@@ -24,6 +24,8 @@ function motionFromEnvironment(
         ? "clear-my-mind"
         : workspaceId === "plan-my-day"
           ? "planning-table"
+          : workspaceId === "visual-focus"
+            ? "focus-studio"
           : workspaceId === "focus-hub" || workspaceId === "focus-category"
             ? "sunroom-over-pond"
             : "default",

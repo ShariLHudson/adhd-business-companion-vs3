@@ -7,7 +7,7 @@ import {
   listSampleReports,
 } from "@/lib/research";
 
-/** Bootstrap for Executive Research Center™ room UI. */
+/** Bootstrap for Executive Research Center room UI. */
 export function getResearchCenterBootstrap(): ResearchCenterBootstrap {
   const reports = listSampleReports();
   return {

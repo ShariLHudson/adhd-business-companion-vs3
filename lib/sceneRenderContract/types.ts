@@ -13,6 +13,7 @@ export const SCENE_WORKSPACE_IDS = [
   "clear-my-mind-thoughts",
   "life-experience-room",
   "plan-my-day",
+  "visual-focus",
   "focus-hub",
   "focus-category",
   "breathe",

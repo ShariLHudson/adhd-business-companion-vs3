@@ -105,7 +105,7 @@ const CURATED_ACTIVITIES: Array<{
 const CURATED_SECTIONS: MomentumBuilderItem[] = [
   sectionItem(
     "section-breathe",
-    "Breathe & Reset",
+    "Breathe",
     "A short breathing reset when your nervous system needs care.",
     "3–5 min",
     "breathing",

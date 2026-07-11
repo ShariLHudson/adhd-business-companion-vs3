@@ -1,5 +1,5 @@
 /**
- * Companion Context Routing™ — separate Estate voice from system/debug channels.
+ * Companion Context Routing — separate Estate voice from system/debug channels.
  *
  * Estate Chat: places, feelings, navigation, Shari presence.
  * System channel: fetch/runtime failures — console + retry only.

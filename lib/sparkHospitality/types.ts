@@ -1,5 +1,5 @@
 /**
- * Spark Hospitality™ (Spec 111).
+ * Spark Hospitality (Spec 111).
  * Emotional operating system — how Spark should make members feel everywhere.
  *
  * Copy/tone gate: docs/RELATIONSHIP_CONSTITUTION.md

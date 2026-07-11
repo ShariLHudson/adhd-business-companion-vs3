@@ -1,5 +1,5 @@
 /**
- * Estate Collections Playbook™
+ * Estate Collections Playbook
  *
  * Canonical reference for where meaningful moments belong in Spark Estate.
  * Philosophy first — technology follows. Used by collection offer intelligence,
@@ -30,7 +30,7 @@ export type EstateCollectionCrossRoomExample = {
 };
 
 export const ESTATE_COLLECTIONS_PLAYBOOK_TITLE =
-  "Estate Collections Playbook™";
+  "Estate Collections Playbook";
 
 export const ESTATE_COLLECTIONS_PLAYBOOK_ROOMS: Record<
   EstateCollectionRoomId,
@@ -428,7 +428,7 @@ export function singleRoomOfferLine(roomId: EstateCollectionRoomId): string {
     return `That sounds like something still growing in your life. Would you like to ${phrase}?`;
   }
   if (roomId === "evidence-vault") {
-    return `This sounds like strong evidence of a problem you solved. Would you like to ${phrase}?`;
+    return `This sounds like a discovery worth preserving in your Evidence Vault. Would you like to preserve it?`;
   }
   if (roomId === "achievement-library") {
     return `That sounds like part of your life's body of work. Would you like to ${phrase}?`;

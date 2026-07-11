@@ -1,5 +1,5 @@
 /**
- * Spec 122 — Insight Generation™
+ * Spec 122 — Insight Generation
  */
 
 import type { InsightRecommendation } from "./types";

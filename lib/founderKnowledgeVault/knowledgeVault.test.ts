@@ -6,7 +6,7 @@ import {
   KNOWLEDGE_VAULT_SECTIONS,
 } from "./index";
 
-describe("Founder Knowledge Vault™", () => {
+describe("Founder Knowledge Vault", () => {
   it("composeKnowledgeVaultView includes expanded archive sections", () => {
     const view = composeKnowledgeVaultView();
     expect(view.sections.length).toBeGreaterThanOrEqual(18);
@@ -18,7 +18,7 @@ describe("Founder Knowledge Vault™", () => {
   it("vault items include authority and related systems", () => {
     const item = ALL_KNOWLEDGE_VAULT_ITEMS.find((i) => i.id === "kv-founder-constitution");
     expect(item).toMatchObject({
-      title: "Founder Experience Constitution™",
+      title: "Founder Experience Constitution",
       purpose: expect.any(String),
       lastUpdated: expect.any(String),
       status: "active",

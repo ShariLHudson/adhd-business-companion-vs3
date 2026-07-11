@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — Spark Tools discovery and integration (Phase 35).
+ * Spark Estate — Spark Tools discovery and integration (Phase 35).
  * Quick-support tools discovered at the moment they are needed.
  *
  * @see docs/protocols/SPARK_ESTATE_SPARK_TOOLS_DISCOVERY_AND_INTEGRATION_SPECIFICATION_PHASE35.md
@@ -101,16 +101,17 @@ export const SPARK_ESTATE_TOOL_CATEGORIES: readonly SparkEstateToolCategory[] = 
   },
 ] as const;
 
-export const SPARK_ESTATE_CLEAR_MY_MIND_ENVIRONMENT = "Sunroom";
+export const SPARK_ESTATE_CLEAR_MY_MIND_ENVIRONMENT =
+  "Treehouse Reflection Desk";
 
 export const SPARK_ESTATE_CLEAR_MY_MIND_EXPERIENCE_NOTE =
-  "The Sunroom is the environment. Clear My Mind is the experience.";
+  "The Treehouse Reflection Desk is the environment. Clear My Mind is the experience.";
 
 export const SPARK_ESTATE_CLEAR_MY_MIND_WELCOME =
-  "Let's get everything out of your head. Nothing needs to be organized yet.";
+  "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.";
 
 export const SPARK_ESTATE_CLEAR_MY_MIND_FLOW = [
-  "Open Sunroom",
+  "Open Treehouse Reflection Desk",
   "Welcome and capture thoughts",
   "Organize into categories, priorities, ideas, tasks, and projects",
   "Choose next actions",
@@ -177,7 +178,7 @@ export const SPARK_ESTATE_SPARK_TOOLS_DISCOVERY_CHANNELS = [
 
 export const SPARK_ESTATE_TOOL_ENVIRONMENT_RULES = [
   "maintain current room atmosphere",
-  "keep Spark Estate™ visual style",
+  "keep Spark Estate visual style",
   "use appropriate background",
   "preserve consistent navigation",
 ] as const;
@@ -231,7 +232,7 @@ export const SPARK_ESTATE_ROOM_TOOL_SUGGESTIONS: readonly {
 }[] = [
   {
     room: "chamber-of-momentum",
-    label: "Chamber of Momentum™",
+    label: "Chamber of Momentum",
     toolIds: ["clear-my-mind", "spin-wheel", "focus-audio"],
   },
   {
@@ -537,7 +538,7 @@ export function assessSparkEstateSparkToolsCompliance(): {
       Object.keys(TOOL_SECTION).length >= 5 && SIDEBAR_TOOLS.length >= 4,
     sunroomEnvironmentReady:
       CLEAR_MY_MIND_SUNROOM_BG.startsWith(ESTATE_ROOM_BG.clearMyMind) &&
-      SPARK_ESTATE_CLEAR_MY_MIND_ENVIRONMENT === "Sunroom",
+      SPARK_ESTATE_CLEAR_MY_MIND_ENVIRONMENT === "Treehouse Reflection Desk",
     routingBridgeReady: routing.routesResolve,
     projectWorkspaceBridgeReady: projects.universalProjectReady,
   };
@@ -614,7 +615,7 @@ export function formatSparkEstateSparkToolsReport(
   });
 
   const lines: string[] = [
-    `Spark Estate™ Spark Tools: ${verification.discoveryReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate Spark Tools: ${verification.discoveryReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_SPARK_TOOLS_PRINCIPLE,
     SPARK_ESTATE_SPARK_TOOLS_VISION,
     "",

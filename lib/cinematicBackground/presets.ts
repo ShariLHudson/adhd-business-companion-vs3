@@ -38,7 +38,7 @@ export const CINEMATIC_PRESETS: Record<CinematicPresetId, CinematicFraming> = {
     gradientStrength: 1,
   },
   "peaceful-places": {
-    scale: 1.05,
+    scale: 1,
     position: "center center",
     gradientStrength: 0.85,
   },
@@ -96,6 +96,16 @@ export const CINEMATIC_PRESETS: Record<CinematicPresetId, CinematicFraming> = {
     scale: 1.05,
     position: "center 45%",
     gradientStrength: 0.85,
+  },
+  "ocean-conservatory": {
+    scale: 1,
+    position: "center center",
+    gradientStrength: 0,
+  },
+  "chamber-of-momentum": {
+    scale: 1,
+    position: "center center",
+    gradientStrength: 0,
   },
   default: CINEMATIC_DEFAULT_FRAMING,
 };

@@ -1,5 +1,5 @@
 /**
- * Load Progressive Discovery Curriculum™ KB documents.
+ * Load Progressive Discovery Curriculum KB documents.
  */
 
 import curriculumJson from "@/docs/estate-knowledge-base/progressive-discovery-curriculum.json";

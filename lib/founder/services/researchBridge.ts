@@ -1,5 +1,5 @@
 /**
- * Founder bridge — Executive Research Center™
+ * Founder bridge — Executive Research Center
  */
 import type { MissionId } from "@/lib/founder/missions/types";
 import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";

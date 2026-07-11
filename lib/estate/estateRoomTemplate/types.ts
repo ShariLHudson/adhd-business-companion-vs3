@@ -1,5 +1,5 @@
 /**
- * Estate Room Template™ — five-layer room arrival contract.
+ * Estate Room Template — five-layer room arrival contract.
  * @see docs/ESTATE_ROOM_TEMPLATE.md
  */
 

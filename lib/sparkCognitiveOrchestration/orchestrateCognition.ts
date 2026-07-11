@@ -1,5 +1,5 @@
 /**
- * Spark Cognitive Orchestration Engine™ — 8-step thinking pipeline.
+ * Spark Cognitive Orchestration Engine — 8-step thinking pipeline.
  */
 
 import { selectDisciplines } from "@/lib/sparkResponseIntelligence/disciplineRouting";

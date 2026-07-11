@@ -1,5 +1,5 @@
 /**
- * Estate Presence™ — room-specific environmental life (slow, subtle, realistic).
+ * Estate Presence — room-specific environmental life (slow, subtle, realistic).
  *
  * **Adapter (Phase B):** Presence profiles extend canonical places — ids must match
  * `canonicalEstateRegistry.ts`. Not a place registry.
@@ -182,7 +182,7 @@ export const ESTATE_PRESENCE_REGISTRY: Record<string, EstatePresenceProfile> = {
       L("dust", { top: "28%", left: "38%", width: "30%", height: "38%" }),
     ],
   },
-  /** Estate Profile™ — gate pillars + manor entrance lanterns on spark-estate-photo plate */
+  /** Estate Profile — gate pillars + manor entrance lanterns on spark-estate-photo plate */
   "my-estate": {
     roomId: "my-estate",
     layers: [
@@ -204,8 +204,11 @@ export function estatePresenceRoomForSection(
   section: string,
 ): string | null {
   const map: Record<string, string> = {
-    "brain-dump": "conservatory",
+    // Clear My Mind lives at Treehouse Reflection Desk (Architecture 154) —
+    // not Butterfly Conservatory.
+    "brain-dump": "clear-my-mind",
     "momentum-institute": "momentum-institute",
+    "chamber-of-momentum": "momentum-institute",
     "growth-library": "library",
     "how-do-i": "library",
     stables: "stables",
@@ -215,7 +218,8 @@ export function estatePresenceRoomForSection(
     "grow-observatory": "observatory",
     "momentum-builder": "momentum-builder",
     "grow-momentum-builders": "momentum-builder",
-    "growth-journal": "journal",
+    "evidence-bank": "evidence-vault",
+  "growth-journal": "journal",
   };
   return map[section] ?? null;
 }

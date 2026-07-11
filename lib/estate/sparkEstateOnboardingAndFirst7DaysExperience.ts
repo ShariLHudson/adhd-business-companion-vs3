@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — onboarding and first 7 days experience (Phase 23).
+ * Spark Estate — onboarding and first 7 days experience (Phase 23).
  * Help new members experience value quickly — confidence, connection, momentum.
  *
  * @see docs/protocols/SPARK_ESTATE_ONBOARDING_AND_FIRST_7_DAYS_EXPERIENCE_SPECIFICATION_PHASE23.md
@@ -57,7 +57,7 @@ export const SPARK_ESTATE_ONBOARDING_STAGES = [
   },
   {
     id: "first-spark-card",
-    title: "First Spark Card™",
+    title: "First Spark Card",
     goal: "Introduce the daily companion.",
     introduces: [
       "Spark Cards are little moments designed to encourage, inspire, or help you notice something useful",
@@ -529,7 +529,7 @@ export function formatSparkEstateOnboardingReport(
   verification: ReturnType<typeof verifySparkEstateOnboardingAndFirst7Days> = verifySparkEstateOnboardingAndFirst7Days(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ onboarding: ${verification.firstWeekReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate onboarding: ${verification.firstWeekReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_ONBOARDING_PRINCIPLE,
     SPARK_ESTATE_ONBOARDING_SUCCESS_VISION,
     "",

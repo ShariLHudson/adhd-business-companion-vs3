@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ — room experience state from conversation (client-safe).
+ * Momentum Builder — room experience state from conversation (client-safe).
  */
 
 import type { MomentumBuilderCelebrationKind } from "./estateIntegration";

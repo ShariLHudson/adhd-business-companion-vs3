@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — analytics and learning system (Phase 22).
+ * Spark Estate — analytics and learning system (Phase 22).
  * Learn from usage to improve member progress — not vanity metrics or surveillance.
  *
  * @see docs/protocols/SPARK_ESTATE_ANALYTICS_AND_LEARNING_SYSTEM_SPECIFICATION_PHASE22.md
@@ -21,7 +21,7 @@ export const SPARK_ESTATE_ANALYTICS_PURPOSE_QUESTION =
   "How can Spark help members better?";
 
 export const SPARK_ESTATE_ANALYTICS_VISION =
-  "Spark Estate™ becomes better because it listens — analytics exist to improve the companion relationship.";
+  "Spark Estate becomes better because it listens — analytics exist to improve the companion relationship.";
 
 export const SPARK_ESTATE_ANALYTICS_CATEGORIES = [
   {
@@ -567,7 +567,7 @@ export function formatSparkEstateAnalyticsAndLearningReport(
   compliance: ReturnType<typeof assessSparkEstateAnalyticsCompliance> = assessSparkEstateAnalyticsCompliance(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ analytics: ${verification.analyticsReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate analytics: ${verification.analyticsReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_ANALYTICS_PRINCIPLE,
     SPARK_ESTATE_ANALYTICS_VISION,
     "",

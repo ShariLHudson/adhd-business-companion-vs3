@@ -1,5 +1,5 @@
 /**
- * Estate Wings™ — organizational structure for recognition records.
+ * Estate Wings — organizational structure for recognition records.
  * @see docs/estate/recognition standards (031)
  */
 

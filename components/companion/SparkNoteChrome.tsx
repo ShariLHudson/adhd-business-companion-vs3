@@ -22,7 +22,7 @@ type Props = {
 type SparkView = "collapsed" | "expanded" | "collection";
 
 /**
- * Portaled Spark Note™ chrome — collapsed card (bottom right) + expanded story.
+ * Portaled Spark Note chrome — collapsed card (bottom right) + expanded story.
  * Fixed to the viewport; separate from Estate navigation and chat routing.
  */
 export function SparkNoteChrome({

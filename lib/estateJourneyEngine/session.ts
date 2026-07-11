@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — session tracking and summaries.
+ * Estate Journey Engine — session tracking and summaries.
  */
 
 import { BEGIN_NEW_DAY_GREETING } from "@/lib/freshStartCopy";

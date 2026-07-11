@@ -9,7 +9,7 @@ export const RECOGNITION_COLD_START: Record<
   { title: string; body: string }
 > = {
   "evidence-vault": {
-    title: "Your Evidence Vault™ is ready.",
+    title: "Your Evidence Vault is ready.",
     body: "When something feels worth remembering, Spark can help you preserve it here.",
   },
   gardens: {
@@ -21,10 +21,10 @@ export const RECOGNITION_COLD_START: Record<
     body: "This room is ready whenever something deserves joyful celebration.",
   },
   "legacy-studio": {
-    title: "Legacy Studio™ is ready.",
+    title: "Legacy Studio is ready.",
     body: "When you want to tell the fuller story, you can shape it here — nothing has to be finished today.",
   },
-  "gallery-of-firsts": {
+  "portfolio": {
     title: "Your Hall is waiting.",
     body: "Your Hall is waiting for the moments that become part of your story. Nothing has to be added today.",
   },

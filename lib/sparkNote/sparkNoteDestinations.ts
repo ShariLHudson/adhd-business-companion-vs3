@@ -9,7 +9,7 @@ export type SparkNoteDestination =
   | "momentum-project";
 
 export const SPARK_NOTE_DESTINATION_ROUTES: Record<SparkNoteDestination, string> = {
-  /** Idea Vault — remember this (Evidence Vault™ until dedicated Idea Vault ships). */
+  /** Idea Vault — remember this (Evidence Vault until dedicated Idea Vault ships). */
   "idea-vault": "/companion?section=evidence-bank",
   journal: "/companion?section=growth-journal",
   /** Chamber doorway — system routes to Learn / Build / Execute. */

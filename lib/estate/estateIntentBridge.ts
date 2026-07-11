@@ -1,5 +1,5 @@
 /**
- * Estate Intent Bridge™ (Phase H.1) — natural language + emotional intent → canonical places.
+ * Estate Intent Bridge (Phase H.1) — natural language + emotional intent → canonical places.
  *
  * Understanding only. Does not navigate, open UI, or call goToPlace.
  * Consumers decide whether to suggest (confidence < 0.7) or route (confidence ≥ 0.7).
@@ -107,7 +107,7 @@ const DESCRIPTIVE_PHRASE_RULES: readonly {
   {
     pattern: /\b(?:plant place|flower room|plant room|green place|growing room)\b/i,
     placeId: "greenhouse",
-    reason: "descriptive → Greenhouse™",
+    reason: "descriptive → Greenhouse",
     confidence: 0.82,
   },
   {
@@ -119,7 +119,7 @@ const DESCRIPTIVE_PHRASE_RULES: readonly {
   {
     pattern: /\b(?:coffee place|espresso|latte spot|cafe)\b/i,
     placeId: "coffee-house",
-    reason: "descriptive → Coffee House™",
+    reason: "descriptive → Coffee House",
     confidence: 0.78,
   },
   {
@@ -131,7 +131,7 @@ const DESCRIPTIVE_PHRASE_RULES: readonly {
   {
     pattern: /\b(?:gallery|show my work|creative archive)\b/i,
     placeId: "portfolio",
-    reason: "descriptive → Portfolio™ (creative archive)",
+    reason: "descriptive → Portfolio (creative archive)",
     confidence: 0.76,
   },
   {
@@ -181,31 +181,31 @@ const DESCRIPTIVE_PHRASE_RULES: readonly {
   {
     pattern: /\b(?:orchard|apple trees)\b/i,
     placeId: "apple-orchard",
-    reason: "descriptive → Apple Orchard™",
+    reason: "descriptive → Apple Orchard",
     confidence: 0.78,
   },
   {
     pattern: /\b(?:institute|classroom)\b/i,
     placeId: "momentum-institute",
-    reason: "descriptive → Momentum Institute™",
+    reason: "descriptive → Momentum Institute",
     confidence: 0.75,
   },
   {
     pattern: /\b(?:study hall)\b/i,
     placeId: "study-hall",
-    reason: "descriptive → Study Hall™",
+    reason: "descriptive → Study Hall",
     confidence: 0.8,
   },
   {
     pattern: /\b(?:momentum room)\b/i,
     placeId: "momentum-room",
-    reason: "descriptive → Momentum Room™",
+    reason: "descriptive → Momentum Room",
     confidence: 0.8,
   },
   {
     pattern: /\b(?:stars|look up|night sky)\b/i,
     placeId: "observatory",
-    reason: "descriptive → Observatory™",
+    reason: "descriptive → Observatory",
     confidence: 0.74,
   },
 ];
@@ -264,7 +264,7 @@ function normalize(text: string): string {
 }
 
 function stripPunctuation(text: string): string {
-  return text.replace(/[™®.,!?]+/g, " ").replace(/\s+/g, " ").trim();
+  return text.replace(/[®.,!?]+/g, " ").replace(/\s+/g, " ").trim();
 }
 
 function hasMoveIntent(text: string): boolean {

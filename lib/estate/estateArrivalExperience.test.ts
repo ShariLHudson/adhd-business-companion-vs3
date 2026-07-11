@@ -8,10 +8,10 @@ import { GREENHOUSE_BIRDS_AMBIENCE_MP3 } from "@/lib/soundscapes/audioAssets";
 import { recordEstateRoomVisit } from "./estateRoomVisitMemory";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
 
-describe("Estate Arrival Experience™", () => {
+describe("Estate Arrival Experience", () => {
   it("resolves conservatory title and motto", () => {
     const config = resolveEstateArrivalExperience("conservatory");
-    expect(config?.title).toBe("The Conservatory™");
+    expect(config?.title).toBe("The Conservatory");
     expect(config?.motto).toContain("breathe, think, and regain clarity");
     expect(config?.shariGreeting).toBeTruthy();
     expect(config?.ambience?.src).toBeTruthy();
@@ -19,8 +19,8 @@ describe("Estate Arrival Experience™", () => {
 
   it("resolves Chamber of Momentum from momentum institute entry", () => {
     const config = resolveEstateArrivalExperience("momentum-institute");
-    expect(config?.title).toBe("Chamber of Momentum™");
-    expect(config?.motto).toContain("figure everything out");
+    expect(config?.title).toBe("Chamber of Momentum");
+    expect(config?.motto).toContain("move forward");
     expect(config?.shariGreeting).toBe(
       "What would help you move forward today?",
     );
@@ -40,7 +40,7 @@ describe("Estate Arrival Experience™", () => {
   });
 });
 
-describe("Estate Room Visit Memory™", () => {
+describe("Estate Room Visit Memory", () => {
   it("increments visit counts per room", () => {
     recordEstateRoomVisit("conservatory");
     recordEstateRoomVisit("conservatory");

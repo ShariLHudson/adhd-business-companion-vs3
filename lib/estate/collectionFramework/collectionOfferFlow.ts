@@ -62,6 +62,9 @@ function roomIdFromUserText(text: string): EstateCollectionRoomId | null {
 
 function openAck(roomId: EstateCollectionRoomId): string {
   const room = getEstateCollectionRoom(roomId);
+  if (roomId === "evidence-vault") {
+    return "Would you like to add anything else before we preserve it?";
+  }
   return `I'll open ${room.roomName} with a draft ready — you can edit before saving.`;
 }
 
@@ -117,7 +120,7 @@ export function resolveCollectionOfferReply(
     return {
       handled: true,
       kind: "decline",
-      ack: "No problem — we can stay right here.",
+      ack: "No problem. We can preserve it later if you change your mind.",
       nextPending: null,
     };
   }

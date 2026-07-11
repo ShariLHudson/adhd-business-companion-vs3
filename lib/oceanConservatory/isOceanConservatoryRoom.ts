@@ -1,4 +1,4 @@
-/** Canonical place id for Ocean Conservatory™ */
+/** Canonical place id for Ocean Conservatory */
 export const OCEAN_CONSERVATORY_PLACE_ID = "conservatory" as const;
 
 export const OCEAN_CONSERVATORY_BACKGROUND_FRAGMENT =

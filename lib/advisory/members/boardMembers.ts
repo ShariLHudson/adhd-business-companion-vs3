@@ -30,7 +30,7 @@ export const ADVISORY_BOARD_MEMBERS: AdvisoryMember[] = [
     role: "Long-Range Vision",
     expertise: ["Ten-year estate", "Category creation", "Transformation narrative"],
     decisionStyle: "Imagines futures first; grounds in member dignity.",
-    primaryConcerns: ["Spark Feeling™", "Belonging", "Timeless beauty"],
+    primaryConcerns: ["Spark Feeling", "Belonging", "Timeless beauty"],
     strengths: ["Naming what members will feel before we build it"],
     typicalQuestions: ["Will someone want to stay here in five years?"],
     sampleRecommendations: ["Beauty before information — always."],

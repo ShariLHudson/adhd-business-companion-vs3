@@ -3,6 +3,7 @@ import { CompanionLanguageProvider } from "@/components/companion/CompanionLangu
 import { CompanionPhotoProvider } from "@/lib/companionPhotoProvider";
 import { LiveEcosystemInit } from "@/components/companion/LiveEcosystemInit";
 import { RoomBackgroundWarmup } from "@/components/companion/RoomBackgroundWarmup";
+import { EstateSceneTransitionHost } from "@/components/companion/estate/EstateSceneTransitionHost";
 import { HomesteadSceneProvider } from "@/lib/homesteadScene";
 import { resolveCompanionSupabaseEnv } from "@/lib/supabase/resolveCompanionSupabaseEnv";
 import { isBrowserSafeSupabaseKey } from "@/lib/supabase/supabaseKeyRoles";
@@ -33,6 +34,8 @@ import "./stables-room.css";
 import "./cartographers-studio.css";
 import "./estate-immersive.css";
 import "./estate-room-fullbleed.css";
+import "./estate-scene-transition.css";
+import "./estate-arrival.css";
 import "./ocean-conservatory-aquarium.css";
 import "./estate-room-frosted-chat.css";
 import "./estate-audio-settings.css";
@@ -41,6 +44,7 @@ import "./estate-room-template.css";
 import "./estate-room-experience-menu.css";
 import "./estate-top-right-chrome.css";
 import "./just-be-here.css";
+import "./breathe-destination.css";
 import "./estate-presence.css";
 import "./global-estate-menu.css";
 import "./spark-estate-guide.css";
@@ -82,6 +86,7 @@ export default function CompanionLayout({
           <CompanionPhotoProvider>
             <LiveEcosystemInit />
             <RoomBackgroundWarmup />
+            <EstateSceneTransitionHost />
             {children}
           </CompanionPhotoProvider>
         </CompanionLanguageProvider>

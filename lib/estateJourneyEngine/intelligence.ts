@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — intelligence hints for natural room recommendations.
+ * Estate Journey Engine — intelligence hints for natural room recommendations.
  */
 
 import { getJourneyEngineState } from "./journeyStore";
@@ -10,17 +10,17 @@ const TOPIC_ROOM_SUGGESTIONS: Record<
   { roomName: string; entryId: string; minWeeks: number }
 > = {
   marketing: {
-    roomName: "Creative Studio™",
+    roomName: "Creative Studio",
     entryId: "creative-studio",
     minWeeks: 3,
   },
   sales: {
-    roomName: "Sales Workshop™",
+    roomName: "Sales Workshop",
     entryId: "sales-workshop",
     minWeeks: 2,
   },
   leadership: {
-    roomName: "Conservatory™",
+    roomName: "Conservatory",
     entryId: "conservatory",
     minWeeks: 2,
   },

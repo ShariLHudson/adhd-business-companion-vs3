@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
+import { useChatBackdropRevision } from "@/lib/chatBackdrop";
 import { CHAMBER_OF_MOMENTUM_ROOM_BG } from "@/lib/estate/chamber/chamberOfMomentumRoomRegistry";
+import { resolveEstateRoomBackgroundImage } from "@/lib/estate/estateRoomBackground";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import type { ReactNode } from "react";
@@ -11,11 +13,21 @@ type Props = {
   children: ReactNode;
 };
 
-/** Chamber of Momentum™ — guided doorway (not a dashboard). */
+/** Chamber of Momentum — guided doorway (not a dashboard). */
 export function ChamberOfMomentumRoomShell({ children }: Props) {
+  const backdropRevision = useChatBackdropRevision();
+  const imageUrl = useMemo(() => {
+    void backdropRevision;
+    return (
+      resolveEstateRoomBackgroundImage("chamber-of-momentum") ??
+      resolveEstateRoomBackgroundImage("momentum-institute") ??
+      CHAMBER_OF_MOMENTUM_ROOM_BG
+    );
+  }, [backdropRevision]);
+
   useEffect(() => {
-    preloadRoomBackground(CHAMBER_OF_MOMENTUM_ROOM_BG);
-  }, []);
+    preloadRoomBackground(imageUrl);
+  }, [imageUrl]);
 
   return (
     <div
@@ -24,13 +36,11 @@ export function ChamberOfMomentumRoomShell({ children }: Props) {
       data-homestead-room="chamber-of-momentum"
     >
       <CinematicBackground
-        preset="growth"
+        preset="chamber-of-momentum"
         mode="image"
-        scale={1}
-        position="center center"
-        imageUrl={CHAMBER_OF_MOMENTUM_ROOM_BG}
-        imageStyle={roomBackgroundImageStyle(CHAMBER_OF_MOMENTUM_ROOM_BG)}
-        placement="absolute"
+        imageUrl={imageUrl}
+        imageStyle={roomBackgroundImageStyle(imageUrl)}
+        placement="fixed"
         className="chamber-room__cinematic"
         showBottomFade={false}
         gradientStrength={0}

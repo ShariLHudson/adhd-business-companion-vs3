@@ -42,5 +42,5 @@ export const GALLERY_ENTRANCE_FRAMES: readonly GalleryEntranceFrame[] = [
   },
 ] as const;
 
-/** Future estate name — warmer than "Evidence Bank". */
-export const GALLERY_EVIDENCE_ROOM_LABEL = "Evidence Bank" as const;
+/** Estate room label for evidence proof. */
+export const GALLERY_EVIDENCE_ROOM_LABEL = "Evidence Vault" as const;

@@ -36,7 +36,7 @@ describe("Estate Coaching Architecture", () => {
     expect(formatted).toMatch(/figure out what would help/i);
     expect(formatted).toMatch(/Get everything out of your head first/);
     expect(formatted).toMatch(/two-minute breathing reset/);
-    expect(formatted).not.toMatch(/Clear My Mind™/);
+    expect(formatted).not.toMatch(/Clear My Mind/);
     expect(formatted).not.toMatch(/Focus Room/);
   });
 

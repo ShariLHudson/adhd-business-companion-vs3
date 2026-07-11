@@ -14,20 +14,16 @@ import {
 import {
   CLEAR_MY_MIND_CAPTURE_BUTTON,
   CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM,
-  CLEAR_MY_MIND_CONTINUE_PROMPT,
+  CLEAR_MY_MIND_REVIEW_THOUGHTS_LABEL,
   CLEAR_MY_MIND_SHARE_ACK_DELAY_MS,
-  CLEAR_MY_MIND_SHARE_CONFIRM_MS,
   CLEAR_MY_MIND_SPLIT_KEEP,
 } from "@/lib/clearMyMindCopy";
 import {
-  shariImmediateHoldResponse,
-  shariPostShareAcknowledgment,
-} from "@/lib/clearMyMindCompanionVoice";
+  noteClearMyMindCapture,
+  setClearMyMindModePhase,
+} from "@/lib/clearMyMind/clearMyMindMode";
 import { recordClearMyMindSubmission } from "@/lib/clearMyMindIntelligence";
-import {
-  getReliefCompanionHints,
-  recordReliefSignal,
-} from "@/lib/reliefIntelligence";
+import { recordReliefSignal } from "@/lib/reliefIntelligence";
 import {
   initialClearMyMindStage,
   stageOnCaptureBegin,
@@ -35,48 +31,66 @@ import {
   type ClearMyMindStage,
 } from "@/lib/clearMyMindStages";
 import { isVisibleInMentalLandscape } from "@/lib/thoughtLifecycle";
-import { getThinkingSpaceThoughts } from "@/lib/thinkingSpace";
 import {
   collectionLabelFromAiCategory,
   setThoughtCollectionSuggestion,
   SUGGESTED_COLLECTION_AI_CONFIDENCE,
 } from "@/lib/thinkingSpace/thoughtCollectionAuthority";
+import { pauseClearMyMindSession } from "@/lib/clearMyMindSessionStore";
 import { ClearMyMindCaptureCard } from "@/components/companion/ClearMyMindCaptureCard";
-import { ClearMyMindCaptureInvite } from "@/components/companion/ClearMyMindCaptureInvite";
+import {
+  ClearMyMindCaptureChoice,
+  type ClearMyMindChoiceAction,
+} from "@/components/companion/ClearMyMindCaptureChoice";
 import { ThoughtSeparateOffer } from "@/components/companion/ThoughtSeparateOffer";
 import {
   detectThoughtSplitProposal,
   type ThoughtSplitProposal,
 } from "@/lib/clearMyMindThoughtSplitter";
 
+type CaptureSurface = "writing" | "choice";
+
+export type ClearMyMindSessionAction =
+  | "organize"
+  | "visualize"
+  | "filter"
+  | "prioritize"
+  | "convert"
+  | "save"
+  | "continue-later"
+  | "exit"
+  | "my-thoughts";
+
 type Props = {
   sessionId?: string;
+  initialSurface?: CaptureSurface;
   onSessionEntriesChange?: (entries: BrainDumpEntry[]) => void;
   onPresenceStateChange?: (state: {
     shareConfirming: boolean;
     holdAck: string | null;
     stage: ClearMyMindStage;
     lastShareItemCount: number;
+    surface: CaptureSurface;
   }) => void;
-  onOpenMyThoughts?: () => void;
-  onTotalThoughtCountChange?: (count: number) => void;
+  onAction?: (action: ClearMyMindSessionAction) => void;
 };
 
 /**
- * Clear My Mind — unload first. Organization follows with permission.
+ * Clear My Mind capture + post-Continue choices.
+ * Continue → stay in workspace. Never auto-organize.
  */
 export function ClearMyMindSession({
   sessionId: sessionIdProp,
+  initialSurface = "writing",
   onSessionEntriesChange,
   onPresenceStateChange,
-  onOpenMyThoughts,
-  onTotalThoughtCountChange,
+  onAction,
 }: Props) {
   const [sessionId] = useState(() => sessionIdProp ?? newCaptureSessionId());
   const [stage, setStage] = useState<ClearMyMindStage>(initialClearMyMindStage);
+  const [surface, setSurface] = useState<CaptureSurface>(initialSurface);
   const [input, setInput] = useState("");
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
-  const [splitNotice, setSplitNotice] = useState<string | null>(null);
   const [pendingSplit, setPendingSplit] = useState<ThoughtSplitProposal | null>(
     null,
   );
@@ -86,6 +100,8 @@ export function ClearMyMindSession({
   const [submissionCount, setSubmissionCount] = useState(0);
   const [lastShareItemCount, setLastShareItemCount] = useState(0);
   const [shareConfirming, setShareConfirming] = useState(false);
+  const [rawThoughts, setRawThoughts] = useState<string[]>([]);
+  const [saveAck, setSaveAck] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const refresh = useCallback(() => {
@@ -109,27 +125,37 @@ export function ClearMyMindSession({
     [entries],
   );
 
-  const totalThoughtCount = useMemo(() => getThinkingSpaceThoughts().length, [
-    sessionItems,
-    submissionCount,
-  ]);
-
   useEffect(() => {
     onPresenceStateChange?.({
       shareConfirming,
       holdAck,
       stage,
       lastShareItemCount,
+      surface,
     });
-  }, [shareConfirming, holdAck, stage, lastShareItemCount, onPresenceStateChange]);
+  }, [
+    shareConfirming,
+    holdAck,
+    stage,
+    lastShareItemCount,
+    surface,
+    onPresenceStateChange,
+  ]);
 
   useEffect(() => {
     onSessionEntriesChange?.(sessionItems);
   }, [sessionItems, onSessionEntriesChange]);
 
   useEffect(() => {
-    onTotalThoughtCountChange?.(totalThoughtCount);
-  }, [totalThoughtCount, onTotalThoughtCountChange]);
+    pauseClearMyMindSession({
+      sessionId,
+      phase: surface === "choice" ? "choice" : "capture",
+      rawCaptureTexts:
+        rawThoughts.length > 0
+          ? rawThoughts
+          : sessionItems.map((e) => e.text),
+    });
+  }, [sessionId, surface, rawThoughts, sessionItems]);
 
   useEffect(() => {
     return () => {
@@ -194,6 +220,7 @@ export function ClearMyMindSession({
 
     setShareConfirming(true);
     setHoldAck(null);
+    setSaveAck(null);
     setLastShareItemCount(parts.length);
 
     const all = addBrainDumps(parts, { captureSessionId: sessionId });
@@ -202,13 +229,14 @@ export function ClearMyMindSession({
       (e) => e.captureSessionId === sessionId && isVisibleInMentalLandscape(e),
     );
 
-    setSplitNotice(null);
     setEntries(sessionSaved);
+    setRawThoughts(sessionSaved.map((e) => e.text));
     setInput("");
     setPendingSplit(null);
     setStage(stageOnReleaseComplete(stageOnCaptureBegin(stage)));
 
     const nextSubmission = submissionCount + 1;
+    noteClearMyMindCapture(parts.length);
     if (nextSubmission > 1) {
       recordReliefSignal({ kind: "continued-capture", sessionId });
     }
@@ -221,24 +249,13 @@ export function ClearMyMindSession({
       sessionId,
     });
 
-    const ack =
-      parts.join(" ").length >= 80 || parts.length > 2
-        ? shariPostShareAcknowledgment(rawDump)
-        : shariImmediateHoldResponse({
-            parts,
-            submissionIndex: nextSubmission,
-            hints: getReliefCompanionHints(),
-          });
-
     window.setTimeout(() => {
-      setHoldAck(ack);
+      setHoldAck(null);
       setStage("understanding");
-    }, CLEAR_MY_MIND_SHARE_ACK_DELAY_MS);
-
-    window.setTimeout(() => {
       setShareConfirming(false);
-      focusCaptureInput();
-    }, CLEAR_MY_MIND_SHARE_CONFIRM_MS);
+      setSurface("choice");
+      setClearMyMindModePhase("capture");
+    }, CLEAR_MY_MIND_SHARE_ACK_DELAY_MS);
 
     setSubmissionCount((n) => n + 1);
 
@@ -249,6 +266,12 @@ export function ClearMyMindSession({
       entries: createdItems,
       usedVoice,
       usedTyping,
+    });
+
+    pauseClearMyMindSession({
+      sessionId,
+      phase: "choice",
+      rawCaptureTexts: sessionSaved.map((e) => e.text),
     });
 
     createdItems.forEach((item, index) => {
@@ -274,7 +297,7 @@ export function ClearMyMindSession({
     );
   }
 
-  function addThoughts() {
+  function handleContinue() {
     const raw = input.trim();
     const parts = splitCaptureInput(raw);
     if (!parts.length) return;
@@ -288,6 +311,36 @@ export function ClearMyMindSession({
     }
 
     saveThoughtParts(parts, raw);
+  }
+
+  function handleReviewThoughts() {
+    if (shareConfirming || pendingSplit) return;
+    const raw = input.trim();
+    if (raw) {
+      const parts = splitCaptureInput(raw);
+      if (parts.length === 1) {
+        const proposal = detectThoughtSplitProposal(parts[0]!);
+        if (proposal) {
+          setPendingSplit(proposal);
+          return;
+        }
+      }
+      if (parts.length) {
+        saveThoughtParts(parts, raw);
+        return;
+      }
+    }
+    if (sessionItems.length === 0 && rawThoughts.length === 0) return;
+    setSurface("choice");
+    setClearMyMindModePhase("capture");
+    pauseClearMyMindSession({
+      sessionId,
+      phase: "choice",
+      rawCaptureTexts:
+        rawThoughts.length > 0
+          ? rawThoughts
+          : sessionItems.map((e) => e.text),
+    });
   }
 
   function confirmSplit() {
@@ -304,15 +357,70 @@ export function ClearMyMindSession({
     setStage(stageOnCaptureBegin(stage));
   }
 
-  const shareDisabled =
+  function handleChoice(action: ClearMyMindChoiceAction) {
+    if (action === "add-more") {
+      setSurface("writing");
+      setSaveAck(null);
+      setClearMyMindModePhase("capture");
+      focusCaptureInput();
+      return;
+    }
+    if (action === "save") {
+      onAction?.("save");
+      return;
+    }
+
+    const phaseMap: Partial<
+      Record<ClearMyMindChoiceAction, Parameters<typeof setClearMyMindModePhase>[0]>
+    > = {
+      organize: "organize",
+      visualize: "visual",
+      filter: "action",
+      prioritize: "action",
+      convert: "action",
+      create: "action",
+      "continue-later": "follow-up",
+      exit: "session-end",
+    };
+    if (action === "my-thoughts") {
+      onAction?.("my-thoughts");
+      return;
+    }
+    const phase = phaseMap[action];
+    if (phase) setClearMyMindModePhase(phase);
+    onAction?.(action === "create" ? "convert" : action);
+  }
+
+  const continueDisabled =
     shareConfirming || !input.trim() || pendingSplit !== null;
+  const hasReviewableThoughts =
+    sessionItems.length > 0 || rawThoughts.length > 0;
+  const reviewDisabled =
+    shareConfirming ||
+    pendingSplit !== null ||
+    (!input.trim() && !hasReviewableThoughts);
+
+  if (surface === "choice") {
+    return (
+      <ClearMyMindCaptureChoice
+        thoughtCount={sessionItems.length || rawThoughts.length}
+        rawThoughts={
+          rawThoughts.length > 0
+            ? rawThoughts
+            : sessionItems.map((e) => e.text)
+        }
+        entries={sessionItems}
+        saveAck={saveAck}
+        onAction={handleChoice}
+      />
+    );
+  }
 
   return (
-    <div className="clear-my-mind-session flex flex-col gap-5" data-cmind-mode="capture">
-      {submissionCount > 0 && !shareConfirming ? (
-        <p className="clear-my-mind-session__continue">{CLEAR_MY_MIND_CONTINUE_PROMPT}</p>
-      ) : null}
-
+    <div
+      className="clear-my-mind-session clear-my-mind-session--capture-workspace flex flex-col gap-4"
+      data-cmind-mode="capture"
+    >
       <ClearMyMindCaptureCard
         value={input}
         onChange={(value) => {
@@ -326,13 +434,14 @@ export function ClearMyMindSession({
         onVoiceUsed={() => setUsedVoice(true)}
         inputRef={inputRef}
         shareConfirming={shareConfirming}
+        expansive
       />
 
       <div className="clear-my-mind-save-row">
         <button
           type="button"
-          disabled={shareDisabled}
-          onClick={addThoughts}
+          disabled={continueDisabled}
+          onClick={handleContinue}
           aria-live="polite"
           data-testid="share-capture-button"
           data-share-confirming={shareConfirming ? "true" : "false"}
@@ -344,11 +453,16 @@ export function ClearMyMindSession({
             ? CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM
             : CLEAR_MY_MIND_CAPTURE_BUTTON}
         </button>
+        <button
+          type="button"
+          disabled={reviewDisabled}
+          onClick={handleReviewThoughts}
+          data-testid="review-thoughts-button"
+          className="clear-my-mind-review-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c4a882]/35 focus-visible:ring-offset-2 disabled:cursor-not-allowed"
+        >
+          {CLEAR_MY_MIND_REVIEW_THOUGHTS_LABEL}
+        </button>
       </div>
-
-      {splitNotice ? (
-        <p className="text-sm text-[#6b635a]">{splitNotice}</p>
-      ) : null}
 
       {pendingSplit ? (
         <ThoughtSeparateOffer
@@ -357,15 +471,6 @@ export function ClearMyMindSession({
           onDecline={leaveAsIs}
           declineLabel={CLEAR_MY_MIND_SPLIT_KEEP}
           testId="thought-split-offer"
-        />
-      ) : null}
-
-      {onOpenMyThoughts ? (
-        <ClearMyMindCaptureInvite
-          totalThoughtCount={totalThoughtCount}
-          sessionShareCount={submissionCount}
-          sessionId={sessionId}
-          onOpenMyThoughts={onOpenMyThoughts}
         />
       ) : null}
     </div>

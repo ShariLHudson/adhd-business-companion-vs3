@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — read/write helpers on Estate Memory.
+ * Estate Journey Engine — read/write helpers on Estate Memory.
  */
 
 import type { EstateMemory } from "@/lib/estateMemory/types";

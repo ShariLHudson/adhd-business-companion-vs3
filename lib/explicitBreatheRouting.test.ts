@@ -19,9 +19,18 @@ describe("explicitBreatheRouting", () => {
     expect(detectStandaloneToolRequest(text)?.tool).toBe("breathe");
   });
 
-  it("still blocks generic calm down without breath intent", () => {
-    expect(shouldBlockStressAutoToolRouting("I need to calm down")).toBe(true);
-    expect(detectStandaloneToolRequest("I need to calm down")).toBeNull();
+  it("opens Breathe for calm-me-down aliases (Universal Access)", () => {
+    expect(shouldBlockStressAutoToolRouting("I need to calm down")).toBe(false);
+    expect(detectStandaloneToolRequest("I need to calm down")?.tool).toBe("breathe");
+    expect(detectStandaloneToolRequest("Calm me down")?.tool).toBe("breathe");
+  });
+
+  it("recognizes Estate navigation and reset phrases", () => {
+    expect(isExplicitBreatheRequest("Take me to Breathe")).toBe(true);
+    expect(isExplicitBreatheRequest("Open Breathe")).toBe(true);
+    expect(isExplicitBreatheRequest("I need to breathe")).toBe(true);
+    expect(isExplicitBreatheRequest("Help me calm down")).toBe(true);
+    expect(isExplicitBreatheRequest("I need a reset")).toBe(true);
   });
 
   it("maps let's do breathing after stress offer", () => {

@@ -1,5 +1,5 @@
 /**
- * Bridge — Estate Navigation Intelligence™ ↔ resolveEstatePlace.
+ * Bridge — Estate Navigation Intelligence ↔ resolveEstatePlace.
  */
 
 import type {
@@ -43,7 +43,7 @@ export function navigationDecisionToPlaceResolution(
       placeId: decision.placeId,
       place: place ?? undefined,
       confidence: "high",
-      reason: `Estate Navigation Intelligence™ → ${decision.intentKind}`,
+      reason: `Estate Navigation Intelligence → ${decision.intentKind}`,
       matchedAlias: decision.matchedPhrase,
     };
   }
@@ -60,7 +60,7 @@ export function navigationDecisionToPlaceResolution(
         .map((id) => getCanonicalEstatePlaceById(id))
         .filter((place): place is NonNullable<typeof place> => place != null),
       confidence: "medium",
-      reason: `Estate Navigation Intelligence™ → ${decision.intentKind}`,
+      reason: `Estate Navigation Intelligence → ${decision.intentKind}`,
       matchedAlias: decision.matchedPhrase,
     };
   }

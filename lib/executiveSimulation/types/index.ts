@@ -1,4 +1,4 @@
-/** Executive Simulation Studio™ — scenario planning types. */
+/** Executive Simulation Studio — scenario planning types. */
 
 export type SimulationConfidence = "high" | "medium" | "low" | "exploratory";
 

@@ -1,5 +1,5 @@
 /**
- * Wisdom Layer Validation Gate™ — active test set and pass criteria.
+ * Wisdom Layer Validation Gate — active test set and pass criteria.
  *
  * @see docs/WISDOM_LAYER_VALIDATION_GATE.md
  */

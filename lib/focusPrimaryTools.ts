@@ -8,7 +8,7 @@ export type FocusPrimaryTool = {
   action: FocusHubAction;
 };
 
-/** Focus™ primary tools — purpose obvious within five seconds. */
+/** Focus primary tools — purpose obvious within five seconds. */
 export const FOCUS_PRIMARY_TOOLS: FocusPrimaryTool[] = [
   {
     id: "clear-my-mind",

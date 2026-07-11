@@ -1,5 +1,5 @@
 /**
- * Capture System™ — write-only storage for Journal, Portfolio, Evidence Vault.
+ * Capture System — write-only storage for Journal, Portfolio, Evidence Vault.
  * Not conversation. Not navigation. Not sound.
  */
 

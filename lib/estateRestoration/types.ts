@@ -1,5 +1,5 @@
 /**
- * Intentional Restoration™ — Estate Guide as restorative experience.
+ * Intentional Restoration — Estate Guide as restorative experience.
  * @see docs/estate/ESTATE_RESTORATION_GUIDE.md
  */
 

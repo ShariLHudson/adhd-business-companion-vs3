@@ -3,7 +3,12 @@
 ═══════════════════════════════════════════════════════════ */
 
 .companion-estate-immersive-root {
-  background: #0e1210 !important;
+  background: linear-gradient(
+    180deg,
+    #2a2420 0%,
+    #1a1612 48%,
+    #12100e 100%
+  ) !important;
 }
 
 /* Direct room overlay — photograph owns every pixel; no letterbox frame */

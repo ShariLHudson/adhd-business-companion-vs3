@@ -3,7 +3,7 @@
 import { momentumPathStoneCount } from "@/lib/momentumBuilderRoom/momentumPathHooks";
 
 /**
- * Momentum Path™ — V2 stone garden placeholder (architecture only).
+ * Momentum Path — V2 stone garden placeholder (architecture only).
  */
 export function MomentumBuilderPathPlaceholder() {
   const stones = momentumPathStoneCount();
@@ -14,7 +14,7 @@ export function MomentumBuilderPathPlaceholder() {
       data-testid="momentum-path-placeholder"
       aria-hidden
     >
-      <p className="momentum-builder-room__momentum-path-label">Momentum Path™</p>
+      <p className="momentum-builder-room__momentum-path-label">Momentum Path</p>
       <div className="momentum-builder-room__momentum-path-stones">
         {Array.from({ length: Math.max(3, stones + 2) }).map((_, i) => (
           <span

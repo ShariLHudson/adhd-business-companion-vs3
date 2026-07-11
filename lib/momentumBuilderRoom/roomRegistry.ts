@@ -1,12 +1,12 @@
 /**
- * Momentum Builder™ — estate room registration (V1 shell).
+ * Momentum Builder — estate room registration (V1 shell).
  * @see docs/MOMENTUM_BUILDER_ROOM_ARCHITECTURE.md
  */
 
 import type { AppSection } from "@/lib/companionUi";
 import { STUDY_ROOM_BG } from "@/lib/companionHomestead/homesteadRoomRegistry";
 
-/** Canonical app section for the public Momentum Builder™ room. */
+/** Canonical app section for the public Momentum Builder room. */
 export const MOMENTUM_BUILDER_SECTION = "momentum-builder" as const satisfies AppSection;
 
 export type MomentumBuilderSection = typeof MOMENTUM_BUILDER_SECTION;
@@ -28,7 +28,7 @@ export const MOMENTUM_BUILDER_ROOM_META = {
   objectId: MOMENTUM_BUILDER_OBJECT_ID,
   homesteadRoomId: MOMENTUM_BUILDER_HOMESTEAD_ROOM_ID,
   title: "Momentum Builder",
-  trademark: "Momentum Builder™",
+  trademark: "Momentum Builder",
   purpose: "Coaching conversation — help the member move forward today.",
   entryPrompt: "What's making today difficult?",
   successMeasure:

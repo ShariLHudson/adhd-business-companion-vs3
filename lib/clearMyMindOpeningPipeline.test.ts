@@ -29,7 +29,7 @@ describe("clearMyMindOpeningPipeline", () => {
     expect(room.hasComposition).toBe(true);
   });
 
-  it("runs Scene Render Contract for clear-my-mind conservatory", () => {
+  it("runs Scene Render Contract for clear-my-mind sunroom", () => {
     const copy = resolveSceneCopy("clear-my-mind");
     expect(copy.title).toBe("Clear My Mind");
     expect(copy.title).not.toMatch(/^Today is /);

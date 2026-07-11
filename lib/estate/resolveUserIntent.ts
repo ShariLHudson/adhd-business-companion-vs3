@@ -1,5 +1,5 @@
 /**
- * resolveUserIntent™ — delegates to Estate Decision Kernel (legacy adapter).
+ * resolveUserIntent — delegates to Estate Decision Kernel (legacy adapter).
  * @deprecated Prefer resolveEstateAction from decisionKernel directly.
  */
 

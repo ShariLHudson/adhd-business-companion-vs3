@@ -13,12 +13,12 @@ import { resolveCanonicalPlaceBackground, resolveCanonicalPlaceVideo } from "@/l
 import { resolveEstateRoutingDecision } from "@/lib/estate/estateRoutingRegistry";
 
 describe("estatePlaceMasterManifest — protocol regression", () => {
-  it("take me to butterflies → Butterfly House™", () => {
+  it("take me to butterflies → Butterfly House", () => {
     const result = resolveManifestNavigation("take me to butterflies");
     expect(result.kind).toBe("navigate");
     if (result.kind === "navigate") {
       expect(result.legacyPlaceId).toBe("butterfly-house");
-      expect(result.place.official_name).toBe("Butterfly House™");
+      expect(result.place.official_name).toBe("Butterfly House");
     }
     expect(resolveEstatePlaceIdFromUserText("take me to butterflies")).toBe(
       "butterfly-house",
@@ -33,16 +33,16 @@ describe("estatePlaceMasterManifest — protocol regression", () => {
     );
   });
 
-  it("take me to aquarium → Aquarium Room™", () => {
+  it("take me to aquarium → Aquarium Room", () => {
     const result = resolveManifestNavigation("take me to aquarium");
     expect(result.kind).toBe("navigate");
     if (result.kind === "navigate") {
       expect(result.legacyPlaceId).toBe("conservatory");
-      expect(result.place.official_name).toBe("Aquarium Room™");
+      expect(result.place.official_name).toBe("Aquarium Room");
     }
   });
 
-  it("take me to the fish → Aquarium Room™", () => {
+  it("take me to the fish → Aquarium Room", () => {
     const result = resolveManifestNavigation("take me to the fish");
     expect(result.kind).toBe("navigate");
     if (result.kind === "navigate") {
@@ -50,12 +50,12 @@ describe("estatePlaceMasterManifest — protocol regression", () => {
     }
   });
 
-  it("take me to personal library → Personal Library™ (not Estate Library)", () => {
+  it("take me to personal library → Personal Library (not Estate Library)", () => {
     const result = resolveManifestNavigation("take me to personal library");
     expect(result.kind).toBe("navigate");
     if (result.kind === "navigate") {
       expect(result.legacyPlaceId).toBe("personal-library");
-      expect(result.place.official_name).toBe("Personal Library™");
+      expect(result.place.official_name).toBe("Personal Library");
     }
     expect(resolveEstatePlaceIdFromUserText("personal library")).toBe(
       "personal-library",

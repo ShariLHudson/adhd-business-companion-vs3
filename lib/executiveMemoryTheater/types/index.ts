@@ -1,4 +1,4 @@
-/** Executive Memory Theater™ — living history into executive wisdom. */
+/** Executive Memory Theater — living history into executive wisdom. */
 
 export type MemoryReplayKind =
   | "product"

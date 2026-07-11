@@ -15,7 +15,7 @@ export type InstituteCabinetSaveState = {
 };
 
 /**
- * My Institute Cabinet™ — save hook (Phase 1 placeholder wiring).
+ * My Institute Cabinet — save hook (Phase 1 placeholder wiring).
  */
 export function useInstituteCabinetSave(knowledgeCardId: string | null) {
   const [state, setState] = useState<InstituteCabinetSaveState>({

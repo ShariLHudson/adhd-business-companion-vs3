@@ -1,5 +1,5 @@
 /**
- * Momentum Profile™ — quiet bridge to existing momentum intelligence.
+ * Momentum Profile — quiet bridge to existing momentum intelligence.
  * Learns work style, energy, obstacles over time — largely invisible to members.
  *
  * @see docs/MOMENTUM_BUILDER_V1_ORCHESTRATION.md

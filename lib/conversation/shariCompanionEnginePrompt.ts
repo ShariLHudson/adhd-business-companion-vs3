@@ -1,5 +1,5 @@
 /**
- * Shari Companion Engine™ — static prompt constants (no runtime imports).
+ * Shari Companion Engine — static prompt constants (no runtime imports).
  *
  * Kept separate from shariCompanionEngine.ts to avoid circular imports with
  * sparkCompanion / frictionlessActionLayer.

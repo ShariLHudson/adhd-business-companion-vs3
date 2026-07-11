@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence™ — drawer resolution from member language (Phase 1).
+ * Estate Intelligence — drawer resolution from member language (Phase 1).
  * Future: Shari opens the right drawer without the member hunting the wall.
  */
 

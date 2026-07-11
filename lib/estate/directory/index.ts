@@ -1,5 +1,5 @@
 /**
- * Spark Estate Directory™ — master location registry.
+ * Spark Estate Directory — master location registry.
  *
  * Every background, room, and space: category, image, shell, recommendations,
  * and connections — built from canonical places, not hard-coded per screen.

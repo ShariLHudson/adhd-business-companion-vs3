@@ -1,5 +1,5 @@
 /**
- * Founder Journey Framework™ — entrepreneurial journey stages (member experience).
+ * Founder Journey Framework — entrepreneurial journey stages (member experience).
  * Not rigid labels; members may loop. Infer quietly — never force UI selection.
  *
  * @see docs/FOUNDER_JOURNEY_FRAMEWORK.md

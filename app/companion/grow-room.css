@@ -1,4 +1,4 @@
-/* Grow™ — entrepreneurial capability rooms */
+/* Grow — entrepreneurial capability rooms */
 
 .grow-room {
   position: relative;
@@ -144,7 +144,7 @@
   max-width: 32rem;
 }
 
-/* Growth Profile™ — greenhouse full-bleed */
+/* Growth Profile — greenhouse full-bleed */
 .growth-profile-estate-place .growth-estate-choice__photo {
   height: clamp(6.5rem, 16vh, 8.5rem);
 }
@@ -202,7 +202,7 @@
   z-index: 2;
 }
 
-/* Portfolio™ — portfolio room full-bleed */
+/* Portfolio — portfolio room full-bleed */
 .portfolio-room {
   position: relative;
   width: 100%;

@@ -62,7 +62,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
     environment:
       "Wide open meadow, lake horizon, soft sky, wind through grass, low object density",
     movementLanguage: ["wind", "water", "distant-birds", "slow-clouds"],
-    uiFunctionCluster: ["breathe-reset"],
+    uiFunctionCluster: ["focus-audio", "quick-recharge"],
     placeId: "sunroom-over-pond",
     sharisPresence: "nearby",
   },

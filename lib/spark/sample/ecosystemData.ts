@@ -1,5 +1,5 @@
 /**
- * SPARK™ sample ecosystem data — demonstrates cross-product intelligence linkage.
+ * SPARK sample ecosystem data — demonstrates cross-product intelligence linkage.
  * No AI. No external APIs. Replace internally in future phases without changing public API.
  */
 import type {
@@ -34,7 +34,7 @@ export const SPARK_SAMPLE_SOURCES: SparkSource[] = [
     id: "src-companion",
     sourceCategory: "companion",
     title: "Companion member sessions",
-    summary: "Conversation signals from Spark Companion™.",
+    summary: "Conversation signals from Spark Companion.",
     tags: ["companion", "member"],
     createdAt: TS,
     updatedAt: TS,
@@ -44,7 +44,7 @@ export const SPARK_SAMPLE_SOURCES: SparkSource[] = [
     id: "src-founder",
     sourceCategory: "founder",
     title: "Founder Studio executive notes",
-    summary: "Executive decisions and reflections from Founder Studio™.",
+    summary: "Executive decisions and reflections from Founder Studio.",
     tags: ["founder", "executive"],
     createdAt: TS,
     updatedAt: TS,

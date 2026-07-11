@@ -15,8 +15,8 @@ export function ResourcesPanel({ dimmed }: ResourcesPanelProps) {
       <section className="spark-studio-resources__card">
         <h3>Business Brain</h3>
         <ul>
-          <li>Business: Visual Spark Studios™</li>
-          <li>Current focus: ADHD Business Ecosystem™</li>
+          <li>Business: Visual Spark Studios</li>
+          <li>Current focus: ADHD Business Ecosystem</li>
           <li>Voice: warm, clear, encouraging</li>
         </ul>
       </section>

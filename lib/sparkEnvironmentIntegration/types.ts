@@ -1,5 +1,5 @@
 /**
- * Environment Integration™ (Spec 108).
+ * Environment Integration (Spec 108).
  * How the Spark Estate participates in conversations — supportive, never interrupting.
  *
  * Room design: T-017 — lib/sparkEstateRooms/types.ts

@@ -26,7 +26,7 @@ export function MaterialsOverlay({ open, onClose }: MaterialsOverlayProps) {
           </button>
         </header>
         <section>
-          <h3>Business Brain™</h3>
+          <h3>Business Brain</h3>
           <ul>
             {RESOURCES.businessBrain.map((item) => (
               <li key={item}>{item}</li>
@@ -42,7 +42,7 @@ export function MaterialsOverlay({ open, onClose }: MaterialsOverlayProps) {
           <p>{RESOURCES.clientAvatar}</p>
         </section>
         <section>
-          <h3>Business Assets™</h3>
+          <h3>Business Assets</h3>
           <ul>
             {RESOURCES.assets.map((item) => (
               <li key={item}>{item}</li>
@@ -50,7 +50,7 @@ export function MaterialsOverlay({ open, onClose }: MaterialsOverlayProps) {
           </ul>
         </section>
         <section className="uw-materials__spark">
-          <h3>Spark Card™</h3>
+          <h3>Spark Card</h3>
           <p>{RESOURCES.sparkCard}</p>
         </section>
       </div>

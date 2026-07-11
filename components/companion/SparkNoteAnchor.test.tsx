@@ -48,7 +48,7 @@ describe("SparkNoteAnchor", () => {
     expect(anchor?.getAttribute("data-estate-chrome-position")).toBe(
       "bottom-right",
     );
-    expect(container.textContent).toContain("Spark Card™");
+    expect(container.textContent).toContain("Daily Spark");
     expect(container.textContent).toContain(sampleCard.shortTitle);
     expect(container.textContent).not.toContain(sampleCard.teaser);
   });

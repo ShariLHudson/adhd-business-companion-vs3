@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence™ — direct room command resolution.
+ * Estate Intelligence — direct room command resolution.
  * Exact room name overrides feeling/activity routing.
  *
  * **Phase C:** Canonical resolution via `resolveEstatePlace` + `goToPlace` wins over
@@ -162,7 +162,7 @@ export function resolveDirectRoomDestination(
   const canonical = resolutionFromCanonicalText(fullText);
   if (canonical) return canonical;
 
-  const normalized = phrase.trim().toLowerCase().replace(/[™®.!?]+$/g, "");
+  const normalized = phrase.trim().toLowerCase().replace(/[®.!?]+$/g, "");
   if (!normalized) return null;
 
   const exactRoomId = resolveEstateRoomAliasExact(normalized);
@@ -196,6 +196,6 @@ export function resolveDirectRoomFromUserText(
 
   const destination =
     extractRoomPhraseFromNavigation(userText) ??
-    userText.trim().replace(/[™®.!?]+$/g, "");
+    userText.trim().replace(/[®.!?]+$/g, "");
   return resolveDirectRoomDestination(destination, userText);
 }

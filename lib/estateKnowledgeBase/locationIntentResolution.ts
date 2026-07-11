@@ -1,5 +1,5 @@
 /**
- * Location Intent Resolution Layer™
+ * Location Intent Resolution Layer
  *
  * Members speak naturally. Spark determines:
  * 1. Specific location named (official display name)
@@ -34,7 +34,7 @@ function matchLocationByOfficialName(query: string): {
   const match = longestPhraseMatch(
     probe,
     getLiveEstateLocations(),
-    (loc) => loc.officialDisplayName.replace(/™/g, ""),
+    (loc) => loc.officialDisplayName.replace(/\u2122/g, ""),
     { probeText: probe },
   );
   if (match) {

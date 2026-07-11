@@ -2,7 +2,7 @@ import type { PeacefulPlace } from "./types";
 
 export const BEDROOM_WINDOW_IMAGE_VERSION = "20260628a" as const;
 
-/** Canonical Bedroom Window™ session + directory thumbnail. */
+/** Canonical Bedroom Window session + directory thumbnail. */
 export const BEDROOM_WINDOW_IMAGE =
   `/backgrounds/peaceful-places/bedroom-window-peaceful-places.png?v=${BEDROOM_WINDOW_IMAGE_VERSION}` as const;
 

@@ -7,7 +7,7 @@ import {
   listWorkModes,
 } from "./index";
 
-describe("Founder Daily Workflow™", () => {
+describe("Founder Daily Workflow", () => {
   it("defines six work modes that map to existing workspaces", () => {
     expect(FOUNDER_WORK_MODES).toHaveLength(6);
     expect(listWorkModes().map((m) => m.id)).toEqual([

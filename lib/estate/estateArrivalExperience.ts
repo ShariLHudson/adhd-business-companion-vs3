@@ -1,5 +1,5 @@
 /**
- * Estate Arrival Experience™ — room identity, motto, Shari greeting, ambience.
+ * Estate Arrival Experience — room identity, motto, Shari greeting, ambience.
  *
  * @deprecated **Arrival authority (Phase B):** Title/motto plaques and timed arrival sequences
  * conflict with canonical `arrivalBehavior` (threshold · ambient-crossfade · presence-only).
@@ -47,7 +47,7 @@ export const ESTATE_ARRIVAL_TOTAL_MS =
   ESTATE_ARRIVAL_TITLE_FADE_OUT_MS;
 
 const CHAMBER_ARRIVAL = {
-  title: "Chamber of Momentum™",
+  title: "Chamber of Momentum",
   motto: "Let's find what will help you move forward today.",
   shariGreeting: "What would help you move forward today?",
   invitationAfterArrival: true,
@@ -62,6 +62,30 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
       character: "soft library ambience, page turns, quiet footsteps",
     },
   },
+  "focus-studio": {
+    title: "Cartographer's Studio",
+    motto: "Every map tells a story. Every story reveals a path.",
+    shariGreeting:
+      "Welcome to the Cartographer's Studio — tell me what you'd like to map, or click a framed map to begin.",
+    invitationAfterArrival: false,
+    ambience: {
+      src: BRIGHT_STUDIO_AMBIENCE_MP3,
+      volume: 0.1,
+      character: "soft studio hush, pencil on paper",
+    },
+  },
+  "cartographers-studio": {
+    title: "Cartographer's Studio",
+    motto: "Every map tells a story. Every story reveals a path.",
+    shariGreeting:
+      "Welcome to the Cartographer's Studio — tell me what you'd like to map, or click a framed map to begin.",
+    invitationAfterArrival: false,
+    ambience: {
+      src: BRIGHT_STUDIO_AMBIENCE_MP3,
+      volume: 0.1,
+      character: "soft studio hush, pencil on paper",
+    },
+  },
   "momentum-institute": {
     ...CHAMBER_ARRIVAL,
     ambience: {
@@ -71,7 +95,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   library: {
-    title: "The Library™",
+    title: "The Library",
     motto: "Quiet reading and story — wisdom on the shelves.",
     shariGreeting: "What would you like to read or explore?",
     invitationAfterArrival: true,
@@ -82,7 +106,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "creative-studio": {
-    title: "Creative Studio™",
+    title: "Creative Studio",
     motto: "Where Ideas Become Reality.",
     shariGreeting: "What would you like to create together?",
     ambience: {
@@ -92,7 +116,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   conservatory: {
-    title: "The Conservatory™",
+    title: "The Conservatory",
     motto: "A peaceful place to breathe, think, and regain clarity.",
     shariGreeting:
       "We can simply enjoy the space, or if you'd like, I can help you with one of these.",
@@ -104,7 +128,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "clear-my-mind": {
-    title: "The Conservatory™",
+    title: "The Conservatory",
     motto: "A peaceful place to breathe, think, and regain clarity.",
     shariGreeting:
       "We can simply enjoy the space, or if you'd like, I can help you with one of these.",
@@ -116,7 +140,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "coffee-house": {
-    title: "Coffee House™",
+    title: "Coffee House",
     motto: "Great Conversations Change Businesses.",
     shariGreeting: "Pull up a chair — what's worth talking through?",
     ambience: {
@@ -126,7 +150,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "apple-orchard": {
-    title: "Apple Orchard™",
+    title: "Apple Orchard",
     motto: "Growth Happens One Season at a Time.",
     shariGreeting: "Let's slow down for a moment.",
     ambience: {
@@ -146,7 +170,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   greenhouse: {
-    title: "Greenhouse™",
+    title: "Greenhouse",
     motto: "Every thriving business began as a tiny seed of an idea.",
     shariGreeting: "Welcome.",
     invitationAfterArrival: true,
@@ -157,7 +181,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   observatory: {
-    title: "Observatory™",
+    title: "Observatory",
     motto: "Discover. Explore. Understand.",
     shariGreeting: "What would you like to understand better?",
     ambience: {
@@ -167,7 +191,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "grow-observatory": {
-    title: "Observatory™",
+    title: "Observatory",
     motto: "Discover. Explore. Understand.",
     shariGreeting: "What would you like to understand better?",
     ambience: {
@@ -177,7 +201,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   stables: {
-    title: "The Stables™",
+    title: "The Stables",
     motto: "Confidence Is Built Through Practice.",
     shariGreeting:
       "What would you like to do while we're here?",
@@ -189,7 +213,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "music-room": {
-    title: "Music Room™",
+    title: "Music Room",
     motto: "Find Your Rhythm.",
     shariGreeting: "What kind of sound would help you think?",
     ambience: {
@@ -199,7 +223,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "decision-compass": {
-    title: "Decision Compass™",
+    title: "Decision Compass",
     motto: "Clear Decisions Begin With Clear Thinking.",
     shariGreeting: "What's the choice sitting in front of you?",
     ambience: {
@@ -209,7 +233,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "peaceful-places": {
-    title: "Peaceful Places™",
+    title: "Peaceful Places",
     motto: "Restoration Without Leaving Spark.",
     shariGreeting: "What kind of calm would help most right now?",
     ambience: {
@@ -235,7 +259,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   journal: {
-    title: "Journal™",
+    title: "Journal",
     motto: "Your Story, Privately Held.",
     shariGreeting: "What's worth capturing while it's fresh?",
     ambience: {
@@ -245,7 +269,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "growth-journal": {
-    title: "Journal™",
+    title: "Journal",
     motto: "Your Story, Privately Held.",
     shariGreeting: "What's worth capturing while it's fresh?",
     ambience: {
@@ -255,7 +279,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "growth-profile": {
-    title: "Growth Profile™",
+    title: "Growth Profile",
     motto: "Capabilities earned through learning and return.",
     shariGreeting: "How are you growing as an entrepreneur?",
     ambience: {
@@ -265,7 +289,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "my-estate": {
-    title: "My Estate™",
+    title: "My Estate",
     motto: "Your place in the Spark Estate.",
     shariGreeting: "What would you like to tend to in your estate today?",
     ambience: {
@@ -275,9 +299,11 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "evidence-vault": {
-    title: "Evidence Vault™",
-    motto: "Your story deserves to be remembered.",
-    shariGreeting: "Tell me about something good — I'll help you keep it.",
+    title: "Evidence Vault",
+    motto: "What has my life been teaching me?",
+    shariGreeting:
+      "Welcome back to your Evidence Vault.\n\nEvery experience has something to teach us.\n\nWhat discovery would you like to preserve today?",
+    invitationAfterArrival: false,
     ambience: {
       src: HALL_OF_REFLECTIONS_AMBIENCE_MP3,
       volume: 0.1,
@@ -285,9 +311,9 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   portfolio: {
-    title: "Portfolio™",
-    motto: "What you've built, thoughtfully kept.",
-    shariGreeting: "What would you like to review together?",
+    title: "Hall of Accomplishments",
+    motto: "Look what you've accomplished.",
+    shariGreeting: "What milestone would you like to celebrate together?",
     ambience: {
       src: BRIGHT_STUDIO_AMBIENCE_MP3,
       volume: 0.1,

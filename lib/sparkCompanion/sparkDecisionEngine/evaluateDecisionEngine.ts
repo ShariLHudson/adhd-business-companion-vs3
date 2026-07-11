@@ -20,7 +20,7 @@ import type {
 } from "./types";
 
 /**
- * Spark Decision Engine™ — seven-step orchestration before every response.
+ * Spark Decision Engine — seven-step orchestration before every response.
  * Composes constitution layers; does not replace them.
  */
 export function evaluateSparkDecisionEngine(

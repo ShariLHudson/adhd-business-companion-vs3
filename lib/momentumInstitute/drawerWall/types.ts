@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ Drawer Wall™ — UI layout types (data-driven hotspots).
+ * Momentum Institute Drawer Wall — UI layout types (data-driven hotspots).
  */
 
 import type {
@@ -52,7 +52,7 @@ export type KnowledgeCardPanelModel = {
   experiences: LearningExperienceDefinition[];
 };
 
-/** Future Estate Intelligence™ — open a drawer by id without navigation. */
+/** Future Estate Intelligence — open a drawer by id without navigation. */
 export type InstituteDrawerWallCommand =
   | { type: "open_drawer"; drawerId: string }
   | { type: "open_knowledge_card"; knowledgeCardId: string }

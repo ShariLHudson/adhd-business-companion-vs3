@@ -1,5 +1,5 @@
 /**
- * Founder bridge — Executive Relationship Intelligence™
+ * Founder bridge — Executive Relationship Intelligence
  */
 import type { MissionId } from "@/lib/founder/missions/types";
 import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";

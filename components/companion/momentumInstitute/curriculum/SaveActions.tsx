@@ -28,7 +28,7 @@ export function SaveActions({
             className="institute-knowledge-panel__action-btn institute-knowledge-panel__action-btn--available"
             onClick={onSaveToCabinet}
           >
-            Save to My Institute Cabinet™
+            Save to My Institute Cabinet
           </button>
         ) : null}
         {onDiscuss ? (
@@ -37,7 +37,7 @@ export function SaveActions({
             className="institute-knowledge-panel__action-btn institute-knowledge-panel__action-btn--available"
             onClick={onDiscuss}
           >
-            Discuss with Shari™
+            Discuss with Shari
           </button>
         ) : null}
         {onMakeItMine ? (
@@ -46,7 +46,7 @@ export function SaveActions({
             className="institute-knowledge-panel__action-btn institute-knowledge-panel__action-btn--available"
             onClick={onMakeItMine}
           >
-            Make It Mine™
+            Make It Mine
           </button>
         ) : null}
       </div>
@@ -55,7 +55,7 @@ export function SaveActions({
       ) : null}
       {cabinetSaved ? (
         <p className="institute-knowledge-panel__cabinet-saved" role="status">
-          Filed in My Institute Cabinet™
+          Filed in My Institute Cabinet
         </p>
       ) : null}
     </footer>

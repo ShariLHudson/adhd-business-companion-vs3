@@ -248,15 +248,15 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
 
     recommended: tool(
 
-      "breathe-reset",
+      "focus-audio",
 
-      "Most People Start Here",
+      "Peaceful Places",
 
-      { kind: "tool", tool: "breathe", toolId: "breathe-reset" },
+      { kind: "audio", categoryId: "soundscapes", toolId: "focus-audio" },
 
-      "Quick calming reset.",
+      "Most people start here — choose a calming place.",
 
-      "🌬",
+      "🌳",
 
     ),
 
@@ -272,27 +272,13 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
 
           tool(
 
-            "breathe-reset",
-
-            "Most People Start Here",
-
-            { kind: "tool", tool: "breathe", toolId: "breathe-reset" },
-
-            "Quick calming reset.",
-
-            "🌬",
-
-          ),
-
-          tool(
-
             "focus-audio",
 
             "Peaceful Places",
 
-            { kind: "audio", categoryId: "soundscapes" },
+            { kind: "audio", categoryId: "soundscapes", toolId: "focus-audio" },
 
-            "Choose a calming place.",
+            "Most people start here — choose a calming place.",
 
             "🌳",
 
@@ -309,6 +295,20 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             "Simple resets for when your brain needs a break.",
 
             "🌿",
+
+          ),
+
+          tool(
+
+            "calm-moment",
+
+            "Take a Quiet Moment",
+
+            { kind: "section", section: "guided-exercises", toolId: "calm-moment" },
+
+            "A softer pace when your mind needs space.",
+
+            "🍃",
 
           ),
 
@@ -476,9 +476,9 @@ export const REQUIRED_FOCUS_ASSET_IDS = [
 
   "focus-audio",
 
-  "breathe-reset",
-
   "next-small-step",
+
+  "quick-recharge",
 
 ] as const;
 

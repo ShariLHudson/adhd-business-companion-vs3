@@ -99,7 +99,7 @@ function base(
 export const SAMPLE_EXECUTIVE_INITIATIVES: ExecutiveInitiative[] = [
   base({
     id: "init-listening-rooms",
-    title: "Listening Rooms™ Estate Scene",
+    title: "Listening Rooms Estate Scene",
     category: "mission",
     missionId: "listening-rooms",
     productId: "listening-rooms",
@@ -142,7 +142,7 @@ export const SAMPLE_EXECUTIVE_INITIATIVES: ExecutiveInitiative[] = [
 
   base({
     id: "init-voice-companion",
-    title: "Voice Companion™ (Limited Return)",
+    title: "Voice Companion (Limited Return)",
     category: "product",
     missionId: "listening-rooms",
     productId: "companion",

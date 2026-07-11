@@ -1,5 +1,5 @@
 /**
- * Hidden Work Engine™ — The Iceberg (Spec 118).
+ * Hidden Work Engine — The Iceberg (Spec 118).
  * Everything Spark quietly does while the member simply has a conversation.
  *
  * Philosophy: Spec 111 — SPARK_HOSPITALITY_ICEBERG_PRINCIPLE
@@ -77,7 +77,7 @@ export const HIDDEN_WORK_CATEGORIES: readonly {
   { id: "brain_propose_write", title: "Propose Brain memory write", domain: "memory", defaultVisibility: "invisible" },
   { id: "brain_connect", title: "Connect via LIG / lineage", domain: "memory", defaultVisibility: "invisible" },
   { id: "win_capture", title: "Capture win / milestone", domain: "memory", defaultVisibility: "permission_gated" },
-  { id: "asset_organize", title: "Organize Business Assets™", domain: "assets", defaultVisibility: "invisible" },
+  { id: "asset_organize", title: "Organize Business Assets", domain: "assets", defaultVisibility: "invisible" },
   { id: "asset_create_prep", title: "Pre-stage asset template", domain: "assets", defaultVisibility: "permission_gated" },
   { id: "project_connect", title: "Connect to active project", domain: "assets", defaultVisibility: "invisible" },
   { id: "autosave", title: "Autosave conversation artifact", domain: "assets", defaultVisibility: "invisible" },
@@ -146,12 +146,12 @@ export const HIDDEN_WORK_TRIGGER_QUESTIONS = [
 
 /** User-facing examples — what Spark may do while member talks */
 export const HIDDEN_WORK_MEMBER_EXAMPLES = [
-  "organize Business Assets™",
+  "organize Business Assets",
   "prepare research",
   "connect related projects",
   "identify opportunities",
   "remember wins",
-  "update Business Brain™",
+  "update Business Brain",
   "draft ideas",
   "prepare social posts",
   "identify missing information",

@@ -1,4 +1,4 @@
-/** Workspace Orchestrator™ — intention-based executive workspaces */
+/** Workspace Orchestrator — intention-based executive workspaces */
 
 import type { FounderLabelTone } from "./index";
 

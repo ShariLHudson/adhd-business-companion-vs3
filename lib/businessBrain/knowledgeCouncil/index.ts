@@ -1,5 +1,5 @@
 /**
- * Build Spark Knowledge Council™ bundle.
+ * Build Spark Knowledge Council bundle.
  */
 
 import type { KnowledgeCouncil } from "../types";
@@ -12,7 +12,7 @@ import { DEPARTMENT_COUNCIL_SEEDS } from "./departmentCouncil";
 export function buildKnowledgeCouncil(): KnowledgeCouncil {
   return {
     version: BUSINESS_BRAIN_VERSION,
-    title: "Spark Knowledge Council™",
+    title: "Spark Knowledge Council",
     mission:
       "Synthesize timeless disciplines into one consistent Spark teaching voice — internal reference only.",
     researchDisciplines: RESEARCH_DISCIPLINES,

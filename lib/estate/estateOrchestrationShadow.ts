@@ -1,5 +1,5 @@
 /**
- * Estate Orchestration Shadow™ — Phase 2A observe/log only.
+ * Estate Orchestration Shadow — Phase 2A observe/log only.
  *
  * Compares orchestrator decisions with legacy matcher signals. No handleSend wiring.
  *

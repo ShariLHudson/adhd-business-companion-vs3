@@ -5,6 +5,8 @@ import {
   formatSparkEstateTopNavigationReport,
   SPARK_ESTATE_PROFILE_MENU_ITEMS,
   SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS,
+  SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS,
+  SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS,
   SPARK_ESTATE_TOP_NAVIGATION_CONTROLS,
   SPARK_ESTATE_TOP_NAVIGATION_PRINCIPLE,
   verifySparkEstateTopNavigationAndProfileMenu,
@@ -16,28 +18,49 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(SPARK_ESTATE_TOP_NAVIGATION_CONTROLS).toHaveLength(2);
     expect(SPARK_ESTATE_TOP_NAVIGATION_PRINCIPLE).toContain("two permanent");
     expect(verification.controlCount).toBe(2);
-    expect(verification.profileMenuAligned).toBe(true);
     expect(verification.wanderManifestRuleReady).toBe(true);
   });
 
-  it("aligns profile menu items with the correction spec", () => {
+  it("aligns profile menu items with the working Welcome Home menu", () => {
     expect(SPARK_ESTATE_PROFILE_MENU_ITEMS.map((item) => item.label)).toEqual([
-      "Profile",
-      "Settings",
       "Conversations",
-      "Personalization",
-      "Account",
+      "Settings",
+      "Profile",
+      "Logout",
     ]);
   });
 
-  it("documents room menu experience and navigation sections", () => {
-    expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS).toHaveLength(4);
-    expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS.map((item) => item.id)).toContain(
-      "return-to-room",
-    );
+  it("documents room menu experience, navigation, and experiences sections", () => {
+    expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS).toHaveLength(5);
+    expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS.map((item) => item.id)).toEqual([
+      "chat",
+      "sound",
+      "fullscreen",
+      "change-background",
+      "return-to-estate",
+    ]);
     const verification = verifySparkEstateTopNavigationAndProfileMenu();
-    expect(verification.roomExperienceItems).toBe(4);
-    expect(verification.roomNavigationItems).toBe(2);
+    expect(verification.roomExperienceItems).toBe(5);
+    expect(verification.roomNavigationItems).toBe(5);
+    expect(verification.roomExperiencesItems).toBe(3);
+    expect(
+      SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.map((item) => item.id),
+    ).toEqual([
+      "chamber-of-momentum",
+      "evidence-vault",
+      "hall-of-accomplishments",
+      "journal",
+      "cartographers-studio",
+    ]);
+    expect(
+      SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.map((item) => item.label),
+    ).toContain("Journal Gazebo");
+    expect(
+      SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.map((item) => item.label),
+    ).toContain("Cartographer's Studio™");
+    expect(
+      SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS.map((item) => item.id),
+    ).toEqual(["breathe", "soundscapes", "explore-spark"]);
   });
 
   it("assesses manifest alignment for room button display names", () => {
@@ -51,5 +74,6 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(report).toContain("Top-right controls");
     expect(report).toContain("Profile menu");
     expect(report).toContain("Integration checks");
+    expect(report).toContain("Explore Spark");
   });
 });

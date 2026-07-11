@@ -1,4 +1,4 @@
-/** Executive Strategy Center™ — visual thinking environment (no AI). */
+/** Executive Strategy Center — visual thinking environment (no AI). */
 
 export type StrategyToolId =
   | "whiteboard"

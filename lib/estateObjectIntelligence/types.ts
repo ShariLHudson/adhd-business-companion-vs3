@@ -1,5 +1,5 @@
 /**
- * Estate Object Intelligence™ — shared types.
+ * Estate Object Intelligence — shared types.
  */
 
 import type { EstateKnowledgeStatus } from "@/lib/estateKnowledgeBase/types";

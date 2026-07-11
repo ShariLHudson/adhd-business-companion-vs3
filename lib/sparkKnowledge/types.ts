@@ -1,5 +1,5 @@
 /**
- * Shari Knowledge & Intelligence Framework™ — unified knowledge types.
+ * Shari Knowledge & Intelligence Framework — unified knowledge types.
  * @see docs/estate/SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md
  */
 

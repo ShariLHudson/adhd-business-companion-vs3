@@ -1,7 +1,7 @@
 /**
- * Estate Navigation Intelligence™ — resolve member intent to Estate destinations.
+ * Estate Navigation Intelligence — resolve member intent to Estate destinations.
  *
- * Connects: Estate Knowledge Base™, aliases, experience groups, route validation.
+ * Connects: Estate Knowledge Base, aliases, experience groups, route validation.
  */
 
 import { resolveLocationIntent } from "@/lib/estateKnowledgeBase/locationIntentResolution";

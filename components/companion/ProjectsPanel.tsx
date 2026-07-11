@@ -25,6 +25,7 @@ import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 import { ProjectAssetsPanel } from "@/components/companion/ProjectAssetsPanel";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { VisualizeThisButton } from "@/components/companion/VisualizeThisButton";
 import { PROJECT_SOURCE_OBJECT_ID } from "@/lib/companionObjects";
 import { useVisualMode } from "@/lib/useVisualMode";
 import {
@@ -105,6 +106,7 @@ export function ProjectsPanel({
   onBuildWithShari,
   resumeProjectId,
   onResumeConsumed,
+  onVisualizeThis,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
@@ -133,6 +135,8 @@ export function ProjectsPanel({
   sopSession?: WorkspaceSession | null;
   onSopFieldChange?: (stepId: string, value: string) => void;
   onProjectSaved?: (projectId: string, projectTitle: string) => void;
+  /** #184 Spark Visual Engine — Visualize This from Projects. */
+  onVisualizeThis?: (request: import("@/lib/sparkVisualEngine").SparkVisualEngineOpenRequest) => void;
 }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [view, setView] = useState<
@@ -1337,13 +1341,30 @@ export function ProjectsPanel({
             Your filing cabinet — pick a project when you&apos;re ready.
           </p>
         </div>
-        <button
-          type="button"
-          onClick={startCreate}
-          className="shrink-0 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-        >
-          + New Project
-        </button>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {onVisualizeThis ? (
+            <VisualizeThisButton
+              onVisualize={onVisualizeThis}
+              request={{
+                source: "projects",
+                viewId: "project-map",
+                seedText: detailId
+                  ? projects.find((p) => p.id === detailId)?.name
+                  : undefined,
+                title: detailId
+                  ? projects.find((p) => p.id === detailId)?.name
+                  : "Projects",
+              }}
+            />
+          ) : null}
+          <button
+            type="button"
+            onClick={startCreate}
+            className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+          >
+            + New Project
+          </button>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end">

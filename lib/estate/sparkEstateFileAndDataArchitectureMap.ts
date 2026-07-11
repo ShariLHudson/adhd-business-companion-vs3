@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — file and data architecture map (Phase 27).
+ * Spark Estate — file and data architecture map (Phase 27).
  * Every piece of information has a clear home; one primary owner per domain.
  *
  * @see docs/protocols/SPARK_ESTATE_FILE_AND_DATA_ARCHITECTURE_MAP_SPECIFICATION_PHASE27.md
@@ -91,10 +91,10 @@ export const SPARK_ESTATE_DATA_LAYERS = [
       "status",
       "completion history",
     ],
-    primaryOwner: "Goals & Projects™ (companion projects store)",
+    primaryOwner: "Goals & Projects (companion projects store)",
     location:
       "lib/companionStore.ts (companion-projects-v1, companion-project-items-v1), lib/estate/chamberProjectMeta.ts",
-    usedBy: ["Momentum", "wins", "memory", "Momentum Card™"],
+    usedBy: ["Momentum", "wins", "memory", "Momentum Card"],
     references: ["lib/estate/chamberOfMomentumMemory.ts (read-only snapshot)"],
     status: "implemented",
   },
@@ -121,12 +121,12 @@ export const SPARK_ESTATE_DATA_LAYERS = [
     title: "Cards",
     purpose: "Generated views from approved data sources — not duplicate stores.",
     stores: [
-      "Spark Card™",
-      "Momentum Card™",
-      "Knowledge Card™",
-      "Win Card™",
-      "Project Card™",
-      "Reflection Card™",
+      "Spark Card",
+      "Momentum Card",
+      "Knowledge Card",
+      "Win Card",
+      "Project Card",
+      "Reflection Card",
     ],
     primaryOwner: "Spark Estate card ecosystem (generated)",
     location: "lib/estate/sparkEstateCardEcosystem.ts",
@@ -155,7 +155,7 @@ export const SPARK_ESTATE_DATA_LAYERS = [
     primaryOwner: "Spark Estate knowledge and asset library architecture",
     location:
       "lib/estate/sparkEstateKnowledgeAndAssetLibraryArchitecture.ts, lib/sparkNote/catalog.ts",
-    usedBy: ["rooms", "workflows", "conversations", "Knowledge Card™"],
+    usedBy: ["rooms", "workflows", "conversations", "Knowledge Card"],
     status: "partial",
   },
   {
@@ -322,7 +322,7 @@ export const SPARK_ESTATE_ROOM_DATA_RULES = [
 ] as const;
 
 export const SPARK_ESTATE_EXPORT_SAVE_RULES = [
-  "Created work supports save inside Spark Estate™.",
+  "Created work supports save inside Spark Estate.",
   "Export when available (PDF, document, spreadsheet).",
   "Print-friendly output when requested.",
   "Share when collaboration is available.",
@@ -332,8 +332,8 @@ export const SPARK_ESTATE_EXPORT_SAVE_RULES = [
 export const SPARK_ESTATE_FUNNEL_DATA_FLOW = [
   "Marketing Room creates funnel content.",
   "Saved as member-created asset (universal creation + asset library).",
-  "Connected to project when needed (Goals & Projects™).",
-  "Momentum tracks progress (chamber memory + Momentum Card™).",
+  "Connected to project when needed (Goals & Projects).",
+  "Momentum tracks progress (chamber memory + Momentum Card).",
   "Completion creates a win (growthWinsStore / evidenceBankStore).",
   "Memory learns successful approaches (chamber patterns + member profile).",
 ] as const;
@@ -410,7 +410,7 @@ export function formatSparkEstateFileAndDataArchitectureReport(
   verification: ReturnType<typeof verifySparkEstateFileAndDataArchitecture> = verifySparkEstateFileAndDataArchitecture(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ file and data architecture: ${verification.oneSourceOfTruth ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate file and data architecture: ${verification.oneSourceOfTruth ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_DATA_PRINCIPLE,
     SPARK_ESTATE_DATA_VISION,
     "",

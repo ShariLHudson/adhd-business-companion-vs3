@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — demo-to-production readiness checklist (Phase 28).
+ * Spark Estate — demo-to-production readiness checklist (Phase 28).
  * Verify members can understand, navigate, create, and return without broken journeys.
  *
  * @see docs/protocols/SPARK_ESTATE_DEMO_TO_PRODUCTION_READINESS_CHECKLIST_PHASE28.md
@@ -244,28 +244,28 @@ function runCardTestingChecks(): SparkEstateProductionCheckItem[] {
       "card-spark",
       "card-testing",
       "must-fix",
-      "Spark Card™ ecosystem is defined",
+      "Spark Card ecosystem is defined",
       cards.cardKinds.includes("spark-card"),
     ),
     check(
       "card-momentum",
       "card-testing",
       "must-fix",
-      "Momentum Card™ uses project and next-step context",
+      "Momentum Card uses project and next-step context",
       cards.selectionWorks,
     ),
     check(
       "card-knowledge",
       "card-testing",
       "important",
-      "Knowledge Card™ learning path is available",
+      "Knowledge Card learning path is available",
       cards.cardKinds.includes("knowledge-card") && knowledge.retrievalReady,
     ),
     check(
       "card-win",
       "card-testing",
       "important",
-      "Win Card™ celebrates accomplishments",
+      "Win Card celebrates accomplishments",
       cards.cardKinds.includes("win-card"),
     ),
   ];
@@ -545,7 +545,7 @@ export function formatSparkEstateProductionReadinessReport(
   result: SparkEstateProductionReadinessResult = runSparkEstateProductionReadinessChecklist(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ production readiness: ${result.readyForProduction ? "READY" : "NOT READY"}`,
+    `Spark Estate production readiness: ${result.readyForProduction ? "READY" : "NOT READY"}`,
     SPARK_ESTATE_PRODUCTION_PRINCIPLE,
     `Companion URL: ${result.productionHref}`,
     "",

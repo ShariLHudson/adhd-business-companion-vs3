@@ -22,11 +22,12 @@
 ## Spec priority (conflicts)
 
 1. SPARK_RECOGNITION_ENGINE.md / 001
-2. 002 Room Interaction Standard
-3. 003 Unified Recognition System
-4. 030 Recognition Data Model / 058 Shared Schema
-5. Room implementation specs 051–055
-6. Older prompts/images/notes
+2. **EST-001 The Room Is the Interface™** — estate immersion / presentation law
+3. 002 Room Interaction Standard
+4. 003 Unified Recognition System
+5. 030 Recognition Data Model / 058 Shared Schema
+6. Room implementation specs 051–055
+7. Older prompts/images/notes
 
 ## Ingested Architecture Library (recognition folder)
 
@@ -132,7 +133,19 @@
 | 237 Visual Recommendation Overlay | [library/237_VISUAL_RECOMMENDATION_OVERLAY.md](./library/237_VISUAL_RECOMMENDATION_OVERLAY.md) | Subtle map suggestions · Create / Show Other / Not Now · never block |
 | 239 Export Share Present Mode | [library/239_EXPORT_SHARE_PRESENT_MODE.md](./library/239_EXPORT_SHARE_PRESENT_MODE.md) | PDF/PNG/SVG/MD · share · one-branch present mode |
 | 240 Visual Accessibility Standard | [library/240_VISUAL_ACCESSIBILITY_STANDARD.md](./library/240_VISUAL_ACCESSIBILITY_STANDARD.md) | Voice · keyboard · SR · touch · contrast · text size · reduced motion |
+| 242 Visual Discovery Interview Library | [library/242_VISUAL_DISCOVERY_INTERVIEW_LIBRARY.md](./library/242_VISUAL_DISCOVERY_INTERVIEW_LIBRARY.md) | Map-specific Discovery Interviews · memory-first · stop when draft-ready |
+| 243 Visual Discovery Patterns | [library/243_VISUAL_DISCOVERY_PATTERNS.md](./library/243_VISUAL_DISCOVERY_PATTERNS.md) | Map chosen · no repeat · estate memory · one question · know when to stop |
+| 244 Spark First Draft Intelligence | [library/244_SPARK_FIRST_DRAFT_INTELLIGENCE.md](./library/244_SPARK_FIRST_DRAFT_INTELLIGENCE.md) | Spark builds first draft · group/dedupe/gaps · refine together |
+| 245 Evidence Intelligence Architecture | [library/245_EVIDENCE_INTELLIGENCE_ARCHITECTURE.md](./library/245_EVIDENCE_INTELLIGENCE_ARCHITECTURE.md) | Proof of growth · Vault + Hall + Garden · evidence over empty praise |
+| 246 Evidence Capture Standard | [library/246_EVIDENCE_CAPTURE_STANDARD.md](./library/246_EVIDENCE_CAPTURE_STANDARD.md) | Detect moments · “Would you like to save this?” · Vault / Hall / Both / Not now |
+| 247 Hall of Accomplishments Standard | [library/247_HALL_OF_ACCOMPLISHMENTS_STANDARD.md](./library/247_HALL_OF_ACCOMPLISHMENTS_STANDARD.md) | Major milestones · “Look what you've accomplished.” · museum feel |
+| 248 Evidence Vault Standard | [library/248_EVIDENCE_VAULT_STANDARD.md](./library/248_EVIDENCE_VAULT_STANDARD.md) | Proof for hard days · “Remember who you are.” · suggest on discouragement |
+| 249 Celebration Garden Standard | [library/249_CELEBRATION_GARDEN_STANDARD.md](./library/249_CELEBRATION_GARDEN_STANDARD.md) | Moments not milestones · peaceful / reflective · occasional invite |
+| 250 Wins Timeline Standard | [library/250_WINS_TIMELINE_STANDARD.md](./library/250_WINS_TIMELINE_STANDARD.md) | Chronological growth · year/category filters · major moments · evidence |
+| 251 Confidence Recovery Engine | [library/251_CONFIDENCE_RECOVERY_ENGINE.md](./library/251_CONFIDENCE_RECOVERY_ENGINE.md) | Discouragement → meaningful evidence · restoration not motivation |
+| 252 Evidence Retrieval Intelligence | [library/252_EVIDENCE_RETRIEVAL_INTELLIGENCE.md](./library/252_EVIDENCE_RETRIEVAL_INTELLIGENCE.md) | Right evidence, right time · small relevant set · never overwhelm |
 | 060 Cursor Implementation Order | [library/060_CURSOR_IMPLEMENTATION_ORDER.md](./library/060_CURSOR_IMPLEMENTATION_ORDER.md) | Recognition room Cursor build order |
+| EST-001 The Room Is the Interface™ | [library/EST-001_THE_ROOM_IS_THE_INTERFACE.md](./library/EST-001_THE_ROOM_IS_THE_INTERFACE.md) | Place → Spark → Workspace · full-screen rooms · remove software chrome · camera before pages |
 
 **Runtime:** `lib/sparkSharedCapabilities/` — see [SHARED_CAPABILITY_LIBRARY_IMPLEMENTATION.md](./SHARED_CAPABILITY_LIBRARY_IMPLEMENTATION.md).
 

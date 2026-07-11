@@ -5,7 +5,7 @@ import {
   SPARK_SEVEN_INTERNAL_QUESTIONS,
 } from "./types";
 
-export const SPARK_DECISION_ENGINE_PROMPT_BLOCK = `# SPARK DECISION ENGINE™ (Core Brain — runs before every response)
+export const SPARK_DECISION_ENGINE_PROMPT_BLOCK = `# SPARK DECISION ENGINE (Core Brain — runs before every response)
 
 **Mission:** ${SPARK_DECISION_MISSION}
 

@@ -1,5 +1,5 @@
 /**
- * Estate Presence™ — slow, subtle environmental life across the Estate.
+ * Estate Presence — slow, subtle environmental life across the Estate.
  * Never competes with conversation or reading.
  */
 
@@ -24,7 +24,7 @@
   mix-blend-mode: screen;
 }
 
-/* ——— Steam (Coffee House™) ——— */
+/* ——— Steam (Coffee House) ——— */
 .estate-presence__layer--steam {
   border-radius: 40% 40% 50% 50%;
   background: radial-gradient(
@@ -84,7 +84,7 @@
   }
 }
 
-/* ——— Water ripple (Conservatory™) ——— */
+/* ——— Water ripple (Conservatory) ——— */
 .estate-presence__layer--water-ripple {
   border-radius: 50%;
   background: radial-gradient(
@@ -157,7 +157,7 @@
   }
 }
 
-/* ——— Cloud drift (Observatory™) ——— */
+/* ——— Cloud drift (Observatory) ——— */
 .estate-presence__layer--cloud-drift {
   background: linear-gradient(
     90deg,
@@ -304,7 +304,7 @@
   }
 }
 
-/* ——— Horse calm (Stables™) ——— */
+/* ——— Horse calm (Stables) ——— */
 .estate-presence__layer--horse-calm {
   background: radial-gradient(
     ellipse at 50% 60%,

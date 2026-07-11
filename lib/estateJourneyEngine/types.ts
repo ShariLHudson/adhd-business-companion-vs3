@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — central journey state for the Spark Estate™.
+ * Estate Journey Engine — central journey state for the Spark Estate.
  *
  * One continuous journey: rooms, work, learning, sessions, and return context.
  */

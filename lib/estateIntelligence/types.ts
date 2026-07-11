@@ -1,7 +1,7 @@
 /**
- * Estate Intelligence™ — shared types (Phase 1 registry shell).
+ * Estate Intelligence — shared types (Phase 1 registry shell).
  *
- * Serves The Conversation Front Door™: members describe needs; Spark knows
+ * Serves The Conversation Front Door: members describe needs; Spark knows
  * where the Estate can help — without requiring room names or map hunting.
  *
  * @see docs/ESTATE_INTELLIGENCE_FRAMEWORK.md

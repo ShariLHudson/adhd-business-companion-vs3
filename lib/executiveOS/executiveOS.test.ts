@@ -13,7 +13,7 @@ import {
   executiveOSService,
 } from "./index";
 
-describe("Executive Operating System™", () => {
+describe("Executive Operating System", () => {
   it("defines the full executive operating loop", () => {
     expect(EXECUTIVE_OPERATING_LOOP[0]).toBe("observe");
     expect(EXECUTIVE_OPERATING_LOOP.at(-1)).toBe("repeat");

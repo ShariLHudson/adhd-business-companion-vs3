@@ -1,5 +1,5 @@
 /**
- * Estate Room Lifecycle™ — shared behavioral contract (all rooms).
+ * Estate Room Lifecycle — shared behavioral contract (all rooms).
  * Experiences, not definitions. One conversation across the Estate.
  *
  * @see docs/ESTATE_BEHAVIORAL_CONSISTENCY.md
@@ -25,7 +25,7 @@ export const ESTATE_ROOM_ENTRY_HINT = [
   "Step 1 — Arrival (emotional acknowledgment, warm, brief).",
   "Step 2 — One guiding question (then wait).",
   "Step 3 — Spark selects internal method silently.",
-  "Step 4 — Output action or guidance (Today's Path™, clarity, draft — as fits).",
+  "Step 4 — Output action or guidance (Today's Path, clarity, draft — as fits).",
   "Step 5 — Offer next step OR gentle Estate transition.",
 ].join("\n");
 
@@ -33,6 +33,6 @@ export const ESTATE_ROOM_EXIT_HINT = [
   "ROOM EXIT / TRANSITION (when natural pause):",
   "Detect partial or meaningful completion.",
   "Suggest ONE logical next Estate room — invitation only.",
-  'Example tone: "I think the next step belongs in Creative Studio™. Would you like me to take you there?"',
+  'Example tone: "I think the next step belongs in Creative Studio. Would you like me to take you there?"',
   "Preserve context — never imply the conversation ended.",
 ].join("\n");

@@ -32,7 +32,7 @@ export type InstituteLearningChatTurn = {
 type Props = {
   thread: ReactNode;
   footer: ReactNode;
-  /** Estate Intelligence™ — open a drawer on arrival (Phase 3) */
+  /** Estate Intelligence — open a drawer on arrival (Phase 3) */
   initialOpenDrawerId?: string | null;
   onInstituteLearningChat?: (turn: InstituteLearningChatTurn) => void;
   conversationScrollKey?: string | number;

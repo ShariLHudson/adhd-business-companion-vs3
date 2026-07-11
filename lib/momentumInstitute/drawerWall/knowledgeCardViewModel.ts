@@ -1,5 +1,5 @@
 /**
- * Knowledge Card™ view models for drawer index cards and learning panel.
+ * Knowledge Card view models for drawer index cards and learning panel.
  */
 
 import type {

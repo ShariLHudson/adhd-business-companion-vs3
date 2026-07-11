@@ -16,7 +16,7 @@ export function FounderAiExtensionsCenter() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="AI Extensions Center™"
+        eyebrow="AI Extensions Center"
         title="Specialist AI Tools"
         question="Which extension helps with today's work?"
         purpose="Calm access to ChatGPT, Claude, Gemini, Cursor, and image tools — Founder remains the Executive Headquarters."

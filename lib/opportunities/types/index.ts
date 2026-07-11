@@ -1,4 +1,4 @@
-/** Opportunity Discovery Center™ — business opportunity types. */
+/** Opportunity Discovery Center — business opportunity types. */
 
 export type OpportunityTypeId =
   | "new-product"

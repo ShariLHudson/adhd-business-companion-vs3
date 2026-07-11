@@ -5,7 +5,7 @@ import {
 } from "./registry";
 import { clampAmbienceVolume } from "../estateAmbienceVolume";
 
-describe("Estate Presence™ registry", () => {
+describe("Estate Presence registry", () => {
   it("configures conservatory with water, leaves, and birds", () => {
     const profile = resolveEstatePresenceProfile("conservatory");
     expect(profile?.layers.some((l) => l.kind === "water-ripple")).toBe(true);
@@ -19,12 +19,18 @@ describe("Estate Presence™ registry", () => {
     expect(profile?.layers.filter((l) => l.kind === "lantern").length).toBe(2);
   });
 
-  it("maps brain-dump section to conservatory presence", () => {
-    expect(estatePresenceRoomForSection("brain-dump")).toBe("conservatory");
+  it("maps brain-dump section to clear-my-mind presence", () => {
+    expect(estatePresenceRoomForSection("brain-dump")).toBe("clear-my-mind");
   });
 
   it("maps momentum institute section", () => {
     expect(estatePresenceRoomForSection("momentum-institute")).toBe(
+      "momentum-institute",
+    );
+  });
+
+  it("maps chamber of momentum section to momentum institute presence", () => {
+    expect(estatePresenceRoomForSection("chamber-of-momentum")).toBe(
       "momentum-institute",
     );
   });

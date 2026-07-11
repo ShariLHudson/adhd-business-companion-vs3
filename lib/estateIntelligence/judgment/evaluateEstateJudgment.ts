@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Judgment Layer™ — reasoning over registry facts.
+ * Estate Knowledge Judgment Layer — reasoning over registry facts.
  *
  * User → Spark Intelligence → **Estate Judgment** → Estate Knowledge Registry → Answer
  *

@@ -1,23 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { LibraryCloseButton } from "@/components/companion/LibraryOrientationChrome";
-import { AppBackButton } from "@/components/companion/AppBackButton";
-import { NAV_FOCUS_MY_BRAIN } from "@/lib/navigationBack";
 import { VisualFocusPurposeAnchor } from "@/components/companion/VisualFocusPurposeAnchor";
 import { CartographersStudioRoom } from "@/components/companion/cartographersStudio/CartographersStudioRoom";
 import { MindMapDiscoveryInterview } from "@/components/companion/cartographersStudio/MindMapDiscoveryInterview";
 import { MindMapEditableCanvas } from "@/components/companion/cartographersStudio/MindMapEditableCanvas";
-import { VisualFocusMapHeader } from "@/components/companion/visualFocus/VisualFocusMapHeader";
 import { VisualFocusVisualCanvas } from "@/components/companion/visualFocus/VisualFocusVisualCanvas";
 import { VisualFocusIntelligencePanel } from "@/components/companion/visualFocus/VisualFocusIntelligencePanel";
 import { IntelligenceViewModeToggle } from "@/components/companion/visualFocus/IntelligenceViewModeToggle";
 import { BusinessCanvasHealthOverviewPanel } from "@/components/companion/visualFocus/BusinessCanvasHealthOverviewPanel";
-import { VisualFocusSaveMenu } from "@/components/companion/visualFocus/VisualFocusSaveMenu";
-import { VisualFocusVersionHistoryDialog } from "@/components/companion/visualFocus/VisualFocusVersionHistoryDialog";
 import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
-import { SaveDestinationDialog } from "@/components/companion/SaveDestinationDialog";
-import { suggestSaveDestinationForVisualMap } from "@/lib/saveDestinations";
 import { BusinessCanvasInteractiveCanvas } from "@/components/companion/visualFocus/BusinessCanvasInteractiveCanvas";
 import { affectedSectionsForChange } from "@/lib/visualFocus/businessCanvas/changeExploration";
 import { BusinessCanvasChangePanel } from "@/components/companion/visualFocus/BusinessCanvasChangePanel";
@@ -28,32 +20,34 @@ import type {
   BusinessCanvasWorkflowStage,
 } from "@/lib/visualFocus/businessCanvas/workflowTypes";
 import { normalizeBusinessCanvasWorkflow } from "@/lib/visualFocus/businessCanvas/workflowTypes";
-import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import {
+  CARTOGRAPHERS_ATLAS_SAVE_LINE,
+  CARTOGRAPHERS_EXIT,
+  CARTOGRAPHERS_HELP,
+  CARTOGRAPHERS_RESUME_PREVIOUS,
+  CARTOGRAPHERS_RETURN_TO_ESTATE,
+  CARTOGRAPHERS_STUDIO_BACKGROUND,
+  requestCartographersWelcome,
+} from "@/lib/cartographersStudio";
 import {
   VISUAL_FOCUS_UPDATED,
   VISUAL_FOCUS_SHOW_STUDIO,
   VISUAL_FOCUS_OPEN_REQUESTED,
+  VISUAL_FOCUS_MIND_MAP_DISCOVERY_REQUESTED,
   canGenerateVisualFocusMap,
   clearActiveVisualFocusMapSelection,
   consumeVisualFocusOpen,
+  consumeMindMapDiscoveryPending,
   createAndActivateMap,
   deleteVisualFocusMap,
   archiveVisualFocusMap,
-  unarchiveVisualFocusMap,
-  saveVisualFocusMapVersion,
-  restoreVisualFocusMapVersion,
-  duplicateVisualFocusMap,
   generateMapLabelForMode,
   generateVisualFocusMap,
   generateBusinessCanvasImpact,
   getVisualFocusMapById,
   listVisualFocusMaps,
-  renameVisualFocusMap,
   saveVisualFocusMap,
-  saveVisualFocusMapToDestination,
   setActiveVisualFocusMap,
-  togglePinVisualFocusMap,
-  studioCardTitleForMode,
   listContinueThinkingMaps,
   type VisualFocusMap,
   type VisualFocusMode,
@@ -297,12 +291,14 @@ export function VisualFocusWorkspacePanel({
   onBack,
   onClose,
   registerBack,
-  onWorkWithShari,
+  onReturnToEstate,
 }: {
   onBack?: () => void;
   onClose?: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
+  /** @deprecated Removed from production chrome. */
   onWorkWithShari?: () => void;
+  onReturnToEstate?: () => void;
 }) {
   const [view, setView] = useState<StudioView>("hub");
   const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>("build");
@@ -311,17 +307,16 @@ export function VisualFocusWorkspacePanel({
   const [pendingCreateMode, setPendingCreateMode] =
     useState<VisualFocusMode | null>(null);
   const [mindMapDiscoveryOpen, setMindMapDiscoveryOpen] = useState(false);
+  const [mindMapDiscoverySeed, setMindMapDiscoverySeed] = useState<
+    string | undefined
+  >(undefined);
   const [showDraftReview, setShowDraftReview] = useState(false);
-  const [autosaveLabel, setAutosaveLabel] = useState<"saved" | "saving">("saved");
+  const [atlasSaveAck, setAtlasSaveAck] = useState<string | null>(null);
   const [showBuildPanel, setShowBuildPanel] = useState(true);
   const [mindHistory, setMindHistory] = useState<MindMapHistoryState | null>(
     null,
   );
-  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
-  const [saveAsMode, setSaveAsMode] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [hubDeleteMapId, setHubDeleteMapId] = useState<string | null>(null);
-  const [versionHistoryOpen, setVersionHistoryOpen] = useState(false);
   const [intelligenceViewMode, setIntelligenceViewMode] =
     useState<IntelligenceViewMode>("canvas-intelligence");
   const [intelligenceHighlightSection, setIntelligenceHighlightSection] =
@@ -333,7 +328,19 @@ export function VisualFocusWorkspacePanel({
     setView("hub");
     setWorkspaceMode("build");
     setMindMapDiscoveryOpen(false);
+    setMindMapDiscoverySeed(undefined);
     setShowDraftReview(false);
+  }, []);
+
+  const openMindMapDiscovery = useCallback((seedText?: string) => {
+    clearActiveVisualFocusMapSelection();
+    setActive(null);
+    setView("hub");
+    setWorkspaceMode("build");
+    setShowDraftReview(false);
+    setPendingCreateMode(null);
+    setMindMapDiscoverySeed(seedText?.trim() || undefined);
+    setMindMapDiscoveryOpen(true);
   }, []);
 
   const openMapWorkspace = useCallback(
@@ -368,8 +375,11 @@ export function VisualFocusWorkspacePanel({
 
   useEffect(() => {
     setMaps(listVisualFocusMaps());
+    const discoveryPending = consumeMindMapDiscoveryPending();
     const pending = consumeVisualFocusOpen();
-    if (pending) {
+    if (discoveryPending) {
+      openMindMapDiscovery(discoveryPending.seedText);
+    } else if (pending) {
       openMapWorkspace(pending.mapId, pending.preferGenerated);
     } else {
       showStudioHub();
@@ -389,16 +399,31 @@ export function VisualFocusWorkspacePanel({
         consumed?.preferGenerated ?? detail.preferGenerated,
       );
     };
+    const onMindMapDiscovery = (event: Event) => {
+      const detail = (event as CustomEvent<{ seedText?: string }>).detail;
+      const consumed = consumeMindMapDiscoveryPending();
+      openMindMapDiscovery(
+        consumed?.seedText ?? detail?.seedText,
+      );
+    };
 
     window.addEventListener(VISUAL_FOCUS_UPDATED, onUpdate);
     window.addEventListener(VISUAL_FOCUS_SHOW_STUDIO, onStudio);
     window.addEventListener(VISUAL_FOCUS_OPEN_REQUESTED, onOpenRequested);
+    window.addEventListener(
+      VISUAL_FOCUS_MIND_MAP_DISCOVERY_REQUESTED,
+      onMindMapDiscovery,
+    );
     return () => {
       window.removeEventListener(VISUAL_FOCUS_UPDATED, onUpdate);
       window.removeEventListener(VISUAL_FOCUS_SHOW_STUDIO, onStudio);
       window.removeEventListener(VISUAL_FOCUS_OPEN_REQUESTED, onOpenRequested);
+      window.removeEventListener(
+        VISUAL_FOCUS_MIND_MAP_DISCOVERY_REQUESTED,
+        onMindMapDiscovery,
+      );
     };
-  }, [reload, showStudioHub, openMapWorkspace]);
+  }, [reload, showStudioHub, openMapWorkspace, openMindMapDiscovery]);
 
   const backToStudio = useCallback(() => {
     setIntelligenceHighlightSection(null);
@@ -432,25 +457,34 @@ export function VisualFocusWorkspacePanel({
     return () => registerBack(null);
   }, [registerBack, view, backToStudio]);
 
-  function persist(map: VisualFocusMap) {
-    setAutosaveLabel("saving");
+  function persist(map: VisualFocusMap, opts?: { announce?: boolean }) {
     const saved = saveVisualFocusMap(map);
     setActive(saved);
     setMaps(listVisualFocusMaps());
-    setAutosaveLabel("saved");
+    if (opts?.announce) {
+      setAtlasSaveAck(CARTOGRAPHERS_ATLAS_SAVE_LINE);
+      window.setTimeout(() => setAtlasSaveAck(null), 4200);
+    }
     return saved;
   }
 
   function handleSelectMindMapFromRoom() {
-    setMindMapDiscoveryOpen(true);
+    openMindMapDiscovery();
   }
 
   function handleMindMapDiscoveryComplete(answers: {
     topic: string;
     everything: string;
+    desiredOutcome?: string;
     anythingElse?: string;
   }) {
-    const map = createAndActivateMap("mind-map", { mindMapDiscovery: answers });
+    const map = createAndActivateMap("mind-map", {
+      mindMapDiscovery: {
+        topic: answers.topic,
+        everything: answers.everything,
+        desiredOutcome: answers.desiredOutcome ?? answers.anythingElse,
+      },
+    });
     const withLayout = generateVisualFocusMap(map);
     const saved = persist(withLayout);
     setActive(saved);
@@ -460,6 +494,7 @@ export function VisualFocusWorkspacePanel({
     setMindHistory(createMindMapHistory(saved.root));
     setShowDraftReview(true);
     setMindMapDiscoveryOpen(false);
+    setMindMapDiscoverySeed(undefined);
   }
 
   function handleCreate(mode: VisualFocusMode, purposeAnswer: string) {
@@ -478,11 +513,7 @@ export function VisualFocusWorkspacePanel({
   function handleGenerate() {
     if (!active) return;
     const generated = generateVisualFocusMap(active);
-    let saved = persist(generated);
-    if (saved.mode !== "business-canvas") {
-      const versioned = saveVisualFocusMapVersion(saved.id, "Generated snapshot");
-      if (versioned) saved = versioned;
-    }
+    const saved = persist(generated);
     setActive(saved);
     setWorkspaceMode("generated");
   }
@@ -570,14 +601,6 @@ export function VisualFocusWorkspacePanel({
     return map.analysis!;
   }
 
-  function promptTitle(defaultValue: string): string | null {
-    if (typeof window === "undefined") return null;
-    const next = window.prompt("Map name", defaultValue);
-    if (next === null) return null;
-    return next.trim() || defaultValue;
-  }
-
-  const modeBadge = active ? studioCardTitleForMode(active.mode) : null;
   const continueThinking = useMemo(
     () => listContinueThinkingMaps(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -589,9 +612,11 @@ export function VisualFocusWorkspacePanel({
     active.visualLayout &&
     active.analysis;
 
+  const exitHandler = onReturnToEstate ?? onClose ?? onBack;
+
   return (
     <div
-      className={`${workspacePanelShellClass({ width: "full", inSplit: true })} companion-panel-surface`}
+      className="cartographers-room-root"
       data-testid="visual-focus-workspace"
       data-visual-focus-view={view}
       data-workspace-mode={workspaceMode}
@@ -604,7 +629,7 @@ export function VisualFocusWorkspacePanel({
             onOpenMap={handleOpenMap}
             onRemoveMap={handleRemoveContinueThinkingMap}
             onDeleteMap={handleRequestDeleteContinueThinkingMap}
-            onWorkWithShari={onWorkWithShari}
+            onReturnToEstate={onReturnToEstate ?? onClose ?? onBack}
             onBack={onBack}
             onClose={onClose}
           />
@@ -631,10 +656,17 @@ export function VisualFocusWorkspacePanel({
             }}
           />
           {mindMapDiscoveryOpen ? (
-            <MindMapDiscoveryInterview
-              onCancel={() => setMindMapDiscoveryOpen(false)}
-              onComplete={handleMindMapDiscoveryComplete}
-            />
+            <div className="cartographers-discovery-layer">
+              <MindMapDiscoveryInterview
+                key={mindMapDiscoverySeed ?? "mind-map-discovery"}
+                seedText={mindMapDiscoverySeed}
+                onCancel={() => {
+                  setMindMapDiscoveryOpen(false);
+                  setMindMapDiscoverySeed(undefined);
+                }}
+                onComplete={handleMindMapDiscoveryComplete}
+              />
+            </div>
           ) : null}
           {pendingCreateMode ? (
             <VisualFocusPurposeAnchor
@@ -645,456 +677,315 @@ export function VisualFocusWorkspacePanel({
           ) : null}
         </>
       ) : active ? (
-        <div className="flex min-h-0 flex-1 flex-col">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e7dfd4] pb-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <AppBackButton
-                destination="Studio"
-                onBack={backToStudio}
-                size="compact"
-                className="mb-0"
-                ariaLabel="Back to Studio"
-              />
-              {modeBadge ? (
-                <span
-                  className="rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#1e4f4f]"
-                  data-testid="visual-focus-mode-badge"
-                >
-                  {modeBadge}
-                </span>
-              ) : null}
-              <span
-                className={`cartographers-autosave${
-                  autosaveLabel === "saved" ? " cartographers-autosave--saved" : ""
-                }`}
-                data-testid="cartographers-autosave"
-              >
-                {autosaveLabel === "saving" ? "Saving…" : "Auto-saved"}
-              </span>
-              {active.mode !== "mind-map" && active.workflowStage === "generated" ? (
+        <div className="cartographers-discovery-table">
+          <div
+            className="cartographers-discovery-table__plate"
+            style={{ backgroundImage: `url(${CARTOGRAPHERS_STUDIO_BACKGROUND})` }}
+            aria-hidden
+          />
+          <div className="cartographers-immersive__veil" aria-hidden />
+
+          <div className="cartographers-immersive__chrome">
+            <div className="cartographers-immersive__chrome-left">
+              {exitHandler ? (
                 <button
                   type="button"
-                  onClick={() =>
-                    setWorkspaceMode((m) => (m === "generated" ? "build" : "generated"))
-                  }
-                  className="rounded-full border border-[#e7dfd4] px-3 py-1 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
+                  className="cartographers-chrome-link"
+                  data-testid="cartographers-workspace-return"
+                  onClick={exitHandler}
                 >
-                  {workspaceMode === "generated" ? "Edit structure" : "View visual map"}
+                  <span aria-hidden>←</span> {CARTOGRAPHERS_RETURN_TO_ESTATE}
                 </button>
               ) : null}
             </div>
-            <div className="flex items-center gap-2">
-              <VisualFocusSaveMenu
-                pinned={active.pinned}
-                archived={active.lifecycleStatus === "archived"}
-                versionCount={active.versions?.length ?? 0}
-                onSave={() => {
-                  setSaveAsMode(false);
-                  setSaveDialogOpen(true);
+            <div className="cartographers-immersive__chrome-actions">
+              <button
+                type="button"
+                className="cartographers-chrome-link"
+                data-testid="cartographers-workspace-resume"
+                onClick={backToStudio}
+              >
+                {CARTOGRAPHERS_RESUME_PREVIOUS}
+              </button>
+              <button
+                type="button"
+                className="cartographers-chrome-link"
+                data-testid="cartographers-workspace-help"
+                onClick={() => {
+                  requestCartographersWelcome();
+                  backToStudio();
                 }}
-                onSaveAs={() => {
-                  setSaveAsMode(true);
-                  setSaveDialogOpen(true);
-                }}
-                onRename={() => {
-                  const title = promptTitle(active.title);
-                  if (!title) return;
-                  const renamed = renameVisualFocusMap(active.id, title);
-                  if (renamed) setActive(renamed);
-                }}
-                onDuplicate={() => {
-                  const copy = duplicateVisualFocusMap(active.id);
-                  if (copy) {
-                    setActive(copy);
-                    setMaps(listVisualFocusMaps());
-                  }
-                }}
-                onSaveVersion={() => {
-                  persist(active);
-                  const defaultLabel =
-                    (active.versions?.length ?? 0) > 0 ? "Version" : "Initial Version";
-                  const label =
-                    typeof window !== "undefined"
-                      ? window.prompt("Version label (optional)", defaultLabel)
-                      : defaultLabel;
-                  if (label === null) return;
-                  const updated = saveVisualFocusMapVersion(
-                    active.id,
-                    label.trim() || undefined,
-                  );
-                  if (updated) {
-                    setActive(updated);
-                    setMaps(listVisualFocusMaps());
-                  }
-                }}
-                onVersionHistory={() => setVersionHistoryOpen(true)}
-                onPin={() => {
-                  const updated = togglePinVisualFocusMap(active.id);
-                  if (updated) {
-                    setActive(updated);
-                    setMaps(listVisualFocusMaps());
-                  }
-                }}
-                onArchive={() => {
-                  persist(active);
-                  const updated = archiveVisualFocusMap(active.id);
-                  if (updated) {
-                    setActive(updated);
-                    reload();
-                  }
-                }}
-                onUnarchive={() => {
-                  const updated = unarchiveVisualFocusMap(active.id);
-                  if (updated) {
-                    setActive(updated);
-                    reload();
-                  }
-                }}
-                onDelete={() => setDeleteDialogOpen(true)}
-              />
-              {onClose ? (
-                <LibraryCloseButton
-                  onClose={onClose}
-                  destination={NAV_FOCUS_MY_BRAIN}
-                />
+              >
+                {CARTOGRAPHERS_HELP}
+              </button>
+              {exitHandler ? (
+                <button
+                  type="button"
+                  className="cartographers-chrome-link"
+                  data-testid="cartographers-workspace-exit"
+                  onClick={exitHandler}
+                >
+                  {CARTOGRAPHERS_EXIT}
+                </button>
               ) : null}
             </div>
           </div>
 
-          {active.mode === "mind-map" &&
-          active.discoveryInterview &&
-          showDraftReview ? (
-            <div
-              className="cartographers-draft-review"
-              data-testid="mind-map-draft-review"
+          {atlasSaveAck ? (
+            <p
+              className="cartographers-atlas-ack"
+              role="status"
+              aria-live="polite"
             >
-              <p className="cartographers-draft-review__question">
-                Does this look like the right starting point?
-              </p>
-              {active.draftExplanation ? (
-                <p className="mt-2 text-sm leading-relaxed text-[#6b635a]">
-                  {active.draftExplanation}
-                </p>
-              ) : null}
-              {active.draftDuplicates && active.draftDuplicates.length > 0 ? (
-                <p className="mt-1 text-xs text-[#9a8f82]">
-                  Merged near-duplicates: {active.draftDuplicates.slice(0, 3).join("; ")}
-                </p>
-              ) : null}
-              {active.draftSuggestions && active.draftSuggestions.length > 0 ? (
-                <p className="mt-1 text-sm text-[#6b635a]">
-                  Soft prompts: {active.draftSuggestions.join(" · ")}
-                </p>
-              ) : null}
-              <div className="cartographers-draft-review__actions">
-                <button
-                  type="button"
-                  className="rounded-xl bg-[#1e4f4f] px-3 py-2 text-xs font-semibold text-white hover:bg-[#163c3c]"
-                  onClick={() => setShowDraftReview(false)}
-                >
-                  Yes, keep going
-                </button>
-                <button
-                  type="button"
-                  className="rounded-xl border border-[#e7dfd4] px-3 py-2 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
-                  onClick={() => setShowDraftReview(false)}
-                >
-                  Keep editing on the map
-                </button>
-              </div>
-            </div>
+              {atlasSaveAck}
+            </p>
           ) : null}
 
-          <SaveDestinationDialog
-            open={saveDialogOpen && Boolean(active)}
-            title={saveAsMode ? "Save As" : "Save To"}
-            suggested={
-              active
-                ? suggestSaveDestinationForVisualMap(active.mode).destination
-                : undefined
-            }
-            suggestionReason={
-              active
-                ? suggestSaveDestinationForVisualMap(active.mode).reason
-                : undefined
-            }
-            onCancel={() => setSaveDialogOpen(false)}
-            onSave={(destination) => {
-              if (!active) return;
-              persist(active);
-              if (saveAsMode) {
-                const copy = duplicateVisualFocusMap(active.id);
-                if (copy) {
-                  const saved = saveVisualFocusMapToDestination(copy.id, destination);
-                  if (saved) {
-                    setActive(saved);
-                    setMaps(listVisualFocusMaps());
-                  }
-                }
-              } else {
-                const saved = saveVisualFocusMapToDestination(active.id, destination);
-                if (saved) setActive(saved);
-              }
-              setSaveDialogOpen(false);
-              setMaps(listVisualFocusMaps());
-            }}
-          />
-
-          <ConfirmDialog
-            open={deleteDialogOpen && Boolean(active)}
-            title="Delete Map"
-            message="This action cannot be undone. The map will be permanently removed from your workspace."
-            confirmLabel="Delete"
-            cancelLabel="Cancel"
-            destructive
-            onCancel={() => setDeleteDialogOpen(false)}
-            onConfirm={() => {
-              if (!active) return;
-              deleteVisualFocusMap(active.id);
-              setDeleteDialogOpen(false);
-              reload();
-              backToStudio();
-            }}
-          />
-
-          <VisualFocusVersionHistoryDialog
-            open={versionHistoryOpen && Boolean(active)}
-            map={active}
-            onClose={() => setVersionHistoryOpen(false)}
-            onSaveVersion={() => {
-              if (!active) return;
-              persist(active);
-              const defaultLabel =
-                (active.versions?.length ?? 0) > 0 ? "Version" : "Initial Version";
-              const label =
-                typeof window !== "undefined"
-                  ? window.prompt("Version label (optional)", defaultLabel)
-                  : defaultLabel;
-              if (label === null) return;
-              const updated = saveVisualFocusMapVersion(
-                active.id,
-                label.trim() || undefined,
-              );
-              if (updated) {
-                setActive(updated);
-                setMaps(listVisualFocusMaps());
-              }
-            }}
-            onRestore={(versionId) => {
-              if (!active) return;
-              persist(active);
-              const updated = restoreVisualFocusMapVersion(active.id, versionId);
-              if (updated) {
-                setActive(updated);
-                setMaps(listVisualFocusMaps());
-                setVersionHistoryOpen(false);
-              }
-            }}
-          />
-
-          <div className="mt-4">
-            <VisualFocusMapHeader map={active} />
-          </div>
-
-          {active.mode === "mind-map" ? (
-            <div className="cartographers-workspace-shell mt-4 min-h-0 flex-1 overflow-hidden p-3">
-              <input
-                value={active.title}
-                onChange={(e) => persist({ ...active, title: e.target.value })}
-                className="mb-3 w-full border-0 border-b border-[#e7dfd4] bg-transparent pb-2 text-xl font-semibold text-[#1f1c19] focus:border-[#8b7355] focus:outline-none"
-                aria-label="Map title"
-              />
-              <MindMapEditableCanvas
-                root={mindHistory?.present ?? active.root}
-                canUndo={mindHistory ? canUndo(mindHistory) : false}
-                canRedo={mindHistory ? canRedo(mindHistory) : false}
-                onUndo={() => {
-                  if (!mindHistory || !canUndo(mindHistory)) return;
-                  const next = undoMindMapHistory(mindHistory);
-                  setMindHistory(next);
-                  persist({ ...active, root: cloneTree(next.present) });
-                }}
-                onRedo={() => {
-                  if (!mindHistory || !canRedo(mindHistory)) return;
-                  const next = redoMindMapHistory(mindHistory);
-                  setMindHistory(next);
-                  persist({ ...active, root: cloneTree(next.present) });
-                }}
-                onChange={(root) => {
-                  const base = mindHistory ?? createMindMapHistory(active.root);
-                  const next = pushMindMapHistory(base, root);
-                  setMindHistory(next);
-                  persist({ ...active, root: cloneTree(root) });
-                }}
-              />
-            </div>
-          ) : showGenerated ? (
-            <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-                  Strategic view
+          <div className="cartographers-discovery-table__focus">
+            {active.mode === "mind-map" &&
+            active.discoveryInterview &&
+            showDraftReview ? (
+              <div
+                className="cartographers-draft-review"
+                data-testid="mind-map-draft-review"
+              >
+                <p className="cartographers-draft-review__question">
+                  I think this is a strong starting point. We can refine it together.
                 </p>
-                <IntelligenceViewModeToggle
-                  mode={intelligenceViewMode}
-                  onChange={setIntelligenceViewMode}
+                {active.draftExplanation ? (
+                  <p className="mt-2 text-sm leading-relaxed text-[#6b635a]">
+                    {active.draftExplanation}
+                  </p>
+                ) : null}
+                {active.draftDuplicates && active.draftDuplicates.length > 0 ? (
+                  <p className="mt-1 text-xs text-[#9a8f82]">
+                    Merged near-duplicates: {active.draftDuplicates.slice(0, 3).join("; ")}
+                  </p>
+                ) : null}
+                {active.draftSuggestions && active.draftSuggestions.length > 0 ? (
+                  <p className="mt-1 text-sm text-[#6b635a]">
+                    Soft prompts: {active.draftSuggestions.join(" · ")}
+                  </p>
+                ) : null}
+                <div className="cartographers-draft-review__actions">
+                  <button
+                    type="button"
+                    className="rounded-xl bg-[#1e4f4f] px-3 py-2 text-xs font-semibold text-white hover:bg-[#163c3c]"
+                    onClick={() => setShowDraftReview(false)}
+                  >
+                    Yes, keep going
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-xl border border-[#e7dfd4] px-3 py-2 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
+                    onClick={() => setShowDraftReview(false)}
+                  >
+                    Keep editing on the map
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {active.mode === "mind-map" ? (
+              <div className="cartographers-workspace-shell mt-4 min-h-0 flex-1 overflow-hidden p-3">
+                <input
+                  value={active.title}
+                  onChange={(e) => persist({ ...active, title: e.target.value })}
+                  className="mb-3 w-full border-0 border-b border-[#e7dfd4] bg-transparent pb-2 text-xl font-semibold text-[#1f1c19] focus:border-[#8b7355] focus:outline-none"
+                  aria-label="Map title"
+                />
+                <MindMapEditableCanvas
+                  root={mindHistory?.present ?? active.root}
+                  canUndo={mindHistory ? canUndo(mindHistory) : false}
+                  canRedo={mindHistory ? canRedo(mindHistory) : false}
+                  onUndo={() => {
+                    if (!mindHistory || !canUndo(mindHistory)) return;
+                    const next = undoMindMapHistory(mindHistory);
+                    setMindHistory(next);
+                    persist({ ...active, root: cloneTree(next.present) });
+                  }}
+                  onRedo={() => {
+                    if (!mindHistory || !canRedo(mindHistory)) return;
+                    const next = redoMindMapHistory(mindHistory);
+                    setMindHistory(next);
+                    persist({ ...active, root: cloneTree(next.present) });
+                  }}
+                  onChange={(root) => {
+                    const base = mindHistory ?? createMindMapHistory(active.root);
+                    const next = pushMindMapHistory(base, root);
+                    setMindHistory(next);
+                    persist({ ...active, root: cloneTree(root) });
+                  }}
                 />
               </div>
-              <div
-                className={`flex min-h-0 flex-1 flex-col gap-4 ${
-                  intelligenceViewMode === "canvas-intelligence"
-                    ? "lg:flex-row"
-                    : ""
-                }`}
-              >
-              {active.mode === "business-canvas" &&
-              active.businessCanvasHealth &&
-              intelligenceViewMode !== "canvas-only" ? (
-                <BusinessCanvasHealthOverviewPanel health={active.businessCanvasHealth} />
-              ) : null}
-              {intelligenceViewMode !== "intelligence-only" &&
-              showBuildPanel &&
-              active.mode !== "business-canvas" ? (
-                <aside className="w-full shrink-0 overflow-y-auto lg:w-64 xl:w-72">
-                  <div className="mb-2 flex items-center justify-between">
-                    <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-                      Input structure
-                    </p>
-                    <button
-                      type="button"
-                      className="text-xs text-[#9a8f82] lg:hidden"
-                      onClick={() => setShowBuildPanel(false)}
-                    >
-                      Hide
-                    </button>
-                  </div>
-                  {active.mode === "visual-kanban" && active.kanban ? (
-                    <VisualFocusKanbanEditor
-                      columns={active.kanban.columns}
-                      cards={active.kanban.cards}
-                      onChange={(columns, cards) => {
-                        const updated = { ...active, kanban: { columns, cards } };
-                        persist(
-                          workspaceMode === "generated"
-                            ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
-                            : updated,
-                        );
-                      }}
+            ) : showGenerated ? (
+              <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                    Strategic view
+                  </p>
+                  <IntelligenceViewModeToggle
+                    mode={intelligenceViewMode}
+                    onChange={setIntelligenceViewMode}
+                  />
+                </div>
+                <div
+                  className={`flex min-h-0 flex-1 flex-col gap-4 ${
+                    intelligenceViewMode === "canvas-intelligence"
+                      ? "lg:flex-row"
+                      : ""
+                  }`}
+                >
+                {active.mode === "business-canvas" &&
+                active.businessCanvasHealth &&
+                intelligenceViewMode !== "canvas-only" ? (
+                  <BusinessCanvasHealthOverviewPanel health={active.businessCanvasHealth} />
+                ) : null}
+                {intelligenceViewMode !== "intelligence-only" &&
+                showBuildPanel &&
+                active.mode !== "business-canvas" ? (
+                  <aside className="w-full shrink-0 overflow-y-auto lg:w-64 xl:w-72">
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                        Input structure
+                      </p>
+                      <button
+                        type="button"
+                        className="text-xs text-[#9a8f82] lg:hidden"
+                        onClick={() => setShowBuildPanel(false)}
+                      >
+                        Hide
+                      </button>
+                    </div>
+                    {active.mode === "visual-kanban" && active.kanban ? (
+                      <VisualFocusKanbanEditor
+                        columns={active.kanban.columns}
+                        cards={active.kanban.cards}
+                        onChange={(columns, cards) => {
+                          const updated = { ...active, kanban: { columns, cards } };
+                          persist(
+                            workspaceMode === "generated"
+                              ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
+                              : updated,
+                          );
+                        }}
+                      />
+                    ) : (
+                      <VisualFocusTreeEditor
+                        root={active.root}
+                        onChange={(root) => {
+                          const updated = { ...active, root };
+                          persist(
+                            workspaceMode === "generated"
+                              ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
+                              : updated,
+                          );
+                        }}
+                      />
+                    )}
+                  </aside>
+                ) : showBuildPanel && active.mode !== "business-canvas" ? (
+                  <button
+                    type="button"
+                    className="self-start text-xs font-semibold text-[#1e4f4f] lg:hidden"
+                    onClick={() => setShowBuildPanel(true)}
+                  >
+                    Show input structure
+                  </button>
+                ) : null}
+                {intelligenceViewMode !== "intelligence-only" ? (
+                <main className="min-h-0 flex-1 space-y-4">
+                  {active.mode === "business-canvas" ? (
+                    <BusinessCanvasInteractiveCanvas
+                      centerTitle={active.title}
+                      data={businessCanvasData(active)}
+                      highlightedSections={mergedCanvasHighlights(active)}
+                      impactStates={active.businessCanvasImpactStates}
+                      onChange={(data) =>
+                        persistBusinessCanvas(data, workspaceMode === "generated")
+                      }
                     />
                   ) : (
-                    <VisualFocusTreeEditor
-                      root={active.root}
-                      onChange={(root) => {
-                        const updated = { ...active, root };
-                        persist(
-                          workspaceMode === "generated"
-                            ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
-                            : updated,
-                        );
-                      }}
+                    <VisualFocusVisualCanvas
+                      layout={active.visualLayout!}
+                      centerTitle={active.title}
                     />
                   )}
-                </aside>
-              ) : showBuildPanel && active.mode !== "business-canvas" ? (
-                <button
-                  type="button"
-                  className="self-start text-xs font-semibold text-[#1e4f4f] lg:hidden"
-                  onClick={() => setShowBuildPanel(true)}
-                >
-                  Show input structure
-                </button>
-              ) : null}
-              {intelligenceViewMode !== "intelligence-only" ? (
-              <main className="min-h-0 flex-1 space-y-4">
+                  {active.mode === "business-canvas" &&
+                  businessCanvasWorkflow(active) !== "buildCurrentCanvas" ? (
+                    <BusinessCanvasChangePanel
+                      workflow={businessCanvasWorkflow(active)}
+                      change={businessCanvasChange(active)}
+                      onChange={persistBusinessCanvasChange}
+                      onAnalyzeImpact={handleAnalyzeBusinessCanvasImpact}
+                    />
+                  ) : null}
+                </main>
+                ) : null}
+                {intelligenceViewMode !== "canvas-only" ? (
+                <VisualFocusIntelligencePanel
+                  analysis={intelligenceAnalysis(active)}
+                  onSectionHighlight={
+                    active.mode === "business-canvas"
+                      ? handleIntelligenceSectionHighlight
+                      : undefined
+                  }
+                  fullWidth={intelligenceViewMode === "intelligence-only"}
+                />
+                ) : null}
+                </div>
+              </div>
+            ) : (
+              <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
+                <input
+                  value={active.title}
+                  onChange={(e) => persist({ ...active, title: e.target.value })}
+                  className="mb-4 w-full border-0 border-b border-[#e7dfd4] bg-transparent pb-2 text-xl font-semibold text-[#1f1c19] focus:border-[#1e4f4f] focus:outline-none"
+                  aria-label="Map title"
+                />
                 {active.mode === "business-canvas" ? (
                   <BusinessCanvasInteractiveCanvas
-                    centerTitle={active.title}
                     data={businessCanvasData(active)}
                     highlightedSections={mergedCanvasHighlights(active)}
-                    impactStates={active.businessCanvasImpactStates}
                     onChange={(data) =>
-                      persistBusinessCanvas(data, workspaceMode === "generated")
+                      persist({ ...active, businessCanvas: data })
+                    }
+                  />
+                ) : active.mode === "visual-kanban" && active.kanban ? (
+                  <VisualFocusKanbanEditor
+                    columns={active.kanban.columns}
+                    cards={active.kanban.cards}
+                    onChange={(columns, cards) =>
+                      persist({ ...active, kanban: { columns, cards } })
                     }
                   />
                 ) : (
-                  <VisualFocusVisualCanvas
-                    layout={active.visualLayout!}
-                    centerTitle={active.title}
+                  <VisualFocusTreeEditor
+                    root={active.root}
+                    onChange={(root) => persist({ ...active, root })}
                   />
                 )}
-                {active.mode === "business-canvas" &&
-                businessCanvasWorkflow(active) !== "buildCurrentCanvas" ? (
-                  <BusinessCanvasChangePanel
-                    workflow={businessCanvasWorkflow(active)}
-                    change={businessCanvasChange(active)}
-                    onChange={persistBusinessCanvasChange}
-                    onAnalyzeImpact={handleAnalyzeBusinessCanvasImpact}
-                  />
-                ) : null}
-              </main>
-              ) : null}
-              {intelligenceViewMode !== "canvas-only" ? (
-              <VisualFocusIntelligencePanel
-                analysis={intelligenceAnalysis(active)}
-                onSectionHighlight={
-                  active.mode === "business-canvas"
-                    ? handleIntelligenceSectionHighlight
-                    : undefined
-                }
-                fullWidth={intelligenceViewMode === "intelligence-only"}
-              />
-              ) : null}
+                {canGenerateVisualFocusMap(active) ? (
+                  <div className="sticky bottom-4 mt-6 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={handleGenerate}
+                      className="rounded-full bg-[#1e4f4f] px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-[#163b3b]"
+                      data-testid="visual-focus-generate"
+                    >
+                      {generateMapLabelForMode(active.mode)}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="mt-6 text-center text-sm text-[#9a8f82]">
+                    {active.mode === "business-canvas"
+                      ? "Fill at least 3 sections (or 4 entries total) to generate your canvas."
+                      : "Add at least two meaningful items to generate your visual map."}
+                  </p>
+                )}
               </div>
-            </div>
-          ) : (
-            <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
-              <input
-                value={active.title}
-                onChange={(e) => persist({ ...active, title: e.target.value })}
-                className="mb-4 w-full border-0 border-b border-[#e7dfd4] bg-transparent pb-2 text-xl font-semibold text-[#1f1c19] focus:border-[#1e4f4f] focus:outline-none"
-                aria-label="Map title"
-              />
-              {active.mode === "business-canvas" ? (
-                <BusinessCanvasInteractiveCanvas
-                  data={businessCanvasData(active)}
-                  highlightedSections={mergedCanvasHighlights(active)}
-                  onChange={(data) =>
-                    persist({ ...active, businessCanvas: data })
-                  }
-                />
-              ) : active.mode === "visual-kanban" && active.kanban ? (
-                <VisualFocusKanbanEditor
-                  columns={active.kanban.columns}
-                  cards={active.kanban.cards}
-                  onChange={(columns, cards) =>
-                    persist({ ...active, kanban: { columns, cards } })
-                  }
-                />
-              ) : (
-                <VisualFocusTreeEditor
-                  root={active.root}
-                  onChange={(root) => persist({ ...active, root })}
-                />
-              )}
-              {canGenerateVisualFocusMap(active) ? (
-                <div className="sticky bottom-4 mt-6 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={handleGenerate}
-                    className="rounded-full bg-[#1e4f4f] px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-[#163b3b]"
-                    data-testid="visual-focus-generate"
-                  >
-                    {generateMapLabelForMode(active.mode)}
-                  </button>
-                </div>
-              ) : (
-                <p className="mt-6 text-center text-sm text-[#9a8f82]">
-                  {active.mode === "business-canvas"
-                    ? "Fill at least 3 sections (or 4 entries total) to generate your canvas."
-                    : "Add at least two meaningful items to generate your visual map."}
-                </p>
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
       ) : null}
     </div>

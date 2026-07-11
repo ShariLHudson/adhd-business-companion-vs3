@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ Drawer Wall™ — resolve catalog + layout; future Estate Intelligence hooks.
+ * Momentum Institute Drawer Wall — resolve catalog + layout; future Estate Intelligence hooks.
  */
 
 import {
@@ -86,7 +86,7 @@ export function resolveKnowledgeCardPanel(
   };
 }
 
-/** Estate Intelligence™ — resolve drawer from member language (Phase 1 keyword match). */
+/** Estate Intelligence — resolve drawer from member language (Phase 1 keyword match). */
 export function matchDrawerIdForMemberText(text: string): string | null {
   const normalized = text.toLowerCase();
   const items = resolveDrawerWallItems();

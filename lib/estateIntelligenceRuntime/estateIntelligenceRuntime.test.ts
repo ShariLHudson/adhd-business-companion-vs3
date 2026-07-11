@@ -13,7 +13,7 @@ const stubRouting = {
   learnFastPath: false,
 } as IntentRoutingDecision;
 
-describe("Estate Intelligence Runtime™", () => {
+describe("Estate Intelligence Runtime", () => {
   it("navigates immediately for explicit take-me-to requests", () => {
     const pipeline = runConversationRoutingPipeline(
       { userText: "Take me to the treehouse" },

@@ -1,5 +1,5 @@
 /**
- * Estate Arrival Experience™ — cross-cutting session events (room open → arrival overlay).
+ * Estate Arrival Experience — cross-cutting session events (room open → arrival overlay).
  */
 
 export const ESTATE_ARRIVAL_START_EVENT = "spark:estate-arrival-start";

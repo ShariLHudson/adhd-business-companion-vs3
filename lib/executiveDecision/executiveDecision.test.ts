@@ -16,7 +16,7 @@ import {
   executiveControlSummary,
 } from "./index";
 
-describe("Executive Decision Lifecycle™", () => {
+describe("Executive Decision Lifecycle", () => {
   beforeEach(() => {
     resetRuntimeExecutiveDecisions();
   });

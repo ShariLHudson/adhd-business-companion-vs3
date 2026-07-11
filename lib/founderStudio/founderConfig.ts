@@ -1,4 +1,4 @@
-/** Founder Studio™ visual + route constants */
+/** Founder Studio visual + route constants */
 export const FOUNDER_STUDIO_BASE = "/companion/founder" as const;
 
 export const FOUNDER_OFFICE_BACKGROUND =
@@ -14,18 +14,18 @@ export const FOUNDER_COLORS = {
 
 export const FOUNDER_INTEL = {
   spark: {
-    acronym: "SPARK™",
-    name: "Strategic Pattern Analysis & Recommendation Kernel™",
+    acronym: "SPARK",
+    name: "Strategic Pattern Analysis & Recommendation Kernel",
     purpose: "Central intelligence and pattern recognition.",
   },
   flame: {
-    acronym: "FLAME™",
-    name: "Founder Learning & Adaptive Mentoring Engine™",
+    acronym: "FLAME",
+    name: "Founder Learning & Adaptive Mentoring Engine",
     purpose: "Learns Shari, adapts, remembers, mentors, and prioritizes.",
   },
   fire: {
-    acronym: "FIRE™",
-    name: "Founder Intelligence Report Engine™",
+    acronym: "FIRE",
+    name: "Founder Intelligence Report Engine",
     purpose:
       "Daily briefings, reports, forecasts, recommendations, PDFs, and archives.",
   },

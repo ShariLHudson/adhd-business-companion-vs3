@@ -1,5 +1,5 @@
 /**
- * The Gallery™ — Hall of Reflections (Songer).
+ * The Gallery — Hall of Reflections (Songer).
  * Source: https://songer.co/song/n4mxywv47fi61ovoo8994j55
  */
 

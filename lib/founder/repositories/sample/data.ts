@@ -50,7 +50,7 @@ export const SAMPLE_TODAY_BRIEF: FounderDailyBrief = {
           label: "Opportunity",
           tone: "opportunity",
           summary:
-            "ADHD planner bundle with Spark Card™ — test with 3 founders.",
+            "ADHD planner bundle with Spark Card — test with 3 founders.",
         },
       ],
     },
@@ -81,7 +81,7 @@ export const SAMPLE_TODAY_BRIEF: FounderDailyBrief = {
           id: "d2",
           label: "On Deck",
           tone: "on-deck",
-          summary: "Team Hub™ Izna lane — marketing execution only.",
+          summary: "Team Hub Izna lane — marketing execution only.",
         },
       ],
     },
@@ -90,7 +90,7 @@ export const SAMPLE_TODAY_BRIEF: FounderDailyBrief = {
     id: "best-idea-today",
     title: "Today's Best Idea",
     summary:
-      "Lock the Founder Intelligence OS foundation now — services and repositories — so FIRE™, FLAME™, and SPARK™ plug in without another refactor.",
+      "Lock the Founder Intelligence OS foundation now — services and repositories — so FIRE, FLAME, and SPARK plug in without another refactor.",
     tone: "insight",
     category: "strategy",
     source: "flame",
@@ -384,7 +384,7 @@ export const SAMPLE_CREATION: readonly FounderCreationOpportunity[] = [
     id: "lead-magnet",
     format: "lead-magnet",
     title: "Lead magnet",
-    summary: "Clear My Mind™ printable — gentle capture",
+    summary: "Clear My Mind printable — gentle capture",
     tone: "insight",
   },
   {

@@ -1,4 +1,4 @@
-/** AI Extensions Center™ — specialist AI tools; Founder remains Executive Headquarters. */
+/** AI Extensions Center — specialist AI tools; Founder remains Executive Headquarters. */
 
 export type AiExtensionTool = {
   id: string;

@@ -1,5 +1,5 @@
 /**
- * Discovery Mode™ — understand before routing.
+ * Discovery Mode — understand before routing.
  *
  * @see docs/estate/ESTATE_DISCOVERY_MODE.md
  */

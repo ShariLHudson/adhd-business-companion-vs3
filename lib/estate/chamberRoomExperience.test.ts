@@ -52,7 +52,7 @@ describe("chamberRoomExperience", () => {
       status: "active-focus",
     });
     const items = buildChamberMomentumPathItems();
-    expect(items[0]?.trademark).toBe("First Step™");
+    expect(items[0]?.trademark).toBe("First Step");
     expect(items[0]?.label).toBe("Write the homepage headline");
     expect(hasChamberSupplementalPanels()).toBe(true);
   });
@@ -73,7 +73,7 @@ describe("chamberRoomExperience", () => {
     expect(buildChamberProgressMoments().length).toBeGreaterThan(0);
     expect(
       buildChamberMomentumPathItems().some(
-        (item) => item.trademark === "Easy Wins™",
+        (item) => item.trademark === "Easy Wins",
       ),
     ).toBe(true);
   });
@@ -85,7 +85,7 @@ describe("chamber Phase 7 copy and room identity", () => {
       "Let's find what will help you move forward today.",
     );
     expect(CHAMBER_WELCOME_TITLE).toBe(
-      "Welcome to the Chamber of Momentum™",
+      "Welcome to the Chamber of Momentum",
     );
     expect(CHAMBER_OF_MOMENTUM_ROOM_META.background).toContain(
       "spark-chamber-of-momentum-background.png",

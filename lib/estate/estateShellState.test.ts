@@ -43,11 +43,11 @@ describe("resolveEstateShellState — Phase D.1", () => {
     expect(state?.showInvitationGrid).toBe(false);
   });
 
-  it("destination may show invitation grid when canon allows", () => {
+  it("destinations use conversation-only shell (no invitation grid on arrival)", () => {
     const state = resolveEstateShellState("momentum-institute");
     expect(state?.category).toBe("destination");
-    expect(state?.showInvitationGrid).toBe(true);
-    expect(state?.conversationOnly).toBe(false);
+    expect(state?.showInvitationGrid).toBe(false);
+    expect(state?.conversationOnly).toBe(true);
   });
 
   it("preserves conversation law on all resolved places", () => {

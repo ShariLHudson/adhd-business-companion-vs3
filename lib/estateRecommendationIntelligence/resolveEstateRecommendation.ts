@@ -1,5 +1,5 @@
 /**
- * Estate Recommendation Intelligence™
+ * Estate Recommendation Intelligence
  *
  * Connects human need signals → validated Live destinations → why-now invitations.
  * Companion, not directory. Permission before navigation (Spec 108).

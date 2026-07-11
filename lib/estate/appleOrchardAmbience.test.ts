@@ -7,7 +7,7 @@ import {
 import { resolveEstatePlaceAmbientProfile } from "./estatePlaceAmbientSound";
 
 describe("apple-orchard ambience", () => {
-  it("resolves bird audio for Apple Orchard™", () => {
+  it("resolves bird audio for Apple Orchard", () => {
     const profile = resolveEstatePlaceAmbientProfile("apple-orchard");
     expect(profile).toBeTruthy();
     expect(profile!.src).toBe(ORCHARD_BIRDS_AMBIENCE_MP3);

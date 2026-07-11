@@ -155,6 +155,14 @@ export function pickWanderDestination(
 export function resolveWanderRoomDisplayName(
   legacyPlaceId: string,
 ): string {
+  if (
+    legacyPlaceId === "clear-my-mind" ||
+    legacyPlaceId === "clear-my-mind-thoughts" ||
+    legacyPlaceId === "brain-dump"
+  ) {
+    return "Clear My Mind";
+  }
+
   const chamberName = resolveChamberMemberFacingName(legacyPlaceId);
   if (chamberName) return chamberName;
 

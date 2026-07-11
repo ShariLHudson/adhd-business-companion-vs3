@@ -85,7 +85,7 @@ function PresenceLayer({ layer }: { layer: EstatePresenceLayer }) {
 }
 
 /**
- * Estate Presence™ — subtle environmental life above the room plate, below UI.
+ * Estate Presence — subtle environmental life above the room plate, below UI.
  */
 export function EstatePresence({ roomId, className = "" }: Props) {
   const paused = useEstatePresencePaused();

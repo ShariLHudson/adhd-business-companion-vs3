@@ -9,6 +9,10 @@
  * @see lib/estate/resolveEstatePlace.ts
  */
 
+import {
+  buildCanonResponseHint,
+  tryCanonLocalReply,
+} from "@/lib/canonContext";
 import { detectAudioRequest } from "./audioSuggestions";
 import {
   executeGuardedEnvironmentalAudioPlay,
@@ -239,6 +243,12 @@ import {
   type VisualThinkingViewId,
 } from "./visualThinkingStudio";
 import {
+  detectsVisualBeginnerUnsure,
+  formatVisualBeginnerChoiceMessage,
+  parseVisualBeginnerChoice,
+  isVisualBeginnerChoiceMessage,
+} from "./cartographersStudio/visualBeginnerChoice";
+import {
   detectSheetIntent,
   shouldExcludeSheetOffer,
   startGoogleSheetIntake,
@@ -432,6 +442,8 @@ export type FrictionlessActionDecision = {
     purposeAnswer?: string;
     ack: string;
   };
+  /** Open Cartographer's Studio hub (room) — no map creation. */
+  immediateCartographersStudioOpen?: boolean;
   immediateCreateOpen?: ImmediateCreateOpenPayload;
   immediateCreateProjectOpen?: ImmediateCreateProjectOpenPayload;
   immediateMomentumOpen?: ImmediateMomentumOpenPayload;
@@ -557,7 +569,7 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
       : "Opening **Focus Audio**.";
   }
   if (action.target === "breathe") {
-    return "Opening **Breathe & Reset** — follow along on screen.";
+    return "Opening **Breathe** — follow along on screen.";
   }
   if (action.target === "content-generator") {
     const pending = loadEstatePendingTransition();
@@ -567,10 +579,16 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
     return "Let's head to Create.";
   }
   if (action.target === "decision-compass") {
-    return "We're in the Decision Compass™ now — let's talk this through calmly.";
+    return "We're in the Decision Compass now — let's talk this through calmly.";
   }
   if (action.target === "visual-focus") {
     const title = action.viewTitle?.trim();
+    if (
+      action.viewId === "mind-map" ||
+      /mind\s*map/i.test(title ?? "")
+    ) {
+      return "Opening Mind Map Discovery — what would you like to create a mind map about?";
+    }
     return title
       ? `Opening **${title}** in Visual Thinking.`
       : "Opening Visual Thinking.";
@@ -580,13 +598,19 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
       action.type === "visual_recommendation") &&
     action.viewTitle
   ) {
+    if (
+      action.viewId === "mind-map" ||
+      /mind\s*map/i.test(action.viewTitle)
+    ) {
+      return "Opening Mind Map Discovery — what would you like to create a mind map about?";
+    }
     return `Opening **${action.viewTitle}** in Visual Thinking.`;
   }
   if (action.target === "brain-dump") {
-    return "We're in Clear My Mind™ together — what's crowding your head most right now?";
+    return "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.";
   }
   if (action.target === "plan-my-day") {
-    return "Let's shape today together in Momentum Builder™.";
+    return "Let's shape today together in Momentum Builder.";
   }
   if (action.type === "create_google_sheet") {
     return "Creating your Google Sheet.";
@@ -685,7 +709,7 @@ export function frictionlessToToolSuggestion(
       tool === "focus-audio"
         ? "Open Focus Audio"
         : tool === "breathe"
-          ? "Breathe & Reset"
+          ? "Breathe"
           : "Open tool",
     toolObjectId: tool === "focus-audio" ? "focus-audio" : "breathing",
     keepTalkingLabel: "Keep Talking",
@@ -1173,6 +1197,8 @@ function resolveFrictionlessForPrimaryTurn(
     case "IMPLIED_NEED":
       return tryImpliedNeedFlow(input, routing);
     case "TASK_REQUEST": {
+      const beginner = tryVisualBeginnerChoiceFlow(input, routing);
+      if (beginner) return beginner;
       const visual = tryVisualStructureEarlyFlow(input, routing);
       if (visual) return visual;
       if (isSimpleCreateRequest(input.userText.trim())) {
@@ -2768,6 +2794,68 @@ function buildStrategyFrictionlessDecision(
   };
 }
 
+function tryVisualBeginnerChoiceFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const lastAssistant = input.lastAssistantText?.trim() ?? "";
+  if (isVisualBeginnerChoiceMessage(lastAssistant)) {
+    const choice = parseVisualBeginnerChoice(userText);
+    if (choice === "recommend") {
+      return buildVisualRecommendationDecision(
+        lastAssistant.includes("organize")
+          ? "help me organize this visually"
+          : "help me choose a visual",
+        input.currentTurn ?? 0,
+        routing,
+        input.lastAssistantText,
+      );
+    }
+    if (choice === "explore") {
+      return {
+        category: "direct_action",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint:
+          "CARTOGRAPHER BEGINNER: Open Studio so member can explore frames / Atlas.",
+        localReply:
+          "I'll open Cartographer's Studio — explore the framed maps or the Atlas, and choose when you're ready.",
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+        immediateCartographersStudioOpen: true,
+      };
+    }
+  }
+
+  if (detectsVisualBeginnerUnsure(userText)) {
+    if (detectExplicitVisualView(userText)?.id === "mind-map") {
+      return null;
+    }
+    const reply = formatVisualBeginnerChoiceMessage();
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "CARTOGRAPHER BEGINNER: Offer Recommend One / I'll Choose — never force a map menu.",
+      localReply: reply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  return null;
+}
+
 function tryVisualRecommendationFlow(
   input: FrictionlessActionInput,
   routing: IntentRoutingDecision,
@@ -3378,6 +3466,20 @@ function resolveFrictionlessActionImpl(
     return result;
   };
 
+  const canonLocalReply = tryCanonLocalReply(userText);
+  if (canonLocalReply) {
+    return finish({
+      ...none,
+      category: "estate_guide",
+      localReply: canonLocalReply,
+      responseHint: buildCanonResponseHint(userText),
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      intentRouting: null,
+    });
+  }
+
   const routing = resolveIntentRouting({
     userText,
     workspace: input.workspace,
@@ -3447,6 +3549,11 @@ function resolveFrictionlessActionImpl(
         routingPipeline.fastPath,
       ),
     );
+  }
+
+  const visualBeginnerBeforeEstate = tryVisualBeginnerChoiceFlow(input, routing);
+  if (visualBeginnerBeforeEstate) {
+    return finish(visualBeginnerBeforeEstate);
   }
 
   const visualStructureBeforeEstate = tryVisualStructureEarlyFlow(input, routing);

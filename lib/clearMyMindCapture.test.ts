@@ -33,6 +33,12 @@ describe("clearMyMindCapture", () => {
     ).toEqual(["Call doctor", "Finish newsletter", "Text Izna"]);
   });
 
+  it("splits comma lists into separate thoughts", () => {
+    expect(
+      splitCaptureInput("Call doctor, finish newsletter, text Izna"),
+    ).toEqual(["Call doctor", "finish newsletter", "text Izna"]);
+  });
+
   it("splits the P0 four-line sales repro input", () => {
     expect(
       splitCaptureInput(

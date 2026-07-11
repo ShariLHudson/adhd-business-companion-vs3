@@ -2,6 +2,7 @@
  * In-room conversation intents — context-aware replies when already visiting a place.
  */
 
+import { canClaimAlreadyHere } from "@/lib/estate/roomAwareness";
 import { getCanonicalEstatePlaceById } from "./canonicalEstateRegistry";
 import { resolveChamberMemberFacingName } from "./chamberOfMomentumIdentity";
 
@@ -33,9 +34,9 @@ export function isGalleryPlaceId(placeId?: string | null): boolean {
 
 export function memberFacingPlaceName(placeId: string): string {
   const chamberName = resolveChamberMemberFacingName(placeId);
-  if (chamberName) return chamberName.replace(/™/g, "");
+  if (chamberName) return chamberName.replace(/\u2122/g, "");
   const canonical = getCanonicalEstatePlaceById(placeId);
-  if (canonical) return canonical.officialName.replace(/™/g, "");
+  if (canonical) return canonical.officialName.replace(/\u2122/g, "");
   return placeId;
 }
 
@@ -87,6 +88,8 @@ export function evaluateInRoomConversationReply(
   }
 
   if (currentPlaceId && ALREADY_HERE_RE.test(t)) {
+    // Never claim already-here unless visual_room confirms.
+    if (!canClaimAlreadyHere(currentPlaceId)) return null;
     return formatAlreadyHereReply(currentPlaceId);
   }
 

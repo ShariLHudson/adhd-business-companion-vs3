@@ -1,5 +1,5 @@
 /**
- * Estate Registry™ — room registrations (thin adapters; no duplicate runtime logic).
+ * Estate Registry — room registrations (thin adapters; no duplicate runtime logic).
  */
 
 import type { EstateRegistryEntry } from "../types";
@@ -10,12 +10,12 @@ import {
 
 export const PEACEFUL_PLACES_ENTRY: EstateRegistryEntry = {
   id: "peaceful-places",
-  name: "Peaceful Places™",
+  name: "Peaceful Places",
   category: "room",
   purpose:
     "Immersive calm destinations inside the Estate — soundscapes, warmth, and restoration without leaving Spark.",
   memberDescription:
-    "Peaceful Places™ inside the Estate was created for moments when you need calm, focus, or a gentle reset.",
+    "Peaceful Places inside the Estate was created for moments when you need calm, focus, or a gentle reset.",
   primarySection: "focus-audio",
   objectId: "focus-audio",
   keywords: [
@@ -56,12 +56,12 @@ export const PEACEFUL_PLACES_ENTRY: EstateRegistryEntry = {
 
 export const MOMENTUM_BUILDER_ENTRY: EstateRegistryEntry = {
   id: "momentum-builder",
-  name: "Momentum Builder™",
+  name: "Momentum Builder",
   category: "room",
   purpose:
     "Coaching conversation in a planning studio — turn uncertainty into one meaningful next step.",
   memberDescription:
-    "Momentum Builder™ is where we figure out what matters today and name the smallest honest next step together.",
+    "Momentum Builder is where we figure out what matters today and name the smallest honest next step together.",
   primarySection: MOMENTUM_BUILDER_SECTION,
   sections: ["grow-momentum-builders"],
   objectId: MOMENTUM_BUILDER_OBJECT_ID,
@@ -101,12 +101,12 @@ export const MOMENTUM_BUILDER_ENTRY: EstateRegistryEntry = {
 
 export const CLEAR_MY_MIND_ENTRY: EstateRegistryEntry = {
   id: "clear-my-mind",
-  name: "Clear My Mind™",
+  name: "Clear My Mind",
   category: "room",
   purpose:
     "Continuous thought capture — empty the head without organizing pressure.",
   memberDescription:
-    "Clear My Mind™ is where we unload what's swirling so your head has room to think again.",
+    "Clear My Mind is where we unload what's swirling so your head has room to think again.",
   primarySection: "brain-dump",
   objectId: "brain-dump",
   keywords: [
@@ -139,11 +139,11 @@ export const CLEAR_MY_MIND_ENTRY: EstateRegistryEntry = {
 
 export const CREATIVE_STUDIO_ENTRY: EstateRegistryEntry = {
   id: "creative-studio",
-  name: "Creative Studio™",
+  name: "Creative Studio",
   category: "room",
   purpose: "Create workshops, content, and business assets with Spark beside you.",
   memberDescription:
-    "Creative Studio™ is a peaceful place to build what you're imagining — drafts welcome, perfection not required.",
+    "Creative Studio is a peaceful place to build what you're imagining — drafts welcome, perfection not required.",
   primarySection: "content-generator",
   objectId: "content-generator",
   keywords: [
@@ -173,12 +173,12 @@ export const CREATIVE_STUDIO_ENTRY: EstateRegistryEntry = {
 
 export const COFFEE_HOUSE_ENTRY: EstateRegistryEntry = {
   id: "coffee-house",
-  name: "Coffee House™",
+  name: "Coffee House",
   category: "room",
   purpose:
     "Warm reflective pause — debrief, breathe, and celebrate without productivity pressure.",
   memberDescription:
-    "The Coffee House™ is always warm when you need a breather or a quiet moment to reflect.",
+    "The Coffee House is always warm when you need a breather or a quiet moment to reflect.",
   keywords: [
     "coffee house",
     "coffee shop",

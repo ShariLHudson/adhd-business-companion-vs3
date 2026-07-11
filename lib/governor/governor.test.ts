@@ -13,7 +13,7 @@ import {
   resolveConflicts,
 } from "./index";
 
-describe("Companion Intelligence Governor™", () => {
+describe("Companion Intelligence Governor", () => {
   it("defines one companion principle — not competing systems", () => {
     expect(GOVERNOR_PRINCIPLE).toContain("ONE trusted companion");
     expect(ATTENTION_PROTECTION_RULE).toContain("Governor");

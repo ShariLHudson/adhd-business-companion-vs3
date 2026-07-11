@@ -1,6 +1,6 @@
 /**
  * Human-facing narrative for Estate Intelligence recommendations.
- * Rule of Gentle Guidance™ — recommend, never direct.
+ * Rule of Gentle Guidance — recommend, never direct.
  */
 
 import { getFeatureCatalog, getPlaceById } from "@/lib/estateKnowledge";

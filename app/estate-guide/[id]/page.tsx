@@ -24,7 +24,7 @@ export default async function EstateGuideSpreadPage({ params }: Props) {
     <main className="eg-guide-preview">
       <header className="eg-guide-preview__toolbar">
         <div>
-          <p className="eg-guide-preview__eyebrow">Spark Estate Guide™</p>
+          <p className="eg-guide-preview__eyebrow">Spark Estate Guide</p>
           <p className="eg-guide-preview__title">{spread.title}</p>
         </div>
         <Link href="/companion" className="eg-guide-preview__back">

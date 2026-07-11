@@ -1,5 +1,5 @@
 /**
- * Audio Experience Foundation™ — classify natural-language audio intent.
+ * Audio Experience Foundation — classify natural-language audio intent.
  */
 
 import { classifyAudioPlaybackIntent } from "@/lib/estate/audioPlaybackGuard";

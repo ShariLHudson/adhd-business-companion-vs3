@@ -1,7 +1,8 @@
 /**
- * Audio Experience Foundation™ — experience registry loader.
+ * Audio Experience Foundation — experience registry loader.
  */
 
+import { isEstateNonAudioPlace } from "@/lib/estate/estateNonAudioPlaces";
 import audioExperiencesJson from "@/docs/estate-knowledge-base/audio-experiences.json";
 import { getKnowledgeItem } from "@/lib/estateKnowledgeBase/loader";
 import { getEstateLocationById } from "@/lib/estateKnowledgeBase/estateLocations";
@@ -56,11 +57,13 @@ export function audioExperiencesAtLocation(
   locationId: string,
   liveOnly = true,
 ): AudioExperience[] {
+  if (isEstateNonAudioPlace(locationId)) return [];
   const pool = liveOnly ? getLiveAudioExperiences() : getAudioExperiences();
   return pool.filter(
     (exp) =>
-      exp.location === locationId ||
-      exp.relatedLocations.includes(locationId),
+      !isEstateNonAudioPlace(exp.location) &&
+      (exp.location === locationId ||
+        exp.relatedLocations.includes(locationId)),
   );
 }
 

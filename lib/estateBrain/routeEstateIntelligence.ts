@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence Router™ — capability-first decision tree.
+ * Estate Intelligence Router — capability-first decision tree.
  *
  * User Message → Intent → Capability → Expert → Experience → Tool → Conversation
  */

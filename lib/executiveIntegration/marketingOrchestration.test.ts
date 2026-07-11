@@ -9,7 +9,7 @@ import {
 describe("Marketing orchestration flow", () => {
   it("defines Founder → recommend → prepare → departments → feedback", () => {
     expect(MARKETING_ORCHESTRATION_FLOW.steps.map((s) => s.label)).toEqual([
-      "Founder Studio™",
+      "Founder Studio",
       "Makes recommendations",
       "Prepares everything",
     ]);

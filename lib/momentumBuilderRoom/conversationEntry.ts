@@ -1,5 +1,5 @@
 /**
- * Layer 1 — Conversation entry for Momentum Builder™.
+ * Layer 1 — Conversation entry for Momentum Builder.
  * Discovers context; never shows productivity frameworks.
  *
  * @see docs/MOMENTUM_BUILDER_ROOM_ARCHITECTURE.md

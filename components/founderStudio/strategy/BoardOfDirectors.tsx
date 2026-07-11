@@ -53,7 +53,7 @@ export function BoardOfDirectors({ members }: BoardOfDirectorsProps) {
               </span>
               {expanded ? (
                 <p className="strategy-board__future">
-                  Future discussion surface — FLAME™ will bring live counsel here.
+                  Future discussion surface — FLAME will bring live counsel here.
                 </p>
               ) : null}
               <button

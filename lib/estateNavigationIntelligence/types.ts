@@ -1,7 +1,7 @@
 /**
- * Estate Navigation Intelligence™ — connects member intent to Estate destinations.
+ * Estate Navigation Intelligence — connects member intent to Estate destinations.
  *
- * @see docs/estate-knowledge-base/ (Estate Knowledge Base™)
+ * @see docs/estate-knowledge-base/ (Estate Knowledge Base)
  */
 
 import type { LocationOption } from "@/lib/estateKnowledgeBase/types";

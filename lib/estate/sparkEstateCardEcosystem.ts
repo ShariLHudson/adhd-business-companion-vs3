@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — card ecosystem (Phase 16).
+ * Spark Estate — card ecosystem (Phase 16).
  * Intelligent touchpoints: the right card at the right time, without clutter.
  *
  * @see docs/protocols/SPARK_ESTATE_CARD_ECOSYSTEM_SPECIFICATION_PHASE16.md
@@ -327,7 +327,7 @@ export function buildSparkEstateWinCard(
     kind: "win-card",
     accomplishment: win.whatHappened,
     milestone: win.classification?.label ?? null,
-    evidenceLink: "Evidence Bank",
+    evidenceLink: "Evidence Vault",
     purpose: "Capture progress and evidence of capability.",
     actions: ["open", "save", "connect"],
   };

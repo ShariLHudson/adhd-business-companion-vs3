@@ -150,7 +150,7 @@ export const SAMPLE_RESEARCH_REPORTS: ExecutiveResearchReport[] = [
       { id: "src-learning-ef", title: "Executive function and re-engagement", kind: "article", publisher: "Learning science summary" },
     ],
     relatedMissions: ["listening-rooms", "companion-trust"],
-    relatedProducts: ["Spark Companion", "Listening Rooms™"],
+    relatedProducts: ["Spark Companion", "Listening Rooms"],
     relatedCustomerProblems: ["Return guilt", "Decision fatigue before action"],
     relatedContentOpportunities: ["Restart ritual workshop", "Pinterest save: 5-minute return"],
     relatedAutomationOpportunities: ["GHL gentle check-in sequence (permission required)"],

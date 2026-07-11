@@ -64,11 +64,11 @@ Maria raised her rate and three clients said yes.
 - Where does this show up in your business?
 - What would you try this week?
 
-## Make It Mine™
+## Make It Mine
 
 - How could this apply to your business?
 
-## Try It This Week™
+## Try It This Week
 
 Write your price and read it aloud once.
 
@@ -76,15 +76,15 @@ Write your price and read it aloud once.
 
 - Apologizing for your price
 
-## Related competencies™
+## Related competencies
 
 - pricing-confidence
 
-## Related knowledge cards™
+## Related knowledge cards
 
 - KC-002-trust-before-transaction — natural next
 
-## Related apprenticeships™
+## Related apprenticeships
 
 - Marketing Confidence Apprenticeship
 `;

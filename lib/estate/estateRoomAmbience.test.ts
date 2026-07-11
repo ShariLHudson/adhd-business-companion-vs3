@@ -78,7 +78,7 @@ describe("estateRoomAmbience", () => {
     const { kickstartEstateRoomAmbience, activeEstateAmbienceRoomId } =
       await loadAmbience();
     const profile = {
-      src: "/audio/greenhouse-birds-ambience.mp3",
+      src: "/audio/Soundscapes/greenhouse-birds-ambience.mp3",
       volume: 0.09,
       character: "birds",
     };
@@ -125,7 +125,7 @@ describe("estateRoomAmbience", () => {
     } = await loadAmbience();
 
     kickstartEstateRoomAmbience("coffee-house", {
-      src: "/audio/java-seranade-coffee-house.mp3",
+      src: "/audio/Soundscapes/java-seranade-coffee-house.mp3",
       volume: 0.13,
       character: "cafe",
     });
@@ -146,7 +146,7 @@ describe("estateRoomAmbience", () => {
     } = await loadAmbience();
 
     kickstartEstateRoomAmbience("coffee-house", {
-      src: "/audio/java-seranade-coffee-house.mp3",
+      src: "/audio/Soundscapes/java-seranade-coffee-house.mp3",
       volume: 0.13,
       character: "cafe",
     });

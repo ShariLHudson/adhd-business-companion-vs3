@@ -1,5 +1,5 @@
 /**
- * Spark Curriculum Master Index™ — merged curriculum.
+ * Spark Curriculum Master Index — merged curriculum.
  */
 
 import type { InstitutePillarId } from "@/lib/sparkCompetencyFramework/types";
@@ -18,7 +18,7 @@ import { CURRICULUM_INDEX_VERSION } from "./types";
 
 export const SPARK_CURRICULUM_MASTER_INDEX: CurriculumMasterIndex = {
   version: CURRICULUM_INDEX_VERSION,
-  title: "Spark Curriculum Master Index™",
+  title: "Spark Curriculum Master Index",
   mission: "Help every member become a better entrepreneur.",
   entries: [
     ...BUILD_YOURSELF_CURRICULUM,

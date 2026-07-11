@@ -5779,9 +5779,9 @@ export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
   },
   {
     id: "hall-of-accomplishments",
-    title: "Hall of Accomplishments",
+    title: "Hall of Accomplishments™",
     image: ESTATE_ROOM_BG.hallOfAchievements,
-    imagePlaceId: "portfolio",
+    imagePlaceId: "gallery-of-firsts",
     blocks: [
       {
         type: "story",
@@ -6364,6 +6364,9 @@ export function getEstateGuideSpread(
 /** Canonical place id → guide spread (when ids align or mapped). */
 const GUIDE_SPREAD_BY_PLACE_ID: Readonly<Record<string, string>> = {
   conservatory: "ocean-conservatory",
+  "gallery-of-firsts": "hall-of-accomplishments",
+  "celebration-room": "celebration-garden",
+  gardens: "celebration-garden",
   "the-swing-beneath-the-oak": "the-swing-beneath-the-oak",
   "house-possibility-outside": "house-possibility-outside",
   "house-possibility-studio": "house-possibility-studio",
@@ -6395,7 +6398,8 @@ const COLLECTION_ROOM_GUIDE_SPREAD_ID: Record<EstateCollectionRoomId, string> =
     "evidence-vault": "evidence-vault",
     "achievement-library": "personal-library",
     "celebration-garden": "celebration-garden",
-    "celebration-hall": "hall-of-accomplishments",
+    // Collection key celebration-hall → Celebration Room™ (not Hall of Accomplishments)
+    "celebration-hall": "celebration-garden",
   };
 
 export function getEstateGuideSpreadForCollectionRoom(

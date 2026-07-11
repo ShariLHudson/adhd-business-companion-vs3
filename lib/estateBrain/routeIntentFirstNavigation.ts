@@ -1,5 +1,5 @@
 /**
- * Intent-First Estate Navigation™ — full decision pipeline.
+ * Intent-First Estate Navigation — full decision pipeline.
  *
  * User Request → Intent → Capability → Environment → Tool → Conversation
  */

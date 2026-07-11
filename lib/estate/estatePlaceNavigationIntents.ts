@@ -6,7 +6,7 @@
 
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
 
-/** Explicit swim / pool navigation — route to Summer Terrace™ via alias registry. */
+/** Explicit swim / pool navigation — route to Summer Terrace via alias registry. */
 export const EXPLICIT_POOL_NAV_RE =
   /\b(?:(?:take\s+me|go|head|bring\s+me)\s+to\s+(?:the\s+)?(?:swimming\s+)?pool|(?:show\s+me|open|visit)\s+(?:the\s+)?(?:swimming\s+)?pool|swimming\s+pool)\b/i;
 
@@ -31,7 +31,7 @@ export function isSwimmingPoolNavigationRequest(text: string): boolean {
   );
 }
 
-/** Celebration audio — not Celebration Room™ / Hall™ / Garden™ navigation. */
+/** Celebration audio — not Celebration Room / Hall / Garden navigation. */
 export const CELEBRATION_SOUNDS_INTENT_RE =
   /\b(?:(?:show(?:\s+me)?|turn\s+on|enable|play|start)\s+(?:the\s+)?celebration\s+sounds?|celebration\s+sounds?\s+(?:on|please))\b/i;
 
@@ -55,7 +55,7 @@ export function isCelebrationSoundsIntent(text: string): boolean {
 }
 
 export function formatSwimmingPoolUnavailableReply(): string {
-  return `The swimming pool isn't on the Estate yet — it's still being shaped, and I think you'll love it when it opens. For water and quiet nearby, we could visit Seat at the Pond™ or Peaceful Places™ — or stay right here.`;
+  return `The swimming pool isn't on the Estate yet — it's still being shaped, and I think you'll love it when it opens. For water and quiet nearby, we could visit Seat at the Pond or Peaceful Places — or stay right here.`;
 }
 
 export function formatSwimmingPoolOfferLine(): string {
@@ -65,5 +65,5 @@ export function formatSwimmingPoolOfferLine(): string {
 }
 
 export function formatCelebrationSoundsReply(): string {
-  return `Celebration sounds live in your audio settings — they're not a room on the map. I can help you turn them on while we stay here, or we can open Estate Soundscapes™ for focus and calm music.`;
+  return `Celebration sounds live in your audio settings — they're not a room on the map. I can help you turn them on while we stay here, or we can open Estate Soundscapes for focus and calm music.`;
 }

@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — daily companion experience (Phase 24).
+ * Spark Estate — daily companion experience (Phase 24).
  * Personal daily arrival, focus selection, and gentle progress rhythm.
  *
  * @see docs/protocols/SPARK_ESTATE_DAILY_COMPANION_EXPERIENCE_SPECIFICATION_PHASE24.md
@@ -151,9 +151,9 @@ const FOCUS_GOALS: Record<SparkEstateDailyFocusChoice, string> = {
 
 const FOCUS_INTELLIGENCE: Record<SparkEstateDailyFocusChoice, string> = {
   "clear-mind": "Clear My Mind",
-  "work-important": "Momentum Builder™",
+  "work-important": "Momentum Builder",
   continue: "Continue previous work",
-  learn: "Momentum Institute™",
+  learn: "Momentum Institute",
   create: "Universal Creation Journey",
   decide: "Decision Intelligence",
   explore: "Spark discovery",

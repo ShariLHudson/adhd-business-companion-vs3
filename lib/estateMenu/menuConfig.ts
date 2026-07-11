@@ -1,6 +1,15 @@
 /**
- * Global Estate Menu™ — universal upper-right session controls.
- * Dropdown shows five calm choices; other action ids remain for routing.
+ * Global Estate Menu — universal upper-right session controls.
+ * Welcome Home / profile dropdown shows only working member controls.
+ *
+ * Visible menu:
+ * 1. Conversations → New Chat · New Day Chat
+ * 2. Settings
+ * 3. Profile
+ * 4. Logout
+ *
+ * Personalization and Account are hidden (not currently working).
+ * Other action ids remain for programmatic routing only.
  *
  * @see docs/protocols/SPARK_ESTATE_TOP_NAVIGATION_AND_PROFILE_MENU_CORRECTION.md
  */
@@ -33,35 +42,71 @@ export type EstateMenuDropdownItem = {
   label: string;
 };
 
-/** Profile initials menu — five member-facing choices (separate from room navigation). */
-export const ESTATE_MENU_DROPDOWN_ITEMS: readonly EstateMenuDropdownItem[] = [
+export type EstateMenuDropdownGroup = {
+  kind: "group";
+  id: "conversations";
+  emoji: string;
+  label: string;
+  children: readonly EstateMenuDropdownItem[];
+};
+
+export type EstateMenuDropdownEntry =
+  | ({ kind: "item" } & EstateMenuDropdownItem)
+  | EstateMenuDropdownGroup;
+
+/**
+ * Profile initials menu — working member-facing choices only.
+ * Order: Conversations (with New Chat / New Day Chat) → Settings → Profile → Logout.
+ */
+export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = [
   {
-    id: "my-profile",
-    emoji: "👤",
-    label: "Profile",
+    kind: "group",
+    id: "conversations",
+    emoji: "💬",
+    label: "Conversations",
+    children: [
+      {
+        id: "start-new-conversation",
+        emoji: "✨",
+        label: "New Chat",
+      },
+      {
+        id: "start-new-day-conversation",
+        emoji: "🌅",
+        label: "New Day Chat",
+      },
+    ],
   },
   {
+    kind: "item",
     id: "settings",
     emoji: "⚙️",
     label: "Settings",
   },
   {
-    id: "memory-library",
-    emoji: "💬",
-    label: "Conversations",
+    kind: "item",
+    id: "my-profile",
+    emoji: "👤",
+    label: "Profile",
   },
   {
-    id: "growth-profile",
-    emoji: "✨",
-    label: "Personalization",
-  },
-  {
-    id: "estate-profile",
-    emoji: "🏡",
-    label: "Account",
+    kind: "item",
+    id: "log-out",
+    emoji: "🚪",
+    label: "Logout",
   },
 ];
 
+/** Flat clickable actions currently shown in the dropdown (excludes group headers). */
+export const ESTATE_MENU_DROPDOWN_ITEMS: readonly EstateMenuDropdownItem[] =
+  ESTATE_MENU_DROPDOWN_ENTRIES.flatMap((entry) =>
+    entry.kind === "group" ? [...entry.children] : [entry],
+  );
+
 export function estateMenuDropdownItems(): EstateMenuDropdownItem[] {
   return [...ESTATE_MENU_DROPDOWN_ITEMS];
+}
+
+export function estateMenuDropdownEntries(): EstateMenuDropdownEntry[] {
+  return [...ESTATE_MENU_DROPDOWN_ENTRIES];
 }

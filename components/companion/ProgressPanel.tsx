@@ -140,7 +140,7 @@ export function ProgressPanel({ onOpen }: { onOpen?: (s: AppSection) => void }) 
     noticed.push(`Finished ${plural(completes, "thing", "things")} you set out to do`);
   if (captures)
     noticed.push(`Captured ${plural(captures, "Clear My Mind item", "Clear My Mind items")}`);
-  if (breatheCount) noticed.push("Used Breathe & Reset");
+  if (breatheCount) noticed.push("Used Breathe");
   if (resetCount > 0) noticed.push("Took a reset");
   if (resilience) noticed.push("Came back after getting stuck");
   if (moves) noticed.push("Moved a project forward");
@@ -189,7 +189,7 @@ export function ProgressPanel({ onOpen }: { onOpen?: (s: AppSection) => void }) 
   const allBridges: Bridge[] = [
     { label: "🧠 Clear my mind", section: "brain-dump" },
     { label: "🎯 Focus session", section: "focus-timer" },
-    { label: "🌿 Breathe & reset", section: "breathe" },
+    { label: "🌿 Breathe", section: "breathe" },
     { label: "💬 Talk with Shari", section: "home" },
   ];
   const otherBridges = allBridges.filter((b) => b.section !== primaryBridge.section);

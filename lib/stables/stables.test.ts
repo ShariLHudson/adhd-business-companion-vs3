@@ -9,7 +9,7 @@ import {
 import { stablesRoomHintForChat } from "./stablesVoice";
 import { isStablesSection, STABLES_ROOM_BG } from "./stablesRoomRegistry";
 
-describe("The Stables™", () => {
+describe("The Stables", () => {
   it("registers eight placeholder experiences", () => {
     expect(listStablesExperiences()).toHaveLength(8);
     expect(listStablesExperiences().every((e) => e.status === "placeholder")).toBe(
@@ -24,9 +24,10 @@ describe("The Stables™", () => {
     ).toBe(true);
   });
 
-  it("uses the existing stables background plate", () => {
+  it("uses the dedicated Spark Estate Stables plate", () => {
+    expect(STABLES_ROOM_BG).toBe(ESTATE_ROOM_BG.stables);
     expect(STABLES_ROOM_BG).toBe(
-      ESTATE_ROOM_BG.stables,
+      "/backgrounds/spark-estate-stables-background.png",
     );
     expect(isStablesSection("stables")).toBe(true);
   });

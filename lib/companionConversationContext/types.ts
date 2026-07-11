@@ -1,5 +1,5 @@
 /**
- * Companion Conversation Context™ — one continuous companion turn model.
+ * Companion Conversation Context — one continuous companion turn model.
  * Preserves location, pending offers, KB thread, and emotional pivots before goal routing.
  */
 

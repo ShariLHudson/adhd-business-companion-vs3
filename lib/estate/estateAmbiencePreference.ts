@@ -1,5 +1,5 @@
 /**
- * Estate ambience on/off — delegates to Estate Audio Settings™ (Layer 1).
+ * Estate ambience on/off — delegates to Estate Audio Settings (Layer 1).
  */
 
 import {

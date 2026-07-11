@@ -15,10 +15,10 @@ import {
 import { KNOWLEDGE_SOURCES, SCHOOLS_OF_THOUGHT, RESEARCH_DISCIPLINES } from "./knowledgeCouncil";
 import type { KnowledgeContentClaim } from "./sourceIntegrity/types";
 
-describe("Spark Business Brain™", () => {
+describe("Spark Business Brain", () => {
   it("loads full catalog from curriculum + knowledge council", () => {
     const catalog = loadBusinessBrainCatalog();
-    expect(catalog.knowledgeCouncil.title).toBe("Spark Knowledge Council™");
+    expect(catalog.knowledgeCouncil.title).toBe("Spark Knowledge Council");
     expect(catalog.departments).toHaveLength(44);
     expect(catalog.curriculumTopics.length).toBeGreaterThan(150);
     expect(catalog.knowledgeCards).toHaveLength(catalog.curriculumTopics.length);
@@ -105,7 +105,7 @@ describe("Spark Business Brain™", () => {
   });
 });
 
-describe("Source Integrity™", () => {
+describe("Source Integrity", () => {
   const verifiedSource = buildVerifiedKnowledgeSource({
     id: "src-test-verified",
     slug: "test-verified",

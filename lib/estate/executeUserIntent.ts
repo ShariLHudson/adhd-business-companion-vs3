@@ -1,5 +1,5 @@
 /**
- * executeUserIntentPlan™ — maps resolved intent to a single execution action.
+ * executeUserIntentPlan — maps resolved intent to a single execution action.
  * No cross-system triggers — one plan per input event.
  */
 

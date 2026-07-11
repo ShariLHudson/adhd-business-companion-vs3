@@ -1,4 +1,4 @@
-/** Founder Memory & Decision Vault™ — institutional memory types */
+/** Founder Memory & Decision Vault — institutional memory types */
 
 import type { FounderMemoryLink, FounderMemoryRef } from "./links";
 
@@ -56,7 +56,7 @@ export type FounderDecisionRelations = {
   memories: FounderMemoryRef[];
 };
 
-/** Decision Vault™ centerpiece */
+/** Decision Vault centerpiece */
 export type FounderDecision = {
   id: string;
   title: string;

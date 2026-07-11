@@ -44,7 +44,7 @@ export const GROWTH_PRIMARY_DESTINATIONS: {
   },
   {
     id: "evidence-bank",
-    label: "Evidence Bank",
+    label: "Evidence Vault",
     subtitle: "Proof that it worked",
   },
   {

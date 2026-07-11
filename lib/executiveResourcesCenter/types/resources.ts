@@ -1,4 +1,4 @@
-/** Executive Resources Center™ — department-organized external resources. */
+/** Executive Resources Center — department-organized external resources. */
 
 export type ResourceDepartmentId =
   | "executive"

@@ -17,7 +17,7 @@ describe("gardenBannerMenu", () => {
     const menu = gardenBannerMenuFor("calming");
     expect(menu.map((item) => item.label)).toEqual([
       "Pause & Reset",
-      "Breathing Room",
+      "Breathe",
       "Quiet Moment",
     ]);
     expect(menu[1]).toMatchObject({ kind: "section", section: "breathe" });

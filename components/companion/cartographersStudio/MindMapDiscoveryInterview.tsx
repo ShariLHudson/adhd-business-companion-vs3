@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   MIND_MAP_DISCOVERY_QUESTIONS,
+  hasEnoughForMindMapFirstDraft,
   type MindMapDiscoveryQuestionId,
   gatherMindMapDiscoveryContext,
   type DiscoveryContextSeed,
@@ -11,6 +12,9 @@ import {
 export type MindMapDiscoveryAnswers = {
   topic: string;
   everything: string;
+  /** End goal / desired outcome (242). */
+  desiredOutcome?: string;
+  /** @deprecated use desiredOutcome */
   anythingElse?: string;
 };
 
@@ -37,19 +41,22 @@ function getSpeechRecognition(): (new () => SpeechRecognitionLike) | null {
 export function MindMapDiscoveryInterview({
   onCancel,
   onComplete,
+  seedText,
 }: {
   onCancel: () => void;
   onComplete: (answers: MindMapDiscoveryAnswers) => void;
+  /** Optional NL seed ("mind map this launch plan") — same interview as frame click. */
+  seedText?: string;
 }) {
   const [context] = useState<DiscoveryContextSeed>(() =>
-    gatherMindMapDiscoveryContext(),
+    gatherMindMapDiscoveryContext({ seedText }),
   );
   const [step, setStep] = useState(0);
   const [topic, setTopic] = useState(context.suggestedTopic ?? "");
   const [everything, setEverything] = useState(
     context.suggestedEverything ?? "",
   );
-  const [anythingElse, setAnythingElse] = useState("");
+  const [desiredOutcome, setDesiredOutcome] = useState("");
   const [confirmedContext, setConfirmedContext] = useState(false);
   const [listening, setListening] = useState(false);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
@@ -62,7 +69,19 @@ export function MindMapDiscoveryInterview({
       !everything.trim() &&
       context.knownFacts.length > 0;
     return MIND_MAP_DISCOVERY_QUESTIONS.filter((q) => {
-      if (!confirmedContext || fresh) return true;
+      if (!confirmedContext || fresh) {
+        // Pattern 5: if memory already gives a strong draft, still show topic/ideas only.
+        if (
+          q.id === "desired-outcome" &&
+          hasEnoughForMindMapFirstDraft({
+            topic: topic || context.suggestedTopic || "",
+            everything: everything || context.suggestedEverything || "",
+          })
+        ) {
+          return false;
+        }
+        return true;
+      }
       if (q.id === "main-topic" && context.skipTopicQuestion && topic.trim()) {
         return false;
       }
@@ -73,12 +92,20 @@ export function MindMapDiscoveryInterview({
       ) {
         return false;
       }
+      if (
+        q.id === "desired-outcome" &&
+        hasEnoughForMindMapFirstDraft({ topic, everything })
+      ) {
+        return false;
+      }
       return true;
     });
   }, [confirmedContext, context, everything, topic]);
 
-  const question = questions[Math.min(step, questions.length - 1)]!;
-  const progress = `${Math.min(step + 1, questions.length)} of ${questions.length}`;
+  const question = questions[Math.min(step, Math.max(questions.length - 1, 0))];
+  const progress = questions.length
+    ? `${Math.min(step + 1, questions.length)} of ${questions.length}`
+    : "Ready";
 
   useEffect(() => {
     return () => {
@@ -86,16 +113,30 @@ export function MindMapDiscoveryInterview({
     };
   }, []);
 
+  // Pattern 5 — if context alone is enough after confirm, build immediately.
+  useEffect(() => {
+    if (!confirmedContext) return;
+    if (questions.length > 0) return;
+    onComplete({
+      topic: topic.trim() || context.suggestedTopic || "Central idea",
+      everything: everything.trim() || context.suggestedEverything || "",
+      desiredOutcome: desiredOutcome.trim() || undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once when questions collapse to empty
+  }, [confirmedContext, questions.length]);
+
   function currentValue(): string {
+    if (!question) return "";
     if (question.id === "main-topic") return topic;
     if (question.id === "everything") return everything;
-    return anythingElse;
+    return desiredOutcome;
   }
 
   function setCurrentValue(value: string) {
+    if (!question) return;
     if (question.id === "main-topic") setTopic(value);
     else if (question.id === "everything") setEverything(value);
-    else setAnythingElse(value);
+    else setDesiredOutcome(value);
   }
 
   function appendVoice(transcript: string) {
@@ -144,12 +185,26 @@ export function MindMapDiscoveryInterview({
     onComplete({
       topic: topic.trim() || context.suggestedTopic || "Central idea",
       everything: everything.trim(),
-      anythingElse: (extra ?? anythingElse).trim() || undefined,
+      desiredOutcome: (extra ?? desiredOutcome).trim() || undefined,
     });
   }
 
   function handleNext() {
-    if (!canAdvance()) return;
+    if (!question || !canAdvance()) return;
+    const nextTopic = question.id === "main-topic" ? currentValue() : topic;
+    const nextEverything =
+      question.id === "everything" ? currentValue() : everything;
+    if (
+      question.id === "everything" &&
+      hasEnoughForMindMapFirstDraft({
+        topic: nextTopic,
+        everything: nextEverything,
+      }) &&
+      step >= questions.length - 1
+    ) {
+      finish();
+      return;
+    }
     if (step < questions.length - 1) {
       setStep((s) => s + 1);
       return;
@@ -221,7 +276,7 @@ export function MindMapDiscoveryInterview({
               onClick={() => {
                 setTopic("");
                 setEverything("");
-                setAnythingElse("");
+                setDesiredOutcome("");
                 setConfirmedContext(true);
                 setStep(0);
               }}
@@ -242,6 +297,19 @@ export function MindMapDiscoveryInterview({
             </button>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (!question) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4"
+        data-testid="mind-map-discovery-building"
+      >
+        <p className="rounded-2xl bg-[#fffdf8] px-6 py-4 text-sm text-[#6b635a]">
+          Building your first draft…
+        </p>
       </div>
     );
   }

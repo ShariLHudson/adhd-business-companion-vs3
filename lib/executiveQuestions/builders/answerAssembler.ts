@@ -1,5 +1,5 @@
 /**
- * Answer Assembler™ — architecture for composed executive answers.
+ * Answer Assembler — architecture for composed executive answers.
  * Sample data only. Future: SPARK, FLAME, and FIRE enrich evidence here.
  */
 import type {

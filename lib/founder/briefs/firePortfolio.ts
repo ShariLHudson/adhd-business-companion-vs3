@@ -25,7 +25,7 @@ function capPortfolio(portfolio: FireExecutivePortfolio): FireExecutivePortfolio
   };
 }
 
-/** FIRE™ — today's executive portfolio for the Founder office home. */
+/** FIRE — today's executive portfolio for the Founder office home. */
 export function getFireExecutivePortfolio(): FireExecutivePortfolio {
   return capPortfolio({ ...SAMPLE_FIRE_TODAY_PORTFOLIO });
 }

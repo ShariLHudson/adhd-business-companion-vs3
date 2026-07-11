@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  CLEAR_MY_MIND_ACK_CONTINUE_LABEL,
   CLEAR_MY_MIND_CAPTURE_BUTTON,
   CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM,
   CLEAR_MY_MIND_CONTINUE_PROMPT,
   CLEAR_MY_MIND_HEADER,
+  CLEAR_MY_MIND_NEXT_SECTION,
+  CLEAR_MY_MIND_REFLECTION_LEAD,
   CLEAR_MY_MIND_WORKSPACE_SUBTITLE,
   clearMyMindHeldCountLine,
   CLEAR_MY_MIND_SPLIT_CONFIRM,
@@ -19,7 +22,7 @@ describe("clearMyMindCopy", () => {
   });
 
   it("uses continuous capture continue prompt", () => {
-    expect(CLEAR_MY_MIND_CONTINUE_PROMPT).toMatch(/what else/i);
+    expect(CLEAR_MY_MIND_CONTINUE_PROMPT).toMatch(/anything else/i);
   });
 
   it("formats held count for My Thoughts invitation", () => {
@@ -27,9 +30,10 @@ describe("clearMyMindCopy", () => {
     expect(clearMyMindHeldCountLine(27)).toMatch(/safely/i);
   });
 
-  it("uses Save action for capture", () => {
-    expect(CLEAR_MY_MIND_CAPTURE_BUTTON).toBe("Save");
+  it("uses Continue action for capture — never Save", () => {
+    expect(CLEAR_MY_MIND_CAPTURE_BUTTON).toBe("Continue");
     expect(CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM).toBe("I've got it.");
+    expect(CLEAR_MY_MIND_CAPTURE_BUTTON.toLowerCase()).not.toContain("save");
     expect(CLEAR_MY_MIND_CAPTURE_BUTTON.toLowerCase()).not.toContain("hold");
   });
 
@@ -38,8 +42,9 @@ describe("clearMyMindCopy", () => {
     expect(CLEAR_MY_MIND_SPLIT_CONFIRM).toMatch(/yes, separate them/i);
   });
 
-  it("avoids more in overflow fallback copy", () => {
-    expect(OVERFLOW_CLUSTER_FALLBACK).not.toMatch(/\bmore\b/i);
-    expect(MORE_CLUSTER_FALLBACK).not.toMatch(/\bmore\b/i);
+  it("uses conversation reflection language after Continue", () => {
+    expect(CLEAR_MY_MIND_REFLECTION_LEAD).toMatch(/As I looked through what you shared/);
+    expect(CLEAR_MY_MIND_NEXT_SECTION).toBe("What would you like to do next?");
+    expect(CLEAR_MY_MIND_ACK_CONTINUE_LABEL).toBe("Look through these with me");
   });
 });

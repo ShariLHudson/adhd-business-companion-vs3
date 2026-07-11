@@ -1,5 +1,5 @@
 /**
- * Estate Environment Registry™ — every navigable environment (single source of truth).
+ * Estate Environment Registry — every navigable environment (single source of truth).
  *
  * Members think in goals. Spark chooses the environment automatically.
  */

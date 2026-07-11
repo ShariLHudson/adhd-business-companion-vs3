@@ -10,26 +10,36 @@ type Props = {
     EstateCollectionRoomConfig,
     "placeId" | "backgroundImage" | "imagePlaceId" | "id"
   >;
+  /** When set, overrides `room.backgroundImage` (Evidence Vault entrance vs interior). */
+  backgroundImage?: string;
   children: ReactNode;
+  dataVaultEntrancePhase?: string;
 };
 
 /** Shared full-bleed shell for every collection room. */
-export function EstateCollectionRoomShell({ room, children }: Props) {
+export function EstateCollectionRoomShell({
+  room,
+  backgroundImage: backgroundImageOverride,
+  children,
+  dataVaultEntrancePhase,
+}: Props) {
   const placeId = room.imagePlaceId ?? room.placeId;
+  const plateUrl = backgroundImageOverride ?? room.backgroundImage;
 
   useEffect(() => {
-    preloadRoomBackground(room.backgroundImage);
-  }, [room.backgroundImage]);
+    preloadRoomBackground(plateUrl);
+  }, [plateUrl]);
 
   return (
     <div
       className="estate-collection-room"
       data-testid={`estate-collection-room-${room.id}`}
       data-homestead-room={placeId}
+      data-vault-entrance-phase={dataVaultEntrancePhase}
     >
       <EstateRoomFullBleedBackground
         roomId={placeId}
-        imageUrl={room.backgroundImage}
+        imageUrl={plateUrl}
         className="estate-collection-room__plate"
       />
       <div className="estate-collection-room__scroll">{children}</div>

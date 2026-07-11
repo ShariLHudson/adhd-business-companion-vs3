@@ -16,7 +16,7 @@ import {
   resolveAudioExperienceQuery,
 } from "./resolveAudioExperienceQuery";
 
-describe("Audio Experience Foundation™", () => {
+describe("Audio Experience Foundation", () => {
   it("loads live audio categories", () => {
     const categories = getLiveAudioCategories();
     expect(categories.length).toBeGreaterThan(0);

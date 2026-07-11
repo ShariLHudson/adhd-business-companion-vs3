@@ -39,7 +39,7 @@ const ECOSYSTEM_SYSTEM_DEFINITIONS: readonly EcosystemSystemDefinition[] = [
   },
   {
     id: "postcraft",
-    system: "PostCraft™",
+    system: "PostCraft",
     purpose: "Content & Marketing",
     marketingKey: "postcraft",
     connectedMarketingLastSync: "2 min ago",

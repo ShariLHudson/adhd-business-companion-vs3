@@ -1,5 +1,5 @@
 /**
- * Intent-Aware Conversation Framework™
+ * Intent-Aware Conversation Framework
  * @see docs/estate/INTENT_AWARE_CONVERSATION_FRAMEWORK.md
  */
 

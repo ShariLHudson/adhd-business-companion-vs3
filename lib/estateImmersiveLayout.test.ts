@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { shouldShowEstateRoomHomeLink } from "./estateImmersiveLayout";
+import {
+  shouldPreserveEstateRoomSectionDuringChat,
+  shouldShowEstateRoomHomeLink,
+} from "./estateImmersiveLayout";
 
 const base = {
   activeSection: "home" as const,
@@ -40,5 +43,19 @@ describe("shouldShowEstateRoomHomeLink", () => {
         profileEstateChromeActive: true,
       }),
     ).toBe(false);
+  });
+});
+
+describe("shouldPreserveEstateRoomSectionDuringChat", () => {
+  it("preserves standalone estate room sections during chat", () => {
+    expect(shouldPreserveEstateRoomSectionDuringChat("chamber-of-momentum")).toBe(
+      true,
+    );
+    expect(shouldPreserveEstateRoomSectionDuringChat("evidence-bank")).toBe(true);
+  });
+
+  it("does not preserve the home chat shell", () => {
+    expect(shouldPreserveEstateRoomSectionDuringChat("home")).toBe(false);
+    expect(shouldPreserveEstateRoomSectionDuringChat(null)).toBe(false);
   });
 });

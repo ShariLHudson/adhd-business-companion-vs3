@@ -1314,7 +1314,7 @@ function LessonHeading({
 const TOOL_LABELS: Partial<Record<AppSection, { label: string; objectId: string }>> = {
   "brain-dump": { label: "Clear My Mind", objectId: "clear-my-mind" },
   "focus-timer": { label: "Focus Session", objectId: "focus-timer" },
-  breathe: { label: "Breathe & Reset", objectId: "breathing" },
+  breathe: { label: "Breathe", objectId: "breathing" },
   energy: { label: "How Are You Feeling Today?", objectId: "todays-reality" },
   projects: { label: "Projects", objectId: "projects" },
   "spin-wheel": { label: "Spin the Wheel", objectId: "spin-wheel" },

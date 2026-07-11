@@ -1,4 +1,4 @@
-/** Founder Advisory Council™ — executive board reasoning types (no UI). */
+/** Founder Advisory Council — executive board reasoning types (no UI). */
 
 export type AdvisoryMemberId =
   | "ceo"

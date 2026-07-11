@@ -1,5 +1,5 @@
 /**
- * Spec 130 — The Wisdom Loop™
+ * Spec 130 — The Wisdom Loop
  * Final internal reasoning before every Spark response.
  */
 
@@ -88,6 +88,8 @@ export function runWisdomLoop(input: WisdomLoopInput): WisdomLoopResult {
 
   return {
     ...partial,
-    promptHint: buildWisdomLoopPromptHint(partial),
+    promptHint: buildWisdomLoopPromptHint(partial, {
+      memberMessage: input.memberMessage,
+    }),
   };
 }

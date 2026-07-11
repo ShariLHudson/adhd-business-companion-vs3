@@ -13,3 +13,5 @@ Phases:
 
 Goal:
 Provide a long-term implementation roadmap while protecting the core vision.
+
+**Product completion order (experiences first):** [182 Spark Estate Completion Roadmap](./182_SPARK_ESTATE_COMPLETION_ROADMAP.md)

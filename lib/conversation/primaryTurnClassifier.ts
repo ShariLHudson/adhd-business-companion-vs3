@@ -28,6 +28,11 @@ import {
   reconcilePrimaryTurnWithDecisionEngine,
 } from "@/lib/sparkCompanion";
 import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
+import {
+  evaluateRecognitionLifecycleTurn,
+  isDiscoveryLanguageNotCreate,
+  isExplicitCreateRequestForRecognition,
+} from "@/lib/sparkRecognitionEngine";
 
 export type PrimaryConversationType =
   | "RELATIONSHIP_CHAT"
@@ -35,7 +40,8 @@ export type PrimaryConversationType =
   | "IMPLIED_NEED"
   | "TASK_REQUEST"
   | "EMOTIONAL_SUPPORT"
-  | "INFORMATION_OR_RESEARCH";
+  | "INFORMATION_OR_RESEARCH"
+  | "RECOGNITION";
 
 export type PrimaryTurnConfidence = "high" | "medium" | "low";
 
@@ -128,11 +134,11 @@ function buildDecision(
     TASK_REQUEST: "frictionless:discovery",
     EMOTIONAL_SUPPORT: "frictionless:support",
     INFORMATION_OR_RESEARCH: "chat:research",
+    RECOGNITION: "recognition:lifecycle",
   };
 
   const blockKernel = type !== "DIRECT_COMMAND";
-  const blockCollection =
-    type !== "DIRECT_COMMAND";
+  const blockCollection = type !== "DIRECT_COMMAND";
 
   return {
     type,
@@ -156,7 +162,11 @@ export function classifyPrimaryConversationTurn(
   const decision = evaluateSparkDecisionEngine({
     userText: input.userText.trim(),
   });
-  return reconcilePrimaryTurnWithDecisionEngine(legacy, decision);
+  return reconcilePrimaryTurnWithDecisionEngine(
+    legacy,
+    decision,
+    input.userText,
+  );
 }
 
 function classifyPrimaryConversationTurnLegacy(
@@ -207,7 +217,29 @@ function classifyPrimaryConversationTurnLegacy(
     );
   }
 
+  // Recognition lifecycle — discoveries preserve-first; never Create unless explicit.
+  const recognitionTurn = evaluateRecognitionLifecycleTurn({ userText: text });
+  if (recognitionTurn.ownsTurn && !recognitionTurn.allowCreate) {
+    return buildDecision(
+      "RECOGNITION",
+      "high",
+      recognitionTurn.offer?.reason ??
+        "recognition lifecycle — preserve before Create",
+    );
+  }
+
   if (taskRequest(text)) {
+    // Discovery language that looks like create ("how to create…") must not enter Create.
+    if (
+      isDiscoveryLanguageNotCreate(text) &&
+      !isExplicitCreateRequestForRecognition(text)
+    ) {
+      return buildDecision(
+        "RECOGNITION",
+        "high",
+        "discovery language — Evidence Vault preserve-first, not Create",
+      );
+    }
     const base = buildDecision(
       "TASK_REQUEST",
       "high",
@@ -279,6 +311,9 @@ export function primaryTurnAllowsFrictionlessCategory(
         category === "focus_support" ||
         category === "none"
       );
+    case "RECOGNITION":
+      // Recognition owns the turn — no Create / universal creation frictionless paths
+      return category === "none" || category === "estate_guide";
     default: {
       const _exhaustive: never = decision.type;
       return _exhaustive;

@@ -46,7 +46,7 @@ export function detectOverwhelmPatterns(
       trigger: "Feeling there's too much at once",
       frequency: overwhelmHits,
       severity: severityFromFrequency(overwhelmHits),
-      recoveryMethods: ["Breathe & Reset", "Clear My Mind", "One small next step"],
+      recoveryMethods: ["Breathe", "Clear My Mind", "One small next step"],
     });
 
   // Unclear priorities: repeated "too much to do" without a chosen focus.

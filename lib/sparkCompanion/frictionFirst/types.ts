@@ -1,7 +1,7 @@
 /**
- * Friction First™ — diagnose the obstacle before prescribing a path.
+ * Friction First — diagnose the obstacle before prescribing a path.
  *
- * @see docs/spark-estate/Friction First™ (V4 constitution)
+ * @see docs/spark-estate/Friction First (V4 constitution)
  */
 
 export const FRICTION_FIRST_GOVERNING_QUESTION =

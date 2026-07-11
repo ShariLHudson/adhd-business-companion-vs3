@@ -227,15 +227,16 @@
       "audio": null,
       "aliases": [
         "decision compass",
-        "the decision compass",
-        "writing room",
-        "the writing room"
+        "the decision compass"
       ],
       "intent_tags": [],
       "related_places": [],
-      "do_not_route_to": [],
-      "navigable": true,
-      "status": "Live",
+      "do_not_route_to": [
+        "writing room",
+        "the writing room"
+      ],
+      "navigable": false,
+      "status": "Draft",
       "route": "/companion?section=decision-compass",
       "merged_into_place_id": null,
       "media_ownership": "owned",
@@ -306,15 +307,16 @@
       ],
       "related_places": [],
       "do_not_route_to": [
-        "Fireside Deck",
-        "Back Deck"
+        "fireside deck",
+        "back deck",
+        "the back deck"
       ],
       "navigable": true,
       "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
-      "media_ownership": "owned",
-      "missing_canonical_image": "private-balcony-sunset-background.PNG"
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "missing_canonical_image": "estate-room-personal-deck-main.png"
     },
     {
       "place_id": "DINING-MAIN",
@@ -387,7 +389,7 @@
       "intent_tags": [],
       "related_places": [],
       "do_not_route_to": [],
-      "navigable": true,
+      "navigable": false,
       "status": "Live",
       "route": null,
       "merged_into_place_id": null,
@@ -428,8 +430,8 @@
       "place_id": "GALLERY-FIRSTS",
       "legacy_place_id": "gallery-of-firsts",
       "estate_room_id": "ESTATE-ROOM-035",
-      "official_name": "Hall of Accomplishments™",
-      "display_name": "Hall of Accomplishments",
+      "official_name": "Gallery™",
+      "display_name": "Gallery",
       "category": "Archive",
       "parent_area": "Archive",
       "primary_image": "gallery-background.png",
@@ -437,19 +439,21 @@
       "video": null,
       "audio": null,
       "aliases": [
+        "gallery",
+        "the gallery",
         "gallery of firsts",
-        "hall of accomplishments",
-        "the hall of accomplishments",
-        "the gallery of firsts",
-        "hall of achievements",
-        "accomplishments hall"
+        "the gallery of firsts"
       ],
       "intent_tags": [],
       "related_places": [],
-      "do_not_route_to": [],
+      "do_not_route_to": [
+        "hall of accomplishments",
+        "portfolio",
+        "celebration hall"
+      ],
       "navigable": true,
       "status": "Live",
-      "route": "/companion?section=growth-portfolio",
+      "route": "/companion?section=home",
       "merged_into_place_id": null,
       "media_ownership": "owned",
       "missing_canonical_image": "estate-room-gallery-of-firsts-main.png"
@@ -517,7 +521,7 @@
       "display_name": "Celebration Garden",
       "category": "Nature",
       "parent_area": "Grounds",
-      "primary_image": "space-reflection-tree-swing-background.png",
+      "primary_image": "swing-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
@@ -544,9 +548,9 @@
       ],
       "navigable": true,
       "status": "Live",
-      "route": "/companion?section=home",
+      "route": "/companion?section=wins-this-week",
       "merged_into_place_id": null,
-      "media_ownership": "missing_dedicated_asset",
+      "media_ownership": "borrowed_pending_dedicated_asset",
       "missing_canonical_image": null
     },
     {
@@ -777,8 +781,8 @@
       "place_id": "LAKE-HAMMOCK",
       "legacy_place_id": "lakeside-hammock",
       "estate_room_id": "ESTATE-ROOM-017",
-      "official_name": "Lakeside Hammock™",
-      "display_name": "Lakeside Hammock",
+      "official_name": "Water / Lakeside Hammock™",
+      "display_name": "Water / Lakeside Hammock",
       "category": "Restoration",
       "parent_area": "Grounds",
       "primary_image": "water-lakeside-hammock-background.png",
@@ -835,8 +839,8 @@
       "place_id": "LIBRARY-ESTATE",
       "legacy_place_id": "library",
       "estate_room_id": "ESTATE-ROOM-027",
-      "official_name": "The Library™",
-      "display_name": "The Library",
+      "official_name": "Estate Library™",
+      "display_name": "Estate Library",
       "category": "Learning",
       "parent_area": "Reading Spaces",
       "primary_image": "room-library-estate-background.png",
@@ -971,8 +975,8 @@
       "place_id": "NOOK-READING",
       "legacy_place_id": "reading-nook",
       "estate_room_id": "ESTATE-ROOM-023",
-      "official_name": "Reading Nook™",
-      "display_name": "Reading Nook",
+      "official_name": "Reading Nook Window™",
+      "display_name": "Reading Nook Window",
       "category": "Reflection",
       "parent_area": "Reading Spaces",
       "primary_image": "reading-nook-window background.png",
@@ -982,9 +986,9 @@
       "aliases": [
         "reading nook",
         "the reading nook",
-        "arched window nook",
-        "window reading nook",
-        "quiet read"
+        "reading nook window",
+        "the reading nook window",
+        "nook window"
       ],
       "intent_tags": [
         "reading",
@@ -1135,7 +1139,7 @@
       "display_name": "Apple Orchard",
       "category": "Nature",
       "parent_area": "Nature Spaces",
-      "primary_image": "space-reflection-tree-swing-background.png",
+      "primary_image": "apple-orchard-kinsey-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
@@ -1151,7 +1155,9 @@
         "possibility",
         "fresh air"
       ],
-      "related_places": [],
+      "related_places": [
+        "the-swing-beneath-the-oak"
+      ],
       "do_not_route_to": [
         "greenhouse",
         "estate gardens",
@@ -1161,8 +1167,8 @@
       "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
-      "media_ownership": "missing_dedicated_asset",
-      "missing_canonical_image": "estate-room-apple-orchard-main.png"
+      "media_ownership": "owned",
+      "runtime_note": "Dedicated Kinsey orchard plate — apple-orchard-kinsey-background.png"
     },
     {
       "place_id": "PATH-WOODLAND",
@@ -1172,7 +1178,7 @@
       "display_name": "Woodland Path",
       "category": "Nature",
       "parent_area": "Grounds",
-      "primary_image": "space-reflection-tree-swing-background.png",
+      "primary_image": "swing-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
@@ -1268,15 +1274,17 @@
       "place_id": "PORCH-SWING",
       "legacy_place_id": "porch-swing",
       "estate_room_id": "ESTATE-ROOM-021",
-      "official_name": "Porch Swing™",
-      "display_name": "Porch Swing",
+      "official_name": "Swing™",
+      "display_name": "Swing",
       "category": "Restoration",
       "parent_area": "Grounds",
-      "primary_image": "fireside-deck-background.PNG",
+      "primary_image": "swing-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
       "aliases": [
+        "swing",
+        "the swing",
         "porch swing",
         "the porch swing",
         "swing on the porch"
@@ -1285,18 +1293,18 @@
       "related_places": [],
       "do_not_route_to": [],
       "navigable": true,
-      "status": "Draft",
+      "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
-      "media_ownership": "borrowed_pending_dedicated_asset",
+      "media_ownership": "owned",
       "missing_canonical_image": "estate-room-porch-swing-main.png"
     },
     {
       "place_id": "PORTFOLIO-MAIN",
       "legacy_place_id": "portfolio",
       "estate_room_id": "ESTATE-ROOM-037",
-      "official_name": "Portfolio™",
-      "display_name": "Portfolio",
+      "official_name": "Hall of Accomplishments™",
+      "display_name": "Hall of Accomplishments",
       "category": "Archive",
       "parent_area": "Archive",
       "primary_image": "hall-of-achievements-room-background.png",
@@ -1304,12 +1312,19 @@
       "video": null,
       "audio": null,
       "aliases": [
-        "portfolio",
-        "my portfolio"
+        "hall of accomplishments",
+        "the hall of accomplishments",
+        "hall of achievements",
+        "accomplishments hall"
       ],
       "intent_tags": [],
       "related_places": [],
-      "do_not_route_to": [],
+      "do_not_route_to": [
+        "gallery",
+        "celebration hall",
+        "evidence vault",
+        "portfolio"
+      ],
       "navigable": true,
       "status": "Live",
       "route": "/companion?section=growth-portfolio",
@@ -1336,7 +1351,7 @@
       "intent_tags": [],
       "related_places": [],
       "do_not_route_to": [],
-      "navigable": true,
+      "navigable": false,
       "status": "Live",
       "route": null,
       "merged_into_place_id": null,
@@ -1407,7 +1422,7 @@
       "display_name": "The Stables",
       "category": "Reflection",
       "parent_area": "Grounds",
-      "primary_image": "spark-estate-photo-background.png",
+      "primary_image": "spark-estate-stables-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
@@ -1426,8 +1441,8 @@
       "status": "Live",
       "route": "/companion?section=stables",
       "merged_into_place_id": null,
-      "media_ownership": "borrowed_pending_dedicated_asset",
-      "missing_canonical_image": "estate-room-stables-main.png"
+      "media_ownership": "owned",
+      "runtime_note": "Dedicated Spark Estate Stables plate — spark-estate-stables-background.png"
     },
     {
       "place_id": "STAIR-MAIN",
@@ -1572,10 +1587,7 @@
       "related_places": [],
       "do_not_route_to": [
         "butterfly house",
-        "butterfly conservatory",
-        "butterfly garden",
-        "aquarium",
-        "ocean conservatory",
+        "aquarium room",
         "conservatory"
       ],
       "navigable": true,
@@ -1593,7 +1605,7 @@
       "display_name": "The Swing Beneath the Oak",
       "category": "Nature",
       "parent_area": "Grounds",
-      "primary_image": "space-reflection-tree-swing-background.png",
+      "primary_image": "swing-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
@@ -1630,7 +1642,7 @@
       "related_places": [],
       "do_not_route_to": [],
       "navigable": true,
-      "status": "Draft",
+      "status": "Live",
       "route": "/companion?section=focus-audio",
       "merged_into_place_id": null,
       "media_ownership": "owned",
@@ -1666,8 +1678,8 @@
       "place_id": "TERRACE-SUMMER",
       "legacy_place_id": "summer-terrace",
       "estate_room_id": "ESTATE-ROOM-059",
-      "official_name": "Summer Terrace™",
-      "display_name": "Summer Terrace",
+      "official_name": "Swimming Pool™",
+      "display_name": "Swimming Pool",
       "category": "Restoration",
       "parent_area": "Grounds",
       "primary_image": "water-swimming-pool-private-background.png",
@@ -1675,16 +1687,19 @@
       "video": null,
       "audio": null,
       "aliases": [
-        "summer terrace",
         "swimming pool",
         "the swimming pool",
-        "the summer terrace",
         "the pool",
-        "pool"
+        "pool",
+        "summer terrace",
+        "the summer terrace"
       ],
       "intent_tags": [],
       "related_places": [],
-      "do_not_route_to": [],
+      "do_not_route_to": [
+        "lakeside hammock",
+        "grand terrace"
+      ],
       "navigable": true,
       "status": "Live",
       "route": "/companion?section=home",
@@ -1700,7 +1715,7 @@
       "display_name": "Reflection Tree",
       "category": "Nature",
       "parent_area": "Grounds",
-      "primary_image": "space-reflection-tree-swing-background.png",
+      "primary_image": "swing-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
@@ -1721,8 +1736,8 @@
       "place_id": "TREEHOUSE-CHEST",
       "legacy_place_id": "house-possibility-discovery-chest",
       "estate_room_id": "ESTATE-ROOM-049",
-      "official_name": "Discovery Chest",
-      "display_name": "Discovery Chest",
+      "official_name": "Treehouse Discovery Chest™",
+      "display_name": "Treehouse Discovery Chest",
       "category": "Archive",
       "parent_area": "Possibility House",
       "primary_image": "treehouse-possibility-discovery-chest-background.png",
@@ -1730,13 +1745,15 @@
       "video": null,
       "audio": null,
       "aliases": [
+        "treehouse discovery chest",
+        "discovery chest",
         "house possibility discovery chest"
       ],
       "intent_tags": [],
       "related_places": [],
       "do_not_route_to": [],
       "navigable": true,
-      "status": "Draft",
+      "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
       "media_ownership": "owned",
@@ -1746,8 +1763,8 @@
       "place_id": "TREEHOUSE-DESK",
       "legacy_place_id": "house-possibility-reflection-desk",
       "estate_room_id": "ESTATE-ROOM-045",
-      "official_name": "Reflection Desk",
-      "display_name": "Reflection Desk",
+      "official_name": "Treehouse Reflection Desk™",
+      "display_name": "Treehouse Reflection Desk",
       "category": "Reflection",
       "parent_area": "Possibility House",
       "primary_image": "treehouse-possibility-reflection-desk-background.png",
@@ -1755,13 +1772,15 @@
       "video": null,
       "audio": null,
       "aliases": [
+        "treehouse reflection desk",
+        "reflection desk",
         "house possibility reflection desk"
       ],
       "intent_tags": [],
       "related_places": [],
       "do_not_route_to": [],
       "navigable": true,
-      "status": "Draft",
+      "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
       "media_ownership": "owned",
@@ -1811,7 +1830,7 @@
       "related_places": [],
       "do_not_route_to": [],
       "navigable": true,
-      "status": "Draft",
+      "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
       "media_ownership": "borrowed_pending_dedicated_asset",
@@ -1850,8 +1869,8 @@
       "place_id": "TREEHOUSE-STAIR",
       "legacy_place_id": "house-possibility-staircase",
       "estate_room_id": "ESTATE-ROOM-046",
-      "official_name": "Possibility Staircase",
-      "display_name": "Possibility Staircase",
+      "official_name": "Treehouse Staircase / Reading Nook™",
+      "display_name": "Treehouse Staircase / Reading Nook",
       "category": "Reflection",
       "parent_area": "Possibility House",
       "primary_image": "treehouse-possibility-staircase-window-reading-nook-background.png",
@@ -1859,13 +1878,16 @@
       "video": null,
       "audio": null,
       "aliases": [
+        "treehouse staircase",
+        "treehouse reading nook",
+        "possibility staircase",
         "house possibility staircase"
       ],
       "intent_tags": [],
       "related_places": [],
       "do_not_route_to": [],
       "navigable": true,
-      "status": "Draft",
+      "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
       "media_ownership": "owned",
@@ -1875,8 +1897,8 @@
       "place_id": "TREEHOUSE-STUDIO",
       "legacy_place_id": "house-possibility-studio",
       "estate_room_id": "ESTATE-ROOM-048",
-      "official_name": "Possibility Studio",
-      "display_name": "Possibility Studio",
+      "official_name": "Treehouse Possibility Studio™",
+      "display_name": "Treehouse Possibility Studio",
       "category": "Creation",
       "parent_area": "Possibility House",
       "primary_image": "treehouse-possibility-studio.png",
@@ -1884,13 +1906,15 @@
       "video": null,
       "audio": null,
       "aliases": [
+        "treehouse possibility studio",
+        "possibility studio",
         "house possibility studio"
       ],
       "intent_tags": [],
       "related_places": [],
       "do_not_route_to": [],
       "navigable": true,
-      "status": "Draft",
+      "status": "Live",
       "route": "/companion?section=home",
       "merged_into_place_id": null,
       "media_ownership": "owned",
@@ -1904,7 +1928,7 @@
       "display_name": "Evidence Vault",
       "category": "Archive",
       "parent_area": "Archive",
-      "primary_image": "hall-of-achievements-room-background.png",
+      "primary_image": "evidence-vault-background.png",
       "image_variants": [],
       "video": null,
       "audio": null,
@@ -1952,6 +1976,125 @@
       "merged_into_place_id": null,
       "media_ownership": "owned",
       "missing_canonical_image": "estate-room-welcome-home-main.png"
+    },
+    {
+      "place_id": "OBS-DAY-INSIDE",
+      "legacy_place_id": "observatory-day-inside",
+      "estate_room_id": null,
+      "official_name": "Observatory — Daytime Inside™",
+      "display_name": "Observatory — Daytime Inside",
+      "category": "Research",
+      "parent_area": "Research",
+      "primary_image": "observatory-daytime-inside.png",
+      "image_variants": [],
+      "video": null,
+      "audio": null,
+      "aliases": [
+        "observatory — daytime inside"
+      ],
+      "intent_tags": [
+        "observatory"
+      ],
+      "related_places": [
+        "OBS-MAIN"
+      ],
+      "do_not_route_to": [],
+      "navigable": true,
+      "status": "Live",
+      "route": "/companion?section=grow-observatory",
+      "merged_into_place_id": null,
+      "media_ownership": "owned",
+      "missing_canonical_image": null
+    },
+    {
+      "place_id": "OBS-DAY-OUTSIDE",
+      "legacy_place_id": "observatory-day-outside",
+      "estate_room_id": null,
+      "official_name": "Observatory — Daytime Outside™",
+      "display_name": "Observatory — Daytime Outside",
+      "category": "Research",
+      "parent_area": "Research",
+      "primary_image": "observatory-daytime-outside-background.png",
+      "image_variants": [],
+      "video": null,
+      "audio": null,
+      "aliases": [
+        "observatory — daytime outside"
+      ],
+      "intent_tags": [
+        "observatory"
+      ],
+      "related_places": [
+        "OBS-MAIN"
+      ],
+      "do_not_route_to": [],
+      "navigable": true,
+      "status": "Live",
+      "route": "/companion?section=grow-observatory",
+      "merged_into_place_id": null,
+      "media_ownership": "owned",
+      "missing_canonical_image": null
+    },
+    {
+      "place_id": "OBS-NIGHT-OUTSIDE",
+      "legacy_place_id": "observatory-night-outside",
+      "estate_room_id": null,
+      "official_name": "Observatory — Night Outside™",
+      "display_name": "Observatory — Night Outside",
+      "category": "Research",
+      "parent_area": "Research",
+      "primary_image": "observatory-night-outside-background.png",
+      "image_variants": [],
+      "video": null,
+      "audio": null,
+      "aliases": [
+        "observatory — night outside"
+      ],
+      "intent_tags": [
+        "observatory"
+      ],
+      "related_places": [
+        "OBS-MAIN"
+      ],
+      "do_not_route_to": [],
+      "navigable": true,
+      "status": "Live",
+      "route": "/companion?section=grow-observatory",
+      "merged_into_place_id": null,
+      "media_ownership": "owned",
+      "missing_canonical_image": null
+    },
+    {
+      "place_id": "WRITING-ROOM",
+      "legacy_place_id": "writing-room",
+      "estate_room_id": null,
+      "official_name": "Writing Room™",
+      "display_name": "Writing Room",
+      "category": "Creative",
+      "parent_area": "Creative Spaces",
+      "primary_image": "writing-room-background.png",
+      "image_variants": [],
+      "video": null,
+      "audio": null,
+      "aliases": [
+        "writing room",
+        "the writing room"
+      ],
+      "intent_tags": [
+        "writing",
+        "draft",
+        "quiet"
+      ],
+      "related_places": [],
+      "do_not_route_to": [
+        "decision compass"
+      ],
+      "navigable": true,
+      "status": "Live",
+      "route": "/companion?section=home",
+      "merged_into_place_id": null,
+      "media_ownership": "owned",
+      "missing_canonical_image": null
     }
   ],
   "removed_places": [

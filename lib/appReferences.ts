@@ -55,7 +55,7 @@ const RULES: RefRule[] = [
   },
   {
     section: "breathe",
-    label: "Breathe & Reset",
+    label: "Breathe",
     objectId: "breathing",
     re: /\bbreathe|breathing|slow breath|reset your (attention|nervous system)|ground (yourself|your body)\b/i,
   },

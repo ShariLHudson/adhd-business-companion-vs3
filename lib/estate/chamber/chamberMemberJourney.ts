@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — end-to-end member journey and intelligence flow (Phase 10).
+ * Chamber of Momentum — end-to-end member journey and intelligence flow (Phase 10).
  * Guided arrival → need → intelligence → work → completion → review → save.
  * Project creation follows the Spark Estate universal journey (Phase 11).
  *

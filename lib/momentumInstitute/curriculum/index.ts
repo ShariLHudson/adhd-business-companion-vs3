@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — Curriculum Development public API.
+ * Momentum Institute — Curriculum Development public API.
  */
 
 export * from "./types";

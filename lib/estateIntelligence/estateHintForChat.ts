@@ -1,6 +1,6 @@
 /**
- * Estate Intelligence™ — mandatory LLM hint (estate-first mandate).
- * Serves The Conversation Front Door™ — talk is enough; Estate invites deepen.
+ * Estate Intelligence — mandatory LLM hint (estate-first mandate).
+ * Serves The Conversation Front Door — talk is enough; Estate invites deepen.
  */
 
 import { CONVERSATION_FRONT_DOOR_PRINCIPLE } from "@/lib/sparkEstateRooms/types";

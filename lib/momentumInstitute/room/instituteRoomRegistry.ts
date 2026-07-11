@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — estate room registration (Entrepreneur Development Center).
+ * Momentum Institute — estate room registration (Entrepreneur Development Center).
  */
 
 import type { AppSection } from "@/lib/companionUi";
@@ -16,8 +16,8 @@ export const MOMENTUM_INSTITUTE_ROOM_BG = ESTATE_ROOM_BG.momentumInstitute;
 export const MOMENTUM_INSTITUTE_ROOM_META = {
   section: MOMENTUM_INSTITUTE_SECTION,
   objectId: MOMENTUM_INSTITUTE_OBJECT_ID,
-  title: "Momentum Institute™",
-  trademark: "Momentum Institute™",
+  title: "Momentum Institute",
+  trademark: "Momentum Institute",
   subtitle: "Entrepreneur Development Center",
   purpose: "Develop entrepreneurial capability — drawer by drawer.",
   background: MOMENTUM_INSTITUTE_ROOM_BG,

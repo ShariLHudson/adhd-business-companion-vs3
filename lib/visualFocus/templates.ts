@@ -103,10 +103,12 @@ function treeTemplate(mode: VisualFocusMode): { title: string; root: VisualFocus
 
 export type CreateVisualFocusMapOptions = {
   purposeAnswer?: string;
-  /** Mind Map Discovery Interview answers (199) — preferred over purposeAnswer. */
+  /** Mind Map Discovery Interview answers (199 / 242) — preferred over purposeAnswer. */
   mindMapDiscovery?: {
     topic: string;
     everything: string;
+    desiredOutcome?: string;
+    /** @deprecated use desiredOutcome */
     anythingElse?: string;
   };
 };

@@ -43,7 +43,7 @@ export function FounderExecutiveIntelligenceGraph() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Intelligence Graph™"
+        eyebrow="Executive Intelligence Graph"
         title="The Living Brain of Visual Spark Studios"
         question="How is everything connected?"
         purpose="Relationships — not folders. Every product, decision, and idea linked into executive intelligence."

@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — paused work when leaving mid-task.
+ * Estate Journey Engine — paused work when leaving mid-task.
  */
 
 import type { AppSection } from "@/lib/companionUi";

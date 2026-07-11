@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — user journey and member lifecycle architecture (Phase 20).
+ * Spark Estate — user journey and member lifecycle architecture (Phase 20).
  * The complete relationship between Spark and a member over time.
  *
  * @see docs/protocols/SPARK_ESTATE_USER_JOURNEY_AND_MEMBER_LIFECYCLE_ARCHITECTURE_PHASE20.md
@@ -32,7 +32,7 @@ export const SPARK_ESTATE_MEMBER_LIFECYCLE_STAGES = [
     id: "discovery",
     stage: 1,
     title: "Discovery",
-    goal: "Help someone understand why Spark Estate™ may help them.",
+    goal: "Help someone understand why Spark Estate may help them.",
     communicates: [
       "who it is for",
       "what problems it helps solve",
@@ -76,8 +76,8 @@ export const SPARK_ESTATE_MEMBER_LIFECYCLE_STAGES = [
     title: "Daily Companion Experience",
     goal: "Give the member a reason to return with adapted cards and next steps.",
     experiences: [
-      "Spark Card™",
-      "Momentum Card™",
+      "Spark Card",
+      "Momentum Card",
       "progress reminder",
       "encouragement",
       "next step",
@@ -291,7 +291,7 @@ export function formatSparkEstateLifecycleWelcome(input: {
 
   switch (input.stage) {
     case "discovery":
-      return "Welcome. Spark Estate™ helps turn ideas into action — one gentle step at a time.";
+      return "Welcome. Spark Estate helps turn ideas into action — one gentle step at a time.";
     case "onboarding":
       return name
         ? `Welcome, ${name}. Let's get to know what would help you most.`
@@ -401,7 +401,7 @@ export function formatSparkEstateUserJourneyAndMemberLifecycleReport(
   verification: ReturnType<typeof verifySparkEstateUserJourneyAndMemberLifecycle> = verifySparkEstateUserJourneyAndMemberLifecycle(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ member lifecycle: ${verification.lifecycleResolutionReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate member lifecycle: ${verification.lifecycleResolutionReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_LIFECYCLE_PRINCIPLE,
     SPARK_ESTATE_LIFECYCLE_VISION,
     SPARK_ESTATE_LIFECYCLE_JOURNEY_HEADLINE,

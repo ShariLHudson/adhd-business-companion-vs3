@@ -8,7 +8,7 @@ describe("composeEcosystemSystemsStatus", () => {
     expect(rows.map((row) => row.system)).toEqual([
       "Founder",
       "Spark Companion",
-      "PostCraft™",
+      "PostCraft",
       "GoHighLevel",
       "GitHub",
       "Cursor",

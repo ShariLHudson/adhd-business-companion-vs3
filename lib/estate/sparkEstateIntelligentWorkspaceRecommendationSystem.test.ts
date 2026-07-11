@@ -93,7 +93,7 @@ describe("sparkEstateIntelligentWorkspaceRecommendationSystem", () => {
 
     const report = formatSparkEstateWorkspaceRecommendationReport();
     expect(report).toContain("Selection flow");
-    expect(report).toContain("Chamber of Momentum™");
+    expect(report).toContain("Chamber of Momentum");
     expect(report).toContain("Compliance checks");
   });
 });

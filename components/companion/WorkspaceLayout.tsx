@@ -55,6 +55,7 @@ export function WorkspaceLayout({
   onViewSizePresetChange,
   chatFocusKey = 0,
   onReturnToChat,
+  immersiveWorkspace = false,
 }: {
   chat: ReactNode;
   workspace?: ReactNode | null;
@@ -83,6 +84,11 @@ export function WorkspaceLayout({
   chatFocusKey?: number;
   /** Closes workspace and opens main Chat — highest nav priority. */
   onReturnToChat?: () => void;
+  /**
+   * Immersive workspace (e.g. Cartographer's Studio) — hides the split-chat
+   * header entirely so the workspace owns all available chrome.
+   */
+  immersiveWorkspace?: boolean;
 }) {
   const [mobileView, setMobileView] = useState<"chat" | "work">("chat");
   const workspacePaneRef = useRef<HTMLDivElement>(null);
@@ -235,7 +241,7 @@ export function WorkspaceLayout({
           }`}
         >
           <div
-            className={`companion-split-chat-header flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 py-2 ${WORKSPACE_HEADER_MIN_HEIGHT_CLASS}`}
+            className={`companion-split-chat-header flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 py-2 ${WORKSPACE_HEADER_MIN_HEIGHT_CLASS}${immersiveWorkspace ? " hidden" : ""}`}
           >
             <div className="flex min-w-0 items-center gap-2">
               {onClose ? (

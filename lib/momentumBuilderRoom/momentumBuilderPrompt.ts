@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ — invisible coaching prompt for Spark (never member-facing labels).
+ * Momentum Builder — invisible coaching prompt for Spark (never member-facing labels).
  */
 
 import type { MomentumConversationDiscovery } from "./types";
@@ -27,7 +27,7 @@ export function isMomentumBuilderRoomSection(
   return section === "momentum-builder" || section === "grow-momentum-builders";
 }
 
-/** Mandatory chat hint while member is in Momentum Builder™. */
+/** Mandatory chat hint while member is in Momentum Builder. */
 export function momentumBuilderRoomHintForChat(input?: {
   userText?: string;
   hasConversationStarted?: boolean;
@@ -54,7 +54,7 @@ export function momentumBuilderRoomHintForChat(input?: {
   const estateHint = estateConnectionHintForChat(estateConnection);
 
   return [
-    "MOMENTUM BUILDER™ ROOM (mandatory — coaching, not teaching):",
+    "MOMENTUM BUILDER ROOM (mandatory — coaching, not teaching):",
     "Arrival first: \"Let's make today a little easier.\" — then one question. Never define the room.",
     "Never offer: Quick Answer, Example, Apply to My Business, Deep Dive, or numbered learning menus.",
     'Never ask "Would you like to learn about…" or "A momentum builder is…".',

@@ -33,7 +33,7 @@
  *   const report = buildBenchmarkReport(results);
  *   console.log(formatBenchmarkRunReport(report));
  *
- * Sprint: Phase 2 — ADHD Business Ecosystem™
+ * Sprint: Phase 2 — ADHD Business Ecosystem
  */
 
 import { detectAdhdBusinessPatterns } from "@/lib/adhdEntrepreneurIntelligence";

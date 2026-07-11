@@ -29,7 +29,7 @@ export function frictionFirstHintForChat(
     input.session?.focusSituation ?? decision.focusSituation;
 
   const lines = [
-    "FRICTION FIRST™ (mandatory — diagnose before prescribe):",
+    "FRICTION FIRST (mandatory — diagnose before prescribe):",
     `Governing question: "${FRICTION_FIRST_GOVERNING_QUESTION}"`,
     ...FRICTION_FIRST_CORE_BELIEF.map((b) => `- ${b}`),
     "",

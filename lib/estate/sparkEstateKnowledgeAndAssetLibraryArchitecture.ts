@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — knowledge and asset library architecture (Phase 19).
+ * Spark Estate — knowledge and asset library architecture (Phase 19).
  * Intelligent resource retrieval — the right knowledge at the right moment.
  *
  * @see docs/protocols/SPARK_ESTATE_KNOWLEDGE_AND_ASSET_LIBRARY_ARCHITECTURE_SPECIFICATION_PHASE19.md
@@ -114,7 +114,7 @@ export const SPARK_ESTATE_ROOM_KNOWLEDGE: Record<
   { label: string; uses: readonly string[]; sections: readonly AppSection[] }
 > = {
   chamber: {
-    label: "Chamber of Momentum™",
+    label: "Chamber of Momentum",
     uses: ["progress frameworks", "decision tools", "next-step strategies"],
     sections: [
       "chamber-of-momentum",
@@ -475,7 +475,7 @@ export function formatSparkEstateKnowledgeAndAssetLibraryReport(
   verification: ReturnType<typeof verifySparkEstateKnowledgeAndAssetLibrary> = verifySparkEstateKnowledgeAndAssetLibrary(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ knowledge and asset library: ${verification.retrievalReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate knowledge and asset library: ${verification.retrievalReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_KNOWLEDGE_PRINCIPLE,
     SPARK_ESTATE_KNOWLEDGE_QUESTION,
     "",

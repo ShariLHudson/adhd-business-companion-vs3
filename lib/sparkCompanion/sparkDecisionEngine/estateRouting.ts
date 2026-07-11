@@ -24,7 +24,7 @@ export function suggestEstateRoute(input: {
 
   if (input.landscape === "mirror_pond" || input.friction === "confidence") {
     return {
-      placeId: "hall-of-accomplishments",
+      placeId: "evidence-vault",
       reason: "Mirror Pond — restore perspective with evidence",
       optional: true,
     };
@@ -56,7 +56,7 @@ export function suggestEstateRoute(input: {
 
   if (input.landscape === "campfire") {
     return {
-      placeId: "pond",
+      placeId: "seat-at-pond",
       reason: "Campfire — presence, listen more than solve",
       optional: true,
     };
@@ -72,16 +72,16 @@ export function suggestEstateRoute(input: {
 
   if (input.friction === "capacity") {
     return {
-      placeId: "pool",
-      reason: "restoration — Pool reduces pressure",
+      placeId: "summer-terrace",
+      reason: "restoration — Summer Terrace reduces pressure",
       optional: true,
     };
   }
 
   if (input.friction === "clarity" && input.intent === "THINK") {
     return {
-      placeId: "pond",
-      reason: "quiet thinking — Pond, no solving required",
+      placeId: "seat-at-pond",
+      reason: "quiet thinking — Seat at the Pond, no solving required",
       optional: true,
     };
   }
@@ -96,7 +96,7 @@ export function suggestEstateRoute(input: {
 
   if (input.friction === "emotional_weight") {
     return {
-      placeId: "journal-gazebo",
+      placeId: "journal",
       reason: "reflection — Journal Gazebo when story needs space",
       optional: true,
     };

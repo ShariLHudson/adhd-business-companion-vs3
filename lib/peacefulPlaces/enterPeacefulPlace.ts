@@ -14,7 +14,7 @@ export type EnterPeacefulPlaceResult = {
 };
 
 /**
- * Single entry point for immersive Peaceful Places™ destinations.
+ * Single entry point for immersive Peaceful Places destinations.
  * Image + ambient audio are one experience — never separate actions.
  */
 export function enterPeacefulPlace(

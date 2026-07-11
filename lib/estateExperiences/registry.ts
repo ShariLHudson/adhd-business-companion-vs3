@@ -1,5 +1,5 @@
 /**
- * Estate Experiences™ — canonical experience map for Spark Estate.
+ * Estate Experiences — canonical experience map for Spark Estate.
  * **Source of truth:** `lib/estateBrain/knowledgeRegistry.ts` (Estate Brain).
  */
 

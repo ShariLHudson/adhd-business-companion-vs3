@@ -217,7 +217,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "evidence-bank",
-    feature: "Evidence Bank",
+    feature: "Evidence Vault",
     currentEmoji: "⭐",
     signatureObject: "Keepsake box",
     room: "library",

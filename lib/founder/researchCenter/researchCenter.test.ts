@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { getResearchCenterBootstrap } from "./services/researchCenterService";
 
-describe("Executive Research Center™ bootstrap", () => {
+describe("Executive Research Center bootstrap", () => {
   it("returns categories, queries, and alerts for room UI", () => {
     const boot = getResearchCenterBootstrap();
     expect(boot.categories.length).toBeGreaterThan(10);

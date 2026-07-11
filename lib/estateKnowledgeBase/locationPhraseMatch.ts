@@ -13,7 +13,7 @@ export function stripNavigationVerbsFromQuery(query: string): string {
   return query
     .trim()
     .replace(NAV_VERB_PREFIX_RE, "")
-    .replace(/[™®.!?]+$/g, "")
+    .replace(/[®.!?]+$/g, "")
     .trim();
 }
 

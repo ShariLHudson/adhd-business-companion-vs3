@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — intelligence decision logic (Phase 5).
+ * Chamber of Momentum — intelligence decision logic (Phase 5).
  * Understand emotional state, energy, and clarity before routing support.
  *
  * @see docs/protocols/CHAMBER_OF_MOMENTUM_INTELLIGENCE_DECISION_LOGIC_SPECIFICATION_PHASE5.md

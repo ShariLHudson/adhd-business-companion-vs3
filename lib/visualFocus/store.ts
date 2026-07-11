@@ -18,14 +18,23 @@ import {
 
 const STORE_KEY = "companion-visual-focus-maps-v1";
 const PENDING_OPEN_KEY = "companion-visual-focus-pending-open-v1";
+const PENDING_MIND_MAP_DISCOVERY_KEY =
+  "companion-visual-focus-mind-map-discovery-v1";
 export const VISUAL_FOCUS_UPDATED = "companion-visual-focus-updated";
 /** Studio hub only — maps open only via explicit user action or pending open. */
 export const VISUAL_FOCUS_SHOW_STUDIO = "companion-visual-focus-show-studio";
 export const VISUAL_FOCUS_OPEN_REQUESTED = "companion-visual-focus-open-requested";
+/** Open Mind Map Discovery Interview (same path as framed Mind Map click). */
+export const VISUAL_FOCUS_MIND_MAP_DISCOVERY_REQUESTED =
+  "companion-visual-focus-mind-map-discovery-requested";
 
 export type VisualFocusPendingOpen = {
   mapId: string;
   preferGenerated: boolean;
+};
+
+export type MindMapDiscoveryPendingOpen = {
+  seedText?: string;
 };
 
 type Store = {
@@ -389,6 +398,56 @@ export function peekVisualFocusPendingOpen(): VisualFocusPendingOpen | null {
 export function requestVisualFocusStudio(): void {
   if (typeof window !== "undefined") {
     window.dispatchEvent(new Event(VISUAL_FOCUS_SHOW_STUDIO));
+  }
+}
+
+/**
+ * Open Cartographer's Studio + Mind Map Discovery Interview.
+ * Used by NL ("create a mind map") and the Mind Map frame — same entry.
+ */
+export function requestMindMapDiscoveryOpen(seedText?: string): void {
+  if (typeof sessionStorage !== "undefined") {
+    try {
+      const payload: MindMapDiscoveryPendingOpen = {
+        seedText: seedText?.trim() || undefined,
+      };
+      sessionStorage.setItem(
+        PENDING_MIND_MAP_DISCOVERY_KEY,
+        JSON.stringify(payload),
+      );
+    } catch {
+      /* ignore */
+    }
+  }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent(VISUAL_FOCUS_MIND_MAP_DISCOVERY_REQUESTED, {
+        detail: { seedText: seedText?.trim() || undefined },
+      }),
+    );
+  }
+}
+
+export function peekMindMapDiscoveryPending(): MindMapDiscoveryPendingOpen | null {
+  if (typeof sessionStorage === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(PENDING_MIND_MAP_DISCOVERY_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as MindMapDiscoveryPendingOpen;
+  } catch {
+    return null;
+  }
+}
+
+export function consumeMindMapDiscoveryPending(): MindMapDiscoveryPendingOpen | null {
+  if (typeof sessionStorage === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(PENDING_MIND_MAP_DISCOVERY_KEY);
+    if (!raw) return null;
+    sessionStorage.removeItem(PENDING_MIND_MAP_DISCOVERY_KEY);
+    return JSON.parse(raw) as MindMapDiscoveryPendingOpen;
+  } catch {
+    return null;
   }
 }
 

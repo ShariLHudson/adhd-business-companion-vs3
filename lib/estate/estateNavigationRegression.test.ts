@@ -9,6 +9,7 @@ const EXPLICIT_NAV_CASES: { text: string; placeId: string }[] = [
   { text: "take me to the butterfly house", placeId: "butterfly-house" },
   { text: "take me to the music room", placeId: "music-room" },
   { text: "take me to the apple orchard", placeId: "apple-orchard" },
+  { text: "take me to the stables", placeId: "stables" },
 ];
 
 describe("estate navigation regression", () => {
@@ -38,7 +39,7 @@ describe("estate navigation regression", () => {
     });
   }
 
-  it("explicit pool navigation routes to Summer Terrace™ — not game-room", () => {
+  it("explicit pool navigation routes to Summer Terrace — not game-room", () => {
     const turn = evaluateEstatePlaceTurn({
       userText: "take me to the swimming pool",
     });

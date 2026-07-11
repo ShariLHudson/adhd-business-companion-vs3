@@ -1,5 +1,5 @@
 /**
- * Global navigation back labels — ADHD Business Ecosystem™ standard.
+ * Global navigation back labels — ADHD Business Ecosystem standard.
  * Format: "Back to [Previous Page]"
  */
 

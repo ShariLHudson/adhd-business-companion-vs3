@@ -17,7 +17,7 @@ import {
   validateRelationshipIntegrity,
 } from "./index";
 
-describe("Institutional Memory™", () => {
+describe("Institutional Memory", () => {
   beforeEach(() => {
     resetRuntimeInstitutionalMemory();
   });

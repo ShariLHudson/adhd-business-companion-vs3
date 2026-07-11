@@ -1,5 +1,5 @@
 /**
- * Estate Command Router™ — spoken room names → registry ids.
+ * Estate Command Router — spoken room names → registry ids.
  * @deprecated Prefer lib/estate/estateRoomAliasRegistry.ts for new code.
  */
 

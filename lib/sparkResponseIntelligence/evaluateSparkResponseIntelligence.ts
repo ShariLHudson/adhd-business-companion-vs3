@@ -1,5 +1,5 @@
 /**
- * Spark Response Intelligence Engine™ — orchestration.
+ * Spark Response Intelligence Engine — orchestration.
  * Highest-priority pre-send pipeline (scaffold).
  * @see spark-intelligence-foundation/12-spark-response-intelligence-engine.md
  */

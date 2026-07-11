@@ -36,27 +36,27 @@ export const CLOSING_LINES = [
 
 export const FOLIO_SECTIONS = {
   businessBrain: {
-    title: "Business Brain™",
-    items: ["Visual Spark Studios™", "ADHD Business Ecosystem™", "Warm, clear, encouraging voice"],
+    title: "Business Brain",
+    items: ["Visual Spark Studios", "ADHD Business Ecosystem", "Warm, clear, encouraging voice"],
   },
   clientAvatar: {
-    title: "Client Avatar™",
+    title: "Client Avatar",
     items: ["ADHD entrepreneur", "Easily overwhelmed", "Wants clarity and momentum"],
   },
   brandVoice: {
-    title: "Brand Voice™",
+    title: "Brand Voice",
     items: ["Warm", "Clear", "Encouraging", "Never clinical"],
   },
   assets: {
-    title: "Related Business Assets™",
+    title: "Related Business Assets",
     items: ["Workshop Launch", "7-Day Email Sequence", "Founder Invitation"],
   },
   sparkCard: {
-    title: "Spark Card™",
+    title: "Spark Card",
     body: "Positioning: Make the promise clear before creating the content.",
   },
   decision: {
-    title: "Previous Decision™",
+    title: "Previous Decision",
     body: "Lead with transformation, not features.",
   },
 } as const;

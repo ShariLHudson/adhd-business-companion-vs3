@@ -14,11 +14,10 @@ export function focusHubCardArt(feelingId: FocusFeelingId): string {
 /** Soft illustrations for workspace tool cards. */
 export const FOCUS_TOOL_CARD_ART: Record<string, string> = {
   "next-small-step": "/backgrounds/peaceful-places/peaceful-places-pathway.png",
-  "break-smaller": "/backgrounds/peaceful-places/woodland-pathway.png",
+  "break-smaller": "/backgrounds/woodland-pathway.png",
   "prioritize-options": ESTATE_ROOM_BG.studyHall,
   "focus-audio": "/backgrounds/peaceful-places/summer-storm-covered-deck.png",
   "momentum-builders": ESTATE_ROOM_BG.gameRoom,
-  "breathe-reset": "/backgrounds/audio-rain-background.png",
   "sixty-second-reset": "/backgrounds/peaceful-places/cozy-cafeimage.png",
   "calm-moment": "/backgrounds/peaceful-places/cozy-cafeimage.png",
   "brain-break-games": ESTATE_ROOM_BG.gameRoom,
@@ -26,9 +25,9 @@ export const FOCUS_TOOL_CARD_ART: Record<string, string> = {
   "brain-dump": ESTATE_ROOM_BG.sunroom,
   "chat-guide": "/backgrounds/life-experience-room.png",
   "mind-slow-breathe": "/backgrounds/audio-rain-background.png",
-  "mind-slow-places": "/backgrounds/peaceful-places/woodland-pathway.png",
+  "mind-slow-places": "/backgrounds/woodland-pathway.png",
   "overwhelm-prioritize": ESTATE_ROOM_BG.studyHall,
-  "overwhelm-break-down": "/backgrounds/peaceful-places/woodland-pathway.png",
+  "overwhelm-break-down": "/backgrounds/woodland-pathway.png",
   "overwhelm-clear": ESTATE_ROOM_BG.sunroom,
   "overwhelm-breathe": "/backgrounds/audio-rain-background.png",
 };

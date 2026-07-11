@@ -127,6 +127,11 @@
   pointer-events: auto;
 }
 
+.jg-design-studio button,
+.jg-design-studio .jg-design-swatch {
+  pointer-events: auto;
+}
+
 .jg-design-name-ceremony__nav {
   margin: clamp(0.35rem, 1vh, 0.55rem) 0 clamp(0.15rem, 0.5vh, 0.35rem);
 }

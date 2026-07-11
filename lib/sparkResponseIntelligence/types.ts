@@ -1,5 +1,5 @@
 /**
- * Spark Response Intelligence Engine™ — types.
+ * Spark Response Intelligence Engine — types.
  * @see spark-intelligence-foundation/12-spark-response-intelligence-engine.md
  * Not wired to production companion routes in v1 scaffold.
  */

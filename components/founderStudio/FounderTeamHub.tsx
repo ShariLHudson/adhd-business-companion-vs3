@@ -11,8 +11,8 @@ export function FounderTeamHub() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Team Hub™ · Execution layer"
-        title="Team Hub™"
+        eyebrow="Team Hub · Execution layer"
+        title="Team Hub"
         question="What needs to be executed, assigned, reviewed, or approved?"
         purpose="Founder thinks. Team Hub executes. Izna's lane stays here — not in private strategy intelligence."
       />

@@ -1,4 +1,4 @@
-/** Executive Experience Framework™ — experiences, not tools. */
+/** Executive Experience Framework — experiences, not tools. */
 
 import type { MissionId } from "@/lib/founder/missions/types";
 

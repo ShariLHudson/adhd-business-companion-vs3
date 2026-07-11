@@ -5,7 +5,7 @@ import {
   composeAiExtensionsCenterView,
 } from "./index";
 
-describe("AI Extensions Center™", () => {
+describe("AI Extensions Center", () => {
   it("lists all specialist tools including future slot", () => {
     expect(AI_EXTENSION_TOOLS.map((t) => t.name)).toEqual([
       "ChatGPT",

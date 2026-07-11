@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ — natural estate handoffs (delegates to Estate Registry™).
+ * Momentum Builder — natural estate handoffs (delegates to Estate Registry).
  */
 
 import type { AppSection } from "@/lib/companionUi";

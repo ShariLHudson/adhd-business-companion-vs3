@@ -1,4 +1,4 @@
-/** Institutional Memory™ — ecosystem organizational wisdom (not storage). */
+/** Institutional Memory — ecosystem organizational wisdom (not storage). */
 
 export type MemoryKind =
   | "decision"

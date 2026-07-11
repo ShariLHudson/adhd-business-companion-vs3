@@ -1,4 +1,4 @@
-/** Executive Search™ — future universal search architecture (V1: scope definition only). */
+/** Executive Search — future universal search architecture (V1: scope definition only). */
 
 export type ExecutiveSearchScopeId =
   | "documents"
@@ -23,7 +23,7 @@ export type ExecutiveSearchScope = {
   status: "planned" | "partial" | "live";
 };
 
-export const EXECUTIVE_SEARCH_HEADLINE = "Executive Search™";
+export const EXECUTIVE_SEARCH_HEADLINE = "Executive Search";
 export const EXECUTIVE_SEARCH_SUMMARY =
   "One search box — documents, prompts, research, missions, email, calendars, Drive, PostCraft, GoHighLevel, GitHub, Cursor, and NotebookLM libraries. Architecture prepared; universal search ships in a future sprint.";
 

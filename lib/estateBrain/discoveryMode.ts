@@ -1,5 +1,5 @@
 /**
- * Discovery Mode™ — understand goal, obstacle, and outcome before routing.
+ * Discovery Mode — understand goal, obstacle, and outcome before routing.
  *
  * User Request → Intent → Discovery → Confidence → Capability → Experience → Prepare → Navigate
  */

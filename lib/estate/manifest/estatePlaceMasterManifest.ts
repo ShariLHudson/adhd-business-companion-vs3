@@ -32,7 +32,7 @@ export function normalizeManifestPhrase(phrase: string): string {
   return phrase
     .trim()
     .toLowerCase()
-    .replace(/[™®.!?]+$/g, "")
+    .replace(/[®.!?]+$/g, "")
     .replace(/\s+/g, " ");
 }
 
@@ -244,9 +244,12 @@ export function getPlaceMedia(
     };
   }
 
-  const backgroundUrl = place.primary_image
-    ? `/backgrounds/${encodeURI(place.primary_image)}`
-    : null;
+  const backgroundUrl =
+    place.legacy_place_id === "journal" && place.primary_image
+      ? `/images/${encodeURI(place.primary_image)}`
+      : place.primary_image
+        ? `/backgrounds/${encodeURI(place.primary_image)}`
+        : null;
   const videoUrl = place.video ? `/Videos/${encodeURI(place.video)}` : null;
   const audioUrl = place.audio ? `/audio/${encodeURI(place.audio)}` : null;
 
@@ -305,7 +308,7 @@ export function stripManifestNavigationVerbs(text: string): string {
       /\b(?:take me to|go to|let(?:'s| us) go to|open|show me|visit|head to|bring me to|i want to go to|i need to go to|want to go to)\s+(?:the\s+)?/gi,
       "",
     )
-    .replace(/[™®.!?]+$/g, "")
+    .replace(/[®.!?]+$/g, "")
     .trim();
 }
 

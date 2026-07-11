@@ -11,7 +11,7 @@ import { WorkSurface } from "./WorkSurface";
 import type { UniversalWorkStage } from "./types";
 
 /**
- * Spark™ Universal Work Experience — Prototype 01
+ * Spark Universal Work Experience — Prototype 01
  *
  * Design intent: the room never disappears. Work quietly appears,
  * then quietly fades. No launch. No dashboard. One prepared next step.
@@ -65,7 +65,7 @@ export function UniversalWorkPrototypePage() {
       style={{ backgroundImage: `url(${CONSERVATORY_BG})` }}
     >
       <p className="uw-dev-link">
-        Universal Work™ prototype 01 ·{" "}
+        Universal Work prototype 01 ·{" "}
         <a href="/companion">Companion</a>
         {" · "}
         <a href="/prototype/relationship">Relationship 4</a>

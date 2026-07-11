@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — learning memory across the Estate.
+ * Estate Journey Engine — learning memory across the Estate.
  */
 
 import { getJourneyEngineState, patchJourneyEngine } from "./journeyStore";

@@ -28,10 +28,10 @@ export function FounderExecutiveIntelligence() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Founder Intelligence Pipeline™"
+        eyebrow="Founder Intelligence Pipeline"
         title="Executive Intelligence"
         question="What is entering the ecosystem?"
-        purpose="Incoming signals, timeline, and inbox — plumbing for SPARK™, FLAME™, and FIRE™."
+        purpose="Incoming signals, timeline, and inbox — plumbing for SPARK, FLAME, and FIRE."
       />
 
       <section className="founder-intelligence__pipeline" aria-labelledby="intel-pipeline">

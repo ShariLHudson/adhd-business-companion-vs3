@@ -1,5 +1,5 @@
 /**
- * Environmental Experience Intelligence™ — organic estate variation per visit.
+ * Environmental Experience Intelligence — organic estate variation per visit.
  * V1: deterministic seed from date; V2+: full weather/season engine.
  */
 

@@ -8,13 +8,12 @@ export function webpBackgroundUrl(pngOrAnyUrl: string): string {
   return pngOrAnyUrl.replace(PNG_EXT, ".webp$1");
 }
 
-/** CSS image-set — WebP when supported, PNG otherwise. */
+/**
+ * Direct URL only — do not prefer a sibling .webp via image-set.
+ * Missing WebP plates left rooms blank (beige fallback) in supporting browsers.
+ */
 export function roomBackgroundImageCss(imageUrl: string): string {
-  if (!PNG_EXT.test(imageUrl)) {
-    return `url('${imageUrl}')`;
-  }
-  const webp = webpBackgroundUrl(imageUrl);
-  return `image-set(url('${webp}') type('image/webp'), url('${imageUrl}') type('image/png'))`;
+  return `url('${imageUrl}')`;
 }
 
 export function roomBackgroundImageStyle(imageUrl: string): {

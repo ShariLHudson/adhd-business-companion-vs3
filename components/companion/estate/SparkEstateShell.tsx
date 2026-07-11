@@ -55,7 +55,7 @@ function resolveBackground(
 }
 
 /**
- * SparkEstateShell™ — one scene, one conversation panel (Phase D.1).
+ * SparkEstateShell — one scene, one conversation panel (Phase D.1).
  *
  * Replaces parallel `EstateChatNavigationOverlay` and `ProfileEstateRoomExperience`
  * stacks for direct and profile estate visits.

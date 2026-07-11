@@ -52,7 +52,7 @@ export function executeSemanticIntent(
 
     const location = getEstateLocationById(navTarget.locationId);
     const displayName =
-      location?.officialDisplayName?.replace(/™/g, "") ??
+      location?.officialDisplayName?.replace(/\u2122/g, "") ??
       navTarget.displayName ??
       "that place";
 
@@ -82,7 +82,7 @@ export function executeSemanticIntent(
   ) {
     const location = getEstateLocationById(intent.target.locationId!);
     if (!location) return null;
-    const name = location.officialDisplayName.replace(/™/g, "");
+    const name = location.officialDisplayName.replace(/\u2122/g, "");
     const hint = location.memberFacingHint || location.description;
     const localReply = hint
       ? `${name} is here on the Estate — ${hint}. Would you like me to take you there?`
@@ -116,7 +116,7 @@ export function executeSemanticIntent(
     ) {
       const parent = getEstateLocationById(intent.target.parentLocationId);
       const placeName =
-        parent?.officialDisplayName?.replace(/™/g, "") ?? "that room";
+        parent?.officialDisplayName?.replace(/\u2122/g, "") ?? "that room";
       return {
         capability: "navigation",
         knowledgeSource: "estate-objects.json",

@@ -42,7 +42,7 @@ export type SparkPrepareResult = {
 };
 
 /**
- * SPARK™ public API — Strategic Pattern Analysis & Recommendation Kernel™
+ * SPARK public API — Strategic Pattern Analysis & Recommendation Kernel
  * No UI. No AI. No product-specific logic.
  */
 export const Spark = {
@@ -112,7 +112,7 @@ export const Spark = {
       limit: context.limit ?? 10,
     });
     return {
-      headline: "SPARK™ ecosystem intelligence overview",
+      headline: "SPARK ecosystem intelligence overview",
       sourceCount: observed.sources.length,
       signalCount: observed.signals.length,
       observationCount: observed.observations.length,

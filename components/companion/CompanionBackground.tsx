@@ -6,6 +6,10 @@ import {
   SCENE_OVERLAY,
   type ScenePage,
 } from "@/lib/companionBackgrounds";
+import {
+  getClearMyMindBackdropImageUrl,
+  useChatBackdropRevision,
+} from "@/lib/chatBackdrop";
 import { SCENE_BG_IMAGE_CLASS } from "@/lib/sceneRenderContract";
 import { HomesteadChatScene } from "./HomesteadChatScene";
 
@@ -17,7 +21,7 @@ type CompanionBackgroundProps = {
   seed?: string;
   /** Quieter atmosphere for the calm home — Shari and conversation lead. */
   calmHome?: boolean;
-  /** Clear My Mind — warmer room visible, less wash. */
+  /** Clear My Mind — Sunroom (or member-chosen) photograph behind the workspace. */
   clearMyMind?: boolean;
   /** Everyday chat — fixed living-room homestead, soft ambient only. */
   homesteadChat?: boolean;
@@ -37,15 +41,20 @@ export function CompanionBackground({
   // mount. Until then we show the warm gradient base (no layout shift, no
   // hydration mismatch).
   const [scene, setScene] = useState<string | null>(null);
+  const backdropRevision = useChatBackdropRevision();
+  const clearMyMindImage = clearMyMind
+    ? getClearMyMindBackdropImageUrl()
+    : null;
+  void backdropRevision;
 
   useEffect(() => {
-    if (suppress || homesteadChat) return;
+    if (suppress || homesteadChat || clearMyMind) return;
     setScene(pickScene(page, seed));
     // Re-pick when the topic or scene family changes; also re-resolves the
     // hour so the image shifts across morning → night.
-  }, [page, seed, suppress, homesteadChat]);
+  }, [page, seed, suppress, homesteadChat, clearMyMind]);
 
-  if (homesteadChat && !suppress) {
+  if (homesteadChat && !suppress && !clearMyMind) {
     return (
       <div
         className="companion-background-homestead-chat pointer-events-none absolute inset-0 overflow-hidden"
@@ -58,9 +67,22 @@ export function CompanionBackground({
     );
   }
 
+  const photoUrl =
+    clearMyMind && suppress
+      ? null
+      : clearMyMind
+        ? clearMyMindImage
+        : !suppress
+          ? scene
+          : null;
+  /** When SceneRenderer owns Clear My Mind, keep only a quiet gradient under the panel. */
+  const showAtmosphere = Boolean(
+    (clearMyMind && !suppress) || (!clearMyMind && !suppress),
+  );
+
   return (
     <div
-      className={`pointer-events-none absolute inset-0 overflow-hidden ${calmHome ? "companion-background-calm" : ""}${clearMyMind ? " companion-background-clear-my-mind" : ""}`}
+      className={`pointer-events-none absolute inset-0 overflow-hidden ${calmHome ? "companion-background-calm" : ""}${clearMyMind && !suppress ? " companion-background-clear-my-mind" : ""}`}
       aria-hidden="true"
       data-home-calm={calmHome ? "" : undefined}
       data-clear-my-mind={clearMyMind ? "" : undefined}
@@ -69,27 +91,38 @@ export function CompanionBackground({
       {/* Warm gradient base — always present as a fallback. */}
       <div className="companion-bg-base absolute inset-0 bg-gradient-to-br from-[#f7f0e6] via-[#f2ebe2] to-[#ebe4da]" />
 
-      {!suppress && scene && (
+      {photoUrl ? (
         <div
-          className={`${SCENE_BG_IMAGE_CLASS} companion-bg-scene companion-scene-fade absolute inset-0 transition-opacity duration-700`}
+          key={photoUrl}
+          className={`${SCENE_BG_IMAGE_CLASS} companion-bg-scene absolute inset-0 ${clearMyMind ? "" : "companion-scene-fade transition-opacity duration-700"}`}
           style={{
-            backgroundImage: `url('${scene}')`,
-            opacity: clearMyMind ? "var(--scene-image-dominance, 0.55)" : undefined,
+            backgroundImage: `url('${photoUrl}')`,
+            opacity: clearMyMind ? "1" : undefined,
           }}
+          data-testid={
+            clearMyMind ? "clear-my-mind-page-backdrop" : undefined
+          }
         />
-      )}
+      ) : null}
 
-      {!suppress ? (
+      {showAtmosphere ? (
         <>
           {/* Warm wash so dark text + glass cards stay readable over any photo. */}
           <div
             className="companion-bg-wash absolute inset-0"
-            style={{ background: SCENE_OVERLAY }}
+            style={{
+              background: clearMyMind
+                ? "rgba(255, 248, 232, 0.08)"
+                : SCENE_OVERLAY,
+            }}
           />
 
           {/* Subtle texture + vignette for depth. */}
           <div className="companion-noise absolute inset-0 opacity-[0.03]" />
-          <div className="companion-bg-vignette absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(35,30,26,0.12)_100%)]" />
+          <div
+            className="companion-bg-vignette absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_45%,rgba(35,30,26,0.12)_100%)]"
+            style={clearMyMind ? { opacity: 0.22 } : undefined}
+          />
         </>
       ) : null}
     </div>

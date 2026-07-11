@@ -2,6 +2,7 @@
  * Per-room action matchers — activity in place, not navigation.
  */
 
+import { canClaimAlreadyHere } from "@/lib/estate/roomAwareness";
 import { detectDirectCommand } from "@/lib/estateIntelligence/estateCommandRouter";
 import { resolveEstatePlaceIdFromUserText } from "../estateRoomAliasRegistry";
 import { hasHardEstateNavigationIntent } from "../estateMetaNavigationPhrases";
@@ -126,6 +127,12 @@ function matchRoomActions(
 
   for (const row of matchers) {
     if (row.pattern.test(text)) {
+      if (
+        row.action.kind === "remain_in_room" &&
+        !canClaimAlreadyHere(normalized)
+      ) {
+        return null;
+      }
       return {
         currentRoomId: normalized,
         action: row.action,
@@ -217,10 +224,22 @@ function defaultActionForRedundantNavigation(
     };
   }
 
+  // Clear My Mind is an experience — never dead-end with "already here".
+  // Re-open the workspace so Welcome Home / stale visual cannot strand the member.
+  if (estateRoomsEquivalent(room, "clear-my-mind")) {
+    return {
+      currentRoomId: room,
+      action: { kind: "open_section", section: "brain-dump" },
+      reply: "Let's clear your mind — I'm opening Clear My Mind for you.",
+    };
+  }
+
+  // Universal Access — same-room explicit nav still re-opens the capability.
+  // Rooms are context, not permission; never dead-end with "already here" alone.
   return {
     currentRoomId: room,
     action: { kind: "remain_in_room" },
-    reply: `We're already here. What would you like to do?`,
+    reply: `We're already here — what would you like to do next?`,
   };
 }
 
@@ -242,6 +261,10 @@ export function matchEstateRoomAction(
   }
 
   if (isRedundantNavigationToCurrentRoom(trimmed, current)) {
+    // Sprint 1 — never claim "already here" unless visual_room confirms.
+    if (!canClaimAlreadyHere(current)) {
+      return null;
+    }
     return defaultActionForRedundantNavigation(current);
   }
 

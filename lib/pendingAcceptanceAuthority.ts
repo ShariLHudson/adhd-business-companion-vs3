@@ -149,7 +149,7 @@ export function acceptanceAckForKind(
 ): string {
   switch (kind) {
     case "create_consent":
-      return "Let's head into the Creative Studio™ together.";
+      return "Let's head into the Creative Studio together.";
     case "draft_switch":
       return "Continuing your draft.";
     case "workspace":

@@ -144,7 +144,7 @@ const GUIDANCE: Record<
   "burned-out": {
     shariShould: [
       "Prioritize rest and scope reduction.",
-      "Offer Breathe & Reset.",
+      "Offer Breathe.",
       "Suggest the smallest possible win or pause.",
     ],
     shariShouldAvoid: [

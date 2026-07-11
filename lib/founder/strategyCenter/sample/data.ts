@@ -35,7 +35,7 @@ export const STRATEGY_PERSPECTIVES: StrategyPerspective[] = [
     id: "ceo",
     role: "CEO Perspective",
     keyQuestion: "Does this strengthen the company we are building?",
-    insight: "Placeholder — future FLAME™ lens on leadership and direction.",
+    insight: "Placeholder — future FLAME lens on leadership and direction.",
     initials: "CEO",
   },
   {
@@ -325,7 +325,7 @@ const DEFAULT_DECISION: StrategyDecisionSummary = {
   currentDecision: "How should Executive Strategy Center evolve after the visual environment ships?",
   pros: [
     "Creates a dedicated thinking room before intelligence layers arrive",
-    "Board and perspectives architecture ready for FLAME™",
+    "Board and perspectives architecture ready for FLAME",
     "Supports big decisions without execution pressure",
   ],
   concerns: [

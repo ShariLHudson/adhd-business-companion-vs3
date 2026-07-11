@@ -1,5 +1,5 @@
 /**
- * Estate Capability Index™ — inverted index for fast matcher lookup.
+ * Estate Capability Index — inverted index for fast matcher lookup.
  */
 
 import type {

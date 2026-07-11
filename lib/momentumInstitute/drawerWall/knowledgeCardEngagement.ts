@@ -1,5 +1,5 @@
 /**
- * Quiet engagement when a member opens a Knowledge Card™.
+ * Quiet engagement when a member opens a Knowledge Card.
  */
 
 import { getKnowledgeCardById } from "@/lib/momentumInstitute/catalog/provider";

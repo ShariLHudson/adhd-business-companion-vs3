@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — master operating document (Phase 29).
+ * Spark Estate — master operating document (Phase 29).
  * Single high-level operating view that protects the vision while the ecosystem grows.
  *
  * @see docs/protocols/SPARK_ESTATE_MASTER_OPERATING_DOCUMENT_SPECIFICATION_PHASE29.md
@@ -64,7 +64,7 @@ export const SPARK_ESTATE_SPARK_RELATIONSHIP = {
 export const SPARK_ESTATE_OPERATING_ROOM_MODEL = [
   {
     id: "chamber",
-    label: "Chamber of Momentum™",
+    label: "Chamber of Momentum",
     helps: ["create clarity", "find next steps", "overcome blockers", "maintain progress"],
   },
   {
@@ -109,7 +109,7 @@ export const SPARK_ESTATE_MEMORY_PHILOSOPHY = {
 
 export const SPARK_ESTATE_CARD_PHILOSOPHY = {
   principle: "Cards are helpful moments — not notifications.",
-  examples: ["Spark Card™", "Momentum Card™", "Knowledge Card™", "Win Card™"],
+  examples: ["Spark Card", "Momentum Card", "Knowledge Card", "Win Card"],
   purpose: "Each card exists to help the member move forward.",
 } as const;
 
@@ -282,7 +282,7 @@ export function formatSparkEstateMasterOperatingDocumentReport(
   compliance: ReturnType<typeof assessSparkEstateMasterOperatingDocumentCompliance> = assessSparkEstateMasterOperatingDocumentCompliance(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ master operating document: ${verification.operatingDocumentReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate master operating document: ${verification.operatingDocumentReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_MASTER_OPERATING_PURPOSE,
     SPARK_ESTATE_MASTER_OPERATING_VISION,
     "",

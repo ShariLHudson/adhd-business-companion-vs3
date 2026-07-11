@@ -1,5 +1,5 @@
 /**
- * Estate Object Intelligence™ — natural language object alias resolver.
+ * Estate Object Intelligence — natural language object alias resolver.
  */
 
 import objectAliasesJson from "@/docs/estate-knowledge-base/object-aliases.json";

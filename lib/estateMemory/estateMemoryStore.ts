@@ -1,5 +1,5 @@
 /**
- * Estate Memory Store™ — global session memory across all Estate rooms.
+ * Estate Memory Store — global session memory across all Estate rooms.
  */
 
 import type { EstateMemory } from "./types";

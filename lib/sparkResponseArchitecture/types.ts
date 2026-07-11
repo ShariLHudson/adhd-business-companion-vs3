@@ -1,11 +1,11 @@
 /**
- * Spark Response Architecture™ — runtime pipeline types.
+ * Spark Response Architecture — runtime pipeline types.
  * Every member interaction flows through this lifecycle.
  *
  * @see spark-intelligence-foundation/006-spark-response-architecture.md
  */
 
-/** Ten-stage Response Lifecycle™ */
+/** Ten-stage Response Lifecycle */
 export type SparkResponseLifecycleStage =
   | "intent_recognition"
   | "request_classification"
@@ -31,7 +31,7 @@ export const SPARK_RESPONSE_LIFECYCLE_ORDER: readonly SparkResponseLifecycleStag
   "background_learning",
 ] as const;
 
-/** Request Classification™ response classes */
+/** Request Classification response classes */
 export type SparkResponseClass =
   | "A" // quick factual
   | "B" // business advice
@@ -49,7 +49,7 @@ export const SPARK_RESPONSE_CLASS_LABELS: Record<SparkResponseClass, string> = {
   F: "Reflection",
 };
 
-/** Response Modes™ — depth vs speed */
+/** Response Modes — depth vs speed */
 export type SparkResponseMode = "instant" | "guided" | "deep_strategy";
 
 /** Principle 7 — confidence drives behavior */
@@ -79,10 +79,10 @@ export type SparkMvcRetrievalSlot =
 /** @deprecated Use SparkMvcRetrievalSlot or import from lib/sparkContextStrategy/types */
 export type SparkContextTier = SparkMvcRetrievalSlot;
 
-/** Selective System Activation™ states */
+/** Selective System Activation states */
 export type SparkSystemActivationState = "dormant" | "listening" | "active";
 
-/** Performance Standards™ — latency budgets (ms) */
+/** Performance Standards — latency budgets (ms) */
 export const SPARK_RESPONSE_LATENCY_BUDGETS = {
   firstUiFeedback: 500,
   intentRecognition: 100,

@@ -12,7 +12,7 @@ import {
   SAMPLE_BOARD_DISCUSSIONS,
 } from "./index";
 
-describe("Founder Advisory Council™", () => {
+describe("Founder Advisory Council", () => {
   it("board composition includes 18 executive disciplines", () => {
     const members = listBoardMembers();
     expect(members).toHaveLength(18);

@@ -11,7 +11,7 @@ type Props = {
   children: ReactNode;
 };
 
-/** Portfolio™ — portfolio room plate, full-bleed cover. */
+/** Portfolio — portfolio room plate, full-bleed cover. */
 export function PortfolioRoomShell({ children }: Props) {
   useEffect(() => {
     preloadRoomBackground(preferredBackgroundPreloadUrl(PORTFOLIO_ROOM_BG));

@@ -1,4 +1,4 @@
-/** Executive Brief Experience™ — presentation types (plain English, no UI). */
+/** Executive Brief Experience — presentation types (plain English, no UI). */
 
 export type ExecutivePriorityLabel =
   | "critical"

@@ -19,7 +19,7 @@ type Props = {
 };
 
 /**
- * @deprecated Phase D.1 — delegates to SparkEstateShell™
+ * @deprecated Phase D.1 — delegates to SparkEstateShell
  */
 export function EstateChatNavigationOverlay(props: Props) {
   const { roomId, section, ...rest } = props;

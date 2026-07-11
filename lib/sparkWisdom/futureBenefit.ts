@@ -1,5 +1,5 @@
 /**
- * Spec 129 — Future Benefit™
+ * Spec 129 — Future Benefit
  */
 
 import type { FutureBenefitPlan } from "./types";

@@ -54,7 +54,7 @@ export function MemoryReplayDetail({ replay, onBack }: MemoryReplayDetailProps) 
       ) : null}
 
       {replay.historicalSimulation ? (
-        <Panel title="Historical Simulation™" defaultOpen>
+        <Panel title="Historical Simulation" defaultOpen>
           <ol className="founder-memory-theater__historical-flow">
             <li><strong>Decision ({replay.historicalSimulation.decisionDate})</strong></li>
             <li>Historical recommendation: {replay.historicalSimulation.historicalRecommendation}</li>
@@ -109,7 +109,7 @@ export function MemoryReplayDetail({ replay, onBack }: MemoryReplayDetailProps) 
         </ul>
       </Panel>
 
-      <Panel title="Wisdom Index™" defaultOpen>
+      <Panel title="Wisdom Index" defaultOpen>
         <ul className="founder-memory-theater__metrics">
           <li><strong>Knowledge gained:</strong> {replay.wisdomIndex.knowledgeGained}</li>
           <li><strong>Time saved:</strong> {replay.wisdomIndex.timeSaved}</li>

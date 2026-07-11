@@ -88,7 +88,7 @@ const COMMUNICATION: ExecutiveIntegration[] = [
 const DEVELOPMENT: ExecutiveIntegration[] = [
   integration({
     id: "founder-studio",
-    name: "Founder Studio™",
+    name: "Founder Studio",
     groupId: "development",
     tagline: "Executive Headquarters",
     status: "connected",
@@ -134,7 +134,7 @@ const DEVELOPMENT: ExecutiveIntegration[] = [
     lastActivityAt: "2026-07-06T12:45:00Z",
     lastActivitySummary: "Implementation Sprint 1 — Integration Center",
     highlights: [
-      { id: "cu-prompt", label: "Current prompt", value: "Executive Integration Center™" },
+      { id: "cu-prompt", label: "Current prompt", value: "Executive Integration Center" },
       { id: "cu-impl", label: "Implementation", value: "Founder Studio bridge layer" },
     ],
     quickActions: [
@@ -148,7 +148,7 @@ const DEVELOPMENT: ExecutiveIntegration[] = [
 const MARKETING: ExecutiveIntegration[] = [
   integration({
     id: "postcraft",
-    name: "PostCraft™",
+    name: "PostCraft",
     groupId: "marketing",
     tagline: "Founder decides · PostCraft creates",
     status: "needs-configuration",
@@ -168,7 +168,7 @@ const MARKETING: ExecutiveIntegration[] = [
   }),
   integration({
     id: "gohighlevel",
-    name: "GoHighLevel™",
+    name: "GoHighLevel",
     groupId: "marketing",
     tagline: "Founder decides · GHL delivers",
     status: "needs-configuration",
@@ -285,7 +285,7 @@ const AI: ExecutiveIntegration[] = [
 const OPERATIONS: ExecutiveIntegration[] = [
   integration({
     id: "team-hub",
-    name: "Team Hub™",
+    name: "Team Hub",
     groupId: "operations",
     tagline: "Founder thinks · Team Hub executes",
     status: "connected",
@@ -305,7 +305,7 @@ const OPERATIONS: ExecutiveIntegration[] = [
 const BUSINESS: ExecutiveIntegration[] = [
   integration({
     id: "companion",
-    name: "Spark Companion™",
+    name: "Spark Companion",
     groupId: "business",
     tagline: "Members experience Spark here",
     status: "connected",
@@ -342,7 +342,7 @@ const PRODUCTIVITY: ExecutiveIntegration[] = [
 const RESEARCH: ExecutiveIntegration[] = [
   integration({
     id: "executive-research-center",
-    name: "Executive Research Center™",
+    name: "Executive Research Center",
     groupId: "research",
     tagline: "Your private research department",
     status: "connected",
@@ -372,16 +372,16 @@ export const INTEGRATION_GROUPS: IntegrationGroup[] = [
 ];
 
 export const SEARCH_INDEX: IntegrationSearchResult[] = [
-  { id: "sr-listening", integrationId: "founder-studio", integrationName: "Founder Studio™", groupId: "development", title: "Listening Rooms mission", summary: "Current mission workspace and restart narrative", openUrl: "/companion/founder/executive-builder" },
+  { id: "sr-listening", integrationId: "founder-studio", integrationName: "Founder Studio", groupId: "development", title: "Listening Rooms mission", summary: "Current mission workspace and restart narrative", openUrl: "/companion/founder/executive-builder" },
   { id: "sr-email", integrationId: "google-mail", integrationName: "Google Mail", groupId: "communication", title: "Latest important email", summary: "Workshop inquiry — member waitlist", openUrl: "https://mail.google.com" },
   { id: "sr-roadmap", integrationId: "github", integrationName: "GitHub", groupId: "development", title: "Latest roadmap milestone", summary: "Founder Studio executive stack", openUrl: "https://github.com" },
-  { id: "sr-postcraft", integrationId: "postcraft", integrationName: "PostCraft™", groupId: "marketing", title: "Latest PostCraft campaign", summary: "Gentle Restart campaign — awaiting visual" },
-  { id: "sr-ghl", integrationId: "gohighlevel", integrationName: "GoHighLevel™", groupId: "marketing", title: "Latest GHL workflow", summary: "Workshop funnel automation draft" },
-  { id: "sr-cursor", integrationId: "cursor", integrationName: "Cursor", groupId: "development", title: "Current Cursor prompt", summary: "Executive Integration Center™ implementation" },
+  { id: "sr-postcraft", integrationId: "postcraft", integrationName: "PostCraft", groupId: "marketing", title: "Latest PostCraft campaign", summary: "Gentle Restart campaign — awaiting visual" },
+  { id: "sr-ghl", integrationId: "gohighlevel", integrationName: "GoHighLevel", groupId: "marketing", title: "Latest GHL workflow", summary: "Workshop funnel automation draft" },
+  { id: "sr-cursor", integrationId: "cursor", integrationName: "Cursor", groupId: "development", title: "Current Cursor prompt", summary: "Executive Integration Center implementation" },
   { id: "sr-linkedin", integrationId: "linkedin", integrationName: "LinkedIn", groupId: "social-media", title: "LinkedIn draft", summary: "Workshop announcement — scheduled draft" },
   { id: "sr-drive", integrationId: "google-drive", integrationName: "Google Drive", groupId: "communication", title: "Listening Rooms strategy doc", summary: "Mission document — updated today", openUrl: "https://drive.google.com" },
-  { id: "sr-research", integrationId: "executive-research-center", integrationName: "Executive Research Center™", groupId: "research", title: "ADHD Restart research", summary: "Latest completed research report", openUrl: "/companion/founder/executive-research" },
-  { id: "sr-discovery", integrationId: "founder-studio", integrationName: "Founder Studio™", groupId: "development", title: "Today's Discovery Brief", summary: "Overnight findings — unified restart narrative", openUrl: "/companion/founder/executive-discovery-engine" },
+  { id: "sr-research", integrationId: "executive-research-center", integrationName: "Executive Research Center", groupId: "research", title: "ADHD Restart research", summary: "Latest completed research report", openUrl: "/companion/founder/executive-research" },
+  { id: "sr-discovery", integrationId: "founder-studio", integrationName: "Founder Studio", groupId: "development", title: "Today's Discovery Brief", summary: "Overnight findings — unified restart narrative", openUrl: "/companion/founder/executive-discovery-engine" },
 ];
 
 export function getIntegration(id: string): ExecutiveIntegration | undefined {

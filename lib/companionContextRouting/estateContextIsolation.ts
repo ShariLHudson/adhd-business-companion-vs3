@@ -1,5 +1,5 @@
 /**
- * Estate Context Isolation Rule™
+ * Estate Context Isolation Rule
  *
  * Estate conversation must never expose system/debug language.
  * Priority: Estate conversation → navigation → intent bridge → recovery → silent log.

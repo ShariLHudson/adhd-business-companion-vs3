@@ -1,5 +1,5 @@
 /**
- * Spark Card™ Framework — living entrepreneurial wisdom (T-011).
+ * Spark Card Framework — living entrepreneurial wisdom (T-011).
  * Not collectible rewards; every card must strengthen capability and enable application.
  *
  * @see docs/SPARK_CARD_FRAMEWORK.md
@@ -94,7 +94,7 @@ export type SparkCardFiveQuestions = {
   whatIsIt: string;
   whyItMatters: string;
   howItAppliesGenerally: string;
-  /** Business Brain™ personalizes at runtime */
+  /** Business Brain personalizes at runtime */
   howItAppliesToThisBusiness: string;
   whatToDoNext: string;
 };
@@ -123,7 +123,7 @@ export const SPARK_CARD_COMPANION_INTRO_EXAMPLES: Record<
     "I came across something you might enjoy exploring...",
 };
 
-/** Signals for Personalization™ — Brain supplies; card template stays stable */
+/** Signals for Personalization — Brain supplies; card template stays stable */
 export type SparkCardPersonalizationSignals = {
   businessAssetIds?: string[];
   audienceSummary?: string;

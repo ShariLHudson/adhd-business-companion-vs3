@@ -1,4 +1,4 @@
-/* Spark Estate Guide™ — bottom left (standard UI position) */
+/* Spark Estate Guide — bottom left (standard UI position) */
 
 :root {
   --spark-estate-guide-anchor-size: clamp(3.25rem, 11vw, 4.75rem);

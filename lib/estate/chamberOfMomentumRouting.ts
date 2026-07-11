@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — intent routing (Phase 2–3).
+ * Chamber of Momentum — intent routing (Phase 2–3).
  * Members describe what they need; the system routes internally.
  *
  * @see docs/protocols/CHAMBER_OF_MOMENTUM_ROUTING_AND_EXPERIENCE_ALIGNMENT_PHASE2.md

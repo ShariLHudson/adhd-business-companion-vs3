@@ -85,6 +85,14 @@ describe("sparkRecognitionEngine room state", () => {
     expect(canClaimAlreadyHere("gardens")).toBe(true);
   });
 
+  it("treats Bank/Wins aliases as already-here for Vault/Garden", () => {
+    setVisualRoom("evidence-vault");
+    expect(canClaimAlreadyHere("evidence-bank")).toBe(true);
+    setVisualRoom("gardens");
+    expect(canClaimAlreadyHere("wins-this-week")).toBe(true);
+    expect(canClaimAlreadyHere("celebration-garden")).toBe(true);
+  });
+
   it("tracks requested destination and active flow", () => {
     setRequestedDestination("evidence-vault");
     startRecognitionFlow({
@@ -96,6 +104,32 @@ describe("sparkRecognitionEngine room state", () => {
     expect(state.activeRecognitionFlow?.kind).toBe("preserve_discovery");
     clearRecognitionFlow();
     expect(getRecognitionRoomState().activeRecognitionFlow).toBeNull();
+  });
+});
+
+describe("sparkRecognitionEngine recognition IDs", () => {
+  it("maps Bank/Wins/Hall collection aliases to canonical places", async () => {
+    const {
+      toCanonicalRecognitionRoomId,
+      recognitionRoomsEquivalent,
+    } = await import("./recognitionIds");
+    expect(toCanonicalRecognitionRoomId("evidence-bank")).toBe("evidence-vault");
+    expect(toCanonicalRecognitionRoomId("wins-this-week")).toBe("gardens");
+    expect(toCanonicalRecognitionRoomId("celebration-hall")).toBe(
+      "celebration-room",
+    );
+    expect(toCanonicalRecognitionRoomId("hall-of-accomplishments")).toBe(
+      "portfolio",
+    );
+    expect(
+      recognitionRoomsEquivalent("portfolio", "growth-portfolio"),
+    ).toBe(true);
+    expect(
+      recognitionRoomsEquivalent("portfolio", "gallery-of-firsts"),
+    ).toBe(false);
+    expect(recognitionRoomsEquivalent("evidence-bank", "evidence-vault")).toBe(
+      true,
+    );
   });
 });
 
@@ -203,7 +237,7 @@ describe("sparkRecognitionEngine store", () => {
 
 describe("sparkRecognitionEngine cold start", () => {
   it("returns inviting copy for empty Hall", () => {
-    const copy = coldStartForRoom("gallery-of-firsts");
+    const copy = coldStartForRoom("portfolio");
     expect(copy.body).toMatch(/Nothing has to be added today/i);
   });
 });

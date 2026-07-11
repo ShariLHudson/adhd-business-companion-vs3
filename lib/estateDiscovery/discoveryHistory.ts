@@ -1,5 +1,5 @@
 /**
- * Discovery History™ — member-level model and persistence.
+ * Discovery History — member-level model and persistence.
  *
  * One record per member × discovery. Status advances over time.
  * Internal only — never surfaces "ignored" to members.

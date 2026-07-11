@@ -12,7 +12,7 @@ export const TEST_INSTITUTE_CATALOG: MomentumInstituteCatalog = {
   institute: {
     id: "momentum-institute",
     slug: "momentum-institute",
-    title: "Momentum Institute™",
+    title: "Momentum Institute",
     subtitle: "Entrepreneur Development Center",
     tagline: "Help every member become a better entrepreneur.",
     pillarIds: ["build_your_business"],

@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — return experience when member comes back.
+ * Estate Journey Engine — return experience when member comes back.
  * @see lib/sparkCompanion/sparkEstateWelcomeHome — never punish absence
  */
 

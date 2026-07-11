@@ -1,7 +1,7 @@
 import { isConfirmationAcceptance } from "@/lib/conversationConfirmationGate";
 
 /**
- * Active Task Lock™ — Phase 2A (observe + protect).
+ * Active Task Lock — Phase 2A (observe + protect).
  *
  * Tracks deliverable promises (research, draft, summarize, …) so room routing
  * can be suppressed mid-task. Wired via estateTaskLockGate in handleSend.

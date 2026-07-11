@@ -1,5 +1,5 @@
 /**
- * Estate Presence™ — subtle environmental life layer types.
+ * Estate Presence — subtle environmental life layer types.
  */
 
 export type EstatePresenceLayerKind =

@@ -15,7 +15,7 @@ import {
 describe("Estate Knowledge Base", () => {
   it("loads live greenhouse room", () => {
     const room = getKnowledgeItem("rooms", "greenhouse");
-    expect(room?.officialName).toBe("Greenhouse™");
+    expect(room?.officialName).toBe("Greenhouse");
     expect(room?.status).toBe("Live");
     expect(canRecommendKnowledgeItem(room)).toBe(true);
   });
@@ -27,15 +27,15 @@ describe("Estate Knowledge Base", () => {
   });
 
   it("resolves official vocabulary name", () => {
-    expect(officialNameFor("rooms", "greenhouse")).toBe("Greenhouse™");
+    expect(officialNameFor("rooms", "greenhouse")).toBe("Greenhouse");
     expect(officialNameFor("features", "focus-audio")).toBe("Peaceful Places");
   });
 
   it("flags forbidden substitutions", () => {
-    expect(isForbiddenSubstitution("Clear My Mind™", "Brain dump room")).toBe(
+    expect(isForbiddenSubstitution("Clear My Mind", "Brain dump room")).toBe(
       true,
     );
-    expect(isForbiddenSubstitution("Clear My Mind™", "Show Me How")).toBe(
+    expect(isForbiddenSubstitution("Clear My Mind", "Show Me How")).toBe(
       false,
     );
   });

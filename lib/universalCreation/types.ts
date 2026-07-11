@@ -1,5 +1,5 @@
 /**
- * Universal Creation Framework™ — one journey, every document type.
+ * Universal Creation Framework — one journey, every document type.
  *
  * Discover → Prepare → Create → Enhance → Review → Revise → Approve → Deliver
  * @see docs/estate/UNIVERSAL_CREATION_FRAMEWORK.md

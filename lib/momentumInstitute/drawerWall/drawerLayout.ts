@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — data-driven drawer hotspot layout on wall photograph.
+ * Momentum Institute — data-driven drawer hotspot layout on wall photograph.
  */
 
 import type { DrawerWallHotspot, DrawerWallLayout } from "./types";

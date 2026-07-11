@@ -2,7 +2,7 @@ import type { PeacefulPlace } from "./types";
 
 export const MUSIC_ROOM_IMAGE_VERSION = "20260629a" as const;
 
-/** Canonical Music Room™ session + garden card art. */
+/** Canonical Music Room session + garden card art. */
 export const MUSIC_ROOM_IMAGE =
   `/backgrounds/music-room-background.png?v=${MUSIC_ROOM_IMAGE_VERSION}` as const;
 

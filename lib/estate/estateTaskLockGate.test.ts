@@ -243,7 +243,7 @@ describe("estateTaskLockGate — Wonderdog / AI research handleSend gate", () =>
   it("detects estate frictionless copy that must be blocked during tasks", () => {
     expect(
       frictionlessOffersEstateRoom(
-        `${ESTATE_PLACE_SUGGESTION_INTRO}\n1. Greenhouse™`,
+        `${ESTATE_PLACE_SUGGESTION_INTRO}\n1. Greenhouse`,
       ),
     ).toBe(true);
     expect(frictionlessOffersEstateRoom("Got it — I'll keep looking into that.")).toBe(

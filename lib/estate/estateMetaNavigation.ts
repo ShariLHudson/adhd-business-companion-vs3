@@ -52,11 +52,12 @@ const DEFAULT_EXPLORATORY_PLACE_IDS = [
   "momentum-institute",
   "peaceful-places",
   "apple-orchard",
+  "stables",
   "creative-studio",
 ] as const;
 
 export function normalizeSoftPlacePhrase(phrase: string): string {
-  const trimmed = phrase.trim().replace(/[™®.!?]+$/g, "");
+  const trimmed = phrase.trim().replace(/[®.!?]+$/g, "");
   const bare = trimmed.replace(/^(?:the|a|an)\s+/i, "").trim();
   const lower = bare.toLowerCase();
   return SOFT_PLACE_TYPO_ALIASES[lower] ?? bare;

@@ -1,0 +1,500 @@
+/* Evidence Vault — Discovery File tactile experience */
+
+.discovery-file {
+  position: relative;
+  z-index: 2;
+  min-height: min(52vh, 560px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(0.75rem, 3vw, 1.5rem);
+  pointer-events: none;
+}
+
+.evidence-vault-inline-discovery .discovery-file {
+  min-height: 0;
+  align-items: flex-end;
+  padding: 0;
+}
+
+.discovery-file > * {
+  pointer-events: auto;
+}
+
+/* ── Arrival: folder on the table ── */
+
+.discovery-file__arrival {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+  text-align: center;
+  animation: discovery-fade-in 0.9s ease both;
+}
+
+.discovery-file__arrival-prompt {
+  margin: 0;
+  max-width: 22rem;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: clamp(1.2rem, 2.6vw, 1.65rem);
+  font-style: italic;
+  line-height: 1.4;
+  color: rgba(248, 236, 214, 0.94);
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.45);
+  text-wrap: balance;
+}
+
+.discovery-file__folder {
+  position: relative;
+  width: min(220px, 42vw);
+  height: min(148px, 28vw);
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transform-origin: center bottom;
+  transition: transform 0.45s ease;
+}
+
+.discovery-file__folder:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.discovery-file__folder:focus-visible {
+  outline: 2px solid rgba(201, 166, 107, 0.85);
+  outline-offset: 6px;
+}
+
+.discovery-file__folder::before {
+  content: "";
+  position: absolute;
+  inset: -18% -12%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(201, 166, 107, 0.28) 0%,
+    rgba(201, 166, 107, 0.08) 45%,
+    transparent 70%
+  );
+  animation: discovery-folder-glow 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.discovery-file__folder-spine {
+  position: absolute;
+  left: 0;
+  top: 8%;
+  width: 14%;
+  height: 84%;
+  border-radius: 4px 0 0 4px;
+  background: linear-gradient(180deg, #3d2e22 0%, #2a1f17 100%);
+  box-shadow: inset -2px 0 6px rgba(0, 0, 0, 0.35);
+}
+
+.discovery-file__folder-cover {
+  position: absolute;
+  left: 10%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 6px 10px 10px 4px;
+  background: linear-gradient(145deg, #6b4f38 0%, #4a3628 48%, #3a2a1f 100%);
+  box-shadow:
+    0 14px 36px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.discovery-file__folder-label {
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(232, 210, 168, 0.88);
+}
+
+/* ── Portfolio (open file) ── */
+
+.discovery-file__portfolio {
+  width: min(680px, 94vw);
+  max-height: min(52vh, 480px);
+  overflow-y: auto;
+  animation: discovery-portfolio-open 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.evidence-vault-inline-discovery .discovery-file__portfolio {
+  width: 100%;
+  max-height: min(50vh, 460px);
+}
+
+.discovery-file[data-phase="open"] .discovery-file__portfolio {
+  animation: discovery-portfolio-soft-in 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.discovery-file__portfolio--closing {
+  animation: discovery-portfolio-close 1.2s ease forwards;
+}
+
+.discovery-file__portfolio-inner {
+  border-radius: 14px 18px 18px 14px;
+  background: linear-gradient(
+    165deg,
+    rgba(250, 244, 232, 0.97) 0%,
+    rgba(238, 226, 204, 0.96) 100%
+  );
+  box-shadow:
+    0 28px 64px rgba(0, 0, 0, 0.38),
+    inset 0 0 0 1px rgba(201, 166, 107, 0.22);
+  padding: clamp(1rem, 2.4vw, 1.5rem);
+}
+
+.discovery-file__page-kicker {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-weight: 500;
+  color: #3d3024;
+}
+
+.discovery-file__page-prompt {
+  margin: 0 0 1.1rem;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #6b5a46;
+}
+
+.discovery-file__guide-questions {
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: #5c4d3c;
+}
+
+.discovery-file__guide-questions li {
+  margin-bottom: 0.35rem;
+}
+
+.discovery-file__guide-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.discovery-file__guide-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.discovery-file__guide-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  color: #4a3d30;
+}
+
+.discovery-file__guide-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(107, 90, 70, 0.22);
+  background: transparent;
+  resize: vertical;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.02rem;
+  line-height: 1.55;
+  color: #2f261f;
+  padding: 0.35rem 0 0.55rem;
+}
+
+.discovery-file__guide-input:focus {
+  outline: none;
+  border-bottom-color: rgba(107, 90, 70, 0.45);
+}
+
+.discovery-file__story-wrap {
+  position: relative;
+}
+
+.discovery-file__mic {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 1;
+}
+
+.discovery-file__story,
+.discovery-file__section-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(107, 90, 70, 0.22);
+  background: transparent;
+  resize: vertical;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.12rem;
+  line-height: 1.65;
+  color: #2f261f;
+  padding: 0.35rem 2.5rem 0.65rem 0;
+}
+
+.discovery-file__story:focus,
+.discovery-file__section-input:focus {
+  outline: none;
+  border-bottom-color: rgba(107, 90, 70, 0.45);
+}
+
+.discovery-file__suggestion {
+  margin-top: 1.35rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(107, 90, 70, 0.14);
+}
+
+.discovery-file__suggestion-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a7358;
+}
+
+.discovery-file__suggestion-line {
+  margin: 0.15rem 0;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: 1rem;
+  color: #4a3d30;
+}
+
+.discovery-file__suggestion-actions {
+  display: flex;
+  gap: 0.65rem;
+  margin-top: 0.55rem;
+}
+
+.discovery-file__add-btn,
+.discovery-file__preserve-btn,
+.discovery-file__post-save-btn {
+  border: 1px solid rgba(107, 90, 70, 0.35);
+  border-radius: 999px;
+  background: linear-gradient(180deg, #5c4634 0%, #3f3024 100%);
+  color: #f5ead8;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.55rem 1.1rem;
+  cursor: pointer;
+}
+
+.discovery-file__dismiss-btn,
+.discovery-file__cancel-btn {
+  border: none;
+  background: transparent;
+  color: #7a6652;
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.discovery-file__section {
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed rgba(107, 90, 70, 0.18);
+  animation: discovery-section-expand 0.45s ease both;
+}
+
+.discovery-file__section-title {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.05rem;
+  color: #4a3d30;
+}
+
+.discovery-file__attachments {
+  margin-top: 1.25rem;
+}
+
+.discovery-file__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.discovery-file__preserve-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ── Save ceremony ── */
+
+.discovery-file__ceremony {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  animation: discovery-stamp-in 0.8s ease both;
+}
+
+.discovery-file__date-stamp {
+  margin: 0;
+  padding: 0.45rem 1rem;
+  border: 2px solid #9a7b4f;
+  border-radius: 4px;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: #6b4f2e;
+  background: rgba(250, 244, 232, 0.92);
+  transform: rotate(-2deg);
+}
+
+/* ── Post-save ── */
+
+.discovery-file[data-phase="saved"] {
+  min-height: 0;
+  align-items: flex-end;
+}
+
+.discovery-file__saved {
+  width: min(40rem, 92vw);
+  padding: 1.25rem 1.5rem 1.35rem;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 166, 107, 0.28);
+  background: rgba(18, 12, 8, 0.52);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  text-align: center;
+  animation: discovery-fade-in 0.7s ease both;
+}
+
+.discovery-file__saved-message {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+  font-style: italic;
+  color: rgba(248, 236, 214, 0.95);
+  text-shadow: 0 1px 16px rgba(0, 0, 0, 0.4);
+}
+
+.discovery-file__post-save {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: center;
+}
+
+.discovery-file__post-save-btn {
+  backdrop-filter: blur(8px);
+  background: rgba(20, 14, 10, 0.55);
+}
+
+.discovery-file__post-save-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ── Keyframes ── */
+
+@keyframes discovery-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes discovery-folder-glow {
+  0%,
+  100% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes discovery-portfolio-open {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes discovery-portfolio-soft-in {
+  from {
+    opacity: 0.82;
+    transform: translateY(8px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes discovery-portfolio-close {
+  to {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+}
+
+@keyframes discovery-section-expand {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 400px;
+  }
+}
+
+@keyframes discovery-stamp-in {
+  from {
+    opacity: 0;
+    transform: scale(1.2) rotate(6deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(-2deg);
+  }
+}
+
+/* Vault browse overlay — lighter chrome over the room */
+.discovery-file-browse {
+  position: relative;
+  z-index: 2;
+  max-width: min(720px, 94vw);
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+.discovery-file-browse .estate-workspace {
+  background: rgba(18, 12, 8, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.discovery-file-exit {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 5;
+}

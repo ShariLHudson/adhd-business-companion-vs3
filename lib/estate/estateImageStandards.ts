@@ -1,5 +1,5 @@
 /**
- * Estate Image Bible™ — Spark Estate Image Standards™
+ * Estate Image Bible — Spark Estate Image Standards
  *
  * Append ESTATE_IMAGE_BRAND_PROMPT to every room-plate and scene-generation prompt.
  *

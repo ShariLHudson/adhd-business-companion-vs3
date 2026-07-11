@@ -1,5 +1,5 @@
 /**
- * Estate Audio Settings™ — member controls for Layer 1 ambience + Layer 2 soundscapes.
+ * Estate Audio Settings — member controls for Layer 1 ambience + Layer 2 soundscapes.
  * Environmental simulation — not a media player.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Discovery Engine™ — selects the next eligible discovery for a member.
+ * Discovery Engine — selects the next eligible discovery for a member.
  * No UI; consumed by Estate Intelligence Engine and Discovery Key system.
  */
 

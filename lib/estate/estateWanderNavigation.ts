@@ -8,21 +8,24 @@ import { matchVaguePlaceCluster } from "./estatePlaceClusters";
 
 /** Rotating wander destinations — member sees actual room names first. */
 export const ESTATE_WANDER_PLACE_ORDER = [
-  "coffee-house",
   "library",
   "observatory",
   "tea-room",
   "dining-room",
   "discovery-room",
   "estate-kitchen",
-  "evidence-vault",
   "summer-terrace",
-  "music-room",
   "conservatory",
-  "stables",
-  "estate-gardens",
+  "gardens",
   "greenhouse",
   "reading-nook",
+  "butterfly-house",
+  "celebration-room",
+  "house-possibility-outside",
+  "writing-room",
+  "porch-swing",
+  "lakeside-hammock",
+  "study-hall",
 ] as const;
 
 export function pickWanderPlaceIds(excludePlaceId?: string | null): string[] {

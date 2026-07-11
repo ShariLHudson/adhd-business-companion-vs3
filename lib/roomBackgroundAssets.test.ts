@@ -13,12 +13,12 @@ describe("roomBackgroundAssets", () => {
     );
   });
 
-  it("builds image-set css for png sources", () => {
-    expect(roomBackgroundImageCss("/backgrounds/study-hall-background.png")).toContain(
-      "image-set",
+  it("uses a direct png url so missing webp plates cannot blank the room", () => {
+    expect(roomBackgroundImageCss("/backgrounds/study-hall-background.png")).toBe(
+      "url('/backgrounds/study-hall-background.png')",
     );
-    expect(roomBackgroundImageCss("/backgrounds/study-hall-background.png")).toContain(
-      ".webp",
+    expect(roomBackgroundImageCss("/backgrounds/study-hall-background.png")).not.toContain(
+      "image-set",
     );
   });
 

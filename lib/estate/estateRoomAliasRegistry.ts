@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — exact room alias registry.
+ * Spark Estate — exact room alias registry.
  * Room name match overrides feeling/activity routing.
  *
  * **Adapter (Phase B):** Aliases and `AppSection` overrides should eventually derive from
@@ -55,14 +55,14 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
   "apple-orchard": "home",
   "music-room": "focus-audio",
   sunroom: "welcome-room",
-  "momentum-institute": "momentum-institute",
+  "momentum-institute": "chamber-of-momentum",
   stables: "stables",
   "game-room": "quick-recharge",
   journal: "growth-journal",
   greenhouse: "growth-greenhouse",
   "reading-nook": "home",
-  "study-hall": "momentum-institute",
-  "momentum-room": "momentum-institute",
+  "study-hall": "chamber-of-momentum",
+  "momentum-room": "chamber-of-momentum",
   "personal-deck": "home",
   "estate-kitchen": "home",
   "summer-terrace": "home",
@@ -71,7 +71,7 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
   "lakeside-hammock": "home",
   "fireside-deck": "home",
   "estate-gardens": "home",
-  gardens: "home",
+  gardens: "wins-this-week",
   "discovery-room": "home",
   "art-studio": "content-generator",
   "strategy-studio": "content-generator",
@@ -79,7 +79,8 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
   "dining-room": "home",
   "stairway-reading-nook": "home",
   "spark-estate": "home",
-  "gallery-of-firsts": "growth-portfolio",
+  /** Hall of Accomplishments ≠ Portfolio / Achievement Library */
+  "gallery-of-firsts": "home",
 };
 
 function entry(
@@ -138,7 +139,7 @@ for (const row of ESTATE_ROOM_ALIAS_REGISTRY) {
 }
 
 export function normalizeAliasPhrase(phrase: string): string {
-  return phrase.trim().toLowerCase().replace(/[™®.!?]+$/g, "");
+  return phrase.trim().toLowerCase().replace(/[®.!?]+$/g, "");
 }
 
 function phraseContainsBoundedAlias(text: string, aliasPhrase: string): boolean {
@@ -274,12 +275,12 @@ export function extractEstateDestinationPhrase(userText: string): string | null 
 
   const lookLike = trimmed.match(PLACE_LOOK_LIKE_RE);
   if (lookLike?.[1]?.trim()) {
-    return lookLike[1].trim().replace(/[™®.!?]+$/g, "");
+    return lookLike[1].trim().replace(/[®.!?]+$/g, "");
   }
 
   const visitWish = trimmed.match(VISIT_WISH_RE);
   if (visitWish?.[1]?.trim()) {
-    return visitWish[1].trim().replace(/[™®.!?]+$/g, "");
+    return visitWish[1].trim().replace(/[®.!?]+$/g, "");
   }
 
   return null;
@@ -344,7 +345,7 @@ export function extractRoomPhraseFromNavigation(text: string): string | null {
 }
 
 function trimCompoundDestinationPhrase(phrase: string): string {
-  const trimmed = phrase.replace(/[™®.!?]+$/g, "").trim();
+  const trimmed = phrase.replace(/[®.!?]+$/g, "").trim();
   const parts = trimmed.split(
     /\s+and\s+(?:help me|then|also)\b/i,
   );

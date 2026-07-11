@@ -58,7 +58,7 @@ function choiceSearchText(choice: PendingChoiceItem): string {
   ]
     .join(" ")
     .toLowerCase()
-    .replace(/™/g, "")
+    .replace(/\u2122/g, "")
     .replace(/-/g, " ");
 }
 
@@ -130,7 +130,7 @@ function parseNumberIndex(userText: string, count: number): number | null {
 
 function matchLabel(userText: string, choice: PendingChoiceItem): boolean {
   const t = normalize(userText);
-  const label = normalize(choice.label.replace(/™/g, ""));
+  const label = normalize(choice.label.replace(/\u2122/g, ""));
   if (label.length >= 3 && (t === label || t.includes(label))) return true;
 
   const dest = choice.destination?.replace(/-/g, " ").toLowerCase();

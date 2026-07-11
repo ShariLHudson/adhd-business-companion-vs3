@@ -1,4 +1,4 @@
-/** Executive Discovery Engine™ — continuous executive discovery department. */
+/** Executive Discovery Engine — continuous executive discovery department. */
 
 export type DiscoveryEngineCategory =
   | "new-business-opportunities"

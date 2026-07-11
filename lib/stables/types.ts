@@ -1,5 +1,5 @@
 /**
- * The Stables™ — experience architecture types.
+ * The Stables — experience architecture types.
  *
  * Horse is metaphor. Room develops entrepreneur qualities through story, reflection, and coaching.
  */
@@ -8,7 +8,7 @@ import type { AppSection } from "@/lib/companionUi";
 
 export const STABLES_SECTION = "stables" as const satisfies AppSection;
 
-/** Entrepreneur qualities the Stables™ develop — not horse training. */
+/** Entrepreneur qualities the Stables develop — not horse training. */
 export type StablesQualityId =
   | "leadership"
   | "trust"

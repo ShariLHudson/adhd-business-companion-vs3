@@ -129,10 +129,21 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   },
   {
     id: "breathe",
-    name: "Breathe & Reset",
-    navigation: "Say 'help me breathe' or 'I need to reset.'",
-    howTo: "Grounding exercise to calm your nervous system and regroup.",
-    match: [/\bbreathe\b/i, /\breset\b/i, /\bgrounding\b/i],
+    name: "Breathe",
+    navigation:
+      "Say 'Take me to Breathe', 'Open Breathe', 'I need to breathe', 'Help me calm down', or 'I need a reset' — or open Breathe from the Room menu. Opens as an overlay from anywhere.",
+    howTo:
+      "Universal calming overlay — opens over your current place without leaving your work. Not a Wander destination.",
+    match: [
+      /\bbreathe\b/i,
+      /\bhelp me (?:calm down|reset)\b/i,
+      /\bcalm me down\b/i,
+      /\bi need a minute\b/i,
+      /\bi need to breathe\b/i,
+      /\bi need a reset\b/i,
+      /\bbox breathing\b/i,
+      /\b4[\s-]?7[\s-]?8\b/i,
+    ],
   },
   {
     id: "focus-audio",
@@ -319,7 +330,7 @@ export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritati
 • Today's Reality: say "today's reality" or share how your energy feels
 • Chat: say "new chat" or "start fresh" when you want a clean conversation
 • Focus / Focus Session: say "focus" or "focus session" for timed work
-• Breathe & Reset: say "help me breathe" or "I need to reset"
+• Breathe: say "help me breathe", "I need a minute", "calm me down", or "open Breathe" from anywhere
 • Peaceful Places: say "peaceful places" or ask for background sound
 • Momentum Appointments: say "block out time" or "momentum appointment"
 • Guided Exercises: say "guided exercise" or name the exercise

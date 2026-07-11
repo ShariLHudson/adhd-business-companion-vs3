@@ -1,5 +1,5 @@
 /**
- * The Gallery™ Demo Mode — experience the vision without years of user data.
+ * The Gallery Demo Mode — experience the vision without years of user data.
  * Nothing here is connected to real user information.
  */
 

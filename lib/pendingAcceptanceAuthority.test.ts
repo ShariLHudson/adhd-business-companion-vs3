@@ -227,7 +227,7 @@ describe("pendingAcceptanceAuthority", () => {
         kind: "action-bridge",
         bridge: {
           id: "breathe",
-          label: "Start Breathe & Reset",
+          label: "Start Breathe",
           emoji: "🌿",
           tool: "breathe",
         },

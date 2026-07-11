@@ -50,7 +50,7 @@ describe("sparkEstateAiPromptAndIntelligenceLayerArchitecture", () => {
       knowledge: "progress, clarity, next steps",
       behavior: "Ask one useful question at a time",
       boundaries: "Do not become a separate personality",
-      connections: "Momentum Builder™, Knowledge Cards",
+      connections: "Momentum Builder, Knowledge Cards",
     });
     expect(evaluation.approved).toBe(true);
     expect(evaluation.issues).toHaveLength(0);

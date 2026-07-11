@@ -38,7 +38,7 @@ describe("soundscape catalog", () => {
   it("links coffee shop to the cozy café peaceful place image", () => {
     const coffeeShop = SOUNDSCAPES.find((s) => s.id === "coffee-shop");
     expect(coffeeShop?.peacefulPlaceId).toBe("cozy-cafe");
-    expect(coffeeShop?.playbackUrl).toContain("AMBRest-Quiet_coffee_shop_am-Elevenlabs.mp3");
+    expect(coffeeShop?.playbackUrl).toContain("coffee-shop-chatter-audio.mp3");
     expect(coffeeShop?.destinationName).toBe("Cozy Café");
   });
 

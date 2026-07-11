@@ -1,5 +1,5 @@
 /**
- * Presence Mode™ — Enjoy the Estate™
+ * Presence Mode — Enjoy the Estate
  *
  * Permission to exist in the place without prompts. The Estate welcomes
  * presence; it never demands attention.

@@ -185,7 +185,7 @@ export const SPARK_LANDSCAPES: Readonly<
   },
 };
 
-export const SPARK_LANDSCAPES_PROMPT_BLOCK = `# SPARK LANDSCAPES™ (today's weather — not identity)
+export const SPARK_LANDSCAPES_PROMPT_BLOCK = `# SPARK LANDSCAPES (today's weather — not identity)
 
 **Rule:** ${SPARK_LANDSCAPE_CORE_RULE}
 

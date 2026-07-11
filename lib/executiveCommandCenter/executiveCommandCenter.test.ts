@@ -7,7 +7,7 @@ import {
   getExecutiveCommandCenterBootstrap,
 } from "./index";
 
-describe("Executive Command Center™", () => {
+describe("Executive Command Center", () => {
   it("exposes headquarters principle", () => {
     expect(COMMAND_CENTER_PRINCIPLE).toContain("One mission");
   });
@@ -53,7 +53,7 @@ describe("Executive Command Center™", () => {
   it("getExecutiveCommandCenterBootstrap lists intelligence sources", () => {
     const bootstrap = getExecutiveCommandCenterBootstrap();
     expect(bootstrap.panelCount).toBe(6);
-    expect(bootstrap.intelligenceSources).toContain("SPARK™");
-    expect(bootstrap.intelligenceSources).toContain("Executive Judgment™");
+    expect(bootstrap.intelligenceSources).toContain("SPARK");
+    expect(bootstrap.intelligenceSources).toContain("Executive Judgment");
   });
 });

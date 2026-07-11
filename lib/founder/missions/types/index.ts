@@ -1,4 +1,4 @@
-/** Mission Workspace™ — reusable mission types (no UI). */
+/** Mission Workspace — reusable mission types (no UI). */
 
 export type MissionId =
   | "listening-rooms"

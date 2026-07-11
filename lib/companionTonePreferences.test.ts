@@ -36,7 +36,7 @@ describe("The Immutable Friend — constitutional guardrails", () => {
 
   it("guardrail states relationship wins on conflict", () => {
     expect(THE_IMMUTABLE_FRIEND_GUARDRAIL).toMatch(
-      /The Friend We All Deserve™ is highest authority/i,
+      /The Friend We All Deserve is highest authority/i,
     );
     expect(THE_IMMUTABLE_FRIEND_GUARDRAIL).toMatch(/relationship wins/i);
     expect(THE_IMMUTABLE_FRIEND_GUARDRAIL).toMatch(

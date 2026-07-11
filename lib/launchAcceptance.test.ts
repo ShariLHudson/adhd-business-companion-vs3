@@ -212,14 +212,14 @@ describe("Launch Acceptance — Category 4: Tool consent", () => {
     expect(
       shouldAutoLaunchAfterAssistantOffer(
         "yes",
-        "Want to try Breathe & Reset?",
-        "Opening Breathe & Reset for you now.",
+        "Want to try Breathe?",
+        "Opening Breathe for you now.",
         {
           kind: "tool",
           suggestion: {
             kind: "breathe",
             line: "",
-            toolLabel: "Breathe & Reset",
+            toolLabel: "Breathe",
             toolEmoji: "🌿",
             keepTalkingLabel: "Not now",
             action: { type: "tool", tool: "breathe" },

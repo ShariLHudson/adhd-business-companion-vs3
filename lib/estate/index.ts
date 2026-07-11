@@ -1,5 +1,5 @@
 /**
- * Estate™ — public API.
+ * Estate — public API.
  *
  * **Authority (Phase B):** `canonicalEstateRegistry` is the single runtime source of truth
  * for place identity. Legacy exports remain for adapters until migration completes.

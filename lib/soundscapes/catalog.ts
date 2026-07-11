@@ -5,7 +5,11 @@ import {
   COFFEE_SHOP_AMBIENCE_MP3,
   EAST_TERRACE_AMBIENCE_MP3,
   EVENING_HEARTH_AMBIENCE_MP3,
+  GAZEBO_JOURNAL_AMBIENCE_MP3,
+  MINUTE_OF_PEACE_AMBIENCE_MP3,
   MUSIC_LOFT_AMBIENCE_MP3,
+  OCEAN_CONSERVATORY_AMBIENCE_MP3,
+  ORCHARD_BIRDS_AMBIENCE_MP3,
   TIN_ROOF_RAIN_AMBIENCE_MP3,
 } from "./audioAssets";
 
@@ -50,7 +54,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Gentle birdsong as the garden wakes around you.",
     description:
       "Gentle birdsong, soft breezes, and a peaceful garden awakening around you.",
-    playbackUrl: "https://www.youtube.com/watch?v=lTRiuFIWV54",
+    playbackUrl: ORCHARD_BIRDS_AMBIENCE_MP3,
   },
   {
     id: "ocean-waves",
@@ -63,7 +67,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Steady waves below a wide horizon — nowhere you need to be.",
     description:
       "Steady waves roll in below the overlook — salt air, wide horizon, and nowhere you need to be.",
-    playbackUrl: "https://www.youtube.com/watch?v=WHPEKLQID4U",
+    playbackUrl: OCEAN_CONSERVATORY_AMBIENCE_MP3,
   },
   {
     id: "fireside-retreat",
@@ -76,7 +80,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Low fire crackle and quiet warmth holding you.",
     description:
       "A low fire crackles in the stone hearth while the room holds you in quiet warmth.",
-    playbackUrl: "https://www.youtube.com/watch?v=LGn608ws4pk",
+    playbackUrl: EVENING_HEARTH_AMBIENCE_MP3,
   },
   {
     id: "coffee-shop",
@@ -103,7 +107,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Deep quiet built for thinking.",
     description:
       "Tall shelves, muffled footsteps, and the deep quiet of a room built for thinking.",
-    playbackUrl: "https://www.youtube.com/watch?v=sjkrrmBnpGE",
+    playbackUrl: GAZEBO_JOURNAL_AMBIENCE_MP3,
   },
   {
     id: "airplane-cabin",
@@ -116,7 +120,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Cabin hush miles above the world.",
     description:
       "Cabin hush and gentle engine drone — a pocket of calm miles above the world.",
-    playbackUrl: "https://www.youtube.com/watch?v=WG47y6LpayM",
+    playbackUrl: MINUTE_OF_PEACE_AMBIENCE_MP3,
   },
   {
     id: "brown-noise",
@@ -129,7 +133,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Deep steady sound that softens everything else.",
     description:
       "Deep, steady brown noise to soften distractions and help your thoughts line up.",
-    playbackUrl: "https://www.youtube.com/watch?v=nMfPqeZjc2c",
+    playbackUrl: TIN_ROOF_RAIN_AMBIENCE_MP3,
   },
   {
     id: "deep-focus-piano",
@@ -183,7 +187,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Crickets and owl hush under a wide night sky.",
     description:
       "Crickets, distant owls, and the hush of trees under a wide night sky.",
-    playbackUrl: "https://www.youtube.com/watch?v=eKFTSSKC7WA",
+    playbackUrl: ORCHARD_BIRDS_AMBIENCE_MP3,
   },
   {
     id: "ocean-night",
@@ -196,7 +200,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Slow waves in the dark, easy to drift with.",
     description:
       "Slow waves in the dark — rhythmic, distant, and easy to drift with.",
-    playbackUrl: "https://www.youtube.com/watch?v=uMenfkw_60I",
+    playbackUrl: OCEAN_CONSERVATORY_AMBIENCE_MP3,
   },
   {
     id: "nature-escape",
@@ -209,7 +213,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Creek, birds, and wildflowers — room to fill your cup again.",
     description:
       "A sunlit garden nook — flowing creek, birdsong, hammock shade, wildflowers, and a gentle breeze while guided recharge moments meet you where you are.",
-    playbackUrl: "https://www.youtube.com/watch?v=lTRiuFIWV54",
+    playbackUrl: ORCHARD_BIRDS_AMBIENCE_MP3,
     peacefulPlaceId: "nature-escape",
   },
   {

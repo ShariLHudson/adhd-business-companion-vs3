@@ -1,5 +1,5 @@
 /**
- * PLACE_ID_ALIASES™ — additive canonical place id resolution (Phase 1).
+ * PLACE_ID_ALIASES — additive canonical place id resolution (Phase 1).
  *
  * Maps legacy route ids, collection room ids, and colloquial slugs to canonical
  * `placeId` values. **Additive only** — never delete legacy keys without a
@@ -26,7 +26,7 @@ export const PLACE_ID_ALIASES: Readonly<Record<string, string>> = {
   "journal-gazebo": "journal",
   "gazebo-journal": "journal",
 
-  // Collection & intelligence ids
+  // Collection & intelligence ids — redirects only; never navigable surface labels
   "evidence-bank": "evidence-vault",
   "achievement-library": "library",
   "celebration-hall": "celebration-room",
@@ -36,6 +36,27 @@ export const PLACE_ID_ALIASES: Readonly<Record<string, string>> = {
   "growth-greenhouse": "greenhouse",
   "growth-reports": "celebration-room",
   "wins-this-week": "gardens",
+  /** Hall of Accomplishments ≠ Gallery; Portfolio slot is Hall member-facing name */
+  "hall-of-accomplishments": "portfolio",
+  "hall-of-achievements": "portfolio",
+  /** Gallery of Firsts — member-facing Gallery */
+  "gallery": "gallery-of-firsts",
+  "the-gallery": "gallery-of-firsts",
+  /** Writing Room is its own place (not Decision Compass) */
+  "writing-room": "writing-room",
+  /** Observatory view variants */
+  "observatory-day-inside": "observatory-day-inside",
+  "observatory-day-outside": "observatory-day-outside",
+  "observatory-night-outside": "observatory-night-outside",
+  /** Swing — oak swing plate (SW loves RH) is The Swing Beneath the Oak */
+  swing: "the-swing-beneath-the-oak",
+  "the-swing": "the-swing-beneath-the-oak",
+  "tree-swing": "the-swing-beneath-the-oak",
+  /** Swimming Pool (legacy summer-terrace id) */
+  "swimming-pool": "summer-terrace",
+  pool: "summer-terrace",
+  /** Estate Library */
+  "estate-library": "library",
 
   // Removed navigable rooms — legacy ids redirect to canonical destination
   "reflection-pond": "seat-at-pond",
@@ -45,9 +66,7 @@ export const PLACE_ID_ALIASES: Readonly<Record<string, string>> = {
   "estate-registry-journal": "journal",
   kitchen: "estate-kitchen",
   "board-room": "round-table",
-  "estate-library": "library",
-  pool: "summer-terrace",
-  "hall-of-accomplishments": "gallery-of-firsts",
+  pond: "seat-at-pond",
 };
 
 const MAX_ALIAS_HOPS = 8;

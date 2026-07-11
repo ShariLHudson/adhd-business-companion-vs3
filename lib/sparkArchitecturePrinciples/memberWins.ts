@@ -1,10 +1,10 @@
 /**
- * The Member Wins™ — permanent architecture principle.
+ * The Member Wins — permanent architecture principle.
  *
  * @see docs/THE_MEMBER_WINS.md
  */
 
-export const THE_MEMBER_WINS_PRINCIPLE_NAME = "The Member Wins™" as const;
+export const THE_MEMBER_WINS_PRINCIPLE_NAME = "The Member Wins" as const;
 
 export const THE_MEMBER_WINS_QUESTION =
   "Does this make life easier for the member?" as const;

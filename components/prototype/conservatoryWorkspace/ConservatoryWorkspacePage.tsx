@@ -61,7 +61,7 @@ export function ConservatoryWorkspacePage() {
       style={{ backgroundImage: `url(${CONSERVATORY_BACKGROUND})` }}
     >
       <p className="cw-dev-link">
-        Conservatory Workspace™ V3 ·{" "}
+        Conservatory Workspace V3 ·{" "}
         <a href="/companion">Companion</a>
         {" · "}
         <a href="/prototype/universal-work">Universal Work 01</a>

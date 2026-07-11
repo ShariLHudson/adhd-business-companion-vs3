@@ -1,4 +1,4 @@
-/** Calm Intelligence™ — showing less, helping more (cognitive load reduction). */
+/** Calm Intelligence — showing less, helping more (cognitive load reduction). */
 
 import type { MissionId } from "@/lib/founder/missions/types";
 

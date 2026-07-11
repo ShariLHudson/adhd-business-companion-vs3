@@ -1,4 +1,4 @@
-/* Momentum Builder™ — planning studio estate room (conversation primary). */
+/* Momentum Builder — planning studio estate room (conversation primary). */
 
 .momentum-builder-room {
   position: relative;
@@ -230,7 +230,7 @@
   color: rgba(47, 41, 36, 0.78);
 }
 
-/* ——— Momentum Path™ placeholder (V2 garden) ——— */
+/* ——— Momentum Path placeholder (V2 garden) ——— */
 .momentum-builder-room__momentum-path {
   position: absolute;
   left: max(1.25rem, 8vw);

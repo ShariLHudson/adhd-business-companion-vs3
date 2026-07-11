@@ -75,7 +75,7 @@ function buildAssistantQueue(): ExecutiveAssistantItem[] {
     title: offer.label,
     summary: offer.description,
     status: "draft" as const,
-    sourceEngine: "Executive Judgment™",
+    sourceEngine: "Executive Judgment",
   }));
 
   const researchAlerts = researchSampleRepository.significantAlerts().slice(0, 2);
@@ -85,7 +85,7 @@ function buildAssistantQueue(): ExecutiveAssistantItem[] {
     title: alert.title,
     summary: alert.whatHappened,
     status: "draft" as const,
-    sourceEngine: "Executive Research™",
+    sourceEngine: "Executive Research",
   }));
 
   return [...fromJudgment, ...fromResearch].slice(0, 8);
@@ -134,7 +134,7 @@ function buildPanels(): ExecutivePanelSummary[] {
     itemCount: 5,
     primaryRoomHref: `${FOUNDER_BASE}/executive-judgment-engine`,
     items: [
-      { id: "today-mission", label: "Active mission", detail: getSampleMission(DEFAULT_ACTIVE_MISSION_ID)?.name ?? "Listening Rooms™" },
+      { id: "today-mission", label: "Active mission", detail: getSampleMission(DEFAULT_ACTIVE_MISSION_ID)?.name ?? "Listening Rooms" },
       { id: "today-rec", label: "Primary recommendation", detail: primary.headline, roomHref: `${FOUNDER_BASE}/executive-judgment-engine` },
       { id: "today-goal", label: "Today's goal", detail: "Advance unified restart narrative before workshop momentum fades." },
       { id: "today-momentum", label: "Current momentum", detail: `Building — ${getSampleMission(DEFAULT_ACTIVE_MISSION_ID)?.progress ?? 64}% estimated progress on active mission.` },
@@ -163,7 +163,7 @@ function buildPanels(): ExecutivePanelSummary[] {
         roomHref: `${FOUNDER_BASE}/opportunity-discovery`,
       },
       ...(daily.founderAlert
-        ? [{ id: daily.founderAlert.id, label: "Founder Alert™", detail: daily.founderAlert.title, roomHref: `${FOUNDER_BASE}/executive-discovery-engine` }]
+        ? [{ id: daily.founderAlert.id, label: "Founder Alert", detail: daily.founderAlert.title, roomHref: `${FOUNDER_BASE}/executive-discovery-engine` }]
         : []),
       ...discoveries.map((d) => ({
         id: d.id,
@@ -202,9 +202,9 @@ function buildPanels(): ExecutivePanelSummary[] {
     itemCount: 5,
     primaryRoomHref: `${FOUNDER_BASE}/executive-builder`,
     items: [
-      { id: "builder", label: "Executive Builder™", detail: builder.suggestedBuilds[0]?.phrase ?? "Complete blueprint ready", roomHref: `${FOUNDER_BASE}/executive-builder` },
+      { id: "builder", label: "Executive Builder", detail: builder.suggestedBuilds[0]?.phrase ?? "Complete blueprint ready", roomHref: `${FOUNDER_BASE}/executive-builder` },
       { id: "cursor", label: "Cursor", detail: "Implementation packet drafted — approval before any build.", roomHref: `${FOUNDER_BASE}/executive-integration-center` },
-      { id: "products", label: "Products", detail: "Listening Rooms™, Companion™, Founder Studio™ aligned to restart mission.", roomHref: `${FOUNDER_BASE}/spark-command` },
+      { id: "products", label: "Products", detail: "Listening Rooms, Companion, Founder Studio aligned to restart mission.", roomHref: `${FOUNDER_BASE}/spark-command` },
       { id: "roadmap", label: "Roadmaps", detail: "One-room-per-sprint rhythm — final headquarters sprint complete.", roomHref: `${FOUNDER_BASE}/executive-strategy` },
       { id: "launch", label: "Launch preparation", detail: "Gentle Restart campaign hooks tied to workshop proximity.", roomHref: `${FOUNDER_BASE}/creation-studio` },
     ],
@@ -214,7 +214,7 @@ function buildPanels(): ExecutivePanelSummary[] {
     id: "run",
     title: "Run",
     mission: "Operations · Automation · Revenue",
-    teaser: `${integration.connectedCount} systems connected · One Office Principle™`,
+    teaser: `${integration.connectedCount} systems connected · One Office Principle`,
     itemCount: 6,
     primaryRoomHref: `${FOUNDER_BASE}/executive-integration-center`,
     items: runGroups.slice(0, 6).map((group) => ({
@@ -282,7 +282,7 @@ export function composeExecutiveCommandCenterView(): ExecutiveCommandCenterView 
     overnightMessage: daily.overnightMessage,
     companionVoice,
     status: buildStatusBar(
-      mission?.name ?? "Listening Rooms™",
+      mission?.name ?? "Listening Rooms",
       primary.headline,
       primary.shariLens.currentEnergy,
       mission?.progress ?? 64,
@@ -290,14 +290,14 @@ export function composeExecutiveCommandCenterView(): ExecutiveCommandCenterView 
       opportunities.todaysBiggest.rankScore,
     ),
     sixQuestions: {
-      whatMattersToday: `${mission?.name ?? "Listening Rooms™"} — ${primary.headline}`,
+      whatMattersToday: `${mission?.name ?? "Listening Rooms"} — ${primary.headline}`,
       whyItMatters: primary.whyThis,
       whatWeRecommend: primary.summary,
       opportunitiesToKnow: opportunities.todaysBiggest.name,
       decisionsWaiting: `Simulation ready: workshop vs membership. ${pyramid.supporting.length} supporting judgments waiting.`,
       whatToDoNext: nextAction,
     },
-    primaryMission: mission?.name ?? "Listening Rooms™",
+    primaryMission: mission?.name ?? "Listening Rooms",
     primaryRecommendation: primary.headline,
     primaryRecommendationSummary: primary.summary,
     todaysGoal: "Advance unified restart narrative before workshop momentum fades.",

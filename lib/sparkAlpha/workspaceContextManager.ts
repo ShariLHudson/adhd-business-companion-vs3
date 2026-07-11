@@ -1,5 +1,5 @@
 /**
- * Spark Alpha™ — Workspace Context Manager™
+ * Spark Alpha — Workspace Context Manager
  * Intent → Context. Not navigation.
  *
  * @see docs/SPARK_ALPHA_FRAMEWORK.md

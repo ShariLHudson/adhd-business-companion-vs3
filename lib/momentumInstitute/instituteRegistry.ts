@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — estate and ecosystem registration.
+ * Momentum Institute — estate and ecosystem registration.
  * The Institute is the Entrepreneur Development Center — not a single room.
  */
 

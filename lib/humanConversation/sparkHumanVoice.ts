@@ -1,5 +1,5 @@
 /**
- * Spark Human Voice Rules™ — permanent language standards.
+ * Spark Human Voice Rules — permanent language standards.
  * Authentic Shari voice; not AI-detector evasion.
  *
  * @see docs/SPARK_HUMAN_VOICE_RULES.md

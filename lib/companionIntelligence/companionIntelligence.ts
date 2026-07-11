@@ -1,5 +1,5 @@
 /**
- * Companion Intelligence™ feature gate.
+ * Companion Intelligence feature gate.
  */
 
 export function isCompanionIntelligenceEnabled(): boolean {

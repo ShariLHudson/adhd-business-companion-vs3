@@ -16,6 +16,7 @@ The conversation is only one expression of the relationship. The relationship re
 
 | Document | Layer |
 |----------|-------|
+| [SPARK_COMPANION_RUNTIME_ARCHITECTURE.md](./SPARK_COMPANION_RUNTIME_ARCHITECTURE.md) | Visual runtime map · Mermaid · message → final Spark response |
 | [CONVERSATION_MODE_INTELLIGENCE.md](./CONVERSATION_MODE_INTELLIGENCE.md) | Conversation Mode · sticky member activity (Capture · Create · …) |
 | [CONVERSATION_SESSION_ARCHITECTURE.md](./CONVERSATION_SESSION_ARCHITECTURE.md) | Conversation Session · one active relationship · memory spine |
 | [CREATION_GUIDANCE_INTELLIGENCE.md](./CREATION_GUIDANCE_INTELLIGENCE.md) | Creation Guidance · idea → finished work (ask · act · draft · review · complete) |

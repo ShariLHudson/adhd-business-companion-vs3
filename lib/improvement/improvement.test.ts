@@ -13,7 +13,7 @@ import {
   review,
 } from "./index";
 
-describe("Continuous Improvement Engine™", () => {
+describe("Continuous Improvement Engine", () => {
   it("sample opportunities answer what, why, root cause, and action", () => {
     expect(SAMPLE_IMPROVEMENT_OPPORTUNITIES.length).toBeGreaterThanOrEqual(4);
     for (const opp of SAMPLE_IMPROVEMENT_OPPORTUNITIES) {

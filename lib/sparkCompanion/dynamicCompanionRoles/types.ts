@@ -1,5 +1,5 @@
 /**
- * Dynamic Companion Roles™ — one relationship, many roles.
+ * Dynamic Companion Roles — one relationship, many roles.
  */
 
 export const COMPANION_ROLE_GOVERNING_QUESTION =

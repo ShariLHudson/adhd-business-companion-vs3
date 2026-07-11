@@ -36,7 +36,7 @@ export function FounderExecutiveBuilder() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Builder™"
+        eyebrow="Executive Builder"
         title="The World's Smartest Business Builder"
         question="Where do I start?"
         purpose="Every idea becomes a complete implementation blueprint — phases, packets, options, and drafts. Never a blank page."

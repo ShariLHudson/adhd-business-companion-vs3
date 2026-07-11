@@ -19,7 +19,7 @@ import { lintDiscoveryVoice } from "./voiceLint";
 import { editorialStatus, isMemberFacingDiscoveryStatus } from "./workflow";
 
 function stripTm(value: string): string {
-  return value.replace(/™/g, "").trim().toLowerCase();
+  return value.replace(/\u2122/g, "").trim().toLowerCase();
 }
 
 function titleUsesOfficialName(title: string, official: string): boolean {

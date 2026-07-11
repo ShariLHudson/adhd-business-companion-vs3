@@ -6,6 +6,7 @@ import {
   COFFEE_HOUSE_AMBIENCE_MP3,
   MUSIC_LOFT_AMBIENCE_MP3,
   OCEAN_CONSERVATORY_AMBIENCE_MP3,
+  WELCOME_ROOM_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 import {
   ESTATE_AMBIENT_ACCEPTANCE_SEQUENCE,
@@ -47,6 +48,12 @@ describe("estatePlaceAmbientSound", () => {
     expect(coffee?.src).toBe(COFFEE_HOUSE_AMBIENCE_MP3);
     expect(music?.src).toBe(MUSIC_LOFT_AMBIENCE_MP3);
     expect(coffee?.src).not.toBe(music?.src);
+  });
+
+  it("maps welcome-home to welcome-room ambience for Room menu Sound on/off", () => {
+    const welcome = resolveEstatePlaceAmbientProfile("welcome-home");
+    expect(welcome?.src).toBe(WELCOME_ROOM_AMBIENCE_MP3);
+    expect(welcome?.character).toMatch(/welcome|hearth|porch/i);
   });
 
   it("acceptance sequence: Reading Nook → Gazebo → Greenhouse uses three identities", () => {

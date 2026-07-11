@@ -1,8 +1,8 @@
 /**
- * Estate Intelligence Runtime™ — activate KB-backed intelligence on every turn.
+ * Estate Intelligence Runtime — activate KB-backed intelligence on every turn.
  *
  * After goal detection and capability selection, query the appropriate
- * Estate Knowledge Base™ source and return member-facing copy grounded in canon.
+ * Estate Knowledge Base source and return member-facing copy grounded in canon.
  */
 
 import type { IntentRoutingDecision } from "@/lib/intentRoutingIntelligence";

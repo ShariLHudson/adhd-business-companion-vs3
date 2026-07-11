@@ -34,8 +34,8 @@ export function FounderRoomPageView({ room }: FounderRoomPageProps) {
 
       <ExecutivePanel title="Coming next" className="founder-room-page__coming">
         <p>
-          Real {room.title} intelligence connects here — SPARK™ patterns, FLAME™
-          mentoring memory, and FIRE™ briefings when you are ready.
+          Real {room.title} intelligence connects here — SPARK patterns, FLAME
+          mentoring memory, and FIRE briefings when you are ready.
         </p>
       </ExecutivePanel>
     </div>

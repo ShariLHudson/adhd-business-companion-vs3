@@ -2,9 +2,10 @@
 
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
-import { OCEAN_CONSERVATORY_VIDEO } from "@/lib/oceanConservatory/media";
+import { OCEAN_CONSERVATORY_VIDEO, OCEAN_CONSERVATORY_VIDEO_PLAYBACK_RATE } from "@/lib/oceanConservatory/media";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { LivingBorderFrame } from "@/components/companion/LivingBorderFrame";
+import { useChatBackdropRevision } from "@/lib/chatBackdrop";
 import {
   layoutScene,
   resolveScene,
@@ -29,6 +30,11 @@ type Props = {
   banner?: ReactNode;
   /** Hide resolver-driven header when workspace renders its own */
   hideHeader?: boolean;
+  /**
+   * Immersive estate session — no frosted glass panel.
+   * Background stays fully visible; children float over the room.
+   */
+  immersive?: boolean;
 };
 
 const CINEMATIC_PRESET_BY_WORKSPACE: Partial<
@@ -53,9 +59,12 @@ export function SceneRenderer({
   className = "",
   banner,
   hideHeader = false,
+  immersive = false,
 }: Props) {
+  const backdropRevision = useChatBackdropRevision();
   const resolved = resolveScene(scene);
   const layout = layoutScene(resolved);
+  void backdropRevision;
   const { copy, background, motion } = resolved;
   const cinematicPreset =
     CINEMATIC_PRESET_BY_WORKSPACE[scene.workspaceId] ?? "default";
@@ -82,45 +91,74 @@ export function SceneRenderer({
       ? OCEAN_CONSERVATORY_VIDEO
       : background.videoUrl;
 
+  const keepEstateFullyVisible =
+    immersive ||
+    scene.workspaceId === "breathe" ||
+    scene.workspaceId === "clear-my-mind" ||
+    scene.workspaceId === "clear-my-mind-thoughts";
+
   return (
     <div
       className={`${layout.rootClassName} ${className}`.trim()}
       style={rootStyle}
       {...layout.dataAttributes}
       data-scene-contract="1"
+      data-scene-immersive={immersive ? "1" : undefined}
     >
       {/* Background layer — masked, dominance-capped; never in center zone */}
       {background.mode !== "none" ? (
         <div className={layout.backgroundClassName} aria-hidden="true">
           {background.mode === "photo-scene" && sceneVideoUrl ? (
             <CinematicBackground
-              preset={cinematicPreset}
+              preset={
+                isOceanConservatoryScene ? "ocean-conservatory" : cinematicPreset
+              }
               mode="video"
               videoSrc={sceneVideoUrl}
               poster={background.imageUrl}
+              playbackRate={
+                isOceanConservatoryScene
+                  ? OCEAN_CONSERVATORY_VIDEO_PLAYBACK_RATE
+                  : undefined
+              }
               placement="absolute"
-              className="cinematic-background--scene-video"
-              mediaClassName="companion-scene-fade"
-              showBottomFade={!isOceanConservatoryScene}
+              className={[
+                "cinematic-background--scene-video",
+                isOceanConservatoryScene
+                  ? "cinematic-background--ocean-conservatory"
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              mediaClassName={
+                keepEstateFullyVisible ? undefined : "companion-scene-fade"
+              }
+              showBottomFade={!isOceanConservatoryScene && !immersive}
             />
           ) : null}
           {background.mode === "photo-scene" &&
           background.imageUrl &&
           !sceneVideoUrl ? (
             <CinematicBackground
+              key={`scene-photo-${background.imageUrl}-${backdropRevision}`}
               preset={cinematicPreset}
               mode="image"
               imageStyle={photoBgStyle}
               placement="absolute"
               className="cinematic-background--scene-image"
-              mediaClassName={`${SCENE_BG_IMAGE_CLASS} companion-scene-fade`}
+              mediaClassName={`${SCENE_BG_IMAGE_CLASS}${
+                keepEstateFullyVisible ? "" : " companion-scene-fade"
+              }`}
+              showBottomFade={!keepEstateFullyVisible}
             />
           ) : null}
-          <div
-            className="companion-scene-bg__wash"
-            style={{ background: background.overlay }}
-          />
-          <div className={SCENE_BG_MASK_CLASS} />
+          {!immersive ? (
+            <div
+              className="companion-scene-bg__wash"
+              style={{ background: background.overlay }}
+            />
+          ) : null}
+          {!immersive ? <div className={SCENE_BG_MASK_CLASS} /> : null}
         </div>
       ) : null}
 
@@ -163,7 +201,18 @@ export function SceneRenderer({
           </header>
         ) : null}
 
-        <div className={`${layout.panel.className} companion-glass-panel`}>{children}</div>
+        {immersive ? (
+          <div
+            className="companion-scene-immersive-layer"
+            data-scene-immersive="1"
+          >
+            {children}
+          </div>
+        ) : (
+          <div className={`${layout.panel.className} companion-glass-panel`}>
+            {children}
+          </div>
+        )}
       </div>
     </div>
   );

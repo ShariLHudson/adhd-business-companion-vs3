@@ -72,11 +72,11 @@ describe("Focus V2 — feelings first, tools second", () => {
 
 
 
-  it("recommends Most People Start Here for I Need A Break", () => {
+  it("recommends Peaceful Places for I Need A Break", () => {
 
     expect(recommendedToolForFeeling("need-break")?.label).toBe(
 
-      "Most People Start Here",
+      "Peaceful Places",
 
     );
 
@@ -94,13 +94,9 @@ describe("Focus V2 — feelings first, tools second", () => {
 
   it("keeps core Focus menu tools reachable from the hub", () => {
 
-    const coreTools = ["breathe", "focus-audio"] as const;
+    expect(focusHubOpensSidebarTool("focus-audio")).toBe(true);
 
-    for (const tool of coreTools) {
-
-      expect(focusHubOpensSidebarTool(tool)).toBe(true);
-
-    }
+    expect(focusHubOpensSidebarTool("breathe")).toBe(false);
 
   });
 
@@ -128,10 +124,9 @@ describe("Focus V2 — feelings first, tools second", () => {
 
         focusHubDropdownTools(needBreak).map((t) => t.label),
 
-    ).toEqual(["Most People Start Here", "Peaceful Places", "Momentum Builders"]);
+    ).toEqual(["Peaceful Places", "Quick Recharge", "Take a Quiet Moment"]);
 
   });
-
 });
 
 

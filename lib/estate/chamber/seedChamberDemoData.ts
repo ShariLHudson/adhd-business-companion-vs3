@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — idempotent demo data seed (Phase 8).
+ * Chamber of Momentum — idempotent demo data seed (Phase 8).
  */
 
 import {

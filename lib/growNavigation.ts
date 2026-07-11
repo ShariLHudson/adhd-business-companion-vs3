@@ -1,7 +1,7 @@
 import type { AppSection } from "./companionUi";
 import { NAV_HOME } from "./navigationBack";
 
-/** Entrepreneurial Grow™ family — capability practice and knowledge. */
+/** Entrepreneurial Grow family — capability practice and knowledge. */
 export const GROW_PANEL_SECTIONS: AppSection[] = [
   "grow",
   "grow-momentum-builders",
@@ -39,7 +39,7 @@ export const GROW_SECTION_META: Record<
   },
   "grow-momentum-builders": {
     objectId: "momentum-builder-room",
-    title: "Momentum Builder™",
+    title: "Momentum Builder",
     lead: "Find the easiest way to move forward today.",
   },
   "grow-spark-cards": {

@@ -18,7 +18,7 @@ export function dynamicCompanionRoleHintForChat(
   const meta = COMPANION_ROLE_DESCRIPTIONS[decision.role];
 
   const lines = [
-    "DYNAMIC COMPANION ROLES™:",
+    "DYNAMIC COMPANION ROLES:",
     `Ask silently: "${COMPANION_ROLE_GOVERNING_QUESTION}"`,
     `Role this turn: **${meta.title}** (${decision.confidence} confidence)`,
     meta.memberNeeds,

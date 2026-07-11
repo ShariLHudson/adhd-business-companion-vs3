@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { ALL_MASTER_LIBRARY_ITEMS, composeMasterLibraryView, MASTER_LIBRARY_CATEGORIES } from "./index";
 
-describe("Spark Master Library™", () => {
+describe("Spark Master Library", () => {
   it("composeMasterLibraryView returns indexed categories", () => {
     const view = composeMasterLibraryView();
     expect(view.headline).toContain("Master Library");

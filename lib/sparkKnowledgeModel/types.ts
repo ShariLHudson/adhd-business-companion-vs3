@@ -1,5 +1,5 @@
 /**
- * Spark Knowledge Model™ — canonical knowledge categories for Spark OS.
+ * Spark Knowledge Model — canonical knowledge categories for Spark OS.
  * Common language for every intelligence system; not storage or retrieval logic.
  *
  * @see spark-intelligence-foundation/004-spark-knowledge-model.md

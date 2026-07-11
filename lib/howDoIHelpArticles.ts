@@ -122,7 +122,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Chat Workspace (💬) — New Chat or New Day's Chat when you need a fresh conversation or fresh daily start.",
       "Create: New Draft, Start From Template, Snippet, Audience Profile, Resume Draft.",
       "My Work: Search, Continue Working, Browse (Created Content, Projects, libraries, Archive).",
-      "Growth: My Wins, Evidence Bank, My Highlights, My Journey.",
+      "Growth: My Wins, Evidence Vault, My Highlights, My Journey.",
       "Open How Do I → Main Areas anytime for how each one works.",
     ],
     tips: ["Chat can help you pick — you do not have to memorize the map."],
@@ -296,12 +296,12 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     categoryId: "focus-momentum",
     title: "Focus",
     emoji: "⏱️",
-    whatItIs: "Timed work with intention — timer, audio, and breathing when needed.",
+    whatItIs: "Timed work with intention — timer and audio when needed.",
     whenToUse: "You know what to do but cannot seem to start.",
     workflow: [
       "Tell me you'd like to focus, or say what you want to work on.",
       "Name one task — everything else waits.",
-      "Pick a timer, audio, or breathing reset.",
+      "Pick a timer or audio. Say \"help me breathe\" anytime for Breathe.",
       "Work until the session ends — then decide what's next.",
     ],
     tips: ["One task per session. Seriously — one."],
@@ -971,7 +971,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
       "Say 'open growth' or tell me what you'd like to celebrate or track.",
-      "Open Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
+      "Open Wins, Evidence Vault, My Highlights, or My Journey from the hub cards.",
       "Check Growth Inbox for moments the app noticed — save where they belong or dismiss.",
       "Tap 📖 Growth Reports to build a printable or downloadable combined report.",
     ],
@@ -999,7 +999,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     emoji: "🏆",
     featured: true,
     whatItIs:
-      "Confirmed progress for this week — encouragement without performance pressure. Wins capture what happened; Evidence Bank captures why it mattered.",
+      "Confirmed progress for this week — encouragement without performance pressure. Wins capture what happened; Evidence Vault captures why it mattered.",
     whenToUse:
       "Friday reflection, low-motivation days, or when you need proof you are moving forward.",
     workflow: [
@@ -1034,7 +1034,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "evidence-bank",
     categoryId: "personal-growth",
-    title: "Evidence Bank",
+    title: "Evidence Vault",
     emoji: "📈",
     featured: true,
     whatItIs:
@@ -1042,14 +1042,13 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse:
       "When imposter syndrome shows up, you need facts for a decision, or you want to remember why your work mattered.",
     workflow: [
-      "Open Evidence Bank from 🌱 Growth.",
-      "Tap Add evidence — or route from Growth Inbox (Save as Evidence) or a win (Save to Evidence).",
-      "Pick a category: Business Growth, Client Impact, Personal Growth, Health & Wellbeing, Courage, or Problem Solving.",
-      "Fill what happened and why it mattered — what improved, who benefited, what this proves.",
-      "Attach screenshots, certificates, or documents per entry (Attach on an expanded entry).",
+      "Open Evidence Vault from the profile menu or say \"Open Evidence Vault\".",
+      "Arrive in the room first — Spark welcomes you, then offers gentle choices.",
+      "Choose Show me a reminder, Add something new, Browse my vault, or Help me find proof I forgot.",
+      "When adding: pick a category and describe what happened and why it mattered.",
+      "Attach screenshots, certificates, or documents when helpful.",
       "Edit, Print, or Export individual entries from the entry actions.",
-      "Use Archive filters and search to review proof over time.",
-      "Tap 🖨 Print in the header to print your evidence list.",
+      "Use browse filters and search to review proof over time.",
     ],
     tips: [
       "Why evidence matters: capturing impact strengthens pattern recognition and decision-making — you build a library of proof for pricing, pitching, and hard choices.",
@@ -1071,7 +1070,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "attach",
     ],
     openSection: "evidence-bank",
-    openLabel: "Open Evidence Bank",
+    openLabel: "Open Evidence Vault",
   },
   {
     id: "my-highlights",
@@ -1095,7 +1094,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     tips: [
       "Why highlights matter: preserving recognition helps you remember reality when self-doubt appears — this is about accomplishments, not ego.",
       "Belongs here: testimonials, praise, credentials, certifications, awards, speaking, media, client results, and personal achievements.",
-      "Not Evidence Bank (impact on others) and not My Journey (life story and lessons).",
+      "Not Evidence Vault (impact on others) and not My Journey (life story and lessons).",
     ],
     keywords: [
       "highlights",
@@ -1204,7 +1203,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     workflow: [
       "Log a win via Growth Inbox or Wins This Week.",
       "Tell Chat if you want acknowledgment.",
-      "Review Evidence Bank or My Highlights when doubting yourself.",
+      "Review Evidence Vault or My Highlights when doubting yourself.",
       "Plan a small reward that actually restores you.",
     ],
     tips: [
@@ -1223,7 +1222,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Using evidence, highlights, and small wins to counter self-doubt — grounded in facts, not affirmations.",
     whenToUse: "Pricing conversations, launches, or comparison traps.",
     workflow: [
-      "Review Evidence Bank before hard tasks — what impact you have created.",
+      "Review Evidence Vault before hard tasks — what impact you have created.",
       "Open My Highlights — testimonials, praise, and accomplishments you have saved.",
       "List three recent wins from Wins This Week — any size.",
       "Use Client Avatars to anchor who you help.",
@@ -1242,7 +1241,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse: "Monthly reviews or planning the next chapter.",
     workflow: [
       "Open 🌱 Growth for the snapshot across all four pillars.",
-      "Review Wins This Week history and Evidence Bank trends.",
+      "Review Wins This Week history and Evidence Vault trends.",
       "Browse My Journey chapters for lessons and milestones.",
       "Use 📖 Growth Reports for monthly or annual reviews.",
       "Adjust Plan My Day based on what actually happened.",

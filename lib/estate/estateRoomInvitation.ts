@@ -1,5 +1,5 @@
 /**
- * Arrival Before Activity™ — concierge invitations per room.
+ * Arrival Before Activity — concierge invitations per room.
  * @see docs/estate/ARRIVAL_BEFORE_ACTIVITY.md
  */
 
@@ -36,6 +36,10 @@ export function estateInvitationKeepsInConversation(
     case "companion-continue":
     case "plan-my-day":
     case "show-suggestions":
+    case "evidence-reminder":
+    case "evidence-find-proof":
+    case "evidence-search":
+    case "evidence-insights":
       return true;
     default:
       return false;
@@ -61,7 +65,16 @@ export function estatePresenceGreeting(roomId: string): string {
   return ESTATE_PRESENCE_GREETINGS[idx]!;
 }
 
+/** Cartographer's Studio uses its own orientation guide — never Welcome Home closers. */
+const ROOMS_WITHOUT_UNIVERSAL_CLOSERS = new Set([
+  "focus-studio",
+  "cartographers-studio",
+]);
+
 function universalClosers(roomId: string): EstateRoomInvitationItem[] {
+  if (ROOMS_WITHOUT_UNIVERSAL_CLOSERS.has(roomId)) {
+    return [];
+  }
   const copy = ESTATE_UNIVERSAL_CLOSER_COPY[roomId] ?? {};
   const includePresence = copy.includePresence !== false;
   const includeChat = copy.includeChat !== false;

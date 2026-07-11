@@ -1,5 +1,5 @@
 /**
- * goToPlace™ — single approved Estate navigation primitive (Phase C).
+ * goToPlace — single approved Estate navigation primitive (Phase C).
  *
  * Navigation law: the conversation belongs to the member; the place changes;
  * the conversation continues. Only explicit new-conversation actions reset chat.
@@ -24,6 +24,14 @@ import {
 import { resolveNavigationTarget } from "./estateRoutingRegistry";
 import { resolveSceneViewBackgroundUrl } from "./estatePlaceSceneViews";
 import type { DirectEstateVisit } from "./directEstateVisit";
+import { shouldSuppressDestinationInvitationGrid } from "./estatePlaceFirstArrival";
+import { onEstatePlaceArrived } from "@/lib/sparkRecognitionEngine/shellSync";
+
+/**
+ * Places that must not claim their own name until dedicated art ships.
+ * Navigation lands on the honest live place (same plate the member sees).
+ */
+const PLACE_NAVIGATION_REDIRECTS: Readonly<Record<string, string>> = {};
 
 export type GoToPlaceInput = {
   placeId: string;
@@ -32,7 +40,7 @@ export type GoToPlaceInput = {
   /** User messages already in thread when navigation begins */
   userMessageCountAtArrival?: number;
   /**
-   * When true, member explicitly requested an activity/workspace (e.g. Clear My Mind™).
+   * When true, member explicitly requested an activity/workspace (e.g. Clear My Mind).
    * Default false — place change only, no auto-open.
    */
   explicitActivityRequested?: boolean;
@@ -81,17 +89,20 @@ function arrivalUiFlags(
   const isTransition = place.category === "transition-space";
   return {
     showTitlePlaque: !isLiving && !isTransition && place.arrivalBehavior !== "presence-only",
-    showInvitationGrid:
-      !isLiving &&
-      !isTransition &&
-      place.arrivalBehavior === "object-invitation",
+    showInvitationGrid: shouldSuppressDestinationInvitationGrid()
+      ? false
+      : !isLiving &&
+        !isTransition &&
+        place.arrivalBehavior === "object-invitation",
   };
 }
 
 /** Validate canonical place id and build navigation metadata without mutating chat. */
 export function goToPlace(input: GoToPlaceInput): GoToPlaceOutcome {
-  const navTarget = resolveNavigationTarget(input.placeId);
-  const shellPlaceId = navTarget?.navigatePlaceId ?? input.placeId;
+  const requestedId = resolveCanonicalPlaceId(input.placeId);
+  const redirectedId = PLACE_NAVIGATION_REDIRECTS[requestedId] ?? requestedId;
+  const navTarget = resolveNavigationTarget(redirectedId);
+  const shellPlaceId = navTarget?.navigatePlaceId ?? redirectedId;
   const entry = getEstateDirectoryEntry(shellPlaceId);
   if (!entry) {
     return {
@@ -124,7 +135,7 @@ export function goToPlace(input: GoToPlaceInput): GoToPlaceOutcome {
       : null;
   const focusMedia = getEstateDirectoryEntry(focusPlace.id)?.media.backgroundUrl;
 
-  return {
+  const result: GoToPlaceResult = {
     ok: true,
     placeId: focusPlace.id,
     place,
@@ -153,6 +164,11 @@ export function goToPlace(input: GoToPlaceInput): GoToPlaceOutcome {
         backgroundImageOverride ?? focusMedia ?? null,
     },
   };
+
+  // Sprint 1 — keep recognition visual_room aligned with navigation.
+  onEstatePlaceArrived({ placeId: result.placeId, section: result.section });
+
+  return result;
 }
 
 export function requireGoToPlace(input: GoToPlaceInput): GoToPlaceResult {

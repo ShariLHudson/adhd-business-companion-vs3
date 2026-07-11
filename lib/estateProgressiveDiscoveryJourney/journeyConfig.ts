@@ -1,5 +1,5 @@
 /**
- * Progressive Discovery Journey™ — KB stage configuration.
+ * Progressive Discovery Journey — KB stage configuration.
  */
 
 import progressiveDiscoveryJson from "@/docs/estate-knowledge-base/progressive-discovery.json";

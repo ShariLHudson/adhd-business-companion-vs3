@@ -1,5 +1,5 @@
 /**
- * Spark Conversation Completion™ (Spec 110).
+ * Spark Conversation Completion (Spec 110).
  * STATE 9 — Complete: member decides what happens next; no forced closure.
  *
  * State machine: Spec 107 State 9 (complete) · State 10 (continue)

@@ -1,5 +1,5 @@
 /**
- * planEstateActionExecution™ — maps kernel decision to execution instructions.
+ * planEstateActionExecution — maps kernel decision to execution instructions.
  * Still side-effect free — CompanionPageClient performs the work.
  */
 

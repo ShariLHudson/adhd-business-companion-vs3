@@ -1,5 +1,5 @@
 /**
- * Founder bridge — Executive Simulation Studio™
+ * Founder bridge — Executive Simulation Studio
  */
 import type { MissionId } from "@/lib/founder/missions/types";
 import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";

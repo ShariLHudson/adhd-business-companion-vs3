@@ -1,5 +1,5 @@
 /**
- * The Gallery™ — permanent conservatory hallway architecture.
+ * The Gallery — permanent conservatory hallway architecture.
  * Uses gallery-background as the base plate; do not redesign the hallway.
  */
 

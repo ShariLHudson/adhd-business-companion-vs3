@@ -2,7 +2,7 @@ import type { PeacefulPlace } from "./types";
 
 export const EAST_TERRACE_IMAGE_VERSION = "20260626a" as const;
 
-/** Canonical East Terrace™ session + directory thumbnail. */
+/** Canonical East Terrace session + directory thumbnail. */
 export const EAST_TERRACE_IMAGE =
   `/backgrounds/peaceful-places/east-terrace-peaceful-places.png?v=${EAST_TERRACE_IMAGE_VERSION}` as const;
 

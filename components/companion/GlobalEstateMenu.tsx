@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  ESTATE_MENU_DROPDOWN_ITEMS,
+  ESTATE_MENU_DROPDOWN_ENTRIES,
   type EstateMenuActionId,
 } from "@/lib/estateMenu";
 import { getPrefs } from "@/lib/companionStore";
@@ -165,21 +165,76 @@ export function GlobalEstateMenu({
           </div>
 
           <div className="global-estate-menu__list">
-            {ESTATE_MENU_DROPDOWN_ITEMS.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                role="menuitem"
-                onClick={() => run(item.id)}
-                className="global-estate-menu__item"
-                data-estate-menu-item={item.id}
-              >
-                <span className="global-estate-menu__item-emoji" aria-hidden>
-                  {item.emoji}
-                </span>
-                <span className="global-estate-menu__item-label">{item.label}</span>
-              </button>
-            ))}
+            {ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => {
+              if (entry.kind === "group") {
+                return (
+                  <div
+                    key={entry.id}
+                    className="global-estate-menu__group"
+                    data-estate-menu-group={entry.id}
+                  >
+                    <div
+                      className="global-estate-menu__group-label"
+                      role="presentation"
+                    >
+                      <span
+                        className="global-estate-menu__item-emoji"
+                        aria-hidden
+                      >
+                        {entry.emoji}
+                      </span>
+                      <span className="global-estate-menu__item-label">
+                        {entry.label}
+                      </span>
+                    </div>
+                    <div className="global-estate-menu__group-children">
+                      {entry.children.map((child) => (
+                        <button
+                          key={child.id}
+                          type="button"
+                          role="menuitem"
+                          onClick={() => run(child.id)}
+                          className="global-estate-menu__item global-estate-menu__item--nested"
+                          data-estate-menu-item={child.id}
+                        >
+                          <span
+                            className="global-estate-menu__item-emoji"
+                            aria-hidden
+                          >
+                            {child.emoji}
+                          </span>
+                          <span className="global-estate-menu__item-label">
+                            {child.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <button
+                  key={entry.id}
+                  type="button"
+                  role="menuitem"
+                  onClick={() => run(entry.id)}
+                  className={`global-estate-menu__item${
+                    entry.id === "log-out"
+                      ? " global-estate-menu__item--logout"
+                      : ""
+                  }`}
+                  data-estate-menu-item={entry.id}
+                >
+                  <span className="global-estate-menu__item-emoji" aria-hidden>
+                    {entry.emoji}
+                  </span>
+                  <span className="global-estate-menu__item-label">
+                    {entry.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       ) : null}

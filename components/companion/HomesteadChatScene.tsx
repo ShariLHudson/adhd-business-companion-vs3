@@ -2,21 +2,25 @@
 
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
 import { HomesteadSceneLayers } from "@/components/companion/HomesteadSceneLayers";
+import { useChatBackdropRevision } from "@/lib/chatBackdrop";
 import {
   homesteadLivingRoomImageUrl,
   useHomesteadSceneSurfaceProps,
 } from "@/lib/homesteadScene";
 import { masterLivingRoomImageId } from "@/lib/livingRoomMaster/masterLivingRoom";
 
-/** Fixed living-room homestead background for everyday chat. */
+/** Living-room (or member-chosen) photograph behind everyday chat. */
 export function HomesteadChatScene() {
+  const backdropRevision = useChatBackdropRevision();
   const { surfaceProps } = useHomesteadSceneSurfaceProps({
     surface: "chat",
     welcomePhotographId: masterLivingRoomImageId(),
     className:
       "companion-homestead-chat-scene homestead-scene-surface absolute inset-0",
   });
+  // Re-read preference when member changes background (revision bump).
   const imageUrl = homesteadLivingRoomImageUrl();
+  void backdropRevision;
 
   return (
     <div {...surfaceProps} aria-hidden>

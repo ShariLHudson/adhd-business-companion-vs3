@@ -8,7 +8,7 @@ export const DOCUMENT_LAYER_SUMMARY =
 export const DOCUMENT_LAYERS = [
   {
     id: "vault",
-    label: "Founder Knowledge Vault™",
+    label: "Founder Knowledge Vault",
     role: "Curated executive view",
     description:
       "The permanent executive archive — constitutions, blueprints, prompts, and recovery guides. Not raw file storage.",

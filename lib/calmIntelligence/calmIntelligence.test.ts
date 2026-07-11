@@ -18,7 +18,7 @@ import {
   filterForToday,
 } from "./index";
 
-describe("Calm Intelligence™", () => {
+describe("Calm Intelligence", () => {
   it("states the core principle — knowing does not mean showing", () => {
     expect(CALM_INTELLIGENCE_PRINCIPLE).toContain("does not mean Founder should show it");
     expect(ATTENTION_FILTER_QUESTIONS.length).toBe(5);

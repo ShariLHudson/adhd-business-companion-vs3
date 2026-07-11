@@ -13,7 +13,7 @@ import {
   calculateFocusScore,
 } from "./index";
 
-describe("Executive Command Center™", () => {
+describe("Executive Command Center", () => {
   it("composes full command center from existing intelligence", () => {
     const center = composeCommandCenter({ missionId: "listening-rooms" });
     expect(center.product).toBe("founder");

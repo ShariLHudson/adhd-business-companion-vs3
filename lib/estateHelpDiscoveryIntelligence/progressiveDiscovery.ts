@@ -1,5 +1,5 @@
 /**
- * Progressive discovery — delegates to Progressive Discovery Journey™.
+ * Progressive discovery — delegates to Progressive Discovery Journey.
  */
 
 import {

@@ -53,7 +53,7 @@ describe("discoveryCms validation", () => {
   it("validates structural content for drafts", () => {
     const draft = createDiscoveryDraftTemplate({
       id: "DISC-DRAFT-TEST",
-      title: "Greenhouse™",
+      title: "Greenhouse",
       category: "estate-discovery",
       discoveryText: "A quiet place for ideas still taking root.",
       targetRegistry: "estate-rooms",

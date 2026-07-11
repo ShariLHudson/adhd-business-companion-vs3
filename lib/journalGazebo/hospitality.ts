@@ -1,5 +1,5 @@
 /**
- * Journal Gazebo™ — hospitality copy.
+ * Journal Gazebo — hospitality copy.
  *
  * Spark Estate is designed to make people feel cared for.
  * Warmth over cleverness. Hospitality over efficiency.
@@ -44,17 +44,23 @@ export const JOURNAL_ENVELOPE_ADDRESS = "For You";
 
 export const JOURNAL_CREATE_INVITE = "Let's Create Your Journal";
 
-/** Welcome letter scene — primary first-visit action. */
-export const JOURNAL_WELCOME_CREATE_FIRST = {
-  title: "Begin My Journal",
-  subtitle: "Create a journal that's uniquely yours.",
+/** Table sanctuary — create a new journal. */
+export const JOURNAL_TABLE_CREATE = {
+  title: "Create New Journal",
+  subtitle: "Begin a journal that's uniquely yours.",
 } as const;
 
-/** Available once a journal exists (return visits). */
-export const JOURNAL_WELCOME_OPEN_TODAY = {
-  title: "Open today's page",
-  subtitle: "Take me to my journal and begin writing.",
+/** Table sanctuary — open an existing journal. */
+export const JOURNAL_TABLE_OPEN = {
+  title: "Open My Journal",
+  subtitle: "Continue where you left off.",
 } as const;
+
+/** @deprecated Use JOURNAL_TABLE_CREATE */
+export const JOURNAL_WELCOME_CREATE_FIRST = JOURNAL_TABLE_CREATE;
+
+/** @deprecated Use JOURNAL_TABLE_OPEN */
+export const JOURNAL_WELCOME_OPEN_TODAY = JOURNAL_TABLE_OPEN;
 
 export const JOURNAL_LIBRARY_SHELF_LABEL = "My special journals";
 
@@ -206,7 +212,7 @@ export const JOURNAL_CEREMONY_TODAY_INTRO =
   "When you're ready, turn the page and begin.";
 
 export const JOURNAL_CEREMONY_DEDICATION_PRESENTED =
-  "Presented with love by Spark Estate™";
+  "Presented with love by Spark Estate";
 
 export const JOURNAL_CEREMONY_DEDICATION_WISH =
   "May these pages become part of the story only you can tell.";

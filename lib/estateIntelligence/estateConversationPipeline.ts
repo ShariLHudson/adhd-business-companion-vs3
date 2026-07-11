@@ -1,6 +1,6 @@
 /**
- * Estate Conversation Pipeline™ — single evaluation + hint path for all Estate rooms.
- * Welcome Home, Momentum Builder™, Peaceful Places™, and frosted-chat destinations
+ * Estate Conversation Pipeline — single evaluation + hint path for all Estate rooms.
+ * Welcome Home, Momentum Builder, Peaceful Places, and frosted-chat destinations
  * delegate here instead of parallel routing trees.
  */
 
@@ -115,14 +115,14 @@ export function estateEmotionalAlignmentHint(
   if (overwhelmed) {
     return [
       "EMOTIONAL ALIGNMENT: overwhelmed — simplify, one step, reduce choices.",
-      "Prefer Momentum Builder™ or Clear My Mind™ when Estate matches.",
+      "Prefer Momentum Builder or Clear My Mind when Estate matches.",
     ].join("\n");
   }
   if (calm) {
     return "EMOTIONAL ALIGNMENT: calm — exploration allowed; gentle invitations only.";
   }
   if (curious) {
-    return "EMOTIONAL ALIGNMENT: curious — Observatory™ / Library™ when Estate matches.";
+    return "EMOTIONAL ALIGNMENT: curious — Observatory / Library when Estate matches.";
   }
   return null;
 }
@@ -158,7 +158,7 @@ export function estateInRoomBehaviorHint(
 
 export type EstateConversationHintOptions = {
   hasConversationHistory?: boolean;
-  /** Room-specific coaching hint (Momentum Builder™, etc.) — merged when in-room. */
+  /** Room-specific coaching hint (Momentum Builder, etc.) — merged when in-room. */
   inRoomHint?: string | null;
   overwhelmed?: boolean;
   emotionalState?: string | null;

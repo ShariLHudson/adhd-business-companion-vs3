@@ -7,6 +7,10 @@ import type {
   PrimaryTurnConfidence,
   PrimaryTurnDecision,
 } from "@/lib/conversation/primaryTurnClassifier";
+import {
+  isDiscoveryLanguageNotCreate,
+  isExplicitCreateRequestForRecognition,
+} from "@/lib/sparkRecognitionEngine";
 import type {
   SparkDecisionEngineDecision,
   SparkPrimaryIntent,
@@ -36,6 +40,7 @@ const PRIMARY_OWNERS: Record<PrimaryConversationType, string> = {
   TASK_REQUEST: "frictionless:decision_engine",
   EMOTIONAL_SUPPORT: "frictionless:decision_engine",
   INFORMATION_OR_RESEARCH: "chat:decision_engine",
+  RECOGNITION: "recognition:lifecycle",
 };
 
 function buildAdaptedPrimaryDecision(
@@ -73,12 +78,35 @@ export function primaryTurnFromDecisionEngine(
 
 /**
  * Reconcile legacy primary classification with Decision Engine when engine confidence is high.
- * CREATE + high is terminal — always wins over legacy routers.
+ * CREATE + high is terminal — except discovery language (preserve-first, not Create).
  */
 export function reconcilePrimaryTurnWithDecisionEngine(
   legacy: PrimaryTurnDecision,
   decision: SparkDecisionEngineDecision,
+  userText?: string,
 ): PrimaryTurnDecision {
+  const text = userText?.trim() ?? "";
+  const discoveryNotCreate =
+    Boolean(text) &&
+    isDiscoveryLanguageNotCreate(text) &&
+    !isExplicitCreateRequestForRecognition(text);
+
+  // Recognition lifecycle owns the turn — do not let CREATE override discoveries.
+  if (legacy.type === "RECOGNITION" || discoveryNotCreate) {
+    if (legacy.type === "RECOGNITION") return legacy;
+    return {
+      type: "RECOGNITION",
+      confidence: "high",
+      owner: "recognition:lifecycle",
+      reason:
+        "discovery language — Evidence Vault preserve-first (blocks decision-engine CREATE)",
+      blockKernelNavigation: true,
+      blockBridgeResponder: true,
+      blockCollectionOffer: true,
+      blockSecondaryResponders: true,
+    };
+  }
+
   if (decision.intent === "CREATE" && decision.intentConfidence === "high") {
     return {
       type: "TASK_REQUEST",

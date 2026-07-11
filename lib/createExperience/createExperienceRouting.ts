@@ -1,5 +1,5 @@
 /**
- * Create Experience™ — estate creation routing (not legacy workspace offers).
+ * Create Experience — estate creation routing (not legacy workspace offers).
  * Intent → Create → open tool → continue conversation.
  */
 

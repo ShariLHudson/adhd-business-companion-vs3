@@ -1,4 +1,4 @@
-/** FIRE™ — Founder Intelligence Report Engine™ executive briefing types */
+/** FIRE — Founder Intelligence Report Engine executive briefing types */
 
 import type { FounderWorkspaceId } from "./workspace";
 

@@ -69,7 +69,7 @@ function matchLocationByDisplayName(query: string): string | null {
   const match = longestPhraseMatch(
     probe,
     getLiveEstateLocations(),
-    (loc) => loc.officialDisplayName.replace(/™/g, ""),
+    (loc) => loc.officialDisplayName.replace(/\u2122/g, ""),
     { probeText: probe },
   );
   if (match) return match.item.locationId;
@@ -122,7 +122,7 @@ function buildRoomTarget(
     placeId,
     displayName:
       displayName ??
-      location?.officialDisplayName?.replace(/™/g, "") ??
+      location?.officialDisplayName?.replace(/\u2122/g, "") ??
       matchedPhrase,
     matchedPhrase,
   };

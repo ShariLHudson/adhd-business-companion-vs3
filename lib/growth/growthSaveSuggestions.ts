@@ -70,7 +70,7 @@ export function clearGrowthSaveSuggestion(): void {
 
 export const GROWTH_SAVE_DESTINATION_LABEL: Record<GrowthSaveDestination, string> = {
   wins: "Save to My Wins?",
-  evidence: "Save to Evidence Bank?",
+  evidence: "Save to Evidence Vault?",
   journey: "Save to My Journey?",
   highlights: "Save to My Highlights?",
 };

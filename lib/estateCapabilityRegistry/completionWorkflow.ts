@@ -1,5 +1,5 @@
 /**
- * Completion Workflow™ — every creation ends the same way (Spec 110 + user polish).
+ * Completion Workflow — every creation ends the same way (Spec 110 + user polish).
  */
 
 import type { CompletionWorkflowId } from "./types";

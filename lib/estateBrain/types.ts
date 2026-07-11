@@ -1,5 +1,5 @@
 /**
- * Estate Brain™ — internal knowledge schema for Spark (not member-facing copy).
+ * Estate Brain — internal knowledge schema for Spark (not member-facing copy).
  *
  * One authoritative object per experience and space. Chat, routing, menus,
  * suggestions, and onboarding all read from here.

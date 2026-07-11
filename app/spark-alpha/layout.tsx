@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./spark-alpha.css";
 
 export const metadata: Metadata = {
-  title: "Spark Alpha™",
+  title: "Spark Alpha",
   description: "Relationship prototype — conversation is the interface",
 };
 

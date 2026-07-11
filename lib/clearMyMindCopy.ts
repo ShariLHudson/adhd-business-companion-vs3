@@ -10,28 +10,77 @@ export const CLEAR_MY_MIND_HEADER = "Clear My Mind";
 export const CLEAR_MY_MIND_WORKSPACE_SUBTITLE =
   "Let's get it out of your head together.";
 
-/** Reassurance welcome — inside the frosted workspace only. */
+/**
+ * Entry greeting — Capture Mode only.
+ * Spark does not organize yet; Spark captures.
+ */
 export const CLEAR_MY_MIND_WELCOME_LINES = [
-  "Nothing has to be organized. Write one thought or one hundred. Messy is perfectly okay. I'll help you sort it afterward.",
+  "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.",
 ] as const;
 
-/** Quiet support while the user is still unloading. */
+/** Quiet support while the member is still unloading — never coaching. */
 export const CLEAR_MY_MIND_CAPTURE_SUPPORT_LINES = [
   "Take your time.",
-  "There's no rush.",
-  "You don't have to make it make sense.",
-  "I'm following along.",
+  "Anything else?",
+  "I'm still listening.",
+  "Keep going.",
+  "No rush.",
 ] as const;
 
+export const CLEAR_MY_MIND_ORGANIZE_LABEL = "Organize My Thoughts";
+
+export const CLEAR_MY_MIND_DONE_LABEL = "Done";
+
+export const CLEAR_MY_MIND_VISUAL_THINKING_LABEL = "Visualize";
+
+export const CLEAR_MY_MIND_ADD_MORE_THOUGHTS_LABEL = "Add More Thoughts";
+
+export const CLEAR_MY_MIND_SAVE_FOR_LATER_LABEL = "Continue Later";
+
+export const CLEAR_MY_MIND_FILTER_LABEL = "Filter";
+
+export const CLEAR_MY_MIND_PRIORITIZE_LABEL = "Prioritize";
+
+export const CLEAR_MY_MIND_CONVERT_LABEL = "Create";
+
+export const CLEAR_MY_MIND_SAVE_LABEL = "Save";
+
+export const CLEAR_MY_MIND_EXIT_LABEL = "Exit";
+
+export const CLEAR_MY_MIND_NEXT_PROMPT =
+  "As I looked through what you shared, a few things stood out. What would you like to do next?";
+
+/** Soft reflection lead after Continue — personal, not a report header. */
+export const CLEAR_MY_MIND_REFLECTION_LEAD =
+  "As I looked through what you shared…" as const;
+
+export const CLEAR_MY_MIND_NEXT_SECTION =
+  "What would you like to do next?" as const;
+
+export const CLEAR_MY_MIND_JOURNAL_LIST_LABEL =
+  "What you shared" as const;
+
+export const CLEAR_MY_MIND_SAVED_ACK =
+  "Saved to My Thoughts. You can open My Thoughts anytime to find, filter, or print them.";
+
+export const CLEAR_MY_MIND_CONTINUE_LATER_ACK =
+  "I'll hold this session for you. Come back anytime to continue.";
+
+export const CLEAR_MY_MIND_VISUAL_OFFER =
+  "Would you like to see this visually?";
+
+export const CLEAR_MY_MIND_EXIT_ANNOUNCE =
+  "We've left Clear My Mind for now. Your thoughts are saved whenever you want to return.";
+
 export const CLEAR_MY_MIND_INPUT_PLACEHOLDER =
-  "What's taking up space in your head today?";
+  "Type, speak, or paste everything that's on your mind. Use commas or new lines if you like — nothing has to be organized yet.";
 
 /** Visible Thinking during sort — never loading language. */
 export const CLEAR_MY_MIND_VISIBLE_THINKING_LINES = [
-  "I'm looking for themes.",
-  "Some of these thoughts seem connected.",
-  "I'm noticing a few things that may be causing the most pressure.",
-  "I'm sorting these into manageable pieces.",
+  "As I look through what you shared…",
+  "Taking a quiet moment with these thoughts…",
+  "Sitting with what you wrote…",
+  "Letting the threads come into view…",
 ] as const;
 
 /** After submission — acknowledgment before organizing. */
@@ -48,12 +97,11 @@ export const CLEAR_MY_MIND_MEMORY_YES = "Yes, remember what helps";
 
 export const CLEAR_MY_MIND_MEMORY_NO = "Not right now";
 
-/** Max three gentle next steps. */
+/** Max three gentle next steps — after capture, member-led. */
 export const CLEAR_MY_MIND_SUGGESTIONS = [
   "Let's organize these.",
+  "Would you like to see this visually?",
   "Let's figure out what actually matters today.",
-  "Would it help to move some of these into your parking lot?",
-  "Which one feels heaviest right now?",
 ] as const;
 
 /** @deprecated Use CLEAR_MY_MIND_WELCOME_LINES */
@@ -73,9 +121,14 @@ export const CLEAR_MY_MIND_RELEASE_DONE_LABEL =
 export const CLEAR_MY_MIND_RELEASE_DONE_HINT =
   "When you're ready, I'll receive what you shared.";
 
-/** After Share — encourages continuous capture. */
-export const CLEAR_MY_MIND_CONTINUE_PROMPT =
-  "What else is taking up space?";
+/** After Share — encourages continuous capture (never coaching). */
+export const CLEAR_MY_MIND_CONTINUE_PROMPT = "Anything else?";
+
+export function clearMyMindCaptureSupportLine(submissionIndex: number): string {
+  const lines = CLEAR_MY_MIND_CAPTURE_SUPPORT_LINES;
+  const i = Math.max(0, submissionIndex - 1) % lines.length;
+  return lines[i]!;
+}
 
 export function clearMyMindHeldCountLine(count: number): string {
   const n = Math.max(0, Math.floor(count));
@@ -87,10 +140,10 @@ export function clearMyMindHeldCountLine(count: number): string {
 }
 
 export const CLEAR_MY_MIND_ACK_CONTINUE_LABEL =
-  "See what I'm noticing";
+  "Look through these with me";
 
-/** @deprecated Capture never ends — organization lives in My Thoughts. */
-export const CLEAR_MY_MIND_ADD_MORE_LABEL = "Add more thoughts";
+/** @deprecated Use CLEAR_MY_MIND_ADD_MORE_THOUGHTS_LABEL */
+export const CLEAR_MY_MIND_ADD_MORE_LABEL = "Add More Thoughts";
 
 export const CLEAR_MY_MIND_SPLIT_HEADLINE = THOUGHT_SEPARATE_INTRO;
 
@@ -100,13 +153,23 @@ export const CLEAR_MY_MIND_SPLIT_CONFIRM = "Yes, separate them";
 
 export const CLEAR_MY_MIND_SPLIT_KEEP = "Keep as one thought";
 
-/** Primary capture action — clear for first-time users. */
-export const CLEAR_MY_MIND_CAPTURE_BUTTON = "Save";
+/** Primary capture action — guided Continue, never "Save". */
+export const CLEAR_MY_MIND_CAPTURE_BUTTON = "Continue";
 
-export const CLEAR_MY_MIND_CAPTURE_BUTTON_MORE = "Save more";
+export const CLEAR_MY_MIND_CAPTURE_BUTTON_MORE = "Continue";
 
-/** Brief button confirmation after Share — emotional, not functional. */
+/** Brief confirmation while thoughts are received. */
 export const CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM = "I've got it.";
+
+/** Secondary capture action — review thoughts already captured this session. */
+export const CLEAR_MY_MIND_REVIEW_THOUGHTS_LABEL = "Review Thoughts";
+
+export function clearMyMindCapturedCountLine(count: number): string {
+  const n = Math.max(0, Math.floor(count));
+  if (n === 0) return "Nothing captured yet — keep going whenever you're ready.";
+  if (n === 1) return "1 thought captured. Still raw — nothing organized yet.";
+  return `${n} thoughts captured. Still raw — nothing organized yet.`;
+}
 
 /** How long the Share button shows confirmation before returning to idle. */
 export const CLEAR_MY_MIND_SHARE_CONFIRM_MS = 1400;

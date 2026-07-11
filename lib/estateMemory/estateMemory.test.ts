@@ -12,7 +12,7 @@ import {
 } from "./estateMemoryContinuity";
 import { estateMemoryHintForChat } from "./estateMemoryHint";
 
-describe("Estate Memory Store™", () => {
+describe("Estate Memory Store", () => {
   beforeEach(() => {
     __resetEstateMemoryCacheForTests();
     vi.stubGlobal("sessionStorage", {
@@ -40,7 +40,7 @@ describe("Estate Memory Store™", () => {
   });
 });
 
-describe("Estate Memory Continuity™", () => {
+describe("Estate Memory Continuity", () => {
   beforeEach(() => {
     __resetEstateMemoryCacheForTests();
     resetEstateMemory();
@@ -101,7 +101,7 @@ describe("Estate Memory Continuity™", () => {
     mem.activeJourney.steps = [
       {
         entryId: "momentum-builder",
-        roomName: "Momentum Builder™",
+        roomName: "Momentum Builder",
         section: "momentum-builder",
         enteredAt: new Date().toISOString(),
       },

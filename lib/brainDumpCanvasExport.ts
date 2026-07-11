@@ -124,3 +124,75 @@ export function printBrainDumpVisual(element: HTMLElement | null): void {
   w.focus();
   w.print();
 }
+
+/** Plain-text session list for Print / Copy from Organize & Filter. */
+export function buildClearMyMindSessionListText(
+  entries: { text: string; category?: string | null; topic?: string | null }[],
+): string {
+  if (entries.length === 0) return "Clear My Mind — no thoughts yet.";
+  const lines = ["Clear My Mind", ""];
+  const byBucket = new Map<string, string[]>();
+  for (const entry of entries) {
+    const key = (entry.category || entry.topic || "Unsorted").trim() || "Unsorted";
+    const list = byBucket.get(key) ?? [];
+    list.push(entry.text.trim());
+    byBucket.set(key, list);
+  }
+  for (const [bucket, thoughts] of byBucket) {
+    lines.push(`${bucket} (${thoughts.length})`);
+    for (const thought of thoughts) {
+      lines.push(`  • ${thought}`);
+    }
+    lines.push("");
+  }
+  return lines.join("\n").trim();
+}
+
+export function printClearMyMindSessionList(
+  entries: { text: string; category?: string | null; topic?: string | null }[],
+): void {
+  if (typeof window === "undefined") return;
+  const body = buildClearMyMindSessionListText(entries)
+    .split("\n")
+    .map((line) => {
+      if (!line) return "<br/>";
+      if (line.startsWith("  • ")) {
+        return `<li>${escapeXml(line.slice(4))}</li>`;
+      }
+      if (line === "Clear My Mind") {
+        return `<h1>${escapeXml(line)}</h1>`;
+      }
+      return `<h2>${escapeXml(line)}</h2>`;
+    })
+    .join("\n");
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`
+    <html><head><title>Clear My Mind</title>
+    <style>
+      body{font-family:system-ui,sans-serif;padding:32px;background:#faf7f2;color:#1f1c19;font-size:16px;line-height:1.5;}
+      h1{font-size:1.5rem;margin:0 0 1rem;}
+      h2{font-size:1.1rem;margin:1.25rem 0 0.5rem;}
+      li{margin:0.25rem 0;}
+      ul{margin:0;padding-left:1.25rem;}
+    </style>
+    </head><body>${body.replace(/<\/h2>\n(?=<li)/g, "</h2><ul>").replace(/(<\/li>\n)(?=<h2)/g, "</li></ul>")}</body></html>
+  `);
+  w.document.close();
+  w.focus();
+  w.print();
+}
+
+export async function copyClearMyMindSessionList(
+  entries: { text: string; category?: string | null; topic?: string | null }[],
+): Promise<boolean> {
+  if (typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
+    return false;
+  }
+  try {
+    await navigator.clipboard.writeText(buildClearMyMindSessionListText(entries));
+    return true;
+  } catch {
+    return false;
+  }
+}

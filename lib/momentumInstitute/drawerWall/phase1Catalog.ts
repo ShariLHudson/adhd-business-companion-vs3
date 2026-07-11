@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ Phase 1 — placeholder catalog for drawer-wall interaction.
+ * Momentum Institute Phase 1 — placeholder catalog for drawer-wall interaction.
  * Structural data only — no lesson bodies.
  */
 
@@ -215,7 +215,7 @@ function buildPhase1Catalog(): MomentumInstituteCatalog {
         topicId,
         drawerId,
         departmentId: dept.id,
-        title: `${cardTitle} — Business Mastery Minute™`,
+        title: `${cardTitle} — Business Mastery Minute`,
         summary: "Placeholder experience shell.",
         estimatedMinutes: 5,
         competencyIds: [],
@@ -278,7 +278,7 @@ function buildPhase1Catalog(): MomentumInstituteCatalog {
     institute: {
       id: INSTITUTE_ID,
       slug: "momentum-institute",
-      title: "Momentum Institute™",
+      title: "Momentum Institute",
       subtitle: "Entrepreneur Development Center",
       tagline: "Who do you want to become?",
       pillarIds: SPARK_COMPETENCY_FRAMEWORK_V1.pillars.map((p) => p.id),

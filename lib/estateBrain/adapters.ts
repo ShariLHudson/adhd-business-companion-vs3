@@ -1,5 +1,5 @@
 /**
- * Estate Brain™ — adapters so legacy modules read one source of truth.
+ * Estate Brain — adapters so legacy modules read one source of truth.
  */
 
 import type { EstateExperienceDefinition } from "@/lib/estateExperiences/types";

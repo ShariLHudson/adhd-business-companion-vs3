@@ -51,7 +51,7 @@ export type GalleryWeather =
   | "snow"
   | "wind";
 
-/** Environmental Experience Intelligence™ — believable, organic estate state. */
+/** Environmental Experience Intelligence — believable, organic estate state. */
 export type GalleryEnvironmentState = {
   timeOfDay: GalleryTimeOfDay;
   season: GallerySeason;

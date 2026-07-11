@@ -33,7 +33,7 @@ function nextId() {
 }
 
 /**
- * Spark™ Prototype 4 — The Relationship Prototype
+ * Spark Prototype 4 — The Relationship Prototype
  *
  * The conversation is primary. The document is secondary.
  * The room is always present. Never ask the member to navigate.

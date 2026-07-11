@@ -1,4 +1,4 @@
-/** Companion Intelligence Governor™ — coordinates all executive intelligence. */
+/** Companion Intelligence Governor — coordinates all executive intelligence. */
 
 import type { MissionId } from "@/lib/founder/missions/types";
 

@@ -10,7 +10,7 @@ type Props = {
   children: ReactNode;
 };
 
-/** Grow™ — entrepreneurial capability landing and sub-rooms. */
+/** Grow — entrepreneurial capability landing and sub-rooms. */
 export function GrowRoomShell({ children }: Props) {
   useEffect(() => {
     preloadRoomBackground(GROWTH_ROOM_BG);

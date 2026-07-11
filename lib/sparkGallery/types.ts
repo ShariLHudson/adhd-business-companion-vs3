@@ -1,12 +1,12 @@
 /**
- * Gallery™ Framework (T-015).
+ * Gallery Framework (T-015).
  * Philosophy and architecture — preserves transformation, not activity.
  * Runtime wall frames: lib/gallery/types.ts (V1 hallway implementation).
  *
  * @see docs/GALLERY_FRAMEWORK.md
  */
 
-/** Gallery Categories™ — seven preservation lenses */
+/** Gallery Categories — seven preservation lenses */
 export type GalleryCategory =
   | "milestones"
   | "breakthroughs"
@@ -90,7 +90,7 @@ export const GALLERY_EXCLUDED_ACTIVITIES: readonly GalleryExcludedActivity[] = [
   "minor_action",
 ] as const;
 
-/** Reflection Prompts™ — deepen memory without guilt */
+/** Reflection Prompts — deepen memory without guilt */
 export const GALLERY_REFLECTION_PROMPTS = [
   "What changed because of this?",
   "What did you learn?",
@@ -122,7 +122,7 @@ export const GALLERY_SEARCH_DIMENSIONS: readonly GallerySearchDimension[] = [
   "projects",
 ] as const;
 
-/** Business Asset™ story preserved in Gallery */
+/** Business Asset story preserved in Gallery */
 export type GalleryBusinessAssetStory = {
   businessAssetId: string;
   createdAt: string;
@@ -133,7 +133,7 @@ export type GalleryBusinessAssetStory = {
   relatedMomentumBuilderIds?: string[];
 };
 
-/** Gallery Preservation Gate™ — before writing any memory */
+/** Gallery Preservation Gate — before writing any memory */
 export const GALLERY_PRESERVATION_QUESTIONS = [
   "Should this become part of Gallery?",
   "What category?",

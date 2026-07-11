@@ -13,7 +13,7 @@ import {
 } from "../sample/officePreparation";
 import type { PreparedOffice } from "../types";
 
-/** Executive Concierge™ — prepares Founder Studio before Shari arrives. */
+/** Executive Concierge — prepares Founder Studio before Shari arrives. */
 export const ExecutiveConciergeService = {
   prepareOffice(): PreparedOffice {
     return prepareOfficePreparation();

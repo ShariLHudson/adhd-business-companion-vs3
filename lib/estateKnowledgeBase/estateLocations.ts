@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — location directory loader.
+ * Estate Knowledge Base — location directory loader.
  */
 
 import estateLocationsJson from "@/docs/estate-knowledge-base/estate-locations.json";

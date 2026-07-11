@@ -7,7 +7,7 @@ import {
   resolveObjectIntent,
 } from "./resolveObjectIntent";
 
-describe("Estate Object Intelligence™", () => {
+describe("Estate Object Intelligence", () => {
   it("resolves telescope visual reference", () => {
     const alias = matchObjectAlias("What is that telescope?");
     expect(alias?.objectId).toBe("observatory-telescope");
@@ -23,6 +23,12 @@ describe("Estate Object Intelligence™", () => {
     expect(resolution.object?.objectId).toBe("kinsey");
     expect(resolution.object?.objectType).toBe("character");
     expect(resolution.memberFacingAnswer).toContain("Kinsey");
+  });
+
+  it("resolves Kinsey from dog name in the picture", () => {
+    const resolution = resolveObjectIntent("What is the dog's name in the picture?");
+    expect(resolution.object?.objectId).toBe("kinsey");
+    expect(resolution.memberFacingAnswer).toContain("That is Kinsey");
   });
 
   it("resolves discovery chest from that chest", () => {

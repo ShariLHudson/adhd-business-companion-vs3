@@ -48,7 +48,7 @@ describe("estateRoomAliasRegistry", () => {
       ["journal gazebo", "journal"],
       ["reflection pond", "reflection-pond"],
       ["pool", "summer-terrace"],
-      ["hall of accomplishments", "gallery-of-firsts"],
+      ["hall of accomplishments", "portfolio"],
     ];
     for (const [phrase, roomId] of cases) {
       expect(resolveEstateRoomAliasExact(phrase)).toBe(roomId);

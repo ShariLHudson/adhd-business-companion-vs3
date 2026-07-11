@@ -1,5 +1,5 @@
 /**
- * Spark Experience Engine™ — V1 scaffold (behavior, not screens).
+ * Spark Experience Engine — V1 scaffold (behavior, not screens).
  */
 
 import { resolveWelcomeHomeDailyGreeting } from "@/lib/welcomeHome/dailyGreeting";

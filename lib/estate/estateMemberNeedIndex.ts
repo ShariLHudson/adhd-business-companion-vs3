@@ -1,5 +1,5 @@
 /**
- * Estate Member Need Index™ — unified need → place phrase index (Phase 1).
+ * Estate Member Need Index — unified need → place phrase index (Phase 1).
  *
  * Members speak in needs, not room names. This index is the additive foundation
  * for conversation-accurate routing. Legacy matchers remain until Phase 2.
@@ -131,7 +131,7 @@ const PHRASE_RULES: readonly PhraseRule[] = [
     placeIds: ["journal"],
     primaryPlaceId: "journal",
     confidence: "high",
-    reason: "express need → Journal Gazebo™",
+    reason: "express need → Journal Gazebo",
   },
   {
     id: "express-journal",
@@ -141,7 +141,7 @@ const PHRASE_RULES: readonly PhraseRule[] = [
     placeIds: ["journal"],
     primaryPlaceId: "journal",
     confidence: "high",
-    reason: "journal intent → Journal Gazebo™",
+    reason: "journal intent → Journal Gazebo",
   },
   {
     id: "reflect-process",
@@ -243,7 +243,7 @@ const PHRASE_RULES: readonly PhraseRule[] = [
     placeIds: ["evidence-vault"],
     primaryPlaceId: "evidence-vault",
     confidence: "high",
-    reason: "prove need → Evidence Vault™",
+    reason: "prove need → Evidence Vault",
   },
   {
     id: "prove-evidence",
@@ -253,7 +253,7 @@ const PHRASE_RULES: readonly PhraseRule[] = [
     placeIds: ["evidence-vault"],
     primaryPlaceId: "evidence-vault",
     confidence: "high",
-    reason: "evidence language → Evidence Vault™",
+    reason: "evidence language → Evidence Vault",
   },
 
   // ── Achievement library ──
@@ -266,7 +266,7 @@ const PHRASE_RULES: readonly PhraseRule[] = [
     placeIds: ["library"],
     primaryPlaceId: "library",
     confidence: "high",
-    reason: "accomplishments → Achievement Library™",
+    reason: "accomplishments → Achievement Library",
   },
 
   // ── Greenhouse seeds ──
@@ -278,7 +278,7 @@ const PHRASE_RULES: readonly PhraseRule[] = [
     placeIds: ["greenhouse"],
     primaryPlaceId: "greenhouse",
     confidence: "medium",
-    reason: "seed/idea → Growth Greenhouse™",
+    reason: "seed/idea → Growth Greenhouse",
   },
 ];
 

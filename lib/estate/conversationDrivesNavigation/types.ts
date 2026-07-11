@@ -1,5 +1,5 @@
 /**
- * Conversation Drives Navigation™ — types.
+ * Conversation Drives Navigation — types.
  *
  * Member expresses a need → Spark understands → gentle Estate environment offer.
  * Not click-navigation. Spec 108: invitation only; member stays or moves.

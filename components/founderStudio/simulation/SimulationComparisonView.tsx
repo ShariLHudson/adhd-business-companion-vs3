@@ -24,7 +24,7 @@ export function SimulationComparisonView({
       </button>
 
       <header className="founder-simulation__header">
-        <p className="founder-simulation__meta">Think Before You Build™ · {simulation.scenarios.length} paths</p>
+        <p className="founder-simulation__meta">Think Before You Build · {simulation.scenarios.length} paths</p>
         <h2 className="founder-simulation__title">{simulation.decisionQuestion}</h2>
       </header>
 

@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — expert team and chamber member collaboration architecture (Phase 33).
+ * Spark Estate — expert team and chamber member collaboration architecture (Phase 33).
  * One trusted companion coordinates specialized intelligence behind the scenes.
  *
  * @see docs/protocols/SPARK_ESTATE_EXPERT_TEAM_AND_CHAMBER_MEMBER_COLLABORATION_ARCHITECTURE_PHASE33.md
@@ -90,7 +90,7 @@ export const SPARK_ESTATE_EXPERT_COLLABORATION_AVOID = [
 ] as const;
 
 export const SPARK_ESTATE_CHAMBER_COORDINATED_WORKSPACE = {
-  label: "Chamber of Momentum™",
+  label: "Chamber of Momentum",
   bringsTogether: [
     "planning",
     "expertise",
@@ -504,7 +504,7 @@ export function formatSparkEstateExpertCollaborationReport(
   });
 
   const lines: string[] = [
-    `Spark Estate™ expert collaboration: ${verification.collaborationReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate expert collaboration: ${verification.collaborationReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_EXPERT_COLLABORATION_PRINCIPLE,
     SPARK_ESTATE_EXPERT_COLLABORATION_VISION,
     SPARK_ESTATE_EXPERT_COLLABORATION_SUCCESS_TEST,

@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — intelligent project lifecycle engine (Phase 32).
+ * Spark Estate — intelligent project lifecycle engine (Phase 32).
  * Manages projects from first idea through completion and future reuse.
  *
  * @see docs/protocols/SPARK_ESTATE_INTELLIGENT_PROJECT_LIFECYCLE_ENGINE_SPECIFICATION_PHASE32.md
@@ -140,7 +140,7 @@ export type SparkEstateProjectLifecycleStageId =
 export const SPARK_ESTATE_PROJECT_ENTRY_POINTS = [
   {
     id: "chamber",
-    label: "Chamber of Momentum™",
+    label: "Chamber of Momentum",
     recommendedFor: ["larger projects", "multiple steps", "planning needs"],
   },
   {
@@ -183,17 +183,17 @@ export const SPARK_ESTATE_PROJECT_INTELLIGENCE_SUPPORT = {
 export const SPARK_ESTATE_PROJECT_LIFECYCLE_CARDS = [
   {
     kind: "project-card",
-    label: "Project Card™",
+    label: "Project Card",
     shows: ["project name", "status", "next step"],
   },
   {
     kind: "momentum-card",
-    label: "Momentum Card™",
+    label: "Momentum Card",
     shows: ["progress", "encouragement"],
   },
   {
     kind: "win-card",
-    label: "Win Card™",
+    label: "Win Card",
     shows: ["completion", "achievement"],
   },
 ] as const;
@@ -490,7 +490,7 @@ export function formatSparkEstateProjectLifecycleReport(
   compliance: ReturnType<typeof assessSparkEstateProjectLifecycleCompliance> = assessSparkEstateProjectLifecycleCompliance(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ project lifecycle: ${verification.lifecycleReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate project lifecycle: ${verification.lifecycleReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_PROJECT_LIFECYCLE_PRINCIPLE,
     SPARK_ESTATE_PROJECT_LIFECYCLE_VISION,
     `Journey: ${SPARK_ESTATE_PROJECT_LIFECYCLE_SUCCESS_JOURNEY.from} → ${SPARK_ESTATE_PROJECT_LIFECYCLE_SUCCESS_JOURNEY.to}`,

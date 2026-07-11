@@ -1,5 +1,5 @@
 /**
- * Estate Expert Registry™ — internal advisors Spark selects automatically.
+ * Estate Expert Registry — internal advisors Spark selects automatically.
  * Members never choose experts; Spark integrates expertise invisibly.
  */
 

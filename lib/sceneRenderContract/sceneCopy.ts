@@ -42,8 +42,7 @@ const SCENE_COPY: Record<SceneWorkspaceId, SceneCopy> = {
   },
   breathe: {
     title: "Breathe",
-    subtitle:
-      "Pick a pattern and length — energizing breaths stay under 1 minute to keep it safe and light.",
+    subtitle: "Stay with your breath — the estate is quiet with you.",
   },
   "focus-audio": {
     title: "Peaceful Places",

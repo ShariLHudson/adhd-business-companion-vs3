@@ -1,5 +1,5 @@
 /**
- * Estate Turn Orchestration™ — Phase 2A shadow evaluator.
+ * Estate Turn Orchestration — Phase 2A shadow evaluator.
  *
  * Single decision per turn for future handleSend wiring. Observe-only today.
  *

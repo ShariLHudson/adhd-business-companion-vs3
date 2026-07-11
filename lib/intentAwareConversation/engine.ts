@@ -1,5 +1,5 @@
 /**
- * Intent-Aware Conversation Framework™ — evaluate depth and purpose per turn.
+ * Intent-Aware Conversation Framework — evaluate depth and purpose per turn.
  */
 
 import {

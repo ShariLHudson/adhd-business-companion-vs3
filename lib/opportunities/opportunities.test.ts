@@ -6,7 +6,7 @@ import {
   OPPORTUNITY_DISCOVERY_PRINCIPLE,
 } from "./index";
 
-describe("Opportunity Discovery Center™ engine", () => {
+describe("Opportunity Discovery Center engine", () => {
   it("exposes discovery principle", () => {
     expect(OPPORTUNITY_DISCOVERY_PRINCIPLE).toContain("build next");
   });

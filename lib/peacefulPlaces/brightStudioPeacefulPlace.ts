@@ -2,7 +2,7 @@ import type { PeacefulPlace } from "./types";
 
 export const BRIGHT_STUDIO_IMAGE_VERSION = "20260628a" as const;
 
-/** Canonical Bright Studio™ session + directory thumbnail. */
+/** Canonical Bright Studio session + directory thumbnail. */
 export const BRIGHT_STUDIO_IMAGE =
   `/backgrounds/peaceful-places/bright-studio-peaceful-places.png?v=${BRIGHT_STUDIO_IMAGE_VERSION}` as const;
 

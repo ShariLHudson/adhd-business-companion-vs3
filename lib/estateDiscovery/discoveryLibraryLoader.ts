@@ -1,5 +1,5 @@
 /**
- * Discovery Library™ — load discovery records from CMS repository (JSON V1).
+ * Discovery Library — load discovery records from CMS repository (JSON V1).
  */
 
 import {

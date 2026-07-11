@@ -23,6 +23,8 @@ export const CINEMATIC_PRESET_IDS = [
   "story-library",
   "capture-moment",
   "momentum-games",
+  "ocean-conservatory",
+  "chamber-of-momentum",
   "default",
 ] as const;
 

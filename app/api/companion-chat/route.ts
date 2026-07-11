@@ -17,6 +17,7 @@ import {
 } from "@/lib/sparkConversation/coachingFallback";
 import { sanitizeBridgeFromReply } from "@/lib/sparkConversation/bridgeResponderGuard";
 import { shariCompanionHintForChat } from "@/lib/conversation/shariCompanionEngine";
+import { buildCanonContextBlockForChat } from "@/lib/canonContext";
 import {
   buildRelationshipResponseTraceSummary,
   createRelationshipResponseId,
@@ -207,10 +208,14 @@ export async function POST(request: NextRequest) {
       : "";
 
     const shariCompanionBlock = shariCompanionHintForChat({ userText: userProbe });
+    const canonContextBlock = buildCanonContextBlockForChat({
+      userText: userProbe,
+      roomId: typeof body.currentRoom === "string" ? body.currentRoom : null,
+    });
 
     const finalSystem = `${priorityBlock}${
       businessContext ? `${systemPrompt}\n\n${businessContext}` : systemPrompt
-    }${shariCompanionBlock ? `\n\n${shariCompanionBlock}` : ""}${attune}${ecosystemBlock}${intelligenceBlock}${wisdomLoopBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
+    }${shariCompanionBlock ? `\n\n${shariCompanionBlock}` : ""}\n\n${canonContextBlock}${attune}${ecosystemBlock}${intelligenceBlock}${wisdomLoopBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
 
     if (process.env.NODE_ENV === "development" && relationshipIntelligencePriority) {
       console.debug("[relationship-intelligence-debug] API priority received", {

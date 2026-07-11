@@ -1,5 +1,5 @@
 /**
- * Intent-First Estate Navigation™ — member goals, not room names.
+ * Intent-First Estate Navigation — member goals, not room names.
  *
  * People think in goals. Spark chooses environment, tools, and experience.
  *

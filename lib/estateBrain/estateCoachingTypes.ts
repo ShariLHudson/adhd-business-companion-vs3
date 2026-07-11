@@ -1,5 +1,5 @@
 /**
- * Estate Coaching Architecture™ — experiences as prescriptions, not destinations.
+ * Estate Coaching Architecture — experiences as prescriptions, not destinations.
  *
  * @see docs/estate/ESTATE_COACHING_ARCHITECTURE.md
  */

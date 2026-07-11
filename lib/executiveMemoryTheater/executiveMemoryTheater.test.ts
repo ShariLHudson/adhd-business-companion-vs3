@@ -6,7 +6,7 @@ import {
   MEMORY_THEATER_PRINCIPLE,
 } from "./index";
 
-describe("Executive Memory Theater™ engine", () => {
+describe("Executive Memory Theater engine", () => {
   it("exposes memory theater principle", () => {
     expect(MEMORY_THEATER_PRINCIPLE).toContain("wisdom");
   });

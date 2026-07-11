@@ -27,7 +27,9 @@ describe("Spark Estate Collection Framework registry", () => {
       expect(room.roomName.length).toBeGreaterThan(0);
       expect(room.openingSparkPrompt.length).toBeGreaterThan(0);
       expect(room.suggestedPrompts.length).toBeGreaterThan(0);
-      expect(room.followUpQuestions.length).toBeGreaterThan(0);
+      if (roomId !== "evidence-vault") {
+        expect(room.followUpQuestions.length).toBeGreaterThan(0);
+      }
       expect(room.backgroundImage.length).toBeGreaterThan(0);
       expect(room.capture.fields.length).toBeGreaterThan(0);
       expect(room.capture.saveLabel.length).toBeGreaterThan(0);

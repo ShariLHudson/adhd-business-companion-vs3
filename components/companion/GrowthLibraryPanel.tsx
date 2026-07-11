@@ -10,7 +10,7 @@ type Props = {
   onOpenTimeline?: () => void;
 };
 
-/** Achievement Library — Spark Estate Collection Framework™ */
+/** Achievement Library — Spark Estate Collection Framework */
 export function GrowthLibraryPanel({ onBack, backLabel }: Props) {
   return (
     <EstateCollectionRoomPanel

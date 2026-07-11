@@ -1,5 +1,5 @@
 /**
- * Momentum Institute Engine™ — public API.
+ * Momentum Institute Engine — public API.
  */
 
 export type {

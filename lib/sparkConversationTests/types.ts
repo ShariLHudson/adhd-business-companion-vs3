@@ -1,5 +1,5 @@
 /**
- * Conversation Validation™ (Spec 119).
+ * Conversation Validation (Spec 119).
  * Architecture FROZEN — validate companion behavior; break the engine.
  *
  * Answer key: Spec 116 — docs/conversation-gold-standards/
@@ -50,13 +50,13 @@ export const CONVERSATION_TEST_QA_GATES: readonly {
   order: number;
 }[] = [
   { gate: "conversation_quality", title: "Gate 1 — Conversation Quality (1–10)", order: 1 },
-  { gate: "hospitality", title: "Gate 2 — Hospitality™ (Spec 111)", order: 2 },
-  { gate: "cognitive_load", title: "Gate 3 — Cognitive Load Audit™", order: 3 },
-  { gate: "iceberg", title: "Gate 4 — Iceberg Audit™ (Spec 118)", order: 4 },
-  { gate: "relief", title: "Gate 5 — Relief Test™", order: 5 },
-  { gate: "future_me", title: "Gate 6 — Future Me Test™", order: 6 },
-  { gate: "spark_question", title: "Gate 7 — The Spark Question™", order: 7 },
-  { gate: "shari_over_shoulder", title: "Gate 8 — Shari Over-the-Shoulder Review™", order: 8 },
+  { gate: "hospitality", title: "Gate 2 — Hospitality (Spec 111)", order: 2 },
+  { gate: "cognitive_load", title: "Gate 3 — Cognitive Load Audit", order: 3 },
+  { gate: "iceberg", title: "Gate 4 — Iceberg Audit (Spec 118)", order: 4 },
+  { gate: "relief", title: "Gate 5 — Relief Test", order: 5 },
+  { gate: "future_me", title: "Gate 6 — Future Me Test", order: 6 },
+  { gate: "spark_question", title: "Gate 7 — The Spark Question", order: 7 },
+  { gate: "shari_over_shoulder", title: "Gate 8 — Shari Over-the-Shoulder Review", order: 8 },
 ] as const;
 
 /** Gate 1 — Conversation Quality */
@@ -158,14 +158,14 @@ export const CONVERSATION_TEST_ICEBERG_CHECKLIST: readonly {
   id: ConversationTestIcebergItemId;
   label: string;
 }[] = [
-  { id: "brain_retrieval", label: "Business Brain™ retrieval" },
-  { id: "asset_connections", label: "Business Assets™ connections" },
+  { id: "brain_retrieval", label: "Business Brain retrieval" },
+  { id: "asset_connections", label: "Business Assets connections" },
   { id: "research_prep", label: "Research preparation" },
   { id: "draft_prep", label: "Draft preparation" },
   { id: "related_conversations", label: "Related conversations linked" },
   { id: "memory_updates_proposed", label: "Memory updates (proposed)" },
   { id: "opportunity_detection", label: "Opportunity detection" },
-  { id: "spark_card_opportunity", label: "Spark Card™ opportunities" },
+  { id: "spark_card_opportunity", label: "Spark Card opportunities" },
   { id: "hidden_intent_hypothesis", label: "Hidden intent hypothesis (CT-11)" },
 ] as const;
 

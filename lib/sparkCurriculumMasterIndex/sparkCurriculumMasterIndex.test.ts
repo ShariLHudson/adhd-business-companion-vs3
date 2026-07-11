@@ -9,7 +9,7 @@ import {
 } from "./masterIndex";
 import { CURRICULUM_EXPERIENCE_KINDS } from "./types";
 
-describe("Spark Curriculum Master Index™", () => {
+describe("Spark Curriculum Master Index", () => {
   it("has unique curriculum entry ids", () => {
     const ids = getAllCurriculumEntries().map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);

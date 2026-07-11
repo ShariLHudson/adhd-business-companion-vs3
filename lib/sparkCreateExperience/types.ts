@@ -1,5 +1,5 @@
 /**
- * Create™ Experience Philosophy (Spec 104).
+ * Create Experience Philosophy (Spec 104).
  * How building a business inside Spark should feel — not screens or workflows.
  *
  * @see docs/CREATE_EXPERIENCE_PHILOSOPHY.md
@@ -27,7 +27,7 @@ export const CREATE_PURPOSE_OUTCOME_LABELS: Record<CreatePurposeOutcome, string>
   increase_confidence: "Increase Confidence",
 };
 
-/** Governing Create™ principles — Spec 104 */
+/** Governing Create principles — Spec 104 */
 export type CreateExperiencePrinciple =
   | "hero"
   | "collaboration"
@@ -51,7 +51,7 @@ export const CREATE_EXPERIENCE_PRINCIPLES: readonly CreateExperiencePrinciple[] 
   "executive_function",
 ] as const;
 
-/** Connected Creation™ — ecosystem targets */
+/** Connected Creation — ecosystem targets */
 export type CreateEcosystemConnection =
   | "business_brain"
   | "business_assets"
@@ -111,7 +111,7 @@ export const CREATE_COGNITIVE_LOAD_MAXIMIZE: readonly CreateCognitiveLoadMaximiz
   "progress",
 ] as const;
 
-/** Guidance Philosophy™ — never generate before understanding */
+/** Guidance Philosophy — never generate before understanding */
 export const CREATE_GUIDANCE_FLOW = [
   "understand",
   "guide",
@@ -121,7 +121,7 @@ export const CREATE_GUIDANCE_FLOW = [
 
 export type CreateGuidanceFlowStage = (typeof CREATE_GUIDANCE_FLOW)[number];
 
-/** Reflection Philosophy™ */
+/** Reflection Philosophy */
 export const CREATE_REFLECTION_PROMPTS = [
   "What did I learn?",
   "What worked?",
@@ -129,7 +129,7 @@ export const CREATE_REFLECTION_PROMPTS = [
   "How does this strengthen my business?",
 ] as const;
 
-/** Decision domains strengthened through Create™ */
+/** Decision domains strengthened through Create */
 export type CreateDecisionDomain =
   | "marketing"
   | "sales"
@@ -153,7 +153,7 @@ export const CREATE_DECISION_DOMAINS: readonly CreateDecisionDomain[] = [
   "leadership",
 ] as const;
 
-/** Success Metrics™ */
+/** Success Metrics */
 export type CreateExperienceSuccessMetric =
   | "think_more_clearly"
   | "creating_easier"
@@ -172,7 +172,7 @@ export const CREATE_EXPERIENCE_SUCCESS_METRICS: readonly CreateExperienceSuccess
     "becoming_better_entrepreneur",
   ] as const;
 
-/** What Create™ should never become */
+/** What Create should never become */
 export type CreateAntiPattern =
   | "prompt_library"
   | "form_builder"

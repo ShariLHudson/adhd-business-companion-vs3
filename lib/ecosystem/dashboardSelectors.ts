@@ -367,7 +367,7 @@ export function selectOpportunities(events: FounderEvent[]): OpportunityView[] {
 // ---- 6. Pain Points / Patterns -----------------------------------------
 const PAIN_RULES: { category: PainPointCategory; label: string; re: RegExp; path: string }[] = [
   { category: "overwhelm", label: "Overwhelm", re: /overwhelm|too much|so much|drowning|everything at once/i, path: "Clear My Mind, then pick one next step" },
-  { category: "low-energy", label: "Low energy", re: /low energy|no energy|tired|exhaust|drained|burn(t|ed) out/i, path: "Smaller steps today + Breathe & Reset" },
+  { category: "low-energy", label: "Low energy", re: /low energy|no energy|tired|exhaust|drained|burn(t|ed) out/i, path: "Smaller steps today + Breathe" },
   { category: "procrastination", label: "Procrastination", re: /procrastinat|avoid|putting off|can'?t start|keep delaying/i, path: "The 2-Minute Entry" },
   { category: "email-overload", label: "Email overload", re: /\bemail|\binbox/i, path: "Time-block one focused inbox sweep" },
   { category: "decision-fatigue", label: "Decision fatigue", re: /decision|can'?t (decide|choose)|too many (choices|options)|stuck (choosing|between)/i, path: "Pick Then Learn" },

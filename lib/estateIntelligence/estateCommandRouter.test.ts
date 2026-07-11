@@ -21,7 +21,7 @@ describe("estateCommandRouter direct navigation", () => {
   it("Test 2: Take me to the Apple Orchard → Apple Orchard", () => {
     const cmd = detectDirectCommand("Take me to the Apple Orchard.");
     expect(cmd?.roomId).toBe("apple-orchard");
-    expect(cmd?.section).toBe("focus-audio");
+    expect(cmd?.section).toBe("home");
   });
 
   it("Test 3: Take me to the Music Room → Music Room", () => {
@@ -33,10 +33,10 @@ describe("estateCommandRouter direct navigation", () => {
   it("Test 4: Open the Momentum Institute → Momentum Institute", () => {
     const cmd = detectDirectCommand("Open the Momentum Institute.");
     expect(cmd?.roomId).toBe("momentum-institute");
-    expect(cmd?.section).toBe("momentum-institute");
+    expect(cmd?.section).toBe("chamber-of-momentum");
   });
 
-  it("Test 5: I need to clear my mind → direct to Clear My Mind™", () => {
+  it("Test 5: I need to clear my mind → direct to Clear My Mind", () => {
     const cmd = detectDirectCommand("I need to clear my mind");
     expect(cmd?.kind).toBe("direct");
     expect(cmd?.entryId).toBe("clear-my-mind");
@@ -53,19 +53,19 @@ describe("estateCommandRouter direct navigation", () => {
     expect(cmd?.pendingJourneyEntryIds).toContain("clear-my-mind");
   });
 
-  it("detects voice-style 'me to the apple orchard'", () => {
+  it("detects voice-style 'me to the apple orchard' → Apple Orchard", () => {
     const cmd = detectDirectCommand("me to the apple orchard");
     expect(cmd?.roomId).toBe("apple-orchard");
   });
 
-  it("detects bare 'apple orchard'", () => {
+  it("detects bare 'apple orchard' → Apple Orchard", () => {
     const cmd = detectDirectCommand("apple orchard");
     expect(cmd?.roomId).toBe("apple-orchard");
   });
 
-  it("detects contextual 'just go there' after assistant named destination", () => {
+  it("detects contextual 'just go there' after assistant named orchard → Apple Orchard", () => {
     const cmd = detectDirectCommand("i don't know let's just go there", {
-      lastAssistantText: "Let's head to the Apple Orchard™!",
+      lastAssistantText: "Let's head to the Apple Orchard!",
     });
     expect(cmd?.roomId).toBe("apple-orchard");
   });

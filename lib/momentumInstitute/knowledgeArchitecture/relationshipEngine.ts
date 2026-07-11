@@ -1,5 +1,5 @@
 /**
- * Spark Knowledge Relationship Engine™
+ * Spark Knowledge Relationship Engine
  * Related · Prerequisite · Advanced · Recommended Next · Learning Paths
  */
 

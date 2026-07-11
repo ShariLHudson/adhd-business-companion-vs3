@@ -1,5 +1,5 @@
 /**
- * Spark Card™ — visual design refinement and daily generation specification.
+ * Spark Card — visual design refinement and daily generation specification.
  * Companion moment: one thoughtful Spark Card per day, not a dashboard widget.
  *
  * @see docs/protocols/SPARK_CARD_VISUAL_DESIGN_REFINEMENT_AND_DAILY_GENERATION_SPECIFICATION.md
@@ -19,13 +19,13 @@ import { resolveFallbackSparkCard } from "./runtimeIntegration";
 import type { EvaluateDailySparkNoteInput, SparkNoteDailyCard } from "./types";
 
 export const SPARK_CARD_DESIGN_PRINCIPLE =
-  "The Spark Card™ is a companion experience — encouragement, gratitude, meaning, reflection, and discovery. It connects; it does not manage tasks.";
+  "The Spark Card is a delightful daily moment of curiosity, inspiration, and discovery — not a productivity tool, task list, or place to manage information.";
 
 export const SPARK_CARD_DESIGN_VISION =
-  "A small daily ritual — one thoughtful moment, one meaningful message, one connection point with Spark each day.";
+  "A small daily ritual — one thoughtful moment, one meaningful discovery, one reason to look forward to opening Spark Estate each day.";
 
 export const SPARK_CARD_QUALITY_TEST = {
-  shouldFeel: "I received something meaningful today.",
+  shouldFeel: "Spark gave me a little gift today.",
   shouldNotFeel: "I received another notification.",
 } as const;
 
@@ -49,14 +49,14 @@ export const SPARK_CARD_VISUAL_IMPLEMENTATION = {
 } as const;
 
 export const SPARK_CARD_CONTENT_STRUCTURE = {
-  header: "Spark Card™",
+  header: "Daily Spark",
   mainMessage: [
-    "gratitude",
-    "meaning",
-    "encouragement",
-    "reflection",
     "curiosity",
     "inspiration",
+    "discovery",
+    "story",
+    "fun fact",
+    "spark connection",
   ],
 } as const;
 
@@ -89,26 +89,26 @@ export const SPARK_CARD_PERSONAL_REFLECTION_TONES = [
 
 export const SPARK_CARD_ACTIONS = [
   {
-    id: "how-did-this-land",
-    label: "How Did This Land?",
-    purpose: "Allow the member to reflect.",
-    implementation: "SparkNoteExpanded reaction row",
+    id: "save-spark",
+    label: "Save Spark",
+    purpose: "Keep the Daily Spark as a collectible in My Spark Collection.",
+    implementation: "SparkNoteExpanded primary action",
   },
   {
-    id: "save-to-journal",
-    label: "Save to Journal",
-    purpose: "Store meaningful reflections.",
-    implementation: "SparkNoteExpanded Add to Journal + Save Spark",
+    id: "close-backdrop",
+    label: "Close",
+    purpose: "Click outside the card to return to Spark Estate.",
+    implementation: "SparkNoteExpanded backdrop",
   },
   {
-    id: "my-sparks",
-    label: "My Sparks",
-    purpose: "Allow the member to revisit saved Spark moments.",
+    id: "my-spark-collection",
+    label: "My Spark Collection",
+    purpose: "Browse saved discoveries separately from the daily experience.",
     implementation: "SparkNoteMyCollection.tsx",
   },
 ] as const;
 
-export const SPARK_CARD_DAILY_GENERATION_RULE = "One Spark Card™ per calendar day.";
+export const SPARK_CARD_DAILY_GENERATION_RULE = "One Spark Card per calendar day.";
 
 export const SPARK_CARD_DAILY_LIFECYCLE = [
   "date",
@@ -133,7 +133,7 @@ export const SPARK_CARD_REGENERATION_EXCEPTIONS = [
 ] as const;
 
 export const SPARK_CARD_MEMORY_ITEMS = [
-  "saved Spark Cards™",
+  "saved Spark Cards",
   "reflections",
   "meaningful responses",
 ] as const;
@@ -288,12 +288,12 @@ export function assessSparkCardVisualDesignCompliance(): {
   });
 
   return {
-    principleReady: SPARK_CARD_DESIGN_PRINCIPLE.includes("companion experience"),
+    principleReady: SPARK_CARD_DESIGN_PRINCIPLE.includes("daily moment"),
     visualRequirementsReady:
       SPARK_CARD_VISUAL_REQUIREMENTS.avoid.length === 4 &&
       SPARK_CARD_VISUAL_IMPLEMENTATION.placementAttribute.includes("bottom-right"),
     contentStructureReady:
-      SPARK_CARD_CONTENT_STRUCTURE.header === "Spark Card™" &&
+      SPARK_CARD_CONTENT_STRUCTURE.header === "Daily Spark" &&
       SPARK_CARD_CONTENT_STRUCTURE.mainMessage.length === 6,
     personalTonesReady: SPARK_CARD_PERSONAL_REFLECTION_TONES.length === 4,
     actionsReady: SPARK_CARD_ACTIONS.length === 3,
@@ -339,7 +339,7 @@ export function verifySparkCardVisualDesignAndDailyGeneration(): {
       sameDayStabilityReady: first.card.id === second.card.id,
       personalAdaptationReady: birthdayTone === "Celebration and appreciation",
       regenerationReady: requested.card.id !== undefined,
-      qualityTestReady: SPARK_CARD_QUALITY_TEST.shouldFeel.includes("meaningful"),
+      qualityTestReady: SPARK_CARD_QUALITY_TEST.shouldFeel.includes("gift"),
     };
   } finally {
     resetSparkNoteStoreForTests();
@@ -369,7 +369,7 @@ export function formatSparkCardVisualDesignReport(
 ): string {
   const fallback = resolveFallbackSparkCard();
   const lines: string[] = [
-    `Spark Card™ visual design and daily generation: ${verification.dailyGenerationReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Card visual design and daily generation: ${verification.dailyGenerationReady ? "ALIGNED" : "GAPS"}`,
     SPARK_CARD_DESIGN_PRINCIPLE,
     SPARK_CARD_DESIGN_VISION,
     `Quality test: ${SPARK_CARD_QUALITY_TEST.shouldFeel}`,

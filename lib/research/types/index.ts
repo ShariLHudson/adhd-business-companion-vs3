@@ -1,4 +1,4 @@
-/** Executive Research Center™ — research engine types (Founder Studio). */
+/** Executive Research Center — research engine types (Founder Studio). */
 
 export type ResearchCategoryId =
   | "artificial-intelligence"

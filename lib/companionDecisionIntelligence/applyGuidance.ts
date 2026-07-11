@@ -1,5 +1,5 @@
 /**
- * Apply Companion Decision Intelligence™ to frictionless decisions.
+ * Apply Companion Decision Intelligence to frictionless decisions.
  */
 
 import { SPARK_HUMAN_VOICE_FINAL_CHECK } from "@/lib/humanConversation/sparkHumanVoice";

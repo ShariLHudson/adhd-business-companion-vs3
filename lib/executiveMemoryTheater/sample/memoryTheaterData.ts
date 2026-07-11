@@ -194,11 +194,11 @@ export const SAMPLE_REPLAYS: MemoryReplay[] = [
     ],
     evolutionMap: [
       { id: "fj-idea", label: "Idea", summary: "Spark needs Shari's executive layer" },
-      { id: "fj-research", label: "Research", summary: "Executive Research Center™", date: "Sprint 1" },
-      { id: "fj-opp", label: "Opportunity", summary: "Opportunity Discovery Center™", date: "Sprint 2" },
-      { id: "fj-build", label: "Builder", summary: "Executive Builder™", date: "Sprint 3" },
-      { id: "fj-sim", label: "Simulation", summary: "Executive Simulation Studio™", date: "Sprint 4" },
-      { id: "fj-memory", label: "Memory", summary: "Executive Memory Theater™", date: "Sprint 5" },
+      { id: "fj-research", label: "Research", summary: "Executive Research Center", date: "Sprint 1" },
+      { id: "fj-opp", label: "Opportunity", summary: "Opportunity Discovery Center", date: "Sprint 2" },
+      { id: "fj-build", label: "Builder", summary: "Executive Builder", date: "Sprint 3" },
+      { id: "fj-sim", label: "Simulation", summary: "Executive Simulation Studio", date: "Sprint 4" },
+      { id: "fj-memory", label: "Memory", summary: "Executive Memory Theater", date: "Sprint 5" },
       { id: "fj-today", label: "Today", summary: "Complete executive pipeline" },
     ],
     wisdomIndex: {

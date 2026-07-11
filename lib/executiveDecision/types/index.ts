@@ -1,4 +1,4 @@
-/** Executive Decision Lifecycle™ — operating system for executive decisions. */
+/** Executive Decision Lifecycle — operating system for executive decisions. */
 
 export type DecisionLifecycleStep =
   | "discover"

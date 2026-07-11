@@ -19,6 +19,8 @@ export type SparkNotePersistenceStore = {
   viewedIds: string[];
   /** User-favorited spark ids */
   favoriteIds: string[];
+  /** spark id -> ISO when saved to My Spark Collection */
+  favoriteSavedAt: Record<string, string>;
   /** Spark ids marked complete / read */
   completedIds: string[];
   /** Category/tag affinity from reactions and saves. */
@@ -37,6 +39,7 @@ function emptyStore(): SparkNotePersistenceStore {
     recentIds: [],
     viewedIds: [],
     favoriteIds: [],
+    favoriteSavedAt: {},
     completedIds: [],
     categoryAffinity: {},
     ignoredCategories: {},
@@ -60,6 +63,7 @@ export function readSparkNoteStore(): SparkNotePersistenceStore {
       recentIds: parsed.recentIds ?? [],
       viewedIds: parsed.viewedIds ?? [],
       favoriteIds: parsed.favoriteIds ?? [],
+      favoriteSavedAt: parsed.favoriteSavedAt ?? {},
       completedIds: parsed.completedIds ?? [],
       categoryAffinity: parsed.categoryAffinity ?? {},
       ignoredCategories: parsed.ignoredCategories ?? {},
@@ -186,7 +190,13 @@ export function toggleSparkNoteFavorite(sparkId: string): boolean {
   const favoriteIds = isFavorite
     ? store.favoriteIds.filter((id) => id !== sparkId)
     : [sparkId, ...store.favoriteIds].slice(0, 20);
-  writeSparkNoteStore({ ...store, favoriteIds });
+  const favoriteSavedAt = { ...store.favoriteSavedAt };
+  if (isFavorite) {
+    delete favoriteSavedAt[sparkId];
+  } else {
+    favoriteSavedAt[sparkId] = new Date().toISOString();
+  }
+  writeSparkNoteStore({ ...store, favoriteIds, favoriteSavedAt });
   return !isFavorite;
 }
 
@@ -222,8 +232,10 @@ export function recordSparkNoteReaction(
   ].slice(-5);
 
   let favoriteIds = store.favoriteIds;
+  let favoriteSavedAt = { ...store.favoriteSavedAt };
   if (reaction === "save" && !favoriteIds.includes(sparkId)) {
     favoriteIds = [sparkId, ...favoriteIds].slice(0, 20);
+    favoriteSavedAt[sparkId] = new Date().toISOString();
   }
 
   const ignoredCategories = { ...store.ignoredCategories };
@@ -245,6 +257,7 @@ export function recordSparkNoteReaction(
     categoryAffinity,
     reactionsBySparkId,
     favoriteIds,
+    favoriteSavedAt,
     ignoredCategories,
     dailyRecords,
   });

@@ -15,9 +15,16 @@ export type EstateTopRightChromeProps = {
   onEstateMenuAction: (actionId: EstateMenuActionId) => void;
   onToggleChat: () => void;
   onToggleSound?: () => void;
-  onReturnToRoom: () => void;
   onBackToEstate: () => void;
-  onWander?: () => void;
+  onOpenChamber?: () => void;
+  onOpenEvidenceVault?: () => void;
+  onOpenHallOfAccomplishments?: () => void;
+  onOpenJournal?: () => void;
+  onOpenCartographersStudio?: () => void;
+  onOpenBreathe?: () => void;
+  onOpenSoundscapes?: () => void;
+  onExploreSpark?: () => void;
+  backdropSurface?: "chat" | "clear-my-mind";
 };
 
 /**
@@ -33,9 +40,16 @@ export function EstateTopRightChrome({
   onEstateMenuAction,
   onToggleChat,
   onToggleSound,
-  onReturnToRoom,
   onBackToEstate,
-  onWander,
+  onOpenChamber,
+  onOpenEvidenceVault,
+  onOpenHallOfAccomplishments,
+  onOpenJournal,
+  onOpenCartographersStudio,
+  onOpenBreathe,
+  onOpenSoundscapes,
+  onExploreSpark,
+  backdropSurface,
 }: EstateTopRightChromeProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -54,9 +68,16 @@ export function EstateTopRightChrome({
           soundEnabled={soundEnabled}
           onToggleChat={onToggleChat}
           onToggleSound={onToggleSound}
-          onReturnToRoom={onReturnToRoom}
           onBackToEstate={onBackToEstate}
-          onWander={onWander}
+          onOpenChamber={onOpenChamber}
+          onOpenEvidenceVault={onOpenEvidenceVault}
+          onOpenHallOfAccomplishments={onOpenHallOfAccomplishments}
+          onOpenJournal={onOpenJournal}
+          onOpenCartographersStudio={onOpenCartographersStudio}
+          onOpenBreathe={onOpenBreathe}
+          onOpenSoundscapes={onOpenSoundscapes}
+          onExploreSpark={onExploreSpark}
+          backdropSurface={backdropSurface}
         />
       ) : null}
       {showProfile ? (

@@ -17,7 +17,7 @@ const stubRouting = {
   learnFastPath: false,
 } as IntentRoutingDecision;
 
-describe("Companion Intelligence™", () => {
+describe("Companion Intelligence", () => {
   it("locks brain-dump session — capture not create", () => {
     const arbitration = arbitrateConversationRouting({
       userText: "call the dentist tomorrow",

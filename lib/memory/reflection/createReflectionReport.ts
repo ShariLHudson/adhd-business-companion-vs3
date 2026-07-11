@@ -1,5 +1,5 @@
 /**
- * createReflectionReport™ — pure memory analysis, no chat / no UI.
+ * createReflectionReport — pure memory analysis, no chat / no UI.
  */
 
 import { queryMemoryEntries } from "../queryMemory";

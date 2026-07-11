@@ -1,5 +1,5 @@
 /**
- * Conversation Drives Navigation™
+ * Conversation Drives Navigation
  *
  * User expresses a need → Spark recommends an environment → Estate transforms around them.
  * Source of truth: Estate Directory. Spec 108: invitation, never forced move.

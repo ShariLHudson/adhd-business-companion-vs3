@@ -1,6 +1,6 @@
 /**
- * Estate Intelligence Engine™ — discovery evaluation bridge.
- * Future: Spark Cards™, Momentum™, Estate Guide™ share this entry point.
+ * Estate Intelligence Engine — discovery evaluation bridge.
+ * Future: Spark Cards, Momentum, Estate Guide share this entry point.
  */
 
 export {

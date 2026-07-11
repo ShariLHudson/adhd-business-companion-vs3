@@ -1,7 +1,7 @@
 import type { KnowledgeVaultItem, KnowledgeVaultSection } from "../types";
 import type { DocumentAuthorityLevel } from "../types";
 
-export const KNOWLEDGE_VAULT_HEADLINE = "Founder Knowledge Vault™";
+export const KNOWLEDGE_VAULT_HEADLINE = "Founder Knowledge Vault";
 export const KNOWLEDGE_VAULT_SUMMARY =
   "The permanent executive archive — constitutions, blueprints, prompts, Cursor rules, and recovery documents. Not a file dump. Source of truth for Visual Spark Studios.";
 
@@ -22,7 +22,7 @@ function item(
 const CONSTITUTIONS: KnowledgeVaultItem[] = [
   item({
     id: "kv-founder-constitution",
-    title: "Founder Experience Constitution™",
+    title: "Founder Experience Constitution",
     categoryId: "constitutions",
     purpose: "Supreme authority for how Founder feels — wins on experience conflicts.",
     lastUpdated: "2026-07-06",
@@ -36,7 +36,7 @@ const CONSTITUTIONS: KnowledgeVaultItem[] = [
   }),
   item({
     id: "kv-spec-100",
-    title: "Entrepreneurial Transformation Constitution™",
+    title: "Entrepreneurial Transformation Constitution",
     categoryId: "constitutions",
     purpose: "How members grow — hero principle, cognitive load, ownership.",
     lastUpdated: "2026-07-01",
@@ -54,7 +54,7 @@ const CONSTITUTIONS: KnowledgeVaultItem[] = [
   }),
   item({
     id: "kv-friend",
-    title: "The Friend We All Deserve™",
+    title: "The Friend We All Deserve",
     categoryId: "constitutions",
     purpose: "How Spark speaks — companion DNA, not software voice.",
     lastUpdated: "2026-07-01",
@@ -66,7 +66,7 @@ const CONSTITUTIONS: KnowledgeVaultItem[] = [
 const BLUEPRINTS: KnowledgeVaultItem[] = [
   item({
     id: "kv-master-blueprint",
-    title: "Founder Master Blueprint™",
+    title: "Founder Master Blueprint",
     categoryId: "blueprints",
     purpose: "SPARK Intelligence Blueprint — vision, promise, executive philosophy.",
     lastUpdated: "2026-07-06",

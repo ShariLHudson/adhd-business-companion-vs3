@@ -1,5 +1,5 @@
 /**
- * Discovery Key™ library bridge — approved discoveries only.
+ * Discovery Key library bridge — approved discoveries only.
  */
 
 import discoveryLibraryJson from "@/docs/estate-intelligence/discovery-library.json";

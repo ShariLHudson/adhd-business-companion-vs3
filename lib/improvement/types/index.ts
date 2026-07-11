@@ -1,4 +1,4 @@
-/** Continuous Improvement Engine™ — evidence-based ecosystem learning (not analytics, not AI). */
+/** Continuous Improvement Engine — evidence-based ecosystem learning (not analytics, not AI). */
 
 export type ImprovementCategory =
   | "founder_experience"

@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — re-exports from data layer.
+ * Spark Estate Guidebook — re-exports from data layer.
  * @see data/estateGuideSpreads.ts
  */
 

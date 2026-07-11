@@ -1,5 +1,5 @@
 /**
- * Spark Cognitive Orchestration Engine™ — types.
+ * Spark Cognitive Orchestration Engine — types.
  * @see spark-intelligence-foundation/13-spark-cognitive-orchestration-engine.md
  */
 

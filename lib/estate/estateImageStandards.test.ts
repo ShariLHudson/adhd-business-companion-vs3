@@ -5,7 +5,7 @@ import {
   buildEstateRoomImagePrompt,
 } from "./estateImageStandards";
 
-describe("Estate Image Bible™", () => {
+describe("Estate Image Bible", () => {
   it("includes Spark flame logo rule on all drinking vessels", () => {
     expect(ESTATE_IMAGE_BRAND_PROMPT).toContain("official Spark flame logo");
     expect(ESTATE_IMAGE_BRAND_PROMPT).toContain("Never leave mugs blank");

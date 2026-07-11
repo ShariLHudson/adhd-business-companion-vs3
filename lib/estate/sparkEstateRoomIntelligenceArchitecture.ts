@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — room intelligence architecture (Phase 18).
+ * Spark Estate — room intelligence architecture (Phase 18).
  * Specialized room expertise with one unified Spark companion experience.
  *
  * @see docs/protocols/SPARK_ESTATE_ROOM_INTELLIGENCE_ARCHITECTURE_SPECIFICATION_PHASE18.md
@@ -104,7 +104,7 @@ export const SPARK_ESTATE_ROOM_EXPERTISE: Record<
 > = {
   chamber: {
     id: "chamber",
-    label: "Chamber of Momentum™",
+    label: "Chamber of Momentum",
     purpose: "Help members move forward.",
     specialties: ["clarity", "next steps", "progress", "overcoming blockers"],
     primarySections: [
@@ -484,7 +484,7 @@ export function formatSparkEstateRoomIntelligenceArchitectureReport(
   verification: ReturnType<typeof verifySparkEstateRoomIntelligenceArchitecture> = verifySparkEstateRoomIntelligenceArchitecture(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ room intelligence: ${verification.sharedFoundationReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate room intelligence: ${verification.sharedFoundationReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_ROOM_INTELLIGENCE_PRINCIPLE,
     SPARK_ESTATE_ROOM_INTELLIGENCE_VISION,
     "",

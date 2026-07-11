@@ -1,5 +1,5 @@
 /**
- * Discovery Key System™ — orchestrates engine, placement, note, history, navigation.
+ * Discovery Key System — orchestrates engine, placement, note, history, navigation.
  */
 
 import { selectNextDiscovery } from "./discoveryEngine";

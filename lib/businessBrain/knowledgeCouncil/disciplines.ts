@@ -1,5 +1,5 @@
 /**
- * Spark Knowledge Council™ — research disciplines registry.
+ * Spark Knowledge Council — research disciplines registry.
  * INTERNAL — informs synthesis; never shown as expert names to members.
  */
 

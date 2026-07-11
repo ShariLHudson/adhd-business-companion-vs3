@@ -1,10 +1,29 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { clearPendingEstatePlaceMenu, savePendingEstatePlaceMenu } from "../estatePlaceNavigation";
+import { resetEstateRoomAwarenessForTests } from "@/lib/estate/roomAwareness";
 import { planEstateActionExecution } from "./planEstateActionExecution";
 import { resolveEstateAction } from "./resolveEstateAction";
 
+function stubSession() {
+  const mem = new Map<string, string>();
+  const storage = {
+    getItem: (k: string) => mem.get(k) ?? null,
+    setItem: (k: string, v: string) => {
+      mem.set(k, v);
+    },
+    removeItem: (k: string) => {
+      mem.delete(k);
+    },
+    clear: () => mem.clear(),
+  };
+  vi.stubGlobal("sessionStorage", storage);
+  vi.stubGlobal("window", { sessionStorage: storage, dispatchEvent: vi.fn() });
+}
+
 describe("estate decision kernel acceptance", () => {
   beforeEach(() => {
+    stubSession();
+    resetEstateRoomAwarenessForTests();
     clearPendingEstatePlaceMenu();
   });
 
@@ -14,12 +33,14 @@ describe("estate decision kernel acceptance", () => {
     expect(planEstateActionExecution(result).type).toBe("chat");
   });
 
-  it('2. "Take me to Reading Nook" → NAVIGATE', () => {
-    const result = resolveEstateAction({ userText: "Take me to Reading Nook" });
+  it('2. "Take me to the Coffee House" → NAVIGATE', () => {
+    const result = resolveEstateAction({
+      userText: "Take me to the Coffee House",
+    });
     expect(result.action).toBe("NAVIGATE");
     if (result.action === "NAVIGATE" && result.target.kind === "place") {
       expect(result.target.command.roomId ?? result.target.command.entryId).toBe(
-        "reading-nook",
+        "coffee-house",
       );
     }
     expect(planEstateActionExecution(result).type).toBe("navigate-place");
@@ -78,7 +99,9 @@ describe("estate decision kernel acceptance", () => {
   });
 
   it("NAVIGATE wins over AUDIO for explicit place phrasing", () => {
-    const result = resolveEstateAction({ userText: "Take me to Reading Nook" });
+    const result = resolveEstateAction({
+      userText: "Take me to the Coffee House",
+    });
     expect(result.action).toBe("NAVIGATE");
   });
 

@@ -1,5 +1,5 @@
 /**
- * Founder bridge — Executive Command Center™ / Executive Headquarters
+ * Founder bridge — Executive Command Center / Executive Headquarters
  */
 import type { MissionId } from "@/lib/founder/missions/types";
 import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";

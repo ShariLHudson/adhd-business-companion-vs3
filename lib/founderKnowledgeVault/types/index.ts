@@ -1,4 +1,4 @@
-/** Founder Knowledge Vault™ — executive archive for master documents and prompts. */
+/** Founder Knowledge Vault — executive archive for master documents and prompts. */
 
 export type DocumentAuthorityLevel =
   | "constitution"

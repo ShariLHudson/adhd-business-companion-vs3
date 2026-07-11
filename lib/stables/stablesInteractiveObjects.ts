@@ -1,7 +1,7 @@
 import type { StablesInteractiveObjectDefinition } from "./types";
 
 /**
- * Future interactive objects on the Stables™ room plate.
+ * Future interactive objects on the Stables room plate.
  * Architecture only — hotspots and experiences ship later.
  */
 export const STABLES_INTERACTIVE_OBJECTS: readonly StablesInteractiveObjectDefinition[] =

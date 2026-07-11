@@ -1,5 +1,5 @@
 /**
- * Rule: The Most Recent Meaning Wins™
+ * Rule: The Most Recent Meaning Wins
  *
  * Spark prioritizes the member's most recent meaningful intent over stale
  * pending actions, reminders, or previous suggestions.

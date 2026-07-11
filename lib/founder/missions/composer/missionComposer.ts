@@ -1,5 +1,5 @@
 /**
- * Mission Composer™ — assembles a mission workspace from existing Founder services.
+ * Mission Composer — assembles a mission workspace from existing Founder services.
  * Never duplicates Concierge, FLAME, FIRE, SPARK, Daily Workflow, or Workspace Orchestrator.
  */
 import { getFireExecutivePortfolio } from "../../briefs/firePortfolio";

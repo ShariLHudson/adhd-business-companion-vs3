@@ -1,5 +1,5 @@
 /**
- * Estate Place Ambient Sound™ — Layer 1 identity sound per canonical place.
+ * Estate Place Ambient Sound — Layer 1 identity sound per canonical place.
  * Natural sound of being there — not music tracks or playlists.
  *
  * @see docs/estate/ESTATE_AMBIENT_SOUND_SYSTEM.md (spec)
@@ -20,9 +20,10 @@ import {
   OCEAN_CONSERVATORY_AMBIENCE_MP3,
   ORCHARD_BIRDS_AMBIENCE_MP3,
   TIN_ROOF_RAIN_AMBIENCE_MP3,
+  WELCOME_ROOM_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 
-/** Gazebo™ shares journal place id — fountain-forward regulation space. */
+/** Gazebo shares journal place id — fountain-forward regulation space. */
 export const GAZEBO_PLACE_ID = "journal";
 
 /**
@@ -32,6 +33,11 @@ export const GAZEBO_PLACE_ID = "journal";
 export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
   Record<string, EstateArrivalAmbienceProfile>
 > = {
+  "welcome-home": {
+    src: WELCOME_ROOM_AMBIENCE_MP3,
+    volume: 0.12,
+    character: "warm hearth, soft breeze, distant birds, porch welcome",
+  },
   [GAZEBO_PLACE_ID]: {
     src: GAZEBO_JOURNAL_AMBIENCE_MP3,
     volume: 0.14,
@@ -89,7 +95,7 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
     volume: 0.09,
     character: "horses shifting, soft leather creaks, distant birds",
   },
-  /** Lakeside Hammock™ proxy until dedicated place ships. */
+  /** Lakeside Hammock proxy until dedicated place ships. */
   "seat-at-pond": {
     src: ORCHARD_BIRDS_AMBIENCE_MP3,
     volume: 0.1,
@@ -100,13 +106,13 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
     volume: 0.09,
     character: "irrigation water, birds, soft wind through plants",
   },
-  /** Tree Swing™ — porch swing, creek, wind */
+  /** Tree Swing — porch swing, creek, wind */
   "porch-swing": {
     src: ORCHARD_BIRDS_AMBIENCE_MP3,
     volume: 0.1,
     character: "wind, swing softly creaking, distant creek, birds",
   },
-  /** The Swing Beneath the Oak™ — oak shade, creek, gentle sway */
+  /** The Swing Beneath the Oak — oak shade, creek, gentle sway */
   "the-swing-beneath-the-oak": {
     src: ORCHARD_BIRDS_AMBIENCE_MP3,
     volume: 0.1,

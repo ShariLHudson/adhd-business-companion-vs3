@@ -1,5 +1,5 @@
 /**
- * Spark Alpha™ — Relationship Prototype types.
+ * Spark Alpha — Relationship Prototype types.
  *
  * @see docs/SPARK_ALPHA_FRAMEWORK.md
  */

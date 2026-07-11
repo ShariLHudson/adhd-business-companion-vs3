@@ -1,4 +1,4 @@
-/** Founder Daily Workflow™ — work modes replace module thinking. */
+/** Founder Daily Workflow — work modes replace module thinking. */
 
 import type { PreparedOffice } from "../../concierge/types";
 import type { FounderWorkspaceId } from "../../types/workspace";

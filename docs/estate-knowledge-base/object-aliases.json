@@ -136,6 +136,24 @@
       "status": "Live"
     },
     {
+      "phrase": "dog's name",
+      "objectId": "kinsey",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "dog in the picture",
+      "objectId": "kinsey",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
+      "phrase": "the dog in the picture",
+      "objectId": "kinsey",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
       "phrase": "what is the guidebook",
       "objectId": "guidebook",
       "matchType": "question",

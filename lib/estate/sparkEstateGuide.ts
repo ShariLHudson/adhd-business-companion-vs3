@@ -4,6 +4,6 @@ export const SPARK_ESTATE_GUIDE_COVER_SRC =
 
 export const SPARK_ESTATE_GUIDE_COVER_ALT = "Spark Estate Guide";
 
-/** Prototype entry — journal gazebo hosts the in-scene guidebook anchor. */
+/** Guidebook opens from the live Journal Gazebo room. */
 export const SPARK_ESTATE_GUIDE_DEFAULT_ROUTE =
-  "/companion/journal-gazebo-prototype" as const;
+  "/companion?section=growth-journal" as const;

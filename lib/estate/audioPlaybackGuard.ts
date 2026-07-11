@@ -1,5 +1,5 @@
 /**
- * Audio Playback Guard™ — one intentional environmental track at a time.
+ * Audio Playback Guard — one intentional environmental track at a time.
  *
  * Rollback: NEXT_PUBLIC_AUDIO_PLAYBACK_GUARD=0
  */

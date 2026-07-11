@@ -1,5 +1,5 @@
 /**
- * Shari Companion Engine™ — Emotion Before Instruction (rewrite authority).
+ * Shari Companion Engine — Emotion Before Instruction (rewrite authority).
  *
  * @see docs/estate/SHARI_COMPANION_ENGINE_REWRITE.md
  * @see docs/EMOTIONAL_FIRST_RESPONSE_SEQUENCE.md

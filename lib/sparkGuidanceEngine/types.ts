@@ -1,11 +1,11 @@
 /**
- * Guidance Engine™ — recommendation framework types.
+ * Guidance Engine — recommendation framework types.
  * Reasons with Brain/Assets/Knowledge; does not own memory or speak to members.
  *
  * @see spark-intelligence-foundation/005-guidance-engine.md
  */
 
-/** Progressive Guidance™ — adapts depth to member experience. */
+/** Progressive Guidance — adapts depth to member experience. */
 export type SparkProgressiveGuidanceLevel =
   | "new"
   | "experienced"

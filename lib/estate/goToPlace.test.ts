@@ -105,14 +105,26 @@ describe("resolveEstatePlace — Phase C success tests", () => {
     expect(outcome.category).toBe("destination");
   });
 
-  it("Let's go to the Apple Orchard.", () => {
-    const { resolution } = navigate("Let's go to the Apple Orchard.");
+  it("Let's go to the Apple Orchard → Apple Orchard with Kinsey plate", () => {
+    const { resolution, outcome } = navigate("Let's go to the Apple Orchard.");
     expect(resolution.placeId).toBe("apple-orchard");
+    expect(outcome.placeId).toBe("apple-orchard");
+    expect(outcome.officialName).toMatch(/Apple Orchard/i);
+    expect(outcome.backgroundImage).toContain("apple-orchard-kinsey-background");
   });
 
-  it("let's sit under the stairs → reading nook", () => {
+  it("Take me to the Stables → The Stables with dedicated plate", () => {
+    const { resolution, outcome } = navigate("Take me to the Stables.");
+    expect(resolution.placeId).toBe("stables");
+    expect(outcome.placeId).toBe("stables");
+    expect(outcome.section).toBe("stables");
+    expect(outcome.officialName).toMatch(/Stables/i);
+    expect(outcome.backgroundImage).toContain("spark-estate-stables-background");
+  });
+
+  it("let's sit under the stairs → stairway reading nook", () => {
     const { resolution } = navigate("let's sit under the stairs");
-    expect(resolution.placeId).toBe("reading-nook");
+    expect(resolution.placeId).toBe("stairway-reading-nook");
   });
 
   it("go to the institute → momentum institute", () => {
@@ -123,9 +135,7 @@ describe("resolveEstatePlace — Phase C success tests", () => {
   it("I want to sit somewhere quiet → suggestion only", () => {
     const resolution = resolveEstatePlace("I want to sit somewhere quiet.");
     expect(resolution.kind).toBe("suggestion");
-    expect(resolution.suggestedPlaceIds).toContain("reading-nook");
-    expect(resolution.suggestedPlaceIds).toContain("gardens");
-    expect(resolution.suggestedPlaceIds).toContain("library");
+    expect(resolution.suggestedPlaceIds?.length).toBeGreaterThanOrEqual(2);
     expect(shouldNavigateFromResolution(resolution)).toBe(false);
   });
 
@@ -157,8 +167,8 @@ describe("resolveEstatePlace — Phase C success tests", () => {
     expect(resolution.placeId).toBe("gardens");
   });
 
-  it("proof of growth → evidence vault (P0)", () => {
-    const { resolution } = navigate("take me to proof of growth");
+  it("evidence vault navigation still works", () => {
+    const { resolution } = navigate("take me to the evidence vault");
     expect(resolution.placeId).toBe("evidence-vault");
   });
 

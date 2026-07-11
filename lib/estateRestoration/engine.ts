@@ -1,5 +1,5 @@
 /**
- * Intentional Restoration™ engine — Estate Guide as restorative experience.
+ * Intentional Restoration engine — Estate Guide as restorative experience.
  */
 
 import {

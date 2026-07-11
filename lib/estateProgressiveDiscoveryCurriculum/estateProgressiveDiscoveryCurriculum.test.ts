@@ -15,7 +15,7 @@ import {
 } from "./index";
 import { getLiveDiscoveryLibraryItems } from "@/lib/estateDiscovery/discoveryLibraryLoader";
 
-describe("Progressive Discovery Curriculum™", () => {
+describe("Progressive Discovery Curriculum", () => {
   it("loads curriculum philosophy and rules", () => {
     const curriculum = getProgressiveDiscoveryCurriculum();
     expect(curriculum.registry).toBe("progressive-discovery-curriculum");

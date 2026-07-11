@@ -356,7 +356,7 @@ export function continuationForWorkflow(
         action: "open_tool",
         tool: "breathe",
         message:
-          "Let's take a moment. Opening **Breathe & Reset** — chat stays right here when you're done.",
+          "Let's take a moment. Opening **Breathe** — your place stays right here when you're done.",
         nextWorkflow: null,
       };
     case "open_adjust_my_day":

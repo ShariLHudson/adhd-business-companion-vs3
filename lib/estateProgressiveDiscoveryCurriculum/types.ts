@@ -1,5 +1,5 @@
 /**
- * Progressive Discovery Curriculum™ — shared types.
+ * Progressive Discovery Curriculum — shared types.
  */
 
 import type { JourneyStageId } from "@/lib/estateProgressiveDiscoveryJourney";

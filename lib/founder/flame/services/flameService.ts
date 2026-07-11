@@ -4,7 +4,7 @@ import { getMorningMessage } from "../messages";
 import { getMentorOverview, getWeeklyReflection } from "../mentor";
 import type { FlameMentorOverview } from "../types";
 
-/** FLAME™ Executive Mentor — Founder personality layer (sample data only). */
+/** FLAME Executive Mentor — Founder personality layer (sample data only). */
 export const FounderFlameService = {
   getMorningMessage(date?: Date) {
     return getMorningMessage(date);

@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — visual asset directory loader.
+ * Estate Knowledge Base — visual asset directory loader.
  */
 
 import estateAssetsJson from "@/docs/estate-knowledge-base/estate-assets.json";

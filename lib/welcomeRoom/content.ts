@@ -15,7 +15,7 @@ export const WELCOME_ROOM_LOGIN_OFFER = {
 } as const;
 
 export const WELCOME_ROOM_LEAVE_INVITATION = {
-  buttonLabel: "Continue Into the ADHD Business Ecosystem™",
+  buttonLabel: "Continue Into the ADHD Business Ecosystem",
 } as const;
 
 /** Exit immersive welcome while audio may still be playing. */

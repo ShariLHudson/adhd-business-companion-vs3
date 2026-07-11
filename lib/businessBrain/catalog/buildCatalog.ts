@@ -1,5 +1,5 @@
 /**
- * Bridge Spark Curriculum Master Index™ → Business Brain OS models.
+ * Bridge Spark Curriculum Master Index → Business Brain OS models.
  */
 
 import { SPARK_COMPETENCY_FRAMEWORK_V1 } from "@/lib/sparkCompetencyFramework/competencyFrameworkV1";

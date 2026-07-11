@@ -1,5 +1,5 @@
 /**
- * Spec 125 — Conversation Synthesis™
+ * Spec 125 — Conversation Synthesis
  */
 
 import type { ConversationSynthesisCue } from "./types";

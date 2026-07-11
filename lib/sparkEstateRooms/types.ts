@@ -1,5 +1,5 @@
 /**
- * Estate Rooms™ Framework (T-017).
+ * Estate Rooms Framework (T-017).
  * Philosophy and design standards for every Spark Estate room.
  * V1 runtime catalog: lib/companionHomestead/homesteadRoomRegistry.ts
  *
@@ -13,7 +13,7 @@ import type {
   EntrepreneurialCapabilityDomain,
 } from "@/lib/sparkTransformationConstitution/types";
 
-/** The Estate Principle™ — gate before any room ships */
+/** The Estate Principle — gate before any room ships */
 export const ESTATE_PRINCIPLE_QUESTIONS = [
   "Why does this room exist?",
   "How does this environment improve the member's thinking?",
@@ -21,7 +21,7 @@ export const ESTATE_PRINCIPLE_QUESTIONS = [
 ] as const;
 
 /**
- * The Conversation Front Door™ — governing rule for every Estate feature.
+ * The Conversation Front Door — governing rule for every Estate feature.
  * Conversation is how members enter; rooms deepen the experience.
  *
  * @see docs/ESTATE_INTELLIGENCE_FRAMEWORK.md#the-conversation-front-door
@@ -37,7 +37,7 @@ export const CONVERSATION_FRONT_DOOR_GATE = [
   "Would a first-time visitor need to know a room name to succeed?",
 ] as const;
 
-/** Environmental Psychology™ — dimensions the room intentionally influences */
+/** Environmental Psychology — dimensions the room intentionally influences */
 export type EnvironmentalPsychologyDimension =
   | "attention"
   | "emotion"
@@ -262,7 +262,7 @@ export type SparkEstateRoomSpec = {
   executiveFunctionStrategy: string;
   ambientSoundDesign: readonly EstateAmbientSound[];
   livingSpaceDetails?: readonly LivingSpaceDetail[];
-  /** Estate Principle™ — must be answerable */
+  /** Estate Principle — must be answerable */
   estatePrincipleAnswers: {
     whyExists: string;
     howImprovesThinking: string;

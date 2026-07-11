@@ -1,5 +1,5 @@
 /**
- * Discovery Companion Response™ — curated Spark voice after a Discovery button tap.
+ * Discovery Companion Response — curated Spark voice after a Discovery button tap.
  */
 
 import type { DiscoveryEngineSelection, DiscoveryLibraryItem } from "./types";

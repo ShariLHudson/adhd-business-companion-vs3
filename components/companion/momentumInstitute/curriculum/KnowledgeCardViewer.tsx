@@ -41,7 +41,7 @@ export function KnowledgeCardViewer({
       <header className="institute-knowledge-panel__header">
         <div>
           <p className="institute-knowledge-panel__eyebrow">
-            Knowledge Card™ · {model.drawerLabel}
+            Knowledge Card · {model.drawerLabel}
           </p>
           <h2 className="institute-knowledge-panel__title">{metadata.title}</h2>
           {body.essentialQuestion ? (

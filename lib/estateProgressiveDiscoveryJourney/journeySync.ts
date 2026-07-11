@@ -1,5 +1,5 @@
 /**
- * Sync journey progress from Discovery History™ and estate signals.
+ * Sync journey progress from Discovery History and estate signals.
  */
 
 import type { DiscoveryHistoryStore } from "@/lib/estateDiscovery/types";

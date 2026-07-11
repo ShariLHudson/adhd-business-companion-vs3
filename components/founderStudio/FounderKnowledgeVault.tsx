@@ -17,7 +17,7 @@ export function FounderKnowledgeVault() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Founder Knowledge Vault™"
+        eyebrow="Founder Knowledge Vault"
         title="Executive Archive"
         question="Where does our source of truth live?"
         purpose="Constitutions, blueprints, prompts, Cursor rules, and recovery documents — curated for calm retrieval, not file hunting."

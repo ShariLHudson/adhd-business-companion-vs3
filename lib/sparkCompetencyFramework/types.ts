@@ -1,8 +1,8 @@
 /**
- * Spark Competency Framework™ v1.0
+ * Spark Competency Framework v1.0
  * The Four Pillars of Entrepreneurial Mastery.
  *
- * Everything in the Momentum Institute™ belongs to one pillar.
+ * Everything in the Momentum Institute belongs to one pillar.
  * Capability growth — not gamification.
  *
  * @see lib/sparkCompetencyFramework/competencyFrameworkV1.ts
@@ -105,7 +105,7 @@ export function nextCompetencyLevel(
 }
 
 /**
- * Spark Knowledge Perspectives™ — disciplines that inform a topic.
+ * Spark Knowledge Perspectives — disciplines that inform a topic.
  * Not organized around famous people; Spark's own voice.
  */
 export type KnowledgePerspectiveDefinition = {
@@ -135,7 +135,7 @@ export const LEARNING_TIME_SLOT_LABELS: Record<LearningTimeSlotId, string> = {
 };
 
 /**
- * Personal Learning Ecosystem™ — destinations learning connects to.
+ * Personal Learning Ecosystem — destinations learning connects to.
  * References only — no duplicate content.
  */
 export const PERSONAL_LEARNING_ECOSYSTEM_DESTINATIONS = [
@@ -154,12 +154,12 @@ export const PERSONAL_LEARNING_ECOSYSTEM_LABELS: Record<
   PersonalLearningEcosystemDestination,
   string
 > = {
-  institute_cabinet: "My Institute Cabinet™",
-  journal: "Journal™",
-  make_it_mine: "Make It Mine™",
-  evidence_vault: "Evidence Vault™",
-  growth_profile: "Growth Profile™",
-  portfolio: "Portfolio™",
+  institute_cabinet: "My Institute Cabinet",
+  journal: "Journal",
+  make_it_mine: "Make It Mine",
+  evidence_vault: "Evidence Vault",
+  growth_profile: "Growth Profile",
+  portfolio: "Portfolio",
 };
 
 /** Standard drawer contents — every drawer can offer these experience types */

@@ -39,9 +39,9 @@ describe("sparkEstateSparkToolsDiscoveryAndIntegration", () => {
     expect(mapSparkToolToSection("spin-wheel")).toBe("spin-wheel");
   });
 
-  it("models the Clear My Mind Sunroom experience", () => {
+  it("models the Clear My Mind Reflection Desk experience", () => {
     const steps = buildClearMyMindExperienceSteps();
-    expect(steps[0]).toContain("Sunroom");
+    expect(steps[0]).toContain("Treehouse Reflection Desk");
     expect(steps[1]).toBe(SPARK_ESTATE_CLEAR_MY_MIND_WELCOME);
     expect(steps[4]).toContain("create project");
   });

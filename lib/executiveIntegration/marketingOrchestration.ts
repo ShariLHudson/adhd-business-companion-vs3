@@ -1,4 +1,4 @@
-/** Founder Studio™ marketing orchestration — PostCraft creates · GHL delivers */
+/** Founder Studio marketing orchestration — PostCraft creates · GHL delivers */
 
 export const MARKETING_ORCHESTRATION_HEADLINE = "Founder decides · PostCraft creates · GoHighLevel delivers";
 
@@ -17,14 +17,14 @@ export type MarketingDepartmentRole = {
 };
 
 export const MARKETING_ORCHESTRATION_STEPS: readonly MarketingOrchestrationStep[] = [
-  { id: "founder-studio", label: "Founder Studio™" },
+  { id: "founder-studio", label: "Founder Studio" },
   { id: "recommendations", label: "Makes recommendations" },
   { id: "prepares", label: "Prepares everything" },
 ] as const;
 
 export const POSTCRAFT_DEPARTMENT: MarketingDepartmentRole = {
   id: "postcraft",
-  name: "PostCraft™",
+  name: "PostCraft",
   responsibilities: [
     "Creates content",
     "Creates campaigns",

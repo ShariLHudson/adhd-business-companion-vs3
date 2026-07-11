@@ -17,7 +17,7 @@ function libraryEvaluation(userText: string): EstateIntelligenceEvaluation {
     route: {
       primaryEntry: LIBRARY_ENTRY,
       invitation:
-        "The Momentum Institute™ has wonderful resources on that topic. Would you like to explore them together?",
+        "The Momentum Institute has wonderful resources on that topic. Would you like to explore them together?",
       primarySection: "momentum-institute",
       suppressGenericDefinition: false,
     },

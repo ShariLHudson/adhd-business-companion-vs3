@@ -1,5 +1,5 @@
 /**
- * Opening Phrase Library™ — natural Shari conversation starters.
+ * Opening Phrase Library — natural Shari conversation starters.
  * Rotates so Spark does not sound repetitive.
  *
  * @see docs/SPARK_WISDOM_LAYER_FRAMEWORK.md#spec-131--outcome-discovery

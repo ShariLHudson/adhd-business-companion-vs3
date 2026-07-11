@@ -8,7 +8,7 @@ import {
   JUDGMENT_ENGINE_PRINCIPLE,
 } from "./index";
 
-describe("Executive Judgment Engine™", () => {
+describe("Executive Judgment Engine", () => {
   it("exposes judgment principle", () => {
     expect(JUDGMENT_ENGINE_PRINCIPLE).toContain("judgment");
   });

@@ -7,7 +7,7 @@ import {
 } from "./resolveEstateNavigationIntent";
 import { tryKnowledgeBasePlaceResolution } from "./bridge";
 
-describe("Estate Navigation Intelligence™", () => {
+describe("Estate Navigation Intelligence", () => {
   it("navigates directly for alias match — treehouse → Possibility House", () => {
     const decision = resolveEstateNavigationIntent("Take me to the treehouse");
     expect(decision.kind).toBe("navigate_direct");

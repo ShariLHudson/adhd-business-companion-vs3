@@ -16,7 +16,7 @@ type Props = {
   celebrationKind?: MomentumBuilderCelebrationKind | null;
 };
 
-/** Full-screen Momentum Builder™ planning studio — conversation primary. */
+/** Full-screen Momentum Builder planning studio — conversation primary. */
 export function MomentumBuilderRoomShell({
   children,
   todaysPath,

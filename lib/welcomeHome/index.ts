@@ -27,6 +27,7 @@ export {
   markChatAssistantAudioElement,
   pauseChatAssistantAudio,
   setWelcomeHomeIntroAudioBlocked,
+  subscribeWelcomeHomeIntroAudioBlocked,
 } from "./introAudioGuard";
 export { resolveWelcomeHomeDailyGreeting } from "./dailyGreeting";
 export {

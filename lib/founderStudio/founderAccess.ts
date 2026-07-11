@@ -1,6 +1,6 @@
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 
-/** Founder Studio™ — private. Replace with roles when auth supports them. */
+/** Founder Studio — private. Replace with roles when auth supports them. */
 const DEFAULT_FOUNDER_EMAILS = [
   "shari@visualsparkstudios.com",
   "shari@sparkadhd.com",

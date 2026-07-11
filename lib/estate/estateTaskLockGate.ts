@@ -1,5 +1,5 @@
 /**
- * Estate Task Lock Gate™ — Phase 2C handleSend integration.
+ * Estate Task Lock Gate — Phase 2C handleSend integration.
  *
  * Applies active task state and gates Estate room routing during deliverable tasks.
  *

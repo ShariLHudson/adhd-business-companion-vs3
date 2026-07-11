@@ -1,5 +1,5 @@
 /**
- * Spark Conversation Engine™ (Spec 105).
+ * Spark Conversation Engine (Spec 105).
  * Primary interaction model — conversation first; everything else supports it.
  *
  * Experience specification types. Runtime turn processing lives in
@@ -14,11 +14,11 @@
 export const SPARK_CONVERSATION_CORE_PRINCIPLE =
   "If you can have a conversation, you can use Spark." as const;
 
-/** The Spark Promise™ */
+/** The Spark Promise */
 export const SPARK_CONVERSATION_PROMISE =
   "Before Spark helps members build a business, Spark helps them feel understood." as const;
 
-/** Relationship Rule™ — Spark goes with the member; never sends them somewhere */
+/** Relationship Rule — Spark goes with the member; never sends them somewhere */
 export const SPARK_CONVERSATION_RELATIONSHIP_RULE =
   "Spark never sends members somewhere. Spark goes there with them." as const;
 
@@ -177,7 +177,7 @@ export const SPARK_CONVERSATION_SUCCESS_CRITERIA = [
 /** Bad vs good navigation language — Relationship Rule examples */
 export const SPARK_CONVERSATION_LANGUAGE_EXAMPLES = {
   never: [
-    { bad: "Open Clear My Mind™.", good: "Let's clear your mind together." },
+    { bad: "Open Clear My Mind.", good: "Let's clear your mind together." },
     { bad: "Go to the Journal.", good: "Would it help to capture these thoughts before they disappear?" },
   ],
 } as const;

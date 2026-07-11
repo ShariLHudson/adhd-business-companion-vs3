@@ -9,7 +9,7 @@ import {
 } from "./services/researchService";
 import { RESEARCH_PRINCIPLE } from "./sample/researchData";
 
-describe("Executive Research Center™ engine", () => {
+describe("Executive Research Center engine", () => {
   it("exposes research principle", () => {
     expect(RESEARCH_PRINCIPLE).toContain("needs to know");
   });

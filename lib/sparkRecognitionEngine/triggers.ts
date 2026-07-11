@@ -20,6 +20,7 @@ const PRESERVE_PHRASES = [
   "i prevented",
   "it worked",
   "i made progress",
+  "i realized",
 ] as const;
 
 const CELEBRATION_PHRASES = [

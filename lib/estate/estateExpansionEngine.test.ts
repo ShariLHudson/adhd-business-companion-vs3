@@ -5,7 +5,7 @@ import {
   expansionRequiresMerge,
 } from "./estateExpansionEngine";
 
-describe("Estate Expansion Engine™ (Phase H.2)", () => {
+describe("Estate Expansion Engine (Phase H.2)", () => {
   it('"wins room" merges into Celebration Room + Accomplishments Book', () => {
     const result = evaluateEstateExpansion({ name: "wins room" });
     expect(result.classification).toBe("Reject / Not Needed");

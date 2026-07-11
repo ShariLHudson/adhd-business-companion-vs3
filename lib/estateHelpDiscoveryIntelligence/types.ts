@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ Help & Discovery Intelligence — shared types.
+ * Spark Estate Help & Discovery Intelligence — shared types.
  */
 
 import type { AudioExperience } from "@/lib/estateAudioExperienceFoundation";

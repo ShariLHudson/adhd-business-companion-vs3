@@ -33,15 +33,20 @@ describe("estateWanderMode", () => {
     expect(places.map((p) => p.legacy_place_id)).not.toContain("goals-projects");
   });
 
+  it("shows Clear My Mind for the capture workspace room id", () => {
+    expect(resolveWanderRoomDisplayName("clear-my-mind")).toBe("Clear My Mind");
+    expect(resolveWanderRoomDisplayName("brain-dump")).toBe("Clear My Mind");
+  });
+
   it("shows Chamber of Momentum for momentum sub-places in room chrome", () => {
     expect(resolveWanderRoomDisplayName("momentum-institute")).toBe(
-      "Chamber of Momentum™",
+      "Chamber of Momentum",
     );
     expect(resolveWanderRoomDisplayName("momentum-builder")).toBe(
-      "Chamber of Momentum™",
+      "Chamber of Momentum",
     );
     expect(resolveWanderRoomDisplayName("goals-projects")).toBe(
-      "Chamber of Momentum™",
+      "Chamber of Momentum",
     );
   });
 

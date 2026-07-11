@@ -1,4 +1,4 @@
-/* Spark Estate Guidebook™ — one room page */
+/* Spark Estate Guidebook — one room page */
 
 /* Estate flame — teardrop, never star-shaped */
 .eg-estate-flame {
@@ -840,7 +840,7 @@
   }
 }
 
-/* Whisper from the Estate™ — recurring corner line on every spread page */
+/* Whisper from the Estate — recurring corner line on every spread page */
 .eg-guide-whisper {
   position: absolute;
   right: clamp(0.65rem, 1.8vw, 1.1rem);
@@ -894,7 +894,7 @@
   color: var(--eg-charcoal-soft, #5c5650);
 }
 
-/* Your Journey Through the Treehouse™ — narrative footer on Possibility House spreads */
+/* Your Journey Through the Treehouse — narrative footer on Possibility House spreads */
 .eg-guide-treehouse-journey {
   position: absolute;
   left: clamp(0.65rem, 1.8vw, 1.1rem);

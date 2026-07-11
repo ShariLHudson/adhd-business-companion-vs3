@@ -1,5 +1,5 @@
 /**
- * Estate Brain™ — search and ranking (internal Spark reasoning).
+ * Estate Brain — search and ranking (internal Spark reasoning).
  */
 
 import {

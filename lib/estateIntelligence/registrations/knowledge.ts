@@ -1,7 +1,7 @@
 /**
- * Estate Registry™ — knowledge & research registrations.
+ * Estate Registry — knowledge & research registrations.
  *
- * Canon: The Library™ (Living/reading) ≠ Momentum Institute™ (Destination/learning).
+ * Canon: The Library (Living/reading) ≠ Momentum Institute (Destination/learning).
  * @see docs/estate/Spark Estate Bible.md — Ch 7, Ch 12
  */
 
@@ -10,12 +10,12 @@ import type { EstateRegistryEntry } from "../types";
 /** Reading Nook / Estate Library — stories, volumes, peaceful reading (not the Institute). */
 export const LIBRARY_ENTRY: EstateRegistryEntry = {
   id: "library",
-  name: "The Library™",
+  name: "The Library",
   category: "knowledge",
   purpose:
     "Quiet reading and story — wisdom on the shelves, volumes that protect the member's life.",
   memberDescription:
-    "The Library™ is peaceful — stories, how-to at your pace, and room to think beneath the staircase.",
+    "The Library is peaceful — stories, how-to at your pace, and room to think beneath the staircase.",
   primarySection: "growth-library",
   sections: ["how-do-i"],
   objectId: "library",
@@ -46,15 +46,15 @@ export const LIBRARY_ENTRY: EstateRegistryEntry = {
   status: "live",
 };
 
-/** Entrepreneur Development Center — drawer wall, Knowledge Cards™, capability growth. */
+/** Entrepreneur Development Center — drawer wall, Knowledge Cards, capability growth. */
 export const MOMENTUM_INSTITUTE_ENTRY: EstateRegistryEntry = {
   id: "momentum-institute",
-  name: "Momentum Institute™",
+  name: "Momentum Institute",
   category: "knowledge",
   purpose:
     "Entrepreneurial development inside the Estate — drawer by drawer, capability by capability.",
   memberDescription:
-    "The Momentum Institute™ is where discoveries live — drawers, Knowledge Cards™, and conversations that build capability.",
+    "The Momentum Institute is where discoveries live — drawers, Knowledge Cards, and conversations that build capability.",
   primarySection: "momentum-institute",
   sections: [],
   objectId: "momentum-institute",
@@ -94,12 +94,12 @@ export const MOMENTUM_INSTITUTE_ENTRY: EstateRegistryEntry = {
 
 export const GROWTH_JOURNAL_ENTRY: EstateRegistryEntry = {
   id: "growth-journal",
-  name: "Growth Journal™",
+  name: "Growth Journal",
   category: "reflection",
   purpose:
     "Private reflection and growth journaling — capture insights, wins, and lessons without pressure.",
   memberDescription:
-    "Your Growth Journal™ is a quiet place to reflect — what you're learning, what mattered, and what's next.",
+    "Your Growth Journal is a quiet place to reflect — what you're learning, what mattered, and what's next.",
   primarySection: "growth-journal",
   objectId: "growth-journal",
   keywords: [
@@ -128,12 +128,12 @@ export const GROWTH_JOURNAL_ENTRY: EstateRegistryEntry = {
 
 export const OBSERVATORY_ENTRY: EstateRegistryEntry = {
   id: "observatory",
-  name: "Observatory™",
+  name: "Observatory",
   category: "research",
   purpose:
     "Curated research on AI, business, technology, and innovation — explore before you commit.",
   memberDescription:
-    "The Observatory™ is where we explore what's emerging — trends, tools, and ideas worth your attention.",
+    "The Observatory is where we explore what's emerging — trends, tools, and ideas worth your attention.",
   primarySection: "grow-observatory",
   objectId: "observatory",
   keywords: [

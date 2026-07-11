@@ -1,5 +1,5 @@
 /**
- * Member progress on Knowledge Cards™ — cabinet, learning sessions, completions.
+ * Member progress on Knowledge Cards — cabinet, learning sessions, completions.
  */
 
 import { isKnowledgeCardInCabinet } from "@/lib/momentumInstitute/cabinetStore";

@@ -36,7 +36,7 @@ export function stablesLearningChatHint(
       break;
     case "save-reflection":
       lines.push(
-        "Member may want to save this reflection. Ask permission before Journal™, Cabinet, Evidence Vault™, or Growth Profile™.",
+        "Member may want to save this reflection. Ask permission before Journal, Cabinet, Evidence Vault, or Growth Profile.",
       );
       break;
   }

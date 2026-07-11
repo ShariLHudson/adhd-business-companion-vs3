@@ -1,5 +1,5 @@
 /**
- * User Memory Library™ — unified read model for Capture destinations.
+ * User Memory Library — unified read model for Capture destinations.
  * Capture writes → domain stores → UserMemoryStore aggregates for view/export.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Member need signal loader — human-side of Estate Recommendation Intelligence™.
+ * Member need signal loader — human-side of Estate Recommendation Intelligence.
  */
 
 import memberNeedSignalsJson from "@/docs/estate-knowledge-base/member-need-signals.json";

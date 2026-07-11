@@ -1,5 +1,5 @@
 /**
- * Canonical Place Suggestions™ — ALL menus from registry records only.
+ * Canonical Place Suggestions — ALL menus from registry records only.
  *
  * @see canonicalEstateRegistry.ts
  */

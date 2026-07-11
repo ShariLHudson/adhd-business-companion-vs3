@@ -12,9 +12,10 @@ import {
 } from "./canonicalEstateRegistry";
 
 describe("canonicalEstateRegistry", () => {
-  it("has expected version and place count from Phase A canon", () => {
+  it("has expected version and place count", () => {
     expect(CANONICAL_ESTATE_REGISTRY_VERSION).toBe("1.0");
-    expect(CANONICAL_ESTATE_REGISTRY.length).toBe(75);
+    // Includes Destination Gallery (Architecture 156) and later place expansions.
+    expect(CANONICAL_ESTATE_REGISTRY.length).toBe(84);
   });
 
   it("passes integrity validation", () => {
@@ -44,12 +45,18 @@ describe("canonicalEstateRegistry", () => {
     expect(match?.id).toBe("momentum-institute");
   });
 
-  it("categories match canon distribution", () => {
+  it("categories match registry distribution", () => {
     const stats = canonicalRegistryStats();
-    expect(stats.byCategory["living-place"]).toBe(32);
-    expect(stats.byCategory.destination).toBe(28);
-    expect(stats.byCategory.collection).toBe(8);
+    expect(stats.byCategory["living-place"]).toBe(33);
+    expect(stats.byCategory.destination).toBe(35);
+    expect(stats.byCategory.collection).toBe(9);
     expect(stats.byCategory["transition-space"]).toBe(7);
+  });
+
+  it("includes Destination Gallery", () => {
+    const gallery = getCanonicalEstatePlaceById("destination-gallery");
+    expect(gallery?.category).toBe("destination");
+    expect(gallery?.backgroundImage).toContain("destination-gallery.png");
   });
 
   it("living places forbid object-invitation arrival", () => {

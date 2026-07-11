@@ -1,5 +1,5 @@
 /**
- * Resolve the five-layer Estate Room Template™ for a room id.
+ * Resolve the five-layer Estate Room Template for a room id.
  */
 
 import { resolveEstateArrivalExperience } from "@/lib/estate/estateArrivalExperience";

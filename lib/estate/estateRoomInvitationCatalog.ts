@@ -44,15 +44,15 @@ export const ESTATE_ROOM_PRIMARY_CATALOG: Record<string, EstateRoomInvitationIte
     p("explore-estate", "🗺", "Explore the Estate", { kind: "estate-map" }),
   ],
   conservatory: [
-    p("clear-my-mind", "🫧", "Clear My Mind™", { kind: "brain-dump-engage" }),
+    p("clear-my-mind", "🫧", "Clear My Mind", { kind: "brain-dump-engage" }),
     section("journal", "📝", "Journal Gazebo", "growth-journal"),
-    section("peaceful-places", "🎵", "Peaceful Places™", "focus-audio"),
+    section("peaceful-places", "🎵", "Peaceful Places", "focus-audio"),
     p("talk-shari", "💬", "Talk with Shari", { kind: "conversation" }),
   ],
   "clear-my-mind": [
-    p("clear-my-mind", "🫧", "Clear My Mind™", { kind: "brain-dump-engage" }),
+    p("clear-my-mind", "🫧", "Clear My Mind", { kind: "brain-dump-engage" }),
     section("journal", "📝", "Journal Gazebo", "growth-journal"),
-    section("peaceful-places", "🎵", "Listen to Peaceful Places™", "focus-audio"),
+    section("peaceful-places", "🎵", "Listen to Peaceful Places", "focus-audio"),
   ],
   "momentum-institute": [
     p("browse-drawers", "🗂", "Browse the Drawers", { kind: "institute-browse" }),
@@ -121,7 +121,7 @@ export const ESTATE_ROOM_PRIMARY_CATALOG: Record<string, EstateRoomInvitationIte
   greenhouse: [
     p("plant-idea", "🌱", "Plant a New Idea", { kind: "conversation" }),
     p("nurture-idea", "🪴", "Nurture an Existing Idea", { kind: "conversation" }),
-    section("seeds-planted", "📦", "Visit Seeds Planted™", "grow-spark-cards"),
+    section("seeds-planted", "📦", "Visit Seeds Planted", "grow-spark-cards"),
     p("explore-shari", "💡", "Explore Possibilities with Shari", {
       kind: "conversation",
     }),
@@ -144,14 +144,20 @@ export const ESTATE_ROOM_PRIMARY_CATALOG: Record<string, EstateRoomInvitationIte
     p("light-play", "✨", "Something Light and Fun", { kind: "conversation" }),
   ],
   "evidence-vault": [
-    section("review-wins", "🌟", "Evidence Vault", "evidence-bank"),
-    p("add-proud", "✨", "Add Something I'm Proud Of", { kind: "conversation" }),
-    p("kind-words", "💌", "Remember Kind Words", { kind: "conversation" }),
-    section("review-progress", "📈", "Review My Progress", "evidence-bank"),
-    p("build-confidence", "💪", "Build My Confidence", { kind: "conversation" }),
+    p("today-discovery", "📖", "Open Today's Discovery File", {
+      kind: "evidence-today",
+    }),
+    p("browse-archive", "📂", "Browse Archive", { kind: "evidence-browse" }),
+    p("search-discoveries", "🔍", "Search Discoveries", {
+      kind: "evidence-search",
+    }),
+    p("view-insights", "✨", "View Insights", { kind: "evidence-insights" }),
+    p("print-discoveries", "🖨", "Print Discoveries", {
+      kind: "evidence-print",
+    }),
   ],
   "institute-cabinet": [
-    p("review-cards", "📇", "Review Saved Knowledge Cards™", {
+    p("review-cards", "📇", "Review Saved Knowledge Cards", {
       kind: "institute-browse",
     }),
     p("continue-learning", "🎓", "Continue Saved Learning", {
@@ -203,6 +209,9 @@ export const ESTATE_ROOM_PRIMARY_CATALOG: Record<string, EstateRoomInvitationIte
     p("quiet-tea", "🍵", "Quiet Tea and Talk", { kind: "conversation" }),
     p("reflect", "🌿", "Reflect Over Tea", { kind: "conversation" }),
   ],
+  /** Empty — Cartographer's Studio welcome guide lives in the room UI */
+  "focus-studio": [],
+  "cartographers-studio": [],
 };
 
 /** Per-room universal closer copy — concierge, never menu-like. */
@@ -274,7 +283,8 @@ export const ESTATE_UNIVERSAL_CLOSER_COPY: Record<
     chat: "Just Hang Out",
   },
   "evidence-vault": {
-    chat: "Tell Shari About Something Good",
+    includeChat: false,
+    includePresence: false,
   },
   "institute-cabinet": {
     chat: "Ask Shari About a Saved Topic",
@@ -293,6 +303,15 @@ export const ESTATE_UNIVERSAL_CLOSER_COPY: Record<
   },
   "peaceful-places": {
     presence: "Simply Enjoy the View",
+  },
+  /** Cartographer's Studio — orientation panel owns arrival; no Welcome Home closers */
+  "focus-studio": {
+    includeChat: false,
+    includePresence: false,
+  },
+  "cartographers-studio": {
+    includeChat: false,
+    includePresence: false,
   },
 };
 

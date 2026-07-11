@@ -28,7 +28,7 @@ function assertMenuUsesOnlyCanonicalPlaces(line: string) {
   for (const [, label] of numbered) {
     const normalized = label!.split("—")[0]!.trim().toLowerCase();
     const known = CANONICAL_ESTATE_REGISTRY.some((place) => {
-      const official = place.officialName.replace(/™/g, "").trim().toLowerCase();
+      const official = place.officialName.replace(/\u2122/g, "").trim().toLowerCase();
       return (
         normalized.includes(official) ||
         place.aliases.some((alias) =>

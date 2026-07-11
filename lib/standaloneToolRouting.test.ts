@@ -46,7 +46,7 @@ describe("standaloneToolRouting", () => {
   it("launches when assistant says opening", () => {
     expect(
       detectAssistantToolLaunch(
-        "Sure! Opening Breathe & Reset for you now. One moment!",
+        "Sure! Opening Breathe for you now. One moment!",
       )?.tool,
     ).toBe("breathe");
     expect(

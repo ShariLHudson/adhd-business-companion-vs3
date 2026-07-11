@@ -33,7 +33,7 @@ export function getMyTasks() {
   return sampleTeamHubRepository.listMyTasks();
 }
 
-/** Full Team Hub™ layout sections for the execution layer UI. */
+/** Full Team Hub layout sections for the execution layer UI. */
 export function getTeamHubSections(): TeamHubSection[] {
   return [
     toSection(

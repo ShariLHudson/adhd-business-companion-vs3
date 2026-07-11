@@ -16,7 +16,7 @@ export const EMOTIONAL_FIRST_FINAL_PRINCIPLE =
 export const EMOTIONAL_FIRST_ESTATE_WELCOME =
   "You don't have to earn your way into Spark Estate. You arrive exactly as you are. Whether today is a day for action, reflection, celebration, or simply resting, there is a place here for you." as const;
 
-export const EMOTIONAL_FIRST_PROMPT_BLOCK = `# EMOTIONAL FIRST, ACTION SECOND™
+export const EMOTIONAL_FIRST_PROMPT_BLOCK = `# EMOTIONAL FIRST, ACTION SECOND
 
 Spark is not a productivity app. Before tools, rooms, or strategies, ask internally: **"${EMOTIONAL_FIRST_GOVERNING_QUESTION}"**
 

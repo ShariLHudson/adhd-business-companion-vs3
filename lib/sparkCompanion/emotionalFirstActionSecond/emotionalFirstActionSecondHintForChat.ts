@@ -28,7 +28,7 @@ export function emotionalFirstActionSecondHintForChat(
   const canonical = matchCanonicalEmotionalOpening(input.userText);
 
   const lines = [
-    "EMOTIONAL FIRST, ACTION SECOND™:",
+    "EMOTIONAL FIRST, ACTION SECOND:",
     `Ask internally: "${EMOTIONAL_FIRST_GOVERNING_QUESTION}"`,
     `Success: ${EMOTIONAL_FIRST_SUCCESS}`,
   ];

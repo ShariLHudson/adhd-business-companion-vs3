@@ -1,5 +1,5 @@
 /**
- * Room Placement Library™ — approved Discovery Key surfaces per room.
+ * Room Placement Library — approved Discovery Key surfaces per room.
  */
 
 import roomPlacementJson from "@/docs/estate-intelligence/room-placement-library.json";

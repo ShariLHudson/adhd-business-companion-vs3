@@ -1,6 +1,6 @@
 import type { AiExtensionTool } from "../types";
 
-export const AI_EXTENSIONS_HEADLINE = "AI Extensions Center™";
+export const AI_EXTENSIONS_HEADLINE = "AI Extensions Center";
 export const AI_EXTENSIONS_SUMMARY =
   "Specialist AI tools for Visual Spark Studios. Extensions only — Founder Studio remains the Executive Headquarters. No paid APIs connected in this sprint.";
 

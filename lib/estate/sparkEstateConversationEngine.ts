@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — conversation engine and Shari voice (Phase 17).
+ * Spark Estate — conversation engine and Shari voice (Phase 17).
  * One consistent companion across every room, card, workflow, and creation experience.
  *
  * @see docs/protocols/SPARK_ESTATE_CONVERSATION_ENGINE_AND_SHARI_VOICE_SPECIFICATION_PHASE17.md

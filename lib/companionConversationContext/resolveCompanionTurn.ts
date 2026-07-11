@@ -159,7 +159,7 @@ export function resolveCompanionTurn(
       ? getEstateLocationById(pending.locationId)
       : null;
     const display =
-      location?.officialDisplayName?.replace(/™/g, "") ?? "there";
+      location?.officialDisplayName?.replace(/\u2122/g, "") ?? "there";
     trace.pendingAction = pending.type;
     trace.finalResponseReason = "pending_estate_navigate";
     trace.winningCapability = "navigation";

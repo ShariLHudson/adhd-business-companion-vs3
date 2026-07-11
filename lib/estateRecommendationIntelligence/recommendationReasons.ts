@@ -2,6 +2,7 @@
  * Estate recommendation reasons — why a place fits right now.
  */
 
+import { filterPlacesForAudioContext } from "@/lib/estate/estateNonAudioPlaces";
 import recommendationReasonsJson from "@/docs/estate-knowledge-base/estate-recommendation-reasons.json";
 import {
   getEstateLocationById,
@@ -51,6 +52,12 @@ export function buildRecommendationChoices(
   for (const reason of reasons) {
     if (choices.length >= maxChoices) break;
     if (isDeprioritized(reason.locationId, context)) continue;
+    if (
+      (signalId === "need-focus" || signalId === "need-quiet") &&
+      filterPlacesForAudioContext([reason.locationId]).length === 0
+    ) {
+      continue;
+    }
 
     const validation = validateEstateNavigationTarget(reason.locationId);
     if (!validation.ok) continue;

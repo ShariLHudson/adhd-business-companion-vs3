@@ -39,7 +39,7 @@ function nextLineId() {
 const STUCK_PATTERN = /\b(not sure|unsure|don't know|do not know|stuck|fuzzy)\b/i;
 
 /**
- * Spark™ Prototype V4 — The Conversation Creates the Workspace™
+ * Spark Prototype V4 — The Conversation Creates the Workspace
  *
  * Conversation drives everything. The notebook emerges when context exists.
  * The room is always the emotional center.

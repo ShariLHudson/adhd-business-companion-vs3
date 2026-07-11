@@ -11,7 +11,7 @@ const TS = "2026-07-06T08:00:00.000Z";
 export const SAMPLE_MISSIONS: Mission[] = [
   {
     id: "listening-rooms",
-    name: "Listening Rooms™",
+    name: "Listening Rooms",
     purpose:
       "Calm estate spaces where members return without pressure — gentle re-entry after interruption.",
     status: "active",
@@ -26,7 +26,7 @@ export const SAMPLE_MISSIONS: Mission[] = [
   },
   {
     id: "founder-studio",
-    name: "Founder Studio™",
+    name: "Founder Studio",
     purpose: "Shari's private executive headquarters — one operating system for the entire day.",
     status: "active",
     phase: "Build",
@@ -40,7 +40,7 @@ export const SAMPLE_MISSIONS: Mission[] = [
   },
   {
     id: "companion",
-    name: "Spark Companion™",
+    name: "Spark Companion",
     purpose: "Member-facing ADHD business companion — relationship is the product.",
     status: "active",
     phase: "Grow",
@@ -54,7 +54,7 @@ export const SAMPLE_MISSIONS: Mission[] = [
   },
   {
     id: "postcraft",
-    name: "PostCraft™",
+    name: "PostCraft",
     purpose: "Transform ideas into campaigns — content that traces to real member outcomes.",
     status: "active",
     phase: "Launch",
@@ -68,7 +68,7 @@ export const SAMPLE_MISSIONS: Mission[] = [
   },
   {
     id: "workshop-series",
-    name: "Workshop Series™",
+    name: "Workshop Series",
     purpose: "Live transformation experiences that feed courses, content, and member growth.",
     status: "active",
     phase: "Define",
@@ -82,7 +82,7 @@ export const SAMPLE_MISSIONS: Mission[] = [
   },
   {
     id: "estate",
-    name: "Spark Estate™",
+    name: "Spark Estate",
     purpose: "Premium cognitive interface — beauty before information, places not pages.",
     status: "active",
     phase: "Grow",
@@ -96,7 +96,7 @@ export const SAMPLE_MISSIONS: Mission[] = [
   },
   {
     id: "marketing-launch",
-    name: "Marketing Launch™",
+    name: "Marketing Launch",
     purpose: "Gentle Restart campaign — PostCraft through GHL nurture to member re-entry.",
     status: "planned",
     phase: "Discover",

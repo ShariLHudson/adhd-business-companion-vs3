@@ -1,5 +1,5 @@
 /**
- * Emotional First, Action Second™ — understand the moment before optimizing.
+ * Emotional First, Action Second — understand the moment before optimizing.
  */
 
 export const EMOTIONAL_FIRST_GOVERNING_QUESTION =

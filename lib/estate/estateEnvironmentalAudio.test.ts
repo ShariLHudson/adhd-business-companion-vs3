@@ -38,7 +38,7 @@ describe("resolveEstatePresenceRoomId", () => {
         activeSection: "brain-dump",
         memoryRoomId: "coffee-house",
       }),
-    ).toBe("conservatory");
+    ).toBe("clear-my-mind");
   });
 
   it("keeps direct coffee-house overlay while visit is active", () => {
@@ -50,6 +50,15 @@ describe("resolveEstatePresenceRoomId", () => {
         memoryRoomId: "peaceful-places",
       }),
     ).toBe("coffee-house");
+  });
+
+  it("maps evidence-bank section to evidence-vault presence", () => {
+    expect(
+      resolveEstatePresenceRoomId({
+        activeSection: "evidence-bank",
+        memoryRoomId: "coffee-house",
+      }),
+    ).toBe("evidence-vault");
   });
 
   it("falls back to memory when section has no mapped room", () => {

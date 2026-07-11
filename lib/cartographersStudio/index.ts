@@ -1,11 +1,16 @@
 /**
- * Cartographer's Studio™ public exports.
+ * Cartographer's Studio public exports.
  */
 
 export {
   CARTOGRAPHERS_STUDIO_BACKGROUND,
   CARTOGRAPHERS_STUDIO_PLACE_ID,
   CARTOGRAPHERS_STUDIO_OFFICIAL_NAME,
+  CARTOGRAPHERS_ATLAS_SAVE_LINE,
+  CARTOGRAPHERS_RETURN_TO_ESTATE,
+  CARTOGRAPHERS_RESUME_PREVIOUS,
+  CARTOGRAPHERS_HELP,
+  CARTOGRAPHERS_EXIT,
 } from "./media";
 
 export {
@@ -16,3 +21,35 @@ export {
   type CartographersFramedMap,
   type CartographersFramedMapId,
 } from "./framedMaps";
+
+export {
+  CARTOGRAPHERS_ATLAS_ENTRIES,
+  CARTOGRAPHERS_ATLAS_INTRO,
+  getAtlasEntry,
+  type CartographersAtlasEntry,
+} from "./atlas";
+
+export {
+  detectsVisualBeginnerUnsure,
+  formatVisualBeginnerChoiceMessage,
+  parseVisualBeginnerChoice,
+  isVisualBeginnerChoiceMessage,
+  VISUAL_BEGINNER_CHOICE_LINE,
+  type VisualBeginnerChoice,
+} from "./visualBeginnerChoice";
+
+export {
+  CARTOGRAPHERS_WELCOME_TITLE,
+  CARTOGRAPHERS_WELCOME_SUBTITLE,
+  CARTOGRAPHERS_WELCOME_BODY,
+  CARTOGRAPHERS_WELCOME_BEGIN_HEADING,
+  CARTOGRAPHERS_WELCOME_TELL_SPARK,
+  CARTOGRAPHERS_WELCOME_CLICK_FRAME,
+  CARTOGRAPHERS_WELCOME_ABOUT_HEADING,
+  CARTOGRAPHERS_WELCOME_MAP_BLURBS,
+  CARTOGRAPHERS_WELCOME_FOOTER,
+  CARTOGRAPHERS_WELCOME_REQUEST_EVENT,
+  hasDismissedCartographersWelcome,
+  dismissCartographersWelcome,
+  requestCartographersWelcome,
+} from "./welcome";

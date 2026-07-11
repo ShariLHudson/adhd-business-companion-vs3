@@ -5,7 +5,7 @@ describe("resolveEstateRoomTemplate", () => {
   it("resolves evidence vault welcome and empty state", () => {
     const template = resolveEstateRoomTemplate("evidence-vault");
     expect(template.hero.title).toContain("Evidence Vault");
-    expect(template.welcome.shariLine).toMatch(/story of your journey/i);
+    expect(template.welcome.shariLine).toMatch(/Welcome back to the Evidence Vault/i);
     expect(template.emptyState.headline).toMatch(/waiting to tell your story/i);
   });
 

@@ -1,5 +1,5 @@
 /**
- * Spec 120 — Wisdom Before Information™
+ * Spec 120 — Wisdom Before Information
  */
 
 import type { MemberNeedAssessment, MemberNeedKind } from "./types";

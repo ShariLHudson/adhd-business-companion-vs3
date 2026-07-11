@@ -3,10 +3,8 @@
 import { useEffect, useState } from "react";
 import {
   ESTATE_ARRIVAL_HOLD_MS,
-  ESTATE_ARRIVAL_MOTTO_FADE_MS,
   ESTATE_ARRIVAL_NAME_FADE_MS,
   ESTATE_ARRIVAL_TITLE_FADE_OUT_MS,
-  ESTATE_ARRIVAL_VEIL_MS,
   type EstateArrivalExperienceConfig,
 } from "@/lib/estate/estateArrivalExperience";
 import { prefersReducedMotion } from "@/lib/welcomeRoom/arrival";
@@ -28,7 +26,7 @@ type Props = {
  * Universal Estate arrival — room name + motto, then fade away.
  */
 export function EstateArrivalOverlay({ config, onPhaseChange, onComplete }: Props) {
-  const [phase, setPhase] = useState<EstateArrivalPhase>("veil");
+  const [phase, setPhase] = useState<EstateArrivalPhase>("reveal");
 
   useEffect(() => {
     onPhaseChange?.(phase);
@@ -44,23 +42,13 @@ export function EstateArrivalOverlay({ config, onPhaseChange, onComplete }: Prop
     const timers: ReturnType<typeof setTimeout>[] = [];
 
     timers.push(
-      setTimeout(() => setPhase("reveal"), ESTATE_ARRIVAL_VEIL_MS),
-    );
-
-    timers.push(
-      setTimeout(
-        () => setPhase("hold"),
-        ESTATE_ARRIVAL_VEIL_MS +
-          Math.max(ESTATE_ARRIVAL_NAME_FADE_MS, ESTATE_ARRIVAL_MOTTO_FADE_MS),
-      ),
+      setTimeout(() => setPhase("hold"), ESTATE_ARRIVAL_NAME_FADE_MS),
     );
 
     timers.push(
       setTimeout(
         () => setPhase("title-exit"),
-        ESTATE_ARRIVAL_VEIL_MS +
-          Math.max(ESTATE_ARRIVAL_NAME_FADE_MS, ESTATE_ARRIVAL_MOTTO_FADE_MS) +
-          ESTATE_ARRIVAL_HOLD_MS,
+        ESTATE_ARRIVAL_NAME_FADE_MS + ESTATE_ARRIVAL_HOLD_MS,
       ),
     );
 
@@ -70,8 +58,7 @@ export function EstateArrivalOverlay({ config, onPhaseChange, onComplete }: Prop
           setPhase("done");
           onComplete();
         },
-        ESTATE_ARRIVAL_VEIL_MS +
-          Math.max(ESTATE_ARRIVAL_NAME_FADE_MS, ESTATE_ARRIVAL_MOTTO_FADE_MS) +
+        ESTATE_ARRIVAL_NAME_FADE_MS +
           ESTATE_ARRIVAL_HOLD_MS +
           ESTATE_ARRIVAL_TITLE_FADE_OUT_MS,
       ),
@@ -86,20 +73,17 @@ export function EstateArrivalOverlay({ config, onPhaseChange, onComplete }: Prop
 
   return (
     <div
-      className={`estate-arrival${phase === "veil" ? " estate-arrival--veil" : ""}${
+      className={`estate-arrival estate-arrival--place-first${
         titleExiting ? " estate-arrival--title-exit" : ""
       }`}
       data-testid="estate-arrival-overlay"
       aria-live="polite"
       aria-label={`Arriving at ${config.title}`}
     >
-      <div className="estate-arrival__veil" aria-hidden />
       <div
-        className={`estate-arrival__plaque${
-          phase === "reveal" || phase === "hold" || titleExiting
-            ? " estate-arrival__plaque--visible"
-            : ""
-        }${titleExiting ? " estate-arrival__plaque--exit" : ""}`}
+        className={`estate-arrival__plaque estate-arrival__plaque--visible${
+          titleExiting ? " estate-arrival__plaque--exit" : ""
+        }`}
       >
         <div className="estate-arrival__rule" aria-hidden />
         <p className="estate-arrival__title">{config.title}</p>

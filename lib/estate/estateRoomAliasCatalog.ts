@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — member-facing alias catalog (single source for navigation phrases).
+ * Spark Estate — member-facing alias catalog (single source for navigation phrases).
  * Sync aliases into `canonicalEstatePlaces.ts` when adding new canonical places.
  *
  * @deprecated Legacy adapter — aliases now derive from
@@ -22,7 +22,7 @@ export type EstateRoomAliasSpec = {
 export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   {
     roomId: "welcome-home",
-    officialName: "Welcome Home™",
+    officialName: "Welcome Home",
     aliases: [
       "welcome home",
       "welcome room",
@@ -35,7 +35,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "spark-estate",
-    officialName: "Spark Estate™",
+    officialName: "Spark Estate",
     aliases: [
       "spark estate",
       "the spark estate",
@@ -49,7 +49,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "sunroom",
-    officialName: "Sunroom™",
+    officialName: "Sunroom",
     aliases: [
       "sunroom",
       "the sunroom",
@@ -64,7 +64,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "conservatory",
-    officialName: "The Conservatory™",
+    officialName: "The Conservatory",
     aliases: [
       "ocean conservatory",
       "the ocean conservatory",
@@ -85,7 +85,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "clear-my-mind",
-    officialName: "Clear My Mind™",
+    officialName: "Clear My Mind",
     aliases: [
       "clear my mind sunroom",
       "clear my mind",
@@ -96,6 +96,19 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
     roomType: "reflection",
   },
   {
+    roomId: "destination-gallery",
+    officialName: "Destination Gallery",
+    aliases: [
+      "destination gallery",
+      "the destination gallery",
+      "send this somewhere",
+      "where should i send this",
+      "where would you like me to send this",
+    ],
+    route: null,
+    roomType: "planning",
+  },
+  {
     roomId: "butterfly-house",
     officialName: "Butterfly House",
     aliases: ["butterfly house", "the butterfly house", "butterfly conservatory", "the butterfly conservatory", "butterfly garden", "the butterfly garden"],
@@ -104,7 +117,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "coffee-house",
-    officialName: "Coffee House™",
+    officialName: "Coffee House",
     aliases: [
       "coffee house",
       "the coffee house",
@@ -121,21 +134,21 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "tea-room",
-    officialName: "Tea Room™",
+    officialName: "Tea Room",
     aliases: ["tea room", "the tea room"],
     route: "focus-audio",
     roomType: "restoration",
   },
   {
     roomId: "dining-room",
-    officialName: "Dining Room™",
+    officialName: "Dining Room",
     aliases: ["dining room", "the dining room"],
     route: "home",
     roomType: "restoration",
   },
   {
     roomId: "estate-kitchen",
-    officialName: "Estate Kitchen™",
+    officialName: "Estate Kitchen",
     aliases: [
       "estate kitchen",
       "the estate kitchen",
@@ -147,14 +160,14 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "music-room",
-    officialName: "Music Room™",
+    officialName: "Music Room",
     aliases: ["music room", "the music room"],
     route: "focus-audio",
     roomType: "restoration",
   },
   {
     roomId: "summer-terrace",
-    officialName: "Summer Terrace™",
+    officialName: "Summer Terrace",
     aliases: [
       "swimming pool",
       "the swimming pool",
@@ -168,21 +181,21 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "grand-terrace",
-    officialName: "Grand Terrace™",
+    officialName: "Grand Terrace",
     aliases: ["grand terrace", "the grand terrace"],
     route: "home",
     roomType: "restoration",
   },
   {
     roomId: "lakeside-verandah",
-    officialName: "Lakeside Verandah™",
+    officialName: "Lakeside Verandah",
     aliases: ["lakeside verandah", "the lakeside verandah", "lakeside veranda", "by the lake", "lake view", "lakeside"],
     route: "home",
     roomType: "restoration",
   },
   {
     roomId: "lakeside-hammock",
-    officialName: "Lakeside Hammock™",
+    officialName: "Lakeside Hammock",
     aliases: [
       "lakeside hammock",
       "the lakeside hammock",
@@ -194,7 +207,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "seat-at-pond",
-    officialName: "Seat at Pond / Dock™",
+    officialName: "Seat at Pond / Dock",
     aliases: [
       "seat at the pond",
       "seat at pond",
@@ -217,7 +230,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "fireside-deck",
-    officialName: "Fireside Deck™",
+    officialName: "Fireside Deck",
     aliases: [
       "fireside deck",
       "the fireside deck",
@@ -231,7 +244,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "personal-deck",
-    officialName: "Personal Deck™",
+    officialName: "Personal Deck",
     aliases: [
       "personal deck",
       "the personal deck",
@@ -244,28 +257,43 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "balcony",
-    officialName: "Private Balcony™",
+    officialName: "Private Balcony",
     aliases: ["balcony", "the balcony", "overlook"],
     route: "home",
     roomType: "restoration",
   },
   {
     roomId: "porch-swing",
-    officialName: "Porch Swing™",
+    officialName: "Porch Swing",
     aliases: ["porch swing", "the porch swing", "swing on the porch"],
     route: "home",
     roomType: "restoration",
   },
   {
+    roomId: "the-swing-beneath-the-oak",
+    officialName: "The Swing Beneath the Oak",
+    aliases: [
+      "swing beneath the oak",
+      "the swing beneath the oak",
+      "oak swing",
+      "tree swing",
+      "memory swing",
+      "the swing",
+      "swing",
+    ],
+    route: "home",
+    roomType: "restoration",
+  },
+  {
     roomId: "apple-orchard",
-    officialName: "Apple Orchard™",
+    officialName: "Apple Orchard",
     aliases: ["apple orchard", "the apple orchard", "orchard", "the orchard"],
     route: "home",
     roomType: "nature",
   },
   {
     roomId: "estate-gardens",
-    officialName: "Estate Gardens™",
+    officialName: "Estate Gardens",
     aliases: [
       "estate gardens",
       "the estate gardens",
@@ -277,7 +305,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "gardens",
-    officialName: "Celebration Garden™",
+    officialName: "Celebration Garden",
     aliases: [
       "celebration garden",
       "the celebration garden",
@@ -291,7 +319,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "greenhouse",
-    officialName: "Greenhouse™",
+    officialName: "Greenhouse",
     aliases: [
       "working greenhouse",
       "the working greenhouse",
@@ -303,14 +331,14 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "garden-bench",
-    officialName: "Garden Bench™",
+    officialName: "Garden Bench",
     aliases: ["garden bench", "the garden bench", "bench in the garden"],
     route: "home",
     roomType: "nature",
   },
   {
     roomId: "reading-nook",
-    officialName: "Reading Nook™",
+    officialName: "Reading Nook",
     aliases: [
       "reading nook",
       "the reading nook",
@@ -322,7 +350,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "stairway-reading-nook",
-    officialName: "Stairway Reading Nook™",
+    officialName: "Stairway Reading Nook",
     aliases: [
       "stairway reading nook",
       "the stairway reading nook",
@@ -337,7 +365,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "window-seat",
-    officialName: "Window Seat™",
+    officialName: "Window Seat",
     aliases: [
       "window seat",
       "the window seat",
@@ -349,7 +377,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "library",
-    officialName: "The Library™",
+    officialName: "The Library",
     aliases: [
       "estate library",
       "the estate library",
@@ -371,7 +399,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "momentum-institute",
-    officialName: "Momentum Institute™",
+    officialName: "Momentum Institute",
     aliases: [
       "momentum institute",
       "the momentum institute",
@@ -383,12 +411,12 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "institute",
       "the institute",
     ],
-    route: "momentum-institute",
+    route: "chamber-of-momentum",
     roomType: "learning",
   },
   {
     roomId: "study-hall",
-    officialName: "Study Hall™",
+    officialName: "Study Hall",
     aliases: [
       "study hall",
       "the study hall",
@@ -396,26 +424,26 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "the classroom",
       "lecture hall",
     ],
-    route: "momentum-institute",
+    route: "chamber-of-momentum",
     roomType: "learning",
   },
   {
     roomId: "momentum-room",
-    officialName: "Momentum Room™",
+    officialName: "Momentum Room",
     aliases: ["momentum room", "the momentum room"],
-    route: "momentum-institute",
+    route: "chamber-of-momentum",
     roomType: "planning",
   },
   {
     roomId: "discovery-room",
-    officialName: "Discovery Room™",
+    officialName: "Discovery Room",
     aliases: ["discovery room", "the discovery room"],
     route: "home",
     roomType: "research",
   },
   {
     roomId: "observatory",
-    officialName: "Observatory™",
+    officialName: "Observatory",
     aliases: [
       "observatory",
       "the observatory",
@@ -440,21 +468,21 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "art-studio",
-    officialName: "Art Studio™",
+    officialName: "Art Studio",
     aliases: ["art studio", "the art studio", "artist studio"],
     route: "content-generator",
     roomType: "creation",
   },
   {
     roomId: "strategy-studio",
-    officialName: "Strategy Studio™",
+    officialName: "Strategy Studio",
     aliases: ["strategy studio", "the strategy studio"],
     route: "content-generator",
     roomType: "planning",
   },
   {
     roomId: "round-table",
-    officialName: "Round Table™",
+    officialName: "Round Table",
     aliases: [
       "round table",
       "the round table",
@@ -468,7 +496,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "journal",
-    officialName: "Journal Gazebo™",
+    officialName: "Journal Gazebo",
     aliases: [
       "journal gazebo",
       "the journal gazebo",
@@ -485,7 +513,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "stables",
-    officialName: "The Stables™",
+    officialName: "The Stables",
     aliases: [
       "spark stables",
       "the spark stables",
@@ -499,7 +527,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "game-room",
-    officialName: "Game Room™",
+    officialName: "Game Room",
     aliases: [
       "game room",
       "the game room",
@@ -511,33 +539,40 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "evidence-vault",
-    officialName: "Evidence Vault™",
+    officialName: "Evidence Vault",
     aliases: [
       "evidence vault",
       "the evidence vault",
+      "my evidence vault",
       "evidence bank",
       "the evidence bank",
+      "proof i can do this",
+      "show me proof",
+      "show me proof i can do this",
+      "i need encouragement",
+      "remind me what i've done",
+      "remind me what i have done",
+      "remind me who i am",
     ],
     route: "evidence-bank",
     roomType: "archive",
   },
   {
     roomId: "gallery-of-firsts",
-    officialName: "Hall of Accomplishments™",
+    officialName: "Gallery",
     aliases: [
-      "hall of accomplishments",
-      "the hall of accomplishments",
       "gallery of firsts",
       "the gallery of firsts",
-      "hall of achievements",
-      "accomplishments hall",
+      "gallery",
+      "the gallery",
     ],
-    route: "growth-portfolio",
+    /** Gallery ≠ Hall of Accomplishments — scene presence until exhibit UI */
+    route: "home",
     roomType: "archive",
   },
   {
     roomId: "accomplishments-shelf",
-    officialName: "Accomplishments Shelf™",
+    officialName: "Accomplishments Shelf",
     aliases: [
       "accomplishments shelf",
       "accomplishments book",
@@ -549,7 +584,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "celebration-room",
-    officialName: "Celebration Hall™",
+    officialName: "Celebration Room",
     aliases: [
       "celebration hall",
       "the celebration hall",
@@ -561,14 +596,26 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "portfolio",
-    officialName: "Portfolio™",
-    aliases: ["portfolio", "my portfolio"],
+    officialName: "Hall of Accomplishments",
+    aliases: [
+      "hall of accomplishments",
+      "the hall of accomplishments",
+      "my hall of accomplishments",
+      "hall of achievements",
+      "accomplishments hall",
+      "my accomplishments",
+      "show my accomplishments",
+      "open hall of accomplishments",
+      "open my hall of accomplishments",
+      "portfolio",
+      "my portfolio",
+    ],
     route: "growth-portfolio",
     roomType: "archive",
   },
   {
     roomId: "decision-compass",
-    officialName: "Decision Compass™",
+    officialName: "Decision Compass",
     aliases: [
       "decision compass",
       "the decision compass",
@@ -580,14 +627,14 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "momentum-builder",
-    officialName: "Momentum Builder™",
+    officialName: "Momentum Builder",
     aliases: ["momentum builder", "the momentum builder", "plan my day"],
     route: "momentum-builder",
     roomType: "planning",
   },
   {
     roomId: "goals-projects",
-    officialName: "Goals & Projects™",
+    officialName: "Goals & Projects",
     aliases: [
       "goals and projects",
       "goals & projects",
@@ -599,7 +646,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "peaceful-places",
-    officialName: "Peaceful Places™",
+    officialName: "Peaceful Places",
     aliases: [
       "peaceful places",
       "peaceful place",
@@ -611,7 +658,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "estate-soundscapes",
-    officialName: "Estate Soundscapes™",
+    officialName: "Estate Soundscapes",
     aliases: [
       "estate soundscapes",
       "soundscapes",
@@ -631,70 +678,70 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "main-hallway",
-    officialName: "Main Hallway™",
+    officialName: "Main Hallway",
     aliases: ["main hallway", "the main hallway", "hallway", "the hallway"],
     route: "home",
     roomType: "reflection",
   },
   {
     roomId: "main-staircase",
-    officialName: "Main Staircase™",
+    officialName: "Main Staircase",
     aliases: ["main staircase", "the main staircase", "stairway", "the stairway"],
     route: "home",
     roomType: "reflection",
   },
   {
     roomId: "front-drive",
-    officialName: "Front Drive™",
+    officialName: "Front Drive",
     aliases: ["front drive", "the front drive", "driveway", "the driveway"],
     route: "home",
     roomType: "reflection",
   },
   {
     roomId: "garden-path",
-    officialName: "Garden Path™",
+    officialName: "Garden Path",
     aliases: ["garden path", "the garden path", "walk with me"],
     route: "home",
     roomType: "nature",
   },
   {
     roomId: "woodland-path",
-    officialName: "Woodland Path™",
+    officialName: "Woodland Path",
     aliases: ["woodland path", "the woodland path", "into the trees"],
     route: "home",
     roomType: "nature",
   },
   {
     roomId: "bridge",
-    officialName: "Garden Bridge™",
+    officialName: "Garden Bridge",
     aliases: ["garden bridge", "the garden bridge", "bridge", "the bridge", "over the stream"],
     route: "home",
     roomType: "nature",
   },
   {
     roomId: "my-estate",
-    officialName: "My Estate™",
+    officialName: "My Estate",
     aliases: ["my estate", "estate profile"],
     route: null,
     roomType: "profile",
   },
   {
     roomId: "institute-cabinet",
-    officialName: "My Institute Cabinet™",
+    officialName: "My Institute Cabinet",
     aliases: ["institute cabinet", "my institute cabinet", "my cabinet"],
     route: null,
     roomType: "archive",
   },
   {
     roomId: "seeds-planted",
-    officialName: "Seeds Planted™",
+    officialName: "Seeds Planted",
     aliases: ["seeds planted", "planted seeds", "spark cards", "my spark cards"],
     route: "grow-spark-cards",
     roomType: "archive",
   },
   {
     roomId: "growth-profile",
-    officialName: "Growth Profile™",
+    officialName: "Growth Profile",
     aliases: ["growth profile", "my growth profile"],
     route: null,
     roomType: "profile",

@@ -15,7 +15,7 @@ import {
   executiveControlPrinciples,
 } from "./index";
 
-describe("Executive Orchestrator™", () => {
+describe("Executive Orchestrator", () => {
   beforeEach(() => {
     resetRuntimeOrchestrator();
   });

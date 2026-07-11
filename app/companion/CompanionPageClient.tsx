@@ -33,7 +33,7 @@ import {
 import { GalleryExperiencePanel } from "@/components/companion/GalleryExperiencePanel";
 import { LifeExperienceRoomPanel } from "@/components/companion/LifeExperienceRoomPanel";
 import { DecisionCompassWorkspace } from "@/components/companion/DecisionCompassWorkspace";
-import { BreathePanel } from "@/components/companion/BreathePanel";
+import { BreatheDestinationHost } from "@/components/companion/BreatheDestinationHost";
 import { StrategiesPanel } from "@/components/companion/StrategiesPanel";
 import { CompanionCommunicationAnchor } from "@/components/companion/CompanionCommunicationAnchor";
 import { CompanionDeskChrome } from "@/components/companion/CompanionDeskChrome";
@@ -96,10 +96,12 @@ const VisualFocusWorkspacePanel = dynamic(
 );
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { EstateCollectionRoomPanel } from "@/components/estate-collection";
+import { EvidenceVaultRoomPanel } from "@/components/estate-collection/EvidenceVaultRoomPanel";
 import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
-import { ChamberOfMomentumEntryPanel } from "@/components/companion/chamber/ChamberOfMomentumEntryPanel";
+import { ChamberOfMomentumRoomPanel } from "@/components/companion/chamber/ChamberOfMomentumRoomPanel";
 import { ChamberProjectEntryPanel } from "@/components/companion/chamber/ChamberProjectEntryPanel";
-import { GrowthJournalPanel } from "@/components/companion/GrowthJournalPanel";
+import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
+import { GrowthPortfolioPanel } from "@/components/companion/GrowthPortfolioPanel";
 import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
 import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
 import type { InstituteLearningChatTurn } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
@@ -331,6 +333,7 @@ import {
   upsertCreateDraftEntry,
 } from "@/lib/createDraftLibrary";
 import { createNavigationHistoryStack } from "@/lib/navigationHistory";
+import { CHAT_NAVIGATION_INTENT } from "@/lib/navigation/chatDestination";
 import {
   loadWorkflowRecord,
   saveWorkflowRecord,
@@ -627,7 +630,14 @@ import {
   detectEcosystemProblemIntent,
   ecosystemIntentToWorkspaceOffer,
 } from "@/lib/companionEcosystemIntent";
-import { queueVisualFocusOpen, peekVisualFocusPendingOpen, requestVisualFocusStudio, createAndActivateMap } from "@/lib/visualFocus";
+import {
+  queueVisualFocusOpen,
+  peekVisualFocusPendingOpen,
+  peekMindMapDiscoveryPending,
+  requestVisualFocusStudio,
+  requestMindMapDiscoveryOpen,
+  createAndActivateMap,
+} from "@/lib/visualFocus";
 import {
   companionEntryLayerHintForChat,
   shouldDeferKeywordWorkspaceOffer,
@@ -918,15 +928,25 @@ import {
   visualMenuSelectionAck,
 } from "@/lib/visualThinkingContinuation";
 import {
+  studioModeForViewId,
   visualThinkingViewTitle,
   type VisualThinkingViewId,
 } from "@/lib/visualThinkingStudio";
+import {
+  resolveStudioViewForEngineOpen,
+  type SparkVisualEngineOpenRequest,
+} from "@/lib/sparkVisualEngine";
 import type { VisualFocusMode } from "@/lib/visualFocus/types";
 import {
   CREATE_PANEL_SECTION,
   isCreatePanelOpen,
   logHardNavCreate,
 } from "@/lib/openCreateWorkspace";
+import {
+  onEstatePlaceArrived,
+  onEstateSectionChanged,
+  shouldBlockCreateForRecognitionTurn,
+} from "@/lib/sparkRecognitionEngine/shellSync";
 import {
   buildCreateOpenLiveSnapshot,
   nextCreateOpenTraceId,
@@ -994,13 +1014,19 @@ import {
 } from "@/lib/conversation/primaryTurnLog";
 import { shouldRouteThroughEstateKernel } from "@/lib/estate/estateKernelGate";
 import { resolveEstatePlaceIdFromUserText } from "@/lib/estate/estateRoomAliasRegistry";
-import { resolveCurrentEstateRoom } from "@/lib/estate/roomContext";
+import { printConversation } from "@/lib/sparkAlpha/conversationExport";
 import { setCurrentRoom } from "@/lib/estateCapabilityRegistry";
 import type { EstateRoomAction } from "@/lib/estate/roomContext/types";
+import { resolveCurrentEstateRoom } from "@/lib/estate/roomContext";
 import {
   requestJournalGazeboCommand,
   type JournalGazeboCommandKind,
 } from "@/lib/journalGazebo/journalGazeboCommands";
+import {
+  consumeSparkCardAskCompanion,
+  subscribeSparkCardAskCompanion,
+} from "@/lib/sparkNote/sparkCardAskCompanion";
+import { JOURNAL_WELCOME_PLATE_URL } from "@/lib/journalGazebo/journalGazeboMedia";
 import { matchImpliedEstatePlace } from "@/lib/estate/impliedEstatePlaceMatch";
 import {
   evaluateImpliedNeed,
@@ -1053,6 +1079,16 @@ import { routeCompanionFailure } from "@/lib/companionContextRouting";
 import { readJsonResponse } from "@/lib/safeJsonResponse";
 import { useVisibleThinking } from "@/lib/useVisibleThinking";
 import { isExplicitBreatheRequest } from "@/lib/explicitBreatheRouting";
+import {
+  BREATHE_DESTINATION_FADE_MS,
+  EMPTY_BREATHE_DESTINATION,
+  isBreatheDestinationActive,
+  type BreatheDestinationState,
+} from "@/lib/breatheDestination";
+import {
+  resolveBreatheEnvironment,
+  type BreatheEnvironmentId,
+} from "@/lib/breatheDestination/breatheEnvironments";
 import {
   isBusinessAdviceRequest,
   primaryBusinessAdviceDomain,
@@ -1175,7 +1211,25 @@ import {
   standaloneToolAck,
 } from "@/lib/standaloneToolRouting";
 import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
-import { CLEAR_MY_MIND_CONSERVATORY_BG } from "@/lib/clearMyMind/conservatory";
+import { getClearMyMindBackdropImageUrl } from "@/lib/chatBackdrop";
+import {
+  enterClearMyMindMode,
+  exitClearMyMindMode,
+  isClearMyMindExitRequest,
+  isClearMyMindModeActive,
+  isClearMyMindOrganizeRequest,
+  setClearMyMindModePhase,
+  shouldStayInClearMyMindMode,
+} from "@/lib/clearMyMind/clearMyMindMode";
+import {
+  resolveExplicitCapabilityIntent,
+  type UniversalCapabilityRequest,
+} from "@/lib/universalAccess";
+import {
+  CLEAR_MY_MIND_CAPTURE_SUPPORT_LINES,
+  CLEAR_MY_MIND_EXIT_ANNOUNCE,
+  CLEAR_MY_MIND_WELCOME_LINES,
+} from "@/lib/clearMyMindCopy";
 import {
   directEstateChatRoomId,
   resolveEstatePlaceAudioHostPlaceId,
@@ -1208,6 +1262,8 @@ import {
   shouldShowDirectEstateVisitOverlay,
   type DirectEstateVisit,
 } from "@/lib/estate/directEstateVisit";
+import { isEstateFullBleedPanelSection } from "@/lib/estate/estateFullBleedPanelSections";
+import { EstateRoomErrorBoundary } from "@/components/companion/estate/EstateRoomErrorBoundary";
 import {
   isEstatePlaceChromeActive,
   resolveEstateChromePolicy,
@@ -1223,9 +1279,24 @@ import {
   estatePresenceGreeting,
   type EstateRoomInvitationItem,
 } from "@/lib/estate/estateRoomInvitation";
+import {
+  EVIDENCE_VAULT_ARRIVAL_WELCOME,
+  EVIDENCE_VAULT_INTENTIONAL_ENTRY_WELCOME,
+  EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT,
+  formatEvidenceVaultFindProofReply,
+  formatEvidenceVaultInsightsReply,
+  formatEvidenceVaultReminderReply,
+  consumeEvidenceVaultPendingWelcome,
+  setEvidenceVaultChatPrefill,
+  setEvidenceVaultPendingWelcome,
+  setEvidenceVaultSkipEntrance,
+  setEvidenceVaultWorkspaceMode,
+} from "@/lib/estate/evidenceVaultArrival";
+import { EVIDENCE_VAULT_CHAT_PRESERVE_OFFER } from "@/lib/estate/evidenceVaultExperience";
+import { evidenceVaultContextReply } from "@/lib/estate/evidenceVaultContextLock";
 import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
 import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
-import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG, ESTATE_PROFILE_ROOM_BG } from "@/lib/growth/growthRoom";
+import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ENTRANCE_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG, ESTATE_PROFILE_ROOM_BG } from "@/lib/growth/growthRoom";
 import {
   isProfileEstateMenuAction,
   isProfileEstateRoomId,
@@ -1242,7 +1313,6 @@ import { CAPTURE_MOMENT_ROOM_BG } from "@/lib/captureMoment/captureMomentRoom";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import {
   type ClearMyMindPanelView,
-  inferClearMyMindViewFromText,
   workspaceOpenCopyVerified,
   workspaceOpeningHintForChat,
 } from "@/lib/workspaceOpeningRule";
@@ -1337,6 +1407,12 @@ import {
   buildWorkspaceOfferForEstateSection,
   isEstateTransitionOfferMessage,
 } from "@/lib/estateMemory";
+import {
+  prepareEstateSceneTransition,
+  prepareEstateSceneTransitionFireAndForget,
+  syncEstateSceneActivePlate,
+} from "@/lib/estate/estateSceneTransition";
+import { WELCOME_ROOM_ASSET } from "@/lib/welcomeRoom/types";
 import { resolveMomentumBuilderRoomState } from "@/lib/momentumBuilderRoom/roomExperience";
 import { recordMomentumPathMilestone } from "@/lib/momentumBuilderRoom/momentumPathHooks";
 import { MOMENTUM_BUILDER_ROOM_BG } from "@/lib/momentumBuilderRoom/roomRegistry";
@@ -1345,6 +1421,7 @@ import {
   momentumBuilderRoomHintForChat,
 } from "@/lib/momentumBuilderRoom/momentumBuilderPrompt";
 import { CHAMBER_OF_MOMENTUM_ROOM_BG } from "@/lib/estate/chamber/chamberOfMomentumRoomRegistry";
+import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio";
 import { ensureChamberDemoDataSeeded } from "@/lib/estate/chamber/seedChamberDemoData";
 import { isChamberDemoMode } from "@/lib/estate/chamber/chamberDemoMode";
 import {
@@ -1366,6 +1443,23 @@ import {
   selectChamberJourneySupport,
   stageChamberJourneySelection,
 } from "@/lib/estate/chamber/chamberMemberJourney";
+import {
+  activateChamberMember,
+  clearActiveChamberMember,
+  stripChamberMemberActivationMessages,
+  readActiveChamberMember,
+} from "@/lib/chamber/chamberMemberActivation";
+import { chamberMemberHintForChat } from "@/lib/chamber/chamberMemberPrompt";
+import { isChamberMemberConversationActive } from "@/lib/chamber/chamberConversationLock";
+import {
+  chamberConversationTitle,
+  formatChamberConversationTranscript,
+} from "@/lib/chamber/chamberConversationExport";
+import { playPlaceFirstArrival } from "@/lib/estate/estatePlaceFirstArrival";
+import {
+  getChamberMemberById,
+  type ChamberMemberId,
+} from "@/lib/chamber/chamberMemberRegistry";
 import { recordChamberIntelligenceVisit } from "@/lib/estate/chamberOfMomentumMemory";
 import {
   STABLES_ROOM_BG,
@@ -1527,7 +1621,7 @@ import {
   searchSavedWork,
   type SavedWorkItem,
 } from "@/lib/savedWorkStore";
-import { setEvidencePrefill } from "@/lib/evidenceBankStore";
+import { exportAllEvidence, setEvidencePrefill } from "@/lib/evidenceBankStore";
 import {
   getEstateCollectionRoom,
   setCollectionPrefill,
@@ -1545,6 +1639,26 @@ import {
   type EstateCollectionRoomId,
   type EstateCollectionCaptureValues,
 } from "@/lib/estate/collectionFramework";
+import {
+  clearWinSavePending,
+  createWinSavePending,
+  detectsEncouragementNeed,
+  detectsSoftDiscouragement,
+  detectsWinSaveRequest,
+  EVIDENCE_VAULT_ENCOURAGEMENT_LINE,
+  formatWinSaveOfferMessage,
+  handleEvidenceCaptureMoment,
+  handleWinSaveRequest,
+  loadWinSavePending,
+  resolveWinSaveReply,
+  saveWinSavePending,
+} from "@/lib/estate/winSavePending";
+import {
+  CELEBRATION_GARDEN_INVITE_LINE,
+  shouldInviteCelebrationGarden,
+} from "@/lib/estate/celebrationGardenIntelligence";
+import { detectsWinsTimelineRequest } from "@/lib/estate/winsTimelineIntelligence";
+import { runConfidenceRecovery } from "@/lib/estate/confidenceRecoveryEngine";
 import { setConfidencePrefill } from "@/lib/confidenceVaultStore";
 import { setJourneyPrefill } from "@/lib/myJourneyStore";
 import {
@@ -1559,7 +1673,7 @@ import {
   type GrowthPanelNav,
   type GrowthSectionId,
 } from "@/lib/growthNavigation";
-import { isEstateImmersiveRoom, isStandaloneEstateRoomSection } from "@/lib/estateImmersiveLayout";
+import { isEstateImmersiveRoom, isStandaloneEstateRoomSection, shouldPreserveEstateRoomSectionDuringChat } from "@/lib/estateImmersiveLayout";
 import {
   isMyWorkPanelSection,
   myWorkPanelBackLabel,
@@ -1919,6 +2033,22 @@ export default function CompanionPageClient() {
   const syncDirectEstateVisit = useCallback((visit: DirectEstateVisit | null) => {
     directEstateVisitRef.current = visit;
     setDirectEstateVisit(visit);
+    if (visit) {
+      onEstatePlaceArrived({
+        placeId: visit.roomId,
+        section: visit.section,
+      });
+      return;
+    }
+    // Leaving a room without a new visit — if shell is Welcome Home, clear stale visual_room
+    // so pivots like "clear my mind" navigate instead of false already-here.
+    // Back to Chat (everyday conversation) must not re-enter welcome-home place sync.
+    if (
+      activeSectionRef.current === "home" &&
+      !preferEverydayConversationRef.current
+    ) {
+      onEstatePlaceArrived({ placeId: "welcome-home", section: "home" });
+    }
   }, []);
   const [workspacePanel, setWorkspacePanelState] = useState<AppSection | null>(
     null,
@@ -2095,6 +2225,14 @@ export default function CompanionPageClient() {
   });
   const [welcomeHomeReplay, setWelcomeHomeReplay] = useState(false);
   const [welcomeHomeIntroActive, setWelcomeHomeIntroActive] = useState(false);
+  /**
+   * Back to Chat / Chat nav — everyday conversation shell.
+   * Must not open Welcome Home lobby, dark curtain, or room restore fallbacks.
+   */
+  const [preferEverydayConversation, setPreferEverydayConversation] =
+    useState(false);
+  const preferEverydayConversationRef = useRef(false);
+  preferEverydayConversationRef.current = preferEverydayConversation;
 
   const [hasChatted, setHasChatted] = useState(false);
   const [recognitionMoment, setRecognitionMoment] =
@@ -2214,6 +2352,7 @@ export default function CompanionPageClient() {
   );
   const welcomeHomePrimary =
     activeSection === "home" &&
+    !preferEverydayConversation &&
     !workspacePanel &&
     !guideBesideSession &&
     !splitCreateChat &&
@@ -2276,6 +2415,12 @@ export default function CompanionPageClient() {
   const instituteLearningHintRef = useRef<string | null>(null);
   const stablesLearningHintRef = useRef<string | null>(null);
   const previousMomentumPathIdRef = useRef<string | null>(null);
+  const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(true);
+  const [activeChamberMemberId, setActiveChamberMemberId] =
+    useState<ChamberMemberId | null>(null);
+  const activeChamberMemberIdRef = useRef<ChamberMemberId | null>(null);
+  activeChamberMemberIdRef.current = activeChamberMemberId;
+  const [evidenceVaultArrivalKey, setEvidenceVaultArrivalKey] = useState(0);
   const momentumBuilderRoomExperience = useMemo(() => {
     if (!momentumBuilderPrimary) return null;
     return resolveMomentumBuilderRoomState({
@@ -2311,6 +2456,32 @@ export default function CompanionPageClient() {
   }, [momentumBuilderPrimary, momentumBuilderRoomExperience?.todaysPath]);
 
   useEffect(() => {
+    const stored = readActiveChamberMember();
+    if (stored?.id) {
+      setActiveChamberMemberId(stored.id);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeSection === "growth-journal") {
+      setEstateRoomChatVisible(false);
+    }
+  }, [activeSection]);
+
+  useEffect(() => {
+    if (activeSection === "evidence-bank") {
+      setEstateRoomChatVisible(false);
+    }
+  }, [activeSection]);
+
+  useEffect(() => {
+    if (activeSection !== "chamber-of-momentum") return;
+    if (activeChamberMemberId) {
+      setEstateRoomChatVisible(true);
+    }
+  }, [activeSection, activeChamberMemberId]);
+
+  useEffect(() => {
     if (activeSection !== "chamber-of-momentum") return;
     const assessment = consumeChamberIntelligence();
     if (assessment) {
@@ -2326,6 +2497,7 @@ export default function CompanionPageClient() {
   const homeCalm =
     activeSection === "home" &&
     isIdle &&
+    !preferEverydayConversation &&
     !splitCreateChat &&
     !workspaceActiveBeside &&
     !welcomeHomePrimary;
@@ -2704,7 +2876,30 @@ export default function CompanionPageClient() {
       sectionHistoryRef.current.push(prevSectionRef.current);
     }
     prevSectionRef.current = activeSection;
+    // Global — every section change updates live shell place (clears stale rooms).
+    // Back to Chat must not sync welcome-home (that triggers lobby / dark curtain).
+    if (!directEstateVisitRef.current) {
+      if (activeSection === "home") {
+        if (!preferEverydayConversationRef.current) {
+          onEstatePlaceArrived({ placeId: "welcome-home", section: "home" });
+        }
+      } else {
+        onEstateSectionChanged(activeSection);
+      }
+    }
   }, [activeSection]);
+
+  // Keep live shell in sync even when section did not "change" (fresh load /
+  // Welcome Home / tool screens with stale sessionStorage).
+  useEffect(() => {
+    if (directEstateVisitRef.current) return;
+    if (preferEverydayConversation) return;
+    if (welcomeHomePrimary || activeSection === "home") {
+      onEstatePlaceArrived({ placeId: "welcome-home", section: "home" });
+      return;
+    }
+    onEstateSectionChanged(activeSection);
+  }, [welcomeHomePrimary, activeSection, preferEverydayConversation]);
 
   // Help Me Right Now is retired — legacy links land on Focus instead.
   useEffect(() => {
@@ -2725,6 +2920,20 @@ export default function CompanionPageClient() {
     | "growth-profile"
     | "institute-cabinet"
   >(null);
+  /**
+   * Breathe Universal Access destination — not a room.
+   * Temporarily replaces the current scene; prior workspace stays mounted.
+   */
+  const [breatheDestination, setBreatheDestination] =
+    useState<BreatheDestinationState>(EMPTY_BREATHE_DESTINATION);
+  const [breatheResumeActive, setBreatheResumeActive] = useState(false);
+  const breathePausedTimerRef = useRef(false);
+  const breatheTransitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const breatheResumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [estateGuideFlipbookOpen, setEstateGuideFlipbookOpen] = useState(false);
   const [justBeHereSession, setJustBeHereSession] =
     useState<JustBeHereSession | null>(null);
@@ -2733,7 +2942,6 @@ export default function CompanionPageClient() {
   >(null);
   const [justBeHereChatVisible, setJustBeHereChatVisible] = useState(false);
   const [justBeHereSoundEnabled, setJustBeHereSoundEnabled] = useState(false);
-  const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(true);
   const justBeHereEnterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -2750,7 +2958,8 @@ export default function CompanionPageClient() {
     if (
       directEstateVisit &&
       isProfileEstateRoomId(directEstateVisit.roomId) &&
-      activeSection === profileEstateSectionForRoom(directEstateVisit.roomId)
+      activeSection === profileEstateSectionForRoom(directEstateVisit.roomId) &&
+      !isDedicatedEstateRoomPanelSection(activeSection)
     ) {
       return directEstateVisit.roomId;
     }
@@ -2799,6 +3008,16 @@ export default function CompanionPageClient() {
     freshStartRevision,
     estateNavigationKey: estateNavigationFocusKey,
   });
+
+  useEffect(() => {
+    return subscribeSparkCardAskCompanion(() => {
+      const request = consumeSparkCardAskCompanion();
+      if (!request) return;
+      setEstateRoomChatVisible(true);
+      requestChatInputFocus({ scrollIntoView: true });
+      void handleSendRef.current(request.prompt, false, true);
+    });
+  }, [requestChatInputFocus]);
 
   const [activityReturnLabel, setActivityReturnLabel] = useState<string | null>(
     null,
@@ -2940,10 +3159,19 @@ export default function CompanionPageClient() {
     useState(false);
   const [welcomeHomeEstateMapVisible, setWelcomeHomeEstateMapVisible] =
     useState(false);
+  /** When true, next Welcome Home primary render should show lobby signposts. */
+  const pendingWelcomeHomeLobbyRevealRef = useRef(false);
 
   useEffect(() => {
     if (!welcomeHomePrimary) {
-      setWelcomeHomeEstateMapVisible(false);
+      if (!pendingWelcomeHomeLobbyRevealRef.current) {
+        setWelcomeHomeEstateMapVisible(false);
+      }
+      return;
+    }
+    if (pendingWelcomeHomeLobbyRevealRef.current) {
+      pendingWelcomeHomeLobbyRevealRef.current = false;
+      setWelcomeHomeEstateMapVisible(true);
     }
   }, [welcomeHomePrimary]);
 
@@ -2954,9 +3182,16 @@ export default function CompanionPageClient() {
   }, [momentumBuilderPrimary]);
 
   useEffect(() => {
-    if (activeSection !== "brain-dump") {
-      setEstateConservatoryEngaged(false);
+    if (activeSection === "brain-dump") return;
+    if (isClearMyMindModeActive()) {
+      /**
+       * Mode is still on but the panel unmounted (stale navigation).
+       * Restore the Clear My Mind workspace — never leave frosted estate chat.
+       */
+      openClearMyMindCore({ silent: true });
+      return;
     }
+    setEstateConservatoryEngaged(false);
   }, [activeSection]);
 
   const [pendingCreateOpen, setPendingCreateOpen] =
@@ -5903,34 +6138,78 @@ export default function CompanionPageClient() {
     [restoreNavigationSnapshot],
   );
 
+  /**
+   * Back to Chat / Chat nav — return to the active conversation shell.
+   * Not Back to Estate: never Welcome Home lobby, dark curtain, or room restore.
+   * Clear My Mind thoughts stay paused in session storage until explicit discard.
+   */
   function navigateToChatCore() {
+    const intent = CHAT_NAVIGATION_INTENT;
     backInterceptorRef.current = null;
     goingBackRef.current = false;
     clearJustBeHereMode();
+
+    // Exit Clear My Mind mode flag so the remount-guard does not reopen the panel.
+    // Session thoughts remain in pauseClearMyMindSession storage.
+    if (isClearMyMindModeActive() || activeSectionRef.current === "brain-dump") {
+      exitClearMyMindMode();
+    }
+
+    setBreatheDestination(EMPTY_BREATHE_DESTINATION);
+    if (breatheTransitionTimerRef.current) {
+      clearTimeout(breatheTransitionTimerRef.current);
+      breatheTransitionTimerRef.current = null;
+    }
+    if (breatheResumeTimerRef.current) {
+      clearTimeout(breatheResumeTimerRef.current);
+      breatheResumeTimerRef.current = null;
+    }
+    setBreatheResumeActive(false);
+    breathePausedTimerRef.current = false;
     syncDirectEstateVisit(null);
     void stopAllEstateEnvironmentalAudio();
     clearEstatePendingTransition();
     setEstateConservatoryEngaged(false);
 
-    if (overlay) {
+    if (intent.dismissOverlay && overlay) {
       setOverlay(null);
       setSettingsSection(null);
     }
     if (planMyDayDrawerOpen) setPlanMyDayDrawerOpen(false);
 
-    setArrivalNavImmersion(false);
-    applyChatLayoutMode("split");
-    setWorkspaceFirstSplit(false);
+    setPreferEverydayConversation(true);
+    preferEverydayConversationRef.current = true;
+    setWelcomeHomeReplay(false);
+    setWelcomeHomeIntroActive(false);
+    setWelcomeHomeEstateMapVisible(false);
+    pendingWelcomeHomeLobbyRevealRef.current = false;
 
-    closeWorkspacePanel({ mode: "hide", silent: true });
+    if (intent.clearArrivalImmersion) {
+      setArrivalNavImmersion(false);
+    }
+    if (intent.restoreSplitLayout) {
+      applyChatLayoutMode("split");
+      setWorkspaceFirstSplit(false);
+    }
 
-    panelBackStackRef.current = [];
-    setWorkspacePanelBackLabel(null);
+    // Skip companionReturnSection / guide-return — those reopen Momentum/rooms.
+    companionReturnSectionRef.current = null;
+    closeWorkspacePanel({
+      mode: "hide",
+      silent: true,
+      skipSectionRestore: intent.skipSectionRestore,
+    });
 
-    setActiveSection("home");
-    activeSectionRef.current = "home";
-    setActiveNav("chat");
+    if (intent.resetPanelBackStack) {
+      panelBackStackRef.current = [];
+      setWorkspacePanelBackLabel(null);
+    }
+
+    setActiveSection(intent.activeSection);
+    activeSectionRef.current = intent.activeSection;
+    setActiveNav(intent.activeNav);
     setPlanMyDayOpenItemId(null);
+    // Do NOT onEstatePlaceArrived(welcome-home) — that is Back to Estate only.
 
     requestAnimationFrame(() => {
       requestChatInputFocus({ preventScroll: true });
@@ -5943,6 +6222,11 @@ export default function CompanionPageClient() {
 
   function goBack(options?: { skipInterceptor?: boolean }) {
     if (!options?.skipInterceptor && backInterceptorRef.current?.()) return;
+
+    if (isBreatheDestinationActive(breatheDestination)) {
+      closeBreatheOverlayCore({ resume: true });
+      return;
+    }
 
     if (overlay) {
       setOverlay(null);
@@ -5993,6 +6277,54 @@ export default function CompanionPageClient() {
     window.addEventListener("pointerdown", unlock, { once: true });
     return () => window.removeEventListener("pointerdown", unlock);
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (breatheTransitionTimerRef.current) {
+        clearTimeout(breatheTransitionTimerRef.current);
+      }
+      if (breatheResumeTimerRef.current) {
+        clearTimeout(breatheResumeTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    function onEvidenceVaultEntranceComplete() {
+      const welcome = consumeEvidenceVaultPendingWelcome();
+      if (!welcome) return;
+      setMessages((prev) => {
+        if (prev.some((m) => m.role === "assistant" && m.content === welcome)) {
+          return prev;
+        }
+        return [...prev, { role: "assistant", content: welcome }];
+      });
+    }
+    window.addEventListener(
+      EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT,
+      onEvidenceVaultEntranceComplete,
+    );
+    return () => {
+      window.removeEventListener(
+        EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT,
+        onEvidenceVaultEntranceComplete,
+      );
+    };
+  }, []);
+
+  /**
+   * Legacy `breathe` section → Universal Access destination.
+   * Breathe is not a Focus room; prior workspace stays mounted in memory.
+   */
+  useEffect(() => {
+    if (activeSection !== "breathe") return;
+    openBreatheOverlayCore();
+    const prev = sectionHistoryRef.current.pop() ?? "home";
+    goingBackRef.current = true;
+    setActiveSection(prev);
+    activeSectionRef.current = prev;
+    if (prev === "home") setActiveNav("chat");
+  }, [activeSection]);
 
   // Time-block alerts: while the app is open, check each ~30s for (a) a block
   // starting in ~15 minutes (gentle heads-up) and (b) a block whose start time
@@ -6215,7 +6547,26 @@ export default function CompanionPageClient() {
   }
 
   function requestClearTodayContext() {
-    setFreshStartDialog("clear-context");
+    // Conversations → New Chat: start immediately (no explanation dialog).
+    try {
+      const preserveRoom = shouldPreserveRoomForFreshConversation();
+      clearTodayContext({ preserveRoom });
+      setMessages([
+        {
+          role: "assistant",
+          content: NEW_CONVERSATION_GREETING,
+        },
+      ]);
+      setFreshStartRevision((revision) => revision + 1);
+      window.requestAnimationFrame(() => requestChatInputFocus());
+    } catch (err) {
+      const routed = routeCompanionFailure(err, {
+        surface: "fresh-start",
+      });
+      if (routed.channel === "estate") {
+        setMessages([{ role: "assistant", content: routed.message }]);
+      }
+    }
   }
 
   function requestResetDay() {
@@ -6223,7 +6574,20 @@ export default function CompanionPageClient() {
   }
 
   function requestBeginNewDay() {
-    setFreshStartDialog("begin-new-day");
+    // Conversations → New Day Chat: start immediately (no explanation dialog).
+    try {
+      const preserveRoom = shouldPreserveRoomForFreshConversation();
+      beginNewDay(preserveRoom);
+      setFreshStartRevision((revision) => revision + 1);
+      window.requestAnimationFrame(() => requestChatInputFocus());
+    } catch (err) {
+      const routed = routeCompanionFailure(err, {
+        surface: "fresh-start",
+      });
+      if (routed.channel === "estate") {
+        setMessages([{ role: "assistant", content: routed.message }]);
+      }
+    }
   }
 
   function handleStartCleanConversation() {
@@ -6343,6 +6707,17 @@ export default function CompanionPageClient() {
     const isHardNav = source === "hard_nav";
     const beforePanel = workspacePanelRef.current;
     const beforeSection = activeSectionRef.current;
+
+    // Sprint 1+ — recognition preserve-first / active flow blocks Create routing
+    // unless the member explicitly asked to open Create / draft / build.
+    if (
+      !isHardNav &&
+      source !== "ui_nav" &&
+      prompt &&
+      shouldBlockCreateForRecognitionTurn(prompt)
+    ) {
+      return false;
+    }
 
     publishLiveWorkspaceTrace("after_open_create_workspace", {
       command: opts?.hardNavCommand ?? prompt,
@@ -6485,6 +6860,14 @@ export default function CompanionPageClient() {
     nav?: SidebarNavId,
     options?: { userInitiated?: boolean },
   ) {
+    if (
+      isChamberMemberConversationActive({
+        activeSection: activeSectionRef.current,
+        activeMemberId: activeChamberMemberIdRef.current,
+      })
+    ) {
+      return;
+    }
     if (shouldBlockWorkspaceOpenForPhase1(options)) return;
     if (section === "growth") {
       openGrowthLandingCore();
@@ -6539,7 +6922,11 @@ export default function CompanionPageClient() {
     const workspaceFocusPanel = isWelcomeRoom;
 
     if (workspacePanel === section) {
-      if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
+      if (
+        section === "visual-focus" &&
+        !peekVisualFocusPendingOpen() &&
+        !peekMindMapDiscoveryPending()
+      ) {
         requestVisualFocusStudio();
       }
       setActiveSection("home");
@@ -6577,7 +6964,11 @@ export default function CompanionPageClient() {
 
     pushNavigationRestore();
     patchWorkspacePanel(section, options);
-    if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
+    if (
+      section === "visual-focus" &&
+      !peekVisualFocusPendingOpen() &&
+      !peekMindMapDiscoveryPending()
+    ) {
       requestVisualFocusStudio();
     }
     if (section === "projects" && !projectsResumeIdRef.current) {
@@ -7300,34 +7691,165 @@ export default function CompanionPageClient() {
   /** Standalone focus tools (Clear My Mind, spin wheel, energy, etc.). */
   function openStandaloneFocusSectionCore(section: AppSection) {
     const resolvedSection = section === "games" ? "quick-recharge" : section;
-    recordEstateRoomTransition({
-      toSection: resolvedSection,
-      fromSection: activeSectionRef.current,
-      reason: "estate room navigation",
-      userText: lastUserTextRef.current || undefined,
-      preserveChat: true,
-    });
-    pushNavigationRestore();
-    clearParallelCoachingOffers();
-    clearSplitBesideWorkspace();
-    setActiveSection(resolvedSection);
-    activeSectionRef.current = resolvedSection;
-    setActiveNav(navForWorkspaceSection(resolvedSection) ?? "focus");
+    setPreferEverydayConversation(false);
+    preferEverydayConversationRef.current = false;
+
+    void (async () => {
+      await prepareEstateSceneTransition({ toSection: resolvedSection });
+      recordEstateRoomTransition({
+        toSection: resolvedSection,
+        fromSection: activeSectionRef.current,
+        reason: "estate room navigation",
+        userText: lastUserTextRef.current || undefined,
+        preserveChat: true,
+      });
+      pushNavigationRestore();
+      clearParallelCoachingOffers();
+      clearSplitBesideWorkspace();
+      setActiveSection(resolvedSection);
+      activeSectionRef.current = resolvedSection;
+      setActiveNav(navForWorkspaceSection(resolvedSection) ?? "focus");
+    })();
   }
 
-  /** Clear My Mind — Garden Conservatory standalone room; never beside chat. */
+  /**
+   * Breathe Universal Access destination (#183).
+   * Full-screen scene replaces the current room; workspace stays mounted in memory.
+   * Pauses an active focus timer; progress is preserved until resume.
+   */
+  function openBreatheOverlayCore(options?: {
+    patternId?: string;
+    minutes?: number;
+    environmentId?: BreatheEnvironmentId;
+  }) {
+    setEstateRoomChatVisible(false);
+    const breatheEnv = resolveBreatheEnvironment(options?.environmentId);
+    preloadRoomBackground(breatheEnv.imageUrl);
+    if (
+      pomodoroTimer.isActive &&
+      !pomodoroTimer.isPaused &&
+      typeof pomodoroTimer.pause === "function"
+    ) {
+      pomodoroTimer.pause();
+      breathePausedTimerRef.current = true;
+    } else {
+      breathePausedTimerRef.current = false;
+    }
+
+    if (breatheTransitionTimerRef.current) {
+      clearTimeout(breatheTransitionTimerRef.current);
+      breatheTransitionTimerRef.current = null;
+    }
+    if (breatheResumeTimerRef.current) {
+      clearTimeout(breatheResumeTimerRef.current);
+      breatheResumeTimerRef.current = null;
+    }
+    setBreatheResumeActive(false);
+
+    setBreatheDestination({
+      phase: "entering",
+      patternId: options?.patternId,
+      minutes: options?.minutes,
+      environmentId: breatheEnv.id,
+      key: Date.now(),
+    });
+    breatheTransitionTimerRef.current = setTimeout(() => {
+      setBreatheDestination((prev) =>
+        prev.phase === "entering" ? { ...prev, phase: "active" } : prev,
+      );
+      breatheTransitionTimerRef.current = null;
+    }, BREATHE_DESTINATION_FADE_MS);
+  }
+
+  function closeBreatheOverlayCore(opts?: {
+    resume?: boolean;
+    goChat?: boolean;
+    goJournal?: boolean;
+  }) {
+    if (
+      !breatheDestination.phase ||
+      breatheDestination.phase === "exiting"
+    ) {
+      return;
+    }
+
+    if (breatheTransitionTimerRef.current) {
+      clearTimeout(breatheTransitionTimerRef.current);
+      breatheTransitionTimerRef.current = null;
+    }
+
+    const shouldResumeTimer = breathePausedTimerRef.current;
+    const pending = opts;
+
+    setBreatheDestination((prev) => ({ ...prev, phase: "exiting" }));
+    breatheTransitionTimerRef.current = setTimeout(() => {
+      breatheTransitionTimerRef.current = null;
+      setBreatheDestination(EMPTY_BREATHE_DESTINATION);
+      setBreatheResumeActive(true);
+      if (breatheResumeTimerRef.current) {
+        clearTimeout(breatheResumeTimerRef.current);
+      }
+      breatheResumeTimerRef.current = setTimeout(() => {
+        setBreatheResumeActive(false);
+        breatheResumeTimerRef.current = null;
+      }, BREATHE_DESTINATION_FADE_MS);
+
+      breathePausedTimerRef.current = false;
+
+      if (pending?.goJournal) {
+        openGrowthDestinationCore("growth-journal");
+        return;
+      }
+      if (pending?.goChat) {
+        navigateToChatCore();
+        return;
+      }
+      /** Resume previous activity — workspace was never unmounted. */
+      if (shouldResumeTimer && typeof pomodoroTimer.start === "function") {
+        pomodoroTimer.start();
+      }
+    }, BREATHE_DESTINATION_FADE_MS);
+  }
+
+  /** Clear My Mind Mode — interactive capture workspace; never frosted chat overlay. */
   function openClearMyMindCore(options?: {
     initialView?: ClearMyMindPanelView;
     silent?: boolean;
   }) {
-    preloadRoomBackground(CLEAR_MY_MIND_CONSERVATORY_BG);
+    const backdropUrl = getClearMyMindBackdropImageUrl();
+    preloadRoomBackground(backdropUrl);
     const view = options?.initialView ?? "capture";
+    setPreferEverydayConversation(false);
+    preferEverydayConversationRef.current = false;
+    enterClearMyMindMode();
+    setClearMyMindModePhase(view === "my-thoughts" ? "organize" : "capture");
     setBrainDumpInitialView(view);
     setBrainDumpPanelKey((k) => k + 1);
     trackWorkspaceEcosystemEvent("brain-dump");
     noteWorkspaceOpened("brain-dump", "standalone_room");
     clearSplitBesideWorkspace();
+    /** Dedicated panel — never leave a direct-visit overlay covering the workspace. */
+    syncDirectEstateVisit(null);
+    clearEstatePendingTransition();
+    setEstateConservatoryEngaged(true);
+    patchEstateRuntimeState({
+      currentPlaceId: "clear-my-mind",
+      activeConversationMode: true,
+    });
     openStandaloneFocusSectionCore("brain-dump");
+    if (!options?.silent) {
+      const greeting = CLEAR_MY_MIND_WELCOME_LINES[0];
+      setMessages((prev) => {
+        if (
+          prev.some(
+            (m) => m.role === "assistant" && m.content === greeting,
+          )
+        ) {
+          return prev;
+        }
+        return [...prev, { role: "assistant", content: greeting }];
+      });
+    }
   }
 
   /** Plan My Day — Morning Room standalone; never beside chat. */
@@ -7432,6 +7954,9 @@ export default function CompanionPageClient() {
 
   function openChamberOfMomentumCore() {
     pauseActiveArtifactIfLeavingCreate("chamber-of-momentum");
+    setOverlay(null);
+    clearActiveChamberMember();
+    setActiveChamberMemberId(null);
     pushGrowBackLabel();
     preloadRoomBackground(CHAMBER_OF_MOMENTUM_ROOM_BG);
     if (isChamberDemoMode()) {
@@ -7439,7 +7964,122 @@ export default function CompanionPageClient() {
     }
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
+    playPlaceFirstArrival("chamber-of-momentum");
+    syncDirectEstateVisit({
+      roomId: "chamber-of-momentum",
+      section: "chamber-of-momentum",
+      userIntent: "chamber-of-momentum",
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user")
+        .length,
+    });
     openStandaloneFocusSectionCore("chamber-of-momentum");
+    setEstateRoomChatVisible(false);
+  }
+
+  function openCartographersStudioCore() {
+    pauseActiveArtifactIfLeavingCreate("visual-focus");
+    setOverlay(null);
+    pushGrowBackLabel();
+    preloadRoomBackground(CARTOGRAPHERS_STUDIO_BACKGROUND);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    setEstateRoomChatVisible(false);
+    syncDirectEstateVisit({
+      roomId: "cartographers-studio",
+      section: "visual-focus",
+      userIntent: "cartographers-studio",
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user")
+        .length,
+    });
+    openStandaloneFocusSectionCore("visual-focus");
+  }
+
+  function inviteChamberMemberCore(memberId: ChamberMemberId) {
+    const previousId = activeChamberMemberId;
+    const activation = activateChamberMember(memberId);
+    if (!activation) return;
+
+    setActiveChamberMemberId(memberId);
+    setMessages((prev) => {
+      let next = prev;
+      if (previousId && previousId !== memberId) {
+        const previousMember = getChamberMemberById(previousId);
+        next = stripChamberMemberActivationMessages(next).filter(
+          (message) =>
+            !(
+              previousMember &&
+              message.role === "assistant" &&
+              message.content === previousMember.activationOpener
+            ),
+        );
+      }
+      return [
+        ...next,
+        { role: "system", content: activation.messages.system },
+        { role: "assistant", content: activation.messages.assistant },
+      ];
+    });
+    setEstateRoomChatVisible(true);
+    requestChatInputFocus();
+  }
+
+  function endChamberMemberConversationCore() {
+    clearActiveChamberMember();
+    setActiveChamberMemberId(null);
+    setEstateRoomChatVisible(false);
+  }
+
+  function saveChamberConversationCore() {
+    saveConversation(messages);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content:
+          "Saved. This Chamber conversation is in your history whenever you need it again.",
+      },
+    ]);
+  }
+
+  function printChamberConversationCore() {
+    const member = activeChamberMemberId
+      ? getChamberMemberById(activeChamberMemberId)
+      : null;
+    if (!member) return;
+    const lines = messages.map((message) => ({
+      role: message.role,
+      text: message.content,
+    }));
+    const title = chamberConversationTitle(member, lines);
+    const transcript = formatChamberConversationTranscript(lines, member);
+    const error = printConversation(title, transcript);
+    if (error) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: error },
+      ]);
+    }
+  }
+
+  function continueChamberConversationCore() {
+    setEstateRoomChatVisible(true);
+    requestChatInputFocus();
+  }
+
+  function startChamberNewTopicCore() {
+    const member = activeChamberMemberId
+      ? getChamberMemberById(activeChamberMemberId)
+      : null;
+    if (!member) return;
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: `Fresh topic with ${member.displayName}. What would you like help with?`,
+      },
+    ]);
+    setEstateRoomChatVisible(true);
+    requestChatInputFocus();
   }
 
   function openChamberProjectEntryCore() {
@@ -7470,7 +8110,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (section === "evidence-bank") {
-      openStandaloneFocusSectionCore("evidence-bank");
+      enterEvidenceVaultRoomCore({ userIntent: "chamber:evidence-vault" });
       return;
     }
     if (section === "chamber-project-entry") {
@@ -7548,6 +8188,10 @@ export default function CompanionPageClient() {
   );
 
   function openSectionFromUrlCore(section: AppSection) {
+    if (section === "breathe") {
+      openBreatheOverlayCore();
+      return;
+    }
     if (section === "chamber-of-momentum") {
       openChamberOfMomentumCore();
       return;
@@ -7679,14 +8323,43 @@ export default function CompanionPageClient() {
   }
 
   function openGrowthDestinationCore(section: AppSection) {
-    const resolved =
-      section === "growth-portfolio" ? ("growth-library" as AppSection) : section;
+    // Portfolio ≠ Achievement Library — do not remap growth-portfolio → growth-library
+    const resolved = section;
+    setOverlay(null);
+    if (resolved === "brain-dump") {
+      openClearMyMindCore();
+      return;
+    }
+    /** Evidence Vault — EST-001 place-first (room + welcome before form). */
+    if (resolved === "evidence-bank") {
+      enterEvidenceVaultRoomCore({
+        userIntent: lastUserTextRef.current || "open-evidence-vault",
+      });
+      return;
+    }
     pushGrowthBackLabel();
     if (resolved === "growth-journal") {
+      const journalPlate =
+        resolveEstateRoomBackgroundImage("journal") ?? JOURNAL_ROOM_BG;
       preloadRoomBackground(JOURNAL_ROOM_BG);
-    }
-    if (resolved === "evidence-bank") {
-      preloadRoomBackground(EVIDENCE_VAULT_ROOM_BG);
+      preloadRoomBackground(JOURNAL_WELCOME_PLATE_URL);
+      syncEstateSceneActivePlate({
+        toRoomId: "journal",
+        imageUrl: journalPlate,
+      });
+      prepareEstateSceneTransitionFireAndForget({
+        toRoomId: "journal",
+        imageUrl: journalPlate,
+        silent: true,
+      });
+      setEstateRoomChatVisible(false);
+      syncDirectEstateVisit({
+        roomId: "journal",
+        section: "growth-journal",
+        userIntent: "growth-journal",
+        userMessageCountAtArrival: messages.filter((m) => m.role === "user")
+          .length,
+      });
     }
     if (resolved === "growth-library") {
       preloadRoomBackground(STORY_LIBRARY_ROOM_BG);
@@ -7707,6 +8380,71 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore(resolved);
   }
 
+  /**
+   * Evidence Vault EST-001 — enter the place first.
+   * Background + Spark welcome + invitation offers; form only after member chooses.
+   * When workspaceMode is add/browse, skip the frosted arrival overlay and open the panel.
+   */
+  function enterEvidenceVaultRoomCore(opts?: {
+    userIntent?: string;
+    workspaceMode?: "arrive" | "add" | "browse";
+    skipWelcome?: boolean;
+  }) {
+    if (isBreatheDestinationActive(breatheDestination)) {
+      closeBreatheOverlayCore({ resume: true });
+    }
+    setEstateRoomChatVisible(false);
+    const mode = opts?.workspaceMode ?? "arrive";
+    setEvidenceVaultWorkspaceMode(mode);
+    if (mode === "add") {
+      setEvidenceVaultSkipEntrance(true);
+      setEvidenceVaultChatPrefill(true);
+    } else if (mode === "browse") {
+      setEvidenceVaultSkipEntrance(true);
+    } else {
+      setEvidenceVaultSkipEntrance(false);
+      setEvidenceVaultArrivalKey((key) => key + 1);
+    }
+    preloadRoomBackground(EVIDENCE_VAULT_ENTRANCE_BG);
+    preloadRoomBackground(EVIDENCE_VAULT_ROOM_BG);
+    pushGrowthBackLabel();
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    setOverlay(null);
+
+    const visit: DirectEstateVisit = {
+      roomId: "evidence-vault",
+      section: "evidence-bank",
+      userIntent: opts?.userIntent ?? "evidence-vault",
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user")
+        .length,
+    };
+    syncDirectEstateVisit(visit);
+    openStandaloneFocusSectionCore("evidence-bank");
+    if (opts?.skipWelcome) return;
+    const intentionalVault =
+      /\b(?:use\s+(?:my\s+)?evidence\s+vault|i\s+want\s+to\s+use|open\s+(?:my\s+)?evidence\s+vault)\b/i.test(
+        opts?.userIntent ?? "",
+      );
+    const welcome = intentionalVault
+      ? EVIDENCE_VAULT_INTENTIONAL_ENTRY_WELCOME
+      : (estateArrivalShariGreeting("evidence-vault") ??
+        EVIDENCE_VAULT_ARRIVAL_WELCOME);
+    if (mode === "arrive") {
+      /** Door/key ritual first — welcome posts after doors open. */
+      setEvidenceVaultPendingWelcome(welcome);
+      return;
+    }
+    setMessages((prev) => {
+      if (
+        prev.some((m) => m.role === "assistant" && m.content === welcome)
+      ) {
+        return prev;
+      }
+      return [...prev, { role: "assistant", content: welcome }];
+    });
+  }
+
   function openCollectionRoomWithPrefillCore(
     roomId: EstateCollectionRoomId,
     prefill: EstateCollectionCaptureValues,
@@ -7718,6 +8456,14 @@ export default function CompanionPageClient() {
       sourceText,
       savedAt: new Date().toISOString(),
     });
+    if (roomId === "evidence-vault") {
+      enterEvidenceVaultRoomCore({
+        userIntent: sourceText,
+        workspaceMode: "add",
+        skipWelcome: true,
+      });
+      return;
+    }
     const room = getEstateCollectionRoom(roomId);
     openGrowthDestinationCore(room.section);
   }
@@ -7764,6 +8510,10 @@ export default function CompanionPageClient() {
   }
 
   function openWorkspaceFromSection(section: AppSection) {
+    if (section === "breathe") {
+      openBreatheOverlayCore();
+      return;
+    }
     const source = resolveCurrentGuideSection();
     if (shouldWalkThroughFromHowDoI(source)) {
       openHowDoIToolWalkthrough(section);
@@ -7954,6 +8704,12 @@ export default function CompanionPageClient() {
       preloadRoomBackground(bg);
       setGrowthProfileEmphasizeTimeline(false);
       setOverlay(null);
+      if (roomId === "evidence-vault") {
+        enterEvidenceVaultRoomCore({
+          userIntent: "estate-menu:evidence-vault",
+        });
+        return;
+      }
       syncDirectEstateVisit(null);
       openGrowthDestinationCore(section);
       return;
@@ -8021,30 +8777,26 @@ export default function CompanionPageClient() {
     setEstateRoomChatVisible((visible) => !visible);
   }
 
-  function returnToCurrentRoomView() {
-    if (justBeHereSession) {
-      clearJustBeHereMode();
-      return;
-    }
-    if (
-      overlay === "settings" ||
-      overlay === "profile" ||
-      overlay === "growth-profile"
-    ) {
-      setOverlay(null);
-      setSettingsSection(null);
-      return;
-    }
-    if (planMyDayDrawerOpen) {
-      setPlanMyDayDrawerOpen(false);
-    }
-  }
-
+  /**
+   * Room menu → Back to Estate.
+   * Always returns to the Welcome Home lobby (not everyday chat shell).
+   */
   function navigateBackToEstateHome() {
-    returnFromJustBeHere();
+    returnToWelcomeHomeLobby("back to estate");
   }
 
   function handleEstateWander(fromRoomId: string) {
+    /**
+     * Clear My Mind Mode — stay in the capture workspace until explicit exit.
+     * Wander must not drop the member into frosted estate chat on another room.
+     */
+    if (
+      isClearMyMindModeActive() ||
+      activeSectionRef.current === "brain-dump"
+    ) {
+      return;
+    }
+
     const pick = pickWanderDestination(fromRoomId);
     if (!pick || !validateWanderPick(pick)) return;
 
@@ -8074,6 +8826,11 @@ export default function CompanionPageClient() {
   }
 
   function returnFromJustBeHere() {
+    returnToWelcomeHomeLobby("just be here return");
+  }
+
+  /** Full reset into Welcome Home lobby — clears overlays, visits, and panels that block welcomeHomePrimary. */
+  function returnToWelcomeHomeLobby(reason: string) {
     if (typeof document !== "undefined" && document.fullscreenElement) {
       void document.exitFullscreen().catch(() => {
         /* member declined or browser blocked */
@@ -8081,22 +8838,79 @@ export default function CompanionPageClient() {
     }
 
     const fromSection = activeSectionRef.current;
+
+    if (isClearMyMindModeActive() || fromSection === "brain-dump") {
+      exitClearMyMindMode();
+    }
+
     clearJustBeHereMode();
+    setPreferEverydayConversation(false);
+    preferEverydayConversationRef.current = false;
+    setWelcomeHomeIntroActive(false);
+    setWelcomeHomeReplay(false);
+    setEstateRoomChatVisible(false);
     syncDirectEstateVisit(null);
     clearEstatePendingTransition();
+
+    const welcomeHomePlate =
+      resolveEstateRoomBackgroundImage("welcome-home") ?? WELCOME_ROOM_ASSET;
+    syncEstateSceneActivePlate({
+      toRoomId: "welcome-home",
+      imageUrl: welcomeHomePlate,
+    });
+    prepareEstateSceneTransitionFireAndForget({
+      toRoomId: "welcome-home",
+      imageUrl: welcomeHomePlate,
+      silent: true,
+    });
     setEstateConservatoryEngaged(false);
+    setMomentumBuilderArrivalActive(false);
+    setGuideBesideSession(null);
     setCompanionStandaloneSection(null);
+    setActivitySession(EMPTY_ACTIVITY_SESSION);
+    activitySessionRef.current = EMPTY_ACTIVITY_SESSION;
+    setDecisionCompassSession(null);
+    setDecisionCompassPrefill(null);
+    setPlanMyDayDrawerOpen(false);
+    setPlanMyDayOpenItemId(null);
+    setOverlay(null);
+    setSettingsSection(null);
+    setEstateGuideFlipbookOpen(false);
 
     recordEstateRoomTransition({
       toSection: "home",
       toEntryId: "welcome-home",
       fromSection,
-      reason: "just be here return",
+      reason,
       preserveChat: true,
+      playArrival: false,
     });
     setCurrentRoom("welcome-home");
+
+    backInterceptorRef.current = null;
+    goingBackRef.current = false;
+    void stopAllEstateEnvironmentalAudio();
+    setArrivalNavImmersion(false);
+    applyChatLayoutMode("split");
+    setWorkspaceFirstSplit(false);
+    closeWorkspacePanel({ mode: "hide", silent: true });
+    panelBackStackRef.current = [];
+    setWorkspacePanelBackLabel(null);
+    navHistoryRef.current = createNavigationHistoryStack();
+    sectionHistoryRef.current = [];
+
+    setActiveSection("home");
+    activeSectionRef.current = "home";
+    setActiveNav("chat");
+    onEstatePlaceArrived({ placeId: "welcome-home", section: "home" });
+
+    /** Reveal lobby after welcomeHomePrimary becomes true (avoids clear race). */
+    pendingWelcomeHomeLobbyRevealRef.current = true;
     setWelcomeHomeEstateMapVisible(true);
-    navigateToChatCore();
+    requestAnimationFrame(() => {
+      pendingWelcomeHomeLobbyRevealRef.current = false;
+      requestChatInputFocus({ preventScroll: true });
+    });
   }
 
   function handleEstateMenuAction(actionId: EstateMenuActionId) {
@@ -8105,7 +8919,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (actionId === "journal") {
-      openUserMemoryCore("journal");
+      openGrowthDestinationCore("growth-journal");
       return;
     }
 
@@ -8158,6 +8972,111 @@ export default function CompanionPageClient() {
     }
   }
 
+  /**
+   * Universal Access (#183) — fulfill an explicit capability request from any room.
+   * Exits Clear My Mind Mode when leaving for another capability so location never blocks.
+   * Always user-initiated so Phase 1 / context locks cannot deny access.
+   */
+  function fulfillUniversalCapabilityRequest(
+    request: UniversalCapabilityRequest,
+  ): void {
+    const leavingClearMyMind =
+      request.capabilityId !== "clear-my-mind" &&
+      request.capabilityId !== "breathe" &&
+      (isClearMyMindModeActive() ||
+        activeSectionRef.current === "brain-dump");
+    if (leavingClearMyMind) {
+      exitClearMyMindMode();
+    }
+
+    const openBeside = (section: AppSection) => {
+      openWorkspaceBesideChatCore(section, workspaceOpenAck(section), {
+        userInitiated: true,
+      });
+    };
+
+    switch (request.capabilityId) {
+      case "clear-my-mind":
+        openClearMyMindCore({ silent: true });
+        break;
+      case "visual-thinking": {
+        const viewId = request.visualStudioViewId ?? "mind-map";
+        const mode = studioModeForViewId(viewId);
+        completeVisualThinkingOpen({
+          mode,
+          viewId,
+          viewTitle: visualThinkingViewTitle(viewId),
+          ack: request.ack,
+        });
+        break;
+      }
+      case "focus-timer":
+        openStandaloneFocusSectionCore("focus-timer");
+        break;
+      case "calendar":
+        openBeside("time-block");
+        break;
+      case "projects":
+        openSectionBesideChatCore("projects", "projects", {
+          userInitiated: true,
+        });
+        break;
+      case "journal":
+        openGrowthDestinationCore("growth-journal");
+        break;
+      case "evidence-vault":
+        enterEvidenceVaultRoomCore({
+          userIntent: "universal:evidence-vault",
+        });
+        break;
+      case "destination-gallery":
+        openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth");
+        break;
+      case "google-workspace":
+        openCreateWorkspace({ source: "hard_nav", hardNavCommand: "google" });
+        break;
+      case "decision-compass":
+        openDecisionCompass();
+        break;
+      case "plan-my-day":
+        openPlanMyDayCore();
+        break;
+      case "breathe":
+        openBreatheOverlayCore({
+          patternId: request.breathePatternId,
+        });
+        break;
+      case "peaceful-places":
+        openFocusAudioCore();
+        break;
+      case "content-create":
+        openCreateWorkspace({ source: "hard_nav", hardNavCommand: "create" });
+        break;
+      case "strategies":
+        openBeside("playbook");
+        break;
+      case "saved-work":
+        openBeside("saved-work");
+        break;
+      case "templates":
+        openBeside("templates-library");
+        break;
+      case "client-avatars":
+        openBeside("client-avatars");
+        break;
+      case "momentum-games":
+        openStandaloneFocusSectionCore("quick-recharge");
+        break;
+      case "spin-wheel":
+        openStandaloneFocusSectionCore("spin-wheel");
+        break;
+      default: {
+        const _exhaustive: never = request.capabilityId;
+        return _exhaustive;
+      }
+    }
+  }
+
   function handleToolSelectCore(tool: SidebarToolId) {
     switch (tool) {
       case "brain-dump":
@@ -8167,7 +9086,7 @@ export default function CompanionPageClient() {
         openStandaloneFocusSectionCore("focus-timer");
         break;
       case "breathe":
-        openStandaloneFocusSectionCore("breathe");
+        openBreatheOverlayCore();
         break;
       case "focus-audio":
         openFocusAudioCore(detectAudioRequest(lastUserTextRef.current).categoryId);
@@ -8914,7 +9833,7 @@ export default function CompanionPageClient() {
       switch (result.section) {
         case "brain-dump":
           openClearMyMindCore({
-            initialView: result.clearMyMindView ?? "capture",
+            initialView: "capture",
             silent: true,
           });
           break;
@@ -9534,6 +10453,7 @@ export default function CompanionPageClient() {
   function openWorkspaceBesideChatCore(
     section: AppSection,
     ack = workspaceOpenAck(section),
+    options?: { userInitiated?: boolean },
   ) {
     if (isClearMyMindSection(section)) {
       openClearMyMindCore();
@@ -9590,7 +10510,9 @@ export default function CompanionPageClient() {
     }
 
     pushNavigationRestore();
-    patchWorkspacePanel(section);
+    patchWorkspacePanel(section, {
+      userInitiated: options?.userInitiated ?? true,
+    });
     setWorkspaceDetail(emptyWorkspaceDetail());
     setActiveSection("home");
     activeSectionRef.current = "home";
@@ -9777,6 +10699,32 @@ export default function CompanionPageClient() {
   }) {
     const prompt = input.purposeAnswer?.trim();
     if (prompt) lastUserTextRef.current = prompt;
+
+    const isMindMap =
+      input.mode === "mind-map" ||
+      input.viewId === "mind-map" ||
+      /mind\s*map/i.test(input.viewTitle ?? "");
+
+    if (isMindMap) {
+      // Same Discovery Interview as the Mind Map frame — never the old dashboard.
+      requestMindMapDiscoveryOpen(prompt || undefined);
+      openSectionBesideChatCore("visual-focus", undefined, {
+        userInitiated: true,
+      });
+      clearVisualThinkingMenuPending();
+      clearFrictionlessPending();
+      clearPendingAcceptanceAuthority();
+      setToolSuggestion(null);
+      setWorkspaceOffer(null);
+      setDecisionCompassOffer(null);
+      setActionBridge(null);
+      setBridge(null);
+      return (
+        input.ack ||
+        "Let's start with Discovery — what would you like to create a mind map about?"
+      );
+    }
+
     const map = createAndActivateMap(input.mode, prompt || undefined);
     queueVisualFocusOpen(map.id);
     openSectionBesideChatCore("visual-focus", undefined, { userInitiated: true });
@@ -9789,6 +10737,24 @@ export default function CompanionPageClient() {
     setActionBridge(null);
     setBridge(null);
     return input.ack;
+  }
+
+  function openSparkVisualEngineFromExperience(
+    request: SparkVisualEngineOpenRequest,
+  ) {
+    const viewId = resolveStudioViewForEngineOpen(request);
+    const mode = studioModeForViewId(viewId);
+    const ack = completeVisualThinkingOpen({
+      mode,
+      viewId,
+      viewTitle: visualThinkingViewTitle(viewId),
+      purposeAnswer: request.seedText,
+      ack: "I'll bring that up.",
+    });
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: ack },
+    ]);
   }
 
   function clearFrictionlessOfferState() {
@@ -10054,7 +11020,12 @@ export default function CompanionPageClient() {
     ]);
     recordPrimaryTurnResponse(frictionlessAction.localReply!);
 
-    if (frictionlessAction.immediateVisualOpen) {
+    const chamberMemberConversationLocked = isChamberMemberConversationActive({
+      activeSection: activeSectionRef.current,
+      activeMemberId: activeChamberMemberIdRef.current,
+    });
+
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateVisualOpen) {
       completeVisualThinkingOpen(frictionlessAction.immediateVisualOpen);
       setInput("");
       setAwaitingUserConfirmation(null);
@@ -10063,7 +11034,19 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (frictionlessAction.immediateCreateOpen) {
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateCartographersStudioOpen) {
+      requestVisualFocusStudio();
+      openSectionBesideChatCore("visual-focus", undefined, {
+        userInitiated: true,
+      });
+      setInput("");
+      setAwaitingUserConfirmation(null);
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateCreateOpen) {
       completeImmediateCreateOpen(frictionlessAction.immediateCreateOpen);
       setInput("");
       finishEarlyChatTurn();
@@ -10071,7 +11054,7 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (frictionlessAction.immediateCreateProjectOpen) {
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateCreateProjectOpen) {
       completeImmediateCreateProjectOpen(
         frictionlessAction.immediateCreateProjectOpen,
       );
@@ -10081,7 +11064,7 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (frictionlessAction.immediateMomentumOpen) {
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateMomentumOpen) {
       completeImmediateMomentumOpen(frictionlessAction.immediateMomentumOpen);
       setInput("");
       finishEarlyChatTurn();
@@ -10089,7 +11072,7 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (frictionlessAction.immediateResearchOpen) {
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateResearchOpen) {
       completeImmediateResearchOpen(frictionlessAction.immediateResearchOpen);
       setInput("");
       finishEarlyChatTurn();
@@ -10097,7 +11080,7 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (frictionlessAction.immediateEstateCoachingOpen) {
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateEstateCoachingOpen) {
       completeImmediateEstateCoachingOpen(
         frictionlessAction.immediateEstateCoachingOpen,
       );
@@ -10107,7 +11090,7 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (frictionlessAction.pendingChoiceExecution) {
+    if (!chamberMemberConversationLocked && frictionlessAction.pendingChoiceExecution) {
       completePendingChoiceExecution(frictionlessAction.pendingChoiceExecution);
       setInput("");
       finishEarlyChatTurn();
@@ -10115,7 +11098,7 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (frictionlessAction.immediateEstatePlaceNavigate) {
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateEstatePlaceNavigate) {
       const payload = frictionlessAction.immediateEstatePlaceNavigate;
       const command = estateNavigateCommandForPlace(
         payload.placeId,
@@ -10312,6 +11295,111 @@ export default function CompanionPageClient() {
     activeChatTurnLifecycleRef.current = chatTurnState;
 
     try {
+    /**
+     * Universal Access (#183) — explicit capability requests win over location.
+     * Must run before Clear My Mind capture lock so CMM never denies another capability.
+     */
+    {
+      const universalRequest = resolveExplicitCapabilityIntent(trimmed);
+      if (universalRequest) {
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        fulfillUniversalCapabilityRequest(universalRequest);
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: universalRequest.ack },
+        ]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (!getPrefs().hasChatted) {
+          savePrefs({ hasChatted: true });
+          setHasChatted(true);
+        }
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    /**
+     * Clear My Mind Mode lock — stay in the interactive workspace.
+     * Do not route to normal chat until the member explicitly exits.
+     */
+    if (
+      shouldStayInClearMyMindMode({
+        activeSection: activeSectionRef.current,
+      }) ||
+      isClearMyMindModeActive()
+    ) {
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+
+      if (isClearMyMindExitRequest(trimmed)) {
+        exitClearMyMindMode();
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: CLEAR_MY_MIND_EXIT_ANNOUNCE },
+        ]);
+        setInput("");
+        voiceUsedRef.current = false;
+        navigateToChatCore();
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+
+      if (isClearMyMindOrganizeRequest(trimmed)) {
+        setClearMyMindModePhase("organize");
+        setBrainDumpInitialView("my-thoughts");
+        setBrainDumpPanelKey((k) => k + 1);
+        if (activeSectionRef.current !== "brain-dump") {
+          openClearMyMindCore({ initialView: "my-thoughts", silent: true });
+        }
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          {
+            role: "assistant",
+            content:
+              "I'll group what you've shared. You can rename any cluster — nothing has to stay as I sorted it.",
+          },
+        ]);
+        setInput("");
+        voiceUsedRef.current = false;
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+
+      /** Recover workspace if mode is on but panel was torn down (e.g. prior Wander). */
+      if (activeSectionRef.current !== "brain-dump") {
+        openClearMyMindCore({ silent: true });
+      }
+
+      /** Capture Mode — encourage only; never coach or organize. */
+      const encourage =
+        CLEAR_MY_MIND_CAPTURE_SUPPORT_LINES[
+          Math.floor(Math.random() * CLEAR_MY_MIND_CAPTURE_SUPPORT_LINES.length)
+        ] ?? "I'm still listening.";
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: encourage },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      if (activeSectionRef.current !== "brain-dump") {
+        openClearMyMindCore({ silent: true });
+      }
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     if (isStopEstateAmbienceRequest(trimmed)) {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
@@ -11072,9 +12160,11 @@ export default function CompanionPageClient() {
               artifactType: frictionlessPendingForYes.artifactType,
             });
           }
-          applyChatLayoutMode("split");
-          setActiveSection("home");
-          activeSectionRef.current = "home";
+          if (!shouldPreserveEstateRoomSectionDuringChat(activeSectionRef.current)) {
+            applyChatLayoutMode("split");
+            setActiveSection("home");
+            activeSectionRef.current = "home";
+          }
           revealWorkspace();
           logCreatePendingAction("active panel after open", {
             activePanel: workspacePanelRef.current ?? "content-generator",
@@ -11684,6 +12774,182 @@ export default function CompanionPageClient() {
     const lastAssistantBeforeSend =
       [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
 
+    const winSavePendingNow = loadWinSavePending();
+    if (winSavePendingNow) {
+      const winSaveReply = resolveWinSaveReply(trimmed, winSavePendingNow);
+      if (winSaveReply.handled) {
+        if (winSaveReply.openPlaceId === "evidence-vault") {
+          openGrowthDestinationCore("evidence-bank");
+        } else if (winSaveReply.openPlaceId === "portfolio") {
+          openGrowthDestinationCore("growth-portfolio");
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: winSaveReply.ack },
+        ]);
+        setAwaitingUserConfirmation(null);
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const winSaveRequest =
+      handleWinSaveRequest({
+        userText: trimmed,
+        seedText: lastAssistantBeforeSend.slice(0, 400) || trimmed,
+        offeredAtTurn: chatTurnRef.current,
+      }) ??
+      handleEvidenceCaptureMoment({
+        userText: trimmed,
+        offeredAtTurn: chatTurnRef.current,
+      });
+    if (winSaveRequest) {
+      if (winSaveRequest.kind === "offer") {
+        saveWinSavePending(winSaveRequest.pending);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: winSaveRequest.message },
+        ]);
+        setAwaitingUserConfirmation(
+          createAwaitingConfirmationState({
+            assistantPrompt: winSaveRequest.message,
+            offeredAtTurn: chatTurnRef.current,
+            kind: "general",
+          }),
+        );
+      } else {
+        clearWinSavePending();
+        if (winSaveRequest.openPlaceId === "evidence-vault") {
+          openGrowthDestinationCore("evidence-bank");
+        } else if (winSaveRequest.openPlaceId === "portfolio") {
+          openGrowthDestinationCore("growth-portfolio");
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: winSaveRequest.ack },
+        ]);
+        setAwaitingUserConfirmation(null);
+      }
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    const confidenceRecovery = runConfidenceRecovery(trimmed);
+    if (confidenceRecovery) {
+      const recoveryMessage = confidenceRecovery.message;
+      const openTarget =
+        confidenceRecovery.openPlaceId === "portfolio"
+          ? "growth-portfolio"
+          : confidenceRecovery.openPlaceId === "wins-this-week"
+            ? "wins-this-week"
+            : confidenceRecovery.openPlaceId === "my-journey"
+              ? "my-journey"
+              : "evidence-bank";
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: recoveryMessage },
+      ]);
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: recoveryMessage,
+          offeredAtTurn: chatTurnRef.current,
+          kind: "general",
+          frictionlessPending: {
+            type: "open_workspace",
+            target: openTarget,
+            label:
+              openTarget === "growth-portfolio"
+                ? "Hall of Accomplishments"
+                : openTarget === "wins-this-week"
+                  ? "Celebration Garden"
+                  : openTarget === "my-journey"
+                    ? "Wins Timeline"
+                    : "Evidence Vault",
+            context: recoveryMessage,
+            offerSummary: "Open evidence for restoration",
+            offeredAtTurn: chatTurnRef.current,
+          },
+        }),
+      );
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    if (
+      detectsSoftDiscouragement(trimmed) &&
+      !detectsEncouragementNeed(trimmed)
+    ) {
+      const encouragementLine = EVIDENCE_VAULT_ENCOURAGEMENT_LINE;
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: encouragementLine },
+      ]);
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: encouragementLine,
+          offeredAtTurn: chatTurnRef.current,
+          kind: "general",
+          frictionlessPending: {
+            type: "open_workspace",
+            target: "evidence-bank",
+            label: "Evidence Vault",
+            context: encouragementLine,
+            offerSummary: "Open Evidence Vault",
+            offeredAtTurn: chatTurnRef.current,
+          },
+        }),
+      );
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    if (detectsWinsTimelineRequest(trimmed)) {
+      openGrowthDestinationCore("my-journey");
+      const timelineAck =
+        "Opening your Wins Timeline — progress over months and years, not just isolated moments.";
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: timelineAck },
+      ]);
+      setAwaitingUserConfirmation(null);
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    if (
+      shouldInviteCelebrationGarden(trimmed) &&
+      !detectsWinSaveRequest(trimmed)
+    ) {
+      const inviteLine = CELEBRATION_GARDEN_INVITE_LINE;
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: inviteLine },
+      ]);
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: inviteLine,
+          offeredAtTurn: chatTurnRef.current,
+          kind: "general",
+          frictionlessPending: {
+            type: "open_workspace",
+            target: "wins-this-week",
+            label: "Celebration Garden",
+            context: inviteLine,
+            offerSummary: "Open Celebration Garden",
+            offeredAtTurn: chatTurnRef.current,
+          },
+        }),
+      );
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     const collectionPendingNow = loadCollectionPendingOffer();
     if (collectionPendingNow) {
       const collectionReply = resolveCollectionOfferReply(
@@ -11755,6 +13021,19 @@ export default function CompanionPageClient() {
     });
     setCurrentRoom(currentEstateRoomId);
 
+    if (currentEstateRoomId === "evidence-vault") {
+      const vaultContextReply = evidenceVaultContextReply(trimmed);
+      if (vaultContextReply) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: vaultContextReply },
+        ]);
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
     const informationalChatTurn = isInformationalChatTurn(trimmed);
 
     // estateTaskLockTurn applied before frictionless yes-handler (Phase 2C)
@@ -11794,6 +13073,7 @@ export default function CompanionPageClient() {
           userText: trimmed,
           lastAssistantText: lastAssistantBeforeSend,
           currentPlaceId: currentEstateRoomId,
+          activeSection: activeSectionRef.current,
           forceChat:
             (informationalChatTurn ||
               taskLockBlocksEstateRouting ||
@@ -12671,8 +13951,10 @@ export default function CompanionPageClient() {
       }
     }
 
-    setActiveSection("home");
-    setActiveNav(workspacePanel === "content-generator" ? "create" : "chat");
+    if (!shouldPreserveEstateRoomSectionDuringChat(activeSectionRef.current)) {
+      setActiveSection("home");
+      setActiveNav(workspacePanel === "content-generator" ? "create" : "chat");
+    }
 
     latencyProfiler.mark("intentRouting");
     let turnIntentRouting = resolveIntentRouting({
@@ -12758,6 +14040,61 @@ export default function CompanionPageClient() {
         cooldownActive: isCollectionOfferCooldownActive(chatTurnRef.current),
       });
       if (collectionOffer) {
+        const isWinOrEvidenceRoom =
+          collectionOffer.roomId === "celebration-garden" ||
+          collectionOffer.roomId === "celebration-hall" ||
+          collectionOffer.roomId === "achievement-library";
+        if (collectionOffer.roomId === "evidence-vault") {
+          const vaultOfferLine = `${EVIDENCE_VAULT_CHAT_PRESERVE_OFFER}\n\nWould you like to preserve it?`;
+          const pending = createCollectionPendingOffer({
+            roomId: "evidence-vault",
+            sourceUserText: trimmed,
+            offerLine: vaultOfferLine,
+            prefill: collectionOffer.prefill,
+            offeredAtTurn: chatTurnRef.current,
+          });
+          saveCollectionPendingOffer(pending);
+          markCollectionOfferCooldown(chatTurnRef.current);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: vaultOfferLine },
+          ]);
+          recordPrimaryTurnResponse(vaultOfferLine);
+          setAwaitingUserConfirmation(
+            createAwaitingConfirmationState({
+              assistantPrompt: vaultOfferLine,
+              offeredAtTurn: chatTurnRef.current,
+              kind: "general",
+            }),
+          );
+          finishEarlyChatTurn();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
+        if (isWinOrEvidenceRoom) {
+          const winPending = createWinSavePending({
+            seedText: trimmed,
+            offeredAtTurn: chatTurnRef.current,
+          });
+          saveWinSavePending(winPending);
+          markCollectionOfferCooldown(chatTurnRef.current);
+          const winOfferLine = formatWinSaveOfferMessage(winPending.offer);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: winOfferLine },
+          ]);
+          recordPrimaryTurnResponse(winOfferLine);
+          setAwaitingUserConfirmation(
+            createAwaitingConfirmationState({
+              assistantPrompt: winOfferLine,
+              offeredAtTurn: chatTurnRef.current,
+              kind: "general",
+            }),
+          );
+          finishEarlyChatTurn();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
         const pending = createCollectionPendingOffer({
           roomId: collectionOffer.roomId,
           sourceUserText: trimmed,
@@ -12988,7 +14325,7 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (isExplicitBreatheRequest(trimmed) && !governorChatOnly) {
+    if (isExplicitBreatheRequest(trimmed)) {
       setStressReliefOffer(null);
       clearAllPendingOffers();
       handleToolSelectCore("breathe");
@@ -13269,7 +14606,7 @@ export default function CompanionPageClient() {
     }
 
     const standaloneTool = detectStandaloneToolRequest(trimmed);
-    if (standaloneTool && !governorChatOnly) {
+    if (standaloneTool) {
       if (standaloneTool.tool === "focus-audio") {
         openFocusAudioCore(standaloneTool.focusAudioCategory);
       } else {
@@ -13796,7 +15133,7 @@ export default function CompanionPageClient() {
           ]);
           return;
         }
-        if (explicitWorkspaceCommand && !governorChatOnly) {
+        if (explicitWorkspaceCommand) {
           openWorkspaceWithSession(
             buildSessionFromProject(match),
             buildProjectOpenMessage(match),
@@ -14086,7 +15423,7 @@ export default function CompanionPageClient() {
       const lookupQuery = extractProjectQuery(trimmed);
       if (lookupQuery && pendingWorkspaceOffer.section === "projects") {
         const existing = searchProjects(lookupQuery);
-        if (existing.length === 1 && explicitWorkspaceCommand && !governorChatOnly) {
+        if (existing.length === 1 && explicitWorkspaceCommand) {
           openWorkspaceWithSession(
             buildSessionFromProject(existing[0]!),
             buildProjectOpenMessage(existing[0]!),
@@ -14807,6 +16144,12 @@ export default function CompanionPageClient() {
       instituteLearningHintRef.current = null;
       const stablesLearningHint = stablesLearningHintRef.current;
       stablesLearningHintRef.current = null;
+      const activeChamberMember = activeChamberMemberId
+        ? getChamberMemberById(activeChamberMemberId)
+        : undefined;
+      const chamberMemberChatHint = activeChamberMember
+        ? chamberMemberHintForChat(activeChamberMember)
+        : null;
       const useChatStream = speedProfile.routeClass !== "instant";
       const res = await fetchCompanionChatWithTimeout({
           stream: useChatStream,
@@ -14833,6 +16176,7 @@ export default function CompanionPageClient() {
                   ? "Member tone preference in Settings overrides conflicting action-first routing hints this turn."
                   : null,
                 estateMemoryHintForChat(),
+                chamberMemberChatHint,
                 activeTaskLockHintForChat(estateTaskLockTurn.state),
                 estateConversationTurn && !taskLockBlocksEstateRouting
                   ? estateConversationHintForChat(estateConversationTurn, {
@@ -14907,7 +16251,7 @@ export default function CompanionPageClient() {
                     return null;
                   }
                   return (
-                    `AUDIO / ENERGIZE REQUEST: User wants listening support — lead with Peaceful Places™ ` +
+                    `AUDIO / ENERGIZE REQUEST: User wants listening support — lead with Peaceful Places ` +
                     `(category: ${audio.categoryId}). Offer invitation; Estate Registry is source of truth. ` +
                     `Do NOT define soundscapes or give a generic lecture.`
                   );
@@ -16060,6 +17404,60 @@ export default function CompanionPageClient() {
       case "stables-experience":
         openStablesRoomCore();
         return;
+      case "evidence-reminder": {
+        const reply = formatEvidenceVaultReminderReply();
+        setMessages((prev) => [
+          ...prev,
+          { role: "user", content: "Show me a reminder" },
+          { role: "assistant", content: reply },
+        ]);
+        return;
+      }
+      case "evidence-add":
+      case "evidence-today":
+        enterEvidenceVaultRoomCore({
+          userIntent: "open-todays-discovery-file",
+          workspaceMode: "add",
+          skipWelcome: true,
+        });
+        return;
+      case "evidence-browse":
+        enterEvidenceVaultRoomCore({
+          userIntent: "browse-evidence-archive",
+          workspaceMode: "browse",
+          skipWelcome: true,
+        });
+        return;
+      case "evidence-find-proof":
+      case "evidence-search":
+        enterEvidenceVaultRoomCore({
+          userIntent: "search-discoveries",
+          workspaceMode: "browse",
+          skipWelcome: true,
+        });
+        return;
+      case "evidence-insights": {
+        const reply = formatEvidenceVaultInsightsReply();
+        setMessages((prev) => [
+          ...prev,
+          { role: "user", content: "View Insights" },
+          { role: "assistant", content: reply },
+        ]);
+        return;
+      }
+      case "evidence-print": {
+        exportAllEvidence("print");
+        setMessages((prev) => [
+          ...prev,
+          { role: "user", content: "Print Discoveries" },
+          {
+            role: "assistant",
+            content:
+              "Your discoveries are ready to print — the print dialog should be open.",
+          },
+        ]);
+        return;
+      }
       default:
         return;
     }
@@ -16086,10 +17484,140 @@ export default function CompanionPageClient() {
     navigationLine?: string,
     opts?: { skipAssistantMessage?: boolean },
   ) {
+    if (
+      isChamberMemberConversationActive({
+        activeSection: activeSectionRef.current,
+        activeMemberId: activeChamberMemberIdRef.current,
+      }) &&
+      command.section !== "chamber-of-momentum"
+    ) {
+      return;
+    }
     setStressReliefOffer(null);
     clearOfferStateOnly();
-    setEstateConservatoryEngaged(false);
+
     const roomId = command.roomId ?? command.entryId;
+
+    /**
+     * Clear My Mind Mode — dedicated interactive workspace, never frosted chat.
+     * Enter mode immediately; do not create a direct-visit overlay.
+     */
+    if (
+      command.section === "brain-dump" ||
+      roomId === "clear-my-mind" ||
+      command.entryId === "clear-my-mind"
+    ) {
+      patchEstateRuntimeState({
+        currentPlaceId: "clear-my-mind",
+        activeConversationMode: true,
+      });
+      registerEstatePendingTransition({
+        destinationSection: "brain-dump",
+        destinationEntryId: "clear-my-mind",
+        originalUserIntent: userText,
+        offeredAtTurn: chatTurnRef.current,
+        followUpQuestion: false,
+      });
+      executeEstateCommandMemoryHandoff(command, {
+        userText,
+        fromSection: activeSectionRef.current,
+        playArrival: true,
+        playAmbience: true,
+      });
+      captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
+      const arrivalAck =
+        navigationLine ??
+        CLEAR_MY_MIND_WELCOME_LINES[0] ??
+        estateCommandAckLine(command);
+      openClearMyMindCore({ silent: true });
+      if (!opts?.skipAssistantMessage) {
+        if (activeChatTurnLifecycleRef.current) {
+          markAssistantReplied(activeChatTurnLifecycleRef.current);
+        }
+        setMessages((prev) => {
+          if (
+            prev.some(
+              (m) => m.role === "assistant" && m.content === arrivalAck,
+            )
+          ) {
+            return prev;
+          }
+          return [...prev, { role: "assistant", content: arrivalAck }];
+        });
+      }
+      finishEarlyChatTurn();
+      return;
+    }
+
+    /**
+     * Cartographer's Studio — dedicated orientation room, never Focus Studio
+     * frosted invitation chrome (Just Chat / Visit Another Room / Enjoy the Estate).
+     */
+    if (
+      command.section === "visual-focus" ||
+      roomId === "focus-studio" ||
+      roomId === "cartographers-studio" ||
+      command.entryId === "focus-studio" ||
+      command.entryId === "cartographers-studio"
+    ) {
+      patchEstateRuntimeState({
+        currentPlaceId: "focus-studio",
+        activeConversationMode: true,
+      });
+      registerEstatePendingTransition({
+        destinationSection: "visual-focus",
+        destinationEntryId: "focus-studio",
+        originalUserIntent: userText,
+        offeredAtTurn: chatTurnRef.current,
+        followUpQuestion: false,
+      });
+      executeEstateCommandMemoryHandoff(command, {
+        userText,
+        fromSection: activeSectionRef.current,
+        playArrival: true,
+        playAmbience: true,
+      });
+      captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
+      requestVisualFocusStudio();
+      clearSplitBesideWorkspace();
+      openStandaloneFocusSectionCore("visual-focus");
+      const arrivalAck =
+        navigationLine ??
+        "Welcome to the Cartographer's Studio — every map tells a story.";
+      if (!opts?.skipAssistantMessage) {
+        if (activeChatTurnLifecycleRef.current) {
+          markAssistantReplied(activeChatTurnLifecycleRef.current);
+        }
+        setMessages((prev) => {
+          if (
+            prev.some(
+              (m) => m.role === "assistant" && m.content === arrivalAck,
+            )
+          ) {
+            return prev;
+          }
+          return [...prev, { role: "assistant", content: arrivalAck }];
+        });
+      }
+      finishEarlyChatTurn();
+      return;
+    }
+
+    /**
+     * While Clear My Mind Mode is active, refuse estate room hops that would
+     * replace the workspace with frosted chat (Wander / go-to-room).
+     * Member exits only via Back, Welcome Home, or explicit leave phrases.
+     */
+    if (
+      isClearMyMindModeActive() ||
+      activeSectionRef.current === "brain-dump"
+    ) {
+      openClearMyMindCore({ silent: true });
+      finishEarlyChatTurn();
+      return;
+    }
+
+    setEstateConservatoryEngaged(false);
     patchEstateRuntimeState({
       currentPlaceId: roomId,
       activeConversationMode: true,
@@ -16233,22 +17761,17 @@ export default function CompanionPageClient() {
       return;
     }
     if (offer.section === "brain-dump") {
-      const directVisit = directEstateVisitRef.current;
-      if (directVisit?.roomId === "clear-my-mind") {
-        const conservatoryBg =
-          resolveEstateRoomBackgroundImage(directVisit.roomId) ??
-          CLEAR_MY_MIND_CONSERVATORY_BG;
-        preloadRoomBackground(conservatoryBg);
-        setBrainDumpInitialView("capture");
-        trackWorkspaceEcosystemEvent("brain-dump");
-        noteWorkspaceOpened("brain-dump", "standalone_room");
-        clearSplitBesideWorkspace();
-        openStandaloneFocusSectionCore("brain-dump");
-        return;
-      }
       openClearMyMindCore({
-        initialView: inferClearMyMindViewFromText(offer.line),
+        initialView: "capture",
+        silent: Boolean(directEstateVisitRef.current),
       });
+      return;
+    }
+    if (offer.section === "visual-focus") {
+      noteWorkspaceOpened("visual-focus", "estate_offer");
+      requestVisualFocusStudio();
+      clearSplitBesideWorkspace();
+      openStandaloneFocusSectionCore("visual-focus");
       return;
     }
     if (offer.section === "momentum-builder") {
@@ -16289,6 +17812,7 @@ export default function CompanionPageClient() {
       if (directVisit?.roomId === "journal") {
         noteWorkspaceOpened("growth-journal", "standalone_room");
         clearSplitBesideWorkspace();
+        setEstateRoomChatVisible(false);
         openStandaloneFocusSectionCore("growth-journal");
         return;
       }
@@ -16313,11 +17837,14 @@ export default function CompanionPageClient() {
       if (directVisit?.roomId === "evidence-vault") {
         noteWorkspaceOpened("evidence-bank", "standalone_room");
         clearSplitBesideWorkspace();
+        /** Stay on place-first arrival — do not jump into the form. */
         openStandaloneFocusSectionCore("evidence-bank");
         return;
       }
       noteWorkspaceOpened("evidence-bank", "estate_offer");
-      openGrowthDestinationCore("evidence-bank");
+      enterEvidenceVaultRoomCore({
+        userIntent: pendingIntent || lastUserTextRef.current || "evidence-vault",
+      });
       return;
     }
     if (offer.section === "growth-portfolio") {
@@ -16583,6 +18110,8 @@ export default function CompanionPageClient() {
     mode?: PanelCloseMode;
     recoveryContext?: Partial<PanelCloseContext>;
     silent?: boolean;
+    /** Back to Chat — never restore companionReturnSection / guide room. */
+    skipSectionRestore?: boolean;
     /** @deprecated use mode: "hide" — hide preserves resumable work */
     preserveCreateSession?: boolean;
   }) {
@@ -16656,13 +18185,17 @@ export default function CompanionPageClient() {
     setPendingCreateOpen(null);
     clearPendingAcceptanceAuthority();
 
-    if (guideReturn && guideReturn !== "home") {
-      setActiveSection(guideReturn);
-      setActiveNav(navForWorkspaceSection(guideReturn) ?? "chat");
-      focusWorkspaceLayout();
-    } else if (returnTo && returnTo !== "home") {
-      setActiveSection(returnTo);
-      setActiveNav(navForWorkspaceSection(returnTo) ?? "chat");
+    if (!opts?.skipSectionRestore) {
+      if (guideReturn && guideReturn !== "home") {
+        setActiveSection(guideReturn);
+        setActiveNav(navForWorkspaceSection(guideReturn) ?? "chat");
+        focusWorkspaceLayout();
+      } else if (returnTo && returnTo !== "home") {
+        setActiveSection(returnTo);
+        setActiveNav(navForWorkspaceSection(returnTo) ?? "chat");
+      } else {
+        setActiveNav("chat");
+      }
     } else {
       setActiveNav("chat");
     }
@@ -16827,6 +18360,7 @@ export default function CompanionPageClient() {
                 source: "project",
               })
             }
+            onVisualizeThis={openSparkVisualEngineFromExperience}
           />
         );
       case "playbook":
@@ -16840,6 +18374,7 @@ export default function CompanionPageClient() {
             onSuggestOpen={suggestCrossWorkspaceOpen}
             onContextChange={handleWorkspaceDetailChange}
             onBackToChat={goBackToChat}
+            onVisualizeThis={openSparkVisualEngineFromExperience}
           />
         );
       case "time-block":
@@ -17027,12 +18562,7 @@ export default function CompanionPageClient() {
             onBack={goBack}
             onClose={closeWorkspacePanel}
             registerBack={registerBack}
-            onWorkWithShari={() => {
-              setInput(
-                "I'm in Visual Focus and I'm not sure which visual thinking tool fits. Here's what I'm trying to figure out: ",
-              );
-              requestChatInputFocus();
-            }}
+            onReturnToEstate={navigateBackToEstateHome}
           />
         );
       case "wins-this-week":
@@ -17044,9 +18574,57 @@ export default function CompanionPageClient() {
         );
       case "evidence-bank":
         return (
-          <EstateCollectionRoomPanel
-            roomId="evidence-vault"
+          <EvidenceVaultRoomPanel
             nav={buildGrowthPanelNav("evidence-bank")}
+            arrivalKey={evidenceVaultArrivalKey}
+            chatVisible={roomMenuChatVisible}
+            conversationScrollKey={estateChatScrollKey}
+            thread={
+              <SimpleChat
+                messages={messages}
+                stateHint={stateHint}
+                showHint={false}
+                hideEmptyState
+                isLoading={isLoading}
+                thinkingMessage={visibleThinkingMessage}
+                awaitingUserConfirmation={chatAwaitingConfirmation}
+                thinkingEmotion={displayEmotion}
+                workspacePanel={workspacePanel}
+                workspaceActiveBeside={workspaceActiveBeside}
+                formatParagraphs={formatAssistantParagraphs}
+                afterLastAssistant={undefined}
+              />
+            }
+            footer={
+              <HomeChatInputFooter
+                homeCalm={false}
+                homeChatPlaceholder="What discovery would you like to preserve?"
+                conversationMode
+                input={input}
+                isLoading={isLoading}
+                isListening={isListening}
+                speechSupported={speechSupported}
+                inputRef={inputRef}
+                onInputChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onToggleListening={toggleListening}
+                onSend={(text) => void handleSend(text)}
+                pendingAction={pendingAction}
+                suppressInterventionCards
+                onRunArtifactExport={runArtifactExport}
+                onClearPendingOffers={clearAllPendingOffers}
+                onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                onExecutePendingAction={executePendingAction}
+                splitCreateBuilder={splitCreateBuilder}
+                createBuilderSession={createBuilderSession}
+                onCreateBuilderAction={handleCreateBuilderAction}
+                voiceOutput={voiceOutput}
+                voiceBlocked={voiceBlocked}
+                onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                ttsAudioRef={ttsAudioRef}
+              />
+            }
           />
         );
       case "focus":
@@ -17069,15 +18647,62 @@ export default function CompanionPageClient() {
         );
       case "growth-journal":
         return (
-          <GrowthJournalPanel
-            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+          <GrowthJournalRoomPanel
             nav={buildGrowthPanelNav("growth-journal")}
+            chatVisible={roomMenuChatVisible}
+            onVisualizeThis={openSparkVisualEngineFromExperience}
+            conversationScrollKey={estateChatScrollKey}
+            thread={
+              <SimpleChat
+                messages={messages}
+                stateHint={stateHint}
+                showHint={false}
+                hideEmptyState
+                isLoading={isLoading}
+                thinkingMessage={visibleThinkingMessage}
+                awaitingUserConfirmation={chatAwaitingConfirmation}
+                thinkingEmotion={displayEmotion}
+                workspacePanel={workspacePanel}
+                workspaceActiveBeside={workspaceActiveBeside}
+                formatParagraphs={formatAssistantParagraphs}
+                afterLastAssistant={undefined}
+              />
+            }
+            footer={
+              <HomeChatInputFooter
+                homeCalm={false}
+                homeChatPlaceholder="Share a thought when you're ready."
+                conversationMode
+                input={input}
+                isLoading={isLoading}
+                isListening={isListening}
+                speechSupported={speechSupported}
+                inputRef={inputRef}
+                onInputChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                onToggleListening={toggleListening}
+                onSend={(text) => void handleSend(text)}
+                pendingAction={pendingAction}
+                suppressInterventionCards
+                onRunArtifactExport={runArtifactExport}
+                onClearPendingOffers={clearAllPendingOffers}
+                onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                onExecutePendingAction={executePendingAction}
+                splitCreateBuilder={splitCreateBuilder}
+                createBuilderSession={createBuilderSession}
+                onCreateBuilderAction={handleCreateBuilderAction}
+                voiceOutput={voiceOutput}
+                voiceBlocked={voiceBlocked}
+                onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                ttsAudioRef={ttsAudioRef}
+              />
+            }
           />
         );
       case "growth-portfolio":
         return (
-          <EstateCollectionRoomPanel
-            roomId="achievement-library"
+          <GrowthPortfolioPanel
             nav={buildGrowthPanelNav("growth-portfolio")}
           />
         );
@@ -17187,6 +18812,7 @@ export default function CompanionPageClient() {
             onAsk={handleProjectAsk}
             onOpenTimeBlock={handleOpenProjectTimeBlock}
             onBuildWithShari={() => openCompanionAssist("projects")}
+            onVisualizeThis={openSparkVisualEngineFromExperience}
           />
         );
       case "templates-library":
@@ -17266,6 +18892,7 @@ export default function CompanionPageClient() {
                   null
                 : null
             }
+            onVisualizeThis={openSparkVisualEngineFromExperience}
           />
         );
       case "time-block":
@@ -17318,7 +18945,8 @@ export default function CompanionPageClient() {
       case "focus":
         return <FocusAreaPanel onAction={handleFocusHubAction} />;
       case "breathe":
-        return <BreathePanel onDone={closeWorkspacePanel} />;
+        /** Legacy section id — Breathe is overlay-only; effect redirects. */
+        return null;
       case "focus-audio":
         return (
           <FocusAudioPanel
@@ -18039,6 +19667,7 @@ export default function CompanionPageClient() {
     showDirectEstateOverlay,
     estatePresenceRoomId,
     showGlobalEstatePresence,
+    welcomeHomePrimary,
   });
 
   const estatePlaceChromeActive = isEstatePlaceChromeActive({
@@ -18082,22 +19711,56 @@ export default function CompanionPageClient() {
     !justBeHereSession &&
     !estatePlaceChromeActive;
 
-  const sparkEstateShellPlaceId =
-    profileEstateRoomOverlayId ??
-    (showDirectEstateOverlay && !estateConservatoryEngaged
-      ? estateChatRoomId
-      : null);
-  const sparkEstateShellProfileMode = Boolean(profileEstateRoomOverlayId);
+  const clearMyMindWorkspaceActive =
+    activeSection === "brain-dump" || isClearMyMindModeActive();
+
+  const sparkEstateShellPlaceId = clearMyMindWorkspaceActive
+    ? null
+    : profileEstateRoomOverlayId ??
+      (showDirectEstateOverlay && !estateConservatoryEngaged
+        ? estateChatRoomId
+        : null);
+  /**
+   * Evidence Vault uses Arrival Before Activity (invitation grid).
+   * Do not force profile conversation-only chrome — EST-001 place-first.
+   */
+  const sparkEstateShellProfileMode = Boolean(
+    profileEstateRoomOverlayId &&
+      profileEstateRoomOverlayId !== "evidence-vault",
+  );
+
+  const activeSectionMenuRoomId =
+    activeSection === "growth-journal"
+      ? "journal"
+      : activeSection === "evidence-bank"
+        ? "evidence-vault"
+        : activeSection === "chamber-of-momentum"
+          ? "chamber-of-momentum"
+          : activeSection === "visual-focus"
+            ? "cartographers-studio"
+            : activeSection === "the-gallery"
+              ? "destination-gallery"
+              : welcomeHomePrimary
+                ? "welcome-home"
+                : null;
 
   const estateExperienceMenuRoomId = resolvePresenceModeRoomId({
     directRoomId:
+      activeSectionMenuRoomId ??
       sparkEstateShellPlaceId ??
-      (showDirectEstateOverlay ? estateChatRoomId : null),
+      (showDirectEstateOverlay ? estateChatRoomId : null) ??
+      (directEstateVisit?.section === activeSection
+        ? directEstateVisit.roomId
+        : null),
     memoryRoomId: getEstateMemory().currentRoom?.entryId ?? null,
     presenceRoomId: estatePresenceRoomId,
     fallbackRoomId: welcomeHomePrimary ? "welcome-home" : null,
   });
-  const roomMenuRoomId = justBeHereSession?.roomId ?? estateExperienceMenuRoomId;
+  const roomMenuRoomId = justBeHereSession?.roomId
+    ? justBeHereSession.roomId
+    : clearMyMindWorkspaceActive
+      ? "clear-my-mind"
+      : estateExperienceMenuRoomId;
   const roomMenuChatVisible = justBeHereSession
     ? justBeHereChatVisible
     : estateRoomChatVisible;
@@ -18126,6 +19789,12 @@ export default function CompanionPageClient() {
 
   const profileEstateWelcomeMessage = useMemo(() => {
     if (!profileEstateRoomOverlayId) return undefined;
+    if (profileEstateRoomOverlayId === "evidence-vault") {
+      return (
+        estateArrivalShariGreeting("evidence-vault") ??
+        EVIDENCE_VAULT_ARRIVAL_WELCOME
+      );
+    }
     if (shouldSuppressEstateInvitationGrid(profileEstateRoomOverlayId)) {
       return undefined;
     }
@@ -18174,6 +19843,9 @@ export default function CompanionPageClient() {
     !momentumInstitutePrimary &&
     !stablesPrimary;
 
+  const estateFullBleedShellActive =
+    isEstateFullBleedPanelSection(activeSection) || focusSanctuaryFullBleed;
+
   return (
     <CompanionDeskProvider
       fullBleed={companionDeskFullBleed}
@@ -18209,6 +19881,14 @@ export default function CompanionPageClient() {
       data-just-be-here-chat-visible={
         justBeHereChatVisible ? "true" : undefined
       }
+      data-breathe-destination={
+        isBreatheDestinationActive(breatheDestination) ? "" : undefined
+      }
+      data-breathe-destination-phase={breatheDestination.phase ?? undefined}
+      data-breathe-resume={breatheResumeActive ? "" : undefined}
+      data-journal-gazebo-active={
+        activeSection === "growth-journal" ? "" : undefined
+      }
       data-estate-room-chat-visible={
         roomMenuChatVisible ? "true" : "false"
       }
@@ -18226,8 +19906,22 @@ export default function CompanionPageClient() {
         }}
       />
       <EstateArrivalHost
-        onShariGreeting={(message) => {
-          setMessages((prev) => [...prev, { role: "assistant", content: message }]);
+        onShariGreeting={(message, roomId) => {
+          const greeting = message.trim();
+          if (!greeting) return;
+          setMessages((prev) => {
+            if (
+              prev.some(
+                (entry) => entry.role === "assistant" && entry.content === greeting,
+              )
+            ) {
+              return prev;
+            }
+            return [...prev, { role: "assistant", content: greeting }];
+          });
+          if (roomId === "chamber-of-momentum") {
+            setEstateRoomChatVisible(true);
+          }
         }}
       />
       <EstatePlaceAudioHost placeId={estatePlaceAudioHostPlaceId} />
@@ -18257,6 +19951,7 @@ export default function CompanionPageClient() {
         homesteadChat={homeMode === "chat" && !suppressGlobalBackground}
         suppress={
           suppressGlobalBackground ||
+          isBreatheDestinationActive(breatheDestination) ||
           workspacePanel === "welcome-room" ||
           homeMode === "welcome" ||
           welcomeHomePrimary ||
@@ -18269,6 +19964,7 @@ export default function CompanionPageClient() {
       />
 
       <div
+        data-companion-session-layer=""
         className={`relative z-10 flex h-full min-h-0 w-full overflow-hidden ${
           estatePlaceChromeActive
             ? `companion-estate-immersive-active pl-0 pr-0${
@@ -18288,6 +19984,12 @@ export default function CompanionPageClient() {
               ? "companion-momentum-builder-active pl-0 pr-0"
             : momentumInstitutePrimary
               ? "companion-momentum-institute-active pl-0 pr-0"
+            : activeSection === "chamber-of-momentum"
+              ? "companion-chamber-active pl-0 pr-0"
+            : activeSection === "visual-focus"
+              ? "companion-cartographers-active pl-0 pr-0"
+            : activeSection === "evidence-bank"
+              ? "companion-evidence-vault-active pl-0 pr-0"
             : stablesPrimary
               ? "companion-stables-active pl-0 pr-0"
             : welcomeScene
@@ -19257,9 +20959,9 @@ export default function CompanionPageClient() {
                 onChatLayoutModeChange={applyChatLayoutMode}
                 onReturnToChat={navigateToChatCore}
                 viewSizePreset={effectiveViewSize}
-                onViewSizePresetChange={applyViewSizePreset}
+                onViewSizePresetChange={workspacePanel === "visual-focus" ? undefined : applyViewSizePreset}
                 onClose={
-                  workspacePanel === "plan-my-day" ? undefined : goBack
+                  workspacePanel === "plan-my-day" || workspacePanel === "visual-focus" ? undefined : goBack
                 }
                 revealKey={workspaceRevealSeq}
                 chatFocusKey={chatFocusSeq}
@@ -19267,8 +20969,10 @@ export default function CompanionPageClient() {
                 hideAssistToggle={
                   workspacePanel === "content-generator" ||
                   workspacePanel === "welcome-room" ||
+                  workspacePanel === "visual-focus" ||
                   Boolean(guideBesideSession)
                 }
+                immersiveWorkspace={workspacePanel === "visual-focus"}
                 leftPaneTitle={
                   guideBesideSession
                     ? guideBesideSession.source.kind === "activity"
@@ -19288,45 +20992,18 @@ export default function CompanionPageClient() {
           {activeSection !== "home" && !momentumBuilderPrimary && !profileEstateChromeActive && (
             <div
               className={
-                activeSection === "brain-dump" ||
-                activeSection === "life-experience" ||
-                activeSection === "the-gallery" ||
-                isGrowthPanelSection(activeSection) ||
-                isGrowPanelSection(activeSection) ||
-                activeSection === "plan-my-day" ||
-                activeSection === "focus-audio" ||
-                activeSection === "games" ||
-                activeSection === "quick-recharge" ||
-                focusSanctuaryFullBleed
+                estateFullBleedShellActive
                   ? "clear-my-mind-standalone-shell min-h-[100dvh] min-h-[100svh] flex-1 overflow-hidden"
                   : "min-h-0 flex-1 overflow-y-auto px-2 py-3 sm:px-4"
               }
               role="presentation"
               title={
-                activeSection === "brain-dump" ||
-                activeSection === "life-experience" ||
-                activeSection === "the-gallery" ||
-                isGrowthPanelSection(activeSection) ||
-                isGrowPanelSection(activeSection) ||
-                activeSection === "plan-my-day" ||
-                activeSection === "focus-audio" ||
-                activeSection === "games" ||
-                activeSection === "quick-recharge" ||
-                focusSanctuaryFullBleed
+                estateFullBleedShellActive
                   ? undefined
                   : "Click outside the panel to go back"
               }
               onClick={
-                activeSection === "brain-dump" ||
-                activeSection === "life-experience" ||
-                activeSection === "the-gallery" ||
-                isGrowthPanelSection(activeSection) ||
-                isGrowPanelSection(activeSection) ||
-                activeSection === "plan-my-day" ||
-                activeSection === "focus-audio" ||
-                activeSection === "games" ||
-                activeSection === "quick-recharge" ||
-                focusSanctuaryFullBleed
+                estateFullBleedShellActive
                   ? undefined
                   : (e) => {
                       if (e.target === e.currentTarget) goBack();
@@ -19335,16 +21012,7 @@ export default function CompanionPageClient() {
             >
               <div
                 className={
-                  activeSection === "brain-dump" ||
-                  activeSection === "life-experience" ||
-                  activeSection === "the-gallery" ||
-                  isGrowthPanelSection(activeSection) ||
-                  isGrowPanelSection(activeSection) ||
-                  activeSection === "plan-my-day" ||
-                  activeSection === "focus-audio" ||
-                  activeSection === "games" ||
-                  activeSection === "quick-recharge" ||
-                  focusSanctuaryFullBleed
+                  estateFullBleedShellActive
                     ? "clear-my-mind-standalone-frame h-full min-h-[100dvh] min-h-[100svh] w-full"
                     : WORKSPACE_FULL_PAGE_SURFACE_CLASS
                 }
@@ -19367,8 +21035,7 @@ export default function CompanionPageClient() {
             </WorkspaceShell>
           )}
 
-          {activeSection === "brain-dump" &&
-            (!showDirectEstateOverlay || estateConservatoryEngaged) && (
+          {activeSection === "brain-dump" && (
             <BrainDumpPanel
               key={brainDumpPanelKey}
               standalone
@@ -19376,8 +21043,23 @@ export default function CompanionPageClient() {
               onOpen={openWorkspaceFromSection}
               onSuggestOpen={suggestCrossWorkspaceOpen}
               onContextChange={handleWorkspaceDetailChange}
-              onBackToChat={navigateToChatCore}
+              onVisualizeThis={openSparkVisualEngineFromExperience}
+              onBackToChat={goBackToChat}
             />
+          )}
+
+          {activeSection === "visual-focus" && !showDirectEstateOverlay && (
+            <EstateRoomErrorBoundary
+              roomLabel="Cartographer's Studio"
+              onReturnToEstate={navigateBackToEstateHome}
+            >
+              <VisualFocusWorkspacePanel
+                onBack={navigateToChatCore}
+                onClose={navigateToChatCore}
+                registerBack={registerBack}
+                onReturnToEstate={navigateBackToEstateHome}
+              />
+            </EstateRoomErrorBoundary>
           )}
 
           {activeSection === "life-experience" && (
@@ -19437,12 +21119,64 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "chamber-of-momentum" && (
-            <ChamberOfMomentumEntryPanel
-              onBack={goBack}
-              onSelectIntent={routeChamberMomentumIntentCore}
-              onSelectUnsure={routeChamberUnsureOptionCore}
-              onDescribeSituation={routeChamberNaturalLanguageCore}
-            />
+            <EstateRoomErrorBoundary
+              roomLabel="The Chamber"
+              onReturnToEstate={navigateBackToEstateHome}
+            >
+              <ChamberOfMomentumRoomPanel
+                onBack={goBack}
+                activeMemberId={activeChamberMemberId}
+                onInviteMember={inviteChamberMemberCore}
+                onEndMemberConversation={endChamberMemberConversationCore}
+                conversationScrollKey={estateChatScrollKey}
+                thread={
+                  <SimpleChat
+                    messages={messages}
+                    stateHint={stateHint}
+                    showHint={false}
+                    hideEmptyState
+                    isLoading={isLoading}
+                    thinkingMessage={visibleThinkingMessage}
+                    awaitingUserConfirmation={chatAwaitingConfirmation}
+                    thinkingEmotion={displayEmotion}
+                    workspacePanel={workspacePanel}
+                    workspaceActiveBeside={workspaceActiveBeside}
+                    formatParagraphs={formatAssistantParagraphs}
+                    afterLastAssistant={undefined}
+                  />
+                }
+                footer={
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What would you like to work on together?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
+              />
+            </EstateRoomErrorBoundary>
           )}
 
           {activeSection === "grow-spark-cards" && !showDirectEstateOverlay && (
@@ -19537,18 +21271,65 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "growth-journal" &&
-            !showDirectEstateOverlay &&
-            !profileEstateRoomOverlayId && (
-            <GrowthJournalPanel
+            !showDirectEstateOverlay && (
+            <GrowthJournalRoomPanel
               nav={buildGrowthPanelNav("growth-journal")}
+              chatVisible={roomMenuChatVisible}
+              onVisualizeThis={openSparkVisualEngineFromExperience}
+              conversationScrollKey={estateChatScrollKey}
+              thread={
+                <SimpleChat
+                  messages={messages}
+                  stateHint={stateHint}
+                  showHint={false}
+                  hideEmptyState
+                  isLoading={isLoading}
+                  thinkingMessage={visibleThinkingMessage}
+                  awaitingUserConfirmation={chatAwaitingConfirmation}
+                  thinkingEmotion={displayEmotion}
+                  workspacePanel={workspacePanel}
+                  workspaceActiveBeside={workspaceActiveBeside}
+                  formatParagraphs={formatAssistantParagraphs}
+                  afterLastAssistant={undefined}
+                />
+              }
+              footer={
+                <HomeChatInputFooter
+                  homeCalm={false}
+                  homeChatPlaceholder="Share a thought when you're ready."
+                  conversationMode
+                  input={input}
+                  isLoading={isLoading}
+                  isListening={isListening}
+                  speechSupported={speechSupported}
+                  inputRef={inputRef}
+                  onInputChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onToggleListening={toggleListening}
+                  onSend={(text) => void handleSend(text)}
+                  pendingAction={pendingAction}
+                  suppressInterventionCards
+                  onRunArtifactExport={runArtifactExport}
+                  onClearPendingOffers={clearAllPendingOffers}
+                  onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                  onExecutePendingAction={executePendingAction}
+                  splitCreateBuilder={splitCreateBuilder}
+                  createBuilderSession={createBuilderSession}
+                  onCreateBuilderAction={handleCreateBuilderAction}
+                  voiceOutput={voiceOutput}
+                  voiceBlocked={voiceBlocked}
+                  onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                  onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                  ttsAudioRef={ttsAudioRef}
+                />
+              }
             />
           )}
 
           {activeSection === "growth-portfolio" &&
             !showDirectEstateOverlay &&
             !profileEstateRoomOverlayId && (
-            <EstateCollectionRoomPanel
-              roomId="achievement-library"
+            <GrowthPortfolioPanel
               nav={buildGrowthPanelNav("growth-portfolio")}
             />
           )}
@@ -19561,11 +21342,58 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "evidence-bank" &&
-            !showDirectEstateOverlay &&
-            !profileEstateRoomOverlayId && (
-            <EstateCollectionRoomPanel
-              roomId="evidence-vault"
+            !showDirectEstateOverlay && (
+            <EvidenceVaultRoomPanel
               nav={buildGrowthPanelNav("evidence-bank")}
+              arrivalKey={evidenceVaultArrivalKey}
+              chatVisible={roomMenuChatVisible}
+              conversationScrollKey={estateChatScrollKey}
+              thread={
+                <SimpleChat
+                  messages={messages}
+                  stateHint={stateHint}
+                  showHint={false}
+                  hideEmptyState
+                  isLoading={isLoading}
+                  thinkingMessage={visibleThinkingMessage}
+                  awaitingUserConfirmation={chatAwaitingConfirmation}
+                  thinkingEmotion={displayEmotion}
+                  workspacePanel={workspacePanel}
+                  workspaceActiveBeside={workspaceActiveBeside}
+                  formatParagraphs={formatAssistantParagraphs}
+                  afterLastAssistant={undefined}
+                />
+              }
+              footer={
+                <HomeChatInputFooter
+                  homeCalm={false}
+                  homeChatPlaceholder="What discovery would you like to preserve?"
+                  conversationMode
+                  input={input}
+                  isLoading={isLoading}
+                  isListening={isListening}
+                  speechSupported={speechSupported}
+                  inputRef={inputRef}
+                  onInputChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onToggleListening={toggleListening}
+                  onSend={(text) => void handleSend(text)}
+                  pendingAction={pendingAction}
+                  suppressInterventionCards
+                  onRunArtifactExport={runArtifactExport}
+                  onClearPendingOffers={clearAllPendingOffers}
+                  onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                  onExecutePendingAction={executePendingAction}
+                  splitCreateBuilder={splitCreateBuilder}
+                  createBuilderSession={createBuilderSession}
+                  onCreateBuilderAction={handleCreateBuilderAction}
+                  voiceOutput={voiceOutput}
+                  voiceBlocked={voiceBlocked}
+                  onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                  onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                  ttsAudioRef={ttsAudioRef}
+                />
+              }
             />
           )}
 
@@ -19575,10 +21403,6 @@ export default function CompanionPageClient() {
 
           {activeSection === "my-journey" && !showDirectEstateOverlay && (
             <MyJourneyPanel nav={buildGrowthPanelNav("my-journey")} />
-          )}
-
-          {activeSection === "breathe" && (
-            <BreathePanel onDone={() => setActiveSection("home")} />
           )}
 
           {activeSection === "focus-audio" && !showDirectEstateOverlay && (
@@ -19777,6 +21601,7 @@ export default function CompanionPageClient() {
                 onAsk={handleProjectAsk}
                 onOpenTimeBlock={handleOpenProjectTimeBlock}
                 onBuildWithShari={() => openCompanionAssist("projects")}
+                onVisualizeThis={openSparkVisualEngineFromExperience}
               />
             </WorkspaceShell>
           )}
@@ -19954,7 +21779,7 @@ export default function CompanionPageClient() {
             portaled={portaledModalSheets}
             open={overlay === "institute-cabinet"}
             onClose={() => setOverlay(null)}
-            title="My Institute Cabinet™"
+            title="My Institute Cabinet"
           >
             <InstituteCabinetPanel />
           </ModalSheet>
@@ -20047,6 +21872,11 @@ export default function CompanionPageClient() {
         showRoom={showEstateExperienceMenu}
         roomId={roomMenuRoomId}
         chatVisible={roomMenuChatVisible}
+        backdropSurface={
+          activeSection === "brain-dump" || isClearMyMindModeActive()
+            ? "clear-my-mind"
+            : "chat"
+        }
         onEstateMenuAction={handleEstateMenuAction}
         onToggleChat={toggleEstateRoomChat}
         onToggleSound={
@@ -20055,13 +21885,38 @@ export default function CompanionPageClient() {
         soundEnabled={
           justBeHereSession ? justBeHereSoundEnabled : undefined
         }
-        onReturnToRoom={returnToCurrentRoomView}
         onBackToEstate={navigateBackToEstateHome}
-        onWander={() => {
-          if (roomMenuRoomId) {
-            handleEstateWander(roomMenuRoomId);
-          }
-        }}
+        onOpenChamber={() => openChamberOfMomentumCore()}
+        onOpenEvidenceVault={() =>
+          enterEvidenceVaultRoomCore({ userIntent: "room-menu:evidence-vault" })
+        }
+        onOpenHallOfAccomplishments={() =>
+          openGrowthDestinationCore("growth-portfolio")
+        }
+        onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
+        onOpenCartographersStudio={() => openCartographersStudioCore()}
+        onOpenBreathe={() => openBreatheOverlayCore()}
+        onOpenSoundscapes={() =>
+          openPeacefulPlacesCore({ categoryId: "calm-brain" })
+        }
+        onExploreSpark={
+          clearMyMindWorkspaceActive
+            ? undefined
+            : () => {
+                if (roomMenuRoomId) {
+                  handleEstateWander(roomMenuRoomId);
+                }
+              }
+        }
+      />
+
+      <BreatheDestinationHost
+        destination={breatheDestination}
+        resumeActive={breatheResumeActive}
+        onDone={() => closeBreatheOverlayCore({ resume: true })}
+        onContinueChat={() => closeBreatheOverlayCore({ goChat: true })}
+        onReturnPrevious={() => closeBreatheOverlayCore({ resume: true })}
+        onJournalThis={() => closeBreatheOverlayCore({ goJournal: true })}
       />
     </div>
     </CompanionDeskProvider>

@@ -1,33 +1,26 @@
-/* Estate Arrival Experience™ — universal room title + motto sequence */
+/* Estate Arrival Experience — optional plaque over an already-visible room */
 
 .estate-arrival {
   position: fixed;
   inset: 0;
-  z-index: 180;
+  z-index: 90;
   pointer-events: none;
   display: grid;
-  place-items: center;
+  place-items: end center;
+  padding-bottom: clamp(2.5rem, 12vh, 5rem);
+}
+
+.estate-arrival--place-first .estate-arrival__plaque {
+  opacity: 1;
+  transform: translateY(0);
+  background: rgba(12, 10, 8, 0.42);
+  border: 1px solid rgba(232, 212, 168, 0.28);
+  border-radius: 0.75rem;
+  backdrop-filter: blur(6px);
 }
 
 .estate-arrival__veil {
-  position: absolute;
-  inset: 0;
-  background: rgba(8, 10, 9, 0.72);
-  opacity: 0;
-  animation: estate-arrival-veil-in 520ms ease-out forwards;
-}
-
-.estate-arrival--veil .estate-arrival__veil {
-  opacity: 1;
-}
-
-@keyframes estate-arrival-veil-in {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
+  display: none;
 }
 
 .estate-arrival__plaque {

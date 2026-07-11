@@ -1,0 +1,120 @@
+/* Global estate room crossfade — never expose blank app chrome between plates */
+
+.estate-scene-transition-host {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(180deg, #2a2420 0%, #1a1612 48%, #12100e 100%);
+}
+
+/* Journal Gazebo owns its own full-bleed plates — hide global crossfade to avoid sunroom bleed-through. */
+body:has(.companion-root[data-journal-gazebo-active]) .estate-scene-transition-host {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.estate-scene-transition-host__plate {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  user-select: none;
+}
+
+.estate-scene-transition-host--show-full-plate .estate-scene-transition-host__plate {
+  object-fit: contain;
+  object-position: center center;
+}
+
+.estate-scene-transition-host__plate--hold,
+.estate-scene-transition-host__plate--active,
+.estate-scene-transition-host__plate--outgoing {
+  opacity: 1;
+}
+
+.estate-scene-transition-host__plate--incoming {
+  opacity: 0;
+  animation: estate-scene-crossfade-in var(--estate-scene-crossfade-ms, 620ms) ease forwards;
+}
+
+.estate-scene-transition-host__plate--outgoing {
+  animation: estate-scene-crossfade-out var(--estate-scene-crossfade-ms, 620ms) ease forwards;
+}
+
+@keyframes estate-scene-crossfade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes estate-scene-crossfade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.estate-scene-transition-host__preparing {
+  position: absolute;
+  left: 50%;
+  bottom: max(1.35rem, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 248, 235, 0.22);
+  background: rgba(18, 14, 10, 0.55);
+  color: rgba(255, 248, 235, 0.9);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: estate-scene-preparing-in 0.35s ease;
+}
+
+@keyframes estate-scene-preparing-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Per-room full bleed — crossfade when the plate swaps inside a shell */
+.estate-room-fullbleed-stack--crossfade {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.estate-room-fullbleed-bg--previous {
+  opacity: 1;
+  transition: opacity var(--estate-scene-crossfade-ms, 620ms) ease;
+}
+
+.estate-room-fullbleed-bg--previous-fading {
+  opacity: 0;
+}
+
+.estate-room-fullbleed-bg--incoming {
+  opacity: 0;
+}
+
+.estate-room-fullbleed-bg--incoming-visible {
+  opacity: 1;
+  transition: opacity var(--estate-scene-crossfade-ms, 620ms) ease;
+}

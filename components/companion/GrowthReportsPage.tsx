@@ -7,7 +7,7 @@ type Props = {
   backLabel?: string | null;
 };
 
-/** Celebration Hall — Spark Estate Collection Framework™ */
+/** Celebration Hall — Spark Estate Collection Framework */
 export function GrowthReportsPage({ onBack, backLabel }: Props) {
   return (
     <EstateCollectionRoomPanel

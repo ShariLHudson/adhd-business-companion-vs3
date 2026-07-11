@@ -1,4 +1,4 @@
-/** FLAME™ Executive Mentor — experience types (no AI). */
+/** FLAME Executive Mentor — experience types (no AI). */
 
 export type FlameObservationCategory =
   | "progress"

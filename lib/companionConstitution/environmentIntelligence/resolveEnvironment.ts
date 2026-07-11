@@ -1,4 +1,6 @@
 import { pickScene, SCENE_OVERLAY, type ScenePage } from "@/lib/companionBackgrounds";
+import { resolveBreatheEnvironment } from "@/lib/breatheDestination/breatheEnvironments";
+import { getClearMyMindBackdropImageUrl } from "@/lib/chatBackdrop";
 import {
   CLEAR_MY_MIND_CONSERVATORY_BG,
   CLEAR_MY_MIND_WORKSPACE_MAX_WIDTH,
@@ -14,6 +16,7 @@ import {
   PLAN_MY_DAY_WORKSPACE_MAX_WIDTH,
   PLAN_MY_DAY_WORKSPACE_MIN_WIDTH,
 } from "@/lib/planMyDay/morningRoom";
+import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 import {
   LIFE_EXPERIENCE_LETTER_MAX_WIDTH,
   LIFE_EXPERIENCE_ROOM_BG,
@@ -43,6 +46,7 @@ const HOMESTEAD_WORKSPACES = new Set<SceneWorkspaceId>([
   "clear-my-mind-thoughts",
   "life-experience-room",
   "plan-my-day",
+  "visual-focus",
   "focus-hub",
   "focus-category",
   "focus-audio",
@@ -53,6 +57,7 @@ const HOMESTEAD_SCENE_PAGES: Partial<Record<SceneWorkspaceId, ScenePage>> = {
   "clear-my-mind-thoughts": "recovery",
   "life-experience-room": "recovery",
   "plan-my-day": "today",
+  "visual-focus": "focus",
   "focus-hub": "focus",
   "focus-category": "focus",
   "focus-audio": "recovery",
@@ -78,12 +83,17 @@ const SIGNATURE_BY_WORKSPACE: Partial<
     signatureId: "sig-pond-anchor",
     objectId: "focus-my-brain",
   },
+  "visual-focus": {
+    signatureId: "sig-visual-focus-studio",
+    objectId: "visual-focus-studio",
+  },
 };
 
 const SECTION_TO_SCENE: Partial<Record<AppSection, SceneWorkspaceId>> = {
   "brain-dump": "clear-my-mind",
   "life-experience": "life-experience-room",
   "plan-my-day": "plan-my-day",
+  "visual-focus": "visual-focus",
   focus: "focus-hub",
   breathe: "breathe",
   "focus-audio": "focus-audio",
@@ -182,11 +192,16 @@ function resolvePlaceId(input: EnvironmentInput): {
     };
   }
 
+  if (workspaceId === "visual-focus" || input.section === "visual-focus") {
+    return { placeId: "focus-studio" };
+  }
+
   if (workspaceId) {
     const base: Partial<Record<SceneWorkspaceId, CompanionPlaceId>> = {
       "clear-my-mind": "greenhouse",
       "clear-my-mind-thoughts": "greenhouse",
       "life-experience-room": "reading-nook",
+      "visual-focus": "focus-studio",
       breathe: "reading-nook",
       "focus-audio": "reading-nook",
       default: "living-room",
@@ -224,6 +239,19 @@ function resolveBackground(
   const seed = input.seed ?? workspaceId ?? input.section ?? "living-room";
   const room = roomRegistryEntry(placeId);
 
+  if (placeId === "focus-studio" && workspaceId !== "visual-focus") {
+    return {
+      mode: "photo-scene",
+      imageUrl: CARTOGRAPHERS_STUDIO_BACKGROUND,
+      scenePage: "focus",
+      seed: "cartographers-studio",
+      overlay: "rgba(255, 248, 235, 0.05)",
+      objectPosition: "center center",
+      fit: "cover-safe-crop",
+      dominanceCap: 1,
+    };
+  }
+
   if (workspaceId && HOMESTEAD_WORKSPACES.has(workspaceId)) {
     if (
       workspaceId === "clear-my-mind" ||
@@ -231,9 +259,9 @@ function resolveBackground(
     ) {
       return {
         mode: "photo-scene",
-        imageUrl: CLEAR_MY_MIND_CONSERVATORY_BG,
+        imageUrl: getClearMyMindBackdropImageUrl() || CLEAR_MY_MIND_CONSERVATORY_BG,
         scenePage: "recovery",
-        seed: "original-sunroom",
+        seed: "sunroom",
         overlay: "rgba(255, 248, 232, 0.05)",
         objectPosition: "center 42%",
         fit: "cover-safe-crop",
@@ -280,6 +308,19 @@ function resolveBackground(
       };
     }
 
+    if (workspaceId === "visual-focus") {
+      return {
+        mode: "photo-scene",
+        imageUrl: CARTOGRAPHERS_STUDIO_BACKGROUND,
+        scenePage: "focus",
+        seed: "cartographers-studio",
+        overlay: "rgba(255, 248, 235, 0.05)",
+        objectPosition: "center center",
+        fit: "cover-safe-crop",
+        dominanceCap: 1,
+      };
+    }
+
     if (workspaceId === "focus-hub" || workspaceId === "focus-category") {
       return {
         mode: "photo-scene",
@@ -316,6 +357,15 @@ function resolveBackground(
     (workspaceId ? PHOTO_SCENE_WORKSPACES[workspaceId] : undefined) ??
     "focus";
   const imageUrl = pickScene(scenePage, seed);
+
+  /* Breathe — peaceful estate backdrop is owned by BreatheDestinationHost */
+  if (workspaceId === "breathe") {
+    void resolveBreatheEnvironment();
+    return {
+      mode: "none",
+      dominanceCap: 1,
+    };
+  }
 
   return {
     mode: "photo-scene",
@@ -397,6 +447,8 @@ export function resolveEnvironment(
           ? `clamp(26.25rem, 92vw, ${LIFE_EXPERIENCE_LETTER_MAX_WIDTH})`
           : workspaceId === "focus-hub" || workspaceId === "focus-category"
             ? `clamp(${FOCUS_MY_BRAIN_WORKSPACE_MIN_WIDTH}, 92vw, ${FOCUS_MY_BRAIN_WORKSPACE_MAX_WIDTH})`
+            : workspaceId === "visual-focus"
+              ? "42rem"
             : homestead
               ? "36rem"
               : "32rem",
@@ -407,6 +459,7 @@ export function resolveEnvironment(
         workspaceId !== "clear-my-mind" &&
         workspaceId !== "clear-my-mind-thoughts" &&
         workspaceId !== "life-experience-room" &&
+        workspaceId !== "visual-focus" &&
         workspaceId !== "focus-hub" &&
         workspaceId !== "focus-category" &&
         workspaceId !== "focus-audio",
@@ -414,6 +467,7 @@ export function resolveEnvironment(
         workspaceId === "clear-my-mind" ||
         workspaceId === "clear-my-mind-thoughts" ||
         workspaceId === "life-experience-room" ||
+        workspaceId === "visual-focus" ||
         workspaceId === "focus-hub" ||
         workspaceId === "focus-category" ||
         workspaceId === "focus-audio"

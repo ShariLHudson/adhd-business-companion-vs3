@@ -59,7 +59,7 @@ const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
 
 const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "plan-my-day":
-    "Pulls from Projects and Clear My Mind. Finished work lands in My Work; wins and proof build in Wins This Week and Evidence Bank.",
+    "Pulls from Projects and Clear My Mind. Finished work lands in My Work; wins and proof build in Wins This Week and Evidence Vault.",
   "visual-focus":
     "Studio hub with teaching cards — separate from Plan My Day (tasks) and Decision Compass (choosing which option is best). Decision Tree here explores what happens if you choose a path.",
   projects:
@@ -79,9 +79,9 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "evidence-bank":
     "Separate from Wins This Week — wins capture what happened; evidence captures why it mattered. Part of 🌱 Growth alongside My Highlights and My Journey.",
   "wins-this-week":
-    "Companion to Evidence Bank and My Highlights — weekly encouragement without scorekeeping. Review via Growth Inbox on the Growth hub.",
+    "Companion to Evidence Vault and My Highlights — weekly encouragement without scorekeeping. Review via Growth Inbox on the Growth hub.",
   growth:
-    "Hub for Wins This Week, Evidence Bank, My Highlights, and My Journey — open each from navigation cards. Growth Inbox and Growth Reports live here too.",
+    "Hub for Wins This Week, Evidence Vault, My Highlights, and My Journey — open each from navigation cards. Growth Inbox and Growth Reports live here too.",
   "client-avatars":
     "Informs Create, Templates, Snippets, and Strategies so messaging stays personal.",
   settings:
@@ -145,7 +145,7 @@ const LOCAL_GROWTH_HELP: Record<
     workflow: [
       "Define Outcome Goals — where you are headed (not a task list).",
       "Open Plan My Day when you are ready to choose what fits today.",
-      "Open My Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
+      "Open My Wins, Evidence Vault, My Highlights, or My Journey from the hub cards.",
       "Check Growth Inbox for moments the app noticed — save where they belong or dismiss.",
       "Tap Growth Reports for a printable reflection — not a live dashboard.",
     ],
@@ -154,7 +154,7 @@ const LOCAL_GROWTH_HELP: Record<
       "Nothing is logged without your review in Growth Inbox.",
     ],
     relatedAreas:
-      "Wins, Evidence Bank, My Highlights, and My Journey — each area has its own workspace.",
+      "Wins, Evidence Vault, My Highlights, and My Journey — each area has its own workspace.",
   },
   "confidence-vault": {
     areaName: "My Highlights",
@@ -170,10 +170,10 @@ const LOCAL_GROWTH_HELP: Record<
     ],
     tips: [
       "Recognizing accomplishments is not ego — it is remembering reality when self-doubt appears.",
-      "Separate from Evidence Bank: highlights celebrate you; evidence captures impact.",
+      "Separate from Evidence Vault: highlights celebrate you; evidence captures impact.",
     ],
     relatedAreas:
-      "Part of 🌱 Growth alongside Wins, Evidence Bank, and My Journey.",
+      "Part of 🌱 Growth alongside Wins, Evidence Vault, and My Journey.",
   },
   "my-journey": {
     areaName: "My Journey",
@@ -192,7 +192,7 @@ const LOCAL_GROWTH_HELP: Record<
       "Preserve meaning — not a profile form.",
     ],
     relatedAreas:
-      "Distinct from Evidence Bank (impact) and My Highlights (accomplishments and recognition).",
+      "Distinct from Evidence Vault (impact) and My Highlights (accomplishments and recognition).",
   },
 };
 

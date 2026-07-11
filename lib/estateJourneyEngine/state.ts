@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — state normalization and cloning.
+ * Estate Journey Engine — state normalization and cloning.
  */
 
 import type { EstateJourneyEngineState } from "./types";

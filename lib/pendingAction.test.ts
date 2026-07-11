@@ -65,7 +65,7 @@ describe("pendingAction", () => {
       toolSuggestion: {
         kind: "breathe",
         line: "Would a reset help?",
-        toolLabel: "Breathe & Reset",
+        toolLabel: "Breathe",
         toolEmoji: "🌿",
         keepTalkingLabel: "Keep Talking",
         action: { type: "tool", tool: "breathe" },

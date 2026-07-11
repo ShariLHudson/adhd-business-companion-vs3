@@ -1,5 +1,5 @@
 /**
- * saveCaptureEntry™ — instant local persist for capture systems.
+ * saveCaptureEntry — instant local persist for capture systems.
  * No LLM. On failure → silent queue for retry.
  */
 

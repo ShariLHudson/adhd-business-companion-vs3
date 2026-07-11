@@ -102,7 +102,7 @@ export function InstituteKnowledgeCardPanel({
         <header className="institute-knowledge-panel__header">
           <div>
             <p className="institute-knowledge-panel__eyebrow">
-              Knowledge Card™ · {drawer.title}
+              Knowledge Card · {drawer.title}
             </p>
             <h2 className="institute-knowledge-panel__title">{card.title}</h2>
             <dl className="institute-knowledge-panel__facts">
@@ -229,7 +229,7 @@ export function InstituteKnowledgeCardPanel({
           </div>
 
           <div className="institute-knowledge-panel__discuss">
-            <p className="institute-knowledge-panel__discuss-lead">Discuss with Shari™</p>
+            <p className="institute-knowledge-panel__discuss-lead">Discuss with Shari</p>
             <div className="institute-knowledge-panel__discuss-links">
               <button type="button" onClick={() => onDiscuss("understand")}>
                 Help me understand this
@@ -256,7 +256,7 @@ export function InstituteKnowledgeCardPanel({
           ) : null}
           {cabinet.saved ? (
             <p className="institute-knowledge-panel__cabinet-saved" role="status">
-              Filed in My Institute Cabinet™
+              Filed in My Institute Cabinet
             </p>
           ) : null}
         </footer>

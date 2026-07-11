@@ -1,12 +1,12 @@
 /**
- * Universal Experience Standards Framework™ (Spec 103).
+ * Universal Experience Standards Framework (Spec 103).
  * Design principles and experiential qualities for every member-facing experience.
  *
  * @see docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md
  * @see docs/UNIVERSAL_EXPERIENCE_STANDARDS.md (T-003 — flow arc, max 3 choices, supplementary)
  */
 
-/** The Spark Feeling™ — every experience should evoke these */
+/** The Spark Feeling — every experience should evoke these */
 export type SparkFeeling =
   | "calm"
   | "clarity"
@@ -39,7 +39,7 @@ export const SPARK_FEELING_LABELS: Record<SparkFeeling, string> = {
   ownership: "Ownership",
 };
 
-/** Universal Design Principles™ — eight governing principles */
+/** Universal Design Principles — eight governing principles */
 export type UniversalDesignPrinciple =
   | "one_relationship"
   | "orientation_before_action"
@@ -75,7 +75,7 @@ export const UNIVERSAL_DESIGN_PRINCIPLE_LABELS: Record<
   connection_everywhere: "Connection Everywhere",
 };
 
-/** Cognitive Load Standards™ — minimize */
+/** Cognitive Load Standards — minimize */
 export type CognitiveLoadMinimize =
   | "decision_fatigue"
   | "context_switching"
@@ -93,7 +93,7 @@ export const COGNITIVE_LOAD_MINIMIZE: readonly CognitiveLoadMinimize[] = [
   "memory_burden",
 ] as const;
 
-/** Cognitive Load Standards™ — maximize */
+/** Cognitive Load Standards — maximize */
 export type CognitiveLoadMaximize =
   | "recognition_over_recall"
   | "visual_clarity"
@@ -109,7 +109,7 @@ export const COGNITIVE_LOAD_MAXIMIZE: readonly CognitiveLoadMaximize[] = [
   "obvious_next_actions",
 ] as const;
 
-/** Interaction Standards™ — every interaction must answer */
+/** Interaction Standards — every interaction must answer */
 export const INTERACTION_STANDARD_QUESTIONS = [
   "What am I doing?",
   "Why does it matter?",
@@ -117,7 +117,7 @@ export const INTERACTION_STANDARD_QUESTIONS = [
   "What should I do now?",
 ] as const;
 
-/** Visual Standards™ — Estate environments should feel */
+/** Visual Standards — Estate environments should feel */
 export type VisualStandardPositive =
   | "premium"
   | "warm"
@@ -137,7 +137,7 @@ export const VISUAL_STANDARD_POSITIVE: readonly VisualStandardPositive[] = [
   "natural",
 ] as const;
 
-/** Visual Standards™ — never */
+/** Visual Standards — never */
 export type VisualStandardAvoid =
   | "gamified"
   | "busy"
@@ -153,7 +153,7 @@ export const VISUAL_STANDARD_AVOID: readonly VisualStandardAvoid[] = [
   "overstimulating",
 ] as const;
 
-/** Emotional Standards™ — reduce */
+/** Emotional Standards — reduce */
 export type EmotionalStandardReduce =
   | "overwhelm"
   | "isolation"
@@ -169,7 +169,7 @@ export const EMOTIONAL_STANDARD_REDUCE: readonly EmotionalStandardReduce[] = [
   "shame",
 ] as const;
 
-/** Emotional Standards™ — increase */
+/** Emotional Standards — increase */
 export type EmotionalStandardIncrease =
   | "hope"
   | "clarity"
@@ -187,7 +187,7 @@ export const EMOTIONAL_STANDARD_INCREASE: readonly EmotionalStandardIncrease[] =
   "belonging",
 ] as const;
 
-/** Estate Standards™ — every room should answer */
+/** Estate Standards — every room should answer */
 export const ESTATE_ROOM_DESIGN_QUESTIONS = [
   "Why does this place exist?",
   "What capability does it strengthen?",
@@ -195,7 +195,7 @@ export const ESTATE_ROOM_DESIGN_QUESTIONS = [
   "How does it connect to the entrepreneurial journey?",
 ] as const;
 
-/** Experience Review Checklist™ — gate before implementation */
+/** Experience Review Checklist — gate before implementation */
 export const SPARK_UNIVERSAL_EXPERIENCE_REVIEW_CHECKLIST = [
   "Does it reduce cognitive load?",
   "Does it strengthen an entrepreneurial capability?",
@@ -207,7 +207,7 @@ export const SPARK_UNIVERSAL_EXPERIENCE_REVIEW_CHECKLIST = [
   "Does it feel like Spark?",
 ] as const;
 
-/** Success Metrics™ */
+/** Success Metrics */
 export type SparkUniversalExperienceSuccessMetric =
   | "feels_easy_to_use"
   | "feels_calm"

@@ -6,7 +6,7 @@ import type { DiscoveryEngineSelection } from "./types";
 const baseSelection: DiscoveryEngineSelection = {
   discoveryId: "DISC-001",
   category: "estate-discovery",
-  title: "Greenhouse™",
+  title: "Greenhouse",
   subtitle: null,
   destinationRoute: "/companion?section=growth-greenhouse",
   destinationSection: "growth-greenhouse",
@@ -23,7 +23,7 @@ const baseSelection: DiscoveryEngineSelection = {
 describe("discoveryNotePresentation", () => {
   it("maps engine selection to note data", () => {
     const note = toDiscoveryNoteData(baseSelection);
-    expect(note.title).toBe("Greenhouse™");
+    expect(note.title).toBe("Greenhouse");
     expect(note.showPrimaryButton).toBe(true);
     expect(note.primaryButtonLabel).toBe("Take Me There");
   });

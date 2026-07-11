@@ -237,7 +237,6 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
       return "todays-reality";
     case "focus":
     case "focus-timer":
-    case "breathe":
     case "focus-audio":
     case "activities":
     case "guided-exercises":
@@ -245,6 +244,9 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "games":
     case "quick-recharge":
       return "focus";
+    /** Breathe is a universal overlay — not a Focus nav destination. */
+    case "breathe":
+      return null;
     case "grow":
     case "momentum-builder":
     case "grow-momentum-builders":
@@ -318,8 +320,8 @@ export type MenuNode = MenuLeaf | MenuBranch;
 //  ├─ What's on your mind   → Brain Dump
 //  └─ Focus Tools
 //       ├─ Focus Audio      → focus-audio
-//       ├─ Breathe          → breathe
 //       └─ Pomodoro timer   → focus-timer
+// Breathe is a universal capability overlay — not listed under Focus.
 export const FOCUS_MENU: MenuNode[] = [
   {
     kind: "leaf",
@@ -343,13 +345,6 @@ export const FOCUS_MENU: MenuNode[] = [
       },
       {
         kind: "leaf",
-        id: "breathe",
-        label: "Breathe",
-        objectId: "breathing",
-        tool: "breathe",
-      },
-      {
-        kind: "leaf",
         id: "pomodoro",
         label: "Pomodoro timer",
         objectId: "focus-timer",
@@ -360,10 +355,10 @@ export const FOCUS_MENU: MenuNode[] = [
 ];
 
 // Maps a tool action to the AppSection it opens (null = no section switch).
+// Breathe opens as a Universal Access overlay — not a section route.
 export const TOOL_SECTION: Partial<Record<SidebarToolId, AppSection>> = {
   "brain-dump": "brain-dump",
   "focus-timer": "focus-timer",
-  breathe: "breathe",
   "focus-audio": "focus-audio",
   "time-block": "time-block",
   activities: "activities",

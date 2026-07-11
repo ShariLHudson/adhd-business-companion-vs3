@@ -1,5 +1,5 @@
 /**
- * Per-room welcome and empty-state copy — Estate Room Template™ layer 2 & 5.
+ * Per-room welcome and empty-state copy — Estate Room Template layer 2 & 5.
  */
 
 import type {
@@ -22,7 +22,11 @@ export const ESTATE_ROOM_WELCOME_COPY: Record<string, EstateRoomTemplateWelcome>
   {
     "evidence-vault": {
       shariLine:
-        "One day this room will tell the story of your journey. Every lesson you apply, every obstacle you overcome, every person you help — it all belongs here.",
+        "Welcome back to your Evidence Vault.",
+      shariParagraphs: [
+        "Every experience has something to teach us.",
+        "What discovery would you like to preserve today?",
+      ],
     },
     journal: {
       shariLine:
@@ -80,9 +84,9 @@ export const ESTATE_ROOM_EMPTY_STATE_COPY: Record<
   EstateRoomTemplateEmptyState
 > = {
   "evidence-vault": {
-    headline: "This room is waiting to tell your story.",
+    headline: "This room is waiting for your first discovery.",
     detail:
-      "When you're ready, we can add the first thing you're proud of — a win, kind words, or proof of how far you've come.",
+      "When you're ready, preserve something meaningful — a win, kind words, or wisdom from your journey.",
   },
   journal: {
     headline: "This room is waiting to tell your story.",

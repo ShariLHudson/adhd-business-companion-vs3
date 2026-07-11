@@ -7,7 +7,7 @@ import {
   INTEGRATION_CENTER_PRINCIPLE,
 } from "./index";
 
-describe("Executive Integration Center™", () => {
+describe("Executive Integration Center", () => {
   it("exposes one office principle", () => {
     expect(INTEGRATION_CENTER_PRINCIPLE).toContain("orchestrates");
   });
@@ -26,7 +26,7 @@ describe("Executive Integration Center™", () => {
       "Research",
     ]);
     const names = view.groups.flatMap((g) => g.integrations.map((i) => i.name));
-    expect(names).toContain("PostCraft™");
+    expect(names).toContain("PostCraft");
     expect(names).toContain("Google Mail");
     expect(names).toContain("GitHub");
     expect(names).toContain("ChatGPT Command Center");

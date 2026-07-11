@@ -1,5 +1,5 @@
 /**
- * Estate Brain™ — search and routing from one knowledge registry.
+ * Estate Brain — search and routing from one knowledge registry.
  */
 
 import { describe, expect, it } from "vitest";

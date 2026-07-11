@@ -1,5 +1,5 @@
 /**
- * Semantic Intent Resolver™ — meaning-first orchestration.
+ * Semantic Intent Resolver — meaning-first orchestration.
  *
  * Regex classifiers remain a fast path. When meaning is clear from KB + signals,
  * route by meaning — not exact phrases like “take me to”.

@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Registry™ — singleton + query helpers (Phase 1).
+ * Estate Knowledge Registry — singleton + query helpers (Phase 1).
  */
 
 import { matchAppFeatures } from "@/lib/appFeatureKnowledge";

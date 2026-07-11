@@ -1,5 +1,5 @@
 /**
- * Certainty Before Completion™ (Spec 113).
+ * Certainty Before Completion (Spec 113).
  * Conversation architecture for how Spark ends meaningful interactions.
  * Overrides traditional Save/Export/Print/Share/file-management endings.
  *
@@ -61,9 +61,9 @@ export const SPARK_CERTAINTY_WHAT_HAPPENED_NEVER = [
 ] as const;
 
 export const SPARK_CERTAINTY_WHERE_EXAMPLES = [
-  "It's now part of your Business Brain™ under Marketing Plans.",
+  "It's now part of your Business Brain under Marketing Plans.",
   "I've added it to your Workshop Launch project.",
-  "It's safely stored with your Business Assets™.",
+  "It's safely stored with your Business Assets.",
 ] as const;
 
 export const SPARK_CERTAINTY_FIND_LATER_EXAMPLES = [
@@ -84,7 +84,7 @@ export const SPARK_CERTAINTY_AVOID_TOOLBAR_ACTIONS = [
 export const SPARK_CERTAINTY_NEXT_QUESTION =
   "What would you like to do next?" as const;
 
-/** Conversation Drives Navigation™ */
+/** Conversation Drives Navigation */
 export const SPARK_CERTAINTY_CONVERSATION_NAVIGATION_EXAMPLES = [
   { member: "Print this.", spark: "Opens the print experience" },
   { member: "Email this to my client.", spark: "Prepares the email" },

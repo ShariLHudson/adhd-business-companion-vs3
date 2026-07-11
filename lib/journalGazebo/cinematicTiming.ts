@@ -1,5 +1,5 @@
 /**
- * Journal Gazebo™ — unhurried ceremony; linger between steps.
+ * Journal Gazebo — unhurried ceremony; linger between steps.
  * Paced ~18% slower — luxury never rushes.
  */
 

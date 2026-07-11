@@ -1,9 +1,14 @@
 /**
- * Mind Map first draft — stronger grouping, duplicates, gaps, explanation (199).
+ * Mind Map first draft — First Draft Intelligence (199 / 244).
+ * Thinking order: purpose → themes → groups → relationships → priorities →
+ * missing pieces → risks → opportunities → next steps.
  */
 
 import type { VisualFocusNode } from "../types";
 import type { VisualFocusDiscoveryInterview } from "./types";
+import {
+  formatFirstDraftReviewMessage,
+} from "./firstDraftIntelligence";
 import { MIND_MAP_DISCOVERY_QUESTIONS, parseIdeaLines } from "./mindMapDiscovery";
 
 export type MindMapDraftResult = {
@@ -204,13 +209,16 @@ function capitalize(s: string): string {
 export function buildMindMapDraftFromDiscovery(input: {
   topic: string;
   everything: string;
+  /** Desired outcome / end goal (242). */
+  desiredOutcome?: string;
+  /** @deprecated use desiredOutcome */
   anythingElse?: string;
 }): MindMapDraftResult {
   const topic = input.topic.trim() || "Central idea";
-  const rawLines = [
-    ...parseIdeaLines(input.everything),
-    ...parseIdeaLines(input.anythingElse ?? ""),
-  ].filter((line) => normalizeIdea(line) !== normalizeIdea(topic));
+  const outcome = (input.desiredOutcome ?? input.anythingElse ?? "").trim();
+  const rawLines = parseIdeaLines(input.everything).filter(
+    (line) => normalizeIdea(line) !== normalizeIdea(topic),
+  );
 
   const { unique: lines, duplicates } = dedupeIdeas(rawLines);
 
@@ -245,6 +253,13 @@ export function buildMindMapDraftFromDiscovery(input: {
     }
   }
 
+  if (outcome) {
+    children.unshift(
+      node("Desired outcome", [node(outcome)], "End goal from Discovery"),
+    );
+    groupReasons.unshift("Desired outcome — what success looks like");
+  }
+
   if (children.length === 0) {
     children.push(
       node("First thoughts", [node("Add what comes to mind")]),
@@ -260,8 +275,18 @@ export function buildMindMapDraftFromDiscovery(input: {
       suggestedGaps.push(gap.label);
     }
   }
+  // 244 — missing pieces / risks / opportunities / next steps
+  if (!branchLabels.some((l) => /risk|worr/i.test(l))) {
+    suggestedGaps.push("Risks & worries");
+  }
+  if (!branchLabels.some((l) => /opportunit/i.test(l))) {
+    suggestedGaps.push("Opportunities");
+  }
+  if (!branchLabels.some((l) => /next|action|step/i.test(l))) {
+    suggestedGaps.push("Suggested next steps");
+  }
 
-  const suggestedBranches = suggestedGaps.slice(0, 3);
+  const suggestedBranches = [...new Set(suggestedGaps)].slice(0, 3);
   for (const gap of suggestedBranches) {
     if (!branchLabels.some((l) => l.toLowerCase() === gap.toLowerCase())) {
       children.push(
@@ -293,16 +318,18 @@ export function buildMindMapDraftFromDiscovery(input: {
     suggestedGaps,
     suggestedBranches,
     duplicates,
-    explanation: explanationParts.join(" "),
+    explanation: formatFirstDraftReviewMessage(explanationParts.join(" ")),
   };
 }
 
 export function buildMindMapDiscoveryInterview(answers: {
   topic: string;
   everything: string;
+  desiredOutcome?: string;
   anythingElse?: string;
 }): VisualFocusDiscoveryInterview {
   const now = new Date().toISOString();
+  const outcome = (answers.desiredOutcome ?? answers.anythingElse ?? "").trim();
   return {
     mapKind: "mind-map",
     completedAt: now,
@@ -318,9 +345,9 @@ export function buildMindMapDiscoveryInterview(answers: {
         answer: answers.everything.trim(),
       },
       {
-        questionId: "anything-else",
+        questionId: "desired-outcome",
         question: MIND_MAP_DISCOVERY_QUESTIONS[2]!.prompt,
-        answer: (answers.anythingElse ?? "").trim(),
+        answer: outcome,
       },
     ],
   };

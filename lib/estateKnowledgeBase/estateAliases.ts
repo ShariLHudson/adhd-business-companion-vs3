@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — natural language alias resolver.
+ * Estate Knowledge Base — natural language alias resolver.
  */
 
 import estateAliasesJson from "@/docs/estate-knowledge-base/estate-aliases.json";

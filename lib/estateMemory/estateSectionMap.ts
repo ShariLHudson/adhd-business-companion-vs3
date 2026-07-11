@@ -1,5 +1,5 @@
 /**
- * Estate Memory™ — AppSection ↔ Registry entry mapping.
+ * Estate Memory — AppSection ↔ Registry entry mapping.
  *
  * **Adapter (Phase B):** Section ↔ place links should eventually resolve through
  * `canonicalEstateRegistry.ts` + a single routing layer. Not authoritative for place identity.
@@ -23,7 +23,7 @@ export const SECTION_TO_ESTATE_ENTRY: Partial<Record<AppSection, string>> = {
   "momentum-institute": "momentum-institute",
   "content-generator": "creative-studio",
   "decision-compass": "decision-compass",
-  "growth-journal": "growth-journal",
+  "growth-journal": "journal",
   "stables": "stables",
 };
 
@@ -33,7 +33,9 @@ const ENTRY_TO_SECTION_OVERRIDES: Record<string, AppSection> = {
   stables: "stables",
   "music-room": "focus-audio",
   "coffee-house": "focus-audio",
-  "apple-orchard": "focus-audio",
+  /** Orchard redirects to The Swing Beneath the Oak (no dedicated plate yet). */
+  "apple-orchard": "home",
+  "the-swing-beneath-the-oak": "home",
   "my-estate": "home",
   settings: "settings",
 };

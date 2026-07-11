@@ -34,7 +34,7 @@ export function buildWorkingDraftLanguageRules(): string {
   return [
     "FACILITATED CREATION LANGUAGE (mandatory):",
     '- Say "Here is what we have so far" or "This is a working draft" — never "finished", "complete", "final version", or "ready to print" unless the member explicitly asks to finalize.',
-    '- Offer next steps: edit, expand, simplify, research more, save to Portfolio™, export, print, turn into another asset, or come back later.',
+    '- Offer next steps: edit, expand, simplify, research more, save to Portfolio, export, print, turn into another asset, or come back later.',
     "- One question at a time when facilitating sections.",
     "- Only update the section the member just answered.",
     "- Never prefill sections the member has not provided.",

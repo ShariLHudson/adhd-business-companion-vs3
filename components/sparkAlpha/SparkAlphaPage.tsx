@@ -85,7 +85,7 @@ function isFocusEffect(
 }
 
 /**
- * Spark Alpha™ — Relationship Prototype
+ * Spark Alpha — Relationship Prototype
  * Conversation is the interface. Conservatory only. Invisible layer logged for dev.
  */
 export function SparkAlphaPage() {

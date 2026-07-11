@@ -1,6 +1,6 @@
 /**
- * Spark Estate Collection™ — permission-first suggestion lines.
- * Room routing follows the Estate Collections Playbook™.
+ * Spark Estate Collection — permission-first suggestion lines.
+ * Room routing follows the Estate Collections Playbook.
  */
 
 import { playbookRoomForDecisionTreeKeyword } from "./estateCollectionsPlaybook";

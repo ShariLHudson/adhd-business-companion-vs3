@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — Universal Artifact State Model
+ * Spark Estate — Universal Artifact State Model
  * Artifact memory for facilitated creation — not UI.
  *
  * Shari tracks work-in-progress; the member owns the artifact.
@@ -137,7 +137,7 @@ export const ARTIFACT_SOURCE_LABELS: Record<ArtifactSource, string> = {
   shari_suggestion: "Shari suggested",
   imported_research: "Research",
   previous_artifact: "Previous artifact",
-  momentum_institute: "Momentum Institute™",
+  momentum_institute: "Momentum Institute",
   template: "Template",
   manual_edit: "Your edit",
 };

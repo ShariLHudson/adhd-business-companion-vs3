@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — demo room experience (Phase 7).
+ * Chamber of Momentum — demo room experience (Phase 7).
  * Surfaces momentum path + progress only when data exists — no empty dashboard sections.
  *
  * @see docs/protocols/CHAMBER_OF_MOMENTUM_DEMO_EXPERIENCE_AND_VISUAL_ROOM_SPECIFICATION_PHASE7.md
@@ -30,13 +30,13 @@ export type ChamberProgressMoment = {
 function milestoneTrademark(kind: MomentumPathMilestoneKind): string | null {
   switch (kind) {
     case "first_step_taken":
-      return "First Step™";
+      return "First Step";
     case "easy_win_completed":
-      return "Easy Wins™";
+      return "Easy Wins";
     case "focus_session_honored":
-      return "Focus Session™";
+      return "Focus Session";
     case "roadblock_named":
-      return "Roadblocks™";
+      return "Roadblocks";
     default:
       return null;
   }
@@ -61,7 +61,7 @@ export function buildChamberMomentumPathItems(): ChamberMomentumPathItem[] {
   if (focusProject) {
     items.push({
       id: `first-step-${focusProject.id}`,
-      trademark: "First Step™",
+      trademark: "First Step",
       label: focusProject.nextAction.trim(),
       detail: focusProject.name,
     });

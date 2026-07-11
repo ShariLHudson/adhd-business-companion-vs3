@@ -29,7 +29,7 @@ function resolveLiveNavigationTarget(locationId: string): ObjectNavigationTarget
     return {
       placeId: validated[0].placeId,
       locationId: validated[0].locationId,
-      displayName: loc?.officialDisplayName?.replace(/™/g, "") ?? validated[0].locationId,
+      displayName: loc?.officialDisplayName?.replace(/\u2122/g, "") ?? validated[0].locationId,
       objectName: "",
     };
   }
@@ -42,7 +42,7 @@ function resolveLiveNavigationTarget(locationId: string): ObjectNavigationTarget
       return {
         placeId: parentValidated[0].placeId,
         locationId: parentValidated[0].locationId,
-        displayName: loc?.officialDisplayName?.replace(/™/g, "") ?? parentValidated[0].locationId,
+        displayName: loc?.officialDisplayName?.replace(/\u2122/g, "") ?? parentValidated[0].locationId,
         objectName: "",
       };
     }
@@ -53,7 +53,7 @@ function resolveLiveNavigationTarget(locationId: string): ObjectNavigationTarget
     return {
       placeId: loc.canonicalPlaceId ?? loc.locationId,
       locationId: loc.locationId,
-      displayName: loc.officialDisplayName.replace(/™/g, ""),
+      displayName: loc.officialDisplayName.replace(/\u2122/g, ""),
       objectName: "",
     };
   }

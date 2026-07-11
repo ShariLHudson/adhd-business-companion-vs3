@@ -38,7 +38,7 @@ function originLabel(ws?: string): string {
 
 const PAIN_SUPPORT: { re: RegExp; label: string; path: string }[] = [
   { re: /overwhelm|too much|drowning/i, label: "Overwhelm", path: "Clear My Mind, then one next step" },
-  { re: /low energy|tired|exhaust|drained|burn/i, label: "Low energy", path: "Smaller steps + Breathe & Reset" },
+  { re: /low energy|tired|exhaust|drained|burn/i, label: "Low energy", path: "Smaller steps + Breathe" },
   { re: /procrastinat|avoid|putting off/i, label: "Procrastination / avoidance", path: "The 2-Minute Entry" },
   { re: /focus|distract|attention/i, label: "Focus", path: "Focus Session + Focus Audio" },
   { re: /decision|can'?t (decide|choose)/i, label: "Decision fatigue", path: "Pick Then Learn" },

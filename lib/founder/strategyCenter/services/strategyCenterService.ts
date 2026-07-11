@@ -1,7 +1,7 @@
 import { sampleStrategyCenterRepository } from "../repositories/sample";
 import type { StrategyCenterBootstrap, StrategySession } from "../types";
 
-/** Bootstrap data for Executive Strategy Center™ room. */
+/** Bootstrap data for Executive Strategy Center room. */
 export function getStrategyCenterBootstrap(): StrategyCenterBootstrap {
   return sampleStrategyCenterRepository.getBootstrap();
 }

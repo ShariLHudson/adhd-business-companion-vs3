@@ -1,5 +1,5 @@
 /**
- * Spark Business Brain™ — canonical knowledge OS types.
+ * Spark Business Brain — canonical knowledge OS types.
  * Institutional knowledge architecture — not member business memory (Spec 003).
  *
  * @see docs/SPARK_BUSINESS_BRAIN.md
@@ -37,7 +37,7 @@ export type {
   SourceIntegrityChecklistResult,
 } from "./sourceIntegrity/types";
 
-// ── Knowledge Council™ ──────────────────────────────────────────────────────
+// ── Knowledge Council ──────────────────────────────────────────────────────
 
 /** Research discipline — academic or practical field informing Spark */
 export type ResearchDiscipline = {
@@ -94,7 +94,7 @@ export type SchoolOfThought = {
   visibility: BrainVisibility;
 };
 
-/** Spark Knowledge Council™ — permanent internal reference */
+/** Spark Knowledge Council — permanent internal reference */
 export type KnowledgeCouncil = {
   version: typeof BUSINESS_BRAIN_VERSION;
   title: string;
@@ -180,7 +180,7 @@ export type BrainCurriculumTopic = {
 };
 
 /**
- * Knowledge Card™ — master canonical knowledge object in the Brain OS.
+ * Knowledge Card — master canonical knowledge object in the Brain OS.
  * Lesson bodies live elsewhere; this is structure + metadata.
  */
 export type BrainKnowledgeCard = {

@@ -43,7 +43,7 @@ export function FounderDecisionVault() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Founder Memory & Decision Vault™"
+        eyebrow="Founder Memory & Decision Vault"
         title="Decision Vault"
         question="What did we decide — and why?"
         purpose="Institutional memory for Visual Spark Studios. Every major decision, lesson, and milestone preserved."

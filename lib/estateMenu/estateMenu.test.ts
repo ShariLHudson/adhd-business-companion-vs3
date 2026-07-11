@@ -1,39 +1,56 @@
 import { describe, expect, it } from "vitest";
 import {
   ESTATE_MENU_ACTION_IDS,
+  ESTATE_MENU_DROPDOWN_ENTRIES,
   ESTATE_MENU_DROPDOWN_ITEMS,
 } from "./menuConfig";
 
-describe("Global Estate Menu™", () => {
+describe("Global Estate Menu", () => {
   it("keeps routing action ids for programmatic navigation", () => {
     expect(ESTATE_MENU_ACTION_IDS).toContain("memory-library");
     expect(ESTATE_MENU_ACTION_IDS).toContain("journal");
     expect(ESTATE_MENU_ACTION_IDS).toContain("notifications");
     expect(ESTATE_MENU_ACTION_IDS).toContain("my-profile");
     expect(ESTATE_MENU_ACTION_IDS).toContain("start-new-conversation");
+    expect(ESTATE_MENU_ACTION_IDS).toContain("start-new-day-conversation");
     expect(ESTATE_MENU_ACTION_IDS).toContain("log-out");
   });
 
-  it("shows five profile dropdown choices per navigation correction spec", () => {
-    expect(ESTATE_MENU_DROPDOWN_ITEMS).toHaveLength(5);
-    const ids = ESTATE_MENU_DROPDOWN_ITEMS.map((item) => item.id);
-    expect(ids).toEqual([
-      "my-profile",
-      "settings",
-      "memory-library",
-      "growth-profile",
-      "estate-profile",
+  it("shows Conversations, Settings, Profile, and Logout only", () => {
+    expect(ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => entry.label)).toEqual([
+      "Conversations",
+      "Settings",
+      "Profile",
+      "Logout",
     ]);
   });
 
-  it("uses spec-aligned profile menu labels", () => {
-    const labels = ESTATE_MENU_DROPDOWN_ITEMS.map((item) => item.label);
-    expect(labels).toEqual([
-      "Profile",
-      "Settings",
-      "Conversations",
-      "Personalization",
-      "Account",
+  it("nests New Chat and New Day Chat under Conversations", () => {
+    const conversations = ESTATE_MENU_DROPDOWN_ENTRIES.find(
+      (entry) => entry.kind === "group" && entry.id === "conversations",
+    );
+    expect(conversations?.kind).toBe("group");
+    if (conversations?.kind !== "group") return;
+    expect(conversations.children.map((child) => child.label)).toEqual([
+      "New Chat",
+      "New Day Chat",
     ]);
+    expect(conversations.children.map((child) => child.id)).toEqual([
+      "start-new-conversation",
+      "start-new-day-conversation",
+    ]);
+  });
+
+  it("hides Personalization and Account from the visible menu", () => {
+    const labels = ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => entry.label);
+    expect(labels).not.toContain("Personalization");
+    expect(labels).not.toContain("Account");
+    expect(labels).not.toContain("Evidence Vault");
+    expect(labels).not.toContain("Hall of Accomplishments");
+    const ids = ESTATE_MENU_DROPDOWN_ITEMS.map((item) => item.id);
+    expect(ids).not.toContain("growth-profile");
+    expect(ids).not.toContain("estate-profile");
+    expect(ids).not.toContain("evidence-vault");
+    expect(ids).not.toContain("portfolio");
   });
 });

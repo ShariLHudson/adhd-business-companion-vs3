@@ -1,5 +1,5 @@
 /**
- * Spec 132 — Emotional Blocker Conversations™
+ * Spec 132 — Emotional Blocker Conversations
  * Understand why they can't begin before suggesting how to do the task.
  *
  * @see docs/conversation-tests/ct-05.md

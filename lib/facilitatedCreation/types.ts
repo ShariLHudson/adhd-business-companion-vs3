@@ -1,5 +1,5 @@
 /**
- * Facilitated Creation Flow™ — Shari facilitates; the member owns the business.
+ * Facilitated Creation Flow — Shari facilitates; the member owns the business.
  * Split workspace opens only when building, tracking, or reviewing matters.
  */
 

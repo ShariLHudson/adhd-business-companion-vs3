@@ -30,7 +30,7 @@ export type LegacyWorkspaceEntry = {
 export const LEGACY_WORKSPACE_MAP: readonly LegacyWorkspaceEntry[] = [
   {
     legacyId: "creative-studio",
-    legacyLabel: "Creative Studio™",
+    legacyLabel: "Creative Studio",
     disposition: "move",
     experienceId: "create",
     spaceId: "creative-studio",
@@ -120,7 +120,7 @@ export const LEGACY_WORKSPACE_MAP: readonly LegacyWorkspaceEntry[] = [
   },
   {
     legacyId: "momentum-builder",
-    legacyLabel: "Momentum Builder™",
+    legacyLabel: "Momentum Builder",
     disposition: "move",
     experienceId: "momentum",
     spaceId: "momentum-builder",

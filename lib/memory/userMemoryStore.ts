@@ -1,5 +1,5 @@
 /**
- * UserMemoryStore™ — aggregates journal, portfolio, and evidence from domain stores.
+ * UserMemoryStore — aggregates journal, portfolio, and evidence from domain stores.
  * Read-only aggregation — writes stay in Capture / domain stores.
  */
 

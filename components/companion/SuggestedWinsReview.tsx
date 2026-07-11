@@ -149,7 +149,7 @@ export function SuggestedWinsReview({
                     {(
                       [
                         ["wins", "Wins This Week"],
-                        ["evidence", "Evidence Bank"],
+                        ["evidence", "Evidence Vault"],
                         ["confidence", "My Highlights"],
                         ["journey", "My Journey"],
                       ] as const

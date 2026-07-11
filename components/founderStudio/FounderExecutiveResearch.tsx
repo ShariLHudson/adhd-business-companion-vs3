@@ -38,7 +38,7 @@ export function FounderExecutiveResearch() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Research Center™"
+        eyebrow="Executive Research Center"
         title="Your Private Executive Research Department"
         question="What does Shari actually need to know?"
         purpose="Answer, evidence, Spark application, and prepared next steps — not another search engine."

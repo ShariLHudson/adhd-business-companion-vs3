@@ -1,5 +1,5 @@
 /**
- * Spec 128 — Thinking Pause™
+ * Spec 128 — Thinking Pause
  */
 
 import {

@@ -1,5 +1,5 @@
 /**
- * Spark Conversation State Machine™ (Spec 107).
+ * Spark Conversation State Machine (Spec 107).
  * Internal behavioral engine — invisible to members; governs turn logic.
  *
  * Member-facing flow: Spec 105 — lib/sparkConversationEngine/types.ts

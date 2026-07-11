@@ -1,4 +1,4 @@
-/** Executive Orchestrator™ — from decision to prepared execution. */
+/** Executive Orchestrator — from decision to prepared execution. */
 
 export type OrchestratorStep =
   | "discover"

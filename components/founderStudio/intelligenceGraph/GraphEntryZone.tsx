@@ -89,7 +89,7 @@ export function GraphEntryZone({
           className="founder-graph__featured-link"
           onClick={() => onSelectNode(featuredNodeId)}
         >
-          Explore featured node — Listening Rooms™
+          Explore featured node — Listening Rooms
         </button>
       </section>
     </>

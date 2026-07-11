@@ -101,6 +101,21 @@
   max-height: 100%;
 }
 
+.companion-scene-root--clear-my-mind
+  .cinematic-background--scene-image
+  .cinematic-background__image,
+.companion-scene-root--clear-my-mind
+  .cinematic-background--scene-image
+  .companion-scene-bg__image,
+.companion-scene-root--clear-my-mind-thoughts
+  .cinematic-background--scene-image
+  .cinematic-background__image,
+.companion-scene-root--clear-my-mind-thoughts
+  .cinematic-background--scene-image
+  .companion-scene-bg__image {
+  opacity: 1;
+}
+
 .companion-scene-bg .cinematic-background--scene-video {
   position: absolute;
   inset: 0;
@@ -109,6 +124,12 @@
 
 .companion-scene-bg .cinematic-background--scene-video .cinematic-background__fade {
   z-index: 3;
+}
+
+.companion-scene-bg .cinematic-background--ocean-conservatory .cinematic-background__media {
+  filter: contrast(1.06) saturate(1.05);
+  backface-visibility: hidden;
+  transform: scale(var(--video-scale)) translateZ(0);
 }
 
 /* Homestead home + chat — same engine, calmer fade on reading */

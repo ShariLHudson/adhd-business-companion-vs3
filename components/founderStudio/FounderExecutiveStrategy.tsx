@@ -175,7 +175,7 @@ export function FounderExecutiveStrategy() {
         <RoomHeader
           backHref={FOUNDER_STUDIO_BASE}
           backLabel="← Back to the Office"
-          eyebrow="Executive Strategy Center™"
+          eyebrow="Executive Strategy Center"
           title="Executive Strategy Center"
           question="What deserves your clearest thinking?"
           purpose="A strategy room for decisions, ideas, and long-view leadership — not execution."
@@ -189,7 +189,7 @@ export function FounderExecutiveStrategy() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Strategy Center™"
+        eyebrow="Executive Strategy Center"
         title="Executive Strategy Center"
         question="What deserves your clearest thinking?"
         purpose="A strategy room for decisions, ideas, and long-view leadership — not execution."

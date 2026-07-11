@@ -57,7 +57,7 @@ export const GARDEN_BANNER_MENUS: Record<EstateSignId, readonly GardenBannerMenu
     },
     {
       id: "breathing-room",
-      label: "Breathing Room",
+      label: "Breathe",
       kind: "section",
       section: "breathe",
     },

@@ -1,5 +1,5 @@
 /**
- * Spark Alpha™ — detect member intent from conversation text.
+ * Spark Alpha — detect member intent from conversation text.
  */
 
 import type { SparkAlphaSuggestionEffect } from "./suggestionParser";

@@ -1,5 +1,5 @@
 /**
- * Spark Estate Collection Framework™ — per-room data adapters.
+ * Spark Estate Collection Framework — per-room data adapters.
  */
 
 import {
@@ -197,6 +197,12 @@ function parseGardenWinBody(raw: string): {
   };
 }
 
+function evidenceTitle(entry: NonNullable<ReturnType<typeof getEvidenceEntryById>>): string {
+  const firstLine = entry.whatHappened.trim().split(/\n/)[0] ?? "";
+  if (firstLine.length <= 72) return firstLine;
+  return `${firstLine.slice(0, 69)}…`;
+}
+
 function evidenceCaptureFromEntry(
   entry: NonNullable<ReturnType<typeof getEvidenceEntryById>>,
 ): EstateCollectionCaptureValues {
@@ -210,6 +216,13 @@ function evidenceCaptureFromEntry(
     whyItMattered: entry.whyItMattered,
     lessonsLearned: entry.whatThisProves,
     category: entry.category,
+    source: entry.source ?? "",
+    emotion: entry.emotion ?? "",
+    projectName: entry.projectName ?? "",
+    personName: entry.personName ?? "",
+    noteOrLink: entry.noteOrLink ?? "",
+    confidenceBoost: entry.confidenceBoost ? "yes" : "no",
+    hallCandidate: entry.hallCandidate ? "yes" : "no",
   };
 }
 
@@ -217,11 +230,15 @@ function evidenceFieldsFromCapture(
   capture: EstateCollectionCaptureValues,
 ): EstateCollectionItemField[] {
   const pairs: [string, string | undefined][] = [
-    ["Problem", capture.problem],
-    ["What I did", capture.whatIDid],
-    ["Outcome", capture.outcome],
+    ["Source", capture.source],
+    ["Emotion", capture.emotion],
+    ["Project", capture.projectName],
+    ["Person", capture.personName],
+    ["Confidence boost", capture.confidenceBoost],
+    ["Note / link", capture.noteOrLink],
     ["Who benefited", capture.whoBenefited],
-    ["Lessons", capture.lessonsLearned],
+    ["What this proves", capture.lessonsLearned],
+    ["Hall candidate", capture.hallCandidate],
   ];
   return pairs
     .filter(([, value]) => value?.trim())
@@ -249,9 +266,7 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
       return getEvidenceEntries().map((entry) => ({
         id: entry.id,
         badge: entry.category,
-        title: entry.whatProblemSolved
-          ? "Proof preserved"
-          : undefined,
+        title: evidenceTitle(entry),
         body: entry.whatHappened,
         createdAt: entry.createdAt,
         updatedAt: entry.updatedAt,
@@ -274,12 +289,18 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
           "Personal Growth") as EvidenceCategory,
         whatHappened: situation,
         whatProblemSolved: capture.problem?.trim() ?? "",
-        whatMovedForward: capture.whatIDid?.trim() ?? "",
+        whatMovedForward: capture.whatIDid?.trim() ?? situation,
         whatImproved: capture.whyApproach?.trim() ?? "",
         whyItMattered: capture.whyItMattered?.trim() ?? capture.outcome?.trim() ?? "",
         whoBenefited: capture.whoBenefited?.trim() ?? "",
         whatThisProves: capture.lessonsLearned?.trim() ?? "",
         attachments: attachmentList,
+        source: capture.source?.trim() || undefined,
+        emotion: capture.emotion?.trim() || undefined,
+        projectName: capture.projectName?.trim() || undefined,
+        personName: capture.personName?.trim() || undefined,
+        noteOrLink: capture.noteOrLink?.trim() || undefined,
+        confidenceBoost: /^yes\b/i.test(capture.confidenceBoost?.trim() ?? "yes"),
       };
       if (options?.editId) {
         updateEvidenceEntry(options.editId, payload);
@@ -391,6 +412,7 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
           id: win.id,
           body: parsed.body,
           createdAt: win.createdAt,
+          category: win.category?.trim() || undefined,
           detail: formatDate(win.ts),
           fields: [
             ...(parsed.whyItMatters
@@ -405,6 +427,7 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
             whyItMatters: parsed.whyItMatters ?? "",
             gratitude: parsed.gratitude ?? "",
             winDate: win.ts.slice(0, 10),
+            category: win.category ?? "",
           },
           attachments: win.attachments,
         };
@@ -431,6 +454,7 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
           ? new Date(capture.winDate).toISOString()
           : new Date().toISOString(),
         icon: "",
+        category: capture.category?.trim() || undefined,
         attachments: attachmentList,
       };
       if (options?.editId) {
@@ -448,6 +472,7 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
         whyItMatters: parsed.whyItMatters ?? "",
         gratitude: parsed.gratitude ?? "",
         winDate: win.ts.slice(0, 10),
+        category: win.category ?? "",
       };
     },
     removeItem(id: string) {

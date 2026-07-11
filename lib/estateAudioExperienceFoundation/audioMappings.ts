@@ -1,5 +1,5 @@
 /**
- * Audio Experience Foundation™ — cross-link mappings loader.
+ * Audio Experience Foundation — cross-link mappings loader.
  */
 
 import audioMappingsJson from "@/docs/estate-knowledge-base/audio-mappings.json";

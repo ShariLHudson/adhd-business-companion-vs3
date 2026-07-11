@@ -60,7 +60,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "orchard",
     name: "Apple Orchard",
-    image: "/backgrounds/space-apple-orchard-background.webp",
+    image: "/backgrounds/apple-orchard-kinsey-background.png",
     mood: "Fresh ideas & possibility",
     x: 78,
     y: 50,
@@ -69,8 +69,8 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   },
   {
     id: "stable",
-    name: "Stable",
-    image: "/backgrounds/peaceful-places/woodland-pathway.png",
+    name: "The Stables",
+    image: "/backgrounds/spark-estate-stables-background.png",
     mood: "Grounding & calm",
     x: 22,
     y: 72,

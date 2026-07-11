@@ -17,7 +17,7 @@ import { getJourneyStages } from "./journeyConfig";
 import { syncJourneyProgressFromDiscoveryHistory } from "./journeySync";
 import { recordDiscoveryShown } from "@/lib/estateDiscovery/discoveryHistory";
 
-describe("Progressive Discovery Journey™", () => {
+describe("Progressive Discovery Journey", () => {
   it("defines five live journey stages", () => {
     const stages = getJourneyStages();
     expect(stages).toHaveLength(5);

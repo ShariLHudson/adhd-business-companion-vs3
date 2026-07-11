@@ -1,5 +1,5 @@
 /**
- * Companion Intelligence™ — active session detection and direction changes.
+ * Companion Intelligence — active session detection and direction changes.
  * Session wins unless the member explicitly changes direction.
  */
 
@@ -109,7 +109,7 @@ export function companionSessionContinueHint(
     case "conversation_session":
       return `${base} Active: Create — continue the document naturally.`;
     case "brain_dump":
-      return `${base} Active: Clear My Mind — capture only. Never launch Create.`;
+      return `${base} Active: Clear My Mind Mode — interactive capture workspace, not chat. Capture only until the member chooses Done or Organize. Encourage briefly ("Anything else?", "I'm still listening.", "Keep going.", "No rush."). Never coach, never organize unprompted. If the member explicitly requests another capability (timer, mind map, journal, Destination Gallery, etc.), fulfill it immediately — Universal Access; do not say they must leave first. Stay in Clear My Mind until they explicitly exit or request another capability.`;
     case "research":
       return `${base} Active: Research — stay in research. Never suggest rooms first.`;
     case "planning":

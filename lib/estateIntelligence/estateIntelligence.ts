@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence™ — main evaluation entry (matcher + router).
+ * Estate Intelligence — main evaluation entry (matcher + router).
  */
 
 import { bestEstateMatch, type EstateMatcherInput } from "./estateMatcher";

@@ -1,5 +1,5 @@
 /**
- * My Institute Cabinet™ — reference-only archive. Never duplicates lesson content.
+ * My Institute Cabinet — reference-only archive. Never duplicates lesson content.
  */
 
 import type { InstituteCabinetItem } from "./types";
@@ -118,7 +118,7 @@ export function linkJournalToCabinetItem(
 }
 
 export function cabinetFilingPrompt(knowledgeCardTitle: string): string {
-  return `Would you like me to file this in your My Institute Cabinet™ so you can easily find **${knowledgeCardTitle}** again later?`;
+  return `Would you like me to file this in your My Institute Cabinet so you can easily find **${knowledgeCardTitle}** again later?`;
 }
 
 export function cabinetLocationLabel(item: InstituteCabinetItem): string {

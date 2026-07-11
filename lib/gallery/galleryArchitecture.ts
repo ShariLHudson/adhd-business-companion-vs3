@@ -1,5 +1,5 @@
 /**
- * The Gallery™ — estate spine architecture & emotional walk order.
+ * The Gallery — estate spine architecture & emotional walk order.
  * Visible hallway art follows this arc when memories populate the walls.
  */
 

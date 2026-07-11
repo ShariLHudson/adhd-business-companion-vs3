@@ -41,8 +41,8 @@ export function FounderExecutiveSimulation() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Simulation Studio™"
-        title="Think Before You Build™"
+        eyebrow="Executive Simulation Studio"
+        title="Think Before You Build"
         question="If we choose this path… what is most likely to happen?"
         purpose="Compare possible futures — tradeoffs, risks, and opportunity cost — before time, money, and energy are invested."
       />

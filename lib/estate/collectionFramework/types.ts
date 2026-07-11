@@ -1,5 +1,5 @@
 /**
- * Spark Estate Collection Framework™ — shared types.
+ * Spark Estate Collection Framework — shared types.
  *
  * One engine, one workflow. Rooms differ in meaning via config + adapter.
  */
@@ -52,6 +52,8 @@ export type EstateCollectionCaptureConfig = {
   suggestedPromptsLabel?: string;
   followUpSectionLabel?: string;
   composeTitle?: string;
+  /** Evidence Vault — single discovery field; no interview form. */
+  discoveryPreserveMode?: boolean;
   enableAttachments?: boolean;
   attachmentLabel?: string;
 };
@@ -62,6 +64,19 @@ export type EstateCollectionBrowseConfig = {
   enableFavorites: boolean;
   enableCategoryFilter: boolean;
   categoryLabel?: string;
+  /** Evidence Vault extended filters */
+  enableSourceFilter?: boolean;
+  sourceLabel?: string;
+  enableEmotionFilter?: boolean;
+  emotionLabel?: string;
+  enableProjectFilter?: boolean;
+  projectLabel?: string;
+  enablePersonFilter?: boolean;
+  personLabel?: string;
+  enableConfidenceBoostFilter?: boolean;
+  enableRecentFilter?: boolean;
+  enableDatePresets?: boolean;
+  enableHallCandidateFilter?: boolean;
   pageSize: number;
   loadMoreLabel: string;
   resultsLabel: string;

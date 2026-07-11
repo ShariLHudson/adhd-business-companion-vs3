@@ -1,4 +1,4 @@
-/** Executive Relationship Intelligence™ — discovery engine that creates new knowledge. */
+/** Executive Relationship Intelligence — discovery engine that creates new knowledge. */
 
 export type DiscoveryCategory =
   | "hidden-customer-patterns"

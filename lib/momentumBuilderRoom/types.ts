@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ Estate Room — canonical types (V1 shell).
+ * Momentum Builder Estate Room — canonical types (V1 shell).
  * Public room for forward motion; strategies are invisible engine fuel.
  *
  * @see docs/MOMENTUM_BUILDER_ROOM_ARCHITECTURE.md
@@ -18,14 +18,14 @@ export type MomentumBuilderLayer =
 /** Member energy — discovered in conversation, not assumed. */
 export type MomentumRoomEnergy = "low" | "medium" | "high" | "unknown";
 
-/** Roadblocks™ (formerly obstacles). */
+/** Roadblocks (formerly obstacles). */
 export type MomentumRoadblock = {
   id: string;
   label: string;
   kind?: "internal" | "external" | "unclear";
 };
 
-/** First Step™ (formerly next tiny step). */
+/** First Step (formerly next tiny step). */
 export type TodaysPathFirstStep = {
   id: string;
   label: string;
@@ -33,14 +33,14 @@ export type TodaysPathFirstStep = {
   rationale?: string;
 };
 
-/** Easy Win™ (formerly quick win). */
+/** Easy Win (formerly quick win). */
 export type TodaysPathEasyWin = {
   id: string;
   label: string;
   estimatedMinutes?: number;
 };
 
-/** Focus Session™ (formerly deep work). */
+/** Focus Session (formerly deep work). */
 export type TodaysPathFocusSession = {
   id: string;
   label: string;
@@ -88,7 +88,7 @@ export type MomentumRoomOrchestration = {
   orchestratedAt: string;
 };
 
-/** Today's Path™ — member-facing outcome (formerly daily momentum plan). */
+/** Today's Path — member-facing outcome (formerly daily momentum plan). */
 export type TodaysPath = IntelligenceReadyHooks & {
   kind: "todays-path";
   id: string;
@@ -100,7 +100,7 @@ export type TodaysPath = IntelligenceReadyHooks & {
   easyWins: TodaysPathEasyWin[];
   focusSessions: TodaysPathFocusSession[];
   roadblocks: MomentumRoadblock[];
-  /** Tomorrow Starts Here™ */
+  /** Tomorrow Starts Here */
   tomorrowStartsHere: string | null;
   discovery: MomentumConversationDiscovery;
   orchestration: MomentumRoomOrchestration;

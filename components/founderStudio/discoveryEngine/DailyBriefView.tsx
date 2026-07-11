@@ -45,7 +45,7 @@ export function DailyBriefView({ brief, onSelectFinding, onBack }: DailyBriefVie
       {brief.founderAlert ? (
         <section className="founder-discovery-engine__alert-detail" aria-labelledby="ede-founder-alert">
           <h3 className="founder-discovery-engine__section-title" id="ede-founder-alert">
-            Founder Alert™
+            Founder Alert
           </h3>
           <span className="founder-discovery-engine__urgency">{brief.founderAlert.urgency}</span>
           <p className="founder-discovery-engine__prose"><strong>{brief.founderAlert.title}</strong></p>

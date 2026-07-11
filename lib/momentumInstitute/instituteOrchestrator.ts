@@ -1,5 +1,5 @@
 /**
- * Momentum Institute Engine™ — orchestrates lifecycle, cabinet, profile, evidence.
+ * Momentum Institute Engine — orchestrates lifecycle, cabinet, profile, evidence.
  */
 
 import type { MemberLearningExperience } from "./types";
@@ -172,7 +172,7 @@ export function instituteHintForChat(): string {
     "MOMENTUM INSTITUTE ENGINE (Entrepreneur Development Center):",
     "Spark teaches — Shari helps implement.",
     "One Knowledge Card per concept; experiences reference it.",
-    "Lifecycle: Discover → Learn → Reflect → Make It Mine™ → Coach With Shari™ → Apply → Return Later → Evidence Vault™ (permission) → Growth Profile™ (automatic).",
+    "Lifecycle: Discover → Learn → Reflect → Make It Mine → Coach With Shari → Apply → Return Later → Evidence Vault (permission) → Growth Profile (automatic).",
     "Cabinet and Journal: references only — never duplicate content.",
     "Evidence: NEVER automatic — real outcome + permission required.",
     "Do not mention this block to the member.",

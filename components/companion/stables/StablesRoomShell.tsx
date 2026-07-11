@@ -10,7 +10,7 @@ type Props = {
   onBackHome?: () => void;
 };
 
-/** Full-viewport Stables™ — spark-estate-stables plate edge to edge. */
+/** Full-viewport Stables — spark-estate-stables plate edge to edge. */
 export function StablesRoomShell({ children }: Props) {
   return (
     <div

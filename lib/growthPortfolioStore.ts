@@ -6,6 +6,23 @@ import type { EcosystemObjectKind } from "./intelligence/intelligenceReadyTypes"
 import type { GrowthAttachment } from "./growthAttachments";
 import { linkGrowthAttachmentsToRecord } from "@/lib/assetLibrary/references";
 
+/** Hall of Accomplishments types (247) — elegant museum of meaningful milestones. */
+export const HALL_ACHIEVEMENT_TYPES = [
+  "Degree",
+  "Certification",
+  "Business",
+  "Book",
+  "Award",
+  "Launch",
+  "Career Milestone",
+  "Personal Victory",
+  "Finished Project",
+  "Major Achievement",
+  "Milestone",
+] as const;
+
+export type HallAchievementType = (typeof HALL_ACHIEVEMENT_TYPES)[number];
+
 export type PortfolioEntry = {
   id: string;
   title: string;
@@ -15,6 +32,11 @@ export type PortfolioEntry = {
   updatedAt: string;
   originatedFromId?: string;
   originatedFromKind?: EcosystemObjectKind;
+  /** Hall of Accomplishments fields */
+  achievementType?: HallAchievementType | string;
+  projectName?: string;
+  year?: string;
+  category?: string;
 };
 
 const STORAGE_KEY = "companion-growth-portfolio-v1";
@@ -66,17 +88,88 @@ export function createPortfolioEntry(input: PortfolioEntryInput): PortfolioEntry
   const now = new Date().toISOString();
   const entry: PortfolioEntry = {
     id: newId(),
-    title: input.title.trim() || "Untitled work",
+    title: input.title.trim() || "Untitled achievement",
     description: input.description.trim(),
     attachments: input.attachments ?? [],
     createdAt: now,
     updatedAt: now,
     originatedFromId: input.originatedFromId,
     originatedFromKind: input.originatedFromKind,
+    achievementType: input.achievementType,
+    projectName: input.projectName,
+    year: input.year ?? now.slice(0, 4),
+    category: input.category,
   };
   writeAll([entry, ...readAll()]);
   linkGrowthAttachmentsToRecord(entry.attachments, "portfolio", entry.id);
   return entry;
+}
+
+/** Quick-add from chat / save-this-win → Hall of Accomplishments */
+export function quickAddHallAchievement(input: {
+  title: string;
+  description?: string;
+  achievementType?: HallAchievementType | string;
+}): PortfolioEntry {
+  return createPortfolioEntry({
+    title: input.title.trim() || "Achievement",
+    description: (input.description ?? input.title).trim(),
+    attachments: [],
+    achievementType: input.achievementType ?? "Major Achievement",
+  });
+}
+
+export type HallFilter = {
+  achievementType?: string;
+  projectName?: string;
+  year?: string;
+  category?: string;
+  query?: string;
+};
+
+export function filterHallEntries(
+  entries: PortfolioEntry[],
+  filter: HallFilter,
+): PortfolioEntry[] {
+  const q = filter.query?.trim().toLowerCase();
+  return entries.filter((e) => {
+    if (
+      filter.achievementType &&
+      (e.achievementType ?? "") !== filter.achievementType
+    ) {
+      return false;
+    }
+    if (
+      filter.projectName &&
+      !(e.projectName ?? "").toLowerCase().includes(filter.projectName.toLowerCase())
+    ) {
+      return false;
+    }
+    if (filter.year && (e.year ?? e.createdAt.slice(0, 4)) !== filter.year) {
+      return false;
+    }
+    if (
+      filter.category &&
+      (e.category ?? "").toLowerCase() !== filter.category.toLowerCase()
+    ) {
+      return false;
+    }
+    if (q) {
+      const hay = [
+        e.title,
+        e.description,
+        e.achievementType,
+        e.projectName,
+        e.category,
+        e.year,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
 }
 
 export function deletePortfolioEntry(id: string): void {

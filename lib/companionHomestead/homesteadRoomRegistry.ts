@@ -1,5 +1,6 @@
 import type { AppSection } from "@/lib/companionUi";
 import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
+import { BUTTERFLY_HOUSE_VIDEO } from "@/lib/butterflyHouse/media";
 import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import { homesteadLivingRoomImageUrl } from "@/lib/homesteadScene/homesteadLivingRoomImage";
 
@@ -43,9 +44,8 @@ export type HomesteadRoomEntry = {
 
 export const LIVING_ROOM_BG = homesteadLivingRoomImageUrl();
 
-/** Butterfly House™ — room experience video (ESTATE-VID-002). @see docs/estate/ESTATE_VIDEO_ASSET_REGISTRY.md */
-export const SUNROOM_BUTTERFLY_VIDEO =
-  "/Videos/butterfly-house-video.mp4" as const;
+/** Butterfly House — room experience video (ESTATE-VID-002). @see docs/estate/ESTATE_VIDEO_ASSET_REGISTRY.md */
+export const SUNROOM_BUTTERFLY_VIDEO = BUTTERFLY_HOUSE_VIDEO;
 
 export const SUNROOM_FALLBACK_IMAGE = ESTATE_ROOM_BG.sunroom;
 

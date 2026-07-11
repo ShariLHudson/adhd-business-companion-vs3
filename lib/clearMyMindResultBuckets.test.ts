@@ -12,13 +12,13 @@ function entry(text: string, category?: string): BrainDumpEntry {
 }
 
 describe("clearMyMindResultBuckets", () => {
-  it("groups worries and ideas into separate cards", () => {
+  it("groups business worries and ideas into protocol clusters", () => {
     const buckets = groupEntriesIntoResultBuckets([
-      entry("I'm worried about payroll"),
+      entry("I'm worried about payroll for the business"),
       entry("Maybe we could launch a workshop"),
     ]);
     const labels = buckets.map((b) => b.label);
-    expect(labels).toContain("Worries");
+    expect(labels).toContain("Business");
     expect(labels).toContain("Ideas");
   });
 
@@ -26,5 +26,17 @@ describe("clearMyMindResultBuckets", () => {
     const buckets = groupEntriesIntoResultBuckets([entry("Call Izna tomorrow")]);
     expect(buckets).toHaveLength(1);
     expect(buckets[0]!.label).toBe("People");
+  });
+
+  it("supports health, shopping, and someday clusters", () => {
+    const buckets = groupEntriesIntoResultBuckets([
+      entry("Call the doctor about sleep"),
+      entry("Buy groceries tomorrow"),
+      entry("Someday write a book"),
+    ]);
+    const labels = buckets.map((b) => b.label);
+    expect(labels).toContain("Health");
+    expect(labels).toContain("Shopping");
+    expect(labels).toContain("Someday");
   });
 });

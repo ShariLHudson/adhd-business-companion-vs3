@@ -1,5 +1,5 @@
 /**
- * Business Brain™ catalog provider — data-driven load target.
+ * Business Brain catalog provider — data-driven load target.
  */
 
 import type { BusinessBrainCatalog } from "../types";

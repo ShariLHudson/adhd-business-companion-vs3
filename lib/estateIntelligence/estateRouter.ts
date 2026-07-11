@@ -1,5 +1,5 @@
 /**
- * Estate Router™ — primary destination + invitation copy.
+ * Estate Router — primary destination + invitation copy.
  *
  * **Phase C — adapter:** Intent invitations must not override `goToPlace` direct navigation.
  *
@@ -18,25 +18,25 @@ const INVITATION_TEMPLATES: Partial<Record<string, string>> = {
   "peaceful-places":
     "I know a peaceful place that might help. Would you like to go there with me?",
   "momentum-builder":
-    "The Momentum Builder™ can help us create a simple path forward. Shall we head over?",
+    "The Momentum Builder can help us create a simple path forward. Shall we head over?",
   "clear-my-mind":
-    "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind™ together?",
+    "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind together?",
   "decision-compass":
-    "The Decision Compass™ was designed for situations like this. Would you like me to guide you there?",
+    "The Decision Compass was designed for situations like this. Would you like me to guide you there?",
   "observatory":
-    "The Observatory™ is where we gather information and evaluate ideas. Shall we head there?",
+    "The Observatory is where we gather information and evaluate ideas. Shall we head there?",
   "library":
-    "The Library™ is quiet when you want to read or think. Would you like to go there together?",
+    "The Library is quiet when you want to read or think. Would you like to go there together?",
   "momentum-institute":
-    "The Momentum Institute™ has just the drawer for that. Would you like to explore it together?",
+    "The Momentum Institute has just the drawer for that. Would you like to explore it together?",
   "creative-studio":
     `I'd love to help with that. ${estateCreativeStudioInvite()}`,
   "growth-journal":
-    "That sounds worth capturing while it's fresh. Would you like to step into your Journal™ together?",
+    "That sounds worth capturing while it's fresh. Would you like to step into your Journal together?",
   "coffee-house":
-    "The Coffee House™ is warm when you need a breather. Would you like a quiet pause there?",
+    "The Coffee House is warm when you need a breather. Would you like a quiet pause there?",
   "soundscapes-focus-audio":
-    "Peaceful Places™ has soundscapes made for exactly this — rain, hearth, morning light, and more. Would you like to listen there with me?",
+    "Peaceful Places has soundscapes made for exactly this — rain, hearth, morning light, and more. Would you like to listen there with me?",
 };
 
 export function buildEstateInvitation(entry: EstateRegistryEntry): string {

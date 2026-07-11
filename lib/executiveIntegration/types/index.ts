@@ -1,4 +1,4 @@
-/** Executive Integration Center™ — One Office Principle™ bridge to external systems. */
+/** Executive Integration Center — One Office Principle bridge to external systems. */
 
 export type IntegrationGroupId =
   | "communication"

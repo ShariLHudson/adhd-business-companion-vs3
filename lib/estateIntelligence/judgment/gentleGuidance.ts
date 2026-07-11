@@ -1,5 +1,5 @@
 /**
- * Rule of Gentle Guidance™ — Spark recommends; it rarely directs.
+ * Rule of Gentle Guidance — Spark recommends; it rarely directs.
  *
  * Not a GPS. Not a command center. A thoughtful host.
  */
@@ -9,7 +9,7 @@ export const GENTLE_GUIDANCE_FORBIDDEN_RE =
   /\b(?:go to|open the|open |launch(?:ing)?|navigate to|take you to|I'll take you|let me take you|you should|you need to|you must|head to|visit the)\b/i;
 
 export function stripEstateTm(displayName: string): string {
-  return displayName.replace(/™/g, "").trim();
+  return displayName.replace(/\u2122/g, "").trim();
 }
 
 export function gentlePlaceLeadIn(displayName: string): string {

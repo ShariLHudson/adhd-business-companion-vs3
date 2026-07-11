@@ -1,5 +1,5 @@
 /**
- * Estate Pending Transition™ — permission-to-enter another room without losing intent.
+ * Estate Pending Transition — permission-to-enter another room without losing intent.
  * When Spark asks "Would you like me to take us there?" the original goal stays queued.
  */
 

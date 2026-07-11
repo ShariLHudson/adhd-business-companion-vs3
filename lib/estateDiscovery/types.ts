@@ -1,5 +1,5 @@
 /**
- * Discovery Key™ — shared types across library, engine, placement, and UI.
+ * Discovery Key — shared types across library, engine, placement, and UI.
  */
 
 import type { AppSection } from "@/lib/companionUi";

@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence Library™ — reads Estate Knowledge Base™ (permanent source of truth).
+ * Estate Intelligence Library — reads Estate Knowledge Base (permanent source of truth).
  *
  * @deprecated Import from `@/lib/estateKnowledgeBase` directly in new code.
  */

@@ -37,7 +37,10 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "welcome-home": estateBackgroundPath("welcome-home-background.png"),
   sunroom: estateBackgroundPath("sunroom-background.png"),
   conservatory: estateBackgroundPath("aquarium-room-background.png"),
-  "clear-my-mind": estateBackgroundPath("sunroom-background.png"),
+  "clear-my-mind": estateBackgroundPath(
+    "treehouse-possibility-reflection-desk-background.png",
+  ),
+  "destination-gallery": estateBackgroundPath("destination-gallery.png"),
   "coffee-house": estateBackgroundPath("tea-room-background.webp"),
   "tea-room": estateBackgroundPath("tea-room-background.webp"),
   "dining-room": estateBackgroundPath("room-dining-room-background.png"),
@@ -49,19 +52,32 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "estate-gardens": estateBackgroundPath("spark-estate-photo-background.png"),
   "music-room": estateBackgroundPath("writing-room-background.png"),
   greenhouse: estateBackgroundPath("greenhouse-background.png"),
-  gardens: estateBackgroundPath("space-reflection-tree-swing-background.png"),
+  "apple-orchard": estateBackgroundPath("apple-orchard-kinsey-background.png"),
+  gardens: estateBackgroundPath("swing-background.png"),
   "celebration-room": estateBackgroundPath("room-celebration-hall-background.png"),
-  "apple-orchard": estateBackgroundPath("space-reflection-tree-swing-background.png"),
   "reading-nook": estateBackgroundPath("reading-nook-window background.png"),
   library: estateBackgroundPath("room-library-estate-background.png"),
   "personal-library": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   "momentum-institute": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
   "chamber-of-momentum": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
   "creative-studio": estateBackgroundPath("creative-studio-background.png"),
+  "focus-studio": estateBackgroundPath(
+    "cartoghraphers-studio-background.png",
+  ),
+  "cartographers-studio": estateBackgroundPath(
+    "cartoghraphers-studio-background.png",
+  ),
   "art-studio": estateBackgroundPath("creative-studio-background.png"),
   observatory: estateBackgroundPath("observatory-daytime-outside-background.png"),
+  "observatory-day-inside": estateBackgroundPath("observatory-daytime-inside.png"),
+  "observatory-day-outside": estateBackgroundPath(
+    "observatory-daytime-outside-background.png",
+  ),
+  "observatory-night-outside": estateBackgroundPath(
+    "observatory-night-outside-background.png",
+  ),
   "study-hall": estateBackgroundPath("study-hall-background.png"),
-  stables: estateBackgroundPath("spark-estate-photo-background.png"),
+  stables: estateBackgroundPath("spark-estate-stables-background.png"),
   "game-room": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
   "momentum-builder": estateBackgroundPath("study-hall-background.png"),
   "strategy-studio": estateBackgroundPath("creative-studio-background.png"),
@@ -69,8 +85,9 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "round-table": estateBackgroundPath("room-dining-room-background.png"),
   "summer-terrace": estateBackgroundPath("water-swimming-pool-private-background.png"),
   "decision-compass": estateBackgroundPath("writing-room-background.png"),
-  journal: estateBackgroundPath("welcome-to-the-journal-gazebo.png"),
-  "evidence-vault": estateBackgroundPath("hall-of-achievements-room-background.png"),
+  "writing-room": estateBackgroundPath("writing-room-background.png"),
+  journal: `${estateBackgroundPath("journal-desk-background.png")}?v=20260710b`,
+  "evidence-vault": estateBackgroundPath("evidence-vault-background.png"),
   "gallery-of-firsts": estateBackgroundPath("gallery-background.png"),
   portfolio: estateBackgroundPath("hall-of-achievements-room-background.png"),
   "goals-projects": estateBackgroundPath("room-dining-room-background.png"),
@@ -81,13 +98,11 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "back-deck": estateBackgroundPath("fireside-deck-background.PNG"),
   "fireside-deck": estateBackgroundPath("fireside-deck-background.PNG"),
   "personal-deck": estateBackgroundPath("grand-terrace-background.png"),
-  "porch-swing": estateBackgroundPath("fireside-deck-background.PNG"),
-  "the-swing-beneath-the-oak": estateBackgroundPath(
-    "space-reflection-tree-swing-background.png",
-  ),
+  "porch-swing": estateBackgroundPath("swing-background.png"),
+  "the-swing-beneath-the-oak": estateBackgroundPath("swing-background.png"),
   "window-seat": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   balcony: estateBackgroundPath("grand-terrace-background.png"),
-  "woodland-path": estateBackgroundPath("space-reflection-tree-swing-background.png"),
+  "woodland-path": estateBackgroundPath("swing-background.png"),
   "main-staircase": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   "stairway-reading-nook": estateBackgroundPath(
     "reading-nook-under-stairway-background.png",
@@ -129,9 +144,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "legacy-room-main": estateBackgroundPath(
     "treehouse-possibility-house-outside-background.png",
   ),
-  "reflection-tree-main": estateBackgroundPath(
-    "space-reflection-tree-swing-background.png",
-  ),
+  "reflection-tree-main": estateBackgroundPath("swing-background.png"),
   "butterfly-house": estateBackgroundPath("butterfly-house-background.png"),
 };
 
@@ -144,7 +157,13 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
     estateBackgroundPath("aquarium-room-background.png"),
     estateBackgroundPath("sunroom-background.png"),
   ],
-  "clear-my-mind": [estateBackgroundPath("greenhouse-background.png")],
+  "clear-my-mind": [
+    estateBackgroundPath("treehouse-possibility-reflection-desk-background.png"),
+    estateBackgroundPath("sunroom-background.png"),
+  ],
+  "destination-gallery": [
+    estateBackgroundPath("destination-gallery.png"),
+  ],
   library: [
     estateBackgroundPath("reading-nook-under-stairway-background.png"),
     estateBackgroundPath("room-library-estate-background.png"),
@@ -166,7 +185,11 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
     estateBackgroundPath("spark-estate-photo-background.png"),
   ],
   "apple-orchard": [
-    estateBackgroundPath("spark-estate-photo-background.png"),
+    estateBackgroundPath("apple-orchard-kinsey-background.png"),
+    estateBackgroundPath("swing-background.png"),
+  ],
+  "the-swing-beneath-the-oak": [
+    estateBackgroundPath("swing-background.png"),
   ],
   "reading-nook": [
     estateBackgroundPath("reading-nook-under-stairway-background.png"),
@@ -205,8 +228,7 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
     estateBackgroundPath("tea-room-background.webp"),
   ],
   stables: [
-    estateBackgroundPath("greenhouse-background.png"),
-    estateBackgroundPath("spark-estate-photo-background.png"),
+    estateBackgroundPath("spark-estate-stables-background.png"),
   ],
 };
 

@@ -1,5 +1,5 @@
 /**
- * The Gallery™ Demo Mode — scripted exhibitions across a life journey.
+ * The Gallery Demo Mode — scripted exhibitions across a life journey.
  * No real user data. Demonstrates the ten-year vision.
  */
 

@@ -1,4 +1,4 @@
-/* Founder Studio™ — private executive shell. Spark colors, large type, calm density. */
+/* Founder Studio — private executive shell. Spark colors, large type, calm density. */
 
 .founder-shell {
   --founder-teal: #0f6f7c;
@@ -327,7 +327,7 @@
   margin: 0;
 }
 
-/* Mission Workspace™ */
+/* Mission Workspace */
 .founder-mission-workspace {
   margin-bottom: 2rem;
   padding: 1.75rem 2rem;
@@ -1706,7 +1706,7 @@
   }
 }
 
-/* FIRE™ Executive Portfolio */
+/* FIRE Executive Portfolio */
 .fire-portfolio {
   margin-bottom: 2.25rem;
   border-radius: 1.35rem;
@@ -2365,7 +2365,7 @@
   color: var(--founder-muted);
 }
 
-/* Executive Strategy Center™ */
+/* Executive Strategy Center */
 .founder-strategy {
   padding-bottom: 2.5rem;
 }
@@ -3073,7 +3073,7 @@
   }
 }
 
-/* Founder Memory & Decision Vault™ */
+/* Founder Memory & Decision Vault */
 .founder-memory-vault {
   padding-bottom: 2.5rem;
 }
@@ -3613,7 +3613,7 @@
   white-space: pre-wrap;
 }
 
-/* Executive Concierge™ */
+/* Executive Concierge */
 .founder-concierge-card {
   margin-bottom: 1.35rem;
   padding: 1.35rem 1.5rem;
@@ -3983,7 +3983,7 @@
   color: var(--founder-muted);
 }
 
-/* FLAME™ Executive Mentor */
+/* FLAME Executive Mentor */
 .founder-flame-presence {
   margin-bottom: 1.5rem;
   display: flex;
@@ -4172,7 +4172,7 @@
   color: rgba(244, 247, 248, 0.8);
 }
 
-/* Executive Research Center™ */
+/* Executive Research Center */
 .founder-research {
   display: flex;
   flex-direction: column;
@@ -4451,7 +4451,7 @@
   align-self: start;
 }
 
-/* Opportunity Discovery Center™ */
+/* Opportunity Discovery Center */
 .founder-opportunity {
   display: flex;
   flex-direction: column;
@@ -4663,7 +4663,7 @@
   align-self: start;
 }
 
-/* Executive Builder™ */
+/* Executive Builder */
 .founder-builder {
   display: flex;
   flex-direction: column;
@@ -4893,7 +4893,7 @@
   color: var(--founder-gold);
 }
 
-/* Executive Simulation Studio™ */
+/* Executive Simulation Studio */
 .founder-simulation {
   display: flex;
   flex-direction: column;
@@ -5167,7 +5167,7 @@
   color: var(--founder-gold);
 }
 
-/* Executive Memory Theater™ */
+/* Executive Memory Theater */
 .founder-memory-theater {
   display: flex;
   flex-direction: column;
@@ -5388,7 +5388,7 @@
   margin-bottom: 0.85rem;
 }
 
-/* Executive Intelligence Graph™ */
+/* Executive Intelligence Graph */
 .founder-graph {
   display: flex;
   flex-direction: column;
@@ -5650,7 +5650,7 @@
   margin-bottom: 0.85rem;
 }
 
-/* Executive Relationship Intelligence™ */
+/* Executive Relationship Intelligence */
 .founder-relationship-intel {
   display: flex;
   flex-direction: column;
@@ -5900,7 +5900,7 @@
   color: var(--founder-gold);
 }
 
-/* Executive Discovery Engine™ */
+/* Executive Discovery Engine */
 .founder-discovery-engine {
   display: flex;
   flex-direction: column;
@@ -6146,7 +6146,7 @@
   color: var(--founder-teal);
 }
 
-/* Executive Integration Center™ */
+/* Executive Integration Center */
 .founder-integration {
   display: flex;
   flex-direction: column;
@@ -6583,7 +6583,7 @@
   cursor: pointer;
 }
 
-/* Executive Judgment Engine™ */
+/* Executive Judgment Engine */
 .founder-judgment {
   display: flex;
   flex-direction: column;
@@ -6785,7 +6785,7 @@
   color: var(--founder-purple, #b8a0d8);
 }
 
-/* Executive Command Center™ — Executive Headquarters */
+/* Executive Command Center — Executive Headquarters */
 .founder-hq {
   display: flex;
   flex-direction: column;
@@ -7024,7 +7024,7 @@
   color: var(--founder-purple, #b8a0d8);
 }
 
-/* Founder Knowledge Vault™ + AI Extensions Center™ */
+/* Founder Knowledge Vault + AI Extensions Center */
 
 .founder-vault,
 .founder-ai-ext {
@@ -7256,7 +7256,7 @@
   border: 1px solid rgba(15, 111, 124, 0.15);
 }
 
-/* Executive Resources Center™ */
+/* Executive Resources Center */
 
 .founder-resources {
   display: flex;

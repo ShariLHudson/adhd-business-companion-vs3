@@ -22,9 +22,11 @@ export const WELCOME_ROOM_FULL_WELCOME_AUDIO_SRC =
 export const WELCOME_HOME_WELCOME_AUDIO_FILENAME =
   "Welcome to the Spark Estates.m4a" as const;
 
-export const WELCOME_HOME_FOUNDER_AUDIO_SRC = estateAudioPath(
-  WELCOME_HOME_WELCOME_AUDIO_FILENAME,
-);
+/** Bump when the welcome track is replaced so browsers skip stale cached audio. */
+export const WELCOME_HOME_FOUNDER_AUDIO_VERSION = "20260709c" as const;
+
+export const WELCOME_HOME_FOUNDER_AUDIO_SRC =
+  `${estateAudioPath(WELCOME_HOME_WELCOME_AUDIO_FILENAME)}?v=${WELCOME_HOME_FOUNDER_AUDIO_VERSION}` as const;
 
 export type CachedSpeechClip = {
   audio: HTMLAudioElement;

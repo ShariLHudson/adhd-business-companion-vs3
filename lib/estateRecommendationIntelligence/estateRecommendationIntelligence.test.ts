@@ -6,7 +6,7 @@ import {
   resolveEstateRecommendation,
 } from "./resolveEstateRecommendation";
 
-describe("Estate Recommendation Intelligence™", () => {
+describe("Estate Recommendation Intelligence", () => {
   it("detects mental overload signal", () => {
     const match = matchMemberNeedSignal("I'm so overwhelmed right now");
     expect(match?.signal.signalId).toBe("mental-overload");

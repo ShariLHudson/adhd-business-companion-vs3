@@ -1,4 +1,4 @@
-/** Executive Operating System™ — connected company intelligence (composition only). */
+/** Executive Operating System — connected company intelligence (composition only). */
 
 import type { MissionId } from "@/lib/founder/missions/types";
 

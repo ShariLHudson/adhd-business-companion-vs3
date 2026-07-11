@@ -142,7 +142,7 @@ export function CompanionSignInExperience({
                 Spark Studio Companions
               </p>
               <p className="text-xs font-medium text-[#6b635a]">
-                ADHD Business Ecosystem™
+                ADHD Business Ecosystem
               </p>
             </div>
 

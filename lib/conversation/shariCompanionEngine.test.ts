@@ -10,7 +10,7 @@ import {
   SHARI_ERROR_RECOVERY_LINE,
 } from "./shariCompanionEngine";
 
-describe("Shari Companion Engine™", () => {
+describe("Shari Companion Engine", () => {
   it("flags generic AI banned phrases", () => {
     expect(detectShariBannedPhrases("Let's break this down step by step")).not.toEqual(
       [],

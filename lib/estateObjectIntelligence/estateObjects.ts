@@ -1,5 +1,5 @@
 /**
- * Estate Object Intelligence™ — object registry loader.
+ * Estate Object Intelligence — object registry loader.
  */
 
 import estateObjectsJson from "@/docs/estate-knowledge-base/estate-objects.json";

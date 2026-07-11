@@ -1,0 +1,567 @@
+.chamber-member-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  width: 100%;
+  max-width: 76rem;
+  margin: 0 auto;
+  padding: 0.5rem 0 2.5rem;
+  min-height: 0;
+  max-height: calc(100dvh - 10rem);
+}
+
+.chamber-member-gallery__header {
+  padding: 0.25rem 0.5rem 0;
+}
+
+.chamber-member-gallery__kicker {
+  margin: 0 0 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(255, 252, 245, 0.88);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.chamber-member-gallery__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.5rem, 3.8vw, 2.1rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff9ef;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.chamber-member-gallery__subtitle {
+  margin: 0.45rem 0 0;
+  max-width: 40rem;
+  font-size: clamp(0.92rem, 1.8vw, 1rem);
+  line-height: 1.5;
+  color: rgba(255, 252, 245, 0.92);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.chamber-member-gallery__scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: min(62vh, 44rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 0.15rem;
+}
+
+.chamber-member-gallery__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
+  gap: 1.15rem;
+  padding: 0.25rem 0.15rem 2rem;
+}
+
+.chamber-member-gallery__item {
+  display: flex;
+  min-height: 0;
+}
+
+@media (min-width: 40rem) {
+  .chamber-member-gallery__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .chamber-member-gallery__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.35rem;
+  }
+}
+
+.chamber-member-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.85rem;
+  border: 1px solid rgba(201, 162, 39, 0.32);
+  border-radius: 0.7rem;
+  background: rgba(12, 28, 44, 0.48);
+  text-align: left;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.22);
+}
+
+.chamber-member-card--active {
+  border-color: rgba(201, 162, 39, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(201, 162, 39, 0.35),
+    0 8px 28px rgba(0, 0, 0, 0.24);
+}
+
+.chamber-member-card__portrait-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 0.5rem;
+}
+
+.chamber-member-card__portrait-btn:focus-visible {
+  outline: 2px solid rgba(201, 162, 39, 0.95);
+  outline-offset: 3px;
+}
+
+.chamber-member-card__frame {
+  display: block;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(201, 162, 39, 0.42);
+  background: rgba(255, 252, 245, 0.12);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.chamber-member-card:hover .chamber-member-card__frame,
+.chamber-member-card:focus-visible .chamber-member-card__frame {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+}
+
+.chamber-member-card__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  object-fit: contain;
+  background: rgba(255, 252, 245, 0.08);
+}
+
+.chamber-member-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.chamber-member-card__name {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.2rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: #fff9ef;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.chamber-member-card__specialty {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: rgba(232, 210, 168, 0.95);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.chamber-member-card__purpose {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: rgba(255, 252, 245, 0.92);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.chamber-member-card__specialties {
+  margin: 0.15rem 0 0;
+  padding-left: 1.1rem;
+  list-style: disc;
+}
+
+.chamber-member-card__specialties li {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-bottom: 0.2rem;
+  color: rgba(255, 252, 245, 0.9);
+}
+
+.chamber-member-card__talk {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.62rem 0.85rem;
+  border: none;
+  border-radius: 0.45rem;
+  background: #1a3d5c;
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 650;
+  line-height: 1.3;
+  cursor: pointer;
+  text-align: center;
+}
+
+.chamber-member-card__talk:hover {
+  background: #234d72;
+}
+
+.chamber-member-card__talk:focus-visible {
+  outline: 2px solid rgba(201, 162, 39, 0.95);
+  outline-offset: 2px;
+}
+
+.chamber-active-member {
+  display: grid;
+  grid-template-columns: minmax(3.5rem, 4.5rem) minmax(0, 1fr) auto;
+  gap: 0.65rem 0.85rem;
+  align-items: center;
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  border-radius: 0.65rem;
+  background: rgba(255, 252, 245, 0.94);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.2);
+  max-width: 44rem;
+}
+
+@media (max-width: 40rem) {
+  .chamber-active-member {
+    grid-template-columns: minmax(3.25rem, 4rem) minmax(0, 1fr);
+  }
+
+  .chamber-active-member__end {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}
+
+.chamber-active-member__portrait {
+  border-radius: 0.45rem;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 39, 0.28);
+}
+
+.chamber-active-member__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: rgba(26, 61, 92, 0.06);
+}
+
+.chamber-active-member__name {
+  margin: 0 0 0.15rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: #1a3d5c;
+}
+
+.chamber-active-member__purpose {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgba(26, 61, 92, 0.9);
+}
+
+.chamber-active-member__end {
+  align-self: center;
+  padding: 0.45rem 0.7rem;
+  border: 1px dashed rgba(201, 162, 39, 0.55);
+  border-radius: 0.45rem;
+  background: transparent;
+  color: #1a3d5c;
+  font-size: 0.74rem;
+  font-weight: 650;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chamber-active-member__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.chamber-member-profile {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.chamber-member-profile__backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgba(12, 28, 44, 0.58);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+
+.chamber-member-profile__panel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 44rem);
+  max-height: min(92vh, 52rem);
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 245, 0.96);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+}
+
+.chamber-member-profile__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem 0.55rem;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.22);
+}
+
+.chamber-member-profile__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  line-height: 1.25;
+  color: #1a3d5c;
+}
+
+.chamber-member-profile__close {
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.85);
+  font-size: 1.45rem;
+  line-height: 1;
+  color: #1a3d5c;
+  cursor: pointer;
+}
+
+.chamber-member-profile__close:focus-visible {
+  outline: 2px solid rgba(201, 162, 39, 0.95);
+  outline-offset: 2px;
+}
+
+.chamber-member-profile__body {
+  display: grid;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  overflow-y: auto;
+}
+
+@media (min-width: 40rem) {
+  .chamber-member-profile__body {
+    grid-template-columns: minmax(9rem, 11rem) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.chamber-member-profile__portrait {
+  border-radius: 0.55rem;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 39, 0.28);
+}
+
+.chamber-member-profile__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chamber-member-profile__specialty {
+  margin: 0 0 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: rgba(30, 92, 92, 0.88);
+}
+
+.chamber-member-profile__bio,
+.chamber-member-profile__help-text {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: rgba(26, 61, 92, 0.9);
+}
+
+.chamber-member-profile__bio + .chamber-member-profile__bio {
+  margin-top: 0.55rem;
+}
+
+.chamber-member-profile__details .chamber-member-card__specialties {
+  margin: 0.45rem 0;
+}
+
+.chamber-member-profile__details .chamber-member-card__specialties li {
+  background: rgba(26, 61, 92, 0.08);
+  color: #1a3d5c;
+}
+
+.chamber-member-profile__help {
+  margin-top: 0.85rem;
+}
+
+.chamber-member-profile__help-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1a3d5c;
+}
+
+.chamber-member-profile__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(201, 162, 39, 0.22);
+}
+
+.chamber-member-profile__invite,
+.chamber-member-profile__return {
+  padding: 0.5rem 0.85rem;
+  border-radius: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.chamber-member-profile__invite {
+  border: none;
+  background: #1a3d5c;
+  color: #fff;
+}
+
+.chamber-member-profile__return {
+  border: 1px dashed rgba(201, 162, 39, 0.45);
+  background: transparent;
+  color: #1a3d5c;
+}
+
+.chamber-entry--members .grow-room-panel {
+  background: transparent;
+  box-shadow: none;
+}
+
+.chamber-entry--conversation.grow-room-panel {
+  max-width: none;
+  width: 100%;
+  padding: clamp(0.45rem, 1.2vh, 0.75rem) clamp(0.65rem, 2vw, 1rem) 0;
+}
+
+.chamber-entry--conversation .chamber-active-member {
+  margin: 0 auto 0.35rem;
+  max-width: min(44rem, 94vw);
+  background: rgba(12, 28, 44, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-color: rgba(201, 162, 39, 0.52);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+.chamber-entry--conversation .chamber-active-member__name {
+  color: #fff9ef;
+}
+
+.chamber-entry--conversation .chamber-active-member__specialty {
+  margin: 0 0 0.12rem;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: rgba(232, 210, 168, 0.96);
+}
+
+.chamber-entry--conversation .chamber-active-member__purpose {
+  color: rgba(255, 252, 245, 0.9);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chamber-entry--conversation .chamber-active-member__end {
+  color: rgba(255, 249, 239, 0.92);
+  border-color: rgba(201, 162, 39, 0.55);
+}
+
+.chamber-active-member__specialty {
+  margin: 0 0 0.12rem;
+  font-size: 0.76rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: rgba(30, 92, 92, 0.88);
+}
+
+.chamber-entry--members .chamber-room__layout {
+  display: block;
+}
+
+.chamber-conversation-bar {
+  padding: 1rem 1.1rem 1.15rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 0.65rem;
+  background: rgba(255, 252, 245, 0.94);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+
+.chamber-conversation-bar__prompt {
+  margin: 0 0 0.75rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  line-height: 1.35;
+  color: #1a3d5c;
+}
+
+.chamber-conversation-bar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.chamber-conversation-bar__btn {
+  padding: 0.5rem 0.85rem;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.88);
+  color: #1a3d5c;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.chamber-conversation-bar__btn--primary {
+  border: none;
+  background: #1a3d5c;
+  color: #fff;
+}
+
+.chamber-conversation-bar__btn--ghost {
+  border-style: dashed;
+  background: transparent;
+}
+
+.chamber-conversation-bar__hint {
+  margin: 0.75rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(26, 61, 92, 0.72);
+}

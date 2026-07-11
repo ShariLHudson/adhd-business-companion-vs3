@@ -23,7 +23,7 @@ afterEach(() => {
   clearCompanionConversationState();
 });
 
-describe("Companion Conversation Context™ — golden tests", () => {
+describe("Companion Conversation Context — golden tests", () => {
   it("A — lists Possibility House sublocations from current location", () => {
     writeCompanionConversationState({
       currentLocation: {

@@ -227,11 +227,11 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
     title: "How To: Use Focus",
     question: "How do I use Focus?",
     whatItIs:
-      "Focus tools — timer, audio, breathing — to start one task without fighting your brain.",
+      "Focus tools — timer and audio — to start one task without fighting your brain.",
     whenToUse: "When you know what to do but can't seem to start.",
     steps: [
       "Tell me you'd like to focus, or say what you want to work on.",
-      "Pick a timer, calming audio, or breathing.",
+      "Pick a timer or calming audio. Say \"help me breathe\" anytime for Breathe.",
       "Name one task — everything else can wait.",
       "Start the session and work until the timer ends.",
     ],

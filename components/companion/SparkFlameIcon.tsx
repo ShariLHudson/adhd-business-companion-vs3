@@ -1,4 +1,4 @@
-/** Spark Note™ flame mark — use instead of stars or generic notification icons. */
+/** Spark Note flame mark — use instead of stars or generic notification icons. */
 export function SparkFlameIcon({ className }: { className?: string }) {
   return (
     <svg

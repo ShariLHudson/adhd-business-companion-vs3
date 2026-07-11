@@ -1,5 +1,5 @@
 /**
- * SparkEstateShell™ state — maps `goToPlace` to shell props (Phase D.1).
+ * SparkEstateShell state — maps `goToPlace` to shell props (Phase D.1).
  *
  * @see docs/estate/PHASE_D_UNIFIED_ESTATE_SHELL.md
  * @see docs/estate/P0_CANON_ERRATA.md
@@ -120,7 +120,7 @@ export function resolveEstateShellState(
         resolveCanonicalPlaceBackground(placeId) ?? place.backgroundImage,
       arrivalBehavior: place.arrivalBehavior,
       showTitlePlaque: place.category !== "living-place",
-      showInvitationGrid: place.category === "destination",
+      showInvitationGrid: false,
     });
   }
 

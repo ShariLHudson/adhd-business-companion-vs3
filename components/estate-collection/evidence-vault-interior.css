@@ -1,0 +1,192 @@
+/* Evidence Vault — interior journal-first surface */
+
+.evidence-vault-interior {
+  position: relative;
+  z-index: 4;
+  min-height: min(58vh, 560px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2.5rem);
+  pointer-events: none;
+}
+
+.evidence-vault-interior__ambient {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 60% at 50% 48%,
+    rgba(8, 6, 4, 0.08) 0%,
+    rgba(8, 6, 4, 0.38) 100%
+  );
+}
+
+.evidence-vault-interior__content {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: min(36rem, 92vw);
+  padding: 1.25rem 1.35rem 1.5rem;
+  border-radius: 1rem;
+  background: rgba(18, 12, 8, 0.42);
+  border: 1px solid rgba(201, 166, 107, 0.22);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  text-align: center;
+}
+
+.evidence-vault-interior__kicker {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(201, 166, 107, 0.88);
+}
+
+.evidence-vault-interior__title {
+  margin: 0;
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  color: #f0e6d6;
+}
+
+.evidence-vault-interior__hint {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgba(240, 228, 206, 0.88);
+}
+
+.evidence-vault-interior__journal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.5rem;
+  padding: 0.85rem 1rem 1rem;
+  border: 1px solid rgba(201, 166, 107, 0.38);
+  border-radius: 0.75rem;
+  background: rgba(255, 248, 235, 0.08);
+  cursor: pointer;
+  transition:
+    transform 0.28s ease,
+    box-shadow 0.28s ease,
+    border-color 0.28s ease;
+}
+
+.evidence-vault-interior__journal:hover,
+.evidence-vault-interior__journal:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(201, 166, 107, 0.62);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+}
+
+.evidence-vault-interior__journal--active {
+  border-color: rgba(201, 166, 107, 0.72);
+  box-shadow: 0 0 0 1px rgba(201, 166, 107, 0.35);
+}
+
+.evidence-vault-interior__journal-cover {
+  position: relative;
+  width: min(9rem, 42vw);
+  height: min(6.5rem, 30vw);
+}
+
+.evidence-vault-interior__journal-spine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 14%;
+  border-radius: 0.35rem 0 0 0.35rem;
+  background: linear-gradient(180deg, #6b4f32 0%, #3d2c1c 100%);
+}
+
+.evidence-vault-interior__journal-pages {
+  position: absolute;
+  left: 12%;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 0 0.35rem 0.35rem 0;
+  background: linear-gradient(180deg, #f4ead8 0%, #e8dcc8 100%);
+  box-shadow: inset 0 0 0 1px rgba(107, 90, 70, 0.18);
+}
+
+.evidence-vault-interior__journal-label {
+  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f0e6d6;
+}
+
+.evidence-vault-interior__journal-prompt {
+  font-size: 0.78rem;
+  color: rgba(232, 210, 168, 0.82);
+}
+
+.evidence-vault-interior__browse {
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border: none;
+  background: transparent;
+  color: rgba(232, 210, 168, 0.88);
+  font-size: 0.76rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.evidence-vault-interior--behind-discovery .evidence-vault-interior__content {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px) scale(0.985);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.evidence-vault-inline-discovery {
+  position: fixed;
+  left: 50%;
+  bottom: clamp(10%, 14vh, 18%);
+  top: auto;
+  right: auto;
+  transform: translateX(-50%);
+  z-index: 8;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: min(40rem, 92vw);
+  max-height: min(56vh, 500px);
+  padding: 0;
+  pointer-events: none;
+}
+
+.evidence-vault-inline-discovery > .discovery-file {
+  pointer-events: auto;
+  width: 100%;
+  min-height: 0;
+  max-height: min(56vh, 500px);
+  padding: 0;
+}
+
+.evidence-vault-room__chat-panel {
+  z-index: 40;
+}
+
+.companion-evidence-vault-active .clear-my-mind-standalone-shell,
+.companion-evidence-vault-active .clear-my-mind-standalone-frame {
+  overflow: visible;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.companion-evidence-vault-active .estate-collection-room__scroll {
+  overflow-y: auto;
+  min-height: 100dvh;
+}

@@ -85,7 +85,7 @@ export function detectActionBridge(assistantText: string): ActionBridge | null {
     return {
       id: "breathe",
       emoji: "🌿",
-      label: "Start Breathe & Reset",
+      label: "Start Breathe",
       tool: "breathe",
     };
   }

@@ -1,5 +1,5 @@
 /**
- * Estate Place Ambience Intent™ — emotional purpose per canonical place.
+ * Estate Place Ambience Intent — emotional purpose per canonical place.
  *
  * Ambience is hospitality, not background audio. Every place earns a unique
  * sonic identity. V1 may use one loop per place; layers document the target mix.

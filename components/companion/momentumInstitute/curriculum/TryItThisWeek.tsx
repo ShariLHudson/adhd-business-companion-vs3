@@ -14,7 +14,7 @@ export function TryItThisWeek({ action }: Props) {
       data-testid="try-it-this-week"
     >
       <h3 className="institute-knowledge-panel__section-title">
-        Try It This Week™
+        Try It This Week
       </h3>
       <p className="institute-knowledge-panel__prose">{action}</p>
     </section>

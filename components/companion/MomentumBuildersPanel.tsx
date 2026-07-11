@@ -25,7 +25,7 @@ type Phase = "menu" | "play" | "done";
 type Props = {
   onLaunchExternal: (launch: Exclude<MomentumBuilderLaunch, { kind: "game" }>) => void;
   onReturnHome?: () => void;
-  /** Quick Recharge™ — games only, no business-growth framing */
+  /** Quick Recharge — games only, no business-growth framing */
   variant?: "default" | "quick-recharge";
   panelTitle?: string;
   panelIntro?: string;

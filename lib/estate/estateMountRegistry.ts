@@ -1,10 +1,10 @@
 /**
- * Estate Mount Registry™ — single room mount table (Phase 1).
+ * Estate Mount Registry — single room mount table (Phase 1).
  *
  * Maps canonical `placeId` → AppSection shell → experience tier → component.
  * **Additive** — does not replace CompanionPageClient mounts yet.
  *
- * Journal Gazebo™ is the reference Tier A immersive room.
+ * Journal Gazebo is the reference Tier A immersive room.
  *
  * @see docs/estate/SPARK_ESTATE_MASTER_PLAN.md
  */
@@ -27,6 +27,7 @@ export type EstateMountShellComponent =
   | "JournalGazeboExperience"
   | "EstateCollectionRoomEngine"
   | "EstateCollectionRoomPanel"
+  | "GrowthPortfolioPanel"
   | "profile-estate-overlay"
   | "estate-scene-only"
   | "unmounted";
@@ -53,7 +54,7 @@ export type EstateMountSpec = {
 export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   {
     placeId: "journal",
-    officialName: "Journal Gazebo™",
+    officialName: "Journal Gazebo",
     appSection: "growth-journal",
     experienceTier: "immersive",
     shellComponent: "JournalGazeboExperience",
@@ -65,7 +66,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "greenhouse",
-    officialName: "Growth Greenhouse™",
+    officialName: "Growth Greenhouse",
     appSection: "growth-greenhouse",
     experienceTier: "collection",
     shellComponent: "EstateCollectionRoomEngine",
@@ -74,7 +75,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "evidence-vault",
-    officialName: "Evidence Vault™",
+    officialName: "Evidence Vault",
     appSection: "evidence-bank",
     experienceTier: "collection",
     shellComponent: "EstateCollectionRoomEngine",
@@ -84,18 +85,28 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "library",
-    officialName: "Achievement Library™",
+    officialName: "Achievement Library",
     appSection: "growth-library",
     experienceTier: "collection",
     shellComponent: "EstateCollectionRoomEngine",
     collectionRoomId: "achievement-library",
-    menuActionId: "portfolio",
     navigable: true,
-    architectNotes: "Collection room id achievement-library; canonical placeId library.",
+    architectNotes:
+      "Collection room id achievement-library; canonical placeId library. Portfolio is a separate place.",
+  },
+  {
+    placeId: "portfolio",
+    officialName: "Hall of Accomplishments",
+    appSection: "growth-portfolio",
+    experienceTier: "collection",
+    shellComponent: "GrowthPortfolioPanel",
+    navigable: true,
+    architectNotes:
+      "Member-facing Hall of Accomplishments (legacy portfolio section). Gallery is gallery-of-firsts — never mount Hall there.",
   },
   {
     placeId: "gardens",
-    officialName: "Celebration Garden™",
+    officialName: "Celebration Garden",
     appSection: "wins-this-week",
     experienceTier: "collection",
     shellComponent: "EstateCollectionRoomEngine",
@@ -104,7 +115,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "celebration-room",
-    officialName: "Celebration Hall™",
+    officialName: "Celebration Room",
     appSection: "growth-reports",
     experienceTier: "collection",
     shellComponent: "EstateCollectionRoomEngine",
@@ -113,8 +124,18 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
     architectNotes: "Collection room id celebration-hall; canonical place celebration-room.",
   },
   {
+    placeId: "gallery-of-firsts",
+    officialName: "Gallery",
+    appSection: "home",
+    experienceTier: "scene-only",
+    shellComponent: "estate-scene-only",
+    navigable: true,
+    architectNotes:
+      "Gallery scene presence — not Hall of Accomplishments (portfolio / growth-portfolio).",
+  },
+  {
     placeId: "seat-at-pond",
-    officialName: "Seat at the Pond™",
+    officialName: "Seat at the Pond",
     appSection: "focus-audio",
     experienceTier: "scene-only",
     shellComponent: "estate-scene-only",
@@ -123,7 +144,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "tea-room",
-    officialName: "Tea Room™",
+    officialName: "Tea Room",
     appSection: "focus-audio",
     experienceTier: "scene-only",
     shellComponent: "estate-scene-only",
@@ -132,7 +153,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "peaceful-places",
-    officialName: "Peaceful Places™",
+    officialName: "Peaceful Places",
     appSection: "home",
     experienceTier: "scene-only",
     shellComponent: "estate-scene-only",
@@ -142,7 +163,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "reading-nook",
-    officialName: "Reading Nook™",
+    officialName: "Reading Nook",
     appSection: "home",
     experienceTier: "scene-only",
     shellComponent: "estate-scene-only",
@@ -151,7 +172,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
   },
   {
     placeId: "game-room",
-    officialName: "Game Room™",
+    officialName: "Game Room",
     appSection: "quick-recharge",
     experienceTier: "collection",
     shellComponent: "EstateCollectionRoomEngine",

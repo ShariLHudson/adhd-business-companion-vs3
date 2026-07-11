@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — registry loaders.
+ * Estate Knowledge Base — registry loaders.
  */
 
 import roomsJson from "@/docs/estate-knowledge-base/rooms.json";
@@ -100,7 +100,7 @@ export function getMomentumEntityMappings(): MomentumEntityMapping[] {
   return doc.entityMappings ?? [];
 }
 
-/** Bridge for Discovery Key™ target registries */
+/** Bridge for Discovery Key target registries */
 export function getEstateIntelligenceRegistry(
   registry: DiscoveryTargetRegistry,
 ): EstateKnowledgeItem[] {

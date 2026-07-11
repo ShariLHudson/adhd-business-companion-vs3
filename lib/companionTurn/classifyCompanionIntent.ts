@@ -94,6 +94,7 @@ export function classifyCompanionIntent(
     userText,
     lastAssistantText: input.lastAssistantText,
     currentPlaceId: input.currentPlaceId,
+    activeSection: input.activeSection,
     soundscapeCategoryId: input.soundscapeCategoryId,
   });
   const plan = planEstateActionExecution(decision);

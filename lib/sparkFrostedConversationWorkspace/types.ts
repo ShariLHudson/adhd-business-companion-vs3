@@ -1,5 +1,5 @@
 /**
- * Spark Frosted Conversation Workspace™ (Spec 109).
+ * Spark Frosted Conversation Workspace (Spec 109).
  * Universal conversation/work surface — frosted glass, one panel, room visible.
  *
  * Conversation stack: Spec 105–108

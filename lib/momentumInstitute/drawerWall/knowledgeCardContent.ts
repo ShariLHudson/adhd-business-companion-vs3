@@ -1,5 +1,5 @@
 /**
- * Knowledge Card™ learning body — catalog-driven placeholders until CMS loads.
+ * Knowledge Card learning body — catalog-driven placeholders until CMS loads.
  */
 
 import type {
@@ -57,10 +57,10 @@ export function resolveKnowledgeCardLearningContent(
       `Leave with one reflection or action that fits how you actually work.`,
     ],
     mainContent: [
-      `This Knowledge Card™ lives in the **${drawer.title}** drawer — one idea at a time,`,
+      `This Knowledge Card lives in the **${drawer.title}** drawer — one idea at a time,`,
       `so you can build ${competency} without drowning in content.`,
       "",
-      "Full lesson experiences — Business Mastery Minutes™, Deep Lessons™, Labs, and more —",
+      "Full lesson experiences — Business Mastery Minutes, Deep Lessons, Labs, and more —",
       "open here when you are ready. Shari stays with you in the conversation panel.",
     ].join("\n"),
     reflectionQuestions: [
@@ -70,8 +70,8 @@ export function resolveKnowledgeCardLearningContent(
     ],
     relatedResources: [
       `${drawer.title} drawer — explore neighboring index cards`,
-      "My Institute Cabinet™ — cards you have filed for later",
-      "Growth Profile™ — capability earned through learning, reflection, and use",
+      "My Institute Cabinet — cards you have filed for later",
+      "Growth Profile — capability earned through learning, reflection, and use",
     ],
   };
 }
@@ -96,16 +96,16 @@ export type InstituteLearningAction = {
 };
 
 const ACTION_LABELS: Record<InstituteLearningActionId, string> = {
-  business_mastery_minute: "Business Mastery Minute™",
-  deep_lesson: "Deep Lesson™",
-  business_lab: "Business Lab™",
-  simulation: "Simulation™",
-  challenge: "Challenge™",
-  worksheet: "Worksheet™",
-  template: "Template™",
-  apply_to_my_business: "Make It Mine™",
-  discuss_with_shari: "Discuss with Shari™",
-  save_to_cabinet: "Save to My Institute Cabinet™",
+  business_mastery_minute: "Business Mastery Minute",
+  deep_lesson: "Deep Lesson",
+  business_lab: "Business Lab",
+  simulation: "Simulation",
+  challenge: "Challenge",
+  worksheet: "Worksheet",
+  template: "Template",
+  apply_to_my_business: "Make It Mine",
+  discuss_with_shari: "Discuss with Shari",
+  save_to_cabinet: "Save to My Institute Cabinet",
 };
 
 const EXPERIENCE_TO_ACTION: Partial<
@@ -189,16 +189,16 @@ export function resolveRelatedLearning(
       kind: "knowledge_card",
       label:
         relatedCards > 0
-          ? `Related Knowledge Cards™ in ${drawer.title}`
-          : `More Knowledge Cards™ in ${drawer.title}`,
+          ? `Related Knowledge Cards in ${drawer.title}`
+          : `More Knowledge Cards in ${drawer.title}`,
     },
     {
       kind: "apprenticeship",
-      label: `Apprenticeships™ for ${competency}`,
+      label: `Apprenticeships for ${competency}`,
     },
     {
       kind: "business_lab",
-      label: `Business Labs™ — apply ${card.title}`,
+      label: `Business Labs — apply ${card.title}`,
     },
     {
       kind: "competency",
@@ -206,7 +206,7 @@ export function resolveRelatedLearning(
     },
     {
       kind: "challenge",
-      label: `Challenges™ — practice ${card.title}`,
+      label: `Challenges — practice ${card.title}`,
     },
   ];
 }

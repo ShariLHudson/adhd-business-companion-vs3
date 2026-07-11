@@ -1,5 +1,5 @@
 /**
- * Document Creation Profiles™ — what each artifact type needs before drafting.
+ * Document Creation Profiles — what each artifact type needs before drafting.
  *
  * Email ≠ newsletter ≠ funnel ≠ website. Same journey, type-specific discovery.
  */

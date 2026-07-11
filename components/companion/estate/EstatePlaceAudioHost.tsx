@@ -10,6 +10,10 @@ import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmenta
 import {
   transitionEstatePlaceAmbient,
 } from "@/lib/estate/estateRoomAmbience";
+import {
+  isWelcomeHomeIntroAudioBlocked,
+  subscribeWelcomeHomeIntroAudioBlocked,
+} from "@/lib/welcomeHome/introAudioGuard";
 
 type Props = {
   /** Current canonical place id — from direct visit or estate presence. */
@@ -20,6 +24,7 @@ type AppliedAudioState = {
   placeId: string | null;
   ambienceEnabled: boolean;
   silenced: boolean;
+  introBlocked: boolean;
 };
 
 /**
@@ -31,26 +36,31 @@ export function EstatePlaceAudioHost({ placeId }: Props) {
     placeId: null,
     ambienceEnabled: true,
     silenced: false,
+    introBlocked: false,
   });
 
   const applyPlace = useCallback((id: string | null) => {
     const settings = getEstateAudioSettings();
     const ambienceEnabled = isEstateAmbienceLayerEnabled();
+    const introBlocked =
+      id === "welcome-home" && isWelcomeHomeIntroAudioBlocked();
     const last = lastAppliedRef.current;
 
     const unchanged =
       id === last.placeId &&
       ambienceEnabled === last.ambienceEnabled &&
-      settings.silenced === last.silenced;
+      settings.silenced === last.silenced &&
+      introBlocked === last.introBlocked;
     if (unchanged) return;
 
     lastAppliedRef.current = {
       placeId: id,
       ambienceEnabled,
       silenced: settings.silenced,
+      introBlocked,
     };
 
-    if (!ambienceEnabled || settings.silenced || !id) {
+    if (!ambienceEnabled || settings.silenced || !id || introBlocked) {
       void stopAllEstateEnvironmentalAudio();
       return;
     }
@@ -64,6 +74,10 @@ export function EstatePlaceAudioHost({ placeId }: Props) {
 
   useEffect(() => {
     return subscribeEstateAudioSettings(() => applyPlace(placeId));
+  }, [placeId, applyPlace]);
+
+  useEffect(() => {
+    return subscribeWelcomeHomeIntroAudioBlocked(() => applyPlace(placeId));
   }, [placeId, applyPlace]);
 
   return null;

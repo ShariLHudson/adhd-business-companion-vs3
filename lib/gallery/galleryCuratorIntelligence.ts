@@ -1,5 +1,5 @@
 /**
- * Gallery Curator Intelligence™ — decides today's exhibition.
+ * Gallery Curator Intelligence — decides today's exhibition.
  * Demo Mode uses scripted scenes; production will rotate from the full archive.
  */
 

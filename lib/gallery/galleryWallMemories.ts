@@ -86,7 +86,7 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     wallTopPercent: 28,
     variant: "milestone",
     title: "First win remembered",
-    subtitle: "Evidence Bank",
+    subtitle: "Evidence Vault",
     plaque: "Growing",
   }),
   seedWallMemory({

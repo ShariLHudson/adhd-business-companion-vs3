@@ -1,5 +1,5 @@
 /**
- * Conversation Drives Navigation™ — evaluate member language for environment needs.
+ * Conversation Drives Navigation — evaluate member language for environment needs.
  */
 
 import {
@@ -18,7 +18,7 @@ import type {
 import { ENVIRONMENT_NEED_MAX_SUGGESTIONS } from "./types";
 
 const NAV_VERB_ONLY_RE =
-  /\b(?:take me to|go to|let(?:'s| us) go to|open|show me|visit|head to|bring me to)\s+[\w\s™-]{3,}\b/i;
+  /\b(?:take me to|go to|let(?:'s| us) go to|open|show me|visit|head to|bring me to)\s+[\w\s-]{3,}\b/i;
 
 function filterNavigablePlaceIds(ids: readonly string[]): string[] {
   const seen = new Set<string>();

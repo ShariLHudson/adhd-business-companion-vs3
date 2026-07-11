@@ -14,6 +14,8 @@ type Props = {
   onVoiceUsed: () => void;
   inputRef: RefObject<HTMLTextAreaElement | null>;
   shareConfirming: boolean;
+  /** Large writing surface for guided Capture (~65–70% of panel). */
+  expansive?: boolean;
 };
 
 export function ClearMyMindCaptureCard({
@@ -23,6 +25,7 @@ export function ClearMyMindCaptureCard({
   onVoiceUsed,
   inputRef,
   shareConfirming,
+  expansive = false,
 }: Props) {
   const [supportIndex, setSupportIndex] = useState(0);
 
@@ -44,12 +47,21 @@ export function ClearMyMindCaptureCard({
   useEffect(() => {
     const el = inputRef.current;
     if (!el) return;
+    if (expansive) {
+      el.style.height = "";
+      return;
+    }
     el.style.height = "auto";
     el.style.height = `${Math.max(140, el.scrollHeight)}px`;
-  }, [value, inputRef]);
+  }, [value, inputRef, expansive]);
 
   return (
-    <div className="clear-my-mind-capture-card" data-testid="clear-my-mind-capture-card">
+    <div
+      className={`clear-my-mind-capture-card${
+        expansive ? " clear-my-mind-capture-card--expansive" : ""
+      }`}
+      data-testid="clear-my-mind-capture-card"
+    >
       <div className="clear-my-mind-input-card">
         <VoiceAnswerField
           value={value}
@@ -59,7 +71,9 @@ export function ClearMyMindCaptureCard({
           onVoiceUsed={onVoiceUsed}
           voiceProminent={false}
           placeholder={CLEAR_MY_MIND_INPUT_PLACEHOLDER}
-          inputClassName="clear-my-mind-capture clear-my-mind-capture--expand clear-my-mind-journal-field w-full resize-none outline-none"
+          inputClassName={`clear-my-mind-capture clear-my-mind-capture--expand clear-my-mind-journal-field w-full resize-none outline-none${
+            expansive ? " clear-my-mind-journal-field--expansive" : ""
+          }`}
           micTitle="Speak what's on your mind"
         />
         {supportLine ? (

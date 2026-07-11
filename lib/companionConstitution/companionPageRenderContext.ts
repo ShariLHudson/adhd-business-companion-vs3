@@ -31,6 +31,7 @@ export type CompanionPageGlobalBackground = {
 const HOMESTEAD_SCENE_SECTIONS = new Set<AppSection>([
   "brain-dump",
   "plan-my-day",
+  "visual-focus",
   "focus",
   "focus-audio",
 ]);
@@ -77,6 +78,7 @@ export function sectionToSceneWorkspaceId(
   const map: Partial<Record<AppSection, SceneWorkspaceId>> = {
     "brain-dump": "clear-my-mind",
     "plan-my-day": "plan-my-day",
+    "visual-focus": "visual-focus",
     focus: "focus-hub",
     breathe: "breathe",
     "focus-audio": "focus-audio",

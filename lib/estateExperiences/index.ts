@@ -1,5 +1,5 @@
 /**
- * Spark Estate Experiences™ — intent-first navigation layer.
+ * Spark Estate Experiences — intent-first navigation layer.
  */
 
 export {

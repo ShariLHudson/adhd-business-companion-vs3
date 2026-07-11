@@ -1,5 +1,5 @@
 /**
- * Business Brain™ Memory & Retrieval (Spec 117).
+ * Business Brain Memory & Retrieval (Spec 117).
  * Knowledge architecture — remember, connect, organize, retrieve, dedupe, pattern, forget.
  *
  * OS layer: spark-intelligence-foundation/003-business-brain.md
@@ -90,10 +90,10 @@ export const BUSINESS_BRAIN_ORGANIZATION_METAPHORS: readonly {
   memberVisible: boolean;
   title: string;
 }[] = [
-  { id: "companion_box", memberVisible: true, title: "Companion Boxes™" },
-  { id: "business_asset", memberVisible: true, title: "Business Assets™" },
+  { id: "companion_box", memberVisible: true, title: "Companion Boxes" },
+  { id: "business_asset", memberVisible: true, title: "Business Assets" },
   { id: "project", memberVisible: true, title: "Projects" },
-  { id: "memory_center", memberVisible: true, title: "Memory Center™" },
+  { id: "memory_center", memberVisible: true, title: "Memory Center" },
   { id: "living_intelligence_graph", memberVisible: false, title: "Living Intelligence Graph" },
 ] as const;
 

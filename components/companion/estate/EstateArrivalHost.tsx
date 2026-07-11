@@ -19,7 +19,7 @@ type Props = {
 };
 
 /**
- * Global Estate Arrival Experience™ host — one overlay for every room transition.
+ * Global Estate Arrival Experience host — one overlay for every room transition.
  */
 export function EstateArrivalHost({ onShariGreeting }: Props) {
   const [active, setActive] = useState<{
@@ -55,9 +55,6 @@ export function EstateArrivalHost({ onShariGreeting }: Props) {
     const { config, shariGreeting } = active;
     setActive(null);
     dispatchEstateArrivalComplete(config.roomId);
-    if (config.invitationAfterArrival !== false) {
-      return;
-    }
     if (shariGreeting) {
       onShariGreeting?.(shariGreeting, config.roomId);
     }

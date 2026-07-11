@@ -2,7 +2,7 @@ import type { PeacefulPlace } from "./types";
 
 export const NATURE_ESCAPE_IMAGE_VERSION = "20260628a" as const;
 
-/** Canonical Nature Escape™ session + directory thumbnail. */
+/** Canonical Nature Escape session + directory thumbnail. */
 export const NATURE_ESCAPE_IMAGE =
   `/backgrounds/momentum-games/momentum-mental-vacation.png?v=${NATURE_ESCAPE_IMAGE_VERSION}` as const;
 

@@ -1,5 +1,5 @@
 /**
- * Spark Recognition Engine™ — shared types.
+ * Spark Recognition Engine — shared types.
  * Source of truth: docs/estate/recognition/SPARK_RECOGNITION_ENGINE.md
  *
  * Distinct from lib/recognition/ (birthday/anniversary milestones).
@@ -13,7 +13,7 @@ export const RECOGNITION_ROOM_IDS = [
   "gardens",
   "celebration-room",
   "legacy-studio",
-  "gallery-of-firsts",
+  "portfolio",
 ] as const;
 
 export type RecognitionRoomId = (typeof RECOGNITION_ROOM_IDS)[number];
@@ -156,11 +156,24 @@ export type HallExhibit = {
 /**
  * Required routing state — track independently.
  * Never claim "already here" unless visualRoom matches.
+ *
+ * Architecture Library aliases:
+ * - visualRoom → visual_room
+ * - conversationContext → conversation_room
+ * - requestedDestination → requested_room
+ * - previousRoom → previous_room
+ * - activeRecognitionFlow → active_flow / active_workflow
  */
 export type RecognitionRoomState = {
+  /** visual_room — place currently visible on screen */
   visualRoom: string | null;
+  /** conversation_room — what conversation believes is active */
   conversationContext: string | null;
+  /** requested_room — explicit member navigation target */
   requestedDestination: string | null;
+  /** previous_room — last visual room before the current one */
+  previousRoom: string | null;
+  /** active_flow — in-progress recognition flow */
   activeRecognitionFlow: ActiveRecognitionFlow | null;
 };
 

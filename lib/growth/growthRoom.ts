@@ -6,15 +6,19 @@ export const GROWTH_ROOM_BG = ESTATE_ROOM_BG.greenhouse;
 /** Journal — quiet writing room, full-bleed background. */
 export const JOURNAL_ROOM_BG = ESTATE_ROOM_BG.gazeboJournal;
 
-/** Evidence Vault — proof archive, full-bleed background. */
-export const EVIDENCE_VAULT_ROOM_BG =
+/** Evidence Vault — exterior doors plate (entrance ritual). */
+export const EVIDENCE_VAULT_ENTRANCE_BG =
   "/backgrounds/evidence-vault-background.png" as const;
+
+/** Evidence Vault — interior room plate (journal workspace). */
+export const EVIDENCE_VAULT_ROOM_BG =
+  "/backgrounds/evidence-vault-room-background.png" as const;
 
 /** Portfolio — creative work archive, full-bleed background. */
 export const PORTFOLIO_ROOM_BG =
   "/backgrounds/accomplisments-room-background.png" as const;
 
-/** Estate Profile™ / My Estate™ — member's estate portrait plate. */
+/** Estate Profile / My Estate — member's estate portrait plate. */
 export const ESTATE_PROFILE_ROOM_BG =
   "/backgrounds/spark-estate-photo-background.png" as const;
 

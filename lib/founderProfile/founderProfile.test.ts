@@ -14,7 +14,7 @@ import {
   founderProfileService,
 } from "./index";
 
-describe("Executive Digital Twin™ — Founder Profile Intelligence", () => {
+describe("Executive Digital Twin — Founder Profile Intelligence", () => {
   beforeEach(() => {
     resetRuntimeFounderProfile();
   });

@@ -28,7 +28,7 @@ export function DiscoveryEntryZone({
 
       {alertCount > 0 ? (
         <p className="founder-relationship-intel__alert-banner">
-          {alertCount} Founder Alert{alertCount > 1 ? "s" : ""}™ — material insights waiting
+          {alertCount} Founder Alert{alertCount > 1 ? "s" : ""} — material insights waiting
         </p>
       ) : null}
 

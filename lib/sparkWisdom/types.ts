@@ -1,5 +1,5 @@
 /**
- * Spark Wisdom Layer™ — Specs 120–131.
+ * Spark Wisdom Layer — Specs 120–131.
  * How Spark thinks before every response (invisible to members).
  *
  * @see docs/SPARK_WISDOM_LAYER_FRAMEWORK.md

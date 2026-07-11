@@ -1,5 +1,5 @@
 /**
- * Today's Path™ — planning table object (not a task list).
+ * Today's Path — planning table object (not a task list).
  * Built from existing EF + momentum signals — no duplicate planning logic.
  *
  * @see docs/MOMENTUM_BUILDER_V1_ORCHESTRATION.md
@@ -29,7 +29,7 @@ function newId(prefix: string, now: Date): string {
   return `${prefix}-${now.getTime()}`;
 }
 
-/** Draft Today's Path™ — only sections that are useful; no empty placeholders. */
+/** Draft Today's Path — only sections that are useful; no empty placeholders. */
 export function buildTodaysPathDraft(input: BuildTodaysPathInput): TodaysPath | null {
   const { discovery, orchestration, executiveFunction, momentum, now = new Date() } =
     input;

@@ -307,7 +307,7 @@ export function stressReliefToolAction(
 export function stressToolOpenAck(id: StressReliefOptionId): string {
   switch (id) {
     case "breathe":
-      return "Opening **Breathe & Reset** — take your time. Chat stays right here.";
+      return "Opening **Breathe** — take your time. Your place stays right here.";
     case "calm-audio":
       return "Opening **Focus Audio** with calm sounds — pick a track or add your own link.";
     case "clear-mind":

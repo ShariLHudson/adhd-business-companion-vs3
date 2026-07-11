@@ -1,6 +1,6 @@
 /**
- * Context-first Discovery seeding (197).
- * Check conversation, Clear My Mind, Projects, Journal before asking.
+ * Context-first Discovery seeding (197 / 242 / 243 Pattern 3).
+ * Check conversation, Clear My Mind, Journal, Projects, previous maps before asking.
  */
 
 import { loadConversation } from "@/lib/companionStore";
@@ -10,12 +10,14 @@ import { resumeClearMyMindSession } from "@/lib/clearMyMindSessionStore";
 import { getSessionThoughts } from "@/lib/thinkingSpace/queries";
 import { getGrowthMemoryEntries } from "@/lib/growthJournalStore";
 import { loadProjectContinuity } from "@/lib/projectContinuityStore";
+import { listContinueThinkingMaps } from "@/lib/visualFocus/continueThinking";
 
 export type DiscoveryContextSource =
   | "conversation"
   | "clear-my-mind"
   | "projects"
-  | "journal";
+  | "journal"
+  | "previous-maps";
 
 export type DiscoveryContextSeed = {
   suggestedTopic: string | null;
@@ -42,14 +44,17 @@ function uniqueLines(lines: string[]): string[] {
   return out;
 }
 
-export function gatherMindMapDiscoveryContext(): DiscoveryContextSeed {
+export function gatherMindMapDiscoveryContext(options?: {
+  seedText?: string;
+}): DiscoveryContextSeed {
   if (typeof window === "undefined") {
+    const seed = options?.seedText?.trim() || null;
     return {
-      suggestedTopic: null,
+      suggestedTopic: seed,
       suggestedEverything: null,
-      sources: [],
+      sources: seed ? (["conversation"] as DiscoveryContextSource[]) : [],
       knownFacts: [],
-      skipTopicQuestion: false,
+      skipTopicQuestion: Boolean(seed && seed.length > 2),
       skipEverythingQuestion: false,
     };
   }
@@ -59,13 +64,36 @@ export function gatherMindMapDiscoveryContext(): DiscoveryContextSeed {
   const ideaLines: string[] = [];
   let suggestedTopic: string | null = null;
 
+  const seed = options?.seedText?.trim();
+  if (seed) {
+    const cleaned = seed
+      .replace(
+        /\b(?:i\s+want\s+(?:a\s+)?|create\s+(?:a\s+)?|build\s+(?:a\s+)?|make\s+(?:a\s+)?|open\s+(?:a\s+)?|start\s+(?:a\s+)?)mind\s*maps?\b/gi,
+        "",
+      )
+      .replace(/\bmind\s*map\s+(?:this|that|it)\b/gi, "")
+      .replace(/\bmind\s*maps?\b/gi, "")
+      .replace(/^\s*(?:about|for|on|:)\s+/i, "")
+      .trim();
+    if (cleaned.length > 2) {
+      suggestedTopic = cleaned.slice(0, 120);
+      sources.push("conversation");
+      knownFacts.push(`You asked to map: ${suggestedTopic}`);
+      ideaLines.push(cleaned);
+    } else if (seed.length > 2 && !/^mind\s*map/i.test(seed)) {
+      suggestedTopic = seed.slice(0, 120);
+      sources.push("conversation");
+      knownFacts.push(`You asked to map: ${suggestedTopic}`);
+    }
+  }
+
   try {
     const ctx = readCompanionConversationState();
-    if (ctx.currentTopic?.trim()) {
+    if (!suggestedTopic && ctx.currentTopic?.trim()) {
       suggestedTopic = ctx.currentTopic.trim();
       sources.push("conversation");
       knownFacts.push(`You're already talking about: ${suggestedTopic}`);
-    } else if (ctx.lastUserGoal?.trim()) {
+    } else if (!suggestedTopic && ctx.lastUserGoal?.trim()) {
       suggestedTopic = ctx.lastUserGoal.trim();
       sources.push("conversation");
       knownFacts.push(`Your recent goal: ${suggestedTopic}`);
@@ -97,7 +125,7 @@ export function gatherMindMapDiscoveryContext(): DiscoveryContextSeed {
         sources.push("clear-my-mind");
         ideaLines.push(...texts.slice(0, 40));
         knownFacts.push(
-          `Clear My Mind™ is holding ${texts.length} thought${texts.length === 1 ? "" : "s"}.`,
+          `Clear My Mind is holding ${texts.length} thought${texts.length === 1 ? "" : "s"}.`,
         );
         if (!suggestedTopic) {
           suggestedTopic = texts[0]!.slice(0, 80);
@@ -105,7 +133,7 @@ export function gatherMindMapDiscoveryContext(): DiscoveryContextSeed {
       } else if (cmm.rawCaptureTexts?.length) {
         sources.push("clear-my-mind");
         ideaLines.push(...cmm.rawCaptureTexts.filter(Boolean));
-        knownFacts.push("I can use your Clear My Mind™ captures.");
+        knownFacts.push("I can use your Clear My Mind captures.");
       }
     }
   } catch {
@@ -142,6 +170,29 @@ export function gatherMindMapDiscoveryContext(): DiscoveryContextSeed {
       );
       for (const entry of journal) {
         ideaLines.push(entry.body.slice(0, 280));
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+
+  try {
+    const previous = listContinueThinkingMaps().slice(0, 3);
+    if (previous.length > 0) {
+      sources.push("previous-maps");
+      knownFacts.push(
+        `You already have ${previous.length} map${previous.length === 1 ? "" : "s"} in progress (e.g. “${previous[0]!.title}”).`,
+      );
+      for (const map of previous) {
+        if (map.root?.label) ideaLines.push(map.root.label);
+        const branchLabels = (map.root?.children ?? [])
+          .slice(0, 4)
+          .map((c) => c.label)
+          .filter(Boolean);
+        ideaLines.push(...branchLabels);
+      }
+      if (!suggestedTopic && previous[0]?.title) {
+        suggestedTopic = previous[0].title;
       }
     }
   } catch {

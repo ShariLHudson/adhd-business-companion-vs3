@@ -30,6 +30,8 @@ export type CinematicBackgroundProps = {
   className?: string;
   mediaClassName?: string;
   showBottomFade?: boolean;
+  /** Values below 1 slow motion — useful for short looping aquarium clips. */
+  playbackRate?: number;
   children?: ReactNode;
 };
 
@@ -53,6 +55,7 @@ export function CinematicBackground({
   className = "",
   mediaClassName = "",
   showBottomFade = true,
+  playbackRate = 1,
   children,
 }: CinematicBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -74,6 +77,7 @@ export function CinematicBackground({
 
     let cancelled = false;
     video.loop = true;
+    video.playbackRate = playbackRate;
 
     const safePlay = async () => {
       if (cancelled) return;
@@ -121,7 +125,7 @@ export function CinematicBackground({
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("loadeddata", onLoadedData);
     };
-  }, [mode, playKey, videoSrc]);
+  }, [mode, playKey, playbackRate, videoSrc]);
 
   const rootClass = [
     "cinematic-background",

@@ -16,7 +16,7 @@ type OceanConservatoryAquariumLifeProps = {
 };
 
 /**
- * Living aquarium overlay — Ocean Conservatory™ only.
+ * Living aquarium overlay — Ocean Conservatory only.
  * Tank life animates inside the clip; room candles/lanterns flicker outside it.
  */
 export function OceanConservatoryAquariumLife({

@@ -70,7 +70,7 @@ export function SparkStudioPrototypePage() {
       style={{ backgroundImage: `url(${TEA_HOUSE_BACKGROUND})` }}
     >
       <p className="spark-studio-dev-link">
-        Spark Studio™ prototype ·{" "}
+        Spark Studio prototype ·{" "}
         <a href="/companion">Back to companion</a>
         {" · "}
         <a href="/prototype/universal-work">Universal Work 01</a>

@@ -16,10 +16,11 @@ import {
 } from "./directEstateVisit";
 import { getEstateRoomForRoute } from "./estateRoomRegistry";
 
-/** @deprecated use shouldShowDirectEstateVisitOverlay with React visit state */
-export const ESTATE_CHAT_NAVIGATION_OVERLAY_SECTIONS: readonly AppSection[] = [
-  "brain-dump",
-] as const;
+/**
+ * @deprecated Chat-navigation overlay list — Clear My Mind is a dedicated panel
+ * (`isDedicatedEstateRoomPanelSection`), not frosted chat.
+ */
+export const ESTATE_CHAT_NAVIGATION_OVERLAY_SECTIONS: readonly AppSection[] = [] as const;
 
 export function estateSectionUsesChatNavigationOverlay(
   section: AppSection,
@@ -41,18 +42,24 @@ export { shouldShowDirectEstateVisitOverlay };
 /**
  * Layer 1 ambience follows the place on screen — not a stale direct-visit ref.
  * Coffee House audio must stop when the overlay/section no longer matches.
+ * Welcome Home lobby is not immersive presence — pass welcomeHomePrimary so
+ * Room menu Sound on/off can drive welcome-room ambience.
  */
 export function resolveEstatePlaceAudioHostPlaceId(input: {
   directEstateVisit: DirectEstateVisit | null;
   showDirectEstateOverlay: boolean;
   estatePresenceRoomId: string | null;
   showGlobalEstatePresence: boolean;
+  welcomeHomePrimary?: boolean;
 }): string | null {
   if (input.showDirectEstateOverlay && input.directEstateVisit?.roomId) {
     return input.directEstateVisit.roomId;
   }
   if (input.showGlobalEstatePresence && input.estatePresenceRoomId) {
     return input.estatePresenceRoomId;
+  }
+  if (input.welcomeHomePrimary) {
+    return "welcome-home";
   }
   return null;
 }

@@ -1,4 +1,4 @@
-/** Executive Command Center™ — calm center of the Executive Operating System. */
+/** Executive Command Center — calm center of the Executive Operating System. */
 
 import type { MissionId } from "@/lib/founder/missions/types";
 

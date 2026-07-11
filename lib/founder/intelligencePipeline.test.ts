@@ -11,7 +11,7 @@ import {
   traceSamplePipeline,
 } from "./intelligence/services";
 
-describe("Founder Intelligence Pipeline™", () => {
+describe("Founder Intelligence Pipeline", () => {
   it("source registry includes ecosystem placeholders", () => {
     const sources = listIntelligenceSources();
     expect(sources.length).toBeGreaterThanOrEqual(20);

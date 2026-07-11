@@ -1,5 +1,5 @@
 /**
- * EstateRuntimeState™ — single source of truth for cross-system runtime flags.
+ * EstateRuntimeState — single source of truth for cross-system runtime flags.
  * Modules read/write through this store — no duplicated mic/place/soundscape state.
  */
 

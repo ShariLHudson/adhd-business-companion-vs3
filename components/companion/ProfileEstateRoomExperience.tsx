@@ -14,7 +14,7 @@ type Props = {
 };
 
 /**
- * @deprecated Phase D.1 — delegates to SparkEstateShell™
+ * @deprecated Phase D.1 — delegates to SparkEstateShell
  */
 export function ProfileEstateRoomExperience(props: Props) {
   const { roomId, ...rest } = props;

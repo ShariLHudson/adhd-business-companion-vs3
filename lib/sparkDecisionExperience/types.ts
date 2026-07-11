@@ -1,5 +1,5 @@
 /**
- * Decision Experience Framework™ — member-owned decision support.
+ * Decision Experience Framework — member-owned decision support.
  *
  * @see docs/DECISION_EXPERIENCE_FRAMEWORK.md
  */

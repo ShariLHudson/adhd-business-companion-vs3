@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — AI prompt and intelligence layer architecture (Phase 26).
+ * Spark Estate — AI prompt and intelligence layer architecture (Phase 26).
  * One companion personality with layered specialized intelligence behind the experience.
  *
  * @see docs/protocols/SPARK_ESTATE_AI_PROMPT_AND_INTELLIGENCE_LAYER_ARCHITECTURE_PHASE26.md
@@ -321,7 +321,7 @@ export function verifySparkEstateAiPromptAndIntelligenceLayerArchitecture(): {
     knowledge: "progress, clarity, next steps, momentum patterns",
     behavior: "Ask one useful question at a time and guide the next step",
     boundaries: "Do not become a separate personality or duplicate planning systems",
-    connections: "Momentum Builder™, Universal Creation Journey, Knowledge Cards",
+    connections: "Momentum Builder, Universal Creation Journey, Knowledge Cards",
   });
 
   const stack = buildSparkEstateIntelligenceLayerStack({
@@ -367,7 +367,7 @@ export function formatSparkEstateAiPromptAndIntelligenceLayerReport(
   compliance: ReturnType<typeof assessSparkEstateAiPromptAndIntelligenceLayerCompliance> = assessSparkEstateAiPromptAndIntelligenceLayerCompliance(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ AI intelligence layers: ${verification.intelligenceLayerReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate AI intelligence layers: ${verification.intelligenceLayerReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_AI_INTELLIGENCE_PRINCIPLE,
     SPARK_ESTATE_AI_INTELLIGENCE_VISION,
     "",

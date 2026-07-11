@@ -1,5 +1,5 @@
 /**
- * Momentum Path™ — architecture hooks (V2 visual; V1 types + stub recorder).
+ * Momentum Path — architecture hooks (V2 visual; V1 types + stub recorder).
  * Progress = journey stones through the Estate — not checklists or streaks.
  *
  * @see docs/MOMENTUM_BUILDER_V1_ORCHESTRATION.md
@@ -21,7 +21,7 @@ export type MomentumPathMilestone = IntelligenceReadyHooks & {
   milestoneKind: MomentumPathMilestoneKind;
   label: string;
   recordedAt: string;
-  /** Future: LIG edge to Today's Path™, project, or conversation. */
+  /** Future: LIG edge to Today's Path, project, or conversation. */
   todaysPathId?: string;
 };
 

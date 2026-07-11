@@ -1,4 +1,4 @@
-/** Executive Digital Twin™ — Founder Profile Intelligence (observation only, no labels). */
+/** Executive Digital Twin — Founder Profile Intelligence (observation only, no labels). */
 
 export type FounderObservationKind =
   | "working_hours"

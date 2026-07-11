@@ -1,5 +1,5 @@
 /**
- * Estate Chrome Policy™ (Phase E) — what app chrome may appear in Estate mode.
+ * Estate Chrome Policy (Phase E) — what app chrome may appear in Estate mode.
  *
  * Authority: Constitution Art. VIII · Phase D shell · `goToPlace` arrival flags.
  *

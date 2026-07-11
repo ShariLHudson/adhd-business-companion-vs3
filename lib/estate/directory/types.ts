@@ -1,5 +1,5 @@
 /**
- * Spark Estate Directory™ — unified location registry types.
+ * Spark Estate Directory — unified location registry types.
  *
  * One entry per Estate space: identity (canon) + shell + media + connections.
  *

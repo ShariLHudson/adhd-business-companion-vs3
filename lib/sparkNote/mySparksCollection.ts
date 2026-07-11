@@ -1,5 +1,5 @@
 import { SPARK_NOTE_CATALOG } from "./catalog";
-import { getFavoriteSparkIds } from "./persistence";
+import { getFavoriteSparkIds, readSparkNoteStore } from "./persistence";
 import type { SparkNoteDailyCard } from "./types";
 
 function catalogEntryToSavedCard(
@@ -22,9 +22,99 @@ function catalogEntryToSavedCard(
 
 export type MySparkSavedItem = NonNullable<
   ReturnType<typeof catalogEntryToSavedCard>
->;
+> & {
+  savedAtIso: string | null;
+};
 
-/** My Sparks shelf buckets (routing spec). */
+export type MySparkCollectionDateFilter = "all" | "this-month" | "this-year";
+export type MySparkCollectionSort = "newest" | "oldest";
+
+/** Saved Sparks for My Spark Collection — separate from the daily experience. */
+export function resolveMySparksCollection(): MySparkSavedItem[] {
+  const store = readSparkNoteStore();
+  return getFavoriteSparkIds()
+    .map((id) => {
+      const item = catalogEntryToSavedCard(id);
+      if (!item) return null;
+      return {
+        ...item,
+        savedAtIso: store.favoriteSavedAt[id] ?? null,
+      };
+    })
+    .filter((item): item is MySparkSavedItem => item != null);
+}
+
+export function filterMySparksCollection(input: {
+  items: MySparkSavedItem[];
+  query?: string;
+  category?: string | null;
+  dateFilter?: MySparkCollectionDateFilter;
+  sort?: MySparkCollectionSort;
+  now?: Date;
+}): MySparkSavedItem[] {
+  const {
+    items,
+    query = "",
+    category = null,
+    dateFilter = "all",
+    sort = "newest",
+    now = new Date(),
+  } = input;
+
+  const normalizedQuery = query.trim().toLowerCase();
+  let filtered = items;
+
+  if (normalizedQuery) {
+    filtered = filtered.filter((item) => {
+      const haystack = [item.title, item.teaser, item.categoryLabel]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+  }
+
+  if (category) {
+    filtered = filtered.filter((item) => item.categoryLabel === category);
+  }
+
+  if (dateFilter !== "all") {
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    filtered = filtered.filter((item) => {
+      if (!item.savedAtIso) return false;
+      const saved = new Date(item.savedAtIso);
+      if (dateFilter === "this-year") return saved.getFullYear() === year;
+      return saved.getFullYear() === year && saved.getMonth() === month;
+    });
+  }
+
+  return [...filtered].sort((a, b) => {
+    const aTime = a.savedAtIso ? Date.parse(a.savedAtIso) : 0;
+    const bTime = b.savedAtIso ? Date.parse(b.savedAtIso) : 0;
+    return sort === "newest" ? bTime - aTime : aTime - bTime;
+  });
+}
+
+export function mySparkCollectionCategories(
+  items: MySparkSavedItem[],
+): string[] {
+  return [...new Set(items.map((item) => item.categoryLabel))].sort();
+}
+
+export function formatMySparkSavedDate(iso: string | null): string {
+  if (!iso) return "Saved";
+  try {
+    return new Date(iso).toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return "Saved";
+  }
+}
+
+/** Legacy shelf buckets — retained for delight analytics and tests. */
 export type MySparksShelfBucket =
   | "favorites"
   | "ideas"
@@ -73,11 +163,4 @@ export function mySparksShelfBucket(
     default:
       return "favorites";
   }
-}
-
-/** Saved Sparks for My Sparks collection — simple, not a full library. */
-export function resolveMySparksCollection(): MySparkSavedItem[] {
-  return getFavoriteSparkIds()
-    .map((id) => catalogEntryToSavedCard(id))
-    .filter((item): item is MySparkSavedItem => item != null);
 }

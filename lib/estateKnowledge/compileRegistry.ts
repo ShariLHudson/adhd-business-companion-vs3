@@ -80,7 +80,7 @@ function buildGroups(place: CanonicalEstatePlace): string[] {
 
 function buildSynonyms(place: CanonicalEstatePlace): string[] {
   const set = new Set<string>();
-  set.add(place.officialName.replace(/™/g, "").trim());
+  set.add(place.officialName.replace(/\u2122/g, "").trim());
   for (const alias of place.aliases) {
     set.add(alias);
   }

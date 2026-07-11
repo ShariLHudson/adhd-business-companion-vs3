@@ -1,5 +1,5 @@
 /**
- * Spark Companion Memory & Context™ (Spec 112).
+ * Spark Companion Memory & Context (Spec 112).
  * What Spark remembers, forgets, and how context builds trust without intrusion.
  *
  * OS implementation: spark-intelligence-foundation/08-memory-engine.md
@@ -38,10 +38,10 @@ export const SPARK_COMPANION_MEMORY_TYPES: readonly {
   title: string;
   duration: string;
 }[] = [
-  { id: "business", title: "Business Memory™", duration: "long-term" },
-  { id: "project", title: "Project Memory™", duration: "until completed/archived/deleted" },
-  { id: "relationship", title: "Relationship Memory™", duration: "communication preferences" },
-  { id: "session", title: "Session Memory™", duration: "expires at session end unless saved" },
+  { id: "business", title: "Business Memory", duration: "long-term" },
+  { id: "project", title: "Project Memory", duration: "until completed/archived/deleted" },
+  { id: "relationship", title: "Relationship Memory", duration: "communication preferences" },
+  { id: "session", title: "Session Memory", duration: "expires at session end unless saved" },
 ] as const;
 
 /** Permission phrases */
@@ -88,7 +88,7 @@ export const SPARK_COMPANION_MEMORY_SHOULD_NOT_REMEMBER = [
   "anything that would surprise the member later",
 ] as const;
 
-/** Memory Center™ sections */
+/** Memory Center sections */
 export type SparkCompanionMemoryCenterSection =
   | "business"
   | "projects"

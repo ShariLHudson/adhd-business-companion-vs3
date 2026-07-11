@@ -2,7 +2,7 @@ import type { PeacefulPlace } from "./types";
 
 export const COZY_CAFE_IMAGE_VERSION = "20260628a" as const;
 
-/** Canonical Cozy Café™ session + Focus menu thumbnail. */
+/** Canonical Cozy Café session + Focus menu thumbnail. */
 export const COZY_CAFE_IMAGE =
   `/backgrounds/peaceful-places/cozy-cafeimage.png?v=${COZY_CAFE_IMAGE_VERSION}` as const;
 

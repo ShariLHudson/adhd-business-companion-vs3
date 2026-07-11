@@ -73,7 +73,7 @@ export function supportsWorkspace(section: AppSection): boolean {
 }
 
 export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
-  projects: "Chamber of Momentum™",
+  projects: "Chamber of Momentum",
   "my-work": "Other",
   "content-generator": "Create",
   "google-workspace": "Google Workspace",
@@ -81,9 +81,9 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "saved-work": "Created Content",
   playbook: "Strategies",
   "how-do-i": "How Do I",
-  "momentum-institute": "Chamber of Momentum™",
-  "chamber-of-momentum": "Chamber of Momentum™",
-  "chamber-project-entry": "Chamber of Momentum™",
+  "momentum-institute": "Chamber of Momentum",
+  "chamber-of-momentum": "Chamber of Momentum",
+  "chamber-project-entry": "Chamber of Momentum",
   "brain-dump": "Clear My Mind",
   "time-block": "Momentum Appointments",
   "email-generator": "Email",
@@ -99,12 +99,12 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   growth: "Your Story",
   "growth-capture": "Capture a Moment",
   "growth-library": "Achievement Library",
-  "growth-reports": "Celebration Hall",
+  "growth-reports": "Celebration Room",
   "confidence-vault": "Highlights",
-  "my-journey": "My Journey",
+  "my-journey": "Wins Timeline",
   "growth-journal": "Journal Gazebo",
   "growth-greenhouse": "Growth Greenhouse",
-  "growth-portfolio": "Achievement Library",
+  "growth-portfolio": "Hall of Accomplishments",
   "user-memory": "Memory",
   "welcome-room": "Welcome Room",
   "life-experience": "Life Experience Room",
@@ -131,9 +131,9 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   games: "Quick Recharge",
   "quick-recharge": "Quick Recharge",
   grow: "Grow",
-  "momentum-builder": "Chamber of Momentum™",
-  "grow-momentum-builders": "Chamber of Momentum™",
-  "goals-projects": "Chamber of Momentum™",
+  "momentum-builder": "Chamber of Momentum",
+  "grow-momentum-builders": "Chamber of Momentum",
+  "goals-projects": "Chamber of Momentum",
   "grow-spark-cards": "Spark Cards",
   "grow-guilds": "Guilds",
   "grow-daily-discoveries": "Daily Discoveries",
@@ -175,7 +175,7 @@ export type WorkspaceOffer = {
   buttonLabel: string;
   line: string;
   visualFocusMode?: import("./visualFocus/types").VisualFocusMode;
-  /** Momentum Institute™ — Estate Intelligence opens a specific drawer */
+  /** Momentum Institute — Estate Intelligence opens a specific drawer */
   instituteDrawerId?: string;
   /** Global Estate menu overlay — profile, settings, etc. */
   estateMenuActionId?: import("@/lib/estateMenu/menuConfig").EstateMenuActionId;

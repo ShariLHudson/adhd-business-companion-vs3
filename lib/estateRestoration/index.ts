@@ -1,5 +1,5 @@
 /**
- * Intentional Restoration™ — Estate Guide integration.
+ * Intentional Restoration — Estate Guide integration.
  * @see docs/estate/ESTATE_RESTORATION_GUIDE.md
  */
 

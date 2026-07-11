@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — demo member scenario and copy (Phase 8).
+ * Chamber of Momentum — demo member scenario and copy (Phase 8).
  */
 
 export const CHAMBER_DEMO_MEMBER = {

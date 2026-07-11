@@ -27,7 +27,7 @@ type Props = {
 };
 
 /**
- * Arrival Before Activity™ — one frosted chat surface; invitation then conversation.
+ * Arrival Before Activity — one frosted chat surface; invitation then conversation.
  * Member chooses when ready — never auto-skip invitation on input focus.
  */
 export function EstateRoomVisitChrome({

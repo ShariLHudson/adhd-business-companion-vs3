@@ -109,7 +109,7 @@ export const SAMPLE_MEMORY_VAULT: FounderMemoryVaultOverview = {
         "Demo-heavy workshop",
         "Price-led offer",
       ],
-      finalDecision: "Lead workshops with transformation arc and Spark Feeling™.",
+      finalDecision: "Lead workshops with transformation arc and Spark Feeling.",
       expectedOutcome: "Higher trust and clearer next steps for attendees.",
       status: "revisited",
       related: {

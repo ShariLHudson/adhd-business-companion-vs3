@@ -5,7 +5,7 @@ import {
   evaluateCompanionDecision,
 } from "./index";
 
-describe("Companion Decision Intelligence™", () => {
+describe("Companion Decision Intelligence", () => {
   it("research → one step, no feature dump", () => {
     const guidance = evaluateCompanionDecision({
       userText: "Research pricing for my music library",

@@ -69,6 +69,10 @@ const PHRASE_MATRIX: {
     text: "take me to the Apple Orchard",
     expect: { type: "navigate", placeId: "apple-orchard" },
   },
+  {
+    text: "take me to the Stables",
+    expect: { type: "navigate", placeId: "stables" },
+  },
 ];
 
 describe("estate place navigation phrase matrix", () => {

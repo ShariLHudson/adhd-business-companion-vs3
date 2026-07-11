@@ -26,7 +26,7 @@ type Props = {
 const DEFAULT_CALM_CATEGORY = "calming";
 
 /**
- * Estate Audio Settings™ — ambience, soundscape overlay, master volume, silence.
+ * Estate Audio Settings — ambience, soundscape overlay, master volume, silence.
  * Soundscape toggles affect Layer 2 only — never change place.
  */
 export function EstateAudioSettings({ placeId, className }: Props) {

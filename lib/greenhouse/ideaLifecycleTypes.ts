@@ -1,13 +1,13 @@
 /**
- * Greenhouse™ idea lifecycle — intelligence-ready growth stages.
+ * Greenhouse idea lifecycle — intelligence-ready growth stages.
  *
  * Memorable journey: Seed → Sprout → Growing → Flourishing → Harvested
- * → Portfolio™ or Evidence Vault™
+ * → Portfolio or Evidence Vault
  *
  * @see docs/ESTATE_ROOM_TEMPLATE.md#greenhouse-idea-lifecycle
  */
 
-/** Visual + emotional stage inside the Greenhouse and Seeds Planted™ */
+/** Visual + emotional stage inside the Greenhouse and Seeds Planted */
 export type IdeaLifecycleStage =
   | "seed"
   | "sprout"

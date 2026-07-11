@@ -1,4 +1,4 @@
-/* Global Estate Menu™ — account menu, upper-right on every page */
+/* Global Estate Menu — account menu, upper-right on every page */
 
 .global-estate-menu-anchor {
   pointer-events: auto;
@@ -160,6 +160,27 @@
   padding: 0.2rem 0 0.35rem;
 }
 
+.global-estate-menu__group {
+  padding: 0.15rem 0 0.25rem;
+}
+
+.global-estate-menu__group-label {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.45rem 1rem 0.2rem;
+  color: #6b5d4f;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.global-estate-menu__group-children {
+  display: flex;
+  flex-direction: column;
+}
+
 .global-estate-menu__item {
   display: flex;
   width: 100%;
@@ -174,6 +195,11 @@
   font-size: 0.96rem;
   line-height: 1.35;
   transition: background 0.15s ease;
+}
+
+.global-estate-menu__item--nested {
+  padding-left: 2.35rem;
+  font-size: 0.92rem;
 }
 
 .global-estate-menu__item:hover,
@@ -203,6 +229,32 @@
 .global-estate-menu__item--logout:hover,
 .global-estate-menu__item--logout:focus-visible {
   background: rgba(255, 244, 240, 0.9);
+}
+
+/* Mobile / narrow viewports — keep menu usable with thumb targets */
+@media (max-width: 900px) {
+  .global-estate-menu__trigger {
+    min-height: 2.75rem;
+    min-width: 2.75rem;
+  }
+
+  .global-estate-menu__panel,
+  .global-estate-menu__panel.global-estate-menu__panel--floating[data-companion-menu-panel="true"] {
+    width: min(17.5rem, calc(100vw - 1.25rem)) !important;
+    max-width: calc(100vw - 1.25rem) !important;
+    max-height: min(70dvh, calc(100dvh - 5rem)) !important;
+  }
+
+  .global-estate-menu__item,
+  .global-estate-menu__item--nested {
+    min-height: 2.75rem;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .global-estate-menu__group-label {
+    padding-top: 0.55rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

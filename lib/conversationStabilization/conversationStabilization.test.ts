@@ -17,7 +17,7 @@ const stubRouting = {
   learnFastPath: false,
 } as IntentRoutingDecision;
 
-describe("Conversation Stabilization™", () => {
+describe("Conversation Stabilization", () => {
   describe("goal classifier", () => {
     it("A — new project → create", () => {
       expect(classifyConversationGoal("I need to start a new project")).toBe(

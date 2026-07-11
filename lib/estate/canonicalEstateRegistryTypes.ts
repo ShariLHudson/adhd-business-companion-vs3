@@ -1,5 +1,5 @@
 /**
- * Canonical Estate Registry™ — types aligned to
+ * Canonical Estate Registry — types aligned to
  * docs/estate/SPARK_ESTATE_CANONICAL_REGISTRY.md (Phase A authority).
  */
 

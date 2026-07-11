@@ -125,6 +125,11 @@ export function EstateCollectionCaptureForm({
     return 0;
   });
 
+  const visibleFields =
+    capture.discoveryPreserveMode && !editingId
+      ? sortedFields.filter((field) => field.primary)
+      : sortedFields;
+
   return (
     <section
       className="estate-collection-panel__capture"
@@ -138,7 +143,7 @@ export function EstateCollectionCaptureForm({
         </h2>
       ) : null}
 
-      {sortedFields.map((field) => {
+      {visibleFields.map((field) => {
         const fieldId = `collection-compose-${roomId}-${field.id}`;
         const useTextareaWrap =
           (field.kind ?? "textarea") === "textarea" && field.primary;
@@ -195,9 +200,13 @@ export function EstateCollectionCaptureForm({
           </button>
         ) : null}
         {statusMessage ? (
-          <p className="estate-collection-panel__status" role="status">
-            {statusMessage}
-          </p>
+          <div className="estate-collection-panel__status-block" role="status">
+            {statusMessage.split("\n\n").map((paragraph) => (
+              <p key={paragraph.slice(0, 24)} className="estate-collection-panel__status">
+                {paragraph}
+              </p>
+            ))}
+          </div>
         ) : null}
       </div>
     </section>

@@ -24,12 +24,25 @@ import {
 } from "../mindMapHistory";
 
 describe("Mind Map Discovery Interview", () => {
-  it("asks the three Mind Map questions from 199", () => {
+  it("asks Mind Map Discovery questions from 242", () => {
     expect(MIND_MAP_DISCOVERY_QUESTIONS.map((q) => q.id)).toEqual([
       "main-topic",
       "everything",
-      "anything-else",
+      "desired-outcome",
     ]);
+  });
+
+  it("opens with the mind-map-about question (map already selected)", () => {
+    expect(MIND_MAP_DISCOVERY_QUESTIONS[0]?.prompt).toBe(
+      "What would you like to create a mind map about?",
+    );
+  });
+
+  it("uses 242 example prompts for ideas and end goal", () => {
+    expect(MIND_MAP_DISCOVERY_QUESTIONS[1]?.prompt).toBe(
+      "What ideas immediately come to mind?",
+    );
+    expect(MIND_MAP_DISCOVERY_QUESTIONS[2]?.prompt).toBe("Is there an end goal?");
   });
 
   it("parses pasted lists into idea lines", () => {

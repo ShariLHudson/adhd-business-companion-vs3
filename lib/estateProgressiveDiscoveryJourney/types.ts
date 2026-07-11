@@ -1,5 +1,5 @@
 /**
- * Progressive Discovery Journey™ — shared types.
+ * Progressive Discovery Journey — shared types.
  * Progress is tracked quietly — never surfaced as scores or checklists.
  */
 

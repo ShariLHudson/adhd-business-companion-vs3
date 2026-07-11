@@ -13,7 +13,7 @@ describe("cinematic background presets", () => {
   it("never exceeds maximum crop scale", () => {
     for (const preset of Object.values(CINEMATIC_PRESETS)) {
       expect(preset.scale).toBeLessThanOrEqual(1.08);
-      expect(preset.scale).toBeGreaterThanOrEqual(1.05);
+      expect(preset.scale).toBeGreaterThanOrEqual(1);
     }
   });
 

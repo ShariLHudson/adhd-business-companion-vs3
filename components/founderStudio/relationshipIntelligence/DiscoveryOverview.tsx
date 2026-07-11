@@ -23,7 +23,7 @@ export function DiscoveryOverview({ session, onSelectDiscovery, onClose }: Disco
       {session.founderAlerts.length > 0 ? (
         <section className="founder-relationship-intel__alerts" aria-labelledby="founder-alerts">
           <h3 className="founder-relationship-intel__section-title" id="founder-alerts">
-            Founder Alert™
+            Founder Alert
           </h3>
           <ul className="founder-relationship-intel__alert-list">
             {session.founderAlerts.map((alert) => (

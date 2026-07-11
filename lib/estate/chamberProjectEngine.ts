@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — project engine (Phase 4).
+ * Chamber of Momentum — project engine (Phase 4).
  * Connects existing project storage to a focused, ADHD-friendly doorway.
  *
  * @see docs/protocols/CHAMBER_OF_MOMENTUM_PROJECT_ENGINE_SPECIFICATION_PHASE4.md

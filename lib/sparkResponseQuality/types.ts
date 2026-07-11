@@ -1,11 +1,11 @@
 /**
- * Response Quality Framework™ (Spec 101).
+ * Response Quality Framework (Spec 101).
  * What members should experience receiving responses — Spark OS defines production.
  *
  * @see docs/RESPONSE_QUALITY_FRAMEWORK.md
  */
 
-/** Twelve Response Standards™ — evaluate every delivery */
+/** Twelve Response Standards — evaluate every delivery */
 export type SparkResponseStandard =
   | "accuracy"
   | "business_relevance"
@@ -114,7 +114,7 @@ export const SPARK_RESPONSE_STANDARD_QUESTIONS: Record<
   ],
 };
 
-/** Response Promise™ — how delivery should feel */
+/** Response Promise — how delivery should feel */
 export type SparkResponsePromiseQuality =
   | "fast"
   | "accurate"

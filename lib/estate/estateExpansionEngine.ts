@@ -1,5 +1,5 @@
 /**
- * Estate Expansion Engine™ (Phase H.2) — classify new concepts before canon adoption.
+ * Estate Expansion Engine (Phase H.2) — classify new concepts before canon adoption.
  *
  * Governance only. Does not add rooms, routes, or registry entries.
  * Every new Estate idea must pass through this engine first.
@@ -112,8 +112,8 @@ const MERGE_RULES: readonly {
     classification: "Reject / Not Needed",
     mergeIntoPlaceIds: ["celebration-room", "accomplishments-shelf"],
     mergeRecommendation:
-      "Merge into Celebration Room™ (ritual / marking moments) and Accomplishments Book™ (honored chapters). Wins are not a separate Estate category (P0 §4).",
-    suggestedCanonicalName: "Celebration Room™",
+      "Merge into Celebration Room (ritual / marking moments) and Accomplishments Book (honored chapters). Wins are not a separate Estate category (P0 §4).",
+    suggestedCanonicalName: "Celebration Room",
     aliases: ["wins", "my wins", "celebration room"],
     reasoning:
       "Duplicate celebration system — canon already routes wins to Celebration Room + Accomplishments Book.",
@@ -124,8 +124,8 @@ const MERGE_RULES: readonly {
     classification: "Reject / Not Needed",
     mergeIntoPlaceIds: ["creative-studio", "portfolio"],
     mergeRecommendation:
-      "No separate Gallery room. Active making → Creative Studio™; finished work archive → Portfolio™.",
-    suggestedCanonicalName: "Creative Studio™",
+      "No separate Gallery room. Active making → Creative Studio; finished work archive → Portfolio.",
+    suggestedCanonicalName: "Creative Studio",
     aliases: ["gallery", "creative studio", "portfolio"],
     reasoning:
       "Gallery duplicates creative purpose — split between studio (making) and portfolio (archive).",
@@ -137,10 +137,10 @@ const MERGE_RULES: readonly {
     classification: "Collection",
     mergeIntoPlaceIds: ["portfolio"],
     mergeRecommendation:
-      "Merge into Portfolio™ collection unless a distinct ritual is documented in canon first.",
-    suggestedCanonicalName: "Portfolio™",
+      "Merge into Portfolio collection unless a distinct ritual is documented in canon first.",
+    suggestedCanonicalName: "Portfolio",
     aliases: ["portfolio", "my portfolio"],
-    reasoning: "Portfolio Room duplicates the existing Portfolio™ collection.",
+    reasoning: "Portfolio Room duplicates the existing Portfolio collection.",
     requiresHumanApproval: true,
   },
   {
@@ -149,8 +149,8 @@ const MERGE_RULES: readonly {
     classification: "Object",
     mergeIntoPlaceIds: [],
     mergeRecommendation:
-      "Guidebook™ is a portable Estate object — not a walkable room (P0 §5). Surface in any room via object layer.",
-    suggestedCanonicalName: "Guidebook™",
+      "Guidebook is a portable Estate object — not a walkable room (P0 §5). Surface in any room via object layer.",
+    suggestedCanonicalName: "Guidebook",
     aliases: ["guidebook", "the guidebook", "estate guidebook"],
     reasoning: "Guidebook is an object, not a destination.",
     requiresHumanApproval: false,
@@ -161,8 +161,8 @@ const MERGE_RULES: readonly {
     classification: "Reject / Not Needed",
     mergeIntoPlaceIds: ["celebration-room", "gardens"],
     mergeRecommendation:
-      "Ritual celebration → Celebration Room™; outdoor walk → Gardens™. Do not add a third celebration space.",
-    suggestedCanonicalName: "Celebration Room™",
+      "Ritual celebration → Celebration Room; outdoor walk → Gardens. Do not add a third celebration space.",
+    suggestedCanonicalName: "Celebration Room",
     aliases: ["celebration room", "celebration garden", "gardens"],
     reasoning: "Celebration variations already split across room + living garden.",
     requiresHumanApproval: false,
@@ -173,8 +173,8 @@ const MERGE_RULES: readonly {
     classification: "Reject / Not Needed",
     mergeIntoPlaceIds: ["clear-my-mind", "journal"],
     mergeRecommendation:
-      "Capture → Clear My Mind™; reflective writing → Journal™. My Thoughts is not canon (P0 §6).",
-    suggestedCanonicalName: "Clear My Mind™",
+      "Capture → Clear My Mind; reflective writing → Journal. My Thoughts is not canon (P0 §6).",
+    suggestedCanonicalName: "Clear My Mind",
     aliases: ["clear my mind", "journal"],
     reasoning: "My Thoughts as a room duplicates capture + journal homes.",
     requiresHumanApproval: false,
@@ -197,8 +197,8 @@ const MERGE_RULES: readonly {
     classification: "Destination",
     mergeIntoPlaceIds: ["momentum-institute"],
     mergeRecommendation:
-      "Merge into Momentum Institute™ — the canonical learning destination.",
-    suggestedCanonicalName: "Momentum Institute™",
+      "Merge into Momentum Institute — the canonical learning destination.",
+    suggestedCanonicalName: "Momentum Institute",
     aliases: ["momentum institute", "institute", "library"],
     reasoning: "Duplicate learning system — institute already owns transformation learning.",
     requiresHumanApproval: true,
@@ -209,8 +209,8 @@ const MERGE_RULES: readonly {
     classification: "Collection",
     mergeIntoPlaceIds: ["evidence-vault", "accomplishments-shelf"],
     mergeRecommendation:
-      "Proof / impact → Evidence Vault™; honored chapters → Accomplishments Book™.",
-    suggestedCanonicalName: "Evidence Vault™",
+      "Proof / impact → Evidence Vault; honored chapters → Accomplishments Book.",
+    suggestedCanonicalName: "Evidence Vault",
     aliases: ["evidence vault", "accomplishments book"],
     reasoning: "Multiple memory systems forbidden — route to existing collections.",
     requiresHumanApproval: true,

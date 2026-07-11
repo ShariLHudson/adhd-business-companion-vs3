@@ -15,7 +15,8 @@ type Props = {
 };
 
 /**
- * Sunroom journal surface — warm paper over glass, not application chrome.
+ * Clear My Mind journal surface — warm paper over glass, not application chrome.
+ * Page photograph: Sunroom by default (member may change via Room → Change background).
  */
 export function ClearMyMindConservatoryWorkspace({
   onBackToChat,

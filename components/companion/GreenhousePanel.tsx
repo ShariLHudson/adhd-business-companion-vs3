@@ -7,7 +7,7 @@ type Props = {
   backLabel?: string | null;
 };
 
-/** Growth Greenhouse — Spark Estate Collection Framework™ */
+/** Growth Greenhouse — Spark Estate Collection Framework */
 export function GreenhousePanel({ onBack, backLabel }: Props) {
   return (
     <EstateCollectionRoomPanel

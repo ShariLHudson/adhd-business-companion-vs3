@@ -8,7 +8,7 @@ import {
 
 const stubRouting = { category: "chat", learnFastPath: false };
 
-describe("Semantic Intent Resolver™", () => {
+describe("Semantic Intent Resolver", () => {
   const treehousePhrases = [
     "I'd like to see the treehouse.",
     "Can we visit the house in the trees?",

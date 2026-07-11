@@ -62,7 +62,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "coffee-house",
     confidence: 0.84,
     matchKey: "coffee-need",
-    reason: "implied:coffee → Coffee House™",
+    reason: "implied:coffee → Coffee House",
     warmLine: IMPLIED_WARM_LINES["coffee-house"],
   },
   {
@@ -70,7 +70,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "tea-room",
     confidence: 0.82,
     matchKey: "tea-need",
-    reason: "implied:tea → Tea Room™",
+    reason: "implied:tea → Tea Room",
     warmLine: IMPLIED_WARM_LINES["tea-room"],
   },
   {
@@ -79,7 +79,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "clear-my-mind",
     confidence: 0.86,
     matchKey: "clear-head",
-    reason: "implied:mental clutter → Clear My Mind™",
+    reason: "implied:mental clutter → Clear My Mind",
     warmLine: IMPLIED_WARM_LINES["clear-my-mind"],
   },
   {
@@ -87,7 +87,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "clear-my-mind",
     confidence: 0.8,
     matchKey: "overwhelmed",
-    reason: "implied:overwhelmed → Clear My Mind™",
+    reason: "implied:overwhelmed → Clear My Mind",
     warmLine: IMPLIED_WARM_LINES["clear-my-mind"],
   },
   {
@@ -96,7 +96,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "journal",
     confidence: 0.8,
     matchKey: "journal-write",
-    reason: "implied:journal → Journal Gazebo™",
+    reason: "implied:journal → Journal Gazebo",
     warmLine: IMPLIED_WARM_LINES.journal,
   },
   {
@@ -105,7 +105,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "strategy-studio",
     confidence: 0.82,
     matchKey: "plan-strategy",
-    reason: "implied:plan → Strategy Studio™",
+    reason: "implied:plan → Strategy Studio",
     warmLine: IMPLIED_WARM_LINES["strategy-studio"],
   },
   {
@@ -113,7 +113,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "strategy-studio",
     confidence: 0.78,
     matchKey: "strategy",
-    reason: "implied:strategy → Strategy Studio™",
+    reason: "implied:strategy → Strategy Studio",
     warmLine: IMPLIED_WARM_LINES["strategy-studio"],
   },
   {
@@ -122,7 +122,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "round-table",
     confidence: 0.81,
     matchKey: "decision-leadership",
-    reason: "implied:decision → Round Table™",
+    reason: "implied:decision → Round Table",
     warmLine: IMPLIED_WARM_LINES["round-table"],
   },
   {
@@ -131,7 +131,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "gardens",
     confidence: 0.79,
     matchKey: "celebrate-win",
-    reason: "implied:celebrate → Celebration Garden™",
+    reason: "implied:celebrate → Celebration Garden",
     warmLine: IMPLIED_WARM_LINES.gardens,
   },
   {
@@ -140,7 +140,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "lakeside-hammock",
     confidence: 0.77,
     matchKey: "rest-relax",
-    reason: "implied:rest → Lakeside Hammock™",
+    reason: "implied:rest → Lakeside Hammock",
     warmLine: IMPLIED_WARM_LINES["lakeside-hammock"],
   },
   {
@@ -148,7 +148,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "summer-terrace",
     confidence: 0.78,
     matchKey: "swim-need",
-    reason: "implied:swim → Summer Terrace™",
+    reason: "implied:swim → Summer Terrace",
     warmLine: IMPLIED_WARM_LINES["summer-terrace"],
   },
   {
@@ -156,7 +156,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "music-room",
     confidence: 0.76,
     matchKey: "music-song",
-    reason: "implied:music → Music Room™",
+    reason: "implied:music → Music Room",
     warmLine: IMPLIED_WARM_LINES["music-room"],
   },
   {
@@ -165,7 +165,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "estate-gardens",
     confidence: 0.79,
     matchKey: "fresh-air",
-    reason: "implied:outside → Estate Gardens™",
+    reason: "implied:outside → Estate Gardens",
     warmLine: IMPLIED_WARM_LINES["estate-gardens"],
   },
   {
@@ -174,7 +174,7 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "evidence-vault",
     confidence: 0.8,
     matchKey: "proof-evidence",
-    reason: "implied:proof → Evidence Vault™",
+    reason: "implied:proof → Evidence Vault",
     warmLine: IMPLIED_WARM_LINES["evidence-vault"],
   },
   {
@@ -191,14 +191,14 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
     placeId: "strategy-studio",
     confidence: 0.68,
     matchKey: "think-need",
-    reason: "implied:think → Strategy Studio™ (medium confidence)",
+    reason: "implied:think → Strategy Studio (medium confidence)",
   },
   {
     pattern: /\b(?:need to focus|want to focus|need focus|can't focus)\b/i,
     placeId: "study-hall",
     confidence: 0.66,
     matchKey: "focus-need",
-    reason: "implied:focus → Study Hall™ (medium confidence)",
+    reason: "implied:focus → Study Hall (medium confidence)",
   },
 ];
 

@@ -1,5 +1,5 @@
 /**
- * Estate Orchestration Dev™ — Phase 2B shadow observe (development only).
+ * Estate Orchestration Dev — Phase 2B shadow observe (development only).
  *
  * Wired from handleSend. No member-visible behavior change.
  *

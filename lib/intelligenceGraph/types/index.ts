@@ -1,4 +1,4 @@
-/** Companion Intelligence Graph™ — ecosystem-wide connected institutional memory. */
+/** Companion Intelligence Graph — ecosystem-wide connected institutional memory. */
 
 export type GraphNodeKind =
   | "mission"

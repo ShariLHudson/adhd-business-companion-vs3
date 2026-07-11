@@ -1,5 +1,5 @@
 /**
- * Estate Experiences™ — intent layer above spaces and tools.
+ * Estate Experiences — intent layer above spaces and tools.
  *
  * Estate Space = visual environment (canonical place id)
  * Experience = what the member is trying to accomplish

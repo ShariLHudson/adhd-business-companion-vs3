@@ -53,4 +53,28 @@ describe("resolveEstatePlaceAudioHostPlaceId", () => {
       }),
     ).toBe("peaceful-places");
   });
+
+  it("plays welcome-home ambience while Welcome Home lobby is primary", () => {
+    expect(
+      resolveEstatePlaceAudioHostPlaceId({
+        directEstateVisit: null,
+        showDirectEstateOverlay: false,
+        estatePresenceRoomId: null,
+        showGlobalEstatePresence: false,
+        welcomeHomePrimary: true,
+      }),
+    ).toBe("welcome-home");
+  });
+
+  it("does not force welcome-home when another place is already on screen", () => {
+    expect(
+      resolveEstatePlaceAudioHostPlaceId({
+        directEstateVisit: coffeeVisit,
+        showDirectEstateOverlay: true,
+        estatePresenceRoomId: "coffee-house",
+        showGlobalEstatePresence: true,
+        welcomeHomePrimary: true,
+      }),
+    ).toBe("coffee-house");
+  });
 });

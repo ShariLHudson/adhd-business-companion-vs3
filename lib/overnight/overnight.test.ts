@@ -23,7 +23,7 @@ import {
   topRecommendations,
 } from "./index";
 
-describe("Overnight Executive Cycle™", () => {
+describe("Overnight Executive Cycle", () => {
   it("defines seven overnight phases in order", () => {
     expect(OVERNIGHT_PHASE_TIMELINE).toHaveLength(7);
     expect(listOvernightPhases().map((p) => p.id)).toEqual([

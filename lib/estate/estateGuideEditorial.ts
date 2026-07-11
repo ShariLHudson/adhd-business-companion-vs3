@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — premium coffee-table room pages.
+ * Spark Estate Guidebook — premium coffee-table room pages.
  *
  * Layout: top-half photograph → title under image → caretaker sections across two pages.
  */
@@ -331,7 +331,7 @@ export type EstateGuideSpreadData = {
   epigraph?: string;
   blocks: EstateGuideEditorialBlock[];
   /**
-   * Short corner line on every page of this spread — Whisper from the Estate™.
+   * Short corner line on every page of this spread — Whisper from the Estate.
    * One thoughtful line; optional on legacy spreads until migrated.
    */
   whisperFromEstate?: string;

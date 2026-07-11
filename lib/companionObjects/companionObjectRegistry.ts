@@ -159,8 +159,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "evidence-bank",
-    label: "Evidence Bank",
-    feature: "Evidence Bank",
+    label: "Evidence Vault",
+    feature: "Evidence Vault",
     replacesEmoji: "📊",
     room: "business-office",
     objectName: "Keepsake box",

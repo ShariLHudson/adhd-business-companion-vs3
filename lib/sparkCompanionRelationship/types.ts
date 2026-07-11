@@ -1,10 +1,10 @@
 /**
- * Companion Relationship Framework™ — relationship stages and approval gate.
+ * Companion Relationship Framework — relationship stages and approval gate.
  *
  * @see docs/COMPANION_RELATIONSHIP_FRAMEWORK.md
  */
 
-/** Relationship Stages™ — experience progression */
+/** Relationship Stages — experience progression */
 export type SparkRelationshipStage =
   | 1 // introduction
   | 2 // understanding

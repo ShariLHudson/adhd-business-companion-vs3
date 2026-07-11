@@ -19,7 +19,7 @@ import {
   stripExecutiveJargon,
 } from "./index";
 
-describe("Executive Brief Experience™", () => {
+describe("Executive Brief Experience", () => {
   it("sample brief greets Shari in plain English", () => {
     expect(SAMPLE_EXECUTIVE_BRIEF.greeting).toContain("Shari");
     expect(SAMPLE_EXECUTIVE_BRIEF.summary.stats.itemsReviewed).toBe(124);

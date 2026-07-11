@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — shared types.
+ * Estate Knowledge Base — shared types.
  * Permanent source of truth for rooms, features, tools, routes, and mappings.
  */
 

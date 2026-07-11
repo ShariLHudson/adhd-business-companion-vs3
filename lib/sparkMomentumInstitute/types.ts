@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — Entrepreneur Development Center of the Spark Estate™
+ * Momentum Institute — Entrepreneur Development Center of the Spark Estate
  * Framework types (T-spec). Data-driven catalog definitions — not lesson content.
  *
  * One master Knowledge Card per concept. Every experience references it.
@@ -74,7 +74,7 @@ export type InstituteTopicDefinition = {
   /** Which experience types this topic supports — engine resolves availability */
   supportedExperienceTypes: LearningExperienceTypeId[];
   competencyIds: string[];
-  /** Spark Knowledge Perspectives™ — discipline ids informing this topic */
+  /** Spark Knowledge Perspectives — discipline ids informing this topic */
   perspectiveIds: string[];
   sortOrder: number;
 };
@@ -156,7 +156,7 @@ export type SuggestedLearningPathDefinition = {
 // ── Master knowledge object ─────────────────────────────────────────────────
 
 /**
- * Knowledge Card™ — the single canonical knowledge object.
+ * Knowledge Card — the single canonical knowledge object.
  * All experiences, cabinet items, journal links, and evidence reference this id.
  */
 export type KnowledgeCardDefinition = IntelligenceReadyHooks & {
@@ -212,19 +212,19 @@ export const LEARNING_EXPERIENCE_TYPE_LABELS: Record<
   LearningExperienceTypeId,
   string
 > = {
-  business_mastery_minute: "Business Mastery Minute™",
-  guided_lesson: "Guided Lesson™",
-  deep_lesson: "Deep Lesson™",
-  deep_workshop: "Deep Workshop™",
-  strategy_collection: "Strategy Collection™",
-  thinking_gym: "Thinking Gym™",
-  business_lab: "Business Lab™",
-  simulation: "Simulation™",
-  apprenticeship: "Apprenticeship™",
-  reflection: "Reflection™",
-  challenge: "Challenge™",
-  coaching_session: "Coaching Session™",
-  apply_to_my_business: "Apply To My Business™",
+  business_mastery_minute: "Business Mastery Minute",
+  guided_lesson: "Guided Lesson",
+  deep_lesson: "Deep Lesson",
+  deep_workshop: "Deep Workshop",
+  strategy_collection: "Strategy Collection",
+  thinking_gym: "Thinking Gym",
+  business_lab: "Business Lab",
+  simulation: "Simulation",
+  apprenticeship: "Apprenticeship",
+  reflection: "Reflection",
+  challenge: "Challenge",
+  coaching_session: "Coaching Session",
+  apply_to_my_business: "Apply To My Business",
 };
 
 /** Shared base for every experience definition — always references a Knowledge Card. */
@@ -340,12 +340,12 @@ export const INSTITUTE_LIFECYCLE_LABELS: Record<
   discover: "Discover",
   learn: "Learn",
   reflect: "Reflect",
-  make_it_mine: "Make It Mine™",
-  coach_with_shari: "Coach With Shari™",
+  make_it_mine: "Make It Mine",
+  coach_with_shari: "Coach With Shari",
   apply_in_my_business: "Apply In My Business",
   return_and_share: "Return & Share Results",
-  evidence_vault: "Evidence Vault™",
-  growth_profile: "Growth Profile™",
+  evidence_vault: "Evidence Vault",
+  growth_profile: "Growth Profile",
 };
 
 /** Stages that require member permission before proceeding */
@@ -356,7 +356,7 @@ export const PERMISSION_GATED_LIFECYCLE_STAGES: readonly InstituteLifecycleStage
 export const AUTOMATIC_LIFECYCLE_STAGES: readonly InstituteLifecycleStageId[] =
   ["growth_profile"] as const;
 
-// ── Make It Mine™ ───────────────────────────────────────────────────────────
+// ── Make It Mine ───────────────────────────────────────────────────────────
 
 export type MakeItMineIntent =
   | "create_my_plan"
@@ -374,7 +374,7 @@ export type MakeItMineDefinition = {
   outcomeLabel: string;
 };
 
-// ── My Institute Cabinet™ ───────────────────────────────────────────────────
+// ── My Institute Cabinet ───────────────────────────────────────────────────
 
 /** Cabinet reference — never duplicates lesson content */
 export type InstituteCabinetReferenceDefinition = {
@@ -386,7 +386,7 @@ export type InstituteCabinetReferenceDefinition = {
   label: string;
 };
 
-// ── Growth Profile™ ─────────────────────────────────────────────────────────
+// ── Growth Profile ─────────────────────────────────────────────────────────
 
 export type GrowthCompetencyDefinition = {
   id: string;
@@ -400,10 +400,10 @@ export type GrowthCompetencyDefinition = {
 
 // GrowthCompetencyLevel — see @/lib/sparkCompetencyFramework/types
 
-// ── Evidence Vault™ ─────────────────────────────────────────────────────────
+// ── Evidence Vault ─────────────────────────────────────────────────────────
 
 /**
- * Evidence opportunity — surfaced on Return Later™, never auto-created.
+ * Evidence opportunity — surfaced on Return Later, never auto-created.
  * Real-world outcome required; permission before save.
  */
 export type EvidenceOpportunityDefinition = {
@@ -414,7 +414,7 @@ export type EvidenceOpportunityDefinition = {
   evidencePromptKey: string;
 };
 
-// ── The Return™ ─────────────────────────────────────────────────────────────
+// ── The Return ─────────────────────────────────────────────────────────────
 
 export type ReturnClosingDefinition = {
   id: string;

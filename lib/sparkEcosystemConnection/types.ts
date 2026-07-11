@@ -1,5 +1,5 @@
 /**
- * Ecosystem Connection Framework™ (T-014).
+ * Ecosystem Connection Framework (T-014).
  * How experiences connect — one living ecosystem, no dead ends.
  *
  * @see docs/ECOSYSTEM_CONNECTION_FRAMEWORK.md

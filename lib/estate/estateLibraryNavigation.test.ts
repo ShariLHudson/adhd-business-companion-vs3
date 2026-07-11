@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeEach, vi } from "vitest";
 import { classifyCompanionIntent } from "@/lib/companionTurn/classifyCompanionIntent";
 import { evaluateEstatePlaceTurn } from "./estatePlaceNavigation";
 import {
@@ -11,6 +11,21 @@ import { evaluateLibraryConversationReply } from "./libraryConversationIntents";
 import { evaluateInRoomConversationReply } from "./estateInRoomConversationIntents";
 import { estateDirectCommandArrivalLine } from "@/lib/estateIntelligence/estateCommandRouter";
 import { evaluateConversationEnvironmentNeed } from "./conversationDrivesNavigation";
+import {
+  resetEstateRoomAwarenessForTests,
+  setVisualRoom,
+} from "@/lib/estate/roomAwareness";
+
+function stubSession() {
+  const mem = new Map<string, string>();
+  vi.stubGlobal("sessionStorage", {
+    getItem: (k: string) => mem.get(k) ?? null,
+    setItem: (k: string, v: string) => mem.set(k, v),
+    removeItem: (k: string) => mem.delete(k),
+    clear: () => mem.clear(),
+  });
+  vi.stubGlobal("window", { dispatchEvent: vi.fn() });
+}
 
 describe("estateMetaNavigation", () => {
   it("does not treat room list questions as hard navigation", () => {
@@ -136,7 +151,8 @@ describe("deck navigation", () => {
     });
     expect(turn.type).toBe("navigate");
     if (turn.type === "navigate") {
-      expect(turn.command.roomId ?? turn.command.entryId).toBe("back-deck");
+      // back-deck aliases to fireside-deck (PLACE_ID_ALIASES)
+      expect(turn.command.roomId ?? turn.command.entryId).toBe("fireside-deck");
     }
   });
 
@@ -154,11 +170,19 @@ describe("deck navigation", () => {
     });
     expect(turn.type).toBe("navigate");
     if (turn.type === "navigate") {
-      expect(turn.command.roomId ?? turn.command.entryId).toBe("back-deck");
+      expect(turn.command.roomId ?? turn.command.entryId).toBe("fireside-deck");
     }
   });
 
-  it("acknowledges already here", () => {
+  it("acknowledges already here only when visual_room confirms", () => {
+    stubSession();
+    resetEstateRoomAwarenessForTests();
+    // Without visual confirmation — no false already-here
+    expect(
+      evaluateInRoomConversationReply("we are already there", "discovery-room"),
+    ).toBeNull();
+
+    setVisualRoom("discovery-room");
     const reply = evaluateInRoomConversationReply(
       "we are already there",
       "discovery-room",

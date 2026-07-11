@@ -16,7 +16,7 @@ import {
   sparkSuggestedNextCards,
 } from "./knowledgeArchitecture";
 
-describe("Spark Knowledge Architecture™", () => {
+describe("Spark Knowledge Architecture", () => {
   beforeEach(() => {
     setInstituteCatalogProvider({ load: () => TEST_INSTITUTE_CATALOG });
   });
@@ -68,7 +68,7 @@ describe("Spark Knowledge Architecture™", () => {
     );
   });
 
-  it("resolves Spark Suggested Learning Path™ from catalog data", () => {
+  it("resolves Spark Suggested Learning Path from catalog data", () => {
     const path = sparkSuggestedLearningPath("kc-pricing-foundations", {
       completedKnowledgeCardIds: [],
     });

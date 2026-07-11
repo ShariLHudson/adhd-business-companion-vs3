@@ -21,7 +21,7 @@ export const ESTATE_PLACE_SCENE_VIEWS: Readonly<
   observatory: [
     {
       viewId: "day-outside",
-      label: "Outside in the daylight",
+      label: "Observatory — Daytime Outside",
       blurb: "wide sky, open air",
       backgroundUrl: estateBackgroundPath(
         "observatory-daytime-outside-background.png",
@@ -29,23 +29,55 @@ export const ESTATE_PLACE_SCENE_VIEWS: Readonly<
     },
     {
       viewId: "day-inside",
-      label: "Inside with the telescope",
+      label: "Observatory — Daytime Inside",
       blurb: "quiet study, curated stacks",
       backgroundUrl: estateBackgroundPath("observatory-daytime-inside.png"),
     },
     {
       viewId: "night-outside",
-      label: "Under the night sky",
+      label: "Observatory — Night Outside",
       blurb: "stars, calm night air",
       backgroundUrl: estateBackgroundPath(
         "observatory-night-outside-background.png",
       ),
     },
   ],
+  "house-possibility-outside": [
+    {
+      viewId: "discovery-chest",
+      label: "Treehouse Discovery Chest",
+      blurb: "curious finds, gentle surprises",
+      backgroundUrl: estateBackgroundPath(
+        "treehouse-possibility-discovery-chest-background.png",
+      ),
+    },
+    {
+      viewId: "reflection-desk",
+      label: "Treehouse Reflection Desk",
+      blurb: "quiet writing, soft light",
+      backgroundUrl: estateBackgroundPath(
+        "treehouse-possibility-reflection-desk-background.png",
+      ),
+    },
+    {
+      viewId: "staircase-nook",
+      label: "Treehouse Staircase / Reading Nook",
+      blurb: "stairs, window light, a place to pause",
+      backgroundUrl: estateBackgroundPath(
+        "treehouse-possibility-staircase-window-reading-nook-background.png",
+      ),
+    },
+    {
+      viewId: "possibility-studio",
+      label: "Treehouse Possibility Studio",
+      blurb: "ideas, sketches, open canvas",
+      backgroundUrl: estateBackgroundPath("treehouse-possibility-studio.png"),
+    },
+  ],
   "summer-terrace": [
     {
       viewId: "pool",
-      label: "By the swimming pool",
+      label: "Swimming Pool",
       blurb: "private pool, open sky",
       backgroundUrl: estateBackgroundPath(
         "water-swimming-pool-private-background.png",
@@ -61,7 +93,7 @@ export const ESTATE_PLACE_SCENE_VIEWS: Readonly<
     },
     {
       viewId: "hammock",
-      label: "Lakeside hammock",
+      label: "Water / Lakeside Hammock",
       blurb: "slow rest by the water",
       backgroundUrl: estateBackgroundPath("water-lakeside-hammock-background.png"),
     },
@@ -145,7 +177,7 @@ export function sceneViewIdFromUserText(
 
   for (const view of listSceneViewsForPlace(placeId)) {
     const normalized = text.toLowerCase();
-    const label = view.label.toLowerCase().replace(/™/g, "");
+    const label = view.label.toLowerCase().replace(/\u2122/g, "");
     if (normalized.includes(view.viewId.replace(/-/g, " "))) return view.viewId;
     if (normalized.includes(label)) return view.viewId;
   }
@@ -189,7 +221,7 @@ export function extractSceneViewTokensFromNumberedMenu(
     const body = match[1]!.trim().toLowerCase();
     for (const [placeId, placeViews] of Object.entries(ESTATE_PLACE_SCENE_VIEWS)) {
       for (const view of placeViews) {
-        const label = view.label.toLowerCase().replace(/™/g, "");
+        const label = view.label.toLowerCase().replace(/\u2122/g, "");
         if (
           body.includes(label) ||
           body.includes(view.blurb.toLowerCase()) ||

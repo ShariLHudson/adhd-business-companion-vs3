@@ -1,5 +1,5 @@
 /**
- * Session storage for Companion Conversation Context™.
+ * Session storage for Companion Conversation Context.
  */
 
 import type {

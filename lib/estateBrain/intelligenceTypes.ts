@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence Architecture™ — world model types.
+ * Estate Intelligence Architecture — world model types.
  * Capability-first routing: Intent → Capability → Expert → Experience → Tool.
  *
  * @see docs/estate/ESTATE_INTELLIGENCE_ARCHITECTURE.md

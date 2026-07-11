@@ -1,5 +1,5 @@
 /**
- * Spark Trust & Performance Engine™
+ * Spark Trust & Performance Engine
  * Highest-priority Spark OS wrapper — ingress + egress quality gate.
  */
 

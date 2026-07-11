@@ -42,7 +42,7 @@ export const GROWTH_STORY_HUB_PANELS: GrowthStoryHubPanel[] = [
   {
     id: "wins-this-week",
     title: "Celebration Garden",
-    description: "Wins, milestones, and moments worth remembering.",
+    description: "Moments of progress — peaceful, reflective, not milestones.",
   },
   {
     id: "growth-portfolio",
@@ -51,7 +51,7 @@ export const GROWTH_STORY_HUB_PANELS: GrowthStoryHubPanel[] = [
   },
   {
     id: "timeline",
-    title: "Create Your Storybook",
-    description: "Turn the chapters of your journey into a beautiful keepsake.",
+    title: "Wins Timeline",
+    description: "See growth over months and years — not isolated events.",
   },
 ];

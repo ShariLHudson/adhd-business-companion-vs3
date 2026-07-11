@@ -1,5 +1,5 @@
 /**
- * Estate Ambient Sound Engine™ — Layer 1 place ambience with crossfade.
+ * Estate Ambient Sound Engine — Layer 1 place ambience with crossfade.
  * One place at a time — never overlapping place identities.
  */
 

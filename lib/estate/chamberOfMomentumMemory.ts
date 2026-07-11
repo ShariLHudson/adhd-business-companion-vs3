@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — data and memory architecture (Phase 6).
+ * Chamber of Momentum — data and memory architecture (Phase 6).
  * Connects project, momentum, evidence, wins, patterns, blockers, and preferences
  * without duplicating domain stores.
  *

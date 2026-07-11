@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — Shari conversation experience for creation (Phase 11).
+ * Spark Estate — Shari conversation experience for creation (Phase 11).
  * Warm, practical, step-by-step guidance — never a software manual.
  *
  * @see docs/protocols/SPARK_ESTATE_UNIVERSAL_CREATION_JOURNEY_AND_SHARI_EXPERIENCE_PHASE11.md

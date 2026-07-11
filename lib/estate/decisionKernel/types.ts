@@ -1,5 +1,5 @@
 /**
- * Estate Decision Kernel™ — single source of truth for member input routing.
+ * Estate Decision Kernel — single source of truth for member input routing.
  * Pure types only — no side effects.
  */
 
@@ -58,6 +58,11 @@ export type ResolveEstateActionContext = {
   userText: string;
   lastAssistantText?: string | null;
   currentPlaceId?: string | null;
+  /**
+   * Live AppSection / shell section. When set, syncs room awareness before
+   * already-here decisions so stale visual_room cannot win on the wrong page.
+   */
+  activeSection?: string | null;
   /** Explicit soundscape UI selection — never changes place. */
   soundscapeCategoryId?: string | null;
 };

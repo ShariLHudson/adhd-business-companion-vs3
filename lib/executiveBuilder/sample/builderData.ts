@@ -25,7 +25,7 @@ export const BUILD_MODES: BuildMode[] = [
 export const SUGGESTED_BUILDS: BuilderSuggestedBuild[] = [
   { id: "sb-listening-restart", phrase: "Shame-Free Restart Listening Room", entryKind: "opportunity" },
   { id: "sb-founder-research-pipeline", phrase: "Research to Build Pipeline", entryKind: "opportunity" },
-  { id: "sb-listening-rooms", phrase: "Listening Rooms™", entryKind: "product-idea" },
+  { id: "sb-listening-rooms", phrase: "Listening Rooms", entryKind: "product-idea" },
   { id: "sb-lead-magnet", phrase: "ADHD Founder Restart Lead Magnet", entryKind: "marketing-campaign" },
   { id: "sb-membership-tier", phrase: "Calm Depth Membership Tier", entryKind: "product-idea" },
   { id: "sb-workshop", phrase: "New Workshop on Decision Fatigue", entryKind: "workshop-idea" },

@@ -31,6 +31,7 @@ const CINEMATIC_PRESET_BY_WORKSPACE: Partial<
   "clear-my-mind": "clear-my-mind",
   "clear-my-mind-thoughts": "clear-my-mind-thoughts",
   "plan-my-day": "plan-my-day",
+  "visual-focus": "default",
   "life-experience-room": "life-evidence",
   "focus-hub": "focus-my-brain",
   "focus-category": "focus-my-brain",

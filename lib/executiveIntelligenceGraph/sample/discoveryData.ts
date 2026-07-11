@@ -85,7 +85,7 @@ export const DIDNT_KNOW_THAT: DidntKnowThatInsight[] = [
 export const ECOSYSTEM_AREAS: SparkEcosystemArea[] = [
   {
     id: "eco-founder",
-    label: "Founder™",
+    label: "Founder",
     summary: "Executive pipeline — Research through Memory Theater",
     nodeCount: 8,
     highlightNodeIds: ["node-brief-2026-07-06", "node-eq-build-next", "node-decision-invest-restart"],
@@ -93,7 +93,7 @@ export const ECOSYSTEM_AREAS: SparkEcosystemArea[] = [
   },
   {
     id: "eco-companion",
-    label: "Spark Companion™",
+    label: "Spark Companion",
     summary: "Return voice, conversations, member continuity",
     nodeCount: 5,
     highlightNodeIds: ["node-feedback-restart", "node-analytics-retention"],
@@ -101,7 +101,7 @@ export const ECOSYSTEM_AREAS: SparkEcosystemArea[] = [
   },
   {
     id: "eco-postcraft",
-    label: "PostCraft™",
+    label: "PostCraft",
     summary: "Campaigns, newsletters, content queue",
     nodeCount: 4,
     highlightNodeIds: ["node-campaign-gentle-restart", "node-newsletter-restart"],
@@ -109,7 +109,7 @@ export const ECOSYSTEM_AREAS: SparkEcosystemArea[] = [
   },
   {
     id: "eco-listening",
-    label: "Listening Rooms™",
+    label: "Listening Rooms",
     summary: "Flagship restart experience — research to revenue",
     nodeCount: 12,
     highlightNodeIds: ["node-listening-rooms", "node-workshop-fatigue", "node-research-adhd-restart"],

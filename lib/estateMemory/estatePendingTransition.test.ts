@@ -8,7 +8,7 @@ import {
   saveEstatePendingTransition,
 } from "./estatePendingTransition";
 
-describe("Estate Pending Transition™", () => {
+describe("Estate Pending Transition", () => {
   beforeEach(() => {
     clearEstatePendingTransition();
   });
@@ -16,7 +16,7 @@ describe("Estate Pending Transition™", () => {
   it("recognizes estate invitation language in assistant offers", () => {
     expect(
       isEstateTransitionOfferMessage(
-        "The Creative Studio™ is the perfect place for that. Would you like me to take us there?",
+        "The Creative Studio is the perfect place for that. Would you like me to take us there?",
       ),
     ).toBe(true);
     expect(

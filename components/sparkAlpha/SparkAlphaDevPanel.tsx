@@ -14,7 +14,7 @@ export function SparkAlphaDevPanel({ open, onClose, state }: Props) {
   return (
     <aside className="spark-alpha-dev" aria-label="Spark Alpha developer panel">
       <header className="spark-alpha-dev__header">
-        <h2>Spark Alpha™ — Dev</h2>
+        <h2>Spark Alpha — Dev</h2>
         <button type="button" onClick={onClose} aria-label="Close panel">
           ×
         </button>

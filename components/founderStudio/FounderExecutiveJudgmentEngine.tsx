@@ -34,7 +34,7 @@ export function FounderExecutiveJudgmentEngine() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Judgment Engine™"
+        eyebrow="Executive Judgment Engine"
         title="The Executive Brain of Founder"
         question="What would I recommend today?"
         purpose="Judgment — not certainty. Everything competes. Founder decides what deserves your attention before speaking."

@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — universal completion and output system (Phase 12).
+ * Spark Estate — universal completion and output system (Phase 12).
  * Create → Review → Improve → Finalize → Output → Remember
  *
  * @see docs/protocols/SPARK_ESTATE_UNIVERSAL_COMPLETION_AND_OUTPUT_SYSTEM_SPECIFICATION_PHASE12.md
@@ -42,7 +42,7 @@ export const SPARK_ESTATE_UNIVERSAL_ROOM_COMPLETION_EXAMPLES = [
     flow: ["create article", "review", "edit", "publish/export"],
   },
   {
-    room: "Chamber of Momentum™",
+    room: "Chamber of Momentum",
     flow: ["create project", "review", "complete", "capture win"],
   },
 ] as const;
@@ -111,7 +111,7 @@ export const SPARK_ESTATE_OUTPUT_OPTIONS: readonly SparkEstateOutputOption[] = [
   {
     id: "save",
     label: "Save",
-    description: "Save inside Spark Estate™.",
+    description: "Save inside Spark Estate.",
     examples: "My Projects, My Templates, My Strategies, My Content Library, My Sparks",
   },
   {
@@ -431,7 +431,7 @@ export function formatSparkEstateCompletionReport(
   verification: ReturnType<typeof verifySparkEstateCompletionSystem> = verifySparkEstateCompletionSystem(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ completion system: ${verification.journeyReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate completion system: ${verification.journeyReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_COMPLETION_PRINCIPLE,
     SPARK_ESTATE_COMPLETION_JOURNEY_HEADLINE,
     "",

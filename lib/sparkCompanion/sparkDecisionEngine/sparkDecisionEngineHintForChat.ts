@@ -22,7 +22,7 @@ export function sparkDecisionEngineHintForChat(
   const frictionGuide = FRICTION_RESPONSES[decision.friction];
 
   const lines = [
-    "SPARK DECISION ENGINE™ (orchestrate — hide all complexity from member):",
+    "SPARK DECISION ENGINE (orchestrate — hide all complexity from member):",
     `Mission: ${SPARK_DECISION_MISSION}`,
     "",
     `Step 1 INTENT: ${decision.intent} (${decision.intentConfidence})`,

@@ -1,5 +1,5 @@
 /**
- * Context Strategy™ & Minimum Viable Context (MVC) types.
+ * Context Strategy & Minimum Viable Context (MVC) types.
  * Intelligent context selection — not maximum retrieval.
  *
  * @see spark-intelligence-foundation/007-context-strategy.md
@@ -36,7 +36,7 @@ export const SPARK_CONTEXT_TIER_RETRIEVAL: Record<
   discovery: "post_response",
 };
 
-/** Progressive Context Loading™ — only Phase 1 blocks generation */
+/** Progressive Context Loading — only Phase 1 blocks generation */
 export type SparkContextLoadPhase =
   | "required" // Phase 1
   | "helpful" // Phase 2 — async ok
@@ -51,14 +51,14 @@ export type SparkContextPriority =
   | 5 // relevant historical
   | 6; // everything else
 
-/** Context Confidence™ — influences reasoning, not retrieval */
+/** Context Confidence — influences reasoning, not retrieval */
 export type SparkContextConfidence =
   | "high"
   | "medium"
   | "low"
   | "unknown";
 
-/** Context Freshness™ — affects priority, not availability */
+/** Context Freshness — affects priority, not availability */
 export type SparkContextFreshness =
   | "current"
   | "aging"
@@ -74,7 +74,7 @@ export type SparkContextLifecycleState =
   | "archived"
   | "retired";
 
-/** Context Budget™ by response depth */
+/** Context Budget by response depth */
 export type SparkContextBudgetProfile = "simple" | "moderate" | "complex_strategy";
 
 export const SPARK_CONTEXT_BUDGET_LIMITS: Record<

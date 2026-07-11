@@ -19,7 +19,10 @@ const USER_ROOM_CASES: ReadonlyArray<{
   },
   { roomId: "study-hall", phrases: ["study hall"] },
   { roomId: "momentum-room", phrases: ["momentum room"] },
-  { roomId: "evidence-vault", phrases: ["evidence vault"] },
+  {
+    roomId: "evidence-vault",
+    phrases: ["evidence vault", "my evidence vault"],
+  },
   { roomId: "discovery-room", phrases: ["discovery room"] },
   { roomId: "gardens", phrases: ["celebration garden"] },
   {
@@ -27,8 +30,17 @@ const USER_ROOM_CASES: ReadonlyArray<{
     phrases: ["celebration hall", "celebration room"],
   },
   {
+    roomId: "portfolio",
+    phrases: [
+      "hall of accomplishments",
+      "my accomplishments",
+      "show my accomplishments",
+      "open hall of accomplishments",
+    ],
+  },
+  {
     roomId: "gallery-of-firsts",
-    phrases: ["hall of accomplishments", "gallery of firsts"],
+    phrases: ["gallery of firsts", "the gallery"],
   },
   { roomId: "strategy-studio", phrases: ["strategy studio"] },
   { roomId: "round-table", phrases: ["round table", "boardroom", "board room"] },

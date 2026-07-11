@@ -1,5 +1,5 @@
 /**
- * Spark Trust & Performance Engine™ — types.
+ * Spark Trust & Performance Engine — types.
  * @see spark-intelligence-foundation/14-spark-trust-performance-engine.md
  */
 

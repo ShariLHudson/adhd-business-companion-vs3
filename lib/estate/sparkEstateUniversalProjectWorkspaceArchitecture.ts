@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — universal project workspace architecture refinement.
+ * Spark Estate — universal project workspace architecture refinement.
  * Projects are living member-owned workspaces available throughout the app.
  *
  * @see docs/protocols/SPARK_ESTATE_UNIVERSAL_PROJECT_WORKSPACE_ARCHITECTURE_REFINEMENT_SPECIFICATION.md
@@ -30,7 +30,7 @@ import {
 import { verifySparkEstateExpertTeamAndChamberMemberCollaboration } from "./sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture";
 
 export const SPARK_ESTATE_UNIVERSAL_PROJECT_PRINCIPLE =
-  "A project belongs to the member — the Chamber of Momentum™ can create and organize projects, but the project follows the member everywhere.";
+  "A project belongs to the member — the Chamber of Momentum can create and organize projects, but the project follows the member everywhere.";
 
 export const SPARK_ESTATE_UNIVERSAL_PROJECT_VISION =
   "Rooms provide expertise. Projects provide continuity. Spark provides guidance. Progress follows the member anywhere.";
@@ -69,7 +69,7 @@ export const SPARK_ESTATE_PROJECT_LIBRARY_SEARCH_TYPES = [
 
 export const SPARK_ESTATE_PROJECT_ENTRY_POINTS = [
   {
-    location: "Chamber of Momentum™",
+    location: "Chamber of Momentum",
     example: "I need to create a sales funnel.",
     section: "chamber-of-momentum" as AppSection,
   },
@@ -95,7 +95,7 @@ export const SPARK_ESTATE_UNIVERSAL_PROJECT_ACCESS_ROOMS = [
   { room: "Email Area", purpose: "Create emails connected to the project." },
   { room: "Content Room", purpose: "Create content connected to the project." },
   {
-    room: "Chamber of Momentum™",
+    room: "Chamber of Momentum",
     purpose: "See overall progress and next steps.",
   },
 ] as const;
@@ -553,7 +553,7 @@ export function formatUniversalProjectWorkspaceReport(
   compliance: ReturnType<typeof assessUniversalProjectWorkspaceCompliance> = assessUniversalProjectWorkspaceCompliance(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ universal project workspace: ${verification.universalProjectReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate universal project workspace: ${verification.universalProjectReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_UNIVERSAL_PROJECT_PRINCIPLE,
     SPARK_ESTATE_UNIVERSAL_PROJECT_VISION,
     "",

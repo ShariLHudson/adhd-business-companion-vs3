@@ -1,5 +1,5 @@
 /**
- * resolveEstatePlace™ — natural language → canonical place (Phase C).
+ * resolveEstatePlace — natural language → canonical place (Phase C).
  *
  * Routing priority:
  * 1. Exact canonical place name / alias (with navigation or bare destination)
@@ -87,23 +87,23 @@ const EXPLICIT_OBJECT_RULES: {
     pattern:
       /\b(?:accomplishments?\s+book|my\s+accomplishments?\s+book|the\s+accomplishments?\s+book|show\s+me\s+my\s+accomplishments)\b/i,
     placeId: "accomplishments-shelf",
-    reason: "explicit object → Accomplishments Book™",
+    reason: "explicit object → Accomplishments Book",
   },
   {
     pattern:
       /\b(?:celebration\s+(?:room|hall)|open\s+(?:the\s+)?celebration(?:\s+room|\s+hall)?)\b/i,
     placeId: "celebration-room",
-    reason: "explicit object → Celebration Hall™",
+    reason: "explicit object → Celebration Hall",
   },
   {
     pattern: /\b(?:celebration\s+garden|the\s+celebration\s+garden)\b/i,
     placeId: "gardens",
-    reason: "explicit object → Celebration Garden™ / wins collection",
+    reason: "explicit object → Celebration Garden / wins collection",
   },
   {
     pattern: /\b(?:institute\s+cabinet|my\s+cabinet)\b/i,
     placeId: "institute-cabinet",
-    reason: "explicit object → Institute Cabinet™",
+    reason: "explicit object → Institute Cabinet",
   },
   {
     pattern:
@@ -113,7 +113,7 @@ const EXPLICIT_OBJECT_RULES: {
   },
 ];
 
-/** Wins vs proof routing (P0 canon — see docs/estate/P0_CANON_ERRATA.md) */
+/** Wins vs proof vs Hall routing (P0 canon — see docs/estate/P0_CANON_ERRATA.md) */
 const WINS_AND_PROOF_RULES: {
   pattern: RegExp;
   placeId: string;
@@ -121,15 +121,21 @@ const WINS_AND_PROOF_RULES: {
 }[] = [
   {
     pattern:
-      /\b(?:evidence\s+vault|proof\s+of\s+(?:growth|impact)|proof\b|impact\s+stories?|people\s+(?:i|I've|I\s+have)\s+helped|difference\s+(?:i|I)\s+made|impact\s+(?:i|I've)\s+made)\b/i,
+      /\b(?:hall\s+of\s+accomplishments|hall\s+of\s+achievements|accomplishments?\s+hall|show\s+(?:me\s+)?my\s+accomplishments|open\s+(?:my\s+)?(?:hall\s+of\s+)?accomplishments)\b/i,
+    placeId: "portfolio",
+    reason: "accomplishments → Hall of Accomplishments (not Gallery/Portfolio label)",
+  },
+  {
+    pattern:
+      /\b(?:evidence\s+vault|my\s+evidence\s+vault|use\s+(?:my\s+)?evidence\s+vault|i\s+want\s+to\s+use\s+(?:my\s+)?evidence\s+vault|open\s+(?:my\s+)?evidence\s+vault|show\s+(?:me\s+)?(?:my\s+)?evidence\s+vault|take\s+me\s+to\s+(?:my\s+)?evidence\s+vault|go\s+to\s+(?:my\s+)?evidence\s+vault|i\s+want\s+to\s+(?:record|preserve)\s+(?:a\s+)?discovery|i\s+want\s+to\s+preserve\s+something|preserve\s+something|proof\s+of\s+(?:growth|impact)|show\s+(?:me\s+)?proof|proof\s+i\s+can|impact\s+stories?|people\s+(?:i|I've|I\s+have)\s+helped|difference\s+(?:i|I)\s+made|impact\s+(?:i|I've)\s+made|i\s+need\s+encouragement|remind\s+me\s+what\s+(?:i'?ve|i\s+have)\s+done|remind\s+me\s+who\s+i\s+am)\b/i,
     placeId: "evidence-vault",
-    reason: "impact/proof → Evidence Vault™",
+    reason: "impact/proof/encouragement → Evidence Vault",
   },
   {
     pattern:
       /\b(?:my\s+wins|show\s+(?:me\s+)?my\s+wins|story\s+of\s+my\s+wins|wins\s+this\s+week)\b/i,
     placeId: "gardens",
-    reason: "wins → Celebration Garden™ / wins collection",
+    reason: "wins → Celebration Garden / wins collection",
   },
 ];
 
@@ -142,17 +148,17 @@ const EXPLICIT_ACTIVITY_RULES: {
   {
     pattern: /\b(?:clear\s+(?:my\s+)?mind|brain\s+dump)\b/i,
     placeId: "clear-my-mind",
-    reason: "explicit activity → Clear My Mind™",
+    reason: "explicit activity → Clear My Mind",
   },
   {
     pattern: /\bplan\s+my\s+day\b/i,
     placeId: "momentum-builder",
-    reason: "explicit activity → Plan My Day / Momentum Builder™",
+    reason: "explicit activity → Plan My Day / Momentum Builder",
   },
   {
     pattern: /\bdecision\s+compass\b/i,
     placeId: "decision-compass",
-    reason: "explicit activity → Decision Compass™",
+    reason: "explicit activity → Decision Compass",
   },
 ];
 
@@ -164,7 +170,7 @@ function normalize(text: string): string {
 }
 
 function stripPunctuation(text: string): string {
-  return text.replace(/[™®.!?]+$/g, "").trim();
+  return text.replace(/[®.!?]+$/g, "").trim();
 }
 
 function hasNavigationIntent(text: string): boolean {

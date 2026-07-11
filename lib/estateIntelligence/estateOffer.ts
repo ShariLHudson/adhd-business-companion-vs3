@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence™ — workspace offers for room routing (Welcome Home concierge).
+ * Estate Intelligence — workspace offers for room routing (Welcome Home concierge).
  */
 
 import type { WorkspaceOffer } from "@/lib/workspaceMode";

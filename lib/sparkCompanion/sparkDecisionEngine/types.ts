@@ -1,5 +1,5 @@
 /**
- * Spark Decision Engine™ — operating system for how Spark thinks before every response.
+ * Spark Decision Engine — operating system for how Spark thinks before every response.
  */
 
 export const SPARK_DECISION_MISSION =
@@ -63,7 +63,7 @@ export type SparkDecisionEngineDecision = {
   friction: SparkDecisionFrictionType;
   companionRole: SparkCompanionStyleRole;
   estateRoute: EstateRouteSuggestion | null;
-  /** Spark Landscapes™ — today's weather, not identity */
+  /** Spark Landscapes — today's weather, not identity */
   landscape: SparkLandscapeDecision;
   targetOutcomes: readonly SparkLeaveBetterOutcome[];
   learningSignals: readonly string[];

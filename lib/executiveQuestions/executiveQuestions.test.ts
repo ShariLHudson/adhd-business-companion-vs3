@@ -11,7 +11,7 @@ import {
   relationshipsForQuestion,
 } from "./index";
 
-describe("Executive Questions™ Framework", () => {
+describe("Executive Questions Framework", () => {
   it("question catalog defines all eight categories", () => {
     const categories = new Set(EXECUTIVE_QUESTION_CATALOG.map((q) => q.category));
     expect(categories.has("product")).toBe(true);

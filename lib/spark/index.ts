@@ -1,5 +1,5 @@
 /**
- * SPARK™ Intelligence Core — Strategic Pattern Analysis & Recommendation Kernel™
+ * SPARK Intelligence Core — Strategic Pattern Analysis & Recommendation Kernel
  *
  * Ecosystem-wide intelligence layer. No UI. No AI. No Founder dependency.
  * @see docs/architecture/SPARK_INTELLIGENCE_BLUEPRINT.md

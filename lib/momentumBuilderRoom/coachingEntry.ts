@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ — coaching arrival copy (never definitions or lessons).
+ * Momentum Builder — coaching arrival copy (never definitions or lessons).
  * @see docs/MOMENTUM_BUILDER_ROOM_ARCHITECTURE.md
  */
 

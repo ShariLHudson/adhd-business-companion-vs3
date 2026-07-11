@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ — single room cycle composer.
+ * Momentum Builder — single room cycle composer.
  * Orchestrates existing intelligence — does NOT implement new strategy engines.
  *
  * @see docs/MOMENTUM_BUILDER_V1_ORCHESTRATION.md
@@ -42,7 +42,7 @@ export type MomentumBuilderRoomCycleResult = {
   todaysPath: TodaysPath | null;
 };
 
-/** Compose all existing systems for one member turn in Momentum Builder™. */
+/** Compose all existing systems for one member turn in Momentum Builder. */
 export function runMomentumBuilderRoomCycle(
   input: MomentumBuilderRoomCycleInput,
 ): MomentumBuilderRoomCycleResult {

@@ -12,6 +12,8 @@ export type SavedGrowthWin = {
   whatHappened: string;
   ts: string;
   icon: string;
+  /** Celebration Garden moment kind (249) */
+  category?: string;
   sourceId?: string;
   classification?: GrowthMomentClassification;
   attachments: GrowthAttachment[];

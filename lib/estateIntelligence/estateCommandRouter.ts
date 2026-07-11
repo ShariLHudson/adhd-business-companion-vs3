@@ -1,7 +1,7 @@
 /**
- * Estate Command Router™ — execution layer after Estate Intelligence + Matcher.
+ * Estate Command Router — execution layer after Estate Intelligence + Matcher.
  * Routes direct commands, intent-based navigation, and hybrid journeys.
- * Always passes Estate Memory™ forward on transitions.
+ * Always passes Estate Memory forward on transitions.
  *
  * **Phase C:** Direct navigation must flow through `resolveEstatePlace` → `goToPlace`
  * (via `estateDirectRoomResolve`). Intent routing must not override exact place navigation.
@@ -119,11 +119,11 @@ function extractWhereRoomPhrase(text: string): string | null {
   }
   const match = text.match(WHERE_ROOM_RE);
   if (!match?.[1]?.trim()) return null;
-  return match[1].trim().replace(/[™®.!?]+$/g, "");
+  return match[1].trim().replace(/[®.!?]+$/g, "");
 }
 
 function extractBareDestinationPhrase(text: string): string | null {
-  const normalized = text.trim().replace(/[™®.!?]+$/g, "");
+  const normalized = text.trim().replace(/[®.!?]+$/g, "");
   if (!normalized || normalized.split(/\s+/).length > 8) return null;
   if (resolveEstateRoomAliasExact(normalized)) return normalized;
   if (resolveEstateRoomAliasExact(`the ${normalized}`)) return normalized;
@@ -133,7 +133,7 @@ function extractBareDestinationPhrase(text: string): string | null {
 function extractLookLikeRoomPhrase(text: string): string | null {
   const match = text.match(/\bwhat does (?:the\s+)?(.+?)\s+look like\b/i);
   if (!match?.[1]?.trim()) return null;
-  return match[1].trim().replace(/[™®.!?]+$/g, "");
+  return match[1].trim().replace(/[®.!?]+$/g, "");
 }
 
 function extractDirectDestinationPhrase(text: string): string | null {
@@ -604,6 +604,10 @@ export function estateDirectCommandArrivalLine(
   entryId: string,
   roomId?: string,
 ): string {
+  const id = roomId ?? entryId;
+  if (id === "clear-my-mind" || entryId === "clear-my-mind") {
+    return "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.";
+  }
   const name = displayNameForCommand(entryId, roomId);
   return `We're in ${name} now.`;
 }
@@ -626,6 +630,11 @@ export function directEstateNavigationHintForChat(
 
 export function estateCommandAckLine(command: EstateCommandDecision): string {
   if (command.kind === "direct") {
+    const id = command.roomId ?? command.entryId;
+    /** Clear My Mind Mode — capture greeting only; no navigation chatter. */
+    if (id === "clear-my-mind" || command.entryId === "clear-my-mind") {
+      return estateDirectCommandArrivalLine(command.entryId, command.roomId);
+    }
     return [
       estateDirectCommandHeadingLine(command.entryId, command.roomId),
       estateDirectCommandArrivalLine(command.entryId, command.roomId),

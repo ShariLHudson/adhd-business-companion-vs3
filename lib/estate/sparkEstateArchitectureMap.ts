@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — architecture implementation mapping and integration (Phase 13).
+ * Spark Estate — architecture implementation mapping and integration (Phase 13).
  * Connects Phases 1–17 and 24 to the existing codebase without duplicate systems.
  *
  * @see docs/protocols/SPARK_ESTATE_ARCHITECTURE_IMPLEMENTATION_MAPPING_AND_INTEGRATION_PLAN_PHASE13.md
@@ -605,7 +605,7 @@ export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitecture
   {
     id: "room-chamber-identity",
     domain: "room-architecture",
-    label: "Chamber of Momentum™ room identity",
+    label: "Chamber of Momentum room identity",
     existing: "Identity, routing, registry, manifest backgrounds",
     location:
       "lib/estate/chamberOfMomentumIdentity.ts, lib/estate/chamber/chamberOfMomentumRoomRegistry.ts",
@@ -746,7 +746,7 @@ export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitecture
   {
     id: "card-spark-note",
     domain: "card-system",
-    label: "Spark Card™",
+    label: "Spark Card",
     existing: "Daily Spark Note anchor + expanded experience + one-per-day generation",
     location:
       "components/companion/SparkNoteAnchor.tsx, lib/sparkNote/sparkCardVisualDesignAndDailyGeneration.ts",
@@ -808,7 +808,7 @@ export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitecture
     id: "navigation-profile-menu",
     domain: "navigation",
     label: "Profile button (settings, profile)",
-    existing: "Initials profile menu — Profile, Settings, Conversations, Personalization, Account",
+    existing: "Initials profile menu — Conversations (New Chat · New Day Chat), Settings, Profile, Logout",
     location:
       "components/companion/GlobalEstateMenu.tsx, lib/estateMenu/menuConfig.ts, lib/estate/sparkEstateTopNavigationAndProfileMenu.ts",
     status: "implemented",
@@ -996,7 +996,7 @@ export function formatSparkEstateArchitectureReport(
   assessment: SparkEstateIntegrationAssessment = assessSparkEstateIntegration(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ integration: ${assessment.phasesAligned ? "PHASES ALIGNED" : "PHASE GAPS"}`,
+    `Spark Estate integration: ${assessment.phasesAligned ? "PHASES ALIGNED" : "PHASE GAPS"}`,
     SPARK_ESTATE_ECOSYSTEM_VISION,
     "",
     "Existing (working):",

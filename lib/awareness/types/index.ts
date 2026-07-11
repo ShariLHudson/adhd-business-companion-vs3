@@ -1,4 +1,4 @@
-/** Executive Awareness™ — notices change before presenting guidance. */
+/** Executive Awareness — notices change before presenting guidance. */
 
 import type { MissionId } from "@/lib/founder/missions/types";
 

@@ -1,0 +1,22 @@
+export {
+  CHAT_BACKDROP_CHANGED_EVENT,
+  CHAT_BACKDROP_OPTIONS,
+  DEFAULT_CHAT_BACKDROP_ID,
+  DEFAULT_CLEAR_MY_MIND_BACKDROP_ID,
+  allBackdropOptions,
+  chatBackdropOptionById,
+  getChatBackdropId,
+  getChatBackdropImageUrl,
+  getClearMyMindBackdropId,
+  getClearMyMindBackdropImageUrl,
+  getRoomBackdropImageUrl,
+  getRoomBackdropOverrideId,
+  getStoredChatBackdropId,
+  optionsForSurface,
+  setChatBackdropId,
+  setClearMyMindBackdropId,
+  setRoomBackdropOverride,
+  subscribeChatBackdropChange,
+  type ChatBackdropOption,
+} from "./chatBackdropPreference";
+export { useChatBackdropRevision } from "./useChatBackdropRevision";

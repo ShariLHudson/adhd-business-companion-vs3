@@ -10,7 +10,7 @@ import {
   relationshipsForMission,
 } from "./index";
 
-describe("Mission Engine™", () => {
+describe("Mission Engine", () => {
   beforeEach(() => {
     missionService.setActiveMission(DEFAULT_ACTIVE_MISSION_ID);
   });

@@ -1,5 +1,5 @@
 /**
- * Estate Registry™ — central catalog (aggregates registration adapters).
+ * Estate Registry — central catalog (aggregates registration adapters).
  *
  * **Adapter (Phase B):** Intelligence/routing extensions (tools, lifecycle, sections).
  * Place identity must align with `canonicalEstateRegistry.ts` — not a competing place list.

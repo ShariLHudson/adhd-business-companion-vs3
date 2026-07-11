@@ -1,5 +1,5 @@
 /**
- * Shari Knowledge & Intelligence Framework™
+ * Shari Knowledge & Intelligence Framework
  * @see docs/estate/SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md
  */
 

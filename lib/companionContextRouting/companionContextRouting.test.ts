@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { routeCompanionFailure } from "./routeCompanionFailure";
 
-describe("Companion Context Routing™", () => {
+describe("Companion Context Routing", () => {
   it("never puts Failed to fetch in estate channel", () => {
     const routed = routeCompanionFailure(new TypeError("Failed to fetch"), {
       surface: "chat",

@@ -13,6 +13,8 @@ This index lists **binding architecture documents** for conversation, creation, 
 | Document | Role |
 |----------|------|
 | [SPARK_CONVERSATION_INTELLIGENCE_ARCHITECTURE.md](./SPARK_CONVERSATION_INTELLIGENCE_ARCHITECTURE.md) | **Conversation Intelligence** — master pipeline, layer order, ownership boundaries |
+| [SPARK_COMPANION_RUNTIME_ARCHITECTURE.md](./SPARK_COMPANION_RUNTIME_ARCHITECTURE.md) | **Companion Runtime** — Mermaid flow: message → intent → recognition → capabilities → composition → memory → room routing → facade → response |
+| [estate/recognition/library/151_SPARK_COMPANION_RUNTIME_ARCHITECTURE.md](./estate/recognition/library/151_SPARK_COMPANION_RUNTIME_ARCHITECTURE.md) | **Architecture Library #151** — same runtime map (numbered index copy) |
 
 ---
 

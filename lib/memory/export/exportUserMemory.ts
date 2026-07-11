@@ -1,5 +1,5 @@
 /**
- * exportUserMemory™ — background data processor.
+ * exportUserMemory — background data processor.
  * No chat · no LLM · no estate navigation.
  */
 

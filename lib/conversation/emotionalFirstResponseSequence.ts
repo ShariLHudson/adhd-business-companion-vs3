@@ -1,5 +1,5 @@
 /**
- * Emotional-First Response Sequence™
+ * Emotional-First Response Sequence
  *
  * Before advice, scripts, or solutions:
  * 1. Detect emotional state

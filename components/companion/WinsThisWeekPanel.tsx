@@ -3,7 +3,7 @@
 import { EstateCollectionRoomPanel } from "@/components/estate-collection";
 import type { GrowthPanelNav } from "@/lib/growthNavigation";
 
-/** Celebration Garden — Spark Estate Collection Framework™ */
+/** Celebration Garden — Spark Estate Collection Framework */
 export function WinsThisWeekPanel({
   nav,
 }: {

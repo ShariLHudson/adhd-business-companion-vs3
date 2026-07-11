@@ -16,7 +16,7 @@ function capBrief(brief: FounderDailyBrief): FounderDailyBrief {
   };
 }
 
-/** FIRE™ entry point — today's executive brief for Founder Studio home. */
+/** FIRE entry point — today's executive brief for Founder Studio home. */
 export function getTodayBrief(): FounderDailyBrief {
   return capBrief(sampleBriefRepository.getTodayBrief());
 }

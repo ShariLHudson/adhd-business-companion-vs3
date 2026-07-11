@@ -1,4 +1,4 @@
-/** Overnight Executive Cycle™ — orchestration types (no UI, no schedulers). */
+/** Overnight Executive Cycle — orchestration types (no UI, no schedulers). */
 
 export type OvernightPhaseId =
   | "collect"

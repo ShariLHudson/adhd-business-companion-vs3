@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ Framework — entrepreneurial practice experiences (T-012).
+ * Momentum Builder Framework — entrepreneurial practice experiences (T-012).
  * Not games; transformation through practice. 2–10 minutes; real business connection.
  *
  * @see docs/MOMENTUM_BUILDER_FRAMEWORK.md
@@ -83,7 +83,7 @@ export type MomentumBuilderObjective =
   | "generate_insights"
   | "build_momentum";
 
-/** Capability strengthened — Capability Graph™ tracks quietly */
+/** Capability strengthened — Capability Graph tracks quietly */
 export type MomentumBuilderCapability =
   | "decision_making"
   | "executive_function"

@@ -18,7 +18,7 @@ type Props = {
 };
 
 /**
- * Momentum Builder™ — coaching conversation in a planning studio.
+ * Momentum Builder — coaching conversation in a planning studio.
  */
 export function MomentumBuilderRoomPanel({
   thread,

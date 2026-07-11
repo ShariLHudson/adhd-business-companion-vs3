@@ -1,5 +1,5 @@
 /**
- * Estate Room Visit Memory™ — favorites, frequency, unfinished activity.
+ * Estate Room Visit Memory — favorites, frequency, unfinished activity.
  */
 
 import type { EstateMemory } from "@/lib/estateMemory/types";

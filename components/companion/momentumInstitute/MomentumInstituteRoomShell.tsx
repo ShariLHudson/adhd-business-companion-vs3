@@ -8,7 +8,7 @@ type Props = {
   children: ReactNode;
 };
 
-/** Full-viewport Momentum Institute™ — drawer wall visible behind frosted conversation. */
+/** Full-viewport Momentum Institute — drawer wall visible behind frosted conversation. */
 export function MomentumInstituteRoomShell({ children }: Props) {
   return (
     <div

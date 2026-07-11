@@ -23,8 +23,8 @@ describe("welcomeAudio profiles", () => {
 
   it("registers welcome-home profile with post-login welcome track", () => {
     expect(WELCOME_HOME_AUDIO_PROFILE.id).toBe("welcome-home");
-    expect(WELCOME_HOME_AUDIO_PROFILE.voice?.fullWelcomeSrc).toBe(
-      "/audio/Welcome%20to%20the%20Spark%20Estates.m4a",
+    expect(WELCOME_HOME_AUDIO_PROFILE.voice?.fullWelcomeSrc).toMatch(
+      /^\/audio\/Welcome%20to%20the%20Spark%20Estates\.m4a(\?v=.+)?$/,
     );
     expect(WELCOME_HOME_AUDIO_PROFILE.voice?.playbackRate).toBe(1);
     expect(WELCOME_HOME_AUDIO_PROFILE.ambience).toBeUndefined();

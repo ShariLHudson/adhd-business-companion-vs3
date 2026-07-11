@@ -13,7 +13,7 @@ import {
   significantAwareness,
 } from "./index";
 
-describe("Executive Awareness™", () => {
+describe("Executive Awareness", () => {
   it("states the design principle — observant, not talkative", () => {
     expect(AWARENESS_PRINCIPLE).toContain("observant");
     expect(EXECUTIVE_AWARENESS_QUESTIONS.length).toBe(6);

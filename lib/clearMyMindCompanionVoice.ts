@@ -133,11 +133,11 @@ export function shariReleasePrompt(count: number): string {
   if (count === 0) {
     return "What's taking up space in your head right now?";
   }
-  return "What else is taking up space?";
+  return "Anything else?";
 }
 
 export const CLEAR_MY_MIND_ACK_CONTINUE_LABEL =
-  "See what I'm noticing";
+  "Look through these with me";
 
 /** Secondary acknowledgment — warm, never inventory-like. */
 export function shariReceiveAcknowledgment(entries: BrainDumpEntry[]): string {

@@ -37,7 +37,7 @@ export function FindingDetailPanel({ view, onBack }: FindingDetailPanelProps) {
 
       {founderAlert ? (
         <section className="founder-discovery-engine__alert-detail">
-          <h3 className="founder-discovery-engine__section-title">Founder Alert™</h3>
+          <h3 className="founder-discovery-engine__section-title">Founder Alert</h3>
           <span className="founder-discovery-engine__urgency">{founderAlert.urgency}</span>
           <p className="founder-discovery-engine__prose"><strong>{founderAlert.title}</strong></p>
           <ul className="founder-discovery-engine__metrics">

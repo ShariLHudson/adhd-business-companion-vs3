@@ -1,5 +1,5 @@
 /**
- * Audio Experience Foundation™ — member-facing response formatting.
+ * Audio Experience Foundation — member-facing response formatting.
  */
 
 import type { AudioExperience } from "./types";

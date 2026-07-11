@@ -1,21 +1,27 @@
-import { estateBackgroundPath } from "@/lib/estate/estatePlaceMedia";
+import { CANONICAL_PLACE_BACKGROUNDS } from "@/lib/estate/estatePlaceMedia";
 import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 
-/** Full gazebo vista — design studio, workshop, and return visits. */
-export const GAZEBO_JOURNAL_BACKGROUND_URL = estateBackgroundPath(
-  "gazebo-journal-background.png",
-);
+/** Bust cache when desk or welcome plates change. */
+export const JOURNAL_DESK_BACKGROUND_VERSION = "20260710b" as const;
 
-/** First-visit welcome letter — letter on the gazebo desk. */
-export const JOURNAL_WELCOME_PLATE_URL = estateBackgroundPath(
-  "journal-gazebo-letter-background.png",
-);
+/** Return visits — clean desk without the welcome letter (`journal-desk-background.png`). */
+export const JOURNAL_GAZEBO_BACKGROUND_URL =
+  CANONICAL_PLACE_BACKGROUNDS.journal;
+
+/** Full gazebo vista — design studio, workshop, and return visits. */
+export const GAZEBO_JOURNAL_BACKGROUND_URL = JOURNAL_GAZEBO_BACKGROUND_URL;
+
+/**
+ * First visit only — welcome letter baked into the plate
+ * (`public/images/welcome-to-the-journal-gazebo.png`).
+ */
+export const JOURNAL_WELCOME_PLATE_URL =
+  `/images/welcome-to-the-journal-gazebo.png?v=${JOURNAL_DESK_BACKGROUND_VERSION}` as const;
 
 /**
  * Journal Gazebo plate — creation choices, gift, ceremony, return visits.
- * Asset: `public/backgrounds/gazebo-journal-background.png`
  */
-export const JOURNAL_GAZEBO_SCENE_URL = GAZEBO_JOURNAL_BACKGROUND_URL;
+export const JOURNAL_GAZEBO_SCENE_URL = JOURNAL_GAZEBO_BACKGROUND_URL;
 
 /** @deprecated Use JOURNAL_GAZEBO_SCENE_URL */
 export const JOURNAL_WORKSHOP_PLATE_URL = JOURNAL_GAZEBO_SCENE_URL;

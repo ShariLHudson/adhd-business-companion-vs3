@@ -1,5 +1,5 @@
 /**
- * Estate Memory Continuity™ — turn + transition recording (merge, never overwrite).
+ * Estate Memory Continuity — turn + transition recording (merge, never overwrite).
  */
 
 import type { EstateEmotionalLabel } from "./types";
@@ -14,6 +14,7 @@ import {
   estateRoomDisplayName,
   estateSectionForEntryId,
 } from "./estateSectionMap";
+import { prepareEstateSceneTransitionFireAndForget } from "@/lib/estate/estateSceneTransition";
 import {
   getEstateMemory,
   markEstateTransitionPreserveChat,
@@ -264,6 +265,11 @@ export function recordEstateRoomTransition(input: RecordEstateRoomTransitionInpu
     fromSection: fromSection ?? undefined,
     reason: input.reason,
     userText: input.userText,
+  });
+
+  prepareEstateSceneTransitionFireAndForget({
+    toSection,
+    toRoomId: toEntryId,
   });
 
   if (input.playArrival !== false && shouldPlayEstateArrival(toEntryId)) {

@@ -92,7 +92,7 @@ export function GrowthUniversalCapture({
     }
     const label =
       destination === "evidence-bank"
-        ? "Evidence Bank"
+        ? "Evidence Vault"
         : destination === "journal"
           ? "Journal"
           : "Portfolio";

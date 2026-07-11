@@ -6,7 +6,7 @@ import {
   EXECUTIVE_RESOURCE_ADMISSION_QUESTIONS,
 } from "./index";
 
-describe("Executive Resources Center™", () => {
+describe("Executive Resources Center", () => {
   it("defines five admission questions", () => {
     expect(EXECUTIVE_RESOURCE_ADMISSION_QUESTIONS).toHaveLength(5);
     expect(EXECUTIVE_RESOURCE_ADMISSION_QUESTIONS[0]!.question).toContain("weekly");

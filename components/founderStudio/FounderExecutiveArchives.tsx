@@ -12,7 +12,7 @@ export function FounderExecutiveArchives() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="FIRE™ · Executive Archives"
+        eyebrow="FIRE · Executive Archives"
         title="Executive Archives"
         question="What did we already decide?"
         purpose="Previous FIRE briefs — calm history, not a file cabinet."

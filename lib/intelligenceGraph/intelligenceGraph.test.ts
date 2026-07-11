@@ -15,7 +15,7 @@ import {
   SAMPLE_GRAPH_RELATIONSHIPS,
 } from "./index";
 
-describe("Companion Intelligence Graph™", () => {
+describe("Companion Intelligence Graph", () => {
   beforeEach(() => {
     resetRuntimeGraph();
   });

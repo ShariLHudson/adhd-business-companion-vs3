@@ -1,5 +1,5 @@
 /**
- * Daily Discoveries™ Framework (T-016).
+ * Daily Discoveries Framework (T-016).
  * Curated entrepreneurial insight — not daily tips.
  * V1 estate hospitality signals: lib/companionEnvironmentIntelligence/dailyDiscovery.ts (distinct).
  *
@@ -8,7 +8,7 @@
 
 import type { EntrepreneurialCapability } from "@/lib/sparkTransformationConstitution/types";
 
-/** Discovery Principle™ — all three required */
+/** Discovery Principle — all three required */
 export type DiscoveryPrinciple = "learn" | "connect" | "apply";
 
 export const DISCOVERY_PRINCIPLES: readonly DiscoveryPrinciple[] = [
@@ -23,7 +23,7 @@ export const DISCOVERY_PRINCIPLE_LABELS: Record<DiscoveryPrinciple, string> = {
   apply: "Apply",
 };
 
-/** Discovery Categories™ — rotate naturally */
+/** Discovery Categories — rotate naturally */
 export type DiscoveryCategory =
   | "entrepreneur_stories"
   | "this_day_in_business"
@@ -62,7 +62,7 @@ export const DISCOVERY_CATEGORY_LABELS: Record<DiscoveryCategory, string> = {
   hidden_connections: "Hidden Connections",
 };
 
-/** Discovery Structure™ — same rhythm every time */
+/** Discovery Structure — same rhythm every time */
 export type DiscoveryStructureStage =
   | "remarkable_idea"
   | "why_it_matters"
@@ -122,7 +122,7 @@ export const DISCOVERY_ROTATION_DIMENSIONS: readonly DiscoveryRotationDimension[
   "patterns",
 ] as const;
 
-/** Reflection™ — one thoughtful question per Discovery */
+/** Reflection — one thoughtful question per Discovery */
 export const DISCOVERY_REFLECTION_PROMPT_EXAMPLES = [
   "How could this influence your business?",
   "Where have you seen this before?",

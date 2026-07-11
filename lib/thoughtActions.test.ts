@@ -20,11 +20,20 @@ describe("thoughtActions", () => {
     });
   });
 
-  it("exposes all PR 4C action labels", () => {
+  it("exposes Clear My Mind Action Mode labels", () => {
+    expect(THOUGHT_ACTION_LABEL["do-now"]).toBe("Do Now");
+    expect(THOUGHT_ACTION_LABEL.today).toBe("Today");
+    expect(THOUGHT_ACTION_LABEL["this-week"]).toBe("This Week");
     expect(THOUGHT_ACTION_LABEL["mark-done"]).toBe("Mark Done");
     expect(THOUGHT_ACTION_LABEL.schedule).toBe("Schedule");
     expect(THOUGHT_ACTION_LABEL["add-to-calendar"]).toBe("Add to Calendar");
     expect(THOUGHT_ACTION_LABEL["move-to-project"]).toBe("Move to Project");
+    expect(THOUGHT_ACTION_LABEL.research).toBe("Research");
+    expect(THOUGHT_ACTION_LABEL.waiting).toBe("Waiting");
+    expect(THOUGHT_ACTION_LABEL.someday).toBe("Someday");
+    expect(THOUGHT_ACTION_LABEL["parking-lot"]).toBe("Parking Lot");
+    expect(THOUGHT_ACTION_LABEL.reference).toBe("Reference");
+    expect(THOUGHT_ACTION_LABEL.journal).toBe("Journal");
     expect(THOUGHT_ACTION_LABEL["plan-my-day"]).toBe("Move to Plan My Day");
     expect(THOUGHT_ACTION_LABEL["keep-here"]).toBe("Keep Here");
     expect(THOUGHT_ACTION_LABEL.delete).toBe("Delete");

@@ -29,7 +29,7 @@ const VISIT_WISH_RE =
   /\b(?:i(?:'d| would)?\s+like\s+to\s+visit|i want to visit|can we visit)\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i;
 
 function phraseNamesEstateRoom(phrase: string): boolean {
-  const trimmed = phrase.trim().replace(/[™®.!?]+$/g, "");
+  const trimmed = phrase.trim().replace(/[®.!?]+$/g, "");
   if (!trimmed) return false;
   return messageNamesExactEstateRoom(trimmed) || detectDirectCommand(trimmed) !== null;
 }

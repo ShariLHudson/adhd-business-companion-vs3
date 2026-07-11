@@ -1,22 +1,9 @@
-import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import {
   GAZEBO_JOURNAL_BACKGROUND_URL,
   JOURNAL_WELCOME_PLATE_URL,
 } from "./journalGazeboMedia";
 
 const RETURN_VISIT_COUNT_KEY = "spark-journal-gazebo-return-visit-count";
-
-/** Peaceful estate scenes — rotated after each return visit begins at the Gazebo. */
-const ESTATE_RETURN_ROTATION: readonly string[] = [
-  ESTATE_ROOM_BG.seatAtPond,
-  ESTATE_ROOM_BG.readingNook,
-  ESTATE_ROOM_BG.greenhouse,
-  ESTATE_ROOM_BG.celebrationGarden,
-  ESTATE_ROOM_BG.coffeeHouse,
-  ESTATE_ROOM_BG.musicRoom,
-  ESTATE_ROOM_BG.teaRoom,
-  ESTATE_ROOM_BG.butterflyConservatory,
-];
 
 export type JournalSessionScenes = {
   /** Always the Gazebo — every session opens here. */
@@ -52,19 +39,14 @@ export function journalGazeboStartUrl(): string {
 }
 
 /**
- * Return visits (Open today's page) — rotate through peaceful estate scenes.
- * First visit / create-new-journal always uses the gazebo plate via workshop resolver.
+ * Return visits — always the clean gazebo desk (no welcome letter on the plate).
  */
 export function recordJournalReturnSession(): JournalSessionScenes {
   const count = safeGetCount() + 1;
   safeSetCount(count);
 
-  const estateUrl =
-    ESTATE_RETURN_ROTATION[(count - 1) % ESTATE_RETURN_ROTATION.length] ??
-    ESTATE_RETURN_ROTATION[0]!;
-
   return {
-    gazeboUrl: estateUrl,
+    gazeboUrl: journalGazeboStartUrl(),
     settledUrl: null,
     transitionAfterMs: 0,
   };

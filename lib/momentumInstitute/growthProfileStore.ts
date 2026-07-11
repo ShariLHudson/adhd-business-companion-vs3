@@ -1,5 +1,5 @@
 /**
- * Growth Profile™ — automatic quiet updates. No permission prompts.
+ * Growth Profile — automatic quiet updates. No permission prompts.
  */
 
 import type {

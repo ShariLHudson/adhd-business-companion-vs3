@@ -38,9 +38,10 @@ import type { WelcomeHomeExperiencePlan } from "@/lib/sparkExperienceEngine";
 import {
   hasPendingWelcomeRoomGestureUnlock,
   prefersReducedMotion,
-  WELCOME_ROOM_ASSET,
   useWelcomeRoomArrival,
 } from "@/lib/welcomeRoom";
+import { useChatBackdropRevision } from "@/lib/chatBackdrop";
+import { resolveWelcomeHomeHeroImageUrl } from "@/lib/welcomeHome/resolveWelcomeHomeHeroImageUrl";
 import {
   welcomeRoomCinematicDollyProgress,
   welcomeRoomDollyFrame,
@@ -93,6 +94,11 @@ export function WelcomeHomePage({
   const [voiceHasPlayed, setVoiceHasPlayed] = useState(false);
   const [screenReady, setScreenReady] = useState(false);
   const [heroImageLoaded, setHeroImageLoaded] = useState(false);
+  const backdropRevision = useChatBackdropRevision();
+  const heroImageUrl = useMemo(() => {
+    void backdropRevision;
+    return resolveWelcomeHomeHeroImageUrl();
+  }, [backdropRevision]);
 
   const introActive = firstVisitCinematic && phase === "intro";
   const introPlaybackReady = introActive && screenReady;
@@ -215,8 +221,8 @@ export function WelcomeHomePage({
   }, [phase, onIntroComplete]);
 
   useEffect(() => {
-    preloadRoomBackground(WELCOME_ROOM_ASSET);
-  }, []);
+    preloadRoomBackground(heroImageUrl);
+  }, [heroImageUrl]);
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -313,7 +319,7 @@ export function WelcomeHomePage({
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={WELCOME_ROOM_ASSET}
+                    src={heroImageUrl}
                     alt=""
                     className="welcome-room__photo welcome-home-page__photo"
                     style={{

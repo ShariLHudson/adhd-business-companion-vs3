@@ -11,7 +11,7 @@ import {
   routeExperienceFromPhrase,
 } from "./index";
 
-describe("Executive Experience Framework™", () => {
+describe("Executive Experience Framework", () => {
   it("defines eight experience types — not software modules", () => {
     expect(ALL_EXPERIENCE_IDS.length).toBe(8);
     expect(EXPERIENCE_FRAMEWORK_PRINCIPLE).toContain("experiences");

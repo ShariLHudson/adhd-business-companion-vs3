@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Registry™ — Phase 1 read-only layer + legacy room hints.
+ * Estate Knowledge Registry — Phase 1 read-only layer + legacy room hints.
  *
  * @see docs/ESTATE_KNOWLEDGE_REGISTRY_AUDIT.md
  * @see docs/estate/LAW_4_PHASE_0_MIGRATION_REPORT.md

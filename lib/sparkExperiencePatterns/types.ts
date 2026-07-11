@@ -1,5 +1,5 @@
 /**
- * Experience Patterns™ — twelve reusable interaction patterns for Spark.
+ * Experience Patterns — twelve reusable interaction patterns for Spark.
  *
  * @see docs/EXPERIENCE_PATTERNS.md
  */

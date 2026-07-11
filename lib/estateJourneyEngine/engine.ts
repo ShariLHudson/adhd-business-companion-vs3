@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — orchestration API.
+ * Estate Journey Engine — orchestration API.
  */
 
 import type { EstateEmotionalLabel } from "@/lib/estateMemory/types";

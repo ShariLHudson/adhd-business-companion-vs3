@@ -16,13 +16,13 @@ describe("conversationConfirmationGate", () => {
 
   it("detects estate room invitation", () => {
     const line =
-      "Peaceful Places™ inside the Estate was created for moments like this. Would you like me to take you there?";
+      "Peaceful Places inside the Estate was created for moments like this. Would you like me to take you there?";
     expect(messageAsksUserConfirmation(line)).toBe(true);
   });
 
   it("does not treat statements as confirmation waits", () => {
     expect(
-      messageAsksUserConfirmation("Momentum Builder™ helps with overwhelm."),
+      messageAsksUserConfirmation("Momentum Builder helps with overwhelm."),
     ).toBe(false);
   });
 

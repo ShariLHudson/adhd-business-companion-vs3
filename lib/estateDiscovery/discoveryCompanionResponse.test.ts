@@ -21,7 +21,7 @@ describe("discoveryNotePresentation", () => {
     const selection: DiscoveryEngineSelection = {
       discoveryId: "DISC-002",
       category: "welcome",
-      title: "Meet Your Discovery Key™",
+      title: "Meet Your Discovery Key",
       subtitle: null,
       destinationRoute: null,
       destinationSection: null,

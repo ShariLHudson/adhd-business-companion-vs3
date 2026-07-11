@@ -1,5 +1,5 @@
 /**
- * Founder bridge — Executive Builder™
+ * Founder bridge — Executive Builder
  */
 import type { MissionId } from "@/lib/founder/missions/types";
 import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";

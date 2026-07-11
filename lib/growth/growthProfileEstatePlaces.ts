@@ -9,19 +9,21 @@ export type GrowthProfileEstatePlace = {
   cta: string;
 };
 
-/** Estate destinations surfaced from Growth Profile™ — room plate per place. */
+/** Estate destinations surfaced from Growth Profile — room plate per place. */
 export const GROWTH_PROFILE_ESTATE_PLACES: readonly GrowthProfileEstatePlace[] = [
   {
     actionId: "portfolio",
-    title: "Portfolio™",
-    description: "Creative work and projects — what you've built, in one thoughtful place.",
+    title: "Hall of Accomplishments",
+    description:
+      "Major achievements, milestones, launches, and finished work — look what you've accomplished.",
     image: PORTFOLIO_ROOM_BG,
-    cta: "Visit Portfolio →",
+    cta: "Visit the Hall →",
   },
   {
     actionId: "evidence-vault",
-    title: "Evidence Vault™",
-    description: "Proof of growth for harder days — wins preserved with dignity.",
+    title: "Evidence Vault",
+    description:
+      "Private proof, testimonials, and encouragement for the days you need to remember who you are.",
     image: EVIDENCE_VAULT_ROOM_BG,
     cta: "Visit the Vault →",
   },

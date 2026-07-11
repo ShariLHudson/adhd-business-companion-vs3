@@ -17,7 +17,7 @@ export function sparkLandscapesHintForChat(
   const primary = SPARK_LANDSCAPES[decision.primary];
 
   const lines = [
-    "SPARK LANDSCAPES™ (internal — today's weather, NOT identity):",
+    "SPARK LANDSCAPES (internal — today's weather, NOT identity):",
     SPARK_LANDSCAPE_CORE_RULE,
     `Ask quietly: "${SPARK_LANDSCAPE_QUESTION}"`,
     `Recognized: ${primary.emoji} ${primary.name} (${decision.confidence}) — member did NOT choose this`,

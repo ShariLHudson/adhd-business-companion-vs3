@@ -5,7 +5,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-command-center",
     href: `${FOUNDER_STUDIO_BASE}/executive-command-center`,
-    title: "Executive Command Center™",
+    title: "Executive Command Center",
     question: "What matters today?",
     purpose:
       "The Executive Headquarters — one mission, one recommendation, one next action. Everything else expands only when you ask.",
@@ -86,7 +86,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "team-hub",
     href: `${FOUNDER_STUDIO_BASE}/team-hub`,
-    title: "Team Hub™",
+    title: "Team Hub",
     question:
       "What needs to be executed, assigned, reviewed, or approved?",
     purpose: "Founder thinks. Team Hub executes.",
@@ -104,7 +104,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-strategy",
     href: `${FOUNDER_STUDIO_BASE}/executive-strategy`,
-    title: "Executive Strategy Center™",
+    title: "Executive Strategy Center",
     question: "What deserves your clearest thinking?",
     purpose:
       "Visual thinking for decisions, roadmaps, and leadership — not execution.",
@@ -113,7 +113,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-research",
     href: `${FOUNDER_STUDIO_BASE}/executive-research`,
-    title: "Executive Research Center™",
+    title: "Executive Research Center",
     question: "What does Shari actually need to know?",
     purpose:
       "Your private research department — answer, evidence, Spark application, prepared action.",
@@ -122,7 +122,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "opportunity-discovery",
     href: `${FOUNDER_STUDIO_BASE}/opportunity-discovery`,
-    title: "Opportunity Discovery Center™",
+    title: "Opportunity Discovery Center",
     question: "If this were my company, what would I build next?",
     purpose:
       "Evidence-backed opportunities — today's biggest bet, quick wins, threats, and what to watch.",
@@ -131,7 +131,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-builder",
     href: `${FOUNDER_STUDIO_BASE}/executive-builder`,
-    title: "Executive Builder™",
+    title: "Executive Builder",
     question: "Where do I start?",
     purpose:
       "Complete implementation blueprints — phases, work packets, three options, draft outputs. Never a blank page.",
@@ -140,7 +140,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-simulation",
     href: `${FOUNDER_STUDIO_BASE}/executive-simulation`,
-    title: "Executive Simulation Studio™",
+    title: "Executive Simulation Studio",
     question: "If we choose this path… what is most likely to happen?",
     purpose:
       "Compare possible futures — tradeoffs, risks, and opportunity cost before you commit time, money, or energy.",
@@ -149,7 +149,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-memory-theater",
     href: `${FOUNDER_STUDIO_BASE}/executive-memory-theater`,
-    title: "Executive Memory Theater™",
+    title: "Executive Memory Theater",
     question: "What happened — and what did we learn?",
     purpose:
       "The living history of Visual Spark Studios — replay decisions, launches, and journeys as executive wisdom.",
@@ -158,7 +158,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-intelligence-graph",
     href: `${FOUNDER_STUDIO_BASE}/executive-intelligence-graph`,
-    title: "Executive Intelligence Graph™",
+    title: "Executive Intelligence Graph",
     question: "How is everything connected?",
     purpose:
       "The living brain — relationships, not folders. Every product, decision, and idea linked into intelligence.",
@@ -167,7 +167,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-relationship-intelligence",
     href: `${FOUNDER_STUDIO_BASE}/executive-relationship-intelligence`,
-    title: "Executive Relationship Intelligence™",
+    title: "Executive Relationship Intelligence",
     question: "What might we be missing?",
     purpose:
       "The discovery engine — hidden patterns, butterfly chains, and Founder Alerts that create new executive knowledge.",
@@ -176,7 +176,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-discovery-engine",
     href: `${FOUNDER_STUDIO_BASE}/executive-discovery-engine`,
-    title: "Executive Discovery Engine™",
+    title: "Executive Discovery Engine",
     question: "What did Founder find while you were away?",
     purpose:
       "Your executive discovery department — daily briefs, weekly patterns, and calm recommendations before you ask.",
@@ -185,7 +185,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-resources-center",
     href: `${FOUNDER_STUDIO_BASE}/executive-resources-center`,
-    title: "Executive Resources Center™",
+    title: "Executive Resources Center",
     question: "Where are all important external resources?",
     purpose:
       "Single authoritative location — systems, AI tools, documents, dashboards, and executive links. Nothing important scattered elsewhere.",
@@ -194,7 +194,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-integration-center",
     href: `${FOUNDER_STUDIO_BASE}/executive-integration-center`,
-    title: "Executive Integration Center™",
+    title: "Executive Integration Center",
     question: "What do I need from my connected systems today?",
     purpose:
       "Mission Control — Founder orchestrates PostCraft, GHL, GitHub, Google, Cursor, and every department of Visual Spark Studios.",
@@ -203,7 +203,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "founder-knowledge-vault",
     href: `${FOUNDER_STUDIO_BASE}/founder-knowledge-vault`,
-    title: "Founder Knowledge Vault™",
+    title: "Founder Knowledge Vault",
     question: "Where does our source of truth live?",
     purpose:
       "Executive archive — constitutions, blueprints, prompts, Cursor rules, and recovery documents.",
@@ -212,7 +212,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "spark-master-library",
     href: `${FOUNDER_STUDIO_BASE}/spark-master-library`,
-    title: "Spark Master Library™",
+    title: "Spark Master Library",
     question: "Where does everything important belong?",
     purpose:
       "Permanent index of all Spark knowledge — unlimited growth, one calm catalog.",
@@ -221,7 +221,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "ai-extensions-center",
     href: `${FOUNDER_STUDIO_BASE}/ai-extensions-center`,
-    title: "AI Extensions Center™",
+    title: "AI Extensions Center",
     question: "Which specialist AI tool helps today?",
     purpose:
       "ChatGPT, Claude, Gemini, Cursor, and image tools — extensions only; Founder remains headquarters.",
@@ -230,7 +230,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "executive-judgment-engine",
     href: `${FOUNDER_STUDIO_BASE}/executive-judgment-engine`,
-    title: "Executive Judgment Engine™",
+    title: "Executive Judgment Engine",
     question: "What would I recommend today?",
     purpose:
       "The executive brain — everything competes, judgment decides what deserves attention. Wisdom before Founder speaks.",
@@ -239,7 +239,7 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
-    title: "Decision Vault™",
+    title: "Decision Vault",
     question: "What did we decide — and why?",
     purpose:
       "Institutional memory — decisions, lessons, milestones, and the company story.",

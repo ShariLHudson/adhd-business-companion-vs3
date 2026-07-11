@@ -23,6 +23,13 @@
   object-position: center center;
 }
 
+/* Ocean Conservatory — native scale (no watermark crop) + light contrast lift */
+.estate-room-fullbleed-cinematic--ocean-conservatory .cinematic-background__media {
+  filter: contrast(1.06) saturate(1.05);
+  backface-visibility: hidden;
+  transform: scale(var(--video-scale)) translateZ(0);
+}
+
 .estate-room-fullbleed-bg {
   position: fixed;
   inset: 0;
@@ -100,9 +107,49 @@
   );
 }
 
+/* Member-chosen environment — show the full designed plate (Change background). */
+.estate-room-fullbleed-stack--show-full-plate {
+  background: linear-gradient(180deg, #2a2420 0%, #1a1612 48%, #12100e 100%);
+}
+
+.estate-room-fullbleed-bg--show-full-plate {
+  object-fit: contain;
+  object-position: center center;
+}
+
+/* Demo estate rooms — show the full designed plate (no crop). */
+.companion-chamber-active .chamber-room__cinematic .cinematic-background__media,
+.companion-evidence-vault-active .estate-collection-room .estate-room-fullbleed-bg,
+.companion-cartographers-active .estate-room-fullbleed-bg,
+.companion-growth-active .journal-gazebo__background {
+  object-fit: contain;
+  object-position: center center;
+  transform: none;
+}
+
+.companion-chamber-active .chamber-room__cinematic,
+.companion-evidence-vault-active .estate-room-fullbleed-stack,
+.companion-cartographers-active .estate-room-fullbleed-stack {
+  background: linear-gradient(180deg, #2a2420 0%, #1a1612 48%, #12100e 100%);
+}
+
 .companion-stables-active > .relative.flex.min-h-0,
-.companion-momentum-institute-active > .relative.flex.min-h-0 {
+.companion-momentum-institute-active > .relative.flex.min-h-0,
+.companion-chamber-active > .relative.flex.min-h-0 {
   background: transparent;
+}
+
+.companion-chamber-active .clear-my-mind-standalone-shell,
+.companion-chamber-active .clear-my-mind-standalone-frame {
+  background: transparent;
+  min-height: 100dvh;
+  min-height: 100svh;
+}
+
+.companion-chamber-active .companion-bg-base {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .companion-stables-active .estate-room-main {

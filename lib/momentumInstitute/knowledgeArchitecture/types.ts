@@ -1,5 +1,5 @@
 /**
- * Spark Knowledge Architecture™ — Phase 3 runtime types.
+ * Spark Knowledge Architecture — Phase 3 runtime types.
  * Catalog contracts live in @/lib/sparkMomentumInstitute/types.
  *
  * @see docs/MOMENTUM_INSTITUTE_ARCHITECTURE.md

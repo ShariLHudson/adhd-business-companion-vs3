@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — member profile and personalization engine (Phase 15).
+ * Spark Estate — member profile and personalization engine (Phase 15).
  * Seven profile layers; gradual learning; member control without questionnaires.
  *
  * @see docs/protocols/SPARK_ESTATE_MEMBER_PROFILE_AND_PERSONALIZATION_ENGINE_SPECIFICATION_PHASE15.md
@@ -860,7 +860,7 @@ export function formatSparkEstateMemberProfileReport(
   verification: ReturnType<typeof verifySparkEstateMemberProfile> = verifySparkEstateMemberProfile(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ member profile: ${verification.personalizationReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate member profile: ${verification.personalizationReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_PROFILE_PRINCIPLE,
     SPARK_ESTATE_PROFILE_SUCCESS_TEST,
     SPARK_ESTATE_PRIVACY_PRINCIPLE,

@@ -38,7 +38,7 @@ export const SAMPLE_FIRE_TODAY_PORTFOLIO: FireExecutivePortfolio = {
       id: "es-4",
       whatChanged: "Founder Intelligence OS Phase 2 foundation is in place.",
       whyItMatters:
-        "FIRE™, FLAME™, and SPARK™ can plug in without another structural refactor.",
+        "FIRE, FLAME, and SPARK can plug in without another structural refactor.",
     },
     {
       id: "es-5",
@@ -111,7 +111,7 @@ export const SAMPLE_FIRE_TODAY_PORTFOLIO: FireExecutivePortfolio = {
   opportunities: {
     top: "Premium Estate cohort — twelve founders, conversation-first onboarding.",
     revenue:
-      "ADHD planner bundle paired with Spark Card™ — test with three trusted founders.",
+      "ADHD planner bundle paired with Spark Card — test with three trusted founders.",
     product:
       "Member welcome video — sixty seconds, Shari voice, no product tour.",
     relationship:

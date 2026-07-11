@@ -36,7 +36,7 @@ function patchFromNavigation(
 
   const locationId = location?.locationId ?? nav.placeId;
   const display =
-    location?.officialDisplayName?.replace(/™/g, "") ?? nav.placeId;
+    location?.officialDisplayName?.replace(/\u2122/g, "") ?? nav.placeId;
 
   return {
     currentLocation: {
@@ -184,7 +184,7 @@ export function updateCompanionContextFromEstateRuntime(
     patch.currentLocation = {
       locationId: loc?.locationId ?? placeId,
       placeId,
-      displayName: loc?.officialDisplayName?.replace(/™/g, "") ?? placeId,
+      displayName: loc?.officialDisplayName?.replace(/\u2122/g, "") ?? placeId,
     };
     patch.pendingAction = null;
   }

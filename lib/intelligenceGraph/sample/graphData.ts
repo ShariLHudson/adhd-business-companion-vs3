@@ -23,7 +23,7 @@ export const SAMPLE_GRAPH_NODES: GraphNode[] = [
   node({
     id: "node-listening-rooms",
     kind: "listening-room",
-    title: "Listening Rooms™",
+    title: "Listening Rooms",
     summary: "Calm estate re-entry for members returning after absence.",
     status: "active",
     missionIds: ["listening-rooms"],

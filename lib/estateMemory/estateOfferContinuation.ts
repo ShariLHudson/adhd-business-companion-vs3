@@ -1,5 +1,5 @@
 /**
- * Estate workspace offer continuation — register and recover Creative Studio™ (etc.)
+ * Estate workspace offer continuation — register and recover Creative Studio (etc.)
  * invitations so "yes" opens the room instead of a dead-end fallback.
  */
 

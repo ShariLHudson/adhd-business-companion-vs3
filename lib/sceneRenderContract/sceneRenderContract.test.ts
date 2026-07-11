@@ -37,14 +37,14 @@ describe("Scene Render Contract", () => {
     expect(Number(layout.cssVars["--scene-image-dominance"])).toBeGreaterThan(0.8);
   });
 
-  it("clear my mind conservatory fills the room without edge motion", () => {
+  it("clear my mind sunroom fills the room without edge motion", () => {
     const resolved = resolveScene(
       createSceneState({ workspaceId: "clear-my-mind" }),
     );
     expect(resolved.motion.placement).toBe("none");
     expect(resolved.motion.enabled).toBe(false);
     expect(resolved.background.mode).toBe("photo-scene");
-    expect(resolved.background.imageUrl).toContain("greenhouse-background");
+    expect(resolved.background.imageUrl).toContain("sunroom-background");
     expect(resolved.environment.placeId).toBe("greenhouse");
   });
 
@@ -53,7 +53,7 @@ describe("Scene Render Contract", () => {
       createSceneState({ workspaceId: "breathe", seed: "breathe" }),
     );
     expect(resolved.motion.enabled).toBe(false);
-    expect(resolved.background.imageUrl).toBeTruthy();
+    expect(resolved.background.mode).toBe("none");
   });
 
   it("focus category copy comes from resolver", () => {
@@ -122,6 +122,7 @@ describe("Scene Render Contract", () => {
     expect(resolved.signatureId).toBeUndefined();
     expect(resolved.objectId).toBeUndefined();
     expect(hasRenderableSignatureObject(resolved)).toBe(false);
+    expect(resolved.background.mode).toBe("none");
   });
 
   it("partial signature ids do not qualify for render", () => {

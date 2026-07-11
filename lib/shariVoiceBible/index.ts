@@ -1,7 +1,7 @@
 /**
  * Shari Voice Bible
  *
- * Permanent communication foundation for the ADHD Business Ecosystem™.
+ * Permanent communication foundation for the ADHD Business Ecosystem.
  * Every companion sentence originates here — not ad-hoc copy.
  */
 

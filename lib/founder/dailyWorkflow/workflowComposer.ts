@@ -1,5 +1,5 @@
 /**
- * Workflow Composer™ — assembles today's work from existing Founder services.
+ * Workflow Composer — assembles today's work from existing Founder services.
  * Consumes Concierge, FLAME, FIRE, SPARK bridge, and Workspace Orchestrator.
  * No new intelligence. No duplication.
  */

@@ -51,7 +51,7 @@ export function getAreasInFamily(familyPrefix: string): EstateLocation[] {
 function formatAreaName(location: EstateLocation): string {
   return (
     AREA_DISPLAY[location.locationId] ??
-    location.officialDisplayName.replace(/™/g, "").trim()
+    location.officialDisplayName.replace(/\u2122/g, "").trim()
   );
 }
 
@@ -63,7 +63,7 @@ export function formatLocationAreasReply(parentLocationId: string): string | nul
 
   const parent = getEstateLocationById(resolveParentLocationId(parentLocationId));
   const houseName =
-    parent?.officialDisplayName?.replace(/™/g, "") ?? "Possibility House";
+    parent?.officialDisplayName?.replace(/\u2122/g, "") ?? "Possibility House";
 
   const areas = getAreasInFamily(family).filter(
     (loc) => loc.locationId !== resolveParentLocationId(parentLocationId),
@@ -88,8 +88,8 @@ export function formatLocationHereReply(locationId: string): string | null {
     if (!loc) return null;
     const hint = loc.memberFacingHint || loc.description;
     return hint
-      ? `You're in ${loc.officialDisplayName.replace(/™/g, "")}. ${hint}`
-      : `You're in ${loc.officialDisplayName.replace(/™/g, "")}.`;
+      ? `You're in ${loc.officialDisplayName.replace(/\u2122/g, "")}. ${hint}`
+      : `You're in ${loc.officialDisplayName.replace(/\u2122/g, "")}.`;
   }
   return formatLocationAreasReply(locationId);
 }

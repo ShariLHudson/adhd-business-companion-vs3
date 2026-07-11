@@ -1,4 +1,4 @@
-/** Executive Judgment Engine™ — final layer before Founder speaks. */
+/** Executive Judgment Engine — final layer before Founder speaks. */
 
 export type JudgmentScoreDimension =
   | "impact"

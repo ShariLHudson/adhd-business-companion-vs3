@@ -1,5 +1,5 @@
 /**
- * Spark Alpha™ — Hidden Work Log (developer only).
+ * Spark Alpha — Hidden Work Log (developer only).
  *
  * @see docs/SPARK_ALPHA_FRAMEWORK.md
  */
@@ -156,7 +156,7 @@ export function recordTurnHiddenWork(input: {
       turnId: input.turnId,
       category: "spark_card",
       status: "prepared",
-      summary: "Possible Spark Card™ signal detected — not surfaced",
+      summary: "Possible Spark Card signal detected — not surfaced",
     });
   }
 

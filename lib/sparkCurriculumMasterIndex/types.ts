@@ -1,5 +1,5 @@
 /**
- * Spark Curriculum Master Index™ — Phase 4
+ * Spark Curriculum Master Index — Phase 4
  * Permanent curriculum roadmap. Structure only — no lesson content.
  *
  * @see docs/SPARK_CURRICULUM_MASTER_INDEX.md
@@ -38,23 +38,23 @@ export const CURRICULUM_EXPERIENCE_LABELS: Record<
   CurriculumExperienceKind,
   string
 > = {
-  knowledge_card: "Knowledge Card™",
-  business_mastery_minute: "Business Mastery Minute™",
-  strategy_collection: "Strategy Collection™",
-  deep_lesson: "Deep Lesson™",
-  business_lab: "Business Lab™",
-  simulation: "Simulation™",
-  challenge: "Challenge™",
-  apprenticeship: "Apprenticeship™",
-  reflection: "Reflection™",
-  worksheet: "Worksheet™",
-  thinking_gym: "Thinking Gym™",
-  coaching_session: "Coaching Session™",
-  apply_to_my_business: "Apply To My Business™",
+  knowledge_card: "Knowledge Card",
+  business_mastery_minute: "Business Mastery Minute",
+  strategy_collection: "Strategy Collection",
+  deep_lesson: "Deep Lesson",
+  business_lab: "Business Lab",
+  simulation: "Simulation",
+  challenge: "Challenge",
+  apprenticeship: "Apprenticeship",
+  reflection: "Reflection",
+  worksheet: "Worksheet",
+  thinking_gym: "Thinking Gym",
+  coaching_session: "Coaching Session",
+  apply_to_my_business: "Apply To My Business",
 };
 
 /**
- * One row in the master curriculum — maps 1:1 to a future Knowledge Card™.
+ * One row in the master curriculum — maps 1:1 to a future Knowledge Card.
  * Every field is data-driven; bodies load later from CMS.
  */
 export type CurriculumMasterIndexEntry = {

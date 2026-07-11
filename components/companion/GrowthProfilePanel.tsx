@@ -13,7 +13,7 @@ import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import "@/app/companion/growth-story-hub.css";
 
 type Props = {
-  /** Emphasize timeline when opened from Progress Timeline™ */
+  /** Emphasize timeline when opened from Progress Timeline */
   emphasizeTimeline?: boolean;
   /** Inside frosted estate workspace — skip modal padding shell */
   embedded?: boolean;
@@ -91,7 +91,7 @@ export function GrowthProfilePanel({
         className={`mt-6${emphasizeTimeline ? " rounded-xl border border-[#d4cdc3] bg-[#faf7f2] p-4" : ""}`}
       >
         <h3 className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          {emphasizeTimeline ? "Progress Timeline™" : "Recent activity"}
+          {emphasizeTimeline ? "Progress Timeline" : "Recent activity"}
         </h3>
         {profile.timeline.length === 0 ? (
           <p className="mt-2 text-sm text-[#6b635a]">

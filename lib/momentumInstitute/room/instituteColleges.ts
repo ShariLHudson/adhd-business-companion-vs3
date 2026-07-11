@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — six colleges (orientation copy; drawer wall remains navigation).
+ * Momentum Institute — six colleges (orientation copy; drawer wall remains navigation).
  */
 
 export type InstituteCollege = {
@@ -17,6 +17,6 @@ export const MOMENTUM_INSTITUTE_COLLEGES: InstituteCollege[] = [
 ] as const;
 
 export const MOMENTUM_INSTITUTE_ARRIVAL = {
-  title: "Momentum Institute™",
+  title: "Momentum Institute",
   invitation: "Choose a drawer to begin.",
 } as const;

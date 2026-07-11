@@ -17,4 +17,5 @@ export { OCEAN_CONSERVATORY_AMBIENCE_MP3 } from "@/lib/soundscapes/audioAssets";
 export {
   OCEAN_CONSERVATORY_POSTER,
   OCEAN_CONSERVATORY_VIDEO,
+  OCEAN_CONSERVATORY_VIDEO_PLAYBACK_RATE,
 } from "./media";

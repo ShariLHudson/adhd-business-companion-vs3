@@ -1,5 +1,5 @@
 /**
- * Spark Restoration Intelligence™ — energy types and evaluation.
+ * Spark Restoration Intelligence — energy types and evaluation.
  * @see docs/estate/SPARK_RESTORATION_INTELLIGENCE.md
  */
 

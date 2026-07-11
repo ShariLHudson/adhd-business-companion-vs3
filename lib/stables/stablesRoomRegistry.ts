@@ -1,5 +1,5 @@
 /**
- * The Stables™ — estate room registration.
+ * The Stables — estate room registration.
  */
 
 import type { AppSection } from "@/lib/companionUi";
@@ -12,7 +12,7 @@ export const STABLES_ROOM_BG = ESTATE_ROOM_BG.stables;
 export const STABLES_ROOM_META = {
   section: STABLES_SECTION,
   title: "The Stables",
-  trademark: "The Stables™",
+  trademark: "The Stables",
   subtitle: "Grounded confidence for entrepreneurs",
   purpose:
     "Develop leadership, trust, confidence, and calm through stories, analogies, reflection, and coaching — not horse training.",

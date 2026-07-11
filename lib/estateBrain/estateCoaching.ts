@@ -1,5 +1,5 @@
 /**
- * Estate Coaching Architecture™ — coach before navigate.
+ * Estate Coaching Architecture — coach before navigate.
  *
  * What is the member trying to accomplish?
  * What is getting in the way?

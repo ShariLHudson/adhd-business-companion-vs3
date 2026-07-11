@@ -1,5 +1,5 @@
 /**
- * Spark Estate Navigation Philosophy™ — operating system for routing.
+ * Spark Estate Navigation Philosophy — operating system for routing.
  *
  * The user should never need to know where a feature lives. Spark knows the Estate.
  * The member shares what they want to accomplish. Spark guides them to the most

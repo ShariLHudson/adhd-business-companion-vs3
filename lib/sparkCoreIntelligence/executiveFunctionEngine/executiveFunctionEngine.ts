@@ -1,5 +1,5 @@
 /**
- * Spark Executive Function Engine™
+ * Spark Executive Function Engine
  * Reduce cognitive load before asking the user to do more cognitive work.
  */
 

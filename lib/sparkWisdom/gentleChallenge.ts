@@ -1,5 +1,5 @@
 /**
- * Spec 124 — Gentle Challenge™
+ * Spec 124 — Gentle Challenge
  */
 
 import type { GentleChallengeCue } from "./types";

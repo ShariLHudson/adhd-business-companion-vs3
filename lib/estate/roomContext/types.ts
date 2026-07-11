@@ -1,5 +1,5 @@
 /**
- * Estate Room Context™ — in-room actions vs navigation.
+ * Estate Room Context — in-room actions vs navigation.
  */
 
 import type { AppSection } from "@/lib/companionUi";

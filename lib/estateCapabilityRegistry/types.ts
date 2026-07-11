@@ -1,5 +1,5 @@
 /**
- * Estate Capability Registry™ — canonical capability model.
+ * Estate Capability Registry — canonical capability model.
  * Spark consults this before routing. Never guess what exists.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Estate Place Navigation Policy™ — PATH B only.
+ * Estate Place Navigation Policy — PATH B only.
  *
  * PATH A (conversation) returns { type: "none" } — never guess toward routing.
  * PATH B: canonical registry · numbered menus · immediate selection → goToPlace.
@@ -425,7 +425,7 @@ function placeIdFromUserSelection(
         (row) => row.viewId === sceneToken.viewId,
       );
       if (view) {
-        const label = normalize(view.label.replace(/™/g, ""));
+        const label = normalize(view.label.replace(/\u2122/g, ""));
         if (normalized.includes(label) || normalized.includes(sceneToken.viewId)) {
           return placeId;
         }

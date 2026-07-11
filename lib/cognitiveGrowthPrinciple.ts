@@ -1,5 +1,5 @@
 /**
- * Cognitive Growth Principle — product north star for the ADHD Business Ecosystem™.
+ * Cognitive Growth Principle — product north star for the ADHD Business Ecosystem.
  * Support first. Growth second. Users should feel helped before they feel taught.
  */
 

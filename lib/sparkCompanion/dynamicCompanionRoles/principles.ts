@@ -82,7 +82,7 @@ export const ROLE_SWITCH_EXAMPLES = [
 export const SPARK_FOUR_ROLES_SUMMARY =
   "Create & Do — Let's build it. · Think & Decide — Let's figure it out. · Support & Restore — Let's make this feel lighter. · Discover & Learn — Let me teach and show you what's possible." as const;
 
-export const DYNAMIC_COMPANION_ROLES_PROMPT_BLOCK = `# DYNAMIC COMPANION ROLES™
+export const DYNAMIC_COMPANION_ROLES_PROMPT_BLOCK = `# DYNAMIC COMPANION ROLES
 
 Before responding, ask silently: **"What role would be most helpful right now?"**
 

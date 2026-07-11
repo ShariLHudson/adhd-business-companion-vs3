@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PortfolioRoomShell } from "@/components/companion/PortfolioRoomShell";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
 import {
+  createPortfolioEntry,
   deletePortfolioEntry,
+  filterHallEntries,
   getPortfolioEntries,
   GROWTH_PORTFOLIO_UPDATED_EVENT,
+  HALL_ACHIEVEMENT_TYPES,
   type PortfolioEntry,
 } from "@/lib/growthPortfolioStore";
 import type { GrowthPanelNav } from "@/lib/growthNavigation";
@@ -30,6 +33,17 @@ export function GrowthPortfolioPanel({
   nav: GrowthPanelNav;
 }) {
   const [entries, setEntries] = useState<PortfolioEntry[]>([]);
+  const [showAdd, setShowAdd] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [achievementType, setAchievementType] = useState<string>(
+    HALL_ACHIEVEMENT_TYPES[0]!,
+  );
+  const [projectName, setProjectName] = useState("");
+  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const [filterType, setFilterType] = useState("");
+  const [filterYear, setFilterYear] = useState("");
+  const [filterQuery, setFilterQuery] = useState("");
 
   useEffect(() => {
     const load = () => setEntries(getPortfolioEntries());
@@ -38,6 +52,39 @@ export function GrowthPortfolioPanel({
     return () => window.removeEventListener(GROWTH_PORTFOLIO_UPDATED_EVENT, load);
   }, []);
 
+  const filtered = useMemo(
+    () =>
+      filterHallEntries(entries, {
+        achievementType: filterType || undefined,
+        year: filterYear || undefined,
+        query: filterQuery || undefined,
+      }),
+    [entries, filterType, filterYear, filterQuery],
+  );
+
+  const years = useMemo(() => {
+    const set = new Set(
+      entries.map((e) => e.year ?? e.createdAt.slice(0, 4)).filter(Boolean),
+    );
+    return [...set].sort((a, b) => b.localeCompare(a));
+  }, [entries]);
+
+  function handleAdd() {
+    if (!title.trim()) return;
+    createPortfolioEntry({
+      title: title.trim(),
+      description: description.trim(),
+      attachments: [],
+      achievementType,
+      projectName: projectName.trim() || undefined,
+      year: year.trim() || undefined,
+    });
+    setTitle("");
+    setDescription("");
+    setProjectName("");
+    setShowAdd(false);
+  }
+
   return (
     <PortfolioRoomShell>
       <EstateWorkspace className="grow-room-panel">
@@ -45,19 +92,133 @@ export function GrowthPortfolioPanel({
 
         <header className="grow-room__header">
           <p className="estate-workspace__kicker">Your Estate</p>
-          <h1 className="estate-workspace__title">Portfolio™</h1>
+          <h1 className="estate-workspace__title">Hall of Accomplishments</h1>
           <p className="grow-room__lead grow-room__intro-support">
-            A place for your ideas, projects, courses, businesses and creative work to grow.
+            Look what you&apos;ve accomplished — milestones, launches, certifications,
+            awards, and finished work worth celebrating.
           </p>
         </header>
 
-        {entries.length === 0 ? (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163c3c]"
+            onClick={() => setShowAdd((v) => !v)}
+            data-testid="hall-add-achievement"
+          >
+            {showAdd ? "Cancel" : "Add achievement"}
+          </button>
+          <input
+            value={filterQuery}
+            onChange={(e) => setFilterQuery(e.target.value)}
+            placeholder="Search…"
+            className="min-w-[10rem] flex-1 rounded-xl border border-[#e7dfd4] bg-white px-3 py-2 text-sm"
+            aria-label="Search accomplishments"
+          />
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="rounded-xl border border-[#e7dfd4] bg-white px-3 py-2 text-sm"
+            aria-label="Filter by type"
+          >
+            <option value="">All types</option>
+            {HALL_ACHIEVEMENT_TYPES.map((t) => (
+              <option key={t} value={t}>
+                {t}
+              </option>
+            ))}
+          </select>
+          <select
+            value={filterYear}
+            onChange={(e) => setFilterYear(e.target.value)}
+            className="rounded-xl border border-[#e7dfd4] bg-white px-3 py-2 text-sm"
+            aria-label="Filter by year"
+          >
+            <option value="">All years</option>
+            {years.map((y) => (
+              <option key={y} value={y}>
+                {y}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {showAdd ? (
+          <div
+            className="mb-4 rounded-2xl border border-[#e7dfd4] bg-white/90 p-4"
+            data-testid="hall-add-form"
+          >
+            <label className="block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+              Type
+              <select
+                value={achievementType}
+                onChange={(e) => setAchievementType(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-[#c9bfb0] px-3 py-2 text-sm font-normal text-[#1f1c19]"
+              >
+                {HALL_ACHIEVEMENT_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+              Title
+              <input
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-[#c9bfb0] px-3 py-2 text-sm font-normal text-[#1f1c19]"
+                placeholder="What did you accomplish?"
+              />
+            </label>
+            <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+              Story
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="mt-1 w-full rounded-xl border border-[#c9bfb0] px-3 py-2 text-sm font-normal text-[#1f1c19]"
+                placeholder="Why it matters…"
+              />
+            </label>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <label className="flex-1 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                Project
+                <input
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-[#c9bfb0] px-3 py-2 text-sm font-normal text-[#1f1c19]"
+                  placeholder="Optional"
+                />
+              </label>
+              <label className="w-28 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                Year
+                <input
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-[#c9bfb0] px-3 py-2 text-sm font-normal text-[#1f1c19]"
+                />
+              </label>
+            </div>
+            <button
+              type="button"
+              onClick={handleAdd}
+              disabled={!title.trim()}
+              className="mt-4 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
+            >
+              Save to Hall
+            </button>
+          </div>
+        ) : null}
+
+        {filtered.length === 0 ? (
           <p className="grow-room__placeholder-card">
-            Your gallery is waiting. Capture something you made from Growth — file to Portfolio.
+            Your Hall is ready. Add a finished project, milestone, launch, or personal
+            victory — look what you&apos;ve accomplished.
           </p>
         ) : (
           <ul className="creative-studio-room__grid">
-            {entries.map((entry) => {
+            {filtered.map((entry) => {
               const cover = entry.attachments.find((a) => a.kind === "image");
               return (
                 <li key={entry.id} className="creative-studio-room__card">
@@ -71,9 +232,15 @@ export function GrowthPortfolioPanel({
                     <div className="creative-studio-room__card-placeholder" aria-hidden />
                   )}
                   <div className="creative-studio-room__card-body">
+                    {entry.achievementType ? (
+                      <p className="text-[10px] font-bold uppercase tracking-wide text-[#8b7355]">
+                        {entry.achievementType}
+                      </p>
+                    ) : null}
                     <h2 className="font-bold text-[#2f261f]">{entry.title}</h2>
                     <time className="text-[10px] font-semibold uppercase tracking-wide text-[#9a8f82]">
                       {formatDate(entry.createdAt)}
+                      {entry.year ? ` · ${entry.year}` : null}
                     </time>
                     {entry.description ? (
                       <p className="mt-2 line-clamp-3 text-sm text-[#4b463f]">
@@ -84,7 +251,7 @@ export function GrowthPortfolioPanel({
                       <div className="mt-2">
                         <GrowthAttachmentsField
                           attachments={entry.attachments}
-                          onAttachmentsChange={() => {}}
+                          onChange={() => {}}
                         />
                       </div>
                     ) : null}

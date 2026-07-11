@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — demo mode (Phase 8).
+ * Chamber of Momentum — demo mode (Phase 8).
  * Opt-in via `?chamberDemo=1` — scripted member experience, not live user data.
  */
 

@@ -1,17 +1,17 @@
 /**
- * Estate Registry™ — tool registrations.
+ * Estate Registry — tool registrations.
  */
 
 import type { EstateRegistryEntry } from "../types";
 
 export const DECISION_COMPASS_ENTRY: EstateRegistryEntry = {
   id: "decision-compass",
-  name: "Decision Compass™",
+  name: "Decision Compass",
   category: "tool",
   purpose:
     "Talk through choices with structure — member owns the decision, Spark illuminates options.",
   memberDescription:
-    "Decision Compass™ is where we talk through a choice until the right path feels clear — without rushing you.",
+    "Decision Compass is where we talk through a choice until the right path feels clear — without rushing you.",
   primarySection: "decision-compass",
   objectId: "decision-compass",
   keywords: [
@@ -49,7 +49,7 @@ export const SOUNDSCAPES_FOCUS_AUDIO_ENTRY: EstateRegistryEntry = {
   purpose:
     "Estate listening environments — rain, hearth, café, morning light, and more.",
   memberDescription:
-    "Soundscapes inside Peaceful Places™ let you stay in the Estate while the world gets quieter.",
+    "Soundscapes inside Peaceful Places let you stay in the Estate while the world gets quieter.",
   primarySection: "focus-audio",
   objectId: "focus-audio",
   keywords: [

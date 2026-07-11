@@ -72,7 +72,7 @@ describe("V3 behavior recovery — routing regression", () => {
   it("merges v3 secondary workspace offer when estate has none", () => {
     const primary = {
       section: "momentum-builder" as const,
-      buttonLabel: "Step into Momentum Builder™",
+      buttonLabel: "Step into Momentum Builder",
       line: "Let's make today easier.",
     };
     const intent = resolveIntentRouting({

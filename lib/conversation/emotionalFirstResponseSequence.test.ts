@@ -9,7 +9,7 @@ import {
   shouldUseEmotionalFirstSequence,
 } from "./emotionalFirstResponseSequence";
 
-describe("Emotional-First Response Sequence™", () => {
+describe("Emotional-First Response Sequence", () => {
   it("detects overwhelm and plans reflect → normalize before guidance", () => {
     const plan = planEmotionalFirstResponse({
       text: "I'm completely overwhelmed and don't know what to do first",

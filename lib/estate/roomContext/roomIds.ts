@@ -1,10 +1,9 @@
-/**
- * Canonical estate room identity — aliases and equivalence groups.
- */
-
-import { getCanonicalEstatePlaceById } from "../canonicalEstateRegistry";
+import {
+  getCanonicalEstatePlaceById,
+} from "../canonicalEstateRegistry";
 import { resolvePlaceId } from "../placeIdAliases";
 import { resolveEstatePlaceIdFromUserText } from "../estateRoomAliasRegistry";
+import { recognitionRoomsEquivalent } from "@/lib/sparkRecognitionEngine/recognitionIds";
 
 const ROOM_EQUIVALENCE: Record<string, readonly string[]> = {
   journal: ["journal", "journal-gazebo"],
@@ -16,6 +15,21 @@ const ROOM_EQUIVALENCE: Record<string, readonly string[]> = {
   "creative-studio": ["creative-studio", "art-studio", "strategy-studio"],
   library: ["library", "estate-library", "growth-library"],
   "personal-library": ["personal-library"],
+  /** Recognition aliases — Bank≡Vault, Wins≡Garden, Hall collection≡Celebration Room */
+  "evidence-vault": ["evidence-vault", "evidence-bank"],
+  gardens: ["gardens", "celebration-garden", "wins-this-week"],
+  "celebration-room": [
+    "celebration-room",
+    "celebration-hall",
+    "growth-reports",
+  ],
+  "gallery-of-firsts": ["gallery-of-firsts", "gallery", "the-gallery"],
+  portfolio: [
+    "portfolio",
+    "hall-of-accomplishments",
+    "hall-of-achievements",
+    "growth-portfolio",
+  ],
 };
 
 export function normalizeEstateRoomId(
@@ -34,6 +48,8 @@ export function estateRoomsEquivalent(
   a: string | null | undefined,
   b: string | null | undefined,
 ): boolean {
+  if (recognitionRoomsEquivalent(a, b)) return true;
+
   const na = normalizeEstateRoomId(a);
   const nb = normalizeEstateRoomId(b);
   if (!na || !nb) return false;

@@ -6,7 +6,7 @@ import {
   resolveHelpDiscoveryQuery,
 } from "./resolveHelpDiscoveryQuery";
 
-describe("Estate Help & Discovery Intelligence™", () => {
+describe("Estate Help & Discovery Intelligence", () => {
   it("classifies location questions", () => {
     expect(classifyHelpDiscoveryIntent("Where is the pool?")?.route).toBe(
       "location",

@@ -12,7 +12,7 @@ function entry(
 const CONSTITUTIONS: MasterLibraryItem[] = [
   entry({
     id: "ml-founder-constitution",
-    name: "Founder Experience Constitution™",
+    name: "Founder Experience Constitution",
     purpose: "Supreme authority for how Founder feels.",
     categoryId: "constitutions",
     authority: "constitution",
@@ -36,7 +36,7 @@ const CONSTITUTIONS: MasterLibraryItem[] = [
   }),
   entry({
     id: "ml-friend",
-    name: "The Friend We All Deserve™",
+    name: "The Friend We All Deserve",
     purpose: "How Spark speaks — companion DNA.",
     categoryId: "constitutions",
     authority: "constitution",
@@ -51,7 +51,7 @@ const CONSTITUTIONS: MasterLibraryItem[] = [
 const BLUEPRINTS: MasterLibraryItem[] = [
   entry({
     id: "ml-master-blueprint",
-    name: "Founder Master Blueprint™",
+    name: "Founder Master Blueprint",
     purpose: "SPARK Intelligence Blueprint — vision and executive philosophy.",
     categoryId: "blueprints",
     authority: "blueprint",
@@ -327,7 +327,7 @@ const DEVELOPMENT: MasterLibraryItem[] = [
 const MARKETING: MasterLibraryItem[] = [
   entry({
     id: "ml-postcraft",
-    name: "PostCraft™",
+    name: "PostCraft",
     purpose: "Content and campaign creation department.",
     categoryId: "postcraft",
     authority: "reference",
@@ -369,7 +369,7 @@ const AI: MasterLibraryItem[] = [
   }),
 ];
 
-export const MASTER_LIBRARY_HEADLINE = "Spark Master Library™";
+export const MASTER_LIBRARY_HEADLINE = "Spark Master Library";
 export const MASTER_LIBRARY_SUMMARY =
   "The permanent index of all important Spark knowledge — unlimited growth, one calm catalog. Founder indexes; Drive stores; NotebookLM researches.";
 

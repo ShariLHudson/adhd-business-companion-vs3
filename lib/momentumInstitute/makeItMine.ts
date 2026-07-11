@@ -1,5 +1,5 @@
 /**
- * Make It Mine™ — coaching conversation launcher.
+ * Make It Mine — coaching conversation launcher.
  * Shari helps the member adapt the lesson to THEIR business.
  */
 

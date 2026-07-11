@@ -1,5 +1,5 @@
 /**
- * When Estate Intelligence™ should invite The Stables™.
+ * When Estate Intelligence should invite The Stables.
  */
 
 export type StablesRecommendationMatch = {
@@ -83,5 +83,5 @@ export function shouldRecommendStables(text: string): boolean {
 }
 
 export function stablesInvitationLine(): string {
-  return "I'd like to take us somewhere that might help. Let's spend a few minutes at the Stables™.";
+  return "I'd like to take us somewhere that might help. Let's spend a few minutes at the Stables.";
 }

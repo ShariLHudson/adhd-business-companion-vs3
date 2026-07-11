@@ -9,7 +9,7 @@ import {
   getDiscoveryEngineBootstrap,
 } from "./index";
 
-describe("Executive Discovery Engine™", () => {
+describe("Executive Discovery Engine", () => {
   it("exposes discovery department principle", () => {
     expect(DISCOVERY_ENGINE_PRINCIPLE).toContain("value");
   });

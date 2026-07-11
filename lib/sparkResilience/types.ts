@@ -1,5 +1,5 @@
 /**
- * Entrepreneurial Resilience™ — difficult-season experience types.
+ * Entrepreneurial Resilience — difficult-season experience types.
  * Experience layer; signals from lib/recovery-intelligence/.
  *
  * @see docs/ENTREPRENEURIAL_RESILIENCE.md

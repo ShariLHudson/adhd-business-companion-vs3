@@ -24,7 +24,7 @@ export const HOW_DO_I_CORE_WORKFLOW = {
     "Use Create to build content.",
     "Use Plan My Day to schedule work.",
     "Save finished work in My Work.",
-    "Track progress through Wins This Week and Evidence Bank.",
+    "Track progress through Wins This Week and Evidence Vault.",
   ],
 } as const;
 
@@ -246,7 +246,7 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
   },
   {
     id: "evidence-bank",
-    title: "Evidence Bank",
+    title: "Evidence Vault",
     emoji: "🏆",
     whatItIs:
       "Proof that you are making progress — what changed because of what you did.",
@@ -261,7 +261,7 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
     tips: ["Wins capture what happened. Evidence captures why it mattered."],
     keywords: ["evidence", "proof", "wins", "momentum", "progress", "impact"],
     openSection: "evidence-bank",
-    openLabel: "Open Evidence Bank",
+    openLabel: "Open Evidence Vault",
   },
   {
     id: "wins-this-week",
@@ -273,11 +273,11 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
     workflow: [
       "Open Wins This Week from More.",
       "Review what was noticed this week.",
-      "Save a moment to Evidence Bank when you want the deeper story.",
+      "Save a moment to Evidence Vault when you want the deeper story.",
       "Glance at previous weeks for perspective.",
     ],
     tips: [
-      "Wins capture what happened. Evidence Bank captures why it mattered.",
+      "Wins capture what happened. Evidence Vault captures why it mattered.",
       "Every small step counts — including showing up.",
     ],
     keywords: ["wins", "week", "weekly", "celebration"],

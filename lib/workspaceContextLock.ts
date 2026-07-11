@@ -13,6 +13,7 @@ import {
   type WorkspaceOpenSnapshot,
 } from "./workspaceExecution";
 import { isExplicitWorkspaceOpenRequest } from "./conversationGating";
+import { isExplicitCapabilityIntent } from "./universalAccess";
 
 export const ACTIVE_WORKSPACE_FIRST_RULE = `ACTIVE WORKSPACE FIRST (mandatory when a panel is open beside chat):
 Before answering, check in order:
@@ -84,9 +85,11 @@ export function isExplicitWorkspaceSwitchRequest(
 ): boolean {
   const t = userText.trim().toLowerCase();
   if (isExplicitWorkspaceOpenRequest(userText)) return true;
+  /** Universal Access — any explicit capability intent switches freely. */
+  if (isExplicitCapabilityIntent(userText)) return true;
   if (
     /\b(?:switch to|go to|open|take me to|move to|let'?s use)\b/.test(t) &&
-    /\b(?:create|projects?|strateg|focus|clear my mind|brain dump|templates?|time block|client avatar)\b/.test(
+    /\b(?:create|projects?|strateg|focus|clear my mind|brain dump|templates?|time block|client avatar|journal|gallery|timer|calendar|mind map)\b/.test(
       t,
     )
   ) {

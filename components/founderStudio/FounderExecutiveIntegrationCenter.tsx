@@ -40,7 +40,7 @@ export function FounderExecutiveIntegrationCenter() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Integration Center™"
+        eyebrow="Executive Integration Center"
         title="Mission Control for Visual Spark Studios"
         question="What do I need from my connected systems today?"
         purpose={`One calm executive headquarters — ${MARKETING_ORCHESTRATION_HEADLINE}. You run the company.`}
@@ -48,7 +48,7 @@ export function FounderExecutiveIntegrationCenter() {
 
       <section className="founder-integration__hero" aria-labelledby="integration-hero">
         <h2 className="founder-integration__section-title" id="integration-hero">
-          The One Office Principle™
+          The One Office Principle
         </h2>
         <p className="founder-integration__overnight">{bootstrap.oneOfficeMessage}</p>
         <p className="founder-integration__stats">

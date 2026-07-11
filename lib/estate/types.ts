@@ -1,5 +1,5 @@
 /**
- * Estate Room Registry™ — master types for every Spark Estate™ place.
+ * Estate Room Registry — master types for every Spark Estate place.
  *
  * @see docs/ESTATE_ROOM_REGISTRY.md
  */
@@ -32,7 +32,7 @@ export type EstateRoomStatus =
 export type EstateRoomDefinition = {
   /** Stable registry id — snake-case */
   id: string;
-  /** Display name (may include ™ in name field) */
+  /** Display name (may include  in name field) */
   name: string;
   trademark?: string;
   /** Primary app route when the room is visitable */

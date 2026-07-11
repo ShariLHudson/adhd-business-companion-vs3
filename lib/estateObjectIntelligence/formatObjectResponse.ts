@@ -11,7 +11,7 @@ export function formatObjectIdentification(
 ): string {
   if (object.objectType === "character") {
     return [
-      `That's ${object.officialName}.`,
+      `That is ${object.officialName}.`,
       object.description,
       object.story,
     ]

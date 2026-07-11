@@ -17,7 +17,7 @@ const VALIDATION_PROMPTS: {
   { text: "I want to research AI tools", entryId: "observatory" },
 ];
 
-describe("Estate Conversation Pipeline™", () => {
+describe("Estate Conversation Pipeline", () => {
   for (const { text, entryId } of VALIDATION_PROMPTS) {
     it(`routes "${text}" via unified pipeline`, () => {
       const turn = evaluateEstateConversationTurn({
@@ -55,10 +55,10 @@ describe("Estate Conversation Pipeline™", () => {
     });
     expect(turn?.estate.suppressed).toBe(true);
     const hint = estateConversationHintForChat(turn, {
-      inRoomHint: "MOMENTUM BUILDER™ ROOM",
+      inRoomHint: "MOMENTUM BUILDER ROOM",
     });
     expect(hint).toContain("ESTATE IN-ROOM");
-    expect(hint).toContain("MOMENTUM BUILDER™ ROOM");
+    expect(hint).toContain("MOMENTUM BUILDER ROOM");
     expect(hint).not.toContain("This is Momentum Builder");
   });
 

@@ -6,7 +6,7 @@ import {
   sanitizeEstateFacingCopy,
 } from "./estateContextIsolation";
 
-describe("Estate Context Isolation Rule™", () => {
+describe("Estate Context Isolation Rule", () => {
   it("defines canonical recovery opening", () => {
     expect(ESTATE_RECOVERY_OPENING).toBe(SHARI_ERROR_RECOVERY_LINE);
     expect(ESTATE_RECOVERY_OPENING).toContain("still here");

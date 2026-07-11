@@ -8,7 +8,7 @@ type Props = {
 };
 
 /**
- * Estate Room Template™ layers 1–2: hero plaque + Shari welcome above invitations.
+ * Estate Room Template layers 1–2: hero plaque + Shari welcome above invitations.
  */
 export function EstateRoomTemplateArrival({ roomId, className }: Props) {
   const template = resolveEstateRoomTemplate(roomId);

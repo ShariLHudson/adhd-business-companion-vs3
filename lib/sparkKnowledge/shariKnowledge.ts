@@ -1,5 +1,5 @@
 /**
- * Shari Knowledge Registry™ — unified index over all Estate knowledge sources.
+ * Shari Knowledge Registry — unified index over all Estate knowledge sources.
  */
 
 import {
@@ -13,6 +13,7 @@ import {
   matchCanonicalPlaceInText,
 } from "@/lib/estate/canonicalEstateRegistry";
 import { estateRoomKnowledgeHintForChat } from "@/lib/estateKnowledge";
+import { buildCanonResponseHint, retrieveCanonContext } from "@/lib/canonContext";
 import { CREATION_KNOWLEDGE } from "./creationKnowledge";
 import { THINKING_FRAMEWORKS } from "./thinkingFrameworkRegistry";
 import type {
@@ -189,6 +190,11 @@ export function shariKnowledgeHintForChat(
   const userText = options?.userText?.trim();
 
   if (userText) {
+    const canon = retrieveCanonContext({ userText });
+    if (canon.topics.length > 0) {
+      parts.push(buildCanonResponseHint(userText));
+    }
+
     const search = searchSparkKnowledge(userText);
     if (search.best && search.best.score >= 18) {
       const { entry, reasons } = search.best;

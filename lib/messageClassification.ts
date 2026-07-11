@@ -157,7 +157,7 @@ export function classifyFrustration(text: string): FrustrationKind {
   return "analytical";
 }
 
-/** Block Breathe & Reset, Clear My Mind triage, and other emotional tool cards. */
+/** Block Breathe, Clear My Mind triage, and other emotional tool cards. */
 export function shouldSuppressEmotionalTools(text: string): boolean {
   if (EXPLICIT_EMOTIONAL_HELP_RE.test(text.trim())) return false;
   if (isGenuineEmotionalDistress(text)) return false;
@@ -179,7 +179,7 @@ export function frustrationContextHintForChat(text: string): string | undefined 
   const kind = classifyFrustration(text);
   return (
     `TOPIC CONTEXT — PROBLEM-SOLVING (${kind} frustration): User is frustrated about a problem, not asking for emotional regulation — "${text.slice(0, 100)}". ` +
-    `Stay in problem-solving or decision coaching. Do NOT use nervous system language, Breathe & Reset, or emotional triage. ` +
+    `Stay in problem-solving or decision coaching. Do NOT use nervous system language, Breathe, or emotional triage. ` +
     `Do NOT say "that sounds heavy" or "carrying a lot". Help debug, decide, or simplify the actual problem.`
   );
 }

@@ -35,9 +35,9 @@ export function FireExecutivePortfolioView({
     >
       <header className="fire-portfolio__cover">
         <div className="fire-portfolio__brand">
-          <p className="fire-portfolio__mark">FIRE™</p>
+          <p className="fire-portfolio__mark">FIRE</p>
           <p className="fire-portfolio__engine">
-            Founder Intelligence Report Engine™
+            Founder Intelligence Report Engine
           </p>
         </div>
         <h2 className="fire-portfolio__title" id="fire-portfolio-title">

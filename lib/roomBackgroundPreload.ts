@@ -1,6 +1,7 @@
 import { preferredBackgroundPreloadUrl } from "./roomBackgroundAssets";
 
 const preloaded = new Set<string>();
+const loaded = new Set<string>();
 
 function preloadKey(url: string): string {
   return url.split("?")[0] ?? url;
@@ -26,7 +27,39 @@ export function preloadRoomBackground(imageUrl: string): void {
 
   const img = new Image();
   img.decoding = "async";
+  img.onload = () => loaded.add(key);
+  img.onerror = () => loaded.add(key);
   img.src = href;
+}
+
+/** Resolve when a room plate is decoded — used before estate scene crossfade. */
+export function awaitRoomBackgroundReady(
+  imageUrl: string,
+  timeoutMs = 9000,
+): Promise<boolean> {
+  if (typeof window === "undefined" || !imageUrl) return Promise.resolve(false);
+  const href = preferredBackgroundPreloadUrl(imageUrl);
+  const key = preloadKey(href);
+  if (loaded.has(key)) return Promise.resolve(true);
+
+  preloadRoomBackground(imageUrl);
+
+  return new Promise((resolve) => {
+    const img = new Image();
+    const timer = window.setTimeout(() => resolve(false), timeoutMs);
+    img.decoding = "async";
+    img.onload = () => {
+      window.clearTimeout(timer);
+      loaded.add(key);
+      resolve(true);
+    };
+    img.onerror = () => {
+      window.clearTimeout(timer);
+      loaded.add(key);
+      resolve(false);
+    };
+    img.src = href;
+  });
 }
 
 export function preloadRoomBackgrounds(urls: readonly string[]): void {

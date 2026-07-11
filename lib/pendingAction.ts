@@ -328,7 +328,18 @@ export function detectOpenSectionRequest(text: string): AppSection | null {
   }
   if (
     /\bopen (?:the )?(?:breathe|breathing|breathe & reset)\b/.test(t) ||
-    /\bstart (?:the )?breathing\b/.test(t)
+    /\bstart (?:the )?breathing\b/.test(t) ||
+    /\bhelp me breathe\b/.test(t) ||
+    /\blet'?s breathe\b/.test(t) ||
+    /\bi need a minute\b/.test(t) ||
+    /\bi need to breathe\b/.test(t) ||
+    /\bi need a reset\b/.test(t) ||
+    /\bi need to calm down\b/.test(t) ||
+    /\bhelp me (?:calm down|reset)\b/.test(t) ||
+    /\bi'?m overwhelmed\b/.test(t) ||
+    /\bbox breathing\b/.test(t) ||
+    /\b(?:four[\s-]?seven[\s-]?eight|4[\s-]?7[\s-]?8)\b/.test(t) ||
+    /\btake me to breathe\b/.test(t)
   ) {
     return "breathe";
   }

@@ -1,9 +1,9 @@
 /**
- * Spark Estate Collection Framework™ — room registry.
+ * Spark Estate Collection Framework — room registry.
  *
  * Add a room = one config object here. Do not build a new app.
  *
- * Room meaning & routing: Estate Collections Playbook™
+ * Room meaning & routing: Estate Collections Playbook
  * @see docs/estate/ESTATE_COLLECTIONS_PLAYBOOK.md
  * @see docs/estate/ESTATE_COLLECTION_INTELLIGENCE.md
  * @see ./estateCollectionsPlaybook.ts
@@ -18,6 +18,11 @@ import {
   JOURNAL_ROOM_BG,
 } from "@/lib/growth/growthRoom";
 import { CELEBRATION_GARDEN_ROOM_BG } from "@/lib/celebrationGarden/celebrationGardenRoom";
+import { CELEBRATION_GARDEN_CATEGORIES } from "@/lib/estate/celebrationGardenIntelligence";
+import {
+  EVIDENCE_VAULT_CEREMONIAL_SAVE,
+  EVIDENCE_VAULT_DISCOVERY_PROMPT,
+} from "@/lib/estate/evidenceVaultExperience";
 import { STORY_LIBRARY_ROOM_BG } from "@/lib/storyLibrary/storyLibraryRoom";
 import { getEstateCollectionAdapter } from "./adapters";
 import type {
@@ -69,12 +74,26 @@ const GREENHOUSE_CATEGORIES = [
   { value: "character", label: "Character" },
 ] as const;
 
+/** Evidence Vault categories (246/248) — proof for hard days. */
 const EVIDENCE_CATEGORIES = [
-  { value: "Business Growth", label: "Business growth" },
-  { value: "Client Impact", label: "Client impact" },
-  { value: "Personal Growth", label: "Personal growth" },
-  { value: "Courage", label: "Courage" },
+  { value: "Small Win", label: "Small win" },
+  { value: "Testimonial", label: "Testimonial" },
+  { value: "Encouraging Message", label: "Encouraging message" },
+  { value: "Thank-You Note", label: "Thank-you note" },
+  { value: "Gratitude", label: "Gratitude" },
+  { value: "Progress", label: "Progress" },
   { value: "Problem Solving", label: "Problem solving" },
+  { value: "Lives Impacted", label: "Lives impacted" },
+  { value: "Client Result", label: "Client result" },
+  { value: "Client Impact", label: "Client impact" },
+  { value: "Personal Proof", label: "Personal proof" },
+  { value: "Before/After", label: "Before/after" },
+  { value: "Journal Evidence", label: "Journal evidence" },
+  { value: "Business Growth", label: "Business growth" },
+  { value: "Personal Growth", label: "Personal growth" },
+  { value: "Health", label: "Health" },
+  { value: "Courage", label: "Courage" },
+  { value: "Prevented Problem", label: "Prevented problem" },
   { value: "Moved Forward", label: "Moved forward" },
 ] as const;
 
@@ -300,112 +319,119 @@ const ROOM_CONFIGS = {
     placeId: "evidence-vault",
     section: "evidence-bank" as AppSection,
     roomName: "Evidence Vault",
-    kicker: "Proof you can solve hard things",
+    kicker: "Your personal intelligence library",
     description:
-      "Private proof for the days confidence needs reminding — situations you faced and strength you showed.",
+      "Preserve meaningful experiences so Spark can gradually transform them into understanding, patterns, and wisdom.",
     backgroundImage: EVIDENCE_VAULT_ROOM_BG,
     imagePlaceId: "evidence-vault",
     openingSparkPrompt:
-      "You have handled hard things before. What difficult moment deserves proof in the Vault?",
+      "Every discovery you preserve becomes another piece of evidence. Over time, Spark connects experiences, notices patterns, and helps you rediscover the wisdom you've already earned.",
     returnSparkPrompt:
-      "Welcome back to the Vault. Your proof is here whenever confidence needs reminding.",
+      "Welcome back. Your vault is growing — each piece of evidence helps Spark understand your story a little more clearly.",
     suggestedPrompts: [
-      "A problem I solved or prevented",
-      "A hard conversation I navigated",
-      "Proof I kept going when it was difficult",
+      "What surprised you today?",
+      "What lesson almost slipped by unnoticed?",
+      "What would future you want to rediscover?",
     ],
-    followUpQuestions: [
-      "What does this prove about you?",
-      "Who benefited — including future-you?",
-      "Would this help on a harder day?",
-    ],
-    collectionTitle: "Records at rest",
+    followUpQuestions: [],
+    collectionTitle: "Discoveries at rest",
     collectionEmptyMessage:
-      "The vault is ready. Your strength does not have to live only in memory.",
+      "The vault is ready. Your wisdom does not have to live only in memory.",
     capture: {
       primaryFieldId: "situation",
-      composeTitle: "Preserve evidence",
+      composeTitle: "Today's Discovery",
+      discoveryPreserveMode: true,
       fields: [
         {
-          id: "category",
-          label: "Kind of evidence",
-          kind: "select",
-          options: EVIDENCE_CATEGORIES,
-          required: true,
-        },
-        {
           id: "situation",
-          label: "Situation",
-          placeholder: "What was happening?",
+          label: "Today's Discovery",
+          placeholder: "Begin writing…",
           required: true,
-          rows: 3,
-          kind: "textarea",
-        },
-        {
-          id: "problem",
-          label: "Problem",
-          placeholder: "What was difficult or at risk?",
-          rows: 3,
-          kind: "textarea",
-        },
-        {
-          id: "whatIDid",
-          label: "What I did",
-          placeholder: "The action you took.",
-          required: true,
-          rows: 4,
+          rows: 12,
           kind: "textarea",
           primary: true,
         },
         {
-          id: "whyApproach",
-          label: "Why I chose that approach",
-          placeholder: "Your reasoning — even if it was instinct.",
-          rows: 3,
-          kind: "textarea",
-        },
-        {
-          id: "outcome",
-          label: "Outcome",
-          placeholder: "What changed?",
+          id: "problem",
+          label: "Problem Solved",
+          placeholder: "What was the challenge — and how did you meet it?",
           rows: 3,
           kind: "textarea",
         },
         {
           id: "whoBenefited",
-          label: "Who benefited",
-          placeholder: "Clients, family, team, future-you…",
+          label: "People Helped",
+          placeholder: "Who felt the difference?",
           rows: 2,
           kind: "textarea",
         },
         {
-          id: "whyItMattered",
-          label: "Why it mattered",
+          id: "whyApproach",
+          label: "What Improved",
+          placeholder: "What is better now?",
+          rows: 2,
+          kind: "textarea",
+        },
+        {
+          id: "whatIDid",
+          label: "Progress Made",
+          placeholder: "What moved forward?",
           rows: 2,
           kind: "textarea",
         },
         {
           id: "lessonsLearned",
-          label: "Lessons learned",
-          placeholder: "What this proves about you.",
+          label: "Lesson Learned",
+          placeholder: "What did this teach you?",
           rows: 3,
           kind: "textarea",
         },
+        {
+          id: "whyItMattered",
+          label: "Why It Matters",
+          placeholder: "Why will you want to remember this?",
+          rows: 3,
+          kind: "textarea",
+        },
+        {
+          id: "category",
+          label: "Kind of evidence",
+          kind: "select",
+          options: EVIDENCE_CATEGORIES,
+        },
+        {
+          id: "noteOrLink",
+          label: "Supporting Evidence",
+          placeholder: "Link, reference, or short note…",
+          kind: "text",
+        },
       ],
-      saveLabel: "Preserve in vault",
-      updateLabel: "Open record",
-      savedMessage: "This story now lives safely in your Vault.",
-      updatedMessage: "Your record has been updated.",
-      suggestedPromptsLabel: "Proof easily overlooked",
-      followUpSectionLabel: "On a harder day",
+      saveLabel: "Preserve Today's Discovery",
+      updateLabel: "Refine discovery",
+      savedMessage: EVIDENCE_VAULT_CEREMONIAL_SAVE,
+      updatedMessage: "Your discovery has been refined.",
+      suggestedPromptsLabel: "Gentle starters",
+      followUpSectionLabel: "",
       enableAttachments: true,
-      attachmentLabel: "Screenshots or proof (optional)",
+      attachmentLabel: "Attach something (optional)",
     },
     browse: browse({
-      searchPlaceholder: "Search your vault…",
+      searchPlaceholder: "What would you like to rediscover?",
       enableCategoryFilter: true,
-      categoryLabel: "Kind of evidence",
-      loadMoreLabel: "More records at rest",
+      categoryLabel: "Topic",
+      enableSourceFilter: true,
+      sourceLabel: "Source",
+      enableEmotionFilter: true,
+      emotionLabel: "Emotion",
+      enableProjectFilter: true,
+      projectLabel: "Project",
+      enablePersonFilter: true,
+      personLabel: "Person",
+      enableConfidenceBoostFilter: true,
+      enableRecentFilter: true,
+      enableDatePresets: true,
+      enableHallCandidateFilter: true,
+      loadMoreLabel: "More evidence at rest",
       resultsLabel: "In the vault",
     }),
     display: {
@@ -419,15 +445,15 @@ const ROOM_CONFIGS = {
         showProgress: false,
         bodyEmphasis: "prose",
         layout: "stack",
-        editLabel: "Open record",
+        editLabel: "Refine discovery",
         favoriteLabel: CARD_FAVORITE,
         previewLines: 4,
       },
       removeLabel: "Remove from vault",
     },
     sparkSuggestionLines: [
-      "This sounds like a wonderful addition to your Evidence Vault — may I help you preserve it?",
-      "You handled something real there. Would you like proof of that in your vault?",
+      "Would you like to preserve this discovery in your Evidence Vault?",
+      "This sounds like wisdom worth keeping — shall we preserve it in the Evidence Vault?",
     ],
   },
   "achievement-library": {
@@ -535,19 +561,19 @@ const ROOM_CONFIGS = {
     placeId: "gardens",
     section: "wins-this-week" as AppSection,
     roomName: "Celebration Garden",
-    kicker: "Celebrations in bloom",
+    kicker: "Moments, not milestones",
     description:
-      "Celebrate progress — large, small, and everything in between. Hopeful, elegant, never childish.",
+      "A peaceful place to recognize progress — finished weeks, habits kept, help given, breakthroughs. Reflective, not an awards ceremony.",
     backgroundImage: CELEBRATION_GARDEN_ROOM_BG,
     imagePlaceId: "gardens",
     openingSparkPrompt:
-      "Celebrations of every size belong here. What went well lately?",
+      "This garden is for moments of progress. What went well lately — even something small?",
     returnSparkPrompt:
-      "It is lovely to see you in the Celebration Garden. Your garden has grown since your last visit.",
+      "Welcome back to the Celebration Garden. Peaceful, beautiful, and ready for whatever is worth naming.",
     suggestedPrompts: [
-      "A celebration I keep minimizing",
-      "Something unexpectedly good",
-      "A small courage worth naming",
+      "Finished a difficult week",
+      "Maintained a new habit",
+      "Helped someone / a personal breakthrough",
     ],
     followUpQuestions: [
       "What made this possible?",
@@ -562,9 +588,15 @@ const ROOM_CONFIGS = {
       composeTitle: "Plant a celebration",
       fields: [
         {
+          id: "category",
+          label: "Kind of moment",
+          kind: "select",
+          options: CELEBRATION_GARDEN_CATEGORIES,
+        },
+        {
           id: "body",
           label: "What are we celebrating?",
-          placeholder: "A moment worth remembering — any size.",
+          placeholder: "A moment of progress — not a museum milestone.",
           required: true,
           rows: 5,
           kind: "textarea",
@@ -594,7 +626,7 @@ const ROOM_CONFIGS = {
       updateLabel: "Refine bloom",
       savedMessage: "Your celebration has been planted.",
       updatedMessage: "Your bloom has been updated.",
-      suggestedPromptsLabel: "Celebrations worth naming",
+      suggestedPromptsLabel: "Moments worth naming",
       followUpSectionLabel: "Before we move on",
       enableAttachments: true,
       attachmentLabel: "A photo from the moment (optional)",
@@ -602,6 +634,8 @@ const ROOM_CONFIGS = {
     browse: browse({
       searchPlaceholder: "Search your garden…",
       enableFavorites: true,
+      enableCategoryFilter: true,
+      categoryLabel: "Moment",
       loadMoreLabel: "More in bloom",
       resultsLabel: "In bloom",
     }),
@@ -623,15 +657,15 @@ const ROOM_CONFIGS = {
       removeLabel: "Clear from garden",
     },
     sparkSuggestionLines: [
-      "I noticed something today that might belong in your Celebration Garden — would you like to plant it there?",
-      "That is worth celebrating in the garden. May I help you plant it there?",
+      "Would you like to visit the Celebration Garden to mark this progress?",
+      "That sounds like a moment worth planting — not a Hall milestone. Shall we celebrate it in the garden?",
     ],
   },
   "celebration-hall": {
     id: "celebration-hall",
     placeId: "celebration-room",
     section: "growth-reports" as AppSection,
-    roomName: "Celebration Hall",
+    roomName: "Celebration Room",
     kicker: "Honored chapters",
     description:
       "Major life moments — rare, grand, almost museum quality. Book published. Business launched. Wedding. Graduation.",
@@ -640,7 +674,7 @@ const ROOM_CONFIGS = {
     openingSparkPrompt:
       "Some chapters are rare enough to honor. What moment in your life deserves that?",
     returnSparkPrompt:
-      "Welcome back to the Celebration Hall. Your honored chapters are here — take your time.",
+      "Welcome back to the Celebration Room. Your honored chapters are here — take your time.",
     suggestedPrompts: [
       "A season I'm proud I survived",
       "A turning point I want to name",
@@ -711,8 +745,8 @@ const ROOM_CONFIGS = {
       removeLabel: "Remove chapter",
     },
     sparkSuggestionLines: [
-      "This feels like a Celebration Hall moment — a chapter worth honoring. Shall we?",
-      "Some moments are rare enough for the Hall. Would you like to preserve this one?",
+      "This feels like a Celebration Room moment — a chapter worth honoring. Shall we?",
+      "Some moments are rare enough for the Celebration Room. Would you like to preserve this one?",
     ],
   },
 } as const satisfies Record<

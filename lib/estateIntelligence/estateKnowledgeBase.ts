@@ -1,5 +1,5 @@
 /**
- * Estate Intelligence™ — bridge to Estate Knowledge Base™.
+ * Estate Intelligence — bridge to Estate Knowledge Base.
  */
 
 export {

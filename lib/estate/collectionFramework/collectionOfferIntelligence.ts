@@ -2,7 +2,7 @@
  * Detect when conversation content belongs in an Estate collection room.
  * Permission-first — never auto-save.
  *
- * Routing follows the Estate Collections Playbook™.
+ * Routing follows the Estate Collections Playbook.
  * @see docs/estate/ESTATE_COLLECTIONS_PLAYBOOK.md
  */
 

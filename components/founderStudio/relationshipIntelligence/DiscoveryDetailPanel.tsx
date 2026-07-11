@@ -36,7 +36,7 @@ export function DiscoveryDetailPanel({ view, onBack }: DiscoveryDetailPanelProps
 
       {founderAlert ? (
         <section className="founder-relationship-intel__alert-detail">
-          <h3 className="founder-relationship-intel__section-title">Founder Alert™</h3>
+          <h3 className="founder-relationship-intel__section-title">Founder Alert</h3>
           <p className="founder-relationship-intel__prose"><strong>{founderAlert.title}</strong></p>
           <ul className="founder-relationship-intel__metrics">
             <li><strong>Urgency:</strong> {founderAlert.urgency}</li>
@@ -69,7 +69,7 @@ export function DiscoveryDetailPanel({ view, onBack }: DiscoveryDetailPanelProps
       </Panel>
 
       {discovery.butterflyChain ? (
-        <Panel title="Butterfly Connections™" defaultOpen>
+        <Panel title="Butterfly Connections" defaultOpen>
           <ol className="founder-relationship-intel__butterfly">
             {discovery.butterflyChain.map((step) => (
               <li key={step.id}>

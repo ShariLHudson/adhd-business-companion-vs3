@@ -1,5 +1,5 @@
 /**
- * evaluateEstateTurn™ — Phase 1 turn evaluation (additive).
+ * evaluateEstateTurn — Phase 1 turn evaluation (additive).
  *
  * Unifies member-need resolution for tests and future orchestration.
  * Does not replace estateCommandRouter yet — legacy paths remain active.

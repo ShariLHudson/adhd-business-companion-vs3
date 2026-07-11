@@ -1,5 +1,5 @@
 /**
- * Evidence Vault™ bridge — evidence is NEVER automatic.
+ * Evidence Vault bridge — evidence is NEVER automatic.
  * Requires real-world outcome + member permission.
  */
 
@@ -69,7 +69,7 @@ export function returnClosingPrompt(
   return (
     "When you have a chance to use this in your business, come back and tell me what happened. " +
     "I'd genuinely love to hear your story. " +
-    "If it creates a breakthrough, we'll celebrate it together and preserve it in your Evidence Vault™ " +
+    "If it creates a breakthrough, we'll celebrate it together and preserve it in your Evidence Vault " +
     "so you'll always remember what you're capable of."
   );
 }
@@ -77,7 +77,7 @@ export function returnClosingPrompt(
 export function evidencePermissionPrompt(knowledgeCardTitle: string): string {
   return (
     `That's a real breakthrough with **${knowledgeCardTitle}**. ` +
-    "Would you like me to save this story in your Evidence Vault™ so you'll always remember what you're capable of?"
+    "Would you like me to save this story in your Evidence Vault so you'll always remember what you're capable of?"
   );
 }
 

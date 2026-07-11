@@ -51,7 +51,7 @@ export const HOW_DO_I_CORE_WORKFLOW = {
     "Use Create to build content.",
     "Use Plan My Day to schedule work.",
     "Save finished work in My Work.",
-    "Track progress in 🌱 Growth — Wins, Evidence Bank, My Highlights, and My Journey.",
+    "Track progress in 🌱 Growth — Wins, Evidence Vault, My Highlights, and My Journey.",
   ],
 } as const;
 

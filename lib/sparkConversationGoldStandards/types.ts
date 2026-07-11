@@ -1,5 +1,5 @@
 /**
- * Conversation Gold Standards™ (Spec 116).
+ * Conversation Gold Standards (Spec 116).
  * Catalog of 25–50 complete reference conversations.
  *
  * @see docs/SPARK_CONVERSATION_GOLD_STANDARDS_FRAMEWORK.md

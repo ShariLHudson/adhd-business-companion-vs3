@@ -1,5 +1,5 @@
 /**
- * Spark Estate Canonical Registry™ — **runtime authority** for every Estate place.
+ * Spark Estate Canonical Registry — **runtime authority** for every Estate place.
  *
  * Source document: docs/estate/SPARK_ESTATE_CANONICAL_REGISTRY.md (Phase A).
  * Phase B: code is subordinate to canon — legacy registries are adapters only.

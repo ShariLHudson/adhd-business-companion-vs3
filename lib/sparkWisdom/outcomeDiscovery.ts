@@ -1,5 +1,5 @@
 /**
- * Spec 131 — Outcome Discovery™
+ * Spec 131 — Outcome Discovery
  * Hidden intent is the why. Outcome is what success looks like when it works.
  *
  * Rule: Ask outcome questions before solution questions.

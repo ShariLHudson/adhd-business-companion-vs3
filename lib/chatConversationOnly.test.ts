@@ -35,13 +35,35 @@ describe("chatConversationOnly", () => {
     expect(isChatConversationOnlyMode()).toBe(true);
   });
 
-  it("downgrades workspace_open to chat_only with full suppressions", () => {
+  it("preserves explicit workspace_open (#183 Universal Access)", () => {
     const next = enforceConversationOnlyTurnSurface(BASE_SURFACE);
+    expect(next.outcome).toBe("workspace_open");
+    expect(next.targetSection).toBe("content-generator");
+    expect(next.suppressWorkspaceRouting).toBe(false);
+    expect(next.promptHints.join(" ")).toContain("CHAT ROLE RESET");
+  });
+
+  it("preserves explicit tool_open", () => {
+    const next = enforceConversationOnlyTurnSurface({
+      ...BASE_SURFACE,
+      outcome: "tool_open",
+      targetTool: "games",
+      targetSection: undefined,
+    });
+    expect(next.outcome).toBe("tool_open");
+    expect(next.targetTool).toBe("games");
+  });
+
+  it("downgrades non-explicit outcomes to chat_only with suppressions", () => {
+    const next = enforceConversationOnlyTurnSurface({
+      ...BASE_SURFACE,
+      outcome: "pending_offer",
+      pendingOfferSection: "content-generator",
+    });
     expect(next.outcome).toBe("chat_only");
     expect(next.targetSection).toBeUndefined();
     expect(next.suppressWorkspaceRouting).toBe(true);
     expect(next.suppressArtifactHandoff).toBe(true);
-    expect(next.promptHints.join(" ")).toContain("CHAT ROLE RESET");
   });
 
   it("keeps active_workflow but blocks handoff", () => {

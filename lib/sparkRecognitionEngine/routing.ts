@@ -3,6 +3,9 @@
  * Source of truth: SPARK_RECOGNITION_ENGINE.md + 032 + 044.
  */
 
+import {
+  toCanonicalRecognitionRoomId,
+} from "./recognitionIds";
 import { getRecognitionRoomState } from "./roomState";
 import {
   FESTIVE_TONES,
@@ -37,12 +40,12 @@ export function toneSuggestionPrompt(
   tone: RecognitionTone | undefined,
 ): string {
   if (isFestiveTone(tone)) {
-    return "This sounds joyful. Would you like to celebrate it in the Celebration Room™?";
+    return "This sounds joyful. Would you like to celebrate it in the Celebration Room?";
   }
   if (isReflectiveTone(tone)) {
     return "This feels like it could be a quiet celebration. Does that fit?";
   }
-  return "This sounds worth remembering. Would you like to preserve it in your Evidence Vault™?";
+  return "This sounds worth remembering. Would you like to preserve it in your Evidence Vault?";
 }
 
 /**
@@ -60,7 +63,7 @@ export function buildPreserveFirstDecision(input?: {
     preserveFirst: true,
     reason: "preserve_first_default",
     memberPrompt:
-      "This sounds like something worth remembering. Would you like to preserve it in your Evidence Vault™?",
+      "This sounds like something worth remembering. Would you like to preserve it in your Evidence Vault?",
     options: ["preserve_it", "celebrate_it", "not_now"],
   };
 }
@@ -89,30 +92,12 @@ export function resolveContextLockedRoom(
 ): RecognitionRoomId {
   const state = getRecognitionRoomState();
   if (state.requestedDestination) {
-    const dest = state.requestedDestination as RecognitionRoomId;
-    if (isRecognitionRoomId(dest)) return dest;
+    const dest = toCanonicalRecognitionRoomId(state.requestedDestination);
+    if (dest) return dest;
   }
-  const visual = state.visualRoom as RecognitionRoomId | null;
-  if (visual && isRecognitionRoomId(visual)) {
-    if (visual === "evidence-vault") return "evidence-vault";
-    if (visual === "gardens") return "gardens";
-    if (visual === "celebration-room") return "celebration-room";
-    if (visual === "gallery-of-firsts") return "gallery-of-firsts";
-    if (visual === "legacy-studio") return "legacy-studio";
-  }
+  const visual = toCanonicalRecognitionRoomId(state.visualRoom);
+  if (visual) return visual;
   return preferredSuggestion;
-}
-
-export function isRecognitionRoomId(
-  placeId: string | null | undefined,
-): placeId is RecognitionRoomId {
-  return (
-    placeId === "evidence-vault" ||
-    placeId === "gardens" ||
-    placeId === "celebration-room" ||
-    placeId === "legacy-studio" ||
-    placeId === "gallery-of-firsts"
-  );
 }
 
 /**
@@ -123,13 +108,13 @@ export function applyMemberRoomOverride(
 ): RecognitionRoutingDecision {
   const prompts: Record<RecognitionRoomId, string> = {
     "evidence-vault":
-      "You're right. Let's preserve this in your Evidence Vault™.",
-    gardens: "You're right. Let's take it to the Celebration Garden™.",
+      "You're right. Let's preserve this in your Evidence Vault.",
+    gardens: "You're right. Let's take it to the Celebration Garden.",
     "celebration-room":
-      "You're right. Let's celebrate this in the Celebration Room™.",
-    "legacy-studio": "You're right. Let's open Legacy Studio™.",
-    "gallery-of-firsts":
-      "You're right. Let's look at this in your Hall of Accomplishments™.",
+      "You're right. Let's celebrate this in the Celebration Room.",
+    "legacy-studio": "You're right. Let's open Legacy Studio.",
+    "portfolio":
+      "You're right. Let's look at this in your Hall of Accomplishments.",
   };
   return {
     suggestedRoomId: memberChosenRoom,
@@ -142,15 +127,29 @@ export function applyMemberRoomOverride(
 }
 
 /**
- * Discovery language inside Evidence Vault must preserve — never Create.
+ * Discovery language must preserve — never Create unless explicitly requested.
+ * Pass explicitCreateRequested=true only when isExplicitCreateRequestForRecognition.
  */
 export function shouldBlockCreateRouting(input: {
   trigger: RecognitionTriggerMatch;
   visualRoom: string | null;
   activeFlowKind?: string | null;
+  /** When true, Create may proceed even if discovery language is present */
+  explicitCreateRequested?: boolean;
+  /** Discovery narrative that contains "create" but is not a Create request */
+  discoveryLanguage?: boolean;
 }): boolean {
+  if (input.explicitCreateRequested && !input.discoveryLanguage) {
+    return false;
+  }
+  if (input.discoveryLanguage) return true;
   if (input.activeFlowKind === "preserve_discovery") return true;
-  if (input.visualRoom === "evidence-vault" && input.trigger.suggestsPreserve) {
+  if (input.activeFlowKind === "quiet_celebration") return true;
+  if (input.activeFlowKind === "festive_celebration") return true;
+  if (input.activeFlowKind === "legacy_story") return true;
+  if (input.activeFlowKind === "hall_exhibit") return true;
+  const visual = toCanonicalRecognitionRoomId(input.visualRoom);
+  if (visual === "evidence-vault" && input.trigger.suggestsPreserve) {
     return true;
   }
   if (input.trigger.matched && input.trigger.suggestsPreserve) {

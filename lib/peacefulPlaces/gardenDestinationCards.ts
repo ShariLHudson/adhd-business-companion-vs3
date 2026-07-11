@@ -35,7 +35,7 @@ const PLAN_MY_DAY_IMAGE = ESTATE_ROOM_BG.studyHall;
 const GALLERY_IMAGE = ESTATE_ROOM_BG.galleryOfFirsts;
 const LIFE_EXPERIENCE_IMAGE = "/backgrounds/life-experience-room.webp" as const;
 const FOCUS_PLANNING_IMAGE = ESTATE_ROOM_BG.gameRoom;
-const WOODLAND_IMAGE = "/backgrounds/peaceful-places/woodland-pathway.png" as const;
+const WOODLAND_IMAGE = PEACEFUL_PLACES_PATHWAY_BG;
 const MOONLIT_SHORE_IMAGE = "/backgrounds/evening/night-bg.png" as const;
 const GAZEBO_IMAGE = "/backgrounds/evening/living-room-at-twilight-bg.png" as const;
 const WILDFLOWER_MEADOW_IMAGE =
@@ -94,8 +94,8 @@ export const GARDEN_DESTINATION_CARDS: Record<string, GardenDestinationCard> = {
   },
   "breathing-room": {
     id: "breathing-room",
-    title: "Breathing Room",
-    description: "Slow your breathing and calm your nervous system.",
+    title: "Breathe",
+    description: "Open Breathe without leaving this place.",
     imageUrl: LIFE_EXPERIENCE_IMAGE,
     imageObjectPosition: "center 45%",
     imagePrompt:

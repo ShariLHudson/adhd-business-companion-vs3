@@ -29,7 +29,7 @@ export function FounderOpportunityDiscovery() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Opportunity Discovery Center™"
+        eyebrow="Opportunity Discovery Center"
         title="Turning Research into Business Opportunities"
         question="If this were my company, what would I build next?"
         purpose="Evidence-backed opportunities — not random ideas. One recommendation at a time."

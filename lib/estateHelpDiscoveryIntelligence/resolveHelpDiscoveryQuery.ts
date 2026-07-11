@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ Help & Discovery Intelligence Layer
+ * Spark Estate Help & Discovery Intelligence Layer
  *
  * Orchestrates: Navigation · Recommendation · Object · How-To · Discovery Key · Progressive discovery
  */

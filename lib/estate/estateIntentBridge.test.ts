@@ -7,7 +7,7 @@ import {
 } from "./estateIntentBridge";
 import { suggestCanonicalPlacesForProfile } from "./canonicalPlaceSuggestions";
 
-describe("Estate Intent Bridge™ (Phase H.1)", () => {
+describe("Estate Intent Bridge (Phase H.1)", () => {
   it('"I need somewhere quiet" suggests restorative places without auto-route', () => {
     const result = resolveEstateIntent({ text: "I need somewhere quiet" });
     expect(result.primaryPlaceId).toBeNull();

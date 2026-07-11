@@ -1,10 +1,11 @@
 /**
- * Audio Experience Foundation™
+ * Audio Experience Foundation
  *
  * Understands what audio exists, where it lives, when it helps, and how it
  * connects to rooms and experiences — without inventing a full music library.
  */
 
+import { isEstateNonAudioPlace } from "@/lib/estate/estateNonAudioPlaces";
 import { matchMemberNeedSignal } from "@/lib/estateRecommendationIntelligence/memberNeedSignals";
 import { getEstateLocationById } from "@/lib/estateKnowledgeBase/estateLocations";
 import { audioExperiencesAtLocation } from "./audioExperiences";
@@ -37,6 +38,7 @@ function pickExperiences(
   for (const experience of candidates) {
     if (picked.length >= max) break;
     if (seen.has(experience.audioExperienceId)) continue;
+    if (isEstateNonAudioPlace(experience.location)) continue;
     seen.add(experience.audioExperienceId);
     picked.push(experience);
   }

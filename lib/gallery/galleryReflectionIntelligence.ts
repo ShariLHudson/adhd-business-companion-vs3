@@ -1,5 +1,5 @@
 /**
- * Reflection Intelligence™ — wisdom on the wall, never copied journal text.
+ * Reflection Intelligence — wisdom on the wall, never copied journal text.
  * Journal holds private words; Gallery holds distilled meaning.
  */
 

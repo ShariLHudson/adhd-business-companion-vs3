@@ -1,5 +1,5 @@
 /**
- * Estate Recommendation Intelligence™ — connects human need to Estate invitation.
+ * Estate Recommendation Intelligence — connects human need to Estate invitation.
  *
  * Answers: "Why would this person want to go there right now?"
  */

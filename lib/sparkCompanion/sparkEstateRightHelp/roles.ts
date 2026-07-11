@@ -105,7 +105,7 @@ FORBIDDEN: ${SPARK_RIGHT_HELP_FORBIDDEN.join(" · ")}
 
 **Final:** ${SPARK_RIGHT_HELP_FINAL}`;
 
-/** Bridge to Dynamic Companion Roles™ (4 roles) for suppression wiring */
+/** Bridge to Dynamic Companion Roles (4 roles) for suppression wiring */
 export function mapRightHelpToCompanionRole(
   role: RightHelpRoleId,
 ): CompanionRole {

@@ -1,5 +1,5 @@
 /**
- * Entrepreneurial Transformation Constitution™ (Spec 100).
+ * Entrepreneurial Transformation Constitution (Spec 100).
  * Governs how members grow — Spark OS governs how Spark understands.
  *
  * @see docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md

@@ -1,5 +1,5 @@
 /**
- * Spark Conversation Examples™ (Spec 115).
+ * Spark Conversation Examples (Spec 115).
  * Gold-standard scenario metadata — full turn-by-turn lives in docs/conversation-examples/
  *
  * @see docs/SPARK_CONVERSATION_EXAMPLES_FRAMEWORK.md

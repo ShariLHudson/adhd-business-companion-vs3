@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — room blueprint template (Phase 25).
+ * Spark Estate — room blueprint template (Phase 25).
  * Standard foundation every room must follow — different expertise, same companion experience.
  *
  * @see docs/protocols/SPARK_ESTATE_ROOM_BLUEPRINT_TEMPLATE_SPECIFICATION_PHASE25.md
@@ -163,7 +163,7 @@ export const SPARK_ESTATE_ROOM_BLUEPRINTS: readonly SparkEstateRoomBlueprint[] =
     intelligence: {
       knowledge: [
         "Entrepreneurial capability topics across pricing, marketing, leadership, and executive function",
-        "Drawer index and Knowledge Card™ catalog",
+        "Drawer index and Knowledge Card catalog",
         "Member goals and prior learning history",
       ],
       frameworks: [
@@ -175,7 +175,7 @@ export const SPARK_ESTATE_ROOM_BLUEPRINTS: readonly SparkEstateRoomBlueprint[] =
         "Arrive → choose focus → open drawer → learn → apply → save",
         "Route to project or creation room when ready to build",
       ],
-      templates: ["Institute index cards", "Knowledge Card™ structures", "Saved cabinet entries"],
+      templates: ["Institute index cards", "Knowledge Card structures", "Saved cabinet entries"],
       examples: ["Sample strategies", "Worked examples in drawers", "Member saved work"],
     },
     experience: {
@@ -293,7 +293,7 @@ export const SPARK_ESTATE_ROOM_BLUEPRINTS: readonly SparkEstateRoomBlueprint[] =
   },
   {
     roomId: "clear-my-mind",
-    memberFacingName: "Clear My Mind™",
+    memberFacingName: "Clear My Mind",
     primarySection: "brain-dump",
     purpose: "Continuous thought capture — empty the head without organizing pressure.",
     audience: "Members feeling scattered, overwhelmed, or full of unprocessed thoughts.",
@@ -355,7 +355,7 @@ export const SPARK_ESTATE_ROOM_BLUEPRINTS: readonly SparkEstateRoomBlueprint[] =
   },
   {
     roomId: "decision-compass",
-    memberFacingName: "Decision Compass™",
+    memberFacingName: "Decision Compass",
     primarySection: "decision-compass",
     purpose: "Think through decisions with clarity — options, values, and next steps without pressure.",
     audience: "Members stuck between options or facing meaningful choices.",
@@ -420,7 +420,7 @@ export const SPARK_ESTATE_ROOM_BLUEPRINTS: readonly SparkEstateRoomBlueprint[] =
   },
   {
     roomId: "momentum-builder",
-    memberFacingName: "Momentum Builder™",
+    memberFacingName: "Momentum Builder",
     primarySection: "momentum-builder",
     additionalSections: ["goals-projects", "grow-momentum-builders"],
     purpose: "Turn goals into projects with milestones, tasks, and visible momentum.",
@@ -573,7 +573,7 @@ export function assessSparkEstateRoomBlueprintCompliance(roomId: string): {
   if (registry) {
     if (
       registry.trademark &&
-      !registry.trademark.includes(blueprint.memberFacingName.replace("™", "")) &&
+      !registry.trademark.includes(blueprint.memberFacingName.replace("", "")) &&
       !blueprint.memberFacingName.includes(registry.name)
     ) {
       issues.push("member-facing name may not match registry trademark");
@@ -729,7 +729,7 @@ export function formatSparkEstateRoomBlueprintReport(
   verification: ReturnType<typeof verifySparkEstateRoomBlueprintTemplate> = verifySparkEstateRoomBlueprintTemplate(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ room blueprint: ${verification.allBlueprintsValid ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate room blueprint: ${verification.allBlueprintsValid ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_ROOM_BLUEPRINT_PRINCIPLE,
     SPARK_ESTATE_ROOM_BLUEPRINT_VISION,
     "",

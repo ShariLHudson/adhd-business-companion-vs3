@@ -28,7 +28,7 @@ export function ReflectionPanel({ questions, onDiscuss }: Props) {
           className="institute-curriculum-reflection__discuss"
           onClick={onDiscuss}
         >
-          Discuss with Shari™
+          Discuss with Shari
         </button>
       ) : null}
     </section>

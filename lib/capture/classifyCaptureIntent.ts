@@ -1,5 +1,5 @@
 /**
- * classifyCaptureIntent™ — pure capture decision (no side effects).
+ * classifyCaptureIntent — pure capture decision (no side effects).
  * Separate from resolveUserIntent — capture has its own tree.
  */
 

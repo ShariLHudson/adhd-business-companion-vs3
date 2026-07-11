@@ -17,7 +17,7 @@ export function FounderExecutiveResourcesCenter() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Resources Center™"
+        eyebrow="Executive Resources Center"
         title="Executive Headquarters — Every Department"
         question="Where is it? Why do I use it? When should I use it?"
         purpose="One calm executive control center — external systems, AI tools, calendars, documents, and executive links. Founder orchestrates; departments execute."
@@ -25,7 +25,7 @@ export function FounderExecutiveResourcesCenter() {
 
       <section className="founder-resources__hero" aria-labelledby="resources-hero">
         <h2 className="founder-resources__section-title" id="resources-hero">
-          The One Office Principle™
+          The One Office Principle
         </h2>
         <p className="founder-resources__lead">{center.summary}</p>
       </section>

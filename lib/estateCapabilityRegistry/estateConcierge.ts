@@ -1,5 +1,5 @@
 /**
- * Estate Concierge™ — best experience for what the member is trying to accomplish.
+ * Estate Concierge — best experience for what the member is trying to accomplish.
  *
  * Consults the capability registry first. Sometimes route, sometimes stay in chat,
  * sometimes recommend 2–4 paths — always the simplest helpful experience.
@@ -39,10 +39,13 @@ function roomNeeded(
   capability: EstateCapabilityEntry,
   currentRoomId: string | null,
 ): boolean {
-  if (!capability.requiredRoomId) return false;
-  const required = capability.requiredRoomId.toLowerCase();
-  const current = (currentRoomId ?? "").toLowerCase();
-  return current !== required;
+  /**
+   * #183 Universal Access — requiredRoomId is recommendation context only.
+   * Never treat a different room as a permission block.
+   */
+  void capability;
+  void currentRoomId;
+  return false;
 }
 
 function singleCapabilityLine(
@@ -52,8 +55,9 @@ function singleCapabilityLine(
   if (launchDiscovery) {
     return `Let's create your ${capability.name} — I'll ask only what we need, one question at a time.`;
   }
+  /** #183 — rooms recommend; never imply the member must go elsewhere first. */
   if (capability.requiredRoomId) {
-    return `${capability.purpose} The ${capability.name} experience fits best here.`;
+    return `${capability.purpose} I can open ${capability.name} right here, or we can use the ${capability.requiredRoomId.replace(/-/g, " ")} atmosphere if you prefer.`;
   }
   return capability.purpose;
 }

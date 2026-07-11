@@ -7,12 +7,12 @@ const ALLOWED =
   process.env.NODE_ENV === "development" ||
   process.env.NEXT_PUBLIC_SPARK_ALPHA === "true";
 
-/** Spark Alpha™ — Relationship Prototype. Development / flagged only. */
+/** Spark Alpha — Relationship Prototype. Development / flagged only. */
 export default function SparkAlphaRoute() {
   if (!ALLOWED) {
     return (
       <main className="spark-alpha-root" style={{ padding: "2rem" }}>
-        Spark Alpha™ is available in development, or set NEXT_PUBLIC_SPARK_ALPHA=true.
+        Spark Alpha is available in development, or set NEXT_PUBLIC_SPARK_ALPHA=true.
       </main>
     );
   }

@@ -4,7 +4,7 @@
 
 /* ── Hero — single title + subtitle, no duplicate layers ── */
 
-/* Hide baked photograph title (incl. ™) and subtitle — immersive uses edge-to-edge cover */
+/* Hide baked photograph title (incl. ) and subtitle — immersive uses edge-to-edge cover */
 .peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-wash,
 .peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-quiet {
   display: none;

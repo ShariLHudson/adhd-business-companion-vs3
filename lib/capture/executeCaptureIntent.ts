@@ -1,5 +1,5 @@
 /**
- * executeCaptureIntent™ — capture execution layer only.
+ * executeCaptureIntent — capture execution layer only.
  * No chat, navigation, or audio side effects.
  */
 

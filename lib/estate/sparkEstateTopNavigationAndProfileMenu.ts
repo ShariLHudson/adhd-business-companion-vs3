@@ -1,11 +1,12 @@
 /**
- * Spark Estate™ — top navigation and profile menu correction.
+ * Spark Estate — top navigation and profile menu correction.
  * Two permanent top-right controls: Room Navigation + User Profile/Settings.
  *
  * @see docs/protocols/SPARK_ESTATE_TOP_NAVIGATION_AND_PROFILE_MENU_CORRECTION.md
  */
 
 import {
+  ESTATE_MENU_DROPDOWN_ENTRIES,
   ESTATE_MENU_DROPDOWN_ITEMS,
   type EstateMenuActionId,
 } from "@/lib/estateMenu";
@@ -42,23 +43,53 @@ export const SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS = [
   { id: "chat", label: "Chat on / Chat off" },
   { id: "sound", label: "Sound on / Sound off" },
   { id: "fullscreen", label: "Full screen on / Full screen off" },
-  { id: "return-to-room", label: "Return to room" },
+  { id: "change-background", label: "Change background" },
+  { id: "return-to-estate", label: "Return to Estate", target: "welcome-home" },
 ] as const;
 
 export const SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS = [
-  { id: "back-to-estate", label: "Back to Estate", target: "welcome-home" },
-  { id: "wander", label: "Wander", manifestDriven: true },
+  { id: "chamber-of-momentum", label: "Chamber of Momentum" },
+  { id: "evidence-vault", label: "Evidence Vault" },
+  { id: "hall-of-accomplishments", label: "Hall of Accomplishments" },
+  { id: "journal", label: "Journal Gazebo" },
+  { id: "cartographers-studio", label: "Cartographer's Studio™" },
 ] as const;
 
+export const SPARK_ESTATE_ROOM_MENU_SECTIONS = [
+  { id: "experience-controls", label: "Experience Controls" },
+  { id: "estate-navigation", label: "Estate Navigation" },
+  { id: "experiences", label: "Experiences" },
+] as const;
+
+export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = [
+  { id: "breathe", label: "Breathe", capability: "breathe" as const },
+  { id: "soundscapes", label: "Soundscapes" },
+  {
+    id: "explore-spark",
+    label: "Explore Spark",
+    note: "Future replacement for Wander — manifest-driven place exploration",
+    manifestDriven: true,
+  },
+] as const;
+
+/** Visible profile-menu actions (Personalization / Account hidden — not working yet). */
 export const SPARK_ESTATE_PROFILE_MENU_ITEMS: readonly {
+  id: EstateMenuActionId | "conversations";
+  label: string;
+}[] = [
+  { id: "conversations", label: "Conversations" },
+  { id: "settings", label: "Settings" },
+  { id: "my-profile", label: "Profile" },
+  { id: "log-out", label: "Logout" },
+];
+
+/** Clickable leaf actions under Conversations. */
+export const SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS: readonly {
   id: EstateMenuActionId;
   label: string;
 }[] = [
-  { id: "my-profile", label: "Profile" },
-  { id: "settings", label: "Settings" },
-  { id: "memory-library", label: "Conversations" },
-  { id: "growth-profile", label: "Personalization" },
-  { id: "estate-profile", label: "Account" },
+  { id: "start-new-conversation", label: "New Chat" },
+  { id: "start-new-day-conversation", label: "New Day Chat" },
 ];
 
 export const SPARK_ESTATE_NAVIGATION_SEPARATION_RULE =
@@ -93,8 +124,8 @@ export function assessRoomButtonManifestAlignment(roomId: string): {
     const official = place.display_name ?? place.official_name;
     if (
       official &&
-      !displayName.includes(official.replace(/™/g, "")) &&
-      !official.includes(displayName.replace(/™/g, ""))
+      !displayName.includes(official.replace(/\u2122/g, "")) &&
+      !official.includes(displayName.replace(/\u2122/g, ""))
     ) {
       issues.push("display name may not match manifest official name");
     }
@@ -114,19 +145,30 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
   profileMenuAligned: boolean;
   roomExperienceItems: number;
   roomNavigationItems: number;
+  roomExperiencesItems: number;
   wanderManifestRuleReady: boolean;
   separationRuleReady: boolean;
 } {
-  const profileLabels = ESTATE_MENU_DROPDOWN_ITEMS.map((item) => item.label);
-  const expectedLabels = SPARK_ESTATE_PROFILE_MENU_ITEMS.map((item) => item.label);
+  const topLevelLabels = ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => entry.label);
+  const expectedTopLabels = SPARK_ESTATE_PROFILE_MENU_ITEMS.map((item) => item.label);
+  const conversationChildren =
+    ESTATE_MENU_DROPDOWN_ENTRIES.find((entry) => entry.kind === "group")?.children ??
+    [];
   const profileMenuAligned =
-    ESTATE_MENU_DROPDOWN_ITEMS.length === SPARK_ESTATE_PROFILE_MENU_ITEMS.length &&
+    ESTATE_MENU_DROPDOWN_ENTRIES.length === SPARK_ESTATE_PROFILE_MENU_ITEMS.length &&
     SPARK_ESTATE_PROFILE_MENU_ITEMS.every(
-      (item, index) =>
-        ESTATE_MENU_DROPDOWN_ITEMS[index]?.id === item.id &&
-        ESTATE_MENU_DROPDOWN_ITEMS[index]?.label === item.label,
+      (item, index) => ESTATE_MENU_DROPDOWN_ENTRIES[index]?.label === item.label,
     ) &&
-    profileLabels.every((label) => expectedLabels.includes(label));
+    topLevelLabels.every((label) => expectedTopLabels.includes(label)) &&
+    conversationChildren.length === SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS.length &&
+    SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS.every(
+      (item, index) =>
+        conversationChildren[index]?.id === item.id &&
+        conversationChildren[index]?.label === item.label,
+    ) &&
+    !ESTATE_MENU_DROPDOWN_ITEMS.some(
+      (item) => item.id === "growth-profile" || item.id === "estate-profile",
+    );
 
   const wanderPlace = getWanderableManifestPlaces()[0];
   const samplePick: EstateWanderPick | null = wanderPlace
@@ -142,6 +184,7 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
     profileMenuAligned,
     roomExperienceItems: SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS.length,
     roomNavigationItems: SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.length,
+    roomExperiencesItems: SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS.length,
     wanderManifestRuleReady: samplePick ? validateWanderPick(samplePick) : false,
     separationRuleReady: Boolean(SPARK_ESTATE_NAVIGATION_SEPARATION_RULE),
   };
@@ -151,7 +194,7 @@ export function formatSparkEstateTopNavigationReport(
   verification: ReturnType<typeof verifySparkEstateTopNavigationAndProfileMenu> = verifySparkEstateTopNavigationAndProfileMenu(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ top navigation: ${verification.profileMenuAligned ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate top navigation: ${verification.profileMenuAligned ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_TOP_NAVIGATION_PRINCIPLE,
     SPARK_ESTATE_TOP_NAVIGATION_GOAL,
     "",
@@ -169,6 +212,11 @@ export function formatSparkEstateTopNavigationReport(
 
   lines.push("", "Room menu — estate navigation:");
   for (const item of SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS) {
+    lines.push(`  • ${item.label}`);
+  }
+
+  lines.push("", "Room menu — experiences:");
+  for (const item of SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS) {
     lines.push(`  • ${item.label}`);
   }
 

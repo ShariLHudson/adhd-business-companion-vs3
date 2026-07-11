@@ -1,5 +1,5 @@
 /**
- * Estate Registry™ — planned / partial catalog entries (awareness only in V1).
+ * Estate Registry — planned / partial catalog entries (awareness only in V1).
  * Matcher uses live entries only; these register Estate scope for future phases.
  */
 
@@ -23,7 +23,7 @@ export const WELCOME_HOME_ENTRY: EstateRegistryEntry = {
 export const PLANNED_ESTATE_CATALOG: readonly EstateRegistryEntry[] = [
   {
     id: "conservatory",
-    name: "Conservatory™",
+    name: "Conservatory",
     category: "room",
     purpose: "Think it through — planning and reflection atmosphere.",
     memberDescription: "The Conservatory is where we think things through together.",
@@ -36,10 +36,10 @@ export const PLANNED_ESTATE_CATALOG: readonly EstateRegistryEntry[] = [
   },
   {
     id: "business-mastery-minutes",
-    name: "Business Mastery Minutes™",
+    name: "Business Mastery Minutes",
     category: "knowledge",
     purpose: "Short applied business lessons.",
-    memberDescription: "Business Mastery Minutes™ — practical lessons in minutes.",
+    memberDescription: "Business Mastery Minutes — practical lessons in minutes.",
     keywords: ["business mastery", "mastery minute"],
     problemsSolved: ["quick learning"],
     outcomes: ["applied insight"],
@@ -89,10 +89,10 @@ export const PLANNED_ESTATE_CATALOG: readonly EstateRegistryEntry[] = [
   },
   {
     id: "evidence-bank",
-    name: "Evidence Bank",
+    name: "Evidence Vault",
     category: "collection",
     purpose: "Wins and proof collected over time.",
-    memberDescription: "Evidence Bank holds what you've already accomplished.",
+    memberDescription: "Evidence Vault holds what you've already accomplished.",
     primarySection: "evidence-bank",
     keywords: ["evidence", "wins bank"],
     problemsSolved: ["forgetting progress"],
@@ -115,11 +115,11 @@ export const PLANNED_ESTATE_CATALOG: readonly EstateRegistryEntry[] = [
   },
   {
     id: "stables",
-    name: "The Stables™",
+    name: "The Stables",
     category: "room",
     purpose: "Gentle confidence restoration — fear, doubt, and second-guessing.",
     memberDescription:
-      "The Stables™ is where we rebuild courage without performance pressure.",
+      "The Stables is where we rebuild courage without performance pressure.",
     primarySection: "stables",
     keywords: ["stables", "confidence", "courage", "nervous"],
     problemsSolved: ["fear", "self-doubt", "pricing anxiety"],

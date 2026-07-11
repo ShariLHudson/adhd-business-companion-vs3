@@ -1,5 +1,5 @@
 /**
- * Interaction Contracts™ — system boundaries for Spark OS runtime.
+ * Interaction Contracts — system boundaries for Spark OS runtime.
  * One primary responsibility per system; communicate via published contracts only.
  *
  * @see spark-intelligence-foundation/008-interaction-contracts.md

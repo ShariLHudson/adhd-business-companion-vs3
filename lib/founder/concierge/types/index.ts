@@ -1,4 +1,4 @@
-/** Executive Concierge™ — orchestration types (no AI). */
+/** Executive Concierge — orchestration types (no AI). */
 
 import type { FounderWorkspaceId } from "../../types/workspace";
 

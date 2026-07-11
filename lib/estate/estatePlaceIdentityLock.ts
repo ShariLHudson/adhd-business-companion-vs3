@@ -1,5 +1,5 @@
 /**
- * Estate Place Identity Lock™
+ * Estate Place Identity Lock
  *
  * Shari may ONLY reference canonical Estate place names (registry officialName).
  * Descriptive invented locations are mapped internally — never echoed member-facing.
@@ -102,7 +102,7 @@ export function canonicalPlaceSuggestionBlurb(
 function normalizePlaceMenuLabel(label: string): string {
   return label
     .trim()
-    .replace(/™/g, "")
+    .replace(/\u2122/g, "")
     .replace(/\s+/g, " ")
     .toLowerCase();
 }
@@ -116,7 +116,7 @@ export function extractPlaceIdsFromNumberedAssistantMenu(text: string): string[]
   const out: string[] = [];
   for (const match of lines) {
     const body = match[1]!.trim();
-    const namePart = body.split(" — ")[0]!.replace(/™/g, "").trim();
+    const namePart = body.split(" — ")[0]!.replace(/\u2122/g, "").trim();
     const placeId = resolveCanonicalPlaceIdFromAlias(namePart);
     if (!placeId || seen.has(placeId)) continue;
     seen.add(placeId);
@@ -173,7 +173,7 @@ export function stripEstatePlaceMenuFromAssistantCopy(text: string): {
         const namePart = line
           .replace(/^\s*\d+[.)]\s+/, "")
           .split(" — ")[0]!
-          .replace(/™/g, "")
+          .replace(/\u2122/g, "")
           .trim();
         return !resolveCanonicalPlaceIdFromAlias(namePart);
       })
@@ -229,7 +229,7 @@ export function textContainsCanonicalPlaceName(text: string): boolean {
   const lower = text.toLowerCase();
   for (const place of CANONICAL_ESTATE_REGISTRY) {
     const official = place.officialName.toLowerCase();
-    const withoutMark = official.replace(/™/g, "").trim();
+    const withoutMark = official.replace(/\u2122/g, "").trim();
     const withoutThe = withoutMark.replace(/^the\s+/, "");
     if (
       lower.includes(official) ||
@@ -246,7 +246,7 @@ function normalizeMentionText(text: string): string {
   return text
     .trim()
     .toLowerCase()
-    .replace(/[™®.,!?]+/g, " ")
+    .replace(/[®.,!?]+/g, " ")
     .replace(/\s+/g, " ");
 }
 

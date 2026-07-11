@@ -1,4 +1,4 @@
-/** SPARK™ Intelligence Core — shared ecosystem types (no UI, no Founder dependency). */
+/** SPARK Intelligence Core — shared ecosystem types (no UI, no Founder dependency). */
 
 export type SparkEntityKind =
   | "signal"

@@ -11,7 +11,7 @@ type Props = {
   onOpenEstatePlace?: (actionId: EstateMenuActionId) => void;
 };
 
-/** Growth Profile™ — greenhouse sanctuary, frosted capability workspace. */
+/** Growth Profile — greenhouse sanctuary, frosted capability workspace. */
 export function GrowthProfileRoomPanel({
   emphasizeTimeline = false,
   onOpenEstatePlace,
@@ -22,7 +22,7 @@ export function GrowthProfileRoomPanel({
         <header className="grow-room__header">
           <p className="estate-workspace__kicker">Your Estate</p>
           <h1 className="estate-workspace__title">
-            {emphasizeTimeline ? "Progress Timeline™" : "Growth Profile™"}
+            {emphasizeTimeline ? "Progress Timeline" : "Growth Profile"}
           </h1>
           <p className="grow-room__lead grow-room__intro-support">
             Capabilities earned through learning, reflection, and return — updated

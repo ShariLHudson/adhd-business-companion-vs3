@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — founder intelligence dashboard (Phase 30).
+ * Spark Estate — founder intelligence dashboard (Phase 30).
  * Founder-facing listening system — signals about member experience, not surveillance.
  *
  * @see docs/protocols/SPARK_ESTATE_FOUNDER_INTELLIGENCE_DASHBOARD_SPECIFICATION_PHASE30.md
@@ -338,7 +338,7 @@ export function formatSparkEstateFounderIntelligenceDashboardReport(
   dashboard: SparkEstateFounderIntelligenceDashboard = buildSparkEstateFounderIntelligenceDashboard(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ founder intelligence: ${verification.founderDashboardReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate founder intelligence: ${verification.founderDashboardReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_FOUNDER_INTELLIGENCE_PRINCIPLE,
     SPARK_ESTATE_FOUNDER_INTELLIGENCE_VISION,
     SPARK_ESTATE_ANALYTICS_PRINCIPLE,

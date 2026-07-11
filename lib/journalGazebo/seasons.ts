@@ -29,13 +29,10 @@ const SEASONAL_FILES: Record<Exclude<GazeboSeason, "default">, string> = {
   holiday: "gazebo-journal-holiday-background.png",
 };
 
-/** Use CSS atmosphere when photo plates are not available locally. */
+/** Use CSS atmosphere only when explicitly enabled (missing local plates). */
 export function journalGazeboAtmosphereOnly(): boolean {
   if (typeof window === "undefined") return false;
-  return (
-    process.env.NEXT_PUBLIC_JOURNAL_GAZEBO_ATMOSPHERE === "true" ||
-    process.env.NODE_ENV === "development"
-  );
+  return process.env.NEXT_PUBLIC_JOURNAL_GAZEBO_ATMOSPHERE === "true";
 }
 
 /** Primary seasonal plate; falls back to canonical gazebo journal. */

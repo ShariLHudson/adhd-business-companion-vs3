@@ -1,5 +1,5 @@
 /**
- * Companion Decision Intelligence™ — "What would be most helpful right now?"
+ * Companion Decision Intelligence — "What would be most helpful right now?"
  */
 
 import { loadConversationSession } from "@/lib/conversationSession";

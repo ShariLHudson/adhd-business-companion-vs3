@@ -75,9 +75,9 @@ export const GROWTH_SECTION_META: Record<
   },
   "growth-reports": {
     objectId: "growth",
-    title: "Celebration Hall",
+    title: "Celebration Room",
     subtitle:
-      "Honor what matters — milestones and celebrations gathered in one quiet hall.",
+      "Honor what matters — milestones and celebrations gathered in one quiet room.",
   },
   "wins-this-week": {
     objectId: "wins",
@@ -98,8 +98,9 @@ export const GROWTH_SECTION_META: Record<
   },
   "my-journey": {
     objectId: "growth",
-    title: "My Journey",
-    subtitle: "Life experiences, lessons, wisdom, milestones, and personal growth.",
+    title: "Wins Timeline",
+    subtitle:
+      "Your chronological story of growth — personal, business, family, education, health, and creative work over months and years.",
   },
   "growth-journal": {
     objectId: "journal",
@@ -108,8 +109,9 @@ export const GROWTH_SECTION_META: Record<
   },
   "growth-portfolio": {
     objectId: "create",
-    title: "Achievement Library",
-    subtitle: "Achievements and work worth keeping on the shelf.",
+    title: "Hall of Accomplishments",
+    subtitle:
+      "Major achievements, milestones, launches, certifications, and finished work — look what you've accomplished.",
   },
 };
 
@@ -120,9 +122,9 @@ export const GROWTH_CROSS_LINKS: {
   { id: "wins-this-week", label: "Open Celebration Garden" },
   { id: "evidence-bank", label: "Open Evidence Vault" },
   { id: "confidence-vault", label: "Open Highlights" },
-  { id: "my-journey", label: "Open Journey" },
+  { id: "my-journey", label: "Open Wins Timeline" },
   { id: "growth-journal", label: "Open Journal Gazebo" },
-  { id: "growth-portfolio", label: "Open Achievement Library" },
+  { id: "growth-portfolio", label: "Open Hall of Accomplishments" },
 ];
 
 export type GrowthPanelNav = {

@@ -1,5 +1,5 @@
 /**
- * Make It Lighter™ — Spark's internal heartbeat.
+ * Make It Lighter — Spark's internal heartbeat.
  * Help members feel capable again; capability follows feeling.
  */
 

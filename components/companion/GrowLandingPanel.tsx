@@ -16,7 +16,7 @@ type GrowCard = {
 const GROW_LANDING_CARDS: GrowCard[] = [
   {
     id: "grow-momentum-builders",
-    title: "Momentum Builder™",
+    title: "Momentum Builder",
     description: "Find the easiest way to move forward today.",
     buttonLabel: "Step inside",
   },

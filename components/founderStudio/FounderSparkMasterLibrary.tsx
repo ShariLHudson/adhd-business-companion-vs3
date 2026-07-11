@@ -16,7 +16,7 @@ export function FounderSparkMasterLibrary() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Spark Master Library™"
+        eyebrow="Spark Master Library"
         title="Permanent Knowledge Index"
         question="Where does everything important belong?"
         purpose="The master catalog of Spark knowledge — unlimited growth, one calm index. Every constitution protected. Every blueprint indexed."

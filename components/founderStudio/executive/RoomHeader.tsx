@@ -12,7 +12,7 @@ type RoomHeaderProps = {
 export function RoomHeader({
   backHref,
   backLabel = "← Back to Founder Studio",
-  eyebrow = "Founder Studio™",
+  eyebrow = "Founder Studio",
   title,
   question,
   purpose,

@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — compact room history for the continuous journey.
+ * Estate Journey Engine — compact room history for the continuous journey.
  */
 
 import { patchJourneyEngine } from "./journeyStore";

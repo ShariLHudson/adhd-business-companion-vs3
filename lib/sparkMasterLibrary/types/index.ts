@@ -1,4 +1,4 @@
-/** Spark Master Library™ — permanent index of all important Spark knowledge. */
+/** Spark Master Library — permanent index of all important Spark knowledge. */
 
 export type MasterLibraryCategoryId =
   | "founder"

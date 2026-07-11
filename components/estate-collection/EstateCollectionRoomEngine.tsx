@@ -15,34 +15,94 @@ import {
   captureValuesFromItem,
 } from "@/lib/estate/collectionFramework/captureUtils";
 import {
+  DEFAULT_COLLECTION_BROWSE_STATE,
   filterCollectionItems,
   paginateCollectionItems,
   type CollectionBrowseState,
 } from "@/lib/estate/collectionFramework/collectionQuery";
+import {
+  consumeEvidenceVaultWorkspaceMode,
+  consumeEvidenceVaultSkipEntrance,
+  consumeEvidenceVaultChatPrefill,
+  EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT,
+  EVIDENCE_VAULT_ENTRANCE_DOOR_MS,
+  EVIDENCE_VAULT_ENTRANCE_ENTER_MS,
+  EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS,
+  hasEvidenceVaultEntranceCompleted,
+  markEvidenceVaultEntranceCompleted,
+  formatEvidenceVaultFindProofReply,
+  formatEvidenceVaultInsightsReply,
+  type EvidenceVaultEntrancePhase,
+  type EvidenceVaultWorkspaceMode,
+} from "@/lib/estate/evidenceVaultArrival";
+import {
+  exportAllEvidence,
+  getEvidenceEntries,
+} from "@/lib/evidenceBankStore";
+import {
+  EVIDENCE_VAULT_CHAT_PREFILL_ACK,
+  EVIDENCE_VAULT_DISCOVERY_GUIDE_FIELDS,
+} from "@/lib/estate/evidenceVaultExperience";
 import { EstateCollectionBrowseBar } from "./EstateCollectionBrowseBar";
+import {
+  DiscoveryFileExperience,
+  type DiscoveryFilePhase,
+} from "./DiscoveryFileExperience";
+import { EvidenceVaultEntrance } from "./EvidenceVaultEntrance";
+import { EvidenceVaultInterior } from "./EvidenceVaultInterior";
 import { EstateCollectionCaptureForm } from "./EstateCollectionCaptureForm";
 import { EstateCollectionItemCard } from "./EstateCollectionItemCard";
 import { EstateCollectionRoomScene } from "./EstateCollectionRoomScene";
 import { EstateCollectionRoomShell } from "./EstateCollectionRoomShell";
+import {
+  EvidenceVaultActionBar,
+  type EvidenceVaultActionId,
+} from "./EvidenceVaultActionBar";
+import { EvidenceVaultWorkspaceModal } from "./EvidenceVaultWorkspaceModal";
+import {
+  EVIDENCE_VAULT_ENTRANCE_BG,
+  EVIDENCE_VAULT_ROOM_BG,
+} from "@/lib/growth/growthRoom";
+import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import "./estate-collection-room.css";
+import "./evidence-vault-entrance.css";
+import "./evidence-vault-interior.css";
+import "./evidence-vault-workspace.css";
+
+type VaultEntrancePhase = EvidenceVaultEntrancePhase;
+
+type VaultPanel = null | "discovery" | "browse" | "insights" | "search";
+
+function vaultPanelForMode(mode: EvidenceVaultWorkspaceMode): VaultPanel {
+  if (mode === "add") return "discovery";
+  if (mode === "browse") return "browse";
+  return null;
+}
 
 type Props = {
   roomId: EstateCollectionRoomId;
   onBack: () => void;
   backLabel?: string | null;
+  /**
+   * Evidence Vault EST-001 — place-first mode.
+   * When omitted, vault reads session mode (arrive / add / browse).
+   */
+  evidenceVaultMode?: EvidenceVaultWorkspaceMode;
 };
 
 /**
- * Spark Estate Collection Framework™ — one engine for all collection rooms.
+ * Spark Estate Collection Framework — one engine for all collection rooms.
  */
 export function EstateCollectionRoomEngine({
   roomId,
   onBack,
   backLabel = "Companion",
+  evidenceVaultMode: evidenceVaultModeProp,
 }: Props) {
   const room = getEstateCollectionRoom(roomId);
   const { adapter, capture, browse, display } = room;
   const composeRef = useRef<HTMLDivElement | null>(null);
+  const isEvidenceVault = roomId === "evidence-vault";
 
   const initialCapture = useMemo(
     () => emptyCaptureValues(capture.fields),
@@ -56,15 +116,174 @@ export function EstateCollectionRoomEngine({
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [activePrompt, setActivePrompt] = useState<string | null>(null);
   const [browseState, setBrowseState] = useState<CollectionBrowseState>({
-    search: "",
-    favoritesOnly: false,
-    category: null,
+    ...DEFAULT_COLLECTION_BROWSE_STATE,
     visibleCount: browse.pageSize,
   });
+  const [initialVault] = useState(() => {
+    if (!isEvidenceVault) {
+      return {
+        mode: "add" as EvidenceVaultWorkspaceMode,
+        panel: null as VaultPanel,
+        skipEntrance: false,
+        chatPrefill: false,
+      };
+    }
+    const skipEntrance = consumeEvidenceVaultSkipEntrance();
+    const rawMode = evidenceVaultModeProp ?? consumeEvidenceVaultWorkspaceMode();
+    const mode: EvidenceVaultWorkspaceMode =
+      rawMode === "add" ? "arrive" : rawMode;
+    const chatPrefill = consumeEvidenceVaultChatPrefill();
+    const panel: VaultPanel =
+      rawMode === "browse"
+        ? "browse"
+        : rawMode === "add" && skipEntrance
+          ? "discovery"
+          : vaultPanelForMode(mode);
+    return {
+      mode,
+      panel,
+      skipEntrance,
+      chatPrefill,
+    };
+  });
+  const skipEntranceOnMount = isEvidenceVault && initialVault.skipEntrance;
+  const [vaultMode, setVaultMode] = useState<EvidenceVaultWorkspaceMode>(
+    () => initialVault.mode,
+  );
+  const [vaultPanel, setVaultPanel] = useState<VaultPanel>(() => initialVault.panel);
+  const [entrancePhase, setEntrancePhase] = useState<VaultEntrancePhase>(() => {
+    if (!isEvidenceVault || skipEntranceOnMount) return "inside";
+    return "door";
+  });
+  const [chatPrefillNote, setChatPrefillNote] = useState(
+    () => isEvidenceVault && initialVault.chatPrefill,
+  );
+  const [lastSavedId, setLastSavedId] = useState<string | null>(null);
+  const [filePhase, setFilePhase] = useState<DiscoveryFilePhase>(() => {
+    if (!isEvidenceVault) return "open";
+    return "folder";
+  });
+
+  const vaultInsightsCopy = useMemo(
+    () => (isEvidenceVault ? formatEvidenceVaultInsightsReply() : ""),
+    [isEvidenceVault],
+  );
+  const vaultSearchCopy = useMemo(
+    () => (isEvidenceVault ? formatEvidenceVaultFindProofReply() : ""),
+    [isEvidenceVault],
+  );
+
+  const showEntrance =
+    isEvidenceVault && vaultMode !== "browse" && entrancePhase !== "inside";
+  const showVaultInterior =
+    isEvidenceVault &&
+    entrancePhase === "inside" &&
+    vaultMode === "arrive" &&
+    (vaultPanel === null || vaultPanel === "discovery");
+  const showInlineDiscovery =
+    isEvidenceVault &&
+    entrancePhase === "inside" &&
+    vaultPanel === "discovery" &&
+    vaultMode === "arrive";
+  const showVaultActionBar =
+    isEvidenceVault &&
+    entrancePhase === "inside" &&
+    vaultPanel === null &&
+    vaultMode !== "arrive";
+  const showVaultBrowse =
+    isEvidenceVault && entrancePhase === "inside" && vaultPanel === "browse";
+  const showVaultInsights =
+    isEvidenceVault && entrancePhase === "inside" && vaultPanel === "insights";
+  const showVaultSearch =
+    isEvidenceVault && entrancePhase === "inside" && vaultPanel === "search";
+  const vaultPlateImage = useMemo(() => {
+    if (!isEvidenceVault) return undefined;
+    if (entrancePhase === "door" || entrancePhase === "unlocking") {
+      return EVIDENCE_VAULT_ENTRANCE_BG;
+    }
+    return EVIDENCE_VAULT_ROOM_BG;
+  }, [isEvidenceVault, entrancePhase]);
+  const showBrowseOnly = !isEvidenceVault || showVaultBrowse;
+  const showCaptureForm = !isEvidenceVault || vaultMode === "add";
+  const showBrowse = showBrowseOnly;
+
+  function useVaultKey() {
+    if (entrancePhase !== "door") return;
+    setEntrancePhase("unlocking");
+    window.setTimeout(() => {
+      setEntrancePhase("opening");
+      window.setTimeout(() => {
+        setEntrancePhase("entering");
+        window.setTimeout(() => {
+          markEvidenceVaultEntranceCompleted();
+          setEntrancePhase("inside");
+          window.dispatchEvent(
+            new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
+          );
+        }, EVIDENCE_VAULT_ENTRANCE_ENTER_MS);
+      }, EVIDENCE_VAULT_ENTRANCE_DOOR_MS);
+    }, EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS);
+  }
+
+  function openJournalFromInterior() {
+    setVaultPanel("discovery");
+    setFilePhase("folder");
+  }
+
+  const closeVaultPanel = useCallback(() => {
+    setVaultPanel(null);
+    setVaultMode("arrive");
+    setFilePhase("folder");
+    setEditingId(null);
+    setDraft(emptyCaptureValues(capture.fields));
+    setAttachments([]);
+    setActivePrompt(null);
+  }, [capture.fields]);
+
+  const openVaultAction = useCallback(
+    (actionId: EvidenceVaultActionId) => {
+      switch (actionId) {
+        case "today-discovery":
+          setVaultMode("arrive");
+          setVaultPanel("discovery");
+          setFilePhase("folder");
+          setChatPrefillNote(false);
+          setDraft(emptyCaptureValues(capture.fields));
+          setAttachments([]);
+          setEditingId(null);
+          setActivePrompt(null);
+          return;
+        case "browse-archive":
+          setVaultMode("browse");
+          setVaultPanel("browse");
+          return;
+        case "search-discoveries":
+          setVaultMode("browse");
+          setVaultPanel("search");
+          return;
+        case "view-insights":
+          setVaultPanel("insights");
+          return;
+        case "print-discoveries":
+          exportAllEvidence("print");
+          setStatusMessage("Your discoveries are ready to print.");
+          return;
+        default:
+          return;
+      }
+    },
+    [capture.fields],
+  );
 
   const reload = useCallback(() => {
     setItems(adapter.listItems());
   }, [adapter]);
+
+  useEffect(() => {
+    if (!isEvidenceVault) return;
+    preloadRoomBackground(EVIDENCE_VAULT_ENTRANCE_BG);
+    preloadRoomBackground(EVIDENCE_VAULT_ROOM_BG);
+  }, [isEvidenceVault]);
 
   useEffect(() => {
     reload();
@@ -84,6 +303,11 @@ export function EstateCollectionRoomEngine({
   useEffect(() => {
     const prefill = consumeCollectionPrefill(roomId);
     if (!prefill) return;
+    if (isEvidenceVault) {
+      setVaultMode("arrive");
+      setVaultPanel("discovery");
+      setFilePhase("open");
+    }
     setDraft({
       ...emptyCaptureValues(capture.fields),
       ...prefill.values,
@@ -92,7 +316,7 @@ export function EstateCollectionRoomEngine({
     window.setTimeout(() => {
       composeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 120);
-  }, [roomId, capture.fields]);
+  }, [roomId, capture.fields, isEvidenceVault]);
 
   const filteredItems = useMemo(
     () => filterCollectionItems(items, browseState),
@@ -123,20 +347,50 @@ export function EstateCollectionRoomEngine({
     setActivePrompt(null);
   }
 
+  function openNewDiscovery() {
+    resetCompose();
+    setVaultMode("arrive");
+    setVaultPanel("discovery");
+    setFilePhase("folder");
+    setChatPrefillNote(false);
+  }
+
   function saveDraft() {
+    let payload = draft;
+    if (
+      isEvidenceVault &&
+      !editingId &&
+      capture.discoveryPreserveMode &&
+      !payload.situation?.trim()
+    ) {
+      const combined = EVIDENCE_VAULT_DISCOVERY_GUIDE_FIELDS.map(({ question, fieldId }) => {
+        const value = payload[fieldId]?.trim();
+        return value ? `${question}\n${value}` : "";
+      })
+        .filter(Boolean)
+        .join("\n\n");
+      if (combined) {
+        payload = { ...payload, situation: combined };
+      }
+    }
     const saveOptions = {
       ...(editingId ? { editId: editingId } : {}),
       attachments,
     };
-    if (!adapter.saveItem(draft, saveOptions)) {
+    if (!adapter.saveItem(payload, saveOptions)) {
       return;
     }
+    const wasEdit = Boolean(editingId);
     resetCompose();
     setStatusMessage(
-      editingId
+      wasEdit
         ? (capture.updatedMessage ?? "Updated quietly.")
         : (capture.savedMessage ?? "Saved quietly."),
     );
+    if (isEvidenceVault && !wasEdit) {
+      const [latest] = getEvidenceEntries();
+      if (latest) setLastSavedId(latest.id);
+    }
     reload();
   }
 
@@ -148,6 +402,11 @@ export function EstateCollectionRoomEngine({
         capture.fields,
       );
     if (!captureValues) return;
+    if (isEvidenceVault) {
+      setVaultMode("arrive");
+      setVaultPanel("discovery");
+      setFilePhase("open");
+    }
     setEditingId(itemId);
     setDraft(captureValues);
     const item = items.find((entry) => entry.id === itemId);
@@ -164,7 +423,183 @@ export function EstateCollectionRoomEngine({
       : room.openingSparkPrompt;
 
   return (
-    <EstateCollectionRoomShell room={room}>
+    <EstateCollectionRoomShell
+      room={room}
+      backgroundImage={vaultPlateImage}
+      dataVaultEntrancePhase={
+        isEvidenceVault && entrancePhase !== "inside" ? entrancePhase : undefined
+      }
+    >
+      {isEvidenceVault ? (
+        <>
+          {entrancePhase === "inside" ? (
+            <div className="discovery-file-exit">
+              <GrowthPanelBackButton onBack={onBack} label={backLabel} />
+            </div>
+          ) : null}
+          {showEntrance ? (
+            <EvidenceVaultEntrance
+              phase={entrancePhase as Exclude<VaultEntrancePhase, "inside">}
+              onUseKey={useVaultKey}
+            />
+          ) : null}
+          {showVaultInterior ? (
+            <EvidenceVaultInterior
+              journalActive={vaultPanel === "discovery"}
+              onOpenJournal={openJournalFromInterior}
+              showSecondaryActions={hasEvidenceVaultEntranceCompleted()}
+              onBrowseArchive={() => {
+                setVaultMode("browse");
+                setVaultPanel("browse");
+              }}
+              behindDiscovery={vaultPanel === "discovery"}
+            />
+          ) : null}
+          {showVaultActionBar ? (
+            <EvidenceVaultActionBar onSelect={openVaultAction} />
+          ) : null}
+          {statusMessage ? (
+            <p className="evidence-vault-status" role="status">
+              {statusMessage}
+            </p>
+          ) : null}
+          {showInlineDiscovery ? (
+            <div className="evidence-vault-inline-discovery">
+              <DiscoveryFileExperience
+                capture={capture}
+                values={draft}
+                onChange={setDraft}
+                attachments={attachments}
+                onAttachmentsChange={
+                  capture.enableAttachments ? setAttachments : undefined
+                }
+                onSave={saveDraft}
+                onCancelEdit={editingId ? resetCompose : undefined}
+                editingId={editingId}
+                phase={filePhase}
+                onPhaseChange={setFilePhase}
+                lastSavedId={lastSavedId}
+                chatPrefillNote={
+                  chatPrefillNote ? EVIDENCE_VAULT_CHAT_PREFILL_ACK : null
+                }
+                onDismissChatPrefillNote={() => setChatPrefillNote(false)}
+                onViewDiscovery={(id) => {
+                  setFilePhase("open");
+                  beginEdit(id);
+                }}
+                onAddAnother={openNewDiscovery}
+                onReturnToEstate={closeVaultPanel}
+              />
+            </div>
+          ) : null}
+          <EvidenceVaultWorkspaceModal
+            open={showVaultBrowse}
+            onClose={closeVaultPanel}
+            title="Browse Archive"
+            testId="evidence-vault-browse-modal"
+          >
+            <div className="discovery-file-browse">
+              <EstateWorkspace className="estate-collection-panel" variant="vault">
+                <section
+                  className="estate-workspace__section estate-collection-panel__collection estate-collection-panel__flow-item"
+                  aria-label={room.collectionTitle}
+                >
+                  {items.length > 0 ? (
+                    <EstateCollectionBrowseBar
+                      items={items}
+                      browse={browse}
+                      state={browseState}
+                      onChange={setBrowseState}
+                    />
+                  ) : null}
+                  {total === 0 ? (
+                    <p className="estate-collection-panel__empty">
+                      {items.length === 0
+                        ? room.collectionEmptyMessage
+                        : browse.emptyFilterMessage}
+                    </p>
+                  ) : (
+                    <>
+                      <ul className="estate-collection-panel__items estate-collection-panel__items--vault">
+                        {visible.map((item) => (
+                          <li key={item.id}>
+                            <EstateCollectionItemCard
+                              item={item}
+                              displayStyle={display.style}
+                              card={display.card}
+                              removeLabel={removeLabel}
+                              onEdit={() => beginEdit(item.id)}
+                              onToggleFavorite={
+                                adapter.toggleFavorite
+                                  ? () => {
+                                      adapter.toggleFavorite?.(item.id);
+                                      reload();
+                                    }
+                                  : undefined
+                              }
+                              onRemove={
+                                adapter.removeItem
+                                  ? () => {
+                                      adapter.removeItem?.(item.id);
+                                      if (editingId === item.id) resetCompose();
+                                      reload();
+                                    }
+                                  : undefined
+                              }
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                      {hasMore ? (
+                        <button
+                          type="button"
+                          className="estate-collection-panel__load-more"
+                          onClick={() =>
+                            setBrowseState((current) => ({
+                              ...current,
+                              visibleCount:
+                                current.visibleCount + browse.pageSize,
+                            }))
+                          }
+                        >
+                          {browse.loadMoreLabel}
+                        </button>
+                      ) : null}
+                    </>
+                  )}
+                </section>
+              </EstateWorkspace>
+            </div>
+          </EvidenceVaultWorkspaceModal>
+          <EvidenceVaultWorkspaceModal
+            open={showVaultInsights}
+            onClose={closeVaultPanel}
+            title="View Insights"
+            testId="evidence-vault-insights-modal"
+          >
+            <div className="evidence-vault-insights-panel">{vaultInsightsCopy}</div>
+          </EvidenceVaultWorkspaceModal>
+          <EvidenceVaultWorkspaceModal
+            open={showVaultSearch}
+            onClose={closeVaultPanel}
+            title="Search Discoveries"
+            testId="evidence-vault-search-modal"
+          >
+            <div className="evidence-vault-insights-panel">{vaultSearchCopy}</div>
+            <button
+              type="button"
+              className="evidence-vault-workspace-modal__return"
+              style={{ marginTop: "1rem" }}
+              onClick={() => {
+                setVaultMode("browse");
+                setVaultPanel("browse");
+              }}
+            >
+              Open Browse Archive
+            </button>
+          </EvidenceVaultWorkspaceModal>
+        </>
+      ) : (
       <div
         className="estate-collection-panel-root"
         data-collection-style={display.style}
@@ -173,7 +608,7 @@ export function EstateCollectionRoomEngine({
       >
         <EstateWorkspace
           className="estate-collection-panel"
-          variant={roomId === "evidence-vault" ? "vault" : "ivory"}
+          variant="ivory"
         >
           <GrowthPanelBackButton onBack={onBack} label={backLabel} />
 
@@ -184,32 +619,34 @@ export function EstateCollectionRoomEngine({
             <p className="estate-workspace__lead">{room.description}</p>
           </header>
 
-          <div
-            ref={composeRef}
-            className="estate-collection-panel__compose-zone estate-collection-panel__flow-item"
-          >
-            <EstateCollectionCaptureForm
-              roomId={room.id}
-              capture={capture}
-              values={draft}
-              onChange={setDraft}
-              onSave={saveDraft}
-              onCancelEdit={editingId ? resetCompose : undefined}
-              statusMessage={statusMessage}
-              editingId={editingId}
-              attachments={attachments}
-              onAttachmentsChange={
-                capture.enableAttachments ? setAttachments : undefined
-              }
-            />
-          </div>
-
           <section
             className="estate-collection-panel__spark estate-collection-panel__flow-item"
             aria-label="Spark opening"
           >
             <p className="estate-collection-panel__spark-line">{sparkLine}</p>
           </section>
+
+          {showCaptureForm ? (
+            <div
+              ref={composeRef}
+              className="estate-collection-panel__compose-zone estate-collection-panel__flow-item"
+            >
+              <EstateCollectionCaptureForm
+                roomId={room.id}
+                capture={capture}
+                values={draft}
+                onChange={setDraft}
+                onSave={saveDraft}
+                onCancelEdit={editingId ? resetCompose : undefined}
+                statusMessage={statusMessage}
+                editingId={editingId}
+                attachments={attachments}
+                onAttachmentsChange={
+                  capture.enableAttachments ? setAttachments : undefined
+                }
+              />
+            </div>
+          ) : null}
 
           {room.suggestedPrompts.length > 0 ? (
             <section
@@ -236,6 +673,7 @@ export function EstateCollectionRoomEngine({
             </section>
           ) : null}
 
+          {showBrowse ? (
           <section
             className="estate-workspace__section estate-collection-panel__collection estate-collection-panel__flow-item"
             aria-label={room.collectionTitle}
@@ -319,8 +757,9 @@ export function EstateCollectionRoomEngine({
               </>
             )}
           </section>
+          ) : null}
 
-          {room.followUpQuestions.length > 0 ? (
+          {showCaptureForm && room.followUpQuestions.length > 0 ? (
             <section
               className="estate-collection-panel__followups estate-collection-panel__flow-item"
               aria-label="Gentle follow-up questions"
@@ -337,6 +776,7 @@ export function EstateCollectionRoomEngine({
           ) : null}
         </EstateWorkspace>
       </div>
+      )}
     </EstateCollectionRoomShell>
   );
 }

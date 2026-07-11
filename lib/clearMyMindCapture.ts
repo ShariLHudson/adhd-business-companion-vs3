@@ -27,9 +27,21 @@ function splitSemicolonClauses(text: string): string[] | null {
   return parts.length >= 2 ? parts : null;
 }
 
+function splitCommaList(text: string): string[] | null {
+  if (!text.includes(",")) return null;
+  const parts = text
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+  /** Only treat as a list when there are multiple meaningful pieces. */
+  if (parts.length < 2) return null;
+  if (parts.every((part) => part.split(/\s+/).length <= 8)) return parts;
+  return null;
+}
+
 /**
- * Split pasted multi-line / bulleted input into separate thoughts.
- * Comma/period lists are offered via Smart Split — not auto-split here.
+ * Split pasted multi-line / bulleted / comma / clause input into thoughts.
+ * Raw text stays available to the member; this only counts and stores pieces.
  */
 export function splitCaptureInput(raw: string): string[] {
   const text = raw.trim();
@@ -41,11 +53,17 @@ export function splitCaptureInput(raw: string): string[] {
     .filter(Boolean);
 
   if (lines.length > 1) {
-    return lines;
+    return lines.flatMap((line) => {
+      const commaParts = splitCommaList(line);
+      return commaParts ?? [line];
+    });
   }
 
   const semicolonParts = splitSemicolonClauses(text);
   if (semicolonParts) return semicolonParts;
+
+  const commaParts = splitCommaList(text);
+  if (commaParts) return commaParts;
 
   const periodParts = splitPeriodClauses(text);
   if (periodParts) return periodParts;

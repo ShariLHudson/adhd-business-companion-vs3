@@ -1,5 +1,5 @@
 /**
- * Estate Room Registry™ — **legacy runtime catalog** (27 walkable rooms).
+ * Estate Room Registry — **legacy runtime catalog** (27 walkable rooms).
  *
  * @deprecated **Not authoritative.** Phase B: `canonicalEstateRegistry.ts` is the single
  * source of truth for place identity. This file will be **replaced later** — keep for routing,
@@ -20,7 +20,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "welcome-home",
     name: "Welcome Home",
-    trademark: "Welcome Home™",
+    trademark: "Welcome Home",
     route: "home",
     routes: ["welcome-room", "today"],
     backgroundImage: null,
@@ -53,7 +53,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "conservatory",
     name: "The Conservatory",
-    trademark: "The Conservatory™",
+    trademark: "The Conservatory",
     route: null,
     routes: ["brain-dump"],
     backgroundImage: null,
@@ -63,7 +63,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
     purpose: "Restoration, clarity, gentle thinking — garden glass and unhurried reflection.",
     emotionalFeeling: "Restoration, clarity, gentle thinking",
     whatMembersDo:
-      "Clear their mind, journal, visit Peaceful Places™, or talk with Shari — nothing required.",
+      "Clear their mind, journal, visit Peaceful Places, or talk with Shari — nothing required.",
     whatShariDoes:
       "Thinks alongside — never rushes to solutions; holds space for understanding.",
     whenToRecommend: [
@@ -85,7 +85,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "library",
     name: "The Library",
-    trademark: "The Library™",
+    trademark: "The Library",
     route: "growth-library",
     routes: ["how-do-i"],
     backgroundImage: null,
@@ -131,7 +131,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "momentum-institute",
     name: "The Momentum Institute",
-    trademark: "Momentum Institute™",
+    trademark: "Momentum Institute",
     route: "momentum-institute",
     routes: [],
     backgroundImage: null,
@@ -139,7 +139,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
     estateRegistryId: "momentum-institute",
     homesteadRoomId: "library",
     roomType: "learning",
-    purpose: "Entrepreneur Development Center — drawer wall, Knowledge Cards™, capability growth.",
+    purpose: "Entrepreneur Development Center — drawer wall, Knowledge Cards, capability growth.",
     emotionalFeeling: "Discovery, prestige, curiosity, earned capability",
     whatMembersDo: "Open drawers, explore index cards, learn, reflect, apply, save to cabinet.",
     whatShariDoes:
@@ -166,7 +166,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "coffee-house",
     name: "The Coffee House",
-    trademark: "Coffee House™",
+    trademark: "Coffee House",
     route: null,
     backgroundImage: null,
     intendedBackgroundImage: ESTATE_ROOM_BG.coffeeHouse,
@@ -224,7 +224,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "observatory",
     name: "The Observatory",
-    trademark: "Observatory™",
+    trademark: "Observatory",
     route: "grow-observatory",
     backgroundImage: null,
     intendedBackgroundImage: ESTATE_ROOM_BG.observatory,
@@ -250,7 +250,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "music-room",
     name: "The Music Room",
-    trademark: "Music Room™",
+    trademark: "Music Room",
     route: "focus-audio",
     backgroundImage: null,
     intendedBackgroundImage: ESTATE_ROOM_BG.musicRoom,
@@ -279,7 +279,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "tea-room",
     name: "The Tea Room",
-    trademark: "Tea Room™",
+    trademark: "Tea Room",
     route: null,
     backgroundImage: null,
     roomType: "restoration",
@@ -296,7 +296,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "game-room",
     name: "The Game Room",
-    trademark: "Game Room™",
+    trademark: "Game Room",
     route: "games",
     routes: ["activities", "quick-recharge"],
     backgroundImage: null,
@@ -320,7 +320,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "gardens",
     name: "The Gardens",
-    trademark: "The Gardens™",
+    trademark: "The Gardens",
     route: "home",
     routes: ["focus-audio", "breathe"],
     backgroundImage: null,
@@ -353,7 +353,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "greenhouse",
     name: "The Greenhouse",
-    trademark: "Greenhouse™",
+    trademark: "Greenhouse",
     route: null,
     routes: ["growth-greenhouse"],
     backgroundImage: ESTATE_ROOM_BG.greenhouse,
@@ -362,7 +362,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
     purpose: "This is where possibilities begin — nurture ideas before anything is rushed.",
     emotionalFeeling: "Possibility, patience, safe emergence",
     whatMembersDo:
-      "Plant ideas, nurture seedlings, visit Seeds Planted™ — Kinsey asleep nearby signals this is a safe place.",
+      "Plant ideas, nurture seedlings, visit Seeds Planted — Kinsey asleep nearby signals this is a safe place.",
     whatShariDoes:
       "Helps ideas take shape at their own pace — never rushes harvest.",
     whenToRecommend: [
@@ -379,7 +379,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "stables",
     name: "The Stables",
-    trademark: "The Stables™",
+    trademark: "The Stables",
     route: "stables",
     backgroundImage: ESTATE_ROOM_BG.stables,
     roomType: "restoration",
@@ -389,7 +389,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
     whatMembersDo:
       "Choose a Stables experience, reflect, take small confidence steps, save insights when ready.",
     whatShariDoes:
-      "Speaks slower and warmer — stories and coaching, not lectures. May say: Let's spend a few minutes at the Stables™.",
+      "Speaks slower and warmer — stories and coaching, not lectures. May say: Let's spend a few minutes at the Stables.",
     whenToRecommend: [
       "nervous",
       "lack confidence",
@@ -425,15 +425,16 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "apple-orchard",
     name: "Apple Orchard",
-    trademark: "Apple Orchard™",
-    route: null,
-    backgroundImage: null,
+    trademark: "Apple Orchard",
+    route: "home",
+    backgroundImage: ESTATE_ROOM_BG.appleOrchard,
     intendedBackgroundImage: ESTATE_ROOM_BG.appleOrchard,
     roomType: "nature",
     purpose: "Fresh ideas and possibility — harvest thinking in an open orchard.",
     emotionalFeeling: "Possibility, freshness, gentle abundance",
-    whatMembersDo: "Explore ideas, celebrate planting seeds of thought (map destination today).",
-    whatShariDoes: "May say 'Let's head to the Apple Orchard' when ideation wants air and light.",
+    whatMembersDo: "Explore ideas, walk the rows, celebrate planting seeds of thought.",
+    whatShariDoes:
+      "Welcomes the member into the Apple Orchard with Kinsey nearby — open air, gentle abundance.",
     whenToRecommend: [
       "fresh ideas",
       "want the orchard",
@@ -446,7 +447,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
       "take me to the apple orchard",
     ],
     estateIntelligenceExamples: ["I want to go to the Apple Orchard."],
-    status: "future",
+    status: "live",
   },
   {
     id: "sunroom",
@@ -474,11 +475,11 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "peaceful-places",
     name: "Peaceful Places",
-    trademark: "Peaceful Places™",
+    trademark: "Peaceful Places",
     route: "focus-audio",
     routes: ["breathe"],
     backgroundImage: null,
-    intendedBackgroundImage: "/backgrounds/peaceful-places/woodland-pathway.png",
+    intendedBackgroundImage: "/backgrounds/woodland-pathway.png",
     estateRegistryId: "peaceful-places",
     homesteadRoomId: "peaceful-places",
     roomType: "restoration",
@@ -501,14 +502,14 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
     ],
     estateIntelligenceExamples: [
       "I need a peaceful place.",
-      "Help me calm down.",
+      "Open Peaceful Places.",
     ],
     status: NEEDS_ASSET,
   },
   {
     id: "clear-my-mind",
     name: "Clear My Mind",
-    trademark: "Clear My Mind™",
+    trademark: "Clear My Mind",
     route: "brain-dump",
     backgroundImage: null,
     intendedBackgroundImage: ESTATE_ROOM_BG.butterflyConservatory,
@@ -539,7 +540,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "decision-compass",
     name: "Decision Compass",
-    trademark: "Decision Compass™",
+    trademark: "Decision Compass",
     route: "decision-compass",
     backgroundImage: null,
     estateRegistryId: "decision-compass",
@@ -569,7 +570,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "momentum-builder",
     name: "Momentum Builder",
-    trademark: "Momentum Builder™",
+    trademark: "Momentum Builder",
     route: "momentum-builder",
     routes: ["grow-momentum-builders"],
     backgroundImage: null,
@@ -596,10 +597,10 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "journal",
     name: "Journal Gazebo",
-    trademark: "Journal Gazebo™",
+    trademark: "Journal Gazebo",
     route: "growth-journal",
     backgroundImage: null,
-    intendedBackgroundImage: "/backgrounds/gazebo-journal-background.png",
+    intendedBackgroundImage: ESTATE_ROOM_BG.gazeboJournal,
     estateRegistryId: "growth-journal",
     menuActionId: "journal",
     roomType: "reflection",
@@ -620,7 +621,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "my-estate",
     name: "My Estate",
-    trademark: "My Estate™",
+    trademark: "My Estate",
     route: null,
     menuActionId: "estate-profile",
     overlayId: "profile",
@@ -646,17 +647,17 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "institute-cabinet",
     name: "My Institute Cabinet",
-    trademark: "My Institute Cabinet™",
+    trademark: "My Institute Cabinet",
     route: null,
     menuActionId: "institute-cabinet",
     overlayId: "institute-cabinet",
     backgroundImage: null,
     roomType: "archive",
-    purpose: "Saved Knowledge Cards™ and Institute references — filed for easy return.",
+    purpose: "Saved Knowledge Cards and Institute references — filed for easy return.",
     emotionalFeeling: "Trust, organization without folders",
     whatMembersDo: "Save cards from the Institute, revisit filed lessons.",
     whatShariDoes:
-      "Asks 'Would you like me to file this in your My Institute Cabinet™?' — permission first.",
+      "Asks 'Would you like me to file this in your My Institute Cabinet?' — permission first.",
     whenToRecommend: ["save this lesson", "find what I saved", "institute cabinet"],
     relatedRoomIds: ["momentum-institute", "growth-profile"],
     navigationPhrases: ["institute cabinet", "my institute cabinet", "open my cabinet"],
@@ -666,10 +667,10 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "evidence-vault",
     name: "Evidence Vault",
-    trademark: "Evidence Vault™",
+    trademark: "Evidence Vault",
     route: "evidence-bank",
     menuActionId: "evidence-vault",
-    backgroundImage: null,
+    backgroundImage: "/backgrounds/evidence-vault-background.png",
     intendedBackgroundImage: "/backgrounds/evidence-vault-background.png",
     estateRegistryId: "evidence-bank",
     roomType: "archive",
@@ -683,39 +684,66 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
       "collect wins",
     ],
     relatedRoomIds: ["journal", "growth-profile", "portfolio"],
-    navigationPhrases: ["evidence vault", "my wins", "proof of growth"],
-    estateIntelligenceExamples: ["I need to remember what I've accomplished."],
-    status: NEEDS_ASSET,
+    navigationPhrases: [
+      "evidence vault",
+      "my evidence vault",
+      "open evidence vault",
+      "show my evidence vault",
+      "proof of growth",
+      "show me proof",
+      "proof i can do this",
+      "i need encouragement",
+      "remind me what i've done",
+    ],
+    estateIntelligenceExamples: [
+      "Open my Evidence Vault.",
+      "I need encouragement.",
+      "Show me proof I can do this.",
+    ],
+    status: "live",
   },
   {
     id: "portfolio",
-    name: "Achievement Library",
-    trademark: "Achievement Library™",
+    name: "Hall of Accomplishments",
+    trademark: "Hall of Accomplishments",
     route: "growth-portfolio",
     menuActionId: "portfolio",
     backgroundImage: ESTATE_ROOM_BG.portfolio,
     intendedBackgroundImage: ESTATE_ROOM_BG.portfolio,
     roomType: "archive",
-    purpose: "Creative work and projects — what you've built, in one thoughtful place.",
-    emotionalFeeling: "Pride, craft, continuity",
-    whatMembersDo: "Review creative work, projects, and growth artifacts.",
-    whatShariDoes: "Connects work to story — never reduces portfolio to a file list.",
-    whenToRecommend: ["show my work", "what have I built", "my portfolio"],
+    purpose:
+      "Major achievements, milestones, launches, certifications, awards, and finished work worth celebrating.",
+    emotionalFeeling: "Pride, celebration, visible progress",
+    whatMembersDo:
+      "Add and review finished projects, milestones, launches, certifications, awards, and personal victories.",
+    whatShariDoes:
+      "Celebrates major accomplishments — never confuses Hall with Gallery, Evidence Vault, or Wins.",
+    whenToRecommend: [
+      "show my accomplishments",
+      "hall of accomplishments",
+      "what have I achieved",
+    ],
     relatedRoomIds: ["creative-studio", "goals-projects", "evidence-vault"],
-    navigationPhrases: ["portfolio", "my portfolio", "open portfolio"],
-    estateIntelligenceExamples: ["Show my Portfolio."],
-    status: NEEDS_ASSET,
+    navigationPhrases: [
+      "hall of accomplishments",
+      "my hall of accomplishments",
+      "my accomplishments",
+      "show my accomplishments",
+      "open hall of accomplishments",
+    ],
+    estateIntelligenceExamples: ["Show my Hall of Accomplishments."],
+    status: "live",
   },
   {
     id: "seeds-planted",
     name: "Seeds Planted",
-    trademark: "Seeds Planted™",
+    trademark: "Seeds Planted",
     route: "grow-spark-cards",
     menuActionId: "seeds-planted",
     backgroundImage: null,
     estateRegistryId: "knowledge-cards",
     roomType: "archive",
-    purpose: "Spark Cards™ and ideas taking root — wisdom captured before it becomes a project.",
+    purpose: "Spark Cards and ideas taking root — wisdom captured before it becomes a project.",
     emotionalFeeling: "Hope, emergence, gentle growth",
     whatMembersDo: "Browse Spark Cards, ideas planted, early insights.",
     whatShariDoes: "Notices seeds that may be ready to nurture — never rushes harvest.",
@@ -728,7 +756,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "goals-projects",
     name: "Goals & Projects",
-    trademark: "Goals & Projects™",
+    trademark: "Goals & Projects",
     route: "projects",
     menuActionId: "goals-projects",
     backgroundImage: null,
@@ -746,7 +774,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   {
     id: "growth-profile",
     name: "Growth Profile",
-    trademark: "Growth Profile™",
+    trademark: "Growth Profile",
     route: null,
     menuActionId: "growth-profile",
     overlayId: "growth-profile",

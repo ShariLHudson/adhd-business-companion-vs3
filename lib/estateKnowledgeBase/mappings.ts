@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — relationship queries from mapping registries.
+ * Estate Knowledge Base — relationship queries from mapping registries.
  */
 
 import {

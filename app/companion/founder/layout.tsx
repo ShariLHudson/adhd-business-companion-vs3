@@ -5,7 +5,7 @@ import { FounderShell } from "@/components/founderStudio/FounderShell";
 import "./founder-studio.css";
 
 export const metadata = {
-  title: "Founder Studio™",
+  title: "Founder Studio",
   robots: { index: false, follow: false },
 };
 

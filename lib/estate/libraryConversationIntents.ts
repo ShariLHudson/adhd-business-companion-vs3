@@ -1,5 +1,5 @@
 /**
- * Library™ conversation intents — reading, resources, thinkers, authors.
+ * Library conversation intents — reading, resources, thinkers, authors.
  */
 
 const WHATS_AVAILABLE_RE =
@@ -34,7 +34,7 @@ export function isLibraryExplorationTurn(
 }
 
 export function formatLibraryWhatsAvailableReply(): string {
-  return "The Library holds stories and resources on the shelves — and the Momentum Institute™ nearby has business learning drawers. You can browse resources, ask for something specific, or tell me what you're curious about.";
+  return "The Library holds stories and resources on the shelves — and the Momentum Institute nearby has business learning drawers. You can browse resources, ask for something specific, or tell me what you're curious about.";
 }
 
 export function formatLibraryGreatThinkersReply(): string {

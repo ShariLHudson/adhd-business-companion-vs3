@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ — Estate journey connection points.
+ * Momentum Builder — Estate journey connection points.
  *
  * @see docs/MOMENTUM_BUILDER_V1_ORCHESTRATION.md
  * @see docs/ESTATE_ROOMS_FRAMEWORK.md
@@ -32,7 +32,7 @@ export const MOMENTUM_BUILDER_ESTATE_ROLE = {
   follows: ["content-generator", "creative-studio"] as const,
 } as const;
 
-/** Rooms that may hand off into Momentum Builder™ with context (V2). */
+/** Rooms that may hand off into Momentum Builder with context (V2). */
 export type MomentumBuilderHandoffSource =
   | "observatory"
   | "library"

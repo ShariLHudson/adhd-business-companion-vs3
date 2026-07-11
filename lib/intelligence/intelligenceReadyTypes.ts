@@ -1,6 +1,6 @@
 /**
  * Intelligence-Ready Architecture
- * Shared hooks for every living object in the ADHD Business Ecosystem™.
+ * Shared hooks for every living object in the ADHD Business Ecosystem.
  *
  * Users never see intelligenceMeta or bulk connection graphs in V1.
  * Engines enrich quietly; the surface stays calm.

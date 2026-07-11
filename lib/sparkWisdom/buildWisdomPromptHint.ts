@@ -1,5 +1,6 @@
 /**
  * Spec 130 — Assemble Wisdom Loop prompt hint for companion-chat.
+ * Estate 131–140 — Shared Capability composition stays hidden behind Spark.
  */
 
 import {
@@ -11,8 +12,17 @@ import { memberNeedLabel } from "./memberNeed";
 import { buildOutcomeDiscoveryPromptBlock } from "./outcomeDiscovery";
 import { EMOTIONAL_BLOCKER_FORBIDDEN_UNTIL_UNDERSTOOD } from "./emotionalBlocker";
 import { HIDDEN_INTENT_TURN1_FORBIDDEN } from "./validationGate";
+import { resolveCompanionCapabilityHelp } from "@/lib/sparkSharedCapabilities";
+import { evaluateRecognitionLifecycleTurn } from "@/lib/sparkRecognitionEngine";
 
-export function buildWisdomLoopPromptHint(result: WisdomLoopResult): string {
+export function buildWisdomLoopPromptHint(
+  result: WisdomLoopResult,
+  opts?: {
+    memberMessage?: string;
+    visualRoom?: string | null;
+    activeRecognitionFlowKind?: string | null;
+  },
+): string {
   const lines: string[] = [
     "WISDOM LOOP (Specs 120–131 — invisible — respond like Shari):",
     SHARI_PRINCIPLE,
@@ -103,6 +113,38 @@ export function buildWisdomLoopPromptHint(result: WisdomLoopResult): string {
   lines.push(
     "Never default to the fastest literal answer. Leave the member better than you found them.",
   );
+
+  if (opts?.memberMessage?.trim()) {
+    const recognition = evaluateRecognitionLifecycleTurn({
+      userText: opts.memberMessage,
+    });
+    if (recognition.ownsTurn && recognition.companionPromptHint) {
+      lines.push("=== RECOGNITION LIFECYCLE (invisible) ===");
+      lines.push(recognition.companionPromptHint);
+      if (recognition.speak) {
+        lines.push(`Offer: ${recognition.speak}`);
+      }
+      lines.push(
+        "Do not route this discovery to Create unless the member explicitly asks to build.",
+      );
+    }
+
+    const capabilityHelp = resolveCompanionCapabilityHelp({
+      userText: opts.memberMessage,
+      visualRoom: opts.visualRoom,
+      activeRecognitionFlowKind: opts.activeRecognitionFlowKind,
+    });
+    if (capabilityHelp.composition && capabilityHelp.promptHint) {
+      lines.push("=== SHARED CAPABILITY (Estate 131–140 — invisible) ===");
+      lines.push(capabilityHelp.promptHint);
+      if (capabilityHelp.speak) {
+        lines.push(`Companion offer tone: ${capabilityHelp.speak}`);
+      }
+      lines.push(
+        `Never say: ${capabilityHelp.neverSay.slice(0, 8).join(", ")}`,
+      );
+    }
+  }
 
   lines.push(
     "SPARK HUMAN VOICE (final check): Would Shari say this out loud? No ### headings, no 'Great question!', no 'Let's dive in', no essay format unless requested. One thought at a time.",

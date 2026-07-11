@@ -41,7 +41,7 @@ describe("visualThinkingStudio (P0.20)", () => {
       currentTurn: 1,
     });
     expect(decision.immediateVisualOpen?.viewId).toBe("mind-map");
-    expect(decision.localReply).toMatch(/Opening \*\*Mind Map\*\*/);
+    expect(decision.localReply).toMatch(/Mind Map Discovery/i);
     expect(decision.pendingAction).toBeNull();
   });
 

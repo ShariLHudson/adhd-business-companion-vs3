@@ -1,7 +1,7 @@
 import type { ExecutiveQuestionDefinition } from "../types";
 import { relationshipsForQuestion } from "../relationships/questionRelationships";
 
-/** Question Builder™ — enriches catalog definitions with relationship metadata. */
+/** Question Builder — enriches catalog definitions with relationship metadata. */
 export function buildExecutiveQuestion(
   definition: ExecutiveQuestionDefinition,
 ): ExecutiveQuestionDefinition & { relationshipCount: number } {

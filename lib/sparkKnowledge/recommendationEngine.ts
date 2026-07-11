@@ -1,5 +1,5 @@
 /**
- * Shari Recommendation Engine™ — connect capabilities after member actions.
+ * Shari Recommendation Engine — connect capabilities after member actions.
  * Complements Adaptive Intelligence anticipation chains.
  */
 

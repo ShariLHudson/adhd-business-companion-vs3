@@ -1,5 +1,5 @@
 /**
- * Estate Brain™ — public API
+ * Estate Brain — public API
  */
 
 export type {

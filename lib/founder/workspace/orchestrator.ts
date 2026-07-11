@@ -1,5 +1,5 @@
 /**
- * Workspace Orchestrator™
+ * Workspace Orchestrator
  * Receives an intention. Returns a workspace assembled from existing Founder services.
  */
 

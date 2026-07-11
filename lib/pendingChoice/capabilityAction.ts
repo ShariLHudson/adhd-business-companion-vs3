@@ -94,7 +94,7 @@ export function ackForPendingChoiceAction(action: PendingChoiceAction): string {
   const place =
     action.placeId != null ? getCanonicalEstatePlaceById(action.placeId) : null;
   const name =
-    entry?.name ?? place?.officialName.replace(/™/g, "") ?? action.placeId?.replace(/-/g, " ") ?? "that";
+    entry?.name ?? place?.officialName.replace(/\u2122/g, "") ?? action.placeId?.replace(/-/g, " ") ?? "that";
 
   switch (action.kind) {
     case "navigate_place":

@@ -7,7 +7,7 @@ import {
   getBuilderBootstrap,
 } from "./index";
 
-describe("Executive Builder™ engine", () => {
+describe("Executive Builder engine", () => {
   it("exposes builder principle", () => {
     expect(EXECUTIVE_BUILDER_PRINCIPLE).toContain("blueprint");
   });

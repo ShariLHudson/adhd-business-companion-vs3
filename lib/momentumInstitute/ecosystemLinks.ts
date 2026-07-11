@@ -1,5 +1,5 @@
 /**
- * Personal Learning Ecosystem™ — connection destinations for every experience.
+ * Personal Learning Ecosystem — connection destinations for every experience.
  * References only — never duplicate content.
  */
 

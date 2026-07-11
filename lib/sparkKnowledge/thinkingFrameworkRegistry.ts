@@ -1,5 +1,5 @@
 /**
- * Thinking Framework Registry™ — every visual and strategic model Shari can teach.
+ * Thinking Framework Registry — every visual and strategic model Shari can teach.
  */
 
 import type { SparkKnowledgeEntry } from "./types";

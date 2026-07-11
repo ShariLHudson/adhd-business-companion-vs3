@@ -18,7 +18,7 @@ function FounderAccessDenied() {
   return (
     <main className="founder-access-denied">
       <div className="founder-access-denied__card">
-        <p className="founder-access-denied__eyebrow">Founder Studio™</p>
+        <p className="founder-access-denied__eyebrow">Founder Studio</p>
         <h1>Founder access only</h1>
         <p>
           This private space is for Shari. Your member experience is unchanged

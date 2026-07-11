@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CINEMATIC } from "@/lib/journalGazebo/cinematicTiming";
+import { JOURNAL_GAZEBO_BACKGROUND_URL } from "@/lib/journalGazebo/journalGazeboMedia";
 import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
 import { EstateImmersiveHomeLink } from "@/components/companion/EstateImmersiveHomeLink";
 import { SparkEstateGuideAnchor } from "@/components/companion/SparkEstateGuideAnchor";
@@ -28,7 +29,10 @@ import {
   consumeJournalGazeboCommand,
   subscribeJournalGazeboCommands,
 } from "@/lib/journalGazebo/journalGazeboCommands";
-import { pickJournalGazeboReturnGreeting } from "@/lib/journalGazebo/returnGreetings";
+import {
+  pickJournalGazeboReturnNote,
+  type JournalGazeboReturnNote,
+} from "@/lib/journalGazebo/returnGreetings";
 import {
   JOURNAL_ON_DESK_SPARK,
   JOURNAL_OPEN_INVITE,
@@ -74,6 +78,7 @@ import { JournalGazeboOptionsMenu } from "./JournalGazeboOptionsMenu";
 import { JournalGazeboDoneButton } from "./JournalGazeboDoneButton";
 import { JournalGazeboLibraryShelf } from "./JournalGazeboLibraryShelf";
 import { JournalGazeboJournalPicker } from "./JournalGazeboJournalPicker";
+import { JournalGazeboSanctuaryDesk } from "./JournalGazeboSanctuaryDesk";
 import {
   getLibraryJournals,
 } from "@/lib/journalGazebo/journalLibrary";
@@ -106,7 +111,6 @@ type Props = {
   assumeFirstVisit?: boolean;
 };
 
-const RETURN_GREETING_MS = Math.round(2200 * 1.18);
 const AUTOSAVE_MS = 1500;
 const DESK_REVEAL_MS = Math.round(500 * 1.18);
 
@@ -138,7 +142,7 @@ export function JournalGazeboExperience({
   const [sparkLine, setSparkLine] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState<string | null>(null);
   const [showTime, setShowTime] = useState(true);
-  const [returnGreeting, setReturnGreeting] = useState<string | null>(null);
+  const [returnNote, setReturnNote] = useState<JournalGazeboReturnNote | null>(null);
   const [deskCamera, setDeskCamera] = useState<DeskCamera>("wide");
   const [ceremonyStep, setCeremonyStep] = useState<JournalCeremonyStep>(0);
   const [bookPageIndex, setBookPageIndex] = useState(0);
@@ -263,6 +267,22 @@ export function JournalGazeboExperience({
 
   const showWelcomeDesk = showWelcomeLetter;
 
+  const openBookActive =
+    config != null &&
+    (phase === "journal-reveal" ||
+      phase === "journal-opening" ||
+      phase === "ceremony" ||
+      phase === "writing");
+
+  const showSanctuaryDesk =
+    phase === "gazebo-rest" && !openBookActive && !deskOpen && !journalPickerOpen;
+
+  const featuredJournal = useMemo(() => {
+    if (config) return config;
+    if (libraryJournals.length > 0) return libraryJournals[0]!;
+    return null;
+  }, [config, libraryJournals]);
+
   const estateWelcomeVisible =
     showWelcomeDesk ||
     phase === "writing-desk-arrival";
@@ -277,13 +297,6 @@ export function JournalGazeboExperience({
 
   const firstCreationCeremony =
     config != null && !hasCompletedJournalCeremony(config.id);
-
-  const openBookActive =
-    config != null &&
-    (phase === "journal-reveal" ||
-      phase === "journal-opening" ||
-      phase === "ceremony" ||
-      phase === "writing");
 
   const cinematicJournalVisible = openBookActive;
 
@@ -377,11 +390,13 @@ export function JournalGazeboExperience({
       setBody(getPageBody(journal.id, page));
       setPageTypingStyle(resolvePageTypingStyle(journal.id, page, journal));
       setPhase(page >= FIRST_WRITING_PAGE_INDEX ? "writing" : "ceremony");
+      setDeskCamera("writing");
+      setDeskOpen(false);
       return;
     }
     setBookPageIndex(0);
     setBody("");
-    setDedicationHtml(config ? getPageBody(config.id, 0) : "");
+    setDedicationHtml(getPageBody(journal.id, 0));
     setTasselY(JOURNAL_RIBBON_CENTER_Y);
     setPhase("journal-reveal");
   }, []);
@@ -545,7 +560,7 @@ export function JournalGazeboExperience({
     setDeskCamera("wide");
     setCeremonyStep(0);
     setBookPageIndex(0);
-    setReturnGreeting(null);
+    setReturnNote(null);
     setEditingEntryId(null);
     setVisitMode("first");
     openCompletedRef.current = false;
@@ -676,13 +691,18 @@ export function JournalGazeboExperience({
     if (visitMode === "first") {
       setPhase("estate");
       setEstateMoment("ready");
-      setSceneComposed(true);
       return;
     }
-    const active = ensureActiveJournalConfig();
-    setConfig(active);
-    setReturnGreeting(pickJournalGazeboReturnGreeting());
-    setPhase("return-greeting");
+    refreshLibrary();
+    const journals = getLibraryJournals();
+    if (journals.length > 0) {
+      setConfig(ensureActiveJournalConfig());
+    } else {
+      setConfig(null);
+    }
+    setReturnNote(pickJournalGazeboReturnNote());
+    setDeskCamera("wide");
+    setPhase("gazebo-rest");
   }, [visitMode]);
 
   useEffect(() => {
@@ -723,15 +743,6 @@ export function JournalGazeboExperience({
     const timer = window.setTimeout(() => setJournalRevealArrived(true), 120);
     return () => window.clearTimeout(timer);
   }, [phase]);
-
-  useEffect(() => {
-    if (visitMode !== "return" || phase !== "return-greeting") return;
-    const timer = window.setTimeout(() => {
-      setReturnGreeting(null);
-      if (config) openJournalAtSavedPlace(config);
-    }, RETURN_GREETING_MS);
-    return () => window.clearTimeout(timer);
-  }, [phase, config, openJournalAtSavedPlace, visitMode]);
 
   useEffect(() => {
     const existingId = getEditingEntryId();
@@ -841,20 +852,34 @@ export function JournalGazeboExperience({
 
   function handleWelcomeCreateJournal() {
     markWelcomeNoteSeen();
-    setPhase("creating");
+    clearCinematicTimers();
+    setJournalPickerOpen(false);
+    setDeskOpen(false);
+    setConfig(null);
+    setBody("");
+    setEntryId(null);
+    setEditingEntryId(null);
     setSparkLine(null);
+    setPhase("creating");
   }
 
-  function handleOpenTodaysPage() {
+  function handleOpenMyJournal(journal?: JournalGazeboConfig) {
     markWelcomeNoteSeen();
     refreshLibrary();
     const journals = getLibraryJournals();
-    if (journals.length > 1) {
-      setJournalPickerOpen(true);
+    if (journals.length === 0) {
+      handleWelcomeCreateJournal();
       return;
     }
-    const journal = journals[0] ?? config ?? openTodaysPageJournal();
-    openSelectedJournal(journal);
+    if (journal) {
+      openSelectedJournal(journal);
+      return;
+    }
+    if (journals.length === 1) {
+      openSelectedJournal(journals[0]!);
+      return;
+    }
+    setJournalPickerOpen(true);
   }
 
   function handleDesignComplete(draft: JournalGazeboConfig) {
@@ -892,9 +917,15 @@ export function JournalGazeboExperience({
     t += CINEMATIC.giftUnwrapMs * scale;
     scheduleCinematic(t, () => {
       setGiftMoment("reveal");
-      setPhase("journal-reveal");
       setSparkLine(null);
       openCompletedRef.current = false;
+    });
+    t += CINEMATIC.giftAdmireMs * scale;
+    scheduleCinematic(t, () => {
+      setPhase("gazebo-rest");
+      setDeskCamera("wide");
+      setSparkLine(JOURNAL_ON_DESK_SPARK);
+      window.setTimeout(() => setSparkLine(null), CINEMATIC.sparkLineMs);
     });
   }
 
@@ -1007,9 +1038,11 @@ export function JournalGazeboExperience({
   );
 
   const showImmersiveHome =
-    !showWelcomeDesk &&
+    phase !== "arrival" &&
+    phase !== "envelope-opening" &&
     (openBookActive ||
       phase === "gazebo-rest" ||
+      phase === "estate" ||
       phase === "creating" ||
       phase === "writing" ||
       phase === "ceremony" ||
@@ -1036,12 +1069,25 @@ export function JournalGazeboExperience({
 
   function handleChooseAnotherJournal() {
     setCenteredBookActive(false);
-    setConfig(null);
+    setDeskOpen(false);
     setBody("");
     setEntryId(null);
     setBookPageIndex(0);
-    setPhase("creating");
     setSparkLine(null);
+    setDeskCamera("wide");
+    refreshLibrary();
+    const journals = getLibraryJournals();
+    if (journals.length === 0) {
+      handleWelcomeCreateJournal();
+      return;
+    }
+    setPhase("gazebo-rest");
+    if (journals.length === 1) {
+      openSelectedJournal(journals[0]!);
+      return;
+    }
+    setConfig(null);
+    setJournalPickerOpen(true);
   }
 
   const deskClickable =
@@ -1076,7 +1122,7 @@ export function JournalGazeboExperience({
 
   const usingPlateBackground = phaseBackgroundScenes != null;
   const photoScene = Boolean(backgroundUrl) || usingPlateBackground;
-  const sceneReady = sceneComposed || usingPlateBackground;
+  const sceneReady = sceneComposed;
   const memberFirstName = getMemberFirstName() || memberDisplayName.split(/\s+/)[0] || "";
 
   return (
@@ -1258,7 +1304,7 @@ export function JournalGazeboExperience({
       ) : !useAtmosphere ? (
         <EstateRoomFullBleedBackground
           roomId="journal"
-          imageUrl="/backgrounds/gazebo-journal-background.png"
+          imageUrl={JOURNAL_GAZEBO_BACKGROUND_URL}
           className="journal-gazebo__background"
           onLoad={() => setSceneComposed(true)}
         />
@@ -1306,9 +1352,21 @@ export function JournalGazeboExperience({
           moment={estateMoment}
           showWelcome
           sceneComposed={sceneReady}
+          journals={libraryJournals}
           onCreateJournal={handleWelcomeCreateJournal}
-          onOpenToday={handleOpenTodaysPage}
-          hasSavedJournals={libraryJournals.length > 0}
+          onOpenJournal={handleOpenMyJournal}
+        />
+      ) : null}
+
+      {showSanctuaryDesk ? (
+        <JournalGazeboSanctuaryDesk
+          journals={libraryJournals}
+          featuredJournal={featuredJournal}
+          sceneComposed={sceneReady}
+          initialNote={returnNote}
+          onCreateJournal={handleWelcomeCreateJournal}
+          onOpenJournal={handleOpenMyJournal}
+          onJournalClick={featuredJournal ? handleJournalOpen : undefined}
         />
       ) : null}
 
@@ -1319,13 +1377,6 @@ export function JournalGazeboExperience({
             activeJournalId={config?.id}
             onSelectJournal={openSelectedJournal}
           />
-        </div>
-      ) : null}
-
-      {estateVisible && visitMode === "return" && phase === "gazebo-rest" ? (
-        <div className="journal-estate journal-estate--rest" aria-hidden="true">
-          <div className="journal-estate__glow" />
-          <div className="journal-estate__table" />
         </div>
       ) : null}
 
@@ -1380,12 +1431,6 @@ export function JournalGazeboExperience({
               {i < arr.length - 1 ? <br /> : null}
             </span>
           ))}
-        </p>
-      ) : null}
-
-      {returnGreeting && phase === "return-greeting" ? (
-        <p className="journal-gazebo__spark journal-gazebo__spark--return" role="status">
-          {returnGreeting}
         </p>
       ) : null}
 

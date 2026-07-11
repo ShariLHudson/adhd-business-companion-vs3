@@ -1,5 +1,5 @@
 /**
- * Spark Alpha™ — action permission boundaries.
+ * Spark Alpha — action permission boundaries.
  * Prepare freely. Act only with permission.
  *
  * @see docs/SPARK_ALPHA_FRAMEWORK.md

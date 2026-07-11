@@ -1,5 +1,5 @@
 /**
- * Spark Executive Function Engine™ — Core types.
+ * Spark Executive Function Engine — Core types.
  * @see spark-intelligence-foundation/20-spark-executive-function-engine.md
  *
  * Quiet support across every conversation — not a separate ADHD feature.

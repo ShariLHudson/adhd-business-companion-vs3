@@ -8,7 +8,7 @@ type Props = {
   onOpen: () => void;
 };
 
-/** Growth Profile™ estate destination — photographic room plate on top. */
+/** Growth Profile estate destination — photographic room plate on top. */
 export function GrowthProfileEstatePlaceCard({ place, onOpen }: Props) {
   return (
     <button

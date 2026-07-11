@@ -36,7 +36,7 @@ export type PeacefulPlaceWorkspaceZone = {
 
 export type PeacefulPlace = {
   id: PeacefulPlaceId;
-  /** Full estate name — e.g. Summer Storm at the Covered Deck™ */
+  /** Full estate name — e.g. Summer Storm at the Covered Deck */
   title: string;
   shortTitle: string;
   signature: boolean;

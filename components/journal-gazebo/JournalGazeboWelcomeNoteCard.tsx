@@ -11,7 +11,9 @@ import {
 import { formatNoteCardAddress } from "@/lib/journalGazebo/memberDisplayName";
 import { JournalGazeboLeatherOvalCta } from "./JournalGazeboLeatherOvalCta";
 
-const GAZEBO_NOTE_ART = "/backgrounds/gazebo-journal-background.png";
+import { JOURNAL_GAZEBO_BACKGROUND_URL } from "@/lib/journalGazebo/journalGazeboMedia";
+
+const GAZEBO_NOTE_ART = JOURNAL_GAZEBO_BACKGROUND_URL;
 
 type Props = {
   beat: JournalNoteCardBeat;

@@ -11,7 +11,7 @@ import {
   resolveAudioExperienceQuery,
 } from "@/lib/estateAudioExperienceFoundation/resolveAudioExperienceQuery";
 
-describe("Audio Playback Guard™", () => {
+describe("Audio Playback Guard", () => {
   it("A — browse music requests do not auto-play", () => {
     const q = "what other music do you have";
     expect(classifyAudioPlaybackIntent(q).intent).toBe("browse");

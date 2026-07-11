@@ -7,7 +7,7 @@ import {
   RELATIONSHIP_INTELLIGENCE_PRINCIPLE,
 } from "./index";
 
-describe("Executive Relationship Intelligence™ engine", () => {
+describe("Executive Relationship Intelligence engine", () => {
   it("exposes discovery principle", () => {
     expect(RELATIONSHIP_INTELLIGENCE_PRINCIPLE).toContain("knowledge");
   });

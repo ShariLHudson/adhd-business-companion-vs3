@@ -1,4 +1,4 @@
-/** Executive Questions™ Framework — reusable reasoning types (no UI). */
+/** Executive Questions Framework — reusable reasoning types (no UI). */
 
 export type ExecutiveCategory =
   | "product"
@@ -183,7 +183,7 @@ export type ExecutiveQuestionDefinition = {
   sampleAnswerId?: string;
   nextActionHints: string[];
   tags: string[];
-  /** Populated by Question Builder™ when assembled */
+  /** Populated by Question Builder when assembled */
   relationshipCount?: number;
 };
 

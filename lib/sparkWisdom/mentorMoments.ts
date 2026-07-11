@@ -1,5 +1,5 @@
 /**
- * Spec 127 — Mentor Moments™
+ * Spec 127 — Mentor Moments
  */
 
 import type { MentorMomentCue } from "./types";

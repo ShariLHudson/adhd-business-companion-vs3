@@ -1,5 +1,5 @@
 /**
- * Estate Object Intelligence™ — object ↔ location placement loader.
+ * Estate Object Intelligence — object ↔ location placement loader.
  */
 
 import objectLocationsJson from "@/docs/estate-knowledge-base/object-locations.json";

@@ -2,6 +2,7 @@
  * Score place candidates using purpose profiles + context signals.
  */
 
+import { filterPlacesForAudioContext } from "@/lib/estate/estateNonAudioPlaces";
 import { getPlaceById } from "@/lib/estateKnowledge";
 import { placeIdsForIntentFamilies } from "./intentFamilies";
 import { getPurposeProfile } from "./purposeProfiles";
@@ -156,7 +157,12 @@ export function scorePlaceCandidates(
     }
   }
 
-  return [...candidateIds]
+  let ids = [...candidateIds];
+  if (signals.wantsFocus) {
+    ids = filterPlacesForAudioContext(ids);
+  }
+
+  return ids
     .map((id) => scorePlaceForSignals(id, signals, input))
     .filter((c) => c.score > -50)
     .sort((a, b) => b.score - a.score);

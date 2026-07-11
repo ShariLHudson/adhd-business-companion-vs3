@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — vocabulary and recommendation gate.
+ * Estate Knowledge Base — vocabulary and recommendation gate.
  */
 
 import { getEstateVocabulary, getKnowledgeItem } from "./loader";

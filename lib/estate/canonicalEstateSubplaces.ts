@@ -5,9 +5,9 @@
 
 import type { CanonicalEstatePlace } from "./canonicalEstateRegistryTypes";
 
-/** Possibility House™, Legacy Room™, Observatory subspaces, Reflection Tree™ */
+/** Possibility House, Legacy Room, Observatory subspaces, Reflection Tree */
 export const CANONICAL_ESTATE_SUBPLACES: readonly CanonicalEstatePlace[] = [
-  // —— Possibility House™ ——
+  // —— Possibility House ——
   {
     id: "house-possibility-outside",
     officialName: "Possibility House",
@@ -301,7 +301,7 @@ export const CANONICAL_ESTATE_SUBPLACES: readonly CanonicalEstatePlace[] = [
     availableActions: ["reflect", "browse", "sit quietly"],
     suggestionProfiles: ["reflective", "celebrate"],
   },
-  // —— Legacy Room™ (main Estate wing) ——
+  // —— Legacy Room (main Estate wing) ——
   {
     id: "legacy-room-main",
     officialName: "Legacy Room",
@@ -451,7 +451,7 @@ export const CANONICAL_ESTATE_SUBPLACES: readonly CanonicalEstatePlace[] = [
     availableActions: ["sit", "warm up", "enjoy the room"],
     suggestionProfiles: ["think", "rest"],
   },
-  // —— Reflection Tree™ ——
+  // —— Reflection Tree ——
   {
     id: "reflection-tree-main",
     officialName: "Reflection Tree",

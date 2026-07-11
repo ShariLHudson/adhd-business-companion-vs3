@@ -137,7 +137,7 @@ export function suggestSupportTool(
       kind: "breathe",
       line:
         "That sounds like a lot for your nervous system to hold. Would a short reset help before we go further?",
-      toolLabel: "Breathe & Reset",
+      toolLabel: "Breathe",
       toolObjectId: "breathing",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "breathe" },

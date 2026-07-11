@@ -1,5 +1,5 @@
 /**
- * Semantic Intent Resolver™ — meaning-first member intent (regex is fast path only).
+ * Semantic Intent Resolver — meaning-first member intent (regex is fast path only).
  */
 
 import type { ConversationGoal } from "@/lib/conversationStabilization/goalClassifier";

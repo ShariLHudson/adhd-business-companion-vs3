@@ -1,13 +1,13 @@
 /**
- * Trust Experience Framework™ (Spec 102).
+ * Trust Experience Framework (Spec 102).
  * How members experience trust — Spark OS defines whether Spark can be trusted.
  * Distinct from lib/sparkTrustPerformance (runtime engineering gates).
  *
  * @see docs/TRUST_EXPERIENCE_FRAMEWORK.md
- * @see docs/TRUST_EXPERIENCE.md (T-006 — Trust Pyramid™, supplementary)
+ * @see docs/TRUST_EXPERIENCE.md (T-006 — Trust Pyramid, supplementary)
  */
 
-/** The Trust Promise™ — dimensions every interaction should strengthen */
+/** The Trust Promise — dimensions every interaction should strengthen */
 export type SparkTrustPromiseQuality =
   | "honest"
   | "competent"
@@ -43,7 +43,7 @@ export const SPARK_TRUST_PROMISE_LABELS: Record<SparkTrustPromiseQuality, string
   humble: "Humble",
 };
 
-/** Trust Principles™ — six governing principles */
+/** Trust Principles — six governing principles */
 export type SparkTrustPrinciple =
   | "honesty"
   | "transparency"
@@ -119,7 +119,7 @@ export const SPARK_TRUST_CONFIDENCE_BEHAVIORS: Record<
   very_low: ["communicate_uncertainty", "never_fabricate_certainty"],
 };
 
-/** Trust During Uncertainty™ — distinguish what Spark knows */
+/** Trust During Uncertainty — distinguish what Spark knows */
 export type SparkTrustUncertaintyCategory =
   | "fact"
   | "reasonable_assumption"
@@ -129,7 +129,7 @@ export type SparkTrustUncertaintyCategory =
 export const SPARK_TRUST_UNCERTAINTY_CATEGORIES: readonly SparkTrustUncertaintyCategory[] =
   ["fact", "reasonable_assumption", "opinion", "speculation"] as const;
 
-/** The Trust Bank™ — deposits and withdrawals */
+/** The Trust Bank — deposits and withdrawals */
 export type SparkTrustBankEntry =
   | "remember_important_info"
   | "explain_reasoning_appropriately"
@@ -170,7 +170,7 @@ export const SPARK_TRUST_BANK_WITHDRAWALS: readonly SparkTrustBankEntry[] = [
   "excessive_questioning",
 ] as const;
 
-/** Measuring Trust™ — observable behavioral signals */
+/** Measuring Trust — observable behavioral signals */
 export type SparkTrustBehavioralSignal =
   | "repeat_less_information"
   | "ask_more_strategic_questions"
@@ -190,7 +190,7 @@ export const SPARK_TRUST_BEHAVIORAL_SIGNALS: readonly SparkTrustBehavioralSignal
   "move_forward_consistently",
 ] as const;
 
-/** Experience Standards™ — every interaction gate */
+/** Experience Standards — every interaction gate */
 export const SPARK_TRUST_EXPERIENCE_STANDARDS = [
   "Did Spark respect the member?",
   "Did Spark reduce uncertainty?",
@@ -200,7 +200,7 @@ export const SPARK_TRUST_EXPERIENCE_STANDARDS = [
   "Did Spark increase trust?",
 ] as const;
 
-/** Trust Pyramid™ (T-006) — five layers of earned trust */
+/** Trust Pyramid (T-006) — five layers of earned trust */
 export type SparkTrustPyramidLevel =
   | 1 // reliability
   | 2 // accuracy

@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Registry™ — read-only compiled knowledge types (Phase 1).
+ * Estate Knowledge Registry — read-only compiled knowledge types (Phase 1).
  *
  * @see docs/ESTATE_KNOWLEDGE_REGISTRY_AUDIT.md
  * @see docs/estate/SPARK_ESTATE_MASTER_WORLD_BIBLE.md

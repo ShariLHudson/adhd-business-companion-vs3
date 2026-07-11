@@ -48,7 +48,7 @@ const BUCKET_LABELS: Record<string, string> = {
   brain_dump: "Clear My Mind",
   plan_my_day: "Plan My Day",
   create: "Create",
-  breathing: "Breathe & Reset",
+  breathing: "Breathe",
   workspace_open: "Workspace beside chat",
   momentum_prompt: "Conversation momentum",
   generic_tip: "Conversation-only",

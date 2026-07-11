@@ -1,5 +1,5 @@
 /**
- * Spark Alpha™ — quiet suggestion chips from Shari's last turn.
+ * Spark Alpha — quiet suggestion chips from Shari's last turn.
  * Conversation-first: one-tap agreement without hunting the input.
  */
 

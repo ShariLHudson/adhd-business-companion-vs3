@@ -1,5 +1,5 @@
 /**
- * Audio Experience Foundation™ — shared types.
+ * Audio Experience Foundation — shared types.
  */
 
 import type { EstateKnowledgeStatus } from "@/lib/estateKnowledgeBase/types";

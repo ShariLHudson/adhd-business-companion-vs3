@@ -7,7 +7,7 @@ import {
 } from "./workspace";
 import { FOUNDER_WORKSPACE_IDS } from "./workspace/config";
 
-describe("Workspace Orchestrator™", () => {
+describe("Workspace Orchestrator", () => {
   it("lists six executive workspaces", () => {
     const workspaces = listWorkspaces();
     expect(workspaces.length).toBe(6);

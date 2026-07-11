@@ -26,7 +26,7 @@ export function FounderExecutiveCommandCenter() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Command Center™"
+        eyebrow="Executive Command Center"
         title="The Executive Headquarters of Visual Spark Studios"
         question="What matters today?"
         purpose="Your chief of staff, strategist, and research department — already working before you arrive. Not a dashboard. One calm executive experience."

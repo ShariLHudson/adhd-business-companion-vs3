@@ -6,7 +6,7 @@ import {
   SIMULATION_STUDIO_PRINCIPLE,
 } from "./index";
 
-describe("Executive Simulation Studio™ engine", () => {
+describe("Executive Simulation Studio engine", () => {
   it("exposes simulation principle", () => {
     expect(SIMULATION_STUDIO_PRINCIPLE).toContain("futures");
   });

@@ -39,7 +39,7 @@ export function clearActiveArtifact(): void {
   setActiveArtifact(null);
 }
 
-/** Save hooks — Portfolio™, Cabinet, Journal, Evidence (permission-gated later). */
+/** Save hooks — Portfolio, Cabinet, Journal, Evidence (permission-gated later). */
 export type ArtifactSaveTarget =
   | "portfolio"
   | "institute_cabinet"

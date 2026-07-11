@@ -26,6 +26,14 @@ export const DEDICATED_ESTATE_ROOM_PANEL_SECTIONS: readonly AppSection[] = [
   "momentum-institute",
   "momentum-builder",
   "growth-journal",
+  /** Evidence Vault — door/key entrance ritual + Discovery File room (EST-001) */
+  "evidence-bank",
+  /** Clear My Mind — interactive capture workspace, never frosted chat overlay */
+  "brain-dump",
+  /** Cartographer's Studio — orientation + framed maps, never Focus Studio invitation chrome */
+  "visual-focus",
+  /** Chamber of Momentum — member gallery, never frosted invitation overlay */
+  "chamber-of-momentum",
 ] as const;
 
 export function isDedicatedEstateRoomPanelSection(

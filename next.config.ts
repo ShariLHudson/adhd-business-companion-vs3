@@ -9,10 +9,41 @@ loadEnvConfig(appRoot);
 
 const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+  // ESLint is no longer configured via next.config (Next 16+) — use `npm run lint`.
   // Ensure .env.local in companion-app is loaded (monorepo has parent lockfile).
   turbopack: {
     root: appRoot,
+  },
+  async redirects() {
+    // Sprint 1 — remove prototype routing from the live product surface.
+    // Prototypes remain in the repo for design reference but are not navigable.
+    const prototypePaths = [
+      "/prototype/:path*",
+      "/workspace-prototype",
+      "/workspace-prototype/:path*",
+      "/estate-map-prototype",
+      "/estate-map-prototype/:path*",
+      "/spark-estate-guide-prototype",
+      "/spark-estate-guide-prototype/:path*",
+      "/companion/hospitality-prototype",
+      "/companion/hospitality-prototype/:path*",
+    ];
+    return prototypePaths.map((source) => ({
+      source,
+      destination: "/companion",
+      permanent: false,
+    })).concat([
+      {
+        source: "/companion/journal-gazebo-prototype",
+        destination: "/companion?section=growth-journal",
+        permanent: false,
+      },
+      {
+        source: "/companion/journal-gazebo-prototype/:path*",
+        destination: "/companion?section=growth-journal",
+        permanent: false,
+      },
+    ]);
   },
   async headers() {
     return [

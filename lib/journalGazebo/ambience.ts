@@ -1,5 +1,5 @@
 /**
- * Journal Gazebo™ ambient layers — gentle estate atmosphere.
+ * Journal Gazebo ambient layers — gentle estate atmosphere.
  * Assets optional; silence is valid until plates are added to public/audio/.
  */
 

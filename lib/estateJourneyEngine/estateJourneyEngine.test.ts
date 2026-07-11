@@ -18,7 +18,7 @@ import {
   recordJourneyRoomVisit,
 } from "@/lib/estateJourneyEngine";
 
-describe("Estate Journey Engine™", () => {
+describe("Estate Journey Engine", () => {
   beforeEach(() => {
     __resetEstateMemoryCacheForTests();
     resetEstateMemory();
@@ -26,15 +26,15 @@ describe("Estate Journey Engine™", () => {
 
   it("records compact room history without consecutive duplicates", () => {
     recordJourneyRoomVisit("welcome-home", "Welcome Home");
-    recordJourneyRoomVisit("momentum-institute", "Momentum Institute™");
-    recordJourneyRoomVisit("creative-studio", "Creative Studio™");
-    recordJourneyRoomVisit("creative-studio", "Creative Studio™");
+    recordJourneyRoomVisit("momentum-institute", "Momentum Institute");
+    recordJourneyRoomVisit("creative-studio", "Creative Studio");
+    recordJourneyRoomVisit("creative-studio", "Creative Studio");
 
     const journey = getJourneyEngineState();
     expect(journey.roomHistory.map((h) => h.roomName)).toEqual([
       "Welcome Home",
-      "Momentum Institute™",
-      "Creative Studio™",
+      "Momentum Institute",
+      "Creative Studio",
     ]);
   });
 
@@ -76,7 +76,7 @@ describe("Estate Journey Engine™", () => {
   });
 
   it("begin new day preserves journey and starts fresh conversation session", () => {
-    recordJourneyRoomVisit("conservatory", "The Conservatory™");
+    recordJourneyRoomVisit("conservatory", "The Conservatory");
     pauseJourneyWork({ kind: "decision", label: "Pricing decision" });
 
     const before = getJourneyEngineState();
@@ -111,7 +111,7 @@ describe("Estate Journey Engine™", () => {
   });
 
   it("builds optional session summary", () => {
-    recordJourneyRoomVisit("stables", "The Stables™");
+    recordJourneyRoomVisit("stables", "The Stables");
     recordJourneyLearning({
       kind: "lesson",
       label: "Leadership basics",

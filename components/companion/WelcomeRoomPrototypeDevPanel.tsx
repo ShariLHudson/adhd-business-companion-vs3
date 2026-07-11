@@ -152,21 +152,21 @@ function PanelContent({ overrides, onChange, onReset }: Props) {
         className="welcome-room-prototype__link"
         prefetch
       >
-        Open Spark Studio™ prototype →
+        Open Spark Studio prototype →
       </Link>
       <Link
         href="/workspace-prototype"
         className="welcome-room-prototype__link"
         prefetch
       >
-        Open Spark Workspace™ prototype →
+        Open Spark Workspace prototype →
       </Link>
       <Link
         href="/estate-map-prototype"
         className="welcome-room-prototype__link"
         prefetch
       >
-        Open Folded Estate Map™ prototype →
+        Open Folded Estate Map prototype →
       </Link>
       <Link
         href="/prototype/conversation-workspace"
@@ -187,21 +187,21 @@ function PanelContent({ overrides, onChange, onReset }: Props) {
         className="welcome-room-prototype__link"
         prefetch
       >
-        Open Universal Work™ prototype 01 →
+        Open Universal Work prototype 01 →
       </Link>
       <Link
         href="/spark-alpha"
         className="welcome-room-prototype__link"
         prefetch
       >
-        Open Spark Alpha™ (relationship prototype) →
+        Open Spark Alpha (relationship prototype) →
       </Link>
       <Link
         href="/prototype/conservatory-workspace"
         className="welcome-room-prototype__link"
         prefetch
       >
-        Open Conservatory Workspace™ V3 →
+        Open Conservatory Workspace V3 →
       </Link>
       <button type="button" className="welcome-room-prototype__reset" onClick={onReset}>
         Reset to intelligence

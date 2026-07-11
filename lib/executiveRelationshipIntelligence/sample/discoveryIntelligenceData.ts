@@ -229,7 +229,7 @@ export const FOUNDER_ALERTS: FounderAlert[] = [
   {
     id: "alert-unified-restart",
     discoveryId: "disc-seven-conversations",
-    title: "Founder Alert™ — Unify restart narrative before workshop",
+    title: "Founder Alert — Unify restart narrative before workshop",
     whatWasDiscovered: "Seven conversation streams describe the same guilt-after-absence problem.",
     whyItMatters: "Workshop enrollment could fail if marketing speaks productivity while members need permission.",
     evidence: ["Customer feedback node", "Restart research", "Memory Theater quotes"],
@@ -248,7 +248,7 @@ export const FOUNDER_ALERTS: FounderAlert[] = [
   {
     id: "alert-butterfly",
     discoveryId: "disc-butterfly-restart",
-    title: "Founder Alert™ — Workshop-to-membership chain is ready",
+    title: "Founder Alert — Workshop-to-membership chain is ready",
     whatWasDiscovered: "Complete butterfly chain from research to recurring revenue is visible in the graph.",
     whyItMatters: "You may be one proof event away from a tier you haven't designed yet.",
     evidence: ["Butterfly chain", "Simulation Scenario A", "Memory Theater replay"],

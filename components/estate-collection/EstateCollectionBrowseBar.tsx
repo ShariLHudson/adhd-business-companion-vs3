@@ -3,6 +3,7 @@
 import {
   filterCollectionItems,
   listCollectionCategories,
+  listCollectionFieldValues,
   type CollectionBrowseState,
 } from "@/lib/estate/collectionFramework/collectionQuery";
 import type {
@@ -17,6 +18,65 @@ type Props = {
   onChange: (state: CollectionBrowseState) => void;
 };
 
+function Chip({
+  active,
+  label,
+  onClick,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={[
+        "estate-collection-browse__chip",
+        active ? "estate-collection-browse__chip--active" : "",
+      ].join(" ")}
+      aria-pressed={active}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+}
+
+function FilterGroup({
+  label,
+  values,
+  selected,
+  onSelect,
+}: {
+  label: string;
+  values: string[];
+  selected: string | null;
+  onSelect: (value: string | null) => void;
+}) {
+  if (values.length === 0) return null;
+  return (
+    <div
+      className="estate-collection-browse__categories"
+      role="group"
+      aria-label={label}
+    >
+      <Chip
+        active={!selected}
+        label={`All ${label.toLowerCase()}`}
+        onClick={() => onSelect(null)}
+      />
+      {values.map((value) => (
+        <Chip
+          key={value}
+          active={selected === value}
+          label={value}
+          onClick={() => onSelect(value)}
+        />
+      ))}
+    </div>
+  );
+}
+
 /** Curated browse controls — search, favorites, category — never dashboard chrome. */
 export function EstateCollectionBrowseBar({
   items,
@@ -25,10 +85,36 @@ export function EstateCollectionBrowseBar({
   onChange,
 }: Props) {
   const categories = listCollectionCategories(items);
+  const sources = listCollectionFieldValues(items, "Source");
+  const emotions = listCollectionFieldValues(items, "Emotion");
+  const projects = listCollectionFieldValues(items, "Project");
+  const people = listCollectionFieldValues(items, "Person");
   const filteredCount = filterCollectionItems(items, {
     ...state,
     visibleCount: items.length,
   }).length;
+
+  const hasActiveFilter = Boolean(
+    state.search ||
+      state.favoritesOnly ||
+      state.category ||
+      state.source ||
+      state.emotion ||
+      state.projectName ||
+      state.personName ||
+      state.confidenceBoostOnly ||
+      state.recentOnly ||
+      state.datePreset ||
+      state.hallCandidateOnly,
+  );
+
+  function patch(partial: Partial<CollectionBrowseState>) {
+    onChange({
+      ...state,
+      ...partial,
+      visibleCount: browse.pageSize,
+    });
+  }
 
   return (
     <section
@@ -45,86 +131,130 @@ export function EstateCollectionBrowseBar({
             className="estate-collection-browse__search"
             value={state.search}
             placeholder={browse.searchPlaceholder}
-            onChange={(event) =>
-              onChange({ ...state, search: event.target.value, visibleCount: browse.pageSize })
-            }
+            onChange={(event) => patch({ search: event.target.value })}
           />
         </label>
       ) : null}
 
       <div className="estate-collection-browse__filters">
         {browse.enableFavorites ? (
-          <button
-            type="button"
-            className={[
-              "estate-collection-browse__chip",
-              state.favoritesOnly ? "estate-collection-browse__chip--active" : "",
-            ].join(" ")}
-            aria-pressed={state.favoritesOnly}
+          <Chip
+            active={state.favoritesOnly}
+            label="Treasured"
+            onClick={() => patch({ favoritesOnly: !state.favoritesOnly })}
+          />
+        ) : null}
+
+        {browse.enableConfidenceBoostFilter ? (
+          <Chip
+            active={state.confidenceBoostOnly}
+            label="Confidence boost"
             onClick={() =>
-              onChange({
-                ...state,
-                favoritesOnly: !state.favoritesOnly,
-                visibleCount: browse.pageSize,
-              })
+              patch({ confidenceBoostOnly: !state.confidenceBoostOnly })
             }
-          >
-            Treasured
-          </button>
+          />
+        ) : null}
+
+        {browse.enableRecentFilter ? (
+          <Chip
+            active={state.recentOnly}
+            label="Recent evidence"
+            onClick={() =>
+              patch({ recentOnly: !state.recentOnly })
+            }
+          />
+        ) : null}
+
+        {browse.enableDatePresets ? (
+          <>
+            {(
+              [
+                ["today", "Today"],
+                ["yesterday", "Yesterday"],
+                ["this-week", "This Week"],
+                ["last-week", "Last Week"],
+                ["this-month", "This Month"],
+                ["last-month", "Last Month"],
+                ["this-year", "This Year"],
+              ] as const
+            ).map(([id, label]) => (
+              <Chip
+                key={id}
+                active={state.datePreset === id}
+                label={label}
+                onClick={() =>
+                  patch({
+                    datePreset: state.datePreset === id ? null : id,
+                  })
+                }
+              />
+            ))}
+          </>
+        ) : null}
+
+        {browse.enableHallCandidateFilter ? (
+          <Chip
+            active={state.hallCandidateOnly}
+            label="Hall Candidate"
+            onClick={() =>
+              patch({ hallCandidateOnly: !state.hallCandidateOnly })
+            }
+          />
         ) : null}
 
         {browse.enableCategoryFilter && categories.length > 0 ? (
-          <div
-            className="estate-collection-browse__categories"
-            role="group"
-            aria-label={browse.categoryLabel ?? "Category"}
-          >
-            <button
-              type="button"
-              className={[
-                "estate-collection-browse__chip",
-                !state.category ? "estate-collection-browse__chip--active" : "",
-              ].join(" ")}
-              aria-pressed={!state.category}
-              onClick={() =>
-                onChange({ ...state, category: null, visibleCount: browse.pageSize })
-              }
-            >
-              All
-            </button>
-            {categories.map((category) => (
-              <button
-                key={category}
-                type="button"
-                className={[
-                  "estate-collection-browse__chip",
-                  state.category === category
-                    ? "estate-collection-browse__chip--active"
-                    : "",
-                ].join(" ")}
-                aria-pressed={state.category === category}
-                onClick={() =>
-                  onChange({
-                    ...state,
-                    category,
-                    visibleCount: browse.pageSize,
-                  })
-                }
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+          <FilterGroup
+            label={browse.categoryLabel ?? "Category"}
+            values={categories}
+            selected={state.category}
+            onSelect={(category) => patch({ category })}
+          />
+        ) : null}
+
+        {browse.enableSourceFilter ? (
+          <FilterGroup
+            label={browse.sourceLabel ?? "Source"}
+            values={sources}
+            selected={state.source}
+            onSelect={(source) => patch({ source })}
+          />
+        ) : null}
+
+        {browse.enableEmotionFilter ? (
+          <FilterGroup
+            label={browse.emotionLabel ?? "Emotion"}
+            values={emotions}
+            selected={state.emotion}
+            onSelect={(emotion) => patch({ emotion })}
+          />
+        ) : null}
+
+        {browse.enableProjectFilter ? (
+          <FilterGroup
+            label={browse.projectLabel ?? "Project"}
+            values={projects}
+            selected={state.projectName}
+            onSelect={(projectName) => patch({ projectName })}
+          />
+        ) : null}
+
+        {browse.enablePersonFilter ? (
+          <FilterGroup
+            label={browse.personLabel ?? "Person"}
+            values={people}
+            selected={state.personName}
+            onSelect={(personName) => patch({ personName })}
+          />
         ) : null}
       </div>
 
-      {(state.search || state.favoritesOnly || state.category) && (
+      {hasActiveFilter ? (
         <p className="estate-collection-browse__count" aria-live="polite">
           {filteredCount === 0
             ? browse.emptyFilterMessage
             : `${filteredCount} ${filteredCount === 1 ? "entry" : "entries"} ${browse.resultsLabel.toLowerCase()}`}
         </p>
-      )}
+      ) : null}
     </section>
   );
 }

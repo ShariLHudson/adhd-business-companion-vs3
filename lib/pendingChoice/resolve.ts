@@ -61,7 +61,7 @@ function placeChoicesFromIds(placeIds: readonly string[]): PendingChoiceItem[] {
     .filter((placeId) => isLiveEstatePlace(placeId))
     .map((placeId) => {
     const place = getCanonicalEstatePlaceById(placeId);
-    const label = place?.officialName.replace(/™/g, "") ?? placeId.replace(/-/g, " ");
+    const label = place?.officialName.replace(/\u2122/g, "") ?? placeId.replace(/-/g, " ");
     return {
       id: placeId,
       label,

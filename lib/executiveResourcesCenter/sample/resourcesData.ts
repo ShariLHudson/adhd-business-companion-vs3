@@ -12,7 +12,7 @@ export const RESOURCE_DEPARTMENTS: readonly ResourceDepartment[] = [
     items: [
       resource({
         id: "founder-studio",
-        name: "Founder Studio™",
+        name: "Founder Studio",
         purpose: "Executive Headquarters for Visual Spark Studios.",
         bestUsedFor: "Running the company — missions, decisions, resources, and knowledge.",
         openUrl: "/companion/founder/executive-command-center",
@@ -201,7 +201,7 @@ export const RESOURCE_DEPARTMENTS: readonly ResourceDepartment[] = [
     items: [
       resource({
         id: "postcraft",
-        name: "PostCraft™",
+        name: "PostCraft",
         purpose: "Content and campaign creation.",
         bestUsedFor: "Campaigns, content assets, marketing pipeline.",
         openUrl: "/ecosystem/dashboard",
@@ -247,7 +247,7 @@ export const RESOURCE_DEPARTMENTS: readonly ResourceDepartment[] = [
     items: [
       resource({
         id: "ghl",
-        name: "GoHighLevel™",
+        name: "GoHighLevel",
         purpose: "CRM, funnels, membership, automations, analytics.",
         bestUsedFor: "Client nurture, workshop funnels, membership.",
         openUrl: "/ghl/dashboard",
@@ -330,7 +330,7 @@ export const RESOURCE_DEPARTMENTS: readonly ResourceDepartment[] = [
   },
   {
     id: "business-toolkit",
-    label: "Business Toolkit™",
+    label: "Business Toolkit",
     purpose: "Future home for vendors Shari repeatedly searches for.",
     items: [
       resource({

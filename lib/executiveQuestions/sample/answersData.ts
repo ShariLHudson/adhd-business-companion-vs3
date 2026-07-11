@@ -51,12 +51,12 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
     relatedMissions: [
       {
         missionId: "listening-rooms",
-        name: "Listening Rooms™",
+        name: "Listening Rooms",
         summary: "Calm estate re-entry — primary build focus.",
       },
       {
         missionId: "companion",
-        name: "Spark Companion™",
+        name: "Spark Companion",
         summary: "Relationship product benefits from calmer return rituals.",
       },
     ],
@@ -166,12 +166,12 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
     relatedMissions: [
       {
         missionId: "postcraft",
-        name: "PostCraft™",
+        name: "PostCraft",
         summary: "Primary creation surface for the series.",
       },
       {
         missionId: "workshop-series",
-        name: "Workshop Series™",
+        name: "Workshop Series",
         summary: "Live session can premiere one episode.",
       },
     ],
@@ -227,7 +227,7 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
     relatedMissions: [
       {
         missionId: "listening-rooms",
-        name: "Listening Rooms™",
+        name: "Listening Rooms",
         summary: "Active mission — 64% progress.",
       },
     ],
@@ -274,7 +274,7 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
     relatedMissions: [
       {
         missionId: "listening-rooms",
-        name: "Listening Rooms™",
+        name: "Listening Rooms",
         summary: "Primary mission to advance.",
       },
     ],
@@ -319,7 +319,7 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
       },
     ],
     supportingResearch: [],
-    relatedMissions: [{ missionId: "companion", name: "Spark Companion™", summary: "Primary surface for struggle signals." }],
+    relatedMissions: [{ missionId: "companion", name: "Spark Companion", summary: "Primary surface for struggle signals." }],
     relatedDecisions: [],
     recommendedActions: [
       {
@@ -360,7 +360,7 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
       },
     ],
     supportingResearch: [],
-    relatedMissions: [{ missionId: "workshop-series", name: "Workshop Series™", summary: "Blocked on approval." }],
+    relatedMissions: [{ missionId: "workshop-series", name: "Workshop Series", summary: "Blocked on approval." }],
     relatedDecisions: [
       {
         id: "dec-workshop-approve",
@@ -416,7 +416,7 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
       },
     ],
     supportingResearch: [],
-    relatedMissions: [{ missionId: "postcraft", name: "PostCraft™", summary: "Content mission active." }],
+    relatedMissions: [{ missionId: "postcraft", name: "PostCraft", summary: "Content mission active." }],
     relatedDecisions: [],
     recommendedActions: [
       {
@@ -457,7 +457,7 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
       },
     ],
     supportingResearch: [],
-    relatedMissions: [{ missionId: "listening-rooms", name: "Listening Rooms™", summary: "Impact anchor mission." }],
+    relatedMissions: [{ missionId: "listening-rooms", name: "Listening Rooms", summary: "Impact anchor mission." }],
     relatedDecisions: [],
     recommendedActions: [
       {
@@ -498,7 +498,7 @@ export const SAMPLE_EXECUTIVE_ANSWERS: SampleAnswerRecord[] = [
       },
     ],
     supportingResearch: [],
-    relatedMissions: [{ missionId: "marketing-launch", name: "Marketing Launch™", summary: "Planned launch mission." }],
+    relatedMissions: [{ missionId: "marketing-launch", name: "Marketing Launch", summary: "Planned launch mission." }],
     relatedDecisions: [],
     recommendedActions: [
       {

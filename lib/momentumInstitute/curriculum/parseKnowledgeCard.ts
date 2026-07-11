@@ -1,5 +1,5 @@
 /**
- * Parse authored Knowledge Card™ markdown into structured curriculum documents.
+ * Parse authored Knowledge Card markdown into structured curriculum documents.
  */
 
 import type { KnowledgeDifficultyLevel } from "@/lib/sparkMomentumInstitute/types";

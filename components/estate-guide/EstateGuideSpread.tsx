@@ -43,7 +43,7 @@ function RoomHeader({ spread }: { spread: EstateGuideSpreadData }) {
 }
 
 /**
- * Spark Estate Guidebook™ — one flipbook page for a room.
+ * Spark Estate Guidebook — one flipbook page for a room.
  * Photo page: top-half photograph, title tucked under the image, opening sections below.
  * Text page: remaining caretaker copy (no photograph).
  */

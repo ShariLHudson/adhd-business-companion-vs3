@@ -9,7 +9,7 @@ export const DISCOVERY_ENGINE_PRINCIPLE =
 
 export const DEFAULT_PREP: DiscoveryPrepOffer[] = [
   { id: "ede-prep-mission", kind: "mission", label: "Mission update", description: "Align discovery to active mission.", status: "draft" },
-  { id: "ede-prep-builder", kind: "executive-builder", label: "Executive Builder™", description: "Blueprint from discovery.", status: "draft" },
+  { id: "ede-prep-builder", kind: "executive-builder", label: "Executive Builder", description: "Blueprint from discovery.", status: "draft" },
   { id: "ede-prep-sim", kind: "simulation", label: "Simulation", description: "Compare paths before acting.", status: "draft" },
   { id: "ede-prep-research", kind: "research-brief", label: "Research brief", description: "Close knowledge gap.", status: "draft" },
   { id: "ede-prep-brief", kind: "executive-brief", label: "Executive brief", description: "One-page decision support.", status: "draft" },
@@ -74,7 +74,7 @@ export const SAMPLE_FINDINGS: DiscoveryFinding[] = [
     prepOffers: DEFAULT_PREP,
     learningNote: "Track workshop enrollment vs launches without unified narrative.",
     relatedRelationshipDiscoveryId: "disc-seven-conversations",
-    sources: ["Executive Relationship Intelligence™", "Memory Theater™", "Customer Conversations"],
+    sources: ["Executive Relationship Intelligence", "Memory Theater", "Customer Conversations"],
   },
   {
     id: "ede-butterfly-chain",
@@ -118,7 +118,7 @@ export const SAMPLE_FINDINGS: DiscoveryFinding[] = [
     prepOffers: DEFAULT_PREP.filter((p) => ["executive-builder", "workshop", "simulation"].includes(p.kind)),
     learningNote: "Compare predicted butterfly chain to actual workshop outcomes in Memory Theater.",
     relatedRelationshipDiscoveryId: "disc-butterfly-restart",
-    sources: ["Executive Intelligence Graph™", "Executive Simulation Studio™", "Executive Memory Theater™"],
+    sources: ["Executive Intelligence Graph", "Executive Simulation Studio", "Executive Memory Theater"],
   },
   {
     id: "ede-quote-library",
@@ -168,7 +168,7 @@ export const SAMPLE_FINDINGS: DiscoveryFinding[] = [
     prepOffers: DEFAULT_PREP.filter((p) => ["postcraft-campaign", "executive-brief"].includes(p.kind)),
     learningNote: "Track copy prep time before/after quote linking.",
     relatedRelationshipDiscoveryId: "disc-founder-postcraft",
-    sources: ["Executive Builder™", "PostCraft™", "Executive Research Center™"],
+    sources: ["Executive Builder", "PostCraft", "Executive Research Center"],
   },
   {
     id: "ede-pricing-gap",
@@ -218,7 +218,7 @@ export const SAMPLE_FINDINGS: DiscoveryFinding[] = [
     prepOffers: DEFAULT_PREP.filter((p) => ["research-brief", "simulation", "executive-brief"].includes(p.kind)),
     learningNote: "Add pricing nodes to graph when research completes.",
     relatedRelationshipDiscoveryId: "disc-gap-pricing",
-    sources: ["Executive Simulation Studio™", "Decision Vault™", "Executive Intelligence Graph™"],
+    sources: ["Executive Simulation Studio", "Decision Vault", "Executive Intelligence Graph"],
   },
   {
     id: "ede-sprint-rhythm",
@@ -268,7 +268,7 @@ export const SAMPLE_FINDINGS: DiscoveryFinding[] = [
     prepOffers: DEFAULT_PREP.filter((p) => p.kind === "executive-brief"),
     learningNote: "Log sprint completion vs energy in future discoveries.",
     relatedRelationshipDiscoveryId: "disc-habit-sprint",
-    sources: ["Executive Memory Theater™", "Executive Simulation Studio™", "GitHub / Cursor Development"],
+    sources: ["Executive Memory Theater", "Executive Simulation Studio", "GitHub / Cursor Development"],
   },
   {
     id: "ede-competitive-signal",
@@ -317,7 +317,7 @@ export const SAMPLE_FINDINGS: DiscoveryFinding[] = [
     },
     prepOffers: DEFAULT_PREP.filter((p) => ["marketing-strategy", "executive-brief"].includes(p.kind)),
     learningNote: "Track which competitive signals led to product changes vs noise.",
-    sources: ["Industry News", "Analytics", "Spark Companion™"],
+    sources: ["Industry News", "Analytics", "Spark Companion"],
   },
 ];
 
@@ -325,7 +325,7 @@ export const DISCOVERY_ENGINE_ALERTS: DiscoveryEngineFounderAlert[] = [
   {
     id: "ede-alert-unified-restart",
     findingId: "ede-unified-restart",
-    title: "Founder Alert™ — Unify restart narrative before workshop",
+    title: "Founder Alert — Unify restart narrative before workshop",
     whatWasDiscovered: "Seven conversation streams describe the same guilt-after-absence problem.",
     whyItMatters: "Workshop enrollment could fail if marketing speaks productivity while members need permission.",
     evidence: ["Relationship Intelligence disc-seven-conversations", "Customer feedback", "Memory Theater quotes"],

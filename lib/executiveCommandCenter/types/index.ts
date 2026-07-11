@@ -1,4 +1,4 @@
-/** Executive Command Center™ — Visual Spark Studios Executive Headquarters */
+/** Executive Command Center — Visual Spark Studios Executive Headquarters */
 
 export type ExecutivePanelId = "today" | "discover" | "decide" | "build" | "run" | "learn";
 

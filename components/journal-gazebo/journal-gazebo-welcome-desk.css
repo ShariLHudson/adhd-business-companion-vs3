@@ -16,7 +16,8 @@
   object-position: center top;
 }
 
-.journal-gazebo--workshop-plate .journal-gazebo__background {
+.journal-gazebo--workshop-plate .journal-gazebo__background,
+.journal-gazebo--gazebo-rest .journal-gazebo__background {
   inset: 0;
   width: 100%;
   height: 100%;
@@ -38,21 +39,40 @@
   max-width: min(96vw, 100%);
   aspect-ratio: 16 / 10;
   transform: translateX(-50%);
-  z-index: 30;
+  z-index: 35;
   pointer-events: none;
 }
 
-.jg-welcome-desk__actions {
+.jg-welcome-desk .jg-table-actions {
   position: absolute;
   inset: 0;
+  pointer-events: auto;
+}
+
+.jg-welcome-desk--actions-only,
+.jg-sanctuary-desk--actions-only {
+  position: fixed;
+  inset: 0;
+  z-index: 36;
   pointer-events: none;
 }
 
-/* Estate green plaque — warm gold frame for "Begin My Journal" */
-.jg-welcome-desk__plaque {
+.jg-welcome-desk--actions-only .jg-table-actions--sanctuary,
+.jg-sanctuary-desk--actions-only .jg-table-actions--sanctuary,
+.jg-welcome-desk--composed .jg-table-actions--sanctuary,
+.jg-sanctuary-desk .jg-table-actions--sanctuary {
+  pointer-events: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Table sanctuary actions — estate green plaques
+═══════════════════════════════════════════════════════════ */
+
+.jg-table-actions__plaque {
   position: absolute;
   bottom: 2.4%;
-  height: 12.8%;
+  height: 13.5%;
+  min-height: 3.25rem;
   margin: 0;
   padding: 0.5em 0.65em 0.55em;
   display: flex;
@@ -82,8 +102,8 @@
     transform 0.25s ease;
 }
 
-.jg-welcome-desk__plaque--create::before,
-.jg-welcome-desk__plaque--create::after {
+.jg-table-actions__plaque--create::before,
+.jg-table-actions__plaque--create::after {
   content: "";
   display: block;
   width: min(88%, 14rem);
@@ -99,7 +119,7 @@
   pointer-events: none;
 }
 
-.jg-welcome-desk__plaque::after {
+.jg-table-actions__plaque::after {
   content: "";
   position: absolute;
   inset: 3px;
@@ -109,22 +129,31 @@
   pointer-events: none;
 }
 
-.jg-welcome-desk__plaque--create {
+.jg-table-actions__plaque--create {
   left: 2.8%;
   right: 50.4%;
 }
 
-.jg-welcome-desk__plaque--open {
+.jg-table-actions__open-wrap {
+  position: absolute;
   left: 50.4%;
   right: 2.8%;
+  bottom: 2.4%;
+  height: 13.5%;
+  min-height: 3.25rem;
+  z-index: 3;
 }
 
-.jg-welcome-desk__actions--single .jg-welcome-desk__plaque--create {
-  left: 18%;
-  right: 18%;
+.jg-table-actions__open-wrap .jg-table-actions__plaque--open {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  height: 100%;
 }
 
-.jg-welcome-desk__plaque:hover {
+.jg-table-actions__plaque:hover {
   border-color: rgba(212, 184, 112, 0.82);
   box-shadow:
     inset 0 1px 0 rgba(212, 184, 112, 0.18),
@@ -133,12 +162,12 @@
   transform: translateY(-1px);
 }
 
-.jg-welcome-desk__plaque:focus-visible {
+.jg-table-actions__plaque:focus-visible {
   outline: 2px solid rgba(212, 184, 112, 0.78);
   outline-offset: 2px;
 }
 
-.jg-welcome-desk__plaque-title {
+.jg-table-actions__plaque-title {
   position: relative;
   z-index: 1;
   font-family: "Cormorant Garamond", Georgia, serif;
@@ -150,7 +179,16 @@
   color: #d4b870;
 }
 
-.jg-welcome-desk__plaque-sub {
+.jg-table-actions__caret {
+  display: inline-block;
+  margin-left: 0.35em;
+  font-size: 0.72em;
+  letter-spacing: 0;
+  opacity: 0.85;
+  vertical-align: middle;
+}
+
+.jg-table-actions__plaque-sub {
   position: relative;
   z-index: 1;
   max-width: 94%;
@@ -161,15 +199,15 @@
   color: rgba(212, 184, 112, 0.88);
 }
 
-.jg-welcome-desk__plaque-sub::before {
+.jg-table-actions__plaque-sub::before {
   content: "\201C";
 }
 
-.jg-welcome-desk__plaque-sub::after {
+.jg-table-actions__plaque-sub::after {
   content: "\201D";
 }
 
-.jg-welcome-desk__quill {
+.jg-table-actions__quill {
   position: absolute;
   right: 7%;
   bottom: 14%;
@@ -180,6 +218,220 @@
   z-index: 1;
 }
 
+.jg-table-actions__menu {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 0.45rem);
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  border: 1px solid rgba(201, 166, 107, 0.55);
+  border-radius: 3px;
+  background: linear-gradient(
+    168deg,
+    rgba(42, 38, 30, 0.97) 0%,
+    rgba(24, 22, 18, 0.98) 100%
+  );
+  box-shadow:
+    0 10px 28px rgba(8, 6, 4, 0.45),
+    inset 0 1px 0 rgba(212, 184, 112, 0.14);
+  pointer-events: auto;
+  animation: jg-table-actions-menu-in 0.22s ease both;
+}
+
+@keyframes jg-table-actions-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.jg-table-actions__menu-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.9rem, 1.8vw, 1.05rem);
+  letter-spacing: 0.04em;
+  color: rgba(212, 184, 112, 0.92);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.jg-table-actions__menu-item:hover,
+.jg-table-actions__menu-item:focus-visible {
+  background: rgba(201, 166, 107, 0.12);
+  color: #e8d4a0;
+  outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Gazebo sanctuary — return visits & resting at the table
+═══════════════════════════════════════════════════════════ */
+
+.jg-sanctuary-desk {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+
+.jg-return-note {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  width: min(16.5rem, 42vw);
+  margin: 0;
+  padding: 1.15rem 1.25rem 1rem;
+  border: 1px solid rgba(155, 125, 78, 0.42);
+  border-radius: 3px;
+  background: linear-gradient(165deg, #fdf9f0 0%, #f3e8d6 48%, #e8dbc4 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 252, 245, 0.92),
+    0 14px 32px rgba(10, 8, 6, 0.38);
+  pointer-events: none;
+  animation: journal-gazebo-spark-in 1.1s ease;
+}
+
+.jg-return-note__texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image: radial-gradient(
+    circle at 20% 15%,
+    rgba(255, 255, 255, 0.55),
+    transparent 45%
+  );
+  pointer-events: none;
+}
+
+.jg-return-note__greeting,
+.jg-return-note__question,
+.jg-return-note__sign {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.jg-return-note__greeting {
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1rem, 2.1vw, 1.2rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: #3d3428;
+}
+
+.jg-return-note__question {
+  margin-top: 0.65rem;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(0.88rem, 1.75vw, 1rem);
+  font-style: italic;
+  line-height: 1.45;
+  color: #4a4034;
+}
+
+.jg-return-note__sign {
+  margin-top: 0.85rem;
+  font-family: "Pinyon Script", "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  color: #5c4a32;
+  text-align: right;
+}
+
+.jg-sanctuary-desk__message {
+  position: absolute;
+  left: 50%;
+  top: clamp(12%, 16vh, 20%);
+  transform: translateX(-50%);
+  width: min(34rem, 88vw);
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.2rem, 2.6vw, 1.65rem);
+  font-style: italic;
+  letter-spacing: 0.03em;
+  line-height: 1.45;
+  text-align: center;
+  color: rgba(255, 250, 240, 0.88);
+  text-shadow: 0 2px 18px rgba(20, 16, 12, 0.5);
+  animation: journal-gazebo-spark-in 1.2s ease;
+}
+
+.jg-sanctuary-desk__journal {
+  position: absolute;
+  left: 24%;
+  bottom: clamp(30%, 34vh, 38%);
+  transform: translateX(-50%) rotate(-7deg);
+  pointer-events: auto;
+  filter: drop-shadow(0 16px 36px rgba(10, 8, 6, 0.42));
+  animation: jg-sanctuary-journal-in 1s ease 0.2s both;
+}
+
+.jg-sanctuary-desk__journal .journal-hero {
+  transform: scale(clamp(0.72, 1.1vw, 0.95));
+  transform-origin: center bottom;
+}
+
+@keyframes jg-sanctuary-journal-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) rotate(-7deg) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) rotate(-7deg) translateY(0);
+  }
+}
+
+.jg-table-actions--sanctuary {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(8%, 12vh, 14%);
+  transform: translateX(-50%);
+  width: min(52rem, 92vw);
+  height: clamp(4.5rem, 11vh, 5.75rem);
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.jg-table-actions--sanctuary .jg-table-actions__plaque {
+  bottom: 0;
+  height: 100%;
+}
+
+.jg-table-actions--sanctuary .jg-table-actions__plaque--create {
+  left: 0;
+  right: 50.6%;
+}
+
+.jg-table-actions--sanctuary .jg-table-actions__open-wrap {
+  left: 50.6%;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+}
+
+.jg-table-actions--sanctuary .jg-table-actions__plaque-title {
+  font-size: clamp(0.72rem, 1.45vw, 0.95rem);
+}
+
+.jg-table-actions--sanctuary .jg-table-actions__plaque-sub {
+  font-size: clamp(0.62rem, 1.1vw, 0.78rem);
+}
+
+.journal-gazebo__chat-panel {
+  max-width: min(44rem, 92vw);
+}
+
 @media (max-width: 640px) {
   .journal-gazebo--welcome-letter .journal-gazebo__background,
   .jg-welcome-desk {
@@ -187,15 +439,30 @@
     max-height: 74vh;
   }
 
-  .jg-welcome-desk__plaque {
+  .jg-table-actions__plaque {
     bottom: 2%;
     height: 11.5%;
     padding: 0.35em 0.45em;
   }
 
-  .jg-welcome-desk__actions--single .jg-welcome-desk__plaque--create {
-    left: 10%;
-    right: 10%;
+  .jg-table-actions__open-wrap {
+    bottom: 2%;
+    height: 11.5%;
+  }
+
+  .jg-table-actions--sanctuary {
+    width: min(48rem, 94vw);
+    height: clamp(4rem, 10vh, 5rem);
+    bottom: clamp(6%, 10vh, 12%);
+  }
+
+  .jg-sanctuary-desk__journal {
+    bottom: clamp(20%, 26vh, 30%);
+  }
+
+  .jg-sanctuary-desk__message {
+    top: clamp(10%, 14vh, 16%);
+    font-size: clamp(1.05rem, 4.5vw, 1.25rem);
   }
 }
 

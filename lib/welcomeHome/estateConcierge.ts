@@ -1,5 +1,5 @@
 /**
- * Welcome Home Estate Concierge™ — universal front door orchestration.
+ * Welcome Home Estate Concierge — universal front door orchestration.
  *
  * Flow: Understand → Memory (delegated) → Estate Intelligence → Router
  * Reuses existing engines — no duplicate routing logic.
@@ -81,7 +81,7 @@ export function welcomeHomeConciergeHintForChat(
 
   const lines = [
     "WELCOME HOME ESTATE CONCIERGE (mandatory — not a generic chat page):",
-    "You are the front door to the entire Spark Estate™. The member describes what they need; Spark knows where it belongs.",
+    "You are the front door to the entire Spark Estate. The member describes what they need; Spark knows where it belongs.",
     CONVERSATION_FRONT_DOOR_PRINCIPLE,
     "",
     "CONVERSATION FLOW (invisible to member):",
@@ -91,7 +91,7 @@ export function welcomeHomeConciergeHintForChat(
     "4. Route invisibly — invitation, never forced navigation.",
     "",
     "FORBIDDEN: menus, room directories, 'Open X', dictionary definitions of Estate capabilities.",
-    "PREFERRED: \"I think I know exactly where we should go.\" · \"This is something [Place]™ was designed for.\" · \"Would you like me to take you there?\"",
+    "PREFERRED: \"I think I know exactly where we should go.\" · \"This is something [Place] was designed for.\" · \"Would you like me to take you there?\"",
   ];
 
   if (evaluation.needsSummary) {

@@ -9,7 +9,9 @@ import {
 } from "react";
 
 import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
+import { EstateRouteRecovery } from "@/components/companion/estate/EstateRouteRecovery";
 import { ESTATE_WORKSPACE_LOAD_RECOVERY } from "@/lib/companionContextRouting/workspaceLoadRecovery";
+import "@/app/companion/estate-route-recovery.css";
 
 const LOADING = (
   <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
@@ -40,7 +42,7 @@ type EstateErrorBoundaryState = { hasError: boolean };
  * ChunkLoadError when the dev bundle is stale.
  */
 class EstateErrorBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; onReturnToEstate?: () => void },
   EstateErrorBoundaryState
 > {
   state: EstateErrorBoundaryState = { hasError: false };
@@ -53,25 +55,24 @@ class EstateErrorBoundary extends Component<
     logWorkspaceLoadFailure(error);
   }
 
-  private handleReset = () => {
+  private handleRetry = () => {
     this.setState({ hasError: false });
   };
 
   render() {
     if (this.state.hasError) {
       return (
-        <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-[#f5f0e8] p-6 text-center text-[#3d3630]">
-          <p className="max-w-md text-base leading-relaxed">
-            {ESTATE_WORKSPACE_LOAD_RECOVERY}
-          </p>
-          <button
-            type="button"
-            onClick={this.handleReset}
-            className="rounded-full bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
-          >
-            Stay here
-          </button>
-        </main>
+        <EstateRouteRecovery
+          message={ESTATE_WORKSPACE_LOAD_RECOVERY}
+          onRetry={this.handleRetry}
+          onReturnToEstate={
+            this.props.onReturnToEstate ??
+            (() => {
+              window.location.assign("/companion?section=home");
+            })
+          }
+          error={new Error("Companion workspace failed to render")}
+        />
       );
     }
     return this.props.children;
@@ -84,18 +85,13 @@ function WorkspaceLoadRecovery({
   onRetry: () => void;
 }) {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-[#f5f0e8] p-6 text-center text-[#3d3630]">
-      <p className="max-w-md text-base leading-relaxed">
-        {ESTATE_WORKSPACE_LOAD_RECOVERY}
-      </p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="rounded-full bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
-      >
-        Stay here
-      </button>
-    </main>
+    <EstateRouteRecovery
+      message={ESTATE_WORKSPACE_LOAD_RECOVERY}
+      onRetry={onRetry}
+      onReturnToEstate={() => {
+        window.location.assign("/companion?section=home");
+      }}
+    />
   );
 }
 

@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — Curriculum Development types.
+ * Momentum Institute — Curriculum Development types.
  *
  * Shari and ChatGPT author content; this system delivers it.
  * Educational content is proprietary IP of Visual Spark Studios.
@@ -30,7 +30,7 @@ export const CURRICULUM_CARD_STATUSES = [
 
 export type CurriculumCardStatus = (typeof CURRICULUM_CARD_STATUSES)[number];
 
-/** Frontmatter metadata — one Knowledge Card™ markdown file. */
+/** Frontmatter metadata — one Knowledge Card markdown file. */
 export type CurriculumKnowledgeCardMetadata = {
   id: string;
   title: string;
@@ -51,7 +51,7 @@ export type CurriculumKnowledgeCardMetadata = {
   last_updated: string;
 };
 
-/** Fifteen-section Knowledge Card™ body (authored in markdown). */
+/** Fifteen-section Knowledge Card body (authored in markdown). */
 export type CurriculumKnowledgeCardBody = {
   essentialQuestion: string;
   whyThisMatters: string;
@@ -72,7 +72,7 @@ export type CurriculumRelatedCardRef = {
   relationship?: string;
 };
 
-/** Parsed Knowledge Card™ document — metadata + body + source path. */
+/** Parsed Knowledge Card document — metadata + body + source path. */
 export type CurriculumKnowledgeCardDocument = {
   kind: "knowledge-card";
   metadata: CurriculumKnowledgeCardMetadata;

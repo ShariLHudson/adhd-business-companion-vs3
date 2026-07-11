@@ -10,7 +10,7 @@ type Props = {
   children: ReactNode;
 };
 
-/** Growth Profile™ — greenhouse plate, full-bleed cover. */
+/** Growth Profile — greenhouse plate, full-bleed cover. */
 export function GrowthProfileRoomShell({ children }: Props) {
   useEffect(() => {
     preloadRoomBackground(GROWTH_ROOM_BG);

@@ -1,5 +1,5 @@
 /**
- * Estate Adaptive Intelligence™ — learn preferences that change future behavior.
+ * Estate Adaptive Intelligence — learn preferences that change future behavior.
  *
  * @see docs/estate/ESTATE_ADAPTIVE_INTELLIGENCE.md
  */

@@ -1,5 +1,5 @@
 /**
- * Founder bridge — Executive Discovery Engine™
+ * Founder bridge — Executive Discovery Engine
  */
 import type { MissionId } from "@/lib/founder/missions/types";
 import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";

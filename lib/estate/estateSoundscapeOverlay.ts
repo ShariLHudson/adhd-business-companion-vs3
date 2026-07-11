@@ -1,5 +1,5 @@
 /**
- * Estate Soundscapes™ — Layer 2 optional overlay on place ambience.
+ * Estate Soundscapes — Layer 2 optional overlay on place ambience.
  * Never replaces Layer 1 — layers over it.
  */
 

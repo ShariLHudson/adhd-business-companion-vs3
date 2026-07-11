@@ -8,7 +8,7 @@ import {
 } from "@/lib/estate/estateArrivalSession";
 import { prefersReducedMotion } from "@/lib/welcomeRoom/arrival";
 
-/** Arrival Before Activity™ — visit phases for any estate room. */
+/** Arrival Before Activity — visit phases for any estate room. */
 export type EstateRoomVisitPhase =
   | "awaiting-arrival"
   | "invitation"

@@ -46,7 +46,7 @@ export function BuildEntryZone({
           id="build-query"
           type="text"
           className="founder-builder__entry-input"
-          placeholder="Listening Rooms™, workshop, lead magnet, feature…"
+          placeholder="Listening Rooms, workshop, lead magnet, feature…"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
         />

@@ -1,5 +1,5 @@
 /**
- * Spark Restoration Intelligence™
+ * Spark Restoration Intelligence
  * @see docs/estate/SPARK_RESTORATION_INTELLIGENCE.md
  */
 

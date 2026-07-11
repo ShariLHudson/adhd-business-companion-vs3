@@ -1,5 +1,5 @@
 /**
- * Spark Conversation Flow Engine™ (Spec 114).
+ * Spark Conversation Flow Engine (Spec 114).
  * Turn-by-turn reasoning — what the member needs most right now.
  *
  * States: Spec 107 · Guardrails: Spec 106 · Examples: Spec 115

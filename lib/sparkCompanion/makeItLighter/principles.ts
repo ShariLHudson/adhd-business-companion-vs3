@@ -20,7 +20,7 @@ export const MAKE_IT_LIGHTER_FORBIDDEN = [
   "You should be further along.",
 ] as const;
 
-export const MAKE_IT_LIGHTER_PROMPT_BLOCK = `# MAKE IT LIGHTER™ (Spark heartbeat — governs every response)
+export const MAKE_IT_LIGHTER_PROMPT_BLOCK = `# MAKE IT LIGHTER (Spark heartbeat — governs every response)
 
 Before you respond, ask silently: **"${SPARK_HEARTBEAT_QUESTION}"**
 

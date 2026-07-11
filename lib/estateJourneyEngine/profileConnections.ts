@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — profile connection touches (Growth, Cabinet, Journal…).
+ * Estate Journey Engine — profile connection touches (Growth, Cabinet, Journal…).
  */
 
 import { getJourneyEngineState, patchJourneyEngine } from "./journeyStore";

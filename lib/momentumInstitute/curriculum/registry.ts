@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ — Curriculum Registry.
+ * Momentum Institute — Curriculum Registry.
  *
  * Central index of every authored asset. Grows one card at a time.
  * Scan `docs/momentum-institute/curriculum/` with `npm run curriculum:scan` after adding files.

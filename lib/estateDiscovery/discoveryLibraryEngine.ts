@@ -1,5 +1,5 @@
 /**
- * Discovery Library Engine™ — validate discovery records against Estate Knowledge Base™.
+ * Discovery Library Engine — validate discovery records against Estate Knowledge Base.
  */
 
 import { validateDiscoveryForLive } from "./discoveryCms/validation";

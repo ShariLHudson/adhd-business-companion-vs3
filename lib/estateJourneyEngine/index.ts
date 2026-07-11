@@ -1,5 +1,5 @@
 /**
- * Estate Journey Engine™ — public API.
+ * Estate Journey Engine — public API.
  */
 
 export * from "./types";

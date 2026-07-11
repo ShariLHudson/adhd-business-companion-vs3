@@ -1,5 +1,5 @@
 /**
- * Business Brain™ Lifecycle Architecture — knowledge lifecycle, versioning, retrieval.
+ * Business Brain Lifecycle Architecture — knowledge lifecycle, versioning, retrieval.
  * Brain stores and evolves; Context Strategy selects MVC for responses.
  *
  * @see spark-intelligence-foundation/009-business-brain-lifecycle.md
@@ -7,7 +7,7 @@
  * @see docs/SPARK_BUSINESS_BRAIN_MEMORY_RETRIEVAL_FRAMEWORK.md (Spec 117)
  */
 
-/** Business Knowledge Lifecycle™ — eight stages */
+/** Business Knowledge Lifecycle — eight stages */
 export type BusinessKnowledgeLifecycleStage =
   | "observed"
   | "candidate"
@@ -44,7 +44,7 @@ export const BUSINESS_KNOWLEDGE_STAGE_CONFIDENCE: Record<
   retired: "member_retired",
 };
 
-/** Freshness Model™ — retrieval priority, not storage */
+/** Freshness Model — retrieval priority, not storage */
 export type BusinessKnowledgeFreshness =
   | "current"
   | "recent"
@@ -74,7 +74,7 @@ export type BusinessKnowledgeCategory =
   | "lessons_learned"
   | "business_preferences";
 
-/** Business Versioning™ — phase snapshot (e.g. 2026 Coach → 2028 Software) */
+/** Business Versioning — phase snapshot (e.g. 2026 Coach → 2028 Software) */
 export type BusinessPhaseVersion = {
   id: string;
   label: string;
@@ -84,7 +84,7 @@ export type BusinessPhaseVersion = {
   supersededById?: string;
 };
 
-/** Learning Rules™ — requires one or more signals unless explicit confirmation */
+/** Learning Rules — requires one or more signals unless explicit confirmation */
 export type BusinessKnowledgeLearningSignal =
   | "member_confirmation"
   | "repeated_behavior"
@@ -109,7 +109,7 @@ export const BUSINESS_KNOWLEDGE_RETRIEVAL_PRIORITY: Record<
   retired: "never_auto",
 };
 
-/** Conflict Resolution™ — do not overwrite; hold hypotheses */
+/** Conflict Resolution — do not overwrite; hold hypotheses */
 export type BusinessKnowledgeConflict = {
   existingObjectId: string;
   competingHypothesisId: string;

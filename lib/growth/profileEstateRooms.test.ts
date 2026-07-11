@@ -49,7 +49,7 @@ describe("profileEstateRooms", () => {
       EVIDENCE_VAULT_ROOM_BG,
     );
     expect(profileEstateRoomBackgroundImage("evidence-vault")).toBe(
-      "/backgrounds/evidence-vault-background.png",
+      "/backgrounds/evidence-vault-room-background.png",
     );
     expect(profileEstateRoomBackgroundImage("portfolio")).toBe(PORTFOLIO_ROOM_BG);
     expect(profileEstateRoomBackgroundImage("portfolio")).toBe(

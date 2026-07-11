@@ -91,9 +91,13 @@ export function conversationGatingHint(text: string): string {
 export function isExplicitWorkspaceOpenRequest(text: string): boolean {
   const t = text.trim().toLowerCase();
   return (
-    /\bopen (?:the )?(?:create|projects?|time ?block|clear my mind|brain dump|saved work|templates?)\b/.test(
+    /\bopen (?:the )?(?:create|projects?|time ?block|clear my mind|brain dump|saved work|templates?|strategies|playbook|journal|evidence|gallery|destination gallery|mind map|visual thinking|focus timer|plan my day|decision compass|client avatars?)\b/.test(
       t,
-    ) || /\bopen (?:my )?saved work\b/.test(t)
+    ) ||
+    /\bopen (?:my )?saved work\b/.test(t) ||
+    /\b(?:start (?:a )?(?:timer|focus session)|create a mind map|show my projects|schedule this)\b/.test(
+      t,
+    )
   );
 }
 

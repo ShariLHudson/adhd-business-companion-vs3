@@ -1,4 +1,4 @@
-/** Executive Builder™ — implementation blueprint types. */
+/** Executive Builder — implementation blueprint types. */
 
 export type BuildEntryKind =
   | "idea"

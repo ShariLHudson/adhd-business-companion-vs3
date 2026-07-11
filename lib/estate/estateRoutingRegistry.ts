@@ -1,5 +1,5 @@
 /**
- * Estate Routing Registry™ — single canonical routing map for every place,
+ * Estate Routing Registry — single canonical routing map for every place,
  * subspace, object, and experience.
  *
  * All routing decisions derive from CANONICAL_ESTATE_REGISTRY + ambiguity groups here.
@@ -159,7 +159,7 @@ function normalize(text: string): string {
 }
 
 function stripPunctuation(text: string): string {
-  return text.replace(/[™®.!?]+$/g, "").trim();
+  return text.replace(/[®.!?]+$/g, "").trim();
 }
 
 function stripNavigationVerbs(text: string): string {

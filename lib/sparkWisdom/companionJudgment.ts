@@ -1,5 +1,5 @@
 /**
- * Spec 123 — Companion Judgment™
+ * Spec 123 — Companion Judgment
  */
 
 import type { JudgmentCue } from "./types";

@@ -1,5 +1,5 @@
 /**
- * Reflection Engine™ — memory-to-insight types (no chat dependency).
+ * Reflection Engine — memory-to-insight types (no chat dependency).
  */
 
 import type { MemoryDateRange } from "../types";

@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — universal creation journey (Phase 11).
+ * Spark Estate — universal creation journey (Phase 11).
  * One guided path for every room and every creation type.
  *
  * @see docs/protocols/SPARK_ESTATE_UNIVERSAL_CREATION_JOURNEY_AND_SHARI_EXPERIENCE_PHASE11.md

@@ -1,5 +1,5 @@
 /**
- * Discovery Content Management System™ — types.
+ * Discovery Content Management System — types.
  */
 
 import type {

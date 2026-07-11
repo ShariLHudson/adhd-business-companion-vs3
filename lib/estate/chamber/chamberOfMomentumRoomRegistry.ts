@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — room registry (Phase 7 visual identity).
+ * Chamber of Momentum — room registry (Phase 7 visual identity).
  */
 
 import { CHAMBER_OF_MOMENTUM_SECTION } from "@/lib/estate/chamberOfMomentumIdentity";
@@ -9,8 +9,8 @@ export const CHAMBER_OF_MOMENTUM_ROOM_BG = ESTATE_ROOM_BG.chamberOfMomentum;
 
 export const CHAMBER_OF_MOMENTUM_ROOM_META = {
   section: CHAMBER_OF_MOMENTUM_SECTION,
-  title: "Welcome to the Chamber of Momentum™",
-  trademark: "Chamber of Momentum™",
+  title: "Welcome to the Chamber of Momentum",
+  trademark: "Chamber of Momentum",
   subtitle: "Let's find what will help you move forward today.",
   purpose: "A guided place to discover your next best step.",
   background: CHAMBER_OF_MOMENTUM_ROOM_BG,

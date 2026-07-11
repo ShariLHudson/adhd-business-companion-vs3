@@ -1,5 +1,5 @@
 /**
- * Audio Experience Foundation™ — category registry loader.
+ * Audio Experience Foundation — category registry loader.
  */
 
 import audioCategoriesJson from "@/docs/estate-knowledge-base/audio-categories.json";

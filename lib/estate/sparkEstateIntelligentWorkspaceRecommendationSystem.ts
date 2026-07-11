@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — intelligent workspace recommendation system (Phase 31).
+ * Spark Estate — intelligent workspace recommendation system (Phase 31).
  * Guide members to the right workspace without forcing movement.
  *
  * @see docs/protocols/SPARK_ESTATE_INTELLIGENT_WORKSPACE_RECOMMENDATION_SYSTEM_SPECIFICATION_PHASE31.md
@@ -44,7 +44,7 @@ export const SPARK_ESTATE_WORKSPACE_VS_INTELLIGENCE = {
   workspace: {
     question: "Where would I have the best experience?",
     examples: [
-      "Chamber of Momentum™",
+      "Chamber of Momentum",
       "Marketing Room",
       "Content Room",
       "Research Room",
@@ -146,7 +146,7 @@ export type SparkEstateWorkspaceRecommendation = {
 const WORKSPACE_OPTIONS: Record<SparkEstateWorkspaceId, SparkEstateWorkspaceOption> = {
   chamber: {
     id: "chamber",
-    label: "Chamber of Momentum™",
+    label: "Chamber of Momentum",
     section: "chamber-of-momentum",
     explanation:
       "The Chamber brings together the right support to help you move from idea to finished project.",
@@ -563,7 +563,7 @@ export function formatSparkEstateWorkspaceRecommendationReport(
   });
 
   const lines: string[] = [
-    `Spark Estate™ workspace recommendation: ${verification.recommendationReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate workspace recommendation: ${verification.recommendationReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_WORKSPACE_RECOMMENDATION_PRINCIPLE,
     SPARK_ESTATE_WORKSPACE_RECOMMENDATION_VISION,
     SPARK_ESTATE_WORKSPACE_SUCCESS_TEST,

@@ -1,5 +1,5 @@
 /**
- * Spark Landscapes™ — today's weather, not today's identity.
+ * Spark Landscapes — today's weather, not today's identity.
  * Spark recognizes temporary conditions; never labels people.
  */
 

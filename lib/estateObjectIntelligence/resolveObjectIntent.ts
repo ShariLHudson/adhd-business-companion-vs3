@@ -1,5 +1,5 @@
 /**
- * Estate Object Intelligence™ — resolve member questions about objects they see.
+ * Estate Object Intelligence — resolve member questions about objects they see.
  *
  * Connects: estate-objects.json · object-locations.json · object-aliases.json
  */

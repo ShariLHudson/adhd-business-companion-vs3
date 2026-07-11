@@ -1,4 +1,4 @@
-/** Journal Gazebo™ — customization & session types. */
+/** Journal Gazebo — customization & session types. */
 
 export type JournalPaperStyle =
   | "cream"

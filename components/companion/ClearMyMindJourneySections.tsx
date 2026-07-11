@@ -43,7 +43,7 @@ export function ClearMyMindJourneySections({
           <button
             type="button"
             onClick={onContinueToUnderstanding}
-            className="rounded-2xl border border-[#c5ddd8] bg-[#f0f8f8] px-5 py-3 text-base font-semibold text-[#1e4f4f] transition-colors hover:bg-[#e6f4f4] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35"
+            className="clear-my-mind-capture-choice__suggestion clear-my-mind-capture-choice__suggestion--lead"
             data-testid="cmind-ack-continue"
           >
             {CLEAR_MY_MIND_ACK_CONTINUE_LABEL}

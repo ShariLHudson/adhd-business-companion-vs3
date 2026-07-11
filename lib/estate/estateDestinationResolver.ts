@@ -1,5 +1,5 @@
 /**
- * Ambiguous Estate Destination Resolution™
+ * Ambiguous Estate Destination Resolution
  *
  * When a broad place name maps to several valid destinations, offer numbered
  * choices — never guess blindly or surface unknown-place errors.
@@ -323,7 +323,7 @@ function normalizePhrase(phrase: string): string {
   return normalizeSpokenPlaceText(phrase)
     .trim()
     .toLowerCase()
-    .replace(/[™®.!?]+$/g, "")
+    .replace(/[®.!?]+$/g, "")
     .replace(/\s+/g, " ");
 }
 
@@ -403,7 +403,7 @@ function displayNameForDestination(destinationId: string): string {
   if (option) return option.displayName;
   return (
     getCanonicalEstatePlaceById(resolvePlaceId(destinationId))?.officialName.replace(
-      /™/g,
+      //g,
       "",
     ) ?? destinationId
   );

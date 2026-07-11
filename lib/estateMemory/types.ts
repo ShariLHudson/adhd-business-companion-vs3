@@ -1,5 +1,5 @@
 /**
- * Estate Memory Continuity Layer™ — shared memory schema across all Estate rooms.
+ * Estate Memory Continuity Layer — shared memory schema across all Estate rooms.
  *
  * One continuous intelligence moving through different environments.
  *
@@ -110,7 +110,7 @@ export type EstateMemory = {
   conversationDigest: EstateConversationDigestTurn[];
   /** Visit patterns — favorites, frequency, unfinished activity */
   roomVisitMemory?: EstateRoomVisitMemory;
-  /** Estate Journey Engine™ — continuous journey state */
+  /** Estate Journey Engine — continuous journey state */
   journeyEngine?: EstateJourneyEngineState;
 };
 

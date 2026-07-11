@@ -1,5 +1,5 @@
 /**
- * Hidden Intent™ — Spec 121 / CT-11.
+ * Hidden Intent — Spec 121 / CT-11.
  * Invisible to members. Coaches Spark toward mentor behavior, not task-bot.
  *
  * @see docs/conversation-tests/ct-11.md

@@ -1,4 +1,4 @@
-/** Founder Intelligence Operating System™ — shared domain types */
+/** Founder Intelligence Operating System — shared domain types */
 
 export type FounderLabelTone =
   | "critical"

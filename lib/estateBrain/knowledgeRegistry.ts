@@ -1,5 +1,5 @@
 /**
- * Estate Brain™ — authoritative knowledge registry (internal, not member UI).
+ * Estate Brain — authoritative knowledge registry (internal, not member UI).
  *
  * Every experience and navigable space appears exactly once.
  * @see docs/estate/ESTATE_REGISTRY.md

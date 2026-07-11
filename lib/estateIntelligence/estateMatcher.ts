@@ -1,5 +1,5 @@
 /**
- * Estate Matcher™ — score user messages against the capability index.
+ * Estate Matcher — score user messages against the capability index.
  */
 
 import type { IntentCategory } from "@/lib/intentRoutingIntelligence";
@@ -31,13 +31,13 @@ const PRODUCT_RULES: {
     pattern: /\bwhat(?:'s| is) (?:a )?peaceful place\b/i,
     entryId: "peaceful-places",
     score: 30,
-    reason: 'definitional question about Peaceful Places™ — estate invitation, not dictionary',
+    reason: 'definitional question about Peaceful Places — estate invitation, not dictionary',
   },
   {
     pattern: /\bpeaceful places?\b/i,
     entryId: "peaceful-places",
     score: 12,
-    reason: "mentions Peaceful Places™",
+    reason: "mentions Peaceful Places",
   },
   {
     pattern: /\b(?:i'?m|i am|feeling|so) overwhelmed\b/i,
@@ -55,37 +55,37 @@ const PRODUCT_RULES: {
     pattern: /\bclear (?:my )?(?:thoughts|mind|head)\b/i,
     entryId: "clear-my-mind",
     score: 22,
-    reason: "clear thoughts → Clear My Mind™",
+    reason: "clear thoughts → Clear My Mind",
   },
   {
     pattern: /\bbrain dump\b/i,
     entryId: "clear-my-mind",
     score: 18,
-    reason: "brain dump → Clear My Mind™",
+    reason: "brain dump → Clear My Mind",
   },
   {
     pattern: /\b(?:can'?t|cannot) decide\b/i,
     entryId: "decision-compass",
     score: 22,
-    reason: "indecision → Decision Compass™",
+    reason: "indecision → Decision Compass",
   },
   {
     pattern: /\b(?:research|explore).*\b(?:ai|artificial intelligence)\b/i,
     entryId: "observatory",
     score: 20,
-    reason: "research AI → Observatory™",
+    reason: "research AI → Observatory",
   },
   {
     pattern: /\b(?:want|need) to research\b/i,
     entryId: "observatory",
     score: 14,
-    reason: "research intent → Observatory™",
+    reason: "research intent → Observatory",
   },
   {
     pattern: /\bpeaceful music\b/i,
     entryId: "peaceful-places",
     score: 20,
-    reason: "peaceful music → Peaceful Places™",
+    reason: "peaceful music → Peaceful Places",
   },
   {
     pattern: /\b(?:help )?(?:creating|create) (?:a )?workshop\b/i,
@@ -115,62 +115,62 @@ const PRODUCT_RULES: {
     pattern: /\blearn(?:ing)? (?:about )?pricing\b/i,
     entryId: "momentum-institute",
     score: 20,
-    reason: "learn pricing → Momentum Institute™",
+    reason: "learn pricing → Momentum Institute",
   },
   {
     pattern: /\borganize (?:my )?thoughts\b/i,
     entryId: "clear-my-mind",
     score: 20,
-    reason: "organize thoughts → Clear My Mind™",
+    reason: "organize thoughts → Clear My Mind",
   },
   {
     pattern:
       /\boverwhelm(?:ed|ing)?\b.*\b(?:don'?t|do not) know\b.*\b(?:start|where)\b/i,
     entryId: "momentum-builder",
     score: 28,
-    reason: "overwhelmed + stuck at start → Momentum Builder™",
+    reason: "overwhelmed + stuck at start → Momentum Builder",
   },
   {
     pattern: /\b(?:don'?t|do not) know where to start\b/i,
     entryId: "momentum-builder",
     score: 20,
-    reason: "don't know where to start → Momentum Builder™",
+    reason: "don't know where to start → Momentum Builder",
   },
   {
     pattern: /\bcan'?t decide what to do first\b/i,
     entryId: "momentum-builder",
     score: 22,
-    reason: "first step paralysis → Momentum Builder™",
+    reason: "first step paralysis → Momentum Builder",
   },
   {
     pattern: /\b(?:need to|want to|help me) focus\b/i,
     entryId: "momentum-builder",
     score: 20,
-    reason: "focus intent → Momentum Builder™",
+    reason: "focus intent → Momentum Builder",
   },
   {
     pattern: /\b(?:need|want).*\b(?:calm|peace|quiet)\b/i,
     entryId: "peaceful-places",
     score: 18,
-    reason: "calm need → Peaceful Places™",
+    reason: "calm need → Peaceful Places",
   },
   {
     pattern: /\bresearch ai tools?\b/i,
     entryId: "observatory",
     score: 22,
-    reason: "research AI tools → Observatory™",
+    reason: "research AI tools → Observatory",
   },
   {
     pattern: /\b(?:want|need) to relax\b/i,
     entryId: "peaceful-places",
     score: 22,
-    reason: "relax intent → Peaceful Places™",
+    reason: "relax intent → Peaceful Places",
   },
   {
     pattern: /\b(?:want|need) (?:some )?peace\b/i,
     entryId: "peaceful-places",
     score: 20,
-    reason: "peace need → Peaceful Places™",
+    reason: "peace need → Peaceful Places",
   },
   {
     pattern: /\b(?:want|need) to (?:create|make) something\b/i,
@@ -182,13 +182,13 @@ const PRODUCT_RULES: {
     pattern: /\b(?:want|need) to reflect\b/i,
     entryId: "growth-journal",
     score: 20,
-    reason: "reflect intent → Growth Journal™",
+    reason: "reflect intent → Growth Journal",
   },
   {
     pattern: /\b(?:want|need) to relax\b/i,
     entryId: "peaceful-places",
     score: 22,
-    reason: "relax intent → Peaceful Places™",
+    reason: "relax intent → Peaceful Places",
   },
   {
     pattern: /\b(?:want|need) to (?:create|make) something\b/i,
@@ -200,43 +200,43 @@ const PRODUCT_RULES: {
     pattern: /\b(?:want|need) to reflect\b/i,
     entryId: "growth-journal",
     score: 20,
-    reason: "reflect intent → Growth Journal™",
+    reason: "reflect intent → Growth Journal",
   },
   {
     pattern: /\bteach me about\b/i,
     entryId: "momentum-institute",
     score: 16,
-    reason: "teach me → Momentum Institute™",
+    reason: "teach me → Momentum Institute",
   },
   {
     pattern: /\b(?:imposter|impostor) syndrome\b/i,
     entryId: "momentum-institute",
     score: 22,
-    reason: "imposter syndrome → Momentum Institute™ drawer",
+    reason: "imposter syndrome → Momentum Institute drawer",
   },
   {
     pattern: /\b(?:lack of |low )?confidence\b/i,
     entryId: "momentum-institute",
     score: 20,
-    reason: "confidence → Momentum Institute™ drawer",
+    reason: "confidence → Momentum Institute drawer",
   },
   {
     pattern: /\bnetwork(?:ing)?\b/i,
     entryId: "momentum-institute",
     score: 18,
-    reason: "networking → Momentum Institute™ drawer",
+    reason: "networking → Momentum Institute drawer",
   },
   {
     pattern: /\bcustomer psychology\b/i,
     entryId: "momentum-institute",
     score: 22,
-    reason: "customer psychology → Momentum Institute™ drawer",
+    reason: "customer psychology → Momentum Institute drawer",
   },
   {
     pattern: /\bresearch ai\b/i,
     entryId: "observatory",
     score: 22,
-    reason: "research AI → Observatory™",
+    reason: "research AI → Observatory",
   },
 ];
 

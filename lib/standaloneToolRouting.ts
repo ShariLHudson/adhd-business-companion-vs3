@@ -53,7 +53,7 @@ export function detectAssistantToolLaunch(text: string): StandaloneToolLaunch | 
   if (!t) return null;
   if (!/\bopening\b/i.test(t)) return null;
 
-  if (/\b(?:breathe(?:\s+and\s+reset)?|breathing|breath)\b/i.test(t)) {
+  if (/\b(?:breathe(?:\s+and\s+reset)?|breathe|breathing|breath)\b/i.test(t)) {
     return { tool: "breathe" };
   }
   if (/\b(?:focus audio|calm(?:ing)?|motivation|relaxing|background (?:music|sounds?))\b/i.test(t)) {
@@ -75,7 +75,7 @@ export function standaloneToolAck(
 ): string {
   switch (tool) {
     case "breathe":
-      return "Opening **Breathe & Reset** — follow along on screen. Chat will be right here when you're done.";
+      return "Opening **Breathe** — follow along on screen. Your place stays right here.";
     case "focus-audio":
       return focusAudioCategory
         ? focusAudioOpenAck(focusAudioCategory)

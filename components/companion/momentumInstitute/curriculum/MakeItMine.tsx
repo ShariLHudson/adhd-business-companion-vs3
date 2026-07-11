@@ -14,7 +14,7 @@ export function MakeItMine({ prompts, onMakeItMine }: Props) {
       aria-label="Make It Mine"
       data-testid="make-it-mine"
     >
-      <h3 className="institute-knowledge-panel__section-title">Make It Mine™</h3>
+      <h3 className="institute-knowledge-panel__section-title">Make It Mine</h3>
       {prompts.length > 0 ? (
         <ul className="institute-knowledge-panel__list">
           {prompts.map((prompt) => (

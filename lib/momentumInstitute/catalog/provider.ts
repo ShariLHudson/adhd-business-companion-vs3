@@ -1,5 +1,5 @@
 /**
- * Momentum Institute™ catalog — data provider interface.
+ * Momentum Institute catalog — data provider interface.
  * Catalog content loads from CMS, JSON, or API — never hard-coded in engine logic.
  */
 
@@ -17,7 +17,7 @@ export const EMPTY_INSTITUTE_CATALOG: MomentumInstituteCatalog = {
   institute: {
     id: "momentum-institute",
     slug: "momentum-institute",
-    title: "Momentum Institute™",
+    title: "Momentum Institute",
     subtitle: "Entrepreneur Development Center",
     tagline:
       "Spark teaches timeless business principles. Shari helps you apply them.",

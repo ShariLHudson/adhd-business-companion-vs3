@@ -1,5 +1,5 @@
 /**
- * Momentum Institute Engine™ — runtime member state types.
+ * Momentum Institute Engine — runtime member state types.
  * Instances reference catalog definitions by id — never embed lesson content.
  */
 
@@ -25,7 +25,7 @@ export type MemberLearningExperience = IntelligenceReadyHooks & {
   startedAt: string;
   updatedAt: string;
   completedAt?: string;
-  /** Make It Mine™ outcome reference — coaching conversation id */
+  /** Make It Mine outcome reference — coaching conversation id */
   makeItMineConversationId?: string;
   /** Cabinet reference if filed */
   cabinetReferenceId?: string;
@@ -36,7 +36,7 @@ export type MemberLearningExperience = IntelligenceReadyHooks & {
   status: "in_progress" | "completed" | "returned" | "archived";
 };
 
-/** Make It Mine™ coaching session — Shari helps adapt lesson to member business */
+/** Make It Mine coaching session — Shari helps adapt lesson to member business */
 export type MakeItMineSession = IntelligenceReadyHooks & {
   kind: "institute-make-it-mine";
   id: string;
@@ -50,7 +50,7 @@ export type MakeItMineSession = IntelligenceReadyHooks & {
   status: "active" | "completed" | "abandoned";
 };
 
-/** My Institute Cabinet™ — reference only, never duplicates content */
+/** My Institute Cabinet — reference only, never duplicates content */
 export type InstituteCabinetItem = IntelligenceReadyHooks & {
   kind: "institute-cabinet-item";
   id: string;
@@ -109,7 +109,7 @@ export type MemberLearningTimelineEntry = {
   label: string;
 };
 
-/** Growth Profile™ — automatic, member does not organize manually */
+/** Growth Profile — automatic, member does not organize manually */
 export type MemberGrowthProfile = IntelligenceReadyHooks & {
   kind: "institute-growth-profile";
   id: string;

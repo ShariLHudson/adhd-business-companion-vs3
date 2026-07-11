@@ -1,5 +1,5 @@
 /**
- * Momentum Builder™ — quiet celebration hooks (V1 architecture).
+ * Momentum Builder — quiet celebration hooks (V1 architecture).
  */
 
 import type { MomentumBuilderCelebrationKind } from "./estateIntegration";

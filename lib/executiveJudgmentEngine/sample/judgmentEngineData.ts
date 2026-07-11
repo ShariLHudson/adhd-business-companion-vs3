@@ -16,7 +16,7 @@ export const TODAYS_JUDGMENT_QUESTION =
 
 const DEFAULT_PREP: JudgmentPrepOffer[] = [
   { id: "ej-prep-mission", kind: "mission", label: "Mission update", description: "Align judgment to active mission.", status: "draft" },
-  { id: "ej-prep-builder", kind: "executive-builder", label: "Executive Builder™", description: "Blueprint from judgment.", status: "draft" },
+  { id: "ej-prep-builder", kind: "executive-builder", label: "Executive Builder", description: "Blueprint from judgment.", status: "draft" },
   { id: "ej-prep-sim", kind: "simulation", label: "Simulation", description: "Compare paths before committing.", status: "draft" },
   { id: "ej-prep-brief", kind: "executive-brief", label: "Executive brief", description: "One-page decision support.", status: "draft" },
   { id: "ej-prep-postcraft", kind: "postcraft-campaign", label: "PostCraft campaign", description: "Content from recommendation.", status: "draft" },

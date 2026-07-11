@@ -8,7 +8,7 @@ import { WorkspaceCompanion } from "./WorkspaceCompanion";
 import { WorkspaceResources } from "./WorkspaceResources";
 
 /**
- * Functional Equivalence Rule™
+ * Functional Equivalence Rule
  *
  * Every Business Experience must provide the same core workspace capability
  * regardless of environment.
@@ -19,7 +19,7 @@ import { WorkspaceResources } from "./WorkspaceResources";
  */
 
 /**
- * Cognitive Consistency Rule™
+ * Cognitive Consistency Rule
  *
  * Members should never have to relearn how to work because they chose a
  * different environment.
@@ -94,7 +94,7 @@ export function SparkWorkspacePrototypePage() {
   return (
     <div className={`sw-root sw-root--${effectiveMode}${focusMode ? " sw-root--focus" : ""}`}>
       <p className="sw-dev-link">
-        Spark Workspace™ prototype ·{" "}
+        Spark Workspace prototype ·{" "}
         <a href="/companion">Back to companion</a>
         {" · "}
         <a href="/prototype/spark-studio">Spark Studio prototype</a>

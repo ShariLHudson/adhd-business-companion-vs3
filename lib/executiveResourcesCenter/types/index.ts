@@ -1,4 +1,4 @@
-/** Executive Resources Center™ — single authoritative location for external resources. */
+/** Executive Resources Center — single authoritative location for external resources. */
 
 import type { ResourceDepartment } from "./resources";
 import type { ExecutiveSearchArchitectureView } from "./executiveSearch";
@@ -25,7 +25,7 @@ export type ExecutiveResourceAdmissionQuestion = {
 };
 
 export const EXECUTIVE_RESOURCES_CENTER_HEADLINE =
-  "Executive Resources Center™";
+  "Executive Resources Center";
 
 export const EXECUTIVE_RESOURCES_CENTER_SUMMARY =
   "The single authoritative location for external systems, AI tools, calendars, documents, dashboards, and executive links. Do not scatter important resources throughout Founder.";

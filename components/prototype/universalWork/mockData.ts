@@ -30,7 +30,7 @@ export const STILLNESS_LINE =
   "Beautiful. The room is still here whenever you return.";
 
 export const RESOURCES = {
-  businessBrain: ["Visual Spark Studios™", "ADHD Business Ecosystem™"],
+  businessBrain: ["Visual Spark Studios", "ADHD Business Ecosystem"],
   brandVoice: "Warm, clear, encouraging",
   clientAvatar: "Overwhelmed ADHD entrepreneur seeking momentum",
   assets: ["Workshop Launch", "Founder Invitation"],

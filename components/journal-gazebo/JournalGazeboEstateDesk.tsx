@@ -1,5 +1,6 @@
 "use client";
 
+import type { JournalGazeboConfig } from "@/lib/journalGazebo/types";
 import { JournalGazeboWelcomeDesk } from "./JournalGazeboWelcomeDesk";
 
 export type EstateDeskMoment =
@@ -15,9 +16,9 @@ type Props = {
   moment: EstateDeskMoment;
   showWelcome: boolean;
   sceneComposed?: boolean;
+  journals: JournalGazeboConfig[];
   onCreateJournal: () => void;
-  onOpenToday: () => void;
-  hasSavedJournals?: boolean;
+  onOpenJournal: (journal: JournalGazeboConfig) => void;
 };
 
 /** Gazebo welcome — letter in the plate; desk journal + plate button hits. */
@@ -25,9 +26,9 @@ export function JournalGazeboEstateDesk({
   moment,
   showWelcome,
   sceneComposed = false,
+  journals,
   onCreateJournal,
-  onOpenToday,
-  hasSavedJournals = false,
+  onOpenJournal,
 }: Props) {
   const welcomeVisible =
     showWelcome &&
@@ -52,9 +53,9 @@ export function JournalGazeboEstateDesk({
       {welcomeVisible ? (
         <JournalGazeboWelcomeDesk
           sceneComposed={sceneComposed}
+          journals={journals}
           onCreateJournal={onCreateJournal}
-          onOpenToday={onOpenToday}
-          hasSavedJournals={hasSavedJournals}
+          onOpenJournal={onOpenJournal}
         />
       ) : null}
     </div>

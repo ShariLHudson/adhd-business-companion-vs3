@@ -1,5 +1,5 @@
 /**
- * Spark Competency Framework™ v1.0 — canonical pillar, department, and drawer scaffold.
+ * Spark Competency Framework v1.0 — canonical pillar, department, and drawer scaffold.
  * Data-driven structure only — no lesson content.
  */
 

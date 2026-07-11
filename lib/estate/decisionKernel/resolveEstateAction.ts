@@ -1,5 +1,5 @@
 /**
- * resolveEstateAction™ — the ONLY decision point for member input routing.
+ * resolveEstateAction — the ONLY decision point for member input routing.
  *
  * Priority (strict): NAVIGATE → CAPTURE → AUDIO → MENU → CHAT
  * Pure logic — no LLM, no async, no side effects.
@@ -9,6 +9,15 @@ import { detectAudioRequest } from "@/lib/audioSuggestions";
 import { classifyCaptureIntent } from "@/lib/capture/classifyCaptureIntent";
 import type { CaptureType } from "@/lib/capture/types";
 import { isReflectionRequest } from "@/lib/memory/reflection/createReflectionReport";
+import {
+  canClaimAlreadyHere,
+  getLiveShellPlaceId,
+  getVisualRoom,
+  isNonPlaceShellSection,
+  resolvePlaceFromShell,
+  setRequestedRoom,
+  syncEstateRoomAwareness,
+} from "@/lib/estate/roomAwareness";
 import { evaluateEstatePlaceTurn } from "../estatePlaceNavigation";
 import { evaluateEstateRoomAction } from "../roomContext/evaluateEstateRoomAction";
 import { estateRoomsEquivalent } from "../roomContext/roomIds";
@@ -76,7 +85,35 @@ export function resolveEstateAction(
     return { action: "CHAT", userText: "" };
   }
 
-  const currentPlaceId = context.currentPlaceId ?? null;
+  // Sync live shell first. Section map / non-place tools beat stale memory.
+  // Exception: direct visits keep section=home while placeId is the visited room —
+  // do not wipe those to welcome-home.
+  const section = context.activeSection?.trim() ?? null;
+  const callerPlace = context.currentPlaceId?.trim() || null;
+  if (section) {
+    const shellPlace = resolvePlaceFromShell({ section });
+    const directVisitOnHome =
+      section === "home" &&
+      callerPlace &&
+      !estateRoomsEquivalent(callerPlace, "welcome-home");
+    if (directVisitOnHome) {
+      syncEstateRoomAwareness({ placeId: callerPlace, section });
+    } else if (shellPlace) {
+      syncEstateRoomAwareness({ placeId: shellPlace, section });
+    } else if (isNonPlaceShellSection(section)) {
+      syncEstateRoomAwareness({ section, clearVisual: true });
+    } else {
+      syncEstateRoomAwareness({ placeId: callerPlace, section });
+    }
+  } else if (callerPlace) {
+    syncEstateRoomAwareness({ placeId: callerPlace });
+  }
+
+  // Live shell wins over stale visual; then caller-provided place; then visual.
+  const liveShell = getLiveShellPlaceId();
+  const visualRoom = getVisualRoom();
+  const currentPlaceId =
+    liveShell ?? context.currentPlaceId ?? visualRoom ?? null;
 
   const inRoomAction = evaluateEstateRoomAction({
     userText,
@@ -110,10 +147,14 @@ export function resolveEstateAction(
   if (placeTurn.type === "navigate") {
     const destId =
       placeTurn.command.roomId ?? placeTurn.command.entryId ?? null;
+    if (destId) {
+      setRequestedRoom(destId);
+    }
     if (
       destId &&
       currentPlaceId &&
-      estateRoomsEquivalent(destId, currentPlaceId)
+      estateRoomsEquivalent(destId, currentPlaceId) &&
+      canClaimAlreadyHere(destId)
     ) {
       const sameRoomAction = evaluateEstateRoomAction({
         userText,
@@ -128,11 +169,31 @@ export function resolveEstateAction(
           immediateReply: sameRoomAction.reply,
         };
       }
+      // Experience rooms (Clear My Mind) must still open — never chat-only already-here.
+      if (estateRoomsEquivalent(destId, "clear-my-mind")) {
+        return {
+          action: "NAVIGATE",
+          userText,
+          target: { kind: "place", command: placeTurn.command },
+          navigationLine: placeTurn.navigationLine,
+          impliedPlaceMatch: placeTurn.impliedPlaceMatch,
+        };
+      }
       return {
         action: "CHAT",
         userText,
         immediateReply: formatAlreadyHereReply(currentPlaceId),
       };
+    }
+
+    // Same id in memory but visual unconfirmed → navigate (do not claim already here)
+    if (
+      destId &&
+      currentPlaceId &&
+      estateRoomsEquivalent(destId, currentPlaceId) &&
+      !canClaimAlreadyHere(destId)
+    ) {
+      // Keep navigating so visual_room can catch up via goToPlace
     }
 
     return {

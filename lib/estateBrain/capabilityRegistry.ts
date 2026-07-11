@@ -1,5 +1,5 @@
 /**
- * Estate Capability Registry™ — every capability Spark can fulfill.
+ * Estate Capability Registry — every capability Spark can fulfill.
  * Single source of truth for routing, menus, and conversation hints.
  */
 

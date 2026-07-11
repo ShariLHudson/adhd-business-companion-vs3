@@ -6,7 +6,6 @@ export const FOCUS_TOOL_TO_SPACE: Record<string, FocusLandscapeSpaceId> = {
   "next-small-step": "garden-path",
   "prioritize-options": "garden-path",
   "break-smaller": "garden-path",
-  "breathe-reset": "meadow-lake",
   "mind-slow-breathe": "meadow-lake",
   "stretch-break": "meadow-stretch",
   "calm-moment": "meadow-stretch",
@@ -24,8 +23,8 @@ export const FOCUS_TOOL_TO_SPACE: Record<string, FocusLandscapeSpaceId> = {
   "overwhelm-prioritize": "garden-path",
   "overwhelm-break-down": "garden-path",
   "overwhelm-clear": "deep-forest",
-  "overwhelm-breathe": "meadow-lake",
   "chat-guide": "garden-path",
+  "quick-recharge": "meadow-lake",
 };
 
 export const FOCUS_FEELING_TO_SPACE: Record<FocusFeelingId, FocusLandscapeSpaceId> =

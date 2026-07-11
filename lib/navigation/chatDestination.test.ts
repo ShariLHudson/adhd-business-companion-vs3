@@ -18,4 +18,11 @@ describe("chatDestination", () => {
       activeNav: "chat",
     });
   });
+
+  it("Back to Chat never reuses Welcome Home or room-restore fallbacks", () => {
+    expect(CHAT_NAVIGATION_INTENT.preferEverydayConversation).toBe(true);
+    expect(CHAT_NAVIGATION_INTENT.suppressWelcomeHomePlaceSync).toBe(true);
+    expect(CHAT_NAVIGATION_INTENT.skipSectionRestore).toBe(true);
+    expect(CHAT_NAVIGATION_INTENT.preserveClearMyMindSession).toBe(true);
+  });
 });

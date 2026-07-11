@@ -7,7 +7,7 @@ import {
   getExecutiveGraphBootstrap,
 } from "./index";
 
-describe("Executive Intelligence Graph™ engine", () => {
+describe("Executive Intelligence Graph engine", () => {
   it("exposes graph principle", () => {
     expect(EXECUTIVE_GRAPH_PRINCIPLE).toContain("relationships");
   });

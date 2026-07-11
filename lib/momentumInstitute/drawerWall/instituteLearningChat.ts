@@ -1,5 +1,5 @@
 /**
- * Discuss with Shari™ — Knowledge Card context for companion chat (in-room).
+ * Discuss with Shari — Knowledge Card context for companion chat (in-room).
  */
 
 import type {
@@ -16,7 +16,7 @@ export function instituteLearningChatHint(
 ): string {
   const lines = [
     "MOMENTUM INSTITUTE LEARNING CONTEXT (mandatory):",
-    `Member is in the Momentum Institute™ — drawer **${drawer.title}**, Knowledge Card **${card.title}**.`,
+    `Member is in the Momentum Institute — drawer **${drawer.title}**, Knowledge Card **${card.title}**.`,
     `Card summary: ${card.summary}`,
     "Do NOT leave the Institute or reset the conversation.",
     "One thoughtful response — coach, do not lecture.",
@@ -40,7 +40,7 @@ export function instituteLearningChatHint(
       break;
     case "make_it_mine":
       lines.push(
-        "Make It Mine™ — ask permission before generating anything.",
+        "Make It Mine — ask permission before generating anything.",
         'Start with: "Would you like to make this work for your business?"',
         "Facilitate thinking one question at a time. No automatic content generation.",
       );

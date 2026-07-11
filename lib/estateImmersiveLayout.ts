@@ -1,5 +1,5 @@
 /**
- * Estate Immersive Layout™ — full-viewport rooms with no app chrome.
+ * Estate Immersive Layout — full-viewport rooms with no app chrome.
  * One navigable world: edge-to-edge imagery, no sidebar, no top bar, no brown framing.
  */
 
@@ -23,6 +23,7 @@ export const STANDALONE_ESTATE_ROOM_SECTIONS: readonly AppSection[] = [
   "breathe",
   "focus",
   "visual-focus",
+  "chamber-of-momentum",
   "momentum-builder",
   "momentum-institute",
   "stables",
@@ -61,6 +62,16 @@ export function isEstateImmersiveRoom(
   if (ctx.welcomeHomePrimary) return false;
   if (ctx.activeSection === "home") return false;
   return true;
+}
+
+/**
+ * Standalone estate rooms render from `activeSection`, not the home chat shell.
+ * Keep the current section while chatting inside those rooms.
+ */
+export function shouldPreserveEstateRoomSectionDuringChat(
+  section: AppSection | null | undefined,
+): boolean {
+  return isStandaloneEstateRoomSection(section);
 }
 
 /** Upper-left Home control — every navigable estate room and overlay. */

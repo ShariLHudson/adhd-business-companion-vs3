@@ -1,5 +1,5 @@
 /**
- * Estate Coaching Registry™ — human prescriptions → internal experiences.
+ * Estate Coaching Registry — human prescriptions → internal experiences.
  */
 
 import type {

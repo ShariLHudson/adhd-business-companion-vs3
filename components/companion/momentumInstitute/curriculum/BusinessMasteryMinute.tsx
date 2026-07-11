@@ -23,7 +23,7 @@ export function BusinessMasteryMinute({
       data-testid="business-mastery-minute"
     >
       <h3 className="institute-knowledge-panel__section-title">
-        Business Mastery Minute™
+        Business Mastery Minute
       </h3>
       <p className="institute-curriculum-bmm__meta">
         {title} · about {estimatedMinutes} min

@@ -1,4 +1,4 @@
-/** Executive Intelligence Graph™ — Founder Studio visual brain. */
+/** Executive Intelligence Graph — Founder Studio visual brain. */
 
 import type { GraphNode, GraphQueryResult, GraphRelationship } from "@/lib/intelligenceGraph/types";
 

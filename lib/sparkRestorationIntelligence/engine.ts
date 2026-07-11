@@ -1,5 +1,5 @@
 /**
- * Spark Restoration Intelligence™ — what would give this person more energy?
+ * Spark Restoration Intelligence — what would give this person more energy?
  */
 
 import { buildStoryPick } from "@/lib/estateRestoration/storySnippets";

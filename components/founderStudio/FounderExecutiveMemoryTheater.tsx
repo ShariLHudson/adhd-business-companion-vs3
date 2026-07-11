@@ -34,7 +34,7 @@ export function FounderExecutiveMemoryTheater() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Memory Theater™"
+        eyebrow="Executive Memory Theater"
         title="The Living History of Visual Spark Studios"
         question="What happened — and what did we learn?"
         purpose="Organizational memory transformed into executive wisdom. Replay decisions, launches, and journeys — not archives."

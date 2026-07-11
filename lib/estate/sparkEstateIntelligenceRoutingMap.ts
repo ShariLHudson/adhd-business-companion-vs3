@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — intelligence routing map (Phase 14).
+ * Spark Estate — intelligence routing map (Phase 14).
  * One companion, many specialized intelligences — right support at the right moment.
  *
  * @see docs/protocols/SPARK_ESTATE_INTELLIGENCE_ROUTING_MAP_SPECIFICATION_PHASE14.md
@@ -130,12 +130,12 @@ const PRIMARY_ROUTES: Record<
     purpose: "Sort thoughts, then choose idea, decision, project, or next action.",
   },
   "move-forward": {
-    intelligence: "Momentum Builder™",
+    intelligence: "Momentum Builder",
     defaultSection: "momentum-builder",
-    purpose: "Chamber of Momentum™ support to find the next step.",
+    purpose: "Chamber of Momentum support to find the next step.",
   },
   learn: {
-    intelligence: "Momentum Institute™",
+    intelligence: "Momentum Institute",
     defaultSection: "momentum-institute",
     purpose: "Knowledge and skill development.",
   },
@@ -145,7 +145,7 @@ const PRIMARY_ROUTES: Record<
     purpose: "Expert room + shared creation journey.",
   },
   execute: {
-    intelligence: "Goals & Projects™",
+    intelligence: "Goals & Projects",
     defaultSection: "chamber-project-entry",
     purpose: "Tasks, milestones, and project progress.",
   },
@@ -393,7 +393,7 @@ export function formatSparkEstateIntelligenceRoutingReport(
   verification: ReturnType<typeof verifySparkEstateIntelligenceRouting> = verifySparkEstateIntelligenceRouting(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ intelligence routing: ${verification.routesResolve ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate intelligence routing: ${verification.routesResolve ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_ROUTING_PRINCIPLE,
     SPARK_ESTATE_ROUTING_SUCCESS_TEST,
     "",

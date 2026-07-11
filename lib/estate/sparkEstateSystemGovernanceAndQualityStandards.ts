@@ -1,5 +1,5 @@
 /**
- * Spark Estate™ — system governance and quality standards (Phase 21).
+ * Spark Estate — system governance and quality standards (Phase 21).
  * Rules that keep the ecosystem organized, consistent, and scalable as it grows.
  *
  * @see docs/protocols/SPARK_ESTATE_SYSTEM_GOVERNANCE_AND_QUALITY_STANDARDS_SPECIFICATION_PHASE21.md
@@ -19,7 +19,7 @@ import { verifySparkEstateRoomBlueprintTemplate } from "./sparkEstateRoomBluepri
 import { verifySparkEstateRoomIntelligenceArchitecture } from "./sparkEstateRoomIntelligenceArchitecture";
 
 export const SPARK_ESTATE_GOVERNANCE_PRINCIPLE =
-  "Spark Estate™ is one ecosystem — every part supports one companion, one journey, one creation process, one memory system, and one consistent experience.";
+  "Spark Estate is one ecosystem — every part supports one companion, one journey, one creation process, one memory system, and one consistent experience.";
 
 export const SPARK_ESTATE_GOVERNANCE_VISION =
   "One trusted companion. Many helpful capabilities. Growth creates more value, not more confusion.";
@@ -125,17 +125,17 @@ export const SPARK_ESTATE_DUPLICATE_INTELLIGENCE_MAP = [
   {
     capability: "planning",
     useExisting: "creation and project systems",
-    owner: "Universal Creation Journey + Goals & Projects™",
+    owner: "Universal Creation Journey + Goals & Projects",
   },
   {
     capability: "learning",
     useExisting: "knowledge architecture",
-    owner: "Knowledge and Asset Library + Momentum Institute™",
+    owner: "Knowledge and Asset Library + Momentum Institute",
   },
   {
     capability: "progress",
     useExisting: "Momentum systems",
-    owner: "Chamber of Momentum™ + Momentum Card™",
+    owner: "Chamber of Momentum + Momentum Card",
   },
   {
     capability: "conversation voice",
@@ -385,7 +385,7 @@ export function formatSparkEstateSystemGovernanceReport(
   compliance: ReturnType<typeof assessSparkEstateGovernanceCompliance> = assessSparkEstateGovernanceCompliance(),
 ): string {
   const lines: string[] = [
-    `Spark Estate™ governance: ${verification.governanceReady ? "ALIGNED" : "GAPS"}`,
+    `Spark Estate governance: ${verification.governanceReady ? "ALIGNED" : "GAPS"}`,
     SPARK_ESTATE_GOVERNANCE_PRINCIPLE,
     SPARK_ESTATE_GOVERNANCE_VISION,
     "",

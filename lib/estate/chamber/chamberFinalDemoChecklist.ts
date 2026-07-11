@@ -1,5 +1,5 @@
 /**
- * Chamber of Momentum™ — final demo checklist (Phase 9).
+ * Chamber of Momentum — final demo checklist (Phase 9).
  * Priority-ordered readiness checks before demonstration.
  *
  * @see docs/protocols/CHAMBER_OF_MOMENTUM_FINAL_DEMO_CHECKLIST_AND_PRIORITY_FIX_ORDER_PHASE9.md
@@ -100,11 +100,11 @@ function runMustFixChecks(): ChamberDemoCheckItem[] {
     check(
       "identity-labels",
       "must-fix",
-      "Chamber of Momentum™ has one clear member-facing name",
+      "Chamber of Momentum has one clear member-facing name",
       identityConsistent,
       identityConsistent
         ? undefined
-        : "Workspace titles must all read Chamber of Momentum™",
+        : "Workspace titles must all read Chamber of Momentum",
     ),
     check(
       "room-image-route",
@@ -130,7 +130,7 @@ function runMustFixChecks(): ChamberDemoCheckItem[] {
     check(
       "entry-welcome",
       "must-fix",
-      'Entry shows "Welcome to the Chamber of Momentum™"',
+      'Entry shows "Welcome to the Chamber of Momentum"',
       entryWelcomeOk,
       CHAMBER_WELCOME_TITLE,
     ),
@@ -264,7 +264,7 @@ export function formatChamberDemoChecklistReport(
   result: ChamberFinalDemoChecklistResult,
 ): string {
   const lines: string[] = [
-    `Chamber of Momentum™ demo readiness: ${result.readyForDemo ? "READY" : "NOT READY"}`,
+    `Chamber of Momentum demo readiness: ${result.readyForDemo ? "READY" : "NOT READY"}`,
     `Demo URL: ${result.demoHref}`,
     "",
     "Priority 1 — Must fix before demo:",

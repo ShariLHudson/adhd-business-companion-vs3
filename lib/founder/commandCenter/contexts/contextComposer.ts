@@ -21,7 +21,7 @@ export function composeExecutiveContexts(missionId: MissionId = DEFAULT_ACTIVE_M
     memory: getFounderInstitutionalMemoryBundle(missionId),
     graph: getFounderIntelligenceGraphBundle(missionId),
     predictive: null as null,
-    note: "Predictive Intelligence™ hook reserved — not duplicated here.",
+    note: "Predictive Intelligence hook reserved — not duplicated here.",
   };
 }
 

@@ -6,7 +6,10 @@
 |-------|-------|
 | **Registry ID** | `clear-my-mind` |
 | **Estate section** | `brain-dump` |
+| **Primary location** | Treehouse Reflection Desk™ |
+| **Background** | `treehouse-possibility-reflection-desk-background.png` |
 | **Status** | Live |
+| **Architecture** | [154 Clear My Mind Experience Architecture v2](./recognition/library/154_CLEAR_MY_MIND_EXPERIENCE_ARCHITECTURE.md) |
 
 **Ref:** `lib/clearMyMind/COMPANION_PRINCIPLES.md`
 

@@ -1,5 +1,5 @@
 /**
- * Estate Knowledge Base™ — experience group intent matching.
+ * Estate Knowledge Base — experience group intent matching.
  */
 
 import experienceGroupsJson from "@/docs/estate-knowledge-base/estate-experience-groups.json";
@@ -51,7 +51,7 @@ function hasSpecificLocationMention(query: string): boolean {
   const official = longestPhraseMatch(
     probe,
     getLiveEstateLocations(),
-    (loc) => loc.officialDisplayName.replace(/™/g, ""),
+    (loc) => loc.officialDisplayName.replace(/\u2122/g, ""),
     { probeText: probe },
   );
   return Boolean(official);

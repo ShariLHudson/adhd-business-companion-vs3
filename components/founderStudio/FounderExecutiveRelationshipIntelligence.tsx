@@ -40,7 +40,7 @@ export function FounderExecutiveRelationshipIntelligence() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Relationship Intelligence™"
+        eyebrow="Executive Relationship Intelligence"
         title="The Discovery Engine That Creates New Knowledge"
         question="What might we be missing?"
         purpose="Founder discovers hidden patterns and relationships — creating knowledge, not just finding information."

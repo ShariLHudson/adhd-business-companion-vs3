@@ -1,5 +1,5 @@
 /**
- * Spark Conversation Guardrails™ (Spec 106).
+ * Spark Conversation Guardrails (Spec 106).
  * Governs every conversation — overrides features, builders, and prompts on conflict.
  *
  * @see docs/SPARK_CONVERSATION_GUARDRAILS_FRAMEWORK.md
@@ -92,7 +92,7 @@ export const SPARK_CONVERSATION_PROGRESS_STAGES: readonly SparkConversationProgr
 /** Actions Spark may take automatically — Rule 13 */
 export const SPARK_CONVERSATION_AUTO_ALLOWED = [
   "Autosave",
-  "Organize Business Assets™",
+  "Organize Business Assets",
   "Link conversations",
   "Remember context",
 ] as const;
@@ -102,8 +102,8 @@ export const SPARK_CONVERSATION_PERMISSION_REQUIRED = [
   "Create draft",
   "Research",
   "Journal",
-  "Momentum Builder™",
-  "Gallery™",
+  "Momentum Builder",
+  "Gallery",
   "Environment change",
   "Export",
   "Publish",

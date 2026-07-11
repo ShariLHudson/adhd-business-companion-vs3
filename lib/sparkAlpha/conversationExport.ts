@@ -1,5 +1,5 @@
 /**
- * Spark Alpha™ — print, PDF, and Google export from conversation content.
+ * Spark Alpha — print, PDF, and Google export from conversation content.
  */
 
 export type ConversationLine = {

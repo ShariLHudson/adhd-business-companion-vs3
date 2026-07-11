@@ -27,7 +27,7 @@ describe("sparkCardVisualDesignAndDailyGeneration", () => {
   });
 
   it("defines companion design principle and daily generation rule", () => {
-    expect(SPARK_CARD_DESIGN_PRINCIPLE).toContain("companion experience");
+    expect(SPARK_CARD_DESIGN_PRINCIPLE).toContain("daily moment");
     expect(SPARK_CARD_DAILY_GENERATION_RULE).toContain("One Spark Card");
     expect(SPARK_CARD_PERSONAL_REFLECTION_TONES).toHaveLength(4);
     expect(SPARK_CARD_ACTIONS).toHaveLength(3);

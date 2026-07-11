@@ -1,11 +1,11 @@
 /**
- * Chamber of Momentum™ — member-facing umbrella identity (Phase 1).
+ * Chamber of Momentum — member-facing umbrella identity (Phase 1).
  * Internal areas (Institute, Builder, Goals & Projects) keep their placeIds.
  *
  * @see docs/protocols/CHAMBER_OF_MOMENTUM_IDENTITY_CONSOLIDATION_FIX_PHASE1.md
  */
 
-export const CHAMBER_OF_MOMENTUM_MEMBER_NAME = "Chamber of Momentum™";
+export const CHAMBER_OF_MOMENTUM_MEMBER_NAME = "Chamber of Momentum";
 
 /** Canonical doorway — chamber aliases and learning entry route here. */
 export const CHAMBER_OF_MOMENTUM_ENTRY_PLACE_ID = "momentum-institute";

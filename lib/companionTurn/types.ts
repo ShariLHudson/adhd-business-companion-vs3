@@ -20,6 +20,8 @@ export type ClassifyCompanionIntentInput = {
   userText: string;
   lastAssistantText?: string | null;
   currentPlaceId?: string | null;
+  /** Live AppSection — syncs room awareness before already-here decisions. */
+  activeSection?: string | null;
   soundscapeCategoryId?: string | null;
   /** Coaching / SOP / how-to — skip estate kernel, chat API only. */
   forceChat?: boolean;

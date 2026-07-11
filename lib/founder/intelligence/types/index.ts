@@ -1,4 +1,4 @@
-/** Founder Intelligence Pipeline™ — shared domain types */
+/** Founder Intelligence Pipeline — shared domain types */
 
 export type FounderIntelligenceSourceId = string;
 

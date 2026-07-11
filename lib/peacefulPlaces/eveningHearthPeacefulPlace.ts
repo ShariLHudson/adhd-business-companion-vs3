@@ -2,7 +2,7 @@ import type { PeacefulPlace } from "./types";
 
 export const EVENING_HEARTH_IMAGE_VERSION = "20260628a" as const;
 
-/** Canonical Evening Hearth™ session + directory thumbnail. */
+/** Canonical Evening Hearth session + directory thumbnail. */
 export const EVENING_HEARTH_IMAGE =
   `/backgrounds/peaceful-places/evening-hearth-peaceful-places.png?v=${EVENING_HEARTH_IMAGE_VERSION}` as const;
 

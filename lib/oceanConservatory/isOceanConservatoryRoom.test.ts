@@ -14,7 +14,7 @@ describe("Ocean Conservatory room detection", () => {
   it("recognizes the ocean conservatory background plate", () => {
     expect(
       isOceanConservatoryBackground(
-        "/backgrounds/the-ocean-conservatory-background.png",
+        "/backgrounds/aquarium-room-background.png",
       ),
     ).toBe(true);
     expect(isOceanConservatoryBackground("/backgrounds/sunroom-background.png")).toBe(

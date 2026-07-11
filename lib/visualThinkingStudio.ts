@@ -59,7 +59,16 @@ const VIEW_DEFS: VisualThinkingViewDef[] = [
     title: "Mind Map",
     category: "brainstorming",
     mode: "mind-map",
-    aliases: [/\bmind\s*maps?\b/i, /\bvisual\s*maps?\b/i, /\bdiagrams?\b/i],
+    aliases: [
+      /\bmind\s*maps?\b/i,
+      /\bmindmaps?\b/i,
+      /\bmind\s*mapping\b/i,
+      /\bidea\s*maps?\b/i,
+      /\bbrain\s*maps?\b/i,
+      /\btopic\s*maps?\b/i,
+      /\bvisual\s*maps?\b/i,
+      /\bdiagrams?\b/i,
+    ],
   },
   {
     id: "concept-map",
@@ -123,10 +132,14 @@ const VIEW_DEFS: VisualThinkingViewDef[] = [
     category: "systems",
     mode: "decision-tree",
     aliases: [
-      /\bprocess\s*flows?\b/i,
+      /\bprocess\s*(?:flows?|maps?)\b/i,
       /\bflowcharts?\b/i,
       /\bflow\s*charts?\b/i,
       /\bflow\s*maps?\b/i,
+      /\bworkflows?\b/i,
+      /\bsystem\s*maps?\b/i,
+      /\bbusiness\s+process(?:es)?\b/i,
+      /\bstep[-\s]?by[-\s]?step\s*maps?\b/i,
     ],
   },
   {
@@ -272,10 +285,15 @@ const BUSINESS_STRATEGY_DOC_RE =
 const BUSINESS_STRATEGY_CREATE_RE =
   /\b(?:help me (?:create|write|draft|build)|(?:create|write|draft|build) (?:a |an |my )?)(?:marketing|sales|business|launch|content|growth) strateg(?:y|ies)\b/i;
 
+/** Procedural documents (SOP) belong in Create — not Visual Thinking process maps. */
+const SOP_DOCUMENT_CREATE_RE =
+  /\b(?:help me (?:create|write|draft|build)|(?:create|write|draft|build))\s+(?:a |an |my )?(?:sops?|standard operating procedures?)\b/i;
+
 export function shouldRouteBusinessStrategyToCreate(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
   if (BUSINESS_STRATEGY_CREATE_RE.test(t)) return true;
+  if (SOP_DOCUMENT_CREATE_RE.test(t)) return true;
   return (
     BUSINESS_STRATEGY_DOC_RE.test(t) &&
     /\b(?:create|write|draft|build|document|plan)\b/i.test(t)
@@ -403,10 +421,16 @@ export function buildPathAVisualOfferReply(text: string): string {
 }
 
 export function immediateVisualOpenAck(view: VisualThinkingViewDef): string {
+  if (view.id === "mind-map" || view.mode === "mind-map") {
+    return "Opening Mind Map Discovery — what would you like to create a mind map about?";
+  }
   return `Opening **${view.title}** in Visual Thinking.`;
 }
 
 export function visualThinkingMenuAck(viewId: VisualThinkingViewId): string {
+  if (viewId === "mind-map") {
+    return "Opening Mind Map Discovery — what would you like to create a mind map about?";
+  }
   const title = visualThinkingViewTitle(viewId);
   return `Opening **${title}** in Visual Thinking.`;
 }
@@ -416,7 +440,8 @@ export function visualThinkingStudioHintForChat(): string {
     "VISUAL THINKING STUDIO (P0.20):",
     "Visual structures always route to Visual Thinking — never Create, Documents, or Strategies.",
     "Path A (user unsure): recommend 2–3 structures + numbered menu; wait for selection.",
-    "Path B (user names a structure): open Visual Thinking immediately — no extra questions.",
+    "Path B (user names Mind Map): open Mind Map Discovery Interview immediately — never the old map-type dashboard.",
+    "Path B (other named structures): open Visual Thinking for that structure.",
     "Content conversion (turn this into…): reuse chat content; open Visual Thinking with the target structure.",
     "Decision comparisons (should I, pros/cons) → Decision Compass unless user asked for a visual map.",
     `Available views: ${VISUAL_THINKING_VIEW_LIBRARY.map((v) => v.title).join(", ")}.`,

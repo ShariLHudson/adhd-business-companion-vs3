@@ -47,7 +47,7 @@ export function FounderExecutiveDiscoveryEngine() {
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
         backLabel="← Back to the Office"
-        eyebrow="Executive Discovery Engine™"
+        eyebrow="Executive Discovery Engine"
         title="Your Executive Discovery Department"
         question="What did Founder find while you were away?"
         purpose="Continuous executive discovery — calm briefs, rare alerts, and recommendations that help you move from insight to action."

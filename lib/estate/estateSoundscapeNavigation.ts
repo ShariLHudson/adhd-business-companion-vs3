@@ -1,5 +1,5 @@
 /**
- * Estate Soundscapes™ — PATH B audio-only navigation (never physical places).
+ * Estate Soundscapes — PATH B audio-only navigation (never physical places).
  */
 
 import {

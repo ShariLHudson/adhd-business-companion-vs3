@@ -1,5 +1,5 @@
 /**
- * Estate Capability Registry™ — unified inventory + concierge + recommendations.
+ * Estate Capability Registry — unified inventory + concierge + recommendations.
  *
  * Spark consults this before routing. Never guess what exists.
  *

@@ -133,7 +133,7 @@ describe("estate stabilization acceptance", () => {
       userText: "1",
       lastAssistantText: `These might fit:
 1. Reading Nook
-2. Greenhouse™
+2. Greenhouse
 3. Garden Path
 Say the number or name — or we can stay right here.`,
     });

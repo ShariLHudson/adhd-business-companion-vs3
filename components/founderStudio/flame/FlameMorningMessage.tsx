@@ -8,7 +8,7 @@ export function FlameMorningMessage({ message }: FlameMorningMessageProps) {
   return (
     <section className="founder-flame-morning" aria-labelledby="flame-morning-heading">
       <p className="founder-flame-morning__eyebrow" id="flame-morning-heading">
-        FLAME™
+        FLAME
       </p>
       <p className="founder-flame-morning__text">{message.text}</p>
     </section>

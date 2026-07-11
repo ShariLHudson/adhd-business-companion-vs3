@@ -74,7 +74,7 @@ export function curriculumCardToBusinessMasteryMinuteExperience(
     topicId,
     drawerId,
     departmentId,
-    title: `${doc.metadata.title} — Business Mastery Minute™`,
+    title: `${doc.metadata.title} — Business Mastery Minute`,
     summary:
       doc.body.corePrinciple ||
       `A fast grounding on ${doc.metadata.title}.`,
@@ -139,7 +139,7 @@ function mergeDepartments(
       pillarId: "build_your_business",
       slug: card.departmentId.replace(/^dept-/, ""),
       title: titleCase(card.departmentId.replace(/^dept-/, "").replace(/-/g, " ")),
-      description: `${titleCase(card.departmentId.replace(/^dept-/, ""))} — Momentum Institute™`,
+      description: `${titleCase(card.departmentId.replace(/^dept-/, ""))} — Momentum Institute`,
       drawerIds: [],
       sortOrder: map.size + 1,
       competencyIds: card.competencyIds,
