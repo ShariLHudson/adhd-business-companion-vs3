@@ -10,6 +10,7 @@ import {
 
 import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
 import { EstateRouteRecovery } from "@/components/companion/estate/EstateRouteRecovery";
+import { armCompanionPreviewTestHarnessFromQuery } from "@/lib/companionPreviewTestHarness";
 import { ESTATE_WORKSPACE_LOAD_RECOVERY } from "@/lib/companionContextRouting/workspaceLoadRecovery";
 import "@/app/companion/estate-route-recovery.css";
 
@@ -138,6 +139,10 @@ function AuthenticatedCompanionShell() {
  * large client tree.
  */
 export function CompanionPageLoader() {
+  useLayoutEffect(() => {
+    armCompanionPreviewTestHarnessFromQuery();
+  }, []);
+
   return (
     <CompanionAuthGate>
       <AuthenticatedCompanionShell />

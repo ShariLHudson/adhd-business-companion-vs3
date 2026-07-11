@@ -6,6 +6,10 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 import {
+  armCompanionPreviewTestHarnessFromQuery,
+  COMPANION_PREVIEW_TEST_QUERY,
+} from "@/lib/companionPreviewTestHarness";
+import {
   clearCompanionPostLoginQuiet,
   isCompanionPostLoginQuiet,
 } from "@/lib/companionLoginTransition";
@@ -34,6 +38,10 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
   const gateOpen = isAuthed || loginHandoff;
 
   useEffect(() => {
+    armCompanionPreviewTestHarnessFromQuery();
+  }, []);
+
+  useEffect(() => {
     if (isAuthed) {
       clearCompanionPostLoginQuiet();
       redirectingRef.current = false;
@@ -55,7 +63,11 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
       return;
     }
     redirectingRef.current = true;
-    router.replace("/companion/login");
+    const loginUrl = new URL("/companion/login", window.location.origin);
+    if (new URLSearchParams(window.location.search).get(COMPANION_PREVIEW_TEST_QUERY) === "1") {
+      loginUrl.searchParams.set(COMPANION_PREVIEW_TEST_QUERY, "1");
+    }
+    router.replace(`${loginUrl.pathname}${loginUrl.search}`);
   }, [configChecked, configured, sessionChecked, loading, gateOpen, router]);
 
   if (!configChecked || !sessionChecked || loading) {

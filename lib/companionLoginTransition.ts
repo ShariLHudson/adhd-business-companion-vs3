@@ -8,6 +8,7 @@ import {
   safeLocalStorageSet,
 } from "@/lib/companionStorageRecovery";
 import { COMPANION_LOGIN_OPENING_MESSAGE } from "@/lib/companionLoginPage";
+import { companionPreviewTestQuerySuffix } from "@/lib/companionPreviewTestHarness";
 
 /** Immediate route change after auth — home shell hydrates progressively. */
 export const COMPANION_LOGIN_FADE_MS = 0 as const;
@@ -161,7 +162,7 @@ export function navigateToCompanionHome(): void {
   }
   companionHomeNavigationPending = true;
   markCompanionLoginArrival();
-  window.location.replace("/companion");
+  window.location.replace(`/companion${companionPreviewTestQuerySuffix()}`);
 }
 
 /** @internal test helper */

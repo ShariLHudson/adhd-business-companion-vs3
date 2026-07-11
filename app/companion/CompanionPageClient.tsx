@@ -956,6 +956,20 @@ import {
   type CreateOpenLiveTraceStage,
 } from "@/lib/createOpenLiveTrace";
 import { WorkspaceDebugBanner } from "@/components/companion/WorkspaceDebugBanner";
+import { CompanionPreviewTestPanel } from "@/components/companion/CompanionPreviewTestPanel";
+import {
+  armCompanionPreviewTestHarnessFromQuery,
+  buildPreviewDiscoveryKeySession,
+  clearCompanionPreviewTestLaunch,
+  getCompanionPreviewTestLaunch,
+  getCompanionPreviewTestRevision,
+  isCompanionPreviewTestHarnessArmed,
+  isCompanionPreviewTestSessionActive,
+  setCompanionPreviewTestLaunch,
+  type CompanionPreviewTestLaunchTarget,
+} from "@/lib/companionPreviewTestHarness";
+import { InMemoryDiscoveryHistoryStore } from "@/lib/estateDiscovery/discoveryHistory";
+import { dispatchEstateArrivalStart } from "@/lib/estate/estateArrivalSession";
 import {
   auditPromptBlocks,
   CompanionLatencyProfiler,
@@ -1402,6 +1416,7 @@ import {
   recordEstateRoomTransition,
   registerEstatePendingTransition,
   estateEntryIdForSection,
+  estateSectionForEntryId,
   registerEstateWorkspaceOfferFromAssistant,
   recoverEstateWorkspaceOfferFromChat,
   buildWorkspaceOfferForEstateSection,
@@ -2224,6 +2239,8 @@ export default function CompanionPageClient() {
     return isCompanionPostLoginQuiet();
   });
   const [welcomeHomeReplay, setWelcomeHomeReplay] = useState(false);
+  const [previewTestRevision, setPreviewTestRevision] = useState(0);
+  const previewDiscoveryHistoryStoreRef = useRef(new InMemoryDiscoveryHistoryStore());
   const [welcomeHomeIntroActive, setWelcomeHomeIntroActive] = useState(false);
   /**
    * Back to Chat / Chat nav — everyday conversation shell.
@@ -2508,6 +2525,14 @@ export default function CompanionPageClient() {
 
   const welcomeHomeExperience = useMemo(
     () => {
+      const previewLaunch = getCompanionPreviewTestLaunch();
+      if (previewLaunch?.target === "welcome-home") {
+        return evaluateWelcomeHomeExperience({
+          hasSeenWelcomeIntro: false,
+          replayRequested: true,
+          isRepeatLogin: false,
+        });
+      }
       const authIntel = getCompanionAuthIntelligence();
       const isRepeatLogin = authIntel.loginCount > 1;
       return evaluateWelcomeHomeExperience({
@@ -2516,11 +2541,24 @@ export default function CompanionPageClient() {
         isRepeatLogin,
       });
     },
-    [welcomeHomeReplay, hydrated],
+    [welcomeHomeReplay, hydrated, previewTestRevision],
   );
 
   useEffect(() => {
+    if (!armCompanionPreviewTestHarnessFromQuery()) return;
+    setPreviewTestRevision(getCompanionPreviewTestRevision());
+  }, []);
+
+  useEffect(() => {
+    if (!isCompanionPreviewTestHarnessArmed()) return;
+    const onStorage = () => setPreviewTestRevision(getCompanionPreviewTestRevision());
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  useEffect(() => {
     if (!hydrated || !welcomeHomePrimary) return;
+    if (isCompanionPreviewTestSessionActive()) return;
     if (getCompanionAuthIntelligence().loginCount > 1 && !hasSeenWelcomeIntro()) {
       markWelcomeIntroSeen();
     }
@@ -7019,7 +7057,10 @@ export default function CompanionPageClient() {
   }
 
   function finishWelcomeHomeIntro() {
-    if (!hasSeenWelcomeIntro()) {
+    if (
+      !isCompanionPreviewTestSessionActive() &&
+      !hasSeenWelcomeIntro()
+    ) {
       markWelcomeIntroSeen();
     }
     setWelcomeHomeReplay(false);
@@ -8727,6 +8768,79 @@ export default function CompanionPageClient() {
       userMessageCountAtArrival: messages.filter((m) => m.role === "user").length,
     });
     openStandaloneFocusSectionCore(section);
+  }
+
+  function launchPreviewTestExperience(
+    target: CompanionPreviewTestLaunchTarget,
+    roomId?: string,
+  ) {
+    if (!isCompanionPreviewTestHarnessArmed()) return;
+
+    if (target === "welcome-home") {
+      setCompanionPreviewTestLaunch({ target });
+      returnToWelcomeHomeLobby("preview-test:welcome-home");
+      setWelcomeHomeReplay(true);
+      setPreviewTestRevision(getCompanionPreviewTestRevision());
+      return;
+    }
+
+    if (target === "profile-estate" && roomId) {
+      setCompanionPreviewTestLaunch({
+        target,
+        profileRoomId: roomId,
+      });
+      openProfileEstateRoomFromMenu(roomId as ProfileEstateRoomId);
+      setPreviewTestRevision(getCompanionPreviewTestRevision());
+      return;
+    }
+
+    const estateRoomId =
+      roomId ?? (target === "discovery-key" ? "greenhouse" : "coffee-house");
+    const section = estateSectionForEntryId(estateRoomId) ?? "home";
+
+    if (target === "discovery-key") {
+      previewDiscoveryHistoryStoreRef.current =
+        new InMemoryDiscoveryHistoryStore();
+      const discoverySession = buildPreviewDiscoveryKeySession(
+        getDiscoveryMemberId(),
+        estateRoomId,
+      );
+      setCompanionPreviewTestLaunch({
+        target,
+        roomId: estateRoomId,
+        discoverySession,
+      });
+    } else {
+      setCompanionPreviewTestLaunch({ target, roomId: estateRoomId });
+    }
+
+    setOverlay(null);
+    setGrowthProfileEmphasizeTimeline(false);
+    syncDirectEstateVisit({
+      roomId: estateRoomId,
+      section,
+      userIntent: `preview-test:${target}`,
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user").length,
+    });
+    openStandaloneFocusSectionCore(section);
+
+    if (target === "shari-arrival") {
+      window.requestAnimationFrame(() => {
+        dispatchEstateArrivalStart({
+          roomId: estateRoomId,
+          shariGreeting: estateArrivalShariGreeting(estateRoomId) ?? undefined,
+          playAmbience: true,
+        });
+      });
+    }
+
+    setPreviewTestRevision(getCompanionPreviewTestRevision());
+  }
+
+  function resetPreviewTestExperience() {
+    clearCompanionPreviewTestLaunch();
+    setWelcomeHomeReplay(false);
+    setPreviewTestRevision(getCompanionPreviewTestRevision());
   }
 
   function openSparkEstateGuideCore() {
@@ -19655,11 +19769,27 @@ export default function CompanionPageClient() {
     [activeSection, estatePresenceRoomId],
   );
 
+  const previewTestLaunch = useMemo(
+    () => getCompanionPreviewTestLaunch(),
+    [previewTestRevision],
+  );
+
+  const previewDiscoverySession =
+    previewTestLaunch?.target === "discovery-key"
+      ? previewTestLaunch.discoverySession ?? null
+      : null;
+
+  const previewDiscoveryRoomId =
+    previewTestLaunch?.target === "discovery-key"
+      ? previewTestLaunch.roomId ?? null
+      : null;
+
   const showDiscoveryKeyHost = Boolean(
-    showGlobalEstatePresence &&
+    !overlay &&
       estatePresenceRoomId &&
-      estateImmersiveActive &&
-      !overlay,
+      ((showGlobalEstatePresence && estateImmersiveActive) ||
+        (previewDiscoverySession &&
+          previewDiscoveryRoomId === estatePresenceRoomId)),
   );
 
   const estatePlaceAudioHostPlaceId = resolveEstatePlaceAudioHostPlaceId({
@@ -19934,12 +20064,28 @@ export default function CompanionPageClient() {
           memberId={discoveryMemberId}
           memberContext={discoveryMemberContext}
           enabled={showDiscoveryKeyHost}
+          previewForcedSession={
+            previewDiscoverySession &&
+            previewDiscoveryRoomId === estatePresenceRoomId
+              ? previewDiscoverySession
+              : null
+          }
+          previewHistoryStore={
+            previewDiscoverySession &&
+            previewDiscoveryRoomId === estatePresenceRoomId
+              ? previewDiscoveryHistoryStoreRef.current
+              : undefined
+          }
           onNavigateSection={openStandaloneFocusSectionCore}
           onCompanionResponse={(message) => {
             setMessages((prev) => [...prev, { role: "assistant", content: message }]);
           }}
         />
       ) : null}
+      <CompanionPreviewTestPanel
+        onLaunch={launchPreviewTestExperience}
+        onReset={resetPreviewTestExperience}
+      />
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
       </Suspense>

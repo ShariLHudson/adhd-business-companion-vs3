@@ -15,6 +15,7 @@ import {
   DISCOVERY_IGNORE_WINDOW_MS,
   shouldRecordSilentIgnore,
 } from "@/lib/estateDiscovery/discoveryHistoryPolicy";
+import type { DiscoveryHistoryStore } from "@/lib/estateDiscovery/types";
 import type { DiscoveryKeySessionState } from "@/lib/estateDiscovery/discoveryKeySystem";
 import type { DiscoveryMemberContext } from "@/lib/estateDiscovery/types";
 import { DiscoveryKey } from "./DiscoveryKey";
@@ -25,6 +26,9 @@ type DiscoveryKeyHostProps = {
   memberId: string;
   memberContext: DiscoveryMemberContext;
   enabled?: boolean;
+  /** Preview harness only — forces a canned session without touching saved history. */
+  previewForcedSession?: DiscoveryKeySessionState | null;
+  previewHistoryStore?: DiscoveryHistoryStore;
   onNavigateSection: (section: AppSection) => void;
   /** Spark speaks this in conversation when a Discovery primary button is tapped. */
   onCompanionResponse?: (message: string, discoveryId: string) => void;
@@ -35,6 +39,8 @@ export function DiscoveryKeyHost({
   memberId,
   memberContext,
   enabled = true,
+  previewForcedSession = null,
+  previewHistoryStore,
   onNavigateSection,
   onCompanionResponse,
 }: DiscoveryKeyHostProps) {
@@ -45,7 +51,10 @@ export function DiscoveryKeyHost({
   const [noteOpen, setNoteOpen] = useState(false);
   const [unlocking, setUnlocking] = useState(false);
   const shownDiscoveryRef = useRef<string | null>(null);
-  const historyStore = useMemo(() => getDefaultDiscoveryHistoryStore(), []);
+  const historyStore = useMemo(
+    () => previewHistoryStore ?? getDefaultDiscoveryHistoryStore(),
+    [previewHistoryStore],
+  );
 
   const context = useMemo(
     () => buildDiscoveryMemberContextFromEstateMemory(memberContext),
@@ -67,6 +76,11 @@ export function DiscoveryKeyHost({
       return;
     }
 
+    if (previewForcedSession) {
+      setSessionState(previewForcedSession);
+      return;
+    }
+
     const next = evaluateDiscoveryKeySession({
       memberId,
       currentRoomId: roomId,
@@ -82,6 +96,7 @@ export function DiscoveryKeyHost({
     roomId,
     context,
     historyStore,
+    previewForcedSession,
   ]);
 
   useEffect(() => {
@@ -90,9 +105,11 @@ export function DiscoveryKeyHost({
     const { discoveryId } = session;
     if (shownDiscoveryRef.current === discoveryId) return;
 
-    markDiscoveryKeyShown(memberId, session);
+    if (!previewForcedSession) {
+      markDiscoveryKeyShown(memberId, session);
+    }
     shownDiscoveryRef.current = discoveryId;
-  }, [sessionState, enabled, memberId]);
+  }, [sessionState, enabled, memberId, previewForcedSession]);
 
   const finishSession = useCallback(
     (outcome: "completed" | "saved" | "ignored" | "destination_visited") => {

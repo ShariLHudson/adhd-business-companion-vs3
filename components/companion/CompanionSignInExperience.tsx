@@ -19,6 +19,7 @@ import {
   waitForCompanionAuthStorage,
 } from "@/lib/companionLoginTransition";
 import { getCompanionSupabase } from "@/lib/supabase/companionClient";
+import { armCompanionPreviewTestHarnessFromQuery } from "@/lib/companionPreviewTestHarness";
 import {
   dismissWelcomeRoomInvitation,
   dismissWelcomeRoomLoginOffer,
@@ -50,6 +51,7 @@ export function CompanionSignInExperience({
 
   useEffect(() => {
     setMounted(true);
+    armCompanionPreviewTestHarnessFromQuery();
   }, []);
 
   const goHomeAfterAuth = useCallback(async () => {
