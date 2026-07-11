@@ -1,108 +1,134 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEstateRoomShell";
-import { getBusinessProfile, getPrefs } from "@/lib/companionStore";
-import { PROFILE_DESTINATION_CARDS } from "@/lib/profile/profileDestination";
-import type { ProfileDestination } from "@/lib/profile/profileDestination";
+import { BusinessEstateSectionEditor } from "@/components/companion/business-estate/BusinessEstateSectionEditor";
+import {
+  BUSINESS_ESTATE_SECTIONS,
+  getBusinessEstateSectionStatus,
+  summarizeBusinessEstateSection,
+  type BusinessEstateSectionId,
+} from "@/lib/profile/businessEstateProfile";
+import { buildApprovedBusinessSnapshot } from "@/lib/profile/businessSnapshot";
 import "@/app/companion/my-business-estate.css";
 
-type Props = {
-  onOpenDestination: (destination: ProfileDestination) => void;
-};
+const STATUS_LABELS = {
+  "not-started": "Not started",
+  started: "Started",
+  "ready-to-review": "Ready to review",
+  updated: "Updated",
+} as const;
 
-function buildBusinessSnapshot(): string {
-  const prefs = getPrefs();
-  const business = getBusinessProfile();
-  const lines: string[] = [];
-
-  if (prefs.name?.trim()) {
-    lines.push(`You are ${prefs.name.trim()}.`);
-  }
-  if (business?.role?.trim()) {
-    lines.push(`In business, you show up as ${business.role.trim()}.`);
-  }
-  if (business?.sells?.trim()) {
-    lines.push(`You offer: ${business.sells.trim()}`);
-  }
-  if (business?.goals?.length) {
-    lines.push(`Working toward: ${business.goals.slice(0, 3).join(", ")}.`);
-  }
-
-  if (lines.length === 0) {
-    return "Your business snapshot will grow here as you add identity and direction. No rush — start wherever feels natural.";
-  }
-
-  return lines.join(" ");
+function formatSnapshot(snapshot: string): string {
+  return snapshot.includes("\n") ? snapshot.split("\n").join(" · ") : snapshot;
 }
 
-/** Cycle 1 — Profile landing for My Business Estate™ (read-only snapshot). */
-export function MyBusinessEstatePanel({ onOpenDestination }: Props) {
-  const [snapshot, setSnapshot] = useState(
-    "Your business snapshot will grow here as you add identity and direction. No rush — start wherever feels natural.",
-  );
+/** My Business Estate — editable section overview (separate from People I Help). */
+export function MyBusinessEstatePanel() {
+  const [snapshot, setSnapshot] = useState(() => buildApprovedBusinessSnapshot());
+  const [activeSection, setActiveSection] =
+    useState<BusinessEstateSectionId | null>(null);
+  const [revision, setRevision] = useState(0);
 
-  useEffect(() => {
-    setSnapshot(buildBusinessSnapshot());
+  const refresh = useCallback(() => {
+    setSnapshot(buildApprovedBusinessSnapshot());
+    setRevision((value) => value + 1);
   }, []);
 
-  const otherDestinations = PROFILE_DESTINATION_CARDS.filter(
-    (card) => card.destination !== "my-business-estate",
+  useEffect(() => {
+    refresh();
+    const onUpdate = () => refresh();
+    window.addEventListener("companion-business-estate-updated", onUpdate);
+    window.addEventListener("companion-prefs-updated", onUpdate);
+    return () => {
+      window.removeEventListener("companion-business-estate-updated", onUpdate);
+      window.removeEventListener("companion-prefs-updated", onUpdate);
+    };
+  }, [refresh]);
+
+  const activeMeta = BUSINESS_ESTATE_SECTIONS.find(
+    (section) => section.id === activeSection,
   );
 
   return (
     <MyBusinessEstateRoomShell>
       <EstateWorkspace className="my-business-estate-panel estate-workspace--landing">
-        <header className="my-business-estate-panel__header">
-          <p className="estate-workspace__kicker">Profile</p>
-          <h1 className="estate-workspace__title">My Business Estate™</h1>
-          <p className="my-business-estate-panel__lead">
-            Your business home inside Spark Estate™—where the information about
-            your business can come together and grow over time.
-          </p>
-        </header>
+        {activeSection && activeMeta ? (
+          <BusinessEstateSectionEditor
+            sectionId={activeSection}
+            title={activeMeta.title}
+            description={activeMeta.description}
+            onBack={() => {
+              setActiveSection(null);
+              refresh();
+            }}
+          />
+        ) : (
+          <>
+            <header className="my-business-estate-panel__header">
+              <p className="estate-workspace__kicker">Profile</p>
+              <h1 className="estate-workspace__title">My Business Estate</h1>
+              <p className="my-business-estate-panel__lead">
+                Your business home inside Spark Estate — where approved
+                information about your business can come together and grow over
+                time.
+              </p>
+            </header>
 
-        <section className="my-business-estate-panel__snapshot" aria-label="Business Snapshot">
-          <h2 className="my-business-estate-panel__snapshot-title">
-            Business Snapshot
-          </h2>
-          <p className="my-business-estate-panel__snapshot-body">{snapshot}</p>
-        </section>
+            <section
+              className="my-business-estate-panel__snapshot"
+              aria-label="Business Snapshot"
+            >
+              <h2 className="my-business-estate-panel__snapshot-title">
+                Business Snapshot
+              </h2>
+              <p className="my-business-estate-panel__snapshot-body">
+                {formatSnapshot(snapshot)}
+              </p>
+            </section>
 
-        {otherDestinations.length > 0 ? (
-          <section
-            className="my-business-estate-panel__destinations"
-            aria-label="Profile destinations"
-          >
-            <h2 className="my-business-estate-panel__section-title">
-              From here
-            </h2>
-            <ul className="my-business-estate-panel__destination-list">
-              {otherDestinations.map((card) => (
-                <li key={card.destination}>
-                  <button
-                    type="button"
-                    className="my-business-estate-panel__destination-card"
-                    onClick={() => onOpenDestination(card.destination)}
-                  >
-                    <span className="my-business-estate-panel__destination-label">
-                      {card.label}
-                    </span>
-                    <span className="my-business-estate-panel__destination-blurb">
-                      {card.blurb}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        <p className="my-business-estate-panel__note" role="status">
-          Full editing for Business Identity and Direction arrives in the next
-          cycle. Your conversation with Shari stays right where you left it.
-        </p>
+            <section
+              className="my-business-estate-panel__sections"
+              aria-label="Business Estate sections"
+            >
+              <h2 className="my-business-estate-panel__section-title">
+                Your business sections
+              </h2>
+              <ul className="my-business-estate-panel__section-list" key={revision}>
+                {BUSINESS_ESTATE_SECTIONS.map((section) => {
+                  const status = getBusinessEstateSectionStatus(section.id);
+                  return (
+                    <li key={section.id}>
+                      <article className="my-business-estate-panel__section-card">
+                        <div className="my-business-estate-panel__section-card-head">
+                          <h3 className="my-business-estate-panel__section-card-title">
+                            {section.title}
+                          </h3>
+                          <span
+                            className={`my-business-estate-panel__section-status my-business-estate-panel__section-status--${status}`}
+                          >
+                            {STATUS_LABELS[status]}
+                          </span>
+                        </div>
+                        <p className="my-business-estate-panel__section-card-summary">
+                          {summarizeBusinessEstateSection(section.id)}
+                        </p>
+                        <button
+                          type="button"
+                          className="my-business-estate-panel__section-open"
+                          onClick={() => setActiveSection(section.id)}
+                        >
+                          {status === "not-started" ? "Open" : "Edit"}
+                        </button>
+                      </article>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          </>
+        )}
       </EstateWorkspace>
     </MyBusinessEstateRoomShell>
   );

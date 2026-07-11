@@ -243,6 +243,14 @@ function AvatarMark({
   );
 }
 
+export type IdealClientBuilderPresentation = {
+  destinationKicker?: string;
+  listHeading?: string;
+  newAvatarLabel?: string;
+  backToDestinationLabel?: string;
+  newAvatarTitle?: string;
+};
+
 export function IdealClientBuilder({
   focusField,
   focusStamp,
@@ -254,6 +262,7 @@ export function IdealClientBuilder({
   onStepAdvance,
   onBuildComplete,
   onCoachSnapshot,
+  presentation,
 }: {
   focusField?: WorkspaceFieldId | null;
   focusStamp?: number;
@@ -271,7 +280,14 @@ export function IdealClientBuilder({
   onStepAdvance?: (step: ClientAvatarStepKey, stepIndex: number) => void;
   onBuildComplete?: () => void;
   onCoachSnapshot?: (snapshot: ReturnType<typeof snapshotFromBuilderInput>) => void;
+  presentation?: IdealClientBuilderPresentation;
 } = {}) {
+  const listHeading = presentation?.listHeading ?? "Client Avatars";
+  const newAvatarLabel = presentation?.newAvatarLabel ?? "New Avatar";
+  const backToDestinationLabel =
+    presentation?.backToDestinationLabel ?? "Back";
+  const newAvatarTitle = presentation?.newAvatarTitle ?? "New Client Avatar";
+  const destinationKicker = presentation?.destinationKicker;
   const [avatars, setAvatars] = useState<IdealClientAvatar[]>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
   const [building, setBuilding] = useState(false);
@@ -521,6 +537,29 @@ export function IdealClientBuilder({
     const editing = Boolean(form.id);
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+        {destinationKicker ? (
+          <div className="mb-3">
+            <button
+              type="button"
+              onClick={() => {
+                setBuilding(false);
+                setForm({ ...EMPTY });
+                setStep(0);
+              }}
+              className="people-i-help-panel__back"
+            >
+              ← {backToDestinationLabel}
+            </button>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+              {destinationKicker}
+            </p>
+            {!editing ? (
+              <p className="text-lg font-semibold text-[#1f1c19]">
+                {newAvatarTitle}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
         {editing ? (
           // Edit mode = section hub: jump straight to any block, no flow lock.
           <div className="mb-2">
@@ -910,7 +949,7 @@ export function IdealClientBuilder({
                 }
                 className="rounded-xl border-2 border-[#1e4f4f] bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
               >
-                {step === 0 ? "Cancel" : "Back"}
+                {step === 0 ? (destinationKicker ? backToDestinationLabel : "Cancel") : "Back"}
               </button>
               <button
                 type="button"
@@ -941,13 +980,13 @@ export function IdealClientBuilder({
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Client Avatars</p>
+        <p className="text-2xl font-semibold text-[#1f1c19]">{listHeading}</p>
         <button
           type="button"
           onClick={startNew}
           className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
         >
-          + New avatar
+          + {newAvatarLabel}
         </button>
       </div>
       <p className="mt-1 text-base text-[#6b635a]">

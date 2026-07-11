@@ -5,7 +5,7 @@
  * Visible menu:
  * 1. Conversations → New Chat · New Day Chat
  * 2. Settings
- * 3. Profile → My Business Estate™ · People I Help™
+ * 3. Profile → My Business Estate · People I Help
  * 4. Logout
  *
  * Personalization and Account are hidden (not currently working).
@@ -93,12 +93,12 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
       {
         id: "my-profile",
         emoji: "🏡",
-        label: "My Business Estate™",
+        label: "My Business Estate",
       },
       {
         id: "people-i-help",
         emoji: "🤝",
-        label: "People I Help™",
+        label: "People I Help",
       },
     ],
   },

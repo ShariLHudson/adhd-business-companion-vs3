@@ -6276,7 +6276,7 @@ export default function CompanionPageClient() {
     }
 
     if (overlay === "people-i-help") {
-      setOverlay("profile");
+      setOverlay(null);
       return;
     }
 
@@ -20347,17 +20347,11 @@ export default function CompanionPageClient() {
             </div>
           ) : estateProfilePrimary ? (
             <main className="estate-room-main">
-              <MyBusinessEstatePanel
-                onOpenDestination={(destination) =>
-                  openProfileDestinationCore(destination)
-                }
-              />
+              <MyBusinessEstatePanel />
             </main>
           ) : peopleIHelpProfilePrimary ? (
             <main className="estate-room-main">
-              <PeopleIHelpPanel
-                onBackToProfile={() => setOverlay("profile")}
-              />
+              <PeopleIHelpPanel onClose={goBack} />
             </main>
           ) : growthProfilePrimary ? (
             <main className="estate-room-main">

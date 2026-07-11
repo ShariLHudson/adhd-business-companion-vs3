@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  PROFILE_DESTINATION_CARDS,
   PROFILE_DESTINATION_DEFAULT,
+  PROFILE_MENU_LABELS,
   resolveProfileDestination,
   resolveProfileDestinationNavigation,
 } from "./profileDestination";
@@ -13,16 +13,11 @@ describe("profileDestination", () => {
     expect(PROFILE_DESTINATION_DEFAULT).toBe("my-business-estate");
   });
 
-  it("lists only approved Profile destinations", () => {
-    expect(PROFILE_DESTINATION_CARDS.map((card) => card.destination)).toEqual([
-      "my-business-estate",
-      "people-i-help",
-    ]);
-    expect(
-      PROFILE_DESTINATION_CARDS.some((card) =>
-        /evidence|journal|portfolio|settings/i.test(card.label),
-      ),
-    ).toBe(false);
+  it("uses approved Profile labels without trademark symbols", () => {
+    expect(PROFILE_MENU_LABELS.myBusinessEstate).toBe("My Business Estate");
+    expect(PROFILE_MENU_LABELS.peopleIHelp).toBe("People I Help");
+    expect(PROFILE_MENU_LABELS.myBusinessEstate).not.toContain("™");
+    expect(PROFILE_MENU_LABELS.peopleIHelp).not.toContain("™");
   });
 
   it("resolves profile overlay navigation", () => {

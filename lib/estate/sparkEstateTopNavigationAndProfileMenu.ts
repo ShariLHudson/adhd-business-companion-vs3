@@ -89,8 +89,8 @@ export const SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS: readonly {
   id: EstateMenuActionId;
   label: string;
 }[] = [
-  { id: "my-profile", label: "My Business Estate™" },
-  { id: "people-i-help", label: "People I Help™" },
+  { id: "my-profile", label: "My Business Estate" },
+  { id: "people-i-help", label: "People I Help" },
 ];
 
 /** Clickable leaf actions under Conversations. */

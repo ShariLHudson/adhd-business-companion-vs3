@@ -1193,7 +1193,18 @@ export function saveBusinessProfile(
   };
   if (typeof window !== "undefined") {
     try {
-      localStorage.setItem(BIZ_PROFILE_KEY, JSON.stringify(next));
+      const raw = localStorage.getItem(BIZ_PROFILE_KEY);
+      const existing =
+        raw && typeof raw === "string"
+          ? (JSON.parse(raw) as Record<string, unknown>)
+          : {};
+      localStorage.setItem(
+        BIZ_PROFILE_KEY,
+        JSON.stringify({
+          ...existing,
+          ...next,
+        }),
+      );
     } catch {
       /* noop */
     }

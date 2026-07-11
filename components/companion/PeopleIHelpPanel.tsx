@@ -6,33 +6,40 @@ import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEsta
 import "@/app/companion/my-business-estate.css";
 
 type Props = {
-  onBackToProfile: () => void;
+  onClose: () => void;
 };
 
 /**
- * People I Help™ — user-facing adapter over existing Audience Profile data/UI.
- * No duplicate storage; same IdealClientBuilder and companion-ideal-clients-v1.
+ * People I Help — separate Profile destination over existing client avatars.
  */
-export function PeopleIHelpPanel({ onBackToProfile }: Props) {
+export function PeopleIHelpPanel({ onClose }: Props) {
   return (
     <MyBusinessEstateRoomShell>
       <EstateWorkspace className="my-business-estate-panel people-i-help-panel">
         <button
           type="button"
           className="people-i-help-panel__back"
-          onClick={onBackToProfile}
+          onClick={onClose}
         >
-          ← Back to Profile
+          Close
         </button>
         <header className="people-i-help-panel__header">
           <p className="estate-workspace__kicker">Profile</p>
-          <h1 className="estate-workspace__title">People I Help™</h1>
+          <h1 className="estate-workspace__title">People I Help</h1>
           <p className="my-business-estate-panel__lead">
-            The people your work is for — saved audiences and client avatars that
+            The people your work is for — saved client avatars and audiences that
             guide your messaging and offers.
           </p>
         </header>
-        <IdealClientBuilder />
+        <IdealClientBuilder
+          presentation={{
+            destinationKicker: "People I Help",
+            listHeading: "Client Avatars",
+            newAvatarLabel: "New Avatar",
+            backToDestinationLabel: "Back to People I Help",
+            newAvatarTitle: "New Client Avatar",
+          }}
+        />
       </EstateWorkspace>
     </MyBusinessEstateRoomShell>
   );

@@ -1,4 +1,4 @@
-/* My Business Estate™ + People I Help™ — Profile routing (Cycle 1) */
+/* My Business Estate + People I Help — Profile routing */
 
 .my-business-estate-room {
   position: relative;
@@ -128,6 +128,189 @@
   font-size: 0.92rem;
   line-height: 1.5;
   color: rgba(60, 52, 44, 0.78);
+}
+
+.my-business-estate-panel__sections {
+  margin-top: 1.5rem;
+}
+
+.my-business-estate-panel__section-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.my-business-estate-panel__section-card {
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  border-radius: 0.65rem;
+  background: rgba(255, 252, 245, 0.82);
+}
+
+.my-business-estate-panel__section-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.my-business-estate-panel__section-card-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: rgba(36, 30, 24, 0.95);
+}
+
+.my-business-estate-panel__section-status {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  color: rgba(60, 52, 44, 0.82);
+}
+
+.my-business-estate-panel__section-status--updated {
+  border-color: rgba(30, 79, 79, 0.35);
+  color: rgba(30, 79, 79, 0.92);
+}
+
+.my-business-estate-panel__section-status--ready-to-review {
+  border-color: rgba(168, 92, 74, 0.35);
+  color: rgba(120, 58, 44, 0.92);
+}
+
+.my-business-estate-panel__section-card-summary {
+  margin: 0.55rem 0 0.8rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(60, 52, 44, 0.82);
+}
+
+.my-business-estate-panel__section-open {
+  border: 1px solid rgba(30, 79, 79, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.9);
+  color: rgba(30, 79, 79, 0.95);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+}
+
+.my-business-estate-panel__section-open:hover {
+  background: rgba(240, 245, 245, 0.95);
+}
+
+.business-estate-section-editor__back {
+  margin: 0 0 0.75rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.72);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.business-estate-section-editor__header {
+  margin-bottom: 1rem;
+}
+
+.business-estate-section-editor__title {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.2rem, 2.5vw, 1.45rem);
+  font-weight: 600;
+  color: rgba(36, 30, 24, 0.95);
+}
+
+.business-estate-section-editor__review,
+.business-estate-section-editor__saved {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.business-estate-section-editor__review {
+  border: 1px solid rgba(168, 92, 74, 0.28);
+  background: rgba(255, 248, 245, 0.85);
+  color: rgba(90, 48, 36, 0.9);
+}
+
+.business-estate-section-editor__saved {
+  border: 1px solid rgba(30, 79, 79, 0.28);
+  background: rgba(240, 245, 245, 0.85);
+  color: rgba(30, 79, 79, 0.92);
+}
+
+.business-estate-section-editor__fields {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.business-estate-section-editor__field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.business-estate-section-editor__label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(60, 52, 44, 0.88);
+}
+
+.business-estate-section-editor__input,
+.business-estate-section-editor__textarea {
+  width: 100%;
+  border: 1px solid rgba(201, 191, 176, 0.9);
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.7rem 0.8rem;
+  font-size: 0.95rem;
+  color: rgba(31, 28, 25, 0.95);
+}
+
+.business-estate-section-editor__textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+}
+
+.business-estate-section-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1.25rem;
+}
+
+.business-estate-section-editor__cancel,
+.business-estate-section-editor__save {
+  border-radius: 999px;
+  padding: 0.55rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.business-estate-section-editor__cancel {
+  border: 1px solid rgba(30, 79, 79, 0.45);
+  background: rgba(255, 252, 245, 0.9);
+  color: rgba(30, 79, 79, 0.95);
+}
+
+.business-estate-section-editor__save {
+  border: 1px solid rgba(30, 79, 79, 0.55);
+  background: rgba(30, 79, 79, 0.95);
+  color: white;
+}
+
+.people-i-help-panel .companion-fade-in {
+  padding-left: 0;
+  padding-right: 0;
+  padding-top: 0.25rem;
 }
 
 .people-i-help-panel__back {

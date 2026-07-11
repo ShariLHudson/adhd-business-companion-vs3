@@ -45,5 +45,7 @@ describe("profileDropdownCorrection", () => {
     expect(companion).toMatch(/<PeopleIHelpPanel/);
     expect(companion).toMatch(/estateProfilePrimary \?/);
     expect(companion).toMatch(/peopleIHelpProfilePrimary \?/);
+    expect(companion).not.toMatch(/From here/);
+    expect(companion).not.toMatch(/onOpenDestination/);
   });
 });
