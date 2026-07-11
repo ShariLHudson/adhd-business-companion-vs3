@@ -2,7 +2,11 @@
 
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
-import { OCEAN_CONSERVATORY_VIDEO, OCEAN_CONSERVATORY_VIDEO_PLAYBACK_RATE } from "@/lib/oceanConservatory/media";
+import {
+  estateRoomExperienceVideoPlaybackRate,
+  estateRoomUsesOceanConservatoryVideo,
+  resolveEstateRoomExperienceVideo,
+} from "@/lib/estate/estateRoomExperienceVideo";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { LivingBorderFrame } from "@/components/companion/LivingBorderFrame";
 import { useChatBackdropRevision } from "@/lib/chatBackdrop";
@@ -18,10 +22,6 @@ import type { CinematicPresetId } from "@/lib/cinematicBackground";
 import { hasRenderableSignatureObject } from "@/lib/sceneRenderContract/signatureObject";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
-import {
-  isOceanConservatoryBackground,
-  isOceanConservatoryRoom,
-} from "@/lib/oceanConservatory/isOceanConservatoryRoom";
 
 type Props = {
   scene: SceneState;
@@ -83,13 +83,17 @@ export function SceneRenderer({
 
   const isOceanConservatoryScene =
     background.mode === "photo-scene" &&
-    (isOceanConservatoryRoom(resolved.environment.placeId) ||
-      isOceanConservatoryBackground(background.imageUrl));
+    estateRoomUsesOceanConservatoryVideo(resolved.environment.placeId);
 
-  const sceneVideoUrl =
-    isOceanConservatoryScene
-      ? OCEAN_CONSERVATORY_VIDEO
-      : background.videoUrl;
+  const manifestVideo =
+    background.mode === "photo-scene"
+      ? resolveEstateRoomExperienceVideo(
+          resolved.environment.placeId,
+          background.imageUrl,
+        )
+      : null;
+
+  const sceneVideoUrl = manifestVideo ?? background.videoUrl;
 
   const keepEstateFullyVisible =
     immersive ||
@@ -117,8 +121,10 @@ export function SceneRenderer({
               videoSrc={sceneVideoUrl}
               poster={background.imageUrl}
               playbackRate={
-                isOceanConservatoryScene
-                  ? OCEAN_CONSERVATORY_VIDEO_PLAYBACK_RATE
+                sceneVideoUrl
+                  ? estateRoomExperienceVideoPlaybackRate(
+                      resolved.environment.placeId,
+                    )
                   : undefined
               }
               placement="absolute"

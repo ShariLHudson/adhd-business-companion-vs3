@@ -5,7 +5,14 @@ export const OCEAN_CONSERVATORY_BACKGROUND_FRAGMENT =
   "aquarium-room-background" as const;
 
 export function isOceanConservatoryRoom(roomId?: string | null): boolean {
-  return roomId === OCEAN_CONSERVATORY_PLACE_ID;
+  if (!roomId) return false;
+  const id = roomId.trim().toLowerCase();
+  return (
+    id === OCEAN_CONSERVATORY_PLACE_ID ||
+    id === "aquarium-room" ||
+    id === "ocean-conservatory" ||
+    id === "ocean conservatory"
+  );
 }
 
 export function isOceanConservatoryBackground(url?: string | null): boolean {

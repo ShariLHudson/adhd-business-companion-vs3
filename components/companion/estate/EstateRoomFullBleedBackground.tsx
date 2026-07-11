@@ -8,6 +8,11 @@ import {
   getRoomBackdropOverrideId,
 } from "@/lib/chatBackdrop/chatBackdropPreference";
 import { resolveCanonicalPlaceId } from "@/lib/estate/canonicalEstateRegistry";
+import {
+  estateRoomExperienceVideoPlaybackRate,
+  estateRoomUsesOceanConservatoryVideo,
+  resolveEstateRoomExperienceVideo,
+} from "@/lib/estate/estateRoomExperienceVideo";
 import { backgroundUrlVariants } from "@/lib/roomBackgroundAssets";
 import { estateRoomBackgroundCandidates } from "@/lib/estate/estateRoomAssets";
 import {
@@ -17,19 +22,10 @@ import {
 import { ESTATE_SCENE_CROSSFADE_MS } from "@/lib/estate/estateSceneTransition";
 import {
   BUTTERFLY_HOUSE_POSTER,
-  BUTTERFLY_HOUSE_VIDEO,
-  isButterflyHouseBackground,
-  isButterflyHouseRoom,
 } from "@/lib/butterflyHouse/media";
 import {
   OCEAN_CONSERVATORY_POSTER,
-  OCEAN_CONSERVATORY_VIDEO,
-  OCEAN_CONSERVATORY_VIDEO_PLAYBACK_RATE,
 } from "@/lib/oceanConservatory/media";
-import {
-  isOceanConservatoryBackground,
-  isOceanConservatoryRoom,
-} from "@/lib/oceanConservatory/isOceanConservatoryRoom";
 
 type Props = {
   roomId: string;
@@ -99,19 +95,27 @@ export function EstateRoomFullBleedBackground({
   }, [candidates.length]);
 
   const src = candidates[candidateIndex];
+  const canonicalRoomId = useMemo(
+    () => resolveCanonicalPlaceId(roomId),
+    [roomId],
+  );
+  const experienceVideo = useMemo(
+    () =>
+      resolveEstateRoomExperienceVideo(
+        canonicalRoomId,
+        src ?? imageUrl ?? resolvedUrl,
+      ),
+    [canonicalRoomId, src, imageUrl, resolvedUrl],
+  );
+  const useRoomVideo = Boolean(experienceVideo);
   const useOceanConservatoryVideo =
-    !hasMemberOverride &&
-    (isOceanConservatoryRoom(roomId) || isOceanConservatoryBackground(src));
-  const useButterflyHouseVideo =
-    !hasMemberOverride &&
-    (isButterflyHouseRoom(roomId) || isButterflyHouseBackground(src));
-  const poster = useButterflyHouseVideo
-    ? src ?? BUTTERFLY_HOUSE_POSTER
-    : src ?? OCEAN_CONSERVATORY_POSTER;
-  const useRoomVideo = useOceanConservatoryVideo || useButterflyHouseVideo;
-  const videoSrc = useButterflyHouseVideo
-    ? BUTTERFLY_HOUSE_VIDEO
-    : OCEAN_CONSERVATORY_VIDEO;
+    useRoomVideo && estateRoomUsesOceanConservatoryVideo(canonicalRoomId);
+  const videoSrc = experienceVideo;
+  const poster =
+    src ??
+    imageUrl ??
+    resolvedUrl ??
+    (useOceanConservatoryVideo ? OCEAN_CONSERVATORY_POSTER : BUTTERFLY_HOUSE_POSTER);
 
   const [displayedSrc, setDisplayedSrc] = useState<string | null>(null);
   const [incomingSrc, setIncomingSrc] = useState<string | null>(null);
@@ -160,7 +164,7 @@ export function EstateRoomFullBleedBackground({
     onLoad();
   }, [onLoad, useRoomVideo, poster]);
 
-  const showFullPlate = hasMemberOverride;
+  const showFullPlate = hasMemberOverride && !useRoomVideo;
   const plateClassName = [
     "estate-room-fullbleed-bg",
     showFullPlate ? "estate-room-fullbleed-bg--show-full-plate" : "",
@@ -196,11 +200,7 @@ export function EstateRoomFullBleedBackground({
           mode="video"
           videoSrc={videoSrc}
           poster={poster}
-          playbackRate={
-            useOceanConservatoryVideo
-              ? OCEAN_CONSERVATORY_VIDEO_PLAYBACK_RATE
-              : undefined
-          }
+          playbackRate={estateRoomExperienceVideoPlaybackRate(canonicalRoomId)}
           fallbackBackground={`url('${poster}')`}
           placement="fixed"
           showBottomFade={false}

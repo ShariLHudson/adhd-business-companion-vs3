@@ -11,6 +11,11 @@ describe("Ocean Conservatory room detection", () => {
     expect(isOceanConservatoryRoom(null)).toBe(false);
   });
 
+  it("recognizes aquarium room aliases", () => {
+    expect(isOceanConservatoryRoom("aquarium-room")).toBe(true);
+    expect(isOceanConservatoryRoom("ocean-conservatory")).toBe(true);
+  });
+
   it("recognizes the ocean conservatory background plate", () => {
     expect(
       isOceanConservatoryBackground(
