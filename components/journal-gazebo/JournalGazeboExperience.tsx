@@ -1358,7 +1358,6 @@ export function JournalGazeboExperience({
         <JournalGazeboEstateDesk
           moment={estateMoment}
           showWelcome
-          sceneComposed={sceneReady}
           journals={libraryJournals}
           onCreateJournal={handleWelcomeCreateJournal}
           onOpenJournal={handleOpenMyJournal}

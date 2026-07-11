@@ -10220,9 +10220,11 @@
   pointer-events: auto;
 }
 
-.companion-root[data-journal-gazebo-active] .spark-note-anchor {
-  z-index: 50;
-  pointer-events: none;
+/* Spark Note + guidebook portal to document.body — descendant selectors do not reach them */
+body:has(.companion-root[data-journal-gazebo-active]) .spark-note-anchor,
+body:has(.companion-root[data-journal-gazebo-active])
+  .spark-estate-guide-anchor:not(.journal-gazebo__estate-guide) {
+  pointer-events: none !important;
 }
 
 .companion-growth-active .clear-my-mind-standalone-frame:has(.journal-room),

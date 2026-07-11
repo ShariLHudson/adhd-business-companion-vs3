@@ -55,4 +55,18 @@ describe("journalGazeboCompanion", () => {
     expect(estateDesk).not.toMatch(/welcomeVisible[\s\S]*sceneComposed/);
     expect(estateDesk).toMatch(/<JournalGazeboWelcomeDesk/);
   });
+
+  it("portals welcome desk actions above portaled estate chrome", () => {
+    const welcomeDesk = readFileSync(
+      resolve(
+        process.cwd(),
+        "components/journal-gazebo/JournalGazeboWelcomeDesk.tsx",
+      ),
+      "utf8",
+    );
+    expect(welcomeDesk).toMatch(/JournalGazeboTableActionsPortal/);
+    expect(readFileSync(resolve(process.cwd(), "app/companion/companion.css"), "utf8")).toMatch(
+      /body:has\(\.companion-root\[data-journal-gazebo-active\]\) \.spark-note-anchor/,
+    );
+  });
 });

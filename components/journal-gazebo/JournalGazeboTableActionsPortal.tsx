@@ -1,0 +1,35 @@
+"use client";
+
+import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+
+type Props = {
+  children: ReactNode;
+  className?: string;
+  "aria-label"?: string;
+};
+
+/**
+ * Portals desk plaques to document.body so they sit above portaled estate chrome
+ * (Spark Note, guidebook) and receive pointer events reliably.
+ */
+export function JournalGazeboTableActionsPortal({
+  children,
+  className = "",
+  "aria-label": ariaLabel,
+}: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <div
+      className={["jg-table-actions-portal", className].filter(Boolean).join(" ")}
+      aria-label={ariaLabel}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}

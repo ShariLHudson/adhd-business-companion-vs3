@@ -9,6 +9,7 @@ import type { JournalGazeboConfig } from "@/lib/journalGazebo/types";
 import { JournalGazeboHeroJournal } from "./JournalGazeboHeroJournal";
 import { JournalGazeboReturnNoteCard } from "./JournalGazeboReturnNoteCard";
 import { JournalGazeboTableActions } from "./JournalGazeboTableActions";
+import { JournalGazeboTableActionsPortal } from "./JournalGazeboTableActionsPortal";
 
 const NOTE_ROTATE_MS = 18_000;
 
@@ -52,14 +53,14 @@ export function JournalGazeboSanctuaryDesk({
 
   if (!sceneComposed) {
     return (
-      <div className="jg-sanctuary-desk jg-sanctuary-desk--actions-only" aria-label="Journal Gazebo sanctuary">
+      <JournalGazeboTableActionsPortal aria-label="Journal Gazebo sanctuary">
         <JournalGazeboTableActions
           layout="sanctuary"
           journals={journals}
           onCreateJournal={onCreateJournal}
           onOpenJournal={onOpenJournal}
         />
-      </div>
+      </JournalGazeboTableActionsPortal>
     );
   }
 
@@ -80,12 +81,14 @@ export function JournalGazeboSanctuaryDesk({
         </div>
       ) : null}
 
-      <JournalGazeboTableActions
-        layout="sanctuary"
-        journals={journals}
-        onCreateJournal={onCreateJournal}
-        onOpenJournal={onOpenJournal}
-      />
+      <JournalGazeboTableActionsPortal>
+        <JournalGazeboTableActions
+          layout="sanctuary"
+          journals={journals}
+          onCreateJournal={onCreateJournal}
+          onOpenJournal={onOpenJournal}
+        />
+      </JournalGazeboTableActionsPortal>
     </div>
   );
 }

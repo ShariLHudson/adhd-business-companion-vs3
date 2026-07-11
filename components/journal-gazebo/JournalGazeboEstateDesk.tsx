@@ -15,7 +15,6 @@ export type EstateDeskMoment =
 type Props = {
   moment: EstateDeskMoment;
   showWelcome: boolean;
-  sceneComposed?: boolean;
   journals: JournalGazeboConfig[];
   onCreateJournal: () => void;
   onOpenJournal: (journal: JournalGazeboConfig) => void;
@@ -25,7 +24,6 @@ type Props = {
 export function JournalGazeboEstateDesk({
   moment,
   showWelcome,
-  sceneComposed = false,
   journals,
   onCreateJournal,
   onOpenJournal,
@@ -39,7 +37,6 @@ export function JournalGazeboEstateDesk({
 
   return (
     <JournalGazeboWelcomeDesk
-      sceneComposed={sceneComposed}
       journals={journals}
       onCreateJournal={onCreateJournal}
       onOpenJournal={onOpenJournal}

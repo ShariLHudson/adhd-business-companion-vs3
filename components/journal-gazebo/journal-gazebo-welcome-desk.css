@@ -57,6 +57,18 @@
   pointer-events: none;
 }
 
+/* Portaled to document.body — above Spark Note / guidebook anchors */
+.jg-table-actions-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 100009;
+  pointer-events: none;
+}
+
+.jg-table-actions-portal .jg-table-actions--sanctuary {
+  pointer-events: auto;
+}
+
 .jg-welcome-desk--actions-only .jg-table-actions--sanctuary,
 .jg-sanctuary-desk--actions-only .jg-table-actions--sanctuary,
 .jg-welcome-desk--composed .jg-table-actions--sanctuary,
