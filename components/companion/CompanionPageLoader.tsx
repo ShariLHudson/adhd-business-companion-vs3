@@ -12,6 +12,11 @@ import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
 import { EstateRouteRecovery } from "@/components/companion/estate/EstateRouteRecovery";
 import { armCompanionPreviewTestHarnessFromQuery } from "@/lib/companionPreviewTestHarness";
 import { ESTATE_WORKSPACE_LOAD_RECOVERY } from "@/lib/companionContextRouting/workspaceLoadRecovery";
+import {
+  clearCompanionChunkReloadGuard,
+  isCompanionWebpackChunkFailure,
+  reloadOnceForStaleCompanionChunk,
+} from "@/lib/companionWebpackChunkFailure";
 import "@/app/companion/estate-route-recovery.css";
 
 const LOADING = (
@@ -108,13 +113,21 @@ function AuthenticatedCompanionShell() {
     let cancelled = false;
     void import("@/app/companion/CompanionPageClient")
       .then((mod) => {
-        if (!cancelled) setPage(() => mod.default);
+        if (!cancelled) {
+          clearCompanionChunkReloadGuard();
+          setPage(() => mod.default);
+        }
       })
       .catch((err: unknown) => {
-        if (!cancelled) {
-          routeWorkspaceLoadFailure(err);
-          setLoadFailed(true);
+        if (cancelled) return;
+        if (
+          isCompanionWebpackChunkFailure(err) &&
+          reloadOnceForStaleCompanionChunk()
+        ) {
+          return;
         }
+        routeWorkspaceLoadFailure(err);
+        setLoadFailed(true);
       });
     return () => {
       cancelled = true;

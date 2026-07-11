@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEstateRoomShell";
 import { getBusinessProfile, getPrefs } from "@/lib/companionStore";
@@ -39,7 +39,13 @@ function buildBusinessSnapshot(): string {
 
 /** Cycle 1 — Profile landing for My Business Estate™ (read-only snapshot). */
 export function MyBusinessEstatePanel({ onOpenDestination }: Props) {
-  const snapshot = useMemo(() => buildBusinessSnapshot(), []);
+  const [snapshot, setSnapshot] = useState(
+    "Your business snapshot will grow here as you add identity and direction. No rush — start wherever feels natural.",
+  );
+
+  useEffect(() => {
+    setSnapshot(buildBusinessSnapshot());
+  }, []);
 
   const otherDestinations = PROFILE_DESTINATION_CARDS.filter(
     (card) => card.destination !== "my-business-estate",
