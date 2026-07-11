@@ -65,6 +65,8 @@ describe("journalGazeboCompanion", () => {
       "utf8",
     );
     expect(welcomeDesk).toMatch(/JournalGazeboTableActionsPortal/);
+    expect(welcomeDesk).toMatch(/layout="welcome-plate"/);
+    expect(welcomeDesk).toMatch(/jg-welcome-desk/);
     expect(readFileSync(resolve(process.cwd(), "app/companion/companion.css"), "utf8")).toMatch(
       /body:has\(\.companion-root\[data-journal-gazebo-active\]\) \.spark-note-anchor/,
     );

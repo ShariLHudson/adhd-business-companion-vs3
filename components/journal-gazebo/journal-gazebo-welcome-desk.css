@@ -65,6 +65,15 @@
   pointer-events: none;
 }
 
+.jg-table-actions-portal .jg-welcome-desk {
+  z-index: 1;
+  pointer-events: none;
+}
+
+.jg-table-actions-portal .jg-welcome-desk .jg-table-actions {
+  pointer-events: auto;
+}
+
 .jg-table-actions-portal .jg-table-actions--sanctuary {
   pointer-events: auto;
 }

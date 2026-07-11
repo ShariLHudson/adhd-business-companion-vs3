@@ -54,12 +54,14 @@ export function JournalGazeboSanctuaryDesk({
   if (!sceneComposed) {
     return (
       <JournalGazeboTableActionsPortal aria-label="Journal Gazebo sanctuary">
-        <JournalGazeboTableActions
-          layout="sanctuary"
-          journals={journals}
-          onCreateJournal={onCreateJournal}
-          onOpenJournal={onOpenJournal}
-        />
+        <div className="jg-sanctuary-desk--actions-only">
+          <JournalGazeboTableActions
+            layout="sanctuary"
+            journals={journals}
+            onCreateJournal={onCreateJournal}
+            onOpenJournal={onOpenJournal}
+          />
+        </div>
       </JournalGazeboTableActionsPortal>
     );
   }
@@ -82,12 +84,14 @@ export function JournalGazeboSanctuaryDesk({
       ) : null}
 
       <JournalGazeboTableActionsPortal>
-        <JournalGazeboTableActions
-          layout="sanctuary"
-          journals={journals}
-          onCreateJournal={onCreateJournal}
-          onOpenJournal={onOpenJournal}
-        />
+        <div className="jg-sanctuary-desk--actions-only">
+          <JournalGazeboTableActions
+            layout="sanctuary"
+            journals={journals}
+            onCreateJournal={onCreateJournal}
+            onOpenJournal={onOpenJournal}
+          />
+        </div>
       </JournalGazeboTableActionsPortal>
     </div>
   );
