@@ -32,6 +32,8 @@ export type CinematicBackgroundProps = {
   showBottomFade?: boolean;
   /** Values below 1 slow motion — useful for short looping aquarium clips. */
   playbackRate?: number;
+  /** Default true — estate experience videos pass false so embedded music plays. */
+  muted?: boolean;
   children?: ReactNode;
 };
 
@@ -56,6 +58,7 @@ export function CinematicBackground({
   mediaClassName = "",
   showBottomFade = true,
   playbackRate = 1,
+  muted = true,
   children,
 }: CinematicBackgroundProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -77,6 +80,7 @@ export function CinematicBackground({
 
     let cancelled = false;
     video.loop = true;
+    video.muted = muted;
     video.playbackRate = playbackRate;
 
     const safePlay = async () => {
@@ -125,7 +129,7 @@ export function CinematicBackground({
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("loadeddata", onLoadedData);
     };
-  }, [mode, playKey, playbackRate, videoSrc]);
+  }, [mode, muted, playKey, playbackRate, videoSrc]);
 
   const rootClass = [
     "cinematic-background",
@@ -157,7 +161,7 @@ export function CinematicBackground({
               className={mediaClass}
               src={videoSrc}
               poster={poster}
-              muted
+              muted={muted}
               loop
               autoPlay
               playsInline

@@ -20,6 +20,7 @@ describe("estatePlaceAmbientSound", () => {
     const gazebo = resolveEstatePlaceAmbientProfile("gazebo");
     const greenhouse = resolveEstatePlaceAmbientProfile("greenhouse");
     const conservatory = resolveEstatePlaceAmbientProfile("conservatory");
+    const butterflyHouse = resolveEstatePlaceAmbientProfile("butterfly-house");
 
     expect(nook?.src).toBe(EVENING_HEARTH_AMBIENCE_MP3);
     expect(nook?.character).toMatch(/fireplace|page turn/i);
@@ -33,9 +34,8 @@ describe("estatePlaceAmbientSound", () => {
     expect(greenhouse?.character).toMatch(/glasshouse|greenhouse/i);
     expect(greenhouse?.layers?.length).toBeGreaterThanOrEqual(3);
 
-    expect(conservatory?.src).toBe(OCEAN_CONSERVATORY_AMBIENCE_MP3);
-    expect(conservatory?.character).toMatch(/aquarium/i);
-    expect(conservatory?.volume).toBeGreaterThan(greenhouse?.volume ?? 0);
+    expect(conservatory).toBeNull();
+    expect(butterflyHouse).toBeNull();
 
     expect(nook?.src).not.toBe(gazebo?.src);
     expect(gazebo?.src).not.toBe(greenhouse?.src);

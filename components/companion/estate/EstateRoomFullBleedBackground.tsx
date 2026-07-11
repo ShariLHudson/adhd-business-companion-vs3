@@ -200,6 +200,7 @@ export function EstateRoomFullBleedBackground({
           mode="video"
           videoSrc={videoSrc}
           poster={poster}
+          muted={false}
           playbackRate={estateRoomExperienceVideoPlaybackRate(canonicalRoomId)}
           fallbackBackground={`url('${poster}')`}
           placement="fixed"

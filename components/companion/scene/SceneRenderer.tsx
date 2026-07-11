@@ -4,6 +4,7 @@ import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
 import {
   estateRoomExperienceVideoPlaybackRate,
+  estateRoomUsesExperienceVideo,
   estateRoomUsesOceanConservatoryVideo,
   resolveEstateRoomExperienceVideo,
 } from "@/lib/estate/estateRoomExperienceVideo";
@@ -94,6 +95,13 @@ export function SceneRenderer({
       : null;
 
   const sceneVideoUrl = manifestVideo ?? background.videoUrl;
+  const sceneVideoCarriesAudio = Boolean(
+    sceneVideoUrl &&
+      estateRoomUsesExperienceVideo(
+        resolved.environment.placeId,
+        background.imageUrl,
+      ),
+  );
 
   const keepEstateFullyVisible =
     immersive ||
@@ -120,6 +128,7 @@ export function SceneRenderer({
               mode="video"
               videoSrc={sceneVideoUrl}
               poster={background.imageUrl}
+              muted={!sceneVideoCarriesAudio}
               playbackRate={
                 sceneVideoUrl
                   ? estateRoomExperienceVideoPlaybackRate(

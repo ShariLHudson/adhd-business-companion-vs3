@@ -6,6 +6,7 @@
  */
 
 import { resolveCanonicalPlaceId } from "./canonicalEstateRegistry";
+import { estateRoomUsesExperienceVideo } from "./estateRoomExperienceVideo";
 import { resolveEstateArrivalExperience } from "./estateArrivalExperience";
 import type { EstateArrivalAmbienceProfile } from "./estateArrivalExperienceTypes";
 import { resolveCanonicalPlaceAmbience } from "./estatePlaceMedia";
@@ -140,6 +141,7 @@ export function resolveEstatePlaceAmbientProfile(
   placeId: string,
 ): EstateArrivalAmbienceProfile | null {
   const id = normalizePlaceKey(placeId);
+  if (estateRoomUsesExperienceVideo(id)) return null;
   const layered = ESTATE_PLACE_AMBIENT_SOUND[id];
   if (layered) return enrichAmbienceProfileWithIntent(id, layered);
   const media = resolveCanonicalPlaceAmbience(id);
