@@ -18762,6 +18762,7 @@ export default function CompanionPageClient() {
           />
         );
       case "growth-journal":
+        if (activeSection === "growth-journal") return null;
         return (
           <GrowthJournalRoomPanel
             nav={buildGrowthPanelNav("growth-journal")}

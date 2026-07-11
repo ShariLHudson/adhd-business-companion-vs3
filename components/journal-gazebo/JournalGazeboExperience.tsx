@@ -59,7 +59,6 @@ import { JournalGazeboAmbience } from "./JournalGazeboAmbience";
 import { JournalGazeboCeremonyPage } from "./JournalGazeboCeremonyPage";
 import { JournalGazeboCreationWizard } from "./JournalGazeboCreationWizard";
 import { gazeboSeasonBackgroundCandidates, journalGazeboAtmosphereOnly } from "@/lib/journalGazebo/seasons";
-import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import { JournalGazeboDesignStudio } from "./JournalGazeboDesignStudio";
 import {
   JournalGazeboWrappedGift,
@@ -198,13 +197,15 @@ export function JournalGazeboExperience({
 
   const [useAtmosphere, setUseAtmosphere] = useState(false);
   const backgroundCandidates = useMemo(() => {
-    const plates = prototypeMode
-      ? gazeboSeasonBackgroundCandidates(undefined, { atmosphereOnly: false })
-      : useAtmosphere
-        ? []
-        : gazeboSeasonBackgroundCandidates(undefined, { atmosphereOnly: false });
-    if (plates.length > 0) return plates;
-    return [ESTATE_ROOM_BG.gazeboJournal];
+    if (prototypeMode) {
+      const plates = gazeboSeasonBackgroundCandidates(undefined, {
+        atmosphereOnly: false,
+      });
+      if (plates.length > 0) return plates;
+      return [JOURNAL_GAZEBO_BACKGROUND_URL];
+    }
+    if (useAtmosphere) return [];
+    return [JOURNAL_GAZEBO_BACKGROUND_URL];
   }, [prototypeMode, useAtmosphere]);
   const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [sceneComposed, setSceneComposed] = useState(assumeFirstVisit || prototypeMode);
@@ -1366,7 +1367,11 @@ export function JournalGazeboExperience({
           initialNote={returnNote}
           onCreateJournal={handleWelcomeCreateJournal}
           onOpenJournal={handleOpenMyJournal}
-          onJournalClick={featuredJournal ? handleJournalOpen : undefined}
+          onJournalClick={
+            featuredJournal
+              ? () => openSelectedJournal(featuredJournal)
+              : undefined
+          }
         />
       ) : null}
 
@@ -1440,8 +1445,13 @@ export function JournalGazeboExperience({
             onComplete={handleDesignComplete}
             onExit={() => {
               setSparkLine(null);
-              setPhase("estate");
-              setEstateMoment("ready");
+              if (visitMode === "return") {
+                setPhase("gazebo-rest");
+                setEstateMoment("rest");
+              } else {
+                setPhase("estate");
+                setEstateMoment("ready");
+              }
             }}
           />
         </div>

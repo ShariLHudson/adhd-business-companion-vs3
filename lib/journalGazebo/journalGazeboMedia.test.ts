@@ -13,7 +13,7 @@ describe("journalGazeboMedia", () => {
     expect(JOURNAL_ROOM_BG).toBe(JOURNAL_GAZEBO_BACKGROUND_URL);
   });
 
-  it("uses the welcome letter plate for first visits only", () => {
+  it("keeps the welcome letter asset available for preload only", () => {
     expect(JOURNAL_WELCOME_PLATE_URL).toContain("welcome-to-the-journal-gazebo");
     expect(JOURNAL_WELCOME_PLATE_URL).not.toBe(JOURNAL_GAZEBO_BACKGROUND_URL);
   });

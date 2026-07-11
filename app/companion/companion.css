@@ -10211,7 +10211,17 @@
   background: transparent;
 }
 
+.companion-root[data-journal-gazebo-active] .clear-my-mind-standalone-shell,
+.companion-root[data-journal-gazebo-active] .clear-my-mind-standalone-frame {
+  pointer-events: none;
+}
+
+.companion-root[data-journal-gazebo-active] .journal-gazebo--companion {
+  pointer-events: auto;
+}
+
 .companion-growth-active .clear-my-mind-standalone-frame:has(.journal-room),
+.companion-growth-active .clear-my-mind-standalone-frame:has(.journal-gazebo),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.capture-moment-room),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.creative-studio-room),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.evidence-vault-room),

@@ -1,7 +1,4 @@
-import {
-  GAZEBO_JOURNAL_BACKGROUND_URL,
-  JOURNAL_WELCOME_PLATE_URL,
-} from "./journalGazeboMedia";
+import { GAZEBO_JOURNAL_BACKGROUND_URL } from "./journalGazeboMedia";
 
 const RETURN_VISIT_COUNT_KEY = "spark-journal-gazebo-return-visit-count";
 
@@ -54,7 +51,7 @@ export function recordJournalReturnSession(): JournalSessionScenes {
 
 export function resolveJournalWelcomeScenes(): JournalSessionScenes {
   return {
-    gazeboUrl: JOURNAL_WELCOME_PLATE_URL,
+    gazeboUrl: journalGazeboStartUrl(),
     settledUrl: null,
     transitionAfterMs: 0,
   };

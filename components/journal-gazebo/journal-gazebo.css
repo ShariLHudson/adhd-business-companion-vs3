@@ -23,8 +23,9 @@
 .journal-gazebo--companion {
   position: fixed;
   inset: 0;
-  z-index: 18;
+  z-index: 120;
   width: 100vw;
+  pointer-events: auto;
 }
 
 /* CSS atmosphere when photo plates are missing (prototype / local dev). */
@@ -50,6 +51,11 @@
   pointer-events: none;
   user-select: none;
   background: linear-gradient(180deg, #2a2420 0%, #1a1612 48%, #12100e 100%);
+}
+
+.journal-gazebo .estate-room-fullbleed-bg {
+  object-fit: contain;
+  object-position: center center;
 }
 
 .journal-gazebo__background--gazebo {
