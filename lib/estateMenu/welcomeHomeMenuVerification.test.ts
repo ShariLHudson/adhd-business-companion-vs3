@@ -194,18 +194,23 @@ describe("Welcome Home menu — desktop + mobile layout", () => {
     expect(menuCss).toMatch(/\.global-estate-menu__trigger[\s\S]*?min-height:\s*2\.75rem/);
     expect(menuCss).toMatch(/@media \(max-width:\s*900px\)[\s\S]*?min-height:\s*2\.75rem/);
     expect(menuCss).toMatch(
-      /@media \(max-width:\s*900px\)[\s\S]*?\.global-estate-menu__item--nested/,
+      /@media \(max-width:\s*900px\)[\s\S]*?\.global-estate-menu__action-row/,
     );
   });
 
-  it("renders Conversations and Profile as non-clickable groups with nested actions", () => {
+  it("renders Conversations and Profile as collapsible groups with nested actions", () => {
     const component = readFileSync(
       resolve(process.cwd(), "components/companion/GlobalEstateMenu.tsx"),
       "utf8",
     );
-    expect(component).toMatch(/data-estate-menu-group=\{entry\.id\}/);
-    expect(component).toMatch(/global-estate-menu__item--nested/);
-    expect(component).toMatch(/role="presentation"/);
+    expect(component).toMatch(/EstateDropdownMenuSection/);
+    expect(component).toMatch(/EstateDropdownMenuCategoryRow/);
+    expect(component).toMatch(/EstateDropdownMenuActionRow/);
+    expect(component).toMatch(/closeAndRun\(child\.id\)/);
+    expect(component).toMatch(/onActionRef\.current\(actionId\)/);
+    expect(component).toMatch(/toggleGroup\(entry\.id\)/);
+    expect(component).toMatch(/showChevron/);
+    expect(component).toMatch(/estate-room-experience-menu__panel/);
     expect(component).not.toMatch(/growth-profile/);
     expect(component).not.toMatch(/estate-profile/);
     expect(component).not.toMatch(/Personalization/);

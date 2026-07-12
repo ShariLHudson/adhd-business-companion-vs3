@@ -1,7 +1,11 @@
-/* Global Estate Menu — account menu, upper-right on every page */
+/* Global Estate Menu — SH profile dropdown; panel rows match Welcome Home room menu */
 
 .global-estate-menu-anchor {
   pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
 }
 
 [data-companion-menu-layer="true"][data-estate-menu-variant="floating"].global-estate-menu-anchor {
@@ -22,7 +26,10 @@
   bottom: auto !important;
   transform: none !important;
   width: min(17.5rem, calc(100vw - 1.5rem)) !important;
+  min-width: min(17.5rem, calc(100vw - 1.5rem)) !important;
+  max-width: min(17.5rem, calc(100vw - 1.5rem)) !important;
   max-height: min(24rem, calc(100dvh - 5rem)) !important;
+  overflow-y: auto;
 }
 
 .global-estate-menu__trigger {
@@ -59,6 +66,11 @@
 }
 
 .global-estate-menu__trigger--floating:hover {
+  background: rgba(18, 22, 18, 0.62);
+}
+
+.global-estate-menu--open .global-estate-menu__trigger--floating {
+  border-color: rgba(255, 236, 200, 0.58);
   background: rgba(18, 22, 18, 0.62);
 }
 
@@ -102,32 +114,25 @@
   font-size: 0.58rem;
   line-height: 1;
   opacity: 0.88;
+  transition: transform 0.2s ease;
 }
 
-.global-estate-menu__panel {
-  overflow: hidden;
-  border-radius: 1rem;
-  border: 1px solid rgba(212, 198, 178, 0.65);
-  background: linear-gradient(
-    168deg,
-    rgba(255, 251, 244, 0.98) 0%,
-    rgba(252, 246, 236, 0.96) 100%
-  );
-  box-shadow:
-    0 18px 44px rgba(42, 34, 28, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+.global-estate-menu--open .global-estate-menu__trigger-chevron {
+  transform: rotate(180deg);
 }
 
 .global-estate-menu__header {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.9rem 1rem 0.75rem;
+  gap: 0.65rem;
+  margin: -0.1rem 0 0.15rem;
+  padding: 0.15rem 0.35rem 0.45rem;
+  border-bottom: 1px solid rgba(255, 248, 235, 0.12);
 }
 
 .global-estate-menu__header-avatar {
-  height: 2rem;
-  width: 2rem;
+  height: 1.85rem;
+  width: 1.85rem;
   flex-shrink: 0;
   border-radius: 999px;
   object-fit: cover;
@@ -137,98 +142,92 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #e8e2d8;
-  font-size: 0.78rem;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.74rem;
   font-weight: 600;
-  color: #4b463f;
+  color: rgba(255, 248, 235, 0.92);
 }
 
 .global-estate-menu__header-name {
   margin: 0;
   min-width: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: #3d342c;
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 248, 235, 0.96);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .global-estate-menu__list {
-  padding: 0.2rem 0 0.35rem;
-}
-
-.global-estate-menu__group {
-  padding: 0.15rem 0 0.25rem;
-}
-
-.global-estate-menu__group-label {
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  padding: 0.45rem 1rem 0.2rem;
-  color: #6b5d4f;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.global-estate-menu__group-children {
   display: flex;
   flex-direction: column;
+  gap: 0.28rem;
 }
 
-.global-estate-menu__item {
-  display: flex;
-  width: 100%;
+.global-estate-menu__action-row {
+  justify-content: space-between;
+}
+
+.global-estate-menu__action-row-main {
+  display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  border: 0;
-  background: transparent;
-  padding: 0.62rem 1rem;
-  text-align: left;
-  cursor: pointer;
-  color: #3d342c;
-  font-size: 0.96rem;
-  line-height: 1.35;
-  transition: background 0.15s ease;
-}
-
-.global-estate-menu__item--nested {
-  padding-left: 2.35rem;
-  font-size: 0.92rem;
-}
-
-.global-estate-menu__item:hover,
-.global-estate-menu__item:focus-visible {
-  background: rgba(255, 248, 236, 0.85);
-  outline: none;
-}
-
-.global-estate-menu__item-emoji {
-  flex-shrink: 0;
-  width: 1.35rem;
-  font-size: 1rem;
-  line-height: 1;
-  text-align: center;
-}
-
-.global-estate-menu__item-label {
+  gap: 0.5rem;
   min-width: 0;
 }
 
-.global-estate-menu__item--logout {
-  margin-top: 0.15rem;
-  border-top: 1px solid rgba(212, 198, 178, 0.45);
-  color: #6b4f4f;
+.global-estate-menu__action-chevron {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.78;
 }
 
-.global-estate-menu__item--logout:hover,
-.global-estate-menu__item--logout:focus-visible {
-  background: rgba(255, 244, 240, 0.9);
+.global-estate-menu__action-row--logout {
+  margin-top: 0.08rem;
+  border-color: rgba(220, 170, 170, 0.28);
+  color: rgba(255, 220, 220, 0.92);
+}
+
+.global-estate-menu__action-row--logout:hover,
+.global-estate-menu__action-row--logout:focus-visible {
+  background: rgba(180, 90, 90, 0.14);
+  border-color: rgba(220, 170, 170, 0.42);
+}
+
+.estate-dropdown-menu__value-row {
+  gap: 0.65rem;
+}
+
+.estate-dropdown-menu__value-row-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.estate-dropdown-menu__value-row-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  min-width: 0;
+  max-width: 58%;
+}
+
+.estate-dropdown-menu__value-row-value {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: rgba(255, 236, 200, 0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.settings-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
 }
 
 /* Mobile / narrow viewports — keep menu usable with thumb targets */
@@ -238,28 +237,22 @@
     min-width: 2.75rem;
   }
 
-  .global-estate-menu__panel,
   .global-estate-menu__panel.global-estate-menu__panel--floating[data-companion-menu-panel="true"] {
     width: min(17.5rem, calc(100vw - 1.25rem)) !important;
+    min-width: min(17.5rem, calc(100vw - 1.25rem)) !important;
     max-width: calc(100vw - 1.25rem) !important;
     max-height: min(70dvh, calc(100dvh - 5rem)) !important;
   }
 
-  .global-estate-menu__item,
-  .global-estate-menu__item--nested {
+  .estate-room-experience-menu__category,
+  .global-estate-menu__action-row {
     min-height: 2.75rem;
-    padding-top: 0.7rem;
-    padding-bottom: 0.7rem;
-  }
-
-  .global-estate-menu__group-label {
-    padding-top: 0.55rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .global-estate-menu__trigger,
-  .global-estate-menu__item {
+  .global-estate-menu__trigger-chevron {
     transition: none;
   }
 }

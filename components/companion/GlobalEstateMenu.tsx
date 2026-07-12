@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  EstateDropdownMenuActionRow,
+  EstateDropdownMenuCategoryRow,
+  EstateDropdownMenuSection,
+  EstateDropdownMenuSectionItems,
+} from "@/components/companion/estate/EstateDropdownMenuPrimitives";
 import {
   ESTATE_MENU_DROPDOWN_ENTRIES,
   type EstateMenuActionId,
@@ -20,6 +26,8 @@ export type GlobalEstateMenuProps = {
   embedded?: boolean;
   className?: string;
 };
+
+type ExpandedGroupId = "conversations" | "profile";
 
 function useUserProfileDisplay() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -46,56 +54,82 @@ export function GlobalEstateMenu({
 }: GlobalEstateMenuProps) {
   const { imageUrl, initials, name } = useUserProfileDisplay();
   const [open, setOpen] = useState(false);
+  const [expandedGroup, setExpandedGroup] = useState<ExpandedGroupId | null>(null);
   const [mounted, setMounted] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const onActionRef = useRef(onAction);
+
+  useEffect(() => {
+    onActionRef.current = onAction;
+  }, [onAction]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  function close() {
+  const close = useCallback(() => {
     setOpen(false);
-  }
+    setExpandedGroup(null);
+  }, []);
 
-  function run(actionId: EstateMenuActionId) {
-    close();
-    onAction(actionId);
-  }
+  /** Run destination first, then close — avoids losing the click when the panel unmounts. */
+  const closeAndRun = useCallback(
+    (actionId: EstateMenuActionId) => {
+      onActionRef.current(actionId);
+      close();
+    },
+    [close],
+  );
+
+  const toggleGroup = useCallback((groupId: ExpandedGroupId) => {
+    setExpandedGroup((current) => (current === groupId ? null : groupId));
+  }, []);
 
   useEffect(() => {
     if (!open) return;
 
-    const onClickOutside = (event: MouseEvent) => {
-      if (rootRef.current?.contains(event.target as Node)) return;
+    const onPointerDownOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (target && rootRef.current?.contains(target)) return;
       close();
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
     };
-    document.addEventListener("click", onClickOutside);
+    document.addEventListener("mousedown", onPointerDownOutside);
+    document.addEventListener("touchstart", onPointerDownOutside);
     document.addEventListener("keydown", onKeyDown);
     return () => {
-      document.removeEventListener("click", onClickOutside);
+      document.removeEventListener("mousedown", onPointerDownOutside);
+      document.removeEventListener("touchstart", onPointerDownOutside);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  }, [close, open]);
 
   const triggerClass =
     variant === "floating"
       ? "global-estate-menu__trigger global-estate-menu__trigger--floating"
       : "global-estate-menu__trigger";
 
-  const panelClass =
-    variant === "floating"
-      ? "global-estate-menu__panel global-estate-menu__panel--floating"
-      : "global-estate-menu__panel";
+  const panelClass = [
+    "estate-room-experience-menu__panel",
+    "global-estate-menu__panel",
+    variant === "floating" ? "global-estate-menu__panel--floating" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  const rootClass =
+  const rootClass = [
     variant === "floating"
       ? `global-estate-menu-anchor${
           embedded ? " global-estate-menu-anchor--embedded" : ""
-        } ${className}`.trim()
-      : `relative z-50 ${className}`.trim();
+        }`
+      : "relative z-50",
+    open ? "global-estate-menu--open" : "",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const displayName = name?.trim() || "Member";
 
@@ -144,6 +178,8 @@ export function GlobalEstateMenu({
           aria-label="Profile menu"
           data-companion-menu-panel="true"
           data-estate-menu-panel=""
+          onPointerDown={(event) => event.stopPropagation()}
+          onMouseDown={(event) => event.stopPropagation()}
         >
           <div className="global-estate-menu__header">
             {imageUrl ? (
@@ -167,72 +203,59 @@ export function GlobalEstateMenu({
           <div className="global-estate-menu__list">
             {ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => {
               if (entry.kind === "group") {
+                const isExpanded = expandedGroup === entry.id;
                 return (
-                  <div
+                  <EstateDropdownMenuSection
                     key={entry.id}
-                    className="global-estate-menu__group"
-                    data-estate-menu-group={entry.id}
+                    sectionId={entry.id}
+                    expanded={isExpanded}
                   >
-                    <div
-                      className="global-estate-menu__group-label"
-                      role="presentation"
-                    >
-                      <span
-                        className="global-estate-menu__item-emoji"
-                        aria-hidden
-                      >
-                        {entry.emoji}
-                      </span>
-                      <span className="global-estate-menu__item-label">
-                        {entry.label}
-                      </span>
-                    </div>
-                    <div className="global-estate-menu__group-children">
-                      {entry.children.map((child) => (
-                        <button
-                          key={child.id}
-                          type="button"
-                          role="menuitem"
-                          onClick={() => run(child.id)}
-                          className="global-estate-menu__item global-estate-menu__item--nested"
-                          data-estate-menu-item={child.id}
-                        >
-                          <span
-                            className="global-estate-menu__item-emoji"
-                            aria-hidden
-                          >
-                            {child.emoji}
-                          </span>
-                          <span className="global-estate-menu__item-label">
-                            {child.label}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                    <EstateDropdownMenuCategoryRow
+                      label={entry.label}
+                      expanded={isExpanded}
+                      testId={`global-estate-menu-group-${entry.id}`}
+                      onClick={() => toggleGroup(entry.id)}
+                    />
+                    {isExpanded ? (
+                      <EstateDropdownMenuSectionItems label={entry.label}>
+                        {entry.children.map((child) => (
+                          <EstateDropdownMenuActionRow
+                            key={child.id}
+                            label={child.label}
+                            icon={child.emoji}
+                            showChevron
+                            testId={`global-estate-menu-item-${child.id}`}
+                            menuItemId={child.id}
+                            onClick={() => closeAndRun(child.id)}
+                          />
+                        ))}
+                      </EstateDropdownMenuSectionItems>
+                    ) : null}
+                  </EstateDropdownMenuSection>
+                );
+              }
+
+              if (entry.id === "settings") {
+                return (
+                  <EstateDropdownMenuCategoryRow
+                    key={entry.id}
+                    label={entry.label}
+                    testId="global-estate-menu-item-settings"
+                    onClick={() => closeAndRun(entry.id)}
+                  />
                 );
               }
 
               return (
-                <button
+                <EstateDropdownMenuActionRow
                   key={entry.id}
-                  type="button"
-                  role="menuitem"
-                  onClick={() => run(entry.id)}
-                  className={`global-estate-menu__item${
-                    entry.id === "log-out"
-                      ? " global-estate-menu__item--logout"
-                      : ""
-                  }`}
-                  data-estate-menu-item={entry.id}
-                >
-                  <span className="global-estate-menu__item-emoji" aria-hidden>
-                    {entry.emoji}
-                  </span>
-                  <span className="global-estate-menu__item-label">
-                    {entry.label}
-                  </span>
-                </button>
+                  label={entry.label}
+                  icon={entry.emoji}
+                  variant={entry.id === "log-out" ? "logout" : "default"}
+                  testId={`global-estate-menu-item-${entry.id}`}
+                  menuItemId={entry.id}
+                  onClick={() => closeAndRun(entry.id)}
+                />
               );
             })}
           </div>
