@@ -566,31 +566,35 @@ export const BUSINESS_ESTATE_SECTIONS: readonly {
   {
     id: "identity",
     title: "Business Identity",
-    description: "Who you are, what your business is, and how you describe it.",
+    description:
+      "The foundation of who your business is and why it exists.",
   },
   {
     id: "offers",
     title: "What I Offer",
-    description: "Products, services, programs, and the outcomes you create.",
+    description:
+      "The products, services, programs, and outcomes you provide.",
   },
   {
     id: "brand",
     title: "Brand and Message",
-    description: "How you sound, what you stand for, and what to avoid.",
+    description: "How your business sounds, looks, and communicates.",
   },
   {
     id: "direction",
     title: "Business Direction",
-    description: "Priorities, goals, milestones, and what you are building.",
+    description:
+      "What you are focused on now and where the business is going next.",
   },
   {
     id: "work-style",
     title: "How I Work Best",
-    description: "Focus patterns and how Spark Estate can support your work.",
+    description:
+      "The patterns and preferences that help Spark Estate support you well.",
   },
   {
     id: "tools",
     title: "Business Tools and Systems",
-    description: "Platforms and systems your business already uses.",
+    description: "The tools and systems your business currently uses.",
   },
 ] as const;

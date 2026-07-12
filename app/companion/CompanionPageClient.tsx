@@ -20347,7 +20347,7 @@ export default function CompanionPageClient() {
             </div>
           ) : estateProfilePrimary ? (
             <main className="estate-room-main">
-              <MyBusinessEstatePanel />
+              <MyBusinessEstatePanel onClose={goBack} />
             </main>
           ) : peopleIHelpProfilePrimary ? (
             <main className="estate-room-main">
