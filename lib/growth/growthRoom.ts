@@ -10,9 +10,8 @@ export const JOURNAL_ROOM_BG = ESTATE_ROOM_BG.gazeboJournal;
 export const EVIDENCE_VAULT_ENTRANCE_BG =
   "/backgrounds/evidence-vault-background.png" as const;
 
-/** Evidence Vault — interior room plate (journal workspace). */
-export const EVIDENCE_VAULT_ROOM_BG =
-  "/backgrounds/evidence-vault-room-background.png" as const;
+/** Evidence Vault — interior room plate (shares entrance plate until interior asset ships). */
+export const EVIDENCE_VAULT_ROOM_BG = ESTATE_ROOM_BG.evidenceVault;
 
 /** Portfolio — creative work archive, full-bleed background. */
 export const PORTFOLIO_ROOM_BG =

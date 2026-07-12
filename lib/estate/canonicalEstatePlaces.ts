@@ -767,7 +767,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Momentum Institute",
     category: "destination",
     primaryFeeling: "Discovery, prestige, earned capability",
-    backgroundImage: "/backgrounds/the-momentum-institute-background.png",
+    backgroundImage: "/backgrounds/spark-chamber-of-momentum-background.png",
     aliases: [
       "momentum institute",
       "the momentum institute",
