@@ -29,6 +29,7 @@ import { playChime, unlockChime } from "@/lib/chime";
 import { RemindersPanel } from "@/components/companion/RemindersPanel";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import { EstateDropdownMenuValueRow } from "@/components/companion/estate/EstateDropdownMenuPrimitives";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { MENU_LIST_LABEL, MENU_SECTION_HEADING } from "@/lib/menuNavStyles";
 import {
@@ -1354,25 +1355,18 @@ export function SettingsPanel({
         How the app behaves — language, appearance, notifications, and more.
       </p>
       <WorkspaceAreaWorksGuide areaId="settings" />
-      <div className="mt-6 flex flex-col gap-2.5">
+      <div className="settings-menu-list mt-6">
         {[...ROWS]
           .sort((a, b) => compareDropdownLabels(a.label, b.label))
           .map((r) => (
-          <button
-            key={r.id}
-            type="button"
-            onClick={() => setOpen(r.id)}
-            className={`${CARD} flex items-center justify-between border-[#d4cdc3] hover:border-[#1e4f4f]/45 hover:bg-white`}
-          >
-            <span className={MENU_LIST_LABEL}>
-              {r.label}
-            </span>
-            <span className="flex items-center gap-2 text-sm text-black">
-              {r.value}
-              <span className="text-black">›</span>
-            </span>
-          </button>
-        ))}
+            <EstateDropdownMenuValueRow
+              key={r.id}
+              label={r.label}
+              value={r.value}
+              testId={`settings-row-${r.id}`}
+              onClick={() => setOpen(r.id)}
+            />
+          ))}
       </div>
     </div>
   );
