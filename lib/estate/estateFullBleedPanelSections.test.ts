@@ -14,6 +14,10 @@ describe("estateFullBleedPanelSections", () => {
     expect(isEstateFullBleedPanelSection("visual-focus")).toBe(true);
   });
 
+  it("includes Round Table Boardroom as full-bleed", () => {
+    expect(isEstateFullBleedPanelSection("boardroom")).toBe(true);
+  });
+
   it("does not treat generic home as full-bleed", () => {
     expect(isEstateFullBleedPanelSection("home")).toBe(false);
   });

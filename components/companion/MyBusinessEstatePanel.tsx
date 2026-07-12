@@ -4,49 +4,36 @@ import { useCallback, useEffect, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEstateRoomShell";
 import { BusinessEstateSectionEditor } from "@/components/companion/business-estate/BusinessEstateSectionEditor";
+import { BusinessAreaCard } from "@/components/companion/business-estate/BusinessAreaCard";
+import { ExecutiveBusinessSnapshot } from "@/components/companion/business-estate/ExecutiveBusinessSnapshot";
+import { ShariNote } from "@/components/companion/business-estate/ShariNote";
 import {
   BUSINESS_ESTATE_SECTIONS,
-  getBusinessEstateSectionStatus,
-  summarizeBusinessEstateSection,
   type BusinessEstateSectionId,
 } from "@/lib/profile/businessEstateProfile";
-import { buildApprovedBusinessSnapshot } from "@/lib/profile/businessSnapshot";
+import {
+  BUSINESS_AREA_PRESENTATION,
+  getBusinessAreaPresentation,
+} from "@/lib/profile/executiveOfficePresentation";
+import { setUnsavedWorkGuard } from "@/lib/unsavedWorkGuard";
 import "@/app/companion/my-business-estate.css";
-
-const STATUS_LABELS = {
-  "not-started": "Not started",
-  started: "Started",
-  "ready-to-review": "Ready to review",
-  updated: "Updated",
-} as const;
-
-const SECTION_ICONS: Record<BusinessEstateSectionId, string> = {
-  identity: "🏛",
-  offers: "✨",
-  brand: "💬",
-  direction: "🧭",
-  "work-style": "⚡",
-  tools: "🛠",
-};
-
-function formatSnapshot(snapshot: string): string {
-  return snapshot.includes("\n") ? snapshot.split("\n").join(" · ") : snapshot;
-}
 
 type Props = {
   onClose: () => void;
 };
 
-/** My Business Estate — editable section overview (separate from People I Help). */
+/**
+ * My Business Estate — Executive Office overview.
+ * Presentation/navigation redesign; section editor + storage unchanged.
+ */
 export function MyBusinessEstatePanel({ onClose }: Props) {
-  const [snapshot, setSnapshot] = useState(() => buildApprovedBusinessSnapshot());
   const [activeSection, setActiveSection] =
     useState<BusinessEstateSectionId | null>(null);
+  const [openSectionInEdit, setOpenSectionInEdit] = useState(false);
   const [sectionDirty, setSectionDirty] = useState(false);
   const [revision, setRevision] = useState(0);
 
   const refresh = useCallback(() => {
-    setSnapshot(buildApprovedBusinessSnapshot());
     setRevision((value) => value + 1);
   }, []);
 
@@ -61,6 +48,19 @@ export function MyBusinessEstatePanel({ onClose }: Props) {
     };
   }, [refresh]);
 
+  useEffect(() => {
+    if (!sectionDirty) {
+      setUnsavedWorkGuard(null);
+      return;
+    }
+    setUnsavedWorkGuard(() =>
+      window.confirm(
+        "You have unsaved changes. Discard them and leave My Business Estate?",
+      ),
+    );
+    return () => setUnsavedWorkGuard(null);
+  }, [sectionDirty]);
+
   function handleClose() {
     if (sectionDirty) {
       const discard = window.confirm(
@@ -71,31 +71,41 @@ export function MyBusinessEstatePanel({ onClose }: Props) {
     onClose();
   }
 
+  function enterArea(sectionId: BusinessEstateSectionId, edit = false) {
+    setOpenSectionInEdit(edit);
+    setActiveSection(sectionId);
+  }
+
   const activeMeta = BUSINESS_ESTATE_SECTIONS.find(
     (section) => section.id === activeSection,
   );
+  const activeArea = activeSection
+    ? getBusinessAreaPresentation(activeSection)
+    : null;
 
   return (
-    <MyBusinessEstateRoomShell>
-      <EstateWorkspace className="my-business-estate-panel estate-workspace--landing">
-        {activeSection && activeMeta ? (
+    <MyBusinessEstateRoomShell backgroundUrl="/backgrounds/founder-office-background.png">
+      <EstateWorkspace className="my-business-estate-panel executive-office-panel estate-workspace--landing">
+        {activeSection && activeMeta && activeArea ? (
           <BusinessEstateSectionEditor
             sectionId={activeSection}
-            title={activeMeta.title}
+            title={activeArea.areaName}
             description={activeMeta.description}
+            initialMode={openSectionInEdit ? "edit" : "view"}
             onDirtyChange={setSectionDirty}
             onBack={() => {
               setSectionDirty(false);
+              setOpenSectionInEdit(false);
               setActiveSection(null);
               refresh();
             }}
           />
         ) : (
           <>
-            <header className="my-business-estate-panel__header">
-              <div className="my-business-estate-panel__header-row">
+            <header className="executive-office-panel__header">
+              <div className="executive-office-panel__header-row">
                 <div>
-                  <p className="estate-workspace__kicker">Profile</p>
+                  <p className="estate-workspace__kicker">Executive Office</p>
                   <h1 className="estate-workspace__title">My Business Estate</h1>
                 </div>
                 <button
@@ -106,77 +116,37 @@ export function MyBusinessEstatePanel({ onClose }: Props) {
                   Close
                 </button>
               </div>
-              <p className="my-business-estate-panel__lead">
-                Your business home inside Spark Estate — where the important
-                information about your business can come together and grow over
-                time.
+              <p className="executive-office-panel__lead">
+                Your business headquarters inside Spark Estate.
               </p>
             </header>
 
-            <section
-              className="my-business-estate-panel__snapshot"
-              aria-label="Business Snapshot"
-            >
-              <h2 className="my-business-estate-panel__snapshot-title">
-                Business Snapshot
-              </h2>
-              <p className="my-business-estate-panel__snapshot-body">
-                {formatSnapshot(snapshot)}
-              </p>
-            </section>
+            <ExecutiveBusinessSnapshot revision={revision} />
+
+            <ShariNote revision={revision} />
 
             <section
-              className="my-business-estate-panel__sections"
-              aria-label="Business Estate sections"
+              className="executive-office-areas"
+              aria-label="Business Areas"
             >
-              <h2 className="my-business-estate-panel__section-title">
-                Your business sections
-              </h2>
-              <ul className="my-business-estate-panel__section-list" key={revision}>
-                {BUSINESS_ESTATE_SECTIONS.map((section) => {
-                  const status = getBusinessEstateSectionStatus(section.id);
-                  return (
-                    <li key={section.id}>
-                      <article className="my-business-estate-panel__section-card">
-                        <div className="my-business-estate-panel__section-card-head">
-                          <div className="my-business-estate-panel__section-card-title-row">
-                            <span
-                              className="my-business-estate-panel__section-icon"
-                              aria-hidden
-                            >
-                              {SECTION_ICONS[section.id]}
-                            </span>
-                            <h3 className="my-business-estate-panel__section-card-title">
-                              {section.title}
-                            </h3>
-                          </div>
-                          <span
-                            className={`my-business-estate-panel__section-status my-business-estate-panel__section-status--${status}`}
-                          >
-                            {STATUS_LABELS[status]}
-                          </span>
-                        </div>
-                        <p className="my-business-estate-panel__section-card-desc">
-                          {section.description}
-                        </p>
-                        <p className="my-business-estate-panel__section-card-summary">
-                          {summarizeBusinessEstateSection(section.id)}
-                        </p>
-                        <button
-                          type="button"
-                          className="my-business-estate-panel__section-open"
-                          onClick={() => setActiveSection(section.id)}
-                        >
-                          <span>
-                            {status === "not-started" ? "Open" : "Edit"}
-                          </span>
-                          <span aria-hidden>›</span>
-                        </button>
-                      </article>
-                    </li>
-                  );
-                })}
+              <h2 className="executive-office-areas__title">Business Areas</h2>
+              <ul className="executive-office-areas__list" key={revision}>
+                {BUSINESS_AREA_PRESENTATION.map((area) => (
+                  <li key={area.sectionId}>
+                    <BusinessAreaCard area={area} onEnter={enterArea} />
+                  </li>
+                ))}
               </ul>
+              <div className="executive-office-areas__secondary">
+                <button
+                  type="button"
+                  className="executive-office-areas__identity-update"
+                  onClick={() => enterArea("identity", true)}
+                  data-testid="my-business-estate-edit-profile"
+                >
+                  Update Identity Office
+                </button>
+              </div>
             </section>
           </>
         )}

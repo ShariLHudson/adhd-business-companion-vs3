@@ -28,6 +28,9 @@ export type AppSection =
   | "momentum-institute"
   | "chamber-of-momentum"
   | "chamber-project-entry"
+  | "boardroom"
+  /** Design prototype — Estate Project Homes (does not replace Projects) */
+  | "project-homes"
   | "stables"
   | "grow-momentum-builders"
   | "grow-spark-cards"

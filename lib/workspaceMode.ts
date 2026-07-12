@@ -84,6 +84,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "momentum-institute": "Chamber of Momentum",
   "chamber-of-momentum": "Chamber of Momentum",
   "chamber-project-entry": "Chamber of Momentum",
+  "project-homes": "Project Homes",
   "brain-dump": "Clear My Mind",
   "time-block": "Momentum Appointments",
   "email-generator": "Email",
@@ -177,6 +178,8 @@ export type WorkspaceOffer = {
   visualFocusMode?: import("./visualFocus/types").VisualFocusMode;
   /** Momentum Institute — Estate Intelligence opens a specific drawer */
   instituteDrawerId?: string;
+  /** Chamber of Momentum — open a specific Chamber member immediately */
+  chamberMemberId?: import("./chamber/chamberMemberRegistry").ChamberMemberId;
   /** Global Estate menu overlay — profile, settings, etc. */
   estateMenuActionId?: import("@/lib/estateMenu/menuConfig").EstateMenuActionId;
   secondary?: {

@@ -23,7 +23,8 @@ export type WorkspaceHelpAreaId =
   | "time-block"
   | "decision-compass"
   | "confidence-vault"
-  | "my-journey";
+  | "my-journey"
+  | "boardroom";
 
 const HELP_ARTICLE_ID: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "plan-my-day": "plan-my-day",
@@ -55,6 +56,7 @@ const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "time-block": "Momentum Appointments",
   "decision-compass": "Decision Compass",
   growth: "Growth Center",
+  boardroom: "Boardroom",
 };
 
 const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
@@ -86,6 +88,8 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
     "Informs Create, Templates, Snippets, and Strategies so messaging stays personal.",
   settings:
     "Personalization improves Chat and Create. Business Profile and appearance settings support the whole ecosystem.",
+  boardroom:
+    "Separate from Decision Compass (weighing options) and the Chamber of Momentum (practice with mentors). The Boardroom is multi-perspective exploration — you keep the final decision.",
 };
 
 const articlesById = new Map(HOW_DO_I_HELP_ARTICLES.map((a) => [a.id, a]));
@@ -196,10 +200,42 @@ const LOCAL_GROWTH_HELP: Record<
   },
 };
 
+const LOCAL_BOARDROOM_HELP: Omit<
+  WorkspaceHelpContent,
+  "areaId" | "helpsToday" | "strengthens"
+> = {
+  areaName: "the Boardroom",
+  whatItIs:
+    "A Round Table for important decisions, problems, opportunities, or ideas — several selected perspectives, moderated by Shari. The board never chooses for you.",
+  whenToUse:
+    "When you want to see pros, cons, risks, opportunities, trade-offs, unknowns, and options before you decide.",
+  workflow: [
+    "Start a Board Discussion and describe the situation in your own words.",
+    "Assemble the Best Board or choose members yourself — review who sits at the table.",
+    "Pick Quick Review, Full Discussion, or Challenge My Thinking (Full is the default).",
+    "Listen to distinct perspectives; add context, ask members, or invite another lens as needed.",
+    "End the meeting for a Decision Brief — record your decision, wait, or revisit later.",
+  ],
+  tips: [
+    "The Boardroom explores — it does not recommend a final choice as what you should do.",
+    "Talk with Shari during a meeting if you want support, but the structured board is the main experience.",
+    "Past discussions keep your situation, members, brief, and any decision you recorded.",
+  ],
+  relatedAreas:
+    "Separate from Decision Compass (option weighing) and the Chamber of Momentum (mentor practice). Does not auto-create projects, reminders, or rhythms.",
+};
+
 export function getWorkspaceHelpContent(
   areaId: string,
 ): WorkspaceHelpContent | null {
   const key = areaId as WorkspaceHelpAreaId;
+
+  if (key === "boardroom") {
+    return {
+      areaId: key,
+      ...LOCAL_BOARDROOM_HELP,
+    };
+  }
 
   if (key === "brain-dump") {
     const growth = getCognitiveGrowthProfile(key);

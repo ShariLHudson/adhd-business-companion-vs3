@@ -107,6 +107,7 @@ export function ProjectsPanel({
   resumeProjectId,
   onResumeConsumed,
   onVisualizeThis,
+  onPreviewProjectHomes,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
@@ -137,6 +138,8 @@ export function ProjectsPanel({
   onProjectSaved?: (projectId: string, projectTitle: string) => void;
   /** #184 Spark Visual Engine — Visualize This from Projects. */
   onVisualizeThis?: (request: import("@/lib/sparkVisualEngine").SparkVisualEngineOpenRequest) => void;
+  /** Design prototype — Project Homes (does not change project storage). */
+  onPreviewProjectHomes?: () => void;
 }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [view, setView] = useState<
@@ -1340,6 +1343,15 @@ export function ProjectsPanel({
           <p className="mt-1 text-base text-[#6b635a]">
             Your filing cabinet — pick a project when you&apos;re ready.
           </p>
+          {onPreviewProjectHomes ? (
+            <button
+              type="button"
+              onClick={onPreviewProjectHomes}
+              className="mt-2 text-left text-sm font-medium text-[#1e4f4f] underline-offset-2 hover:underline"
+            >
+              Preview Project Homes (prototype)
+            </button>
+          ) : null}
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           {onVisualizeThis ? (

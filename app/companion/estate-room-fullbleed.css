@@ -152,6 +152,41 @@
   pointer-events: none;
 }
 
+.companion-project-homes-active > .relative.flex.min-h-0 {
+  background: transparent;
+}
+
+.companion-project-homes-active .companion-bg-base {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.companion-boardroom-active > .relative.flex.min-h-0 {
+  background: transparent;
+}
+
+.companion-boardroom-active .companion-bg-base {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.companion-boardroom-active .clear-my-mind-standalone-shell,
+.companion-boardroom-active .clear-my-mind-standalone-frame {
+  background: transparent;
+  min-height: 100dvh;
+  min-height: 100svh;
+}
+
+/* Boardroom uses cover — never letterbox with contain */
+.companion-boardroom-active .boardroom-room__cinematic .cinematic-background__image,
+.companion-boardroom-active .boardroom-room__cinematic .cinematic-background__media {
+  object-fit: cover !important;
+  background-size: cover !important;
+  transform: none;
+}
+
 .companion-stables-active .estate-room-main {
   background: transparent !important;
 }

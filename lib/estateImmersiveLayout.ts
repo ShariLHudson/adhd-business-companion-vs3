@@ -24,6 +24,8 @@ export const STANDALONE_ESTATE_ROOM_SECTIONS: readonly AppSection[] = [
   "focus",
   "visual-focus",
   "chamber-of-momentum",
+  "boardroom",
+  "project-homes",
   "momentum-builder",
   "momentum-institute",
   "stables",

@@ -10,6 +10,8 @@ export const ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS = [
   "brain-dump",
   "visual-focus",
   "chamber-of-momentum",
+  "boardroom",
+  "project-homes",
   "life-experience",
   "the-gallery",
   "plan-my-day",

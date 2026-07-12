@@ -8,13 +8,18 @@ import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 
 type Props = {
   children: ReactNode;
+  /** Optional room plate — defaults to Estate Profile portrait. */
+  backgroundUrl?: string;
 };
 
-/** My Business Estate™ — estate profile plate, full-bleed cover. */
-export function MyBusinessEstateRoomShell({ children }: Props) {
+/** My Business Estate — full-bleed Executive Office room. */
+export function MyBusinessEstateRoomShell({
+  children,
+  backgroundUrl = ESTATE_PROFILE_ROOM_BG,
+}: Props) {
   useEffect(() => {
-    preloadRoomBackground(ESTATE_PROFILE_ROOM_BG);
-  }, []);
+    preloadRoomBackground(backgroundUrl);
+  }, [backgroundUrl]);
 
   return (
     <div
@@ -27,9 +32,9 @@ export function MyBusinessEstateRoomShell({ children }: Props) {
         mode="image"
         scale={1}
         position="center center"
-        imageUrl={ESTATE_PROFILE_ROOM_BG}
-        imageStyle={roomBackgroundImageStyle(ESTATE_PROFILE_ROOM_BG)}
-        placement="absolute"
+        imageUrl={backgroundUrl}
+        imageStyle={roomBackgroundImageStyle(backgroundUrl)}
+        placement="fixed"
         className="my-business-estate-room__cinematic"
         showBottomFade={false}
         gradientStrength={0}

@@ -1,7 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import {
+  applyFormVoiceTranscript,
+  FormVoiceEntryControl,
+} from "@/components/companion/FormVoiceEntryControl";
 import {
   getBusinessEstateEnvelope,
   saveBusinessEstateSection,
@@ -16,6 +19,8 @@ type Props = {
   sectionId: BusinessEstateSectionId;
   title: string;
   description: string;
+  /** Open directly in edit mode (e.g. overview Update Identity Office). */
+  initialMode?: "view" | "edit";
   onBack: () => void;
   onDirtyChange?: (dirty: boolean) => void;
 };
@@ -57,6 +62,7 @@ export function BusinessEstateSectionEditor({
   sectionId,
   title,
   description,
+  initialMode = "view",
   onBack,
   onDirtyChange,
 }: Props) {
@@ -64,9 +70,10 @@ export function BusinessEstateSectionEditor({
   const [values, setValues] = useState<Record<string, string>>(() =>
     readSectionValues(sectionId),
   );
-  const [mode, setMode] = useState<"view" | "edit">("view");
+  const [mode, setMode] = useState<"view" | "edit">(initialMode);
   const [savedMessage, setSavedMessage] = useState<string | null>(null);
   const [reviewNotice, setReviewNotice] = useState(false);
+  const [activeFieldKey, setActiveFieldKey] = useState<string | null>(null);
 
   const reload = useCallback(() => {
     setValues(readSectionValues(sectionId));
@@ -76,8 +83,9 @@ export function BusinessEstateSectionEditor({
 
   useEffect(() => {
     reload();
-    setMode("view");
-  }, [reload, sectionId]);
+    setMode(initialMode);
+    setActiveFieldKey(null);
+  }, [reload, sectionId, initialMode]);
 
   useEffect(() => {
     onDirtyChange?.(mode === "edit" && valuesAreDirty(sectionId, values));
@@ -93,12 +101,14 @@ export function BusinessEstateSectionEditor({
     setReviewNotice(false);
     setMode("view");
     setSavedMessage("Saved");
+    setActiveFieldKey(null);
     reload();
   }
 
   function handleCancel() {
     reload();
     setMode("view");
+    setActiveFieldKey(null);
   }
 
   function handleBack() {
@@ -111,6 +121,14 @@ export function BusinessEstateSectionEditor({
     onBack();
   }
 
+  function enterEditMode() {
+    setSavedMessage(null);
+    setMode("edit");
+  }
+
+  const activeFieldLabel =
+    fields.find((field) => field.key === activeFieldKey)?.label ?? null;
+
   return (
     <div className="business-estate-section-editor">
       <button
@@ -122,8 +140,22 @@ export function BusinessEstateSectionEditor({
       </button>
 
       <header className="business-estate-section-editor__header">
-        <p className="estate-workspace__kicker">My Business Estate</p>
-        <h2 className="business-estate-section-editor__title">{title}</h2>
+        <div className="business-estate-section-editor__header-row">
+          <div>
+            <p className="estate-workspace__kicker">Business Area</p>
+            <h2 className="business-estate-section-editor__title">{title}</h2>
+          </div>
+          {mode === "view" ? (
+            <button
+              type="button"
+              className="business-estate-section-editor__save"
+              onClick={enterEditMode}
+              data-testid="business-estate-edit-profile"
+            >
+              Update
+            </button>
+          ) : null}
+        </div>
         <p className="my-business-estate-panel__lead">{description}</p>
       </header>
 
@@ -139,37 +171,78 @@ export function BusinessEstateSectionEditor({
           {fields.map((field) => {
             const value = values[field.key]?.trim() ?? "";
             return (
-              <div key={field.key} className="business-estate-section-editor__view-row">
+              <button
+                key={field.key}
+                type="button"
+                className="business-estate-section-editor__view-row"
+                onClick={enterEditMode}
+                aria-label={`Edit ${field.label}`}
+              >
                 <span className="business-estate-section-editor__view-label">
                   {field.label}
                 </span>
                 <span className="business-estate-section-editor__view-value">
                   {value || "Not set"}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
       ) : (
         <div className="business-estate-section-editor__fields">
-          {fields.map((field) => (
-            <label key={field.key} className="business-estate-section-editor__field">
-              <span className="business-estate-section-editor__label">
-                {field.label}
-              </span>
-              <VoiceAnswerField
-                value={values[field.key] ?? ""}
-                onChange={(value) => updateField(field.key, value)}
-                multiline={field.type === "textarea"}
-                placeholder={field.placeholder}
-                inputClassName={
-                  field.type === "textarea"
-                    ? "business-estate-section-editor__textarea"
-                    : "business-estate-section-editor__input"
-                }
-              />
-            </label>
-          ))}
+          <div className="business-estate-section-editor__voice-bar">
+            <FormVoiceEntryControl
+              activeFieldKey={activeFieldKey}
+              activeFieldLabel={activeFieldLabel}
+              onTranscript={(fieldKey, spoken) => {
+                setValues((current) => ({
+                  ...current,
+                  [fieldKey]: applyFormVoiceTranscript(
+                    current[fieldKey] ?? "",
+                    spoken,
+                  ),
+                }));
+                setSavedMessage(null);
+              }}
+            />
+          </div>
+          {fields.map((field) => {
+            const fieldId = `business-estate-${sectionId}-${field.key}`;
+            const isActive = activeFieldKey === field.key;
+            return (
+              <label
+                key={field.key}
+                className={`business-estate-section-editor__field${
+                  isActive ? " business-estate-section-editor__field--active" : ""
+                }`}
+                htmlFor={fieldId}
+              >
+                <span className="business-estate-section-editor__label">
+                  {field.label}
+                </span>
+                {field.type === "textarea" ? (
+                  <textarea
+                    id={fieldId}
+                    value={values[field.key] ?? ""}
+                    onChange={(e) => updateField(field.key, e.target.value)}
+                    onFocus={() => setActiveFieldKey(field.key)}
+                    placeholder={field.placeholder}
+                    className="business-estate-section-editor__textarea"
+                  />
+                ) : (
+                  <input
+                    id={fieldId}
+                    type="text"
+                    value={values[field.key] ?? ""}
+                    onChange={(e) => updateField(field.key, e.target.value)}
+                    onFocus={() => setActiveFieldKey(field.key)}
+                    placeholder={field.placeholder}
+                    className="business-estate-section-editor__input"
+                  />
+                )}
+              </label>
+            );
+          })}
         </div>
       )}
 
@@ -180,23 +253,13 @@ export function BusinessEstateSectionEditor({
       ) : null}
 
       <div className="business-estate-section-editor__actions">
-        {mode === "view" ? (
-          <button
-            type="button"
-            className="business-estate-section-editor__save"
-            onClick={() => {
-              setSavedMessage(null);
-              setMode("edit");
-            }}
-          >
-            Edit
-          </button>
-        ) : (
+        {mode === "edit" ? (
           <>
             <button
               type="button"
               className="business-estate-section-editor__cancel"
               onClick={handleCancel}
+              data-testid="business-estate-cancel"
             >
               Cancel
             </button>
@@ -204,11 +267,12 @@ export function BusinessEstateSectionEditor({
               type="button"
               className="business-estate-section-editor__save"
               onClick={handleSave}
+              data-testid="business-estate-save-changes"
             >
-              Save
+              Save Changes
             </button>
           </>
-        )}
+        ) : null}
       </div>
     </div>
   );
