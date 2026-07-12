@@ -156,6 +156,19 @@
   background: #f3eee6;
 }
 
+.boardroom-btn--primary:focus-visible,
+.boardroom-btn--secondary:focus-visible,
+.boardroom-btn--ghost:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(201, 166, 107, 0.45);
+}
+
+.boardroom-btn--primary:active:not(:disabled),
+.boardroom-btn--secondary:active:not(:disabled),
+.boardroom-btn--ghost:active:not(:disabled) {
+  transform: translateY(0.5px);
+}
+
 .boardroom-btn--ghost {
   background: transparent;
   color: #4b463f;
@@ -346,4 +359,82 @@
 .boardroom-workspace.estate-workspace:has(.boardroom-member-grid) {
   width: min(44rem, 100%);
   max-height: min(88dvh, 52rem);
+}
+
+/* Boardroom home — four clear interactive action cards */
+.boardroom-home__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1.1rem;
+}
+
+.boardroom-home__action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  background: rgba(255, 252, 245, 0.92);
+  padding: 0.95rem 1.05rem;
+  min-height: 3.25rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.boardroom-home__action-card:hover {
+  border-color: rgba(180, 132, 58, 0.65);
+  background: #faf7f2;
+}
+
+.boardroom-home__action-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(201, 166, 107, 0.5);
+}
+
+.boardroom-home__action-title {
+  font-size: 1.05rem;
+  font-weight: 650;
+  color: #1f1c19;
+  line-height: 1.3;
+}
+
+.boardroom-home__action-meta {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #6b635a;
+}
+
+.boardroom-home__secondary {
+  margin-top: 1rem;
+}
+
+.boardroom-past-empty {
+  margin-top: 1rem;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: #4b463f;
+}
+
+.boardroom-past-section-label {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.boardroom-director-intake textarea {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #c9bfb0;
+  background: #fff;
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+  color: #1f1c19;
 }

@@ -11,8 +11,11 @@ export type BoardDiscussionStyle =
 
 export type BoardroomView =
   | "home"
+  | "meet-directors"
   | "past"
   | "past-detail"
+  | "how-to"
+  | "board-director-intake"
   | "new-situation"
   | "new-assembly"
   | "new-members"

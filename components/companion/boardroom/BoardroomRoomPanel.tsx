@@ -7,7 +7,15 @@ import { GrowPanelBackButton } from "@/components/companion/GrowPanelBackButton"
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { EstateRoomChatChrome } from "@/components/companion/estate/EstateRoomChatChrome";
 import { BoardroomRoomShell } from "@/components/companion/boardroom/BoardroomRoomShell";
+import { BoardDirectorsMeetExperience } from "@/components/companion/board/BoardDirectorsMeetExperience";
+import { BoardDirectorDiscussionIntake } from "@/components/companion/board/BoardDirectorDiscussionIntake";
 import type { AdvisoryMemberId } from "@/lib/advisory/types";
+import type { BoardDirectorId } from "@/lib/board";
+import { getBoardDirectorById } from "@/lib/board";
+import { THOMAS_ELLISON_DIRECTOR_ID } from "@/lib/board/visibleDirectors";
+import {
+  listBoardDirectorDiscussions,
+} from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
 import {
   BOARDROOM_PURPOSE,
   DISCUSSION_STYLE_META,
@@ -68,6 +76,10 @@ export function BoardroomRoomPanel({
   conversationScrollKey,
 }: Props) {
   const [view, setView] = useState<BoardroomView>("home");
+  const [meetRoundTableOpen, setMeetRoundTableOpen] = useState(false);
+  const [boardReviewDirectorIds, setBoardReviewDirectorIds] = useState<
+    BoardDirectorId[]
+  >([]);
   const [tick, setTick] = useState(0);
   const recent = useMemo(() => {
     void tick;
@@ -76,6 +88,10 @@ export function BoardroomRoomPanel({
   const allPast = useMemo(() => {
     void tick;
     return recentBoardroomDiscussions(50);
+  }, [tick]);
+  const boardDirectorPast = useMemo(() => {
+    void tick;
+    return listBoardDirectorDiscussions(50);
   }, [tick]);
 
   const [situation, setSituation] = useState("");
@@ -115,6 +131,7 @@ export function BoardroomRoomPanel({
 
   function startHome() {
     setView("home");
+    setMeetRoundTableOpen(false);
     setActive(null);
     setDetailId(null);
     setActionPanel(null);
@@ -122,13 +139,14 @@ export function BoardroomRoomPanel({
   }
 
   function beginNewDiscussion() {
-    setSituation("");
-    setAssemblyMode("assemble-best");
-    setMemberIds([]);
-    setStyle("full-discussion");
-    setActive(null);
-    setView("new-situation");
+    setView("board-director-intake");
     setActionPanel(null);
+  }
+
+  function beginDiscussionWithDirectors(ids: readonly BoardDirectorId[]) {
+    setBoardReviewDirectorIds([...ids]);
+    setMeetRoundTableOpen(false);
+    setView("board-director-intake");
   }
 
   function goAssemblyChoice() {
@@ -418,14 +436,81 @@ export function BoardroomRoomPanel({
           {view === "home" ? (
             <HomeView
               onStart={beginNewDiscussion}
+              onMeetDirectors={() => {
+                setMeetRoundTableOpen(false);
+                setView("meet-directors");
+              }}
+              onMyPlaceAtTheTable={() => {
+                setMeetRoundTableOpen(true);
+                setView("meet-directors");
+              }}
               onReviewPast={() => setView("past")}
+              onHowToUse={() => setView("how-to")}
             />
           ) : null}
 
+          {view === "how-to" ? (
+            <div data-testid="boardroom-how-to-view">
+              <p className="boardroom-kicker">Boardroom</p>
+              <h2 className="boardroom-title">How to Use the Boardroom</h2>
+              <div className="boardroom-gold-rule" aria-hidden />
+              <div className="boardroom-how-to">
+                <WorkspaceAreaWorksGuide areaId="boardroom" />
+              </div>
+              <p className="boardroom-purpose mt-4">
+                Meet the Directors privately first if you like. When you are
+                ready, include the Chair in a Board Review and start a
+                discussion — one question at a time. The Chamber helps with
+                implementation later; the Board helps you decide.
+              </p>
+              <div className="boardroom-actions">
+                <button
+                  type="button"
+                  className="boardroom-btn boardroom-btn--secondary"
+                  onClick={startHome}
+                >
+                  Return to Boardroom
+                </button>
+              </div>
+            </div>
+          ) : null}
+
+          {view === "board-director-intake" ? (
+            <BoardDirectorDiscussionIntake
+              initialDirectorIds={
+                boardReviewDirectorIds.length > 0
+                  ? boardReviewDirectorIds
+                  : []
+              }
+              onCancel={startHome}
+              onComplete={() => {
+                refresh();
+                startHome();
+              }}
+            />
+          ) : null}
+
+          {view === "meet-directors" ? (
+            <BoardDirectorsMeetExperience
+              onBackToBoardroom={() => {
+                setMeetRoundTableOpen(false);
+                startHome();
+              }}
+              initialRoundTableOpen={meetRoundTableOpen}
+              initialBoardReviewIds={boardReviewDirectorIds}
+              onStartBoardDiscussion={(ids) => {
+                beginDiscussionWithDirectors(
+                  ids.length > 0 ? ids : [THOMAS_ELLISON_DIRECTOR_ID],
+                );
+              }}
+              onBoardReviewIdsChange={setBoardReviewDirectorIds}
+            />
+          ) : null}
           {view === "past" ? (
             <PastListView
-              items={allPast}
-              onOpen={openPast}
+              advisoryItems={allPast}
+              boardDirectorItems={boardDirectorPast}
+              onOpenAdvisory={openPast}
               onBack={startHome}
             />
           ) : null}
@@ -725,34 +810,93 @@ export function BoardroomRoomPanel({
 
 function HomeView({
   onStart,
+  onMeetDirectors,
+  onMyPlaceAtTheTable,
   onReviewPast,
+  onHowToUse,
 }: {
   onStart: () => void;
+  onMeetDirectors: () => void;
+  onMyPlaceAtTheTable: () => void;
   onReviewPast: () => void;
+  onHowToUse: () => void;
 }) {
   return (
-    <div className="boardroom-home">
+    <div className="boardroom-home" data-testid="boardroom-home">
       <p className="boardroom-kicker">Spark Estate</p>
       <h1 className="boardroom-title">Round Table Boardroom</h1>
       <div className="boardroom-gold-rule" aria-hidden />
-      <div className="boardroom-how-to">
-        <WorkspaceAreaWorksGuide areaId="boardroom" />
-      </div>
       <p className="boardroom-purpose">{BOARDROOM_PURPOSE}</p>
-      <div className="boardroom-actions">
+
+      <div
+        className="boardroom-home__actions"
+        role="list"
+        aria-label="Boardroom actions"
+      >
         <button
           type="button"
-          className="boardroom-btn boardroom-btn--primary"
+          role="listitem"
+          className="boardroom-home__action-card"
+          data-testid="boardroom-start-discussion"
           onClick={onStart}
         >
-          Start a Board Discussion
+          <span className="boardroom-home__action-title">
+            Start a Board Discussion
+          </span>
+          <span className="boardroom-home__action-meta">
+            Bring a decision to the Chair for calm, independent review.
+          </span>
         </button>
         <button
           type="button"
-          className="boardroom-btn boardroom-btn--secondary"
+          role="listitem"
+          className="boardroom-home__action-card"
+          data-testid="boardroom-meet-directors"
+          onClick={onMeetDirectors}
+        >
+          <span className="boardroom-home__action-title">Meet the Directors</span>
+          <span className="boardroom-home__action-meta">
+            Get to know Thomas Ellison, Chair of the Board.
+          </span>
+        </button>
+        <button
+          type="button"
+          role="listitem"
+          className="boardroom-home__action-card"
+          data-testid="boardroom-review-past"
           onClick={onReviewPast}
         >
-          Review Past Discussions
+          <span className="boardroom-home__action-title">
+            Review Past Discussions
+          </span>
+          <span className="boardroom-home__action-meta">
+            Return to decisions you chose to preserve.
+          </span>
+        </button>
+        <button
+          type="button"
+          role="listitem"
+          className="boardroom-home__action-card"
+          data-testid="boardroom-how-to-use"
+          onClick={onHowToUse}
+        >
+          <span className="boardroom-home__action-title">
+            How to Use the Boardroom
+          </span>
+          <span className="boardroom-home__action-meta">
+            A short guide to Board discussions and Meet the Directors.
+          </span>
+        </button>
+      </div>
+
+      <div className="boardroom-actions boardroom-home__secondary">
+        <button
+          type="button"
+          className="boardroom-btn boardroom-btn--secondary"
+          data-testid="boardroom-my-place-at-the-table"
+          onClick={onMyPlaceAtTheTable}
+        >
+          My Place at the Table
         </button>
       </div>
     </div>
@@ -760,43 +904,81 @@ function HomeView({
 }
 
 function PastListView({
-  items,
-  onOpen,
+  advisoryItems,
+  boardDirectorItems,
+  onOpenAdvisory,
   onBack,
 }: {
-  items: BoardroomDiscussionRecord[];
-  onOpen: (id: string) => void;
+  advisoryItems: BoardroomDiscussionRecord[];
+  boardDirectorItems: ReturnType<typeof listBoardDirectorDiscussions>;
+  onOpenAdvisory: (id: string) => void;
   onBack: () => void;
 }) {
+  const hasAny =
+    boardDirectorItems.length > 0 || advisoryItems.length > 0;
+
   return (
-    <div>
-      <p className="boardroom-title">Past Discussions</p>
+    <div data-testid="boardroom-past-discussions">
+      <p className="boardroom-kicker">Boardroom</p>
+      <h2 className="boardroom-title">Past Discussions</h2>
+      <div className="boardroom-gold-rule" aria-hidden />
       <p className="boardroom-purpose">
-        Titles, dates, briefs, and any decisions you recorded.
+        Decisions you chose to preserve. Board history stays separate from
+        Chamber advice and research notes.
       </p>
-      {items.length === 0 ? (
-        <p className="mt-4 text-sm text-[#6b635a]">
-          No discussions yet. Start one when you have something important to
-          explore.
+
+      {!hasAny ? (
+        <p
+          className="boardroom-past-empty"
+          data-testid="boardroom-past-empty"
+        >
+          No Board discussions have been saved yet. Your important decisions
+          will appear here after you choose to preserve them.
         </p>
       ) : (
-        <div className="boardroom-card-list">
-          {items.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className="boardroom-card"
-              onClick={() => onOpen(item.id)}
-            >
-              <div className="boardroom-card__title">{item.title}</div>
-              <div className="boardroom-card__meta">
-                {formatDate(item.createdAt)} ·{" "}
-                {item.memberIds.length} members ·{" "}
-                {DISCUSSION_STYLE_META[item.style].label}
-              </div>
-            </button>
-          ))}
-        </div>
+        <>
+          {boardDirectorItems.length > 0 ? (
+            <div className="boardroom-card-list" data-testid="board-director-past-list">
+              <p className="boardroom-past-section-label">Board of Directors</p>
+              {boardDirectorItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="boardroom-card"
+                  data-testid={`board-director-past-${item.id}`}
+                >
+                  <div className="boardroom-card__title">{item.title}</div>
+                  <div className="boardroom-card__meta">
+                    {formatDate(item.createdAt)} ·{" "}
+                    {item.directorIds
+                      .map((id) => getBoardDirectorById(id)?.name)
+                      .filter(Boolean)
+                      .join(", ")}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          {advisoryItems.length > 0 ? (
+            <div className="boardroom-card-list mt-4">
+              <p className="boardroom-past-section-label">Earlier Boardroom records</p>
+              {advisoryItems.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className="boardroom-card"
+                  onClick={() => onOpenAdvisory(item.id)}
+                >
+                  <div className="boardroom-card__title">{item.title}</div>
+                  <div className="boardroom-card__meta">
+                    {formatDate(item.createdAt)} ·{" "}
+                    {item.memberIds.length} members ·{" "}
+                    {DISCUSSION_STYLE_META[item.style].label}
+                  </div>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </>
       )}
       <div className="boardroom-actions">
         <button
