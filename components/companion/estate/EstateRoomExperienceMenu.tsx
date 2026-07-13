@@ -18,16 +18,33 @@ import {
   ESTATE_ROOM_MENU_FULLSCREEN_IDLE_MS,
 } from "@/lib/estate/justBeHere";
 import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
-import { kickstartEstateRoomAmbience } from "@/lib/estate/estateRoomAmbience";
+import {
+  activeEstateAmbienceRoomId,
+  kickstartEstateRoomAmbience,
+} from "@/lib/estate/estateRoomAmbience";
 import { resolveCanonicalPlaceId } from "@/lib/estate/canonicalEstateRegistry";
 import { resolveWanderRoomDisplayName } from "@/lib/estate/manifest/estateWanderMode";
 import { useIdleChromeReveal } from "@/lib/estate/useIdleChromeReveal";
+import {
+  EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS,
+  PEACEFUL_PLACES_MUSIC_TRACKS,
+  type ExperienceSoundscapeTrack,
+} from "@/lib/soundscapes/experienceSoundscapesMenu";
 
-type MenuSection = "experience-controls" | "estate-navigation" | "experiences";
+type MenuSection =
+  | "experience-controls"
+  | "estate-navigation"
+  | "my-day-and-work"
+  | "my-story-and-progress"
+  | "knowledge-and-advisory"
+  | "experiences";
 
 const MENU_SECTIONS: readonly { id: MenuSection; label: string }[] = [
   { id: "experience-controls", label: "Experience Controls" },
   { id: "estate-navigation", label: "Estate Navigation" },
+  { id: "my-day-and-work", label: "My Day & Work" },
+  { id: "my-story-and-progress", label: "My Story & Progress" },
+  { id: "knowledge-and-advisory", label: "Knowledge & Advisory" },
   { id: "experiences", label: "Experiences" },
 ] as const;
 
@@ -43,17 +60,29 @@ export type EstateRoomExperienceMenuProps = {
   onToggleSound?: () => void;
   soundEnabled?: boolean;
   onBackToEstate: () => void;
-  /** Chamber of Momentum — estate navigation. */
-  onOpenChamber?: () => void;
+  /** Estate Navigation — Explore Spark (Library / Cartography omitted). */
+  onExploreSpark?: () => void;
+  /** My Day & Work */
+  onOpenPlanMyDay?: () => void;
+  onOpenRhythms?: () => void;
+  onOpenReminders?: () => void;
+  onOpenCalendar?: () => void;
+  onOpenProjects?: () => void;
+  onOpenClearMyMind?: () => void;
+  onOpenParkingLot?: () => void;
+  onOpenDestinationGallery?: () => void;
+  onOpenCartographersStudio?: () => void;
+  /** My Story & Progress */
+  onOpenJournal?: () => void;
   onOpenEvidenceVault?: () => void;
   onOpenHallOfAccomplishments?: () => void;
-  onOpenJournal?: () => void;
-  onOpenCartographersStudio?: () => void;
-  /** Breathe Universal Access overlay. */
+  /** Knowledge & Advisory */
+  onOpenChamber?: () => void;
+  onOpenBoardroom?: () => void;
+  /** Experiences — Breathe; Peaceful Places / Soundscapes stay here. */
   onOpenBreathe?: () => void;
-  onOpenSoundscapes?: () => void;
-  /** Manifest explore — future replacement for Wander. */
-  onExploreSpark?: () => void;
+  /** Play an owned soundscape or Peaceful Places music track in-room. */
+  onPlaySoundscape?: (track: ExperienceSoundscapeTrack) => void;
   /**
    * Which photograph surface Change background updates.
    * Defaults from roomId (Clear My Mind → clear-my-mind; else chat).
@@ -92,20 +121,31 @@ export function EstateRoomExperienceMenu({
   onToggleSound,
   soundEnabled: soundEnabledProp,
   onBackToEstate,
-  onOpenChamber,
+  onExploreSpark,
+  onOpenPlanMyDay,
+  onOpenRhythms,
+  onOpenReminders,
+  onOpenCalendar,
+  onOpenProjects,
+  onOpenClearMyMind,
+  onOpenParkingLot,
+  onOpenDestinationGallery,
+  onOpenCartographersStudio,
+  onOpenJournal,
   onOpenEvidenceVault,
   onOpenHallOfAccomplishments,
-  onOpenJournal,
-  onOpenCartographersStudio,
+  onOpenChamber,
+  onOpenBoardroom,
   onOpenBreathe,
-  onOpenSoundscapes,
-  onExploreSpark,
+  onPlaySoundscape,
   backdropSurface: backdropSurfaceProp,
 }: EstateRoomExperienceMenuProps) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [pickingBackdrop, setPickingBackdrop] = useState(false);
   const [expandedSection, setExpandedSection] = useState<MenuSection | null>(null);
+  const [soundscapesExpanded, setSoundscapesExpanded] = useState(false);
+  const [peacefulPlacesExpanded, setPeacefulPlacesExpanded] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -129,12 +169,23 @@ export function EstateRoomExperienceMenu({
         setSoundEnabled(soundEnabledProp);
         return;
       }
+      /**
+       * Welcome Home stays silent until Sound on (kickstart). Do not show
+       * "Sound on" from a global preference while nothing is playing.
+       */
+      if (roomId === "welcome-home") {
+        setSoundEnabled(
+          isEstateAmbienceEnabled() &&
+            activeEstateAmbienceRoomId() === "welcome-home",
+        );
+        return;
+      }
       setSoundEnabled(isEstateAmbienceEnabled());
     };
     syncSound();
     if (soundEnabledProp !== undefined) return;
     return subscribeEstateAudioSettings(syncSound);
-  }, [soundEnabledProp]);
+  }, [soundEnabledProp, roomId]);
 
   useEffect(() => {
     const syncFullscreen = () => setFullscreen(isEstateBrowserFullscreen());
@@ -154,6 +205,8 @@ export function EstateRoomExperienceMenu({
     if (!open) {
       setPickingBackdrop(false);
       setExpandedSection(null);
+      setSoundscapesExpanded(false);
+      setPeacefulPlacesExpanded(false);
       return;
     }
     const onPointerDown = (event: MouseEvent | TouchEvent) => {
@@ -283,6 +336,7 @@ export function EstateRoomExperienceMenu({
               aria-label="Room menu"
               data-testid="estate-room-quick-choices"
             >
+              <div className="estate-room-experience-menu__panel-scroll">
               {pickingBackdrop ? (
                 <>
                   <button
@@ -480,23 +534,241 @@ export function EstateRoomExperienceMenu({
                             role="group"
                             aria-label="Estate Navigation"
                           >
-                            {onOpenChamber ? (
+                            {onExploreSpark ? (
                               <button
                                 type="button"
                                 role="menuitem"
                                 className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Open Chamber of Momentum"
-                                data-testid="estate-open-chamber"
-                                onClick={() => closeAndRun(onOpenChamber)}
+                                aria-label="Explore Spark"
+                                data-testid="estate-open-explore-spark"
+                                onClick={() => closeAndRun(onExploreSpark)}
                               >
                                 <span
                                   className="estate-room-experience-menu__item-icon"
                                   aria-hidden
                                 >
-                                  🏛
+                                  🚶
                                 </span>
                                 <span className="estate-room-experience-menu__item-label">
-                                  Chamber of Momentum
+                                  Explore Spark
+                                </span>
+                              </button>
+                            ) : null}
+                          </div>
+                        ) : null}
+
+                        {isExpanded && section.id === "my-day-and-work" ? (
+                          <div
+                            className="estate-room-experience-menu__section-items"
+                            role="group"
+                            aria-label="My Day & Work"
+                          >
+                            {onOpenPlanMyDay ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Plan My Day"
+                                data-testid="estate-open-plan-my-day"
+                                onClick={() => closeAndRun(onOpenPlanMyDay)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  ☀
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Plan My Day
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenRhythms ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Rhythms"
+                                data-testid="estate-open-rhythms"
+                                onClick={() => closeAndRun(onOpenRhythms)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  ♻
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Rhythms
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenReminders ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Reminders"
+                                data-testid="estate-open-reminders"
+                                onClick={() => closeAndRun(onOpenReminders)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  🔔
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Reminders
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenCalendar ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Calendar"
+                                data-testid="estate-open-calendar"
+                                onClick={() => closeAndRun(onOpenCalendar)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  📅
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Calendar
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenProjects ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Projects"
+                                data-testid="estate-open-projects"
+                                onClick={() => closeAndRun(onOpenProjects)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  📁
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Projects
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenClearMyMind ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Clear My Mind"
+                                data-testid="estate-open-clear-my-mind"
+                                onClick={() => closeAndRun(onOpenClearMyMind)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  🧠
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Clear My Mind
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenParkingLot ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Parking Lot"
+                                data-testid="estate-open-parking-lot"
+                                onClick={() => closeAndRun(onOpenParkingLot)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  🅿️
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Parking Lot
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenDestinationGallery ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Destination Gallery"
+                                data-testid="estate-open-destination-gallery"
+                                onClick={() => closeAndRun(onOpenDestinationGallery)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  🖼
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Destination Gallery
+                                </span>
+                              </button>
+                            ) : null}
+                            {onOpenCartographersStudio ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Cartographer's Studio"
+                                data-testid="estate-open-cartographers-studio"
+                                onClick={() => closeAndRun(onOpenCartographersStudio)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  🗺
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Cartographer&apos;s Studio
+                                </span>
+                              </button>
+                            ) : null}
+                          </div>
+                        ) : null}
+
+                        {isExpanded && section.id === "my-story-and-progress" ? (
+                          <div
+                            className="estate-room-experience-menu__section-items"
+                            role="group"
+                            aria-label="My Story & Progress"
+                          >
+                            {onOpenJournal ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Open Journal Gazebo"
+                                data-testid="estate-open-journal"
+                                onClick={() => closeAndRun(onOpenJournal)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  📖
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Journal Gazebo
                                 </span>
                               </button>
                             ) : null}
@@ -540,43 +812,52 @@ export function EstateRoomExperienceMenu({
                                 </span>
                               </button>
                             ) : null}
-                            {onOpenJournal ? (
+                          </div>
+                        ) : null}
+
+                        {isExpanded && section.id === "knowledge-and-advisory" ? (
+                          <div
+                            className="estate-room-experience-menu__section-items"
+                            role="group"
+                            aria-label="Knowledge & Advisory"
+                          >
+                            {onOpenChamber ? (
                               <button
                                 type="button"
                                 role="menuitem"
                                 className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Open Journal Gazebo"
-                                data-testid="estate-open-journal"
-                                onClick={() => closeAndRun(onOpenJournal)}
+                                aria-label="Open Chamber of Momentum"
+                                data-testid="estate-open-chamber"
+                                onClick={() => closeAndRun(onOpenChamber)}
                               >
                                 <span
                                   className="estate-room-experience-menu__item-icon"
                                   aria-hidden
                                 >
-                                  📖
+                                  🏛
                                 </span>
                                 <span className="estate-room-experience-menu__item-label">
-                                  Journal Gazebo
+                                  Chamber of Momentum
                                 </span>
                               </button>
                             ) : null}
-                            {onOpenCartographersStudio ? (
+                            {onOpenBoardroom ? (
                               <button
                                 type="button"
                                 role="menuitem"
                                 className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Open Cartographer's Studio"
-                                data-testid="estate-open-cartographers-studio"
-                                onClick={() => closeAndRun(onOpenCartographersStudio)}
+                                aria-label="Open Boardroom"
+                                data-testid="estate-open-boardroom"
+                                onClick={() => closeAndRun(onOpenBoardroom)}
                               >
                                 <span
                                   className="estate-room-experience-menu__item-icon"
                                   aria-hidden
                                 >
-                                  🗺
+                                  🪑
                                 </span>
                                 <span className="estate-room-experience-menu__item-label">
-                                  Cartographer&apos;s Studio™
+                                  Boardroom
                                 </span>
                               </button>
                             ) : null}
@@ -609,45 +890,129 @@ export function EstateRoomExperienceMenu({
                                 </span>
                               </button>
                             ) : null}
-                            {onOpenSoundscapes ? (
-                              <button
-                                type="button"
-                                role="menuitem"
-                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Open Soundscapes"
-                                data-testid="estate-open-soundscapes"
-                                onClick={() => closeAndRun(onOpenSoundscapes)}
-                              >
-                                <span
-                                  className="estate-room-experience-menu__item-icon"
-                                  aria-hidden
-                                >
-                                  🎧
-                                </span>
-                                <span className="estate-room-experience-menu__item-label">
-                                  Soundscapes
-                                </span>
-                              </button>
-                            ) : null}
-                            {onExploreSpark ? (
-                              <button
-                                type="button"
-                                role="menuitem"
-                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Explore Spark Estate"
-                                data-testid="estate-explore-spark"
-                                onClick={() => closeAndRun(onExploreSpark)}
-                              >
-                                <span
-                                  className="estate-room-experience-menu__item-icon"
-                                  aria-hidden
-                                >
-                                  🚶
-                                </span>
-                                <span className="estate-room-experience-menu__item-label">
-                                  Explore Spark
-                                </span>
-                              </button>
+                            {onPlaySoundscape ? (
+                              <>
+                                <div className="estate-room-experience-menu__nested-group">
+                                  <button
+                                    type="button"
+                                    className={[
+                                      "estate-room-experience-menu__category",
+                                      "estate-room-experience-menu__category--nested",
+                                      peacefulPlacesExpanded
+                                        ? "estate-room-experience-menu__category--open"
+                                        : "",
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" ")}
+                                    aria-expanded={peacefulPlacesExpanded}
+                                    data-testid="estate-open-peaceful-places"
+                                    onClick={() => {
+                                      bumpVisibility();
+                                      setPeacefulPlacesExpanded((current) => !current);
+                                    }}
+                                  >
+                                    <span className="estate-room-experience-menu__category-label">
+                                      Peaceful Places
+                                    </span>
+                                    <span
+                                      className="estate-room-experience-menu__category-chevron"
+                                      aria-hidden
+                                    >
+                                      ›
+                                    </span>
+                                  </button>
+                                  {peacefulPlacesExpanded ? (
+                                    <div
+                                      className="estate-room-experience-menu__section-items estate-room-experience-menu__section-items--nested"
+                                      role="group"
+                                      aria-label="Peaceful Places"
+                                    >
+                                      {PEACEFUL_PLACES_MUSIC_TRACKS.map((track) => (
+                                        <button
+                                          key={track.id}
+                                          type="button"
+                                          role="menuitem"
+                                          className="estate-room-experience-menu__item estate-room-experience-menu__item--nested"
+                                          data-testid={`estate-play-peaceful-place-${track.id}`}
+                                          onClick={() =>
+                                            closeAndRun(() => onPlaySoundscape(track))
+                                          }
+                                        >
+                                          <span
+                                            className="estate-room-experience-menu__item-icon"
+                                            aria-hidden
+                                          >
+                                            🎵
+                                          </span>
+                                          <span className="estate-room-experience-menu__item-label">
+                                            {track.title}
+                                          </span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  ) : null}
+                                </div>
+                                <div className="estate-room-experience-menu__nested-group">
+                                  <button
+                                    type="button"
+                                    className={[
+                                      "estate-room-experience-menu__category",
+                                      "estate-room-experience-menu__category--nested",
+                                      soundscapesExpanded
+                                        ? "estate-room-experience-menu__category--open"
+                                        : "",
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" ")}
+                                    aria-expanded={soundscapesExpanded}
+                                    data-testid="estate-open-soundscapes"
+                                    onClick={() => {
+                                      bumpVisibility();
+                                      setSoundscapesExpanded((current) => !current);
+                                    }}
+                                  >
+                                    <span className="estate-room-experience-menu__category-label">
+                                      Soundscapes
+                                    </span>
+                                    <span
+                                      className="estate-room-experience-menu__category-chevron"
+                                      aria-hidden
+                                    >
+                                      ›
+                                    </span>
+                                  </button>
+                                  {soundscapesExpanded ? (
+                                    <div
+                                      className="estate-room-experience-menu__section-items estate-room-experience-menu__section-items--nested"
+                                      role="group"
+                                      aria-label="Soundscapes"
+                                    >
+                                      {EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS.map((track) => (
+                                        <button
+                                          key={track.id}
+                                          type="button"
+                                          role="menuitem"
+                                          className="estate-room-experience-menu__item estate-room-experience-menu__item--nested"
+                                          data-testid={`estate-play-soundscape-${track.id}`}
+                                          onClick={() =>
+                                            closeAndRun(() => onPlaySoundscape(track))
+                                          }
+                                        >
+                                          <span
+                                            className="estate-room-experience-menu__item-icon"
+                                            aria-hidden
+                                          >
+                                            🔊
+                                          </span>
+                                          <span className="estate-room-experience-menu__item-label">
+                                            {track.title}
+                                          </span>
+                                        </button>
+                                      ))}
+                                    </div>
+                                  ) : null}
+                                </div>
+                              </>
                             ) : null}
                           </div>
                         ) : null}
@@ -656,6 +1021,7 @@ export function EstateRoomExperienceMenu({
                   })}
                 </>
               )}
+              </div>
             </div>
           ) : null}
         </>

@@ -18,6 +18,7 @@ import {
   getDiscoveryMemberId,
 } from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
+import { playExperienceSoundscapeTrack } from "@/lib/soundscapes/playExperienceSoundscapeTrack";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
 import { SparkNoteChrome } from "@/components/companion/SparkNoteChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
@@ -31,6 +32,7 @@ import {
   sidebarNavForGrowthDestination,
 } from "@/lib/gallery";
 import { GalleryExperiencePanel } from "@/components/companion/GalleryExperiencePanel";
+import { DestinationGalleryPanel } from "@/components/companion/destinationGallery/DestinationGalleryPanel";
 import { LifeExperienceRoomPanel } from "@/components/companion/LifeExperienceRoomPanel";
 import { DecisionCompassWorkspace } from "@/components/companion/DecisionCompassWorkspace";
 import { BreatheDestinationHost } from "@/components/companion/BreatheDestinationHost";
@@ -100,6 +102,8 @@ import { EvidenceVaultRoomPanel } from "@/components/estate-collection/EvidenceV
 import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
 import { ChamberOfMomentumRoomPanel } from "@/components/companion/chamber/ChamberOfMomentumRoomPanel";
 import { ChamberProjectEntryPanel } from "@/components/companion/chamber/ChamberProjectEntryPanel";
+import { ProjectHomesPrototypePanel } from "@/components/companion/projectHomes";
+import { getProjectHomeRoom } from "@/lib/projectHomes";
 import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
 import { GrowthProfileRoomPanel } from "@/components/companion/GrowthProfileRoomPanel";
 import { MyBusinessEstatePanel } from "@/components/companion/MyBusinessEstatePanel";
@@ -1316,6 +1320,8 @@ import { EVIDENCE_VAULT_CHAT_PRESERVE_OFFER } from "@/lib/estate/evidenceVaultEx
 import { evidenceVaultContextReply } from "@/lib/estate/evidenceVaultContextLock";
 import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
 import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
+import type { PlanningCenterArea } from "@/lib/planMyDay/planningCenter";
+import { confirmLeaveUnsavedWork } from "@/lib/unsavedWorkGuard";
 import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ENTRANCE_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG, ESTATE_PROFILE_ROOM_BG } from "@/lib/growth/growthRoom";
 import {
   isProfileEstateMenuAction,
@@ -1450,6 +1456,8 @@ import {
 } from "@/lib/momentumBuilderRoom/momentumBuilderPrompt";
 import { CHAMBER_OF_MOMENTUM_ROOM_BG } from "@/lib/estate/chamber/chamberOfMomentumRoomRegistry";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio";
+import { DESTINATION_GALLERY_BG } from "@/lib/destinationGallery";
+import { resolveMyDayAndWorkOpenerFromText } from "@/lib/estate/myDayAndWorkNavigation";
 import { ensureChamberDemoDataSeeded } from "@/lib/estate/chamber/seedChamberDemoData";
 import { isChamberDemoMode } from "@/lib/estate/chamber/chamberDemoMode";
 import {
@@ -3031,6 +3039,11 @@ export default function CompanionPageClient() {
   const [planMyDayOpenItemId, setPlanMyDayOpenItemId] = useState<string | null>(
     null,
   );
+  const [planMyDayInitialArea, setPlanMyDayInitialArea] =
+    useState<PlanningCenterArea | null>(null);
+  const [planMyDayInitialRhythmsTab, setPlanMyDayInitialRhythmsTab] = useState<
+    "today" | "all" | "reminders" | null
+  >(null);
   const [freshStartDialog, setFreshStartDialog] =
     useState<FreshStartKind | null>(null);
   const [freshStartRevision, setFreshStartRevision] = useState(0);
@@ -7916,14 +7929,81 @@ export default function CompanionPageClient() {
     }
   }
 
+  /**
+   * Leave Clear My Mind when navigating to another My Day & Work place.
+   * Otherwise the active-section restore effect snaps back to Clear My Mind.
+   */
+  function leaveClearMyMindIfNavigatingAway() {
+    if (
+      isClearMyMindModeActive() ||
+      activeSectionRef.current === "brain-dump"
+    ) {
+      exitClearMyMindMode();
+      setEstateConservatoryEngaged(false);
+    }
+  }
+
   /** Plan My Day — Morning Room standalone; never beside chat. */
-  function openPlanMyDayCore(options?: { itemId?: string | null }) {
+  function openPlanMyDayCore(options?: {
+    itemId?: string | null;
+    area?: PlanningCenterArea | null;
+    rhythmsTab?: "today" | "all" | "reminders" | null;
+  }) {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
     preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
     setPlanMyDayOpenItemId(options?.itemId ?? null);
+    setPlanMyDayInitialArea(options?.area ?? null);
+    setPlanMyDayInitialRhythmsTab(options?.rhythmsTab ?? null);
     trackWorkspaceEcosystemEvent("plan-my-day");
     noteWorkspaceOpened("plan-my-day", "standalone_room");
     clearSplitBesideWorkspace();
     openStandaloneFocusSectionCore("plan-my-day");
+  }
+
+  /**
+   * Reminders — approved RemindersPanel (Settings → Notifications).
+   * Never opens Rhythms.
+   */
+  function openRemindersCore() {
+    leaveClearMyMindIfNavigatingAway();
+    openHowDoISettings("notifications");
+  }
+
+  /**
+   * Destination Gallery — Architecture 156 crystals (not Asset Library / the-gallery).
+   */
+  function openDestinationGalleryCore() {
+    leaveClearMyMindIfNavigatingAway();
+    setOverlay(null);
+    preloadRoomBackground(DESTINATION_GALLERY_BG.split("?")[0] ?? DESTINATION_GALLERY_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    syncDirectEstateVisit({
+      roomId: "destination-gallery",
+      section: "destination-gallery",
+      userIntent: "destination-gallery",
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user")
+        .length,
+    });
+    trackWorkspaceEcosystemEvent("destination-gallery");
+    noteWorkspaceOpened("destination-gallery", "standalone_room");
+    openStandaloneFocusSectionCore("destination-gallery");
+    setEstateRoomChatVisible(false);
+  }
+
+  /** Design prototype — Project Homes as Estate places (no project storage). */
+  function openProjectHomesPrototypeCore() {
+    leaveClearMyMindIfNavigatingAway();
+    pauseActiveArtifactIfLeavingCreate("project-homes");
+    setOverlay(null);
+    preloadRoomBackground(getProjectHomeRoom("sunroom").artwork.backgroundUrl);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    trackWorkspaceEcosystemEvent("project-homes");
+    noteWorkspaceOpened("project-homes", "standalone_room");
+    openStandaloneFocusSectionCore("project-homes");
+    setEstateRoomChatVisible(false);
   }
 
   /** Life Experience Room — full-screen library; letters, not articles. */
@@ -8041,6 +8121,7 @@ export default function CompanionPageClient() {
   }
 
   function openCartographersStudioCore() {
+    leaveClearMyMindIfNavigatingAway();
     pauseActiveArtifactIfLeavingCreate("visual-focus");
     setOverlay(null);
     pushGrowBackLabel();
@@ -8959,7 +9040,7 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Explore Spark � open the approved visual Estate explorer.
+   * Explore Spark � open the approved visual Estate explorer.
    * Never wander into Create / Create Studio.
    */
   function openExploreSparkVisualExplorer() {
@@ -9130,7 +9211,7 @@ export default function CompanionPageClient() {
         return;
       case "goals-projects":
         setOverlay(null);
-        openWorkspaceFromSection("projects");
+        openProjectHomesPrototypeCore();
         return;
       case "start-new-conversation":
         requestClearTodayContext();
@@ -9202,12 +9283,10 @@ export default function CompanionPageClient() {
         openStandaloneFocusSectionCore("focus-timer");
         break;
       case "calendar":
-        openBeside("time-block");
+        openPlanMyDayCore({ area: "calendar" });
         break;
       case "projects":
-        openSectionBesideChatCore("projects", "projects", {
-          userInitiated: true,
-        });
+        openProjectHomesPrototypeCore();
         break;
       case "journal":
         openGrowthDestinationCore("growth-journal");
@@ -9218,7 +9297,7 @@ export default function CompanionPageClient() {
         });
         break;
       case "destination-gallery":
-        openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth");
+        openDestinationGalleryCore();
         break;
       case "google-workspace":
         openCreateWorkspace({ source: "hard_nav", hardNavCommand: "google" });
@@ -11488,6 +11567,57 @@ export default function CompanionPageClient() {
      * Must run before Clear My Mind capture lock so CMM never denies another capability.
      */
     {
+      const myDayOpener = resolveMyDayAndWorkOpenerFromText(trimmed);
+      if (myDayOpener) {
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        switch (myDayOpener) {
+          case "plan-my-day":
+            openPlanMyDayCore();
+            break;
+          case "rhythms":
+            openPlanMyDayCore({ area: "rhythms" });
+            break;
+          case "reminders":
+            openRemindersCore();
+            break;
+          case "calendar":
+            openPlanMyDayCore({ area: "calendar" });
+            break;
+          case "project-homes":
+            openProjectHomesPrototypeCore();
+            break;
+          case "clear-my-mind":
+            openClearMyMindCore();
+            break;
+          case "parking-lot":
+            openPlanMyDayCore({ area: "parking-lot" });
+            break;
+          case "destination-gallery":
+            openDestinationGalleryCore();
+            break;
+          case "cartographers-studio":
+            openCartographersStudioCore();
+            break;
+          default: {
+            const _exhaustive: never = myDayOpener;
+            void _exhaustive;
+            break;
+          }
+        }
+        setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (!getPrefs().hasChatted) {
+          savePrefs({ hasChatted: true });
+          setHasChatted(true);
+        }
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+
       const universalRequest = resolveExplicitCapabilityIntent(trimmed);
       if (universalRequest) {
         lastUserTextRef.current = trimmed;
@@ -19938,11 +20068,13 @@ export default function CompanionPageClient() {
           ? "chamber-of-momentum"
           : activeSection === "visual-focus"
             ? "cartographers-studio"
-            : activeSection === "the-gallery"
+            : activeSection === "destination-gallery"
               ? "destination-gallery"
-              : welcomeHomePrimary
-                ? "welcome-home"
-                : null;
+              : activeSection === "the-gallery"
+                ? "the-gallery"
+                : welcomeHomePrimary
+                  ? "welcome-home"
+                  : null;
 
   const estateExperienceMenuRoomId = resolvePresenceModeRoomId({
     directRoomId:
@@ -21306,6 +21438,29 @@ export default function CompanionPageClient() {
             />
           )}
 
+          {activeSection === "destination-gallery" && (
+            <EstateRoomErrorBoundary
+              roomLabel="Destination Gallery"
+              onReturnToEstate={navigateBackToEstateHome}
+            >
+              <DestinationGalleryPanel
+                onBack={navigateBackToEstateHome}
+                onReturnToEstate={navigateBackToEstateHome}
+              />
+            </EstateRoomErrorBoundary>
+          )}
+
+          {activeSection === "project-homes" && (
+            <EstateRoomErrorBoundary
+              roomLabel="Project Homes"
+              onReturnToEstate={navigateBackToEstateHome}
+            >
+              <ProjectHomesPrototypePanel
+                onBack={navigateBackToEstateHome}
+              />
+            </EstateRoomErrorBoundary>
+          )}
+
           {activeSection === "plan-my-day" && (
             <PlanMyDayPanel
               standalone
@@ -21332,6 +21487,8 @@ export default function CompanionPageClient() {
                 openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"))
               }
               initialOpenItemId={planMyDayOpenItemId}
+              initialPlanningArea={planMyDayInitialArea}
+              initialRhythmsTab={planMyDayInitialRhythmsTab}
             />
           )}
 
@@ -22118,19 +22275,6 @@ export default function CompanionPageClient() {
           justBeHereSession ? justBeHereSoundEnabled : undefined
         }
         onBackToEstate={navigateBackToEstateHome}
-        onOpenChamber={() => openChamberOfMomentumCore()}
-        onOpenEvidenceVault={() =>
-          enterEvidenceVaultRoomCore({ userIntent: "room-menu:evidence-vault" })
-        }
-        onOpenHallOfAccomplishments={() =>
-          openGrowthDestinationCore("growth-portfolio")
-        }
-        onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
-        onOpenCartographersStudio={() => openCartographersStudioCore()}
-        onOpenBreathe={() => openBreatheOverlayCore()}
-        onOpenSoundscapes={() =>
-          openPeacefulPlacesCore({ categoryId: "calm-brain" })
-        }
         onExploreSpark={
           clearMyMindWorkspaceActive
             ? undefined
@@ -22138,6 +22282,27 @@ export default function CompanionPageClient() {
                 openExploreSparkVisualExplorer();
               }
         }
+        onOpenPlanMyDay={() => openPlanMyDayCore()}
+        onOpenRhythms={() => openPlanMyDayCore({ area: "rhythms" })}
+        onOpenReminders={() => openRemindersCore()}
+        onOpenCalendar={() => openPlanMyDayCore({ area: "calendar" })}
+        onOpenProjects={() => openProjectHomesPrototypeCore()}
+        onOpenClearMyMind={() => openClearMyMindCore()}
+        onOpenParkingLot={() => openPlanMyDayCore({ area: "parking-lot" })}
+        onOpenDestinationGallery={() => openDestinationGalleryCore()}
+        onOpenCartographersStudio={() => openCartographersStudioCore()}
+        onOpenEvidenceVault={() =>
+          enterEvidenceVaultRoomCore({ userIntent: "room-menu:evidence-vault" })
+        }
+        onOpenHallOfAccomplishments={() =>
+          openGrowthDestinationCore("growth-portfolio")
+        }
+        onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
+        onOpenChamber={() => openChamberOfMomentumCore()}
+        onOpenBreathe={() => openBreatheOverlayCore()}
+        onPlaySoundscape={(track) => {
+          void playExperienceSoundscapeTrack(track);
+        }}
       />
 
       <BreatheDestinationHost

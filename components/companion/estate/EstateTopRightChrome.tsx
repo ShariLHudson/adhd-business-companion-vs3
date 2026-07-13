@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
 import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
+import type { ExperienceSoundscapeTrack } from "@/lib/soundscapes/experienceSoundscapesMenu";
 
 export type EstateTopRightChromeProps = {
   showProfile: boolean;
@@ -16,14 +17,23 @@ export type EstateTopRightChromeProps = {
   onToggleChat: () => void;
   onToggleSound?: () => void;
   onBackToEstate: () => void;
-  onOpenChamber?: () => void;
+  onExploreSpark?: () => void;
+  onOpenPlanMyDay?: () => void;
+  onOpenRhythms?: () => void;
+  onOpenReminders?: () => void;
+  onOpenCalendar?: () => void;
+  onOpenProjects?: () => void;
+  onOpenClearMyMind?: () => void;
+  onOpenParkingLot?: () => void;
+  onOpenDestinationGallery?: () => void;
+  onOpenCartographersStudio?: () => void;
+  onOpenJournal?: () => void;
   onOpenEvidenceVault?: () => void;
   onOpenHallOfAccomplishments?: () => void;
-  onOpenJournal?: () => void;
-  onOpenCartographersStudio?: () => void;
+  onOpenChamber?: () => void;
+  onOpenBoardroom?: () => void;
   onOpenBreathe?: () => void;
-  onOpenSoundscapes?: () => void;
-  onExploreSpark?: () => void;
+  onPlaySoundscape?: (track: ExperienceSoundscapeTrack) => void;
   backdropSurface?: "chat" | "clear-my-mind";
 };
 
@@ -41,14 +51,23 @@ export function EstateTopRightChrome({
   onToggleChat,
   onToggleSound,
   onBackToEstate,
-  onOpenChamber,
+  onExploreSpark,
+  onOpenPlanMyDay,
+  onOpenRhythms,
+  onOpenReminders,
+  onOpenCalendar,
+  onOpenProjects,
+  onOpenClearMyMind,
+  onOpenParkingLot,
+  onOpenDestinationGallery,
+  onOpenCartographersStudio,
+  onOpenJournal,
   onOpenEvidenceVault,
   onOpenHallOfAccomplishments,
-  onOpenJournal,
-  onOpenCartographersStudio,
+  onOpenChamber,
+  onOpenBoardroom,
   onOpenBreathe,
-  onOpenSoundscapes,
-  onExploreSpark,
+  onPlaySoundscape,
   backdropSurface,
 }: EstateTopRightChromeProps) {
   const [mounted, setMounted] = useState(false);
@@ -69,14 +88,23 @@ export function EstateTopRightChrome({
           onToggleChat={onToggleChat}
           onToggleSound={onToggleSound}
           onBackToEstate={onBackToEstate}
-          onOpenChamber={onOpenChamber}
+          onExploreSpark={onExploreSpark}
+          onOpenPlanMyDay={onOpenPlanMyDay}
+          onOpenRhythms={onOpenRhythms}
+          onOpenReminders={onOpenReminders}
+          onOpenCalendar={onOpenCalendar}
+          onOpenProjects={onOpenProjects}
+          onOpenClearMyMind={onOpenClearMyMind}
+          onOpenParkingLot={onOpenParkingLot}
+          onOpenDestinationGallery={onOpenDestinationGallery}
+          onOpenCartographersStudio={onOpenCartographersStudio}
+          onOpenJournal={onOpenJournal}
           onOpenEvidenceVault={onOpenEvidenceVault}
           onOpenHallOfAccomplishments={onOpenHallOfAccomplishments}
-          onOpenJournal={onOpenJournal}
-          onOpenCartographersStudio={onOpenCartographersStudio}
+          onOpenChamber={onOpenChamber}
+          onOpenBoardroom={onOpenBoardroom}
           onOpenBreathe={onOpenBreathe}
-          onOpenSoundscapes={onOpenSoundscapes}
-          onExploreSpark={onExploreSpark}
+          onPlaySoundscape={onPlaySoundscape}
           backdropSurface={backdropSurface}
         />
       ) : null}
