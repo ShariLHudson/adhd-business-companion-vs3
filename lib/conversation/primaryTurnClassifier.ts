@@ -169,6 +169,23 @@ export function classifyPrimaryConversationTurn(
   );
 }
 
+/**
+ * Primary turn + Decision Engine together — used by CREATE terminal owner tests
+ * and continuity gates that need both signals without double-evaluating elsewhere.
+ */
+export function classifyPrimaryConversationTurnWithEngine(
+  input: ClassifyPrimaryTurnInput,
+): {
+  primary: PrimaryTurnDecision;
+  engine: ReturnType<typeof evaluateSparkDecisionEngine>;
+} {
+  const engine = evaluateSparkDecisionEngine({
+    userText: input.userText.trim(),
+  });
+  const primary = classifyPrimaryConversationTurn(input);
+  return { primary, engine };
+}
+
 function classifyPrimaryConversationTurnLegacy(
   input: ClassifyPrimaryTurnInput,
 ): PrimaryTurnDecision {

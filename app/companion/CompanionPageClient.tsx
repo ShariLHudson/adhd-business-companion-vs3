@@ -1054,6 +1054,12 @@ import {
   type PrimaryTurnDecision,
 } from "@/lib/conversation/primaryTurnClassifier";
 import {
+  clearConversationOwner,
+  continuityOwnerHintForChat,
+  resolveContinuityTurnGate,
+  setActiveConversationOwner,
+} from "@/lib/conversationContinuity";
+import {
   logPrimaryTurnClassification,
   recordPrimaryTurnFinalResponse,
 } from "@/lib/conversation/primaryTurnLog";
@@ -11850,31 +11856,6 @@ export default function CompanionPageClient() {
     chatTurnRef.current += 1;
     const lastAssistantForPrimary =
       [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
-    const primaryTurnDecision = runReliableSyncLayer(
-      "decision_engine",
-      () =>
-        classifyPrimaryConversationTurn({
-          userText: trimmed,
-          lastAssistantText: lastAssistantForPrimary,
-        }),
-      {
-        type: "RELATIONSHIP_CHAT",
-        confidence: "low",
-        owner: "chat",
-        reason: "classification recovered — stay in chat",
-        blockKernelNavigation: true,
-        blockBridgeResponder: true,
-        blockCollectionOffer: true,
-        blockSecondaryResponders: false,
-      } satisfies PrimaryTurnDecision,
-      {
-        turn: chatTurnRef.current,
-        userText: trimmed,
-        normalizedMessage: normalizeTurnMessage(trimmed),
-      },
-    );
-    activePrimaryTurnRef.current = primaryTurnDecision;
-    logPrimaryTurnClassification(chatTurnRef.current, trimmed, primaryTurnDecision);
 
     const confirmationReply =
       isConfirmationAcceptance(trimmed) || isConfirmationDecline(trimmed);
@@ -11898,51 +11879,199 @@ export default function CompanionPageClient() {
     markChatTurnStarted(chatTurnState);
     activeChatTurnLifecycleRef.current = chatTurnState;
 
+    const applyMyDayAndWorkOpener = (
+      opener: import("@/lib/estate/myDayAndWorkNavigation").MyDayAndWorkOpener,
+    ) => {
+      switch (opener) {
+        case "plan-my-day":
+          openPlanMyDayCore();
+          break;
+        case "rhythms":
+          openPlanMyDayCore({ area: "rhythms" });
+          break;
+        case "reminders":
+          openRemindersCore();
+          break;
+        case "calendar":
+          openPlanMyDayCore({ area: "calendar" });
+          break;
+        case "project-homes":
+          openProjectHomesPrototypeCore();
+          break;
+        case "clear-my-mind":
+          openClearMyMindCore();
+          break;
+        case "parking-lot":
+          openPlanMyDayCore({ area: "parking-lot" });
+          break;
+        case "destination-gallery":
+          openDestinationGalleryCore();
+          break;
+        case "cartographers-studio":
+          openCartographersStudioCore();
+          break;
+        default: {
+          const _exhaustive: never = opener;
+          void _exhaustive;
+          break;
+        }
+      }
+    };
+
+    let continuityLocksBroadRouting = false;
+    let primaryTurnDecision: PrimaryTurnDecision | null = null;
+
     try {
+    /**
+     * Continuity ownership gate (Slice 2) — before primary / Decision Engine /
+     * navigation / generic recovery. Active owner receives the turn unless the
+     * member explicitly exits or changes tasks.
+     */
+
+    const continuityGate = resolveContinuityTurnGate({
+      userText: trimmed,
+      lastAssistantText: lastAssistantForPrimary,
+      activeSection: activeSectionRef.current,
+    });
+
+    if (continuityGate.action === "clear_owner_continue") {
+      if (continuityGate.clearUniversalCreation) {
+        clearUniversalCreationSession();
+      }
+    }
+
+    if (continuityGate.action === "destination") {
+      if (continuityGate.clearUniversalCreation) {
+        clearUniversalCreationSession();
+      }
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      const dest = continuityGate.destination;
+      if (dest.kind === "my_day") {
+        applyMyDayAndWorkOpener(dest.opener);
+      } else if (dest.destination === "evidence-vault") {
+        enterEvidenceVaultRoomCore({
+          userIntent: trimmed || "show-evidence",
+        });
+      } else if (dest.destination === "my-business-estate") {
+        openProfileDestinationCore("my-business-estate");
+      } else if (dest.destination === "boardroom") {
+        openBoardroomCore({
+          intent: dest.boardroomIntent ?? "past",
+        });
+      }
+      setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    if (continuityGate.action === "route_to_owner") {
+      const { routed, owner } = continuityGate;
+      if (routed.kind === "universal_creation" || routed.kind === "board_intake") {
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: routed.reply },
+        ]);
+        setActiveConversationOwner(owner);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (!getPrefs().hasChatted) {
+          savePrefs({ hasChatted: true });
+          setHasChatted(true);
+        }
+        recordPrimaryTurnResponse(routed.reply);
+        markAssistantReplied(chatTurnState);
+        logConversationPipelineDiagnostic({
+          turn: chatTurnRef.current,
+          userText: trimmed,
+          detectedIntent:
+            routed.kind === "universal_creation" ? "CREATE" : "BOARD_INTAKE",
+          kernelHandled: false,
+          informationalChatBypass: true,
+          estateKernelForced: false,
+          taskLockBlocksEstate: true,
+          selectedHandler: `continuity:${routed.kind}`,
+          turnOwner: owner.kind,
+          normalizedMessage: normalizeTurnMessage(trimmed),
+          primaryType: "TASK_REQUEST",
+          primaryOwner: owner.kind,
+          primaryConfidence: "high",
+        });
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+      if (routed.kind === "continue_in_chat") {
+        continuityLocksBroadRouting = true;
+        setActiveConversationOwner(routed.owner);
+        primaryTurnDecision = {
+          type: "RELATIONSHIP_CHAT",
+          confidence: "high",
+          owner: routed.syntheticPrimaryOwner,
+          reason: `continuity gate — ${routed.owner.kind} owns turn`,
+          blockKernelNavigation: true,
+          blockBridgeResponder: true,
+          blockCollectionOffer: true,
+          blockSecondaryResponders: true,
+        };
+      }
+    }
+
+    if (!primaryTurnDecision) {
+      primaryTurnDecision = runReliableSyncLayer(
+        "decision_engine",
+        () =>
+          classifyPrimaryConversationTurn({
+            userText: trimmed,
+            lastAssistantText: lastAssistantForPrimary,
+          }),
+        {
+          type: "RELATIONSHIP_CHAT",
+          confidence: "low",
+          owner: "chat",
+          reason: "classification recovered — stay in chat",
+          blockKernelNavigation: true,
+          blockBridgeResponder: true,
+          blockCollectionOffer: true,
+          blockSecondaryResponders: false,
+        } satisfies PrimaryTurnDecision,
+        {
+          turn: chatTurnRef.current,
+          userText: trimmed,
+          normalizedMessage: normalizeTurnMessage(trimmed),
+        },
+      );
+    }
+    // Continuity gate always leaves a decision before broad routing continues.
+    const activePrimaryTurn: PrimaryTurnDecision = primaryTurnDecision;
+    primaryTurnDecision = activePrimaryTurn;
+    activePrimaryTurnRef.current = activePrimaryTurn;
+    logPrimaryTurnClassification(chatTurnRef.current, trimmed, activePrimaryTurn);
+
     /**
      * Universal Access (#183) — explicit capability requests win over location.
      * Must run before Clear My Mind capture lock so CMM never denies another capability.
+     * Skipped when a sticky continuity owner (e.g. Chamber) already owns the turn.
      */
-    {
+    if (!continuityLocksBroadRouting) {
       const myDayOpener = resolveMyDayAndWorkOpenerFromText(trimmed);
       if (myDayOpener) {
         lastUserTextRef.current = trimmed;
         const userMessage: Message = { role: "user", content: trimmed };
         if (fresh) clearConversation();
-        switch (myDayOpener) {
-          case "plan-my-day":
-            openPlanMyDayCore();
-            break;
-          case "rhythms":
-            openPlanMyDayCore({ area: "rhythms" });
-            break;
-          case "reminders":
-            openRemindersCore();
-            break;
-          case "calendar":
-            openPlanMyDayCore({ area: "calendar" });
-            break;
-          case "project-homes":
-            openProjectHomesPrototypeCore();
-            break;
-          case "clear-my-mind":
-            openClearMyMindCore();
-            break;
-          case "parking-lot":
-            openPlanMyDayCore({ area: "parking-lot" });
-            break;
-          case "destination-gallery":
-            openDestinationGalleryCore();
-            break;
-          case "cartographers-studio":
-            openCartographersStudioCore();
-            break;
-          default: {
-            const _exhaustive: never = myDayOpener;
-            void _exhaustive;
-            break;
-          }
-        }
+        applyMyDayAndWorkOpener(myDayOpener);
         setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
         setInput("");
         voiceUsedRef.current = false;
@@ -12136,7 +12265,7 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (isVagueHelpRequest(trimmed)) {
+    if (isVagueHelpRequest(trimmed) && !continuityLocksBroadRouting) {
       clearUniversalCreationSession();
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
@@ -12376,15 +12505,18 @@ export default function CompanionPageClient() {
         isGuidedCreationAssistantContext(lastAssistantForCreateFastPath) ||
         createWorkflowContinuation ||
         conversationPriority?.winner === "continue_creation" ||
-        Boolean(universalSessionActive.approvedDraft) ||
-        universalSessionActive.phase === "awaiting_action" ||
-        universalSessionActive.phase === "review" ||
-        universalSessionActive.phase === "revision" ||
-        universalSessionActive.phase === "approval" ||
-        universalSessionActive.phase === "guided_creation") &&
+        Boolean(universalSessionActive?.approvedDraft) ||
+        universalSessionActive?.phase === "awaiting_action" ||
+        universalSessionActive?.phase === "review" ||
+        universalSessionActive?.phase === "revision" ||
+        universalSessionActive?.phase === "approval" ||
+        universalSessionActive?.phase === "guided_creation") &&
       !isVagueHelpRequest(trimmed);
 
-    if (isSimpleCreateRequest(trimmed) || universalCreationContinuation) {
+    if (
+      !continuityLocksBroadRouting &&
+      (isSimpleCreateRequest(trimmed) || universalCreationContinuation)
+    ) {
       const createRouting = resolveIntentRouting({
         userText: trimmed,
         workspace: workspacePanel,
@@ -13792,7 +13924,7 @@ export default function CompanionPageClient() {
         // Chat-primary turns answer in conversation — do not swap rooms as a
         // side effect of send. Clear My Mind + Chamber members stay exempt
         // (explicit capability requests). DIRECT_COMMAND has blockKernel false.
-        if (primaryTurnDecision.blockKernelNavigation) {
+        if (activePrimaryTurnRef.current?.blockKernelNavigation) {
           const roomId = command.roomId ?? command.entryId;
           const opensClearMyMind =
             command.section === "brain-dump" ||
@@ -16905,6 +17037,9 @@ export default function CompanionPageClient() {
                 tonePreferenceOverridesRoutingGuidance(prefs)
                   ? "Member tone preference in Settings overrides conflicting action-first routing hints this turn."
                   : null,
+                continuityOwnerHintForChat({
+                  activeSection: activeSectionRef.current,
+                }),
                 estateMemoryHintForChat(),
                 chamberMemberChatHint,
                 activeTaskLockHintForChat(estateTaskLockTurn.state),
@@ -17922,8 +18057,8 @@ export default function CompanionPageClient() {
         turn: chatTurnRef.current,
         userText: trimmed,
         normalizedMessage: normalizeTurnMessage(trimmed),
-        intent: primaryTurnDecision.type,
-        turnOwner: primaryTurnDecision.owner,
+        intent: primaryTurnDecision?.type ?? "unknown",
+        turnOwner: primaryTurnDecision?.owner ?? "unknown",
         currentRoom: currentEstateRoomId ?? null,
         failureReason:
           err instanceof Error ? err.message : "companion-chat-error",
@@ -17967,8 +18102,8 @@ export default function CompanionPageClient() {
         turn: chatTurnRef.current,
         userText: trimmed,
         normalizedMessage: normalizeTurnMessage(trimmed),
-        intent: primaryTurnDecision.type,
-        turnOwner: primaryTurnDecision.owner,
+        intent: primaryTurnDecision?.type ?? "unknown",
+        turnOwner: primaryTurnDecision?.owner ?? "unknown",
         currentRoom:
           resolveCurrentEstateRoom({
             directVisitRoomId: directEstateVisitRef.current?.roomId ?? null,

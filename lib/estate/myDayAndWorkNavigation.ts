@@ -150,7 +150,10 @@ export function resolveMyDayAndWorkOpenerFromText(
   }
   if (
     /\b(?:open|show|take me to)\s+(?:my\s+)?projects?\b/i.test(normalized) ||
-    /\bproject\s+homes?\b/i.test(normalized)
+    /\bproject\s+homes?\b/i.test(normalized) ||
+    /\b(?:i need to see|see|view)\b[\s\S]{0,40}\b(?:all\s+)?(?:my\s+)?(?:current\s+)?projects?\b/i.test(
+      normalized,
+    )
   ) {
     return "project-homes";
   }
