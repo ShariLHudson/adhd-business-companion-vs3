@@ -4,7 +4,7 @@ import {
   todayStr,
   type TimeBlock,
 } from "@/lib/companionStore";
-import type { PlanDayItem, PlanItemColumn, PlanItemPriority } from "./types";
+import type { PlanDayItem, PlanItemColumn, PlanItemPriority, PlanDayItemSource } from "./types";
 import type { PlanLifeDomain } from "./types";
 import { resolvePlanItemLifeAreaName, classifyTaskLifeArea } from "./lifeAreaBridge";
 import {
@@ -13,9 +13,15 @@ import {
   type PlanTaskSourceWorkspace,
 } from "./planTaskCompletion";
 import { recordPlanBehaviorEvent } from "./planBehaviorLearning";
+import {
+  filterPlanItemsForOwner,
+  getPlanDayOwnerUserId,
+  planDayDeferredStoreKey,
+  planDayItemsStoreKey,
+} from "./planDayOwner";
 
-const STORE_KEY = "companion-plan-my-day-items-v1";
-const DEFERRED_STORE_KEY = "companion-plan-my-day-deferred-v1";
+const LEGACY_STORE_KEY = "companion-plan-my-day-items-v1";
+const LEGACY_DEFERRED_STORE_KEY = "companion-plan-my-day-deferred-v1";
 
 export const PLAN_MY_DAY_UPDATED = "companion-plan-my-day-updated";
 
@@ -46,11 +52,23 @@ function hasBrowserStorage(): boolean {
 function readStored(): StoredDay | null {
   if (!hasBrowserStorage()) return null;
   try {
-    const raw = localStorage.getItem(STORE_KEY);
+    const key = planDayItemsStoreKey();
+    let raw = localStorage.getItem(key);
+    // One-time migrate from legacy device key into the signed-in member key.
+    // Delete legacy after copy so a second account cannot inherit the same day.
+    if (!raw && key !== LEGACY_STORE_KEY) {
+      const legacy = localStorage.getItem(LEGACY_STORE_KEY);
+      if (legacy) {
+        localStorage.setItem(key, legacy);
+        localStorage.removeItem(LEGACY_STORE_KEY);
+        raw = legacy;
+      }
+    }
     if (!raw) return null;
     const parsed = JSON.parse(raw) as StoredDay;
     if (!parsed?.date || !Array.isArray(parsed.items)) return null;
-    return parsed;
+    const items = filterPlanItemsForOwner(parsed.items);
+    return { ...parsed, items };
   } catch {
     return null;
   }
@@ -59,10 +77,15 @@ function readStored(): StoredDay | null {
 function writeStored(data: StoredDay): void {
   if (!hasBrowserStorage()) return;
   try {
-    const payload = JSON.stringify(data);
-    const existing = localStorage.getItem(STORE_KEY);
+    const key = planDayItemsStoreKey();
+    const owner = getPlanDayOwnerUserId();
+    const items = data.items.map((item) =>
+      owner && !item.ownerUserId ? { ...item, ownerUserId: owner } : item,
+    );
+    const payload = JSON.stringify({ ...data, items });
+    const existing = localStorage.getItem(key);
     if (existing === payload) return;
-    localStorage.setItem(STORE_KEY, payload);
+    localStorage.setItem(key, payload);
     notifyPlanUpdated();
   } catch {
     /* storage unavailable */
@@ -72,10 +95,25 @@ function writeStored(data: StoredDay): void {
 function readDeferred(): Record<string, PlanDayItem[]> {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(DEFERRED_STORE_KEY);
+    const key = planDayDeferredStoreKey();
+    let raw = localStorage.getItem(key);
+    if (!raw && key !== LEGACY_DEFERRED_STORE_KEY) {
+      const legacy = localStorage.getItem(LEGACY_DEFERRED_STORE_KEY);
+      if (legacy) {
+        localStorage.setItem(key, legacy);
+        localStorage.removeItem(LEGACY_DEFERRED_STORE_KEY);
+        raw = legacy;
+      }
+    }
     if (!raw) return {};
     const parsed = JSON.parse(raw) as Record<string, PlanDayItem[]>;
-    return parsed && typeof parsed === "object" ? parsed : {};
+    if (!parsed || typeof parsed !== "object") return {};
+    const next: Record<string, PlanDayItem[]> = {};
+    for (const [date, list] of Object.entries(parsed)) {
+      if (!Array.isArray(list)) continue;
+      next[date] = filterPlanItemsForOwner(list);
+    }
+    return next;
   } catch {
     return {};
   }
@@ -117,10 +155,11 @@ export function bringParkingLotItemToToday(itemId: string): PlanDayItem[] {
 function writeDeferred(data: Record<string, PlanDayItem[]>): void {
   if (typeof window === "undefined") return;
   try {
+    const key = planDayDeferredStoreKey();
     const payload = JSON.stringify(data);
-    const existing = localStorage.getItem(DEFERRED_STORE_KEY);
+    const existing = localStorage.getItem(key);
     if (existing === payload) return;
-    localStorage.setItem(DEFERRED_STORE_KEY, payload);
+    localStorage.setItem(key, payload);
     notifyPlanUpdated();
   } catch {
     /* storage unavailable */
@@ -135,6 +174,80 @@ function consumeDeferredForDate(date: string): PlanDayItem[] {
   delete next[date];
   writeDeferred(next);
   return forDate;
+}
+
+/**
+ * Normalize a Date or YYYY-MM-DD string to the member's local calendar day.
+ * Prefer this over UTC `toISOString().slice(0, 10)`.
+ */
+export function normalizePlanningDate(input?: Date | string | null): string {
+  if (typeof input === "string" && /^\d{4}-\d{2}-\d{2}$/.test(input.trim())) {
+    return input.trim();
+  }
+  const d =
+    input instanceof Date
+      ? input
+      : typeof input === "string" && input.trim()
+        ? new Date(input)
+        : new Date();
+  if (Number.isNaN(d.getTime())) return todayStr();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate(),
+  ).padStart(2, "0")}`;
+}
+
+/** Resolve which local day an item belongs to. */
+export function planItemPlanningDate(
+  item: PlanDayItem,
+  envelopeDate?: string | null,
+): string {
+  if (item.planningDate && /^\d{4}-\d{2}-\d{2}$/.test(item.planningDate)) {
+    return item.planningDate;
+  }
+  if (envelopeDate && /^\d{4}-\d{2}-\d{2}$/.test(envelopeDate)) {
+    return envelopeDate;
+  }
+  return todayStr();
+}
+
+/** A saved item with a real title counts as meaningful plan data for its day. */
+export function isMeaningfulPlanItem(item: PlanDayItem): boolean {
+  return Boolean(item.title?.trim());
+}
+
+/**
+ * True when the member already has one or more saved Plan My Day items
+ * for the given local calendar date (no seeding, no writes).
+ */
+export function hasMeaningfulPlanItemsForDate(date = todayStr()): boolean {
+  const day = normalizePlanningDate(date);
+  const stored = readStored();
+  if (!stored || stored.date !== day) return false;
+  return stored.items.some(
+    (item) =>
+      isMeaningfulPlanItem(item) &&
+      planItemPlanningDate(item, stored.date) === day,
+  );
+}
+
+export function hasMeaningfulPlanItemsForToday(): boolean {
+  return hasMeaningfulPlanItemsForDate(todayStr());
+}
+
+/** Stamp planningDate onto items missing it (in-memory; caller persists). */
+export function ensurePlanningDates(
+  items: PlanDayItem[],
+  date = todayStr(),
+): PlanDayItem[] {
+  const day = normalizePlanningDate(date);
+  let changed = false;
+  const next = items.map((item) => {
+    if (item.planningDate === day) return item;
+    if (item.planningDate && item.planningDate !== day) return item;
+    changed = true;
+    return { ...item, planningDate: day };
+  });
+  return changed ? next : items;
 }
 
 export function dateStrFromOffset(days: number, from = todayStr()): string {
@@ -209,18 +322,21 @@ function columnFromBlock(b: TimeBlock): PlanItemColumn {
 }
 
 function itemFromTimeBlock(b: TimeBlock): PlanDayItem {
+  const planningDate = normalizePlanningDate(b.date || todayStr());
   return {
     id: `tb-${b.id}`,
     title: b.title,
     durationMinutes: b.durationMin,
     flexible: b.durationFlexible,
     startTime: b.startTime || undefined,
+    planningDate,
     column: columnFromBlock(b),
     done: b.status === "completed",
     projectId: b.projectId,
     notes: b.note,
     createdAt: b.createdAt,
     sourceTimeBlockId: b.id,
+    source: "time-block",
   };
 }
 
@@ -252,9 +368,11 @@ export function seedPlanItemsFromSources(): PlanDayItem[] {
         title: block.title,
         durationMinutes: block.durationMinutes,
         flexible: block.durationMinutes <= 15,
+        planningDate: today,
         column: "ready",
         done: false,
         createdAt: new Date().toISOString(),
+        source: "day-designer",
       });
     }
     for (const p of dayPlan.priorities) {
@@ -266,9 +384,11 @@ export function seedPlanItemsFromSources(): PlanDayItem[] {
         title: p.label,
         durationMinutes: p.estimatedMinutes,
         flexible: !p.estimatedMinutes,
+        planningDate: today,
         column: "ready",
         done: false,
         createdAt: new Date().toISOString(),
+        source: "day-designer",
       });
     }
   }
@@ -301,13 +421,24 @@ export function loadTodayPlanItems(): PlanDayItem[] {
       shouldPersist = true;
     }
   } else {
+    // New local day: preserve previous plan history. Do NOT carry unfinished into today.
+    if (stored?.date && stored.items.length > 0) {
+      archivePlanEnvelope(stored);
+    }
     items = seedPlanItemsFromSources();
     shouldPersist = true;
   }
 
+  // Intentional dated deferrals / one-time “remind me” holds for today only.
   const deferred = consumeDeferredForDate(today);
   if (deferred.length > 0) {
     items = assignDefaultTimes([...items, ...deferred]);
+    shouldPersist = true;
+  }
+
+  const stamped = ensurePlanningDates(items, today);
+  if (stamped !== items) {
+    items = stamped;
     shouldPersist = true;
   }
 
@@ -316,6 +447,40 @@ export function loadTodayPlanItems(): PlanDayItem[] {
   }
 
   return items;
+}
+
+/**
+ * Preserve a day's plan in deferred history without adding it to today.
+ * Idempotent per item id for the same date key.
+ */
+export function archivePlanEnvelope(envelope: {
+  date: string;
+  items: PlanDayItem[];
+}): string {
+  const dateKey = /^\d{4}-\d{2}-\d{2}$/.test(envelope.date)
+    ? envelope.date
+    : todayStr();
+  if (!envelope.items.length) return dateKey;
+  const deferred = readDeferred();
+  const existing = deferred[dateKey] ?? [];
+  const existingIds = new Set(existing.map((i) => i.id));
+  const incoming = envelope.items.filter((i) => !existingIds.has(i.id));
+  if (incoming.length > 0) {
+    deferred[dateKey] = [...existing, ...incoming];
+    writeDeferred(deferred);
+  }
+  return dateKey;
+}
+
+/** Read-only access to deferred / archive buckets (Parking Lot, past days, dated holds). */
+export function readDeferredPlanStore(): Record<string, PlanDayItem[]> {
+  return readDeferred();
+}
+
+export function writeDeferredPlanStore(
+  data: Record<string, PlanDayItem[]>,
+): void {
+  writeDeferred(data);
 }
 
 /** Read today's plan from storage only — no seeding, writes, or events. */
@@ -376,8 +541,9 @@ export function resetTodayPlanForNewDay(): void {
 
 export function saveTodayPlanItems(items: PlanDayItem[]): PlanDayItem[] {
   const today = todayStr();
-  writeStored({ date: today, items });
-  return items;
+  const stamped = ensurePlanningDates(items, today);
+  writeStored({ date: today, items: stamped });
+  return stamped;
 }
 
 export function updatePlanItem(
@@ -385,8 +551,11 @@ export function updatePlanItem(
   id: string,
   patch: Partial<PlanDayItem>,
 ): PlanDayItem[] {
+  const now = new Date().toISOString();
   return saveTodayPlanItems(
-    items.map((it) => (it.id === id ? { ...it, ...patch } : it)),
+    items.map((it) =>
+      it.id === id ? { ...it, ...patch, updatedAt: now } : it,
+    ),
   );
 }
 
@@ -536,6 +705,74 @@ export function snoozePlanItemUntil(
   return updatePlanItem(items, id, { snoozedUntil: until });
 }
 
+/** Intentional parking — not tied to a calendar day. */
+export const PLAN_PARKING_HOLD_KEY = "someday";
+
+/** Move an item into the Planning Parking Lot (intentional set-aside). */
+export function parkPlanItem(items: PlanDayItem[], id: string): PlanDayItem[] {
+  return deferPlanItemToDate(items, id, PLAN_PARKING_HOLD_KEY);
+}
+
+/** Intentional Parking Lot only (not dated “send later” holds). */
+export function readPlanningParkingLotItems(): PlanDayItem[] {
+  const deferred = readDeferred();
+  return (deferred[PLAN_PARKING_HOLD_KEY] ?? []).filter((i) => !i.done);
+}
+
+/** Deferred items keyed by date (excludes intentional someday parking). */
+export function readDatedDeferredPlanItems(): {
+  date: string;
+  items: PlanDayItem[];
+}[] {
+  const deferred = readDeferred();
+  return Object.entries(deferred)
+    .filter(
+      ([date]) =>
+        date !== PLAN_PARKING_HOLD_KEY && !date.startsWith("archived-"),
+    )
+    .filter(([, list]) => list.some((i) => !i.done))
+    .map(([date, list]) => ({
+      date,
+      items: list.filter((i) => !i.done),
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** Update a deferred / parked item in place. */
+export function updateDeferredPlanItem(
+  itemId: string,
+  patch: Partial<
+    Pick<PlanDayItem, "title" | "notes" | "durationMinutes" | "priority">
+  >,
+): void {
+  const deferred = readDeferred();
+  let changed = false;
+  const next: Record<string, PlanDayItem[]> = {};
+  for (const [date, list] of Object.entries(deferred)) {
+    next[date] = list.map((item) => {
+      if (item.id !== itemId) return item;
+      changed = true;
+      return {
+        ...item,
+        ...patch,
+        updatedAt: new Date().toISOString(),
+      };
+    });
+  }
+  if (changed) writeDeferred(next);
+}
+
+/** Permanently remove a deferred / parked item. */
+export function deleteDeferredPlanItem(itemId: string): void {
+  const deferred = readDeferred();
+  const next: Record<string, PlanDayItem[]> = {};
+  for (const [date, list] of Object.entries(deferred)) {
+    const kept = list.filter((i) => i.id !== itemId);
+    if (kept.length > 0) next[date] = kept;
+  }
+  writeDeferred(next);
+}
+
 /** Remove from today and schedule for a future date. */
 export function deferPlanItemToDate(
   items: PlanDayItem[],
@@ -664,6 +901,12 @@ export type QuickPlanItemInput = {
   category?: PlanLifeDomain | "auto";
   startTime?: string;
   durationMinutes?: number;
+  /** Optional details / why today */
+  notes?: string;
+  /** Day area — defaults to Considering Today */
+  column?: Extract<PlanItemColumn, "ready" | "today" | "doing">;
+  /** Provenance — defaults to manual */
+  source?: PlanDayItemSource;
 };
 
 export function countActivePlanItems(): number {
@@ -700,17 +943,27 @@ export function addQuickPlanItem(
     }
   }
 
+  const column: PlanItemColumn = parsed.column ?? "ready";
+  const now = new Date().toISOString();
+  const ownerUserId = getPlanDayOwnerUserId();
+
   const next: PlanDayItem = {
     id: uid(),
     title: trimmed,
-    column: "ready",
+    column,
     done: false,
     lifeAreaId: resolvedLifeAreaId,
     category: explicitCategory,
     startTime: hasTime ? parsed.startTime!.trim() : undefined,
     flexible: !parsed.durationMinutes,
     durationMinutes: parsed.durationMinutes,
-    createdAt: new Date().toISOString(),
+    notes: parsed.notes?.trim() || undefined,
+    source: parsed.source ?? "manual",
+    planningDate: todayStr(),
+    createdAt: now,
+    updatedAt: now,
+    ownerUserId: ownerUserId ?? undefined,
+    focusRank: column === "doing" ? Date.now() : undefined,
   };
   return saveTodayPlanItems([...items, next]);
 }

@@ -17,6 +17,14 @@ export type PlanLifeDomain =
 
 export type PlanItemPriority = "low" | "medium" | "high";
 
+/** Where a plan item came from — for memory, not member-facing chrome. */
+export type PlanDayItemSource =
+  | "manual"
+  | "clear-my-mind"
+  | "time-block"
+  | "day-designer"
+  | "rhythm";
+
 export type PlanDayItem = {
   id: string;
   title: string;
@@ -31,20 +39,30 @@ export type PlanDayItem = {
   startTime?: string;
   /** YYYY-MM-DD — target day for this task */
   dueDate?: string;
+  /**
+   * Local calendar day this item belongs to (YYYY-MM-DD).
+   * Distinct from dueDate (deferral target). Defaults to the day envelope when missing.
+   */
+  planningDate?: string;
   column: PlanItemColumn;
   done: boolean;
   notes?: string;
   projectId?: string;
   /** Linked momentum appointment, when seeded from a time block */
   sourceTimeBlockId?: string;
+  /** Provenance — manual add, Clear My Mind, seed sources, etc. */
+  source?: PlanDayItemSource;
   relatedFileLabels?: string[];
   createdAt?: string;
+  updatedAt?: string;
   /** Hidden from active list until this ISO timestamp */
   snoozedUntil?: string;
   /** Completed but kept visible for reference */
   keptForReference?: boolean;
   /** Higher = shown first when multiple items are Doing */
   focusRank?: number;
+  /** Owner user id when authenticated — prevents cross-account leakage on shared devices */
+  ownerUserId?: string;
 };
 
 export const PLAN_PRIORITY_OPTIONS: {

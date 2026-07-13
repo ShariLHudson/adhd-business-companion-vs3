@@ -3,7 +3,7 @@
  */
 
 import { captureBehaviorEvent } from "../closedLoopLearning";
-import { getProjectItems, saveProjectItem } from "../companionStore";
+import { getProjectItems, saveProjectItem, todayStr } from "../companionStore";
 import { createEvidenceEntry } from "../evidenceBankStore";
 import type { PlanDayItem, PlanLifeDomain } from "./types";
 import { inferPlanLifeDomain } from "./planItemColors";
@@ -82,6 +82,19 @@ function writeProjectLog(log: ProjectCompletionLog): void {
 
 export function getPlanCompletionHistory(): PlanTaskCompletionRecord[] {
   return readHistory();
+}
+
+/** Completions whose local calendar day matches the given YYYY-MM-DD. */
+export function getPlanCompletionsForDate(
+  date = todayStr(),
+): PlanTaskCompletionRecord[] {
+  const day = date;
+  return readHistory().filter((r) => {
+    const d = new Date(r.completedAt);
+    if (Number.isNaN(d.getTime())) return false;
+    const local = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return local === day;
+  });
 }
 
 export function getProjectPlanCompletions(

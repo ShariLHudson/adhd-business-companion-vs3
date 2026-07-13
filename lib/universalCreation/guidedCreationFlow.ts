@@ -33,6 +33,22 @@ const NO_REVISION_RE =
 const SHOW_DRAFT_RE =
   /\b(?:where (?:is|'s) the draft|show (?:me )?(?:the )?draft|i don'?t see (?:the )?draft|didn'?t see (?:the )?draft|can'?t see (?:the )?draft)\b/i;
 
+const POST_DISCOVERY_PHASES = new Set([
+  "guided_creation",
+  "enhancement",
+  "review",
+  "revision",
+  "approval",
+  "awaiting_action",
+  "completion",
+]);
+
+export function isPostDiscoveryCreationPhase(
+  phase: UniversalCreationSession["phase"],
+): boolean {
+  return POST_DISCOVERY_PHASES.has(phase);
+}
+
 export function isGuidedCreationAssistantContext(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
