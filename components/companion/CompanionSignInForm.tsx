@@ -307,10 +307,23 @@ export function CompanionSignInForm({
     }
   }
 
+  function selectMode(next: Mode) {
+    if (mode === next) return;
+    setMode(next);
+    setError(null);
+    setNotice(null);
+    setAuthHint(null);
+    setShowResend(false);
+  }
+
   async function onSubmit(e: FormEvent, submitMode?: Mode) {
     e.preventDefault();
     if (authInFlightRef.current) return;
     const effectiveMode = submitMode ?? mode;
+    if (!email.trim() || !password.trim()) {
+      setError("Email and password are required.");
+      return;
+    }
     authInFlightRef.current = true;
     onProcessingChange?.(true);
     setBusy(true);
@@ -391,16 +404,21 @@ export function CompanionSignInForm({
     primeWelcomeHomeAudioFromGesture();
   };
 
+  /** Active mode = submit; inactive mode = switch only (never submits). */
   const createAccountButton = (
     <button
       key="create"
-      type="button"
+      type={mode === "signup" ? "submit" : "button"}
       disabled={authProcessing}
       onPointerDown={primeWelcomeAudio}
-      onClick={(e) => {
-        setMode("signup");
-        void onSubmit(e, "signup");
-      }}
+      onClick={
+        mode === "signup"
+          ? undefined
+          : (e) => {
+              e.preventDefault();
+              selectMode("signup");
+            }
+      }
       className={variant === "page" && !returning ? pagePrimaryClass : pageSecondaryClass}
     >
       {authProcessing && mode === "signup" ? openingLabel : "Create Account"}
@@ -410,13 +428,17 @@ export function CompanionSignInForm({
   const signInButton = (
     <button
       key="signin"
-      type="button"
+      type={mode === "signin" ? "submit" : "button"}
       disabled={authProcessing}
       onPointerDown={primeWelcomeAudio}
-      onClick={(e) => {
-        setMode("signin");
-        void onSubmit(e, "signin");
-      }}
+      onClick={
+        mode === "signin"
+          ? undefined
+          : (e) => {
+              e.preventDefault();
+              selectMode("signin");
+            }
+      }
       className={variant === "page" && returning ? pagePrimaryClass : pageSecondaryClass}
     >
       {authProcessing && mode === "signin" ? openingLabel : t("auth.signIn")}
