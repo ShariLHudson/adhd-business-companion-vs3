@@ -23,9 +23,7 @@ import {
 } from "@/lib/estate/estateDirectRoomResolve";
 import {
   extractRoomPhraseFromNavigation,
-  getEstateRoomAliasEntry,
   messageNamesExactEstateRoom,
-  resolveEstateRoomAliasBounded,
   resolveEstateRoomAliasExact,
 } from "@/lib/estate/estateRoomAliasRegistry";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
@@ -55,6 +53,12 @@ import {
 } from "@/lib/estate/resolveEstatePlace";
 import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
 import { resolveSingleCanonicalPlaceMentionedInText } from "@/lib/estate/estatePlaceIdentityLock";
+import {
+  chamberMemberShortLabel,
+  resolveChamberMemberFromText,
+} from "@/lib/chamber/chamberMemberAliases";
+import type { ChamberMemberId } from "@/lib/chamber/chamberMemberRegistry";
+import { getChamberMemberById } from "@/lib/chamber/chamberMemberRegistry";
 
 export type EstateCommandKind = "direct" | "intent" | "hybrid" | "none";
 
@@ -146,12 +150,17 @@ function extractDirectDestinationPhrase(text: string): string | null {
   const wherePhrase = extractWhereRoomPhrase(text);
   if (wherePhrase) return wherePhrase;
 
-  const boundedRoomId = resolveEstateRoomAliasBounded(text);
-  if (boundedRoomId) {
-    const entry = getEstateRoomAliasEntry(boundedRoomId);
-    return entry?.aliases[0] ?? boundedRoomId;
+  // Explicit activity destinations (not incidental room name mentions).
+  if (/\b(?:clear\s+(?:my\s+)?mind|brain\s*dump)\b/i.test(text)) {
+    return "clear my mind";
+  }
+  if (/\bplan\s+my\s+day\b/i.test(text)) {
+    return "plan my day";
   }
 
+  // Bare exact place names only ("Apple Orchard"). Do NOT use bounded
+  // substring aliases here — chatting about a room must not become a
+  // direct navigation command (Arrival / relationship chat stay in chat).
   return extractBareDestinationPhrase(text);
 }
 
@@ -490,6 +499,61 @@ export function detectIntentCommand(
   };
 }
 
+export function detectChamberMemberCommand(
+  userText: string,
+): EstateCommandDecision | null {
+  const resolved = resolveChamberMemberFromText(userText);
+  if (resolved.kind === "none") return null;
+
+  if (resolved.kind === "ambiguous") {
+    const entry = syntheticEntry(
+      "chamber-of-momentum",
+      "chamber-of-momentum",
+      "Chamber of Momentum",
+    );
+    const offer = workspaceOfferFromEntry(entry, undefined, {
+      section: "chamber-of-momentum",
+    });
+    if (!offer) return null;
+    return {
+      kind: "intent",
+      executeImmediately: false,
+      entryId: "chamber-of-momentum",
+      entry,
+      section: "chamber-of-momentum",
+      workspaceOffer: offer,
+      roomId: "chamber-of-momentum",
+      clarifyQuestion: resolved.clarifyQuestion,
+    };
+  }
+
+  const memberId = resolved.match.memberId;
+  const member = getChamberMemberById(memberId);
+  const label = chamberMemberShortLabel(memberId);
+  const entry = syntheticEntry(
+    "chamber-of-momentum",
+    "chamber-of-momentum",
+    member?.displayName ?? label,
+  );
+  const offer = workspaceOfferFromEntry(entry, undefined, {
+    section: "chamber-of-momentum",
+  });
+  if (!offer) return null;
+  offer.chamberMemberId = memberId as ChamberMemberId;
+  offer.buttonLabel = `Talk with ${label}`;
+  offer.line = `Opening ${label} in the Chamber of Momentum.`;
+
+  return {
+    kind: "direct",
+    executeImmediately: true,
+    entryId: "chamber-of-momentum",
+    entry,
+    section: "chamber-of-momentum",
+    workspaceOffer: offer,
+    roomId: "chamber-of-momentum",
+  };
+}
+
 export function evaluateEstateCommand(
   input: EstateCommandRouterInput,
 ): EstateCommandDecision | null {
@@ -497,9 +561,19 @@ export function evaluateEstateCommand(
   if (!text) return null;
   if (isConversationOnlyTurn(text)) return null;
 
+  // Priority 1: specific Chamber member (or clarify when two fit equally)
+  const chamberMember = detectChamberMemberCommand(text);
+  if (chamberMember?.workspaceOffer.chamberMemberId) {
+    return chamberMember;
+  }
+  if (chamberMember?.clarifyQuestion) {
+    return chamberMember;
+  }
+
   const hybrid = detectHybridCommand(text);
   if (hybrid) return hybrid;
 
+  // Priority 2: general Chamber / other rooms
   const direct = detectDirectCommand(text, {
     lastAssistantText: input.lastAssistantText,
   });
@@ -629,6 +703,11 @@ export function directEstateNavigationHintForChat(
 }
 
 export function estateCommandAckLine(command: EstateCommandDecision): string {
+  const memberId = command.workspaceOffer.chamberMemberId;
+  if (memberId) {
+    const label = chamberMemberShortLabel(memberId);
+    return `Of course — here's ${label}.`;
+  }
   if (command.kind === "direct") {
     const id = command.roomId ?? command.entryId;
     /** Clear My Mind Mode — capture greeting only; no navigation chatter. */

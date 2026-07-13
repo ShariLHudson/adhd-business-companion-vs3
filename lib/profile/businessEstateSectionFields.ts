@@ -1,4 +1,5 @@
 import type { BusinessEstateSectionId } from "@/lib/profile/businessEstateProfile";
+import { getGuidedFieldDef } from "@/lib/profile/guidedFieldRegistry";
 
 export type BusinessEstateFieldType = "text" | "textarea";
 
@@ -7,8 +8,15 @@ export type BusinessEstateFieldDef = {
   label: string;
   type: BusinessEstateFieldType;
   placeholder?: string;
+  /** Slice 1–2 guided fields */
+  guided?: boolean;
 };
 
+/**
+ * Field order for each Business Area.
+ * Slice 1: stage, mission, vision, coreValues
+ * Slice 2: motivation, return plan, decision style, work preferences
+ */
 export const BUSINESS_ESTATE_SECTION_FIELDS: Record<
   BusinessEstateSectionId,
   readonly BusinessEstateFieldDef[]
@@ -18,7 +26,12 @@ export const BUSINESS_ESTATE_SECTION_FIELDS: Record<
     { key: "founderName", label: "Founder or owner name", type: "text" },
     { key: "roleTitle", label: "Role or title", type: "text" },
     { key: "website", label: "Website", type: "text" },
-    { key: "businessStage", label: "Business stage", type: "text" },
+    {
+      key: "businessStage",
+      label: "Business stage",
+      type: "text",
+      guided: true,
+    },
     {
       key: "shortDescription",
       label: "Short description",
@@ -30,9 +43,39 @@ export const BUSINESS_ESTATE_SECTION_FIELDS: Record<
       label: "Business story",
       type: "textarea",
     },
-    { key: "mission", label: "Mission", type: "textarea" },
-    { key: "vision", label: "Vision", type: "textarea" },
-    { key: "coreValues", label: "Core values", type: "textarea" },
+    { key: "mission", label: "Mission", type: "textarea", guided: true },
+    { key: "vision", label: "Vision", type: "textarea", guided: true },
+    { key: "coreValues", label: "Core values", type: "textarea", guided: true },
+    {
+      key: "coreValueNotes",
+      label: "Why these values matter (optional)",
+      type: "textarea",
+      placeholder: "Optional notes about why a value matters to you.",
+    },
+    {
+      key: "whyBusinessMatters",
+      label: "Why this business matters",
+      type: "textarea",
+      guided: true,
+    },
+    {
+      key: "whatInspiredYou",
+      label: "What inspired you to begin",
+      type: "textarea",
+      guided: true,
+    },
+    {
+      key: "hopedImpact",
+      label: "Impact you hope to make",
+      type: "textarea",
+      guided: true,
+    },
+    {
+      key: "whatHelpsYouContinue",
+      label: "What helps you continue when things are difficult",
+      type: "textarea",
+      guided: true,
+    },
   ],
   offers: [
     { key: "mainOffer", label: "Main offer", type: "textarea" },
@@ -98,16 +141,88 @@ export const BUSINESS_ESTATE_SECTION_FIELDS: Record<
     },
   ],
   "work-style": [
-    { key: "bestFocusTimes", label: "Best focus times", type: "textarea" },
+    {
+      key: "preferredTimeOfDay",
+      label: "Preferred work time",
+      type: "text",
+      guided: true,
+    },
+    {
+      key: "preferredSessionLength",
+      label: "Preferred session length",
+      type: "text",
+      guided: true,
+    },
+    {
+      key: "soundPreference",
+      label: "Work environment",
+      type: "text",
+      guided: true,
+    },
+    {
+      key: "structurePreference",
+      label: "Structure preference",
+      type: "text",
+      guided: true,
+    },
+    {
+      key: "thinkingOrderPreference",
+      label: "Thinking order",
+      type: "text",
+      guided: true,
+    },
+    {
+      key: "collaborationPreference",
+      label: "Working style",
+      type: "text",
+      guided: true,
+    },
+    {
+      key: "decisionStyle",
+      label: "Decision style",
+      type: "textarea",
+      guided: true,
+    },
+    {
+      key: "overwhelmTriggers",
+      label: "What usually makes returning difficult",
+      type: "textarea",
+      guided: true,
+    },
+    {
+      key: "restartHelpers",
+      label: "Smallest restart action",
+      type: "textarea",
+      guided: true,
+    },
+    {
+      key: "returnSupportTone",
+      label: "Support tone when you return",
+      type: "text",
+      guided: true,
+    },
+    {
+      key: "shariShouldAvoid",
+      label: "What Shari should avoid",
+      type: "textarea",
+      guided: true,
+    },
+    {
+      key: "returnOfferPreferences",
+      label: "On return, Shari may offer",
+      type: "textarea",
+      guided: true,
+    },
+    { key: "bestFocusTimes", label: "Best focus times (notes)", type: "textarea" },
     { key: "energyPatterns", label: "Energy patterns", type: "textarea" },
     {
       key: "planningPreferences",
-      label: "Planning preferences",
+      label: "Planning preferences (notes)",
       type: "textarea",
     },
     {
       key: "communicationPreferences",
-      label: "Communication preferences",
+      label: "Communication preferences (notes)",
       type: "textarea",
     },
     {
@@ -117,18 +232,8 @@ export const BUSINESS_ESTATE_SECTION_FIELDS: Record<
     },
     { key: "commonFriction", label: "Common friction points", type: "textarea" },
     {
-      key: "restartHelpers",
-      label: "What helps you restart",
-      type: "textarea",
-    },
-    {
-      key: "overwhelmTriggers",
-      label: "What causes overwhelm",
-      type: "textarea",
-    },
-    {
       key: "shariSupportStyle",
-      label: "How Shari should support you",
+      label: "How Shari should support you (notes)",
       type: "textarea",
     },
   ],
@@ -147,4 +252,12 @@ export function sectionStorageKey(
   sectionId: BusinessEstateSectionId,
 ): keyof import("@/lib/profile/businessEstateProfile").BusinessEstateSections {
   return sectionId === "work-style" ? "workStyle" : sectionId;
+}
+
+export function fieldDisplayLabel(
+  sectionId: BusinessEstateSectionId,
+  field: BusinessEstateFieldDef,
+): string {
+  const guided = getGuidedFieldDef(sectionId, field.key);
+  return guided?.question ?? field.label;
 }

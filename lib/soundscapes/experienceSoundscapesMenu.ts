@@ -1,7 +1,11 @@
 /**
- * Room menu Experiences track types.
- * Full folder manifests remain WIP; empty lists keep My Day & Work chrome compiling.
+ * Room menu → Experiences
+ * Peaceful Places = music titles from public/audio/peaceful-places.
+ * Soundscapes = ambient audio from public/audio/Soundscapes.
  */
+
+import { buildPeacefulPlacesFolderTracks } from "@/lib/peacefulPlaces/peacefulPlacesFolderManifest";
+import { buildSoundscapesFolderTracks } from "./soundscapesFolderManifest";
 
 export type ExperienceSoundscapeTrack = {
   id: string;
@@ -9,13 +13,13 @@ export type ExperienceSoundscapeTrack = {
   src: string;
 };
 
-/** Music titles - Peaceful Places submenu. */
+/** Music titles — Peaceful Places submenu. */
 export const PEACEFUL_PLACES_MUSIC_TRACKS: readonly ExperienceSoundscapeTrack[] =
-  [];
+  buildPeacefulPlacesFolderTracks();
 
-/** Ambient loops - Soundscapes submenu. */
+/** Ambient loops — Soundscapes submenu. */
 export const EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS: readonly ExperienceSoundscapeTrack[] =
-  [];
+  buildSoundscapesFolderTracks();
 
 export function experienceSoundscapeTrackById(
   trackId: string,
