@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
@@ -1842,6 +1843,11 @@ import {
   formatGuidedFieldHelpPrompt,
   readPendingGuidedFieldHelp,
 } from "@/lib/profile/guidedFieldHelp";
+import {
+  GUIDED_FIELD_HELP_EVENT,
+  type GuidedFieldHelpRequest,
+} from "@/lib/profile/guidedFieldTypes";
+import { openGuidedFieldHelpChat } from "@/lib/profile/openGuidedFieldHelpChat";
 import { readExpertSessionPrompt } from "@/lib/profile/fieldHelpRegistry";
 import { readStageTalkThroughPrompt } from "@/lib/profile/guidedStageTalkThrough";
 import { readResearchSessionPrompt } from "@/lib/profile/businessEstateResearch";
@@ -1850,6 +1856,7 @@ import {
   ADVISORY_INVITE_CHAMBER_EVENT,
   type AdvisoryInviteChamberDetail,
 } from "@/lib/profile/advisoryHelpTypes";
+import "@/app/companion/guided-field-help-chat.css";
 import {
   tonePreferenceOverridesRoutingGuidance,
 } from "@/lib/companionTonePreferences";
@@ -2538,6 +2545,7 @@ export default function CompanionPageClient() {
   const stablesLearningHintRef = useRef<string | null>(null);
   const previousMomentumPathIdRef = useRef<string | null>(null);
   const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(true);
+  const [guidedFieldHelpChatOpen, setGuidedFieldHelpChatOpen] = useState(false);
   const [activeChamberMemberId, setActiveChamberMemberId] =
     useState<ChamberMemberId | null>(null);
   const activeChamberMemberIdRef = useRef<ChamberMemberId | null>(null);
@@ -8410,6 +8418,33 @@ export default function CompanionPageClient() {
     return () =>
       window.removeEventListener(ADVISORY_INVITE_CHAMBER_EVENT, onAdvisoryInvite);
   }, []);
+
+  // Business Estate section help — open persistent Shari chat with field context
+  useEffect(() => {
+    function onGuidedFieldHelp(event: Event) {
+      const detail = (event as CustomEvent<GuidedFieldHelpRequest>).detail;
+      openGuidedFieldHelpChat(detail, {
+        openChat: () => setGuidedFieldHelpChatOpen(true),
+        ensureEstateChatVisible: () => setEstateRoomChatVisible(true),
+        appendAssistantWelcome: (text) => {
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: text },
+          ]);
+        },
+        sendMemberOpener: (opener) => {
+          window.setTimeout(() => {
+            void handleSendRef.current(opener, false, true, true);
+            requestChatInputFocus({ scrollIntoView: true });
+          }, 40);
+        },
+      });
+    }
+
+    window.addEventListener(GUIDED_FIELD_HELP_EVENT, onGuidedFieldHelp);
+    return () =>
+      window.removeEventListener(GUIDED_FIELD_HELP_EVENT, onGuidedFieldHelp);
+  }, [requestChatInputFocus]);
 
   function endChamberMemberConversationCore() {
     clearActiveChamberMember();
@@ -18184,6 +18219,8 @@ export default function CompanionPageClient() {
     }
   }
 
+  handleSendRef.current = handleSend;
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     voiceUsedRef.current = false;
   }
@@ -23096,6 +23133,87 @@ export default function CompanionPageClient() {
         onClose={goBack}
         onOpenEstatePlace={handleEstateMenuAction}
       />
+
+      {guidedFieldHelpChatOpen
+        ? createPortal(
+            <div
+              className="guided-field-help-chat"
+              data-testid="guided-field-help-chat"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Shari help"
+            >
+              <div className="guided-field-help-chat__panel">
+                <header className="guided-field-help-chat__header">
+                  <div>
+                    <p className="guided-field-help-chat__title">
+                      Talk with Shari
+                    </p>
+                    <p className="guided-field-help-chat__sub">
+                      Your Business Estate draft stays open behind this — nothing
+                      is saved until you choose.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    className="guided-field-help-chat__close"
+                    data-testid="guided-field-help-chat-close"
+                    onClick={() => setGuidedFieldHelpChatOpen(false)}
+                  >
+                    Back to your profile
+                  </button>
+                </header>
+                <div className="guided-field-help-chat__thread">
+                  <SimpleChat
+                    messages={messages}
+                    stateHint={stateHint}
+                    showHint={false}
+                    hideEmptyState
+                    isLoading={isLoading}
+                    thinkingMessage={visibleThinkingMessage}
+                    awaitingUserConfirmation={chatAwaitingConfirmation}
+                    thinkingEmotion={displayEmotion}
+                    workspacePanel={workspacePanel}
+                    workspaceActiveBeside={workspaceActiveBeside}
+                    formatParagraphs={formatAssistantParagraphs}
+                    afterLastAssistant={undefined}
+                  />
+                </div>
+                <div className="guided-field-help-chat__footer">
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What would help most right now?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
 
       <BreatheDestinationHost
         destination={breatheDestination}

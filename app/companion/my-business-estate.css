@@ -1,5 +1,9 @@
 /* My Business Estate + People I Help — Profile routing */
 
+/* Restore guided estate / stage workspace controls (CSS regression fix).
+ * Source of truth: components/companion/guided-stages/guidedStageWorkspace.css */
+@import "../../components/companion/guided-stages/guidedStageWorkspace.css";
+
 .my-business-estate-room {
   position: relative;
   min-height: 100dvh;
@@ -521,6 +525,8 @@
 .executive-office-panel.estate-workspace {
   width: min(42rem, calc(100% - 1.5rem));
   max-height: min(88dvh, 52rem);
+  padding: clamp(1.15rem, 2.5vw, 1.65rem) clamp(1rem, 2.5vw, 1.4rem)
+    clamp(1.35rem, 3vw, 1.85rem);
   background: rgba(255, 250, 242, 0.55);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -528,10 +534,16 @@
   box-shadow:
     0 18px 42px rgba(42, 36, 30, 0.12),
     0 1px 0 rgba(255, 255, 255, 0.4) inset;
+  color: rgba(28, 22, 16, 0.96);
+}
+
+.executive-office-panel .estate-workspace__title {
+  margin: 0;
+  color: rgba(22, 18, 14, 0.98);
 }
 
 .executive-office-panel__header {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.15rem;
 }
 
 .executive-office-panel__header-row {
@@ -542,11 +554,38 @@
 }
 
 .executive-office-panel__lead {
-  margin: 0.5rem 0 0;
+  margin: 0.35rem 0 0;
   max-width: 32rem;
   font-size: 0.98rem;
-  line-height: 1.5;
-  color: rgba(42, 36, 30, 0.86);
+  line-height: 1.45;
+  color: rgba(28, 22, 16, 0.92);
+}
+
+.executive-office-panel__help {
+  margin-top: 0.45rem;
+}
+
+.executive-office-panel .business-estate-how-to-link,
+.business-estate-how-to-link.estate-how-to-open-action {
+  display: inline-flex;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(22, 58, 58, 0.98);
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+  line-height: 1.35;
+}
+
+.executive-office-panel .business-estate-how-to-link:hover,
+.business-estate-how-to-link.estate-how-to-open-action:hover {
+  background: transparent;
+  color: rgba(16, 44, 44, 1);
 }
 
 .executive-office-snapshot {
@@ -570,7 +609,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9a8f82;
+  color: rgba(55, 46, 38, 0.88);
 }
 
 .executive-office-snapshot__status {
@@ -580,18 +619,18 @@
   padding: 0.22rem 0.55rem;
   border-radius: 999px;
   border: 1px solid rgba(201, 166, 107, 0.4);
-  color: rgba(60, 52, 44, 0.88);
+  color: rgba(36, 28, 22, 0.92);
   background: rgba(255, 252, 245, 0.88);
 }
 
 .executive-office-snapshot__status--well-tended {
   border-color: rgba(30, 79, 79, 0.35);
-  color: rgba(30, 79, 79, 0.95);
+  color: rgba(22, 58, 58, 0.98);
 }
 
 .executive-office-snapshot__status--needs-review {
   border-color: rgba(168, 92, 74, 0.4);
-  color: rgba(120, 58, 44, 0.95);
+  color: rgba(96, 42, 30, 0.98);
 }
 
 .executive-office-snapshot__facts {
@@ -611,21 +650,21 @@
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(90, 80, 70, 0.88);
+  color: rgba(55, 46, 38, 0.9);
 }
 
 .executive-office-snapshot__fact dd {
   margin: 0;
   font-size: 0.9rem;
   line-height: 1.4;
-  color: rgba(36, 30, 24, 0.94);
+  color: rgba(22, 18, 14, 0.96);
 }
 
 .executive-office-snapshot__empty {
   margin: 0.65rem 0 0;
   font-size: 0.9rem;
   line-height: 1.5;
-  color: rgba(60, 52, 44, 0.88);
+  color: rgba(36, 28, 22, 0.92);
 }
 
 .executive-office-shari-note {
@@ -642,25 +681,25 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(30, 79, 79, 0.82);
+  color: rgba(22, 58, 58, 0.95);
 }
 
 .executive-office-shari-note__body {
   margin: 0.3rem 0 0;
   font-size: 0.9rem;
   line-height: 1.45;
-  color: rgba(42, 36, 30, 0.9);
+  color: rgba(28, 22, 16, 0.94);
 }
 
 .executive-office-areas {
-  margin-top: 1.25rem;
+  margin-top: 0.75rem;
 }
 
 .executive-office-areas__title {
-  margin: 0 0 0.7rem;
+  margin: 0 0 0.55rem;
   font-size: 0.98rem;
   font-weight: 600;
-  color: rgba(36, 30, 24, 0.95);
+  color: rgba(22, 18, 14, 0.98);
 }
 
 .executive-office-areas__list {
@@ -715,7 +754,7 @@
   font-family: Georgia, "Times New Roman", serif;
   font-size: 0.98rem;
   font-weight: 600;
-  color: rgba(36, 30, 24, 0.96);
+  color: rgba(22, 18, 14, 0.98);
   line-height: 1.25;
 }
 
@@ -726,17 +765,17 @@
   padding: 0.15rem 0.4rem;
   border-radius: 999px;
   border: 1px solid rgba(201, 166, 107, 0.35);
-  color: rgba(60, 52, 44, 0.82);
+  color: rgba(36, 28, 22, 0.92);
 }
 
 .business-area-card__status--updated {
   border-color: rgba(30, 79, 79, 0.35);
-  color: rgba(30, 79, 79, 0.92);
+  color: rgba(22, 58, 58, 0.98);
 }
 
 .business-area-card__status--ready-to-review {
   border-color: rgba(168, 92, 74, 0.35);
-  color: rgba(120, 58, 44, 0.92);
+  color: rgba(96, 42, 30, 0.98);
 }
 
 .business-area-card__blurb {
@@ -744,7 +783,7 @@
   flex: 1;
   font-size: 0.8rem;
   line-height: 1.4;
-  color: rgba(60, 52, 44, 0.82);
+  color: rgba(36, 28, 22, 0.92);
 }
 
 .business-area-card__action {
@@ -815,3 +854,368 @@
 .people-i-help-panel__header {
   margin-bottom: 0.75rem;
 }
+
+/* Overview help + Research / Need Another Perspective placement */
+.my-business-estate-panel--how-to-host.estate-workspace {
+  position: relative;
+}
+
+.business-estate-persistent-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+.business-estate-persistent-actions--after-areas {
+  margin-top: 1rem;
+  margin-bottom: 0;
+}
+
+.business-estate-research-action {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(30, 79, 79, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 252, 245, 0.92);
+}
+
+.business-estate-research-action--in-area {
+  margin: 0 0 0.85rem;
+}
+
+.business-estate-research-action__btn {
+  border: 1px solid rgba(30, 79, 79, 0.4);
+  border-radius: 999px;
+  background: rgba(30, 79, 79, 0.1);
+  color: rgba(30, 79, 79, 0.98);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+
+.business-estate-research-action__btn:hover {
+  background: rgba(30, 79, 79, 0.16);
+}
+
+.business-estate-research-action__hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgba(36, 28, 22, 0.92);
+}
+
+.get-expert-help-action {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(30, 79, 79, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 252, 245, 0.92);
+}
+
+.get-expert-help-action--in-area {
+  margin: 0;
+}
+
+.get-expert-help-action__btn {
+  border: 1px solid rgba(30, 79, 79, 0.4);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.98);
+  color: rgba(30, 79, 79, 0.98);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+}
+
+.get-expert-help-action__btn:hover {
+  background: rgba(230, 240, 240, 0.98);
+}
+
+.get-expert-help-action__hint {
+  margin: 0.4rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: rgba(36, 28, 22, 0.92);
+}
+
+/* —— Shared Business Estate room template —— */
+
+.business-estate-room-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.business-estate-room-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+
+.business-estate-room-header__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.business-estate-room-header__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  font-weight: 600;
+  color: rgba(22, 18, 14, 0.98);
+  line-height: 1.2;
+}
+
+.business-estate-room-header__purpose {
+  margin: 0.4rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(28, 22, 16, 0.92);
+  max-width: 34rem;
+}
+
+.business-estate-room-header__status {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 166, 107, 0.4);
+  color: rgba(36, 28, 22, 0.92);
+  background: rgba(255, 252, 245, 0.88);
+}
+
+.business-estate-room-header__status--progress {
+  border-color: rgba(30, 79, 79, 0.35);
+  color: rgba(22, 58, 58, 0.98);
+}
+
+.business-estate-room-header__status--review {
+  border-color: rgba(168, 92, 74, 0.4);
+  color: rgba(96, 42, 30, 0.98);
+}
+
+.business-estate-room-header__status--complete {
+  border-color: rgba(30, 79, 79, 0.4);
+  color: rgba(22, 58, 58, 0.98);
+  background: rgba(230, 240, 240, 0.75);
+}
+
+.business-estate-progress__title {
+  margin: 0 0 0.55rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(22, 18, 14, 0.98);
+}
+
+/* Accordion: expand in place — one main panel scrollbar, no nested Progress scroll */
+.business-estate-progress {
+  min-height: 0;
+}
+
+.business-estate-progress--accordion {
+  max-height: none;
+  overflow: visible;
+}
+
+.business-estate-progress__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.business-estate-progress__item {
+  margin: 0;
+  min-width: 0;
+}
+
+.business-estate-progress__card {
+  width: 100%;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 245, 0.78);
+  font: inherit;
+  color: inherit;
+  overflow: hidden;
+}
+
+.business-estate-progress__card--open {
+  border-color: rgba(30, 79, 79, 0.5);
+  background: rgba(255, 252, 245, 0.94);
+}
+
+.business-estate-progress__toggle {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.business-estate-progress__toggle:hover {
+  background: rgba(255, 252, 245, 0.55);
+}
+
+.business-estate-progress__toggle:focus-visible {
+  outline: 2px solid rgba(30, 79, 79, 0.45);
+  outline-offset: -2px;
+}
+
+.business-estate-progress__card--optional {
+  opacity: 0.9;
+}
+
+.business-estate-progress__card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.business-estate-progress__stage-title {
+  font-size: 0.95rem;
+  font-weight: 650;
+  color: rgba(22, 18, 14, 0.98);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.business-estate-progress__optional {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: rgba(90, 80, 70, 0.9);
+}
+
+.business-estate-progress__stage-status {
+  flex-shrink: 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: rgba(30, 79, 79, 0.95);
+}
+
+.business-estate-progress__chevron {
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  color: rgba(30, 79, 79, 0.85);
+  line-height: 1;
+}
+
+.business-estate-progress__fields {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.28rem;
+}
+
+.business-estate-progress__field {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  line-height: 1.35;
+  color: rgba(55, 46, 38, 0.9);
+}
+
+.business-estate-progress__field--done {
+  color: rgba(22, 58, 58, 0.95);
+  font-weight: 600;
+}
+
+.business-estate-progress__panel {
+  padding: 0 0.85rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  border-top: 1px solid rgba(201, 166, 107, 0.28);
+}
+
+.business-estate-progress__stage-desc {
+  margin: 0.65rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(55, 46, 38, 0.9);
+}
+
+.business-estate-progress__working {
+  min-width: 0;
+}
+
+.business-estate-progress__footer {
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 0.15rem;
+}
+
+.business-estate-room-layout__working-hint {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.65rem;
+  border: 1px dashed rgba(201, 166, 107, 0.4);
+  background: rgba(255, 252, 245, 0.55);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(36, 28, 22, 0.92);
+}
+
+.business-estate-primary-action {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.business-estate-primary-action__btn {
+  border: 1px solid rgba(30, 79, 79, 0.55);
+  border-radius: 999px;
+  background: rgba(30, 79, 79, 0.95);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.55rem 1.25rem;
+  cursor: pointer;
+}
+
+.business-estate-primary-action__btn:hover {
+  background: rgba(22, 58, 58, 1);
+}
+
+.business-estate-primary-action__btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.business-estate-room-layout__perspective {
+  margin-top: 0.25rem;
+}
+
+.business-estate-room-layout__perspective .get-expert-help-action {
+  margin: 0;
+}
+
+/* Guided stage field/workspace/entry styles:
+ * components/companion/guided-stages/guidedStageWorkspace.css
+ * (imported at top of this file + by GuidedStageWorkspace). */
+

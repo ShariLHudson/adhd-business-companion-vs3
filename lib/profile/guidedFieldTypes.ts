@@ -89,6 +89,28 @@ export type GuidedFieldHelpRequest = BusinessEstateFieldHelpContext & {
 
 export const GUIDED_FIELD_HELP_EVENT = "companion-business-estate-field-help";
 
+/** Member-facing opener when Help Me Answer / Research This opens chat. */
+export function guidedFieldHelpMemberOpener(
+  helpMode: GuidanceHelpMode,
+): string {
+  if (helpMode === "research_with_shari") {
+    return "Research this for me — look for outside perspective that could help me answer, without changing my draft.";
+  }
+  return "Help me answer this question based on what you already know about my business.";
+}
+
+/** Short assistant line before Shari’s reply — does not replace the draft. */
+export function guidedFieldHelpAssistantWelcome(
+  helpMode: GuidanceHelpMode,
+  question?: string,
+): string {
+  const topic = question?.trim() || "this question";
+  if (helpMode === "research_with_shari") {
+    return `I'll research ${topic} with you. Your draft stays as it is until you choose what to keep.`;
+  }
+  return `Let's work through ${topic} together. Your draft stays right where it is — nothing is saved until you decide.`;
+}
+
 export const ANSWER_CONFIDENCE_OPTIONS: readonly {
   id: AnswerConfidence;
   label: string;

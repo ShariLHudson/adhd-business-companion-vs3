@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { GuidedEstateField } from "@/components/companion/business-estate/GuidedEstateField";
 import { GuidedAssistanceBar } from "@/components/companion/GuidedAssistanceBar";
 import { getPrimaryAvatar } from "@/lib/companionStore";
@@ -9,7 +9,12 @@ import {
   BUSINESS_ESTATE_SECTION_FIELDS,
   fieldDisplayLabel,
 } from "@/lib/profile/businessEstateSectionFields";
+import {
+  collectApprovedBusinessEstateContext,
+  requestGuidedFieldHelp,
+} from "@/lib/profile/guidedFieldHelp";
 import { getGuidedFieldDef } from "@/lib/profile/guidedFieldRegistry";
+import { businessEstateFieldSupportsResearch } from "@/lib/profile/businessEstateSectionResearchSupport";
 import {
   deriveStageStatus,
   formatStageStatusLabel,
@@ -21,7 +26,6 @@ import {
   getGuidedAreaStages,
   resolveConditionalOfferFields,
 } from "@/lib/profile/guidedStageRegistry";
-import { requestStageTalkThrough } from "@/lib/profile/guidedStageTalkThrough";
 import type {
   GuidedEntryMode,
   GuidedStageAreaId,
@@ -33,6 +37,11 @@ import {
   GUIDED_STAGES_MAY_AUTO_SAVE,
 } from "@/lib/profile/guidedStageTypes";
 import { getPeopleIHelpGuidedField } from "@/lib/profile/peopleIHelpGuidedFields";
+import { PeopleIHelpQuestionHelp } from "@/components/companion/guided-stages/PeopleIHelpQuestionHelp";
+import { PeopleIHelpSingleQuestionScreen } from "@/components/companion/guided-stages/PeopleIHelpSingleQuestionScreen";
+/* Entry + field + stage + section-help styles (approved: this CSS file only) */
+import "./guidedStageWorkspace.css";
+import "./peopleIHelpSingleQuestion.css";
 
 type Props = {
   areaId: GuidedStageAreaId;
@@ -55,6 +64,15 @@ type Props = {
     open: boolean,
     onDone: () => void,
   ) => React.ReactNode;
+  /**
+   * Business Estate room chrome: skip entry picker, hide duplicate progress
+   * list and footer Save/Cancel (primary CTA lives in room layout).
+   */
+  roomChrome?: boolean;
+  /** Focus a stage by id (from Progress Overview). */
+  focusStageId?: string | null;
+  /** Keep Progress Overview in sync when this workspace advances stages. */
+  onFocusStageIdChange?: (stageId: string) => void;
 };
 
 function pathToFieldKey(path: string): string | null {
@@ -98,17 +116,64 @@ export function GuidedStageWorkspace({
   onNotesChange,
   notesValue = "",
   renderPeopleField,
+  roomChrome = false,
+  focusStageId = null,
+  onFocusStageIdChange,
 }: Props) {
   const area = getGuidedAreaStages(areaId);
-  const [entryMode, setEntryMode] = useState<GuidedEntryMode | null>(null);
-  const [stageIndex, setStageIndex] = useState(0);
+  const stages = area.stages;
+  const focusedStageIndex = useMemo(() => {
+    if (!focusStageId) return -1;
+    return stages.findIndex((s) => s.id === focusStageId);
+  }, [focusStageId, stages]);
+
+  const [entryMode, setEntryMode] = useState<GuidedEntryMode | null>(
+    roomChrome ? "guided_setup" : null,
+  );
+  const [stageIndex, setStageIndex] = useState(() =>
+    focusedStageIndex >= 0 ? focusedStageIndex : 0,
+  );
   const [openFieldPath, setOpenFieldPath] = useState<string | null>(null);
   const [showStageComplete, setShowStageComplete] = useState(false);
   const [quickStartDone, setQuickStartDone] = useState(false);
-  const [talkNotice, setTalkNotice] = useState<string | null>(null);
 
-  const stages = area.stages;
-  const activeStage: GuidedStageDefinition | undefined = stages[stageIndex];
+  /**
+   * Room chrome: Progress Overview owns the active stage via focusStageId.
+   * Using local stageIndex alone desyncs on view→edit mount (clicks look dead).
+   */
+  const activeStageIndex =
+    roomChrome && focusedStageIndex >= 0 ? focusedStageIndex : stageIndex;
+  const activeStage: GuidedStageDefinition | undefined =
+    stages[activeStageIndex];
+
+  useEffect(() => {
+    if (!roomChrome) return;
+    setEntryMode("guided_setup");
+  }, [roomChrome, areaId]);
+
+  useLayoutEffect(() => {
+    if (!roomChrome || !focusStageId) return;
+    const idx = stages.findIndex((s) => s.id === focusStageId);
+    if (idx < 0) return;
+    setEntryMode((mode) => mode ?? "guided_setup");
+    setStageIndex(idx);
+    setShowStageComplete(false);
+    setQuickStartDone(false);
+    setOpenFieldPath(stages[idx]?.fieldPaths[0] ?? null);
+  }, [roomChrome, focusStageId, stages]);
+
+  function goToStage(nextIndex: number) {
+    const next = stages[nextIndex];
+    if (!next) return;
+    setShowStageComplete(false);
+    setQuickStartDone(false);
+    setOpenFieldPath(next.fieldPaths[0] ?? null);
+    if (roomChrome && onFocusStageIdChange) {
+      onFocusStageIdChange(next.id);
+      return;
+    }
+    setStageIndex(nextIndex);
+  }
 
   const stageStatuses = useMemo(
     () => listAreaStageStatuses(areaId, values),
@@ -117,7 +182,8 @@ export function GuidedStageWorkspace({
 
   const visiblePaths = useMemo(() => {
     if (!activeStage) return [] as string[];
-    if (entryMode === "quick_start") {
+    const mode = entryMode ?? (roomChrome ? "guided_setup" : null);
+    if (mode === "quick_start") {
       return [...area.quickStartFieldPaths];
     }
     const paths = [...activeStage.fieldPaths];
@@ -131,15 +197,18 @@ export function GuidedStageWorkspace({
       }
     }
     return paths;
-  }, [activeStage, entryMode, area.quickStartFieldPaths, areaId, values]);
+  }, [activeStage, entryMode, roomChrome, area.quickStartFieldPaths, areaId, values]);
 
   function selectEntry(mode: GuidedEntryMode) {
     setEntryMode(mode);
     setStageIndex(0);
     setShowStageComplete(false);
     setQuickStartDone(false);
+    // People I Help single-question flow always opens the first prompt
+    // (including Browse) so the screen never dumps every field at once.
+    const peopleSingle = areaId === "people-i-help" && !roomChrome;
     setOpenFieldPath(
-      mode === "browse"
+      mode === "browse" && !peopleSingle
         ? null
         : (area.quickStartFieldPaths[0] ??
             stages[0]?.fieldPaths[0] ??
@@ -161,14 +230,6 @@ export function GuidedStageWorkspace({
       return;
     }
     setShowStageComplete(true);
-  }
-
-  function handleTalkThrough() {
-    if (!activeStage) return;
-    requestStageTalkThrough(activeStage, values);
-    setTalkNotice(
-      "Shari has this stage context. Stay here — nothing is saved until you approve a draft and Save.",
-    );
   }
 
   function renderEstateField(path: string, open: boolean) {
@@ -275,12 +336,15 @@ export function GuidedStageWorkspace({
             </button>
           </div>
         )}
-        <GuidedAssistanceBar
-          fieldPath={path}
-          currentValue={values[fieldKey] ?? ""}
-          estateSectionId={sectionId}
-          estateFieldKey={fieldKey}
-        />
+        {/* Section help replaces the broader assistance bar for estate fields */}
+        {!roomChrome && areaId === "people-i-help" ? (
+          <GuidedAssistanceBar
+            fieldPath={path}
+            currentValue={values[fieldKey] ?? ""}
+            estateSectionId={sectionId}
+            estateFieldKey={fieldKey}
+          />
+        ) : null}
         <button
           type="button"
           className="guided-stage__done-btn"
@@ -293,13 +357,13 @@ export function GuidedStageWorkspace({
     );
   }
 
-  if (!entryMode) {
+  if (!entryMode && !roomChrome) {
     return (
       <div className="guided-stage-entry" data-testid="guided-stage-entry">
         <p className="guided-stage-entry__lead">
-          How would you like to work in {area.title}?
+          Choose how you&apos;d like to begin.
         </p>
-        <div className="guided-stage-entry__options">
+        <div className="guided-stage-entry__options" role="group" aria-label="Setup choices">
           <button
             type="button"
             className="guided-stage-entry__option"
@@ -340,8 +404,9 @@ export function GuidedStageWorkspace({
         </div>
         <button
           type="button"
-          className="business-estate-section-editor__cancel"
+          className="guided-stage-entry__cancel"
           onClick={onCancel}
+          data-testid="guided-stage-entry-cancel"
         >
           Cancel
         </button>
@@ -352,8 +417,203 @@ export function GuidedStageWorkspace({
     );
   }
 
+  const effectiveEntryMode: GuidedEntryMode = entryMode ?? "guided_setup";
+
+  const peopleSingleQuestion =
+    areaId === "people-i-help" && !roomChrome && Boolean(entryMode);
+
+  if (peopleSingleQuestion) {
+    const currentPath =
+      openFieldPath && visiblePaths.includes(openFieldPath)
+        ? openFieldPath
+        : visiblePaths[0] ?? null;
+    const currentKey = currentPath ? pathToFieldKey(currentPath) : null;
+    const stepIndex = currentPath ? Math.max(0, visiblePaths.indexOf(currentPath)) : 0;
+    const stepCount = visiblePaths.length;
+    const isLastInStage = stepIndex >= stepCount - 1;
+
+    if (quickStartDone) {
+      return (
+        <div
+          className="guided-stage-complete"
+          data-testid="quick-start-complete"
+        >
+          <p>{GUIDED_QUICK_START_DONE_MESSAGE}</p>
+          <div className="guided-stage-complete__actions">
+            <button
+              type="button"
+              className="pih-single-question__primary"
+              onClick={() => {
+                setEntryMode("guided_setup");
+                setQuickStartDone(false);
+                setStageIndex(0);
+                setOpenFieldPath(stages[0]?.fieldPaths[0] ?? null);
+              }}
+            >
+              Continue
+            </button>
+            <button
+              type="button"
+              className="pih-single-question__secondary"
+              onClick={onSaveAndReturnLater}
+            >
+              Enough for now
+            </button>
+            <button
+              type="button"
+              className="pih-single-question__secondary"
+              onClick={() => {
+                setQuickStartDone(false);
+                setOpenFieldPath(area.quickStartFieldPaths[0] ?? null);
+              }}
+            >
+              Review answers
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (showStageComplete && activeStage) {
+      const hasNext = activeStageIndex < stages.length - 1;
+      return (
+        <div
+          className="guided-stage-complete"
+          data-testid="stage-complete-panel"
+        >
+          <p>{GUIDED_STAGE_COMPLETION_PROMPT}</p>
+          <p className="guided-stage-complete__sub">
+            {activeStage.completionMessage}
+          </p>
+          <div className="guided-stage-complete__actions">
+            <button
+              type="button"
+              className="pih-single-question__primary"
+              onClick={() => {
+                if (hasNext) {
+                  goToStage(activeStageIndex + 1);
+                } else {
+                  setShowStageComplete(false);
+                  onSaveAndReturnLater();
+                }
+              }}
+              data-testid="stage-continue"
+            >
+              {hasNext ? "Continue" : "Save Progress"}
+            </button>
+            <button
+              type="button"
+              className="pih-single-question__secondary"
+              onClick={() => {
+                markStageEnoughForNow(activeStage.id);
+                onEnoughForNow?.();
+                onSaveAndReturnLater();
+              }}
+              data-testid="stage-enough-for-now"
+            >
+              Enough for now
+            </button>
+            <button
+              type="button"
+              className="pih-single-question__secondary"
+              onClick={() => {
+                setShowStageComplete(false);
+                setOpenFieldPath(activeStage.fieldPaths[0] ?? null);
+              }}
+              data-testid="stage-review"
+            >
+              Review answers
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (!currentPath || !currentKey) {
+      return (
+        <div className="pih-single-question" data-testid="pih-single-question">
+          <p className="pih-single-question__guidance">
+            Choose a stage above to continue.
+          </p>
+          <button
+            type="button"
+            className="pih-single-question__secondary"
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+        </div>
+      );
+    }
+
+    const meta = getPeopleIHelpGuidedField(currentKey);
+    const question =
+      currentPath === "people-i-help.link"
+        ? "Who this business helps"
+        : (meta?.question ?? currentKey);
+    const guidance =
+      meta?.definition ??
+      "A sentence or two is enough. You can change this anytime.";
+    const stageTitle =
+      effectiveEntryMode === "quick_start"
+        ? "Quick Start"
+        : (activeStage?.title ?? "People I Help");
+
+    let primaryLabel = "Continue";
+    if (effectiveEntryMode === "quick_start" && isLastInStage) {
+      primaryLabel = "Finish Quick Start";
+    } else if (effectiveEntryMode !== "quick_start" && isLastInStage) {
+      primaryLabel = "Finish Stage";
+    }
+
+    const answerBody =
+      renderPeopleField?.(currentKey, true, () =>
+        openNextQuestion(currentPath),
+      ) ?? null;
+
+    return (
+      <PeopleIHelpSingleQuestionScreen
+        stageTitle={stageTitle}
+        stepIndex={stepIndex}
+        stepCount={stepCount}
+        question={question}
+        guidance={guidance}
+        answer={answerBody}
+        help={
+          <PeopleIHelpQuestionHelp
+            key={currentKey}
+            fieldKey={currentKey}
+            currentValue={values[currentKey] ?? ""}
+          />
+        }
+        primaryLabel={primaryLabel}
+        onPrimary={() => openNextQuestion(currentPath)}
+        onSaveLater={onSaveAndReturnLater}
+        onCancel={onCancel}
+        showStageOverview={effectiveEntryMode !== "quick_start"}
+        stageOverview={stageStatuses}
+        activeStageId={activeStage?.id ?? null}
+        onSelectStage={(stageId) => {
+          const idx = stages.findIndex((s) => s.id === stageId);
+          if (idx >= 0) {
+            setEntryMode((mode) =>
+              mode === "quick_start" ? "browse" : mode ?? "browse",
+            );
+            goToStage(idx);
+          }
+        }}
+      />
+    );
+  }
+
   return (
-    <div className="guided-stage-workspace" data-testid="guided-stage-workspace">
+    <div
+      className={`guided-stage-workspace${
+        roomChrome ? " guided-stage-workspace--room-chrome" : ""
+      }`}
+      data-testid="guided-stage-workspace"
+    >
+      {!roomChrome ? (
       <div className="guided-stage-workspace__status-list" role="list">
         {stageStatuses.map(({ stage, label }) => (
           <button
@@ -363,12 +623,12 @@ export function GuidedStageWorkspace({
             className={`guided-stage-workspace__status-item${
               stage.optional ? " guided-stage-workspace__status-item--optional" : ""
             }${
-              entryMode !== "quick_start" && activeStage?.id === stage.id
+              effectiveEntryMode !== "quick_start" && activeStage?.id === stage.id
                 ? " guided-stage-workspace__status-item--active"
                 : ""
             }`}
             onClick={() => {
-              if (entryMode === "quick_start") return;
+              if (effectiveEntryMode === "quick_start") return;
               const idx = stages.findIndex((s) => s.id === stage.id);
               if (idx >= 0) {
                 setStageIndex(idx);
@@ -383,16 +643,21 @@ export function GuidedStageWorkspace({
           </button>
         ))}
       </div>
+      ) : null}
 
-      <div className="guided-stage-workspace__scroll">
-        {entryMode === "quick_start" ? (
+      <div
+        className={`guided-stage-workspace__scroll${
+          roomChrome ? " guided-stage-workspace__scroll--inline" : ""
+        }`}
+      >
+        {effectiveEntryMode === "quick_start" ? (
           <header className="guided-stage-workspace__stage-header">
             <h3 className="guided-stage-workspace__stage-title">Quick Start</h3>
             <p className="guided-stage-workspace__stage-desc">
               A few essentials — enough for Shari to begin personalizing help.
             </p>
           </header>
-        ) : activeStage ? (
+        ) : activeStage && !roomChrome ? (
           <header className="guided-stage-workspace__stage-header">
             <h3 className="guided-stage-workspace__stage-title">
               {activeStage.title}
@@ -415,8 +680,15 @@ export function GuidedStageWorkspace({
 
         {!showStageComplete && !quickStartDone ? (
           <div className="guided-stage-workspace__questions">
-            {visiblePaths.map((path) => {
-              const isOpen = openFieldPath === path;
+            {(roomChrome
+              ? visiblePaths.filter(
+                  (path) => path === (openFieldPath ?? visiblePaths[0]),
+                )
+              : visiblePaths
+            ).map((path) => {
+              const isOpen = roomChrome
+                ? true
+                : openFieldPath === path;
 
               const title =
                 path === "people-i-help.link"
@@ -438,6 +710,8 @@ export function GuidedStageWorkspace({
                         : key;
                     })();
 
+              const fieldKey = pathToFieldKey(path);
+
               return (
                 <div
                   key={path}
@@ -446,22 +720,110 @@ export function GuidedStageWorkspace({
                   }`}
                   data-testid={`stage-question-${path}`}
                 >
-                  <button
-                    type="button"
-                    className="guided-stage-question__toggle"
-                    aria-expanded={isOpen}
-                    onClick={() => {
-                      setOpenFieldPath(isOpen ? null : path);
-                      const key = pathToFieldKey(path);
-                      if (key && !isOpen) onFocusField(key);
-                    }}
-                  >
-                    <span>{title}</span>
-                    <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
-                  </button>
+                  {roomChrome ? (
+                    <h4 className="guided-stage-question__toggle" id={`q-${path}`}>
+                      {title}
+                    </h4>
+                  ) : (
+                    <button
+                      type="button"
+                      className="guided-stage-question__toggle"
+                      aria-expanded={isOpen}
+                      onClick={() => {
+                        setOpenFieldPath(isOpen ? null : path);
+                        const key = pathToFieldKey(path);
+                        if (key && !isOpen) onFocusField(key);
+                      }}
+                    >
+                      <span>{title}</span>
+                      <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
+                    </button>
+                  )}
                   {isOpen ? (
                     <div className="guided-stage-question__body">
                       {renderEstateField(path, true)}
+                      {activeStage &&
+                      effectiveEntryMode !== "quick_start" &&
+                      fieldKey &&
+                      areaId !== "people-i-help" ? (
+                        <div
+                          className="business-estate-section-help"
+                          data-testid="business-estate-section-help"
+                          data-stage-id={activeStage.id}
+                          data-field-path={path}
+                        >
+                          <p className="business-estate-section-help__label">
+                            Help with {activeStage.title}
+                          </p>
+                          <div
+                            className="business-estate-section-help__actions"
+                            role="group"
+                            aria-label={`Help for ${activeStage.title}`}
+                          >
+                            <button
+                              type="button"
+                              className="guided-estate-field__help-btn"
+                              data-testid="section-help-me-answer"
+                              onClick={() => {
+                                const sectionId = path.includes(".")
+                                  ? path.slice(0, path.indexOf("."))
+                                  : activeStage.areaId;
+                                requestGuidedFieldHelp({
+                                  sectionId,
+                                  fieldKey,
+                                  fieldPath: path,
+                                  helpMode: "help_me_develop",
+                                  currentValue: values[fieldKey] ?? "",
+                                  approvedBusinessContext:
+                                    collectApprovedBusinessEstateContext(),
+                                  relatedFieldValues: {},
+                                  question: `${activeStage.title} — ${title}`,
+                                  definition: activeStage.description,
+                                  guidedQuestions: [...activeStage.fieldPaths],
+                                });
+                              }}
+                            >
+                              Help Me Answer
+                            </button>
+                            {businessEstateFieldSupportsResearch(path) ? (
+                              <button
+                                type="button"
+                                className="guided-estate-field__help-btn"
+                                data-testid="section-research-this"
+                                onClick={() => {
+                                  const sectionId = path.includes(".")
+                                    ? path.slice(0, path.indexOf("."))
+                                    : activeStage.areaId;
+                                  requestGuidedFieldHelp({
+                                    sectionId,
+                                    fieldKey,
+                                    fieldPath: path,
+                                    helpMode: "research_with_shari",
+                                    currentValue: values[fieldKey] ?? "",
+                                    approvedBusinessContext:
+                                      collectApprovedBusinessEstateContext(),
+                                    relatedFieldValues: {},
+                                    question: `${activeStage.title} — ${title}`,
+                                    definition: activeStage.description,
+                                    guidedQuestions: [
+                                      ...activeStage.fieldPaths,
+                                    ],
+                                  });
+                                }}
+                              >
+                                Research This
+                              </button>
+                            ) : null}
+                          </div>
+                          <p
+                            className="business-estate-section-help__hint"
+                            data-testid="business-estate-section-help-hint"
+                          >
+                            Shari will use this question and your current answer
+                            as context.
+                          </p>
+                        </div>
+                      ) : null}
                     </div>
                   ) : (
                     <div className="guided-stage-question__preview">
@@ -530,13 +892,10 @@ export function GuidedStageWorkspace({
                 type="button"
                 className="business-estate-section-editor__save"
                 onClick={() => {
-                  setShowStageComplete(false);
-                  if (stageIndex < stages.length - 1) {
-                    setStageIndex((i) => i + 1);
-                    setOpenFieldPath(
-                      stages[stageIndex + 1]?.fieldPaths[0] ?? null,
-                    );
+                  if (activeStageIndex < stages.length - 1) {
+                    goToStage(activeStageIndex + 1);
                   } else {
+                    setShowStageComplete(false);
                     onSaveAndReturnLater();
                   }
                 }}
@@ -570,25 +929,10 @@ export function GuidedStageWorkspace({
             </div>
           </div>
         ) : null}
-
-        {talkNotice ? (
-          <p className="guided-estate-field__notice" role="status">
-            {talkNotice}
-          </p>
-        ) : null}
       </div>
 
       <div className="guided-stage-workspace__footer">
-        {activeStage && entryMode !== "quick_start" ? (
-          <button
-            type="button"
-            className="guided-stage__talk-btn"
-            onClick={handleTalkThrough}
-            data-testid="talk-this-through"
-          >
-            Talk This Through With Shari
-          </button>
-        ) : null}
+        {!roomChrome ? (
         <div className="guided-stage-workspace__footer-actions">
           <button
             type="button"
@@ -614,7 +958,8 @@ export function GuidedStageWorkspace({
             Save Changes
           </button>
         </div>
-        {entryMode === "quick_start" &&
+        ) : null}
+        {effectiveEntryMode === "quick_start" &&
         isQuickStartSatisfied(areaId, values) &&
         !quickStartDone ? (
           <button
@@ -625,6 +970,7 @@ export function GuidedStageWorkspace({
             I&apos;m done with Quick Start
           </button>
         ) : null}
+        {!roomChrome ? (
         <button
           type="button"
           className="guided-stage__change-mode"
@@ -632,6 +978,7 @@ export function GuidedStageWorkspace({
         >
           Change how I work here
         </button>
+        ) : null}
       </div>
     </div>
   );
