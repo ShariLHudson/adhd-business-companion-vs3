@@ -2671,13 +2671,8 @@ export default function CompanionPageClient() {
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
-  useEffect(() => {
-    if (!hydrated || !welcomeHomePrimary) return;
-    if (isCompanionPreviewTestSessionActive()) return;
-    if (getCompanionAuthIntelligence().loginCount > 1 && !hasSeenWelcomeIntro()) {
-      markWelcomeIntroSeen();
-    }
-  }, [hydrated, welcomeHomePrimary]);
+  // First-login completion is account-backed via FirstLoginWelcomeGate
+  // (welcome_completed_at). Do not auto-skip from device loginCount.
 
   const welcomeHomeGreeting =
     welcomeHomeExperience.greeting ??

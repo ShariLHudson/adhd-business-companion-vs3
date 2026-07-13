@@ -9,7 +9,9 @@ import {
 } from "react";
 
 import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
+import { FirstLoginWelcomeGate } from "@/components/companion/FirstLoginWelcomeOverlay";
 import { EstateRouteRecovery } from "@/components/companion/estate/EstateRouteRecovery";
+import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
 import { armCompanionPreviewTestHarnessFromQuery } from "@/lib/companionPreviewTestHarness";
 import { ESTATE_WORKSPACE_LOAD_RECOVERY } from "@/lib/companionContextRouting/workspaceLoadRecovery";
 import {
@@ -18,11 +20,14 @@ import {
   reloadOnceForStaleCompanionChunk,
 } from "@/lib/companionWebpackChunkFailure";
 import "@/app/companion/estate-route-recovery.css";
+import "@/app/companion/spark-thinking-flame.css";
 
 const LOADING = (
-  <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
-    Loading your workspace…
-  </main>
+  <SparkLoadingState
+    fullPage
+    message="Loading your workspace…"
+    size="lg"
+  />
 );
 
 function logWorkspaceLoadFailure(error: Error): void {
@@ -158,7 +163,9 @@ export function CompanionPageLoader() {
 
   return (
     <CompanionAuthGate>
-      <AuthenticatedCompanionShell />
+      <FirstLoginWelcomeGate>
+        <AuthenticatedCompanionShell />
+      </FirstLoginWelcomeGate>
     </CompanionAuthGate>
   );
 }

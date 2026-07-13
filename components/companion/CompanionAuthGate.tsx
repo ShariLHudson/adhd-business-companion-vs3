@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, type ReactNode } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 import {
   armCompanionPreviewTestHarnessFromQuery,
@@ -15,11 +16,7 @@ import {
 } from "@/lib/companionLoginTransition";
 
 function AuthGateLoading({ message }: { message: string }) {
-  return (
-    <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
-      {message}
-    </main>
-  );
+  return <SparkLoadingState fullPage message={message} size="lg" />;
 }
 
 /** Unauthenticated visitors go to sign-in when Supabase auth is configured. */
@@ -70,15 +67,22 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
     router.replace(`${loginUrl.pathname}${loginUrl.search}`);
   }, [configChecked, configured, sessionChecked, loading, gateOpen, router]);
 
+  // Never render the Estate shell until the session is confirmed — login
+  // handoff may open the gate for redirect logic, but must not flash workspace.
   if (!configChecked || !sessionChecked || loading) {
-    if (loginHandoff) {
-      return <>{children}</>;
-    }
-    return <AuthGateLoading message="Loading your space…" />;
+    return (
+      <AuthGateLoading
+        message={loginHandoff ? "Opening your space…" : "Loading your space…"}
+      />
+    );
   }
 
   if (!configured || !gateOpen) {
     return <AuthGateLoading message="Redirecting to sign in…" />;
+  }
+
+  if (!isAuthed && loginHandoff) {
+    return <AuthGateLoading message="Opening your space…" />;
   }
 
   return <>{children}</>;

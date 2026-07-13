@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { GoogleSignInIcon } from "@/components/companion/GoogleSignInIcon";
+import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import {
   recordAuthLoginFailure,
@@ -181,7 +182,7 @@ export function CompanionSignInForm({
 
   if (loading && variant !== "page") {
     return (
-      <p className="text-sm text-[#6b635a]">Checking your session…</p>
+      <SparkLoadingState message="Checking your session…" size="sm" />
     );
   }
 
@@ -429,8 +430,8 @@ export function CompanionSignInForm({
         : [createAccountButton, signInButton]
       : null;
 
-  const showNameField =
-    mode === "signup" || (variant === "page" && !returning);
+  /** Name is only for account creation — never during Sign In. */
+  const showNameField = mode === "signup";
 
   return (
     <div className="flex flex-col gap-4">

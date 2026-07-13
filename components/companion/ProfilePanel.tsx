@@ -284,10 +284,10 @@ export function ProfilePanel({
           </span>
           <span>
             <span className="block text-base font-semibold text-[#1f1c19]">
-              Welcome Home
+              Replay Shari&apos;s Welcome
             </span>
             <span className="block text-sm text-[#6b635a]">
-              Replay your cinematic arrival at the Estate.
+              Hear the Welcome Home arrival again — without resetting first login.
             </span>
           </span>
         </button>
