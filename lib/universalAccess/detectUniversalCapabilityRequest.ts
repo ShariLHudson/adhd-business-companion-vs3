@@ -89,9 +89,9 @@ const RULES: readonly Rule[] = [
   },
   {
     id: "projects",
-    section: "projects",
+    section: "project-homes",
     nav: "create",
-    pattern: /\b(?:my projects|open projects|show projects|projects?)\b/i,
+    pattern: /\b(?:my projects|open projects|show projects|project homes?)\b/i,
     ackSeed: 3,
   },
   {
@@ -111,7 +111,7 @@ const RULES: readonly Rule[] = [
   },
   {
     id: "destination-gallery",
-    section: "the-gallery",
+    section: "destination-gallery",
     nav: "create",
     pattern:
       /\b(?:destination gallery|send this somewhere|save (?:this )?to (?:google )?(?:drive|docs)|google drive|google docs)\b/i,

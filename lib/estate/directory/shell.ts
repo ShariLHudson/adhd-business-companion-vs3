@@ -47,7 +47,7 @@ export const ESTATE_DIRECTORY_PLACE_SECTION: Partial<
   "evidence-vault": "evidence-bank",
   /** Member-facing Hall of Accomplishments (legacy portfolio section). */
   portfolio: "growth-portfolio",
-  "goals-projects": "projects",
+  "goals-projects": "project-homes",
   "my-estate": "home",
   "growth-profile": "home",
   gardens: "wins-this-week",
@@ -87,9 +87,10 @@ export const ESTATE_DIRECTORY_PLACE_SECTION: Partial<
   "discovery-room": "home",
   "art-studio": "content-generator",
   "strategy-studio": "content-generator",
-  "round-table": "projects",
+  "round-table": "boardroom",
   /** Gallery — not Hall of Accomplishments. */
   "gallery-of-firsts": "home",
+  "destination-gallery": "destination-gallery",
   "writing-room": "home",
   "house-possibility-outside": "home",
   "house-possibility-discovery-chest": "home",

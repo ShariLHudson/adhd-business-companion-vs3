@@ -39,7 +39,7 @@ describe("detectUniversalCapabilityRequest", () => {
       "calendar",
     );
     expect(detectUniversalCapabilityRequest("Show my projects")?.section).toBe(
-      "projects",
+      "project-homes",
     );
     expect(detectUniversalCapabilityRequest("Open my journal")?.section).toBe(
       "growth-journal",
@@ -49,7 +49,7 @@ describe("detectUniversalCapabilityRequest", () => {
   it("opens Destination Gallery and Evidence Vault by name", () => {
     expect(
       detectUniversalCapabilityRequest("Open Destination Gallery")?.section,
-    ).toBe("the-gallery");
+    ).toBe("destination-gallery");
     expect(
       detectUniversalCapabilityRequest("Save this to Google Docs")?.capabilityId,
     ).toBe("destination-gallery");

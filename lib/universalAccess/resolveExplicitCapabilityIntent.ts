@@ -30,6 +30,7 @@ const SECTION_TO_CAPABILITY: Partial<
   "growth-journal": { id: "journal", nav: "journal", ackSeed: 0 },
   "evidence-bank": { id: "evidence-vault", nav: "evidence-bank", ackSeed: 1 },
   "the-gallery": { id: "destination-gallery", nav: "create", ackSeed: 2 },
+  "destination-gallery": { id: "destination-gallery", nav: "create", ackSeed: 2 },
   "decision-compass": { id: "decision-compass", nav: "create", ackSeed: 0 },
   "plan-my-day": { id: "plan-my-day", nav: "plan-my-day", ackSeed: 1 },
   "quick-recharge": { id: "momentum-games", nav: "focus", ackSeed: 1 },

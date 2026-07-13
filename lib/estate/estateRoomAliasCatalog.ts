@@ -105,7 +105,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "where should i send this",
       "where would you like me to send this",
     ],
-    route: null,
+    route: "destination-gallery",
     roomType: "planning",
   },
   {
@@ -491,7 +491,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "board room",
       "the board room",
     ],
-    route: "projects",
+    route: "boardroom",
     roomType: "planning",
   },
   {

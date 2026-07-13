@@ -75,12 +75,13 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
   "discovery-room": "home",
   "art-studio": "content-generator",
   "strategy-studio": "content-generator",
-  "round-table": "projects",
+  "round-table": "boardroom",
   "dining-room": "home",
   "stairway-reading-nook": "home",
   "spark-estate": "home",
   /** Hall of Accomplishments ≠ Portfolio / Achievement Library */
   "gallery-of-firsts": "home",
+  "destination-gallery": "destination-gallery",
 };
 
 function entry(

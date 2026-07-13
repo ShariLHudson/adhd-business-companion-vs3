@@ -64,7 +64,9 @@ export type AppSection =
   | "user-memory"
   | "welcome-room"
   | "life-experience"
-  | "the-gallery";
+  | "the-gallery"
+  /** Architecture 156 — Destination Gallery (outcome crystals). */
+  | "destination-gallery";
 
 export type SidebarNavId =
   | "chat"
@@ -221,6 +223,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
   switch (section) {
     case "my-work":
     case "projects":
+    case "project-homes":
     case "templates-library":
     case "snippets":
     case "saved-work":
@@ -230,6 +233,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "playbook":
     case "how-do-i":
     case "visual-focus":
+    case "destination-gallery":
     case "welcome-room":
       return "other";
     case "brain-dump":
