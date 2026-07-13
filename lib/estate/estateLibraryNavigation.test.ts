@@ -46,6 +46,14 @@ describe("estateMetaNavigation", () => {
     }
   });
 
+  it("opens visual Explore Spark for room list requests", () => {
+    const turn = evaluateMetaEstateNavigationTurn({
+      userText: "do you have a list of rooms i can visit",
+      currentPlaceId: "library",
+    });
+    expect(turn?.type).toBe("open_visual_explorer");
+  });
+
   it("navigates soft music room proposals with typos", () => {
     const turn = evaluateEstatePlaceTurn({
       userText: "how about a musci room",
@@ -57,15 +65,12 @@ describe("estateMetaNavigation", () => {
     }
   });
 
-  it("offers room list instead of unknown place", () => {
+  it("opens visual explorer for room list instead of text Create menus", () => {
     const turn = evaluateEstatePlaceTurn({
       userText: "do you have a list of rooms i can visit",
       currentPlaceId: "library",
     });
-    expect(turn.type).toBe("offer");
-    if (turn.type === "offer") {
-      expect(turn.line).toMatch(/Where would you like to go|Coffee House|Library/i);
-    }
+    expect(turn.type).toBe("open_visual_explorer");
   });
 
   it("never unknown-places another room", () => {

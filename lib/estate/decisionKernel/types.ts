@@ -8,7 +8,7 @@ import type { EstateCommandDecision } from "@/lib/estateIntelligence/estateComma
 import type { ImpliedEstatePlaceMatch } from "../impliedEstatePlaceMatch";
 import type { EstateRoomAction } from "../roomContext/types";
 
-export type EstateAction = "CHAT" | "NAVIGATE" | "CAPTURE" | "AUDIO" | "MENU" | "ROOM_ACTION";
+export type EstateAction = "CHAT" | "NAVIGATE" | "CAPTURE" | "AUDIO" | "MENU" | "ROOM_ACTION" | "OPEN_EXPLORE_SPARK";
 
 export type MemoryLibraryTargetTab =
   | "all"
@@ -52,7 +52,8 @@ export type EstateActionResult =
       currentPlaceId: string;
       roomAction: EstateRoomAction;
       immediateReply: string;
-    };
+    }
+  | { action: "OPEN_EXPLORE_SPARK"; userText: string };
 
 export type ResolveEstateActionContext = {
   userText: string;

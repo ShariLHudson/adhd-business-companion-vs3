@@ -51,7 +51,8 @@ export type EstateActionExecutionPlan =
       currentPlaceId: string;
       roomAction: EstateRoomAction;
       reply: string;
-    };
+    }
+  | { type: "open-explore-spark"; userText: string };
 
 export function planEstateActionExecution(
   result: EstateActionResult,
@@ -118,6 +119,11 @@ export function planEstateActionExecution(
         currentPlaceId: result.currentPlaceId,
         roomAction: result.roomAction,
         reply: result.immediateReply,
+      };
+    case "OPEN_EXPLORE_SPARK":
+      return {
+        type: "open-explore-spark",
+        userText: result.userText,
       };
     default: {
       const _exhaustive: never = result;

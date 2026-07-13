@@ -47,6 +47,8 @@ export type CompanionIntentExecutor = {
     reply: string;
   }) => void;
   onClearPlaceMenu?: () => void;
+  /** Opens the approved visual Explore Spark Estate map. */
+  onOpenExploreSpark?: () => void;
 };
 
 function executePlan(
@@ -103,6 +105,10 @@ function executePlan(
         roomAction: plan.roomAction,
         reply: plan.reply,
       });
+      return;
+    case "open-explore-spark":
+      executor.onClearPlaceMenu?.();
+      executor.onOpenExploreSpark?.();
       return;
     case "noop":
       return;

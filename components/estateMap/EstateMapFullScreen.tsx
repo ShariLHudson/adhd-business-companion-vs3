@@ -100,12 +100,12 @@ export function EstateMapFullScreen({
       className={`emfs-root${visible ? " emfs-root--visible" : ""}${entering ? " emfs-root--entering" : ""}`}
       role="dialog"
       aria-modal="true"
-      aria-label="Spark Estate Map"
+      aria-label="Explore Spark"
     >
       <div className="emfs-parchment">
         <header className="emfs-toolbar">
           <div className="emfs-toolbar__title">
-            <h1>The Spark Estate</h1>
+            <h1>Explore Spark</h1>
             <p>A memory map of places you belong</p>
           </div>
           <div className="emfs-toolbar__actions">

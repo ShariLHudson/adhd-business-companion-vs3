@@ -3,13 +3,14 @@ import type { EstateMapLocation } from "./types";
 
 /**
  * Spark Estate locations — each node uses a real environment photograph.
- * Replace image paths when dedicated estate assets ship; layout stays the same.
+ * Source of truth for Explore Spark visual destinations.
+ * Create / Create Studio are intentionally omitted.
  */
 export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "welcome-house",
     name: "Welcome House",
-    image: "/backgrounds/life-experience-room.webp",
+    image: ESTATE_ROOM_BG.welcomeHome,
     mood: "Arrival & belonging",
     x: 50,
     y: 52,
@@ -50,7 +51,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "reflection-garden",
     name: "Reflection Garden",
-    image: "/backgrounds/peaceful-places/east-terrace-peaceful-places.png",
+    image: "/peaceful-places/east-terrace-peaceful-places.png",
     mood: "Quiet insight",
     x: 18,
     y: 48,
@@ -60,7 +61,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "orchard",
     name: "Apple Orchard",
-    image: "/backgrounds/apple-orchard-kinsey-background.png",
+    image: ESTATE_ROOM_BG.appleOrchard,
     mood: "Fresh ideas & possibility",
     x: 78,
     y: 50,
@@ -70,7 +71,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "stable",
     name: "The Stables",
-    image: "/backgrounds/spark-estate-stables-background.png",
+    image: ESTATE_ROOM_BG.stables,
     mood: "Grounding & calm",
     x: 22,
     y: 72,
@@ -80,7 +81,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "mountain-cabin",
     name: "Mountain Cabin",
-    image: "/backgrounds/peaceful-places/evening-hearth-peaceful-places.png",
+    image: "/peaceful-places/evening-hearth-peaceful-places.png",
     mood: "Restoration",
     x: 50,
     y: 78,

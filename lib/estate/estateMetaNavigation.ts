@@ -24,6 +24,7 @@ export {
   hasHardEstateNavigationIntent,
   isAnotherRoomRequest,
   isEstateRoomListOrMapRequest,
+  isExploreSparkOrEstateMapRequest,
   isMetaNavigationDestinationPhrase,
 } from "./estateMetaNavigationPhrases";
 
@@ -53,7 +54,6 @@ const DEFAULT_EXPLORATORY_PLACE_IDS = [
   "peaceful-places",
   "apple-orchard",
   "stables",
-  "creative-studio",
 ] as const;
 
 export function normalizeSoftPlacePhrase(phrase: string): string {
@@ -89,7 +89,9 @@ export type MetaEstateNavigationTurn =
       type: "navigate";
       command: ReturnType<typeof estateNavigateCommandForPlace>;
     }
-  | { type: "offer"; line: string; placeIds: string[] };
+  | { type: "offer"; line: string; placeIds: string[] }
+  /** Opens the approved visual Estate explorer (Explore Spark). */
+  | { type: "open_visual_explorer" };
 
 /**
  * Meta navigation turns — room picker menus and soft place proposals.
@@ -124,7 +126,15 @@ export function evaluateMetaEstateNavigationTurn(input: {
     }
   }
 
-  if (isAnotherRoomRequest(text) || isEstateRoomListOrMapRequest(text)) {
+  /**
+   * Explore Spark / room list / estate map → visual explorer.
+   * Never open Create or a text wander menu for these phrases.
+   */
+  if (isEstateRoomListOrMapRequest(text)) {
+    return { type: "open_visual_explorer" };
+  }
+
+  if (isAnotherRoomRequest(text)) {
     const wander = formatEstateWanderMenu(input.currentPlaceId);
     return {
       type: "offer",

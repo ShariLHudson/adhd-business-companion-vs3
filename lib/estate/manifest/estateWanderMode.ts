@@ -22,10 +22,23 @@ export type EstateWanderPick = {
   manifestPlaceId: string;
 };
 
+/** Create destinations must never appear in casual wander. */
+const WANDER_EXCLUDED_LEGACY_IDS = new Set([
+  "creative-studio",
+  "content-generator",
+  "create",
+  "art-studio",
+  "strategy-studio",
+]);
+
 /** Navigable Live places from ESTATE_PLACE_MASTER_MANIFEST.json only. */
 export function getWanderableManifestPlaces(): EstateManifestPlaceRecord[] {
   return getManifestDocument().places.filter(
-    (place) => place.navigable && place.status === "Live",
+    (place) =>
+      place.navigable &&
+      place.status === "Live" &&
+      !WANDER_EXCLUDED_LEGACY_IDS.has(place.legacy_place_id) &&
+      !WANDER_EXCLUDED_LEGACY_IDS.has(place.place_id),
   );
 }
 

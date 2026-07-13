@@ -207,6 +207,7 @@ export type EstatePlaceTurnResult =
       navigationLine?: string;
     }
   | { type: "offer"; line: string; placeIds: string[]; impliedPlaceMatch?: ImpliedEstatePlaceMatch }
+  | { type: "open_visual_explorer" }
   | { type: "reply"; line: string }
   | { type: "unknown_place"; line: string };
 
@@ -829,6 +830,9 @@ export function evaluateEstatePlaceTurn(input: {
     const finalized = finalizePlaceNavigation(placeId, text);
     if (finalized) return finalized;
     return { type: "navigate", command: metaNav.command };
+  }
+  if (metaNav?.type === "open_visual_explorer") {
+    return { type: "open_visual_explorer" };
   }
   if (metaNav?.type === "offer") {
     return {

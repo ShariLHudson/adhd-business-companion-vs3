@@ -41,6 +41,12 @@ function planOpensClearMyMindCapture(plan: EstateActionExecutionPlan): boolean {
   );
 }
 
+/** Chamber member requests must open immediately — never stay in chat-only. */
+function planOpensChamberMember(plan: EstateActionExecutionPlan): boolean {
+  if (plan.type !== "navigate-place") return false;
+  return Boolean(plan.command.workspaceOffer.chamberMemberId);
+}
+
 function kindFromPlan(plan: EstateActionExecutionPlan): CompanionIntentKind {
   switch (plan.type) {
     case "navigate-place":
@@ -55,6 +61,7 @@ function kindFromPlan(plan: EstateActionExecutionPlan): CompanionIntentKind {
     case "place-menu":
     case "capture-menu":
     case "room-action":
+    case "open-explore-spark":
     case "noop":
       return "CHAT";
     default: {
@@ -102,11 +109,14 @@ export function classifyCompanionIntent(
   // Fix A — when the primary-turn verdict says this is a clear goal/help turn,
   // do not let the estate kernel divert it into room menus or room navigation.
   // Fix D — Clear My Mind capture is exempt and always opens.
+  // Chamber members are exempt — member asked for a person in the Chamber.
   if (
     input.primaryTurn &&
     !primaryTurnAllowsKernel(input.primaryTurn) &&
     (plan.type === "place-menu" ||
-      (plan.type === "navigate-place" && !planOpensClearMyMindCapture(plan)))
+      (plan.type === "navigate-place" &&
+        !planOpensClearMyMindCapture(plan) &&
+        !planOpensChamberMember(plan)))
   ) {
     return { kind: "CHAT", userText, plan: { type: "chat", userText } };
   }

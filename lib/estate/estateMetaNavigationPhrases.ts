@@ -6,19 +6,27 @@ const ANOTHER_ROOM_RE =
   /\b(?:another|different|some\s+other|new)\s+room\b|\bvisit\s+another\s+room\b|\b(?:go|take\s+me)\s+(?:somewhere|elsewhere|another\s+place|a\s+different\s+place)\b/i;
 
 const ROOM_LIST_RE =
-  /\b(?:(?:list|show).{0,24}(?:of\s+)?rooms?|rooms?\s+(?:on|at|in|around)\s+the\s+estate|rooms?\s+i\s+can\s+visit|what\s+rooms?|which\s+rooms?|places\s+(?:on|at|in)\s+the\s+estate|places\s+i\s+can\s+(?:go|visit)|where\s+can\s+i\s+go\s+on\s+the\s+estate)\b/i;
+  /\b(?:(?:list|show).{0,24}(?:of\s+)?rooms?|rooms?\s+(?:on|at|in|around)\s+the\s+estate|rooms?\s+i\s+can\s+visit|what\s+rooms?|which\s+rooms?|places\s+(?:on|at|in)\s+the\s+estate|places\s+i\s+can\s+(?:go|visit)|where\s+can\s+i\s+go\s+on\s+the\s+estate|show\s+(?:me\s+)?(?:all\s+)?(?:the\s+)?(?:estate\s+)?rooms?(?:\s+and\s+spaces)?|show\s+all\s+rooms?\s+and\s+spaces)\b/i;
 
 const ESTATE_MAP_RE =
-  /\b(?:estate\s+map|folded\s+map|show\s+(?:me\s+)?(?:the\s+)?map|explore\s+the\s+estate)\b/i;
+  /\b(?:estate\s+map|folded\s+map|show\s+(?:me\s+)?(?:the\s+)?map|explore\s+the\s+estate|explore\s+estate)\b/i;
+
+/** Explore Spark / Explore Estate — opens the visual Estate explorer (not Create). */
+const EXPLORE_SPARK_RE =
+  /\b(?:(?:open|show(?:\s+me)?|take\s+me\s+to|go\s+to)\s+)?explore\s+spark(?:\s+estate)?\b|\blet(?:'s| us)?\s+explore\s+(?:the\s+)?(?:spark\s+)?estate\b/i;
 
 /** "rooms I can visit" — not a navigation command. */
 const VISIT_AS_LIST_RE =
   /\b(?:list|what|which|do you have).{0,50}\brooms?\b/i;
 
-export function isEstateRoomListOrMapRequest(text: string): boolean {
+export function isExploreSparkOrEstateMapRequest(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
-  return ESTATE_MAP_RE.test(t) || ROOM_LIST_RE.test(t);
+  return EXPLORE_SPARK_RE.test(t) || ESTATE_MAP_RE.test(t) || ROOM_LIST_RE.test(t);
+}
+
+export function isEstateRoomListOrMapRequest(text: string): boolean {
+  return isExploreSparkOrEstateMapRequest(text);
 }
 
 export function isAnotherRoomRequest(text: string): boolean {

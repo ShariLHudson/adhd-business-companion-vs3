@@ -27,6 +27,10 @@ import {
   formatAlreadyHereReply,
 } from "../estateInRoomConversationIntents";
 import { isEstateSoundscapeNavigationRequest } from "../estateSoundscapeNavigation";
+import {
+  detectChamberMemberCommand,
+  estateCommandAckLine,
+} from "@/lib/estateIntelligence/estateCommandRouter";
 import type {
   EstateActionResult,
   MemoryLibraryTargetTab,
@@ -129,6 +133,25 @@ export function resolveEstateAction(
     };
   }
 
+  // Chamber members — higher priority than room navigation
+  const chamberMemberCmd = detectChamberMemberCommand(userText);
+  if (chamberMemberCmd?.clarifyQuestion) {
+    return {
+      action: "CHAT",
+      userText,
+      immediateReply: chamberMemberCmd.clarifyQuestion,
+    };
+  }
+  if (chamberMemberCmd?.workspaceOffer.chamberMemberId) {
+    setRequestedRoom("chamber-of-momentum");
+    return {
+      action: "NAVIGATE",
+      userText,
+      target: { kind: "place", command: chamberMemberCmd },
+      navigationLine: estateCommandAckLine(chamberMemberCmd),
+    };
+  }
+
   const placeTurn = evaluateEstatePlaceTurn({
     userText,
     currentPlaceId,
@@ -140,6 +163,13 @@ export function resolveEstateAction(
       action: "CHAT",
       userText,
       immediateReply: placeTurn.line,
+    };
+  }
+
+  if (placeTurn.type === "open_visual_explorer") {
+    return {
+      action: "OPEN_EXPLORE_SPARK",
+      userText,
     };
   }
 
@@ -156,6 +186,16 @@ export function resolveEstateAction(
       estateRoomsEquivalent(destId, currentPlaceId) &&
       canClaimAlreadyHere(destId)
     ) {
+      // Switching Chamber members stays a navigate — never "you're already here"
+      if (placeTurn.command.workspaceOffer.chamberMemberId) {
+        return {
+          action: "NAVIGATE",
+          userText,
+          target: { kind: "place", command: placeTurn.command },
+          navigationLine: placeTurn.navigationLine,
+          impliedPlaceMatch: placeTurn.impliedPlaceMatch,
+        };
+      }
       const sameRoomAction = evaluateEstateRoomAction({
         userText,
         currentPlaceId,
@@ -171,6 +211,16 @@ export function resolveEstateAction(
       }
       // Experience rooms (Clear My Mind) must still open — never chat-only already-here.
       if (estateRoomsEquivalent(destId, "clear-my-mind")) {
+        return {
+          action: "NAVIGATE",
+          userText,
+          target: { kind: "place", command: placeTurn.command },
+          navigationLine: placeTurn.navigationLine,
+          impliedPlaceMatch: placeTurn.impliedPlaceMatch,
+        };
+      }
+      // Re-entering Chamber of Momentum from chat should open the gallery, not chat-only.
+      if (estateRoomsEquivalent(destId, "chamber-of-momentum")) {
         return {
           action: "NAVIGATE",
           userText,

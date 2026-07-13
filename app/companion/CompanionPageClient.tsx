@@ -1389,6 +1389,13 @@ import {
   recordWanderTransition,
   validateWanderPick,
 } from "@/lib/estate/manifest/estateWanderMode";
+import { EstateMapFullScreen } from "@/components/estateMap";
+import {
+  exploreMapLocationIdForPlaceId,
+  getExploreSparkMapLocations,
+  resolveExploreMapLocationPlaceId,
+} from "@/lib/estateMap/exploreSparkNavigation";
+import type { EstateMapLocation } from "@/lib/estateMap/types";
 import type {
   ImmediateCreateOpenPayload,
   ImmediateCreateProjectOpenPayload,
@@ -3206,6 +3213,8 @@ export default function CompanionPageClient() {
     useState(false);
   const [welcomeHomeEstateMapVisible, setWelcomeHomeEstateMapVisible] =
     useState(false);
+  /** Approved visual Explore Spark Estate map (image cards). */
+  const [exploreSparkMapOpen, setExploreSparkMapOpen] = useState(false);
   /** When true, next Welcome Home primary render should show lobby signposts. */
   const pendingWelcomeHomeLobbyRevealRef = useRef(false);
 
@@ -8949,7 +8958,36 @@ export default function CompanionPageClient() {
     });
   }
 
+  /**
+   * Explore Spark — open the approved visual Estate explorer.
+   * Never wander into Create / Create Studio.
+   */
+  function openExploreSparkVisualExplorer() {
+    setWelcomeHomeEstateMapVisible(false);
+    setExploreSparkMapOpen(true);
+  }
+
+  function handleExploreSparkMapSelect(location: EstateMapLocation) {
+    const placeId = resolveExploreMapLocationPlaceId(location);
+    if (!placeId) {
+      setExploreSparkMapOpen(true);
+      return;
+    }
+    const command = estateNavigateCommandForPlace(
+      placeId,
+      `Explore Spark: ${location.name}`,
+    );
+    if (!command) {
+      setExploreSparkMapOpen(true);
+      return;
+    }
+    runDirectEstateRoomNavigation(command, `Explore Spark: ${location.name}`, undefined, {
+      skipAssistantMessage: true,
+    });
+  }
+
   function toggleJustBeHereSound() {
+
     const roomId = justBeHereSession?.roomId;
     if (!roomId) return;
     if (justBeHereSoundEnabled) {
@@ -13317,6 +13355,10 @@ export default function CompanionPageClient() {
         recordPrimaryTurnResponse(reply);
         executeEstateRoomActionCore({ userText, roomAction, reply });
       },
+      onOpenExploreSpark: () => {
+        if (taskLockBlocksEstateRouting && !estateKernelForced) return;
+        openExploreSparkVisualExplorer();
+      },
       onClearPlaceMenu: () => clearPendingEstatePlaceMenu(),
     });
 
@@ -17458,15 +17500,7 @@ export default function CompanionPageClient() {
   }
 
   function revealWelcomeHomeEstateMap() {
-    setWelcomeHomeEstateMapVisible(true);
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "assistant",
-        content:
-          "The homestead signposts are on the left â€” wander as long as you like. I'm right here when you're ready.",
-      },
-    ]);
+    openExploreSparkVisualExplorer();
   }
 
   function revealEstateRoomChoices(fromRoomId?: string | null) {
@@ -17509,11 +17543,7 @@ export default function CompanionPageClient() {
         enterJustBeHere(roomId);
         return;
       case "estate-map":
-        if (welcomeHomePrimary && roomId === "welcome-home") {
-          revealWelcomeHomeEstateMap();
-        } else {
-          revealEstateRoomChoices(roomId);
-        }
+        openExploreSparkVisualExplorer();
         return;
       case "companion-continue": {
         const resolution = resolveCompanionContinue();
@@ -22105,9 +22135,7 @@ export default function CompanionPageClient() {
           clearMyMindWorkspaceActive
             ? undefined
             : () => {
-                if (roomMenuRoomId) {
-                  handleEstateWander(roomMenuRoomId);
-                }
+                openExploreSparkVisualExplorer();
               }
         }
       />
@@ -22119,6 +22147,18 @@ export default function CompanionPageClient() {
         onContinueChat={() => closeBreatheOverlayCore({ goChat: true })}
         onReturnPrevious={() => closeBreatheOverlayCore({ resume: true })}
         onJournalThis={() => closeBreatheOverlayCore({ goJournal: true })}
+      />
+
+      <EstateMapFullScreen
+        open={exploreSparkMapOpen}
+        onClose={() => setExploreSparkMapOpen(false)}
+        locations={getExploreSparkMapLocations()}
+        currentLocationId={exploreMapLocationIdForPlaceId(
+          roomMenuRoomId ??
+            getEstateMemory().currentRoom?.entryId ??
+            undefined,
+        )}
+        onSelectLocation={handleExploreSparkMapSelect}
       />
     </div>
     </CompanionDeskProvider>
