@@ -1,9 +1,12 @@
 /**
  * Draft pages are permission-gated — brainstorming and direction-picking stay in chat.
  * Create opens only after explicit user consent (write/draft/create it) or UI navigation.
+ *
+ * Default: deny. Allow only when companionIntentRouting says the turn is an explicit
+ * creation request, or the member accepted a Create/draft handoff / UI open.
  */
 
-import { hasCreateIntent } from "./intentStabilizer";
+import { shouldOpenCreateWorkspace } from "./companionIntentRouting";
 import {
   classifyConversationalMode,
   isContentBrainstorming,
@@ -11,7 +14,6 @@ import {
   isExplicitCreationRequest,
   isExplicitProjectRequest,
   shouldBlockArtifactPipeline,
-  shouldStayConversationalOnly,
 } from "./messageClassification";
 import { isExplicitWorkspaceOpenRequest } from "./conversationGating";
 import { shariOfferedToApplyDraft } from "./liveCreateWorkspace";
@@ -20,7 +22,6 @@ import {
   userAcceptedCreateHandoff,
 } from "./chatCreateHandoff";
 import {
-  isAutoApplyWorkspaceSection,
   shouldBlockAutoApplyFromChat,
 } from "./activeWorkspaceAutoApply";
 import type { AppSection } from "./companionUi";
@@ -59,10 +60,11 @@ export function userGrantedDraftPermission(
   const t = text.trim();
   if (!t) return false;
   if (isDecidingConversation(t)) return false;
+  // Deny-by-default create gate — information / advice / questions never grant.
+  if (shouldOpenCreateWorkspace(t)) return true;
   if (isExplicitCreationRequest(t)) return true;
   if (isExplicitProjectRequest(t)) return true;
   if (isExplicitWorkspaceOpenRequest(t)) return true;
-  if (hasCreateIntent(t) && !shouldStayConversationalOnly(t)) return true;
   if (lastAssistantText && shariOfferedToDraft(lastAssistantText) && userAcceptedDraftOffer(t)) {
     return true;
   }
@@ -88,31 +90,35 @@ export type DraftPermissionOpts = {
 /**
  * Block opening Create / setting draftContent / artifacts from chat automation.
  * UI-initiated opens pass userInitiated: true to bypass.
+ *
+ * Default is deny. Allow only when the message is an explicit creation request
+ * (shouldOpenCreateWorkspace) or the member granted draft/Create permission
+ * (handoff accept, open Create, etc.). Having another workspace open is not
+ * Create consent — use shouldBlockAutoApplyFromChat for those panels.
  */
 export function shouldBlockDraftPanelFromChat(
   text: string,
   lastAssistantText = "",
   opts?: DraftPermissionOpts,
 ): boolean {
-  const autoApplySection = opts?.activeWorkspaceSection;
-  if (
-    autoApplySection &&
-    isAutoApplyWorkspaceSection(autoApplySection) &&
-    !opts?.liveCreateOpen
-  ) {
-    if (shouldBlockAutoApplyFromChat(text, lastAssistantText)) return true;
-    return false;
-  }
+  // Live Create: conversation may feed the open draft unless deny-listed.
   if (opts?.liveCreateOpen) {
     if (shouldBlockAutoApplyFromChat(text, lastAssistantText)) return true;
     return false;
   }
+
   if (shouldBlockArtifactPipeline(text)) return true;
   if (isDraftDirectionSelectionOnly(text)) return true;
   if (classifyConversationalMode(text) === "brainstorming") return true;
   if (isContentBrainstorming(text) && !isExplicitCreationRequest(text)) return true;
-  if (!userGrantedDraftPermission(text, lastAssistantText)) return true;
-  return false;
+
+  // Explicit create / draft / build — allow Create to open from chat.
+  if (shouldOpenCreateWorkspace(text)) return false;
+  if (userGrantedDraftPermission(text, lastAssistantText)) return false;
+
+  // Default deny. Another open workspace is not Create consent —
+  // avatars/projects/playbook use shouldBlockAutoApplyFromChat instead.
+  return true;
 }
 
 export function lastUserTextFromChatTurns(

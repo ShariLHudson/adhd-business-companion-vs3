@@ -115,10 +115,16 @@ export function isInformationIntent(text: string): boolean {
   return INFORMATION_INTENT_BUCKETS.has(bucket);
 }
 
+/**
+ * True only when chat may open Create as a direct response to this message.
+ * Information / advice / soft exploration never qualify — deny by default.
+ * Requires an explicit create/draft/write/build request (isExplicitCreationRequest).
+ */
 export function shouldOpenCreateWorkspace(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
   if (isInformationIntent(t)) return false;
+  if (!isExplicitCreationRequest(t)) return false;
   return CREATE_INTENT_BUCKETS.has(classifyCompanionIntentBucket(t));
 }
 

@@ -10,10 +10,6 @@ import {
 } from "@/lib/estate/estateAudioSettings";
 import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
 import {
-  refreshEstateSoundscapeOverlayVolume,
-  stopEstateSoundscapeOverlay,
-} from "@/lib/estate/estateSoundscapeOverlay";
-import {
   isAudioPlaybackGuardEnabled,
   prepareSingleTrackPlayback,
 } from "@/lib/estate/audioPlaybackGuard";
@@ -141,7 +137,9 @@ export function kickstartEstateRoomAmbience(
 
   if (isAudioPlaybackGuardEnabled()) {
     void prepareSingleTrackPlayback(`room:${roomId}`);
-    void stopEstateSoundscapeOverlay();
+    void import("./estateSoundscapeOverlay").then(({ stopEstateSoundscapeOverlay }) =>
+      stopEstateSoundscapeOverlay(),
+    );
   }
 
   if (transitionInFlight === roomId) return;
@@ -257,6 +255,9 @@ export async function transitionEstatePlaceAmbient(
   }
 
   if (isAudioPlaybackGuardEnabled()) {
+    const { stopEstateSoundscapeOverlay } = await import(
+      "./estateSoundscapeOverlay"
+    );
     await stopEstateSoundscapeOverlay();
   }
 

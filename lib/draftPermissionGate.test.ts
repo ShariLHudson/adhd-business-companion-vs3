@@ -157,4 +157,39 @@ What part of your day would you love to see more of from me?`,
       }).outcome,
     ).toBe("chat_only");
   });
+
+  it("plain questions and advice stay chat-only — never open Create", () => {
+    const questions = [
+      "What pricing should I use for coaching?",
+      "How does an email funnel work?",
+      "Should I use LinkedIn or Instagram?",
+      "I'm overwhelmed and don't know where to start.",
+      "Can you explain what a lead magnet is?",
+    ];
+    for (const text of questions) {
+      expect(shouldBlockDraftPanelFromChat(text)).toBe(true);
+      expect(userGrantedDraftPermission(text)).toBe(false);
+    }
+  });
+
+  it("soft exploration does not open Create from chat", () => {
+    expect(
+      shouldBlockDraftPanelFromChat("I might want to create a workshop."),
+    ).toBe(true);
+    expect(
+      userGrantedDraftPermission("I want to create a 4-part offer."),
+    ).toBe(false);
+  });
+
+  it("explicit write/draft/build opens Create from chat", () => {
+    expect(shouldBlockDraftPanelFromChat("Write a welcome email for new clients")).toBe(
+      false,
+    );
+    expect(shouldBlockDraftPanelFromChat("Draft a LinkedIn post about ADHD")).toBe(
+      false,
+    );
+    expect(shouldBlockDraftPanelFromChat("Create a newsletter about my offer")).toBe(
+      false,
+    );
+  });
 });

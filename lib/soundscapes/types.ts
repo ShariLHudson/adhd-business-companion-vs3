@@ -1,4 +1,4 @@
-import type { PeacefulPlaceId } from "@/lib/peacefulPlaces";
+import type { PeacefulPlaceId } from "@/lib/peacefulPlaces/types";
 
 export type SoundscapeMoodId = "calming" | "focus" | "unwind" | "energize";
 

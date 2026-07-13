@@ -14,7 +14,6 @@ import {
   isAudioPlaybackGuardEnabled,
   prepareSingleTrackPlayback,
 } from "./audioPlaybackGuard";
-import { stopEstateRoomAmbience } from "./estateRoomAmbience";
 import { fadeAudioVolumeAsync } from "@/lib/welcomeAudio/fadeVolume";
 
 const OVERLAY_CROSSFADE_MS = 650;
@@ -49,30 +48,27 @@ export async function stopEstateSoundscapeOverlay(): Promise<void> {
   overlayAudio.currentTime = 0;
 }
 
-export async function startEstateSoundscapeOverlay(
-  soundscapeId: string,
+async function startOverlayPlayback(
+  overlayId: string,
+  playbackUrl: string,
 ): Promise<void> {
   if (typeof window === "undefined") return;
   if (!isEstateSoundscapeOverlayEnabled()) return;
-
-  const soundscape = soundscapeById(soundscapeId);
-  if (!soundscape) return;
-
-  const playback: SoundscapePlayback = soundscapePlaybackFrom(soundscape);
-  if (!/\.(mp3|wav|ogg|m4a|aac|flac|webm)(\?|$)/i.test(playback.playbackUrl)) {
+  if (!/\.(mp3|wav|ogg|m4a|aac|flac|webm)(\?|$)/i.test(playbackUrl)) {
     return;
   }
 
   if (isAudioPlaybackGuardEnabled()) {
-    await prepareSingleTrackPlayback(`overlay:${soundscapeId}`);
+    await prepareSingleTrackPlayback(`overlay:${overlayId}`);
+    const { stopEstateRoomAmbience } = await import("./estateRoomAmbience");
     await stopEstateRoomAmbience();
   }
 
   const token = ++overlayFadeToken;
   const audio = ensureOverlayAudio();
-  const resolved = new URL(playback.playbackUrl, window.location.origin).href;
+  const resolved = new URL(playbackUrl, window.location.origin).href;
   if (audio.src !== resolved) {
-    audio.src = playback.playbackUrl;
+    audio.src = playbackUrl;
     audio.currentTime = 0;
   }
 
@@ -84,9 +80,26 @@ export async function startEstateSoundscapeOverlay(
   }
 
   if (token !== overlayFadeToken) return;
-  activeOverlayId = soundscapeId;
+  activeOverlayId = overlayId;
   const target = effectiveEstateLayerVolume(OVERLAY_BASE_VOLUME);
   await fadeAudioVolumeAsync(audio, target, OVERLAY_CROSSFADE_MS);
+}
+
+export async function startEstateSoundscapeOverlay(
+  soundscapeId: string,
+): Promise<void> {
+  const soundscape = soundscapeById(soundscapeId);
+  if (!soundscape) return;
+
+  const playback: SoundscapePlayback = soundscapePlaybackFrom(soundscape);
+  await startOverlayPlayback(soundscapeId, playback.playbackUrl);
+}
+
+export async function startEstateSoundscapeOverlayFromUrl(
+  overlayId: string,
+  playbackUrl: string,
+): Promise<void> {
+  await startOverlayPlayback(overlayId, playbackUrl);
 }
 
 export async function refreshEstateSoundscapeOverlayVolume(): Promise<void> {

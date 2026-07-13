@@ -36,11 +36,14 @@ describe("activeWorkspaceAutoApply", () => {
     const msg =
       "My ideal client is a 35-year-old entrepreneur with ADHD who runs a service business.";
     expect(isActiveWorkspaceAutoApplyMode("client-avatars", msg)).toBe(false);
+    // Draft/Create gate stays closed for ordinary chat — even with avatars open.
+    // Auto-apply into the open panel uses shouldBlockAutoApplyFromChat instead.
     expect(
       shouldBlockDraftPanelFromChat(msg, "", {
         activeWorkspaceSection: "client-avatars",
       }),
-    ).toBe(false);
+    ).toBe(true);
+    expect(shouldBlockAutoApplyFromChat(msg)).toBe(false);
   });
 
   it("hint tells model chat is conversation only when workspace is open", () => {

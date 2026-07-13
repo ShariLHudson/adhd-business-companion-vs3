@@ -4,15 +4,8 @@
  * Rollback: NEXT_PUBLIC_AUDIO_PLAYBACK_GUARD=0
  */
 
-import { stopEstateRoomAmbience } from "@/lib/estate/estateRoomAmbience";
-import { stopEstateSoundscapeOverlay } from "@/lib/estate/estateSoundscapeOverlay";
 import { stopGardenCardAmbience } from "@/lib/peacefulPlaces/gardenCardAmbience";
 import { stopGardenFlagAmbience } from "@/lib/peacefulPlaces/gardenFlagAmbience";
-import {
-  kickstartEstateRoomAmbience,
-  startEstateRoomAmbience,
-} from "@/lib/estate/estateRoomAmbience";
-import { startEstateSoundscapeOverlay } from "@/lib/estate/estateSoundscapeOverlay";
 import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
 import type { EstateArrivalAmbienceProfile } from "@/lib/estate/estateArrivalExperienceTypes";
 
@@ -145,6 +138,13 @@ export function resolveGuardedEnvironmentalAudioRequest(
 }
 
 async function stopAllEnvironmentalLayers(): Promise<void> {
+  const [
+    { stopEstateRoomAmbience },
+    { stopEstateSoundscapeOverlay },
+  ] = await Promise.all([
+    import("@/lib/estate/estateRoomAmbience"),
+    import("@/lib/estate/estateSoundscapeOverlay"),
+  ]);
   await Promise.all([
     stopEstateRoomAmbience(),
     stopEstateSoundscapeOverlay(),
@@ -190,6 +190,10 @@ export async function executeGuardedEnvironmentalAudioPlay(
   }
 
   if (request.layer === "room" && request.placeId && request.profile) {
+    const {
+      kickstartEstateRoomAmbience,
+      startEstateRoomAmbience,
+    } = await import("@/lib/estate/estateRoomAmbience");
     if (opts?.userInitiated) {
       kickstartEstateRoomAmbience(request.placeId, request.profile);
     } else {
@@ -209,6 +213,9 @@ export async function executeGuardedEnvironmentalAudioPlay(
   }
 
   if (request.layer === "overlay" && request.soundscapeId) {
+    const { startEstateSoundscapeOverlay } = await import(
+      "@/lib/estate/estateSoundscapeOverlay"
+    );
     await startEstateSoundscapeOverlay(request.soundscapeId);
     activeAudioId = request.trackId;
     return recordTrace({

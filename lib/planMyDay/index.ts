@@ -8,6 +8,7 @@ export * from "./planTaskCompletion";
 export * from "./companionBrainClient";
 export * from "./planningCenter";
 export * from "./previousDay";
+export * from "./upcomingPlanning";
 export {
   setPlanDayOwnerUserId,
   getPlanDayOwnerUserId,
