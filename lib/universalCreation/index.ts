@@ -40,6 +40,26 @@ export {
 } from "./phases";
 
 export {
+  advanceGuidedCreationFlow,
+  isGuidedCreationAssistantContext,
+  isPostDiscoveryCreationPhase,
+  formatPostDraftReviewPrompt,
+} from "./guidedCreationFlow";
+
+export {
+  emailWorkflowStateFromSession,
+  hasUsableApprovedEmailDraft,
+  formatEmailAwaitingActionMenu,
+  formatApprovedEmailReply,
+  formatEmailAwaitingActionRecovery,
+  parseEmailAwaitingAction,
+  DRAFT_APPROVAL_RE,
+  SHOW_FINISHED_EMAIL_RE,
+  EXPLICIT_EMAIL_START_OVER_RE,
+  type EmailWorkflowState,
+} from "./emailWorkflowCompletion";
+
+export {
   detectUniversalDocumentType,
   shouldEnterUniversalCreation,
   isUniversalCreationMessage,

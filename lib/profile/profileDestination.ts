@@ -9,6 +9,26 @@ export const PROFILE_MENU_LABELS = {
   peopleIHelp: "People I Help",
 } as const;
 
+/** Overlay ids used for dedicated profile destination host mounts. */
+export const PROFILE_DESTINATION_OVERLAY_IDS = [
+  "profile",
+  "people-i-help",
+  "growth-profile",
+] as const;
+
+export type ProfileDestinationOverlayId =
+  (typeof PROFILE_DESTINATION_OVERLAY_IDS)[number];
+
+export function isProfileDestinationOverlay(
+  overlay: string | null | undefined,
+): overlay is ProfileDestinationOverlayId {
+  return (
+    overlay === "profile" ||
+    overlay === "people-i-help" ||
+    overlay === "growth-profile"
+  );
+}
+
 /** Default Profile landing — never Growth Profile. */
 export function resolveProfileDestination(
   destination?: ProfileDestination | null,

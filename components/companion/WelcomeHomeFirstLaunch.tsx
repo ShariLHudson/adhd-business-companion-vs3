@@ -18,10 +18,7 @@ import {
   destroyWelcomeHomeAudioManager,
   useWelcomeAudioExperience,
 } from "@/lib/welcomeAudio";
-import {
-  isWelcomeAudioSessionUnlocked,
-  unlockBrowserAudioFromClick,
-} from "@/lib/welcomeAudio/audioUnlock";
+import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
 import {
   WELCOME_HOME_BEGIN_HINT,
   WELCOME_HOME_BEGIN_LABEL,
@@ -35,11 +32,7 @@ import {
   WELCOME_HOME_MIN_DOLLY_MS,
 } from "@/lib/welcomeHome/introTiming";
 import type { WelcomeHomeExperiencePlan } from "@/lib/sparkExperienceEngine";
-import {
-  hasPendingWelcomeRoomGestureUnlock,
-  prefersReducedMotion,
-  useWelcomeRoomArrival,
-} from "@/lib/welcomeRoom";
+import { prefersReducedMotion, useWelcomeRoomArrival } from "@/lib/welcomeRoom";
 import { useChatBackdropRevision } from "@/lib/chatBackdrop";
 import { resolveWelcomeHomeHeroImageUrl } from "@/lib/welcomeHome/resolveWelcomeHomeHeroImageUrl";
 import {
@@ -55,6 +48,8 @@ type Props = {
   welcomeMessage: string | null;
   showWelcomeLine: boolean;
   showConversation: boolean;
+  /** ARCH-018 companion decision area — rendered with the welcome line. */
+  welcomeSlot?: ReactNode;
   thread: ReactNode;
   footer: ReactNode;
   conversationScrollKey?: string | number;
@@ -79,6 +74,7 @@ export function WelcomeHomePage({
   welcomeMessage,
   showWelcomeLine,
   showConversation,
+  welcomeSlot,
   thread,
   footer,
   conversationScrollKey,
@@ -170,16 +166,6 @@ export function WelcomeHomePage({
     }, WELCOME_HOME_INTRO_SCREEN_READY_MS);
     return () => window.clearTimeout(timer);
   }, [heroImageLoaded, introActive]);
-
-  useEffect(() => {
-    if (!introPlaybackReady || audioUnlocked) return;
-    if (
-      isWelcomeAudioSessionUnlocked() ||
-      hasPendingWelcomeRoomGestureUnlock()
-    ) {
-      void playExperience();
-    }
-  }, [introPlaybackReady, audioUnlocked, playExperience]);
 
   useEffect(() => {
     onIntroActiveChange?.(chromeHiddenDuringWelcome);
@@ -384,7 +370,10 @@ export function WelcomeHomePage({
         {chatVisible ? (
           <WelcomeHomeFrostedChatPanel
             welcomeMessage={welcomeMessage ?? undefined}
-            showWelcomeLine={showWelcomeLine && Boolean(welcomeMessage)}
+            welcomeSlot={welcomeSlot}
+            showWelcomeLine={
+              showWelcomeLine && Boolean(welcomeSlot ?? welcomeMessage)
+            }
             showConversation={showConversation}
             thread={thread}
             footer={footer}

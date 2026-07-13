@@ -2,22 +2,32 @@
  * Visible Thinking chat UI rules — pure helpers for tests and SimpleChat.
  */
 
-/** Single calm label while the model responds — no rotating "still with you" copy. */
-export const CHAT_THINKING_LABEL = "Thinking…" as const;
+/** Soft presence — the flame carries the moment; no “Thinking…” software copy. */
+export const CHAT_THINKING_LABEL = "" as const;
 
+/**
+ * Show the Spark presence flame only when loading has been revealed.
+ * Callers delay reveal (~200ms) so fast turns never flicker.
+ * Empty string = flame-only (no “Thinking…” copy).
+ */
 export function shouldShowChatVisibleThinking(
   isLoading: boolean,
-  _thinkingMessage?: string | null,
+  thinkingMessage?: string | null,
   awaitingUserConfirmation = false,
 ): boolean {
   if (awaitingUserConfirmation) return false;
-  return isLoading;
+  if (!isLoading) return false;
+  return thinkingMessage !== null && thinkingMessage !== undefined;
 }
 
 export function chatVisibleThinkingCopy(
-  _thinkingMessage?: string | null,
+  thinkingMessage?: string | null,
 ): string {
-  return CHAT_THINKING_LABEL;
+  const trimmed = thinkingMessage?.trim();
+  if (!trimmed || /^thinking…?$/i.test(trimmed) || /^thinking\.\.\.?$/i.test(trimmed)) {
+    return "";
+  }
+  return trimmed;
 }
 
 /** Identity Bar shows portrait animation only — chat owns thinking copy. */

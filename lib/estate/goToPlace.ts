@@ -24,7 +24,6 @@ import {
 import { resolveNavigationTarget } from "./estateRoutingRegistry";
 import { resolveSceneViewBackgroundUrl } from "./estatePlaceSceneViews";
 import type { DirectEstateVisit } from "./directEstateVisit";
-import { shouldSuppressDestinationInvitationGrid } from "./estatePlaceFirstArrival";
 import { onEstatePlaceArrived } from "@/lib/sparkRecognitionEngine/shellSync";
 
 /**
@@ -85,15 +84,11 @@ export type GoToPlaceOutcome = GoToPlaceResult | GoToPlaceError;
 function arrivalUiFlags(
   place: CanonicalEstatePlace,
 ): Pick<GoToPlaceResult, "showTitlePlaque" | "showInvitationGrid"> {
-  const isLiving = place.category === "living-place";
-  const isTransition = place.category === "transition-space";
+  void place;
+  // Place-first arrival: room photograph + conversation only — no popup frames.
   return {
-    showTitlePlaque: !isLiving && !isTransition && place.arrivalBehavior !== "presence-only",
-    showInvitationGrid: shouldSuppressDestinationInvitationGrid()
-      ? false
-      : !isLiving &&
-        !isTransition &&
-        place.arrivalBehavior === "object-invitation",
+    showTitlePlaque: false,
+    showInvitationGrid: false,
   };
 }
 

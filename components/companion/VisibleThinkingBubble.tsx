@@ -3,6 +3,8 @@
 import type { EmotionalState } from "@/lib/companionEmotions";
 import type { AppSection } from "@/lib/companionUi";
 import { useCompanionPresence } from "@/lib/useCompanionPresence";
+import { ShariPresenceFlame } from "@/components/companion/ShariPresenceFlame";
+import { ShariPresenceState } from "@/lib/shariPresenceFlame/types";
 
 type Props = {
   message: string;
@@ -12,7 +14,8 @@ type Props = {
 };
 
 /**
- * Visible Thinking — warm amber breath while Shari composes a reply.
+ * Visible presence — SSC flame while Shari composes a reply.
+ * No “Thinking…” software label; the flame is the presence.
  */
 export function VisibleThinkingBubble({
   message,
@@ -24,20 +27,29 @@ export function VisibleThinkingBubble({
     compact: true,
     emotion,
     isThinking: true,
-    thinkingMessage: message,
+    thinkingMessage: message || undefined,
     workspacePanel,
     workspaceActiveBeside,
   });
+
+  const showCopy = Boolean(message.trim());
 
   return (
     <div
       className="companion-chat-thinking companion-fade-in"
       aria-live="polite"
-      aria-label="Shari is thinking"
+      aria-label="Shari is with you"
       data-testid="visible-thinking-bubble"
     >
-      <span className="companion-chat-thinking__pulse" aria-hidden />
-      <p className="companion-chat-thinking__copy">{message}</p>
+      <ShariPresenceFlame
+        state={ShariPresenceState.THINKING}
+        size="md"
+        label="Shari is with you"
+        className="companion-chat-thinking__flame"
+      />
+      {showCopy ? (
+        <p className="companion-chat-thinking__copy">{message}</p>
+      ) : null}
     </div>
   );
 }

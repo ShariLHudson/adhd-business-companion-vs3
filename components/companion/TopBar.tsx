@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { TopBarNavButton } from "@/components/companion/TopBarNavButton";
+import { RhythmNotificationsGlance } from "@/components/companion/RhythmNotificationsGlance";
 import {
   countActivePlanItems,
   PLAN_MY_DAY_UPDATED,
 } from "@/lib/planMyDay";
+import { collectDueDeliverables } from "@/lib/rhythms";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
 import type { HomeNavVisibility } from "@/lib/arrivalIntelligence";
 import type { AppSection } from "@/lib/companionUi";
@@ -34,6 +36,23 @@ function usePlanActiveCount(): number {
   return count;
 }
 
+function useDueGlanceCount(): number {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    const sync = () => setCount(collectDueDeliverables().length);
+    sync();
+    const id = window.setInterval(sync, 30_000);
+    window.addEventListener("companion-rhythms-updated", sync);
+    window.addEventListener("companion-reminders-updated", sync);
+    return () => {
+      window.clearInterval(id);
+      window.removeEventListener("companion-rhythms-updated", sync);
+      window.removeEventListener("companion-reminders-updated", sync);
+    };
+  }, []);
+  return count;
+}
+
 export function TopBar({
   calmHome = false,
   navVisibility: _navVisibility = "normal",
@@ -43,6 +62,8 @@ export function TopBar({
   onOpenTodaysReality,
 }: TopBarProps) {
   const planActiveCount = usePlanActiveCount();
+  const dueCount = useDueGlanceCount();
+  const [glanceOpen, setGlanceOpen] = useState(false);
 
   return (
     <div
@@ -82,7 +103,21 @@ export function TopBar({
             onClick={onOpenTodaysReality}
           />
         ) : null}
+
+        <TopBarNavButton
+          menuId="rhythms-glance"
+          objectId="rhythms-glance"
+          label="For you"
+          badge={dueCount || undefined}
+          active={glanceOpen}
+          onClick={() => setGlanceOpen((o) => !o)}
+        />
       </div>
+
+      <RhythmNotificationsGlance
+        open={glanceOpen}
+        onClose={() => setGlanceOpen(false)}
+      />
     </div>
   );
 }

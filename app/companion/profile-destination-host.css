@@ -1,0 +1,33 @@
+/* ═══════════════════════════════════════════════════════════
+   Profile destinations — body portal above Welcome Home
+   Welcome Home is portaled at z-index 20 (99999 intro).
+   This host sits above that layer and below Breathe / Settings sheets.
+═══════════════════════════════════════════════════════════ */
+
+.profile-destination-host {
+  position: fixed;
+  inset: 0;
+  z-index: 100002;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  min-height: 100svh;
+  width: 100vw;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+.profile-destination-host__main.estate-room-main {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+}
+
+/* Block Welcome Home interaction while a profile destination is open */
+html[data-profile-destination] .welcome-home-page,
+html[data-profile-destination] .welcome-home-page--intro {
+  pointer-events: none !important;
+}

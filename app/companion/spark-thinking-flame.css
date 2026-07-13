@@ -1,0 +1,4 @@
+/**
+ * Legacy filename — presence styles live in shari-presence-flame.css.
+ * layout.tsx imports both during migration; this file intentionally has no rules.
+ */

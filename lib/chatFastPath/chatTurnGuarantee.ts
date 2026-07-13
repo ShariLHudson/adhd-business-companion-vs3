@@ -70,12 +70,32 @@ export function buildFailSafeChatReply(
   return sanitizeBridgeFromReply(buildContextualChatFallback(input), trimmed);
 }
 
+export type FetchCompanionChatOptions = {
+  timeoutMs?: number;
+  /** When aborted by a newer send, throws companion-chat-aborted (not timeout). */
+  signal?: AbortSignal;
+};
+
 export async function fetchCompanionChatWithTimeout(
   body: Record<string, unknown>,
-  timeoutMs = CHAT_COMPLETION_TIMEOUT_MS,
+  timeoutMsOrOptions: number | FetchCompanionChatOptions = CHAT_COMPLETION_TIMEOUT_MS,
 ): Promise<Response> {
+  const options: FetchCompanionChatOptions =
+    typeof timeoutMsOrOptions === "number"
+      ? { timeoutMs: timeoutMsOrOptions }
+      : timeoutMsOrOptions;
+  const timeoutMs = options.timeoutMs ?? CHAT_COMPLETION_TIMEOUT_MS;
+  const external = options.signal;
+
+  if (external?.aborted) {
+    throw new Error("companion-chat-aborted");
+  }
+
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const onExternalAbort = () => controller.abort();
+  external?.addEventListener("abort", onExternalAbort);
+
   try {
     return await fetch("/api/companion-chat", {
       method: "POST",
@@ -85,10 +105,14 @@ export async function fetchCompanionChatWithTimeout(
     });
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
+      if (external?.aborted) {
+        throw new Error("companion-chat-aborted");
+      }
       throw new Error("companion-chat-timeout");
     }
     throw err;
   } finally {
     clearTimeout(timer);
+    external?.removeEventListener("abort", onExternalAbort);
   }
 }

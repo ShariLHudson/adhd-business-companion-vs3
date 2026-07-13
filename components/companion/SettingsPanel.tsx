@@ -44,6 +44,20 @@ import {
 } from "@/lib/recognition";
 
 import { AI_TONE_GUIDES, aiToneLabel } from "@/lib/aiToneGuide";
+import { SettingsConnectionCard } from "@/components/companion/SettingsConnectionCard";
+import {
+  buildSettingsConnectionCards,
+  connectOutlookCalendarLocal,
+  disconnectOutlookCalendarLocal,
+  isOutlookCalendarConnected,
+  type SettingsConnectionId,
+} from "@/lib/connections";
+import {
+  SOCIAL_PROFILE_FIELDS,
+  socialProfileOpenHref,
+  socialProfileUrlHint,
+  type SocialProfilePrefKey,
+} from "@/lib/socialProfileUrls";
 
 const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = sortByDropdownLabel(
   [
@@ -223,14 +237,21 @@ export function SettingsPanel({
   const visualMode = useVisualMode();
   const [pattern, setPattern] = useState<PatternAwareness>("light");
   const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
+  const [planningSavedFlash, setPlanningSavedFlash] = useState(false);
   const [plan, setPlan] = useState<Plan>("essential");
   const [advanced, setAdvanced] = useState(false);
   const [alerts, setAlerts] = useState(true);
   const [desktop, setDesktop] = useState(true);
   const [perm, setPerm] = useState<NotifPerm>("default");
-  const [fb, setFb] = useState("");
-  const [ig, setIg] = useState("");
-  const [li, setLi] = useState("");
+  const [socialUrls, setSocialUrls] = useState<
+    Record<SocialProfilePrefKey, string>
+  >({
+    facebookUrl: "",
+    instagramUrl: "",
+    linkedinUrl: "",
+    tiktokUrl: "",
+    pinterestUrl: "",
+  });
   const [interfaceLanguage, setInterfaceLanguage] = useState<LanguageCode>("en");
   const [responseLanguage, setResponseLanguage] = useState<LanguageCode>("en");
   const [contentLanguage, setContentLanguage] = useState<LanguageCode>("en");
@@ -242,6 +263,9 @@ export function SettingsPanel({
     connected: boolean;
     email: string | null;
   }>({ configured: false, connected: false, email: null });
+  const [outlookConnected, setOutlookConnected] = useState(false);
+  const [managingConnectionId, setManagingConnectionId] =
+    useState<SettingsConnectionId | null>(null);
   const [celebrationMode, setCelebrationMode] =
     useState<CelebrationMode>("full");
   const [birthdayMonth, setBirthdayMonth] = useState<number | "">("");
@@ -255,8 +279,19 @@ export function SettingsPanel({
       .then((d) => setG(d))
       .catch(() => {});
   }
+  function refreshOutlook() {
+    setOutlookConnected(isOutlookCalendarConnected());
+  }
   useEffect(() => {
     refreshGoogle();
+    refreshOutlook();
+    const syncOutlook = () => refreshOutlook();
+    window.addEventListener("companion-outlook-calendar-updated", syncOutlook);
+    return () =>
+      window.removeEventListener(
+        "companion-outlook-calendar-updated",
+        syncOutlook,
+      );
   }, []);
 
   useEffect(() => {
@@ -270,9 +305,13 @@ export function SettingsPanel({
     setAdvanced(p.advancedAiTools);
     setAlerts(p.timeBlockAlerts);
     setDesktop(p.desktopNotifications);
-    setFb(p.facebookUrl);
-    setIg(p.instagramUrl);
-    setLi(p.linkedinUrl);
+    setSocialUrls({
+      facebookUrl: p.facebookUrl ?? "",
+      instagramUrl: p.instagramUrl ?? "",
+      linkedinUrl: p.linkedinUrl ?? "",
+      tiktokUrl: p.tiktokUrl ?? "",
+      pinterestUrl: p.pinterestUrl ?? "",
+    });
     setInterfaceLanguage(p.interfaceLanguage);
     setResponseLanguage(p.responseLanguage);
     setContentLanguage(p.contentLanguage);
@@ -362,10 +401,10 @@ export function SettingsPanel({
     {
       id: "connections",
       label: "Connections",
-      value:
-        [fb, ig, li].filter(Boolean).length > 0
-          ? `${[fb, ig, li].filter(Boolean).length} linked`
-          : "Not set",
+      value: (() => {
+        const linked = Object.values(socialUrls).filter((v) => v.trim()).length;
+        return linked > 0 ? `${linked} linked` : "Not set";
+      })(),
     },
     {
       id: "account",
@@ -416,15 +455,15 @@ export function SettingsPanel({
       <button
         type="button"
         onClick={() => setOpen(null)}
-        className="self-start text-sm font-semibold text-[#1e4f4f]"
+        className="settings-panel__back self-start text-sm font-semibold"
       >
         ‹ Settings
       </button>
-      <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{title}</p>
+      <p className="settings-panel__title mt-2 text-2xl font-semibold">{title}</p>
     </>
   );
 
-  const wrap = `${workspacePanelShellClass({ width: "standard" })} companion-fade-in mx-auto flex h-full max-w-xl flex-col`;
+  const wrap = `${workspacePanelShellClass({ width: "standard" })} settings-panel companion-fade-in mx-auto flex h-full max-w-xl flex-col`;
   const selectCls =
     "mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 
@@ -497,7 +536,7 @@ export function SettingsPanel({
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className={MENU_LIST_LABEL}>
-                    {tone.emoji} {tone.label}
+                    {tone.label}
                   </span>
                   {active ? <span className="text-[#1e4f4f]">✓</span> : null}
                 </span>
@@ -668,8 +707,20 @@ export function SettingsPanel({
           onPick={(v) => {
             setPlanningView(v);
             setDefaultPlanningView(v);
+            setPlanningSavedFlash(true);
+            window.setTimeout(() => setPlanningSavedFlash(false), 2200);
           }}
         />
+        {planningSavedFlash ? (
+          <p
+            className="mt-3 text-center text-sm font-semibold text-[#1e4f4f]"
+            role="status"
+            aria-live="polite"
+            data-testid="planning-view-saved"
+          >
+            Saved — Plan My Day will use {planningViewLabel(planningView)}.
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -1089,181 +1140,130 @@ export function SettingsPanel({
           </button>
 
           <RemindersPanel />
+          <p className="mt-3 text-sm text-[#6b635a]">
+            Quiet hours, day adjustments, and rhythm profiles live under Plan My Day → Rhythms → Settings.
+          </p>
         </div>
       </div>
     );
   }
   if (open === "connections") {
-    const field = (
-      id: string,
-      lbl: string,
-      val: string,
-      set: (v: string) => void,
-      save: (v: string) => void,
-      ph: string,
-    ) => (
-      <div>
-        <label className={LABEL} htmlFor={id}>
-          {lbl}
-        </label>
-        <input
-          id={id}
-          value={val}
-          onChange={(e) => {
-            set(e.target.value);
-            save(e.target.value);
-          }}
-          placeholder={ph}
-          className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        />
-      </div>
-    );
+    const connectionCards = buildSettingsConnectionCards({
+      google: g,
+      outlookConnected,
+      googleAuthHref: "/api/google/auth?returnTo=/companion?settings=connections",
+    });
+
     return (
-      <div className={wrap}>
+      <div className={wrap} data-testid="settings-connections">
         {header("Connections")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Connect your Google account to save work directly to Docs, Sheets,
-          Forms, and Drive. Add social links so export buttons open the right
-          place.
+          Connect the calendars and Google services Spark uses today — and
+          prepare Outlook Calendar for when you&apos;re ready.
         </p>
 
-        {/* Google account */}
-        <div className="mt-4 rounded-xl border border-[#d4cdc3] bg-white/85 p-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-lg" aria-hidden="true">
-              {g.connected ? "🟢" : "🔴"}
-            </span>
-            <p className="text-base font-semibold text-[#1f1c19]">
-              {g.connected ? "Google Connected" : "Google Not Connected"}
-            </p>
-          </div>
-
-          {!g.configured ? (
-            <>
-              <p className="mt-3 text-sm leading-relaxed text-[#6b635a]">
-                Saving directly to Google isn&apos;t turned on for this site
-                yet. Your work is always saved here in the app.
-              </p>
-              <p className="mt-2 text-sm text-[#6b635a]">
-                You can still copy your work and paste it into Google Docs,
-                Sheets, or Forms manually, or download and print from any export
-                menu.
-              </p>
-              <p className="mt-3 text-sm text-[#6b635a]">
-                Need Google saving enabled?{" "}
-                <a
-                  href="mailto:info@visualsparkstudios.com"
-                  className="font-semibold text-[#1e4f4f] hover:underline"
+        <div className="mt-4 flex flex-col gap-3">
+          {connectionCards.map((card) => (
+            <div key={card.id}>
+              <SettingsConnectionCard
+                card={card}
+                onConnectOutlook={() => {
+                  connectOutlookCalendarLocal();
+                  refreshOutlook();
+                  setManagingConnectionId(null);
+                }}
+                onManageGoogle={() =>
+                  setManagingConnectionId((current) =>
+                    current === card.id ? null : card.id,
+                  )
+                }
+                onManageOutlook={() =>
+                  setManagingConnectionId((current) =>
+                    current === card.id ? null : card.id,
+                  )
+                }
+              />
+              {managingConnectionId === card.id && card.status === "connected" ? (
+                <div
+                  className="mt-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-4 py-3"
+                  data-testid={`settings-connection-manage-panel-${card.id}`}
                 >
-                  Contact support
-                </a>
-                .
-              </p>
-            </>
-          ) : g.connected ? (
-            <>
-              <p className="mt-2 text-sm text-[#6b635a]">
-                Connected as:{" "}
-                <span className="font-semibold text-[#1e4f4f]">
-                  {g.email ?? "your Google account"}
-                </span>
-              </p>
-              <p className="mt-2 text-sm text-[#6b635a]">
-                Files can now be saved directly to your Google Drive.
-              </p>
-              <ul className="mt-3 space-y-1 text-sm text-[#2d2926]">
-                <li>✓ Google Docs</li>
-                <li>✓ Google Sheets</li>
-                <li>✓ Google Forms</li>
-                <li>✓ Google Drive</li>
-              </ul>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <a
-                  href="/api/google/auth"
-                  className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-                >
-                  Reconnect
-                </a>
-                <button
-                  type="button"
-                  onClick={() =>
-                    fetch("/api/google/disconnect", { method: "POST" })
-                      .then(() => refreshGoogle())
-                      .catch(() => {})
-                  }
-                  className="rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
-                >
-                  Disconnect
-                </button>
-              </div>
-            </>
-          ) : (
-            <>
-              <p className="mt-3 text-sm leading-relaxed text-[#6b635a]">
-                Connect your Google account to save work directly to Google Docs,
-                Sheets, Forms, and Drive.
-              </p>
-              <p className="mt-2 text-sm text-[#6b635a]">
-                When connected, anything you choose to save can be created
-                automatically in your Google Drive.
-              </p>
-              <a
-                href="/api/google/auth"
-                className="mt-4 inline-block rounded-lg bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-              >
-                Connect Google
-              </a>
-              <details className="mt-4 rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2">
-                <summary className="cursor-pointer text-sm font-semibold text-[#1e4f4f]">
-                  How it works
-                </summary>
-                <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#4b463f]">
-                  <li>Click Connect Google</li>
-                  <li>Choose your Google account</li>
-                  <li>Click Allow</li>
-                  <li>Return to the ADHD Business Ecosystem</li>
-                </ol>
-                <p className="mt-2 text-sm text-[#6b635a]">That&apos;s it.</p>
-                <p className="mt-3 text-sm text-[#6b635a]">
-                  If Google shows an &ldquo;unverified app&rdquo; notice, tap{" "}
-                  <span className="font-semibold">Advanced</span> →{" "}
-                  <span className="font-semibold">Continue</span>. We only
-                  access files this app creates for you.
-                </p>
-              </details>
-              <p className="mt-3 text-sm text-[#9a8f82]">
-                Until you connect: use <span className="font-semibold">Copy</span>{" "}
-                on any draft, then paste into Google manually. Your work stays
-                safe here.
-              </p>
-            </>
-          )}
-
-          <div className="mt-4 border-t border-[#e7dfd4] pt-3">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-              Shortcuts — open Google in your browser
-            </p>
-            <p className="mt-1 text-xs text-[#9a8f82]">
-              These open Google; they don&apos;t save from here.
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {[
-                { label: "📅 Calendar", url: "https://calendar.google.com" },
-                { label: "📝 Docs", url: "https://docs.google.com" },
-                { label: "📊 Sheets", url: "https://sheets.google.com" },
-                { label: "📁 Drive", url: "https://drive.google.com" },
-              ].map((link) => (
-                <a
-                  key={link.label}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded-lg border border-[#1e4f4f]/30 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-                >
-                  {link.label}
-                </a>
-              ))}
+                  {card.kind === "google" ? (
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href="/api/google/auth?returnTo=/companion?settings=connections"
+                        className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+                      >
+                        Reconnect
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          fetch("/api/google/disconnect", { method: "POST" })
+                            .then(() => {
+                              refreshGoogle();
+                              setManagingConnectionId(null);
+                            })
+                            .catch(() => {})
+                        }
+                        className="rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-sm text-[#6b635a]">
+                        Outlook Calendar is prepared in Spark. Microsoft Graph
+                        sync will plug into this same connection when it&apos;s
+                        ready — no second calendar system.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          disconnectOutlookCalendarLocal();
+                          refreshOutlook();
+                          setManagingConnectionId(null);
+                        }}
+                        className="self-start rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </div>
+          ))}
+        </div>
+
+        <div className="mt-4 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/70 px-4 py-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+            Shortcuts — open in your browser
+          </p>
+          <p className="mt-1 text-xs text-[#9a8f82]">
+            These open the service; they don&apos;t change your Spark connection.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {[
+              { label: "Calendar", url: "https://calendar.google.com" },
+              { label: "Docs", url: "https://docs.google.com" },
+              { label: "Drive", url: "https://drive.google.com" },
+              {
+                label: "Outlook Calendar",
+                url: "https://outlook.office.com/calendar/",
+              },
+            ].map((link) => (
+              <a
+                key={link.label}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border border-[#1e4f4f]/30 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
         </div>
 
@@ -1271,30 +1271,70 @@ export function SettingsPanel({
           Social profile links
         </p>
         <div className="mt-2 flex flex-col gap-4">
-          {field(
-            "conn-fb",
-            "Facebook URL",
-            fb,
-            setFb,
-            (v) => savePrefs({ facebookUrl: v }),
-            "https://facebook.com/yourpage",
-          )}
-          {field(
-            "conn-ig",
-            "Instagram URL",
-            ig,
-            setIg,
-            (v) => savePrefs({ instagramUrl: v }),
-            "https://instagram.com/yourhandle",
-          )}
-          {field(
-            "conn-li",
-            "LinkedIn URL",
-            li,
-            setLi,
-            (v) => savePrefs({ linkedinUrl: v }),
-            "https://linkedin.com/in/you",
-          )}
+          {SOCIAL_PROFILE_FIELDS.map((platform) => {
+            const value = socialUrls[platform.prefKey] ?? "";
+            const openHref = socialProfileOpenHref(value);
+            const hint = socialProfileUrlHint(platform.id, value);
+            return (
+              <div key={platform.id} data-testid={`social-profile-${platform.id}`}>
+                <label className={LABEL} htmlFor={`conn-${platform.id}`}>
+                  {platform.label}
+                </label>
+                <input
+                  id={`conn-${platform.id}`}
+                  value={value}
+                  onChange={(e) => {
+                    const next = e.target.value;
+                    setSocialUrls((prev) => ({
+                      ...prev,
+                      [platform.prefKey]: next,
+                    }));
+                    savePrefs({ [platform.prefKey]: next });
+                  }}
+                  placeholder={platform.placeholder}
+                  className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  data-testid={`social-profile-input-${platform.id}`}
+                />
+                {hint ? (
+                  <p
+                    className="mt-1 text-xs text-[#6b635a]"
+                    data-testid={`social-profile-hint-${platform.id}`}
+                  >
+                    {hint}
+                  </p>
+                ) : null}
+                {value.trim() ? (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {openHref ? (
+                      <a
+                        href={openHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-lg border border-[#1e4f4f]/30 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+                        data-testid={`social-profile-open-${platform.id}`}
+                      >
+                        {platform.openLabel}
+                      </a>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSocialUrls((prev) => ({
+                          ...prev,
+                          [platform.prefKey]: "",
+                        }));
+                        savePrefs({ [platform.prefKey]: "" });
+                      }}
+                      className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
+                      data-testid={`social-profile-clear-${platform.id}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
         <p className="mt-4 text-sm text-[#9a8f82]">
           Social posts use copy-and-paste: the app copies your text and opens
@@ -1349,24 +1389,30 @@ export function SettingsPanel({
 
   // ---- List ---------------------------------------------------------------
   return (
-    <div className={wrap}>
-      <p className="text-2xl font-semibold text-[#1f1c19]">Settings</p>
-      <p className="mt-1 text-sm text-[#6b635a]">
+    <div className={`${wrap} settings-panel--menu`}>
+      <p className="settings-panel__heading text-2xl font-semibold">Settings</p>
+      <p className="settings-panel__subheading mt-1 text-sm">
         How the app behaves — language, appearance, notifications, and more.
       </p>
       <WorkspaceAreaWorksGuide areaId="settings" />
-      <div className="settings-menu-list mt-6">
-        {[...ROWS]
-          .sort((a, b) => compareDropdownLabels(a.label, b.label))
-          .map((r) => (
-            <EstateDropdownMenuValueRow
-              key={r.id}
-              label={r.label}
-              value={r.value}
-              testId={`settings-row-${r.id}`}
-              onClick={() => setOpen(r.id)}
-            />
-          ))}
+      <div
+        className="estate-room-experience-menu__panel estate-room-experience-menu__panel--backdrop settings-menu-panel mt-4"
+        role="menu"
+        aria-label="Settings"
+      >
+        <div className="settings-menu-list estate-room-experience-menu__panel-scroll">
+          {[...ROWS]
+            .sort((a, b) => compareDropdownLabels(a.label, b.label))
+            .map((r) => (
+              <EstateDropdownMenuValueRow
+                key={r.id}
+                label={r.label}
+                value={r.value}
+                testId={`settings-row-${r.id}`}
+                onClick={() => setOpen(r.id)}
+              />
+            ))}
+        </div>
       </div>
     </div>
   );

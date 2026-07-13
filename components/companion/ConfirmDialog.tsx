@@ -1,5 +1,7 @@
 "use client";
 
+import { useDismissibleWindow } from "@/lib/windowDismiss";
+
 type ConfirmDialogProps = {
   open: boolean;
   title: string;
@@ -11,6 +13,10 @@ type ConfirmDialogProps = {
   onCancel: () => void;
 };
 
+/**
+ * Explicit-decision dialog — outside click and Escape do not dismiss.
+ * Member must choose Confirm or Cancel.
+ */
 export function ConfirmDialog({
   open,
   title,
@@ -21,13 +27,19 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  useDismissibleWindow({
+    open,
+    onClose: onCancel,
+    requiresExplicitDecision: true,
+  });
+
   if (!open) return null;
 
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
       role="presentation"
-      onClick={onCancel}
+      data-testid="confirm-dialog"
     >
       <div
         role="dialog"

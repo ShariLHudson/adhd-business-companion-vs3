@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PRESENCE_LINES, type EmotionalState } from "@/lib/companionEmotions";
 import { BRAND } from "@/lib/companionUi";
 import type { AppSection } from "@/lib/companionUi";
@@ -10,6 +10,8 @@ import { useVisualMode } from "@/lib/useVisualMode";
 import { getMemberSinceIso } from "@/lib/shariMemberSince";
 import { useCompanionPresence } from "@/lib/useCompanionPresence";
 import { ShariPortrait } from "@/components/companion/ShariPortrait";
+import { ShariPresenceFlame } from "@/components/companion/ShariPresenceFlame";
+import { resolveShariPresenceState } from "@/lib/shariPresenceFlame";
 import { identityBarShowsThinkingCopy } from "@/lib/visibleThinking/chatThinkingUi";
 
 const RING: Record<EmotionalState, string> = {
@@ -45,6 +47,16 @@ type IdentityBarProps = {
   isThinking?: boolean;
   /** Visible Thinking message — overrides presence default while loading. */
   thinkingMessage?: string | null;
+  /** Microphone / voice transcription active */
+  isListening?: boolean;
+  /** Companion voice output playing */
+  isSpeaking?: boolean;
+  /** Text beginning to appear */
+  isResponding?: boolean;
+  /** Soft settle after a turn */
+  isWaiting?: boolean;
+  /** Assistant unavailable */
+  isOffline?: boolean;
 };
 
 export function IdentityBar({
@@ -68,6 +80,11 @@ export function IdentityBar({
   workspaceActiveBeside = false,
   isThinking = false,
   thinkingMessage = null,
+  isListening = false,
+  isSpeaking = false,
+  isResponding = false,
+  isWaiting = false,
+  isOffline = false,
 }: IdentityBarProps) {
   const effectiveWelcome = calmHome ? null : welcomeLine;
   const effectivePrimary =
@@ -94,10 +111,26 @@ export function IdentityBar({
         : RING[emotion] ?? "#d4a574";
 
   const [memberSince, setMemberSince] = useState<string | null>(null);
+  const [softWaiting, setSoftWaiting] = useState(false);
+  const wasThinkingRef = useRef(false);
 
   useEffect(() => {
     setMemberSince(getMemberSinceIso());
   }, []);
+
+  useEffect(() => {
+    if (isThinking) {
+      wasThinkingRef.current = true;
+      setSoftWaiting(false);
+      return;
+    }
+    if (wasThinkingRef.current) {
+      wasThinkingRef.current = false;
+      setSoftWaiting(true);
+      const t = window.setTimeout(() => setSoftWaiting(false), 1400);
+      return () => window.clearTimeout(t);
+    }
+  }, [isThinking]);
 
   const presence = useCompanionPresence({
     compact,
@@ -113,6 +146,15 @@ export function IdentityBar({
     workspaceActiveBeside,
     isThinking,
     thinkingMessage: thinkingMessage ?? undefined,
+  });
+
+  const presenceState = resolveShariPresenceState({
+    isOffline,
+    isThinking,
+    isSpeaking,
+    isListening,
+    isResponding,
+    isWaiting: isWaiting || softWaiting,
   });
 
   if (photoError) {
@@ -180,6 +222,11 @@ export function IdentityBar({
               ? presence.thinkingMessage
               : status}
           </p>
+          <ShariPresenceFlame
+            state={presenceState}
+            size="sm"
+            audioWarmth={isSpeaking}
+          />
         </div>
       </header>
     );
@@ -220,6 +267,13 @@ export function IdentityBar({
                 ? presence.thinkingMessage
                 : status}
             </p>
+            <div className="mt-2 flex justify-center">
+              <ShariPresenceFlame
+                state={presenceState}
+                size="md"
+                audioWarmth={isSpeaking}
+              />
+            </div>
             {effectiveWelcome && onDismissWelcome ? (
               <button
                 type="button"

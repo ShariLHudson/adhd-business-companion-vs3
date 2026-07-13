@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getDayState } from "@/lib/companionStore";
 import {
   addQuickPlanItem,
   bringParkingLotItemToToday,
   durationLabel,
   formatPlanTime,
+  hasMeaningfulPlanItemsForToday,
+  isMeaningfulPlanItem,
   isPlanItemActive,
   loadTodayPlanItems,
   readTodayPlanItems,
@@ -70,6 +72,29 @@ import {
   PlanDayItemDetail,
   type PlanItemDetailMode,
 } from "@/components/companion/PlanDayItemDetail";
+import { PlanMyDayPlanningNav } from "@/components/companion/PlanMyDayPlanningNav";
+import { PlanMyDayRhythmsArea } from "@/components/companion/PlanMyDayRhythmsArea";
+import { PlanMyDayCalendarArea } from "@/components/companion/PlanMyDayCalendarArea";
+import { PlanMyDayUpcomingArea } from "@/components/companion/PlanMyDayUpcomingArea";
+import { PlanMyDayParkingLotArea } from "@/components/companion/PlanMyDayParkingLotArea";
+import { PlanMyDayHistoryArea } from "@/components/companion/PlanMyDayHistoryArea";
+import { PlanDayPreviousDayPrompt } from "@/components/companion/PlanDayPreviousDayPrompt";
+import { PlanDayPreviousDayReview } from "@/components/companion/PlanDayPreviousDayReview";
+import {
+  isPlanningCenterArea,
+  type PlanningCenterArea,
+} from "@/lib/planMyDay/planningCenter";
+import {
+  beginPreviousDayReview,
+  clearPreviousDayReviewSession,
+  findHeldPreviousDayUnfinished,
+  getPlanCompletionsForDate,
+  getReviewablePreviousDayItems,
+  leavePreviousDayItemsThere,
+  previousDayPromptCopy,
+  readPreviousDayPromptState,
+  shouldShowPreviousDayPrompt,
+} from "@/lib/planMyDay";
 import {
   dismissPlanRealityPrompt,
   evaluatePlanRealityMismatch,
@@ -79,6 +104,22 @@ import { useCategoryColorCoding } from "@/lib/useCategoryColorCoding";
 import { publishRealitySignal } from "@/lib/companionJudgmentClient";
 import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 const PLAN_KANBAN_BOARD_CLASS = "mx-auto w-full min-w-0 max-w-6xl";
+const PLANNING_AREA_STORAGE_KEY = "companion-plan-my-day-planning-area-v1";
+
+function readInitialPlanningArea(): PlanningCenterArea {
+  if (typeof window === "undefined") return "today";
+  try {
+    const fromQuery = new URLSearchParams(window.location.search).get(
+      "planningArea",
+    );
+    if (fromQuery && isPlanningCenterArea(fromQuery)) return fromQuery;
+    const stored = localStorage.getItem(PLANNING_AREA_STORAGE_KEY);
+    if (stored && isPlanningCenterArea(stored)) return stored;
+  } catch {
+    /* ignore */
+  }
+  return "today";
+}
 
 const VIEW_SELECT =
   "min-w-[10rem] rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
@@ -218,6 +259,8 @@ export function PlanMyDayPanel({
   onOpenAdaptMyDay,
   registerBack,
   initialOpenItemId,
+  initialPlanningArea,
+  initialRhythmsTab,
   standalone = false,
 }: {
   onBack?: () => void;
@@ -230,6 +273,10 @@ export function PlanMyDayPanel({
   onOpenAdaptMyDay?: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
   initialOpenItemId?: string | null;
+  /** When set (e.g. Room menu → Rhythms), open that Planning Center area. */
+  initialPlanningArea?: PlanningCenterArea | null;
+  /** When opening Rhythms, optionally land on Reminders (or another tab). */
+  initialRhythmsTab?: "today" | "all" | "reminders" | null;
   standalone?: boolean;
 }) {
   const companion = usePlanDayCompanionCycle();
@@ -247,15 +294,25 @@ export function PlanMyDayPanel({
   const [kanbanToast, setKanbanToast] = useState<string | null>(null);
   const [realityPrompt, setRealityPrompt] =
     useState<RealityMismatchPrompt | null>(null);
-  const [livingUnlocked, setLivingUnlocked] = useState(
-    () =>
+  const [livingUnlocked, setLivingUnlocked] = useState(() => {
+    const hasPlan = hasMeaningfulPlanItemsForToday();
+    return (
+      hasPlan ||
       initialSession.phase === "living" ||
-      shouldSkipOrientation(initialSession.phase, initialOpenItemId),
-  );
+      shouldSkipOrientation(
+        initialSession.phase,
+        initialOpenItemId,
+        hasPlan,
+      )
+    );
+  });
   const [flexibleMode, setFlexibleMode] = useState(
-    () => initialSession.phase === "flexible",
+    () =>
+      initialSession.phase === "flexible" &&
+      !hasMeaningfulPlanItemsForToday(),
   );
   const [readyLine, setReadyLine] = useState(false);
+  /** Today's Plan: add form stays collapsed until "Add another item". */
   const [showAddForm, setShowAddForm] = useState(false);
   const [confirmedToday, setConfirmedToday] = useState(false);
   const [editingReality, setEditingReality] = useState(false);
@@ -269,11 +326,72 @@ export function PlanMyDayPanel({
     useState<SmartLifeAreaSuggestion | null>(null);
   const [showPlanAdjustment, setShowPlanAdjustment] = useState(false);
   const [planAdjustToast, setPlanAdjustToast] = useState<string | null>(null);
+  const [planningArea, setPlanningArea] = useState<PlanningCenterArea>(() =>
+    initialPlanningArea && isPlanningCenterArea(initialPlanningArea)
+      ? initialPlanningArea
+      : readInitialPlanningArea(),
+  );
+  const [previousDayPrompt, setPreviousDayPrompt] = useState<{
+    sourceDate: string;
+    count: number;
+  } | null>(null);
+  const [reviewingPreviousDay, setReviewingPreviousDay] = useState<
+    string | null
+  >(null);
+  const [previousReviewRevision, setPreviousReviewRevision] = useState(0);
+  const [completionRevision, setCompletionRevision] = useState(0);
   const lastJudgmentRevision = useRef(0);
 
+  function handlePlanningAreaChange(area: PlanningCenterArea) {
+    setPlanningArea(area);
+    try {
+      localStorage.setItem(PLANNING_AREA_STORAGE_KEY, area);
+    } catch {
+      /* ignore */
+    }
+    if (area !== "today") {
+      setOpenItemId(null);
+      setEditingReality(false);
+      setFlexibleMode(false);
+      setShowAddForm(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!initialPlanningArea || !isPlanningCenterArea(initialPlanningArea)) {
+      return;
+    }
+    setPlanningArea(initialPlanningArea);
+    try {
+      localStorage.setItem(PLANNING_AREA_STORAGE_KEY, initialPlanningArea);
+    } catch {
+      /* ignore */
+    }
+    if (initialPlanningArea !== "today") {
+      setOpenItemId(null);
+      setEditingReality(false);
+      setFlexibleMode(false);
+      setShowAddForm(false);
+    }
+  }, [initialPlanningArea]);
+
   const atmosphereClass = dayModeAtmosphereClass(companion.orientation.dayMode);
+  const hasMeaningfulToday = items.some(isMeaningfulPlanItem);
+  /** State A — Start My Day: no meaningful saved items for local today. */
   const showOrientation =
-    !livingUnlocked && !flexibleMode && !openItemId && !editingReality;
+    planningArea === "today" &&
+    !livingUnlocked &&
+    !flexibleMode &&
+    !openItemId &&
+    !editingReality &&
+    !hasMeaningfulToday;
+  /** State B — Today's Plan: saved items (or session already living today). */
+  const showingTodaysPlan =
+    planningArea === "today" &&
+    livingUnlocked &&
+    !flexibleMode &&
+    !openItemId &&
+    !editingReality;
   const flexibleContext = gatherFlexiblePlanningContext(
     items,
     companion.cycle.judgment,
@@ -284,6 +402,7 @@ export function PlanMyDayPanel({
   );
   const session = readPlanDaySession(companion.dayKey);
   const showSuggestionsReminder =
+    planningArea === "today" &&
     livingUnlocked &&
     !flexibleMode &&
     !openItemId &&
@@ -292,9 +411,10 @@ export function PlanMyDayPanel({
     flexibleContext.suggestionCount > 0;
   const chapter = resolvePlanDayChapter({
     orienting: showOrientation,
-    flexiblePlanning: flexibleMode && !openItemId && !editingReality,
-    editingReality,
-    openItemId,
+    flexiblePlanning:
+      planningArea === "today" && flexibleMode && !openItemId && !editingReality,
+    editingReality: planningArea === "today" && editingReality,
+    openItemId: planningArea === "today" ? openItemId : null,
     detailMode,
   });
   const livingPartition = partitionLivingBoard(
@@ -303,17 +423,57 @@ export function PlanMyDayPanel({
   );
   const boardSubtitle = livingBoardSubtitle(
     companion.cycle.judgment,
-    confirmedToday || companion.sessionPhase === "living",
+    confirmedToday || companion.sessionPhase === "living" || hasMeaningfulToday,
   );
+  const completedToday = useMemo(() => {
+    void completionRevision;
+    return getPlanCompletionsForDate().map((r) => ({
+      id: r.id,
+      title: r.taskName,
+    }));
+  }, [completionRevision, items]);
+  const previousReviewItems = useMemo(() => {
+    void previousReviewRevision;
+    if (!reviewingPreviousDay) return [];
+    return getReviewablePreviousDayItems(reviewingPreviousDay);
+  }, [reviewingPreviousDay, previousReviewRevision]);
+
+  const showPreviousDayBanner =
+    planningArea === "today" &&
+    !reviewingPreviousDay &&
+    !openItemId &&
+    !editingReality &&
+    !flexibleMode &&
+    Boolean(previousDayPrompt);
+
+  /** Saved items for today prove the day has started — no separate setup flag. */
+  function enterTodaysPlanFromSavedItems() {
+    setFlexibleMode(false);
+    setLivingUnlocked(true);
+    setShowAddForm(false);
+    const current = readPlanDaySession(companion.dayKey);
+    if (current.phase !== "living") {
+      markPlanDayLiving(companion.dayKey, current.livingEntry ?? "flexible-build");
+    }
+  }
 
   useEffect(() => {
     if (!livingUnlocked || showOrientation || flexibleMode) {
       setShowAddForm(false);
-      return;
     }
-    const timer = window.setTimeout(() => setShowAddForm(true), 2400);
-    return () => window.clearTimeout(timer);
   }, [livingUnlocked, showOrientation, flexibleMode]);
+
+  /** Settings → Planning (and in-room last-used) keep this panel in sync. */
+  useEffect(() => {
+    const syncView = () => {
+      const next = resolveInitialPlanningView(
+        getDayState()?.energy ?? dayEnergy,
+      );
+      setView((current) => (current === next ? current : next));
+    };
+    window.addEventListener("companion-prefs-updated", syncView);
+    return () => window.removeEventListener("companion-prefs-updated", syncView);
+  }, [dayEnergy]);
 
   useEffect(() => {
     if (!livingUnlocked) return;
@@ -358,11 +518,47 @@ export function PlanMyDayPanel({
   }, [companion.sessionPhase]);
 
   useEffect(() => {
-    setItems(loadTodayPlanItems());
-    const sync = () => setItems(readTodayPlanItems());
+    const loaded = loadTodayPlanItems();
+    setItems(loaded);
+    if (loaded.some(isMeaningfulPlanItem)) {
+      enterTodaysPlanFromSavedItems();
+    }
+
+    const promptState = readPreviousDayPromptState();
+    if (promptState.reviewSourceDate) {
+      setReviewingPreviousDay(promptState.reviewSourceDate);
+      setPreviousDayPrompt(null);
+    } else if (shouldShowPreviousDayPrompt()) {
+      const held = findHeldPreviousDayUnfinished();
+      if (held) {
+        setPreviousDayPrompt({
+          sourceDate: held.date,
+          count: held.unfinished.length,
+        });
+      }
+    } else {
+      setPreviousDayPrompt(null);
+    }
+
+    const sync = () => {
+      const next = readTodayPlanItems();
+      setItems(next);
+      if (next.some(isMeaningfulPlanItem)) {
+        enterTodaysPlanFromSavedItems();
+      }
+      setCompletionRevision((n) => n + 1);
+      setPreviousReviewRevision((n) => n + 1);
+    };
     window.addEventListener(PLAN_MY_DAY_UPDATED, sync);
     return () => window.removeEventListener(PLAN_MY_DAY_UPDATED, sync);
   }, []);
+
+  /** First saved item for today → leave Start My Day for Today's Plan. */
+  useEffect(() => {
+    if (!hasMeaningfulToday) return;
+    if (livingUnlocked && !flexibleMode) return;
+    enterTodaysPlanFromSavedItems();
+  }, [hasMeaningfulToday, livingUnlocked, flexibleMode]);
 
   useEffect(() => {
     if (!livingUnlocked) return;
@@ -445,11 +641,16 @@ export function PlanMyDayPanel({
     markPlanDayLiving(companion.dayKey, livingEntry);
     setFlexibleMode(false);
     setLivingUnlocked(true);
+    setShowAddForm(!next.some(isMeaningfulPlanItem));
     setReadyLine(true);
     window.setTimeout(() => setReadyLine(false), 4000);
   }
 
   function enterFlexiblePlanning() {
+    if (hasMeaningfulPlanItemsForToday() || items.some(isMeaningfulPlanItem)) {
+      enterTodaysPlanFromSavedItems();
+      return;
+    }
     markPlanDayFlexible(companion.dayKey);
     setFlexibleMode(true);
     setLivingUnlocked(false);
@@ -465,6 +666,7 @@ export function PlanMyDayPanel({
     markPlanDayLiving(companion.dayKey, "flexible-build");
     setFlexibleMode(false);
     setLivingUnlocked(true);
+    setShowAddForm(!next.some(isMeaningfulPlanItem));
     setConfirmedToday(false);
     setReadyLine(true);
     window.setTimeout(() => setReadyLine(false), 4000);
@@ -475,9 +677,14 @@ export function PlanMyDayPanel({
   }
 
   function returnToGateway() {
+    if (hasMeaningfulPlanItemsForToday() || items.some(isMeaningfulPlanItem)) {
+      enterTodaysPlanFromSavedItems();
+      return;
+    }
     markPlanDayOrienting(companion.dayKey);
     setFlexibleMode(false);
     setLivingUnlocked(false);
+    setShowAddForm(false);
   }
 
   function handleBringParkingItem(itemId: string) {
@@ -565,11 +772,39 @@ export function PlanMyDayPanel({
     const result = finishPlanItem(items, id, { sourceWorkspace: "kanban" });
     if (!result) return;
     refresh(result.items);
+    setCompletionRevision((n) => n + 1);
     showCompletionToast(result.toast);
     if (openItemId === id) {
       setOpenItemId(null);
       setDetailMode("form");
     }
+  }
+
+  function handlePreviousDayLeave() {
+    leavePreviousDayItemsThere();
+    setPreviousDayPrompt(null);
+    setReviewingPreviousDay(null);
+  }
+
+  function handlePreviousDayReview() {
+    const sourceDate =
+      previousDayPrompt?.sourceDate ??
+      findHeldPreviousDayUnfinished()?.date ??
+      null;
+    if (!sourceDate) {
+      setPreviousDayPrompt(null);
+      return;
+    }
+    beginPreviousDayReview(sourceDate);
+    setPreviousDayPrompt(null);
+    setReviewingPreviousDay(sourceDate);
+    setPreviousReviewRevision((n) => n + 1);
+  }
+
+  function handleClosePreviousReview() {
+    clearPreviousDayReviewSession();
+    setReviewingPreviousDay(null);
+    setPreviousReviewRevision((n) => n + 1);
   }
 
   function handleKanbanDrop(id: string, column: PlanItemColumn) {
@@ -599,6 +834,7 @@ export function PlanMyDayPanel({
   function handleAdd(input: QuickPlanItemInput) {
     const next = addQuickPlanItem(input, items);
     refresh(next);
+    enterTodaysPlanFromSavedItems();
     publishRealitySignal({
       source: "plan-my-day",
       kind: "plan-items",
@@ -631,6 +867,7 @@ export function PlanMyDayPanel({
             partition={livingPartition}
             onOpen={(id) => handleOpenItem(id)}
             holdingTransparencyLine={holdingTransparency}
+            completedToday={completedToday}
           />
         ) : null}
         {view === "timeline" ? (
@@ -685,16 +922,39 @@ export function PlanMyDayPanel({
         data-plan-view={view}
         data-day-mode={companion.orientation.dayMode}
         data-experience-phase={
-          showOrientation ? "orienting" : flexibleMode ? "flexible" : "living"
+          showOrientation
+            ? "start-my-day"
+            : flexibleMode
+              ? "flexible"
+              : "todays-plan"
+        }
+        data-daily-state={
+          showOrientation || (!livingUnlocked && !hasMeaningfulToday)
+            ? "start-my-day"
+            : "todays-plan"
         }
       >
-      {showOrientation && standalone ? (
-        <PlanMyDayMorningConversation
-          judgment={companion.cycle.judgment}
-          onPrevious={handleNavBack}
-          onConfirm={() => unlockLiving(true, "confirmed")}
-          onNotRightNow={enterFlexiblePlanning}
-        />
+      {showOrientation && standalone && !reviewingPreviousDay ? (
+        <>
+          {showPreviousDayBanner && previousDayPrompt ? (
+            <div className="mx-auto w-full max-w-xl px-4 pt-4">
+              <PlanDayPreviousDayPrompt
+                {...previousDayPromptCopy(previousDayPrompt.count)}
+                onReview={handlePreviousDayReview}
+                onLeave={handlePreviousDayLeave}
+              />
+            </div>
+          ) : null}
+          <PlanMyDayMorningConversation
+            judgment={companion.cycle.judgment}
+            onPrevious={handleNavBack}
+            onConfirm={() => unlockLiving(true, "confirmed")}
+            onNotRightNow={enterFlexiblePlanning}
+          />
+          <div className="mx-auto w-full max-w-xl px-4 pb-10">
+            <PlanDayAddForm onAdd={handleAdd} />
+          </div>
+        </>
       ) : (
       <PlanDayJourneyShell
         chapter={chapter}
@@ -704,19 +964,83 @@ export function PlanMyDayPanel({
         hideHelp={showOrientation || flexibleMode || standalone}
         morningRoom={standalone}
         headerActions={
-          !showOrientation && !flexibleMode && !openItem && !editingReality ? (
+          planningArea === "today" &&
+          !showOrientation &&
+          !flexibleMode &&
+          !openItem &&
+          !editingReality ? (
             <ViewDropdown active={view} onChange={handleViewChange} />
           ) : undefined
         }
       >
-        {showOrientation ? (
-          <div className="flex flex-1 flex-col justify-center py-6 plan-day-journey-chapter-enter">
+        {!showOrientation ? (
+          <PlanMyDayPlanningNav
+            active={planningArea}
+            onChange={handlePlanningAreaChange}
+          />
+        ) : null}
+
+        {planningArea === "rhythms" ? (
+          <div className="plan-day-journey-chapter-enter">
+            <PlanMyDayRhythmsArea initialTab={initialRhythmsTab ?? undefined} />
+          </div>
+        ) : planningArea === "calendar" ? (
+          <div className="plan-day-journey-chapter-enter">
+            <PlanMyDayCalendarArea />
+          </div>
+        ) : planningArea === "upcoming" ? (
+          <div className="plan-day-journey-chapter-enter">
+            <PlanMyDayUpcomingArea
+              onBroughtToToday={refresh}
+              onGoToToday={() => handlePlanningAreaChange("today")}
+            />
+          </div>
+        ) : planningArea === "parking-lot" ? (
+          <div className="plan-day-journey-chapter-enter">
+            <PlanMyDayParkingLotArea
+              onBroughtToToday={refresh}
+              onGoToToday={() => handlePlanningAreaChange("today")}
+            />
+          </div>
+        ) : planningArea === "history" ? (
+          <div className="plan-day-journey-chapter-enter">
+            <PlanMyDayHistoryArea
+              onTodayItemsChange={(next) => {
+                refresh(next);
+                enterTodaysPlanFromSavedItems();
+              }}
+              onGoToToday={() => handlePlanningAreaChange("today")}
+            />
+          </div>
+        ) : reviewingPreviousDay ? (
+          <div className="mt-4 plan-day-journey-chapter-enter">
+            <PlanDayPreviousDayReview
+              sourceDate={reviewingPreviousDay}
+              items={previousReviewItems}
+              onItemsChange={() => setPreviousReviewRevision((n) => n + 1)}
+              onTodayItemsChange={(next) => {
+                refresh(next);
+                enterTodaysPlanFromSavedItems();
+              }}
+              onClose={handleClosePreviousReview}
+            />
+          </div>
+        ) : showOrientation ? (
+          <div className="flex flex-1 flex-col justify-center gap-6 py-6 plan-day-journey-chapter-enter">
+            {showPreviousDayBanner && previousDayPrompt ? (
+              <PlanDayPreviousDayPrompt
+                {...previousDayPromptCopy(previousDayPrompt.count)}
+                onReview={handlePreviousDayReview}
+                onLeave={handlePreviousDayLeave}
+              />
+            ) : null}
             <PlanDayOrientationSurface
               presentation={companion.orientation}
               onPrevious={handleNavBack}
               onConfirm={() => unlockLiving(true, "confirmed")}
               onOpenAdaptMyDay={openTodaysReality}
             />
+            <PlanDayAddForm onAdd={handleAdd} />
           </div>
         ) : flexibleMode && !editingReality && !openItem ? (
           <div className="flex flex-1 flex-col justify-center py-6 plan-day-journey-chapter-enter">
@@ -759,6 +1083,13 @@ export function PlanMyDayPanel({
               className="mt-4 flex flex-col gap-4 plan-day-journey-chapter-enter"
               style={{ animationDelay: "120ms" }}
             >
+              {showPreviousDayBanner && previousDayPrompt ? (
+                <PlanDayPreviousDayPrompt
+                  {...previousDayPromptCopy(previousDayPrompt.count)}
+                  onReview={handlePreviousDayReview}
+                  onLeave={handlePreviousDayLeave}
+                />
+              ) : null}
               {realityPrompt ? (
                 <div
                   className="rounded-xl border border-[#c9bfb0] bg-[#faf7f2] p-4"
@@ -835,15 +1166,6 @@ export function PlanMyDayPanel({
                   onDismiss={() => setSmartLifeAreaSuggestion(null)}
                 />
               ) : null}
-              {showAddForm ? (
-                <div className="plan-day-living-enter plan-day-add-form--delayed">
-                  <p className="mb-3 text-base leading-relaxed text-[#6b635a]">
-                    Unlike Clear My Mind, enter one task at a time so I can place
-                    each one where it belongs.
-                  </p>
-                  <PlanDayAddForm onAdd={handleAdd} />
-                </div>
-              ) : null}
               {view !== "kanban" ? renderTaskView() : null}
             </div>
             {view === "kanban" ? (
@@ -852,6 +1174,58 @@ export function PlanMyDayPanel({
                 style={{ animationDelay: "220ms" }}
               >
                 {renderTaskView()}
+                {completedToday.length > 0 ? (
+                  <div
+                    className="mt-6"
+                    data-testid="plan-day-completed-today-kanban"
+                  >
+                    <p className="text-lg font-semibold text-[#1f1c19]">
+                      Completed Today
+                    </p>
+                    <ul className="mt-3 flex flex-col gap-2">
+                      {completedToday.map((row) => (
+                        <li
+                          key={row.id}
+                          className="rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/70 px-4 py-3 text-base text-[#4b463f]"
+                        >
+                          {row.title}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+            {showingTodaysPlan ? (
+              <div className="mt-4 flex flex-col gap-3">
+                {showAddForm ? (
+                  <div
+                    className="plan-day-living-enter"
+                    data-testid="plan-day-add-another-form"
+                  >
+                    <PlanDayAddForm onAdd={handleAdd} />
+                    {hasMeaningfulToday ? (
+                      <button
+                        type="button"
+                        onClick={() => setShowAddForm(false)}
+                        className="mt-2 self-start text-sm font-semibold text-[#6b635a] hover:underline"
+                      >
+                        Close
+                      </button>
+                    ) : null}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowAddForm(true)}
+                    className="self-start rounded-xl border border-[#c9bfb0] bg-white px-4 py-2.5 text-base font-semibold text-[#1e4f4f] hover:bg-[#f5f0ea]"
+                    data-testid="plan-day-add-another-item"
+                  >
+                    {hasMeaningfulToday
+                      ? "Add another item"
+                      : "Add something for today"}
+                  </button>
+                )}
               </div>
             ) : null}
             {onOpenSettings ? (

@@ -5,6 +5,7 @@
 import { isRegistryArtifactExecution } from "@/lib/artifactRegistry";
 import { resolveImmediateCreateAction } from "@/lib/createExperience/createExperienceRouting";
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
+import { isEmailAutomationOrInboxHelpRequest } from "@/lib/estate/emailAutomationHelp";
 import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
 import { shouldOfferVisualThinkingRecommendation } from "@/lib/visualThinkingOverreach";
 import {
@@ -28,6 +29,15 @@ import {
   guidedCreationHint,
 } from "./phases";
 import { formatPostDraftReviewPrompt } from "./guidedCreationFlow";
+import {
+  advanceGuidedCreationFlow,
+  isGuidedCreationAssistantContext,
+  isPostDiscoveryCreationPhase,
+} from "./guidedCreationFlow";
+import {
+  EXPLICIT_EMAIL_START_OVER_RE,
+  hasUsableApprovedEmailDraft,
+} from "./emailWorkflowCompletion";
 import {
   formatShariCreationIntro,
   formatShariCreationQuestion,
@@ -69,6 +79,7 @@ export function detectUniversalDocumentType(
 ): UniversalDocumentType | null {
   const t = userText.trim();
   if (!t) return null;
+  if (isEmailAutomationOrInboxHelpRequest(t)) return null;
   for (const plugin of UNIVERSAL_DOCUMENT_PLUGINS) {
     if (plugin.id === "document") continue;
     if (plugin.detectPatterns.some((re) => re.test(t))) return plugin.id;
@@ -85,6 +96,7 @@ export function detectUniversalDocumentType(
 export function shouldEnterUniversalCreation(userText: string): boolean {
   const t = userText.trim();
   if (!t || EXPLICIT_ROOM_NAV_RE.test(t)) return false;
+  if (isEmailAutomationOrInboxHelpRequest(t)) return false;
   if (isProjectCreationIntent(t)) return false;
   if (isGoogleSheetWorthyRequest(t)) return false;
   if (shouldOfferVisualThinkingRecommendation(t) && !isSimpleCreateRequest(t)) {
@@ -382,6 +394,25 @@ export function formatUniversalCreationTurnReply(
     return formatUniversalCreationQuestion(turn);
   }
   if (turn.kind === "draft") {
+    const isApprovedEmail =
+      turn.session.documentType === "email" &&
+      (turn.session.phase === "awaiting_action" ||
+        Boolean(turn.session.approvedDraft));
+    if (isApprovedEmail) {
+      return [
+        turn.message,
+        "",
+        turn.draftBody,
+        "",
+        "Your email is ready. What would you like to do?",
+        "",
+        "1. Copy Email",
+        "2. Create Gmail Draft",
+        "3. Send Email",
+        "4. Make Changes",
+        "5. Save for Later",
+      ].join("\n");
+    }
     return `${turn.message}\n\n${turn.draftBody}${formatPostDraftReviewPrompt()}`;
   }
   if (
@@ -412,25 +443,109 @@ export function resolveUniversalCreationTurn(
   if (!t) return null;
 
   const storedSession = loadUniversalCreationSession();
+
+  // Active post-discovery / approved artifact — never restart intake on "write".
+  if (
+    storedSession &&
+    isPostDiscoveryCreationPhase(storedSession.phase) &&
+    !EXPLICIT_EMAIL_START_OVER_RE.test(t)
+  ) {
+    const guided = advanceGuidedCreationFlow(
+      storedSession,
+      t,
+      lastAssistantText,
+    );
+    if (guided) return guided;
+
+    // Keep session alive: create-intent phrases with an approved draft show it.
+    if (
+      hasUsableApprovedEmailDraft(storedSession) ||
+      (storedSession.approvedDraft && storedSession.draftContent?.trim())
+    ) {
+      const recovered = advanceGuidedCreationFlow(
+        {
+          ...storedSession,
+          phase: "awaiting_action",
+          approvedDraft: true,
+        },
+        t.match(/\bemail\b/i) ? "show the email" : t,
+        lastAssistantText,
+      );
+      if (recovered) return recovered;
+    }
+
+    // Mid-flow create verbs must continue the same session, not restart discovery.
+    if (
+      isSimpleCreateRequest(t) ||
+      detectUniversalDocumentType(t) === storedSession.documentType
+    ) {
+      const continueGuided = advanceGuidedCreationFlow(
+        storedSession.phase === "guided_creation" && storedSession.preparationReady
+          ? storedSession
+          : storedSession,
+        storedSession.phase === "guided_creation" ? "yes" : t,
+        lastAssistantText ?? "Want me to start the draft now?",
+      );
+      if (continueGuided) return continueGuided;
+    }
+  }
+
   if (storedSession && isBareGenericAcceptance(t) && lastAssistantText?.trim()) {
     const recentTopic = inferMeaningTopicFromAssistant(lastAssistantText);
     if (
       isUniversalCreationMessage(lastAssistantText) ||
+      isGuidedCreationAssistantContext(lastAssistantText) ||
       assistantOfferedConsent(lastAssistantText) ||
       recentTopic === "create"
     ) {
+      if (isPostDiscoveryCreationPhase(storedSession.phase)) {
+        const guided = advanceGuidedCreationFlow(
+          storedSession,
+          t,
+          lastAssistantText,
+        );
+        if (guided) return guided;
+      }
       return advanceUniversalCreation(storedSession, t);
     }
   }
 
-  if (lastAssistantText && isUniversalCreationMessage(lastAssistantText)) {
-    if (storedSession) return advanceUniversalCreation(storedSession, t);
+  if (
+    lastAssistantText &&
+    (isUniversalCreationMessage(lastAssistantText) ||
+      isGuidedCreationAssistantContext(lastAssistantText))
+  ) {
+    if (storedSession) {
+      if (isPostDiscoveryCreationPhase(storedSession.phase)) {
+        const guided = advanceGuidedCreationFlow(
+          storedSession,
+          t,
+          lastAssistantText,
+        );
+        if (guided) return guided;
+      }
+      return advanceUniversalCreation(storedSession, t);
+    }
   }
 
   if (!shouldEnterUniversalCreation(t) && !detectUniversalDocumentType(t)) {
     return null;
   }
   if (isProjectCreationIntent(t)) return null;
+
+  // Don't start a second email intake while an approved draft is still live.
+  if (
+    storedSession &&
+    hasUsableApprovedEmailDraft(storedSession) &&
+    !EXPLICIT_EMAIL_START_OVER_RE.test(t)
+  ) {
+    const guided = advanceGuidedCreationFlow(
+      { ...storedSession, phase: "awaiting_action", approvedDraft: true },
+      t,
+      lastAssistantText,
+    );
+    if (guided) return guided;
+  }
 
   if (isSimpleCreateRequest(t)) {
     logCreateFastPath({

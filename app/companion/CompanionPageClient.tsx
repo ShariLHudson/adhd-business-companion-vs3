@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
 import { AppSidebar } from "@/components/companion/AppSidebar";
 import { CompanionSidebarPortal } from "@/components/companion/CompanionSidebarPortal";
 import { CompanionUrlNavigation } from "@/components/companion/CompanionUrlNavigation";
@@ -18,14 +19,15 @@ import {
   getDiscoveryMemberId,
 } from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
-import { playExperienceSoundscapeTrack } from "@/lib/soundscapes/playExperienceSoundscapeTrack";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
 import { SparkNoteChrome } from "@/components/companion/SparkNoteChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
+import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
 import { SparkEstateShell } from "@/components/companion/estate/SparkEstateShell";
 import { InstituteCabinetPanel } from "@/components/companion/InstituteCabinetPanel";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
+import { playExperienceSoundscapeTrack } from "@/lib/soundscapes/playExperienceSoundscapeTrack";
 import {
   GALLERY_HOME_SECTION,
   isLegacyGrowthHubSection,
@@ -76,9 +78,7 @@ const PlanMyDayPanel = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex min-h-[12rem] items-center justify-center p-6 text-sm text-[#6b635a]">
-        Loading Plan My Day…
-      </div>
+      <SparkLoadingState message="Loading Plan My Day…" size="md" />
     ),
   },
 );
@@ -90,9 +90,7 @@ const VisualFocusWorkspacePanel = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex min-h-[12rem] items-center justify-center p-6 text-sm text-[#6b635a]">
-        Loading Visual Focus…
-      </div>
+      <SparkLoadingState message="Loading Visual Focus…" size="md" />
     ),
   },
 );
@@ -102,14 +100,25 @@ import { EvidenceVaultRoomPanel } from "@/components/estate-collection/EvidenceV
 import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
 import { ChamberOfMomentumRoomPanel } from "@/components/companion/chamber/ChamberOfMomentumRoomPanel";
 import { ChamberProjectEntryPanel } from "@/components/companion/chamber/ChamberProjectEntryPanel";
+import { BoardroomRoomPanel } from "@/components/companion/boardroom/BoardroomRoomPanel";
+import {
+  BOARDROOM_ROOM_BG,
+  resolveBoardroomEntryIntent,
+  type BoardroomEntryIntent,
+} from "@/lib/boardroom";
 import { ProjectHomesPrototypePanel } from "@/components/companion/projectHomes";
 import { getProjectHomeRoom } from "@/lib/projectHomes";
 import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
-import { GrowthProfileRoomPanel } from "@/components/companion/GrowthProfileRoomPanel";
-import { MyBusinessEstatePanel } from "@/components/companion/MyBusinessEstatePanel";
-import { PeopleIHelpPanel } from "@/components/companion/PeopleIHelpPanel";
+import { ProfileDestinationHost } from "@/components/companion/ProfileDestinationHost";
 import type { ProfileDestination } from "@/lib/profile/profileDestination";
-import { resolveProfileDestinationNavigation } from "@/lib/profile/profileDestination";
+import {
+  isProfileDestinationOverlay,
+  resolveProfileDestinationNavigation,
+} from "@/lib/profile/profileDestination";
+import {
+  requestOpenEstateHowToGuide,
+  type EstateHowToGuideId,
+} from "@/lib/estateRoomGuides";
 import { GrowthPortfolioPanel } from "@/components/companion/GrowthPortfolioPanel";
 import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
 import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
@@ -169,6 +178,7 @@ import { resolveAdaptiveVisualContext } from "@/lib/adaptiveVisualContext";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import { WelcomeRoomPanel } from "@/components/companion/WelcomeRoomPanel";
 import { WelcomeHomePage } from "@/components/companion/WelcomeHomeFirstLaunch";
+import { WelcomeHomeDailyChoices } from "@/components/companion/WelcomeHomeDailyChoices";
 import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
@@ -730,6 +740,9 @@ import {
   markChatAssistantAudioElement,
   markWelcomeIntroSeen,
   peekWelcomeHomeReplayRequested,
+  resolveWelcomeHomeDailyChoices,
+  WELCOME_HOME_DISCOVERY_KEY_DELAY_MS,
+  type WelcomeHomeDailyChoiceId,
   type WelcomeHomeFirstChoice,
 } from "@/lib/welcomeHome";
 import { getCompanionAuthIntelligence } from "@/lib/companionAuthIntelligence";
@@ -909,9 +922,12 @@ import {
 } from "@/lib/reminderStore";
 import { resolveReminderTurn } from "@/lib/reminderIntelligence";
 import {
-  afterReminderFired,
-  collectDueReminderAlerts,
-} from "@/lib/reminderAlerts";
+  afterDeliverableFired,
+  collectDueDeliverables,
+  deliverableOccurrenceKey,
+  shouldDeliverBrowserNotification,
+  shouldDeliverInApp,
+} from "@/lib/rhythms";
 import {
   createGoogleSheetFromPayload,
   googleSheetCreateAck,
@@ -1008,11 +1024,17 @@ import {
   fetchCompanionChatWithTimeout,
   isInformationalChatTurn,
 } from "@/lib/chatFastPath/chatTurnGuarantee";
+import {
+  isChatRequestAbortError,
+  isChatRequestSuperseded,
+  supersedeInFlightChatRequest,
+} from "@/lib/chatFastPath/chatRequestInterrupt";
 import { resolveChatFailureReply } from "@/lib/chatFastPath/resolveChatFailureReply";
 import { logConversationPipelineDiagnostic } from "@/lib/conversation/conversationPipelineDiagnostics";
 import {
   isSimpleCreateRequest,
   isUniversalCreationMessage,
+  isGuidedCreationAssistantContext,
   loadUniversalCreationSession,
   clearUniversalCreationSession,
   detectUniversalDocumentType,
@@ -1319,9 +1341,10 @@ import {
 import { EVIDENCE_VAULT_CHAT_PRESERVE_OFFER } from "@/lib/estate/evidenceVaultExperience";
 import { evidenceVaultContextReply } from "@/lib/estate/evidenceVaultContextLock";
 import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
-import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
-import type { PlanningCenterArea } from "@/lib/planMyDay/planningCenter";
 import { confirmLeaveUnsavedWork } from "@/lib/unsavedWorkGuard";
+import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
+import { setPlanDayOwnerUserId } from "@/lib/planMyDay/planDayOwner";
+import type { PlanningCenterArea } from "@/lib/planMyDay/planningCenter";
 import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ENTRANCE_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG, ESTATE_PROFILE_ROOM_BG } from "@/lib/growth/growthRoom";
 import {
   isProfileEstateMenuAction,
@@ -1399,8 +1422,10 @@ import { EstateMapFullScreen } from "@/components/estateMap";
 import {
   exploreMapLocationIdForPlaceId,
   getExploreSparkMapLocations,
+  markExploreEstateReturnPending,
   resolveExploreMapLocationPlaceId,
 } from "@/lib/estateMap/exploreSparkNavigation";
+import { getExploreEstateDestinationById } from "@/lib/estateMap/exploreEstateDestinations";
 import type { EstateMapLocation } from "@/lib/estateMap/types";
 import type {
   ImmediateCreateOpenPayload,
@@ -1803,6 +1828,22 @@ import {
   type SidebarToolId,
 } from "@/lib/companionUi";
 import { type CoachingMode } from "@/lib/companionPrompt";
+import {
+  formatDailyContextCompanionBlock,
+  getDailyContext,
+} from "@/lib/dailyContextEngine";
+import {
+  formatGuidedFieldHelpPrompt,
+  readPendingGuidedFieldHelp,
+} from "@/lib/profile/guidedFieldHelp";
+import { readExpertSessionPrompt } from "@/lib/profile/fieldHelpRegistry";
+import { readStageTalkThroughPrompt } from "@/lib/profile/guidedStageTalkThrough";
+import { readResearchSessionPrompt } from "@/lib/profile/businessEstateResearch";
+import { readAdvisoryPrompt } from "@/lib/profile/advisoryHelpContext";
+import {
+  ADVISORY_INVITE_CHAMBER_EVENT,
+  type AdvisoryInviteChamberDetail,
+} from "@/lib/profile/advisoryHelpTypes";
 import {
   tonePreferenceOverridesRoutingGuidance,
 } from "@/lib/companionTonePreferences";
@@ -2272,6 +2313,33 @@ export default function CompanionPageClient() {
   const preferEverydayConversationRef = useRef(false);
   preferEverydayConversationRef.current = preferEverydayConversation;
 
+  /**
+   * Session overlays: settings / sign-in / whats-new sheets, plus dedicated
+   * profile destinations (My Business Estate, People I Help, Growth Profile).
+   * Profile destinations render through ProfileDestinationHost (body portal) —
+   * not ModalSheet. Declared before welcomeHomePrimary so Welcome Home cannot
+   * stay semantically active while a profile destination is open.
+   */
+  const [overlay, setOverlay] = useState<
+    | null
+    | "settings"
+    | "profile"
+    | "people-i-help"
+    | "signin"
+    | "whats-new"
+    | "growth-profile"
+    | "institute-cabinet"
+  >(null);
+  const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
+    useState(false);
+  const estateProfilePrimary = overlay === "profile";
+  const peopleIHelpProfilePrimary = overlay === "people-i-help";
+  const growthProfilePrimary = overlay === "growth-profile";
+  const profileDestinationActive =
+    estateProfilePrimary ||
+    peopleIHelpProfilePrimary ||
+    growthProfilePrimary;
+
   const [hasChatted, setHasChatted] = useState(false);
   const [recognitionMoment, setRecognitionMoment] =
     useState<RecognitionMoment | null>(null);
@@ -2342,6 +2410,7 @@ export default function CompanionPageClient() {
   const [visibleThinkingContext, setVisibleThinkingContext] =
     useState<VisibleThinkingContext | null>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isTtsSpeaking, setIsTtsSpeaking] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [voiceMode, setVoiceMode] = useState(false);
@@ -2370,9 +2439,17 @@ export default function CompanionPageClient() {
   const inputSnapshotRef = useRef("");
   const micExplicitStopRef = useRef(false);
   const handleSendRef = useRef<
-    (overrideText?: string, fresh?: boolean, skipToolOffer?: boolean) => Promise<void>
+    (
+      overrideText?: string,
+      fresh?: boolean,
+      skipToolOffer?: boolean,
+      preferChatAnswer?: boolean,
+    ) => Promise<void>
   >(async () => {});
   const activeChatTurnLifecycleRef = useRef<ChatTurnState | null>(null);
+  /** Increments on every send — in-flight AI turns check this to avoid stale UI locks. */
+  const chatRequestGenerationRef = useRef(0);
+  const chatRequestAbortRef = useRef<AbortController | null>(null);
   const voiceUsedRef = useRef(false);
   const pomodoroTimer = usePomodoroTimer();
 
@@ -2395,6 +2472,7 @@ export default function CompanionPageClient() {
     !guideBesideSession &&
     !splitCreateChat &&
     !companionStandaloneSection &&
+    !profileDestinationActive &&
     !(
       directEstateVisit &&
       directEstateVisit.section === "home"
@@ -2458,6 +2536,11 @@ export default function CompanionPageClient() {
     useState<ChamberMemberId | null>(null);
   const activeChamberMemberIdRef = useRef<ChamberMemberId | null>(null);
   activeChamberMemberIdRef.current = activeChamberMemberId;
+  const [boardroomShariChatOpen, setBoardroomShariChatOpen] = useState(false);
+  /** Remount Boardroom on each open so stale subviews cannot hijack home. */
+  const [boardroomEntryKey, setBoardroomEntryKey] = useState(0);
+  const [boardroomEntryIntent, setBoardroomEntryIntent] =
+    useState<BoardroomEntryIntent>("home");
   const [evidenceVaultArrivalKey, setEvidenceVaultArrivalKey] = useState(0);
   const momentumBuilderRoomExperience = useMemo(() => {
     if (!momentumBuilderPrimary) return null;
@@ -2518,6 +2601,11 @@ export default function CompanionPageClient() {
       setEstateRoomChatVisible(true);
     }
   }, [activeSection, activeChamberMemberId]);
+
+  useEffect(() => {
+    if (activeSection === "boardroom") return;
+    setBoardroomShariChatOpen(false);
+  }, [activeSection]);
 
   useEffect(() => {
     if (activeSection !== "chamber-of-momentum") return;
@@ -2592,6 +2680,52 @@ export default function CompanionPageClient() {
           homeArrival ?? evaluateArrivalIntelligence({ record: false }),
         )
       : null);
+
+  const welcomeHomeDaily = useMemo(() => {
+    const arrival =
+      homeArrival ??
+      (welcomeHomePrimary
+        ? evaluateArrivalIntelligence({ record: false })
+        : null);
+    return resolveWelcomeHomeDailyChoices({
+      arrival,
+      experienceVisitorKind: welcomeHomeExperience.visitorKind,
+      hasSeenWelcomeIntro: hasSeenWelcomeIntro(),
+      continueResolution: arrival?.continue ?? resolveCompanionContinue(),
+      existingGreeting: welcomeHomeGreeting,
+    });
+  }, [
+    homeArrival,
+    welcomeHomePrimary,
+    welcomeHomeExperience.visitorKind,
+    welcomeHomeGreeting,
+    hydrated,
+  ]);
+
+  const welcomeHomeDisplayMessage =
+    welcomeHomeDaily.preferredWelcomeMessage ?? welcomeHomeGreeting;
+
+  const [welcomeHomeDiscoveryReady, setWelcomeHomeDiscoveryReady] =
+    useState(false);
+
+  useEffect(() => {
+    if (!hydrated || !welcomeHomePrimary) {
+      setWelcomeHomeDiscoveryReady(false);
+      return;
+    }
+    if (welcomeHomeExperience.showIntro) {
+      setWelcomeHomeDiscoveryReady(false);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setWelcomeHomeDiscoveryReady(true);
+    }, WELCOME_HOME_DISCOVERY_KEY_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [
+    hydrated,
+    welcomeHomePrimary,
+    welcomeHomeExperience.showIntro,
+  ]);
 
   const welcomeScene = false;
   const visibleThinkingMessage = useVisibleThinking(
@@ -2969,17 +3103,6 @@ export default function CompanionPageClient() {
     setActiveNav("focus");
   }, [activeSection]);
 
-  // Settings / Profile / Sign-in open as modal sheets on top of the app (not pages).
-  const [overlay, setOverlay] = useState<
-    | null
-    | "settings"
-    | "profile"
-    | "people-i-help"
-    | "signin"
-    | "whats-new"
-    | "growth-profile"
-    | "institute-cabinet"
-  >(null);
   /**
    * Breathe Universal Access destination — not a room.
    * Temporarily replaces the current scene; prior workspace stays mounted.
@@ -3005,11 +3128,6 @@ export default function CompanionPageClient() {
   const justBeHereEnterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
-  const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
-    useState(false);
-  const growthProfilePrimary = overlay === "growth-profile";
-  const estateProfilePrimary = overlay === "profile";
-  const peopleIHelpProfilePrimary = overlay === "people-i-help";
   const profileEstateRoomOverlayId = useMemo((): ProfileEstateRoomId | null => {
     if (estateProfilePrimary) return "my-estate";
     if (growthProfilePrimary) return "growth-profile";
@@ -3112,6 +3230,10 @@ export default function CompanionPageClient() {
     ],
   );
   const { configured: authConfigured, user, signOut } = useCompanionAuth();
+
+  useEffect(() => {
+    setPlanDayOwnerUserId(user?.id ?? null);
+  }, [user?.id]);
 
   const openSignIn = useCallback(() => {
     if (isCompanionAuthBypassed()) return;
@@ -3228,6 +3350,8 @@ export default function CompanionPageClient() {
     useState(false);
   /** Approved visual Explore Spark Estate map (image cards). */
   const [exploreSparkMapOpen, setExploreSparkMapOpen] = useState(false);
+  const [exploreEstateReturnAvailable, setExploreEstateReturnAvailable] =
+    useState(false);
   /** When true, next Welcome Home primary render should show lobby signposts. */
   const pendingWelcomeHomeLobbyRevealRef = useRef(false);
 
@@ -3347,6 +3471,11 @@ export default function CompanionPageClient() {
   const [doItNowOffer, setDoItNowOffer] = useState<DoItNowOffer | null>(null);
   const [physicalActionWaiting, setPhysicalActionWaiting] = useState(false);
   const workspaceRevealSeqRef = useRef(0);
+  /**
+   * Cancels in-flight openStandaloneFocusSectionCore work when a newer
+   * navigation (especially Return to Estate → Welcome Home) wins.
+   */
+  const estateSectionNavEpochRef = useRef(0);
   const activeSectionRef = useRef<AppSection>("home");
   activeSectionRef.current = activeSection;
   const [workspaceFirstSplit, setWorkspaceFirstSplit] = useState(false);
@@ -4782,6 +4911,7 @@ export default function CompanionPageClient() {
     }
     try {
       ttsAudioRef.current?.pause();
+      setIsTtsSpeaking(false);
       const res = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -4792,12 +4922,21 @@ export default function CompanionPageClient() {
       const audio = new Audio(url);
       markChatAssistantAudioElement(audio);
       ttsAudioRef.current = audio;
+      audio.onplay = () => setIsTtsSpeaking(true);
       audio.onended = () => {
+        setIsTtsSpeaking(false);
         addVoiceSeconds(audio.duration || 0);
         URL.revokeObjectURL(url);
       };
-      void audio.play();
+      audio.onerror = () => setIsTtsSpeaking(false);
+      audio.onpause = () => {
+        if (audio.ended || audio.paused) setIsTtsSpeaking(false);
+      };
+      void audio.play().then(() => setIsTtsSpeaking(true)).catch(() => {
+        setIsTtsSpeaking(false);
+      });
     } catch {
+      setIsTtsSpeaking(false);
       /* voice optional */
     }
   }
@@ -4998,6 +5137,7 @@ export default function CompanionPageClient() {
 
     if (section === "content-generator") {
       setCreateExportReady(false);
+      preloadRoomBackground(CREATIVE_STUDIO_ROOM_BG);
     }
 
     setCreationContext((prev) => (creationContextEqual(prev, ctx) ? prev : ctx));
@@ -6459,13 +6599,21 @@ export default function CompanionPageClient() {
           );
         }
       }
-      // Chat reminders (P0.24).
-      for (const alert of collectDueReminderAlerts(now)) {
-        if (remindedRef.current.has(alert.reminder.id)) continue;
-        remindedRef.current.add(alert.reminder.id);
-        playChime();
-        notify(alert.title, alert.body);
-        afterReminderFired(alert.reminder, now);
+      // Chat reminders (P0.24) + Adaptive Rhythms — single load-managed path.
+      for (const item of collectDueDeliverables(now)) {
+        const key = deliverableOccurrenceKey(item);
+        if (remindedRef.current.has(key)) continue;
+        remindedRef.current.add(key);
+        if (shouldDeliverInApp() || shouldDeliverBrowserNotification()) {
+          playChime();
+          if (
+            shouldDeliverBrowserNotification() &&
+            getPrefs().desktopNotifications
+          ) {
+            notify(item.title, item.body);
+          }
+        }
+        afterDeliverableFired(item, now);
       }
     }
 
@@ -6849,6 +6997,7 @@ export default function CompanionPageClient() {
     armCreateOpenGuard(isHardNav ? "hard_nav" : source);
     createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
     createBuilderBootstrappedRef.current = false;
+    preloadRoomBackground(CREATIVE_STUDIO_ROOM_BG);
 
     const createInput = {
       itemType: opts?.artifactType ?? "",
@@ -7771,8 +7920,11 @@ export default function CompanionPageClient() {
     setPreferEverydayConversation(false);
     preferEverydayConversationRef.current = false;
 
+    const navEpoch = ++estateSectionNavEpochRef.current;
+
     void (async () => {
       await prepareEstateSceneTransition({ toSection: resolvedSection });
+      if (navEpoch !== estateSectionNavEpochRef.current) return;
       recordEstateRoomTransition({
         toSection: resolvedSection,
         fromSection: activeSectionRef.current,
@@ -7930,7 +8082,7 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Leave Clear My Mind when navigating to another My Day & Work place.
+   * Leave Clear My Mind Mode before opening another My Day & Work destination.
    * Otherwise the active-section restore effect snaps back to Clear My Mind.
    */
   function leaveClearMyMindIfNavigatingAway() {
@@ -7992,12 +8144,45 @@ export default function CompanionPageClient() {
     setEstateRoomChatVisible(false);
   }
 
+  function openBoardroomCore(options?: { intent?: BoardroomEntryIntent }) {
+    pauseActiveArtifactIfLeavingCreate("boardroom");
+    setOverlay(null);
+    setBoardroomShariChatOpen(false);
+    const intent = options?.intent ?? "home";
+    const alreadyInBoardroom = activeSectionRef.current === "boardroom";
+    setBoardroomEntryIntent(intent);
+    /**
+     * Remount when entering Boardroom, or when forcing Home from navigation.
+     * Do NOT remount while already inside on a non-home re-entry — that wiped
+     * in-progress Board intake (concerns → Q1 restart). Intake draft is also
+     * persisted as a second safety net.
+     */
+    if (!alreadyInBoardroom || intent === "home") {
+      setBoardroomEntryKey((k) => k + 1);
+    }
+    preloadRoomBackground(BOARDROOM_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    playPlaceFirstArrival("round-table");
+    syncDirectEstateVisit({
+      roomId: "round-table",
+      section: "boardroom",
+      userIntent: "boardroom",
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user")
+        .length,
+    });
+    trackWorkspaceEcosystemEvent("boardroom");
+    noteWorkspaceOpened("boardroom", "standalone_room");
+    openStandaloneFocusSectionCore("boardroom");
+    setEstateRoomChatVisible(false);
+  }
+
   /** Design prototype — Project Homes as Estate places (no project storage). */
   function openProjectHomesPrototypeCore() {
     leaveClearMyMindIfNavigatingAway();
     pauseActiveArtifactIfLeavingCreate("project-homes");
     setOverlay(null);
-    preloadRoomBackground(getProjectHomeRoom("sunroom").artwork.backgroundUrl);
+    preloadRoomBackground(getProjectHomeRoom("sunroom").backgroundUrl);
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
     trackWorkspaceEcosystemEvent("project-homes");
@@ -8096,11 +8281,25 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("momentum-institute");
   }
 
-  function openChamberOfMomentumCore() {
+  function openChamberOfMomentumCore(opts?: {
+    memberId?: ChamberMemberId | null;
+  }) {
+    const memberId = opts?.memberId ?? null;
+    const alreadyInChamber =
+      activeSectionRef.current === "chamber-of-momentum";
+
+    // Already in the Chamber — switch members without relaunching
+    if (alreadyInChamber && memberId) {
+      inviteChamberMemberCore(memberId);
+      return;
+    }
+
     pauseActiveArtifactIfLeavingCreate("chamber-of-momentum");
     setOverlay(null);
-    clearActiveChamberMember();
-    setActiveChamberMemberId(null);
+    if (!memberId) {
+      clearActiveChamberMember();
+      setActiveChamberMemberId(null);
+    }
     pushGrowBackLabel();
     preloadRoomBackground(CHAMBER_OF_MOMENTUM_ROOM_BG);
     if (isChamberDemoMode()) {
@@ -8117,7 +8316,11 @@ export default function CompanionPageClient() {
         .length,
     });
     openStandaloneFocusSectionCore("chamber-of-momentum");
-    setEstateRoomChatVisible(false);
+    if (memberId) {
+      inviteChamberMemberCore(memberId);
+    } else {
+      setEstateRoomChatVisible(false);
+    }
   }
 
   function openCartographersStudioCore() {
@@ -8167,6 +8370,45 @@ export default function CompanionPageClient() {
     setEstateRoomChatVisible(true);
     requestChatInputFocus();
   }
+
+  // Estate / People I Help advisory help — invite without navigating to Chamber home
+  useEffect(() => {
+    function onAdvisoryInvite(event: Event) {
+      const detail = (event as CustomEvent<AdvisoryInviteChamberDetail>).detail;
+      if (!detail?.memberIds?.length) return;
+      const primary = detail.memberIds[0];
+      if (!primary) return;
+      // In-context invite: activate member without opening Chamber of Momentum room
+      const previousId = activeChamberMemberIdRef.current;
+      const activation = activateChamberMember(primary);
+      if (!activation) return;
+      setActiveChamberMemberId(primary);
+      setMessages((prev) => {
+        let next = prev;
+        if (previousId && previousId !== primary) {
+          const previousMember = getChamberMemberById(previousId);
+          next = stripChamberMemberActivationMessages(next).filter(
+            (message) =>
+              !(
+                previousMember &&
+                message.role === "assistant" &&
+                message.content === previousMember.activationOpener
+              ),
+          );
+        }
+        return [
+          ...next,
+          { role: "system", content: activation.messages.system },
+          { role: "assistant", content: activation.messages.assistant },
+        ];
+      });
+      setEstateRoomChatVisible(true);
+      requestChatInputFocus();
+    }
+    window.addEventListener(ADVISORY_INVITE_CHAMBER_EVENT, onAdvisoryInvite);
+    return () =>
+      window.removeEventListener(ADVISORY_INVITE_CHAMBER_EVENT, onAdvisoryInvite);
+  }, []);
 
   function endChamberMemberConversationCore() {
     clearActiveChamberMember();
@@ -8339,6 +8581,14 @@ export default function CompanionPageClient() {
     }
     if (section === "chamber-of-momentum") {
       openChamberOfMomentumCore();
+      return;
+    }
+    if (section === "boardroom") {
+      openBoardroomCore();
+      return;
+    }
+    if (section === "project-homes") {
+      openProjectHomesPrototypeCore();
       return;
     }
     if (section === "chamber-project-entry") {
@@ -9040,7 +9290,7 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Explore Spark � open the approved visual Estate explorer.
+   * Explore Spark — open the approved visual Estate explorer.
    * Never wander into Create / Create Studio.
    */
   function openExploreSparkVisualExplorer() {
@@ -9049,26 +9299,35 @@ export default function CompanionPageClient() {
   }
 
   function handleExploreSparkMapSelect(location: EstateMapLocation) {
-    const placeId = resolveExploreMapLocationPlaceId(location);
+    const dest = getExploreEstateDestinationById(location.id);
+    const placeId = resolveExploreMapLocationPlaceId(dest ?? location);
     if (!placeId) {
       setExploreSparkMapOpen(true);
       return;
     }
+
+    markExploreEstateReturnPending();
+    setExploreEstateReturnAvailable(true);
+
+    if (dest?.destinationType === "overlay" && placeId === "my-business-estate") {
+      openProfileDestinationCore("my-business-estate");
+      return;
+    }
+
     const command = estateNavigateCommandForPlace(
       placeId,
-      `Explore Spark: ${location.name}`,
+      `Explore Estate: ${location.name}`,
     );
     if (!command) {
       setExploreSparkMapOpen(true);
       return;
     }
-    runDirectEstateRoomNavigation(command, `Explore Spark: ${location.name}`, undefined, {
+    runDirectEstateRoomNavigation(command, `Explore Estate: ${location.name}`, undefined, {
       skipAssistantMessage: true,
     });
   }
 
   function toggleJustBeHereSound() {
-
     const roomId = justBeHereSession?.roomId;
     if (!roomId) return;
     if (justBeHereSoundEnabled) {
@@ -9096,13 +9355,33 @@ export default function CompanionPageClient() {
       });
     }
 
+    /** Invalidate in-flight standalone room opens so they cannot overwrite Welcome Home. */
+    estateSectionNavEpochRef.current += 1;
+
     const fromSection = activeSectionRef.current;
+
+    if (isBreatheDestinationActive(breatheDestination)) {
+      if (breatheTransitionTimerRef.current) {
+        clearTimeout(breatheTransitionTimerRef.current);
+        breatheTransitionTimerRef.current = null;
+      }
+      if (breatheResumeTimerRef.current) {
+        clearTimeout(breatheResumeTimerRef.current);
+        breatheResumeTimerRef.current = null;
+      }
+      setBreatheDestination(EMPTY_BREATHE_DESTINATION);
+      setBreatheResumeActive(false);
+      breathePausedTimerRef.current = false;
+    }
 
     if (isClearMyMindModeActive() || fromSection === "brain-dump") {
       exitClearMyMindMode();
     }
 
     clearJustBeHereMode();
+    clearActiveChamberMember();
+    setActiveChamberMemberId(null);
+    setBoardroomShariChatOpen(false);
     setPreferEverydayConversation(false);
     preferEverydayConversationRef.current = false;
     setWelcomeHomeIntroActive(false);
@@ -9126,12 +9405,15 @@ export default function CompanionPageClient() {
     setMomentumBuilderArrivalActive(false);
     setGuideBesideSession(null);
     setCompanionStandaloneSection(null);
+    companionReturnSectionRef.current = null;
     setActivitySession(EMPTY_ACTIVITY_SESSION);
     activitySessionRef.current = EMPTY_ACTIVITY_SESSION;
     setDecisionCompassSession(null);
     setDecisionCompassPrefill(null);
     setPlanMyDayDrawerOpen(false);
     setPlanMyDayOpenItemId(null);
+    setPlanMyDayInitialArea(null);
+    setPlanMyDayInitialRhythmsTab(null);
     setOverlay(null);
     setSettingsSection(null);
     setEstateGuideFlipbookOpen(false);
@@ -9152,7 +9434,11 @@ export default function CompanionPageClient() {
     setArrivalNavImmersion(false);
     applyChatLayoutMode("split");
     setWorkspaceFirstSplit(false);
-    closeWorkspacePanel({ mode: "hide", silent: true });
+    closeWorkspacePanel({
+      mode: "hide",
+      silent: true,
+      skipSectionRestore: true,
+    });
     panelBackStackRef.current = [];
     setWorkspacePanelBackLabel(null);
     navHistoryRef.current = createNavigationHistoryStack();
@@ -9163,11 +9449,10 @@ export default function CompanionPageClient() {
     setActiveNav("chat");
     onEstatePlaceArrived({ placeId: "welcome-home", section: "home" });
 
-    /** Reveal lobby after welcomeHomePrimary becomes true (avoids clear race). */
+    /** Reveal lobby after welcomeHomePrimary becomes true (effect consumes the flag). */
     pendingWelcomeHomeLobbyRevealRef.current = true;
     setWelcomeHomeEstateMapVisible(true);
     requestAnimationFrame(() => {
-      pendingWelcomeHomeLobbyRevealRef.current = false;
       requestChatInputFocus({ preventScroll: true });
     });
   }
@@ -11132,6 +11417,25 @@ export default function CompanionPageClient() {
     });
   }
 
+  function completeImmediateEstateHowToGuideOpen(guideId: EstateHowToGuideId) {
+    clearFrictionlessOfferState();
+    if (guideId === "chamber-of-momentum") {
+      if (activeSectionRef.current !== "chamber-of-momentum") {
+        openChamberOfMomentumCore();
+      }
+      window.setTimeout(() => {
+        requestOpenEstateHowToGuide("chamber-of-momentum");
+      }, 0);
+      return;
+    }
+    if (overlay !== "profile") {
+      openProfileDestinationCore("my-business-estate");
+    }
+    window.setTimeout(() => {
+      requestOpenEstateHowToGuide("my-business-estate");
+    }, 0);
+  }
+
   function completeImmediateEstateCoachingOpen(
     payload: import("@/lib/estateBrain/estateCoachingTypes").ImmediateEstateCoachingOpenPayload,
   ) {
@@ -11365,6 +11669,20 @@ export default function CompanionPageClient() {
       return true;
     }
 
+    if (!chamberMemberConversationLocked && frictionlessAction.immediateEstateHowToGuideOpen) {
+      completeImmediateEstateHowToGuideOpen(
+        frictionlessAction.immediateEstateHowToGuideOpen,
+      );
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: frictionlessAction.localReply! },
+      ]);
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
     if (!chamberMemberConversationLocked && frictionlessAction.immediateEstatePlaceNavigate) {
       const payload = frictionlessAction.immediateEstatePlaceNavigate;
       const command = estateNavigateCommandForPlace(
@@ -11479,6 +11797,7 @@ export default function CompanionPageClient() {
     overrideText?: string,
     fresh = false,
     skipToolOffer = false,
+    preferChatAnswer = false,
   ) {
     handleSendRef.current = handleSend;
     const trimmed = (
@@ -11487,7 +11806,25 @@ export default function CompanionPageClient() {
       inputSnapshotRef.current ??
       input
     ).trim();
-    if (!trimmed || isLoading) return;
+    // Never block send on isLoading — newer messages supersede in-flight AI.
+    if (!trimmed) return;
+
+    chatRequestGenerationRef.current += 1;
+    const sendGeneration = chatRequestGenerationRef.current;
+    supersedeInFlightChatRequest(chatRequestAbortRef.current);
+    chatRequestAbortRef.current = null;
+    if (isLoading) {
+      endVisibleThinking();
+      setIsLoading(false);
+      // Drop an empty streaming shell from the superseded turn.
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant" && !last.content.trim()) {
+          return prev.slice(0, -1);
+        }
+        return prev;
+      });
+    }
 
     micExplicitStopRef.current = false;
     recognitionRef.current?.stop();
@@ -12036,8 +12373,15 @@ export default function CompanionPageClient() {
     const universalCreationContinuation =
       Boolean(universalSessionActive) &&
       (isUniversalCreationMessage(lastAssistantForCreateFastPath) ||
+        isGuidedCreationAssistantContext(lastAssistantForCreateFastPath) ||
         createWorkflowContinuation ||
-        conversationPriority?.winner === "continue_creation") &&
+        conversationPriority?.winner === "continue_creation" ||
+        Boolean(universalSessionActive.approvedDraft) ||
+        universalSessionActive.phase === "awaiting_action" ||
+        universalSessionActive.phase === "review" ||
+        universalSessionActive.phase === "revision" ||
+        universalSessionActive.phase === "approval" ||
+        universalSessionActive.phase === "guided_creation") &&
       !isVagueHelpRequest(trimmed);
 
     if (isSimpleCreateRequest(trimmed) || universalCreationContinuation) {
@@ -13379,6 +13723,7 @@ export default function CompanionPageClient() {
     }
 
     const estateKernelForced =
+      !preferChatAnswer &&
       primaryTurnAllowsKernel(primaryTurnDecision) &&
       shouldRouteThroughEstateKernel(trimmed, {
         primaryTurn: primaryTurnDecision,
@@ -13393,10 +13738,11 @@ export default function CompanionPageClient() {
           currentPlaceId: currentEstateRoomId,
           activeSection: activeSectionRef.current,
           forceChat:
-            (informationalChatTurn ||
+            preferChatAnswer ||
+            ((informationalChatTurn ||
               taskLockBlocksEstateRouting ||
               isDirectHelpOverrideRequest(trimmed)) &&
-            !estateKernelForced,
+              !estateKernelForced),
           primaryTurn: primaryTurnDecision,
         }),
       {
@@ -13434,11 +13780,44 @@ export default function CompanionPageClient() {
         openUserMemoryCore(tab);
       },
       onNavigatePlace: ({ command, navigationLine }) => {
+        if (preferChatAnswer) {
+          return;
+        }
         if (
           taskLockBlocksEstateRouting &&
           !estateTaskLockTurn.allowsExplicitEstateNavigation
         ) {
           return;
+        }
+        // Chat-primary turns answer in conversation — do not swap rooms as a
+        // side effect of send. Clear My Mind + Chamber members stay exempt
+        // (explicit capability requests). DIRECT_COMMAND has blockKernel false.
+        if (primaryTurnDecision.blockKernelNavigation) {
+          const roomId = command.roomId ?? command.entryId;
+          const opensClearMyMind =
+            command.section === "brain-dump" ||
+            roomId === "clear-my-mind" ||
+            command.entryId === "clear-my-mind";
+          const opensChamberMember = Boolean(
+            command.workspaceOffer.chamberMemberId,
+          );
+          if (!opensClearMyMind && !opensChamberMember) {
+            const offerLine =
+              navigationLine?.trim() ||
+              command.workspaceOffer.line?.trim() ||
+              (command.entry?.name
+                ? `If you'd like, we could visit the ${command.entry.name} — just say when.`
+                : null);
+            if (offerLine) {
+              markAssistantReplied(chatTurnState);
+              recordPrimaryTurnResponse(offerLine);
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: offerLine },
+              ]);
+            }
+            return;
+          }
         }
         runDirectEstateRoomNavigation(command, trimmed, navigationLine);
       },
@@ -13485,11 +13864,11 @@ export default function CompanionPageClient() {
         recordPrimaryTurnResponse(reply);
         executeEstateRoomActionCore({ userText, roomAction, reply });
       },
+      onClearPlaceMenu: () => clearPendingEstatePlaceMenu(),
       onOpenExploreSpark: () => {
         if (taskLockBlocksEstateRouting && !estateKernelForced) return;
         openExploreSparkVisualExplorer();
       },
-      onClearPlaceMenu: () => clearPendingEstatePlaceMenu(),
     });
 
     const resolvedCanonicalPlaceId = resolveEstatePlaceIdFromUserText(trimmed);
@@ -13595,9 +13974,18 @@ export default function CompanionPageClient() {
 
     // classifiedIntent.kind === "CHAT" — chat API path only.
 
+    if (isChatRequestSuperseded(sendGeneration, chatRequestGenerationRef.current)) {
+      return;
+    }
+
     markChatTurnLoading(chatTurnState);
     beginVisibleThinking(trimmed, detected);
     setIsLoading(true);
+    const requestAbort = new AbortController();
+    chatRequestAbortRef.current = requestAbort;
+    const isStaleSend = () =>
+      isChatRequestSuperseded(sendGeneration, chatRequestGenerationRef.current) ||
+      requestAbort.signal.aborted;
     const finishLocalChatTurn = (assistantContent?: string) => {
       if (assistantContent) {
         markAssistantReplied(chatTurnState);
@@ -16473,7 +16861,8 @@ export default function CompanionPageClient() {
         ? chamberMemberHintForChat(activeChamberMember)
         : null;
       const useChatStream = speedProfile.routeClass !== "instant";
-      const res = await fetchCompanionChatWithTimeout({
+      const res = await fetchCompanionChatWithTimeout(
+        {
           stream: useChatStream,
           messages: messagesForApi(
             nextMessages,
@@ -16486,6 +16875,25 @@ export default function CompanionPageClient() {
           memoryConfidence: relationshipTurnClientMeta.memoryConfidence,
           emotionalState: EMOTION_LABELS[detected],
           dayState: dayStateSummary(getDayState()),
+          dailyContextHint: formatDailyContextCompanionBlock(
+            getDailyContext({
+              activeFocusSession: activeSectionRef.current === "focus-timer",
+            }),
+          ),
+          guidedFieldHelpHint: (() => {
+            const parts: string[] = [];
+            const pending = readPendingGuidedFieldHelp();
+            if (pending) parts.push(formatGuidedFieldHelpPrompt(pending));
+            const expertPrompt = readExpertSessionPrompt();
+            if (expertPrompt) parts.push(expertPrompt);
+            const stageTalk = readStageTalkThroughPrompt();
+            if (stageTalk) parts.push(stageTalk);
+            const estateResearch = readResearchSessionPrompt();
+            if (estateResearch) parts.push(estateResearch);
+            const advisory = readAdvisoryPrompt();
+            if (advisory) parts.push(advisory);
+            return parts.length ? parts.join("\n\n") : undefined;
+          })(),
           aiTone: prefs.aiTone,
           helpMode: prefs.helpMode,
           supportStyle: prefs.supportStyle,
@@ -16877,7 +17285,13 @@ export default function CompanionPageClient() {
           ecosystemGuidance: ecosystemSnapshot
             ? ecosystemGuidanceForChat(ecosystemSnapshot)
             : undefined,
-      });
+        },
+        { signal: requestAbort.signal },
+      );
+
+      if (isStaleSend()) {
+        return;
+      }
 
       let rawAssistantMsg = "";
       let relationshipResponseId = "unknown";
@@ -16898,11 +17312,13 @@ export default function CompanionPageClient() {
         setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
         let firstChunk = false;
         const streamResult = await consumeCompanionChatStream(res, (text) => {
+          if (isStaleSend()) return;
           if (!firstChunk && text) {
             firstChunk = true;
             endVisibleThinking();
           }
           setMessages((prev) => {
+            if (isStaleSend()) return prev;
             const copy = [...prev];
             const last = copy[copy.length - 1];
             if (last?.role === "assistant") {
@@ -17498,6 +17914,10 @@ export default function CompanionPageClient() {
         void playTTS(rawAssistantMsg);
       }
     } catch (err) {
+      if (isStaleSend() || isChatRequestAbortError(err)) {
+        // Superseded by a newer message — stay silent; newest turn owns the UI.
+        return;
+      }
       logPipelineTurnFailure({
         turn: chatTurnRef.current,
         userText: trimmed,
@@ -17524,6 +17944,12 @@ export default function CompanionPageClient() {
       }
       setError(null);
     } finally {
+      if (chatRequestAbortRef.current === requestAbort) {
+        chatRequestAbortRef.current = null;
+      }
+      if (isStaleSend()) {
+        return;
+      }
       if (latencyProfiler.calledApi) {
         latencyProfiler.measure("uiRender");
         finishLatencyTurn({ calledApi: true });
@@ -17531,6 +17957,12 @@ export default function CompanionPageClient() {
       finishEarlyChatTurn();
     }
     } catch (err) {
+      if (
+        isChatRequestSuperseded(sendGeneration, chatRequestGenerationRef.current) ||
+        isChatRequestAbortError(err)
+      ) {
+        return;
+      }
       logPipelineTurnFailure({
         turn: chatTurnRef.current,
         userText: trimmed,
@@ -17564,6 +17996,13 @@ export default function CompanionPageClient() {
       }
       setError(null);
     } finally {
+      if (isChatRequestSuperseded(sendGeneration, chatRequestGenerationRef.current)) {
+        // Newest turn owns loading + fail-safe — do not unlock or invent a reply here.
+        if (activeChatTurnLifecycleRef.current === chatTurnState) {
+          activeChatTurnLifecycleRef.current = null;
+        }
+        return;
+      }
       guaranteeChatTurnCompletion({
         state: chatTurnState,
         ensureVisibleReply: () => {
@@ -17631,6 +18070,56 @@ export default function CompanionPageClient() {
 
   function revealWelcomeHomeEstateMap() {
     openExploreSparkVisualExplorer();
+  }
+
+  function handleWelcomeHomeDailyChoice(choiceId: WelcomeHomeDailyChoiceId) {
+    switch (choiceId) {
+      case "tell-spark-about-me":
+        openProfileDestinationCore("my-business-estate");
+        return;
+      case "clear-my-mind":
+        openClearMyMindCore();
+        return;
+      case "explore-spark-estate":
+        openExploreSparkVisualExplorer();
+        return;
+      case "continue-where-left-off": {
+        const resolution = resolveCompanionContinue();
+        if (resolution.mode === "single") {
+          handleCompanionContinueOption(resolution.option);
+          return;
+        }
+        if (resolution.mode === "choose" && resolution.options[0]) {
+          handleCompanionContinueOption(resolution.options[0]);
+          return;
+        }
+        focusChatInput();
+        return;
+      }
+      case "check-my-day":
+        openPlanMyDayCore();
+        return;
+      case "help-me-restart":
+        void handleSend(
+          "I'm returning after some time away. Help me gently restart — what matters most right now?",
+          true,
+        );
+        return;
+      default:
+        focusChatInput();
+    }
+  }
+
+  function handleWelcomeHomeDiscoveryInvite() {
+    setWelcomeHomeDiscoveryReady(true);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content:
+          "I have a new discovery ready whenever you'd like. Look for the Discovery Key nearby — or just tell me when you're curious.",
+      },
+    ]);
   }
 
   function revealEstateRoomChoices(fromRoomId?: string | null) {
@@ -17914,6 +18403,58 @@ export default function CompanionPageClient() {
     }
 
     /**
+     * Round Table Boardroom — structured decision support, never Projects stub
+     * or blank frosted chat as the primary interface.
+     */
+    if (
+      command.section === "boardroom" ||
+      roomId === "round-table" ||
+      command.entryId === "round-table"
+    ) {
+      patchEstateRuntimeState({
+        currentPlaceId: "round-table",
+        activeConversationMode: true,
+      });
+      registerEstatePendingTransition({
+        destinationSection: "boardroom",
+        destinationEntryId: "round-table",
+        originalUserIntent: userText,
+        offeredAtTurn: chatTurnRef.current,
+        followUpQuestion: false,
+      });
+      executeEstateCommandMemoryHandoff(command, {
+        userText,
+        fromSection: activeSectionRef.current,
+        playArrival: true,
+        playAmbience: true,
+      });
+      captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
+      openBoardroomCore({
+        intent: resolveBoardroomEntryIntent(userText),
+      });
+      const arrivalAck =
+        navigationLine ??
+        "Welcome to the Round Table — we can explore this from several angles.";
+      if (!opts?.skipAssistantMessage) {
+        if (activeChatTurnLifecycleRef.current) {
+          markAssistantReplied(activeChatTurnLifecycleRef.current);
+        }
+        setMessages((prev) => {
+          if (
+            prev.some(
+              (m) => m.role === "assistant" && m.content === arrivalAck,
+            )
+          ) {
+            return prev;
+          }
+          return [...prev, { role: "assistant", content: arrivalAck }];
+        });
+      }
+      finishEarlyChatTurn();
+      return;
+    }
+
+    /**
      * While Clear My Mind Mode is active, refuse estate room hops that would
      * replace the workspace with frosted chat (Wander / go-to-room).
      * Member exits only via Back, Welcome Home, or explicit leave phrases.
@@ -18090,9 +18631,30 @@ export default function CompanionPageClient() {
       openMomentumBuilderRoomCore();
       return;
     }
+    if (offer.section === "chamber-of-momentum") {
+      noteWorkspaceOpened("chamber-of-momentum", "estate_offer");
+      openChamberOfMomentumCore({
+        memberId: offer.chamberMemberId ?? null,
+      });
+      return;
+    }
+    if (offer.section === "boardroom") {
+      noteWorkspaceOpened("boardroom", "estate_offer");
+      openBoardroomCore();
+      return;
+    }
     if (offer.section === "momentum-institute") {
-      noteWorkspaceOpened("momentum-institute", "estate_offer");
-      openMomentumInstituteRoomCore(offer.instituteDrawerId);
+      // Legacy institute drawer only when a specific drawer was requested;
+      // otherwise open the live Chamber of Momentum (no launch bridge).
+      if (offer.instituteDrawerId) {
+        noteWorkspaceOpened("momentum-institute", "estate_offer");
+        openMomentumInstituteRoomCore(offer.instituteDrawerId);
+        return;
+      }
+      noteWorkspaceOpened("chamber-of-momentum", "estate_offer");
+      openChamberOfMomentumCore({
+        memberId: offer.chamberMemberId ?? null,
+      });
       return;
     }
     if (offer.section === "stables") {
@@ -18671,6 +19233,7 @@ export default function CompanionPageClient() {
               })
             }
             onVisualizeThis={openSparkVisualEngineFromExperience}
+            onPreviewProjectHomes={openProjectHomesPrototypeCore}
           />
         );
       case "playbook":
@@ -19124,6 +19687,7 @@ export default function CompanionPageClient() {
             onOpenTimeBlock={handleOpenProjectTimeBlock}
             onBuildWithShari={() => openCompanionAssist("projects")}
             onVisualizeThis={openSparkVisualEngineFromExperience}
+            onPreviewProjectHomes={openProjectHomesPrototypeCore}
           />
         );
       case "templates-library":
@@ -19236,6 +19800,10 @@ export default function CompanionPageClient() {
             section={section}
             onOpenFullScreen={() => {
               closeWorkspacePanel();
+              if (section === "chamber-of-momentum") {
+                openChamberOfMomentumCore();
+                return;
+              }
               setActiveSection(section);
             }}
           />
@@ -19984,11 +20552,19 @@ export default function CompanionPageClient() {
 
   const showDiscoveryKeyHost = Boolean(
     !overlay &&
-      estatePresenceRoomId &&
-      ((showGlobalEstatePresence && estateImmersiveActive) ||
-        (previewDiscoverySession &&
-          previewDiscoveryRoomId === estatePresenceRoomId)),
+      ((estatePresenceRoomId &&
+        ((showGlobalEstatePresence && estateImmersiveActive) ||
+          (previewDiscoverySession &&
+            previewDiscoveryRoomId === estatePresenceRoomId))) ||
+        (welcomeHomePrimary &&
+          welcomeHomeDiscoveryReady &&
+          !welcomeHomeExperience.showIntro)),
   );
+
+  const discoveryKeyHostRoomId =
+    welcomeHomePrimary && welcomeHomeDiscoveryReady
+      ? "sunroom"
+      : estatePresenceRoomId;
 
   const estatePlaceAudioHostPlaceId = resolveEstatePlaceAudioHostPlaceId({
     directEstateVisit,
@@ -20042,6 +20618,10 @@ export default function CompanionPageClient() {
   const clearMyMindWorkspaceActive =
     activeSection === "brain-dump" || isClearMyMindModeActive();
 
+  const createWorkspaceActive =
+    workspacePanel === "content-generator" ||
+    activeSection === "content-generator";
+
   const sparkEstateShellPlaceId = resolveSparkEstateShellPlaceId({
     clearMyMindWorkspaceActive,
     profileEstateRoomOverlayId,
@@ -20066,10 +20646,12 @@ export default function CompanionPageClient() {
         ? "evidence-vault"
         : activeSection === "chamber-of-momentum"
           ? "chamber-of-momentum"
-          : activeSection === "visual-focus"
-            ? "cartographers-studio"
-            : activeSection === "destination-gallery"
-              ? "destination-gallery"
+          : activeSection === "boardroom"
+            ? "round-table"
+            : activeSection === "visual-focus"
+              ? "cartographers-studio"
+              : activeSection === "destination-gallery"
+                ? "destination-gallery"
               : activeSection === "the-gallery"
                 ? "the-gallery"
                 : welcomeHomePrimary
@@ -20100,15 +20682,8 @@ export default function CompanionPageClient() {
     overlay !== "signin" && Boolean(roomMenuRoomId);
 
   const handleCompanionBack = () => {
-    if (
-      estatePlaceChromeActive ||
-      welcomeHomePrimary ||
-      Boolean(sparkEstateShellPlaceId)
-    ) {
-      navigateToChatCore();
-      return;
-    }
-    goBack();
+    // Back To Estate / Return to Estate — always Welcome Home lobby, never everyday chat.
+    navigateBackToEstateHome();
   };
 
   const portaledModalSheets =
@@ -20260,9 +20835,9 @@ export default function CompanionPageClient() {
       {showGlobalEstatePresence && estatePresenceRoomId ? (
         <EstatePresence roomId={estatePresenceRoomId} />
       ) : null}
-      {showDiscoveryKeyHost && estatePresenceRoomId ? (
+      {showDiscoveryKeyHost && discoveryKeyHostRoomId ? (
         <DiscoveryKeyHost
-          roomId={estatePresenceRoomId}
+          roomId={discoveryKeyHostRoomId}
           memberId={discoveryMemberId}
           memberContext={discoveryMemberContext}
           enabled={showDiscoveryKeyHost}
@@ -20291,25 +20866,32 @@ export default function CompanionPageClient() {
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
       </Suspense>
-      <CompanionBackground
-        page={scenePage}
-        seed={sceneSeed}
-        calmHome={false}
-        clearMyMind={clearMyMind}
-        homesteadChat={homeMode === "chat" && !suppressGlobalBackground}
-        suppress={
-          suppressGlobalBackground ||
-          isBreatheDestinationActive(breatheDestination) ||
-          workspacePanel === "welcome-room" ||
-          homeMode === "welcome" ||
-          welcomeHomePrimary ||
-          momentumBuilderPrimary ||
-          momentumInstitutePrimary ||
-          stablesPrimary ||
-          profileEstateChromeActive ||
-          estateImmersiveActive
-        }
-      />
+      {createWorkspaceActive && !sparkEstateShellPlaceId ? (
+        <EstateRoomFullBleedBackground
+          roomId="creative-studio"
+          imageUrl={CREATIVE_STUDIO_ROOM_BG}
+        />
+      ) : (
+        <CompanionBackground
+          page={scenePage}
+          seed={sceneSeed}
+          calmHome={false}
+          clearMyMind={clearMyMind}
+          homesteadChat={homeMode === "chat" && !suppressGlobalBackground}
+          suppress={
+            suppressGlobalBackground ||
+            isBreatheDestinationActive(breatheDestination) ||
+            workspacePanel === "welcome-room" ||
+            homeMode === "welcome" ||
+            welcomeHomePrimary ||
+            momentumBuilderPrimary ||
+            momentumInstitutePrimary ||
+            stablesPrimary ||
+            profileEstateChromeActive ||
+            estateImmersiveActive
+          }
+        />
+      )}
 
       <div
         data-companion-session-layer=""
@@ -20318,6 +20900,8 @@ export default function CompanionPageClient() {
             ? `companion-estate-immersive-active pl-0 pr-0${
                 profileEstateChromeActive ? " companion-growth-profile-active" : ""
               }`
+            : createWorkspaceActive
+              ? "companion-create-active pl-0 pr-0"
             : welcomeHomePrimary
             ? `companion-welcome-home-active pl-0 pr-0${
                 welcomeHomeIntroActive
@@ -20334,6 +20918,12 @@ export default function CompanionPageClient() {
               ? "companion-momentum-institute-active pl-0 pr-0"
             : activeSection === "chamber-of-momentum"
               ? "companion-chamber-active pl-0 pr-0"
+            : activeSection === "boardroom"
+              ? "companion-boardroom-active pl-0 pr-0"
+            : activeSection === "project-homes"
+              ? "companion-project-homes-active pl-0 pr-0"
+            : activeSection === "destination-gallery"
+              ? "companion-destination-gallery-active pl-0 pr-0"
             : activeSection === "visual-focus"
               ? "companion-cartographers-active pl-0 pr-0"
             : activeSection === "evidence-bank"
@@ -20507,21 +21097,6 @@ export default function CompanionPageClient() {
                 }
               />
             </div>
-          ) : estateProfilePrimary ? (
-            <main className="estate-room-main">
-              <MyBusinessEstatePanel onClose={goBack} />
-            </main>
-          ) : peopleIHelpProfilePrimary ? (
-            <main className="estate-room-main">
-              <PeopleIHelpPanel onClose={goBack} />
-            </main>
-          ) : growthProfilePrimary ? (
-            <main className="estate-room-main">
-              <GrowthProfileRoomPanel
-                emphasizeTimeline={growthProfileEmphasizeTimeline}
-                onOpenEstatePlace={handleEstateMenuAction}
-              />
-            </main>
           ) : null}
 
           {(activeSection === "home" ||
@@ -20589,10 +21164,13 @@ export default function CompanionPageClient() {
                 experience={welcomeHomeExperience}
                 onIntroComplete={finishWelcomeHomeIntro}
                 onIntroActiveChange={setWelcomeHomeIntroActive}
-                welcomeMessage={welcomeHomeGreeting}
+                welcomeMessage={welcomeHomeDisplayMessage}
                 showWelcomeLine={
-                  messages.length === 0 && !isLoading && Boolean(welcomeHomeGreeting)
+                  messages.length === 0 &&
+                  !isLoading &&
+                  Boolean(welcomeHomeDisplayMessage)
                 }
+                welcomeSlot={undefined}
                 showConversation={messages.length > 0 || isLoading}
                 conversationScrollKey={`${messages.length}-${isLoading ? 1 : 0}`}
                 inputRef={inputRef}
@@ -20854,7 +21432,7 @@ export default function CompanionPageClient() {
                   onImmersionNav={setArrivalNavImmersion}
                   onWalkComplete={handleArrivalWalkComplete}
                   onStayAndChat={() => undefined}
-                  onSend={(text) => void handleSend(text)}
+                  onSend={(text) => void handleSend(text, false, false, true)}
                 />
               ) : activeSection === "home" && !welcomeScene ? null : (
               <IdentityBar
@@ -20891,8 +21469,10 @@ export default function CompanionPageClient() {
                 }
                 workspacePanel={workspacePanel}
                 workspaceActiveBeside={workspaceActiveBeside}
-                isThinking={isLoading && !homeCalm}
+                isThinking={Boolean(visibleThinkingMessage) && !homeCalm}
                 thinkingMessage={visibleThinkingMessage}
+                isListening={isListening && !homeCalm}
+                isSpeaking={isTtsSpeaking && !homeCalm}
                 welcomeLine={null}
                 onDismissWelcome={undefined}
                 primaryQuestion={null}
@@ -21450,17 +22030,6 @@ export default function CompanionPageClient() {
             </EstateRoomErrorBoundary>
           )}
 
-          {activeSection === "project-homes" && (
-            <EstateRoomErrorBoundary
-              roomLabel="Project Homes"
-              onReturnToEstate={navigateBackToEstateHome}
-            >
-              <ProjectHomesPrototypePanel
-                onBack={navigateBackToEstateHome}
-              />
-            </EstateRoomErrorBoundary>
-          )}
-
           {activeSection === "plan-my-day" && (
             <PlanMyDayPanel
               standalone
@@ -21512,7 +22081,7 @@ export default function CompanionPageClient() {
               onReturnToEstate={navigateBackToEstateHome}
             >
               <ChamberOfMomentumRoomPanel
-                onBack={goBack}
+                onBack={navigateBackToEstateHome}
                 activeMemberId={activeChamberMemberId}
                 onInviteMember={inviteChamberMemberCore}
                 onEndMemberConversation={endChamberMemberConversationCore}
@@ -21563,6 +22132,79 @@ export default function CompanionPageClient() {
                     ttsAudioRef={ttsAudioRef}
                   />
                 }
+              />
+            </EstateRoomErrorBoundary>
+          )}
+
+          {activeSection === "boardroom" && (
+            <EstateRoomErrorBoundary
+              roomLabel="Round Table Boardroom"
+              onReturnToEstate={navigateBackToEstateHome}
+            >
+              <BoardroomRoomPanel
+                key={boardroomEntryKey}
+                entryIntent={boardroomEntryIntent}
+                onBack={navigateBackToEstateHome}
+                shariChatOpen={boardroomShariChatOpen}
+                onToggleShariChat={setBoardroomShariChatOpen}
+                conversationScrollKey={estateChatScrollKey}
+                thread={
+                  <SimpleChat
+                    messages={messages}
+                    stateHint={stateHint}
+                    showHint={false}
+                    hideEmptyState
+                    isLoading={isLoading}
+                    thinkingMessage={visibleThinkingMessage}
+                    awaitingUserConfirmation={chatAwaitingConfirmation}
+                    thinkingEmotion={displayEmotion}
+                    workspacePanel={workspacePanel}
+                    workspaceActiveBeside={workspaceActiveBeside}
+                    formatParagraphs={formatAssistantParagraphs}
+                    afterLastAssistant={undefined}
+                  />
+                }
+                footer={
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What would you like to talk through?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
+              />
+            </EstateRoomErrorBoundary>
+          )}
+
+          {activeSection === "project-homes" && (
+            <EstateRoomErrorBoundary
+              roomLabel="Project Homes"
+              onReturnToEstate={navigateBackToEstateHome}
+            >
+              <ProjectHomesPrototypePanel
+                onBack={navigateBackToEstateHome}
               />
             </EstateRoomErrorBoundary>
           )}
@@ -21991,6 +22633,7 @@ export default function CompanionPageClient() {
                 onOpenTimeBlock={handleOpenProjectTimeBlock}
                 onBuildWithShari={() => openCompanionAssist("projects")}
                 onVisualizeThis={openSparkVisualEngineFromExperience}
+                onPreviewProjectHomes={openProjectHomesPrototypeCore}
               />
             </WorkspaceShell>
           )}
@@ -22147,6 +22790,7 @@ export default function CompanionPageClient() {
               setActiveNav((nav) => (nav === "settings" ? "chat" : nav));
             }}
             title="Settings"
+            theme="estate-dark"
           >
             <SettingsPanel
               onSignIn={openSignIn}
@@ -22282,6 +22926,14 @@ export default function CompanionPageClient() {
                 openExploreSparkVisualExplorer();
               }
         }
+        onReturnToExploreEstate={
+          exploreEstateReturnAvailable
+            ? () => {
+                setExploreEstateReturnAvailable(false);
+                openExploreSparkVisualExplorer();
+              }
+            : undefined
+        }
         onOpenPlanMyDay={() => openPlanMyDayCore()}
         onOpenRhythms={() => openPlanMyDayCore({ area: "rhythms" })}
         onOpenReminders={() => openRemindersCore()}
@@ -22299,10 +22951,20 @@ export default function CompanionPageClient() {
         }
         onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
         onOpenChamber={() => openChamberOfMomentumCore()}
+        onOpenBoardroom={() => openBoardroomCore()}
         onOpenBreathe={() => openBreatheOverlayCore()}
         onPlaySoundscape={(track) => {
           void playExperienceSoundscapeTrack(track);
         }}
+      />
+
+      <ProfileDestinationHost
+        destination={
+          isProfileDestinationOverlay(overlay) ? overlay : null
+        }
+        growthProfileEmphasizeTimeline={growthProfileEmphasizeTimeline}
+        onClose={goBack}
+        onOpenEstatePlace={handleEstateMenuAction}
       />
 
       <BreatheDestinationHost

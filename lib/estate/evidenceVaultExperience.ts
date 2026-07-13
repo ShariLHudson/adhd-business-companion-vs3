@@ -6,13 +6,28 @@ export const EVIDENCE_VAULT_ROOM_NAME = "Evidence Vault" as const;
 
 /** Exterior entrance — shown before doors open. */
 export const EVIDENCE_VAULT_EXTERIOR_WELCOME = [
-  "Behind these doors are the moments that prove your growth, resilience, creativity, and accomplishments.",
-  "When you're ready, open the vault and step inside.",
+  "Your Evidence Vault holds the proof of what you have done, handled, learned, created, and overcome.",
+  "Unlock the door when you are ready to begin preserving that evidence.",
 ].join("\n\n");
 
-export const EVIDENCE_VAULT_DOOR_ACTION_LABEL = "Open Evidence Vault" as const;
+export const EVIDENCE_VAULT_KEY_INVITATION =
+  "Use the key when you are ready to unlock your Evidence Vault." as const;
 
-export const EVIDENCE_VAULT_KEY_ACTION_LABEL = "Use the key" as const;
+export const EVIDENCE_VAULT_DOOR_ACTION_LABEL = "Unlock the Vault" as const;
+
+export const EVIDENCE_VAULT_KEY_ACTION_LABEL = "Unlock the Vault" as const;
+
+export const EVIDENCE_VAULT_LOCKED_INDICATOR = "Locked" as const;
+
+/** First visit after doors open — exactly three choices. */
+export const EVIDENCE_VAULT_FIRST_ENTRY_CHOICES = [
+  { id: "add-evidence", label: "Add a Piece of Evidence" },
+  { id: "shari-remember", label: "Let Shari Help Me Remember" },
+  { id: "look-inside", label: "Look Inside the Vault" },
+] as const;
+
+export type EvidenceVaultFirstEntryChoiceId =
+  (typeof EVIDENCE_VAULT_FIRST_ENTRY_CHOICES)[number]["id"];
 
 export const EVIDENCE_VAULT_JOURNAL_LABEL = "My Evidence Journal" as const;
 

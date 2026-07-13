@@ -39,6 +39,16 @@ export {
 
 export { resolveWelcomeHomeChatPrompt } from "./chatPrompt";
 export {
+  resolveWelcomeHomeDailyChoices,
+  continueDestinationAvailable,
+  type WelcomeHomeChoiceVisitorKind,
+  type WelcomeHomeDailyChoice,
+  type WelcomeHomeDailyChoiceId,
+  type WelcomeHomeDailyChoicesResult,
+  type WelcomeHomeDiscoveryInvitation,
+  type ResolveWelcomeHomeDailyChoicesInput,
+} from "./resolveWelcomeHomeDailyChoices";
+export {
   evaluateWelcomeHomeConcierge,
   welcomeHomeConciergeHintForChat,
   type WelcomeHomeConciergeEvaluation,

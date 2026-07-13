@@ -32,9 +32,15 @@ import {
   markEvidenceVaultEntranceCompleted,
   formatEvidenceVaultFindProofReply,
   formatEvidenceVaultInsightsReply,
-  type EvidenceVaultEntrancePhase,
   type EvidenceVaultWorkspaceMode,
 } from "@/lib/estate/evidenceVaultArrival";
+import {
+  isEvidenceVaultDoorBusy,
+  prefersEvidenceVaultReducedMotion,
+  resolveInitialEvidenceVaultDoorState,
+  EVIDENCE_VAULT_REDUCED_MOTION_MS,
+  type EvidenceVaultDoorState,
+} from "@/lib/estate/evidenceVaultDoor";
 import {
   exportAllEvidence,
   getEvidenceEntries,
@@ -42,6 +48,7 @@ import {
 import {
   EVIDENCE_VAULT_CHAT_PREFILL_ACK,
   EVIDENCE_VAULT_DISCOVERY_GUIDE_FIELDS,
+  type EvidenceVaultFirstEntryChoiceId,
 } from "@/lib/estate/evidenceVaultExperience";
 import { EstateCollectionBrowseBar } from "./EstateCollectionBrowseBar";
 import {
@@ -68,8 +75,6 @@ import "./estate-collection-room.css";
 import "./evidence-vault-entrance.css";
 import "./evidence-vault-interior.css";
 import "./evidence-vault-workspace.css";
-
-type VaultEntrancePhase = EvidenceVaultEntrancePhase;
 
 type VaultPanel = null | "discovery" | "browse" | "insights" | "search";
 
@@ -151,10 +156,13 @@ export function EstateCollectionRoomEngine({
     () => initialVault.mode,
   );
   const [vaultPanel, setVaultPanel] = useState<VaultPanel>(() => initialVault.panel);
-  const [entrancePhase, setEntrancePhase] = useState<VaultEntrancePhase>(() => {
-    if (!isEvidenceVault || skipEntranceOnMount) return "inside";
-    return "door";
+  const [doorState, setDoorState] = useState<EvidenceVaultDoorState>(() => {
+    if (!isEvidenceVault) return "open";
+    return resolveInitialEvidenceVaultDoorState({
+      skipEntrance: skipEntranceOnMount,
+    });
   });
+  const unlockInFlightRef = useRef(false);
   const [chatPrefillNote, setChatPrefillNote] = useState(
     () => isEvidenceVault && initialVault.chatPrefill,
   );
@@ -174,60 +182,93 @@ export function EstateCollectionRoomEngine({
   );
 
   const showEntrance =
-    isEvidenceVault && vaultMode !== "browse" && entrancePhase !== "inside";
+    isEvidenceVault && vaultMode !== "browse" && doorState !== "open";
   const showVaultInterior =
     isEvidenceVault &&
-    entrancePhase === "inside" &&
+    doorState === "open" &&
     vaultMode === "arrive" &&
     (vaultPanel === null || vaultPanel === "discovery");
   const showInlineDiscovery =
     isEvidenceVault &&
-    entrancePhase === "inside" &&
+    doorState === "open" &&
     vaultPanel === "discovery" &&
     vaultMode === "arrive";
   const showVaultActionBar =
     isEvidenceVault &&
-    entrancePhase === "inside" &&
+    doorState === "open" &&
     vaultPanel === null &&
     vaultMode !== "arrive";
   const showVaultBrowse =
-    isEvidenceVault && entrancePhase === "inside" && vaultPanel === "browse";
+    isEvidenceVault && doorState === "open" && vaultPanel === "browse";
   const showVaultInsights =
-    isEvidenceVault && entrancePhase === "inside" && vaultPanel === "insights";
+    isEvidenceVault && doorState === "open" && vaultPanel === "insights";
   const showVaultSearch =
-    isEvidenceVault && entrancePhase === "inside" && vaultPanel === "search";
+    isEvidenceVault && doorState === "open" && vaultPanel === "search";
   const vaultPlateImage = useMemo(() => {
     if (!isEvidenceVault) return undefined;
-    if (entrancePhase === "door" || entrancePhase === "unlocking") {
+    if (doorState === "locked" || doorState === "key_ready" || doorState === "unlocking") {
       return EVIDENCE_VAULT_ENTRANCE_BG;
     }
     return EVIDENCE_VAULT_ROOM_BG;
-  }, [isEvidenceVault, entrancePhase]);
+  }, [isEvidenceVault, doorState]);
   const showBrowseOnly = !isEvidenceVault || showVaultBrowse;
   const showCaptureForm = !isEvidenceVault || vaultMode === "add";
   const showBrowse = showBrowseOnly;
 
   function useVaultKey() {
-    if (entrancePhase !== "door") return;
-    setEntrancePhase("unlocking");
-    window.setTimeout(() => {
-      setEntrancePhase("opening");
+    if (!isEvidenceVault) return;
+    if (isEvidenceVaultDoorBusy(doorState) || unlockInFlightRef.current) return;
+    if (doorState !== "locked" && doorState !== "key_ready") return;
+    unlockInFlightRef.current = true;
+    setDoorState("unlocking");
+
+    const reduced = prefersEvidenceVaultReducedMotion();
+    if (reduced) {
       window.setTimeout(() => {
-        setEntrancePhase("entering");
-        window.setTimeout(() => {
-          markEvidenceVaultEntranceCompleted();
-          setEntrancePhase("inside");
-          window.dispatchEvent(
-            new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
-          );
-        }, EVIDENCE_VAULT_ENTRANCE_ENTER_MS);
-      }, EVIDENCE_VAULT_ENTRANCE_DOOR_MS);
+        markEvidenceVaultEntranceCompleted();
+        setDoorState("open");
+        unlockInFlightRef.current = false;
+        window.dispatchEvent(
+          new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
+        );
+      }, EVIDENCE_VAULT_REDUCED_MOTION_MS);
+      return;
+    }
+
+    window.setTimeout(() => {
+      setDoorState("opening");
+      window.setTimeout(() => {
+        markEvidenceVaultEntranceCompleted();
+        setDoorState("open");
+        unlockInFlightRef.current = false;
+        window.dispatchEvent(
+          new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
+        );
+      }, EVIDENCE_VAULT_ENTRANCE_DOOR_MS + EVIDENCE_VAULT_ENTRANCE_ENTER_MS);
     }, EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS);
   }
 
   function openJournalFromInterior() {
     setVaultPanel("discovery");
     setFilePhase("folder");
+  }
+
+  function handleFirstEntryChoice(id: EvidenceVaultFirstEntryChoiceId) {
+    switch (id) {
+      case "add-evidence":
+        setVaultMode("arrive");
+        setVaultPanel("discovery");
+        setFilePhase("folder");
+        return;
+      case "shari-remember":
+        setVaultMode("arrive");
+        setVaultPanel("search");
+        return;
+      case "look-inside":
+        setVaultMode("browse");
+        setVaultPanel("browse");
+        return;
+    }
   }
 
   const closeVaultPanel = useCallback(() => {
@@ -427,26 +468,28 @@ export function EstateCollectionRoomEngine({
       room={room}
       backgroundImage={vaultPlateImage}
       dataVaultEntrancePhase={
-        isEvidenceVault && entrancePhase !== "inside" ? entrancePhase : undefined
+        isEvidenceVault && doorState !== "open" ? doorState : undefined
       }
     >
       {isEvidenceVault ? (
         <>
-          {entrancePhase === "inside" ? (
+          {doorState === "open" ? (
             <div className="discovery-file-exit">
               <GrowthPanelBackButton onBack={onBack} label={backLabel} />
             </div>
           ) : null}
           {showEntrance ? (
             <EvidenceVaultEntrance
-              phase={entrancePhase as Exclude<VaultEntrancePhase, "inside">}
-              onUseKey={useVaultKey}
+              doorState={doorState}
+              onUnlock={useVaultKey}
+              onBack={onBack}
             />
           ) : null}
           {showVaultInterior ? (
             <EvidenceVaultInterior
               journalActive={vaultPanel === "discovery"}
               onOpenJournal={openJournalFromInterior}
+              onFirstEntryChoice={handleFirstEntryChoice}
               showSecondaryActions={hasEvidenceVaultEntranceCompleted()}
               onBrowseArchive={() => {
                 setVaultMode("browse");

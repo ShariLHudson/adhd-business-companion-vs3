@@ -49,13 +49,14 @@ export function ChatInputBar({
       className={`companion-chat-input input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5 ${
         conversationMode ? "input-glass-conversation" : ""
       }`}
+      aria-busy={isLoading || undefined}
     >
       <button
         type="button"
         data-testid={COMMUNICATION_ANCHOR_TEST_IDS.mic}
         data-icon-slot="voice-input"
         onClick={onToggleListening}
-        disabled={!speechSupported || isLoading}
+        disabled={!speechSupported}
         aria-label={isListening ? "Stop listening" : "Voice input"}
         aria-pressed={isListening}
         title={

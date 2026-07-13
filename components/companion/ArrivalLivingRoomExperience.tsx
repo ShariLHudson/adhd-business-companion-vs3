@@ -80,6 +80,8 @@ export function ArrivalLivingRoomExperience({
     }
 
     onInputChange("");
+    // Answer in chat first. Arrival room suggestions stay as UI/text until the
+    // member clicks accept — never navigate as a side effect of send.
     onSend(trimmed);
     if (
       !experience.showRealityQuestion &&

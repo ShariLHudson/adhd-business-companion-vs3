@@ -25,6 +25,8 @@ import "./focus-my-brain-sanctuary.css";
 import "./companion-floating-card.css";
 import "./companion-desk.css";
 import "./companion-chat.css";
+import "./spark-thinking-flame.css";
+import "./shari-presence-flame.css";
 import "./plan-day-experience.css";
 import "./growth-story-hub.css";
 import "./welcome-home-first-launch.css";
