@@ -73,16 +73,21 @@ export function CompanionSignInExperience({
 
   useEffect(() => {
     if (forceSignIn || !sessionChecked || loading || redirecting) return;
+    // Trust restored session user — avoid getUser() which rate-limits easily.
+    if (user?.id) {
+      goHomeAfterAuth();
+      return;
+    }
     const token = session?.access_token;
-    if (!user?.id && !token) return;
+    if (!token) return;
 
     let cancelled = false;
     void (async () => {
       const supabase = getCompanionSupabase();
       if (!supabase) return;
-      const { data: userData, error } = await supabase.auth.getUser();
+      const { data: sessionData } = await supabase.auth.getSession();
       if (cancelled) return;
-      if (error || !userData.user) return;
+      if (!sessionData.session?.user) return;
       goHomeAfterAuth();
     })();
 

@@ -76,7 +76,8 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     enabled: welcomeRequired,
     active: welcomeRequired,
     immersive: welcomeRequired,
-    paused: !welcomeRequired || voiceMuted || phase === "stopped",
+    // Do not read `voiceMuted` here — it comes from this same destructure (TDZ crash).
+    paused: !welcomeRequired || phase === "stopped" || phase === "muted",
   });
 
   useEffect(() => {

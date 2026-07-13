@@ -283,15 +283,14 @@ async function restoreLoginPageSession(
   const oauthReturn = isOAuthReturnUrl();
   const attempts = oauthReturn ? 40 : 1;
 
+  // Prefer getSession only — getUser() hits Auth and rate-limits (429) when
+  // retried in a tight loop after OAuth. Session user is enough for restore.
   for (let i = 0; i < attempts; i += 1) {
     const { data, error } = await supabase.auth.getSession();
     if (error) break;
-    if (data.session?.access_token) {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (!userError && userData.user) {
-        if (oauthReturn) scrubOAuthParamsFromLoginUrl();
-        return data.session;
-      }
+    if (data.session?.user) {
+      if (oauthReturn) scrubOAuthParamsFromLoginUrl();
+      return data.session;
     }
     if (!oauthReturn) break;
     await new Promise((resolve) => window.setTimeout(resolve, 100));
