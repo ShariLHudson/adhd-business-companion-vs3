@@ -112,5 +112,8 @@ export const AI_TONE_GUIDES: AiToneGuide[] = [
 
 export function aiToneLabel(id: AiTone): string {
   const guide = AI_TONE_GUIDES.find((g) => g.id === id);
-  return guide ? `${guide.emoji} ${guide.label}` : id;
+  if (!guide) return id;
+  // Playful: label only — no smile emoji in Settings.
+  if (guide.id === "playful") return guide.label;
+  return `${guide.emoji} ${guide.label}`;
 }

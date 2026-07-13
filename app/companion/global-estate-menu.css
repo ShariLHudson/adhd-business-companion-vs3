@@ -224,10 +224,283 @@
   text-overflow: ellipsis;
 }
 
+.settings-panel__heading {
+  color: #1f1c19;
+}
+
+.settings-panel__subheading {
+  color: #6b635a;
+}
+
+.settings-panel__back {
+  color: #1e4f4f;
+}
+
+.settings-panel__title {
+  color: #1f1c19;
+}
+
+.settings-menu-panel.estate-room-experience-menu__panel {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  /* Leave room for sheet header + Settings title; scroll the options */
+  max-height: min(68dvh, calc(100dvh - 11rem));
+  overflow: hidden;
+}
+
 .settings-menu-list {
   display: flex;
   flex-direction: column;
   gap: 0.28rem;
+}
+
+/* Scrollable options — more rows than fit on screen */
+.settings-menu-panel .settings-menu-list.estate-room-experience-menu__panel-scroll,
+.settings-menu-panel .estate-room-experience-menu__panel-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 236, 200, 0.45) rgba(255, 255, 255, 0.06);
+}
+
+.settings-menu-panel .estate-room-experience-menu__panel-scroll::-webkit-scrollbar {
+  width: 0.55rem;
+}
+
+.settings-menu-panel .estate-room-experience-menu__panel-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+}
+
+.settings-menu-panel .estate-room-experience-menu__panel-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 236, 200, 0.4);
+  border-radius: 999px;
+}
+
+.settings-menu-panel .estate-room-experience-menu__panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 236, 200, 0.58);
+}
+
+.settings-menu-list .estate-dropdown-menu__value-row {
+  align-items: flex-start;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+.settings-menu-list .estate-dropdown-menu__value-row-label {
+  flex: 1 1 42%;
+  line-height: 1.3;
+  padding-top: 0.05rem;
+}
+
+.settings-menu-list .estate-dropdown-menu__value-row-meta {
+  flex: 1 1 50%;
+  max-width: none;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.settings-menu-list .estate-dropdown-menu__value-row-value {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Dark Settings sheet — match Estate option rows end-to-end */
+.modal-sheet--estate-dark {
+  background: rgba(22, 18, 14, 0.98);
+  color: rgba(255, 248, 235, 0.96);
+  border-left: 1px solid rgba(255, 236, 200, 0.22);
+}
+
+.modal-sheet__body--dark {
+  background: rgba(22, 18, 14, 0.98);
+}
+
+.modal-sheet--estate-dark .settings-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: rgba(255, 248, 235, 0.96);
+}
+
+.modal-sheet--estate-dark .settings-panel--menu {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+}
+
+.modal-sheet--estate-dark .settings-panel__heading,
+.modal-sheet--estate-dark .settings-panel__title {
+  color: rgba(255, 248, 235, 0.98);
+}
+
+.modal-sheet--estate-dark .settings-panel__subheading,
+.modal-sheet--estate-dark .settings-panel p.text-sm,
+.modal-sheet--estate-dark .settings-panel .text-\[\#6b635a\] {
+  color: rgba(255, 236, 200, 0.72);
+}
+
+.modal-sheet--estate-dark .settings-panel__back {
+  color: rgba(255, 220, 160, 0.92);
+}
+
+.modal-sheet--estate-dark .settings-panel__back:hover {
+  color: rgba(255, 236, 200, 1);
+}
+
+.modal-sheet--estate-dark .settings-menu-panel.estate-room-experience-menu__panel {
+  background: rgba(22, 18, 14, 0.92);
+  border-color: rgba(255, 236, 200, 0.28);
+  box-shadow: none;
+}
+
+.modal-sheet--estate-dark .settings-panel .text-\[\#1f1c19\],
+.modal-sheet--estate-dark .settings-panel .text-2xl {
+  color: rgba(255, 248, 235, 0.98);
+}
+
+/* How To Use Settings — readable on dark sheet */
+.modal-sheet--estate-dark .workspace-area-works-guide {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 236, 200, 0.28);
+  box-shadow: none;
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide__trigger:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide__title {
+  color: #ffffff !important;
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide__chevron {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide__body {
+  border-top-color: rgba(255, 236, 200, 0.2);
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide__copy,
+.modal-sheet--estate-dark .workspace-area-works-guide__copy .font-medium {
+  color: rgba(255, 255, 255, 0.92) !important;
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide .text-\[\#b45309\] {
+  color: rgba(255, 220, 160, 0.95) !important;
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide__support {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 236, 200, 0.2);
+}
+
+.modal-sheet--estate-dark .workspace-area-works-guide__support .text-\[\#9a8f82\] {
+  color: rgba(255, 236, 200, 0.7) !important;
+}
+
+/*
+ * Light surfaces inside dark Settings (Celebrations cards, selects, connection
+ * cards, appearance samples, etc.) — keep all text black so it stays readable.
+ */
+.modal-sheet--estate-dark .settings-panel :is(
+  [class*="bg-white"],
+  .bg-\[\#faf7f2\],
+  .bg-\[\#faf7f2\]\/70,
+  .bg-\[\#f3efe8\],
+  .bg-\[\#1e4f4f\]\/\[0\.06\]
+) {
+  color: #000000;
+}
+
+.modal-sheet--estate-dark .settings-panel :is(
+  [class*="bg-white"],
+  .bg-\[\#faf7f2\],
+  .bg-\[\#faf7f2\]\/70,
+  .bg-\[\#f3efe8\],
+  .bg-\[\#1e4f4f\]\/\[0\.06\]
+)
+  :is(p, span, label, summary, strong, em, small, li, div, button),
+.modal-sheet--estate-dark .settings-panel :is(
+  [class*="bg-white"],
+  .bg-\[\#faf7f2\],
+  .bg-\[\#faf7f2\]\/70,
+  .bg-\[\#f3efe8\],
+  .bg-\[\#1e4f4f\]\/\[0\.06\]
+)
+  :is(
+    .text-black,
+    .text-\[\#1f1c19\],
+    .text-\[\#3d3630\],
+    .text-\[\#4b463f\],
+    .text-\[\#6b635a\],
+    .text-\[\#9a8f82\],
+    .text-\[\#1e4f4f\],
+    .text-\[\#a85c4a\],
+    .text-sm,
+    .text-xs,
+    .text-base,
+    .text-lg,
+    .text-2xl
+  ) {
+  color: #000000 !important;
+}
+
+/* How To Use Settings — title only white (must follow light-surface black rules) */
+.modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__title {
+  color: #ffffff !important;
+}
+
+.modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__chevron {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Appearance (Background) option cards — match dark Settings buttons */
+.modal-sheet--estate-dark .settings-panel .settings-appearance-option {
+  color: rgba(255, 248, 235, 0.98) !important;
+}
+
+.modal-sheet--estate-dark .settings-panel .settings-appearance-option :is(span, p) {
+  color: inherit;
+}
+
+.modal-sheet--estate-dark .settings-panel .settings-appearance-option .text-\[rgba\(255\,236\,200\,0\.72\)\],
+.modal-sheet--estate-dark
+  .settings-panel
+  .settings-appearance-picker
+  .text-\[rgba\(255\,236\,200\,0\.72\)\] {
+  color: rgba(255, 236, 200, 0.72) !important;
+}
+
+.modal-sheet--estate-dark .settings-panel :is(input, select, textarea) {
+  color: #000000 !important;
+  color-scheme: light;
+}
+
+.modal-sheet--estate-dark .settings-panel :is(input, select, textarea)::placeholder {
+  color: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Filled teal CTA buttons stay white-on-teal */
+.modal-sheet--estate-dark .settings-panel :is(
+  [class*="bg-white"],
+  .bg-\[\#faf7f2\]
+)
+  .bg-\[\#1e4f4f\],
+.modal-sheet--estate-dark .settings-panel .bg-\[\#1e4f4f\] {
+  color: #ffffff !important;
 }
 
 /* Mobile / narrow viewports — keep menu usable with thumb targets */

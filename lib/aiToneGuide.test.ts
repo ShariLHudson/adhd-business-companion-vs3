@@ -23,8 +23,10 @@ describe("aiToneGuide — six distinct companion tones", () => {
     }
   });
 
-  it("formats settings summary labels with emoji", () => {
+  it("formats settings summary labels with emoji except Playful", () => {
     expect(aiToneLabel("strategic")).toBe("🧠 Strategic");
+    expect(aiToneLabel("playful")).toBe("Playful");
+    expect(aiToneLabel("gentle")).toBe("❤️ Gentle");
   });
 });
 

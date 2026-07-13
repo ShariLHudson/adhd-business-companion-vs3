@@ -9,10 +9,12 @@ import {
 } from "@/lib/visualColorModes";
 import { activeColorModeProofLabel } from "@/lib/visualColorCoding";
 
+/** Match dark Settings / Estate menu button rows (not light cream cards). */
 const CARD =
-  "w-full rounded-2xl border bg-white/90 p-4 text-left transition-colors";
+  "settings-appearance-option w-full rounded-[0.65rem] border border-[rgba(255,248,235,0.2)] bg-[rgba(255,255,255,0.05)] p-4 text-left text-[rgba(255,248,235,0.98)] transition-colors";
 
-const LABEL = "text-sm font-bold uppercase tracking-wide text-[#6b635a]";
+const LABEL =
+  "text-sm font-bold uppercase tracking-wide text-[rgba(255,236,200,0.72)]";
 
 type Props = {
   current: VisualMode;
@@ -165,24 +167,31 @@ export function VisualColorModePicker({ current, onSave }: Props) {
   }
 
   return (
-    <div className="mt-4 flex flex-col gap-4">
+    <div
+      className="settings-appearance-picker mt-4 flex flex-col gap-4"
+      data-testid="settings-appearance-picker"
+    >
       <p
-        className="rounded-xl border border-dashed border-[#c9bfb0] bg-white px-4 py-2.5 text-sm font-semibold text-[#1f1c19]"
+        className="rounded-[0.65rem] border border-[rgba(255,248,235,0.2)] bg-[rgba(255,255,255,0.05)] px-4 py-2.5 text-sm font-semibold text-[rgba(255,248,235,0.98)]"
         role="status"
         aria-live="polite"
       >
         {activeColorModeProofLabel(current)}
       </p>
 
-      <details className="rounded-xl border border-[#d4cdc3] bg-white/70 px-4 py-3">
-        <summary className="cursor-pointer text-sm font-semibold text-[#1f1c19] hover:text-[#1e4f4f]">
+      <details className="rounded-[0.65rem] border border-[rgba(255,248,235,0.2)] bg-[rgba(255,255,255,0.05)] px-4 py-3">
+        <summary className="cursor-pointer text-sm font-semibold text-[rgba(255,248,235,0.98)] hover:text-[rgba(255,236,200,1)]">
           ▼ What do these color modes do?
         </summary>
-        <div className="mt-3 flex flex-col gap-3 text-sm text-[#4b463f]">
+        <div className="mt-3 flex flex-col gap-3 text-sm text-[rgba(255,236,200,0.78)]">
           {VISUAL_COLOR_OPTIONS.map((opt) => (
             <div key={opt.id}>
-              <p className="font-semibold text-[#1f1c19]">{opt.label}</p>
-              <p className="mt-0.5 text-[#6b635a]">{opt.explanation}</p>
+              <p className="font-semibold text-[rgba(255,248,235,0.98)]">
+                {opt.label}
+              </p>
+              <p className="mt-0.5 text-[rgba(255,236,200,0.72)]">
+                {opt.explanation}
+              </p>
             </div>
           ))}
         </div>
@@ -198,19 +207,21 @@ export function VisualColorModePicker({ current, onSave }: Props) {
               onClick={() => setDraft(it.id)}
               className={`${CARD} ${
                 selected
-                  ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06] ring-1 ring-[#1e4f4f]/20"
-                  : "border-[#d4cdc3] hover:border-[#1e4f4f]/45"
+                  ? "border-[rgba(201,164,108,0.55)] bg-[rgba(201,164,108,0.1)]"
+                  : "hover:border-[rgba(255,248,235,0.3)] hover:bg-[rgba(255,255,255,0.1)]"
               }`}
             >
               <span className="flex items-center justify-between gap-2">
-                <span className="text-base font-semibold text-[#1f1c19]">
+                <span className="text-base font-semibold text-[rgba(255,248,235,0.98)]">
                   {it.label}
                 </span>
                 {selected && current === it.id ? (
-                  <span className="text-[#1e4f4f]">✓</span>
+                  <span className="text-[rgba(255,220,160,0.95)]">✓</span>
                 ) : null}
               </span>
-              <span className="mt-0.5 block text-sm text-[#6b635a]">{it.desc}</span>
+              <span className="mt-0.5 block text-sm text-[rgba(255,236,200,0.72)]">
+                {it.desc}
+              </span>
               {it.id === "decorative" && (
                 <span className="mt-2 flex flex-wrap gap-1">
                   {DYNAMIC_MODE_SWATCHES.map((m) => (
@@ -241,12 +252,12 @@ export function VisualColorModePicker({ current, onSave }: Props) {
       </div>
 
       <div aria-live="polite">
-        <p className="text-sm text-[#6b635a]">
+        <p className="text-sm text-[rgba(255,236,200,0.72)]">
           What you&apos;re seeing below is an example of how the app would look using
           the selected color mode.
         </p>
         {previewOption ? (
-          <p className="mt-1 text-sm font-medium text-[#4b463f]">
+          <p className="mt-1 text-sm font-medium text-[rgba(255,248,235,0.92)]">
             {previewOption.previewNote}
           </p>
         ) : null}
@@ -256,7 +267,7 @@ export function VisualColorModePicker({ current, onSave }: Props) {
 
       {savedFlash ? (
         <p
-          className="companion-fade-in text-center text-sm font-semibold text-[#1e4f4f]"
+          className="companion-fade-in text-center text-sm font-semibold text-[rgba(255,220,160,0.95)]"
           role="status"
         >
           ✓ Appearance updated — {activeColorModeProofLabel(draft)}
