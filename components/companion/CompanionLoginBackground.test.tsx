@@ -29,11 +29,11 @@ describe("CompanionLoginBackground", () => {
     return container.querySelector("[data-testid='companion-login-scene']");
   }
 
-  it("renders login-welcome-background with uniform full exposure", () => {
+  it("renders welcome-home-front-door with uniform full exposure", () => {
     render();
     expect(scene()).toBeTruthy();
     expect(scene()?.getAttribute("data-login-background")).toBe(
-      "login-welcome-background",
+      "welcome-home-front-door",
     );
     expect(scene()?.classList.contains("companion-login-scene--full-exposure")).toBe(
       true,
@@ -41,10 +41,8 @@ describe("CompanionLoginBackground", () => {
     const images = container.querySelectorAll(
       ".companion-login-scene__base",
     ) as NodeListOf<HTMLImageElement>;
-    expect(images.length).toBe(2);
-    for (const img of images) {
-      expect(img.getAttribute("src")).toBe(COMPANION_LOGIN_BACKGROUND);
-    }
+    expect(images.length).toBe(1);
+    expect(images[0]?.getAttribute("src")).toBe(COMPANION_LOGIN_BACKGROUND);
     expect(container.querySelector(".companion-login-scene__soften")).toBeFalsy();
     expect(
       container.querySelector(".companion-welcome-scene__sunlight"),
@@ -56,8 +54,8 @@ describe("CompanionLoginBackground", () => {
     expect(scene()).toBeFalsy();
   });
 
-  it("keeps the scene behind the login card stacking context", () => {
+  it("keeps the scene inside the login page stacking context", () => {
     render();
-    expect(scene()?.classList.contains("-z-10")).toBe(true);
+    expect(scene()?.classList.contains("z-0")).toBe(true);
   });
 });

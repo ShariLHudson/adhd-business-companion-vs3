@@ -212,7 +212,7 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
 
   if (!welcomeRequired && phase === "error") {
     return (
-      <main className="relative flex min-h-dvh items-center justify-center px-4">
+      <main className="companion-login-page companion-login-page--welcome-bg relative flex min-h-dvh items-center justify-center px-4">
         <CompanionLoginBackground />
         <div className="relative z-10 max-w-md rounded-3xl border border-white/45 bg-[#faf7f2]/90 p-6 text-center shadow-sm backdrop-blur-md">
           <p className="text-base text-[#6b635a]">
@@ -238,7 +238,7 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
 
   return (
     <main
-      className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8"
+      className="companion-login-page companion-login-page--welcome-bg relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8"
       data-testid="first-login-welcome"
       data-welcome-state={phase}
       aria-labelledby={titleId}

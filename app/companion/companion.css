@@ -6808,8 +6808,12 @@
   position: absolute;
   z-index: 60;
   width: min(11.5rem, 46vw);
-  max-height: min(72vh, 26rem);
-  overflow: visible;
+  max-height: min(72dvh, calc(100dvh - 2rem));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
   pointer-events: auto;
 }
 
@@ -10071,6 +10075,8 @@
 
 .companion-login-page--welcome-bg {
   background: transparent;
+  /* Keep the doorway scene inside this page stack so z-0 is not painted under <body>. */
+  isolation: isolate;
 }
 
 .companion-login-scene {

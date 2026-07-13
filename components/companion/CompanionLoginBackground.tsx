@@ -15,7 +15,7 @@ export function CompanionLoginBackground({ fullExposure = true }: Props) {
 
   return (
     <div
-      className="companion-login-scene companion-login-scene--full-exposure pointer-events-none absolute inset-0 -z-10"
+      className="companion-login-scene companion-login-scene--full-exposure pointer-events-none absolute inset-0 z-0"
       data-testid="companion-login-scene"
       data-login-exposure="full"
       data-login-background="welcome-home-front-door"
