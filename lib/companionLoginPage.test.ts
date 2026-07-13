@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { describe, expect, it } from "vitest";
 import {
   COMPANION_LOGIN_BACKGROUND,
@@ -11,7 +13,15 @@ import {
 
 describe("companion login page", () => {
   it("uses login welcome background asset", () => {
-    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/\/backgrounds\/login-welcome-background\.PNG\?v=/);
+    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/\/backgrounds\/welcome-home-front-door\.png\?v=/);
+  });
+
+  it("ships welcome-home-front-door background file", () => {
+    expect(
+      fs.existsSync(
+        path.join(process.cwd(), "public/backgrounds/welcome-home-front-door.png"),
+      ),
+    ).toBe(true);
   });
 
   it("uses official transparent brand logo", () => {
