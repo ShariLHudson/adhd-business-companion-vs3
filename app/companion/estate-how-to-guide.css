@@ -1,0 +1,368 @@
+/* Shared Estate How to Use overlay — calm, readable, collapsible */
+
+.estate-how-to-guide {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: 0.75rem;
+  background: rgba(28, 22, 16, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.estate-how-to-guide__surface {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 42rem);
+  max-height: min(92dvh, 48rem);
+  margin: auto;
+  border-radius: 18px;
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  background: rgba(255, 252, 245, 0.98);
+  box-shadow: 0 18px 48px rgba(20, 14, 8, 0.28);
+  overflow: hidden;
+}
+
+.estate-how-to-guide__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem 0.75rem;
+  border-bottom: 1px solid rgba(201, 166, 107, 0.28);
+  flex-shrink: 0;
+}
+
+.estate-how-to-guide__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.35rem, 3.5vw, 1.75rem);
+  line-height: 1.25;
+  font-weight: 700;
+  color: rgba(36, 30, 24, 0.96);
+}
+
+.estate-how-to-guide__close,
+.estate-how-to-guide__footer-close,
+.estate-how-to-guide__primary {
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.estate-how-to-guide__close,
+.estate-how-to-guide__footer-close {
+  border: 1px solid rgba(90, 78, 64, 0.35);
+  background: rgba(255, 252, 245, 0.98);
+  color: rgba(36, 30, 24, 0.95);
+}
+
+.estate-how-to-guide__close:hover,
+.estate-how-to-guide__footer-close:hover,
+.estate-how-to-guide__primary:hover,
+.estate-how-to-guide__section-toggle:hover {
+  background: rgba(250, 243, 230, 0.98);
+}
+
+.estate-how-to-guide__close:focus-visible,
+.estate-how-to-guide__footer-close:focus-visible,
+.estate-how-to-guide__primary:focus-visible,
+.estate-how-to-guide__section-toggle:focus-visible,
+.estate-how-to-open-action:focus-visible,
+.estate-how-to-invite__open:focus-visible,
+.estate-how-to-invite__dismiss:focus-visible {
+  outline: 3px solid rgba(30, 79, 79, 0.55);
+  outline-offset: 2px;
+}
+
+.estate-how-to-guide__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.85rem 1.1rem 1rem;
+}
+
+.estate-how-to-guide__welcome p {
+  margin: 0 0 0.7rem;
+  font-size: clamp(1rem, 2.4vw, 1.08rem);
+  line-height: 1.55;
+  color: rgba(36, 30, 24, 0.94);
+}
+
+.estate-how-to-guide__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+}
+
+.estate-how-to-guide__section {
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  border-radius: 12px;
+  background: rgba(255, 255, 252, 0.92);
+  overflow: hidden;
+}
+
+.estate-how-to-guide__section-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 0.85rem 0.95rem;
+  cursor: pointer;
+  color: rgba(36, 30, 24, 0.96);
+}
+
+.estate-how-to-guide__section-title {
+  font-size: clamp(1.02rem, 2.5vw, 1.12rem);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.estate-how-to-guide__chevron {
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: rgba(90, 78, 64, 0.85);
+}
+
+.estate-how-to-guide__section-body {
+  padding: 0 0.95rem 0.95rem;
+  border-top: 1px solid rgba(201, 166, 107, 0.22);
+}
+
+.estate-how-to-guide__section-body p,
+.estate-how-to-guide__section-body li,
+.estate-how-to-guide__subsection h3 {
+  font-size: clamp(0.98rem, 2.3vw, 1.05rem);
+  line-height: 1.55;
+  color: rgba(36, 30, 24, 0.94);
+}
+
+.estate-how-to-guide__section-body p {
+  margin: 0.65rem 0 0;
+}
+
+.estate-how-to-guide__bullets,
+.estate-how-to-guide__numbered,
+.estate-how-to-guide__subsection ul,
+.estate-how-to-guide__comparison ul {
+  margin: 0.55rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.estate-how-to-guide__bullets li,
+.estate-how-to-guide__subsection li,
+.estate-how-to-guide__comparison li {
+  margin: 0.25rem 0;
+}
+
+.estate-how-to-guide__numbered {
+  list-style: decimal;
+}
+
+.estate-how-to-guide__numbered li {
+  margin: 0.55rem 0;
+}
+
+.estate-how-to-guide__numbered strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  color: rgba(36, 30, 24, 0.96);
+}
+
+.estate-how-to-guide__numbered span {
+  display: block;
+  color: rgba(36, 30, 24, 0.92);
+}
+
+.estate-how-to-guide__subsection {
+  margin-top: 0.75rem;
+}
+
+.estate-how-to-guide__subsection h3 {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.estate-how-to-guide__closing {
+  margin-top: 0.75rem !important;
+  font-weight: 600;
+}
+
+.estate-how-to-guide__comparison--table {
+  display: none;
+  margin-top: 0.75rem;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.estate-how-to-guide__comparison-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.35fr) 1fr;
+  gap: 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-top: 1px solid rgba(201, 166, 107, 0.22);
+}
+
+.estate-how-to-guide__comparison-row--head {
+  border-top: 0;
+  background: rgba(250, 243, 230, 0.9);
+  font-weight: 700;
+}
+
+.estate-how-to-guide__comparison--cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.estate-how-to-guide__comparison-card {
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  background: rgba(255, 252, 245, 0.96);
+}
+
+.estate-how-to-guide__comparison-card h3 {
+  margin: 0;
+  font-size: 1.02rem;
+}
+
+.estate-how-to-guide__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  justify-content: flex-end;
+  padding: 0.75rem 1.1rem 1rem;
+  border-top: 1px solid rgba(201, 166, 107, 0.28);
+  background: rgba(255, 252, 245, 0.98);
+  flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+}
+
+.estate-how-to-guide__primary {
+  border: 1px solid rgba(30, 79, 79, 0.45);
+  background: rgba(30, 79, 79, 0.92);
+  color: #fffaf2;
+}
+
+.estate-how-to-open-action {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(201, 166, 107, 0.55);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.96);
+  color: rgba(36, 30, 24, 0.96);
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 0.4rem 1rem;
+  cursor: pointer;
+  line-height: 1.25;
+}
+
+.estate-how-to-open-action:hover {
+  background: rgba(250, 243, 230, 0.98);
+}
+
+.estate-how-to-open-action--on-dark {
+  border-color: rgba(255, 252, 245, 0.55);
+  background: rgba(28, 22, 16, 0.42);
+  color: #fff9ef;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+.estate-how-to-open-action--on-dark:hover {
+  background: rgba(28, 22, 16, 0.55);
+}
+
+.estate-how-to-invite {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.65rem;
+  margin: 0.65rem 0 0;
+  padding: 0.55rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(201, 166, 107, 0.4);
+  background: rgba(255, 252, 245, 0.92);
+}
+
+.estate-how-to-invite--on-dark {
+  border-color: rgba(255, 252, 245, 0.4);
+  background: rgba(28, 22, 16, 0.38);
+  color: #fff9ef;
+}
+
+.estate-how-to-invite__label {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.estate-how-to-invite__open,
+.estate-how-to-invite__dismiss {
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+
+.estate-how-to-invite__open {
+  border: 1px solid rgba(30, 79, 79, 0.45);
+  background: rgba(30, 79, 79, 0.92);
+  color: #fffaf2;
+}
+
+.estate-how-to-invite--on-dark .estate-how-to-invite__open {
+  border-color: rgba(255, 252, 245, 0.55);
+  background: rgba(255, 252, 245, 0.95);
+  color: rgba(36, 30, 24, 0.96);
+}
+
+.estate-how-to-invite__dismiss {
+  border: 1px solid transparent;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (min-width: 48rem) {
+  .estate-how-to-guide__comparison--table {
+    display: block;
+  }
+
+  .estate-how-to-guide__comparison--cards {
+    display: none;
+  }
+}
+
+@media (max-width: 47.99rem) {
+  .estate-how-to-guide {
+    padding: 0.35rem;
+    align-items: flex-end;
+  }
+
+  .estate-how-to-guide__surface {
+    width: 100%;
+    max-height: min(94dvh, 52rem);
+    border-radius: 16px 16px 10px 10px;
+  }
+}

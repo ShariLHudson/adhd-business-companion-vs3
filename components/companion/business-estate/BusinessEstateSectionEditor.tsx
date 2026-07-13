@@ -5,6 +5,7 @@ import {
   applyFormVoiceTranscript,
   FormVoiceEntryControl,
 } from "@/components/companion/FormVoiceEntryControl";
+import { GuidedStageWorkspace } from "@/components/companion/guided-stages/GuidedStageWorkspace";
 import {
   getBusinessEstateEnvelope,
   saveBusinessEstateSection,
@@ -12,8 +13,11 @@ import {
 } from "@/lib/profile/businessEstateProfile";
 import {
   BUSINESS_ESTATE_SECTION_FIELDS,
+  fieldDisplayLabel,
   sectionStorageKey,
 } from "@/lib/profile/businessEstateSectionFields";
+import type { GuidedStageAreaId } from "@/lib/profile/guidedStageTypes";
+import { listAreaStageStatuses } from "@/lib/profile/guidedStageCompletion";
 
 type Props = {
   sectionId: BusinessEstateSectionId;
@@ -58,6 +62,10 @@ function valuesAreDirty(
   );
 }
 
+function isHiddenCompanionField(key: string): boolean {
+  return key === "coreValueNotes";
+}
+
 export function BusinessEstateSectionEditor({
   sectionId,
   title,
@@ -67,6 +75,7 @@ export function BusinessEstateSectionEditor({
   onDirtyChange,
 }: Props) {
   const fields = BUSINESS_ESTATE_SECTION_FIELDS[sectionId];
+  const visibleFields = fields.filter((f) => !isHiddenCompanionField(f.key));
   const [values, setValues] = useState<Record<string, string>>(() =>
     readSectionValues(sectionId),
   );
@@ -127,7 +136,12 @@ export function BusinessEstateSectionEditor({
   }
 
   const activeFieldLabel =
-    fields.find((field) => field.key === activeFieldKey)?.label ?? null;
+    visibleFields.find((field) => field.key === activeFieldKey)?.label ?? null;
+
+  const stageStatuses = listAreaStageStatuses(
+    sectionId as GuidedStageAreaId,
+    values,
+  );
 
   return (
     <div className="business-estate-section-editor">
@@ -167,29 +181,52 @@ export function BusinessEstateSectionEditor({
       ) : null}
 
       {mode === "view" ? (
-        <div className="business-estate-section-editor__view">
-          {fields.map((field) => {
-            const value = values[field.key]?.trim() ?? "";
-            return (
-              <button
-                key={field.key}
-                type="button"
-                className="business-estate-section-editor__view-row"
-                onClick={enterEditMode}
-                aria-label={`Edit ${field.label}`}
+        <>
+          <div
+            className="guided-stage-workspace__status-list guided-stage-workspace__status-list--view"
+            role="list"
+          >
+            {stageStatuses.map(({ stage, label }) => (
+              <div
+                key={stage.id}
+                role="listitem"
+                className={`guided-stage-workspace__status-item${
+                  stage.optional
+                    ? " guided-stage-workspace__status-item--optional"
+                    : ""
+                }`}
               >
-                <span className="business-estate-section-editor__view-label">
-                  {field.label}
+                <span>{stage.title}</span>
+                <span className="guided-stage-workspace__status-label">
+                  {label}
                 </span>
-                <span className="business-estate-section-editor__view-value">
-                  {value || "Not set"}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+              </div>
+            ))}
+          </div>
+          <div className="business-estate-section-editor__view">
+            {visibleFields.map((field) => {
+              const value = values[field.key]?.trim() ?? "";
+              return (
+                <button
+                  key={field.key}
+                  type="button"
+                  className="business-estate-section-editor__view-row"
+                  onClick={enterEditMode}
+                  aria-label={`Edit ${fieldDisplayLabel(sectionId, field)}`}
+                >
+                  <span className="business-estate-section-editor__view-label">
+                    {fieldDisplayLabel(sectionId, field)}
+                  </span>
+                  <span className="business-estate-section-editor__view-value">
+                    {value || "Ready when you are"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </>
       ) : (
-        <div className="business-estate-section-editor__fields">
+        <div className="business-estate-section-editor__fields business-estate-section-editor__fields--staged">
           <div className="business-estate-section-editor__voice-bar">
             <FormVoiceEntryControl
               activeFieldKey={activeFieldKey}
@@ -206,43 +243,17 @@ export function BusinessEstateSectionEditor({
               }}
             />
           </div>
-          {fields.map((field) => {
-            const fieldId = `business-estate-${sectionId}-${field.key}`;
-            const isActive = activeFieldKey === field.key;
-            return (
-              <label
-                key={field.key}
-                className={`business-estate-section-editor__field${
-                  isActive ? " business-estate-section-editor__field--active" : ""
-                }`}
-                htmlFor={fieldId}
-              >
-                <span className="business-estate-section-editor__label">
-                  {field.label}
-                </span>
-                {field.type === "textarea" ? (
-                  <textarea
-                    id={fieldId}
-                    value={values[field.key] ?? ""}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                    onFocus={() => setActiveFieldKey(field.key)}
-                    placeholder={field.placeholder}
-                    className="business-estate-section-editor__textarea"
-                  />
-                ) : (
-                  <input
-                    id={fieldId}
-                    type="text"
-                    value={values[field.key] ?? ""}
-                    onChange={(e) => updateField(field.key, e.target.value)}
-                    onFocus={() => setActiveFieldKey(field.key)}
-                    placeholder={field.placeholder}
-                    className="business-estate-section-editor__input"
-                  />
-                )}
-              </label>
-            );
-          })}
+          <GuidedStageWorkspace
+            areaId={sectionId as GuidedStageAreaId}
+            values={values}
+            onChange={updateField}
+            onFocusField={setActiveFieldKey}
+            activeFieldKey={activeFieldKey}
+            onSaveAndReturnLater={handleSave}
+            onCancel={handleCancel}
+            notesValue={values.coreValueNotes ?? ""}
+            onNotesChange={(next) => updateField("coreValueNotes", next)}
+          />
         </div>
       )}
 
@@ -251,29 +262,6 @@ export function BusinessEstateSectionEditor({
           {savedMessage}
         </p>
       ) : null}
-
-      <div className="business-estate-section-editor__actions">
-        {mode === "edit" ? (
-          <>
-            <button
-              type="button"
-              className="business-estate-section-editor__cancel"
-              onClick={handleCancel}
-              data-testid="business-estate-cancel"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              className="business-estate-section-editor__save"
-              onClick={handleSave}
-              data-testid="business-estate-save-changes"
-            >
-              Save Changes
-            </button>
-          </>
-        ) : null}
-      </div>
     </div>
   );
 }

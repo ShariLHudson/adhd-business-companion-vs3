@@ -12,12 +12,14 @@ import {
   formatPlanItemCreated,
   movePlanItemColumn,
   nextFocusOptions,
-  snoozePlanItem,
+  parkPlanItem,
   snoozePlanItemUntil,
   tomorrowStr,
   updatePlanItem,
   type PlanDayItem,
+  type PlanItemColumn,
   type PlanItemPriority,
+  KANBAN_COLUMNS,
 } from "@/lib/planMyDay";
 import {
   PLAN_PRIORITY_OPTIONS,
@@ -31,12 +33,19 @@ import {
   shariRemindAcknowledgment,
 } from "@/lib/planMyDay/companionBrainClient/planDayRemindMe";
 import { AppBackButton } from "@/components/companion/AppBackButton";
+import { MyRhythmsSetupFlow } from "@/components/companion/MyRhythmsSetupFlow";
+import {
+  FormVoiceEntryControl,
+  applyFormVoiceTranscript,
+} from "@/components/companion/FormVoiceEntryControl";
 
 export type PlanItemDetailMode =
   | "form"
   | "mark-done"
   | "defer-day"
-  | "delete-confirm";
+  | "delete-confirm"
+  | "move-area"
+  | "convert-rhythm";
 
 type Props = {
   item: PlanDayItem;
@@ -130,6 +139,8 @@ export function PlanDayItemDetail({
   const [remindOpen, setRemindOpen] = useState(false);
   const [remindAck, setRemindAck] = useState<string | null>(null);
   const [deferDate, setDeferDate] = useState(tomorrowStr());
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [activeFieldKey, setActiveFieldKey] = useState<string | null>(null);
   const form = useItemForm(item);
 
   const projects = useMemo(
@@ -229,13 +240,6 @@ export function PlanDayItemDetail({
     }
   }
 
-  function handleSnooze(minutes: number) {
-    const next = updatePlanItem(items, item.id, buildPatch());
-    apply(snoozePlanItem(next, item.id, minutes));
-    setRemindAck(shariRemindAcknowledgment(item.title));
-    window.setTimeout(() => onClose(), 1200);
-  }
-
   function handleRemindUntil(until: string) {
     const next = updatePlanItem(items, item.id, buildPatch());
     apply(snoozePlanItemUntil(next, item.id, until));
@@ -255,9 +259,72 @@ export function PlanDayItemDetail({
     onClose();
   }
 
+  function handleMoveArea(column: Extract<PlanItemColumn, "ready" | "today" | "doing">) {
+    const next = updatePlanItem(items, item.id, buildPatch());
+    apply(movePlanItemColumn(next, item.id, column));
+    setDetailMode("form");
+    setActionsOpen(false);
+  }
+
   const shell = compact
     ? "rounded-xl border border-[#e7dfd4] bg-white"
     : "rounded-2xl border border-[#e7dfd4] bg-white shadow-sm";
+
+  if (mode === "convert-rhythm") {
+    return (
+      <MyRhythmsSetupFlow
+        item={{ ...item, title: form.title.trim() || item.title, notes: form.notes.trim() || item.notes }}
+        onCancel={() => setDetailMode("form")}
+        onKeepDayItem={() => {
+          handleSave();
+          onClose();
+        }}
+        onRemoveDayItem={() => {
+          handleDelete();
+        }}
+      />
+    );
+  }
+
+  if (mode === "move-area") {
+    return (
+      <div className={`${shell} px-4 py-5`} data-testid="plan-item-move-area">
+        <p className="text-lg font-semibold text-[#1f1c19]">
+          Move to another day area
+        </p>
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Choose where &ldquo;{form.title || item.title}&rdquo; belongs today.
+        </p>
+        <div className="mt-4 flex flex-col gap-2">
+          {KANBAN_COLUMNS.map((col) => (
+            <button
+              key={col.id}
+              type="button"
+              disabled={item.column === col.id}
+              onClick={() =>
+                handleMoveArea(
+                  col.id as Extract<PlanItemColumn, "ready" | "today" | "doing">,
+                )
+              }
+              className="rounded-xl border border-[#d4cdc3] bg-[#faf7f2] px-4 py-3 text-left text-base font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/40 disabled:opacity-40"
+              data-testid={`plan-item-move-${col.id}`}
+            >
+              {col.label}
+              <span className="mt-0.5 block text-sm font-normal text-[#6b635a]">
+                {col.hint}
+              </span>
+            </button>
+          ))}
+        </div>
+        <AppBackButton
+          destination="Manage item"
+          onBack={() => setDetailMode("form")}
+          size="compact"
+          className="mt-4"
+        />
+      </div>
+    );
+  }
 
   if (mode === "mark-done") {
     return (
@@ -303,7 +370,7 @@ export function PlanDayItemDetail({
   if (mode === "delete-confirm") {
     return (
       <div className={`${shell} px-4 py-5`}>
-        <p className="text-lg font-semibold text-[#1f1c19]">Delete this item?</p>
+        <p className="text-lg font-semibold text-[#1f1c19]">Remove from today?</p>
         <p className="mt-2 text-sm text-[#6b635a]">
           &ldquo;{form.title}&rdquo; will be removed from today&apos;s plan.
         </p>
@@ -313,7 +380,7 @@ export function PlanDayItemDetail({
             onClick={handleDelete}
             className="rounded-xl bg-[#8b3a3a] px-4 py-2 text-sm font-semibold text-white"
           >
-            Delete
+            Remove
           </button>
           <button
             type="button"
@@ -410,9 +477,25 @@ export function PlanDayItemDetail({
           <input
             value={form.title}
             onChange={(e) => form.setTitle(e.target.value)}
+            onFocus={() => setActiveFieldKey("title")}
             className={FIELD}
           />
         </label>
+
+        <FormVoiceEntryControl
+          activeFieldKey={activeFieldKey}
+          activeFieldLabel={
+            activeFieldKey === "notes" ? "Why this matters today" : "Title"
+          }
+          onTranscript={(fieldKey, spoken) => {
+            if (fieldKey === "notes") {
+              form.setNotes(applyFormVoiceTranscript(form.notes, spoken));
+              return;
+            }
+            form.setTitle(applyFormVoiceTranscript(form.title, spoken));
+          }}
+          micTitle="Edit with voice"
+        />
 
         <div className="grid gap-3 sm:grid-cols-2">
           <label className={LABEL}>
@@ -514,6 +597,7 @@ export function PlanDayItemDetail({
           <textarea
             value={form.notes}
             onChange={(e) => form.setNotes(e.target.value)}
+            onFocus={() => setActiveFieldKey("notes")}
             rows={3}
             placeholder={defaultWhyTodayPlaceholder()}
             className={FIELD}
@@ -548,85 +632,168 @@ export function PlanDayItemDetail({
           >
             Save Changes
           </button>
-          <button
-            type="button"
-            onClick={() => setDetailMode("mark-done")}
-            className="rounded-xl border border-[#1e4f4f]/35 px-4 py-2 text-sm font-semibold text-[#1e4f4f]"
-          >
-            Mark Done
-          </button>
-          {onStartNow ? (
-            <button
-              type="button"
-              onClick={handleStartNow}
-              className="rounded-xl border border-[#d4cdc3] px-4 py-2 text-sm font-semibold text-[#4b463f]"
-            >
-              Start Now
-            </button>
-          ) : null}
-        </div>
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => handleSnooze(30)}
-            className="rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-xs font-semibold text-[#6b635a]"
-          >
-            Snooze 30m
-          </button>
-          <button
-            type="button"
-            onClick={() => handleSnooze(60)}
-            className="rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-xs font-semibold text-[#6b635a]"
-          >
-            Snooze 1h
-          </button>
           <div className="relative">
             <button
               type="button"
-              onClick={() => setRemindOpen((o) => !o)}
-              className="rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-xs font-semibold text-[#6b635a]"
-              aria-expanded={remindOpen}
-              data-testid="plan-item-remind-me"
+              onClick={() => setActionsOpen((o) => !o)}
+              className="rounded-xl border border-[#d4cdc3] px-4 py-2 text-sm font-semibold text-[#4b463f]"
+              aria-expanded={actionsOpen}
+              aria-haspopup="menu"
+              data-testid="plan-item-actions-menu"
             >
-              Remind me…
+              More…
             </button>
-            {remindOpen ? (
+            {actionsOpen ? (
               <ul
-                className="absolute left-0 top-full z-10 mt-1 min-w-[11rem] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-lg"
+                className="absolute bottom-full left-0 z-10 mb-1 min-w-[14rem] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-lg"
                 role="menu"
+                data-testid="plan-item-actions-list"
               >
-                {REMIND_PRESETS.map((preset) => (
-                  <li key={preset.id} role="none">
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      setDetailMode("move-area");
+                    }}
+                  >
+                    Move to another day area
+                  </button>
+                </li>
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      setDetailMode("mark-done");
+                    }}
+                  >
+                    Mark complete
+                  </button>
+                </li>
+                {onStartNow ? (
+                  <li role="none">
                     <button
                       type="button"
                       role="menuitem"
-                      className="block w-full px-3 py-2 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
-                      onClick={() =>
-                        handleRemindUntil(preset.resolveUntil().toISOString())
-                      }
+                      className="block w-full px-3 py-2.5 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                      onClick={() => {
+                        setActionsOpen(false);
+                        handleStartNow();
+                      }}
                     >
-                      {preset.label}
+                      Start now
                     </button>
                   </li>
-                ))}
+                ) : null}
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      setDetailMode("defer-day");
+                    }}
+                  >
+                    Send to later
+                  </button>
+                </li>
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                    data-testid="plan-item-park"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      const next = updatePlanItem(items, item.id, buildPatch());
+                      apply(parkPlanItem(next, item.id));
+                      onClose();
+                    }}
+                  >
+                    Move to Parking Lot
+                  </button>
+                </li>
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      setDetailMode("convert-rhythm");
+                    }}
+                    data-testid="plan-item-convert-rhythm"
+                  >
+                    Convert to a Rhythm
+                  </button>
+                </li>
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      setRemindOpen(true);
+                    }}
+                  >
+                    Remind me…
+                  </button>
+                </li>
+                <li role="none">
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="block w-full px-3 py-2.5 text-left text-sm text-[#8b3a3a] hover:bg-[#faf7f2]"
+                    onClick={() => {
+                      setActionsOpen(false);
+                      setDetailMode("delete-confirm");
+                    }}
+                  >
+                    Remove from today
+                  </button>
+                </li>
               </ul>
             ) : null}
           </div>
-          <button
-            type="button"
-            onClick={() => setDetailMode("defer-day")}
-            className="rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-xs font-semibold text-[#6b635a]"
-          >
-            Move to another day
-          </button>
-          <button
-            type="button"
-            onClick={() => setDetailMode("delete-confirm")}
-            className="rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-xs font-semibold text-[#8b3a3a]"
-          >
-            Delete
-          </button>
         </div>
+        {remindOpen ? (
+          <ul
+            className="mt-2 rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-sm"
+            role="menu"
+          >
+            {REMIND_PRESETS.map((preset) => (
+              <li key={preset.id} role="none">
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="block w-full px-3 py-2 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                  onClick={() =>
+                    handleRemindUntil(preset.resolveUntil().toISOString())
+                  }
+                >
+                  {preset.label}
+                </button>
+              </li>
+            ))}
+            <li role="none">
+              <button
+                type="button"
+                role="menuitem"
+                className="block w-full px-3 py-2 text-left text-sm text-[#6b635a] hover:bg-[#faf7f2]"
+                onClick={() => setRemindOpen(false)}
+              >
+                Cancel
+              </button>
+            </li>
+          </ul>
+        ) : null}
       </div>
     </div>
   );

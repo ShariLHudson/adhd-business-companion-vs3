@@ -38,6 +38,10 @@
   max-height: none;
   overflow: visible;
   padding: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.chamber-entry--how-to-host.estate-workspace {
+  position: relative;
   padding-bottom: clamp(8rem, 22vh, 12rem);
 }
 
