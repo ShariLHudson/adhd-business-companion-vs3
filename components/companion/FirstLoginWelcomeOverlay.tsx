@@ -62,8 +62,7 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     phase === "audio_blocked" ||
     phase === "playing" ||
     phase === "muted" ||
-    phase === "stopped" ||
-    phase === "error";
+    phase === "stopped";
 
   const {
     voiceState,
@@ -102,7 +101,8 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
         }
         setPhase("ready");
       } catch {
-        if (!cancelled) setPhase("error");
+        // Never block Estate behind a welcome-record failure.
+        if (!cancelled) setPhase("not_required");
       }
     })();
 
@@ -206,28 +206,8 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     return <SparkLoadingState fullPage message="Loading your space…" size="lg" />;
   }
 
-  if (phase === "not_required" || phase === "completed") {
+  if (phase === "not_required" || phase === "completed" || phase === "error") {
     return <>{children}</>;
-  }
-
-  if (!welcomeRequired && phase === "error") {
-    return (
-      <main className="companion-login-page companion-login-page--welcome-bg relative flex min-h-dvh items-center justify-center px-4">
-        <CompanionLoginBackground />
-        <div className="relative z-10 max-w-md rounded-3xl border border-white/45 bg-[#faf7f2]/90 p-6 text-center shadow-sm backdrop-blur-md">
-          <p className="text-base text-[#6b635a]">
-            Something got tangled for a second, but I&apos;m still here.
-          </p>
-          <button
-            type="button"
-            className="mt-4 rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white"
-            onClick={() => void handleEnter()}
-          >
-            {FIRST_LOGIN_WELCOME_PRIMARY}
-          </button>
-        </div>
-      </main>
-    );
   }
 
   const showPlay =

@@ -163,9 +163,11 @@ export function CompanionPageLoader() {
 
   return (
     <CompanionAuthGate>
-      <FirstLoginWelcomeGate>
-        <AuthenticatedCompanionShell />
-      </FirstLoginWelcomeGate>
+      <EstateErrorBoundary>
+        <FirstLoginWelcomeGate>
+          <AuthenticatedCompanionShell />
+        </FirstLoginWelcomeGate>
+      </EstateErrorBoundary>
     </CompanionAuthGate>
   );
 }
