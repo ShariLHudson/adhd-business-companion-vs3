@@ -18,17 +18,29 @@ export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
 
   return (
     <div
-      className="workspace-area-works-guide mb-4 overflow-hidden rounded-xl border border-[#e4ddd2] bg-white shadow-sm"
+      className={
+        areaId === "settings"
+          ? "workspace-area-works-guide workspace-area-works-guide--settings mb-4 overflow-hidden rounded-xl border border-[rgba(255,236,200,0.28)] bg-[rgba(255,255,255,0.06)] shadow-none"
+          : "workspace-area-works-guide mb-4 overflow-hidden rounded-xl border border-[#e4ddd2] bg-white shadow-sm"
+      }
       data-testid="workspace-area-works-guide"
     >
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="workspace-area-works-guide__trigger flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[#faf7f2]/80"
+        className={
+          areaId === "settings"
+            ? "workspace-area-works-guide__trigger flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-white/10"
+            : "workspace-area-works-guide__trigger flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[#faf7f2]/80"
+        }
         aria-expanded={open}
       >
         <span
-          className="workspace-area-works-guide__chevron shrink-0 text-sm text-[#9a8f82]"
+          className={
+            areaId === "settings"
+              ? "workspace-area-works-guide__chevron shrink-0 text-sm text-white/75"
+              : "workspace-area-works-guide__chevron shrink-0 text-sm text-[#9a8f82]"
+          }
           aria-hidden="true"
         >
           {open ? "▼" : "▶"}

@@ -3,10 +3,12 @@
 import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 
-// A light, ADHD-friendly modal sheet that slides in from the right. It never
-// feels like leaving the app: the background stays partly visible and dimmed.
-// Three always-available exits: click the backdrop, press ESC, or tap ✕.
-// State inside is preserved while open (we just unmount on close).
+export type ModalSheetTheme = "default" | "estate-dark";
+
+/**
+ * ADHD-friendly modal sheet from the right.
+ * Settings uses theme="estate-dark" for the brown estate sheet.
+ */
 export function ModalSheet({
   open,
   onClose,
@@ -14,12 +16,15 @@ export function ModalSheet({
   children,
   /** Portal above Welcome Home / full-bleed estate layers (body + fixed). */
   portaled = false,
+  /** Match Estate menus — dark brown sheet for Settings. */
+  theme = "default",
 }: {
   open: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
   portaled?: boolean;
+  theme?: ModalSheetTheme;
 }) {
   const [entered, setEntered] = useState(open);
   const [portalReady, setPortalReady] = useState(false);
@@ -29,7 +34,6 @@ export function ModalSheet({
     setPortalReady(true);
   }, [portaled]);
 
-  // Slide-in runs after paint; panel stays interactive immediately on open.
   useLayoutEffect(() => {
     if (!open) {
       setEntered(false);
@@ -38,7 +42,6 @@ export function ModalSheet({
     setEntered(true);
   }, [open]);
 
-  // ESC closes.
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
@@ -50,46 +53,80 @@ export function ModalSheet({
 
   if (!open) return null;
 
-  // Default: absolute so the sheet only covers the main pane — sidebar stays
-  // clickable. Portaled: fixed on body above Welcome Home (z-index 99999 intro).
   const shellClass = portaled
     ? "modal-sheet-portal pointer-events-none fixed inset-0 z-[100010] flex justify-end overflow-hidden"
     : "pointer-events-none absolute inset-0 z-50 flex justify-end overflow-hidden";
 
+  const dark = theme === "estate-dark";
+
   const sheet = (
-    <div className={shellClass} data-companion-modal-layer={portaled ? "true" : undefined}>
+    <div
+      className={shellClass}
+      data-companion-modal-layer={portaled ? "true" : undefined}
+      data-testid="modal-sheet"
+      data-modal-theme={theme}
+    >
       {entered ? (
         <button
           type="button"
           aria-label="Close"
           onClick={onClose}
           className="pointer-events-auto absolute inset-0 bg-black/30 transition-opacity duration-300"
+          data-testid="modal-sheet-backdrop"
         />
       ) : null}
 
-      {/* Panel */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`pointer-events-auto relative z-10 flex h-full w-full max-w-md flex-col bg-[#faf7f2] shadow-2xl transition-transform duration-300 ease-out ${
-          entered ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={[
+          "pointer-events-auto relative z-10 flex h-full w-full max-w-md flex-col shadow-2xl transition-transform duration-300 ease-out",
+          dark ? "modal-sheet--estate-dark" : "modal-sheet--default bg-[#faf7f2]",
+          entered ? "translate-x-0" : "translate-x-full",
+        ].join(" ")}
       >
-        <div className="flex items-center justify-between gap-3 px-5 py-3">
-          <span className="text-sm font-semibold text-[#6b635a]">
+        <div
+          className={[
+            "flex shrink-0 items-center justify-between gap-3 px-5 py-3",
+            dark ? "modal-sheet__header--dark" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          <span
+            className={
+              dark
+                ? "text-sm font-semibold text-[rgba(255,236,200,0.82)]"
+                : "text-sm font-semibold text-[#6b635a]"
+            }
+          >
             {title}
           </span>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
+            className={
+              dark
+                ? "flex h-9 w-9 items-center justify-center rounded-full text-xl text-[rgba(255,236,200,0.85)] hover:bg-white/10"
+                : "flex h-9 w-9 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
+            }
+            data-testid="modal-sheet-close"
           >
             ✕
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+        <div
+          className={[
+            "modal-sheet__body min-h-0 flex-1 overflow-y-auto",
+            dark ? "modal-sheet__body--dark" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );

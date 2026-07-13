@@ -458,13 +458,24 @@
   color: #000000 !important;
 }
 
-/* How To Use Settings — title only white (must follow light-surface black rules) */
+/* How To Use Settings — brown panel + white title */
+.modal-sheet--estate-dark .settings-panel .workspace-area-works-guide--settings,
+.modal-sheet--estate-dark .settings-panel .workspace-area-works-guide {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 236, 200, 0.28) !important;
+  box-shadow: none !important;
+}
+
 .modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__title {
   color: #ffffff !important;
 }
 
 .modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__chevron {
   color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__trigger:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Appearance (Background) option cards — match dark Settings buttons */
