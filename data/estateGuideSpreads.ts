@@ -1,10 +1,11 @@
 /**
- * Spark Estate Guidebook™ — caretaker pages.
+ * Spark Estate Guidebook — caretaker pages.
  * Each room: top-half photograph + bottom-half unique block combination (3–5).
  */
 
 import { estateBackgroundPath } from "@/lib/estate/estatePlaceMedia";
 import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
+import { WELCOME_HOME_GUIDEBOOK_PLATE } from "@/lib/estate/welcomeHomeGuidebookAssets";
 import type { EstateCollectionRoomId } from "@/lib/estate/collectionFramework/types";
 import type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
 import { POSSIBILITY_HOUSE_GUIDE_CHAPTERS } from "./estateGuideSpreads/possibilityHouseSection";
@@ -23,7 +24,7 @@ export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
     title: "Welcome Home",
     epigraph:
       "Every meaningful journey begins the same way... someone opens the door.",
-    image: ESTATE_ROOM_BG.welcomeHome,
+    image: WELCOME_HOME_GUIDEBOOK_PLATE,
     imagePlaceId: "welcome-home",
     blocks: [
       {
@@ -5779,7 +5780,7 @@ export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
   },
   {
     id: "hall-of-accomplishments",
-    title: "Hall of Accomplishments™",
+    title: "Hall of Accomplishments",
     image: ESTATE_ROOM_BG.hallOfAchievements,
     imagePlaceId: "gallery-of-firsts",
     blocks: [
@@ -6398,7 +6399,7 @@ const COLLECTION_ROOM_GUIDE_SPREAD_ID: Record<EstateCollectionRoomId, string> =
     "evidence-vault": "evidence-vault",
     "achievement-library": "personal-library",
     "celebration-garden": "celebration-garden",
-    // Collection key celebration-hall → Celebration Room™ (not Hall of Accomplishments)
+    // Collection key celebration-hall → Celebration Room (not Hall of Accomplishments)
     "celebration-hall": "celebration-garden",
   };
 

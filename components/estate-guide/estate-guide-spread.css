@@ -70,6 +70,11 @@
   object-position: center center;
 }
 
+/* Welcome Home Guidebook plate — keep doorway, lanterns, and planters in frame. */
+.eg-guide-room-page[data-room-id="welcome-home"] .eg-guide-plate__image {
+  object-position: center 32%;
+}
+
 .eg-guide-room-page__lower {
   flex: 1 1 var(--eg-half);
   min-height: 0;

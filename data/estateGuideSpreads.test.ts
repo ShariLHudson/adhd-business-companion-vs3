@@ -137,6 +137,7 @@ describe("estateGuideSpreads", () => {
     const spread = getEstateGuideSpread("welcome-home");
     expect(spread).toBeDefined();
     expect(spread!.title).toContain("Welcome Home");
+    expect(spread!.image).toMatch(/welcome-home-front-door-guidebook\.png$/);
     expect(spread!.blocks[0]?.type).toBe("estate-journals");
     expect(spread!.blocks.some((block) => block.type === "front-entrance")).toBe(
       true,
@@ -382,7 +383,7 @@ describe("estateGuideSpreads", () => {
     const spread = getEstateGuideSpread("house-possibility-discovery-chest");
     expect(spread).toBeDefined();
     expect(spread!.title).toBe("The Treehouse Discovery Chest");
-    expect(spread!.title).not.toContain("™");
+    expect(spread!.title).not.toContain("\u2122");
     expect(spread!.guideSubtitle).toContain("Curiosity Is Always Rewarded");
     expect(spread!.whisperFromEstate).toMatch(/Stay curious/i);
     expect(spread!.blocks.some((block) => block.type === "opening-the-chest")).toBe(true);
@@ -407,7 +408,7 @@ describe("estateGuideSpreads", () => {
       "house-possibility-legacy-room",
     ]) {
       const spread = getEstateGuideSpread(id);
-      expect(spread!.title).not.toContain("™");
+      expect(spread!.title).not.toContain("\u2122");
     }
   });
 
