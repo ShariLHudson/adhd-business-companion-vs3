@@ -60,8 +60,10 @@ export type EstateRoomExperienceMenuProps = {
   onToggleSound?: () => void;
   soundEnabled?: boolean;
   onBackToEstate: () => void;
-  /** Estate Navigation — Explore Spark (Library / Cartography omitted). */
+  /** Estate Navigation — Explore Estate visual directory. */
   onExploreSpark?: () => void;
+  /** Shown after visiting a place from Explore Estate. */
+  onReturnToExploreEstate?: () => void;
   /** My Day & Work */
   onOpenPlanMyDay?: () => void;
   onOpenRhythms?: () => void;
@@ -122,6 +124,7 @@ export function EstateRoomExperienceMenu({
   soundEnabled: soundEnabledProp,
   onBackToEstate,
   onExploreSpark,
+  onReturnToExploreEstate,
   onOpenPlanMyDay,
   onOpenRhythms,
   onOpenReminders,
@@ -539,7 +542,7 @@ export function EstateRoomExperienceMenu({
                                 type="button"
                                 role="menuitem"
                                 className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Explore Spark"
+                                aria-label="Explore Estate"
                                 data-testid="estate-open-explore-spark"
                                 onClick={() => closeAndRun(onExploreSpark)}
                               >
@@ -550,7 +553,27 @@ export function EstateRoomExperienceMenu({
                                   🚶
                                 </span>
                                 <span className="estate-room-experience-menu__item-label">
-                                  Explore Spark
+                                  Explore Estate
+                                </span>
+                              </button>
+                            ) : null}
+                            {onReturnToExploreEstate ? (
+                              <button
+                                type="button"
+                                role="menuitem"
+                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                                aria-label="Return to Explore Estate"
+                                data-testid="estate-return-to-explore-estate"
+                                onClick={() => closeAndRun(onReturnToExploreEstate)}
+                              >
+                                <span
+                                  className="estate-room-experience-menu__item-icon"
+                                  aria-hidden
+                                >
+                                  🗺
+                                </span>
+                                <span className="estate-room-experience-menu__item-label">
+                                  Return to Explore Estate
                                 </span>
                               </button>
                             ) : null}

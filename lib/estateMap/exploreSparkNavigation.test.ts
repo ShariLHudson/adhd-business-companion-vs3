@@ -61,13 +61,16 @@ describe("Explore Spark visual navigation", () => {
       expect(isExploreSparkForbiddenPlaceId(placeId)).toBe(false);
       expect(loc.image).toMatch(/^\//);
     }
-    expect(resolveExploreMapLocationPlaceId("welcome-house")).toBe("welcome-home");
-    expect(resolveExploreMapLocationPlaceId("orchard")).toBe("apple-orchard");
-    expect(resolveExploreMapLocationPlaceId("stable")).toBe("stables");
+    expect(resolveExploreMapLocationPlaceId("welcome-home")).toBe("welcome-home");
+    expect(resolveExploreMapLocationPlaceId("apple-orchard")).toBe("apple-orchard");
+    expect(resolveExploreMapLocationPlaceId("stables")).toBe("stables");
+    expect(resolveExploreMapLocationPlaceId("momentum-institute")).toBe(
+      "chamber-of-momentum",
+    );
   });
 
   it("resolves You-are-here from place ids", () => {
-    expect(exploreMapLocationIdForPlaceId("welcome-home")).toBe("welcome-house");
+    expect(exploreMapLocationIdForPlaceId("welcome-home")).toBe("welcome-home");
     expect(exploreMapLocationIdForPlaceId("creative-studio")).toBeUndefined();
   });
 
