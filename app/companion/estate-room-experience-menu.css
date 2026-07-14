@@ -341,10 +341,33 @@
   background: rgba(201, 164, 108, 0.1);
 }
 
+.estate-room-experience-menu__category--open
+  .estate-room-experience-menu__category-chevron {
+  transform: rotate(90deg);
+}
+
 .estate-room-experience-menu__item--nested {
   min-height: 2.35rem;
   font-size: 0.84rem;
   margin-left: 0.35rem;
+}
+
+.estate-room-experience-menu__section-items--create {
+  padding-left: 0.85rem;
+  border-left: 1px solid rgba(255, 248, 235, 0.14);
+  margin-left: 0.25rem;
+}
+
+.estate-room-experience-menu__item--pending {
+  opacity: 0.62;
+  cursor: not-allowed;
+  color: rgba(255, 248, 235, 0.88);
+}
+
+.estate-room-experience-menu__item--pending:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 248, 235, 0.16);
+  transform: none;
 }
 
 @keyframes estate-room-experience-menu-in {

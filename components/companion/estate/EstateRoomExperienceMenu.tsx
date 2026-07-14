@@ -25,6 +25,7 @@ import {
 import { resolveCanonicalPlaceId } from "@/lib/estate/canonicalEstateRegistry";
 import { resolveWanderRoomDisplayName } from "@/lib/estate/manifest/estateWanderMode";
 import { useIdleChromeReveal } from "@/lib/estate/useIdleChromeReveal";
+import { SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS } from "@/lib/estate/sparkEstateTopNavigationAndProfileMenu";
 import {
   EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS,
   PEACEFUL_PLACES_MUSIC_TRACKS,
@@ -75,6 +76,10 @@ export type EstateRoomExperienceMenuProps = {
   onOpenCalendar?: () => void;
   /** My Work Studio */
   onOpenProjects?: () => void;
+  /**
+   * Reserved for a later Create-destination pass.
+   * Nested Create items stay non-navigating until each has a safe handler.
+   */
   onOpenDocuments?: () => void;
   onOpenSops?: () => void;
   onOpenContent?: () => void;
@@ -140,9 +145,9 @@ export function EstateRoomExperienceMenu({
   onOpenReminders,
   onOpenCalendar,
   onOpenProjects,
-  onOpenDocuments,
-  onOpenSops,
-  onOpenContent,
+  onOpenDocuments: _onOpenDocuments,
+  onOpenSops: _onOpenSops,
+  onOpenContent: _onOpenContent,
   onOpenClearMyMind,
   onOpenParkingLot,
   onOpenSpinTheWheel,
@@ -163,6 +168,7 @@ export function EstateRoomExperienceMenu({
   const [expandedSection, setExpandedSection] = useState<MenuSection | null>(null);
   const [soundscapesExpanded, setSoundscapesExpanded] = useState(false);
   const [peacefulPlacesExpanded, setPeacefulPlacesExpanded] = useState(false);
+  const [createExpanded, setCreateExpanded] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -224,6 +230,7 @@ export function EstateRoomExperienceMenu({
       setExpandedSection(null);
       setSoundscapesExpanded(false);
       setPeacefulPlacesExpanded(false);
+      setCreateExpanded(false);
       return;
     }
     const onPointerDown = (event: MouseEvent | TouchEvent) => {
@@ -698,77 +705,83 @@ export function EstateRoomExperienceMenu({
                                 data-testid="estate-open-projects"
                                 onClick={() => closeAndRun(onOpenProjects)}
                               >
-                                <span
-                                  className="estate-room-experience-menu__item-icon"
-                                  aria-hidden
-                                >
-                                  📁
-                                </span>
                                 <span className="estate-room-experience-menu__item-label">
                                   Projects
                                 </span>
                               </button>
                             ) : null}
-                            {onOpenDocuments ? (
+                            <div className="estate-room-experience-menu__nested-group">
                               <button
                                 type="button"
-                                role="menuitem"
-                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Open Documents"
-                                data-testid="estate-open-documents"
-                                onClick={() => closeAndRun(onOpenDocuments)}
+                                className={[
+                                  "estate-room-experience-menu__category",
+                                  "estate-room-experience-menu__category--nested",
+                                  createExpanded
+                                    ? "estate-room-experience-menu__category--open"
+                                    : "",
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
+                                aria-expanded={createExpanded}
+                                aria-controls="estate-create-submenu"
+                                data-testid="estate-open-create"
+                                onClick={() => {
+                                  bumpVisibility();
+                                  setCreateExpanded((current) => !current);
+                                }}
                               >
+                                <span className="estate-room-experience-menu__category-label">
+                                  Create
+                                </span>
                                 <span
-                                  className="estate-room-experience-menu__item-icon"
+                                  className="estate-room-experience-menu__category-chevron"
                                   aria-hidden
                                 >
-                                  📄
-                                </span>
-                                <span className="estate-room-experience-menu__item-label">
-                                  Documents
+                                  ›
                                 </span>
                               </button>
-                            ) : null}
-                            {onOpenSops ? (
-                              <button
-                                type="button"
-                                role="menuitem"
-                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Open SOPs"
-                                data-testid="estate-open-sops"
-                                onClick={() => closeAndRun(onOpenSops)}
-                              >
-                                <span
-                                  className="estate-room-experience-menu__item-icon"
-                                  aria-hidden
+                              {createExpanded ? (
+                                <div
+                                  id="estate-create-submenu"
+                                  className="estate-room-experience-menu__section-items estate-room-experience-menu__section-items--nested estate-room-experience-menu__section-items--create"
+                                  role="group"
+                                  aria-label="Create"
+                                  data-testid="estate-create-submenu"
                                 >
-                                  📋
-                                </span>
-                                <span className="estate-room-experience-menu__item-label">
-                                  SOPs
-                                </span>
-                              </button>
-                            ) : null}
-                            {onOpenContent ? (
-                              <button
-                                type="button"
-                                role="menuitem"
-                                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-                                aria-label="Open Content"
-                                data-testid="estate-open-content"
-                                onClick={() => closeAndRun(onOpenContent)}
-                              >
-                                <span
-                                  className="estate-room-experience-menu__item-icon"
-                                  aria-hidden
-                                >
-                                  ✍️
-                                </span>
-                                <span className="estate-room-experience-menu__item-label">
-                                  Content
-                                </span>
-                              </button>
-                            ) : null}
+                                  {SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS.map(
+                                    (item) => (
+                                      <button
+                                        key={item.id}
+                                        type="button"
+                                        role="menuitem"
+                                        aria-disabled="true"
+                                        tabIndex={0}
+                                        className="estate-room-experience-menu__item estate-room-experience-menu__item--nested estate-room-experience-menu__item--pending"
+                                        data-testid={`estate-create-${item.id}`}
+                                        title="Coming soon"
+                                        onClick={(event) => {
+                                          event.preventDefault();
+                                          event.stopPropagation();
+                                        }}
+                                        onKeyDown={(event) => {
+                                          if (
+                                            event.key === "Enter" ||
+                                            event.key === " "
+                                          ) {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                          }
+                                        }}
+                                      >
+                                        <span className="estate-room-experience-menu__item-label">
+                                          {item.label}
+                                        </span>
+                                      </button>
+                                    ),
+                                  )}
+                                </div>
+                              ) : null}
+                            </div>
                             {onOpenDestinationGallery ? (
                               <button
                                 type="button"
@@ -778,12 +791,6 @@ export function EstateRoomExperienceMenu({
                                 data-testid="estate-open-destination-gallery"
                                 onClick={() => closeAndRun(onOpenDestinationGallery)}
                               >
-                                <span
-                                  className="estate-room-experience-menu__item-icon"
-                                  aria-hidden
-                                >
-                                  🖼
-                                </span>
                                 <span className="estate-room-experience-menu__item-label">
                                   Destination Gallery
                                 </span>
@@ -798,12 +805,6 @@ export function EstateRoomExperienceMenu({
                                 data-testid="estate-open-cartographers-studio"
                                 onClick={() => closeAndRun(onOpenCartographersStudio)}
                               >
-                                <span
-                                  className="estate-room-experience-menu__item-icon"
-                                  aria-hidden
-                                >
-                                  🗺
-                                </span>
                                 <span className="estate-room-experience-menu__item-label">
                                   Cartographer&apos;s Studio
                                 </span>
