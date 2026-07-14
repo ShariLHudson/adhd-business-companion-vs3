@@ -96,14 +96,19 @@
 }
 
 .estate-room-experience-menu__panel {
+  --estate-room-menu-panel-offset: calc(
+    max(0.85rem, env(safe-area-inset-top, 0px)) + 2.75rem + 0.45rem +
+      max(1rem, env(safe-area-inset-bottom, 0px))
+  );
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 0.28rem;
   width: 100%;
   min-width: 12.5rem;
   max-width: min(16rem, 52vw);
-  padding: 0.55rem;
+  max-height: min(32rem, calc(100dvh - var(--estate-room-menu-panel-offset)));
+  overflow: hidden;
+  padding: 0;
   border-radius: 0.85rem;
   border: 1px solid rgba(255, 236, 200, 0.32);
   background: rgba(22, 18, 14, 0.9);
@@ -113,11 +118,26 @@
   animation: estate-room-experience-menu-in 0.28s ease-out;
 }
 
+/* Scroll region — Peaceful Places / Soundscapes nested lists must stay reachable */
+.estate-room-experience-menu__panel-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.28rem;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.55rem;
+  padding-bottom: max(1.5rem, calc(0.55rem + env(safe-area-inset-bottom, 0px)));
+}
+
 .estate-room-experience-menu__panel--backdrop {
   min-width: min(20rem, 80vw);
   max-width: min(24rem, 88vw);
-  max-height: min(72vh, 32rem);
-  overflow-y: auto;
+  max-height: min(72dvh, calc(100dvh - var(--estate-room-menu-panel-offset)));
 }
 
 .chat-backdrop-picker {
@@ -295,6 +315,36 @@
   gap: 0.22rem;
   padding: 0.1rem 0 0.15rem 0.35rem;
   animation: estate-room-experience-menu-in 0.22s ease-out;
+}
+
+.estate-room-experience-menu__nested-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+}
+
+.estate-room-experience-menu__section-items--nested {
+  padding-left: 0.55rem;
+}
+
+.estate-room-experience-menu__category--nested {
+  min-height: 2.2rem;
+  font-size: 0.82rem;
+}
+
+.estate-room-experience-menu__category--sub {
+  margin-left: 0.2rem;
+}
+
+.estate-room-experience-menu__category--open {
+  border-color: rgba(201, 164, 108, 0.55);
+  background: rgba(201, 164, 108, 0.1);
+}
+
+.estate-room-experience-menu__item--nested {
+  min-height: 2.35rem;
+  font-size: 0.84rem;
+  margin-left: 0.35rem;
 }
 
 @keyframes estate-room-experience-menu-in {

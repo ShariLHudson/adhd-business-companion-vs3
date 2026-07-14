@@ -65,6 +65,14 @@ function readLayoutCss(): string {
   );
 }
 
+
+function readRoomMenuSource(): string {
+  return readFileSync(
+    resolve(process.cwd(), "components/companion/estate/EstateRoomExperienceMenu.tsx"),
+    "utf8",
+  );
+}
+
 describe("Welcome Home menu — visibility", () => {
   it("shows only Conversations, Settings, Profile, Logout", () => {
     expect(ESTATE_MENU_DROPDOWN_ENTRIES.map((e) => e.label)).toEqual([
@@ -110,6 +118,7 @@ describe("Welcome Home menu — visibility", () => {
 
 describe("Welcome Home menu — action wiring", () => {
   const source = readCompanionHandlerSource();
+  const roomMenuSource = readRoomMenuSource();
 
   it("New Chat routes to requestClearTodayContext", () => {
     expect(source).toMatch(
@@ -156,6 +165,16 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(/openProfileDestinationCore\("people-i-help"\)/);
     expect(source).toMatch(/<PeopleIHelpPanel/);
     expect(source).toMatch(/setOverlay\("people-i-help"\)/);
+  });
+
+
+  it("room menu nests Peaceful Places above Soundscapes under Experiences", () => {
+    expect(roomMenuSource).toMatch(/PEACEFUL_PLACES_MUSIC_TRACKS/);
+    expect(roomMenuSource).toMatch(/EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS/);
+    expect(roomMenuSource).toMatch(/data-testid="estate-open-peaceful-places"/);
+    expect(roomMenuSource).toMatch(/data-testid="estate-open-soundscapes"/);
+    expect(roomMenuSource).not.toMatch(/category--sub/);
+    expect(source).toMatch(/playExperienceSoundscapeTrack\(track\)/);
   });
 
   it("Logout signs out and routes to login", () => {
