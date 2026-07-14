@@ -1274,7 +1274,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Goals & Projects",
     category: "destination",
     primaryFeeling: "Direction, ownership, honest ambition",
-    backgroundImage: null,
+    backgroundImage: "/backgrounds/project-room.png",
     aliases: [
       "goals and projects",
       "my projects",

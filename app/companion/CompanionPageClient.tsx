@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -119,6 +119,18 @@ const CalendarRoomPanel = dynamic(
     ),
   },
 );
+const ParkingLotRoomPanel = dynamic(
+  () =>
+    import("@/components/companion/ParkingLotRoomPanel").then((mod) => ({
+      default: mod.ParkingLotRoomPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Parking Lot…" size="md" />
+    ),
+  },
+);
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -144,7 +156,7 @@ import {
   type BoardroomEntryIntent,
 } from "@/lib/boardroom";
 import { ProjectHomesPrototypePanel } from "@/components/companion/projectHomes";
-import { getProjectHomeRoom } from "@/lib/projectHomes";
+import { PROJECT_HOMES_ROOM_BACKGROUND } from "@/lib/projectHomes";
 import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
 import { ProfileDestinationHost } from "@/components/companion/ProfileDestinationHost";
 import type { ProfileDestination } from "@/lib/profile/profileDestination";
@@ -1888,6 +1900,10 @@ import {
   type GuidedFieldHelpRequest,
 } from "@/lib/profile/guidedFieldTypes";
 import { openGuidedFieldHelpChat } from "@/lib/profile/openGuidedFieldHelpChat";
+import {
+  PLAN_DAY_IM_STUCK_EVENT,
+  PLAN_DAY_IM_STUCK_QUESTION,
+} from "@/lib/planMyDay/planDayImStuck";
 import { readExpertSessionPrompt } from "@/lib/profile/fieldHelpRegistry";
 import { readStageTalkThroughPrompt } from "@/lib/profile/guidedStageTalkThrough";
 import { readResearchSessionPrompt } from "@/lib/profile/businessEstateResearch";
@@ -8236,6 +8252,22 @@ export default function CompanionPageClient() {
   }
 
   /**
+   * Calendar — dedicated Connected Calendars room (My Workday).
+   * Never opens Momentum Appointments, Plan My Day, Rhythms, Reminders, or Settings.
+   */
+  function openCalendarCore() {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    trackWorkspaceEcosystemEvent("calendar");
+    noteWorkspaceOpened("calendar", "standalone_room");
+    openStandaloneFocusSectionCore("calendar");
+  }
+
+  /**
    * Rhythms — dedicated estate room (My Workday).
    * Never opens Plan My Day, Settings, or Reminders.
    */
@@ -8252,19 +8284,19 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Calendar — dedicated Connected Calendars room (My Workday).
-   * Never opens Momentum Appointments, Plan My Day, Rhythms, Reminders, or Settings.
+   * Parking Lot — dedicated estate room (Focus).
+   * Never opens Plan My Day, Clear My Mind, Reminders, Settings, or Create.
    */
-  function openCalendarCore() {
+  function openParkingLotCore() {
     leaveClearMyMindIfNavigatingAway();
     if (!confirmLeaveUnsavedWork()) return;
     preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
     setOverlay(null);
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
-    trackWorkspaceEcosystemEvent("calendar");
-    noteWorkspaceOpened("calendar", "standalone_room");
-    openStandaloneFocusSectionCore("calendar");
+    trackWorkspaceEcosystemEvent("parking-lot");
+    noteWorkspaceOpened("parking-lot", "standalone_room");
+    openStandaloneFocusSectionCore("parking-lot");
   }
 
   /**
@@ -8327,7 +8359,7 @@ export default function CompanionPageClient() {
     leaveClearMyMindIfNavigatingAway();
     pauseActiveArtifactIfLeavingCreate("project-homes");
     setOverlay(null);
-    preloadRoomBackground(getProjectHomeRoom("sunroom").backgroundUrl);
+    preloadRoomBackground(PROJECT_HOMES_ROOM_BACKGROUND);
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
     trackWorkspaceEcosystemEvent("project-homes");
@@ -8580,6 +8612,24 @@ export default function CompanionPageClient() {
     window.addEventListener(GUIDED_FIELD_HELP_EVENT, onGuidedFieldHelp);
     return () =>
       window.removeEventListener(GUIDED_FIELD_HELP_EVENT, onGuidedFieldHelp);
+  }, [requestChatInputFocus]);
+
+  // Plan My Day — I'm Stuck → existing Shari chat, one question only
+  useEffect(() => {
+    function onPlanDayImStuck() {
+      navigateToChatCore();
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: PLAN_DAY_IM_STUCK_QUESTION },
+      ]);
+      window.setTimeout(() => {
+        requestChatInputFocus({ scrollIntoView: true });
+      }, 40);
+    }
+
+    window.addEventListener(PLAN_DAY_IM_STUCK_EVENT, onPlanDayImStuck);
+    return () =>
+      window.removeEventListener(PLAN_DAY_IM_STUCK_EVENT, onPlanDayImStuck);
   }, [requestChatInputFocus]);
 
   function endChamberMemberConversationCore() {
@@ -9740,7 +9790,7 @@ export default function CompanionPageClient() {
         openStandaloneFocusSectionCore("focus-timer");
         break;
       case "calendar":
-          openCalendarCore();
+        openCalendarCore();
         break;
       case "projects":
         openProjectHomesPrototypeCore();
@@ -12026,7 +12076,7 @@ export default function CompanionPageClient() {
           openClearMyMindCore();
           break;
         case "parking-lot":
-          openPlanMyDayCore({ area: "parking-lot" });
+          openParkingLotCore();
           break;
         case "destination-gallery":
           openDestinationGalleryCore();
@@ -21203,7 +21253,9 @@ export default function CompanionPageClient() {
               : activeSection === "plan-my-day" ||
                   activeSection === "reminders" ||
                   activeSection === "rhythms" ||
-                  activeSection === "calendar"
+                  activeSection === "calendar" ||
+                  activeSection === "parking-lot" ||
+                  activeSection === "spin-wheel"
                 ? "pl-0 companion-plan-my-day-active"
               : activeSection === "brain-dump"
                 ? "pl-0 companion-clear-my-mind-active"
@@ -21228,7 +21280,9 @@ export default function CompanionPageClient() {
           activeSection === "plan-my-day" ||
           activeSection === "reminders" ||
           activeSection === "rhythms" ||
-          activeSection === "calendar"
+          activeSection === "calendar" ||
+          activeSection === "parking-lot" ||
+          activeSection === "spin-wheel"
             ? "companion-plan-my-day-active"
             : ""
         } ${
@@ -22321,7 +22375,7 @@ export default function CompanionPageClient() {
                 });
                 openSectionBesideChatCore("projects", "projects");
               }}
-              onOpenProjects={() => openProjectHomesPrototypeCore()}
+              onOpenProjects={() => openSectionBesideChatCore("projects", "projects")}
               onOpenCalendar={() =>
                 openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"))
               }
@@ -22330,14 +22384,21 @@ export default function CompanionPageClient() {
               initialRhythmsTab={planMyDayInitialRhythmsTab}
             />
           )}
+
           {activeSection === "reminders" && (
             <RemindersRoomPanel onBack={goBack} registerBack={registerBack} />
           )}
+
           {activeSection === "rhythms" && (
             <RhythmsRoomPanel onBack={goBack} registerBack={registerBack} />
           )}
+
           {activeSection === "calendar" && (
             <CalendarRoomPanel onBack={goBack} registerBack={registerBack} />
+          )}
+
+          {activeSection === "parking-lot" && (
+            <ParkingLotRoomPanel onBack={goBack} registerBack={registerBack} />
           )}
 
           {activeSection === "grow" && (
@@ -22812,6 +22873,7 @@ export default function CompanionPageClient() {
               onAutoSpinStarted={() => setSpinWheelAutoSpin(false)}
               onOpen={suggestCrossWorkspaceOpen}
               onAsk={handlePlaybookAsk}
+              onBack={goBack}
             />
           )}
 
@@ -23219,7 +23281,8 @@ export default function CompanionPageClient() {
         onOpenCalendar={() => openCalendarCore()}
         onOpenProjects={() => openProjectHomesPrototypeCore()}
         onOpenClearMyMind={() => openClearMyMindCore()}
-        onOpenParkingLot={() => openPlanMyDayCore({ area: "parking-lot" })}
+        onOpenParkingLot={() => openParkingLotCore()}
+        onOpenSpinTheWheel={() => openStandaloneFocusSectionCore("spin-wheel")}
         onOpenDestinationGallery={() => openDestinationGalleryCore()}
         onOpenCartographersStudio={() => openCartographersStudioCore()}
         onOpenEvidenceVault={() =>

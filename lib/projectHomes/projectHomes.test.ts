@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  PROJECT_HOMES_ROOM_BACKGROUND,
   SAMPLE_PROJECT_HOMES,
   connectedPlacesForProjectHome,
   getProjectHomeRoom,
@@ -10,6 +11,10 @@ import {
 } from "@/lib/projectHomes";
 
 describe("projectHomes refinement", () => {
+  it("uses project-room.png as the permanent Projects room background", () => {
+    expect(PROJECT_HOMES_ROOM_BACKGROUND).toBe("/backgrounds/project-room.png");
+  });
+
   it("lists ten Project Homes with existing artwork paths", () => {
     const rooms = listProjectHomeRooms();
     expect(rooms).toHaveLength(10);

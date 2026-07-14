@@ -1,6 +1,7 @@
 export type * from "./types";
 
 export {
+  PROJECT_HOMES_ROOM_BACKGROUND,
   PROJECT_HOME_ROOMS,
   getProjectHomeRoom,
   listProjectHomeRooms,

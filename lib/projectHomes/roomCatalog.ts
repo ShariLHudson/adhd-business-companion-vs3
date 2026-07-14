@@ -7,6 +7,13 @@ import type {
 } from "./types";
 
 /**
+ * Permanent Projects room plate (gallery / arrive).
+ * Individual Project Homes still keep their own room artwork when opened.
+ */
+export const PROJECT_HOMES_ROOM_BACKGROUND =
+  "/backgrounds/project-room.png" as const;
+
+/**
  * Project Homes available for projects.
  * Artwork paths point at existing `public/backgrounds/` plates only.
  * Strategy Conference Room uses an isolated placeholder until dedicated art ships.

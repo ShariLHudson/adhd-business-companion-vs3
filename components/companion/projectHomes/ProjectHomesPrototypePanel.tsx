@@ -7,6 +7,7 @@ import { ProjectHomesRoomShell } from "@/components/companion/projectHomes/Proje
 import { ProjectHomeCard } from "@/components/companion/projectHomes/ProjectHomeCard";
 import { ProjectHomeDetail } from "@/components/companion/projectHomes/ProjectHomeDetail";
 import {
+  PROJECT_HOMES_ROOM_BACKGROUND,
   SAMPLE_PROJECT_HOMES,
   getProjectHomeBackgroundUrl,
   getProjectHomeRoom,
@@ -44,7 +45,7 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
       ? getProjectHomeBackgroundUrl(active)
       : selectedRoomId && (view === "create-home" || view === "create-purpose")
         ? getProjectHomeRoom(selectedRoomId).artwork.backgroundUrl
-        : getProjectHomeRoom("sunroom").artwork.backgroundUrl;
+        : PROJECT_HOMES_ROOM_BACKGROUND;
 
   function beginCreate() {
     setPurpose("");

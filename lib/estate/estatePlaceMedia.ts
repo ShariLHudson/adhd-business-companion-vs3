@@ -91,7 +91,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "evidence-vault": estateBackgroundPath("evidence-vault-room-static.png"),
   "gallery-of-firsts": estateBackgroundPath("gallery-background.png"),
   portfolio: estateBackgroundPath("hall-of-achievements-room-background.png"),
-  "goals-projects": estateBackgroundPath("room-dining-room-background.png"),
+  "goals-projects": estateBackgroundPath("project-room.png"),
   "peaceful-places": estateBackgroundPath("water-seat-at-pond-background.png"),
   "seat-at-pond": estateBackgroundPath("water-seat-at-pond-background.png"),
   "reflection-pond": estateBackgroundPath("water-seat-at-pond-background.png"),
