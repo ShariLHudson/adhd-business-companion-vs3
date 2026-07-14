@@ -86,7 +86,7 @@ export const DESTINATION_GALLERY_CRYSTALS: readonly DestinationCrystal[] = [
   },
   {
     id: "write",
-    name: "Write",
+    name: "Document",
     purpose: "Save written content.",
     hands: ["Google Docs"],
     capabilities: [
@@ -101,7 +101,7 @@ export const DESTINATION_GALLERY_CRYSTALS: readonly DestinationCrystal[] = [
   },
   {
     id: "save",
-    name: "Save",
+    name: "Store",
     purpose: "Store important files.",
     hands: ["Google Drive"],
     capabilities: [
@@ -115,7 +115,7 @@ export const DESTINATION_GALLERY_CRYSTALS: readonly DestinationCrystal[] = [
   },
   {
     id: "spark-social-media",
-    name: "Spark Social Media",
+    name: "Share",
     purpose: "Prepare content for publishing.",
     hands: [
       "Facebook",
@@ -152,7 +152,7 @@ export const DESTINATION_GALLERY_CRYSTALS: readonly DestinationCrystal[] = [
   },
   {
     id: "create",
-    name: "Create",
+    name: "Design",
     purpose: "Create visual assets.",
     hands: ["Canva"],
     capabilities: [

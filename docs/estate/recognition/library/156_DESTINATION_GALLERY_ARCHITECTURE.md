@@ -56,7 +56,7 @@ One purpose · one crystal · no dashboards · no technical language.
 | **Destination (hand)** | Google Calendar |
 | **Spark can** | Create calendar events · Schedule focus sessions · Schedule workshops · Block work time · Add reminders |
 
-### Write
+### Document *(internal id: `write`)*
 
 | | |
 |--|--|
@@ -64,7 +64,7 @@ One purpose · one crystal · no dashboards · no technical language.
 | **Destination (hand)** | Google Docs |
 | **Spark can** | Create documents · Save workshops · blog posts · SOPs · books · journals · meeting notes |
 
-### Save
+### Store *(internal id: `save`)*
 
 | | |
 |--|--|
@@ -72,7 +72,7 @@ One purpose · one crystal · no dashboards · no technical language.
 | **Destination (hand)** | Google Drive |
 | **Spark can** | Save files · Create folders · Organize projects · Store PDFs · images · presentations |
 
-### Spark Social Media
+### Share *(internal id: `spark-social-media`)*
 
 | | |
 |--|--|
@@ -90,7 +90,7 @@ Actual publishing occurs **only after member approval**.
 | **Purpose** | Prepare printable versions |
 | **Spark can** | Print · Save as PDF · Download · Export workbook · checklist · journal · worksheets |
 
-### Create
+### Design *(internal id: `create`)*
 
 | | |
 |--|--|
