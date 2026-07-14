@@ -54,13 +54,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  max-width: min(36rem, 92vw);
+  gap: 0.85rem;
+  max-width: min(40rem, 94vw);
+  max-height: min(78vh, 720px);
+  overflow-y: auto;
   padding: 1.25rem 1.35rem 1.5rem;
   border-radius: 1rem;
-  background: rgba(18, 12, 8, 0.42);
+  background: rgba(18, 12, 8, 0.48);
   border: 1px solid rgba(201, 166, 107, 0.22);
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
   text-align: center;
 }
@@ -81,131 +83,286 @@
   color: #f0e6d6;
 }
 
-.evidence-vault-interior__hint {
+.evidence-vault-interior__hint,
+.evidence-vault-interior__next {
   margin: 0;
   font-size: 0.92rem;
   line-height: 1.5;
   color: rgba(240, 228, 206, 0.88);
 }
 
-.evidence-vault-interior__first-entry {
+.evidence-vault-interior__next {
+  font-size: 0.84rem;
+  color: rgba(232, 210, 168, 0.86);
+}
+
+.evidence-vault-interior__how {
   width: 100%;
-  margin-top: 0.35rem;
+  text-align: left;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(201, 166, 107, 0.28);
+  background: rgba(255, 248, 235, 0.06);
+  padding: 0.35rem 0.75rem;
 }
 
-.evidence-vault-interior__first-entry-lead {
-  margin: 0 0 0.85rem;
-  font-size: 0.92rem;
-  color: rgba(232, 210, 168, 0.92);
+.evidence-vault-interior__how summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: rgba(232, 210, 168, 0.95);
+  padding: 0.45rem 0;
 }
 
-.evidence-vault-interior__first-entry-list {
+.evidence-vault-interior__how summary::-webkit-details-marker {
+  display: none;
+}
+
+.evidence-vault-interior__how-body {
+  padding: 0 0 0.55rem;
+}
+
+.evidence-vault-interior__how-body p {
+  margin: 0 0 0.55rem;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: rgba(240, 228, 206, 0.88);
+}
+
+.evidence-vault-interior__reminder {
+  margin: 0;
+  width: 100%;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: rgba(232, 210, 168, 0.9);
+  font-style: italic;
+}
+
+.evidence-vault-interior__empty {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.evidence-vault-interior__empty p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(240, 228, 206, 0.92);
+}
+
+.evidence-vault-interior__actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+}
+
+.evidence-vault-interior__action {
+  cursor: pointer;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  background: rgba(255, 250, 242, 0.14);
+  padding: 0.72rem 1.1rem;
+  min-height: 2.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f0e6d6;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.evidence-vault-interior__action--primary {
+  background: rgba(255, 250, 242, 0.92);
+  color: #1f1c19;
+  border-color: rgba(201, 166, 107, 0.55);
+}
+
+.evidence-vault-interior__action:hover,
+.evidence-vault-interior__action:focus-visible {
+  outline: none;
+  border-color: rgba(180, 132, 58, 0.9);
+  box-shadow: 0 0 0 2px rgba(201, 166, 107, 0.28);
+}
+
+.evidence-vault-interior__categories {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.15rem;
+}
+
+.evidence-vault-interior__category {
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  background: rgba(255, 248, 235, 0.08);
+  color: rgba(240, 228, 206, 0.9);
+  font-size: 0.72rem;
+  padding: 0.28rem 0.65rem;
+}
+
+.evidence-vault-interior__category:hover,
+.evidence-vault-interior__category:focus-visible {
+  outline: none;
+  border-color: rgba(201, 166, 107, 0.65);
+}
+
+.evidence-vault-interior__search {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.3rem;
+  text-align: left;
+}
+
+.evidence-vault-interior__search-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(201, 166, 107, 0.88);
+}
+
+.evidence-vault-interior__search input {
+  width: 100%;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  background: rgba(255, 250, 242, 0.1);
+  color: #f0e6d6;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.evidence-vault-interior__search input::placeholder {
+  color: rgba(232, 210, 168, 0.55);
+}
+
+.evidence-vault-interior__search-results,
+.evidence-vault-interior__recent {
+  width: 100%;
+  text-align: left;
+}
+
+.evidence-vault-interior__search-results ul,
+.evidence-vault-interior__recent-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
+  gap: 0.4rem;
 }
 
-.evidence-vault-interior__first-entry-btn {
-  cursor: pointer;
+.evidence-vault-interior__search-results button,
+.evidence-vault-interior__recent-item {
   width: 100%;
-  border-radius: 999px;
-  border: 1px solid rgba(201, 166, 107, 0.5);
-  background: rgba(255, 250, 242, 0.92);
-  padding: 0.75rem 1.1rem;
-  min-height: 2.85rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #1f1c19;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.evidence-vault-interior__first-entry-btn:hover,
-.evidence-vault-interior__first-entry-btn:focus-visible {
-  outline: none;
-  border-color: rgba(180, 132, 58, 0.9);
-  box-shadow: 0 0 0 2px rgba(201, 166, 107, 0.35);
-}
-
-.evidence-vault-interior__journal {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.55rem;
-  margin-top: 0.5rem;
-  padding: 0.85rem 1rem 1rem;
-  border: 1px solid rgba(201, 166, 107, 0.38);
-  border-radius: 0.75rem;
-  background: rgba(255, 248, 235, 0.08);
+  text-align: left;
   cursor: pointer;
-  transition:
-    transform 0.28s ease,
-    box-shadow 0.28s ease,
-    border-color 0.28s ease;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(201, 166, 107, 0.22);
+  background: rgba(255, 248, 235, 0.07);
+  color: rgba(240, 228, 206, 0.95);
+  padding: 0.55rem 0.7rem;
+  font-size: 0.86rem;
+  line-height: 1.4;
 }
 
-.evidence-vault-interior__journal:hover,
-.evidence-vault-interior__journal:focus-visible {
-  transform: translateY(-2px);
-  border-color: rgba(201, 166, 107, 0.62);
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+.evidence-vault-interior__recent-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.45rem;
 }
 
-.evidence-vault-interior__journal--active {
-  border-color: rgba(201, 166, 107, 0.72);
-  box-shadow: 0 0 0 1px rgba(201, 166, 107, 0.35);
-}
-
-.evidence-vault-interior__journal-cover {
-  position: relative;
-  width: min(9rem, 42vw);
-  height: min(6.5rem, 30vw);
-}
-
-.evidence-vault-interior__journal-spine {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 14%;
-  border-radius: 0.35rem 0 0 0.35rem;
-  background: linear-gradient(180deg, #6b4f32 0%, #3d2c1c 100%);
-}
-
-.evidence-vault-interior__journal-pages {
-  position: absolute;
-  left: 12%;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  border-radius: 0 0.35rem 0.35rem 0;
-  background: linear-gradient(180deg, #f4ead8 0%, #e8dcc8 100%);
-  box-shadow: inset 0 0 0 1px rgba(107, 90, 70, 0.18);
-}
-
-.evidence-vault-interior__journal-label {
+.evidence-vault-interior__recent-head h3 {
+  margin: 0;
   font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
   color: #f0e6d6;
 }
 
-.evidence-vault-interior__journal-prompt {
-  font-size: 0.78rem;
-  color: rgba(232, 210, 168, 0.82);
+.evidence-vault-interior__recent-list > li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem;
+  align-items: stretch;
 }
 
-.evidence-vault-interior__browse {
-  margin-top: 0.35rem;
-  padding: 0.35rem 0.7rem;
+.evidence-vault-interior__recent-meta {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: rgba(201, 166, 107, 0.9);
+}
+
+.evidence-vault-interior__favorite {
+  cursor: pointer;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(201, 166, 107, 0.28);
+  background: rgba(255, 248, 235, 0.06);
+  color: rgba(232, 210, 168, 0.55);
+  min-width: 2.4rem;
+  font-size: 1rem;
+}
+
+.evidence-vault-interior__favorite--on {
+  color: #e0c07a;
+}
+
+.evidence-vault-interior__secondary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem;
+}
+
+.evidence-vault-interior__text-btn {
+  cursor: pointer;
   border: none;
   background: transparent;
-  color: rgba(232, 210, 168, 0.88);
-  font-size: 0.76rem;
+  color: rgba(232, 210, 168, 0.9);
+  font-size: 0.8rem;
   text-decoration: underline;
-  cursor: pointer;
+  padding: 0.2rem;
+}
+
+.evidence-vault-interior__surprise {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  background: rgba(255, 248, 235, 0.09);
+  padding: 0.85rem;
+  text-align: left;
+}
+
+.evidence-vault-interior__surprise-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(201, 166, 107, 0.9);
+}
+
+.evidence-vault-interior__surprise p {
+  margin: 0 0 0.7rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: rgba(240, 228, 206, 0.95);
+}
+
+.evidence-vault-interior__muted {
+  margin: 0;
+  font-size: 0.84rem;
+  color: rgba(232, 210, 168, 0.75);
 }
 
 .evidence-vault-interior--behind-discovery .evidence-vault-interior__content {

@@ -13797,9 +13797,10 @@ export default function CompanionPageClient() {
     }
 
     if (
-      detectsSoftDiscouragement(trimmed) &&
-      !detectsEncouragementNeed(trimmed)
+      detectsSoftDiscouragement(trimmed) ||
+      detectsEncouragementNeed(trimmed)
     ) {
+      /** Permission first — never auto-open Evidence Vault for encouragement/doubt. */
       const encouragementLine = EVIDENCE_VAULT_ENCOURAGEMENT_LINE;
       setMessages((prev) => [
         ...prev,

@@ -155,9 +155,9 @@ describe("evidenceVaultDoor", () => {
   it("offers exactly three first-entry choices", () => {
     expect(EVIDENCE_VAULT_FIRST_ENTRY_CHOICES).toHaveLength(3);
     expect(EVIDENCE_VAULT_FIRST_ENTRY_CHOICES.map((c) => c.label)).toEqual([
-      "Add a Piece of Evidence",
-      "Let Shari Help Me Remember",
-      "Look Inside the Vault",
+      "Add Evidence",
+      "Surprise Me",
+      "Browse My Evidence",
     ]);
   });
 });

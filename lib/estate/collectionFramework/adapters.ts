@@ -8,6 +8,8 @@ import {
   EVIDENCE_BANK_UPDATED_EVENT,
   getEvidenceEntries,
   getEvidenceEntryById,
+  isEvidenceFavorite,
+  toggleEvidenceFavorite,
   updateEvidenceEntry,
   type EvidenceCategory,
 } from "@/lib/evidenceBankStore";
@@ -272,6 +274,7 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
         updatedAt: entry.updatedAt,
         detail: formatDate(entry.createdAt),
         category: entry.category,
+        favorite: isEvidenceFavorite(entry),
         fields: evidenceFieldsFromCapture(evidenceCaptureFromEntry(entry)),
         captureValues: evidenceCaptureFromEntry(entry),
         attachments: entry.attachments,
@@ -319,6 +322,9 @@ export const ESTATE_COLLECTION_ADAPTERS: Record<
     getItemCapture(id: string) {
       const entry = getEvidenceEntryById(id);
       return entry ? evidenceCaptureFromEntry(entry) : null;
+    },
+    toggleFavorite(id: string) {
+      toggleEvidenceFavorite(id);
     },
     removeItem(id: string) {
       deleteEvidenceEntry(id);

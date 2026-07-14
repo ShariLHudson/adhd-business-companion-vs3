@@ -25,7 +25,7 @@ const WIN_SAVE_RE =
   /\b(?:save\s+this\s+win|save\s+this\s+(?:as\s+)?(?:evidence|proof)|add\s+this\s+to\s+(?:my\s+)?(?:hall\s+of\s+)?accomplishments|add\s+this\s+to\s+(?:my\s+)?(?:evidence\s+)?vault|preserve\s+this\s+(?:win|moment|proof)|file\s+this\s+(?:win|as\s+evidence)|would\s+you\s+like\s+to\s+save\s+this)\b/i;
 
 const ENCOURAGEMENT_NEED_RE =
-  /\b(?:i\s+need\s+encouragement|i'?m\s+(?:feeling\s+)?(?:discouraged|doubt(?:ing)?\s+myself|stuck)|remind\s+me\s+what\s+(?:i'?ve|i\s+have)\s+done|remind\s+me\s+who\s+i\s+am|show\s+me\s+proof\s+i\s+can|i\s+don'?t\s+trust\s+myself|feeling\s+defeated)\b/i;
+  /\b(?:i\s+need\s+encouragement|i'?m\s+(?:feeling\s+)?(?:discouraged|doubt(?:ing)?\s+myself|stuck)|remind\s+me\s+what\s+(?:i'?ve|i\s+have)\s+done|remind\s+me\s+who\s+i\s+am|show\s+me\s+proof\s+i\s+can|i\s+don'?t\s+trust\s+myself|feeling\s+defeated|i\s+don'?t\s+think\s+i'?ve\s+accomplished(?:\s+anything)?)\b/i;
 
 export function detectsWinSaveRequest(text: string): boolean {
   return WIN_SAVE_RE.test(text.trim());
@@ -77,7 +77,7 @@ export function buildWinSaveOffer(seedText?: string): WinSaveOffer {
 }
 
 export const EVIDENCE_VAULT_ENCOURAGEMENT_LINE =
-  "Would it help to look at some evidence of what you've already handled?" as const;
+  "Would you like me to open your Evidence Vault?" as const;
 
 export function parseWinSaveChoice(text: string): WinSaveDestination | null {
   const t = text.trim().toLowerCase();

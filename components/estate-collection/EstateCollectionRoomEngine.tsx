@@ -28,7 +28,6 @@ import {
   EVIDENCE_VAULT_ENTRANCE_DOOR_MS,
   EVIDENCE_VAULT_ENTRANCE_ENTER_MS,
   EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS,
-  hasEvidenceVaultEntranceCompleted,
   markEvidenceVaultEntranceCompleted,
   formatEvidenceVaultFindProofReply,
   formatEvidenceVaultInsightsReply,
@@ -48,8 +47,16 @@ import {
 import {
   EVIDENCE_VAULT_CHAT_PREFILL_ACK,
   EVIDENCE_VAULT_DISCOVERY_GUIDE_FIELDS,
-  type EvidenceVaultFirstEntryChoiceId,
 } from "@/lib/estate/evidenceVaultExperience";
+import {
+  clearEvidenceVaultDraft,
+  loadEvidenceVaultDraft,
+  saveEvidenceVaultDraft,
+} from "@/lib/estate/evidenceVaultDraft";
+import {
+  EVIDENCE_VAULT_HOME_CATEGORY_MAP,
+  type EvidenceVaultHomeCategory,
+} from "@/lib/estate/evidenceVaultHome";
 import { EstateCollectionBrowseBar } from "./EstateCollectionBrowseBar";
 import {
   DiscoveryFileExperience,
@@ -282,26 +289,52 @@ export function EstateCollectionRoomEngine({
   }
 
   function openJournalFromInterior() {
+    setVaultMode("arrive");
     setVaultPanel("discovery");
     setFilePhase("folder");
   }
 
-  function handleFirstEntryChoice(id: EvidenceVaultFirstEntryChoiceId) {
-    switch (id) {
-      case "add-evidence":
-        setVaultMode("arrive");
-        setVaultPanel("discovery");
-        setFilePhase("folder");
-        return;
-      case "shari-remember":
-        setVaultMode("arrive");
-        setVaultPanel("search");
-        return;
-      case "look-inside":
-        setVaultMode("browse");
-        setVaultPanel("browse");
-        return;
+  function openAddEvidenceFromHome() {
+    clearEvidenceVaultDraft();
+    setDraft(emptyCaptureValues(capture.fields));
+    setAttachments([]);
+    setEditingId(null);
+    openJournalFromInterior();
+  }
+
+  function continueDraftFromHome() {
+    const saved = loadEvidenceVaultDraft();
+    if (saved?.values) {
+      setDraft({ ...emptyCaptureValues(capture.fields), ...saved.values });
     }
+    setEditingId(null);
+    openJournalFromInterior();
+  }
+
+  function browseArchiveFromHome() {
+    setVaultMode("browse");
+    setVaultPanel("browse");
+  }
+
+  function openHomeCategory(category: EvidenceVaultHomeCategory) {
+    const mapped = EVIDENCE_VAULT_HOME_CATEGORY_MAP[category] ?? [];
+    setBrowseState((current) => ({
+      ...current,
+      category: mapped[0] ?? null,
+      search: "",
+      visibleCount: browse.pageSize,
+    }));
+    browseArchiveFromHome();
+  }
+
+  function searchBrowseFromHome(query: string) {
+    setBrowseState((current) => ({
+      ...current,
+      search: query,
+      category: null,
+      visibleCount: browse.pageSize,
+    }));
+    browseArchiveFromHome();
   }
 
   const closeVaultPanel = useCallback(() => {
@@ -455,6 +488,7 @@ export function EstateCollectionRoomEngine({
       return;
     }
     const wasEdit = Boolean(editingId);
+    if (isEvidenceVault) clearEvidenceVaultDraft();
     resetCompose();
     setStatusMessage(
       wasEdit
@@ -467,6 +501,12 @@ export function EstateCollectionRoomEngine({
     }
     reload();
   }
+
+  useEffect(() => {
+    if (!isEvidenceVault || editingId) return;
+    if (vaultPanel !== "discovery") return;
+    saveEvidenceVaultDraft(draft);
+  }, [draft, editingId, isEvidenceVault, vaultPanel]);
 
   function beginEdit(itemId: string) {
     const captureValues =
@@ -532,12 +572,12 @@ export function EstateCollectionRoomEngine({
               <EvidenceVaultInterior
                 journalActive={vaultPanel === "discovery"}
                 onOpenJournal={openJournalFromInterior}
-                onFirstEntryChoice={handleFirstEntryChoice}
-                showSecondaryActions={hasEvidenceVaultEntranceCompleted()}
-                onBrowseArchive={() => {
-                  setVaultMode("browse");
-                  setVaultPanel("browse");
-                }}
+                onAddEvidence={openAddEvidenceFromHome}
+                onContinueDraft={continueDraftFromHome}
+                onBrowseArchive={browseArchiveFromHome}
+                onOpenEntry={(id) => beginEdit(id)}
+                onCategorySelect={openHomeCategory}
+                onSearchBrowse={searchBrowseFromHome}
                 behindDiscovery={vaultPanel === "discovery"}
               />
             </div>

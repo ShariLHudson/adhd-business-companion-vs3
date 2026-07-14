@@ -21,11 +21,11 @@ export const EVIDENCE_VAULT_KEY_ACTION_LABEL =
 
 export const EVIDENCE_VAULT_LOCKED_INDICATOR = "Locked" as const;
 
-/** First visit after doors open — exactly three choices. */
+/** Primary home actions — exactly three prominent choices. */
 export const EVIDENCE_VAULT_FIRST_ENTRY_CHOICES = [
-  { id: "add-evidence", label: "Add a Piece of Evidence" },
-  { id: "shari-remember", label: "Let Shari Help Me Remember" },
-  { id: "look-inside", label: "Look Inside the Vault" },
+  { id: "add-evidence", label: "Add Evidence" },
+  { id: "shari-remember", label: "Surprise Me" },
+  { id: "look-inside", label: "Browse My Evidence" },
 ] as const;
 
 export type EvidenceVaultFirstEntryChoiceId =
@@ -76,6 +76,9 @@ export const EVIDENCE_VAULT_POST_SAVE_NAV = [
 /** Spark invitation from regular chat — permission first. */
 export const EVIDENCE_VAULT_CHAT_PRESERVE_OFFER =
   "This sounds like a discovery worth preserving in your Evidence Vault." as const;
+
+/** Encouragement / self-doubt — ask before opening; never auto-open. */
+export { EVIDENCE_VAULT_CHAT_OPEN_OFFER } from "./evidenceVaultHome";
 
 export const EVIDENCE_VAULT_CHAT_DECLINE_ACK =
   "No problem. We can preserve it later if you change your mind." as const;

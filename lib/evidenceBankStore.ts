@@ -59,6 +59,8 @@ export type EvidenceEntry = {
   noteOrLink?: string;
   /** Internal tag — possible Hall of Accomplishment candidate; never auto-promoted. */
   hallCandidate?: boolean;
+  /** Optional favorite for rediscovery — absent on legacy entries means false. */
+  favorite?: boolean;
 };
 
 export type EvidenceDashboardStats = {
@@ -635,6 +637,21 @@ export function exportAllEvidence(
 
 export function tagEvidenceHallCandidate(id: string, candidate: boolean): void {
   updateEvidenceEntry(id, { hallCandidate: candidate });
+}
+
+export function isEvidenceFavorite(entry: EvidenceEntry): boolean {
+  return entry.favorite === true;
+}
+
+export function toggleEvidenceFavorite(id: string): EvidenceEntry | null {
+  const existing = getEvidenceEntryById(id);
+  if (!existing) return null;
+  return updateEvidenceEntry(id, { favorite: !isEvidenceFavorite(existing) });
+}
+
+export function getFavoriteEvidenceEntries(pool?: EvidenceEntry[]): EvidenceEntry[] {
+  const source = pool ?? getEvidenceEntries();
+  return source.filter(isEvidenceFavorite);
 }
 
 export function setEvidencePrefill(prefill: EvidencePrefill): void {
