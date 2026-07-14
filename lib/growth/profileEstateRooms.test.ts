@@ -5,6 +5,7 @@ import {
   profileEstateRoomBackgroundImage,
   profileEstateRoomForMenuAction,
   profileEstateSectionForRoom,
+  type EstateMenuShellActionId,
 } from "./profileEstateRooms";
 import { GROWTH_ROOM_BG, ESTATE_PROFILE_ROOM_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG } from "./growthRoom";
 
@@ -17,6 +18,13 @@ describe("profileEstateRooms", () => {
     expect(profileEstateRoomForMenuAction("portfolio")).toBe("portfolio");
     expect(isProfileEstateMenuAction("journal")).toBe(false);
     expect(isProfileEstateMenuAction("settings")).toBe(false);
+  });
+
+  it("excludes people-i-help from shell action ids", () => {
+    type AssertPeopleIHelpExcluded =
+      "people-i-help" extends EstateMenuShellActionId ? never : true;
+    const ok: AssertPeopleIHelpExcluded = true;
+    expect(ok).toBe(true);
   });
 
   it("maps profile rooms to growth sections", () => {
@@ -49,7 +57,7 @@ describe("profileEstateRooms", () => {
       EVIDENCE_VAULT_ROOM_BG,
     );
     expect(profileEstateRoomBackgroundImage("evidence-vault")).toBe(
-      "/backgrounds/evidence-vault-background.png",
+      "/backgrounds/evidence-vault-room-static.png",
     );
     expect(profileEstateRoomBackgroundImage("portfolio")).toBe(PORTFOLIO_ROOM_BG);
     expect(profileEstateRoomBackgroundImage("portfolio")).toBe(

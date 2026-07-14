@@ -1,4 +1,8 @@
 import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
+import {
+  EVIDENCE_VAULT_CLOSED_DOOR_BG,
+  EVIDENCE_VAULT_ROOM_STATIC_BG,
+} from "@/lib/estate/evidenceVaultDoor";
 
 /** Growth hub — greenhouse sanctuary background. */
 export const GROWTH_ROOM_BG = ESTATE_ROOM_BG.greenhouse;
@@ -7,11 +11,10 @@ export const GROWTH_ROOM_BG = ESTATE_ROOM_BG.greenhouse;
 export const JOURNAL_ROOM_BG = ESTATE_ROOM_BG.gazeboJournal;
 
 /** Evidence Vault — exterior doors plate (entrance ritual). */
-export const EVIDENCE_VAULT_ENTRANCE_BG =
-  "/backgrounds/evidence-vault-background.png" as const;
+export const EVIDENCE_VAULT_ENTRANCE_BG = EVIDENCE_VAULT_CLOSED_DOOR_BG;
 
-/** Evidence Vault — interior room plate (shares entrance plate until interior asset ships). */
-export const EVIDENCE_VAULT_ROOM_BG = ESTATE_ROOM_BG.evidenceVault;
+/** Evidence Vault — open portal plate after entrance (doors removed). */
+export const EVIDENCE_VAULT_ROOM_BG = EVIDENCE_VAULT_ROOM_STATIC_BG;
 
 /** Portfolio — creative work archive, full-bleed background. */
 export const PORTFOLIO_ROOM_BG =

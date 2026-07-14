@@ -158,6 +158,54 @@ export function isEvidenceVaultDoorBusy(state: EvidenceVaultDoorState): boolean 
   return state === "unlocking" || state === "opening";
 }
 
+/** Door ritual finished — home/interior may mount. */
+export function isEvidenceVaultEntranceComplete(
+  doorState: EvidenceVaultDoorState,
+): boolean {
+  return doorState === "open";
+}
+
+/**
+ * Home UI mounts only after entrance completes.
+ * Do not mount during locked / key_ready / unlocking / opening.
+ */
+export function shouldMountEvidenceVaultHome(opts: {
+  doorState: EvidenceVaultDoorState;
+  vaultMode: "arrive" | "add" | "browse";
+  vaultPanel: null | "discovery" | "browse" | "insights" | "search";
+}): boolean {
+  return (
+    isEvidenceVaultEntranceComplete(opts.doorState) &&
+    opts.vaultMode === "arrive" &&
+    (opts.vaultPanel === null || opts.vaultPanel === "discovery")
+  );
+}
+
+/** Entrance overlay while ritual is incomplete (not browse-intent skip). */
+export function shouldShowEvidenceVaultEntrance(opts: {
+  doorState: EvidenceVaultDoorState;
+  vaultMode: "arrive" | "add" | "browse";
+}): boolean {
+  return (
+    opts.vaultMode !== "browse" &&
+    !isEvidenceVaultEntranceComplete(opts.doorState)
+  );
+}
+
+/**
+ * Shell plate under the room.
+ * Closed doors only while the ritual runs; open portal after entranceComplete.
+ * Never leave home sitting on the closed-door plate.
+ */
+export function evidenceVaultShellBackground(
+  doorState: EvidenceVaultDoorState,
+): string {
+  if (isEvidenceVaultEntranceComplete(doorState) || doorState === "opening") {
+    return EVIDENCE_VAULT_ROOM_STATIC_BG;
+  }
+  return EVIDENCE_VAULT_CLOSED_DOOR_BG;
+}
+
 /** Percent geometry for door leaves inside the art frame. */
 export function evidenceVaultDoorLeafStyle(
   bounds: readonly [number, number, number, number],

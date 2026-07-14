@@ -34,16 +34,23 @@ describe("Evidence Vault entrance reveal wiring", () => {
     expect(src).toContain("EVIDENCE_VAULT_DOOR_RIGHT_BG");
   });
 
-  it("engine mounts interior once during opening and supports skip", () => {
+  it("engine mounts interior only after entrance completes — not during opening", () => {
     const src = readFileSync(
       join(root, "components/estate-collection/EstateCollectionRoomEngine.tsx"),
       "utf8",
     );
     expect(src).toContain("skipVaultEntrance");
     expect(src).toContain("onSkip={skipVaultEntrance}");
-    expect(src).toContain('doorState === "opening"');
+    expect(src).toContain("shouldMountEvidenceVaultHome");
+    expect(src).toContain("isEvidenceVaultEntranceComplete");
     expect(src).toContain("evidence-vault-interior-mount");
     expect(src).toContain("completeVaultEntrance");
+    expect(src).not.toMatch(
+      /showVaultInterior[\s\S]*doorState === "opening"/,
+    );
+    expect(src).not.toMatch(
+      /\(doorState === "open" \|\| doorState === "opening"\)/,
+    );
   });
 
   it("does not touch authentication modules", () => {

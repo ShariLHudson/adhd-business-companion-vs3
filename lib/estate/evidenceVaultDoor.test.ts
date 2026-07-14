@@ -16,15 +16,19 @@ import {
   EVIDENCE_VAULT_SETTLE_MS,
   EVIDENCE_VAULT_UNLOCK_MS,
   evidenceVaultDoorLeafStyle,
+  evidenceVaultShellBackground,
   hasEvidenceVaultFirstEntryDone,
   hasEvidenceVaultUnlocked,
   isEvidenceVaultDoorBusy,
+  isEvidenceVaultEntranceComplete,
   markEvidenceVaultFirstEntryDone,
   markEvidenceVaultUnlocked,
   resetEvidenceVaultAccessStateForDev,
   resolveInitialEvidenceVaultDoorState,
+  shouldMountEvidenceVaultHome,
+  shouldShowEvidenceVaultEntrance,
 } from "./evidenceVaultDoor";
-import { EVIDENCE_VAULT_ENTRANCE_BG } from "@/lib/growth/growthRoom";
+import { EVIDENCE_VAULT_ENTRANCE_BG, EVIDENCE_VAULT_ROOM_BG } from "@/lib/growth/growthRoom";
 import {
   EVIDENCE_VAULT_DOOR_ACTION_LABEL,
   EVIDENCE_VAULT_FIRST_ENTRY_CHOICES,
@@ -53,6 +57,7 @@ describe("evidenceVaultDoor", () => {
       "/backgrounds/evidence-vault-background.png",
     );
     expect(EVIDENCE_VAULT_ENTRANCE_BG).toBe(EVIDENCE_VAULT_CLOSED_DOOR_BG);
+    expect(EVIDENCE_VAULT_ROOM_BG).toBe(EVIDENCE_VAULT_ROOM_STATIC_BG);
     expect(EVIDENCE_VAULT_ROOM_STATIC_BG).toContain("room-static");
     expect(EVIDENCE_VAULT_DOOR_LEFT_BG).toContain("door-left");
     expect(EVIDENCE_VAULT_DOOR_RIGHT_BG).toContain("door-right");
@@ -105,6 +110,60 @@ describe("evidenceVaultDoor", () => {
     expect(isEvidenceVaultDoorBusy("unlocking")).toBe(true);
     expect(isEvidenceVaultDoorBusy("opening")).toBe(true);
     expect(isEvidenceVaultDoorBusy("open")).toBe(false);
+  });
+
+  it("does not mount home until entranceComplete (open)", () => {
+    const panel = null;
+    for (const doorState of [
+      "locked",
+      "key_ready",
+      "unlocking",
+      "opening",
+    ] as const) {
+      expect(isEvidenceVaultEntranceComplete(doorState)).toBe(false);
+      expect(
+        shouldMountEvidenceVaultHome({
+          doorState,
+          vaultMode: "arrive",
+          vaultPanel: panel,
+        }),
+      ).toBe(false);
+      expect(
+        shouldShowEvidenceVaultEntrance({
+          doorState,
+          vaultMode: "arrive",
+        }),
+      ).toBe(true);
+    }
+    expect(isEvidenceVaultEntranceComplete("open")).toBe(true);
+    expect(
+      shouldMountEvidenceVaultHome({
+        doorState: "open",
+        vaultMode: "arrive",
+        vaultPanel: null,
+      }),
+    ).toBe(true);
+    expect(
+      shouldShowEvidenceVaultEntrance({
+        doorState: "open",
+        vaultMode: "arrive",
+      }),
+    ).toBe(false);
+  });
+
+  it("keeps closed-door shell plate until doors open", () => {
+    expect(evidenceVaultShellBackground("key_ready")).toBe(
+      EVIDENCE_VAULT_CLOSED_DOOR_BG,
+    );
+    expect(evidenceVaultShellBackground("unlocking")).toBe(
+      EVIDENCE_VAULT_CLOSED_DOOR_BG,
+    );
+    expect(evidenceVaultShellBackground("opening")).toBe(
+      EVIDENCE_VAULT_ROOM_STATIC_BG,
+    );
+    expect(evidenceVaultShellBackground("open")).toBe(
+      EVIDENCE_VAULT_ROOM_STATIC_BG,
+    );
   });
 
   it("aligns unlock timings to the approved entrance sequence", () => {

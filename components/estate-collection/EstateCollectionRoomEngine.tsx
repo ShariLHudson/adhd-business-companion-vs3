@@ -34,9 +34,13 @@ import {
   type EvidenceVaultWorkspaceMode,
 } from "@/lib/estate/evidenceVaultArrival";
 import {
+  evidenceVaultShellBackground,
   isEvidenceVaultDoorBusy,
+  isEvidenceVaultEntranceComplete,
   prefersEvidenceVaultReducedMotion,
   resolveInitialEvidenceVaultDoorState,
+  shouldMountEvidenceVaultHome,
+  shouldShowEvidenceVaultEntrance,
   EVIDENCE_VAULT_REDUCED_MOTION_MS,
   type EvidenceVaultDoorState,
 } from "@/lib/estate/evidenceVaultDoor";
@@ -74,9 +78,9 @@ import {
 } from "./EvidenceVaultActionBar";
 import { EvidenceVaultWorkspaceModal } from "./EvidenceVaultWorkspaceModal";
 import {
-  EVIDENCE_VAULT_ENTRANCE_BG,
-  EVIDENCE_VAULT_ROOM_BG,
-} from "@/lib/growth/growthRoom";
+  EVIDENCE_VAULT_CLOSED_DOOR_BG,
+  EVIDENCE_VAULT_ROOM_STATIC_BG,
+} from "@/lib/estate/evidenceVaultDoor";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import "./estate-collection-room.css";
 import "./evidence-vault-entrance.css";
@@ -198,40 +202,37 @@ export function EstateCollectionRoomEngine({
     [isEvidenceVault],
   );
 
+  const entranceComplete = isEvidenceVaultEntranceComplete(doorState);
   const showEntrance =
-    isEvidenceVault && vaultMode !== "browse" && doorState !== "open";
-  /** Mount once when doors begin opening — fade in; stay mounted when open. */
+    isEvidenceVault &&
+    shouldShowEvidenceVaultEntrance({ doorState, vaultMode });
+  /** Mount home only after doors finish — never over closed/opening doors. */
   const showVaultInterior =
     isEvidenceVault &&
-    (doorState === "open" || doorState === "opening") &&
-    vaultMode === "arrive" &&
-    (vaultPanel === null || vaultPanel === "discovery");
+    shouldMountEvidenceVaultHome({
+      doorState,
+      vaultMode,
+      vaultPanel,
+    });
   const showInlineDiscovery =
     isEvidenceVault &&
-    doorState === "open" &&
+    entranceComplete &&
     vaultPanel === "discovery" &&
     vaultMode === "arrive";
   const showVaultActionBar =
     isEvidenceVault &&
-    doorState === "open" &&
+    entranceComplete &&
     vaultPanel === null &&
     vaultMode !== "arrive";
   const showVaultBrowse =
-    isEvidenceVault && doorState === "open" && vaultPanel === "browse";
+    isEvidenceVault && entranceComplete && vaultPanel === "browse";
   const showVaultInsights =
-    isEvidenceVault && doorState === "open" && vaultPanel === "insights";
+    isEvidenceVault && entranceComplete && vaultPanel === "insights";
   const showVaultSearch =
-    isEvidenceVault && doorState === "open" && vaultPanel === "search";
+    isEvidenceVault && entranceComplete && vaultPanel === "search";
   const vaultPlateImage = useMemo(() => {
     if (!isEvidenceVault) return undefined;
-    if (
-      doorState === "locked" ||
-      doorState === "key_ready" ||
-      doorState === "unlocking"
-    ) {
-      return EVIDENCE_VAULT_ENTRANCE_BG;
-    }
-    return EVIDENCE_VAULT_ROOM_BG;
+    return evidenceVaultShellBackground(doorState);
   }, [isEvidenceVault, doorState]);
   const showBrowseOnly = !isEvidenceVault || showVaultBrowse;
   const showCaptureForm = !isEvidenceVault || vaultMode === "add";
@@ -388,8 +389,8 @@ export function EstateCollectionRoomEngine({
 
   useEffect(() => {
     if (!isEvidenceVault) return;
-    preloadRoomBackground(EVIDENCE_VAULT_ENTRANCE_BG);
-    preloadRoomBackground(EVIDENCE_VAULT_ROOM_BG);
+    preloadRoomBackground(EVIDENCE_VAULT_CLOSED_DOOR_BG);
+    preloadRoomBackground(EVIDENCE_VAULT_ROOM_STATIC_BG);
   }, [isEvidenceVault]);
 
   useEffect(() => {
@@ -541,12 +542,12 @@ export function EstateCollectionRoomEngine({
       room={room}
       backgroundImage={vaultPlateImage}
       dataVaultEntrancePhase={
-        isEvidenceVault && doorState !== "open" ? doorState : undefined
+        isEvidenceVault && !entranceComplete ? doorState : undefined
       }
     >
       {isEvidenceVault ? (
         <>
-          {doorState === "open" ? (
+          {entranceComplete ? (
             <div className="discovery-file-exit">
               <GrowthPanelBackButton onBack={onBack} label={backLabel} />
             </div>
@@ -561,12 +562,7 @@ export function EstateCollectionRoomEngine({
           ) : null}
           {showVaultInterior ? (
             <div
-              className={[
-                "evidence-vault-interior-mount",
-                doorState === "opening"
-                  ? "evidence-vault-interior-mount--entering"
-                  : "evidence-vault-interior-mount--open",
-              ].join(" ")}
+              className="evidence-vault-interior-mount evidence-vault-interior-mount--open"
               data-testid="evidence-vault-interior-mount"
             >
               <EvidenceVaultInterior
