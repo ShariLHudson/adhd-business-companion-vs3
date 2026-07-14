@@ -713,6 +713,56 @@ export function parkPlanItem(items: PlanDayItem[], id: string): PlanDayItem[] {
   return deferPlanItemToDate(items, id, PLAN_PARKING_HOLD_KEY);
 }
 
+/**
+ * Park free-form text in the intentional Parking Lot (deferred someday hold).
+ * Reuses companion-plan-my-day-deferred-v1 — does not create a second store.
+ */
+export function addParkingLotItem(input: {
+  title: string;
+  source?: PlanDayItemSource;
+  notes?: string;
+}): PlanDayItem | null {
+  const title = input.title.trim();
+  if (!title) return null;
+  const now = new Date().toISOString();
+  const owner = getPlanDayOwnerUserId();
+  const item: PlanDayItem = {
+    id: uid(),
+    title,
+    column: "ready",
+    done: false,
+    notes: input.notes?.trim() || undefined,
+    source: input.source ?? "manual",
+    createdAt: now,
+    updatedAt: now,
+    ownerUserId: owner ?? undefined,
+  };
+  const deferred = readDeferred();
+  deferred[PLAN_PARKING_HOLD_KEY] = [
+    ...(deferred[PLAN_PARKING_HOLD_KEY] ?? []),
+    item,
+  ];
+  writeDeferred(deferred);
+  return item;
+}
+
+/** Member-facing source label when provenance is known. */
+export function parkingLotSourceLabel(
+  source: PlanDayItemSource | undefined,
+): string | null {
+  if (!source) return null;
+  if (source === "clear-my-mind") return "Clear My Mind";
+  if (source === "manual") return "Added directly";
+  if (
+    source === "time-block" ||
+    source === "day-designer" ||
+    source === "rhythm"
+  ) {
+    return "Plan My Day";
+  }
+  return null;
+}
+
 /** Intentional Parking Lot only (not dated “send later” holds). */
 export function readPlanningParkingLotItems(): PlanDayItem[] {
   const deferred = readDeferred();
