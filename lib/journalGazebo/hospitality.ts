@@ -18,16 +18,14 @@ export const JOURNAL_DESK_OPEN_LETTER = "Open the note";
 
 export const JOURNAL_DESK_OPEN_JOURNAL = "Open your journal";
 
-export const JOURNAL_WELCOME_NOTE_TITLE = "Welcome";
+export const JOURNAL_WELCOME_NOTE_TITLE = "Welcome to your Journal Gazebo";
 
 export const JOURNAL_WELCOME_NOTE_PARAGRAPHS = [
-  "I'm so glad you're here.",
-  "This place was made for moments like this — quiet, unhurried, yours.",
-  "Before anything else, I wanted you to know you belong here.",
+  "A quiet place to capture thoughts, ideas, memories, and moments that matter.",
 ] as const;
 
 export const JOURNAL_WELCOME_NOTE_CLOSING =
-  "Let's create something that will become part of your story.";
+  "When you're ready, create a journal that feels like yours.";
 
 export const JOURNAL_WELCOME_NOTE_SIGN = "— Shari";
 
@@ -50,17 +48,20 @@ export const JOURNAL_TABLE_CREATE = {
   subtitle: "Begin a journal that's uniquely yours.",
 } as const;
 
-/** Table sanctuary — open an existing journal. */
-export const JOURNAL_TABLE_OPEN = {
-  title: "Open My Journal",
+/** Table sanctuary — write in an existing journal. */
+export const JOURNAL_TABLE_WRITE = {
+  title: "Write",
   subtitle: "Continue where you left off.",
 } as const;
+
+/** @deprecated Prefer JOURNAL_TABLE_WRITE */
+export const JOURNAL_TABLE_OPEN = JOURNAL_TABLE_WRITE;
 
 /** @deprecated Use JOURNAL_TABLE_CREATE */
 export const JOURNAL_WELCOME_CREATE_FIRST = JOURNAL_TABLE_CREATE;
 
-/** @deprecated Use JOURNAL_TABLE_OPEN */
-export const JOURNAL_WELCOME_OPEN_TODAY = JOURNAL_TABLE_OPEN;
+/** @deprecated Use JOURNAL_TABLE_WRITE */
+export const JOURNAL_WELCOME_OPEN_TODAY = JOURNAL_TABLE_WRITE;
 
 export const JOURNAL_LIBRARY_SHELF_LABEL = "My special journals";
 
@@ -68,7 +69,7 @@ export const JOURNAL_DONE_LABEL = "Done";
 
 export const JOURNAL_DONE_HINT = "Return to the gazebo and rest your journal on the shelf.";
 
-export const JOURNAL_PICKER_TITLE = "Which journal today?";
+export const JOURNAL_PICKER_TITLE = "Choose a journal:";
 
 export const JOURNAL_PICKER_SUBTITLE = "Pick up where you left off.";
 

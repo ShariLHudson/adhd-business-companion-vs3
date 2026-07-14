@@ -93,7 +93,8 @@
 }
 
 .journal-gazebo--welcome-letter {
-  background: linear-gradient(180deg, #2a2420 0%, #1a1612 48%, #12100e 100%);
+  /* Brief fallback while the desk plate loads — photo covers the viewport. */
+  background: #1a1612;
 }
 
 /* Prototype route — same full-viewport shell as companion */
@@ -170,7 +171,7 @@
   transition: filter 1.6s ease;
 }
 
-.journal-gazebo--gazebo-rest .journal-gazebo__background {
+.journal-gazebo--gazebo-rest:not(.journal-gazebo--welcome-letter) .journal-gazebo__background {
   inset: 0;
   width: 100%;
   height: 100%;
@@ -178,6 +179,14 @@
   max-height: none;
   object-fit: cover;
   object-position: center center;
+}
+
+/* Return desk uses a dedicated plate (letter already removed from the asset). */
+.journal-gazebo.journal-gazebo--return-desk .journal-gazebo__background,
+.journal-gazebo.journal-gazebo--return-desk .estate-room-fullbleed-bg {
+  object-fit: cover;
+  object-position: center center;
+  transform: none;
 }
 
 .journal-estate {

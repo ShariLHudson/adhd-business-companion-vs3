@@ -6,8 +6,8 @@ type Props = {
 };
 
 /** Flame mark only — cropped from SSC logo (no wordmark). */
-const SPARK_FLAME_SRC = "/images/spark-estate-flame-only.jpg";
-const SPARK_FLAME_FALLBACK = "/images/spark-estate-flame.svg";
+const SPARK_FLAME_SRC = "/images/ssc-presence-flame.png";
+const SPARK_FLAME_FALLBACK = "/images/spark-estate-flame-only.jpg";
 
 export function JournalGazeboSparkFlame({ className = "", size = "md" }: Props) {
   const sizeClass =

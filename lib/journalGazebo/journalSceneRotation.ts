@@ -1,4 +1,4 @@
-import { GAZEBO_JOURNAL_BACKGROUND_URL } from "./journalGazeboMedia";
+import { JOURNAL_GAZEBO_BACKGROUND_URL } from "./journalGazeboMedia";
 
 const RETURN_VISIT_COUNT_KEY = "spark-journal-gazebo-return-visit-count";
 
@@ -8,6 +8,8 @@ export type JournalSessionScenes = {
   /** Return visits crossfade here after a quiet beat. */
   settledUrl: string | null;
   transitionAfterMs: number;
+  /** Letter desk plate framing (Create / Write sit under the letter). */
+  framing: "welcome-letter" | "return-desk";
 };
 
 function safeGetCount(): number {
@@ -30,49 +32,40 @@ function safeSetCount(n: number): void {
   }
 }
 
-/** Canonical gazebo vista for every journal session. */
-export function journalGazeboStartUrl(): string {
-  return GAZEBO_JOURNAL_BACKGROUND_URL;
+function letterDeskScenes(): JournalSessionScenes {
+  return {
+    gazeboUrl: JOURNAL_GAZEBO_BACKGROUND_URL,
+    settledUrl: null,
+    transitionAfterMs: 0,
+    framing: "welcome-letter",
+  };
 }
 
-/**
- * Return visits — always the clean gazebo desk (no welcome letter on the plate).
- */
+/** Canonical gazebo desk with welcome letter. */
+export function journalGazeboStartUrl(): string {
+  return JOURNAL_GAZEBO_BACKGROUND_URL;
+}
+
+/** Return visits — same letter desk; Create + Write are the actions. */
 export function recordJournalReturnSession(): JournalSessionScenes {
   const count = safeGetCount() + 1;
   safeSetCount(count);
-
-  return {
-    gazeboUrl: journalGazeboStartUrl(),
-    settledUrl: null,
-    transitionAfterMs: 0,
-  };
+  return letterDeskScenes();
 }
 
+/** First visit — letter desk. */
 export function resolveJournalWelcomeScenes(): JournalSessionScenes {
-  return {
-    gazeboUrl: journalGazeboStartUrl(),
-    settledUrl: null,
-    transitionAfterMs: 0,
-  };
+  return letterDeskScenes();
 }
 
-/** First journal creation — full gazebo vista behind the design studio and gift. */
+/** Creation / gift — letter desk behind workshop layers. */
 export function resolveJournalWorkshopScenes(): JournalSessionScenes {
-  return {
-    gazeboUrl: journalGazeboStartUrl(),
-    settledUrl: null,
-    transitionAfterMs: 0,
-  };
+  return letterDeskScenes();
 }
 
-/** Full gazebo vista — member steps back from the open book to the garden scene. */
+/** Gazebo rest — letter desk with Create + Write. */
 export function resolveJournalGazeboRestScenes(): JournalSessionScenes {
-  return {
-    gazeboUrl: journalGazeboStartUrl(),
-    settledUrl: null,
-    transitionAfterMs: 0,
-  };
+  return letterDeskScenes();
 }
 
 export function resetJournalSceneRotation(): void {

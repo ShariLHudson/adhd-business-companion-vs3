@@ -2,22 +2,106 @@
    Welcome letter scene — photo plate + estate green plaques
 ═══════════════════════════════════════════════════════════ */
 
-.journal-gazebo--welcome-letter .journal-gazebo__background {
-  inset: auto;
-  top: 0;
-  left: 50%;
-  width: auto;
-  height: min(78vh, 100%);
-  max-height: 78vh;
-  max-width: min(96vw, 100%);
-  aspect-ratio: 16 / 10;
-  transform: translateX(-50%);
-  object-fit: contain;
-  object-position: center top;
+.jg-welcome-desk-root {
+  position: absolute;
+  inset: 0;
+  z-index: 34;
+  pointer-events: none;
 }
 
-.journal-gazebo--workshop-plate .journal-gazebo__background,
-.journal-gazebo--gazebo-rest .journal-gazebo__background {
+/* Letter is baked into the plate — never mount an HTML duplicate card. */
+.jg-welcome-desk__letter-slot {
+  display: none !important;
+}
+
+/*
+ * Create + Write — on the desk wood, directly under the envelope.
+ */
+.jg-welcome-desk-actions {
+  position: fixed;
+  inset: auto;
+  left: 50%;
+  bottom: clamp(11%, 13.5vh, 16%);
+  transform: translateX(-50%);
+  width: min(42rem, 78vw);
+  height: clamp(4.5rem, 9.5vh, 5.75rem);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.jg-welcome-desk-actions .jg-table-actions {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+.jg-welcome-desk-actions .jg-table-actions__plaque {
+  position: absolute;
+  bottom: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.jg-welcome-desk-actions .jg-table-actions__plaque--create {
+  left: 0;
+  right: 50.8%;
+}
+
+.jg-welcome-desk-actions .jg-table-actions__open-wrap {
+  position: absolute;
+  left: 50.8%;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.jg-welcome-desk-actions .jg-table-actions__open-wrap .jg-table-actions__plaque--open {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Letter desk — full-bleed photograph (no black letterbox).
+ * Cover the viewport; keep the envelope centered and desk wood at the bottom
+ * so Create / Write sit on the table under the letter.
+ */
+.journal-gazebo--welcome-letter .estate-room-fullbleed-stack,
+.journal-gazebo--welcome-letter.journal-gazebo--gazebo-rest .estate-room-fullbleed-stack {
+  background: #1a1612;
+}
+
+.journal-gazebo--welcome-letter .journal-gazebo__background,
+.journal-gazebo--welcome-letter .estate-room-fullbleed-bg,
+.journal-gazebo--welcome-letter.journal-gazebo--gazebo-rest .journal-gazebo__background,
+.journal-gazebo--welcome-letter.journal-gazebo--gazebo-rest .estate-room-fullbleed-bg {
+  position: absolute;
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  transform: none;
+  object-fit: cover;
+  object-position: center 48%;
+  opacity: 1;
+}
+
+.journal-gazebo--workshop-plate:not(.journal-gazebo--welcome-letter) .journal-gazebo__background,
+.journal-gazebo--gazebo-rest:not(.journal-gazebo--welcome-letter) .journal-gazebo__background {
   inset: 0;
   width: 100%;
   height: 100%;
@@ -26,6 +110,14 @@
   transform: none;
   object-fit: cover;
   object-position: center center;
+}
+
+/* Return desk plate is letter-free — keep normal cover framing. */
+.journal-gazebo.journal-gazebo--return-desk .journal-gazebo__background,
+.journal-gazebo.journal-gazebo--return-desk .estate-room-fullbleed-bg {
+  object-fit: cover;
+  object-position: center center;
+  transform: none;
 }
 
 /* Sized to match background img rect via JS in WelcomeDesk */
@@ -306,22 +398,9 @@
   pointer-events: none;
 }
 
+/* Return notecards disabled — plate + journals only. */
 .jg-return-note {
-  position: absolute;
-  left: 50%;
-  top: 42%;
-  transform: translate(-50%, -50%);
-  width: min(16.5rem, 42vw);
-  margin: 0;
-  padding: 1.15rem 1.25rem 1rem;
-  border: 1px solid rgba(155, 125, 78, 0.42);
-  border-radius: 3px;
-  background: linear-gradient(165deg, #fdf9f0 0%, #f3e8d6 48%, #e8dbc4 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 252, 245, 0.92),
-    0 14px 32px rgba(10, 8, 6, 0.38);
-  pointer-events: none;
-  animation: journal-gazebo-spark-in 1.1s ease;
+  display: none !important;
 }
 
 .jg-return-note__texture {
@@ -345,20 +424,16 @@
 }
 
 .jg-return-note__greeting {
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(1rem, 2.1vw, 1.2rem);
-  font-weight: 600;
-  line-height: 1.35;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(0.86rem, 1.65vw, 0.98rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.45;
   color: #3d3428;
 }
 
 .jg-return-note__question {
-  margin-top: 0.65rem;
-  font-family: "Lora", Georgia, serif;
-  font-size: clamp(0.88rem, 1.75vw, 1rem);
-  font-style: italic;
-  line-height: 1.45;
-  color: #4a4034;
+  display: none;
 }
 
 .jg-return-note__sign {
@@ -454,10 +529,10 @@
 }
 
 @media (max-width: 640px) {
-  .journal-gazebo--welcome-letter .journal-gazebo__background,
-  .jg-welcome-desk {
-    height: min(74vh, 100%);
-    max-height: 74vh;
+  .jg-welcome-desk-actions {
+    bottom: clamp(12%, 14vh, 18%);
+    width: min(42rem, 92vw);
+    height: clamp(4.25rem, 10vh, 5.25rem);
   }
 
   .jg-table-actions__plaque {
@@ -487,6 +562,18 @@
   }
 }
 
-.journal-gazebo--welcome-letter .jg-cinematic-env {
-  display: none;
+.journal-gazebo--welcome-letter .jg-cinematic-env,
+.journal-gazebo--gazebo-rest .jg-cinematic-env {
+  display: none !important;
+}
+
+/* Letter desk: journals live under Write — never as spines on the envelope. */
+.journal-gazebo--welcome-letter .journal-gazebo__gazebo-shelf {
+  display: none !important;
+}
+
+/* No dark atmosphere / glow veils over the welcome letter plate. */
+.journal-gazebo--welcome-letter .journal-gazebo__atmosphere,
+.journal-gazebo--welcome-letter .journal-estate__glow {
+  display: none !important;
 }

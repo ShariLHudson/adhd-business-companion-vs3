@@ -11,8 +11,15 @@ import { journalConfigTag, parseJournalConfigTag } from "./types";
 
 export type JournalGazeboSession = {
   activeJournalId: string | null;
-  /** Welcome stationery shown once; never again unless requested. */
+  /**
+   * Welcome stationery / first-visit letter shown once.
+   * Kept in sync with `journalGazeboVisited`.
+   */
   hasSeenWelcomeNote: boolean;
+  /** Persisted first-visit completion — letter never returns after true. */
+  journalGazeboVisited: boolean;
+  /** Persisted — member has created at least one journal in the Gazebo. */
+  journalCreated: boolean;
   editingEntryId: string | null;
   /** Journal ids that completed the first-opening ceremony. */
   completedCeremonies: string[];
@@ -26,6 +33,8 @@ export const JOURNAL_GAZEBO_UPDATED_EVENT = "companion-journal-gazebo-updated";
 const EMPTY_SESSION: JournalGazeboSession = {
   activeJournalId: null,
   hasSeenWelcomeNote: false,
+  journalGazeboVisited: false,
+  journalCreated: false,
   editingEntryId: null,
   completedCeremonies: [],
 };
@@ -157,10 +166,16 @@ function parseSession(raw: string | null): JournalGazeboSession | null {
     const parsed = JSON.parse(raw) as Partial<JournalGazeboSession> & {
       hasVisited?: boolean;
     };
+    const visited =
+      parsed.journalGazeboVisited ??
+      parsed.hasSeenWelcomeNote ??
+      parsed.hasVisited ??
+      false;
     return {
       activeJournalId: parsed.activeJournalId ?? null,
-      hasSeenWelcomeNote:
-        parsed.hasSeenWelcomeNote ?? parsed.hasVisited ?? false,
+      hasSeenWelcomeNote: visited,
+      journalGazeboVisited: visited,
+      journalCreated: parsed.journalCreated ?? false,
       editingEntryId: parsed.editingEntryId ?? null,
       completedCeremonies: Array.isArray(parsed.completedCeremonies)
         ? parsed.completedCeremonies.filter((id): id is string => typeof id === "string")
@@ -222,18 +237,55 @@ export function markJournalCeremonyComplete(journalId: string): void {
   });
 }
 
+/**
+ * First visit until the member completes the Gazebo onboarding
+ * (gift reveal finished) or already has journals from a prior session.
+ */
 export function isFirstJournalGazeboVisit(): boolean {
-  return !readSession().hasSeenWelcomeNote;
+  const session = readSession();
+  if (session.journalGazeboVisited || session.hasSeenWelcomeNote) return false;
+  if (readConfigs().length > 0) return false;
+  return true;
 }
 
-export function markWelcomeNoteSeen(): void {
+export function hasJournalGazeboVisited(): boolean {
   const session = readSession();
-  writeSession({ ...session, hasSeenWelcomeNote: true });
+  return session.journalGazeboVisited || session.hasSeenWelcomeNote;
+}
+
+export function hasJournalCreated(): boolean {
+  const session = readSession();
+  if (session.journalCreated) return true;
+  return readConfigs().length > 0;
+}
+
+/** Persist first-visit completion across sessions (letter never returns). */
+export function markJournalGazeboVisited(): void {
+  const session = readSession();
+  writeSession({
+    ...session,
+    hasSeenWelcomeNote: true,
+    journalGazeboVisited: true,
+  });
+}
+
+/** @deprecated Prefer markJournalGazeboVisited */
+export function markWelcomeNoteSeen(): void {
+  markJournalGazeboVisited();
+}
+
+export function markJournalCreated(): void {
+  const session = readSession();
+  writeSession({ ...session, journalCreated: true });
 }
 
 export function requestWelcomeNoteAgain(): void {
   const session = readSession();
-  writeSession({ ...session, hasSeenWelcomeNote: false });
+  writeSession({
+    ...session,
+    hasSeenWelcomeNote: false,
+    journalGazeboVisited: false,
+  });
 }
 
 /** Return visits — ensure a journal exists without showing first-visit UI. */
@@ -272,6 +324,7 @@ export function createJournalConfig(
   const config = defaultJournalConfig(rest);
   writeConfigs([config, ...readConfigs()]);
   setActiveJournalConfig(config.id);
+  markJournalCreated();
   return config;
 }
 
@@ -294,7 +347,7 @@ export function updateJournalConfig(
 }
 
 export function hasVisitedJournalGazebo(): boolean {
-  return readSession().hasSeenWelcomeNote;
+  return hasJournalGazeboVisited();
 }
 
 export function setEditingEntryId(entryId: string | null): void {

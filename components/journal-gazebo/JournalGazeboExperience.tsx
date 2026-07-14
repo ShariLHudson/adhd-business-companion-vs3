@@ -16,6 +16,7 @@ import {
   hasCompletedJournalCeremony,
   isFirstJournalGazeboVisit,
   markJournalCeremonyComplete,
+  markJournalGazeboVisited,
   markWelcomeNoteSeen,
   openJournalEntry,
   openTodaysPageJournal,
@@ -30,10 +31,6 @@ import {
   subscribeJournalGazeboCommands,
 } from "@/lib/journalGazebo/journalGazeboCommands";
 import {
-  pickJournalGazeboReturnNote,
-  type JournalGazeboReturnNote,
-} from "@/lib/journalGazebo/returnGreetings";
-import {
   JOURNAL_ON_DESK_SPARK,
   JOURNAL_OPEN_INVITE,
   JOURNAL_OPEN_TODAY_SPARK,
@@ -47,9 +44,7 @@ import {
   readJournalGazeboSoundMuted,
   writeJournalGazeboSoundMuted,
 } from "@/lib/journalGazebo/soundPreference";
-import type { JournalNoteCardBeat } from "@/lib/journalGazebo/cinematicTypes";
 import { getMemberDisplayName, getMemberFirstName } from "@/lib/journalGazebo/memberDisplayName";
-import { playJournalPageTurnSound, playPaperRustleSound } from "@/lib/journalGazebo/ritualSounds";
 import type {
   JournalCeremonyStep,
   JournalGazeboConfig,
@@ -60,10 +55,7 @@ import { JournalGazeboCeremonyPage } from "./JournalGazeboCeremonyPage";
 import { JournalGazeboCreationWizard } from "./JournalGazeboCreationWizard";
 import { gazeboSeasonBackgroundCandidates, journalGazeboAtmosphereOnly } from "@/lib/journalGazebo/seasons";
 import { JournalGazeboDesignStudio } from "./JournalGazeboDesignStudio";
-import {
-  JournalGazeboWrappedGift,
-  type GiftUnwrapMoment,
-} from "./JournalGazeboWrappedGift";
+import { JournalRevealFlow } from "./journal-reveal";
 import { JournalGazeboCinematicEnvironment } from "./JournalGazeboCinematicEnvironment";
 import { JournalGazeboDesk, type DeskCamera } from "./JournalGazeboDesk";
 import type { JournalHeroMoment } from "./JournalGazeboHeroJournal";
@@ -141,7 +133,6 @@ export function JournalGazeboExperience({
   const [sparkLine, setSparkLine] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState<string | null>(null);
   const [showTime, setShowTime] = useState(true);
-  const [returnNote, setReturnNote] = useState<JournalGazeboReturnNote | null>(null);
   const [deskCamera, setDeskCamera] = useState<DeskCamera>("wide");
   const [ceremonyStep, setCeremonyStep] = useState<JournalCeremonyStep>(0);
   const [bookPageIndex, setBookPageIndex] = useState(0);
@@ -149,8 +140,8 @@ export function JournalGazeboExperience({
   const [estateMoment, setEstateMoment] = useState<EstateDeskMoment>(() =>
     assumeFirstVisit ? "ready" : "settling",
   );
-  const [noteCardBeat, setNoteCardBeat] = useState<JournalNoteCardBeat>("waiting");
-  const [giftMoment, setGiftMoment] = useState<GiftUnwrapMoment>("wrapped");
+  /** First journal creation → full wrapping ceremony; returning → shortened. */
+  const [giftRevealIsFirstCreation, setGiftRevealIsFirstCreation] = useState(true);
   const [journalRevealArrived, setJournalRevealArrived] = useState(false);
   const [centeredBookActive, setCenteredBookActive] = useState(false);
   const [memberDisplayName, setMemberDisplayName] = useState("");
@@ -170,12 +161,6 @@ export function JournalGazeboExperience({
 
   const arrivalBreatheMs = CINEMATIC.arrivalMs;
   const estateReadyMs = CINEMATIC.estateStillnessMs;
-
-  const scheduleCinematic = useCallback((ms: number, fn: () => void) => {
-    const id = window.setTimeout(fn, ms);
-    cinematicTimersRef.current.push(id);
-    return id;
-  }, []);
 
   const refreshLibrary = useCallback(() => {
     setLibraryJournals(getLibraryJournals());
@@ -211,6 +196,10 @@ export function JournalGazeboExperience({
   const [sceneComposed, setSceneComposed] = useState(assumeFirstVisit || prototypeMode);
   const [soundMuted, setSoundMuted] = useState(false);
   const backgroundUrl = backgroundCandidates[backgroundIndex] ?? null;
+
+  const isFirstVisit = visitMode === "first";
+  const showWelcomeLetter = isFirstVisit && phase === "estate";
+  const showWelcomeDesk = showWelcomeLetter;
 
   useLayoutEffect(() => {
     setSoundMuted(readJournalGazeboSoundMuted());
@@ -267,12 +256,6 @@ export function JournalGazeboExperience({
       }),
     );
   }, []);
-
-  const isFirstVisit = visitMode !== "return";
-
-  const showWelcomeLetter = isFirstVisit && phase === "estate";
-
-  const showWelcomeDesk = showWelcomeLetter;
 
   const openBookActive =
     config != null &&
@@ -556,7 +539,6 @@ export function JournalGazeboExperience({
     setPhase("arrival");
     setEstateMoment("settling");
     setNoteCardBeat("waiting");
-    setGiftMoment("wrapped");
     setJournalRevealArrived(false);
     setCenteredBookActive(false);
     setSparkLine(null);
@@ -567,7 +549,6 @@ export function JournalGazeboExperience({
     setDeskCamera("wide");
     setCeremonyStep(0);
     setBookPageIndex(0);
-    setReturnNote(null);
     setEditingEntryId(null);
     setVisitMode("first");
     openCompletedRef.current = false;
@@ -707,7 +688,6 @@ export function JournalGazeboExperience({
     } else {
       setConfig(null);
     }
-    setReturnNote(pickJournalGazeboReturnNote());
     setDeskCamera("wide");
     setPhase("gazebo-rest");
   }, [visitMode]);
@@ -806,33 +786,6 @@ export function JournalGazeboExperience({
     [openJournalAtSavedPlace],
   );
 
-  function runNoteCardCinematic() {
-    clearCinematicTimers();
-    setPhase("envelope-opening");
-    setEstateMoment("envelope-opening");
-    setNoteCardBeat("pause");
-
-    let t = CINEMATIC.notePauseMs;
-    scheduleCinematic(t, () => {
-      setNoteCardBeat("lift");
-      playPaperRustleSound();
-    });
-    t += CINEMATIC.noteLiftMs;
-    scheduleCinematic(t, () => setNoteCardBeat("flap-lift"));
-    t += CINEMATIC.noteFlapLiftMs;
-    scheduleCinematic(t, () => setNoteCardBeat("flap-open"));
-    t += CINEMATIC.noteFlapOpenMs;
-    scheduleCinematic(t, () => {
-      setNoteCardBeat("revealed");
-      playJournalPageTurnSound();
-      setEstateMoment("letter");
-    });
-    t += CINEMATIC.noteRevealMs;
-    scheduleCinematic(t, () => {
-      setNoteCardBeat("complete");
-    });
-  }
-
   function toggleSound() {
     setSoundMuted((current) => {
       const next = !current;
@@ -841,24 +794,8 @@ export function JournalGazeboExperience({
     });
   }
 
-  function handleNoteOpen() {
-    if (!showWelcomeDesk) return;
-    if (estateMoment === "envelope-opening" || estateMoment === "letter") return;
-
-    if (
-      phase === "estate" && estateMoment === "settling"
-    ) {
-      setEstateMoment("ready");
-    } else if (phase !== "estate" || estateMoment !== "ready") {
-      return;
-    }
-
-    if (noteCardBeat !== "waiting") return;
-    runNoteCardCinematic();
-  }
-
   function handleWelcomeCreateJournal() {
-    markWelcomeNoteSeen();
+    // Do not mark first visit complete yet — letter returns if they abandon create.
     clearCinematicTimers();
     setJournalPickerOpen(false);
     setDeskOpen(false);
@@ -870,8 +807,8 @@ export function JournalGazeboExperience({
     setPhase("creating");
   }
 
+  /** Write — open one journal, or show selection when several exist. */
   function handleOpenMyJournal(journal?: JournalGazeboConfig) {
-    markWelcomeNoteSeen();
     refreshLibrary();
     const journals = getLibraryJournals();
     if (journals.length === 0) {
@@ -892,7 +829,7 @@ export function JournalGazeboExperience({
   function handleDesignComplete(draft: JournalGazeboConfig) {
     clearCinematicTimers();
     openCompletedRef.current = false;
-    markWelcomeNoteSeen();
+    const wasFirstCreation = getLibraryJournals().length === 0;
     const created = createJournalConfig(draft);
     refreshLibrary();
     setConfig(created);
@@ -902,38 +839,60 @@ export function JournalGazeboExperience({
     setCeremonyStep(0);
     setBookPageIndex(0);
     setTasselY(JOURNAL_RIBBON_CENTER_Y);
-    setGiftMoment("wrapping");
+    setGiftRevealIsFirstCreation(wasFirstCreation);
     setPhase("gift-unwrap");
     setEstateMoment("rest");
     setSparkLine(null);
+  }
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const scale = reduced ? 0.35 : 1;
-    let t = CINEMATIC.giftWrappingMs * scale;
+  function enterWritingAfterGiftReveal(journal: JournalGazeboConfig) {
+    setActiveJournalConfig(journal.id);
+    setConfig(journal);
+    setCenteredBookActive(true);
+    setDeskOpen(false);
+    setDeskCamera("writing");
+    setTasselY(JOURNAL_RIBBON_CENTER_Y);
+    openCompletedRef.current = true;
 
-    scheduleCinematic(t, () => setGiftMoment("wrapped"));
-    t += CINEMATIC.giftWrappedPauseMs * scale;
+    if (!hasCompletedJournalCeremony(journal.id)) {
+      setCeremonyStep(0);
+      setBookPageIndex(0);
+      setDedicationHtml(getPageBody(journal.id, 0));
+      setBody("");
+      setPhase("ceremony");
+      return;
+    }
 
-    scheduleCinematic(t, () => setGiftMoment("bow"));
-    t += CINEMATIC.giftBowMs * scale;
-    scheduleCinematic(t, () => setGiftMoment("ribbon-pull"));
-    t += CINEMATIC.giftRibbonPullMs * scale;
-    scheduleCinematic(t, () => setGiftMoment("ribbon"));
-    t += CINEMATIC.giftRibbonMs * scale;
-    scheduleCinematic(t, () => setGiftMoment("unwrap"));
-    t += CINEMATIC.giftUnwrapMs * scale;
-    scheduleCinematic(t, () => {
-      setGiftMoment("reveal");
-      setSparkLine(null);
-      openCompletedRef.current = false;
-    });
-    t += CINEMATIC.giftAdmireMs * scale;
-    scheduleCinematic(t, () => {
-      setPhase("gazebo-rest");
-      setDeskCamera("wide");
-      setSparkLine(JOURNAL_ON_DESK_SPARK);
-      window.setTimeout(() => setSparkLine(null), CINEMATIC.sparkLineMs);
-    });
+    const page = FIRST_WRITING_PAGE_INDEX;
+    setBookPageIndex(page);
+    setBody(getPageBody(journal.id, page));
+    setPageTypingStyle(resolvePageTypingStyle(journal.id, page, journal));
+    setPhase("writing");
+    window.setTimeout(() => paperRef.current?.focus(), 500);
+  }
+
+  function handleJournalRevealComplete(
+    journal: JournalGazeboConfig,
+    meta: { skipped: boolean; opened: boolean },
+  ) {
+    clearCinematicTimers();
+    openCompletedRef.current = false;
+    markJournalGazeboVisited();
+    setVisitMode("return");
+    setConfig(journal);
+    setActiveJournalConfig(journal.id);
+    refreshLibrary();
+
+    if (meta.opened) {
+      enterWritingAfterGiftReveal(journal);
+      return;
+    }
+
+    // Skip still lands in the returning Gazebo home (desk + Write).
+    setPhase("gazebo-rest");
+    setDeskCamera("wide");
+    setSparkLine(JOURNAL_ON_DESK_SPARK);
+    window.setTimeout(() => setSparkLine(null), CINEMATIC.sparkLineMs);
   }
 
   function handleStepBackIntoGazebo() {
@@ -1102,11 +1061,7 @@ export function JournalGazeboExperience({
     (deskCamera === "approach" || deskCamera === "wide");
 
   const bookFocusActive =
-    phase === "journal-opening" ||
-    (phase === "gift-unwrap" &&
-      (giftMoment === "unwrap" ||
-        giftMoment === "reveal" ||
-        giftMoment === "admire"));
+    phase === "journal-opening" || phase === "gift-unwrap";
 
   const phaseBackgroundScenes = useMemo((): JournalSessionScenes | null => {
     if (showWelcomeDesk) return resolveJournalWelcomeScenes();
@@ -1138,8 +1093,14 @@ export function JournalGazeboExperience({
         "journal-gazebo",
         prototypeMode ? "journal-gazebo--prototype" : "journal-gazebo--companion",
         photoScene ? "journal-gazebo--photo-scene" : "",
-        showWelcomeDesk ? "journal-gazebo--welcome-letter" : "",
-        usingPlateBackground && !showWelcomeDesk && phase !== "gazebo-rest"
+        showWelcomeDesk ||
+        phase === "gazebo-rest" ||
+        phaseBackgroundScenes?.framing === "welcome-letter"
+          ? "journal-gazebo--welcome-letter"
+          : "",
+        usingPlateBackground &&
+        !showWelcomeDesk &&
+        phase !== "gazebo-rest"
           ? "journal-gazebo--workshop-plate"
           : "",
         openBookActive ? "journal-gazebo--cinematic-book" : "",
@@ -1349,7 +1310,11 @@ export function JournalGazeboExperience({
           ) : null}
           <div className="journal-estate journal-estate--photo-scene journal-estate--composed journal-estate--gift">
             <div className="journal-estate__glow" aria-hidden="true" />
-            <JournalGazeboWrappedGift config={config} moment={giftMoment} />
+            <JournalRevealFlow
+              journal={config}
+              isFirstCreation={giftRevealIsFirstCreation}
+              onComplete={handleJournalRevealComplete}
+            />
           </div>
         </>
       ) : null}
@@ -1369,7 +1334,6 @@ export function JournalGazeboExperience({
           journals={libraryJournals}
           featuredJournal={featuredJournal}
           sceneComposed={sceneReady}
-          initialNote={returnNote}
           onCreateJournal={handleWelcomeCreateJournal}
           onOpenJournal={handleOpenMyJournal}
           onJournalClick={
@@ -1380,7 +1344,10 @@ export function JournalGazeboExperience({
         />
       ) : null}
 
-      {phase === "gazebo-rest" && shelfJournals.length > 0 ? (
+      {/* Letter desk keeps Create / Write only — no shelf spines on the envelope. */}
+      {phase === "gazebo-rest" &&
+      shelfJournals.length > 0 &&
+      phaseBackgroundScenes?.framing !== "welcome-letter" ? (
         <div className="journal-gazebo__gazebo-shelf">
           <JournalGazeboLibraryShelf
             journals={shelfJournals}
@@ -1426,13 +1393,10 @@ export function JournalGazeboExperience({
         </JournalGazeboDesk>
       ) : null}
 
+      {/* Spark whisper lines stay off the gazebo entry desk — letter plate is primary. */}
       {sparkLine &&
-      (phase === "writing-desk-arrival" ||
-        phase === "journal-desk" ||
-        phase === "gazebo-rest" ||
-        phase === "gift-unwrap" ||
+      (phase === "gift-unwrap" ||
         phase === "journal-reveal" ||
-        phase === "return-greeting" ||
         phase === "creating") ? (
         <p className="journal-gazebo__spark" role="status">
           {sparkLine.split("\n").map((line, i, arr) => (

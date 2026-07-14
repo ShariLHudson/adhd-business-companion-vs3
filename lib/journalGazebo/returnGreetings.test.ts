@@ -1,20 +1,40 @@
-import { describe, expect, it } from "vitest";
+/**
+ * @vitest-environment jsdom
+ */
+import { beforeEach, describe, expect, it } from "vitest";
 import { pickJournalGazeboReturnNote } from "./returnGreetings";
 
 describe("pickJournalGazeboReturnNote", () => {
-  it("returns a greeting, question, and Shari signature", () => {
+  beforeEach(() => {
+    window.sessionStorage.clear();
+  });
+
+  it("returns desk note body and Shari signature", () => {
     const note = pickJournalGazeboReturnNote();
-    expect(note.greeting.length).toBeGreaterThan(4);
-    expect(note.question.length).toBeGreaterThan(8);
+    expect(note.body.length).toBeGreaterThan(8);
+    expect(note.greeting).toBe(note.body);
     expect(note.sign).toContain("Shari");
   });
 
-  it("rotates to a different question when excluded", () => {
+  it("rotates to a different note when excluded", () => {
     const first = pickJournalGazeboReturnNote();
     let different = false;
     for (let i = 0; i < 12; i += 1) {
-      const next = pickJournalGazeboReturnNote(first.question);
-      if (next.question !== first.question) {
+      const next = pickJournalGazeboReturnNote(first.body);
+      if (next.body !== first.body) {
+        different = true;
+        break;
+      }
+    }
+    expect(different).toBe(true);
+  });
+
+  it("changes content across visits via last-note memory", () => {
+    const first = pickJournalGazeboReturnNote();
+    let different = false;
+    for (let i = 0; i < 16; i += 1) {
+      const next = pickJournalGazeboReturnNote();
+      if (next.body !== first.body) {
         different = true;
         break;
       }

@@ -12,21 +12,24 @@ import { JournalGazeboLeatherOvalCta } from "./JournalGazeboLeatherOvalCta";
 type Props = {
   visible: boolean;
   folding?: boolean;
-  onCreateJournal: () => void;
+  onCreateJournal?: () => void;
+  /** When false, letter is intro-only — Create New Journal lives on the desk plaque. */
+  showCreateInvite?: boolean;
 };
 
 /**
- * Open 4×6 bifold — flame, Welcome, filigree, Shari's words, gold invitation.
+ * Welcome letter on the desk — first visit only.
  */
 export function JournalGazeboWelcomeLetter({
   visible,
   folding = false,
   onCreateJournal,
+  showCreateInvite = false,
 }: Props) {
   const [showInvite, setShowInvite] = useState(false);
 
   useEffect(() => {
-    if (!visible) {
+    if (!visible || !showCreateInvite) {
       setShowInvite(false);
       return;
     }
@@ -36,7 +39,7 @@ export function JournalGazeboWelcomeLetter({
       reduced ? 120 : 1400,
     );
     return () => window.clearTimeout(timer);
-  }, [visible]);
+  }, [visible, showCreateInvite]);
 
   return (
     <div
@@ -50,6 +53,7 @@ export function JournalGazeboWelcomeLetter({
       ]
         .filter(Boolean)
         .join(" ")}
+      data-testid="jg-welcome-letter"
       role="region"
       aria-label="Welcome note from Shari"
     >
@@ -77,7 +81,7 @@ export function JournalGazeboWelcomeLetter({
           </p>
         </div>
 
-        {showInvite ? (
+        {showInvite && onCreateJournal ? (
           <div className="jg-welcome-note__invite jg-welcome-note__invite--in-card">
             <JournalGazeboLeatherOvalCta onClick={onCreateJournal} />
           </div>

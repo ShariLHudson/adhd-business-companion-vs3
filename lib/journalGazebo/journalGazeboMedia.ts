@@ -1,19 +1,25 @@
-import { CANONICAL_PLACE_BACKGROUNDS } from "@/lib/estate/estatePlaceMedia";
 import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 
 /** Bust cache when desk or welcome plates change. */
-export const JOURNAL_DESK_BACKGROUND_VERSION = "20260710b" as const;
+export const JOURNAL_DESK_BACKGROUND_VERSION = "20260714d" as const;
 
-/** Return visits — clean desk without the welcome letter (`journal-desk-background.png`). */
+/** First visit — desk plate with the baked welcome letter. */
 export const JOURNAL_GAZEBO_BACKGROUND_URL =
-  CANONICAL_PLACE_BACKGROUNDS.journal;
+  `/backgrounds/journal-desk-background.png?v=${JOURNAL_DESK_BACKGROUND_VERSION}` as const;
 
-/** Full gazebo vista — design studio, workshop, and return visits. */
+/**
+ * Return visits — same gazebo desk with the welcome letter removed
+ * so Create / Write never share the frame with first-visit stationery.
+ */
+export const JOURNAL_GAZEBO_RETURN_BACKGROUND_URL =
+  `/backgrounds/journal-desk-return-background.png?v=${JOURNAL_DESK_BACKGROUND_VERSION}` as const;
+
+/** Alias — prefer framing helpers in journalSceneRotation for visit-specific plates. */
 export const GAZEBO_JOURNAL_BACKGROUND_URL = JOURNAL_GAZEBO_BACKGROUND_URL;
 
 /**
- * First visit only — welcome letter baked into the plate
- * (`public/images/welcome-to-the-journal-gazebo.png`).
+ * Alternate welcome plate (letter + props). Prefer JOURNAL_GAZEBO_BACKGROUND_URL
+ * for first visit so baked Create/Open buttons from this asset are never shown.
  */
 export const JOURNAL_WELCOME_PLATE_URL =
   `/images/welcome-to-the-journal-gazebo.png?v=${JOURNAL_DESK_BACKGROUND_VERSION}` as const;

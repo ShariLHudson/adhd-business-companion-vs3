@@ -6,16 +6,19 @@ type Props = {
   note: JournalGazeboReturnNote;
 };
 
-/** Return-visit desk note from Shari — sits where the welcome letter was on first visit. */
+/** Return-visit desk note — small physical card on the table (not a center overlay). */
 export function JournalGazeboReturnNoteCard({ note }: Props) {
+  const body = note.body || [note.greeting, note.question].filter(Boolean).join(" ");
+
   return (
     <article
       className="jg-return-note"
-      aria-label={`Note from Shari: ${note.greeting} ${note.question}`}
+      data-testid="jg-return-desk-note"
+      data-desk-note="true"
+      aria-label={`Note from Shari: ${body}`}
     >
       <div className="jg-return-note__texture" aria-hidden="true" />
-      <p className="jg-return-note__greeting">{note.greeting}</p>
-      <p className="jg-return-note__question">{note.question}</p>
+      <p className="jg-return-note__greeting">{body}</p>
       <p className="jg-return-note__sign">{note.sign}</p>
     </article>
   );
