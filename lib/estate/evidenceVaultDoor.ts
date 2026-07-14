@@ -1,15 +1,42 @@
 /**
  * Evidence Vault — door unlock state, persistence, and timing.
  * Separate from “Vault contains evidence” and “first entry completed.”
+ *
+ * Future (not built): Memory Center / Settings toggle to replay entrance.
  */
 
 /** Official closed-door plate (approved Estate entrance). */
 export const EVIDENCE_VAULT_CLOSED_DOOR_BG =
-  "/backgrounds/evidence-vault-background(1).png" as const;
+  "/backgrounds/evidence-vault-background.png" as const;
 
-/** Interior plate — same Estate atmosphere until a dedicated open-interior asset ships. */
+/** Stationary room plate — doors removed / open portal (never rotates). */
+export const EVIDENCE_VAULT_ROOM_STATIC_BG =
+  "/backgrounds/evidence-vault-room-static.png" as const;
+
+/** Left door leaf crop (hinge at outer left; seam at x≈745). */
+export const EVIDENCE_VAULT_DOOR_LEFT_BG =
+  "/backgrounds/evidence-vault-door-left.png" as const;
+
+/** Right door leaf crop (hinge at outer right). */
+export const EVIDENCE_VAULT_DOOR_RIGHT_BG =
+  "/backgrounds/evidence-vault-door-right.png" as const;
+
+/** Soft interior atmosphere revealed behind opening doors. */
+export const EVIDENCE_VAULT_INTERIOR_REVEAL_BG =
+  "/backgrounds/evidence-vault-interior-reveal.png" as const;
+
+/** Room plate after entrance — existing vault atmosphere. */
 export const EVIDENCE_VAULT_INTERIOR_BG =
   "/backgrounds/evidence-vault-background.png" as const;
+
+/** Art plate size used for door geometry (must match source PNG). */
+export const EVIDENCE_VAULT_ART_WIDTH = 1535;
+export const EVIDENCE_VAULT_ART_HEIGHT = 1024;
+/** Vertical seam between door leaves (not image center). */
+export const EVIDENCE_VAULT_DOOR_SEAM_X = 745;
+/** Door leaf crop bounds in source pixels [left, top, right, bottom]. */
+export const EVIDENCE_VAULT_DOOR_LEFT_BOUNDS = [390, 200, 745, 910] as const;
+export const EVIDENCE_VAULT_DOOR_RIGHT_BOUNDS = [745, 200, 1075, 910] as const;
 
 export type EvidenceVaultDoorState =
   | "locked"
@@ -31,12 +58,18 @@ export const EVIDENCE_VAULT_FIRST_ENTRY_DONE_KEY =
 export const EVIDENCE_VAULT_ENTRANCE_COMPLETED_KEY =
   "spark:estate:evidence-vault-entrance-completed:v1";
 
-/** Normal unlock sequence (~2.4s). */
-export const EVIDENCE_VAULT_UNLOCK_MS = 700;
-export const EVIDENCE_VAULT_OPEN_MS = 1400;
-export const EVIDENCE_VAULT_SETTLE_MS = 300;
+/** Arrival settle before key glow (State 1). */
+export const EVIDENCE_VAULT_ARRIVAL_MS = 400;
+/** Key turn / unlock (State 2). */
+export const EVIDENCE_VAULT_UNLOCK_MS = 500;
+/** Hinged door open (State 3). */
+export const EVIDENCE_VAULT_OPEN_MS = 1200;
+/** Right door starts slightly after left. */
+export const EVIDENCE_VAULT_DOOR_STAGGER_MS = 100;
+/** Existing UI fade / settle (State 4). */
+export const EVIDENCE_VAULT_SETTLE_MS = 250;
 
-/** Reduced-motion: brief status then open. */
+/** Reduced-motion: brief fade into vault. */
 export const EVIDENCE_VAULT_REDUCED_MOTION_MS = 280;
 
 export const EVIDENCE_VAULT_DOOR_STATUS = {
@@ -123,4 +156,17 @@ export function resolveInitialEvidenceVaultDoorState(opts: {
 
 export function isEvidenceVaultDoorBusy(state: EvidenceVaultDoorState): boolean {
   return state === "unlocking" || state === "opening";
+}
+
+/** Percent geometry for door leaves inside the art frame. */
+export function evidenceVaultDoorLeafStyle(
+  bounds: readonly [number, number, number, number],
+): { left: string; top: string; width: string; height: string } {
+  const [l, t, r, b] = bounds;
+  return {
+    left: `${(l / EVIDENCE_VAULT_ART_WIDTH) * 100}%`,
+    top: `${(t / EVIDENCE_VAULT_ART_HEIGHT) * 100}%`,
+    width: `${((r - l) / EVIDENCE_VAULT_ART_WIDTH) * 100}%`,
+    height: `${((b - t) / EVIDENCE_VAULT_ART_HEIGHT) * 100}%`,
+  };
 }

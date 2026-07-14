@@ -163,6 +163,7 @@ export function EstateCollectionRoomEngine({
     });
   });
   const unlockInFlightRef = useRef(false);
+  const unlockTimersRef = useRef<number[]>([]);
   const [chatPrefillNote, setChatPrefillNote] = useState(
     () => isEvidenceVault && initialVault.chatPrefill,
   );
@@ -171,6 +172,15 @@ export function EstateCollectionRoomEngine({
     if (!isEvidenceVault) return "open";
     return "folder";
   });
+
+  useEffect(() => {
+    return () => {
+      for (const id of unlockTimersRef.current) {
+        window.clearTimeout(id);
+      }
+      unlockTimersRef.current = [];
+    };
+  }, []);
 
   const vaultInsightsCopy = useMemo(
     () => (isEvidenceVault ? formatEvidenceVaultInsightsReply() : ""),
@@ -183,9 +193,10 @@ export function EstateCollectionRoomEngine({
 
   const showEntrance =
     isEvidenceVault && vaultMode !== "browse" && doorState !== "open";
+  /** Mount once when doors begin opening — fade in; stay mounted when open. */
   const showVaultInterior =
     isEvidenceVault &&
-    doorState === "open" &&
+    (doorState === "open" || doorState === "opening") &&
     vaultMode === "arrive" &&
     (vaultPanel === null || vaultPanel === "discovery");
   const showInlineDiscovery =
@@ -206,7 +217,11 @@ export function EstateCollectionRoomEngine({
     isEvidenceVault && doorState === "open" && vaultPanel === "search";
   const vaultPlateImage = useMemo(() => {
     if (!isEvidenceVault) return undefined;
-    if (doorState === "locked" || doorState === "key_ready" || doorState === "unlocking") {
+    if (
+      doorState === "locked" ||
+      doorState === "key_ready" ||
+      doorState === "unlocking"
+    ) {
       return EVIDENCE_VAULT_ENTRANCE_BG;
     }
     return EVIDENCE_VAULT_ROOM_BG;
@@ -215,37 +230,55 @@ export function EstateCollectionRoomEngine({
   const showCaptureForm = !isEvidenceVault || vaultMode === "add";
   const showBrowse = showBrowseOnly;
 
+  function clearUnlockTimers() {
+    for (const id of unlockTimersRef.current) {
+      window.clearTimeout(id);
+    }
+    unlockTimersRef.current = [];
+  }
+
+  function completeVaultEntrance() {
+    clearUnlockTimers();
+    markEvidenceVaultEntranceCompleted();
+    setDoorState("open");
+    unlockInFlightRef.current = false;
+    window.dispatchEvent(
+      new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
+    );
+  }
+
   function useVaultKey() {
     if (!isEvidenceVault) return;
     if (isEvidenceVaultDoorBusy(doorState) || unlockInFlightRef.current) return;
     if (doorState !== "locked" && doorState !== "key_ready") return;
     unlockInFlightRef.current = true;
+    clearUnlockTimers();
     setDoorState("unlocking");
 
     const reduced = prefersEvidenceVaultReducedMotion();
     if (reduced) {
-      window.setTimeout(() => {
-        markEvidenceVaultEntranceCompleted();
-        setDoorState("open");
-        unlockInFlightRef.current = false;
-        window.dispatchEvent(
-          new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
-        );
+      const id = window.setTimeout(() => {
+        completeVaultEntrance();
       }, EVIDENCE_VAULT_REDUCED_MOTION_MS);
+      unlockTimersRef.current.push(id);
       return;
     }
 
-    window.setTimeout(() => {
+    const unlockId = window.setTimeout(() => {
       setDoorState("opening");
-      window.setTimeout(() => {
-        markEvidenceVaultEntranceCompleted();
-        setDoorState("open");
-        unlockInFlightRef.current = false;
-        window.dispatchEvent(
-          new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
-        );
+      const openId = window.setTimeout(() => {
+        completeVaultEntrance();
       }, EVIDENCE_VAULT_ENTRANCE_DOOR_MS + EVIDENCE_VAULT_ENTRANCE_ENTER_MS);
+      unlockTimersRef.current.push(openId);
     }, EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS);
+    unlockTimersRef.current.push(unlockId);
+  }
+
+  /** Skip — immediately reveal existing vault; cancel animation; no duplicate UI. */
+  function skipVaultEntrance() {
+    if (!isEvidenceVault) return;
+    if (doorState === "open") return;
+    completeVaultEntrance();
   }
 
   function openJournalFromInterior() {
@@ -482,21 +515,32 @@ export function EstateCollectionRoomEngine({
             <EvidenceVaultEntrance
               doorState={doorState}
               onUnlock={useVaultKey}
+              onSkip={skipVaultEntrance}
               onBack={onBack}
             />
           ) : null}
           {showVaultInterior ? (
-            <EvidenceVaultInterior
-              journalActive={vaultPanel === "discovery"}
-              onOpenJournal={openJournalFromInterior}
-              onFirstEntryChoice={handleFirstEntryChoice}
-              showSecondaryActions={hasEvidenceVaultEntranceCompleted()}
-              onBrowseArchive={() => {
-                setVaultMode("browse");
-                setVaultPanel("browse");
-              }}
-              behindDiscovery={vaultPanel === "discovery"}
-            />
+            <div
+              className={[
+                "evidence-vault-interior-mount",
+                doorState === "opening"
+                  ? "evidence-vault-interior-mount--entering"
+                  : "evidence-vault-interior-mount--open",
+              ].join(" ")}
+              data-testid="evidence-vault-interior-mount"
+            >
+              <EvidenceVaultInterior
+                journalActive={vaultPanel === "discovery"}
+                onOpenJournal={openJournalFromInterior}
+                onFirstEntryChoice={handleFirstEntryChoice}
+                showSecondaryActions={hasEvidenceVaultEntranceCompleted()}
+                onBrowseArchive={() => {
+                  setVaultMode("browse");
+                  setVaultPanel("browse");
+                }}
+                behindDiscovery={vaultPanel === "discovery"}
+              />
+            </div>
           ) : null}
           {showVaultActionBar ? (
             <EvidenceVaultActionBar onSelect={openVaultAction} />

@@ -13,9 +13,11 @@ export const EVIDENCE_VAULT_EXTERIOR_WELCOME = [
 export const EVIDENCE_VAULT_KEY_INVITATION =
   "Use the key when you are ready to unlock your Evidence Vault." as const;
 
-export const EVIDENCE_VAULT_DOOR_ACTION_LABEL = "Unlock the Vault" as const;
+export const EVIDENCE_VAULT_DOOR_ACTION_LABEL =
+  "Unlock the Evidence Vault" as const;
 
-export const EVIDENCE_VAULT_KEY_ACTION_LABEL = "Unlock the Vault" as const;
+export const EVIDENCE_VAULT_KEY_ACTION_LABEL =
+  "Unlock the Evidence Vault" as const;
 
 export const EVIDENCE_VAULT_LOCKED_INDICATOR = "Locked" as const;
 

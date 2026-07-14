@@ -81,10 +81,15 @@ describe("evidenceVaultArrival", () => {
     expect(isDedicatedEstateRoomPanelSection("evidence-bank")).toBe(true);
   });
 
-  it("entrance timing stays within a slow ceremonial pace", () => {
-    expect(EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS).toBeGreaterThanOrEqual(500);
-    expect(EVIDENCE_VAULT_ENTRANCE_DOOR_MS).toBeGreaterThanOrEqual(1800);
-    expect(EVIDENCE_VAULT_ENTRANCE_ENTER_MS).toBeGreaterThanOrEqual(600);
+  it("entrance timing stays within a polished ceremonial pace", () => {
+    expect(EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS).toBe(500);
+    expect(EVIDENCE_VAULT_ENTRANCE_DOOR_MS).toBe(1200);
+    expect(EVIDENCE_VAULT_ENTRANCE_ENTER_MS).toBeGreaterThanOrEqual(200);
+    expect(
+      EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS +
+        EVIDENCE_VAULT_ENTRANCE_DOOR_MS +
+        EVIDENCE_VAULT_ENTRANCE_ENTER_MS,
+    ).toBeLessThanOrEqual(2500);
   });
 
   it("persists entrance completion for returning visits", () => {

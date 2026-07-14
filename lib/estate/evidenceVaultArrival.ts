@@ -45,9 +45,9 @@ export const EVIDENCE_VAULT_CHAT_PREFILL_KEY =
 export const EVIDENCE_VAULT_PENDING_WELCOME_KEY =
   "spark:estate:evidence-vault-pending-welcome:v1";
 
-export const EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS = 720;
-export const EVIDENCE_VAULT_ENTRANCE_DOOR_MS = 2200;
-export const EVIDENCE_VAULT_ENTRANCE_ENTER_MS = 900;
+export const EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS = 500;
+export const EVIDENCE_VAULT_ENTRANCE_DOOR_MS = 1200;
+export const EVIDENCE_VAULT_ENTRANCE_ENTER_MS = 250;
 
 /** Returning members — browse archive link after first successful entrance. */
 export const EVIDENCE_VAULT_ENTRANCE_COMPLETED_KEY =
@@ -56,6 +56,10 @@ export const EVIDENCE_VAULT_ENTRANCE_COMPLETED_KEY =
 export const EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT =
   "spark:evidence-vault-entrance-complete";
 
+/**
+ * @deprecated Prefer EvidenceVaultDoorState from evidenceVaultDoor.ts
+ * Kept for engine compatibility during migration.
+ */
 export type EvidenceVaultEntrancePhase =
   | "door"
   | "unlocking"
@@ -63,25 +67,12 @@ export type EvidenceVaultEntrancePhase =
   | "entering"
   | "inside";
 
-export function hasEvidenceVaultEntranceCompleted(): boolean {
-  if (typeof localStorage === "undefined") return false;
-  try {
-    return (
-      localStorage.getItem(EVIDENCE_VAULT_ENTRANCE_COMPLETED_KEY) === "1"
-    );
-  } catch {
-    return false;
-  }
-}
-
-export function markEvidenceVaultEntranceCompleted(): void {
-  if (typeof localStorage === "undefined") return;
-  try {
-    localStorage.setItem(EVIDENCE_VAULT_ENTRANCE_COMPLETED_KEY, "1");
-  } catch {
-    /* ignore */
-  }
-}
+export {
+  hasEvidenceVaultUnlocked as hasEvidenceVaultEntranceCompleted,
+  markEvidenceVaultUnlocked as markEvidenceVaultEntranceCompleted,
+  resetEvidenceVaultAccessStateForDev,
+  type EvidenceVaultDoorState,
+} from "./evidenceVaultDoor";
 
 export function setEvidenceVaultSkipEntrance(skip: boolean): void {
   if (typeof sessionStorage === "undefined") return;
