@@ -39,12 +39,24 @@
   padding: clamp(1rem, 2.5vw, 1.85rem);
 }
 
+/* Stronger frost for Projects room — dark text readable over project-room.png */
+.project-homes-workspace.estate-workspace.companion-workspace-frosted {
+  background: rgba(255, 252, 245, 0.9);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  box-shadow:
+    0 24px 56px rgba(42, 58, 38, 0.14),
+    0 2px 0 rgba(255, 255, 255, 0.5) inset;
+  color: #1f1c19;
+}
+
 .project-homes-kicker {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9a8f82;
+  color: #5c534a;
 }
 
 .project-homes-title {
@@ -61,8 +73,42 @@
   margin-top: 0.55rem;
   font-size: 1.05rem;
   line-height: 1.55;
-  color: #4b463f;
+  color: #2d2926;
   max-width: 38rem;
+}
+
+.project-homes-sample-note {
+  margin-top: 0.65rem;
+  max-width: 38rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: #4b463f;
+}
+
+.project-homes-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.35rem;
+}
+
+.project-homes-title-row .project-homes-title {
+  margin-top: 0;
+}
+
+.project-homes-sample-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid #c9bfb0;
+  background: #f3eee6;
+  padding: 0.28rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #3d3832;
 }
 
 .project-homes-actions {
@@ -125,38 +171,59 @@
 
 .project-home-card {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   border-radius: 1.15rem;
-  border: 1px solid rgba(228, 221, 210, 0.85);
+  border: 1px solid rgba(228, 221, 210, 0.95);
   background: #fff;
   text-align: left;
   min-height: 20.5rem;
-  box-shadow: 0 10px 28px rgba(45, 36, 28, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 10px 28px rgba(45, 36, 28, 0.1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  cursor: pointer;
 }
 
 .project-home-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 34px rgba(45, 36, 28, 0.12);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 38px rgba(45, 36, 28, 0.16);
+  border-color: rgba(30, 79, 79, 0.45);
+}
+
+.project-home-card:focus {
+  outline: none;
+}
+
+.project-home-card:focus-visible {
+  outline: 2px solid rgba(30, 79, 79, 0.85);
+  outline-offset: 3px;
+  box-shadow: 0 16px 38px rgba(45, 36, 28, 0.16);
+  border-color: rgba(30, 79, 79, 0.55);
 }
 
 .project-home-card__cover {
   position: absolute;
   inset: 0;
+  border-radius: 1.15rem;
   background-size: cover;
   background-position: center;
   transform: scale(1.02);
+  overflow: hidden;
+  pointer-events: none;
 }
 
 .project-home-card__veil {
   position: absolute;
   inset: 0;
+  border-radius: 1.15rem;
   background: linear-gradient(
     180deg,
-    rgba(20, 16, 12, 0.12) 0%,
-    rgba(20, 16, 12, 0.45) 42%,
-    rgba(20, 16, 12, 0.88) 100%
+    rgba(20, 16, 12, 0.28) 0%,
+    rgba(20, 16, 12, 0.55) 42%,
+    rgba(20, 16, 12, 0.92) 100%
   );
+  pointer-events: none;
 }
 
 .project-home-card__body {
@@ -168,6 +235,118 @@
   min-height: 20.5rem;
   padding: 1.1rem 1.15rem 1.2rem;
   color: #faf7f2;
+  border-radius: 1.15rem;
+  overflow: hidden;
+}
+
+.project-home-card__top {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  right: 0.75rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+.project-home-card__sample-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 252, 245, 0.92);
+  padding: 0.22rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #2d2926;
+}
+
+.project-home-card__menu {
+  position: relative;
+  margin-left: auto;
+}
+
+.project-home-card__options {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(20, 16, 12, 0.55);
+  color: #faf7f2;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.project-home-card__options:hover,
+.project-home-card__options:focus-visible {
+  background: rgba(20, 16, 12, 0.78);
+  border-color: rgba(255, 255, 255, 0.7);
+  outline: 2px solid rgba(255, 252, 245, 0.85);
+  outline-offset: 2px;
+}
+
+.project-home-card__menu-panel {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  z-index: 5;
+  min-width: 10.5rem;
+  padding: 0.35rem;
+  border-radius: 0.75rem;
+  border: 1px solid #c9bfb0;
+  background: rgba(255, 252, 245, 0.98);
+  box-shadow: 0 12px 28px rgba(45, 36, 28, 0.18);
+}
+
+.project-home-card__menu-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  border-radius: 0.55rem;
+  background: transparent;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f1c19;
+  cursor: pointer;
+}
+
+.project-home-card__menu-item:hover,
+.project-home-card__menu-item:focus-visible {
+  background: #f3eee6;
+  outline: none;
+}
+
+.project-home-card__menu-item--danger {
+  color: #8a3a2a;
+}
+
+.project-home-card__delete-confirm {
+  padding: 0.45rem 0.35rem 0.35rem;
+}
+
+.project-home-card__delete-confirm p {
+  margin: 0 0.35rem 0.55rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #1f1c19;
+}
+
+.project-home-card__delete-actions {
+  display: grid;
+  gap: 0.2rem;
 }
 
 .project-home-card__name {
@@ -175,6 +354,8 @@
   font-size: 1.35rem;
   font-weight: 600;
   line-height: 1.25;
+  color: #faf7f2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 .project-home-card__room {
@@ -183,14 +364,14 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  opacity: 0.9;
+  color: #f3eee6;
 }
 
 .project-home-card__purpose {
   margin-top: 0.4rem;
   font-size: 0.88rem;
   line-height: 1.4;
-  opacity: 0.92;
+  color: #faf7f2;
 }
 
 .project-home-card__meta {
@@ -199,7 +380,7 @@
   margin-top: 0.75rem;
   font-size: 0.82rem;
   line-height: 1.4;
-  opacity: 0.95;
+  color: #faf7f2;
 }
 
 .project-home-card__meta-row {
@@ -213,7 +394,28 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  opacity: 0.75;
+  color: #e8e0d4;
+}
+
+.project-home-card__open {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 252, 245, 0.18);
+  padding: 0.35rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #faf7f2;
+}
+
+.project-home-card:hover .project-home-card__open,
+.project-home-card:focus-visible .project-home-card__open {
+  background: rgba(255, 252, 245, 0.32);
+  border-color: rgba(255, 255, 255, 0.8);
 }
 
 .project-homes-shari-voice {
@@ -253,7 +455,7 @@
   margin: 0.35rem 0 0.75rem;
   font-size: 0.9rem;
   line-height: 1.45;
-  color: #6b635a;
+  color: #4b463f;
 }
 
 .project-homes-connected__list {
@@ -277,18 +479,12 @@
   border-radius: 0.85rem;
   border: 1px solid #e4ddd2;
   background: #faf7f2;
-  cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.project-homes-connected__item:hover {
-  border-color: #c9bfb0;
-  background: #fff;
-}
-
-.project-homes-connected__item:focus-visible {
-  outline: 2px solid rgba(30, 79, 79, 0.65);
-  outline-offset: 2px;
+.project-homes-connected__item--preparing {
+  cursor: default;
+  opacity: 0.92;
+  background: #f3eee6;
 }
 
 .project-homes-connected__label {
@@ -300,7 +496,15 @@
 .project-homes-connected__blurb {
   font-size: 0.82rem;
   line-height: 1.4;
-  color: #6b635a;
+  color: #4b463f;
+}
+
+.project-homes-connected__coming-soon {
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #5c534a;
 }
 
 .project-homes-field label {
@@ -309,7 +513,149 @@
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #6b635a;
+  color: #5c534a;
+}
+
+.project-homes-actions-lead {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: #2d2926;
+}
+
+.project-homes-action-rows {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.project-homes-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.project-homes-action-row input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  border-radius: 0.8rem;
+  border: 1px solid #c9bfb0;
+  background: #fff;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  color: #1f1c19;
+}
+
+.project-homes-action-row input:focus {
+  outline: none;
+  border-color: #1e4f4f;
+}
+
+.project-homes-action-message {
+  margin-top: 0.65rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1e4f4f;
+}
+
+.project-homes-store-items {
+  margin: 0.75rem 0 0;
+  padding-left: 1.15rem;
+  color: #2d2926;
+}
+
+.project-homes-structure__toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.project-homes-structure__toggle h3 {
+  margin: 0;
+}
+
+.project-homes-structure__toggle:focus-visible {
+  outline: 2px solid rgba(30, 79, 79, 0.65);
+  outline-offset: 3px;
+  border-radius: 0.35rem;
+}
+
+.project-homes-structure__placeholder {
+  margin-top: 0.55rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #2d2926;
+}
+
+.project-homes-rename-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(20, 16, 12, 0.35);
+}
+
+.project-homes-rename-dialog {
+  width: min(22rem, 100%);
+  border-radius: 1rem;
+  border: 1px solid #c9bfb0;
+  background: rgba(255, 252, 245, 0.98);
+  padding: 1.15rem 1.2rem;
+  box-shadow: 0 18px 40px rgba(45, 36, 28, 0.2);
+}
+
+.project-homes-rename-dialog h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f1c19;
+}
+
+.project-homes-rename-dialog input {
+  margin-top: 0.75rem;
+  width: 100%;
+  border-radius: 0.8rem;
+  border: 1px solid #c9bfb0;
+  background: #fff;
+  padding: 0.7rem 0.85rem;
+  font-size: 1rem;
+  color: #1f1c19;
+}
+
+.project-homes-detail-hero__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f3eee6;
+}
+
+.project-homes-detail-hero__name {
+  margin: 0.35rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  color: #faf7f2;
+}
+
+.project-homes-detail-hero__desc {
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #faf7f2;
 }
 
 .project-homes-field textarea,
@@ -426,11 +772,11 @@
 }
 
 .project-homes-section h3 {
-  font-size: 0.72rem;
+  font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #9a8f82;
+  color: #3d3832;
 }
 
 .project-homes-section p,
@@ -438,7 +784,7 @@
   margin-top: 0.4rem;
   font-size: 0.95rem;
   line-height: 1.5;
-  color: #2d2926;
+  color: #1f1c19;
 }
 
 .project-homes-section ul {
@@ -450,21 +796,21 @@
   display: inline-flex;
   margin-top: 0.55rem;
   border-radius: 999px;
-  border: 1px solid #e4ddd2;
-  background: #faf7f2;
+  border: 1px solid #c9bfb0;
+  background: #f3eee6;
   padding: 0.28rem 0.7rem;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #4b463f;
+  color: #2d2926;
 }
 
 .project-homes-prototype-note {
   margin-top: 1.5rem;
   border-radius: 0.85rem;
   border: 1px dashed #c9bfb0;
-  background: rgba(250, 247, 242, 0.65);
+  background: rgba(250, 247, 242, 0.92);
   padding: 0.85rem 1rem;
   font-size: 0.85rem;
   line-height: 1.45;
-  color: #6b635a;
+  color: #4b463f;
 }

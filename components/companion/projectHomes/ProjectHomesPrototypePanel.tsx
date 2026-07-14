@@ -4,15 +4,25 @@ import { useMemo, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowPanelBackButton } from "@/components/companion/GrowPanelBackButton";
 import { ProjectHomesRoomShell } from "@/components/companion/projectHomes/ProjectHomesRoomShell";
-import { ProjectHomeCard } from "@/components/companion/projectHomes/ProjectHomeCard";
+import {
+  ProjectHomeCard,
+  type ProjectHomeCardAction,
+} from "@/components/companion/projectHomes/ProjectHomeCard";
 import { ProjectHomeDetail } from "@/components/companion/projectHomes/ProjectHomeDetail";
 import {
   PROJECT_HOMES_ROOM_BACKGROUND,
   SAMPLE_PROJECT_HOMES,
+  SAMPLE_PROJECTS_GALLERY_NOTE,
+  archiveProjectHome,
+  deleteProjectHome,
+  duplicateProjectHome,
   getProjectHomeBackgroundUrl,
   getProjectHomeRoom,
   listProjectHomeRooms,
+  newProjectHomeId,
   recommendProjectHome,
+  renameProjectHome,
+  visibleGalleryHomes,
   type ProjectHomeRecord,
   type ProjectHomeRoomId,
   type ProjectHomeView,
@@ -22,10 +32,6 @@ import "@/app/companion/project-homes.css";
 type Props = {
   onBack: () => void;
 };
-
-function newId(): string {
-  return `ph-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
-}
 
 export function ProjectHomesPrototypePanel({ onBack }: Props) {
   const [view, setView] = useState<ProjectHomeView>("gallery");
@@ -37,8 +43,11 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
   const [selectedRoomId, setSelectedRoomId] =
     useState<ProjectHomeRoomId | null>(null);
   const [browsingHomes, setBrowsingHomes] = useState(false);
+  const [renameTargetId, setRenameTargetId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   const rooms = useMemo(() => listProjectHomeRooms(), []);
+  const galleryHomes = useMemo(() => visibleGalleryHomes(homes), [homes]);
   const active = homes.find((h) => h.id === activeId) ?? null;
   const galleryBackground =
     active && view === "detail"
@@ -78,7 +87,7 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
     const room = getProjectHomeRoom(selectedRoomId);
     const now = new Date().toISOString();
     const record: ProjectHomeRecord = {
-      id: newId(),
+      id: newProjectHomeId(),
       name: draftName.trim() || `${room.name} Project`,
       purpose: purpose.trim(),
       projectHomeId: selectedRoomId,
@@ -88,6 +97,7 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
       nextSuggestedStep: `Spend a few quiet minutes in the ${room.name}`,
       atmosphereNote: room.description,
       personalization: {},
+      isSample: false,
     };
     setHomes((prev) => [record, ...prev]);
     setActiveId(record.id);
@@ -99,10 +109,66 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
     setView("detail");
   }
 
+  function updateActiveProject(next: ProjectHomeRecord) {
+    setHomes((prev) => prev.map((h) => (h.id === next.id ? next : h)));
+  }
+
+  function beginRename(id: string) {
+    const target = homes.find((h) => h.id === id);
+    if (!target) return;
+    setRenameTargetId(id);
+    setRenameValue(target.name);
+  }
+
+  function commitRename() {
+    if (!renameTargetId) return;
+    setHomes((prev) => renameProjectHome(prev, renameTargetId, renameValue));
+    setRenameTargetId(null);
+    setRenameValue("");
+  }
+
+  function handleCardAction(action: ProjectHomeCardAction, id: string) {
+    switch (action) {
+      case "open":
+        openDetail(id);
+        break;
+      case "rename":
+        beginRename(id);
+        break;
+      case "duplicate": {
+        const result = duplicateProjectHome(homes, id);
+        setHomes(result.homes);
+        break;
+      }
+      case "archive":
+        setHomes((prev) => archiveProjectHome(prev, id));
+        if (activeId === id) {
+          setActiveId(null);
+          setView("gallery");
+        }
+        break;
+      case "delete": {
+        const result = deleteProjectHome(homes, id);
+        if (result.blockedAsSample) return;
+        setHomes(result.homes);
+        if (activeId === id) {
+          setActiveId(null);
+          setView("gallery");
+        }
+        break;
+      }
+      default:
+        break;
+    }
+  }
+
   const recommendation = recommendProjectHome(purpose);
   const recommendedRoom = getProjectHomeRoom(
     selectedRoomId ?? recommendation.roomId,
   );
+  const renameTarget = renameTargetId
+    ? homes.find((h) => h.id === renameTargetId)
+    : null;
 
   return (
     <ProjectHomesRoomShell backgroundUrl={galleryBackground}>
@@ -125,12 +191,18 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
         />
 
         {view === "gallery" ? (
-          <div>
-            <p className="project-homes-kicker">Prototype</p>
+          <div data-testid="project-homes-gallery">
+            <p className="project-homes-kicker">Projects</p>
             <h1 className="project-homes-title">Project Homes</h1>
             <p className="project-homes-lead">
               Living places inside Spark Estate — not folders. Opening a
               project feels like walking into its workspace.
+            </p>
+            <p
+              className="project-homes-sample-note"
+              data-testid="project-homes-sample-note"
+            >
+              {SAMPLE_PROJECTS_GALLERY_NOTE}
             </p>
             <div className="project-homes-actions">
               <button
@@ -142,17 +214,18 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
               </button>
             </div>
             <div className="project-homes-grid">
-              {homes.map((project) => (
+              {galleryHomes.map((project) => (
                 <ProjectHomeCard
                   key={project.id}
                   project={project}
                   onOpen={openDetail}
+                  onAction={handleCardAction}
                 />
               ))}
             </div>
             <p className="project-homes-prototype-note">
-              Design prototype only. Existing Projects stay unchanged. Sample
-              homes are not saved to your project storage.
+              Sample homes stay labeled as examples. Sections, tasks, and notes
+              use your existing projects storage when you add them.
             </p>
           </div>
         ) : null}
@@ -328,7 +401,60 @@ export function ProjectHomesPrototypePanel({ onBack }: Props) {
         ) : null}
 
         {view === "detail" && active ? (
-          <ProjectHomeDetail project={active} />
+          <ProjectHomeDetail
+            project={active}
+            onProjectChange={updateActiveProject}
+          />
+        ) : null}
+
+        {renameTarget ? (
+          <div
+            className="project-homes-rename-overlay"
+            data-testid="project-homes-rename-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-homes-rename-title"
+          >
+            <div className="project-homes-rename-dialog">
+              <h2 id="project-homes-rename-title">Rename project</h2>
+              <input
+                type="text"
+                value={renameValue}
+                onChange={(e) => setRenameValue(e.target.value)}
+                aria-label="Project name"
+                data-testid="project-homes-rename-input"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") commitRename();
+                  if (e.key === "Escape") {
+                    setRenameTargetId(null);
+                    setRenameValue("");
+                  }
+                }}
+              />
+              <div className="project-homes-actions">
+                <button
+                  type="button"
+                  className="project-homes-btn project-homes-btn--primary"
+                  data-testid="project-homes-rename-save"
+                  onClick={commitRename}
+                  disabled={!renameValue.trim()}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="project-homes-btn project-homes-btn--ghost"
+                  onClick={() => {
+                    setRenameTargetId(null);
+                    setRenameValue("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
         ) : null}
       </EstateWorkspace>
     </ProjectHomesRoomShell>

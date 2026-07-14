@@ -76,6 +76,18 @@ export type ProjectHomeRecord = {
   artworkOverride?: ProjectHomeArtwork | null;
   /** Future hooks only — not rendered yet */
   personalization?: ProjectHomePersonalizationHooks;
+  /**
+   * True for curated example homes — labeled in UI, not deletable.
+   * Never mix unlabeled samples with member projects.
+   */
+  isSample?: boolean;
+  /** Soft-removed from the gallery; kept in local Project Homes state */
+  archived?: boolean;
+  /**
+   * Linked companion-projects-v1 id when sections/tasks/notes are used.
+   * Does not change PROJECTS_KEY; created on first store write if missing.
+   */
+  companionProjectId?: string;
 };
 
 export type ProjectHomeView =

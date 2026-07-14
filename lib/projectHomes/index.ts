@@ -18,7 +18,9 @@ export {
 export {
   PROJECT_HOME_STATUS_LABEL,
   SAMPLE_PROJECT_HOMES,
+  SAMPLE_PROJECTS_GALLERY_NOTE,
   formatProjectHomeDate,
+  isSampleProjectHome,
 } from "./sampleProjects";
 
 export {
@@ -29,3 +31,17 @@ export {
   prototypeOpenQuestions,
   prototypeRecentWins,
 } from "./workspaceContent";
+
+export {
+  newProjectHomeId,
+  renameProjectHome,
+  duplicateProjectHome,
+  archiveProjectHome,
+  deleteProjectHome,
+  visibleGalleryHomes,
+  ensureCompanionProject,
+  addSectionToHome,
+  addTaskToHome,
+  addNoteToHome,
+  listHomeProjectItems,
+} from "./homeActions";

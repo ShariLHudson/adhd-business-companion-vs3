@@ -1,6 +1,6 @@
 import type { ProjectHomeRecord, ProjectHomeStatus } from "./types";
 
-/** Prototype-only sample homes — not read from companion-projects storage. */
+/** Curated example homes — labeled Sample; not read from companion-projects until used. */
 export const SAMPLE_PROJECT_HOMES: ProjectHomeRecord[] = [
   {
     id: "ph-sample-newsletter",
@@ -13,6 +13,7 @@ export const SAMPLE_PROJECT_HOMES: ProjectHomeRecord[] = [
     nextSuggestedStep: "Write the opening paragraph in the Writing Room",
     atmosphereNote: "Quiet desk light · soft paper · one letter at a time",
     personalization: {},
+    isSample: true,
   },
   {
     id: "ph-sample-brand",
@@ -25,6 +26,7 @@ export const SAMPLE_PROJECT_HOMES: ProjectHomeRecord[] = [
     nextSuggestedStep: "Pin three images that pass the Photograph Test",
     atmosphereNote: "Paint-scented calm · unfinished canvases welcome",
     personalization: {},
+    isSample: true,
   },
   {
     id: "ph-sample-offer",
@@ -37,6 +39,7 @@ export const SAMPLE_PROJECT_HOMES: ProjectHomeRecord[] = [
     nextSuggestedStep: "Sketch the middle offer in one sentence",
     atmosphereNote: "Maps on the table · decisions without rush",
     personalization: {},
+    isSample: true,
   },
   {
     id: "ph-sample-course",
@@ -49,8 +52,18 @@ export const SAMPLE_PROJECT_HOMES: ProjectHomeRecord[] = [
     nextSuggestedStep: "Return when rested — pick one outcome to refine",
     atmosphereNote: "Lamplit desks · books waiting patiently",
     personalization: {},
+    isSample: true,
   },
 ];
+
+export const SAMPLE_PROJECTS_GALLERY_NOTE =
+  "Sample projects are examples to help you explore.";
+
+export function isSampleProjectHome(
+  project: Pick<ProjectHomeRecord, "id" | "isSample">,
+): boolean {
+  return project.isSample === true || project.id.startsWith("ph-sample-");
+}
 
 export const PROJECT_HOME_STATUS_LABEL: Record<ProjectHomeStatus, string> = {
   dreaming: "Dreaming",

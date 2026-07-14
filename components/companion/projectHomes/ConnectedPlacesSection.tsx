@@ -2,40 +2,37 @@
 
 import {
   connectedPlacesForProjectHome,
-  type ConnectedPlaceShortcut,
   type ProjectHomeRoomId,
 } from "@/lib/projectHomes";
 
 type Props = {
   projectHomeId: ProjectHomeRoomId;
-  /** Prototype only — shortcuts do not navigate yet */
-  onPlacePress?: (place: ConnectedPlaceShortcut) => void;
 };
 
-/** Connected Places — Estate destination shortcuts (no data duplication). */
-export function ConnectedPlacesSection({
-  projectHomeId,
-  onPlacePress,
-}: Props) {
+/**
+ * Connected Places — preparing state only.
+ * No routing to old workspaces; items are not clickable destinations.
+ */
+export function ConnectedPlacesSection({ projectHomeId }: Props) {
   const places = connectedPlacesForProjectHome(projectHomeId);
 
   return (
     <section
       className="project-homes-section project-homes-connected"
       aria-label="Connected Places"
+      data-testid="project-homes-connected-places"
     >
       <h3>Connected Places</h3>
       <p className="project-homes-connected__lead">
-        Nearby destinations in Spark Estate — shortcuts only, when you want
-        them.
+        Nearby destinations in Spark Estate — connections are being prepared.
       </p>
       <ul className="project-homes-connected__list">
         {places.map((place) => (
           <li key={place.id}>
-            <button
-              type="button"
-              className="project-homes-connected__item"
-              onClick={() => onPlacePress?.(place)}
+            <div
+              className="project-homes-connected__item project-homes-connected__item--preparing"
+              data-testid={`project-homes-connected-${place.id}`}
+              aria-disabled="true"
             >
               <span className="project-homes-connected__label">
                 {place.label}
@@ -43,7 +40,10 @@ export function ConnectedPlacesSection({
               <span className="project-homes-connected__blurb">
                 {place.blurb}
               </span>
-            </button>
+              <span className="project-homes-connected__coming-soon">
+                Coming soon — this connection is being prepared.
+              </span>
+            </div>
           </li>
         ))}
       </ul>
