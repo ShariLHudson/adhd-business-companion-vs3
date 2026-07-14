@@ -44,7 +44,7 @@ export type ImmediateCreateOpenPayload = {
 };
 
 const PROJECT_CREATE_RE =
-  /\b(?:create|start|new|add)\s+(?:a\s+)?(?:new\s+)?project\b/i;
+  /\b(?:create|start|new|add|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\bturn\s+(?:this|it|that)\s+into\s+a\s+project\b|\borganize\s+(?:this|it|that)\s+as\s+a\s+project\b|\bhelp\s+me\s+(?:start|create|organize)\s+(?:a\s+)?(?:new\s+)?project\b/i;
 
 const MOMENTUM_PLANNING_RE =
   /\b(?:marketing strategy|business plan(?:ning)?|weekly plan(?:ning)?|quarterly plan(?:ning)?|action plan|roadmap|milestone|goal tracking|move .* forward)\b/i;
@@ -124,8 +124,9 @@ export const MOMENTUM_ESTATE_PLACE_ID =
 export type ImmediateCreateProjectOpenPayload = {
   userText: string;
   experienceId: "create";
-  estatePlaceId: typeof CREATE_ESTATE_PLACE_ID;
-  toolSection: "projects";
+  /** Estate Projects destination — never legacy split ProjectsPanel. */
+  estatePlaceId: "project-homes";
+  toolSection: "project-homes";
   followUpLine: string;
 };
 
@@ -143,8 +144,8 @@ export function resolveImmediateCreateProjectAction(
   return {
     userText: text,
     experienceId: "create",
-    estatePlaceId: CREATE_ESTATE_PLACE_ID,
-    toolSection: "projects",
+    estatePlaceId: "project-homes",
+    toolSection: "project-homes",
     followUpLine: `${arrival}\n\n${followUp}`,
   };
 }
@@ -152,7 +153,8 @@ export function resolveImmediateCreateProjectAction(
 export type ImmediateMomentumOpenPayload = {
   userText: string;
   estatePlaceId: typeof MOMENTUM_ESTATE_PLACE_ID;
-  section: "projects";
+  /** Active project work lands in Project Homes — not legacy split projects. */
+  section: "project-homes";
   followUpLine: string;
 };
 
@@ -166,7 +168,7 @@ export function resolveImmediateMomentumAction(
   return {
     userText: text,
     estatePlaceId: MOMENTUM_ESTATE_PLACE_ID,
-    section: "projects",
+    section: "project-homes",
     followUpLine: `${arrival}\n\n${followUp}`,
   };
 }

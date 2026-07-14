@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -1475,6 +1475,10 @@ import type {
   ImmediateCreateProjectOpenPayload,
   ImmediateMomentumOpenPayload,
 } from "@/lib/createExperience/createExperienceRouting";
+import {
+  CREATE_ROOM_PREPARED_STATE_MESSAGE,
+  resolveLegacyCreateWorkspaceGuard,
+} from "@/lib/createExperience/blockLegacyCreateWorkspaceRouting";
 import {
   savePendingEstatePlaceMenu,
   registerPendingEstatePlaceMenuFromAssistant,
@@ -5073,6 +5077,37 @@ export default function CompanionPageClient() {
     setMessages((prev) => [...prev, { role: "assistant", content: line }]);
   }
 
+  /**
+   * Block legacy split Create / Projects opens. Returns true when handled
+   * (caller must not continue into old Chat + Workspace layout).
+   */
+  function redirectLegacyCreateWorkspaceIfNeeded(
+    section: AppSection,
+    opts?: { userText?: string | null; itemType?: string | null },
+  ): boolean {
+    const decision = resolveLegacyCreateWorkspaceGuard({
+      section,
+      userText: opts?.userText ?? lastUserTextRef.current,
+      itemType: opts?.itemType,
+      alreadyOpen:
+        section === "content-generator" &&
+        workspacePanelRef.current === "content-generator",
+    });
+    if (decision.kind === "allow") return false;
+    if (decision.kind === "project_homes") {
+      openProjectHomesPrototypeCore();
+      return true;
+    }
+    if (decision.kind === "cartographers_studio") {
+      openCartographersStudioCore();
+      return true;
+    }
+    postCreateTransparencyMessage(
+      decision.message || CREATE_ROOM_PREPARED_STATE_MESSAGE,
+    );
+    return true;
+  }
+
   type CreateOpenMeta = {
     source?: CreateOpenSource;
     userInitiated?: boolean;
@@ -5296,6 +5331,14 @@ export default function CompanionPageClient() {
     },
     meta?: CreateOpenMeta,
   ): boolean {
+    if (
+      redirectLegacyCreateWorkspaceIfNeeded(section, {
+        userText: meta?.userText ?? lastUserTextRef.current,
+        itemType: input.itemType,
+      })
+    ) {
+      return false;
+    }
     if (section !== "content-generator") {
       routingExecutorRef.current.execute({
         routeId: "create.open",
@@ -5839,6 +5882,14 @@ export default function CompanionPageClient() {
         ackMessage ?? createReceiptMessage("draft_updated", { itemType: artifact.itemType }),
       );
       if (exportAction) setExportTrigger(exportAction);
+      return;
+    }
+    if (
+      redirectLegacyCreateWorkspaceIfNeeded("content-generator", {
+        userText: meta?.userText ?? lastUserTextRef.current,
+        itemType: artifact.itemType,
+      })
+    ) {
       return;
     }
     requestCreateOpen(
@@ -6975,6 +7026,15 @@ export default function CompanionPageClient() {
     const beforePanel = workspacePanelRef.current;
     const beforeSection = activeSectionRef.current;
 
+    if (
+      redirectLegacyCreateWorkspaceIfNeeded("content-generator", {
+        userText: prompt || opts?.hardNavCommand,
+        itemType: opts?.artifactType,
+      })
+    ) {
+      return false;
+    }
+
     // Sprint 1+ — recognition preserve-first / active flow blocks Create routing
     // unless the member explicitly asked to open Create / draft / build.
     if (
@@ -7136,6 +7196,7 @@ export default function CompanionPageClient() {
     ) {
       return;
     }
+    if (redirectLegacyCreateWorkspaceIfNeeded(section)) return;
     if (shouldBlockWorkspaceOpenForPhase1(options)) return;
     if (section === "growth") {
       openGrowthLandingCore();
@@ -11126,6 +11187,7 @@ export default function CompanionPageClient() {
       openPlanMyDayCore();
       return;
     }
+    if (redirectLegacyCreateWorkspaceIfNeeded(section)) return;
     clearParallelCoachingOffers();
     if (section === "content-generator") {
       if (workspacePanel === "content-generator") {
@@ -11435,27 +11497,10 @@ export default function CompanionPageClient() {
 
   function completeImmediateCreateOpen(payload: ImmediateCreateOpenPayload) {
     clearFrictionlessOfferState();
-    const command = estateNavigateCommandForPlace(
-      payload.estatePlaceId,
-      payload.userText,
-    );
-    const alreadyAtPlace =
-      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
-    if (command && !alreadyAtPlace) {
-      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
-        skipAssistantMessage: true,
-      });
-    } else if (command) {
-      patchEstateRuntimeState({
-        currentPlaceId: payload.estatePlaceId,
-        activeConversationMode: true,
-      });
-    }
-    openCreateWithResolvedArtifact(payload.artifact, undefined, null, {
-      userInitiated: true,
-      skipConsentCheck: true,
-      skipWorkspaceChatReset: true,
-      source: "artifact",
+    // Never open legacy Create / content-generator from chat create intents.
+    redirectLegacyCreateWorkspaceIfNeeded("content-generator", {
+      userText: payload.userText,
+      itemType: payload.artifact.itemType,
     });
   }
 
@@ -11463,44 +11508,18 @@ export default function CompanionPageClient() {
     payload: ImmediateCreateProjectOpenPayload,
   ) {
     clearFrictionlessOfferState();
-    const command = estateNavigateCommandForPlace(
-      payload.estatePlaceId,
-      payload.userText,
-    );
-    const alreadyAtPlace =
-      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
-    if (command && !alreadyAtPlace) {
-      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
-        skipAssistantMessage: true,
-      });
-    } else if (command) {
-      patchEstateRuntimeState({
-        currentPlaceId: payload.estatePlaceId,
-        activeConversationMode: true,
-      });
+    openProjectHomesPrototypeCore();
+    if (payload.followUpLine?.trim()) {
+      postCreateTransparencyMessage(payload.followUpLine);
     }
-    openSectionBesideChatCore("projects", "projects", { userInitiated: true });
   }
 
   function completeImmediateMomentumOpen(payload: ImmediateMomentumOpenPayload) {
     clearFrictionlessOfferState();
-    const command = estateNavigateCommandForPlace(
-      payload.estatePlaceId,
-      payload.userText,
-    );
-    const alreadyAtPlace =
-      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
-    if (command && !alreadyAtPlace) {
-      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
-        skipAssistantMessage: true,
-      });
-    } else if (command) {
-      patchEstateRuntimeState({
-        currentPlaceId: payload.estatePlaceId,
-        activeConversationMode: true,
-      });
+    openProjectHomesPrototypeCore();
+    if (payload.followUpLine?.trim()) {
+      postCreateTransparencyMessage(payload.followUpLine);
     }
-    openSectionBesideChatCore("projects", "projects", { userInitiated: true });
   }
 
   function completeImmediateResearchOpen(
@@ -22301,7 +22320,7 @@ export default function CompanionPageClient() {
                 });
                 openSectionBesideChatCore("projects", "projects");
               }}
-              onOpenProjects={() => openSectionBesideChatCore("projects", "projects")}
+              onOpenProjects={() => openProjectHomesPrototypeCore()}
               onOpenCalendar={() =>
                 openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"))
               }

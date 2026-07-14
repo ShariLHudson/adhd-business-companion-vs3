@@ -21,11 +21,18 @@ describe("createExperienceRouting", () => {
     expect(action?.followUpLine).toMatch(/email/i);
   });
 
-  it("routes new project to Create experience", () => {
+  it("routes new project to Project Homes estate destination", () => {
     expect(isMomentumForwardIntent("create a new project")).toBe(false);
     expect(resolveImmediateCreateAction("create a new project")).toBeNull();
     const project = resolveImmediateCreateProjectAction("create a new project");
     expect(project?.experienceId).toBe("create");
-    expect(project?.estatePlaceId).toBe("creative-studio");
+    expect(project?.estatePlaceId).toBe("project-homes");
+    expect(project?.toolSection).toBe("project-homes");
+  });
+
+  it("routes momentum forward work to project-homes section id", () => {
+    const momentum = resolveImmediateMomentumAction("marketing strategy");
+    expect(momentum?.section).toBe("project-homes");
   });
 });
+
