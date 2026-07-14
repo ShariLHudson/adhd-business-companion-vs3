@@ -107,6 +107,18 @@ const RhythmsRoomPanel = dynamic(
     ),
   },
 );
+const CalendarRoomPanel = dynamic(
+  () =>
+    import("@/components/companion/CalendarRoomPanel").then((mod) => ({
+      default: mod.CalendarRoomPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Calendar…" size="md" />
+    ),
+  },
+);
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -8179,6 +8191,22 @@ export default function CompanionPageClient() {
   }
 
   /**
+   * Calendar — dedicated Connected Calendars room (My Workday).
+   * Never opens Momentum Appointments, Plan My Day, Rhythms, Reminders, or Settings.
+   */
+  function openCalendarCore() {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    trackWorkspaceEcosystemEvent("calendar");
+    noteWorkspaceOpened("calendar", "standalone_room");
+    openStandaloneFocusSectionCore("calendar");
+  }
+
+  /**
    * Destination Gallery — Architecture 156 crystals (not Asset Library / the-gallery).
    */
   function openDestinationGalleryCore() {
@@ -9651,7 +9679,7 @@ export default function CompanionPageClient() {
         openStandaloneFocusSectionCore("focus-timer");
         break;
       case "calendar":
-        openPlanMyDayCore({ area: "calendar" });
+          openCalendarCore();
         break;
       case "projects":
         openProjectHomesPrototypeCore();
@@ -11970,7 +11998,7 @@ export default function CompanionPageClient() {
           openRemindersCore();
           break;
         case "calendar":
-          openPlanMyDayCore({ area: "calendar" });
+          openCalendarCore();
           break;
         case "project-homes":
           openProjectHomesPrototypeCore();
@@ -21154,7 +21182,8 @@ export default function CompanionPageClient() {
                 ? "pl-0 companion-growth-active"
               : activeSection === "plan-my-day" ||
                   activeSection === "reminders" ||
-                  activeSection === "rhythms"
+                  activeSection === "rhythms" ||
+                  activeSection === "calendar"
                 ? "pl-0 companion-plan-my-day-active"
               : activeSection === "brain-dump"
                 ? "pl-0 companion-clear-my-mind-active"
@@ -21178,7 +21207,8 @@ export default function CompanionPageClient() {
         } ${
           activeSection === "plan-my-day" ||
           activeSection === "reminders" ||
-          activeSection === "rhythms"
+          activeSection === "rhythms" ||
+          activeSection === "calendar"
             ? "companion-plan-my-day-active"
             : ""
         } ${
@@ -22286,6 +22316,9 @@ export default function CompanionPageClient() {
           {activeSection === "rhythms" && (
             <RhythmsRoomPanel onBack={goBack} registerBack={registerBack} />
           )}
+          {activeSection === "calendar" && (
+            <CalendarRoomPanel onBack={goBack} registerBack={registerBack} />
+          )}
 
           {activeSection === "grow" && (
             <GrowLandingPanel
@@ -23163,7 +23196,7 @@ export default function CompanionPageClient() {
         onOpenPlanMyDay={() => openPlanMyDayCore()}
         onOpenRhythms={() => openRhythmsCore()}
         onOpenReminders={() => openRemindersCore()}
-        onOpenCalendar={() => openPlanMyDayCore({ area: "calendar" })}
+        onOpenCalendar={() => openCalendarCore()}
         onOpenProjects={() => openProjectHomesPrototypeCore()}
         onOpenClearMyMind={() => openClearMyMindCore()}
         onOpenParkingLot={() => openPlanMyDayCore({ area: "parking-lot" })}

@@ -42,11 +42,24 @@ function gatherSparkCalendarEvents(): UnifiedPlanningEvent[] {
   });
 }
 
+export type PlanMyDayCalendarAreaProps = {
+  /**
+   * When true, omit the inner Calendar heading — used by the dedicated
+   * Calendar room which already shows the room title.
+   */
+  hideHeading?: boolean;
+  /** Google OAuth return path (defaults to Plan My Day calendar area). */
+  authReturnPath?: string;
+};
+
 /**
  * Planning Calendar home — Connected Calendars abstraction.
  * Reuses existing Google OAuth; Outlook plugs into the same snapshot.
  */
-export function PlanMyDayCalendarArea() {
+export function PlanMyDayCalendarArea({
+  hideHeading = false,
+  authReturnPath = "/companion?section=plan-my-day&planningArea=calendar",
+}: PlanMyDayCalendarAreaProps) {
   const [snapshot, setSnapshot] = useState<ConnectedCalendarsSnapshot | null>(
     null,
   );
@@ -84,22 +97,21 @@ export function PlanMyDayCalendarArea() {
   const connected = (snapshot?.connections.length ?? 0) > 0;
   const googleProvider = snapshot?.providers.find((p) => p.id === "google");
   const outlookProvider = snapshot?.providers.find((p) => p.id === "outlook");
-  const connectHref = connectedCalendarAuthHref(
-    "google",
-    "/companion?section=plan-my-day&planningArea=calendar",
-  );
+  const connectHref = connectedCalendarAuthHref("google", authReturnPath);
   const outlookDisconnected = outlookProvider?.status === "disconnected";
 
   return (
     <div className="mt-4 flex flex-col gap-6" data-testid="plan-area-calendar-panel">
-      <div>
-        <h2 className="text-xl font-semibold text-[#1f1c19]">
-          {PLANNING_CENTER_AREA_META.calendar.label}
-        </h2>
-        <p className="mt-1 text-base text-[#6b635a]">
-          {PLANNING_CENTER_AREA_META.calendar.purpose}
-        </p>
-      </div>
+      {hideHeading ? null : (
+        <div>
+          <h2 className="text-xl font-semibold text-[#1f1c19]">
+            {PLANNING_CENTER_AREA_META.calendar.label}
+          </h2>
+          <p className="mt-1 text-base text-[#6b635a]">
+            {PLANNING_CENTER_AREA_META.calendar.purpose}
+          </p>
+        </div>
+      )}
 
       <section
         className="rounded-xl border border-[#e7dfd4] bg-[#faf7f2] p-4"

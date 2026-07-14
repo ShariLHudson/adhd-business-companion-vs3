@@ -76,37 +76,4 @@ describe("Rhythms dedicated destination", () => {
   });
 });
 
-describe("Calendar My Workday destination", () => {
-  const client = read("app/companion/CompanionPageClient.tsx");
-  const menu = read(
-    "components/companion/estate/EstateRoomExperienceMenu.tsx",
-  );
-
-  it("wires My Workday Calendar to openCalendarCore — not Plan My Day", () => {
-    expect(menu).toMatch(/data-testid="estate-open-calendar"/);
-    expect(client).toMatch(/onOpenCalendar=\{\(\) => openCalendarCore\(\)\}/);
-    expect(client).not.toMatch(
-      /onOpenCalendar=\{\(\) => openPlanMyDayCore\(\{ area: "calendar" \}\)\}/,
-    );
-  });
-
-  it("openCalendarCore opens time-block — not Plan My Day, Rhythms, Reminders, or Settings", () => {
-    const fn = client.match(
-      /function openCalendarCore\(\) \{[\s\S]*?\n  \}/,
-    )?.[0];
-    expect(fn).toBeTruthy();
-    expect(fn).toContain(
-      'openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"))',
-    );
-    expect(fn).not.toContain("openPlanMyDayCore");
-    expect(fn).not.toContain("openRhythmsCore");
-    expect(fn).not.toContain("openRemindersCore");
-    expect(fn).not.toContain("openHowDoISettings");
-  });
-
-  it("Calendar destination renders TimeBlockPanel", () => {
-    expect(client).toMatch(
-      /activeSection === "time-block"[\s\S]*?<TimeBlockPanel/,
-    );
-  });
-});
+/* Calendar My Workday destination tests live in lib/calendar/calendarDestination.test.ts */

@@ -49,6 +49,10 @@ export type AppSection =
   | "decision-compass"
   | "today"
   | "plan-my-day"
+  | "reminders"
+  | "rhythms"
+  | "calendar"
+  | "parking-lot"
   | "visual-focus"
   | "wins-this-week"
   | "evidence-bank"
@@ -239,6 +243,11 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "brain-dump":
       return "clear-my-mind";
     case "plan-my-day":
+      return "plan-my-day";
+    case "reminders":
+    case "rhythms":
+    case "calendar":
+    case "parking-lot":
       return "plan-my-day";
     case "energy":
       return "todays-reality";
