@@ -7,10 +7,11 @@ import { estateBackgroundPath } from "@/lib/estate/estatePlaceMedia";
 
 export const DESTINATION_GALLERY_PLACE_ID = "destination-gallery" as const;
 
-export const DESTINATION_GALLERY_BG_VERSION = "20260709a" as const;
+export const DESTINATION_GALLERY_BG_VERSION = "20260714b" as const;
 
+/** Existing approved gallery scene asset (do not edit the image file). */
 export const DESTINATION_GALLERY_BG_FILENAME =
-  "destination-gallery.png" as const;
+  "destination-gallery-background.png" as const;
 
 export const DESTINATION_GALLERY_BG =
   `${estateBackgroundPath(DESTINATION_GALLERY_BG_FILENAME)}?v=${DESTINATION_GALLERY_BG_VERSION}` as const;

@@ -1,0 +1,316 @@
+/**
+ * Destination Gallery — transparent hit areas over painted crystal pillars.
+ * No cards, orbs, or dashboard chrome over the scene.
+ */
+
+.destination-gallery-panel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: #120e0a;
+}
+
+.companion-destination-gallery-active .destination-gallery-panel,
+.companion-estate-immersive-active .destination-gallery-panel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.companion-destination-gallery-active .clear-my-mind-standalone-frame,
+.companion-estate-immersive-active:has(.destination-gallery-panel)
+  .clear-my-mind-standalone-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+}
+
+/**
+ * Aspect-locked stage = full artwork composition (1536×1024).
+ * Fills the viewport as far as possible without cropping crystal pillars.
+ * Hit areas are percentage-positioned inside this stage.
+ */
+.destination-gallery-panel__stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  width: min(100%, calc(100dvh * 1536 / 1024));
+  height: min(100%, calc(100dvw * 1024 / 1536));
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+
+.destination-gallery-panel__scene {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.destination-gallery-panel__media {
+  /* Stage matches image aspect — cover fills the stage without cropping pillars */
+  object-fit: cover;
+  object-position: center center;
+}
+
+.destination-gallery-panel__chrome {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 30;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.destination-gallery-panel__chrome-btn {
+  border-radius: 999px;
+  border: 1px solid rgba(232, 220, 200, 0.28);
+  background: rgba(28, 22, 16, 0.35);
+  color: rgba(247, 240, 228, 0.82);
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.destination-gallery-panel__chrome-btn:hover,
+.destination-gallery-panel__chrome-btn:focus-visible {
+  background: rgba(28, 22, 16, 0.55);
+  border-color: rgba(232, 220, 200, 0.55);
+  outline: none;
+}
+
+.destination-gallery-crystal-field {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.destination-gallery-crystal-slot {
+  position: absolute;
+}
+
+/* Transparent object hit target — the painted crystal is the UI */
+.destination-gallery-crystal {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 1rem;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  transition: transform 200ms ease;
+}
+
+.destination-gallery-crystal:focus {
+  outline: none;
+}
+
+.destination-gallery-crystal__glow {
+  position: absolute;
+  inset: 2% 12% 6%;
+  border-radius: 42% 42% 30% 30% / 38% 38% 48% 48%;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse at 50% 35%,
+    rgba(255, 244, 210, 0.28) 0%,
+    rgba(255, 220, 150, 0.1) 42%,
+    transparent 70%
+  );
+  box-shadow: none;
+  transition:
+    opacity 180ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    filter 200ms ease;
+}
+
+.destination-gallery-crystal__shimmer {
+  position: absolute;
+  inset: 8% 22% 18%;
+  border-radius: 40%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    118deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.35) 48%,
+    transparent 66%
+  );
+  mix-blend-mode: soft-light;
+  transform: translateX(-30%);
+}
+
+.destination-gallery-crystal:hover,
+.destination-gallery-crystal:focus-visible {
+  transform: translateY(-3px) scale(1.02);
+  filter: brightness(1.06);
+}
+
+.destination-gallery-crystal:hover .destination-gallery-crystal__glow,
+.destination-gallery-crystal:focus-visible .destination-gallery-crystal__glow {
+  opacity: 1;
+  box-shadow:
+    0 0 18px rgba(255, 226, 170, 0.4),
+    0 0 36px rgba(255, 200, 120, 0.22);
+  filter: brightness(1.08);
+}
+
+.destination-gallery-crystal:hover .destination-gallery-crystal__shimmer,
+.destination-gallery-crystal:focus-visible .destination-gallery-crystal__shimmer {
+  opacity: 0.7;
+  animation: destination-crystal-shimmer 1.1s ease-in-out infinite;
+}
+
+.destination-gallery-crystal:focus-visible {
+  box-shadow: 0 0 0 2px rgba(247, 240, 228, 0.9);
+}
+
+.destination-gallery-crystal[data-activating="true"] {
+  transform: translateY(-6px) scale(1.045);
+}
+
+.destination-gallery-crystal[data-activating="true"] .destination-gallery-crystal__glow {
+  opacity: 1;
+  filter: brightness(1.35);
+  box-shadow:
+    0 0 28px rgba(255, 236, 200, 0.75),
+    0 0 56px rgba(255, 210, 140, 0.45);
+  animation: destination-crystal-activate 380ms ease-out;
+}
+
+.destination-gallery-crystal[data-activating="true"] .destination-gallery-crystal__spark {
+  opacity: 1;
+}
+
+.destination-gallery-crystal__spark {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 62% 42%, rgba(255, 236, 180, 0.95) 0 1.5px, transparent 3px),
+    radial-gradient(circle at 48% 58%, rgba(255, 255, 255, 0.8) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 28%, rgba(255, 220, 150, 0.9) 0 1px, transparent 2px);
+  animation: destination-crystal-spark 380ms ease-out;
+}
+
+@keyframes destination-crystal-shimmer {
+  0% {
+    transform: translateX(-35%);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateX(35%);
+    opacity: 0.15;
+  }
+}
+
+@keyframes destination-crystal-activate {
+  0% {
+    filter: brightness(1.05);
+  }
+  40% {
+    filter: brightness(1.5);
+  }
+  100% {
+    filter: brightness(1.25);
+  }
+}
+
+@keyframes destination-crystal-spark {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+.destination-gallery-panel__flash {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--flash-x, 50%) var(--flash-y, 50%),
+    rgba(255, 236, 200, 0.28) 0%,
+    transparent 38%
+  );
+  opacity: 0;
+}
+
+.destination-gallery-panel__flash[data-active="true"] {
+  animation: destination-gallery-flash 380ms ease-out;
+}
+
+@keyframes destination-gallery-flash {
+  0% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.destination-gallery-prepared {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(16, 12, 10, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.destination-gallery-prepared__whisper {
+  width: min(28rem, 100%);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(232, 220, 200, 0.28);
+  background: rgba(28, 22, 16, 0.72);
+  color: #f7f0e4;
+  padding: 1.5rem 1.6rem;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .destination-gallery-crystal,
+  .destination-gallery-crystal__glow {
+    transition: none;
+  }
+
+  .destination-gallery-crystal__shimmer,
+  .destination-gallery-crystal[data-activating="true"] .destination-gallery-crystal__glow,
+  .destination-gallery-crystal__spark,
+  .destination-gallery-panel__flash[data-active="true"] {
+    animation: none;
+  }
+}

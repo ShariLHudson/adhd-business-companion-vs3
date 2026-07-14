@@ -9,6 +9,7 @@ import { resolveCompanionSupabaseEnv } from "@/lib/supabase/resolveCompanionSupa
 import { isBrowserSafeSupabaseKey } from "@/lib/supabase/supabaseKeyRoles";
 import "./cinematic-background.css";
 import "./estate-light-flicker.css";
+import "./destination-gallery-crystals.css";
 import "./companion.css";
 import "./companion-login-transition.css";
 import "./gallery.css";

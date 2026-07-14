@@ -1540,7 +1540,12 @@ import {
 } from "@/lib/momentumBuilderRoom/momentumBuilderPrompt";
 import { CHAMBER_OF_MOMENTUM_ROOM_BG } from "@/lib/estate/chamber/chamberOfMomentumRoomRegistry";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio";
-import { DESTINATION_GALLERY_BG } from "@/lib/destinationGallery";
+import {
+  DESTINATION_GALLERY_BG,
+  resolveCrystalActivation,
+  type CrystalActivation,
+  type DestinationCrystal,
+} from "@/lib/destinationGallery";
 import { resolveMyDayAndWorkOpenerFromText } from "@/lib/estate/myDayAndWorkNavigation";
 import { ensureChamberDemoDataSeeded } from "@/lib/estate/chamber/seedChamberDemoData";
 import { isChamberDemoMode } from "@/lib/estate/chamber/chamberDemoMode";
@@ -2399,6 +2404,9 @@ export default function CompanionPageClient() {
     | "growth-profile"
     | "institute-cabinet"
   >(null);
+  /** Destination Gallery pass-1 prepared crystal (Document / Store / Share / Print / Design). */
+  const [destinationCrystalPrepared, setDestinationCrystalPrepared] =
+    useState<CrystalActivation | null>(null);
   const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
     useState(false);
   const estateProfilePrimary = overlay === "profile";
@@ -8305,6 +8313,7 @@ export default function CompanionPageClient() {
   function openDestinationGalleryCore() {
     leaveClearMyMindIfNavigatingAway();
     setOverlay(null);
+    setDestinationCrystalPrepared(null);
     preloadRoomBackground(DESTINATION_GALLERY_BG.split("?")[0] ?? DESTINATION_GALLERY_BG);
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
@@ -8319,6 +8328,22 @@ export default function CompanionPageClient() {
     noteWorkspaceOpened("destination-gallery", "standalone_room");
     openStandaloneFocusSectionCore("destination-gallery");
     setEstateRoomChatVisible(false);
+  }
+
+  /**
+   * Destination Gallery crystal activation (pass 1).
+   * Schedule → Connected Calendars. Other crystals → prepared states in-gallery.
+   * Never opens content-generator, Evidence Vault, Saved Work, or legacy Create.
+   */
+  function handleSelectDestinationCrystal(crystal: DestinationCrystal) {
+    const activation = resolveCrystalActivation(crystal.id);
+    if (activation.kind === "open_calendar") {
+      setDestinationCrystalPrepared(null);
+      openCalendarCore();
+      return;
+    }
+    // Design and other prepared states stay in Destination Gallery.
+    setDestinationCrystalPrepared(activation);
   }
 
   function openBoardroomCore(options?: { intent?: BoardroomEntryIntent }) {
@@ -21277,6 +21302,10 @@ export default function CompanionPageClient() {
         } ${
           activeSection === "the-gallery" ? "companion-gallery-active" : ""
         } ${
+          activeSection === "destination-gallery"
+            ? "companion-destination-gallery-active"
+            : ""
+        } ${
           activeSection === "plan-my-day" ||
           activeSection === "reminders" ||
           activeSection === "rhythms" ||
@@ -22350,6 +22379,16 @@ export default function CompanionPageClient() {
               <DestinationGalleryPanel
                 onBack={navigateBackToEstateHome}
                 onReturnToEstate={navigateBackToEstateHome}
+                onSelectCrystal={handleSelectDestinationCrystal}
+                prepared={destinationCrystalPrepared}
+                onClearPrepared={() => setDestinationCrystalPrepared(null)}
+                exportText={
+                  [...messages]
+                    .reverse()
+                    .find((m) => m.role === "assistant")?.content ?? ""
+                }
+                exportTitle="Spark work"
+                onOpenConnections={() => openHowDoISettings("connections")}
               />
             </EstateRoomErrorBoundary>
           )}
