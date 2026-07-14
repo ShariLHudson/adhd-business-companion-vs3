@@ -60,14 +60,14 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "personal-library": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   "momentum-institute": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
   "chamber-of-momentum": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
-  "creative-studio": estateBackgroundPath("creative-studio-background.png"),
+  "creative-studio": estateBackgroundPath("art-studio-background.png"),
   "focus-studio": estateBackgroundPath(
     "cartoghraphers-studio-background.png",
   ),
   "cartographers-studio": estateBackgroundPath(
     "cartoghraphers-studio-background.png",
   ),
-  "art-studio": estateBackgroundPath("creative-studio-background.png"),
+  "art-studio": estateBackgroundPath("art-studio-background.png"),
   observatory: estateBackgroundPath("observatory-daytime-outside-background.png"),
   "observatory-day-inside": estateBackgroundPath("observatory-daytime-inside.png"),
   "observatory-day-outside": estateBackgroundPath(
@@ -82,12 +82,13 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "momentum-builder": estateBackgroundPath("study-hall-background.png"),
   "strategy-studio": estateBackgroundPath("creative-studio-background.png"),
   "momentum-room": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
-  "round-table": estateBackgroundPath("room-dining-room-background.png"),
+  "round-table": estateBackgroundPath("round-table-boardroom-background.png"),
   "summer-terrace": estateBackgroundPath("water-swimming-pool-private-background.png"),
   "decision-compass": estateBackgroundPath("writing-room-background.png"),
   "writing-room": estateBackgroundPath("writing-room-background.png"),
   journal: `${estateBackgroundPath("journal-desk-background.png")}?v=20260710b`,
-  "evidence-vault": estateBackgroundPath("evidence-vault-background.png"),
+  /* Open-portal plate — closed doors live only on the entrance overlay. */
+  "evidence-vault": estateBackgroundPath("evidence-vault-room-static.png"),
   "gallery-of-firsts": estateBackgroundPath("gallery-background.png"),
   portfolio: estateBackgroundPath("hall-of-achievements-room-background.png"),
   "goals-projects": estateBackgroundPath("room-dining-room-background.png"),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
 import { useChatBackdropRevision } from "@/lib/chatBackdrop";
 import {
@@ -141,8 +141,12 @@ export function EstateRoomFullBleedBackground({
     onLoad?.();
   }, [incomingSrc, onLoad]);
 
+  const incomingHandledRef = useRef<string | null>(null);
+
   const handleIncomingLoad = useCallback(() => {
     if (!incomingSrc) return;
+    if (incomingHandledRef.current === incomingSrc) return;
+    incomingHandledRef.current = incomingSrc;
 
     if (!displayedSrc) {
       setDisplayedSrc(incomingSrc);
@@ -158,6 +162,10 @@ export function EstateRoomFullBleedBackground({
     });
     window.setTimeout(finishCrossfade, ESTATE_SCENE_CROSSFADE_MS);
   }, [incomingSrc, displayedSrc, finishCrossfade, onLoad]);
+
+  useEffect(() => {
+    incomingHandledRef.current = null;
+  }, [incomingSrc]);
 
   useEffect(() => {
     if (!useRoomVideo || !onLoad) return;
@@ -267,6 +275,12 @@ export function EstateRoomFullBleedBackground({
             .join(" ")}
           decoding="async"
           fetchPriority="high"
+          ref={(node) => {
+            /* Cached plates may not fire onLoad again — promote when already decoded. */
+            if (node?.complete && node.naturalWidth > 0) {
+              handleIncomingLoad();
+            }
+          }}
           onLoad={handleIncomingLoad}
           onError={handleError}
         />

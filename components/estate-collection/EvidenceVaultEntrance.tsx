@@ -56,6 +56,9 @@ export function EvidenceVaultEntrance({
   const idle =
     (doorState === "locked" || doorState === "key_ready") && keyRevealed;
   const doorsOpen = doorState === "opening" || doorState === "open";
+  /** Closed full-plate only before swing — never above hinged leaves while opening. */
+  const showClosedComposite =
+    doorState === "locked" || doorState === "key_ready";
   const status = EVIDENCE_VAULT_DOOR_STATUS[doorState];
   const leftStyle = evidenceVaultDoorLeafStyle(EVIDENCE_VAULT_DOOR_LEFT_BOUNDS);
   const rightStyle = evidenceVaultDoorLeafStyle(
@@ -160,122 +163,131 @@ export function EvidenceVaultEntrance({
       aria-describedby="evidence-vault-entrance-welcome"
     >
       <div className="evidence-vault-entrance__art" aria-hidden>
-        {/* Stationary surroundings — never rotate */}
-        <div className="evidence-vault-entrance__plate evidence-vault-entrance__plate--room">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={EVIDENCE_VAULT_ROOM_STATIC_BG}
-            alt=""
-            decoding="async"
-            data-testid="evidence-vault-room-static-image"
-          />
-        </div>
+        <div className="evidence-vault-entrance__art-inner">
+          {/* 1. Stationary surroundings — never rotate */}
+          <div className="evidence-vault-entrance__plate evidence-vault-entrance__plate--room">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={EVIDENCE_VAULT_ROOM_STATIC_BG}
+              alt=""
+              decoding="async"
+              data-testid="evidence-vault-room-static-image"
+            />
+          </div>
 
-        {/* Interior already behind doors */}
-        <div
-          className={[
-            "evidence-vault-entrance__plate",
-            "evidence-vault-entrance__plate--interior",
-            doorsOpen ? "evidence-vault-entrance__plate--interior-visible" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={EVIDENCE_VAULT_INTERIOR_REVEAL_BG}
-            alt=""
-            decoding="async"
-            data-testid="evidence-vault-interior-reveal-image"
-          />
-        </div>
-
-        {/* Full closed plate under leaves — covers crop seams at arrival */}
-        <div
-          className={[
-            "evidence-vault-entrance__plate",
-            "evidence-vault-entrance__plate--closed",
-            doorsOpen ? "evidence-vault-entrance__plate--closed-hidden" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          data-testid="evidence-vault-closed-composite"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={EVIDENCE_VAULT_CLOSED_DOOR_BG}
-            alt=""
-            decoding="async"
-            data-testid="evidence-vault-closed-door-image"
-          />
-        </div>
-
-        <div className="evidence-vault-entrance__door-stage">
-          <motion.div
-            className="evidence-vault-entrance__door evidence-vault-entrance__door--left"
-            style={{
-              ...leftStyle,
-              transformOrigin: "left center",
-            }}
-            initial={false}
-            animate={
-              reduceMotion
-                ? { rotateY: 0, opacity: doorsOpen ? 0 : 1 }
-                : {
-                    rotateY: doorsOpen ? -110 : 0,
-                    opacity: doorsOpen ? 0.35 : 1,
-                  }
-            }
-            transition={
-              reduceMotion
-                ? { duration: 0.28, ease: "easeOut" }
-                : {
-                    duration: openDuration,
-                    ease: [0.42, 0, 0.58, 1],
-                    delay: 0,
-                  }
-            }
-            data-testid="evidence-vault-door-left"
+          {/* 2. Interior already behind doors */}
+          <div
+            className={[
+              "evidence-vault-entrance__plate",
+              "evidence-vault-entrance__plate--interior",
+              doorsOpen
+                ? "evidence-vault-entrance__plate--interior-visible"
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={EVIDENCE_VAULT_DOOR_LEFT_BG} alt="" draggable={false} />
-            <span className="evidence-vault-entrance__door-shade" />
-          </motion.div>
+            <img
+              src={EVIDENCE_VAULT_INTERIOR_REVEAL_BG}
+              alt=""
+              decoding="async"
+              data-testid="evidence-vault-interior-reveal-image"
+            />
+          </div>
 
-          <motion.div
-            className="evidence-vault-entrance__door evidence-vault-entrance__door--right"
-            style={{
-              ...rightStyle,
-              transformOrigin: "right center",
-            }}
-            initial={false}
-            animate={
-              reduceMotion
-                ? { rotateY: 0, opacity: doorsOpen ? 0 : 1 }
-                : {
-                    rotateY: doorsOpen ? 110 : 0,
-                    opacity: doorsOpen ? 0.35 : 1,
-                  }
-            }
-            transition={
-              reduceMotion
-                ? { duration: 0.28, ease: "easeOut" }
-                : {
-                    duration: openDuration,
-                    ease: [0.42, 0, 0.58, 1],
-                    delay: stagger,
-                  }
-            }
-            data-testid="evidence-vault-door-right"
+          {/* 3. Hinged leaves — under closed plate at arrival; top while swinging */}
+          <div
+            className="evidence-vault-entrance__door-stage"
+            data-testid="evidence-vault-door-stage"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={EVIDENCE_VAULT_DOOR_RIGHT_BG} alt="" draggable={false} />
-            <span className="evidence-vault-entrance__door-shade" />
-          </motion.div>
-        </div>
+            <motion.div
+              className="evidence-vault-entrance__door evidence-vault-entrance__door--left"
+              style={{
+                ...leftStyle,
+                transformOrigin: "left center",
+                transformPerspective: 1400,
+              }}
+              initial={false}
+              animate={
+                reduceMotion
+                  ? { rotateY: 0, opacity: doorsOpen ? 0 : 1 }
+                  : { rotateY: doorsOpen ? -110 : 0, opacity: 1 }
+              }
+              transition={
+                reduceMotion
+                  ? { duration: 0.28, ease: "easeOut" }
+                  : {
+                      duration: openDuration,
+                      // Ease-out so the swing is readable early (same duration).
+                      ease: [0.22, 0.61, 0.36, 1],
+                      delay: 0,
+                    }
+              }
+              data-testid="evidence-vault-door-left"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={EVIDENCE_VAULT_DOOR_LEFT_BG} alt="" draggable={false} />
+              <span className="evidence-vault-entrance__door-shade" />
+            </motion.div>
 
-        <div className="evidence-vault-entrance__lock-glow" />
-        <div className="evidence-vault-entrance__key-glint" />
+            <motion.div
+              className="evidence-vault-entrance__door evidence-vault-entrance__door--right"
+              style={{
+                ...rightStyle,
+                transformOrigin: "right center",
+                transformPerspective: 1400,
+              }}
+              initial={false}
+              animate={
+                reduceMotion
+                  ? { rotateY: 0, opacity: doorsOpen ? 0 : 1 }
+                  : { rotateY: doorsOpen ? 110 : 0, opacity: 1 }
+              }
+              transition={
+                reduceMotion
+                  ? { duration: 0.28, ease: "easeOut" }
+                  : {
+                      duration: openDuration,
+                      ease: [0.22, 0.61, 0.36, 1],
+                      delay: stagger,
+                    }
+              }
+              data-testid="evidence-vault-door-right"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={EVIDENCE_VAULT_DOOR_RIGHT_BG}
+                alt=""
+                draggable={false}
+              />
+              <span className="evidence-vault-entrance__door-shade" />
+            </motion.div>
+          </div>
+
+          {/* 4. Closed full-plate only at arrival — never above hinged leaves while opening */}
+          {showClosedComposite ? (
+            <div
+              className="evidence-vault-entrance__plate evidence-vault-entrance__plate--closed"
+              data-testid="evidence-vault-closed-composite"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={EVIDENCE_VAULT_CLOSED_DOOR_BG}
+                alt=""
+                decoding="async"
+                data-testid="evidence-vault-closed-door-image"
+              />
+            </div>
+          ) : null}
+
+          {showClosedComposite ? (
+            <>
+              <div className="evidence-vault-entrance__lock-glow" />
+              <div className="evidence-vault-entrance__key-glint" />
+            </>
+          ) : null}
+        </div>
       </div>
 
       <button

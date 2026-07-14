@@ -10,20 +10,37 @@
   overflow: hidden;
   pointer-events: auto;
   background: #1a1410;
-  perspective: 1400px;
 }
 
-/* Art frame — cover crop of 1535×1024 plate; door % match source pixels */
+/* Allow hinged leaves to swing past the frame without clipping. */
+.evidence-vault-entrance--unlocking,
+.evidence-vault-entrance--opening {
+  overflow: visible;
+}
+
+/*
+ * Art frame — cover crop of 1535×1024 plate; door % match source pixels.
+ * Center with flex (no transform) so child rotateY is not flattened by a
+ * parent 2D transform stacking context.
+ */
 .evidence-vault-entrance__art {
   position: absolute;
-  left: 50%;
-  top: 42%;
+  inset: 0;
   z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  perspective: 1400px;
+  transform-style: preserve-3d;
+}
+
+.evidence-vault-entrance__art-inner {
+  position: relative;
+  flex: 0 0 auto;
   width: max(100vw, calc(100vh * 1535 / 1024));
   height: max(100vh, calc(100vw * 1024 / 1535));
-  transform: translate(-50%, -42%);
   transform-style: preserve-3d;
-  pointer-events: none;
 }
 
 .evidence-vault-entrance__plate {
@@ -56,16 +73,8 @@
 }
 
 .evidence-vault-entrance__plate--closed {
-  z-index: 2;
+  z-index: 3;
   opacity: 1;
-  transition: opacity 0.28s ease;
-}
-
-.evidence-vault-entrance__plate--closed-hidden,
-.evidence-vault-entrance--opening .evidence-vault-entrance__plate--closed,
-.evidence-vault-entrance--unlocking .evidence-vault-entrance__plate--closed {
-  opacity: 0;
-  pointer-events: none;
 }
 
 /* Soft vignette — ambient only */
@@ -100,29 +109,39 @@
   }
 }
 
-/* Door stage — perspective only on leaves */
+/* Door stage — under closed plate at arrival; above interior while swinging */
 .evidence-vault-entrance__door-stage {
   position: absolute;
   inset: 0;
-  z-index: 4;
-  perspective: 1400px;
+  z-index: 2;
   transform-style: preserve-3d;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  opacity: 1;
 }
 
 .evidence-vault-entrance--unlocking .evidence-vault-entrance__door-stage,
 .evidence-vault-entrance--opening .evidence-vault-entrance__door-stage {
-  opacity: 1;
+  z-index: 5;
+}
+
+/* Closed plate must never cover hinged leaves once unlock begins */
+.evidence-vault-entrance--unlocking .evidence-vault-entrance__plate--closed,
+.evidence-vault-entrance--opening .evidence-vault-entrance__plate--closed {
+  display: none;
 }
 
 .evidence-vault-entrance__door {
   position: absolute;
   transform-style: preserve-3d;
-  backface-visibility: hidden;
-  will-change: transform, opacity;
+  backface-visibility: visible;
+  will-change: transform;
   filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.28));
+}
+
+/* Filter flattens 3D on some engines — drop it while swinging */
+.evidence-vault-entrance--unlocking .evidence-vault-entrance__door,
+.evidence-vault-entrance--opening .evidence-vault-entrance__door {
+  filter: none;
 }
 
 .evidence-vault-entrance__door img {
@@ -485,10 +504,6 @@
   pointer-events: none;
 }
 
-.evidence-vault-entrance--opening .evidence-vault-entrance__door {
-  transition: opacity 0.45s ease 0.85s;
-}
-
 @media (max-width: 640px) {
   .evidence-vault-entrance__scene {
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
@@ -521,14 +536,12 @@
   }
 
   .evidence-vault-entrance__plate--interior,
-  .evidence-vault-entrance__plate--closed,
   .evidence-vault-entrance__copy,
   .evidence-vault-entrance__invite,
   .evidence-vault-entrance__key-btn {
     transition: opacity 0.28s ease;
   }
 
-  .evidence-vault-entrance--opening .evidence-vault-entrance__plate--closed,
   .evidence-vault-entrance--reduced.evidence-vault-entrance--opening
     .evidence-vault-entrance__door {
     opacity: 0;

@@ -25,9 +25,9 @@ export const EVIDENCE_VAULT_DOOR_RIGHT_BG =
 export const EVIDENCE_VAULT_INTERIOR_REVEAL_BG =
   "/backgrounds/evidence-vault-interior-reveal.png" as const;
 
-/** Room plate after entrance — existing vault atmosphere. */
+/** Room plate after entrance — open portal (never closed doors). */
 export const EVIDENCE_VAULT_INTERIOR_BG =
-  "/backgrounds/evidence-vault-background.png" as const;
+  "/backgrounds/evidence-vault-room-static.png" as const;
 
 /** Art plate size used for door geometry (must match source PNG). */
 export const EVIDENCE_VAULT_ART_WIDTH = 1535;
@@ -194,13 +194,17 @@ export function shouldShowEvidenceVaultEntrance(opts: {
 
 /**
  * Shell plate under the room.
- * Closed doors only while the ritual runs; open portal after entranceComplete.
+ * Closed doors only before unlock; open portal once hinged swing begins.
  * Never leave home sitting on the closed-door plate.
  */
 export function evidenceVaultShellBackground(
   doorState: EvidenceVaultDoorState,
 ): string {
-  if (isEvidenceVaultEntranceComplete(doorState) || doorState === "opening") {
+  if (
+    isEvidenceVaultEntranceComplete(doorState) ||
+    doorState === "opening" ||
+    doorState === "unlocking"
+  ) {
     return EVIDENCE_VAULT_ROOM_STATIC_BG;
   }
   return EVIDENCE_VAULT_CLOSED_DOOR_BG;
