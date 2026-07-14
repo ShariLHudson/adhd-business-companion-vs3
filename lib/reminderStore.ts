@@ -9,8 +9,22 @@ import {
 } from "./companionStorageRecovery";
 
 export type ReminderType = "one_time" | "recurring" | "event_offset";
-export type ReminderSource = "chat" | "calendar" | "project" | "task";
+export type ReminderSource =
+  | "chat"
+  | "calendar"
+  | "project"
+  | "task"
+  | "rhythm"
+  | "clear_my_mind"
+  | "parking_lot"
+  | "journal"
+  | "plan_day";
 export type ReminderStatus = "active" | "completed" | "cancelled";
+export type ReminderPriority =
+  | "critical"
+  | "important"
+  | "supportive"
+  | "optional";
 
 export type Reminder = {
   id: string;
@@ -27,6 +41,12 @@ export type Reminder = {
   status: ReminderStatus;
   snoozedUntil?: string;
   lastFiredAt?: string;
+  /** Link to Adaptive Rhythm when reminder is a delivery vehicle. */
+  linkedRhythmId?: string;
+  priority?: ReminderPriority;
+  /** Lineage — source thought / parking lot item / chat (never deleted). */
+  originatedFromId?: string;
+  originatedFromKind?: string;
 };
 
 const STORAGE_KEY = "companion-reminders-v1";
@@ -153,8 +173,8 @@ function readAll(): Reminder[] {
   return pruned;
 }
 
-function writeAll(items: Reminder[]): void {
-  safeWriteAll(items);
+function writeAll(items: Reminder[]): boolean {
+  return safeWriteAll(items);
 }
 
 export function getReminders(): Reminder[] {
@@ -197,8 +217,18 @@ export function saveReminder(
     status: input.status ?? "active",
     snoozedUntil: input.snoozedUntil,
     lastFiredAt: input.lastFiredAt,
+    linkedRhythmId: input.linkedRhythmId,
+    priority: input.priority ?? "important",
+    originatedFromId: input.originatedFromId,
+    originatedFromKind: input.originatedFromKind,
   });
-  writeAll([reminder, ...readAll().filter((r) => r.id !== reminder.id)]);
+  const ok = writeAll([
+    reminder,
+    ...readAll().filter((r) => r.id !== reminder.id),
+  ]);
+  if (!ok) {
+    throw new Error("REMINDER_PERSIST_FAILED");
+  }
   return reminder;
 }
 

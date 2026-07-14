@@ -3,6 +3,7 @@
  * Migrates companion-my-rhythms-v1 → companion-rhythms-v1.
  */
 
+import { safeLocalStorageSet } from "@/lib/companionStorageRecovery";
 import { getPlanDayOwnerUserId } from "@/lib/planMyDay/planDayOwner";
 import { updateReminder } from "@/lib/reminderStore";
 import {
@@ -90,11 +91,13 @@ export function migrateLegacyMyRhythmsOnce(): {
     const key = storeKey();
     const existingRaw = localStorage.getItem(key);
     if (existingRaw) {
-      // Normalize + dedupe in place (no legacy re-read).
       const normalized = parseRhythmList(existingRaw);
-      localStorage.setItem(key, JSON.stringify(normalized));
-      localStorage.setItem(migrationFlagKey(), "1");
-      return { migrated: false, count: normalized.length };
+      // Empty scoped store must still import unscoped/legacy candidates.
+      if (normalized.length > 0) {
+        localStorage.setItem(key, JSON.stringify(normalized));
+        localStorage.setItem(migrationFlagKey(), "1");
+        return { migrated: false, count: normalized.length };
+      }
     }
 
     const candidates = [
@@ -160,15 +163,41 @@ export function normalizeMemberRhythm(
   };
 }
 
+/**
+ * Heal owner split-brain: when scoped storage is empty/missing but the
+ * unscoped companion-rhythms-v1 key still has rows, import them once.
+ */
+function mergeUnscopedIntoOwnerStore(ownerScoped: MemberRhythm[]): MemberRhythm[] {
+  const owner = getPlanDayOwnerUserId();
+  if (!owner) return ownerScoped;
+  if (storeKey() === STORE_KEY) return ownerScoped;
+  try {
+    const unscopedRaw = localStorage.getItem(STORE_KEY);
+    if (!unscopedRaw) return ownerScoped;
+    const unscoped = parseRhythmList(unscopedRaw).filter(
+      (r) => !r.ownerUserId || r.ownerUserId === owner,
+    );
+    if (unscoped.length === 0) return ownerScoped;
+    const merged = dedupeById([...ownerScoped, ...unscoped]);
+    if (merged.length !== ownerScoped.length) {
+      localStorage.setItem(storeKey(), JSON.stringify(merged));
+    }
+    return merged;
+  } catch {
+    return ownerScoped;
+  }
+}
+
 function readAll(): MemberRhythm[] {
   if (typeof window === "undefined") return [];
   try {
     migrateLegacyMyRhythmsOnce();
     const key = storeKey();
     const raw = localStorage.getItem(key);
-    if (!raw) return [];
     const owner = getPlanDayOwnerUserId();
-    return parseRhythmList(raw).filter((r) => {
+    const fromKey = raw ? parseRhythmList(raw) : [];
+    const merged = mergeUnscopedIntoOwnerStore(fromKey);
+    return merged.filter((r) => {
       if (!owner) return true;
       return !r.ownerUserId || r.ownerUserId === owner;
     });
@@ -177,14 +206,13 @@ function readAll(): MemberRhythm[] {
   }
 }
 
-function writeAll(items: MemberRhythm[]): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(storeKey(), JSON.stringify(items));
-    window.dispatchEvent(new CustomEvent("companion-rhythms-updated"));
-  } catch {
-    /* storage unavailable */
-  }
+function writeAll(items: MemberRhythm[]): boolean {
+  if (typeof window === "undefined") return false;
+  const key = storeKey();
+  const payload = JSON.stringify(items);
+  if (!safeLocalStorageSet(key, payload)) return false;
+  window.dispatchEvent(new CustomEvent("companion-rhythms-updated"));
+  return true;
 }
 
 export function listMemberRhythms(ownerUserId?: string | null): MemberRhythm[] {
@@ -302,7 +330,10 @@ export function createMemberRhythm(input: {
   if (draft.status === "active") {
     draft.nextDueAt = resolveNextDueAt(draft, new Date());
   }
-  writeAll([...readAll(), draft]);
+  const next = [...readAll(), draft];
+  if (!writeAll(next)) {
+    throw new Error("RHYTHM_PERSIST_FAILED");
+  }
   return draft;
 }
 

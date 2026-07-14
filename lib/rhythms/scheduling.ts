@@ -231,7 +231,11 @@ export function resolveNextDueAt(
     candidate = applyClock(candidate, hour, minute);
   }
 
-  if (rhythm.schedule.cadence === "weekly" && rhythm.schedule.weekdays?.length) {
+  if (
+    (rhythm.schedule.cadence === "weekly" ||
+      rhythm.schedule.cadence === "daily") &&
+    rhythm.schedule.weekdays?.length
+  ) {
     for (let i = 0; i < 14; i++) {
       const name = WEEKDAYS[candidate.getDay()]!;
       if (

@@ -83,6 +83,30 @@ const PlanMyDayPanel = dynamic(
     ),
   },
 );
+const RemindersRoomPanel = dynamic(
+  () =>
+    import("@/components/companion/RemindersRoomPanel").then((mod) => ({
+      default: mod.RemindersRoomPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Reminders…" size="md" />
+    ),
+  },
+);
+const RhythmsRoomPanel = dynamic(
+  () =>
+    import("@/components/companion/RhythmsRoomPanel").then((mod) => ({
+      default: mod.RhythmsRoomPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Rhythms…" size="md" />
+    ),
+  },
+);
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -8123,12 +8147,35 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Reminders — approved RemindersPanel (Settings → Notifications).
-   * Never opens Rhythms.
+   * Reminders — dedicated estate room (My Workday).
+   * Never opens Settings, Notifications overlay, or Plan My Day.
    */
   function openRemindersCore() {
     leaveClearMyMindIfNavigatingAway();
-    openHowDoISettings("notifications");
+    if (!confirmLeaveUnsavedWork()) return;
+    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    trackWorkspaceEcosystemEvent("reminders");
+    noteWorkspaceOpened("reminders", "standalone_room");
+    openStandaloneFocusSectionCore("reminders");
+  }
+
+  /**
+   * Rhythms — dedicated estate room (My Workday).
+   * Never opens Plan My Day, Settings, or Reminders.
+   */
+  function openRhythmsCore() {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    trackWorkspaceEcosystemEvent("rhythms");
+    noteWorkspaceOpened("rhythms", "standalone_room");
+    openStandaloneFocusSectionCore("rhythms");
   }
 
   /**
@@ -11917,7 +11964,7 @@ export default function CompanionPageClient() {
           openPlanMyDayCore();
           break;
         case "rhythms":
-          openPlanMyDayCore({ area: "rhythms" });
+          openRhythmsCore();
           break;
         case "reminders":
           openRemindersCore();
@@ -21105,7 +21152,9 @@ export default function CompanionPageClient() {
                 ? "pl-0 companion-gallery-active"
               : isGrowthPanelSection(activeSection)
                 ? "pl-0 companion-growth-active"
-              : activeSection === "plan-my-day"
+              : activeSection === "plan-my-day" ||
+                  activeSection === "reminders" ||
+                  activeSection === "rhythms"
                 ? "pl-0 companion-plan-my-day-active"
               : activeSection === "brain-dump"
                 ? "pl-0 companion-clear-my-mind-active"
@@ -21127,7 +21176,11 @@ export default function CompanionPageClient() {
         } ${
           activeSection === "the-gallery" ? "companion-gallery-active" : ""
         } ${
-          activeSection === "plan-my-day" ? "companion-plan-my-day-active" : ""
+          activeSection === "plan-my-day" ||
+          activeSection === "reminders" ||
+          activeSection === "rhythms"
+            ? "companion-plan-my-day-active"
+            : ""
         } ${
           activeSection === "brain-dump" ? "companion-clear-my-mind-active" : ""
         } ${
@@ -22227,6 +22280,12 @@ export default function CompanionPageClient() {
               initialRhythmsTab={planMyDayInitialRhythmsTab}
             />
           )}
+          {activeSection === "reminders" && (
+            <RemindersRoomPanel onBack={goBack} registerBack={registerBack} />
+          )}
+          {activeSection === "rhythms" && (
+            <RhythmsRoomPanel onBack={goBack} registerBack={registerBack} />
+          )}
 
           {activeSection === "grow" && (
             <GrowLandingPanel
@@ -23102,7 +23161,7 @@ export default function CompanionPageClient() {
             : undefined
         }
         onOpenPlanMyDay={() => openPlanMyDayCore()}
-        onOpenRhythms={() => openPlanMyDayCore({ area: "rhythms" })}
+        onOpenRhythms={() => openRhythmsCore()}
         onOpenReminders={() => openRemindersCore()}
         onOpenCalendar={() => openPlanMyDayCore({ area: "calendar" })}
         onOpenProjects={() => openProjectHomesPrototypeCore()}
