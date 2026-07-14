@@ -75,14 +75,20 @@ export const SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS = [
   { id: "calendar", label: "Calendar" },
 ] as const;
 
-/** My Work Studio — create, build, write, and manage. */
+/** My Work Studio — top-level rows (Create expands a nested submenu). */
 export const SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS = [
   { id: "projects", label: "Projects" },
-  { id: "documents", label: "Documents" },
-  { id: "sops", label: "SOPs" },
-  { id: "content", label: "Content" },
+  { id: "create", label: "Create" },
   { id: "destination-gallery", label: "Destination Gallery" },
   { id: "cartographers-studio", label: "Cartographer's Studio" },
+] as const;
+
+/** Nested under My Work Studio → Create (destinations wired in a later pass). */
+export const SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS = [
+  { id: "documents", label: "Documents" },
+  { id: "templates", label: "Templates" },
+  { id: "sops", label: "SOPs" },
+  { id: "content", label: "Content" },
 ] as const;
 
 /** Focus — reduce overwhelm, regain focus, reset. */
@@ -354,6 +360,11 @@ export function formatSparkEstateTopNavigationReport(
   lines.push("", "Room menu — My Work Studio:");
   for (const item of SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS) {
     lines.push(`  • ${item.label}`);
+    if (item.id === "create") {
+      for (const nested of SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS) {
+        lines.push(`    ◦ ${nested.label}`);
+      }
+    }
   }
 
   lines.push("", "Room menu — Focus:");
