@@ -20,6 +20,13 @@ import {
   getDiscoveryMemberId,
 } from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
+import { ExperienceControlsOverlay } from "@/components/companion/estate/ExperienceControlsOverlay";
+import { SoundscapeSelectionOverlay } from "@/components/companion/estate/SoundscapeSelectionOverlay";
+import {
+  applyExperienceControlPresentation,
+  getExperienceControlPrefs,
+  patchExperienceControlPrefs,
+} from "@/lib/estate/experienceControlPrefs";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
 import { SparkNoteChrome } from "@/components/companion/SparkNoteChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
@@ -2663,7 +2670,15 @@ export default function CompanionPageClient() {
   const instituteLearningHintRef = useRef<string | null>(null);
   const stablesLearningHintRef = useRef<string | null>(null);
   const previousMomentumPathIdRef = useRef<string | null>(null);
-  const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(true);
+  const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return getExperienceControlPrefs().conversationVisibility !== "hidden";
+  });
+  const [experienceControlsOpen, setExperienceControlsOpen] = useState(false);
+  const [soundscapeSelectionOpen, setSoundscapeSelectionOpen] = useState(false);
+  useEffect(() => {
+    applyExperienceControlPresentation(getExperienceControlPrefs());
+  }, []);
   const [guidedFieldHelpChatOpen, setGuidedFieldHelpChatOpen] = useState(false);
   const [activeChamberMemberId, setActiveChamberMemberId] =
     useState<ChamberMemberId | null>(null);
@@ -10095,7 +10110,24 @@ export default function CompanionPageClient() {
       toggleJustBeHereChat();
       return;
     }
-    setEstateRoomChatVisible((visible) => !visible);
+    setEstateRoomChatVisible((visible) => {
+      const next = !visible;
+      patchExperienceControlPrefs({
+        conversationVisibility: next ? "showing" : "hidden",
+      });
+      return next;
+    });
+  }
+
+  function setEstateRoomChatVisiblePreserving(visible: boolean) {
+    if (justBeHereSession) {
+      setJustBeHereChatVisible(visible);
+      return;
+    }
+    patchExperienceControlPrefs({
+      conversationVisibility: visible ? "showing" : "hidden",
+    });
+    setEstateRoomChatVisible(visible);
   }
 
   /**
@@ -10353,6 +10385,11 @@ export default function CompanionPageClient() {
   }
 
   function handleEstateMenuAction(actionId: EstateMenuActionId) {
+    if (actionId === "experience-controls") {
+      setExperienceControlsOpen(true);
+      return;
+    }
+
     if (actionId === "memory-library") {
       openUserMemoryCore("all");
       return;
@@ -24160,10 +24197,40 @@ export default function CompanionPageClient() {
         onOpenChamber={() => openChamberOfMomentumCore()}
         onOpenBoardroom={() => openBoardroomCore()}
         onOpenBreathe={() => openBreatheOverlayCore()}
-        onPlaySoundscape={(track) => {
+        onOpenPeacefulPlaces={() => openPeacefulPlacesCore({ animate: true })}
+        onOpenSoundscapes={() => setSoundscapeSelectionOpen(true)}
+      />
+
+      <ExperienceControlsOverlay
+        open={experienceControlsOpen}
+        onClose={() => setExperienceControlsOpen(false)}
+        roomId={roomMenuRoomId ?? "welcome-home"}
+        chatVisible={roomMenuChatVisible}
+        onSetChatVisible={setEstateRoomChatVisiblePreserving}
+        onOpenNotifications={() => {
+          setExperienceControlsOpen(false);
+          handleEstateMenuAction("notifications");
+        }}
+      />
+
+      <SoundscapeSelectionOverlay
+        open={soundscapeSelectionOpen}
+        onClose={() => setSoundscapeSelectionOpen(false)}
+        onPlay={(track) => {
           void playExperienceSoundscapeTrack(track);
         }}
       />
+
+      {!roomMenuChatVisible && !experienceControlsOpen ? (
+        <button
+          type="button"
+          className="conversation-visibility-chip"
+          data-testid="show-conversation-chip"
+          onClick={() => setEstateRoomChatVisiblePreserving(true)}
+        >
+          Show Conversation
+        </button>
+      ) : null}
 
       <ProfileDestinationHost
         destination={
