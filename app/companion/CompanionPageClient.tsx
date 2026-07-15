@@ -302,6 +302,11 @@ import {
   openCalendarItemIntent,
   type CalendarItemOpenSource,
 } from "@/lib/calendar/openCalendarItem";
+import {
+  openMemberCalendarExternal,
+  resolveMemberCalendarOpenTarget,
+} from "@/lib/calendar/memberCalendarDestination";
+import { fetchConnectedCalendarsSnapshot } from "@/lib/connectedCalendars";
 import { TopBar } from "@/components/companion/TopBar";
 import { FreshStartConfirmDialog } from "@/components/companion/FreshStartConfirmDialog";
 import { SimpleChat } from "@/components/companion/SimpleChat";
@@ -8397,8 +8402,9 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Calendar — dedicated Connected Calendars room (My Workday).
-   * Never opens Momentum Appointments, Plan My Day, Rhythms, Reminders, or Settings.
+   * Calendar — opens the member's connected calendar (Google or Outlook —
+   * whichever they use) when known, and the Spark Calendar room for connect /
+   * planning events. Never Momentum Appointments or Plan My Day shell.
    */
   function openCalendarCore() {
     leaveClearMyMindIfNavigatingAway();
@@ -8410,6 +8416,17 @@ export default function CompanionPageClient() {
     trackWorkspaceEcosystemEvent("calendar");
     noteWorkspaceOpened("calendar", "standalone_room");
     openStandaloneFocusSectionCore("calendar");
+    // Open their real calendar when we know which one they use.
+    void fetchConnectedCalendarsSnapshot()
+      .then((snapshot) => {
+        const target = resolveMemberCalendarOpenTarget(snapshot);
+        if (target.kind === "external") {
+          openMemberCalendarExternal(target.provider);
+        }
+      })
+      .catch(() => {
+        /* stay in Spark Calendar room */
+      });
   }
 
   /**

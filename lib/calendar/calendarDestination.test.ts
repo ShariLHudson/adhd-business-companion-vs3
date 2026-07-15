@@ -41,6 +41,9 @@ describe("Calendar My Workday destination", () => {
     expect(fn).toBeTruthy();
     expect(fn).toContain('openStandaloneFocusSectionCore("calendar")');
     expect(fn).toContain('noteWorkspaceOpened("calendar", "standalone_room")');
+    // Also opens the member's connected Google/Outlook calendar when known.
+    expect(fn).toContain("resolveMemberCalendarOpenTarget");
+    expect(fn).toContain("openMemberCalendarExternal");
     expect(fn).not.toContain("time-block");
     expect(fn).not.toContain("openPlanMyDayCore");
     expect(fn).not.toContain("openRhythmsCore");

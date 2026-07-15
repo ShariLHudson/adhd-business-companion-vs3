@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  MEMBER_CALENDAR_EXTERNAL_URLS,
+  readPreferredCalendarProvider,
+} from "@/lib/calendar/memberCalendarDestination";
 import { compareDropdownLabels, sortByDropdownLabel } from "@/lib/dropdownSort";
 import {
   getPrefs,
@@ -11,10 +15,12 @@ import {
   SORTED_DATE_FORMAT_OPTIONS,
   SORTED_LANGUAGE_OPTIONS,
   SORTED_REGION_OPTIONS,
+  SORTED_TIME_FORMAT_OPTIONS,
   languageCommunicationSummary,
   type LanguageCode,
   type RegionCode,
   type DateFormat,
+  type TimeFormat,
   withUnifiedAppLanguage,
   type AiTone,
   type HelpMode,
@@ -258,6 +264,7 @@ export function SettingsPanel({
   const [voiceLanguage, setVoiceLanguage] = useState<LanguageCode>("en");
   const [region, setRegion] = useState<RegionCode>("US");
   const [dateFormat, setDateFormat] = useState<DateFormat>("MM/DD/YYYY");
+  const [timeFormat, setTimeFormat] = useState<TimeFormat>("12h");
   const [g, setG] = useState<{
     configured: boolean;
     connected: boolean;
@@ -318,6 +325,7 @@ export function SettingsPanel({
     setVoiceLanguage(p.voiceLanguage);
     setRegion(p.region);
     setDateFormat(p.dateFormat);
+    setTimeFormat(p.timeFormat);
     setPerm(readPerm());
     const rec = getRecognitionStore();
     setCelebrationMode(rec.celebrationMode);
@@ -371,6 +379,7 @@ export function SettingsPanel({
         voiceLanguage,
         region,
         dateFormat,
+        timeFormat,
       }),
     },
     { id: "notifications", label: "Notifications", value: alerts ? "On" : "Off" },
@@ -583,6 +592,7 @@ export function SettingsPanel({
       setVoiceLanguage(next.voiceLanguage);
       setRegion(next.region);
       setDateFormat(next.dateFormat);
+      setTimeFormat(next.timeFormat);
     }
     return (
       <div className={wrap}>
@@ -632,6 +642,14 @@ export function SettingsPanel({
             value={dateFormat}
             options={SORTED_DATE_FORMAT_OPTIONS}
             onChange={(v) => saveLang({ dateFormat: v as DateFormat })}
+          />
+          <LanguageField
+            id="lang-time"
+            label="Time format"
+            hint="How times appear across Spark — 12-hour or 24-hour military time."
+            value={timeFormat}
+            options={SORTED_TIME_FORMAT_OPTIONS}
+            onChange={(v) => saveLang({ timeFormat: v as TimeFormat })}
           />
         </div>
       </div>
@@ -1246,12 +1264,22 @@ export function SettingsPanel({
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {[
-              { label: "Calendar", url: "https://calendar.google.com" },
+              {
+                label: "My Calendar",
+                url:
+                  readPreferredCalendarProvider() === "outlook"
+                    ? MEMBER_CALENDAR_EXTERNAL_URLS.outlook
+                    : MEMBER_CALENDAR_EXTERNAL_URLS.google,
+              },
               { label: "Docs", url: "https://docs.google.com" },
               { label: "Drive", url: "https://drive.google.com" },
               {
                 label: "Outlook Calendar",
-                url: "https://outlook.office.com/calendar/",
+                url: MEMBER_CALENDAR_EXTERNAL_URLS.outlook,
+              },
+              {
+                label: "Google Calendar",
+                url: MEMBER_CALENDAR_EXTERNAL_URLS.google,
               },
             ].map((link) => (
               <a

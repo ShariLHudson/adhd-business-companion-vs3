@@ -17,6 +17,7 @@ import {
   type TimeBlock,
 } from "@/lib/companionStore";
 import {
+  deletePlanItem,
   readTodayPlanItems,
   saveTodayPlanItems,
   updatePlanItem,
@@ -151,6 +152,26 @@ describe("openCalendarItem — legacy Momentum Appointment compatibility", () =>
     const item = ensureCalendarPlanItem("ready-1");
     expect(item?.id).toBe("tb-ready-1");
     expect(item?.title).toBe("When ready");
+  });
+
+  it("deleting a legacy calendar item removes the time-block so it cannot return", () => {
+    seedLegacyAppointment({
+      id: "del-1",
+      title: "Ghost appointment",
+      note: "should stay gone",
+    });
+    const item = ensureCalendarPlanItem("del-1")!;
+    expect(getTimeBlocks().some((b) => b.id === "del-1")).toBe(true);
+
+    deletePlanItem(readTodayPlanItems(), item.id);
+
+    expect(getTimeBlocks().some((b) => b.id === "del-1")).toBe(false);
+    expect(
+      readTodayPlanItems().some(
+        (i) => i.id === "tb-del-1" || i.sourceTimeBlockId === "del-1",
+      ),
+    ).toBe(false);
+    expect(ensureCalendarPlanItem("del-1")).toBeNull();
   });
 });
 
