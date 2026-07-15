@@ -42,6 +42,12 @@ describe("chamberMemberAliases", () => {
     }
   });
 
+  it("resolves Execution Manager to Momentum Intelligence", () => {
+    const r = resolveChamberMemberFromText("Talk to the Execution Manager");
+    expect(r.kind).toBe("match");
+    if (r.kind === "match") expect(r.match.memberId).toBe("momentum");
+  });
+
   it("resolves finance and sales aliases", () => {
     expect(resolveChamberMemberFromText("Open Finance").kind).toBe("match");
     expect(resolveChamberMemberFromText("I need help with invoicing").kind).toBe(

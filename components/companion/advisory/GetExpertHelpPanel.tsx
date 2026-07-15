@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import "@/components/companion/guided-stages/guidedStageEntry.css";
 import {
   CHAMBER_MEMBERS,
   getChamberMemberById,
@@ -204,7 +205,7 @@ export function GetExpertHelpPanel({
     if (rec.path === "research_with_shari") {
       setPhase("research_redirect");
       setNotice(
-        "Research is separate. Close this panel and use Research This With Shari — not Chamber or Board.",
+        "Deep research stays with Shari in conversation — not Chamber or Board. Close this and ask in chat when you want to dig in.",
       );
       return;
     }
@@ -226,16 +227,18 @@ export function GetExpertHelpPanel({
     }
   }
 
-  const chamberList =
-    phase === "browse_chamber" && memberFilter.trim()
-      ? CHAMBER_MEMBERS.filter((m) => {
-          const q = memberFilter.toLowerCase();
-          return (
-            m.displayName.toLowerCase().includes(q) ||
-            m.specialty.toLowerCase().includes(q)
-          );
-        })
-      : CHAMBER_MEMBERS.filter((m) => recommendedChamber.includes(m.id));
+  const chamberList = (() => {
+    if (phase === "browse_chamber") {
+      const q = memberFilter.trim().toLowerCase();
+      if (!q) return [...CHAMBER_MEMBERS];
+      return CHAMBER_MEMBERS.filter(
+        (m) =>
+          m.displayName.toLowerCase().includes(q) ||
+          m.specialty.toLowerCase().includes(q),
+      );
+    }
+    return CHAMBER_MEMBERS.filter((m) => recommendedChamber.includes(m.id));
+  })();
 
   const boardSummary = board ? summarizeBoardForOverlay(board) : null;
 
@@ -411,16 +414,31 @@ export function GetExpertHelpPanel({
             >
               Invite Chamber specialist
             </button>
-            <button
-              type="button"
-              className="guided-estate-field__help-btn"
-              onClick={() => {
-                setMemberFilter("");
-                setPhase("pick_chamber");
-              }}
-            >
-              Show recommended
-            </button>
+            {phase === "browse_chamber" ? (
+              <button
+                type="button"
+                className="guided-estate-field__help-btn"
+                onClick={() => {
+                  setMemberFilter("");
+                  setPhase("pick_chamber");
+                }}
+                data-testid="expert-show-recommended-chamber"
+              >
+                Show recommended
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="guided-estate-field__help-btn"
+                onClick={() => {
+                  setMemberFilter("");
+                  setPhase("browse_chamber");
+                }}
+                data-testid="expert-browse-all-chamber"
+              >
+                Browse all Chamber specialists
+              </button>
+            )}
           </div>
         </div>
       )}
@@ -489,7 +507,7 @@ export function GetExpertHelpPanel({
                   ? CHAMBER_PATH_LABEL
                   : shariRec.path === "take_to_board"
                     ? BOARD_PATH_LABEL
-                    : "Research This With Shari"}
+                    : "Ask Shari in conversation"}
             </strong>
           </p>
           <div className="guided-stage-complete__actions">
@@ -515,8 +533,9 @@ export function GetExpertHelpPanel({
       {phase === "research_redirect" ? (
         <div data-testid="research-path-redirect">
           <p className="get-expert-help-panel__lead">
-            Research stays on Research This With Shari — separate from Chamber
-            and Board.
+            Deep research stays with Shari in conversation — separate from
+            Chamber and Board. Close this and ask in chat when you want to dig
+            in.
           </p>
           <button
             type="button"

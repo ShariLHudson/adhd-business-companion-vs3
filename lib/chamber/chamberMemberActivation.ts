@@ -55,8 +55,17 @@ export function readActiveChamberMember(): ActiveChamberMemberState | null {
     const raw = sessionStorage.getItem(CHAMBER_ACTIVE_MEMBER_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as ActiveChamberMemberState;
-    if (!parsed?.id || !getChamberMemberById(parsed.id)) return null;
-    return parsed;
+    const member = parsed?.id ? getChamberMemberById(parsed.id) : undefined;
+    if (!member) return null;
+    // Always refresh portrait/name from the canonical registry — never trust
+    // stale session paths from older image filenames.
+    return {
+      id: member.id,
+      displayName: member.displayName,
+      specialty: member.specialty,
+      cardImagePath: member.cardImagePath,
+      activatedAt: parsed.activatedAt || new Date().toISOString(),
+    };
   } catch {
     return null;
   }

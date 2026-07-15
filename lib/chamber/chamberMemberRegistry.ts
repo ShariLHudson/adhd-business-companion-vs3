@@ -319,6 +319,15 @@ const MEMBER_BY_ID = new Map<ChamberMemberId, ChamberMember>(
   CHAMBER_MEMBERS.map((member) => [member.id, member]),
 );
 
+/**
+ * Canonical active Chamber roster.
+ * Every Chamber gallery / profile / conversation portrait must read from here.
+ * Board directors are a separate registry — never merge or fall back to Board.
+ */
+export function listActiveChamberMembers(): readonly ChamberMember[] {
+  return CHAMBER_MEMBERS;
+}
+
 export function getChamberMemberById(
   id: string,
 ): ChamberMember | undefined {

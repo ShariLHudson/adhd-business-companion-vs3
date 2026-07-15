@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import {
-  CHAMBER_MEMBERS,
+  listActiveChamberMembers,
   type ChamberMember,
   type ChamberMemberId,
 } from "@/lib/chamber/chamberMemberRegistry";
@@ -10,11 +10,17 @@ import {
   chamberMemberTalkLabel,
   getChamberMemberCardDisplay,
 } from "@/lib/chamber/chamberMemberCardDisplay";
+import { EstateHowToOpenControls } from "@/components/companion/EstateHowToOpenControls";
+import { CHAMBER_HOW_TO_GUIDE } from "@/lib/estateRoomGuides";
 import "@/app/companion/chamber-member-gallery.css";
+import "@/app/companion/estate-how-to-guide.css";
 
 type Props = {
   activeMemberId?: ChamberMemberId | null;
   onTalkWithMember: (memberId: ChamberMemberId) => void;
+  howToOpen?: boolean;
+  onOpenHowTo?: () => void;
+  onCloseHowTo?: () => void;
 };
 
 function ChamberMemberCard({
@@ -76,16 +82,21 @@ function ChamberMemberCard({
   );
 }
 
-/** Desktop: 3 cards across; rows scroll vertically. */
+/** Desktop: 2 cards across; full roster scrolls vertically. */
 export function ChamberMemberGallery({
   activeMemberId = null,
   onTalkWithMember,
+  howToOpen = false,
+  onOpenHowTo,
 }: Props) {
+  const members = listActiveChamberMembers();
+
   return (
     <section
       className="chamber-member-gallery"
       aria-label="Chamber Members"
       data-testid="chamber-member-gallery"
+      data-member-total={members.length}
     >
       <header className="chamber-member-gallery__header">
         <p className="chamber-member-gallery__kicker">Chamber of Momentum</p>
@@ -94,14 +105,32 @@ export function ChamberMemberGallery({
           Twenty-four specialized intelligences — choose who to talk with. Your
           conversation and context stay exactly where they are.
         </p>
+        <p className="chamber-member-gallery__scroll-hint">
+          Scroll to see all {members.length} members. Filters are optional —
+          everyone starts visible.
+        </p>
+        {onOpenHowTo ? (
+          <EstateHowToOpenControls
+            content={CHAMBER_HOW_TO_GUIDE}
+            onOpen={onOpenHowTo}
+            onDark
+            className="chamber-member-gallery__how-to"
+          />
+        ) : null}
       </header>
-      <div className="chamber-member-gallery__scroll">
+      <div
+        className="chamber-member-gallery__scroll"
+        hidden={howToOpen ? true : undefined}
+        aria-hidden={howToOpen || undefined}
+      >
         <div
           className="chamber-member-gallery__grid"
           role="list"
-          data-member-count={CHAMBER_MEMBERS.length}
+          data-member-count={members.length}
+          tabIndex={-1}
+          data-testid="chamber-member-gallery-grid"
         >
-          {CHAMBER_MEMBERS.map((member) => (
+          {members.map((member) => (
             <div key={member.id} role="listitem" className="chamber-member-gallery__item">
               <ChamberMemberCard
                 member={member}

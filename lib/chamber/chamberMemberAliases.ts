@@ -138,7 +138,13 @@ export const CHAMBER_MEMBER_ALIASES: Record<ChamberMemberId, readonly string[]> 
   "creative-studio": ["creative studio", "creative direction", "creative"],
   innovations: ["innovations", "innovation", "new ideas"],
   horizons: ["horizons", "future vision", "long-term vision"],
-  momentum: ["momentum intelligence", "momentum member", "keep moving"],
+  momentum: [
+    "momentum intelligence",
+    "momentum member",
+    "keep moving",
+    "execution manager",
+    "execution",
+  ],
 };
 
 export type ChamberMemberMatch = {

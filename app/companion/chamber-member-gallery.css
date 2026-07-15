@@ -43,14 +43,28 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
+.chamber-member-gallery__how-to {
+  margin-top: 0.75rem;
+}
+
+.chamber-member-gallery__scroll-hint {
+  margin: 0.55rem 0 0;
+  max-width: 36rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: rgba(255, 252, 245, 0.82);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
 .chamber-member-gallery__scroll {
   flex: 1;
   min-height: 0;
-  max-height: min(62vh, 44rem);
+  max-height: min(78vh, 56rem);
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-right: 0.15rem;
+  scrollbar-gutter: stable;
 }
 
 .chamber-member-gallery__grid {
@@ -66,17 +80,11 @@
   min-height: 0;
 }
 
+/* Desktop + tablet: two columns so the full roster stays discoverable */
 @media (min-width: 40rem) {
   .chamber-member-gallery__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.2rem;
-  }
-}
-
-@media (min-width: 64rem) {
-  .chamber-member-gallery__grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.35rem;
+    gap: 1.25rem;
   }
 }
 
