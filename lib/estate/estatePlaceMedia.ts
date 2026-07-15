@@ -48,7 +48,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "grand-terrace": estateBackgroundPath("grand-terrace-background.png"),
   "lakeside-verandah": estateBackgroundPath("grand-terrace-background.png"),
   "lakeside-hammock": estateBackgroundPath("water-lakeside-hammock-background.png"),
-  "discovery-room": estateBackgroundPath("room-discovery-room-background.png"),
+  "discovery-room": estateBackgroundPath("writing-room-2-background.png"),
   "estate-gardens": estateBackgroundPath("spark-estate-photo-background.png"),
   "music-room": estateBackgroundPath("writing-room-background.png"),
   greenhouse: estateBackgroundPath("greenhouse-background.png"),
@@ -103,7 +103,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "the-swing-beneath-the-oak": estateBackgroundPath("swing-background.png"),
   "window-seat": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   balcony: estateBackgroundPath("grand-terrace-background.png"),
-  "woodland-path": estateBackgroundPath("swing-background.png"),
+  "woodland-path": estateBackgroundPath("woodland-pathway.png"),
   "main-staircase": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   "stairway-reading-nook": estateBackgroundPath(
     "reading-nook-under-stairway-background.png",

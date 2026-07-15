@@ -39,10 +39,11 @@ describe("Explore Spark visual navigation", () => {
     }
   });
 
-  it("does not treat Create as an Explore Spark destination", () => {
-    expect(isExploreSparkForbiddenPlaceId("creative-studio")).toBe(true);
+  it("does not treat Create / content-generator as Explore Spark destinations", () => {
     expect(isExploreSparkForbiddenPlaceId("content-generator")).toBe(true);
     expect(isExploreSparkForbiddenPlaceId("create")).toBe(true);
+    expect(isExploreSparkForbiddenPlaceId("clear-my-mind")).toBe(true);
+    expect(isExploreSparkForbiddenPlaceId("creative-studio")).toBe(false);
     expect(isExploreSparkForbiddenPlaceId("library")).toBe(false);
   });
 
@@ -71,7 +72,10 @@ describe("Explore Spark visual navigation", () => {
 
   it("resolves You-are-here from place ids", () => {
     expect(exploreMapLocationIdForPlaceId("welcome-home")).toBe("welcome-home");
-    expect(exploreMapLocationIdForPlaceId("creative-studio")).toBeUndefined();
+    expect(exploreMapLocationIdForPlaceId("creative-studio")).toBe(
+      "creative-studio",
+    );
+    expect(exploreMapLocationIdForPlaceId("create")).toBeUndefined();
   });
 
   it("meta navigation opens the visual explorer for Explore Spark", () => {

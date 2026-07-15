@@ -3,6 +3,7 @@
  */
 
 export type EstateExploreCategory =
+  | "entry"
   | "rooms"
   | "grounds"
   | "outbuildings"
@@ -19,12 +20,20 @@ export type EstateExploreDestinationType =
   | "room"
   | "external";
 
+/** Directory card / destination media kind — never put `.mp4` in `imagePath`. */
+export type EstateExploreMediaType = "image" | "video";
+
 export type EstateExploreDestination = {
   id: string;
   name: string;
   aliases?: string[];
   category: EstateExploreCategory;
+  /** Poster / still for directory cards (always an image URL). */
   imagePath: string;
+  /** Room experience media — video destinations use experience video on open. */
+  mediaType: EstateExploreMediaType;
+  /** Exact public video path when `mediaType` is `"video"`. */
+  videoPath?: string;
   description: string;
   destinationType: EstateExploreDestinationType;
   destinationId: string;

@@ -46,6 +46,8 @@ function DestinationCard({
       data-testid={`explore-estate-card-${destination.id}`}
       data-destination-id={destination.destinationId}
       data-category={destination.category}
+      data-media-type={destination.mediaType}
+      data-video-path={destination.videoPath ?? ""}
       data-image-ready={showImage ? "true" : "false"}
       aria-label={`${destination.name}. ${destination.description}${
         isHere ? ". You are here." : ""
@@ -107,6 +109,7 @@ function toDestination(location: EstateMapLocation): EstateExploreDestination {
     name: location.name,
     category: "other",
     imagePath: location.image,
+    mediaType: "image",
     description: location.mood,
     destinationType: "room",
     destinationId: location.id,

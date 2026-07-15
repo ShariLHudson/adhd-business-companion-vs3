@@ -18,81 +18,234 @@ function listManifestPlaces(): EstateManifestPlaceRecord[] {
   return getManifestDocument().places;
 }
 
-/** Never appear as Explore Estate cards. */
+/**
+ * Never appear as Explore Estate cards and never resolve as Explore navigation.
+ * Create / Clear My Mind stay excluded; Creative Studio & Art Studio are catalog rooms.
+ */
 export const EXPLORE_ESTATE_FORBIDDEN_IDS = [
-  "creative-studio",
   "content-generator",
   "create",
-  "art-studio",
   "strategy-studio",
   "clear-my-mind",
   "brain-dump",
 ] as const;
 
+/**
+ * Hide from Explore catalog only (room identity preserved elsewhere).
+ * These share a background plate with a kept card — showing both looks like
+ * duplicate images in Estate Navigation / Explore Estate.
+ */
+const EXPLORE_CATALOG_EXCLUDED_IDS = new Set([
+  // Removed from Explore Estate (member-facing list)
+  "personal-library",
+  "stairway-reading-nook",
+  "main-staircase",
+  "window-seat",
+  "momentum-builder",
+  "momentum-room",
+  "lakeside-verandah",
+  "balcony",
+  "personal-deck",
+  "the-swing-beneath-the-oak",
+  "reflection-tree-main",
+  "porch-swing",
+  "observatory",
+  "observatory-day-outside",
+  "observatory-day-inside",
+  "observatory-night-outside",
+  // Same plate as Tea Room
+  "coffee-house",
+  // Same plate as Seat at Pond
+  "peaceful-places",
+  // Same plate as Greenhouse
+  "garden-bench",
+  // Same plate as Possibility House / Treehouse staircase
+  "house-possibility-legacy-room",
+  "house-possibility-window-nook",
+  // Writing Room reuses Music Room plate — keep Music Room in Indoor Spaces
+  "writing-room",
+]);
+
+/** Exact experience videos for Explore destinations (never used as card imagePath). */
+export const EXPLORE_ESTATE_VIDEO_PATHS: Readonly<Record<string, string>> = {
+  conservatory: "/Videos/aquarium-room-video.mp4",
+  "butterfly-house": "/Videos/butterfly-house-video.mp4",
+};
+
 /** Prefer product language over raw manifest display names. */
 const DISPLAY_NAME_OVERRIDES: Readonly<Record<string, string>> = {
+  "spark-estate": "Spark Estate Entry",
   "house-possibility-outside": "Possibility House",
   "round-table": "Round Table Boardroom",
-  "fireside-deck": "Back Deck",
-  "personal-deck": "Private Deck",
+  "personal-library": "Reading Nook Under Stairway",
+  portfolio: "Hall of Achievements",
+  "estate-gardens": "Estate Garden",
+  "the-swing-beneath-the-oak": "Tree Swing",
+  "lakeside-hammock": "Lakeside Hammock",
+  "seat-at-pond": "Seat at Pond",
+  stables: "Stables",
+  "personal-deck": "Personal Deck",
   "summer-terrace": "Swimming Pool",
+  "observatory-day-outside": "Observatory Daytime",
+  "observatory-day-inside": "Observatory Inside",
   conservatory: "Aquarium Room",
-  "butterfly-house": "Butterfly Conservatory",
 };
 
 /** Route overrides when legacy_place_id differs from live navigation id. */
 const DESTINATION_ID_OVERRIDES: Readonly<Record<string, string>> = {
   "momentum-institute": "chamber-of-momentum",
   "round-table": "boardroom",
+  "project-room": "goals-projects",
 };
 
 /** Prefer a dedicated plate when the manifest primary is a borrowed asset. */
 const IMAGE_PATH_OVERRIDES: Readonly<Record<string, string>> = {
   "round-table": "/backgrounds/round-table-boardroom-background.png",
   "destination-gallery": "/backgrounds/destination-gallery-background.png",
+  "art-studio": "/backgrounds/art-studio-background.png",
+  "project-room": "/backgrounds/project-room.png",
+  portfolio: "/backgrounds/hall-of-achievements-room-background.png",
+  "game-room": "/backgrounds/game-room-background.png",
+  "gallery-of-firsts": "/backgrounds/gallery-background.png",
+  "creative-studio": "/backgrounds/creative-studio-background.png",
+  "cartographers-studio":
+    "/backgrounds/cartoghraphers-studio-background.png",
+  "woodland-path": "/backgrounds/woodland-pathway.png",
+  "discovery-room": "/backgrounds/writing-room-2-background.png",
+  "horizon-point": "/backgrounds/horizon-point-background.png",
+  "grand-terrace": "/backgrounds/grand-terrace-background.png",
+  "fireside-deck": "/backgrounds/fireside-deck-background.PNG",
+  "estate-back-deck": "/backgrounds/estate-back-deck.png",
+  breathe: "/backgrounds/breathing-exercise-background.png",
+  "back-fireside-deck-rain":
+    "/backgrounds/back-fireside-deck-rain-background.png",
+  // Distinct from Spark Estate Entry (manifest reused estate entry photo)
+  "estate-gardens": "/backgrounds/estate-garden-background.png",
+  gardens: "/backgrounds/celebrations-garden-background.png",
+  // Dedicated plate (manifest reused writing-room plate)
+  "music-room": "/backgrounds/music-room-background.png",
 };
 
 /** Known missing public assets (do not invent replacements). */
 const KNOWN_MISSING_IMAGE_FILES = new Set([
   "room-discovery-room-background.png",
-  "destination-gallery.png",
 ]);
 
 const CATEGORY_ORDER: EstateExploreCategory[] = [
+  "entry",
   "rooms",
+  "creative",
   "work",
   "advisory",
   "reflection",
   "peaceful",
   "grounds",
   "outbuildings",
-  "creative",
   "other",
 ];
 
 export const EXPLORE_CATEGORY_LABELS: Record<EstateExploreCategory, string> = {
-  rooms: "Rooms",
+  entry: "Estate Entry",
+  rooms: "Indoor Spaces",
   work: "Work and Business",
   advisory: "Advisory and Decision Spaces",
   reflection: "Reflection and Progress",
   peaceful: "Peaceful Places",
-  grounds: "Grounds and Outdoor Spaces",
+  grounds: "Outside Spaces",
   outbuildings: "Outbuildings",
   creative: "Creative Spaces",
   other: "Other Places",
 };
 
+/** Preferred order within a category (unlisted ids sort alphabetically after). */
+const CATEGORY_PREFERRED_ORDER: Readonly<
+  Partial<Record<EstateExploreCategory, readonly string[]>>
+> = {
+  entry: ["spark-estate", "welcome-home"],
+  rooms: [
+    "study-hall",
+    "reading-nook",
+    "tea-room",
+    "music-room",
+    "celebration-room",
+    "art-studio",
+    "project-room",
+    "portfolio",
+    "game-room",
+    "gallery-of-firsts",
+    "creative-studio",
+    "cartographers-studio",
+    "conservatory",
+    "butterfly-house",
+    "discovery-room",
+  ],
+  grounds: [
+    "greenhouse",
+    "estate-gardens",
+    "woodland-path",
+    "apple-orchard",
+    "lakeside-hammock",
+    "summer-terrace",
+    "seat-at-pond",
+    "stables",
+    "gardens",
+    "horizon-point",
+    "grand-terrace",
+    "fireside-deck",
+    "estate-back-deck",
+    "breathe",
+    "back-fireside-deck-rain",
+  ],
+};
+
 const ID_CATEGORY_OVERRIDES: Readonly<Record<string, EstateExploreCategory>> = {
+  "spark-estate": "entry",
+  "welcome-home": "entry",
   "round-table": "advisory",
   "momentum-institute": "advisory",
   "chamber-of-momentum": "advisory",
   "decision-compass": "advisory",
-  stables: "outbuildings",
-  greenhouse: "outbuildings",
-  observatory: "outbuildings",
-  "observatory-day-inside": "outbuildings",
-  "observatory-day-outside": "outbuildings",
-  "observatory-night-outside": "outbuildings",
+  "study-hall": "rooms",
+  "personal-library": "rooms",
+  "reading-nook": "rooms",
+  "tea-room": "rooms",
+  "music-room": "rooms",
+  "celebration-room": "rooms",
+  "art-studio": "rooms",
+  "project-room": "rooms",
+  portfolio: "rooms",
+  "game-room": "rooms",
+  "gallery-of-firsts": "rooms",
+  "creative-studio": "rooms",
+  "cartographers-studio": "rooms",
+  "butterfly-house": "rooms",
+  conservatory: "rooms",
+  "discovery-room": "rooms",
+  greenhouse: "grounds",
+  "estate-gardens": "grounds",
+  "the-swing-beneath-the-oak": "grounds",
+  "woodland-path": "grounds",
+  "apple-orchard": "grounds",
+  "lakeside-hammock": "grounds",
+  "summer-terrace": "grounds",
+  "seat-at-pond": "grounds",
+  stables: "grounds",
+  gardens: "grounds",
+  "personal-deck": "grounds",
+  observatory: "grounds",
+  "observatory-day-inside": "grounds",
+  "observatory-day-outside": "grounds",
+  "observatory-night-outside": "grounds",
+  "horizon-point": "grounds",
+  "grand-terrace": "grounds",
+  "fireside-deck": "grounds",
+  "estate-back-deck": "grounds",
+  breathe: "grounds",
+  "back-fireside-deck-rain": "grounds",
+  "porch-swing": "grounds",
+  balcony: "grounds",
+  "lakeside-verandah": "grounds",
+  "garden-bench": "grounds",
   "house-possibility-outside": "outbuildings",
   "house-possibility-discovery-chest": "outbuildings",
   "house-possibility-reflection-desk": "outbuildings",
@@ -100,38 +253,21 @@ const ID_CATEGORY_OVERRIDES: Readonly<Record<string, EstateExploreCategory>> = {
   "house-possibility-window-nook": "outbuildings",
   "house-possibility-staircase": "outbuildings",
   "house-possibility-studio": "outbuildings",
-  "garden-bench": "grounds",
   "peaceful-places": "peaceful",
-  "seat-at-pond": "peaceful",
-  "music-room": "peaceful",
-  "fireside-deck": "peaceful",
-  "personal-deck": "peaceful",
-  "grand-terrace": "peaceful",
-  "summer-terrace": "peaceful",
-  "lakeside-hammock": "peaceful",
-  "lakeside-verandah": "peaceful",
-  "porch-swing": "peaceful",
-  balcony: "peaceful",
   journal: "reflection",
   "evidence-vault": "reflection",
-  portfolio: "reflection",
-  "celebration-room": "reflection",
-  gardens: "reflection",
-  "apple-orchard": "grounds",
-  "estate-gardens": "grounds",
-  "woodland-path": "grounds",
-  "the-swing-beneath-the-oak": "grounds",
-  "reflection-tree-main": "grounds",
-  "spark-estate": "grounds",
   "writing-room": "creative",
   "momentum-builder": "work",
   "momentum-room": "work",
-  "study-hall": "work",
   "destination-gallery": "work",
 };
 
 function isForbidden(id: string): boolean {
   return (EXPLORE_ESTATE_FORBIDDEN_IDS as readonly string[]).includes(id);
+}
+
+function isCatalogExcluded(id: string): boolean {
+  return EXPLORE_CATALOG_EXCLUDED_IDS.has(id);
 }
 
 function mapManifestCategory(
@@ -146,16 +282,21 @@ function mapManifestCategory(
 
   switch (place.category) {
     case "Welcome":
+      return place.legacy_place_id === "spark-estate" ||
+        place.legacy_place_id === "welcome-home"
+        ? "entry"
+        : "rooms";
     case "Living":
     case "Reading":
     case "Learning":
+    case "Play":
       return "rooms";
     case "Planning":
     case "Profile":
       return "work";
     case "Creation":
     case "Creative":
-      return "creative";
+      return "rooms";
     case "Reflection":
     case "Archive":
       return "reflection";
@@ -167,7 +308,6 @@ function mapManifestCategory(
     case "Research":
     case "Discovery":
       return "outbuildings";
-    case "Play":
     case "Destination":
     default:
       return "other";
@@ -190,6 +330,13 @@ function resolveImagePath(place: EstateManifestPlaceRecord): {
     imagePath && primary && !KNOWN_MISSING_IMAGE_FILES.has(primary),
   );
   return { imagePath: imagePath || "", imageReady };
+}
+
+function resolveVideoPath(placeId: string): string | undefined {
+  const override = EXPLORE_ESTATE_VIDEO_PATHS[placeId];
+  if (override) return override;
+  const media = getPlaceMedia(placeId);
+  return media.videoUrl ?? undefined;
 }
 
 function focalFor(place: EstateManifestPlaceRecord): string {
@@ -221,6 +368,7 @@ function buildFromManifestPlace(
 ): EstateExploreDestination | null {
   if (!place.navigable) return null;
   if (isForbidden(place.legacy_place_id)) return null;
+  if (isCatalogExcluded(place.legacy_place_id)) return null;
 
   const { imagePath, imageReady } = resolveImagePath(place);
   const destinationId =
@@ -240,12 +388,17 @@ function buildFromManifestPlace(
     ),
   ];
 
+  const videoPath = resolveVideoPath(place.legacy_place_id);
+  const mediaType = videoPath ? ("video" as const) : ("image" as const);
+
   return {
     id: place.legacy_place_id,
     name,
     aliases,
     category: mapManifestCategory(place),
     imagePath,
+    mediaType,
+    videoPath,
     description: descriptionFor(place),
     destinationType: "room",
     destinationId,
@@ -259,10 +412,20 @@ function buildFromManifestPlace(
   };
 }
 
+function supplementalDestination(
+  dest: Omit<EstateExploreDestination, "mediaType" | "videoPath"> &
+    Partial<Pick<EstateExploreDestination, "mediaType" | "videoPath">>,
+): EstateExploreDestination {
+  return {
+    mediaType: "image",
+    ...dest,
+  };
+}
+
 /** Extra approved destinations with assets that are not navigable in the manifest. */
 function buildSupplementalDestinations(): EstateExploreDestination[] {
-  const extras: EstateExploreDestination[] = [
-    {
+  return [
+    supplementalDestination({
       id: "destination-gallery",
       name: "Destination Gallery",
       aliases: ["destination gallery", "the destination gallery"],
@@ -275,8 +438,8 @@ function buildSupplementalDestinations(): EstateExploreDestination[] {
       focalPosition: "center",
       imageReady: true,
       purpose: "Destination",
-    },
-    {
+    }),
+    supplementalDestination({
       id: "founder-office",
       name: "Founder Office",
       aliases: [
@@ -294,9 +457,129 @@ function buildSupplementalDestinations(): EstateExploreDestination[] {
       focalPosition: "center",
       imageReady: true,
       purpose: "Profile",
-    },
+    }),
+    supplementalDestination({
+      id: "project-room",
+      name: "Project Room",
+      aliases: ["project room", "the project room", "goals and projects"],
+      category: "rooms",
+      imagePath: "/backgrounds/project-room.png",
+      description: "A calm indoor space for the work you are building.",
+      destinationType: "room",
+      destinationId: "goals-projects",
+      isAvailable: true,
+      focalPosition: "center",
+      imageReady: true,
+      purpose: "Planning",
+    }),
+    supplementalDestination({
+      id: "cartographers-studio",
+      name: "Cartographer's Studio",
+      aliases: [
+        "cartographers studio",
+        "cartographer's studio",
+        "cartographer studio",
+        "visual focus",
+      ],
+      category: "rooms",
+      imagePath: "/backgrounds/cartoghraphers-studio-background.png",
+      description: "Map ideas and connections in a quiet studio.",
+      destinationType: "room",
+      destinationId: "cartographers-studio",
+      isAvailable: true,
+      focalPosition: "center",
+      imageReady: true,
+      purpose: "Creation",
+    }),
+    supplementalDestination({
+      id: "horizon-point",
+      name: "Horizon Point",
+      aliases: ["horizon point", "the horizon point"],
+      category: "grounds",
+      imagePath: "/backgrounds/horizon-point-background.png",
+      description: "An outdoor overlook for quiet perspective.",
+      destinationType: "room",
+      destinationId: "horizon-point",
+      isAvailable: true,
+      focalPosition: "center",
+      imageReady: true,
+      purpose: "Nature",
+    }),
+    supplementalDestination({
+      id: "estate-back-deck",
+      name: "Estate Back Deck",
+      aliases: ["estate back deck", "the estate back deck", "back deck"],
+      category: "grounds",
+      imagePath: "/backgrounds/estate-back-deck.png",
+      description: "An outdoor deck behind the Estate house.",
+      destinationType: "room",
+      destinationId: "estate-back-deck",
+      isAvailable: true,
+      focalPosition: "center bottom",
+      imageReady: true,
+      purpose: "Restoration",
+    }),
+    supplementalDestination({
+      id: "breathe",
+      name: "Breathe",
+      aliases: ["breathe", "breathing", "breathing exercise"],
+      category: "grounds",
+      imagePath: "/backgrounds/breathing-exercise-background.png",
+      description: "A gentle outdoor space to slow down and breathe.",
+      destinationType: "room",
+      destinationId: "breathe",
+      isAvailable: true,
+      focalPosition: "center",
+      imageReady: true,
+      purpose: "Restoration",
+    }),
+    supplementalDestination({
+      id: "back-fireside-deck-rain",
+      name: "Back Fireside Deck Rain",
+      aliases: [
+        "back fireside deck rain",
+        "rainy fireside deck",
+        "fireside deck in the rain",
+      ],
+      category: "grounds",
+      imagePath: "/backgrounds/back-fireside-deck-rain-background.png",
+      description: "A fireside deck under soft rain.",
+      destinationType: "room",
+      destinationId: "back-fireside-deck-rain",
+      isAvailable: true,
+      focalPosition: "center bottom",
+      imageReady: true,
+      purpose: "Restoration",
+    }),
   ];
-  return extras;
+}
+
+function categoryRank(category: EstateExploreCategory): number {
+  const idx = CATEGORY_ORDER.indexOf(category);
+  return idx === -1 ? CATEGORY_ORDER.length : idx;
+}
+
+function preferredRank(
+  category: EstateExploreCategory,
+  id: string,
+): number {
+  const order = CATEGORY_PREFERRED_ORDER[category];
+  if (!order) return Number.MAX_SAFE_INTEGER;
+  const idx = order.indexOf(id);
+  return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+}
+
+function sortExploreDestinations(
+  destinations: EstateExploreDestination[],
+): EstateExploreDestination[] {
+  return [...destinations].sort((a, b) => {
+    const catDiff = categoryRank(a.category) - categoryRank(b.category);
+    if (catDiff !== 0) return catDiff;
+    const prefDiff =
+      preferredRank(a.category, a.id) - preferredRank(b.category, b.id);
+    if (prefDiff !== 0) return prefDiff;
+    return a.name.localeCompare(b.name);
+  });
 }
 
 let cached: EstateExploreDestination[] | null = null;
@@ -317,9 +600,7 @@ export function getExploreEstateDestinations(): EstateExploreDestination[] {
     return true;
   });
 
-  cached = [...fromManifest, ...supplemental].sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
+  cached = sortExploreDestinations([...fromManifest, ...supplemental]);
   return cached;
 }
 
@@ -373,3 +654,71 @@ export function getExploreEstateDestinationById(
 export function resetExploreEstateDestinationsCache(): void {
   cached = null;
 }
+
+/** Member-facing names that must appear exactly once in Explore Estate. */
+export const EXPLORE_ESTATE_REQUIRED_NAMES = [
+  "Spark Estate Entry",
+  "Welcome Home",
+  "Study Hall",
+  "Reading Nook Window",
+  "Tea Room",
+  "Music Room",
+  "Celebration Hall",
+  "Art Studio",
+  "Project Room",
+  "Hall of Achievements",
+  "Game Room",
+  "Gallery",
+  "Creative Studio",
+  "Cartographer's Studio",
+  "Aquarium Room",
+  "Butterfly House",
+  "Discovery Room",
+  "Greenhouse",
+  "Estate Garden",
+  "Woodland Path",
+  "Apple Orchard",
+  "Lakeside Hammock",
+  "Swimming Pool",
+  "Seat at Pond",
+  "Stables",
+  "Celebration Garden",
+  "Horizon Point",
+  "Grand Terrace",
+  "Fireside Deck",
+  "Estate Back Deck",
+  "Breathe",
+  "Back Fireside Deck Rain",
+] as const;
+
+/** Background / poster paths that Explore Estate must resolve for listed rooms. */
+export const EXPLORE_ESTATE_REQUIRED_BACKGROUNDS: Readonly<
+  Record<string, string>
+> = {
+  "art-studio": "/backgrounds/art-studio-background.png",
+  "project-room": "/backgrounds/project-room.png",
+  portfolio: "/backgrounds/hall-of-achievements-room-background.png",
+  "game-room": "/backgrounds/game-room-background.png",
+  "gallery-of-firsts": "/backgrounds/gallery-background.png",
+  "creative-studio": "/backgrounds/creative-studio-background.png",
+  "cartographers-studio":
+    "/backgrounds/cartoghraphers-studio-background.png",
+  "estate-gardens": "/backgrounds/estate-garden-background.png",
+  gardens: "/backgrounds/celebrations-garden-background.png",
+  "music-room": "/backgrounds/music-room-background.png",
+  "woodland-path": "/backgrounds/woodland-pathway.png",
+  "discovery-room": "/backgrounds/writing-room-2-background.png",
+  "horizon-point": "/backgrounds/horizon-point-background.png",
+  "grand-terrace": "/backgrounds/grand-terrace-background.png",
+  "fireside-deck": "/backgrounds/fireside-deck-background.PNG",
+  "estate-back-deck": "/backgrounds/estate-back-deck.png",
+  breathe: "/backgrounds/breathing-exercise-background.png",
+  "back-fireside-deck-rain":
+    "/backgrounds/back-fireside-deck-rain-background.png",
+};
+
+/** Experience video paths that Explore Estate video destinations must resolve. */
+export const EXPLORE_ESTATE_REQUIRED_VIDEOS: Readonly<Record<string, string>> = {
+  conservatory: "/Videos/aquarium-room-video.mp4",
+  "butterfly-house": "/Videos/butterfly-house-video.mp4",
+};

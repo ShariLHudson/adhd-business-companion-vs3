@@ -101,6 +101,8 @@ export function getExploreSparkMapLocations(): EstateMapLocation[] {
 
 /**
  * Stale last-location values that must not hijack Explore Spark.
+ * Creative Studio can appear in the catalog, but a Create-session
+ * last-location must still be ignored when reopening Explore.
  */
 export function isStaleCreateLastLocation(
   value: string | null | undefined,
@@ -109,6 +111,7 @@ export function isStaleCreateLastLocation(
   const v = value.trim().toLowerCase();
   return (
     isExploreSparkForbiddenPlaceId(v) ||
+    v === "creative-studio" ||
     v === "create-studio" ||
     v.includes("content-generator")
   );
