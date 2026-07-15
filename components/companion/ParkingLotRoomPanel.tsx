@@ -363,16 +363,27 @@ export function ParkingLotRoomPanel({
               data-testid="parking-lot-empty"
             >
               <p className="text-base text-[#6b635a]">
-                Nothing is parked right now.
+                Your Parking Lot is empty. Ideas and tasks you set aside will
+                wait here until you are ready.
               </p>
-              <button
-                type="button"
-                className={`${BTN_PRIMARY} mt-4`}
-                onClick={focusAdd}
-                data-testid="parking-lot-empty-add"
-              >
-                Add Something
-              </button>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={BTN_PRIMARY}
+                  onClick={focusAdd}
+                  data-testid="parking-lot-empty-add"
+                >
+                  Add Something
+                </button>
+                <button
+                  type="button"
+                  className={BTN_SECONDARY}
+                  onClick={onBack}
+                  data-testid="parking-lot-empty-return"
+                >
+                  Return to Welcome Home
+                </button>
+              </div>
             </div>
           ) : (
             <ul className="flex flex-col gap-3">
