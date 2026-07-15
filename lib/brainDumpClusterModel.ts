@@ -302,13 +302,55 @@ function buildRelationships(entries: BrainDumpEntry[]): ThoughtRelationship[] {
   return rels.slice(0, 12);
 }
 
+const MEANINGLESS_THEME_LABELS = new Set([
+  "other",
+  "miscellaneous",
+  "unknown",
+  "uncategorized",
+  "misc",
+  "general",
+]);
+
+export type ThemeSummary = {
+  hasMeaningfulTheme: boolean;
+  label?: string;
+  explanation: string;
+};
+
+/** Build a theme only from meaningful categories — never "Other" or raw Markdown. */
+export function buildThemeSummary(
+  subCounts: Map<string, number>,
+): ThemeSummary {
+  if (subCounts.size === 0) {
+    return {
+      hasMeaningfulTheme: false,
+      explanation:
+        "There is not one clear theme yet, and that is completely fine.",
+    };
+  }
+  const ranked = [...subCounts.entries()]
+    .filter(([label]) => !MEANINGLESS_THEME_LABELS.has(label.trim().toLowerCase()))
+    .sort((a, b) => b[1] - a[1]);
+  const top = ranked[0];
+  if (!top || top[1] < 3) {
+    return {
+      hasMeaningfulTheme: false,
+      explanation:
+        "These thoughts cover several different areas, so I would not force them into one theme.",
+    };
+  }
+  return {
+    hasMeaningfulTheme: true,
+    label: top[0],
+    explanation: `Several of these thoughts relate to ${top[0].toLowerCase()}.`,
+  };
+}
+
 function focusSuggestionFromGraph(
   subCounts: Map<string, number>,
 ): string | null {
-  if (subCounts.size === 0) return null;
-  const top = [...subCounts.entries()].sort((a, b) => b[1] - a[1])[0];
-  if (!top || top[1] < 3) return null;
-  return `There appears to be a common theme around **${top[0]}**.`;
+  const theme = buildThemeSummary(subCounts);
+  return theme.explanation;
 }
 
 export function buildBrainDumpClusterGraph(

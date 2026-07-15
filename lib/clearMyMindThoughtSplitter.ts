@@ -153,14 +153,27 @@ function splitOnClauseDelimiters(text: string): string[] | null {
   return segments;
 }
 
-/** Normalize segments after user confirms split — light touch on first segment only. */
-export function normalizeSplitSegments(segments: string[]): string[] {
+/**
+ * Prepare segments for save/display.
+ * Only trim whitespace and drop empties — never strip internal characters,
+ * apostrophes, or rewrite wording. Prefix stripping is opt-in for UI previews only.
+ */
+export function normalizeSplitSegments(
+  segments: string[],
+  opts?: { stripLeadingNeedTo?: boolean },
+): string[] {
   if (!segments.length) return [];
-  const [first, ...rest] = segments;
-  const normalizedFirst = first.replace(FIRST_SEGMENT_PREFIX_RE, "").trim();
-  return [(normalizedFirst || first).trim(), ...rest.map((s) => s.trim())].filter(
-    Boolean,
-  );
+  const stripPrefix = opts?.stripLeadingNeedTo === true;
+  return segments
+    .map((segment, index) => {
+      let text = segment.trim();
+      if (stripPrefix && index === 0) {
+        const withoutPrefix = text.replace(FIRST_SEGMENT_PREFIX_RE, "").trim();
+        text = withoutPrefix || text;
+      }
+      return text;
+    })
+    .filter(Boolean);
 }
 
 /**

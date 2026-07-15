@@ -37,7 +37,23 @@ export function buildRecommendationWhy(
   const place = getPlaceById(placeId);
 
   if (signals.emotional === "overwhelmed" || signals.emotional === "burnout") {
-    return `${stripEstateTm(profile.displayName)} offers one of the quietest places in the Estate to slow your mind — ${profile.primaryFeeling.toLowerCase()} and unhurried.`;
+    const curatedWhy: Record<string, string> = {
+      "peaceful-places":
+        "A quiet place to slow down and settle your thoughts.",
+      "lakeside-hammock":
+        "A gentle place to pause, rest, and let your mind ease.",
+      conservatory:
+        "A calming place for breathing room, reflection, and a sense of wonder.",
+      "ocean-conservatory":
+        "A calming place for breathing room, reflection, and a sense of wonder.",
+    };
+    const curated = curatedWhy[placeId] ?? curatedWhy[place?.id ?? ""];
+    if (curated) return curated;
+    return (
+      place?.guidebook?.epigraph ??
+      profile.purpose ??
+      `${stripEstateTm(profile.displayName)} is a quiet place to slow down.`
+    );
   }
 
   if (signals.wantsReading) {
