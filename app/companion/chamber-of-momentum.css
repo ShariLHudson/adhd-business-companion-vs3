@@ -32,12 +32,23 @@
   padding: clamp(0.75rem, 2vh, 1.25rem) clamp(0.75rem, 2.5vw, 1.5rem);
 }
 
+/*
+ * Member gallery needs a wide stage — default estate-workspace is ~900px and
+ * grow-room-panel caps at 42rem, which forced cramped 2-column cards.
+ */
+.estate-workspace.chamber-entry--members.grow-room-panel,
 .chamber-entry--members.estate-workspace {
-  width: min(76rem, 100%);
-  max-width: 100%;
+  width: min(96rem, calc(100vw - 1.5rem));
+  max-width: min(96rem, calc(100vw - 1.5rem));
   max-height: none;
   overflow: visible;
-  padding: clamp(1rem, 2.5vw, 1.75rem);
+  padding: clamp(0.85rem, 2vw, 1.5rem);
+}
+
+/* Active member chat stays compact — only the gallery needs the wide panel */
+.estate-workspace.chamber-entry--members.chamber-entry--conversation.grow-room-panel {
+  width: min(44rem, calc(100vw - 1.5rem));
+  max-width: min(44rem, calc(100vw - 1.5rem));
 }
 
 .chamber-entry--how-to-host.estate-workspace {

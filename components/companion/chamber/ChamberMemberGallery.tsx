@@ -53,7 +53,7 @@ function ChamberMemberCard({
             className="chamber-member-card__image"
             width={320}
             height={480}
-            sizes="(max-width: 40rem) 90vw, (max-width: 64rem) 45vw, 30vw"
+            sizes="(max-width: 34rem) 90vw, (max-width: 52rem) 45vw, 28vw"
           />
         </span>
       </button>

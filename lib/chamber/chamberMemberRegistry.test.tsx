@@ -187,6 +187,25 @@ describe("Chamber gallery roster", () => {
     expect((html.match(/chamber-member-card-/g) ?? []).length).toBe(24);
   });
 
+  it("gallery CSS defaults to three columns on desktop-width panels", () => {
+    const { readFileSync } = require("node:fs") as typeof import("node:fs");
+    const { resolve } = require("node:path") as typeof import("node:path");
+    const css = readFileSync(
+      resolve(process.cwd(), "app/companion/chamber-member-gallery.css"),
+      "utf8",
+    );
+    const chamberCss = readFileSync(
+      resolve(process.cwd(), "app/companion/chamber-of-momentum.css"),
+      "utf8",
+    );
+    expect(css).toMatch(
+      /\.chamber-member-gallery__grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(3/,
+    );
+    expect(chamberCss).toMatch(
+      /chamber-entry--members[\s\S]*?96rem/,
+    );
+  });
+
   it("uses the same canonical portrait in gallery, active card, and profile", () => {
     const member = getChamberMemberById("leadership")!;
     const gallery = renderToStaticMarkup(
