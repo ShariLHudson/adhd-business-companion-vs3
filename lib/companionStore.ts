@@ -137,7 +137,13 @@ import type { EcosystemObjectKind } from "@/lib/intelligence/intelligenceReadyTy
 
 export type BrainDumpEntry = {
   id: string;
+  /**
+   * Display/persist wording. Must equal originalText when present.
+   * Never silently rewrite after capture.
+   */
   text: string;
+  /** Exact member wording at capture — authoritative for display. */
+  originalText?: string;
   createdAt: string;
   updatedAt?: string;
   // AI-assigned, filled in shortly after capture.
@@ -314,13 +320,22 @@ export function getBrainDumps(): BrainDumpEntry[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (e): e is BrainDumpEntry =>
-        e &&
-        typeof e.id === "string" &&
-        typeof e.text === "string" &&
-        typeof e.createdAt === "string",
-    );
+    return parsed
+      .filter(
+        (e): e is BrainDumpEntry =>
+          e &&
+          typeof e.id === "string" &&
+          typeof e.text === "string" &&
+          typeof e.createdAt === "string",
+      )
+      .map((e) => {
+        const originalText =
+          typeof e.originalText === "string" && e.originalText.trim()
+            ? e.originalText
+            : e.text;
+        // Prefer original wording for both fields so display never drifts.
+        return { ...e, originalText, text: originalText };
+      });
   } catch {
     return [];
   }
@@ -354,6 +369,7 @@ export function addBrainDumps(
   const newEntries: BrainDumpEntry[] = parts.map((text, index) => ({
     id: newBrainDumpId(),
     text,
+    originalText: text,
     createdAt: new Date(baseMs + index).toISOString(),
     captureSessionId: opts?.captureSessionId,
   }));
@@ -371,9 +387,23 @@ export function updateBrainDump(
   id: string,
   changes: Partial<Omit<BrainDumpEntry, "id">>,
 ): BrainDumpEntry[] {
-  const next = getBrainDumps().map((e) =>
-    e.id === id ? { ...e, ...changes } : e,
-  );
+  const next = getBrainDumps().map((e) => {
+    if (e.id !== id) return e;
+    const merged = { ...e, ...changes };
+    if (typeof changes.text === "string") {
+      // Explicit user edit / merge / split — keep originalText in sync.
+      merged.text = changes.text;
+      merged.originalText =
+        typeof changes.originalText === "string"
+          ? changes.originalText
+          : changes.text;
+    } else {
+      // Classification/metadata must never rewrite capture wording.
+      merged.text = e.originalText ?? e.text;
+      merged.originalText = e.originalText ?? e.text;
+    }
+    return merged;
+  });
   return writeBrainDumps(next);
 }
 

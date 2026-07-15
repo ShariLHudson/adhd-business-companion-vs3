@@ -72,18 +72,23 @@ describe("Clear My Mind text integrity", () => {
   it("round-trips exact text through save and reload", () => {
     const parts = splitCaptureInput(SIX_ITEMS);
     addBrainDumps(parts);
-    const stored = getBrainDumps()
-      .slice(0, parts.length)
-      .map((e) => e.text)
-      .reverse();
-    // Newest-first store — compare as a set of exact strings.
-    expect(new Set(getBrainDumps().map((e) => e.text))).toEqual(
-      new Set(parts),
-    );
-    void stored;
+    const stored = getBrainDumps();
+    expect(new Set(stored.map((e) => e.text))).toEqual(new Set(parts));
+    expect(new Set(stored.map((e) => e.originalText))).toEqual(new Set(parts));
     for (const expected of EXPECTED) {
-      expect(getBrainDumps().some((e) => e.text === expected)).toBe(true);
+      expect(stored.some((e) => e.text === expected)).toBe(true);
+      expect(stored.some((e) => e.originalText === expected)).toBe(true);
     }
+  });
+
+  it("keeps originalText when classification metadata updates", async () => {
+    const { updateBrainDump } = await import("@/lib/companionStore");
+    addBrainDumps(["plan mom's birthday"]);
+    const id = getBrainDumps()[0]!.id;
+    updateBrainDump(id, { category: "Family", topic: "Family" });
+    const entry = getBrainDumps().find((e) => e.id === id)!;
+    expect(entry.text).toBe("plan mom's birthday");
+    expect(entry.originalText).toBe("plan mom's birthday");
   });
 
   it("never surfaces Other as a theme label", () => {

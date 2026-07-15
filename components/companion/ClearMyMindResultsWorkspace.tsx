@@ -21,6 +21,7 @@ import {
   printClearMyMindSessionList,
 } from "@/lib/brainDumpCanvasExport";
 import { analyzeClearMyMindWorkspace } from "@/lib/clearMyMindWorkspaceIntelligence";
+import { displayClearMyMindText } from "@/lib/clearMyMind/originalText";
 
 type Props = {
   entries: BrainDumpEntry[];
@@ -98,7 +99,7 @@ export function ClearMyMindResultsWorkspace({
 
   function startEdit(entry: BrainDumpEntry) {
     setEditingId(entry.id);
-    setEditText(entry.text);
+    setEditText(displayClearMyMindText(entry));
   }
 
   function saveEdit(entryId: string) {
@@ -279,7 +280,7 @@ export function ClearMyMindResultsWorkspace({
                           />
                         ) : (
                           <p className="clear-my-mind-result-item__text">
-                            {entry.text}
+                            {displayClearMyMindText(entry)}
                           </p>
                         )}
                         <div className="clear-my-mind-result-item__actions">

@@ -298,7 +298,9 @@ export function ClearMyMindSession({
   }
 
   function handleContinue() {
-    const raw = input.trim();
+    // Snapshot before any state clear — never parse after input is wiped.
+    const rawSnapshot = input;
+    const raw = rawSnapshot.trim();
     const parts = splitCaptureInput(raw);
     if (!parts.length) return;
 
