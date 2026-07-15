@@ -1625,6 +1625,11 @@ import {
   stripChamberMemberActivationMessages,
   readActiveChamberMember,
 } from "@/lib/chamber/chamberMemberActivation";
+import {
+  dismissActiveChamberConversationStorage,
+  filterDismissedChamberMessages,
+  planDismissActiveChamberConversation,
+} from "@/lib/chamber/dismissActiveChamberConversation";
 import { chamberMemberHintForChat } from "@/lib/chamber/chamberMemberPrompt";
 import { isChamberMemberConversationActive } from "@/lib/chamber/chamberConversationLock";
 import {
@@ -2673,6 +2678,9 @@ export default function CompanionPageClient() {
     useState<ChamberMemberId | null>(null);
   const activeChamberMemberIdRef = useRef<ChamberMemberId | null>(null);
   activeChamberMemberIdRef.current = activeChamberMemberId;
+  /** Message index before the current Chamber member thread began. */
+  const chamberThreadStartIndexRef = useRef<number | null>(null);
+  const previousSectionForChamberRef = useRef<AppSection | null>(null);
   const [boardroomShariChatOpen, setBoardroomShariChatOpen] = useState(false);
   /** Remount Boardroom on each open so stale subviews cannot hijack home. */
   const [boardroomEntryKey, setBoardroomEntryKey] = useState(0);
@@ -2713,12 +2721,15 @@ export default function CompanionPageClient() {
     }
   }, [momentumBuilderPrimary, momentumBuilderRoomExperience?.todaysPath]);
 
+  // Restore sticky Chamber member only when already inside the Chamber.
+  // Never rehydrate an active member into Plan My Day / Projects / etc.
   useEffect(() => {
+    if (activeSection !== "chamber-of-momentum") return;
     const stored = readActiveChamberMember();
     if (stored?.id) {
       setActiveChamberMemberId(stored.id);
     }
-  }, []);
+  }, [activeSection]);
 
   useEffect(() => {
     if (activeSection === "growth-journal") {
@@ -7053,8 +7064,7 @@ export default function CompanionPageClient() {
     setAssistedActionOffer(null);
     setAwaitingUserConfirmation(null);
     awaitingUserConfirmationRef.current = null;
-    clearActiveChamberMember();
-    setActiveChamberMemberId(null);
+    dismissActiveChamberConversationCore({ force: true });
     setBoardroomShariChatOpen(false);
     pauseCreatePersistence();
     patchWorkspacePanel(null);
@@ -8418,6 +8428,63 @@ export default function CompanionPageClient() {
    * Close trapping experiences (Explore Estate map, overlays, Breathe, etc.)
    * before a Welcome Home destination opens. Shared by all menu / section openers.
    */
+  /**
+   * Shared Chamber exit — cancels streams, clears active member, removes
+   * Chamber messages from the visible thread. Preserves saved history records.
+   */
+  function dismissActiveChamberConversationCore(input?: {
+    destinationId?: string | null;
+    previousSection?: string | null;
+    nextSection?: string | null;
+    force?: boolean;
+  }) {
+    const plan = planDismissActiveChamberConversation({
+      destinationId: input?.destinationId,
+      activeMemberId: activeChamberMemberIdRef.current,
+      previousSection: input?.previousSection,
+      nextSection: input?.nextSection,
+      chamberThreadStartIndex: chamberThreadStartIndexRef.current,
+    });
+
+    const shouldRun = input?.force === true || plan.shouldDismiss;
+    if (!shouldRun && !activeChamberMemberIdRef.current) {
+      return;
+    }
+    if (!shouldRun && !input?.force) {
+      return;
+    }
+
+    if (plan.abortStream || input?.force) {
+      chatRequestGenerationRef.current += 1;
+      supersedeInFlightChatRequest(chatRequestAbortRef.current);
+      chatRequestAbortRef.current = null;
+      endVisibleThinking();
+      setIsLoading(false);
+    }
+
+    if (plan.clearActiveMember || input?.force) {
+      dismissActiveChamberConversationStorage();
+      clearActiveChamberMember();
+      setActiveChamberMemberId(null);
+      activeChamberMemberIdRef.current = null;
+    }
+
+    if (plan.hideChat || input?.force) {
+      setEstateRoomChatVisible(false);
+    }
+
+    const restoreIndex = plan.restoreMessageIndex;
+    if (restoreIndex != null || plan.stripActivationMessages || input?.force) {
+      setMessages((prev) =>
+        filterDismissedChamberMessages(
+          prev,
+          restoreIndex ?? chamberThreadStartIndexRef.current,
+        ),
+      );
+    }
+    chamberThreadStartIndexRef.current = null;
+  }
+
   function dismissTransientEstateExperiencesForDestinationSwitch(input: {
     destinationId: string;
     kind: WelcomeHomeDestinationKind;
@@ -8451,7 +8518,36 @@ export default function CompanionPageClient() {
       setBreatheResumeActive(false);
       breathePausedTimerRef.current = false;
     }
+    if (plan.clearActiveChamberConversation) {
+      dismissActiveChamberConversationCore({
+        destinationId: input.destinationId,
+        previousSection: activeSectionRef.current,
+        nextSection:
+          input.kind === "section" || input.kind === "welcome-home"
+            ? input.destinationId === "welcome-home"
+              ? "home"
+              : input.destinationId
+            : input.destinationId,
+        force: Boolean(activeChamberMemberIdRef.current),
+      });
+    }
   }
+
+  // Safety net: leaving Chamber for any other section tears down the member session.
+  useEffect(() => {
+    const previous = previousSectionForChamberRef.current;
+    previousSectionForChamberRef.current = activeSection;
+    if (
+      previous === "chamber-of-momentum" &&
+      activeSection !== "chamber-of-momentum"
+    ) {
+      dismissActiveChamberConversationCore({
+        previousSection: previous,
+        nextSection: activeSection,
+        destinationId: activeSection,
+      });
+    }
+  }, [activeSection]);
 
   /** Standalone focus tools (Clear My Mind, spin wheel, energy, etc.). */
   function openStandaloneFocusSectionCore(section: AppSection) {
@@ -8993,30 +9089,35 @@ export default function CompanionPageClient() {
   }
 
   function inviteChamberMemberCore(memberId: ChamberMemberId) {
-    const previousId = activeChamberMemberId;
+    const previousId = activeChamberMemberIdRef.current;
     const activation = activateChamberMember(memberId);
     if (!activation) return;
 
-    setActiveChamberMemberId(memberId);
-    setMessages((prev) => {
-      let next = prev;
-      if (previousId && previousId !== memberId) {
-        const previousMember = getChamberMemberById(previousId);
-        next = stripChamberMemberActivationMessages(next).filter(
-          (message) =>
-            !(
-              previousMember &&
-              message.role === "assistant" &&
-              message.content === previousMember.activationOpener
-            ),
-        );
-      }
-      return [
-        ...next,
+    // Switching members: cancel prior stream and isolate histories completely.
+    if (previousId && previousId !== memberId) {
+      chatRequestGenerationRef.current += 1;
+      supersedeInFlightChatRequest(chatRequestAbortRef.current);
+      chatRequestAbortRef.current = null;
+      endVisibleThinking();
+      setIsLoading(false);
+      chamberThreadStartIndexRef.current = 0;
+      setMessages([
         { role: "system", content: activation.messages.system },
         { role: "assistant", content: activation.messages.assistant },
-      ];
-    });
+      ]);
+    } else {
+      setMessages((prev) => {
+        chamberThreadStartIndexRef.current = prev.length;
+        return [
+          ...prev,
+          { role: "system", content: activation.messages.system },
+          { role: "assistant", content: activation.messages.assistant },
+        ];
+      });
+    }
+
+    setActiveChamberMemberId(memberId);
+    activeChamberMemberIdRef.current = memberId;
     setEstateRoomChatVisible(true);
     requestChatInputFocus();
   }
@@ -9028,32 +9129,7 @@ export default function CompanionPageClient() {
       if (!detail?.memberIds?.length) return;
       const primary = detail.memberIds[0];
       if (!primary) return;
-      // In-context invite: activate member without opening Chamber of Momentum room
-      const previousId = activeChamberMemberIdRef.current;
-      const activation = activateChamberMember(primary);
-      if (!activation) return;
-      setActiveChamberMemberId(primary);
-      setMessages((prev) => {
-        let next = prev;
-        if (previousId && previousId !== primary) {
-          const previousMember = getChamberMemberById(previousId);
-          next = stripChamberMemberActivationMessages(next).filter(
-            (message) =>
-              !(
-                previousMember &&
-                message.role === "assistant" &&
-                message.content === previousMember.activationOpener
-              ),
-          );
-        }
-        return [
-          ...next,
-          { role: "system", content: activation.messages.system },
-          { role: "assistant", content: activation.messages.assistant },
-        ];
-      });
-      setEstateRoomChatVisible(true);
-      requestChatInputFocus();
+      inviteChamberMemberCore(primary);
     }
     window.addEventListener(ADVISORY_INVITE_CHAMBER_EVENT, onAdvisoryInvite);
     return () =>
@@ -9141,9 +9217,12 @@ export default function CompanionPageClient() {
   }, [requestChatInputFocus]);
 
   function endChamberMemberConversationCore() {
-    clearActiveChamberMember();
-    setActiveChamberMemberId(null);
-    setEstateRoomChatVisible(false);
+    dismissActiveChamberConversationCore({
+      force: true,
+      previousSection: "chamber-of-momentum",
+      nextSection: "chamber-of-momentum",
+      destinationId: "chamber-of-momentum",
+    });
   }
 
   function saveChamberConversationCore() {
@@ -10166,8 +10245,12 @@ export default function CompanionPageClient() {
     }
 
     clearJustBeHereMode();
-    clearActiveChamberMember();
-    setActiveChamberMemberId(null);
+    dismissActiveChamberConversationCore({
+      force: true,
+      destinationId: "welcome-home",
+      previousSection: fromSection,
+      nextSection: "home",
+    });
     setBoardroomShariChatOpen(false);
     setPreferEverydayConversation(false);
     preferEverydayConversationRef.current = false;
@@ -17793,9 +17876,15 @@ export default function CompanionPageClient() {
       instituteLearningHintRef.current = null;
       const stablesLearningHint = stablesLearningHintRef.current;
       stablesLearningHintRef.current = null;
-      const activeChamberMember = activeChamberMemberId
-        ? getChamberMemberById(activeChamberMemberId)
-        : undefined;
+      const chamberConversationActive = isChamberMemberConversationActive({
+        activeSection: activeSectionRef.current,
+        activeMemberId: activeChamberMemberIdRef.current,
+      });
+      const activeChamberMember =
+        chamberConversationActive && activeChamberMemberIdRef.current
+          ? getChamberMemberById(activeChamberMemberIdRef.current)
+          : undefined;
+      // Never inject Chamber persona outside an active Chamber member session.
       const chamberMemberChatHint = activeChamberMember
         ? chamberMemberHintForChat(activeChamberMember)
         : null;

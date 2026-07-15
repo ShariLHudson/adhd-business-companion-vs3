@@ -24,6 +24,11 @@ export type WelcomeHomeDestinationSwitchPlan = {
   clearExploreReturnPending: boolean;
   /** Clear guided field-help chat modal. */
   clearGuidedFieldHelpChat: boolean;
+  /**
+   * Close active Chamber member conversation (session + persona + stream).
+   * False only when the destination is the Chamber itself.
+   */
+  clearActiveChamberConversation: boolean;
 };
 
 /**
@@ -40,6 +45,8 @@ export function planWelcomeHomeDestinationSwitch(input: {
   const openingBreathe = kind === "breathe";
   const openingWelcomeHome = kind === "welcome-home";
 
+  const openingChamber = destinationId === "chamber-of-momentum";
+
   return {
     destinationId,
     kind,
@@ -48,6 +55,7 @@ export function planWelcomeHomeDestinationSwitch(input: {
     clearBreathe: !openingBreathe,
     clearExploreReturnPending: !openingExplore,
     clearGuidedFieldHelpChat: true,
+    clearActiveChamberConversation: !openingChamber,
   };
 }
 

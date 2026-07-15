@@ -47,6 +47,22 @@ describe("planWelcomeHomeDestinationSwitch", () => {
     expect(plan.closeExploreEstate).toBe(false);
     expect(plan.clearOverlays).toBe(true);
     expect(plan.clearBreathe).toBe(true);
+    expect(plan.clearActiveChamberConversation).toBe(true);
+  });
+
+  it("clears active Chamber conversations for every non-Chamber destination", () => {
+    expect(
+      planWelcomeHomeDestinationSwitch({
+        destinationId: "plan-my-day",
+        kind: "section",
+      }).clearActiveChamberConversation,
+    ).toBe(true);
+    expect(
+      planWelcomeHomeDestinationSwitch({
+        destinationId: "chamber-of-momentum",
+        kind: "section",
+      }).clearActiveChamberConversation,
+    ).toBe(false);
   });
 
   it("clears Explore + overlays when returning to Welcome Home", () => {
@@ -176,5 +192,51 @@ describe("CompanionPageClient Welcome Home destination switch wiring", () => {
     expect(source).toContain(
       "dismissTransientEstateExperiencesForDestinationSwitch",
     );
+  });
+
+  it("leaves Explore via Welcome Home lobby — Fold, Return, and Welcome Home cards", () => {
+    const source = readCpc();
+
+    expect(source).toContain(
+      'onClose={() => returnToWelcomeHomeLobby("explore estate fold")}',
+    );
+    expect(source).toContain(
+      'returnToWelcomeHomeLobby("explore estate return")',
+    );
+    expect(source).toContain("onReturnToEstate=");
+
+    const select = source.match(
+      /function handleExploreSparkMapSelect\([\s\S]*?\n  \}/,
+    )?.[0];
+    expect(select).toBeTruthy();
+    expect(select).toContain('placeId === "welcome-home"');
+    expect(select).toContain("returnToWelcomeHomeLobby");
+    expect(select).toContain(
+      "dismissTransientEstateExperiencesForDestinationSwitch",
+    );
+
+    const lobby = source.match(
+      /function returnToWelcomeHomeLobby\(reason: string\) \{[\s\S]*?\n  \}/,
+    )?.[0];
+    expect(lobby).toBeTruthy();
+    expect(lobby).toContain('kind: "welcome-home"');
+    expect(lobby).toContain("clearExploreEstateReturnPending");
+    expect(lobby).toContain("setExploreSparkMapOpen(false)");
+
+    const direct = source.match(
+      /function runDirectEstateRoomNavigation\([\s\S]*?\n  \}/,
+    )?.[0];
+    expect(direct).toBeTruthy();
+    expect(direct).toContain(
+      "dismissTransientEstateExperiencesForDestinationSwitch",
+    );
+    expect(direct).toMatch(/roomId === "welcome-home"/);
+    expect(direct).toContain("returnToWelcomeHomeLobby");
+  });
+
+  it("does not trap Welcome Home behind a home-section direct visit", () => {
+    const source = readCpc();
+    expect(source).toContain('directEstateVisit.roomId !== "welcome-home"');
+    expect(source).toContain('directEstateVisit.roomId !== "spark-estate"');
   });
 });
