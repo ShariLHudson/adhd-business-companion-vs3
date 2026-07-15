@@ -1,14 +1,33 @@
 /* Experience Controls — overlay over current destination (never navigates) */
 
-.experience-controls-overlay,
-.soundscape-selection-overlay {
+.global-overlay-host {
   position: fixed;
   inset: 0;
-  z-index: 100120;
-  display: flex;
+  z-index: 100180;
+  pointer-events: none;
+}
+
+.global-overlay-host:has(.experience-controls-overlay),
+.global-overlay-host:has(.soundscape-selection-overlay) {
+  pointer-events: auto;
+}
+
+.experience-controls-overlay,
+.soundscape-selection-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 100180 !important;
+  display: flex !important;
   justify-content: flex-end;
   align-items: stretch;
   pointer-events: none;
+  margin: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  background: transparent;
+  color: rgba(255, 250, 242, 0.98);
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
 .experience-controls-overlay__backdrop,

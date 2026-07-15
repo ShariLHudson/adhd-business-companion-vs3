@@ -21,6 +21,7 @@ import {
 } from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
 import { ExperienceControlsOverlay } from "@/components/companion/estate/ExperienceControlsOverlay";
+import { GlobalOverlayHost } from "@/components/companion/estate/GlobalOverlayHost";
 import { SoundscapeSelectionOverlay } from "@/components/companion/estate/SoundscapeSelectionOverlay";
 import {
   applyExperienceControlPresentation,
@@ -2455,6 +2456,7 @@ export default function CompanionPageClient() {
     | null
     | "settings"
     | "profile"
+    | "profile-personal"
     | "people-i-help"
     | "signin"
     | "whats-new"
@@ -2467,10 +2469,12 @@ export default function CompanionPageClient() {
   const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
     useState(false);
   const estateProfilePrimary = overlay === "profile";
+  const myProfilePersonalPrimary = overlay === "profile-personal";
   const peopleIHelpProfilePrimary = overlay === "people-i-help";
   const growthProfilePrimary = overlay === "growth-profile";
   const profileDestinationActive =
     estateProfilePrimary ||
+    myProfilePersonalPrimary ||
     peopleIHelpProfilePrimary ||
     growthProfilePrimary;
 
@@ -9976,10 +9980,7 @@ export default function CompanionPageClient() {
   function openProfileDestinationCore(destination?: ProfileDestination) {
     const navigation = resolveProfileDestinationNavigation(destination);
     dismissTransientEstateExperiencesForDestinationSwitch({
-      destinationId:
-        navigation.kind === "people-i-help-overlay"
-          ? "people-i-help"
-          : "my-business-estate",
+      destinationId: navigation.destinationId,
       kind: "overlay",
     });
     preloadRoomBackground(ESTATE_PROFILE_ROOM_BG);
@@ -9987,6 +9988,10 @@ export default function CompanionPageClient() {
     syncDirectEstateVisit(null);
     if (navigation.kind === "people-i-help-overlay") {
       setOverlay("people-i-help");
+      return;
+    }
+    if (navigation.kind === "profile-personal-overlay") {
+      setOverlay("profile-personal");
       return;
     }
     setOverlay("profile");
@@ -10404,8 +10409,13 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (actionId === "my-profile") {
+    if (actionId === "my-business-estate") {
       openProfileDestinationCore("my-business-estate");
+      return;
+    }
+
+    if (actionId === "my-profile" || actionId === "estate-profile") {
+      openProfileDestinationCore("profile-personal");
       return;
     }
 
@@ -24201,17 +24211,19 @@ export default function CompanionPageClient() {
         onOpenSoundscapes={() => setSoundscapeSelectionOpen(true)}
       />
 
-      <ExperienceControlsOverlay
-        open={experienceControlsOpen}
-        onClose={() => setExperienceControlsOpen(false)}
-        roomId={roomMenuRoomId ?? "welcome-home"}
-        chatVisible={roomMenuChatVisible}
-        onSetChatVisible={setEstateRoomChatVisiblePreserving}
-        onOpenNotifications={() => {
-          setExperienceControlsOpen(false);
-          handleEstateMenuAction("notifications");
-        }}
-      />
+      <GlobalOverlayHost>
+        <ExperienceControlsOverlay
+          open={experienceControlsOpen}
+          onClose={() => setExperienceControlsOpen(false)}
+          roomId={roomMenuRoomId ?? "welcome-home"}
+          chatVisible={roomMenuChatVisible}
+          onSetChatVisible={setEstateRoomChatVisiblePreserving}
+          onOpenNotifications={() => {
+            setExperienceControlsOpen(false);
+            handleEstateMenuAction("notifications");
+          }}
+        />
+      </GlobalOverlayHost>
 
       <SoundscapeSelectionOverlay
         open={soundscapeSelectionOpen}
@@ -24240,6 +24252,11 @@ export default function CompanionPageClient() {
         onClose={goBack}
         onOpenEstatePlace={handleEstateMenuAction}
         onOpenPeopleIHelp={() => openProfileDestinationCore("people-i-help")}
+        onOpenSettings={(section) => {
+          setSettingsSection(section === "notifications" ? "notifications" : section ?? null);
+          setOverlay("settings");
+        }}
+        onOpenExperienceControls={() => setExperienceControlsOpen(true)}
       />
 
       {guidedFieldHelpChatOpen

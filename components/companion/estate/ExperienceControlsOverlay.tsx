@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { createPortal } from "react-dom";
 import {
   getEstateAudioSettings,
   patchEstateAudioSettings,
   subscribeEstateAudioSettings,
 } from "@/lib/estate/estateAudioSettings";
+import "@/app/companion/experience-controls-overlay.css";
 import {
   isEstateBrowserFullscreen,
   toggleEstateBrowserFullscreen,
@@ -52,7 +52,6 @@ export function ExperienceControlsOverlay({
   onSetChatVisible,
   onOpenNotifications,
 }: ExperienceControlsOverlayProps) {
-  const [mounted, setMounted] = useState(false);
   const [prefs, setPrefs] = useState<ExperienceControlPrefs>(() =>
     getExperienceControlPrefs(),
   );
@@ -60,8 +59,6 @@ export function ExperienceControlsOverlay({
   const [estateSoundsOn, setEstateSoundsOn] = useState(true);
   const [musicOn, setMusicOn] = useState(false);
   const [volume, setVolume] = useState(0.85);
-
-  useEffect(() => setMounted(true), []);
 
   const syncPrefs = useCallback(() => {
     const next = getExperienceControlPrefs();
@@ -114,7 +111,7 @@ export function ExperienceControlsOverlay({
     applyExperienceControlPresentation(getExperienceControlPrefs());
   }, []);
 
-  if (!mounted || !open) return null;
+  if (!open) return null;
 
   const setConversationVisible = (visible: boolean) => {
     patchExperienceControlPrefs({
@@ -173,7 +170,8 @@ export function ExperienceControlsOverlay({
     setFullscreen(isEstateBrowserFullscreen());
   };
 
-  return createPortal(
+  // Rendered through GlobalOverlayHost (body portal) — never page flow.
+  return (
     <div
       className="experience-controls-overlay"
       data-testid="experience-controls-overlay"
@@ -378,7 +376,6 @@ export function ExperienceControlsOverlay({
           ) : null}
         </div>
       </aside>
-    </div>,
-    document.body,
+    </div>
   );
 }
