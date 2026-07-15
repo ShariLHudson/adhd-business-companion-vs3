@@ -17,6 +17,8 @@ export function buildDailyOpeningArrivalMessage(
     }
     case "plan-my-day":
       return "Here you are. Let's shape today's plan.";
+    case "adapt-my-day":
+      return "Here you are. We'll reshape today around how you feel right now.";
     case "clear-my-mind":
       return "Here you are. We can set things down together.";
     case "explore-estate":

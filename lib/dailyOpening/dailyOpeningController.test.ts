@@ -199,7 +199,7 @@ describe("Global Daily Companion Experience — shared controller", () => {
     });
   });
 
-  it("Plan or Adapt My Day opens Plan My Day on first click", () => {
+  it("Plan or Adapt My Day opens the Plan-vs-Adapt choice step", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "settings-new-day",
     });
@@ -207,10 +207,7 @@ describe("Global Daily Companion Experience — shared controller", () => {
       "plan-or-adapt-my-day",
       opening,
     );
-    expect(action).toEqual({
-      kind: "navigate",
-      destination: { kind: "plan-my-day" },
-    });
+    expect(action).toEqual({ kind: "show-plan-or-adapt" });
   });
 
   it("Help Me Choose produces exactly three actionable suggestions that navigate on first click", () => {

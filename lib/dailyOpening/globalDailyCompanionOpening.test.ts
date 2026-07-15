@@ -192,7 +192,7 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
     );
   });
 
-  it("Plan or Adapt My Day opens Plan My Day on first click", () => {
+  it("Plan or Adapt My Day opens the Plan-vs-Adapt choice step", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "settings-new-day",
     });
@@ -200,10 +200,7 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
       "plan-or-adapt-my-day",
       opening,
     );
-    expect(action).toEqual({
-      kind: "navigate",
-      destination: { kind: "plan-my-day" },
-    });
+    expect(action).toEqual({ kind: "show-plan-or-adapt" });
   });
 
   it("Help Me Choose stays in place with exactly three clickable suggestions", () => {
@@ -233,9 +230,11 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
       "help-me-choose",
     ] as const) {
       const action = resolveDailyOpeningChoiceAction(id, opening);
-      expect(action.kind === "navigate" || action.kind === "show-help-me-choose").toBe(
-        true,
-      );
+      expect(
+        action.kind === "navigate" ||
+          action.kind === "show-help-me-choose" ||
+          action.kind === "show-plan-or-adapt",
+      ).toBe(true);
     }
   });
 });

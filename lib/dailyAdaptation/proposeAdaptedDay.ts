@@ -1,0 +1,184 @@
+import type { PlanDayItem } from "@/lib/planMyDay/types";
+import { isPlanItemActive } from "@/lib/planMyDay/planDayItems";
+import {
+  guidanceForPosture,
+  recoveryBreakMinutesForPosture,
+  resolveAdaptationPosture,
+} from "./adaptationGuidance";
+import type {
+  AdaptedDayProposal,
+  AdaptedPlanItem,
+  DailyAdaptationCheckIn,
+} from "./types";
+
+function activeFocusItems(items: PlanDayItem[]): PlanDayItem[] {
+  return items.filter(
+    (item) =>
+      isPlanItemActive(item) &&
+      !item.done &&
+      item.column !== "parked" &&
+      item.column !== "done",
+  );
+}
+
+function priorityWeight(item: PlanDayItem): number {
+  if (item.priority === "high") return 3;
+  if (item.priority === "medium") return 2;
+  if (item.priority === "low") return 1;
+  return 2;
+}
+
+/**
+ * Propose a reshaped day from the existing plan + today's check-in.
+ * Does not mutate storage — caller applies when the member accepts.
+ */
+export function proposeAdaptedDay(
+  checkIn: DailyAdaptationCheckIn,
+  planItems: PlanDayItem[],
+): AdaptedDayProposal {
+  const posture = resolveAdaptationPosture(
+    checkIn.energyLevel,
+    checkIn.motivationLevel,
+  );
+  const guidance = guidanceForPosture(posture);
+  const recoveryBreakMinutes = recoveryBreakMinutesForPosture(posture);
+  const focus = activeFocusItems(planItems).sort(
+    (a, b) => priorityWeight(b) - priorityWeight(a),
+  );
+
+  const adapted: AdaptedPlanItem[] = [];
+
+  if (focus.length === 0) {
+    return {
+      guidance,
+      posture,
+      items: [],
+      recoveryBreakMinutes,
+      startWithTitle: null,
+    };
+  }
+
+  const start = focus[0]!;
+  adapted.push({
+    itemId: start.id,
+    title: start.title,
+    bucket: "start-with-this",
+    note:
+      posture === "high-energy-low-motivation"
+        ? "Easiest meaningful entry point"
+        : posture === "low-energy-low-motivation"
+          ? "One small starting step"
+          : "Begin here",
+  });
+
+  const rest = focus.slice(1);
+
+  if (posture === "low-energy-low-motivation") {
+    if (rest[0]) {
+      adapted.push({
+        itemId: rest[0].id,
+        title: rest[0].title,
+        bucket: "keep-today",
+        note: "Protect this one important item",
+      });
+    }
+    for (const item of rest.slice(1)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "move-later",
+      });
+    }
+  } else if (posture === "low-energy-high-motivation") {
+    if (rest[0]) {
+      adapted.push({
+        itemId: rest[0].id,
+        title: rest[0].title,
+        bucket: "make-smaller",
+        note: "Short work periods",
+      });
+    }
+    for (const item of rest.slice(1, 3)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "keep-today",
+      });
+    }
+    for (const item of rest.slice(3)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "move-later",
+      });
+    }
+  } else if (posture === "high-energy-low-motivation") {
+    if (rest[0]) {
+      adapted.push({
+        itemId: rest[0].id,
+        title: rest[0].title,
+        bucket: "keep-today",
+        note: "Useful alternative if the first step stalls",
+      });
+    }
+    for (const item of rest.slice(1, 2)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "make-smaller",
+      });
+    }
+    for (const item of rest.slice(2)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "move-later",
+      });
+    }
+  } else if (posture === "high-energy-high-motivation") {
+    for (const item of rest.slice(0, 3)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "keep-today",
+      });
+    }
+    for (const item of rest.slice(3)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "move-later",
+        note: "Protect capacity — don't fill every open space",
+      });
+    }
+  } else {
+    for (const item of rest.slice(0, 3)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "keep-today",
+      });
+    }
+    for (const item of rest.slice(3)) {
+      adapted.push({
+        itemId: item.id,
+        title: item.title,
+        bucket: "move-later",
+      });
+    }
+  }
+
+  adapted.push({
+    itemId: `recovery-break-${checkIn.date}`,
+    title: `${recoveryBreakMinutes}-minute recovery break`,
+    bucket: "add-a-break",
+  });
+
+  return {
+    guidance,
+    posture,
+    items: adapted,
+    recoveryBreakMinutes,
+    startWithTitle: start.title,
+  };
+}

@@ -7,6 +7,8 @@ import type {
   HelpMeChooseSuggestion,
 } from "@/lib/dailyOpening";
 import { TODAYS_WELCOME_CARD_VERSION } from "@/lib/dailyOpening";
+import type { PlanOrAdaptChoiceCard } from "@/lib/dailyAdaptation";
+import { PLAN_OR_ADAPT_MESSAGE } from "@/lib/dailyAdaptation";
 
 type MainProps = {
   mode: "main";
@@ -26,7 +28,14 @@ type HelpProps = {
   onBackToToday: () => void;
 };
 
-type Props = MainProps | HelpProps;
+type PlanOrAdaptProps = {
+  mode: "plan-or-adapt";
+  choices: PlanOrAdaptChoiceCard[];
+  onSelect: (choiceId: PlanOrAdaptChoiceCard["id"]) => void;
+  onBackToToday: () => void;
+};
+
+type Props = MainProps | HelpProps | PlanOrAdaptProps;
 
 /**
  * Today's Welcome Card — shared Global Daily Companion Opening.
@@ -83,6 +92,76 @@ export function TodaysWelcomeCard(props: Props) {
           data-testid="global-daily-back-to-today"
         >
           Back to Today&apos;s Choices
+        </button>
+      </section>
+    );
+  }
+
+  if (props.mode === "plan-or-adapt") {
+    const choices = props.choices.slice(0, 2);
+    if (choices.length === 0) return null;
+
+    return (
+      <section
+        className="global-daily-opening todays-welcome-card"
+        data-testid="todays-welcome-card"
+        data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
+        data-mode="plan-or-adapt"
+        aria-label="Plan or Adapt My Day"
+      >
+        <header className="global-daily-opening__header">
+          <p className="global-daily-opening__eyebrow">Shari</p>
+          <h2 className="global-daily-opening__title">
+            Plan or Adapt My Day
+          </h2>
+          <p className="global-daily-opening__message">
+            {PLAN_OR_ADAPT_MESSAGE}
+          </p>
+        </header>
+
+        <ul className="global-daily-opening__cards global-daily-opening__cards--two">
+          {choices.map((choice) => (
+            <li key={choice.id} className="global-daily-opening__card-item">
+              <button
+                type="button"
+                className={[
+                  "global-daily-opening__card",
+                  choice.recommended
+                    ? "global-daily-opening__card--recommended"
+                    : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={() => props.onSelect(choice.id)}
+                data-testid={`plan-or-adapt-${choice.id}`}
+                data-recommended={choice.recommended ? "true" : "false"}
+              >
+                {choice.recommended ? (
+                  <span className="global-daily-opening__recommended">
+                    Recommended
+                  </span>
+                ) : null}
+                <span className="global-daily-opening__card-title">
+                  {choice.title}
+                </span>
+                <span className="global-daily-opening__card-explain">
+                  {choice.explanation}
+                </span>
+                <span className="global-daily-opening__card-estimate">
+                  {choice.buttonLabel}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          className="global-daily-opening__back"
+          onClick={props.onBackToToday}
+          data-testid="global-daily-back-to-today"
+        >
+          Back to Today&apos;s Welcome Card
         </button>
       </section>
     );

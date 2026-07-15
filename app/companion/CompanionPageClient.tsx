@@ -232,6 +232,7 @@ import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import { WelcomeRoomPanel } from "@/components/companion/WelcomeRoomPanel";
 import { WelcomeHomePage } from "@/components/companion/WelcomeHomeFirstLaunch";
 import { TodaysWelcomeCard } from "@/components/companion/TodaysWelcomeCard";
+import { AdaptMyDayCheckIn } from "@/components/companion/AdaptMyDayCheckIn";
 import {
   runSharedNewDay,
   resolveDailyOpeningChoiceAction,
@@ -251,6 +252,11 @@ import {
   type HelpMeChooseSuggestion,
   type DailyOpeningChoiceId,
 } from "@/lib/dailyOpening";
+import {
+  resolvePlanOrAdaptChoices,
+  type AdaptedDayProposal,
+  type PlanOrAdaptChoiceId,
+} from "@/lib/dailyAdaptation";
 import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
@@ -3312,6 +3318,10 @@ export default function CompanionPageClient() {
     useState<GlobalDailyOpeningResult | null>(null);
   const [dailyOpeningHelpSuggestions, setDailyOpeningHelpSuggestions] =
     useState<HelpMeChooseSuggestion[] | null>(null);
+  const [dailyOpeningPlanOrAdapt, setDailyOpeningPlanOrAdapt] =
+    useState(false);
+  const [dailyOpeningAdaptCheckIn, setDailyOpeningAdaptCheckIn] =
+    useState(false);
   const dailyOpeningStartedRef = useRef(false);
   const [pendingDailyOpeningEntry, setPendingDailyOpeningEntry] =
     useState<DailyOpeningEntryPoint | null>(null);
@@ -3362,6 +3372,8 @@ export default function CompanionPageClient() {
     });
     setGlobalDailyOpening(opening);
     setDailyOpeningHelpSuggestions(null);
+    setDailyOpeningPlanOrAdapt(false);
+    setDailyOpeningAdaptCheckIn(false);
     setMessages([]);
     markDailyOpeningPresented();
   }, [
@@ -7209,8 +7221,16 @@ export default function CompanionPageClient() {
     setActiveNav("chat");
     setGlobalDailyOpening(result.opening);
     setDailyOpeningHelpSuggestions(null);
+    setDailyOpeningPlanOrAdapt(false);
+    setDailyOpeningAdaptCheckIn(false);
     // Card owns the welcome message — do not inject it as a chat bubble.
     setMessages([]);
+  }
+
+  function clearDailyOpeningSubViews() {
+    setDailyOpeningHelpSuggestions(null);
+    setDailyOpeningPlanOrAdapt(false);
+    setDailyOpeningAdaptCheckIn(false);
   }
 
   function navigateDailyOpeningDestination(
@@ -7218,7 +7238,7 @@ export default function CompanionPageClient() {
   ) {
     markTodaysWelcomeDismissedThisSession();
     setGlobalDailyOpening(null);
-    setDailyOpeningHelpSuggestions(null);
+    clearDailyOpeningSubViews();
     const arrival = buildDailyOpeningArrivalMessage(destination);
     switch (destination.kind) {
       case "continue":
@@ -7233,6 +7253,16 @@ export default function CompanionPageClient() {
         return;
       case "plan-my-day":
         openPlanMyDayCore();
+        return;
+      case "adapt-my-day":
+        // Stay on Welcome Home for the Adapt check-in (not Plan My Day entry).
+        setGlobalDailyOpening(
+          globalDailyOpening ??
+            todaysWelcomeOpening ??
+            resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" }),
+        );
+        setDailyOpeningAdaptCheckIn(true);
+        setDailyOpeningPlanOrAdapt(false);
         return;
       case "clear-my-mind":
         openClearMyMindCore();
@@ -7260,9 +7290,34 @@ export default function CompanionPageClient() {
     const action = resolveDailyOpeningChoiceAction(choiceId, opening);
     if (action.kind === "show-help-me-choose") {
       setDailyOpeningHelpSuggestions(action.suggestions.slice(0, 3));
+      setDailyOpeningPlanOrAdapt(false);
+      setDailyOpeningAdaptCheckIn(false);
+      return;
+    }
+    if (action.kind === "show-plan-or-adapt") {
+      setDailyOpeningPlanOrAdapt(true);
+      setDailyOpeningHelpSuggestions(null);
+      setDailyOpeningAdaptCheckIn(false);
       return;
     }
     navigateDailyOpeningDestination(action.destination);
+  }
+
+  function handlePlanOrAdaptChoice(choiceId: PlanOrAdaptChoiceId) {
+    if (choiceId === "plan-my-day") {
+      // Plan My Day — no energy/motivation interview on entry.
+      navigateDailyOpeningDestination({ kind: "plan-my-day" });
+      return;
+    }
+    setDailyOpeningPlanOrAdapt(false);
+    setDailyOpeningAdaptCheckIn(true);
+  }
+
+  function finishAdaptMyDayToPlan(_proposal: AdaptedDayProposal) {
+    markTodaysWelcomeDismissedThisSession();
+    setGlobalDailyOpening(null);
+    clearDailyOpeningSubViews();
+    openPlanMyDayCore();
   }
 
   function handleGlobalDailyHelpSuggestion(suggestion: HelpMeChooseSuggestion) {
@@ -7295,7 +7350,7 @@ export default function CompanionPageClient() {
   }
 
   function handleGlobalDailyBackToToday() {
-    setDailyOpeningHelpSuggestions(null);
+    clearDailyOpeningSubViews();
   }
 
   // Run queued first-of-day / absence opening through the shared New Day controller.
@@ -12530,7 +12585,7 @@ export default function CompanionPageClient() {
     if (globalDailyOpening) {
       markTodaysWelcomeDismissedThisSession();
       setGlobalDailyOpening(null);
-      setDailyOpeningHelpSuggestions(null);
+      clearDailyOpeningSubViews();
     }
 
     chatRequestGenerationRef.current += 1;
@@ -22093,7 +22148,30 @@ export default function CompanionPageClient() {
                 }
                 welcomeSlot={
                   todaysWelcomeOpening && !isLoading ? (
-                    dailyOpeningHelpSuggestions ? (
+                    dailyOpeningAdaptCheckIn ? (
+                      <AdaptMyDayCheckIn
+                        onBack={() => {
+                          setDailyOpeningAdaptCheckIn(false);
+                          setDailyOpeningPlanOrAdapt(true);
+                        }}
+                        onUsePlan={finishAdaptMyDayToPlan}
+                        onAdjustPlan={finishAdaptMyDayToPlan}
+                        onStartFirstStep={finishAdaptMyDayToPlan}
+                        onKeepCurrentPlan={() => {
+                          markTodaysWelcomeDismissedThisSession();
+                          setGlobalDailyOpening(null);
+                          clearDailyOpeningSubViews();
+                          openPlanMyDayCore();
+                        }}
+                      />
+                    ) : dailyOpeningPlanOrAdapt ? (
+                      <TodaysWelcomeCard
+                        mode="plan-or-adapt"
+                        choices={resolvePlanOrAdaptChoices()}
+                        onSelect={handlePlanOrAdaptChoice}
+                        onBackToToday={handleGlobalDailyBackToToday}
+                      />
+                    ) : dailyOpeningHelpSuggestions ? (
                       <TodaysWelcomeCard
                         mode="help-me-choose"
                         suggestions={dailyOpeningHelpSuggestions}

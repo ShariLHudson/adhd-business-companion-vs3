@@ -206,10 +206,8 @@ export function resolveDailyOpeningChoiceAction(
   }
 
   if (choiceId === "plan-or-adapt-my-day") {
-    return {
-      kind: "navigate",
-      destination: { kind: "plan-my-day" },
-    };
+    // Plan vs Adapt are different needs — show the choice step first.
+    return { kind: "show-plan-or-adapt" };
   }
 
   // continue-meaningful-work

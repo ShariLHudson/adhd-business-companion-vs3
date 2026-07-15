@@ -40,6 +40,7 @@ export type DailyOpeningChoiceCard = {
 export type DailyOpeningDestination =
   | { kind: "continue"; option: CompanionContinueOption }
   | { kind: "plan-my-day" }
+  | { kind: "adapt-my-day" }
   | { kind: "section"; section: AppSection }
   | { kind: "clear-my-mind" }
   | { kind: "explore-estate" }
@@ -63,7 +64,8 @@ export type HelpMeChooseSuggestion = {
 
 export type DailyOpeningChoiceAction =
   | { kind: "navigate"; destination: DailyOpeningDestination }
-  | { kind: "show-help-me-choose"; suggestions: HelpMeChooseSuggestion[] };
+  | { kind: "show-help-me-choose"; suggestions: HelpMeChooseSuggestion[] }
+  | { kind: "show-plan-or-adapt" };
 
 export type DailyOpeningDiscoveryInvite = {
   show: boolean;
