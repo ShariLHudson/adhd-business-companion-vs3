@@ -241,6 +241,21 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
 });
 
 describe("GlobalDailyCompanionOpening — wiring contracts", () => {
+  it("soft-presents the card when the calendar day was already marked", () => {
+    const { readFileSync } = require("node:fs") as typeof import("node:fs");
+    const { resolve } = require("node:path") as typeof import("node:path");
+    const source = readFileSync(
+      resolve(process.cwd(), "app/companion/CompanionPageClient.tsx"),
+      "utf8",
+    );
+    expect(source).toContain("isTodaysWelcomeDismissedThisSession");
+    expect(source).toContain("markTodaysWelcomeDismissedThisSession");
+    expect(source).toContain("hasUserMessage");
+    expect(source).toMatch(
+      /Day already marked[\s\S]*?resolveGlobalDailyOpening/,
+    );
+  });
+
   it("CPC uses the shared card, empty chat seed, and input placeholder", () => {
     const { readFileSync } = require("node:fs") as typeof import("node:fs");
     const { resolve } = require("node:path") as typeof import("node:path");

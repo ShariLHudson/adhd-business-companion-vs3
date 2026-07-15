@@ -235,10 +235,14 @@ import { TodaysWelcomeCard } from "@/components/companion/TodaysWelcomeCard";
 import {
   runSharedNewDay,
   resolveDailyOpeningChoiceAction,
+  resolveGlobalDailyOpening,
   shouldOfferFirstPlatformOpeningOfDay,
   isAbsenceReturn,
   buildDailyOpeningArrivalMessage,
   markDailyOpeningDiscoveryPresented,
+  markDailyOpeningPresented,
+  markTodaysWelcomeDismissedThisSession,
+  isTodaysWelcomeDismissedThisSession,
   GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER,
   type DailyOpeningEntryPoint,
   type GlobalDailyOpeningResult,
@@ -3305,31 +3309,51 @@ export default function CompanionPageClient() {
     useState<DailyOpeningEntryPoint | null>(null);
   const estateChatScrollKey = `${freshStartRevision}-${messages.length}-${isLoading ? 1 : 0}`;
 
-  // Today's Welcome Card — first meaningful open of day / absence return.
-  // Never fall back to retired plain-text WelcomeHomeDailyChoices.
+  // Today's Welcome Card — always present on quiet Welcome Home arrival.
+  // First-of-day / absence → full New Day reset. Otherwise soft-present the card
+  // (fixes empty local UI when the calendar day was already marked in localStorage).
   useEffect(() => {
     if (!hydrated || !welcomeHomePrimary) return;
     if (welcomeHomeExperience.showIntro) return;
     if (dailyOpeningStartedRef.current) return;
     if (globalDailyOpening) return;
-    if (messages.length > 0) return;
+    if (isTodaysWelcomeDismissedThisSession()) return;
 
     const arrival =
       homeArrival ?? evaluateArrivalIntelligence({ record: false });
     const absence = isAbsenceReturn(arrival?.returnIntervalDays);
-    if (!absence && !shouldOfferFirstPlatformOpeningOfDay()) return;
+    const firstOfDay = shouldOfferFirstPlatformOpeningOfDay();
+
+    // Fresh day / absence: reset conversation and show the card.
+    if (firstOfDay || absence) {
+      dailyOpeningStartedRef.current = true;
+      setPendingDailyOpeningEntry(
+        absence ? "absence-return" : "first-platform-opening",
+      );
+      return;
+    }
+
+    // Day already marked — still show the card once on a quiet Welcome Home
+    // without wiping the conversation id again. A leftover assistant greeting
+    // must not block the card (that was the empty local UI).
+    const hasUserMessage = messages.some((m) => m.role === "user");
+    if (hasUserMessage) return;
 
     dailyOpeningStartedRef.current = true;
-    setPendingDailyOpeningEntry(
-      absence ? "absence-return" : "first-platform-opening",
-    );
+    const opening = resolveGlobalDailyOpening({
+      entryPoint: "explicit-new-day",
+    });
+    setGlobalDailyOpening(opening);
+    setDailyOpeningHelpSuggestions(null);
+    setMessages([]);
+    markDailyOpeningPresented();
   }, [
     hydrated,
     welcomeHomePrimary,
     welcomeHomeExperience.showIntro,
     homeArrival,
     globalDailyOpening,
-    messages.length,
+    messages,
   ]);
 
   const estateChatInputFocusEnabled =
@@ -7157,6 +7181,7 @@ export default function CompanionPageClient() {
   function navigateDailyOpeningDestination(
     destination: import("@/lib/dailyOpening").DailyOpeningDestination,
   ) {
+    markTodaysWelcomeDismissedThisSession();
     setGlobalDailyOpening(null);
     setDailyOpeningHelpSuggestions(null);
     const arrival = buildDailyOpeningArrivalMessage(destination);
@@ -12458,6 +12483,7 @@ export default function CompanionPageClient() {
 
     // Freeform input dismisses the guided daily opening (choices stay optional).
     if (globalDailyOpening) {
+      markTodaysWelcomeDismissedThisSession();
       setGlobalDailyOpening(null);
       setDailyOpeningHelpSuggestions(null);
     }

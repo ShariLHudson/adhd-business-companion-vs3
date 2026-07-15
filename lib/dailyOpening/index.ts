@@ -27,3 +27,8 @@ export {
 } from "./resolveDiscoveryInvite";
 export { buildDailyOpeningArrivalMessage } from "./arrivalMessage";
 export { resolveMeaningfulContinueForWelcome } from "./resolveMeaningfulContinue";
+export {
+  isTodaysWelcomeDismissedThisSession,
+  markTodaysWelcomeDismissedThisSession,
+  clearTodaysWelcomeSessionDismissForTests,
+} from "./todaysWelcomeSession";
