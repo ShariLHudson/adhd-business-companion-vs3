@@ -296,8 +296,12 @@ import {
   upsertDocumentMetadata,
 } from "@/lib/documentMetadataStore";
 import { recordProjectConversationIfOpen } from "@/lib/projectConversations";
-import { TimeBlockPanel } from "@/components/companion/TimeBlockPanel";
 import { TimeBlockTrigger } from "@/components/companion/TimeBlockTrigger";
+import { LegacyMomentumAppointmentRedirect } from "@/components/companion/LegacyMomentumAppointmentRedirect";
+import {
+  openCalendarItemIntent,
+  type CalendarItemOpenSource,
+} from "@/lib/calendar/openCalendarItem";
 import { TopBar } from "@/components/companion/TopBar";
 import { FreshStartConfirmDialog } from "@/components/companion/FreshStartConfirmDialog";
 import { SimpleChat } from "@/components/companion/SimpleChat";
@@ -1405,7 +1409,11 @@ import {
   setEvidenceVaultWorkspaceMode,
 } from "@/lib/estate/evidenceVaultArrival";
 import { EVIDENCE_VAULT_CHAT_PRESERVE_OFFER } from "@/lib/estate/evidenceVaultExperience";
-import { evidenceVaultContextReply } from "@/lib/estate/evidenceVaultContextLock";
+import {
+  evidenceVaultContextReply,
+  isEvidenceVaultLeaveRequest,
+  looksLikeEvidenceVaultDiscoveryShare,
+} from "@/lib/estate/evidenceVaultContextLock";
 import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
 import { confirmLeaveUnsavedWork } from "@/lib/unsavedWorkGuard";
 import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
@@ -2573,7 +2581,10 @@ export default function CompanionPageClient() {
     !profileDestinationActive &&
     !(
       directEstateVisit &&
-      directEstateVisit.section === "home"
+      directEstateVisit.section === "home" &&
+      /** Welcome Home / Spark Estate entry must never be treated as a visit trap. */
+      directEstateVisit.roomId !== "welcome-home" &&
+      directEstateVisit.roomId !== "spark-estate"
     );
   const momentumBuilderPrimary =
     isMomentumBuilderRoomSection(activeSection) &&
@@ -8351,6 +8362,25 @@ export default function CompanionPageClient() {
   }
 
   /**
+   * Shared calendar item open — Plan My Day → Calendar (+ detail when id given).
+   * Never opens legacy Momentum Appointments / TimeBlockPanel split layout.
+   */
+  function openCalendarItemCore(
+    itemId?: string | null,
+    source: CalendarItemOpenSource = "planning-calendar",
+  ) {
+    const intent = openCalendarItemIntent(itemId, source);
+    setTimeBlockFocusId(null);
+    if (workspacePanel === "time-block") {
+      patchWorkspacePanel(null);
+    }
+    openPlanMyDayCore({
+      itemId: intent.planItemId,
+      area: "calendar",
+    });
+  }
+
+  /**
    * Reminders — dedicated estate room (My Workday).
    * Never opens Settings, Notifications overlay, or Plan My Day.
    */
@@ -9177,6 +9207,12 @@ export default function CompanionPageClient() {
     if (isBreatheDestinationActive(breatheDestination)) {
       closeBreatheOverlayCore({ resume: true });
     }
+    /**
+     * Vault is its own conversation — never continue a Create / document owner
+     * ("We were creating your document…") inside Evidence Vault.
+     */
+    clearConversationOwner();
+    clearUniversalCreationSession();
     setEstateRoomChatVisible(false);
     const mode = opts?.workspaceMode ?? "arrive";
     setEvidenceVaultWorkspaceMode(mode);
@@ -9656,9 +9692,17 @@ export default function CompanionPageClient() {
   /**
    * Room menu → Back to Estate.
    * Always returns to the Welcome Home lobby (not everyday chat shell).
+   * Leaving Evidence Vault starts a fresh chat — vault welcome must not linger.
    */
   function navigateBackToEstateHome() {
+    const leavingEvidenceVault =
+      activeSectionRef.current === "evidence-bank" ||
+      directEstateVisitRef.current?.roomId === "evidence-vault";
     returnToWelcomeHomeLobby("back to estate");
+    if (leavingEvidenceVault) {
+      clearTodayContext({ preserveRoom: true, mode: "new-chat" });
+      setFreshStartRevision((revision) => revision + 1);
+    }
   }
 
   function handleEstateWander(fromRoomId: string) {
@@ -9702,9 +9746,22 @@ export default function CompanionPageClient() {
     const dest = getExploreEstateDestinationById(location.id);
     const placeId = resolveExploreMapLocationPlaceId(dest ?? location);
     if (!placeId) {
-      setExploreSparkMapOpen(true);
       return;
     }
+
+    const isWelcomeHomePlace =
+      placeId === "welcome-home" || placeId === "spark-estate";
+    if (isWelcomeHomePlace) {
+      returnToWelcomeHomeLobby(`Explore Estate: ${location.name}`);
+      return;
+    }
+
+    /** Close Explore before the room hop — never leave the map covering arrival. */
+    dismissTransientEstateExperiencesForDestinationSwitch({
+      destinationId: placeId,
+      kind: "section",
+    });
+    leaveClearMyMindIfNavigatingAway();
 
     markExploreEstateReturnPending();
     setExploreEstateReturnAvailable(true);
@@ -9722,6 +9779,18 @@ export default function CompanionPageClient() {
       setExploreSparkMapOpen(true);
       return;
     }
+
+    const commandPlace = command.roomId ?? command.entryId;
+    if (
+      commandPlace === "welcome-home" ||
+      commandPlace === "spark-estate" ||
+      command.entryId === "welcome-home" ||
+      command.entryId === "spark-estate"
+    ) {
+      returnToWelcomeHomeLobby(`Explore Estate: ${location.name}`);
+      return;
+    }
+
     runDirectEstateRoomNavigation(command, `Explore Estate: ${location.name}`, undefined, {
       skipAssistantMessage: true,
     });
@@ -9759,6 +9828,13 @@ export default function CompanionPageClient() {
     estateSectionNavEpochRef.current += 1;
 
     const fromSection = activeSectionRef.current;
+
+    dismissTransientEstateExperiencesForDestinationSwitch({
+      destinationId: "welcome-home",
+      kind: "welcome-home",
+    });
+    clearExploreEstateReturnPending();
+    setExploreEstateReturnAvailable(false);
 
     if (isBreatheDestinationActive(breatheDestination)) {
       if (breatheTransitionTimerRef.current) {
@@ -10069,7 +10145,7 @@ export default function CompanionPageClient() {
         openFocusAudioCore(detectAudioRequest(lastUserTextRef.current).categoryId);
         break;
       case "time-block":
-        openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"));
+        openCalendarItemCore(timeBlockFocusId, "tool");
         break;
       case "activities":
         openStandaloneFocusSectionCore("focus");
@@ -10372,9 +10448,8 @@ export default function CompanionPageClient() {
         });
         break;
       case "reschedule":
-        setTimeBlockFocusId(block.id);
-        setActiveSection("time-block");
-        break;
+        openCalendarItemCore(block.id, "legacy-redirect");
+        return;
       case "parking-lot":
         saveTimeBlock({ id: block.id, date: "", status: "pending" });
         break;
@@ -10425,7 +10500,7 @@ export default function CompanionPageClient() {
   function handleOpenProjectTimeBlock(projectId: string, blockId?: string) {
     setProjectContinueId(projectId);
     setTimeBlockFocusId(blockId ?? null);
-    openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"));
+    openCalendarItemCore(blockId ?? null, "project");
   }
 
   function handleTemplateBuildWithShari(input: CreationWorkspaceInput) {
@@ -11440,6 +11515,11 @@ export default function CompanionPageClient() {
       openPlanMyDayCore();
       return;
     }
+    // Legacy Momentum Appointments → current Plan My Day Calendar (never split-chat).
+    if (section === "time-block") {
+      openCalendarItemCore(timeBlockFocusId, "legacy-redirect");
+      return;
+    }
     if (redirectLegacyCreateWorkspaceIfNeeded(section)) return;
     clearParallelCoachingOffers();
     if (section === "content-generator") {
@@ -12303,7 +12383,16 @@ export default function CompanionPageClient() {
      * Continuity ownership gate (Slice 2) — before primary / Decision Engine /
      * navigation / generic recovery. Active owner receives the turn unless the
      * member explicitly exits or changes tasks.
+     *
+     * Inside Evidence Vault, never continue Create / document ownership.
      */
+    const sendInEvidenceVault =
+      activeSectionRef.current === "evidence-bank" ||
+      directEstateVisitRef.current?.roomId === "evidence-vault";
+    if (sendInEvidenceVault) {
+      clearConversationOwner();
+      clearUniversalCreationSession();
+    }
 
     const continuityGate = resolveContinuityTurnGate({
       userText: trimmed,
@@ -14193,7 +14282,47 @@ export default function CompanionPageClient() {
     });
     setCurrentRoom(currentEstateRoomId);
 
-    if (currentEstateRoomId === "evidence-vault") {
+    if (
+      currentEstateRoomId === "evidence-vault" ||
+      activeSectionRef.current === "evidence-bank"
+    ) {
+      if (isEvidenceVaultLeaveRequest(trimmed)) {
+        navigateBackToEstateHome();
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+
+      const lastVaultPrompt =
+        lastAssistantBeforeSend.includes(
+          "What discovery would you like to preserve",
+        ) ||
+        lastAssistantBeforeSend.includes(
+          "What would you like to preserve today",
+        );
+
+      if (
+        looksLikeEvidenceVaultDiscoveryShare(trimmed) ||
+        (lastVaultPrompt && trimmed.length >= 8)
+      ) {
+        openCollectionRoomWithPrefillCore(
+          "evidence-vault",
+          { situation: trimmed },
+          trimmed,
+        );
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content:
+              "I've opened today's Discovery File with what you shared. Add anything else you'd like, then we can preserve it.",
+          },
+        ]);
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+
       const vaultContextReply = evidenceVaultContextReply(trimmed);
       if (vaultContextReply) {
         setMessages((prev) => [
@@ -16213,15 +16342,9 @@ export default function CompanionPageClient() {
       }
       if (
         (recovery === "time-block" || recovery === "any") &&
-        workspacePanel === "time-block"
+        (workspacePanel === "time-block" || !governorChatOnly)
       ) {
-        setActiveSection("home");
-        activeSectionRef.current = "home";
-        revealWorkspace();
-        appendVerifiedWorkspaceMessage(
-          "time-block",
-          "**Momentum Appointments** is open beside you — check the panel on the right (or tap **Open** in the **Active** bar).",
-        );
+        openCalendarItemCore(timeBlockFocusId, "recovery");
         return;
       }
       if (
@@ -16229,16 +16352,6 @@ export default function CompanionPageClient() {
         workspacePanel === "brain-dump"
       ) {
         openClearMyMindCore({ silent: true });
-        return;
-      }
-      if (
-        (recovery === "time-block" || recovery === "any") &&
-        !governorChatOnly
-      ) {
-        openWorkspaceBesideChatCore(
-          "time-block",
-          "**Momentum Appointments** is open beside you — let's place your next move on the day.",
-        );
         return;
       }
     }
@@ -18813,6 +18926,34 @@ export default function CompanionPageClient() {
     const roomId = command.roomId ?? command.entryId;
 
     /**
+     * Always dismiss Explore Estate before a room hop so the map cannot cover
+     * Welcome Home or the destination photograph.
+     */
+    dismissTransientEstateExperiencesForDestinationSwitch({
+      destinationId: roomId || command.section,
+      kind: "section",
+    });
+
+    /** Welcome Home is the lobby — never a home-section direct visit trap. */
+    if (
+      roomId === "welcome-home" ||
+      roomId === "spark-estate" ||
+      command.entryId === "welcome-home" ||
+      command.entryId === "spark-estate"
+    ) {
+      returnToWelcomeHomeLobby(userText || "welcome home");
+      return;
+    }
+
+    const openingClearMyMind =
+      command.section === "brain-dump" ||
+      roomId === "clear-my-mind" ||
+      command.entryId === "clear-my-mind";
+    if (!openingClearMyMind) {
+      leaveClearMyMindIfNavigatingAway();
+    }
+
+    /**
      * Clear My Mind Mode — dedicated interactive workspace, never frosted chat.
      * Enter mode immediately; do not create a direct-visit overlay.
      */
@@ -19123,7 +19264,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (offer.section === "time-block") {
-      openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"));
+      openCalendarItemCore(timeBlockFocusId, "workspace-offer");
       return;
     }
     if (offer.section === "brain-dump") {
@@ -19767,16 +19908,10 @@ export default function CompanionPageClient() {
         );
       case "time-block":
         return (
-          <TimeBlockPanel
-            onStart={startBlock}
-            onTestAlert={testAlert}
-            initialProjectId={
-              workspaceSession?.projectId ??
-              workspaceDetail?.selectedItemId ??
-              projectContinueId ??
-              undefined
+          <LegacyMomentumAppointmentRedirect
+            onRedirect={() =>
+              openCalendarItemCore(timeBlockFocusId, "legacy-redirect")
             }
-            initialBlockId={timeBlockFocusId ?? undefined}
           />
         );
       default:
@@ -20288,16 +20423,10 @@ export default function CompanionPageClient() {
         );
       case "time-block":
         return (
-          <TimeBlockPanel
-            onStart={startBlock}
-            onTestAlert={testAlert}
-            initialProjectId={
-              workspaceSession?.projectId ??
-              workspaceDetail?.selectedItemId ??
-              projectContinueId ??
-              undefined
+          <LegacyMomentumAppointmentRedirect
+            onRedirect={() =>
+              openCalendarItemCore(timeBlockFocusId, "legacy-redirect")
             }
-            initialBlockId={timeBlockFocusId ?? undefined}
           />
         );
       case "focus-timer":
@@ -20689,7 +20818,7 @@ export default function CompanionPageClient() {
   function launchActionBridge(bridge: ActionBridge) {
     clearAllPendingOffers();
     if (bridge.tool === "time-block") {
-      openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"));
+      openCalendarItemCore(timeBlockFocusId, "action-bridge");
       return;
     }
     if (bridge.tool === "brain-dump") {
@@ -20910,12 +21039,9 @@ export default function CompanionPageClient() {
       items.push({
         id: "time-block",
         objectId: "calendar",
-        label: "Momentum Appointments",
+        label: "Calendar",
         detail: "Planning open",
-        onOpen: () => {
-          setActiveSection("home");
-          revealWorkspace();
-        },
+        onOpen: () => openCalendarItemCore(timeBlockFocusId, "legacy-redirect"),
         onClose: closeWorkspacePanel,
       });
     }
@@ -22593,8 +22719,9 @@ export default function CompanionPageClient() {
                 openSectionBesideChatCore("projects", "projects");
               }}
               onOpenProjects={() => openSectionBesideChatCore("projects", "projects")}
-              onOpenCalendar={() =>
-                openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"))
+              onOpenCalendar={() => openCalendarCore()}
+              onOpenAppointment={(appointmentId) =>
+                openCalendarItemCore(appointmentId, "planning-calendar")
               }
               initialOpenItemId={planMyDayOpenItemId}
               initialPlanningArea={planMyDayInitialArea}
@@ -22611,7 +22738,16 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "calendar" && (
-            <CalendarRoomPanel onBack={goBack} registerBack={registerBack} />
+            <CalendarRoomPanel
+              onBack={goBack}
+              registerBack={registerBack}
+              onOpenPlanItem={(itemId) =>
+                openCalendarItemCore(itemId, "calendar-room")
+              }
+              onOpenAppointment={(appointmentId) =>
+                openCalendarItemCore(appointmentId, "calendar-room")
+              }
+            />
           )}
 
           {activeSection === "parking-lot" && (
@@ -23036,12 +23172,11 @@ export default function CompanionPageClient() {
           ) : null}
 
           {activeSection === "time-block" && (
-            <WorkspaceShell
-              assistLabel={getShariAssistLabel("time-block")}
-              onAskShari={() => openCompanionAssist("time-block")}
-            >
-              <TimeBlockPanel onStart={startBlock} onTestAlert={testAlert} />
-            </WorkspaceShell>
+            <LegacyMomentumAppointmentRedirect
+              onRedirect={() =>
+                openCalendarItemCore(timeBlockFocusId, "deep-link")
+              }
+            />
           )}
 
           {activeSection === "guided-exercises" &&
@@ -23619,7 +23754,10 @@ export default function CompanionPageClient() {
 
       <EstateMapFullScreen
         open={exploreSparkMapOpen}
-        onClose={() => setExploreSparkMapOpen(false)}
+        onClose={() => returnToWelcomeHomeLobby("explore estate fold")}
+        onReturnToEstate={() =>
+          returnToWelcomeHomeLobby("explore estate return")
+        }
         locations={getExploreSparkMapLocations()}
         currentLocationId={exploreMapLocationIdForPlaceId(
           roomMenuRoomId ??

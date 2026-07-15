@@ -314,10 +314,10 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     categoryId: "focus-momentum",
     title: "Momentum Blocks",
     emoji: "🧱",
-    whatItIs: "Gentle time intentions — Momentum Appointments on your calendar.",
+    whatItIs: "Gentle time intentions on your planning calendar.",
     whenToUse: "When you want structure without rigid deadlines.",
     workflow: [
-      "Open Momentum Appointments (Time Block).",
+      "Open Plan My Day → Calendar.",
       "Name one intention and pick 15–45 minutes.",
       "Start when ready — check in with How did it go?",
       "Made progress counts as success.",
@@ -325,7 +325,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     tips: ["Flexible timing is a feature, not a failure."],
     keywords: ["momentum", "appointment", "time block", "calendar"],
     openSection: "time-block",
-    openLabel: "Open Momentum Appointments",
+    openLabel: "Open Calendar",
   },
   {
     id: "energy-matching",

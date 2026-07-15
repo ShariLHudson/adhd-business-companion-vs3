@@ -1199,14 +1199,14 @@ export function ProjectsPanel({
 
           <CollapsibleSection
             id="time-blocks"
-            title="Momentum Appointments"
+            title="Calendar appointments"
             count={blocks.length}
             open={!!detailSectionsOpen["time-blocks"]}
             onToggle={toggleDetailSection}
           >
             {blocks.length === 0 ? (
               <p className="text-sm text-[#6b635a]">
-                No momentum appointments yet — add one from Overview.
+                No appointments yet — add one from Overview or Plan My Day → Calendar.
               </p>
             ) : (
               <div className="flex flex-col gap-3">

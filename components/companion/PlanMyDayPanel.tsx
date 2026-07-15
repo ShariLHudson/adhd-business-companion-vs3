@@ -21,6 +21,7 @@ import {
   PLANNING_VIEW_OPTIONS,
   setLastPlanningView,
   updatePlanItem,
+  deletePlanItem,
   type PlanDayItem,
   type PlanItemColumn,
   type PlanningViewMode,
@@ -77,7 +78,14 @@ import { PlanMyDayRhythmsArea } from "@/components/companion/PlanMyDayRhythmsAre
 import { PlanMyDayCalendarArea } from "@/components/companion/PlanMyDayCalendarArea";
 import { PlanMyDayUpcomingArea } from "@/components/companion/PlanMyDayUpcomingArea";
 import { PlanMyDayParkingLotArea } from "@/components/companion/PlanMyDayParkingLotArea";
+import { ensureCalendarPlanItem } from "@/lib/calendar/openCalendarItem";
 import { PlanMyDayHistoryArea } from "@/components/companion/PlanMyDayHistoryArea";
+import {
+  PLAN_DAY_IM_STUCK_BUTTON_LABEL,
+  requestPlanDayImStuck,
+} from "@/lib/planMyDay/planDayImStuck";
+import { PlanDaySimpleAdd } from "@/components/companion/PlanDaySimpleAdd";
+import { PlanDaySimpleList } from "@/components/companion/PlanDaySimpleList";
 import { PlanDayPreviousDayPrompt } from "@/components/companion/PlanDayPreviousDayPrompt";
 import { PlanDayPreviousDayReview } from "@/components/companion/PlanDayPreviousDayReview";
 import {
@@ -256,6 +264,7 @@ export function PlanMyDayPanel({
   onOpenProject,
   onOpenProjects,
   onOpenCalendar,
+  onOpenAppointment,
   onOpenAdaptMyDay,
   registerBack,
   initialOpenItemId,
@@ -270,6 +279,11 @@ export function PlanMyDayPanel({
   onOpenProject?: (projectId: string) => void;
   onOpenProjects?: () => void;
   onOpenCalendar?: () => void;
+  /**
+   * Open a calendar / legacy Momentum Appointment in the current detail experience.
+   * Prefer local Plan My Day calendar detail; host should route via openCalendarItem.
+   */
+  onOpenAppointment?: (appointmentId?: string) => void;
   onOpenAdaptMyDay?: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
   initialOpenItemId?: string | null;
@@ -290,11 +304,15 @@ export function PlanMyDayPanel({
   const [openItemId, setOpenItemId] = useState<string | null>(
     initialOpenItemId ?? null,
   );
+  /** Detail for calendar / legacy appointments not yet on today's board. */
+  const [calendarDetailItem, setCalendarDetailItem] =
+    useState<PlanDayItem | null>(null);
   const [detailMode, setDetailMode] = useState<PlanItemDetailMode>("form");
   const [kanbanToast, setKanbanToast] = useState<string | null>(null);
   const [realityPrompt, setRealityPrompt] =
     useState<RealityMismatchPrompt | null>(null);
   const [livingUnlocked, setLivingUnlocked] = useState(() => {
+    if (standalone) return true;
     const hasPlan = hasMeaningfulPlanItemsForToday();
     return (
       hasPlan ||
@@ -308,6 +326,7 @@ export function PlanMyDayPanel({
   });
   const [flexibleMode, setFlexibleMode] = useState(
     () =>
+      !standalone &&
       initialSession.phase === "flexible" &&
       !hasMeaningfulPlanItemsForToday(),
   );
@@ -351,6 +370,7 @@ export function PlanMyDayPanel({
     }
     if (area !== "today") {
       setOpenItemId(null);
+      setCalendarDetailItem(null);
       setEditingReality(false);
       setFlexibleMode(false);
       setShowAddForm(false);
@@ -367,13 +387,19 @@ export function PlanMyDayPanel({
     } catch {
       /* ignore */
     }
-    if (initialPlanningArea !== "today") {
+    // Keep the requested item when deep-linking into Calendar (or another area).
+    if (initialPlanningArea !== "today" && !initialOpenItemId) {
       setOpenItemId(null);
+      setCalendarDetailItem(null);
+      setEditingReality(false);
+      setFlexibleMode(false);
+      setShowAddForm(false);
+    } else if (initialPlanningArea !== "today") {
       setEditingReality(false);
       setFlexibleMode(false);
       setShowAddForm(false);
     }
-  }, [initialPlanningArea]);
+  }, [initialPlanningArea, initialOpenItemId]);
 
   const atmosphereClass = dayModeAtmosphereClass(companion.orientation.dayMode);
   const hasMeaningfulToday = items.some(isMeaningfulPlanItem);
@@ -463,6 +489,19 @@ export function PlanMyDayPanel({
     }
   }, [livingUnlocked, showOrientation, flexibleMode]);
 
+  useEffect(() => {
+    if (!standalone) return;
+    setLivingUnlocked(true);
+    setFlexibleMode(false);
+    const current = readPlanDaySession(companion.dayKey);
+    if (current.phase !== "living") {
+      markPlanDayLiving(
+        companion.dayKey,
+        current.livingEntry ?? "flexible-build",
+      );
+    }
+  }, [standalone, companion.dayKey]);
+
   /** Settings → Planning (and in-room last-used) keep this panel in sync. */
   useEffect(() => {
     const syncView = () => {
@@ -476,6 +515,7 @@ export function PlanMyDayPanel({
   }, [dayEnergy]);
 
   useEffect(() => {
+    if (standalone) return;
     if (!livingUnlocked) return;
     const stored = readTodayPlanItems();
     if (!stored.length) return;
@@ -567,11 +607,22 @@ export function PlanMyDayPanel({
   }, [items, livingUnlocked]);
 
   useEffect(() => {
-    if (initialOpenItemId) {
+    if (!initialOpenItemId) return;
+    const ensured =
+      ensureCalendarPlanItem(initialOpenItemId) ??
+      readTodayPlanItems().find((i) => i.id === initialOpenItemId) ??
+      null;
+    if (ensured) {
+      setCalendarDetailItem(ensured);
+      setOpenItemId(ensured.id);
+      setItems((prev) =>
+        prev.some((i) => i.id === ensured.id) ? prev : [...prev, ensured],
+      );
+    } else {
       setOpenItemId(initialOpenItemId);
-      setDetailMode("form");
-      setLivingUnlocked(true);
     }
+    setDetailMode("form");
+    setLivingUnlocked(true);
   }, [initialOpenItemId]);
 
   useEffect(() => {
@@ -587,6 +638,7 @@ export function PlanMyDayPanel({
           return true;
         }
         setOpenItemId(null);
+        setCalendarDetailItem(null);
         setDetailMode("form");
         return true;
       }
@@ -611,7 +663,8 @@ export function PlanMyDayPanel({
   ]);
 
   const openItem = openItemId
-    ? items.find((i) => i.id === openItemId) ?? null
+    ? items.find((i) => i.id === openItemId) ??
+      (calendarDetailItem?.id === openItemId ? calendarDetailItem : null)
     : null;
 
   function refresh(next: PlanDayItem[]) {
@@ -754,12 +807,48 @@ export function PlanMyDayPanel({
         : null;
 
   function handleOpenItem(id: string, mode: PlanItemDetailMode = "form") {
-    setOpenItemId(id);
+    const ensured =
+      ensureCalendarPlanItem(id) ??
+      items.find((i) => i.id === id) ??
+      null;
+    if (ensured) {
+      setCalendarDetailItem(ensured);
+      setOpenItemId(ensured.id);
+      setItems((prev) =>
+        prev.some((i) => i.id === ensured.id) ? prev : [...prev, ensured],
+      );
+    } else {
+      setOpenItemId(id);
+    }
     setDetailMode(mode);
+  }
+
+  function handleOpenCalendarEventId(rawId: string) {
+    const ensured = ensureCalendarPlanItem(rawId);
+    if (!ensured) {
+      onOpenAppointment?.(rawId);
+      return;
+    }
+    setCalendarDetailItem(ensured);
+    setOpenItemId(ensured.id);
+    setDetailMode("form");
+    setItems((prev) =>
+      prev.some((i) => i.id === ensured.id) ? prev : [...prev, ensured],
+    );
+    // Stay on Calendar so Back returns to the planning calendar, not Today.
+    if (planningArea !== "calendar") {
+      setPlanningArea("calendar");
+      try {
+        localStorage.setItem(PLANNING_AREA_STORAGE_KEY, "calendar");
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   function handleCloseItem() {
     setOpenItemId(null);
+    setCalendarDetailItem(null);
     setDetailMode("form");
   }
 
@@ -898,9 +987,50 @@ export function PlanMyDayPanel({
   }
 
   if (standalone) {
+    const listItems = items.filter(
+      (item) => isMeaningfulPlanItem(item) && !item.done,
+    );
     return (
       <PlanMyDayMorningRoomShell onOutsideDismiss={() => onBack?.()}>
-        {renderPanelBody()}
+        <div
+          className="flex h-full min-h-0 w-full flex-col overflow-y-auto"
+          data-testid="plan-day-simple-paper"
+          data-daily-state="todays-plan"
+          data-experience-phase="todays-plan"
+        >
+          <PlanDayJourneyShell
+            chapter="todays-plan"
+            onBack={() => onBack?.()}
+            onBackToChat={() => onBackToChat?.()}
+            morningRoom
+            memberOrderLayout
+            hideHelp
+          >
+            <div className="mt-6 flex flex-col gap-8 pb-10">
+              <PlanDaySimpleAdd
+                onAdd={(title) => handleAdd({ title, column: "today" })}
+              />
+              <PlanDaySimpleList
+                items={listItems}
+                onComplete={handleCompleteItem}
+                onEdit={(id, title) =>
+                  refresh(updatePlanItem(items, id, { title }))
+                }
+                onDelete={(id) => refresh(deletePlanItem(items, id))}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  requestPlanDayImStuck(listItems.map((item) => item.title))
+                }
+                className="self-start rounded-xl border border-[#c9bfb0] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f5f0ea]"
+                data-testid="plan-day-im-stuck"
+              >
+                {PLAN_DAY_IM_STUCK_BUTTON_LABEL}
+              </button>
+            </div>
+          </PlanDayJourneyShell>
+        </div>
       </PlanMyDayMorningRoomShell>
     );
   }
@@ -963,6 +1093,7 @@ export function PlanMyDayPanel({
         shariWhisper={standalone ? null : shariWhisper}
         hideHelp={showOrientation || flexibleMode || standalone}
         morningRoom={standalone}
+        memberOrderLayout={showingTodaysPlan}
         headerActions={
           planningArea === "today" &&
           !showOrientation &&
@@ -973,20 +1104,57 @@ export function PlanMyDayPanel({
           ) : undefined
         }
       >
-        {!showOrientation ? (
+        {!showOrientation && !showingTodaysPlan ? (
           <PlanMyDayPlanningNav
             active={planningArea}
             onChange={handlePlanningAreaChange}
           />
         ) : null}
 
-        {planningArea === "rhythms" ? (
+        {openItem ? (
+          <div
+            className="mt-4 plan-day-journey-chapter-enter"
+            data-testid="plan-day-calendar-item-detail"
+          >
+            <PlanDayItemDetail
+              key={`${openItem.id}-${detailMode}`}
+              item={openItem}
+              items={items}
+              onItemsChange={(next) => {
+                refresh(next);
+                const updated = next.find((i) => i.id === openItem.id);
+                if (updated) setCalendarDetailItem(updated);
+              }}
+              onClose={handleCloseItem}
+              onStartNow={(it) => handleStartFocus(it.id)}
+              onOpenProject={onOpenProject}
+              onOpenNextItem={(id) => handleOpenItem(id)}
+              initialMode={detailMode}
+              onModeChange={setDetailMode}
+              hideClose
+              onCompleted={showCompletionToast}
+            />
+          </div>
+        ) : planningArea === "rhythms" ? (
           <div className="plan-day-journey-chapter-enter">
             <PlanMyDayRhythmsArea initialTab={initialRhythmsTab ?? undefined} />
           </div>
         ) : planningArea === "calendar" ? (
           <div className="plan-day-journey-chapter-enter">
-            <PlanMyDayCalendarArea />
+            <PlanMyDayCalendarArea
+              onOpenEvent={(ev) => {
+                if (ev.source === "spark-plan" && ev.id.startsWith("plan-")) {
+                  handleOpenItem(ev.id.slice("plan-".length));
+                  return;
+                }
+                if (
+                  ev.source === "spark-appointment" &&
+                  ev.id.startsWith("tb-")
+                ) {
+                  handleOpenCalendarEventId(ev.id);
+                }
+              }}
+            />
           </div>
         ) : planningArea === "upcoming" ? (
           <div className="plan-day-journey-chapter-enter">
@@ -1051,6 +1219,7 @@ export function PlanMyDayPanel({
               onOpenProject={onOpenProject}
               onOpenProjects={onOpenProjects}
               onOpenCalendar={onOpenCalendar}
+              onOpenAppointment={(id) => handleOpenCalendarEventId(id)}
               onBringParkingItem={handleBringParkingItem}
               onOpenItem={(id) => handleOpenItem(id)}
               onReturnToGateway={returnToGateway}
@@ -1060,29 +1229,68 @@ export function PlanMyDayPanel({
           <div className="mt-4 plan-day-journey-chapter-enter">
             <AdjustMyDayPanel embedded onDone={closeTodaysReality} />
           </div>
-        ) : openItem ? (
-          <div className="mt-4 plan-day-journey-chapter-enter">
-            <PlanDayItemDetail
-              key={`${openItem.id}-${detailMode}`}
-              item={openItem}
-              items={items}
-              onItemsChange={refresh}
-              onClose={handleCloseItem}
-              onStartNow={(it) => handleStartFocus(it.id)}
-              onOpenProject={onOpenProject}
-              onOpenNextItem={(id) => handleOpenItem(id)}
-              initialMode={detailMode}
-              onModeChange={setDetailMode}
-              hideClose
-              onCompleted={showCompletionToast}
-            />
-          </div>
         ) : (
           <>
             <div
               className="mt-4 flex flex-col gap-4 plan-day-journey-chapter-enter"
+              data-testid="plan-day-todays-plan-order"
               style={{ animationDelay: "120ms" }}
             >
+              <div data-testid="plan-day-add-another-form">
+                <PlanDayAddForm onAdd={handleAdd} />
+              </div>
+
+              <section
+                aria-label="Today's Items"
+                data-testid="plan-day-todays-items"
+                className="flex flex-col gap-3"
+              >
+                <h2 className="text-lg font-semibold text-[#1f1c19]">
+                  Today&apos;s Items
+                </h2>
+                {view !== "kanban" ? renderTaskView() : null}
+                {view === "kanban" ? (
+                  <div className={PLAN_KANBAN_BOARD_CLASS}>
+                    {renderTaskView()}
+                    {completedToday.length > 0 ? (
+                      <div
+                        className="mt-6"
+                        data-testid="plan-day-completed-today-kanban"
+                      >
+                        <p className="text-lg font-semibold text-[#1f1c19]">
+                          Completed Today
+                        </p>
+                        <ul className="mt-3 flex flex-col gap-2">
+                          {completedToday.map((row) => (
+                            <li
+                              key={row.id}
+                              className="rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/70 px-4 py-3 text-base text-[#4b463f]"
+                            >
+                              {row.title}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </section>
+
+              <button
+                type="button"
+                onClick={() =>
+                  requestPlanDayImStuck(
+                    items.filter(isMeaningfulPlanItem).map((item) => item.title),
+                  )
+                }
+                className="plan-day-morning-conversation__submit self-start"
+                data-testid="plan-day-im-stuck"
+              >
+                {PLAN_DAY_IM_STUCK_BUTTON_LABEL}
+              </button>
+            </div>
+
+            <div className="mt-4 flex flex-col gap-4">
               {showPreviousDayBanner && previousDayPrompt ? (
                 <PlanDayPreviousDayPrompt
                   {...previousDayPromptCopy(previousDayPrompt.count)}
@@ -1166,83 +1374,28 @@ export function PlanMyDayPanel({
                   onDismiss={() => setSmartLifeAreaSuggestion(null)}
                 />
               ) : null}
-              {view !== "kanban" ? renderTaskView() : null}
+              {showingTodaysPlan ? (
+                <PlanMyDayPlanningNav
+                  active={planningArea}
+                  onChange={handlePlanningAreaChange}
+                />
+              ) : null}
+              {onOpenSettings ? (
+                <div>
+                  <p className="text-base text-[#6b635a]">
+                    Set your default view in{" "}
+                    <button
+                      type="button"
+                      onClick={onOpenSettings}
+                      className="font-semibold text-[#1e4f4f] hover:underline"
+                    >
+                      Settings → Planning
+                    </button>
+                    .
+                  </p>
+                </div>
+              ) : null}
             </div>
-            {view === "kanban" ? (
-              <div
-                className={`mt-4 ${PLAN_KANBAN_BOARD_CLASS} plan-day-journey-chapter-enter`}
-                style={{ animationDelay: "220ms" }}
-              >
-                {renderTaskView()}
-                {completedToday.length > 0 ? (
-                  <div
-                    className="mt-6"
-                    data-testid="plan-day-completed-today-kanban"
-                  >
-                    <p className="text-lg font-semibold text-[#1f1c19]">
-                      Completed Today
-                    </p>
-                    <ul className="mt-3 flex flex-col gap-2">
-                      {completedToday.map((row) => (
-                        <li
-                          key={row.id}
-                          className="rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/70 px-4 py-3 text-base text-[#4b463f]"
-                        >
-                          {row.title}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-            {showingTodaysPlan ? (
-              <div className="mt-4 flex flex-col gap-3">
-                {showAddForm ? (
-                  <div
-                    className="plan-day-living-enter"
-                    data-testid="plan-day-add-another-form"
-                  >
-                    <PlanDayAddForm onAdd={handleAdd} />
-                    {hasMeaningfulToday ? (
-                      <button
-                        type="button"
-                        onClick={() => setShowAddForm(false)}
-                        className="mt-2 self-start text-sm font-semibold text-[#6b635a] hover:underline"
-                      >
-                        Close
-                      </button>
-                    ) : null}
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowAddForm(true)}
-                    className="self-start rounded-xl border border-[#c9bfb0] bg-white px-4 py-2.5 text-base font-semibold text-[#1e4f4f] hover:bg-[#f5f0ea]"
-                    data-testid="plan-day-add-another-item"
-                  >
-                    {hasMeaningfulToday
-                      ? "Add another item"
-                      : "Add something for today"}
-                  </button>
-                )}
-              </div>
-            ) : null}
-            {onOpenSettings ? (
-              <div className="mt-4">
-                <p className="text-base text-[#6b635a]">
-                  Set your default view in{" "}
-                  <button
-                    type="button"
-                    onClick={onOpenSettings}
-                    className="font-semibold text-[#1e4f4f] hover:underline"
-                  >
-                    Settings → Planning
-                  </button>
-                  .
-                </p>
-              </div>
-            ) : null}
           </>
         )}
       </PlanDayJourneyShell>

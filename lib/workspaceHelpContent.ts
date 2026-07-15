@@ -53,7 +53,7 @@ const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
   playbook: "Strategies",
   "templates-library": "Templates",
   settings: "Settings",
-  "time-block": "Momentum Appointments",
+  "time-block": "Calendar",
   "decision-compass": "Decision Compass",
   growth: "Growth Center",
   boardroom: "Boardroom",

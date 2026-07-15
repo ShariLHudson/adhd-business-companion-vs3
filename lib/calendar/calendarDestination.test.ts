@@ -84,14 +84,25 @@ describe("Calendar My Workday destination", () => {
     expect(client).toContain("CalendarRoomPanel");
   });
 
-  it("Plan My Day internal onOpenCalendar still opens Momentum Appointments (time-block)", () => {
-    expect(client).toMatch(
-      /onOpenCalendar=\{\(\) =>\s*\n\s*openWorkspaceBesideChatCore\("time-block", workspaceOpenAck\("time-block"\)\)/,
+  it("Plan My Day Open calendar opens Connected Calendars room — not time-block", () => {
+    const planMyDayMount = client.match(
+      /activeSection === "plan-my-day" && \(\s*\n\s*<PlanMyDayPanel[\s\S]*?\n\s*\/>\s*\n\s*\)\}/,
+    )?.[0];
+    expect(planMyDayMount).toBeTruthy();
+    expect(planMyDayMount).toContain(
+      "onOpenCalendar={() => openCalendarCore()}",
+    );
+    expect(planMyDayMount).not.toMatch(
+      /onOpenCalendar=\{\(\) =>\s*openWorkspaceBesideChatCore\(\s*"time-block"/,
     );
     expect(planPanel).toContain("onOpenCalendar");
+    expect(planPanel).toContain("onOpenEvent");
+    expect(area).toContain("planning-calendar-event-");
+    // Legacy time-block deep links redirect — never mount TimeBlockPanel live.
     expect(client).toMatch(
-      /activeSection === "time-block"[\s\S]*?<TimeBlockPanel/,
+      /activeSection === "time-block"[\s\S]*?<LegacyMomentumAppointmentRedirect/,
     );
+    expect(client).not.toContain("<TimeBlockPanel");
   });
 
   it("does not touch authentication or login routes in calendar room files", () => {

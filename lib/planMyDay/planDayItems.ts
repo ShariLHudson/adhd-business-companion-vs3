@@ -1,6 +1,8 @@
 import { getDayDesignerStore } from "@/lib/day-designer/dayStore";
 import {
+  formatPrefsClockTime,
   getTimeBlocks,
+  saveTimeBlock,
   todayStr,
   type TimeBlock,
 } from "@/lib/companionStore";
@@ -321,7 +323,8 @@ function columnFromBlock(b: TimeBlock): PlanItemColumn {
   return "ready";
 }
 
-function itemFromTimeBlock(b: TimeBlock): PlanDayItem {
+/** Map a legacy Momentum Appointment (TimeBlock) into the current PlanDayItem model. */
+export function planDayItemFromTimeBlock(b: TimeBlock): PlanDayItem {
   const planningDate = normalizePlanningDate(b.date || todayStr());
   return {
     id: `tb-${b.id}`,
@@ -338,6 +341,11 @@ function itemFromTimeBlock(b: TimeBlock): PlanDayItem {
     sourceTimeBlockId: b.id,
     source: "time-block",
   };
+}
+
+/** @deprecated Prefer planDayItemFromTimeBlock */
+function itemFromTimeBlock(b: TimeBlock): PlanDayItem {
+  return planDayItemFromTimeBlock(b);
 }
 
 /** Build items from today’s time blocks + adaptive day plan. */
@@ -546,17 +554,46 @@ export function saveTodayPlanItems(items: PlanDayItem[]): PlanDayItem[] {
   return stamped;
 }
 
+function syncLegacyTimeBlockFromPlanItem(item: PlanDayItem): void {
+  const blockId = item.sourceTimeBlockId;
+  if (!blockId) return;
+  const existing = getTimeBlocks().find((b) => b.id === blockId);
+  if (!existing) return;
+  const status: TimeBlock["status"] = item.done
+    ? "completed"
+    : item.column === "doing"
+      ? "progress"
+      : existing.status === "completed"
+        ? "pending"
+        : existing.status;
+  saveTimeBlock({
+    id: blockId,
+    title: item.title.trim() || existing.title,
+    date: item.planningDate || item.dueDate || existing.date,
+    startTime: item.startTime || existing.startTime,
+    durationMin: item.durationMinutes ?? existing.durationMin,
+    note: item.notes,
+    projectId: item.projectId,
+    status,
+  });
+}
+
 export function updatePlanItem(
   items: PlanDayItem[],
   id: string,
   patch: Partial<PlanDayItem>,
 ): PlanDayItem[] {
   const now = new Date().toISOString();
-  return saveTodayPlanItems(
+  const next = saveTodayPlanItems(
     items.map((it) =>
       it.id === id ? { ...it, ...patch, updatedAt: now } : it,
     ),
   );
+  const updated = next.find((it) => it.id === id);
+  if (updated?.sourceTimeBlockId) {
+    syncLegacyTimeBlockFromPlanItem(updated);
+  }
+  return next;
 }
 
 export function movePlanItemColumn(
@@ -916,10 +953,7 @@ export function formatPlanTime(startTime?: string): string {
   if (Number.isNaN(h)) return startTime;
   const d = new Date();
   d.setHours(h ?? 0, m ?? 0, 0, 0);
-  return d.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return formatPrefsClockTime(d);
 }
 
 export function durationLabel(item: PlanDayItem): string {

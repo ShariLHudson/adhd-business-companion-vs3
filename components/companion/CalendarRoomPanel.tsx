@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CalendarRoomShell } from "@/components/companion/CalendarRoomShell";
 import { PlanMyDayCalendarArea } from "@/components/companion/PlanMyDayCalendarArea";
+import type { UnifiedPlanningEvent } from "@/lib/connectedCalendars";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 
 export const CALENDAR_HOW_DO_I_COPY =
@@ -38,14 +39,20 @@ function CalendarHowDoI() {
 
 /**
  * Dedicated My Workday → Calendar room — Connected Calendars via PlanMyDayCalendarArea.
- * Never opens Momentum Appointments, Plan My Day shell, Reminders, or Rhythms.
+ * Never opens Momentum Appointments, Plan My Day shell, Reminders, or Rhythms on arrival.
  */
 export function CalendarRoomPanel({
   onBack,
   registerBack,
+  onOpenPlanItem,
+  onOpenAppointment,
 }: {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
+  /** Open a timed plan item in Plan My Day. */
+  onOpenPlanItem?: (itemId: string) => void;
+  /** Open appointment detail in Plan My Day → Calendar (never legacy Momentum Appointments). */
+  onOpenAppointment?: (appointmentId: string) => void;
 }) {
   useEffect(() => {
     if (!registerBack) return;
@@ -53,6 +60,19 @@ export function CalendarRoomPanel({
     registerBack(() => false);
     return () => registerBack(null);
   }, [registerBack]);
+
+  function handleOpenEvent(event: UnifiedPlanningEvent) {
+    if (event.source === "spark-plan" && event.id.startsWith("plan-")) {
+      onOpenPlanItem?.(event.id.slice("plan-".length));
+      return;
+    }
+    if (
+      event.source === "spark-appointment" &&
+      event.id.startsWith("tb-")
+    ) {
+      onOpenAppointment?.(event.id.slice("tb-".length));
+    }
+  }
 
   return (
     <CalendarRoomShell onOutsideDismiss={onBack}>
@@ -83,6 +103,9 @@ export function CalendarRoomPanel({
         <PlanMyDayCalendarArea
           hideHeading
           authReturnPath="/companion?section=calendar"
+          onOpenEvent={
+            onOpenPlanItem || onOpenAppointment ? handleOpenEvent : undefined
+          }
         />
       </div>
     </CalendarRoomShell>

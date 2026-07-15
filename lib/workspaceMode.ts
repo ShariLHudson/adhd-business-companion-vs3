@@ -86,7 +86,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "chamber-project-entry": "Chamber of Momentum",
   "project-homes": "Project Homes",
   "brain-dump": "Clear My Mind",
-  "time-block": "Momentum Appointments",
+  "time-block": "Calendar",
   "email-generator": "Email",
   snippets: "Snippets",
   "business-profile": "Business Profile",
@@ -303,7 +303,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
   ) {
     return {
       section: "time-block",
-      buttonLabel: "Open Momentum Appointments",
+      buttonLabel: "Open Calendar",
       topic: "plan",
       topicLabel: "plan",
     };

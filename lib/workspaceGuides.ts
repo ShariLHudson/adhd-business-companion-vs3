@@ -66,10 +66,10 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
   },
   "time-block": {
     id: "time-block",
-    title: "Momentum Appointments",
+    title: "Calendar",
     what: "Gentle intentions for momentum — goal, time, and when. Every outcome counts.",
     why: "Plans change; self-trust matters more than perfect execution.",
-    how: "Add an appointment, pick 15–45 min or Flexible, and check in with “How did it go?” — no guilt.",
+    how: "Open Plan My Day → Calendar, add an appointment, pick 15–45 min or Flexible, and check in with “How did it go?” — no guilt.",
     example: "Marketing plan → 30 min → Afternoon → Made progress counts as success.",
   },
   relationships: {

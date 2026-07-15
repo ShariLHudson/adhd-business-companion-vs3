@@ -49,7 +49,7 @@ const RULES: RefRule[] = [
   },
   {
     section: "time-block",
-    label: "Momentum Appointments",
+    label: "Calendar",
     objectId: "calendar",
     re: /\btime ?block|schedule (it|time|the)|put it on (your|the) calendar|block (out )?time\b/i,
   },
