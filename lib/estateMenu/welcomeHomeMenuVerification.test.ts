@@ -142,13 +142,23 @@ describe("Welcome Home menu — action wiring", () => {
       /case\s+"start-new-day-conversation"\s*:\s*[\s\S]*?requestBeginNewDay\(\)/,
     );
     expect(source).toMatch(
-      /function requestBeginNewDay\(\)\s*\{[\s\S]*?beginNewDay\(preserveRoom\)/,
+      /function requestBeginNewDay\([\s\S]*?beginNewDay\(entryPoint\)/,
     );
+    expect(source).toMatch(/runSharedNewDay\(/);
     expect(source).toMatch(
-      /function beginNewDay\([\s\S]*?mode:\s*"new-day"/,
+      /function beginNewDay\([\s\S]*?entryPoint[\s\S]*?runSharedNewDay/,
     );
     expect(source).not.toMatch(
       /function requestBeginNewDay\(\)\s*\{\s*setFreshStartDialog\("begin-new-day"\)/,
+    );
+  });
+
+  it("Settings New Day uses the shared daily-opening controller", () => {
+    expect(source).toMatch(
+      /onBeginNewDay=\{requestBeginNewDayFromSettings\}/,
+    );
+    expect(source).toMatch(
+      /function requestBeginNewDayFromSettings\(\)\s*\{[\s\S]*?requestBeginNewDay\("settings-new-day"\)/,
     );
   });
 

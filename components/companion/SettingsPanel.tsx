@@ -156,7 +156,8 @@ type Section =
   | "plan"
   | "advanced"
   | "connections"
-  | "account";
+  | "account"
+  | "new-day";
 
 export type SettingsSection = Section;
 
@@ -225,10 +226,13 @@ export function SettingsPanel({
   registerBack,
   onSignIn,
   initialSection = null,
+  onBeginNewDay,
 }: {
   registerBack?: (fn: (() => boolean) | null) => void;
   onSignIn?: () => void;
   initialSection?: Section | null;
+  /** Shared Global Daily Companion Experience — same controller as menu New Day. */
+  onBeginNewDay?: () => void;
 }) {
   const { configured: authConfigured, user, signOut } = useCompanionAuth();
   const { t } = useCompanionLanguage();
@@ -420,6 +424,15 @@ export function SettingsPanel({
       label: "Sign-in & security",
       value: user?.email ?? (authConfigured ? "Not signed in" : "Not set"),
     },
+    ...(onBeginNewDay
+      ? [
+          {
+            id: "new-day" as const,
+            label: "New Day",
+            value: "Fresh start",
+          },
+        ]
+      : []),
   ];
 
   // Reusable selectable list (radio-style cards).
@@ -1437,7 +1450,14 @@ export function SettingsPanel({
                 label={r.label}
                 value={r.value}
                 testId={`settings-row-${r.id}`}
-                onClick={() => setOpen(r.id)}
+                onClick={() => {
+                  if (r.id === "new-day") {
+                    // Click is permission — shared daily-opening controller, no confirm.
+                    onBeginNewDay?.();
+                    return;
+                  }
+                  setOpen(r.id);
+                }}
               />
             ))}
         </div>

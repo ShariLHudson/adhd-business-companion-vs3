@@ -209,8 +209,6 @@ import {
   type FreshStartKind,
   freshStartCopy,
 } from "@/lib/freshStartCopy";
-import { beginEstateJourneyNewDay } from "@/lib/estateJourneyEngine/session";
-import { clearDailySessionFlags } from "@/lib/freshStartSession";
 import {
   beginContextualHelpSession,
   endContextualHelpSession,
@@ -218,7 +216,7 @@ import {
   recoverContextualHelpSessionAfterRefresh,
   resetActiveConversation,
 } from "@/lib/conversationReset";
-import { resetTodayPlanForNewDay, resetPlanDayView } from "@/lib/planMyDay/planDayItems";
+import { resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
@@ -234,6 +232,17 @@ import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import { WelcomeRoomPanel } from "@/components/companion/WelcomeRoomPanel";
 import { WelcomeHomePage } from "@/components/companion/WelcomeHomeFirstLaunch";
 import { WelcomeHomeDailyChoices } from "@/components/companion/WelcomeHomeDailyChoices";
+import { GlobalDailyOpeningChoices } from "@/components/companion/GlobalDailyOpeningChoices";
+import {
+  runSharedNewDay,
+  resolveDailyOpeningChoiceAction,
+  shouldOfferFirstPlatformOpeningOfDay,
+  isAbsenceReturn,
+  type DailyOpeningEntryPoint,
+  type GlobalDailyOpeningResult,
+  type HelpMeChooseSuggestion,
+  type DailyOpeningChoiceId,
+} from "@/lib/dailyOpening";
 import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
@@ -3285,7 +3294,42 @@ export default function CompanionPageClient() {
   const [freshStartDialog, setFreshStartDialog] =
     useState<FreshStartKind | null>(null);
   const [freshStartRevision, setFreshStartRevision] = useState(0);
+  /** Global Daily Companion Experience — shared three-choice opening. */
+  const [globalDailyOpening, setGlobalDailyOpening] =
+    useState<GlobalDailyOpeningResult | null>(null);
+  const [dailyOpeningHelpSuggestions, setDailyOpeningHelpSuggestions] =
+    useState<HelpMeChooseSuggestion[] | null>(null);
+  const dailyOpeningStartedRef = useRef(false);
+  const [pendingDailyOpeningEntry, setPendingDailyOpeningEntry] =
+    useState<DailyOpeningEntryPoint | null>(null);
   const estateChatScrollKey = `${freshStartRevision}-${messages.length}-${isLoading ? 1 : 0}`;
+
+  // First meaningful platform opening of the day / absence return —
+  // queue the shared controller (runner lives beside beginNewDay below).
+  useEffect(() => {
+    if (!hydrated || !welcomeHomePrimary) return;
+    if (welcomeHomeExperience.showIntro) return;
+    if (welcomeHomeExperience.visitorKind === "first_visit") return;
+    if (!shouldOfferFirstPlatformOpeningOfDay()) return;
+    if (dailyOpeningStartedRef.current) return;
+    if (globalDailyOpening) return;
+
+    dailyOpeningStartedRef.current = true;
+    const arrival =
+      homeArrival ?? evaluateArrivalIntelligence({ record: false });
+    setPendingDailyOpeningEntry(
+      isAbsenceReturn(arrival?.returnIntervalDays)
+        ? "absence-return"
+        : "first-platform-opening",
+    );
+  }, [
+    hydrated,
+    welcomeHomePrimary,
+    welcomeHomeExperience.showIntro,
+    welcomeHomeExperience.visitorKind,
+    homeArrival,
+    globalDailyOpening,
+  ]);
 
   const estateChatInputFocusEnabled =
     hydrated &&
@@ -6897,16 +6941,26 @@ export default function CompanionPageClient() {
   function clearTodayContext(options?: {
     preserveRoom?: boolean;
     mode?: "new-chat" | "new-day";
+    /** When true, conversation reset already ran (shared New Day controller). */
+    skipReset?: boolean;
+    conversationIdAfterReset?: string;
   }) {
-    const reset = resetActiveConversation({
-      mode: options?.mode ?? "new-chat",
-      abortController: chatRequestAbortRef.current,
-      bumpRequestGeneration: () => {
-        chatRequestGenerationRef.current += 1;
-      },
-    });
-    chatRequestAbortRef.current = null;
-    activeConversationIdRef.current = reset.conversationId;
+    if (!options?.skipReset) {
+      const reset = resetActiveConversation({
+        mode: options?.mode ?? "new-chat",
+        abortController: chatRequestAbortRef.current,
+        bumpRequestGeneration: () => {
+          chatRequestGenerationRef.current += 1;
+        },
+      });
+      chatRequestAbortRef.current = null;
+      activeConversationIdRef.current = reset.conversationId;
+    } else {
+      chatRequestAbortRef.current = null;
+      if (options.conversationIdAfterReset) {
+        activeConversationIdRef.current = options.conversationIdAfterReset;
+      }
+    }
 
     recognitionRef.current?.stop();
     micExplicitStopRef.current = false;
@@ -6980,6 +7034,8 @@ export default function CompanionPageClient() {
       const preserveRoom = shouldPreserveRoomForFreshConversation();
       clearTodayContext({ preserveRoom, mode: "new-chat" });
       setMessages([]);
+      setGlobalDailyOpening(null);
+      setDailyOpeningHelpSuggestions(null);
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
@@ -6996,11 +7052,12 @@ export default function CompanionPageClient() {
     setFreshStartDialog("reset-day");
   }
 
-  function requestBeginNewDay() {
-    // Conversations → New Day Chat: start immediately (no explanation dialog).
+  function requestBeginNewDay(
+    entryPoint: DailyOpeningEntryPoint = "explicit-new-day",
+  ) {
+    // Settings / Conversations → New Day: start immediately (no confirmation dialog).
     try {
-      const preserveRoom = shouldPreserveRoomForFreshConversation();
-      beginNewDay(preserveRoom);
+      beginNewDay(entryPoint);
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
@@ -7013,14 +7070,18 @@ export default function CompanionPageClient() {
     }
   }
 
+  function requestBeginNewDayFromSettings() {
+    requestBeginNewDay("settings-new-day");
+  }
+
   function handleStartCleanConversation() {
     clearTodayContext();
+    setGlobalDailyOpening(null);
+    setDailyOpeningHelpSuggestions(null);
   }
 
   function handleStartNewDayConversation() {
-    clearTodayContext();
-    clearDailySessionFlags();
-    resetTodayPlanForNewDay();
+    beginNewDay("explicit-new-day");
   }
 
   function shouldPreserveRoomForFreshConversation(): boolean {
@@ -7033,12 +7094,14 @@ export default function CompanionPageClient() {
     try {
       const preserveRoom = shouldPreserveRoomForFreshConversation();
       if (freshStartDialog === "begin-new-day") {
-        beginNewDay(preserveRoom);
+        beginNewDay("explicit-new-day");
       } else if (freshStartDialog === "reset-day") {
         resetPlanDay();
       } else if (freshStartDialog === "clear-context") {
         clearTodayContext({ preserveRoom, mode: "new-chat" });
         setMessages([]);
+        setGlobalDailyOpening(null);
+        setDailyOpeningHelpSuggestions(null);
       }
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
@@ -7059,18 +7122,96 @@ export default function CompanionPageClient() {
     setPlanMyDayOpenItemId(null);
   }
 
-  function beginNewDay(preserveRoom = false) {
-    clearTodayContext({ preserveRoom, mode: "new-day" });
-    clearDailySessionFlags();
-    resetTodayPlanForNewDay();
-    const { greeting } = beginEstateJourneyNewDay();
+  /**
+   * Shared New Day / Global Daily Companion Experience entry.
+   * Always uses runSharedNewDay — never a Settings-only or menu-only path.
+   * Does not restore the prior room; opens Welcome Home with three choices.
+   */
+  function beginNewDay(entryPoint: DailyOpeningEntryPoint = "explicit-new-day") {
+    const result = runSharedNewDay({
+      entryPoint,
+      abortController: chatRequestAbortRef.current,
+      bumpRequestGeneration: () => {
+        chatRequestGenerationRef.current += 1;
+      },
+    });
+
+    clearTodayContext({
+      preserveRoom: false,
+      mode: "new-day",
+      skipReset: true,
+      conversationIdAfterReset: result.reset.conversationId,
+    });
+
+    setOverlay(null);
+    setSettingsSection(null);
+    setActiveSection("home");
+    setActiveNav("chat");
+    setGlobalDailyOpening(result.opening);
+    setDailyOpeningHelpSuggestions(null);
     setMessages([
       {
         role: "assistant",
-        content: greeting,
+        content: result.opening.greeting,
       },
     ]);
   }
+
+  function navigateDailyOpeningDestination(
+    destination: import("@/lib/dailyOpening").DailyOpeningDestination,
+  ) {
+    setGlobalDailyOpening(null);
+    setDailyOpeningHelpSuggestions(null);
+    switch (destination.kind) {
+      case "continue":
+        handleCompanionContinueOption(destination.option);
+        return;
+      case "plan-my-day":
+        openPlanMyDayCore();
+        return;
+      case "clear-my-mind":
+        openClearMyMindCore();
+        return;
+      case "explore-estate":
+        openExploreSparkVisualExplorer();
+        return;
+      case "business-estate":
+        openProfileDestinationCore("my-business-estate");
+        return;
+      case "section":
+        openStandaloneFocusSectionCore(destination.section);
+        return;
+      default:
+        focusChatInput();
+    }
+  }
+
+  function handleGlobalDailyOpeningChoice(choiceId: DailyOpeningChoiceId) {
+    if (!globalDailyOpening) return;
+    const action = resolveDailyOpeningChoiceAction(choiceId, globalDailyOpening);
+    if (action.kind === "show-help-me-choose") {
+      setDailyOpeningHelpSuggestions(action.suggestions.slice(0, 3));
+      return;
+    }
+    navigateDailyOpeningDestination(action.destination);
+  }
+
+  function handleGlobalDailyHelpSuggestion(suggestion: HelpMeChooseSuggestion) {
+    navigateDailyOpeningDestination(suggestion.destination);
+  }
+
+  // Run queued first-of-day / absence opening through the shared New Day controller.
+  useEffect(() => {
+    if (!pendingDailyOpeningEntry) return;
+    const entry = pendingDailyOpeningEntry;
+    setPendingDailyOpeningEntry(null);
+    try {
+      beginNewDay(entry);
+      setFreshStartRevision((revision) => revision + 1);
+    } catch {
+      dailyOpeningStartedRef.current = false;
+    }
+  }, [pendingDailyOpeningEntry]);
 
   function buildGrowthPanelNav(current: GrowthSectionId): GrowthPanelNav {
     return {
@@ -21842,9 +21983,37 @@ export default function CompanionPageClient() {
                 showWelcomeLine={
                   messages.length === 0 &&
                   !isLoading &&
-                  Boolean(welcomeHomeDisplayMessage)
+                  Boolean(welcomeHomeDisplayMessage || globalDailyOpening)
                 }
-                welcomeSlot={undefined}
+                welcomeSlot={
+                  globalDailyOpening &&
+                  !isLoading &&
+                  messages.length === 0 ? (
+                    dailyOpeningHelpSuggestions ? (
+                      <GlobalDailyOpeningChoices
+                        mode="help-me-choose"
+                        suggestions={dailyOpeningHelpSuggestions}
+                        onSelectSuggestion={handleGlobalDailyHelpSuggestion}
+                      />
+                    ) : (
+                      <GlobalDailyOpeningChoices
+                        mode="main"
+                        choices={globalDailyOpening.choices}
+                        onSelect={handleGlobalDailyOpeningChoice}
+                      />
+                    )
+                  ) : welcomeHomeDaily.choices.length > 0 &&
+                    !globalDailyOpening &&
+                    messages.length === 0 &&
+                    !isLoading ? (
+                    <WelcomeHomeDailyChoices
+                      choices={welcomeHomeDaily.choices}
+                      discoveryInvitation={welcomeHomeDaily.discoveryInvitation}
+                      onSelect={handleWelcomeHomeDailyChoice}
+                      onDiscoveryInvite={handleWelcomeHomeDiscoveryInvite}
+                    />
+                  ) : undefined
+                }
                 showConversation={messages.length > 0 || isLoading}
                 conversationScrollKey={`${messages.length}-${isLoading ? 1 : 0}`}
                 inputRef={inputRef}
@@ -21863,7 +22032,27 @@ export default function CompanionPageClient() {
                       workspacePanel={workspacePanel}
                       workspaceActiveBeside={workspaceActiveBeside}
                       formatParagraphs={formatAssistantParagraphs}
-                      afterLastAssistant={undefined}
+                      afterLastAssistant={
+                        globalDailyOpening &&
+                        messages.length > 0 &&
+                        !isLoading ? (
+                          dailyOpeningHelpSuggestions ? (
+                            <GlobalDailyOpeningChoices
+                              mode="help-me-choose"
+                              suggestions={dailyOpeningHelpSuggestions}
+                              onSelectSuggestion={
+                                handleGlobalDailyHelpSuggestion
+                              }
+                            />
+                          ) : (
+                            <GlobalDailyOpeningChoices
+                              mode="main"
+                              choices={globalDailyOpening.choices}
+                              onSelect={handleGlobalDailyOpeningChoice}
+                            />
+                          )
+                        ) : undefined
+                      }
                     />
                   </>
                 }
@@ -23506,6 +23695,7 @@ export default function CompanionPageClient() {
               onSignIn={openSignIn}
               initialSection={settingsSection}
               registerBack={registerBack}
+              onBeginNewDay={requestBeginNewDayFromSettings}
             />
           </ModalSheet>
 
