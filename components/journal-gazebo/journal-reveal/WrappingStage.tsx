@@ -6,13 +6,16 @@ import {
   JOURNAL_REVEAL_CREATING_MESSAGES,
   JOURNAL_REVEAL_MESSAGE_ROTATE_MS,
 } from "@/lib/journalGazebo/journalRevealTypes";
+import type { JournalGazeboConfig } from "@/lib/journalGazebo/types";
+import { JournalRevealCover } from "./JournalRevealCover";
 
 type Props = {
+  journal: JournalGazeboConfig;
   onReady: () => void;
   durationMs: number;
 };
 
-export function WrappingStage({ onReady, durationMs }: Props) {
+export function WrappingStage({ journal, onReady, durationMs }: Props) {
   const reduceMotion = useReducedMotion();
   const [messageIndex, setMessageIndex] = useState(0);
 
@@ -39,6 +42,7 @@ export function WrappingStage({ onReady, durationMs }: Props) {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: reduceMotion ? 0.01 : 1.1, ease: "easeOut" }}
         aria-hidden="true"
+        data-leather={journal.leatherColor}
       >
         {!reduceMotion ? (
           <motion.span
@@ -47,14 +51,25 @@ export function WrappingStage({ onReady, durationMs }: Props) {
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
           />
         ) : null}
-        <div className="journal-reveal__box">
+        <div className="journal-reveal__box" data-leather={journal.leatherColor}>
+          {/* Selected journal rests inside while the wrap settles over it. */}
+          <motion.div
+            className="journal-reveal__journal journal-reveal__journal--wrapping"
+            initial={reduceMotion ? false : { opacity: 0.85, scale: 0.92 }}
+            animate={{ opacity: 0.55, scale: 0.96 }}
+            transition={{ duration: reduceMotion ? 0.01 : 1.2 }}
+          >
+            <JournalRevealCover journal={journal} compact />
+          </motion.div>
           <motion.div
             className="journal-reveal__paper"
+            data-leather={journal.leatherColor}
             initial={reduceMotion ? false : { scale: 0.7, opacity: 0.4 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: reduceMotion ? 0.01 : 1.4 }}
           >
             <span className="journal-reveal__paper-sheen" />
+            <span className="journal-reveal__paper-flame" aria-hidden="true" />
           </motion.div>
           <motion.span
             className="journal-reveal__ribbon-h"

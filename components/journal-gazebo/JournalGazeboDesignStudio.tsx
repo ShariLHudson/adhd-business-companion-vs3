@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CINEMATIC } from "@/lib/journalGazebo/cinematicTiming";
 import type { DesignStudioBeat } from "@/lib/journalGazebo/designStudioTypes";
 import {
@@ -12,9 +12,18 @@ import {
   JOURNAL_PRINTED_COVER_DESIGNS,
 } from "@/lib/journalGazebo/designStudioCatalog";
 import {
+  JOURNAL_INTENTION_OPTIONS,
+  resolveShowPageWatermarks,
+  type JournalIntentionId,
+} from "@/lib/journalGazebo/journalIntentions";
+import {
   JOURNAL_DESIGN_CRAFTING_MESSAGE,
+  JOURNAL_DESIGN_INTENTION_PROMPT,
+  JOURNAL_DESIGN_PAGE_IMAGES_PROMPT,
 } from "@/lib/journalGazebo/hospitality";
 import { resolveCoverTitleTone } from "@/lib/journalGazebo/coverTitleContrast";
+import { pageWatermarkUrl } from "@/lib/journalGazebo/pageWatermarks";
+import { preloadJournalCoverImages } from "@/lib/journalGazebo/preloadJournalCovers";
 import { defaultJournalConfig } from "@/lib/journalGazebo/store";
 import type {
   JournalFontId,
@@ -90,15 +99,19 @@ function PrintedCoverSwatch({
         .join(" ")}
       onClick={() => onSelect(design.id)}
     >
-      <span
-        className="jg-design-swatch__face jg-design-swatch__face--printed"
-        style={
-          design.previewImageUrl
-            ? { backgroundImage: `url(${design.previewImageUrl})` }
-            : undefined
-        }
-        aria-hidden="true"
-      />
+      <span className="jg-design-swatch__face jg-design-swatch__face--printed" aria-hidden="true">
+        {design.previewImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- estate plate; eager for instant cover choice
+          <img
+            src={design.previewImageUrl}
+            alt=""
+            className="jg-design-swatch__face-img"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        ) : null}
+      </span>
       <span className="jg-design-swatch__label">{design.label}</span>
       <span className="jg-design-swatch__sub">{design.description}</span>
     </button>
@@ -116,6 +129,10 @@ export function JournalGazeboDesignStudio({ onComplete, onExit }: Props) {
   draftRef.current = draft;
   onCompleteRef.current = onComplete;
 
+  useLayoutEffect(() => {
+    preloadJournalCoverImages();
+  }, []);
+
   const patch = useCallback((partial: Partial<JournalGazeboConfig>) => {
     setDraft((current) => ({ ...current, ...partial }));
   }, []);
@@ -126,6 +143,8 @@ export function JournalGazeboDesignStudio({ onComplete, onExit }: Props) {
         return coverChoice != null;
       case "name":
         return Boolean(draft.name.trim());
+      case "intention":
+      case "page-images":
       case "paper":
       case "font":
       case "pen":
@@ -163,6 +182,12 @@ export function JournalGazeboDesignStudio({ onComplete, onExit }: Props) {
         return;
       case "name":
         patch({ embossedTitle: draft.name.trim() });
+        advanceTo("intention");
+        return;
+      case "intention":
+        advanceTo("page-images");
+        return;
+      case "page-images":
         advanceTo("paper");
         return;
       case "paper":
@@ -202,6 +227,14 @@ export function JournalGazeboDesignStudio({ onComplete, onExit }: Props) {
     });
   }
 
+  function selectIntention(intention: JournalIntentionId) {
+    patch({ intention });
+  }
+
+  function selectPageImages(show: boolean) {
+    patch({ showPageWatermarks: show });
+  }
+
   function selectPaper(paper: JournalPaperStyle) {
     patch({ paperStyle: paper });
   }
@@ -238,6 +271,10 @@ export function JournalGazeboDesignStudio({ onComplete, onExit }: Props) {
 
   const prompt = (() => {
     switch (beat) {
+      case "intention":
+        return JOURNAL_DESIGN_INTENTION_PROMPT;
+      case "page-images":
+        return JOURNAL_DESIGN_PAGE_IMAGES_PROMPT;
       case "crafting":
         return null;
       default:
@@ -351,6 +388,98 @@ export function JournalGazeboDesignStudio({ onComplete, onExit }: Props) {
                   leatherColor={leatherColor}
                   nav={designStepNav}
                 />
+              </div>
+            ) : null}
+
+            {beat === "intention" ? (
+              <div className="jg-design-choice-experience jg-design-choice-experience--intention">
+                <div
+                  className="jg-design-choice-experience__choices jg-design-choice-experience__choices--intention"
+                  role="group"
+                  aria-label="Journal type"
+                >
+                  {JOURNAL_INTENTION_OPTIONS.map((option) => (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={[
+                        "jg-estate-plaque",
+                        "jg-design-choice-plaque",
+                        "jg-design-choice-plaque--intention",
+                        (draft.intention ?? "journey") === option.id
+                          ? "jg-design-choice-plaque--active"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() => selectIntention(option.id)}
+                    >
+                      <span
+                        className="jg-design-intention-plaque__mark"
+                        aria-hidden="true"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={pageWatermarkUrl(option.previewWatermark)}
+                          alt=""
+                          className="jg-design-intention-plaque__mark-img"
+                          draggable={false}
+                        />
+                      </span>
+                      <span className="jg-design-choice-plaque__label">{option.label}</span>
+                      <span className="jg-design-intention-plaque__desc">{option.description}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {beat === "page-images" ? (
+              <div className="jg-design-choice-experience jg-design-choice-experience--page-images">
+                <div
+                  className="jg-design-intention-images"
+                  role="group"
+                  aria-label="Page images"
+                >
+                  <button
+                    type="button"
+                    className={[
+                      "jg-estate-plaque",
+                      "jg-design-choice-plaque",
+                      "jg-design-choice-plaque--page-images",
+                      resolveShowPageWatermarks(draft.showPageWatermarks)
+                        ? "jg-design-choice-plaque--active"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() => selectPageImages(true)}
+                  >
+                    <span className="jg-design-choice-plaque__label">Gentle topic images</span>
+                    <span className="jg-design-intention-plaque__desc">
+                      Soft marks that match this journal
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className={[
+                      "jg-estate-plaque",
+                      "jg-design-choice-plaque",
+                      "jg-design-choice-plaque--page-images",
+                      !resolveShowPageWatermarks(draft.showPageWatermarks)
+                        ? "jg-design-choice-plaque--active"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    onClick={() => selectPageImages(false)}
+                  >
+                    <span className="jg-design-choice-plaque__label">No images</span>
+                    <span className="jg-design-intention-plaque__desc">
+                      Clear pages — only your words
+                    </span>
+                  </button>
+                </div>
               </div>
             ) : null}
 

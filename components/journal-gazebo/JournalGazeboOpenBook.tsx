@@ -13,9 +13,18 @@ import {
 import { CREATION_CEREMONY_PAGE_COUNT, volumePageLabel } from "@/lib/journalGazebo/bookCeremony";
 import { journalCoverImageUrl, journalCoverTitle } from "@/lib/journalGazebo/coverArt";
 import { CINEMATIC } from "@/lib/journalGazebo/cinematicTiming";
-import { JOURNAL_PAGE_PLACEHOLDER } from "@/lib/journalGazebo/hospitality";
+import {
+  JOURNAL_CREATION_BEGIN_WRITING,
+  JOURNAL_PAGE_PLACEHOLDER,
+} from "@/lib/journalGazebo/hospitality";
 import { buildJournalPageHeader } from "@/lib/journalGazebo/journalPageHeader";
-import { FIRST_WRITING_PAGE_INDEX, getPageBody, resolvePageTypingStyle, savePageBody } from "@/lib/journalGazebo/journalPageStorage";
+import {
+  FIRST_WRITING_PAGE_INDEX,
+  LAST_WRITING_PAGE_INDEX,
+  getPageBody,
+  resolvePageTypingStyle,
+  savePageBody,
+} from "@/lib/journalGazebo/journalPageStorage";
 import {
   focusEditableAtStart,
   focusWritingAtPageStart,
@@ -38,6 +47,7 @@ import {
   WelcomeMemoryPage,
 } from "./JournalGazeboBookCeremonyPages";
 import { JournalCoverEmboss } from "./JournalCoverEmboss";
+import { JournalGazeboSparkFlame } from "./JournalGazeboSparkFlame";
 import { JournalGazeboPageChrome } from "./JournalGazeboPageChrome";
 import { JournalGazeboPageFolio } from "./JournalGazeboPageFolio";
 import { JournalGazeboWritingSurface } from "./JournalGazeboWritingSurface";
@@ -123,6 +133,8 @@ function PageShell({
   side,
   paperStyle,
   pageIndex,
+  intention,
+  showPageWatermarks,
   lined,
   children,
   surfaceStyle,
@@ -133,6 +145,8 @@ function PageShell({
   side: "left" | "right";
   paperStyle: string;
   pageIndex: number;
+  intention?: JournalGazeboConfig["intention"];
+  showPageWatermarks?: boolean;
   lined?: boolean;
   children: ReactNode;
   surfaceStyle?: CSSProperties;
@@ -153,6 +167,8 @@ function PageShell({
         .filter(Boolean)
         .join(" ")}
       data-paper={paperStyle}
+      data-intention={intention ?? "journey"}
+      data-page-images={showPageWatermarks === false ? "off" : "on"}
       style={surfaceStyle}
     >
       {hideForeEdge ? null : <span className="jg-open-book__page-edge jg-open-book__page-edge--outer" aria-hidden="true" />}
@@ -171,7 +187,13 @@ function PageShell({
         </>
       )}
       <span className="jg-open-book__page-lift" aria-hidden="true" />
-      {hideForeEdge ? null : <JournalGazeboPageChrome pageIndex={pageIndex} />}
+      {hideForeEdge ? null : (
+        <JournalGazeboPageChrome
+          pageIndex={pageIndex}
+          intention={intention}
+          showPageWatermarks={showPageWatermarks}
+        />
+      )}
       <div className="jg-open-book__page-inner">
         <span className="jg-open-book__paper-fiber" aria-hidden="true" />
         {children}
@@ -180,35 +202,51 @@ function PageShell({
   );
 }
 
-function EstateSideNav({
-  side,
-  onClick,
-  disabled,
-  label,
+/** Always-visible page turns — fixed at the bottom so members never hunt for them. */
+function JournalPageTurnNav({
+  onPrev,
+  onNext,
+  canPrev,
+  canNext,
+  prevLabel = "Back",
+  nextLabel = "Next",
 }: {
-  side: "prev" | "next";
-  onClick?: () => void;
-  disabled?: boolean;
-  label: string;
+  onPrev?: () => void;
+  onNext?: () => void;
+  canPrev: boolean;
+  canNext: boolean;
+  prevLabel?: string;
+  nextLabel?: string;
 }) {
   return (
-    <button
-      type="button"
-      className={[
-        "jg-design-studio__nav",
-        `jg-design-studio__nav--${side}`,
-        "jg-estate-side-nav",
-        `jg-estate-side-nav--${side}`,
-      ].join(" ")}
-      onClick={onClick}
-      disabled={disabled}
-      aria-label={label}
-    >
-      <span className="jg-design-studio__nav-plate" aria-hidden="true" />
-      <span className="jg-design-studio__nav-arrow" aria-hidden="true">
-        {side === "prev" ? "‹" : "›"}
-      </span>
-    </button>
+    <nav className="jg-page-turn-nav" aria-label="Journal pages">
+      <button
+        type="button"
+        className="jg-page-turn-nav__btn jg-page-turn-nav__btn--prev"
+        onClick={onPrev}
+        disabled={!canPrev}
+        aria-label={prevLabel}
+        data-testid="jg-page-nav-back"
+      >
+        <span className="jg-page-turn-nav__arrow" aria-hidden="true">
+          ‹
+        </span>
+        <span className="jg-page-turn-nav__label">{prevLabel}</span>
+      </button>
+      <button
+        type="button"
+        className="jg-page-turn-nav__btn jg-page-turn-nav__btn--next"
+        onClick={onNext}
+        disabled={!canNext}
+        aria-label={nextLabel}
+        data-testid="jg-page-nav-next"
+      >
+        <span className="jg-page-turn-nav__label">{nextLabel}</span>
+        <span className="jg-page-turn-nav__arrow" aria-hidden="true">
+          ›
+        </span>
+      </button>
+    </nav>
   );
 }
 
@@ -288,18 +326,25 @@ export function JournalGazeboOpenBook({
     !turning &&
     !creationCeremony &&
     (pageIndex > 0 || view === "open");
-  const canTurnForward = pageReady && !turning && isWritingPage;
+  const atLastWritingPage = isWritingPage && pageIndex >= LAST_WRITING_PAGE_INDEX;
+  const canTurnForward =
+    pageReady && !turning && isWritingPage && !atLastWritingPage;
   const canGoNext =
     !turning &&
     !creationCeremony &&
     (isCeremonyPage
       ? pageReady && pageIndex < FIRST_WRITING_PAGE_INDEX
-      : canTurnForward);
+      : pageReady && isWritingPage && (canTurnForward || atLastWritingPage));
 
   const turnForward = useCallback(() => {
+    if (atLastWritingPage) {
+      // Experience clamps and shows JOURNAL_FULL_SPARK.
+      onPageIndexChange(pageIndex + 1);
+      return;
+    }
     if (!canTurnForward) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    playJournalPageTurnSound();
+    playJournalPageTurnSound(CINEMATIC.pageTurnMs);
     if (reduced) {
       onPageIndexChange(pageIndex + 1);
       return;
@@ -308,28 +353,56 @@ export function JournalGazeboOpenBook({
     setTurning("forward");
     scheduleTurn(() => onPageIndexChange(pageIndex + 1), CINEMATIC.pageTurnMs);
     scheduleTurn(() => setTurning(null), CINEMATIC.pageTurnMs + CINEMATIC.pageTurnPauseMs);
-  }, [canTurnForward, clearTurnTimers, onPageIndexChange, pageIndex, scheduleTurn]);
+  }, [
+    atLastWritingPage,
+    canTurnForward,
+    clearTurnTimers,
+    onPageIndexChange,
+    pageIndex,
+    scheduleTurn,
+  ]);
 
   const turnCeremonyForward = useCallback(() => {
     if (!pageReady || turning) return;
-    playJournalPageTurnSound();
-    onPageIndexChange(pageIndex + 1);
-  }, [onPageIndexChange, pageIndex, pageReady, turning]);
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    playJournalPageTurnSound(CINEMATIC.pageTurnMs);
+    if (reduced) {
+      onPageIndexChange(pageIndex + 1);
+      return;
+    }
+    // Right-to-left curl — same physical turn as writing pages
+    clearTurnTimers();
+    setTurning("forward");
+    scheduleTurn(() => onPageIndexChange(pageIndex + 1), CINEMATIC.pageTurnMs);
+    scheduleTurn(() => setTurning(null), CINEMATIC.pageTurnMs + CINEMATIC.pageTurnPauseMs);
+  }, [
+    clearTurnTimers,
+    onPageIndexChange,
+    pageIndex,
+    pageReady,
+    scheduleTurn,
+    turning,
+  ]);
 
   const goBack = useCallback(() => {
     if (!canGoBack) return;
     if (pageIndex === 0 && view === "open") {
-      playJournalPageTurnSound();
+      playJournalPageTurnSound(Math.round(CINEMATIC.pageTurnMs * 0.55));
       onRequestClose?.();
       return;
     }
-    playJournalPageTurnSound();
+    playJournalPageTurnSound(Math.round(CINEMATIC.pageTurnMs * 0.55));
     onPageIndexChange(pageIndex - 1);
   }, [canGoBack, onPageIndexChange, onRequestClose, pageIndex, view]);
 
   const handleWritingOverflow = useCallback(
     (overflowHtml: string) => {
-      if (!canTurnForward || turning) return;
+      if (turning) return;
+      if (atLastWritingPage) {
+        onPageIndexChange(pageIndex + 1);
+        return;
+      }
+      if (!canTurnForward) return;
       const el = paperRef.current;
       if (!el) return;
       const kept = sanitizePageHtml(el.innerHTML);
@@ -340,14 +413,24 @@ export function JournalGazeboOpenBook({
       onBodyChange(kept);
       turnForward();
     },
-    [canTurnForward, config.id, onBodyChange, pageIndex, paperRef, turnForward, turning],
+    [
+      atLastWritingPage,
+      canTurnForward,
+      config.id,
+      onBodyChange,
+      onPageIndexChange,
+      pageIndex,
+      paperRef,
+      turnForward,
+      turning,
+    ],
   );
 
   function promptForWritingPage(forIndex: number): string | null {
+    if (forIndex < FIRST_WRITING_PAGE_INDEX) return null;
     const html = forIndex === pageIndex ? body : getPageBody(config.id, forIndex);
     if (plainTextFromHtml(html).trim()) return null;
-    if (forIndex <= FIRST_WRITING_PAGE_INDEX) return null;
-    return pickJournalPageTip(forIndex);
+    return pickJournalPageTip(forIndex, new Date(), config.intention);
   }
 
   function renderWritingPage(forIndex: number, editable: boolean) {
@@ -447,10 +530,13 @@ export function JournalGazeboOpenBook({
     const timer = window.setTimeout(() => {
       const el = paperRef.current;
       if (!el) return;
+      // Only on page arrival — never when config/autosave identity changes.
       focusWritingAtPageStart(el, config, activePageStyle);
     }, 280);
     return () => window.clearTimeout(timer);
-  }, [activePageStyle, config, isWritingPage, pageIndex, paperRef]);
+    // Pen/font/color/config updates must not yank the caret to the page start.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- page turn only
+  }, [isWritingPage, pageIndex]);
 
   useEffect(() => {
     if (pageIndex !== 0 || creationCeremony || !isCeremonyPage) return;
@@ -595,9 +681,16 @@ export function JournalGazeboOpenBook({
           side="right"
           paperStyle={config.paperStyle}
           pageIndex={forIndex}
+          intention={config.intention}
+          showPageWatermarks={config.showPageWatermarks}
           lined={isLined && writingPage}
           surfaceStyle={
-            writingPage && forIndex === pageIndex ? ruledSurfaceStyle : undefined
+            isLined && writingPage
+              ? (ruledPaperStyle(
+                  config,
+                  forIndex === pageIndex ? activePageStyle : undefined,
+                ) as CSSProperties)
+              : undefined
           }
           active={active}
           memory={false}
@@ -613,12 +706,13 @@ export function JournalGazeboOpenBook({
   if (view === "closed" || view === "opening") {
     return (
       <>
-        <EstateSideNav side="prev" disabled label="Previous" />
-        {onRequestOpen ? (
-          <EstateSideNav side="next" onClick={onRequestOpen} label="Open journal" />
-        ) : (
-          <EstateSideNav side="next" disabled label="Open journal" />
-        )}
+        <JournalPageTurnNav
+          canPrev={false}
+          canNext={Boolean(onRequestOpen) && view === "closed"}
+          onNext={onRequestOpen}
+          prevLabel="Back"
+          nextLabel="Open journal"
+        />
         <div
           className={[
             "jg-open-book",
@@ -660,20 +754,27 @@ export function JournalGazeboOpenBook({
                 ]
                   .filter(Boolean)
                   .join(" ")}
-                style={
-                  coverImage
-                    ? {
-                        backgroundImage: `url(${coverImage})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center center",
-                        backgroundRepeat: "no-repeat",
-                      }
-                    : undefined
-                }
               >
+                {coverImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- preloaded estate plate
+                  <img
+                    src={coverImage}
+                    alt=""
+                    className="jg-closed-journal__cover-img"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="async"
+                    aria-hidden
+                  />
+                ) : null}
                 <span className="jg-closed-journal__cover-inside" aria-hidden="true" />
                 <span className="jg-closed-journal__cover-edge" aria-hidden="true" />
                 <span className="jg-closed-journal__leather-thickness" aria-hidden="true" />
+                {config.showSparkFlame !== false ? (
+                  <span className="jg-closed-journal__cover-flame" aria-hidden="true">
+                    <JournalGazeboSparkFlame size="sm" />
+                  </span>
+                ) : null}
                 <JournalCoverEmboss title={journalCoverTitle(config)} />
               </div>
             </div>
@@ -687,17 +788,13 @@ export function JournalGazeboOpenBook({
   if (!creationCeremony) {
     return (
       <>
-        <EstateSideNav
-          side="prev"
-          onClick={goBack}
-          disabled={!canGoBack}
-          label="Previous page"
-        />
-        <EstateSideNav
-          side="next"
-          onClick={goNext}
-          disabled={!canGoNext}
-          label="Next page"
+        <JournalPageTurnNav
+          onPrev={goBack}
+          onNext={goNext}
+          canPrev={canGoBack}
+          canNext={canGoNext}
+          prevLabel="Back"
+          nextLabel={pageIndex === 0 ? "Begin writing" : "Next"}
         />
         <div
           className={[
@@ -711,6 +808,8 @@ export function JournalGazeboOpenBook({
             .filter(Boolean)
             .join(" ")}
           style={{ "--jg-page-turn-ms": `${CINEMATIC.pageTurnMs}ms` } as CSSProperties}
+          data-testid="jg-open-book-single"
+          data-page-index={pageIndex}
         >
         <div className="jg-open-book__stage jg-open-book__stage--single">
           <div
@@ -735,21 +834,26 @@ export function JournalGazeboOpenBook({
               ref={spreadRef}
             >
               {turning === "forward" ? (
-                <div className="jg-open-book__under-next jg-open-book__under-next--single">
+                <div className="jg-page-under jg-page-under--single" aria-hidden="true">
                   {renderSinglePageLeaf(pageIndex + 1, true)}
                 </div>
               ) : null}
 
               {turning === "forward" ? (
-                <div className="jg-flip-leaf jg-flip-leaf--single" aria-hidden="true">
-                  <div className="jg-flip-leaf__sheet">
-                    <div className="jg-flip-leaf__front">
+                <div className="jg-page-curl jg-page-curl--single" aria-hidden="true">
+                  <div className="jg-page-curl__sheet">
+                    <div className="jg-page-curl__face">
                       {renderSinglePageLeaf(pageIndex, true)}
                     </div>
                     <div
-                      className="jg-flip-leaf__back jg-book-paper"
+                      className="jg-page-curl__back jg-book-paper"
                       data-paper={config.paperStyle}
                     />
+                    <span className="jg-page-curl__spine-shade" />
+                    <span className="jg-page-curl__bend" />
+                    <span className="jg-page-curl__edge" />
+                    <span className="jg-page-curl__fold" />
+                    <span className="jg-page-curl__shine" />
                   </div>
                 </div>
               ) : (
@@ -758,6 +862,16 @@ export function JournalGazeboOpenBook({
             </div>
           </div>
         </div>
+        {pageIndex === 0 && pageReady && !turning ? (
+          <button
+            type="button"
+            className="jg-open-book__begin-writing"
+            onClick={goNext}
+            data-testid="jg-begin-writing"
+          >
+            {JOURNAL_CREATION_BEGIN_WRITING}
+          </button>
+        ) : null}
       </div>
       </>
     );
@@ -765,17 +879,13 @@ export function JournalGazeboOpenBook({
 
   return (
     <>
-      <EstateSideNav
-        side="prev"
-        onClick={goBack}
-        disabled={!canGoBack}
-        label="Previous page"
-      />
-      <EstateSideNav
-        side="next"
-        onClick={goNext}
-        disabled={!canGoNext}
-        label="Next page"
+      <JournalPageTurnNav
+        onPrev={goBack}
+        onNext={goNext}
+        canPrev={canGoBack}
+        canNext={canGoNext}
+        prevLabel="Back"
+        nextLabel="Next"
       />
       <div
         className={[
@@ -820,6 +930,8 @@ export function JournalGazeboOpenBook({
               side="left"
               paperStyle={config.paperStyle}
               pageIndex={pageIndex}
+              intention={config.intention}
+              showPageWatermarks={config.showPageWatermarks}
               lined={isLined && isWritingPage}
               surfaceStyle={ruledSurfaceStyle}
               memory={pageIndex > 0}
@@ -828,11 +940,13 @@ export function JournalGazeboOpenBook({
             </PageShell>
 
             {turning === "forward" ? (
-              <div className="jg-open-book__under-next">
+              <div className="jg-page-under" aria-hidden="true">
                 <PageShell
                   side="right"
                   paperStyle={config.paperStyle}
                   pageIndex={pageIndex + 1}
+                  intention={config.intention}
+                  showPageWatermarks={config.showPageWatermarks}
                   lined={isLined && pageIndex + 1 >= FIRST_WRITING_PAGE_INDEX}
                   active
                 >
@@ -842,13 +956,15 @@ export function JournalGazeboOpenBook({
             ) : null}
 
             {turning === "forward" ? (
-              <div className="jg-flip-leaf" aria-hidden="true">
-                <div className="jg-flip-leaf__sheet">
-                  <div className="jg-flip-leaf__front">
+              <div className="jg-page-curl" aria-hidden="true">
+                <div className="jg-page-curl__sheet">
+                  <div className="jg-page-curl__face">
                     <PageShell
                       side="right"
                       paperStyle={config.paperStyle}
                       pageIndex={pageIndex}
+                      intention={config.intention}
+                      showPageWatermarks={config.showPageWatermarks}
                       lined={isLined && isWritingPage}
                       surfaceStyle={ruledSurfaceStyle}
                       active
@@ -857,9 +973,14 @@ export function JournalGazeboOpenBook({
                     </PageShell>
                   </div>
                   <div
-                    className="jg-flip-leaf__back jg-book-paper"
+                    className="jg-page-curl__back jg-book-paper"
                     data-paper={config.paperStyle}
                   />
+                  <span className="jg-page-curl__spine-shade" />
+                  <span className="jg-page-curl__bend" />
+                  <span className="jg-page-curl__edge" />
+                  <span className="jg-page-curl__fold" />
+                  <span className="jg-page-curl__shine" />
                 </div>
               </div>
             ) : (
@@ -867,6 +988,8 @@ export function JournalGazeboOpenBook({
                 side="right"
                 paperStyle={config.paperStyle}
                 pageIndex={pageIndex}
+                intention={config.intention}
+                showPageWatermarks={config.showPageWatermarks}
                 lined={isLined && isWritingPage}
                 surfaceStyle={ruledSurfaceStyle}
                 active

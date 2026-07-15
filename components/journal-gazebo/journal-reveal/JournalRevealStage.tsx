@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import { journalCoverImageUrl, journalCoverTitle } from "@/lib/journalGazebo/coverArt";
+import { journalCoverTitle } from "@/lib/journalGazebo/coverArt";
 import type { JournalGazeboConfig } from "@/lib/journalGazebo/types";
+import { JournalRevealCover } from "./JournalRevealCover";
 
 type Props = {
   journal: JournalGazeboConfig;
@@ -21,7 +22,6 @@ const PARTICLE_SLOTS = [
 export function JournalRevealStage({ journal, onOpenJournal }: Props) {
   const reduceMotion = useReducedMotion();
   const title = journalCoverTitle(journal);
-  const coverImage = journalCoverImageUrl(journal);
 
   return (
     <div className="journal-reveal__stage" data-testid="journal-reveal-journal">
@@ -83,21 +83,7 @@ export function JournalRevealStage({ journal, onOpenJournal }: Props) {
               animate={{ y: 0, filter: "brightness(1.05)" }}
               transition={{ duration: reduceMotion ? 0.1 : 0.9 }}
             >
-              <div
-                className="journal-reveal__journal-cover"
-                data-leather={journal.leatherColor}
-                style={
-                  coverImage
-                    ? {
-                        backgroundImage: `url(${coverImage})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }
-                    : undefined
-                }
-              >
-                <span className="journal-reveal__journal-title">{title}</span>
-              </div>
+              <JournalRevealCover journal={journal} />
             </motion.div>
           </div>
         </motion.span>

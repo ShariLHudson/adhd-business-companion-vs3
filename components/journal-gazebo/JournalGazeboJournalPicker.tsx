@@ -60,13 +60,22 @@ export function JournalGazeboJournalPicker({
                     ]
                       .filter(Boolean)
                       .join(" ")}
-                    style={
-                      coverUrl
-                        ? { backgroundImage: `url(${coverUrl})` }
-                        : undefined
-                    }
                     aria-hidden="true"
-                  />
+                  >
+                    {coverUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- preloaded estate plate
+                      <img
+                        src={coverUrl}
+                        alt=""
+                        className="jg-journal-picker__cover-img"
+                        loading="eager"
+                        decoding="async"
+                      />
+                    ) : null}
+                    {coverUrl ? (
+                      <span className="jg-journal-picker__cover-title">{title}</span>
+                    ) : null}
+                  </span>
                   <span className="jg-journal-picker__meta">
                     <span className="jg-journal-picker__name">{title}</span>
                     {journal.name.trim() && journal.name.trim() !== title ? (

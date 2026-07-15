@@ -1,25 +1,51 @@
-import { pageIllustrationForIndex } from "@/lib/journalGazebo/pageIllustrations";
+import type { JournalIntentionId } from "@/lib/journalGazebo/journalIntentions";
+import { resolveShowPageWatermarks } from "@/lib/journalGazebo/journalIntentions";
+import { pageWatermarkUrlForIndex } from "@/lib/journalGazebo/pageWatermarks";
 
 type Props = {
-  pageIndex: number;
+  pageIndex?: number;
+  /** Journal type — prayer, gratitude, etc. shapes which Estate places appear. */
+  intention?: JournalIntentionId;
+  /** When false, pages stay clear — no corner place marks. */
+  showPageWatermarks?: boolean;
 };
 
-/** Subtle estate illustration on select pages — no watermarks or corner chrome. */
-export function JournalGazeboPageChrome({ pageIndex }: Props) {
-  const illustration = pageIllustrationForIndex(pageIndex);
-
-  if (illustration.id === "none" || !illustration.imageUrl) {
-    return null;
-  }
+/**
+ * Quiet page design — thin gold frame near the edge,
+ * soft topic watermark (~2") in the bottom-right corner
+ * (prayer verse, gratitude mark, health leaf…).
+ * Mark rotates as pages turn; set matches journal intention.
+ */
+export function JournalGazeboPageChrome({
+  pageIndex = 0,
+  intention,
+  showPageWatermarks,
+}: Props) {
+  const showWatermark = resolveShowPageWatermarks(showPageWatermarks);
+  const watermarkUrl = showWatermark
+    ? pageWatermarkUrlForIndex(pageIndex, intention)
+    : null;
 
   return (
-    <span
-      className={[
-        "jg-page-chrome__illustration",
-        `jg-page-chrome__illustration--${illustration.id}`,
-      ].join(" ")}
-      style={{ backgroundImage: `url(${illustration.imageUrl})` }}
-      aria-hidden="true"
-    />
+    <div className="jg-page-chrome" aria-hidden="true">
+      <span className="jg-page-chrome__gold-frame">
+        <span className="jg-page-chrome__gold-corner jg-page-chrome__gold-corner--tl" />
+        <span className="jg-page-chrome__gold-corner jg-page-chrome__gold-corner--tr" />
+        <span className="jg-page-chrome__gold-corner jg-page-chrome__gold-corner--bl" />
+        <span className="jg-page-chrome__gold-corner jg-page-chrome__gold-corner--br" />
+      </span>
+      {watermarkUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          key={watermarkUrl}
+          src={watermarkUrl}
+          alt=""
+          className="jg-page-chrome__place-mark"
+          data-testid="jg-page-place-mark"
+          data-watermark-page={pageIndex}
+          draggable={false}
+        />
+      ) : null}
+    </div>
   );
 }

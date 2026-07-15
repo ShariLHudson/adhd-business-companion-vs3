@@ -112,6 +112,8 @@ export function defaultJournalConfig(
     coverMaterial: "leather",
     embossingStyle: "gold",
     penVariant: "elegant-fountain",
+    intention: "journey",
+    showPageWatermarks: true,
     paperStyle: "cream",
     bookmarkColor: "forest",
     bookmarkStyle: "ribbon",

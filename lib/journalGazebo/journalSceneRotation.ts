@@ -1,4 +1,7 @@
-import { JOURNAL_GAZEBO_BACKGROUND_URL } from "./journalGazeboMedia";
+import {
+  JOURNAL_GAZEBO_BACKGROUND_URL,
+  JOURNAL_GAZEBO_RETURN_BACKGROUND_URL,
+} from "./journalGazeboMedia";
 
 const RETURN_VISIT_COUNT_KEY = "spark-journal-gazebo-return-visit-count";
 
@@ -58,9 +61,14 @@ export function resolveJournalWelcomeScenes(): JournalSessionScenes {
   return letterDeskScenes();
 }
 
-/** Creation / gift — letter desk behind workshop layers. */
+/** Creation / gift — letter-free gazebo desk so the stationery is not behind choices. */
 export function resolveJournalWorkshopScenes(): JournalSessionScenes {
-  return letterDeskScenes();
+  return {
+    gazeboUrl: JOURNAL_GAZEBO_RETURN_BACKGROUND_URL,
+    settledUrl: null,
+    transitionAfterMs: 0,
+    framing: "return-desk",
+  };
 }
 
 /** Gazebo rest — letter desk with Create + Write. */

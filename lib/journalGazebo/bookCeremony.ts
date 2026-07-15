@@ -6,6 +6,13 @@ export const FIRST_WRITING_PAGE_INDEX = 1;
 /** First-opening ceremony pages before writing (page 0). Human page 1. */
 export const FIRST_OPEN_CEREMONY_PAGE_COUNT = 1;
 
+/** Writing pages per journal (indices FIRST_WRITING_PAGE_INDEX … LAST_WRITING_PAGE_INDEX). */
+export const MAX_JOURNAL_WRITING_PAGES = 200;
+
+/** Last writable page index (0-based). After this, start a new journal. */
+export const LAST_WRITING_PAGE_INDEX =
+  FIRST_WRITING_PAGE_INDEX + MAX_JOURNAL_WRITING_PAGES - 1;
+
 /** @deprecated Use FIRST_OPEN_CEREMONY_PAGE_COUNT */
 export const BOOK_CEREMONY_PAGE_COUNT = FIRST_OPEN_CEREMONY_PAGE_COUNT;
 

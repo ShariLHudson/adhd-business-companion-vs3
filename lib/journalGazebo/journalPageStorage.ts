@@ -3,12 +3,20 @@
  */
 
 import { JOURNAL_GAZEBO_UPDATED_EVENT } from "./store";
-import { FIRST_WRITING_PAGE_INDEX } from "./bookCeremony";
+import {
+  FIRST_WRITING_PAGE_INDEX,
+  LAST_WRITING_PAGE_INDEX,
+  MAX_JOURNAL_WRITING_PAGES,
+} from "./bookCeremony";
 import type { TypingStyle } from "./writingSurface";
 import { typingStyleFromConfig } from "./writingSurface";
 import type { JournalGazeboConfig } from "./types";
 
-export { FIRST_WRITING_PAGE_INDEX } from "./bookCeremony";
+export {
+  FIRST_WRITING_PAGE_INDEX,
+  LAST_WRITING_PAGE_INDEX,
+  MAX_JOURNAL_WRITING_PAGES,
+} from "./bookCeremony";
 
 const PLACE_STORAGE_KEY = "companion-journal-gazebo-places-v1";
 const BODIES_STORAGE_KEY = "companion-journal-gazebo-page-bodies-v1";
@@ -111,8 +119,57 @@ export function saveJournalPlace(
 ): JournalPlace {
   const places = readPlaces();
   const next: JournalPlace = { ...getJournalPlace(journalId), ...partial };
+  if (typeof next.pageIndex === "number") {
+    next.pageIndex = clampWritingPageIndex(next.pageIndex);
+  }
   writePlaces({ ...places, [journalId]: next });
   return next;
+}
+
+export function clampWritingPageIndex(pageIndex: number): number {
+  if (!Number.isFinite(pageIndex)) return FIRST_WRITING_PAGE_INDEX;
+  if (pageIndex < FIRST_WRITING_PAGE_INDEX) return FIRST_WRITING_PAGE_INDEX;
+  if (pageIndex > LAST_WRITING_PAGE_INDEX) return LAST_WRITING_PAGE_INDEX;
+  return Math.floor(pageIndex);
+}
+
+function pageHasWriting(html: string): boolean {
+  if (!html) return false;
+  const plain = html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/\u200b/g, "")
+    .trim();
+  return plain.length > 0;
+}
+
+/**
+ * Highest writing page that still has words — so switching journals
+ * resumes where the member left off even if place was never saved.
+ */
+export function getLastWrittenPageIndex(journalId: string): number {
+  const bodies = readBodies()[journalId] ?? {};
+  let last = FIRST_WRITING_PAGE_INDEX;
+  for (const [key, html] of Object.entries(bodies)) {
+    const index = Number(key);
+    if (!Number.isFinite(index)) continue;
+    if (index < FIRST_WRITING_PAGE_INDEX || index > LAST_WRITING_PAGE_INDEX) continue;
+    if (pageHasWriting(html)) last = Math.max(last, index);
+  }
+  return last;
+}
+
+/** Page to open when returning to a journal (saved place ∪ last written). */
+export function resolveResumePageIndex(journalId: string): number {
+  const place = getJournalPlace(journalId).pageIndex;
+  const written = getLastWrittenPageIndex(journalId);
+  return clampWritingPageIndex(Math.max(place, written));
+}
+
+export function isJournalWritingFull(journalId: string): boolean {
+  return getLastWrittenPageIndex(journalId) >= LAST_WRITING_PAGE_INDEX;
 }
 
 export function getPageBody(journalId: string, pageIndex: number): string {

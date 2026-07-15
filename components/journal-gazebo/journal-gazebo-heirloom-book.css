@@ -163,6 +163,7 @@
 }
 
 .jg-open-book__page {
+  position: relative;
   border-radius: 0 5px 5px 0;
   overflow: visible;
 }
@@ -251,27 +252,35 @@
     inset 1px 0 0 rgba(255, 248, 235, 0.1);
 }
 
-/* ── Page chrome — gold frame, watermark, signature ── */
+/* ── Page chrome — thin gold frame + small gazebo mark ── */
+
+.jg-page-chrome {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Above page-inner so the frame + corner mark stay visible */
+  z-index: 3;
+}
 
 .jg-page-chrome__gold-frame {
   position: absolute;
-  inset: clamp(0.55rem, 1.4vh, 0.85rem) clamp(0.5rem, 1.2vw, 0.75rem)
-    clamp(0.65rem, 1.6vh, 0.95rem);
+  inset: clamp(0.35rem, 0.9vh, 0.55rem) clamp(0.32rem, 0.85vw, 0.5rem)
+    clamp(0.4rem, 1vh, 0.6rem);
   pointer-events: none;
   z-index: 1;
-  border: 0.5px solid rgba(181, 148, 88, 0.42);
+  border: 0.5px solid rgba(181, 148, 88, 0.34);
   box-shadow:
-    inset 0 0 0 0.5px rgba(255, 248, 235, 0.35),
-    0 0 0 0.5px rgba(139, 105, 20, 0.08);
+    inset 0 0 0 0.5px rgba(255, 248, 235, 0.22),
+    0 0 0 0.5px rgba(139, 105, 20, 0.05);
 }
 
 .jg-page-chrome__gold-corner {
   position: absolute;
-  width: 10px;
-  height: 10px;
-  border-color: rgba(196, 160, 96, 0.55);
+  width: 8px;
+  height: 8px;
+  border-color: rgba(196, 160, 96, 0.48);
   border-style: solid;
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 .jg-page-chrome__gold-corner--tl {
@@ -298,32 +307,64 @@
   border-width: 0 1px 1px 0;
 }
 
+/* Soft topic watermark — about 2", feathered watercolor (no square frame) */
+.jg-page-chrome__place-mark,
+.jg-page-chrome__gazebo-mark {
+  position: absolute;
+  right: clamp(0.15rem, 1%, 0.45rem);
+  bottom: clamp(0.15rem, 0.9%, 0.4rem);
+  width: min(2.15in, 28vw);
+  height: min(2.15in, 28vw);
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0.28;
+  object-fit: cover;
+  border: 0 !important;
+  outline: none;
+  border-radius: 0;
+  box-shadow: none !important;
+  background: transparent !important;
+  filter: sepia(0.12) saturate(0.9) contrast(0.96);
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(
+    ellipse 74% 74% at 50% 52%,
+    #000 38%,
+    transparent 80%
+  );
+  mask-image: radial-gradient(
+    ellipse 74% 74% at 50% 52%,
+    #000 38%,
+    transparent 80%
+  );
+}
+
 .jg-page-chrome__watermark {
   position: absolute;
-  width: clamp(2rem, 16%, 3.25rem);
-  height: clamp(1.75rem, 14%, 2.85rem);
+  width: clamp(1.65rem, 7.5vw, 2.35rem);
+  height: clamp(1.35rem, 6.2vw, 1.9rem);
   pointer-events: none;
-  z-index: 1;
-  opacity: 0.07;
+  z-index: 2;
+  opacity: 0.14;
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
-  filter: sepia(0.42) saturate(0.55);
+  filter: sepia(0.28) saturate(0.7);
   transform-origin: center center;
 }
 
 .jg-page-chrome__watermark--corner-bl {
-  left: clamp(0.5rem, 3.5%, 0.9rem);
-  bottom: clamp(0.5rem, 4.5%, 0.95rem);
+  left: clamp(0.55rem, 2.8%, 0.85rem);
+  bottom: clamp(0.55rem, 2.8%, 0.85rem);
 }
 
 .jg-page-chrome__watermark--corner-br {
-  right: clamp(0.5rem, 3.5%, 0.9rem);
-  bottom: clamp(0.5rem, 4.5%, 0.95rem);
+  right: clamp(0.55rem, 2.8%, 0.85rem);
+  bottom: clamp(0.7rem, 3.2%, 1rem);
 }
 
 .jg-page-chrome__watermark--gazebo {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'%3E%3Cpath fill='%238b7355' d='M60 8l-28 14v8h56v-8zm-24 22v36h48V30H36zm8 8h32v20H44V38z'/%3E%3Cpath fill='none' stroke='%238b7355' stroke-width='1.5' d='M20 66h80'/%3E%3C/svg%3E");
+  background-image: url("/images/journal-gazebo/gazebo-page-mark.svg");
+  opacity: 0.34;
 }
 
 .jg-page-chrome__watermark--trees {
@@ -567,7 +608,9 @@
     linear-gradient(165deg, #f8f0e0 0%, #f0e6d4 48%, #e6dac4 100%);
 }
 
-.jg-open-book__page[data-paper="cotton"] {
+.jg-open-book__page[data-paper="cotton"],
+.jg-open-book__page--left[data-paper="cotton"],
+.jg-open-book__page--right[data-paper="cotton"] {
   background:
     repeating-linear-gradient(
       0deg,
@@ -579,26 +622,43 @@
     linear-gradient(180deg, #faf8f5, #eeeae6);
 }
 
-.jg-open-book__page[data-paper="linen"] {
-  background:
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 3px,
-      rgba(160, 150, 140, 0.04) 3px,
-      rgba(160, 150, 140, 0.04) 4px
-    ),
-    linear-gradient(180deg, #f4efe6, #e8e0d4);
+/* Lined choice — warm paper under ruled-line layer (::after) */
+.jg-open-book__page[data-paper="linen"],
+.jg-open-book__page--left[data-paper="linen"],
+.jg-open-book__page--right[data-paper="linen"] {
+  background: linear-gradient(180deg, #f6f1e8 0%, #efe8dc 48%, #e6ddd0 100%);
 }
 
-.jg-open-book__page[data-paper="parchment"] {
+.jg-open-book__page[data-paper="parchment"],
+.jg-open-book__page--left[data-paper="parchment"],
+.jg-open-book__page--right[data-paper="parchment"] {
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Cpath fill='%23c9b898' fill-opacity='0.08' d='M0 0h1v1H0zm2 2h1v1H2z'/%3E%3C/svg%3E"),
     linear-gradient(180deg, #f3ead8, #e9deca);
 }
 
-.jg-open-book__page[data-paper="ivory"] {
+.jg-open-book__page[data-paper="ivory"],
+.jg-open-book__page--left[data-paper="ivory"],
+.jg-open-book__page--right[data-paper="ivory"] {
   background: linear-gradient(165deg, #f7f2e8 0%, #ebe3d2 50%, #e0d6c4 100%);
+}
+
+.jg-open-book__page[data-paper="champagne"],
+.jg-open-book__page--left[data-paper="champagne"],
+.jg-open-book__page--right[data-paper="champagne"] {
+  background: linear-gradient(180deg, #faf6ec, #f0e6d0);
+}
+
+.jg-open-book__page[data-paper="blush"],
+.jg-open-book__page--left[data-paper="blush"],
+.jg-open-book__page--right[data-paper="blush"] {
+  background: linear-gradient(180deg, #faf4f2, #f0e2de);
+}
+
+.jg-open-book__page[data-paper="sage"],
+.jg-open-book__page--left[data-paper="sage"],
+.jg-open-book__page--right[data-paper="sage"] {
+  background: linear-gradient(180deg, #f2f4f0, #e4e8e0);
 }
 
 /* ── Floating writing toolbar ── */
@@ -1094,41 +1154,43 @@
   min-height: 100%;
 }
 
-.jg-open-book__under-next--single {
+.jg-page-under--single {
   width: 100%;
   height: 100%;
   right: 0;
   left: 0;
 }
 
-.jg-flip-leaf--single {
+.jg-page-curl--single {
   width: 100%;
   height: 100%;
   left: 0;
   right: 0;
+  perspective: 1180px;
+  perspective-origin: 0% 60%;
 }
 
-.jg-flip-leaf--single .jg-flip-leaf__sheet {
-  transform-origin: left center;
+.jg-page-curl--single .jg-page-curl__sheet {
+  /* Single page — bound on the left; free corner leads the bend */
+  transform-origin: left 58%;
+  filter: none;
+  box-shadow: -6px 10px 18px rgba(30, 20, 12, 0.14);
 }
 
-.jg-flip-leaf--single .jg-open-book__page--right,
-.jg-flip-leaf--single .jg-open-book__page-inner {
+.jg-page-curl--single .jg-open-book__page--right,
+.jg-page-curl--single .jg-open-book__page-inner {
   transform: none !important;
 }
 
-.jg-open-book__spread--turning-forward .jg-flip-leaf--single .jg-flip-leaf__sheet {
-  animation: jg-flip-leaf-forward-single var(--jg-page-turn-ms, 2.8s)
-    cubic-bezier(0.28, 0.82, 0.32, 1) forwards;
+.jg-open-book__spread--turning-forward .jg-page-curl--single .jg-page-curl__sheet {
+  /* Must stay linear — eased multi-keyframe turns look like staged steps */
+  animation: jg-page-curl-peel var(--jg-page-turn-ms, 2.4s) linear forwards;
 }
 
-@keyframes jg-flip-leaf-forward-single {
-  0% {
-    transform: rotateY(0deg);
-  }
-  100% {
-    transform: rotateY(-180deg);
-  }
+.jg-page-under--single {
+  width: 100%;
+  left: 0;
+  right: 0;
 }
 
 /* Folio footer — Volume I · flame · Page n */

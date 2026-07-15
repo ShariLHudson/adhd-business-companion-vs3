@@ -5,7 +5,7 @@ type Props = {
   onToggle: () => void;
 };
 
-/** Top-right ambience toggle — fades, never snaps. */
+/** Top-right ambience toggle — quiet until clicked on; click again to silence. */
 export function JournalGazeboSoundControl({ muted, onToggle }: Props) {
   return (
     <button
@@ -18,7 +18,9 @@ export function JournalGazeboSoundControl({ muted, onToggle }: Props) {
         .join(" ")}
       onClick={onToggle}
       aria-label={muted ? "Turn gazebo sound on" : "Turn gazebo sound off"}
-      aria-pressed={muted}
+      aria-pressed={!muted}
+      title={muted ? "Sound off — click to hear the garden" : "Sound on — click to quiet"}
+      data-testid="jg-sound-control"
     >
       <span className="jg-sound-control__icon" aria-hidden="true">
         {muted ? "🔇" : "🔊"}

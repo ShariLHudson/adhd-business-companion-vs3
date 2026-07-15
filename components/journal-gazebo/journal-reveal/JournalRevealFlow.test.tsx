@@ -21,9 +21,9 @@ vi.mock("framer-motion", async () => {
 
 const sampleJournal: JournalGazeboConfig = {
   id: "journal-reveal-test",
-  name: "Morning Pages",
-  embossedTitle: "Morning Pages",
-  leatherColor: "cognac",
+  name: "My Journey",
+  embossedTitle: "My Journey",
+  leatherColor: "forest",
   showSparkFlame: true,
   coverImageKind: "none",
   paperStyle: "cream",
@@ -36,7 +36,7 @@ const sampleJournal: JournalGazeboConfig = {
   updatedAt: "2026-07-14T00:00:00.000Z",
 };
 
-describe("JournalRevealFlow", () => {
+describe("JournalRevealFlow physical gift", () => {
   let container: HTMLDivElement;
   let root: Root;
 
@@ -66,7 +66,35 @@ describe("JournalRevealFlow", () => {
     });
   }
 
-  it("starts full wrapping for first creation", () => {
+  function state() {
+    return container
+      .querySelector("[data-testid='journal-reveal-flow']")
+      ?.getAttribute("data-reveal-state");
+  }
+
+  function tick(ms: number) {
+    act(() => {
+      vi.advanceTimersByTime(ms);
+    });
+  }
+
+  function unwrapToAdmire() {
+    clickTestId("journal-reveal-gift-button");
+    expect(state()).toBe("ribbon-pull");
+    clickTestId("journal-reveal-ribbon-drag");
+    expect(state()).toBe("bow");
+    // bow 1600 → ribbon 1500 → unwrap 2400 → reveal 2200
+    tick(1600);
+    expect(state()).toBe("ribbon");
+    tick(1500);
+    expect(state()).toBe("unwrap");
+    tick(2400);
+    expect(state()).toBe("reveal");
+    tick(2200);
+    expect(state()).toBe("admire");
+  }
+
+  it("shows a physical wrapped gift on the desk — not panel dots", () => {
     act(() => {
       root.render(
         <JournalRevealFlow
@@ -76,36 +104,25 @@ describe("JournalRevealFlow", () => {
         />,
       );
     });
-    const flow = container.querySelector("[data-testid='journal-reveal-flow']");
-    expect(flow?.getAttribute("data-reveal-state")).toBe("creating");
-    expect(
-      container.querySelector("[data-testid='journal-reveal-wrapping']"),
-    ).toBeTruthy();
-    expect(
-      container.querySelector("[data-testid='journal-reveal-skip']"),
-    ).toBeTruthy();
-  });
-
-  it("shortens returning creations to the wrapped gift", () => {
-    act(() => {
-      root.render(
-        <JournalRevealFlow
-          journal={sampleJournal}
-          isFirstCreation={false}
-          onComplete={() => {}}
-        />,
-      );
-    });
-    expect(
-      container
-        .querySelector("[data-testid='journal-reveal-flow']")
-        ?.getAttribute("data-reveal-state"),
-    ).toBe("wrapped");
+    expect(state()).toBe("wrapped");
     expect(container.textContent).toContain("Your journal is ready");
     expect(container.textContent).toContain("Open your gift");
+    expect(
+      container.querySelector("[data-testid='journal-physical-gift']"),
+    ).toBeTruthy();
+    expect(
+      container.querySelector("[data-testid='journal-reveal-dots']"),
+    ).toBeFalsy();
+    expect(
+      container.querySelector(".jg-cinematic-gift__package-photo"),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(".jg-cinematic-gift--layered"),
+    ).toBeTruthy();
+    expect(container.querySelector(".jg-cinematic-gift__wrap")).toBeTruthy();
   });
 
-  it("skip transitions with journal data and skipped meta", () => {
+  it("skip returns skipped meta", () => {
     const onComplete = vi.fn();
     act(() => {
       root.render(
@@ -117,19 +134,17 @@ describe("JournalRevealFlow", () => {
       );
     });
     clickTestId("journal-reveal-skip");
-    expect(onComplete).toHaveBeenCalledTimes(1);
-    expect(onComplete.mock.calls[0]?.[0]).toMatchObject({
-      id: "journal-reveal-test",
-      name: "Morning Pages",
-      leatherColor: "cognac",
-    });
-    expect(onComplete.mock.calls[0]?.[1]).toEqual({
-      skipped: true,
-      opened: false,
-    });
+    expect(onComplete).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "journal-reveal-test",
+        leatherColor: "forest",
+        name: "My Journey",
+      }),
+      { skipped: true, opened: false },
+    );
   });
 
-  it("shows selected cover title on journal reveal", () => {
+  it("reveals the selected cover color and title", () => {
     act(() => {
       root.render(
         <JournalRevealFlow
@@ -139,29 +154,17 @@ describe("JournalRevealFlow", () => {
         />,
       );
     });
-
-    clickTestId("journal-reveal-gift-button");
-
-    const state = container
-      .querySelector("[data-testid='journal-reveal-flow']")
-      ?.getAttribute("data-reveal-state");
-
-    if (state === "unwrapping") {
-      clickTestId("journal-reveal-unwrap-ribbon");
-      clickTestId("journal-reveal-unwrap-paper");
-      clickTestId("journal-reveal-unwrap-lid");
-    }
-
+    unwrapToAdmire();
+    const gift = container.querySelector("[data-testid='journal-physical-gift']");
+    expect(gift?.getAttribute("data-leather")).toBe("forest");
+    expect(gift?.getAttribute("data-gift-moment")).toBe("admire");
+    expect(container.textContent).toContain("My Journey");
     expect(
-      container
-        .querySelector("[data-testid='journal-reveal-flow']")
-        ?.getAttribute("data-reveal-state"),
-    ).toBe("revealed");
-    expect(container.textContent).toContain("Your journal is here.");
-    expect(container.textContent).toContain("Morning Pages");
+      container.querySelector(".jg-cinematic-gift__journal-cover--clickable"),
+    ).toBeTruthy();
   });
 
-  it("opens into completion with opened:true after journal click", () => {
+  it("opens the journal and completes with opened:true", () => {
     const onComplete = vi.fn();
     act(() => {
       root.render(
@@ -172,27 +175,10 @@ describe("JournalRevealFlow", () => {
         />,
       );
     });
-
-    clickTestId("journal-reveal-gift-button");
-    if (
-      container
-        .querySelector("[data-testid='journal-reveal-flow']")
-        ?.getAttribute("data-reveal-state") === "unwrapping"
-    ) {
-      clickTestId("journal-reveal-unwrap-ribbon");
-      clickTestId("journal-reveal-unwrap-paper");
-      clickTestId("journal-reveal-unwrap-lid");
-    }
-
+    unwrapToAdmire();
     clickTestId("journal-reveal-open-journal");
-    expect(
-      container.querySelector("[data-testid='journal-reveal-opening']"),
-    ).toBeTruthy();
-
-    act(() => {
-      vi.runAllTimers();
-    });
-
+    expect(state()).toBe("opening");
+    tick(1600);
     expect(onComplete).toHaveBeenCalledWith(sampleJournal, {
       skipped: false,
       opened: true,
@@ -201,28 +187,24 @@ describe("JournalRevealFlow", () => {
 });
 
 describe("Journal reveal Experience wiring", () => {
-  it("mounts JournalRevealFlow after design complete and opens Gazebo path", () => {
+  it("mounts physical gift layer and hands off to writing", () => {
     const source = readFileSync(
       join(process.cwd(), "components/journal-gazebo/JournalGazeboExperience.tsx"),
       "utf8",
     );
-    expect(source).toContain('from "./journal-reveal"');
     expect(source).toContain("JournalRevealFlow");
+    expect(source).toContain("enterWritingAfterGiftReveal");
+    expect(source).toContain("journal-estate--physical-gift");
     expect(source).toContain("handleJournalRevealComplete");
-    expect(source).toContain("openSelectedJournal(journal)");
-    expect(source).toContain('setPhase("gazebo-rest")');
-    expect(source).not.toContain("JournalGazeboWrappedGift config={config}");
-    expect(source).toContain("giftRevealIsFirstCreation");
-    expect(source).toContain("isFirstCreation={giftRevealIsFirstCreation}");
   });
 
-  it("does not import a separate generic journal editor for the reveal handoff", () => {
-    const source = readFileSync(
-      join(process.cwd(), "components/journal-gazebo/JournalGazeboExperience.tsx"),
+  it("Dear Friend and Begin Writing remain on the open book", () => {
+    const openBook = readFileSync(
+      join(process.cwd(), "components/journal-gazebo/JournalGazeboOpenBook.tsx"),
       "utf8",
     );
-    expect(source).not.toMatch(/content-generator|GrowthJournalEditor|generic.?editor/i);
-    expect(source).toContain("JournalGazeboOpenBook");
-    expect(source).toContain("JournalGazeboWritingPage");
+    expect(openBook).toContain("FirstOpenWelcomePage");
+    expect(openBook).toContain("jg-begin-writing");
+    expect(openBook).toContain('setTurning("forward")');
   });
 });

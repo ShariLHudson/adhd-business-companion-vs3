@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useLayoutEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import "./journal-gazebo-welcome-desk.css";
 
@@ -20,14 +20,15 @@ export function JournalGazeboTableActionsPortal({
   "aria-label": ariaLabel,
 }: Props) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useLayoutEffect(() => setMounted(true), []);
 
-  if (!mounted) return null;
+  if (!mounted || typeof document === "undefined") return null;
 
   return createPortal(
     <div
       className={["jg-table-actions-portal", className].filter(Boolean).join(" ")}
       aria-label={ariaLabel}
+      data-testid="jg-table-actions-portal"
     >
       {children}
     </div>,

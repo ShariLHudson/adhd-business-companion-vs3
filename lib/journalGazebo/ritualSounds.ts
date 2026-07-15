@@ -64,10 +64,64 @@ function noiseBurst(
   noise.stop(now + duration);
 }
 
-/** Soft paper page turn. */
-export function playJournalPageTurnSound(): void {
+/**
+ * Light paper page-turn — soft rustle that follows the leaf, not a chunky whoosh.
+ * Pass durationMs to keep the sound in step with the visual turn.
+ */
+export function playJournalPageTurnSound(durationMs = 1800): void {
   runWhenReady((ctx, now) => {
-    noiseBurst(ctx, now, { duration: 0.38, peak: 0.14, freq: 820 });
+    const turnSec = Math.min(2.8, Math.max(0.9, durationMs / 1000));
+
+    // 1. Quiet peel as the free edge lifts (thin paper, high and soft)
+    noiseBurst(ctx, now, {
+      duration: 0.22,
+      peak: 0.028,
+      freq: 3200,
+      q: 0.35,
+      type: "highpass",
+    });
+    noiseBurst(ctx, now + 0.04, {
+      duration: 0.18,
+      peak: 0.022,
+      freq: 2100,
+      q: 0.45,
+      type: "bandpass",
+    });
+
+    // 2. Soft flutter while the leaf is mid-air (matches the bend)
+    const flutterAt = now + turnSec * 0.18;
+    const flutterLen = turnSec * 0.48;
+    noiseBurst(ctx, flutterAt, {
+      duration: flutterLen,
+      peak: 0.024,
+      freq: 1800,
+      q: 0.4,
+      type: "bandpass",
+    });
+    noiseBurst(ctx, flutterAt + flutterLen * 0.35, {
+      duration: flutterLen * 0.45,
+      peak: 0.018,
+      freq: 2600,
+      q: 0.35,
+      type: "highpass",
+    });
+
+    // 3. Gentle settle as the page lays down — a whisper, not a slap
+    const settleAt = now + turnSec * 0.78;
+    noiseBurst(ctx, settleAt, {
+      duration: 0.2,
+      peak: 0.02,
+      freq: 1400,
+      q: 0.5,
+      type: "bandpass",
+    });
+    noiseBurst(ctx, settleAt + 0.06, {
+      duration: 0.14,
+      peak: 0.012,
+      freq: 900,
+      q: 0.6,
+      type: "lowpass",
+    });
   });
 }
 

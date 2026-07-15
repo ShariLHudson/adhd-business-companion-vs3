@@ -1349,10 +1349,7 @@
   transform: scale(1.12);
 }
 
-.jg-cinematic-gift--unwrap .jg-cinematic-gift__paper--front {
-  transform: rotateX(52deg) translateY(-35%) translateZ(12px);
-  opacity: 0;
-}
+/* Unwrap paper pose — see journal-reveal.css (single peel definition). */
 
 .jg-cinematic-gift--unwrap .jg-cinematic-gift__paper--back {
   opacity: 0.4;
@@ -3864,6 +3861,25 @@
   padding-top: 32%;
 }
 
+/* Patterned covers — keep the title readable near the bottom center. */
+.journal-hero__cover:has(.journal-hero__cover-image--printed) .journal-hero__cover-brand {
+  justify-content: flex-end;
+  padding-top: 0;
+  padding-bottom: 12%;
+}
+
+.journal-hero__cover:has(.journal-hero__cover-image--printed) .journal-hero__estate-mark,
+.journal-hero__cover:has(.journal-hero__cover-image--printed) .journal-hero__emboss-rule,
+.journal-hero__cover:has(.journal-hero__cover-image--printed) .journal-hero__flame--ceremony {
+  display: none;
+}
+
+.journal-hero__cover:has(.journal-hero__cover-image--printed) .journal-hero__emboss--ceremony,
+.journal-hero__cover:has(.journal-hero__cover-image--printed) .journal-hero__cover-title-slot {
+  margin-top: 0;
+  text-align: center;
+}
+
 .journal-hero__estate-mark {
   margin: 0;
   text-align: center;
@@ -4638,6 +4654,11 @@
 .jg-design-studio__step .jg-design-studio__panel {
   width: min(52rem, 100%);
   max-height: min(62vh, 34rem);
+}
+
+.jg-design-studio--cover-select .jg-design-studio__step .jg-design-studio__panel {
+  max-height: none;
+  overflow: visible;
 }
 
 .jg-design-studio__nav {
@@ -5817,6 +5838,126 @@
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ── Design studio — journal type (centered, alone) ── */
+
+.jg-design-studio--intention,
+.jg-design-studio--page-images {
+  justify-content: center;
+  padding-top: clamp(0.35rem, 1.2vh, 0.75rem);
+}
+
+.jg-design-studio--intention .jg-design-studio__prompt,
+.jg-design-studio--page-images .jg-design-studio__prompt {
+  margin-bottom: clamp(0.55rem, 1.4vh, 0.85rem);
+  text-align: center;
+}
+
+.jg-design-studio--intention .jg-design-studio__workspace,
+.jg-design-studio--page-images .jg-design-studio__workspace {
+  margin-top: 0;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 auto;
+  width: 100%;
+}
+
+.jg-design-studio--intention .jg-design-studio__step,
+.jg-design-studio--page-images .jg-design-studio__step {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.jg-design-choice-experience--intention,
+.jg-design-choice-experience--page-images {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.jg-design-choice-experience__choices--intention {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.4rem, 1vh, 0.65rem);
+  width: 100%;
+  justify-content: center;
+}
+
+.jg-design-choice-plaque--intention {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+  min-height: 6.5rem;
+  padding: 0.55rem 0.45rem 0.6rem;
+  text-align: center;
+}
+
+.jg-design-intention-plaque__mark {
+  display: block;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0.78;
+  mask-image: radial-gradient(circle, #000 42%, transparent 78%);
+  -webkit-mask-image: radial-gradient(circle, #000 42%, transparent 78%);
+}
+
+.jg-design-intention-plaque__mark-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.jg-design-intention-plaque__desc {
+  display: block;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.62rem, 1.15vw, 0.72rem);
+  font-style: italic;
+  line-height: 1.25;
+  color: rgba(255, 246, 228, 0.72);
+  max-width: 14ch;
+}
+
+.jg-design-choice-plaque--intention.jg-design-choice-plaque--active
+  .jg-design-intention-plaque__mark {
+  opacity: 0.95;
+}
+
+.jg-design-intention-images {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.55rem, 1.2vh, 0.85rem);
+  width: min(100%, 26rem);
+  margin: 0 auto;
+  justify-content: center;
+}
+
+.jg-design-choice-plaque--page-images {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+  min-height: 4.5rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  text-align: center;
+}
+
+.jg-design-choice-plaque--page-images .jg-design-intention-plaque__desc {
+  max-width: 18ch;
+}
+
+@media (max-width: 640px) {
+  .jg-design-choice-experience__choices--intention {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* ── Design studio — paper step (large sheet, plaque choices, no scroll) ── */
@@ -7394,10 +7535,7 @@
   transform: translate(-50%, -120%) scale(0.92);
 }
 
-.jg-cinematic-gift--unwrap .jg-cinematic-gift__paper--front {
-  transform: rotateY(-112deg) translateZ(8px);
-  opacity: 0.08;
-}
+/* Unwrap paper pose — see journal-reveal.css (single peel definition). */
 
 .jg-cinematic-gift--unwrap .jg-cinematic-gift__wrap-spine {
   transform: translateX(-55%) rotateY(-18deg);
@@ -7436,10 +7574,19 @@
 .jg-cinematic-gift--wrapped .jg-cinematic-gift__journal,
 .jg-cinematic-gift--bow .jg-cinematic-gift__journal,
 .jg-cinematic-gift--ribbon-pull .jg-cinematic-gift__journal,
-.jg-cinematic-gift--ribbon .jg-cinematic-gift__journal,
-.jg-cinematic-gift--unwrap .jg-cinematic-gift__journal {
+.jg-cinematic-gift--ribbon .jg-cinematic-gift__journal {
   opacity: 0;
   transform: scale(0.96) translateY(4%);
+  pointer-events: none;
+}
+
+/* Journal is under the wrap — visible as paper peels (unwrap+) */
+.jg-cinematic-gift--layered.jg-cinematic-gift--wrapped .jg-cinematic-gift__journal,
+.jg-cinematic-gift--layered.jg-cinematic-gift--ribbon-pull .jg-cinematic-gift__journal,
+.jg-cinematic-gift--layered.jg-cinematic-gift--bow .jg-cinematic-gift__journal,
+.jg-cinematic-gift--layered.jg-cinematic-gift--ribbon .jg-cinematic-gift__journal {
+  opacity: 1;
+  transform: scale(1) translateY(0);
   pointer-events: none;
 }
 
@@ -7669,9 +7816,7 @@
   transform-origin: left center;
 }
 
-.jg-cinematic-gift--ribbon-pull .jg-cinematic-gift__ribbon-tail--right {
-  transform: translate(48%, -62%) rotate(-18deg);
-}
+/* Ribbon tail follows --jg-ribbon-pull during the drag (journal-reveal.css). */
 
 .jg-cinematic-gift--bow-loose .jg-cinematic-gift__bow {
   opacity: 0;
@@ -7972,6 +8117,23 @@
 }
 .jg-closed-journal[data-leather="camel"] .jg-closed-journal__cover:not([style*="background-image"]) {
   background: linear-gradient(145deg, #c4a574, #a68b5b, #6b5638);
+}
+
+.jg-closed-journal__cover-flame {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(22%, 2.75rem);
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.92;
+}
+
+.jg-closed-journal__cover-flame .jg-spark-flame-img {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
 }
 
 .jg-closed-journal__cover::before {
@@ -8326,7 +8488,8 @@
   position: relative;
 }
 
-.jg-open-book__under-next {
+/* Layered physical paper — next page rests under the curling leaf */
+.jg-page-under {
   position: absolute;
   top: 0;
   right: 0;
@@ -8334,9 +8497,39 @@
   height: 100%;
   z-index: 2;
   pointer-events: none;
+  overflow: hidden;
 }
 
-.jg-flip-leaf {
+/* Shadow cast onto the page underneath as the leaf turns */
+.jg-page-under::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(40, 28, 16, 0.32) 0%,
+    rgba(40, 28, 16, 0.14) 28%,
+    rgba(40, 28, 16, 0.04) 55%,
+    transparent 78%
+  );
+  opacity: 0;
+  transform-origin: left center;
+  animation: jg-page-under-shade var(--jg-page-turn-ms, 2.4s) linear forwards;
+}
+
+.jg-page-under--single::after {
+  background: linear-gradient(
+    90deg,
+    rgba(40, 28, 16, 0.38) 0%,
+    rgba(40, 28, 16, 0.16) 32%,
+    rgba(40, 28, 16, 0.04) 58%,
+    transparent 82%
+  );
+}
+
+.jg-page-curl {
   position: absolute;
   top: 0;
   right: 0;
@@ -8344,102 +8537,392 @@
   height: 100%;
   z-index: 12;
   pointer-events: none;
-  perspective: 1800px;
+  perspective: 1280px;
+  /* Spine left; slight low bias so the free corner leads like real paper */
+  perspective-origin: 0% 58%;
 }
 
-.jg-flip-leaf__sheet {
+.jg-page-curl__sheet {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transform-origin: left center;
+  /* Hinge near the spine, a little low — pages bend, they don't swing like doors */
+  transform-origin: left 58%;
+  will-change: transform;
+  /* Avoid filter drop-shadow during turn — it stutters; soft shadow via box-shadow */
+  box-shadow: -6px 10px 20px rgba(30, 20, 12, 0.14);
 }
 
-.jg-open-book__spread--turning-forward .jg-flip-leaf__sheet {
-  animation: jg-flip-leaf-forward var(--jg-page-turn-ms, 2.8s)
-    cubic-bezier(0.28, 0.82, 0.32, 1) forwards;
+.jg-open-book__spread--turning-forward .jg-page-curl__sheet {
+  /*
+   * linear between many even keyframes = one continuous glide.
+   * (ease/cubic-bezier on multi-step keyframes eases EACH segment → jerky stages)
+   */
+  animation: jg-page-curl-peel var(--jg-page-turn-ms, 2.4s) linear forwards;
 }
 
-.jg-flip-leaf__front,
-.jg-flip-leaf__back {
+.jg-page-curl__face,
+.jg-page-curl__back {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   transform-style: preserve-3d;
 }
 
-.jg-flip-leaf__back {
+.jg-page-curl__face {
+  box-shadow:
+    inset -18px 0 28px rgba(60, 42, 28, 0.08),
+    2px 0 0 rgba(255, 248, 230, 0.25);
+}
+
+.jg-page-curl__back {
   transform: rotateY(180deg);
   border-radius: 0 5px 5px 0;
   box-shadow:
     inset 0 0 0 1px rgba(120, 100, 70, 0.16),
-    inset -10px 0 22px rgba(80, 62, 42, 0.1);
-  background: linear-gradient(165deg, #f3e8d4 0%, #e8dcc4 48%, #ddd0b8 100%);
+    inset -14px 0 28px rgba(80, 62, 42, 0.14),
+    inset 18px 0 36px rgba(40, 28, 18, 0.12);
+  background:
+    linear-gradient(
+      90deg,
+      rgba(90, 70, 48, 0.12) 0%,
+      transparent 18%,
+      transparent 100%
+    ),
+    linear-gradient(165deg, #efe4d0 0%, #e4d8c0 48%, #d8ccb4 100%);
 }
 
-.jg-flip-leaf__back[data-paper="ivory"] {
-  background: linear-gradient(165deg, #f5efe0 0%, #ebe3d2 50%, #e0d6c4 100%);
+.jg-page-curl__back[data-paper="ivory"] {
+  background:
+    linear-gradient(90deg, rgba(90, 70, 48, 0.1) 0%, transparent 18%),
+    linear-gradient(165deg, #f0e8d6 0%, #e6dcc8 50%, #dcd2be 100%);
 }
-.jg-flip-leaf__back[data-paper="linen"] {
-  background: linear-gradient(180deg, #f4efe6, #e8e0d4);
+.jg-page-curl__back[data-paper="linen"] {
+  background:
+    linear-gradient(90deg, rgba(90, 70, 48, 0.1) 0%, transparent 18%),
+    linear-gradient(180deg, #efe8dc, #e2d8c8);
 }
-.jg-flip-leaf__back[data-paper="cream"] {
-  background: linear-gradient(165deg, #f3e8d4 0%, #e8dcc4 48%, #ddd0b8 100%);
+.jg-page-curl__back[data-paper="cream"] {
+  background:
+    linear-gradient(90deg, rgba(90, 70, 48, 0.1) 0%, transparent 18%),
+    linear-gradient(165deg, #efe4d0 0%, #e4d8c0 48%, #d8ccb4 100%);
 }
-.jg-flip-leaf__back[data-paper="cotton"] {
-  background: linear-gradient(180deg, #faf8f5, #eeeae6);
+.jg-page-curl__back[data-paper="cotton"] {
+  background:
+    linear-gradient(90deg, rgba(90, 70, 48, 0.1) 0%, transparent 18%),
+    linear-gradient(180deg, #f2eee8, #e6e0d8);
 }
-.jg-flip-leaf__back[data-paper="champagne"] {
-  background: linear-gradient(180deg, #faf6ec, #f0e6d0);
+.jg-page-curl__back[data-paper="champagne"] {
+  background:
+    linear-gradient(90deg, rgba(90, 70, 48, 0.1) 0%, transparent 18%),
+    linear-gradient(180deg, #f2ead8, #e6d8c0);
 }
-.jg-flip-leaf__back[data-paper="blush"] {
-  background: linear-gradient(180deg, #faf4f2, #f0e2de);
+.jg-page-curl__back[data-paper="blush"] {
+  background:
+    linear-gradient(90deg, rgba(90, 70, 48, 0.1) 0%, transparent 18%),
+    linear-gradient(180deg, #f0e6e2, #e4d4ce);
 }
-.jg-flip-leaf__back[data-paper="sage"] {
-  background: linear-gradient(180deg, #f2f4f0, #e4e8e0);
+.jg-page-curl__back[data-paper="sage"] {
+  background:
+    linear-gradient(90deg, rgba(90, 70, 48, 0.1) 0%, transparent 18%),
+    linear-gradient(180deg, #e8ebe4, #d8ddd4);
 }
 
-@keyframes jg-flip-leaf-forward {
+/* Soft shade near the spine as the leaf lifts */
+.jg-page-curl__spine-shade {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 32%;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(40, 28, 16, 0.22) 0%,
+    rgba(40, 28, 16, 0.08) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  mix-blend-mode: multiply;
+  animation: jg-page-curl-spine var(--jg-page-turn-ms, 2.4s) linear forwards;
+}
+
+/*
+ * Moving cylindrical bend — the dark/light band that sells flexible paper.
+ * Travels from the free edge toward the spine as the leaf turns.
+ */
+.jg-page-curl__bend {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    92deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(255, 248, 230, 0.18) 46%,
+    rgba(70, 50, 32, 0.16) 51%,
+    rgba(40, 28, 16, 0.28) 54%,
+    rgba(255, 248, 230, 0.1) 58%,
+    transparent 68%,
+    transparent 100%
+  );
+  background-size: 220% 100%;
+  background-position: 100% 0;
+  opacity: 0;
+  mix-blend-mode: multiply;
+  animation: jg-page-curl-bend var(--jg-page-turn-ms, 2.4s) linear forwards;
+}
+
+/* Thin paper edge catching light on the free side */
+.jg-page-curl__edge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 8px;
+  z-index: 6;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 248, 230, 0.45) 40%,
+    rgba(210, 190, 150, 0.5) 72%,
+    rgba(120, 96, 70, 0.28) 100%
+  );
+  opacity: 0;
+  animation: jg-page-curl-edge var(--jg-page-turn-ms, 2.4s) linear forwards;
+}
+
+/* Soft fold ridge + corner shine — free corner leads the bend */
+.jg-page-curl__fold {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 70%;
+  height: 70%;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    228deg,
+    transparent 36%,
+    rgba(40, 28, 18, 0.08) 56%,
+    rgba(40, 28, 18, 0.18) 74%,
+    rgba(30, 22, 14, 0.1) 100%
+  );
+  opacity: 0;
+  mix-blend-mode: multiply;
+  animation: jg-page-curl-fold var(--jg-page-turn-ms, 2.4s) linear forwards;
+}
+
+.jg-page-curl__shine {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 48%;
+  height: 48%;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 80% 70% at 100% 100%,
+    rgba(255, 248, 230, 0.32) 0%,
+    rgba(255, 248, 230, 0.08) 45%,
+    transparent 72%
+  );
+  opacity: 0;
+  animation: jg-page-curl-shine var(--jg-page-turn-ms, 2.4s) linear forwards;
+}
+
+/*
+ * Continuous paper turn — even 10% steps, linear interpolation.
+ * rotateY advances steadily; rotateX / Z lift rise and fall smoothly (no skew).
+ */
+@keyframes jg-page-curl-peel {
   0% {
-    transform: rotateY(0deg);
+    transform: rotateY(0deg) rotateX(0deg) translateZ(0);
+  }
+  10% {
+    transform: rotateY(-18deg) rotateX(2deg) translateZ(10px);
+  }
+  20% {
+    transform: rotateY(-36deg) rotateX(3.2deg) translateZ(18px);
+  }
+  30% {
+    transform: rotateY(-54deg) rotateX(3.8deg) translateZ(24px);
+  }
+  40% {
+    transform: rotateY(-72deg) rotateX(3.4deg) translateZ(28px);
+  }
+  50% {
+    transform: rotateY(-90deg) rotateX(2.6deg) translateZ(28px);
+  }
+  60% {
+    transform: rotateY(-108deg) rotateX(1.8deg) translateZ(24px);
+  }
+  70% {
+    transform: rotateY(-126deg) rotateX(1.2deg) translateZ(18px);
+  }
+  80% {
+    transform: rotateY(-144deg) rotateX(0.7deg) translateZ(12px);
+  }
+  90% {
+    transform: rotateY(-162deg) rotateX(0.3deg) translateZ(5px);
   }
   100% {
-    transform: rotateY(-180deg);
+    transform: rotateY(-180deg) rotateX(0deg) translateZ(0);
+  }
+}
+
+@keyframes jg-page-curl-bend {
+  0% {
+    opacity: 0;
+    background-position: 100% 0;
+  }
+  12% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.75;
+    background-position: 45% 0;
+  }
+  100% {
+    opacity: 0.1;
+    background-position: 0% 0;
+  }
+}
+
+@keyframes jg-page-under-shade {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scaleX(0.85);
+  }
+  100% {
+    opacity: 0.06;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes jg-page-curl-spine {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
+
+@keyframes jg-page-curl-edge {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0.08;
+  }
+}
+
+@keyframes jg-page-curl-fold {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0.08;
+  }
+}
+
+@keyframes jg-page-curl-shine {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
   }
 }
 
 .jg-open-book__spread--turning-forward,
 .jg-open-book__spread--turning-back {
-  perspective: 1800px;
+  perspective: 1280px;
+  perspective-origin: 0% 58%;
   transform-style: preserve-3d;
 }
 
 .jg-open-book__spread--turning-forward {
-  animation: jg-open-book-spread-bend var(--jg-page-turn-ms, 2.8s) cubic-bezier(0.28, 0.82, 0.32, 1);
+  animation: none;
 }
 
 .jg-open-book__spread--turning-forward .jg-open-book__page--right {
   animation: none;
 }
 
+/* Cast shadow from curling corner onto the page underneath — no full-bleed panel */
 .jg-open-book__spread--turning-forward::after {
   content: "";
   position: absolute;
   right: 0;
-  top: 0;
   bottom: 0;
-  width: 52%;
+  width: 48%;
+  height: 55%;
   pointer-events: none;
   z-index: 11;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(20, 16, 12, 0.04) 24%,
-    rgba(20, 16, 12, 0.18) 100%
+  background: radial-gradient(
+    ellipse 90% 80% at 100% 100%,
+    rgba(20, 14, 10, 0.28) 0%,
+    rgba(20, 14, 10, 0.1) 42%,
+    transparent 72%
   );
-  animation: jg-open-book-turn-shadow var(--jg-page-turn-ms, 2.8s)
-    cubic-bezier(0.28, 0.82, 0.32, 1);
-  transform-origin: left center;
+  opacity: 0;
+  animation: jg-page-curl-cast var(--jg-page-turn-ms, 2.4s)
+    cubic-bezier(0.22, 0.7, 0.28, 1) forwards;
+}
+
+@keyframes jg-page-curl-cast {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  20% {
+    opacity: 0.9;
+    transform: scale(0.85);
+  }
+  70% {
+    opacity: 0.45;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jg-open-book__spread--turning-forward .jg-page-curl__sheet,
+  .jg-page-curl__fold,
+  .jg-page-curl__shine,
+  .jg-page-curl__spine-shade,
+  .jg-page-curl__bend,
+  .jg-page-curl__edge,
+  .jg-page-under::after,
+  .jg-open-book__spread--turning-forward::after {
+    animation: none !important;
+  }
 }
 
 @keyframes jg-open-book-spread-bend {
@@ -8506,14 +8989,9 @@
   background: linear-gradient(180deg, #f2f4f0, #e4e8e0);
 }
 
+/* Lined paper — single rule, notebook spacing (one layer only — no double lines) */
 .jg-open-book__page--lined {
-  --jg-ruled-step: var(--jg-writing-line-height, 26px);
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent var(--jg-ruled-step),
-    rgba(139, 115, 85, 0.14) var(--jg-ruled-step),
-    rgba(139, 115, 85, 0.14) calc(var(--jg-ruled-step) + 1px)
-  );
+  --jg-ruled-step: var(--jg-writing-line-height, 34px);
 }
 
 .jg-open-book__belongs {
@@ -8618,13 +9096,30 @@
   width: 100%;
   min-height: 10rem;
   border: 0;
-  background: transparent;
-  padding: 0;
+  /* color only — leave background-image free for lined paper */
+  background-color: transparent;
+  /* Keep ink clear of the gold frame + corner gazebo mark */
+  padding: 0 clamp(0.35rem, 1vw, 0.55rem) clamp(1.6rem, 3.5vh, 2.1rem);
   outline: none;
   position: relative;
   z-index: 3;
   pointer-events: auto;
   cursor: text;
+}
+
+/* Lined paper rules — one line, then a generous blank band, then the next line */
+.jg-open-book__page--lined .jg-open-book__writing-input,
+.jg-open-book__page--lined .jg-writing-surface--page-bound {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--jg-ruled-step, 34px) - 1px),
+    rgba(120, 96, 72, 0.28) calc(var(--jg-ruled-step, 34px) - 1px),
+    rgba(120, 96, 72, 0.28) var(--jg-ruled-step, 34px)
+  );
+  background-attachment: local;
+  background-size: 100% var(--jg-ruled-step, 34px);
+  line-height: var(--jg-ruled-step, 34px);
 }
 
 .jg-writing-surface-wrap {
@@ -9261,22 +9756,24 @@
   pointer-events: none;
   filter: drop-shadow(0 22px 48px rgba(8, 6, 4, 0.42));
   transition:
-    opacity 3.2s ease,
-    transform 3.8s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1.6s ease,
+    transform 1.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .jg-cinematic-gift__package-photo--unwrapping {
-  opacity: 0.92;
+  opacity: 0.78;
 }
 
 .jg-cinematic-gift__package-photo--peeling {
-  opacity: 0.22;
-  transform: scale(1.03) translateY(-1%);
+  opacity: 0.18;
+  transform: scale(1.02) translateY(-0.5%);
 }
 
+.jg-cinematic-gift__package-photo--gone,
 .jg-cinematic-gift--journal-visible .jg-cinematic-gift__package-photo {
   opacity: 0;
-  transform: scale(1.06);
+  transform: scale(1.04);
+  pointer-events: none;
 }
 
 .jg-cinematic-gift--journal-shape .jg-cinematic-gift__wrap {

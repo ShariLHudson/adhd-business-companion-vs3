@@ -1,11 +1,17 @@
 const STORAGE_KEY = "spark-journal-gazebo-sound-muted";
 
+/**
+ * Opt-in ambience — quiet until the member turns sound on.
+ * Missing key ⇒ muted (never auto-play on first visit).
+ */
 export function readJournalGazeboSoundMuted(): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") return true;
   try {
-    return window.localStorage.getItem(STORAGE_KEY) === "1";
+    const value = window.localStorage.getItem(STORAGE_KEY);
+    if (value === null) return true;
+    return value === "1";
   } catch {
-    return false;
+    return true;
   }
 }
 

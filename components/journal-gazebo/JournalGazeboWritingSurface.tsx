@@ -22,14 +22,16 @@ import {
   applyFontToSelection,
   applyInkToSelection,
   applyPenToSelection,
+  beginTypingRunAtCaret,
+  captureEditorCaretOffsets,
   consolidateVerticalCharBlocks,
   ensureEditorShell,
   execWritingFormat,
   migratePageHtml,
   peelEditorOverflow,
-  prepareActiveBlockForTypingStyle,
+  plainTextFromHtml,
   refreshEmptyActiveBlock,
-  restyleAllBlocksInEditor,
+  restoreEditorCaretOffsets,
   sanitizePageHtml,
   stampActiveBlockOnInput,
   writingSurfaceChromeStyle,
@@ -88,8 +90,10 @@ export function JournalGazeboWritingSurface({
   const syncingRef = useRef(false);
   const configRef = useRef(config);
   const typingStyleRef = useRef(typingStyle);
+  const onHtmlChangeRef = useRef(onHtmlChange);
   configRef.current = config;
   typingStyleRef.current = typingStyle;
+  onHtmlChangeRef.current = onHtmlChange;
 
   const [toolbar, setToolbar] = useState<{
     visible: boolean;
@@ -100,18 +104,15 @@ export function JournalGazeboWritingSurface({
 
   const emitChange = useCallback(() => {
     const el = localRef.current;
-    if (!el || readOnly || !onHtmlChange) return;
+    if (!el || readOnly || !onHtmlChangeRef.current) return;
     const next = sanitizePageHtml(el.innerHTML);
+    if (next === lastEmittedRef.current) {
+      el.dataset.empty = (el.textContent ?? "").trim() ? "false" : "true";
+      return;
+    }
     lastEmittedRef.current = next;
     el.dataset.empty = (el.textContent ?? "").trim() ? "false" : "true";
-    onHtmlChange(next);
-  }, [onHtmlChange, readOnly]);
-
-  const stampForTyping = useCallback(() => {
-    const el = localRef.current;
-    if (!el || readOnly) return;
-    ensureEditorShell(el, configRef.current, typingStyleRef.current);
-    stampActiveBlockOnInput(el, configRef.current, typingStyleRef.current);
+    onHtmlChangeRef.current(next);
   }, [readOnly]);
 
   const updateToolbarPosition = useCallback(() => {
@@ -173,7 +174,8 @@ export function JournalGazeboWritingSurface({
     [emitChange, readOnly, restoreSavedSelection, updateToolbarPosition],
   );
 
-  const applyPageStylePatch = useCallback(
+  /** Update the active pen only — prior runs keep their look. */
+  const applyActiveStylePatch = useCallback(
     (patch: Partial<TypingStyle>) => {
       if (readOnly) return;
       const el = localRef.current;
@@ -181,7 +183,7 @@ export function JournalGazeboWritingSurface({
       typingStyleRef.current = next;
       onTypingStyleChange?.(patch);
       if (el) {
-        restyleAllBlocksInEditor(el, configRef.current, next);
+        beginTypingRunAtCaret(el, configRef.current, next);
       }
       emitChange();
       localRef.current?.focus();
@@ -214,14 +216,14 @@ export function JournalGazeboWritingSurface({
         onTypingStyleChange?.(patch);
         emitChange();
       } else {
-        applyPageStylePatch(patch);
+        applyActiveStylePatch(patch);
         return;
       }
       localRef.current?.focus();
       updateToolbarPosition();
     },
     [
-      applyPageStylePatch,
+      applyActiveStylePatch,
       emitChange,
       onTypingStyleChange,
       readOnly,
@@ -232,8 +234,8 @@ export function JournalGazeboWritingSurface({
 
   const runFontOnSelection = useCallback(
     (fontId: JournalFontId) => {
-      applyStyleToSelectionOrPage({ fontId }, (config, style) => {
-        applyFontToSelection(fontId, config, style);
+      applyStyleToSelectionOrPage({ fontId }, (cfg, style) => {
+        applyFontToSelection(fontId, cfg, style);
       });
     },
     [applyStyleToSelectionOrPage],
@@ -241,8 +243,8 @@ export function JournalGazeboWritingSurface({
 
   const runInkOnSelection = useCallback(
     (inkColor: JournalInkColor) => {
-      applyStyleToSelectionOrPage({ inkColor }, (config, style) => {
-        applyInkToSelection(inkColor, config, style);
+      applyStyleToSelectionOrPage({ inkColor }, (cfg, style) => {
+        applyInkToSelection(inkColor, cfg, style);
       });
     },
     [applyStyleToSelectionOrPage],
@@ -250,8 +252,8 @@ export function JournalGazeboWritingSurface({
 
   const runPenOnSelection = useCallback(
     (penStyle: JournalPenStyle) => {
-      applyStyleToSelectionOrPage({ penStyle }, (config, style) => {
-        applyPenToSelection(penStyle, config, style);
+      applyStyleToSelectionOrPage({ penStyle }, (cfg, style) => {
+        applyPenToSelection(penStyle, cfg, style);
       });
     },
     [applyStyleToSelectionOrPage],
@@ -284,31 +286,48 @@ export function JournalGazeboWritingSurface({
   useEffect(() => {
     const el = localRef.current;
     if (!el) return;
-    if (html === lastEmittedRef.current && el.innerHTML) return;
+    if (html === lastEmittedRef.current) return;
+
+    const focused =
+      document.activeElement === el || el.contains(document.activeElement);
+    const incomingPlain = plainTextFromHtml(html).replace(/\u200b/g, "");
+    const currentPlain = (el.textContent ?? "").replace(/\u200b/g, "");
+
+    // While typing, parent sanitize/migrate must not rewrite the live DOM.
+    if (focused && incomingPlain === currentPlain) {
+      lastEmittedRef.current = html;
+      return;
+    }
+
+    const caret = focused ? captureEditorCaretOffsets(el) : null;
     syncingRef.current = true;
     const migrated = migratePageHtml(html, configRef.current, typingStyleRef.current);
     el.innerHTML = migrated;
     el.dataset.empty = (el.textContent ?? "").trim() ? "false" : "true";
-    if (migrated !== html && !readOnly && onHtmlChange) {
+    if (caret) {
+      restoreEditorCaretOffsets(el, caret);
+    }
+    if (migrated !== html && !readOnly && onHtmlChangeRef.current) {
       lastEmittedRef.current = migrated;
-      onHtmlChange(migrated);
+      onHtmlChangeRef.current(migrated);
     } else {
       lastEmittedRef.current = html;
     }
     syncingRef.current = false;
-  }, [html, pageIndex, onHtmlChange, readOnly]);
+  }, [html, pageIndex, readOnly]);
 
+  // Style prefs changed — open a new run at the caret; never restamp while idle.
   useEffect(() => {
     const el = localRef.current;
     if (!el || readOnly) return;
-    if (refreshEmptyActiveBlock(el, config, typingStyle)) {
+    if (refreshEmptyActiveBlock(el, configRef.current, typingStyle)) {
       emitChange();
       return;
     }
     const focused =
       document.activeElement === el || el.contains(document.activeElement);
     if (!focused) return;
-    prepareActiveBlockForTypingStyle(el, config, typingStyle);
+    beginTypingRunAtCaret(el, configRef.current, typingStyle);
     emitChange();
   }, [
     typingStyle.fontId,
@@ -316,7 +335,6 @@ export function JournalGazeboWritingSurface({
     typingStyle.writingFontSize,
     typingStyle.penStyle,
     typingStyle.nibSize,
-    config,
     emitChange,
     readOnly,
     pageIndex,
@@ -485,7 +503,12 @@ export function JournalGazeboWritingSurface({
           if (readOnly) return;
           const el = localRef.current;
           if (el) ensureEditorShell(el, configRef.current, typingStyleRef.current);
-          stampForTyping();
+          // Stamp empty pages only — do not insert runs mid-sentence on focus.
+          if (el && !(el.textContent ?? "").replace(/\u200b/g, "").trim()) {
+            beginTypingRunAtCaret(el, configRef.current, typingStyleRef.current);
+          } else if (el) {
+            stampActiveBlockOnInput(el, configRef.current, typingStyleRef.current);
+          }
           updateToolbarPosition();
         }}
         onClick={() => {
@@ -499,8 +522,14 @@ export function JournalGazeboWritingSurface({
         onInput={() => {
           if (syncingRef.current || readOnly) return;
           const el = localRef.current;
-          if (el) consolidateVerticalCharBlocks(el);
-          stampForTyping();
+          if (el) {
+            const caret = captureEditorCaretOffsets(el);
+            if (consolidateVerticalCharBlocks(el) && caret) {
+              restoreEditorCaretOffsets(el, caret);
+            }
+            // Keep new paragraphs styled — never open a mid-word span on each key.
+            stampActiveBlockOnInput(el, configRef.current, typingStyleRef.current);
+          }
           emitChange();
           updateToolbarPosition();
           if (pageBound && onPageOverflow) {
@@ -521,7 +550,10 @@ export function JournalGazeboWritingSurface({
               updateToolbarPosition();
               return;
             }
-            if (document.activeElement instanceof Node && toolbarRef.current?.contains(document.activeElement)) {
+            if (
+              document.activeElement instanceof Node &&
+              toolbarRef.current?.contains(document.activeElement)
+            ) {
               return;
             }
             setToolbar((t) => (t.visible ? { ...t, visible: false } : t));

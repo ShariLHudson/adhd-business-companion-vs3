@@ -267,7 +267,7 @@ export function JournalGazeboCinematicBook({
     const option = JOURNAL_WORKSHOP_PAPER_OPTIONS[paperIndex]!;
     patch({ paperStyle: option.paperStyle });
     setBeat("paper-linger");
-    if (!reducedMotion()) playJournalPageTurnSound();
+    if (!reducedMotion()) playJournalPageTurnSound(900);
   }
 
   function selectPen(pen: JournalPenStyle) {
@@ -297,7 +297,7 @@ export function JournalGazeboCinematicBook({
 
   function turnToWriting() {
     const reduced = reducedMotion();
-    if (!reduced) playJournalPageTurnSound();
+    if (!reduced) playJournalPageTurnSound(CINEMATIC.pageTurnMs);
     setTurning(true);
     setBeat("turn-to-writing");
     const turnMs = reduced ? 80 : CINEMATIC.pageTurnMs;

@@ -1,31 +1,32 @@
 /**
- * Ceremonial journal gift reveal — completion moment, not a loader.
+ * Ceremonial journal gift reveal — physical desk object, not a UI panel.
  */
 
 import type { JournalGazeboConfig } from "./types";
 
-export type JournalRevealState =
-  | "creating"
+/** Physical unwrap beats on the desk gift. */
+export type JournalGiftBeat =
   | "wrapped"
-  | "unwrapping"
-  | "revealed"
+  | "ribbon-pull"
+  | "bow"
+  | "ribbon"
+  | "unwrap"
+  | "reveal"
+  | "admire"
   | "opening";
 
-/** Interactive unwrap beats inside the unwrapping state. */
+export type JournalRevealState = JournalGiftBeat;
+
+/** @deprecated Prefer JournalGiftBeat. */
 export type JournalUnwrapStep = "ribbon" | "paper" | "lid";
 
 export type JournalRevealCompleteMeta = {
   skipped: boolean;
-  /** True when the member opened the journal into the Gazebo writing path. */
   opened: boolean;
 };
 
 export type JournalRevealFlowProps = {
   journal: JournalGazeboConfig;
-  /**
-   * First journal creation in this Estate visit lineage.
-   * Full wrapping sequence; returning creations start shortened at wrapped.
-   */
   isFirstCreation?: boolean;
   onComplete: (
     journal: JournalGazeboConfig,
@@ -39,9 +40,19 @@ export const JOURNAL_REVEAL_CREATING_MESSAGES = [
   "Adding the final touch...",
 ] as const;
 
-/** Creating / wrapping stage — 3–5 seconds max. */
 export const JOURNAL_REVEAL_CREATING_MS = 4200;
 export const JOURNAL_REVEAL_CREATING_SHORT_MS = 900;
 export const JOURNAL_REVEAL_MESSAGE_ROTATE_MS = 1400;
-export const JOURNAL_REVEAL_OPENING_MS = 1600;
+export const JOURNAL_REVEAL_OPENING_MS = 1400;
 export const JOURNAL_REVEAL_OPENING_REDUCED_MS = 200;
+
+/**
+ * Timing between automatic physical beats after the ribbon is freed.
+ * Matched to CSS material transitions (+ short linger) so beats never cut mid-motion.
+ */
+export const JOURNAL_GIFT_BEAT_MS = {
+  bow: 1600,
+  ribbon: 1500,
+  unwrap: 2400,
+  reveal: 2200,
+} as const;

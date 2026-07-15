@@ -28,7 +28,7 @@ export function JournalGazeboPaperPicker({
   useEffect(() => {
     if (paperIndex === displayIndex) return;
     setTurning(true);
-    playJournalPageTurnSound();
+    playJournalPageTurnSound(520);
     const timer = window.setTimeout(() => {
       setDisplayIndex(paperIndex);
       setTurning(false);

@@ -15,110 +15,108 @@ const LAYER_VOLUME: Record<keyof typeof JOURNAL_GAZEBO_AMBIENCE, number> = {
   piano: 0.08,
 };
 
-const FADE_MS = 1400;
-const FADE_STEP = 0.012;
+const FADE_MS = 900;
+const FADE_STEP = 0.02;
 
 /**
- * Natural gazebo soundscape — waterfall, birds, breeze, soft piano.
- * No synthesis. Fades gently; respects mute preference.
+ * Optional gazebo layers — only after the member turns sound on.
+ * Never starts from ambient page clicks while muted.
  */
 export function JournalGazeboAmbience({ active, muted }: Props) {
   const refs = useRef<Record<string, HTMLAudioElement | null>>({});
-  const fadeTimersRef = useRef<number[]>([]);
-  const startedRef = useRef(false);
-  const targetMutedRef = useRef(muted);
+  const fadeTimersRef = useRef<Record<string, number>>({});
 
-  targetMutedRef.current = muted;
-
-  const clearFades = () => {
-    for (const id of fadeTimersRef.current) window.clearInterval(id);
-    fadeTimersRef.current = [];
+  const clearFade = (key: string) => {
+    const id = fadeTimersRef.current[key];
+    if (id != null) {
+      window.clearInterval(id);
+      delete fadeTimersRef.current[key];
+    }
   };
 
-  const fadeTo = (el: HTMLAudioElement, target: number) => {
-    clearFades();
+  const clearAllFades = () => {
+    for (const key of Object.keys(fadeTimersRef.current)) clearFade(key);
+  };
+
+  const fadeTo = (key: string, el: HTMLAudioElement, target: number) => {
+    clearFade(key);
     const id = window.setInterval(() => {
       const delta = target > el.volume ? FADE_STEP : -FADE_STEP;
-      const next = Math.max(0, Math.min(target, el.volume + delta));
+      const next = Math.max(0, Math.min(1, el.volume + delta));
       el.volume = next;
       if (Math.abs(next - target) < FADE_STEP) {
         el.volume = target;
         window.clearInterval(id);
-      }
-    }, FADE_MS / 80);
-    fadeTimersRef.current.push(id);
-  };
-
-  const applyMute = (nextMuted: boolean) => {
-    for (const [key, el] of Object.entries(refs.current)) {
-      if (!el) continue;
-      const layer = key as keyof typeof JOURNAL_GAZEBO_AMBIENCE;
-      fadeTo(el, nextMuted ? 0 : LAYER_VOLUME[layer]);
-    }
-  };
-
-  useEffect(() => {
-    applyMute(muted);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- fade all layers on mute toggle
-  }, [muted]);
-
-  useEffect(() => {
-    if (!active) {
-      clearFades();
-      for (const el of Object.values(refs.current)) {
-        if (el) {
+        delete fadeTimersRef.current[key];
+        if (target <= 0) {
           el.pause();
-          el.volume = 0;
         }
       }
-      startedRef.current = false;
-      return;
-    }
+    }, FADE_MS / 50);
+    fadeTimersRef.current[key] = id;
+  };
 
+  const stopAll = (immediate = false) => {
+    clearAllFades();
+    for (const el of Object.values(refs.current)) {
+      if (!el) continue;
+      if (immediate) {
+        el.pause();
+        el.volume = 0;
+      } else {
+        el.volume = 0;
+        el.pause();
+      }
+    }
+  };
+
+  const ensureLayers = () => {
     const layers = Object.entries(JOURNAL_GAZEBO_AMBIENCE) as [
       keyof typeof JOURNAL_GAZEBO_AMBIENCE,
       string,
     ][];
-
     for (const [key, src] of layers) {
       if (refs.current[key]) continue;
       const audio = new Audio(src);
       audio.loop = true;
       audio.volume = 0;
-      audio.preload = "auto";
+      audio.preload = "none";
       refs.current[key] = audio;
     }
+  };
 
-    const start = () => {
-      if (startedRef.current) return;
-      startedRef.current = true;
-      let delay = 0;
-      for (const [key, el] of Object.entries(refs.current)) {
-        if (!el) continue;
-        const layer = key as keyof typeof JOURNAL_GAZEBO_AMBIENCE;
-        window.setTimeout(() => {
-          void el.play().then(() => {
-            if (!targetMutedRef.current) fadeTo(el, LAYER_VOLUME[layer]);
-          }).catch(() => undefined);
-        }, delay);
-        delay += 600;
-      }
-    };
+  const startLayers = () => {
+    ensureLayers();
+    let delay = 0;
+    for (const [key, el] of Object.entries(refs.current)) {
+      if (!el) continue;
+      const layer = key as keyof typeof JOURNAL_GAZEBO_AMBIENCE;
+      window.setTimeout(() => {
+        void el.play()
+          .then(() => fadeTo(key, el, LAYER_VOLUME[layer]))
+          .catch(() => undefined);
+      }, delay);
+      delay += 500;
+    }
+  };
 
-    start();
-    window.addEventListener("pointerdown", start, { once: true });
-
+  useEffect(() => {
+    if (!active || muted) {
+      stopAll(true);
+      return;
+    }
+    startLayers();
     return () => {
-      window.removeEventListener("pointerdown", start);
-      clearFades();
+      stopAll(true);
     };
-  }, [active]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- start/stop only on active + mute
+  }, [active, muted]);
 
   useEffect(() => {
     return () => {
-      clearFades();
-      for (const el of Object.values(refs.current)) el?.pause();
+      stopAll(true);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- unmount cleanup
   }, []);
 
   return null;

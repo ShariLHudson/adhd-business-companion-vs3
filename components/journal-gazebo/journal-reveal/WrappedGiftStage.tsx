@@ -1,13 +1,17 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+import { journalCoverTitle } from "@/lib/journalGazebo/coverArt";
+import type { JournalGazeboConfig } from "@/lib/journalGazebo/types";
 
 type Props = {
+  journal: JournalGazeboConfig;
   onOpenGift: () => void;
 };
 
-export function WrappedGiftStage({ onOpenGift }: Props) {
+export function WrappedGiftStage({ journal, onOpenGift }: Props) {
   const reduceMotion = useReducedMotion();
+  const title = journalCoverTitle(journal);
 
   return (
     <div className="journal-reveal__stage" data-testid="journal-reveal-wrapped">
@@ -21,8 +25,9 @@ export function WrappedGiftStage({ onOpenGift }: Props) {
             onOpenGift();
           }
         }}
-        aria-label="Open your gift"
+        aria-label={`Open your gift — ${title}`}
         data-testid="journal-reveal-gift-button"
+        data-leather={journal.leatherColor}
       >
         <motion.span
           className="journal-reveal__gift-motion"
@@ -52,9 +57,13 @@ export function WrappedGiftStage({ onOpenGift }: Props) {
               transition={{ duration: 2.2, repeat: Infinity }}
             />
           ) : null}
-          <div className="journal-reveal__box">
-            <div className="journal-reveal__paper">
+          <div className="journal-reveal__box" data-leather={journal.leatherColor}>
+            <div
+              className="journal-reveal__paper"
+              data-leather={journal.leatherColor}
+            >
               <span className="journal-reveal__paper-sheen" />
+              <span className="journal-reveal__paper-flame" aria-hidden="true" />
             </div>
             <span className="journal-reveal__ribbon-h" />
             <span className="journal-reveal__ribbon-v" />

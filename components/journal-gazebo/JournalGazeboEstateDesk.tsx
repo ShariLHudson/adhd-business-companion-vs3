@@ -13,7 +13,8 @@ export type EstateDeskMoment =
   | "rest";
 
 type Props = {
-  moment: EstateDeskMoment;
+  /** Kept for call-site compatibility; no longer gates the plaques. */
+  moment?: EstateDeskMoment;
   showWelcome: boolean;
   journals: JournalGazeboConfig[];
   onCreateJournal: () => void;
@@ -22,18 +23,12 @@ type Props = {
 
 /** Gazebo welcome — estate green plaques anchored to the viewport (always visible). */
 export function JournalGazeboEstateDesk({
-  moment,
   showWelcome,
   journals,
   onCreateJournal,
   onOpenJournal,
 }: Props) {
-  const showDeskActions =
-    showWelcome &&
-    moment !== "letter-fading" &&
-    moment !== "letter-closing";
-
-  if (!showDeskActions) return null;
+  if (!showWelcome) return null;
 
   return (
     <JournalGazeboWelcomeDesk

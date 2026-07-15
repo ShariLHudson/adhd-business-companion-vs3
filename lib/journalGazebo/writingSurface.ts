@@ -82,9 +82,20 @@ export function blockInlineStyle(config: JournalGazeboConfig, style: TypingStyle
   return parts.join("; ");
 }
 
+function styleDataAttrs(style: TypingStyle): string {
+  return [
+    `data-pen="${style.penStyle}"`,
+    `data-nib="${style.nibSize}"`,
+    `data-font="${style.fontId}"`,
+    `data-ink="${style.inkColor}"`,
+    `data-size="${style.writingFontSize}"`,
+    `data-jg-styled="true"`,
+  ].join(" ");
+}
+
 function blockOpenTag(config: JournalGazeboConfig, style: TypingStyle): string {
   const inline = blockInlineStyle(config, style);
-  return `<p style="${inline}" data-pen="${style.penStyle}" data-nib="${style.nibSize}" data-jg-styled="true">`;
+  return `<p style="${inline}" ${styleDataAttrs(style)}>`;
 }
 
 export function emptyStyledPageHtml(
@@ -188,7 +199,11 @@ export function sanitizePageHtml(html: string): string {
         if (
           attr.name === "data-pen" ||
           attr.name === "data-nib" ||
-          attr.name === "data-jg-styled"
+          attr.name === "data-font" ||
+          attr.name === "data-ink" ||
+          attr.name === "data-size" ||
+          attr.name === "data-jg-styled" ||
+          attr.name === "class"
         ) {
           continue;
         }
@@ -277,7 +292,7 @@ export function appendDictationToBody(
   if (!config) return `${currentBody}${escText(added)}`;
   const resolved = style ?? typingStyleFromConfig(config);
   const inline = blockInlineStyle(config, resolved);
-  return `${currentBody}<span style="${inline}" data-pen="${resolved.penStyle}" data-nib="${resolved.nibSize}">${escText(added)}</span>`;
+  return `${currentBody}<span style="${inline}" ${styleDataAttrs(resolved)}>${escText(added)}</span>`;
 }
 
 /** Root chrome only — typography lives on each paragraph. */
@@ -372,6 +387,9 @@ export function stampWritingBlock(
   block.setAttribute("style", blockInlineStyle(config, style));
   block.setAttribute("data-pen", style.penStyle);
   block.setAttribute("data-nib", style.nibSize);
+  block.setAttribute("data-font", style.fontId);
+  block.setAttribute("data-ink", style.inkColor);
+  block.setAttribute("data-size", String(style.writingFontSize));
   block.setAttribute("data-jg-styled", "true");
   if (block.tagName.toLowerCase() === "div") {
     block.classList.add("jg-writing-block");
@@ -414,7 +432,10 @@ export function refreshEmptyActiveBlock(
   return block;
 }
 
-/** Restyle every paragraph on the page — ink, pen, and size feel immediate. */
+/**
+ * Restyle every paragraph on the page.
+ * Prefer {@link beginTypingRunAtCaret} for prefs changes — members keep prior runs.
+ */
 export function restyleAllBlocksInEditor(
   editor: HTMLElement,
   config: JournalGazeboConfig,
@@ -431,10 +452,153 @@ export function restyleAllBlocksInEditor(
     stampWritingBlock(block, config, style);
   }
   for (const span of editor.querySelectorAll<HTMLElement>("span[data-jg-styled]")) {
-    span.setAttribute("style", blockInlineStyle(config, style));
-    span.setAttribute("data-pen", style.penStyle);
-    span.setAttribute("data-nib", style.nibSize);
+    stampWritingBlock(span, config, style);
   }
+}
+
+function styledRunMatches(el: HTMLElement, style: TypingStyle): boolean {
+  if (el.getAttribute("data-jg-styled") !== "true") return false;
+  if (el.getAttribute("data-pen") !== style.penStyle) return false;
+  if (el.getAttribute("data-nib") !== style.nibSize) return false;
+  if (el.getAttribute("data-font") !== style.fontId) return false;
+  if (el.getAttribute("data-ink") !== style.inkColor) return false;
+  if (el.getAttribute("data-size") !== String(style.writingFontSize)) return false;
+  return true;
+}
+
+function findStyledRun(node: Node | null, editor: HTMLElement): HTMLElement | null {
+  let current: Node | null = node;
+  while (current && current !== editor) {
+    if (current.nodeType === Node.ELEMENT_NODE) {
+      const el = current as HTMLElement;
+      if (el.getAttribute("data-jg-styled") === "true") return el;
+    }
+    current = current.parentNode;
+  }
+  return null;
+}
+
+/** Character offsets within the editor for caret restore after DOM repairs. */
+export function captureEditorCaretOffsets(
+  editor: HTMLElement,
+): { start: number; end: number } | null {
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) return null;
+  if (!editor.contains(selection.anchorNode) || !editor.contains(selection.focusNode)) {
+    return null;
+  }
+  const startRange = document.createRange();
+  startRange.selectNodeContents(editor);
+  startRange.setEnd(selection.anchorNode!, selection.anchorOffset);
+  const start = startRange.toString().length;
+  const endRange = document.createRange();
+  endRange.selectNodeContents(editor);
+  endRange.setEnd(selection.focusNode!, selection.focusOffset);
+  const end = endRange.toString().length;
+  return { start, end };
+}
+
+export function restoreEditorCaretOffsets(
+  editor: HTMLElement,
+  offsets: { start: number; end: number },
+): boolean {
+  const pointAt = (target: number): { node: Node; offset: number } | null => {
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+    let passed = 0;
+    let node = walker.nextNode();
+    while (node) {
+      const length = node.textContent?.length ?? 0;
+      if (passed + length >= target) {
+        return { node, offset: Math.max(0, target - passed) };
+      }
+      passed += length;
+      node = walker.nextNode();
+    }
+    const fallback =
+      editor.querySelector<HTMLElement>("p, .jg-writing-block") ?? editor;
+    return { node: fallback, offset: fallback.childNodes.length };
+  };
+
+  const start = pointAt(Math.max(0, offsets.start));
+  const end = pointAt(Math.max(0, offsets.end));
+  if (!start || !end) return false;
+  const range = document.createRange();
+  try {
+    range.setStart(start.node, Math.min(start.offset, start.node.textContent?.length ?? start.offset));
+    range.setEnd(end.node, Math.min(end.offset, end.node.textContent?.length ?? end.offset));
+  } catch {
+    return false;
+  }
+  const selection = window.getSelection();
+  if (!selection) return false;
+  selection.removeAllRanges();
+  selection.addRange(range);
+  return true;
+}
+
+/**
+ * Point the caret at a run that uses the active typing style without rewriting
+ * existing text. Empty blocks are stamped; style changes open a new span at the caret.
+ * Safe to call while typing — matching runs leave the caret untouched.
+ */
+export function beginTypingRunAtCaret(
+  editor: HTMLElement,
+  config: JournalGazeboConfig,
+  style: TypingStyle,
+): HTMLElement | null {
+  const caretBefore = captureEditorCaretOffsets(editor);
+  if (consolidateVerticalCharBlocks(editor) && caretBefore) {
+    restoreEditorCaretOffsets(editor, caretBefore);
+  }
+  ensureEditorShell(editor, config, style);
+
+  const selection = window.getSelection();
+  if (!selection || selection.rangeCount === 0) {
+    const first = editor.querySelector<HTMLElement>("p, .jg-writing-block");
+    if (first && isEmptyWritingBlock(first)) {
+      stampWritingBlock(first, config, style);
+      return first;
+    }
+    return first;
+  }
+
+  if (!selection.isCollapsed) return findStyledRun(selection.anchorNode, editor);
+
+  const block = findWritingBlock(selection.anchorNode, editor);
+  if (!block) {
+    const first = editor.querySelector<HTMLElement>("p, .jg-writing-block");
+    if (first && isEmptyWritingBlock(first)) stampWritingBlock(first, config, style);
+    return first;
+  }
+
+  if (isEmptyWritingBlock(block)) {
+    stampWritingBlock(block, config, style);
+    return block;
+  }
+
+  const existingRun = findStyledRun(selection.anchorNode, editor);
+  if (existingRun && styledRunMatches(existingRun, style)) {
+    return existingRun;
+  }
+
+  // Already inside a styled paragraph that matches — never insert mid-word.
+  if (block.getAttribute("data-jg-styled") === "true" && styledRunMatches(block, style)) {
+    return block;
+  }
+
+  // Style changed at a collapsed caret — open a new run from here forward.
+  const range = selection.getRangeAt(0).cloneRange();
+  const span = document.createElement("span");
+  stampWritingBlock(span, config, style);
+  span.appendChild(document.createTextNode("\u200b"));
+  range.insertNode(span);
+
+  const caret = document.createRange();
+  caret.selectNodeContents(span);
+  caret.collapse(false);
+  selection.removeAllRanges();
+  selection.addRange(caret);
+  return span;
 }
 
 /**
@@ -456,23 +620,16 @@ export function consolidateVerticalCharBlocks(editor: HTMLElement): boolean {
   return true;
 }
 
-/** Prepare the cursor block — never split mid-page into a new line per keystroke. */
+/**
+ * @deprecated Prefer {@link beginTypingRunAtCaret} — restamping a non-empty
+ * block rewrites prior handwriting when prefs change.
+ */
 export function prepareActiveBlockForTypingStyle(
   editor: HTMLElement,
   config: JournalGazeboConfig,
   style: TypingStyle,
 ): HTMLElement | null {
-  consolidateVerticalCharBlocks(editor);
-  const selection = window.getSelection();
-  const block = findWritingBlock(selection?.anchorNode ?? null, editor);
-  if (!block) {
-    ensureEditorShell(editor, config, style);
-    const first = editor.querySelector("p, .jg-writing-block") as HTMLElement | null;
-    if (first) stampWritingBlock(first, config, style);
-    return first;
-  }
-  stampWritingBlock(block, config, style);
-  return block;
+  return beginTypingRunAtCaret(editor, config, style);
 }
 
 function wrapSelectionWithStyle(
@@ -484,10 +641,7 @@ function wrapSelectionWithStyle(
   if (!selection || selection.isCollapsed || selection.rangeCount === 0) return false;
   const range = selection.getRangeAt(0);
   const span = document.createElement("span");
-  span.setAttribute("style", blockInlineStyle(config, style));
-  span.setAttribute("data-pen", style.penStyle);
-  span.setAttribute("data-nib", style.nibSize);
-  span.setAttribute("data-jg-styled", "true");
+  stampWritingBlock(span, config, style);
   if (extra) {
     for (const [key, value] of Object.entries(extra)) {
       if (value) (span.style as unknown as Record<string, string>)[key] = String(value);
@@ -539,6 +693,14 @@ export function applyPenToSelection(
 ): void {
   const next = { ...style, penStyle };
   wrapSelectionWithStyle(config, next);
+}
+
+/** Apply the full active typing style to the current selection only. */
+export function applyTypingStyleToSelection(
+  config: JournalGazeboConfig,
+  style: TypingStyle,
+): boolean {
+  return wrapSelectionWithStyle(config, style);
 }
 
 function lastTextNodeIn(root: HTMLElement): Text | null {

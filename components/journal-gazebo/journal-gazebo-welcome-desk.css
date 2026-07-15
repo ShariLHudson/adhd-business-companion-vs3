@@ -21,12 +21,14 @@
   position: fixed;
   inset: auto;
   left: 50%;
-  bottom: clamp(11%, 13.5vh, 16%);
+  bottom: max(1.25rem, env(safe-area-inset-bottom, 0px), clamp(8%, 11vh, 14%));
   transform: translateX(-50%);
   width: min(42rem, 78vw);
   height: clamp(4.5rem, 9.5vh, 5.75rem);
   z-index: 2;
   pointer-events: none;
+  opacity: 1;
+  visibility: visible;
 }
 
 .jg-welcome-desk-actions .jg-table-actions {
@@ -149,11 +151,11 @@
   pointer-events: none;
 }
 
-/* Portaled to document.body — above Spark Note / guidebook anchors */
+/* Portaled to document.body — above Spark Note / guidebook / estate chrome */
 .jg-table-actions-portal {
   position: fixed;
   inset: 0;
-  z-index: 100009;
+  z-index: 100050;
   pointer-events: none;
 }
 
@@ -530,7 +532,7 @@
 
 @media (max-width: 640px) {
   .jg-welcome-desk-actions {
-    bottom: clamp(12%, 14vh, 18%);
+    bottom: max(1rem, env(safe-area-inset-bottom, 0px), clamp(9%, 12vh, 16%));
     width: min(42rem, 92vw);
     height: clamp(4.25rem, 10vh, 5.25rem);
   }

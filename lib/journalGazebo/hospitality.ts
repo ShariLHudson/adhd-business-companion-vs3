@@ -79,6 +79,11 @@ export const JOURNAL_DESIGN_COVER_PROMPT =
 export const JOURNAL_DESIGN_NAME_PROMPT =
   "What would you like to name your journal?";
 
+export const JOURNAL_DESIGN_INTENTION_PROMPT = "What is this journal for?";
+
+export const JOURNAL_DESIGN_PAGE_IMAGES_PROMPT =
+  "Would you like gentle images on the pages?";
+
 export const JOURNAL_DESIGN_PAPER_PROMPT =
   "Choose the paper beneath your words.";
 
@@ -231,6 +236,10 @@ export const JOURNAL_PLAQUE_TODAY = {
 export const JOURNAL_PAGE_SAVED = "I've kept this safe for you.";
 
 export const JOURNAL_PAGE_PLACEHOLDER = "";
+
+/** Gentle cue when a journal has used all writing pages. */
+export const JOURNAL_FULL_SPARK =
+  "This journal is full — two hundred pages of your story. Create a new journal when you're ready to keep writing.";
 
 export const JOURNAL_OPEN_TODAY_SPARK = "Perfect.\nYour page is waiting.";
 

@@ -36,5 +36,11 @@ export const JOURNAL_WORKSHOP_PLATE_URL = JOURNAL_GAZEBO_SCENE_URL;
 export const JOURNAL_GAZEBO_COVER_ART_URL =
   "/images/journal-gazebo/gazebo-cover-watercolor.png";
 
+/** Soft page-corner watermark — gazebo only, feathered edges (no square frame). */
+export const JOURNAL_GAZEBO_PAGE_WATERMARK_URL =
+  "/images/journal-gazebo/page-watermarks/gazebo.png";
+
+/** Rotating Estate place watermarks live in `pageWatermarks.ts`. */
+
 /** Embossed estate — Old World printed cover art. */
 export const JOURNAL_ESTATE_COVER_ART_URL = ESTATE_ROOM_BG.sparkEstatePhoto;

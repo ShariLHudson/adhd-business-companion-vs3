@@ -159,6 +159,8 @@ describe("Journal Gazebo Experience visit wiring", () => {
     expect(source).toContain("markJournalGazeboVisited");
     expect(source).toContain("JournalRevealFlow");
     expect(source).toContain("handleWelcomeCreateJournal");
+    expect(source).toContain("showLetterDeskActions");
+    expect(source).toContain("didRouteLetterDeskHomeRef");
     expect(source).not.toContain("JournalGazeboWelcomeNoteCard");
     expect(source).not.toContain("JournalGazeboReturnNoteCard");
     expect(source).toContain("journal-gazebo--welcome-letter");

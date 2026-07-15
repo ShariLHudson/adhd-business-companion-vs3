@@ -1,5 +1,9 @@
 /** Journal Gazebo — customization & session types. */
 
+import type { JournalIntentionId } from "./journalIntentions";
+
+export type { JournalIntentionId };
+
 export type JournalPaperStyle =
   | "cream"
   | "ivory"
@@ -82,6 +86,16 @@ export type JournalGazeboConfig = {
   coverMaterial?: "leather" | "linen";
   embossingStyle?: "gold" | "silver" | "blind";
   penVariant?: string;
+  /**
+   * What this journal is for — prayer, gratitude, health, etc.
+   * Shapes page watermarks and blank-page questions.
+   */
+  intention?: JournalIntentionId;
+  /**
+   * Soft Estate place marks in the page corner.
+   * Default true; false = clear pages (questions still match intention).
+   */
+  showPageWatermarks?: boolean;
   paperStyle: JournalPaperStyle;
   fontId: JournalFontId;
   inkColor: JournalInkColor;

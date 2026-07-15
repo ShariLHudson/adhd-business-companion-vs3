@@ -22,6 +22,40 @@
   display: none !important;
 }
 
+/* Dear Friend → Begin Writing (first open after gift reveal) */
+.jg-open-book__begin-writing {
+  position: fixed;
+  left: 50%;
+  /* Sit above the always-visible Back / Next bar */
+  bottom: calc(max(1.5rem, env(safe-area-inset-bottom, 0px)) + 3.35rem);
+  transform: translateX(-50%);
+  z-index: 100049;
+  margin: 0;
+  padding: 0.7rem 1.45rem;
+  border: 1px solid rgba(212, 184, 112, 0.72);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 244, 210, 0.12), transparent 52%),
+    linear-gradient(168deg, rgba(42, 38, 30, 0.94) 0%, rgba(24, 22, 18, 0.97) 100%);
+  color: #d4b870;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(212, 184, 112, 0.22),
+    0 8px 22px rgba(8, 6, 4, 0.4);
+  pointer-events: auto;
+}
+
+.jg-open-book__begin-writing:hover,
+.jg-open-book__begin-writing:focus-visible {
+  border-color: rgba(232, 208, 140, 0.9);
+  outline: 2px solid rgba(212, 184, 112, 0.55);
+  outline-offset: 2px;
+}
+
 .journal-gazebo--design-studio .journal-gazebo__atmosphere,
 .journal-gazebo--workshop .journal-gazebo__atmosphere,
 .journal-gazebo--gift-unwrap .journal-gazebo__atmosphere,
@@ -35,25 +69,34 @@
   overflow: visible;
 }
 
-.journal-gazebo--design-studio .journal-gazebo__background,
-.journal-gazebo--design-studio .journal-gazebo__background--gazebo,
-.journal-gazebo--design-studio.journal-gazebo--workshop .journal-gazebo__background,
-.journal-gazebo--design-studio.journal-gazebo--workshop .journal-gazebo__background--gazebo {
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  object-fit: cover;
-  object-position: center center;
-  transform: none !important;
-  filter: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+/*
+ * Cover / design choices — plain dark fill matching estate chrome buttons.
+ * No wood desk, letter, or photo plate behind the samples.
+ */
+.journal-gazebo--design-studio,
+.journal-gazebo--design-studio.journal-gazebo--workshop,
+.journal-gazebo--design-studio.journal-gazebo--workshop-plate,
+.journal-gazebo--design-studio.journal-gazebo--return-desk {
+  background: #141210 !important;
 }
 
-.journal-gazebo--design-studio .journal-gazebo__background--settled {
+.journal-gazebo--design-studio .estate-room-fullbleed-stack,
+.journal-gazebo--design-studio .journal-gazebo__background,
+.journal-gazebo--design-studio .journal-gazebo__background--gazebo,
+.journal-gazebo--design-studio .journal-gazebo__background--settled,
+.journal-gazebo--design-studio.journal-gazebo--workshop .journal-gazebo__background,
+.journal-gazebo--design-studio.journal-gazebo--workshop .journal-gazebo__background--gazebo,
+.journal-gazebo--design-studio .estate-room-fullbleed-bg {
+  display: none !important;
   opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.journal-gazebo--design-studio::before,
+.journal-gazebo--design-studio::after {
+  display: none !important;
+  content: none !important;
 }
 
 .journal-gazebo--workshop .journal-gazebo__background,
@@ -91,19 +134,14 @@
   visibility: visible !important;
 }
 
+/* No milky frost panels — estate stays visible; book carries the focus */
 .journal-gazebo--gift-unwrap::before,
 .journal-gazebo--journal-reveal::before,
 .journal-gazebo--journal-opening::before,
 .journal-gazebo--cinematic-book.journal-gazebo--writing-open::before,
 .journal-gazebo--cinematic-book.journal-gazebo--cinematic-ceremony::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-  background: rgba(255, 252, 245, 0.1);
-  backdrop-filter: blur(8px) saturate(0.92);
-  -webkit-backdrop-filter: blur(8px) saturate(0.92);
+  content: none;
+  display: none;
 }
 
 .jg-design-studio__workspace {
@@ -197,9 +235,13 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background: rgba(255, 252, 245, 0.14);
-  backdrop-filter: blur(14px) saturate(0.92);
-  -webkit-backdrop-filter: blur(14px) saturate(0.92);
+  background: radial-gradient(
+    ellipse 70% 60% at 50% 45%,
+    rgba(12, 10, 8, 0.12) 0%,
+    rgba(8, 6, 5, 0.28) 100%
+  );
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .jg-handcraft-ceremony--message-only .jg-design-studio__crafting-script {
@@ -219,11 +261,33 @@
   -webkit-backdrop-filter: blur(12px) saturate(1.05);
 }
 
+/* Cover select — all 9 portrait samples + nav fit one viewport (no scroll). */
+.jg-design-studio--cover-select {
+  justify-content: center;
+  padding-top: clamp(2.75rem, 7vh, 4rem);
+  padding-bottom: clamp(0.5rem, 1.5vh, 1rem);
+  overflow: hidden;
+}
+
+.jg-design-studio--cover-select .jg-design-studio__prompt {
+  margin-bottom: clamp(0.35rem, 1vh, 0.55rem);
+  padding: 0.4rem 0.9rem;
+  font-size: clamp(0.95rem, 1.8vw, 1.2rem);
+}
+
 .jg-design-studio--cover-select .jg-design-studio__workspace {
   align-items: center;
-  padding-top: clamp(0.75rem, 2.5vh, 1.35rem);
-  width: min(62rem, 98vw);
-  min-height: min(54vh, 30rem);
+  justify-content: center;
+  padding-top: 0;
+  width: min(36rem, 94vw);
+  min-height: 0;
+  flex: 1 1 auto;
+  max-height: calc(100dvh - 7.5rem);
+}
+
+.jg-design-studio--cover-select .jg-design-studio__step {
+  flex: 0 1 auto;
+  max-height: 100%;
 }
 
 .jg-design-studio--cover-select .jg-design-studio__panel--cover {
@@ -233,24 +297,29 @@
   backdrop-filter: none;
   padding: 0;
   max-height: none;
+  width: 100%;
+  overflow: visible;
 }
 
 .jg-design-studio--cover-select .jg-design-studio__grid--covers {
-  grid-template-columns: repeat(3, minmax(4.85rem, 1fr));
-  gap: clamp(0.35rem, 0.85vh, 0.55rem);
-  width: min(42rem, 90vw);
-  margin-bottom: 0.25rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.3rem, 0.9vh, 0.55rem) clamp(0.45rem, 1.2vw, 0.75rem);
+  width: min(32rem, 88vw);
+  margin: 0 auto;
 }
 
 .jg-design-studio--cover-select .jg-design-swatch {
   min-height: 0;
-  padding: 0.28rem;
+  padding: clamp(0.2rem, 0.55vh, 0.35rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .jg-design-studio--cover-select .jg-design-swatch__label,
 .jg-design-studio--cover-select .jg-design-swatch__sub {
-  font-size: clamp(0.62rem, 1.15vw, 0.74rem);
-  line-height: 1.15;
+  font-size: clamp(0.55rem, 1.05vw, 0.68rem);
+  line-height: 1.1;
 }
 
 .jg-design-studio--cover-select .jg-design-swatch__sub {
@@ -258,13 +327,28 @@
 }
 
 .jg-design-studio--cover-select .jg-design-swatch__face {
-  width: 100%;
-  max-width: none;
+  width: min(100%, 6.25rem);
+  max-width: 6.25rem;
   height: auto !important;
   min-height: unset !important;
-  max-height: none !important;
+  max-height: min(22vh, 9.25rem) !important;
   aspect-ratio: 2 / 3;
-  margin: 0 auto 0.4rem;
+  margin: 0 auto 0.25rem;
+}
+
+.jg-design-swatch__face--printed {
+  position: relative;
+  overflow: hidden;
+}
+
+.jg-design-swatch__face-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
 }
 
 .jg-design-studio--cover-select .jg-design-swatch__face--printed,
@@ -282,23 +366,41 @@
   display: none;
 }
 
-.jg-design-studio--cover-select .jg-design-swatch {
-  padding: clamp(0.4rem, 0.9vh, 0.55rem);
-  min-height: 0;
+.jg-design-studio--cover-select .jg-design-studio__nav-row {
+  margin-top: clamp(0.35rem, 1.2vh, 0.65rem);
+  flex-shrink: 0;
+}
+
+.jg-design-studio--cover-select .jg-design-studio__nav {
+  width: clamp(2.35rem, 4.5vw, 2.85rem);
+  height: clamp(2.35rem, 4.5vw, 2.85rem);
 }
 
 @media (max-width: 720px) {
   .jg-design-studio--cover-select .jg-design-studio__grid--covers {
-    grid-template-columns: repeat(3, minmax(4.75rem, 1fr));
-    width: min(100%, 22.5rem);
-    gap: 0.45rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(100%, 20.5rem);
+    gap: 0.35rem 0.4rem;
   }
 
   .jg-design-studio--cover-select .jg-design-swatch__face {
+    width: min(100%, 5.35rem);
+    max-width: 5.35rem;
+    max-height: min(18vh, 7.75rem) !important;
     aspect-ratio: 2 / 3;
     height: auto !important;
     min-height: unset !important;
-    max-height: none !important;
+  }
+}
+
+@media (max-height: 720px) {
+  .jg-design-studio--cover-select .jg-design-swatch__face {
+    max-height: min(18vh, 7.5rem) !important;
+    max-width: 5.5rem;
+  }
+
+  .jg-design-studio--cover-select .jg-design-swatch__label {
+    font-size: 0.55rem;
   }
 }
 
@@ -326,7 +428,7 @@
 .jg-cinematic-gift__bow-knot,
 .jg-cinematic-gift__bow-tail {
   background-color: #f3ebe0;
-  background-image: var(--jg-gift-wrap-paper, url("/images/journal-gift-wrapping-paper.png"));
+  background-image: var(--jg-gift-wrap-paper, url("/images/spark-wrapping-paper.png"));
   background-repeat: repeat;
   border: 2px solid var(--jg-ribbon-gold);
   box-shadow:
@@ -555,10 +657,104 @@
 .jg-cinematic-gift__journal-cover--printed,
 .jg-closed-journal__cover[style*="background-image"],
 .jg-cinematic-gift__journal-cover[style*="background-image"] {
+  position: relative;
+  overflow: hidden;
   background-color: rgba(24, 18, 12, 0.42);
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
+}
+
+.jg-closed-journal__cover-img,
+.jg-cinematic-gift__journal-cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center center;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.jg-closed-journal__cover--printed > .jg-cover-emboss,
+.jg-cinematic-gift__journal-cover--printed > .jg-cover-emboss {
+  z-index: 2;
+}
+
+/* Back / Next — always at the bottom of the writing page */
+.jg-page-turn-nav {
+  position: fixed;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 100050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: min(22rem, calc(100vw - 1.5rem));
+  pointer-events: none;
+}
+
+.jg-page-turn-nav__btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 6.5rem;
+  min-height: 2.55rem;
+  margin: 0;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgba(201, 166, 107, 0.72);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 244, 210, 0.12), transparent 52%),
+    linear-gradient(168deg, rgba(42, 38, 30, 0.94) 0%, rgba(24, 22, 18, 0.97) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 184, 112, 0.22),
+    0 6px 18px rgba(8, 6, 4, 0.36);
+  color: #d4b870;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.92rem, 1.7vw, 1.08rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.jg-page-turn-nav__btn:hover:not(:disabled) {
+  border-color: rgba(232, 208, 140, 0.9);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 184, 112, 0.28),
+    0 8px 20px rgba(8, 6, 4, 0.42);
+}
+
+.jg-page-turn-nav__btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.jg-page-turn-nav__arrow {
+  font-size: 1.15em;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+.jg-page-turn-nav__label {
+  line-height: 1.1;
+}
+
+/* Hide legacy top-right page arrows when the bottom bar is present */
+.journal-gazebo:has(.jg-page-turn-nav) .jg-estate-side-nav {
+  display: none !important;
 }
 
 .jg-closed-journal__cover--printed::before,
@@ -589,14 +785,26 @@
   width: max-content;
   max-width: 88%;
   margin: 0;
+  text-align: center;
 }
 
+/* Patterned / printed covers — title sits low and centered for readability. */
+.jg-closed-journal__cover--printed .jg-cover-emboss__title,
+.jg-cinematic-gift__journal-cover--printed .jg-cover-emboss__title,
 .jg-closed-journal__cover[style*="background-image"] .jg-cover-emboss__title,
 .jg-cinematic-gift__journal-cover[style*="background-image"] .jg-cover-emboss__title {
+  top: auto;
+  bottom: 11%;
+  transform: translateX(-50%);
   font-size: clamp(1.08rem, 2.5vw, 1.5rem);
   color: rgba(22, 14, 6, 0.94);
   background: transparent;
   border: 0;
+  padding: 0.2em 0.55em;
+  text-shadow:
+    0 1px 0 rgba(255, 248, 235, 0.55),
+    0 -1px 2px rgba(0, 0, 0, 0.55),
+    0 2px 10px rgba(8, 6, 4, 0.45);
 }
 
 .jg-closed-journal__cover:not([style*="background-image"]) .jg-cover-emboss__title,
@@ -615,10 +823,7 @@
   filter: drop-shadow(0 1px 2px rgba(8, 6, 4, 0.55));
 }
 
-.jg-cinematic-gift--unwrap .jg-cinematic-gift__paper--front {
-  transform: scale(1.04) rotate(2deg);
-  opacity: 0;
-}
+/* Paper peel lives in journal-reveal.css — do not override with a scale fade. */
 
 .jg-cinematic-gift--reveal .jg-cinematic-gift__wrap,
 .jg-cinematic-gift--journal-visible .jg-cinematic-gift__wrap {
@@ -1199,12 +1404,10 @@
   overflow-y: auto;
   -webkit-user-select: text;
   user-select: text;
-  border: 1px solid rgba(139, 115, 85, 0.44);
-  border-radius: 6px;
-  background: rgba(255, 252, 247, 0.88);
-  box-shadow:
-    inset 0 1px 3px rgba(90, 72, 52, 0.07),
-    0 1px 0 rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(139, 115, 85, 0.28);
+  border-radius: 2px;
+  background: transparent;
+  box-shadow: inset 0 1px 2px rgba(90, 72, 52, 0.05);
 }
 
 .jg-book-page--first-write .jg-book-page__dedication-area p {
@@ -1281,9 +1484,9 @@
   min-height: 4.5rem;
   margin: 0.55rem 0 0;
   padding: clamp(0.65rem, 1.4vh, 0.85rem) clamp(0.75rem, 1.6vw, 0.95rem);
-  border: 1px solid rgba(139, 115, 85, 0.4);
-  border-radius: 6px;
-  background: rgba(255, 252, 247, 0.85);
+  border: 1px solid rgba(139, 115, 85, 0.28);
+  border-radius: 2px;
+  background: transparent;
   outline: none;
   direction: ltr;
   unicode-bidi: normal;
@@ -1293,7 +1496,7 @@
   line-height: 1.55;
   color: #3a322c;
   cursor: text;
-  box-shadow: inset 0 1px 3px rgba(90, 72, 52, 0.06);
+  box-shadow: inset 0 1px 2px rgba(90, 72, 52, 0.05);
 }
 
 .jg-book-page__dedication-placeholder {
@@ -1314,16 +1517,14 @@
   outline: none;
 }
 
-/* Single-page turn — right page lifts at the spine and crosses left */
+/* Single-page curl — layered paper peels from bottom-right; no ghost panels */
 
 .jg-open-book__spread--single.jg-open-book__spread--turning-forward {
   animation: none;
 }
 
 .jg-open-book__spread--single.jg-open-book__spread--turning-forward::after {
-  left: 0;
-  right: 0;
-  width: 100%;
+  display: none;
 }
 
 /* Welcome letter — one voice, sentence rhythm, no scroll */
