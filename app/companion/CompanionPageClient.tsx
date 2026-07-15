@@ -119,18 +119,7 @@ const CalendarRoomPanel = dynamic(
     ),
   },
 );
-const ParkingLotRoomPanel = dynamic(
-  () =>
-    import("@/components/companion/ParkingLotRoomPanel").then((mod) => ({
-      default: mod.ParkingLotRoomPanel,
-    })),
-  {
-    ssr: false,
-    loading: () => (
-      <SparkLoadingState message="Loading Parking Lot…" size="md" />
-    ),
-  },
-);
+import { ParkingLotRoomPanel } from "@/components/companion/ParkingLotRoomPanel";
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -1965,6 +1954,8 @@ import { openGuidedFieldHelpChat } from "@/lib/profile/openGuidedFieldHelpChat";
 import {
   PLAN_DAY_IM_STUCK_EVENT,
   PLAN_DAY_IM_STUCK_QUESTION,
+  buildPlanDayImStuckQuestion,
+  type PlanDayImStuckDetail,
 } from "@/lib/planMyDay/planDayImStuck";
 import { readExpertSessionPrompt } from "@/lib/profile/fieldHelpRegistry";
 import { readStageTalkThroughPrompt } from "@/lib/profile/guidedStageTalkThrough";
@@ -3102,39 +3093,48 @@ export default function CompanionPageClient() {
       setRecovery(null);
       return;
     }
+    // Use last *sent* user message only — never keystroke `input` (update-depth risk).
+    const recentText =
+      [...messages].reverse().find((m) => m.role === "user")?.content ??
+      undefined;
     const result = evaluateAndRecordCognitiveLoad({
       emotionalState: displayEmotion,
-      recentText:
-        ([...messages].reverse().find((m) => m.role === "user")?.content ??
-          input.trim()) ||
-        undefined,
+      recentText,
     });
-    setCognitiveLoad(result);
+    setCognitiveLoad((prev) =>
+      prev?.score.level === result.score.level &&
+      prev.score.total === result.score.total
+        ? prev
+        : result,
+    );
     const health = evaluateAndRecordUserHealth({
       emotionalState: displayEmotion,
-      text:
-        ([...messages].reverse().find((m) => m.role === "user")?.content ??
-          input.trim()) ||
-        undefined,
+      text: recentText,
       cognitiveLoadLevel: result.score.level,
       activationState: activationOffer?.state ?? null,
       primaryLoopType: loopOffer?.loopType ?? null,
     });
-    setUserHealth(health);
+    setUserHealth((prev) => (prev?.status === health.status ? prev : health));
     setRecovery(
       evaluateAndRecordRecovery({
         emotionalState: displayEmotion,
-        text:
-          ([...messages].reverse().find((m) => m.role === "user")?.content ??
-            input.trim()) ||
-          undefined,
+        text: recentText,
         cognitiveLoadLevel: result.score.level,
         activationState: activationOffer?.state ?? null,
         userHealthStatus: health.status,
         recognitionRecent: Boolean(recognitionMoment),
       }),
     );
-  }, [hydrated, intelligenceIdle, homeCalm, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
+  }, [
+    hydrated,
+    intelligenceIdle,
+    homeCalm,
+    displayEmotion,
+    messages,
+    activationOffer?.state,
+    loopOffer?.loopType,
+    recognitionMoment,
+  ]);
 
   useEffect(() => {
     if (!hydrated || !intelligenceIdle || homeCalm || splitCreateChat) {
@@ -3142,8 +3142,7 @@ export default function CompanionPageClient() {
       return;
     }
     const recentText =
-      ([...messages].reverse().find((m) => m.role === "user")?.content ??
-        input.trim()) ||
+      [...messages].reverse().find((m) => m.role === "user")?.content ??
       undefined;
     const loop = evaluateLoopIntelligence({
       text: recentText,
@@ -3177,13 +3176,13 @@ export default function CompanionPageClient() {
           dayDesignerSession && dayDesignerSession.step !== "complete",
         ),
       });
-    setLoopOffer(
-      !blockLoop && shouldSurfaceLoopOffer(loop) ? loop : null,
+    const next = !blockLoop && shouldSurfaceLoopOffer(loop) ? loop : null;
+    setLoopOffer((prev) =>
+      prev?.loopType === next?.loopType ? prev : next,
     );
   }, [
     hydrated,
     intelligenceIdle,
-    input,
     messages,
     cognitiveLoad?.score.level,
     activationOffer?.state,
@@ -7011,6 +7010,9 @@ export default function CompanionPageClient() {
   }
 
   function handleInputChange(value: string) {
+    if (value === inputSnapshotRef.current && value === input) {
+      return;
+    }
     inputSnapshotRef.current = value;
     patchEstateRuntimeState({ inputBuffer: value });
     setInput(value);
@@ -9198,14 +9200,31 @@ export default function CompanionPageClient() {
       window.removeEventListener(GUIDED_FIELD_HELP_EVENT, onGuidedFieldHelp);
   }, [requestChatInputFocus]);
 
-  // Plan My Day — I'm Stuck → existing Shari chat, one question only
+  // Plan My Day — I'm Stuck → contextual help with today's plan (not a blank chat)
   useEffect(() => {
-    function onPlanDayImStuck() {
+    function onPlanDayImStuck(event: Event) {
+      const detail = (event as CustomEvent<PlanDayImStuckDetail>).detail ?? {
+        itemTitles: [],
+      };
+      const question = buildPlanDayImStuckQuestion(detail);
+      beginContextualHelpSession({
+        currentMessages: messagesRef.current.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+        place: {
+          sectionId: "plan-my-day",
+          stepOrField: detail.activeStep ?? "im-stuck",
+          question,
+        },
+        abortController: chatRequestAbortRef.current,
+        bumpRequestGeneration: () => {
+          chatRequestGenerationRef.current += 1;
+        },
+      });
+      chatRequestAbortRef.current = null;
       navigateToChatCore();
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: PLAN_DAY_IM_STUCK_QUESTION },
-      ]);
+      setMessages([{ role: "assistant", content: question }]);
       window.setTimeout(() => {
         requestChatInputFocus({ scrollIntoView: true });
       }, 40);
