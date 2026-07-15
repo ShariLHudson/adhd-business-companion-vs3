@@ -29,7 +29,10 @@ describe("openGuidedFieldHelpChat", () => {
     const ensureEstateChatVisible = vi.fn();
     const focusInput = vi.fn();
 
+    const beginFreshHelpSession = vi.fn();
+
     const ok = openGuidedFieldHelpChat(sampleRequest("help_me_develop"), {
+      beginFreshHelpSession,
       openChat,
       appendAssistantWelcome,
       sendMemberOpener,
@@ -38,6 +41,10 @@ describe("openGuidedFieldHelpChat", () => {
     });
 
     expect(ok).toBe(true);
+    expect(beginFreshHelpSession).toHaveBeenCalledTimes(1);
+    expect(beginFreshHelpSession.mock.invocationCallOrder[0]).toBeLessThan(
+      openChat.mock.invocationCallOrder[0]!,
+    );
     expect(openChat).toHaveBeenCalledTimes(1);
     expect(ensureEstateChatVisible).toHaveBeenCalledTimes(1);
     expect(appendAssistantWelcome).toHaveBeenCalledTimes(1);
@@ -55,6 +62,7 @@ describe("openGuidedFieldHelpChat", () => {
     const sendMemberOpener = vi.fn();
     const appendAssistantWelcome = vi.fn();
     openGuidedFieldHelpChat(sampleRequest("research_with_shari"), {
+      beginFreshHelpSession: vi.fn(),
       openChat: vi.fn(),
       appendAssistantWelcome,
       sendMemberOpener,
@@ -67,6 +75,7 @@ describe("openGuidedFieldHelpChat", () => {
     const openChat = vi.fn();
     expect(
       openGuidedFieldHelpChat(null, {
+        beginFreshHelpSession: vi.fn(),
         openChat,
         appendAssistantWelcome: vi.fn(),
         sendMemberOpener: vi.fn(),
@@ -79,6 +88,7 @@ describe("openGuidedFieldHelpChat", () => {
     const req = sampleRequest("help_me_develop");
     const before = req.currentValue;
     openGuidedFieldHelpChat(req, {
+      beginFreshHelpSession: vi.fn(),
       openChat: vi.fn(),
       appendAssistantWelcome: vi.fn(),
       sendMemberOpener: vi.fn(),

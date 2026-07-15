@@ -9,6 +9,10 @@ import { estateJourneyHintForChat } from "@/lib/estateJourneyEngine/engine";
 import { estateJourneyIntelligenceHint } from "@/lib/estateJourneyEngine/intelligence";
 import { journeyReturnHintForChat } from "@/lib/estateJourneyEngine/returnExperience";
 import { formatRoomHistoryChain } from "@/lib/estateJourneyEngine/roomHistory";
+import {
+  contextualHelpMemoryHintForChat,
+  isContextualHelpSessionActive,
+} from "@/lib/conversationReset/contextualHelpSession";
 
 function formatDigest(memory: EstateMemory): string | null {
   const recent = memory.conversationDigest.slice(-6);
@@ -35,6 +39,14 @@ export function estateMemoryHintForChat(
   memory: EstateMemory | null = getEstateMemory(),
 ): string | null {
   if (!memory) return null;
+
+  /**
+   * Contextual Help (Ask Shari for Help / field help) — never inject prior
+   * digests or yesterday's thread into the help session.
+   */
+  if (isContextualHelpSessionActive()) {
+    return contextualHelpMemoryHintForChat();
+  }
 
   /**
    * After New Chat / New Day, digest and open loops are cleared.

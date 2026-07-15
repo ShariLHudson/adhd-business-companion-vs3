@@ -1,5 +1,5 @@
 /**
- * Bridge: Business Estate section help → existing companion chat.
+ * Bridge: Business Estate section help → isolated contextual help chat.
  * Keeps open/welcome/opener logic testable without mounting CompanionPageClient.
  */
 
@@ -10,10 +10,16 @@ import {
 } from "@/lib/profile/guidedFieldTypes";
 
 export type GuidedFieldHelpChatBridge = {
-  /** Show the existing Shari chat surface (overlay / panel). */
+  /**
+   * Suspend the prior conversation and mint a fresh help session ID
+   * before any welcome/opener messages are added.
+   */
+  beginFreshHelpSession: () => void;
+  /** Show the Shari help chat surface (overlay / panel). */
   openChat: () => void;
   /** Ensure estate room chat visibility flag is on when applicable. */
   ensureEstateChatVisible?: () => void;
+  /** Seed the fresh help thread (must not append onto prior messages). */
   appendAssistantWelcome: (text: string) => void;
   /** Send member opener through the shared handleSend pipeline. */
   sendMemberOpener: (text: string) => void;
@@ -21,8 +27,9 @@ export type GuidedFieldHelpChatBridge = {
 };
 
 /**
- * Opens one existing chat experience with field context.
+ * Opens a fresh contextual help conversation with field context.
  * Does not mutate profile answers or save progress.
+ * Caller must implement beginFreshHelpSession so prior threads stay suspended.
  */
 export function openGuidedFieldHelpChat(
   detail: GuidedFieldHelpRequest | null | undefined,
@@ -30,6 +37,7 @@ export function openGuidedFieldHelpChat(
 ): boolean {
   if (!detail?.helpMode || !detail.fieldPath) return false;
 
+  bridge.beginFreshHelpSession();
   bridge.openChat();
   bridge.ensureEstateChatVisible?.();
 

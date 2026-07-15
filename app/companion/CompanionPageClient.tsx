@@ -211,7 +211,13 @@ import {
 } from "@/lib/freshStartCopy";
 import { beginEstateJourneyNewDay } from "@/lib/estateJourneyEngine/session";
 import { clearDailySessionFlags } from "@/lib/freshStartSession";
-import { resetActiveConversation } from "@/lib/conversationReset";
+import {
+  beginContextualHelpSession,
+  endContextualHelpSession,
+  isContextualHelpSessionActive,
+  recoverContextualHelpSessionAfterRefresh,
+  resetActiveConversation,
+} from "@/lib/conversationReset";
 import { resetTodayPlanForNewDay, resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
   dismissPlanMyDayForSession,
@@ -1907,6 +1913,7 @@ import {
   getDailyContext,
 } from "@/lib/dailyContextEngine";
 import {
+  clearPendingGuidedFieldHelp,
   formatGuidedFieldHelpPrompt,
   readPendingGuidedFieldHelp,
 } from "@/lib/profile/guidedFieldHelp";
@@ -2186,6 +2193,8 @@ export default function CompanionPageClient() {
   const activeNavRef = useRef<SidebarNavId>("chat");
   activeNavRef.current = activeNav;
   const [messages, setMessages] = useState<Message[]>([]);
+  const messagesRef = useRef<Message[]>([]);
+  messagesRef.current = messages;
   const [directEstateVisit, setDirectEstateVisit] = useState<DirectEstateVisit | null>(
     null,
   );
@@ -2929,6 +2938,16 @@ export default function CompanionPageClient() {
   );
   const { scenePage, sceneSeed, clearMyMind, suppress: suppressGlobalBackground } =
     constitutionalRenderContext.globalBackground;
+
+  // If Help was open across refresh, reopen a fresh help thread — never yesterday's chat.
+  useEffect(() => {
+    if (!isContextualHelpSessionActive()) return;
+    const recovered = recoverContextualHelpSessionAfterRefresh();
+    if (!recovered) return;
+    activeConversationIdRef.current = recovered.helpConversationId;
+    setMessages([]);
+    setGuidedFieldHelpChatOpen(true);
+  }, []);
 
   // Hydrate prefs and memory — keep calm home empty; don't reopen past chats.
   useEffect(() => {
@@ -8107,7 +8126,7 @@ export default function CompanionPageClient() {
       setSettingsSection(null);
     }
     if (plan.clearGuidedFieldHelpChat) {
-      setGuidedFieldHelpChatOpen(false);
+      closeGuidedFieldHelpChat();
     }
     if (plan.clearBreathe && isBreatheDestinationActive(breatheDestination)) {
       if (breatheTransitionTimerRef.current) {
@@ -8700,18 +8719,53 @@ export default function CompanionPageClient() {
       window.removeEventListener(ADVISORY_INVITE_CHAMBER_EVENT, onAdvisoryInvite);
   }, []);
 
-  // Business Estate section help — open persistent Shari chat with field context
+  /**
+   * Close contextual Help: restore the suspended conversation and return to
+   * the same Business Estate / room place (overlay only — no navigation).
+   */
+  function closeGuidedFieldHelpChat() {
+    const ended = endContextualHelpSession();
+    clearPendingGuidedFieldHelp();
+    setGuidedFieldHelpChatOpen(false);
+    if (!ended) return;
+    setMessages(ended.restoredMessages);
+    activeConversationIdRef.current = ended.conversationId;
+    if (ended.restoredMessages.some((m) => m.role === "user")) {
+      saveConversation(ended.restoredMessages);
+    }
+  }
+
+  // Business Estate section help — fresh contextual help (never prior thread)
   useEffect(() => {
     function onGuidedFieldHelp(event: Event) {
       const detail = (event as CustomEvent<GuidedFieldHelpRequest>).detail;
       openGuidedFieldHelpChat(detail, {
+        beginFreshHelpSession: () => {
+          const begun = beginContextualHelpSession({
+            currentMessages: messagesRef.current.map((m) => ({
+              role: m.role,
+              content: m.content,
+            })),
+            place: {
+              roomEntryId: getEstateMemory().currentRoom?.entryId ?? null,
+              sectionId: detail?.sectionId ?? null,
+              fieldPath: detail?.fieldPath ?? null,
+              stepOrField: detail?.fieldKey ?? null,
+              question: detail?.question ?? null,
+            },
+            abortController: chatRequestAbortRef.current,
+            bumpRequestGeneration: () => {
+              chatRequestGenerationRef.current += 1;
+            },
+          });
+          chatRequestAbortRef.current = null;
+          activeConversationIdRef.current = begun.helpConversationId;
+          setMessages([]);
+        },
         openChat: () => setGuidedFieldHelpChatOpen(true),
         ensureEstateChatVisible: () => setEstateRoomChatVisible(true),
         appendAssistantWelcome: (text) => {
-          setMessages((prev) => [
-            ...prev,
-            { role: "assistant", content: text },
-          ]);
+          setMessages([{ role: "assistant", content: text }]);
         },
         sendMemberOpener: (opener) => {
           window.setTimeout(() => {
@@ -23496,7 +23550,7 @@ export default function CompanionPageClient() {
                     type="button"
                     className="guided-field-help-chat__close"
                     data-testid="guided-field-help-chat-close"
-                    onClick={() => setGuidedFieldHelpChatOpen(false)}
+                    onClick={() => closeGuidedFieldHelpChat()}
                   >
                     Back to your profile
                   </button>

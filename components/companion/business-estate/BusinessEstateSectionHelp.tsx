@@ -23,8 +23,9 @@ type Props = {
 
 /**
  * Section-scoped Shari help for Business Estate room chrome.
- * Help Me Answer / Research This open the existing companion chat via
+ * Help Me Answer / Research This open a fresh contextual help chat via
  * requestGuidedFieldHelp → GUIDED_FIELD_HELP_EVENT (CompanionPageClient).
+ * Prior conversations stay suspended until Help closes.
  */
 export function BusinessEstateSectionHelp({
   stage,
