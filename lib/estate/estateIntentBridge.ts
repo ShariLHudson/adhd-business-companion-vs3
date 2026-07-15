@@ -34,6 +34,7 @@ import {
 } from "@/lib/intentAwareConversation/routingGate";
 import type { CanonicalSuggestionProfile } from "./canonicalEstateRegistryTypes";
 import { isSubstantiveConversationHelpRequest } from "./substantiveConversationHelp";
+import { shouldBlockScenicOverwhelmMenu } from "@/lib/conversation/overwhelmNeedClassifier";
 
 /** Minimum confidence before a consumer may auto-route (never force below this). */
 export const ESTATE_INTENT_AUTO_ROUTE_CONFIDENCE = 0.7;
@@ -65,7 +66,7 @@ const QUIET_RE =
   /\b(?:quiet|peaceful|peace|calm|silence|stillness|somewhere quiet|need quiet|want quiet|hush)\b/i;
 
 const OVERWHELMED_RE =
-  /\b(?:overwhelm(?:ed|ing)?|too much|can'?t cope|drowning|fried|burnt?\s*out|shutdown)\b/i;
+  /\b(?:overwhelm(?:ed|ing)?|can'?t cope|drowning|fried|burnt?\s*out|shutdown)\b/i;
 
 const STRESSED_RE =
   /\b(?:stress(?:ed|ful)?|anxious|anxiety|tense|on edge|wound up|frazzled)\b/i;
@@ -349,6 +350,9 @@ function matchDescriptive(
 function matchEmotional(
   text: string,
 ): { placeIds: string[]; label: string } | null {
+  // Working-memory overload / task breakdown → Clear My Mind path, not scenic menus.
+  if (shouldBlockScenicOverwhelmMenu(text)) return null;
+
   for (const rule of EMOTIONAL_PROFILE_MAP) {
     if (!rule.pattern.test(text)) continue;
     const placeIds = suggestCanonicalPlacesForProfile(rule.profile).map(

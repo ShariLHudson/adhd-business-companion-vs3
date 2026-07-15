@@ -13,7 +13,7 @@ export type OverwhelmTodayRoute =
   | "brain_dump_primary";
 
 const BRAIN_DUMP_STRONG_RE =
-  /\b(?:brain (?:is )?spinning|thoughts everywhere|mind racing|need to dump|too many thoughts|get (?:this|it) out of my head|dump everything)\b/i;
+  /\b(?:brain (?:is )?spinning|thoughts everywhere|mind racing|need to dump|too many thoughts|get (?:this|it) out of my head|dump everything|too much on my (?:brain|mind|head)|have too much on my (?:brain|mind|head)|to remember it all|can'?t remember (?:everything|it all)|afraid i(?:'|’)(?:ll| will) forget|everything (?:feels? )?(?:jumbled|scattered)|mental clutter)\b/i;
 
 const ADAPT_TODAY_ADJUST_RE =
   /\b(?:my plan changed|need to adjust today|adjust(?:ing)? today|help adjusting|need to adapt(?: today)?)\b/i;
@@ -31,7 +31,7 @@ function isAdaptPrimaryRoute(text: string): boolean {
 }
 
 const START_TODAY_SIGNAL_RE =
-  /\b(?:not sure where to start|don'?t know (?:what to (?:work on|do) first|where to start)|where (?:do i |should i )?start|what (?:should i |do i )?(?:work on|do) first|too much to do|need help getting started|can'?t decide (?:what to work on|where to start)|not sure what to work on)\b/i;
+  /\b(?:not sure where to start|don'?t know (?:what to (?:work on|do) first|where to start|what(?: the)? (?:first )?step|the first step)|don'?t know where to begin|where (?:do i |should i )?start|what (?:should i |do i )?(?:work on|do) first|what step to take first|huge project|big project|too much to do|need help getting started|can'?t decide (?:what to work on|where to start)|not sure what to work on)\b/i;
 
 export const OVERWHELM_TODAY_STAY_HERE_GUIDANCE =
   "Let's start with one thing. What feels most urgent today? Offer a few concrete options if you know them from context — no recap, no relationship reflection.";

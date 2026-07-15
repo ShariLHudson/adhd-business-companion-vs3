@@ -51,13 +51,24 @@ const GOAL_SETS: readonly GoalSet[] = [
   },
   {
     patterns: [
-      /\b(?:overwhelm|overwhelmed|too much|can't keep up|drowning)\b/i,
+      // Cognitive unload — Clear My Mind only (not scenic multi-option menus).
+      /\b(?:too much on my (?:brain|mind|head)|to remember it all|can'?t remember (?:everything|it all)|mental clutter|brain dump|get (?:this|it) out of my (?:head|mind))\b/i,
+    ],
+    goalSummary: "clearing mental clutter",
+    capabilityIds: ["restore.clearmind"],
+    reasons: {
+      "restore.clearmind":
+        "Unload everything onto the page — no organizing required yet.",
+    },
+  },
+  {
+    patterns: [
+      /\b(?:overwhelm|overwhelmed|can't keep up|drowning)\b/i,
     ],
     goalSummary: "easing the overwhelm",
     capabilityIds: [
       "restore.clearmind",
       "focus.breathing",
-      "place.garden",
       "momentum.plan",
     ],
     reasons: {
@@ -65,8 +76,6 @@ const GOAL_SETS: readonly GoalSet[] = [
         "Unload everything onto the page — no organizing required yet.",
       "focus.breathing":
         "A gentle pause so your nervous system can catch up.",
-      "place.garden":
-        "Soft green space when everything feels loud inside.",
       "momentum.plan":
         "One humane next step when the whole list feels impossible.",
     },

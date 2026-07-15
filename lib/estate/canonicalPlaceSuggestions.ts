@@ -13,6 +13,10 @@ import type {
   CanonicalEstatePlace,
   CanonicalSuggestionProfile,
 } from "./canonicalEstateRegistryTypes";
+import {
+  shouldBlockScenicOverwhelmMenu,
+  wantsScenicCalmPlaces,
+} from "@/lib/conversation/overwhelmNeedClassifier";
 
 export const CANONICAL_PLACE_SUGGESTION_MAX = 3;
 
@@ -69,8 +73,9 @@ function isPhysicalQuietPlaceRequest(text: string): boolean {
 const QUIET_RE =
   /\b(?:quiet|peaceful|peace|calm|silence|stillness|somewhere quiet|need quiet|want quiet|hush|de-stress|destress)\b/i;
 
+/** Scenic overwhelm only — not cognitive unload / task breakdown. */
 const OVERWHELMED_RE =
-  /\b(?:overwhelm(?:ed|ing)?|too much|can'?t cope|drowning|fried|burnt?\s*out|shutdown)\b/i;
+  /\b(?:overwhelm(?:ed|ing)?|can'?t cope|drowning|fried|burnt?\s*out|shutdown)\b/i;
 
 const STRESSED_RE =
   /\b(?:stress(?:ed|ful)?|anxious|anxiety|tense|on edge|wound up|frazzled)\b/i;
@@ -131,6 +136,11 @@ export function detectCanonicalSuggestionProfile(
   const text = userText.trim();
   if (!text) return null;
 
+  // Cognitive unload / task breakdown must never open scenic place menus.
+  if (shouldBlockScenicOverwhelmMenu(text) && !wantsScenicCalmPlaces(text)) {
+    return null;
+  }
+
   if (
     isPlaceSuggestionRequest(text) ||
     isPhysicalQuietPlaceRequest(text) ||
@@ -141,6 +151,9 @@ export function detectCanonicalSuggestionProfile(
 
   for (const { profile, pattern } of PROFILE_DETECTORS) {
     if (profile === "quiet") continue;
+    if (profile === "overwhelmed" && shouldBlockScenicOverwhelmMenu(text)) {
+      continue;
+    }
     if (pattern.test(text)) return profile;
   }
 

@@ -100,7 +100,7 @@ export const SPARK_ESTATE_ROUTING_SUCCESS_TEST =
   "Spark understands what I need.";
 
 const CLEAR_MIND_RE =
-  /\b(?:too much in my head|everything in my head|clear my mind|brain dump|mind is everywhere|can'?t get it out of my head|need to sort my thoughts)\b/i;
+  /\b(?:too much (?:in|on) my (?:head|brain|mind)|everything in my head|clear my mind|brain dump|mind is everywhere|can'?t get it out of my head|need to sort my thoughts|to remember it all|can'?t remember (?:everything|it all))\b/i;
 
 const MOVE_FORWARD_RE =
   /\b(?:i'?m stuck|feel(?:ing)? stuck|\bstuck\b|need help getting started|don'?t know where to start|move forward|get unstuck|help me start)\b/i;

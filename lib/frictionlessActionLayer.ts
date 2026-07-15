@@ -220,6 +220,14 @@ import {
   shouldSuppressVisualRecommendation,
 } from "./visualThinkingGuards";
 import {
+  COGNITIVE_OVERLOAD_PRIMARY_LABEL,
+  COGNITIVE_OVERLOAD_REPLY,
+  COGNITIVE_OVERLOAD_STAY_LABEL,
+  TASK_BREAKDOWN_REPLY,
+  isCognitiveOverloadNeed,
+  isTaskBreakdownNeed,
+} from "./conversation/overwhelmNeedClassifier";
+import {
   buildVisualRecommendationReply,
   recommendVisualStructures,
   shouldOfferVisualRecommendation,
@@ -2582,21 +2590,41 @@ function buildSimpleOverwhelmOrganizeDecision(
   currentTurn: number,
   routing: IntentRoutingDecision,
 ): FrictionlessActionDecision {
+  const cognitive = isCognitiveOverloadNeed(userText);
+  const taskBreakdown = isTaskBreakdownNeed(userText);
   const offer = {
     section: "brain-dump" as const,
-    buttonLabel: "Clear My Mind",
-    line: "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind together?",
+    buttonLabel: cognitive
+      ? COGNITIVE_OVERLOAD_PRIMARY_LABEL
+      : "Clear My Mind",
+    line: cognitive
+      ? `${COGNITIVE_OVERLOAD_REPLY}\n\n1. ${COGNITIVE_OVERLOAD_PRIMARY_LABEL}\n2. ${COGNITIVE_OVERLOAD_STAY_LABEL}`
+      : taskBreakdown
+        ? TASK_BREAKDOWN_REPLY
+        : "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind together?",
+    ...(cognitive
+      ? {
+          secondary: {
+            section: "home" as const,
+            buttonLabel: COGNITIVE_OVERLOAD_STAY_LABEL,
+          },
+        }
+      : {}),
   };
   const plainOverwhelm =
     /\b(?:i'?m\s+)?overwhelmed\b/i.test(userText.trim()) &&
     !/\btoo many ideas\b/i.test(userText);
   return {
-    category: plainOverwhelm ? "direct_action" : "none",
+    category:
+      cognitive || taskBreakdown || plainOverwhelm ? "direct_action" : "none",
     suppressRelationship: true,
     suppressRecap: true,
     suppressReflectionFirst: true,
-    responseHint:
-      "OVERWHELM (P0.20.3): Route to Clear My Mind — never Visual Thinking.",
+    responseHint: cognitive
+      ? "COGNITIVE OVERLOAD: Clear My Mind only — never scenic place menus."
+      : taskBreakdown
+        ? "TASK BREAKDOWN: Ask about the project / first step — never scenic place menus."
+        : "OVERWHELM (P0.20.3): Route to Clear My Mind — never Visual Thinking.",
     localReply: offer.line,
     pendingAction: frictionlessPendingFromWorkspaceOffer(offer, currentTurn, {
       userText,
@@ -2668,6 +2696,21 @@ function tryEarlyCompanionSupportFlow(
 
   const audio = buildAudioPending(userText, currentTurn);
   if (audio) return audio;
+
+  // Cognitive overload / task breakdown win before scenic multi-destination menus.
+  if (
+    isCognitiveOverloadNeed(userText) &&
+    !shouldDeferEarlyOverwhelmRoute(userText, input.lastAssistantText)
+  ) {
+    return buildSimpleOverwhelmOrganizeDecision(userText, currentTurn, routing);
+  }
+
+  if (
+    isTaskBreakdownNeed(userText) &&
+    !shouldDeferEarlyOverwhelmRoute(userText, input.lastAssistantText)
+  ) {
+    return buildSimpleOverwhelmOrganizeDecision(userText, currentTurn, routing);
+  }
 
   if (
     !shouldDeferEarlyOverwhelmRoute(userText, input.lastAssistantText) &&
