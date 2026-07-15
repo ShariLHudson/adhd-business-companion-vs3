@@ -3,7 +3,7 @@ export const CHAT_INPUT_PLACEHOLDERS = [
   "Say whatever's true.",
   "What would help most right now?",
   "No rush. I'm here.",
-  "Let's start with one small thing.",
+  "Or tell me what you need today…",
 ] as const;
 
 /** Stable inviting placeholder — rotates gently by day, not every keystroke. */

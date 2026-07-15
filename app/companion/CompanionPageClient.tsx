@@ -243,6 +243,8 @@ import {
   markDailyOpeningPresented,
   markTodaysWelcomeDismissedThisSession,
   isTodaysWelcomeDismissedThisSession,
+  filterLegacyDailyOpeningMessages,
+  isSupersededWelcomeHomeGreeting,
   GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER,
   type DailyOpeningEntryPoint,
   type GlobalDailyOpeningResult,
@@ -2826,8 +2828,14 @@ export default function CompanionPageClient() {
     hydrated,
   ]);
 
-  const welcomeHomeDisplayMessage =
+  const welcomeHomeDisplayMessageRaw =
     welcomeHomeDaily.preferredWelcomeMessage ?? welcomeHomeGreeting;
+  /** Never surface retired plain-text openings as Welcome Home chat copy. */
+  const welcomeHomeDisplayMessage =
+    welcomeHomeDisplayMessageRaw &&
+    !isSupersededWelcomeHomeGreeting(welcomeHomeDisplayMessageRaw)
+      ? welcomeHomeDisplayMessageRaw
+      : null;
 
   const [welcomeHomeDiscoveryReady, setWelcomeHomeDiscoveryReady] =
     useState(false);
@@ -3309,6 +3317,15 @@ export default function CompanionPageClient() {
     useState<DailyOpeningEntryPoint | null>(null);
   const estateChatScrollKey = `${freshStartRevision}-${messages.length}-${isLoading ? 1 : 0}`;
 
+  // Strip retired plain-text daily openings from chat history (keep real talk).
+  useEffect(() => {
+    if (!hydrated) return;
+    setMessages((prev) => {
+      const next = filterLegacyDailyOpeningMessages(prev);
+      return next.length === prev.length ? prev : next;
+    });
+  }, [hydrated, messages]);
+
   // Today's Welcome Card — always present on quiet Welcome Home arrival.
   // First-of-day / absence → full New Day reset. Otherwise soft-present the card
   // (fixes empty local UI when the calendar day was already marked in localStorage).
@@ -3355,6 +3372,24 @@ export default function CompanionPageClient() {
     globalDailyOpening,
     messages,
   ]);
+
+  /** Never fall back to plain-text opening while Welcome Home is quiet. */
+  const welcomeHomeQuietForDailyOpening =
+    welcomeHomePrimary &&
+    !welcomeHomeExperience.showIntro &&
+    !isTodaysWelcomeDismissedThisSession() &&
+    !messages.some((m) => m.role === "user");
+
+  const todaysWelcomeOpening = useMemo(() => {
+    if (globalDailyOpening) return globalDailyOpening;
+    if (!welcomeHomeQuietForDailyOpening) return null;
+    return resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
+  }, [globalDailyOpening, welcomeHomeQuietForDailyOpening]);
+
+  const welcomeHomeVisibleMessages = useMemo(
+    () => filterLegacyDailyOpeningMessages(messages),
+    [messages],
+  );
 
   const estateChatInputFocusEnabled =
     hydrated &&
@@ -7217,8 +7252,12 @@ export default function CompanionPageClient() {
   }
 
   function handleGlobalDailyOpeningChoice(choiceId: DailyOpeningChoiceId) {
-    if (!globalDailyOpening) return;
-    const action = resolveDailyOpeningChoiceAction(choiceId, globalDailyOpening);
+    const opening =
+      globalDailyOpening ??
+      todaysWelcomeOpening ??
+      resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
+    if (!globalDailyOpening) setGlobalDailyOpening(opening);
+    const action = resolveDailyOpeningChoiceAction(choiceId, opening);
     if (action.kind === "show-help-me-choose") {
       setDailyOpeningHelpSuggestions(action.suggestions.slice(0, 3));
       return;
@@ -7232,20 +7271,26 @@ export default function CompanionPageClient() {
 
   function handleGlobalDailyDiscoveryLearn() {
     markDailyOpeningDiscoveryPresented();
-    if (!globalDailyOpening) return;
+    const opening =
+      globalDailyOpening ??
+      todaysWelcomeOpening ??
+      resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
     setGlobalDailyOpening({
-      ...globalDailyOpening,
-      discovery: { ...globalDailyOpening.discovery, show: false },
+      ...opening,
+      discovery: { ...opening.discovery, show: false },
     });
     handleWelcomeHomeDiscoveryInvite();
   }
 
   function handleGlobalDailyDiscoveryDismiss() {
     markDailyOpeningDiscoveryPresented();
-    if (!globalDailyOpening) return;
+    const opening =
+      globalDailyOpening ??
+      todaysWelcomeOpening ??
+      resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
     setGlobalDailyOpening({
-      ...globalDailyOpening,
-      discovery: { ...globalDailyOpening.discovery, show: false },
+      ...opening,
+      discovery: { ...opening.discovery, show: false },
     });
   }
 
@@ -22037,18 +22082,17 @@ export default function CompanionPageClient() {
                 experience={welcomeHomeExperience}
                 onIntroComplete={finishWelcomeHomeIntro}
                 onIntroActiveChange={setWelcomeHomeIntroActive}
-                welcomeMessage={
-                  globalDailyOpening ? null : welcomeHomeDisplayMessage
-                }
+                welcomeMessage={todaysWelcomeOpening ? null : welcomeHomeDisplayMessage}
                 showWelcomeLine={
-                  messages.length === 0 &&
                   !isLoading &&
                   Boolean(
-                    globalDailyOpening || welcomeHomeDisplayMessage,
+                    todaysWelcomeOpening ||
+                      (welcomeHomeVisibleMessages.length === 0 &&
+                        welcomeHomeDisplayMessage),
                   )
                 }
                 welcomeSlot={
-                  globalDailyOpening && !isLoading && messages.length === 0 ? (
+                  todaysWelcomeOpening && !isLoading ? (
                     dailyOpeningHelpSuggestions ? (
                       <TodaysWelcomeCard
                         mode="help-me-choose"
@@ -22059,10 +22103,10 @@ export default function CompanionPageClient() {
                     ) : (
                       <TodaysWelcomeCard
                         mode="main"
-                        welcomeMessage={globalDailyOpening.welcomeMessage}
-                        teachingSentence={globalDailyOpening.teachingSentence}
-                        choiceCards={globalDailyOpening.choiceCards}
-                        discovery={globalDailyOpening.discovery}
+                        welcomeMessage={todaysWelcomeOpening.welcomeMessage}
+                        teachingSentence={todaysWelcomeOpening.teachingSentence}
+                        choiceCards={todaysWelcomeOpening.choiceCards}
+                        discovery={todaysWelcomeOpening.discovery}
                         onSelect={handleGlobalDailyOpeningChoice}
                         onDiscoveryPrimary={handleGlobalDailyDiscoveryLearn}
                         onDiscoveryDismiss={handleGlobalDailyDiscoveryDismiss}
@@ -22070,14 +22114,16 @@ export default function CompanionPageClient() {
                     )
                   ) : undefined
                 }
-                showConversation={messages.length > 0 || isLoading}
-                conversationScrollKey={`${messages.length}-${isLoading ? 1 : 0}`}
+                showConversation={
+                  welcomeHomeVisibleMessages.length > 0 || isLoading
+                }
+                conversationScrollKey={`${welcomeHomeVisibleMessages.length}-${isLoading ? 1 : 0}`}
                 inputRef={inputRef}
                 registerBack={registerBack}
                 thread={
                   <>
                     <SimpleChat
-                      messages={messages}
+                      messages={welcomeHomeVisibleMessages}
                       stateHint={stateHint}
                       showHint={false}
                       hideEmptyState
@@ -22096,12 +22142,12 @@ export default function CompanionPageClient() {
                     welcomeHome
                     homeCalm={false}
                     className={
-                      globalDailyOpening
+                      todaysWelcomeOpening
                         ? "todays-welcome-card__input-secondary"
                         : undefined
                     }
                     homeChatPlaceholder={
-                      globalDailyOpening
+                      todaysWelcomeOpening
                         ? GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER
                         : homeArrival?.chatPlaceholder
                     }

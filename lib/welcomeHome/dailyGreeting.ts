@@ -14,7 +14,7 @@ const MORNING_LINES = [
 const RETURN_LINES = [
   "Welcome back.",
   "What feels most important today?",
-  "I'm glad you're here. What would help most today?",
+  "I'm glad you're here.",
 ] as const;
 
 const PRESENCE_ONLY = "I'm here whenever you're ready." as const;

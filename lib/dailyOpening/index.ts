@@ -32,3 +32,9 @@ export {
   markTodaysWelcomeDismissedThisSession,
   clearTodaysWelcomeSessionDismissForTests,
 } from "./todaysWelcomeSession";
+export {
+  TODAYS_WELCOME_CARD_VERSION,
+  isLegacyDailyOpeningCopy,
+  filterLegacyDailyOpeningMessages,
+  isSupersededWelcomeHomeGreeting,
+} from "./legacyDailyOpeningGuard";

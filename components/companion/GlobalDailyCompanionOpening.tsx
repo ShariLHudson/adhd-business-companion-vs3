@@ -6,6 +6,7 @@ import type {
   DailyOpeningDiscoveryInvite,
   HelpMeChooseSuggestion,
 } from "@/lib/dailyOpening";
+import { TODAYS_WELCOME_CARD_VERSION } from "@/lib/dailyOpening";
 
 type MainProps = {
   mode: "main";
@@ -41,6 +42,7 @@ export function TodaysWelcomeCard(props: Props) {
       <section
         className="global-daily-opening todays-welcome-card"
         data-testid="todays-welcome-card"
+        data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
         data-mode="help-me-choose"
         aria-label="Help me choose"
       >
@@ -96,6 +98,7 @@ export function TodaysWelcomeCard(props: Props) {
     <section
       className="global-daily-opening todays-welcome-card"
       data-testid="todays-welcome-card"
+      data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
       data-mode="main"
       aria-label="Today's Welcome Card"
     >

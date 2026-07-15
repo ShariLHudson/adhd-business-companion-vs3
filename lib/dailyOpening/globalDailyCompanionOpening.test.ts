@@ -273,16 +273,40 @@ describe("GlobalDailyCompanionOpening — wiring contracts", () => {
     expect(source).toContain("TodaysWelcomeCard");
     expect(source).not.toContain("<WelcomeHomeDailyChoices");
     expect(source).toContain("GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER");
+    expect(source).toContain("filterLegacyDailyOpeningMessages");
+    expect(source).toContain("isSupersededWelcomeHomeGreeting");
+    expect(source).toContain("todaysWelcomeOpening");
+    expect(source).toContain("welcomeHomeVisibleMessages");
     expect(source).toMatch(
       /setGlobalDailyOpening\(result\.opening\)[\s\S]*?setMessages\(\[\]\)/,
     );
     expect(source).toContain("buildDailyOpeningArrivalMessage");
     expect(component).toContain('data-testid="todays-welcome-card"');
+    expect(component).toContain('data-daily-opening-version=');
     expect(component).toContain("Recommended Today");
     expect(component).toContain("global-daily-opening__card--recommended");
     expect(component).toContain("Back to Today");
     expect(component).toContain('data-testid="global-daily-discovery"');
     expect(component).not.toMatch(/Help Me Restart|Check My Day/);
+  });
+
+  it("never falls back to the retired plain-text opening strings", () => {
+    const { readFileSync } = require("node:fs") as typeof import("node:fs");
+    const { resolve } = require("node:path") as typeof import("node:path");
+    const source = readFileSync(
+      resolve(process.cwd(), "app/companion/CompanionPageClient.tsx"),
+      "utf8",
+    );
+    const retired = [
+      "Help Me Restart",
+      "Check My Day",
+      "What would help most today?",
+      "I also have a new discovery waiting",
+      "Let's start with one small thing.",
+    ];
+    for (const phrase of retired) {
+      expect(source).not.toContain(phrase);
+    }
   });
 
   it("CSS provides readable cards and focus/hover states", () => {

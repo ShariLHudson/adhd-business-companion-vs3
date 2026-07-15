@@ -73,6 +73,19 @@ describe("resolveWelcomeHomeDailyChoices (retired choice list)", () => {
     expect(result.visitorKind).toBe("absence");
     expect(result.choices).toEqual([]);
     expect(result.discoveryInvitation.show).toBe(false);
+    expect(result.preferredWelcomeMessage ?? "").not.toMatch(
+      /What would help most today/i,
+    );
+  });
+
+  it("returning soft greeting never uses the retired prompt", () => {
+    const result = resolveWelcomeHomeDailyChoices({
+      experienceVisitorKind: "returning",
+      existingGreeting: null,
+    });
+    expect(result.preferredWelcomeMessage ?? "").not.toMatch(
+      /What would help most today|Help Me Restart|Check My Day/i,
+    );
   });
 
   it("continueDestinationAvailable mirrors resolution modes", () => {

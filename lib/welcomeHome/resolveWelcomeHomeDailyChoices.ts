@@ -133,19 +133,19 @@ function buildPreferredMessage(
 
   if (visitorKind === "absence") {
     return name
-      ? `Welcome back, ${name}. I'm glad you're here. We don't need to catch up on everything that happened while you were away. Let's look at what matters now.`
-      : "Welcome back. I'm glad you're here. We don't need to catch up on everything that happened while you were away. Let's look at what matters now.";
+      ? `Welcome home, ${name}. Your work is still here, and we do not need to catch up on everything today.`
+      : "Welcome home. Your work is still here, and we do not need to catch up on everything today.";
   }
 
   if (continuity) {
     return name
-      ? `Welcome back, ${name}. Last time we were working on ${continuity}. Would you like to continue there, clear your mind, or look at what matters today?`
-      : `Welcome back. Last time we were working on ${continuity}. Would you like to continue there, clear your mind, or look at what matters today?`;
+      ? `Welcome back, ${name}. Last time we were working on ${continuity}.`
+      : `Welcome back. Last time we were working on ${continuity}.`;
   }
 
   return name
-    ? `Welcome back, ${name}. I'm glad you're here. What would help most today?`
-    : "Welcome back. I'm glad you're here. What would help most today?";
+    ? `Welcome back, ${name}. I'm glad you're here.`
+    : "Welcome back. I'm glad you're here.";
 }
 
 function buildChoices(
