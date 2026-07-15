@@ -38,6 +38,9 @@ describe("Parking Lot loading states", () => {
     expect(panel).toContain('data-testid="parking-lot-error"');
     expect(panel).toContain("Try Again");
     expect(panel).toContain("I couldn’t load your Parking Lot just now.");
-    expect(panel).toContain("4000");
+    expect(panel).toContain("readParkingLotSafely");
+    expect(panel).toContain("parkInFlightRef");
+    expect(panel).toContain("parking-lot-park-confirm");
+    expect(panel).toContain("2500");
   });
 });

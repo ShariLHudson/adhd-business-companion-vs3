@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ParkingLotRoomShell } from "@/components/companion/ParkingLotRoomShell";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import {
@@ -34,6 +34,28 @@ const BTN_SECONDARY =
   "rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-sm font-semibold text-[#4b463f] hover:bg-[#f5f0ea]";
 const BTN_TEAL_SOFT =
   "rounded-xl border border-[#1e4f4f]/40 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10";
+
+type LoadState = "loading" | "ready" | "error";
+
+function readParkingLotSafely(): {
+  items: PlanDayItem[];
+  loadState: LoadState;
+  loadError: string | null;
+} {
+  try {
+    return {
+      items: readPlanningParkingLotItems(),
+      loadState: "ready",
+      loadError: null,
+    };
+  } catch {
+    return {
+      items: [],
+      loadState: "error",
+      loadError: "I couldn’t load your Parking Lot just now.",
+    };
+  }
+}
 
 function ParkingLotHowDoI() {
   const [open, setOpen] = useState(false);
@@ -259,24 +281,19 @@ export function ParkingLotRoomPanel({
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
 }) {
+  const initial = readParkingLotSafely();
   const [text, setText] = useState("");
-  const [items, setItems] = useState<PlanDayItem[]>([]);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [loadState, setLoadState] = useState<"loading" | "ready" | "error">(
-    "loading",
-  );
+  const [items, setItems] = useState<PlanDayItem[]>(initial.items);
+  const [loadError, setLoadError] = useState<string | null>(initial.loadError);
+  const [loadState, setLoadState] = useState<LoadState>(initial.loadState);
+  const [parkNotice, setParkNotice] = useState<string | null>(null);
+  const parkInFlightRef = useRef(false);
 
   const loadItems = useCallback(() => {
-    try {
-      const next = readPlanningParkingLotItems();
-      setItems(next);
-      setLoadError(null);
-      setLoadState("ready");
-    } catch {
-      setItems([]);
-      setLoadError("I couldn’t load your Parking Lot just now.");
-      setLoadState("error");
-    }
+    const next = readParkingLotSafely();
+    setItems(next.items);
+    setLoadError(next.loadError);
+    setLoadState(next.loadState);
   }, []);
 
   useEffect(() => {
@@ -304,20 +321,31 @@ export function ParkingLotRoomPanel({
         setLoadError("I couldn’t load your Parking Lot just now.");
         return "error";
       });
-    }, 4000);
+    }, 2500);
     return () => window.clearTimeout(failsafe);
   }, [loadState]);
 
   function parkIt() {
+    if (parkInFlightRef.current) return;
     const trimmed = text.trim();
     if (!trimmed) return;
+    parkInFlightRef.current = true;
     try {
-      addParkingLotItem({ title: trimmed, source: "manual" });
+      const created = addParkingLotItem({ title: trimmed, source: "manual" });
+      if (!created) {
+        setLoadError("I couldn’t load your Parking Lot just now.");
+        setLoadState("error");
+        return;
+      }
       setText("");
+      setParkNotice("Parked. It will wait here until you are ready.");
+      window.setTimeout(() => setParkNotice(null), 2800);
       loadItems();
     } catch {
       setLoadError("I couldn’t load your Parking Lot just now.");
       setLoadState("error");
+    } finally {
+      parkInFlightRef.current = false;
     }
   }
 
@@ -375,6 +403,15 @@ export function ParkingLotRoomPanel({
                 data-testid="parking-lot-field-text"
               />
             </label>
+            {parkNotice ? (
+              <p
+                className="text-sm italic text-[#1e4f4f]"
+                role="status"
+                data-testid="parking-lot-park-confirm"
+              >
+                {parkNotice}
+              </p>
+            ) : null}
             <button
               type="submit"
               className={BTN_PRIMARY}
