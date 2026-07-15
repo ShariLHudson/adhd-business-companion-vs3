@@ -9,6 +9,7 @@ export {
   getChatBackdropImageUrl,
   getClearMyMindBackdropId,
   getClearMyMindBackdropImageUrl,
+  clearRoomBackdropOverride,
   getRoomBackdropImageUrl,
   getRoomBackdropOverrideId,
   getStoredChatBackdropId,

@@ -198,6 +198,15 @@ export function setRoomBackdropOverride(roomId: string, optionId: string): void 
   writeRoomOverrides(overrides);
 }
 
+/** Remove a room-specific photograph override (e.g. Return to Estate → Welcome Home plate). */
+export function clearRoomBackdropOverride(roomId: string): void {
+  if (!roomId) return;
+  const overrides = readRoomOverrides();
+  if (!(roomId in overrides)) return;
+  delete overrides[roomId];
+  writeRoomOverrides(overrides);
+}
+
 export function getRoomBackdropImageUrl(roomId: string): string | null {
   const id = getRoomBackdropOverrideId(roomId);
   if (!id) return null;
