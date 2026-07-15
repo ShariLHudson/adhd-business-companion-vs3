@@ -1,10 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
+  EVIDENCE_VAULT_BEGIN_DISCOVERY_LABEL,
   EVIDENCE_VAULT_DOOR_ACTION_LABEL,
   EVIDENCE_VAULT_KEY_INVITATION,
+  EVIDENCE_VAULT_LEARN_WHY_BODY,
+  EVIDENCE_VAULT_LEARN_WHY_LABEL,
+  EVIDENCE_VAULT_WHAT_IT_IS,
+  EVIDENCE_VAULT_WHY_LOCKED,
 } from "@/lib/estate/evidenceVaultExperience";
 import { EVIDENCE_VAULT_UNLOCK_MS } from "@/lib/estate/evidenceVaultDoor";
 import { EvidenceVaultKey } from "./EvidenceVaultKey";
@@ -21,6 +26,7 @@ type Props = {
 export function VaultKeyInteraction({ phase, onUnlock }: Props) {
   const keyRef = useRef<HTMLButtonElement>(null);
   const reduceMotion = useReducedMotion();
+  const [showWhy, setShowWhy] = useState(false);
   const ready = phase === "ready";
   const unlocking = phase === "unlocking";
   const visible = phase === "ready" || phase === "unlocking";
@@ -120,7 +126,7 @@ export function VaultKeyInteraction({ phase, onUnlock }: Props) {
         />
       ) : null}
 
-      <p
+      <div
         id="evidence-vault-key-invite"
         className={[
           "vault-key-interaction__invite",
@@ -128,9 +134,47 @@ export function VaultKeyInteraction({ phase, onUnlock }: Props) {
         ]
           .filter(Boolean)
           .join(" ")}
+        data-testid="evidence-vault-locked-copy"
       >
-        {EVIDENCE_VAULT_KEY_INVITATION}
-      </p>
+        <p className="vault-key-interaction__invite-lead">
+          {EVIDENCE_VAULT_WHAT_IT_IS}
+        </p>
+        <p className="vault-key-interaction__invite-why">
+          {EVIDENCE_VAULT_WHY_LOCKED}
+        </p>
+        {showWhy ? (
+          <p
+            className="vault-key-interaction__invite-why-body"
+            data-testid="evidence-vault-learn-why-body"
+          >
+            {EVIDENCE_VAULT_LEARN_WHY_BODY}
+          </p>
+        ) : null}
+        {ready ? (
+          <div className="vault-key-interaction__actions mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
+              onClick={() => {
+                if (!ready) return;
+                onUnlock();
+              }}
+              data-testid="evidence-vault-begin-discovery"
+            >
+              {EVIDENCE_VAULT_BEGIN_DISCOVERY_LABEL}
+            </button>
+            <button
+              type="button"
+              className="rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-2 text-sm font-semibold text-[#1f1c19]"
+              onClick={() => setShowWhy((v) => !v)}
+              data-testid="evidence-vault-learn-why"
+            >
+              {EVIDENCE_VAULT_LEARN_WHY_LABEL}
+            </button>
+          </div>
+        ) : null}
+        <span className="sr-only">{EVIDENCE_VAULT_KEY_INVITATION}</span>
+      </div>
     </div>
   );
 }

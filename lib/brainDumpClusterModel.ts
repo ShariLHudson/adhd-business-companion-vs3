@@ -317,6 +317,9 @@ export type ThemeSummary = {
   explanation: string;
 };
 
+/** Alias for Clear My Mind theme contracts. */
+export type ThemeResult = ThemeSummary;
+
 /** Build a theme only from meaningful categories — never "Other" or raw Markdown. */
 export function buildThemeSummary(
   subCounts: Map<string, number>,
