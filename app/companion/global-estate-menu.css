@@ -505,6 +505,45 @@
   background: rgba(255, 255, 255, 0.1) !important;
 }
 
+/*
+ * Color mode live preview — light mockup inside dark Settings.
+ * Global cream-text overrides must not apply here (pastel tint + cream = unreadable).
+ */
+.modal-sheet--estate-dark .settings-panel .settings-color-mode-preview {
+  color: #2d2926;
+}
+
+.modal-sheet--estate-dark .settings-panel .settings-color-mode-preview :is(
+  p,
+  span,
+  button,
+  div,
+  li,
+  strong,
+  small,
+  label
+) {
+  color: #2d2926 !important;
+}
+
+.modal-sheet--estate-dark
+  .settings-panel
+  .settings-color-mode-preview
+  .settings-color-mode-preview__eyebrow,
+.modal-sheet--estate-dark
+  .settings-panel
+  .settings-color-mode-preview
+  .settings-color-mode-preview__muted {
+  color: #4b463f !important;
+}
+
+.modal-sheet--estate-dark
+  .settings-panel
+  .settings-color-mode-preview
+  .settings-color-mode-preview__chip-label {
+  color: #2d2926 !important;
+}
+
 /* Appearance (Background) option cards — match dark Settings buttons */
 .modal-sheet--estate-dark .settings-panel .settings-appearance-option {
   color: rgba(255, 248, 235, 0.98) !important;

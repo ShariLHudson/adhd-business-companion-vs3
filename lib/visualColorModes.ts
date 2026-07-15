@@ -33,7 +33,11 @@ export const VISUAL_COLOR_OPTIONS: {
   },
 ];
 
-/** Companion modes — soft rainbow shifts with context (dynamic preview). */
+/**
+ * Companion modes — soft rainbow shifts with context (dynamic preview).
+ * Colors/tints match adaptive theme tokens so the preview mirrors the live app.
+ * Readability comes from dark preview ink (not pastel-on-pastel titles).
+ */
 export const DYNAMIC_MODE_SWATCHES = [
   { id: "support", label: "Blue", color: "#5B8FC9", tint: "#E8F0F8" },
   { id: "recovery", label: "Soft Purple", color: "#9B87C4", tint: "#F2EFF8" },

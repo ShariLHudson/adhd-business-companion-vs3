@@ -13,13 +13,13 @@ import { activeColorModeProofLabel } from "@/lib/visualColorCoding";
 const CARD =
   "settings-appearance-option w-full rounded-[0.65rem] border border-[rgba(255,248,235,0.2)] bg-[rgba(255,255,255,0.05)] p-4 text-left text-[rgba(255,248,235,0.98)] transition-colors";
 
-const LABEL =
-  "text-sm font-bold uppercase tracking-wide text-[rgba(255,236,200,0.72)]";
-
 type Props = {
   current: VisualMode;
   onSave: (mode: VisualMode) => void;
 };
+
+const PREVIEW_SHELL =
+  "settings-color-mode-preview mt-3 overflow-hidden rounded-xl border border-[#cfc6ba]";
 
 function DynamicPreview() {
   const [index, setIndex] = useState(0);
@@ -33,42 +33,47 @@ function DynamicPreview() {
   }, []);
 
   return (
-    <div className="mt-3 overflow-hidden rounded-xl border border-[#d4cdc3]">
+    <div
+      className={PREVIEW_SHELL}
+      data-testid="settings-color-mode-preview"
+      data-preview-mode="decorative"
+    >
       <div
         className="px-4 py-5 transition-colors duration-500"
         style={{ backgroundColor: active.tint }}
       >
-        <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+        <p className="settings-color-mode-preview__eyebrow text-xs font-bold uppercase tracking-wide">
           Adaptive · soft rainbow
         </p>
-        <p
-          className="mt-2 text-lg font-semibold transition-colors duration-500"
-          style={{ color: active.color }}
-        >
+        <p className="mt-2 text-lg font-semibold text-[#2d2926]">
           {active.label} right now
         </p>
         <div
-          className="mt-3 rounded-lg border px-3 py-2.5 transition-colors duration-500"
+          className="mt-3 rounded-lg border border-[#d4cdc3] px-3 py-2.5 transition-colors duration-500"
           style={{
             borderLeftWidth: 4,
             borderLeftColor: active.color,
-            backgroundColor: "rgba(255,255,255,0.75)",
+            backgroundColor: "rgba(255,255,255,0.88)",
           }}
         >
-          <p className="text-sm font-medium text-[#3d3630]">Sample workspace row</p>
-          <p className="mt-0.5 text-xs text-[#6b635a]">
+          <p className="text-sm font-medium text-[#2d2926]">Sample workspace row</p>
+          <p className="settings-color-mode-preview__muted mt-0.5 text-xs">
             Accent color follows {active.label.toLowerCase()}, not the category.
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-1 border-t border-[#e7dfd4] bg-white p-2 sm:grid-cols-7">
+      <div className="grid grid-cols-4 gap-1 border-t border-[#d4cdc3] bg-[#f0ebe3] p-2 sm:grid-cols-7">
         {DYNAMIC_MODE_SWATCHES.map((m, i) => (
           <button
             key={m.id}
             type="button"
             onClick={() => setIndex(i)}
+            aria-pressed={i === index}
+            aria-label={`Preview ${m.label}`}
             className={`rounded-lg px-1 py-2 text-center transition-all ${
-              i === index ? "ring-2 ring-[#1e4f4f]/40" : "opacity-60 hover:opacity-90"
+              i === index
+                ? "ring-2 ring-[#1e4f4f]/55"
+                : "opacity-90 hover:opacity-100"
             }`}
             style={{ backgroundColor: m.tint }}
           >
@@ -77,7 +82,7 @@ function DynamicPreview() {
               style={{ backgroundColor: m.color }}
               aria-hidden="true"
             />
-            <span className="block text-[10px] font-semibold leading-tight text-[#3d3630]">
+            <span className="settings-color-mode-preview__chip-label block text-[10px] font-semibold leading-tight">
               {m.label}
             </span>
           </button>
@@ -89,25 +94,26 @@ function DynamicPreview() {
 
 function MeaningPreview() {
   return (
-    <div className="mt-3 overflow-hidden rounded-xl border border-[#d4cdc3] bg-[#faf7f2] px-4 py-5">
-      <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+    <div
+      className={`${PREVIEW_SHELL} bg-[#f0ebe3] px-4 py-5`}
+      data-testid="settings-color-mode-preview"
+      data-preview-mode="meaning"
+    >
+      <p className="settings-color-mode-preview__eyebrow text-xs font-bold uppercase tracking-wide">
         Category · same color every time
       </p>
-      <p className="mt-1 text-sm text-[#4b463f]">
+      <p className="settings-color-mode-preview__muted mt-1 text-sm">
         Projects are always teal. Focus is always blue. Scan by color, not label.
       </p>
       <div className="mt-3 space-y-1.5">
         {MEANING_CATEGORY_SWATCHES.map((cat) => (
           <div
             key={cat.label}
-            className="flex items-center gap-2 rounded-lg border border-[#e7dfd4] bg-white px-3 py-2"
+            className="flex items-center gap-2 rounded-lg border border-[#d4cdc3] bg-white px-3 py-2"
             style={{ borderLeftWidth: 4, borderLeftColor: cat.color }}
           >
-            <span className="text-sm font-medium text-[#3d3630]">{cat.label}</span>
-            <span
-              className="ml-auto text-xs font-semibold"
-              style={{ color: cat.color }}
-            >
+            <span className="text-sm font-medium text-[#2d2926]">{cat.label}</span>
+            <span className="settings-color-mode-preview__muted ml-auto text-xs font-semibold">
               fixed
             </span>
           </div>
@@ -119,21 +125,27 @@ function MeaningPreview() {
 
 function NonePreview() {
   return (
-    <div className="mt-3 rounded-xl border border-[#d4cdc3] bg-white px-4 py-5">
-      <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+    <div
+      className={`${PREVIEW_SHELL} bg-[#f0ebe3] px-4 py-5`}
+      data-testid="settings-color-mode-preview"
+      data-preview-mode="off"
+    >
+      <p className="settings-color-mode-preview__eyebrow text-xs font-bold uppercase tracking-wide">
         Minimal · clean and neutral
       </p>
       <div className="mt-3 space-y-1.5">
         {["Projects", "Focus", "Planning"].map((label) => (
           <div
             key={label}
-            className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2 text-sm text-[#3d3630]"
+            className="rounded-lg border border-[#d4cdc3] bg-white px-3 py-2 text-sm text-[#2d2926]"
           >
             {label}
           </div>
         ))}
       </div>
-      <p className="mt-2 text-sm text-[#6b635a]">No color coding — text and layout only.</p>
+      <p className="settings-color-mode-preview__muted mt-2 text-sm">
+        No color coding — text and layout only.
+      </p>
     </div>
   );
 }
@@ -158,7 +170,6 @@ export function VisualColorModePicker({ current, onSave }: Props) {
     return () => window.clearTimeout(id);
   }, [savedFlash]);
 
-  const previewOption = VISUAL_COLOR_OPTIONS.find((o) => o.id === draft);
   const dirty = draft !== current;
 
   function save() {
@@ -252,16 +263,11 @@ export function VisualColorModePicker({ current, onSave }: Props) {
       </div>
 
       <div aria-live="polite">
-        <p className="text-sm text-[rgba(255,236,200,0.72)]">
-          What you&apos;re seeing below is an example of how the app would look using
-          the selected color mode.
+        <p className="text-sm font-semibold text-[rgba(255,248,235,0.98)]">Preview</p>
+        <p className="mt-1 text-sm text-[rgba(255,236,200,0.78)]">
+          This is an example of how Spark Estate will look using the selected color
+          mode. The preview updates instantly as you choose different options.
         </p>
-        {previewOption ? (
-          <p className="mt-1 text-sm font-medium text-[rgba(255,248,235,0.92)]">
-            {previewOption.previewNote}
-          </p>
-        ) : null}
-        <p className={`${LABEL} mt-3`}>Preview — {previewOption?.label}</p>
         <ModePreview mode={draft} />
       </div>
 
