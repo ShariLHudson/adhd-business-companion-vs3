@@ -75,10 +75,12 @@ export function runSharedNewDay(
   resetTodayPlanForNewDay();
   const { greeting: journeyGreeting } = beginEstateJourneyNewDay();
 
+  // Warm card copy is owned by resolveGlobalDailyOpening — do not override
+  // with the journey "New day — fresh start" line (that made choices feel like chat).
   const opening = resolveGlobalDailyOpening({
     entryPoint: input.entryPoint,
     continueResolution: input.continueResolution,
-    greeting: input.greeting ?? journeyGreeting,
+    greeting: input.greeting,
     memberFirstName: resolveMemberFirstName(),
   });
 

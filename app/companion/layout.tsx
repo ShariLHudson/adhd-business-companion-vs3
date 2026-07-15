@@ -31,6 +31,7 @@ import "./shari-presence-flame.css";
 import "./plan-day-experience.css";
 import "./growth-story-hub.css";
 import "./welcome-home-first-launch.css";
+import "./global-daily-companion-opening.css";
 import "./momentum-builder-room.css";
 import "./momentum-institute-drawer-wall.css";
 import "./stables-room.css";

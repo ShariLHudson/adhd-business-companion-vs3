@@ -8,10 +8,18 @@ import {
   type CompanionContinueOption,
   type CompanionContinueResolution,
 } from "@/lib/companionLedContinue";
+import { buildDailyOpeningChoiceCards } from "./buildDailyOpeningChoiceCards";
+import {
+  buildDailyOpeningWelcomeMessage,
+  resolveDailyOpeningMomentKind,
+  resolveFirst60TeachingSentence,
+} from "./buildDailyOpeningWelcome";
+import { resolveDailyOpeningDiscoveryInvite } from "./resolveDiscoveryInvite";
+import { readDailyOpeningPresentedDay } from "./dailyOpeningDay";
+import { todayStr } from "@/lib/companionStore";
 import {
   DAILY_OPENING_CHOICE_LABELS,
-  GLOBAL_DAILY_OPENING_CHOICES,
-  GLOBAL_DAILY_OPENING_GREETING,
+  type DailyOpeningChoice,
   type DailyOpeningChoiceAction,
   type DailyOpeningChoiceId,
   type DailyOpeningDestination,
@@ -23,8 +31,11 @@ import {
 export type ResolveGlobalDailyOpeningInput = {
   entryPoint: DailyOpeningEntryPoint;
   continueResolution?: CompanionContinueResolution;
+  /** Explicit override only — prefer built warm messages. */
   greeting?: string | null;
   memberFirstName?: string | null;
+  suppressDiscoveryForRecovery?: boolean;
+  now?: Date;
 };
 
 function primaryContinueOption(
@@ -35,26 +46,28 @@ function primaryContinueOption(
   return null;
 }
 
-function buildGreeting(
-  entryPoint: DailyOpeningEntryPoint,
-  memberFirstName: string | null | undefined,
-  override: string | null | undefined,
+function benefitForSuggestion(
+  suggestion: Omit<HelpMeChooseSuggestion, "benefit"> & {
+    benefit?: string;
+  },
 ): string {
-  const existing = override?.trim();
-  if (existing) return existing;
-
-  const name = memberFirstName?.trim() || null;
-  if (entryPoint === "absence-return") {
-    return name
-      ? `Welcome back, ${name}. I'm glad you're here. What would help most today?`
-      : "Welcome back. I'm glad you're here. What would help most today?";
+  if (suggestion.benefit?.trim()) return suggestion.benefit.trim();
+  switch (suggestion.destination.kind) {
+    case "continue":
+      return "Pick up the meaningful work waiting for you.";
+    case "plan-my-day":
+      return "Shape today around what matters most.";
+    case "clear-my-mind":
+      return "Set everything down so your mind can settle.";
+    case "explore-estate":
+      return "Take a gentle look around Spark Estate.";
+    case "business-estate":
+      return "Add a detail that helps me support you.";
+    case "section":
+      return "Open the place that fits this moment.";
+    default:
+      return "A useful next step for right now.";
   }
-  if (entryPoint === "first-platform-opening") {
-    return name
-      ? `Welcome back, ${name}. What would help most today?`
-      : "Welcome back. What would help most today?";
-  }
-  return GLOBAL_DAILY_OPENING_GREETING;
 }
 
 /**
@@ -69,32 +82,51 @@ export function resolveHelpMeChooseSuggestions(
   const suggestions: HelpMeChooseSuggestion[] = [];
 
   if (continueOption) {
+    const title = continueOption.title.trim();
     suggestions.push({
       id: `hmc-continue-${continueOption.id}`,
-      label: continueOption.title,
+      title,
+      label: title,
+      benefit: continueOption.subtitle?.trim() || benefitForSuggestion({
+        id: "",
+        title,
+        label: title,
+        destination: { kind: "continue", option: continueOption },
+      }),
       destination: { kind: "continue", option: continueOption },
     });
   } else {
     suggestions.push({
       id: "hmc-clear-my-mind",
+      title: "Clear My Mind",
       label: "Clear My Mind",
+      benefit: "Set everything down so your mind can settle.",
       destination: { kind: "clear-my-mind" },
     });
   }
 
   suggestions.push({
     id: "hmc-plan-my-day",
+    title: "Plan My Day",
     label: "Plan My Day",
+    benefit: "Shape today around what matters most.",
     destination: { kind: "plan-my-day" },
   });
 
   suggestions.push({
-    id: "hmc-explore-estate",
-    label: "Explore Spark Estate",
+    id: "hmc-create-something",
+    title: "Create Something",
+    label: "Create Something",
+    benefit: "Start a small piece of work with me beside you.",
     destination: { kind: "explore-estate" },
   });
 
-  return suggestions.slice(0, 3);
+  return suggestions.slice(0, 3).map((s) => ({
+    ...s,
+    benefit: benefitForSuggestion(s),
+    title: s.title || s.label,
+    label: s.title || s.label,
+  }));
 }
 
 export function resolveGlobalDailyOpening(
@@ -106,16 +138,51 @@ export function resolveGlobalDailyOpening(
   const helpMeChooseSuggestions =
     resolveHelpMeChooseSuggestions(continueResolution);
 
+  const alreadyPresentedToday =
+    readDailyOpeningPresentedDay() === todayStr();
+  const momentKind = resolveDailyOpeningMomentKind(
+    input.entryPoint,
+    alreadyPresentedToday,
+  );
+
+  const builtWelcome = buildDailyOpeningWelcomeMessage({
+    momentKind,
+    memberFirstName: input.memberFirstName,
+  });
+  const override = input.greeting?.trim();
+  // Prefer warm card copy; only honor override when it is clearly personalized
+  // and not the old journey "New day — fresh start" line.
+  const welcomeMessage =
+    override &&
+    !/^new day/i.test(override) &&
+    !/what feels most important/i.test(override)
+      ? override
+      : builtWelcome;
+
+  const choiceCards = buildDailyOpeningChoiceCards(continueOption);
+  const choices: DailyOpeningChoice[] = choiceCards.map((card) => ({
+    id: card.id,
+    label: card.title,
+  }));
+
+  const discovery = resolveDailyOpeningDiscoveryInvite({
+    entryPoint: input.entryPoint,
+    momentKind,
+    suppressForRecovery: input.suppressDiscoveryForRecovery,
+    now: input.now,
+  });
+
   return {
     entryPoint: input.entryPoint,
-    greeting: buildGreeting(
-      input.entryPoint,
-      input.memberFirstName,
-      input.greeting,
-    ),
-    choices: GLOBAL_DAILY_OPENING_CHOICES.map((c) => ({ ...c })),
+    momentKind,
+    welcomeMessage,
+    greeting: welcomeMessage,
+    teachingSentence: resolveFirst60TeachingSentence(input.now),
+    choiceCards,
+    choices,
     continueOption,
     helpMeChooseSuggestions,
+    discovery,
   };
 }
 

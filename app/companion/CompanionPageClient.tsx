@@ -232,12 +232,15 @@ import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import { WelcomeRoomPanel } from "@/components/companion/WelcomeRoomPanel";
 import { WelcomeHomePage } from "@/components/companion/WelcomeHomeFirstLaunch";
 import { WelcomeHomeDailyChoices } from "@/components/companion/WelcomeHomeDailyChoices";
-import { GlobalDailyOpeningChoices } from "@/components/companion/GlobalDailyOpeningChoices";
+import { GlobalDailyCompanionOpening } from "@/components/companion/GlobalDailyCompanionOpening";
 import {
   runSharedNewDay,
   resolveDailyOpeningChoiceAction,
   shouldOfferFirstPlatformOpeningOfDay,
   isAbsenceReturn,
+  buildDailyOpeningArrivalMessage,
+  markDailyOpeningDiscoveryPresented,
+  GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER,
   type DailyOpeningEntryPoint,
   type GlobalDailyOpeningResult,
   type HelpMeChooseSuggestion,
@@ -813,7 +816,6 @@ import {
   markChatAssistantAudioElement,
   markWelcomeIntroSeen,
   peekWelcomeHomeReplayRequested,
-  requestWelcomeHomeReplay,
   resolveWelcomeHomeDailyChoices,
   WELCOME_HOME_DISCOVERY_KEY_DELAY_MS,
   type WelcomeHomeDailyChoiceId,
@@ -7149,12 +7151,8 @@ export default function CompanionPageClient() {
     setActiveNav("chat");
     setGlobalDailyOpening(result.opening);
     setDailyOpeningHelpSuggestions(null);
-    setMessages([
-      {
-        role: "assistant",
-        content: result.opening.greeting,
-      },
-    ]);
+    // Card owns the welcome message — do not inject it as a chat bubble.
+    setMessages([]);
   }
 
   function navigateDailyOpeningDestination(
@@ -7162,9 +7160,17 @@ export default function CompanionPageClient() {
   ) {
     setGlobalDailyOpening(null);
     setDailyOpeningHelpSuggestions(null);
+    const arrival = buildDailyOpeningArrivalMessage(destination);
     switch (destination.kind) {
       case "continue":
         handleCompanionContinueOption(destination.option);
+        if (
+          arrival &&
+          destination.option.kind !== "conversation" &&
+          destination.option.kind !== "plan-my-day"
+        ) {
+          setMessages([{ role: "assistant", content: arrival }]);
+        }
         return;
       case "plan-my-day":
         openPlanMyDayCore();
@@ -7198,6 +7204,29 @@ export default function CompanionPageClient() {
 
   function handleGlobalDailyHelpSuggestion(suggestion: HelpMeChooseSuggestion) {
     navigateDailyOpeningDestination(suggestion.destination);
+  }
+
+  function handleGlobalDailyDiscoveryLearn() {
+    markDailyOpeningDiscoveryPresented();
+    if (!globalDailyOpening) return;
+    setGlobalDailyOpening({
+      ...globalDailyOpening,
+      discovery: { ...globalDailyOpening.discovery, show: false },
+    });
+    handleWelcomeHomeDiscoveryInvite();
+  }
+
+  function handleGlobalDailyDiscoveryDismiss() {
+    markDailyOpeningDiscoveryPresented();
+    if (!globalDailyOpening) return;
+    setGlobalDailyOpening({
+      ...globalDailyOpening,
+      discovery: { ...globalDailyOpening.discovery, show: false },
+    });
+  }
+
+  function handleGlobalDailyBackToToday() {
+    setDailyOpeningHelpSuggestions(null);
   }
 
   // Run queued first-of-day / absence opening through the shared New Day controller.
@@ -10118,9 +10147,7 @@ export default function CompanionPageClient() {
     }
 
     if (actionId === "replay-welcome") {
-      requestWelcomeHomeReplay();
-      returnToWelcomeHomeLobby("listen to shari welcome");
-      setWelcomeHomeReplay(true);
+      // Welcome audio is first-login only — never replay after that.
       return;
     }
 
@@ -12429,6 +12456,12 @@ export default function CompanionPageClient() {
     ).trim();
     // Never block send on isLoading — newer messages supersede in-flight AI.
     if (!trimmed) return;
+
+    // Freeform input dismisses the guided daily opening (choices stay optional).
+    if (globalDailyOpening) {
+      setGlobalDailyOpening(null);
+      setDailyOpeningHelpSuggestions(null);
+    }
 
     chatRequestGenerationRef.current += 1;
     const sendGeneration = chatRequestGenerationRef.current;
@@ -21979,27 +22012,35 @@ export default function CompanionPageClient() {
                 experience={welcomeHomeExperience}
                 onIntroComplete={finishWelcomeHomeIntro}
                 onIntroActiveChange={setWelcomeHomeIntroActive}
-                welcomeMessage={welcomeHomeDisplayMessage}
+                welcomeMessage={
+                  globalDailyOpening ? null : welcomeHomeDisplayMessage
+                }
                 showWelcomeLine={
                   messages.length === 0 &&
                   !isLoading &&
-                  Boolean(welcomeHomeDisplayMessage || globalDailyOpening)
+                  Boolean(
+                    globalDailyOpening || welcomeHomeDisplayMessage,
+                  )
                 }
                 welcomeSlot={
-                  globalDailyOpening &&
-                  !isLoading &&
-                  messages.length === 0 ? (
+                  globalDailyOpening && !isLoading && messages.length === 0 ? (
                     dailyOpeningHelpSuggestions ? (
-                      <GlobalDailyOpeningChoices
+                      <GlobalDailyCompanionOpening
                         mode="help-me-choose"
                         suggestions={dailyOpeningHelpSuggestions}
                         onSelectSuggestion={handleGlobalDailyHelpSuggestion}
+                        onBackToToday={handleGlobalDailyBackToToday}
                       />
                     ) : (
-                      <GlobalDailyOpeningChoices
+                      <GlobalDailyCompanionOpening
                         mode="main"
-                        choices={globalDailyOpening.choices}
+                        welcomeMessage={globalDailyOpening.welcomeMessage}
+                        teachingSentence={globalDailyOpening.teachingSentence}
+                        choiceCards={globalDailyOpening.choiceCards}
+                        discovery={globalDailyOpening.discovery}
                         onSelect={handleGlobalDailyOpeningChoice}
+                        onDiscoveryPrimary={handleGlobalDailyDiscoveryLearn}
+                        onDiscoveryDismiss={handleGlobalDailyDiscoveryDismiss}
                       />
                     )
                   ) : welcomeHomeDaily.choices.length > 0 &&
@@ -22032,27 +22073,6 @@ export default function CompanionPageClient() {
                       workspacePanel={workspacePanel}
                       workspaceActiveBeside={workspaceActiveBeside}
                       formatParagraphs={formatAssistantParagraphs}
-                      afterLastAssistant={
-                        globalDailyOpening &&
-                        messages.length > 0 &&
-                        !isLoading ? (
-                          dailyOpeningHelpSuggestions ? (
-                            <GlobalDailyOpeningChoices
-                              mode="help-me-choose"
-                              suggestions={dailyOpeningHelpSuggestions}
-                              onSelectSuggestion={
-                                handleGlobalDailyHelpSuggestion
-                              }
-                            />
-                          ) : (
-                            <GlobalDailyOpeningChoices
-                              mode="main"
-                              choices={globalDailyOpening.choices}
-                              onSelect={handleGlobalDailyOpeningChoice}
-                            />
-                          )
-                        ) : undefined
-                      }
                     />
                   </>
                 }
@@ -22060,7 +22080,11 @@ export default function CompanionPageClient() {
                   <HomeChatInputFooter
                     welcomeHome
                     homeCalm={false}
-                    homeChatPlaceholder={homeArrival?.chatPlaceholder}
+                    homeChatPlaceholder={
+                      globalDailyOpening
+                        ? GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER
+                        : homeArrival?.chatPlaceholder
+                    }
                     conversationMode={
                       homeArrival?.chrome.conversationInput ?? true
                     }

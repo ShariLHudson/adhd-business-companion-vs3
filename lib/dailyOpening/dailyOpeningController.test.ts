@@ -73,19 +73,21 @@ describe("Global Daily Companion Experience — shared controller", () => {
     });
   });
 
-  it("presents exactly three Global Daily choices", () => {
+  it("presents exactly three Global Daily choice cards", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "settings-new-day",
     });
     expect(opening.choices).toHaveLength(3);
+    expect(opening.choiceCards).toHaveLength(3);
     expect(opening.choices.map((c) => c.id)).toEqual([
       "continue-meaningful-work",
       "plan-or-adapt-my-day",
       "help-me-choose",
     ]);
-    expect(opening.choices.map((c) => c.label)).toEqual(
-      GLOBAL_DAILY_OPENING_CHOICES.map((c) => c.label),
+    expect(opening.choiceCards.map((c) => c.id)).toEqual(
+      GLOBAL_DAILY_OPENING_CHOICES.map((c) => c.id),
     );
+    expect(opening.welcomeMessage.length).toBeGreaterThan(20);
   });
 
   it("Settings → New Day creates a fresh conversation ID and clears old messages/summaries", () => {
