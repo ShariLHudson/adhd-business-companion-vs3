@@ -6,6 +6,7 @@ import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowPanelBackButton } from "@/components/companion/GrowPanelBackButton";
 import { ChamberActiveMemberCard } from "@/components/companion/chamber/ChamberActiveMemberCard";
 import { ChamberMemberGallery } from "@/components/companion/chamber/ChamberMemberGallery";
+import { ChamberPerspectiveGuide } from "@/components/companion/chamber/ChamberPerspectiveGuide";
 import { ChamberOfMomentumRoomShell } from "@/components/companion/chamber/ChamberOfMomentumRoomShell";
 import {
   getChamberMemberById,
@@ -39,6 +40,7 @@ export function ChamberOfMomentumEntryPanel({
     ? getChamberMemberById(activeMemberId) ?? null
     : null;
   const [howToOpen, setHowToOpen] = useState(false);
+  const [browseAllMembers, setBrowseAllMembers] = useState(false);
 
   const openHowTo = useCallback(() => setHowToOpen(true), []);
   const closeHowTo = useCallback(() => setHowToOpen(false), []);
@@ -69,12 +71,17 @@ export function ChamberOfMomentumEntryPanel({
             member={activeMember}
             onEndConversation={onEndMemberConversation}
           />
-        ) : (
+        ) : browseAllMembers ? (
           <ChamberMemberGallery
             activeMemberId={activeMemberId}
             onTalkWithMember={onInviteMember}
             howToOpen={howToOpen}
             onOpenHowTo={openHowTo}
+          />
+        ) : (
+          <ChamberPerspectiveGuide
+            onTalkWithMember={onInviteMember}
+            onBrowseAll={() => setBrowseAllMembers(true)}
           />
         )}
         <EstateHowToGuide

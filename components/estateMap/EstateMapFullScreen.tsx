@@ -4,9 +4,13 @@ import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   EXPLORE_CATEGORY_LABELS,
+  EXPLORE_MEMBER_BUCKET_LABELS,
   getExploreEstateCategoryGroups,
   getExploreEstateDestinationById,
+  getExploreFeaturedDestinations,
+  getExploreMemberBucketGroups,
   searchExploreEstateDestinations,
+  type ExploreMemberBucketId,
 } from "@/lib/estateMap/exploreEstateDestinations";
 import type {
   EstateExploreCategory,
@@ -126,6 +130,7 @@ function toDestination(location: EstateMapLocation): EstateExploreDestination {
 export function EstateMapFullScreen({
   open,
   onClose,
+  onReturnToEstate,
   locations,
   currentLocationId,
   onSelectLocation,
@@ -135,9 +140,19 @@ export function EstateMapFullScreen({
     null,
   );
   const [query, setQuery] = useState("");
+  const [browseAllPlaces, setBrowseAllPlaces] = useState(false);
   const [openCategories, setOpenCategories] = useState<
     Record<string, boolean>
   >({});
+  const [openBuckets, setOpenBuckets] = useState<Record<string, boolean>>({});
+
+  const leaveExplore = useCallback(() => {
+    if (onReturnToEstate) {
+      onReturnToEstate();
+      return;
+    }
+    onClose();
+  }, [onClose, onReturnToEstate]);
 
   const destinations = useMemo(
     () => locations.map(toDestination),
@@ -154,11 +169,24 @@ export function EstateMapFullScreen({
     [filtered],
   );
 
+  const memberBuckets = useMemo(
+    () => getExploreMemberBucketGroups(filtered),
+    [filtered],
+  );
+
+  const featuredIds = useMemo(() => {
+    const featured = getExploreFeaturedDestinations(destinations, 3);
+    return new Set(featured.map((d) => d.id));
+  }, [destinations]);
+
+  const showFullDirectory = browseAllPlaces || query.trim().length > 0;
+
   useEffect(() => {
     if (!open) {
       setVisible(false);
       setEntering(null);
       setQuery("");
+      setBrowseAllPlaces(false);
       return;
     }
     const frame = window.requestAnimationFrame(() => setVisible(true));
@@ -177,16 +205,27 @@ export function EstateMapFullScreen({
   }, [open, groups]);
 
   useEffect(() => {
+    if (!open || memberBuckets.length === 0) return;
+    setOpenBuckets((prev) => {
+      const next = { ...prev };
+      for (const group of memberBuckets) {
+        if (next[group.id] === undefined) next[group.id] = true;
+      }
+      return next;
+    });
+  }, [open, memberBuckets]);
+
+  useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         if (entering) setEntering(null);
-        else onClose();
+        else leaveExplore();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, entering, onClose]);
+  }, [open, entering, leaveExplore]);
 
   const handleSelect = useCallback(
     (destination: EstateExploreDestination) => {
@@ -202,17 +241,25 @@ export function EstateMapFullScreen({
         width: 12,
         rotation: 0,
       };
+      /**
+       * Parent closes Explore and navigates. Do not call onClose/leaveExplore
+       * here — Fold / Return to Estate go to Welcome Home and would cancel
+       * the room hop.
+       */
       window.setTimeout(() => {
         onSelectLocation?.(asLocation);
         setEntering(null);
-        onClose();
-      }, 700);
+      }, 450);
     },
-    [onClose, onSelectLocation],
+    [onSelectLocation],
   );
 
   function toggleCategory(id: EstateExploreCategory) {
     setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  function toggleBucket(id: ExploreMemberBucketId) {
+    setOpenBuckets((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
   if (!open && !visible) return null;
@@ -231,13 +278,27 @@ export function EstateMapFullScreen({
         <header className="emfs-toolbar">
           <div className="emfs-toolbar__title">
             <h1>Explore Estate</h1>
-            <p>Every place with a photograph — choose where to go</p>
+            <p>
+              {showFullDirectory
+                ? "Every place with a photograph — choose where to go"
+                : "A few places to begin — browse all when you want to wander"}
+            </p>
           </div>
           <div className="emfs-toolbar__actions">
+            {onReturnToEstate ? (
+              <button
+                type="button"
+                className="emfs-toolbar__btn emfs-toolbar__btn--primary"
+                onClick={onReturnToEstate}
+                data-testid="explore-estate-return-home"
+              >
+                Return to Estate
+              </button>
+            ) : null}
             <button
               type="button"
-              className="emfs-toolbar__btn emfs-toolbar__btn--primary"
-              onClick={onClose}
+              className="emfs-toolbar__btn"
+              onClick={leaveExplore}
               data-testid="explore-estate-fold"
             >
               Fold map
@@ -264,47 +325,116 @@ export function EstateMapFullScreen({
         </div>
 
         <div className="emfs-directory-scroll" data-testid="explore-estate-scroll">
-          {groups.length === 0 ? (
+          {!showFullDirectory ? (
+            <>
+              {memberBuckets.map((group) => {
+                const expanded = openBuckets[group.id] !== false;
+                const cards = group.destinations.filter((d) =>
+                  featuredIds.has(d.id),
+                );
+                if (cards.length === 0) return null;
+                return (
+                  <section
+                    key={group.id}
+                    className="emfs-category"
+                    data-testid={`explore-estate-bucket-${group.id}`}
+                  >
+                    <button
+                      type="button"
+                      className="emfs-category__toggle"
+                      aria-expanded={expanded}
+                      onClick={() => toggleBucket(group.id)}
+                    >
+                      <span>
+                        {EXPLORE_MEMBER_BUCKET_LABELS[group.id] ?? group.label}
+                      </span>
+                      <span aria-hidden>{expanded ? "▾" : "▸"}</span>
+                    </button>
+                    {expanded ? (
+                      <div className="emfs-dest-grid" role="list">
+                        {cards.map((destination) => (
+                          <div key={destination.id} role="listitem">
+                            <DestinationCard
+                              destination={destination}
+                              isHere={
+                                destination.id === currentLocationId ||
+                                destination.destinationId === currentLocationId
+                              }
+                              onSelect={handleSelect}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </section>
+                );
+              })}
+              <div className="emfs-directory-controls" style={{ marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  className="emfs-toolbar__btn emfs-toolbar__btn--primary"
+                  onClick={() => setBrowseAllPlaces(true)}
+                  data-testid="explore-estate-browse-all"
+                >
+                  Browse All Places
+                </button>
+              </div>
+            </>
+          ) : groups.length === 0 ? (
             <p className="emfs-directory-empty">
               No places match that search. Try another name or purpose.
             </p>
           ) : (
-            groups.map((group) => {
-              const expanded = openCategories[group.id] !== false;
-              return (
-                <section
-                  key={group.id}
-                  className="emfs-category"
-                  data-testid={`explore-estate-category-${group.id}`}
-                >
+            <>
+              {!query.trim() ? (
+                <div className="emfs-directory-controls" style={{ marginBottom: "0.75rem" }}>
                   <button
                     type="button"
-                    className="emfs-category__toggle"
-                    aria-expanded={expanded}
-                    onClick={() => toggleCategory(group.id)}
+                    className="emfs-toolbar__btn"
+                    onClick={() => setBrowseAllPlaces(false)}
+                    data-testid="explore-estate-show-featured"
                   >
-                    <span>{group.label}</span>
-                    <span aria-hidden>{expanded ? "▾" : "▸"}</span>
+                    Show featured places
                   </button>
-                  {expanded ? (
-                    <div className="emfs-dest-grid" role="list">
-                      {group.destinations.map((destination) => (
-                        <div key={destination.id} role="listitem">
-                          <DestinationCard
-                            destination={destination}
-                            isHere={
-                              destination.id === currentLocationId ||
-                              destination.destinationId === currentLocationId
-                            }
-                            onSelect={handleSelect}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })
+                </div>
+              ) : null}
+              {groups.map((group) => {
+                const expanded = openCategories[group.id] !== false;
+                return (
+                  <section
+                    key={group.id}
+                    className="emfs-category"
+                    data-testid={`explore-estate-category-${group.id}`}
+                  >
+                    <button
+                      type="button"
+                      className="emfs-category__toggle"
+                      aria-expanded={expanded}
+                      onClick={() => toggleCategory(group.id)}
+                    >
+                      <span>{group.label}</span>
+                      <span aria-hidden>{expanded ? "▾" : "▸"}</span>
+                    </button>
+                    {expanded ? (
+                      <div className="emfs-dest-grid" role="list">
+                        {group.destinations.map((destination) => (
+                          <div key={destination.id} role="listitem">
+                            <DestinationCard
+                              destination={destination}
+                              isHere={
+                                destination.id === currentLocationId ||
+                                destination.destinationId === currentLocationId
+                              }
+                              onSelect={handleSelect}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </section>
+                );
+              })}
+            </>
           )}
         </div>
       </div>

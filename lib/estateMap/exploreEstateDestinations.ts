@@ -157,47 +157,6 @@ export const EXPLORE_CATEGORY_LABELS: Record<EstateExploreCategory, string> = {
   other: "Other Places",
 };
 
-/** Preferred order within a category (unlisted ids sort alphabetically after). */
-const CATEGORY_PREFERRED_ORDER: Readonly<
-  Partial<Record<EstateExploreCategory, readonly string[]>>
-> = {
-  entry: ["spark-estate", "welcome-home"],
-  rooms: [
-    "study-hall",
-    "reading-nook",
-    "tea-room",
-    "music-room",
-    "celebration-room",
-    "art-studio",
-    "project-room",
-    "portfolio",
-    "game-room",
-    "gallery-of-firsts",
-    "creative-studio",
-    "cartographers-studio",
-    "conservatory",
-    "butterfly-house",
-    "discovery-room",
-  ],
-  grounds: [
-    "greenhouse",
-    "estate-gardens",
-    "woodland-path",
-    "apple-orchard",
-    "lakeside-hammock",
-    "summer-terrace",
-    "seat-at-pond",
-    "stables",
-    "gardens",
-    "horizon-point",
-    "grand-terrace",
-    "fireside-deck",
-    "estate-back-deck",
-    "breathe",
-    "back-fireside-deck-rain",
-  ],
-};
-
 const ID_CATEGORY_OVERRIDES: Readonly<Record<string, EstateExploreCategory>> = {
   "spark-estate": "entry",
   "welcome-home": "entry",
@@ -213,7 +172,7 @@ const ID_CATEGORY_OVERRIDES: Readonly<Record<string, EstateExploreCategory>> = {
   "celebration-room": "rooms",
   "art-studio": "rooms",
   "project-room": "rooms",
-  portfolio: "rooms",
+  portfolio: "reflection",
   "game-room": "rooms",
   "gallery-of-firsts": "rooms",
   "creative-studio": "rooms",
@@ -559,26 +518,21 @@ function categoryRank(category: EstateExploreCategory): number {
   return idx === -1 ? CATEGORY_ORDER.length : idx;
 }
 
-function preferredRank(
-  category: EstateExploreCategory,
-  id: string,
+function compareExploreDestinationNames(
+  a: EstateExploreDestination,
+  b: EstateExploreDestination,
 ): number {
-  const order = CATEGORY_PREFERRED_ORDER[category];
-  if (!order) return Number.MAX_SAFE_INTEGER;
-  const idx = order.indexOf(id);
-  return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+  return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
 }
 
+/** Category groups stay; cards within each group are A–Z by display name. */
 function sortExploreDestinations(
   destinations: EstateExploreDestination[],
 ): EstateExploreDestination[] {
   return [...destinations].sort((a, b) => {
     const catDiff = categoryRank(a.category) - categoryRank(b.category);
     if (catDiff !== 0) return catDiff;
-    const prefDiff =
-      preferredRank(a.category, a.id) - preferredRank(b.category, b.id);
-    if (prefDiff !== 0) return prefDiff;
-    return a.name.localeCompare(b.name);
+    return compareExploreDestinationNames(a, b);
   });
 }
 
@@ -618,9 +572,95 @@ export function getExploreEstateCategoryGroups(
     (id) => ({
       id,
       label: EXPLORE_CATEGORY_LABELS[id],
-      destinations: byCategory.get(id) ?? [],
+      destinations: [...(byCategory.get(id) ?? [])].sort(
+        compareExploreDestinationNames,
+      ),
     }),
   );
+}
+
+/** Member-facing Explore buckets — fewer first decisions than 47 place names. */
+export type ExploreMemberBucketId =
+  | "calm-restore"
+  | "explore-discover"
+  | "work-reflect";
+
+export const EXPLORE_MEMBER_BUCKET_LABELS: Record<ExploreMemberBucketId, string> =
+  {
+    "calm-restore": "Calm and Restore",
+    "explore-discover": "Explore and Discover",
+    "work-reflect": "Work and Reflect",
+  };
+
+const MEMBER_BUCKET_ORDER: ExploreMemberBucketId[] = [
+  "calm-restore",
+  "explore-discover",
+  "work-reflect",
+];
+
+function memberBucketForCategory(
+  category: EstateExploreCategory,
+): ExploreMemberBucketId {
+  if (
+    category === "peaceful" ||
+    category === "reflection" ||
+    category === "grounds"
+  ) {
+    return "calm-restore";
+  }
+  if (
+    category === "work" ||
+    category === "advisory" ||
+    category === "creative" ||
+    category === "rooms"
+  ) {
+    return "work-reflect";
+  }
+  return "explore-discover";
+}
+
+export type ExploreMemberBucketGroup = {
+  id: ExploreMemberBucketId;
+  label: string;
+  destinations: EstateExploreDestination[];
+};
+
+export function getExploreMemberBucketGroups(
+  destinations: EstateExploreDestination[] = getExploreEstateDestinations(),
+): ExploreMemberBucketGroup[] {
+  const byBucket = new Map<ExploreMemberBucketId, EstateExploreDestination[]>();
+  for (const dest of destinations) {
+    const bucket = memberBucketForCategory(dest.category);
+    const list = byBucket.get(bucket) ?? [];
+    list.push(dest);
+    byBucket.set(bucket, list);
+  }
+  return MEMBER_BUCKET_ORDER.filter(
+    (id) => (byBucket.get(id)?.length ?? 0) > 0,
+  ).map((id) => ({
+    id,
+    label: EXPLORE_MEMBER_BUCKET_LABELS[id],
+    destinations: [...(byBucket.get(id) ?? [])].sort(
+      compareExploreDestinationNames,
+    ),
+  }));
+}
+
+/** Small featured set for first paint — Browse All Places reveals the rest. */
+export function getExploreFeaturedDestinations(
+  destinations: EstateExploreDestination[] = getExploreEstateDestinations(),
+  perBucket = 3,
+): EstateExploreDestination[] {
+  const featured: EstateExploreDestination[] = [];
+  const seen = new Set<string>();
+  for (const group of getExploreMemberBucketGroups(destinations)) {
+    for (const dest of group.destinations.slice(0, perBucket)) {
+      if (seen.has(dest.id)) continue;
+      seen.add(dest.id);
+      featured.push(dest);
+    }
+  }
+  return featured;
 }
 
 export function searchExploreEstateDestinations(
