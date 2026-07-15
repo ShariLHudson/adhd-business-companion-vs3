@@ -1,5 +1,6 @@
 import { getDayDesignerStore } from "@/lib/day-designer/dayStore";
 import {
+  deleteTimeBlock,
   formatPrefsClockTime,
   getTimeBlocks,
   saveTimeBlock,
@@ -691,11 +692,67 @@ export function isPlanItemActive(item: PlanDayItem): boolean {
   return true;
 }
 
+function findPlanItemInDeferred(id: string): PlanDayItem | null {
+  for (const list of Object.values(readDeferred())) {
+    const found = list.find(
+      (i) => i.id === id || i.sourceTimeBlockId === id || `tb-${i.sourceTimeBlockId}` === id,
+    );
+    if (found) return found;
+  }
+  return null;
+}
+
+/** Remove a plan item from every deferred / archive bucket. */
+function purgeDeferredPlanItem(
+  planItemId: string,
+  timeBlockId: string | null,
+): void {
+  const deferred = readDeferred();
+  let changed = false;
+  const next: Record<string, PlanDayItem[]> = {};
+  for (const [date, list] of Object.entries(deferred)) {
+    const filtered = list.filter(
+      (i) =>
+        i.id !== planItemId &&
+        !(timeBlockId && (i.sourceTimeBlockId === timeBlockId || i.id === `tb-${timeBlockId}`)),
+    );
+    if (filtered.length !== list.length) changed = true;
+    if (filtered.length > 0) next[date] = filtered;
+  }
+  if (changed) writeDeferred(next);
+}
+
+/**
+ * Remove a plan item from today's plan.
+ * Legacy Momentum Appointments also delete the underlying time-block record
+ * so they cannot reappear on the planning calendar after refresh.
+ */
 export function deletePlanItem(
   items: PlanDayItem[],
   id: string,
 ): PlanDayItem[] {
-  return saveTodayPlanItems(items.filter((i) => i.id !== id));
+  const target =
+    items.find((i) => i.id === id) ??
+    readTodayPlanItems().find((i) => i.id === id) ??
+    findPlanItemInDeferred(id);
+
+  const timeBlockId =
+    target?.sourceTimeBlockId ??
+    (id.startsWith("tb-") ? id.slice("tb-".length) : null);
+
+  if (timeBlockId) {
+    deleteTimeBlock(timeBlockId);
+  }
+
+  purgeDeferredPlanItem(id, timeBlockId);
+
+  return saveTodayPlanItems(
+    items.filter(
+      (i) =>
+        i.id !== id &&
+        !(timeBlockId && (i.sourceTimeBlockId === timeBlockId || i.id === `tb-${timeBlockId}`)),
+    ),
+  );
 }
 
 export function duplicatePlanItem(

@@ -42,6 +42,14 @@ export const DATE_FORMAT_OPTIONS = [
 
 export type DateFormat = (typeof DATE_FORMAT_OPTIONS)[number]["code"];
 
+/** Clock display preference — 12-hour AM/PM or 24-hour (military). */
+export const TIME_FORMAT_OPTIONS = [
+  { code: "12h", label: "12-hour (AM/PM)" },
+  { code: "24h", label: "24-hour (military)" },
+] as const;
+
+export type TimeFormat = (typeof TIME_FORMAT_OPTIONS)[number]["code"];
+
 /** Alphabetical dropdown order (source arrays keep stable definition order). */
 export const SORTED_LANGUAGE_OPTIONS: readonly LanguageOption[] =
   sortByDropdownLabel(LANGUAGE_OPTIONS, (o) => o.label);
@@ -50,6 +58,8 @@ export const SORTED_DATE_FORMAT_OPTIONS = sortByDropdownLabel(
   DATE_FORMAT_OPTIONS,
   (o) => o.label,
 );
+/** Keep 12-hour before 24-hour — intentional UX order, not A–Z. */
+export const SORTED_TIME_FORMAT_OPTIONS = TIME_FORMAT_OPTIONS;
 
 export type LanguageCommunicationPrefs = {
   interfaceLanguage: LanguageCode;
@@ -58,6 +68,7 @@ export type LanguageCommunicationPrefs = {
   voiceLanguage: LanguageCode;
   region: RegionCode;
   dateFormat: DateFormat;
+  timeFormat: TimeFormat;
 };
 
 export const DEFAULT_LANGUAGE_COMMUNICATION: LanguageCommunicationPrefs = {
@@ -67,11 +78,13 @@ export const DEFAULT_LANGUAGE_COMMUNICATION: LanguageCommunicationPrefs = {
   voiceLanguage: "en",
   region: "US",
   dateFormat: "MM/DD/YYYY",
+  timeFormat: "12h",
 };
 
 const LANGUAGE_CODES = new Set(LANGUAGE_OPTIONS.map((o) => o.code));
 const REGION_CODES = new Set(REGION_OPTIONS.map((o) => o.code));
 const DATE_FORMAT_CODES = new Set(DATE_FORMAT_OPTIONS.map((o) => o.code));
+const TIME_FORMAT_CODES = new Set(TIME_FORMAT_OPTIONS.map((o) => o.code));
 
 const PROMPT_LANGUAGE_NAMES: Record<LanguageCode, string> = {
   en: "English",
@@ -156,7 +169,24 @@ export function normalizeLanguageCommunication(
     dateFormat: DATE_FORMAT_CODES.has(merged.dateFormat as DateFormat)
       ? merged.dateFormat
       : "MM/DD/YYYY",
+    timeFormat: TIME_FORMAT_CODES.has(merged.timeFormat as TimeFormat)
+      ? merged.timeFormat
+      : "12h",
   };
+}
+
+/** Format a clock time using the member's Settings preference. */
+export function formatMemberClockTime(
+  date: Date,
+  timeFormat: TimeFormat = DEFAULT_LANGUAGE_COMMUNICATION.timeFormat,
+  options?: { includeSeconds?: boolean },
+): string {
+  return date.toLocaleTimeString(undefined, {
+    hour: timeFormat === "24h" ? "2-digit" : "numeric",
+    minute: "2-digit",
+    ...(options?.includeSeconds ? { second: "2-digit" as const } : {}),
+    hour12: timeFormat === "12h",
+  });
 }
 
 /** When user picks an app language, keep all language prefs aligned. */

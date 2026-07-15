@@ -6,6 +6,7 @@
 
 import {
   DEFAULT_LANGUAGE_COMMUNICATION,
+  formatMemberClockTime,
   normalizeLanguageCommunication,
   type LanguageCommunicationPrefs,
 } from "./companionLanguage";
@@ -28,18 +29,22 @@ export type {
   LanguageCode,
   RegionCode,
   DateFormat,
+  TimeFormat,
 } from "./companionLanguage";
 export {
   DEFAULT_LANGUAGE_COMMUNICATION,
   normalizeLanguageCommunication,
   languageCommunicationSummary,
   getOutputLanguageContext,
+  formatMemberClockTime,
   LANGUAGE_OPTIONS,
   REGION_OPTIONS,
   DATE_FORMAT_OPTIONS,
+  TIME_FORMAT_OPTIONS,
   SORTED_LANGUAGE_OPTIONS,
   SORTED_REGION_OPTIONS,
   SORTED_DATE_FORMAT_OPTIONS,
+  SORTED_TIME_FORMAT_OPTIONS,
   withUnifiedAppLanguage,
   speechLocaleForLanguage,
   getInterfaceLanguageCode,
@@ -2464,6 +2469,8 @@ export type Prefs = {
   facebookUrl: string;
   instagramUrl: string;
   linkedinUrl: string;
+  tiktokUrl: string;
+  pinterestUrl: string;
 } & LanguageCommunicationPrefs;
 
 const PREFS_KEY = "companion-prefs-v1";
@@ -2490,6 +2497,8 @@ const DEFAULT_PREFS: Prefs = {
   facebookUrl: "",
   instagramUrl: "",
   linkedinUrl: "",
+  tiktokUrl: "",
+  pinterestUrl: "",
   ...DEFAULT_LANGUAGE_COMMUNICATION,
 };
 
@@ -2510,11 +2519,26 @@ export function getPrefs(): Prefs {
     const merged = { ...DEFAULT_PREFS, ...parsed };
     merged.visualMode = normalizeVisualMode(merged.visualMode);
     merged.aiTone = normalizeAiTone(merged.aiTone);
+    // Legacy prefs may omit newer social URL keys — keep empty strings.
+    merged.facebookUrl = typeof merged.facebookUrl === "string" ? merged.facebookUrl : "";
+    merged.instagramUrl = typeof merged.instagramUrl === "string" ? merged.instagramUrl : "";
+    merged.linkedinUrl = typeof merged.linkedinUrl === "string" ? merged.linkedinUrl : "";
+    merged.tiktokUrl = typeof merged.tiktokUrl === "string" ? merged.tiktokUrl : "";
+    merged.pinterestUrl =
+      typeof merged.pinterestUrl === "string" ? merged.pinterestUrl : "";
     Object.assign(merged, normalizeLanguageCommunication(merged));
     return merged;
   } catch {
     return DEFAULT_PREFS;
   }
+}
+
+/** Clock display using the member's Settings time format (12h or 24h). */
+export function formatPrefsClockTime(
+  date: Date,
+  options?: { includeSeconds?: boolean },
+): string {
+  return formatMemberClockTime(date, getPrefs().timeFormat, options);
 }
 
 export function savePrefs(update: Partial<Prefs>): Prefs {
