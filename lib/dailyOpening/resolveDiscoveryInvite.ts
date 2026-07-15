@@ -11,9 +11,9 @@ import { DAILY_OPENING_DISCOVERY_DAY_STORAGE } from "./types";
 const HIDDEN: DailyOpeningDiscoveryInvite = {
   show: false,
   title: "Something New to Discover",
-  line: "There is one new part of Spark Estate you can explore whenever you are ready.",
-  primaryLabel: "Learn About It",
-  secondaryLabel: "Show Me Later",
+  line: "There is one part of Spark Estate you can explore whenever you are ready.",
+  primaryLabel: "Show Me",
+  secondaryLabel: "Not Today",
 };
 
 function readLastDiscoveryDay(): string | null {
@@ -59,9 +59,9 @@ export function resolveDailyOpeningDiscoveryInvite(input: {
       return {
         show: true,
         title: "Something New to Discover",
-        line: "There is one new part of Spark Estate you can explore whenever you are ready.",
-        primaryLabel: "Learn About It",
-        secondaryLabel: "Show Me Later",
+        line: "There is one part of Spark Estate you can explore whenever you are ready.",
+        primaryLabel: "Show Me",
+        secondaryLabel: "Not Today",
       };
     }
     return { ...HIDDEN };

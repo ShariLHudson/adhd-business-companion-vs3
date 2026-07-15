@@ -14,7 +14,7 @@ export type DailyOpeningMomentKind =
 
 const FIRST_60_TEACHING = [
   "Personalizing your Business Estate is optional, but every detail you add helps me support you more personally.",
-  "You can always tell me what you need in your own words — the choices are just a gentle start.",
+  "Your Client Avatar helps me make better suggestions for your offers, content, and messaging.",
   "Spark remembers what matters so you do not have to hold it all alone.",
 ] as const;
 
@@ -39,21 +39,21 @@ export function buildDailyOpeningWelcomeMessage(input: {
 
   if (input.momentKind === "absence-return") {
     return name
-      ? `Welcome back, ${name}. Your work is still here, and we do not need to catch up on everything today. Let's choose one helpful place to begin.`
-      : "Welcome back. Your work is still here, and we do not need to catch up on everything today. Let's choose one helpful place to begin.";
+      ? `Welcome home, ${name}. Your work is still here, and we do not need to catch up on everything today. Let's choose one small place to begin.`
+      : "Welcome home. Your work is still here, and we do not need to catch up on everything today. Let's choose one small place to begin.";
   }
 
   if (input.momentKind === "same-day-return") {
     return name
-      ? `Welcome back, ${name}. Let's pick up with whatever would help most right now.`
-      : "Welcome back. Let's pick up with whatever would help most right now.";
+      ? `Welcome back, ${name}. Let's choose the most helpful place to pick up from here.`
+      : "Welcome back. Let's choose the most helpful place to pick up from here.";
   }
 
   // first-of-day + explicit new day — two or three short sentences
   if (name) {
-    return `Good morning, ${name}. I'm glad you're here. Choose what would help most, and I'll take you there.`;
+    return `Good morning, ${name}. I'm glad you're here. We can keep today simple — choose what would help most, and I'll take you there.`;
   }
-  return "Good morning. I'm glad you're here. Choose what would help most, and I'll take you there.";
+  return "Good morning. I'm glad you're here. We can keep today simple — choose what would help most, and I'll take you there.";
 }
 
 /** One short teaching sentence during the first 60 days — never a fourth choice. */

@@ -217,12 +217,33 @@
   margin-top: 0.1rem;
 }
 
+/* Keep text entry available, but secondary to the three cards */
+.todays-welcome-card__input-secondary .companion-chat-input.input-glass,
+.todays-welcome-card__input-secondary .companion-chat-input.input-glass-conversation {
+  opacity: 0.88;
+  transform: scale(0.98);
+  transform-origin: bottom center;
+}
+
+.todays-welcome-card__input-secondary textarea {
+  font-size: 0.95em;
+}
+
+.todays-welcome-card__input-secondary .send-soft {
+  opacity: 0.9;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .global-daily-opening__card {
     transition: none;
   }
 
   .global-daily-opening__card:hover {
+    transform: none;
+  }
+
+  .todays-welcome-card__input-secondary .companion-chat-input.input-glass,
+  .todays-welcome-card__input-secondary .companion-chat-input.input-glass-conversation {
     transform: none;
   }
 }

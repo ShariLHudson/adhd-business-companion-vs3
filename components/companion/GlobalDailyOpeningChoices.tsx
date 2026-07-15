@@ -1,7 +1,8 @@
 /**
- * Back-compat export — prefer GlobalDailyCompanionOpening.
+ * Back-compat export — prefer TodaysWelcomeCard.
  */
 export {
+  TodaysWelcomeCard,
   GlobalDailyCompanionOpening,
-  GlobalDailyCompanionOpening as GlobalDailyOpeningChoices,
+  GlobalDailyOpeningChoices,
 } from "./GlobalDailyCompanionOpening";

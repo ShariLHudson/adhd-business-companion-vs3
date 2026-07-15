@@ -231,8 +231,7 @@ import { resolveAdaptiveVisualContext } from "@/lib/adaptiveVisualContext";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import { WelcomeRoomPanel } from "@/components/companion/WelcomeRoomPanel";
 import { WelcomeHomePage } from "@/components/companion/WelcomeHomeFirstLaunch";
-import { WelcomeHomeDailyChoices } from "@/components/companion/WelcomeHomeDailyChoices";
-import { GlobalDailyCompanionOpening } from "@/components/companion/GlobalDailyCompanionOpening";
+import { TodaysWelcomeCard } from "@/components/companion/TodaysWelcomeCard";
 import {
   runSharedNewDay,
   resolveDailyOpeningChoiceAction,
@@ -3306,31 +3305,31 @@ export default function CompanionPageClient() {
     useState<DailyOpeningEntryPoint | null>(null);
   const estateChatScrollKey = `${freshStartRevision}-${messages.length}-${isLoading ? 1 : 0}`;
 
-  // First meaningful platform opening of the day / absence return —
-  // queue the shared controller (runner lives beside beginNewDay below).
+  // Today's Welcome Card — first meaningful open of day / absence return.
+  // Never fall back to retired plain-text WelcomeHomeDailyChoices.
   useEffect(() => {
     if (!hydrated || !welcomeHomePrimary) return;
     if (welcomeHomeExperience.showIntro) return;
-    if (welcomeHomeExperience.visitorKind === "first_visit") return;
-    if (!shouldOfferFirstPlatformOpeningOfDay()) return;
     if (dailyOpeningStartedRef.current) return;
     if (globalDailyOpening) return;
+    if (messages.length > 0) return;
 
-    dailyOpeningStartedRef.current = true;
     const arrival =
       homeArrival ?? evaluateArrivalIntelligence({ record: false });
+    const absence = isAbsenceReturn(arrival?.returnIntervalDays);
+    if (!absence && !shouldOfferFirstPlatformOpeningOfDay()) return;
+
+    dailyOpeningStartedRef.current = true;
     setPendingDailyOpeningEntry(
-      isAbsenceReturn(arrival?.returnIntervalDays)
-        ? "absence-return"
-        : "first-platform-opening",
+      absence ? "absence-return" : "first-platform-opening",
     );
   }, [
     hydrated,
     welcomeHomePrimary,
     welcomeHomeExperience.showIntro,
-    welcomeHomeExperience.visitorKind,
     homeArrival,
     globalDailyOpening,
+    messages.length,
   ]);
 
   const estateChatInputFocusEnabled =
@@ -22025,14 +22024,14 @@ export default function CompanionPageClient() {
                 welcomeSlot={
                   globalDailyOpening && !isLoading && messages.length === 0 ? (
                     dailyOpeningHelpSuggestions ? (
-                      <GlobalDailyCompanionOpening
+                      <TodaysWelcomeCard
                         mode="help-me-choose"
                         suggestions={dailyOpeningHelpSuggestions}
                         onSelectSuggestion={handleGlobalDailyHelpSuggestion}
                         onBackToToday={handleGlobalDailyBackToToday}
                       />
                     ) : (
-                      <GlobalDailyCompanionOpening
+                      <TodaysWelcomeCard
                         mode="main"
                         welcomeMessage={globalDailyOpening.welcomeMessage}
                         teachingSentence={globalDailyOpening.teachingSentence}
@@ -22043,16 +22042,6 @@ export default function CompanionPageClient() {
                         onDiscoveryDismiss={handleGlobalDailyDiscoveryDismiss}
                       />
                     )
-                  ) : welcomeHomeDaily.choices.length > 0 &&
-                    !globalDailyOpening &&
-                    messages.length === 0 &&
-                    !isLoading ? (
-                    <WelcomeHomeDailyChoices
-                      choices={welcomeHomeDaily.choices}
-                      discoveryInvitation={welcomeHomeDaily.discoveryInvitation}
-                      onSelect={handleWelcomeHomeDailyChoice}
-                      onDiscoveryInvite={handleWelcomeHomeDiscoveryInvite}
-                    />
                   ) : undefined
                 }
                 showConversation={messages.length > 0 || isLoading}
@@ -22080,6 +22069,11 @@ export default function CompanionPageClient() {
                   <HomeChatInputFooter
                     welcomeHome
                     homeCalm={false}
+                    className={
+                      globalDailyOpening
+                        ? "todays-welcome-card__input-secondary"
+                        : undefined
+                    }
                     homeChatPlaceholder={
                       globalDailyOpening
                         ? GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER

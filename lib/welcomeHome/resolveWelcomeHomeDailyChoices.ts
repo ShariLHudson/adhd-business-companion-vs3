@@ -115,9 +115,9 @@ function buildPreferredMessage(
 
   const name = resolveMemberFirstName();
   const continuity =
-    arrival?.continue.mode === "single"
+    arrival?.continue?.mode === "single"
       ? arrival.continue.option.title
-      : arrival?.continue.mode === "choose"
+      : arrival?.continue?.mode === "choose"
         ? arrival.continue.options[0]?.title
         : null;
 
@@ -196,6 +196,11 @@ export function resolveWelcomeHomeDailyChoices(
   const visitorKind = resolveVisitorKind(input);
   const choices = buildChoices(visitorKind, continueAvailable).slice(0, 3);
 
+  // Choices retired — Today's Welcome Card owns the three-choice opening.
+  // Keep preferredWelcomeMessage for soft greeting fallback only.
+  void choices;
+  void DISCOVERY_INVITE_LINE;
+
   return {
     visitorKind,
     preferredWelcomeMessage: buildPreferredMessage(
@@ -203,10 +208,9 @@ export function resolveWelcomeHomeDailyChoices(
       input.arrival,
       input.existingGreeting,
     ),
-    choices,
+    choices: [],
     discoveryInvitation: {
-      // Optional — never replaces the three choices; soft invite for returning members.
-      show: visitorKind !== "new",
+      show: false,
       line: DISCOVERY_INVITE_LINE,
     },
     continueAvailable,

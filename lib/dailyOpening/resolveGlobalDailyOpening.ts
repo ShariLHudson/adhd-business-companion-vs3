@@ -5,7 +5,6 @@
 
 import {
   resolveCompanionContinue,
-  type CompanionContinueOption,
   type CompanionContinueResolution,
 } from "@/lib/companionLedContinue";
 import { buildDailyOpeningChoiceCards } from "./buildDailyOpeningChoiceCards";
@@ -15,6 +14,7 @@ import {
   resolveFirst60TeachingSentence,
 } from "./buildDailyOpeningWelcome";
 import { resolveDailyOpeningDiscoveryInvite } from "./resolveDiscoveryInvite";
+import { resolveMeaningfulContinueForWelcome } from "./resolveMeaningfulContinue";
 import { readDailyOpeningPresentedDay } from "./dailyOpeningDay";
 import { todayStr } from "@/lib/companionStore";
 import {
@@ -37,14 +37,6 @@ export type ResolveGlobalDailyOpeningInput = {
   suppressDiscoveryForRecovery?: boolean;
   now?: Date;
 };
-
-function primaryContinueOption(
-  resolution: CompanionContinueResolution,
-): CompanionContinueOption | null {
-  if (resolution.mode === "single") return resolution.option;
-  if (resolution.mode === "choose") return resolution.options[0] ?? null;
-  return null;
-}
 
 function benefitForSuggestion(
   suggestion: Omit<HelpMeChooseSuggestion, "benefit"> & {
@@ -78,7 +70,7 @@ export function resolveHelpMeChooseSuggestions(
   continueResolution?: CompanionContinueResolution,
 ): HelpMeChooseSuggestion[] {
   const resolution = continueResolution ?? resolveCompanionContinue();
-  const continueOption = primaryContinueOption(resolution);
+  const continueOption = resolveMeaningfulContinueForWelcome(resolution);
   const suggestions: HelpMeChooseSuggestion[] = [];
 
   if (continueOption) {
@@ -87,12 +79,14 @@ export function resolveHelpMeChooseSuggestions(
       id: `hmc-continue-${continueOption.id}`,
       title,
       label: title,
-      benefit: continueOption.subtitle?.trim() || benefitForSuggestion({
-        id: "",
-        title,
-        label: title,
-        destination: { kind: "continue", option: continueOption },
-      }),
+      benefit:
+        continueOption.subtitle?.trim() ||
+        benefitForSuggestion({
+          id: "",
+          title,
+          label: title,
+          destination: { kind: "continue", option: continueOption },
+        }),
       destination: { kind: "continue", option: continueOption },
     });
   } else {
@@ -113,13 +107,23 @@ export function resolveHelpMeChooseSuggestions(
     destination: { kind: "plan-my-day" },
   });
 
-  suggestions.push({
-    id: "hmc-create-something",
-    title: "Create Something",
-    label: "Create Something",
-    benefit: "Start a small piece of work with me beside you.",
-    destination: { kind: "explore-estate" },
-  });
+  if (continueOption) {
+    suggestions.push({
+      id: "hmc-clear-my-mind",
+      title: "Clear My Mind",
+      label: "Clear My Mind",
+      benefit: "Set everything down so your mind can settle.",
+      destination: { kind: "clear-my-mind" },
+    });
+  } else {
+    suggestions.push({
+      id: "hmc-business-estate",
+      title: "Work on My Business Estate",
+      label: "Work on My Business Estate",
+      benefit: "Add a detail that helps me support you more personally.",
+      destination: { kind: "business-estate" },
+    });
+  }
 
   return suggestions.slice(0, 3).map((s) => ({
     ...s,
@@ -134,7 +138,7 @@ export function resolveGlobalDailyOpening(
 ): GlobalDailyOpeningResult {
   const continueResolution =
     input.continueResolution ?? resolveCompanionContinue();
-  const continueOption = primaryContinueOption(continueResolution);
+  const continueOption = resolveMeaningfulContinueForWelcome(continueResolution);
   const helpMeChooseSuggestions =
     resolveHelpMeChooseSuggestions(continueResolution);
 

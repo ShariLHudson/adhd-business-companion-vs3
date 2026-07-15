@@ -26,3 +26,4 @@ export {
   markDailyOpeningDiscoveryPresented,
 } from "./resolveDiscoveryInvite";
 export { buildDailyOpeningArrivalMessage } from "./arrivalMessage";
+export { resolveMeaningfulContinueForWelcome } from "./resolveMeaningfulContinue";

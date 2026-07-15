@@ -51,6 +51,8 @@ type Props = {
   ttsAudioRef: RefObject<HTMLAudioElement | null>;
   /** Welcome Home — no footer gradient slab; softer voice hint copy. */
   welcomeHome?: boolean;
+  /** Extra classes (e.g. quieter input under Today's Welcome Card). */
+  className?: string;
 };
 
 /** Home chat on static homestead — floating input footer, not Companion Desk. */
@@ -83,12 +85,13 @@ export function HomeChatInputFooter({
   onVoiceBlockedReset,
   ttsAudioRef,
   welcomeHome = false,
+  className,
 }: Props) {
   return (
     <footer
       className={`companion-home-input-footer input-footer companion-fade-in shrink-0 ${
         welcomeHome ? "" : "px-4 pb-4 pt-2 sm:px-6"
-      }`}
+      }${className ? ` ${className}` : ""}`}
     >
       {welcomeHome &&
       pendingAction?.kind === "workspace" &&

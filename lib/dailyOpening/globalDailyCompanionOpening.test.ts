@@ -53,6 +53,7 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
     });
     expect(message).toMatch(/glad you're here/i);
     expect(message).toMatch(/Shari/);
+    expect(message).not.toMatch(/^What would help most today\??$/i);
     expect(countWelcomeSentences(message)).toBeLessThanOrEqual(3);
   });
 
@@ -62,7 +63,7 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       memberFirstName: "Shari",
     });
     expect(message).toMatch(/welcome back/i);
-    expect(message).toMatch(/right now/i);
+    expect(message).toMatch(/most helpful place/i);
     expect(countWelcomeSentences(message)).toBeLessThanOrEqual(3);
   });
 
@@ -71,8 +72,9 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       momentKind: "absence-return",
       memberFirstName: "Shari",
     });
+    expect(message).toMatch(/welcome home/i);
     expect(message).toMatch(/do not need to catch up/i);
-    expect(message).toMatch(/one helpful place/i);
+    expect(message).toMatch(/one small place/i);
     expect(countWelcomeSentences(message)).toBeLessThanOrEqual(3);
   });
 
@@ -253,16 +255,19 @@ describe("GlobalDailyCompanionOpening — wiring contracts", () => {
       ),
       "utf8",
     );
-    expect(source).toContain("GlobalDailyCompanionOpening");
+    expect(source).toContain("TodaysWelcomeCard");
+    expect(source).not.toContain("<WelcomeHomeDailyChoices");
     expect(source).toContain("GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER");
     expect(source).toMatch(
       /setGlobalDailyOpening\(result\.opening\)[\s\S]*?setMessages\(\[\]\)/,
     );
     expect(source).toContain("buildDailyOpeningArrivalMessage");
-    expect(component).toContain('data-testid="global-daily-companion-opening"');
+    expect(component).toContain('data-testid="todays-welcome-card"');
+    expect(component).toContain("Recommended Today");
     expect(component).toContain("global-daily-opening__card--recommended");
     expect(component).toContain("Back to Today");
     expect(component).toContain('data-testid="global-daily-discovery"');
+    expect(component).not.toMatch(/Help Me Restart|Check My Day/);
   });
 
   it("CSS provides readable cards and focus/hover states", () => {
@@ -294,6 +299,12 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
     expect(cards.filter((c) => c.recommended)).toHaveLength(1);
     expect(cards.every((c) => c.title.trim().length > 0)).toBe(true);
     expect(cards.every((c) => c.explanation.trim().length > 0)).toBe(true);
+    expect(cards.map((c) => c.title).join(" ")).not.toMatch(
+      /Help Me Restart|Check My Day/i,
+    );
+    expect(cards[0]?.title).toBe("Review Where You Left Off");
+    expect(cards[1]?.title).toBe("Plan or Adapt My Day");
+    expect(cards[2]?.title).toBe("Help Me Choose");
   });
 
   it("same-day return after mark uses return moment kind", () => {

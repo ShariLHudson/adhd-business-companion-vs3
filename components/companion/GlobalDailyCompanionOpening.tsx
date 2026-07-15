@@ -28,18 +28,19 @@ type HelpProps = {
 type Props = MainProps | HelpProps;
 
 /**
- * Global Daily Companion Opening — reusable guided welcome card.
+ * Today's Welcome Card — shared Global Daily Companion Opening.
  * Used by first-of-day, absence return, Settings → New Day, and explicit New Day.
+ * Never render as plain chat text or as a fourth discovery choice.
  */
-export function GlobalDailyCompanionOpening(props: Props) {
+export function TodaysWelcomeCard(props: Props) {
   if (props.mode === "help-me-choose") {
     const suggestions = props.suggestions.slice(0, 3);
     if (suggestions.length === 0) return null;
 
     return (
       <section
-        className="global-daily-opening"
-        data-testid="global-daily-companion-opening"
+        className="global-daily-opening todays-welcome-card"
+        data-testid="todays-welcome-card"
         data-mode="help-me-choose"
         aria-label="Help me choose"
       >
@@ -93,10 +94,10 @@ export function GlobalDailyCompanionOpening(props: Props) {
 
   return (
     <section
-      className="global-daily-opening"
-      data-testid="global-daily-companion-opening"
+      className="global-daily-opening todays-welcome-card"
+      data-testid="todays-welcome-card"
       data-mode="main"
-      aria-label="Today's opening choices"
+      aria-label="Today's Welcome Card"
     >
       <header className="global-daily-opening__header">
         <p className="global-daily-opening__eyebrow">Shari</p>
@@ -131,7 +132,7 @@ export function GlobalDailyCompanionOpening(props: Props) {
             >
               {card.recommended ? (
                 <span className="global-daily-opening__recommended">
-                  Recommended
+                  Recommended Today
                 </span>
               ) : null}
               <span className="global-daily-opening__card-title">
@@ -184,5 +185,8 @@ export function GlobalDailyCompanionOpening(props: Props) {
   );
 }
 
-/** @deprecated Prefer GlobalDailyCompanionOpening */
-export { GlobalDailyCompanionOpening as GlobalDailyOpeningChoices };
+/** Shared name used across the platform — same component as TodaysWelcomeCard. */
+export const GlobalDailyCompanionOpening = TodaysWelcomeCard;
+
+/** @deprecated Prefer TodaysWelcomeCard / GlobalDailyCompanionOpening */
+export const GlobalDailyOpeningChoices = TodaysWelcomeCard;
