@@ -118,12 +118,21 @@ describe("firstLoginWelcome persistence", () => {
     expect(isWelcomeCompleted(reloaded)).toBe(true);
   });
 
-  it("treats incomplete welcome as required", () => {
+  it("treats incomplete welcome as required until Continue finishes it", () => {
     expect(
       isWelcomeCompleted({
         welcomeCompletedAt: null,
         welcomeAudioPlayedAt: "2026-07-13T12:00:00.000Z",
       }),
     ).toBe(false);
+  });
+
+  it("exports Stop & Continue and Welcome Home continue labels", async () => {
+    const {
+      FIRST_LOGIN_WELCOME_PRIMARY,
+      FIRST_LOGIN_WELCOME_STOP,
+    } = await import("@/lib/firstLoginWelcome/types");
+    expect(FIRST_LOGIN_WELCOME_PRIMARY).toBe("Continue to Welcome Home");
+    expect(FIRST_LOGIN_WELCOME_STOP).toBe("Stop & Continue");
   });
 });

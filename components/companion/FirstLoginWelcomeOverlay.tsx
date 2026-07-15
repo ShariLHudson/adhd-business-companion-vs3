@@ -20,6 +20,7 @@ import {
   FIRST_LOGIN_WELCOME_MESSAGE,
   FIRST_LOGIN_WELCOME_PRIMARY,
   FIRST_LOGIN_WELCOME_SECONDARY,
+  FIRST_LOGIN_WELCOME_STOP,
   FIRST_LOGIN_WELCOME_TITLE,
   isWelcomeCompleted,
   loadFirstLoginWelcomeRecord,
@@ -40,6 +41,7 @@ type Props = {
 
 /**
  * After auth, gate Estate behind a one-time Shari welcome with controllable audio.
+ * Plays only for a brand-new account’s first visit — never on later logins.
  */
 export function FirstLoginWelcomeGate({ children }: Props) {
   if (isCompanionAuthBypassed()) {
@@ -96,10 +98,21 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
           user?.user_metadata as Record<string, unknown> | undefined,
         );
         if (cancelled) return;
+
+        // Already finished once — never show or play again.
         if (isWelcomeCompleted(record)) {
           setPhase("not_required");
           return;
         }
+
+        // Heard or stopped once but left before Continue — finish quietly
+        // so subsequent logins never re-open this welcome.
+        if (record.welcomeAudioPlayedAt) {
+          await markWelcomeCompleted(userId);
+          if (!cancelled) setPhase("not_required");
+          return;
+        }
+
         setPhase("ready");
       } catch {
         // Never block Estate behind a welcome-record failure.
@@ -149,7 +162,8 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
         ? await loadFirstLoginWelcomeRecord(userId)
         : null;
       if (cancelled) return;
-      if (record?.welcomeAudioPlayedAt) {
+      // Never autoplay if this account already started welcome once.
+      if (record?.welcomeAudioPlayedAt || record?.welcomeCompletedAt) {
         setPhase("audio_blocked");
         return;
       }
@@ -181,11 +195,19 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     }
   }, [playExperience, voiceMuted, toggleVoice, markAudioOnce]);
 
-  const handleStop = useCallback(() => {
+  const handleEnter = useCallback(async () => {
+    if (!userId) return;
     void stopExperience();
-    setPhase("stopped");
+    destroyWelcomeHomeAudioManager();
+    await markWelcomeCompleted(userId);
+    setPhase("completed");
+  }, [userId, stopExperience]);
+
+  /** Stop the recording and go straight to Welcome Home — one-time welcome ends. */
+  const handleStopAndContinue = useCallback(async () => {
     void markAudioOnce();
-  }, [stopExperience, markAudioOnce]);
+    await handleEnter();
+  }, [markAudioOnce, handleEnter]);
 
   const handleMute = useCallback(() => {
     const nextMuted = !voiceMuted;
@@ -194,14 +216,6 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
       nextMuted ? "muted" : voiceState === "playing" ? "playing" : "ready",
     );
   }, [voiceMuted, toggleVoice, voiceState]);
-
-  const handleEnter = useCallback(async () => {
-    if (!userId) return;
-    void stopExperience();
-    destroyWelcomeHomeAudioManager();
-    await markWelcomeCompleted(userId);
-    setPhase("completed");
-  }, [userId, stopExperience]);
 
   if (!sessionChecked || loading || phase === "checking") {
     return <SparkLoadingState fullPage message="Loading your space…" size="lg" />;
@@ -257,11 +271,11 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
           ) : null}
           <button
             type="button"
-            onClick={handleStop}
-            className="rounded-xl border border-[#d4cdc3] bg-white/80 px-4 py-2.5 text-base font-semibold text-[#2f261f]"
+            onClick={() => void handleStopAndContinue()}
+            className="rounded-xl border border-[#1e4f4f]/40 bg-[#1e4f4f]/10 px-4 py-2.5 text-base font-semibold text-[#1e4f4f]"
             data-testid="first-login-stop-welcome"
           >
-            Stop Welcome
+            {FIRST_LOGIN_WELCOME_STOP}
           </button>
           <button
             type="button"

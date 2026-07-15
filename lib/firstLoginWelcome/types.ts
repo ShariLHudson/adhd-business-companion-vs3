@@ -25,7 +25,8 @@ export const FIRST_LOGIN_WELCOME_TITLE = "Welcome to Your Spark Estate" as const
 export const FIRST_LOGIN_WELCOME_MESSAGE =
   "Welcome. I'm Shari, and I'll be here to help you find your way, think things through, and move forward without pressure.\n\nYou do not need to learn everything today. We can begin with whatever would help you most right now." as const;
 
-export const FIRST_LOGIN_WELCOME_PRIMARY = "Enter the Estate" as const;
+export const FIRST_LOGIN_WELCOME_PRIMARY = "Continue to Welcome Home" as const;
+export const FIRST_LOGIN_WELCOME_STOP = "Stop & Continue" as const;
 export const FIRST_LOGIN_WELCOME_SECONDARY = "Tell Me How This Works" as const;
 
 export const FIRST_LOGIN_HOW_THIS_WORKS =

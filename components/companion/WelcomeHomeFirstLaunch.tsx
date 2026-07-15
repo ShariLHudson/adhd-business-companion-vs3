@@ -23,6 +23,7 @@ import {
   WELCOME_HOME_BEGIN_HINT,
   WELCOME_HOME_BEGIN_LABEL,
 } from "@/lib/welcomeHome/content";
+import { markWelcomeIntroSeen } from "@/lib/welcomeHome/firstLaunchPersistence";
 import { setWelcomeHomeIntroAudioBlocked } from "@/lib/welcomeHome/introAudioGuard";
 import { markWelcomeRoomOpenedWithGesture } from "@/lib/welcomeRoom/welcomeRoomGesture";
 import {
@@ -179,8 +180,13 @@ export function WelcomeHomePage({
   useEffect(() => {
     if (voiceState === "playing") {
       setVoiceHasPlayed(true);
+      // Persist as soon as narration starts so a refresh never re-autoplays.
+      // Manual "Listen to Shari's Welcome" uses visitorKind "replay" and may play again.
+      if (experience.visitorKind === "first_visit") {
+        markWelcomeIntroSeen();
+      }
     }
-  }, [voiceState]);
+  }, [voiceState, experience.visitorKind]);
 
   const narrationComplete =
     skippedIntro ||
@@ -222,8 +228,11 @@ export function WelcomeHomePage({
     setSkippedIntro(true);
     setPhase("chat");
     void stopExperience();
+    if (experience.visitorKind === "first_visit") {
+      markWelcomeIntroSeen();
+    }
     onIntroComplete();
-  }, [onIntroComplete, stopExperience]);
+  }, [experience.visitorKind, onIntroComplete, stopExperience]);
 
   useEffect(() => {
     registerBack?.(() => {
@@ -347,8 +356,9 @@ export function WelcomeHomePage({
               className="welcome-home-page__stop-btn"
               onClick={handleStopIntro}
               data-testid="welcome-home-stop-intro"
+              aria-label="Stop welcome recording and continue to Welcome Home"
             >
-              Stop
+              Stop &amp; Continue
             </button>
           </div>
         ) : null}
