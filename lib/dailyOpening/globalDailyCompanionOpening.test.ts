@@ -345,6 +345,28 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
     expect(cards[2]?.title).toBe("Help Me Choose");
   });
 
+  it("never uses a raw user sentence as the continue card title", () => {
+    const cards = buildDailyOpeningChoiceCards({
+      id: "raw-continue",
+      kind: "conversation",
+      title: "whether i should hire a salesperson or not",
+      subtitle: "Pick up our conversation",
+      priority: 1,
+      lastTouchedAt: new Date().toISOString(),
+      homeResumeItem: {
+        id: "hire-decision",
+        kind: "decision-compass",
+        title: "whether i should hire a salesperson or not",
+        typeLabel: "Hiring Decision",
+        lastAction: "Paused",
+        nextStep: "Continue deciding",
+        ts: new Date().toISOString(),
+      },
+    });
+    expect(cards[0]?.title).toBe("Continue Your Hiring Decision");
+    expect(cards[0]?.title).not.toMatch(/whether i should/i);
+  });
+
   it("same-day return after mark uses return moment kind", () => {
     markDailyOpeningPresented(todayStr());
     const opening = resolveGlobalDailyOpening({

@@ -110,7 +110,9 @@ import {
 } from "@/lib/planMyDay/planRealityAlignment";
 import { useCategoryColorCoding } from "@/lib/useCategoryColorCoding";
 import { publishRealitySignal } from "@/lib/companionJudgmentClient";
-import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
+import { AdaptMyDayCheckIn } from "@/components/companion/AdaptMyDayCheckIn";
+import { PlanOrAdaptPathChooser } from "@/components/companion/PlanOrAdaptPathChooser";
+import type { AdaptedDayProposal } from "@/lib/dailyAdaptation";
 const PLAN_KANBAN_BOARD_CLASS = "mx-auto w-full min-w-0 max-w-6xl";
 const PLANNING_AREA_STORAGE_KEY = "companion-plan-my-day-planning-area-v1";
 
@@ -335,6 +337,23 @@ export function PlanMyDayPanel({
   const [showAddForm, setShowAddForm] = useState(false);
   const [confirmedToday, setConfirmedToday] = useState(false);
   const [editingReality, setEditingReality] = useState(false);
+  /** null = show Plan vs Adapt chooser on Today before orientation. */
+  const [dayPath, setDayPath] = useState<"plan" | "adapt" | null>(() => {
+    if (standalone) return "plan";
+    const hasPlan = hasMeaningfulPlanItemsForToday();
+    if (
+      hasPlan ||
+      initialSession.phase === "living" ||
+      shouldSkipOrientation(
+        initialSession.phase,
+        initialOpenItemId,
+        hasPlan,
+      )
+    ) {
+      return "plan";
+    }
+    return null;
+  });
   const [stewardshipNotice, setStewardshipNotice] = useState<string | null>(
     null,
   );
@@ -772,6 +791,7 @@ export function PlanMyDayPanel({
   }
 
   function openTodaysReality() {
+    setDayPath("adapt");
     setEditingReality(true);
     setOpenItemId(null);
     setDetailMode("form");
@@ -779,6 +799,15 @@ export function PlanMyDayPanel({
 
   function closeTodaysReality() {
     setEditingReality(false);
+    if (dayPath === "adapt") setDayPath("plan");
+  }
+
+  function finishAdaptInsidePlan(_proposal: AdaptedDayProposal) {
+    closeTodaysReality();
+    setDayPath("plan");
+    setLivingUnlocked(true);
+    setFlexibleMode(false);
+    refresh(loadTodayPlanItems());
   }
 
   function handleNavBack() {
@@ -1193,7 +1222,20 @@ export function PlanMyDayPanel({
               onClose={handleClosePreviousReview}
             />
           </div>
-        ) : showOrientation ? (
+        ) : dayPath === null && planningArea === "today" && !editingReality ? (
+          <div className="flex flex-1 flex-col justify-center gap-6 py-6 plan-day-journey-chapter-enter">
+            <PlanOrAdaptPathChooser
+              onBack={onBack}
+              onSelect={(choiceId) => {
+                if (choiceId === "adapt-my-day") {
+                  openTodaysReality();
+                  return;
+                }
+                setDayPath("plan");
+              }}
+            />
+          </div>
+        ) : showOrientation && dayPath === "plan" ? (
           <div className="flex flex-1 flex-col justify-center gap-6 py-6 plan-day-journey-chapter-enter">
             {showPreviousDayBanner && previousDayPrompt ? (
               <PlanDayPreviousDayPrompt
@@ -1204,7 +1246,7 @@ export function PlanMyDayPanel({
             ) : null}
             <PlanDayOrientationSurface
               presentation={companion.orientation}
-              onPrevious={handleNavBack}
+              onPrevious={() => setDayPath(null)}
               onConfirm={() => unlockLiving(true, "confirmed")}
               onOpenAdaptMyDay={openTodaysReality}
             />
@@ -1226,8 +1268,17 @@ export function PlanMyDayPanel({
             />
           </div>
         ) : editingReality ? (
-          <div className="mt-4 plan-day-journey-chapter-enter">
-            <AdjustMyDayPanel embedded onDone={closeTodaysReality} />
+          <div
+            className="mt-4 plan-day-journey-chapter-enter"
+            data-testid="plan-day-adapt-my-day"
+          >
+            <AdaptMyDayCheckIn
+              onBack={closeTodaysReality}
+              onUsePlan={finishAdaptInsidePlan}
+              onAdjustPlan={finishAdaptInsidePlan}
+              onStartFirstStep={finishAdaptInsidePlan}
+              onKeepCurrentPlan={closeTodaysReality}
+            />
           </div>
         ) : (
           <>
