@@ -6,60 +6,85 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  EVIDENCE_VAULT_ARRIVAL_MS,
+  EVIDENCE_VAULT_DOOR_HOLD_MS,
   EVIDENCE_VAULT_DOOR_LEFT_BG,
+  EVIDENCE_VAULT_DOOR_OPEN_DEGREES,
   EVIDENCE_VAULT_DOOR_RIGHT_BG,
-  EVIDENCE_VAULT_INTERIOR_REVEAL_BG,
   EVIDENCE_VAULT_ROOM_STATIC_BG,
+  EVIDENCE_VAULT_WRITING_ROOM_BG,
 } from "@/lib/estate/evidenceVaultDoor";
 import { EvidenceVaultEntrance } from "./EvidenceVaultEntrance";
 
 vi.mock("framer-motion", async () => {
   const React = await import("react");
+  const MotionDiv = React.forwardRef(function MotionDiv(
+    {
+      children,
+      animate,
+      style,
+      ...rest
+    }: {
+      children?: React.ReactNode;
+      animate?: { rotateY?: number; opacity?: number };
+      style?: React.CSSProperties & { transformPerspective?: number };
+      className?: string;
+      "data-testid"?: string;
+    },
+    ref: React.Ref<HTMLDivElement>,
+  ) {
+    const rotateY = animate?.rotateY ?? 0;
+    const opacity = animate?.opacity ?? 1;
+    const { transformPerspective, transformOrigin, ...box } = style ?? {};
+    return React.createElement(
+      "div",
+      {
+        ...rest,
+        ref,
+        style: {
+          ...box,
+          transformOrigin,
+          opacity,
+          transform:
+            rotateY === 0
+              ? undefined
+              : `perspective(${transformPerspective ?? 1600}px) rotateY(${rotateY}deg)`,
+        },
+        "data-rotate-y": String(rotateY),
+        "data-door-opacity": String(opacity),
+      },
+      children,
+    );
+  });
+  const MotionButton = React.forwardRef(function MotionButton(
+    {
+      children,
+      animate,
+      ...rest
+    }: {
+      children?: React.ReactNode;
+      animate?: Record<string, unknown>;
+      className?: string;
+      type?: "button";
+      onClick?: () => void;
+      disabled?: boolean;
+      "aria-label"?: string;
+      "aria-describedby"?: string;
+      "data-testid"?: string;
+    },
+    ref: React.Ref<HTMLButtonElement>,
+  ) {
+    return React.createElement(
+      "button",
+      { ...rest, ref, "data-key-animate": animate ? "1" : "0" },
+      children,
+    );
+  });
   return {
     useReducedMotion: () => false,
     motion: {
-      div: React.forwardRef(function MotionDiv(
-        {
-          children,
-          animate,
-          style,
-          ...rest
-        }: {
-          children?: React.ReactNode;
-          animate?: { rotateY?: number; opacity?: number };
-          style?: React.CSSProperties & { transformPerspective?: number };
-          className?: string;
-          "data-testid"?: string;
-        },
-        ref: React.Ref<HTMLDivElement>,
-      ) {
-        const rotateY = animate?.rotateY ?? 0;
-        const opacity = animate?.opacity ?? 1;
-        const {
-          transformPerspective,
-          transformOrigin,
-          ...box
-        } = style ?? {};
-        return React.createElement(
-          "div",
-          {
-            ...rest,
-            ref,
-            style: {
-              ...box,
-              transformOrigin,
-              opacity,
-              transform:
-                rotateY === 0
-                  ? undefined
-                  : `perspective(${transformPerspective ?? 1400}px) rotateY(${rotateY}deg)`,
-            },
-            "data-rotate-y": String(rotateY),
-            "data-door-opacity": String(opacity),
-          },
-          children,
-        );
-      }),
+      div: MotionDiv,
+      button: MotionButton,
     },
   };
 });
@@ -69,6 +94,7 @@ describe("EvidenceVaultEntrance door motion", () => {
   let root: Root;
 
   beforeEach(() => {
+    vi.useFakeTimers();
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
@@ -79,6 +105,7 @@ describe("EvidenceVaultEntrance door motion", () => {
       root.unmount();
     });
     container.remove();
+    vi.useRealTimers();
   });
 
   function renderEntrance(
@@ -93,7 +120,34 @@ describe("EvidenceVaultEntrance door motion", () => {
         />,
       );
     });
+    if (doorState === "locked" || doorState === "key_ready") {
+      act(() => {
+        vi.advanceTimersByTime(EVIDENCE_VAULT_ARRIVAL_MS);
+      });
+    }
   }
+
+  it("starts with closed hinged doors and hanging key object", () => {
+    renderEntrance("key_ready");
+    expect(
+      document.querySelector('[data-testid="evidence-vault-door-left"]'),
+    ).toBeTruthy();
+    expect(
+      document.querySelector('[data-testid="evidence-vault-door-right"]'),
+    ).toBeTruthy();
+    expect(
+      document.querySelector('[data-testid="vault-key-interaction"]'),
+    ).toBeTruthy();
+    expect(
+      document.querySelector('[data-testid="evidence-vault-use-key"]'),
+    ).toBeTruthy();
+    expect(
+      document.querySelector('[data-testid="evidence-vault-closed-composite"]'),
+    ).toBeNull();
+    expect(
+      document.querySelector('[data-testid="evidence-vault-unlock-action"]'),
+    ).toBeNull();
+  });
 
   it("renders two distinct door elements with separate leaf assets", () => {
     renderEntrance("key_ready");
@@ -127,37 +181,32 @@ describe("EvidenceVaultEntrance door motion", () => {
     const right = document.querySelector(
       '[data-testid="evidence-vault-door-right"]',
     );
-    expect(Number(left?.getAttribute("data-rotate-y"))).toBeLessThan(0);
-    expect(Number(right?.getAttribute("data-rotate-y"))).toBeGreaterThan(0);
+    expect(Number(left?.getAttribute("data-rotate-y"))).toBe(
+      -EVIDENCE_VAULT_DOOR_OPEN_DEGREES,
+    );
+    expect(Number(right?.getAttribute("data-rotate-y"))).toBe(
+      EVIDENCE_VAULT_DOOR_OPEN_DEGREES,
+    );
     expect(left?.getAttribute("style") || "").toMatch(/rotateY\(-?\d/i);
     expect(right?.getAttribute("style") || "").toMatch(/rotateY\(\d/i);
   });
 
-  it("removes the closed full-image overlay during unlocking and opening", () => {
-    renderEntrance("key_ready");
-    expect(
-      document.querySelector('[data-testid="evidence-vault-closed-composite"]'),
-    ).toBeTruthy();
-
-    renderEntrance("unlocking");
-    expect(
-      document.querySelector('[data-testid="evidence-vault-closed-composite"]'),
-    ).toBeNull();
-    expect(
-      document.querySelector('[data-testid="evidence-vault-closed-door-image"]'),
-    ).toBeNull();
-
-    renderEntrance("opening");
-    expect(
-      document.querySelector('[data-testid="evidence-vault-closed-composite"]'),
-    ).toBeNull();
+  it("never mounts a closed full-image overlay", () => {
+    for (const state of ["key_ready", "unlocking", "opening"] as const) {
+      renderEntrance(state);
+      expect(
+        document.querySelector(
+          '[data-testid="evidence-vault-closed-composite"]',
+        ),
+      ).toBeNull();
+    }
   });
 
-  it("keeps interior reveal beneath the door stage", () => {
+  it("keeps writing room beneath the door stage without fade swap", () => {
     renderEntrance("opening");
     const inner = document.querySelector(".evidence-vault-entrance__art-inner");
-    const interior = document.querySelector(
-      '[data-testid="evidence-vault-interior-reveal-image"]',
+    const writing = document.querySelector(
+      '[data-testid="evidence-vault-writing-room-image"]',
     );
     const stage = document.querySelector(
       '[data-testid="evidence-vault-door-stage"]',
@@ -165,13 +214,13 @@ describe("EvidenceVaultEntrance door motion", () => {
     const room = document.querySelector(
       '[data-testid="evidence-vault-room-static-image"]',
     );
-    expect(interior?.getAttribute("src")).toBe(EVIDENCE_VAULT_INTERIOR_REVEAL_BG);
+    expect(writing?.getAttribute("src")).toBe(EVIDENCE_VAULT_WRITING_ROOM_BG);
     expect(room?.getAttribute("src")).toBe(EVIDENCE_VAULT_ROOM_STATIC_BG);
-    expect(inner?.contains(interior!)).toBe(true);
+    expect(inner?.contains(writing!)).toBe(true);
     expect(inner?.contains(stage!)).toBe(true);
     const nodes = [...(inner?.children ?? [])];
-    const interiorPlate = interior?.parentElement;
-    expect(nodes.indexOf(interiorPlate!)).toBeLessThan(nodes.indexOf(stage!));
+    const writingPlate = writing?.parentElement;
+    expect(nodes.indexOf(writingPlate!)).toBeLessThan(nodes.indexOf(stage!));
   });
 
   it("does not put a 2D transform on the 3D art stage (prevents flatten)", () => {
@@ -184,7 +233,6 @@ describe("EvidenceVaultEntrance door motion", () => {
     ) as HTMLElement | null;
     expect(art).toBeTruthy();
     expect(inner).toBeTruthy();
-    // Structural guard: centering must not rely on transform on the 3D parent.
     expect(art?.style.transform || "").toBe("");
   });
 
@@ -200,25 +248,32 @@ describe("EvidenceVaultEntrance door motion", () => {
     expect(right?.getAttribute("data-door-opacity")).toBe("1");
   });
 
-  it("does not mount entrance home chrome after open (entrance unmounts)", () => {
+  it("holds open doors framing the room, then unmounts entrance", () => {
     renderEntrance("open");
+    expect(
+      document.querySelector('[data-testid="evidence-vault-entrance"]'),
+    ).toBeTruthy();
+    expect(
+      document.querySelector('[data-testid="evidence-vault-entrance"]')
+        ?.getAttribute("data-holding-open"),
+    ).toBe("true");
+    act(() => {
+      vi.advanceTimersByTime(EVIDENCE_VAULT_DOOR_HOLD_MS + 50);
+    });
     expect(
       document.querySelector('[data-testid="evidence-vault-entrance"]'),
     ).toBeNull();
   });
 
-  it("hides key/lock glow once hinged opening begins", () => {
+  it("hides key interaction once hinged opening begins", () => {
     renderEntrance("key_ready");
     expect(
-      document.querySelector(".evidence-vault-entrance__lock-glow"),
+      document.querySelector('[data-testid="vault-key-interaction"]'),
     ).toBeTruthy();
 
     renderEntrance("opening");
     expect(
-      document.querySelector(".evidence-vault-entrance__lock-glow"),
-    ).toBeNull();
-    expect(
-      document.querySelector(".evidence-vault-entrance__key-glint"),
+      document.querySelector('[data-testid="vault-key-interaction"]'),
     ).toBeNull();
   });
 });

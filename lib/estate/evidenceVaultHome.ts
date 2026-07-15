@@ -14,31 +14,37 @@ export const EVIDENCE_VAULT_HOME_KICKER = "A private archive" as const;
 
 export const EVIDENCE_VAULT_HOME_TITLE = "Evidence Vault" as const;
 
-export const EVIDENCE_VAULT_HOME_LEAD =
-  "Life, growth, achievements, and encouragement — proof of who you are and how far you've come." as const;
+/** Purpose — not random moments; preserved proof of a life and a business. */
+export const EVIDENCE_VAULT_HOME_LEAD = [
+  "A place to preserve what happened, what you learned, problems you solved,",
+  "people you helped, things you created, and evidence of your growth —",
+  "along with anything else meaningful, including attachments, files, and links.",
+].join(" ");
 
 export const EVIDENCE_VAULT_HOME_NEXT =
-  "Preserve a moment, continue something you started, or look back when you need to remember." as const;
+  "Create new evidence, browse what you've kept, or add an attachment or link." as const;
 
 export const EVIDENCE_VAULT_EMPTY_INTRO = [
-  "Every meaningful journey leaves behind evidence.",
-  "This is where you'll collect moments that remind you who you are and how far you've come.",
+  "This vault holds the proof of your journey — not random scraps.",
+  "Start with one thing worth keeping: a result, a lesson, a person you helped, or something you created.",
 ].join("\n\n");
 
-export const EVIDENCE_VAULT_EMPTY_CTA = "Add My First Evidence" as const;
+export const EVIDENCE_VAULT_EMPTY_CTA = "Create Evidence" as const;
 
-export const EVIDENCE_VAULT_ADD_LABEL = "Add Evidence" as const;
+export const EVIDENCE_VAULT_CREATE_LABEL = "Create Evidence" as const;
+export const EVIDENCE_VAULT_ADD_LABEL = "Create Evidence" as const;
 export const EVIDENCE_VAULT_CONTINUE_DRAFT_LABEL = "Continue Draft" as const;
-export const EVIDENCE_VAULT_BROWSE_LABEL = "Browse My Evidence" as const;
+export const EVIDENCE_VAULT_BROWSE_LABEL = "Browse Evidence" as const;
+export const EVIDENCE_VAULT_ADD_ATTACHMENT_LABEL = "Add Attachment" as const;
+export const EVIDENCE_VAULT_ADD_LINK_LABEL = "Add Link" as const;
 export const EVIDENCE_VAULT_SURPRISE_LABEL = "Surprise Me" as const;
 export const EVIDENCE_VAULT_VIEW_ALL_LABEL = "View All" as const;
 export const EVIDENCE_VAULT_HOW_DO_I_LABEL = "How Do I?" as const;
 
 export const EVIDENCE_VAULT_HOW_DO_I_BODY = [
-  "Your Evidence Vault is a quiet place to keep moments that matter — wins, kindness, growth, and proof you can return to on harder days.",
-  "Use it when something feels worth remembering: a client result, a compliment, a milestone, a lesson, or a day you showed up for yourself.",
-  "What belongs here is personal. Achievements, notes, photos, faith, family, health, business — or anything uncategorized that simply feels true.",
-  "When discouragement or self-doubt visits, this archive helps you see evidence instead of guessing. You do not have to remember everything alone.",
+  "Your Evidence Vault preserves what happened, what you learned, problems you solved, people you helped, things you created, and evidence of your growth.",
+  "You can keep attachments, files, links, and any other meaningful proof — not random scraps.",
+  "Return here when you need to see evidence instead of guessing. You do not have to remember everything alone.",
 ].join("\n\n");
 
 export const EVIDENCE_VAULT_GENTLE_REMINDER =

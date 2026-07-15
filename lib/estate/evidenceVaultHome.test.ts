@@ -160,7 +160,7 @@ describe("evidenceVaultHome", () => {
   });
 
   it("keeps empty-state and How Do I? copy calm", () => {
-    expect(EVIDENCE_VAULT_EMPTY_INTRO).toMatch(/meaningful journey/);
+    expect(EVIDENCE_VAULT_EMPTY_INTRO).toMatch(/proof of your journey/);
     expect(EVIDENCE_VAULT_HOW_DO_I_LABEL).toBe("How Do I?");
   });
 });

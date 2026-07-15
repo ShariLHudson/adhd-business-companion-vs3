@@ -50,19 +50,31 @@ describe("EvidenceVaultInterior home", () => {
     return props;
   }
 
-  it("shows empty state with one primary CTA", () => {
+  it("shows desk folio home actions without a giant panel CTA", () => {
     renderHome();
+    expect(
+      container.querySelector('[data-testid="evidence-vault-folio"]'),
+    ).toBeTruthy();
     expect(
       container.querySelector('[data-testid="evidence-vault-empty-state"]'),
     ).toBeTruthy();
-    expect(container.textContent).toMatch(/Every meaningful journey/);
+    expect(container.textContent).toMatch(/worth keeping/);
     expect(
-      container.querySelector('[data-testid="evidence-vault-add-first"]')
+      container.querySelector('[data-testid="evidence-vault-add-evidence"]')
         ?.textContent,
-    ).toMatch(/Add My First Evidence/);
+    ).toMatch(/Create Evidence/);
+    expect(
+      container.querySelector('[data-testid="evidence-vault-home"]'),
+    ).toBeTruthy();
     expect(
       container.querySelector('[data-testid="evidence-vault-primary-actions"]'),
-    ).toBeNull();
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="evidence-vault-add-attachment"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="evidence-vault-add-link"]'),
+    ).toBeTruthy();
   });
 
   it("keeps How Do I? collapsed by default", () => {

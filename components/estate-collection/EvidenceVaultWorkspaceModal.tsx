@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  useCallback,
   useEffect,
   useId,
   useRef,
   type ReactNode,
 } from "react";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "./evidence-vault-workspace.css";
 
 type Props = {
@@ -21,7 +21,7 @@ type Props = {
 
 /**
  * Evidence Vault — modal workspace shell.
- * Room stays visible behind a dimmed backdrop; restores interaction on close.
+ * Shared Estate dismiss (outside + Escape) with unsaved-edit block.
  */
 export function EvidenceVaultWorkspaceModal({
   open,
@@ -35,10 +35,12 @@ export function EvidenceVaultWorkspaceModal({
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
-  const requestClose = useCallback(() => {
-    if (closeBlocked) return;
-    onClose();
-  }, [closeBlocked, onClose]);
+  const { requestClose, onBackdropClick } = useDismissibleWindow({
+    open,
+    onClose,
+    isDirty: closeBlocked,
+    confirmDiscard: () => !closeBlocked,
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -49,18 +51,6 @@ export function EvidenceVaultWorkspaceModal({
       document.body.style.overflow = previousOverflow;
     };
   }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      event.stopPropagation();
-      requestClose();
-    };
-    window.addEventListener("keydown", onKeyDown, true);
-    return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [open, requestClose]);
 
   useEffect(() => {
     if (open) return;
@@ -87,7 +77,7 @@ export function EvidenceVaultWorkspaceModal({
           .filter(Boolean)
           .join(" ")}
         aria-label="Close vault panel"
-        onClick={requestClose}
+        onClick={() => onBackdropClick()}
         tabIndex={-1}
       />
       <div
@@ -106,7 +96,7 @@ export function EvidenceVaultWorkspaceModal({
             type="button"
             className="evidence-vault-workspace-modal__close"
             aria-label="Close"
-            onClick={requestClose}
+            onClick={() => requestClose()}
             data-testid="evidence-vault-modal-close"
           >
             <span aria-hidden>×</span>
@@ -122,7 +112,7 @@ export function EvidenceVaultWorkspaceModal({
           <button
             type="button"
             className="evidence-vault-workspace-modal__return"
-            onClick={requestClose}
+            onClick={() => requestClose()}
             disabled={closeBlocked}
           >
             Return to Vault

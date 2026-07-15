@@ -1,32 +1,28 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 import "./evidence-vault-entrance.css";
 import {
   EVIDENCE_VAULT_ARRIVAL_MS,
   EVIDENCE_VAULT_CLOSED_DOOR_BG,
+  EVIDENCE_VAULT_DOOR_HOLD_MS,
   EVIDENCE_VAULT_DOOR_LEFT_BG,
-  EVIDENCE_VAULT_DOOR_LEFT_BOUNDS,
   EVIDENCE_VAULT_DOOR_RIGHT_BG,
-  EVIDENCE_VAULT_DOOR_RIGHT_BOUNDS,
   EVIDENCE_VAULT_DOOR_STATUS,
-  EVIDENCE_VAULT_DOOR_STAGGER_MS,
   EVIDENCE_VAULT_INTERIOR_REVEAL_BG,
-  EVIDENCE_VAULT_OPEN_MS,
   EVIDENCE_VAULT_ROOM_STATIC_BG,
-  evidenceVaultDoorLeafStyle,
+  EVIDENCE_VAULT_WRITING_ROOM_BG,
   resetEvidenceVaultAccessStateForDev,
   type EvidenceVaultDoorState,
 } from "@/lib/estate/evidenceVaultDoor";
-import {
-  EVIDENCE_VAULT_DOOR_ACTION_LABEL,
-  EVIDENCE_VAULT_EXTERIOR_WELCOME,
-  EVIDENCE_VAULT_KEY_INVITATION,
-} from "@/lib/estate/evidenceVaultExperience";
+import { EVIDENCE_VAULT_EXTERIOR_WELCOME } from "@/lib/estate/evidenceVaultExperience";
 import { playEvidenceVaultUnlockSound } from "@/lib/estate/evidenceVaultUnlockSound";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
+import { VaultDoorAnimation } from "./VaultDoorAnimation";
+import { VaultKeyInteraction } from "./VaultKeyInteraction";
+import { VaultReveal } from "./VaultReveal";
 
 type Props = {
   doorState: EvidenceVaultDoorState;
@@ -36,8 +32,8 @@ type Props = {
 };
 
 /**
- * Evidence Vault entrance — hinged door reveal over stationary room.
- * Portaled so it sits above chat stacking contexts.
+ * Evidence Vault entrance — standing in front of real double doors.
+ * Interior already exists behind the leaves; key unlocks, doors swing open.
  */
 export function EvidenceVaultEntrance({
   doorState,
@@ -47,23 +43,26 @@ export function EvidenceVaultEntrance({
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [keyRevealed, setKeyRevealed] = useState(false);
-  const keyRef = useRef<HTMLButtonElement>(null);
-  const skipRef = useRef<HTMLButtonElement>(null);
-  const unlockStartedRef = useRef(false);
+  const [unlockStarted, setUnlockStarted] = useState(false);
+  /** Keep doors framing the room after open before unmount. */
+  const [holdingOpen, setHoldingOpen] = useState(false);
   const titleId = useId();
   const reduceMotion = useReducedMotion();
   const busy = doorState === "unlocking" || doorState === "opening";
   const idle =
     (doorState === "locked" || doorState === "key_ready") && keyRevealed;
-  const doorsOpen = doorState === "opening" || doorState === "open";
-  /** Closed full-plate only before swing — never above hinged leaves while opening. */
-  const showClosedComposite =
-    doorState === "locked" || doorState === "key_ready";
+  const doorsOpen =
+    doorState === "opening" || doorState === "open" || holdingOpen;
   const status = EVIDENCE_VAULT_DOOR_STATUS[doorState];
-  const leftStyle = evidenceVaultDoorLeafStyle(EVIDENCE_VAULT_DOOR_LEFT_BOUNDS);
-  const rightStyle = evidenceVaultDoorLeafStyle(
-    EVIDENCE_VAULT_DOOR_RIGHT_BOUNDS,
-  );
+
+  const keyPhase =
+    doorState === "opening" || doorState === "open" || holdingOpen
+      ? "done"
+      : doorState === "unlocking"
+        ? "unlocking"
+        : idle
+          ? "ready"
+          : "hidden";
 
   useEffect(() => setMounted(true), []);
 
@@ -72,6 +71,7 @@ export function EvidenceVaultEntrance({
     preloadRoomBackground(EVIDENCE_VAULT_ROOM_STATIC_BG);
     preloadRoomBackground(EVIDENCE_VAULT_DOOR_LEFT_BG);
     preloadRoomBackground(EVIDENCE_VAULT_DOOR_RIGHT_BG);
+    preloadRoomBackground(EVIDENCE_VAULT_WRITING_ROOM_BG);
     preloadRoomBackground(EVIDENCE_VAULT_INTERIOR_REVEAL_BG);
   }, []);
 
@@ -98,7 +98,6 @@ export function EvidenceVaultEntrance({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [onBack]);
 
-  /* State 1 — arrival pause, then reveal key (already in lock). */
   useEffect(() => {
     if (doorState !== "locked" && doorState !== "key_ready") {
       setKeyRevealed(true);
@@ -117,38 +116,43 @@ export function EvidenceVaultEntrance({
   }, [doorState, reduceMotion]);
 
   useEffect(() => {
-    if (idle) keyRef.current?.focus({ preventScroll: true });
-  }, [idle]);
-
-  useEffect(() => {
-    if (doorState === "unlocking" && !unlockStartedRef.current) {
-      unlockStartedRef.current = true;
+    if (doorState === "unlocking" && !unlockStarted) {
+      setUnlockStarted(true);
       playEvidenceVaultUnlockSound();
     }
     if (doorState === "locked" || doorState === "key_ready") {
-      unlockStartedRef.current = false;
+      setUnlockStarted(false);
     }
-  }, [doorState]);
+  }, [doorState, unlockStarted]);
 
-  if (!mounted || doorState === "open") return null;
+  /* State 4 — leave doors at the edges framing the room, then release. */
+  useEffect(() => {
+    if (doorState !== "open") {
+      setHoldingOpen(false);
+      return;
+    }
+    setHoldingOpen(true);
+    const holdMs = reduceMotion
+      ? EVIDENCE_VAULT_DOOR_HOLD_MS * 0.35
+      : EVIDENCE_VAULT_DOOR_HOLD_MS;
+    const timer = window.setTimeout(() => setHoldingOpen(false), holdMs);
+    return () => window.clearTimeout(timer);
+  }, [doorState, reduceMotion]);
+
+  if (!mounted) return null;
+  if (doorState === "open" && !holdingOpen) return null;
 
   function activateUnlock() {
     if (!idle || busy) return;
     onUnlock();
   }
 
-  function activateSkip() {
-    onSkip();
-  }
-
-  const openDuration = EVIDENCE_VAULT_OPEN_MS / 1000;
-  const stagger = EVIDENCE_VAULT_DOOR_STAGGER_MS / 1000;
-
   const entrance = (
     <div
       className={[
         "evidence-vault-entrance",
         `evidence-vault-entrance--${doorState}`,
+        holdingOpen ? "evidence-vault-entrance--holding-open" : "",
         keyRevealed ? "evidence-vault-entrance--key-ready" : "",
         reduceMotion ? "evidence-vault-entrance--reduced" : "",
       ]
@@ -157,6 +161,7 @@ export function EvidenceVaultEntrance({
       data-testid="evidence-vault-entrance"
       data-vault-door-state={doorState}
       data-key-revealed={keyRevealed ? "true" : "false"}
+      data-holding-open={holdingOpen ? "true" : "false"}
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -164,209 +169,39 @@ export function EvidenceVaultEntrance({
     >
       <div className="evidence-vault-entrance__art" aria-hidden>
         <div className="evidence-vault-entrance__art-inner">
-          {/* 1. Stationary surroundings — never rotate */}
-          <div className="evidence-vault-entrance__plate evidence-vault-entrance__plate--room">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={EVIDENCE_VAULT_ROOM_STATIC_BG}
-              alt=""
-              decoding="async"
-              data-testid="evidence-vault-room-static-image"
-            />
-          </div>
-
-          {/* 2. Interior already behind doors */}
-          <div
-            className={[
-              "evidence-vault-entrance__plate",
-              "evidence-vault-entrance__plate--interior",
-              doorsOpen
-                ? "evidence-vault-entrance__plate--interior-visible"
-                : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={EVIDENCE_VAULT_INTERIOR_REVEAL_BG}
-              alt=""
-              decoding="async"
-              data-testid="evidence-vault-interior-reveal-image"
-            />
-          </div>
-
-          {/* 3. Hinged leaves — under closed plate at arrival; top while swinging */}
-          <div
-            className="evidence-vault-entrance__door-stage"
-            data-testid="evidence-vault-door-stage"
-          >
-            <motion.div
-              className="evidence-vault-entrance__door evidence-vault-entrance__door--left"
-              style={{
-                ...leftStyle,
-                transformOrigin: "left center",
-                transformPerspective: 1400,
-              }}
-              initial={false}
-              animate={
-                reduceMotion
-                  ? { rotateY: 0, opacity: doorsOpen ? 0 : 1 }
-                  : { rotateY: doorsOpen ? -110 : 0, opacity: 1 }
-              }
-              transition={
-                reduceMotion
-                  ? { duration: 0.28, ease: "easeOut" }
-                  : {
-                      duration: openDuration,
-                      // Ease-out so the swing is readable early (same duration).
-                      ease: [0.22, 0.61, 0.36, 1],
-                      delay: 0,
-                    }
-              }
-              data-testid="evidence-vault-door-left"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={EVIDENCE_VAULT_DOOR_LEFT_BG} alt="" draggable={false} />
-              <span className="evidence-vault-entrance__door-shade" />
-            </motion.div>
-
-            <motion.div
-              className="evidence-vault-entrance__door evidence-vault-entrance__door--right"
-              style={{
-                ...rightStyle,
-                transformOrigin: "right center",
-                transformPerspective: 1400,
-              }}
-              initial={false}
-              animate={
-                reduceMotion
-                  ? { rotateY: 0, opacity: doorsOpen ? 0 : 1 }
-                  : { rotateY: doorsOpen ? 110 : 0, opacity: 1 }
-              }
-              transition={
-                reduceMotion
-                  ? { duration: 0.28, ease: "easeOut" }
-                  : {
-                      duration: openDuration,
-                      ease: [0.22, 0.61, 0.36, 1],
-                      delay: stagger,
-                    }
-              }
-              data-testid="evidence-vault-door-right"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={EVIDENCE_VAULT_DOOR_RIGHT_BG}
-                alt=""
-                draggable={false}
-              />
-              <span className="evidence-vault-entrance__door-shade" />
-            </motion.div>
-          </div>
-
-          {/* 4. Closed full-plate only at arrival — never above hinged leaves while opening */}
-          {showClosedComposite ? (
-            <div
-              className="evidence-vault-entrance__plate evidence-vault-entrance__plate--closed"
-              data-testid="evidence-vault-closed-composite"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={EVIDENCE_VAULT_CLOSED_DOOR_BG}
-                alt=""
-                decoding="async"
-                data-testid="evidence-vault-closed-door-image"
-              />
-            </div>
-          ) : null}
-
-          {showClosedComposite ? (
-            <>
-              <div className="evidence-vault-entrance__lock-glow" />
-              <div className="evidence-vault-entrance__key-glint" />
-            </>
-          ) : null}
+          <VaultReveal revealed={doorsOpen || doorState === "unlocking"} />
+          <VaultDoorAnimation open={doorsOpen} />
         </div>
       </div>
 
-      <button
-        ref={skipRef}
-        type="button"
-        className="evidence-vault-entrance__skip"
-        onClick={activateSkip}
-        data-testid="evidence-vault-entrance-skip"
-      >
-        Skip
-      </button>
-
-      <div className="evidence-vault-entrance__scene">
-        <header className="evidence-vault-entrance__copy">
-          <p className="evidence-vault-entrance__kicker" id={titleId}>
-            Evidence Vault
-          </p>
-          <p
-            id="evidence-vault-entrance-welcome"
-            className="evidence-vault-entrance__welcome"
-          >
-            {EVIDENCE_VAULT_EXTERIOR_WELCOME}
-          </p>
-        </header>
-
-        {/* Key already inserted in lock — hotspot over painted key */}
+      {!holdingOpen ? (
         <button
-          ref={keyRef}
           type="button"
-          className={[
-            "evidence-vault-entrance__key-btn",
-            keyRevealed ? "evidence-vault-entrance__key-btn--revealed" : "",
-            doorState === "unlocking"
-              ? "evidence-vault-entrance__key-btn--turning"
-              : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          onClick={activateUnlock}
-          disabled={!idle}
-          aria-label={EVIDENCE_VAULT_DOOR_ACTION_LABEL}
-          aria-describedby="evidence-vault-key-invite"
-          data-testid="evidence-vault-use-key"
+          className="evidence-vault-entrance__skip"
+          onClick={() => onSkip()}
+          data-testid="evidence-vault-entrance-skip"
         >
-          <span className="evidence-vault-entrance__key-hit" aria-hidden />
+          Skip
         </button>
+      ) : null}
 
-        <p
-          id="evidence-vault-key-invite"
-          className={[
-            "evidence-vault-entrance__invite",
-            keyRevealed ? "evidence-vault-entrance__invite--visible" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {EVIDENCE_VAULT_KEY_INVITATION}
-        </p>
+      <h1 id={titleId} className="sr-only">
+        Evidence Vault
+      </h1>
+      <p id="evidence-vault-entrance-welcome" className="sr-only">
+        {EVIDENCE_VAULT_EXTERIOR_WELCOME}
+      </p>
 
-        {idle ? (
-          <button
-            type="button"
-            className="evidence-vault-entrance__primary"
-            onClick={activateUnlock}
-            data-testid="evidence-vault-unlock-action"
-          >
-            {EVIDENCE_VAULT_DOOR_ACTION_LABEL}
-          </button>
-        ) : null}
+      <VaultKeyInteraction phase={keyPhase} onUnlock={activateUnlock} />
 
-        <p
-          className="evidence-vault-entrance__status"
-          role="status"
-          aria-live="polite"
-          data-testid="evidence-vault-door-status"
-        >
-          {status}
-        </p>
-      </div>
+      <p
+        className="evidence-vault-entrance__status"
+        role="status"
+        aria-live="polite"
+        data-testid="evidence-vault-door-status"
+      >
+        {status}
+      </p>
     </div>
   );
 

@@ -32,6 +32,8 @@ describe("Evidence Vault entrance reveal wiring", () => {
     expect(src).toContain("playEvidenceVaultUnlockSound");
     expect(src).toContain("EVIDENCE_VAULT_DOOR_LEFT_BG");
     expect(src).toContain("EVIDENCE_VAULT_DOOR_RIGHT_BG");
+    expect(src).toContain("showClosedComposite");
+    expect(src).toContain("transformPerspective");
   });
 
   it("engine mounts interior only after entrance completes — not during opening", () => {

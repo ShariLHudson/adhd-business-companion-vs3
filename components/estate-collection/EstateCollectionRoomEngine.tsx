@@ -41,6 +41,7 @@ import {
   resolveInitialEvidenceVaultDoorState,
   shouldMountEvidenceVaultHome,
   shouldShowEvidenceVaultEntrance,
+  EVIDENCE_VAULT_DOOR_HOLD_MS,
   EVIDENCE_VAULT_REDUCED_MOTION_MS,
   type EvidenceVaultDoorState,
 } from "@/lib/estate/evidenceVaultDoor";
@@ -274,9 +275,10 @@ export function EstateCollectionRoomEngine({
 
     const unlockId = window.setTimeout(() => {
       setDoorState("opening");
+      // Swing, then hold doors framing the room before entering home.
       const openId = window.setTimeout(() => {
         completeVaultEntrance();
-      }, EVIDENCE_VAULT_ENTRANCE_DOOR_MS + EVIDENCE_VAULT_ENTRANCE_ENTER_MS);
+      }, EVIDENCE_VAULT_ENTRANCE_DOOR_MS + EVIDENCE_VAULT_DOOR_HOLD_MS + EVIDENCE_VAULT_ENTRANCE_ENTER_MS);
       unlockTimersRef.current.push(openId);
     }, EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS);
     unlockTimersRef.current.push(unlockId);
@@ -301,6 +303,36 @@ export function EstateCollectionRoomEngine({
     setAttachments([]);
     setEditingId(null);
     openJournalFromInterior();
+  }
+
+  /** Opens create flow focused on preserving a file or attachment. */
+  function openAddAttachmentFromHome() {
+    openAddEvidenceFromHome();
+    if (typeof sessionStorage !== "undefined") {
+      try {
+        sessionStorage.setItem(
+          "spark:estate:evidence-vault-focus-attachments:v1",
+          "1",
+        );
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  /** Opens create flow for preserving a link with the discovery. */
+  function openAddLinkFromHome() {
+    openAddEvidenceFromHome();
+    if (typeof sessionStorage !== "undefined") {
+      try {
+        sessionStorage.setItem(
+          "spark:estate:evidence-vault-focus-link:v1",
+          "1",
+        );
+      } catch {
+        /* ignore */
+      }
+    }
   }
 
   function continueDraftFromHome() {
@@ -571,6 +603,8 @@ export function EstateCollectionRoomEngine({
                 onAddEvidence={openAddEvidenceFromHome}
                 onContinueDraft={continueDraftFromHome}
                 onBrowseArchive={browseArchiveFromHome}
+                onAddAttachment={openAddAttachmentFromHome}
+                onAddLink={openAddLinkFromHome}
                 onOpenEntry={(id) => beginEdit(id)}
                 onCategorySelect={openHomeCategory}
                 onSearchBrowse={searchBrowseFromHome}

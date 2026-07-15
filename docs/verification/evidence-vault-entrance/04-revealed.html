@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Evidence Vault — fully revealed</title>
+    <link rel="stylesheet" href="./frame.css" />
+    <style>
+      .door-left {
+        transform: perspective(1600px) rotateY(-100deg);
+      }
+      .door-right {
+        transform: perspective(1600px) rotateY(100deg);
+      }
+      .writing {
+        position: absolute;
+        inset: 0;
+        clip-path: inset(19.5% 30% 11.1% 25.4%);
+        z-index: 1;
+      }
+      .writing img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage" data-state="open">
+      <div class="art">
+        <div class="plate">
+          <img src="./assets/evidence-vault-room-static.png" alt="" />
+        </div>
+        <div class="writing">
+          <img src="./assets/writing-room-background.png" alt="" />
+        </div>
+        <div class="door door-left">
+          <img src="./assets/evidence-vault-door-left.png" alt="" />
+        </div>
+        <div class="door door-right">
+          <img src="./assets/evidence-vault-door-right.png" alt="" />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -21,13 +21,23 @@ export const EVIDENCE_VAULT_DOOR_LEFT_BG =
 export const EVIDENCE_VAULT_DOOR_RIGHT_BG =
   "/backgrounds/evidence-vault-door-right.png" as const;
 
-/** Soft interior atmosphere revealed behind opening doors. */
+/** Soft light wash over the writing room (optional atmosphere). */
 export const EVIDENCE_VAULT_INTERIOR_REVEAL_BG =
   "/backgrounds/evidence-vault-interior-reveal.png" as const;
+
+/**
+ * Writing room already waiting behind the doors — discovered as they open.
+ * Never faded in as a page transition.
+ */
+export const EVIDENCE_VAULT_WRITING_ROOM_BG =
+  "/backgrounds/writing-room-2-background.png" as const;
 
 /** Room plate after entrance — open portal (never closed doors). */
 export const EVIDENCE_VAULT_INTERIOR_BG =
   "/backgrounds/evidence-vault-room-static.png" as const;
+
+/** Hold open doors framing the room before entrance unmounts. */
+export const EVIDENCE_VAULT_DOOR_HOLD_MS = 900;
 
 /** Art plate size used for door geometry (must match source PNG). */
 export const EVIDENCE_VAULT_ART_WIDTH = 1535;
@@ -58,14 +68,16 @@ export const EVIDENCE_VAULT_FIRST_ENTRY_DONE_KEY =
 export const EVIDENCE_VAULT_ENTRANCE_COMPLETED_KEY =
   "spark:estate:evidence-vault-entrance-completed:v1";
 
-/** Arrival settle before key glow (State 1). */
-export const EVIDENCE_VAULT_ARRIVAL_MS = 400;
-/** Key turn / unlock (State 2). */
-export const EVIDENCE_VAULT_UNLOCK_MS = 500;
-/** Hinged door open (State 3). */
-export const EVIDENCE_VAULT_OPEN_MS = 1200;
-/** Right door starts slightly after left. */
-export const EVIDENCE_VAULT_DOOR_STAGGER_MS = 100;
+/** Arrival settle before key invitation (State 1). */
+export const EVIDENCE_VAULT_ARRIVAL_MS = 500;
+/** Key moves to lock, turns, clicks (State 2) — 0.8–1.2s. */
+export const EVIDENCE_VAULT_UNLOCK_MS = 1000;
+/** Heavy hinged door open (State 3). */
+export const EVIDENCE_VAULT_OPEN_MS = 1600;
+/** Right door starts slightly after left — keeps weight. */
+export const EVIDENCE_VAULT_DOOR_STAGGER_MS = 80;
+/** Final swing angle for each leaf (degrees from closed). */
+export const EVIDENCE_VAULT_DOOR_OPEN_DEGREES = 100;
 /** Existing UI fade / settle (State 4). */
 export const EVIDENCE_VAULT_SETTLE_MS = 250;
 
@@ -143,14 +155,17 @@ export function prefersEvidenceVaultReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
-/** Initial door state for a vault visit. */
+/**
+ * Initial door state for a vault visit.
+ * Arrive always begins at the closed doors + key ritual.
+ * Only explicit skip (chat prefill / browse intent) opens immediately.
+ * `viewEntrance` is retained for API compatibility; unlocked no longer skips.
+ */
 export function resolveInitialEvidenceVaultDoorState(opts: {
   skipEntrance: boolean;
   viewEntrance?: boolean;
 }): EvidenceVaultDoorState {
   if (opts.skipEntrance) return "open";
-  if (opts.viewEntrance && hasEvidenceVaultUnlocked()) return "key_ready";
-  if (hasEvidenceVaultUnlocked() && !opts.viewEntrance) return "open";
   return "key_ready";
 }
 
@@ -194,20 +209,20 @@ export function shouldShowEvidenceVaultEntrance(opts: {
 
 /**
  * Shell plate under the room.
- * Closed doors only before unlock; open portal once hinged swing begins.
- * Never leave home sitting on the closed-door plate.
+ * Entrance ceremony paints hinged doors over the estate surroundings.
+ * Once doors open, keep the writing room that was revealed behind them.
  */
 export function evidenceVaultShellBackground(
   doorState: EvidenceVaultDoorState,
 ): string {
   if (
-    isEvidenceVaultEntranceComplete(doorState) ||
     doorState === "opening" ||
+    doorState === "open" ||
     doorState === "unlocking"
   ) {
-    return EVIDENCE_VAULT_ROOM_STATIC_BG;
+    return EVIDENCE_VAULT_WRITING_ROOM_BG;
   }
-  return EVIDENCE_VAULT_CLOSED_DOOR_BG;
+  return EVIDENCE_VAULT_ROOM_STATIC_BG;
 }
 
 /** Percent geometry for door leaves inside the art frame. */

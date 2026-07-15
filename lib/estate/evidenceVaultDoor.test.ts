@@ -14,6 +14,7 @@ import {
   EVIDENCE_VAULT_REDUCED_MOTION_MS,
   EVIDENCE_VAULT_ROOM_STATIC_BG,
   EVIDENCE_VAULT_SETTLE_MS,
+  EVIDENCE_VAULT_WRITING_ROOM_BG,
   EVIDENCE_VAULT_UNLOCK_MS,
   evidenceVaultDoorLeafStyle,
   evidenceVaultShellBackground,
@@ -87,22 +88,22 @@ describe("evidenceVaultDoor", () => {
     ).not.toBe("open");
   });
 
-  it("opens immediately after unlock persists (return visits skip ritual)", () => {
+  it("still shows the entrance ritual on return visits (unlocked does not skip)", () => {
     markEvidenceVaultUnlocked();
     expect(hasEvidenceVaultUnlocked()).toBe(true);
     expect(
       resolveInitialEvidenceVaultDoorState({ skipEntrance: false }),
-    ).toBe("open");
+    ).toBe("key_ready");
   });
 
-  it("can show entrance again when viewing vault entrance while unlocked", () => {
+  it("only skips entrance when explicitly requested", () => {
     markEvidenceVaultUnlocked();
     expect(
       resolveInitialEvidenceVaultDoorState({
-        skipEntrance: false,
+        skipEntrance: true,
         viewEntrance: true,
       }),
-    ).toBe("key_ready");
+    ).toBe("open");
   });
 
   it("prevents busy re-entry during unlocking and opening", () => {
@@ -151,34 +152,36 @@ describe("evidenceVaultDoor", () => {
     ).toBe(false);
   });
 
-  it("keeps closed-door shell plate until doors open", () => {
+  it("uses surroundings while closed, writing room once doors unlock/open", () => {
     expect(evidenceVaultShellBackground("key_ready")).toBe(
-      EVIDENCE_VAULT_CLOSED_DOOR_BG,
+      EVIDENCE_VAULT_ROOM_STATIC_BG,
     );
     expect(evidenceVaultShellBackground("unlocking")).toBe(
-      EVIDENCE_VAULT_CLOSED_DOOR_BG,
+      EVIDENCE_VAULT_WRITING_ROOM_BG,
     );
     expect(evidenceVaultShellBackground("opening")).toBe(
-      EVIDENCE_VAULT_ROOM_STATIC_BG,
+      EVIDENCE_VAULT_WRITING_ROOM_BG,
     );
     expect(evidenceVaultShellBackground("open")).toBe(
-      EVIDENCE_VAULT_ROOM_STATIC_BG,
+      EVIDENCE_VAULT_WRITING_ROOM_BG,
     );
   });
 
   it("aligns unlock timings to the approved entrance sequence", () => {
     expect(EVIDENCE_VAULT_ARRIVAL_MS).toBeGreaterThanOrEqual(300);
     expect(EVIDENCE_VAULT_ARRIVAL_MS).toBeLessThanOrEqual(500);
-    expect(EVIDENCE_VAULT_UNLOCK_MS).toBe(500);
-    expect(EVIDENCE_VAULT_OPEN_MS).toBe(1200);
-    expect(EVIDENCE_VAULT_DOOR_STAGGER_MS).toBe(100);
+    expect(EVIDENCE_VAULT_UNLOCK_MS).toBeGreaterThanOrEqual(800);
+    expect(EVIDENCE_VAULT_UNLOCK_MS).toBeLessThanOrEqual(1200);
+    expect(EVIDENCE_VAULT_OPEN_MS).toBeGreaterThanOrEqual(1400);
+    expect(EVIDENCE_VAULT_OPEN_MS).toBeLessThanOrEqual(1800);
+    expect(EVIDENCE_VAULT_DOOR_STAGGER_MS).toBeLessThanOrEqual(120);
     expect(EVIDENCE_VAULT_SETTLE_MS).toBeGreaterThanOrEqual(200);
     expect(EVIDENCE_VAULT_SETTLE_MS).toBeLessThanOrEqual(300);
     expect(EVIDENCE_VAULT_UNLOCK_MS + EVIDENCE_VAULT_OPEN_MS).toBeGreaterThanOrEqual(
-      1500,
+      2200,
     );
     expect(EVIDENCE_VAULT_UNLOCK_MS + EVIDENCE_VAULT_OPEN_MS).toBeLessThanOrEqual(
-      2000,
+      3000,
     );
     expect(EVIDENCE_VAULT_REDUCED_MOTION_MS).toBeLessThan(500);
   });
@@ -214,9 +217,9 @@ describe("evidenceVaultDoor", () => {
   it("offers exactly three first-entry choices", () => {
     expect(EVIDENCE_VAULT_FIRST_ENTRY_CHOICES).toHaveLength(3);
     expect(EVIDENCE_VAULT_FIRST_ENTRY_CHOICES.map((c) => c.label)).toEqual([
-      "Add Evidence",
+      "Create Evidence",
       "Surprise Me",
-      "Browse My Evidence",
+      "Browse Evidence",
     ]);
   });
 });

@@ -1,6 +1,10 @@
 /* Evidence Vault — Discovery File tactile experience */
 
 .discovery-file {
+  --discovery-file-max-width: var(
+    --companion-chat-box-max-width,
+    calc(26rem * 4 / 3)
+  );
   position: relative;
   z-index: 2;
   min-height: min(52vh, 560px);
@@ -11,10 +15,21 @@
   pointer-events: none;
 }
 
+.evidence-vault-inline-discovery {
+  --discovery-file-max-width: var(
+    --companion-chat-box-max-width,
+    calc(26rem * 4 / 3)
+  );
+  width: min(var(--discovery-file-max-width), calc(100% - 2.5rem));
+  max-width: var(--discovery-file-max-width);
+  margin-inline: auto;
+}
+
 .evidence-vault-inline-discovery .discovery-file {
   min-height: 0;
   align-items: flex-end;
   padding: 0;
+  width: 100%;
 }
 
 .discovery-file > * {
@@ -118,7 +133,8 @@
 /* ── Portfolio (open file) ── */
 
 .discovery-file__portfolio {
-  width: min(680px, 94vw);
+  width: min(var(--discovery-file-max-width), calc(100vw - 2.5rem));
+  max-width: var(--discovery-file-max-width);
   max-height: min(52vh, 480px);
   overflow-y: auto;
   animation: discovery-portfolio-open 0.72s cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -126,6 +142,7 @@
 
 .evidence-vault-inline-discovery .discovery-file__portfolio {
   width: 100%;
+  max-width: none;
   max-height: min(50vh, 460px);
 }
 
@@ -361,7 +378,8 @@
 }
 
 .discovery-file__saved {
-  width: min(40rem, 92vw);
+  width: min(var(--discovery-file-max-width), calc(100% - 1.5rem));
+  max-width: var(--discovery-file-max-width);
   padding: 1.25rem 1.5rem 1.35rem;
   border-radius: 14px;
   border: 1px solid rgba(201, 166, 107, 0.28);

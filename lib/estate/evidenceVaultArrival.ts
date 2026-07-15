@@ -45,8 +45,10 @@ export const EVIDENCE_VAULT_CHAT_PREFILL_KEY =
 export const EVIDENCE_VAULT_PENDING_WELCOME_KEY =
   "spark:estate:evidence-vault-pending-welcome:v1";
 
-export const EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS = 500;
-export const EVIDENCE_VAULT_ENTRANCE_DOOR_MS = 1200;
+/** Key travels to lock, turns, clicks — 0.8–1.2s. */
+export const EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS = 1000;
+/** Heavy hinged doors swing open. */
+export const EVIDENCE_VAULT_ENTRANCE_DOOR_MS = 1600;
 export const EVIDENCE_VAULT_ENTRANCE_ENTER_MS = 250;
 
 /** Returning members — browse archive link after first successful entrance. */

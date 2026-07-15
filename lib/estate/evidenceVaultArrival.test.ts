@@ -82,14 +82,16 @@ describe("evidenceVaultArrival", () => {
   });
 
   it("entrance timing stays within a polished ceremonial pace", () => {
-    expect(EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS).toBe(500);
-    expect(EVIDENCE_VAULT_ENTRANCE_DOOR_MS).toBe(1200);
+    expect(EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS).toBeGreaterThanOrEqual(800);
+    expect(EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS).toBeLessThanOrEqual(1200);
+    expect(EVIDENCE_VAULT_ENTRANCE_DOOR_MS).toBeGreaterThanOrEqual(1400);
+    expect(EVIDENCE_VAULT_ENTRANCE_DOOR_MS).toBeLessThanOrEqual(1800);
     expect(EVIDENCE_VAULT_ENTRANCE_ENTER_MS).toBeGreaterThanOrEqual(200);
     expect(
       EVIDENCE_VAULT_ENTRANCE_UNLOCK_MS +
         EVIDENCE_VAULT_ENTRANCE_DOOR_MS +
         EVIDENCE_VAULT_ENTRANCE_ENTER_MS,
-    ).toBeLessThanOrEqual(2500);
+    ).toBeLessThanOrEqual(3200);
   });
 
   it("persists entrance completion for returning visits", () => {

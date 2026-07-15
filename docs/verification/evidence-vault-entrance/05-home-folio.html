@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Evidence Vault — room with desk folio</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #120e0b;
+        overflow: hidden;
+        font-family: Georgia, "Times New Roman", serif;
+      }
+      .room {
+        position: absolute;
+        inset: 0;
+        background: #120e0b center / cover no-repeat
+          url("./assets/writing-room-background.png");
+      }
+      .folio {
+        position: absolute;
+        right: 4.5%;
+        bottom: 6%;
+        width: min(24rem, 34vw, 90vw);
+        padding: 0.85rem 0.9rem 1rem;
+        border-radius: 0.55rem 0.85rem 0.55rem 0.55rem;
+        background: linear-gradient(
+          165deg,
+          rgba(42, 30, 20, 0.72) 0%,
+          rgba(22, 15, 10, 0.58) 100%
+        );
+        border: 1px solid rgba(201, 166, 107, 0.28);
+        box-shadow: 0 14px 36px rgba(0, 0, 0, 0.28);
+        color: #f0e6d6;
+      }
+      .kicker {
+        margin: 0;
+        font-size: 0.62rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(201, 166, 107, 0.88);
+        font-family: system-ui, sans-serif;
+      }
+      h1 {
+        margin: 0.35rem 0 0.4rem;
+        font-size: 1.35rem;
+        font-weight: 600;
+      }
+      .lead {
+        margin: 0 0 0.65rem;
+        font-size: 0.78rem;
+        line-height: 1.45;
+        color: rgba(236, 224, 204, 0.88);
+      }
+      .objects {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.45rem;
+      }
+      .obj {
+        min-height: 3.4rem;
+        padding: 0.55rem 0.65rem;
+        border-radius: 0.45rem;
+        border: 1px solid rgba(201, 166, 107, 0.32);
+        background: rgba(255, 248, 235, 0.08);
+        font-family: system-ui, sans-serif;
+      }
+      .obj.primary {
+        background: rgba(255, 248, 230, 0.9);
+        color: #1f1c19;
+      }
+      .obj strong {
+        display: block;
+        font-size: 0.82rem;
+      }
+      .obj span {
+        display: block;
+        margin-top: 0.15rem;
+        font-size: 0.68rem;
+        opacity: 0.72;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="room" data-state="home"></div>
+    <aside class="folio" data-testid="evidence-vault-folio">
+      <p class="kicker">A private archive</p>
+      <h1>Evidence Vault</h1>
+      <p class="lead">
+        A place to preserve what happened, what you learned, problems you
+        solved, people you helped, things you created, and evidence of your
+        growth — along with anything else meaningful, including attachments,
+        files, and links.
+      </p>
+      <div class="objects">
+        <div class="obj primary">
+          <strong>Create Evidence</strong><span>New page</span>
+        </div>
+        <div class="obj"><strong>Browse Evidence</strong><span>Archive</span></div>
+        <div class="obj">
+          <strong>Add Attachment</strong><span>File · photo</span>
+        </div>
+        <div class="obj"><strong>Add Link</strong><span>Keep a link</span></div>
+      </div>
+    </aside>
+  </body>
+</html>

@@ -1,15 +1,18 @@
-/* Evidence Vault — interior journal-first surface */
+/* Evidence Vault home — desk folio in the room (≈30% UI / 70% room) */
 
 .evidence-vault-interior-mount {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 4;
+  pointer-events: none;
   opacity: 0;
-  transition: opacity 0.28s ease;
+  transition: opacity 0.35s ease;
 }
 
-.evidence-vault-interior-mount--entering {
-  opacity: 0.55;
-  pointer-events: none;
+.estate-collection-room__scroll:has(> .evidence-vault-interior-mount) {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
 .evidence-vault-interior-mount--open {
@@ -20,54 +23,71 @@
   .evidence-vault-interior-mount {
     transition: opacity 0.2s ease;
   }
-
-  .evidence-vault-interior-mount--entering {
-    opacity: 1;
-  }
 }
 
 .evidence-vault-interior {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 4;
-  min-height: min(58vh, 560px);
+  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(1rem, 4vw, 2.5rem);
+  padding: max(1rem, env(safe-area-inset-top))
+    max(1rem, env(safe-area-inset-right))
+    max(1rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-left));
+}
+
+.evidence-vault-interior--behind-discovery {
+  opacity: 0.35;
+}
+
+.evidence-vault-interior--behind-discovery .evidence-vault-interior__folio {
   pointer-events: none;
 }
 
-.evidence-vault-interior__ambient {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(
-    ellipse 70% 60% at 50% 48%,
-    rgba(8, 6, 4, 0.08) 0%,
-    rgba(8, 6, 4, 0.38) 100%
+/* Centered frosted window — same Estate workspace glass language */
+.evidence-vault-interior__folio {
+  --evidence-vault-folio-max-width: var(
+    --companion-chat-box-max-width,
+    calc(26rem * 4 / 3)
   );
-}
-
-.evidence-vault-interior__content {
   pointer-events: auto;
+  width: min(var(--evidence-vault-folio-max-width), calc(100% - 1.5rem));
+  max-width: var(--evidence-vault-folio-max-width);
+  max-height: min(78vh, 40rem);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 0.85rem;
-  max-width: min(40rem, 94vw);
-  max-height: min(78vh, 720px);
-  overflow-y: auto;
-  padding: 1.25rem 1.35rem 1.5rem;
-  border-radius: 1rem;
-  background: rgba(18, 12, 8, 0.48);
+  gap: 0.7rem;
+  padding: 1.15rem 1.25rem 1.35rem;
+  border-radius: 1.35rem;
+  background: rgba(32, 24, 18, 0.68);
   border: 1px solid rgba(201, 166, 107, 0.22);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 22px 52px rgba(12, 8, 4, 0.22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   text-align: center;
 }
 
-.evidence-vault-interior__kicker {
+@media (max-width: 900px) {
+  .evidence-vault-interior__folio {
+    width: min(var(--evidence-vault-folio-max-width), calc(100% - 1.5rem));
+    max-height: min(72vh, 36rem);
+    padding: 1rem 1.05rem 1.15rem;
+  }
+}
+
+.evidence-vault-home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.evidence-vault-home__kicker {
   margin: 0;
   font-size: 0.68rem;
   font-weight: 650;
@@ -76,155 +96,141 @@
   color: rgba(201, 166, 107, 0.88);
 }
 
-.evidence-vault-interior__title {
+.evidence-vault-home__title {
   margin: 0;
   font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
-  font-size: clamp(1.35rem, 3vw, 1.75rem);
-  color: #f0e6d6;
+  font-size: clamp(1.45rem, 3vw, 1.85rem);
+  font-weight: 600;
+  color: rgba(248, 240, 224, 0.98);
 }
 
-.evidence-vault-interior__hint,
-.evidence-vault-interior__next {
+.evidence-vault-home__lead {
   margin: 0;
+  max-width: 34rem;
   font-size: 0.92rem;
   line-height: 1.5;
-  color: rgba(240, 228, 206, 0.88);
+  color: rgba(236, 224, 204, 0.9);
 }
 
-.evidence-vault-interior__next {
-  font-size: 0.84rem;
-  color: rgba(232, 210, 168, 0.86);
-}
-
-.evidence-vault-interior__how {
+.evidence-vault-home__objects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
   width: 100%;
-  text-align: left;
-  border-radius: 0.7rem;
-  border: 1px solid rgba(201, 166, 107, 0.28);
-  background: rgba(255, 248, 235, 0.06);
-  padding: 0.35rem 0.75rem;
 }
 
-.evidence-vault-interior__how summary {
+.evidence-vault-home__object {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  min-height: 3.5rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  background: rgba(255, 248, 235, 0.1);
+  color: #f0e6d6;
+  text-align: left;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.evidence-vault-home__object--primary {
+  background: rgba(255, 248, 230, 0.9);
+  color: #1f1c19;
+  border-color: rgba(201, 166, 107, 0.55);
+}
+
+.evidence-vault-home__object--draft {
+  grid-column: 1 / -1;
+  background: rgba(201, 166, 107, 0.14);
+}
+
+.evidence-vault-home__object:hover,
+.evidence-vault-home__object:focus-visible {
+  outline: none;
+  border-color: rgba(201, 166, 107, 0.7);
+  transform: translateY(-1px);
+}
+
+.evidence-vault-home__object-label {
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.evidence-vault-home__object-hint {
+  font-size: 0.68rem;
+  opacity: 0.72;
+}
+
+.evidence-vault-interior__empty-note {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(232, 210, 168, 0.88);
+}
+
+.evidence-vault-interior__how,
+.evidence-vault-interior__drawer {
+  width: 100%;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(201, 166, 107, 0.22);
+  background: rgba(255, 248, 235, 0.05);
+  padding: 0.15rem 0.55rem;
+}
+
+.evidence-vault-interior__how summary,
+.evidence-vault-interior__drawer summary {
   cursor: pointer;
   list-style: none;
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: rgba(232, 210, 168, 0.95);
-  padding: 0.45rem 0;
+  padding: 0.4rem 0;
 }
 
-.evidence-vault-interior__how summary::-webkit-details-marker {
+.evidence-vault-interior__how summary::-webkit-details-marker,
+.evidence-vault-interior__drawer summary::-webkit-details-marker {
   display: none;
 }
 
-.evidence-vault-interior__how-body {
-  padding: 0 0 0.55rem;
+.evidence-vault-interior__how-body,
+.evidence-vault-interior__drawer-body {
+  padding: 0 0 0.5rem;
+  max-height: 11rem;
+  overflow-y: auto;
 }
 
 .evidence-vault-interior__how-body p {
-  margin: 0 0 0.55rem;
-  font-size: 0.84rem;
-  line-height: 1.55;
+  margin: 0 0 0.45rem;
+  font-size: 0.74rem;
+  line-height: 1.5;
   color: rgba(240, 228, 206, 0.88);
 }
 
 .evidence-vault-interior__reminder {
   margin: 0;
-  width: 100%;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: rgba(232, 210, 168, 0.9);
-  font-style: italic;
-}
-
-.evidence-vault-interior__empty {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.evidence-vault-interior__empty p {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: rgba(240, 228, 206, 0.92);
-}
-
-.evidence-vault-interior__actions {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  margin-top: 0.2rem;
-}
-
-.evidence-vault-interior__action {
-  cursor: pointer;
-  width: 100%;
-  border-radius: 999px;
-  border: 1px solid rgba(201, 166, 107, 0.45);
-  background: rgba(255, 250, 242, 0.14);
-  padding: 0.72rem 1.1rem;
-  min-height: 2.75rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #f0e6d6;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-
-.evidence-vault-interior__action--primary {
-  background: rgba(255, 250, 242, 0.92);
-  color: #1f1c19;
-  border-color: rgba(201, 166, 107, 0.55);
-}
-
-.evidence-vault-interior__action:hover,
-.evidence-vault-interior__action:focus-visible {
-  outline: none;
-  border-color: rgba(180, 132, 58, 0.9);
-  box-shadow: 0 0 0 2px rgba(201, 166, 107, 0.28);
-}
-
-.evidence-vault-interior__categories {
-  width: 100%;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem;
-  margin-top: 0.15rem;
-}
-
-.evidence-vault-interior__category {
-  cursor: pointer;
-  border-radius: 999px;
-  border: 1px solid rgba(201, 166, 107, 0.32);
-  background: rgba(255, 248, 235, 0.08);
-  color: rgba(240, 228, 206, 0.9);
   font-size: 0.72rem;
-  padding: 0.28rem 0.65rem;
-}
-
-.evidence-vault-interior__category:hover,
-.evidence-vault-interior__category:focus-visible {
-  outline: none;
-  border-color: rgba(201, 166, 107, 0.65);
+  line-height: 1.4;
+  color: rgba(232, 210, 168, 0.88);
+  font-style: italic;
 }
 
 .evidence-vault-interior__search {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 0.3rem;
-  text-align: left;
+  gap: 0.25rem;
+  margin-bottom: 0.45rem;
 }
 
 .evidence-vault-interior__search-label {
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(201, 166, 107, 0.88);
@@ -232,22 +238,16 @@
 
 .evidence-vault-interior__search input {
   width: 100%;
-  border-radius: 0.65rem;
-  border: 1px solid rgba(201, 166, 107, 0.35);
-  background: rgba(255, 250, 242, 0.1);
+  border-radius: 0.4rem;
+  border: 1px solid rgba(201, 166, 107, 0.3);
+  background: rgba(255, 250, 242, 0.08);
   color: #f0e6d6;
-  padding: 0.55rem 0.75rem;
-  font-size: 0.9rem;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.8rem;
 }
 
 .evidence-vault-interior__search input::placeholder {
-  color: rgba(232, 210, 168, 0.55);
-}
-
-.evidence-vault-interior__search-results,
-.evidence-vault-interior__recent {
-  width: 100%;
-  text-align: left;
+  color: rgba(232, 210, 168, 0.5);
 }
 
 .evidence-vault-interior__search-results ul,
@@ -257,7 +257,14 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem;
+}
+
+.evidence-vault-interior__recent-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem;
+  align-items: center;
 }
 
 .evidence-vault-interior__search-results button,
@@ -265,152 +272,99 @@
   width: 100%;
   text-align: left;
   cursor: pointer;
-  border-radius: 0.65rem;
-  border: 1px solid rgba(201, 166, 107, 0.22);
-  background: rgba(255, 248, 235, 0.07);
-  color: rgba(240, 228, 206, 0.95);
-  padding: 0.55rem 0.7rem;
-  font-size: 0.86rem;
-  line-height: 1.4;
-}
-
-.evidence-vault-interior__recent-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.45rem;
-}
-
-.evidence-vault-interior__recent-head h3 {
-  margin: 0;
-  font-family: var(--font-serif, "Cormorant Garamond", Georgia, serif);
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: #f0e6d6;
-}
-
-.evidence-vault-interior__recent-list > li {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 0.35rem;
-  align-items: stretch;
-}
-
-.evidence-vault-interior__recent-meta {
-  display: block;
-  margin-top: 0.25rem;
-  font-size: 0.72rem;
-  color: rgba(201, 166, 107, 0.9);
+  border-radius: 0.35rem;
+  border: 1px solid rgba(201, 166, 107, 0.2);
+  background: rgba(255, 248, 235, 0.06);
+  color: rgba(240, 228, 206, 0.94);
+  padding: 0.4rem 0.5rem;
+  font-size: 0.74rem;
+  line-height: 1.35;
 }
 
 .evidence-vault-interior__favorite {
   cursor: pointer;
-  border-radius: 0.65rem;
-  border: 1px solid rgba(201, 166, 107, 0.28);
-  background: rgba(255, 248, 235, 0.06);
-  color: rgba(232, 210, 168, 0.55);
-  min-width: 2.4rem;
-  font-size: 1rem;
+  border: none;
+  background: transparent;
+  color: rgba(201, 166, 107, 0.55);
+  font-size: 0.95rem;
+  padding: 0.2rem;
 }
 
 .evidence-vault-interior__favorite--on {
-  color: #e0c07a;
+  color: rgba(232, 190, 110, 0.95);
 }
 
-.evidence-vault-interior__secondary {
+.evidence-vault-interior__drawer-links {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.85rem;
+  gap: 0.35rem 0.65rem;
+  margin: 0.45rem 0 0.35rem;
 }
 
 .evidence-vault-interior__text-btn {
   cursor: pointer;
   border: none;
   background: transparent;
-  color: rgba(232, 210, 168, 0.9);
-  font-size: 0.8rem;
+  color: rgba(232, 210, 168, 0.92);
+  font-size: 0.72rem;
   text-decoration: underline;
-  padding: 0.2rem;
+  text-underline-offset: 2px;
+  padding: 0.15rem 0;
+}
+
+.evidence-vault-interior__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.evidence-vault-interior__category {
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid rgba(201, 166, 107, 0.28);
+  background: rgba(255, 248, 235, 0.06);
+  color: rgba(240, 228, 206, 0.88);
+  font-size: 0.64rem;
+  padding: 0.2rem 0.5rem;
 }
 
 .evidence-vault-interior__surprise {
-  width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid rgba(201, 166, 107, 0.35);
-  background: rgba(255, 248, 235, 0.09);
-  padding: 0.85rem;
-  text-align: left;
+  margin-top: 0.4rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 0.4rem;
+  background: rgba(255, 248, 235, 0.08);
+  border: 1px solid rgba(201, 166, 107, 0.22);
 }
 
 .evidence-vault-interior__surprise-label {
-  margin: 0 0 0.35rem;
-  font-size: 0.72rem;
+  margin: 0 0 0.25rem;
+  font-size: 0.64rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: rgba(201, 166, 107, 0.9);
 }
 
 .evidence-vault-interior__surprise p {
-  margin: 0 0 0.7rem;
-  font-size: 0.92rem;
-  line-height: 1.45;
-  color: rgba(240, 228, 206, 0.95);
+  margin: 0 0 0.35rem;
+  font-size: 0.76rem;
+  line-height: 1.4;
+  color: rgba(240, 228, 206, 0.94);
 }
 
 .evidence-vault-interior__muted {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: 0.74rem;
   color: rgba(232, 210, 168, 0.75);
 }
 
-.evidence-vault-interior--behind-discovery .evidence-vault-interior__content {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(10px) scale(0.985);
-  transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
-}
-
-.evidence-vault-inline-discovery {
-  position: fixed;
-  left: 50%;
-  bottom: clamp(10%, 14vh, 18%);
-  top: auto;
-  right: auto;
-  transform: translateX(-50%);
-  z-index: 8;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  width: min(40rem, 92vw);
-  max-height: min(56vh, 500px);
+.evidence-vault-interior .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
   padding: 0;
-  pointer-events: none;
-}
-
-.evidence-vault-inline-discovery > .discovery-file {
-  pointer-events: auto;
-  width: 100%;
-  min-height: 0;
-  max-height: min(56vh, 500px);
-  padding: 0;
-}
-
-.evidence-vault-room__chat-panel {
-  z-index: 40;
-}
-
-.companion-evidence-vault-active .clear-my-mind-standalone-shell,
-.companion-evidence-vault-active .clear-my-mind-standalone-frame {
-  overflow: visible;
-  background: transparent;
-  pointer-events: auto;
-}
-
-.companion-evidence-vault-active .estate-collection-room__scroll {
-  overflow-y: auto;
-  min-height: 100dvh;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

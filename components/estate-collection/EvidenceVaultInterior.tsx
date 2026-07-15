@@ -10,20 +10,12 @@ import {
 } from "@/lib/evidenceBankStore";
 import { hasEvidenceVaultDraft } from "@/lib/estate/evidenceVaultDraft";
 import {
-  EVIDENCE_VAULT_ADD_LABEL,
-  EVIDENCE_VAULT_BROWSE_LABEL,
   EVIDENCE_VAULT_CONTINUE_DRAFT_LABEL,
-  EVIDENCE_VAULT_EMPTY_CTA,
-  EVIDENCE_VAULT_EMPTY_INTRO,
   EVIDENCE_VAULT_GENTLE_REMINDER,
   EVIDENCE_VAULT_HOME_CATEGORIES,
-  EVIDENCE_VAULT_HOME_KICKER,
-  EVIDENCE_VAULT_HOME_LEAD,
-  EVIDENCE_VAULT_HOME_NEXT,
   EVIDENCE_VAULT_HOME_TITLE,
   EVIDENCE_VAULT_HOW_DO_I_BODY,
   EVIDENCE_VAULT_HOW_DO_I_LABEL,
-  EVIDENCE_VAULT_RECENT_LIMIT,
   EVIDENCE_VAULT_SURPRISE_LABEL,
   EVIDENCE_VAULT_VIEW_ALL_LABEL,
   evidencePreviewLine,
@@ -33,6 +25,7 @@ import {
   shouldShowGentleReminder,
   type EvidenceVaultHomeCategory,
 } from "@/lib/estate/evidenceVaultHome";
+import { EvidenceVaultHome } from "./EvidenceVaultHome";
 import "./evidence-vault-interior.css";
 
 export type EvidenceVaultHomeAction =
@@ -41,7 +34,9 @@ export type EvidenceVaultHomeAction =
   | "browse"
   | "open-entry"
   | "surprise"
-  | "category";
+  | "category"
+  | "add-attachment"
+  | "add-link";
 
 type Props = {
   journalActive: boolean;
@@ -49,6 +44,8 @@ type Props = {
   onAddEvidence: () => void;
   onContinueDraft: () => void;
   onBrowseArchive: () => void;
+  onAddAttachment?: () => void;
+  onAddLink?: () => void;
   onOpenEntry?: (id: string) => void;
   onCategorySelect?: (category: EvidenceVaultHomeCategory) => void;
   onSearchBrowse?: (query: string) => void;
@@ -57,8 +54,7 @@ type Props = {
 };
 
 /**
- * Evidence Vault home — private archive orientation after entrance.
- * Does not own the door ceremony; capture flow stays in Discovery File.
+ * Evidence Vault home — centered frosted window after entrance.
  */
 export function EvidenceVaultInterior({
   journalActive,
@@ -66,6 +62,8 @@ export function EvidenceVaultInterior({
   onAddEvidence,
   onContinueDraft,
   onBrowseArchive,
+  onAddAttachment,
+  onAddLink,
   onOpenEntry,
   onCategorySelect,
   onSearchBrowse,
@@ -74,6 +72,7 @@ export function EvidenceVaultInterior({
   const [entries, setEntries] = useState<EvidenceEntry[]>([]);
   const [hasDraft, setHasDraft] = useState(false);
   const [howOpen, setHowOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [surprise, setSurprise] = useState<EvidenceEntry | null>(null);
 
@@ -98,13 +97,13 @@ export function EvidenceVaultInterior({
 
   const isEmpty = entries.length === 0;
   const recent = useMemo(
-    () => getRecentEvidenceEntries(EVIDENCE_VAULT_RECENT_LIMIT, entries),
+    () => getRecentEvidenceEntries(3, entries),
     [entries],
   );
   const searchResults = useMemo(() => {
     const q = searchQuery.trim();
     if (!q) return null;
-    return searchEvidenceEntries(q, entries).slice(0, 8);
+    return searchEvidenceEntries(q, entries).slice(0, 5);
   }, [entries, searchQuery]);
   const showReminder =
     !isEmpty && !behindDiscovery && shouldShowGentleReminder(entries);
@@ -130,17 +129,50 @@ export function EvidenceVaultInterior({
       data-testid="evidence-vault-interior"
       aria-label={EVIDENCE_VAULT_HOME_TITLE}
     >
-      <div className="evidence-vault-interior__ambient" aria-hidden />
-      <div className="evidence-vault-interior__content">
-        <p className="evidence-vault-interior__kicker">
-          {EVIDENCE_VAULT_HOME_KICKER}
-        </p>
-        <h2 className="evidence-vault-interior__title">
-          {EVIDENCE_VAULT_HOME_TITLE}
-        </h2>
-        <p className="evidence-vault-interior__hint">{EVIDENCE_VAULT_HOME_LEAD}</p>
-        {!isEmpty ? (
-          <p className="evidence-vault-interior__next">{EVIDENCE_VAULT_HOME_NEXT}</p>
+      <aside
+        className="evidence-vault-interior__folio companion-workspace-frosted"
+        data-testid="evidence-vault-folio"
+      >
+        <EvidenceVaultHome
+          onCreateEvidence={onAddEvidence}
+          onBrowseEvidence={onBrowseArchive}
+          onAddAttachment={onAddAttachment ?? onAddEvidence}
+          onAddLink={onAddLink ?? onAddEvidence}
+          createPressed={journalActive}
+        />
+
+        {hasDraft ? (
+          <button
+            type="button"
+            className="evidence-vault-home__object evidence-vault-home__object--draft"
+            onClick={onContinueDraft}
+            data-testid="evidence-vault-continue-draft"
+          >
+            <span className="evidence-vault-home__object-label">
+              {EVIDENCE_VAULT_CONTINUE_DRAFT_LABEL}
+            </span>
+            <span className="evidence-vault-home__object-hint">Unfinished</span>
+          </button>
+        ) : null}
+
+        {isEmpty ? (
+          <p
+            className="evidence-vault-interior__empty-note"
+            data-testid="evidence-vault-empty-state"
+          >
+            Start with one thing worth keeping — a result, a lesson, or someone
+            you helped.
+          </p>
+        ) : null}
+
+        {showReminder ? (
+          <p
+            className="evidence-vault-interior__reminder"
+            data-testid="evidence-vault-gentle-reminder"
+            role="status"
+          >
+            {EVIDENCE_VAULT_GENTLE_REMINDER}
+          </p>
         ) : null}
 
         <details
@@ -159,144 +191,98 @@ export function EvidenceVaultInterior({
           </div>
         </details>
 
-        {showReminder ? (
-          <p
-            className="evidence-vault-interior__reminder"
-            data-testid="evidence-vault-gentle-reminder"
-            role="status"
+        {!isEmpty ? (
+          <details
+            className="evidence-vault-interior__drawer"
+            data-testid="evidence-vault-recent"
+            open={drawerOpen}
+            onToggle={(event) => {
+              setDrawerOpen((event.currentTarget as HTMLDetailsElement).open);
+            }}
           >
-            {EVIDENCE_VAULT_GENTLE_REMINDER}
-          </p>
-        ) : null}
+            <summary>Recent drawer</summary>
+            <div className="evidence-vault-interior__drawer-body">
+              <label className="evidence-vault-interior__search">
+                <span className="evidence-vault-interior__search-label">
+                  Search
+                </span>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" && searchQuery.trim()) {
+                      onSearchBrowse?.(searchQuery.trim());
+                    }
+                  }}
+                  placeholder="Find a memory…"
+                  data-testid="evidence-vault-search"
+                />
+              </label>
 
-        {isEmpty ? (
-          <div
-            className="evidence-vault-interior__empty"
-            data-testid="evidence-vault-empty-state"
-          >
-            {EVIDENCE_VAULT_EMPTY_INTRO.split("\n\n").map((paragraph) => (
-              <p key={paragraph.slice(0, 32)}>{paragraph}</p>
-            ))}
-            {hasDraft ? (
-              <button
-                type="button"
-                className="evidence-vault-interior__action evidence-vault-interior__action--primary"
-                onClick={onContinueDraft}
-                data-testid="evidence-vault-continue-draft"
-              >
-                {EVIDENCE_VAULT_CONTINUE_DRAFT_LABEL}
-              </button>
-            ) : (
-              <button
-                type="button"
-                className="evidence-vault-interior__action evidence-vault-interior__action--primary"
-                onClick={onAddEvidence}
-                data-testid="evidence-vault-add-first"
-              >
-                {EVIDENCE_VAULT_EMPTY_CTA}
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div
-              className="evidence-vault-interior__actions"
-              data-testid="evidence-vault-primary-actions"
-            >
-              <button
-                type="button"
-                className="evidence-vault-interior__action evidence-vault-interior__action--primary"
-                onClick={onAddEvidence}
-                data-testid="evidence-vault-add-evidence"
-                aria-pressed={journalActive}
-              >
-                {EVIDENCE_VAULT_ADD_LABEL}
-              </button>
-              {hasDraft ? (
-                <button
-                  type="button"
-                  className="evidence-vault-interior__action"
-                  onClick={onContinueDraft}
-                  data-testid="evidence-vault-continue-draft"
+              {searchResults ? (
+                <div
+                  className="evidence-vault-interior__search-results"
+                  data-testid="evidence-vault-search-results"
                 >
-                  {EVIDENCE_VAULT_CONTINUE_DRAFT_LABEL}
-                </button>
-              ) : null}
-              <button
-                type="button"
-                className="evidence-vault-interior__action"
-                onClick={onBrowseArchive}
-                data-testid="evidence-vault-browse"
-              >
-                {EVIDENCE_VAULT_BROWSE_LABEL}
-              </button>
-            </div>
+                  {searchResults.length === 0 ? (
+                    <p className="evidence-vault-interior__muted">
+                      Nothing matched that just yet.
+                    </p>
+                  ) : (
+                    <ul>
+                      {searchResults.map((entry) => (
+                        <li key={entry.id}>
+                          <button
+                            type="button"
+                            onClick={() => onOpenEntry?.(entry.id)}
+                          >
+                            {evidencePreviewLine(entry)}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ) : (
+                <ul className="evidence-vault-interior__recent-list">
+                  {recent.map((entry) => (
+                    <li key={entry.id}>
+                      <button
+                        type="button"
+                        className="evidence-vault-interior__recent-item"
+                        onClick={() => onOpenEntry?.(entry.id)}
+                        data-testid={`evidence-vault-recent-${entry.id}`}
+                      >
+                        <span>{evidencePreviewLine(entry)}</span>
+                      </button>
+                      <button
+                        type="button"
+                        className={[
+                          "evidence-vault-interior__favorite",
+                          isEvidenceFavorite(entry)
+                            ? "evidence-vault-interior__favorite--on"
+                            : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                        aria-pressed={isEvidenceFavorite(entry)}
+                        aria-label={
+                          isEvidenceFavorite(entry)
+                            ? "Remove from favorites"
+                            : "Mark as favorite"
+                        }
+                        onClick={() => handleFavorite(entry.id)}
+                        data-testid={`evidence-vault-favorite-${entry.id}`}
+                      >
+                        ★
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-            <div
-              className="evidence-vault-interior__categories"
-              data-testid="evidence-vault-categories"
-              aria-label="Evidence themes"
-            >
-              {EVIDENCE_VAULT_HOME_CATEGORIES.map((category) => (
-                <button
-                  key={category}
-                  type="button"
-                  className="evidence-vault-interior__category"
-                  onClick={() => onCategorySelect?.(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-
-            <label className="evidence-vault-interior__search">
-              <span className="evidence-vault-interior__search-label">Search</span>
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" && searchQuery.trim()) {
-                    onSearchBrowse?.(searchQuery.trim());
-                  }
-                }}
-                placeholder="Find a memory…"
-                data-testid="evidence-vault-search"
-              />
-            </label>
-
-            {searchResults ? (
-              <div
-                className="evidence-vault-interior__search-results"
-                data-testid="evidence-vault-search-results"
-              >
-                {searchResults.length === 0 ? (
-                  <p className="evidence-vault-interior__muted">
-                    Nothing matched that just yet.
-                  </p>
-                ) : (
-                  <ul>
-                    {searchResults.map((entry) => (
-                      <li key={entry.id}>
-                        <button
-                          type="button"
-                          onClick={() => onOpenEntry?.(entry.id)}
-                        >
-                          {evidencePreviewLine(entry)}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            ) : null}
-
-            <div
-              className="evidence-vault-interior__recent"
-              data-testid="evidence-vault-recent"
-            >
-              <div className="evidence-vault-interior__recent-head">
-                <h3>Recent Evidence</h3>
+              <div className="evidence-vault-interior__drawer-links">
                 <button
                   type="button"
                   className="evidence-vault-interior__text-btn"
@@ -305,88 +291,65 @@ export function EvidenceVaultInterior({
                 >
                   {EVIDENCE_VAULT_VIEW_ALL_LABEL}
                 </button>
-              </div>
-              <ul className="evidence-vault-interior__recent-list">
-                {recent.map((entry) => (
-                  <li key={entry.id}>
-                    <button
-                      type="button"
-                      className="evidence-vault-interior__recent-item"
-                      onClick={() => onOpenEntry?.(entry.id)}
-                      data-testid={`evidence-vault-recent-${entry.id}`}
-                    >
-                      <span>{evidencePreviewLine(entry)}</span>
-                      <span className="evidence-vault-interior__recent-meta">
-                        {entry.category}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className={[
-                        "evidence-vault-interior__favorite",
-                        isEvidenceFavorite(entry)
-                          ? "evidence-vault-interior__favorite--on"
-                          : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      aria-pressed={isEvidenceFavorite(entry)}
-                      aria-label={
-                        isEvidenceFavorite(entry)
-                          ? "Remove from favorites"
-                          : "Mark as favorite"
-                      }
-                      onClick={() => handleFavorite(entry.id)}
-                      data-testid={`evidence-vault-favorite-${entry.id}`}
-                    >
-                      ★
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="evidence-vault-interior__secondary">
-              <button
-                type="button"
-                className="evidence-vault-interior__text-btn"
-                onClick={handleSurprise}
-                data-testid="evidence-vault-surprise"
-              >
-                {EVIDENCE_VAULT_SURPRISE_LABEL}
-              </button>
-              <button
-                type="button"
-                className="evidence-vault-interior__text-btn"
-                onClick={onOpenJournal}
-                data-testid="evidence-vault-journal"
-              >
-                Open Evidence Journal
-              </button>
-            </div>
-
-            {surprise ? (
-              <div
-                className="evidence-vault-interior__surprise"
-                data-testid="evidence-vault-surprise-card"
-                role="status"
-              >
-                <p className="evidence-vault-interior__surprise-label">
-                  A moment from your archive
-                </p>
-                <p>{evidencePreviewLine(surprise)}</p>
                 <button
                   type="button"
-                  className="evidence-vault-interior__action"
-                  onClick={() => onOpenEntry?.(surprise.id)}
+                  className="evidence-vault-interior__text-btn"
+                  onClick={handleSurprise}
+                  data-testid="evidence-vault-surprise"
                 >
-                  Open this memory
+                  {EVIDENCE_VAULT_SURPRISE_LABEL}
+                </button>
+                <button
+                  type="button"
+                  className="evidence-vault-interior__text-btn"
+                  onClick={onOpenJournal}
+                  data-testid="evidence-vault-journal"
+                >
+                  Journal
                 </button>
               </div>
-            ) : null}
-          </>
-        )}
-      </div>
+
+              <div
+                className="evidence-vault-interior__categories"
+                data-testid="evidence-vault-categories"
+                aria-label="Evidence themes"
+              >
+                {EVIDENCE_VAULT_HOME_CATEGORIES.slice(0, 8).map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    className="evidence-vault-interior__category"
+                    onClick={() => onCategorySelect?.(category)}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+
+              {surprise ? (
+                <div
+                  className="evidence-vault-interior__surprise"
+                  data-testid="evidence-vault-surprise-card"
+                  role="status"
+                >
+                  <p className="evidence-vault-interior__surprise-label">
+                    From your archive
+                  </p>
+                  <p>{evidencePreviewLine(surprise)}</p>
+                  <button
+                    type="button"
+                    className="evidence-vault-interior__text-btn"
+                    onClick={() => onOpenEntry?.(surprise.id)}
+                  >
+                    Open
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </details>
+        ) : null}
+
+      </aside>
     </section>
   );
 }
