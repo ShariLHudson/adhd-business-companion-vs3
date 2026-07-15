@@ -46,6 +46,7 @@ import "./estate-audio-settings.css";
 import "./estate-room-invitation.css";
 import "./estate-room-template.css";
 import "./estate-room-experience-menu.css";
+import "./experience-controls-overlay.css";
 import "./estate-top-right-chrome.css";
 import "./just-be-here.css";
 import "./breathe-destination.css";

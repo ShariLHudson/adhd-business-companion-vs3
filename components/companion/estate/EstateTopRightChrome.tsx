@@ -5,7 +5,6 @@ import { createPortal } from "react-dom";
 import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
 import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
-import type { ExperienceSoundscapeTrack } from "@/lib/soundscapes/experienceSoundscapesMenu";
 
 export type EstateTopRightChromeProps = {
   showProfile: boolean;
@@ -24,8 +23,10 @@ export type EstateTopRightChromeProps = {
   onOpenReminders?: () => void;
   onOpenCalendar?: () => void;
   onOpenProjects?: () => void;
+  onOpenCreateStudio?: () => void;
   onOpenClearMyMind?: () => void;
   onOpenParkingLot?: () => void;
+  onOpenSpinTheWheel?: () => void;
   onOpenDestinationGallery?: () => void;
   onOpenCartographersStudio?: () => void;
   onOpenJournal?: () => void;
@@ -34,13 +35,14 @@ export type EstateTopRightChromeProps = {
   onOpenChamber?: () => void;
   onOpenBoardroom?: () => void;
   onOpenBreathe?: () => void;
-  onPlaySoundscape?: (track: ExperienceSoundscapeTrack) => void;
+  onOpenPeacefulPlaces?: () => void;
+  onOpenSoundscapes?: () => void;
   backdropSurface?: "chat" | "clear-my-mind";
 };
 
 /**
- * One fixed upper-right mount — Room choices beside the member profile trigger.
- * Prevents duplicate or overlapping fixed-position chrome.
+ * One fixed upper-right mount — Welcome Home beside the member profile trigger.
+ * Experience Controls open from the SH profile menu, not the room menu.
  */
 export function EstateTopRightChrome({
   showProfile,
@@ -59,8 +61,10 @@ export function EstateTopRightChrome({
   onOpenReminders,
   onOpenCalendar,
   onOpenProjects,
+  onOpenCreateStudio,
   onOpenClearMyMind,
   onOpenParkingLot,
+  onOpenSpinTheWheel,
   onOpenDestinationGallery,
   onOpenCartographersStudio,
   onOpenJournal,
@@ -69,7 +73,8 @@ export function EstateTopRightChrome({
   onOpenChamber,
   onOpenBoardroom,
   onOpenBreathe,
-  onPlaySoundscape,
+  onOpenPeacefulPlaces,
+  onOpenSoundscapes,
   backdropSurface,
 }: EstateTopRightChromeProps) {
   const [mounted, setMounted] = useState(false);
@@ -97,8 +102,10 @@ export function EstateTopRightChrome({
           onOpenReminders={onOpenReminders}
           onOpenCalendar={onOpenCalendar}
           onOpenProjects={onOpenProjects}
+          onOpenCreateStudio={onOpenCreateStudio}
           onOpenClearMyMind={onOpenClearMyMind}
           onOpenParkingLot={onOpenParkingLot}
+          onOpenSpinTheWheel={onOpenSpinTheWheel}
           onOpenDestinationGallery={onOpenDestinationGallery}
           onOpenCartographersStudio={onOpenCartographersStudio}
           onOpenJournal={onOpenJournal}
@@ -107,7 +114,8 @@ export function EstateTopRightChrome({
           onOpenChamber={onOpenChamber}
           onOpenBoardroom={onOpenBoardroom}
           onOpenBreathe={onOpenBreathe}
-          onPlaySoundscape={onPlaySoundscape}
+          onOpenPeacefulPlaces={onOpenPeacefulPlaces}
+          onOpenSoundscapes={onOpenSoundscapes}
           backdropSurface={backdropSurface}
         />
       ) : null}

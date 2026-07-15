@@ -22,26 +22,26 @@ import {
 
 const VISIBLE_TOP_LABELS = [
   "Conversations",
+  "My Spark Estate",
+  "Experience Controls",
   "Settings",
-  "Listen to Shari's Welcome",
-  "Profile",
-  "Logout",
+  "Sign Out",
 ] as const;
 
 const VISIBLE_ACTION_IDS: EstateMenuActionId[] = [
   "start-new-conversation",
   "start-new-day-conversation",
-  "settings",
-  "replay-welcome",
   "my-profile",
   "people-i-help",
+  "estate-profile",
+  "experience-controls",
+  "settings",
   "log-out",
 ];
 
 const HIDDEN_LABELS = ["Personalization", "Account", "Evidence Vault", "Hall of Accomplishments"] as const;
 const HIDDEN_ACTION_IDS: EstateMenuActionId[] = [
   "growth-profile",
-  "estate-profile",
   "evidence-vault",
   "portfolio",
 ];
@@ -75,7 +75,7 @@ function readRoomMenuSource(): string {
 }
 
 describe("Welcome Home menu — visibility", () => {
-  it("shows Conversations, Settings, Listen to Shari's Welcome, Profile, Logout", () => {
+  it("shows Conversations, My Spark Estate, Experience Controls, Settings, Sign Out", () => {
     expect(ESTATE_MENU_DROPDOWN_ENTRIES.map((e) => e.label)).toEqual([
       ...VISIBLE_TOP_LABELS,
     ]);
@@ -110,9 +110,12 @@ describe("Welcome Home menu — visibility", () => {
     }
   });
 
-  it("exposes the working clickable actions including welcome replay", () => {
+  it("exposes only working clickable actions (no welcome replay)", () => {
     expect(ESTATE_MENU_DROPDOWN_ITEMS.map((i) => i.id)).toEqual(
       VISIBLE_ACTION_IDS,
+    );
+    expect(ESTATE_MENU_DROPDOWN_ITEMS.map((i) => i.id)).not.toContain(
+      "replay-welcome",
     );
   });
 });
@@ -168,11 +171,13 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
-  it("Listen to Shari's Welcome replays without clearing first-visit completion", () => {
+  it("does not replay welcome audio after first login", () => {
     expect(source).toMatch(/actionId === "replay-welcome"/);
-    expect(source).toMatch(/requestWelcomeHomeReplay\(\)/);
     expect(source).toMatch(
-      /returnToWelcomeHomeLobby\("listen to shari welcome"\)/,
+      /Welcome audio is first-login only — never replay after that/,
+    );
+    expect(source).not.toMatch(
+      /actionId === "replay-welcome"[\s\S]*?requestWelcomeHomeReplay\(\)/,
     );
   });
 
@@ -188,13 +193,29 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(/setOverlay\("people-i-help"\)/);
   });
 
-  it("room menu nests Peaceful Places above Soundscapes under Experiences", () => {
-    expect(roomMenuSource).toMatch(/PEACEFUL_PLACES_MUSIC_TRACKS/);
-    expect(roomMenuSource).toMatch(/EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS/);
-    expect(roomMenuSource).toMatch(/data-testid="estate-open-peaceful-places"/);
-    expect(roomMenuSource).toMatch(/data-testid="estate-open-soundscapes"/);
-    expect(roomMenuSource).not.toMatch(/category--sub/);
+  it("Welcome Home opens Peaceful Places and Soundscapes as destinations", () => {
+    expect(roomMenuSource).toMatch(/estate-open-\$\{id\}/);
+    expect(roomMenuSource).toMatch(/"peaceful-places":\s*onOpenPeacefulPlaces/);
+    expect(roomMenuSource).toMatch(/soundscapes:\s*onOpenSoundscapes/);
+    expect(roomMenuSource).toMatch(/onOpenPeacefulPlaces/);
+    expect(roomMenuSource).toMatch(/onOpenSoundscapes/);
+    expect(roomMenuSource).not.toMatch(/peacefulPlacesExpanded/);
+    expect(roomMenuSource).not.toMatch(/data-testid="estate-room-chat-toggle"/);
+    expect(source).toMatch(/ExperienceControlsOverlay/);
+    expect(source).toMatch(/SoundscapeSelectionOverlay/);
     expect(source).toMatch(/playExperienceSoundscapeTrack\(track\)/);
+  });
+
+  it("Experience Controls open from SH without navigating away", () => {
+    expect(source).toMatch(/actionId === "experience-controls"/);
+    expect(source).toMatch(/setExperienceControlsOpen\(true\)/);
+    expect(source).toMatch(/<ExperienceControlsOverlay/);
+    const experienceControlsHandler = source.match(
+      /if \(actionId === "experience-controls"\) \{[\s\S]*?\n    \}/,
+    )?.[0];
+    expect(experienceControlsHandler).toBeTruthy();
+    expect(experienceControlsHandler).toContain("setExperienceControlsOpen(true)");
+    expect(experienceControlsHandler).not.toContain("setOverlay(");
   });
 
   it("Logout signs out and routes to login", () => {
@@ -204,7 +225,7 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
-  it("Return to Estate / Back To Estate always opens Welcome Home lobby", () => {
+  it("Back To Estate always opens Welcome Home lobby", () => {
     expect(source).toContain("onBackToEstate={navigateBackToEstateHome}");
     expect(source).toContain(
       'returnToWelcomeHomeLobby("back to estate")',
@@ -221,8 +242,8 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(
       /const handleCompanionBack = \(\) => \{\s*\/\/[^\n]*\s*navigateBackToEstateHome\(\);\s*\}/,
     );
-    expect(roomMenuSource).toContain('data-testid="estate-return-to-estate"');
-    expect(roomMenuSource).toContain("closeAndRun(onBackToEstate)");
+    expect(roomMenuSource).toMatch(/Wander the Grounds/);
+    expect(roomMenuSource).toMatch(/data-testid="estate-open-wander-the-grounds"/);
 
     // Must not fall back to member overrides, login art, or history restore.
     const lobbyFn = source.match(
@@ -271,7 +292,7 @@ describe("Welcome Home menu — desktop + mobile layout", () => {
     );
   });
 
-  it("renders Conversations and Profile as collapsible groups with nested actions", () => {
+  it("renders Conversations and My Spark Estate as collapsible groups with nested actions", () => {
     const component = readFileSync(
       resolve(process.cwd(), "components/companion/GlobalEstateMenu.tsx"),
       "utf8",
@@ -284,8 +305,8 @@ describe("Welcome Home menu — desktop + mobile layout", () => {
     expect(component).toMatch(/toggleGroup\(entry\.id\)/);
     expect(component).toMatch(/showChevron/);
     expect(component).toMatch(/estate-room-experience-menu__panel/);
+    expect(component).toMatch(/experience-controls/);
     expect(component).not.toMatch(/growth-profile/);
-    expect(component).not.toMatch(/estate-profile/);
     expect(component).not.toMatch(/Personalization/);
     expect(component).not.toMatch(/>Account</);
   });

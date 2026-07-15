@@ -76,6 +76,7 @@ export type EstateMenuShellActionId = Exclude<
   | "journal"
   | "people-i-help"
   | "replay-welcome"
+  | "experience-controls"
 >;
 
 const MENU_ACTION_TO_ROOM: Record<

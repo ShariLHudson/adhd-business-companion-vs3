@@ -1,17 +1,9 @@
 /**
- * Global Estate Menu — universal upper-right session controls.
- * Welcome Home / profile dropdown shows only working member controls.
+ * Global Estate Menu — SH profile session controls.
+ * Welcome Home (room menu) = where to go.
+ * This menu = profile destinations + Experience Controls (look / sound / behave).
  *
- * Visible menu:
- * 1. Conversations → New Chat · New Day Chat
- * 2. Settings
- * 3. Profile → My Business Estate · People I Help
- * 4. Logout
- *
- * Personalization and Account are hidden (not currently working).
- * Other action ids remain for programmatic routing only.
- *
- * @see docs/protocols/SPARK_ESTATE_TOP_NAVIGATION_AND_PROFILE_MENU_CORRECTION.md
+ * @see lib/estate/welcomeHomeNavigationStructure.ts
  */
 
 export const ESTATE_MENU_ACTION_IDS = [
@@ -29,6 +21,7 @@ export const ESTATE_MENU_ACTION_IDS = [
   "progress-timeline",
   "start-new-conversation",
   "start-new-day-conversation",
+  "experience-controls",
   "settings",
   "replay-welcome",
   "notifications",
@@ -46,7 +39,7 @@ export type EstateMenuDropdownItem = {
 
 export type EstateMenuDropdownGroup = {
   kind: "group";
-  id: "conversations" | "profile";
+  id: "conversations" | "my-spark-estate" | "profile";
   emoji: string;
   label: string;
   children: readonly EstateMenuDropdownItem[];
@@ -57,8 +50,8 @@ export type EstateMenuDropdownEntry =
   | EstateMenuDropdownGroup;
 
 /**
- * Profile initials menu — working member-facing choices only.
- * Order: Conversations → Settings → Listen to Shari's Welcome → Profile → Logout.
+ * SH profile menu — Conversations, My Spark Estate, Experience Controls, Settings, Sign Out.
+ * Experience Controls opens an overlay over the current place (never navigates).
  */
 export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = [
   {
@@ -80,22 +73,10 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
     ],
   },
   {
-    kind: "item",
-    id: "settings",
-    emoji: "⚙️",
-    label: "Settings",
-  },
-  {
-    kind: "item",
-    id: "replay-welcome",
-    emoji: "🎧",
-    label: "Listen to Shari's Welcome",
-  },
-  {
     kind: "group",
-    id: "profile",
-    emoji: "👤",
-    label: "Profile",
+    id: "my-spark-estate",
+    emoji: "🏡",
+    label: "My Spark Estate",
     children: [
       {
         id: "my-profile",
@@ -107,13 +88,30 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
         emoji: "🤝",
         label: "People I Help",
       },
+      {
+        id: "estate-profile",
+        emoji: "👤",
+        label: "My Profile",
+      },
     ],
+  },
+  {
+    kind: "item",
+    id: "experience-controls",
+    emoji: "🎛",
+    label: "Experience Controls",
+  },
+  {
+    kind: "item",
+    id: "settings",
+    emoji: "⚙️",
+    label: "Settings",
   },
   {
     kind: "item",
     id: "log-out",
     emoji: "🚪",
-    label: "Logout",
+    label: "Sign Out",
   },
 ];
 

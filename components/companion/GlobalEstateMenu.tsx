@@ -27,7 +27,7 @@ export type GlobalEstateMenuProps = {
   className?: string;
 };
 
-type ExpandedGroupId = "conversations" | "profile";
+type ExpandedGroupId = "conversations" | "my-spark-estate" | "profile";
 
 function useUserProfileDisplay() {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -235,12 +235,12 @@ export function GlobalEstateMenu({
                 );
               }
 
-              if (entry.id === "settings") {
+              if (entry.id === "settings" || entry.id === "experience-controls") {
                 return (
                   <EstateDropdownMenuCategoryRow
                     key={entry.id}
                     label={entry.label}
-                    testId="global-estate-menu-item-settings"
+                    testId={`global-estate-menu-item-${entry.id}`}
                     onClick={() => closeAndRun(entry.id)}
                   />
                 );

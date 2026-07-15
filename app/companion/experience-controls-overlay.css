@@ -1,0 +1,239 @@
+/* Experience Controls — overlay over current destination (never navigates) */
+
+.experience-controls-overlay,
+.soundscape-selection-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100120;
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+  pointer-events: none;
+}
+
+.experience-controls-overlay__backdrop,
+.soundscape-selection-overlay__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: rgba(12, 10, 8, 0.28);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.experience-controls-overlay__panel,
+.soundscape-selection-overlay__panel {
+  position: relative;
+  z-index: 1;
+  width: min(22rem, 100vw);
+  max-width: 100%;
+  height: 100%;
+  max-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: rgba(28, 22, 16, 0.94);
+  color: rgba(255, 250, 242, 0.96);
+  border-left: 1px solid rgba(255, 236, 200, 0.28);
+  box-shadow: -8px 0 32px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+
+.experience-controls-overlay__header,
+.soundscape-selection-overlay__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid rgba(255, 236, 200, 0.16);
+  flex-shrink: 0;
+}
+
+.experience-controls-overlay__title,
+.soundscape-selection-overlay__title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.experience-controls-overlay__close,
+.soundscape-selection-overlay__close {
+  min-height: 2.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 236, 200, 0.35);
+  background: rgba(255, 248, 235, 0.08);
+  color: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.experience-controls-overlay__scroll {
+  overflow-y: auto;
+  padding: 0.85rem 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.experience-controls-overlay__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.experience-controls-overlay__section-title,
+.experience-controls-overlay__subsection {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.72;
+}
+
+.experience-controls-overlay__status {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.experience-controls-overlay__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.experience-controls-overlay__choice {
+  display: block;
+  width: 100%;
+  text-align: left;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 236, 200, 0.22);
+  background: rgba(255, 248, 235, 0.06);
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.experience-controls-overlay__choice--active {
+  border-color: rgba(255, 220, 160, 0.55);
+  background: rgba(255, 220, 160, 0.14);
+}
+
+.experience-controls-overlay__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.15rem;
+  font-size: 1rem;
+}
+
+.experience-controls-overlay__toggle input {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.experience-controls-overlay__volume {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 1rem;
+}
+
+.experience-controls-overlay__volume input[type="range"] {
+  width: 100%;
+}
+
+.soundscape-selection-overlay__list {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 1rem 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.soundscape-selection-overlay__item {
+  width: 100%;
+  text-align: left;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 236, 200, 0.22);
+  background: rgba(255, 248, 235, 0.06);
+  color: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.conversation-visibility-chip {
+  position: fixed;
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100110;
+  min-height: 2.75rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 236, 200, 0.42);
+  background: rgba(32, 26, 20, 0.88);
+  color: rgba(255, 252, 245, 0.98);
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
+  pointer-events: auto;
+}
+
+/* Presentation modes — do not change route or unload destination */
+html[data-estate-background-mode="soften"] .companion-root::before,
+html[data-estate-background-mode="soften"] .estate-scene-layer {
+  filter: blur(2px) brightness(0.72);
+}
+
+html[data-estate-background-mode="focus"] .companion-root::before,
+html[data-estate-background-mode="focus"] .estate-scene-layer {
+  filter: blur(6px) brightness(0.45) saturate(0.85);
+}
+
+html[data-estate-text-size="large"] .companion-root {
+  font-size: 112.5%;
+}
+
+html[data-estate-text-size="extra-large"] .companion-root {
+  font-size: 125%;
+}
+
+html[data-estate-reduce-motion="true"] *,
+html[data-estate-reduce-motion="true"] *::before,
+html[data-estate-reduce-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (max-width: 767px) {
+  .experience-controls-overlay,
+  .soundscape-selection-overlay {
+    align-items: flex-end;
+    justify-content: stretch;
+  }
+
+  .experience-controls-overlay__panel,
+  .soundscape-selection-overlay__panel {
+    width: 100%;
+    height: min(88dvh, 100%);
+    max-height: 88dvh;
+    border-left: 0;
+    border-top: 1px solid rgba(255, 236, 200, 0.28);
+    border-radius: 1rem 1rem 0 0;
+  }
+}
