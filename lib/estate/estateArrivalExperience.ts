@@ -128,15 +128,55 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "clear-my-mind": {
-    title: "The Conservatory",
-    motto: "A peaceful place to breathe, think, and regain clarity.",
+    title: "Clear My Mind",
+    motto:
+      "This is a place to get everything out of your head. Nothing needs to be organized yet.",
     shariGreeting:
-      "We can simply enjoy the space, or if you'd like, I can help you with one of these.",
-    invitationAfterArrival: true,
+      "Add thoughts, tasks, reminders, and worries exactly as they come to you. We can sort later.",
+    invitationAfterArrival: false,
     ambience: {
       src: EAST_TERRACE_AMBIENCE_MP3,
       volume: 0.13,
       character: "birds, water, wind",
+    },
+  },
+  "plan-my-day": {
+    title: "Plan My Day",
+    motto:
+      "Today is not about doing everything. It is about choosing what matters most.",
+    shariGreeting:
+      "We can build today's plan, or adapt the one you already have, based on your time, energy, and motivation.",
+    invitationAfterArrival: false,
+    ambience: {
+      src: BRIGHT_STUDIO_AMBIENCE_MP3,
+      volume: 0.1,
+      character: "soft morning desk calm",
+    },
+  },
+  "business-estate": {
+    title: "Business Estate",
+    motto:
+      "Spark can help you immediately. Everything here is optional.",
+    shariGreeting:
+      "Each detail you add helps me support your business more personally. Start with whatever feels useful right now.",
+    invitationAfterArrival: false,
+    ambience: {
+      src: BRIGHT_STUDIO_AMBIENCE_MP3,
+      volume: 0.1,
+      character: "quiet business study",
+    },
+  },
+  "my-business-estate": {
+    title: "Business Estate",
+    motto:
+      "Spark can help you immediately. Everything here is optional.",
+    shariGreeting:
+      "Each detail you add helps me support your business more personally. Start with whatever feels useful right now.",
+    invitationAfterArrival: false,
+    ambience: {
+      src: BRIGHT_STUDIO_AMBIENCE_MP3,
+      volume: 0.1,
+      character: "quiet business study",
     },
   },
   "coffee-house": {
@@ -300,9 +340,10 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
   },
   "evidence-vault": {
     title: "Evidence Vault",
-    motto: "What has my life been teaching me?",
+    motto:
+      "This is where you collect proof of progress, strengths, results, and accomplishments.",
     shariGreeting:
-      "Welcome back to your Evidence Vault.\n\nEvery experience has something to teach us.\n\nWhat discovery would you like to preserve today?",
+      "Your key unlocks after a short discovery that helps me notice evidence you may overlook. When you are ready, we can begin.",
     invitationAfterArrival: false,
     ambience: {
       src: HALL_OF_REFLECTIONS_AMBIENCE_MP3,

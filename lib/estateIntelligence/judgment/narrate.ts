@@ -65,18 +65,21 @@ export function buildRecommendationWhy(
   }
 
   if (signals.wantsFocus) {
-    return `${stripEstateTm(profile.displayName)} supports focus with ${profile.primaryFeeling.toLowerCase()} energy and a calm atmosphere.`;
+    return `${stripEstateTm(profile.displayName)} supports focus with a calm, steady atmosphere.`;
   }
 
   if (signals.wantsWater) {
-    return `${stripEstateTm(profile.displayName)} sits among the Estate's peaceful water places — good for ${profile.primaryFeeling.toLowerCase()}.`;
+    return `${stripEstateTm(profile.displayName)} sits among the Estate's peaceful water places — a gentle place to pause.`;
   }
 
   if (place?.guidebook?.epigraph) {
     return place.guidebook.epigraph;
   }
 
-  return profile.purpose.toLowerCase();
+  // Never assemble "feeling and unhurried" style fragments for members.
+  const purpose = profile.purpose?.trim();
+  if (purpose) return purpose;
+  return `${stripEstateTm(profile.displayName)} is a quiet place to settle in.`;
 }
 
 export function buildPlaceRecommendations(
@@ -222,7 +225,7 @@ export function buildRecommendationBody(
     const parts = [
       `${stripEstateTm(profile.displayName)} is ${profile.purpose.toLowerCase()}.`,
       "",
-      `It feels like ${profile.primaryFeeling.toLowerCase()}${profile.secondaryFeelings.length ? ` — ${profile.secondaryFeelings.join(", ").toLowerCase()}` : ""}.`,
+      "It is a calm place to settle in without rushing.",
     ];
     if (place?.guidebook?.openingLine) {
       parts.push("", place.guidebook.openingLine);
