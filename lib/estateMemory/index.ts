@@ -2,6 +2,7 @@ export * from "./types";
 export * from "./estateSectionMap";
 export * from "./estateMemoryStore";
 export * from "./estateMemoryContinuity";
+export * from "./clearConversationThread";
 export * from "./estateMemoryHint";
 export * from "./estatePendingTransition";
 export * from "./estateOfferContinuation";

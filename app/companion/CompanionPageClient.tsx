@@ -208,10 +208,10 @@ import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activit
 import {
   type FreshStartKind,
   freshStartCopy,
-  NEW_CONVERSATION_GREETING,
 } from "@/lib/freshStartCopy";
 import { beginEstateJourneyNewDay } from "@/lib/estateJourneyEngine/session";
 import { clearDailySessionFlags } from "@/lib/freshStartSession";
+import { resetActiveConversation } from "@/lib/conversationReset";
 import { resetTodayPlanForNewDay, resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
   dismissPlanMyDayForSession,
@@ -2528,6 +2528,8 @@ export default function CompanionPageClient() {
   /** Increments on every send — in-flight AI turns check this to avoid stale UI locks. */
   const chatRequestGenerationRef = useRef(0);
   const chatRequestAbortRef = useRef<AbortController | null>(null);
+  /** Active thread id after New Chat / New Day — never reuse prior conversationId. */
+  const activeConversationIdRef = useRef<string | null>(null);
   const voiceUsedRef = useRef(false);
   const pomodoroTimer = usePomodoroTimer();
 
@@ -6836,15 +6838,29 @@ export default function CompanionPageClient() {
     setMessages((prev) => [...prev, { role: "system", content }]);
   }
 
-  function clearTodayContext(options?: { preserveRoom?: boolean }) {
+  function clearTodayContext(options?: {
+    preserveRoom?: boolean;
+    mode?: "new-chat" | "new-day";
+  }) {
+    const reset = resetActiveConversation({
+      mode: options?.mode ?? "new-chat",
+      abortController: chatRequestAbortRef.current,
+      bumpRequestGeneration: () => {
+        chatRequestGenerationRef.current += 1;
+      },
+    });
+    chatRequestAbortRef.current = null;
+    activeConversationIdRef.current = reset.conversationId;
+
     recognitionRef.current?.stop();
     micExplicitStopRef.current = false;
     setIsListening(false);
-    clearConversation();
     declinedConversationOffersRef.current = new Set();
     setMessages([]);
     workspaceChatScopeRef.current = null;
     setInput("");
+    inputSnapshotRef.current = "";
+    lastUserTextRef.current = "";
     setError(null);
     setEmotion("unclear");
     setBridge(null);
@@ -6853,6 +6869,11 @@ export default function CompanionPageClient() {
     businessConfidenceBypassRef.current = false;
     businessConfidencePendingTextRef.current = null;
     setAssistedActionOffer(null);
+    setAwaitingUserConfirmation(null);
+    awaitingUserConfirmationRef.current = null;
+    clearActiveChamberMember();
+    setActiveChamberMemberId(null);
+    setBoardroomShariChatOpen(false);
     pauseCreatePersistence();
     patchWorkspacePanel(null);
     setWorkspaceDetail(null);
@@ -6871,6 +6892,7 @@ export default function CompanionPageClient() {
     setWorkspaceSession(null);
     setProjectsBootstrapCreate(false);
     voiceUsedRef.current = false;
+    endVisibleThinking();
     setIsLoading(false);
     if (!options?.preserveRoom) {
       setActiveSection("home");
@@ -6885,21 +6907,23 @@ export default function CompanionPageClient() {
     sectionHistoryRef.current = [];
     navHistoryRef.current = createNavigationHistoryStack();
     setCoachingMode("today");
+    governorRouteCtxRef.current = {
+      userText: "",
+      lastAssistantText: "",
+      resolved: resolveIntent(""),
+      suppressRestore: true,
+    };
+    governorChatMessagesRef.current = [];
     resumeCreatePersistence();
     focusWorkspaceLayout();
   }
 
   function requestClearTodayContext() {
-    // Conversations → New Chat: start immediately (no explanation dialog).
+    // Conversations → New Chat: blank thread, wait for the member.
     try {
       const preserveRoom = shouldPreserveRoomForFreshConversation();
-      clearTodayContext({ preserveRoom });
-      setMessages([
-        {
-          role: "assistant",
-          content: NEW_CONVERSATION_GREETING,
-        },
-      ]);
+      clearTodayContext({ preserveRoom, mode: "new-chat" });
+      setMessages([]);
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
@@ -6957,13 +6981,8 @@ export default function CompanionPageClient() {
       } else if (freshStartDialog === "reset-day") {
         resetPlanDay();
       } else if (freshStartDialog === "clear-context") {
-        clearTodayContext({ preserveRoom });
-        setMessages([
-          {
-            role: "assistant",
-            content: NEW_CONVERSATION_GREETING,
-          },
-        ]);
+        clearTodayContext({ preserveRoom, mode: "new-chat" });
+        setMessages([]);
       }
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
@@ -6985,7 +7004,7 @@ export default function CompanionPageClient() {
   }
 
   function beginNewDay(preserveRoom = false) {
-    clearTodayContext({ preserveRoom });
+    clearTodayContext({ preserveRoom, mode: "new-day" });
     clearDailySessionFlags();
     resetTodayPlanForNewDay();
     const { greeting } = beginEstateJourneyNewDay();

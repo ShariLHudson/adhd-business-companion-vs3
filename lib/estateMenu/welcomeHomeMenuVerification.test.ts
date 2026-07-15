@@ -126,11 +126,12 @@ describe("Welcome Home menu — action wiring", () => {
       /case\s+"start-new-conversation"\s*:\s*[\s\S]*?requestClearTodayContext\(\)/,
     );
     expect(source).toMatch(
-      /function requestClearTodayContext\(\)\s*\{[\s\S]*?clearTodayContext\(\{\s*preserveRoom\s*\}\)/,
+      /function requestClearTodayContext\(\)\s*\{[\s\S]*?clearTodayContext\(\{\s*preserveRoom,\s*mode:\s*"new-chat"\s*\}\)/,
     );
     expect(source).toMatch(
-      /function requestClearTodayContext\(\)\s*\{[\s\S]*?NEW_CONVERSATION_GREETING/,
+      /function requestClearTodayContext\(\)\s*\{[\s\S]*?setMessages\(\[\]\)/,
     );
+    expect(source).toMatch(/resetActiveConversation\(/);
     expect(source).not.toMatch(
       /function requestClearTodayContext\(\)\s*\{\s*setFreshStartDialog\("clear-context"\)/,
     );
@@ -142,6 +143,9 @@ describe("Welcome Home menu — action wiring", () => {
     );
     expect(source).toMatch(
       /function requestBeginNewDay\(\)\s*\{[\s\S]*?beginNewDay\(preserveRoom\)/,
+    );
+    expect(source).toMatch(
+      /function beginNewDay\([\s\S]*?mode:\s*"new-day"/,
     );
     expect(source).not.toMatch(
       /function requestBeginNewDay\(\)\s*\{\s*setFreshStartDialog\("begin-new-day"\)/,

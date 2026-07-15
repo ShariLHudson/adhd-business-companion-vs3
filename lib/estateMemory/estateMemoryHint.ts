@@ -4,6 +4,7 @@
 
 import type { EstateMemory } from "./types";
 import { getEstateMemory } from "./estateMemoryStore";
+import { isEstateConversationThreadFresh } from "./clearConversationThread";
 import { estateJourneyHintForChat } from "@/lib/estateJourneyEngine/engine";
 import { estateJourneyIntelligenceHint } from "@/lib/estateJourneyEngine/intelligence";
 import { journeyReturnHintForChat } from "@/lib/estateJourneyEngine/returnExperience";
@@ -34,6 +35,26 @@ export function estateMemoryHintForChat(
   memory: EstateMemory | null = getEstateMemory(),
 ): string | null {
   if (!memory) return null;
+
+  /**
+   * After New Chat / New Day, digest and open loops are cleared.
+   * Do not instruct the model to continue a prior thread that no longer exists.
+   */
+  if (isEstateConversationThreadFresh(memory)) {
+    const lines: string[] = [
+      "FRESH CONVERSATION THREAD:",
+      "The member started a new chat or new day. Do not continue prior chat topics, drafts, or unfinished workflows unless they bring them up again.",
+      "Long-term profile and saved preferences may still apply. Wait for the member to speak.",
+    ];
+    if (memory.activeGoals.length) {
+      const goals = memory.activeGoals.map((g) => g.label).join("; ");
+      lines.push(`Saved goals (only if relevant): ${goals}`);
+    }
+    if (memory.currentRoom) {
+      lines.push(`Current room: ${memory.currentRoom.entryId}.`);
+    }
+    return lines.join("\n");
+  }
 
   const lines: string[] = [
     "ESTATE MEMORY CONTINUITY (mandatory — one continuous conversation across rooms):",
