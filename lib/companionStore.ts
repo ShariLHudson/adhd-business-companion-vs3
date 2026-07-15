@@ -2492,6 +2492,10 @@ export type Prefs = {
   hasSeenWelcomeIntro?: boolean;
   name: string;
   email: string;
+  /** What Shari should call the member — personal, not business. */
+  preferredName?: string;
+  /** Optional short personal introduction (My Profile). */
+  personalIntroduction?: string;
   /** User-uploaded portrait — data URL; never Shari/companion images. */
   profileImage?: string;
   howToMemory: string;
@@ -2522,6 +2526,8 @@ const DEFAULT_PREFS: Prefs = {
   hasSeenWelcomeIntro: false,
   name: "",
   email: "",
+  preferredName: "",
+  personalIntroduction: "",
   profileImage: "",
   howToMemory: "",
   facebookUrl: "",

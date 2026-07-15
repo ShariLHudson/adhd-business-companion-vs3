@@ -127,9 +127,9 @@ export const SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS: readonly {
   id: EstateMenuActionId;
   label: string;
 }[] = [
-  { id: "my-profile", label: "My Business Estate" },
+  { id: "my-business-estate", label: "My Business Estate" },
   { id: "people-i-help", label: "People I Help" },
-  { id: "estate-profile", label: "My Profile" },
+  { id: "my-profile", label: "My Profile" },
 ];
 
 export const SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS: readonly {

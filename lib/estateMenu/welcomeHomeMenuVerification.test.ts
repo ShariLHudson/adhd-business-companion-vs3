@@ -31,9 +31,9 @@ const VISIBLE_TOP_LABELS = [
 const VISIBLE_ACTION_IDS: EstateMenuActionId[] = [
   "start-new-conversation",
   "start-new-day-conversation",
-  "my-profile",
+  "my-business-estate",
   "people-i-help",
-  "estate-profile",
+  "my-profile",
   "experience-controls",
   "settings",
   "log-out",
@@ -181,16 +181,28 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
-  it("Profile opens My Business Estate via profile destination resolver", () => {
+  it("My Business Estate opens via profile destination resolver", () => {
     expect(source).toMatch(/openProfileDestinationCore\("my-business-estate"\)/);
+    expect(source).toMatch(/actionId === "my-business-estate"/);
     expect(source).toMatch(/<ProfileDestinationHost/);
     expect(source).toMatch(/setOverlay\("profile"\)/);
+  });
+
+  it("My Profile opens personal profile destination", () => {
+    expect(source).toMatch(/openProfileDestinationCore\("profile-personal"\)/);
+    expect(source).toMatch(/setOverlay\("profile-personal"\)/);
+    expect(source).toMatch(/actionId === "my-profile"/);
   });
 
   it("People I Help opens via profile destination resolver", () => {
     expect(source).toMatch(/openProfileDestinationCore\("people-i-help"\)/);
     expect(source).toMatch(/<ProfileDestinationHost/);
     expect(source).toMatch(/setOverlay\("people-i-help"\)/);
+  });
+
+  it("Experience Controls uses GlobalOverlayHost", () => {
+    expect(source).toMatch(/<GlobalOverlayHost>/);
+    expect(source).toMatch(/ExperienceControlsOverlay/);
   });
 
   it("Welcome Home opens Peaceful Places and Soundscapes as destinations", () => {

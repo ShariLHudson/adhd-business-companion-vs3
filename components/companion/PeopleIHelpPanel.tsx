@@ -7,6 +7,7 @@ import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEsta
 import { GetExpertHelpAction } from "@/components/companion/advisory/GetExpertHelpAction";
 import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHelpPanel";
 import { getActiveAvatar } from "@/lib/companionStore";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "@/app/companion/my-business-estate.css";
 
 type Props = {
@@ -20,10 +21,25 @@ type Props = {
 export function PeopleIHelpPanel({ onClose }: Props) {
   const [expertHelpOpen, setExpertHelpOpen] = useState(false);
   const [avatarIdForHelp, setAvatarIdForHelp] = useState<string | undefined>();
+  const { requestClose } = useDismissibleWindow({
+    open: true,
+    onClose,
+  });
+
+  function dismissOutside() {
+    if (expertHelpOpen) {
+      setExpertHelpOpen(false);
+      return;
+    }
+    requestClose();
+  }
 
   return (
     <MyBusinessEstateRoomShell>
-      <EstateWorkspace className="my-business-estate-panel people-i-help-panel">
+      <EstateWorkspace
+        className="my-business-estate-panel people-i-help-panel"
+        onDismissOutside={dismissOutside}
+      >
         {expertHelpOpen ? (
           <GetExpertHelpPanel
             sourceType="people_i_help"
@@ -38,25 +54,18 @@ export function PeopleIHelpPanel({ onClose }: Props) {
           <button
             type="button"
             className="people-i-help-panel__back"
-            onClick={onClose}
+            onClick={requestClose}
           >
             Close
           </button>
           <header className="people-i-help-panel__header">
-            <p className="estate-workspace__kicker">Profile</p>
+            <p className="estate-workspace__kicker">My Spark Estate › People I Help</p>
             <h1 className="estate-workspace__title">People I Help</h1>
             <p className="my-business-estate-panel__lead">
               The people your work is for — saved client avatars and audiences that
               guide your messaging and offers.
             </p>
           </header>
-
-          <GetExpertHelpAction
-            onOpen={() => {
-              setAvatarIdForHelp(getActiveAvatar()?.id);
-              setExpertHelpOpen(true);
-            }}
-          />
 
           <IdealClientBuilder
             presentation={{
@@ -66,8 +75,11 @@ export function PeopleIHelpPanel({ onClose }: Props) {
               backToDestinationLabel: "Back to People I Help",
               newAvatarTitle: "New Client Avatar",
             }}
-            onExpertHelpRequest={(avatarId) => {
-              setAvatarIdForHelp(avatarId);
+          />
+
+          <GetExpertHelpAction
+            onOpen={() => {
+              setAvatarIdForHelp(getActiveAvatar()?.id);
               setExpertHelpOpen(true);
             }}
           />

@@ -3,11 +3,13 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { MyBusinessEstatePanel } from "@/components/companion/MyBusinessEstatePanel";
+import { MyProfilePanel } from "@/components/companion/MyProfilePanel";
 import { PeopleIHelpPanel } from "@/components/companion/PeopleIHelpPanel";
 import { GrowthProfileRoomPanel } from "@/components/companion/GrowthProfileRoomPanel";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
 import {
   isProfileDestinationOverlay,
+  profileDestinationTitle,
   type ProfileDestinationOverlayId,
 } from "@/lib/profile/profileDestination";
 import "@/app/companion/profile-destination-host.css";
@@ -20,11 +22,13 @@ export type ProfileDestinationHostProps = {
   onOpenEstatePlace?: (actionId: EstateMenuActionId) => void;
   /** Switch from My Business Estate to People I Help without clearing estate data. */
   onOpenPeopleIHelp?: () => void;
+  onOpenSettings?: (section?: "tone" | "plan" | "notifications") => void;
+  onOpenExperienceControls?: () => void;
 };
 
 /**
  * Dedicated profile destinations — body portal above Welcome Home.
- * Matches BreatheDestinationHost durability: never trapped under session stacking.
+ * My Profile, My Business Estate, and People I Help are distinct siblings.
  */
 export function ProfileDestinationHost({
   destination,
@@ -32,6 +36,8 @@ export function ProfileDestinationHost({
   onClose,
   onOpenEstatePlace,
   onOpenPeopleIHelp,
+  onOpenSettings,
+  onOpenExperienceControls,
 }: ProfileDestinationHostProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -54,7 +60,15 @@ export function ProfileDestinationHost({
   }
 
   let content: ReactNode = null;
-  if (destination === "profile") {
+  if (destination === "profile-personal") {
+    content = (
+      <MyProfilePanel
+        onClose={onClose}
+        onOpenSettings={onOpenSettings}
+        onOpenExperienceControls={onOpenExperienceControls}
+      />
+    );
+  } else if (destination === "profile") {
     content = (
       <MyBusinessEstatePanel
         onClose={onClose}
@@ -80,13 +94,7 @@ export function ProfileDestinationHost({
       data-profile-destination={destination}
       role="dialog"
       aria-modal="true"
-      aria-label={
-        destination === "profile"
-          ? "My Business Estate"
-          : destination === "people-i-help"
-            ? "People I Help"
-            : "Growth Profile"
-      }
+      aria-label={profileDestinationTitle(destination)}
     >
       <main className="estate-room-main profile-destination-host__main">
         {content}

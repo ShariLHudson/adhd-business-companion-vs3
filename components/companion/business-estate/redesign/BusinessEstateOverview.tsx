@@ -58,6 +58,12 @@ export function BusinessEstateOverview({
       <header className="be-overview__header">
         <div className="be-overview__header-row">
           <div>
+            <p
+              className="estate-workspace__kicker"
+              data-testid="be-overview-breadcrumb"
+            >
+              My Spark Estate › My Business Estate
+            </p>
             <h1 className="be-overview__title">My Business Estate</h1>
             <p className="be-overview__lead">{BUSINESS_ESTATE_LEAD}</p>
           </div>

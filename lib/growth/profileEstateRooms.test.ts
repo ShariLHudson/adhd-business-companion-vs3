@@ -7,23 +7,39 @@ import {
   profileEstateSectionForRoom,
   type EstateMenuShellActionId,
 } from "./profileEstateRooms";
-import { GROWTH_ROOM_BG, ESTATE_PROFILE_ROOM_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG } from "./growthRoom";
+import {
+  GROWTH_ROOM_BG,
+  ESTATE_PROFILE_ROOM_BG,
+  EVIDENCE_VAULT_ROOM_BG,
+  PORTFOLIO_ROOM_BG,
+} from "./growthRoom";
 
 describe("profileEstateRooms", () => {
-  it("maps menu actions to profile estate rooms", () => {
-    expect(profileEstateRoomForMenuAction("estate-profile")).toBe("my-estate");
-    expect(profileEstateRoomForMenuAction("my-profile")).toBe("my-estate");
-    expect(profileEstateRoomForMenuAction("growth-profile")).toBe("growth-profile");
-    expect(profileEstateRoomForMenuAction("evidence-vault")).toBe("evidence-vault");
+  it("maps immersive estate menu actions — not My Spark Estate overlays", () => {
+    expect(profileEstateRoomForMenuAction("growth-profile")).toBe(
+      "growth-profile",
+    );
+    expect(profileEstateRoomForMenuAction("evidence-vault")).toBe(
+      "evidence-vault",
+    );
     expect(profileEstateRoomForMenuAction("portfolio")).toBe("portfolio");
+    expect(isProfileEstateMenuAction("my-profile")).toBe(false);
+    expect(isProfileEstateMenuAction("estate-profile")).toBe(false);
+    expect(isProfileEstateMenuAction("my-business-estate")).toBe(false);
     expect(isProfileEstateMenuAction("journal")).toBe(false);
     expect(isProfileEstateMenuAction("settings")).toBe(false);
   });
 
-  it("excludes people-i-help from shell action ids", () => {
+  it("excludes My Spark Estate overlay actions from shell ids", () => {
     type AssertPeopleIHelpExcluded =
       "people-i-help" extends EstateMenuShellActionId ? never : true;
-    const ok: AssertPeopleIHelpExcluded = true;
+    type AssertMyProfileExcluded =
+      "my-profile" extends EstateMenuShellActionId ? never : true;
+    type AssertBusinessExcluded =
+      "my-business-estate" extends EstateMenuShellActionId ? never : true;
+    const ok: AssertPeopleIHelpExcluded &
+      AssertMyProfileExcluded &
+      AssertBusinessExcluded = true;
     expect(ok).toBe(true);
   });
 
@@ -45,7 +61,7 @@ describe("profileEstateRooms", () => {
     );
   });
 
-  it("uses spark-estate-photo-background for estate profile", () => {
+  it("uses spark-estate-photo-background for estate profile room plate", () => {
     expect(profileEstateRoomBackgroundImage("my-estate")).toBe(ESTATE_PROFILE_ROOM_BG);
     expect(profileEstateRoomBackgroundImage("my-estate")).toBe(
       "/backgrounds/spark-estate-photo-background.png",

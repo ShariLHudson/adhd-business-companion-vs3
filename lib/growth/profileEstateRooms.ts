@@ -56,9 +56,11 @@ export function isProfileEstateRoomId(
   return roomId != null && PROFILE_ROOM_ID_SET.has(roomId);
 }
 
+/**
+ * Menu actions that open immersive estate rooms (not My Spark Estate overlays).
+ * my-profile / estate-profile / my-business-estate are overlay destinations — not here.
+ */
 export const PROFILE_ESTATE_MENU_ACTION_IDS = [
-  "estate-profile",
-  "my-profile",
   "growth-profile",
   "progress-timeline",
   "evidence-vault",
@@ -77,14 +79,15 @@ export type EstateMenuShellActionId = Exclude<
   | "people-i-help"
   | "replay-welcome"
   | "experience-controls"
+  | "my-profile"
+  | "estate-profile"
+  | "my-business-estate"
 >;
 
 const MENU_ACTION_TO_ROOM: Record<
   ProfileEstateMenuActionId,
   ProfileEstateRoomId
 > = {
-  "estate-profile": "my-estate",
-  "my-profile": "my-estate",
   "growth-profile": "growth-profile",
   "progress-timeline": "growth-profile",
   "evidence-vault": "evidence-vault",
@@ -95,8 +98,6 @@ export function isProfileEstateMenuAction(
   actionId: EstateMenuActionId,
 ): actionId is ProfileEstateMenuActionId {
   switch (actionId) {
-    case "estate-profile":
-    case "my-profile":
     case "growth-profile":
     case "progress-timeline":
     case "evidence-vault":

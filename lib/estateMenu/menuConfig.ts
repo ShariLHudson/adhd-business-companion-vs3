@@ -10,6 +10,7 @@ export const ESTATE_MENU_ACTION_IDS = [
   "memory-library",
   "estate-profile",
   "my-profile",
+  "my-business-estate",
   "people-i-help",
   "growth-profile",
   "institute-cabinet",
@@ -51,7 +52,7 @@ export type EstateMenuDropdownEntry =
 
 /**
  * SH profile menu — Conversations, My Spark Estate, Experience Controls, Settings, Sign Out.
- * Experience Controls opens an overlay over the current place (never navigates).
+ * Each My Spark Estate child maps to one distinct destination.
  */
 export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = [
   {
@@ -79,7 +80,7 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
     label: "My Spark Estate",
     children: [
       {
-        id: "my-profile",
+        id: "my-business-estate",
         emoji: "🏡",
         label: "My Business Estate",
       },
@@ -89,7 +90,7 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
         label: "People I Help",
       },
       {
-        id: "estate-profile",
+        id: "my-profile",
         emoji: "👤",
         label: "My Profile",
       },
