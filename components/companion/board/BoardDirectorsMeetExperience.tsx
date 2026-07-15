@@ -270,14 +270,15 @@ export function BoardDirectorsMeetExperience({
           onClick={onBackToBoardroom}
           data-testid="board-directors-meet-back-boardroom"
         >
-          ← Boardroom
+          ← Return to Boardroom Home
         </button>
         <p className="boardroom-kicker">Board of Directors</p>
         <h1 className="boardroom-title">Meet the Directors</h1>
         <div className="boardroom-gold-rule" aria-hidden />
         <p className="boardroom-purpose">
-          Get to know Thomas Ellison privately. Use the Round Table to see his
-          chair — your Board Review stays with you.
+          Get to know who sits around the Round Table and how each Director
+          thinks. Use the Round Table to see their chairs — your Board Review
+          stays with you.
         </p>
         <div className="board-directors-meet__nav-actions">{placeAtTableBtn}</div>
         {reviewTray}

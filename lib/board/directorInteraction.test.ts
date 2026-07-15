@@ -60,11 +60,17 @@ describe("Director accordion (registry-driven)", () => {
 });
 
 describe("Portrait resolution", () => {
-  it("never falls back to a hardcoded name path when portrait exists", () => {
+  it("resolves every Director to a Board portrait path (Chair fallback when missing)", () => {
+    const chair = getBoardDirectorById("board-chair")!;
     for (const d of BOARD_DIRECTORS) {
       const path = resolveBoardDirectorPortraitPath(d);
       expect(path.startsWith("/board-of-directors/")).toBe(true);
-      expect(path).toBe(d.portraitPath);
+      expect(path).not.toMatch(/chair-of-the-board/);
+      if (d.portraitPath) {
+        expect(path).toBe(d.portraitPath);
+      } else {
+        expect(path).toBe(chair.portraitPath);
+      }
     }
   });
 

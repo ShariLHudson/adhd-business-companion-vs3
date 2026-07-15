@@ -361,27 +361,44 @@
   max-height: min(88dvh, 52rem);
 }
 
-/* Boardroom home — four clear interactive action cards */
+/* Meet the Directors — wider so Compact Gallery Card art text is readable */
+.boardroom-workspace.estate-workspace:has(.board-directors-meet) {
+  width: min(56rem, 96vw);
+  max-height: min(92dvh, 60rem);
+  padding: clamp(1.2rem, 2.5vw, 1.75rem) clamp(1.35rem, 2.8vw, 1.9rem)
+    clamp(2.5rem, 5vh, 3.25rem);
+}
+
+/* Boardroom home — welcome + three primary choice cards */
+.boardroom-welcome {
+  margin: 0.85rem 0 0;
+  font-size: clamp(1.05rem, 2.2vw, 1.28rem);
+  line-height: 1.55;
+  font-weight: 500;
+  color: #1f1c19;
+  max-width: 38rem;
+}
+
 .boardroom-home__actions {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  margin-top: 1.1rem;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
 }
 
 .boardroom-home__action-card {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.25rem;
+  gap: 0.35rem;
   width: 100%;
   text-align: left;
   cursor: pointer;
-  border-radius: 0.9rem;
-  border: 1px solid rgba(201, 166, 107, 0.45);
-  background: rgba(255, 252, 245, 0.92);
-  padding: 0.95rem 1.05rem;
-  min-height: 3.25rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(201, 166, 107, 0.5);
+  background: rgba(255, 252, 245, 0.95);
+  padding: 1.05rem 1.15rem;
+  min-height: 3.5rem;
   transition: border-color 0.15s ease, background-color 0.15s ease,
     box-shadow 0.15s ease;
 }
@@ -397,16 +414,58 @@
 }
 
 .boardroom-home__action-title {
-  font-size: 1.05rem;
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
   font-weight: 650;
   color: #1f1c19;
   line-height: 1.3;
 }
 
 .boardroom-home__action-meta {
-  font-size: 0.9rem;
+  font-size: clamp(0.92rem, 1.6vw, 1.02rem);
   line-height: 1.45;
   color: #6b635a;
+}
+
+.boardroom-home__how-to {
+  margin-top: 1.15rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  background: rgba(255, 250, 242, 0.72);
+  padding: 0.55rem 0.85rem 0.65rem;
+}
+
+.boardroom-home__how-to-summary {
+  cursor: pointer;
+  list-style: none;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: #5c534a;
+  padding: 0.25rem 0;
+}
+
+.boardroom-home__how-to-summary::-webkit-details-marker {
+  display: none;
+}
+
+.boardroom-home__how-to-summary::before {
+  content: "▸ ";
+  color: #a8843f;
+}
+
+.boardroom-home__how-to[open] .boardroom-home__how-to-summary::before {
+  content: "▾ ";
+}
+
+.boardroom-home__how-to-list {
+  margin: 0.45rem 0 0.25rem;
+  padding-left: 1.15rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #3d3630;
+}
+
+.boardroom-home__how-to-list li + li {
+  margin-top: 0.35rem;
 }
 
 .boardroom-home__secondary {

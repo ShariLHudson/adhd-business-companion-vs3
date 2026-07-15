@@ -28,10 +28,9 @@ export type RoundTableSeat = {
 
 /**
  * Seat order around the table (clockwise from the member's place at bottom).
- * Index 0 = member place; Chair opposite the member when visible.
- * Remaining chairs are empty until more Directors are approved.
+ * Index 0 = member place; remaining slots hold the full visible Board roster.
  */
-const CHAIR_AND_FUTURE_SLOTS = 11;
+const CHAIR_AND_FUTURE_SLOTS = 12;
 
 function ellipseSeat(index: number, total: number): { x: number; y: number } {
   const angle = Math.PI / 2 + (index / total) * Math.PI * 2;
@@ -41,8 +40,8 @@ function ellipseSeat(index: number, total: number): { x: number; y: number } {
   };
 }
 
-/** 1 member place + 11 chair slots (only visible Directors assigned) */
-export const ROUND_TABLE_SEAT_COUNT = 12;
+/** 1 member place + 12 Director chairs */
+export const ROUND_TABLE_SEAT_COUNT = 13;
 
 export const ROUND_TABLE_SEATS: readonly RoundTableSeat[] = (() => {
   const seats: RoundTableSeat[] = [];

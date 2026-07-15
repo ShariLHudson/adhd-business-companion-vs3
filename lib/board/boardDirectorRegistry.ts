@@ -4,7 +4,10 @@
  * Do NOT import Chamber member records, portraits, prompts, or IDs here.
  * Do NOT derive Directors by relabeling Chamber specialists.
  *
- * Portrait assets: /public/board-of-directors/ (placeholders until approved art).
+ * Portrait assets: /public/board-of-directors/*-portrait.png (profile / table).
+ * Gallery cards: /public/board-of-directors/{id}-gallery-portrait.png
+ * (content crop only — no painted Core/Meet buttons; those are real HTML controls).
+ * Never serve uncut 3-layout design sheets in the gallery.
  */
 
 import { BOARD_DIRECTOR_NARRATIVES } from "@/lib/board/directorProfileNarratives";
@@ -20,6 +23,11 @@ export const BOARD_DIRECTOR_ASSET_BASE = "/board-of-directors" as const;
 
 function boardPortrait(filename: string): string {
   return `${BOARD_DIRECTOR_ASSET_BASE}/${filename}`;
+}
+
+/** Content-only Compact Gallery Card art (no decorative action buttons in the image). */
+function boardGalleryCard(directorId: BoardDirectorId): string {
+  return `${BOARD_DIRECTOR_ASSET_BASE}/${directorId}-gallery-portrait.png`;
 }
 
 const RESPONSE = [...BOARD_DIRECTOR_RESPONSE_SECTIONS] as BoardDirectorDefinition["responseStructure"];
@@ -73,7 +81,8 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
       "thomas ellison",
       "thomas-ellison",
     ],
-    portraitPath: boardPortrait("thomas-ellison-chair-of-the-board.png"),
+    portraitPath: boardPortrait("thomas-ellison-portrait.png"),
+    galleryCardPath: boardGalleryCard("board-chair"),
     isCoreDirector: true,
     isOptionalDirector: false,
     chamberContrast:
@@ -93,49 +102,49 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     boardRole: "Vice Chair",
     shortRole: "Vice Chair",
     purpose:
-      "Support the Chair, identify skipped issues, connect Director perspectives, track unresolved questions, and help turn conclusions into clear follow-up.",
+      "Help the Board stay aligned and turn good plans into steady, reliable progress — with clear follow-through and lasting results.",
     decisionLens: [
-      "gaps in discussion",
-      "alignment of questions",
-      "unresolved issues",
-      "follow-up clarity",
+      "Follow-Through",
+      "Board Continuity",
+      "Practical Impact",
     ],
     questionsAsked: [
       "What remains unresolved?",
-      "Are the Directors answering the same question?",
-      "Which issue needs further review?",
+      "Are we answering the same question?",
       "What must happen before the next Board review?",
+      "Where does follow-through usually break down?",
     ],
     tone: ["attentive", "integrating", "precise", "supportive"],
     openingMessage:
-      "I'm Shari Menon, Vice Chair. I listen for what we skipped, whether we're answering the same question, and what still needs clarity before you leave the table.",
+      "I'm glad you're here. My role is to help the Board stay aligned and make sure our decisions lead to measurable, lasting results. Let's make things happen—together.",
     responseStructure: RESPONSE,
     aliases: ["vice chair", "vice-chair", "shari menon", "menon"],
-    portraitPath: boardPortrait("shari-menon-vice-chair.png"),
-    isCoreDirector: false,
-    isOptionalDirector: true,
+    portraitPath: boardPortrait("shari-menon-portrait.png"),
+    galleryCardPath: boardGalleryCard("vice-chair"),
+    isCoreDirector: true,
+    isOptionalDirector: false,
     chamberContrast:
-      "Unlike Chamber Project Management (which helps execute work), the Vice Chair tracks Board-level unresolved questions and review conditions — not task plans.",
+      "Unlike Chamber Project Management (which helps execute work), the Vice Chair protects Board alignment and practical follow-through after the recommendation — not task plans.",
     exampleDecision:
       "A direction change with several open questions before a final recommendation.",
     watchesFor: [
       "skipped topics",
       "Directors talking past each other",
       "fuzzy follow-up",
+      "plans without progress",
     ],
   },
   {
     id: "founder-advocate",
-    name: "Mira Solano",
+    name: "David Kim",
     boardRole: "Founder Advocate Director",
     shortRole: "Founder Advocate",
     purpose:
-      "Protect the founder’s vision, capacity, values, and quality of life — and flag decisions that may grow the business in the wrong direction. Does not automatically agree with the founder.",
+      "I champion the founder's vision and ensure the Board stays aligned with the purpose, values, and long-term mission of the business.",
     decisionLens: [
-      "founder vision fit",
-      "personal capacity",
-      "values and quality of life",
-      "right-sized growth",
+      "Vision Alignment",
+      "Founder Success",
+      "Mission Guardian",
     ],
     questionsAsked: [
       "Does this still fit the business the founder wants?",
@@ -145,16 +154,18 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["steady", "honest", "protective", "non-collusive"],
     openingMessage:
-      "I'm Mira Solano, Founder Advocate. I protect your vision and capacity — which sometimes means disagreeing with the option you prefer if it costs more of you than the business can return.",
+      "I'm glad you're here. My role is to ensure the founder's voice is heard, their vision is protected, and they have what they need to lead and thrive. Let's keep the mission at the center—together.",
     responseStructure: RESPONSE,
     aliases: [
       "founder advocate",
       "founder",
-      "mira",
-      "mira solano",
+      "david",
+      "david kim",
+      "kim",
       "capacity advocate",
     ],
-    portraitPath: boardPortrait("mira-solano-founder-advocate.png"),
+    portraitPath: boardPortrait("david-kim-portrait.png"),
+    galleryCardPath: boardGalleryCard("founder-advocate"),
     isCoreDirector: true,
     isOptionalDirector: false,
     chamberContrast:
@@ -169,18 +180,62 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
   },
   {
+    id: "strategy-director",
+    name: "Victoria Hayes",
+    boardRole: "Strategy Director",
+    shortRole: "Strategy",
+    purpose:
+      "Turn big-picture vision into clear strategy and confident direction — clarify choices, tradeoffs, and the path that best serves the business over time.",
+    decisionLens: [
+      "Strategic Clarity",
+      "Opportunity Focus",
+      "Long-Term Impact",
+    ],
+    questionsAsked: [
+      "What is the real strategic choice here?",
+      "Which option best serves the long-term direction?",
+      "What are we saying no to if we say yes?",
+      "Does this strengthen or scatter focus?",
+      "What would make the direction unmistakable?",
+    ],
+    tone: ["clear", "composed", "directional", "practical"],
+    openingMessage:
+      "I'm Victoria Hayes, Strategy Director. I help the Board turn big-picture vision into clear strategy and confident direction.",
+    responseStructure: RESPONSE,
+    aliases: [
+      "strategy",
+      "strategy director",
+      "victoria",
+      "victoria hayes",
+      "hayes",
+      "direction",
+    ],
+    portraitPath: undefined,
+    galleryCardPath: boardGalleryCard("strategy-director"),
+    isCoreDirector: true,
+    isOptionalDirector: false,
+    chamberContrast:
+      "Unlike Chamber Strategy specialists who help build plans and playbooks, this Director judges whether the decision itself sets the right direction for the business.",
+    exampleDecision:
+      "Choosing between two growth paths that both look promising but pull the business in different directions.",
+    watchesFor: [
+      "scattered priorities",
+      "unclear tradeoffs",
+      "short-term wins that weaken direction",
+      "strategy without a real choice",
+    ],
+  },
+  {
     id: "financial-stewardship",
-    name: "Conrad Hayes",
+    name: "Melissa Grant",
     boardRole: "Financial Stewardship Director",
     shortRole: "Financial Stewardship",
     purpose:
       "Evaluate affordability, cash flow exposure, return versus risk, unsupported financial assumptions, and financial safeguards. Decides whether the decision is financially sound — not how to build the financial plan.",
     decisionLens: [
-      "affordability",
-      "cash flow and exposure",
-      "return versus risk",
-      "assumption quality",
-      "smallest responsible test",
+      "Financial Clarity",
+      "Risk Awareness",
+      "Long-Term Value",
     ],
     questionsAsked: [
       "Can the business afford this?",
@@ -191,16 +246,19 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["grounded", "skeptical of optimism", "practical", "calm"],
     openingMessage:
-      "I'm Conrad Hayes, Financial Stewardship Director. I look at whether this decision is financially responsible — exposure, assumptions, and the smallest test that still tells us the truth.",
+      "I'm Melissa Grant, Financial Stewardship Director. I look at whether this decision is financially responsible — exposure, assumptions, and the smallest test that still tells us the truth.",
     responseStructure: RESPONSE,
     aliases: [
       "finance director",
       "financial stewardship",
+      "melissa",
+      "melissa grant",
       "conrad",
       "conrad hayes",
       "money",
     ],
-    portraitPath: boardPortrait("conrad-hayes-financial-stewardship.png"),
+    portraitPath: undefined,
+    galleryCardPath: boardGalleryCard("financial-stewardship"),
     isCoreDirector: true,
     isOptionalDirector: false,
     chamberContrast:
@@ -216,17 +274,15 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
   },
   {
     id: "operations-capacity",
-    name: "Priya Nandakumar",
+    name: "Marcus Whitaker",
     boardRole: "Operations and Capacity Director",
     shortRole: "Operations & Capacity",
     purpose:
-      "Evaluate whether the business can realistically deliver — workload, systems, timing, staffing, dependencies, and where execution may break.",
+      "I help the Board ensure our operations run smoothly and our capacity grows with demand.",
     decisionLens: [
-      "delivery realism",
-      "workload and capacity",
-      "dependencies",
-      "bottlenecks",
-      "scope reduction",
+      "Operational Efficiency",
+      "Capacity Building",
+      "Process Optimization",
     ],
     questionsAsked: [
       "Can the business carry this successfully?",
@@ -237,16 +293,19 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["practical", "clear-eyed", "systems-minded", "constructive"],
     openingMessage:
-      "I'm Priya Nandakumar, Operations and Capacity Director. I ask whether we can actually carry this — and where the plan is likely to break under real workload.",
+      "I'm glad you're here. My role is to help the Board keep our operations strong, our systems efficient, and our capacity aligned with our mission. Let's build systems that support growth—without losing our soul.",
     responseStructure: RESPONSE,
     aliases: [
       "operations",
       "capacity",
       "operations and capacity",
-      "priya",
-      "priya nandakumar",
+      "operations & capacity",
+      "marcus",
+      "marcus whitaker",
+      "whitaker",
     ],
-    portraitPath: boardPortrait("priya-nandakumar-operations-capacity.png"),
+    portraitPath: boardPortrait("marcus-whitaker-portrait.png"),
+    galleryCardPath: boardGalleryCard("operations-capacity"),
     isCoreDirector: true,
     isOptionalDirector: false,
     chamberContrast:
@@ -262,7 +321,7 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
   },
   {
     id: "customer-market",
-    name: "Samira Okonkwo",
+    name: "Sofia Ramirez",
     boardRole: "Customer and Market Director",
     shortRole: "Customer & Market",
     purpose:
@@ -283,16 +342,19 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["customer-centered", "evidence-aware", "direct", "respectful"],
     openingMessage:
-      "I'm Samira Okonkwo, Customer and Market Director. I bring the customer and market into the room — what they want, what evidence we have, and how trust could be affected.",
+      "I'm Sofia Ramirez, Customer and Market Director. I bring the customer and market into the room — what they want, what evidence we have, and how trust could be affected.",
     responseStructure: RESPONSE,
     aliases: [
       "customer",
       "market",
       "customer and market",
+      "sofia",
+      "sofia ramirez",
       "samira",
       "samira okonkwo",
     ],
-    portraitPath: boardPortrait("samira-okonkwo-customer-market.png"),
+    portraitPath: undefined,
+    galleryCardPath: boardGalleryCard("customer-market"),
     isCoreDirector: true,
     isOptionalDirector: false,
     chamberContrast:
@@ -308,7 +370,7 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
   },
   {
     id: "growth-opportunity",
-    name: "Theo Brant",
+    name: "James Holloway",
     boardRole: "Growth and Opportunity Director",
     shortRole: "Growth & Opportunity",
     purpose:
@@ -329,16 +391,19 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["expansive", "curious", "balanced", "forward-looking"],
     openingMessage:
-      "I'm Theo Brant, Growth and Opportunity Director. I look for the upside and the options this decision could unlock — and push back when caution is closing the door too early.",
+      "I'm James Holloway, Growth and Opportunity Director. I look for the upside and the options this decision could unlock — and push back when caution is closing the door too early.",
     responseStructure: RESPONSE,
     aliases: [
       "growth",
       "opportunity",
       "growth and opportunity",
+      "james",
+      "james holloway",
       "theo",
       "theo brant",
     ],
-    portraitPath: boardPortrait("theo-brant-growth-opportunity.png"),
+    portraitPath: undefined,
+    galleryCardPath: boardGalleryCard("growth-opportunity"),
     isCoreDirector: false,
     isOptionalDirector: true,
     chamberContrast:
@@ -354,7 +419,7 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
   },
   {
     id: "risk-resilience",
-    name: "Helen Cross",
+    name: "Laura Bennett",
     boardRole: "Risk and Resilience Director",
     shortRole: "Risk & Resilience",
     purpose:
@@ -375,16 +440,19 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["calm", "clear", "proportionate", "protective"],
     openingMessage:
-      "I'm Helen Cross, Risk and Resilience Director. I name what could go wrong and how we'd recover — without treating every risk as a reason to stop.",
+      "I'm Laura Bennett, Risk and Resilience Director. I name what could go wrong and how we'd recover — without treating every risk as a reason to stop.",
     responseStructure: RESPONSE,
     aliases: [
       "risk",
       "resilience",
       "risk and resilience",
+      "laura",
+      "laura bennett",
       "helen",
       "helen cross",
     ],
-    portraitPath: boardPortrait("helen-cross-risk-resilience.png"),
+    portraitPath: undefined,
+    galleryCardPath: boardGalleryCard("risk-resilience"),
     isCoreDirector: false,
     isOptionalDirector: true,
     chamberContrast:
@@ -400,17 +468,15 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
   },
   {
     id: "technology-future",
-    name: "Rowan Quill",
+    name: "Maya Chen",
     boardRole: "Technology and Future Director",
     shortRole: "Technology & Future",
     purpose:
-      "Examine future readiness, technology opportunity and disruption, fragile approaches, and whether the decision will still make sense later.",
+      "I help the Board leverage emerging technologies and future trends to build intelligent, adaptable solutions that create lasting impact.",
     decisionLens: [
-      "future readiness",
-      "technology leverage",
-      "technical dependence",
-      "obsolescence risk",
-      "changing expectations",
+      "Innovation",
+      "Future Readiness",
+      "Scalability",
     ],
     questionsAsked: [
       "Will this decision still make sense in two or three years?",
@@ -421,16 +487,19 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["thoughtful", "forward-looking", "plainspoken", "non-hype"],
     openingMessage:
-      "I'm Rowan Quill, Technology and Future Director. I ask whether this decision will still make sense later — and whether technology strengthens it or quietly traps it.",
+      "I'm glad you're here. My role is to help the Board explore emerging technologies, anticipate what's next, and ensure we build solutions that are future-ready, scalable, and human-centered. Let's shape a future we'll be proud to pass on.",
     responseStructure: RESPONSE,
     aliases: [
       "technology",
       "future",
       "technology and future",
-      "rowan",
-      "rowan quill",
+      "technology & future",
+      "maya",
+      "maya chen",
+      "chen",
     ],
-    portraitPath: boardPortrait("rowan-quill-technology-future.png"),
+    portraitPath: boardPortrait("maya-chen-portrait.png"),
+    galleryCardPath: boardGalleryCard("technology-future"),
     isCoreDirector: false,
     isOptionalDirector: true,
     chamberContrast:
@@ -446,17 +515,17 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
   },
   {
     id: "values-trust",
-    name: "Amara Delgado",
+    name: "Carlos Rivera",
     boardRole: "Values and Trust Director",
     shortRole: "Values & Trust",
     purpose:
-      "Evaluate alignment with business values, honesty of claims, customer trust, reputation, and conflicts between growth and principles.",
+      "I champion our core values and ensure trust is the foundation of every decision, relationship, and outcome we create together.",
     decisionLens: [
-      "values alignment",
-      "honesty of claims",
-      "trust and reputation",
-      "clear expectations",
-      "promises made",
+      "Values Alignment",
+      "Trust Building",
+      "Culture",
+      "Transparency",
+      "Ethical Leadership",
     ],
     questionsAsked: [
       "Does this align with what the business stands for?",
@@ -467,16 +536,19 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
     ],
     tone: ["principled", "warm", "firm", "clear"],
     openingMessage:
-      "I'm Amara Delgado, Values and Trust Director. I watch for whether this decision keeps the promises your business makes — to customers, community, and yourself.",
+      "I'm glad you're here. My role is to help the Board stay true to what matters most—our values, our people, and the trust we build together. When we lead with values, we create a legacy of trust.",
     responseStructure: RESPONSE,
     aliases: [
       "values",
       "trust",
       "values and trust",
-      "amara",
-      "amara delgado",
+      "values & trust",
+      "carlos",
+      "carlos rivera",
+      "rivera",
     ],
-    portraitPath: boardPortrait("amara-delgado-values-trust.png"),
+    portraitPath: boardPortrait("carlos-rivera-portrait.png"),
+    galleryCardPath: boardGalleryCard("values-trust"),
     isCoreDirector: false,
     isOptionalDirector: true,
     chamberContrast:
@@ -492,18 +564,15 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
   },
   {
     id: "devils-advocate",
-    name: "Dominic Vale",
+    name: "Mateo Vargas",
     boardRole: "Devil’s Advocate Director",
     shortRole: "Devil’s Advocate",
     purpose:
-      "Test the preferred option before the real world does — challenge assumptions, expose confirmation bias, present the strongest opposing case, and recommend low-risk tests. May conclude the preferred idea remains strong.",
+      "I challenge assumptions, test ideas, and ask the uncomfortable questions so the Board sees what others might miss. Discomfort today. Stronger decisions tomorrow.",
     decisionLens: [
-      "weakest assumptions",
-      "strongest opposing case",
-      "contradicting evidence",
-      "failure modes",
-      "information that would change the recommendation",
-      "smaller tests",
+      "Critical Thinking",
+      "Risk Awareness",
+      "Blind Spot Detection",
     ],
     questionsAsked: [
       "Which assumption is weakest?",
@@ -521,21 +590,23 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
       "constructive",
     ],
     openingMessage:
-      "My role is to test the idea before the real world does. I’ll challenge the assumptions, look for risks, and help strengthen the decision.",
+      "I'm glad you're here. My role is to help the Board challenge assumptions, surface hidden risks, and ensure we choose the strongest path forward. Together, we'll turn bold ideas into better outcomes.",
     responseStructure: RESPONSE,
     aliases: [
       "devil's advocate",
       "devils advocate",
       "devil advocate",
-      "dominic",
-      "dominic vale",
+      "mateo",
+      "mateo vargas",
+      "vargas",
       "challenge",
     ],
-    portraitPath: boardPortrait("dominic-vale-devils-advocate.png"),
+    portraitPath: boardPortrait("mateo-vargas-portrait.png"),
+    galleryCardPath: boardGalleryCard("devils-advocate"),
     isCoreDirector: false,
     isOptionalDirector: true,
     chamberContrast:
-      "The Devil’s Advocate exists only on the Board. There is no Chamber equivalent — Chamber builds and improves; Dominic stress-tests the decision itself.",
+      "The Devil’s Advocate exists only on the Board. There is no Chamber equivalent — Chamber builds and improves; this Director stress-tests the decision itself.",
     exampleDecision:
       "A strongly preferred launch with limited evidence and meaningful financial commitment.",
     watchesFor: [
@@ -565,6 +636,19 @@ export function resolveBoardDirectorPortraitPath(
   const chair = BY_ID.get("board-chair");
   if (chair?.portraitPath) return chair.portraitPath;
   return `${BOARD_DIRECTOR_ASSET_BASE}/director-portrait-placeholder.png`;
+}
+
+/**
+ * Compact Gallery Card art from registry — full designed card (layout A).
+ * Never a 3-layout design sheet. Falls back to Chair’s gallery card.
+ */
+export function resolveBoardDirectorGalleryCardPath(
+  director: BoardDirectorDefinition,
+): string {
+  if (director.galleryCardPath) return director.galleryCardPath;
+  const chair = BY_ID.get("board-chair");
+  if (chair?.galleryCardPath) return chair.galleryCardPath;
+  return `${BOARD_DIRECTOR_ASSET_BASE}/board-chair-gallery-portrait.png`;
 }
 
 export function getBoardDirectorById(

@@ -13,11 +13,14 @@ import {
   BOARD_DIRECTOR_ASSET_BASE,
   BOARD_DIRECTORS,
   ensureChairIncluded,
+  getBoardDirectorById,
   getDevilsAdvocate,
   listCoreBoardDirectors,
   listOptionalBoardDirectors,
   recommendBoardDirectorsForDecision,
   recommendationIncludesDevilsAdvocateAutomatically,
+  resolveBoardDirectorGalleryCardPath,
+  resolveBoardDirectorPortraitPath,
   BOARD_DIRECTOR_IDS,
   BOARD_GROUP_NAME,
   BOARDROOM_DESTINATION_NAME,
@@ -39,13 +42,14 @@ describe("Board of Directors — Slice 1 registry", () => {
   });
 
   it("has a separate Board registry with all required roles", () => {
-    expect(BOARD_DIRECTOR_IDS).toHaveLength(11);
-    expect(BOARD_DIRECTORS).toHaveLength(11);
+    expect(BOARD_DIRECTOR_IDS).toHaveLength(12);
+    expect(BOARD_DIRECTORS).toHaveLength(12);
 
     const roles = BOARD_DIRECTORS.map((d) => d.boardRole);
     expect(roles).toContain("Chair of the Board");
     expect(roles).toContain("Vice Chair");
     expect(roles).toContain("Founder Advocate Director");
+    expect(roles).toContain("Strategy Director");
     expect(roles).toContain("Financial Stewardship Director");
     expect(roles).toContain("Operations and Capacity Director");
     expect(roles).toContain("Customer and Market Director");
@@ -63,15 +67,16 @@ describe("Board of Directors — Slice 1 registry", () => {
       expect.arrayContaining([
         "Thomas Ellison",
         "Shari Menon",
-        "Mira Solano",
-        "Conrad Hayes",
-        "Priya Nandakumar",
-        "Samira Okonkwo",
-        "Theo Brant",
-        "Helen Cross",
-        "Rowan Quill",
-        "Amara Delgado",
-        "Dominic Vale",
+        "David Kim",
+        "Victoria Hayes",
+        "Melissa Grant",
+        "Marcus Whitaker",
+        "Sofia Ramirez",
+        "James Holloway",
+        "Laura Bennett",
+        "Maya Chen",
+        "Carlos Rivera",
+        "Mateo Vargas",
       ]),
     );
   });
@@ -83,18 +88,34 @@ describe("Board of Directors — Slice 1 registry", () => {
     }
   });
 
-  it("Board registry does not share portrait paths with Chamber", () => {
+  it("Board registry resolves portraits without Chamber paths", () => {
     const chamberPaths = new Set(
       CHAMBER_MEMBERS.map((m) => m.cardImagePath),
     );
+    const chair = getBoardDirectorById("board-chair")!;
+    expect(chair.portraitPath).toBe(
+      `${BOARD_DIRECTOR_ASSET_BASE}/thomas-ellison-portrait.png`,
+    );
     for (const d of BOARD_DIRECTORS) {
-      expect(d.portraitPath).toBeTruthy();
-      expect(d.portraitPath!.startsWith(BOARD_DIRECTOR_ASSET_BASE)).toBe(true);
-      expect(d.portraitPath!.startsWith(CHAMBER_MEMBER_ASSET_BASE)).toBe(
-        false,
+      const path = resolveBoardDirectorPortraitPath(d);
+      expect(path.startsWith(BOARD_DIRECTOR_ASSET_BASE)).toBe(true);
+      expect(path.startsWith(CHAMBER_MEMBER_ASSET_BASE)).toBe(false);
+      expect(chamberPaths.has(path)).toBe(false);
+      expect(path).not.toMatch(/momentum-chamber-members/);
+      expect(path).not.toMatch(/chair-of-the-board|vice-chair\.png/);
+    }
+  });
+
+  it("resolves Compact Gallery Card art for every Director (not design sheets)", () => {
+    for (const d of BOARD_DIRECTORS) {
+      const path = resolveBoardDirectorGalleryCardPath(d);
+      expect(path).toBe(
+        `${BOARD_DIRECTOR_ASSET_BASE}/${d.id}-gallery-portrait.png`,
       );
-      expect(chamberPaths.has(d.portraitPath!)).toBe(false);
-      expect(d.portraitPath).not.toMatch(/momentum-chamber-members/);
+      expect(path).not.toMatch(
+        /thomas-ellison-chairman|melissa-grant-financial|design-references/i,
+      );
+      expect(d.galleryCardPath).toBe(path);
     }
   });
 
@@ -118,10 +139,11 @@ describe("Board of Directors — Slice 1 registry", () => {
   it("Devil’s Advocate exists only on the Board", () => {
     const da = getDevilsAdvocate();
     expect(da.id).toBe("devils-advocate");
-    expect(da.name).toBe("Dominic Vale");
-    expect(da.openingMessage).toContain(
-      "test the idea before the real world does",
-    );
+    expect(da.name).toBe("Mateo Vargas");
+    expect(
+      da.openingMessage.includes("challenge assumptions") ||
+        da.openingMessage.includes("strongest path"),
+    ).toBe(true);
     expect(da.isOptionalDirector).toBe(true);
     expect(da.isCoreDirector).toBe(false);
     expect(CHAMBER_MEMBER_IDS).not.toContain("devils-advocate");
@@ -135,7 +157,9 @@ describe("Board of Directors — Slice 1 registry", () => {
   it("defines core versus optional Directors correctly", () => {
     expect([...CORE_BOARD_DIRECTOR_IDS]).toEqual([
       "board-chair",
+      "vice-chair",
       "founder-advocate",
+      "strategy-director",
       "financial-stewardship",
       "customer-market",
       "operations-capacity",
@@ -147,7 +171,6 @@ describe("Board of Directors — Slice 1 registry", () => {
     const optional = listOptionalBoardDirectors();
     expect(optional.map((d) => d.id)).toEqual(
       expect.arrayContaining([
-        "vice-chair",
         "growth-opportunity",
         "risk-resilience",
         "technology-future",
@@ -155,6 +178,7 @@ describe("Board of Directors — Slice 1 registry", () => {
         "devils-advocate",
       ]),
     );
+    expect(optional.map((d) => d.id)).not.toContain("vice-chair");
     expect(optional.every((d) => d.isOptionalDirector)).toBe(true);
   });
 

@@ -28,8 +28,9 @@ type Props = {
 };
 
 /**
- * Expanded Director profile — registry-driven text and real controls.
- * Stays mounted under the conversation overlay.
+ * Expanded Director profile — registry-driven React UI.
+ * Portrait photo only; name, role, welcome, accordions, and actions are HTML/CSS.
+ * Never renders a flattened design-reference card image.
  */
 export function BoardDirectorProfileCard({
   director,
@@ -66,27 +67,81 @@ export function BoardDirectorProfileCard({
         ← Directors
       </button>
 
-      <div
+      <header
         className="board-director-profile__identity-strip"
         data-noninteractive
         data-testid="board-director-identity-strip"
       >
         <span>Board of Directors</span>
         <span aria-hidden>·</span>
-        <span>{director.boardRole}</span>
-        {director.isCoreDirector ? (
-          <>
-            <span aria-hidden>·</span>
-            <span
-              title="Core Directors sit at the Round Table for major decisions."
+        <span>Round Table Boardroom</span>
+        <span
+          className="board-director-profile__role-badge"
+          data-testid="board-director-role-badge"
+        >
+          {director.boardRole}
+        </span>
+      </header>
+
+      <div className="board-director-profile__hero">
+        <div className="board-director-profile__hero-copy">
+          <h2 className="board-director-profile__name">{director.name}</h2>
+          <p className="board-director-profile__role" data-noninteractive>
+            {director.boardRole}
+          </p>
+          {director.isCoreDirector ? (
+            <p
+              className="board-director-profile__badge"
+              data-noninteractive
+              title="Core Directors sit at the Round Table for major decisions. They are Board members — not Chamber specialists."
             >
               Core Director
+            </p>
+          ) : null}
+          <blockquote
+            className="board-director-profile__philosophy"
+            data-noninteractive
+          >
+            <span className="board-director-profile__quote-mark" aria-hidden>
+              “
             </span>
-          </>
-        ) : null}
-      </div>
+            {director.philosophy}
+          </blockquote>
+          <div
+            className="board-director-profile__welcome"
+            data-noninteractive
+            data-testid="board-director-welcome"
+          >
+            <p className="board-director-profile__welcome-label">Welcome</p>
+            <p>{director.openingMessage}</p>
+          </div>
+          <div
+            className="board-director-profile__signature-block"
+            data-noninteractive
+          >
+            <p className="board-director-profile__signature-name">
+              {director.name}
+            </p>
+            <p className="board-director-profile__signature">
+              {director.signature}
+            </p>
+          </div>
+          <p className="board-director-profile__purpose" data-noninteractive>
+            {director.purpose}
+          </p>
+          {onOpenPlaceAtTable ? (
+            <button
+              type="button"
+              className="board-director-profile__place"
+              data-testid="board-director-my-place-indicator"
+              onClick={onOpenPlaceAtTable}
+              disabled={faded}
+            >
+              My Place at the Table
+            </button>
+          ) : null}
+        </div>
 
-      <div className="board-director-profile__layout">
         <button
           type="button"
           className="board-director-profile__portrait-btn"
@@ -109,71 +164,10 @@ export function BoardDirectorProfileCard({
             />
           </span>
         </button>
+      </div>
 
-        <div className="board-director-profile__body">
-          <p className="board-director-profile__role" data-noninteractive>
-            {director.boardRole}
-          </p>
-          <h2 className="board-director-profile__name">{director.name}</h2>
-          {director.isCoreDirector ? (
-            <p
-              className="board-director-profile__badge"
-              data-noninteractive
-              title="Core Directors sit at the Round Table for major decisions. They are Board members — not Chamber specialists."
-            >
-              Core Director
-            </p>
-          ) : null}
-          <p className="board-director-profile__philosophy" data-noninteractive>
-            {director.philosophy}
-          </p>
-          <div
-            className="board-director-profile__welcome"
-            data-noninteractive
-            data-testid="board-director-welcome"
-          >
-            <p>{director.openingMessage}</p>
-          </div>
-          <p className="board-director-profile__signature" data-noninteractive>
-            {director.signature}
-          </p>
-          <p className="board-director-profile__purpose" data-noninteractive>
-            {director.purpose}
-          </p>
-
-          {onOpenPlaceAtTable ? (
-            <button
-              type="button"
-              className="board-director-profile__place"
-              data-testid="board-director-my-place-indicator"
-              onClick={onOpenPlaceAtTable}
-              disabled={faded}
-            >
-              My Place at the Table
-            </button>
-          ) : null}
-
-          <div className="board-director-profile__actions">
-            <button
-              type="button"
-              className="board-director-profile__meet"
-              data-testid={`board-director-meet-${director.id}`}
-              onClick={onMeet}
-              disabled={faded}
-            >
-              {meetLabel}
-            </button>
-            {onIncludeInBoardReview && onRemoveFromBoardReview ? (
-              <BoardReviewIncludeButton
-                director={director}
-                included={includedInBoardReview}
-                disabled={faded}
-                onInclude={onIncludeInBoardReview}
-                onRemove={onRemoveFromBoardReview}
-              />
-            ) : null}
-          </div>
-
+      <div className="board-director-profile__detail-grid">
+        <div className="board-director-profile__detail-main">
           {onToggleAccordion ? (
             <BoardDirectorProfileAccordion
               director={director}
@@ -183,6 +177,39 @@ export function BoardDirectorProfileCard({
             />
           ) : null}
         </div>
+        <aside
+          className="board-director-profile__enjoy"
+          data-noninteractive
+          data-testid="board-director-enjoy-panel"
+        >
+          <h3 className="board-director-profile__enjoy-title">
+            You&apos;ll enjoy working with me if…
+          </h3>
+          <p className="board-director-profile__enjoy-body">
+            {director.youllEnjoyWorkingWithMeIf}
+          </p>
+        </aside>
+      </div>
+
+      <div className="board-director-profile__actions">
+        <button
+          type="button"
+          className="board-director-profile__meet"
+          data-testid={`board-director-meet-${director.id}`}
+          onClick={onMeet}
+          disabled={faded}
+        >
+          {meetLabel}
+        </button>
+        {onIncludeInBoardReview && onRemoveFromBoardReview ? (
+          <BoardReviewIncludeButton
+            director={director}
+            included={includedInBoardReview}
+            disabled={faded}
+            onInclude={onIncludeInBoardReview}
+            onRemove={onRemoveFromBoardReview}
+          />
+        ) : null}
       </div>
     </article>
   );

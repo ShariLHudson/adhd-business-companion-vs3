@@ -37,8 +37,13 @@ const PROFILES: Record<BoardDirectorId, DirectorRelationshipProfile> = {
       {
         themes: ["direction", "vision"],
         cues: ["direction", "pivot", "vision", "what kind of business"],
-        inviteDirectorIds: ["founder-advocate", "values-trust"],
-        reason: "Directional choices need founder fit and values clarity.",
+        inviteDirectorIds: [
+          "strategy-director",
+          "founder-advocate",
+          "values-trust",
+        ],
+        reason:
+          "Directional choices need strategy clarity, founder fit, and values.",
       },
     ],
     discussionAffinity: {
@@ -75,12 +80,13 @@ const PROFILES: Record<BoardDirectorId, DirectorRelationshipProfile> = {
     directorId: "founder-advocate",
     oftenWorksWith: [
       "board-chair",
+      "strategy-director",
       "values-trust",
       "financial-stewardship",
       "growth-opportunity",
     ],
     providesBalance: ["growth-opportunity", "technology-future"],
-    recommends: ["values-trust", "financial-stewardship"],
+    recommends: ["strategy-director", "values-trust"],
     inviteForDecisions: [
       {
         themes: ["capacity", "quality-of-life", "growth"],
@@ -99,6 +105,38 @@ const PROFILES: Record<BoardDirectorId, DirectorRelationshipProfile> = {
     discussionAffinity: {
       speakingOrderBias: 2,
       challengeTendency: "high",
+      pairsWellInDebateWith: ["growth-opportunity", "devils-advocate"],
+    },
+  },
+  "strategy-director": {
+    directorId: "strategy-director",
+    oftenWorksWith: [
+      "board-chair",
+      "founder-advocate",
+      "growth-opportunity",
+      "customer-market",
+      "financial-stewardship",
+    ],
+    providesBalance: ["operations-capacity", "risk-resilience"],
+    recommends: ["founder-advocate", "growth-opportunity"],
+    inviteForDecisions: [
+      {
+        themes: ["direction", "vision", "strategy"],
+        cues: [
+          "direction",
+          "pivot",
+          "vision",
+          "strategy",
+          "business model",
+          "what kind of business",
+        ],
+        inviteDirectorIds: ["founder-advocate", "growth-opportunity"],
+        reason: "Directional strategy needs founder fit and opportunity clarity.",
+      },
+    ],
+    discussionAffinity: {
+      speakingOrderBias: 2,
+      challengeTendency: "medium",
       pairsWellInDebateWith: ["growth-opportunity", "devils-advocate"],
     },
   },

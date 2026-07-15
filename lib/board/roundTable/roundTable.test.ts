@@ -27,17 +27,19 @@ describe("Round Table seats", () => {
     );
   });
 
-  it("seats only visible Directors — empty chairs are not Directors", () => {
+  it("seats every visible Director — member place plus twelve chairs", () => {
     expect(verifyRoundTableSeatsCoverAllDirectors()).toBe(true);
     const directorSeats = ROUND_TABLE_SEATS.filter((s) => s.kind === "director");
     expect(directorSeats).toHaveLength(VISIBLE_BOARD_DIRECTOR_IDS.length);
+    expect(directorSeats).toHaveLength(12);
     expect(directorSeats.map((s) => s.directorId)).toEqual([
-      THOMAS_ELLISON_DIRECTOR_ID,
+      ...VISIBLE_BOARD_DIRECTOR_IDS,
     ]);
-    expect(ROUND_TABLE_SEATS.some((s) => s.kind === "empty")).toBe(true);
+    expect(ROUND_TABLE_SEATS.some((s) => s.kind === "empty")).toBe(false);
+    expect(ROUND_TABLE_SEATS.filter((s) => s.kind === "member")).toHaveLength(1);
     expect(
       ROUND_TABLE_SEATS.some((s) => s.directorId === "vice-chair"),
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("highlights Thomas Ellison’s chair (Chair of the Board)", () => {

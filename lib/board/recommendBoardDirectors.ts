@@ -86,11 +86,14 @@ export function recommendBoardDirectorsForDecision(
   } else if (isDirection) {
     selected = [
       "board-chair",
+      "strategy-director",
       "founder-advocate",
       "financial-stewardship",
       "growth-opportunity",
       "values-trust",
     ];
+    rationaleByDirector["strategy-director"] =
+      "Clarifies the strategic choice and long-term direction.";
     rationaleByDirector["founder-advocate"] =
       "Anchors the decision in the business and life you want.";
     rationaleByDirector["financial-stewardship"] =

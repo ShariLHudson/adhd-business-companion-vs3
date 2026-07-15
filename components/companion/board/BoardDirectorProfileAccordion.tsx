@@ -52,6 +52,10 @@ export function BoardDirectorProfileAccordion({
               disabled={disabled}
               onClick={() => onToggleSection(section.id)}
             >
+              <span
+                className={`board-director-accordion__icon board-director-accordion__icon--${section.id}`}
+                aria-hidden
+              />
               <span className="board-director-accordion__toggle-copy">
                 <span className="board-director-accordion__title">
                   {section.title}

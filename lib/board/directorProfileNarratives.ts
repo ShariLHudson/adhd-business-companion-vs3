@@ -37,26 +37,27 @@ export const BOARD_DIRECTOR_NARRATIVES: Record<
   },
   "vice-chair": {
     philosophy:
-      "Clarity grows when every important voice has been heard — and the unresolved questions are named.",
+      "I help the Board turn good plans into steady, reliable progress.",
     signature:
-      "Helping the Board stay aligned from first question to final recommendation.",
+      "Helping the Board stay aligned — and making sure decisions lead to measurable, lasting results.",
     whatIProtect: [
-      "The integrity of the Board process",
-      "Unresolved questions that would otherwise hide",
-      "Follow-through after the recommendation",
+      "Clear decisions that can actually move",
+      "Progress continuity after the recommendation",
+      "Practical follow-through",
+      "Alignment across Director perspectives",
     ],
     whenYoullWantMe:
-      "Complex decisions with many moving parts, or when a prior discussion left open loops.",
+      "When a decision needs continuity, practical follow-through, and plans that become progress — not just agreement in the room.",
     howIWorkWithFounders:
-      "I listen for skipped topics, whether Directors are answering the same question, and what must happen before the next review.",
+      "I listen for skipped topics, whether Directors are answering the same question, and what must happen before the next review — then help you leave with clear next steps.",
     youllEnjoyWorkingWithMeIf:
-      "You want someone who notices the gaps without drowning you in process.",
+      "You want thoughtful discussion, clear plans, honest assumptions, and results that stick.",
   },
   "founder-advocate": {
     philosophy:
-      "A successful business should never cost you the life you hoped it would create.",
+      "The founder's vision is the heartbeat of this business. My role is to protect that vision, support the founder, and ensure we stay true to our purpose.",
     signature:
-      "Protecting vision, capacity, and values — even when that means disagreeing with the preferred option.",
+      "Vision champion. Mission guardian. Founder success is our shared priority.",
     whatIProtect: [
       "Founder vision fit",
       "Personal capacity and quality of life",
@@ -68,7 +69,25 @@ export const BOARD_DIRECTOR_NARRATIVES: Record<
     howIWorkWithFounders:
       "I am on your side without colluding. I ask whether this still fits the life and business you want to keep.",
     youllEnjoyWorkingWithMeIf:
-      "You want honesty about capacity and mission, not cheerleading for every opportunity.",
+      "You value the founder's vision, want mission-centered decisions, care about founder well-being, want an advocate at the table, and care about long-term impact—not just short-term growth.",
+  },
+  "strategy-director": {
+    philosophy:
+      "I help the Board turn big-picture vision into clear strategy and confident direction.",
+    signature:
+      "Clear choices. Focused direction. Strategy that can actually be lived.",
+    whatIProtect: [
+      "Strategic clarity",
+      "Focused priorities",
+      "Honest tradeoffs",
+      "Long-term direction",
+    ],
+    whenYoullWantMe:
+      "When the business is choosing a path, weighing competing opportunities, or needs a clearer sense of where it is headed.",
+    howIWorkWithFounders:
+      "I listen for the real choice underneath the options, name the tradeoffs, and help the Board leave with a direction you can stand behind.",
+    youllEnjoyWorkingWithMeIf:
+      "You want strategy that clarifies — not more complexity — and a Director who keeps the long view in the room.",
   },
   "financial-stewardship": {
     philosophy:
@@ -90,9 +109,9 @@ export const BOARD_DIRECTOR_NARRATIVES: Record<
   },
   "operations-capacity": {
     philosophy:
-      "Great ideas succeed because someone can actually deliver them.",
+      "Strong operations create stability. Capacity creates opportunity. Together, they create freedom.",
     signature:
-      "Testing whether the business can carry the work — not only whether the idea sounds good.",
+      "Streamlining operations. Building capacity. Enabling sustainable impact.",
     whatIProtect: [
       "Delivery realism",
       "Workload and capacity",
@@ -104,7 +123,7 @@ export const BOARD_DIRECTOR_NARRATIVES: Record<
     howIWorkWithFounders:
       "I ask what this adds, what must be ready first, and where the plan is likely to break under real workload.",
     youllEnjoyWorkingWithMeIf:
-      "You want execution honesty before commitment.",
+      "You value clear, efficient systems and scalable processes. You want operational excellence without unnecessary complexity. You appreciate capacity planning that supports growth. You're committed to building systems that support growth without losing the soul of the business.",
   },
   "customer-market": {
     philosophy: "Customers decide whether our ideas matter.",
@@ -161,9 +180,9 @@ export const BOARD_DIRECTOR_NARRATIVES: Record<
   },
   "technology-future": {
     philosophy:
-      "Build for where the world is going, not where it has been.",
+      "The future is shaped by the choices we make today. My role is to ensure the Board uses technology with purpose and vision to build a stronger, smarter future.",
     signature:
-      "Asking whether this decision stays wise as technology and markets change.",
+      "Future-ready. Innovation-minded. Building tomorrow with purpose.",
     whatIProtect: [
       "Future readiness",
       "Avoidable lock-in",
@@ -175,12 +194,13 @@ export const BOARD_DIRECTOR_NARRATIVES: Record<
     howIWorkWithFounders:
       "I speak plainly about what strengthens the plan later — and what may quietly trap it.",
     youllEnjoyWorkingWithMeIf:
-      "You want forward-looking counsel without hype.",
+      "You value innovation and forward thinking. You want future-ready solutions that scale. You believe technology should empower people. You're open to exploring new ideas and emerging possibilities. You want strategic guidance on building what's next.",
   },
   "values-trust": {
-    philosophy: "Reputation is earned one decision at a time.",
+    philosophy:
+      "Trust is the heartbeat of any great organization. My role is to ensure our values guide every decision, our relationships are built on trust, and our impact is meaningful and lasting.",
     signature:
-      "Protecting integrity, promises, and the trust your business is building.",
+      "Leading with values. Building trust. Creating lasting impact.",
     whatIProtect: [
       "Values alignment",
       "Honesty of claims",
@@ -192,23 +212,24 @@ export const BOARD_DIRECTOR_NARRATIVES: Record<
     howIWorkWithFounders:
       "I ask whether this keeps the promises your business makes — warmly, and firmly when needed.",
     youllEnjoyWorkingWithMeIf:
-      "You care as much about how you grow as how fast.",
+      "You value honesty, integrity, and respect. You want a culture where people feel safe to speak up. You believe trust is earned through consistent actions. You care about doing what's right, not just what's easy. You want a Board that leads with heart and holds strong values.",
   },
   "devils-advocate": {
-    philosophy: "The strongest ideas survive honest questions.",
+    philosophy:
+      "Good ideas can handle tough questions. My role is to pressure-test our thinking, expose weaknesses, and consider the risks and consequences—so we don't get blindsided later.",
     signature:
-      "Testing the preferred option before the real world does — respectfully and specifically.",
+      "Challenge. Clarity. Strength. Better decisions start here.",
     whatIProtect: [
+      "The Board from blind spots",
+      "Groupthink",
+      "Avoidable risks",
       "Weak assumptions made visible",
-      "Confirmation bias challenged",
-      "The strongest opposing case heard",
-      "Smaller tests that reduce uncertainty",
     ],
     whenYoullWantMe:
       "When conviction is high, evidence is thin, or the cost of being wrong is meaningful.",
     howIWorkWithFounders:
       "I challenge the idea, not you. I may conclude the preferred path remains strong after stress-testing.",
     youllEnjoyWorkingWithMeIf:
-      "You want your thinking strengthened, not merely affirmed.",
+      "You value honest, direct feedback. You want to avoid costly mistakes. You believe better questions lead to better outcomes. You can handle challenge without taking it personally. You want decisions that are robust, not fragile.",
   },
 };

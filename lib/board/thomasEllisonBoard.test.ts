@@ -40,7 +40,7 @@ describe("Thomas Ellison — visible Board Director", () => {
     expect(thomas?.boardRole).toBe("Chair of the Board");
     expect(thomas?.isCoreDirector).toBe(true);
     expect(thomas?.portraitPath).toBe(
-      "/board-of-directors/thomas-ellison-chair-of-the-board.png",
+      "/board-of-directors/thomas-ellison-portrait.png",
     );
   });
 
@@ -57,12 +57,30 @@ describe("Thomas Ellison — visible Board Director", () => {
     expect(thomas.portraitPath?.startsWith("/momentum-chamber")).toBe(false);
   });
 
-  it("is the only visible Director in Meet the Directors", () => {
-    expect(VISIBLE_BOARD_DIRECTOR_IDS).toEqual(["board-chair"]);
+  it("is among the visible Directors in Meet the Directors", () => {
+    expect(VISIBLE_BOARD_DIRECTOR_IDS).toHaveLength(12);
+    expect(VISIBLE_BOARD_DIRECTOR_IDS).toContain("board-chair");
+    expect(VISIBLE_BOARD_DIRECTOR_IDS).toContain("strategy-director");
+    expect(VISIBLE_BOARD_DIRECTOR_IDS).toContain("financial-stewardship");
+    expect(VISIBLE_BOARD_DIRECTOR_IDS).toContain("customer-market");
+    expect(VISIBLE_BOARD_DIRECTOR_IDS).toContain("growth-opportunity");
+    expect(VISIBLE_BOARD_DIRECTOR_IDS).toContain("risk-resilience");
     const visible = listVisibleBoardDirectors();
-    expect(visible).toHaveLength(1);
-    expect(visible[0]?.name).toBe("Thomas Ellison");
-    expect(BOARD_DIRECTORS.length).toBeGreaterThan(1);
+    expect(visible.map((d) => d.id)).toEqual([
+      "board-chair",
+      "vice-chair",
+      "founder-advocate",
+      "strategy-director",
+      "financial-stewardship",
+      "operations-capacity",
+      "customer-market",
+      "growth-opportunity",
+      "risk-resilience",
+      "technology-future",
+      "values-trust",
+      "devils-advocate",
+    ]);
+    expect(BOARD_DIRECTORS.length).toBe(12);
   });
 
   it("does not appear in Chamber roster", () => {

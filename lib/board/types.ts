@@ -26,6 +26,7 @@ export const BOARD_DIRECTOR_IDS = [
   "board-chair",
   "vice-chair",
   "founder-advocate",
+  "strategy-director",
   "financial-stewardship",
   "operations-capacity",
   "customer-market",
@@ -68,6 +69,11 @@ export type BoardDirectorDefinition = {
   aliases: string[];
   /** Board-only portrait path — never a Chamber asset */
   portraitPath?: string;
+  /**
+   * Compact Gallery Card art (layout A only) — full designed card image.
+   * Never a 3-layout design sheet. Used by Meet the Directors gallery.
+   */
+  galleryCardPath?: string;
   isCoreDirector: boolean;
   isOptionalDirector: boolean;
   /**
@@ -139,7 +145,9 @@ export const BOARD_MAY_AUTO_ADD_DEVILS_ADVOCATE = false as const;
 /** Core meeting group when user chooses “Use the Core Board” */
 export const CORE_BOARD_DIRECTOR_IDS: readonly BoardDirectorId[] = [
   "board-chair",
+  "vice-chair",
   "founder-advocate",
+  "strategy-director",
   "financial-stewardship",
   "customer-market",
   "operations-capacity",
