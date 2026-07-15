@@ -53,7 +53,7 @@ function ChamberMemberCard({
             className="chamber-member-card__image"
             width={320}
             height={480}
-            sizes="(max-width: 40rem) 90vw, (max-width: 64rem) 45vw, 22rem"
+            sizes="(max-width: 40rem) 90vw, (max-width: 64rem) 45vw, 30vw"
           />
         </span>
       </button>
@@ -82,7 +82,7 @@ function ChamberMemberCard({
   );
 }
 
-/** Desktop: 2 cards across; full roster scrolls vertically. */
+/** Desktop: 3 cards across; full roster scrolls vertically. */
 export function ChamberMemberGallery({
   activeMemberId = null,
   onTalkWithMember,
