@@ -202,7 +202,7 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toContain('setCurrentRoom("welcome-home")');
     expect(source).toContain("estateSectionNavEpochRef.current += 1");
     expect(source).toContain("skipSectionRestore: true");
-    expect(source).toContain("clearRoomBackdropOverride(\"welcome-home\")");
+    expect(source).toContain('clearRoomBackdropOverride("welcome-home")');
     expect(source).toContain("const welcomeHomePlate = WELCOME_ROOM_ASSET");
     expect(source).toContain("force: true");
     expect(source).toContain(
@@ -213,6 +213,19 @@ describe("Welcome Home menu — action wiring", () => {
     );
     expect(roomMenuSource).toContain('data-testid="estate-return-to-estate"');
     expect(roomMenuSource).toContain("closeAndRun(onBackToEstate)");
+
+    // Must not fall back to member overrides, login art, or history restore.
+    const lobbyFn = source.match(
+      /function returnToWelcomeHomeLobby\(reason: string\) \{[\s\S]*?\n  \}/,
+    )?.[0];
+    expect(lobbyFn).toBeTruthy();
+    expect(lobbyFn).toContain("const welcomeHomePlate = WELCOME_ROOM_ASSET");
+    expect(lobbyFn).not.toMatch(
+      /resolveEstateRoomBackgroundImage\(\s*["']welcome-home["']/,
+    );
+    expect(lobbyFn).not.toMatch(/welcome-to-spark-estate-background/i);
+    expect(lobbyFn).not.toMatch(/router\.push\(["']\/companion\/login/);
+    expect(lobbyFn).not.toContain("navHistoryRef.current.pop()");
   });
 });
 

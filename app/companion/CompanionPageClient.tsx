@@ -1312,7 +1312,11 @@ import {
   standaloneToolAck,
 } from "@/lib/standaloneToolRouting";
 import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
-import { getClearMyMindBackdropImageUrl } from "@/lib/chatBackdrop";
+import {
+  clearRoomBackdropOverride,
+  getClearMyMindBackdropImageUrl,
+} from "@/lib/chatBackdrop";
+import { isEstateHomeDestination } from "@/lib/navigationBack";
 import {
   enterClearMyMindMode,
   exitClearMyMindMode,
@@ -6576,6 +6580,15 @@ export default function CompanionPageClient() {
       return;
     }
 
+    /**
+     * "Back To Estate" must open Welcome Home lobby + welcome-home photograph.
+     * Plain history restore leaves the previous room plate (often Library).
+     */
+    if (isEstateHomeDestination(workspacePanelBackLabel)) {
+      navigateBackToEstateHome();
+      return;
+    }
+
     const navRestore = navHistoryRef.current.pop();
     if (navRestore) {
       if (panelBackStackRef.current.length > 0) {
@@ -6603,8 +6616,11 @@ export default function CompanionPageClient() {
     }
 
     const prev = sectionHistoryRef.current.pop() ?? "home";
+    if (prev === "home") {
+      navigateBackToEstateHome();
+      return;
+    }
     goingBackRef.current = true;
-    if (prev === "home") setActiveNav("chat");
     setActiveSection(prev);
   }
 
@@ -9656,12 +9672,18 @@ export default function CompanionPageClient() {
     setEstateRoomChatVisible(false);
     syncDirectEstateVisit(null);
     clearEstatePendingTransition();
+    setExploreSparkMapOpen(false);
 
-    const welcomeHomePlate =
-      resolveEstateRoomBackgroundImage("welcome-home") ?? WELCOME_ROOM_ASSET;
+    /**
+     * Always the Welcome Home entrance photograph — never a leftover Library
+     * plate or a room backdrop override from Change background.
+     */
+    clearRoomBackdropOverride("welcome-home");
+    const welcomeHomePlate = WELCOME_ROOM_ASSET;
     syncEstateSceneActivePlate({
       toRoomId: "welcome-home",
       imageUrl: welcomeHomePlate,
+      force: true,
     });
     prepareEstateSceneTransitionFireAndForget({
       toRoomId: "welcome-home",

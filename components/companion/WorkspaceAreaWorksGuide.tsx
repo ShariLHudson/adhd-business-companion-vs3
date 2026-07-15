@@ -30,7 +30,7 @@ export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
         onClick={() => setOpen((o) => !o)}
         className={
           areaId === "settings"
-            ? "workspace-area-works-guide__trigger flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-white/10"
+            ? "workspace-area-works-guide__trigger flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[rgba(255,255,255,0.1)]"
             : "workspace-area-works-guide__trigger flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[#faf7f2]/80"
         }
         aria-expanded={open}
@@ -48,7 +48,7 @@ export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
         <span
           className={
             areaId === "settings"
-              ? "workspace-area-works-guide__title min-w-0 flex-1 text-sm font-semibold text-white"
+              ? "workspace-area-works-guide__title settings-panel__heading min-w-0 flex-1 text-sm font-semibold"
               : "workspace-area-works-guide__title min-w-0 flex-1 text-sm font-semibold text-[#1f1c19]"
           }
         >

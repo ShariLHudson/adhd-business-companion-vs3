@@ -382,7 +382,8 @@
 }
 
 .modal-sheet--estate-dark .workspace-area-works-guide__title {
-  color: #ffffff !important;
+  /* Same token as .settings-panel__heading under dark Settings */
+  color: rgba(255, 248, 235, 0.98) !important;
 }
 
 .modal-sheet--estate-dark .workspace-area-works-guide__chevron {
@@ -414,6 +415,7 @@
 /*
  * Light surfaces inside dark Settings (Celebrations cards, selects, connection
  * cards, appearance samples, etc.) — keep all text black so it stays readable.
+ * Exclude How To Use Settings (dark translucent row — title stays white).
  */
 .modal-sheet--estate-dark .settings-panel :is(
   [class*="bg-white"],
@@ -421,7 +423,7 @@
   .bg-\[\#faf7f2\]\/70,
   .bg-\[\#f3efe8\],
   .bg-\[\#1e4f4f\]\/\[0\.06\]
-) {
+):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger) {
   color: #000000;
 }
 
@@ -431,15 +433,17 @@
   .bg-\[\#faf7f2\]\/70,
   .bg-\[\#f3efe8\],
   .bg-\[\#1e4f4f\]\/\[0\.06\]
-)
-  :is(p, span, label, summary, strong, em, small, li, div, button),
+):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger)
+  :is(p, span, label, summary, strong, em, small, li, div, button):not(
+    .workspace-area-works-guide__title
+  ):not(.workspace-area-works-guide__chevron),
 .modal-sheet--estate-dark .settings-panel :is(
   [class*="bg-white"],
   .bg-\[\#faf7f2\],
   .bg-\[\#faf7f2\]\/70,
   .bg-\[\#f3efe8\],
   .bg-\[\#1e4f4f\]\/\[0\.06\]
-)
+):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger)
   :is(
     .text-black,
     .text-\[\#1f1c19\],
@@ -454,24 +458,47 @@
     .text-base,
     .text-lg,
     .text-2xl
-  ) {
+  ):not(.workspace-area-works-guide__title):not(.workspace-area-works-guide__chevron) {
   color: #000000 !important;
 }
 
-/* How To Use Settings — brown panel + white title */
+/* How To Use Settings — brown panel + white title (wins over light-surface black) */
 .modal-sheet--estate-dark .settings-panel .workspace-area-works-guide--settings,
 .modal-sheet--estate-dark .settings-panel .workspace-area-works-guide {
   background: rgba(255, 255, 255, 0.06) !important;
   border-color: rgba(255, 236, 200, 0.28) !important;
   box-shadow: none !important;
+  color: #ffffff;
 }
 
-.modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__title {
-  color: #ffffff !important;
+.modal-sheet--estate-dark
+  .settings-panel
+  .workspace-area-works-guide--settings
+  .workspace-area-works-guide__title,
+.modal-sheet--estate-dark
+  .settings-panel
+  .workspace-area-works-guide
+  .workspace-area-works-guide__title,
+.modal-sheet--estate-dark
+  .settings-panel
+  .workspace-area-works-guide__trigger
+  .workspace-area-works-guide__title,
+.modal-sheet--estate-dark
+  .settings-panel
+  .workspace-area-works-guide__title.settings-panel__heading {
+  /* Match Settings heading token; beat light-surface black !important */
+  color: rgba(255, 248, 235, 0.98) !important;
 }
 
-.modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__chevron {
-  color: rgba(255, 255, 255, 0.75) !important;
+.modal-sheet--estate-dark
+  .settings-panel
+  .workspace-area-works-guide--settings
+  .workspace-area-works-guide__chevron,
+.modal-sheet--estate-dark
+  .settings-panel
+  .workspace-area-works-guide
+  .workspace-area-works-guide__chevron {
+  color: rgba(255, 255, 255, 0.8) !important;
 }
 
 .modal-sheet--estate-dark .settings-panel .workspace-area-works-guide__trigger:hover {
