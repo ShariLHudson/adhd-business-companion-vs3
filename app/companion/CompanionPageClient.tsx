@@ -1482,9 +1482,14 @@ import { EstateMapFullScreen } from "@/components/estateMap";
 import {
   exploreMapLocationIdForPlaceId,
   getExploreSparkMapLocations,
+  clearExploreEstateReturnPending,
   markExploreEstateReturnPending,
   resolveExploreMapLocationPlaceId,
 } from "@/lib/estateMap/exploreSparkNavigation";
+import {
+  planWelcomeHomeDestinationSwitch,
+  type WelcomeHomeDestinationKind,
+} from "@/lib/estate/welcomeHomeDestinationSwitch";
 import { getExploreEstateDestinationById } from "@/lib/estateMap/exploreEstateDestinations";
 import type { EstateMapLocation } from "@/lib/estateMap/types";
 import type {
@@ -8080,9 +8085,52 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("energy");
   }
 
+  /**
+   * Close trapping experiences (Explore Estate map, overlays, Breathe, etc.)
+   * before a Welcome Home destination opens. Shared by all menu / section openers.
+   */
+  function dismissTransientEstateExperiencesForDestinationSwitch(input: {
+    destinationId: string;
+    kind: WelcomeHomeDestinationKind;
+  }) {
+    const plan = planWelcomeHomeDestinationSwitch(input);
+
+    if (plan.closeExploreEstate) {
+      setExploreSparkMapOpen(false);
+      setExploreEstateReturnAvailable(false);
+    }
+    if (plan.clearExploreReturnPending) {
+      clearExploreEstateReturnPending();
+    }
+    if (plan.clearOverlays) {
+      setOverlay(null);
+      setSettingsSection(null);
+    }
+    if (plan.clearGuidedFieldHelpChat) {
+      setGuidedFieldHelpChatOpen(false);
+    }
+    if (plan.clearBreathe && isBreatheDestinationActive(breatheDestination)) {
+      if (breatheTransitionTimerRef.current) {
+        clearTimeout(breatheTransitionTimerRef.current);
+        breatheTransitionTimerRef.current = null;
+      }
+      if (breatheResumeTimerRef.current) {
+        clearTimeout(breatheResumeTimerRef.current);
+        breatheResumeTimerRef.current = null;
+      }
+      setBreatheDestination(EMPTY_BREATHE_DESTINATION);
+      setBreatheResumeActive(false);
+      breathePausedTimerRef.current = false;
+    }
+  }
+
   /** Standalone focus tools (Clear My Mind, spin wheel, energy, etc.). */
   function openStandaloneFocusSectionCore(section: AppSection) {
     const resolvedSection = section === "games" ? "quick-recharge" : section;
+    dismissTransientEstateExperiencesForDestinationSwitch({
+      destinationId: resolvedSection,
+      kind: "section",
+    });
     setPreferEverydayConversation(false);
     preferEverydayConversationRef.current = false;
 
@@ -8117,6 +8165,10 @@ export default function CompanionPageClient() {
     minutes?: number;
     environmentId?: BreatheEnvironmentId;
   }) {
+    dismissTransientEstateExperiencesForDestinationSwitch({
+      destinationId: "breathe",
+      kind: "breathe",
+    });
     setEstateRoomChatVisible(false);
     const breatheEnv = resolveBreatheEnvironment(options?.environmentId);
     preloadRoomBackground(breatheEnv.imageUrl);
@@ -9409,6 +9461,13 @@ export default function CompanionPageClient() {
 
   function openProfileDestinationCore(destination?: ProfileDestination) {
     const navigation = resolveProfileDestinationNavigation(destination);
+    dismissTransientEstateExperiencesForDestinationSwitch({
+      destinationId:
+        navigation.kind === "people-i-help-overlay"
+          ? "people-i-help"
+          : "my-business-estate",
+      kind: "overlay",
+    });
     preloadRoomBackground(ESTATE_PROFILE_ROOM_BG);
     setGrowthProfileEmphasizeTimeline(false);
     syncDirectEstateVisit(null);
@@ -9577,6 +9636,10 @@ export default function CompanionPageClient() {
    * Never wander into Create / Create Studio.
    */
   function openExploreSparkVisualExplorer() {
+    dismissTransientEstateExperiencesForDestinationSwitch({
+      destinationId: "explore-estate",
+      kind: "explore-estate",
+    });
     setWelcomeHomeEstateMapVisible(false);
     setExploreSparkMapOpen(true);
   }
@@ -9801,14 +9864,26 @@ export default function CompanionPageClient() {
         requestBeginNewDay();
         return;
       case "settings":
+        dismissTransientEstateExperiencesForDestinationSwitch({
+          destinationId: "settings",
+          kind: "overlay",
+        });
         setSettingsSection(null);
         setOverlay("settings");
         return;
       case "notifications":
+        dismissTransientEstateExperiencesForDestinationSwitch({
+          destinationId: "settings-notifications",
+          kind: "overlay",
+        });
         setSettingsSection("notifications");
         setOverlay("settings");
         return;
       case "voice-settings":
+        dismissTransientEstateExperiencesForDestinationSwitch({
+          destinationId: "settings-voice",
+          kind: "overlay",
+        });
         setSettingsSection("plan");
         setOverlay("settings");
         return;
