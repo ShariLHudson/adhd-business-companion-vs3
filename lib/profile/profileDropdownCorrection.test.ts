@@ -1,5 +1,5 @@
 /**
- * Profile dropdown correction — SH initials menu Profile group only.
+ * My Spark Estate dropdown — three sibling destinations.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -16,18 +16,19 @@ describe("profileDropdownCorrection", () => {
     "utf8",
   );
 
-  it("nests only approved destinations under the Profile group", () => {
-    const profileGroup = ESTATE_MENU_DROPDOWN_ENTRIES.find(
-      (entry) => entry.kind === "group" && entry.id === "profile",
+  it("nests approved destinations under My Spark Estate", () => {
+    const group = ESTATE_MENU_DROPDOWN_ENTRIES.find(
+      (entry) => entry.kind === "group" && entry.id === "my-spark-estate",
     );
-    expect(profileGroup?.kind).toBe("group");
-    if (profileGroup?.kind !== "group") return;
-    expect(profileGroup.children.map((child) => child.label)).toEqual(
+    expect(group?.kind).toBe("group");
+    if (group?.kind !== "group") return;
+    expect(group.children.map((child) => child.label)).toEqual(
       SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS.map((item) => item.label),
     );
-    expect(profileGroup.children.map((child) => child.id)).toEqual([
-      "my-profile",
+    expect(group.children.map((child) => child.id)).toEqual([
+      "my-business-estate",
       "people-i-help",
+      "my-profile",
     ]);
   });
 
@@ -40,12 +41,10 @@ describe("profileDropdownCorrection", () => {
     expect(labels).not.toContain("Growth Profile");
   });
 
-  it("mounts dedicated panels instead of the My Estate chat shell", () => {
-    expect(companion).toMatch(/<MyBusinessEstatePanel/);
-    expect(companion).toMatch(/<PeopleIHelpPanel/);
-    expect(companion).toMatch(/estateProfilePrimary \?/);
-    expect(companion).toMatch(/peopleIHelpProfilePrimary \?/);
-    expect(companion).not.toMatch(/From here/);
-    expect(companion).not.toMatch(/onOpenDestination/);
+  it("mounts dedicated panels through ProfileDestinationHost", () => {
+    expect(companion).toMatch(/<ProfileDestinationHost/);
+    expect(companion).toMatch(/isProfileDestinationOverlay\(overlay\)/);
+    expect(companion).toContain("!profileDestinationActive");
+    expect(companion).toContain("profileDestinationForMenuAction");
   });
 });

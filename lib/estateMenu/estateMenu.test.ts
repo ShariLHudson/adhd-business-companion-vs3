@@ -16,12 +16,13 @@ describe("Global Estate Menu", () => {
     expect(ESTATE_MENU_ACTION_IDS).toContain("log-out");
   });
 
-  it("shows Conversations, Settings, Profile, and Logout only", () => {
+  it("shows Conversations, My Spark Estate, Experience Controls, Settings, Sign Out", () => {
     expect(ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => entry.label)).toEqual([
       "Conversations",
+      "My Spark Estate",
+      "Experience Controls",
       "Settings",
-      "Profile",
-      "Logout",
+      "Sign Out",
     ]);
   });
 
@@ -52,5 +53,7 @@ describe("Global Estate Menu", () => {
     expect(ids).not.toContain("estate-profile");
     expect(ids).not.toContain("evidence-vault");
     expect(ids).not.toContain("portfolio");
+    expect(ids).toContain("my-profile");
+    expect(ids).toContain("my-business-estate");
   });
 });

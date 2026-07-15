@@ -8,6 +8,7 @@ import { PeopleIHelpPanel } from "@/components/companion/PeopleIHelpPanel";
 import { GrowthProfileRoomPanel } from "@/components/companion/GrowthProfileRoomPanel";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
 import {
+  canonicalizeProfileDestinationOverlay,
   isProfileDestinationOverlay,
   profileDestinationTitle,
   type ProfileDestinationOverlayId,
@@ -15,20 +16,18 @@ import {
 import "@/app/companion/profile-destination-host.css";
 
 export type ProfileDestinationHostProps = {
-  /** Active profile destination overlay — null when none. */
   destination: ProfileDestinationOverlayId | null;
   growthProfileEmphasizeTimeline?: boolean;
   onClose: () => void;
   onOpenEstatePlace?: (actionId: EstateMenuActionId) => void;
-  /** Switch from My Business Estate to People I Help without clearing estate data. */
   onOpenPeopleIHelp?: () => void;
   onOpenSettings?: (section?: "tone" | "plan" | "notifications") => void;
   onOpenExperienceControls?: () => void;
 };
 
 /**
- * Dedicated profile destinations — body portal above Welcome Home.
- * My Profile, My Business Estate, and People I Help are distinct siblings.
+ * Dedicated My Spark Estate destinations — body portal.
+ * My Profile / My Business Estate / People I Help are siblings — never nested.
  */
 export function ProfileDestinationHost({
   destination,
@@ -43,24 +42,29 @@ export function ProfileDestinationHost({
 
   useEffect(() => setMounted(true), []);
 
+  const canonical =
+    destination && isProfileDestinationOverlay(destination)
+      ? canonicalizeProfileDestinationOverlay(destination)
+      : null;
+
   useEffect(() => {
     const root = document.documentElement;
-    if (destination && isProfileDestinationOverlay(destination)) {
-      root.setAttribute("data-profile-destination", destination);
+    if (canonical) {
+      root.setAttribute("data-profile-destination", canonical);
     } else {
       root.removeAttribute("data-profile-destination");
     }
     return () => {
       root.removeAttribute("data-profile-destination");
     };
-  }, [destination]);
+  }, [canonical]);
 
-  if (!mounted || !destination || !isProfileDestinationOverlay(destination)) {
+  if (!mounted || !canonical) {
     return null;
   }
 
   let content: ReactNode = null;
-  if (destination === "profile-personal") {
+  if (canonical === "profile-personal") {
     content = (
       <MyProfilePanel
         onClose={onClose}
@@ -68,14 +72,14 @@ export function ProfileDestinationHost({
         onOpenExperienceControls={onOpenExperienceControls}
       />
     );
-  } else if (destination === "profile") {
+  } else if (canonical === "my-business-estate") {
     content = (
       <MyBusinessEstatePanel
         onClose={onClose}
         onOpenPeopleIHelp={onOpenPeopleIHelp}
       />
     );
-  } else if (destination === "people-i-help") {
+  } else if (canonical === "people-i-help") {
     content = <PeopleIHelpPanel onClose={onClose} />;
   } else {
     content = (
@@ -91,10 +95,10 @@ export function ProfileDestinationHost({
     <div
       className="profile-destination-host"
       data-testid="profile-destination-host"
-      data-profile-destination={destination}
+      data-profile-destination={canonical}
       role="dialog"
       aria-modal="true"
-      aria-label={profileDestinationTitle(destination)}
+      aria-label={profileDestinationTitle(canonical)}
     >
       <main className="estate-room-main profile-destination-host__main">
         {content}

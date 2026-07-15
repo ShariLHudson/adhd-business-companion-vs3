@@ -59,7 +59,9 @@ export function PeopleIHelpPanel({ onClose }: Props) {
             Close
           </button>
           <header className="people-i-help-panel__header">
-            <p className="estate-workspace__kicker">My Spark Estate › People I Help</p>
+            <p className="estate-workspace__kicker" data-testid="people-i-help-breadcrumb">
+              My Spark Estate › People I Help
+            </p>
             <h1 className="estate-workspace__title">People I Help</h1>
             <p className="my-business-estate-panel__lead">
               The people your work is for — saved client avatars and audiences that

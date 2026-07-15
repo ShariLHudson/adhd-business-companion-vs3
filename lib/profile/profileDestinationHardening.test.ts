@@ -49,16 +49,16 @@ describe("profileDestinationHardening", () => {
 
   it("opens My Business Estate from the My Spark Estate menu", () => {
     expect(companion).toContain('openProfileDestinationCore("my-business-estate")');
-    expect(companion).toContain('setOverlay("profile")');
+    expect(companion).toContain('setOverlay("my-business-estate")');
     expect(host).toContain("MyBusinessEstatePanel");
     expect(host).toContain('data-testid="profile-destination-host"');
   });
 
   it("opens My Profile as a distinct personal destination", () => {
-    expect(companion).toContain('openProfileDestinationCore("profile-personal")');
+    expect(companion).toContain("profileDestinationForMenuAction");
     expect(companion).toContain('setOverlay("profile-personal")');
     expect(host).toContain("MyProfilePanel");
-    expect(host).toContain('destination === "profile-personal"');
+    expect(host).toContain('canonical === "profile-personal"');
   });
 
   it("opens People I Help from the My Spark Estate menu", () => {
@@ -129,7 +129,8 @@ describe("profileDestinationHardening", () => {
     expect(rooms).toMatch(
       /EstateMenuShellActionId = Exclude<[\s\S]*?"people-i-help"/,
     );
-    expect(companion).toContain('if (actionId === "people-i-help")');
+    expect(companion).toContain("profileDestinationForMenuAction(actionId)");
+    expect(companion).toContain('openProfileDestinationCore(sparkEstateDestination)');
     expect(companion).toContain('openProfileDestinationCore("people-i-help")');
     // Type-level: people-i-help must not be a shell action id
     type PeopleIHelpIsNever = "people-i-help" extends EstateMenuShellActionId
@@ -139,17 +140,20 @@ describe("profileDestinationHardening", () => {
     expect(peopleIHelpFallsThrough).toBe(false);
   });
 
+
   it("recognizes My Spark Estate overlay ids including My Profile", () => {
     expect(PROFILE_DESTINATION_OVERLAY_IDS).toEqual([
-      "profile",
+      "my-business-estate",
       "people-i-help",
       "profile-personal",
       "growth-profile",
+      "profile",
     ]);
-    expect(isProfileDestinationOverlay("profile")).toBe(true);
+    expect(isProfileDestinationOverlay("my-business-estate")).toBe(true);
     expect(isProfileDestinationOverlay("people-i-help")).toBe(true);
     expect(isProfileDestinationOverlay("profile-personal")).toBe(true);
     expect(isProfileDestinationOverlay("growth-profile")).toBe(true);
+    expect(isProfileDestinationOverlay("profile")).toBe(true);
     expect(isProfileDestinationOverlay("settings")).toBe(false);
     expect(isProfileDestinationOverlay(null)).toBe(false);
   });

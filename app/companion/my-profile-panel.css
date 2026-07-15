@@ -1,5 +1,51 @@
 /* My Profile — personal destination (not Business Estate) */
 
+.my-profile-destination {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(
+      ellipse at 30% 20%,
+      rgba(72, 58, 42, 0.55),
+      transparent 55%
+    ),
+    linear-gradient(165deg, #2a221a 0%, #1a1511 55%, #12100e 100%);
+  color: rgba(255, 250, 242, 0.98);
+  overflow: auto;
+}
+
+.my-profile-panel {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 2.5rem;
+}
+
+.my-profile-panel__back {
+  min-height: 2.5rem;
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 236, 200, 0.28);
+  background: rgba(255, 248, 235, 0.08);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.my-profile-panel__header {
+  margin-bottom: 1.25rem;
+}
+
+.my-profile-panel__lead {
+  margin: 0.35rem 0 0;
+  opacity: 0.85;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
 .my-profile-panel__identity {
   display: flex;
   flex-direction: column;

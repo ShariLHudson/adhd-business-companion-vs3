@@ -159,6 +159,7 @@ import { ProfileDestinationHost } from "@/components/companion/ProfileDestinatio
 import type { ProfileDestination } from "@/lib/profile/profileDestination";
 import {
   isProfileDestinationOverlay,
+  profileDestinationForMenuAction,
   resolveProfileDestinationNavigation,
 } from "@/lib/profile/profileDestination";
 import {
@@ -2456,6 +2457,7 @@ export default function CompanionPageClient() {
     | null
     | "settings"
     | "profile"
+    | "my-business-estate"
     | "profile-personal"
     | "people-i-help"
     | "signin"
@@ -2468,7 +2470,8 @@ export default function CompanionPageClient() {
     useState<CrystalActivation | null>(null);
   const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
     useState(false);
-  const estateProfilePrimary = overlay === "profile";
+  const estateProfilePrimary =
+    overlay === "my-business-estate" || overlay === "profile";
   const myProfilePersonalPrimary = overlay === "profile-personal";
   const peopleIHelpProfilePrimary = overlay === "people-i-help";
   const growthProfilePrimary = overlay === "growth-profile";
@@ -9942,7 +9945,7 @@ export default function CompanionPageClient() {
       preloadRoomBackground(ESTATE_PROFILE_ROOM_BG);
       setGrowthProfileEmphasizeTimeline(false);
       syncDirectEstateVisit(null);
-      setOverlay("profile");
+      setOverlay("my-business-estate");
       return;
     }
 
@@ -9977,7 +9980,7 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore(section);
   }
 
-  function openProfileDestinationCore(destination?: ProfileDestination) {
+  function openProfileDestinationCore(destination: ProfileDestination) {
     const navigation = resolveProfileDestinationNavigation(destination);
     dismissTransientEstateExperiencesForDestinationSwitch({
       destinationId: navigation.destinationId,
@@ -9986,15 +9989,22 @@ export default function CompanionPageClient() {
     preloadRoomBackground(ESTATE_PROFILE_ROOM_BG);
     setGrowthProfileEmphasizeTimeline(false);
     syncDirectEstateVisit(null);
-    if (navigation.kind === "people-i-help-overlay") {
-      setOverlay("people-i-help");
-      return;
+    // Explicit 1:1 mapping — never fall through My Profile to Business Estate.
+    switch (navigation.kind) {
+      case "people-i-help-overlay":
+        setOverlay("people-i-help");
+        return;
+      case "profile-personal-overlay":
+        setOverlay("profile-personal");
+        return;
+      case "my-business-estate-overlay":
+        setOverlay("my-business-estate");
+        return;
+      default: {
+        const _exhaustive: never = navigation;
+        return _exhaustive;
+      }
     }
-    if (navigation.kind === "profile-personal-overlay") {
-      setOverlay("profile-personal");
-      return;
-    }
-    setOverlay("profile");
   }
 
   function launchPreviewTestExperience(
@@ -10404,18 +10414,9 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (actionId === "people-i-help") {
-      openProfileDestinationCore("people-i-help");
-      return;
-    }
-
-    if (actionId === "my-business-estate") {
-      openProfileDestinationCore("my-business-estate");
-      return;
-    }
-
-    if (actionId === "my-profile" || actionId === "estate-profile") {
-      openProfileDestinationCore("profile-personal");
+    const sparkEstateDestination = profileDestinationForMenuAction(actionId);
+    if (sparkEstateDestination) {
+      openProfileDestinationCore(sparkEstateDestination);
       return;
     }
 
@@ -12349,7 +12350,7 @@ export default function CompanionPageClient() {
       }, 0);
       return;
     }
-    if (overlay !== "profile") {
+    if (overlay !== "my-business-estate" && overlay !== "profile") {
       openProfileDestinationCore("my-business-estate");
     }
     window.setTimeout(() => {

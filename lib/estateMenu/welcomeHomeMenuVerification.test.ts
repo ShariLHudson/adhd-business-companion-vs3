@@ -183,15 +183,15 @@ describe("Welcome Home menu — action wiring", () => {
 
   it("My Business Estate opens via profile destination resolver", () => {
     expect(source).toMatch(/openProfileDestinationCore\("my-business-estate"\)/);
-    expect(source).toMatch(/actionId === "my-business-estate"/);
+    expect(source).toMatch(/profileDestinationForMenuAction/);
     expect(source).toMatch(/<ProfileDestinationHost/);
-    expect(source).toMatch(/setOverlay\("profile"\)/);
+    expect(source).toMatch(/setOverlay\("my-business-estate"\)/);
   });
 
   it("My Profile opens personal profile destination", () => {
-    expect(source).toMatch(/openProfileDestinationCore\("profile-personal"\)/);
     expect(source).toMatch(/setOverlay\("profile-personal"\)/);
-    expect(source).toMatch(/actionId === "my-profile"/);
+    expect(source).toMatch(/profileDestinationForMenuAction/);
+    expect(source).toMatch(/profile-personal-overlay/);
   });
 
   it("People I Help opens via profile destination resolver", () => {

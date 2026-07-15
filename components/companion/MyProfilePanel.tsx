@@ -2,18 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
-import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEstateRoomShell";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import {
-  PROFILE_MENU_LABELS,
-  profileDestinationBreadcrumbParent,
+  profileDestinationBreadcrumb,
 } from "@/lib/profile/profileDestination";
 import {
   userProfileImageUrl,
   userProfileInitials,
 } from "@/lib/userProfileDisplay";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
-import "@/app/companion/my-business-estate.css";
 import "@/app/companion/my-profile-panel.css";
 
 type Props = {
@@ -23,7 +20,8 @@ type Props = {
 };
 
 /**
- * My Profile — personal member information (not Business Estate, not People I Help).
+ * My Profile — personal member information.
+ * Distinct from My Business Estate (business) and People I Help (audience).
  */
 export function MyProfilePanel({
   onClose,
@@ -71,28 +69,32 @@ export function MyProfilePanel({
   }
 
   return (
-    <MyBusinessEstateRoomShell>
+    <div
+      className="my-profile-destination"
+      data-testid="my-profile-destination"
+      data-profile-destination="profile-personal"
+    >
       <EstateWorkspace
-        className="my-business-estate-panel my-profile-panel"
+        className="my-profile-panel"
         onDismissOutside={requestClose}
       >
         <button
           type="button"
-          className="people-i-help-panel__back"
+          className="my-profile-panel__back"
           data-testid="my-profile-close"
           onClick={requestClose}
         >
           Close
         </button>
 
-        <header className="people-i-help-panel__header">
+        <header className="my-profile-panel__header">
           <p className="estate-workspace__kicker">
-            {profileDestinationBreadcrumbParent()} › {PROFILE_MENU_LABELS.myProfile}
+            {profileDestinationBreadcrumb("profile-personal")}
           </p>
           <h1 className="estate-workspace__title">My Profile</h1>
-          <p className="my-business-estate-panel__lead">
-            Information about you — separate from your business and the people
-            you help.
+          <p className="my-profile-panel__lead">
+            Information about you — not your business, and not the people you
+            help.
           </p>
         </header>
 
@@ -104,7 +106,11 @@ export function MyProfilePanel({
           <div className="my-profile-panel__avatar" aria-hidden>
             {imageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={imageUrl} alt="" className="my-profile-panel__avatar-image" />
+              <img
+                src={imageUrl}
+                alt=""
+                className="my-profile-panel__avatar-image"
+              />
             ) : (
               <span className="my-profile-panel__avatar-initials">{initials}</span>
             )}
@@ -203,6 +209,6 @@ export function MyProfilePanel({
           </button>
         </section>
       </EstateWorkspace>
-    </MyBusinessEstateRoomShell>
+    </div>
   );
 }

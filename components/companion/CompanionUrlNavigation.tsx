@@ -92,6 +92,9 @@ export function CompanionUrlNavigation({
     }
 
     if (
+      overlay === "my-business-estate" ||
+      overlay === "profile-personal" ||
+      overlay === "people-i-help" ||
       overlay === "profile" ||
       overlay === "settings" ||
       overlay === "signin"
