@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   addBrainDumps,
   getBrainDumps,
-  updateBrainDump,
   type BrainDumpEntry,
 } from "@/lib/companionStore";
 import {
@@ -22,6 +21,13 @@ import {
   noteClearMyMindCapture,
   setClearMyMindModePhase,
 } from "@/lib/clearMyMind/clearMyMindMode";
+import {
+  clearClearMyMindDraft,
+  draftStatusLabel,
+  loadClearMyMindDraft,
+  saveClearMyMindDraft,
+  type DraftSaveStatus,
+} from "@/lib/clearMyMind/captureDraft";
 import { recordClearMyMindSubmission } from "@/lib/clearMyMindIntelligence";
 import { recordReliefSignal } from "@/lib/reliefIntelligence";
 import {
@@ -31,11 +37,6 @@ import {
   type ClearMyMindStage,
 } from "@/lib/clearMyMindStages";
 import { isVisibleInMentalLandscape } from "@/lib/thoughtLifecycle";
-import {
-  collectionLabelFromAiCategory,
-  setThoughtCollectionSuggestion,
-  SUGGESTED_COLLECTION_AI_CONFIDENCE,
-} from "@/lib/thinkingSpace/thoughtCollectionAuthority";
 import { pauseClearMyMindSession } from "@/lib/clearMyMindSessionStore";
 import { ClearMyMindCaptureCard } from "@/components/companion/ClearMyMindCaptureCard";
 import {
@@ -89,7 +90,10 @@ export function ClearMyMindSession({
   const [sessionId] = useState(() => sessionIdProp ?? newCaptureSessionId());
   const [stage, setStage] = useState<ClearMyMindStage>(initialClearMyMindStage);
   const [surface, setSurface] = useState<CaptureSurface>(initialSurface);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(() => {
+    const draft = loadClearMyMindDraft();
+    return draft?.text ?? "";
+  });
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
   const [pendingSplit, setPendingSplit] = useState<ThoughtSplitProposal | null>(
     null,
@@ -102,7 +106,10 @@ export function ClearMyMindSession({
   const [shareConfirming, setShareConfirming] = useState(false);
   const [rawThoughts, setRawThoughts] = useState<string[]>([]);
   const [saveAck, setSaveAck] = useState<string | null>(null);
+  const [draftStatus, setDraftStatus] = useState<DraftSaveStatus>("idle");
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const draftVersionRef = useRef(loadClearMyMindDraft()?.version ?? 0);
+  const draftTimerRef = useRef<number | null>(null);
 
   const refresh = useCallback(() => {
     setEntries(
@@ -176,38 +183,32 @@ export function ClearMyMindSession({
     });
   }, [input]);
 
-  async function classify(id: string, note: string) {
-    try {
-      const res = await fetch("/api/braindump-classify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: note }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        updateBrainDump(id, {
-          topic: data.topic,
-          category: data.category,
-          contextType: data.contextType,
-          suggestion: data.suggestion,
-        });
-        const collectionLabel = collectionLabelFromAiCategory(
-          data.category,
-          data.topic,
-        );
-        if (collectionLabel) {
-          setThoughtCollectionSuggestion(
-            id,
-            collectionLabel,
-            SUGGESTED_COLLECTION_AI_CONFIDENCE,
-          );
-        }
-        refresh();
-      }
-    } catch {
-      /* unclassified is fine */
+  /** Continuous autosave — never wait for Continue. */
+  useEffect(() => {
+    if (surface !== "writing") return;
+    if (draftTimerRef.current) {
+      window.clearTimeout(draftTimerRef.current);
     }
-  }
+    if (input.trim()) setDraftStatus("saving");
+    draftTimerRef.current = window.setTimeout(() => {
+      draftVersionRef.current += 1;
+      const result = saveClearMyMindDraft({
+        text: input,
+        version: draftVersionRef.current,
+        sessionId,
+      });
+      if (result.ok) {
+        setDraftStatus(input.trim() ? "saved" : "idle");
+      } else if (!result.blockedByNewer) {
+        setDraftStatus("error");
+      }
+    }, 400);
+    return () => {
+      if (draftTimerRef.current) {
+        window.clearTimeout(draftTimerRef.current);
+      }
+    };
+  }, [input, sessionId, surface]);
 
   function focusCaptureInput() {
     window.requestAnimationFrame(() => {
@@ -230,8 +231,11 @@ export function ClearMyMindSession({
     );
 
     setEntries(sessionSaved);
-    setRawThoughts(sessionSaved.map((e) => e.text));
+    setRawThoughts(sessionSaved.map((e) => e.originalText ?? e.text));
     setInput("");
+    clearClearMyMindDraft();
+    draftVersionRef.current += 1;
+    setDraftStatus("idle");
     setPendingSplit(null);
     setStage(stageOnReleaseComplete(stageOnCaptureBegin(stage)));
 
@@ -271,16 +275,10 @@ export function ClearMyMindSession({
     pauseClearMyMindSession({
       sessionId,
       phase: "choice",
-      rawCaptureTexts: sessionSaved.map((e) => e.text),
+      rawCaptureTexts: sessionSaved.map((e) => e.originalText ?? e.text),
     });
 
-    createdItems.forEach((item, index) => {
-      const itemId = item.id;
-      const text = parts[index];
-      if (itemId && text) {
-        void classify(itemId, text);
-      }
-    });
+    // Capture first — no automatic categorization until the member asks.
 
     void import("@/lib/ecosystem/eventTrackingEngine").then(
       ({ trackEcosystemEvent }) => {
@@ -388,6 +386,10 @@ export function ClearMyMindSession({
       onAction?.("my-thoughts");
       return;
     }
+    if (action === "return-welcome") {
+      onAction?.("exit");
+      return;
+    }
     const phase = phaseMap[action];
     if (phase) setClearMyMindModePhase(phase);
     onAction?.(action === "create" ? "convert" : action);
@@ -409,14 +411,17 @@ export function ClearMyMindSession({
         rawThoughts={
           rawThoughts.length > 0
             ? rawThoughts
-            : sessionItems.map((e) => e.text)
+            : sessionItems.map((e) => e.originalText ?? e.text)
         }
         entries={sessionItems}
         saveAck={saveAck}
         onAction={handleChoice}
+        onEntriesChanged={refresh}
       />
     );
   }
+
+  const draftLabel = draftStatusLabel(draftStatus);
 
   return (
     <div
@@ -437,6 +442,7 @@ export function ClearMyMindSession({
         inputRef={inputRef}
         shareConfirming={shareConfirming}
         expansive
+        draftStatusLabel={draftLabel}
       />
 
       <div className="clear-my-mind-save-row">

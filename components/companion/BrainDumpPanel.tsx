@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  clearBrainDumpDraft,
   getBrainDumps,
   type BrainDumpEntry,
 } from "@/lib/companionStore";
@@ -96,9 +95,7 @@ export function BrainDumpPanel({
     }
   }, [initialView]);
 
-  useEffect(() => {
-    clearBrainDumpDraft();
-  }, []);
+  // Draft restore is owned by ClearMyMindSession autosave — do not wipe on mount.
 
   useEffect(() => {
     onContextChange?.({

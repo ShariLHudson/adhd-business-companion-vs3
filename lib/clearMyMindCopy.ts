@@ -12,11 +12,27 @@ export const CLEAR_MY_MIND_WORKSPACE_SUBTITLE =
 
 /**
  * Entry greeting — Capture Mode only.
- * Spark does not organize yet; Spark captures.
+ * Capture first. Protect the user’s words. Organize only with permission.
  */
 export const CLEAR_MY_MIND_WELCOME_LINES = [
-  "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.",
+  "Tell me everything that’s on your mind. Nothing has to be organized yet. As you type, I’ll safely capture your thoughts. When you’re finished, I’ll place them into a clear list while preserving your words, and you can quickly adjust anything I separated incorrectly.",
 ] as const;
+
+/** Post-capture reassurance — flat list first, no automatic analysis. */
+export const CLEAR_MY_MIND_CAPTURED_SAFE_TITLE =
+  "Everything Is Safely Captured" as const;
+
+export const CLEAR_MY_MIND_CAPTURED_SAFE_BODY =
+  "I placed your thoughts into a clear list while preserving your words. Nothing has been categorized, prioritized, or turned into a project." as const;
+
+export const CLEAR_MY_MIND_CAPTURED_SAFE_LOOK =
+  "Take a quick look. You can adjust anything I separated incorrectly." as const;
+
+export const CLEAR_MY_MIND_SAVE_FOR_LATER_CONFIRM =
+  "They’re saved. You do not need to decide anything about them right now." as const;
+
+export const CLEAR_MY_MIND_MAKE_SENSE_DEFAULT =
+  "Organizing these by life area may be the easiest way to scan them. You can use that view now or choose a different way." as const;
 
 /** Quiet support while the member is still unloading — never coaching. */
 export const CLEAR_MY_MIND_CAPTURE_SUPPORT_LINES = [
@@ -52,13 +68,13 @@ export const CLEAR_MY_MIND_NEXT_PROMPT =
 
 /** Soft reflection lead after Continue — personal, not a report header. */
 export const CLEAR_MY_MIND_REFLECTION_LEAD =
-  "As I looked through what you shared…" as const;
+  "Everything is safely out of your head now." as const;
 
 export const CLEAR_MY_MIND_NEXT_SECTION =
-  "What would you like to do next?" as const;
+  "What Would Help Most Right Now?" as const;
 
 export const CLEAR_MY_MIND_JOURNAL_LIST_LABEL =
-  "What you shared" as const;
+  "Your thoughts" as const;
 
 export const CLEAR_MY_MIND_SAVED_ACK =
   "Saved to My Thoughts. You can open My Thoughts anytime to find, filter, or print them.";
@@ -73,7 +89,7 @@ export const CLEAR_MY_MIND_EXIT_ANNOUNCE =
   "We've left Clear My Mind for now. Your thoughts are saved whenever you want to return.";
 
 export const CLEAR_MY_MIND_INPUT_PLACEHOLDER =
-  "Type, speak, or paste everything that's on your mind. Use commas or new lines if you like — nothing has to be organized yet.";
+  "Type, speak, or paste everything that’s on your mind. Nothing has to be organized yet — I’ll keep capturing as you go.";
 
 /** Visible Thinking during sort — never loading language. */
 export const CLEAR_MY_MIND_VISIBLE_THINKING_LINES = [

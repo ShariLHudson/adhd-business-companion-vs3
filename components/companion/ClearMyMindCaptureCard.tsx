@@ -16,6 +16,8 @@ type Props = {
   shareConfirming: boolean;
   /** Large writing surface for guided Capture (~65–70% of panel). */
   expansive?: boolean;
+  /** Quiet autosave indicator — Saving… / Saved / error. */
+  draftStatusLabel?: string | null;
 };
 
 export function ClearMyMindCaptureCard({
@@ -26,6 +28,7 @@ export function ClearMyMindCaptureCard({
   inputRef,
   shareConfirming,
   expansive = false,
+  draftStatusLabel = null,
 }: Props) {
   const [supportIndex, setSupportIndex] = useState(0);
 
@@ -79,6 +82,16 @@ export function ClearMyMindCaptureCard({
         {supportLine ? (
           <p className="clear-my-mind-support-line" role="status" aria-live="polite">
             {supportLine}
+          </p>
+        ) : null}
+        {draftStatusLabel ? (
+          <p
+            className="clear-my-mind-draft-status"
+            role="status"
+            aria-live="polite"
+            data-testid="clear-my-mind-draft-status"
+          >
+            {draftStatusLabel}
           </p>
         ) : null}
       </div>

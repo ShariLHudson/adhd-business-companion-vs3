@@ -288,7 +288,7 @@ function workspaceOfferFromEntry(
     "decision-compass": "Decision Compass",
     observatory: "Observatory",
     library: "Library",
-    "creative-studio": "Create",
+    "creative-studio": "Create Studio",
     "growth-journal": "Journal",
     stables: "Stables",
   };
@@ -680,7 +680,7 @@ export function estateDirectCommandArrivalLine(
 ): string {
   const id = roomId ?? entryId;
   if (id === "clear-my-mind" || entryId === "clear-my-mind") {
-    return "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.";
+    return "Tell me everything that’s on your mind. Nothing has to be organized yet. As you type, I’ll safely capture your thoughts. When you’re finished, I’ll place them into a clear list while preserving your words, and you can quickly adjust anything I separated incorrectly.";
   }
   const name = displayNameForCommand(entryId, roomId);
   return `We're in ${name} now.`;

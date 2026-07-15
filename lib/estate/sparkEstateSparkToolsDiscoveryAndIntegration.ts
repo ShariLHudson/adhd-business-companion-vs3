@@ -108,7 +108,7 @@ export const SPARK_ESTATE_CLEAR_MY_MIND_EXPERIENCE_NOTE =
   "The Treehouse Reflection Desk is the environment. Clear My Mind is the experience.";
 
 export const SPARK_ESTATE_CLEAR_MY_MIND_WELCOME =
-  "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.";
+  "Tell me everything that’s on your mind. Nothing has to be organized yet. As you type, I’ll safely capture your thoughts. When you’re finished, I’ll place them into a clear list while preserving your words, and you can quickly adjust anything I separated incorrectly.";
 
 export const SPARK_ESTATE_CLEAR_MY_MIND_FLOW = [
   "Open Treehouse Reflection Desk",

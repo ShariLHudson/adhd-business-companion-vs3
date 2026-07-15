@@ -155,6 +155,11 @@ import {
   resolveEstateGuideTurn,
   shariKnowledgeHintForChat,
 } from "./sparkKnowledge";
+import { isSubstantiveConversationHelpRequest } from "./estate/substantiveConversationHelp";
+import {
+  buildEmailAutomationHelpReply,
+  isEmailAutomationOrInboxHelpRequest,
+} from "./estate/emailAutomationHelp";
 import {
   acceptRestorationStory,
   buildRestorationOffer,
@@ -274,6 +279,16 @@ import {
 } from "./reminderIntelligence";
 import type { ReminderIntakeSession } from "./reminderStore";
 import {
+  classifyRememberIntent,
+  createRhythmFromContent,
+  extractRhythmTitle,
+  isUnsupportedLocationTrigger,
+  needsRememberClarification,
+  parseCadenceFromText,
+  sourceRefFromChat,
+  tryResolveRememberManagementCommand,
+} from "./rhythms";
+import {
   buildEstateArrivalContinuation,
   isEstateTransitionOfferMessage,
   loadEstatePendingTransition,
@@ -338,6 +353,7 @@ import {
   saveImpliedNeedSession,
 } from "./intentAwareConversation/impliedNeedSession";
 import { estateNavigateCommandForPlace } from "./estateIntelligence/estateCommandRouter";
+import { matchEstateRoomHowToGuide } from "./estateRoomGuides";
 import {
   primaryTurnAllowsFrictionlessCategory,
   type PrimaryTurnDecision,
@@ -472,6 +488,8 @@ export type FrictionlessActionDecision = {
     navigationLine: string;
     userText: string;
   };
+  /** Open Chamber / Business Estate How to Use guide after navigating if needed. */
+  immediateEstateHowToGuideOpen?: import("@/lib/estateRoomGuides").EstateHowToGuideId;
   pendingChoiceExecution?: import("@/lib/pendingChoice/frictionlessBridge").PendingChoiceExecution;
   sparkRuntime?: SparkRuntimeAction | null;
 };
@@ -615,7 +633,7 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
     return `Opening **${action.viewTitle}** in Visual Thinking.`;
   }
   if (action.target === "brain-dump") {
-    return "Take your time. Tell me everything that's on your mind. Nothing has to be organized yet. I'll take care of that after you're finished.";
+    return "Tell me everything that’s on your mind. Nothing has to be organized yet. As you type, I’ll safely capture your thoughts. When you’re finished, I’ll place them into a clear list while preserving your words, and you can quickly adjust anything I separated incorrectly.";
   }
   if (action.target === "plan-my-day") {
     return "Let's shape today together in Momentum Builder.";
@@ -1012,6 +1030,115 @@ function buildReminderDecision(
   currentTurn: number,
   input: FrictionlessActionInput,
 ): FrictionlessActionDecision | null {
+  // Deterministic management commands — never wait on AI.
+  const management = tryResolveRememberManagementCommand(userText);
+  if (management) {
+    return {
+      category: "reminder",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: reminderHintForChat(),
+      localReply: management.reply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: null,
+      reminderIntake: null,
+    };
+  }
+
+  // CONV-040: prefer rhythm when the member describes an ongoing pattern.
+  const intent = classifyRememberIntent(userText);
+
+  if (isUnsupportedLocationTrigger(userText)) {
+    return {
+      category: "reminder",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: reminderHintForChat(),
+      localReply:
+        "I can't watch for when you get home yet — but I can set a reminder for a time, or make it a repeating rhythm. Which would help more?",
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: null,
+      reminderIntake: null,
+    };
+  }
+
+  if (needsRememberClarification(userText) && !input.reminderDraft) {
+    return {
+      category: "reminder",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: reminderHintForChat(),
+      localReply:
+        "Would you like a one-time reminder, or a repeating rhythm you can pause anytime?",
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: null,
+      reminderIntake: null,
+    };
+  }
+
+  if (intent === "rhythm" && !input.reminderDraft) {
+    const title = extractRhythmTitle(userText) || "Something to return to";
+    const cadence = parseCadenceFromText(userText);
+    const result = createRhythmFromContent({
+      title,
+      details: userText,
+      cadence: cadence ?? undefined,
+      inferCadenceFromText: userText,
+      source: "conversation",
+      category: "personal",
+      sourceRef: sourceRefFromChat(
+        `turn-${currentTurn}-${title.slice(0, 24)}`,
+        title,
+      ),
+    });
+
+    if (!result.ok && result.reason === "missing_cadence") {
+      return {
+        category: "reminder",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint: reminderHintForChat(),
+        localReply:
+          result.ask ??
+          "Would you like this daily, weekly, or on another rhythm?",
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: null,
+        reminderIntake: null,
+      };
+    }
+
+    if (result.ok) {
+      const reply = result.duplicate
+        ? `You already have an active rhythm for “${result.rhythm.title}.” I left it as-is — say pause, skip, or reschedule if you'd like a change.`
+        : `I've set up a ${result.rhythm.cadence} rhythm for “${result.rhythm.title}.” You can pause, change the timing, or skip a day anytime — no streaks, no guilt.`;
+      return {
+        category: "reminder",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint: reminderHintForChat(),
+        localReply: reply,
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: null,
+        reminderIntake: null,
+      };
+    }
+  }
+
   const outcome = resolveReminderTurn({
     userText,
     draft: input.reminderDraft ?? null,
@@ -1055,6 +1182,12 @@ function tryImpliedNeedFlow(
   const userText = input.userText.trim();
   const currentTurn = input.currentTurn ?? 0;
   if (!userText) return null;
+  if (
+    isSubstantiveConversationHelpRequest(userText) ||
+    isEmailAutomationOrInboxHelpRequest(userText)
+  ) {
+    return null;
+  }
 
   if (
     stabilization &&
@@ -1572,6 +1705,9 @@ function tryEstateGuideFlow(
     !userText ||
     !isEstateGuideQuestion(userText, input.lastAssistantText)
   ) {
+    return null;
+  }
+  if (isSubstantiveConversationHelpRequest(userText)) {
     return null;
   }
   if (
@@ -2697,7 +2833,7 @@ function tryEarlyCompanionSupportFlow(
   const audio = buildAudioPending(userText, currentTurn);
   if (audio) return audio;
 
-  // Cognitive overload / task breakdown win before scenic multi-destination menus.
+  // Cognitive overload wins before scenic / multi-destination overwhelm menus.
   if (
     isCognitiveOverloadNeed(userText) &&
     !shouldDeferEarlyOverwhelmRoute(userText, input.lastAssistantText)
@@ -3190,6 +3326,7 @@ function mapEstateIntelligenceRuntimeToFrictionless(
     immediateResearchOpen: runtime.immediateResearchOpen,
     immediateCreateProjectOpen: runtime.immediateCreateProjectOpen,
     immediateEstatePlaceNavigate: runtime.immediateEstatePlaceNavigate,
+    immediateEstateHowToGuideOpen: runtime.immediateEstateHowToGuideOpen,
   };
 
   if (runtime.universalCreationCategory || runtime.category === "universal_creation") {
@@ -3213,6 +3350,12 @@ function tryEstateHelpDiscoveryFlow(
   input: FrictionlessActionInput,
   stabilization?: ArbitrationResult | null,
 ): FrictionlessActionDecision | null {
+  if (
+    isSubstantiveConversationHelpRequest(userText) ||
+    isEmailAutomationOrInboxHelpRequest(userText)
+  ) {
+    return null;
+  }
   if (
     stabilization &&
     shouldBlockEstateSubsystem(stabilization, "help_discovery_location") &&
@@ -3263,6 +3406,12 @@ function tryEstateRecommendationInvitation(
   currentLocationId?: string,
   stabilization?: ArbitrationResult | null,
 ): FrictionlessActionDecision | null {
+  if (
+    isSubstantiveConversationHelpRequest(userText) ||
+    isEmailAutomationOrInboxHelpRequest(userText)
+  ) {
+    return null;
+  }
   if (
     stabilization &&
     shouldBlockEstateSubsystem(stabilization, "recommendation")
@@ -3584,6 +3733,23 @@ function resolveFrictionlessActionImpl(
 
   const stabilization = routingPipeline.arbitration;
 
+  const estateRoomHowTo = matchEstateRoomHowToGuide(userText);
+  if (estateRoomHowTo) {
+    return finish({
+      category: "estate_concierge",
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: "Estate How to Use guide",
+      localReply: estateRoomHowTo.shariReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      immediateEstateHowToGuideOpen: estateRoomHowTo.guideId,
+    });
+  }
+
   if (isConversationStabilizationEnabled() && routingPipeline.fastPath) {
     return finish(
       tryConversationStabilizationFlow(
@@ -3612,8 +3778,7 @@ function resolveFrictionlessActionImpl(
     return finish(visualRecommendationBeforeEstate);
   }
 
-  if (
-    EMOTIONAL_REGULATION_RE.test(userText) &&
+  if (EMOTIONAL_REGULATION_RE.test(userText) &&
     !PRODUCTIVITY_FRAMING_RE.test(userText)
   ) {
     return finish(buildEmotionalRegulationDecision(userText, currentTurn));
@@ -3697,6 +3862,23 @@ function resolveFrictionlessActionImpl(
 
   if (isDifficultClientCallRequest(userText)) {
     return buildDifficultClientCallDecision(userText, currentTurn, routing);
+  }
+
+  const emailAutomationReply = buildEmailAutomationHelpReply(userText);
+  if (emailAutomationReply) {
+    return {
+      category: "none",
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "EMAIL_AUTOMATION_HELP: Stay in conversation — never Create write-email or room menus.",
+      localReply: emailAutomationReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
   }
 
   const emotionalCanonFlow = tryEmotionalCanonFlow(input, routing, sparkRuntime);
