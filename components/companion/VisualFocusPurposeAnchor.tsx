@@ -24,13 +24,16 @@ export function VisualFocusPurposeAnchor({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="visual-focus-purpose-anchor-title"
+      role="presentation"
       data-testid="visual-focus-purpose-anchor"
+      onClick={onCancel}
     >
       <form
         className="w-full max-w-md rounded-2xl border border-[#e7dfd4] bg-white p-6 shadow-lg"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="visual-focus-purpose-anchor-title"
+        onClick={(e) => e.stopPropagation()}
         onSubmit={(e) => {
           e.preventDefault();
           const answer = new FormData(e.currentTarget).get("purpose") as string;

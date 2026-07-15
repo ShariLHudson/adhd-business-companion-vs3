@@ -14,6 +14,7 @@ import {
 } from "@/lib/executionReceipts";
 import { ProjectPickerModal } from "@/components/companion/ProjectPickerModal";
 import type { Project } from "@/lib/companionStore";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 export function DecisionCompassSaveModal({
   open,
@@ -27,6 +28,10 @@ export function DecisionCompassSaveModal({
   onReceipt: (message: string) => void;
 }) {
   const [pickerOpen, setPickerOpen] = useState(false);
+  const { onBackdropClick } = useDismissibleWindow({
+    open: open && !pickerOpen,
+    onClose,
+  });
 
   if (!open) return null;
 
@@ -71,11 +76,14 @@ export function DecisionCompassSaveModal({
       <div
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
         data-testid="decision-compass-save-modal"
+        role="presentation"
+        onClick={() => onBackdropClick()}
       >
         <div
           className="w-full max-w-md rounded-2xl border border-[#e7dfd4] bg-[#faf7f2] p-5 shadow-xl"
           role="dialog"
           aria-label="Save decision"
+          onClick={(e) => e.stopPropagation()}
         >
           <p className="text-lg font-semibold text-[#1f1c19]">Save Decision</p>
           <p className="mt-1 text-sm text-[#6b635a]">

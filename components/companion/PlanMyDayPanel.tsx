@@ -899,7 +899,7 @@ export function PlanMyDayPanel({
 
   if (standalone) {
     return (
-      <PlanMyDayMorningRoomShell>
+      <PlanMyDayMorningRoomShell onOutsideDismiss={() => onBack?.()}>
         {renderPanelBody()}
       </PlanMyDayMorningRoomShell>
     );

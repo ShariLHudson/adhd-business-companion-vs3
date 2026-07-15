@@ -4,24 +4,27 @@ import { useEffect, type ReactNode } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
 import { HomesteadRoomSignatureMotion } from "@/components/companion/homesteadRoom/HomesteadRoomSignatureMotion";
 import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
+import { handleMorningRoomOutsideClick } from "@/lib/planMyDay/morningRoomOutsideDismiss";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 
 type Props = {
   children: ReactNode;
+  /** Click the photo / padding outside the frosted workspace to leave. */
+  onOutsideDismiss?: () => void;
 };
 
 /**
  * Estate Parking Lot room — warm study backdrop (existing morning/study asset).
  */
-export function ParkingLotRoomShell({ children }: Props) {
+export function ParkingLotRoomShell({ children, onOutsideDismiss }: Props) {
   useEffect(() => {
     preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
   }, []);
 
   return (
     <div
-      className="plan-my-day-morning-room"
+      className="plan-my-day-morning-room h-full min-h-0"
       data-testid="parking-lot-room"
       data-homestead-room="study"
     >
@@ -33,9 +36,21 @@ export function ParkingLotRoomShell({ children }: Props) {
         className="plan-my-day-morning-room__cinematic"
       />
       <HomesteadRoomSignatureMotion roomId="study" />
-      <div className="plan-my-day-morning-room__scroll">
+      <div
+        className="plan-my-day-morning-room__scroll"
+        role="presentation"
+        title={
+          onOutsideDismiss
+            ? "Click outside the panel to go back"
+            : undefined
+        }
+        onClick={(e) => handleMorningRoomOutsideClick(e, onOutsideDismiss)}
+      >
         <div className="plan-my-day-morning-room__center">
-          <div className="plan-my-day-morning-room__workspace plan-my-day-morning-room__workspace--room-list">
+          <div
+            className="plan-my-day-morning-room__workspace plan-my-day-morning-room__workspace--room-list"
+            data-morning-room-workspace
+          >
             {children}
           </div>
         </div>

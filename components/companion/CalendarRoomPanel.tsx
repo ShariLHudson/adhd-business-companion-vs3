@@ -55,7 +55,7 @@ export function CalendarRoomPanel({
   }, [registerBack]);
 
   return (
-    <CalendarRoomShell>
+    <CalendarRoomShell onOutsideDismiss={onBack}>
       <div
         className="plan-day-morning-note"
         data-testid="calendar-room-panel"

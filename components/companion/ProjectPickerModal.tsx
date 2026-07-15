@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { getProjects, saveProject, type Project } from "@/lib/companionStore";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 export function ProjectPickerModal({
   open,
@@ -22,6 +23,11 @@ export function ProjectPickerModal({
   const [projects, setProjects] = useState<Project[]>(() => getProjects());
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
+  const { onBackdropClick } = useDismissibleWindow({
+    open,
+    onClose,
+    isDirty: creating && newName.trim().length > 0,
+  });
 
   if (!open) return null;
 
@@ -56,11 +62,16 @@ export function ProjectPickerModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4"
+      role="presentation"
+      onClick={() => onBackdropClick()}
+    >
       <div
         className="max-h-[80vh] w-full max-w-md overflow-hidden rounded-2xl border border-[#e7dfd4] bg-[#faf7f2] shadow-xl"
         role="dialog"
         aria-label="Choose a project"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="border-b border-[#e7dfd4] px-4 py-3">
           <p className="text-lg font-semibold text-[#1f1c19]">Add to Project</p>

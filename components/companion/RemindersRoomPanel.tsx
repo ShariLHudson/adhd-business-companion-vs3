@@ -470,7 +470,7 @@ export function RemindersRoomPanel({
   }
 
   return (
-    <RemindersRoomShell>
+    <RemindersRoomShell onOutsideDismiss={onBack}>
       <div
         className="plan-day-morning-note flex flex-col gap-2 pb-10"
         data-testid="reminders-room-panel"

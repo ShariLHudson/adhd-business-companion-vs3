@@ -709,7 +709,7 @@ export function RhythmsRoomPanel({
   }
 
   return (
-    <RhythmsRoomShell>
+    <RhythmsRoomShell onOutsideDismiss={onBack}>
       <div
         className="plan-day-morning-note flex flex-col gap-2 pb-10"
         data-testid="rhythms-room-panel"

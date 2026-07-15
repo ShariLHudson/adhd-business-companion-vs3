@@ -296,7 +296,7 @@ export function ParkingLotRoomPanel({
   }
 
   return (
-    <ParkingLotRoomShell>
+    <ParkingLotRoomShell onOutsideDismiss={onBack}>
       <div
         className="plan-day-morning-note flex flex-col gap-2 pb-10"
         data-testid="parking-lot-room-panel"
