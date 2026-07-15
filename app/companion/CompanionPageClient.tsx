@@ -12822,6 +12822,36 @@ export default function CompanionPageClient() {
       if (continuityGate.clearUniversalCreation) {
         clearUniversalCreationSession();
       }
+      // Authoritative correction — acknowledge once, never resume the rejected workflow.
+      if (
+        continuityGate.reason === "workflow_correction" &&
+        continuityGate.correctionAck
+      ) {
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        const wantsEvent =
+          /\b(?:online event|virtual event|webinar|create(?: an?)? event)\b/i.test(
+            trimmed,
+          );
+        const followUp = wantsEvent
+          ? `${continuityGate.correctionAck}\n\nWhat kind of online event are you creating?`
+          : continuityGate.correctionAck;
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: followUp },
+        ]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (!getPrefs().hasChatted) {
+          savePrefs({ hasChatted: true });
+          setHasChatted(true);
+        }
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
     }
 
     if (continuityGate.action === "destination") {

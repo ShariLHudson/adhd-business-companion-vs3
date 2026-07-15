@@ -24,6 +24,7 @@ import type {
 import type { ConversationOwner } from "./types";
 import { persistConversationOwner } from "./ownerStore";
 import { describeOwnerForRecovery } from "./describeOwnerForRecovery";
+import { wasRecoveryReplyJustRejected } from "./workflowCorrection";
 
 export type OwnerTurnRouteResult =
   | {
@@ -99,13 +100,18 @@ export function routeTurnToOwner(
       if (!session) {
         return { kind: "unhandled", reason: "uc_session_missing" };
       }
+      const recovery = describeOwnerForRecovery(owner);
+      // Never repeat a recovery line the member already rejected.
+      if (wasRecoveryReplyJustRejected(recovery)) {
+        return { kind: "unhandled", reason: "rejected_recovery_repeat" };
+      }
       return {
         kind: "universal_creation",
-        reply: describeOwnerForRecovery(owner),
+        reply: recovery,
         session,
         turn: {
           kind: "message",
-          message: describeOwnerForRecovery(owner),
+          message: recovery,
           session,
         },
       };

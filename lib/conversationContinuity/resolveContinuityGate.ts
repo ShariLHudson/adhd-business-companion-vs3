@@ -14,6 +14,11 @@ import {
 import type { ConversationOwner, ResolveActiveOwnerInput } from "./types";
 import { routeTurnToOwner, type OwnerTurnRouteResult } from "./routeTurnToOwner";
 import { clearUniversalCreationSession } from "@/lib/universalCreation";
+import {
+  clearRejectedRecoveryReply,
+  detectWorkflowCorrection,
+  rememberRejectedRecoveryReply,
+} from "./workflowCorrection";
 
 export type ContinuityGateDecision =
   | {
@@ -23,9 +28,14 @@ export type ContinuityGateDecision =
     }
   | {
       action: "clear_owner_continue";
-      reason: "explicit_exit" | "explicit_task_change";
+      reason:
+        | "explicit_exit"
+        | "explicit_task_change"
+        | "workflow_correction";
       /** Clear Universal Creation when exiting a create owner. */
       clearUniversalCreation: boolean;
+      /** One-time correction acknowledgment when clearing a misunderstood workflow. */
+      correctionAck?: string;
     }
   | {
       action: "destination";
@@ -62,10 +72,30 @@ export function resolveContinuityTurnGate(
       owner.kind === "guided_workflow" || owner.kind === "artifact";
     clearConversationOwner();
     if (clearUc) clearUniversalCreationSession();
+    clearRejectedRecoveryReply();
     return {
       action: "clear_owner_continue",
       reason: "explicit_exit",
       clearUniversalCreation: clearUc,
+    };
+  }
+
+  const correction = detectWorkflowCorrection(userText, owner);
+  if (correction.isCorrection) {
+    const rejectedRecovery =
+      owner.kind === "guided_workflow"
+        ? `We were creating your ${owner.workflowType}. Let's continue from where we left off.`
+        : owner.kind === "artifact"
+          ? `We were creating your ${owner.artifactType}. Let's continue from where we left off.`
+          : "We were creating your document. Let's continue from where we left off.";
+    rememberRejectedRecoveryReply(rejectedRecovery);
+    clearConversationOwner();
+    clearUniversalCreationSession();
+    return {
+      action: "clear_owner_continue",
+      reason: "workflow_correction",
+      clearUniversalCreation: true,
+      correctionAck: correction.ack,
     };
   }
 
