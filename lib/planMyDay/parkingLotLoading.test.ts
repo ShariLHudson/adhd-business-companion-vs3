@@ -25,7 +25,19 @@ describe("Parking Lot loading states", () => {
       "utf8",
     );
     expect(panel).toContain("Your Parking Lot is empty");
+    expect(panel).toContain("Anything you set aside will wait");
     expect(panel).toContain('data-testid="parking-lot-empty"');
     expect(panel).toContain("Return to Welcome Home");
+  });
+
+  it("includes error + retry states so loading cannot stay permanent", () => {
+    const panel = readFileSync(
+      resolve(process.cwd(), "components/companion/ParkingLotRoomPanel.tsx"),
+      "utf8",
+    );
+    expect(panel).toContain('data-testid="parking-lot-error"');
+    expect(panel).toContain("Try Again");
+    expect(panel).toContain("I couldn’t load your Parking Lot just now.");
+    expect(panel).toContain("4000");
   });
 });

@@ -259,15 +259,32 @@ export function ParkingLotRoomPanel({
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
 }) {
-  const [tick, setTick] = useState(0);
   const [text, setText] = useState("");
-  const refresh = useCallback(() => setTick((n) => n + 1), []);
+  const [items, setItems] = useState<PlanDayItem[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadState, setLoadState] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+
+  const loadItems = useCallback(() => {
+    try {
+      const next = readPlanningParkingLotItems();
+      setItems(next);
+      setLoadError(null);
+      setLoadState("ready");
+    } catch {
+      setItems([]);
+      setLoadError("I couldn’t load your Parking Lot just now.");
+      setLoadState("error");
+    }
+  }, []);
 
   useEffect(() => {
-    const onUpdate = () => refresh();
+    loadItems();
+    const onUpdate = () => loadItems();
     window.addEventListener(PLAN_MY_DAY_UPDATED, onUpdate);
     return () => window.removeEventListener(PLAN_MY_DAY_UPDATED, onUpdate);
-  }, [refresh]);
+  }, [loadItems]);
 
   useEffect(() => {
     if (!registerBack) return;
@@ -278,15 +295,30 @@ export function ParkingLotRoomPanel({
     return () => registerBack(null);
   }, [registerBack, onBack]);
 
-  void tick;
-  const items = readPlanningParkingLotItems();
+  // Failsafe — loading must never remain permanent.
+  useEffect(() => {
+    if (loadState !== "loading") return;
+    const failsafe = window.setTimeout(() => {
+      setLoadState((current) => {
+        if (current !== "loading") return current;
+        setLoadError("I couldn’t load your Parking Lot just now.");
+        return "error";
+      });
+    }, 4000);
+    return () => window.clearTimeout(failsafe);
+  }, [loadState]);
 
   function parkIt() {
     const trimmed = text.trim();
     if (!trimmed) return;
-    addParkingLotItem({ title: trimmed, source: "manual" });
-    setText("");
-    refresh();
+    try {
+      addParkingLotItem({ title: trimmed, source: "manual" });
+      setText("");
+      loadItems();
+    } catch {
+      setLoadError("I couldn’t load your Parking Lot just now.");
+      setLoadState("error");
+    }
   }
 
   function focusAdd() {
@@ -357,14 +389,51 @@ export function ParkingLotRoomPanel({
           <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
             Parked Items
           </h2>
-          {items.length === 0 ? (
+          {loadState === "loading" ? (
+            <p
+              className="text-base text-[#6b635a]"
+              data-testid="parking-lot-loading"
+            >
+              Loading Parking Lot…
+            </p>
+          ) : loadState === "error" ? (
+            <div
+              className="rounded-2xl border border-dashed border-[#d4cdc3] bg-white/70 px-4 py-6"
+              data-testid="parking-lot-error"
+            >
+              <p className="text-base text-[#6b635a]">
+                {loadError ?? "I couldn’t load your Parking Lot just now."}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={BTN_PRIMARY}
+                  onClick={() => {
+                    setLoadState("loading");
+                    loadItems();
+                  }}
+                  data-testid="parking-lot-retry"
+                >
+                  Try Again
+                </button>
+                <button
+                  type="button"
+                  className={BTN_SECONDARY}
+                  onClick={onBack}
+                  data-testid="parking-lot-error-return"
+                >
+                  Return to Welcome Home
+                </button>
+              </div>
+            </div>
+          ) : items.length === 0 ? (
             <div
               className="rounded-2xl border border-dashed border-[#d4cdc3] bg-white/70 px-4 py-6"
               data-testid="parking-lot-empty"
             >
               <p className="text-base text-[#6b635a]">
-                Your Parking Lot is empty. Ideas and tasks you set aside will
-                wait here until you are ready.
+                Your Parking Lot is empty. Anything you set aside will wait
+                here until you are ready.
               </p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <button
@@ -391,7 +460,7 @@ export function ParkingLotRoomPanel({
                 <ParkedItemRow
                   key={item.id}
                   item={item}
-                  onChanged={refresh}
+                  onChanged={loadItems}
                 />
               ))}
             </ul>
