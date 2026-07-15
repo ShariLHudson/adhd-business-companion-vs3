@@ -17,15 +17,15 @@ import {
 import { buildThemeSummary } from "@/lib/brainDumpClusterModel";
 
 const SIX_ITEMS =
-  "buy groceries, plan mom's birthday, email Kerry, finish proposal, order supplies, schedule appointment";
+  "finish quarterly report, call dentist, pay rent, buy groceries, respond to client emails, plan mom's birthday";
 
 const EXPECTED = [
+  "finish quarterly report",
+  "call dentist",
+  "pay rent",
   "buy groceries",
+  "respond to client emails",
   "plan mom's birthday",
-  "email Kerry",
-  "finish proposal",
-  "order supplies",
-  "schedule appointment",
 ] as const;
 
 describe("Clear My Mind text integrity", () => {
