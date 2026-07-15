@@ -48,22 +48,26 @@ export function evaluateWelcomeHomeExperience(
   input: ExperienceEngineInput,
 ): WelcomeHomeExperiencePlan {
   const repeatLogin = Boolean(input.isRepeatLogin);
+  const replayRequested = Boolean(input.replayRequested);
+  /** Completion or a later login — never auto-open Shari's welcome again. */
   const introAlreadySeen = input.hasSeenWelcomeIntro || repeatLogin;
 
-  const visitorKind: ExperienceVisitorKind = input.replayRequested
+  const visitorKind: ExperienceVisitorKind = replayRequested
     ? "replay"
     : introAlreadySeen
       ? "returning"
       : "first_visit";
 
+  /**
+   * Auto-open only on the true first visit.
+   * Manual replay always opens the welcome again without clearing completion.
+   */
   const showIntro =
     !isCompanionDevFastPath() &&
-    !introAlreadySeen &&
-    !repeatLogin &&
-    (visitorKind === "first_visit" || visitorKind === "replay");
+    (replayRequested || (!introAlreadySeen && !repeatLogin));
 
   const greeting =
-    visitorKind === "first_visit"
+    visitorKind === "first_visit" || visitorKind === "replay"
       ? null
       : resolveWelcomeHomeDailyGreeting({
           isFirstVisit: false,

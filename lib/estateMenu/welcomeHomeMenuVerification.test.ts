@@ -23,6 +23,7 @@ import {
 const VISIBLE_TOP_LABELS = [
   "Conversations",
   "Settings",
+  "Listen to Shari's Welcome",
   "Profile",
   "Logout",
 ] as const;
@@ -31,6 +32,7 @@ const VISIBLE_ACTION_IDS: EstateMenuActionId[] = [
   "start-new-conversation",
   "start-new-day-conversation",
   "settings",
+  "replay-welcome",
   "my-profile",
   "people-i-help",
   "log-out",
@@ -65,7 +67,6 @@ function readLayoutCss(): string {
   );
 }
 
-
 function readRoomMenuSource(): string {
   return readFileSync(
     resolve(process.cwd(), "components/companion/estate/EstateRoomExperienceMenu.tsx"),
@@ -74,7 +75,7 @@ function readRoomMenuSource(): string {
 }
 
 describe("Welcome Home menu — visibility", () => {
-  it("shows only Conversations, Settings, Profile, Logout", () => {
+  it("shows Conversations, Settings, Listen to Shari's Welcome, Profile, Logout", () => {
     expect(ESTATE_MENU_DROPDOWN_ENTRIES.map((e) => e.label)).toEqual([
       ...VISIBLE_TOP_LABELS,
     ]);
@@ -109,7 +110,7 @@ describe("Welcome Home menu — visibility", () => {
     }
   });
 
-  it("exposes exactly the five working clickable actions", () => {
+  it("exposes the working clickable actions including welcome replay", () => {
     expect(ESTATE_MENU_DROPDOWN_ITEMS.map((i) => i.id)).toEqual(
       VISIBLE_ACTION_IDS,
     );
@@ -130,7 +131,6 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(
       /function requestClearTodayContext\(\)\s*\{[\s\S]*?NEW_CONVERSATION_GREETING/,
     );
-    // No explanation dialog for Conversations → New Chat
     expect(source).not.toMatch(
       /function requestClearTodayContext\(\)\s*\{\s*setFreshStartDialog\("clear-context"\)/,
     );
@@ -143,7 +143,6 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(
       /function requestBeginNewDay\(\)\s*\{[\s\S]*?beginNewDay\(preserveRoom\)/,
     );
-    // No explanation dialog for Conversations → New Day Chat
     expect(source).not.toMatch(
       /function requestBeginNewDay\(\)\s*\{\s*setFreshStartDialog\("begin-new-day"\)/,
     );
@@ -155,18 +154,25 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
+  it("Listen to Shari's Welcome replays without clearing first-visit completion", () => {
+    expect(source).toMatch(/actionId === "replay-welcome"/);
+    expect(source).toMatch(/requestWelcomeHomeReplay\(\)/);
+    expect(source).toMatch(
+      /returnToWelcomeHomeLobby\("listen to shari welcome"\)/,
+    );
+  });
+
   it("Profile opens My Business Estate via profile destination resolver", () => {
     expect(source).toMatch(/openProfileDestinationCore\("my-business-estate"\)/);
-    expect(source).toMatch(/<MyBusinessEstatePanel/);
+    expect(source).toMatch(/<ProfileDestinationHost/);
     expect(source).toMatch(/setOverlay\("profile"\)/);
   });
 
   it("People I Help opens via profile destination resolver", () => {
     expect(source).toMatch(/openProfileDestinationCore\("people-i-help"\)/);
-    expect(source).toMatch(/<PeopleIHelpPanel/);
+    expect(source).toMatch(/<ProfileDestinationHost/);
     expect(source).toMatch(/setOverlay\("people-i-help"\)/);
   });
-
 
   it("room menu nests Peaceful Places above Soundscapes under Experiences", () => {
     expect(roomMenuSource).toMatch(/PEACEFUL_PLACES_MUSIC_TRACKS/);
@@ -182,6 +188,27 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(
       /const handleEstateLogOut = useCallback\(async \(\) => \{[\s\S]*?signOut\(\)[\s\S]*?router\.push\("\/companion\/login\?signedOut=1"\)/,
     );
+  });
+
+  it("Return to Estate / Back To Estate always opens Welcome Home lobby", () => {
+    expect(source).toContain("onBackToEstate={navigateBackToEstateHome}");
+    expect(source).toContain(
+      'returnToWelcomeHomeLobby("back to estate")',
+    );
+    expect(source).toContain('setCurrentRoom("welcome-home")');
+    expect(source).toContain("estateSectionNavEpochRef.current += 1");
+    expect(source).toContain("skipSectionRestore: true");
+    expect(source).toContain("clearRoomBackdropOverride(\"welcome-home\")");
+    expect(source).toContain("const welcomeHomePlate = WELCOME_ROOM_ASSET");
+    expect(source).toContain("force: true");
+    expect(source).toContain(
+      "if (isEstateHomeDestination(workspacePanelBackLabel))",
+    );
+    expect(source).toMatch(
+      /const handleCompanionBack = \(\) => \{\s*\/\/[^\n]*\s*navigateBackToEstateHome\(\);\s*\}/,
+    );
+    expect(roomMenuSource).toContain('data-testid="estate-return-to-estate"');
+    expect(roomMenuSource).toContain("closeAndRun(onBackToEstate)");
   });
 });
 

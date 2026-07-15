@@ -278,16 +278,18 @@ export function ProfilePanel({
           type="button"
           onClick={() => requestWelcomeHomeReplay()}
           className={linkBtn}
+          data-testid="listen-to-sharis-welcome"
         >
           <span aria-hidden="true" className="text-xl">
-            🏡
+            🎧
           </span>
           <span>
             <span className="block text-base font-semibold text-[#1f1c19]">
-              Replay Shari&apos;s Welcome
+              Listen to Shari&apos;s Welcome
             </span>
             <span className="block text-sm text-[#6b635a]">
-              Hear the Welcome Home arrival again — without resetting first login.
+              Replay the welcome conversation anytime — it will not open on its
+              own again.
             </span>
           </span>
         </button>

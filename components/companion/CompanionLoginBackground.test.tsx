@@ -29,11 +29,11 @@ describe("CompanionLoginBackground", () => {
     return container.querySelector("[data-testid='companion-login-scene']");
   }
 
-  it("renders welcome-home-front-door with uniform full exposure", () => {
+  it("renders welcome-to-spark-estate with uniform full exposure", () => {
     render();
     expect(scene()).toBeTruthy();
     expect(scene()?.getAttribute("data-login-background")).toBe(
-      "welcome-home-front-door",
+      "welcome-to-spark-estate",
     );
     expect(scene()?.classList.contains("companion-login-scene--full-exposure")).toBe(
       true,

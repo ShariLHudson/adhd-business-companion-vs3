@@ -3,6 +3,7 @@ import path from "path";
 import { describe, expect, it } from "vitest";
 import {
   COMPANION_LOGIN_BACKGROUND,
+  COMPANION_LOGIN_BACKGROUND_PATH,
   COMPANION_LOGIN_FORGOT_PASSWORD_LABEL,
   COMPANION_LOGIN_LOGO,
   COMPANION_LOGIN_OPENING_MESSAGE,
@@ -10,18 +11,36 @@ import {
   companionLoginHeadline,
   companionLoginSubtext,
 } from "./companionLoginPage";
+import { WELCOME_HOME_BACKGROUND } from "@/lib/welcomeRoom/types";
 
 describe("companion login page", () => {
-  it("uses login welcome background asset", () => {
-    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/\/backgrounds\/welcome-home-front-door\.png\?v=/);
+  it("uses Welcome to Spark Estate login background with uppercase PNG", () => {
+    expect(COMPANION_LOGIN_BACKGROUND_PATH).toBe(
+      "/backgrounds/welcome-to-spark-estate-background.PNG",
+    );
+    expect(COMPANION_LOGIN_BACKGROUND).toMatch(
+      /\/backgrounds\/welcome-to-spark-estate-background\.PNG\?v=/,
+    );
+    expect(COMPANION_LOGIN_BACKGROUND).not.toMatch(/welcome-home-background/i);
+    expect(COMPANION_LOGIN_BACKGROUND).not.toMatch(/welcome-home-front-door/i);
   });
 
-  it("ships welcome-home-front-door background file", () => {
+  it("ships welcome-to-spark-estate-background.PNG file", () => {
     expect(
       fs.existsSync(
-        path.join(process.cwd(), "public/backgrounds/welcome-home-front-door.png"),
+        path.join(
+          process.cwd(),
+          "public/backgrounds/welcome-to-spark-estate-background.PNG",
+        ),
       ),
     ).toBe(true);
+  });
+
+  it("keeps login background separate from Welcome Home lobby art", () => {
+    expect(WELCOME_HOME_BACKGROUND).toMatch(/welcome-home-background\.png/);
+    expect(COMPANION_LOGIN_BACKGROUND).not.toContain(
+      "welcome-home-background.png",
+    );
   });
 
   it("uses official transparent brand logo", () => {

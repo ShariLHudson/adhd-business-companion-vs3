@@ -71,7 +71,11 @@ export type ProfileEstateMenuActionId =
 /** Estate menu actions handled in the shell switch (after memory + profile routes). */
 export type EstateMenuShellActionId = Exclude<
   EstateMenuActionId,
-  ProfileEstateMenuActionId | "memory-library" | "journal"
+  | ProfileEstateMenuActionId
+  | "memory-library"
+  | "journal"
+  | "people-i-help"
+  | "replay-welcome"
 >;
 
 const MENU_ACTION_TO_ROOM: Record<

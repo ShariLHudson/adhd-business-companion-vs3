@@ -134,6 +134,7 @@ export const SPARK_ESTATE_PROFILE_MENU_ITEMS: readonly {
 }[] = [
   { id: "conversations", label: "Conversations" },
   { id: "settings", label: "Settings" },
+  { id: "replay-welcome", label: "Listen to Shari's Welcome" },
   { id: "profile", label: "Profile" },
   { id: "log-out", label: "Logout" },
 ];

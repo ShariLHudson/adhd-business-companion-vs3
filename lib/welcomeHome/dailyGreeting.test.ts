@@ -43,4 +43,15 @@ describe("evaluateWelcomeHomeExperience", () => {
     expect(plan.showIntro).toBe(false);
     expect(plan.visitorKind).toBe("returning");
   });
+
+  it("manual replay opens the welcome after first visit completion", () => {
+    const plan = evaluateWelcomeHomeExperience({
+      hasSeenWelcomeIntro: true,
+      isRepeatLogin: true,
+      replayRequested: true,
+    });
+    expect(plan.visitorKind).toBe("replay");
+    expect(plan.showIntro).toBe(true);
+    expect(plan.greeting).toBeNull();
+  });
 });

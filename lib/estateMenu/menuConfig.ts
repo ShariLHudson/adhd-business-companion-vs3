@@ -30,6 +30,7 @@ export const ESTATE_MENU_ACTION_IDS = [
   "start-new-conversation",
   "start-new-day-conversation",
   "settings",
+  "replay-welcome",
   "notifications",
   "voice-settings",
   "log-out",
@@ -57,7 +58,7 @@ export type EstateMenuDropdownEntry =
 
 /**
  * Profile initials menu — working member-facing choices only.
- * Order: Conversations → Settings → Profile (nested) → Logout.
+ * Order: Conversations → Settings → Listen to Shari's Welcome → Profile → Logout.
  */
 export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = [
   {
@@ -83,6 +84,12 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
     id: "settings",
     emoji: "⚙️",
     label: "Settings",
+  },
+  {
+    kind: "item",
+    id: "replay-welcome",
+    emoji: "🎧",
+    label: "Listen to Shari's Welcome",
   },
   {
     kind: "group",

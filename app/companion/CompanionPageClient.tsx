@@ -789,6 +789,7 @@ import {
   markChatAssistantAudioElement,
   markWelcomeIntroSeen,
   peekWelcomeHomeReplayRequested,
+  requestWelcomeHomeReplay,
   resolveWelcomeHomeDailyChoices,
   WELCOME_HOME_DISCOVERY_KEY_DELAY_MS,
   type WelcomeHomeDailyChoiceId,
@@ -9721,6 +9722,13 @@ export default function CompanionPageClient() {
 
     if (actionId === "my-profile") {
       openProfileDestinationCore("my-business-estate");
+      return;
+    }
+
+    if (actionId === "replay-welcome") {
+      requestWelcomeHomeReplay();
+      returnToWelcomeHomeLobby("listen to shari welcome");
+      setWelcomeHomeReplay(true);
       return;
     }
 

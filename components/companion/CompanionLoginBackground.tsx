@@ -3,11 +3,11 @@
 import { COMPANION_LOGIN_BACKGROUND } from "@/lib/companionLoginPage";
 
 type Props = {
-  /** Full-bleed estate front doors — threshold into Welcome Home (not porch portrait). */
+  /** Full-bleed Welcome to Spark Estate threshold (not Welcome Home lobby). */
   fullExposure?: boolean;
 };
 
-/** Full-viewport login — estate front doors into Welcome Home. */
+/** Full-viewport login / account-access background. */
 export function CompanionLoginBackground({ fullExposure = true }: Props) {
   if (!fullExposure) {
     return null;
@@ -18,7 +18,7 @@ export function CompanionLoginBackground({ fullExposure = true }: Props) {
       className="companion-login-scene companion-login-scene--full-exposure pointer-events-none absolute inset-0 z-0"
       data-testid="companion-login-scene"
       data-login-exposure="full"
-      data-login-background="welcome-home-front-door"
+      data-login-background="welcome-to-spark-estate"
       aria-hidden
     >
       <div className="companion-login-scene__photo">

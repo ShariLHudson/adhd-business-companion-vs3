@@ -15,17 +15,18 @@ describe("welcome home guidebook vs login assets", () => {
       "/Spark Estate Guidebook/welcome-home-front-door-guidebook.png",
     );
     expect(WELCOME_HOME_LOGIN_BACKGROUND).toBe(
-      "/backgrounds/welcome-home-front-door.png",
+      "/backgrounds/welcome-to-spark-estate-background.PNG",
     );
     expect(WELCOME_HOME_GUIDEBOOK_PLATE).not.toBe(WELCOME_HOME_LOGIN_BACKGROUND);
     expect(COMPANION_LOGIN_BACKGROUND).toContain(WELCOME_HOME_LOGIN_BACKGROUND);
     expect(COMPANION_LOGIN_BACKGROUND).not.toContain("guidebook");
+    expect(COMPANION_LOGIN_BACKGROUND).not.toMatch(/welcome-home-background\.png/);
   });
 
   it("ships both files without sharing one blob", () => {
     const loginPath = path.join(
       process.cwd(),
-      "public/backgrounds/welcome-home-front-door.png",
+      "public/backgrounds/welcome-to-spark-estate-background.PNG",
     );
     const guidePath = path.join(
       process.cwd(),

@@ -2,12 +2,18 @@
  * Companion login page — copy and asset constants.
  */
 
-/** Bump when `welcome-home-front-door.png` is replaced so browsers fetch the fresh file. */
-export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260705a" as const;
+/** Bump when the login threshold image is replaced so browsers fetch the fresh file. */
+export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260715a" as const;
 
-/** Estate front doors into Welcome Home — no porch portrait, no interior desk scene. */
+/**
+ * Login / account-access threshold — Welcome to Spark Estate.
+ * Preserve uppercase `.PNG` exactly. Do not reuse Welcome Home lobby art.
+ */
+export const COMPANION_LOGIN_BACKGROUND_PATH =
+  "/backgrounds/welcome-to-spark-estate-background.PNG" as const;
+
 export const COMPANION_LOGIN_BACKGROUND =
-  `/backgrounds/welcome-home-front-door.png?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
+  `${COMPANION_LOGIN_BACKGROUND_PATH}?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
 
 /** Official Spark Studio Companions logo — transparent background. */
 export const COMPANION_LOGIN_LOGO =
