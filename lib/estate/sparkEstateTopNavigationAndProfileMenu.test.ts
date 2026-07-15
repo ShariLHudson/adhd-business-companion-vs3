@@ -3,14 +3,15 @@ import { describe, expect, it } from "vitest";
 import {
   assessRoomButtonManifestAlignment,
   formatSparkEstateTopNavigationReport,
+  SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS,
   SPARK_ESTATE_PROFILE_MENU_ITEMS,
+  SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS,
   SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS,
   SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS,
   SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS,
   SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS,
   SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS,
   SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS,
-  SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS,
   SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS,
   SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS,
   SPARK_ESTATE_ROOM_MENU_SECTIONS,
@@ -28,40 +29,35 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(verification.wanderManifestRuleReady).toBe(true);
   });
 
-  it("aligns profile menu items with the working Welcome Home menu", () => {
+  it("aligns profile menu with Experience Controls under SH", () => {
     expect(SPARK_ESTATE_PROFILE_MENU_ITEMS.map((item) => item.label)).toEqual([
       "Conversations",
+      "My Spark Estate",
+      "Experience Controls",
       "Settings",
-      "Profile",
-      "Logout",
+      "Sign Out",
     ]);
+    expect(SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS.length).toBeGreaterThanOrEqual(8);
   });
 
-  it("documents Welcome Home room menu sections and exclusions", () => {
+  it("documents Welcome Home as five categories without Experience Controls", () => {
     expect(SPARK_ESTATE_ROOM_MENU_SECTIONS.map((s) => s.id)).toEqual([
-      "experience-controls",
-      "estate-navigation",
-      "my-day-and-work",
-      "my-work-studio",
-      "focus",
-      "my-story-and-progress",
-      "knowledge-and-advisory",
-      "experiences",
+      "my-day",
+      "my-work",
+      "take-a-moment",
+      "my-story",
+      "get-advice",
+      "wander-the-grounds",
     ]);
-    expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS).toHaveLength(5);
-    expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS.map((item) => item.id)).toEqual([
-      "chat",
-      "sound",
-      "fullscreen",
-      "change-background",
-      "return-to-estate",
-    ]);
+    expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS).toHaveLength(0);
 
     const verification = verifySparkEstateTopNavigationAndProfileMenu();
-    expect(verification.roomExperienceItems).toBe(5);
+    expect(verification.welcomeHomeHasFiveCategories).toBe(true);
+    expect(verification.experienceControlsNotInWelcomeHome).toBe(true);
+    expect(verification.roomExperienceItems).toBe(0);
     expect(verification.roomNavigationItems).toBe(1);
     expect(verification.roomMyDayWorkItems).toBe(4);
-    expect(verification.roomMyWorkStudioItems).toBe(4);
+    expect(verification.roomMyWorkStudioItems).toBe(3);
     expect(verification.roomFocusItems).toBe(4);
     expect(verification.roomMyStoryItems).toBe(3);
     expect(verification.roomKnowledgeItems).toBe(2);
@@ -71,36 +67,24 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
 
     expect(
       SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.map((item) => item.id),
-    ).toEqual(["explore-spark"]);
-    expect(
-      SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.map((item) => item.label).join(" "),
-    ).not.toMatch(/library|cartograph/i);
+    ).toEqual(["wander-the-grounds"]);
 
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS.map((item) => item.id),
-    ).toEqual(["plan-my-day", "rhythms", "reminders", "calendar"]);
+    ).toEqual(["plan-my-day", "reminders", "calendar", "rhythms"]);
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((item) => item.id),
     ).toEqual([
       "projects",
-      "create",
       "destination-gallery",
       "cartographers-studio",
     ]);
-    expect(
-      SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS.map((item) => item.id),
-    ).toEqual(["documents", "templates", "sops", "content"]);
-    expect(
-      SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((item) => item.label),
-    ).toContain("Cartographer's Studio");
-    expect(
-      SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((item) => item.label),
-    ).toContain("Create");
+    expect(SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS).toEqual([]);
     expect(SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS.map((item) => item.id)).toEqual([
       "clear-my-mind",
       "parking-lot",
-      "spin-the-wheel",
       "breathe",
+      "spin-the-wheel",
     ]);
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS.map((item) => item.id),
@@ -119,18 +103,10 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(welcome.hasManifestRecord).toBe(true);
   });
 
-  it("formats a readable top navigation report", () => {
+  it("formats a readable navigation report", () => {
     const report = formatSparkEstateTopNavigationReport();
-    expect(report).toContain("Top-right controls");
-    expect(report).toContain("Profile menu");
-    expect(report).toContain("Integration checks");
-    expect(report).toContain("Explore Spark");
-    expect(report).toContain("My Workday");
-    expect(report).toContain("My Work Studio");
-    expect(report).toContain("Focus");
-    expect(report).toContain("Peaceful Places");
-    expect(report).toContain("Cartographer's Studio");
-    expect(report).toContain("Library is not listed under Estate Navigation");
+    expect(report).toContain("Welcome Home categories");
+    expect(report).toContain("Experience Controls (SH overlay)");
+    expect(report).not.toMatch(/Room menu — experience controls/i);
   });
 });
-

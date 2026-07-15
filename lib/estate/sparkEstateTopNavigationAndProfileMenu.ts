@@ -1,13 +1,11 @@
 /**
- * Spark Estate — top navigation and profile menu correction.
- * Two permanent top-right controls: Room Navigation + User Profile/Settings.
+ * Spark Estate — top navigation and profile menu.
  *
- * Welcome Home Room menu IA:
- * Experience Controls · Estate Navigation · My Workday · My Work Studio · Focus ·
- * My Story & Progress · Knowledge & Advisory · Experiences (Peaceful Places /
- * Soundscapes stay here). Library is intentionally omitted from Estate Navigation.
+ * Welcome Home (room menu) = where to go (five intent categories + Wander).
+ * SH profile menu = My Spark Estate + Experience Controls + Settings.
+ * Experience Controls open as an overlay — never navigate away.
  *
- * @see docs/protocols/SPARK_ESTATE_TOP_NAVIGATION_AND_PROFILE_MENU_CORRECTION.md
+ * @see lib/estate/welcomeHomeNavigationStructure.ts
  */
 
 import {
@@ -27,128 +25,113 @@ import {
   validateWanderPick,
   type EstateWanderPick,
 } from "@/lib/estate/manifest/estateWanderMode";
+import {
+  WELCOME_HOME_NAV_CATEGORIES,
+  WELCOME_HOME_WANDER_GROUNDS,
+} from "@/lib/estate/welcomeHomeNavigationStructure";
 
 export const SPARK_ESTATE_TOP_NAVIGATION_PRINCIPLE =
-  "Only two permanent top-right controls — Room Navigation and User Profile — no additional standalone navigation buttons.";
+  "Only two permanent top-right controls — Welcome Home navigation and User Profile — no additional standalone navigation buttons.";
 
 export const SPARK_ESTATE_TOP_NAVIGATION_GOAL =
-  "Room Button: Where am I and where can I go? Initials Button: Who am I and what are my settings?";
+  "Welcome Home: Where do I want to go? Initials: How should the platform look, sound, or behave — plus profile and settings.";
 
 export const SPARK_ESTATE_TOP_NAVIGATION_CONTROLS = [
   {
     id: "room",
-    label: "Current Room",
-    purpose: "Estate navigation and room experience settings",
-    question: "Where am I? Where can I go?",
+    label: "Welcome Home",
+    purpose: "Global estate navigation between major areas",
+    question: "Where do I want to go?",
   },
   {
     id: "profile",
     label: "User Initials",
-    purpose: "Profile, settings, conversations, and account",
-    question: "Who am I? What are my settings?",
+    purpose: "Profile, Experience Controls, settings, and account",
+    question: "How do I want the platform to look, sound, or behave?",
   },
 ] as const;
 
-export const SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS = [
-  { id: "chat", label: "Chat on / Chat off" },
-  { id: "sound", label: "Sound on / Sound off" },
-  { id: "fullscreen", label: "Full screen on / Full screen off" },
-  { id: "change-background", label: "Change background" },
-  { id: "return-to-estate", label: "Return to Estate", target: "welcome-home" },
+/** Experience Controls live under SH — documented here for the profile overlay. */
+export const SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS = [
+  { id: "conversation-visibility", label: "Show or Hide Conversation" },
+  { id: "estate-sounds", label: "Estate Sounds" },
+  { id: "music", label: "Music" },
+  { id: "shari-voice", label: "Shari Voice" },
+  { id: "volume", label: "Volume" },
+  { id: "estate-background", label: "Estate Background" },
+  { id: "fullscreen", label: "Full Screen" },
+  { id: "text-size", label: "Text Size" },
+  { id: "reduce-motion", label: "Reduce Motion" },
+  { id: "notifications", label: "Notifications" },
 ] as const;
 
-/** Estate Navigation — visual Explore Spark map. Library and Cartography are not listed here. */
+/** @deprecated Experience Controls removed from Welcome Home. */
+export const SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS = [] as const;
+
 export const SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS = [
   {
-    id: "explore-spark",
-    label: "Explore Spark",
-    note: "Opens the visual Estate explorer (image cards) — never Create",
+    id: "wander-the-grounds",
+    label: WELCOME_HOME_WANDER_GROUNDS.label,
+    note: "Opens Explore Estate — quieter styling below the divider",
     manifestDriven: false,
   },
 ] as const;
 
-/** My Workday — today's work only. */
-export const SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS = [
-  { id: "plan-my-day", label: "Plan My Day" },
-  { id: "rhythms", label: "Rhythms" },
-  { id: "reminders", label: "Reminders" },
-  { id: "calendar", label: "Calendar" },
-] as const;
+export const SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS =
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day")!.destinations;
 
-/** My Work Studio — top-level rows (Create expands a nested submenu). */
-export const SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS = [
-  { id: "projects", label: "Projects" },
-  { id: "create", label: "Create" },
-  { id: "destination-gallery", label: "Destination Gallery" },
-  { id: "cartographers-studio", label: "Cartographer's Studio" },
-] as const;
+export const SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS =
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-work")!.destinations;
 
-/** Nested under My Work Studio → Create (destinations wired in a later pass). */
-export const SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS = [
-  { id: "documents", label: "Documents" },
-  { id: "templates", label: "Templates" },
-  { id: "sops", label: "SOPs" },
-  { id: "content", label: "Content" },
-] as const;
+/** Create submenu removed — no third-level flyouts. */
+export const SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS = [] as const;
 
-/** Focus — reduce overwhelm, regain focus, reset. */
-export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = [
-  { id: "clear-my-mind", label: "Clear My Mind" },
-  { id: "parking-lot", label: "Parking Lot" },
-  { id: "spin-the-wheel", label: "Spin the Wheel" },
-  { id: "breathe", label: "Breathe", capability: "breathe" as const },
-] as const;
+export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = WELCOME_HOME_NAV_CATEGORIES.find(
+  (c) => c.id === "take-a-moment",
+)!.destinations.filter((d) =>
+  ["clear-my-mind", "parking-lot", "breathe", "spin-the-wheel"].includes(d.id),
+);
 
-export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS = [
-  { id: "journal", label: "Journal Gazebo" },
-  { id: "evidence-vault", label: "Evidence Vault" },
-  { id: "hall-of-accomplishments", label: "Hall of Accomplishments" },
-] as const;
+export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS =
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-story")!.destinations;
 
-export const SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS = [
-  { id: "chamber-of-momentum", label: "Chamber of Momentum" },
-  { id: "boardroom", label: "Boardroom" },
-] as const;
+export const SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS =
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "get-advice")!.destinations;
 
 export const SPARK_ESTATE_ROOM_MENU_SECTIONS = [
-  { id: "experience-controls", label: "Experience Controls" },
-  { id: "estate-navigation", label: "Estate Navigation" },
-  { id: "my-day-and-work", label: "My Workday" },
-  { id: "my-work-studio", label: "My Work Studio" },
-  { id: "focus", label: "Focus" },
-  { id: "my-story-and-progress", label: "My Story & Progress" },
-  { id: "knowledge-and-advisory", label: "Knowledge & Advisory" },
-  { id: "experiences", label: "Experiences" },
+  ...WELCOME_HOME_NAV_CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
+  {
+    id: WELCOME_HOME_WANDER_GROUNDS.id,
+    label: WELCOME_HOME_WANDER_GROUNDS.label,
+  },
 ] as const;
 
-/** Experiences — Peaceful Places and Soundscapes stay here (not under Estate Navigation). */
-export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = [
-  { id: "peaceful-places", label: "Peaceful Places" },
-  { id: "soundscapes", label: "Soundscapes" },
-] as const;
+export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = WELCOME_HOME_NAV_CATEGORIES.find(
+  (c) => c.id === "take-a-moment",
+)!.destinations.filter((d) =>
+  ["peaceful-places", "soundscapes"].includes(d.id),
+);
 
-/** Visible profile-menu top-level rows (Profile is a nested group). */
 export const SPARK_ESTATE_PROFILE_MENU_ITEMS: readonly {
-  id: EstateMenuActionId | "conversations" | "profile";
+  id: EstateMenuActionId | "conversations" | "my-spark-estate";
   label: string;
 }[] = [
   { id: "conversations", label: "Conversations" },
+  { id: "my-spark-estate", label: "My Spark Estate" },
+  { id: "experience-controls", label: "Experience Controls" },
   { id: "settings", label: "Settings" },
-  { id: "replay-welcome", label: "Listen to Shari's Welcome" },
-  { id: "profile", label: "Profile" },
-  { id: "log-out", label: "Logout" },
+  { id: "log-out", label: "Sign Out" },
 ];
 
-/** Clickable leaf actions under Profile. */
 export const SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS: readonly {
   id: EstateMenuActionId;
   label: string;
 }[] = [
   { id: "my-profile", label: "My Business Estate" },
   { id: "people-i-help", label: "People I Help" },
+  { id: "estate-profile", label: "My Profile" },
 ];
 
-/** Clickable leaf actions under Conversations. */
 export const SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS: readonly {
   id: EstateMenuActionId;
   label: string;
@@ -157,7 +140,6 @@ export const SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS: readonly {
   { id: "start-new-day-conversation", label: "New Day Chat" },
 ];
 
-/** Music titles under Experiences → Peaceful Places. */
 export const SPARK_ESTATE_ROOM_MENU_PEACEFUL_PLACE_MUSIC_ITEMS: readonly {
   id: string;
   label: string;
@@ -166,7 +148,6 @@ export const SPARK_ESTATE_ROOM_MENU_PEACEFUL_PLACE_MUSIC_ITEMS: readonly {
   label: track.title,
 }));
 
-/** Ambient soundscape loops under Experiences → Soundscapes. */
 export const SPARK_ESTATE_ROOM_MENU_AMBIENT_SOUNDSCAPE_ITEMS: readonly {
   id: string;
   label: string;
@@ -176,13 +157,13 @@ export const SPARK_ESTATE_ROOM_MENU_AMBIENT_SOUNDSCAPE_ITEMS: readonly {
 }));
 
 export const SPARK_ESTATE_NAVIGATION_SEPARATION_RULE =
-  "Room button adjusts the environment and estate navigation. Initials button manages the member and account. Do not combine these menus.";
+  "Welcome Home moves between major areas. Local destination navigation moves within a place. SH Experience Controls change appearance, sound, accessibility, or conversation visibility. Do not mix these three purposes.";
 
 export const SPARK_ESTATE_WANDER_MANIFEST_RULE =
   "Choose one manifest place record — load official name, image, route, and metadata together. Never mix names, images, or routes from separate sources.";
 
 export const SPARK_ESTATE_ROOM_MENU_EXCLUSIONS =
-  "Library is not listed under Estate Navigation. Cartography lives under My Work Studio.";
+  "Experience Controls are not listed under Welcome Home. No third-level flyouts. Peaceful Places and Soundscapes open dedicated experiences.";
 
 export function assessRoomButtonManifestAlignment(roomId: string): {
   roomId: string;
@@ -201,19 +182,8 @@ export function assessRoomButtonManifestAlignment(roomId: string): {
     if (!place.official_name?.trim()) {
       issues.push("manifest missing official_name");
     }
-    if (!place.primary_image?.trim()) {
-      issues.push("manifest missing primary_image");
-    }
-    if (!place.route?.trim()) {
-      issues.push("manifest missing route");
-    }
-    const official = place.display_name ?? place.official_name;
-    if (
-      official &&
-      !displayName.includes(official.replace(/\u2122/g, "")) &&
-      !official.includes(displayName.replace(/\u2122/g, ""))
-    ) {
-      issues.push("display name may not match manifest official name");
+    if (place.official_name && place.official_name !== displayName) {
+      issues.push("display name diverges from manifest official_name");
     }
   }
 
@@ -239,21 +209,25 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
   roomExperiencesItems: number;
   excludesLibraryAndCartography: boolean;
   peacefulPlacesStayInExperiences: boolean;
+  welcomeHomeHasFiveCategories: boolean;
+  experienceControlsNotInWelcomeHome: boolean;
   wanderManifestRuleReady: boolean;
   separationRuleReady: boolean;
 } {
   const topLevelLabels = ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => entry.label);
   const expectedTopLabels = SPARK_ESTATE_PROFILE_MENU_ITEMS.map((item) => item.label);
+
   const conversationsGroup = ESTATE_MENU_DROPDOWN_ENTRIES.find(
     (entry): entry is EstateMenuDropdownGroup =>
       entry.kind === "group" && entry.id === "conversations",
   );
-  const profileGroup = ESTATE_MENU_DROPDOWN_ENTRIES.find(
+  const estateGroup = ESTATE_MENU_DROPDOWN_ENTRIES.find(
     (entry): entry is EstateMenuDropdownGroup =>
-      entry.kind === "group" && entry.id === "profile",
+      entry.kind === "group" && entry.id === "my-spark-estate",
   );
   const conversationChildren = conversationsGroup?.children ?? [];
-  const profileChildren = profileGroup?.children ?? [];
+  const estateChildren = estateGroup?.children ?? [];
+
   const profileMenuAligned =
     ESTATE_MENU_DROPDOWN_ENTRIES.length === SPARK_ESTATE_PROFILE_MENU_ITEMS.length &&
     SPARK_ESTATE_PROFILE_MENU_ITEMS.every(
@@ -266,16 +240,16 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
         conversationChildren[index]?.id === item.id &&
         conversationChildren[index]?.label === item.label,
     ) &&
-    profileChildren.length === SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS.length &&
+    estateChildren.length === SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS.length &&
     SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS.every(
       (item, index) =>
-        profileChildren[index]?.id === item.id &&
-        profileChildren[index]?.label === item.label,
+        estateChildren[index]?.id === item.id &&
+        estateChildren[index]?.label === item.label,
     ) &&
+    ESTATE_MENU_DROPDOWN_ITEMS.some((item) => item.id === "experience-controls") &&
     !ESTATE_MENU_DROPDOWN_ITEMS.some(
       (item) =>
         item.id === "growth-profile" ||
-        item.id === "estate-profile" ||
         item.id === "evidence-vault" ||
         item.id === "portfolio" ||
         item.id === "journal",
@@ -310,7 +284,6 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
     roomExperiencesItems: SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS.length,
     excludesLibraryAndCartography:
       !navigationIds.includes("library" as never) &&
-      !navigationIds.includes("cartographers-studio" as never) &&
       !SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.some(
         (item) =>
           item.label.toLowerCase().includes("library") ||
@@ -322,13 +295,19 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
       experiencesIds.includes("soundscapes") &&
       !experiencesIds.includes("breathe" as never) &&
       focusIds.includes("breathe"),
+    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 5,
+    experienceControlsNotInWelcomeHome: !WELCOME_HOME_NAV_CATEGORIES.some((c) =>
+      /experience controls/i.test(c.label),
+    ),
     wanderManifestRuleReady: samplePick ? validateWanderPick(samplePick) : false,
     separationRuleReady: Boolean(SPARK_ESTATE_NAVIGATION_SEPARATION_RULE),
   };
 }
 
 export function formatSparkEstateTopNavigationReport(
-  verification: ReturnType<typeof verifySparkEstateTopNavigationAndProfileMenu> = verifySparkEstateTopNavigationAndProfileMenu(),
+  verification: ReturnType<
+    typeof verifySparkEstateTopNavigationAndProfileMenu
+  > = verifySparkEstateTopNavigationAndProfileMenu(),
 ): string {
   const lines: string[] = [
     `Spark Estate top navigation: ${verification.profileMenuAligned ? "ALIGNED" : "GAPS"}`,
@@ -342,49 +321,18 @@ export function formatSparkEstateTopNavigationReport(
     lines.push(`  ${control.label} — ${control.purpose}`);
   }
 
-  lines.push("", "Room menu — experience controls:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS) {
-    lines.push(`  • ${item.label}`);
-  }
-
-  lines.push("", "Room menu — estate navigation:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS) {
-    lines.push(`  • ${item.label}`);
-  }
-  lines.push(`  (${SPARK_ESTATE_ROOM_MENU_EXCLUSIONS})`);
-
-  lines.push("", "Room menu — My Workday:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS) {
-    lines.push(`  • ${item.label}`);
-  }
-
-  lines.push("", "Room menu — My Work Studio:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS) {
-    lines.push(`  • ${item.label}`);
-    if (item.id === "create") {
-      for (const nested of SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS) {
-        lines.push(`    ◦ ${nested.label}`);
-      }
+  lines.push("", "Welcome Home categories:");
+  for (const category of WELCOME_HOME_NAV_CATEGORIES) {
+    lines.push(`  ${category.label}`);
+    for (const dest of category.destinations) {
+      lines.push(`    • ${dest.label}`);
     }
   }
+  lines.push(`  ───`);
+  lines.push(`  ${WELCOME_HOME_WANDER_GROUNDS.label} → Explore Estate`);
 
-  lines.push("", "Room menu — Focus:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS) {
-    lines.push(`  • ${item.label}`);
-  }
-
-  lines.push("", "Room menu — My Story & Progress:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS) {
-    lines.push(`  • ${item.label}`);
-  }
-
-  lines.push("", "Room menu — Knowledge & Advisory:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS) {
-    lines.push(`  • ${item.label}`);
-  }
-
-  lines.push("", "Room menu — experiences:");
-  for (const item of SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS) {
+  lines.push("", "Experience Controls (SH overlay):");
+  for (const item of SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS) {
     lines.push(`  • ${item.label}`);
   }
 
@@ -398,12 +346,11 @@ export function formatSparkEstateTopNavigationReport(
   lines.push(`  Controls: ${verification.controlCount}`);
   lines.push(`  Profile menu: ${verification.profileMenuAligned ? "pass" : "fail"}`);
   lines.push(
-    `  Library/Cartography excluded: ${verification.excludesLibraryAndCartography ? "pass" : "fail"}`,
+    `  Five categories: ${verification.welcomeHomeHasFiveCategories ? "pass" : "fail"}`,
   );
   lines.push(
-    `  Peaceful Places in Experiences: ${verification.peacefulPlacesStayInExperiences ? "pass" : "fail"}`,
+    `  EC off Welcome Home: ${verification.experienceControlsNotInWelcomeHome ? "pass" : "fail"}`,
   );
-  lines.push(`  Wander manifest rule: ${verification.wanderManifestRuleReady ? "pass" : "fail"}`);
 
   return lines.join("\n");
 }

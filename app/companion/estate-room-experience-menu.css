@@ -484,6 +484,22 @@
   }
 }
 
+.estate-room-experience-menu__divider {
+  height: 1px;
+  margin: 0.55rem 0.65rem;
+  background: rgba(255, 236, 200, 0.18);
+}
+
+.estate-room-experience-menu__item--wander {
+  opacity: 0.78;
+  font-weight: 500;
+}
+
+.estate-room-experience-menu__item--wander:hover,
+.estate-room-experience-menu__item--wander:focus-visible {
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .estate-room-experience-menu__trigger,
   .estate-room-experience-menu__panel,
