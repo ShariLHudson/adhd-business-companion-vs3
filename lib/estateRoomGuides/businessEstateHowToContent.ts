@@ -7,7 +7,7 @@ import type { EstateHowToGuideContent } from "./types";
 export const BUSINESS_ESTATE_HOW_TO_GUIDE: EstateHowToGuideContent = {
   id: "my-business-estate",
   title: "How to Use My Business Estate",
-  openActionLabel: "How to Use My Business Estate",
+  openActionLabel: "New here? Open How to Use",
   firstVisitInvite: "New here? Open How to Use",
   welcome: [
     "Welcome to My Business Estate.",
@@ -145,26 +145,6 @@ export const BUSINESS_ESTATE_HOW_TO_GUIDE: EstateHowToGuideContent = {
       ],
     },
     {
-      id: "research",
-      title: "Research This With Shari",
-      paragraphs: [
-        "Use Estate-level research when outside information is needed, including:",
-      ],
-      bullets: [
-        "audience needs",
-        "competitors",
-        "pricing",
-        "market trends",
-        "customer language",
-        "offer ideas",
-        "tools",
-        "industry information",
-        "business opportunities",
-      ],
-      closingLine:
-        "Research findings remain separate from approved profile facts. Nothing changes without approval.",
-    },
-    {
       id: "another-perspective",
       title: "Need another perspective?",
       subsections: [
@@ -181,7 +161,7 @@ export const BUSINESS_ESTATE_HOW_TO_GUIDE: EstateHowToGuideContent = {
         {
           title: "Let Shari Recommend",
           bullets: [
-            "Shari explains whether continued conversation, Chamber, Board, or Research fits best",
+            "Shari explains whether continued conversation, Chamber, or Board fits best",
           ],
         },
       ],
@@ -228,7 +208,6 @@ export const BUSINESS_ESTATE_HOW_TO_GUIDE: EstateHowToGuideContent = {
         "Talk This Through With Shari",
         "Help Me Choose",
         "Show Examples",
-        "Research This With Shari",
         "Ask a Chamber Specialist",
         "Leave It for Now",
       ],
@@ -241,7 +220,6 @@ export const BUSINESS_ESTATE_HOW_TO_GUIDE: EstateHowToGuideContent = {
         "users do not need to finish every area",
         "users do not need to answer every question",
         "Shari should reuse approved information",
-        "Research remains separate",
         "Chamber and Board advice do not auto-update profile data",
         "users approve suggested changes",
         "Business Estate grows over time",

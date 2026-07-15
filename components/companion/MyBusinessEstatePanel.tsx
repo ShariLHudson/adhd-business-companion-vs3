@@ -2,59 +2,56 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { EstateHowToGuide } from "@/components/companion/EstateHowToGuide";
-import { EstateHowToOpenControls } from "@/components/companion/EstateHowToOpenControls";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEstateRoomShell";
 import { BusinessEstateSectionEditor } from "@/components/companion/business-estate/BusinessEstateSectionEditor";
-import { BusinessAreaCard } from "@/components/companion/business-estate/BusinessAreaCard";
-import { ExecutiveBusinessSnapshot } from "@/components/companion/business-estate/ExecutiveBusinessSnapshot";
-import { ShariNote } from "@/components/companion/business-estate/ShariNote";
-import { BusinessEstateResearchAction } from "@/components/companion/business-estate/BusinessEstateResearchAction";
-import { BusinessEstateResearchPanel } from "@/components/companion/business-estate/BusinessEstateResearchPanel";
-import { GetExpertHelpAction } from "@/components/companion/advisory/GetExpertHelpAction";
+import { BusinessEstateOverview } from "@/components/companion/business-estate/redesign/BusinessEstateOverview";
+import { IdentityOfficeEntrance } from "@/components/companion/business-estate/redesign/IdentityOfficeEntrance";
+import { IdentitySectionBrowser } from "@/components/companion/business-estate/redesign/IdentitySectionBrowser";
+import { BusinessBasicsFlow } from "@/components/companion/business-estate/redesign/BusinessBasicsFlow";
 import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHelpPanel";
-import {
-  BUSINESS_ESTATE_SECTIONS,
-  type BusinessEstateSectionId,
-} from "@/lib/profile/businessEstateProfile";
-import {
-  BUSINESS_AREA_PRESENTATION,
-  getBusinessAreaPresentation,
-} from "@/lib/profile/executiveOfficePresentation";
-import type { BusinessEstateResearchReturnContext } from "@/lib/profile/businessEstateResearch";
+import type { BusinessEstateSectionId } from "@/lib/profile/businessEstateProfile";
+import { getBusinessAreaPresentation } from "@/lib/profile/executiveOfficePresentation";
+import type { IdentitySectionId } from "@/lib/profile/businessEstateRedesign";
 import {
   BUSINESS_ESTATE_HOW_TO_GUIDE,
   consumePendingEstateHowToGuide,
   subscribeEstateHowToGuideOpen,
 } from "@/lib/estateRoomGuides";
 import { setUnsavedWorkGuard } from "@/lib/unsavedWorkGuard";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "@/app/companion/my-business-estate.css";
 import "@/app/companion/estate-how-to-guide.css";
 
 type Props = {
   onClose: () => void;
+  /** Optional — open People I Help overlay without losing estate data. */
+  onOpenPeopleIHelp?: () => void;
 };
 
+type View =
+  | { kind: "overview" }
+  | { kind: "identity-entrance" }
+  | { kind: "business-basics" }
+  | { kind: "legacy-room"; sectionId: Exclude<BusinessEstateSectionId, "identity"> };
+
 /**
- * My Business Estate — Executive Office overview.
- * Estate-level Research + Need Another Perspective? (not per-field).
+ * My Business Estate — calm optional overview + Identity Office pattern (first slice).
+ * Other rooms still use the existing section editor until redesigned.
  */
-export function MyBusinessEstatePanel({ onClose }: Props) {
-  const [activeSection, setActiveSection] =
-    useState<BusinessEstateSectionId | null>(null);
-  const [openSectionInEdit, setOpenSectionInEdit] = useState(false);
+export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
+  const [view, setView] = useState<View>({ kind: "overview" });
   const [sectionDirty, setSectionDirty] = useState(false);
   const [revision, setRevision] = useState(0);
-  const [researchOpen, setResearchOpen] = useState(false);
   const [expertHelpOpen, setExpertHelpOpen] = useState(false);
   const [howToOpen, setHowToOpen] = useState(false);
-  const [researchReturn, setResearchReturn] =
-    useState<BusinessEstateResearchReturnContext>({
-      sectionId: null,
-    });
+  const [sectionBrowserOpen, setSectionBrowserOpen] = useState(false);
+  const [expandedSectionId, setExpandedSectionId] =
+    useState<IdentitySectionId | null>(null);
+  const [showHowHelps, setShowHowHelps] = useState(false);
+  const [legacyEdit, setLegacyEdit] = useState(false);
 
   const openHowTo = useCallback(() => {
-    setResearchOpen(false);
     setExpertHelpOpen(false);
     setHowToOpen(true);
   }, []);
@@ -95,71 +92,95 @@ export function MyBusinessEstatePanel({ onClose }: Props) {
     return () => setUnsavedWorkGuard(null);
   }, [sectionDirty]);
 
-  function handleClose() {
-    if (sectionDirty) {
-      const discard = window.confirm(
+  const { requestClose } = useDismissibleWindow({
+    open: true,
+    onClose,
+    isDirty: sectionDirty,
+    confirmDiscard: () =>
+      window.confirm(
         "You have unsaved changes. Discard them and close My Business Estate?",
-      );
-      if (!discard) return;
+      ),
+  });
+
+  function dismissOutside() {
+    if (sectionBrowserOpen) {
+      setSectionBrowserOpen(false);
+      return;
     }
-    onClose();
+    if (howToOpen) {
+      setHowToOpen(false);
+      return;
+    }
+    if (expertHelpOpen) {
+      setExpertHelpOpen(false);
+      return;
+    }
+    requestClose();
   }
 
-  function enterArea(sectionId: BusinessEstateSectionId, edit = false) {
-    setOpenSectionInEdit(edit);
-    setActiveSection(sectionId);
+  function goOverview() {
+    setSectionDirty(false);
+    setLegacyEdit(false);
+    setSectionBrowserOpen(false);
+    setShowHowHelps(false);
+    setView({ kind: "overview" });
+    refresh();
   }
 
-  function openResearch() {
-    setResearchReturn({
-      sectionId: activeSection,
-      stageId: null,
-    });
-    setHowToOpen(false);
-    setResearchOpen(true);
+  function enterIdentity() {
+    setView({ kind: "identity-entrance" });
+    setShowHowHelps(false);
   }
 
-  function closeOverlayKeepDrafts() {
-    setResearchOpen(false);
-    setExpertHelpOpen(false);
-    setHowToOpen(false);
+  function enterRoom(sectionId: BusinessEstateSectionId) {
+    if (sectionId === "identity") {
+      enterIdentity();
+      return;
+    }
+    setLegacyEdit(false);
+    setView({ kind: "legacy-room", sectionId });
   }
 
-  const blockingOverlay = researchOpen || expertHelpOpen;
-  const overlayOpen = blockingOverlay || howToOpen;
-
-  const activeMeta = BUSINESS_ESTATE_SECTIONS.find(
-    (section) => section.id === activeSection,
+  const howToLink = (
+    <button
+      type="button"
+      className="estate-how-to-open-action business-estate-how-to-link"
+      onClick={openHowTo}
+      data-testid="estate-how-to-open-my-business-estate"
+      aria-label={BUSINESS_ESTATE_HOW_TO_GUIDE.openActionLabel}
+    >
+      {BUSINESS_ESTATE_HOW_TO_GUIDE.openActionLabel}
+    </button>
   );
-  const activeArea = activeSection
-    ? getBusinessAreaPresentation(activeSection)
-    : null;
 
-  const howToControls = (
-    <EstateHowToOpenControls
-      content={BUSINESS_ESTATE_HOW_TO_GUIDE}
-      onOpen={openHowTo}
-      className="business-estate-how-to-controls"
-    />
-  );
+  const backgroundUrl =
+    view.kind === "identity-entrance" || view.kind === "business-basics"
+      ? getBusinessAreaPresentation("identity").coverImageUrl
+      : view.kind === "legacy-room"
+        ? getBusinessAreaPresentation(view.sectionId).coverImageUrl
+        : "/backgrounds/room-library-estate-background.png";
+
+  const activeSectionAttr =
+    view.kind === "overview"
+      ? "overview"
+      : view.kind === "legacy-room"
+        ? view.sectionId
+        : "identity";
+
+  void revision;
 
   return (
-    <MyBusinessEstateRoomShell backgroundUrl="/backgrounds/founder-office-background.png">
-      <EstateWorkspace className="my-business-estate-panel executive-office-panel estate-workspace--landing my-business-estate-panel--how-to-host">
-        {researchOpen ? (
-          <BusinessEstateResearchPanel
-            returnContext={researchReturn}
-            onClose={closeOverlayKeepDrafts}
-            onReturnToEstate={closeOverlayKeepDrafts}
-          />
-        ) : null}
-
+    <MyBusinessEstateRoomShell backgroundUrl={backgroundUrl}>
+      <EstateWorkspace
+        className="my-business-estate-panel executive-office-panel estate-workspace--landing my-business-estate-panel--how-to-host be-redesign-panel"
+        onDismissOutside={dismissOutside}
+      >
         {expertHelpOpen ? (
           <GetExpertHelpPanel
             sourceType="business_estate"
-            areaId={activeSection ?? "identity"}
-            onClose={closeOverlayKeepDrafts}
-            onReturn={closeOverlayKeepDrafts}
+            areaId="identity"
+            onClose={() => setExpertHelpOpen(false)}
+            onReturn={() => setExpertHelpOpen(false)}
           />
         ) : null}
 
@@ -169,114 +190,77 @@ export function MyBusinessEstatePanel({ onClose }: Props) {
           onClose={closeHowTo}
           onPrimaryAction={() => {
             closeHowTo();
-            setOpenSectionInEdit(false);
-            setActiveSection(null);
+            goOverview();
           }}
         />
 
         <div
-          className={
-            overlayOpen ? "business-estate-research-host--dimmed" : undefined
-          }
-          hidden={blockingOverlay ? true : undefined}
-          aria-hidden={overlayOpen || undefined}
+          hidden={expertHelpOpen ? true : undefined}
+          aria-hidden={expertHelpOpen || howToOpen || undefined}
           data-testid="my-business-estate-main"
-          data-active-section={activeSection ?? "overview"}
+          data-active-section={activeSectionAttr}
           data-section-dirty={sectionDirty ? "true" : "false"}
+          data-be-view={view.kind}
         >
-          {activeSection && activeMeta && activeArea ? (
+          {view.kind === "overview" ? (
+            <BusinessEstateOverview
+              onClose={requestClose}
+              onStartBusinessBasics={() => {
+                setView({ kind: "business-basics" });
+              }}
+              onEnterRoom={enterRoom}
+              onOpenPeopleIHelp={onOpenPeopleIHelp}
+              howToControl={howToLink}
+            />
+          ) : null}
+
+          {view.kind === "identity-entrance" ? (
             <>
-              <div className="business-estate-persistent-actions">
-                {howToControls}
-                <BusinessEstateResearchAction
-                  onOpen={openResearch}
-                  className="business-estate-research-action--in-area"
-                />
-                <GetExpertHelpAction
-                  onOpen={() => {
-                    setHowToOpen(false);
-                    setExpertHelpOpen(true);
-                  }}
-                  className="get-expert-help-action--in-area"
-                />
-              </div>
-              <BusinessEstateSectionEditor
-                sectionId={activeSection}
-                title={activeArea.areaName}
-                description={activeMeta.description}
-                initialMode={openSectionInEdit ? "edit" : "view"}
-                onDirtyChange={setSectionDirty}
-                onBack={() => {
-                  setSectionDirty(false);
-                  setOpenSectionInEdit(false);
-                  setActiveSection(null);
-                  refresh();
+              <IdentityOfficeEntrance
+                onStartBasics={() => setView({ kind: "business-basics" })}
+                onChooseSection={() => {
+                  setSectionBrowserOpen(true);
+                  setExpandedSectionId("business-basics");
+                }}
+                onHowThisHelps={() => setShowHowHelps((v) => !v)}
+                onBack={goOverview}
+                showHowThisHelps={showHowHelps}
+              />
+              <IdentitySectionBrowser
+                open={sectionBrowserOpen}
+                onClose={() => setSectionBrowserOpen(false)}
+                expandedId={expandedSectionId}
+                onExpand={setExpandedSectionId}
+                onSelectImplemented={() => {
+                  setSectionBrowserOpen(false);
+                  setView({ kind: "business-basics" });
                 }}
               />
             </>
-          ) : (
-            <>
-              <header className="executive-office-panel__header">
-                <div className="executive-office-panel__header-row">
-                  <div>
-                    <p className="estate-workspace__kicker">Executive Office</p>
-                    <h1 className="estate-workspace__title">
-                      My Business Estate
-                    </h1>
-                  </div>
-                  <button
-                    type="button"
-                    className="my-business-estate-panel__close"
-                    onClick={handleClose}
-                  >
-                    Close
-                  </button>
-                </div>
-                <p className="executive-office-panel__lead">
-                  Your business headquarters inside Spark Estate.
-                </p>
-              </header>
+          ) : null}
 
-              <ExecutiveBusinessSnapshot revision={revision} />
+          {view.kind === "business-basics" ? (
+            <BusinessBasicsFlow
+              onExitToEntrance={() => setView({ kind: "identity-entrance" })}
+              onFinished={() => {
+                refresh();
+                setView({ kind: "identity-entrance" });
+              }}
+            />
+          ) : null}
 
-              <ShariNote revision={revision} />
-
-              <div className="business-estate-persistent-actions">
-                {howToControls}
-                <BusinessEstateResearchAction onOpen={openResearch} />
-                <GetExpertHelpAction
-                  onOpen={() => {
-                    setHowToOpen(false);
-                    setExpertHelpOpen(true);
-                  }}
-                />
-              </div>
-
-              <section
-                className="executive-office-areas"
-                aria-label="Business Areas"
-              >
-                <h2 className="executive-office-areas__title">Business Areas</h2>
-                <ul className="executive-office-areas__list" key={revision}>
-                  {BUSINESS_AREA_PRESENTATION.map((area) => (
-                    <li key={area.sectionId}>
-                      <BusinessAreaCard area={area} onEnter={enterArea} />
-                    </li>
-                  ))}
-                </ul>
-                <div className="executive-office-areas__secondary">
-                  <button
-                    type="button"
-                    className="executive-office-areas__identity-update"
-                    onClick={() => enterArea("identity", true)}
-                    data-testid="my-business-estate-edit-profile"
-                  >
-                    Update Identity Office
-                  </button>
-                </div>
-              </section>
-            </>
-          )}
+          {view.kind === "legacy-room" ? (
+            <BusinessEstateSectionEditor
+              sectionId={view.sectionId}
+              title={getBusinessAreaPresentation(view.sectionId).areaName}
+              purpose={getBusinessAreaPresentation(view.sectionId).placeBlurb}
+              initialMode={legacyEdit ? "edit" : "view"}
+              onDirtyChange={setSectionDirty}
+              onOpenExpertHelp={() => setExpertHelpOpen(true)}
+              helpControl={howToLink}
+              onBack={goOverview}
+            />
+          ) : null}
         </div>
       </EstateWorkspace>
     </MyBusinessEstateRoomShell>

@@ -81,15 +81,27 @@ describe("Estate How to Use guides", () => {
     );
   });
 
-  it("Business Estate guide is available from overview markup and describes six areas", () => {
+  it("Business Estate guide is available from redesigned overview markup", () => {
     const html = renderToStaticMarkup(<MyBusinessEstatePanel onClose={() => {}} />);
     expect(html).toContain(
       'data-testid="estate-how-to-open-my-business-estate"',
     );
-    expect(html).toContain("How to Use My Business Estate");
+    expect(html).toContain("New here? Open How to Use");
+    expect(html).not.toContain(">How to Use My Business Estate<");
+    expect(html).toContain('data-testid="be-overview"');
+    expect(html).toContain('data-testid="be-optional-reassurance"');
+    expect(html).toContain("Your Next Helpful Step");
+    expect(html).toContain("Browse My Business Estate");
+    expect(html).toContain("Understand My Business");
+    expect(html).toContain("Guide My Business");
+    expect(html).toContain("Keep My Business Moving");
+    expect(html).not.toContain("Need Another Perspective?");
+    expect(html).not.toContain("Research This With Shari");
+    expect(html).toContain("room-library-estate-background.png");
     expect(html).toContain('data-testid="my-business-estate-main"');
     expect(html).toContain('data-active-section="overview"');
     expect(html).toContain('data-section-dirty="false"');
+    expect(html).toContain('data-be-view="overview"');
 
     const guideHtml = renderToStaticMarkup(
       <EstateHowToGuide
@@ -110,13 +122,13 @@ describe("Estate How to Use guides", () => {
     expect(guideHtml).toContain("Guided Setup");
     expect(guideHtml).toContain("Browse and Update");
     expect(guideHtml).toContain("Talk This Through With Shari");
-    expect(guideHtml).toContain("Research This With Shari");
+    expect(guideHtml).not.toContain("Research This With Shari");
     expect(guideHtml).toContain("Ask a Chamber Specialist");
     expect(guideHtml).toContain("Take This to the Board");
     expect(guideHtml).toContain("View this in Cartography");
     expect(guideHtml).toContain("Choose a Business Area");
     expect(guideHtml).toContain("do not auto-update profile data");
-    expect(guideHtml).toContain("Nothing changes without approval");
+    expect(guideHtml).toContain("users approve suggested changes");
   });
 
   it("only one section is open by default and close control is present", () => {
@@ -129,6 +141,7 @@ describe("Estate How to Use guides", () => {
     );
     expect(html).toContain('data-testid="estate-how-to-guide-close-my-business-estate"');
     expect(html).toContain('aria-modal="true"');
+    expect(html).toContain('role="dialog"');
     const openSections = (html.match(/data-open="true"/g) ?? []).length;
     expect(openSections).toBe(1);
     expect(html).toMatch(/font-size|estate-how-to-guide__title/);

@@ -18,6 +18,8 @@ export type ProfileDestinationHostProps = {
   growthProfileEmphasizeTimeline?: boolean;
   onClose: () => void;
   onOpenEstatePlace?: (actionId: EstateMenuActionId) => void;
+  /** Switch from My Business Estate to People I Help without clearing estate data. */
+  onOpenPeopleIHelp?: () => void;
 };
 
 /**
@@ -29,6 +31,7 @@ export function ProfileDestinationHost({
   growthProfileEmphasizeTimeline = false,
   onClose,
   onOpenEstatePlace,
+  onOpenPeopleIHelp,
 }: ProfileDestinationHostProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -52,7 +55,12 @@ export function ProfileDestinationHost({
 
   let content: ReactNode = null;
   if (destination === "profile") {
-    content = <MyBusinessEstatePanel onClose={onClose} />;
+    content = (
+      <MyBusinessEstatePanel
+        onClose={onClose}
+        onOpenPeopleIHelp={onOpenPeopleIHelp}
+      />
+    );
   } else if (destination === "people-i-help") {
     content = <PeopleIHelpPanel onClose={onClose} />;
   } else {
@@ -60,6 +68,7 @@ export function ProfileDestinationHost({
       <GrowthProfileRoomPanel
         emphasizeTimeline={growthProfileEmphasizeTimeline}
         onOpenEstatePlace={onOpenEstatePlace}
+        onClose={onClose}
       />
     );
   }

@@ -23524,6 +23524,7 @@ export default function CompanionPageClient() {
         growthProfileEmphasizeTimeline={growthProfileEmphasizeTimeline}
         onClose={goBack}
         onOpenEstatePlace={handleEstateMenuAction}
+        onOpenPeopleIHelp={() => openProfileDestinationCore("people-i-help")}
       />
 
       {guidedFieldHelpChatOpen
