@@ -51,6 +51,8 @@ export type AppSection =
   | "plan-my-day"
   | "reminders"
   | "rhythms"
+  /** Shared My Day entrance — Reminder vs Rhythm explanation before either room. */
+  | "reminders-rhythms"
   | "calendar"
   | "parking-lot"
   | "visual-focus"
@@ -246,6 +248,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
       return "plan-my-day";
     case "reminders":
     case "rhythms":
+    case "reminders-rhythms":
     case "calendar":
     case "parking-lot":
       return "plan-my-day";

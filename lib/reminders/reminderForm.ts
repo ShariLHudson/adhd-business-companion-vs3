@@ -26,7 +26,7 @@ export const REMINDER_REPEAT_OPTIONS: {
 ];
 
 export const REMINDERS_HOW_DO_I_COPY =
-  "Add something you do not want to forget. A date and time are optional.";
+  "A Reminder remembers a specific thing — usually one moment or task. Add what you don’t want to forget; a date and time are optional.";
 
 export type ReminderFormValues = {
   title: string;
@@ -87,8 +87,7 @@ function weekdayNameFromDate(date: string): string {
 
 /**
  * Map UI repeat → store recurrenceRule.
- * Engine advances: daily@, weekdays@, weekly@, hourly.
- * monthly@ / yearly@ / custom@ are stored for list grouping; engine may not advance them.
+ * Engine advances: hourly, daily@, weekdays@, weekly@, monthly@, yearly@, custom@.
  */
 export function buildRecurrenceRule(
   repeat: ReminderRepeatOption,

@@ -13,7 +13,7 @@ import type {
 import { RHYTHM_CADENCE_OPTIONS } from "./types";
 
 export const RHYTHMS_HOW_DO_I_COPY =
-  "Create repeatable routines for the things you regularly return to. Choose how often each rhythm should happen.";
+  "A Rhythm helps you return regularly with a flexible window — not a rigid schedule. Skip, pause, or resume anytime; you’re never “behind.”";
 
 export type DailyMode = "every_day" | "weekdays" | "selected_days";
 export type MonthlyMode = "day_of_month" | "nth_weekday";
@@ -334,3 +334,9 @@ export function rhythmSaveSuccessMessage(cadence: RhythmCadence): string {
 
 export const RHYTHM_SAVE_FAILURE_MESSAGE =
   "We couldn’t save that rhythm. Your information is still here—please try again.";
+
+export const RHYTHM_TITLE_REQUIRED_MESSAGE =
+  "Give this rhythm a short name, then save.";
+
+export const RHYTHM_CUSTOM_NOTE_REQUIRED_MESSAGE =
+  "For a Custom rhythm, add a short note about how often it should happen.";

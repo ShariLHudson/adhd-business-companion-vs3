@@ -1,14 +1,15 @@
 /**
- * Welcome Home → My Workday → Reminders destination contract.
+ * Reminders dedicated room + My Day shared entrance contract.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS } from "@/lib/estate/estateFullBleedPanelSections";
 import { sidebarNavForSection } from "@/lib/companionUi";
+import { REMINDERS_RHYTHMS_ENTRANCE_ACTION_ID } from "@/lib/remindersVsRhythms";
 
 const REMINDERS_COPY =
-  "Add something you do not want to forget. A date and time are optional.";
+  "A Reminder remembers a specific thing — usually one moment or task. Add what you don’t want to forget; a date and time are optional.";
 
 function read(pathFromRoot: string): string {
   return readFileSync(resolve(process.cwd(), pathFromRoot), "utf8");
@@ -23,10 +24,17 @@ describe("Reminders dedicated destination", () => {
   const notif = read(
     "components/companion/RemindersNotificationSettings.tsx",
   );
+  const chrome = read(
+    "components/companion/ReminderRhythmRoomChrome.tsx",
+  );
 
-  it("wires My Workday Reminders to openRemindersCore", () => {
-    expect(menu).toMatch(/data-testid="estate-open-reminders"/);
-    expect(client).toMatch(/onOpenReminders=\{\(\) => openRemindersCore\(\)\}/);
+  it("My Day uses shared Reminders / Rhythms entrance (not a separate Reminders row)", () => {
+    expect(menu).toContain("onOpenRemindersRhythms");
+    expect(menu).toContain('"reminders-rhythms"');
+    expect(client).toContain(
+      `onOpenRemindersRhythms={() => ${REMINDERS_RHYTHMS_ENTRANCE_ACTION_ID}()}`,
+    );
+    expect(client).toContain("function openRemindersRhythmsCore()");
   });
 
   it("openRemindersCore opens reminders section — not Settings or Plan My Day", () => {
@@ -53,6 +61,10 @@ describe("Reminders dedicated destination", () => {
     expect(panel).toContain("reminders-how-do-i");
     expect(panel).toContain("app-back-button");
     expect(panel).toContain("reminders-title");
+    expect(panel).toContain('kind="reminders"');
+    expect(panel).toContain("PersistentDifferenceCue");
+    expect(chrome).toContain("${kind}-difference-cue");
+    expect(chrome).toContain("DIFFERENCE_CUE_REMINDERS");
     expect(panel).toContain("reminders-add-section");
     expect(panel).toContain('testId="reminders-upcoming"');
     expect(panel).toContain('testId="reminders-recurring"');

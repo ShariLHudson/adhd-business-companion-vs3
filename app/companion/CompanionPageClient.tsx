@@ -103,6 +103,21 @@ const RemindersRoomPanel = dynamic(
     ),
   },
 );
+/** My Day shared entrance — Reminder vs Rhythm before either dedicated room. */
+const RemindersRhythmsEntrancePanel = dynamic(
+  () =>
+    import("@/components/companion/RemindersRhythmsEntrancePanel").then(
+      (mod) => ({
+        default: mod.RemindersRhythmsEntrancePanel,
+      }),
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Reminders / Rhythms…" size="md" />
+    ),
+  },
+);
 const RhythmsRoomPanel = dynamic(
   () =>
     import("@/components/companion/RhythmsRoomPanel").then((mod) => ({
@@ -2150,6 +2165,7 @@ import {
 import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
 import { buildSavedPatternsPromptHint } from "@/lib/patternAwareness";
 import { getActiveSupportStyleId, supportStyleHintForChat } from "@/lib/supportStyle";
+import { buildCuriosityBeforeCommandsPromptHint } from "@/lib/curiosityBeforeCommands";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
   continuous: boolean;
@@ -8818,7 +8834,24 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Reminders — dedicated estate room (My Workday).
+   * My Day → Reminders / Rhythms — shared explanatory entrance.
+   * Welcome Home calls this for the single My Day row (not separate
+   * Reminders / Rhythms rows). Dedicated rooms open after the member chooses.
+   */
+  function openRemindersRhythmsCore() {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    trackWorkspaceEcosystemEvent("reminders-rhythms");
+    noteWorkspaceOpened("reminders-rhythms", "standalone_room");
+    openStandaloneFocusSectionCore("reminders-rhythms");
+  }
+
+  /**
+   * Reminders — dedicated estate room (after entrance or deep link).
    * Never opens Settings, Notifications overlay, or Plan My Day.
    */
   function openRemindersCore() {
@@ -18069,6 +18102,7 @@ export default function CompanionPageClient() {
                 estateMemoryHintForChat(),
                 buildSavedPatternsPromptHint(),
                 supportStyleHintForChat(trimmed),
+                buildCuriosityBeforeCommandsPromptHint(),
                 chamberMemberChatHint,
                 activeTaskLockHintForChat(estateTaskLockTurn.state),
                 estateConversationTurn && !taskLockBlocksEstateRouting
@@ -22119,6 +22153,7 @@ export default function CompanionPageClient() {
               : activeSection === "plan-my-day" ||
                   activeSection === "reminders" ||
                   activeSection === "rhythms" ||
+                  activeSection === "reminders-rhythms" ||
                   activeSection === "calendar" ||
                   activeSection === "parking-lot" ||
                   activeSection === "spin-wheel"
@@ -22150,6 +22185,7 @@ export default function CompanionPageClient() {
           activeSection === "plan-my-day" ||
           activeSection === "reminders" ||
           activeSection === "rhythms" ||
+          activeSection === "reminders-rhythms" ||
           activeSection === "calendar" ||
           activeSection === "parking-lot" ||
           activeSection === "spin-wheel"
@@ -23327,6 +23363,15 @@ export default function CompanionPageClient() {
             />
           )}
 
+          {activeSection === "reminders-rhythms" && (
+            <RemindersRhythmsEntrancePanel
+              onBack={goBack}
+              registerBack={registerBack}
+              onCreateReminder={() => openRemindersCore()}
+              onCreateRhythm={() => openRhythmsCore()}
+            />
+          )}
+
           {activeSection === "reminders" && (
             <RemindersRoomPanel onBack={goBack} registerBack={registerBack} />
           )}
@@ -24226,7 +24271,9 @@ export default function CompanionPageClient() {
               }
             : undefined
         }
+        onOpenAdaptPlanMyDay={() => openPlanMyDayCore()}
         onOpenPlanMyDay={() => openPlanMyDayCore()}
+        onOpenRemindersRhythms={() => openRemindersRhythmsCore()}
         onOpenRhythms={() => openRhythmsCore()}
         onOpenReminders={() => openRemindersCore()}
         onOpenCalendar={() => openCalendarCore()}

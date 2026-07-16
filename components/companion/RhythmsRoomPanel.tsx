@@ -1,7 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { RhythmsRoomShell } from "@/components/companion/RhythmsRoomShell";
+import {
+  ComparisonExpandable,
+  HowToUseBlock,
+  PersistentDifferenceCue,
+  PreviewCard,
+  RhythmStartExamples,
+  RoomArrivalBlock,
+  RhythmsAreFlexibleSection,
+} from "@/components/companion/ReminderRhythmRoomChrome";
+import { NotificationSoundPreferences } from "@/components/companion/NotificationSoundPreferences";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { getPlanDayOwnerUserId } from "@/lib/planMyDay/planDayOwner";
 import {
@@ -22,12 +32,13 @@ import {
   EMPTY_RHYTHM_FORM,
   MONTH_OPTIONS,
   NTH_WEEKDAY_OPTIONS,
+  RHYTHM_CUSTOM_NOTE_REQUIRED_MESSAGE,
   RHYTHM_FREQUENCY_OPTIONS,
   RHYTHM_SAVE_FAILURE_MESSAGE,
+  RHYTHM_TITLE_REQUIRED_MESSAGE,
   RHYTHMS_HOW_DO_I_COPY,
   WEEKDAY_OPTIONS,
   formValuesFromRhythm,
-  groupRhythmsByCadence,
   rhythmPayloadFromForm,
   rhythmSaveSuccessMessage,
   summarizeRhythmSchedule,
@@ -36,6 +47,15 @@ import {
   type NthWeekday,
   type RhythmFormValues,
 } from "@/lib/rhythms/rhythmForm";
+import { scrollRoomListToTestId } from "@/lib/planMyDay/scrollRoomList";
+import {
+  RHYTHM_START_EXAMPLES,
+  buildRhythmPreview,
+  clearRhythmFormDraft,
+  loadRhythmFormDraft,
+  partitionRhythmsForLists,
+  saveRhythmFormDraft,
+} from "@/lib/remindersVsRhythms";
 
 const FIELD =
   "mt-1 w-full rounded-lg border border-[#d4cdc3] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
@@ -122,12 +142,14 @@ function RhythmForm({
   onSubmit,
   submitLabel,
   onCancel,
+  saving = false,
 }: {
   values: RhythmFormValues;
   onChange: (next: RhythmFormValues) => void;
   onSubmit: () => void;
   submitLabel: string;
   onCancel?: () => void;
+  saving?: boolean;
 }) {
   const set = <K extends keyof RhythmFormValues>(
     key: K,
@@ -140,6 +162,7 @@ function RhythmForm({
       data-testid="rhythms-add-form"
       onSubmit={(e) => {
         e.preventDefault();
+        if (saving) return;
         onSubmit();
       }}
     >
@@ -410,8 +433,14 @@ function RhythmForm({
         </label>
       ) : null}
       <div className="room-form-actions flex flex-wrap gap-2">
-        <button type="submit" className={BTN_PRIMARY} data-testid="rhythms-save">
-          {submitLabel}
+        <button
+          type="submit"
+          className={BTN_PRIMARY}
+          data-testid="rhythms-save"
+          disabled={saving}
+          aria-busy={saving || undefined}
+        >
+          {saving ? "Saving…" : submitLabel}
         </button>
         {onCancel ? (
           <button
@@ -419,6 +448,7 @@ function RhythmForm({
             className={BTN_SECONDARY}
             onClick={onCancel}
             data-testid="rhythms-cancel-edit"
+            disabled={saving}
           >
             Cancel
           </button>
@@ -439,6 +469,8 @@ function RhythmRow({
   const [draft, setDraft] = useState<RhythmFormValues>(() =>
     formValuesFromRhythm(rhythm),
   );
+  const [rowError, setRowError] = useState<string | null>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     setDraft(formValuesFromRhythm(rhythm));
@@ -449,27 +481,49 @@ function RhythmRow({
       <li className={CARD} data-testid={`rhythms-row-${rhythm.id}`}>
         <RhythmForm
           values={draft}
-          onChange={setDraft}
+          onChange={(next) => {
+            setRowError(null);
+            setDraft(next);
+          }}
           submitLabel="Save Changes"
           onCancel={() => {
             setDraft(formValuesFromRhythm(rhythm));
+            setRowError(null);
             setEditing(false);
           }}
           onSubmit={() => {
             if (!draft.title.trim()) return;
-            const payload = rhythmPayloadFromForm(draft);
-            updateMemberRhythm(rhythm.id, {
-              title: payload.title,
-              details: payload.details,
-              cadence: payload.cadence,
-              customNote: payload.customNote,
-              schedule: payload.schedule,
-              window: payload.window,
-            });
-            setEditing(false);
-            onChanged();
+            try {
+              const payload = rhythmPayloadFromForm(draft);
+              const saved = updateMemberRhythm(rhythm.id, {
+                title: payload.title,
+                details: payload.details,
+                cadence: payload.cadence,
+                customNote: payload.customNote,
+                schedule: payload.schedule,
+                window: payload.window,
+              });
+              if (!saved || !getMemberRhythm(rhythm.id)) {
+                setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+                return;
+              }
+              setRowError(null);
+              setEditing(false);
+              onChanged();
+            } catch {
+              setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+            }
           }}
         />
+        {rowError ? (
+          <p
+            className="mt-2 text-sm font-medium text-[#6b3f2a]"
+            role="status"
+            data-testid={`rhythms-edit-error-${rhythm.id}`}
+          >
+            {rowError}
+          </p>
+        ) : null}
       </li>
     );
   }
@@ -501,18 +555,47 @@ function RhythmRow({
         <button
           type="button"
           className={BTN_TEAL_SOFT}
-          onClick={() => setEditing(true)}
-          data-testid={`rhythms-edit-${rhythm.id}`}
+          onClick={() => {
+            try {
+              completeRhythmOccurrence(rhythm.id);
+              setRowError(null);
+              onChanged();
+            } catch {
+              setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+            }
+          }}
+          data-testid={`rhythms-complete-${rhythm.id}`}
         >
-          Edit
+          Complete
+        </button>
+        <button
+          type="button"
+          className={BTN_SECONDARY}
+          onClick={() => {
+            try {
+              skipRhythmOccurrence(rhythm.id);
+              setRowError(null);
+              onChanged();
+            } catch {
+              setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+            }
+          }}
+          data-testid={`rhythms-skip-${rhythm.id}`}
+        >
+          Skip
         </button>
         {paused ? (
           <button
             type="button"
             className={BTN_TEAL_SOFT}
             onClick={() => {
-              resumeRhythm(rhythm.id);
-              onChanged();
+              try {
+                resumeRhythm(rhythm.id);
+                setRowError(null);
+                onChanged();
+              } catch {
+                setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+              }
             }}
             data-testid={`rhythms-resume-${rhythm.id}`}
           >
@@ -523,8 +606,13 @@ function RhythmRow({
             type="button"
             className={BTN_TEAL_SOFT}
             onClick={() => {
-              pauseRhythm(rhythm.id);
-              onChanged();
+              try {
+                pauseRhythm(rhythm.id);
+                setRowError(null);
+                onChanged();
+              } catch {
+                setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+              }
             }}
             data-testid={`rhythms-pause-${rhythm.id}`}
           >
@@ -534,104 +622,98 @@ function RhythmRow({
         <button
           type="button"
           className={BTN_SECONDARY}
-          onClick={() => {
-            skipRhythmOccurrence(rhythm.id);
-            onChanged();
-          }}
-          data-testid={`rhythms-skip-${rhythm.id}`}
+          aria-expanded={moreOpen}
+          onClick={() => setMoreOpen((v) => !v)}
+          data-testid={`rhythms-more-${rhythm.id}`}
         >
-          Skip this occurrence
-        </button>
-        <button
-          type="button"
-          className={BTN_SECONDARY}
-          onClick={() => {
-            completeRhythmOccurrence(rhythm.id);
-            onChanged();
-          }}
-          data-testid={`rhythms-complete-${rhythm.id}`}
-        >
-          Complete this occurrence
-        </button>
-        <button
-          type="button"
-          className={BTN_SECONDARY}
-          onClick={() => {
-            deleteMemberRhythm(rhythm.id);
-            onChanged();
-          }}
-          data-testid={`rhythms-delete-${rhythm.id}`}
-        >
-          Delete
+          More
         </button>
       </div>
+      {moreOpen ? (
+        <div
+          className="mt-2 flex flex-wrap gap-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2"
+          data-testid={`rhythms-more-menu-${rhythm.id}`}
+        >
+          <button
+            type="button"
+            className={BTN_SECONDARY}
+            onClick={() => {
+              setRowError(null);
+              setEditing(true);
+              setMoreOpen(false);
+            }}
+            data-testid={`rhythms-edit-${rhythm.id}`}
+          >
+            Edit / Reschedule
+          </button>
+          <button
+            type="button"
+            className={BTN_SECONDARY}
+            onClick={() => {
+              try {
+                deleteMemberRhythm(rhythm.id);
+                setRowError(null);
+                onChanged();
+              } catch {
+                setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+              }
+            }}
+            data-testid={`rhythms-delete-${rhythm.id}`}
+          >
+            Stop
+          </button>
+        </div>
+      ) : null}
+      {rowError ? (
+        <p
+          className="mt-2 text-sm font-medium text-[#6b3f2a]"
+          role="status"
+          data-testid={`rhythms-row-error-${rhythm.id}`}
+        >
+          {rowError}
+        </p>
+      ) : null}
     </li>
   );
 }
 
-function RhythmGroup({
-  id,
-  label,
+function RhythmListSection({
+  title,
+  empty,
   items,
+  testId,
   onChanged,
-  forceOpen,
+  onAddFocus,
 }: {
-  id: RhythmCadence;
-  label: string;
+  title: string;
+  empty: string;
   items: MemberRhythm[];
+  testId: string;
   onChanged: () => void;
-  forceOpen?: boolean;
+  onAddFocus: () => void;
 }) {
-  const [open, setOpen] = useState(items.length > 0);
-  const prevCountRef = useRef(items.length);
-
-  useEffect(() => {
-    const prev = prevCountRef.current;
-    if (forceOpen || (items.length > 0 && prev === 0)) {
-      setOpen(true);
-    }
-    prevCountRef.current = items.length;
-  }, [forceOpen, items.length]);
-
-  const emptyCopy: Record<RhythmCadence, string> = {
-    daily: "No daily rhythms yet.",
-    weekly: "No weekly rhythms yet.",
-    monthly: "No monthly rhythms yet.",
-    quarterly: "No quarterly rhythms yet.",
-    yearly: "No yearly rhythms yet.",
-    custom: "No custom rhythms yet.",
-  };
-
   return (
-    <section className="mt-4" data-testid={`rhythms-group-${id}`}>
-      <button
-        type="button"
-        className="flex w-full items-center justify-between rounded-xl border border-[#e7dfd4] bg-white/80 px-4 py-3 text-left"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-        data-testid={`rhythms-group-toggle-${id}`}
-      >
-        <span className="text-lg font-semibold text-[#1f1c19]">
-          {label}
-          <span className="ml-2 text-sm font-normal text-[#6b635a]">
-            ({items.length})
-          </span>
-        </span>
-        <span aria-hidden="true" className="text-[#1e4f4f]">
-          {open ? "−" : "+"}
-        </span>
-      </button>
-      {open ? (
-        items.length === 0 ? (
-          <p className="mt-2 px-1 text-sm text-[#6b635a]">{emptyCopy[id]}</p>
-        ) : (
-          <ul className="mt-3 flex flex-col gap-3">
-            {items.map((r) => (
-              <RhythmRow key={r.id} rhythm={r} onChanged={onChanged} />
-            ))}
-          </ul>
-        )
-      ) : null}
+    <section className="mt-6" data-testid={testId}>
+      <h2 className="text-lg font-semibold text-[#1f1c19]">{title}</h2>
+      {items.length === 0 ? (
+        <div className="mt-2 rounded-xl border border-dashed border-[#d4cdc3] bg-white/70 px-4 py-5">
+          <p className="text-base text-[#6b635a]">{empty}</p>
+          <button
+            type="button"
+            className={`${BTN_TEAL_SOFT} mt-3`}
+            onClick={onAddFocus}
+            data-testid={`${testId}-add-cta`}
+          >
+            Create a Rhythm
+          </button>
+        </div>
+      ) : (
+        <ul className="mt-3 flex flex-col gap-3">
+          {items.map((r) => (
+            <RhythmRow key={r.id} rhythm={r} onChanged={onChanged} />
+          ))}
+        </ul>
+      )}
     </section>
   );
 }
@@ -647,9 +729,14 @@ export function RhythmsRoomPanel({
   const [form, setForm] = useState<RhythmFormValues>(EMPTY_RHYTHM_FORM);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusTone, setStatusTone] = useState<"success" | "error">("success");
-  const [focusCadence, setFocusCadence] = useState<RhythmCadence | null>(null);
   const [saving, setSaving] = useState(false);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const refresh = useCallback(() => setTick((n) => n + 1), []);
+
+  useEffect(() => {
+    setForm(loadRhythmFormDraft());
+  }, []);
 
   useEffect(() => {
     const onUpdate = () => refresh();
@@ -668,12 +755,58 @@ export function RhythmsRoomPanel({
   }, [registerBack, onBack]);
 
   void tick;
-  const groups = groupRhythmsByCadence(listMemberRhythms());
+  const lists = partitionRhythmsForLists(listMemberRhythms());
+  const preview = buildRhythmPreview(form);
+
+  function updateForm(next: RhythmFormValues) {
+    setStatusMessage(null);
+    setForm(next);
+    saveRhythmFormDraft(next);
+  }
+
+  function focusAddForm() {
+    setShowAddForm(true);
+    window.setTimeout(() => {
+      document
+        .querySelector<HTMLInputElement>('[data-testid="rhythms-field-title"]')
+        ?.focus();
+    }, 40);
+  }
+
+  function applyExample(exampleId: string) {
+    const ex = RHYTHM_START_EXAMPLES.find((e) => e.id === exampleId);
+    if (!ex) return;
+    const next: RhythmFormValues = {
+      ...EMPTY_RHYTHM_FORM,
+      title: ex.form.title,
+      description: ex.form.description,
+      cadence: ex.form.cadence,
+      time: ex.form.time,
+      weekdays:
+        "weekdays" in ex.form && ex.form.weekdays
+          ? [...ex.form.weekdays]
+          : EMPTY_RHYTHM_FORM.weekdays,
+      dailyMode:
+        ex.form.cadence === "daily"
+          ? "every_day"
+          : EMPTY_RHYTHM_FORM.dailyMode,
+    };
+    updateForm(next);
+    focusAddForm();
+  }
 
   function handleSave() {
     if (saving) return;
-    if (!form.title.trim()) return;
-    if (form.cadence === "custom" && !form.customNote.trim()) return;
+    if (!form.title.trim()) {
+      setStatusTone("error");
+      setStatusMessage(RHYTHM_TITLE_REQUIRED_MESSAGE);
+      return;
+    }
+    if (form.cadence === "custom" && !form.customNote.trim()) {
+      setStatusTone("error");
+      setStatusMessage(RHYTHM_CUSTOM_NOTE_REQUIRED_MESSAGE);
+      return;
+    }
 
     setSaving(true);
     setStatusMessage(null);
@@ -684,22 +817,26 @@ export function RhythmsRoomPanel({
         ...payload,
         ownerUserId,
       });
-      const confirmed = getMemberRhythm(created.id);
-      if (!confirmed) {
-        setStatusTone("error");
-        setStatusMessage(RHYTHM_SAVE_FAILURE_MESSAGE);
-        return;
-      }
+      // Persist already succeeded if create returns — trust the return value
+      // even if an immediate re-read glitches.
+      const confirmed = getMemberRhythm(created.id) ?? created;
       setForm(EMPTY_RHYTHM_FORM);
-      setFocusCadence(confirmed.cadence);
+      clearRhythmFormDraft();
       setStatusTone("success");
-      setStatusMessage(rhythmSaveSuccessMessage(confirmed.cadence));
+      setStatusMessage(
+        `Saved under Active. ${rhythmSaveSuccessMessage(confirmed.cadence)}`,
+      );
       refresh();
       window.setTimeout(() => {
-        document
-          .querySelector(`[data-testid="rhythms-group-${confirmed.cadence}"]`)
-          ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-      }, 50);
+        scrollRoomListToTestId(`rhythms-row-${confirmed.id}`);
+        if (
+          !document.querySelector(
+            `[data-testid="rhythms-row-${confirmed.id}"]`,
+          )
+        ) {
+          scrollRoomListToTestId("rhythms-active");
+        }
+      }, 80);
     } catch {
       setStatusTone("error");
       setStatusMessage(RHYTHM_SAVE_FAILURE_MESSAGE);
@@ -715,6 +852,7 @@ export function RhythmsRoomPanel({
         data-testid="rhythms-room-panel"
       >
         <RhythmsHowDoI />
+        <HowToUseBlock kind="rhythms" />
         <div className="mt-3">
           <button
             type="button"
@@ -733,17 +871,57 @@ export function RhythmsRoomPanel({
         >
           Rhythms
         </h1>
+        <PersistentDifferenceCue kind="rhythms" />
+        <RoomArrivalBlock
+          kind="rhythms"
+          onPrimary={focusAddForm}
+          onShowComparison={() => setComparisonOpen(true)}
+        />
+        <ComparisonExpandable
+          open={comparisonOpen}
+          onToggle={() => setComparisonOpen((v) => !v)}
+          testIdPrefix="rhythms"
+        />
+        <RhythmsAreFlexibleSection />
+        <RhythmStartExamples onUse={applyExample} />
 
         <section className="mt-6" data-testid="rhythms-add-section">
           <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
-            Add a Rhythm
+            Create a Rhythm
           </h2>
-          <RhythmForm
-            values={form}
-            onChange={setForm}
-            onSubmit={handleSave}
-            submitLabel="Save Rhythm"
-          />
+          {showAddForm || form.title.trim() ? (
+            <>
+              <RhythmForm
+                values={form}
+                onChange={updateForm}
+                onSubmit={handleSave}
+                submitLabel="Save Rhythm"
+                saving={saving}
+              />
+              {form.title.trim() ? (
+                <PreviewCard
+                  title="Before you save"
+                  testId="rhythms-presave-preview"
+                  lines={[
+                    { label: "Name", value: preview.name },
+                    { label: "Frequency", value: preview.frequency },
+                    { label: "Window", value: preview.window },
+                    { label: "Skip", value: preview.skip },
+                    { label: "Sound", value: preview.sound },
+                  ]}
+                />
+              ) : null}
+            </>
+          ) : (
+            <button
+              type="button"
+              className={BTN_PRIMARY}
+              data-testid="rhythms-show-add-form"
+              onClick={focusAddForm}
+            >
+              Create a Rhythm
+            </button>
+          )}
           {statusMessage ? (
             <p
               className={
@@ -764,16 +942,34 @@ export function RhythmsRoomPanel({
           ) : null}
         </section>
 
-        {groups.map((group) => (
-          <RhythmGroup
-            key={group.id}
-            id={group.id}
-            label={group.label}
-            items={group.items}
-            onChanged={refresh}
-            forceOpen={focusCadence === group.id}
-          />
-        ))}
+        <RhythmListSection
+          title="Today"
+          empty="Nothing due in today’s window yet."
+          items={lists.today}
+          testId="rhythms-today"
+          onChanged={refresh}
+          onAddFocus={focusAddForm}
+        />
+        <RhythmListSection
+          title="Active"
+          empty="No active rhythms yet."
+          items={lists.active}
+          testId="rhythms-active"
+          onChanged={refresh}
+          onAddFocus={focusAddForm}
+        />
+        <RhythmListSection
+          title="Paused"
+          empty="No paused rhythms."
+          items={lists.paused}
+          testId="rhythms-paused"
+          onChanged={refresh}
+          onAddFocus={focusAddForm}
+        />
+
+        <section className="mt-8 border-t border-[#e7dfd4] pt-6">
+          <NotificationSoundPreferences />
+        </section>
       </div>
     </RhythmsRoomShell>
   );

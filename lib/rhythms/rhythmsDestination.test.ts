@@ -1,14 +1,15 @@
 /**
- * Welcome Home → My Workday → Rhythms + Calendar destination contracts.
+ * Rhythms dedicated room + My Day shared entrance contract.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS } from "@/lib/estate/estateFullBleedPanelSections";
 import { sidebarNavForSection } from "@/lib/companionUi";
+import { REMINDERS_RHYTHMS_ENTRANCE_ACTION_ID } from "@/lib/remindersVsRhythms";
 
 const RHYTHMS_COPY =
-  "Create repeatable routines for the things you regularly return to. Choose how often each rhythm should happen.";
+  "A Rhythm helps you return regularly with a flexible window — not a rigid schedule. Skip, pause, or resume anytime; you’re never “behind.”";
 
 function read(pathFromRoot: string): string {
   return readFileSync(resolve(process.cwd(), pathFromRoot), "utf8");
@@ -20,10 +21,16 @@ describe("Rhythms dedicated destination", () => {
     "components/companion/estate/EstateRoomExperienceMenu.tsx",
   );
   const panel = read("components/companion/RhythmsRoomPanel.tsx");
+  const chrome = read(
+    "components/companion/ReminderRhythmRoomChrome.tsx",
+  );
 
-  it("wires My Workday Rhythms to openRhythmsCore — not Plan My Day", () => {
-    expect(menu).toMatch(/data-testid="estate-open-rhythms"/);
-    expect(client).toMatch(/onOpenRhythms=\{\(\) => openRhythmsCore\(\)\}/);
+  it("My Day uses shared Reminders / Rhythms entrance — not a separate Rhythms row", () => {
+    expect(menu).toContain("onOpenRemindersRhythms");
+    expect(menu).toContain('"reminders-rhythms"');
+    expect(client).toContain(
+      `onOpenRemindersRhythms={() => ${REMINDERS_RHYTHMS_ENTRANCE_ACTION_ID}()}`,
+    );
     expect(client).not.toMatch(
       /onOpenRhythms=\{\(\) => openPlanMyDayCore\(\{ area: "rhythms" \}\)\}/,
     );
@@ -49,14 +56,20 @@ describe("Rhythms dedicated destination", () => {
     expect(sidebarNavForSection("rhythms")).toBe("plan-my-day");
   });
 
-  it("exposes How Do I, Previous, Add, and frequency groups in order", () => {
+  it("exposes How Do I, Previous, arrival, Add, and Today/Active/Paused lists", () => {
     expect(panel).toContain("rhythms-how-do-i");
     expect(panel).toContain("app-back-button");
     expect(panel).toContain("rhythms-title");
+    expect(panel).toContain('kind="rhythms"');
+    expect(panel).toContain("PersistentDifferenceCue");
+    expect(chrome).toContain("${kind}-difference-cue");
+    expect(chrome).toContain("DIFFERENCE_CUE_RHYTHMS");
     expect(panel).toContain("rhythms-add-section");
-    expect(panel).toContain("rhythms-group-${id}");
+    expect(panel).toContain("rhythms-today");
+    expect(panel).toContain("rhythms-active");
+    expect(panel).toContain("rhythms-paused");
     expect(panel).toContain("RHYTHM_FREQUENCY_OPTIONS");
-    expect(panel).toContain("groupRhythmsByCadence");
+    expect(panel).toContain("partitionRhythmsForLists");
     expect(panel).toContain("RHYTHMS_HOW_DO_I_COPY");
     expect(read("lib/rhythms/rhythmForm.ts")).toContain(RHYTHMS_COPY);
     expect(read("lib/rhythms/types.ts")).toContain('"daily"');
@@ -67,12 +80,12 @@ describe("Rhythms dedicated destination", () => {
     const previous = panel.indexOf('data-testid="app-back-button"');
     const title = panel.indexOf('data-testid="rhythms-title"');
     const add = panel.indexOf('data-testid="rhythms-add-section"');
-    const groupsRender = panel.indexOf("{groups.map((group) => (");
+    const today = panel.indexOf('testId="rhythms-today"');
     expect(howDoI).toBeGreaterThan(-1);
     expect(howDoI).toBeLessThan(previous);
     expect(previous).toBeLessThan(title);
     expect(title).toBeLessThan(add);
-    expect(add).toBeLessThan(groupsRender);
+    expect(add).toBeLessThan(today);
   });
 });
 

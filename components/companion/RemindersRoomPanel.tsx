@@ -4,6 +4,16 @@ import { useCallback, useEffect, useState } from "react";
 import { RemindersRoomShell } from "@/components/companion/RemindersRoomShell";
 import { RemindersNotificationSettings } from "@/components/companion/RemindersNotificationSettings";
 import {
+  ComparisonExpandable,
+  HowToUseBlock,
+  PersistentDifferenceCue,
+  PreviewCard,
+  ReminderActionsExplained,
+  ReminderStartExamples,
+  RoomArrivalBlock,
+} from "@/components/companion/ReminderRhythmRoomChrome";
+import { NotificationSoundPreferences } from "@/components/companion/NotificationSoundPreferences";
+import {
   PLAN_MY_DAY_MORNING_COPY,
 } from "@/lib/planMyDay/morningRoom";
 import {
@@ -28,6 +38,14 @@ import {
   type ReminderFormValues,
   type ReminderRepeatOption,
 } from "@/lib/reminders/reminderForm";
+import { scrollRoomListToTestId } from "@/lib/planMyDay/scrollRoomList";
+import {
+  REMINDER_START_EXAMPLES,
+  buildReminderPreview,
+  clearReminderFormDraft,
+  loadReminderFormDraft,
+  saveReminderFormDraft,
+} from "@/lib/remindersVsRhythms";
 
 const FIELD =
   "mt-1 w-full rounded-lg border border-[#d4cdc3] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
@@ -202,6 +220,8 @@ function ReminderRow({
   );
   const [moving, setMoving] = useState(false);
   const [moveDate, setMoveDate] = useState("");
+  const [rowError, setRowError] = useState<string | null>(null);
+  const [moreOpen, setMoreOpen] = useState(false);
 
   useEffect(() => {
     setDraft(formValuesFromReminder(reminder));
@@ -212,23 +232,52 @@ function ReminderRow({
       <li className={CARD} data-testid={`reminder-row-${reminder.id}`}>
         <ReminderForm
           values={draft}
-          onChange={setDraft}
+          onChange={(next) => {
+            setRowError(null);
+            setDraft(next);
+          }}
           submitLabel="Save changes"
-          onCancel={() => setEditing(false)}
+          onCancel={() => {
+            setRowError(null);
+            setEditing(false);
+          }}
           onSubmit={() => {
             if (!draft.title.trim()) return;
-            const payload = reminderPayloadFromForm(draft);
-            updateReminder(reminder.id, {
-              title: payload.title,
-              message: payload.message,
-              reminderType: payload.reminderType,
-              scheduledAt: payload.scheduledAt,
-              recurrenceRule: payload.recurrenceRule,
-            });
-            setEditing(false);
-            onChanged();
+            try {
+              const payload = reminderPayloadFromForm(draft);
+              const saved = updateReminder(reminder.id, {
+                title: payload.title,
+                message: payload.message,
+                reminderType: payload.reminderType,
+                scheduledAt: payload.scheduledAt,
+                recurrenceRule: payload.recurrenceRule,
+              });
+              if (!saved) {
+                setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+                return;
+              }
+              const confirmed = getReminders().find((r) => r.id === reminder.id);
+              if (!confirmed) {
+                setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+                return;
+              }
+              setRowError(null);
+              setEditing(false);
+              onChanged();
+            } catch {
+              setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+            }
           }}
         />
+        {rowError ? (
+          <p
+            className="mt-2 text-sm font-medium text-[#6b3f2a]"
+            role="status"
+            data-testid={`reminder-edit-error-${reminder.id}`}
+          >
+            {rowError}
+          </p>
+        ) : null}
       </li>
     );
   }
@@ -248,8 +297,13 @@ function ReminderRow({
           className={BTN_TEAL_SOFT}
           data-testid={`reminder-complete-${reminder.id}`}
           onClick={() => {
-            completeReminder(reminder.id);
-            onChanged();
+            try {
+              completeReminder(reminder.id);
+              setRowError(null);
+              onChanged();
+            } catch {
+              setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+            }
           }}
         >
           Complete
@@ -257,20 +311,17 @@ function ReminderRow({
         <button
           type="button"
           className={BTN_SECONDARY}
-          data-testid={`reminder-edit-${reminder.id}`}
-          onClick={() => setEditing(true)}
-        >
-          Edit
-        </button>
-        <button
-          type="button"
-          className={BTN_SECONDARY}
           data-testid={`reminder-snooze-${reminder.id}`}
           onClick={() => {
-            const until = new Date();
-            until.setMinutes(until.getMinutes() + 15);
-            snoozeReminder(reminder.id, until.toISOString());
-            onChanged();
+            try {
+              const until = new Date();
+              until.setMinutes(until.getMinutes() + 15);
+              snoozeReminder(reminder.id, until.toISOString());
+              setRowError(null);
+              onChanged();
+            } catch {
+              setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+            }
           }}
         >
           Snooze 15m
@@ -278,39 +329,86 @@ function ReminderRow({
         <button
           type="button"
           className={BTN_SECONDARY}
-          data-testid={`reminder-move-${reminder.id}`}
-          onClick={() => setMoving((v) => !v)}
+          data-testid={`reminder-more-${reminder.id}`}
+          aria-expanded={moreOpen}
+          onClick={() => setMoreOpen((v) => !v)}
         >
-          Move date
+          More
         </button>
-        <button
-          type="button"
-          className="rounded-xl border border-[#a85c4a]/40 px-3 py-1.5 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
-          data-testid={`reminder-delete-${reminder.id}`}
-          onClick={() => {
-            deleteReminder(reminder.id);
-            onChanged();
-          }}
+      </div>
+      {moreOpen ? (
+        <div
+          className="mt-2 flex flex-wrap gap-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2"
+          data-testid={`reminder-more-menu-${reminder.id}`}
         >
-          Delete
-        </button>
-        {reminder.reminderType === "recurring" ? (
           <button
             type="button"
             className={BTN_SECONDARY}
-            data-testid={`reminder-end-recurrence-${reminder.id}`}
+            data-testid={`reminder-edit-${reminder.id}`}
             onClick={() => {
-              updateReminder(reminder.id, {
-                reminderType: "one_time",
-                recurrenceRule: undefined,
-              });
-              onChanged();
+              setRowError(null);
+              setEditing(true);
+              setMoreOpen(false);
             }}
           >
-            End recurrence
+            Edit
           </button>
-        ) : null}
-      </div>
+          <button
+            type="button"
+            className={BTN_SECONDARY}
+            data-testid={`reminder-move-${reminder.id}`}
+            onClick={() => setMoving((v) => !v)}
+          >
+            Move date
+          </button>
+          {reminder.reminderType === "recurring" ? (
+            <button
+              type="button"
+              className={BTN_SECONDARY}
+              data-testid={`reminder-end-recurrence-${reminder.id}`}
+              onClick={() => {
+                try {
+                  updateReminder(reminder.id, {
+                    reminderType: "one_time",
+                    recurrenceRule: undefined,
+                  });
+                  setRowError(null);
+                  onChanged();
+                } catch {
+                  setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+                }
+              }}
+            >
+              End recurrence
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="rounded-xl border border-[#a85c4a]/40 px-3 py-1.5 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
+            data-testid={`reminder-delete-${reminder.id}`}
+            onClick={() => {
+              try {
+                deleteReminder(reminder.id);
+                setRowError(null);
+                onChanged();
+              } catch {
+                setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+              }
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      ) : null}
+      {rowError ? (
+        <p
+          className="mt-2 text-sm font-medium text-[#6b3f2a]"
+          role="status"
+          data-testid={`reminder-row-error-${reminder.id}`}
+        >
+          {rowError}
+        </p>
+      ) : null}
       {moving ? (
         <div className="mt-3 flex flex-wrap items-end gap-2">
           <label className="text-sm font-semibold text-[#1f1c19]">
@@ -338,13 +436,18 @@ function ReminderRow({
                 `${moveDate}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:00`,
               );
               if (Number.isNaN(next.getTime())) return;
-              updateReminder(reminder.id, {
-                scheduledAt: next.toISOString(),
-                snoozedUntil: undefined,
-              });
-              setMoving(false);
-              setMoveDate("");
-              onChanged();
+              try {
+                updateReminder(reminder.id, {
+                  scheduledAt: next.toISOString(),
+                  snoozedUntil: undefined,
+                });
+                setMoving(false);
+                setMoveDate("");
+                setRowError(null);
+                onChanged();
+              } catch {
+                setRowError(REMINDER_SAVE_FAILURE_MESSAGE);
+              }
             }}
           >
             Save date
@@ -396,6 +499,15 @@ function ReminderSection({
   );
 }
 
+function dateWithOffset(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 export function RemindersRoomPanel({
   onBack,
   registerBack,
@@ -408,7 +520,13 @@ export function RemindersRoomPanel({
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusTone, setStatusTone] = useState<"success" | "error">("success");
   const [saving, setSaving] = useState(false);
+  const [comparisonOpen, setComparisonOpen] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
   const refresh = useCallback(() => setTick((n) => n + 1), []);
+
+  useEffect(() => {
+    setForm(loadReminderFormDraft());
+  }, []);
 
   useEffect(() => {
     const onUpdate = () => refresh();
@@ -428,11 +546,35 @@ export function RemindersRoomPanel({
 
   const all = getReminders();
   const { upcoming, recurring, completed } = partitionReminders(all);
+  const preview = buildReminderPreview(form);
+
+  function updateForm(next: ReminderFormValues) {
+    setForm(next);
+    saveReminderFormDraft(next);
+  }
 
   function focusAddForm() {
-    document
-      .querySelector<HTMLInputElement>('[data-testid="reminders-field-title"]')
-      ?.focus();
+    setShowAddForm(true);
+    window.setTimeout(() => {
+      document
+        .querySelector<HTMLInputElement>('[data-testid="reminders-field-title"]')
+        ?.focus();
+    }, 40);
+  }
+
+  function applyExample(exampleId: string) {
+    const ex = REMINDER_START_EXAMPLES.find((e) => e.id === exampleId);
+    if (!ex) return;
+    const next: ReminderFormValues = {
+      title: ex.form.title,
+      date: dateWithOffset(ex.form.dateOffsetDays),
+      time: ex.form.time,
+      repeat: ex.form.repeat,
+      notes: ex.form.notes,
+      customRepeatNote: ex.form.customRepeatNote,
+    };
+    updateForm(next);
+    focusAddForm();
   }
 
   function handleSave() {
@@ -449,18 +591,24 @@ export function RemindersRoomPanel({
         return;
       }
       setForm(EMPTY_REMINDER_FORM);
+      clearReminderFormDraft();
       setStatusTone("success");
       setStatusMessage(reminderSaveSuccessMessage(confirmed));
       refresh();
       window.setTimeout(() => {
+        scrollRoomListToTestId(`reminder-row-${confirmed.id}`);
         const section =
           confirmed.reminderType === "recurring"
             ? "reminders-recurring"
             : "reminders-upcoming";
-        document
-          .querySelector(`[data-testid="${section}"]`)
-          ?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-      }, 50);
+        if (
+          !document.querySelector(
+            `[data-testid="reminder-row-${confirmed.id}"]`,
+          )
+        ) {
+          scrollRoomListToTestId(section);
+        }
+      }, 80);
     } catch {
       setStatusTone("error");
       setStatusMessage(REMINDER_SAVE_FAILURE_MESSAGE);
@@ -477,6 +625,7 @@ export function RemindersRoomPanel({
         data-tick={tick}
       >
         <RemindersHowDoI />
+        <HowToUseBlock kind="reminders" />
         <div className="mt-3">
           <button
             type="button"
@@ -495,17 +644,56 @@ export function RemindersRoomPanel({
         >
           Reminders
         </h1>
+        <PersistentDifferenceCue kind="reminders" />
+        <RoomArrivalBlock
+          kind="reminders"
+          onPrimary={focusAddForm}
+          onShowComparison={() => setComparisonOpen(true)}
+        />
+        <ComparisonExpandable
+          open={comparisonOpen}
+          onToggle={() => setComparisonOpen((v) => !v)}
+          testIdPrefix="reminders"
+        />
+        <ReminderStartExamples onUse={applyExample} />
+        <ReminderActionsExplained />
 
         <section className="mt-6" data-testid="reminders-add-section">
           <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
             Add a Reminder
           </h2>
-          <ReminderForm
-            values={form}
-            onChange={setForm}
-            onSubmit={handleSave}
-            submitLabel="Save Reminder"
-          />
+          {showAddForm || form.title.trim() ? (
+            <>
+              <ReminderForm
+                values={form}
+                onChange={updateForm}
+                onSubmit={handleSave}
+                submitLabel="Save Reminder"
+              />
+              {form.title.trim() ? (
+                <PreviewCard
+                  title="Before you save"
+                  testId="reminders-presave-preview"
+                  lines={[
+                    { label: "What", value: preview.what },
+                    { label: "When", value: preview.when },
+                    { label: "Repeat", value: preview.repeat },
+                    { label: "Sound", value: preview.sound },
+                    { label: "Quiet hours", value: preview.quietHours },
+                  ]}
+                />
+              ) : null}
+            </>
+          ) : (
+            <button
+              type="button"
+              className={BTN_PRIMARY}
+              data-testid="reminders-show-add-form"
+              onClick={focusAddForm}
+            >
+              Add a Reminder
+            </button>
+          )}
           {statusMessage ? (
             <p
               className={
@@ -553,6 +741,9 @@ export function RemindersRoomPanel({
 
         <section className="mt-8 border-t border-[#e7dfd4] pt-6">
           <RemindersNotificationSettings />
+          <div className="mt-6">
+            <NotificationSoundPreferences />
+          </div>
         </section>
       </div>
     </RemindersRoomShell>

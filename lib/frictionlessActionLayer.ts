@@ -289,6 +289,16 @@ import {
   tryResolveRememberManagementCommand,
 } from "./rhythms";
 import {
+  buildAmbiguousRememberQuestion,
+  buildConversationTypeConfirm,
+  clearPendingRememberCreate,
+  isAffirmativeRememberConfirm,
+  isNegativeRememberConfirm,
+  loadPendingRememberCreate,
+  parseRememberClarifyAnswer,
+  savePendingRememberCreate,
+} from "./remindersVsRhythms";
+import {
   buildEstateArrivalContinuation,
   isEstateTransitionOfferMessage,
   loadEstatePendingTransition,
@@ -1068,15 +1078,127 @@ function buildReminderDecision(
     };
   }
 
+  // Pending confirm from a prior turn — create only after yes.
+  const pendingRemember = loadPendingRememberCreate();
+  if (pendingRemember && !input.reminderDraft) {
+    if (isNegativeRememberConfirm(userText)) {
+      clearPendingRememberCreate();
+      return {
+        category: "reminder",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint: reminderHintForChat(),
+        localReply:
+          "Okay — I won’t create that. Want a Reminder for a specific moment, or a Rhythm to return to regularly?",
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: null,
+        reminderIntake: null,
+      };
+    }
+    if (isAffirmativeRememberConfirm(userText)) {
+      if (pendingRemember.kind === "rhythm") {
+        const result = createRhythmFromContent({
+          title: pendingRemember.title,
+          details: pendingRemember.sourceText,
+          cadence: (pendingRemember.cadence as
+            | "daily"
+            | "weekly"
+            | "monthly"
+            | "quarterly"
+            | "yearly"
+            | "custom"
+            | undefined) ?? undefined,
+          inferCadenceFromText: pendingRemember.sourceText,
+          source: "conversation",
+          category: "personal",
+          sourceRef: sourceRefFromChat(
+            `turn-${currentTurn}-${pendingRemember.title.slice(0, 24)}`,
+            pendingRemember.title,
+          ),
+        });
+        clearPendingRememberCreate();
+        if (!result.ok && result.reason === "missing_cadence") {
+          return {
+            category: "reminder",
+            suppressRelationship: true,
+            suppressRecap: true,
+            suppressReflectionFirst: true,
+            responseHint: reminderHintForChat(),
+            localReply:
+              result.ask ??
+              "Would you like this daily, weekly, or on another rhythm?",
+            pendingAction: null,
+            toolSuggestion: null,
+            workspaceOffer: null,
+            intentRouting: null,
+            reminderIntake: null,
+          };
+        }
+        if (result.ok) {
+          const reply = result.duplicate
+            ? `You already have an active rhythm for “${result.rhythm.title}.” I left it as-is — say pause, skip, or reschedule if you'd like a change.`
+            : `Done — I’ve set up a ${result.rhythm.cadence} Rhythm for “${result.rhythm.title}.” You can pause, skip, or resume anytime — no streaks.`;
+          return {
+            category: "reminder",
+            suppressRelationship: true,
+            suppressRecap: true,
+            suppressReflectionFirst: true,
+            responseHint: reminderHintForChat(),
+            localReply: reply,
+            pendingAction: null,
+            toolSuggestion: null,
+            workspaceOffer: null,
+            intentRouting: null,
+            reminderIntake: null,
+          };
+        }
+      }
+      clearPendingRememberCreate();
+    } else {
+      const clarified = parseRememberClarifyAnswer(userText);
+      if (clarified === "rhythm" || clarified === "reminder") {
+        savePendingRememberCreate({
+          ...pendingRemember,
+          kind: clarified,
+        });
+        return {
+          category: "reminder",
+          suppressRelationship: true,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint: reminderHintForChat(),
+          localReply: buildConversationTypeConfirm({
+            kind: clarified,
+            title: pendingRemember.title,
+          }),
+          pendingAction: null,
+          toolSuggestion: null,
+          workspaceOffer: null,
+          intentRouting: null,
+          reminderIntake: null,
+        };
+      }
+    }
+  }
+
   if (needsRememberClarification(userText) && !input.reminderDraft) {
+    const title = extractRhythmTitle(userText) || "that";
+    savePendingRememberCreate({
+      kind: "reminder",
+      title,
+      sourceText: userText,
+      createdAt: new Date().toISOString(),
+    });
     return {
       category: "reminder",
       suppressRelationship: true,
       suppressRecap: true,
       suppressReflectionFirst: true,
       responseHint: reminderHintForChat(),
-      localReply:
-        "Would you like a one-time reminder, or a repeating rhythm you can pause anytime?",
+      localReply: buildAmbiguousRememberQuestion(),
       pendingAction: null,
       toolSuggestion: null,
       workspaceOffer: null,
@@ -1088,55 +1210,46 @@ function buildReminderDecision(
   if (intent === "rhythm" && !input.reminderDraft) {
     const title = extractRhythmTitle(userText) || "Something to return to";
     const cadence = parseCadenceFromText(userText);
-    const result = createRhythmFromContent({
+    if (!cadence) {
+      return {
+        category: "reminder",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint: reminderHintForChat(),
+        localReply: `That sounds like a Rhythm for “${title}.” Would you like it daily, weekly, or on another gentle cadence?`,
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: null,
+        reminderIntake: null,
+      };
+    }
+    // Confirm before create — never silent wrong type.
+    savePendingRememberCreate({
+      kind: "rhythm",
       title,
-      details: userText,
-      cadence: cadence ?? undefined,
-      inferCadenceFromText: userText,
-      source: "conversation",
-      category: "personal",
-      sourceRef: sourceRefFromChat(
-        `turn-${currentTurn}-${title.slice(0, 24)}`,
-        title,
-      ),
+      sourceText: userText,
+      cadence,
+      createdAt: new Date().toISOString(),
     });
-
-    if (!result.ok && result.reason === "missing_cadence") {
-      return {
-        category: "reminder",
-        suppressRelationship: true,
-        suppressRecap: true,
-        suppressReflectionFirst: true,
-        responseHint: reminderHintForChat(),
-        localReply:
-          result.ask ??
-          "Would you like this daily, weekly, or on another rhythm?",
-        pendingAction: null,
-        toolSuggestion: null,
-        workspaceOffer: null,
-        intentRouting: null,
-        reminderIntake: null,
-      };
-    }
-
-    if (result.ok) {
-      const reply = result.duplicate
-        ? `You already have an active rhythm for “${result.rhythm.title}.” I left it as-is — say pause, skip, or reschedule if you'd like a change.`
-        : `I've set up a ${result.rhythm.cadence} rhythm for “${result.rhythm.title}.” You can pause, change the timing, or skip a day anytime — no streaks, no guilt.`;
-      return {
-        category: "reminder",
-        suppressRelationship: true,
-        suppressRecap: true,
-        suppressReflectionFirst: true,
-        responseHint: reminderHintForChat(),
-        localReply: reply,
-        pendingAction: null,
-        toolSuggestion: null,
-        workspaceOffer: null,
-        intentRouting: null,
-        reminderIntake: null,
-      };
-    }
+    return {
+      category: "reminder",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: reminderHintForChat(),
+      localReply: buildConversationTypeConfirm({
+        kind: "rhythm",
+        title,
+        detail: `It would be ${cadence}, with a flexible window — you can skip or pause anytime.`,
+      }),
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: null,
+      reminderIntake: null,
+    };
   }
 
   const outcome = resolveReminderTurn({

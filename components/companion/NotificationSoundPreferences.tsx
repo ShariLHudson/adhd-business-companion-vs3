@@ -115,7 +115,18 @@ export function NotificationSoundPreferences({ className = "" }: Props) {
       </p>
 
       <div className="flex flex-col gap-4">
-        {NOTIFICATION_SOUND_FAMILIES.map((family) => {
+        {NOTIFICATION_SOUND_FAMILIES.filter((family) => {
+          // Reminder + Rhythm always; Priority / Attention only when enabled.
+          if (family.id === "reminder" || family.id === "rhythm") return true;
+          if (family.id === "shari-check-in") return true;
+          if (
+            family.id === "priority-alert" ||
+            family.id === "attention-needed"
+          ) {
+            return prefs.attentionNeededEnabled;
+          }
+          return true;
+        }).map((family) => {
           const selected = prefs[family.prefKey];
           return (
             <fieldset
