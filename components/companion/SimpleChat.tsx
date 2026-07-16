@@ -216,12 +216,14 @@ export function SimpleChat({
         {thread.map((item, threadIndex) => {
           const previous = thread[threadIndex - 1];
           const followsUser = previous?.kind === "user";
+          const isLatestExchange = threadIndex === thread.length - 1;
 
           if (item.kind === "user") {
             return (
               <li
                 key={`user-${item.index}`}
                 className="companion-chat-thread__item companion-fade-in flex flex-col items-end"
+                data-conversation-exchange={isLatestExchange ? "latest" : undefined}
               >
                 <p className="companion-chat-bubble--user">{item.message.content}</p>
               </li>
@@ -237,6 +239,10 @@ export function SimpleChat({
               ]
                 .filter(Boolean)
                 .join(" ")}
+              data-conversation-exchange={isLatestExchange ? "latest" : undefined}
+              data-conversation-latest-assistant={
+                isLatestExchange ? "" : undefined
+              }
             >
               {item.messages.map(({ message, index }, groupIndex) => (
                 <div key={index} className="w-full">

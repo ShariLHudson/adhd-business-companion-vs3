@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
+import { scrollConversationToLatestExchange } from "@/lib/conversation/scrollToLatestExchange";
 
 type Props = {
   welcomeMessage?: string;
@@ -11,7 +12,10 @@ type Props = {
   thread: ReactNode;
   footer: ReactNode;
   panelClassName?: string;
-  /** Bumps when messages change — keeps scroll pinned to latest */
+  /**
+   * Bumps when messages change — reveals start of latest exchange at top of
+   * scrollport (Spec 109 top-down reading; not pin-to-bottom).
+   */
   conversationScrollKey?: string | number;
   /** Estate rooms — input always visible even before first message */
   alwaysShowInput?: boolean;
@@ -42,11 +46,11 @@ export function WelcomeHomeFrostedChatPanel({
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || !showMessages) return;
-    const pinLatest = () => {
-      el.scrollTop = el.scrollHeight;
+    const revealLatestFromTop = () => {
+      scrollConversationToLatestExchange(el, { behavior: "auto" });
     };
-    pinLatest();
-    requestAnimationFrame(() => requestAnimationFrame(pinLatest));
+    revealLatestFromTop();
+    requestAnimationFrame(() => requestAnimationFrame(revealLatestFromTop));
   }, [conversationScrollKey, showMessages, thread, showGreeting]);
 
   const panelClasses = estateRoom

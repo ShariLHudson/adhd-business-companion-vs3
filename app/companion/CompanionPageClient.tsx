@@ -1170,6 +1170,7 @@ import {
   logPrimaryTurnClassification,
   recordPrimaryTurnFinalResponse,
 } from "@/lib/conversation/primaryTurnLog";
+import { scrollConversationToLatestExchange } from "@/lib/conversation/scrollToLatestExchange";
 import { shouldRouteThroughEstateKernel } from "@/lib/estate/estateKernelGate";
 import { resolveEstatePlaceIdFromUserText } from "@/lib/estate/estateRoomAliasRegistry";
 import { printConversation } from "@/lib/sparkAlpha/conversationExport";
@@ -4907,7 +4908,14 @@ export default function CompanionPageClient() {
   useEffect(() => {
     if (activeSection !== "home") return;
     if (workspacePanel && chatLayoutMode === "workspace-focus") return;
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const scroller =
+      bottomRef.current?.closest(
+        ".companion-homestead-chat__reading",
+      ) ??
+      document.querySelector(".companion-homestead-chat__reading");
+    if (scroller instanceof HTMLElement) {
+      scrollConversationToLatestExchange(scroller, { behavior: "smooth" });
+    }
   }, [
     messages,
     isLoading,

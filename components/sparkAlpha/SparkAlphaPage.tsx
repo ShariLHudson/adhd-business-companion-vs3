@@ -37,6 +37,7 @@ import {
 } from "@/lib/sparkAlpha";
 import { runWisdomLoop, pickOpeningPhrase } from "@/lib/sparkWisdom";
 import { buildCoachingFallbackResponse } from "@/lib/sparkConversation/coachingFallback";
+import { scrollConversationToLatestExchange } from "@/lib/conversation/scrollToLatestExchange";
 
 type ChatLine = {
   id: string;
@@ -112,7 +113,6 @@ export function SparkAlphaPage() {
   const [memberNeedPrimary, setMemberNeedPrimary] = useState<string | null>(null);
   const [outcomeSummary, setOutcomeSummary] = useState<string | null>(null);
   const threadRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const pomodoro = usePomodoroTimer();
 
@@ -147,7 +147,9 @@ export function SparkAlphaPage() {
 
   useEffect(() => {
     const scrollToLatest = () => {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+      scrollConversationToLatestExchange(threadRef.current, {
+        behavior: "smooth",
+      });
     };
     scrollToLatest();
     const frame = requestAnimationFrame(scrollToLatest);
@@ -430,20 +432,26 @@ export function SparkAlphaPage() {
 
       <div className="spark-alpha-frosted" role="main">
         <div className="spark-alpha-thread" ref={threadRef} aria-live="polite">
-          {lines.map((line) => (
-            <p
-              key={line.id}
-              className={`spark-alpha-line spark-alpha-line--${line.role}`}
-            >
-              {line.text}
-            </p>
-          ))}
+          {lines.map((line, index) => {
+            const isLatest = index === lines.length - 1;
+            return (
+              <p
+                key={line.id}
+                className={`spark-alpha-line spark-alpha-line--${line.role}`}
+                data-conversation-exchange={isLatest ? "latest" : undefined}
+                data-conversation-latest-assistant={
+                  isLatest && line.role === "assistant" ? "" : undefined
+                }
+              >
+                {line.text}
+              </p>
+            );
+          })}
           {loading && (
             <p className="spark-alpha-line spark-alpha-line--assistant spark-alpha-line--thinking">
               …
             </p>
           )}
-          <div ref={bottomRef} className="spark-alpha-thread__anchor" aria-hidden />
         </div>
 
         <SparkAlphaSuggestionChips
