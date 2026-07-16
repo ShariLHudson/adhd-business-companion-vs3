@@ -3,11 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   deleteReminder,
-  getActiveReminders,
-  getReminders,
   snoozeReminder,
   type Reminder,
 } from "@/lib/reminderStore";
+import {
+  formatRhythmWhen,
+  formatTimeBlockWhen,
+  getNotificationInventory,
+} from "@/lib/notifications/notificationInventory";
 
 const CARD =
   "rounded-2xl border px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/40";
@@ -93,27 +96,78 @@ export function RemindersPanel() {
   useEffect(() => {
     const onUpdate = () => refresh();
     window.addEventListener("companion-reminders-updated", onUpdate);
-    return () =>
+    window.addEventListener("companion-rhythms-updated", onUpdate);
+    return () => {
       window.removeEventListener("companion-reminders-updated", onUpdate);
+      window.removeEventListener("companion-rhythms-updated", onUpdate);
+    };
   }, [refresh]);
 
-  const all = getReminders();
-  const active = getActiveReminders();
-  const recurring = active.filter((r) => r.reminderType === "recurring");
-  const upcoming = active.filter((r) => r.reminderType !== "recurring");
-  const completed = all.filter((r) => r.status === "completed");
+  const inventory = getNotificationInventory();
+  const {
+    activeRhythms,
+    todayTimeBlocks,
+    upcomingReminders,
+    recurringReminders,
+    completedReminders,
+  } = inventory;
 
   return (
     <div className="mt-4 flex flex-col gap-4" key={tick}>
+      <p className="text-sm text-[#6b635a]">
+        Chimes can come from rhythms, time blocks, or reminders. Everything that
+        can sound is listed below.
+      </p>
+
       <section>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-          Upcoming
+          Active rhythms
         </h3>
         <div className="mt-2 flex flex-col gap-2">
-          {upcoming.length === 0 ? (
+          {activeRhythms.length === 0 ? (
+            <p className="text-sm text-[#6b635a]">No active rhythms.</p>
+          ) : (
+            activeRhythms.map((rhythm) => (
+              <div key={rhythm.id} className={CARD}>
+                <p className="font-semibold text-[#2a2520]">{rhythm.title}</p>
+                <p className="mt-0.5 text-sm text-[#6b635a]">
+                  {formatRhythmWhen(rhythm)}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      <section>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
+          Today&apos;s time blocks
+        </h3>
+        <div className="mt-2 flex flex-col gap-2">
+          {todayTimeBlocks.length === 0 ? (
+            <p className="text-sm text-[#6b635a]">No time blocks today.</p>
+          ) : (
+            todayTimeBlocks.map((block) => (
+              <div key={block.id} className={CARD}>
+                <p className="font-semibold text-[#2a2520]">{block.title}</p>
+                <p className="mt-0.5 text-sm text-[#6b635a]">
+                  {formatTimeBlockWhen(block)}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
+      <section>
+        <h3 className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
+          Upcoming reminders
+        </h3>
+        <div className="mt-2 flex flex-col gap-2">
+          {upcomingReminders.length === 0 ? (
             <p className="text-sm text-[#6b635a]">No upcoming reminders.</p>
           ) : (
-            upcoming.map((r) => (
+            upcomingReminders.map((r) => (
               <ReminderRow key={r.id} reminder={r} onChange={refresh} />
             ))
           )}
@@ -122,13 +176,13 @@ export function RemindersPanel() {
 
       <section>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-          Recurring
+          Recurring reminders
         </h3>
         <div className="mt-2 flex flex-col gap-2">
-          {recurring.length === 0 ? (
+          {recurringReminders.length === 0 ? (
             <p className="text-sm text-[#6b635a]">No recurring reminders.</p>
           ) : (
-            recurring.map((r) => (
+            recurringReminders.map((r) => (
               <ReminderRow key={r.id} reminder={r} onChange={refresh} />
             ))
           )}
@@ -137,13 +191,13 @@ export function RemindersPanel() {
 
       <section>
         <h3 className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-          Completed
+          Completed reminders
         </h3>
         <div className="mt-2 flex flex-col gap-2">
-          {completed.length === 0 ? (
+          {completedReminders.length === 0 ? (
             <p className="text-sm text-[#6b635a]">None yet.</p>
           ) : (
-            completed.slice(0, 8).map((r) => (
+            completedReminders.slice(0, 8).map((r) => (
               <div
                 key={r.id}
                 className="rounded-xl border border-[#d4cdc3] px-3 py-2 text-sm text-[#6b635a]"

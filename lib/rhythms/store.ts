@@ -3,7 +3,10 @@
  * Migrates companion-my-rhythms-v1 → companion-rhythms-v1.
  */
 
-import { safeLocalStorageSet } from "@/lib/companionStorageRecovery";
+import {
+  reclaimCompanionStorageHeadroom,
+  safeLocalStorageSet,
+} from "@/lib/companionStorageRecovery";
 import { getPlanDayOwnerUserId } from "@/lib/planMyDay/planDayOwner";
 import { updateReminder } from "@/lib/reminderStore";
 import {
@@ -210,9 +213,25 @@ function writeAll(items: MemberRhythm[]): boolean {
   if (typeof window === "undefined") return false;
   const key = storeKey();
   const payload = JSON.stringify(items);
+  if (safeLocalStorageSet(key, payload)) {
+    window.dispatchEvent(new CustomEvent("companion-rhythms-updated"));
+    return true;
+  }
+  // Match Reminders: reclaim regenerable headroom, then retry once.
+  reclaimCompanionStorageHeadroom();
   if (!safeLocalStorageSet(key, payload)) return false;
   window.dispatchEvent(new CustomEvent("companion-rhythms-updated"));
   return true;
+}
+
+/** Scheduling must never block persistence. */
+function safeNextDueAt(rhythm: MemberRhythm): string | undefined {
+  if (rhythm.status !== "active") return undefined;
+  try {
+    return resolveNextDueAt(rhythm, new Date());
+  } catch {
+    return undefined;
+  }
 }
 
 export function listMemberRhythms(ownerUserId?: string | null): MemberRhythm[] {
@@ -251,8 +270,16 @@ export function updateMemberRhythm(
         ? patch.customNote.trim() || undefined
         : current.customNote,
     cadence: patch.schedule?.cadence ?? patch.cadence ?? current.cadence,
+    /**
+     * Replace schedule on edit — shallow-merge kept stale weekdays/interval
+     * when cadence changed (e.g. Weekly → Daily).
+     */
     schedule: patch.schedule
-      ? { ...current.schedule, ...patch.schedule }
+      ? {
+          ...patch.schedule,
+          cadence:
+            patch.schedule.cadence ?? patch.cadence ?? current.cadence,
+        }
       : current.schedule,
     updatedAt: new Date().toISOString(),
   });
@@ -263,19 +290,20 @@ export function updateMemberRhythm(
     patch.status === "active" ||
     !merged.nextDueAt
   ) {
-    merged.nextDueAt =
-      merged.status === "active"
-        ? resolveNextDueAt(merged, new Date())
-        : undefined;
+    merged.nextDueAt = safeNextDueAt(merged);
   }
   const list = [...all];
   list[index] = merged;
-  writeAll(list);
+  if (!writeAll(list)) {
+    throw new Error("RHYTHM_PERSIST_FAILED");
+  }
   return merged;
 }
 
 export function deleteMemberRhythm(id: string): void {
-  writeAll(readAll().filter((r) => r.id !== id));
+  if (!writeAll(readAll().filter((r) => r.id !== id))) {
+    throw new Error("RHYTHM_PERSIST_FAILED");
+  }
 }
 
 export function createMemberRhythm(input: {
@@ -326,10 +354,11 @@ export function createMemberRhythm(input: {
     snoozeDefaultsMinutes: input.snoozeDefaultsMinutes,
     originatedFromId: input.originatedFromId,
     originatedFromKind: input.originatedFromKind,
-  })!;
-  if (draft.status === "active") {
-    draft.nextDueAt = resolveNextDueAt(draft, new Date());
+  });
+  if (!draft) {
+    throw new Error("RHYTHM_INVALID");
   }
+  draft.nextDueAt = safeNextDueAt(draft);
   const next = [...readAll(), draft];
   if (!writeAll(next)) {
     throw new Error("RHYTHM_PERSIST_FAILED");

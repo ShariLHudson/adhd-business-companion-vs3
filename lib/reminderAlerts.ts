@@ -42,21 +42,22 @@ export function afterReminderFired(reminder: Reminder, now = Date.now()): void {
     }
 
     if (reminder.reminderType === "recurring" && reminder.recurrenceRule) {
-      const next = nextRecurrenceFire(
-        reminder.recurrenceRule,
-        reminder.scheduledAt ? new Date(reminder.scheduledAt) : new Date(now),
-      );
-      if (next) {
-        updateReminder(reminder.id, {
-          scheduledAt: next,
-          lastFiredAt: undefined,
-        });
-      } else {
-        updateReminder(reminder.id, {
-          status: "completed",
-          lastFiredAt: firedAt,
-        });
-      }
+      const from = reminder.scheduledAt
+        ? new Date(reminder.scheduledAt)
+        : new Date(now);
+      const next =
+        nextRecurrenceFire(reminder.recurrenceRule, from) ??
+        (() => {
+          /** Never drop recurring solely because advance returned null. */
+          const fallback = new Date(now);
+          fallback.setDate(fallback.getDate() + 1);
+          return fallback.toISOString();
+        })();
+      updateReminder(reminder.id, {
+        scheduledAt: next,
+        lastFiredAt: undefined,
+        status: "active",
+      });
       return;
     }
 

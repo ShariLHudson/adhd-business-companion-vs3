@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   completeReminder,
   deleteReminder,
@@ -62,6 +62,34 @@ describe("Reminders room store actions", () => {
     expect(upcoming).toHaveLength(0);
   });
 
+  it("creates monthly and yearly reminders under Recurring", () => {
+    saveReminder(
+      reminderPayloadFromForm({
+        ...EMPTY_REMINDER_FORM,
+        title: "Rent",
+        repeat: "monthly",
+        date: "2026-07-01",
+        time: "09:00",
+      }),
+    );
+    saveReminder(
+      reminderPayloadFromForm({
+        ...EMPTY_REMINDER_FORM,
+        title: "Anniversary note",
+        repeat: "yearly",
+        date: "2026-03-15",
+        time: "10:00",
+      }),
+    );
+    const { recurring } = partitionReminders(getReminders());
+    const rent = recurring.find((r) => r.title === "Rent");
+    const anniversary = recurring.find((r) => r.title === "Anniversary note");
+    expect(rent?.recurrenceRule).toBe("monthly@01@09:00");
+    expect(anniversary?.recurrenceRule).toBe("yearly@03-15@10:00");
+    expect(rent?.reminderType).toBe("recurring");
+    expect(anniversary?.reminderType).toBe("recurring");
+  });
+
   it("completes, edits, deletes, snoozes, and moves date", () => {
     const created = saveReminder(
       reminderPayloadFromForm({
@@ -98,5 +126,31 @@ describe("Reminders room store actions", () => {
 
     deleteReminder(created.id);
     expect(getReminders().find((r) => r.id === created.id)).toBeUndefined();
+  });
+
+  it("throws when an edit cannot persist and keeps the prior reminder", () => {
+    const created = saveReminder(
+      reminderPayloadFromForm({
+        ...EMPTY_REMINDER_FORM,
+        title: "Keep original",
+      }),
+    );
+    const proto = Object.getPrototypeOf(localStorage);
+    const originalSet = proto.setItem as (key: string, value: string) => void;
+    const setItem = vi
+      .spyOn(proto, "setItem")
+      .mockImplementation(function (this: Storage, key: string, value: string) {
+        if (String(value).includes("Should not stick")) {
+          throw new Error("quota");
+        }
+        return originalSet.call(this, key, value);
+      });
+    expect(() =>
+      updateReminder(created.id, { title: "Should not stick" }),
+    ).toThrow("REMINDER_PERSIST_FAILED");
+    setItem.mockRestore();
+    expect(getReminders().find((r) => r.id === created.id)?.title).toBe(
+      "Keep original",
+    );
   });
 });

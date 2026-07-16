@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   completeRhythmOccurrence,
   pauseRhythm,
@@ -131,6 +131,33 @@ describe("Rhythms room form + store", () => {
     expect(parseCustomIntervalDays("Every 2 weeks")).toBe(14);
     expect(parseCustomIntervalDays("Every 3 months")).toBe(90);
     expect(parseCustomIntervalDays("First Monday of each month")).toBeUndefined();
+  });
+
+  it("throws when an edit cannot persist and keeps the prior rhythm", () => {
+    const created = createMemberRhythm(
+      rhythmPayloadFromForm({
+        ...EMPTY_RHYTHM_FORM,
+        title: "Keep original",
+        cadence: "daily",
+      }),
+    );
+    const proto = Object.getPrototypeOf(localStorage);
+    const originalSet = proto.setItem as (key: string, value: string) => void;
+    const setItem = vi
+      .spyOn(proto, "setItem")
+      .mockImplementation(function (this: Storage, key: string, value: string) {
+        if (String(value).includes("Should not stick")) {
+          throw new Error("quota");
+        }
+        return originalSet.call(this, key, value);
+      });
+    expect(() =>
+      updateMemberRhythm(created.id, { title: "Should not stick" }),
+    ).toThrow("RHYTHM_PERSIST_FAILED");
+    setItem.mockRestore();
+    expect(listMemberRhythms().find((r) => r.id === created.id)?.title).toBe(
+      "Keep original",
+    );
   });
 
   it("reuses companion-rhythms-v1 storage key", () => {

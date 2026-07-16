@@ -4,7 +4,7 @@
  */
 
 import type { TimeBlock } from "./companionStore";
-import { blockDateTime } from "./companionStore";
+import { blockDateTime, formatPrefsClockTime } from "./companionStore";
 import type { Reminder, ReminderType } from "./reminderStore";
 import { saveReminder, saveReminders } from "./reminderStore";
 
@@ -219,10 +219,7 @@ function formatTimeLabel(iso: string, now: Date): string {
   const tomorrow = new Date(now);
   tomorrow.setDate(tomorrow.getDate() + 1);
   const isTomorrow = tomorrow.toDateString() === d.toDateString();
-  const time = d.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  const time = formatPrefsClockTime(d);
   if (today) return `today at ${time}`;
   if (isTomorrow) return `tomorrow at ${time}`;
   return `${d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })} at ${time}`;
@@ -233,9 +230,10 @@ function formatRecurrence(rule: string): string {
   const daily = rule.match(/^daily@(\d{2}):(\d{2})$/);
   if (daily) {
     const h = Number(daily[1]);
-    const suffix = h >= 12 ? "PM" : "AM";
-    const display = h % 12 || 12;
-    return `every day at ${display} ${suffix}`;
+    const m = Number(daily[2] ?? 0);
+    const d = new Date();
+    d.setHours(h, m, 0, 0);
+    return `every day at ${formatPrefsClockTime(d)}`;
   }
   const weekly = rule.match(/^weekly@(\w+)@(\d{2}):(\d{2})$/);
   if (weekly) return `every ${weekly[1]}`;
@@ -669,6 +667,20 @@ export function reminderHintForChat(): string {
 }
 
 /** Compute next fire time for recurring reminders after a fire. */
+function clampDayOfMonth(year: number, monthIndex: number, day: number): number {
+  const last = new Date(year, monthIndex + 1, 0).getDate();
+  return Math.min(Math.max(1, day), last);
+}
+
+/** Advance `from` until the candidate is strictly after `from`. */
+function ensureAfter(from: Date, candidate: Date): Date {
+  const next = new Date(candidate);
+  while (next.getTime() <= from.getTime()) {
+    next.setDate(next.getDate() + 1);
+  }
+  return next;
+}
+
 export function nextRecurrenceFire(
   rule: string,
   from: Date,
@@ -712,6 +724,55 @@ export function nextRecurrenceFire(
     d.setDate(d.getDate() + delta);
     d.setHours(Number(weekly[2]), Number(weekly[3]), 0, 0);
     return d.toISOString();
+  }
+  const monthly = rule.match(/^monthly@(\d{2})@(\d{2}):(\d{2})$/);
+  if (monthly) {
+    const day = Number(monthly[1]);
+    const hour = Number(monthly[2]);
+    const minute = Number(monthly[3]);
+    const d = new Date(from);
+    d.setMonth(d.getMonth() + 1);
+    d.setDate(
+      clampDayOfMonth(d.getFullYear(), d.getMonth(), day),
+    );
+    d.setHours(hour, minute, 0, 0);
+    if (d.getTime() <= from.getTime()) {
+      d.setMonth(d.getMonth() + 1);
+      d.setDate(
+        clampDayOfMonth(d.getFullYear(), d.getMonth(), day),
+      );
+      d.setHours(hour, minute, 0, 0);
+    }
+    return d.toISOString();
+  }
+  const yearly = rule.match(/^yearly@(\d{2})-(\d{2})@(\d{2}):(\d{2})$/);
+  if (yearly) {
+    const monthIndex = Number(yearly[1]) - 1;
+    const day = Number(yearly[2]);
+    const hour = Number(yearly[3]);
+    const minute = Number(yearly[4]);
+    const d = new Date(from);
+    d.setFullYear(d.getFullYear() + 1);
+    d.setMonth(
+      monthIndex,
+      clampDayOfMonth(d.getFullYear(), monthIndex, day),
+    );
+    d.setHours(hour, minute, 0, 0);
+    if (d.getTime() <= from.getTime()) {
+      d.setFullYear(d.getFullYear() + 1);
+      d.setMonth(
+        monthIndex,
+        clampDayOfMonth(d.getFullYear(), monthIndex, day),
+      );
+      d.setHours(hour, minute, 0, 0);
+    }
+    return d.toISOString();
+  }
+  /** custom@ note — keep recurring with a gentle +1 day bump. */
+  if (rule.startsWith("custom@")) {
+    const d = new Date(from);
+    d.setDate(d.getDate() + 1);
+    return ensureAfter(from, d).toISOString();
   }
   return null;
 }

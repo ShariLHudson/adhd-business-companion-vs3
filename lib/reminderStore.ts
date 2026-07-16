@@ -247,18 +247,22 @@ export function updateReminder(
   patch: Partial<Reminder>,
 ): Reminder | null {
   let updated: Reminder | null = null;
-  writeAll(
-    readAll().map((r) => {
-      if (r.id !== id) return r;
-      updated = sanitizeReminder({ ...r, ...patch });
-      return updated;
-    }),
-  );
+  const next = readAll().map((r) => {
+    if (r.id !== id) return r;
+    updated = sanitizeReminder({ ...r, ...patch });
+    return updated;
+  });
+  if (!updated) return null;
+  if (!writeAll(next)) {
+    throw new Error("REMINDER_PERSIST_FAILED");
+  }
   return updated;
 }
 
 export function deleteReminder(id: string): void {
-  writeAll(readAll().filter((r) => r.id !== id));
+  if (!writeAll(readAll().filter((r) => r.id !== id))) {
+    throw new Error("REMINDER_PERSIST_FAILED");
+  }
 }
 
 export function snoozeReminder(id: string, until: string): Reminder | null {

@@ -4,15 +4,18 @@
  * Save → list → group display contract for the Rhythms room.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import * as companionStorageRecovery from "@/lib/companionStorageRecovery";
 import {
   setPlanDayOwnerUserId,
   getPlanDayOwnerUserId,
 } from "@/lib/planMyDay/planDayOwner";
 import { pauseRhythm } from "./actions";
+import * as scheduling from "./scheduling";
 import {
   createMemberRhythm,
   listMemberRhythms,
   getMemberRhythm,
+  updateMemberRhythm,
 } from "./store";
 import {
   EMPTY_RHYTHM_FORM,
@@ -233,5 +236,132 @@ describe("Rhythms save and display", () => {
 
     const listed = listMemberRhythms();
     expect(listed.find((r) => r.id === created.id)?.title).toBe("Unscoped first");
+  });
+
+  it("replaces schedule on edit so Weekly → Daily drops weekdays", () => {
+    const created = createMemberRhythm(
+      rhythmPayloadFromForm({
+        ...EMPTY_RHYTHM_FORM,
+        title: "Cadence change",
+        cadence: "weekly",
+        weekdays: ["friday"],
+      }),
+    );
+    expect(getMemberRhythm(created.id)?.schedule.weekdays).toEqual(["friday"]);
+
+    const dailyPayload = rhythmPayloadFromForm({
+      ...EMPTY_RHYTHM_FORM,
+      title: "Cadence change",
+      cadence: "daily",
+      dailyMode: "every_day",
+    });
+    const saved = updateMemberRhythm(created.id, {
+      cadence: dailyPayload.cadence,
+      schedule: dailyPayload.schedule,
+      customNote: dailyPayload.customNote,
+    });
+    expect(saved?.cadence).toBe("daily");
+    expect(saved?.schedule.cadence).toBe("daily");
+    expect(saved?.schedule.weekdays).toBeUndefined();
+    expect(getMemberRhythm(created.id)?.schedule.weekdays).toBeUndefined();
+  });
+
+  it("saves a second rhythm after the first without losing either", () => {
+    const first = createMemberRhythm(
+      rhythmPayloadFromForm({
+        ...EMPTY_RHYTHM_FORM,
+        title: "Morning planning",
+        cadence: "daily",
+      }),
+    );
+    const second = createMemberRhythm(
+      rhythmPayloadFromForm({
+        ...EMPTY_RHYTHM_FORM,
+        title: "Friday finances",
+        cadence: "weekly",
+        weekdays: ["friday"],
+      }),
+    );
+    const listed = listMemberRhythms();
+    expect(listed.map((r) => r.id)).toEqual(
+      expect.arrayContaining([first.id, second.id]),
+    );
+    const groups = groupRhythmsByCadence(listed);
+    expect(groups.find((g) => g.id === "daily")!.items.map((r) => r.title)).toContain(
+      "Morning planning",
+    );
+    expect(
+      groups.find((g) => g.id === "weekly")!.items.map((r) => r.title),
+    ).toContain("Friday finances");
+  });
+
+  it("retries persist after reclaim so a second write can succeed", () => {
+    createMemberRhythm(
+      rhythmPayloadFromForm({
+        ...EMPTY_RHYTHM_FORM,
+        title: "Already saved",
+        cadence: "daily",
+      }),
+    );
+
+    let failOnce = true;
+    const setSpy = vi
+      .spyOn(companionStorageRecovery, "safeLocalStorageSet")
+      .mockImplementation((key, value) => {
+        if (failOnce) {
+          failOnce = false;
+          return false;
+        }
+        localStorage.setItem(key, value);
+        return localStorage.getItem(key) === value;
+      });
+    const reclaimSpy = vi
+      .spyOn(companionStorageRecovery, "reclaimCompanionStorageHeadroom")
+      .mockReturnValue(128);
+
+    const second = createMemberRhythm(
+      rhythmPayloadFromForm({
+        ...EMPTY_RHYTHM_FORM,
+        title: "Saved after retry",
+        cadence: "daily",
+      }),
+    );
+
+    expect(reclaimSpy).toHaveBeenCalled();
+    expect(getMemberRhythm(second.id)?.title).toBe("Saved after retry");
+    expect(listMemberRhythms().map((r) => r.title)).toEqual(
+      expect.arrayContaining(["Already saved", "Saved after retry"]),
+    );
+
+    setSpy.mockRestore();
+    reclaimSpy.mockRestore();
+  });
+
+  it("still persists when next-due scheduling throws", () => {
+    const resolveSpy = vi
+      .spyOn(scheduling, "resolveNextDueAt")
+      .mockImplementation(() => {
+        throw new RangeError("Invalid time value");
+      });
+
+    const created = createMemberRhythm(
+      rhythmPayloadFromForm({
+        ...EMPTY_RHYTHM_FORM,
+        title: "Survives schedule error",
+        cadence: "monthly",
+        dayOfMonth: 15,
+      }),
+    );
+
+    expect(created.title).toBe("Survives schedule error");
+    expect(created.nextDueAt).toBeUndefined();
+    expect(getMemberRhythm(created.id)?.title).toBe("Survives schedule error");
+    expect(
+      groupRhythmsByCadence(listMemberRhythms())
+        .find((g) => g.id === "monthly")!
+        .items.map((r) => r.title),
+    ).toContain("Survives schedule error");
+
+    resolveSpy.mockRestore();
   });
 });
