@@ -1,5 +1,5 @@
 /**
- * Approved How to Use content — My Business Estate.
+ * Approved How to Use content — My Business Estate (ADHD-calm, three sections).
  */
 
 import type { EstateHowToGuideContent } from "./types";
@@ -11,231 +11,61 @@ export const BUSINESS_ESTATE_HOW_TO_GUIDE: EstateHowToGuideContent = {
   firstVisitInvite: "New here? Open How to Use",
   welcome: [
     "Welcome to My Business Estate.",
-    "This is where Shari learns how your business works, what matters to you, who you help, and how to support you more personally.",
-    "You do not need to complete everything at once.",
-    "Your Business Estate can grow gradually as you work, make decisions, and learn more about your business.",
+    "This is where Spark learns about your business so support feels more personal.",
   ],
   sections: [
     {
-      id: "what-for",
-      title: "What is My Business Estate for?",
+      id: "what-is-it",
+      title: "What is it?",
       paragraphs: [
-        "My Business Estate keeps the approved information Shari needs to understand the business.",
-        "This may include:",
+        "My Business Estate is where Spark learns about your business — identity, people you help, offers, brand, direction, working style, and tools.",
+        "Approved information here helps Shari, the Chamber, and the Board give you more useful guidance.",
       ],
-      bullets: [
-        "business identity",
-        "offers",
-        "brand",
-        "current priorities",
-        "working preferences",
-        "tools and systems",
-        "People I Help context",
-      ],
-      closingLine:
-        "The more approved information you add, the less often you need to repeat yourself.",
     },
     {
-      id: "six-areas",
-      title: "The six Business Areas",
+      id: "how-it-works",
+      title: "How does it work?",
+      paragraphs: ["Three gentle steps:"],
+      bullets: [
+        "Open a room that feels useful right now",
+        "Answer only what you know — leave the rest for later",
+        "Return anytime; Spark remembers what you already shared",
+      ],
+      closingLine: "Everything is optional. There is no required order.",
+    },
+    {
+      id: "what-first",
+      title: "What should I do first?",
+      paragraphs: [
+        "Start with the Next Helpful Step on the overview — usually Business Basics in the Identity Office.",
+        "If you already know who you help, People I Help is a warm next place.",
+      ],
+      closingLine:
+        "One room at a time is enough. You can always Choose Something Else.",
+    },
+    {
+      id: "advanced-help",
+      title: "Advanced help (optional)",
       subsections: [
         {
-          title: "Identity Office",
+          title: "Need another perspective?",
           bullets: [
-            "business identity",
-            "purpose",
-            "mission",
-            "vision",
-            "values",
+            "Ask a Chamber Specialist for focused implementation help",
+            "Take a major decision to the Board",
+            "Let Shari recommend which fits best",
           ],
         },
         {
-          title: "Offer Suite",
+          title: "Things to know",
           bullets: [
-            "products",
-            "services",
-            "programs",
-            "problems solved",
-            "outcomes",
-            "future offers",
+            "You do not need to finish every area",
+            "Shari reuses approved information",
+            "Chamber and Board advice do not auto-update your estate",
           ],
         },
-        {
-          title: "Brand Studio",
-          bullets: [
-            "personality",
-            "tone",
-            "messages",
-            "preferred language",
-            "visual direction",
-            "content boundaries",
-          ],
-        },
-        {
-          title: "Strategy Desk",
-          bullets: [
-            "current priorities",
-            "main projects",
-            "decisions",
-            "challenges",
-            "milestones",
-            "ideas",
-            "success",
-          ],
-        },
-        {
-          title: "Working Style Study",
-          bullets: [
-            "preferred working conditions",
-            "friction",
-            "overwhelm",
-            "restart support",
-            "decision preferences",
-            "how Shari should help",
-          ],
-        },
-        {
-          title: "Systems Desk",
-          bullets: [
-            "website",
-            "calendars",
-            "file storage",
-            "design tools",
-            "payment tools",
-            "social platforms",
-            "other systems",
-          ],
-        },
-      ],
-    },
-    {
-      id: "how-work",
-      title: "How would you like to work?",
-      subsections: [
-        {
-          title: "Quick Start",
-          bullets: ["answer only the most useful questions"],
-        },
-        {
-          title: "Guided Setup",
-          bullets: ["work through one small stage at a time"],
-        },
-        {
-          title: "Browse and Update",
-          bullets: ["go directly to saved information"],
-        },
-        {
-          title: "Talk This Through With Shari",
-          bullets: [
-            "answer conversationally",
-            "receive suggested drafts",
-            "approve before saving",
-          ],
-        },
-      ],
-      closingLine: "These are options, not required paths.",
-    },
-    {
-      id: "own-words",
-      title: "Use your own words",
-      paragraphs: [
-        "Users may type explanations and descriptions in their own words.",
-        "Dropdowns are shortcuts, not restrictions.",
-        "Text boxes should remain available where explanations are useful.",
-      ],
-    },
-    {
-      id: "another-perspective",
-      title: "Need another perspective?",
-      subsections: [
-        {
-          title: "Ask a Chamber Specialist",
-          bullets: ["focused implementation help"],
-        },
-        {
-          title: "Take This to the Board",
-          bullets: [
-            "major decisions, risk, direction, tradeoffs, or long-term consequences",
-          ],
-        },
-        {
-          title: "Let Shari Recommend",
-          bullets: [
-            "Shari explains whether continued conversation, Chamber, or Board fits best",
-          ],
-        },
-      ],
-      closingLine:
-        "Chamber Members and Board Directors stay in separate places — they are never combined.",
-    },
-    {
-      id: "cartography",
-      title: "View this in Cartography",
-      paragraphs: [
-        "Approved Business Estate information may become:",
-      ],
-      bullets: [
-        "identity map",
-        "offer flow",
-        "strategy map",
-        "systems connection map",
-        "working rhythm map",
-        "audience-needs map",
-      ],
-      closingLine:
-        "Cartography uses existing approved information. Visual changes do not automatically rewrite Business Estate fields.",
-    },
-    {
-      id: "saving",
-      title: "Saving and returning",
-      paragraphs: ["Users may:"],
-      bullets: [
-        "save changes",
-        "cancel",
-        "return later",
-        "mark Enough for Now",
-        "reopen and edit",
-        "leave unfinished areas",
-      ],
-      closingLine:
-        "Closing a question must not erase the current draft. Nothing saves without approval.",
-    },
-    {
-      id: "not-sure",
-      title: "When I am not sure",
-      paragraphs: ["You can always:"],
-      bullets: [
-        "Talk This Through With Shari",
-        "Help Me Choose",
-        "Show Examples",
-        "Ask a Chamber Specialist",
-        "Leave It for Now",
-      ],
-      closingLine: "There are no dead ends.",
-    },
-    {
-      id: "things-to-know",
-      title: "Things to know",
-      bullets: [
-        "users do not need to finish every area",
-        "users do not need to answer every question",
-        "Shari should reuse approved information",
-        "Chamber and Board advice do not auto-update profile data",
-        "users approve suggested changes",
-        "Business Estate grows over time",
-      ],
-    },
-    {
-      id: "final-thought",
-      title: "Final thought",
-      paragraphs: [
-        "My Business Estate is not a test or a long form that must be finished.",
-        "It is a living picture of the business.",
-        "Start with what you know.",
-        "Shari can help shape the rest.",
       ],
     },
   ],
-  primaryActionLabel: "Choose a Business Area",
+  primaryActionLabel: "See My Next Helpful Step",
   primaryActionTestId: "business-estate-how-to-choose-area",
 };

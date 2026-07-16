@@ -11,6 +11,7 @@ import {
   type EstateRecommendation,
 } from "@/lib/profile/businessEstateRedesign";
 import { BusinessEstateRecommendationCard } from "./BusinessEstateRecommendationCard";
+import { BusinessEstateProgressStrip } from "./BusinessEstateProgressStrip";
 import { BusinessEstateGroupAccordion } from "./BusinessEstateGroupAccordion";
 
 type Props = {
@@ -91,6 +92,11 @@ export function BusinessEstateOverview({
         recommendation={recommendation}
         onPrimary={() => handlePrimary(recommendation)}
         onChooseSomethingElse={chooseSomethingElse}
+      />
+
+      <BusinessEstateProgressStrip
+        onEnterRoom={onEnterRoom}
+        onOpenPeopleIHelp={onOpenPeopleIHelp}
       />
 
       <BusinessEstateGroupAccordion

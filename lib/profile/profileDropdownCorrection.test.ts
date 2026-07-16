@@ -1,5 +1,6 @@
 /**
- * My Spark Estate dropdown — three sibling destinations.
+ * My Spark Estate dropdown — My Business Estate + My Profile.
+ * People I Help lives inside My Business Estate (direct-link action retained).
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -27,9 +28,11 @@ describe("profileDropdownCorrection", () => {
     );
     expect(group.children.map((child) => child.id)).toEqual([
       "my-business-estate",
-      "people-i-help",
       "my-profile",
     ]);
+    expect(group.children.map((child) => child.id)).not.toContain(
+      "people-i-help",
+    );
   });
 
   it("does not expose Welcome Home destinations in the flat menu list", () => {

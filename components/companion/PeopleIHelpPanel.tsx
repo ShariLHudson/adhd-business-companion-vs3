@@ -7,6 +7,7 @@ import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEsta
 import { GetExpertHelpAction } from "@/components/companion/advisory/GetExpertHelpAction";
 import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHelpPanel";
 import { getActiveAvatar } from "@/lib/companionStore";
+import { businessEstateAreaBreadcrumb } from "@/lib/profile/profileDestination";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "@/app/companion/my-business-estate.css";
 
@@ -15,7 +16,8 @@ type Props = {
 };
 
 /**
- * People I Help — separate Profile destination over existing client avatars.
+ * People I Help — area inside My Business Estate over existing client avatars.
+ * Quick Understanding is enough; Client Avatar depth stays optional.
  * Shared Need Another Perspective? (not per-field).
  */
 export function PeopleIHelpPanel({ onClose }: Props) {
@@ -60,12 +62,15 @@ export function PeopleIHelpPanel({ onClose }: Props) {
           </button>
           <header className="people-i-help-panel__header">
             <p className="estate-workspace__kicker" data-testid="people-i-help-breadcrumb">
-              My Spark Estate › People I Help
+              {businessEstateAreaBreadcrumb("People I Help")}
             </p>
             <h1 className="estate-workspace__title">People I Help</h1>
             <p className="my-business-estate-panel__lead">
-              The people your work is for — saved client avatars and audiences that
-              guide your messaging and offers.
+              A calm place for who you serve — start with a Quick Understanding.
+              A fuller Client Avatar is optional when you want more depth.
+            </p>
+            <p className="people-i-help-panel__meta">
+              About 5 minutes · Primary, Secondary, and Future audiences welcome
             </p>
           </header>
 

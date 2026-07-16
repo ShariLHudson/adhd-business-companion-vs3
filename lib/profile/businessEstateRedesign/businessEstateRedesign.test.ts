@@ -24,9 +24,11 @@ describe("Business Estate redesign first slice", () => {
     localStorage.clear();
   });
 
-  it("keeps optional-use reassurance language", () => {
-    expect(BUSINESS_ESTATE_OPTIONAL_REASSURANCE).toMatch(/right away/i);
-    expect(BUSINESS_ESTATE_OPTIONAL_REASSURANCE).toMatch(/optional/i);
+  it("keeps one calm grow-with-you reassurance", () => {
+    expect(BUSINESS_ESTATE_OPTIONAL_REASSURANCE).toMatch(/grows with you/i);
+    expect(BUSINESS_ESTATE_OPTIONAL_REASSURANCE).toMatch(
+      /nothing here has to be completed all at once/i,
+    );
     expect(BUSINESS_ESTATE_OPTIONAL_REASSURANCE).not.toMatch(/must complete/i);
     expect(BUSINESS_ESTATE_OPTIONAL_REASSURANCE).not.toMatch(/finish onboarding/i);
   });
@@ -38,6 +40,20 @@ describe("Business Estate redesign first slice", () => {
       "guide",
       "keep-moving",
     ]);
+    const understand = BUSINESS_ESTATE_BROWSE_GROUPS.find(
+      (g) => g.id === "understand",
+    );
+    expect(understand?.entries.map((e) => e.id)).toEqual([
+      "identity",
+      "people-i-help",
+      "offers",
+      "brand",
+    ]);
+    const keepMoving = BUSINESS_ESTATE_BROWSE_GROUPS.find(
+      (g) => g.id === "keep-moving",
+    );
+    expect(keepMoving?.entries).toHaveLength(1);
+    expect(keepMoving?.entries[0]?.kind).toBe("coming-soon");
     // Main screen must not flatten every subsection — groups hold rooms only
     for (const group of BUSINESS_ESTATE_BROWSE_GROUPS) {
       expect(group.entries.length).toBeGreaterThan(0);

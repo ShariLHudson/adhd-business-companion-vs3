@@ -32,9 +32,11 @@ describe("My Profile routing contract", () => {
     if (group?.kind !== "group") return;
     expect(group.children.map((child) => child.id)).toEqual([
       "my-business-estate",
-      "people-i-help",
       "my-profile",
     ]);
+    expect(group.children.map((child) => child.id)).not.toContain(
+      "people-i-help",
+    );
   });
 
   it("maps my-profile action only to profile-personal", () => {

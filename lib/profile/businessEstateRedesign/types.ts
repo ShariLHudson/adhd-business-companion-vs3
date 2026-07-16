@@ -12,7 +12,10 @@ export type EstateSectionInternalState =
   | "ready-to-review"
   | "complete";
 
-/** Room-level user-facing status language (redesign). */
+/**
+ * Room-level user-facing status language (encouraging, no failure tone).
+ * Internal id `not-personalized` maps to "Ready to Begin".
+ */
 export type EstateRoomFacingStatus =
   | "not-personalized"
   | "getting-started"
@@ -21,12 +24,9 @@ export type EstateRoomFacingStatus =
   | "well-defined"
   | "ready-to-review";
 
-export type EstateGroupId =
-  | "understand"
-  | "guide"
-  | "keep-moving";
+export type EstateGroupId = "understand" | "guide" | "keep-moving";
 
-export type EstateBrowseEntryKind = "room" | "area";
+export type EstateBrowseEntryKind = "room" | "area" | "coming-soon";
 
 export type EstateBrowseEntry = {
   id: string;
@@ -38,6 +38,8 @@ export type EstateBrowseEntry = {
   /** When false, show Coming Later — no dead button */
   available: boolean;
   comingLaterLabel?: string;
+  /** Compact Coming Soon teaser items (names only — not built) */
+  comingSoonItems?: readonly string[];
 };
 
 export type EstateBrowseGroup = {

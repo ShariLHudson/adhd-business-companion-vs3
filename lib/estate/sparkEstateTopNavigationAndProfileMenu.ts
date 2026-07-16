@@ -128,7 +128,6 @@ export const SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS: readonly {
   label: string;
 }[] = [
   { id: "my-business-estate", label: "My Business Estate" },
-  { id: "people-i-help", label: "People I Help" },
   { id: "my-profile", label: "My Profile" },
 ];
 

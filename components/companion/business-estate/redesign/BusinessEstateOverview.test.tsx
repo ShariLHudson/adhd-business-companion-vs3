@@ -7,7 +7,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { BusinessEstateOverview } from "./BusinessEstateOverview";
 import { IdentityOfficeEntrance } from "./IdentityOfficeEntrance";
-import { BUSINESS_ESTATE_OPTIONAL_REASSURANCE } from "@/lib/profile/businessEstateRedesign";
+import {
+  BUSINESS_ESTATE_BROWSE_GROUPS,
+  BUSINESS_ESTATE_OPTIONAL_REASSURANCE,
+} from "@/lib/profile/businessEstateRedesign";
 
 describe("BusinessEstateOverview", () => {
   let container: HTMLDivElement;
@@ -27,7 +30,7 @@ describe("BusinessEstateOverview", () => {
     container.remove();
   });
 
-  it("shows optional reassurance and a single recommendation", () => {
+  it("shows one reassurance, one recommendation, and a progress overview", () => {
     const html = renderToStaticMarkup(
       <BusinessEstateOverview
         onClose={() => {}}
@@ -37,10 +40,63 @@ describe("BusinessEstateOverview", () => {
     );
     expect(html).toContain('data-testid="be-optional-reassurance"');
     expect(html).toContain(BUSINESS_ESTATE_OPTIONAL_REASSURANCE.slice(0, 40));
-    expect(html).toMatch(/right away/i);
-    expect(html).toMatch(/optional/i);
+    expect(html).toMatch(/grows with you/i);
+    expect((html.match(/data-testid="be-optional-reassurance"/g) ?? []).length).toBe(
+      1,
+    );
     expect((html.match(/data-testid="be-next-step"/g) ?? []).length).toBe(1);
     expect(html).toMatch(/Start Business Basics/i);
+    expect(html).toContain('data-testid="be-progress-strip"');
+    expect(html).toContain("Business Estate Overview");
+  });
+
+  it("uses a compact Coming Later teaser instead of five inactive rows", () => {
+    const keepMoving = BUSINESS_ESTATE_BROWSE_GROUPS.find(
+      (g) => g.id === "keep-moving",
+    );
+    expect(keepMoving?.entries).toHaveLength(1);
+    expect(keepMoving?.entries[0]?.id).toBe("more-support-coming");
+    expect(keepMoving?.entries[0]?.kind).toBe("coming-soon");
+    expect(keepMoving?.entries.map((e) => e.name)).not.toContain(
+      "Goals and Progress",
+    );
+
+    act(() => {
+      root.render(
+        <BusinessEstateOverview
+          onClose={vi.fn()}
+          onStartBusinessBasics={vi.fn()}
+          onEnterRoom={vi.fn()}
+        />,
+      );
+    });
+    act(() => {
+      container
+        .querySelector<HTMLButtonElement>(
+          '[data-testid="be-group-toggle-keep-moving"]',
+        )
+        ?.click();
+    });
+    expect(container.textContent).toContain("More Support Is Coming");
+    expect(container.textContent).toContain("Coming Later");
+    expect(container.textContent).toContain("See What's Coming");
+    // Names stay hidden until optional expand — not five inactive rows
+    expect(container.textContent).not.toContain("Wins and Evidence");
+    expect(
+      container.querySelectorAll('[data-testid^="be-entry-"]').length,
+    ).toBe(1);
+  });
+
+  it("lists People I Help inside Understand My Business", () => {
+    const understand = BUSINESS_ESTATE_BROWSE_GROUPS.find(
+      (g) => g.id === "understand",
+    );
+    expect(understand?.entries.map((e) => e.id)).toEqual([
+      "identity",
+      "people-i-help",
+      "offers",
+      "brand",
+    ]);
   });
 
   it("keeps groups collapsed by default and opens only one at a time", () => {
@@ -131,6 +187,7 @@ describe("IdentityOfficeEntrance", () => {
     expect(html).toContain("Business Basics");
     expect(html).toContain("Start Business Basics");
     expect(html).toContain("Back to My Business Estate");
+    expect(html).toContain("My Business Estate › Identity Office");
     expect(html).not.toContain("Need Another Perspective");
     expect(html).not.toContain("Guiding Principles");
     expect(html).not.toContain("Definition of Success");

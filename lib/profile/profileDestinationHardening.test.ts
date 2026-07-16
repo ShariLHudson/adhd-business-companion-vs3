@@ -61,10 +61,11 @@ describe("profileDestinationHardening", () => {
     expect(host).toContain('canonical === "profile-personal"');
   });
 
-  it("opens People I Help from the My Spark Estate menu", () => {
+  it("opens People I Help via direct destination (inside My Business Estate hierarchy)", () => {
     expect(companion).toContain('openProfileDestinationCore("people-i-help")');
     expect(companion).toContain('setOverlay("people-i-help")');
     expect(host).toContain("PeopleIHelpPanel");
+    expect(host).toContain("MyBusinessEstatePanel");
   });
 
   it("opens Growth Profile through its intended route", () => {

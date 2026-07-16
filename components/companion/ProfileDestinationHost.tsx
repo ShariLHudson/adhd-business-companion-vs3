@@ -29,7 +29,8 @@ export type ProfileDestinationHostProps = {
 
 /**
  * Dedicated My Spark Estate destinations — body portal.
- * My Profile / My Business Estate / People I Help are siblings — never nested.
+ * SH menu: My Business Estate + My Profile.
+ * People I Help opens as its own overlay (inside MBE hierarchy) for direct links.
  */
 export function ProfileDestinationHost({
   destination,

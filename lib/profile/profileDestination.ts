@@ -1,6 +1,7 @@
 /**
  * My Spark Estate destinations — each menu item maps to exactly one overlay.
- * Never use a generic "profile" parent with implicit child selection.
+ * People I Help is nested under My Business Estate in the menu hierarchy,
+ * but keeps a dedicated overlay so direct links open it on first click.
  */
 
 export type ProfileDestination =
@@ -98,9 +99,22 @@ export function profileDestinationBreadcrumbParent(): string {
   return PROFILE_MENU_LABELS.mySparkEstate;
 }
 
+/** Breadcrumb parent for rooms nested inside My Business Estate. */
+export function businessEstateBreadcrumbParent(): string {
+  return PROFILE_MENU_LABELS.myBusinessEstate;
+}
+
+/** e.g. My Business Estate › People I Help */
+export function businessEstateAreaBreadcrumb(areaTitle: string): string {
+  return `${businessEstateBreadcrumbParent()} › ${areaTitle}`;
+}
+
 export function profileDestinationBreadcrumb(
   destination: ProfileDestination | ProfileDestinationOverlayId,
 ): string {
+  if (destination === "people-i-help") {
+    return businessEstateAreaBreadcrumb(PROFILE_MENU_LABELS.peopleIHelp);
+  }
   return `${profileDestinationBreadcrumbParent()} › ${profileDestinationTitle(destination)}`;
 }
 

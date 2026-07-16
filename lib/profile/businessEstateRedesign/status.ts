@@ -1,5 +1,6 @@
 /**
  * Map existing SectionStatus → redesign room-facing labels.
+ * Encouraging language only — Ready to Begin / In Progress / Growing / Needs Review / Complete.
  */
 import {
   getBusinessEstateSectionStatus,
@@ -32,19 +33,19 @@ export function toInternalSectionState(
 export function roomFacingStatusLabel(status: EstateRoomFacingStatus): string {
   switch (status) {
     case "not-personalized":
-      return "Not Personalized";
+      return "Ready to Begin";
     case "getting-started":
-      return "Getting Started";
+      return "In Progress";
     case "useful-foundation":
-      return "Useful Foundation";
+      return "Growing";
     case "growing":
       return "Growing";
     case "well-defined":
-      return "Well Defined";
+      return "Complete";
     case "ready-to-review":
-      return "Ready to Review";
+      return "Needs Review";
     default:
-      return "Not Personalized";
+      return "Ready to Begin";
   }
 }
 

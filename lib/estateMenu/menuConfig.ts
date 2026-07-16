@@ -52,7 +52,8 @@ export type EstateMenuDropdownEntry =
 
 /**
  * SH profile menu — Conversations, My Spark Estate, Experience Controls, Settings, Sign Out.
- * Each My Spark Estate child maps to one distinct destination.
+ * My Spark Estate children: My Business Estate + My Profile.
+ * People I Help lives inside My Business Estate (action id kept for direct links).
  */
 export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = [
   {
@@ -83,11 +84,6 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
         id: "my-business-estate",
         emoji: "🏡",
         label: "My Business Estate",
-      },
-      {
-        id: "people-i-help",
-        emoji: "🤝",
-        label: "People I Help",
       },
       {
         id: "my-profile",

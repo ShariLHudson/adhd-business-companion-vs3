@@ -53,6 +53,12 @@ export function IdentityOfficeEntrance({
           Back to My Business Estate
         </button>
 
+        <p
+          className="estate-workspace__kicker"
+          data-testid="be-identity-breadcrumb"
+        >
+          My Business Estate › Identity Office
+        </p>
         <h1 className="be-identity-entrance__title">Identity Office</h1>
         <p className="be-identity-entrance__lead">
           This room helps Shari understand what your business is, why it

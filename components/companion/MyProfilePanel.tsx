@@ -23,7 +23,7 @@ type Props = {
 
 /**
  * My Profile — personal member information.
- * Distinct from My Business Estate (business) and People I Help (audience).
+ * Distinct from My Business Estate (business info, including People I Help).
  */
 export function MyProfilePanel({
   onClose,

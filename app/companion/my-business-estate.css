@@ -981,6 +981,12 @@
   max-width: 34rem;
 }
 
+.business-estate-room-header__time {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  color: rgba(70, 62, 52, 0.9);
+}
+
 .business-estate-room-header__status {
   flex-shrink: 0;
   font-size: 0.72rem;
@@ -1431,16 +1437,143 @@
 }
 
 .be-room-entry__purpose,
-.be-room-entry__status {
+.be-room-entry__status,
+.be-room-entry__meta {
   margin: 0.25rem 0 0;
   font-size: 0.98rem;
   line-height: 1.4;
   color: #4b463f;
 }
 
+.be-room-entry__meta {
+  font-size: 0.9rem;
+  color: #6b635a;
+}
+
 .be-room-entry__status {
   font-weight: 650;
   color: #1e4f4f;
+}
+
+.be-room-entry--coming-soon {
+  background: rgba(255, 252, 247, 0.96);
+  border-style: dashed;
+}
+
+.be-coming-soon {
+  margin-top: 0.55rem;
+}
+
+.be-coming-soon__list {
+  margin: 0.45rem 0 0;
+  padding-left: 1.15rem;
+  color: #4b463f;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.be-progress-strip {
+  padding: 1.05rem 1.1rem;
+  border-radius: 1rem;
+  background: rgba(255, 253, 248, 0.96);
+  border: 1px solid rgba(196, 164, 106, 0.28);
+}
+
+.be-progress-strip__title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f1c19;
+}
+
+.be-progress-strip__lead {
+  margin: 0.35rem 0 0.85rem;
+  font-size: 0.98rem;
+  line-height: 1.4;
+  color: #4b463f;
+}
+
+.be-progress-strip__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.be-progress-row__button {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(231, 223, 212, 0.95);
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.be-progress-row__button:hover {
+  border-color: rgba(30, 79, 79, 0.35);
+}
+
+.be-progress-row__indicator {
+  flex: 0 0 0.55rem;
+  width: 0.55rem;
+  min-height: 2.6rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    to top,
+    #1e4f4f 0%,
+    #1e4f4f var(--be-progress, 0%),
+    rgba(196, 164, 106, 0.28) var(--be-progress, 0%),
+    rgba(196, 164, 106, 0.28) 100%
+  );
+}
+
+.be-progress-row--quiet .be-progress-row__indicator {
+  background: rgba(196, 164, 106, 0.28);
+}
+
+.be-progress-row--complete .be-progress-row__indicator {
+  background: #1e4f4f;
+}
+
+.be-progress-row--review .be-progress-row__indicator {
+  background: linear-gradient(to top, #b8892d 0%, #b8892d 70%, rgba(196, 164, 106, 0.28) 70%);
+}
+
+.be-progress-row__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.be-progress-row__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1f1c19;
+}
+
+.be-progress-row__status {
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: #1e4f4f;
+}
+
+.be-progress-row__meta {
+  font-size: 0.88rem;
+  color: #6b635a;
+  line-height: 1.35;
+}
+
+.people-i-help-panel__meta {
+  margin: 0.4rem 0 0;
+  font-size: 0.95rem;
+  color: #6b635a;
 }
 
 .be-identity-entrance {

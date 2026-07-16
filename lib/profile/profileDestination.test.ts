@@ -66,11 +66,18 @@ describe("profileDestination", () => {
       "My Spark Estate › My Profile",
     );
     expect(profileDestinationBreadcrumb("people-i-help")).toBe(
-      "My Spark Estate › People I Help",
+      "My Business Estate › People I Help",
     );
     expect(profileDestinationBreadcrumb("my-business-estate")).toBe(
       "My Spark Estate › My Business Estate",
     );
     expect(profileDestinationTitle("profile")).toBe("My Business Estate");
+  });
+
+  it("keeps people-i-help as a direct-link destination (not a SH menu sibling)", () => {
+    expect(profileDestinationForMenuAction("people-i-help")).toBe(
+      "people-i-help",
+    );
+    expect(isProfileDestinationOverlay("people-i-help")).toBe(true);
   });
 });

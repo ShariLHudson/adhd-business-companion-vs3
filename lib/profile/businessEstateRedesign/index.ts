@@ -5,3 +5,4 @@ export * from "./identitySections";
 export * from "./businessBasics";
 export * from "./recommendations";
 export * from "./futureStructure";
+export * from "./roomProgress";

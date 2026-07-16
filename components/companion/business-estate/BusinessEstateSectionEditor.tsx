@@ -25,6 +25,7 @@ import {
   businessEstateRoomStatusLabel,
   businessEstateRoomStatusTone,
 } from "@/lib/profile/businessEstateRoomChrome";
+import { estateRoomTimeEstimate } from "@/lib/profile/businessEstateRedesign";
 import type { GuidedStageAreaId } from "@/lib/profile/guidedStageTypes";
 import { getGuidedAreaStages } from "@/lib/profile/guidedStageRegistry";
 
@@ -276,6 +277,7 @@ export function BusinessEstateSectionEditor({
           statusTone={businessEstateRoomStatusTone(sectionStatus)}
           onBack={handleBack}
           helpControl={helpControl}
+          timeEstimate={estateRoomTimeEstimate(sectionId)}
         />
       }
       notice={notice}

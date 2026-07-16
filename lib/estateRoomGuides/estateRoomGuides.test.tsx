@@ -112,23 +112,14 @@ describe("Estate How to Use guides", () => {
       />,
     );
     expect(guideHtml).toContain("Welcome to My Business Estate");
-    expect(guideHtml).toContain("Identity Office");
-    expect(guideHtml).toContain("Offer Suite");
-    expect(guideHtml).toContain("Brand Studio");
-    expect(guideHtml).toContain("Strategy Desk");
-    expect(guideHtml).toContain("Working Style Study");
-    expect(guideHtml).toContain("Systems Desk");
-    expect(guideHtml).toContain("Quick Start");
-    expect(guideHtml).toContain("Guided Setup");
-    expect(guideHtml).toContain("Browse and Update");
-    expect(guideHtml).toContain("Talk This Through With Shari");
-    expect(guideHtml).not.toContain("Research This With Shari");
+    expect(guideHtml).toContain("What is it?");
+    expect(guideHtml).toContain("How does it work?");
+    expect(guideHtml).toContain("What should I do first?");
+    expect(guideHtml).toContain("Next Helpful Step");
     expect(guideHtml).toContain("Ask a Chamber Specialist");
-    expect(guideHtml).toContain("Take This to the Board");
-    expect(guideHtml).toContain("View this in Cartography");
-    expect(guideHtml).toContain("Choose a Business Area");
-    expect(guideHtml).toContain("do not auto-update profile data");
-    expect(guideHtml).toContain("users approve suggested changes");
+    expect(guideHtml).toContain("See My Next Helpful Step");
+    expect(guideHtml).toContain("do not auto-update your estate");
+    expect(guideHtml).not.toContain("Research This With Shari");
   });
 
   it("only one section is open by default and close control is present", () => {

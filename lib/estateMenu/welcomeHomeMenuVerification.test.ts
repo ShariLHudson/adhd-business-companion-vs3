@@ -32,7 +32,6 @@ const VISIBLE_ACTION_IDS: EstateMenuActionId[] = [
   "start-new-conversation",
   "start-new-day-conversation",
   "my-business-estate",
-  "people-i-help",
   "my-profile",
   "experience-controls",
   "settings",
@@ -194,10 +193,12 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(/profile-personal-overlay/);
   });
 
-  it("People I Help opens via profile destination resolver", () => {
+  it("People I Help stays available via direct destination (not SH menu sibling)", () => {
     expect(source).toMatch(/openProfileDestinationCore\("people-i-help"\)/);
     expect(source).toMatch(/<ProfileDestinationHost/);
     expect(source).toMatch(/setOverlay\("people-i-help"\)/);
+    const flatIds = ESTATE_MENU_DROPDOWN_ITEMS.map((item) => item.id);
+    expect(flatIds).not.toContain("people-i-help");
   });
 
   it("Experience Controls uses GlobalOverlayHost", () => {

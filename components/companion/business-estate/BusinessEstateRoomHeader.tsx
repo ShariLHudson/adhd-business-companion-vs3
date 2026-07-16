@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { businessEstateAreaBreadcrumb } from "@/lib/profile/profileDestination";
 
 type Props = {
   title: string;
@@ -10,6 +11,8 @@ type Props = {
   onBack: () => void;
   /** Optional single How to Use control in the header row */
   helpControl?: ReactNode;
+  /** Optional time estimate line under purpose */
+  timeEstimate?: string | null;
 };
 
 /** Room title + one purpose sentence + optional status badge. */
@@ -20,6 +23,7 @@ export function BusinessEstateRoomHeader({
   statusTone = "quiet",
   onBack,
   helpControl,
+  timeEstimate,
 }: Props) {
   return (
     <header className="business-estate-room-header">
@@ -35,6 +39,12 @@ export function BusinessEstateRoomHeader({
           <div className="business-estate-room-header__help">{helpControl}</div>
         ) : null}
       </div>
+      <p
+        className="estate-workspace__kicker"
+        data-testid="business-estate-room-breadcrumb"
+      >
+        {businessEstateAreaBreadcrumb(title)}
+      </p>
       <div className="business-estate-room-header__title-row">
         <h2 className="business-estate-room-header__title">{title}</h2>
         {statusLabel ? (
@@ -47,6 +57,9 @@ export function BusinessEstateRoomHeader({
         ) : null}
       </div>
       <p className="business-estate-room-header__purpose">{purpose}</p>
+      {timeEstimate ? (
+        <p className="business-estate-room-header__time">{timeEstimate}</p>
+      ) : null}
     </header>
   );
 }

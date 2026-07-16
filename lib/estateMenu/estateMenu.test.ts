@@ -55,5 +55,19 @@ describe("Global Estate Menu", () => {
     expect(ids).not.toContain("portfolio");
     expect(ids).toContain("my-profile");
     expect(ids).toContain("my-business-estate");
+    expect(ids).not.toContain("people-i-help");
+  });
+
+  it("keeps people-i-help as a routing action id without showing it in the SH menu", () => {
+    expect(ESTATE_MENU_ACTION_IDS).toContain("people-i-help");
+    const sparkEstate = ESTATE_MENU_DROPDOWN_ENTRIES.find(
+      (entry) => entry.kind === "group" && entry.id === "my-spark-estate",
+    );
+    expect(sparkEstate?.kind).toBe("group");
+    if (sparkEstate?.kind !== "group") return;
+    expect(sparkEstate.children.map((child) => child.id)).toEqual([
+      "my-business-estate",
+      "my-profile",
+    ]);
   });
 });

@@ -1,5 +1,6 @@
 /**
  * Browse My Business Estate — three collapsed groups.
+ * Keep My Business Moving shows one compact Coming Soon teaser (no inactive rows).
  */
 import type { EstateBrowseGroup } from "./types";
 
@@ -16,14 +17,15 @@ export const BUSINESS_ESTATE_BROWSE_GROUPS: readonly EstateBrowseGroup[] = [
         sectionId: "identity",
         name: "Identity Office",
         purpose:
-          "Define what your business is, why it exists, and what it stands for.",
+          "Helps Shari speak accurately about what your business is and stands for.",
         available: true,
       },
       {
         id: "people-i-help",
         kind: "area",
         name: "People I Help",
-        purpose: "Describe who you serve and what they need most.",
+        purpose:
+          "Helps Spark speak to the right people with the right problems and language.",
         available: true,
       },
       {
@@ -31,7 +33,8 @@ export const BUSINESS_ESTATE_BROWSE_GROUPS: readonly EstateBrowseGroup[] = [
         kind: "room",
         sectionId: "offers",
         name: "Offer Suite",
-        purpose: "Clarify what you offer and the results it creates.",
+        purpose:
+          "Keeps guidance tied to what you actually offer and the results it creates.",
         available: true,
       },
       {
@@ -39,7 +42,7 @@ export const BUSINESS_ESTATE_BROWSE_GROUPS: readonly EstateBrowseGroup[] = [
         kind: "room",
         sectionId: "brand",
         name: "Brand Studio",
-        purpose: "Shape how your business sounds and shows up.",
+        purpose: "Shapes how Spark writes and sounds like your business.",
         available: true,
       },
     ],
@@ -55,7 +58,8 @@ export const BUSINESS_ESTATE_BROWSE_GROUPS: readonly EstateBrowseGroup[] = [
         kind: "room",
         sectionId: "direction",
         name: "Strategy Desk",
-        purpose: "Set direction, priorities, and decision filters.",
+        purpose:
+          "Gives Shari your current priorities so suggestions stay relevant.",
         available: true,
       },
       {
@@ -63,7 +67,8 @@ export const BUSINESS_ESTATE_BROWSE_GROUPS: readonly EstateBrowseGroup[] = [
         kind: "room",
         sectionId: "work-style",
         name: "Working Style Study",
-        purpose: "Teach Shari how you focus, decide, and recover.",
+        purpose:
+          "Teaches Shari how you focus, decide, and recover — so support fits you.",
         available: true,
       },
       {
@@ -71,7 +76,7 @@ export const BUSINESS_ESTATE_BROWSE_GROUPS: readonly EstateBrowseGroup[] = [
         kind: "room",
         sectionId: "tools",
         name: "Systems Desk",
-        purpose: "Capture tools, workflows, and what keeps work moving.",
+        purpose: "Remembers the tools and systems that keep your work moving.",
         available: true,
       },
     ],
@@ -80,54 +85,31 @@ export const BUSINESS_ESTATE_BROWSE_GROUPS: readonly EstateBrowseGroup[] = [
     id: "keep-moving",
     title: "Keep My Business Moving",
     description:
-      "Set goals, return after interruptions, and see your progress.",
+      "Goals, return support, and quiet progress tools will live here later.",
     entries: [
       {
-        id: "goals-progress",
-        kind: "area",
-        name: "Goals and Progress",
-        purpose: "Choose how you want goals and progress to feel.",
+        id: "more-support-coming",
+        kind: "coming-soon",
+        name: "More Support Is Coming",
+        purpose:
+          "A calm place for goals, return support, and quiet progress — arriving later.",
         available: false,
         comingLaterLabel: "Coming Later",
-      },
-      {
-        id: "return-plan",
-        kind: "area",
-        name: "Return Plan",
-        purpose: "Plan how Shari should help you restart after interruptions.",
-        available: false,
-        comingLaterLabel: "Coming Later",
-      },
-      {
-        id: "spark-impact",
-        kind: "area",
-        name: "My Spark Impact",
-        purpose: "Tell Shari what would make Spark genuinely useful.",
-        available: false,
-        comingLaterLabel: "Coming Later",
-      },
-      {
-        id: "wins-evidence",
-        kind: "area",
-        name: "Wins and Evidence",
-        purpose: "Gather proof and quiet wins over time.",
-        available: false,
-        comingLaterLabel: "Coming Later",
-      },
-      {
-        id: "business-check-in",
-        kind: "area",
-        name: "Business Check-In",
-        purpose: "A calm place to notice where things stand.",
-        available: false,
-        comingLaterLabel: "Coming Later",
+        comingSoonItems: [
+          "Goals and Progress",
+          "Return Plan",
+          "My Spark Impact",
+          "Wins and Evidence",
+          "Business Check-In",
+        ],
       },
     ],
   },
 ] as const;
 
+/** Single warm reassurance — do not repeat optional-copy elsewhere on the overview. */
 export const BUSINESS_ESTATE_OPTIONAL_REASSURANCE =
-  "Spark can help you right away. Everything here is optional. Add information whenever it feels useful—the more Shari understands your business and how you work, the more personalized her support can become.";
+  "My Business Estate grows with you over time. Nothing here has to be completed all at once. Every section you complete simply helps Spark understand your business a little better.";
 
 export const BUSINESS_ESTATE_LEAD =
-  "Help Shari learn about your business so her guidance becomes more personal and useful.";
+  "This is where Spark learns about your business so Shari, the Chamber, and the Board can give you more useful and personalized support.";
