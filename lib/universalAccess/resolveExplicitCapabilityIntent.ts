@@ -10,12 +10,13 @@ import {
   type UniversalCapabilityId,
   type UniversalCapabilityRequest,
 } from "./detectUniversalCapabilityRequest";
-import { pickUniversalAccessFulfillLine } from "./universalAccessStandard";
+import { ackForUniversalCapability } from "./capabilityAck";
 
 const SECTION_TO_CAPABILITY: Partial<
   Record<AppSection, { id: UniversalCapabilityId; nav?: string; ackSeed: number }>
 > = {
-  "time-block": { id: "calendar", nav: "create", ackSeed: 2 },
+  calendar: { id: "calendar", nav: "plan-my-day", ackSeed: 2 },
+  "time-block": { id: "calendar", nav: "plan-my-day", ackSeed: 2 },
   "brain-dump": { id: "clear-my-mind", nav: "clear-my-mind", ackSeed: 1 },
   "content-generator": { id: "content-create", nav: "create", ackSeed: 0 },
   projects: { id: "projects", nav: "create", ackSeed: 3 },
@@ -59,7 +60,7 @@ export function resolveExplicitCapabilityIntent(
     capabilityId: mapped.id,
     section,
     nav: mapped.nav,
-    ack: pickUniversalAccessFulfillLine(mapped.ackSeed),
+    ack: ackForUniversalCapability(mapped.id),
   };
 }
 

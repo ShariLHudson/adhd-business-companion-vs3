@@ -27,16 +27,21 @@ export const UNIVERSAL_ACCESS_NEVER_SAY = [
   "That only works in…",
 ] as const;
 
+/** Generic fulfill lines — never vague ("I'll bring that up"). Prefer capability-specific acks. */
 export const UNIVERSAL_ACCESS_FULFILL_LINES = [
   "I can do that.",
   "Let's open that.",
-  "I'll bring that up.",
   "We can do that right here.",
 ] as const;
 
 export function pickUniversalAccessFulfillLine(seed = 0): string {
   const i = Math.abs(seed) % UNIVERSAL_ACCESS_FULFILL_LINES.length;
   return UNIVERSAL_ACCESS_FULFILL_LINES[i]!;
+}
+
+/** True when copy uses the banned vague navigation fallback. */
+export function isVagueNavigationFallback(text: string): boolean {
+  return /\bi'?ll bring that up\b/i.test(text.trim());
 }
 
 export function violatesUniversalAccessBlockLanguage(text: string): boolean {

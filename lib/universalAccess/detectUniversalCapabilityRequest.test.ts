@@ -65,7 +65,7 @@ describe("detectUniversalCapabilityRequest", () => {
     expect(detectUniversalCapabilityRequest("google drive login")).toBeNull();
   });
 
-  it("opens Breathe from calm / reset phrases without a separate open verb", () => {
+  it("opens Breathe from explicit breathe phrases; calm-down stays conversational", () => {
     expect(detectUniversalCapabilityRequest("Help me breathe")?.capabilityId).toBe(
       "breathe",
     );
@@ -73,18 +73,15 @@ describe("detectUniversalCapabilityRequest", () => {
       "breathe",
     );
     expect(detectUniversalCapabilityRequest("I need a minute")).toBeNull();
-    expect(
-      detectUniversalCapabilityRequest("I need to calm down")?.capabilityId,
-    ).toBe("breathe");
-    expect(detectUniversalCapabilityRequest("Calm me down")?.capabilityId).toBe(
-      "breathe",
-    );
-    expect(detectUniversalCapabilityRequest("Help me reset")?.capabilityId).toBe(
-      "breathe",
-    );
-    // Bare overwhelm is conversation — never auto-launch Breathe.
+    // Calm-down / overwhelm language offers conversation — never auto-launch Breathe.
+    expect(detectUniversalCapabilityRequest("I need to calm down")).toBeNull();
+    expect(detectUniversalCapabilityRequest("Calm me down")).toBeNull();
+    expect(detectUniversalCapabilityRequest("Help me reset")).toBeNull();
+    expect(detectUniversalCapabilityRequest("Help me calm down")).toBeNull();
+    expect(detectUniversalCapabilityRequest("I need a reset")).toBeNull();
     expect(detectUniversalCapabilityRequest("I'm overwhelmed")).toBeNull();
     expect(detectUniversalCapabilityRequest("I'm overwhelmed today.")).toBeNull();
+    // Explicit breathe / breathing-exercise language still opens Breathe.
     expect(
       detectUniversalCapabilityRequest("Start a breathing exercise")?.capabilityId,
     ).toBe("breathe");
@@ -108,11 +105,8 @@ describe("detectUniversalCapabilityRequest", () => {
       detectUniversalCapabilityRequest("I need to breathe")?.capabilityId,
     ).toBe("breathe");
     expect(
-      detectUniversalCapabilityRequest("Help me calm down")?.capabilityId,
-    ).toBe("breathe");
-    expect(
-      detectUniversalCapabilityRequest("I need a reset")?.capabilityId,
-    ).toBe("breathe");
+      detectUniversalCapabilityRequest("Take me to Breathe")?.ack,
+    ).not.toMatch(/bring that up/i);
   });
 });
 

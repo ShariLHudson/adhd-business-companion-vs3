@@ -3,9 +3,11 @@ export {
   UNIVERSAL_ACCESS_LAW,
   UNIVERSAL_ACCESS_NEVER_SAY,
   UNIVERSAL_ACCESS_ROUTING_ORDER,
+  isVagueNavigationFallback,
   pickUniversalAccessFulfillLine,
   violatesUniversalAccessBlockLanguage,
 } from "./universalAccessStandard";
+export { ackForUniversalCapability } from "./capabilityAck";
 export {
   detectUniversalCapabilityRequest,
   isUniversalCapabilityRequest,

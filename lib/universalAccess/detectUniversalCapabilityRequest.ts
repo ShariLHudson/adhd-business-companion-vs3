@@ -6,7 +6,7 @@
 import type { AppSection } from "@/lib/companionUi";
 import type { VisualThinkingViewId } from "@/lib/visualThinkingStudio";
 import { detectSparkVisualEngineViewRequest } from "@/lib/sparkVisualEngine";
-import { pickUniversalAccessFulfillLine } from "./universalAccessStandard";
+import { ackForUniversalCapability } from "./capabilityAck";
 import {
   BREATHE_UNIVERSAL_PATTERN,
   detectBreathePatternHint,
@@ -81,17 +81,18 @@ const RULES: readonly Rule[] = [
   },
   {
     id: "calendar",
-    section: "time-block",
-    nav: "create",
+    section: "calendar",
+    nav: "plan-my-day",
     pattern:
-      /\b(?:calendar|schedule this|time block|add to calendar|put this on my calendar)\b/i,
+      /\b(?:(?:open |show |go to )?(?:my )?calendar|schedule this|add to calendar|put this on my calendar)\b/i,
     ackSeed: 2,
   },
   {
     id: "projects",
     section: "project-homes",
     nav: "create",
-    pattern: /\b(?:my projects|open projects|show projects|project homes?)\b/i,
+    pattern:
+      /\b(?:my projects|open projects|show projects|go to projects|project homes?)\b/i,
     ackSeed: 3,
   },
   {
@@ -251,7 +252,7 @@ export function detectUniversalCapabilityRequest(
       capabilityId: rule.id,
       section: rule.section,
       nav: rule.nav,
-      ack: pickUniversalAccessFulfillLine(rule.ackSeed),
+      ack: ackForUniversalCapability(rule.id),
       ...(visual ? { visualStudioViewId: visual.studioViewId } : {}),
       ...(breathePattern ? { breathePatternId: breathePattern } : {}),
     };
@@ -264,7 +265,7 @@ export function detectUniversalCapabilityRequest(
       capabilityId: "visual-thinking",
       section: "visual-focus",
       nav: "visual-thinking",
-      ack: pickUniversalAccessFulfillLine(0),
+      ack: ackForUniversalCapability("visual-thinking"),
       visualStudioViewId: visualOnly.studioViewId,
     };
   }
