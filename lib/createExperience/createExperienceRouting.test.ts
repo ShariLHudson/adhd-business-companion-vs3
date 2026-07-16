@@ -28,6 +28,15 @@ describe("createExperienceRouting", () => {
     expect(project?.experienceId).toBe("create");
     expect(project?.estatePlaceId).toBe("project-homes");
     expect(project?.toolSection).toBe("project-homes");
+    expect(project?.initialView).toBe("create-purpose");
+  });
+
+  it('routes "i want to create a project" to Project Homes create-purpose', () => {
+    const project = resolveImmediateCreateProjectAction(
+      "i want to create a project",
+    );
+    expect(project?.estatePlaceId).toBe("project-homes");
+    expect(project?.initialView).toBe("create-purpose");
   });
 
   it("routes momentum forward work to project-homes section id", () => {

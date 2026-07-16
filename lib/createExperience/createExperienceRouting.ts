@@ -44,7 +44,11 @@ export type ImmediateCreateOpenPayload = {
 };
 
 const PROJECT_CREATE_RE =
-  /\b(?:create|start|new|add|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\bturn\s+(?:this|it|that)\s+into\s+a\s+project\b|\borganize\s+(?:this|it|that)\s+as\s+a\s+project\b|\bhelp\s+me\s+(?:start|create|organize)\s+(?:a\s+)?(?:new\s+)?project\b/i;
+  /\b(?:create|start|new|add|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\b(?:want|need|like)\s+to\s+(?:create|start|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\bturn\s+(?:this|it|that)\s+into\s+a\s+project\b|\borganize\s+(?:this|it|that)\s+as\s+a\s+project\b|\bhelp\s+me\s+(?:start|create|organize)\s+(?:a\s+)?(?:new\s+)?project\b/i;
+
+/** Explicit go/open/show Projects — never multi-place soft invites. */
+const PROJECTS_NAVIGATION_RE =
+  /\b(?:go to|take me to|bring me to|head to|open|show(?:\s+me)?)\s+(?:the\s+|my\s+)?(?:goals\s*(?:&|and)\s*)?projects?\b|\b(?:open|show)\s+project\s+homes?\b|\bproject\s+homes?\b/i;
 
 const MOMENTUM_PLANNING_RE =
   /\b(?:marketing strategy|business plan(?:ning)?|weekly plan(?:ning)?|quarterly plan(?:ning)?|action plan|roadmap|milestone|goal tracking|move .* forward)\b/i;
@@ -127,11 +131,28 @@ export type ImmediateCreateProjectOpenPayload = {
   /** Estate Projects destination — never legacy split ProjectsPanel. */
   estatePlaceId: "project-homes";
   toolSection: "project-homes";
+  /** Open Project Homes on the create-purpose step. */
+  initialView: "create-purpose";
   followUpLine: string;
 };
 
 export function isProjectCreationIntent(userText: string): boolean {
   return PROJECT_CREATE_RE.test(userText.trim());
+}
+
+/** Member asked to go to / open Projects — route directly, no soft invites. */
+export function isExplicitProjectsNavigationIntent(userText: string): boolean {
+  const t = userText.trim();
+  if (!t) return false;
+  if (isProjectCreationIntent(t)) return false;
+  return PROJECTS_NAVIGATION_RE.test(t);
+}
+
+/** Clear project command — navigate or create — never multi-destination menus. */
+export function isExplicitProjectsCommandIntent(userText: string): boolean {
+  const t = userText.trim();
+  if (!t) return false;
+  return isProjectCreationIntent(t) || isExplicitProjectsNavigationIntent(t);
 }
 
 export function resolveImmediateCreateProjectAction(
@@ -146,6 +167,7 @@ export function resolveImmediateCreateProjectAction(
     experienceId: "create",
     estatePlaceId: "project-homes",
     toolSection: "project-homes",
+    initialView: "create-purpose",
     followUpLine: `${arrival}\n\n${followUp}`,
   };
 }
