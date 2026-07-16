@@ -17,6 +17,10 @@ import {
   shouldBlockScenicOverwhelmMenu,
   wantsScenicCalmPlaces,
 } from "@/lib/conversation/overwhelmNeedClassifier";
+import {
+  mayOfferScenicPlaceSuggestions,
+  scenicPlaceSuggestionCount,
+} from "@/lib/estate/scenicPlaceSuggestionPolicy";
 
 export const CANONICAL_PLACE_SUGGESTION_MAX = 3;
 
@@ -136,6 +140,11 @@ export function detectCanonicalSuggestionProfile(
   const text = userText.trim();
   if (!text) return null;
 
+  // Global gate: no unsolicited scenic / mood → place menus from ordinary chat.
+  if (!mayOfferScenicPlaceSuggestions(text)) {
+    return null;
+  }
+
   // Cognitive unload / task breakdown must never open scenic place menus.
   if (shouldBlockScenicOverwhelmMenu(text) && !wantsScenicCalmPlaces(text)) {
     return null;
@@ -144,7 +153,8 @@ export function detectCanonicalSuggestionProfile(
   if (
     isPlaceSuggestionRequest(text) ||
     isPhysicalQuietPlaceRequest(text) ||
-    QUIET_RE.test(text)
+    QUIET_RE.test(text) ||
+    /\bcalming\b/i.test(text)
   ) {
     return "quiet";
   }
@@ -178,19 +188,27 @@ export function suggestCanonicalPlaceIds(
   userText: string,
   max = CANONICAL_PLACE_SUGGESTION_MAX,
 ): string[] {
+  if (!mayOfferScenicPlaceSuggestions(userText)) {
+    return [];
+  }
+
+  const cappedMax = Math.min(max, scenicPlaceSuggestionCount(userText) || max);
+
   const profile =
     detectCanonicalSuggestionProfile(userText) ??
-  (/\b(?:somewhere|some place|a place)\b/i.test(userText) ? "orient" : null);
+    (/\b(?:somewhere|some place|a place)\b/i.test(userText) ? "orient" : null);
 
   if (!profile) return [];
 
-  const places = suggestCanonicalPlacesForProfile(profile, max);
+  const places = suggestCanonicalPlacesForProfile(profile, cappedMax);
   if (places.length > 0) {
     return places.map((place) => place.id);
   }
 
   if (profile !== "orient") {
-    return suggestCanonicalPlacesForProfile("orient", max).map((place) => place.id);
+    return suggestCanonicalPlacesForProfile("orient", cappedMax).map(
+      (place) => place.id,
+    );
   }
 
   return [];

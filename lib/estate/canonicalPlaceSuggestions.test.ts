@@ -41,39 +41,36 @@ function assertMenuUsesOnlyCanonicalPlaces(line: string) {
 }
 
 describe("canonical place suggestions (registry only)", () => {
-  it('"I need somewhere quiet" → quiet profile, max 3 canonical ids', () => {
+  it('"I need somewhere quiet" → quiet profile, singular place offer', () => {
     expect(detectCanonicalSuggestionProfile("I need somewhere quiet")).toBe(
       "quiet",
     );
     const ids = suggestCanonicalPlaceIds("I need somewhere quiet");
     assertOnlyCanonicalIds(ids);
-    expect(ids).toEqual(
-      suggestCanonicalPlacesForProfile("quiet").map((place) => place.id),
+    expect(ids.length).toBe(1);
+    expect(ids[0]).toBe(
+      suggestCanonicalPlacesForProfile("quiet").map((place) => place.id)[0],
     );
     const menu = formatEstatePlaceSuggestionMenu(ids);
     assertMenuUsesOnlyCanonicalPlaces(menu);
   });
 
-  it('"suggest a peaceful place" → same quiet canonical menu', () => {
+  it('"suggest a peaceful place" → quiet canonical menu (singular)', () => {
     const quietIds = suggestCanonicalPlaceIds("I need somewhere quiet");
     const peacefulIds = suggestCanonicalPlaceIds("suggest a peaceful place");
     assertOnlyCanonicalIds(peacefulIds);
     expect(peacefulIds).toEqual(quietIds);
+    expect(peacefulIds.length).toBe(1);
   });
 
-  it('"I\'m stressed" → stressed profile or chat — never invented places', () => {
+  it('"I\'m stressed" → no unsolicited scenic profile', () => {
     const profile = detectCanonicalSuggestionProfile("I'm stressed");
-    expect(profile).toBe("stressed");
+    expect(profile).toBeNull();
     const ids = suggestCanonicalPlaceIds("I'm stressed");
-    assertOnlyCanonicalIds(ids);
-    expect(ids.length).toBeGreaterThan(0);
+    expect(ids).toEqual([]);
 
     const resolution = resolveEstatePlace("I'm stressed");
-    if (resolution.kind === "suggestion") {
-      assertOnlyCanonicalIds(resolution.suggestedPlaceIds ?? []);
-    } else {
-      expect(resolution.kind).toBe("none");
-    }
+    expect(resolution.kind).toBe("none");
   });
 
   it("resolveEstateIntent never returns non-registry place ids", () => {

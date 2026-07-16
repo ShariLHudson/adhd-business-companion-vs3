@@ -29,6 +29,7 @@ import {
   extractEstateContextSignals,
   isEstateJudgmentQuery,
 } from "./signals";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import type {
   EstateIntentFamily,
   EstateJudgmentInput,
@@ -100,6 +101,28 @@ export function evaluateEstateJudgment(
   const signals = extractEstateContextSignals(input.userText);
 
   if (!isEstateJudgmentQuery(input.userText)) {
+    return {
+      handled: false,
+      intentFamily: null,
+      signals,
+      recommendations: [],
+      intro: "",
+      body: "",
+      suggestions: [],
+      shouldAskQuestion: false,
+      stayInChat: false,
+      candidatePlaceIds: [],
+      responseHint: "",
+    };
+  }
+
+  // Global scenic gate — unsolicited overwhelm/mood → place menus stay off.
+  // Catalog / named room story still proceed (explicit Estate orientation).
+  if (
+    !mayOfferScenicPlaceSuggestions(input.userText) &&
+    !signals.wantsCatalog &&
+    !signals.wantsRoomStory
+  ) {
     return {
       handled: false,
       intentFamily: null,

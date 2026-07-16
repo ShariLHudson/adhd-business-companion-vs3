@@ -37,6 +37,7 @@ import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
 import { isCelebrationSoundsIntent } from "./estatePlaceNavigationIntents";
 import { isSubstantiveConversationHelpRequest } from "./substantiveConversationHelp";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import { tryKnowledgeBasePlaceResolution } from "@/lib/estateNavigationIntelligence/bridge";
 
 export type EstatePlaceResolutionKind =
@@ -63,7 +64,7 @@ export type EstatePlaceResolution = {
 };
 
 const NAV_VERB_RE =
-  /\b(?:take me to|go to|let(?:'s| us) go to|open|show me|visit|head to|bring me to)\b/i;
+  /\b(?:take me to|go to|let(?:'s| us) go to|let(?:'s| us) sit|open|show me|visit|head to|bring me to)\b/i;
 
 const VAGUE_FEELING_RE =
   /\b(?:i want|i need|i'd like|i would like|i'm feeling|i feel|somewhere|something)\b/i;
@@ -398,10 +399,20 @@ function matchFeelingSuggestion(text: string): EstatePlaceResolution | null {
   const wantsSuggestions = isPlaceSuggestionRequest(text);
   const wantsQuietPlace = isPhysicalQuietPlaceRequest(text);
 
+  // Unsolicited feeling → place menus disabled (global scenic policy).
+  if (
+    !mayOfferScenicPlaceSuggestions(text) &&
+    !wantsSuggestions &&
+    !wantsQuietPlace
+  ) {
+    return null;
+  }
+
   const environmentNeed = matchConversationEnvironmentNeed(text);
   if (environmentNeed) return environmentNeed;
 
   if (!wantsQuietPlace && !wantsSuggestions) {
+    if (!mayOfferScenicPlaceSuggestions(text)) return null;
     if (!FEELING_SUGGESTION_RE.test(text)) return null;
   }
 
@@ -488,14 +499,41 @@ export function resolveEstatePlace(
     };
   }
   // Place-suggestion / quiet-place asks must stay on the suggestion path.
-  // Weak substring aliases (e.g. "quiet place") must not force exact navigation.
-  if (
-    registryRouting.kind === "suggest" ||
-    (registryRouting.kind === "navigate" &&
-      (!wantsPlaceSuggestions || hasNavigationIntent(text)))
-  ) {
+  // Registry "navigate" from a substring alias must NOT force a room switch
+  // unless the member asked to go there (nav verb, look-like, where, or bare name).
+  const hasDestinationIntent =
+    hasNavigationIntent(text) ||
+    Boolean(extractRoomPhraseFromNavigation(text)) ||
+    Boolean(matchBareDestination(text));
+
+  if (registryRouting.kind === "suggest") {
     const adapted = routingDecisionToPlaceResolution(registryRouting);
     if (adapted.kind !== "none") return adapted;
+  }
+  if (registryRouting.kind === "navigate" && hasDestinationIntent) {
+    const adapted = routingDecisionToPlaceResolution(registryRouting);
+    if (adapted.kind !== "none") return adapted;
+  }
+  if (
+    registryRouting.kind === "navigate" &&
+    !wantsPlaceSuggestions &&
+    !hasDestinationIntent
+  ) {
+    // Incidental place mention in chat → suggest, never auto-route.
+    const placeId = registryRouting.placeId;
+    if (placeId) {
+      const place = getCanonicalEstatePlaceById(placeId);
+      return {
+        kind: "suggestion",
+        placeId,
+        place,
+        suggestedPlaceIds: [placeId],
+        suggestedPlaces: place ? [place] : [],
+        confidence: "medium",
+        reason: "registry place mentioned in chat — offer, do not auto-navigate",
+        matchedAlias: registryRouting.matchedAlias,
+      };
+    }
   }
 
   if (wantsPlaceSuggestions) {
@@ -521,16 +559,25 @@ export function resolveEstatePlace(
     const bare = matchBareDestination(text);
     if (bare) return bare;
 
+    // Mentioning a place inside a short chat line is a suggestion, never
+    // auto-navigation. Actual room switches require a nav verb, a bare
+    // place name, an explicit accept of an offer, or a menu selection.
     const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
     if (wordCount <= 8) {
       const substring = longestAliasInText(text, { minLength: 4 });
       if (substring && !isVagueFeelingRequest(text)) {
-        return buildNavigateResult(
-          substring.placeId,
-          "exact-place",
-          "exact place alias in text",
-          { matchedAlias: substring.alias },
-        );
+        return {
+          kind: "suggestion",
+          placeId: substring.placeId,
+          place: getCanonicalEstatePlaceById(substring.placeId),
+          suggestedPlaceIds: [substring.placeId],
+          suggestedPlaces: [
+            getCanonicalEstatePlaceById(substring.placeId),
+          ].filter((p): p is CanonicalEstatePlace => Boolean(p)),
+          confidence: "medium",
+          reason: "place mentioned in chat — offer, do not auto-navigate",
+          matchedAlias: substring.alias,
+        };
       }
     }
   }

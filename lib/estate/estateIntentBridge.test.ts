@@ -5,7 +5,6 @@ import {
   mayAutoRouteFromEstateIntent,
   resolveEstateIntent,
 } from "./estateIntentBridge";
-import { suggestCanonicalPlacesForProfile } from "./canonicalPlaceSuggestions";
 
 describe("Estate Intent Bridge (Phase H.1)", () => {
   it('"I need somewhere quiet" suggests restorative places without auto-route', () => {
@@ -19,25 +18,18 @@ describe("Estate Intent Bridge (Phase H.1)", () => {
     expect(mayAutoRouteFromEstateIntent(result)).toBe(false);
   });
 
-  it('"I feel overwhelmed" maps to overwhelmed suggestions', () => {
+  it('"I feel overwhelmed" stays in conversation — no scenic suggestions', () => {
     const result = resolveEstateIntent({ text: "I feel overwhelmed" });
     expect(result.primaryPlaceId).toBeNull();
-    expect(result.suggestedPlaceIds.length).toBeGreaterThanOrEqual(1);
-    expect(result.suggestedPlaceIds.length).toBeLessThanOrEqual(3);
-    expect(result.suggestedPlaceIds).toContain("conservatory");
-    expect(result.reasoning).toMatch(/overwhelm/i);
+    expect(result.suggestedPlaceIds).toEqual([]);
+    expect(result.confidence).toBe(0);
   });
 
-  it('"I want to think" suggests thinking places gently', () => {
+  it('"I want to think" stays in conversation without place ask', () => {
     const result = resolveEstateIntent({ text: "I want to think" });
     expect(result.primaryPlaceId).toBeNull();
-    expect(result.suggestedPlaceIds).toEqual([
-      "observatory",
-      "library",
-      "reading-nook",
-    ]);
-    expect(result.reasoning).toMatch(/conversation-drives-navigation:think/);
-    expect(result.confidence).toBeLessThan(ESTATE_INTENT_AUTO_ROUTE_CONFIDENCE);
+    expect(result.suggestedPlaceIds).toEqual([]);
+    expect(result.confidence).toBe(0);
   });
 
   it('"take me to the plant place" resolves Greenhouse with route confidence', () => {
@@ -52,16 +44,12 @@ describe("Estate Intent Bridge (Phase H.1)", () => {
     expect(result.reasoning).toMatch(/greenhouse/i);
   });
 
-  it('"I want to celebrate something" centers celebration profile order', () => {
+  it('"I want to celebrate something" stays in conversation without place ask', () => {
     const result = resolveEstateIntent({
       text: "I want to celebrate something",
     });
-    const celebrateIds = suggestCanonicalPlacesForProfile("celebrate").map(
-      (place) => place.id,
-    );
-    expect(result.suggestedPlaceIds).toEqual(celebrateIds);
-    expect(result.suggestedPlaceIds.length).toBeLessThanOrEqual(3);
-    expect(result.reasoning).toMatch(/celebrat/i);
+    expect(result.suggestedPlaceIds).toEqual([]);
+    expect(result.primaryPlaceId).toBeNull();
   });
 
   it("relationship conversation — good day wish — no place inference", () => {

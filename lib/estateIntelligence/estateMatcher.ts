@@ -3,6 +3,7 @@
  */
 
 import type { IntentCategory } from "@/lib/intentRoutingIntelligence";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import type {
   EstateMatchConfidence,
   EstateMatchResult,
@@ -313,8 +314,17 @@ export function matchEstateCapabilities(
   if (!normalized) return [];
 
   const scores = new Map<string, { score: number; reasons: string[] }>();
+  const allowScenicInvites = mayOfferScenicPlaceSuggestions(input.userText);
 
   for (const rule of PRODUCT_RULES) {
+    // Unsolicited calm/relax → Peaceful Places invitations stay off.
+    if (
+      !allowScenicInvites &&
+      (rule.entryId === "peaceful-places" ||
+        /calm need|relax intent|peace need/i.test(rule.reason))
+    ) {
+      continue;
+    }
     if (rule.pattern.test(input.userText)) {
       const bucket = scores.get(rule.entryId) ?? { score: 0, reasons: [] };
       bucket.score += rule.score;

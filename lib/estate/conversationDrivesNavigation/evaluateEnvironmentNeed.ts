@@ -11,6 +11,7 @@ import { formatEnvironmentPlaceOffer } from "./formatEnvironmentOffer";
 import { ENVIRONMENT_NEED_LEXICON } from "./environmentNeeds";
 import { shouldSuppressEnvironmentNeedDuringDistress } from "@/lib/conversation/emotionalDistressRouting";
 import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import type {
   ConversationEnvironmentEvaluation,
   EnvironmentNeedId,
@@ -93,6 +94,15 @@ export function evaluateConversationEnvironmentNeed(
     return {
       ...empty,
       reasoning: "emotional distress thread — stay in conversation before environment",
+    };
+  }
+
+  // Global gate: think/focus/relax keywords alone must not open place menus.
+  if (!mayOfferScenicPlaceSuggestions(text)) {
+    return {
+      ...empty,
+      reasoning:
+        "scenic auto-suggestions disabled — stay in conversation without place menu",
     };
   }
 

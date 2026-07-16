@@ -3,6 +3,8 @@
  */
 
 import { matchCanonicalPlaceInText } from "@/lib/estate/canonicalEstateRegistry";
+import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
+import { isExplicitProjectsCommandIntent } from "@/lib/createExperience/createExperienceRouting";
 import { getPlaceByAlias } from "@/lib/estateKnowledge";
 import type {
   EstateActivityMode,
@@ -154,8 +156,9 @@ const SIGNAL_RULES: ReadonlyArray<{
     },
   },
   {
+    // Writing/making an artifact — not bare "email" / "create" in how-to questions.
     pattern:
-      /\b(?:write|draft|create|build|email|newsletter|proposal|presentation|sop|document)\b/i,
+      /\b(?:write|draft|compose)\b.{0,40}\b(?:email|newsletter|proposal|presentation|sop|document|letter|post)\b|\b(?:create|build|make)\s+(?:a|an|the|my)\s+\w+|\b(?:newsletter|proposal|presentation|sop)\b/i,
     apply: (w) => {
       bumpFamily(w, "create", 3);
       bumpMode(w, "creation", 3);
@@ -290,31 +293,73 @@ export function extractEstateContextSignals(
   };
 }
 
+/** Explicit place/mood seeking — required before work intents become room offers. */
+const PLACE_SEEKING_RE =
+  /\b(?:somewhere|some place|a place to|quiet place|peaceful place|which room|what room|visit|take me|go to|head to|bring me|where (?:should|can|do|would) i|room for|space (?:to|for)|settle into|wander|show me the estate|estate map)\b/i;
+
+/**
+ * True only when the member is asking about places / atmosphere —
+ * never for ordinary how-to, automation, or business help.
+ */
 export function isEstateJudgmentQuery(userText: string): boolean {
   const text = userText.trim();
   if (!text) return false;
 
+  // Substantive help stays in conversation (Spec 108 — uncertain → stay).
+  if (isSubstantiveConversationHelpRequest(text)) {
+    return false;
+  }
+
+  // Explicit Projects commands — navigate/create directly, never soft multi-place menus.
+  if (isExplicitProjectsCommandIntent(text)) {
+    return false;
+  }
+
   // Direct task requests (write an email…) are Create — not Estate navigation.
   if (
     /^(?:write|draft|create|send|make|build)\b/i.test(text) &&
-    !/\b(?:room|place|estate|somewhere|visit|conservatory|library|gazebo)\b/i.test(
-      text,
-    )
+    !PLACE_SEEKING_RE.test(text) &&
+    !/\b(?:room|place|estate|conservatory|library|gazebo)\b/i.test(text)
   ) {
     return false;
   }
 
   const signals = extractEstateContextSignals(text);
   if (signals.wantsCatalog || signals.wantsRoomStory) return true;
-  if (signals.wantsReading || signals.wantsWater || signals.wantsFocus) {
+  // Reading / water / focus / think / overwhelm → places only when place-seeking.
+  // Bare emotion keywords must never open scenic multi-place menus.
+  if (
+    (signals.wantsReading || signals.wantsWater) &&
+    PLACE_SEEKING_RE.test(text)
+  ) {
     return true;
   }
-  if (signals.wantsThink || signals.wantsRecover) return true;
-  if (signals.emotional === "overwhelmed" || signals.emotional === "burnout") {
+  if (
+    (signals.wantsFocus || signals.wantsThink) &&
+    PLACE_SEEKING_RE.test(text)
+  ) {
     return true;
   }
+  if (
+    (signals.emotional === "overwhelmed" || signals.emotional === "burnout") &&
+    PLACE_SEEKING_RE.test(text)
+  ) {
+    return true;
+  }
+  if (signals.wantsRecover && PLACE_SEEKING_RE.test(text)) return true;
+
+  // Work intents (create / organize / learn) alone must not open room menus.
+  // Only when the member is clearly seeking a place.
   if (signals.intentFamilies.length > 0 && signals.confidence >= 0.35) {
-    return true;
+    const workOnly = signals.intentFamilies.every((f) =>
+      f === "create" || f === "organize" || f === "learn" || f === "celebrate",
+    );
+    if (workOnly && !PLACE_SEEKING_RE.test(text) && !signals.namedPlaceId) {
+      return false;
+    }
+    if (PLACE_SEEKING_RE.test(text) || signals.namedPlaceId) {
+      return true;
+    }
   }
   return false;
 }

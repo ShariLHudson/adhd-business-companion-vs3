@@ -139,19 +139,15 @@ describe("resolveEstatePlace — Phase C success tests", () => {
     expect(shouldNavigateFromResolution(resolution)).toBe(false);
   });
 
-  it("I need to celebrate something → canonical celebration suggestions", () => {
+  it("I need to celebrate something → no unsolicited place menu", () => {
     const resolution = resolveEstatePlace("I need to celebrate something.");
-    expect(resolution.kind).toBe("suggestion");
-    expect(resolution.suggestedPlaceIds?.length).toBeGreaterThan(0);
-    expect(resolution.suggestedPlaceIds?.length).toBeLessThanOrEqual(3);
+    expect(resolution.kind).toBe("none");
     expect(shouldNavigateFromResolution(resolution)).toBe(false);
   });
 
-  it("I want to learn something → canonical learn suggestions", () => {
+  it("I want to learn something → no unsolicited place menu", () => {
     const resolution = resolveEstatePlace("I want to learn something.");
-    expect(resolution.kind).toBe("suggestion");
-    expect(resolution.suggestedPlaceIds?.length).toBeGreaterThan(0);
-    expect(resolution.suggestedPlaceIds?.length).toBeLessThanOrEqual(3);
+    expect(resolution.kind).toBe("none");
     expect(shouldNavigateFromResolution(resolution)).toBe(false);
   });
 

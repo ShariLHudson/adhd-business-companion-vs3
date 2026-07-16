@@ -21,6 +21,9 @@ import {
   isRetrieveIntent,
   isTemplateIntent,
 } from "@/lib/conversationStabilization/goalClassifier";
+import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
+import { isExplicitProjectsCommandIntent } from "@/lib/createExperience/createExperienceRouting";
 import { THINKING_FRAMEWORKS } from "./thinkingFrameworkRegistry";
 import { UNIVERSAL_DOCUMENT_LABELS } from "./creationKnowledge";
 import type { EstateGuideTopic, EstateGuideTurnResult } from "./types";
@@ -93,12 +96,17 @@ export function isEstateGuideQuestion(
     return false;
   }
   if (isInformationalAdhdQuestion(t)) return false;
+  // Explicit Projects commands — never Estate Guide multi-place soft invites.
+  if (isExplicitProjectsCommandIntent(t)) return false;
+  // Capability / ADHD exploration is Estate Guide — before substantive-help gate.
   if (CAPABILITY_EXPLORATION_RE.test(t)) return true;
   if (SPARK_ADHD_CAPABILITY_RE.test(t)) return true;
   if (MEMBER_ADHD_SHARING_RE.test(t)) return true;
+  if (isSubstantiveConversationHelpRequest(t)) return false;
   if (isEstateOrientationQuestion(t)) return true;
   if (isEstateRoomStoryQuestion(t)) return true;
-  if (isEstateJudgmentQuery(t)) return true;
+  // Judgment scenic menus only when place-seeking (or auto-suggestions re-enabled).
+  if (isEstateJudgmentQuery(t) && mayOfferScenicPlaceSuggestions(t)) return true;
   return false;
 }
 
@@ -270,7 +278,8 @@ export function resolveEstateGuideTurn(
   const tryIntelligence =
     topic === "rooms" ||
     topic === "room_story" ||
-    isEstateJudgmentQuery(userText);
+    (isEstateJudgmentQuery(userText) &&
+      mayOfferScenicPlaceSuggestions(userText));
 
   if (tryIntelligence) {
     const intelligence = evaluateEstateJudgment({

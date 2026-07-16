@@ -35,6 +35,7 @@ import {
 import type { CanonicalSuggestionProfile } from "./canonicalEstateRegistryTypes";
 import { isSubstantiveConversationHelpRequest } from "./substantiveConversationHelp";
 import { shouldBlockScenicOverwhelmMenu } from "@/lib/conversation/overwhelmNeedClassifier";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 
 /** Minimum confidence before a consumer may auto-route (never force below this). */
 export const ESTATE_INTENT_AUTO_ROUTE_CONFIDENCE = 0.7;
@@ -350,6 +351,8 @@ function matchDescriptive(
 function matchEmotional(
   text: string,
 ): { placeIds: string[]; label: string } | null {
+  // No unsolicited emotion → scenic menus (global policy).
+  if (!mayOfferScenicPlaceSuggestions(text)) return null;
   // Working-memory overload / task breakdown → Clear My Mind path, not scenic menus.
   if (shouldBlockScenicOverwhelmMenu(text)) return null;
 
@@ -371,6 +374,9 @@ function matchActivity(
   label: string;
   primaryConfidence: number;
 } | null {
+  // Activity keywords alone must not open place menus without an explicit place ask.
+  if (!mayOfferScenicPlaceSuggestions(text)) return null;
+
   for (const rule of ACTIVITY_PROFILE_MAP) {
     if (!rule.pattern.test(text)) continue;
     const placeIds = suggestCanonicalPlacesForProfile(rule.profile).map(
@@ -474,63 +480,67 @@ export function resolveEstateIntent(
     });
   }
 
-  // Conversation Drives Navigation — environmental need before generic emotion buckets
-  const environmentNeed = evaluateConversationEnvironmentNeed(text);
-  if (isConversationEnvironmentOffer(environmentNeed)) {
-    return buildResult({
-      primaryPlaceId: null,
-      suggestedPlaceIds: [...environmentNeed.suggestedPlaceIds],
-      confidence: environmentNeed.confidence,
-      reasoning: environmentNeed.reasoning,
-    });
-  }
+  // Soft place menus only when the member clearly asked for a place / room.
+  // Keyword overwhelm / stress / calm alone must stay in conversation.
+  if (mayOfferScenicPlaceSuggestions(text)) {
+    // Conversation Drives Navigation — environmental need before generic emotion buckets
+    const environmentNeed = evaluateConversationEnvironmentNeed(text);
+    if (isConversationEnvironmentOffer(environmentNeed)) {
+      return buildResult({
+        primaryPlaceId: null,
+        suggestedPlaceIds: [...environmentNeed.suggestedPlaceIds],
+        confidence: environmentNeed.confidence,
+        reasoning: environmentNeed.reasoning,
+      });
+    }
 
-  // Activity intent (often clearer than pure emotion)
-  const activity = matchActivity(text);
-  if (activity && activity.placeIds.length > 0) {
-    const primaryId = activity.placeIds[0]!;
-    return buildResult({
-      primaryPlaceId: primaryId,
-      suggestedPlaceIds: activity.placeIds,
-      confidence: activity.primaryConfidence,
-      reasoning: `activity:${activity.label} → suggest ${activity.placeIds.join(", ")}`,
-    });
-  }
+    // Activity intent (often clearer than pure emotion)
+    const activity = matchActivity(text);
+    if (activity && activity.placeIds.length > 0) {
+      const primaryId = activity.placeIds[0]!;
+      return buildResult({
+        primaryPlaceId: primaryId,
+        suggestedPlaceIds: activity.placeIds,
+        confidence: activity.primaryConfidence,
+        reasoning: `activity:${activity.label} → suggest ${activity.placeIds.join(", ")}`,
+      });
+    }
 
-  // Emotional intent — suggestions only (confidence below auto-route threshold)
-  const emotional = matchEmotional(text);
-  if (emotional && emotional.placeIds.length > 0) {
-    return buildResult({
-      primaryPlaceId: null,
-      suggestedPlaceIds: emotional.placeIds,
-      confidence: 0.62,
-      reasoning: `emotion:${emotional.label} → gentle suggestions (stay here valid)`,
-    });
-  }
+    // Emotional intent — suggestions only (confidence below auto-route threshold)
+    const emotional = matchEmotional(text);
+    if (emotional && emotional.placeIds.length > 0) {
+      return buildResult({
+        primaryPlaceId: null,
+        suggestedPlaceIds: emotional.placeIds,
+        confidence: 0.62,
+        reasoning: `emotion:${emotional.label} → gentle suggestions (stay here valid)`,
+      });
+    }
 
-  // Lost / uncertain — never silent
-  if (UNCERTAIN_RE.test(text)) {
-    const placeIds = capSuggestions(
-      suggestCanonicalPlacesForProfile("uncertain").map((place) => place.id),
-    );
-    return buildResult({
-      primaryPlaceId: null,
-      suggestedPlaceIds: placeIds,
-      confidence: 0.4,
-      reasoning:
-        "uncertain where to go — offer restorative choices; conversation may continue here",
-    });
-  }
+    // Lost / uncertain — never silent when they asked where to go
+    if (UNCERTAIN_RE.test(text)) {
+      const placeIds = capSuggestions(
+        suggestCanonicalPlacesForProfile("uncertain").map((place) => place.id),
+      );
+      return buildResult({
+        primaryPlaceId: null,
+        suggestedPlaceIds: placeIds,
+        confidence: 0.4,
+        reasoning:
+          "uncertain where to go — offer restorative choices; conversation may continue here",
+      });
+    }
 
-  // Peaceful without explicit emotion bucket already matched
-  if (QUIET_RE.test(text)) {
-    const placeIds = capSuggestions(suggestCanonicalPlaceIds(text));
-    return buildResult({
-      primaryPlaceId: null,
-      suggestedPlaceIds: placeIds,
-      confidence: 0.58,
-      reasoning: "quiet need → restorative suggestions",
-    });
+    // Peaceful without explicit emotion bucket already matched
+    if (QUIET_RE.test(text)) {
+      const placeIds = capSuggestions(suggestCanonicalPlaceIds(text));
+      return buildResult({
+        primaryPlaceId: null,
+        suggestedPlaceIds: placeIds,
+        confidence: 0.58,
+        reasoning: "quiet need → restorative suggestions",
+      });
+    }
   }
 
   // No place match — stay in conversation. Do NOT invent orient room menus

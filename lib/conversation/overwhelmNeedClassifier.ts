@@ -61,11 +61,20 @@ export function classifyOverwhelmNeed(text: string): OverwhelmNeedKind {
 
 /** Block Peaceful Places / multi-destination scenic menus for this text. */
 export function shouldBlockScenicOverwhelmMenu(text: string): boolean {
+  // Explicit scenic / place asks are never blocked by this helper.
+  if (wantsScenicCalmPlaces(text)) return false;
   const kind = classifyOverwhelmNeed(text);
   if (kind === "cognitive_overload" || kind === "task_breakdown") return true;
-  if (wantsScenicCalmPlaces(text)) return false;
-  // Bare "too much" without calm-place ask and without emotional calming body language
-  // should not open scenic menus when cognitive/task language is present — already handled.
+  // Emotional calming without a place ask — stay in conversation (no scenic list).
+  if (kind === "emotional_calming") return true;
+  // Bare overwhelm / stress language without an explicit place ask.
+  if (
+    /\b(?:overwhelm(?:ed|ing)?|stress(?:ed|ful)?|anxious|anxiety|too much on my (?:brain|mind))\b/i.test(
+      text,
+    )
+  ) {
+    return true;
+  }
   return false;
 }
 

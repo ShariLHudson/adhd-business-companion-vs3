@@ -1130,6 +1130,11 @@ import {
   resolveEstateGuideTurn,
 } from "@/lib/sparkKnowledge/estateGuide";
 import {
+  classifyOverwhelmNeed,
+  shouldBlockScenicOverwhelmMenu,
+} from "@/lib/conversation/overwhelmNeedClassifier";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
+import {
   logPipelineTurnFailure,
   runReliableSyncLayer,
 } from "@/lib/conversation/conversationTurnPipeline";
@@ -15095,7 +15100,19 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (isEstateGuideQuestion(trimmed)) {
+    // Overwhelm / cognitive need wins before Estate Guide scenic menus.
+    // Bare overwhelm must never early-return into Peaceful Places / hammock lists.
+    const overwhelmNeedKind = classifyOverwhelmNeed(trimmed);
+    const blockScenicEstateGuide =
+      !mayOfferScenicPlaceSuggestions(trimmed) &&
+      (shouldBlockScenicOverwhelmMenu(trimmed) ||
+        overwhelmNeedKind === "cognitive_overload" ||
+        overwhelmNeedKind === "task_breakdown" ||
+        overwhelmNeedKind === "emotional_calming" ||
+        detected === "overwhelmed" ||
+        detected === "burnout");
+
+    if (!blockScenicEstateGuide && isEstateGuideQuestion(trimmed)) {
       const guideReply = formatEstateGuideReply(resolveEstateGuideTurn(trimmed));
       markAssistantReplied(chatTurnState);
       recordPrimaryTurnResponse(guideReply);
