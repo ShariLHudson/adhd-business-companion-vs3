@@ -23,9 +23,17 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(welcomeHomeNavMaxDepth()).toBe(2);
   });
 
-  it("places Wander the Grounds outside categories", () => {
+  it("places Wander the Grounds outside categories with explore + guide destinations", () => {
     expect(WELCOME_HOME_WANDER_GROUNDS.label).toBe("Wander the Grounds");
-    expect(WELCOME_HOME_WANDER_GROUNDS.opens).toBe("explore-estate");
+    expect(WELCOME_HOME_WANDER_GROUNDS.id).toBe("wander-the-grounds");
+    expect(WELCOME_HOME_WANDER_GROUNDS.destinations.map((d) => d.id)).toEqual([
+      "explore-estate",
+      "spark-estate-guide",
+    ]);
+    expect(WELCOME_HOME_WANDER_GROUNDS.destinations.map((d) => d.label)).toEqual([
+      "Explore Estate",
+      "Spark Estate Guide",
+    ]);
     expect(
       WELCOME_HOME_NAV_CATEGORIES.some((c) => c.id === "wander-the-grounds"),
     ).toBe(false);
@@ -123,7 +131,7 @@ describe("welcomeHomeNavigationStructure", () => {
       ),
       "utf8",
     );
-    expect(source).toMatch(/focusedCategory/);
+    expect(source).toMatch(/focusedPanel/);
     expect(source).toMatch(/focused-submenu/);
     expect(source).toMatch(/‹ Back to Welcome Home/);
     expect(source).not.toMatch(/expandedCategory/);
@@ -131,5 +139,7 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(source).not.toMatch(/isExpanded && !mobileDrillIn/);
     expect(source).toMatch(/onOpenRemindersRhythms/);
     expect(source).toMatch(/onOpenAdaptPlanMyDay/);
+    expect(source).toMatch(/onOpenSparkEstateGuide/);
+    expect(source).toMatch(/openFocusedPanel\(WELCOME_HOME_WANDER_GROUNDS\.id\)/);
   });
 });

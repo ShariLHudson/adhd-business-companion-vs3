@@ -6,7 +6,10 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
-import { WELCOME_HOME_NAV_CATEGORIES } from "@/lib/estate/welcomeHomeNavigationStructure";
+import {
+  WELCOME_HOME_NAV_CATEGORIES,
+  WELCOME_HOME_WANDER_GROUNDS,
+} from "@/lib/estate/welcomeHomeNavigationStructure";
 
 vi.mock("@/lib/estate/useIdleChromeReveal", () => ({
   useIdleChromeReveal: () => ({
@@ -23,6 +26,7 @@ describe("Welcome Home focused submenu", () => {
   const onOpenCalendar = vi.fn();
   const onOpenRemindersRhythms = vi.fn();
   const onExploreSpark = vi.fn();
+  const onOpenSparkEstateGuide = vi.fn();
 
   beforeEach(() => {
     container = document.createElement("div");
@@ -32,6 +36,7 @@ describe("Welcome Home focused submenu", () => {
     onOpenCalendar.mockReset();
     onOpenRemindersRhythms.mockReset();
     onExploreSpark.mockReset();
+    onOpenSparkEstateGuide.mockReset();
   });
 
   afterEach(() => {
@@ -52,6 +57,7 @@ describe("Welcome Home focused submenu", () => {
           onOpenCalendar={onOpenCalendar}
           onOpenRemindersRhythms={onOpenRemindersRhythms}
           onExploreSpark={onExploreSpark}
+          onOpenSparkEstateGuide={onOpenSparkEstateGuide}
           onOpenProjects={() => undefined}
           onOpenDestinationGallery={() => undefined}
           onOpenCartographersStudio={() => undefined}
@@ -249,4 +255,69 @@ describe("Welcome Home focused submenu", () => {
       expect(labels).toEqual(category.destinations.map((d) => d.label));
     },
   );
+
+  it("Wander the Grounds replaces top-level with Explore Estate + Spark Estate Guide", () => {
+    renderMenu();
+    openMenu();
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-wander-the-grounds"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    expect(
+      container
+        .querySelector('[data-testid="estate-room-quick-choices"]')
+        ?.getAttribute("data-welcome-home-panel"),
+    ).toBe("focused-submenu");
+    expect(
+      container.querySelector('[data-testid="welcome-home-nav-back"]')
+        ?.textContent,
+    ).toContain("Back to Welcome Home");
+    expect(
+      container.querySelector('[data-testid="welcome-home-submenu-heading"]')
+        ?.textContent,
+    ).toBe(WELCOME_HOME_WANDER_GROUNDS.label);
+
+    const labels = Array.from(
+      container.querySelectorAll(
+        '[data-testid="welcome-home-submenu-wander-the-grounds"] .estate-room-experience-menu__item-label',
+      ),
+    ).map((el) => el.textContent?.trim());
+    expect(labels).toEqual(["Explore Estate", "Spark Estate Guide"]);
+
+    for (const category of WELCOME_HOME_NAV_CATEGORIES) {
+      expect(
+        container.querySelector(
+          `[data-testid="estate-room-menu-section-${category.id}"]`,
+        ),
+      ).toBeFalsy();
+    }
+  });
+
+  it("Spark Estate Guide destination opens once and closes the menu", () => {
+    renderMenu();
+    openMenu();
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-wander-the-grounds"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-spark-estate-guide"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onOpenSparkEstateGuide).toHaveBeenCalledTimes(1);
+    expect(onExploreSpark).not.toHaveBeenCalled();
+    expect(
+      container.querySelector('[data-testid="estate-room-quick-choices"]'),
+    ).toBeFalsy();
+  });
 });

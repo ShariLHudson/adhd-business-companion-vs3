@@ -29,7 +29,8 @@ export type WelcomeHomeNavDestinationId =
   | "hall-of-accomplishments"
   | "chamber-of-momentum"
   | "boardroom"
-  | "wander-the-grounds";
+  | "explore-estate"
+  | "spark-estate-guide";
 
 export type WelcomeHomeNavDestination = {
   id: WelcomeHomeNavDestinationId;
@@ -107,11 +108,19 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   },
 ] as const;
 
+/** Wander the Grounds — focused submenu (same replace pattern as categories). */
 export const WELCOME_HOME_WANDER_GROUNDS = {
   id: "wander-the-grounds" as const,
   label: "Wander the Grounds",
-  opens: "explore-estate" as const,
+  destinations: [
+    { id: "explore-estate" as const, label: "Explore Estate" },
+    { id: "spark-estate-guide" as const, label: "Spark Estate Guide" },
+  ],
 };
+
+export type WelcomeHomeFocusedPanelId =
+  | WelcomeHomeNavCategoryId
+  | typeof WELCOME_HOME_WANDER_GROUNDS.id;
 
 /** Experience Controls must never appear in Welcome Home navigation. */
 export const WELCOME_HOME_FORBIDDEN_LABELS = [

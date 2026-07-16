@@ -11,7 +11,7 @@ import { resolveWanderRoomDisplayName } from "@/lib/estate/manifest/estateWander
 import {
   WELCOME_HOME_NAV_CATEGORIES,
   WELCOME_HOME_WANDER_GROUNDS,
-  type WelcomeHomeNavCategoryId,
+  type WelcomeHomeFocusedPanelId,
   type WelcomeHomeNavDestination,
   type WelcomeHomeNavDestinationId,
 } from "@/lib/estate/welcomeHomeNavigationStructure";
@@ -34,6 +34,8 @@ export type EstateRoomExperienceMenuProps = {
   onBackToEstate: () => void;
   /** Wander the Grounds — Explore Estate. */
   onExploreSpark?: () => void;
+  /** Wander the Grounds — Spark Estate Guide (lazy-loaded flipbook). */
+  onOpenSparkEstateGuide?: () => void;
   onReturnToExploreEstate?: () => void;
   /** Shared Adapt / Plan My Day entrance (PlanOrAdaptPathChooser). */
   onOpenAdaptPlanMyDay?: () => void;
@@ -80,6 +82,7 @@ export function EstateRoomExperienceMenu({
   withEstateMenu = false,
   embedded = false,
   onExploreSpark,
+  onOpenSparkEstateGuide,
   onReturnToExploreEstate,
   onOpenAdaptPlanMyDay,
   onOpenPlanMyDay,
@@ -103,8 +106,8 @@ export function EstateRoomExperienceMenu({
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   /** Focused category submenu — replaces top-level on desktop and mobile. */
-  const [focusedCategory, setFocusedCategory] =
-    useState<WelcomeHomeNavCategoryId | null>(null);
+  const [focusedPanel, setFocusedPanel] =
+    useState<WelcomeHomeFocusedPanelId | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const placeDisplayName = resolveWanderRoomDisplayName(roomId);
 
@@ -122,7 +125,7 @@ export function EstateRoomExperienceMenu({
 
   useEffect(() => {
     if (!open) {
-      setFocusedCategory(null);
+      setFocusedPanel(null);
       return;
     }
     const onPointerDown = (event: MouseEvent | TouchEvent) => {
@@ -132,8 +135,8 @@ export function EstateRoomExperienceMenu({
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        if (focusedCategory) {
-          setFocusedCategory(null);
+        if (focusedPanel) {
+          setFocusedPanel(null);
           return;
         }
         setOpen(false);
@@ -147,13 +150,13 @@ export function EstateRoomExperienceMenu({
       document.removeEventListener("touchstart", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, focusedCategory]);
+  }, [open, focusedPanel]);
 
   const closeAndRun = useCallback(
     (action: (() => void) | undefined) => {
       if (!action) return;
       setOpen(false);
-      setFocusedCategory(null);
+      setFocusedPanel(null);
       bumpVisibility();
       action();
     },
@@ -183,7 +186,8 @@ export function EstateRoomExperienceMenu({
           "hall-of-accomplishments": onOpenHallOfAccomplishments,
           "chamber-of-momentum": onOpenChamber,
           boardroom: onOpenBoardroom,
-          "wander-the-grounds": onExploreSpark,
+          "explore-estate": onExploreSpark,
+          "spark-estate-guide": onOpenSparkEstateGuide,
         };
       return map[id];
     },
@@ -206,22 +210,30 @@ export function EstateRoomExperienceMenu({
       onOpenChamber,
       onOpenBoardroom,
       onExploreSpark,
+      onOpenSparkEstateGuide,
     ],
   );
 
-  const openCategory = useCallback((id: WelcomeHomeNavCategoryId) => {
-    setFocusedCategory(id);
+  const openFocusedPanel = useCallback((id: WelcomeHomeFocusedPanelId) => {
+    setFocusedPanel(id);
   }, []);
 
   const backToTopLevel = useCallback(() => {
     bumpVisibility();
-    setFocusedCategory(null);
+    setFocusedPanel(null);
   }, [bumpVisibility]);
 
   if (!mounted || !visible) return null;
 
   const activeCategory =
-    WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === focusedCategory) ?? null;
+    WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === focusedPanel) ?? null;
+  const wanderFocused = focusedPanel === WELCOME_HOME_WANDER_GROUNDS.id;
+  const activePanelLabel = wanderFocused
+    ? WELCOME_HOME_WANDER_GROUNDS.label
+    : activeCategory?.label ?? null;
+  const activeDestinations = wanderFocused
+    ? WELCOME_HOME_WANDER_GROUNDS.destinations
+    : activeCategory?.destinations ?? null;
 
   const renderDestinationButton = (dest: WelcomeHomeNavDestination) => {
     const action = destinationAction(dest.id);
@@ -261,7 +273,7 @@ export function EstateRoomExperienceMenu({
           : "",
         embedded ? "estate-room-experience-menu--embedded" : "",
         open ? "estate-room-experience-menu--open" : "",
-        focusedCategory
+        focusedPanel
           ? "estate-room-experience-menu--submenu"
           : "",
         browserFullscreen ? "estate-room-experience-menu--fullscreen" : "",
@@ -270,7 +282,7 @@ export function EstateRoomExperienceMenu({
         .filter(Boolean)
         .join(" ")}
       data-testid="estate-room-experience-menu"
-      data-welcome-home-view={focusedCategory ? "submenu" : "top-level"}
+      data-welcome-home-view={focusedPanel ? "submenu" : "top-level"}
       onMouseMove={browserFullscreen ? bumpVisibility : undefined}
       onTouchStart={browserFullscreen ? bumpVisibility : undefined}
     >
@@ -310,17 +322,17 @@ export function EstateRoomExperienceMenu({
               className="estate-room-experience-menu__panel"
               role="menu"
               aria-label={
-                activeCategory
-                  ? `Welcome Home — ${activeCategory.label}`
+                activePanelLabel
+                  ? `Welcome Home — ${activePanelLabel}`
                   : "Welcome Home"
               }
               data-testid="estate-room-quick-choices"
               data-welcome-home-panel={
-                activeCategory ? "focused-submenu" : "top-level"
+                activeDestinations ? "focused-submenu" : "top-level"
               }
             >
               <div className="estate-room-experience-menu__panel-scroll">
-                {activeCategory ? (
+                {activeDestinations && activePanelLabel && focusedPanel ? (
                   <>
                     <button
                       type="button"
@@ -337,15 +349,15 @@ export function EstateRoomExperienceMenu({
                       className="estate-room-experience-menu__section-label"
                       data-testid="welcome-home-submenu-heading"
                     >
-                      {activeCategory.label}
+                      {activePanelLabel}
                     </p>
                     <div
                       className="estate-room-experience-menu__submenu-items"
                       role="group"
-                      aria-label={activeCategory.label}
-                      data-testid={`welcome-home-submenu-${activeCategory.id}`}
+                      aria-label={activePanelLabel}
+                      data-testid={`welcome-home-submenu-${focusedPanel}`}
                     >
-                      {activeCategory.destinations.map((dest) =>
+                      {activeDestinations.map((dest) =>
                         renderDestinationButton(dest),
                       )}
                     </div>
@@ -364,7 +376,7 @@ export function EstateRoomExperienceMenu({
                           data-testid={`estate-room-menu-section-${category.id}`}
                           onClick={() => {
                             bumpVisibility();
-                            openCategory(category.id);
+                            openFocusedPanel(category.id);
                           }}
                         >
                           <span className="estate-room-experience-menu__category-label">
@@ -386,20 +398,27 @@ export function EstateRoomExperienceMenu({
                       aria-hidden
                     />
 
-                    {onExploreSpark ? (
-                      <button
-                        type="button"
-                        role="menuitem"
-                        className="estate-room-experience-menu__item estate-room-experience-menu__item--wander"
-                        aria-label={WELCOME_HOME_WANDER_GROUNDS.label}
-                        data-testid="estate-open-wander-the-grounds"
-                        onClick={() => closeAndRun(onExploreSpark)}
+                    <button
+                      type="button"
+                      className="estate-room-experience-menu__category estate-room-experience-menu__category--wander"
+                      aria-expanded={false}
+                      aria-label={WELCOME_HOME_WANDER_GROUNDS.label}
+                      data-testid="estate-open-wander-the-grounds"
+                      onClick={() => {
+                        bumpVisibility();
+                        openFocusedPanel(WELCOME_HOME_WANDER_GROUNDS.id);
+                      }}
+                    >
+                      <span className="estate-room-experience-menu__category-label">
+                        {WELCOME_HOME_WANDER_GROUNDS.label}
+                      </span>
+                      <span
+                        className="estate-room-experience-menu__category-chevron"
+                        aria-hidden
                       >
-                        <span className="estate-room-experience-menu__item-label">
-                          {WELCOME_HOME_WANDER_GROUNDS.label}
-                        </span>
-                      </button>
-                    ) : null}
+                        ›
+                      </span>
+                    </button>
 
                     {onReturnToExploreEstate ? (
                       <button

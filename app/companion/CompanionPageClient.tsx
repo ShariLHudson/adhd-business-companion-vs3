@@ -3326,6 +3326,10 @@ export default function CompanionPageClient() {
     null,
   );
   const [estateGuideFlipbookOpen, setEstateGuideFlipbookOpen] = useState(false);
+  /** When set, open the Guide to this room spread; null opens from the cover. */
+  const [estateGuideInitialRoomId, setEstateGuideInitialRoomId] = useState<
+    string | null
+  >(null);
   const [justBeHereSession, setJustBeHereSession] =
     useState<JustBeHereSession | null>(null);
   const [justBeHerePhase, setJustBeHerePhase] = useState<
@@ -10131,8 +10135,14 @@ export default function CompanionPageClient() {
     setPreviewTestRevision(getCompanionPreviewTestRevision());
   }
 
-  function openSparkEstateGuideCore() {
+  function openSparkEstateGuideCore(initialRoomId?: string | null) {
+    setEstateGuideInitialRoomId(initialRoomId ?? null);
     setEstateGuideFlipbookOpen(true);
+  }
+
+  function closeSparkEstateGuideCore() {
+    setEstateGuideFlipbookOpen(false);
+    setEstateGuideInitialRoomId(null);
   }
 
   function clearJustBeHereMode() {
@@ -10409,7 +10419,7 @@ export default function CompanionPageClient() {
     setPlanMyDayInitialRhythmsTab(null);
     setOverlay(null);
     setSettingsSection(null);
-    setEstateGuideFlipbookOpen(false);
+    closeSparkEstateGuideCore();
 
     recordEstateRoomTransition({
       toSection: "home",
@@ -24227,8 +24237,9 @@ export default function CompanionPageClient() {
       <SparkEstateGuideChrome
         visible={showSparkEstateGuide}
         flipbookOpen={estateGuideFlipbookOpen}
-        onOpen={openSparkEstateGuideCore}
-        onClose={() => setEstateGuideFlipbookOpen(false)}
+        initialRoomId={estateGuideInitialRoomId}
+        onOpen={() => openSparkEstateGuideCore(roomMenuRoomId)}
+        onClose={closeSparkEstateGuideCore}
       />
       <SparkNoteChrome
         visible={showSparkEstateGuide}
@@ -24263,6 +24274,7 @@ export default function CompanionPageClient() {
                 openExploreSparkVisualExplorer();
               }
         }
+        onOpenSparkEstateGuide={() => openSparkEstateGuideCore(null)}
         onReturnToExploreEstate={
           exploreEstateReturnAvailable
             ? () => {

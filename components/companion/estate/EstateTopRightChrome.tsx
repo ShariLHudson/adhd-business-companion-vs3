@@ -17,6 +17,7 @@ export type EstateTopRightChromeProps = {
   onToggleSound?: () => void;
   onBackToEstate: () => void;
   onExploreSpark?: () => void;
+  onOpenSparkEstateGuide?: () => void;
   onReturnToExploreEstate?: () => void;
   onOpenAdaptPlanMyDay?: () => void;
   onOpenPlanMyDay?: () => void;
@@ -57,6 +58,7 @@ export function EstateTopRightChrome({
   onToggleSound,
   onBackToEstate,
   onExploreSpark,
+  onOpenSparkEstateGuide,
   onReturnToExploreEstate,
   onOpenAdaptPlanMyDay,
   onOpenPlanMyDay,
@@ -100,6 +102,7 @@ export function EstateTopRightChrome({
           onToggleSound={onToggleSound}
           onBackToEstate={onBackToEstate}
           onExploreSpark={onExploreSpark}
+          onOpenSparkEstateGuide={onOpenSparkEstateGuide}
           onReturnToExploreEstate={onReturnToExploreEstate}
           onOpenAdaptPlanMyDay={onOpenAdaptPlanMyDay ?? onOpenPlanMyDay}
           onOpenPlanMyDay={onOpenPlanMyDay}
