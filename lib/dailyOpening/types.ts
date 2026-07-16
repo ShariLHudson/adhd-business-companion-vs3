@@ -31,7 +31,13 @@ export type DailyOpeningChoice = {
 export type DailyOpeningChoiceCard = {
   id: DailyOpeningChoiceId;
   title: string;
+  /** Joined support copy for aria-labels / legacy callers. */
   explanation: string;
+  /**
+   * Soft support lines under the title (why/where, what/when, how).
+   * Prefer these in the UI; fall back to explanation when empty.
+   */
+  supportLines?: string[];
   estimateLabel?: string | null;
   recommended: boolean;
 };
@@ -78,7 +84,13 @@ export type DailyOpeningDiscoveryInvite = {
 export type GlobalDailyOpeningResult = {
   entryPoint: DailyOpeningEntryPoint;
   momentKind: DailyOpeningMomentKind;
-  /** Warm Shari message for the opening card. */
+  /** Prominent greeting title — e.g. Good morning, Sarah. */
+  greetingTitle: string;
+  /** Warm Shari presence line. */
+  welcomeLine: string;
+  /** Brief explanation of the three choices. */
+  choicesIntro: string;
+  /** Joined greeting for older callers / sentence-count gates. */
   welcomeMessage: string;
   /** Alias of welcomeMessage for older callers. */
   greeting: string;
@@ -120,7 +132,7 @@ export const GLOBAL_DAILY_OPENING_GREETING =
   "Good morning. I'm glad you're here. We can keep today simple.";
 
 export const GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER =
-  "Or tell me what you need today…" as const;
+  "You can also tell me what you need today." as const;
 
 /** Absence threshold aligned with Welcome Home / Phase 24 (3 days). */
 export const DAILY_OPENING_ABSENCE_THRESHOLD_DAYS = 3;

@@ -22367,6 +22367,9 @@ export default function CompanionPageClient() {
                     ) : (
                       <TodaysWelcomeCard
                         mode="main"
+                        greetingTitle={todaysWelcomeOpening.greetingTitle}
+                        welcomeLine={todaysWelcomeOpening.welcomeLine}
+                        choicesIntro={todaysWelcomeOpening.choicesIntro}
                         welcomeMessage={todaysWelcomeOpening.welcomeMessage}
                         teachingSentence={todaysWelcomeOpening.teachingSentence}
                         choiceCards={todaysWelcomeOpening.choiceCards}

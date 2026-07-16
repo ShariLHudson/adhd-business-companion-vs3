@@ -1,6 +1,7 @@
 /**
  * Rich choice cards for Global Daily Companion Opening.
- * Exactly three cards — title, explanation, optional time estimate, one Recommended.
+ * Exactly three cards — title, support lines (why/where · what/when · how),
+ * optional time estimate, one Recommended.
  */
 
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
@@ -56,23 +57,36 @@ function continueCardTitle(option: CompanionContinueOption | null): string {
     return "Continue Where You Left Off";
   }
   if (/^continue\b/i.test(title)) return title;
-  // Avoid vague wrappers when the title is already specific.
   if (/^(your |my |the )/i.test(title)) return `Continue ${title}`;
   return `Continue Your ${title}`;
 }
 
-function continueExplanation(option: CompanionContinueOption | null): string {
+function continueWhy(option: CompanionContinueOption | null): string {
   if (!option) {
-    return "We'll open one manageable place to begin — no catch-up list.";
+    return "A gentle place to begin when nothing specific is waiting.";
   }
   const sub = option.subtitle?.trim();
   if (sub && !/help me restart|pick up where you left off/i.test(sub)) {
     return sub;
   }
   if (option.homeResumeItem?.typeLabel) {
-    return `Pick up where you stopped in ${option.homeResumeItem.typeLabel}.`;
+    return `You were in the middle of ${option.homeResumeItem.typeLabel}.`;
   }
-  return "Pick up where you stopped.";
+  return "Something meaningful is still open from last time.";
+}
+
+function continueWhere(option: CompanionContinueOption | null): string {
+  if (!option) {
+    return "We'll open one manageable next step — no catch-up list.";
+  }
+  if (option.homeResumeItem?.typeLabel) {
+    return `Takes you back to your ${option.homeResumeItem.typeLabel}.`;
+  }
+  return "Takes you back to where you stopped.";
+}
+
+function joinExplanation(lines: string[]): string {
+  return lines.map((l) => l.trim()).filter(Boolean).join(" ");
 }
 
 export function buildDailyOpeningChoiceCards(
@@ -80,27 +94,41 @@ export function buildDailyOpeningChoiceCards(
 ): DailyOpeningChoiceCard[] {
   const recommendContinue = Boolean(continueOption);
 
+  const continueLines = [
+    continueWhy(continueOption),
+    continueWhere(continueOption),
+  ];
+  const planLines = [
+    "Build today's plan or adjust it to fit your time, energy, and priorities.",
+    "Helpful when your day needs shape — or the plan you have no longer fits.",
+  ];
+  const helpLines = [
+    "I'll suggest three useful next steps based on where you are today.",
+    "You choose one, and I'll take you there.",
+  ];
+
   return [
     {
       id: "continue-meaningful-work",
       title: continueCardTitle(continueOption),
-      explanation: continueExplanation(continueOption),
+      supportLines: continueLines,
+      explanation: joinExplanation(continueLines),
       estimateLabel: estimateForContinue(continueOption),
       recommended: recommendContinue,
     },
     {
       id: "plan-or-adapt-my-day",
       title: "Plan or Adapt My Day",
-      explanation:
-        "Build today's plan or adjust it to fit your time, energy, calendar, and priorities.",
+      supportLines: planLines,
+      explanation: joinExplanation(planLines),
       estimateLabel: "About 5 minutes",
       recommended: !recommendContinue,
     },
     {
       id: "help-me-choose",
       title: "Help Me Choose",
-      explanation:
-        "I'll suggest three useful next steps based on where you are today.",
+      supportLines: helpLines,
+      explanation: joinExplanation(helpLines),
       estimateLabel: null,
       recommended: false,
     },

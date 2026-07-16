@@ -18,6 +18,7 @@ import { resetTodayPlanForNewDay } from "@/lib/planMyDay/planDayItems";
 import { beginEstateJourneyNewDay } from "@/lib/estateJourneyEngine/session";
 import { getPrefs } from "@/lib/companionStore";
 import { getApprovedFieldValue } from "@/lib/profile/businessEstateProfile";
+import { resolveDailyOpeningMemberFirstName } from "./buildDailyOpeningWelcome";
 import {
   resolveGlobalDailyOpening,
   type ResolveGlobalDailyOpeningInput,
@@ -47,6 +48,8 @@ export type RunSharedNewDayResult = {
 };
 
 function resolveMemberFirstName(): string | null {
+  const fromPrefs = resolveDailyOpeningMemberFirstName();
+  if (fromPrefs) return fromPrefs;
   const founder = getApprovedFieldValue("identity.founderName")?.trim();
   if (founder) return founder.split(/\s+/)[0] ?? founder;
   const prefsName = getPrefs().name?.trim();

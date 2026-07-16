@@ -15,10 +15,14 @@ export {
 } from "./runSharedNewDay";
 export {
   buildDailyOpeningWelcomeMessage,
+  buildDailyOpeningWelcomeParts,
+  resolveDailyOpeningMemberFirstName,
   resolveDailyOpeningMomentKind,
   resolveFirst60TeachingSentence,
   countWelcomeSentences,
+  SOMETHING_HELPFUL_TO_KNOW_TODAY,
   type DailyOpeningMomentKind,
+  type DailyOpeningWelcomeParts,
 } from "./buildDailyOpeningWelcome";
 export { buildDailyOpeningChoiceCards } from "./buildDailyOpeningChoiceCards";
 export {

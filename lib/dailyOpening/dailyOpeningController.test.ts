@@ -88,6 +88,8 @@ describe("Global Daily Companion Experience — shared controller", () => {
       GLOBAL_DAILY_OPENING_CHOICES.map((c) => c.id),
     );
     expect(opening.welcomeMessage.length).toBeGreaterThan(20);
+    expect(opening.greetingTitle.length).toBeGreaterThan(5);
+    expect(opening.choicesIntro.length).toBeGreaterThan(10);
   });
 
   it("Settings → New Day creates a fresh conversation ID and clears old messages/summaries", () => {

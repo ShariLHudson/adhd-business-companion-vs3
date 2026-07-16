@@ -63,8 +63,19 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       memberFirstName: "Shari",
     });
     expect(message).toMatch(/welcome back/i);
-    expect(message).toMatch(/most helpful place/i);
+    expect(message).toMatch(/glad you're here|three simple ways/i);
     expect(countWelcomeSentences(message)).toBeLessThanOrEqual(3);
+  });
+
+  it("structures the morning greeting into title, welcome, and choices intro", () => {
+    const opening = resolveGlobalDailyOpening({
+      entryPoint: "first-platform-opening",
+      memberFirstName: "Sarah",
+    });
+    expect(opening.greetingTitle).toBe("Good morning, Sarah.");
+    expect(opening.welcomeLine).toMatch(/glad you're here/i);
+    expect(opening.choicesIntro).toMatch(/three simple ways/i);
+    expect(opening.welcomeMessage).toContain(opening.greetingTitle);
   });
 
   it("long absence uses Return Plan tone", () => {
@@ -325,7 +336,7 @@ describe("GlobalDailyCompanionOpening — wiring contracts", () => {
 describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
   it("uses a non-competing input placeholder", () => {
     expect(GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER).toBe(
-      "Or tell me what you need today…",
+      "You can also tell me what you need today.",
     );
     expect(GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER).not.toMatch(
       /one small thing/i,
@@ -343,6 +354,28 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
     expect(cards[0]?.title).toBe("Review Where You Left Off");
     expect(cards[1]?.title).toBe("Plan or Adapt My Day");
     expect(cards[2]?.title).toBe("Help Me Choose");
+    expect(cards[0]?.supportLines?.length).toBeGreaterThanOrEqual(2);
+    expect(cards[1]?.supportLines?.join(" ")).toMatch(/when/i);
+    expect(cards[2]?.supportLines?.join(" ")).toMatch(/three useful/i);
+  });
+
+  it("renders the platform lesson section below the choices", () => {
+    const { readFileSync } = require("node:fs") as typeof import("node:fs");
+    const { resolve } = require("node:path") as typeof import("node:path");
+    const source = readFileSync(
+      resolve(process.cwd(), "components/companion/GlobalDailyCompanionOpening.tsx"),
+      "utf8",
+    );
+    const welcome = readFileSync(
+      resolve(process.cwd(), "lib/dailyOpening/buildDailyOpeningWelcome.ts"),
+      "utf8",
+    );
+    expect(source).toContain("SOMETHING_HELPFUL_TO_KNOW_TODAY");
+    expect(welcome).toContain("Something Helpful to Know Today");
+    expect(source).toContain("global-daily-opening__lesson");
+    const lessonIdx = source.indexOf("global-daily-opening__lesson");
+    const cardsIdx = source.indexOf('className="global-daily-opening__cards"');
+    expect(lessonIdx).toBeGreaterThan(cardsIdx);
   });
 
   it("never uses a raw user sentence as the continue card title", () => {

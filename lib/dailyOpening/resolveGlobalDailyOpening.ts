@@ -9,7 +9,8 @@ import {
 } from "@/lib/companionLedContinue";
 import { buildDailyOpeningChoiceCards } from "./buildDailyOpeningChoiceCards";
 import {
-  buildDailyOpeningWelcomeMessage,
+  buildDailyOpeningWelcomeParts,
+  resolveDailyOpeningMemberFirstName,
   resolveDailyOpeningMomentKind,
   resolveFirst60TeachingSentence,
 } from "./buildDailyOpeningWelcome";
@@ -149,19 +150,26 @@ export function resolveGlobalDailyOpening(
     alreadyPresentedToday,
   );
 
-  const builtWelcome = buildDailyOpeningWelcomeMessage({
+  const memberFirstName =
+    input.memberFirstName?.trim() || resolveDailyOpeningMemberFirstName();
+  const built = buildDailyOpeningWelcomeParts({
     momentKind,
-    memberFirstName: input.memberFirstName,
+    memberFirstName,
   });
   const override = input.greeting?.trim();
   // Prefer warm card copy; only honor override when it is clearly personalized
   // and not the old journey "New day — fresh start" line.
-  const welcomeMessage =
-    override &&
-    !/^new day/i.test(override) &&
-    !/what feels most important/i.test(override)
-      ? override
-      : builtWelcome;
+  const useOverride =
+    Boolean(override) &&
+    !/^new day/i.test(override!) &&
+    !/what feels most important/i.test(override!);
+
+  const greetingTitle = useOverride ? override! : built.greetingTitle;
+  const welcomeLine = useOverride ? "" : built.welcomeLine;
+  const choicesIntro = useOverride ? "" : built.choicesIntro;
+  const welcomeMessage = useOverride
+    ? override!
+    : built.welcomeMessage;
 
   const choiceCards = buildDailyOpeningChoiceCards(continueOption);
   const choices: DailyOpeningChoice[] = choiceCards.map((card) => ({
@@ -179,6 +187,9 @@ export function resolveGlobalDailyOpening(
   return {
     entryPoint: input.entryPoint,
     momentKind,
+    greetingTitle,
+    welcomeLine,
+    choicesIntro,
     welcomeMessage,
     greeting: welcomeMessage,
     teachingSentence: resolveFirst60TeachingSentence(input.now),
