@@ -42,7 +42,7 @@ export type EstateTopRightChromeProps = {
 
 /**
  * One fixed upper-right mount — Welcome Home beside the member profile trigger.
- * Experience Controls open from the SH profile menu, not the room menu.
+ * Experience Controls open from the member profile menu, not the room menu.
  */
 export function EstateTopRightChrome({
   showProfile,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import {
   EstateDropdownMenuActionRow,
@@ -12,10 +12,11 @@ import {
   ESTATE_MENU_DROPDOWN_ENTRIES,
   type EstateMenuActionId,
 } from "@/lib/estateMenu";
-import { getPrefs } from "@/lib/companionStore";
 import {
+  userProfileDisplayName,
   userProfileImageUrl,
   userProfileInitials,
+  userProfileMenuGreeting,
 } from "@/lib/userProfileDisplay";
 
 export type GlobalEstateMenuProps = {
@@ -29,21 +30,85 @@ export type GlobalEstateMenuProps = {
 
 type ExpandedGroupId = "conversations" | "my-spark-estate" | "profile";
 
-function useUserProfileDisplay() {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [initials, setInitials] = useState("?");
+type ProfileDisplayState = {
+  imageUrl: string | null;
+  initials: string;
+  displayName: string;
+  greeting: { line1: string; line2: string };
+};
+
+function useUserProfileDisplay(): ProfileDisplayState {
+  const [state, setState] = useState<ProfileDisplayState>(() => ({
+    imageUrl: null,
+    initials: "",
+    displayName: "Member",
+    greeting: userProfileMenuGreeting(),
+  }));
 
   useEffect(() => {
     const sync = () => {
-      setImageUrl(userProfileImageUrl());
-      setInitials(userProfileInitials());
+      setState({
+        imageUrl: userProfileImageUrl(),
+        initials: userProfileInitials(),
+        displayName: userProfileDisplayName(),
+        greeting: userProfileMenuGreeting(),
+      });
     };
     sync();
     window.addEventListener("companion-prefs-updated", sync);
     return () => window.removeEventListener("companion-prefs-updated", sync);
   }, []);
 
-  return { imageUrl, initials, name: getPrefs().name };
+  return state;
+}
+
+function GenericProfileIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      width="1.1em"
+      height="1.1em"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        fill="currentColor"
+        d="M12 12a4.25 4.25 0 1 0-4.25-4.25A4.25 4.25 0 0 0 12 12Zm0 1.75c-3.4 0-7.25 1.7-7.25 4.25V19.5A1.25 1.25 0 0 0 6 20.75h12a1.25 1.25 0 0 0 1.25-1.25v-1.5c0-2.55-3.85-4.25-7.25-4.25Z"
+      />
+    </svg>
+  );
+}
+
+function AvatarFace({
+  imageUrl,
+  initials,
+  imageClassName,
+  fallbackClassName,
+}: {
+  imageUrl: string | null;
+  initials: string;
+  imageClassName: string;
+  fallbackClassName: string;
+}): ReactNode {
+  if (imageUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={imageUrl} alt="" className={imageClassName} />
+    );
+  }
+  if (initials) {
+    return (
+      <span className={fallbackClassName} aria-hidden>
+        {initials}
+      </span>
+    );
+  }
+  return (
+    <span className={`${fallbackClassName} global-estate-menu__avatar-icon`} aria-hidden>
+      <GenericProfileIcon />
+    </span>
+  );
 }
 
 export function GlobalEstateMenu({
@@ -52,7 +117,7 @@ export function GlobalEstateMenu({
   embedded = false,
   className = "",
 }: GlobalEstateMenuProps) {
-  const { imageUrl, initials, name } = useUserProfileDisplay();
+  const { imageUrl, initials, displayName, greeting } = useUserProfileDisplay();
   const [open, setOpen] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<ExpandedGroupId | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -131,8 +196,6 @@ export function GlobalEstateMenu({
     .filter(Boolean)
     .join(" ");
 
-  const displayName = name?.trim() || "Member";
-
   const menu = (
     <div
       ref={rootRef}
@@ -148,24 +211,19 @@ export function GlobalEstateMenu({
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={`${initials} — profile menu`}
-        title="Profile"
+        aria-label="Open profile menu"
+        title="Profile menu"
         className={triggerClass}
         data-estate-menu-trigger=""
         data-top-bar-menu="account"
+        data-testid="global-estate-menu-trigger"
       >
-        {imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imageUrl}
-            alt=""
-            className="global-estate-menu__avatar-image global-estate-menu__avatar-image--trigger"
-          />
-        ) : (
-          <span className="global-estate-menu__trigger-initials" aria-hidden>
-            {initials}
-          </span>
-        )}
+        <AvatarFace
+          imageUrl={imageUrl}
+          initials={initials}
+          imageClassName="global-estate-menu__avatar-image global-estate-menu__avatar-image--trigger"
+          fallbackClassName="global-estate-menu__trigger-initials"
+        />
         <span className="global-estate-menu__trigger-chevron" aria-hidden>
           ▼
         </span>
@@ -182,22 +240,24 @@ export function GlobalEstateMenu({
           onMouseDown={(event) => event.stopPropagation()}
         >
           <div className="global-estate-menu__header">
-            {imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageUrl}
-                alt=""
-                className="global-estate-menu__header-avatar"
-              />
-            ) : (
-              <span
-                className="global-estate-menu__header-avatar global-estate-menu__header-avatar--fallback"
-                aria-hidden
+            <AvatarFace
+              imageUrl={imageUrl}
+              initials={initials}
+              imageClassName="global-estate-menu__header-avatar"
+              fallbackClassName="global-estate-menu__header-avatar global-estate-menu__header-avatar--fallback"
+            />
+            <div className="global-estate-menu__header-copy">
+              <p
+                className="global-estate-menu__header-greeting"
+                data-testid="global-estate-menu-greeting"
               >
-                {initials}
-              </span>
-            )}
-            <p className="global-estate-menu__header-name">{displayName}</p>
+                {greeting.line1}
+              </p>
+              <p className="global-estate-menu__header-sub">{greeting.line2}</p>
+              {displayName && displayName !== "Member" ? (
+                <p className="global-estate-menu__header-name">{displayName}</p>
+              ) : null}
+            </div>
           </div>
 
           <div className="global-estate-menu__list">

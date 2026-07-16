@@ -7,9 +7,10 @@ import {
 import { NEW_CONVERSATION_MENU_ITEMS } from "@/lib/topBarNavigation";
 
 describe("userProfileDisplay", () => {
-  it("derives initials from the saved name", () => {
+  it("derives initials dynamically from the member name", () => {
     expect(userProfileInitials("Shari Test", "")).toBe("ST");
-    expect(userProfileInitials("", "hello@example.com")).toBe("HE");
+    expect(userProfileInitials("Madonna")).toBe("M");
+    expect(userProfileInitials("", "hello@example.com")).toBe("H");
   });
 
   it("returns uploaded profile image only when present", () => {
@@ -20,11 +21,11 @@ describe("userProfileDisplay", () => {
 });
 
 describe("topBarNavigation", () => {
-  it("offers only New Chat and New Day Conversation", () => {
+  it("offers only new conversation and new day conversation actions", () => {
     expect(NEW_CONVERSATION_MENU_ITEMS).toHaveLength(2);
     expect(NEW_CONVERSATION_MENU_ITEMS.map((item) => item.label)).toEqual([
-      "New Chat",
-      "New Day Conversation",
+      "Start New Conversation",
+      "Start New Day Conversation",
     ]);
   });
 });

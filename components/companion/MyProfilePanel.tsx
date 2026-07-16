@@ -55,7 +55,11 @@ export function MyProfilePanel({
     return () => window.removeEventListener("companion-prefs-updated", sync);
   }, []);
 
-  const initials = userProfileInitials(name, email);
+  const initials = userProfileInitials({
+    preferredName,
+    name,
+    email,
+  });
 
   function persistPersonal() {
     savePrefs({

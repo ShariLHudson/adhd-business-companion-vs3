@@ -1,4 +1,4 @@
-/* Global Estate Menu — SH profile dropdown; panel rows match Welcome Home room menu */
+/* Global Estate Menu — member profile dropdown; panel rows match Welcome Home room menu */
 
 .global-estate-menu-anchor {
   pointer-events: auto;
@@ -104,10 +104,22 @@
 }
 
 .global-estate-menu__trigger-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
+}
+
+.global-estate-menu__avatar-icon {
+  opacity: 0.92;
+}
+
+.global-estate-menu__avatar-icon svg {
+  display: block;
 }
 
 .global-estate-menu__trigger-chevron {
@@ -123,11 +135,33 @@
 
 .global-estate-menu__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.65rem;
   margin: -0.1rem 0 0.15rem;
   padding: 0.15rem 0.35rem 0.45rem;
   border-bottom: 1px solid rgba(255, 248, 235, 0.12);
+}
+
+.global-estate-menu__header-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.global-estate-menu__header-greeting {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: rgba(255, 248, 235, 0.96);
+}
+
+.global-estate-menu__header-sub {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.3;
+  color: rgba(255, 248, 235, 0.72);
 }
 
 .global-estate-menu__header-avatar {
@@ -149,12 +183,12 @@
 }
 
 .global-estate-menu__header-name {
-  margin: 0;
+  margin: 0.1rem 0 0;
   min-width: 0;
-  font-size: 0.86rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  color: rgba(255, 248, 235, 0.96);
+  font-size: 0.74rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(255, 248, 235, 0.62);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
