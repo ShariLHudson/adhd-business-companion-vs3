@@ -16,6 +16,12 @@ export type EstateAudioSettings = {
   masterVolume: number;
   /** Silence Estate — disables all environmental audio. */
   silenced: boolean;
+  /**
+   * First-login Shari welcome greeting audio (default on).
+   * Off = skip autoplay and do not offer Play on the first-login gate.
+   * Welcome audio never plays again after the first login either way.
+   */
+  welcomeGreetingAudioEnabled: boolean;
 };
 
 const DEFAULT_SETTINGS: EstateAudioSettings = {
@@ -23,6 +29,7 @@ const DEFAULT_SETTINGS: EstateAudioSettings = {
   soundscapeOverlayEnabled: false,
   masterVolume: 0.85,
   silenced: false,
+  welcomeGreetingAudioEnabled: true,
 };
 
 function clampVolume(volume: number): number {
@@ -45,6 +52,9 @@ function readRaw(): EstateAudioSettings {
         parsed.masterVolume ?? DEFAULT_SETTINGS.masterVolume,
       ),
       silenced: parsed.silenced ?? DEFAULT_SETTINGS.silenced,
+      welcomeGreetingAudioEnabled:
+        parsed.welcomeGreetingAudioEnabled ??
+        DEFAULT_SETTINGS.welcomeGreetingAudioEnabled,
     };
   } catch {
     return { ...DEFAULT_SETTINGS };
@@ -91,6 +101,12 @@ export function patchEstateAudioSettings(
 
 export function isEstateSilenced(): boolean {
   return readRaw().silenced;
+}
+
+/** Whether the one-time first-login welcome greeting may play. */
+export function isWelcomeGreetingAudioEnabled(): boolean {
+  const s = readRaw();
+  return s.welcomeGreetingAudioEnabled && !s.silenced;
 }
 
 export function setEstateSilenced(silenced: boolean): EstateAudioSettings {

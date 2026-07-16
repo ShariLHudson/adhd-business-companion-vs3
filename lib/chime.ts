@@ -118,6 +118,42 @@ export function playFocusComplete() {
   }
 }
 
+/**
+ * Short polished result bell when the Decision Wheel stops.
+ * Distinct from playSpin's tick bed and playChime's wind shimmer.
+ */
+export function playDecisionResultChime() {
+  const c = ensureCtx();
+  if (!c) return;
+  try {
+    const start = c.currentTime + 0.01;
+    const master = c.createGain();
+    master.gain.value = 0.28;
+    master.connect(c.destination);
+    // Soft estate bell: G5 → D6
+    const notes = [
+      { f: 783.99, t: 0, peak: 0.32, decay: 0.9 },
+      { f: 1174.66, t: 0.12, peak: 0.26, decay: 1.1 },
+    ];
+    for (const note of notes) {
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = "sine";
+      osc.frequency.value = note.f;
+      osc.connect(g);
+      g.connect(master);
+      const t = start + note.t;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(note.peak, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + note.decay);
+      osc.start(t);
+      osc.stop(t + note.decay + 0.05);
+    }
+  } catch {
+    /* audio unavailable */
+  }
+}
+
 export function playChime() {
   const audio = ensureCtx();
   if (!audio) return;

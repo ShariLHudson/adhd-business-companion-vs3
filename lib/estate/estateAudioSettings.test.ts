@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getEstateAudioSettings,
   isEstateAmbienceLayerEnabled,
+  isWelcomeGreetingAudioEnabled,
   patchEstateAudioSettings,
 } from "./estateAudioSettings";
 
@@ -29,5 +30,12 @@ describe("estateAudioSettings", () => {
   it("silence disables all layers", () => {
     patchEstateAudioSettings({ silenced: true });
     expect(isEstateAmbienceLayerEnabled()).toBe(false);
+  });
+
+  it("welcome greeting audio defaults on and can be turned off", () => {
+    expect(getEstateAudioSettings().welcomeGreetingAudioEnabled).toBe(true);
+    expect(isWelcomeGreetingAudioEnabled()).toBe(true);
+    patchEstateAudioSettings({ welcomeGreetingAudioEnabled: false });
+    expect(isWelcomeGreetingAudioEnabled()).toBe(false);
   });
 });
