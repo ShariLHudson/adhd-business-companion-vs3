@@ -28,6 +28,7 @@ const FIRST_60_TEACHING = [
   "Personalizing your Business Estate is optional, but every detail you add helps me support you more personally.",
   "Your Client Avatar helps me make better suggestions for your offers, content, and messaging.",
   "Spark remembers what matters so you do not have to hold it all alone.",
+  "Spark can notice strategies that seem to help you — like shorter sessions or fewer priorities. Nothing becomes a lasting pattern unless you choose to keep it.",
 ] as const;
 
 export const SOMETHING_HELPFUL_TO_KNOW_TODAY =

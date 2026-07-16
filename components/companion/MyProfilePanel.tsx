@@ -15,7 +15,9 @@ import "@/app/companion/my-profile-panel.css";
 
 type Props = {
   onClose: () => void;
-  onOpenSettings?: (section?: "tone" | "plan" | "notifications") => void;
+  onOpenSettings?: (
+    section?: "tone" | "plan" | "notifications" | "pattern",
+  ) => void;
   onOpenExperienceControls?: () => void;
 };
 
@@ -210,6 +212,14 @@ export function MyProfilePanel({
             onClick={() => onOpenSettings?.("notifications")}
           >
             Notifications
+          </button>
+          <button
+            type="button"
+            className="my-profile-panel__link"
+            data-testid="my-profile-open-pattern-awareness"
+            onClick={() => onOpenSettings?.("pattern")}
+          >
+            Pattern Awareness
           </button>
         </section>
       </EstateWorkspace>

@@ -24,7 +24,6 @@ import {
   withUnifiedAppLanguage,
   type AiTone,
   type HelpMode,
-  type PatternAwareness,
   type SupportStyle,
   type VisualMode,
   type Plan,
@@ -120,21 +119,8 @@ const SUPPORT_STYLES: { id: SupportStyle; label: string; desc: string }[] = sort
   (s) => s.label,
 );
 
-const PATTERNS: { id: PatternAwareness; label: string; desc: string }[] = [
-  { id: "off", label: "Off", desc: "No weekly reflection." },
-  { id: "light", label: "Light", desc: "A gentle weekly recap on Momentum." },
-  {
-    id: "guided",
-    label: "Guided",
-    desc: "Weekly recap plus a soft suggestion.",
-  },
-  {
-    id: "active",
-    label: "Active",
-    desc: "More frequent, hands-on insights.",
-  },
-];
-
+import { PatternAwarenessPanel } from "@/components/companion/PatternAwarenessPanel";
+import { getPatternAwarenessControlPrefs } from "@/lib/patternAwareness";
 import { visualModeLabel } from "@/lib/visualColorModes";
 import { EstateAudioSettings } from "@/components/companion/estate/EstateAudioSettings";
 import { getEstateAudioSettings } from "@/lib/estate/estateAudioSettings";
@@ -250,7 +236,7 @@ export function SettingsPanel({
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
   const [supportStyle, setSupportStyle] = useState<SupportStyle>("balanced");
   const visualMode = useVisualMode();
-  const [pattern, setPattern] = useState<PatternAwareness>("light");
+  const [patternSummary, setPatternSummary] = useState("On");
   const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
   const [planningSavedFlash, setPlanningSavedFlash] = useState(false);
   const [plan, setPlan] = useState<Plan>("essential");
@@ -315,7 +301,18 @@ export function SettingsPanel({
     setAiTone(p.aiTone);
     setHelpMode(p.helpMode);
     setSupportStyle(p.supportStyle);
-    setPattern(p.patternAwareness);
+    {
+      const pa = getPatternAwarenessControlPrefs();
+      if (!pa.noticeNewPatterns && !pa.useSavedPatterns) {
+        setPatternSummary("Off");
+      } else if (pa.noticeNewPatterns && pa.useSavedPatterns) {
+        setPatternSummary("Noticing & using");
+      } else if (pa.useSavedPatterns) {
+        setPatternSummary("Using saved");
+      } else {
+        setPatternSummary("Noticing only");
+      }
+    }
     setPlanningView(getDefaultPlanningView() ?? "list");
     setPlan(p.plan);
     setAdvanced(p.advancedAiTools);
@@ -413,7 +410,7 @@ export function SettingsPanel({
       value:
         CELEBRATION_MODES.find((c) => c.id === celebrationMode)?.label ?? "",
     },
-    { id: "pattern", label: "Pattern awareness", value: PATTERNS.find((p) => p.id === pattern)?.label ?? "" },
+    { id: "pattern", label: "Pattern Awareness", value: patternSummary },
     { id: "plan", label: "Plan & voice", value: PLAN_LABEL[plan] },
     { id: "advanced", label: "Advanced AI tools", value: advanced ? "On" : "Off" },
     {
@@ -1031,20 +1028,11 @@ export function SettingsPanel({
   }
   if (open === "pattern") {
     return (
-      <div className={wrap}>
-        {header("Pattern awareness")}
-        <p className="mt-1 text-sm text-[#6b635a]">
-          A gentle weekly reflection on what moved you forward. No scores, no
-          judgment — and you can turn it off anytime.
-        </p>
-        <Options
-          items={PATTERNS}
-          current={pattern}
-          onPick={(v) => {
-            setPattern(v);
-            savePrefs({ patternAwareness: v });
-          }}
-        />
+      <div className={wrap} data-testid="settings-pattern-awareness">
+        {header("Pattern Awareness")}
+        <div className="mt-3">
+          <PatternAwarenessPanel />
+        </div>
       </div>
     );
   }

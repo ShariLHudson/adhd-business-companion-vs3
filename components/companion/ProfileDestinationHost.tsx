@@ -21,7 +21,9 @@ export type ProfileDestinationHostProps = {
   onClose: () => void;
   onOpenEstatePlace?: (actionId: EstateMenuActionId) => void;
   onOpenPeopleIHelp?: () => void;
-  onOpenSettings?: (section?: "tone" | "plan" | "notifications") => void;
+  onOpenSettings?: (
+    section?: "tone" | "plan" | "notifications" | "pattern",
+  ) => void;
   onOpenExperienceControls?: () => void;
 };
 
