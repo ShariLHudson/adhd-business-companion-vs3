@@ -43,8 +43,8 @@ export function formatNavigationChoicesPrompt(
   choices: readonly EstateNavigationChoice[],
 ): string {
   const lines = choices.map(
-    (choice) =>
-      `${choice.officialDisplayName}\n${choice.memberFacingHint}`,
+    (choice, index) =>
+      `${index + 1}. ${choice.officialDisplayName} — ${choice.memberFacingHint}`,
   );
 
   return [
@@ -52,7 +52,7 @@ export function formatNavigationChoicesPrompt(
     "",
     ...lines,
     "",
-    "Which would you like to visit?",
+    "Which would you like to visit? Reply with a number or the place name.",
   ].join("\n");
 }
 

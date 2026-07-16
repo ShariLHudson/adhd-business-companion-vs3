@@ -54,7 +54,10 @@
         "somewhere quiet",
         "I need calm",
         "a quiet place",
-        "somewhere still"
+        "somewhere still",
+        "show me three calming places",
+        "show me 3 calming places",
+        "calming places"
       ],
       "locationIds": [
         "reflection-pond",
@@ -78,6 +81,7 @@
         "peaceful",
         "quiet",
         "calm",
+        "calming",
         "still",
         "serene",
         "restful"

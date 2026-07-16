@@ -58,8 +58,8 @@ function formatExperienceOptionsPrompt(
   options: LocationOption[],
 ): string {
   const lines = options.map(
-    (option) =>
-      `${option.officialDisplayName} — ${option.memberFacingHint}`,
+    (option, index) =>
+      `${index + 1}. ${option.officialDisplayName} — ${option.memberFacingHint}`,
   );
 
   return [
@@ -67,7 +67,7 @@ function formatExperienceOptionsPrompt(
     "",
     ...lines,
     "",
-    "Where would you like to go?",
+    "Which would you like to visit? Reply with a number or the place name.",
   ].join("\n");
 }
 

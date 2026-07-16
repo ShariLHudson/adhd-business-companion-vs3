@@ -129,12 +129,21 @@ function parseNumberIndex(userText: string, count: number): number | null {
 }
 
 function matchLabel(userText: string, choice: PendingChoiceItem): boolean {
-  const t = normalize(userText);
+  const t = normalize(userText).replace(/^(?:the|a|an)\s+/, "");
   const label = normalize(choice.label.replace(/\u2122/g, ""));
-  if (label.length >= 3 && (t === label || t.includes(label))) return true;
+  if (label.length >= 3 && (t === label || t.includes(label) || label.includes(t))) {
+    // Avoid matching bare generic tokens like "room" alone.
+    if (!(t.split(/\s+/).length === 1 && GENERIC_PLACE_TOKENS.has(t))) {
+      return true;
+    }
+  }
 
   const dest = choice.destination?.replace(/-/g, " ").toLowerCase();
-  if (dest && dest.length >= 3 && t.includes(dest)) return true;
+  if (dest && dest.length >= 3 && (t.includes(dest) || dest.includes(t))) {
+    if (!(t.split(/\s+/).length === 1 && GENERIC_PLACE_TOKENS.has(t))) {
+      return true;
+    }
+  }
 
   const theOne = t.match(/\b(?:the\s+)?(\w+)\s+one\b/);
   if (theOne?.[1]) {
@@ -142,7 +151,7 @@ function matchLabel(userText: string, choice: PendingChoiceItem): boolean {
     if (cue.length >= 3 && choiceSearchText(choice).includes(cue)) return true;
   }
 
-  const tokens = label.split(/\s+/).filter((w) => w.length >= 4);
+  const tokens = label.split(/\s+/).filter((w) => w.length >= 3);
   if (tokens.length > 0 && tokens.every((w) => t.includes(w))) {
     if (
       tokens.length === 1 &&
@@ -150,6 +159,14 @@ function matchLabel(userText: string, choice: PendingChoiceItem): boolean {
     ) {
       return false;
     }
+    return true;
+  }
+
+  // Distinctive token (≥4 chars) unique enough: "tea" → Tea Room, "hammock" → Lakeside Hammock
+  const distinctive = t
+    .split(/\s+/)
+    .filter((w) => w.length >= 3 && !GENERIC_PLACE_TOKENS.has(w));
+  if (distinctive.length > 0 && distinctive.every((w) => choiceSearchText(choice).includes(w))) {
     return true;
   }
 

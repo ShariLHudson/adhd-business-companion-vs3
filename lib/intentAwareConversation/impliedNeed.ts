@@ -5,11 +5,16 @@
  * @see docs/estate/INTENT_AWARE_CONVERSATION_FRAMEWORK.md
  */
 
+import {
+  classifyOverwhelmNeed,
+  shouldBlockScenicOverwhelmMenu,
+} from "@/lib/conversation/overwhelmNeedClassifier";
 import { getCanonicalEstatePlaceById } from "@/lib/estate/canonicalEstateRegistry";
 import {
   matchImpliedEstatePlace,
   type ImpliedEstatePlaceMatch,
 } from "@/lib/estate/impliedEstatePlaceMatch";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import { isRelationshipConversation } from "./routingGate";
 import type { ImpliedNeedSession } from "./impliedNeedSession";
 
@@ -255,8 +260,30 @@ export function evaluateImpliedNeed(text: string): ImpliedNeedEvaluation | null 
   if (FOCUS_COACHING_EXCLUDE_RE.test(trimmed)) return null;
   if (!IMPLIED_NEED_OPENER_RE.test(trimmed)) return null;
 
+  // Project / task overwhelm stays in conversation — not an Estate place pause.
+  if (classifyOverwhelmNeed(trimmed) === "task_breakdown") return null;
+
+  // Bare overwhelm without place-seeking — conversation, not scenic menus.
+  if (
+    !mayOfferScenicPlaceSuggestions(trimmed) &&
+    shouldBlockScenicOverwhelmMenu(trimmed) &&
+    classifyOverwhelmNeed(trimmed) !== "cognitive_overload"
+  ) {
+    return null;
+  }
+
   const match = resolveMatch(trimmed);
   if (!match) return null;
+
+  // Scenic place destinations require an explicit place ask.
+  if (
+    !mayOfferScenicPlaceSuggestions(trimmed) &&
+    (match.placeId === "peaceful-places" ||
+      match.placeId === "lakeside-hammock" ||
+      match.placeId === "ocean-conservatory")
+  ) {
+    return null;
+  }
 
   const choices = buildChoices(match);
   const suggestedPaths = [...new Set(choices.map((c) => c.path))];

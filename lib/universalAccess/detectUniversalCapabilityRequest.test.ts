@@ -38,6 +38,12 @@ describe("detectUniversalCapabilityRequest", () => {
     expect(detectUniversalCapabilityRequest("Schedule this")?.capabilityId).toBe(
       "calendar",
     );
+    expect(detectUniversalCapabilityRequest("Open my calendar")?.section).toBe(
+      "calendar",
+    );
+    expect(detectUniversalCapabilityRequest("Show calendar")?.nav).toBe(
+      "plan-my-day",
+    );
     expect(detectUniversalCapabilityRequest("Show my projects")?.section).toBe(
       "project-homes",
     );
@@ -66,9 +72,7 @@ describe("detectUniversalCapabilityRequest", () => {
     expect(detectUniversalCapabilityRequest("Let's breathe")?.capabilityId).toBe(
       "breathe",
     );
-    expect(detectUniversalCapabilityRequest("I need a minute")?.capabilityId).toBe(
-      "breathe",
-    );
+    expect(detectUniversalCapabilityRequest("I need a minute")).toBeNull();
     expect(
       detectUniversalCapabilityRequest("I need to calm down")?.capabilityId,
     ).toBe("breathe");
@@ -78,9 +82,9 @@ describe("detectUniversalCapabilityRequest", () => {
     expect(detectUniversalCapabilityRequest("Help me reset")?.capabilityId).toBe(
       "breathe",
     );
-    expect(detectUniversalCapabilityRequest("I'm overwhelmed")?.capabilityId).toBe(
-      "breathe",
-    );
+    // Bare overwhelm is conversation — never auto-launch Breathe.
+    expect(detectUniversalCapabilityRequest("I'm overwhelmed")).toBeNull();
+    expect(detectUniversalCapabilityRequest("I'm overwhelmed today.")).toBeNull();
     expect(
       detectUniversalCapabilityRequest("Start a breathing exercise")?.capabilityId,
     ).toBe("breathe");

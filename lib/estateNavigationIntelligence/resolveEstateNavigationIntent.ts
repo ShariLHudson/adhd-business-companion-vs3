@@ -6,6 +6,10 @@
 
 import { resolveLocationIntent } from "@/lib/estateKnowledgeBase/locationIntentResolution";
 import type { LocationOption } from "@/lib/estateKnowledgeBase/types";
+import {
+  mayOfferScenicPlaceSuggestions,
+  scenicPlaceSuggestionCount,
+} from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import { matchAmbiguousLocationTerm } from "./ambiguousLocations";
 import {
   choicesFromOptions,
@@ -61,11 +65,17 @@ function buildChoicesDecision(
     experienceGroupId?: string;
     intro: string;
     clarificationQuestion?: string;
+    /** Cap choices (explicit "3 places" / "somewhere" → 1). */
+    maxChoices?: number;
   },
 ): EstateNavigationDecision {
+  const maxChoices = Math.min(
+    Math.max(1, opts.maxChoices ?? 3),
+    3,
+  );
   const validated = filterValidatedNavigationTargets(
     options.map((option) => option.locationId),
-  );
+  ).slice(0, maxChoices);
 
   if (validated.length === 0) {
     return {
@@ -88,7 +98,10 @@ function buildChoicesDecision(
     placeIdMap,
   );
 
-  if (choices.length === 1) {
+  // Experience asks stay invitation-only — never auto-navigate without a pick.
+  const forceMenu = intentKind === "experience_request";
+
+  if (choices.length === 1 && !forceMenu) {
     const only = validated[0]!;
     return {
       kind: "navigate_direct",
@@ -154,6 +167,13 @@ function resolveFromKnowledgeBaseIntent(
   }
 
   if (intent.kind === "experience_options" && intent.options?.length) {
+    let maxChoices = mayOfferScenicPlaceSuggestions(query)
+      ? scenicPlaceSuggestionCount(query) || 3
+      : 3;
+    // "Somewhere peaceful" is a choice among calming places — don't auto-pick one.
+    if (maxChoices === 1 && /\bsomewhere\b/i.test(query)) {
+      maxChoices = 3;
+    }
     return buildChoicesDecision(query, "experience_request", intent.options, {
       matchedPhrase: intent.matchedPhrase,
       experienceGroup: intent.experienceGroup,
@@ -161,6 +181,7 @@ function resolveFromKnowledgeBaseIntent(
       intro: intent.experienceGroup
         ? `I have a few ${intent.experienceGroup.toLowerCase()} places you might enjoy:`
         : "I have a few places you might enjoy:",
+      maxChoices,
     });
   }
 

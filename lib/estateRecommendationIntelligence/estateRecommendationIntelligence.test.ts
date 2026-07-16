@@ -12,13 +12,24 @@ describe("Estate Recommendation Intelligence", () => {
     expect(match?.signal.signalId).toBe("mental-overload");
   });
 
-  it("explains why Clear My Mind fits right now — not just that it exists", () => {
+  it("keeps bare overwhelm in conversation — no scenic place invitation", () => {
     const decision = resolveEstateRecommendation("I'm overwhelmed");
+    expect(isResolvedEstateRecommendation(decision)).toBe(false);
+    expect(decision.kind).toBe("unresolved");
+  });
+
+  it("gently offers Clear My Mind only for cognitive overload", () => {
+    const decision = resolveEstateRecommendation(
+      "I have too much on my brain to remember it all.",
+    );
     expect(isResolvedEstateRecommendation(decision)).toBe(true);
     expect(decision.primary?.locationId).toBe("clear-my-mind");
     expect(decision.primary?.whyNow).toContain("relief");
     expect(decision.memberFacingInvitation).toContain("Clear My Mind");
-    expect(decision.memberFacingInvitation).toContain("stay right here");
+    expect(decision.memberFacingInvitation).not.toMatch(
+      /Peaceful Places|Lakeside Hammock|Ocean Conservatory|conservatory|reflection pond/i,
+    );
+    expect(decision.alternatives ?? []).toEqual([]);
   });
 
   it("offers alternatives with distinct why-now reasoning", () => {

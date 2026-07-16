@@ -15,7 +15,7 @@ const COGNITIVE_OVERLOAD_RE =
 
 /** Large project / first-step paralysis — ask about the work, not calm places. */
 const TASK_BREAKDOWN_RE =
-  /\b(?:don'?t know (?:what|the) (?:first )?step|don'?t know where to begin|don'?t know where to start|not sure where to start|project (?:is )?(?:too big|huge)|huge project|big project|too big (?:to start|of a project)|what step to take first|first (?:concrete )?step|where (?:do i|should i) begin)\b/i;
+  /\b(?:don'?t know (?:what|the) (?:first )?step|don'?t know where to begin|don'?t know where to start|not sure where to start|project (?:is )?(?:too big|huge)|huge project|big project|too big (?:to start|of a project)|what step to take first|first (?:concrete )?step|where (?:do i|should i) begin|overwhelm(?:ed)? (?:trying|with|by|about).{0,48}(?:project|task|finish|deadline|work)|trying to finish (?:this |my |the )?project|finish this project|stuck (?:on|with) (?:this |my |the )?project)\b/i;
 
 /** Body/nervous-system calming — breathe / calm audio / stay and talk. */
 const EMOTIONAL_CALMING_RE =

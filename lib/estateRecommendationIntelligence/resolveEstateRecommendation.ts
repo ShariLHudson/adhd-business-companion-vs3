@@ -5,6 +5,11 @@
  * Companion, not directory. Permission before navigation (Spec 108).
  */
 
+import {
+  classifyOverwhelmNeed,
+  shouldBlockScenicOverwhelmMenu,
+} from "@/lib/conversation/overwhelmNeedClassifier";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import { formatRecommendationInvitation } from "./formatRecommendationInvitation";
 import { matchMemberNeedSignal } from "./memberNeedSignals";
 import { buildRecommendationChoices } from "./recommendationReasons";
@@ -18,6 +23,9 @@ const EXPLICIT_NAVIGATION_RE =
 
 const EXPLICIT_TASK_RE =
   /\b(?:help me (?:write|create|draft|build|plan)|write a|create a|draft a)\b/i;
+
+/** Functional relief destinations allowed when scenic auto-suggestions are off. */
+const FUNCTIONAL_RELIEF_LOCATION_IDS = new Set(["clear-my-mind"]);
 
 function isRecommendationQuery(query: string): boolean {
   const trimmed = query.trim();
@@ -49,7 +57,38 @@ export function resolveEstateRecommendation(
   const match = matchMemberNeedSignal(trimmed);
   if (!match) return base;
 
-  const choices = buildRecommendationChoices(match.signal.signalId, context, 3);
+  // Bare overwhelm / task overwhelm → conversation, not scenic place menus.
+  // Cognitive overload may gently invite Clear My Mind only.
+  const scenicAllowed = mayOfferScenicPlaceSuggestions(trimmed);
+  const overwhelmKind = classifyOverwhelmNeed(trimmed);
+  const blockScenic = shouldBlockScenicOverwhelmMenu(trimmed);
+
+  if (!scenicAllowed && blockScenic) {
+    if (overwhelmKind === "task_breakdown") {
+      return {
+        ...base,
+        signalId: match.signal.signalId,
+        signalLabel: match.signal.label,
+        reason: "task_overwhelm_stays_in_conversation",
+      };
+    }
+    if (overwhelmKind !== "cognitive_overload") {
+      return {
+        ...base,
+        signalId: match.signal.signalId,
+        signalLabel: match.signal.label,
+        reason: "overwhelm_stays_in_conversation",
+      };
+    }
+  }
+
+  let choices = buildRecommendationChoices(match.signal.signalId, context, 3);
+  if (!scenicAllowed && blockScenic) {
+    choices = choices.filter((choice) =>
+      FUNCTIONAL_RELIEF_LOCATION_IDS.has(choice.locationId),
+    );
+  }
+
   if (choices.length === 0) {
     return {
       kind: "unresolved",
@@ -70,7 +109,7 @@ export function resolveEstateRecommendation(
     emotionalTone: match.signal.emotionalTone,
     matchedPhrase: match.matchedPhrase,
     primary,
-    alternatives: rest.slice(0, 2),
+    alternatives: scenicAllowed ? rest.slice(0, 2) : [],
     stayHereOffered: true,
     reason: "need_signal_matched",
   };

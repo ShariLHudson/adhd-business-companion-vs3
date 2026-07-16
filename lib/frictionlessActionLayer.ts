@@ -381,6 +381,7 @@ import {
 import {
   hasActivePendingChoice,
   registerPendingChoiceFromConcierge,
+  registerPendingChoiceFromNavigation,
   resolvePendingChoiceTurn,
 } from "@/lib/pendingChoice";
 
@@ -3593,7 +3594,36 @@ function tryEstateNavigationIntelligence(
     };
   }
 
-  if (decision.kind === "offer_choices" || decision.kind === "need_clarification") {
+  if (decision.kind === "offer_choices" && decision.choices?.length) {
+    const destinationChoices = decision.choices.map((choice, index) => ({
+      label: String(index + 1),
+      destinationId: choice.placeId,
+      displayName: choice.officialDisplayName,
+      shortDescription: choice.memberFacingHint,
+      confidence: "medium" as const,
+      reasonMatched: decision.intentKind,
+    }));
+    registerPendingChoiceFromNavigation({
+      choices: destinationChoices,
+      menuText: localReply,
+      queryPhrase: userText,
+      offeredAtTurn: undefined,
+    });
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: `ESTATE NAVIGATION (medium confidence): ${ESTATE_NAVIGATION_GOLDEN_RULE}`,
+      localReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  if (decision.kind === "need_clarification") {
     return {
       category: "direct_action",
       suppressRelationship: true,

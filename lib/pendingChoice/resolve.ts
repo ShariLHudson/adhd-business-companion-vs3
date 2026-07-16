@@ -1,6 +1,7 @@
 import { getCanonicalEstatePlaceById } from "@/lib/estate/canonicalEstateRegistry";
 import { isLiveEstatePlace } from "@/lib/estate/liveEstatePlace";
 import { hasHardEstateNavigationIntent } from "@/lib/estate/estateMetaNavigationPhrases";
+import { resolveEstatePlaceIdFromUserText } from "@/lib/estate/estateRoomAliasRegistry";
 import type { CapabilityRecommendationOption } from "@/lib/estateCapabilityRegistry/types";
 import type { EstateDestinationChoice } from "@/lib/estate/estateDestinationResolver";
 import {
@@ -247,6 +248,28 @@ export function resolvePendingChoiceTurn(
       action: selected.callback,
       reply: ackForPendingChoiceAction(selected.callback),
     };
+  }
+
+  // Named place outside the menu (or alias) — leave pending and route as navigation.
+  const namedPlaceId = resolveEstatePlaceIdFromUserText(trimmed);
+  if (namedPlaceId) {
+    const inMenu = state.choices.find(
+      (choice) =>
+        choice.destination === namedPlaceId ||
+        choice.id === namedPlaceId ||
+        choice.callback.placeId === namedPlaceId,
+    );
+    if (inMenu) {
+      clearPendingChoice();
+      return {
+        kind: "resolved",
+        choice: inMenu,
+        action: inMenu.callback,
+        reply: ackForPendingChoiceAction(inMenu.callback),
+      };
+    }
+    clearPendingChoice();
+    return { kind: "topic_change" };
   }
 
   if (shouldClearPendingChoiceForTopicChange(trimmed)) {
