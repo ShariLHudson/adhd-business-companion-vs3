@@ -25,6 +25,8 @@ import "./estate-guide-flipbook.css";
 type Props = {
   open: boolean;
   onClose: () => void;
+  /** When set, open the first matching room spread (skips cover). */
+  initialRoomId?: string | null;
 };
 
 type FlipPhase = "cover" | "spread";
@@ -69,13 +71,35 @@ function GuideRoomSpread({ roomSpread }: { roomSpread: EstateGuideRoomSpread }) 
   );
 }
 
-export function EstateGuideFlipbook({ open, onClose }: Props) {
+function indexForRoomId(
+  roomSpreads: EstateGuideRoomSpread[],
+  roomId: string | null | undefined,
+): number {
+  if (!roomId) return 0;
+  const normalized = roomId.trim().toLowerCase();
+  if (!normalized) return 0;
+  const index = roomSpreads.findIndex(
+    (spread) =>
+      spread.spread.id.toLowerCase() === normalized ||
+      spread.roomTitle.toLowerCase().includes(normalized),
+  );
+  return index >= 0 ? index : 0;
+}
+
+export function EstateGuideFlipbook({
+  open,
+  onClose,
+  initialRoomId = null,
+}: Props) {
   const roomSpreads = useMemo(
     () => expandEstateGuideToRoomSpreads(ESTATE_GUIDE_SPREADS),
     [],
   );
-  const [phase, setPhase] = useState<FlipPhase>("cover");
-  const [spreadIndex, setSpreadIndex] = useState(0);
+  const startIndex = indexForRoomId(roomSpreads, initialRoomId);
+  const [phase, setPhase] = useState<FlipPhase>(
+    initialRoomId ? "spread" : "cover",
+  );
+  const [spreadIndex, setSpreadIndex] = useState(startIndex);
   const [spreadFading, setSpreadFading] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const spreadRef = useRef<HTMLDivElement>(null);
@@ -111,12 +135,17 @@ export function EstateGuideFlipbook({ open, onClose }: Props) {
       resetBook();
       return;
     }
+    if (initialRoomId) {
+      const next = indexForRoomId(roomSpreads, initialRoomId);
+      setPhase("spread");
+      setSpreadIndex(next);
+    }
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [open, resetBook]);
+  }, [open, resetBook, initialRoomId, roomSpreads]);
 
   useEffect(() => {
     if (!open) return;
@@ -263,6 +292,8 @@ export function EstateGuideFlipbook({ open, onClose }: Props) {
                   alt={SPARK_ESTATE_GUIDE_COVER_ALT}
                   className="eg-flipbook__cover-image"
                   decoding="async"
+                  loading="eager"
+                  fetchPriority="high"
                 />
                 <span className="eg-flipbook__cover-hint">Open guide</span>
               </button>

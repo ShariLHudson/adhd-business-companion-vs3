@@ -1,5 +1,22 @@
 /* Spark Estate Guide — in-app flipbook overlay (book only, no chrome frame) */
 
+.eg-flipbook--loading {
+  z-index: 100010;
+  background: rgba(14, 18, 16, 0.55);
+}
+
+.eg-flipbook__loading-label {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(250, 246, 238, 0.94);
+  color: #2c2620;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
 .eg-flipbook {
   --eg-fb-teal: #1a4a47;
   --eg-fb-gold: #c9a66b;

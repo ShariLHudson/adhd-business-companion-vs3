@@ -49,6 +49,7 @@ export function EstateGuideSpreadPlate({
           alt={alt}
           className="eg-guide-plate__image"
           decoding="async"
+          loading="lazy"
           onError={handleError}
         />
       )}

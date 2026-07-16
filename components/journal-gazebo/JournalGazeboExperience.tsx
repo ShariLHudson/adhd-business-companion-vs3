@@ -1,13 +1,35 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+} from "react";
 import { CINEMATIC } from "@/lib/journalGazebo/cinematicTiming";
 import { JOURNAL_GAZEBO_BACKGROUND_URL } from "@/lib/journalGazebo/journalGazeboMedia";
 import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
 import { EstateImmersiveHomeLink } from "@/components/companion/EstateImmersiveHomeLink";
 import { SparkEstateGuideAnchor } from "@/components/companion/SparkEstateGuideAnchor";
-import { EstateGuideFlipbook } from "@/components/estate-guide";
 import { appendDictationToBody, plainTextFromHtml, type TypingStyle } from "@/lib/journalGazebo/writingSurface";
+
+type EstateGuideFlipbookProps = {
+  open: boolean;
+  onClose: () => void;
+  initialRoomId?: string | null;
+};
+
+const EstateGuideFlipbookLazy = lazy(async () => {
+  const mod = await import("@/components/estate-guide/EstateGuideFlipbook");
+  return {
+    default: mod.EstateGuideFlipbook as ComponentType<EstateGuideFlipbookProps>,
+  };
+});
 import { useSpeechToText } from "@/lib/growth/useSpeechToText";
 import {
   createJournalConfig,
@@ -158,6 +180,8 @@ export function JournalGazeboExperience({
   const [sessionScenes, setSessionScenes] = useState<JournalSessionScenes | null>(null);
   const [sceneSettled, setSceneSettled] = useState(false);
   const [estateGuideOpen, setEstateGuideOpen] = useState(false);
+  /** Mount flipbook chunk only while open (brief keep-alive after close). */
+  const [estateGuideMounted, setEstateGuideMounted] = useState(false);
   const [journalPickerOpen, setJournalPickerOpen] = useState(false);
   const [writingPrefsOpen, setWritingPrefsOpen] = useState(false);
   const [pageTypingStyle, setPageTypingStyle] = useState<TypingStyle | null>(null);
@@ -1099,6 +1123,16 @@ export function JournalGazeboExperience({
 
   const showEstateGuide = !estateGuideOpen;
 
+  useEffect(() => {
+    if (estateGuideOpen) {
+      setEstateGuideMounted(true);
+      return;
+    }
+    if (!estateGuideMounted) return;
+    const timer = window.setTimeout(() => setEstateGuideMounted(false), 400);
+    return () => window.clearTimeout(timer);
+  }, [estateGuideOpen, estateGuideMounted]);
+
   function handleChooseAnotherJournal() {
     persistOpenJournalPlace();
     setCenteredBookActive(false);
@@ -1216,17 +1250,35 @@ export function JournalGazeboExperience({
         />
       ) : null}
 
-      {showEstateGuide && !estateGuideOpen ? (
+      {showEstateGuide ? (
         <SparkEstateGuideAnchor
           onClick={() => setEstateGuideOpen(true)}
           className="journal-gazebo__estate-guide"
         />
       ) : null}
 
-      <EstateGuideFlipbook
-        open={estateGuideOpen}
-        onClose={() => setEstateGuideOpen(false)}
-      />
+      {estateGuideMounted ? (
+        <Suspense
+          fallback={
+            estateGuideOpen ? (
+              <div
+                className="eg-flipbook eg-flipbook--loading"
+                role="status"
+                aria-live="polite"
+                data-testid="estate-guide-loading"
+              >
+                <p className="eg-flipbook__loading-label">Opening the Guide…</p>
+              </div>
+            ) : null
+          }
+        >
+          <EstateGuideFlipbookLazy
+            open={estateGuideOpen}
+            onClose={() => setEstateGuideOpen(false)}
+            initialRoomId="writing-gazebo"
+          />
+        </Suspense>
+      ) : null}
 
       {journalPickerOpen ? (
         <JournalGazeboJournalPicker
