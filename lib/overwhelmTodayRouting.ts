@@ -6,6 +6,7 @@
 import { adaptMyDayOfferLine } from "./adaptMyDayChatRouting";
 import type { AppSection } from "./companionUi";
 import type { WorkspaceOffer } from "./workspaceMode";
+import { prefersBrainDumpBeforePlanning } from "@/lib/patternAwareness";
 
 export type OverwhelmTodayRoute =
   | "plan_primary"
@@ -66,6 +67,14 @@ export function detectOverwhelmTodayRoute(text: string): OverwhelmTodayRoute | n
   if (!t || isUnderstandOverwhelmQuestion(t)) return null;
 
   if (BRAIN_DUMP_STRONG_RE.test(t)) return "brain_dump_primary";
+  // Member-saved Pattern Awareness: unload first when they asked Spark to remember that.
+  if (
+    prefersBrainDumpBeforePlanning() &&
+    /\boverwhelm/i.test(t) &&
+    !isAdaptPrimaryRoute(t)
+  ) {
+    return "brain_dump_primary";
+  }
   if (isAdaptPrimaryRoute(t)) return "adapt_primary";
   if (isOverwhelmTodayStartIntent(t)) return "plan_primary";
 

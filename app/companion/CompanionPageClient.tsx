@@ -2143,6 +2143,7 @@ import {
   unlockNotificationSounds,
 } from "@/lib/notifications/playNotificationSound";
 import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
+import { buildSavedPatternsPromptHint } from "@/lib/patternAwareness";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
   continuous: boolean;
@@ -18048,6 +18049,7 @@ export default function CompanionPageClient() {
                   activeSection: activeSectionRef.current,
                 }),
                 estateMemoryHintForChat(),
+                buildSavedPatternsPromptHint(),
                 chamberMemberChatHint,
                 activeTaskLockHintForChat(estateTaskLockTurn.state),
                 estateConversationTurn && !taskLockBlocksEstateRouting
@@ -24271,7 +24273,7 @@ export default function CompanionPageClient() {
         onOpenEstatePlace={handleEstateMenuAction}
         onOpenPeopleIHelp={() => openProfileDestinationCore("people-i-help")}
         onOpenSettings={(section) => {
-          setSettingsSection(section === "notifications" ? "notifications" : section ?? null);
+          setSettingsSection(section ?? null);
           setOverlay("settings");
         }}
         onOpenExperienceControls={() => setExperienceControlsOpen(true)}

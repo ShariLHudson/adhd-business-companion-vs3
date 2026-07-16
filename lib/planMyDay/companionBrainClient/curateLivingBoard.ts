@@ -3,12 +3,17 @@
  */
 
 import type { CompanionJudgmentResult } from "@/lib/companionBrain";
+import { resolvePlanMyDayPriorityCap } from "@/lib/patternAwareness";
 import type { PlanDayItem, PlanItemColumn } from "@/lib/planMyDay/types";
 import { saveTodayPlanItems } from "@/lib/planMyDay/planDayItems";
 import { whyTodayForItem } from "./whyToday";
 
 export const FOCUS_CAP = 3;
 export const READY_CAP = 8;
+
+function focusCapForToday(): number {
+  return resolvePlanMyDayPriorityCap() ?? FOCUS_CAP;
+}
 
 function isFocusCandidate(
   item: PlanDayItem,
@@ -41,8 +46,13 @@ export function curatePlanBoardForJudgment(
       ? item.notes
       : whyTodayForItem(item, judgment);
 
+    // Member-chosen day areas (manual adds) are not re-bucketed by capacity.
+    if (item.source === "manual") {
+      return { ...item, notes: why };
+    }
+
     if (isFocusCandidate(item, judgment)) {
-      if (focusCount < FOCUS_CAP) {
+      if (focusCount < focusCapForToday()) {
         focusCount += 1;
         const column: PlanItemColumn =
           item.column === "doing" ? "doing" : "today";
