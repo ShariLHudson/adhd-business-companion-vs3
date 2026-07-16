@@ -6,7 +6,6 @@ import {
   useLayoutEffect,
   useMemo,
   useState,
-  type PointerEvent,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -14,23 +13,13 @@ import { createPortal } from "react-dom";
 import { WelcomeHomeFrostedChatPanel } from "@/components/companion/WelcomeHomeFrostedChatPanel";
 import { WelcomeHomeIntroDevPanel } from "@/components/companion/WelcomeHomeIntroDevPanel";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
-import {
-  destroyWelcomeHomeAudioManager,
-  useWelcomeAudioExperience,
-} from "@/lib/welcomeAudio";
-import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
-import {
-  WELCOME_HOME_BEGIN_HINT,
-  WELCOME_HOME_BEGIN_LABEL,
-} from "@/lib/welcomeHome/content";
+import { destroyWelcomeHomeAudioManager } from "@/lib/welcomeAudio";
 import { markWelcomeIntroSeen } from "@/lib/welcomeHome/firstLaunchPersistence";
 import { setWelcomeHomeIntroAudioBlocked } from "@/lib/welcomeHome/introAudioGuard";
-import { markWelcomeRoomOpenedWithGesture } from "@/lib/welcomeRoom/welcomeRoomGesture";
 import {
   WELCOME_HOME_CHAT_REVEAL_DELAY_MS,
   WELCOME_HOME_FALLBACK_DOLLY_MS,
   WELCOME_HOME_INTRO_SCREEN_READY_MS,
-  WELCOME_HOME_MIN_DOLLY_MS,
 } from "@/lib/welcomeHome/introTiming";
 import type { WelcomeHomeExperiencePlan } from "@/lib/sparkExperienceEngine";
 import { prefersReducedMotion, useWelcomeRoomArrival } from "@/lib/welcomeRoom";
@@ -63,9 +52,8 @@ type Phase = "intro" | "pause" | "chat";
 function shouldRunFirstVisitCinematic(plan: WelcomeHomeExperiencePlan): boolean {
   if (prefersReducedMotion()) return false;
   if (!plan.showIntro) return false;
-  return (
-    plan.visitorKind === "first_visit" || plan.visitorKind === "replay"
-  );
+  // Spoken welcome plays only on FirstLoginWelcomeGate — never again here.
+  return plan.visitorKind === "first_visit";
 }
 
 export function WelcomeHomePage({
@@ -88,7 +76,6 @@ export function WelcomeHomePage({
     firstVisitCinematic ? "intro" : "chat",
   );
   const [skippedIntro, setSkippedIntro] = useState(false);
-  const [voiceHasPlayed, setVoiceHasPlayed] = useState(false);
   const [screenReady, setScreenReady] = useState(false);
   const [heroImageLoaded, setHeroImageLoaded] = useState(false);
   const backdropRevision = useChatBackdropRevision();
@@ -103,38 +90,13 @@ export function WelcomeHomePage({
   const chromeHiddenDuringWelcome =
     firstVisitCinematic && phase !== "chat";
 
-  const {
-    voiceState,
-    stopExperience,
-    progress,
-    playExperience,
-    audioUnlocked,
-  } = useWelcomeAudioExperience({
-    profileId: "welcome-home",
-    enabled: firstVisitCinematic,
-    active: introPlaybackReady,
-    immersive: introPlaybackReady,
-    paused: !introPlaybackReady,
-  });
+  // Silent cinematic — spoken welcome is owned by FirstLoginWelcomeGate only.
+  useEffect(() => {
+    destroyWelcomeHomeAudioManager();
+  }, []);
 
-  const dollyDurationMs = useMemo(() => {
-    if (!introPlaybackReady) return WELCOME_HOME_FALLBACK_DOLLY_MS;
-    const fromVoice =
-      progress.totalSeconds > 0
-        ? Math.round(progress.totalSeconds * 1000)
-        : WELCOME_HOME_FALLBACK_DOLLY_MS;
-    return Math.max(WELCOME_HOME_MIN_DOLLY_MS, fromVoice);
-  }, [introPlaybackReady, progress.totalSeconds]);
-
-  const walkPaused =
-    (introActive && !screenReady) ||
-    (introPlaybackReady && !audioUnlocked && !skippedIntro) ||
-    (introPlaybackReady &&
-      !skippedIntro &&
-      !voiceHasPlayed &&
-      voiceState !== "playing" &&
-      voiceState !== "loading" &&
-      voiceState !== "ended");
+  const dollyDurationMs = WELCOME_HOME_FALLBACK_DOLLY_MS;
+  const walkPaused = introActive && !screenReady;
 
   const arrival = useWelcomeRoomArrival({
     skipIntro: true,
@@ -155,12 +117,6 @@ export function WelcomeHomePage({
   const imageScale = roomDolly.imageScale;
 
   useEffect(() => {
-    if (!firstVisitCinematic) {
-      destroyWelcomeHomeAudioManager();
-    }
-  }, [firstVisitCinematic]);
-
-  useEffect(() => {
     if (!heroImageLoaded || !introActive) return;
     const timer = window.setTimeout(() => {
       setScreenReady(true);
@@ -178,25 +134,16 @@ export function WelcomeHomePage({
   }, [chromeHiddenDuringWelcome, onIntroActiveChange]);
 
   useEffect(() => {
-    if (voiceState === "playing") {
-      setVoiceHasPlayed(true);
-      // Persist as soon as narration starts so a refresh never re-autoplays.
-      // Manual "Listen to Shari's Welcome" uses visitorKind "replay" and may play again.
-      if (experience.visitorKind === "first_visit") {
-        markWelcomeIntroSeen();
-      }
+    if (!introPlaybackReady) return;
+    if (experience.visitorKind === "first_visit") {
+      markWelcomeIntroSeen();
     }
-  }, [voiceState, experience.visitorKind]);
-
-  const narrationComplete =
-    skippedIntro ||
-    !firstVisitCinematic ||
-    (voiceHasPlayed &&
-      (voiceState === "ended" || voiceState === "idle" || voiceState === "error")) ||
-    (voiceState === "error" && arrival.walkComplete);
+  }, [introPlaybackReady, experience.visitorKind]);
 
   const introBeatComplete =
-    narrationComplete && (arrival.walkComplete || skippedIntro);
+    skippedIntro ||
+    !firstVisitCinematic ||
+    arrival.walkComplete;
 
   useEffect(() => {
     if (phase !== "intro" || !introBeatComplete) return;
@@ -227,12 +174,11 @@ export function WelcomeHomePage({
   const handleStopIntro = useCallback(() => {
     setSkippedIntro(true);
     setPhase("chat");
-    void stopExperience();
     if (experience.visitorKind === "first_visit") {
       markWelcomeIntroSeen();
     }
     onIntroComplete();
-  }, [experience.visitorKind, onIntroComplete, stopExperience]);
+  }, [experience.visitorKind, onIntroComplete]);
 
   useEffect(() => {
     registerBack?.(() => {
@@ -244,28 +190,6 @@ export function WelcomeHomePage({
     });
     return () => registerBack?.(null);
   }, [registerBack, introActive, handleStopIntro]);
-
-  const beginIntroAudio = useCallback(() => {
-    unlockBrowserAudioFromClick();
-    markWelcomeRoomOpenedWithGesture();
-    void playExperience();
-  }, [playExperience]);
-
-  const handleIntroPointerDown = useCallback(
-    (event: PointerEvent<HTMLDivElement>) => {
-      if (!introPlaybackReady || audioUnlocked) return;
-      if (event.button !== 0) return;
-      beginIntroAudio();
-    },
-    [introPlaybackReady, audioUnlocked, beginIntroAudio],
-  );
-
-  const showBeginWelcome =
-    introPlaybackReady &&
-    !audioUnlocked &&
-    !skippedIntro &&
-    voiceState !== "playing" &&
-    voiceState !== "loading";
 
   useLayoutEffect(() => {
     if (!chatVisible || !inputRef) return;
@@ -300,7 +224,6 @@ export function WelcomeHomePage({
         <div
           className="welcome-home-page__viewport"
           style={{ opacity: arrival.fadeOpacity }}
-          onPointerDown={handleIntroPointerDown}
         >
           <div className="welcome-room__dolly-rig welcome-home-page__photo-rig">
             <div className="welcome-room__dolly-stage">
@@ -337,18 +260,6 @@ export function WelcomeHomePage({
           />
         ) : null}
 
-        {showBeginWelcome ? (
-          <button
-            type="button"
-            className="welcome-room__audio-unlock welcome-home-page__begin-welcome"
-            onClick={beginIntroAudio}
-            data-testid="welcome-home-begin-welcome"
-          >
-            <span className="welcome-room__enter-label">{WELCOME_HOME_BEGIN_LABEL}</span>
-            <span className="welcome-room__enter-hint">{WELCOME_HOME_BEGIN_HINT}</span>
-          </button>
-        ) : null}
-
         {introActive ? (
           <div className="welcome-home-page__intro-controls">
             <button
@@ -356,7 +267,7 @@ export function WelcomeHomePage({
               className="welcome-home-page__stop-btn"
               onClick={handleStopIntro}
               data-testid="welcome-home-stop-intro"
-              aria-label="Stop welcome recording and continue to Welcome Home"
+              aria-label="Skip intro and continue to Welcome Home"
             >
               Stop &amp; Continue
             </button>
@@ -368,8 +279,8 @@ export function WelcomeHomePage({
             phase={phase}
             screenReady={screenReady}
             introActive={introActive}
-            voiceState={voiceState}
-            audioUnlocked={audioUnlocked}
+            voiceState="off"
+            audioUnlocked={false}
             walkPaused={walkPaused}
             cinematicProgress={cinematicProgress}
             scale={imageScale}

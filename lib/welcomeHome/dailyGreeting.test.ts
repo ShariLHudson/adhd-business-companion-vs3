@@ -44,14 +44,14 @@ describe("evaluateWelcomeHomeExperience", () => {
     expect(plan.visitorKind).toBe("returning");
   });
 
-  it("manual replay opens the welcome after first visit completion", () => {
+  it("ignores manual replay — welcome audio is first-login only", () => {
     const plan = evaluateWelcomeHomeExperience({
       hasSeenWelcomeIntro: true,
       isRepeatLogin: true,
       replayRequested: true,
     });
-    expect(plan.visitorKind).toBe("replay");
-    expect(plan.showIntro).toBe(true);
-    expect(plan.greeting).toBeNull();
+    expect(plan.visitorKind).toBe("returning");
+    expect(plan.showIntro).toBe(false);
+    expect(plan.greeting).toBeTruthy();
   });
 });

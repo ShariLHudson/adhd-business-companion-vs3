@@ -30,4 +30,11 @@ describe("FirstLoginWelcomeGate — one-time welcome behavior", () => {
       /welcomeAudioPlayedAt \|\| record\?\.welcomeCompletedAt/,
     );
   });
+
+  it("offers Continue without audio and respects the Settings opt-out", () => {
+    expect(source).toContain("handleContinueWithoutAudio");
+    expect(source).toContain("FIRST_LOGIN_WELCOME_SKIP_AUDIO");
+    expect(source).toContain('data-testid="first-login-skip-welcome-audio"');
+    expect(source).toContain("isWelcomeGreetingAudioEnabled");
+  });
 });

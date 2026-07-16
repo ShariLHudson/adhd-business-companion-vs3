@@ -132,6 +132,9 @@ export function useWelcomeAudioExperience({
       managerRef.current?.pauseExperience();
       return;
     }
+    /** Welcome Home: never auto-start — Begin Welcome / pointer gesture only. */
+    if (profile?.id === "welcome-home") return;
+
     const manager = managerRef.current;
     if (!manager) return;
     if (
@@ -157,7 +160,7 @@ export function useWelcomeAudioExperience({
     if (state === "idle" || state === "ended") {
       void manager.playExperience();
     }
-  }, [enabled, active, immersive, paused]);
+  }, [enabled, active, immersive, paused, profile?.id]);
 
   useEffect(() => {
     managerRef.current?.setMusicMuted(musicMuted);

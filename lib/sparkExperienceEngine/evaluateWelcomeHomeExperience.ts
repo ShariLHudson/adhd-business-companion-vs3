@@ -48,26 +48,21 @@ export function evaluateWelcomeHomeExperience(
   input: ExperienceEngineInput,
 ): WelcomeHomeExperiencePlan {
   const repeatLogin = Boolean(input.isRepeatLogin);
-  const replayRequested = Boolean(input.replayRequested);
   /** Completion or a later login — never auto-open Shari's welcome again. */
   const introAlreadySeen = input.hasSeenWelcomeIntro || repeatLogin;
 
-  const visitorKind: ExperienceVisitorKind = replayRequested
-    ? "replay"
-    : introAlreadySeen
-      ? "returning"
-      : "first_visit";
+  // Spoken welcome audio is FirstLoginWelcomeGate only — Estate never replays it.
+  void input.replayRequested;
+  const visitorKind: ExperienceVisitorKind = introAlreadySeen
+    ? "returning"
+    : "first_visit";
 
-  /**
-   * Auto-open only on the true first visit.
-   * Manual replay always opens the welcome again without clearing completion.
-   */
+  /** Visual Estate intro only on the true first visit — never via menu replay. */
   const showIntro =
-    !isCompanionDevFastPath() &&
-    (replayRequested || (!introAlreadySeen && !repeatLogin));
+    !isCompanionDevFastPath() && !introAlreadySeen && !repeatLogin;
 
   const greeting =
-    visitorKind === "first_visit" || visitorKind === "replay"
+    visitorKind === "first_visit"
       ? null
       : resolveWelcomeHomeDailyGreeting({
           isFirstVisit: false,

@@ -167,6 +167,86 @@ body.companion-welcome-home-mode > .companion-sidebar-portal {
   font-weight: 600;
   line-height: 1.4;
   color: #2f2924;
+  white-space: pre-wrap;
+}
+
+/* ARCH-018 — companion decision area (not a dashboard) */
+.welcome-home-daily-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0.15rem 0 0.35rem;
+}
+
+.welcome-home-daily-choices__prompt {
+  margin: 0;
+  font-size: clamp(0.92rem, 1.4vw, 1.02rem);
+  font-weight: 600;
+  color: rgba(47, 41, 36, 0.78);
+}
+
+.welcome-home-daily-choices__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.welcome-home-daily-choices__btn {
+  width: 100%;
+  margin: 0;
+  padding: 0.55rem 0.85rem;
+  text-align: left;
+  border: 1px solid rgba(201, 166, 107, 0.42);
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 245, 0.82);
+  color: rgba(36, 30, 24, 0.95);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
+}
+
+.welcome-home-daily-choices__btn:hover {
+  border-color: rgba(30, 79, 79, 0.45);
+  background: rgba(255, 252, 245, 0.96);
+  transform: translateY(-1px);
+}
+
+.welcome-home-daily-choices__btn:focus-visible {
+  outline: 2px solid rgba(30, 79, 79, 0.55);
+  outline-offset: 2px;
+}
+
+.welcome-home-daily-choices__discovery {
+  margin: 0.15rem 0 0;
+  padding: 0.35rem 0.15rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: clamp(0.82rem, 1.2vw, 0.92rem);
+  line-height: 1.45;
+  color: rgba(60, 52, 44, 0.78);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(201, 166, 107, 0.55);
+  text-underline-offset: 0.18em;
+}
+
+.welcome-home-daily-choices__discovery:hover {
+  color: rgba(30, 79, 79, 0.95);
+}
+
+.welcome-home-daily-choices__discovery:focus-visible {
+  outline: 2px solid rgba(30, 79, 79, 0.55);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
 }
 
 .welcome-home-page__input-wrap {

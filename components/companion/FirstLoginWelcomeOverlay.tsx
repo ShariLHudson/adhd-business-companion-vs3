@@ -13,13 +13,17 @@ import { CompanionLoginBackground } from "@/components/companion/CompanionLoginB
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
-import { isEstateSilenced } from "@/lib/estate/estateAudioSettings";
+import {
+  isEstateSilenced,
+  isWelcomeGreetingAudioEnabled,
+} from "@/lib/estate/estateAudioSettings";
 import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmentalAudio";
 import {
   FIRST_LOGIN_HOW_THIS_WORKS,
   FIRST_LOGIN_WELCOME_MESSAGE,
   FIRST_LOGIN_WELCOME_PRIMARY,
   FIRST_LOGIN_WELCOME_SECONDARY,
+  FIRST_LOGIN_WELCOME_SKIP_AUDIO,
   FIRST_LOGIN_WELCOME_STOP,
   FIRST_LOGIN_WELCOME_TITLE,
   isWelcomeCompleted,
@@ -151,7 +155,11 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     if (autoplayAttemptedRef.current) return;
     autoplayAttemptedRef.current = true;
 
-    if (isEstateSilenced() || prefersReducedMotion()) {
+    if (
+      isEstateSilenced() ||
+      !isWelcomeGreetingAudioEnabled() ||
+      prefersReducedMotion()
+    ) {
       setPhase("audio_blocked");
       return;
     }
@@ -184,6 +192,10 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
   }, [phase, playExperience, markAudioOnce, userId]);
 
   const handlePlay = useCallback(async () => {
+    if (!isWelcomeGreetingAudioEnabled()) {
+      setPhase("audio_blocked");
+      return;
+    }
     unlockBrowserAudioFromClick();
     if (voiceMuted) toggleVoice();
     const started = await playExperience();
@@ -209,6 +221,13 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     await handleEnter();
   }, [markAudioOnce, handleEnter]);
 
+  /** Skip listening entirely — still ends the one-time welcome for this account. */
+  const handleContinueWithoutAudio = useCallback(async () => {
+    void stopExperience();
+    void markAudioOnce();
+    await handleEnter();
+  }, [stopExperience, markAudioOnce, handleEnter]);
+
   const handleMute = useCallback(() => {
     const nextMuted = !voiceMuted;
     toggleVoice();
@@ -225,11 +244,13 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     return <>{children}</>;
   }
 
+  const greetingAudioAllowed = isWelcomeGreetingAudioEnabled();
   const showPlay =
-    phase === "audio_blocked" ||
-    phase === "stopped" ||
-    phase === "ready" ||
-    (!audioUnlocked && voiceState !== "playing" && voiceState !== "loading");
+    greetingAudioAllowed &&
+    (phase === "audio_blocked" ||
+      phase === "stopped" ||
+      phase === "ready" ||
+      (!audioUnlocked && voiceState !== "playing" && voiceState !== "loading"));
 
   return (
     <main
@@ -269,22 +290,35 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
               Play Welcome
             </button>
           ) : null}
+          {greetingAudioAllowed &&
+          (phase === "playing" || phase === "muted") ? (
+            <button
+              type="button"
+              onClick={() => void handleStopAndContinue()}
+              className="rounded-xl border border-[#1e4f4f]/40 bg-[#1e4f4f]/10 px-4 py-2.5 text-base font-semibold text-[#1e4f4f]"
+              data-testid="first-login-stop-welcome"
+            >
+              {FIRST_LOGIN_WELCOME_STOP}
+            </button>
+          ) : null}
+          {greetingAudioAllowed ? (
+            <button
+              type="button"
+              onClick={handleMute}
+              aria-pressed={voiceMuted}
+              className="rounded-xl border border-[#d4cdc3] bg-white/80 px-4 py-2.5 text-base font-semibold text-[#2f261f]"
+              data-testid="first-login-mute-welcome"
+            >
+              {voiceMuted ? "Unmute" : "Mute"}
+            </button>
+          ) : null}
           <button
             type="button"
-            onClick={() => void handleStopAndContinue()}
-            className="rounded-xl border border-[#1e4f4f]/40 bg-[#1e4f4f]/10 px-4 py-2.5 text-base font-semibold text-[#1e4f4f]"
-            data-testid="first-login-stop-welcome"
+            onClick={() => void handleContinueWithoutAudio()}
+            className="rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-2.5 text-base font-semibold text-[#2f261f]"
+            data-testid="first-login-skip-welcome-audio"
           >
-            {FIRST_LOGIN_WELCOME_STOP}
-          </button>
-          <button
-            type="button"
-            onClick={handleMute}
-            aria-pressed={voiceMuted}
-            className="rounded-xl border border-[#d4cdc3] bg-white/80 px-4 py-2.5 text-base font-semibold text-[#2f261f]"
-            data-testid="first-login-mute-welcome"
-          >
-            {voiceMuted ? "Unmute" : "Mute"}
+            {FIRST_LOGIN_WELCOME_SKIP_AUDIO}
           </button>
         </div>
 

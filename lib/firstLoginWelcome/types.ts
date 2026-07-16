@@ -27,6 +27,7 @@ export const FIRST_LOGIN_WELCOME_MESSAGE =
 
 export const FIRST_LOGIN_WELCOME_PRIMARY = "Continue to Welcome Home" as const;
 export const FIRST_LOGIN_WELCOME_STOP = "Stop & Continue" as const;
+export const FIRST_LOGIN_WELCOME_SKIP_AUDIO = "Continue without audio" as const;
 export const FIRST_LOGIN_WELCOME_SECONDARY = "Tell Me How This Works" as const;
 
 export const FIRST_LOGIN_HOW_THIS_WORKS =
