@@ -2144,6 +2144,7 @@ import {
 } from "@/lib/notifications/playNotificationSound";
 import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
 import { buildSavedPatternsPromptHint } from "@/lib/patternAwareness";
+import { getActiveSupportStyleId, supportStyleHintForChat } from "@/lib/supportStyle";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
   continuous: boolean;
@@ -15820,7 +15821,7 @@ export default function CompanionPageClient() {
     let turnIntentRouting = resolveIntentRouting({
       userText: trimmed,
       workspace: workspacePanel,
-      supportStyle: getPrefs().supportStyle,
+      supportStyle: getActiveSupportStyleId(),
       emotionalState: detected,
       overwhelmed: detected === "overwhelmed",
     });
@@ -18036,7 +18037,7 @@ export default function CompanionPageClient() {
           })(),
           aiTone: prefs.aiTone,
           helpMode: prefs.helpMode,
-          supportStyle: prefs.supportStyle,
+          supportStyle: getActiveSupportStyleId(),
           userName: prefs.name || undefined,
           businessContext: businessContextForApi,
           intentHint:
@@ -18050,6 +18051,7 @@ export default function CompanionPageClient() {
                 }),
                 estateMemoryHintForChat(),
                 buildSavedPatternsPromptHint(),
+                supportStyleHintForChat(trimmed),
                 chamberMemberChatHint,
                 activeTaskLockHintForChat(estateTaskLockTurn.state),
                 estateConversationTurn && !taskLockBlocksEstateRouting

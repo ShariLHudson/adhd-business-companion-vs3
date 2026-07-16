@@ -9,6 +9,10 @@
  */
 
 import type { AiTone, HelpMode, Prefs, SupportStyle } from "@/lib/companionStore";
+import {
+  buildSupportStylePromptBlock,
+  supportStyleIdFromLegacy,
+} from "@/lib/supportStyle";
 
 export type MemberTonePreferenceInput = Pick<
   Prefs,
@@ -229,19 +233,6 @@ const HELP_MODE_DELIVERY: Record<HelpMode, string> = {
     "HELP MODE — CONCISE: Shorter sentences. Fewer words. One idea at a time. Still warm — never curt or robotic.",
 };
 
-const SUPPORT_STYLE_DELIVERY: Record<SupportStyle, string> = {
-  solutions:
-    "SUPPORT — SOLUTIONS FIRST: Lead with what to do. Light validation only when needed.",
-  understand:
-    "SUPPORT — UNDERSTAND FIRST: Reflect and validate their experience before any solution. Slower pacing.",
-  balanced:
-    "SUPPORT — BALANCED: One line of light validation, then the path forward.",
-  sos:
-    "SUPPORT — SOS: Assume overload. Slow down, reduce pressure, stabilize first. Solutions only after they signal readiness.",
-  listen:
-    "SUPPORT — LISTEN ONLY: Presence over fixing. Reflect what you heard. Do NOT give advice, steps, recommendations, or plans unless they explicitly ask for help solving it. One gentle question is fine; no lists.",
-};
-
 export function buildMemberTonePreferenceBlocks(
   prefs: MemberTonePreferenceInput,
 ): string[] {
@@ -256,8 +247,23 @@ export function buildMemberTonePreferenceBlocks(
   const help = HELP_MODE_DELIVERY[prefs.helpMode];
   if (help) blocks.push(help);
 
-  const support = SUPPORT_STYLE_DELIVERY[prefs.supportStyle];
-  if (support) blocks.push(support);
+  // Support Style = what Spark does first when they need help (not Conversation Style).
+  blocks.push(
+    buildSupportStylePromptBlock({
+      styleId: supportStyleIdFromLegacy(prefs.supportStyle),
+      useMostOfTheTime: true,
+      savedAt: new Date().toISOString(),
+      version: 1,
+    }),
+  );
+
+  // Legacy "listen" prefs keep an explicit presence-first constraint for Conversation Style tests
+  // and older saved selections that meant listen-only support.
+  if (prefs.supportStyle === "listen") {
+    blocks.push(
+      "SUPPORT — LISTEN ONLY: Presence over fixing. Reflect what you heard. Do NOT give advice, steps, recommendations, or plans unless they explicitly ask for help solving it. One gentle question is fine; no lists.",
+    );
+  }
 
   return blocks;
 }

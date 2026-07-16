@@ -370,13 +370,32 @@ function resolveSupportStyle(
   pref?: string | null,
   category?: IntentCategory,
 ): RoutingSupportStyle {
-  if (pref === "solutions") return "direct";
-  if (pref === "understand") return "reflective";
-  if (pref === "listen") return "reflective";
+  if (
+    pref === "solutions" ||
+    pref === "practical-first"
+  ) {
+    return "direct";
+  }
+  if (
+    pref === "understand" ||
+    pref === "sos" ||
+    pref === "gentle-first" ||
+    pref === "listen" ||
+    pref === "talk-it-through"
+  ) {
+    return "reflective";
+  }
+  if (pref === "step-by-step") return "guided";
+  if (pref === "give-me-choices") return "guided";
   if (category === "build" || category === "execute") return "direct";
   if (category === "learn") return "direct";
   if (category === "understand") return "reflective";
-  if (category === "decide" && pref === "balanced") return "strategic";
+  if (
+    category === "decide" &&
+    (pref === "balanced" || pref === "adaptive" || !pref)
+  ) {
+    return "strategic";
+  }
   return "guided";
 }
 
@@ -385,11 +404,33 @@ function supportStyleGuidance(
   category: IntentCategory,
   memberSupportPref?: string | null,
 ): string | null {
-  if (memberSupportPref === "listen") {
-    return "Member chose Listen support in Settings — reflect first; no advice unless they explicitly ask.";
+  if (
+    memberSupportPref === "listen" ||
+    memberSupportPref === "talk-it-through"
+  ) {
+    return "Member chose Talk It Through / Listen support — help them understand before solutions; no advice dump unless they ask.";
   }
-  if (memberSupportPref === "understand" || memberSupportPref === "sos") {
-    return "Member chose reflective support in Settings — validate before solutions; tone preference wins over action-first routing.";
+  if (
+    memberSupportPref === "understand" ||
+    memberSupportPref === "sos" ||
+    memberSupportPref === "gentle-first"
+  ) {
+    return "Member chose Gentle First support — acknowledge and reduce pressure before solutions; Support Style wins over action-first routing.";
+  }
+  if (
+    memberSupportPref === "solutions" ||
+    memberSupportPref === "practical-first"
+  ) {
+    return "Member chose Practical First support — Prioritize action. Offer a clear next step quickly with light reassurance only.";
+  }
+  if (memberSupportPref === "step-by-step") {
+    return "Member chose Guide Me Step by Step — one question or one small action only; never a full plan.";
+  }
+  if (memberSupportPref === "give-me-choices") {
+    return "Member chose Give Me Choices — offer 2–3 numbered help options and wait.";
+  }
+  if (memberSupportPref === "adaptive") {
+    return "Member chose Adapt to the Situation — match simple support to the need and briefly explain why when helpful.";
   }
   if (style === "direct" && (category === "build" || category === "execute")) {
     return "Prioritize action. Offer navigation or creation. Minimal reflection before helping.";
