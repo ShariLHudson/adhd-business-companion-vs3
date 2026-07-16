@@ -28,10 +28,15 @@ import {
   type Plan,
 } from "@/lib/companionStore";
 import { SupportStylePanel } from "@/components/companion/SupportStylePanel";
+import { CuriosityBeforeCommandsPanel } from "@/components/companion/CuriosityBeforeCommandsPanel";
 import {
   catalogEntryForStyle,
   getSupportStylePreference,
 } from "@/lib/supportStyle";
+import {
+  CURIOSITY_MODE_OPTIONS,
+  getCuriosityBeforeCommandsPreference,
+} from "@/lib/curiosityBeforeCommands";
 import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
@@ -118,6 +123,7 @@ type Section =
   | "tone"
   | "help"
   | "support"
+  | "curiosity"
   | "language"
   | "notifications"
   | "appearance"
@@ -216,6 +222,9 @@ export function SettingsPanel({
   const [aiTone, setAiTone] = useState<AiTone>("balanced");
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
   const [supportStyleSummary, setSupportStyleSummary] = useState("Adaptive");
+  const [curiositySummary, setCuriositySummary] = useState(
+    "Ask based on the situation",
+  );
   const visualMode = useVisualMode();
   const [patternSummary, setPatternSummary] = useState("On");
   const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
@@ -284,6 +293,11 @@ export function SettingsPanel({
     {
       const support = getSupportStylePreference();
       setSupportStyleSummary(catalogEntryForStyle(support.styleId).label);
+      const curiosity = getCuriosityBeforeCommandsPreference();
+      setCuriositySummary(
+        CURIOSITY_MODE_OPTIONS.find((o) => o.id === curiosity.mode)?.label ??
+          "Ask based on the situation",
+      );
     }
     {
       const pa = getPatternAwarenessControlPrefs();
@@ -359,6 +373,11 @@ export function SettingsPanel({
     { id: "tone", label: "Conversation Style", value: aiToneLabel(aiTone) },
     { id: "help", label: "Help Mode", value: HELP_MODES.find((h) => h.id === helpMode)?.label ?? "" },
     { id: "support", label: "Support Style", value: supportStyleSummary },
+    {
+      id: "curiosity",
+      label: "Curiosity Before Commands",
+      value: curiositySummary,
+    },
     {
       id: "language",
       label: "Language & Communication",
@@ -676,6 +695,16 @@ export function SettingsPanel({
         {header("Support Style")}
         <div className="mt-3">
           <SupportStylePanel />
+        </div>
+      </div>
+    );
+  }
+  if (open === "curiosity") {
+    return (
+      <div className={wrap} data-testid="settings-curiosity-before-commands">
+        {header("Curiosity Before Commands")}
+        <div className="mt-3">
+          <CuriosityBeforeCommandsPanel />
         </div>
       </div>
     );

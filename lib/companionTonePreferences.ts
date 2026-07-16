@@ -13,6 +13,7 @@ import {
   buildSupportStylePromptBlock,
   supportStyleIdFromLegacy,
 } from "@/lib/supportStyle";
+import { buildCuriosityBeforeCommandsPromptHint } from "@/lib/curiosityBeforeCommands";
 
 export type MemberTonePreferenceInput = Pick<
   Prefs,
@@ -264,6 +265,9 @@ export function buildMemberTonePreferenceBlocks(
       "SUPPORT — LISTEN ONLY: Presence over fixing. Reflect what you heard. Do NOT give advice, steps, recommendations, or plans unless they explicitly ask for help solving it. One gentle question is fine; no lists.",
     );
   }
+
+  const curiosity = buildCuriosityBeforeCommandsPromptHint();
+  if (curiosity) blocks.push(curiosity);
 
   return blocks;
 }
