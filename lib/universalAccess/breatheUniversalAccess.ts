@@ -16,26 +16,25 @@ export type BreatheLaunchOptions = {
  * Phrases that open Breathe without requiring a separate open/start verb.
  * Breathe is a universal capability — not a Focus sub-feature / Wander place.
  *
- * Bare overwhelm ("I'm overwhelmed") is NOT permission to launch Breathe —
- * that stays in conversation / overwhelm need routing.
+ * Consent rule: overwhelm / stress / "calm me down" are context signals, not
+ * destination commands. Those stay in conversation and may *offer* Breathe.
+ * Only explicit breathe / breathing-exercise language auto-opens.
  */
 export const BREATHE_UNIVERSAL_PATTERN =
-  /\b(?:help me breathe|let'?s breathe|i need (?:to breathe|a reset)|i need to calm down|calm me down|help me (?:calm down|reset)|start(?:\s+a)?\s+breathing(?:\s+exercise)?|open(?:\s+the)?\s+breathe|take me to breathe|breathe(?:\s+and\s+reset)?|breathing exercise|box breathing|four[\s-]?seven[\s-]?eight|4[\s-]?7[\s-]?8(?:\s+breathing)?)\b/i;
+  /\b(?:help me breathe|let'?s breathe|i need to breathe|start(?:\s+a)?\s+breathing(?:\s+exercise)?|open(?:\s+the)?\s+breathe|take me to breathe|breathe(?:\s+and\s+reset)|breathing (?:exercise|reset)|let'?s do (?:a )?breathing(?:\s+(?:exercise|reset))?|box breathing|four[\s-]?seven[\s-]?eight|4[\s-]?7[\s-]?8(?:\s+breathing)?)\b/i;
 
 export const BREATHE_UNIVERSAL_ALIASES = [
   "help me breathe",
   "let's breathe",
   "I need to breathe",
-  "I need a reset",
-  "calm me down",
-  "I need to calm down",
-  "Help me calm down",
-  "help me reset",
   "start breathing",
+  "breathing exercise",
+  "breathing reset",
   "box breathing",
   "4-7-8 breathing",
   "open Breathe",
   "Take me to Breathe",
+  "breathe and reset",
 ] as const;
 
 export function detectBreathePatternHint(text: string): BreathePatternHint | undefined {

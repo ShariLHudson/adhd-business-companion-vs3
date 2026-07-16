@@ -375,12 +375,16 @@ import {
 } from "./estateCapabilityRegistry";
 import {
   frictionlessDecisionFromCancelledPendingChoice,
+  frictionlessDecisionFromContinuedPendingChoice,
   frictionlessDecisionFromPendingChoice,
   frictionlessDecisionFromUnrecognizedPendingChoice,
 } from "@/lib/pendingChoice/frictionlessBridge";
 import {
   hasActivePendingChoice,
+  registerCognitiveOverloadPendingChoices,
+  registerEmotionalRegulationPendingChoices,
   registerPendingChoiceFromConcierge,
+  registerPendingChoiceFromExperienceMenu,
   registerPendingChoiceFromNavigation,
   resolvePendingChoiceTurn,
 } from "@/lib/pendingChoice";
@@ -1720,6 +1724,9 @@ function tryPendingChoiceFlow(
   if (result.kind === "cancelled") {
     return frictionlessDecisionFromCancelledPendingChoice(result, routing);
   }
+  if (result.kind === "continued" || result.kind === "expanded") {
+    return frictionlessDecisionFromContinuedPendingChoice(result, routing);
+  }
   return null;
 }
 
@@ -2233,30 +2240,21 @@ function buildEmotionalRegulationDecision(
   const opening =
     formatEmotionalFirstOpening(plan) ??
     "A lot is landing at once — we can slow this down together.";
+  const localReply = `${opening}\n\nWould you like:\n1. Calming audio\n2. A breathing reset\n3. Stay here with me`;
+  registerEmotionalRegulationPendingChoices({
+    menuText: localReply,
+    offeredAtTurn: currentTurn,
+  });
   return {
     category: "emotional_regulation",
     suppressRelationship: false,
     suppressRecap: true,
     suppressReflectionFirst: false,
     responseHint:
-      "SHARI COMPANION ENGINE — emotion before instruction. Reflect + normalize before tools. No productivity framing on the first beat.",
-    localReply: `${opening}\n\nWould you like calming audio, a breathing reset, or to stay here with me?`,
-    pendingAction: {
-      type: "open_tool",
-      target: "focus-audio",
-      context: "calming support",
-      focusAudioCategory: "calm-brain",
-      offeredAtTurn: currentTurn,
-      offerSummary: "Focus Audio — calming support",
-    },
-    toolSuggestion: {
-      kind: "breathe",
-      line: "Would calming audio or a breathing reset help?",
-      toolLabel: "Open Focus Audio",
-      toolObjectId: "focus-audio",
-      keepTalkingLabel: "Stay here with me",
-      action: { type: "tool", tool: "focus-audio" },
-    },
+      "SHARI COMPANION ENGINE — emotion before instruction. Reflect + normalize before tools. Offer Breathe only with consent — never auto-open.",
+    localReply,
+    pendingAction: null,
+    toolSuggestion: null,
     workspaceOffer: null,
     intentRouting: null,
   };
@@ -2842,6 +2840,8 @@ function buildSimpleOverwhelmOrganizeDecision(
 ): FrictionlessActionDecision {
   const cognitive = isCognitiveOverloadNeed(userText);
   const taskBreakdown = isTaskBreakdownNeed(userText);
+  const bareOverwhelmReply =
+    "I'm here with you. What's feeling heaviest right now — too much in your head, a project that's stuck, or needing to calm your body?\n\nIf getting it out of your head would help, we can open Clear My Mind whenever you're ready.";
   const offer = {
     section: "brain-dump" as const,
     buttonLabel: cognitive
@@ -2851,7 +2851,7 @@ function buildSimpleOverwhelmOrganizeDecision(
       ? `${COGNITIVE_OVERLOAD_REPLY}\n\n1. ${COGNITIVE_OVERLOAD_PRIMARY_LABEL}\n2. ${COGNITIVE_OVERLOAD_STAY_LABEL}`
       : taskBreakdown
         ? TASK_BREAKDOWN_REPLY
-        : "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind together?",
+        : bareOverwhelmReply,
     ...(cognitive
       ? {
           secondary: {
@@ -2864,6 +2864,12 @@ function buildSimpleOverwhelmOrganizeDecision(
   const plainOverwhelm =
     /\b(?:i'?m\s+)?overwhelmed\b/i.test(userText.trim()) &&
     !/\btoo many ideas\b/i.test(userText);
+  if (cognitive) {
+    registerCognitiveOverloadPendingChoices({
+      menuText: offer.line,
+      offeredAtTurn: currentTurn,
+    });
+  }
   return {
     category:
       cognitive || taskBreakdown || plainOverwhelm ? "direct_action" : "none",
@@ -2874,13 +2880,17 @@ function buildSimpleOverwhelmOrganizeDecision(
       ? "COGNITIVE OVERLOAD: Clear My Mind only — never scenic place menus."
       : taskBreakdown
         ? "TASK BREAKDOWN: Ask about the project / first step — never scenic place menus."
-        : "OVERWHELM (P0.20.3): Route to Clear My Mind — never Visual Thinking.",
+        : "OVERWHELM: Conversation first — offer Clear My Mind with permission, never auto-open Breathe.",
     localReply: offer.line,
-    pendingAction: frictionlessPendingFromWorkspaceOffer(offer, currentTurn, {
-      userText,
-    }),
+    pendingAction: cognitive
+      ? null
+      : taskBreakdown
+        ? null
+        : frictionlessPendingFromWorkspaceOffer(offer, currentTurn, {
+            userText,
+          }),
     toolSuggestion: null,
-    workspaceOffer: offer,
+    workspaceOffer: cognitive || taskBreakdown ? null : offer,
     intentRouting: routing,
   };
 }
@@ -3663,13 +3673,24 @@ function tryEstateNavigationPhilosophy(
 
   const disambiguation = resolveEstateNavigationDisambiguation(userText);
   if (disambiguation) {
+    const localReply = formatEstateNavigationChoiceMenu(disambiguation);
+    registerPendingChoiceFromExperienceMenu({
+      choices: disambiguation.choices.map((choice) => ({
+        id: choice.spaceId || choice.experienceId,
+        label: choice.headline,
+        description: choice.detail,
+        placeId: choice.spaceId,
+      })),
+      menuText: localReply,
+      queryPhrase: userText,
+    });
     return {
       category: "direct_action",
       suppressRelationship: true,
       suppressRecap: true,
       suppressReflectionFirst: true,
       responseHint: `ESTATE NAVIGATION (medium confidence): ${ESTATE_NAVIGATION_GOLDEN_RULE}`,
-      localReply: formatEstateNavigationChoiceMenu(disambiguation),
+      localReply,
       pendingAction: null,
       toolSuggestion: null,
       workspaceOffer: null,
@@ -3847,14 +3868,15 @@ function resolveFrictionlessActionImpl(
 
   maybeClearStaleFrictionlessPending(input, routing);
 
-  const earlySupport = tryEarlyCompanionSupportFlow(input, routing);
-  if (earlySupport) {
-    return finish(earlySupport);
-  }
-
+  /** Pending numbered choices resolve before overwhelm / emotional early routes. */
   const pendingChoiceFlow = tryPendingChoiceFlow(input, routing);
   if (pendingChoiceFlow) {
     return finish(pendingChoiceFlow);
+  }
+
+  const earlySupport = tryEarlyCompanionSupportFlow(input, routing);
+  if (earlySupport) {
+    return finish(earlySupport);
   }
 
   const yesContinuation = tryFrictionlessYesContinuation(input, routing);
