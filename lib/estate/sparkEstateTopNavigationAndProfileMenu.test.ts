@@ -56,7 +56,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(verification.experienceControlsNotInWelcomeHome).toBe(true);
     expect(verification.roomExperienceItems).toBe(0);
     expect(verification.roomNavigationItems).toBe(1);
-    expect(verification.roomMyDayWorkItems).toBe(4);
+    expect(verification.roomMyDayWorkItems).toBe(3);
     expect(verification.roomMyWorkStudioItems).toBe(3);
     expect(verification.roomFocusItems).toBe(4);
     expect(verification.roomMyStoryItems).toBe(3);
@@ -71,7 +71,14 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
 
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS.map((item) => item.id),
-    ).toEqual(["plan-my-day", "reminders", "calendar", "rhythms"]);
+    ).toEqual(["adapt-plan-my-day", "calendar", "reminders-rhythms"]);
+    expect(
+      SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS.map((item) => item.label),
+    ).toEqual([
+      "Adapt / Plan My Day",
+      "Calendar",
+      "Reminders / Rhythms",
+    ]);
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((item) => item.id),
     ).toEqual([

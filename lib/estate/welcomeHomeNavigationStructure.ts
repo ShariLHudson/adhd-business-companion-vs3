@@ -12,10 +12,9 @@ export type WelcomeHomeNavCategoryId =
   | "get-advice";
 
 export type WelcomeHomeNavDestinationId =
-  | "plan-my-day"
-  | "reminders"
+  | "adapt-plan-my-day"
   | "calendar"
-  | "rhythms"
+  | "reminders-rhythms"
   | "projects"
   | "destination-gallery"
   | "cartographers-studio"
@@ -35,6 +34,8 @@ export type WelcomeHomeNavDestinationId =
 export type WelcomeHomeNavDestination = {
   id: WelcomeHomeNavDestinationId;
   label: string;
+  /** Gallery / selection experiences may show a trailing affordance. */
+  selectionExperience?: boolean;
 };
 
 export type WelcomeHomeNavCategory = {
@@ -49,10 +50,9 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
     id: "my-day",
     label: "My Day",
     destinations: [
-      { id: "plan-my-day", label: "Plan My Day" },
-      { id: "reminders", label: "Reminders" },
+      { id: "adapt-plan-my-day", label: "Adapt / Plan My Day" },
       { id: "calendar", label: "Calendar" },
-      { id: "rhythms", label: "Rhythms" },
+      { id: "reminders-rhythms", label: "Reminders / Rhythms" },
     ],
   },
   {
@@ -60,7 +60,11 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
     label: "My Work",
     destinations: [
       { id: "projects", label: "Projects" },
-      { id: "destination-gallery", label: "Destination Gallery" },
+      {
+        id: "destination-gallery",
+        label: "Destination Gallery",
+        selectionExperience: true,
+      },
       { id: "cartographers-studio", label: "Cartographer’s Studio" },
     ],
   },
@@ -72,8 +76,16 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
       { id: "parking-lot", label: "Parking Lot" },
       { id: "breathe", label: "Breathe" },
       { id: "spin-the-wheel", label: "Spin the Wheel" },
-      { id: "peaceful-places", label: "Peaceful Places" },
-      { id: "soundscapes", label: "Soundscapes" },
+      {
+        id: "peaceful-places",
+        label: "Peaceful Places",
+        selectionExperience: true,
+      },
+      {
+        id: "soundscapes",
+        label: "Soundscapes",
+        selectionExperience: true,
+      },
     ],
   },
   {
@@ -120,4 +132,10 @@ export function welcomeHomeHasExperienceControls(
   return categoryLabels.some((label) =>
     /experience controls/i.test(label),
   );
+}
+
+/** My Day focused submenu — exactly three combined destinations. */
+export function welcomeHomeMyDayDestinationIds(): readonly WelcomeHomeNavDestinationId[] {
+  const myDay = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day");
+  return myDay?.destinations.map((d) => d.id) ?? [];
 }

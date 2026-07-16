@@ -287,11 +287,6 @@
   outline-offset: 1px;
 }
 
-.estate-room-experience-menu__section--open .estate-room-experience-menu__category {
-  border-color: rgba(201, 164, 108, 0.55);
-  background: rgba(201, 164, 108, 0.1);
-}
-
 .estate-room-experience-menu__category-label {
   line-height: 1.2;
 }
@@ -301,12 +296,36 @@
   font-size: 1rem;
   line-height: 1;
   opacity: 0.78;
-  transition: transform 0.2s ease;
 }
 
-.estate-room-experience-menu__section--open
-  .estate-room-experience-menu__category-chevron {
-  transform: rotate(90deg);
+/* Focused submenu — replaces top-level list; never stacks under categories */
+.estate-room-experience-menu__submenu-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  padding: 0.05rem 0 0.1rem;
+  animation: estate-room-experience-menu-in 0.22s ease-out;
+}
+
+.estate-room-experience-menu__item--back {
+  border-style: dashed;
+  border-color: rgba(255, 248, 235, 0.22);
+  background: transparent;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.estate-room-experience-menu__item--back:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 248, 235, 0.34);
+}
+
+.estate-room-experience-menu__item-chevron {
+  flex-shrink: 0;
+  margin-left: auto;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.72;
 }
 
 .estate-room-experience-menu__section-items {

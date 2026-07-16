@@ -18,7 +18,9 @@ export type EstateTopRightChromeProps = {
   onBackToEstate: () => void;
   onExploreSpark?: () => void;
   onReturnToExploreEstate?: () => void;
+  onOpenAdaptPlanMyDay?: () => void;
   onOpenPlanMyDay?: () => void;
+  onOpenRemindersRhythms?: () => void;
   onOpenRhythms?: () => void;
   onOpenReminders?: () => void;
   onOpenCalendar?: () => void;
@@ -56,7 +58,9 @@ export function EstateTopRightChrome({
   onBackToEstate,
   onExploreSpark,
   onReturnToExploreEstate,
+  onOpenAdaptPlanMyDay,
   onOpenPlanMyDay,
+  onOpenRemindersRhythms,
   onOpenRhythms,
   onOpenReminders,
   onOpenCalendar,
@@ -97,7 +101,9 @@ export function EstateTopRightChrome({
           onBackToEstate={onBackToEstate}
           onExploreSpark={onExploreSpark}
           onReturnToExploreEstate={onReturnToExploreEstate}
+          onOpenAdaptPlanMyDay={onOpenAdaptPlanMyDay ?? onOpenPlanMyDay}
           onOpenPlanMyDay={onOpenPlanMyDay}
+          onOpenRemindersRhythms={onOpenRemindersRhythms}
           onOpenRhythms={onOpenRhythms}
           onOpenReminders={onOpenReminders}
           onOpenCalendar={onOpenCalendar}

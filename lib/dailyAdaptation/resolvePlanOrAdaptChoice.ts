@@ -11,7 +11,7 @@ export function resolvePlanOrAdaptChoices(input?: {
       id: "plan-my-day",
       title: "Plan My Day",
       explanation:
-        "Build a plan for today based on your time, commitments, priorities, and preferred level of structure.",
+        "Build today’s plan around priorities, commitments, available time, energy, and motivation.",
       buttonLabel: "Plan My Day",
       recommended: !hasPlan,
     },
@@ -19,7 +19,7 @@ export function resolvePlanOrAdaptChoices(input?: {
       id: "adapt-my-day",
       title: "Adapt My Day",
       explanation:
-        "Tell Shari how your energy and motivation are right now so she can help adjust today's plan.",
+        "Change today’s existing plan because time, energy, motivation, priorities, or circumstances changed.",
       buttonLabel: "Adapt My Day",
       recommended: hasPlan,
     },

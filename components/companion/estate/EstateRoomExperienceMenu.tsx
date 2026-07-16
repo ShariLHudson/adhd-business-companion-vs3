@@ -12,6 +12,7 @@ import {
   WELCOME_HOME_NAV_CATEGORIES,
   WELCOME_HOME_WANDER_GROUNDS,
   type WelcomeHomeNavCategoryId,
+  type WelcomeHomeNavDestination,
   type WelcomeHomeNavDestinationId,
 } from "@/lib/estate/welcomeHomeNavigationStructure";
 
@@ -34,10 +35,17 @@ export type EstateRoomExperienceMenuProps = {
   /** Wander the Grounds — Explore Estate. */
   onExploreSpark?: () => void;
   onReturnToExploreEstate?: () => void;
+  /** Shared Adapt / Plan My Day entrance (PlanOrAdaptPathChooser). */
+  onOpenAdaptPlanMyDay?: () => void;
+  /** @deprecated Use onOpenAdaptPlanMyDay — kept for transitional callers. */
   onOpenPlanMyDay?: () => void;
-  onOpenRhythms?: () => void;
-  onOpenReminders?: () => void;
   onOpenCalendar?: () => void;
+  /** Shared Reminders / Rhythms explanatory entrance. */
+  onOpenRemindersRhythms?: () => void;
+  /** @deprecated Prefer onOpenRemindersRhythms from My Day. */
+  onOpenReminders?: () => void;
+  /** @deprecated Prefer onOpenRemindersRhythms from My Day. */
+  onOpenRhythms?: () => void;
   onOpenProjects?: () => void;
   onOpenCreateStudio?: () => void;
   onOpenDestinationGallery?: () => void;
@@ -62,6 +70,9 @@ export type EstateRoomExperienceMenuProps = {
  * Welcome Home menu — global estate navigation only.
  * Answers: Where do I want to go?
  * Look / sound / behave controls live under the SH profile menu.
+ *
+ * Two panel states: top-level categories, or a focused category submenu
+ * that replaces the top-level list (never stacked underneath).
  */
 export function EstateRoomExperienceMenu({
   roomId,
@@ -70,10 +81,10 @@ export function EstateRoomExperienceMenu({
   embedded = false,
   onExploreSpark,
   onReturnToExploreEstate,
+  onOpenAdaptPlanMyDay,
   onOpenPlanMyDay,
-  onOpenRhythms,
-  onOpenReminders,
   onOpenCalendar,
+  onOpenRemindersRhythms,
   onOpenProjects,
   onOpenClearMyMind,
   onOpenParkingLot,
@@ -91,9 +102,8 @@ export function EstateRoomExperienceMenu({
 }: EstateRoomExperienceMenuProps) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
-  const [expandedCategory, setExpandedCategory] =
-    useState<WelcomeHomeNavCategoryId | null>(null);
-  const [mobileDrillIn, setMobileDrillIn] =
+  /** Focused category submenu — replaces top-level on desktop and mobile. */
+  const [focusedCategory, setFocusedCategory] =
     useState<WelcomeHomeNavCategoryId | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const placeDisplayName = resolveWanderRoomDisplayName(roomId);
@@ -112,8 +122,7 @@ export function EstateRoomExperienceMenu({
 
   useEffect(() => {
     if (!open) {
-      setExpandedCategory(null);
-      setMobileDrillIn(null);
+      setFocusedCategory(null);
       return;
     }
     const onPointerDown = (event: MouseEvent | TouchEvent) => {
@@ -123,8 +132,8 @@ export function EstateRoomExperienceMenu({
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        if (mobileDrillIn) {
-          setMobileDrillIn(null);
+        if (focusedCategory) {
+          setFocusedCategory(null);
           return;
         }
         setOpen(false);
@@ -138,50 +147,50 @@ export function EstateRoomExperienceMenu({
       document.removeEventListener("touchstart", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, mobileDrillIn]);
+  }, [open, focusedCategory]);
 
   const closeAndRun = useCallback(
     (action: (() => void) | undefined) => {
       if (!action) return;
       setOpen(false);
-      setExpandedCategory(null);
-      setMobileDrillIn(null);
+      setFocusedCategory(null);
       bumpVisibility();
       action();
     },
     [bumpVisibility],
   );
 
+  const openAdaptPlanMyDay = onOpenAdaptPlanMyDay ?? onOpenPlanMyDay;
+
   const destinationAction = useCallback(
     (id: WelcomeHomeNavDestinationId): (() => void) | undefined => {
-      const map: Record<WelcomeHomeNavDestinationId, (() => void) | undefined> = {
-        "plan-my-day": onOpenPlanMyDay,
-        reminders: onOpenReminders,
-        calendar: onOpenCalendar,
-        rhythms: onOpenRhythms,
-        projects: onOpenProjects,
-        "destination-gallery": onOpenDestinationGallery,
-        "cartographers-studio": onOpenCartographersStudio,
-        "clear-my-mind": onOpenClearMyMind,
-        "parking-lot": onOpenParkingLot,
-        breathe: onOpenBreathe,
-        "spin-the-wheel": onOpenSpinTheWheel,
-        "peaceful-places": onOpenPeacefulPlaces,
-        soundscapes: onOpenSoundscapes,
-        journal: onOpenJournal,
-        "evidence-vault": onOpenEvidenceVault,
-        "hall-of-accomplishments": onOpenHallOfAccomplishments,
-        "chamber-of-momentum": onOpenChamber,
-        boardroom: onOpenBoardroom,
-        "wander-the-grounds": onExploreSpark,
-      };
+      const map: Record<WelcomeHomeNavDestinationId, (() => void) | undefined> =
+        {
+          "adapt-plan-my-day": openAdaptPlanMyDay,
+          calendar: onOpenCalendar,
+          "reminders-rhythms": onOpenRemindersRhythms,
+          projects: onOpenProjects,
+          "destination-gallery": onOpenDestinationGallery,
+          "cartographers-studio": onOpenCartographersStudio,
+          "clear-my-mind": onOpenClearMyMind,
+          "parking-lot": onOpenParkingLot,
+          breathe: onOpenBreathe,
+          "spin-the-wheel": onOpenSpinTheWheel,
+          "peaceful-places": onOpenPeacefulPlaces,
+          soundscapes: onOpenSoundscapes,
+          journal: onOpenJournal,
+          "evidence-vault": onOpenEvidenceVault,
+          "hall-of-accomplishments": onOpenHallOfAccomplishments,
+          "chamber-of-momentum": onOpenChamber,
+          boardroom: onOpenBoardroom,
+          "wander-the-grounds": onExploreSpark,
+        };
       return map[id];
     },
     [
-      onOpenPlanMyDay,
-      onOpenReminders,
+      openAdaptPlanMyDay,
       onOpenCalendar,
-      onOpenRhythms,
+      onOpenRemindersRhythms,
       onOpenProjects,
       onOpenDestinationGallery,
       onOpenCartographersStudio,
@@ -201,39 +210,43 @@ export function EstateRoomExperienceMenu({
   );
 
   const openCategory = useCallback((id: WelcomeHomeNavCategoryId) => {
-    const isNarrow =
-      typeof window !== "undefined" &&
-      window.matchMedia("(max-width: 767px)").matches;
-    if (isNarrow) {
-      setMobileDrillIn(id);
-      setExpandedCategory(id);
-      return;
-    }
-    setExpandedCategory((current) => (current === id ? null : id));
+    setFocusedCategory(id);
   }, []);
+
+  const backToTopLevel = useCallback(() => {
+    bumpVisibility();
+    setFocusedCategory(null);
+  }, [bumpVisibility]);
 
   if (!mounted || !visible) return null;
 
   const activeCategory =
-    WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === mobileDrillIn) ?? null;
+    WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === focusedCategory) ?? null;
 
-  const renderDestinationButton = (
-    id: WelcomeHomeNavDestinationId,
-    label: string,
-  ) => {
-    const action = destinationAction(id);
+  const renderDestinationButton = (dest: WelcomeHomeNavDestination) => {
+    const action = destinationAction(dest.id);
     if (!action) return null;
     return (
       <button
-        key={id}
+        key={dest.id}
         type="button"
         role="menuitem"
         className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-        aria-label={`Open ${label}`}
-        data-testid={`estate-open-${id}`}
+        aria-label={`Open ${dest.label}`}
+        data-testid={`estate-open-${dest.id}`}
         onClick={() => closeAndRun(action)}
       >
-        <span className="estate-room-experience-menu__item-label">{label}</span>
+        <span className="estate-room-experience-menu__item-label">
+          {dest.label}
+        </span>
+        {dest.selectionExperience ? (
+          <span
+            className="estate-room-experience-menu__item-chevron"
+            aria-hidden
+          >
+            ›
+          </span>
+        ) : null}
       </button>
     );
   };
@@ -248,12 +261,16 @@ export function EstateRoomExperienceMenu({
           : "",
         embedded ? "estate-room-experience-menu--embedded" : "",
         open ? "estate-room-experience-menu--open" : "",
+        focusedCategory
+          ? "estate-room-experience-menu--submenu"
+          : "",
         browserFullscreen ? "estate-room-experience-menu--fullscreen" : "",
         faded ? "estate-room-experience-menu--faded" : "",
       ]
         .filter(Boolean)
         .join(" ")}
       data-testid="estate-room-experience-menu"
+      data-welcome-home-view={focusedCategory ? "submenu" : "top-level"}
       onMouseMove={browserFullscreen ? bumpVisibility : undefined}
       onTouchStart={browserFullscreen ? bumpVisibility : undefined}
     >
@@ -292,83 +309,76 @@ export function EstateRoomExperienceMenu({
             <div
               className="estate-room-experience-menu__panel"
               role="menu"
-              aria-label="Welcome Home"
+              aria-label={
+                activeCategory
+                  ? `Welcome Home — ${activeCategory.label}`
+                  : "Welcome Home"
+              }
               data-testid="estate-room-quick-choices"
+              data-welcome-home-panel={
+                activeCategory ? "focused-submenu" : "top-level"
+              }
             >
               <div className="estate-room-experience-menu__panel-scroll">
-                {mobileDrillIn && activeCategory ? (
+                {activeCategory ? (
                   <>
                     <button
                       type="button"
-                      className="estate-room-experience-menu__item"
+                      className="estate-room-experience-menu__item estate-room-experience-menu__item--back"
                       data-testid="welcome-home-nav-back"
-                      onClick={() => {
-                        bumpVisibility();
-                        setMobileDrillIn(null);
-                        setExpandedCategory(null);
-                      }}
+                      aria-label="Back to Welcome Home"
+                      onClick={backToTopLevel}
                     >
                       <span className="estate-room-experience-menu__item-label">
-                        ← Back
+                        ‹ Back to Welcome Home
                       </span>
                     </button>
-                    <p className="estate-room-experience-menu__section-label">
+                    <p
+                      className="estate-room-experience-menu__section-label"
+                      data-testid="welcome-home-submenu-heading"
+                    >
                       {activeCategory.label}
                     </p>
-                    {activeCategory.destinations.map((dest) =>
-                      renderDestinationButton(dest.id, dest.label),
-                    )}
+                    <div
+                      className="estate-room-experience-menu__submenu-items"
+                      role="group"
+                      aria-label={activeCategory.label}
+                      data-testid={`welcome-home-submenu-${activeCategory.id}`}
+                    >
+                      {activeCategory.destinations.map((dest) =>
+                        renderDestinationButton(dest),
+                      )}
+                    </div>
                   </>
                 ) : (
                   <>
-                    {WELCOME_HOME_NAV_CATEGORIES.map((category) => {
-                      const isExpanded = expandedCategory === category.id;
-                      return (
-                        <div
-                          key={category.id}
-                          className={[
-                            "estate-room-experience-menu__section",
-                            isExpanded
-                              ? "estate-room-experience-menu__section--open"
-                              : "",
-                          ]
-                            .filter(Boolean)
-                            .join(" ")}
+                    {WELCOME_HOME_NAV_CATEGORIES.map((category) => (
+                      <div
+                        key={category.id}
+                        className="estate-room-experience-menu__section"
+                      >
+                        <button
+                          type="button"
+                          className="estate-room-experience-menu__category"
+                          aria-expanded={false}
+                          data-testid={`estate-room-menu-section-${category.id}`}
+                          onClick={() => {
+                            bumpVisibility();
+                            openCategory(category.id);
+                          }}
                         >
-                          <button
-                            type="button"
-                            className="estate-room-experience-menu__category"
-                            aria-expanded={isExpanded}
-                            data-testid={`estate-room-menu-section-${category.id}`}
-                            onClick={() => {
-                              bumpVisibility();
-                              openCategory(category.id);
-                            }}
+                          <span className="estate-room-experience-menu__category-label">
+                            {category.label}
+                          </span>
+                          <span
+                            className="estate-room-experience-menu__category-chevron"
+                            aria-hidden
                           >
-                            <span className="estate-room-experience-menu__category-label">
-                              {category.label}
-                            </span>
-                            <span
-                              className="estate-room-experience-menu__category-chevron"
-                              aria-hidden
-                            >
-                              ›
-                            </span>
-                          </button>
-                          {isExpanded && !mobileDrillIn ? (
-                            <div
-                              className="estate-room-experience-menu__section-items"
-                              role="group"
-                              aria-label={category.label}
-                            >
-                              {category.destinations.map((dest) =>
-                                renderDestinationButton(dest.id, dest.label),
-                              )}
-                            </div>
-                          ) : null}
-                        </div>
-                      );
-                    })}
+                            ›
+                          </span>
+                        </button>
+                      </div>
+                    ))}
 
                     <div
                       className="estate-room-experience-menu__divider"
