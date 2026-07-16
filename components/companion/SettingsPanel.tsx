@@ -32,6 +32,11 @@ import {
 import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
+import { NotificationSoundPreferences } from "@/components/companion/NotificationSoundPreferences";
+import {
+  playNotificationSoundForEvent,
+  unlockNotificationSounds,
+} from "@/lib/notifications/playNotificationSound";
 import { RemindersPanel } from "@/components/companion/RemindersPanel";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
@@ -1162,17 +1167,25 @@ export function SettingsPanel({
           <button
             type="button"
             onClick={() => {
+              unlockNotificationSounds();
               unlockChime();
-              playChime();
+              const played = playNotificationSoundForEvent("test");
+              if (!played) playChime();
             }}
             className="mt-2 self-start rounded-xl border-2 border-[#1e4f4f] bg-white px-5 py-2.5 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
           >
-            🔔 Test sound
+            Test reminder sound
           </button>
+
+          <div className="mt-4">
+            <NotificationSoundPreferences />
+          </div>
 
           <RemindersPanel />
           <p className="mt-3 text-sm text-[#6b635a]">
-            Quiet hours, day adjustments, and rhythm profiles live under Plan My Day → Rhythms → Settings.
+            Edit rhythms and quiet hours under Plan My Day → Rhythms. Time block
+            alerts use the Reminder sound above. Desktop notifications can stay
+            on even when a sound category is set to None.
           </p>
         </div>
       </div>

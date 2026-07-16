@@ -2138,6 +2138,11 @@ import {
   type PredictiveSupportOffer,
 } from "@/lib/predictive-support";
 import { playChime, unlockChime } from "@/lib/chime";
+import {
+  playNotificationSoundForEvent,
+  unlockNotificationSounds,
+} from "@/lib/notifications/playNotificationSound";
+import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
   continuous: boolean;
@@ -6899,7 +6904,8 @@ export default function CompanionPageClient() {
         if (now >= lead && now < start) {
           warnedRef.current.add(b.id);
           setWarning(b);
-          playChime();
+          unlockNotificationSounds();
+          playNotificationSoundForEvent("priority-alert", `time-block-warn:${b.id}`);
           notify(
             `Soon: ${b.title}`,
             "Your momentum appointment begins in about 15 minutes.",
@@ -6919,7 +6925,8 @@ export default function CompanionPageClient() {
           setBlockStatus(due.id, "triggered");
           setTriggeredBlock(due);
           setWarning((w) => (w?.id === due.id ? null : w));
-          playChime();
+          unlockNotificationSounds();
+          playNotificationSoundForEvent("priority-alert", `time-block:${due.id}`);
           notify(
             `${due.title} — how did it go?`,
             "Every outcome counts — open the app when you're ready.",
@@ -6932,7 +6939,11 @@ export default function CompanionPageClient() {
         if (remindedRef.current.has(key)) continue;
         remindedRef.current.add(key);
         if (shouldDeliverInApp() || shouldDeliverBrowserNotification()) {
-          playChime();
+          unlockNotificationSounds();
+          playNotificationSoundForEvent(
+            resolveDeliverableSoundEvent(item),
+            `deliverable:${item.kind}:${item.id}`,
+          );
           if (
             shouldDeliverBrowserNotification() &&
             getPrefs().desktopNotifications
@@ -10764,6 +10775,7 @@ export default function CompanionPageClient() {
 
   function testAlert() {
     unlockChime();
+    unlockNotificationSounds();
     const demo: TimeBlock = {
       id: "test-alert",
       title: "Marketing plan",
@@ -10776,7 +10788,9 @@ export default function CompanionPageClient() {
       createdAt: new Date().toISOString(),
     };
     setTriggeredBlock(demo);
-    playChime();
+    if (!playNotificationSoundForEvent("test", "test-alert")) {
+      playChime();
+    }
   }
 
   function startBlock(block: TimeBlock) {
