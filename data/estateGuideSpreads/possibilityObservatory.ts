@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — The Treehouse Observatory™ spread.
+ * Spark Estate Guidebook — The Treehouse Observatory spread.
  */
 
 import { estateBackgroundPath } from "@/lib/estate/estatePlaceMedia";

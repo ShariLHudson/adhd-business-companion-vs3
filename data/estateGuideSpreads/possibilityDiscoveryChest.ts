@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — The Treehouse Discovery Chest spread.
+ * Spark Estate Guidebook — The Treehouse Discovery Chest spread.
  */
 
 import { estateBackgroundPath } from "@/lib/estate/estatePlaceMedia";

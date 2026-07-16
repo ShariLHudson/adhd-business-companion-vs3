@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — Ocean Conservatory™ spread.
+ * Spark Estate Guidebook — Ocean Conservatory spread.
  * Placed immediately before the Treehouse Possibility House section.
  */
 
@@ -8,7 +8,7 @@ import type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
 
 export const OCEAN_CONSERVATORY_GUIDE_SPREAD: EstateGuideSpreadData = {
   id: "ocean-conservatory",
-  title: "Ocean Conservatory™",
+  title: "Ocean Conservatory",
   guideSubtitle: "Spark Estate Guide",
   openingLine: "Welcome to the Ocean Conservatory.",
   epigraph: "Where the rhythm of the sea quiets the mind.",

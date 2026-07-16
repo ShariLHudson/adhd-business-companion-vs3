@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — Treehouse Possibility House section (back of the book).
+ * Spark Estate Guidebook — Treehouse Possibility House section (back of the book).
  *
  * Full Treehouse arc: curiosity → perspective → story → wonder → significance.
  * Placed after the main Estate tour so the Treehouse reads as one continuous journey.

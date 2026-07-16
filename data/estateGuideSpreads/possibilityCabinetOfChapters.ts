@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — The Treehouse Cabinet of Chapters™ spread.
+ * Spark Estate Guidebook — The Treehouse Cabinet of Chapters spread.
  * Philosophy chapter — among the longest in the guidebook; members return as life grows.
  */
 

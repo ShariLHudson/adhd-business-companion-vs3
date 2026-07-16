@@ -1,5 +1,5 @@
 /**
- * Your Journey Through the Treehouse™ — footer progression for Possibility House spreads.
+ * Your Journey Through the Treehouse — footer progression for Possibility House spreads.
  */
 
 export type TreehouseGuideJourneyStep = {

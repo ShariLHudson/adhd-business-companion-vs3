@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — The Swing Beneath the Oak™ spread.
+ * Spark Estate Guidebook — The Swing Beneath the Oak spread.
  * Placed immediately before the Treehouse Possibility House section.
  */
 
@@ -8,7 +8,7 @@ import type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
 
 export const SWING_BENEATH_THE_OAK_GUIDE_SPREAD: EstateGuideSpreadData = {
   id: "the-swing-beneath-the-oak",
-  title: "The Swing Beneath the Oak™",
+  title: "The Swing Beneath the Oak",
   guideSubtitle: "Spark Estate Guide",
   openingLine: "Welcome to The Swing Beneath the Oak.",
   epigraph: "Where the heart remembers what the mind has forgotten.",
@@ -25,7 +25,7 @@ export const SWING_BENEATH_THE_OAK_GUIDE_SPREAD: EstateGuideSpreadData = {
         "Some places ask you to think.",
         "Others ask you to decide.",
         "This place asks for neither.",
-        "The Swing Beneath the Oak™ is one of the quietest places in Spark Estate. Here, the gentle rhythm of the swing, the sound of the water, and the shade of the old oak invite you to slow down without asking anything of you.",
+        "The Swing Beneath the Oak is one of the quietest places in Spark Estate. Here, the gentle rhythm of the swing, the sound of the water, and the shade of the old oak invite you to slow down without asking anything of you.",
         "There is no agenda here.",
         "Sometimes the greatest clarity comes when we stop searching for it.",
       ],

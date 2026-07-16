@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — The Treehouse Reflection Desk™ spread.
+ * Spark Estate Guidebook — The Treehouse Reflection Desk spread.
  */
 
 import { estateBackgroundPath } from "@/lib/estate/estatePlaceMedia";

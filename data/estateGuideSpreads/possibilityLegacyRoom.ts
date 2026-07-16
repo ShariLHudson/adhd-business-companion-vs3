@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — The Treehouse Legacy Room spread.
+ * Spark Estate Guidebook — The Treehouse Legacy Room spread.
  * Emotional conclusion of the Possibility House journey — curiosity to significance.
  */
 

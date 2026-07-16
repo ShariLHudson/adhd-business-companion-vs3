@@ -1,5 +1,5 @@
 /**
- * Spark Estate Guidebook™ — The Treehouse Possibility House™ opening chapter.
+ * Spark Estate Guidebook — The Treehouse Possibility House opening chapter.
  * First impression of the Possibility House section — where every new chapter begins.
  */
 
