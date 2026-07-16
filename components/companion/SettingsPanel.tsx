@@ -24,10 +24,14 @@ import {
   withUnifiedAppLanguage,
   type AiTone,
   type HelpMode,
-  type SupportStyle,
   type VisualMode,
   type Plan,
 } from "@/lib/companionStore";
+import { SupportStylePanel } from "@/components/companion/SupportStylePanel";
+import {
+  catalogEntryForStyle,
+  getSupportStylePreference,
+} from "@/lib/supportStyle";
 import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
@@ -94,29 +98,6 @@ const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = sortByDropdo
   },
   ],
   (h) => h.label,
-);
-
-const SUPPORT_STYLES: { id: SupportStyle; label: string; desc: string }[] = sortByDropdownLabel(
-  [
-  { id: "solutions", label: "Solutions first", desc: "Just tell me what to do." },
-  {
-    id: "understand",
-    label: "Understand me first",
-    desc: "Help me feel understood before fixing it.",
-  },
-  { id: "balanced", label: "Balanced", desc: "A mix of empathy and action." },
-  {
-    id: "sos",
-    label: "SOS mode",
-    desc: "When overwhelmed, help me stabilize before problem-solving.",
-  },
-  {
-    id: "listen",
-    label: "Listen first",
-    desc: "Presence and reflection — advice only when I ask.",
-  },
-  ],
-  (s) => s.label,
 );
 
 import { PatternAwarenessPanel } from "@/components/companion/PatternAwarenessPanel";
@@ -234,7 +215,7 @@ export function SettingsPanel({
   }, [initialSection]);
   const [aiTone, setAiTone] = useState<AiTone>("balanced");
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
-  const [supportStyle, setSupportStyle] = useState<SupportStyle>("balanced");
+  const [supportStyleSummary, setSupportStyleSummary] = useState("Adaptive");
   const visualMode = useVisualMode();
   const [patternSummary, setPatternSummary] = useState("On");
   const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
@@ -300,7 +281,10 @@ export function SettingsPanel({
     const p = getPrefs();
     setAiTone(p.aiTone);
     setHelpMode(p.helpMode);
-    setSupportStyle(p.supportStyle);
+    {
+      const support = getSupportStylePreference();
+      setSupportStyleSummary(catalogEntryForStyle(support.styleId).label);
+    }
     {
       const pa = getPatternAwarenessControlPrefs();
       if (!pa.noticeNewPatterns && !pa.useSavedPatterns) {
@@ -374,7 +358,7 @@ export function SettingsPanel({
   const ROWS: { id: Section; label: string; value: string }[] = [
     { id: "tone", label: "Conversation Style", value: aiToneLabel(aiTone) },
     { id: "help", label: "Help Mode", value: HELP_MODES.find((h) => h.id === helpMode)?.label ?? "" },
-    { id: "support", label: "Support Style", value: SUPPORT_STYLES.find((s) => s.id === supportStyle)?.label ?? "" },
+    { id: "support", label: "Support Style", value: supportStyleSummary },
     {
       id: "language",
       label: "Language & Communication",
@@ -688,17 +672,11 @@ export function SettingsPanel({
   }
   if (open === "support") {
     return (
-      <div className={wrap}>
+      <div className={wrap} data-testid="settings-support-style">
         {header("Support Style")}
-        <p className="mt-1 text-sm text-[#6b635a]">How support feels.</p>
-        <Options
-          items={SUPPORT_STYLES}
-          current={supportStyle}
-          onPick={(v) => {
-            setSupportStyle(v);
-            savePrefs({ supportStyle: v });
-          }}
-        />
+        <div className="mt-3">
+          <SupportStylePanel />
+        </div>
       </div>
     );
   }

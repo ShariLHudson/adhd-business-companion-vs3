@@ -2452,13 +2452,21 @@ export type HelpMode =
   | "navigate"
   | "concise";
 
-// How support feels — empathy vs action balance, plus an overwhelm-safe SOS.
+// How Spark helps when the member needs support (legacy ids + canonical Support Style ids).
+// Canonical source of truth: lib/supportStyle — these values stay for prefs sync / older readers.
 export type SupportStyle =
   | "solutions"
   | "understand"
   | "balanced"
   | "sos"
-  | "listen";
+  | "listen"
+  | "gentle-first"
+  | "practical-first"
+  | "talk-it-through"
+  | "step-by-step"
+  | "give-me-choices"
+  | "adaptive"
+  | "custom";
 
 export type Prefs = {
   aiTone: AiTone;
