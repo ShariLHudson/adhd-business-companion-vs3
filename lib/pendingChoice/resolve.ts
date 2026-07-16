@@ -1,3 +1,4 @@
+import type { AppSection } from "@/lib/companionUi";
 import { getCanonicalEstatePlaceById } from "@/lib/estate/canonicalEstateRegistry";
 import { isLiveEstatePlace } from "@/lib/estate/liveEstatePlace";
 import { hasHardEstateNavigationIntent } from "@/lib/estate/estateMetaNavigationPhrases";
@@ -39,10 +40,11 @@ import type {
   PendingChoiceItem,
   PendingChoiceResolveResult,
   PendingChoiceState,
+  PendingChoiceType,
 } from "./types";
 
 const CANCEL_RE =
-  /\b(?:never\s*mind|nevermind|cancel|forget it|not anymore|don'?t worry|skip it|actually no)\b/i;
+  /\b(?:never\s*mind|nevermind|cancel|forget it|not anymore|don'?t worry|skip it|actually no|none of (?:those|these|them)|something else|go back)\b/i;
 
 const TOPIC_CHANGE_RE =
   /\b(?:need help(?:\s+(?:writing|creating|drafting|building|with|to\b)|\b)|help me (?:create|write|writing|draft|build|make|plan)|help (?:writing|creating|drafting)|write (?:a|an|my)|create (?:a|an|my)|draft (?:a|an|my)|take me to|go to|open the|research|explain|what is|how do)\b/i;
@@ -129,6 +131,140 @@ export function registerPendingChoiceFromNavigation(input: {
     choices: items,
     menuText: input.menuText,
     activeIntent: input.queryPhrase,
+    offeredAtTurn: input.offeredAtTurn,
+  });
+}
+
+/** Estate experience / space disambiguation menus (Momentum / Create / Boardroom). */
+export function registerPendingChoiceFromExperienceMenu(input: {
+  choices: readonly {
+    id: string;
+    label: string;
+    description?: string;
+    placeId?: string;
+    section?: AppSection;
+    stayInChat?: boolean;
+  }[];
+  menuText: string;
+  queryPhrase?: string;
+  offeredAtTurn?: number;
+  type?: PendingChoiceType;
+}): PendingChoiceState {
+  const items: PendingChoiceItem[] = input.choices.map((choice) => {
+    if (choice.stayInChat) {
+      return {
+        id: choice.id,
+        label: choice.label,
+        description: choice.description,
+        callback: { kind: "stay_in_chat" as const },
+        confidence: "medium" as const,
+      };
+    }
+    if (choice.section) {
+      return {
+        id: choice.id,
+        label: choice.label,
+        description: choice.description,
+        destination: choice.placeId,
+        callback: {
+          kind: "open_section" as const,
+          section: choice.section,
+          placeId: choice.placeId,
+        },
+        confidence: "medium" as const,
+      };
+    }
+    return {
+      id: choice.id,
+      label: choice.label,
+      description: choice.description,
+      destination: choice.placeId ?? choice.id,
+      callback: {
+        kind: "navigate_place" as const,
+        placeId: choice.placeId ?? choice.id,
+      },
+      confidence: "medium" as const,
+    };
+  });
+  return registerPendingChoice({
+    type: input.type ?? "estate_navigation",
+    choices: items,
+    menuText: input.menuText,
+    activeIntent: input.queryPhrase,
+    offeredAtTurn: input.offeredAtTurn,
+  });
+}
+
+/** Clear My Mind vs stay — cognitive overload numbered menu. */
+export function registerCognitiveOverloadPendingChoices(input: {
+  menuText: string;
+  offeredAtTurn?: number;
+}): PendingChoiceState {
+  return registerPendingChoice({
+    type: "implied_need",
+    choices: [
+      {
+        id: "open-clear-my-mind",
+        label: "Open Clear My Mind",
+        destination: "clear-my-mind",
+        callback: {
+          kind: "open_section",
+          section: "brain-dump",
+          placeId: "clear-my-mind",
+          capabilityId: "restore.clearmind",
+        },
+        confidence: "high",
+      },
+      {
+        id: "stay-in-chat",
+        label: "Let's Do It Here",
+        callback: { kind: "stay_in_chat" },
+        confidence: "high",
+      },
+    ],
+    menuText: input.menuText,
+    activeIntent: "cognitive_overload",
+    offeredAtTurn: input.offeredAtTurn,
+  });
+}
+
+/** Emotional regulation: calming audio / breathe / stay — consent before open. */
+export function registerEmotionalRegulationPendingChoices(input: {
+  menuText: string;
+  offeredAtTurn?: number;
+}): PendingChoiceState {
+  return registerPendingChoice({
+    type: "coaching_menu",
+    choices: [
+      {
+        id: "calming-audio",
+        label: "Calming audio",
+        callback: {
+          kind: "open_focus_audio",
+          focusAudioCategory: "calm-brain",
+          capabilityId: "focus.music",
+        },
+        confidence: "high",
+      },
+      {
+        id: "breathing-reset",
+        label: "A breathing reset",
+        callback: {
+          kind: "open_section",
+          section: "breathe",
+          capabilityId: "focus.breathing",
+        },
+        confidence: "high",
+      },
+      {
+        id: "stay-here",
+        label: "Stay here with me",
+        callback: { kind: "stay_in_chat" },
+        confidence: "high",
+      },
+    ],
+    menuText: input.menuText,
+    activeIntent: "emotional_regulation",
     offeredAtTurn: input.offeredAtTurn,
   });
 }

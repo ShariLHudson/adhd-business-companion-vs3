@@ -94,8 +94,13 @@ function parseNumberIndex(userText: string, count: number): number | null {
     return null;
   }
 
-  /** "the coffee one" is a label cue — not ordinal "one". */
-  if (/\bthe\s+\w+\s+one\b/.test(t)) return null;
+  /** "the coffee one" is a label cue — not ordinal "one". Ordinals stay numeric. */
+  if (
+    /\bthe\s+\w+\s+one\b/.test(t) &&
+    !/\bthe\s+(?:first|second|third|fourth|1st|2nd|3rd|4th)\s+one\b/.test(t)
+  ) {
+    return null;
+  }
 
   const bare = parseBareNumericSelection(userText, count);
   if (bare !== null) return bare;
@@ -173,6 +178,29 @@ function matchLabel(userText: string, choice: PendingChoiceItem): boolean {
   return false;
 }
 
+/** "Not 3, I meant 2" / "not the third — the second" → corrected index. */
+function parseCorrectedNumberIndex(
+  userText: string,
+  count: number,
+): number | null {
+  const t = normalize(userText);
+  const meantDigit = t.match(
+    /\bnot\s+(?:option\s+|number\s+|#)?(\d+)\b.{0,40}\b(?:meant|mean|want)\s+(?:option\s+|number\s+|#)?(\d+)\b/,
+  );
+  if (meantDigit?.[2]) {
+    const idx = Number.parseInt(meantDigit[2]!, 10) - 1;
+    if (idx >= 0 && idx < count) return idx;
+  }
+  const meantOrdinal = t.match(
+    /\bnot\s+(?:the\s+)?(first|second|third|fourth)\b.{0,40}\b(?:meant|mean|want)\s+(?:the\s+)?(first|second|third|fourth)\b/,
+  );
+  if (meantOrdinal?.[2] && meantOrdinal[2] in ORDINAL_WORDS) {
+    const idx = ORDINAL_WORDS[meantOrdinal[2]!]!;
+    if (idx < count) return idx;
+  }
+  return null;
+}
+
 /** Parse member reply against numbered choices — index or natural language label. */
 export function parsePendingChoiceSelection(
   userText: string,
@@ -189,6 +217,9 @@ export function parsePendingChoiceSelection(
   ) {
     return null;
   }
+
+  const corrected = parseCorrectedNumberIndex(trimmed, choices.length);
+  if (corrected !== null && choices[corrected]) return choices[corrected]!;
 
   const idx = parseNumberIndex(trimmed, choices.length);
   if (idx !== null && choices[idx]) return choices[idx]!;

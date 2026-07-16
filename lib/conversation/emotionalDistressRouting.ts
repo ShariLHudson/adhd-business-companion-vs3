@@ -28,7 +28,7 @@ const EMOTIONAL_FOLLOW_UP_EXCLUDE_RE =
   /\b(?:take me|go to|open(?: the)?|create|write|draft|build|make|research|help me (?:create|write|draft))\b/i;
 
 const EMOTIONAL_SUPPORT_MENU_OFFER_RE =
-  /\b(?:would you like calming audio|calming audio,\s*a breathing reset|breathing reset,\s*or to stay here)\b/i;
+  /\b(?:would you like(?:\s*:)?\s*(?:\n\s*1\.\s*)?calming audio|calming audio,\s*a breathing reset|breathing reset,\s*or to stay here|a breathing reset\n\s*3\.\s*stay here)\b/i;
 
 export type EmotionalSupportMenuChoice = "focus-audio" | "breathe" | "stay";
 

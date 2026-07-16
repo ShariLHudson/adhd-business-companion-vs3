@@ -976,7 +976,9 @@ import {
   clearPendingChoice,
   hasActivePendingChoice,
   isCreateWorkflowContinuation,
+  isLikelyMenuSelectionInput,
   loadPendingChoice,
+  registerPendingChoiceFromAssistantText,
   resolvePendingChoiceTurn,
 } from "@/lib/pendingChoice";
 import {
@@ -12330,7 +12332,7 @@ export default function CompanionPageClient() {
       viewId,
       viewTitle: visualThinkingViewTitle(viewId),
       purposeAnswer: request.seedText,
-      ack: "I'll bring that up.",
+      ack: "Let's open Visual Thinking beside us.",
     });
     setMessages((prev) => [
       ...prev,
@@ -12576,6 +12578,12 @@ export default function CompanionPageClient() {
       { role: "assistant", content: frictionlessAction.localReply! },
     ]);
     recordPrimaryTurnResponse(frictionlessAction.localReply!);
+    if (!hasActivePendingChoice()) {
+      registerPendingChoiceFromAssistantText(
+        frictionlessAction.localReply!,
+        chatTurnRef.current,
+      );
+    }
 
     const chamberMemberConversationLocked = isChamberMemberConversationActive({
       activeSection: activeSectionRef.current,
@@ -13110,7 +13118,16 @@ export default function CompanionPageClient() {
         return;
       }
 
-      const universalRequest = resolveExplicitCapabilityIntent(trimmed);
+      const pendingForUniversal = loadPendingChoice();
+      const skipUniversalForPendingMenu =
+        Boolean(pendingForUniversal?.choices.length) &&
+        isLikelyMenuSelectionInput(
+          trimmed,
+          pendingForUniversal!.choices.length,
+        );
+      const universalRequest = skipUniversalForPendingMenu
+        ? null
+        : resolveExplicitCapabilityIntent(trimmed);
       if (universalRequest) {
         lastUserTextRef.current = trimmed;
         const userMessage: Message = { role: "user", content: trimmed };

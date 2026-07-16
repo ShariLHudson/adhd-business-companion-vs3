@@ -70,3 +70,25 @@ export function frictionlessDecisionFromCancelledPendingChoice(
     intentRouting: routing,
   };
 }
+
+export function frictionlessDecisionFromContinuedPendingChoice(
+  result: Extract<
+    PendingChoiceResolveResult,
+    { kind: "continued" | "expanded" }
+  >,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision {
+  return {
+    category: "pending_choice",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "PENDING CHOICE: Keep the same menu active — answer the meta question or show the expanded list.",
+    localReply: result.reply,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}

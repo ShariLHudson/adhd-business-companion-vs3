@@ -11,7 +11,7 @@ import { resolveExplicitCompanionAction } from "@/lib/companion/explicitCompanio
 import { clearUniversalCreationSession } from "@/lib/universalCreation";
 
 const STRESS_REPLY =
-  "You're carrying a lot of tension in this. Stress doesn't mean you're failing — it means something matters.\n\nWould you like calming audio, a breathing reset, or to stay here with me?";
+  "You're carrying a lot of tension in this. Stress doesn't mean you're failing — it means something matters.\n\nWould you like:\n1. Calming audio\n2. A breathing reset\n3. Stay here with me";
 
 describe("emotional support menu routing", () => {
   it("detects the three-option support menu", () => {

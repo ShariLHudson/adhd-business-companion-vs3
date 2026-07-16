@@ -31,8 +31,11 @@ export {
 
 export {
   pendingChoiceHintForChat,
+  registerCognitiveOverloadPendingChoices,
+  registerEmotionalRegulationPendingChoices,
   registerPendingChoiceFromAssistantText,
   registerPendingChoiceFromConcierge,
+  registerPendingChoiceFromExperienceMenu,
   registerPendingChoiceFromNavigation,
   registerPendingChoiceFromPlaceIds,
   resolvePendingChoiceTurn,

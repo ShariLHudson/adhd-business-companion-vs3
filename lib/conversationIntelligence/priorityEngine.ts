@@ -278,6 +278,20 @@ export function resolveConversationPriority(
     );
   }
 
+  /** Numbered / label menu picks win before emotional-support clears pending. */
+  if (isClearMenuSelection(input)) {
+    return baseVerdict(
+      {
+        winner: "pending_choice",
+        bindAffirmationTo: "none",
+        deferPendingChoice: false,
+        deferFrictionlessYes: false,
+        reason: "clear_menu_selection",
+      },
+      topicShiftClears,
+    );
+  }
+
   if (
     isEmotionalSupportThread(userText, lastAssistant) &&
     !(input.hasUniversalCreationSession && continuationKind)
@@ -294,19 +308,6 @@ export function resolveConversationPriority(
         reason: "emotional_need_outranks_unrelated_tasks",
       },
       clears,
-    );
-  }
-
-  if (isClearMenuSelection(input)) {
-    return baseVerdict(
-      {
-        winner: "pending_choice",
-        bindAffirmationTo: "none",
-        deferPendingChoice: false,
-        deferFrictionlessYes: false,
-        reason: "clear_menu_selection",
-      },
-      topicShiftClears,
     );
   }
 
