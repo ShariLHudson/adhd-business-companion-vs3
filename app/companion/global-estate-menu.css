@@ -374,23 +374,38 @@
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px));
 }
 
+/*
+ * Dark Settings text tokens (Estate palette — do not invent new colors):
+ *   primary   rgba(255, 248, 235, 0.98)
+ *   secondary rgba(255, 236, 200, 0.85)  — AA-friendly helper/body on dark sheet
+ *   accent    rgba(255, 220, 160, 0.95)  — teal-link substitute on dark
+ * !important beats Tailwind ink utilities that otherwise win on load order.
+ */
 .modal-sheet--estate-dark .settings-panel__heading,
 .modal-sheet--estate-dark .settings-panel__title {
-  color: rgba(255, 248, 235, 0.98);
+  color: rgba(255, 248, 235, 0.98) !important;
 }
 
 .modal-sheet--estate-dark .settings-panel__subheading,
 .modal-sheet--estate-dark .settings-panel p.text-sm,
-.modal-sheet--estate-dark .settings-panel .text-\[\#6b635a\] {
-  color: rgba(255, 236, 200, 0.72);
+.modal-sheet--estate-dark .settings-panel .text-sm,
+.modal-sheet--estate-dark .settings-panel .text-xs,
+.modal-sheet--estate-dark .settings-panel .text-\[\#6b635a\],
+.modal-sheet--estate-dark .settings-panel .text-\[\#9a8f82\] {
+  color: rgba(255, 236, 200, 0.85) !important;
 }
 
 .modal-sheet--estate-dark .settings-panel__back {
-  color: rgba(255, 220, 160, 0.92);
+  color: rgba(255, 248, 235, 0.98) !important;
 }
 
 .modal-sheet--estate-dark .settings-panel__back:hover {
-  color: rgba(255, 236, 200, 1);
+  color: rgba(255, 236, 200, 1) !important;
+}
+
+.modal-sheet--estate-dark .settings-panel__back:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
 }
 
 .modal-sheet--estate-dark .settings-menu-panel.estate-room-experience-menu__panel {
@@ -399,9 +414,67 @@
   box-shadow: none;
 }
 
+/* Dark ink / labels sitting on the sheet → primary cream */
+.modal-sheet--estate-dark .settings-panel .text-black,
 .modal-sheet--estate-dark .settings-panel .text-\[\#1f1c19\],
+.modal-sheet--estate-dark .settings-panel .text-\[\#2c2620\],
+.modal-sheet--estate-dark .settings-panel .text-\[\#2d2926\],
+.modal-sheet--estate-dark .settings-panel .text-\[\#3d3630\],
+.modal-sheet--estate-dark .settings-panel .text-\[\#4b463f\],
 .modal-sheet--estate-dark .settings-panel .text-2xl {
-  color: rgba(255, 248, 235, 0.98);
+  color: rgba(255, 248, 235, 0.98) !important;
+}
+
+/* Dark teal accent text on the sheet → warm accent cream */
+.modal-sheet--estate-dark .settings-panel .text-\[\#1e4f4f\] {
+  color: rgba(255, 220, 160, 0.95) !important;
+}
+
+/*
+ * Outline / ghost actions on the dark sheet (Sign in, Log out, etc.).
+ * Light cream cards keep their own black/teal via rules further below.
+ */
+.modal-sheet--estate-dark .settings-panel .settings-panel__btn,
+.modal-sheet--estate-dark .settings-panel button.settings-panel__btn {
+  color: rgba(255, 248, 235, 0.98) !important;
+  border-color: rgba(255, 236, 200, 0.42) !important;
+  background: rgba(255, 248, 235, 0.08) !important;
+}
+
+.modal-sheet--estate-dark .settings-panel .settings-panel__btn:hover,
+.modal-sheet--estate-dark .settings-panel button.settings-panel__btn:hover {
+  color: rgba(255, 248, 235, 1) !important;
+  border-color: rgba(255, 220, 160, 0.55) !important;
+  background: rgba(255, 220, 160, 0.14) !important;
+}
+
+.modal-sheet--estate-dark .settings-panel .settings-panel__btn:focus-visible,
+.modal-sheet--estate-dark .settings-panel button.settings-panel__btn:focus-visible,
+.modal-sheet--estate-dark .settings-panel button:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+/* Disabled: distinct but still readable on dark (avoid opacity-only dark ink) */
+.modal-sheet--estate-dark .settings-panel .settings-panel__btn:disabled,
+.modal-sheet--estate-dark .settings-panel button.settings-panel__btn:disabled,
+.modal-sheet--estate-dark .settings-panel button:disabled {
+  opacity: 1;
+  color: rgba(255, 248, 235, 0.62) !important;
+  border-color: rgba(255, 236, 200, 0.28) !important;
+  background: rgba(255, 248, 235, 0.05) !important;
+  cursor: not-allowed;
+}
+
+/*
+ * Other outline controls on the dark sheet (e.g. Pattern Awareness “Add”).
+ * Light-card children keep black text via the light-surface block below.
+ */
+.modal-sheet--estate-dark .settings-panel button.text-\[\#1e4f4f\]:not([class*="bg-white"]):not(.bg-\[\#1e4f4f\]),
+.modal-sheet--estate-dark .settings-panel button.text-\[\#3d3630\]:not([class*="bg-white"]) {
+  color: rgba(255, 248, 235, 0.98) !important;
+  border-color: rgba(255, 236, 200, 0.42) !important;
+  background: rgba(255, 248, 235, 0.08) !important;
 }
 
 /* How To Use Settings — readable on dark sheet */
@@ -450,12 +523,18 @@
  * Light surfaces inside dark Settings (Celebrations cards, selects, connection
  * cards, appearance samples, etc.) — keep all text black so it stays readable.
  * Exclude How To Use Settings (dark translucent row — title stays white).
+ * Wins over cream text overrides above via !important + later cascade.
  */
 .modal-sheet--estate-dark .settings-panel :is(
   [class*="bg-white"],
   .bg-\[\#faf7f2\],
   .bg-\[\#faf7f2\]\/70,
+  .bg-\[\#f7f3ec\],
+  .bg-\[\#f5f1ea\],
+  .bg-\[\#f5f0e8\],
   .bg-\[\#f3efe8\],
+  .bg-\[\#f0ebe3\],
+  .bg-\[\#fff8ef\],
   .bg-\[\#1e4f4f\]\/\[0\.06\]
 ):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger) {
   color: #000000;
@@ -465,22 +544,34 @@
   [class*="bg-white"],
   .bg-\[\#faf7f2\],
   .bg-\[\#faf7f2\]\/70,
+  .bg-\[\#f7f3ec\],
+  .bg-\[\#f5f1ea\],
+  .bg-\[\#f5f0e8\],
   .bg-\[\#f3efe8\],
+  .bg-\[\#f0ebe3\],
+  .bg-\[\#fff8ef\],
   .bg-\[\#1e4f4f\]\/\[0\.06\]
 ):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger)
-  :is(p, span, label, summary, strong, em, small, li, div, button):not(
+  :is(p, span, label, summary, strong, em, small, li, div, button, legend, a):not(
     .workspace-area-works-guide__title
   ):not(.workspace-area-works-guide__chevron),
 .modal-sheet--estate-dark .settings-panel :is(
   [class*="bg-white"],
   .bg-\[\#faf7f2\],
   .bg-\[\#faf7f2\]\/70,
+  .bg-\[\#f7f3ec\],
+  .bg-\[\#f5f1ea\],
+  .bg-\[\#f5f0e8\],
   .bg-\[\#f3efe8\],
+  .bg-\[\#f0ebe3\],
+  .bg-\[\#fff8ef\],
   .bg-\[\#1e4f4f\]\/\[0\.06\]
 ):not(.workspace-area-works-guide):not(.workspace-area-works-guide--settings):not(.workspace-area-works-guide__trigger)
   :is(
     .text-black,
     .text-\[\#1f1c19\],
+    .text-\[\#2c2620\],
+    .text-\[\#2d2926\],
     .text-\[\#3d3630\],
     .text-\[\#4b463f\],
     .text-\[\#6b635a\],
@@ -591,8 +682,13 @@
 .modal-sheet--estate-dark
   .settings-panel
   .settings-appearance-picker
-  .text-\[rgba\(255\,236\,200\,0\.72\)\] {
-  color: rgba(255, 236, 200, 0.72) !important;
+  .text-\[rgba\(255\,236\,200\,0\.72\)\],
+.modal-sheet--estate-dark .settings-panel .settings-appearance-option .text-\[rgba\(255\,236\,200\,0\.85\)\],
+.modal-sheet--estate-dark
+  .settings-panel
+  .settings-appearance-picker
+  .text-\[rgba\(255\,236\,200\,0\.85\)\] {
+  color: rgba(255, 236, 200, 0.85) !important;
 }
 
 .modal-sheet--estate-dark .settings-panel :is(input, select, textarea) {

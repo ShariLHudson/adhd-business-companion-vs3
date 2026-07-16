@@ -1409,7 +1409,7 @@ export function SettingsPanel({
               <button
                 type="button"
                 onClick={onSignIn}
-                className="rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+                className="settings-panel__btn settings-panel__btn--primary rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
               >
                 {user ? "Your account" : "Sign in"}
               </button>
@@ -1417,7 +1417,7 @@ export function SettingsPanel({
                 <button
                   type="button"
                   onClick={() => void signOut()}
-                  className="rounded-xl border border-[#c9bfb0] px-5 py-2.5 text-sm font-semibold text-[#3d3630] hover:bg-[#f0f5f5]"
+                  className="settings-panel__btn settings-panel__btn--secondary rounded-xl border border-[#c9bfb0] px-5 py-2.5 text-sm font-semibold text-[#3d3630] hover:bg-[#f0f5f5]"
                 >
                   Log out
                 </button>
