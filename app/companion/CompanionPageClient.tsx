@@ -5202,7 +5202,7 @@ export default function CompanionPageClient() {
             },
           ]);
         } else {
-          openPlanMyDayCore();
+          openPlanAdaptSharedCore("plan");
         }
         return;
       }
@@ -7442,10 +7442,11 @@ export default function CompanionPageClient() {
         }
         return;
       case "plan-my-day":
-        openPlanMyDayCore();
+        // Same destination as Welcome Home → My Day → Plan My Day (complete workflow).
+        openPlanAdaptSharedCore("plan");
         return;
       case "adapt-my-day":
-        // Stay on Welcome Home for the Adapt check-in (not Plan My Day entry).
+        // Stay on Welcome Home for the Adapt check-in, then continue into the shared window.
         setGlobalDailyOpening(
           globalDailyOpening ??
             todaysWelcomeOpening ??
@@ -7622,7 +7623,7 @@ export default function CompanionPageClient() {
     markTodaysWelcomeDismissedThisSession();
     setGlobalDailyOpening(null);
     clearDailyOpeningSubViews();
-    openPlanMyDayCore();
+    openPlanAdaptSharedCore("plan");
   }
 
   function handleGlobalDailyDiscoveryLearn() {
@@ -9046,12 +9047,20 @@ export default function CompanionPageClient() {
     }
   }
 
-  /** Plan My Day — Morning Room standalone; never beside chat. */
+  /** Plan My Day — shared complete workflow by default.
+   * Deep links with item/area/rhythms still open the Morning Room panel. */
   function openPlanMyDayCore(options?: {
     itemId?: string | null;
     area?: PlanningCenterArea | null;
     rhythmsTab?: "today" | "all" | "reminders" | null;
   }) {
+    const hasDeepLink = Boolean(
+      options?.itemId || options?.area || options?.rhythmsTab,
+    );
+    if (!hasDeepLink) {
+      openPlanAdaptSharedCore("plan");
+      return;
+    }
     leaveClearMyMindIfNavigatingAway();
     if (!confirmLeaveUnsavedWork()) return;
     preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
@@ -22742,6 +22751,7 @@ export default function CompanionPageClient() {
               : isGrowthPanelSection(activeSection)
                 ? "pl-0 companion-growth-active"
               : activeSection === "plan-my-day" ||
+                  activeSection === "adapt-plan-my-day" ||
                   activeSection === "reminders" ||
                   activeSection === "rhythms" ||
                   activeSection === "reminders-rhythms" ||
@@ -22776,6 +22786,7 @@ export default function CompanionPageClient() {
             : ""
         } ${
           activeSection === "plan-my-day" ||
+          activeSection === "adapt-plan-my-day" ||
           activeSection === "reminders" ||
           activeSection === "rhythms" ||
           activeSection === "reminders-rhythms" ||
@@ -22838,7 +22849,7 @@ export default function CompanionPageClient() {
             navVisibility="normal"
             activeSection={activeSection}
             onOpenClearMyMind={() => openClearMyMindCore()}
-            onOpenPlanMyDay={() => openPlanMyDayCore()}
+            onOpenPlanMyDay={() => openPlanAdaptSharedCore("plan")}
             onOpenTodaysReality={() => openAdaptMyDayCore()}
             onEstateMenuAction={handleEstateMenuAction}
           />
@@ -23015,7 +23026,7 @@ export default function CompanionPageClient() {
                           markTodaysWelcomeDismissedThisSession();
                           setGlobalDailyOpening(null);
                           clearDailyOpeningSubViews();
-                          openPlanMyDayCore();
+                          openPlanAdaptSharedCore("plan");
                         }}
                       />
                     ) : dailyOpeningHelpfulLesson ? (

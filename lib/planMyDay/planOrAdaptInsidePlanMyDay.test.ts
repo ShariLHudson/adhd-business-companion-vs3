@@ -17,14 +17,40 @@ describe("Plan or Adapt inside Plan My Day", () => {
     expect(withPlan.find((c) => c.id === "plan-my-day")?.recommended).toBe(false);
   });
 
-  it("wires AdaptMyDayCheckIn and path chooser into PlanMyDayPanel", () => {
-    const panel = readFileSync(
-      resolve(process.cwd(), "components/companion/PlanMyDayPanel.tsx"),
+  it("wires Adapt and complete Plan workflow into the shared Plan Adapt window", () => {
+    const shared = readFileSync(
+      resolve(process.cwd(), "components/companion/PlanAdaptSharedWindow.tsx"),
       "utf8",
     );
-    expect(panel).toContain("AdaptMyDayCheckIn");
-    expect(panel).toContain("PlanOrAdaptPathChooser");
-    expect(panel).toContain('data-testid="plan-day-adapt-my-day"');
-    expect(panel).not.toContain("AdjustMyDayPanel");
+    expect(shared).toContain("AdaptMyDayCheckIn");
+    expect(shared).toContain("PlanMyDayCompleteWorkflow");
+    expect(shared).toContain("PlanDaySimpleList");
+    expect(shared).toContain("PlanDaySimpleAdd");
+    expect(shared).not.toContain("AdjustMyDayPanel");
+  });
+
+  it("routes generic Plan My Day opens to the shared complete workflow", () => {
+    const cpc = readFileSync(
+      resolve(process.cwd(), "app/companion/CompanionPageClient.tsx"),
+      "utf8",
+    );
+    expect(cpc).toContain("hasDeepLink");
+    expect(cpc).toMatch(
+      /if \(!hasDeepLink\) \{\s*openPlanAdaptSharedCore\("plan"\);/,
+    );
+    expect(cpc).toContain('case "plan-my-day":');
+    expect(cpc).toContain('openPlanAdaptSharedCore("plan")');
+
+    const workflow = readFileSync(
+      resolve(
+        process.cwd(),
+        "components/companion/PlanMyDayCompleteWorkflow.tsx",
+      ),
+      "utf8",
+    );
+    expect(workflow).toContain("aria-pressed");
+    expect(workflow).toContain("plan-day-style-recommendation");
+    expect(workflow).toContain("Today&apos;s Most Important Task");
+    expect(workflow).toContain("plan-day-energy-groups");
   });
 });

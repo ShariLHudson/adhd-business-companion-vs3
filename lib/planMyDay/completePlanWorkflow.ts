@@ -5,6 +5,20 @@
 
 import { todayStr } from "@/lib/companionStore";
 import type { PlanDayItem } from "./types";
+import {
+  companionAwarenessLines,
+  detectDependencyHint,
+  effortBandFromMinutes,
+  mitReason,
+  priorityBandForTask,
+  recommendPlanningStyle,
+  recommendPlanView,
+  taskEnergyFit,
+  type EffortBand,
+  type PriorityBand,
+  type TaskEnergyFit,
+} from "./companionPlanRefinement";
+import type { UniversalViewMode } from "@/lib/presentation/universalViewArchitecture";
 
 export type PlanWorkflowEnergy = "very-low" | "low" | "steady" | "high";
 export type PlanWorkflowMotivation = "very-low" | "low" | "steady" | "high";
@@ -22,7 +36,11 @@ export type PlanMyDayWorkflowState = {
   energy?: PlanWorkflowEnergy;
   motivation?: PlanWorkflowMotivation;
   planningStyle?: PlanWorkflowStyle;
+  /** Calm recommendation line for Gentle / Balanced / Focused. */
+  styleRecommendation?: string | null;
   primaryOutcomeId?: string;
+  /** Why this is today's Most Important Task (recommendation). */
+  primaryReason?: string | null;
   secondaryOutcomeIds: string[];
   orderedTaskIds: string[];
   parkedTaskIds: string[];
@@ -31,7 +49,14 @@ export type PlanMyDayWorkflowState = {
   firstStepText?: string;
   fitMessage?: string | null;
   estimatesById: Record<string, number>;
+  effortById: Record<string, EffortBand>;
+  priorityBandById: Record<string, PriorityBand>;
+  energyFitById: Record<string, TaskEnergyFit>;
   tagsById: Record<string, string[]>;
+  companionNotes: string[];
+  dependencyNotes: string[];
+  recommendedView?: UniversalViewMode | null;
+  viewRecommendationReason?: string | null;
   stage: PlanWorkflowStage;
 };
 
@@ -68,9 +93,18 @@ export function emptyPlanWorkflowState(
     parkedTaskIds: [],
     quickWinIds: [],
     estimatesById: {},
+    effortById: {},
+    priorityBandById: {},
+    energyFitById: {},
     tagsById: {},
+    companionNotes: [],
+    dependencyNotes: [],
     stage: "capture",
     fitMessage: null,
+    styleRecommendation: null,
+    primaryReason: null,
+    recommendedView: null,
+    viewRecommendationReason: null,
   };
 }
 
@@ -94,7 +128,12 @@ export function loadPlanWorkflowState(
       parkedTaskIds: parsed.parkedTaskIds ?? [],
       quickWinIds: parsed.quickWinIds ?? [],
       estimatesById: parsed.estimatesById ?? {},
+      effortById: parsed.effortById ?? {},
+      priorityBandById: parsed.priorityBandById ?? {},
+      energyFitById: parsed.energyFitById ?? {},
       tagsById: parsed.tagsById ?? {},
+      companionNotes: parsed.companionNotes ?? [],
+      dependencyNotes: parsed.dependencyNotes ?? [],
       sourceInputs: parsed.sourceInputs ?? [],
     };
   } catch {
@@ -157,15 +196,9 @@ export function tagTask(title: string): string[] {
 function defaultStyle(
   energy?: PlanWorkflowEnergy,
   motivation?: PlanWorkflowMotivation,
+  taskCount = 0,
 ): PlanWorkflowStyle {
-  if (energy === "very-low" || energy === "low") return "gentle";
-  if (
-    (energy === "high" || energy === "steady") &&
-    (motivation === "high" || motivation === "steady")
-  ) {
-    return "focused";
-  }
-  return "balanced";
+  return recommendPlanningStyle({ energy, motivation, taskCount }).style;
 }
 
 function concreteFirstStep(title: string): string {
@@ -196,23 +229,46 @@ export function buildCompleteDayPlan(
   motivation?: PlanWorkflowMotivation;
 } {
   const active = input.items.filter((item) => !item.done && item.title.trim());
-  const style =
-    input.planningStyle ?? defaultStyle(input.energy, input.motivation);
+  const styleRec = recommendPlanningStyle({
+    energy: input.energy,
+    motivation: input.motivation,
+    taskCount: active.length,
+  });
+  const style = input.planningStyle ?? styleRec.style;
   const available =
     input.availableMinutes ??
     (style === "gentle" ? 120 : style === "focused" ? 240 : 180);
 
   const estimatesById: Record<string, number> = {};
+  const effortById: Record<string, EffortBand> = {};
+  const energyFitById: Record<string, TaskEnergyFit> = {};
   const tagsById: Record<string, string[]> = {};
+  const dependencyNotes: string[] = [];
   for (const item of active) {
     estimatesById[item.id] =
       item.durationMinutes && item.durationMinutes > 0
         ? item.durationMinutes
         : estimateTaskMinutes(item.title);
+    effortById[item.id] = effortBandFromMinutes(estimatesById[item.id]!);
+    energyFitById[item.id] = taskEnergyFit(item.title);
     tagsById[item.id] = tagTask(item.title);
+    const dep = detectDependencyHint(item);
+    if (dep) {
+      dependencyNotes.push(`${item.title} — ${dep.note}`);
+      tagsById[item.id] = [...tagsById[item.id]!, dep.kind];
+    }
   }
 
+  const lowEnergyDay =
+    input.energy === "very-low" || input.energy === "low";
+
   const scored = [...active].sort((a, b) => {
+    if (lowEnergyDay) {
+      const order = { low: 0, medium: 1, high: 2 } as const;
+      const ae = order[energyFitById[a.id] ?? "medium"];
+      const be = order[energyFitById[b.id] ?? "medium"];
+      if (ae !== be) return ae - be;
+    }
     const aFocus = detectFocusWork(a.title) ? 0 : 1;
     const bFocus = detectFocusWork(b.title) ? 0 : 1;
     const aErrand = detectErrandTask(a.title) ? 0 : 1;
@@ -259,6 +315,18 @@ export function buildCompleteDayPlan(
 
   const primary = ordered[0] ?? null;
   const secondaryOutcomeIds = ordered.slice(1, 3).map((item) => item.id);
+  const parkedTaskIds = parked.map((item) => item.id);
+  const orderedTaskIds = ordered.map((item) => item.id);
+  const priorityBandById: Record<string, PriorityBand> = {};
+  for (const item of active) {
+    priorityBandById[item.id] = priorityBandForTask({
+      id: item.id,
+      primaryId: primary?.id,
+      secondaryIds: secondaryOutcomeIds,
+      parkedIds: parkedTaskIds,
+    });
+  }
+
   const totalEstimate = ordered.reduce(
     (sum, item) => sum + (estimatesById[item.id] ?? 0),
     0,
@@ -275,31 +343,55 @@ export function buildCompleteDayPlan(
       hoursAvail === 1 ? "" : "s"
     }. Let’s keep what truly needs today and park the rest without treating it as failure.`;
   } else if (active.length > 0) {
-    fitMessage =
-      "This looks like a realistic fit for the time and energy you described.";
+    fitMessage = input.availableMinutes
+      ? "This looks like a realistic fit for the time and energy you described."
+      : "I built a flexible plan — you can adjust time, energy, or style anytime.";
   }
 
   const firstStepText = primary
     ? concreteFirstStep(primary.title)
     : "Add one thing you want today, then we can shape a plan.";
 
+  const viewRec = recommendPlanView({
+    energy: input.energy,
+    taskCount: active.length,
+  });
+
   return {
     availableMinutes: available,
     energy: input.energy,
     motivation: input.motivation,
     planningStyle: style,
+    styleRecommendation: styleRec.reason,
     primaryOutcomeId: primary?.id,
+    primaryReason: primary ? mitReason(primary.title, style) : null,
     secondaryOutcomeIds,
-    orderedTaskIds: ordered.map((item) => item.id),
-    parkedTaskIds: parked.map((item) => item.id),
+    orderedTaskIds,
+    parkedTaskIds,
     quickWinIds: quickWins.map((item) => item.id),
     currentTaskId: primary?.id,
     firstStepText,
     fitMessage,
     estimatesById,
+    effortById,
+    priorityBandById,
+    energyFitById,
     tagsById,
+    companionNotes: companionAwarenessLines(active),
+    dependencyNotes: dependencyNotes.slice(0, 3),
+    recommendedView: viewRec.mode,
+    viewRecommendationReason: viewRec.reason,
     stage: "planned",
   };
+}
+
+/** Exported for constraints UI — recommend style before generate. */
+export function recommendStyleForConstraints(input: {
+  energy?: PlanWorkflowEnergy | null;
+  motivation?: PlanWorkflowMotivation | null;
+  taskCount: number;
+}): { style: PlanWorkflowStyle; reason: string } {
+  return recommendPlanningStyle(input);
 }
 
 export const AVAILABLE_TIME_OPTIONS = [

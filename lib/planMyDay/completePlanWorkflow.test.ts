@@ -92,6 +92,33 @@ describe("complete Plan My Day workflow (125–127)", () => {
     expect(plan.firstStepText).toMatch(/Open|Begin|Do|Gather/i);
     expect(plan.secondaryOutcomeIds.length).toBeLessThanOrEqual(2);
     expect(plan.fitMessage).toBeTruthy();
+    expect(plan.styleRecommendation).toMatch(/Gentle|Balanced|Focused/i);
+    expect(plan.primaryReason).toBeTruthy();
+    expect(plan.effortById[plan.primaryOutcomeId!]).toBeTruthy();
+    expect(plan.priorityBandById[plan.primaryOutcomeId!]).toBe("highest");
+    expect(plan.energyFitById["5"]).toBe("low");
+    expect(plan.recommendedView).toBeTruthy();
+  });
+
+  it("builds a flexible plan when time/energy/motivation are omitted", () => {
+    const plan = buildCompleteDayPlan({
+      items: [item("1", "email Sam"), item("2", "work on strategy")],
+    });
+    expect(plan.stage).toBe("planned");
+    expect(plan.fitMessage).toMatch(/flexible|realistic/i);
+    expect(plan.styleRecommendation).toMatch(/Balanced/i);
+  });
+
+  it("surfaces dependency notes without shaming", () => {
+    const blocked: PlanDayItem = {
+      id: "b1",
+      title: "Call Carolyn",
+      notes: "requires Find insurance paperwork",
+      column: "today",
+      done: false,
+    };
+    const plan = buildCompleteDayPlan({ items: [blocked, item("2", "water plants")] });
+    expect(plan.dependencyNotes.some((n) => /Requires/i.test(n))).toBe(true);
   });
 
   it("keeps energy and motivation as separate inputs in saved workflow", () => {

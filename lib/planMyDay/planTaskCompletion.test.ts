@@ -42,7 +42,9 @@ describe("planTaskCompletion", () => {
     const result = completePlanItem([item], "task-1", { sourceWorkspace: "kanban" });
     expect(result).not.toBeNull();
     expect(result!.items).toHaveLength(0);
-    expect(result!.toast).toBe(PLAN_COMPLETION_TOAST);
+    expect(result!.toast).toContain("Nice work");
+    expect(result!.toast).toContain("Finish newsletter");
+    expect(PLAN_COMPLETION_TOAST).toContain("Nice work");
     expect(getPlanCompletionHistory()).toHaveLength(1);
     expect(getPlanCompletionHistory()[0]?.taskName).toBe("Finish newsletter");
   });

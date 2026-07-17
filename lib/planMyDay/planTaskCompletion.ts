@@ -8,6 +8,7 @@ import { createEvidenceEntry } from "../evidenceBankStore";
 import type { PlanDayItem, PlanLifeDomain } from "./types";
 import { inferPlanLifeDomain } from "./planItemColors";
 import { recordPlanBehaviorEvent } from "./planBehaviorLearning";
+import { gentleCompletionAcknowledgement } from "./companionPlanRefinement";
 
 export type PlanTaskSourceWorkspace =
   | "plan-my-day"
@@ -32,8 +33,7 @@ const HISTORY_KEY = "companion-plan-completion-history-v1";
 const PROJECT_LOG_KEY = "companion-project-plan-completions-v1";
 const MAX_HISTORY = 1000;
 
-export const PLAN_COMPLETION_TOAST =
-  "✓ Added to your progress history";
+export const PLAN_COMPLETION_TOAST = gentleCompletionAcknowledgement();
 
 function readHistory(): PlanTaskCompletionRecord[] {
   if (typeof window === "undefined") return [];
@@ -235,7 +235,7 @@ export function completePlanItem(
   return {
     items: nextItems,
     record,
-    toast: PLAN_COMPLETION_TOAST,
+    toast: gentleCompletionAcknowledgement(item.title),
     elevatedToEvidence,
   };
 }
