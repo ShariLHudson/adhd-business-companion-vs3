@@ -28,6 +28,11 @@ describe("estateFullBleedPanelSections", () => {
     expect(isEstateFullBleedPanelSection("playbook")).toBe(true);
   });
 
+  it("includes Create estate entrance as full-bleed", () => {
+    expect(ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS).toContain("create");
+    expect(isEstateFullBleedPanelSection("create")).toBe(true);
+  });
+
   it("does not treat generic home as full-bleed", () => {
     expect(isEstateFullBleedPanelSection("home")).toBe(false);
   });

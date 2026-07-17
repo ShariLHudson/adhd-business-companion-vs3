@@ -129,6 +129,18 @@ const StrategyLibraryEstatePanel = dynamic(
     ),
   },
 );
+const CreateEstateEntrancePanel = dynamic(
+  () =>
+    import("@/components/companion/CreateEstateEntrancePanel").then((mod) => ({
+      default: mod.CreateEstateEntrancePanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Create…" size="md" />
+    ),
+  },
+);
 const RemindersRoomPanel = dynamic(
   () =>
     import("@/components/companion/RemindersRoomPanel").then((mod) => ({
@@ -491,7 +503,9 @@ import {
 } from "@/lib/createPersistence";
 import {
   deleteCreateDraftEntry,
+  duplicateCreateDraftEntry,
   getCreateDraftEntry,
+  renameCreateDraftEntry,
   upsertCreateDraftEntry,
 } from "@/lib/createDraftLibrary";
 import { createNavigationHistoryStack } from "@/lib/navigationHistory";
@@ -11341,6 +11355,49 @@ export default function CompanionPageClient() {
     trackWorkspaceEcosystemEvent("playbook");
     noteWorkspaceOpened("playbook", "standalone_room");
     openStandaloneFocusSectionCore("playbook");
+  }
+
+  /**
+   * My Work → Create — estate entrance (fresh intentional create).
+   * Does not resume stale Create Document work; Universal Create opens after a choice.
+   */
+  function openCreateEstateCore() {
+    leaveClearMyMindIfNavigatingAway();
+    pauseActiveArtifactIfLeavingCreate("create");
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    setCompanionStandaloneSection(null);
+    setWorkspaceFirstSplit(false);
+    createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
+    createBuilderBootstrappedRef.current = false;
+    trackWorkspaceEcosystemEvent("create");
+    noteWorkspaceOpened("create", "standalone_room");
+    openStandaloneFocusSectionCore("create");
+  }
+
+  /** From Create estate entrance — begin fresh Universal Create (no stale resume). */
+  function startFreshCreateFromEstate(opts?: {
+    artifactType?: string;
+    initialPrompt?: string;
+  }) {
+    const opened = openCreateWorkspace({
+      source: "hard_nav",
+      hardNavCommand: "my-work-create",
+      artifactType: opts?.artifactType,
+      initialPrompt: opts?.initialPrompt,
+    });
+    if (!opened) return;
+    setEstateRoomChatVisible(true);
+    const opener = opts?.artifactType
+      ? `Let's make a ${opts.artifactType}. What should it accomplish?`
+      : "What would you like to make? Say it in your own words — email, checklist, presentation, strategy, or something else.";
+    setMessages((prev) => {
+      const last = prev[prev.length - 1];
+      if (last?.role === "assistant" && last.content === opener) return prev;
+      return [...prev, { role: "assistant", content: opener }];
+    });
+    requestChatInputFocus();
   }
 
   function startBusinessStrategyBuilder(typeLabel: string) {
@@ -22330,7 +22387,8 @@ export default function CompanionPageClient() {
   const showSparkNoteChrome =
     overlay !== "signin" &&
     !justBeHereSession &&
-    activeSection !== "playbook";
+    activeSection !== "playbook" &&
+    activeSection !== "create";
 
   const clearMyMindWorkspaceActive =
     activeSection === "brain-dump" || isClearMyMindModeActive();
@@ -24572,6 +24630,38 @@ export default function CompanionPageClient() {
           {activeSection === "playbook" &&
             renderStrategyLibraryEstate({ registerBack })}
 
+          {activeSection === "create" && (
+            <CreateEstateEntrancePanel
+              onBack={goBack}
+              registerBack={registerBack}
+              onStartWithNeed={() => startFreshCreateFromEstate()}
+              onBrowseType={(typeLabel) =>
+                startFreshCreateFromEstate({ artifactType: typeLabel })
+              }
+              onOpenStrategyCreate={() =>
+                openStrategyLibraryCore({ openView: "business" })
+              }
+              onOpenSavedDraft={(id) => {
+                openCreateDraftFromLibrary(id);
+                setActiveSection("home");
+                activeSectionRef.current = "home";
+                setActiveNav("create");
+                patchWorkspacePanel("content-generator");
+                setCompanionStandaloneSection(null);
+                setWorkspaceFirstSplit(false);
+                applyChatLayoutMode("split");
+                revealWorkspace();
+                setEstateRoomChatVisible(true);
+                requestChatInputFocus();
+              }}
+              onRenameDraft={(id, title) => renameCreateDraftEntry(id, title)}
+              onDuplicateDraft={(id) => {
+                duplicateCreateDraftEntry(id);
+              }}
+              onDeleteDraft={(id) => deleteCreateDraftFromLibrary(id)}
+            />
+          )}
+
           {activeSection === "how-do-i" && (
             <WorkspaceShell
               assistLabel={getShariAssistLabel("how-do-i")}
@@ -24869,6 +24959,7 @@ export default function CompanionPageClient() {
         onOpenReminders={() => openRemindersRhythmsCore("reminders")}
         onOpenCalendar={() => openCalendarCore()}
         onOpenProjects={() => openProjectHomesPrototypeCore()}
+        onOpenCreateStudio={() => openCreateEstateCore()}
         onOpenClearMyMind={() => openClearMyMindCore()}
         onOpenParkingLot={() => openParkingLotCore()}
         onOpenSpinTheWheel={() => openStandaloneFocusSectionCore("spin-wheel")}

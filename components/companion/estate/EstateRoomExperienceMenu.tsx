@@ -52,6 +52,7 @@ export type EstateRoomExperienceMenuProps = {
   /** Shared Reminders/Rhythms window with Rhythms selected. */
   onOpenRhythms?: () => void;
   onOpenProjects?: () => void;
+  /** My Work → Create estate entrance. */
   onOpenCreateStudio?: () => void;
   onOpenDestinationGallery?: () => void;
   onOpenCartographersStudio?: () => void;
@@ -98,6 +99,7 @@ export function EstateRoomExperienceMenu({
   onOpenReminders,
   onOpenRhythms,
   onOpenProjects,
+  onOpenCreateStudio,
   onOpenClearMyMind,
   onOpenParkingLot,
   onOpenSpinTheWheel,
@@ -213,6 +215,7 @@ export function EstateRoomExperienceMenu({
           "adapt-plan-my-day": onOpenAdaptPlanMyDay,
           calendar: onOpenCalendar,
           "reminders-rhythms": onOpenRemindersRhythms,
+          create: onOpenCreateStudio,
           projects: onOpenProjects,
           "destination-gallery": onOpenDestinationGallery,
           "cartographers-studio": onOpenCartographersStudio,
@@ -238,6 +241,7 @@ export function EstateRoomExperienceMenu({
       onOpenAdaptPlanMyDay,
       onOpenRemindersRhythms,
       onOpenCalendar,
+      onOpenCreateStudio,
       onOpenProjects,
       onOpenDestinationGallery,
       onOpenCartographersStudio,

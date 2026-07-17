@@ -95,6 +95,7 @@ describe("welcomeHomeNavigationStructure", () => {
       ]),
     );
     expect(byId["my-work"]).toEqual([
+      "Create",
       "Projects",
       "Destination Gallery",
       "Cartographer’s Studio",

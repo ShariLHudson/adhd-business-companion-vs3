@@ -57,7 +57,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(verification.roomExperienceItems).toBe(0);
     expect(verification.roomNavigationItems).toBe(0);
     expect(verification.roomMyDayWorkItems).toBe(3);
-    expect(verification.roomMyWorkStudioItems).toBe(3);
+    expect(verification.roomMyWorkStudioItems).toBe(4);
     expect(verification.roomFocusItems).toBe(4);
     expect(verification.roomMyStoryItems).toBe(3);
     expect(verification.roomKnowledgeItems).toBe(3);
@@ -80,6 +80,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((item) => item.id),
     ).toEqual([
+      "create",
       "projects",
       "destination-gallery",
       "cartographers-studio",

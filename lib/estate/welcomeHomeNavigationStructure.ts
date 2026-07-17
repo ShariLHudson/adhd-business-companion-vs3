@@ -20,6 +20,7 @@ export type WelcomeHomeNavDestinationId =
   | "adapt-plan-my-day"
   | "calendar"
   | "reminders-rhythms"
+  | "create"
   | "projects"
   | "destination-gallery"
   | "cartographers-studio"
@@ -100,6 +101,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
     id: "my-work",
     label: "My Work",
     destinations: [
+      { id: "create", label: "Create" },
       { id: "projects", label: "Projects" },
       {
         id: "destination-gallery",

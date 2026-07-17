@@ -1,5 +1,5 @@
 /**
- * My Work — focused submenu (Projects · Destination Gallery · Cartographer).
+ * My Work — focused submenu (Create · Projects · Destination Gallery · Cartographer).
  * @vitest-environment jsdom
  */
 import { act } from "react";
@@ -17,13 +17,15 @@ vi.mock("@/lib/estate/useIdleChromeReveal", () => ({
 }));
 
 describe("My Work — menu canon", () => {
-  it("lists flat destinations in order without Create type submenu", () => {
+  it("lists flat destinations with Create first and no type submenu", () => {
     expect(SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((i) => i.id)).toEqual([
+      "create",
       "projects",
       "destination-gallery",
       "cartographers-studio",
     ]);
     expect(SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((i) => i.label)).toEqual([
+      "Create",
       "Projects",
       "Destination Gallery",
       "Cartographer’s Studio",
@@ -34,6 +36,7 @@ describe("My Work — menu canon", () => {
 describe("My Work — EstateRoomExperienceMenu focused submenu", () => {
   let container: HTMLDivElement;
   let root: Root;
+  const onOpenCreateStudio = vi.fn();
   const onOpenProjects = vi.fn();
   const onOpenDestinationGallery = vi.fn();
   const onOpenCartographersStudio = vi.fn();
@@ -42,6 +45,7 @@ describe("My Work — EstateRoomExperienceMenu focused submenu", () => {
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
+    onOpenCreateStudio.mockReset();
     onOpenProjects.mockReset();
     onOpenDestinationGallery.mockReset();
     onOpenCartographersStudio.mockReset();
@@ -64,6 +68,7 @@ describe("My Work — EstateRoomExperienceMenu focused submenu", () => {
           onOpenAdaptPlanMyDay={() => undefined}
           onOpenCalendar={() => undefined}
           onOpenRemindersRhythms={() => undefined}
+          onOpenCreateStudio={onOpenCreateStudio}
           onOpenProjects={onOpenProjects}
           onOpenDestinationGallery={onOpenDestinationGallery}
           onOpenCartographersStudio={onOpenCartographersStudio}
@@ -89,7 +94,7 @@ describe("My Work — EstateRoomExperienceMenu focused submenu", () => {
     });
   }
 
-  it("replaces top-level with Projects, Destination Gallery, Cartographer's Studio", () => {
+  it("replaces top-level with Create, Projects, Destination Gallery, Cartographer's Studio", () => {
     renderMenu();
     openMyWork();
     expect(
@@ -103,6 +108,7 @@ describe("My Work — EstateRoomExperienceMenu focused submenu", () => {
       ),
     ).map((el) => el.textContent?.trim());
     expect(labels).toEqual([
+      "Create",
       "Projects",
       "Destination Gallery",
       "Cartographer’s Studio",
@@ -113,6 +119,19 @@ describe("My Work — EstateRoomExperienceMenu focused submenu", () => {
     expect(
       container.querySelector('[data-testid="estate-room-menu-section-my-day"]'),
     ).toBeFalsy();
+  });
+
+  it("opens Create on first click", () => {
+    renderMenu();
+    openMyWork();
+    const create = container.querySelector(
+      '[data-testid="estate-open-create"]',
+    ) as HTMLButtonElement | null;
+    expect(create).toBeTruthy();
+    act(() => {
+      create?.click();
+    });
+    expect(onOpenCreateStudio).toHaveBeenCalledTimes(1);
   });
 
   it("opens Destination Gallery on first click", () => {

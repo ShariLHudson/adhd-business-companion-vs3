@@ -42,6 +42,8 @@ export type AppSection =
   | "snippets"
   | "content-types"
   | "content-generator"
+  /** My Work → Create estate entrance (Universal Create opens from here). */
+  | "create"
   | "google-workspace"
   | "business-profile"
   | "client-avatars"
@@ -237,6 +239,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "saved-work":
       return "other";
     case "content-generator":
+    case "create":
       return "create";
     case "playbook":
     case "how-do-i":
