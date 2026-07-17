@@ -3,8 +3,8 @@
 **Status:** `unit_verified` · authenticated preview **Pending**  
 **Do not deploy production** until `138_CREATE_AND_PEACEFUL_PLACES_LIVE_CHECKLIST.md` passes.
 
-**Preview:** _(filled after deploy)_  
-**Commits:** _(filled after push)_
+**Preview:** https://adhd-business-companion-vs3-49esabnlx-shari-hudsons-projects.vercel.app  
+**Commits:** `1b91b947`
 
 ## Root causes
 
