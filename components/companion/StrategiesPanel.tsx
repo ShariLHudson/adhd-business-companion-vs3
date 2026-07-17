@@ -38,7 +38,6 @@ import { compareDropdownLabels } from "@/lib/dropdownSort";
 import {
   getUserStrategies,
   saveUserStrategy,
-  suggestCategory,
   userStrategiesFor,
   type UserStrategy,
 } from "@/lib/userStrategies";
@@ -47,10 +46,8 @@ import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { StrategyApplyPanel } from "@/components/companion/StrategyApplyPanel";
 import type { StrategyApplySession } from "@/lib/strategyApplyCoach";
 import { useVisualMode } from "@/lib/useVisualMode";
-import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { StrategyUseNow } from "@/components/companion/StrategyUseNow";
 import { CoachingLibraryPicker } from "@/components/companion/CoachingLibraryPicker";
-import { saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { appReferences } from "@/lib/appReferences";
 import {
@@ -72,8 +69,12 @@ import {
   STRATEGY_LIBRARY_MODE_CHOICES,
   STRATEGY_LIBRARY_SUBTITLE,
   STRATEGY_LIBRARY_TITLE,
+  recommendStrategyLibraryMode,
   type StrategyLibraryModeId,
 } from "@/lib/strategyLibrary/estateCopy";
+import { buildStrategyDetailViewModel } from "@/lib/strategyLibrary/strategyDetailTemplate";
+import { StrategyExecutionConnections } from "@/components/companion/StrategyExecutionConnections";
+import { StrategyGuidedCreatePanel } from "@/components/companion/StrategyGuidedCreatePanel";
 
 type View =
   | { v: "home" }
@@ -145,17 +146,18 @@ export function StrategiesPanel({
   const estate = presentation === "estate";
   const [view, setView] = useState<View>({ v: "home" });
   const [libraryMode, setLibraryMode] =
-    useState<StrategyLibraryModeId>("browse");
+    useState<StrategyLibraryModeId>("apply");
   const [howDoIOpen, setHowDoIOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const entranceHint = useMemo(
+    () => recommendStrategyLibraryMode(search),
+    [search],
+  );
   const [hubOpen, setHubOpen] = useState<Record<string, boolean>>(() =>
     initialCollapsedSectionMap("adhd", "business", "recommended", "saved"),
   );
   const [adhdPick, setAdhdPick] = useState("");
   const [businessPick, setBusinessPick] = useState("");
-  const [newTitle, setNewTitle] = useState("");
-  const [newProblem, setNewProblem] = useState("");
-  const [newSteps, setNewSteps] = useState("");
   const [openSubcat, setOpenSubcat] = useState<string | null>(null);
   const strategyReturnRef = useRef<View>({ v: "home" });
   const visualMode = useVisualMode();
@@ -350,7 +352,7 @@ export function StrategiesPanel({
     const savedCount = saved.length;
 
     const shellClass = estate
-      ? "companion-fade-in flex min-h-0 w-full flex-col"
+      ? "companion-fade-in flex min-h-0 w-full flex-col overflow-y-auto pb-8"
       : workspacePanelShellClass({ width: "standard", inSplit: true });
     const cardClass = estate
       ? "w-full rounded-xl border border-[#d4cdc3] bg-white px-4 py-3.5 text-left hover:border-[#1e4f4f]/40"
@@ -410,6 +412,19 @@ export function StrategiesPanel({
               ) : null}
             </div>
 
+            <p
+              className="mt-3 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] px-3 py-2 text-sm leading-relaxed text-[#2d2926]"
+              data-testid="strategy-library-recommended-path"
+            >
+              <span className="font-semibold text-[#1e4f4f]">Suggested: </span>
+              {
+                STRATEGY_LIBRARY_MODE_CHOICES.find(
+                  (m) => m.id === entranceHint.recommendedMode,
+                )?.label
+              }
+              . {entranceHint.reason}
+            </p>
+
             <div
               className="mt-4 grid gap-3 sm:grid-cols-2"
               role="group"
@@ -418,6 +433,8 @@ export function StrategiesPanel({
             >
               {STRATEGY_LIBRARY_MODE_CHOICES.map((mode) => {
                 const selected = libraryMode === mode.id;
+                const recommended =
+                  entranceHint.recommendedMode === mode.id;
                 return (
                   <button
                     key={mode.id}
@@ -426,10 +443,13 @@ export function StrategiesPanel({
                     className={
                       selected
                         ? "rounded-2xl border-2 border-[#1e4f4f] bg-white px-4 py-3 text-left shadow-sm"
-                        : "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-3 text-left transition-colors"
+                        : recommended
+                          ? "rounded-2xl border border-[#1e4f4f]/45 bg-white px-4 py-3 text-left shadow-sm"
+                          : "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-3 text-left transition-colors"
                     }
                     aria-pressed={selected}
                     data-testid={`strategy-library-mode-${mode.id}`}
+                    data-recommended={recommended ? "true" : undefined}
                   >
                     <span className="block text-base font-semibold text-[#1f1c19]">
                       {mode.label}
@@ -1029,74 +1049,15 @@ export function StrategiesPanel({
     );
   }
 
-  // ---- New user strategy --------------------------------------------------
+  // ---- Guided create (never a blank form) --------------------------------
   if (view.v === "new") {
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
-        <button
-          type="button"
-          onClick={() => setView({ v: "home" })}
-          className="self-start text-sm font-semibold text-[#1e4f4f]"
-        >
-          ‹ Strategies
-        </button>
-        <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">New strategy</p>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Something you&apos;ve noticed helps — save it for next time.
-        </p>
-        <VoiceAnswerField
-          value={newTitle}
-          onChange={setNewTitle}
-          multiline={false}
-          placeholder="Strategy name"
-          className="mt-4"
-        />
-        <VoiceAnswerField
-          value={newProblem}
-          onChange={setNewProblem}
-          placeholder="What problem does this help with?"
-          className="mt-2"
-          inputClassName="min-h-[80px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
-        />
-        <VoiceAnswerField
-          value={newSteps}
-          onChange={setNewSteps}
-          placeholder="Steps (one per line)"
-          className="mt-2"
-          inputClassName="min-h-[100px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
-        />
-        <button
-          type="button"
-          disabled={!newTitle.trim()}
-          onClick={() => {
-            const steps = newSteps
-              .split("\n")
-              .map((s) => s.trim())
-              .filter(Boolean);
-            const { type, category } = suggestCategory(
-              newTitle,
-              newProblem,
-            );
-            saveUserStrategy({
-              title: newTitle.trim(),
-              type,
-              category,
-              source: "user_generated",
-              description: newProblem.trim() || newTitle.trim(),
-              whenToUse: "When this pattern shows up for you.",
-              steps: steps.length ? steps : ["Try it once and notice what helps."],
-              whyItWorks: "You built this from what actually works for you.",
-            });
-            setNewTitle("");
-            setNewProblem("");
-            setNewSteps("");
-            setView({ v: "saved" });
-          }}
-          className="mt-4 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
-        >
-          Save strategy
-        </button>
-      </div>
+      <StrategyGuidedCreatePanel
+        onBack={() => setView({ v: "home" })}
+        onSaved={() => setView({ v: "saved" })}
+        onOpen={onOpen}
+        onAsk={onAsk}
+      />
     );
   }
 
@@ -1221,6 +1182,7 @@ function StrategyBuiltinDetail({
   const cat = getCategory(resolveSubcat(s));
   const subcat = resolveSubcat(s);
   const accentColor = accent(cat?.color ?? "#1e4f4f");
+  const detail = useMemo(() => buildStrategyDetailViewModel(s), [s]);
   const closingReflection = useMemo(
     () => pickStrategyReflection(subcat, s),
     [subcat, s],
@@ -1230,39 +1192,79 @@ function StrategyBuiltinDetail({
     [s, subcat],
   );
 
+  function saveAsMine() {
+    saveUserStrategy({
+      title: s.title,
+      type: groupForStrategy(s),
+      category: subcat,
+      source: "user_generated",
+      description: s.problem,
+      whenToUse: s.whenToUse,
+      steps: s.steps,
+      whyItWorks: s.whyWorks,
+      example: s.example,
+      reflections: s.reflections,
+    });
+    onSaved();
+  }
+
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+    <div
+      className="companion-fade-in mx-auto flex h-full min-h-0 max-w-xl flex-col overflow-y-auto px-6 py-8"
+      data-testid="strategy-detail-template"
+    >
       <AppBackButton destination={backLabel} onBack={onBack} />
 
       <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{s.title}</p>
 
       <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#6b635a]">
-        <span>⏱ About {timeForStrategy(s)} minutes</span>
+        <span>About {timeForStrategy(s)} minutes</span>
       </div>
 
       {warmthFor(subcat) ? (
         <p className="mt-3 text-base italic text-[#1e4f4f]">{warmthFor(subcat)}</p>
       ) : null}
 
-      <LessonHeading color={accentColor}>What problem it solves</LessonHeading>
+      <LessonHeading color={accentColor}>What This Strategy Helps With</LessonHeading>
       <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.problem}
+        {detail.helpsWith}
       </p>
 
-      <LessonHeading color={accentColor}>Why it works</LessonHeading>
+      <LessonHeading color={accentColor}>When to Use It</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+        {detail.whenToUse}
+      </p>
+
+      <LessonHeading color={accentColor}>When Not to Use It</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+        {detail.whenNotToUse}
+      </p>
+
+      <LessonHeading color={accentColor}>Why It Works</LessonHeading>
       <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.whyWorks}
+        {detail.whyItWorks}
       </p>
       <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#6b635a]">
-        {s.whyBrain}
+        {detail.adhdWhy}
       </p>
 
-      <LessonHeading color={accentColor}>When to use it</LessonHeading>
-      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">{s.whenToUse}</p>
+      <LessonHeading color={accentColor}>How It Applies to Your Situation</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+        {detail.situationApplication}
+      </p>
 
-      <LessonHeading color={accentColor}>How to use it</LessonHeading>
+      <LessonHeading color={accentColor}>Your Best First Step</LessonHeading>
+      <div
+        className="mt-2 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] p-4"
+        style={{ borderLeftWidth: 4, borderLeftColor: accentColor }}
+        data-testid="strategy-first-step"
+      >
+        <p className="text-sm font-medium text-[#1f1c19]">{detail.firstStep}</p>
+      </div>
+
+      <LessonHeading color={accentColor}>Step-by-Step Implementation</LessonHeading>
       <ol className="mt-2 flex flex-col gap-2">
-        {s.steps.map((step, i) => (
+        {detail.steps.map((step, i) => (
           <li key={i} className="flex items-start gap-3">
             <span
               className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
@@ -1275,20 +1277,43 @@ function StrategyBuiltinDetail({
         ))}
       </ol>
 
+      <LessonHeading color={accentColor}>Chamber Expertise</LessonHeading>
+      <div
+        className="mt-2 rounded-xl border border-[#1e4f4f]/15 bg-white/80 p-4"
+        data-testid="strategy-chamber-contribution"
+      >
+        <p className="text-sm font-semibold text-[#1f1c19]">
+          Specialist guidance used
+        </p>
+        {detail.chamber.map((c) => (
+          <div key={c.roleLabel} className="mt-2">
+            <p className="text-sm font-semibold text-[#1e4f4f]">{c.roleLabel}</p>
+            <p className="mt-0.5 text-sm leading-relaxed text-[#2d2926]">
+              {c.guidance}
+            </p>
+          </div>
+        ))}
+      </div>
+
       <LessonHeading color={accentColor}>Real-life example</LessonHeading>
       <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#6b635a]">
-        {s.example}
+        {detail.example}
       </p>
 
-      <LessonHeading color={accentColor}>Try it right now</LessonHeading>
-      <div
-        className="mt-2 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] p-4"
-        style={{ borderLeftWidth: 4, borderLeftColor: accentColor }}
-      >
-        <p className="text-sm font-medium text-[#1f1c19]">
-          Start with step 1: {s.steps[0]}
-        </p>
-      </div>
+      <LessonHeading color={accentColor}>Common Problems</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+        {detail.commonProblems}
+      </p>
+
+      <LessonHeading color={accentColor}>How to Adapt It</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+        {detail.howToAdapt}
+      </p>
+
+      <LessonHeading color={accentColor}>How to Know It Is Working</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+        {detail.howToKnowWorking}
+      </p>
 
       <StrategyUseNow
         key={s.id}
@@ -1298,6 +1323,15 @@ function StrategyBuiltinDetail({
         onOpen={onOpen}
         onAsk={onAsk}
         onStartStrategyApply={onStartStrategyApply}
+      />
+
+      <StrategyExecutionConnections
+        strategy={s}
+        onOpen={onOpen}
+        onAsk={onAsk}
+        onSaved={onSaved}
+        onSaveStrategy={saveAsMine}
+        showOptionalReviews
       />
 
       {relatedTools.length > 0 ? (
@@ -1323,46 +1357,6 @@ function StrategyBuiltinDetail({
         </>
       ) : null}
 
-      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
-        <button
-          type="button"
-          onClick={() => {
-            saveUserStrategy({
-              title: s.title,
-              type: groupForStrategy(s),
-              category: subcat,
-              source: "user_generated",
-              description: s.problem,
-              whenToUse: s.whenToUse,
-              steps: s.steps,
-              whyItWorks: s.whyWorks,
-              example: s.example,
-              reflections: s.reflections,
-            });
-            onSaved();
-          }}
-          className="text-[#1e4f4f] underline decoration-[#1e4f4f]/30 underline-offset-2"
-        >
-          Save as my strategy
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            saveProject({
-              name: s.title,
-              goal: s.problem,
-              nextAction: s.steps[0] ?? "",
-              horizon: "now",
-              status: "in-progress",
-            });
-            onOpen?.("projects");
-          }}
-          className="text-[#6b635a] underline decoration-[#9a8f82]/40 underline-offset-2"
-        >
-          Attach to a project
-        </button>
-      </div>
-
       {s.deeper ? (
         <details className="mt-6 rounded-2xl border border-[#1e4f4f]/15 bg-white/60 px-4 py-3">
           <summary className="cursor-pointer text-base font-semibold text-[#1e4f4f]">
@@ -1374,7 +1368,7 @@ function StrategyBuiltinDetail({
         </details>
       ) : null}
 
-      <p className="mt-8 text-center text-sm italic text-[#9a8f82]">
+      <p className="mt-8 pb-6 text-center text-sm italic text-[#9a8f82]">
         {closingReflection}
       </p>
     </div>

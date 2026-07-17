@@ -31,19 +31,40 @@ function chatPromptForStep(step: string, index: number): string {
   return `Step ${index + 1}:\n${step}\n\nWhat does that look like for you right now?`;
 }
 
+const PERSONALIZE_PREFIX: StrategyApplyQuestion[] = [
+  {
+    id: "confirm-problem",
+    prompt: "What is the real problem right now?",
+    chatPrompt:
+      "Before we apply this, what's the real problem you're dealing with right now — in one or two sentences?",
+  },
+  {
+    id: "desired-outcome",
+    prompt: "What would better look like?",
+    chatPrompt:
+      "What would better look like if this worked — the outcome that matters most?",
+  },
+  {
+    id: "constraints",
+    prompt: "What constraints should we respect?",
+    chatPrompt:
+      "What constraints should we respect — time, energy, ADHD friction, people, or deadlines?",
+  },
+];
+
 export function questionsForStrategy(s: Strategy): StrategyApplyQuestion[] {
-  if (s.coach?.length) {
-    return s.coach.map((prompt, i) => ({
-      id: `q${i}`,
-      prompt,
-      chatPrompt: prompt,
-    }));
-  }
-  return s.steps.map((step, i) => ({
-    id: `step${i}`,
-    prompt: step,
-    chatPrompt: chatPromptForStep(step, i),
-  }));
+  const body = s.coach?.length
+    ? s.coach.map((prompt, i) => ({
+        id: `q${i}`,
+        prompt,
+        chatPrompt: prompt,
+      }))
+    : s.steps.map((step, i) => ({
+        id: `step${i}`,
+        prompt: step,
+        chatPrompt: chatPromptForStep(step, i),
+      }));
+  return [...PERSONALIZE_PREFIX, ...body];
 }
 
 export function buildStrategyApplyOpener(
@@ -106,8 +127,18 @@ export function strategyApplyContextHint(
 
 function buildPlan(session: StrategyApplySession): string {
   const s = getStrategy(session.strategyId);
+  const situation = session.answers["confirm-problem"]?.trim();
+  const outcome = session.answers["desired-outcome"]?.trim();
+  const constraints = session.answers["constraints"]?.trim();
   const lines = [
     `Applying ${session.title}`,
+    "",
+    situation ? `Your situation\n${situation}` : null,
+    outcome ? `Desired outcome\n${outcome}` : null,
+    constraints ? `Constraints to respect\n${constraints}` : null,
+    s
+      ? `Why this fits\n${s.whyWorks}`
+      : null,
     "",
     "Your answers",
     ...session.questions.map((q) => {
@@ -115,12 +146,17 @@ function buildPlan(session: StrategyApplySession): string {
       return `${q.prompt}\n${a}`;
     }),
     "",
-    "Your next move",
-  ];
+    "Personalized next moves",
+  ].filter((line): line is string => line != null);
 
   if (s?.steps.length) {
     lines.push(
       ...s.steps.map((step, i) => `${i + 1}. ${step}`),
+      "",
+      `First action: ${s.steps[0]}`,
+      "",
+      "Success signs: the next step is obvious, and you can name one completed move.",
+      "Review point: check in after the first action — keep, shrink, or adapt.",
       "",
       "Start with step 1 — even a rough version counts.",
     );
