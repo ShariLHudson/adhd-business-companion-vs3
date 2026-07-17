@@ -3,8 +3,8 @@
 **Status:** `unit_verified` · authenticated preview rows **Pending**  
 **Do not deploy production** until authenticated live checklist passes.
 
-**Preview:** _(fill after deploy)_  
-**Commit:** _(fill after commit)_
+**Preview:** https://adhd-business-companion-vs3-1cv2v05yh-shari-hudsons-projects.vercel.app  
+**Commit:** `2e877ff5`
 
 ## Root causes
 
