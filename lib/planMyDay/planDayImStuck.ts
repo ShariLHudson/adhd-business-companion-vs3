@@ -39,6 +39,17 @@ export function buildPlanDayImStuckQuestion(
       ? ` Right now you noted ${capacityBits.join(", ")}.`
       : "";
 
+  const stage = detail.activeStep?.trim().toLowerCase() ?? "";
+  if (stage === "planned" || stage === "started") {
+    return `You’re looking at today’s plan.${planLine}${capacityLine} Would it help to shrink the list, pick a gentler first step, or move something to later?`;
+  }
+  if (stage === "constraints") {
+    return `You’re shaping today’s plan.${planLine}${capacityLine} Is the hard part estimating time, naming your energy, or deciding what can wait?`;
+  }
+  if (titles.length > 3) {
+    return `Today’s list is getting full.${planLine}${capacityLine} Would it help to choose one main focus, park a few items, or start with a five-minute win?`;
+  }
+
   return `You’re in Plan My Day, and it looks like choosing what comes first is the hard part.${planLine}${capacityLine} Is the problem too many tasks, not enough time, low energy, or not knowing what matters most?`;
 }
 

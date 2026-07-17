@@ -14,6 +14,18 @@ describe("morningConversation", () => {
     ).toEqual(["Finish ecosystem", "Call the doctor", "Grocery shopping"]);
   });
 
+  it("parses comma-separated Plan My Day captures into separate tasks", () => {
+    expect(
+      parseMindCapture(
+        "work on adhd app, pick up groceries/meds, water plants",
+      ),
+    ).toEqual([
+      "work on adhd app",
+      "pick up groceries/meds",
+      "water plants",
+    ]);
+  });
+
   it("builds priorities from judgment with remainder buckets", () => {
     const memory = mapFixtureToCompanionMemory(NORMAL_TUESDAY);
     const { judgment } = CompanionBrain.runReasoningCycle(memory);

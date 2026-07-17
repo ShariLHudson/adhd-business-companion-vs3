@@ -11,6 +11,7 @@ import {
   isMeaningfulPlanItem,
   isPlanItemActive,
   loadTodayPlanItems,
+  parseMindCapture,
   readTodayPlanItems,
   movePlanItemKanban,
   finishPlanItem,
@@ -1037,7 +1038,14 @@ export function PlanMyDayPanel({
           >
             <div className="mt-6 flex flex-col gap-8 pb-10">
               <PlanDaySimpleAdd
-                onAdd={(title) => handleAdd({ title, column: "today" })}
+                onAdd={(raw) => {
+                  const titles = parseMindCapture(raw);
+                  const parts = titles.length > 0 ? titles : [raw.trim()];
+                  for (const title of parts) {
+                    if (!title) continue;
+                    handleAdd({ title, column: "today" });
+                  }
+                }}
               />
               <PlanDaySimpleList
                 items={listItems}

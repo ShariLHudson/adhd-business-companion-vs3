@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AdaptMyDayCheckIn } from "@/components/companion/AdaptMyDayCheckIn";
 import { PlanDaySimpleAdd } from "@/components/companion/PlanDaySimpleAdd";
 import { PlanDaySimpleList } from "@/components/companion/PlanDaySimpleList";
+import { PlanMyDayCompleteWorkflow } from "@/components/companion/PlanMyDayCompleteWorkflow";
 import { PlanMyDayMorningRoomShell } from "@/components/companion/PlanMyDayMorningRoomShell";
 import {
   applyAdaptedDayProposal,
@@ -22,13 +23,16 @@ import {
   requestPlanDayImStuck,
 } from "@/lib/planMyDay/planDayImStuck";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
+import { parseMindCapture } from "@/lib/planMyDay/morningConversation";
 import {
-  addQuickPlanItem,
+  addQuickPlanItems,
   deletePlanItem,
   finishPlanItem,
   isMeaningfulPlanItem,
+  loadPlanWorkflowState,
   loadTodayPlanItems,
   PLAN_MY_DAY_UPDATED,
+  savePlanWorkflowState,
   updatePlanItem,
   type PlanDayItem,
 } from "@/lib/planMyDay";
@@ -76,7 +80,11 @@ function SharedHowDoI() {
   );
 }
 
-function PlanChildContent() {
+function PlanChildContent({
+  onOpenAdapt,
+}: {
+  onOpenAdapt: () => void;
+}) {
   const [items, setItems] = useState<PlanDayItem[]>([]);
 
   useEffect(() => {
@@ -95,34 +103,70 @@ function PlanChildContent() {
       className="mt-4 flex flex-col gap-8 pb-6"
       data-testid="plan-adapt-shared-plan-content"
     >
-      <PlanDaySimpleAdd
-        onAdd={(title) => {
-          setItems(addQuickPlanItem(title, items));
-        }}
-      />
-      <PlanDaySimpleList
-        items={listItems}
-        onComplete={(id) => {
-          const result = finishPlanItem(items, id);
-          if (result) setItems(result.items);
-        }}
-        onEdit={(id, title) => {
-          setItems(updatePlanItem(items, id, { title }));
-        }}
-        onDelete={(id) => {
-          setItems(deletePlanItem(items, id));
-        }}
-      />
-      <button
-        type="button"
-        onClick={() =>
-          requestPlanDayImStuck(listItems.map((item) => item.title))
+      <div data-testid="plan-day-section-todays-list">
+        <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
+          Today&apos;s List
+        </h2>
+        <PlanDaySimpleAdd
+          onAdd={(raw) => {
+            const titles = parseMindCapture(raw);
+            const toAdd = titles.length > 0 ? titles : [raw.trim()];
+            const next = addQuickPlanItems(toAdd, items);
+            setItems(next);
+            const prior = loadPlanWorkflowState();
+            savePlanWorkflowState({
+              ...prior,
+              sourceInputs: [...prior.sourceInputs, raw.trim()].filter(Boolean),
+              stage:
+                prior.stage === "planned" || prior.stage === "started"
+                  ? prior.stage
+                  : "capture",
+            });
+          }}
+        />
+        <div className="mt-6">
+          <PlanDaySimpleList
+            items={listItems}
+            onComplete={(id) => {
+              const result = finishPlanItem(items, id);
+              if (result) setItems(result.items);
+            }}
+            onEdit={(id, title) => {
+              setItems(updatePlanItem(items, id, { title }));
+            }}
+            onDelete={(id) => {
+              setItems(deletePlanItem(items, id));
+            }}
+          />
+        </div>
+      </div>
+
+      <PlanMyDayCompleteWorkflow
+        items={items}
+        onItemsChange={setItems}
+        onOpenAdapt={onOpenAdapt}
+        onImStuck={(extras) =>
+          requestPlanDayImStuck(
+            listItems.map((item) => item.title),
+            extras,
+          )
         }
-        className="self-start rounded-xl border border-[#c9bfb0] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f5f0ea]"
-        data-testid="plan-day-im-stuck"
-      >
-        {PLAN_DAY_IM_STUCK_BUTTON_LABEL}
-      </button>
+      />
+
+      {listItems.length === 0 ? (
+        <button
+          type="button"
+          onClick={() =>
+            requestPlanDayImStuck(listItems.map((item) => item.title), {
+              activeStep: "capture",
+            })
+          }
+          className="self-start rounded-xl border border-[#c9bfb0] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f5f0ea]"
+          data-testid="plan-day-im-stuck"
+        >
+          {PLAN_DAY_IM_STUCK_BUTTON_LABEL}
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -277,7 +321,9 @@ export function PlanAdaptSharedWindow({
           </div>
         </div>
 
-        {activeChild === "plan" ? <PlanChildContent /> : null}
+        {activeChild === "plan" ? (
+          <PlanChildContent onOpenAdapt={() => setActiveChild("adapt")} />
+        ) : null}
 
         {activeChild === "adapt" ? (
           <div

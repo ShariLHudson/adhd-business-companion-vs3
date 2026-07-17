@@ -1108,3 +1108,31 @@ export function addQuickPlanItem(
   };
   return saveTodayPlanItems([...items, next]);
 }
+
+/**
+ * Add multiple parsed titles at once. Skips empty/duplicate titles (case-insensitive).
+ */
+export function addQuickPlanItems(
+  titles: string[],
+  existingItems?: PlanDayItem[],
+): PlanDayItem[] {
+  let items =
+    existingItems && existingItems.length >= readTodayPlanItems().length
+      ? existingItems
+      : readTodayPlanItems();
+  const seen = new Set(
+    items.map((item) => item.title.trim().toLowerCase()).filter(Boolean),
+  );
+  for (const title of titles) {
+    const trimmed = title.trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    items = addQuickPlanItem(
+      { title: trimmed, column: "today", source: "manual" },
+      items,
+    );
+  }
+  return items;
+}

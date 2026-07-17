@@ -41,6 +41,10 @@ export type MorningResultsPresentation = {
 };
 
 /** Parse a focused morning capture — not a brain dump stream. */
+/**
+ * Split a capture into candidate tasks.
+ * Preserves wording; splits on newlines, bullets, semicolons, and comma lists.
+ */
 export function parseMindCapture(text: string): string[] {
   const normalized = text.replace(/\r\n/g, "\n").trim();
   if (!normalized) return [];
@@ -49,13 +53,22 @@ export function parseMindCapture(text: string): string[] {
     .split(/\n+/)
     .flatMap((line) =>
       line
-        .split(/(?:^|[\n,;])\s*[-•*]\s+/)
-        .flatMap((part) => part.split(/,\s+(?=[A-Za-z])/)),
+        .split(/(?:^|\n)\s*[-•*]\s+/)
+        .flatMap((part) => part.split(/\s*;\s*/))
+        .flatMap((part) => part.split(/,\s+/)),
     )
     .map((part) => part.trim().replace(/^[-•*]\s*/, ""))
     .filter(Boolean);
 
-  return [...new Set(chunks)];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const chunk of chunks) {
+    const key = chunk.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(chunk);
+  }
+  return out;
 }
 
 function starsForIndex(index: number): 1 | 2 | 3 {
