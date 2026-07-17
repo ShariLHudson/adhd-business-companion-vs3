@@ -45,7 +45,19 @@ describe("shared My Day windows (103–105)", () => {
     expect(source).toContain("AdaptMyDayCheckIn");
     expect(source).toContain("PlanDaySimpleAdd");
     expect(source).toContain("plan-adapt-shared-how-do-i-toggle");
+    expect(source).toContain("md:grid-cols-2");
+    expect(source).toContain("plan-adapt-open-plan");
+    expect(source).toContain("plan-adapt-open-adapt");
+    expect(source).toContain("PLAN_MY_DAY_ITEM.supports");
+    expect(source).toContain("ADAPT_MY_DAY_ITEM.supports");
     expect(source).not.toContain("reminders-how-do-i");
+  });
+
+  it("Plan/Adapt copy includes supports lists and open labels", () => {
+    expect(PLAN_MY_DAY_ITEM.openLabel).toBe("Open Plan My Day");
+    expect(ADAPT_MY_DAY_ITEM.openLabel).toBe("Open Adapt My Day");
+    expect(PLAN_MY_DAY_ITEM.supports.length).toBeGreaterThan(3);
+    expect(ADAPT_MY_DAY_ITEM.supports.length).toBeGreaterThan(3);
   });
 
   it("RemindersRhythmsEntrancePanel is a shared window with inline content", () => {

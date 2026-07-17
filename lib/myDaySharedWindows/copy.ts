@@ -10,6 +10,15 @@ export const PLAN_MY_DAY_ITEM = {
   label: "Plan My Day",
   description:
     "Build a realistic plan for your day from where you are starting now.",
+  supports: [
+    "reviewing commitments",
+    "choosing priorities",
+    "estimating available time",
+    "deciding what realistically fits",
+    "placing tasks into the day",
+    "creating a starting plan",
+  ] as const,
+  openLabel: "Open Plan My Day",
 };
 
 export const ADAPT_MY_DAY_ITEM = {
@@ -17,6 +26,16 @@ export const ADAPT_MY_DAY_ITEM = {
   label: "Adapt My Day",
   description:
     "Adjust the plan you already have when your energy, motivation, time, or priorities change.",
+  supports: [
+    "low energy",
+    "low motivation",
+    "interruptions",
+    "changing priorities",
+    "falling behind",
+    "reduced time",
+    "reshaping the current day without starting over",
+  ] as const,
+  openLabel: "Open Adapt My Day",
 };
 
 export const REMINDER_ITEM = {

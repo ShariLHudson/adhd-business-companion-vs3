@@ -67,6 +67,13 @@ import {
 } from "@/lib/strategyReflections";
 import { MENU_LIST_LABEL, MENU_TEXT } from "@/lib/menuNavStyles";
 import { AppBackButton } from "@/components/companion/AppBackButton";
+import {
+  STRATEGY_LIBRARY_HOW_DO_I,
+  STRATEGY_LIBRARY_MODE_CHOICES,
+  STRATEGY_LIBRARY_SUBTITLE,
+  STRATEGY_LIBRARY_TITLE,
+  type StrategyLibraryModeId,
+} from "@/lib/strategyLibrary/estateCopy";
 
 type View =
   | { v: "home" }
@@ -107,6 +114,7 @@ export function StrategiesPanel({
   businessStrategyDraft,
   onDismissBusinessBuild,
   onTalkBusinessWithShari,
+  presentation = "workspace",
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
@@ -131,8 +139,14 @@ export function StrategiesPanel({
   businessStrategyDraft?: { typeLabel: string; draft: string } | null;
   onDismissBusinessBuild?: () => void;
   onTalkBusinessWithShari?: () => void;
+  /** Estate destination presentation (no split-workspace chrome). */
+  presentation?: "workspace" | "estate";
 }) {
+  const estate = presentation === "estate";
   const [view, setView] = useState<View>({ v: "home" });
+  const [libraryMode, setLibraryMode] =
+    useState<StrategyLibraryModeId>("browse");
+  const [howDoIOpen, setHowDoIOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [hubOpen, setHubOpen] = useState<Record<string, boolean>>(() =>
     initialCollapsedSectionMap("adhd", "business", "recommended", "saved"),
@@ -280,6 +294,27 @@ export function StrategiesPanel({
     setBusinessPick("");
   }
 
+  function selectLibraryMode(mode: StrategyLibraryModeId) {
+    setLibraryMode(mode);
+    if (mode === "browse") {
+      if (view.v !== "home") goToView({ v: "home" });
+      return;
+    }
+    if (mode === "apply") {
+      goToView({ v: "recommended" });
+      return;
+    }
+    if (mode === "create") {
+      goToView({ v: "new" });
+      return;
+    }
+    if (strategyApplySession?.strategyId) {
+      goToView({ v: "strategy", stratId: strategyApplySession.strategyId });
+      return;
+    }
+    goToView({ v: "saved" });
+  }
+
   useEffect(() => {
     if (!openCommand?.key) return;
     if (openCommand.openView) {
@@ -314,16 +349,100 @@ export function StrategiesPanel({
     const saved = getUserStrategies();
     const savedCount = saved.length;
 
+    const shellClass = estate
+      ? "companion-fade-in flex min-h-0 w-full flex-col"
+      : workspacePanelShellClass({ width: "standard", inSplit: true });
+    const cardClass = estate
+      ? "w-full rounded-xl border border-[#d4cdc3] bg-white px-4 py-3.5 text-left hover:border-[#1e4f4f]/40"
+      : "w-full rounded-lg border border-[#d4cdc3] bg-white px-3 py-2.5 text-left hover:border-[#1e4f4f]/40";
+    const cardTitleClass = estate
+      ? "text-base font-semibold text-[#1f1c19]"
+      : "text-sm font-semibold text-[#1f1c19]";
+    const cardSubClass = estate
+      ? "mt-1 block text-sm text-[#6b635a]"
+      : "mt-0.5 block text-xs text-[#6b635a]";
+
     return (
-      <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
-        <WorkspaceAreaWorksGuide areaId="playbook" />
+      <div
+        className={shellClass}
+        data-testid="strategies-panel-home"
+        data-presentation={presentation}
+      >
+        {estate ? null : <WorkspaceAreaWorksGuide areaId="playbook" />}
         {dockedPlan}
-        <p className="text-2xl font-semibold text-[#1f1c19]">
-          ADHD Entrepreneur Strategy Library
+        <p
+          className={
+            estate
+              ? "plan-day-morning-note__title text-3xl font-semibold text-[#1f1c19]"
+              : "text-2xl font-semibold text-[#1f1c19]"
+          }
+          data-testid="strategy-library-title"
+        >
+          {STRATEGY_LIBRARY_TITLE}
         </p>
-        <p className="mt-1 text-base text-[#6b635a]">
-          Browse proven strategies for real problems — or build your own custom strategy with Shari.
-        </p>
+        <p className="mt-1 text-base text-[#6b635a]">{STRATEGY_LIBRARY_SUBTITLE}</p>
+
+        {estate ? (
+          <>
+            <div
+              className="plan-day-how-do-i mt-3"
+              data-testid="strategy-library-how-do-i"
+            >
+              <button
+                type="button"
+                onClick={() => setHowDoIOpen((v) => !v)}
+                className="plan-day-how-do-i__toggle inline-flex items-center gap-1.5 text-sm font-semibold text-[#1e4f4f] transition-colors hover:text-[#163c3c] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
+                aria-expanded={howDoIOpen}
+                data-testid="strategy-library-how-do-i-toggle"
+              >
+                How Do I…
+                <span aria-hidden="true" className="text-xs font-bold">
+                  {howDoIOpen ? "−" : "+"}
+                </span>
+              </button>
+              {howDoIOpen ? (
+                <p
+                  className="plan-day-how-do-i__body mt-2 max-w-xl whitespace-pre-line text-sm leading-relaxed text-[#4b463f]"
+                  data-testid="strategy-library-how-do-i-body"
+                >
+                  {STRATEGY_LIBRARY_HOW_DO_I}
+                </p>
+              ) : null}
+            </div>
+
+            <div
+              className="mt-4 grid gap-3 sm:grid-cols-2"
+              role="group"
+              aria-label="Strategy Library modes"
+              data-testid="strategy-library-mode-choices"
+            >
+              {STRATEGY_LIBRARY_MODE_CHOICES.map((mode) => {
+                const selected = libraryMode === mode.id;
+                return (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => selectLibraryMode(mode.id)}
+                    className={
+                      selected
+                        ? "rounded-2xl border-2 border-[#1e4f4f] bg-white px-4 py-3 text-left shadow-sm"
+                        : "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-3 text-left transition-colors"
+                    }
+                    aria-pressed={selected}
+                    data-testid={`strategy-library-mode-${mode.id}`}
+                  >
+                    <span className="block text-base font-semibold text-[#1f1c19]">
+                      {mode.label}
+                    </span>
+                    <span className="mt-1 block text-sm leading-relaxed text-[#4b463f]">
+                      {mode.description}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </>
+        ) : null}
 
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="rounded-full bg-[#f0f5f5] px-3 py-1 text-sm font-semibold text-[#1e4f4f]">
@@ -350,6 +469,7 @@ export function StrategiesPanel({
           onChange={(e) => setSearch(e.target.value)}
           placeholder={`Search by problem — e.g. "I can't get started" or "sales"`}
           className="mt-4 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
+          data-testid="strategy-library-search"
         />
 
         {q && searchResults.length > 0 ? (
@@ -363,10 +483,10 @@ export function StrategiesPanel({
                   <button
                     type="button"
                     onClick={() => goToView({ v: "strategy", stratId: r.strategyId })}
-                    className="w-full rounded-lg border border-[#d4cdc3] bg-white px-3 py-2.5 text-left hover:border-[#1e4f4f]/40"
+                    className={cardClass}
                   >
-                    <span className="text-sm font-semibold text-[#1f1c19]">{r.title}</span>
-                    <span className="mt-0.5 block text-xs text-[#6b635a]">{r.subtitle}</span>
+                    <span className={cardTitleClass}>{r.title}</span>
+                    <span className={cardSubClass}>{r.subtitle}</span>
                   </button>
                 </li>
               ))}
@@ -388,12 +508,11 @@ export function StrategiesPanel({
                 <button
                   type="button"
                   onClick={() => goToView({ v: "strategy", stratId: pop.strategyId })}
-                  className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-3 py-2.5 text-left hover:border-[#1e4f4f]/40"
+                  className={cardClass}
+                  data-testid={`strategy-library-popular-${pop.id}`}
                 >
-                  <span className="text-sm font-semibold text-[#1f1c19]">
-                    ⭐ {pop.label}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-[#6b635a]">{pop.problem}</span>
+                  <span className={cardTitleClass}>⭐ {pop.label}</span>
+                  <span className={cardSubClass}>{pop.problem}</span>
                 </button>
               </li>
             ))}

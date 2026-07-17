@@ -117,6 +117,18 @@ const RemindersRhythmsEntrancePanel = dynamic(
     ),
   },
 );
+const StrategyLibraryEstatePanel = dynamic(
+  () =>
+    import("@/components/companion/StrategyLibraryEstatePanel").then((mod) => ({
+      default: mod.StrategyLibraryEstatePanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Strategy Library…" size="md" />
+    ),
+  },
+);
 const RemindersRoomPanel = dynamic(
   () =>
     import("@/components/companion/RemindersRoomPanel").then((mod) => ({
@@ -11305,25 +11317,24 @@ export default function CompanionPageClient() {
     setDecisionCompassPrefill(null);
   }
 
-  /** Get Advice → Strategy Library (canonical Welcome Home destination). */
+  /** Get Advice → Strategy Library (Spark Estate destination — not split workspace). */
   function openStrategyLibraryCore(opts?: {
     openView?: "home" | "adhd" | "business" | "saved" | "recommended";
     strategyId?: string;
   }) {
-    setActiveSection("home");
-    activeSectionRef.current = "home";
-    setActiveNav("playbook");
-    patchWorkspacePanel("playbook");
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
     setCompanionStandaloneSection(null);
     setWorkspaceFirstSplit(false);
-    applyChatLayoutMode("split");
-    revealWorkspace();
-    setCoachingMode("playbook");
     setStrategyPanelCommand({
       key: Date.now(),
       openView: opts?.openView ?? "home",
       strategyId: opts?.strategyId,
     });
+    trackWorkspaceEcosystemEvent("playbook");
+    noteWorkspaceOpened("playbook", "standalone_room");
+    openStandaloneFocusSectionCore("playbook");
   }
 
   function startBusinessStrategyBuilder(typeLabel: string) {
@@ -11331,16 +11342,18 @@ export default function CompanionPageClient() {
     setStrategyApplySession(null);
     clearStrategyApplySession();
     setStrategyPanelCommand(null);
-    setActiveSection("home");
-    activeSectionRef.current = "home";
-    setActiveNav("playbook");
-    patchWorkspacePanel("playbook");
     setCompanionStandaloneSection(null);
     setWorkspaceFirstSplit(false);
-    applyChatLayoutMode("split");
-    revealWorkspace();
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
     workspaceCoachSeededRef.current = null;
-    setCoachingMode("playbook");
+    if (activeSectionRef.current !== "playbook") {
+      noteWorkspaceOpened("playbook", "standalone_room");
+      openStandaloneFocusSectionCore("playbook");
+    } else {
+      setActiveNav("playbook");
+    }
+    setEstateRoomChatVisible(true);
     const { session, opener } = bootstrapBusinessStrategySession(typeLabel);
     setBusinessStrategySession(session);
     setMessages((prev) => [...prev, { role: "assistant", content: opener }]);
@@ -11380,18 +11393,18 @@ export default function CompanionPageClient() {
   function startStrategyApplyCoach(strategyId: string) {
     setBusinessStrategyDraft(null);
     setBusinessStrategySession(null);
-    setActiveSection("home");
-    activeSectionRef.current = "home";
-    setActiveNav("playbook");
-    if (workspacePanel !== "playbook") {
-      patchWorkspacePanel("playbook");
-    }
     setCompanionStandaloneSection(null);
     setWorkspaceFirstSplit(false);
-    applyChatLayoutMode("split");
-    revealWorkspace();
-    setCoachingMode("playbook");
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
     setStrategyPanelCommand({ key: Date.now(), strategyId });
+    if (activeSectionRef.current !== "playbook") {
+      noteWorkspaceOpened("playbook", "standalone_room");
+      openStandaloneFocusSectionCore("playbook");
+    } else {
+      setActiveNav("playbook");
+    }
+    setEstateRoomChatVisible(true);
 
     const boot = bootstrapStrategyApplySession(strategyId, {
       activeProjectName: pickActiveProjectName(),
@@ -11544,15 +11557,56 @@ export default function CompanionPageClient() {
           setBusinessStrategySession(null);
         }}
         onTalkBusinessWithShari={() => {
-          applyChatLayoutMode("split");
-          revealWorkspace();
+          setEstateRoomChatVisible(true);
           requestChatInputFocus();
           if (businessStrategyDraft) {
             setMessages((prev) => [
               ...prev,
               {
                 role: "assistant",
-                content: `Your **${businessStrategyDraft.typeLabel}** outline is beside us. What should we flesh out first — weekly breakdown, content ideas, messaging, or something else?`,
+                content: `Your **${businessStrategyDraft.typeLabel}** outline is ready. What should we flesh out first — weekly breakdown, content ideas, messaging, or something else?`,
+              },
+            ]);
+          }
+        }}
+      />
+    );
+  }
+
+  function renderStrategyLibraryEstate(extra?: {
+    registerBack?: (fn: (() => boolean) | null) => void;
+  }) {
+    return (
+      <StrategyLibraryEstatePanel
+        onBack={goBack}
+        registerBack={extra?.registerBack}
+        onOpen={openWorkspaceFromSection}
+        onAsk={handlePlaybookAsk}
+        onContextChange={handleWorkspaceDetailChange}
+        onStartBusinessStrategy={startBusinessStrategyBuilder}
+        onStartStrategyApply={startStrategyApplyCoach}
+        onOpenActivity={handleStrategiesOpenActivity}
+        openCommand={strategyPanelCommand}
+        strategyApplySession={strategyApplySession}
+        onDismissStrategyApply={() => {
+          setStrategyApplySession(null);
+          clearStrategyApplySession();
+        }}
+        businessStrategySession={businessStrategySession}
+        businessStrategyDraft={businessStrategyDraft}
+        onDismissBusinessBuild={() => {
+          setBusinessStrategyDraft(null);
+          setBusinessStrategySession(null);
+        }}
+        onTalkBusinessWithShari={() => {
+          setEstateRoomChatVisible(true);
+          requestChatInputFocus();
+          if (businessStrategyDraft) {
+            setMessages((prev) => [
+              ...prev,
+              {
+                role: "assistant",
+                content: `Your **${businessStrategyDraft.typeLabel}** outline is ready. What should we flesh out first — weekly breakdown, content ideas, messaging, or something else?`,
               },
             ]);
           }
@@ -22266,9 +22320,11 @@ export default function CompanionPageClient() {
    */
   const showSparkEstateGuideChrome =
     estateGuideFlipbookOpen && overlay !== "signin" && !justBeHereSession;
-  /** Spark Note chrome — independent of the Estate Guide launcher. */
+  /** Spark Note chrome — hide while Strategy Library estate destination is open. */
   const showSparkNoteChrome =
-    overlay !== "signin" && !justBeHereSession;
+    overlay !== "signin" &&
+    !justBeHereSession &&
+    activeSection !== "playbook";
 
   const clearMyMindWorkspaceActive =
     activeSection === "brain-dump" || isClearMyMindModeActive();
@@ -24507,14 +24563,8 @@ export default function CompanionPageClient() {
             </WorkspaceShell>
           )}
 
-          {activeSection === "playbook" && (
-            <WorkspaceShell
-              assistLabel={getShariAssistLabel("playbook")}
-              onAskShari={() => openCompanionAssist("playbook")}
-            >
-              {renderPlaybookPanel({ registerBack })}
-            </WorkspaceShell>
-          )}
+          {activeSection === "playbook" &&
+            renderStrategyLibraryEstate({ registerBack })}
 
           {activeSection === "how-do-i" && (
             <WorkspaceShell

@@ -26,6 +26,7 @@ export const ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS = [
   "focus-audio",
   "games",
   "quick-recharge",
+  "playbook",
 ] as const satisfies readonly AppSection[];
 
 export function isEstateCoreFullBleedPanelSection(

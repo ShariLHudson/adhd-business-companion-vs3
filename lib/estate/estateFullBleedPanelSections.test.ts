@@ -14,11 +14,22 @@ describe("estateFullBleedPanelSections", () => {
     expect(isEstateFullBleedPanelSection("visual-focus")).toBe(true);
   });
 
+  it("includes Destination Gallery as full-bleed immersive room", () => {
+    expect(ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS).toContain("destination-gallery");
+    expect(isEstateFullBleedPanelSection("destination-gallery")).toBe(true);
+  });
+
   it("includes Round Table Boardroom as full-bleed", () => {
     expect(isEstateFullBleedPanelSection("boardroom")).toBe(true);
+  });
+
+  it("includes Strategy Library (playbook) as full-bleed estate destination", () => {
+    expect(ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS).toContain("playbook");
+    expect(isEstateFullBleedPanelSection("playbook")).toBe(true);
   });
 
   it("does not treat generic home as full-bleed", () => {
     expect(isEstateFullBleedPanelSection("home")).toBe(false);
   });
 });
+
