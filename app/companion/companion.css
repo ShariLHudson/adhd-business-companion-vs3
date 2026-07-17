@@ -10146,6 +10146,22 @@
   background: transparent;
 }
 
+/**
+ * Create / Plan My Day / Strategy / Reminders / etc.
+ * Tailwind min-h-[100dvh] on the full-bleed frame makes height indefinite, so
+ * the room scrollport never engages and lower controls get clipped (look “dead”).
+ * Bound the host so `.plan-my-day-morning-room__scroll` owns vertical scroll.
+ */
+.companion-plan-my-day-active .clear-my-mind-standalone-shell,
+.companion-plan-my-day-active .clear-my-mind-standalone-frame {
+  display: flex;
+  flex-direction: column;
+  min-height: 0 !important;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
 .plan-my-day-panel--standalone.companion-workspace-shell {
   background: transparent;
 }

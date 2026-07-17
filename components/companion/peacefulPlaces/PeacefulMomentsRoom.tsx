@@ -11,6 +11,10 @@ import { CinematicBackground } from "@/components/companion/scene/CinematicBackg
 import { PEACEFUL_PLACES_PATHWAY_BG } from "@/lib/peacefulPlaces/pathway";
 import { stopGardenCardAmbience } from "@/lib/peacefulPlaces/gardenCardAmbience";
 import { stopGardenFlagAmbience } from "@/lib/peacefulPlaces/gardenFlagAmbience";
+import {
+  registerEstateMediaStopper,
+  stopAllAudio,
+} from "@/lib/estate/stopAllAudio";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
@@ -25,9 +29,14 @@ type Props = {
   backLabel?: string;
 };
 
+const CTRL =
+  "rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#1f1c19] shadow-sm transition-colors hover:border-[#1e4f4f] hover:bg-[#f3f7f7] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f] disabled:cursor-not-allowed disabled:opacity-50";
+const CTRL_PRIMARY =
+  "rounded-xl bg-[#1e4f4f] px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#163d3d] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f] disabled:cursor-not-allowed disabled:opacity-50";
+
 /**
  * Peaceful Moments — woodland pathway + one music dropdown + playback controls.
- * Not a destination chooser, script, or Soundscapes ambient list.
+ * Sound is opt-in: select a track, then press Play. No autoplay.
  */
 export function PeacefulMomentsRoom({
   onDone,
@@ -41,13 +50,34 @@ export function PeacefulMomentsRoom({
   const [selected, setSelected] = useState<ExperienceSoundscapeTrack | null>(
     null,
   );
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const [volume, setVolume] = useState(0.8);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
+
+  const stopLocalAudio = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    try {
+      audio.currentTime = 0;
+    } catch {
+      /* ignore */
+    }
+    setIsPlaying(false);
+  }, []);
 
   useEffect(() => {
     preloadRoomBackground(PEACEFUL_PLACES_PATHWAY_BG);
     void stopGardenFlagAmbience();
     void stopGardenCardAmbience();
   }, []);
+
+  useEffect(() => {
+    return registerEstateMediaStopper(() => {
+      stopLocalAudio();
+    });
+  }, [stopLocalAudio]);
 
   useEffect(() => {
     return () => {
@@ -58,6 +88,13 @@ export function PeacefulMomentsRoom({
       audio.load();
     };
   }, []);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = muted ? 0 : volume;
+    audio.muted = muted;
+  }, [volume, muted]);
 
   const closeDropdown = useCallback(() => setDropdownOpen(false), []);
 
@@ -84,14 +121,53 @@ export function PeacefulMomentsRoom({
     setPlaybackError(null);
     setSelected(track);
     setDropdownOpen(false);
+    setIsPlaying(false);
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
     audio.src = track.src;
     audio.load();
+    // Selecting a track must not start playback — Play is deliberate.
   }, []);
 
+  const play = useCallback(async () => {
+    const audio = audioRef.current;
+    if (!audio || !selected) return;
+    setPlaybackError(null);
+    try {
+      await audio.play();
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+      setPlaybackError(
+        "That piece could not play just now. Try another track, or try again in a moment.",
+      );
+    }
+  }, [selected]);
+
+  const pause = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.pause();
+    setIsPlaying(false);
+  }, []);
+
+  const stop = useCallback(() => {
+    stopLocalAudio();
+  }, [stopLocalAudio]);
+
+  const toggleMute = useCallback(() => {
+    setMuted((m) => !m);
+  }, []);
+
+  const handleLeave = useCallback(() => {
+    stopLocalAudio();
+    void stopAllAudio();
+    onDone?.();
+  }, [onDone, stopLocalAudio]);
+
   const handleAudioError = useCallback(() => {
+    setIsPlaying(false);
     setPlaybackError(
       "That piece could not play just now. Try another track, or try again in a moment.",
     );
@@ -111,12 +187,12 @@ export function PeacefulMomentsRoom({
         className="peaceful-moments-room__cinematic"
       />
 
-      <div className="relative z-10 flex h-full min-h-0 flex-col items-center px-4 pb-10 pt-6">
+      <div className="relative z-10 flex h-full min-h-0 flex-col items-center overflow-y-auto px-4 pb-10 pt-6">
         {onDone ? (
           <button
             type="button"
             className="plan-day-morning-note__previous self-start"
-            onClick={onDone}
+            onClick={handleLeave}
             data-testid="app-back-button"
             aria-label="Previous Screen"
           >
@@ -136,7 +212,7 @@ export function PeacefulMomentsRoom({
             Peaceful Moments
           </h1>
           <p className="mt-2 text-center text-base leading-relaxed text-[#4b463f]">
-            Choose a piece of music and listen.
+            Choose a piece of music, then press Play when you are ready.
           </p>
 
           <div className="relative mt-5">
@@ -144,7 +220,7 @@ export function PeacefulMomentsRoom({
               className="mb-2 block text-sm font-semibold uppercase tracking-wide text-[#6b635a]"
               htmlFor="peaceful-moments-music-trigger"
             >
-              Music
+              Choose Music
             </label>
             <button
               ref={triggerRef}
@@ -170,7 +246,7 @@ export function PeacefulMomentsRoom({
                 ref={listRef}
                 id={listboxId}
                 role="listbox"
-                aria-label="Peaceful Moments music"
+                aria-label="Choose Music"
                 className="absolute left-0 right-0 z-20 mt-2 max-h-64 overflow-y-auto overscroll-contain rounded-xl border border-[#c9bfb0] bg-white py-1 shadow-lg"
                 data-testid="peaceful-moments-music-list"
               >
@@ -202,24 +278,89 @@ export function PeacefulMomentsRoom({
           <div className="mt-5" data-testid="peaceful-moments-player">
             <audio
               ref={audioRef}
-              controls
               preload="metadata"
-              className="w-full"
+              className="sr-only"
               data-testid="peaceful-moments-audio"
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => setIsPlaying(false)}
               onError={handleAudioError}
             />
+
             {selected ? (
               <p
-                className="mt-2 text-center text-sm text-[#4b463f]"
+                className="text-center text-sm font-semibold text-[#1f1c19]"
                 data-testid="peaceful-moments-current-track"
               >
                 {selected.title}
               </p>
             ) : (
-              <p className="mt-2 text-center text-sm text-[#6b635a]">
-                Select a track above, then use play when you are ready.
+              <p className="text-center text-sm text-[#6b635a]">
+                Select a track above, then press Play when you are ready.
               </p>
             )}
+
+            <div
+              className="mt-3 flex flex-wrap justify-center gap-2"
+              data-testid="peaceful-moments-playback-controls"
+            >
+              <button
+                type="button"
+                className={CTRL_PRIMARY}
+                data-testid="peaceful-moments-play"
+                disabled={!selected || isPlaying}
+                onClick={() => void play()}
+              >
+                Play
+              </button>
+              <button
+                type="button"
+                className={CTRL}
+                data-testid="peaceful-moments-pause"
+                disabled={!selected || !isPlaying}
+                onClick={pause}
+              >
+                Pause
+              </button>
+              <button
+                type="button"
+                className={CTRL}
+                data-testid="peaceful-moments-stop"
+                disabled={!selected}
+                onClick={stop}
+              >
+                Stop
+              </button>
+              <button
+                type="button"
+                className={CTRL}
+                data-testid="peaceful-moments-mute"
+                aria-pressed={muted}
+                onClick={toggleMute}
+              >
+                {muted ? "Sound On" : "Sound Off"}
+              </button>
+            </div>
+
+            <label className="mt-4 flex items-center gap-3 text-sm text-[#4b463f]">
+              <span className="shrink-0 font-semibold">Volume</span>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={muted ? 0 : volume}
+                disabled={!selected}
+                data-testid="peaceful-moments-volume"
+                className="w-full accent-[#1e4f4f]"
+                onChange={(e) => {
+                  const next = Number(e.target.value);
+                  setVolume(next);
+                  if (next > 0 && muted) setMuted(false);
+                }}
+              />
+            </label>
+
             {playbackError ? (
               <p
                 className="mt-2 text-center text-sm text-[#8a4b3a]"
