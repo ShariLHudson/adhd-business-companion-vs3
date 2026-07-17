@@ -14,6 +14,7 @@ import {
   scrubAiVoiceFormatting,
   scrubAiVoicePhrases,
 } from "./sparkHumanVoice";
+import { scrubExpertAttribution } from "./expertKnowledgeBranding";
 
 export type HumanConversationViolation = {
   reason: string;
@@ -143,6 +144,12 @@ export function enforceHumanConversation(input: {
   const aiPhraseScrub = scrubAiVoicePhrases(message);
   if (aiPhraseScrub.rewritten) {
     message = aiPhraseScrub.text;
+    rewritten = true;
+  }
+
+  const expertScrub = scrubExpertAttribution(message, input.userText);
+  if (expertScrub.rewritten) {
+    message = expertScrub.text;
     rewritten = true;
   }
 

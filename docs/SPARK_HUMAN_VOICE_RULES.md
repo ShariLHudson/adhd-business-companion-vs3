@@ -61,6 +61,14 @@ Rewrite before sending:
 
 ---
 
+## Expert knowledge branding (Spec 136)
+
+See [SPARK_EXPERT_KNOWLEDGE_AND_BRANDING_RULE.md](./SPARK_EXPERT_KNOWLEDGE_AND_BRANDING_RULE.md).
+
+Synthesize world-class research into Spark Estate's voice. Do **not** name-drop experts at runtime ("According to…", "Covey says…") unless the member asks for a source or attribution is required.
+
+---
+
 ## Final voice check (before every response)
 
 1. Would a real person say this out loud?

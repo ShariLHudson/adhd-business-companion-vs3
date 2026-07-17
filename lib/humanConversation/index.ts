@@ -91,3 +91,11 @@ export {
   scrubAiVoicePhrases,
   type AiVoiceIssue,
 } from "./sparkHumanVoice";
+
+export {
+  SPARK_EXPERT_KNOWLEDGE_BRANDING_PROMPT,
+  memberRequestedExpertAttribution,
+  detectExpertAttributionIssues,
+  scrubExpertAttribution,
+  type ExpertAttributionIssue,
+} from "./expertKnowledgeBranding";

@@ -3,7 +3,10 @@
  * Authentic Shari voice; not AI-detector evasion.
  *
  * @see docs/SPARK_HUMAN_VOICE_RULES.md
+ * @see docs/SPARK_EXPERT_KNOWLEDGE_AND_BRANDING_RULE.md
  */
+
+import { SPARK_EXPERT_KNOWLEDGE_BRANDING_PROMPT } from "./expertKnowledgeBranding";
 
 export const SPARK_HUMAN_VOICE_PRINCIPLE =
   "Spark must never sound like generic AI. Sound like Shari talking naturally — warm, plainspoken, one thought at a time." as const;
@@ -218,6 +221,8 @@ VOICE GOAL:
 - No therapy-speak unless the moment truly calls for care
 
 NOT every conversation is therapeutic. Sometimes they want a timer, to print something, or to vent. Judgment beats excavation.
+
+${SPARK_EXPERT_KNOWLEDGE_BRANDING_PROMPT}
 
 ${SPARK_HUMAN_VOICE_FINAL_CHECK}` as const;
 
