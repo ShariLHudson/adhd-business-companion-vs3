@@ -43,7 +43,10 @@ So Welcome Home stayed semantically primary (`welcomeHomePrimary`) while Profile
 
 ## Preview
 
-- Pending deploy after commit
+- Preview commit: `06ebcc92`
+- Authenticated preview URL: https://adhd-business-companion-vs3-42bjbrviu-shari-hudsons-projects.vercel.app
+- Inspector: https://vercel.com/shari-hudsons-projects/adhd-business-companion-vs3/2eXKRj5dLTG8bxyXpRtQG6Pv2wu8
+- Overall: **unit_verified** · live authenticated **Pending** (`114` checklist)
 
 ## Deploy recommendation
 
