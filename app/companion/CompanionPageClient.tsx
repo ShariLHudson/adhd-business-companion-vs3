@@ -10412,15 +10412,19 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Room menu → Back to Estate.
+   * Authoritative Welcome Home return (106–108).
    * Always returns to the Welcome Home lobby (not everyday chat shell).
    * Leaving Evidence Vault starts a fresh chat — vault welcome must not linger.
    */
+  function returnToWelcomeHome(reason = "welcome home") {
+    returnToWelcomeHomeLobby(reason);
+  }
+
   function navigateBackToEstateHome() {
     const leavingEvidenceVault =
       activeSectionRef.current === "evidence-bank" ||
       directEstateVisitRef.current?.roomId === "evidence-vault";
-    returnToWelcomeHomeLobby("back to estate");
+    returnToWelcomeHome("welcome home");
     if (leavingEvidenceVault) {
       clearTodayContext({ preserveRoom: true, mode: "new-chat" });
       setFreshStartRevision((revision) => revision + 1);
@@ -22266,11 +22270,6 @@ export default function CompanionPageClient() {
   const showSparkNoteChrome =
     overlay !== "signin" && !justBeHereSession;
 
-  const showCompanionBackControl =
-    overlay !== "signin" &&
-    !justBeHereSession &&
-    !estatePlaceChromeActive;
-
   const clearMyMindWorkspaceActive =
     activeSection === "brain-dump" || isClearMyMindModeActive();
 
@@ -22294,6 +22293,18 @@ export default function CompanionPageClient() {
     profileEstateRoomOverlayId &&
       profileEstateRoomOverlayId !== "evidence-vault",
   );
+
+  /**
+   * Persistent top-left Welcome Home (106–108).
+   * Shown throughout Spark Estate; hidden only for sign-in and Just Be Here.
+   */
+  const showCompanionBackControl =
+    overlay !== "signin" &&
+    !justBeHereSession &&
+    (estatePlaceChromeActive ||
+      isEstateFullBleedPanelSection(activeSection) ||
+      estateGuideFlipbookOpen ||
+      Boolean(sparkEstateShellPlaceId));
 
   const activeSectionMenuRoomId =
     activeSection === "growth-journal"
@@ -22707,7 +22718,10 @@ export default function CompanionPageClient() {
           ) : null}
 
           {showCompanionBackControl ? (
-            <EstateImmersiveHomeLink onClick={handleCompanionBack} />
+            <EstateImmersiveHomeLink
+              label="Welcome Home"
+              onClick={handleCompanionBack}
+            />
           ) : null}
 
           {sparkEstateShellPlaceId ? (

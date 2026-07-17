@@ -46,12 +46,14 @@
   user-select: none;
 }
 
-/* In-room home control — fixed upper-left on every estate room */
+/* Persistent Welcome Home — above estate overlays / guide (106–108) */
 .estate-immersive-home-link {
   position: fixed;
   top: max(0.85rem, env(safe-area-inset-top, 0px));
   left: max(0.85rem, env(safe-area-inset-left, 0px));
-  z-index: 100001;
+  z-index: 100020;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
@@ -147,6 +149,16 @@
 }
 
 .companion-chamber-active .companion-bg-base {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.companion-create-active > .relative.flex.min-h-0 {
+  background: transparent;
+}
+
+.companion-create-active .companion-bg-base {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;

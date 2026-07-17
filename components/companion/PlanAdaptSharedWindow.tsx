@@ -16,6 +16,7 @@ import {
   PLAN_MY_DAY_ITEM,
   type PlanAdaptSharedChildId,
 } from "@/lib/myDaySharedWindows";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 import {
   PLAN_DAY_IM_STUCK_BUTTON_LABEL,
   requestPlanDayImStuck,
@@ -135,6 +136,12 @@ export function PlanAdaptSharedWindow({
   const [activeChild, setActiveChild] = useState<PlanAdaptSharedChildId | null>(
     initialChild,
   );
+
+  useDismissibleWindow({
+    open: true,
+    onClose: onBack,
+    closeOnEscape: true,
+  });
 
   useEffect(() => {
     setActiveChild(initialChild ?? null);

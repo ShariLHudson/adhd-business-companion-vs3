@@ -86,6 +86,7 @@ export function EstateRoomExperienceMenu({
   visible = true,
   withEstateMenu = false,
   embedded = false,
+  onBackToEstate,
   onExploreSpark,
   onOpenSparkEstateGuide,
   onReturnToExploreEstate,
@@ -532,6 +533,19 @@ export function EstateRoomExperienceMenu({
                         </span>
                       </button>
                     ) : null}
+
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                      aria-label="Welcome Home"
+                      data-testid="estate-return-to-estate"
+                      onClick={() => closeAndRun(onBackToEstate)}
+                    >
+                      <span className="estate-room-experience-menu__item-label">
+                        Welcome Home
+                      </span>
+                    </button>
                   </>
                 )}
               </div>

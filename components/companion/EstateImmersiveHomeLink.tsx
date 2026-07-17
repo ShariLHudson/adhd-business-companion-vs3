@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  BACK_TO_ESTATE,
+  WELCOME_HOME_NAV_LABEL,
   formatAppBackLabel,
   isEstateHomeDestination,
 } from "@/lib/navigationBack";
@@ -9,23 +9,23 @@ import {
 type Props = {
   onClick: () => void;
   className?: string;
-  /** Visible label — defaults to Back To Estate. */
+  /** Visible label — defaults to Welcome Home. */
   label?: string;
 };
 
 /**
- * Minimal back control for full-bleed estate rooms — no app chrome.
+ * Persistent top-left return control — always Welcome Home lobby.
  */
 export function EstateImmersiveHomeLink({
   onClick,
   className = "",
-  label = BACK_TO_ESTATE,
+  label = WELCOME_HOME_NAV_LABEL,
 }: Props) {
   const visibleLabel = isEstateHomeDestination(label)
-    ? BACK_TO_ESTATE
+    ? WELCOME_HOME_NAV_LABEL
     : label;
   const ariaLabel = isEstateHomeDestination(label)
-    ? BACK_TO_ESTATE
+    ? WELCOME_HOME_NAV_LABEL
     : formatAppBackLabel(label);
 
   return (

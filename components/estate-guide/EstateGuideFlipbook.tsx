@@ -19,6 +19,7 @@ import {
   expandEstateGuideToRoomSpreads,
   type EstateGuideRoomSpread,
 } from "@/lib/estate/estateGuidePages";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { EstateGuideRoomPage } from "./EstateGuideSpread";
 import "./estate-guide-flipbook.css";
 
@@ -147,13 +148,17 @@ export function EstateGuideFlipbook({
     };
   }, [open, resetBook, initialRoomId, roomSpreads]);
 
+  const { onBackdropClick, requestClose } = useDismissibleWindow({
+    open,
+    onClose,
+    closeOnEscape: true,
+  });
+
   useEffect(() => {
     if (!open) return;
     const handleKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
+      // Escape is owned by useDismissibleWindow (topmost-layer stack).
+      if (event.key === "Escape") return;
       if (phase !== "spread" || spreadFading) return;
       if (event.key === "ArrowRight" && spreadIndex < roomSpreads.length - 1) {
         goToSpread(spreadIndex + 1);
@@ -164,7 +169,7 @@ export function EstateGuideFlipbook({
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [open, onClose, phase, spreadFading, spreadIndex, roomSpreads.length, goToSpread]);
+  }, [open, phase, spreadFading, spreadIndex, roomSpreads.length, goToSpread]);
 
   useEffect(() => {
     if (!open || phase !== "spread") {
@@ -259,15 +264,17 @@ export function EstateGuideFlipbook({
       <button
         type="button"
         className="eg-flipbook__backdrop"
-        aria-label="Close guidebook"
-        onClick={onClose}
+        aria-label="Close Spark Estate Guide"
+        data-testid="estate-guide-backdrop"
+        onClick={(event) => onBackdropClick(event)}
       />
 
       <button
         type="button"
         className="eg-flipbook__close"
-        onClick={onClose}
-        aria-label="Close guide"
+        onClick={() => requestClose()}
+        aria-label="Close Spark Estate Guide"
+        data-testid="estate-guide-close"
       >
         <span aria-hidden="true">×</span>
       </button>

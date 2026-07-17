@@ -14,6 +14,7 @@ import {
   type RemindersRhythmsSharedChildId,
 } from "@/lib/myDaySharedWindows";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 const CARD =
   "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-4 text-left transition-colors";
@@ -76,6 +77,12 @@ export function RemindersRhythmsEntrancePanel({
 }: Props) {
   const [activeChild, setActiveChild] =
     useState<RemindersRhythmsSharedChildId | null>(initialChild);
+
+  useDismissibleWindow({
+    open: true,
+    onClose: onBack,
+    closeOnEscape: true,
+  });
 
   useEffect(() => {
     setActiveChild(initialChild ?? null);

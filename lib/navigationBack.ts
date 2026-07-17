@@ -6,10 +6,16 @@
 import type { AppSection } from "./companionUi";
 import { workspaceAreaTitle } from "./workspaceMode";
 
-/** Visible label for estate home back controls. */
-export const BACK_TO_ESTATE = "Back To Estate";
+/**
+ * Persistent top-left return control (106–108).
+ * Prefer this label everywhere — one authoritative Welcome Home action.
+ */
+export const WELCOME_HOME_NAV_LABEL = "Welcome Home";
 
-/** Destination key when returning from a room to the Estate (chat home). */
+/** @deprecated Prefer WELCOME_HOME_NAV_LABEL — kept for legacy string matches. */
+export const BACK_TO_ESTATE = WELCOME_HOME_NAV_LABEL;
+
+/** Destination key when returning from a room to Welcome Home (estate entrance). */
 export const NAV_HOME = "Estate";
 
 /** Trademarked workspace names — consistent across the ecosystem. */
@@ -67,8 +73,10 @@ export function isEstateHomeDestination(
   return (
     normalized === "home" ||
     normalized === "estate" ||
+    normalized === "welcome home" ||
     normalized === "return to estate" ||
-    normalized === "back to estate"
+    normalized === "back to estate" ||
+    normalized === "back to welcome home"
   );
 }
 

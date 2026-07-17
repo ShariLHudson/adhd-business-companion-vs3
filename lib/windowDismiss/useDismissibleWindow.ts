@@ -69,6 +69,26 @@ export function useDismissibleWindow({
     function onKeyDown(event: KeyboardEvent) {
       if (event.key !== "Escape") return;
       if (!isTopDismissibleWindow(id)) return;
+      // Do not steal Escape from text fields or native menus (106 accessibility).
+      const target = event.target;
+      if (target instanceof HTMLElement) {
+        const tag = target.tagName;
+        if (
+          tag === "INPUT" ||
+          tag === "TEXTAREA" ||
+          tag === "SELECT" ||
+          target.isContentEditable
+        ) {
+          return;
+        }
+        if (
+          target.closest(
+            '[role="listbox"], [role="combobox"][aria-expanded="true"], [data-radix-popper-content-wrapper]',
+          )
+        ) {
+          return;
+        }
+      }
       // Confirmation dialogs: Escape does not dismiss (explicit buttons only).
       if (optionsRef.current.requiresExplicitDecision) {
         event.preventDefault();

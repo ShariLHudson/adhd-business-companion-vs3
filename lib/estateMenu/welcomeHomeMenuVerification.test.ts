@@ -240,11 +240,10 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
-  it("Back To Estate always opens Welcome Home lobby", () => {
+  it("Welcome Home always opens Welcome Home lobby", () => {
     expect(source).toContain("onBackToEstate={navigateBackToEstateHome}");
-    expect(source).toContain(
-      'returnToWelcomeHomeLobby("back to estate")',
-    );
+    expect(source).toContain("function returnToWelcomeHome(");
+    expect(source).toContain('returnToWelcomeHome("welcome home")');
     expect(source).toContain('setCurrentRoom("welcome-home")');
     expect(source).toContain("estateSectionNavEpochRef.current += 1");
     expect(source).toContain("skipSectionRestore: true");

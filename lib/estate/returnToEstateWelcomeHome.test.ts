@@ -39,9 +39,9 @@ describe("Return to Estate → Welcome Home", () => {
     expect(menu).toContain('data-testid="estate-return-to-estate"');
     expect(menu).toContain("closeAndRun(onBackToEstate)");
     expect(page).toContain("onBackToEstate={navigateBackToEstateHome}");
-    expect(page).toMatch(
-      /function navigateBackToEstateHome\(\)\s*\{\s*returnToWelcomeHomeLobby\("back to estate"\);\s*\}/,
-    );
+    expect(page).toContain("function returnToWelcomeHome(");
+    expect(page).toContain('returnToWelcomeHome("welcome home")');
+    expect(page).toContain("function navigateBackToEstateHome()");
   });
 
   it("lands on Welcome Home with the welcome-home-background.png plate", () => {
@@ -93,6 +93,21 @@ describe("Return to Estate → Welcome Home", () => {
     );
     expect(page).toMatch(
       /if \(isEstateHomeDestination\(workspacePanelBackLabel\)\) \{\s*navigateBackToEstateHome\(\);/,
+    );
+  });
+
+  it("leaving Evidence Vault starts a new chat (vault welcome does not linger)", () => {
+    const page = readFileSync(
+      path.join(process.cwd(), "app/companion/CompanionPageClient.tsx"),
+      "utf8",
+    );
+    const nav = page.match(
+      /function navigateBackToEstateHome\(\) \{[\s\S]*?\n  \}/,
+    )?.[0];
+    expect(nav).toBeTruthy();
+    expect(nav).toContain('activeSectionRef.current === "evidence-bank"');
+    expect(nav).toContain(
+      'clearTodayContext({ preserveRoom: true, mode: "new-chat" })',
     );
   });
 });
