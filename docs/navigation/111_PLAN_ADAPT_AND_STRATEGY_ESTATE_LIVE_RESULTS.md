@@ -32,9 +32,16 @@
 - `lib/strategyLibrary/strategyLibraryEstate.test.ts`
 - `lib/estate/estateFullBleedPanelSections.test.ts`
 
+## Preview
+
+- Preview commit: `572dd6e5`
+- Authenticated preview URL: https://adhd-business-companion-vs3-o2ooq9obm-shari-hudsons-projects.vercel.app
+- Inspector: https://vercel.com/shari-hudsons-projects/adhd-business-companion-vs3/7UhzDNNYqHewtJb5FUZ9nvV1ygJp
+- Overall: **unit_verified** · live authenticated **Pending** (`111` checklist)
+
 ## Authenticated checklist
 
-See `111_PLAN_ADAPT_AND_STRATEGY_ESTATE_LIVE_CHECKLIST.md` — still required on preview after deploy.
+See `111_PLAN_ADAPT_AND_STRATEGY_ESTATE_LIVE_CHECKLIST.md` — still required on preview.
 
 ## Deploy recommendation
 
