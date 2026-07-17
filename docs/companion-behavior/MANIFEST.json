@@ -1,0 +1,43 @@
+{
+  "package": "Spark Estate Companion Behavior Foundation",
+  "authoritative_root": "docs/companion-behavior",
+  "file_count": 16,
+  "structure": {
+    "standards": "docs/companion-behavior/standards",
+    "contracts": "docs/companion-behavior/contracts",
+    "prompts": "docs/companion-behavior/prompts"
+  },
+  "files": [
+    "standards/000_SPARK_ESTATE_COMPANION_SUCCESS_STANDARD.md",
+    "standards/001_COMPANION_BEHAVIOR_ENGINE_STANDARD.md",
+    "contracts/002_BEHAVIOR_CONTRACT_TEMPLATE.md",
+    "standards/003_REVERSE_ENGINEERING_AND_IMPLEMENTATION_METHOD.md",
+    "prompts/004_CURSOR_GLOBAL_REVERSE_ENGINEERING_PROMPT.md",
+    "standards/005_FRICTION_AND_DECISION_FATIGUE_STANDARD.md",
+    "contracts/006_DEFAULT_COMPETENCE_AND_PROGRESSIVE_PERSONALIZATION_CONTRACT.md",
+    "contracts/007_NEW_CHAT_AND_CONTEXT_ISOLATION_BEHAVIOR_CONTRACT.md",
+    "contracts/008_CONTINUE_WHERE_LEFT_OFF_BEHAVIOR_CONTRACT.md",
+    "contracts/009_HELP_ME_CHOOSE_NEXT_STEP_BEHAVIOR_CONTRACT.md",
+    "contracts/010_OVERWHELM_AND_TASK_FRICTION_BEHAVIOR_CONTRACT.md",
+    "contracts/011_RETURN_AFTER_ABSENCE_BEHAVIOR_CONTRACT.md",
+    "standards/012_LIVE_BEHAVIOR_RELEASE_GATE.md",
+    "standards/013_BEHAVIOR_LIBRARY_BUILD_ORDER.md",
+    "prompts/014_CURSOR_START_HERE_IMPLEMENTATION_PROMPT.md",
+    "standards/015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md"
+  ],
+  "governing_standards": [
+    "000",
+    "001",
+    "003",
+    "005",
+    "012",
+    "013",
+    "015"
+  ],
+  "notes": [
+    "Single source of truth for Companion Behavior Foundation.",
+    "Do not duplicate full standards into .cursor/rules.",
+    "CB-015 governs every visible companion reply, including New Chat greetings.",
+    "Phase A conversation decision work remains separate until contracts are audited."
+  ]
+}
