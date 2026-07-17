@@ -3,11 +3,36 @@
  * Use for prompts (what the model should output) and display (what users see).
  */
 
+import { structureMultiItemResponse } from "./structureMultiItemResponse";
+
+export { structureMultiItemResponse } from "./structureMultiItemResponse";
+
 export const PLAIN_LANGUAGE_FORMATTING_RULE = `PLAIN LANGUAGE FORMATTING (mandatory for every user-facing message):
 Do NOT use markdown heading syntax (#, ##, ###), horizontal rules (---), decorative dividers (///), or document-style section breaks.
 Do NOT use **bold** or other markdown emphasis in user-facing copy.
 Use plain language, short paragraphs, natural spacing, and simple bullet lists when needed (• item).
 Use sentence-case labels only when a short heading helps — never hash prefixes.
+
+MULTI-ITEM RESPONSES (mandatory):
+When giving several steps, choices, examples, recommendations, considerations, or pros and cons, separate them visibly.
+Never place a numbered list inside one continuous paragraph.
+Prefer:
+A short natural opening.
+
+1. First item
+Short explanation.
+
+2. Second item
+Short explanation.
+
+One warm, specific closing question.
+
+Not:
+Here are key points: 1. First… 2. Second… 3. Third… all in one paragraph.
+Do not turn every reply into a list — empathy, one direct answer, and simple explanations stay as ordinary paragraphs.
+Openings should sound like Shari (calm, human), not like "Planning X is crucial for maximizing value…"
+Closings should be context-aware ("Which part feels most important first?") — not a generic "Would you like to dive deeper into any of these areas?" every time.
+
 Prefer:
 Welcome back
 
@@ -35,7 +60,8 @@ export function plainLanguageFormattingHintForPrompt(): string {
 export function toPlainLanguageDisplay(text: string): string {
   if (!text) return "";
 
-  let out = text.replace(/\r\n/g, "\n");
+  // Rendering safeguard first — expand crushed inline lists while code/links intact.
+  let out = structureMultiItemResponse(text.replace(/\r\n/g, "\n"));
 
   // Decorative separator lines
   out = out.replace(/^\s*---+\s*$/gm, "");

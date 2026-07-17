@@ -272,7 +272,6 @@ import {
   type HelpMeChooseSupportOption,
   type HelpfulLessonOffer,
 } from "@/lib/dailyOpening";
-import { clearPendingChoice } from "@/lib/pendingChoice/manager";
 import {
   type AdaptedDayProposal,
 } from "@/lib/dailyAdaptation";
@@ -2002,7 +2001,11 @@ import "@/app/companion/guided-field-help-chat.css";
 import {
   tonePreferenceOverridesRoutingGuidance,
 } from "@/lib/companionTonePreferences";
-import { formatAssistantParagraphs, toPlainLanguageDisplay } from "@/lib/plainLanguageFormatting";
+import {
+  formatAssistantParagraphs,
+  structureMultiItemResponse,
+  toPlainLanguageDisplay,
+} from "@/lib/plainLanguageFormatting";
 import {
   blockDateTime,
   clearConversation,
@@ -6660,7 +6663,9 @@ export default function CompanionPageClient() {
 
   // A panel can register an in-screen back handler (e.g. close an open detail).
   // If it handles the press (returns true), we don't leave the section yet.
+  // Interceptors must not call goBack/onBack — that re-enters and stack-overflows.
   const backInterceptorRef = useRef<(() => boolean) | null>(null);
+  const goBackDepthRef = useRef(0);
   const registerBack = useCallback((fn: (() => boolean) | null) => {
     backInterceptorRef.current = fn;
   }, []);
@@ -6797,8 +6802,19 @@ export default function CompanionPageClient() {
   }
 
   function goBack(options?: { skipInterceptor?: boolean }) {
-    if (!options?.skipInterceptor && backInterceptorRef.current?.()) return;
+    const skipInterceptor =
+      Boolean(options?.skipInterceptor) || goBackDepthRef.current > 0;
+    goBackDepthRef.current += 1;
+    try {
+      if (!skipInterceptor && backInterceptorRef.current?.()) return;
 
+      goBackAfterInterceptor();
+    } finally {
+      goBackDepthRef.current -= 1;
+    }
+  }
+
+  function goBackAfterInterceptor() {
     if (isBreatheDestinationActive(breatheDestination)) {
       closeBreatheOverlayCore({ resume: true });
       return;
@@ -7431,12 +7447,19 @@ export default function CompanionPageClient() {
       navigateDailyOpeningDestination({ kind: "clear-my-mind" });
       return;
     }
-    if (destId === "plan-my-day" || destId === "parking-lot") {
-      navigateDailyOpeningDestination(
-        destId === "parking-lot"
-          ? { kind: "section", section: "parking-lot" }
-          : { kind: "plan-my-day" },
-      );
+    if (destId === "parking-lot") {
+      navigateDailyOpeningDestination({
+        kind: "section",
+        section: "parking-lot",
+      });
+      return;
+    }
+    if (destId === "plan-my-day") {
+      navigateDailyOpeningDestination({ kind: "plan-my-day" });
+      return;
+    }
+    if (destId === "adapt-my-day") {
+      navigateDailyOpeningDestination({ kind: "adapt-my-day" });
       return;
     }
     if (destId === "my-business-estate") {
@@ -12679,7 +12702,7 @@ export default function CompanionPageClient() {
     opts?: { bypassVoiceLayer?: boolean; bypassReason?: "legal" | "safety" | "system_required" },
   ): string {
     const decision = getActiveTurnDecision();
-    return applyShariVoiceLayer({
+    const voiced = applyShariVoiceLayer({
       text: content,
       userText: lastUserTextRef.current ?? undefined,
       emotionalCondition: decision?.emotionalCondition,
@@ -12688,6 +12711,8 @@ export default function CompanionPageClient() {
       bypassVoiceLayer: opts?.bypassVoiceLayer,
       bypassReason: opts?.bypassReason,
     }).text;
+    // Global readability: never leave multi-item lists crushed into one paragraph.
+    return structureMultiItemResponse(voiced);
   }
 
   function finishEarlyChatTurn(ownerHint?: string) {

@@ -201,9 +201,10 @@ ${SPARK_HUMAN_VOICE_PRINCIPLE}
 
 BANNED FORMATTING (unless member explicitly asks for outline, steps, checklist, or structured document):
 - No markdown heading symbols: ###, ##, #, horizontal rules
-- No robotic outline formatting
+- No robotic outline theater or essay-report formatting
 - No excessive bolding (**text**)
-- No long numbered frameworks (4+ numbered steps) unless they asked for steps
+- When giving several steps, choices, examples, recommendations, or considerations, separate each item on its own lines with a short explanation — never crush a numbered list into one continuous paragraph
+- Prefer short visible lists over walls of text; keep ordinary empathy and one-answer replies as paragraphs
 
 BANNED PHRASES (rewrite — never default to these):
 ${SPARK_AI_VOICE_FORBIDDEN_LABELS.map((l) => `- ${l}`).join("\n")}
