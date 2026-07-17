@@ -59,8 +59,8 @@ export type WelcomeHomeNavDestination = {
   /** Gallery / selection experiences may show a trailing affordance. */
   selectionExperience?: boolean;
   /**
-   * Nested dropdown children — independently clickable destinations.
-   * Parent row toggles the dropdown; it does not open a combined chooser.
+   * Nested dropdown children — open the shared parent window with that child selected.
+   * Parent row opens the shared window (103–105).
    */
   dropdownChildren?: readonly WelcomeHomeNavDropdownChild[];
 };

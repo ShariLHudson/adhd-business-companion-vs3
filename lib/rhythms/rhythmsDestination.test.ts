@@ -25,23 +25,23 @@ describe("Rhythms dedicated destination", () => {
     "components/companion/ReminderRhythmRoomChrome.tsx",
   );
 
-  it("My Day uses shared Reminders / Rhythms entrance — not a separate Rhythms row", () => {
+  it("My Day uses shared Reminders / Rhythms window — not a separate Rhythms row", () => {
     expect(menu).toContain("onOpenRemindersRhythms");
     expect(menu).toContain('"reminders-rhythms"');
     expect(client).toContain(
-      `onOpenRemindersRhythms={() => ${REMINDERS_RHYTHMS_ENTRANCE_ACTION_ID}()}`,
+      `onOpenRemindersRhythms={() => ${REMINDERS_RHYTHMS_ENTRANCE_ACTION_ID}(null)}`,
     );
     expect(client).not.toMatch(
       /onOpenRhythms=\{\(\) => openPlanMyDayCore\(\{ area: "rhythms" \}\)\}/,
     );
   });
 
-  it("openRhythmsCore opens rhythms section — not Plan My Day, Settings, or Reminders", () => {
+  it("openRhythmsCore opens shared window with Rhythms selected", () => {
     const fn = client.match(
       /function openRhythmsCore\(\) \{[\s\S]*?\n  \}/,
     )?.[0];
     expect(fn).toBeTruthy();
-    expect(fn).toContain('openStandaloneFocusSectionCore("rhythms")');
+    expect(fn).toContain('openRemindersRhythmsCore("rhythms")');
     expect(fn).not.toContain("openPlanMyDayCore");
     expect(fn).not.toContain("openHowDoISettings");
     expect(fn).not.toContain("openRemindersCore");

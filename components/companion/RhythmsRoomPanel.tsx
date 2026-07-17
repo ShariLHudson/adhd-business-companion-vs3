@@ -721,9 +721,12 @@ function RhythmListSection({
 export function RhythmsRoomPanel({
   onBack,
   registerBack,
+  embedded = false,
 }: {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
+  /** Inside shared Reminders / Rhythms window — no shell or duplicate How Do I. */
+  embedded?: boolean;
 }) {
   const [tick, setTick] = useState(0);
   const [form, setForm] = useState<RhythmFormValues>(EMPTY_RHYTHM_FORM);
@@ -746,13 +749,11 @@ export function RhythmsRoomPanel({
   }, [refresh]);
 
   useEffect(() => {
-    if (!registerBack) return;
-    registerBack(() => {
-      onBack();
-      return true;
-    });
+    if (!registerBack || embedded) return;
+    // Never call onBack/goBack from the interceptor — that re-enters goBack and stack-overflows.
+    registerBack(() => false);
     return () => registerBack(null);
-  }, [registerBack, onBack]);
+  }, [registerBack, embedded]);
 
   void tick;
   const lists = partitionRhythmsForLists(listMemberRhythms());
@@ -845,43 +846,58 @@ export function RhythmsRoomPanel({
     }
   }
 
-  return (
-    <RhythmsRoomShell onOutsideDismiss={onBack}>
+  const body = (
       <div
         className="plan-day-morning-note flex flex-col gap-2 pb-10"
         data-testid="rhythms-room-panel"
+        data-embedded={embedded ? "true" : "false"}
       >
-        <RhythmsHowDoI />
-        <HowToUseBlock kind="rhythms" />
-        <div className="mt-3">
-          <button
-            type="button"
-            className="plan-day-morning-note__previous"
-            onClick={onBack}
-            data-testid="app-back-button"
-            aria-label="Previous Screen"
+        {!embedded ? <RhythmsHowDoI /> : null}
+        {!embedded ? <HowToUseBlock kind="rhythms" /> : null}
+        {!embedded ? (
+          <div className="mt-3">
+            <button
+              type="button"
+              className="plan-day-morning-note__previous"
+              onClick={onBack}
+              data-testid="app-back-button"
+              aria-label="Previous Screen"
+            >
+              <span aria-hidden="true">←</span>
+              <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
+            </button>
+          </div>
+        ) : null}
+        {embedded ? (
+          <h2
+            className="plan-day-morning-note__title mt-2 text-xl"
+            data-testid="rhythms-title"
           >
-            <span aria-hidden="true">←</span>
-            <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
-          </button>
-        </div>
-        <h1
-          className="plan-day-morning-note__title mt-4"
-          data-testid="rhythms-title"
-        >
-          Rhythms
-        </h1>
-        <PersistentDifferenceCue kind="rhythms" />
-        <RoomArrivalBlock
-          kind="rhythms"
-          onPrimary={focusAddForm}
-          onShowComparison={() => setComparisonOpen(true)}
-        />
-        <ComparisonExpandable
-          open={comparisonOpen}
-          onToggle={() => setComparisonOpen((v) => !v)}
-          testIdPrefix="rhythms"
-        />
+            Rhythms
+          </h2>
+        ) : (
+          <h1
+            className="plan-day-morning-note__title mt-4"
+            data-testid="rhythms-title"
+          >
+            Rhythms
+          </h1>
+        )}
+        {!embedded ? <PersistentDifferenceCue kind="rhythms" /> : null}
+        {!embedded ? (
+          <RoomArrivalBlock
+            kind="rhythms"
+            onPrimary={focusAddForm}
+            onShowComparison={() => setComparisonOpen(true)}
+          />
+        ) : null}
+        {!embedded ? (
+          <ComparisonExpandable
+            open={comparisonOpen}
+            onToggle={() => setComparisonOpen((v) => !v)}
+            testIdPrefix="rhythms"
+          />
+        ) : null}
         <RhythmsAreFlexibleSection />
         <RhythmStartExamples onUse={applyExample} />
 
@@ -971,6 +987,8 @@ export function RhythmsRoomPanel({
           <NotificationSoundPreferences />
         </section>
       </div>
-    </RhythmsRoomShell>
   );
+
+  if (embedded) return body;
+  return <RhythmsRoomShell onOutsideDismiss={onBack}>{body}</RhythmsRoomShell>;
 }

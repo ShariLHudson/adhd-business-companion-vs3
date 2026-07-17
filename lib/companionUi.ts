@@ -49,9 +49,11 @@ export type AppSection =
   | "decision-compass"
   | "today"
   | "plan-my-day"
+  /** Shared My Day window — Plan My Day / Adapt My Day. */
+  | "adapt-plan-my-day"
   | "reminders"
   | "rhythms"
-  /** Shared My Day entrance — Reminder vs Rhythm explanation before either room. */
+  /** Shared My Day window — Reminders / Rhythms. */
   | "reminders-rhythms"
   | "calendar"
   | "parking-lot"
@@ -245,6 +247,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "brain-dump":
       return "clear-my-mind";
     case "plan-my-day":
+    case "adapt-plan-my-day":
       return "plan-my-day";
     case "reminders":
     case "rhythms":

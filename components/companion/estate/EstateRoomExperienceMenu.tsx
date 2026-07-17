@@ -38,23 +38,18 @@ export type EstateRoomExperienceMenuProps = {
   /** Spark Estate → Spark Estate Guide (explicit open only). */
   onOpenSparkEstateGuide?: () => void;
   onReturnToExploreEstate?: () => void;
-  /**
-   * Legacy combined Plan/Adapt opener — unused when dropdown children are shown.
-   * Kept for transitional callers.
-   */
+  /** Shared Plan/Adapt window (parent menu item). */
   onOpenAdaptPlanMyDay?: () => void;
-  /** Plan My Day destination (dropdown child). */
+  /** Shared Plan/Adapt window with Plan selected. */
   onOpenPlanMyDay?: () => void;
-  /** Adapt My Day destination (dropdown child). */
+  /** Shared Plan/Adapt window with Adapt selected. */
   onOpenAdaptMyDay?: () => void;
   onOpenCalendar?: () => void;
-  /**
-   * Legacy combined Reminders/Rhythms entrance — unused when dropdown children shown.
-   */
+  /** Shared Reminders/Rhythms window (parent menu item). */
   onOpenRemindersRhythms?: () => void;
-  /** Reminders destination (dropdown child). */
+  /** Shared Reminders/Rhythms window with Reminders selected. */
   onOpenReminders?: () => void;
-  /** Rhythms destination (dropdown child). */
+  /** Shared Reminders/Rhythms window with Rhythms selected. */
   onOpenRhythms?: () => void;
   onOpenProjects?: () => void;
   onOpenCreateStudio?: () => void;
@@ -213,10 +208,10 @@ export function EstateRoomExperienceMenu({
     (id: WelcomeHomeNavDestinationId): (() => void) | undefined => {
       const map: Record<WelcomeHomeNavDestinationId, (() => void) | undefined> =
         {
-          // Dropdown parents toggle in-menu; never route as a combined chooser.
-          "adapt-plan-my-day": undefined,
+          // Parents open shared windows (103–105).
+          "adapt-plan-my-day": onOpenAdaptPlanMyDay,
           calendar: onOpenCalendar,
-          "reminders-rhythms": undefined,
+          "reminders-rhythms": onOpenRemindersRhythms,
           projects: onOpenProjects,
           "destination-gallery": onOpenDestinationGallery,
           "cartographers-studio": onOpenCartographersStudio,
@@ -239,6 +234,8 @@ export function EstateRoomExperienceMenu({
       return map[id];
     },
     [
+      onOpenAdaptPlanMyDay,
+      onOpenRemindersRhythms,
       onOpenCalendar,
       onOpenProjects,
       onOpenDestinationGallery,
@@ -291,6 +288,7 @@ export function EstateRoomExperienceMenu({
     if (children && children.length > 0) {
       const dropdownId = dest.id as WelcomeHomeMyDayDropdownId;
       const isExpanded = expandedDropdown === dropdownId;
+      const parentAction = destinationAction(dest.id);
       return (
         <div
           key={dest.id}
@@ -298,26 +296,33 @@ export function EstateRoomExperienceMenu({
           data-testid={`welcome-home-dropdown-${dest.id}`}
           data-expanded={isExpanded ? "true" : "false"}
         >
-          <button
-            type="button"
-            role="menuitem"
-            className="estate-room-experience-menu__item estate-room-experience-menu__item--nav estate-room-experience-menu__item--dropdown-toggle"
-            aria-expanded={isExpanded}
-            aria-haspopup="menu"
-            aria-label={`${dest.label} menu`}
-            data-testid={`estate-open-${dest.id}`}
-            onClick={() => toggleDropdown(dropdownId)}
-          >
-            <span className="estate-room-experience-menu__item-label">
-              {dest.label}
-            </span>
-            <span
-              className="estate-room-experience-menu__item-chevron estate-room-experience-menu__item-chevron--dropdown"
-              aria-hidden
+          <div className="estate-room-experience-menu__dropdown-row">
+            <button
+              type="button"
+              role="menuitem"
+              className="estate-room-experience-menu__item estate-room-experience-menu__item--nav estate-room-experience-menu__item--dropdown-toggle"
+              aria-label={`Open ${dest.label}`}
+              data-testid={`estate-open-${dest.id}`}
+              onClick={() => {
+                if (parentAction) closeAndRun(parentAction);
+                else toggleDropdown(dropdownId);
+              }}
             >
-              {isExpanded ? "▾" : "›"}
-            </span>
-          </button>
+              <span className="estate-room-experience-menu__item-label">
+                {dest.label}
+              </span>
+            </button>
+            <button
+              type="button"
+              className="estate-room-experience-menu__item-chevron estate-room-experience-menu__item-chevron--dropdown"
+              aria-expanded={isExpanded}
+              aria-label={`${isExpanded ? "Hide" : "Show"} ${dest.label} options`}
+              data-testid={`welcome-home-dropdown-toggle-${dest.id}`}
+              onClick={() => toggleDropdown(dropdownId)}
+            >
+              <span aria-hidden>{isExpanded ? "▾" : "›"}</span>
+            </button>
+          </div>
           {isExpanded ? (
             <div
               className="estate-room-experience-menu__dropdown-children"

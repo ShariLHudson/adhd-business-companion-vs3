@@ -1,395 +1,214 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { RemindersRoomPanel } from "@/components/companion/RemindersRoomPanel";
 import { RemindersRoomShell } from "@/components/companion/RemindersRoomShell";
-import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
+import { RhythmsRoomPanel } from "@/components/companion/RhythmsRoomPanel";
 import {
-  COMPARISON_ROWS,
-  HELP_ME_CHOOSE_CLARIFY_OPTIONS,
-  HELP_ME_CHOOSE_OPTIONS,
-  HELP_ME_CHOOSE_QUESTION,
-  HELP_ME_CHOOSE_CLARIFY_QUESTION,
-  REMINDER_CORE,
-  REMINDER_START_EXAMPLES,
-  REMINDERS_RHYTHMS_ENTRANCE_LABEL,
-  RHYTHM_CORE,
-  RHYTHM_START_EXAMPLES,
-  STILL_NOT_SURE,
-  UNSURE_FALLBACK,
-  loadEntranceUiState,
-  resolveHelpMeChooseClarify,
-  resolveHelpMeChoosePrimary,
-  saveEntranceUiState,
-  type HelpMeChoosePhase,
-  type HelpMeChoosePrimaryId,
-  type HelpMeChooseClarifyId,
-} from "@/lib/remindersVsRhythms";
+  REMINDER_ITEM,
+  REMINDER_VS_RHYTHM_BULLETS,
+  REMINDER_VS_RHYTHM_DIFFERENCE,
+  REMINDERS_RHYTHMS_HOW_DO_I,
+  REMINDERS_RHYTHMS_WINDOW_TITLE,
+  RHYTHM_ITEM,
+  type RemindersRhythmsSharedChildId,
+} from "@/lib/myDaySharedWindows";
+import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 
-const BTN_PRIMARY =
-  "rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white shadow-md transition-colors hover:bg-[#163a3a]";
-const BTN_SECONDARY =
-  "rounded-xl border border-[#d4cdc3] px-4 py-3 text-base font-semibold text-[#4b463f] hover:bg-[#f5f0ea]";
-const BTN_TEAL_SOFT =
-  "rounded-xl border border-[#1e4f4f]/40 px-4 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10";
 const CARD =
-  "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-4 text-left";
+  "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-4 text-left transition-colors";
+const CARD_SELECTED =
+  "rounded-2xl border-2 border-[#1e4f4f] bg-white px-4 py-4 text-left shadow-sm";
 
 type Props = {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
-  /** Open dedicated Reminders room (create path). */
-  onCreateReminder: () => void;
-  /** Open dedicated Rhythms room (create path). */
-  onCreateRhythm: () => void;
+  /** Fresh arrival: null shows both choices; menu child can pre-select. */
+  initialChild?: RemindersRhythmsSharedChildId | null;
+  /**
+   * @deprecated Shared window keeps content in-place. Kept for transitional callers.
+   */
+  onCreateReminder?: () => void;
+  /**
+   * @deprecated Shared window keeps content in-place. Kept for transitional callers.
+   */
+  onCreateRhythm?: () => void;
 };
 
-function HelpMeChooseFlow({
-  onConfirmReminder,
-  onConfirmRhythm,
-}: {
-  onConfirmReminder: () => void;
-  onConfirmRhythm: () => void;
-}) {
-  const [phase, setPhase] = useState<HelpMeChoosePhase>({ phase: "question" });
-
-  if (phase.phase === "question") {
-    return (
-      <div data-testid="help-me-choose-flow">
-        <p className="text-base font-semibold text-[#1f1c19]">
-          {HELP_ME_CHOOSE_QUESTION}
-        </p>
-        <div className="mt-3 flex flex-col gap-2">
-          {HELP_ME_CHOOSE_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={BTN_TEAL_SOFT}
-              data-testid={`help-me-choose-${opt.id}`}
-              onClick={() =>
-                setPhase(
-                  resolveHelpMeChoosePrimary(opt.id as HelpMeChoosePrimaryId),
-                )
-              }
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (phase.phase === "clarify") {
-    return (
-      <div data-testid="help-me-choose-clarify">
-        <p className="text-base font-semibold text-[#1f1c19]">
-          {HELP_ME_CHOOSE_CLARIFY_QUESTION}
-        </p>
-        <div className="mt-3 flex flex-col gap-2">
-          {HELP_ME_CHOOSE_CLARIFY_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              className={BTN_TEAL_SOFT}
-              data-testid={`help-me-choose-clarify-${opt.id}`}
-              onClick={() =>
-                setPhase(
-                  resolveHelpMeChooseClarify(opt.id as HelpMeChooseClarifyId),
-                )
-              }
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        <button
-          type="button"
-          className={`${BTN_SECONDARY} mt-3`}
-          onClick={() => setPhase({ phase: "question" })}
-        >
-          Start over
-        </button>
-      </div>
-    );
-  }
-
-  if (phase.phase === "unsure") {
-    return (
-      <div data-testid="help-me-choose-unsure">
-        <p className="text-base leading-relaxed text-[#4b463f]">
-          {phase.message || UNSURE_FALLBACK}
-        </p>
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-          <button
-            type="button"
-            className={BTN_PRIMARY}
-            data-testid="help-me-choose-pick-reminder"
-            onClick={onConfirmReminder}
-          >
-            Create a Reminder
-          </button>
-          <button
-            type="button"
-            className={BTN_SECONDARY}
-            data-testid="help-me-choose-pick-rhythm"
-            onClick={onConfirmRhythm}
-          >
-            Create a Rhythm
-          </button>
-        </div>
-        <button
-          type="button"
-          className={`${BTN_SECONDARY} mt-3`}
-          onClick={() => setPhase({ phase: "question" })}
-        >
-          Ask again
-        </button>
-      </div>
-    );
-  }
-
-  // confirm
-  const go =
-    phase.recommendation === "reminder" ? onConfirmReminder : onConfirmRhythm;
+function SharedHowDoI() {
+  const [open, setOpen] = useState(false);
   return (
-    <div data-testid="help-me-choose-confirm">
-      <p className="text-base leading-relaxed text-[#4b463f]">
-        {phase.explanation}
-      </p>
-      <p className="mt-2 text-base font-semibold text-[#1f1c19]">
-        {phase.recommendation === "reminder"
-          ? "Shall I take you to create a Reminder?"
-          : "Shall I take you to create a Rhythm?"}
-      </p>
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-        <button
-          type="button"
-          className={BTN_PRIMARY}
-          data-testid="help-me-choose-confirm-yes"
-          onClick={go}
+    <div
+      className="plan-day-how-do-i"
+      data-testid="reminders-rhythms-shared-how-do-i"
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="plan-day-how-do-i__toggle inline-flex items-center gap-1.5 text-sm font-semibold text-[#1e4f4f] transition-colors hover:text-[#163c3c] hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
+        aria-expanded={open}
+        data-testid="reminders-rhythms-shared-how-do-i-toggle"
+      >
+        How Do I…
+        <span aria-hidden="true" className="text-xs font-bold">
+          {open ? "−" : "+"}
+        </span>
+      </button>
+      {open ? (
+        <p
+          className="plan-day-how-do-i__body mt-2 max-w-xl whitespace-pre-line text-sm leading-relaxed text-[#4b463f]"
+          data-testid="reminders-rhythms-shared-how-do-i-body"
         >
-          Yes, continue
-        </button>
-        <button
-          type="button"
-          className={BTN_SECONDARY}
-          data-testid="help-me-choose-confirm-no"
-          onClick={() => setPhase({ phase: "question" })}
-        >
-          Not that — ask again
-        </button>
-      </div>
+          {REMINDERS_RHYTHMS_HOW_DO_I}
+        </p>
+      ) : null}
     </div>
   );
 }
 
 /**
- * Shared My Day entrance: Reminder vs Rhythm explanation before either room.
+ * Shared My Day window: Reminders / Rhythms — one scroll, two children, one How Do I…
  */
 export function RemindersRhythmsEntrancePanel({
   onBack,
   registerBack,
-  onCreateReminder,
-  onCreateRhythm,
+  initialChild = null,
 }: Props) {
-  const [comparisonOpen, setComparisonOpen] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [activeChild, setActiveChild] =
+    useState<RemindersRhythmsSharedChildId | null>(initialChild);
 
   useEffect(() => {
-    const ui = loadEntranceUiState();
-    setComparisonOpen(ui.comparisonOpen);
-    setHelpOpen(ui.helpMeChooseOpen);
-  }, []);
+    setActiveChild(initialChild ?? null);
+  }, [initialChild]);
 
   useEffect(() => {
     if (!registerBack) return;
-    registerBack(() => {
-      onBack();
-      return true;
-    });
+    registerBack(() => false);
     return () => registerBack(null);
-  }, [registerBack, onBack]);
-
-  const persistComparison = useCallback((open: boolean) => {
-    setComparisonOpen(open);
-    saveEntranceUiState({ comparisonOpen: open });
-  }, []);
-
-  const persistHelp = useCallback((open: boolean) => {
-    setHelpOpen(open);
-    saveEntranceUiState({ helpMeChooseOpen: open });
-  }, []);
+  }, [registerBack]);
 
   return (
     <RemindersRoomShell onOutsideDismiss={onBack}>
       <div
-        className="plan-day-morning-note flex flex-col gap-2 pb-10"
+        className="plan-day-morning-note flex flex-col gap-3 pb-10"
         data-testid="reminders-rhythms-entrance"
+        data-shared-window="true"
+        data-active-child={activeChild ?? "none"}
       >
-        <div className="mt-1">
-          <button
-            type="button"
-            className="plan-day-morning-note__previous"
-            onClick={onBack}
-            data-testid="app-back-button"
-            aria-label="Previous Screen"
-          >
-            <span aria-hidden="true">←</span>
-            <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          className="plan-day-morning-note__previous"
+          onClick={onBack}
+          data-testid="app-back-button"
+          aria-label="Previous Screen"
+        >
+          <span aria-hidden="true">←</span>
+          <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
+        </button>
 
         <h1
-          className="plan-day-morning-note__title mt-4"
+          className="plan-day-morning-note__title mt-2"
           data-testid="reminders-rhythms-entrance-title"
         >
-          {REMINDERS_RHYTHMS_ENTRANCE_LABEL}
+          {REMINDERS_RHYTHMS_WINDOW_TITLE}
         </h1>
 
         <p
-          className="mt-2 max-w-xl text-base leading-relaxed text-[#4b463f]"
+          className="mt-1 max-w-xl text-base leading-relaxed text-[#4b463f]"
           data-testid="reminders-rhythms-difference-cue"
         >
-          A Reminder is a specific thing with a specific alert, date, or
-          time — for example, call the dentist tomorrow at 2pm. A Rhythm is
-          a repeated intention with flexible timing — for example, review
-          finances every Friday morning.
+          {REMINDER_VS_RHYTHM_DIFFERENCE}
         </p>
+        <ul
+          className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#6b635a]"
+          data-testid="reminders-rhythms-difference-bullets"
+        >
+          {REMINDER_VS_RHYTHM_BULLETS.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <section className={CARD} data-testid="entrance-reminder-card">
-            <h2 className="text-lg font-semibold text-[#1f1c19]">Reminder</h2>
-            <p className="mt-2 text-base leading-relaxed text-[#4b463f]">
-              {REMINDER_CORE}
-            </p>
-            <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-              Example
-            </p>
-            <p className="mt-1 text-base text-[#1f1c19]">
-              {REMINDER_START_EXAMPLES[0].title} —{" "}
-              {REMINDER_START_EXAMPLES[0].hint}
-            </p>
-            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[#6b635a]">
-              <li>A call or follow-up you don’t want to forget</li>
-              <li>Something due on a date or at a time</li>
-            </ul>
-          </section>
+        <SharedHowDoI />
 
-          <section className={CARD} data-testid="entrance-rhythm-card">
-            <h2 className="text-lg font-semibold text-[#1f1c19]">Rhythm</h2>
-            <p className="mt-2 text-base leading-relaxed text-[#4b463f]">
-              {RHYTHM_CORE}
-            </p>
-            <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-              Example
-            </p>
-            <p className="mt-1 text-base text-[#1f1c19]">
-              {RHYTHM_START_EXAMPLES[1].title} — {RHYTHM_START_EXAMPLES[1].hint}
-            </p>
-            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-[#6b635a]">
-              <li>Weekly review or morning planning</li>
-              <li>Skip, pause, or resume — you’re never “behind”</li>
+        <div
+          className="mt-2 grid gap-3 md:grid-cols-2"
+          role="group"
+          aria-label="Choose Reminders or Rhythms"
+          data-testid="reminders-rhythms-shared-choices"
+        >
+          <button
+            type="button"
+            className={activeChild === "reminders" ? CARD_SELECTED : CARD}
+            data-testid="entrance-reminder-card"
+            aria-pressed={activeChild === "reminders"}
+            onClick={() => setActiveChild("reminders")}
+          >
+            <span className="block text-lg font-semibold text-[#1f1c19]">
+              {REMINDER_ITEM.label}
+            </span>
+            <span
+              className="mt-2 block text-base leading-relaxed text-[#4b463f]"
+              data-testid="reminders-rhythms-reminder-description"
+            >
+              {REMINDER_ITEM.description}
+            </span>
+            <span className="mt-3 block text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
+              Examples
+            </span>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#6b635a]">
+              {REMINDER_ITEM.examples.slice(0, 3).map((ex) => (
+                <li key={ex}>{ex}</li>
+              ))}
             </ul>
-          </section>
+          </button>
+
+          <button
+            type="button"
+            className={activeChild === "rhythms" ? CARD_SELECTED : CARD}
+            data-testid="entrance-rhythm-card"
+            aria-pressed={activeChild === "rhythms"}
+            onClick={() => setActiveChild("rhythms")}
+          >
+            <span className="block text-lg font-semibold text-[#1f1c19]">
+              {RHYTHM_ITEM.label}
+            </span>
+            <span
+              className="mt-2 block text-base leading-relaxed text-[#4b463f]"
+              data-testid="reminders-rhythms-rhythm-description"
+            >
+              {RHYTHM_ITEM.description}
+            </span>
+            <span className="mt-3 block text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
+              Examples
+            </span>
+            <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-[#6b635a]">
+              {RHYTHM_ITEM.examples.slice(0, 3).map((ex) => (
+                <li key={ex}>{ex}</li>
+              ))}
+            </ul>
+          </button>
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <button
-            type="button"
-            className={BTN_PRIMARY}
-            data-testid="entrance-create-reminder"
-            onClick={onCreateReminder}
+        {activeChild === "reminders" ? (
+          <div
+            className="mt-4 border-t border-[#e7dfd4] pt-4"
+            data-testid="reminders-rhythms-shared-reminders-content"
           >
-            Create a Reminder
-          </button>
-          <button
-            type="button"
-            className={BTN_PRIMARY}
-            data-testid="entrance-create-rhythm"
-            onClick={onCreateRhythm}
-          >
-            Create a Rhythm
-          </button>
-          <button
-            type="button"
-            className={BTN_TEAL_SOFT}
-            data-testid="entrance-help-me-choose"
-            aria-expanded={helpOpen}
-            onClick={() => persistHelp(!helpOpen)}
-          >
-            Help Me Choose
-          </button>
-        </div>
-
-        {helpOpen ? (
-          <section
-            className={`${CARD} mt-4`}
-            data-testid="entrance-help-me-choose-panel"
-          >
-            <HelpMeChooseFlow
-              onConfirmReminder={onCreateReminder}
-              onConfirmRhythm={onCreateRhythm}
+            <RemindersRoomPanel
+              embedded
+              onBack={() => setActiveChild(null)}
             />
-          </section>
+          </div>
         ) : null}
 
-        <section className="mt-6">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 text-base font-semibold text-[#1e4f4f] hover:underline"
-            aria-expanded={comparisonOpen}
-            data-testid="entrance-comparison-toggle"
-            onClick={() => persistComparison(!comparisonOpen)}
+        {activeChild === "rhythms" ? (
+          <div
+            className="mt-4 border-t border-[#e7dfd4] pt-4"
+            data-testid="reminders-rhythms-shared-rhythms-content"
           >
-            Reminder or Rhythm?
-            <span aria-hidden="true">{comparisonOpen ? "−" : "+"}</span>
-          </button>
-          {comparisonOpen ? (
-            <div
-              className="mt-3 overflow-x-auto rounded-2xl border border-[#e7dfd4] bg-white/90"
-              data-testid="entrance-comparison-table"
-            >
-              <table className="w-full min-w-[28rem] text-left text-sm">
-                <thead>
-                  <tr className="border-b border-[#e7dfd4] text-[#6b635a]">
-                    <th className="px-4 py-3 font-semibold"> </th>
-                    <th className="px-4 py-3 font-semibold">Reminder</th>
-                    <th className="px-4 py-3 font-semibold">Rhythm</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {COMPARISON_ROWS.map((row) => (
-                    <tr
-                      key={row.aspect}
-                      className="border-b border-[#f0ebe3] last:border-0"
-                    >
-                      <th className="px-4 py-3 font-semibold text-[#1f1c19]">
-                        {row.aspect}
-                      </th>
-                      <td className="px-4 py-3 text-[#4b463f]">
-                        {row.reminder}
-                      </td>
-                      <td className="px-4 py-3 text-[#4b463f]">{row.rhythm}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <p className="border-t border-[#e7dfd4] px-4 py-3 text-sm text-[#6b635a]">
-                {STILL_NOT_SURE}{" "}
-                <button
-                  type="button"
-                  className="font-semibold text-[#1e4f4f] underline"
-                  onClick={() => {
-                    persistHelp(true);
-                    persistComparison(false);
-                  }}
-                >
-                  Help Me Choose
-                </button>
-              </p>
-            </div>
-          ) : null}
-        </section>
+            <RhythmsRoomPanel embedded onBack={() => setActiveChild(null)} />
+          </div>
+        ) : null}
       </div>
     </RemindersRoomShell>
   );

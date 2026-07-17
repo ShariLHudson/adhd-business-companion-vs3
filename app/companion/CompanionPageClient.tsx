@@ -91,6 +91,32 @@ const PlanMyDayPanel = dynamic(
     ),
   },
 );
+const PlanAdaptSharedWindow = dynamic(
+  () =>
+    import("@/components/companion/PlanAdaptSharedWindow").then((mod) => ({
+      default: mod.PlanAdaptSharedWindow,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Plan My Day…" size="md" />
+    ),
+  },
+);
+const RemindersRhythmsEntrancePanel = dynamic(
+  () =>
+    import("@/components/companion/RemindersRhythmsEntrancePanel").then(
+      (mod) => ({
+        default: mod.RemindersRhythmsEntrancePanel,
+      }),
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Reminders…" size="md" />
+    ),
+  },
+);
 const RemindersRoomPanel = dynamic(
   () =>
     import("@/components/companion/RemindersRoomPanel").then((mod) => ({
@@ -3383,6 +3409,11 @@ export default function CompanionPageClient() {
   const profileEstateChromeActive =
     Boolean(profileEstateRoomOverlayId) || peopleIHelpProfilePrimary;
   const [planMyDayDrawerOpen, setPlanMyDayDrawerOpen] = useState(false);
+  const [planAdaptSharedChild, setPlanAdaptSharedChild] = useState<
+    "plan" | "adapt" | null
+  >(null);
+  const [remindersRhythmsSharedChild, setRemindersRhythmsSharedChild] =
+    useState<"reminders" | "rhythms" | null>(null);
   const [planMyDayOpenItemId, setPlanMyDayOpenItemId] = useState<string | null>(
     null,
   );
@@ -8643,9 +8674,26 @@ export default function CompanionPageClient() {
     setActiveNav("focus");
   }
 
-  /** Open full-page Adapt My Day — energy / today's reality check-in. */
+  /**
+   * Shared Plan / Adapt window — Welcome Home My Day parent and children.
+   * Child pre-selects Plan or Adapt inside one scrollable window.
+   */
+  function openPlanAdaptSharedCore(child?: "plan" | "adapt" | null) {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    setPlanAdaptSharedChild(child ?? null);
+    trackWorkspaceEcosystemEvent("adapt-plan-my-day");
+    noteWorkspaceOpened("adapt-plan-my-day", "standalone_room");
+    openStandaloneFocusSectionCore("adapt-plan-my-day");
+  }
+
+  /** Adapt My Day — opens shared Plan/Adapt window with Adapt selected. */
   function openAdaptMyDayCore() {
-    openStandaloneFocusSectionCore("energy");
+    openPlanAdaptSharedCore("adapt");
   }
 
   /**
@@ -9000,36 +9048,26 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * My Day → Reminders / Rhythms — shared explanatory entrance.
-   * Welcome Home calls this for the single My Day row (not separate
-   * Reminders / Rhythms rows). Dedicated rooms open after the member chooses.
+   * My Day → Reminders / Rhythms — one shared window with two selectable children.
    */
-  function openRemindersRhythmsCore() {
+  function openRemindersRhythmsCore(child?: "reminders" | "rhythms" | null) {
     leaveClearMyMindIfNavigatingAway();
     if (!confirmLeaveUnsavedWork()) return;
     preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
     setOverlay(null);
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
+    setRemindersRhythmsSharedChild(child ?? null);
     trackWorkspaceEcosystemEvent("reminders-rhythms");
     noteWorkspaceOpened("reminders-rhythms", "standalone_room");
     openStandaloneFocusSectionCore("reminders-rhythms");
   }
 
   /**
-   * Reminders — dedicated estate room (after entrance or deep link).
-   * Never opens Settings, Notifications overlay, or Plan My Day.
+   * Reminders — Welcome Home opens the shared window with Reminders selected.
    */
   function openRemindersCore() {
-    leaveClearMyMindIfNavigatingAway();
-    if (!confirmLeaveUnsavedWork()) return;
-    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
-    setOverlay(null);
-    clearSplitBesideWorkspace();
-    patchWorkspacePanel(null);
-    trackWorkspaceEcosystemEvent("reminders");
-    noteWorkspaceOpened("reminders", "standalone_room");
-    openStandaloneFocusSectionCore("reminders");
+    openRemindersRhythmsCore("reminders");
   }
 
   /**
@@ -9061,19 +9099,11 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Rhythms — dedicated estate room (My Workday).
-   * Never opens Plan My Day, Settings, or Reminders.
+   * Rhythms — Welcome Home opens the shared window with Rhythms selected.
+   * Dedicated room remains available for deep links via section "rhythms".
    */
   function openRhythmsCore() {
-    leaveClearMyMindIfNavigatingAway();
-    if (!confirmLeaveUnsavedWork()) return;
-    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
-    setOverlay(null);
-    clearSplitBesideWorkspace();
-    patchWorkspacePanel(null);
-    trackWorkspaceEcosystemEvent("rhythms");
-    noteWorkspaceOpened("rhythms", "standalone_room");
-    openStandaloneFocusSectionCore("rhythms");
+    openRemindersRhythmsCore("rhythms");
   }
 
   /**
@@ -23765,6 +23795,14 @@ export default function CompanionPageClient() {
             </EstateRoomErrorBoundary>
           )}
 
+          {activeSection === "adapt-plan-my-day" && (
+            <PlanAdaptSharedWindow
+              onBack={goBack}
+              registerBack={registerBack}
+              initialChild={planAdaptSharedChild}
+            />
+          )}
+
           {activeSection === "plan-my-day" && (
             <PlanMyDayPanel
               standalone
@@ -23801,8 +23839,7 @@ export default function CompanionPageClient() {
             <RemindersRhythmsEntrancePanel
               onBack={goBack}
               registerBack={registerBack}
-              onCreateReminder={() => openRemindersCore()}
-              onCreateRhythm={() => openRhythmsCore()}
+              initialChild={remindersRhythmsSharedChild}
             />
           )}
 
@@ -24754,12 +24791,12 @@ export default function CompanionPageClient() {
               }
             : undefined
         }
-        onOpenAdaptPlanMyDay={() => openPlanMyDayCore()}
-        onOpenPlanMyDay={() => openPlanMyDayCore()}
-        onOpenAdaptMyDay={() => openAdaptMyDayCore()}
-        onOpenRemindersRhythms={() => openRemindersRhythmsCore()}
-        onOpenRhythms={() => openRhythmsCore()}
-        onOpenReminders={() => openRemindersCore()}
+        onOpenAdaptPlanMyDay={() => openPlanAdaptSharedCore(null)}
+        onOpenPlanMyDay={() => openPlanAdaptSharedCore("plan")}
+        onOpenAdaptMyDay={() => openPlanAdaptSharedCore("adapt")}
+        onOpenRemindersRhythms={() => openRemindersRhythmsCore(null)}
+        onOpenRhythms={() => openRemindersRhythmsCore("rhythms")}
+        onOpenReminders={() => openRemindersRhythmsCore("reminders")}
         onOpenCalendar={() => openCalendarCore()}
         onOpenProjects={() => openProjectHomesPrototypeCore()}
         onOpenClearMyMind={() => openClearMyMindCore()}

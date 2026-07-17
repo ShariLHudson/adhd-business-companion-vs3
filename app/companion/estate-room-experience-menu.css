@@ -314,14 +314,42 @@
   animation: estate-room-experience-menu-in 0.22s ease-out;
 }
 
-/* My Day nested dropdowns (Plan/Adapt · Reminders/Rhythms) — 098 restore */
+/* My Day nested dropdowns (Plan/Adapt · Reminders/Rhythms) — shared windows 103 */
 .estate-room-experience-menu__dropdown {
   display: flex;
   flex-direction: column;
   gap: 0.12rem;
 }
 
-.estate-room-experience-menu__item--dropdown-toggle[aria-expanded="true"] {
+.estate-room-experience-menu__dropdown-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0.15rem;
+}
+
+.estate-room-experience-menu__dropdown-row
+  .estate-room-experience-menu__item--dropdown-toggle {
+  flex: 1;
+  min-width: 0;
+}
+
+.estate-room-experience-menu__dropdown-row
+  .estate-room-experience-menu__item-chevron--dropdown {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  padding: 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.estate-room-experience-menu__dropdown-row
+  .estate-room-experience-menu__item-chevron--dropdown[aria-expanded="true"] {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 248, 235, 0.36);
 }

@@ -16,6 +16,7 @@ export const ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS = [
   "the-gallery",
   "destination-gallery",
   "plan-my-day",
+  "adapt-plan-my-day",
   "reminders",
   "rhythms",
   "reminders-rhythms",

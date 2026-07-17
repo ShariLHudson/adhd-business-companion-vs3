@@ -15,7 +15,8 @@ type Props = {
 };
 
 /**
- * Estate Reminders room — warm study backdrop, frosted workspace (shared Morning Room visual language).
+ * Estate Reminders room — warm study backdrop, frosted workspace.
+ * One scrollport: `.reminders-rhythms-shell__content` inside the panel.
  */
 export function RemindersRoomShell({ children, onOutsideDismiss }: Props) {
   useEffect(() => {
@@ -45,10 +46,11 @@ export function RemindersRoomShell({ children, onOutsideDismiss }: Props) {
             : undefined
         }
         onClick={(e) => handleMorningRoomOutsideClick(e, onOutsideDismiss)}
+        data-testid="reminders-rhythms-shared-scroll"
       >
         <div className="plan-my-day-morning-room__center">
           <div
-            className="plan-my-day-morning-room__workspace plan-my-day-morning-room__workspace--room-list"
+            className="plan-my-day-morning-room__workspace plan-my-day-morning-room__workspace--room-list reminders-rhythms-shell"
             data-morning-room-workspace
           >
             {children}

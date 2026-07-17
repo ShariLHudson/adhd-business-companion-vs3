@@ -511,9 +511,12 @@ function dateWithOffset(days: number): string {
 export function RemindersRoomPanel({
   onBack,
   registerBack,
+  embedded = false,
 }: {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
+  /** Inside shared Reminders / Rhythms window — no shell or duplicate How Do I. */
+  embedded?: boolean;
 }) {
   const [tick, setTick] = useState(0);
   const [form, setForm] = useState<ReminderFormValues>(EMPTY_REMINDER_FORM);
@@ -536,13 +539,11 @@ export function RemindersRoomPanel({
   }, [refresh]);
 
   useEffect(() => {
-    if (!registerBack) return;
-    registerBack(() => {
-      onBack();
-      return true;
-    });
+    if (!registerBack || embedded) return;
+    // Never call onBack/goBack from the interceptor — that re-enters goBack and stack-overflows.
+    registerBack(() => false);
     return () => registerBack(null);
-  }, [registerBack, onBack]);
+  }, [registerBack, embedded]);
 
   const all = getReminders();
   const { upcoming, recurring, completed } = partitionReminders(all);
@@ -617,135 +618,168 @@ export function RemindersRoomPanel({
     }
   }
 
-  return (
-    <RemindersRoomShell onOutsideDismiss={onBack}>
+  const body = (
       <div
-        className="plan-day-morning-note flex flex-col gap-2 pb-10"
+        className="plan-day-morning-note flex h-full min-h-0 flex-col"
         data-testid="reminders-room-panel"
+        data-embedded={embedded ? "true" : "false"}
         data-tick={tick}
       >
-        <RemindersHowDoI />
-        <HowToUseBlock kind="reminders" />
-        <div className="mt-3">
-          <button
-            type="button"
-            className="plan-day-morning-note__previous"
-            onClick={onBack}
-            data-testid="app-back-button"
-            aria-label="Previous Screen"
-          >
-            <span aria-hidden="true">←</span>
-            <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
-          </button>
-        </div>
-        <h1
-          className="plan-day-morning-note__title mt-4"
-          data-testid="reminders-title"
-        >
-          Reminders
-        </h1>
-        <PersistentDifferenceCue kind="reminders" />
-        <RoomArrivalBlock
-          kind="reminders"
-          onPrimary={focusAddForm}
-          onShowComparison={() => setComparisonOpen(true)}
-        />
-        <ComparisonExpandable
-          open={comparisonOpen}
-          onToggle={() => setComparisonOpen((v) => !v)}
-          testIdPrefix="reminders"
-        />
-        <ReminderStartExamples onUse={applyExample} />
-        <ReminderActionsExplained />
-
-        <section className="mt-6" data-testid="reminders-add-section">
-          <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
-            Add a Reminder
-          </h2>
-          {showAddForm || form.title.trim() ? (
-            <>
-              <ReminderForm
-                values={form}
-                onChange={updateForm}
-                onSubmit={handleSave}
-                submitLabel="Save Reminder"
-              />
-              {form.title.trim() ? (
-                <PreviewCard
-                  title="Before you save"
-                  testId="reminders-presave-preview"
-                  lines={[
-                    { label: "What", value: preview.what },
-                    { label: "When", value: preview.when },
-                    { label: "Repeat", value: preview.repeat },
-                    { label: "Sound", value: preview.sound },
-                    { label: "Quiet hours", value: preview.quietHours },
-                  ]}
-                />
-              ) : null}
-            </>
-          ) : (
+        {!embedded ? (
+          <header className="reminders-rhythms-shell__header">
             <button
               type="button"
-              className={BTN_PRIMARY}
-              data-testid="reminders-show-add-form"
-              onClick={focusAddForm}
+              className="plan-day-morning-note__previous"
+              onClick={onBack}
+              data-testid="app-back-button"
+              aria-label="Previous Screen"
             >
-              Add a Reminder
+              <span aria-hidden="true">←</span>
+              <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
             </button>
-          )}
-          {statusMessage ? (
-            <p
-              className={
-                statusTone === "success"
-                  ? "mt-3 text-base font-medium text-[#1e4f4f]"
-                  : "mt-3 text-base font-medium text-[#6b3f2a]"
-              }
-              role="status"
-              aria-live="polite"
-              data-testid={
-                statusTone === "success"
-                  ? "reminders-save-success"
-                  : "reminders-save-error"
-              }
+            <h1
+              className="plan-day-morning-note__title mt-2"
+              data-testid="reminders-title"
             >
-              {statusMessage}
-            </p>
+              Reminders
+            </h1>
+          </header>
+        ) : (
+          <h2
+            className="plan-day-morning-note__title mt-2 text-xl"
+            data-testid="reminders-title"
+          >
+            Reminders
+          </h2>
+        )}
+
+        <div className="reminders-rhythms-shell__content flex flex-col gap-2">
+          {!embedded ? <RemindersHowDoI /> : null}
+          {!embedded ? <HowToUseBlock kind="reminders" /> : null}
+          {!embedded ? <PersistentDifferenceCue kind="reminders" /> : null}
+          {!embedded ? (
+            <RoomArrivalBlock
+              kind="reminders"
+              onPrimary={focusAddForm}
+              onShowComparison={() => setComparisonOpen(true)}
+            />
           ) : null}
-        </section>
+          {!embedded ? (
+            <ComparisonExpandable
+              open={comparisonOpen}
+              onToggle={() => setComparisonOpen((v) => !v)}
+              testIdPrefix="reminders"
+            />
+          ) : null}
+          <ReminderStartExamples onUse={applyExample} />
+          <ReminderActionsExplained />
 
-        <ReminderSection
-          title="Upcoming"
-          empty="No upcoming reminders yet."
-          items={upcoming}
-          testId="reminders-upcoming"
-          onChanged={refresh}
-          onAddFocus={focusAddForm}
-        />
-        <ReminderSection
-          title="Recurring"
-          empty="No recurring reminders yet."
-          items={recurring}
-          testId="reminders-recurring"
-          onChanged={refresh}
-          onAddFocus={focusAddForm}
-        />
-        <ReminderSection
-          title="Completed"
-          empty="No completed reminders yet."
-          items={completed}
-          testId="reminders-completed"
-          onChanged={refresh}
-          onAddFocus={focusAddForm}
-        />
+          <section className="mt-6" data-testid="reminders-add-section">
+            <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
+              Add a Reminder
+            </h2>
+            {showAddForm || form.title.trim() ? (
+              <>
+                <ReminderForm
+                  values={form}
+                  onChange={updateForm}
+                  onSubmit={handleSave}
+                  submitLabel="Save Reminder"
+                />
+                {form.title.trim() ? (
+                  <PreviewCard
+                    title="Before you save"
+                    testId="reminders-presave-preview"
+                    lines={[
+                      { label: "What", value: preview.what },
+                      { label: "When", value: preview.when },
+                      { label: "Repeat", value: preview.repeat },
+                      { label: "Sound", value: preview.sound },
+                      { label: "Quiet hours", value: preview.quietHours },
+                    ]}
+                  />
+                ) : null}
+              </>
+            ) : (
+              <button
+                type="button"
+                className={BTN_PRIMARY}
+                data-testid="reminders-show-add-form"
+                onClick={focusAddForm}
+              >
+                Add a Reminder
+              </button>
+            )}
+            {statusMessage ? (
+              <p
+                className={
+                  statusTone === "success"
+                    ? "mt-3 text-base font-medium text-[#1e4f4f]"
+                    : "mt-3 text-base font-medium text-[#6b3f2a]"
+                }
+                role="status"
+                aria-live="polite"
+                data-testid={
+                  statusTone === "success"
+                    ? "reminders-save-success"
+                    : "reminders-save-error"
+                }
+              >
+                {statusMessage}
+              </p>
+            ) : null}
+          </section>
 
-        <section className="mt-8 border-t border-[#e7dfd4] pt-6">
-          <RemindersNotificationSettings />
-          <div className="mt-6">
-            <NotificationSoundPreferences />
-          </div>
-        </section>
+          <ReminderSection
+            title="Upcoming"
+            empty="No upcoming reminders yet."
+            items={upcoming}
+            testId="reminders-upcoming"
+            onChanged={refresh}
+            onAddFocus={focusAddForm}
+          />
+          <ReminderSection
+            title="Recurring"
+            empty="No recurring reminders yet."
+            items={recurring}
+            testId="reminders-recurring"
+            onChanged={refresh}
+            onAddFocus={focusAddForm}
+          />
+          <ReminderSection
+            title="Completed"
+            empty="No completed reminders yet."
+            items={completed}
+            testId="reminders-completed"
+            onChanged={refresh}
+            onAddFocus={focusAddForm}
+          />
+
+          <section
+            className="mt-8 border-t border-[#e7dfd4] pt-6"
+            data-testid="reminders-bottom-settings"
+          >
+            <RemindersNotificationSettings />
+            <div className="mt-6">
+              <NotificationSoundPreferences />
+            </div>
+            {!embedded ? (
+              <button
+                type="button"
+                className={`${BTN_SECONDARY} mt-6`}
+                onClick={onBack}
+                data-testid="reminders-bottom-back"
+              >
+                Back
+              </button>
+            ) : null}
+          </section>
+        </div>
       </div>
-    </RemindersRoomShell>
+  );
+
+  if (embedded) return body;
+  return (
+    <RemindersRoomShell onOutsideDismiss={onBack}>{body}</RemindersRoomShell>
   );
 }

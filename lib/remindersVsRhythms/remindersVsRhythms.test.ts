@@ -38,27 +38,26 @@ describe("routing contract for Welcome Home My Day", () => {
     expect(REMINDERS_RHYTHMS_ENTRANCE.label).toBe("Reminders / Rhythms");
   });
 
-  it("CompanionPageClient wires openRemindersRhythmsCore and entrance panel", () => {
+  it("CompanionPageClient wires openRemindersRhythmsCore and shared window panel", () => {
     const client = read("app/companion/CompanionPageClient.tsx");
-    expect(client).toContain("function openRemindersRhythmsCore()");
+    expect(client).toContain("function openRemindersRhythmsCore(");
     expect(client).toContain(
       'openStandaloneFocusSectionCore("reminders-rhythms")',
     );
     expect(client).toContain("RemindersRhythmsEntrancePanel");
     expect(client).toContain('activeSection === "reminders-rhythms"');
-    expect(client).toContain("onCreateReminder={() => openRemindersCore()}");
-    expect(client).toContain("onCreateRhythm={() => openRhythmsCore()}");
+    expect(client).toContain("initialChild={remindersRhythmsSharedChild}");
   });
 
-  it("entrance panel exposes Create Reminder, Create Rhythm, Help Me Choose", () => {
+  it("shared window exposes Reminder and Rhythm choices plus one How Do I", () => {
     const panel = read(
       "components/companion/RemindersRhythmsEntrancePanel.tsx",
     );
-    expect(panel).toContain("entrance-create-reminder");
-    expect(panel).toContain("entrance-create-rhythm");
-    expect(panel).toContain("entrance-help-me-choose");
-    expect(panel).toContain("entrance-comparison-table");
-    expect(panel).toContain("help-me-choose-confirm");
+    expect(panel).toContain("entrance-reminder-card");
+    expect(panel).toContain("entrance-rhythm-card");
+    expect(panel).toContain("reminders-rhythms-shared-how-do-i");
+    expect(panel).toContain("reminders-rhythms-difference-cue");
+    expect(panel).toContain('data-shared-window="true"');
   });
 });
 
