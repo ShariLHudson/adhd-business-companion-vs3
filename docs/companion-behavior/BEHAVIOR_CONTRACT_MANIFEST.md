@@ -54,7 +54,7 @@ The package contains one authoritative copy of each document.
 |-------------|-------|------|--------|----------------------|-------|-------|------|
 | CB-002 | Behavior Contract Template | `contracts/002_BEHAVIOR_CONTRACT_TEMPLATE.md` | active (template) | n/a | n/a | n/a | n/a |
 | CB-006 | Default Competence & Progressive Personalization | `contracts/006_DEFAULT_COMPETENCE_AND_PROGRESSIVE_PERSONALIZATION_CONTRACT.md` | draft | TBD | not_started | unknown | unverified |
-| CB-007 | New Chat & Context Isolation | `contracts/007_NEW_CHAT_AND_CONTEXT_ISOLATION_BEHAVIOR_CONTRACT.md` | active | `lib/conversationReset/resetActiveConversation.ts` (+ CPC UI adapter) | **in_progress** (temp clears shipped) | regressions added | unverified (preview UI) |
+| CB-007 | New Chat & Context Isolation | `contracts/007_NEW_CHAT_AND_CONTEXT_ISOLATION_BEHAVIOR_CONTRACT.md` | active | `lib/conversationReset/resetActiveConversation.ts` (+ CPC UI adapter) | **in_progress** (temp clears shipped) | **adequate** (16 unit regressions) | **preview_partial** (deploy Ready; UI blocked by Vercel SSO) |
 | CB-008 | Continue Where Left Off | `contracts/008_CONTINUE_WHERE_LEFT_OFF_BEHAVIOR_CONTRACT.md` | draft | `lib/companionLedContinue.ts` | not_started | partial | unverified |
 | CB-009 | Help Me Choose Next Step | `contracts/009_HELP_ME_CHOOSE_NEXT_STEP_BEHAVIOR_CONTRACT.md` | draft | TBD | not_started | unknown | unverified |
 | CB-010 | Overwhelm & Task Friction | `contracts/010_OVERWHELM_AND_TASK_FRICTION_BEHAVIOR_CONTRACT.md` | draft | frictionless + compound intent + Phase A decision | not_started | partial | preview_partial |
