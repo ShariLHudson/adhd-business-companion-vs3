@@ -22,6 +22,12 @@ describe("FirstLoginWelcomeGate — one-time welcome behavior", () => {
     expect(source).toContain('setPhase("not_required")');
   });
 
+  it("avoids welcome flash when account completion is already known", () => {
+    expect(source).toContain('prev === "not_required" || prev === "completed"');
+    expect(source).toContain("metadataCompletedAt");
+    expect(source).toContain("accountCreatedAt");
+  });
+
   it("does not autoplay when welcome audio was already started once", () => {
     expect(source).toContain(
       "Never autoplay if this account already started welcome once",

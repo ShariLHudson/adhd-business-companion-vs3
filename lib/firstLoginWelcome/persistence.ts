@@ -1,16 +1,20 @@
 /**
  * Account-backed first-login welcome persistence.
  * Authoritative: Supabase auth user_metadata.
- * Local fallback while metadata loads / offline.
+ * Local cache for offline / hydration — never sole source of truth.
  */
 
 import { getCompanionSupabase } from "@/lib/supabase/companionClient";
 import { markWelcomeIntroSeen } from "@/lib/welcomeHome/firstLaunchPersistence";
+import { hasEstablishedAccountWelcomeEvidence } from "./establishedAccount";
 import type { FirstLoginWelcomeRecord } from "./types";
 
 const META_COMPLETED = "welcome_completed_at";
 const META_AUDIO = "welcome_audio_played_at";
 const LOCAL_PREFIX = "companion-first-login-welcome-v1:";
+const PUSH_RETRIES = 3;
+
+const completionWriteInFlight = new Set<string>();
 
 function localKey(userId: string): string {
   return `${LOCAL_PREFIX}${userId}`;
@@ -75,7 +79,7 @@ export function recordFromUserMetadata(
   };
 }
 
-/** Merge server + local; completed/audio timestamps win if either side has them. */
+/** Merge server + local; completed/audio timestamps win if either side has them. Never clears completion. */
 export function mergeWelcomeRecords(
   server: FirstLoginWelcomeRecord,
   local: FirstLoginWelcomeRecord,
@@ -92,45 +96,114 @@ export function isWelcomeCompleted(record: FirstLoginWelcomeRecord): boolean {
   return Boolean(record.welcomeCompletedAt);
 }
 
-export async function loadFirstLoginWelcomeRecord(
-  userId: string,
-  metadata?: Record<string, unknown>,
-): Promise<FirstLoginWelcomeRecord> {
-  const local = readLocal(userId);
-  let server = recordFromUserMetadata(metadata);
+export type LoadFirstLoginWelcomeOptions = {
+  accountCreatedAt?: string | null;
+  /** When true, skip established-account migration write (tests). */
+  skipMigrationWrite?: boolean;
+};
 
-  if (!server.welcomeCompletedAt || !server.welcomeAudioPlayedAt) {
-    const supabase = getCompanionSupabase();
-    if (supabase) {
-      try {
-        const { data } = await supabase.auth.getUser();
-        if (data.user?.id === userId) {
-          server = recordFromUserMetadata(
-            data.user.user_metadata as Record<string, unknown> | undefined,
-          );
-        }
-      } catch {
-        /* keep local */
-      }
-    }
+function logWelcomePersistenceFailure(context: string, detail?: unknown): void {
+  if (typeof console === "undefined") return;
+  try {
+    console.warn(`[firstLoginWelcome] ${context}`, detail ?? "");
+  } catch {
+    /* ignore */
   }
-
-  const merged = mergeWelcomeRecords(server, local);
-  writeLocal(userId, merged);
-  return merged;
 }
 
 async function pushMetadata(
   patch: Record<string, string>,
 ): Promise<boolean> {
   const supabase = getCompanionSupabase();
-  if (!supabase) return false;
-  try {
-    const { error } = await supabase.auth.updateUser({ data: patch });
-    return !error;
-  } catch {
+  if (!supabase) {
+    logWelcomePersistenceFailure("pushMetadata: no supabase client");
     return false;
   }
+  for (let attempt = 0; attempt < PUSH_RETRIES; attempt++) {
+    try {
+      const { error } = await supabase.auth.updateUser({ data: patch });
+      if (!error) return true;
+      logWelcomePersistenceFailure(
+        `pushMetadata attempt ${attempt + 1}`,
+        error.message,
+      );
+    } catch (err) {
+      logWelcomePersistenceFailure(`pushMetadata attempt ${attempt + 1}`, err);
+    }
+  }
+  return false;
+}
+
+/**
+ * Load authoritative welcome record. Migrates established accounts to completed
+ * so they never see first-time welcome again after deploy.
+ */
+export async function loadFirstLoginWelcomeRecord(
+  userId: string,
+  metadata?: Record<string, unknown>,
+  options?: LoadFirstLoginWelcomeOptions,
+): Promise<FirstLoginWelcomeRecord> {
+  const local = readLocal(userId);
+  let server = recordFromUserMetadata(metadata);
+  let serverFetchFailed = false;
+
+  if (!server.welcomeCompletedAt || !server.welcomeAudioPlayedAt) {
+    const supabase = getCompanionSupabase();
+    if (supabase) {
+      try {
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          serverFetchFailed = true;
+          logWelcomePersistenceFailure("getUser", error.message);
+        } else if (data.user?.id === userId) {
+          server = recordFromUserMetadata(
+            data.user.user_metadata as Record<string, unknown> | undefined,
+          );
+          if (!options?.accountCreatedAt && data.user.created_at) {
+            options = {
+              ...options,
+              accountCreatedAt: data.user.created_at,
+            };
+          }
+        }
+      } catch (err) {
+        serverFetchFailed = true;
+        logWelcomePersistenceFailure("getUser threw", err);
+      }
+    }
+  }
+
+  let merged = mergeWelcomeRecords(server, local);
+
+  if (isWelcomeCompleted(merged)) {
+    writeLocal(userId, merged);
+    return merged;
+  }
+
+  const established = hasEstablishedAccountWelcomeEvidence({
+    userId,
+    record: merged,
+    metadata,
+    accountCreatedAt: options?.accountCreatedAt,
+  });
+
+  // Failure path: never flash/loop welcome for established users.
+  if (serverFetchFailed && established) {
+    const at = new Date().toISOString();
+    merged = {
+      welcomeCompletedAt: at,
+      welcomeAudioPlayedAt: merged.welcomeAudioPlayedAt ?? at,
+    };
+    writeLocal(userId, merged);
+    return merged;
+  }
+
+  if (established && !options?.skipMigrationWrite) {
+    return markWelcomeCompleted(userId);
+  }
+
+  writeLocal(userId, merged);
+  return merged;
 }
 
 export async function markWelcomeAudioPlayed(
@@ -139,41 +212,68 @@ export async function markWelcomeAudioPlayed(
 ): Promise<FirstLoginWelcomeRecord> {
   const local = readLocal(userId);
   if (local.welcomeAudioPlayedAt) return local;
-  const current = await loadFirstLoginWelcomeRecord(userId);
+  const current = await loadFirstLoginWelcomeRecord(userId, undefined, {
+    skipMigrationWrite: true,
+  });
   if (current.welcomeAudioPlayedAt) return current;
   const next: FirstLoginWelcomeRecord = {
     ...current,
     welcomeAudioPlayedAt: at,
   };
   writeLocal(userId, next);
-  await pushMetadata({ [META_AUDIO]: at });
+  const ok = await pushMetadata({ [META_AUDIO]: at });
+  if (!ok) {
+    logWelcomePersistenceFailure("markWelcomeAudioPlayed: metadata sync failed");
+  }
   return next;
 }
 
 /**
- * Member finished the welcome gate. Also mirrors Welcome Home intro so the
- * cinematic arrival does not replay automatically.
+ * Member finished or dismissed the welcome gate. Also mirrors Welcome Home intro
+ * so the cinematic arrival does not auto-play. Idempotent — never clears completion.
  */
 export async function markWelcomeCompleted(
   userId: string,
   at: string = new Date().toISOString(),
 ): Promise<FirstLoginWelcomeRecord> {
-  const current = await loadFirstLoginWelcomeRecord(userId);
-  const next: FirstLoginWelcomeRecord = {
-    welcomeCompletedAt: current.welcomeCompletedAt ?? at,
-    welcomeAudioPlayedAt: current.welcomeAudioPlayedAt ?? at,
-  };
-  writeLocal(userId, next);
-  markWelcomeIntroSeen();
-  await pushMetadata({
-    [META_COMPLETED]: next.welcomeCompletedAt!,
-    [META_AUDIO]: next.welcomeAudioPlayedAt!,
-  });
-  return next;
+  if (completionWriteInFlight.has(userId)) {
+    const local = readLocal(userId);
+    if (local.welcomeCompletedAt) return local;
+  }
+  completionWriteInFlight.add(userId);
+  try {
+    const current = await loadFirstLoginWelcomeRecord(userId, undefined, {
+      skipMigrationWrite: true,
+    });
+    if (current.welcomeCompletedAt) {
+      writeLocal(userId, current);
+      markWelcomeIntroSeen();
+      return current;
+    }
+    const next: FirstLoginWelcomeRecord = {
+      welcomeCompletedAt: at,
+      welcomeAudioPlayedAt: current.welcomeAudioPlayedAt ?? at,
+    };
+    writeLocal(userId, next);
+    markWelcomeIntroSeen();
+    const ok = await pushMetadata({
+      [META_COMPLETED]: next.welcomeCompletedAt!,
+      [META_AUDIO]: next.welcomeAudioPlayedAt!,
+    });
+    if (!ok) {
+      logWelcomePersistenceFailure(
+        "markWelcomeCompleted: metadata sync failed — local + intro marked; retry on next load",
+      );
+    }
+    return next;
+  } finally {
+    completionWriteInFlight.delete(userId);
+  }
 }
 
-/** Manual replay must not clear completion. */
+/** Manual replay must not clear completion. Tests only. */
 export function resetFirstLoginWelcomeLocalForTests(userId: string): void {
   if (!canUseLocalStorage()) return;
   localStorage.removeItem(localKey(userId));
+  completionWriteInFlight.delete(userId);
 }

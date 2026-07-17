@@ -892,6 +892,7 @@ import {
   markChatAssistantAudioElement,
   markWelcomeIntroSeen,
   peekWelcomeHomeReplayRequested,
+  requestWelcomeHomeReplay,
   resolveWelcomeHomeDailyChoices,
   WELCOME_HOME_DISCOVERY_KEY_DELAY_MS,
   type WelcomeHomeDailyChoiceId,
@@ -3029,8 +3030,12 @@ export default function CompanionPageClient() {
   }, [homeCalm, welcomeHomePrimary]);
 
   useEffect(() => {
-    if (!hydrated || !welcomeHomePrimary) {
-      setWelcomeHomeReplay(false);
+    if (!hydrated) return;
+    if (!welcomeHomePrimary) {
+      // Keep session peek while navigating toward Welcome Home for explicit replay.
+      if (!peekWelcomeHomeReplayRequested()) {
+        setWelcomeHomeReplay(false);
+      }
       return;
     }
     if (peekWelcomeHomeReplayRequested()) {
@@ -3038,7 +3043,6 @@ export default function CompanionPageClient() {
       setWelcomeHomeReplay(true);
       return;
     }
-    setWelcomeHomeReplay(false);
   }, [hydrated, welcomeHomePrimary]);
 
   useEffect(() => {
@@ -10723,7 +10727,10 @@ export default function CompanionPageClient() {
     }
 
     if (actionId === "replay-welcome") {
-      // Welcome audio is first-login only — never replay after that.
+      // Explicit voluntary replay — silent Welcome Home cinematic only.
+      // Does not clear account welcome_completed_at / FirstLoginWelcomeGate.
+      requestWelcomeHomeReplay();
+      returnToWelcomeHomeLobby("replay welcome");
       return;
     }
 
@@ -24812,6 +24819,10 @@ export default function CompanionPageClient() {
               initialSection={settingsSection}
               registerBack={registerBack}
               onBeginNewDay={requestBeginNewDayFromSettings}
+              onReplayWelcome={() => {
+                requestWelcomeHomeReplay();
+                returnToWelcomeHomeLobby("settings replay welcome");
+              }}
             />
           </ModalSheet>
 

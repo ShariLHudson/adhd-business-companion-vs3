@@ -86,6 +86,11 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     paused: !welcomeRequired || phase === "stopped" || phase === "muted",
   });
 
+  const metadataCompletedAt =
+    typeof user?.user_metadata?.welcome_completed_at === "string"
+      ? user.user_metadata.welcome_completed_at
+      : null;
+
   useEffect(() => {
     if (!sessionChecked || loading) return;
     if (!userId) {
@@ -94,12 +99,16 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     }
 
     let cancelled = false;
-    setPhase("checking");
+    // Do not flash the welcome shell when we already know this account is done.
+    setPhase((prev) =>
+      prev === "not_required" || prev === "completed" ? prev : "checking",
+    );
     void (async () => {
       try {
         const record = await loadFirstLoginWelcomeRecord(
           userId,
           user?.user_metadata as Record<string, unknown> | undefined,
+          { accountCreatedAt: user?.created_at ?? null },
         );
         if (cancelled) return;
 
@@ -127,7 +136,9 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [sessionChecked, loading, userId, user?.user_metadata]);
+    // Intentionally omit full user_metadata object — only completion timestamp.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- userId + metadataCompletedAt gate reloads
+  }, [sessionChecked, loading, userId, metadataCompletedAt]);
 
   const markAudioOnce = useCallback(async () => {
     if (!userId || audioMarkedRef.current) return;

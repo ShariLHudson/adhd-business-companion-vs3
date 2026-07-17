@@ -172,14 +172,15 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
-  it("does not replay welcome audio after first login", () => {
+  it("wires explicit Replay Welcome without clearing account completion", () => {
     expect(source).toMatch(/actionId === "replay-welcome"/);
     expect(source).toMatch(
-      /Welcome audio is first-login only — never replay after that/,
-    );
-    expect(source).not.toMatch(
       /actionId === "replay-welcome"[\s\S]*?requestWelcomeHomeReplay\(\)/,
     );
+    expect(source).toMatch(
+      /Does not clear account welcome_completed_at/,
+    );
+    expect(source).toMatch(/onReplayWelcome=\{\(\) => \{/);
   });
 
   it("My Business Estate opens via profile destination resolver", () => {

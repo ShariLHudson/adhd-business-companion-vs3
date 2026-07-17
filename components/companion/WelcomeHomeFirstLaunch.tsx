@@ -53,7 +53,8 @@ function shouldRunFirstVisitCinematic(plan: WelcomeHomeExperiencePlan): boolean 
   if (prefersReducedMotion()) return false;
   if (!plan.showIntro) return false;
   // Spoken welcome plays only on FirstLoginWelcomeGate — never again here.
-  return plan.visitorKind === "first_visit";
+  // Explicit Replay Welcome may re-run the silent cinematic only.
+  return plan.visitorKind === "first_visit" || plan.visitorKind === "replay";
 }
 
 export function WelcomeHomePage({

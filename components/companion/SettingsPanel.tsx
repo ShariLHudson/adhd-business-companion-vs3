@@ -135,7 +135,8 @@ type Section =
   | "advanced"
   | "connections"
   | "account"
-  | "new-day";
+  | "new-day"
+  | "replay-welcome";
 
 export type SettingsSection = Section;
 
@@ -205,12 +206,15 @@ export function SettingsPanel({
   onSignIn,
   initialSection = null,
   onBeginNewDay,
+  onReplayWelcome,
 }: {
   registerBack?: (fn: (() => boolean) | null) => void;
   onSignIn?: () => void;
   initialSection?: Section | null;
   /** Shared Global Daily Companion Experience — same controller as menu New Day. */
   onBeginNewDay?: () => void;
+  /** Explicit Replay Welcome — does not clear account first-login completion. */
+  onReplayWelcome?: () => void;
 }) {
   const { configured: authConfigured, user, signOut } = useCompanionAuth();
   const { t } = useCompanionLanguage();
@@ -435,6 +439,15 @@ export function SettingsPanel({
             id: "new-day" as const,
             label: "New Day",
             value: "Fresh start",
+          },
+        ]
+      : []),
+    ...(onReplayWelcome
+      ? [
+          {
+            id: "replay-welcome" as const,
+            label: "Replay Welcome",
+            value: "Optional",
           },
         ]
       : []),
@@ -1462,6 +1475,10 @@ export function SettingsPanel({
                   if (r.id === "new-day") {
                     // Click is permission — shared daily-opening controller, no confirm.
                     onBeginNewDay?.();
+                    return;
+                  }
+                  if (r.id === "replay-welcome") {
+                    onReplayWelcome?.();
                     return;
                   }
                   setOpen(r.id);

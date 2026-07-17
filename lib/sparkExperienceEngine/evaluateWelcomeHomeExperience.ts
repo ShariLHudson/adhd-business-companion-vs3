@@ -51,13 +51,27 @@ export function evaluateWelcomeHomeExperience(
   /** Completion or a later login — never auto-open Shari's welcome again. */
   const introAlreadySeen = input.hasSeenWelcomeIntro || repeatLogin;
 
-  // Spoken welcome audio is FirstLoginWelcomeGate only — Estate never replays it.
-  void input.replayRequested;
+  /**
+   * Explicit Replay Welcome — silent Welcome Home cinematic only.
+   * Spoken first-login audio stays account-once (FirstLoginWelcomeGate).
+   * Replay must not clear welcome_completed_at.
+   */
+  if (input.replayRequested && !isCompanionDevFastPath()) {
+    return {
+      visitorKind: "replay",
+      greeting: null,
+      showIntro: true,
+      discoveryKeyDelayMs: WELCOME_HOME_DISCOVERY_KEY_DELAY_MS,
+      estateGuideDelayMs: WELCOME_HOME_ESTATE_GUIDE_DELAY_MS,
+      discoverySuggestion: null,
+    };
+  }
+
   const visitorKind: ExperienceVisitorKind = introAlreadySeen
     ? "returning"
     : "first_visit";
 
-  /** Visual Estate intro only on the true first visit — never via menu replay. */
+  /** Visual Estate intro only on the true first visit — not on later logins. */
   const showIntro =
     !isCompanionDevFastPath() && !introAlreadySeen && !repeatLogin;
 

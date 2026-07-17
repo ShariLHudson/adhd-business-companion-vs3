@@ -12,6 +12,10 @@ export {
   FIRST_LOGIN_WELCOME_TITLE,
 } from "./types";
 export {
+  hasEstablishedAccountWelcomeEvidence,
+  type EstablishedWelcomeEvidenceInput,
+} from "./establishedAccount";
+export {
   isWelcomeCompleted,
   loadFirstLoginWelcomeRecord,
   markWelcomeAudioPlayed,
@@ -19,4 +23,5 @@ export {
   mergeWelcomeRecords,
   recordFromUserMetadata,
   resetFirstLoginWelcomeLocalForTests,
+  type LoadFirstLoginWelcomeOptions,
 } from "./persistence";

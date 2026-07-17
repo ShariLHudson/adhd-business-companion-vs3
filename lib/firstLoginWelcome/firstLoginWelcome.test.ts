@@ -35,6 +35,11 @@ vi.mock("@/lib/supabase/companionClient", () => ({
 
 vi.mock("@/lib/welcomeHome/firstLaunchPersistence", () => ({
   markWelcomeIntroSeen: vi.fn(),
+  hasSeenWelcomeIntro: vi.fn(() => false),
+}));
+
+vi.mock("@/lib/firstLoginWelcome/establishedAccount", () => ({
+  hasEstablishedAccountWelcomeEvidence: vi.fn(() => false),
 }));
 
 import {
@@ -46,6 +51,7 @@ import {
   recordFromUserMetadata,
   resetFirstLoginWelcomeLocalForTests,
 } from "@/lib/firstLoginWelcome";
+import { hasEstablishedAccountWelcomeEvidence } from "@/lib/firstLoginWelcome/establishedAccount";
 import { markWelcomeIntroSeen } from "@/lib/welcomeHome/firstLaunchPersistence";
 
 describe("firstLoginWelcome persistence", () => {
@@ -58,6 +64,7 @@ describe("firstLoginWelcome persistence", () => {
       data: { user: { id: "user-1", user_metadata: {} } },
       error: null,
     });
+    vi.mocked(hasEstablishedAccountWelcomeEvidence).mockReturnValue(false);
   });
 
   it("reads welcome fields from user metadata", () => {
@@ -134,5 +141,47 @@ describe("firstLoginWelcome persistence", () => {
     } = await import("@/lib/firstLoginWelcome/types");
     expect(FIRST_LOGIN_WELCOME_PRIMARY).toBe("Continue to Welcome Home");
     expect(FIRST_LOGIN_WELCOME_STOP).toBe("Stop & Continue");
+  });
+
+  it("does not overwrite completed metadata with false on reload", async () => {
+    await markWelcomeCompleted("user-1", "2026-07-13T12:05:00.000Z");
+    updateUser.mockClear();
+    getUser.mockResolvedValue({
+      data: {
+        user: {
+          id: "user-1",
+          user_metadata: {
+            welcome_completed_at: "2026-07-13T12:05:00.000Z",
+            welcome_audio_played_at: "2026-07-13T12:05:00.000Z",
+          },
+        },
+      },
+      error: null,
+    });
+    const again = await markWelcomeCompleted(
+      "user-1",
+      "2026-07-14T00:00:00.000Z",
+    );
+    expect(again.welcomeCompletedAt).toBe("2026-07-13T12:05:00.000Z");
+    expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  it("retries metadata push when first updateUser fails", async () => {
+    updateUser
+      .mockResolvedValueOnce({ data: {}, error: { message: "network" } } as never)
+      .mockResolvedValueOnce({ data: {}, error: null });
+    await markWelcomeCompleted("user-1", "2026-07-13T15:00:00.000Z");
+    expect(updateUser).toHaveBeenCalledTimes(2);
+    expect(isWelcomeCompleted(await loadFirstLoginWelcomeRecord("user-1"))).toBe(
+      true,
+    );
+  });
+
+  it("migrates established accounts to completed on load", async () => {
+    vi.mocked(hasEstablishedAccountWelcomeEvidence).mockReturnValue(true);
+    const migrated = await loadFirstLoginWelcomeRecord("user-1");
+    expect(isWelcomeCompleted(migrated)).toBe(true);
+    expect(updateUser).toHaveBeenCalled();
+    expect(markWelcomeIntroSeen).toHaveBeenCalled();
   });
 });

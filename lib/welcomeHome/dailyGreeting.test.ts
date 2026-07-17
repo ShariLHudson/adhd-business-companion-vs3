@@ -44,14 +44,14 @@ describe("evaluateWelcomeHomeExperience", () => {
     expect(plan.visitorKind).toBe("returning");
   });
 
-  it("ignores manual replay — welcome audio is first-login only", () => {
+  it("allows explicit Replay Welcome cinematic without treating it as first login", () => {
     const plan = evaluateWelcomeHomeExperience({
       hasSeenWelcomeIntro: true,
       isRepeatLogin: true,
       replayRequested: true,
     });
-    expect(plan.visitorKind).toBe("returning");
-    expect(plan.showIntro).toBe(false);
-    expect(plan.greeting).toBeTruthy();
+    expect(plan.visitorKind).toBe("replay");
+    expect(plan.showIntro).toBe(true);
+    expect(plan.greeting).toBeNull();
   });
 });
