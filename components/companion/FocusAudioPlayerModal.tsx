@@ -3,7 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { openAudioLink } from "@/lib/audioPlaylists";
 import { resolveInAppAudioPlayback } from "@/lib/focusAudio/inAppAudioPlayback";
+import { registerEstateMediaStopper } from "@/lib/estate/stopAllAudio";
 import type { SoundscapePlayback } from "@/lib/soundscapes/types";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 type Props = {
   playback: SoundscapePlayback | null;
@@ -12,6 +14,11 @@ type Props = {
 
 export function FocusAudioPlayerModal({ playback, onClose }: Props) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
+  const open = Boolean(playback);
+  const { requestClose, onBackdropClick } = useDismissibleWindow({
+    open,
+    onClose,
+  });
 
   const inApp = useMemo(() => {
     if (!playback) return null;
@@ -24,16 +31,15 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
   }, [playback]);
 
   useEffect(() => {
-    if (!playback) {
-      setAdvancedOpen(false);
-      return;
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [playback, onClose]);
+    if (!playback) setAdvancedOpen(false);
+  }, [playback]);
+
+  useEffect(() => {
+    if (!playback) return;
+    return registerEstateMediaStopper(() => {
+      requestClose();
+    });
+  }, [playback, requestClose]);
 
   if (!playback || !inApp) return null;
 
@@ -45,7 +51,7 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
       <button
         type="button"
         aria-label="Close soundscape"
-        onClick={onClose}
+        onClick={() => onBackdropClick()}
         className="absolute inset-0 bg-black/45"
       />
       <div
@@ -75,7 +81,7 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
             </button>
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => requestClose()}
               aria-label="Close"
               className="flex h-9 w-9 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
             >
@@ -100,7 +106,7 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
           ) : null}
 
           {inApp.kind === "direct" ? (
-            <audio controls autoPlay src={inApp.src} className="w-full">
+            <audio controls src={inApp.src} className="w-full">
               Your browser does not support inline audio playback.
             </audio>
           ) : null}
@@ -134,7 +140,7 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
         <div className="mt-4">
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => requestClose()}
             className="w-full rounded-lg bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
           >
             Done

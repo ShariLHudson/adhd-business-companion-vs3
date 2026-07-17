@@ -10150,10 +10150,19 @@
   background: transparent;
 }
 
+/**
+ * One authoritative scrollport for morning-room destinations (Create, Plan My Day,
+ * Strategy Library, Reminders, etc.). The scroll element must be flex-bounded so
+ * overflow-y engages; min-height: 100dvh alone lets content grow and get clipped
+ * by the parent overflow:hidden full-bleed host.
+ */
 .plan-my-day-morning-room {
   position: relative;
-  min-height: 100dvh;
-  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
   width: 100%;
   overflow: hidden;
 }
@@ -10180,17 +10189,18 @@
 .plan-my-day-morning-room__scroll {
   position: relative;
   z-index: 1;
-  min-height: 100dvh;
-  min-height: 100svh;
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 .plan-my-day-morning-room__center {
   display: flex;
-  min-height: 100dvh;
-  min-height: 100svh;
+  min-height: 100%;
   align-items: flex-start;
   justify-content: center;
   padding:

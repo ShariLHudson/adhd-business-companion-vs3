@@ -59,9 +59,10 @@ export function parseYoutubeVideoId(url: string): string | null {
   }
 }
 
+/** Prepare embed — does not autoplay; member starts playback in the player. */
 export function toYoutubeEmbedUrl(videoId: string): string {
   const params = new URLSearchParams({
-    autoplay: "1",
+    autoplay: "0",
     rel: "0",
     modestbranding: "1",
   });

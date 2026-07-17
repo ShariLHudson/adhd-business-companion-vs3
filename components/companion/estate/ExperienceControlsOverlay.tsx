@@ -24,7 +24,7 @@ import {
   isEstateAmbienceEnabled,
   setEstateAmbienceEnabled,
 } from "@/lib/estate/estateAmbiencePreference";
-import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmentalAudio";
+import { stopAllAudio } from "@/lib/estate/stopAllAudio";
 import {
   activeEstateAmbienceRoomId,
   kickstartEstateRoomAmbience,
@@ -124,16 +124,33 @@ export function ExperienceControlsOverlay({
     patchExperienceControlPrefs({ estateSoundsEnabled: enabled });
     if (!enabled) {
       setEstateAmbienceEnabled(false);
-      void stopAllEstateEnvironmentalAudio();
+      void stopAllAudio();
       setEstateSoundsOn(false);
       return;
     }
     const profile = resolveEstatePlaceAmbientProfile(roomId);
     setEstateAmbienceEnabled(true);
+    patchEstateAudioSettings({ ambienceEnabled: true, autoplayAllowed: false });
     if (profile) {
       kickstartEstateRoomAmbience(roomId, profile);
     }
     setEstateSoundsOn(true);
+  };
+
+  const stopEverything = () => {
+    void stopAllAudio();
+    setEstateAmbienceEnabled(false);
+    setEstateSoundsOn(false);
+    patchExperienceControlPrefs({
+      estateSoundsEnabled: false,
+      musicEnabled: false,
+    });
+    patchEstateAudioSettings({
+      ambienceEnabled: false,
+      soundscapeOverlayEnabled: false,
+      autoplayAllowed: false,
+    });
+    setMusicOn(false);
   };
 
   const setMusic = (enabled: boolean) => {
@@ -279,6 +296,17 @@ export function ExperienceControlsOverlay({
                 }
               />
             </label>
+            <p className="experience-controls-overlay__status">
+              Sound stays off until you choose Play or turn Estate Sounds on.
+            </p>
+            <button
+              type="button"
+              className="experience-controls-overlay__choice"
+              data-testid="experience-controls-stop-all-sound"
+              onClick={stopEverything}
+            >
+              Stop All Sound
+            </button>
           </section>
 
           <section

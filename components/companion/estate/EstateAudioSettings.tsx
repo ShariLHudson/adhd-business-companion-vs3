@@ -17,6 +17,7 @@ import {
   stopEstateRoomAmbience,
   transitionEstatePlaceAmbient,
 } from "@/lib/estate/estateRoomAmbience";
+import { stopAllAudio } from "@/lib/estate/stopAllAudio";
 
 type Props = {
   placeId?: string | null;
@@ -44,8 +45,7 @@ export function EstateAudioSettings({ placeId, className }: Props) {
       setSettings(next);
 
       if (next.silenced) {
-        void stopEstateRoomAmbience();
-        void stopEstateSoundscapeOverlay();
+        void stopAllAudio();
         patchEstateRuntimeState({ activeSoundscape: null });
         return;
       }
@@ -80,9 +80,26 @@ export function EstateAudioSettings({ placeId, className }: Props) {
       aria-label="Estate audio"
     >
       <p className="estate-audio-settings__intro">
-        The Estate carries quiet sound so each place feels alive. Adjust it here
-        anytime.
+        Sound is opt-in. Nothing starts until you choose Play or turn a layer
+        on. Adjust it here anytime.
       </p>
+
+      <label className="estate-audio-settings__row">
+        <input
+          type="checkbox"
+          checked={settings.welcomeGreetingAudioEnabled && !settings.silenced}
+          disabled={settings.silenced}
+          onChange={(e) =>
+            apply({ welcomeGreetingAudioEnabled: e.target.checked })
+          }
+          data-testid="estate-audio-welcome-greeting"
+        />
+        <span>Welcome greeting audio</span>
+        <span className="estate-audio-settings__hint">
+          Optional spoken welcome on a brand-new member&apos;s first login —
+          never autoplays unless you enable it
+        </span>
+      </label>
 
       <label className="estate-audio-settings__row">
         <input
@@ -132,6 +149,23 @@ export function EstateAudioSettings({ placeId, className }: Props) {
           aria-valuenow={Math.round(settings.masterVolume * 100)}
         />
       </label>
+
+      <button
+        type="button"
+        className="estate-audio-settings__silence"
+        data-testid="estate-audio-stop-all-sound"
+        onClick={() => {
+          void stopAllAudio();
+          apply({
+            silenced: true,
+            ambienceEnabled: false,
+            soundscapeOverlayEnabled: false,
+            autoplayAllowed: false,
+          });
+        }}
+      >
+        Stop All Sound
+      </button>
 
       <button
         type="button"

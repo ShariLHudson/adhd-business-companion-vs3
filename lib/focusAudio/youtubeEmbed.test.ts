@@ -40,6 +40,6 @@ describe("youtubeEmbed", () => {
     expect(toYoutubeEmbedUrl("abc123xyz01")).toContain(
       "youtube-nocookie.com/embed/abc123xyz01",
     );
-    expect(toYoutubeEmbedUrl("abc123xyz01")).toContain("autoplay=1");
+    expect(toYoutubeEmbedUrl("abc123xyz01")).toContain("autoplay=0");
   });
 });

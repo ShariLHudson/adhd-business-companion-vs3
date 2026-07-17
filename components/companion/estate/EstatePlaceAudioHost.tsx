@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import {
   getEstateAudioSettings,
   isEstateAmbienceLayerEnabled,
+  isEstateAutoplayAllowed,
   subscribeEstateAudioSettings,
 } from "@/lib/estate/estateAudioSettings";
 import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmentalAudio";
@@ -30,14 +31,13 @@ type AppliedAudioState = {
 
 /**
  * Single owner of Layer 1 place ambience — syncs from placeId only.
- * Layer 2 overlay persists across place moves when enabled.
- *
- * Welcome Home never auto-starts ambience — Sound on (kickstart) is required.
+ * 133–135: navigation never autoplays. Sound on / kickstart is required.
+ * Layer 2 overlay persists across place moves when the member enabled it.
  */
 export function EstatePlaceAudioHost({ placeId }: Props) {
   const lastAppliedRef = useRef<AppliedAudioState>({
     placeId: null,
-    ambienceEnabled: true,
+    ambienceEnabled: false,
     silenced: false,
     introBlocked: false,
   });
@@ -45,6 +45,7 @@ export function EstatePlaceAudioHost({ placeId }: Props) {
   const applyPlace = useCallback((id: string | null) => {
     const settings = getEstateAudioSettings();
     const ambienceEnabled = isEstateAmbienceLayerEnabled();
+    const autoplayAllowed = isEstateAutoplayAllowed();
     const introBlocked =
       id === "welcome-home" && isWelcomeHomeIntroAudioBlocked();
     const last = lastAppliedRef.current;
@@ -69,16 +70,11 @@ export function EstatePlaceAudioHost({ placeId }: Props) {
     }
 
     /**
-     * Opt-in places — stay silent until the member chooses Sound on.
-     * Room menu / gazebo speaker uses kickstartEstateRoomAmbience (user gesture).
-     * Preserve that opt-in if the place is already the active ambience room.
+     * Opt-in by default (autoplayAllowed false): never start on navigate.
+     * Keep playing only if this place is already the active ambience room
+     * (member previously chose Sound on / kickstart).
      */
-    const OPT_IN_AMBIENCE_PLACES = new Set([
-      "welcome-home",
-      "journal",
-      "growth-journal",
-    ]);
-    if (OPT_IN_AMBIENCE_PLACES.has(id)) {
+    if (!autoplayAllowed) {
       if (activeEstateAmbienceRoomId() !== id) {
         void stopAllEstateEnvironmentalAudio();
       }

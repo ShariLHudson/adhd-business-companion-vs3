@@ -22747,7 +22747,9 @@ export default function CompanionPageClient() {
                   activeSection === "reminders-rhythms" ||
                   activeSection === "calendar" ||
                   activeSection === "parking-lot" ||
-                  activeSection === "spin-wheel"
+                  activeSection === "spin-wheel" ||
+                  activeSection === "create" ||
+                  activeSection === "playbook"
                 ? "pl-0 companion-plan-my-day-active"
               : activeSection === "brain-dump"
                 ? "pl-0 companion-clear-my-mind-active"
@@ -22779,7 +22781,9 @@ export default function CompanionPageClient() {
           activeSection === "reminders-rhythms" ||
           activeSection === "calendar" ||
           activeSection === "parking-lot" ||
-          activeSection === "spin-wheel"
+          activeSection === "spin-wheel" ||
+          activeSection === "create" ||
+          activeSection === "playbook"
             ? "companion-plan-my-day-active"
             : ""
         } ${

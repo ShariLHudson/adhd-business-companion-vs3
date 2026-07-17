@@ -1,6 +1,6 @@
 /**
  * Estate Audio Settings — member controls for Layer 1 ambience + Layer 2 soundscapes.
- * Environmental simulation — not a media player.
+ * 133–135: all sound is opt-in; autoplayAllowed defaults false.
  */
 
 const STORAGE_KEY = "spark:estate:audio-settings:v2";
@@ -8,16 +8,21 @@ export const ESTATE_AUDIO_SETTINGS_STORAGE_KEY = STORAGE_KEY;
 const SETTINGS_CHANGE_EVENT = "spark:estate:audio-settings-change";
 
 export type EstateAudioSettings = {
-  /** Layer 1 — place identity sound (default on). */
+  /**
+   * When false (default), place entry / login / navigation never starts audio.
+   * Explicit Play / Sound on still works when ambience is enabled and not silenced.
+   */
+  autoplayAllowed: boolean;
+  /** Layer 1 — place identity sound (default off — opt-in). */
   ambienceEnabled: boolean;
   /** Layer 2 — optional soundscape overlay (default off). */
   soundscapeOverlayEnabled: boolean;
   /** Master volume 0–1 — scales both layers. */
   masterVolume: number;
-  /** Silence Estate — disables all environmental audio. */
+  /** Silence Estate / globalMuted — disables environmental audio. */
   silenced: boolean;
   /**
-   * First-login Shari welcome greeting audio (default on).
+   * First-login Shari welcome greeting audio (default off — opt-in).
    * Off = skip autoplay and do not offer Play on the first-login gate.
    * Welcome audio never plays again after the first login either way.
    */
@@ -25,11 +30,12 @@ export type EstateAudioSettings = {
 };
 
 const DEFAULT_SETTINGS: EstateAudioSettings = {
-  ambienceEnabled: true,
+  autoplayAllowed: false,
+  ambienceEnabled: false,
   soundscapeOverlayEnabled: false,
   masterVolume: 0.85,
   silenced: false,
-  welcomeGreetingAudioEnabled: true,
+  welcomeGreetingAudioEnabled: false,
 };
 
 function clampVolume(volume: number): number {
@@ -43,6 +49,8 @@ function readRaw(): EstateAudioSettings {
     if (!raw) return { ...DEFAULT_SETTINGS };
     const parsed = JSON.parse(raw) as Partial<EstateAudioSettings>;
     return {
+      autoplayAllowed:
+        parsed.autoplayAllowed ?? DEFAULT_SETTINGS.autoplayAllowed,
       ambienceEnabled:
         parsed.ambienceEnabled ?? DEFAULT_SETTINGS.ambienceEnabled,
       soundscapeOverlayEnabled:
@@ -103,10 +111,16 @@ export function isEstateSilenced(): boolean {
   return readRaw().silenced;
 }
 
-/** Whether the one-time first-login welcome greeting may play. */
+/** Whether the one-time first-login welcome greeting may be offered / played. */
 export function isWelcomeGreetingAudioEnabled(): boolean {
   const s = readRaw();
   return s.welcomeGreetingAudioEnabled && !s.silenced;
+}
+
+/** True when automatic starts (room entry, login) are allowed. Default false. */
+export function isEstateAutoplayAllowed(): boolean {
+  const s = readRaw();
+  return s.autoplayAllowed && !s.silenced;
 }
 
 export function setEstateSilenced(silenced: boolean): EstateAudioSettings {
@@ -132,4 +146,18 @@ export function getEstateMasterVolume(): number {
 /** Scales a place profile base volume by master slider. */
 export function effectiveEstateLayerVolume(baseVolume: number): number {
   return baseVolume * getEstateMasterVolume();
+}
+
+/** Package 133 AudioPreference view over stored settings. */
+export function toAudioPreference(settings?: EstateAudioSettings): {
+  autoplayAllowed: boolean;
+  globalMuted: boolean;
+  volume: number;
+} {
+  const s = settings ?? readRaw();
+  return {
+    autoplayAllowed: s.autoplayAllowed,
+    globalMuted: s.silenced,
+    volume: s.masterVolume,
+  };
 }

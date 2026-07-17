@@ -7,6 +7,7 @@ import { HomesteadRoomSignatureMotion } from "@/components/companion/homesteadRo
 import { parseYoutubeVideoId } from "@/lib/focusAudio/youtubeEmbed";
 import { peacefulPlaceNatureMotion } from "@/lib/companionHomestead";
 import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmentalAudio";
+import { registerEstateMediaStopper } from "@/lib/estate/stopAllAudio";
 import {
   peacefulPlaceById,
   resolvePeacefulPlacePlayback,
@@ -49,7 +50,8 @@ export function PeacefulPlaceSession({ destination, onLeave }: Props) {
     [destination],
   );
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [soundOn, setSoundOn] = useState(true);
+  /** Opt-in — selecting / entering a place does not start sound (133–135). */
+  const [soundOn, setSoundOn] = useState(false);
   const [audioDelayed, setAudioDelayed] = useState(false);
   const audioStartedRef = useRef(false);
 
@@ -88,6 +90,13 @@ export function PeacefulPlaceSession({ destination, onLeave }: Props) {
   useEffect(() => {
     void stopAllEstateEnvironmentalAudio();
   }, [destination.id]);
+
+  useEffect(() => {
+    return registerEstateMediaStopper(() => {
+      setSoundOn(false);
+      audioRef.current?.pause();
+    });
+  }, []);
 
   useEffect(() => {
     if (!soundOn) {

@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   getEstateAudioSettings,
   isEstateAmbienceLayerEnabled,
+  isEstateAutoplayAllowed,
   isWelcomeGreetingAudioEnabled,
   patchEstateAudioSettings,
+  toAudioPreference,
 } from "./estateAudioSettings";
 
-describe("estateAudioSettings", () => {
+describe("estateAudioSettings (133 opt-in)", () => {
   beforeEach(() => {
     vi.stubGlobal("localStorage", {
       store: {} as Record<string, string>,
@@ -19,23 +21,33 @@ describe("estateAudioSettings", () => {
     });
   });
 
-  it("defaults ambience on and soundscape overlay off", () => {
+  it("defaults autoplay off, ambience off, welcome greeting off", () => {
     const s = getEstateAudioSettings();
-    expect(s.ambienceEnabled).toBe(true);
+    expect(s.autoplayAllowed).toBe(false);
+    expect(s.ambienceEnabled).toBe(false);
     expect(s.soundscapeOverlayEnabled).toBe(false);
     expect(s.silenced).toBe(false);
-    expect(isEstateAmbienceLayerEnabled()).toBe(true);
+    expect(s.welcomeGreetingAudioEnabled).toBe(false);
+    expect(isEstateAmbienceLayerEnabled()).toBe(false);
+    expect(isEstateAutoplayAllowed()).toBe(false);
+    expect(isWelcomeGreetingAudioEnabled()).toBe(false);
   });
 
   it("silence disables all layers", () => {
-    patchEstateAudioSettings({ silenced: true });
+    patchEstateAudioSettings({ ambienceEnabled: true, silenced: true });
     expect(isEstateAmbienceLayerEnabled()).toBe(false);
+    expect(isEstateAutoplayAllowed()).toBe(false);
   });
 
-  it("welcome greeting audio defaults on and can be turned off", () => {
-    expect(getEstateAudioSettings().welcomeGreetingAudioEnabled).toBe(true);
+  it("welcome greeting can be enabled explicitly", () => {
+    patchEstateAudioSettings({ welcomeGreetingAudioEnabled: true });
     expect(isWelcomeGreetingAudioEnabled()).toBe(true);
-    patchEstateAudioSettings({ welcomeGreetingAudioEnabled: false });
-    expect(isWelcomeGreetingAudioEnabled()).toBe(false);
+  });
+
+  it("exposes AudioPreference view", () => {
+    const pref = toAudioPreference();
+    expect(pref.autoplayAllowed).toBe(false);
+    expect(pref.globalMuted).toBe(false);
+    expect(pref.volume).toBeGreaterThan(0);
   });
 });
