@@ -22,6 +22,10 @@ const NOT_MUCH_RE = /\bnot much\b/i;
 const CASUAL_CHECK_IN_RE =
   /^(?:not much|nothing much|same old|same here|(?:pretty )?(?:good|fine|okay|ok|alright)|doing (?:good|well|okay|fine))(?:[\s!.,?-]+(?:how about you|how are you|and you|what about you|yourself))?[\s!.,?]*$/i;
 
+/** Soft life updates — presence only, no workflow. */
+const CASUAL_UPDATE_RE =
+  /\b(?:appointment|meeting|call|interview|session)\b.{0,40}\b(?:went (?:well|great|okay|fine|better)|went better|turned out well)\b|\b(?:went (?:well|great|okay|fine))\b.{0,40}\b(?:appointment|meeting|call|interview|session)\b/i;
+
 const WARM_RELATIONSHIP_REPLIES = [
   "That's really kind — thank you. I'm glad we're talking.",
   "I appreciate that. What's on your mind today?",
@@ -46,8 +50,16 @@ export function isRelationshipLocalCandidate(userText: string): boolean {
   if (HOW_ARE_YOU_RE.test(trimmed)) return true;
   if (HOW_ABOUT_YOU_RE.test(trimmed)) return true;
   if (CASUAL_CHECK_IN_RE.test(trimmed)) return true;
+  if (CASUAL_UPDATE_RE.test(trimmed)) return true;
   if (isRelationshipConversation(trimmed)) return true;
   return false;
+}
+
+/** Warm acknowledgment for soft updates — no menu, no forced question, no workflow. */
+export function casualUpdateLocalReply(userText: string): string | null {
+  const trimmed = userText.trim();
+  if (!trimmed || !CASUAL_UPDATE_RE.test(trimmed)) return null;
+  return "I'm really glad it went well. That kind of day can leave a little more room to breathe.";
 }
 
 /** Complete relationship small-talk locally — no API, no generic fallback. */
@@ -67,6 +79,8 @@ export function shouldCompleteRelationshipChatLocally(
 
 export function relationshipConversationLocalReply(userText: string): string {
   const trimmed = userText.trim();
+  const casualUpdate = casualUpdateLocalReply(trimmed);
+  if (casualUpdate) return casualUpdate;
   if (isSimpleSocialGreeting(trimmed)) {
     return simpleSocialGreetingReply(trimmed);
   }

@@ -13,4 +13,5 @@ export {
   classifyTechFutureTopic,
   resolveTechFutureChapters,
   techFutureHintForChat,
+  composeThinTechFutureMemberReply,
 } from "./resolveTechFutureOffer";

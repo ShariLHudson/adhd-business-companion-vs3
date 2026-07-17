@@ -5,6 +5,7 @@
  */
 
 import { resolveLocationIntent } from "@/lib/estateKnowledgeBase/locationIntentResolution";
+import { matchExperienceGroupFromQuery } from "@/lib/estateKnowledgeBase/experienceGroups";
 import type { LocationOption } from "@/lib/estateKnowledgeBase/types";
 import {
   mayOfferScenicPlaceSuggestions,
@@ -167,6 +168,12 @@ function resolveFromKnowledgeBaseIntent(
   }
 
   if (intent.kind === "experience_options" && intent.options?.length) {
+    // Unsolicited scenic menus stay off. Explicit KB userMayAsk phrases still resolve.
+    const experienceMatch = matchExperienceGroupFromQuery(query);
+    const explicitExperienceAsk = experienceMatch?.matchSource === "userMayAsk";
+    if (!mayOfferScenicPlaceSuggestions(query) && !explicitExperienceAsk) {
+      return null;
+    }
     let maxChoices = mayOfferScenicPlaceSuggestions(query)
       ? scenicPlaceSuggestionCount(query) || 3
       : 3;

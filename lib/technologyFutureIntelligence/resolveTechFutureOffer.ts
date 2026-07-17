@@ -127,3 +127,37 @@ export function techFutureHintForChat(userText: string): string | null {
     "Do not automatically recommend buying a new tool. Ask one clarifying question only if needed.",
   ].join("\n");
 }
+
+/**
+ * Thin member-facing reply when Technology & Future owns the turn.
+ * Never dumps the library; never navigates; never opens a scenic menu.
+ */
+export function composeThinTechFutureMemberReply(
+  userText: string,
+): string | null {
+  const topic = classifyTechFutureTopic(userText);
+  if (!topic) return null;
+  const chapters = resolveTechFutureChapters(userText, { max: 1 });
+  if (chapters.length === 0) return null;
+
+  if (topic === "crm" || SWITCH_CRM_RE.test(userText)) {
+    return [
+      "Before you switch, it helps to name what you actually need the CRM to do — follow-ups, pipeline, or just remembering people.",
+      "Migration and ongoing maintenance are real costs, so sometimes the kinder move is tightening what you already have.",
+      "What outcome would make a switch worth it for you?",
+    ].join(" ");
+  }
+
+  if (topic === "switch_replace") {
+    return [
+      "Switching only pays off when the current tool is blocking a real outcome — not when something new merely looks shinier.",
+      "I'd weigh migration burden and who will maintain the new system before moving anything.",
+      "What's breaking in the one you have now?",
+    ].join(" ");
+  }
+
+  return [
+    chapters[0]!.offerHint,
+    "What outcome are you hoping for if nothing else changes?",
+  ].join(" ");
+}

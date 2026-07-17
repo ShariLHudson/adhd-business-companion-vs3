@@ -54,6 +54,7 @@ function choiceSearchText(choice: PendingChoiceItem): string {
     choice.destination ?? "",
     choice.capability ?? "",
     choice.id,
+    ...(choice.aliases ?? []),
     aliasText,
   ]
     .join(" ")

@@ -39,6 +39,10 @@ export type PendingChoiceItem = {
   destination?: string;
   capability?: string;
   workflow?: string;
+  /** 1-based number shown in the assistant menu for this turn */
+  visibleNumber?: number;
+  aliases?: string[];
+  navigationAvailable?: boolean;
   callback: PendingChoiceAction;
   confidence?: "high" | "medium" | "low";
 };
@@ -55,6 +59,9 @@ export type PendingChoiceState = {
   /** Full menu text to re-show on unrecognized selection */
   menuText?: string;
   offeredAtTurn?: number;
+  /** Assistant turn that displayed this exact menu */
+  originatingAssistantMessageId?: string;
+  turnId?: string;
 };
 
 export type PendingChoiceResolveResult =

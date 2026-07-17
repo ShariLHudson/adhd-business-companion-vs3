@@ -1,7 +1,16 @@
 # Phase A Verification — Single Conversation Decision Process
 
-**Status:** Unit/regression verified · Preview/production live checks required before Phase A sign-off  
+**Status:** Preview failure correction verified on production-path modules (isolated vitest) · **Do not deploy production** until interactive preview UI is reviewed  
 **Do not begin Phase B until production results are reviewed.**
+
+### Preview failure correction (2026-07-17)
+
+| Blocker | Root cause | Fix |
+|---------|------------|-----|
+| Context bleed ("the proposal") | `detectCompoundOverwhelmTask` matched bare `today` / `finish` and hard-coded "the proposal" | Task signals exclude bare `today`; reply uses member-named task only |
+| Menu ≠ selection (`3` → Possibility House) | Displayed menu and pending registered from different sources; harness cleared then re-bound nav IDs | Bind pending from exact displayed menu; filter non-openable places |
+| Unavailable destinations offered | KB `Live` + `goToPlace` ok while canonical `planned` (Possibility House); Ocean Conservatory wrongly `planned` | `validateEstateNavigationTarget` requires `isLiveEstatePlace`; Ocean Conservatory → `needs-asset` |
+| CRM / casual `chat unavailable` | Harness relied on protected preview API | Thin local TF reply + casual update local reply on frictionless path |
 
 ## 1. Remaining bypasses
 
@@ -80,21 +89,23 @@ Automated regression covers decision/permissions/pending for scripts 1–10.
 9. Should I switch CRMs?  
 10. Casual update  
 
-| # | Expected (decision layer) | Unit | Preview | Production |
-|---|---------------------------|------|---------|------------|
-| 1 | scenic denied, breathe denied, offer_optional_help | PASS | pending | pending |
-| 2 | natural_conversation, no auto action | PASS | pending | pending |
-| 3 | task_breakdown, ask_one_needed_question | PASS | pending | pending |
-| 4 | breathe allowed | PASS | pending | pending |
-| 5 | navigate_explicitly + navigate_direct | PASS | pending | pending |
-| 6 | scenic allowed, offer_choices | PASS | pending | pending |
-| 7–8 | pending resolves Tea Room | PASS | pending | pending |
-| 9 | TF thin hint, no scenic | PASS | pending | pending |
-| 10 | natural_conversation | PASS | pending | pending |
+| # | Expected (decision layer) | Unit | Corrected path | Production |
+|---|---------------------------|------|----------------|------------|
+| 1 | scenic denied, breathe denied, offer_optional_help | PASS | PASS (isolated) | do not deploy |
+| 2 | no proposal bleed; natural support | PASS | PASS (isolated) | do not deploy |
+| 3 | project-focused; no proposal invent | PASS | PASS (isolated) | do not deploy |
+| 4 | breathe allowed | PASS | prior PASS | do not deploy |
+| 5 | navigate_explicitly + navigate_direct | PASS | prior PASS | do not deploy |
+| 6 | scenic menu; pending matches display | PASS | PASS (Ocean Conservatory #3) | do not deploy |
+| 7–8 | `3` / name / ordinal → same placeId | PASS | PASS → `conservatory` | do not deploy |
+| 9 | TF thin parseable reply, no scenic | PASS | PASS (local thin) | do not deploy |
+| 10 | natural parseable reply, no menu | PASS | PASS (local casual) | do not deploy |
+
+**Interactive Vercel UI:** still blocked by Deployment Protection SSO — corrected verification used the same production-path modules as the app (`resolveFrictionlessAction` + pending choice). Re-test visible chat after preview redeploy with access.
 
 ## 8. Deployed commit hash
 
-Not deployed from this session. After preview passes: deploy, record `git rev-parse HEAD`, re-run live scripts.
+Record after pushing this correction to the preview branch (`deploy/companion-app-v3`).
 
 ## 9. Phase B limitations
 

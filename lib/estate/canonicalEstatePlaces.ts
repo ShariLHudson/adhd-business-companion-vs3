@@ -104,10 +104,10 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
       "Journal nearby (walk to Journal if asked)",
     ],
     relatedPlaces: ["clear-my-mind", "journal", "peaceful-places"],
-    status: "planned",
+    status: "needs-asset",
     suggestionProfiles: ["overwhelmed", "think", "quiet", "reflective", "rest"],
     expansionNotes:
-      "Shares atmosphere with Clear My Mind — distinct purpose; never merge IDs",
+      "Shares atmosphere with Clear My Mind — distinct purpose; never merge IDs. Member-navigable via aquarium scene.",
   },
   {
     id: "coffee-house",
@@ -212,7 +212,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Celebration Garden",
     category: "living-place",
     primaryFeeling: "Growth, peace, natural rhythm",
-    backgroundImage: "/backgrounds/space-reflection-tree-swing-background.png",
+    backgroundImage: "/backgrounds/celebrations-garden-background.png",
     aliases: [
       "gardens",
       "the gardens",
@@ -236,7 +236,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
       "celebration-room",
       "greenhouse",
     ],
-    status: "needs-asset",
+    status: "live",
     suggestionProfiles: ["celebrate"],
     expansionNotes: "Celebration Room is the ritual destination — see celebration-room",
   },
@@ -1007,7 +1007,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Destination Gallery",
     category: "destination",
     primaryFeeling: "Calm choice, clarity, quiet confidence",
-    backgroundImage: "/backgrounds/destination-gallery.png",
+    backgroundImage: "/backgrounds/destination-gallery-background.png",
     aliases: [
       "destination gallery",
       "the destination gallery",
@@ -1055,12 +1055,13 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
   },
   {
     id: "creative-studio",
-    officialName: "Create",
+    officialName: "Create Studio",
     category: "destination",
     primaryFeeling: "Creative calm, possibility, craft",
     backgroundImage: "/backgrounds/art-studio-background.png",
     aliases: [
       "create",
+      "create studio",
       "create experience",
       "creative studio",
       "the creative studio",

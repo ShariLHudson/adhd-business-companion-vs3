@@ -30,14 +30,16 @@ describe("estate asset intelligence", () => {
     const intent = resolveLocationIntent("I want somewhere peaceful");
     expect(intent.kind).toBe("experience_options");
     expect(intent.options?.length).toBe(3);
+    // Only member-openable destinations — planned Possibility House is filtered out.
     expect(intent.options?.map((o) => o.locationId)).toEqual([
       "reflection-pond",
       "personal-library",
-      "house-possibility-outside",
+      "conservatory",
     ]);
     expect(intent.memberFacingPrompt).toContain("Reflection Pond");
     expect(intent.memberFacingPrompt).toContain("Personal Library");
-    expect(intent.memberFacingPrompt).toContain("Possibility House");
+    expect(intent.memberFacingPrompt).toContain("Ocean Conservatory");
+    expect(intent.memberFacingPrompt).not.toContain("Possibility House");
   });
 
   it("matches nature renewal experience group", () => {

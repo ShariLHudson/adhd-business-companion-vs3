@@ -74,11 +74,16 @@ export function registerPendingChoice(input: {
   activeRole?: string;
   activeWorkflow?: string;
   offeredAtTurn?: number;
+  originatingAssistantMessageId?: string;
+  turnId?: string;
 }): PendingChoiceState {
   const state: PendingChoiceState = {
     pendingChoiceId: createPendingChoiceId(input.type),
     pendingChoiceType: input.type,
-    choices: input.choices,
+    choices: input.choices.map((choice, index) => ({
+      ...choice,
+      visibleNumber: choice.visibleNumber ?? index + 1,
+    })),
     conversationId: input.conversationId,
     timestamp: Date.now(),
     activeIntent: input.activeIntent,
@@ -86,6 +91,8 @@ export function registerPendingChoice(input: {
     activeWorkflow: input.activeWorkflow,
     menuText: input.menuText,
     offeredAtTurn: input.offeredAtTurn,
+    originatingAssistantMessageId: input.originatingAssistantMessageId,
+    turnId: input.turnId,
   };
   savePendingChoice(state);
   return state;

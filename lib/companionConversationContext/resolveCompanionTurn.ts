@@ -298,8 +298,8 @@ export function resolveCompanionTurn(
       decision: baseDecision(routing, {
         category: "none",
         suppressRelationship: false,
-        localReply: formatCompoundOverwhelmTaskReply(),
-        responseHint: `${CONTEXT_HINT}\nCOMPOUND INTENT: Acknowledge both overwhelm and task. One choice only — Clear My Mind or proposal. Max 2 options.`,
+        localReply: formatCompoundOverwhelmTaskReply(userText),
+        responseHint: `${CONTEXT_HINT}\nCOMPOUND INTENT: Acknowledge overwhelm and the task they named. Never invent a proposal or project. One choice only — clear the mind or the named work. Max 2 options.`,
       }),
       trace,
     };

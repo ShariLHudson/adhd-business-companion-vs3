@@ -14,11 +14,11 @@ import {
   getLiveEstateLocations,
   getEstateLocationById,
   isRecommendableEstateLocation,
-  locationOptionsForIds,
   toLocationOption,
 } from "./estateLocations";
 import { matchExperienceGroupFromQuery } from "./experienceGroups";
 import { matchAmbiguousLocationTerm } from "@/lib/estateNavigationIntelligence/ambiguousLocations";
+import { filterValidatedNavigationTargets } from "@/lib/estateNavigationIntelligence/routeValidation";
 import {
   longestPhraseMatch,
   normalizeLocationPhrase,
@@ -132,13 +132,16 @@ export function resolveLocationIntent(query: string): LocationIntentResolution {
   const experience = matchExperienceGroupFromQuery(query);
   if (experience) {
     const group = experience.group;
-    const maxOptions = group.maxOptions ?? 3;
+    const maxOptions = Math.min(group.maxOptions ?? 3, 3);
     const orderedIds =
       group.presentationOrder?.length > 0
         ? group.presentationOrder
         : group.locationIds;
 
-    const options = locationOptionsForIds(orderedIds).slice(0, maxOptions);
+    // Only offer destinations that exist, are enabled, and can open now.
+    const options = filterValidatedNavigationTargets(orderedIds)
+      .slice(0, maxOptions)
+      .map((target) => target.option);
 
     if (options.length === 1) {
       return {

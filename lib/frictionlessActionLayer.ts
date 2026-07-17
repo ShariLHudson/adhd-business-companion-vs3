@@ -385,11 +385,17 @@ import {
   hasActivePendingChoice,
   registerCognitiveOverloadPendingChoices,
   registerEmotionalRegulationPendingChoices,
+  registerPendingChoiceFromAssistantText,
   registerPendingChoiceFromConcierge,
   registerPendingChoiceFromExperienceMenu,
   registerPendingChoiceFromNavigation,
   resolvePendingChoiceTurn,
 } from "@/lib/pendingChoice";
+import {
+  composeThinTechFutureMemberReply,
+  techFutureHintForChat,
+} from "@/lib/technologyFutureIntelligence";
+import { casualUpdateLocalReply } from "@/lib/chatFastPath/relationshipChatLocal";
 
 export type FrictionlessActionCategory =
   | "direct_action"
@@ -3474,6 +3480,18 @@ function mapEstateIntelligenceRuntimeToFrictionless(
     }
   }
 
+  // Bind pending to the exact displayed place menu when estate intelligence offered choices.
+  if (
+    base.localReply &&
+    !base.immediateEstatePlaceNavigate &&
+    !hasActivePendingChoice()
+  ) {
+    registerPendingChoiceFromAssistantText(
+      base.localReply,
+      input.currentTurn,
+    );
+  }
+
   return base;
 }
 
@@ -3528,6 +3546,27 @@ function tryEstateHelpDiscoveryFlow(
         userText,
       },
     };
+  }
+
+  if (
+    decision.route === "location" &&
+    decision.navigation?.kind === "offer_choices" &&
+    decision.navigation.choices?.length &&
+    decision.memberFacingResponse
+  ) {
+    registerPendingChoiceFromNavigation({
+      choices: decision.navigation.choices.map((choice, index) => ({
+        label: String(index + 1),
+        destinationId: choice.placeId,
+        displayName: choice.officialDisplayName,
+        shortDescription: choice.memberFacingHint,
+        confidence: "medium" as const,
+        reasonMatched: "help_discovery",
+      })),
+      menuText: decision.memberFacingResponse,
+      queryPhrase: userText,
+      offeredAtTurn: input.currentTurn,
+    });
   }
 
   return base;
@@ -3898,6 +3937,41 @@ function resolveFrictionlessActionImpl(
   const earlySupport = tryEarlyCompanionSupportFlow(input, routing);
   if (earlySupport) {
     return finish(earlySupport);
+  }
+
+  const techThin = composeThinTechFutureMemberReply(userText);
+  if (techThin) {
+    return finish({
+      category: "decision_support",
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        techFutureHintForChat(userText) ??
+        "TECHNOLOGY & FUTURE: thin advice only — no scenic menu, no auto-navigate.",
+      localReply: techThin,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    });
+  }
+
+  const casualUpdate = casualUpdateLocalReply(userText);
+  if (casualUpdate) {
+    return finish({
+      category: "none",
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: false,
+      responseHint:
+        "CASUAL UPDATE: Warm presence only — no workflow, menu, or forced follow-up question.",
+      localReply: casualUpdate,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    });
   }
 
   const yesContinuation = tryFrictionlessYesContinuation(input, routing);

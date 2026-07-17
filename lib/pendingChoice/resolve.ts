@@ -8,6 +8,8 @@ import type { EstateDestinationChoice } from "@/lib/estate/estateDestinationReso
 import {
   extractPlaceIdsFromNumberedAssistantMenu,
 } from "@/lib/estate/estatePlaceIdentityLock";
+import { resolveCanonicalPlaceIdFromAlias } from "@/lib/estate/canonicalEstateRegistry";
+import { goToPlace } from "@/lib/estate/goToPlace";
 import {
   ackForPendingChoiceAction,
   pendingChoiceActionFromCapability,
@@ -59,23 +61,51 @@ function formatMenuReplay(state: PendingChoiceState): string {
     .join("\n");
 }
 
-function placeChoicesFromIds(placeIds: readonly string[]): PendingChoiceItem[] {
+function placeChoicesFromIds(
+  placeIds: readonly string[],
+  labelsByPlaceId?: ReadonlyMap<string, string>,
+): PendingChoiceItem[] {
   return placeIds
-    .filter((placeId) => isLiveEstatePlace(placeId))
-    .map((placeId) => {
+    .filter((placeId) => isLiveEstatePlace(placeId) || Boolean(placeId))
+    .map((placeId, index) => {
     const place = getCanonicalEstatePlaceById(placeId);
-    const label = place?.officialName.replace(/\u2122/g, "") ?? placeId.replace(/-/g, " ");
+    const label =
+      labelsByPlaceId?.get(placeId)?.replace(/\u2122/g, "").trim() ||
+      place?.officialName.replace(/\u2122/g, "") ||
+      placeId.replace(/-/g, " ");
+    const navPlace = goToPlace({ placeId });
+    const navId = navPlace.ok ? navPlace.placeId : placeId;
     return {
       id: placeId,
       label,
-      destination: placeId,
+      destination: navId,
+      visibleNumber: index + 1,
+      aliases: [
+        label,
+        ...(place?.aliases ?? []),
+        placeId.replace(/-/g, " "),
+      ],
+      navigationAvailable: true,
       callback: {
         kind: "navigate_place",
-        placeId,
+        placeId: navId,
       },
       confidence: "high" as const,
     };
   });
+}
+
+function labelsFromNumberedPlaceMenu(
+  menuText: string,
+): Map<string, string> {
+  const labels = new Map<string, string>();
+  for (const match of menuText.matchAll(/^\s*\d+[.)]\s+(.+)$/gm)) {
+    const body = match[1]!.trim();
+    const namePart = body.split(" — ")[0]!.replace(/\u2122/g, "").trim();
+    const placeId = resolveCanonicalPlaceIdFromAlias(namePart);
+    if (placeId && namePart) labels.set(placeId, namePart);
+  }
+  return labels;
 }
 
 export function registerPendingChoiceFromConcierge(input: {
@@ -99,7 +129,10 @@ export function registerPendingChoiceFromPlaceIds(input: {
   menuText: string;
   offeredAtTurn?: number;
 }): PendingChoiceState | null {
-  const choices = placeChoicesFromIds(input.placeIds);
+  const choices = placeChoicesFromIds(
+    input.placeIds,
+    labelsFromNumberedPlaceMenu(input.menuText),
+  );
   if (choices.length < 2) return null;
   return registerPendingChoice({
     type: "estate_place",
@@ -114,24 +147,53 @@ export function registerPendingChoiceFromNavigation(input: {
   menuText: string;
   queryPhrase?: string;
   offeredAtTurn?: number;
-}): PendingChoiceState {
-  const items: PendingChoiceItem[] = input.choices.map((choice) => ({
-    id: choice.destinationId,
-    label: choice.displayName,
-    description: choice.shortDescription,
-    destination: choice.destinationId,
-    callback: {
-      kind: "navigate_place",
-      placeId: choice.destinationId,
-    },
-    confidence: choice.confidence,
-  }));
+  conversationId?: string;
+  originatingAssistantMessageId?: string;
+  turnId?: string;
+}): PendingChoiceState | null {
+  // Choices here are already menu-validated — do not re-filter by status.
+  const items: PendingChoiceItem[] = input.choices
+    .filter((choice) => Boolean(choice.destinationId?.trim()))
+    .map((choice, index) => {
+      const place = getCanonicalEstatePlaceById(choice.destinationId);
+      // Prefer the exact displayed menu name over a remapped shell place's official name.
+      const displayed =
+        choice.displayName?.replace(/\u2122/g, "").trim() ||
+        place?.officialName.replace(/\u2122/g, "") ||
+        choice.destinationId.replace(/-/g, " ");
+      const aliases = [
+        displayed,
+        choice.displayName,
+        place?.officialName,
+        ...(place?.aliases ?? []),
+      ]
+        .map((a) => (a ?? "").replace(/\u2122/g, "").trim())
+        .filter(Boolean);
+      return {
+        id: choice.destinationId,
+        label: displayed,
+        description: choice.shortDescription,
+        destination: choice.destinationId,
+        visibleNumber: index + 1,
+        aliases: [...new Set(aliases)],
+        navigationAvailable: true,
+        callback: {
+          kind: "navigate_place" as const,
+          placeId: choice.destinationId,
+        },
+        confidence: choice.confidence,
+      };
+    });
+  if (items.length < 1) return null;
   return registerPendingChoice({
     type: "estate_navigation",
     choices: items,
     menuText: input.menuText,
     activeIntent: input.queryPhrase,
     offeredAtTurn: input.offeredAtTurn,
+    conversationId: input.conversationId,
+    originatingAssistantMessageId: input.originatingAssistantMessageId,
+    turnId: input.turnId,
   });
 }
 

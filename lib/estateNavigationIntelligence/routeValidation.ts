@@ -1,8 +1,10 @@
 /**
- * Route validation — never navigate to Draft, Future, Hidden, or Retired destinations.
+ * Route validation — never navigate to Draft, Future, Hidden, Retired,
+ * or canonical planned/future places that cannot open for members.
  */
 
 import { goToPlace } from "@/lib/estate/goToPlace";
+import { isLiveEstatePlace } from "@/lib/estate/liveEstatePlace";
 import { getEstateAssetByFileName } from "@/lib/estateKnowledgeBase/estateAssets";
 import {
   getEstateLocationById,
@@ -15,7 +17,8 @@ export type RouteValidationFailureCode =
   | "unknown_location"
   | "not_live"
   | "missing_asset"
-  | "not_navigable";
+  | "not_navigable"
+  | "not_member_accessible";
 
 export type RouteValidationResult =
   | { ok: true; target: ValidatedNavigationTarget }
@@ -39,6 +42,10 @@ export function validateEstateNavigationTarget(
   }
 
   const placeId = location.canonicalPlaceId || location.locationId;
+  if (!isLiveEstatePlace(placeId)) {
+    return { ok: false, locationId, code: "not_member_accessible" };
+  }
+
   const nav = goToPlace({ placeId });
   if (!nav.ok) {
     return { ok: false, locationId, code: "not_navigable" };

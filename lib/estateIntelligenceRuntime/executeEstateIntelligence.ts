@@ -15,6 +15,7 @@ import {
   formatFeatureHowToResponse,
   matchFeatureHowToGuide,
 } from "@/lib/estateHelpDiscoveryIntelligence/featureHowTo";
+import { matchEstateRoomHowToGuide } from "@/lib/estateRoomGuides";
 import {
   formatNavigationDecision,
   formatDirectNavigationLine,
@@ -22,6 +23,12 @@ import {
   shouldNavigateFromDecision,
 } from "@/lib/estateNavigationIntelligence";
 import { resolveLocationIntent } from "@/lib/estateKnowledgeBase/locationIntentResolution";
+import { matchExperienceGroupFromQuery } from "@/lib/estateKnowledgeBase/experienceGroups";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
+import {
+  registerPendingChoiceFromAssistantText,
+  registerPendingChoiceFromNavigation,
+} from "@/lib/pendingChoice";
 import {
   isResolvedObjectIntent,
   resolveObjectIntent,
@@ -76,6 +83,33 @@ function baseHint(capability: string, source: string, detail?: string): string {
     .join("\n");
 }
 
+function bindPendingFromNavigationDecision(
+  decision: {
+    kind: string;
+    choices?: Array<{
+      placeId: string;
+      officialDisplayName: string;
+      memberFacingHint: string;
+    }>;
+    query: string;
+  },
+  localReply: string,
+): void {
+  if (decision.kind !== "offer_choices" || !decision.choices?.length) return;
+  registerPendingChoiceFromNavigation({
+    choices: decision.choices.map((choice, index) => ({
+      label: String(index + 1),
+      destinationId: choice.placeId,
+      displayName: choice.officialDisplayName,
+      shortDescription: choice.memberFacingHint,
+      confidence: "medium" as const,
+      reasonMatched: "estate_intelligence",
+    })),
+    menuText: localReply,
+    queryPhrase: decision.query,
+  });
+}
+
 function executeNavigation(
   userText: string,
 ): EstateIntelligenceRuntimeResult | null {
@@ -113,6 +147,8 @@ function executeNavigation(
     };
   }
 
+  bindPendingFromNavigationDecision(decision, localReply);
+
   return {
     capability: "navigation",
     knowledgeSource: "estate-locations.json",
@@ -140,6 +176,7 @@ function executeRoom(
     ) {
       const localReply = formatNavigationDecision(navigation);
       if (!localReply) return null;
+      bindPendingFromNavigationDecision(navigation, localReply);
       return {
         capability: "room",
         knowledgeSource: "estate-locations.json",
@@ -180,6 +217,35 @@ function executeRoom(
 
   const location = resolveLocationIntent(userText);
   if (location.kind === "experience_options" && location.memberFacingPrompt) {
+    const experienceMatch = matchExperienceGroupFromQuery(userText);
+    const explicitExperienceAsk = experienceMatch?.matchSource === "userMayAsk";
+    if (!mayOfferScenicPlaceSuggestions(userText) && !explicitExperienceAsk) {
+      return null;
+    }
+    // Prefer validated navigation so displayed menu matches pending selection.
+    const validatedNav = resolveEstateNavigationIntent(userText, {
+      bypassIntentGate: true,
+    });
+    if (validatedNav.kind === "offer_choices" && validatedNav.choices?.length) {
+      const localReply =
+        formatNavigationDecision(validatedNav) ?? location.memberFacingPrompt;
+      bindPendingFromNavigationDecision(validatedNav, localReply);
+      return {
+        capability: "room",
+        knowledgeSource: "estate-locations.json",
+        category: "estate_concierge",
+        localReply,
+        responseHint: baseHint(
+          "room (experience options)",
+          "estate-locations.json + experience-groups",
+          ESTATE_NAVIGATION_GOLDEN_RULE,
+        ),
+        suppressRelationship: false,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+      };
+    }
+    registerPendingChoiceFromAssistantText(location.memberFacingPrompt);
     return {
       capability: "room",
       knowledgeSource: "estate-locations.json",
@@ -220,6 +286,21 @@ function executeRoom(
 function executeFeature(
   userText: string,
 ): EstateIntelligenceRuntimeResult | null {
+  const roomHowTo = matchEstateRoomHowToGuide(userText);
+  if (roomHowTo) {
+    return {
+      capability: "feature",
+      knowledgeSource: "feature-how-to-guides",
+      category: "estate_concierge",
+      localReply: roomHowTo.shariReply,
+      responseHint: baseHint("feature", "estate-room-how-to-guides"),
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      immediateEstateHowToGuideOpen: roomHowTo.guideId,
+    };
+  }
+
   const match = matchFeatureHowToGuide(userText);
   const localReply = match
     ? formatFeatureHowToResponse(match.guide)
