@@ -34,7 +34,7 @@ export function MyBusinessEstateRoomShell({
         position="center center"
         imageUrl={backgroundUrl}
         imageStyle={roomBackgroundImageStyle(backgroundUrl)}
-        placement="fixed"
+        placement="absolute"
         className="my-business-estate-room__cinematic"
         showBottomFade={false}
         gradientStrength={0}

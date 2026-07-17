@@ -1,6 +1,18 @@
-/* My Profile — personal destination (not Business Estate) */
+/* My Profile — personal destination (not Business Estate)
+ * Dark readable text on light EstateWorkspace surfaces (113–115).
+ */
 
 .my-profile-destination {
+  --profile-text-primary: #2e2e2e;
+  --profile-text-secondary: #454545;
+  --profile-text-heading: #0f6f7c;
+  --profile-text-muted: #5f5f5f;
+  --profile-surface: rgba(255, 252, 247, 0.96);
+  --profile-border: rgba(46, 46, 46, 0.18);
+  --profile-input-bg: #fffdf9;
+  --profile-button-fill: #0f6f7c;
+  --profile-button-fill-text: #fffdf9;
+
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -9,18 +21,33 @@
   background:
     radial-gradient(
       ellipse at 30% 20%,
-      rgba(72, 58, 42, 0.55),
+      rgba(255, 248, 235, 0.55),
       transparent 55%
     ),
-    linear-gradient(165deg, #2a221a 0%, #1a1511 55%, #12100e 100%);
-  color: rgba(255, 250, 242, 0.98);
+    linear-gradient(165deg, #f3ebe0 0%, #e8dfd2 55%, #ddd2c3 100%);
+  color: var(--profile-text-primary);
   overflow: auto;
+}
+
+.my-profile-destination .estate-workspace,
+.my-profile-destination .estate-workspace__title,
+.my-profile-destination .estate-workspace__kicker {
+  color: var(--profile-text-primary);
+}
+
+.my-profile-destination .estate-workspace__title {
+  color: var(--profile-text-heading);
+}
+
+.my-profile-destination .estate-workspace__kicker {
+  color: var(--profile-text-muted);
 }
 
 .my-profile-panel {
   max-width: 36rem;
   margin: 0 auto;
   padding: 1.25rem 1.25rem 2.5rem;
+  color: var(--profile-text-primary);
 }
 
 .my-profile-panel__back {
@@ -28,11 +55,22 @@
   margin-bottom: 0.75rem;
   padding: 0.4rem 0.85rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 236, 200, 0.28);
-  background: rgba(255, 248, 235, 0.08);
-  color: inherit;
+  border: 1px solid var(--profile-border);
+  background: var(--profile-surface);
+  color: var(--profile-text-heading);
   font: inherit;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.my-profile-panel__back:hover {
+  background: #fff;
+  border-color: rgba(15, 111, 124, 0.45);
+}
+
+.my-profile-panel__back:focus-visible {
+  outline: 2px solid var(--profile-text-heading);
+  outline-offset: 2px;
 }
 
 .my-profile-panel__header {
@@ -41,9 +79,10 @@
 
 .my-profile-panel__lead {
   margin: 0.35rem 0 0;
-  opacity: 0.85;
+  color: var(--profile-text-secondary);
   font-size: 1rem;
   line-height: 1.45;
+  opacity: 1;
 }
 
 .my-profile-panel__identity {
@@ -61,9 +100,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(40, 32, 24, 0.72);
-  border: 1px solid rgba(255, 236, 200, 0.28);
-  color: rgba(255, 250, 242, 0.96);
+  background: #e7dfd4;
+  border: 1px solid var(--profile-border);
+  color: var(--profile-text-heading);
   font-size: 1.35rem;
   font-weight: 600;
 }
@@ -74,15 +113,22 @@
   object-fit: cover;
 }
 
+.my-profile-panel__avatar-initials {
+  color: var(--profile-text-heading);
+}
+
 .my-profile-panel__field {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.95rem;
+  color: var(--profile-text-primary);
 }
 
 .my-profile-panel__field span {
-  opacity: 0.78;
+  color: var(--profile-text-secondary);
+  font-weight: 600;
+  opacity: 1;
 }
 
 .my-profile-panel__field input,
@@ -90,10 +136,23 @@
   min-height: 2.75rem;
   padding: 0.55rem 0.75rem;
   border-radius: 0.65rem;
-  border: 1px solid rgba(255, 236, 200, 0.22);
-  background: rgba(255, 248, 235, 0.08);
-  color: rgba(255, 250, 242, 0.98);
+  border: 1px solid var(--profile-border);
+  background: var(--profile-input-bg);
+  color: var(--profile-text-primary);
   font: inherit;
+}
+
+.my-profile-panel__field input::placeholder,
+.my-profile-panel__field textarea::placeholder {
+  color: var(--profile-text-muted);
+  opacity: 1;
+}
+
+.my-profile-panel__field input:focus-visible,
+.my-profile-panel__field textarea:focus-visible {
+  outline: 2px solid var(--profile-text-heading);
+  outline-offset: 2px;
+  border-color: var(--profile-text-heading);
 }
 
 .my-profile-panel__field textarea {
@@ -112,17 +171,33 @@
   min-height: 2.75rem;
   padding: 0.55rem 1.1rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 220, 160, 0.45);
-  background: rgba(255, 220, 160, 0.16);
-  color: inherit;
+  border: 1px solid var(--profile-button-fill);
+  background: var(--profile-button-fill);
+  color: var(--profile-button-fill-text);
   font: inherit;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.my-profile-panel__primary:hover {
+  filter: brightness(0.95);
+}
+
+.my-profile-panel__primary:focus-visible {
+  outline: 2px solid var(--profile-text-heading);
+  outline-offset: 2px;
+}
+
+.my-profile-panel__primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .my-profile-panel__saved {
   margin: 0;
   font-size: 0.95rem;
-  opacity: 0.85;
+  color: var(--profile-text-heading);
+  opacity: 1;
 }
 
 .my-profile-panel__prefs {
@@ -135,12 +210,15 @@
 .my-profile-panel__section-title {
   margin: 0;
   font-size: 1.05rem;
+  color: var(--profile-text-heading);
+  font-weight: 700;
 }
 
 .my-profile-panel__section-lead {
   margin: 0 0 0.35rem;
-  opacity: 0.8;
+  color: var(--profile-text-secondary);
   font-size: 0.95rem;
+  opacity: 1;
 }
 
 .my-profile-panel__link {
@@ -148,9 +226,21 @@
   min-height: 2.75rem;
   padding: 0.55rem 0.75rem;
   border-radius: 0.65rem;
-  border: 1px solid rgba(255, 236, 200, 0.22);
-  background: rgba(255, 248, 235, 0.06);
-  color: inherit;
+  border: 1px solid var(--profile-border);
+  background: var(--profile-surface);
+  color: var(--profile-text-primary);
   font: inherit;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.my-profile-panel__link:hover {
+  border-color: rgba(15, 111, 124, 0.45);
+  color: var(--profile-text-heading);
+  background: #fff;
+}
+
+.my-profile-panel__link:focus-visible {
+  outline: 2px solid var(--profile-text-heading);
+  outline-offset: 2px;
 }

@@ -75,13 +75,25 @@ describe("profileDestinationHardening", () => {
 
   it("keeps Welcome Home semantically inactive while any profile destination is open", () => {
     expect(companion).toContain("!profileDestinationActive");
-    expect(companion).toMatch(
-      /const profileDestinationActive\s*=\s*[\s\S]{0,200}?estateProfilePrimary/,
+    expect(companion).toContain(
+      "const profileDestinationActive = isProfileDestinationOverlay(overlay)",
     );
+    expect(companion).toMatch(
+      /overlay === "profile" \|\| overlay === "my-business-estate"/,
+    );
+    expect(companion).toContain('| "my-business-estate"');
+    expect(companion).toContain('| "profile-personal"');
     const overlayDecl = companion.indexOf("const [overlay, setOverlay]");
     const welcomeDecl = companion.indexOf("const welcomeHomePrimary");
     expect(overlayDecl).toBeGreaterThan(-1);
     expect(welcomeDecl).toBeGreaterThan(overlayDecl);
+  });
+
+  it("treats My Business Estate and My Profile as profile destinations", () => {
+    expect(isProfileDestinationOverlay("my-business-estate")).toBe(true);
+    expect(isProfileDestinationOverlay("profile-personal")).toBe(true);
+    expect(PROFILE_DESTINATION_OVERLAY_IDS).toContain("my-business-estate");
+    expect(PROFILE_DESTINATION_OVERLAY_IDS).toContain("profile-personal");
   });
 
   it("mounts exactly one ProfileDestinationHost and not inline estate-room-main panels", () => {

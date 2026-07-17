@@ -13,13 +13,12 @@
 }
 
 .my-business-estate-room__cinematic {
-  position: fixed;
+  /* Contained inside ProfileDestinationHost — not viewport-fixed under Welcome Home */
+  position: absolute;
   inset: 0;
   z-index: 0;
-  width: 100dvw;
-  width: 100vw;
-  height: 100dvh;
-  height: 100svh;
+  width: 100%;
+  height: 100%;
   max-width: none;
 }
 

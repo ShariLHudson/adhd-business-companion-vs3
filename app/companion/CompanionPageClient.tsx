@@ -2545,6 +2545,8 @@ export default function CompanionPageClient() {
     | null
     | "settings"
     | "profile"
+    | "my-business-estate"
+    | "profile-personal"
     | "people-i-help"
     | "signin"
     | "whats-new"
@@ -2556,13 +2558,17 @@ export default function CompanionPageClient() {
     useState<CrystalActivation | null>(null);
   const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
     useState(false);
-  const estateProfilePrimary = overlay === "profile";
+  /** Legacy "profile" overlay id + current My Business Estate destination. */
+  const estateProfilePrimary =
+    overlay === "profile" || overlay === "my-business-estate";
   const peopleIHelpProfilePrimary = overlay === "people-i-help";
   const growthProfilePrimary = overlay === "growth-profile";
-  const profileDestinationActive =
-    estateProfilePrimary ||
-    peopleIHelpProfilePrimary ||
-    growthProfilePrimary;
+  /**
+   * Any SH / profile destination overlay (My Business Estate, My Profile,
+   * People I Help, Growth Profile). Must include renamed IDs so Welcome Home
+   * cannot stay semantically primary while ProfileDestinationHost is open.
+   */
+  const profileDestinationActive = isProfileDestinationOverlay(overlay);
 
   const [hasChatted, setHasChatted] = useState(false);
   const [recognitionMoment, setRecognitionMoment] =
