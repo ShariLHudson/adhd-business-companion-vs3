@@ -1,7 +1,7 @@
 /**
  * Spark Estate — top navigation and profile menu.
  *
- * Welcome Home (room menu) = where to go (five intent categories + Wander).
+ * Welcome Home (room menu) = where to go (six categories; Spark Estate last).
  * SH profile menu = My Spark Estate + Experience Controls + Settings.
  * Experience Controls open as an overlay — never navigate away.
  *
@@ -25,10 +25,7 @@ import {
   validateWanderPick,
   type EstateWanderPick,
 } from "@/lib/estate/manifest/estateWanderMode";
-import {
-  WELCOME_HOME_NAV_CATEGORIES,
-  WELCOME_HOME_WANDER_GROUNDS,
-} from "@/lib/estate/welcomeHomeNavigationStructure";
+import { WELCOME_HOME_NAV_CATEGORIES } from "@/lib/estate/welcomeHomeNavigationStructure";
 
 export const SPARK_ESTATE_TOP_NAVIGATION_PRINCIPLE =
   "Only two permanent top-right controls — Welcome Home navigation and User Profile — no additional standalone navigation buttons.";
@@ -68,14 +65,8 @@ export const SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS = [
 /** @deprecated Experience Controls removed from Welcome Home. */
 export const SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS = [] as const;
 
-export const SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS = [
-  {
-    id: "wander-the-grounds",
-    label: WELCOME_HOME_WANDER_GROUNDS.label,
-    note: "Opens Explore Estate — quieter styling below the divider",
-    manifestDriven: false,
-  },
-] as const;
+/** @deprecated Wander lives under Spark Estate category — no separate nav strip. */
+export const SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS = [] as const;
 
 export const SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day")!.destinations;
@@ -100,11 +91,10 @@ export const SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS =
 
 export const SPARK_ESTATE_ROOM_MENU_SECTIONS = [
   ...WELCOME_HOME_NAV_CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
-  {
-    id: WELCOME_HOME_WANDER_GROUNDS.id,
-    label: WELCOME_HOME_WANDER_GROUNDS.label,
-  },
 ] as const;
+
+export const SPARK_ESTATE_ROOM_MENU_SPARK_ESTATE_ITEMS =
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "spark-estate")!.destinations;
 
 export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = WELCOME_HOME_NAV_CATEGORIES.find(
   (c) => c.id === "take-a-moment",
@@ -294,7 +284,7 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
       experiencesIds.includes("soundscapes") &&
       !experiencesIds.includes("breathe" as never) &&
       focusIds.includes("breathe"),
-    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 5,
+    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 6,
     experienceControlsNotInWelcomeHome: !WELCOME_HOME_NAV_CATEGORIES.some((c) =>
       /experience controls/i.test(c.label),
     ),
@@ -327,9 +317,6 @@ export function formatSparkEstateTopNavigationReport(
       lines.push(`    • ${dest.label}`);
     }
   }
-  lines.push(`  ───`);
-  lines.push(`  ${WELCOME_HOME_WANDER_GROUNDS.label} → Explore Estate`);
-
   lines.push("", "Experience Controls (SH overlay):");
   for (const item of SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS) {
     lines.push(`  • ${item.label}`);
@@ -345,7 +332,7 @@ export function formatSparkEstateTopNavigationReport(
   lines.push(`  Controls: ${verification.controlCount}`);
   lines.push(`  Profile menu: ${verification.profileMenuAligned ? "pass" : "fail"}`);
   lines.push(
-    `  Five categories: ${verification.welcomeHomeHasFiveCategories ? "pass" : "fail"}`,
+    `  Six categories (Spark Estate last): ${verification.welcomeHomeHasFiveCategories ? "pass" : "fail"}`,
   );
   lines.push(
     `  EC off Welcome Home: ${verification.experienceControlsNotInWelcomeHome ? "pass" : "fail"}`,

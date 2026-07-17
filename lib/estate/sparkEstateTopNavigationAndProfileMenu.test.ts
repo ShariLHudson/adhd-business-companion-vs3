@@ -40,14 +40,14 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS.length).toBeGreaterThanOrEqual(8);
   });
 
-  it("documents Welcome Home as five categories without Experience Controls", () => {
+  it("documents Welcome Home as six categories with Spark Estate last", () => {
     expect(SPARK_ESTATE_ROOM_MENU_SECTIONS.map((s) => s.id)).toEqual([
       "my-day",
       "my-work",
       "take-a-moment",
       "my-story",
       "get-advice",
-      "wander-the-grounds",
+      "spark-estate",
     ]);
     expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS).toHaveLength(0);
 
@@ -55,7 +55,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(verification.welcomeHomeHasFiveCategories).toBe(true);
     expect(verification.experienceControlsNotInWelcomeHome).toBe(true);
     expect(verification.roomExperienceItems).toBe(0);
-    expect(verification.roomNavigationItems).toBe(1);
+    expect(verification.roomNavigationItems).toBe(0);
     expect(verification.roomMyDayWorkItems).toBe(3);
     expect(verification.roomMyWorkStudioItems).toBe(3);
     expect(verification.roomFocusItems).toBe(4);
@@ -65,9 +65,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(verification.excludesLibraryAndCartography).toBe(true);
     expect(verification.peacefulPlacesStayInExperiences).toBe(true);
 
-    expect(
-      SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS.map((item) => item.id),
-    ).toEqual(["wander-the-grounds"]);
+    expect(SPARK_ESTATE_ROOM_MENU_NAVIGATION_ITEMS).toEqual([]);
 
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS.map((item) => item.id),

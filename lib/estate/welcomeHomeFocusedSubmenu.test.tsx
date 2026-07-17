@@ -7,10 +7,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
-import {
-  WELCOME_HOME_NAV_CATEGORIES,
-  WELCOME_HOME_WANDER_GROUNDS,
-} from "@/lib/estate/welcomeHomeNavigationStructure";
+import { WELCOME_HOME_NAV_CATEGORIES } from "@/lib/estate/welcomeHomeNavigationStructure";
 
 vi.mock("@/lib/estate/useIdleChromeReveal", () => ({
   useIdleChromeReveal: () => ({
@@ -107,7 +104,7 @@ describe("Welcome Home focused submenu", () => {
     });
   }
 
-  it("opens with five top-level categories plus Wander — no destinations yet", () => {
+  it("opens with six top-level categories ending in Spark Estate — no destinations yet", () => {
     renderMenu();
     openMenu();
     const panel = container.querySelector(
@@ -122,7 +119,7 @@ describe("Welcome Home focused submenu", () => {
       ).toBeTruthy();
     }
     expect(
-      container.querySelector('[data-testid="estate-open-wander-the-grounds"]'),
+      container.querySelector('[data-testid="estate-room-menu-section-spark-estate"]'),
     ).toBeTruthy();
     expect(
       container.querySelector('[data-testid="estate-open-adapt-plan-my-day"]'),
@@ -183,7 +180,9 @@ describe("Welcome Home focused submenu", () => {
       ),
     ).toBeFalsy();
     expect(
-      container.querySelector('[data-testid="estate-open-wander-the-grounds"]'),
+      container.querySelector(
+        '[data-testid="estate-room-menu-section-spark-estate"]',
+      ),
     ).toBeFalsy();
   });
 
@@ -328,16 +327,10 @@ describe("Welcome Home focused submenu", () => {
     },
   );
 
-  it("Wander the Grounds replaces top-level with Explore Estate + Spark Estate Guide", () => {
+  it("Spark Estate replaces top-level with Wander the Grounds + Spark Estate Guide", () => {
     renderMenu();
     openMenu();
-    act(() => {
-      (
-        container.querySelector(
-          '[data-testid="estate-open-wander-the-grounds"]',
-        ) as HTMLButtonElement
-      ).click();
-    });
+    openCategory("spark-estate");
 
     expect(
       container
@@ -351,16 +344,17 @@ describe("Welcome Home focused submenu", () => {
     expect(
       container.querySelector('[data-testid="welcome-home-submenu-heading"]')
         ?.textContent,
-    ).toBe(WELCOME_HOME_WANDER_GROUNDS.label);
+    ).toBe("Spark Estate");
 
     const labels = Array.from(
       container.querySelectorAll(
-        '[data-testid="welcome-home-submenu-wander-the-grounds"] .estate-room-experience-menu__item-label',
+        '[data-testid="welcome-home-submenu-spark-estate"] .estate-room-experience-menu__item-label',
       ),
     ).map((el) => el.textContent?.trim());
-    expect(labels).toEqual(["Explore Estate", "Spark Estate Guide"]);
+    expect(labels).toEqual(["Wander the Grounds", "Spark Estate Guide"]);
 
     for (const category of WELCOME_HOME_NAV_CATEGORIES) {
+      if (category.id === "spark-estate") continue;
       expect(
         container.querySelector(
           `[data-testid="estate-room-menu-section-${category.id}"]`,
@@ -372,13 +366,7 @@ describe("Welcome Home focused submenu", () => {
   it("Spark Estate Guide destination opens once and closes the menu", () => {
     renderMenu();
     openMenu();
-    act(() => {
-      (
-        container.querySelector(
-          '[data-testid="estate-open-wander-the-grounds"]',
-        ) as HTMLButtonElement
-      ).click();
-    });
+    openCategory("spark-estate");
     act(() => {
       (
         container.querySelector(
@@ -391,5 +379,20 @@ describe("Welcome Home focused submenu", () => {
     expect(
       container.querySelector('[data-testid="estate-room-quick-choices"]'),
     ).toBeFalsy();
+  });
+
+  it("Wander the Grounds opens Explore without opening the Guide", () => {
+    renderMenu();
+    openMenu();
+    openCategory("spark-estate");
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-wander-the-grounds"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onExploreSpark).toHaveBeenCalledTimes(1);
+    expect(onOpenSparkEstateGuide).not.toHaveBeenCalled();
   });
 });

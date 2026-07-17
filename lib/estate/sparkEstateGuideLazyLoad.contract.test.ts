@@ -26,7 +26,7 @@ describe("Spark Estate Guide lazy-load contract", () => {
       /import\("@\/components\/estate-guide\/EstateGuideFlipbook"\)/,
     );
     expect(source).toMatch(/flipbookMounted/);
-    expect(source).toMatch(/SparkEstateGuideAnchor/);
+    expect(source).not.toMatch(/SparkEstateGuideAnchor/);
   });
 
   it("Journal Gazebo does not static-import or always-mount the flipbook", () => {
@@ -70,13 +70,15 @@ describe("Spark Estate Guide lazy-load contract", () => {
     }
   });
 
-  it("CompanionPageClient wires Wander → openSparkEstateGuideCore without static flipbook import", () => {
+  it("CompanionPageClient wires Spark Estate Guide menu open without static flipbook import", () => {
     const source = readSrc("app/companion/CompanionPageClient.tsx");
     expect(source).not.toMatch(STATIC_FLIPBOOK_IMPORT);
     expect(source).not.toMatch(STATIC_FLIPBOOK_DIRECT);
-    expect(source).toMatch(/onOpenSparkEstateGuide=\{\(\) => openSparkEstateGuideCore\(null\)\}/);
+    expect(source).toMatch(
+      /onOpenSparkEstateGuide=\{\(\) => openSparkEstateGuideCore\(\)\}/,
+    );
     expect(source).toMatch(/SparkEstateGuideChrome/);
-    expect(source).toMatch(/initialRoomId=\{estateGuideInitialRoomId\}/);
+    expect(source).toMatch(/showSparkEstateGuideChrome/);
   });
 
   it("EstateTopRightChrome forwards onOpenSparkEstateGuide", () => {

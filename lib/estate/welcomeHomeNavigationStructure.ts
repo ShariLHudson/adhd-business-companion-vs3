@@ -13,7 +13,8 @@ export type WelcomeHomeNavCategoryId =
   | "my-work"
   | "take-a-moment"
   | "my-story"
-  | "get-advice";
+  | "get-advice"
+  | "spark-estate";
 
 export type WelcomeHomeNavDestinationId =
   | "adapt-plan-my-day"
@@ -34,6 +35,9 @@ export type WelcomeHomeNavDestinationId =
   | "chamber-of-momentum"
   | "boardroom"
   | "strategy-library"
+  /** Opens Explore Estate (estate exploration). */
+  | "wander-the-grounds"
+  /** @deprecated Prefer wander-the-grounds from Spark Estate submenu. */
   | "explore-estate"
   | "spark-estate-guide";
 
@@ -143,21 +147,26 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
       { id: "strategy-library", label: "Strategy Library" },
     ],
   },
+  {
+    id: "spark-estate",
+    label: "Spark Estate",
+    destinations: [
+      { id: "wander-the-grounds", label: "Wander the Grounds" },
+      { id: "spark-estate-guide", label: "Spark Estate Guide" },
+    ],
+  },
 ] as const;
 
-/** Wander the Grounds — focused submenu (same replace pattern as categories). */
+/**
+ * @deprecated Use Welcome Home → Spark Estate category.
+ * Kept as a label/id helper for transitional verification strings.
+ */
 export const WELCOME_HOME_WANDER_GROUNDS = {
   id: "wander-the-grounds" as const,
   label: "Wander the Grounds",
-  destinations: [
-    { id: "explore-estate" as const, label: "Explore Estate" },
-    { id: "spark-estate-guide" as const, label: "Spark Estate Guide" },
-  ],
-};
+} as const;
 
-export type WelcomeHomeFocusedPanelId =
-  | WelcomeHomeNavCategoryId
-  | typeof WELCOME_HOME_WANDER_GROUNDS.id;
+export type WelcomeHomeFocusedPanelId = WelcomeHomeNavCategoryId;
 
 /** Experience Controls must never appear in Welcome Home navigation. */
 export const WELCOME_HOME_FORBIDDEN_LABELS = [

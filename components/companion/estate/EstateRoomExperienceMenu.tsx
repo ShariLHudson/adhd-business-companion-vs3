@@ -10,7 +10,6 @@ import { useIdleChromeReveal } from "@/lib/estate/useIdleChromeReveal";
 import { resolveWanderRoomDisplayName } from "@/lib/estate/manifest/estateWanderMode";
 import {
   WELCOME_HOME_NAV_CATEGORIES,
-  WELCOME_HOME_WANDER_GROUNDS,
   type WelcomeHomeFocusedPanelId,
   type WelcomeHomeMyDayDropdownId,
   type WelcomeHomeNavDestination,
@@ -34,9 +33,9 @@ export type EstateRoomExperienceMenuProps = {
   /** @deprecated */
   soundEnabled?: boolean;
   onBackToEstate: () => void;
-  /** Wander the Grounds — Explore Estate. */
+  /** Spark Estate → Wander the Grounds (Explore Estate). */
   onExploreSpark?: () => void;
-  /** Wander the Grounds — Spark Estate Guide (lazy-loaded flipbook). */
+  /** Spark Estate → Spark Estate Guide (explicit open only). */
   onOpenSparkEstateGuide?: () => void;
   onReturnToExploreEstate?: () => void;
   /**
@@ -233,6 +232,7 @@ export function EstateRoomExperienceMenu({
           "chamber-of-momentum": onOpenChamber,
           boardroom: onOpenBoardroom,
           "strategy-library": onOpenStrategyLibrary,
+          "wander-the-grounds": onExploreSpark,
           "explore-estate": onExploreSpark,
           "spark-estate-guide": onOpenSparkEstateGuide,
         };
@@ -283,13 +283,8 @@ export function EstateRoomExperienceMenu({
 
   const activeCategory =
     WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === focusedPanel) ?? null;
-  const wanderFocused = focusedPanel === WELCOME_HOME_WANDER_GROUNDS.id;
-  const activePanelLabel = wanderFocused
-    ? WELCOME_HOME_WANDER_GROUNDS.label
-    : activeCategory?.label ?? null;
-  const activeDestinations = wanderFocused
-    ? WELCOME_HOME_WANDER_GROUNDS.destinations
-    : activeCategory?.destinations ?? null;
+  const activePanelLabel = activeCategory?.label ?? null;
+  const activeDestinations = activeCategory?.destinations ?? null;
 
   const renderDestinationButton = (dest: WelcomeHomeNavDestination) => {
     const children = dest.dropdownChildren;
@@ -490,7 +485,14 @@ export function EstateRoomExperienceMenu({
                       >
                         <button
                           type="button"
-                          className="estate-room-experience-menu__category"
+                          className={[
+                            "estate-room-experience-menu__category",
+                            category.id === "spark-estate"
+                              ? "estate-room-experience-menu__category--spark-estate"
+                              : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
                           aria-expanded={false}
                           data-testid={`estate-room-menu-section-${category.id}`}
                           onClick={() => {
@@ -510,34 +512,6 @@ export function EstateRoomExperienceMenu({
                         </button>
                       </div>
                     ))}
-
-                    <div
-                      className="estate-room-experience-menu__divider"
-                      role="separator"
-                      aria-hidden
-                    />
-
-                    <button
-                      type="button"
-                      className="estate-room-experience-menu__category estate-room-experience-menu__category--wander"
-                      aria-expanded={false}
-                      aria-label={WELCOME_HOME_WANDER_GROUNDS.label}
-                      data-testid="estate-open-wander-the-grounds"
-                      onClick={() => {
-                        bumpVisibility();
-                        openFocusedPanel(WELCOME_HOME_WANDER_GROUNDS.id);
-                      }}
-                    >
-                      <span className="estate-room-experience-menu__category-label">
-                        {WELCOME_HOME_WANDER_GROUNDS.label}
-                      </span>
-                      <span
-                        className="estate-room-experience-menu__category-chevron"
-                        aria-hidden
-                      >
-                        ›
-                      </span>
-                    </button>
 
                     {onReturnToExploreEstate ? (
                       <button

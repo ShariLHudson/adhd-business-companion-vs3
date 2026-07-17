@@ -22226,8 +22226,14 @@ export default function CompanionPageClient() {
   /** Keep profile trigger visible while overlays open — only hide during sign-in. */
   const showGlobalEstateMenu =
     estateChromePolicy.showSubtleEstateMenu && overlay !== "signin";
-  /** Guidebook — bottom left; hidden during sign-in and Enjoy the Estate. */
-  const showSparkEstateGuide =
+  /**
+   * Spark Estate Guide — menu-only entry (Welcome Home → Spark Estate).
+   * Never show bottom-corner launcher; mount chrome only while guide is open.
+   */
+  const showSparkEstateGuideChrome =
+    estateGuideFlipbookOpen && overlay !== "signin" && !justBeHereSession;
+  /** Spark Note chrome — independent of the Estate Guide launcher. */
+  const showSparkNoteChrome =
     overlay !== "signin" && !justBeHereSession;
 
   const showCompanionBackControl =
@@ -24701,13 +24707,13 @@ export default function CompanionPageClient() {
       ) : null}
 
       <SparkEstateGuideChrome
-        visible={showSparkEstateGuide}
+        visible={showSparkEstateGuideChrome}
         flipbookOpen={estateGuideFlipbookOpen}
         onOpen={openSparkEstateGuideCore}
         onClose={() => setEstateGuideFlipbookOpen(false)}
       />
       <SparkNoteChrome
-        visible={showSparkEstateGuide}
+        visible={showSparkNoteChrome}
         firstName={getPrefs().name || null}
         birthday={getRecognitionStore().birthday}
         personalDates={getRecognitionStore().personalDates}
@@ -24739,6 +24745,7 @@ export default function CompanionPageClient() {
                 openExploreSparkVisualExplorer();
               }
         }
+        onOpenSparkEstateGuide={() => openSparkEstateGuideCore()}
         onReturnToExploreEstate={
           exploreEstateReturnAvailable
             ? () => {

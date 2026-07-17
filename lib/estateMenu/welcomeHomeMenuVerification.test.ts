@@ -130,8 +130,10 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(
       /function requestClearTodayContext\(\)\s*\{[\s\S]*?clearTodayContext\(\{\s*preserveRoom,\s*mode:\s*"new-chat"\s*\}\)/,
     );
+    // Fresh welcome only — never leave prior messages in the window.
+    expect(source).toMatch(/NEW_CONVERSATION_GREETING/);
     expect(source).toMatch(
-      /function requestClearTodayContext\(\)\s*\{[\s\S]*?setMessages\(\[\]\)/,
+      /mode === "new-chat"[\s\S]*?NEW_CONVERSATION_GREETING/,
     );
     expect(source).toMatch(/resetActiveConversation\(/);
     expect(source).not.toMatch(
@@ -207,7 +209,7 @@ describe("Welcome Home menu — action wiring", () => {
   });
 
   it("Welcome Home opens Peaceful Places and Soundscapes as destinations", () => {
-    expect(roomMenuSource).toMatch(/estate-open-\$\{id\}/);
+    expect(roomMenuSource).toMatch(/estate-open-\$\{dest\.id\}/);
     expect(roomMenuSource).toMatch(/"peaceful-places":\s*onOpenPeacefulPlaces/);
     expect(roomMenuSource).toMatch(/soundscapes:\s*onOpenSoundscapes/);
     expect(roomMenuSource).toMatch(/onOpenPeacefulPlaces/);
@@ -256,7 +258,8 @@ describe("Welcome Home menu — action wiring", () => {
       /const handleCompanionBack = \(\) => \{\s*\/\/[^\n]*\s*navigateBackToEstateHome\(\);\s*\}/,
     );
     expect(roomMenuSource).toMatch(/Wander the Grounds/);
-    expect(roomMenuSource).toMatch(/data-testid="estate-open-wander-the-grounds"/);
+    expect(roomMenuSource).toMatch(/spark-estate/);
+    expect(roomMenuSource).toMatch(/"wander-the-grounds":\s*onExploreSpark/);
 
     // Must not fall back to member overrides, login art, or history restore.
     const lobbyFn = source.match(

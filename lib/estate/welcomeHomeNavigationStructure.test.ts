@@ -13,32 +13,34 @@ import {
 } from "./welcomeHomeNavigationStructure";
 
 describe("welcomeHomeNavigationStructure", () => {
-  it("has five intent categories and max depth three for My Day dropdowns", () => {
-    expect(WELCOME_HOME_NAV_CATEGORIES).toHaveLength(5);
+  it("has six categories with Spark Estate last and max depth three for My Day dropdowns", () => {
+    expect(WELCOME_HOME_NAV_CATEGORIES).toHaveLength(6);
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
       "my-work",
       "take-a-moment",
       "my-story",
       "get-advice",
+      "spark-estate",
     ]);
     expect(welcomeHomeNavMaxDepth()).toBe(3);
   });
 
-  it("places Wander the Grounds outside categories with explore + guide destinations", () => {
-    expect(WELCOME_HOME_WANDER_GROUNDS.label).toBe("Wander the Grounds");
-    expect(WELCOME_HOME_WANDER_GROUNDS.id).toBe("wander-the-grounds");
-    expect(WELCOME_HOME_WANDER_GROUNDS.destinations.map((d) => d.id)).toEqual([
-      "explore-estate",
+  it("places Wander the Grounds + Spark Estate Guide under Spark Estate (last)", () => {
+    const sparkEstate = WELCOME_HOME_NAV_CATEGORIES.find(
+      (c) => c.id === "spark-estate",
+    );
+    expect(sparkEstate?.label).toBe("Spark Estate");
+    expect(sparkEstate?.destinations.map((d) => d.id)).toEqual([
+      "wander-the-grounds",
       "spark-estate-guide",
     ]);
-    expect(WELCOME_HOME_WANDER_GROUNDS.destinations.map((d) => d.label)).toEqual([
-      "Explore Estate",
+    expect(sparkEstate?.destinations.map((d) => d.label)).toEqual([
+      "Wander the Grounds",
       "Spark Estate Guide",
     ]);
-    expect(
-      WELCOME_HOME_NAV_CATEGORIES.some((c) => c.id === "wander-the-grounds"),
-    ).toBe(false);
+    expect(WELCOME_HOME_NAV_CATEGORIES.at(-1)?.id).toBe("spark-estate");
+    expect(WELCOME_HOME_WANDER_GROUNDS.label).toBe("Wander the Grounds");
   });
 
   it("My Day has two dropdown groups plus Calendar — children are independently routable", () => {
@@ -115,6 +117,10 @@ describe("welcomeHomeNavigationStructure", () => {
       "Boardroom",
       "Strategy Library",
     ]);
+    expect(byId["spark-estate"]).toEqual([
+      "Wander the Grounds",
+      "Spark Estate Guide",
+    ]);
   });
 
   it("never includes Experience Controls in Welcome Home categories", () => {
@@ -173,6 +179,7 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(source).toMatch(/dropdownChildren/);
     expect(source).toMatch(/welcome-home-dropdown-/);
     expect(source).toMatch(/onOpenSparkEstateGuide/);
-    expect(source).toMatch(/openFocusedPanel\(WELCOME_HOME_WANDER_GROUNDS\.id\)/);
+    expect(source).toMatch(/openFocusedPanel\(category\.id\)/);
+    expect(source).toMatch(/spark-estate/);
   });
 });

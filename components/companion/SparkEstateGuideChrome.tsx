@@ -2,7 +2,6 @@
 
 import { lazy, Suspense, useEffect, useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
-import { SparkEstateGuideAnchor } from "./SparkEstateGuideAnchor";
 /** Loading overlay styles — full flipbook CSS arrives with the lazy chunk. */
 import "@/components/estate-guide/estate-guide-flipbook.css";
 
@@ -19,7 +18,10 @@ const EstateGuideFlipbookLazy = lazy(async () => {
 });
 
 type Props = {
-  /** When false, only sign-in and other blocking overlays hide the guidebook. */
+  /**
+   * When false, the guide chrome stays unmounted (Welcome Home arrival).
+   * Bottom-corner launcher removed — open only via Welcome Home → Spark Estate.
+   */
   visible: boolean;
   flipbookOpen: boolean;
   onOpen: () => void;
@@ -29,13 +31,12 @@ type Props = {
 };
 
 /**
- * Portaled guidebook chrome — lightweight cover anchor (bottom left).
- * The full two-page flipbook is dynamically imported only when opened.
+ * Portaled Spark Estate Guide — flipbook only.
+ * No bottom-corner anchor. Mounts only after explicit open.
  */
 export function SparkEstateGuideChrome({
   visible,
   flipbookOpen,
-  onOpen,
   onClose,
   initialRoomId = null,
 }: Props) {
@@ -55,34 +56,30 @@ export function SparkEstateGuideChrome({
     return () => window.clearTimeout(timer);
   }, [flipbookOpen, flipbookMounted]);
 
-  if (!mounted || !visible) return null;
+  // Never mount on Welcome Home arrival — only when explicitly opened (or brief close fade).
+  if (!mounted || !visible || (!flipbookOpen && !flipbookMounted)) return null;
 
   return createPortal(
-    <>
-      {!flipbookOpen ? <SparkEstateGuideAnchor onClick={onOpen} /> : null}
-      {flipbookMounted ? (
-        <Suspense
-          fallback={
-            flipbookOpen ? (
-              <div
-                className="eg-flipbook eg-flipbook--loading"
-                role="status"
-                aria-live="polite"
-                data-testid="estate-guide-loading"
-              >
-                <p className="eg-flipbook__loading-label">Opening the Guide…</p>
-              </div>
-            ) : null
-          }
-        >
-          <EstateGuideFlipbookLazy
-            open={flipbookOpen}
-            onClose={onClose}
-            initialRoomId={initialRoomId}
-          />
-        </Suspense>
-      ) : null}
-    </>,
+    <Suspense
+      fallback={
+        flipbookOpen ? (
+          <div
+            className="eg-flipbook eg-flipbook--loading"
+            role="status"
+            aria-live="polite"
+            data-testid="estate-guide-loading"
+          >
+            <p className="eg-flipbook__loading-label">Opening the Guide…</p>
+          </div>
+        ) : null
+      }
+    >
+      <EstateGuideFlipbookLazy
+        open={flipbookOpen}
+        onClose={onClose}
+        initialRoomId={initialRoomId}
+      />
+    </Suspense>,
     document.body,
   );
 }
