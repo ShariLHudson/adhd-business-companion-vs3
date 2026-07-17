@@ -1,5 +1,5 @@
 /**
- * 116–118 — My Work → Create estate destination.
+ * 116–118 / 149–151 — My Work → Create estate destination.
  */
 
 import { describe, expect, it } from "vitest";
@@ -8,18 +8,23 @@ import { resolve } from "node:path";
 import { ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS } from "@/lib/estate/estateFullBleedPanelSections";
 import { WELCOME_HOME_NAV_CATEGORIES } from "@/lib/estate/welcomeHomeNavigationStructure";
 import {
+  CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_EXPLANATION,
   CREATE_ESTATE_HOW_DO_I,
-  CREATE_ESTATE_START_CHOICES,
+  CREATE_ESTATE_PICKER_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
   CREATE_VS_PROJECTS_CUE,
 } from "./copy";
+import {
+  listActiveCreationPickerCatalog,
+  listActiveCreationTypes,
+} from "./activeCreationTypes";
 
 function read(pathFromRoot: string): string {
   return readFileSync(resolve(process.cwd(), pathFromRoot), "utf8");
 }
 
-describe("My Work → Create navigation (116)", () => {
+describe("My Work → Create navigation (116 / 149)", () => {
   it("places Create first under My Work", () => {
     const myWork = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-work");
     expect(myWork?.destinations.map((d) => d.id)).toEqual([
@@ -43,24 +48,45 @@ describe("My Work → Create navigation (116)", () => {
     expect(client).toContain("CreateEstateEntrancePanel");
     expect(client).toContain("function startFreshCreateFromEstate");
     expect(client).toContain('source: "hard_nav"');
+    expect(client).toContain("onSelectCreationType");
+    expect(client).toContain("resolveCreateLauncherType");
   });
 
-  it("CreateEstateEntrancePanel owns How Do I and three start choices", () => {
+  it("CreateEstateEntrancePanel shows picker + continue (no Browse / Start With)", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-entrance");
     expect(panel).toContain("create-estate-how-do-i");
-    expect(panel).toContain("create-estate-choice-${choice.id}");
+    expect(panel).toContain("CreateCatalogPicker");
     expect(panel).toContain("CreateDraftResumeList");
-    expect(panel).toContain("CREATE_VS_PROJECTS_CUE");
+    expect(panel).toContain("CREATE_ESTATE_PICKER_HEADING");
+    expect(panel).toContain("CREATE_ESTATE_CONTINUE_HEADING");
+    expect(panel).not.toContain("CREATE_ESTATE_START_CHOICES");
+    expect(panel).not.toContain("Browse things I can create");
+    expect(panel).not.toContain("Start with what I need");
     expect(CREATE_ESTATE_WINDOW_TITLE).toBe("Create");
+    expect(CREATE_ESTATE_PICKER_HEADING).toBe("What Do You Want to Create?");
+    expect(CREATE_ESTATE_CONTINUE_HEADING).toBe("Continue a Saved Creation");
     expect(CREATE_ESTATE_EXPLANATION).toMatch(/Make something new/i);
     expect(CREATE_VS_PROJECTS_CUE).toMatch(/Projects organize/i);
     expect(CREATE_ESTATE_HOW_DO_I).toMatch(/Create is different from Projects/i);
-    expect(CREATE_ESTATE_START_CHOICES.map((c) => c.id)).toEqual([
-      "start",
-      "browse",
-      "continue",
-    ]);
+  });
+
+  it("active creation types are alphabetized and workflow-backed", () => {
+    const catalog = listActiveCreationPickerCatalog();
+    const labels = catalog.map((c) => c.label);
+    expect([...labels].sort((a, b) => a.localeCompare(b))).toEqual(labels);
+    for (const cat of catalog) {
+      const itemLabels = cat.items.map((i) => i.label);
+      expect([...itemLabels].sort((a, b) => a.localeCompare(b))).toEqual(
+        itemLabels,
+      );
+      expect(cat.items.every((i) => !i.route)).toBe(true);
+    }
+    const types = listActiveCreationTypes();
+    expect(types.length).toBeGreaterThan(5);
+    expect(types.every((t) => t.status === "active" && t.workflowId)).toBe(
+      true,
+    );
   });
 
   it("routes strategy browse to Strategy Library create path", () => {

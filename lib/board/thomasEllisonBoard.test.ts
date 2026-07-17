@@ -148,12 +148,12 @@ describe("Board Review selection — Board IDs only", () => {
 });
 
 describe("Board Director discussion intake", () => {
-  it("requires Chair confirmation when none selected", () => {
+  it("keeps Chair optional when none selected", () => {
     const empty = createEmptyBoardDirectorIntake([]);
     expect(empty.chairConfirmed).toBe(false);
-    const withChair = ensureChairInIntake(empty);
-    expect(withChair.directorIds).toContain("board-chair");
-    expect(withChair.chairConfirmed).toBe(true);
+    const stillOptional = ensureChairInIntake(empty);
+    expect(stillOptional.directorIds).not.toContain("board-chair");
+    expect(stillOptional.chairConfirmed).toBe(false);
   });
 
   it("asks one question at a time and only includes selected Directors", () => {

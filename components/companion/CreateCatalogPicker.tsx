@@ -1,10 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import {
-  sortedCreateCatalog,
-  type CreateCatalogItem,
-} from "@/lib/createCatalog";
+import type { CreateCatalogItem } from "@/lib/createCatalog";
+import { listActiveCreationPickerCatalog } from "@/lib/createEstate/activeCreationTypes";
 import { compareDropdownLabels } from "@/lib/dropdownSort";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
@@ -25,7 +23,8 @@ export function CreateCatalogPicker({
     NO_CATEGORY,
   );
 
-  const catalog = useMemo(() => sortedCreateCatalog(), []);
+  /** Only workflow-backed types — never inactive placeholders. */
+  const catalog = useMemo(() => listActiveCreationPickerCatalog(), []);
 
   const categoryOptions = useMemo(
     () =>

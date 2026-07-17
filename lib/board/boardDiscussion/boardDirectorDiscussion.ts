@@ -132,19 +132,65 @@ export function createEmptyBoardDirectorIntake(
   return draftToLegacyState(createEmptyBoardIntakeDraft(directorIds));
 }
 
+/**
+ * Chair is optional. Never auto-insert the Chair into a member selection.
+ * Only marks chairConfirmed when Chair is already among selected directors.
+ */
 export function ensureChairInDraft(
   draft: BoardDiscussionIntakeDraft,
 ): BoardDiscussionIntakeDraft {
-  if (draft.selectedDirectorIds.includes(THOMAS_ELLISON_DIRECTOR_ID)) {
-    return { ...draft, chairConfirmed: true };
-  }
+  const chairIncluded = draft.selectedDirectorIds.includes(
+    THOMAS_ELLISON_DIRECTOR_ID,
+  );
+  if (draft.chairConfirmed === chairIncluded) return draft;
   return {
     ...draft,
-    selectedDirectorIds: [
-      THOMAS_ELLISON_DIRECTOR_ID,
-      ...draft.selectedDirectorIds,
-    ],
-    chairConfirmed: true,
+    chairConfirmed: chairIncluded,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/** True when discussion may begin: topic + at least one Director. */
+export function canBeginBoardDiscussion(
+  draft: BoardDiscussionIntakeDraft,
+): boolean {
+  return (
+    Boolean(draft.decision.trim()) && draft.selectedDirectorIds.length > 0
+  );
+}
+
+/** Skip an optional intake question (importance / options / concerns). */
+export function skipBoardIntakeStep(
+  draft: BoardDiscussionIntakeDraft,
+): BoardDiscussionIntakeDraft {
+  if (!isQuestionIntakeStep(draft.currentStep)) return draft;
+  if (draft.currentStep === "decision") return draft;
+  const next: BoardDiscussionIntakeDraft = {
+    ...draft,
+    updatedAt: new Date().toISOString(),
+  };
+  switch (draft.currentStep) {
+    case "importance":
+      next.currentStep = "options";
+      break;
+    case "options":
+      next.currentStep = "concerns";
+      break;
+    case "concerns":
+      next.currentStep = "review";
+      break;
+  }
+  return next;
+}
+
+/** After a decision is captured, jump to review (optional details skipped). */
+export function advanceDecisionToReview(
+  draft: BoardDiscussionIntakeDraft,
+): BoardDiscussionIntakeDraft {
+  if (!draft.decision.trim()) return draft;
+  return {
+    ...draft,
+    currentStep: "review",
     updatedAt: new Date().toISOString(),
   };
 }
@@ -439,54 +485,79 @@ export function draftToAnswerRecord(
 
 export function buildChairOpeningAndSummary(
   answers: Partial<Record<BoardDirectorIntakeStepId, string>>,
-  directorIds: readonly BoardDirectorId[] = [THOMAS_ELLISON_DIRECTOR_ID],
+  directorIds: readonly BoardDirectorId[] = [],
 ): BoardDirectorDiscussionRecord["turns"] {
+  const chairIncluded = directorIds.includes(THOMAS_ELLISON_DIRECTOR_ID);
   const chair = getBoardDirectorById(THOMAS_ELLISON_DIRECTOR_ID);
   const name = chair?.name ?? "Thomas Ellison";
   const decision = answers.decision?.trim() || "this decision";
-  const why = answers["why-now"]?.trim() || "its timing";
-  const options = answers.options?.trim() || "the options on the table";
-  const concerns = answers.concerns?.trim() || "the concerns you named";
+  const why = answers["why-now"]?.trim() || "what matters most to you";
+  const options = answers.options?.trim() || "the options you are weighing";
+  const concerns = answers.concerns?.trim() || "the concerns you are carrying";
   const participants = directorIds
     .map((id) => getBoardDirectorById(id)?.name)
     .filter(Boolean)
     .join(", ");
+  const participantLine = participants
+    ? `At the table: ${participants}.`
+    : "At the table: the Directors you selected.";
+
+  if (chairIncluded) {
+    return [
+      {
+        id: `chair-open-${Date.now().toString(36)}`,
+        role: "chair",
+        text: [
+          `I'm ${name}, Chair of the Board.`,
+          `We're examining: ${decision}.`,
+          `It matters now because: ${why}.`,
+          `Options under consideration: ${options}`,
+          `Concerns already named: ${concerns}`,
+          participantLine,
+          `I'll keep us focused on long-term direction, Board alignment, and a clear recommendation — without making the decision for you.`,
+          `Does that capture what you brought, or should we adjust anything before we continue?`,
+        ].join("\n\n"),
+      },
+      {
+        id: `chair-summary-${Date.now().toString(36)}`,
+        role: "chair",
+        text: [
+          "Chair summary:",
+          `Decision: ${decision}`,
+          `Why now: ${why}`,
+          `Options: ${options}`,
+          `Concerns: ${concerns}`,
+          "What I protect: tomorrow's stability as well as today's opportunity.",
+          "Recommendation: name the real decision in one sentence, then choose the option that best protects long-term strength — or pause for one missing fact before you commit.",
+        ].join("\n\n"),
+      },
+      {
+        id: `mod-${Date.now().toString(36)}`,
+        role: "moderator",
+        text: "I've brought this to the Directors you selected. Let's look at it from their different perspectives.",
+      },
+    ];
+  }
 
   return [
     {
-      id: `chair-open-${Date.now().toString(36)}`,
-      role: "chair",
-      text: [
-        `I'm ${name}, Chair of the Board.`,
-        `We're examining: ${decision}.`,
-        `It matters now because: ${why}.`,
-        `Options under consideration: ${options}`,
-        `Concerns already named: ${concerns}`,
-        participants
-          ? `At the table: ${participants}.`
-          : "At the table: Thomas Ellison.",
-        `I'll keep us focused on long-term direction, Board alignment, and a clear recommendation — without making the decision for you.`,
-        `Does that capture what you brought, or should we adjust anything before we continue?`,
-      ].join("\n\n"),
-    },
-    {
-      id: `chair-summary-${Date.now().toString(36)}`,
-      role: "chair",
-      text: [
-        "Chair summary:",
-        `Decision: ${decision}`,
-        `Why now: ${why}`,
-        `Options: ${options}`,
-        `Concerns: ${concerns}`,
-        "What I protect: tomorrow's stability as well as today's opportunity.",
-        "Recommendation: name the real decision in one sentence, then choose the option that best protects long-term strength — or pause for one missing fact before you commit.",
-        "When more Directors join the Board, we'll bring additional independent viewpoints. For implementation details later, a Chamber specialist can help — after you decide.",
-      ].join("\n\n"),
-    },
-    {
-      id: `mod-${Date.now().toString(36)}`,
+      id: `mod-open-${Date.now().toString(36)}`,
       role: "moderator",
-      text: "This Board discussion has begun with the Chair. You can continue here, preserve this discussion, or return to the Boardroom.",
+      text: [
+        `I've brought this to the Directors you selected. Let's look at it from their different perspectives.`,
+        `We're examining: ${decision}.`,
+        why !== "what matters most to you" ? `What matters now: ${why}.` : "",
+        options !== "the options you are weighing"
+          ? `Options on the table: ${options}`
+          : "",
+        concerns !== "the concerns you are carrying"
+          ? `Concerns named: ${concerns}`
+          : "",
+        participantLine,
+        `I'll invite each Director to contribute in their role — without making the decision for you.`,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
     },
   ];
 }
@@ -494,24 +565,20 @@ export function buildChairOpeningAndSummary(
 export function createBoardDirectorDiscussionFromDraft(
   draft: BoardDiscussionIntakeDraft,
 ): BoardDirectorDiscussionRecord {
-  const withChair = ensureChairInDraft(draft);
-  const answers = draftToAnswerRecord(withChair);
+  const normalized = ensureChairInDraft(draft);
+  const answers = draftToAnswerRecord(normalized);
   const now = new Date().toISOString();
+  const directorIds = [...normalized.selectedDirectorIds];
   const title =
-    answers.decision.trim().slice(0, 72) || "Board discussion with the Chair";
+    answers.decision.trim().slice(0, 72) || "Board discussion";
   return {
     id: `bdd-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     title,
     createdAt: now,
     updatedAt: now,
-    directorIds: withChair.selectedDirectorIds.includes(THOMAS_ELLISON_DIRECTOR_ID)
-      ? [...withChair.selectedDirectorIds]
-      : [THOMAS_ELLISON_DIRECTOR_ID, ...withChair.selectedDirectorIds],
+    directorIds,
     answers,
-    turns: buildChairOpeningAndSummary(
-      answers,
-      withChair.selectedDirectorIds,
-    ),
+    turns: buildChairOpeningAndSummary(answers, directorIds),
     status: "in-progress",
   };
 }

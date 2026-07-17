@@ -1,32 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CreateCatalogPicker } from "@/components/companion/CreateCatalogPicker";
 import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeList";
 import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomShell";
 import {
+  CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_EXPLANATION,
   CREATE_ESTATE_HOW_DO_I,
-  CREATE_ESTATE_START_CHOICES,
+  CREATE_ESTATE_PICKER_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
   CREATE_VS_PROJECTS_CUE,
-  type CreateEstateStartChoiceId,
 } from "@/lib/createEstate/copy";
-import { CREATE_LAUNCHER_TYPE_OPTIONS } from "@/lib/createLauncherTypes";
+import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 const CARD =
   "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-4 text-left transition-colors";
-const CARD_SELECTED =
-  "rounded-2xl border-2 border-[#1e4f4f] bg-white px-4 py-4 text-left shadow-sm";
 
 type Props = {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
-  /** Fresh intentional create — no stale resume. */
-  onStartWithNeed: () => void;
-  /** Browse → pick a type (or Strategy Library create). */
-  onBrowseType: (typeLabel: string) => void;
+  /** Select a catalog creation type — opens its workflow immediately. */
+  onSelectCreationType: (item: CreateCatalogItem) => void;
   onOpenStrategyCreate: () => void;
   onOpenSavedDraft: (id: string) => void;
   onRenameDraft: (id: string, title: string) => void;
@@ -64,22 +61,18 @@ function SharedHowDoI() {
 
 /**
  * Welcome Home → My Work → Create
- * Estate entrance: orientation + three calm choices; Universal Create owns making.
+ * Categorized picker + Continue a Saved Creation (149–151).
  */
 export function CreateEstateEntrancePanel({
   onBack,
   registerBack,
-  onStartWithNeed,
-  onBrowseType,
+  onSelectCreationType,
   onOpenStrategyCreate,
   onOpenSavedDraft,
   onRenameDraft,
   onDuplicateDraft,
   onDeleteDraft,
 }: Props) {
-  const [activeChoice, setActiveChoice] =
-    useState<CreateEstateStartChoiceId | null>(null);
-
   useDismissibleWindow({
     open: true,
     onClose: onBack,
@@ -88,22 +81,15 @@ export function CreateEstateEntrancePanel({
 
   useEffect(() => {
     if (!registerBack) return;
-    registerBack(() => {
-      if (activeChoice) {
-        setActiveChoice(null);
-        return true;
-      }
-      return false;
-    });
+    registerBack(() => false);
     return () => registerBack(null);
-  }, [registerBack, activeChoice]);
+  }, [registerBack]);
 
   return (
     <CreateEstateRoomShell onOutsideDismiss={onBack}>
       <div
         className="plan-day-morning-note flex flex-col gap-3 pb-10"
         data-testid="create-estate-entrance"
-        data-active-choice={activeChoice ?? "none"}
       >
         <button
           type="button"
@@ -138,95 +124,58 @@ export function CreateEstateEntrancePanel({
 
         <SharedHowDoI />
 
-        <div
-          className="mt-2 grid gap-3"
-          role="group"
-          aria-label="How to begin Create"
-          data-testid="create-estate-start-choices"
+        <section
+          className="mt-3 flex flex-col gap-3"
+          data-testid="create-estate-picker"
+          aria-labelledby="create-estate-picker-heading"
         >
-          {CREATE_ESTATE_START_CHOICES.map((choice) => {
-            const selected = activeChoice === choice.id;
-            return (
-              <button
-                key={choice.id}
-                type="button"
-                className={selected ? CARD_SELECTED : CARD}
-                data-testid={`create-estate-choice-${choice.id}`}
-                aria-pressed={selected}
-                onClick={() => {
-                  if (choice.id === "start") {
-                    onStartWithNeed();
-                    return;
-                  }
-                  setActiveChoice(choice.id);
-                }}
-              >
-                <span className="block text-lg font-semibold text-[#1f1c19]">
-                  {choice.label}
-                </span>
-                <span className="mt-2 block text-base leading-relaxed text-[#4b463f]">
-                  {choice.description}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {activeChoice === "browse" ? (
-          <div
-            className="mt-4 flex flex-col gap-2"
-            data-testid="create-estate-browse-types"
+          <h2
+            id="create-estate-picker-heading"
+            className="text-lg font-semibold text-[#1f1c19]"
           >
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-              Things you can create
-            </p>
-            <button
-              type="button"
-              className={CARD}
-              data-testid="create-estate-browse-strategy"
-              onClick={onOpenStrategyCreate}
-            >
-              <span className="block text-base font-semibold text-[#1f1c19]">
-                Strategy
-              </span>
-              <span className="mt-1 block text-sm text-[#4b463f]">
-                Opens Strategy Library create mode under Get Advice — not a
-                second strategy engine.
-              </span>
-            </button>
-            <ul className="flex flex-col gap-2">
-              {CREATE_LAUNCHER_TYPE_OPTIONS.filter((t) => t !== "Custom").map(
-                (label) => (
-                  <li key={label}>
-                    <button
-                      type="button"
-                      className="w-full rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-left text-base font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/40"
-                      data-testid={`create-estate-type-${label}`}
-                      onClick={() => onBrowseType(label)}
-                    >
-                      {label}
-                    </button>
-                  </li>
-                ),
-              )}
-            </ul>
-          </div>
-        ) : null}
+            {CREATE_ESTATE_PICKER_HEADING}
+          </h2>
+          <CreateCatalogPicker onSelect={onSelectCreationType} />
+          <button
+            type="button"
+            className={CARD}
+            data-testid="create-estate-browse-strategy"
+            onClick={onOpenStrategyCreate}
+          >
+            <span className="block text-base font-semibold text-[#1f1c19]">
+              Strategy
+            </span>
+            <span className="mt-1 block text-sm text-[#4b463f]">
+              Opens Strategy Library create mode under Get Advice — not a second
+              strategy engine.
+            </span>
+          </button>
+        </section>
 
-        {activeChoice === "continue" ? (
-          <div className="mt-4" data-testid="create-estate-continue">
+        <section
+          className="mt-6"
+          data-testid="create-estate-continue"
+          aria-labelledby="create-estate-continue-heading"
+        >
+          <h2
+            id="create-estate-continue-heading"
+            className="text-lg font-semibold text-[#1f1c19]"
+          >
+            {CREATE_ESTATE_CONTINUE_HEADING}
+          </h2>
+          <div className="mt-3">
             <CreateDraftResumeList
               onOpen={onOpenSavedDraft}
               onRename={onRenameDraft}
               onDuplicate={onDuplicateDraft}
               onDelete={onDeleteDraft}
             />
-            <p className="mt-3 text-sm text-[#6b635a]">
-              If nothing appears here, you do not have a saved creation to
-              resume yet — start fresh above.
-            </p>
           </div>
-        ) : null}
+          <p className="mt-3 text-sm text-[#6b635a]">
+            If nothing appears here, you do not have a saved creation to resume
+            yet — choose a type above.
+          </p>
+        </section>
       </div>
     </CreateEstateRoomShell>
   );

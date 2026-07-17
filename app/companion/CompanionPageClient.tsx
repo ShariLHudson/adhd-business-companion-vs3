@@ -577,6 +577,7 @@ import {
   type ArtifactExportOffer,
 } from "@/lib/artifactType";
 import { matchCatalogFromText } from "@/lib/createCatalog";
+import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
 import {
   detectActionBridge,
   type ActionBridge,
@@ -24809,10 +24810,12 @@ export default function CompanionPageClient() {
             <CreateEstateEntrancePanel
               onBack={goBack}
               registerBack={registerBack}
-              onStartWithNeed={() => startFreshCreateFromEstate()}
-              onBrowseType={(typeLabel) =>
-                startFreshCreateFromEstate({ artifactType: typeLabel })
-              }
+              onSelectCreationType={(item) => {
+                const resolved = resolveCreateLauncherType(item.label);
+                startFreshCreateFromEstate({
+                  artifactType: resolved.catalogLabel,
+                });
+              }}
               onOpenStrategyCreate={() =>
                 openStrategyLibraryCore({ openView: "business" })
               }

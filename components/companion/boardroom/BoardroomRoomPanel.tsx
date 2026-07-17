@@ -22,6 +22,7 @@ import {
   THOMAS_ELLISON_DIRECTOR_ID,
 } from "@/lib/board/visibleDirectors";
 import {
+  clearBoardIntakeDraft,
   listBoardDirectorDiscussions,
 } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
 import {
@@ -119,6 +120,8 @@ export function BoardroomRoomPanel({
   const [boardReviewDirectorIds, setBoardReviewDirectorIds] = useState<
     BoardDirectorId[]
   >([]);
+  /** Fresh Bring-a-Decision intake — discard stale draft. */
+  const [forceFreshBoardIntake, setForceFreshBoardIntake] = useState(false);
   const [tick, setTick] = useState(0);
   const recent = useMemo(() => {
     void tick;
@@ -178,12 +181,17 @@ export function BoardroomRoomPanel({
   }
 
   function beginNewDiscussion() {
+    clearBoardIntakeDraft();
+    setBoardReviewDirectorIds([]);
+    setForceFreshBoardIntake(true);
     setView("board-director-intake");
     setActionPanel(null);
   }
 
   function beginDiscussionWithDirectors(ids: readonly BoardDirectorId[]) {
+    if (ids.length === 0) return;
     setBoardReviewDirectorIds([...ids]);
+    setForceFreshBoardIntake(false);
     setMeetRoundTableOpen(false);
     setView("board-director-intake");
   }
@@ -511,12 +519,22 @@ export function BoardroomRoomPanel({
 
           {view === "board-director-intake" ? (
             <BoardDirectorDiscussionIntake
+              key={
+                forceFreshBoardIntake
+                  ? "board-intake-fresh"
+                  : `board-intake-${boardReviewDirectorIds.join("-") || "empty"}`
+              }
               initialDirectorIds={
                 boardReviewDirectorIds.length > 0
                   ? boardReviewDirectorIds
                   : []
               }
+              forceFreshDecision={forceFreshBoardIntake}
               onCancel={startHome}
+              onChooseDirectors={() => {
+                setForceFreshBoardIntake(false);
+                setView("meet-directors");
+              }}
               onComplete={() => {
                 refresh();
                 startHome();
@@ -534,9 +552,7 @@ export function BoardroomRoomPanel({
               initialRoundTableOpen={meetRoundTableOpen}
               initialBoardReviewIds={boardReviewDirectorIds}
               onStartBoardDiscussion={(ids) => {
-                beginDiscussionWithDirectors(
-                  ids.length > 0 ? ids : [THOMAS_ELLISON_DIRECTOR_ID],
-                );
+                beginDiscussionWithDirectors(ids);
               }}
               onBoardReviewIdsChange={setBoardReviewDirectorIds}
             />

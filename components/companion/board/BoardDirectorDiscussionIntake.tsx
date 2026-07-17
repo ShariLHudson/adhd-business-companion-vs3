@@ -5,8 +5,10 @@ import type { BoardDirectorId } from "@/lib/board";
 import { getBoardDirectorById } from "@/lib/board";
 import { THOMAS_ELLISON_DIRECTOR_ID } from "@/lib/board/visibleDirectors";
 import {
+  advanceDecisionToReview,
   advanceDraftToReady,
   answerBoardIntakeStep,
+  canBeginBoardDiscussion,
   clearBoardIntakeDraft,
   createBoardDirectorDiscussionFromDraft,
   createEmptyBoardIntakeDraft,
@@ -18,6 +20,7 @@ import {
   resolveInitialBoardIntakeDraft,
   saveBoardIntakeDraft,
   setDraftStep,
+  skipBoardIntakeStep,
   updateDraftDirectors,
   upsertBoardDirectorDiscussion,
   type BoardDiscussionIntakeDraft,
@@ -28,22 +31,31 @@ import "@/app/companion/boardroom.css";
 
 type Props = {
   initialDirectorIds: readonly BoardDirectorId[];
+  /** When true, discard any saved draft and start a fresh decision ask. */
+  forceFreshDecision?: boolean;
   onCancel: () => void;
   onComplete: (record: BoardDirectorDiscussionRecord) => void;
+  onChooseDirectors?: () => void;
 };
 
 /**
  * One-question-at-a-time Board discussion intake → review → one discussion.
- * Draft is persisted so remounts cannot restart from decision.
+ * Chair is optional. Draft is persisted so remounts cannot restart from decision.
  */
 export function BoardDirectorDiscussionIntake({
   initialDirectorIds,
+  forceFreshDecision = false,
   onCancel,
   onComplete,
+  onChooseDirectors,
 }: Props) {
-  const [draft, setDraft] = useState<BoardDiscussionIntakeDraft>(() =>
-    resolveInitialBoardIntakeDraft(initialDirectorIds),
-  );
+  const [draft, setDraft] = useState<BoardDiscussionIntakeDraft>(() => {
+    if (forceFreshDecision) {
+      clearBoardIntakeDraft();
+      return createEmptyBoardIntakeDraft(initialDirectorIds);
+    }
+    return resolveInitialBoardIntakeDraft(initialDirectorIds);
+  });
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<BoardDirectorDiscussionRecord | null>(
     null,
@@ -51,12 +63,10 @@ export function BoardDirectorDiscussionIntake({
   const [submitting, setSubmitting] = useState(false);
   const [confirmStartOver, setConfirmStartOver] = useState(false);
   const [editStep, setEditStep] = useState<BoardIntakeStep | null>(null);
+  const [selectionError, setSelectionError] = useState<string | null>(null);
   const submitLockRef = useRef(false);
 
   const chair = getBoardDirectorById(THOMAS_ELLISON_DIRECTOR_ID);
-  const needsChairConfirm =
-    !draft.chairConfirmed &&
-    !draft.selectedDirectorIds.includes(THOMAS_ELLISON_DIRECTOR_ID);
 
   useEffect(() => {
     if (draft.currentStep === "discussion" && result) return;
@@ -65,19 +75,12 @@ export function BoardDirectorDiscussionIntake({
 
   useEffect(() => {
     if (initialDirectorIds.length === 0) return;
-    setDraft((prev) => {
-      if (prev.selectedDirectorIds.length > 0) return prev;
-      return updateDraftDirectors(prev, initialDirectorIds);
-    });
+    setDraft((prev) => updateDraftDirectors(prev, initialDirectorIds));
   }, [initialDirectorIds]);
 
   function persistDraft(next: BoardDiscussionIntakeDraft) {
     setDraft(next);
     saveBoardIntakeDraft(next);
-  }
-
-  function confirmChair() {
-    persistDraft(ensureChairInDraft(draft));
   }
 
   function submitAnswer() {
@@ -87,6 +90,7 @@ export function BoardDirectorDiscussionIntake({
 
     submitLockRef.current = true;
     setSubmitting(true);
+    setSelectionError(null);
     try {
       if (editStep && isQuestionIntakeStep(editStep)) {
         const editing = { ...draft, currentStep: editStep };
@@ -111,17 +115,50 @@ export function BoardDirectorDiscussionIntake({
     }
   }
 
+  function skipOptional() {
+    if (draft.currentStep === "decision") return;
+    persistDraft(skipBoardIntakeStep(draft));
+    setAnswer("");
+  }
+
+  function startWithDecisionOnly() {
+    if (!draft.decision.trim() && !answer.trim()) return;
+    let next = draft;
+    if (draft.currentStep === "decision" && answer.trim()) {
+      next = answerBoardIntakeStep(draft, answer);
+      setAnswer("");
+    }
+    persistDraft(advanceDecisionToReview(next));
+  }
+
   function beginBoardDiscussion() {
     if (submitLockRef.current || submitting) return;
+    const readyDraft = ensureChairInDraft(
+      draft.currentStep === "review" || draft.currentStep === "ready_to_begin"
+        ? draft
+        : advanceDecisionToReview(draft),
+    );
+    if (!canBeginBoardDiscussion(readyDraft)) {
+      if (!readyDraft.decision.trim()) {
+        setSelectionError(
+          "What would you like the selected Directors to discuss?",
+        );
+        persistDraft(setDraftStep(readyDraft, "decision"));
+        return;
+      }
+      setSelectionError("Choose at least one Director to begin.");
+      return;
+    }
+
     submitLockRef.current = true;
     setSubmitting(true);
+    setSelectionError(null);
     try {
-      const ready = advanceDraftToReady(
-        draft.currentStep === "review"
-          ? draft
-          : { ...draft, currentStep: "review" },
-      );
-      const inDiscussion = markDraftInDiscussion(ensureChairInDraft(ready));
+      const ready = advanceDraftToReady({
+        ...readyDraft,
+        currentStep: "review",
+      });
+      const inDiscussion = markDraftInDiscussion(ready);
       const record = createBoardDirectorDiscussionFromDraft(inDiscussion);
       const saved = upsertBoardDirectorDiscussion(record);
       clearBoardIntakeDraft();
@@ -145,6 +182,7 @@ export function BoardDirectorDiscussionIntake({
     setAnswer("");
     setResult(null);
     setEditStep(null);
+    setSelectionError(null);
     setConfirmStartOver(false);
   }
 
@@ -164,6 +202,9 @@ export function BoardDirectorDiscussionIntake({
   }
 
   if (result) {
+    const names = result.directorIds
+      .map((id) => getBoardDirectorById(id)?.name)
+      .filter(Boolean);
     return (
       <div
         className="boardroom-director-intake"
@@ -173,12 +214,7 @@ export function BoardDirectorDiscussionIntake({
         <p className="boardroom-kicker">Board Discussion</p>
         <h2 className="boardroom-title">{result.title}</h2>
         <p className="boardroom-purpose">
-          Chair opening with{" "}
-          {result.directorIds
-            .map((id) => getBoardDirectorById(id)?.name)
-            .filter(Boolean)
-            .join(", ")}
-          .
+          Discussion begun with {names.join(", ") || "your selected Directors"}.
         </p>
         <div className="boardroom-director-intake__turns">
           {result.turns.map((turn) => (
@@ -206,47 +242,6 @@ export function BoardDirectorDiscussionIntake({
             onClick={() => onComplete(result)}
           >
             Return to Boardroom Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (needsChairConfirm) {
-    return (
-      <div
-        className="boardroom-director-intake"
-        data-testid="board-director-chair-confirm"
-      >
-        <p className="boardroom-kicker">Start a Board Discussion</p>
-        <h2 className="boardroom-title">The Chair is required</h2>
-        <p className="boardroom-purpose">
-          Every Board discussion includes the Chair.{" "}
-          {chair?.name ?? "Thomas Ellison"} guides the conversation toward a
-          clear recommendation. Would you like to include the Chair now?
-        </p>
-        <div className="boardroom-actions">
-          <button
-            type="button"
-            className="boardroom-btn boardroom-btn--primary"
-            data-testid="board-director-confirm-chair"
-            onClick={confirmChair}
-          >
-            Include {chair?.name ?? "Thomas"} as Chair
-          </button>
-          <button
-            type="button"
-            className="boardroom-btn boardroom-btn--ghost"
-            onClick={saveAndReturnLater}
-          >
-            Save and Return Later
-          </button>
-          <button
-            type="button"
-            className="boardroom-btn boardroom-btn--ghost"
-            onClick={onCancel}
-          >
-            Cancel
           </button>
         </div>
       </div>
@@ -300,40 +295,65 @@ export function BoardDirectorDiscussionIntake({
         <p className="boardroom-kicker">Board Discussion · Review</p>
         <h2 className="boardroom-title">Before we begin</h2>
         <p className="boardroom-purpose">
-          Please confirm what you&apos;re bringing to the Round Table.
+          Please confirm what you&apos;re bringing to the Round Table. The Chair
+          is optional.
         </p>
 
-        <div className="boardroom-card-list mt-4" data-testid="board-intake-review-summary">
+        {selectionError ? (
+          <p
+            className="boardroom-purpose"
+            data-testid="board-director-intake-error"
+            role="alert"
+          >
+            {selectionError}
+          </p>
+        ) : null}
+
+        <div
+          className="boardroom-card-list mt-4"
+          data-testid="board-intake-review-summary"
+        >
           <div className="boardroom-card">
             <div className="boardroom-card__title">Decision</div>
             <div className="boardroom-card__meta whitespace-pre-wrap">
-              {draft.decision}
+              {draft.decision || "—"}
             </div>
           </div>
-          <div className="boardroom-card">
-            <div className="boardroom-card__title">Why it matters now</div>
-            <div className="boardroom-card__meta whitespace-pre-wrap">
-              {draft.importance}
+          {draft.importance.trim() ? (
+            <div className="boardroom-card">
+              <div className="boardroom-card__title">Why it matters now</div>
+              <div className="boardroom-card__meta whitespace-pre-wrap">
+                {draft.importance}
+              </div>
             </div>
-          </div>
-          <div className="boardroom-card">
-            <div className="boardroom-card__title">Options</div>
-            <ul className="boardroom-card__meta" style={{ margin: "0.35rem 0 0", paddingLeft: "1.1rem" }}>
-              {draft.options.map((opt) => (
-                <li key={opt}>{opt}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="boardroom-card">
-            <div className="boardroom-card__title">Concerns</div>
-            <div className="boardroom-card__meta whitespace-pre-wrap">
-              {draft.concerns}
+          ) : null}
+          {draft.options.length > 0 ? (
+            <div className="boardroom-card">
+              <div className="boardroom-card__title">Options</div>
+              <ul
+                className="boardroom-card__meta"
+                style={{ margin: "0.35rem 0 0", paddingLeft: "1.1rem" }}
+              >
+                {draft.options.map((opt) => (
+                  <li key={opt}>{opt}</li>
+                ))}
+              </ul>
             </div>
-          </div>
+          ) : null}
+          {draft.concerns.trim() ? (
+            <div className="boardroom-card">
+              <div className="boardroom-card__title">Concerns</div>
+              <div className="boardroom-card__meta whitespace-pre-wrap">
+                {draft.concerns}
+              </div>
+            </div>
+          ) : null}
           <div className="boardroom-card">
             <div className="boardroom-card__title">Selected Directors</div>
             <div className="boardroom-card__meta">
-              {directors.length > 0 ? directors.join(", ") : chair?.name}
+              {directors.length > 0
+                ? directors.join(", ")
+                : "None selected yet"}
             </div>
           </div>
         </div>
@@ -348,37 +368,25 @@ export function BoardDirectorDiscussionIntake({
           >
             Begin Board Discussion
           </button>
+          {onChooseDirectors ? (
+            <button
+              type="button"
+              className="boardroom-btn boardroom-btn--secondary"
+              data-testid="board-director-intake-choose-directors"
+              onClick={onChooseDirectors}
+            >
+              {directors.length > 0
+                ? "Change Directors"
+                : "Choose Directors"}
+            </button>
+          ) : null}
           <button
             type="button"
             className="boardroom-btn boardroom-btn--secondary"
             data-testid="board-director-intake-change-decision"
             onClick={() => changeAnswer("decision")}
           >
-            Change an Answer
-          </button>
-          <button
-            type="button"
-            className="boardroom-btn boardroom-btn--secondary"
-            data-testid="board-director-intake-change-importance"
-            onClick={() => changeAnswer("importance")}
-          >
-            Edit why it matters
-          </button>
-          <button
-            type="button"
-            className="boardroom-btn boardroom-btn--secondary"
-            data-testid="board-director-intake-change-options"
-            onClick={() => changeAnswer("options")}
-          >
-            Edit options
-          </button>
-          <button
-            type="button"
-            className="boardroom-btn boardroom-btn--secondary"
-            data-testid="board-director-intake-change-concerns"
-            onClick={() => changeAnswer("concerns")}
-          >
-            Edit concerns
+            Edit Decision
           </button>
           <button
             type="button"
@@ -397,19 +405,20 @@ export function BoardDirectorDiscussionIntake({
             Start Over
           </button>
         </div>
-        <p className="boardroom-purpose mt-3">
-          To add or remove Directors, return to Meet the Directors, then bring
-          the decision again — your answers stay saved until you Start Over.
-        </p>
       </div>
     );
   }
 
   const activeStep = editStep ?? draft.currentStep;
-  const prompt = currentIntakePrompt({ currentStep: activeStep });
+  const prompt =
+    activeStep === "decision"
+      ? "What decision, situation, or question would you like to bring to the Board?"
+      : currentIntakePrompt({ currentStep: activeStep });
   const stepNum = questionStepNumber(
     isQuestionIntakeStep(activeStep) ? activeStep : "decision",
   );
+  const optionalStep =
+    isQuestionIntakeStep(activeStep) && activeStep !== "decision";
 
   return (
     <div
@@ -422,9 +431,30 @@ export function BoardDirectorDiscussionIntake({
       </p>
       <h2 className="boardroom-title">{prompt}</h2>
       <p className="boardroom-purpose">
-        One question at a time.{" "}
-        {chair?.name ?? "Thomas"} is at the table as Chair.
+        One question at a time. Optional details can be skipped. The Chair is
+        optional.
       </p>
+      {selectionError ? (
+        <p
+          className="boardroom-purpose"
+          data-testid="board-director-intake-error"
+          role="alert"
+        >
+          {selectionError}
+        </p>
+      ) : null}
+      {draft.selectedDirectorIds.length > 0 ? (
+        <p
+          className="boardroom-purpose"
+          data-testid="board-director-intake-selection-summary"
+        >
+          Selected Directors:{" "}
+          {draft.selectedDirectorIds
+            .map((id) => getBoardDirectorById(id)?.name)
+            .filter(Boolean)
+            .join(", ")}
+        </p>
+      ) : null}
       <div className="boardroom-field mt-4">
         <label htmlFor="board-director-intake-answer" className="sr-only">
           {prompt}
@@ -445,7 +475,7 @@ export function BoardDirectorDiscussionIntake({
           disabled={submitting}
         />
       </div>
-      <div className="boardroom-actions">
+      <div className="boardroom-actions" style={{ flexWrap: "wrap" }}>
         <button
           type="button"
           className="boardroom-btn boardroom-btn--primary"
@@ -453,8 +483,32 @@ export function BoardDirectorDiscussionIntake({
           data-testid="board-director-intake-continue"
           onClick={submitAnswer}
         >
-          {activeStep === "concerns" && !editStep ? "Continue to review" : "Continue"}
+          {activeStep === "concerns" && !editStep
+            ? "Continue to review"
+            : "Continue"}
         </button>
+        {optionalStep ? (
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--secondary"
+            data-testid="board-director-intake-skip"
+            onClick={skipOptional}
+            disabled={submitting}
+          >
+            Skip Optional Details
+          </button>
+        ) : null}
+        {activeStep === "decision" && draft.selectedDirectorIds.length > 0 ? (
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--secondary"
+            data-testid="board-director-intake-start-with-decision"
+            disabled={!answer.trim() && !draft.decision.trim()}
+            onClick={startWithDecisionOnly}
+          >
+            Continue to Review
+          </button>
+        ) : null}
         <button
           type="button"
           className="boardroom-btn boardroom-btn--ghost"
