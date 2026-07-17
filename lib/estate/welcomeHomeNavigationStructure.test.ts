@@ -3,15 +3,17 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
   WELCOME_HOME_FORBIDDEN_LABELS,
+  WELCOME_HOME_MY_DAY_DROPDOWN_IDS,
   WELCOME_HOME_NAV_CATEGORIES,
   WELCOME_HOME_WANDER_GROUNDS,
   welcomeHomeHasExperienceControls,
   welcomeHomeMyDayDestinationIds,
+  welcomeHomeMyDayDropdown,
   welcomeHomeNavMaxDepth,
 } from "./welcomeHomeNavigationStructure";
 
 describe("welcomeHomeNavigationStructure", () => {
-  it("has five intent categories and max depth two", () => {
+  it("has five intent categories and max depth three for My Day dropdowns", () => {
     expect(WELCOME_HOME_NAV_CATEGORIES).toHaveLength(5);
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
@@ -20,7 +22,7 @@ describe("welcomeHomeNavigationStructure", () => {
       "my-story",
       "get-advice",
     ]);
-    expect(welcomeHomeNavMaxDepth()).toBe(2);
+    expect(welcomeHomeNavMaxDepth()).toBe(3);
   });
 
   it("places Wander the Grounds outside categories with explore + guide destinations", () => {
@@ -39,7 +41,7 @@ describe("welcomeHomeNavigationStructure", () => {
     ).toBe(false);
   });
 
-  it("My Day has exactly three combined destinations", () => {
+  it("My Day has two dropdown groups plus Calendar — children are independently routable", () => {
     const myDay = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day");
     expect(myDay?.destinations.map((d) => d.id)).toEqual([
       "adapt-plan-my-day",
@@ -47,11 +49,37 @@ describe("welcomeHomeNavigationStructure", () => {
       "reminders-rhythms",
     ]);
     expect(myDay?.destinations.map((d) => d.label)).toEqual([
-      "Adapt / Plan My Day",
+      "Plan My Day / Adapt My Day",
       "Calendar",
       "Reminders / Rhythms",
     ]);
     expect(welcomeHomeMyDayDestinationIds()).toHaveLength(3);
+    expect(WELCOME_HOME_MY_DAY_DROPDOWN_IDS).toEqual([
+      "adapt-plan-my-day",
+      "reminders-rhythms",
+    ]);
+
+    const planAdapt = welcomeHomeMyDayDropdown("adapt-plan-my-day");
+    expect(planAdapt?.dropdownChildren?.map((c) => c.id)).toEqual([
+      "plan-my-day",
+      "adapt-my-day",
+    ]);
+    expect(planAdapt?.dropdownChildren?.map((c) => c.label)).toEqual([
+      "Plan My Day",
+      "Adapt My Day",
+    ]);
+
+    const remindersRhythms = welcomeHomeMyDayDropdown("reminders-rhythms");
+    expect(remindersRhythms?.dropdownChildren?.map((c) => c.id)).toEqual([
+      "reminders",
+      "rhythms",
+    ]);
+    expect(remindersRhythms?.dropdownChildren?.map((c) => c.label)).toEqual([
+      "Reminders",
+      "Rhythms",
+    ]);
+
+    // Children are nested — not top-level My Day rows.
     expect(myDay?.destinations.some((d) => d.id === "plan-my-day")).toBe(false);
     expect(myDay?.destinations.some((d) => d.id === "reminders")).toBe(false);
     expect(myDay?.destinations.some((d) => d.id === "rhythms")).toBe(false);
@@ -138,8 +166,12 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(source).not.toMatch(/expandedCategory/);
     expect(source).not.toMatch(/mobileDrillIn/);
     expect(source).not.toMatch(/isExpanded && !mobileDrillIn/);
-    expect(source).toMatch(/onOpenRemindersRhythms/);
-    expect(source).toMatch(/onOpenAdaptPlanMyDay/);
+    expect(source).toMatch(/onOpenReminders/);
+    expect(source).toMatch(/onOpenRhythms/);
+    expect(source).toMatch(/onOpenPlanMyDay/);
+    expect(source).toMatch(/onOpenAdaptMyDay/);
+    expect(source).toMatch(/dropdownChildren/);
+    expect(source).toMatch(/welcome-home-dropdown-/);
     expect(source).toMatch(/onOpenSparkEstateGuide/);
     expect(source).toMatch(/openFocusedPanel\(WELCOME_HOME_WANDER_GROUNDS\.id\)/);
   });

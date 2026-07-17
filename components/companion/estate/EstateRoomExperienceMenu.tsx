@@ -12,8 +12,10 @@ import {
   WELCOME_HOME_NAV_CATEGORIES,
   WELCOME_HOME_WANDER_GROUNDS,
   type WelcomeHomeFocusedPanelId,
+  type WelcomeHomeMyDayDropdownId,
   type WelcomeHomeNavDestination,
   type WelcomeHomeNavDestinationId,
+  type WelcomeHomeNavDropdownChildId,
 } from "@/lib/estate/welcomeHomeNavigationStructure";
 
 export type EstateRoomExperienceMenuProps = {
@@ -37,16 +39,23 @@ export type EstateRoomExperienceMenuProps = {
   /** Wander the Grounds — Spark Estate Guide (lazy-loaded flipbook). */
   onOpenSparkEstateGuide?: () => void;
   onReturnToExploreEstate?: () => void;
-  /** Shared Adapt / Plan My Day entrance (PlanOrAdaptPathChooser). */
+  /**
+   * Legacy combined Plan/Adapt opener — unused when dropdown children are shown.
+   * Kept for transitional callers.
+   */
   onOpenAdaptPlanMyDay?: () => void;
-  /** @deprecated Use onOpenAdaptPlanMyDay — kept for transitional callers. */
+  /** Plan My Day destination (dropdown child). */
   onOpenPlanMyDay?: () => void;
+  /** Adapt My Day destination (dropdown child). */
+  onOpenAdaptMyDay?: () => void;
   onOpenCalendar?: () => void;
-  /** Shared Reminders / Rhythms explanatory entrance. */
+  /**
+   * Legacy combined Reminders/Rhythms entrance — unused when dropdown children shown.
+   */
   onOpenRemindersRhythms?: () => void;
-  /** @deprecated Prefer onOpenRemindersRhythms from My Day. */
+  /** Reminders destination (dropdown child). */
   onOpenReminders?: () => void;
-  /** @deprecated Prefer onOpenRemindersRhythms from My Day. */
+  /** Rhythms destination (dropdown child). */
   onOpenRhythms?: () => void;
   onOpenProjects?: () => void;
   onOpenCreateStudio?: () => void;
@@ -88,8 +97,11 @@ export function EstateRoomExperienceMenu({
   onReturnToExploreEstate,
   onOpenAdaptPlanMyDay,
   onOpenPlanMyDay,
+  onOpenAdaptMyDay,
   onOpenCalendar,
   onOpenRemindersRhythms,
+  onOpenReminders,
+  onOpenRhythms,
   onOpenProjects,
   onOpenClearMyMind,
   onOpenParkingLot,
@@ -111,6 +123,9 @@ export function EstateRoomExperienceMenu({
   /** Focused category submenu — replaces top-level on desktop and mobile. */
   const [focusedPanel, setFocusedPanel] =
     useState<WelcomeHomeFocusedPanelId | null>(null);
+  /** Which My Day nested dropdown is expanded (at most one). */
+  const [expandedDropdown, setExpandedDropdown] =
+    useState<WelcomeHomeMyDayDropdownId | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const placeDisplayName = resolveWanderRoomDisplayName(roomId);
 
@@ -129,6 +144,7 @@ export function EstateRoomExperienceMenu({
   useEffect(() => {
     if (!open) {
       setFocusedPanel(null);
+      setExpandedDropdown(null);
       return;
     }
     const onPointerDown = (event: MouseEvent | TouchEvent) => {
@@ -138,6 +154,10 @@ export function EstateRoomExperienceMenu({
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        if (expandedDropdown) {
+          setExpandedDropdown(null);
+          return;
+        }
         if (focusedPanel) {
           setFocusedPanel(null);
           return;
@@ -153,28 +173,51 @@ export function EstateRoomExperienceMenu({
       document.removeEventListener("touchstart", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open, focusedPanel]);
+  }, [open, focusedPanel, expandedDropdown]);
 
   const closeAndRun = useCallback(
     (action: (() => void) | undefined) => {
       if (!action) return;
       setOpen(false);
       setFocusedPanel(null);
+      setExpandedDropdown(null);
       bumpVisibility();
       action();
     },
     [bumpVisibility],
   );
 
-  const openAdaptPlanMyDay = onOpenAdaptPlanMyDay ?? onOpenPlanMyDay;
+  const dropdownChildAction = useCallback(
+    (id: WelcomeHomeNavDropdownChildId): (() => void) | undefined => {
+      const map: Record<
+        WelcomeHomeNavDropdownChildId,
+        (() => void) | undefined
+      > = {
+        "plan-my-day": onOpenPlanMyDay ?? onOpenAdaptPlanMyDay,
+        "adapt-my-day": onOpenAdaptMyDay ?? onOpenAdaptPlanMyDay,
+        reminders: onOpenReminders ?? onOpenRemindersRhythms,
+        rhythms: onOpenRhythms ?? onOpenRemindersRhythms,
+      };
+      return map[id];
+    },
+    [
+      onOpenPlanMyDay,
+      onOpenAdaptMyDay,
+      onOpenAdaptPlanMyDay,
+      onOpenReminders,
+      onOpenRhythms,
+      onOpenRemindersRhythms,
+    ],
+  );
 
   const destinationAction = useCallback(
     (id: WelcomeHomeNavDestinationId): (() => void) | undefined => {
       const map: Record<WelcomeHomeNavDestinationId, (() => void) | undefined> =
         {
-          "adapt-plan-my-day": openAdaptPlanMyDay,
+          // Dropdown parents toggle in-menu; never route as a combined chooser.
+          "adapt-plan-my-day": undefined,
           calendar: onOpenCalendar,
-          "reminders-rhythms": onOpenRemindersRhythms,
+          "reminders-rhythms": undefined,
           projects: onOpenProjects,
           "destination-gallery": onOpenDestinationGallery,
           "cartographers-studio": onOpenCartographersStudio,
@@ -196,9 +239,7 @@ export function EstateRoomExperienceMenu({
       return map[id];
     },
     [
-      openAdaptPlanMyDay,
       onOpenCalendar,
-      onOpenRemindersRhythms,
       onOpenProjects,
       onOpenDestinationGallery,
       onOpenCartographersStudio,
@@ -220,13 +261,23 @@ export function EstateRoomExperienceMenu({
   );
 
   const openFocusedPanel = useCallback((id: WelcomeHomeFocusedPanelId) => {
+    setExpandedDropdown(null);
     setFocusedPanel(id);
   }, []);
 
   const backToTopLevel = useCallback(() => {
     bumpVisibility();
+    setExpandedDropdown(null);
     setFocusedPanel(null);
   }, [bumpVisibility]);
+
+  const toggleDropdown = useCallback(
+    (id: WelcomeHomeMyDayDropdownId) => {
+      bumpVisibility();
+      setExpandedDropdown((current) => (current === id ? null : id));
+    },
+    [bumpVisibility],
+  );
 
   if (!mounted || !visible) return null;
 
@@ -241,6 +292,69 @@ export function EstateRoomExperienceMenu({
     : activeCategory?.destinations ?? null;
 
   const renderDestinationButton = (dest: WelcomeHomeNavDestination) => {
+    const children = dest.dropdownChildren;
+    if (children && children.length > 0) {
+      const dropdownId = dest.id as WelcomeHomeMyDayDropdownId;
+      const isExpanded = expandedDropdown === dropdownId;
+      return (
+        <div
+          key={dest.id}
+          className="estate-room-experience-menu__dropdown"
+          data-testid={`welcome-home-dropdown-${dest.id}`}
+          data-expanded={isExpanded ? "true" : "false"}
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className="estate-room-experience-menu__item estate-room-experience-menu__item--nav estate-room-experience-menu__item--dropdown-toggle"
+            aria-expanded={isExpanded}
+            aria-haspopup="menu"
+            aria-label={`${dest.label} menu`}
+            data-testid={`estate-open-${dest.id}`}
+            onClick={() => toggleDropdown(dropdownId)}
+          >
+            <span className="estate-room-experience-menu__item-label">
+              {dest.label}
+            </span>
+            <span
+              className="estate-room-experience-menu__item-chevron estate-room-experience-menu__item-chevron--dropdown"
+              aria-hidden
+            >
+              {isExpanded ? "▾" : "›"}
+            </span>
+          </button>
+          {isExpanded ? (
+            <div
+              className="estate-room-experience-menu__dropdown-children"
+              role="group"
+              aria-label={dest.label}
+              data-testid={`welcome-home-dropdown-children-${dest.id}`}
+            >
+              {children.map((child) => {
+                const childAction = dropdownChildAction(child.id);
+                if (!childAction) return null;
+                return (
+                  <button
+                    key={child.id}
+                    type="button"
+                    role="menuitem"
+                    className="estate-room-experience-menu__item estate-room-experience-menu__item--nav estate-room-experience-menu__item--dropdown-child"
+                    aria-label={`Open ${child.label}`}
+                    data-testid={`estate-open-${child.id}`}
+                    onClick={() => closeAndRun(childAction)}
+                  >
+                    <span className="estate-room-experience-menu__item-label">
+                      {child.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+        </div>
+      );
+    }
+
     const action = destinationAction(dest.id);
     if (!action) return null;
     return (

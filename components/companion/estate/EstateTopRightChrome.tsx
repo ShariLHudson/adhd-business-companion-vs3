@@ -21,6 +21,7 @@ export type EstateTopRightChromeProps = {
   onReturnToExploreEstate?: () => void;
   onOpenAdaptPlanMyDay?: () => void;
   onOpenPlanMyDay?: () => void;
+  onOpenAdaptMyDay?: () => void;
   onOpenRemindersRhythms?: () => void;
   onOpenRhythms?: () => void;
   onOpenReminders?: () => void;
@@ -37,6 +38,7 @@ export type EstateTopRightChromeProps = {
   onOpenHallOfAccomplishments?: () => void;
   onOpenChamber?: () => void;
   onOpenBoardroom?: () => void;
+  onOpenStrategyLibrary?: () => void;
   onOpenBreathe?: () => void;
   onOpenPeacefulPlaces?: () => void;
   onOpenSoundscapes?: () => void;
@@ -62,6 +64,7 @@ export function EstateTopRightChrome({
   onReturnToExploreEstate,
   onOpenAdaptPlanMyDay,
   onOpenPlanMyDay,
+  onOpenAdaptMyDay,
   onOpenRemindersRhythms,
   onOpenRhythms,
   onOpenReminders,
@@ -78,6 +81,7 @@ export function EstateTopRightChrome({
   onOpenHallOfAccomplishments,
   onOpenChamber,
   onOpenBoardroom,
+  onOpenStrategyLibrary,
   onOpenBreathe,
   onOpenPeacefulPlaces,
   onOpenSoundscapes,
@@ -104,8 +108,9 @@ export function EstateTopRightChrome({
           onExploreSpark={onExploreSpark}
           onOpenSparkEstateGuide={onOpenSparkEstateGuide}
           onReturnToExploreEstate={onReturnToExploreEstate}
-          onOpenAdaptPlanMyDay={onOpenAdaptPlanMyDay ?? onOpenPlanMyDay}
+          onOpenAdaptPlanMyDay={onOpenAdaptPlanMyDay}
           onOpenPlanMyDay={onOpenPlanMyDay}
+          onOpenAdaptMyDay={onOpenAdaptMyDay}
           onOpenRemindersRhythms={onOpenRemindersRhythms}
           onOpenRhythms={onOpenRhythms}
           onOpenReminders={onOpenReminders}
@@ -122,6 +127,7 @@ export function EstateTopRightChrome({
           onOpenHallOfAccomplishments={onOpenHallOfAccomplishments}
           onOpenChamber={onOpenChamber}
           onOpenBoardroom={onOpenBoardroom}
+          onOpenStrategyLibrary={onOpenStrategyLibrary}
           onOpenBreathe={onOpenBreathe}
           onOpenPeacefulPlaces={onOpenPeacefulPlaces}
           onOpenSoundscapes={onOpenSoundscapes}

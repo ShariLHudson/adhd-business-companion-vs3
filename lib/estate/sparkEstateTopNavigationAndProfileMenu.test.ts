@@ -75,7 +75,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS.map((item) => item.label),
     ).toEqual([
-      "Adapt / Plan My Day",
+      "Plan My Day / Adapt My Day",
       "Calendar",
       "Reminders / Rhythms",
     ]);

@@ -2,6 +2,10 @@
  * Welcome Home menu — global estate navigation only.
  * Answers: Where do I want to go?
  * Experience Controls live under SH, not here.
+ *
+ * My Day restores two nested dropdown groups (098):
+ * - Plan My Day / Adapt My Day → Plan My Day · Adapt My Day
+ * - Reminders / Rhythms → Reminders · Rhythms
  */
 
 export type WelcomeHomeNavCategoryId =
@@ -33,11 +37,28 @@ export type WelcomeHomeNavDestinationId =
   | "explore-estate"
   | "spark-estate-guide";
 
+/** Independently routable children inside My Day dropdown groups. */
+export type WelcomeHomeNavDropdownChildId =
+  | "plan-my-day"
+  | "adapt-my-day"
+  | "reminders"
+  | "rhythms";
+
+export type WelcomeHomeNavDropdownChild = {
+  id: WelcomeHomeNavDropdownChildId;
+  label: string;
+};
+
 export type WelcomeHomeNavDestination = {
   id: WelcomeHomeNavDestinationId;
   label: string;
   /** Gallery / selection experiences may show a trailing affordance. */
   selectionExperience?: boolean;
+  /**
+   * Nested dropdown children — independently clickable destinations.
+   * Parent row toggles the dropdown; it does not open a combined chooser.
+   */
+  dropdownChildren?: readonly WelcomeHomeNavDropdownChild[];
 };
 
 export type WelcomeHomeNavCategory = {
@@ -46,15 +67,29 @@ export type WelcomeHomeNavCategory = {
   destinations: readonly WelcomeHomeNavDestination[];
 };
 
-/** Five intent categories — max depth two (category › destination). */
+/** Five intent categories — depth two, or three when a My Day dropdown expands. */
 export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   {
     id: "my-day",
     label: "My Day",
     destinations: [
-      { id: "adapt-plan-my-day", label: "Adapt / Plan My Day" },
+      {
+        id: "adapt-plan-my-day",
+        label: "Plan My Day / Adapt My Day",
+        dropdownChildren: [
+          { id: "plan-my-day", label: "Plan My Day" },
+          { id: "adapt-my-day", label: "Adapt My Day" },
+        ],
+      },
       { id: "calendar", label: "Calendar" },
-      { id: "reminders-rhythms", label: "Reminders / Rhythms" },
+      {
+        id: "reminders-rhythms",
+        label: "Reminders / Rhythms",
+        dropdownChildren: [
+          { id: "reminders", label: "Reminders" },
+          { id: "rhythms", label: "Rhythms" },
+        ],
+      },
     ],
   },
   {
@@ -133,8 +168,18 @@ export const WELCOME_HOME_FORBIDDEN_LABELS = [
   "Full screen",
 ] as const;
 
+/** My Day dropdown group ids that expand in the submenu. */
+export const WELCOME_HOME_MY_DAY_DROPDOWN_IDS = [
+  "adapt-plan-my-day",
+  "reminders-rhythms",
+] as const;
+
+export type WelcomeHomeMyDayDropdownId =
+  (typeof WELCOME_HOME_MY_DAY_DROPDOWN_IDS)[number];
+
 export function welcomeHomeNavMaxDepth(): number {
-  return 2;
+  // Category › dropdown group › child destination (My Day only).
+  return 3;
 }
 
 export function welcomeHomeHasExperienceControls(
@@ -145,8 +190,21 @@ export function welcomeHomeHasExperienceControls(
   );
 }
 
-/** My Day focused submenu — exactly three combined destinations. */
+/** My Day focused submenu — three top-level rows (two are dropdown groups). */
 export function welcomeHomeMyDayDestinationIds(): readonly WelcomeHomeNavDestinationId[] {
   const myDay = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day");
   return myDay?.destinations.map((d) => d.id) ?? [];
+}
+
+export function welcomeHomeMyDayDropdown(
+  id: WelcomeHomeMyDayDropdownId,
+): WelcomeHomeNavDestination | undefined {
+  const myDay = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day");
+  return myDay?.destinations.find((d) => d.id === id);
+}
+
+export function isWelcomeHomeMyDayDropdownId(
+  id: string,
+): id is WelcomeHomeMyDayDropdownId {
+  return (WELCOME_HOME_MY_DAY_DROPDOWN_IDS as readonly string[]).includes(id);
 }

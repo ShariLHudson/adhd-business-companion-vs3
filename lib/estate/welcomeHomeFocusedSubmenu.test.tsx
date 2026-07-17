@@ -1,5 +1,6 @@
 /**
  * Welcome Home — focused submenu replaces top-level (desktop + mobile).
+ * My Day restores two nested dropdowns (098).
  * @vitest-environment jsdom
  */
 import { act } from "react";
@@ -22,21 +23,27 @@ vi.mock("@/lib/estate/useIdleChromeReveal", () => ({
 describe("Welcome Home focused submenu", () => {
   let container: HTMLDivElement;
   let root: Root;
-  const onOpenAdaptPlanMyDay = vi.fn();
+  const onOpenPlanMyDay = vi.fn();
+  const onOpenAdaptMyDay = vi.fn();
   const onOpenCalendar = vi.fn();
-  const onOpenRemindersRhythms = vi.fn();
+  const onOpenReminders = vi.fn();
+  const onOpenRhythms = vi.fn();
   const onExploreSpark = vi.fn();
   const onOpenSparkEstateGuide = vi.fn();
+  const onOpenStrategyLibrary = vi.fn();
 
   beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
-    onOpenAdaptPlanMyDay.mockReset();
+    onOpenPlanMyDay.mockReset();
+    onOpenAdaptMyDay.mockReset();
     onOpenCalendar.mockReset();
-    onOpenRemindersRhythms.mockReset();
+    onOpenReminders.mockReset();
+    onOpenRhythms.mockReset();
     onExploreSpark.mockReset();
     onOpenSparkEstateGuide.mockReset();
+    onOpenStrategyLibrary.mockReset();
   });
 
   afterEach(() => {
@@ -53,11 +60,14 @@ describe("Welcome Home focused submenu", () => {
           roomId="welcome-home"
           embedded
           onBackToEstate={() => undefined}
-          onOpenAdaptPlanMyDay={onOpenAdaptPlanMyDay}
+          onOpenPlanMyDay={onOpenPlanMyDay}
+          onOpenAdaptMyDay={onOpenAdaptMyDay}
           onOpenCalendar={onOpenCalendar}
-          onOpenRemindersRhythms={onOpenRemindersRhythms}
+          onOpenReminders={onOpenReminders}
+          onOpenRhythms={onOpenRhythms}
           onExploreSpark={onExploreSpark}
           onOpenSparkEstateGuide={onOpenSparkEstateGuide}
+          onOpenStrategyLibrary={onOpenStrategyLibrary}
           onOpenProjects={() => undefined}
           onOpenDestinationGallery={() => undefined}
           onOpenCartographersStudio={() => undefined}
@@ -122,7 +132,7 @@ describe("Welcome Home focused submenu", () => {
     ).toBeFalsy();
   });
 
-  it("My Day replaces top-level with exactly three destinations + back + heading", () => {
+  it("My Day replaces top-level with three rows (two dropdowns + Calendar)", () => {
     renderMenu();
     openMenu();
     openCategory("my-day");
@@ -144,16 +154,26 @@ describe("Welcome Home focused submenu", () => {
 
     const labels = Array.from(
       container.querySelectorAll(
-        '[data-testid="welcome-home-submenu-my-day"] .estate-room-experience-menu__item-label',
+        '[data-testid="welcome-home-submenu-my-day"] > .estate-room-experience-menu__dropdown > .estate-room-experience-menu__item--dropdown-toggle .estate-room-experience-menu__item-label, [data-testid="welcome-home-submenu-my-day"] > .estate-room-experience-menu__item--nav:not(.estate-room-experience-menu__item--dropdown-toggle):not(.estate-room-experience-menu__item--dropdown-child) .estate-room-experience-menu__item-label',
       ),
     ).map((el) => el.textContent?.trim());
     expect(labels).toEqual([
-      "Adapt / Plan My Day",
+      "Plan My Day / Adapt My Day",
       "Calendar",
       "Reminders / Rhythms",
     ]);
 
-    // Top-level categories must not remain visible underneath.
+    expect(
+      container.querySelector(
+        '[data-testid="welcome-home-dropdown-adapt-plan-my-day"]',
+      ),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(
+        '[data-testid="welcome-home-dropdown-reminders-rhythms"]',
+      ),
+    ).toBeTruthy();
+
     expect(
       container.querySelector('[data-testid="estate-room-menu-section-my-work"]'),
     ).toBeFalsy();
@@ -191,7 +211,7 @@ describe("Welcome Home focused submenu", () => {
     ).toBeTruthy();
   });
 
-  it("destination click opens once, closes menu, clears submenu", () => {
+  it("Plan My Day / Adapt My Day expands; Plan My Day opens its destination", () => {
     renderMenu();
     openMenu();
     openCategory("my-day");
@@ -202,13 +222,29 @@ describe("Welcome Home focused submenu", () => {
         ) as HTMLButtonElement
       ).click();
     });
-    expect(onOpenAdaptPlanMyDay).toHaveBeenCalledTimes(1);
+    expect(onOpenPlanMyDay).not.toHaveBeenCalled();
+    expect(onOpenAdaptMyDay).not.toHaveBeenCalled();
+    expect(
+      container.querySelector(
+        '[data-testid="welcome-home-dropdown-children-adapt-plan-my-day"]',
+      ),
+    ).toBeTruthy();
+
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-plan-my-day"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onOpenPlanMyDay).toHaveBeenCalledTimes(1);
+    expect(onOpenAdaptMyDay).not.toHaveBeenCalled();
     expect(
       container.querySelector('[data-testid="estate-room-quick-choices"]'),
     ).toBeFalsy();
   });
 
-  it("Reminders / Rhythms opens shared entrance on first click", () => {
+  it("Reminders / Rhythms expands; each child opens its own destination", () => {
     renderMenu();
     openMenu();
     openCategory("my-day");
@@ -219,7 +255,40 @@ describe("Welcome Home focused submenu", () => {
         ) as HTMLButtonElement
       ).click();
     });
-    expect(onOpenRemindersRhythms).toHaveBeenCalledTimes(1);
+    expect(onOpenReminders).not.toHaveBeenCalled();
+    expect(onOpenRhythms).not.toHaveBeenCalled();
+
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-reminders"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onOpenReminders).toHaveBeenCalledTimes(1);
+    expect(onOpenRhythms).not.toHaveBeenCalled();
+  });
+
+  it("Adapt My Day child opens Adapt destination", () => {
+    renderMenu();
+    openMenu();
+    openCategory("my-day");
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-adapt-plan-my-day"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-adapt-my-day"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onOpenAdaptMyDay).toHaveBeenCalledTimes(1);
+    expect(onOpenPlanMyDay).not.toHaveBeenCalled();
   });
 
   it.each(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id))(
@@ -247,12 +316,15 @@ describe("Welcome Home focused submenu", () => {
         ).toBeFalsy();
       }
 
+      const expectedTopLabels = category.destinations.map((d) => d.label);
       const labels = Array.from(
         container.querySelectorAll(
-          `[data-testid="welcome-home-submenu-${categoryId}"] .estate-room-experience-menu__item-label`,
+          `[data-testid="welcome-home-submenu-${categoryId}"] .estate-room-experience-menu__item--dropdown-toggle .estate-room-experience-menu__item-label, [data-testid="welcome-home-submenu-${categoryId}"] > .estate-room-experience-menu__item--nav:not(.estate-room-experience-menu__item--dropdown-child) .estate-room-experience-menu__item-label`,
         ),
       ).map((el) => el.textContent?.trim());
-      expect(labels).toEqual(category.destinations.map((d) => d.label));
+      // Deduplicate toggle labels that also match the broader nav selector.
+      const unique = [...new Set(labels)];
+      expect(unique).toEqual(expectedTopLabels);
     },
   );
 

@@ -24749,6 +24749,7 @@ export default function CompanionPageClient() {
         }
         onOpenAdaptPlanMyDay={() => openPlanMyDayCore()}
         onOpenPlanMyDay={() => openPlanMyDayCore()}
+        onOpenAdaptMyDay={() => openAdaptMyDayCore()}
         onOpenRemindersRhythms={() => openRemindersRhythmsCore()}
         onOpenRhythms={() => openRhythmsCore()}
         onOpenReminders={() => openRemindersCore()}
