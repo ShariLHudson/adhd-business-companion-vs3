@@ -3,6 +3,9 @@
 **Status:** `unit_verified` · authenticated preview rows **Pending**  
 **Do not deploy production** until authenticated live checklist passes.
 
+**Preview:** https://adhd-business-companion-vs3-dyjx1a8bz-shari-hudsons-projects.vercel.app  
+**Commit:** `64114b6c`
+
 ## Decision (118)
 
 Create is first under My Work. Create makes output; Projects organize work. Strategy Library stays under Get Advice — browse Strategy from Create routes into Strategy Library create mode, not a second engine.
