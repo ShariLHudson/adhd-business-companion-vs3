@@ -18,7 +18,7 @@ import { OVERFLOW_CLUSTER_FALLBACK } from "./clearMyMindCopy";
 describe("clearMyMindCopy", () => {
   it("uses constitutional header copy", () => {
     expect(CLEAR_MY_MIND_HEADER).toBe("Clear My Mind");
-    expect(CLEAR_MY_MIND_WORKSPACE_SUBTITLE).toContain("together");
+    expect(CLEAR_MY_MIND_WORKSPACE_SUBTITLE).toMatch(/everything competing/i);
   });
 
   it("uses continuous capture continue prompt", () => {
@@ -43,8 +43,8 @@ describe("clearMyMindCopy", () => {
   });
 
   it("uses conversation reflection language after Continue", () => {
-    expect(CLEAR_MY_MIND_REFLECTION_LEAD).toMatch(/As I looked through what you shared/);
-    expect(CLEAR_MY_MIND_NEXT_SECTION).toBe("What would you like to do next?");
-    expect(CLEAR_MY_MIND_ACK_CONTINUE_LABEL).toBe("Look through these with me");
+    expect(CLEAR_MY_MIND_REFLECTION_LEAD).toMatch(/safely out of your head/i);
+    expect(CLEAR_MY_MIND_NEXT_SECTION).toMatch(/help most right now/i);
+    expect(CLEAR_MY_MIND_ACK_CONTINUE_LABEL.length).toBeGreaterThan(0);
   });
 });

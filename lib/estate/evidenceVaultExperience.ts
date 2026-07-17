@@ -8,28 +8,36 @@ export const EVIDENCE_VAULT_ROOM_NAME = "Evidence Vault" as const;
 export const EVIDENCE_VAULT_EXTERIOR_WELCOME =
   "Your Evidence Vault." as const;
 
+/** Locked-state instruction — only copy shown with the moving key. */
+export const EVIDENCE_VAULT_KEY_OPEN_INSTRUCTION =
+  "Click the moving key to open the Vault." as const;
+
 export const EVIDENCE_VAULT_WHAT_IT_IS =
   "The Evidence Vault helps you collect proof of your progress, strengths, results, and accomplishments." as const;
 
 export const EVIDENCE_VAULT_WHY_LOCKED =
   "The Vault opens after you complete six short discovery questions — so nothing here feels rushed or accidental." as const;
 
+/** @deprecated Locked UI uses EVIDENCE_VAULT_KEY_OPEN_INSTRUCTION only. */
 export const EVIDENCE_VAULT_KEY_INVITATION =
-  `${EVIDENCE_VAULT_WHAT_IT_IS} ${EVIDENCE_VAULT_WHY_LOCKED}` as const;
+  EVIDENCE_VAULT_KEY_OPEN_INSTRUCTION;
 
+/** @deprecated Removed from locked UI — key is the only action. */
 export const EVIDENCE_VAULT_BEGIN_DISCOVERY_LABEL =
   "Begin Evidence Discovery" as const;
 
+/** @deprecated Removed from locked UI. */
 export const EVIDENCE_VAULT_LEARN_WHY_LABEL = "Learn Why This Helps" as const;
 
+/** @deprecated Removed from locked UI. */
 export const EVIDENCE_VAULT_LEARN_WHY_BODY =
   "ADHD brains often forget the evidence of their own growth. The Vault keeps those moments findable — wins, lessons, and proof you can return to when doubt gets loud." as const;
 
 export const EVIDENCE_VAULT_DOOR_ACTION_LABEL =
-  "Begin Evidence Discovery" as const;
+  "Unlock the Evidence Vault" as const;
 
 export const EVIDENCE_VAULT_KEY_ACTION_LABEL =
-  "Begin Evidence Discovery" as const;
+  "Unlock the Evidence Vault" as const;
 
 export const EVIDENCE_VAULT_LOCKED_INDICATOR = "Locked" as const;
 

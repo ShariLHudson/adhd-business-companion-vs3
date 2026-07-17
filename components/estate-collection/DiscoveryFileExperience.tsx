@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GrowthMicButton } from "@/components/companion/GrowthMicButton";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
 import type { GrowthAttachment } from "@/lib/growthAttachments";
@@ -21,6 +21,10 @@ import {
   EVIDENCE_VAULT_DISCOVERY_GUIDE_FIELDS,
   EVIDENCE_VAULT_POST_SAVE_NAV,
 } from "@/lib/estate/evidenceVaultExperience";
+import {
+  EVIDENCE_VAULT_HOW_DO_I_BODY,
+  EVIDENCE_VAULT_HOW_DO_I_LABEL,
+} from "@/lib/estate/evidenceVaultHome";
 import "./discovery-file.css";
 
 export type DiscoveryFilePhase =
@@ -80,6 +84,7 @@ export function DiscoveryFileExperience({
   const [dismissedSuggestions, setDismissedSuggestions] = useState<
     Set<DiscoverySectionId>
   >(() => new Set());
+  const [howDoIOpen, setHowDoIOpen] = useState(false);
 
   const guidedDiscovery = Boolean(capture.discoveryPreserveMode && !editingId);
   const story = guidedDiscovery
@@ -101,6 +106,13 @@ export function DiscoveryFileExperience({
     [story, expandedSections, values, dismissedSuggestions],
   );
 
+  /** Skip Discovery File cover — go straight to Today's Discovery. */
+  useEffect(() => {
+    if (phase === "folder") {
+      onPhaseChange("open");
+    }
+  }, [phase, onPhaseChange]);
+
   useEffect(() => {
     if (phase !== "opening") return;
     const timer = window.setTimeout(() => onPhaseChange("open"), 720);
@@ -112,10 +124,6 @@ export function DiscoveryFileExperience({
     const timer = window.setTimeout(() => onPhaseChange("saved"), 1400);
     return () => window.clearTimeout(timer);
   }, [phase, onPhaseChange]);
-
-  const openFolder = useCallback(() => {
-    onPhaseChange("opening");
-  }, [onPhaseChange]);
 
   function setField(id: string, value: string) {
     onChange({ ...values, [id]: value });
@@ -141,8 +149,11 @@ export function DiscoveryFileExperience({
   }
 
   const showPortfolio =
-    phase === "opening" || phase === "open" || phase === "saving" || editingId;
-  const showFolder = phase === "folder" && !editingId;
+    phase === "opening" ||
+    phase === "open" ||
+    phase === "folder" ||
+    phase === "saving" ||
+    Boolean(editingId);
   const showSaved = phase === "saved";
 
   const saveDateLabel = new Date().toLocaleDateString(undefined, {
@@ -154,27 +165,9 @@ export function DiscoveryFileExperience({
   return (
     <div
       className="discovery-file"
-      data-phase={phase}
+      data-phase={phase === "folder" ? "open" : phase}
       data-testid="discovery-file-experience"
     >
-      {showFolder ? (
-        <div className="discovery-file__arrival" aria-label="Discovery File">
-          <p className="discovery-file__arrival-prompt">{DISCOVERY_FILE_OPENING_PROMPT}</p>
-          <button
-            type="button"
-            className="discovery-file__folder"
-            onClick={openFolder}
-            aria-label="Open today's Discovery File"
-            data-testid="discovery-file-folder"
-          >
-            <span className="discovery-file__folder-spine" aria-hidden />
-            <span className="discovery-file__folder-cover">
-              <span className="discovery-file__folder-label">Discovery File</span>
-            </span>
-          </button>
-        </div>
-      ) : null}
-
       {showPortfolio ? (
         <div
           className={[
@@ -182,11 +175,32 @@ export function DiscoveryFileExperience({
             phase === "saving" ? "discovery-file__portfolio--closing" : "",
           ].join(" ")}
           role="region"
-          aria-label="Discovery File portfolio"
+          aria-label="Today's Discovery"
         >
           <div className="discovery-file__portfolio-inner">
             <div className="discovery-file__page discovery-file__page--left">
-              <p className="discovery-file__page-kicker">{DISCOVERY_FILE_LEFT_PAGE_TITLE}</p>
+              <div className="discovery-file__heading-row">
+                <p className="discovery-file__page-kicker">
+                  {DISCOVERY_FILE_LEFT_PAGE_TITLE}
+                </p>
+                <button
+                  type="button"
+                  className="discovery-file__how-do-i"
+                  data-testid="evidence-vault-discovery-how-do-i"
+                  aria-expanded={howDoIOpen}
+                  onClick={() => setHowDoIOpen((v) => !v)}
+                >
+                  {EVIDENCE_VAULT_HOW_DO_I_LABEL.replace("?", "…")}
+                </button>
+              </div>
+              {howDoIOpen ? (
+                <p
+                  className="discovery-file__how-do-i-body"
+                  data-testid="evidence-vault-discovery-how-do-i-body"
+                >
+                  {EVIDENCE_VAULT_HOW_DO_I_BODY}
+                </p>
+              ) : null}
               <p className="discovery-file__page-prompt">{DISCOVERY_FILE_OPENING_PROMPT}</p>
               {chatPrefillNote ? (
                 <p className="discovery-file__prefill-note">{chatPrefillNote}</p>

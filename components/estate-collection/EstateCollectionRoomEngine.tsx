@@ -251,6 +251,10 @@ export function EstateCollectionRoomEngine({
     markEvidenceVaultEntranceCompleted();
     setDoorState("open");
     unlockInFlightRef.current = false;
+    // Key open → Today's Discovery directly (no Discovery File cover, no home underlay).
+    setVaultMode("arrive");
+    setVaultPanel("discovery");
+    setFilePhase("open");
     window.dispatchEvent(
       new CustomEvent(EVIDENCE_VAULT_ENTRANCE_COMPLETE_EVENT),
     );
@@ -294,7 +298,7 @@ export function EstateCollectionRoomEngine({
   function openJournalFromInterior() {
     setVaultMode("arrive");
     setVaultPanel("discovery");
-    setFilePhase("folder");
+    setFilePhase("open");
   }
 
   function openAddEvidenceFromHome() {
@@ -373,7 +377,7 @@ export function EstateCollectionRoomEngine({
   const closeVaultPanel = useCallback(() => {
     setVaultPanel(null);
     setVaultMode("arrive");
-    setFilePhase("folder");
+    setFilePhase("open");
     setEditingId(null);
     setDraft(emptyCaptureValues(capture.fields));
     setAttachments([]);
@@ -386,7 +390,7 @@ export function EstateCollectionRoomEngine({
         case "today-discovery":
           setVaultMode("arrive");
           setVaultPanel("discovery");
-          setFilePhase("folder");
+          setFilePhase("open");
           setChatPrefillNote(false);
           setDraft(emptyCaptureValues(capture.fields));
           setAttachments([]);
@@ -491,7 +495,7 @@ export function EstateCollectionRoomEngine({
     resetCompose();
     setVaultMode("arrive");
     setVaultPanel("discovery");
-    setFilePhase("folder");
+    setFilePhase("open");
     setChatPrefillNote(false);
   }
 
@@ -598,7 +602,7 @@ export function EstateCollectionRoomEngine({
               data-testid="evidence-vault-interior-mount"
             >
               <EvidenceVaultInterior
-                journalActive={vaultPanel === "discovery"}
+                journalActive={false}
                 onOpenJournal={openJournalFromInterior}
                 onAddEvidence={openAddEvidenceFromHome}
                 onContinueDraft={continueDraftFromHome}
@@ -608,7 +612,6 @@ export function EstateCollectionRoomEngine({
                 onOpenEntry={(id) => beginEdit(id)}
                 onCategorySelect={openHomeCategory}
                 onSearchBrowse={searchBrowseFromHome}
-                behindDiscovery={vaultPanel === "discovery"}
               />
             </div>
           ) : null}
@@ -645,7 +648,10 @@ export function EstateCollectionRoomEngine({
                   beginEdit(id);
                 }}
                 onAddAnother={openNewDiscovery}
-                onReturnToEstate={closeVaultPanel}
+                onReturnToEstate={() => {
+                  closeVaultPanel();
+                  onBack();
+                }}
               />
             </div>
           ) : null}

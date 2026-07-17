@@ -1,6 +1,6 @@
 /**
  * ADHD entrepreneur focus tools — one job each. Shari and UI copy pull from here
- * so Clear My Mind, Brain Parking Lot, and Safe For Today never blur together.
+ * so Clear My Mind, Park It / Parking Lot, and Safe For Today never blur together.
  */
 
 import type { AppSection } from "./companionUi";
@@ -27,7 +27,7 @@ export const FOCUS_CLARITY_TOOLS: Record<FocusClarityToolId, FocusClarityTool> =
   "clear-my-mind": {
     id: "clear-my-mind",
     title: "Clear My Mind",
-    tagline: "Get this out of my head.",
+    tagline: "Empty everything competing for attention.",
     problem: "My brain is crowded.",
     useWhen: [
       "Too many thoughts",
@@ -35,6 +35,7 @@ export const FOCUS_CLARITY_TOOLS: Record<FocusClarityToolId, FocusClarityTool> =
       "Mental clutter",
       "Can't think straight",
       "Everything feels important",
+      "Worries, tasks, and reminders all at once",
     ],
     whatItDoes: [
       "Brain dump",
@@ -43,27 +44,30 @@ export const FOCUS_CLARITY_TOOLS: Record<FocusClarityToolId, FocusClarityTool> =
       "Finds priorities",
       "Creates next steps",
     ],
-    question: "What's taking up space in your head right now?",
+    question:
+      "Feeling overwhelmed? Put everything on your mind here. I'll help sort it into manageable next steps.",
     result: "Clarity",
   },
   "brain-parking-lot": {
     id: "brain-parking-lot",
-    title: "Brain Parking Lot",
-    tagline: "Save this for later.",
-    problem: "I need to focus, but new ideas keep showing up.",
+    title: "Park It",
+    tagline: "Save one thing for later so you can stop thinking about it right now.",
+    problem: "I need to focus, but one new thing keeps showing up.",
     useWhen: [
       "Working on something",
-      "New idea pops up",
+      "One idea pops up",
+      "One task or worry to hold",
       "Don't want to lose it",
       "Need to stay on task",
     ],
     whatItDoes: [
-      "Stores ideas quickly",
-      "Tags them",
-      "Saves them for later review",
-      "Doesn't organize them now",
+      "Parks one item quickly",
+      "Holds it in the Parking Lot",
+      "Leaves sorting for later",
+      "Lets you return to focus",
     ],
-    question: "What do you want to save for later?",
+    question:
+      "Not ready to deal with this yet? Park it here and I'll keep it safe until you're ready.",
     result: "Focus",
   },
   "safe-for-today": {
@@ -157,8 +161,8 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
   },
   {
     id: "brain-parking-lot",
-    title: "Brain Parking Lot",
-    purpose: "Save ideas while staying focused",
+    title: "Park It",
+    purpose: "Save one thing for later while staying focused",
     objectId: "parking-lot",
     kind: "activity",
     activityId: "brain-parking-lot",
@@ -166,7 +170,7 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
   {
     id: "clear-my-mind",
     title: "Clear My Mind",
-    purpose: "Reduce mental clutter",
+    purpose: "Empty everything competing for attention",
     objectId: "clear-my-mind",
     kind: "section",
     section: "brain-dump",

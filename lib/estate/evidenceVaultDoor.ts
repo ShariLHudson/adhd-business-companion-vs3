@@ -192,7 +192,7 @@ export function shouldMountEvidenceVaultHome(opts: {
   return (
     isEvidenceVaultEntranceComplete(opts.doorState) &&
     opts.vaultMode === "arrive" &&
-    (opts.vaultPanel === null || opts.vaultPanel === "discovery")
+    opts.vaultPanel === null
   );
 }
 

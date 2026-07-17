@@ -25187,7 +25187,10 @@ export default function CompanionPageClient() {
         }}
       />
 
-      {!roomMenuChatVisible && !experienceControlsOpen ? (
+      {!roomMenuChatVisible &&
+      !experienceControlsOpen &&
+      roomMenuRoomId !== "evidence-vault" &&
+      activeSection !== "evidence-bank" ? (
         <button
           type="button"
           className="conversation-visibility-chip"

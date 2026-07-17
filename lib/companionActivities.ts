@@ -375,39 +375,38 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
   {
     id: "brain-parking-lot",
     categoryId: "calm",
-    title: "Brain Parking Lot",
+    title: "Park It",
     helpsWith:
-      "Saving a stray idea while you stay on task — quick capture only, no sorting or solving.",
+      "Save one thing for later so you can stop thinking about it right now — not a full mind dump.",
     timeLabel: "1–3 min",
     steps: [
-      s("You're working. An idea shows up. Park it here — you don't owe it attention right now."),
-      s("What do you want to save for later?", {
+      s("You're working. One idea or task shows up. Park it here — you don't owe it attention right now."),
+      s("What one thing do you want to park for later?", {
         type: "text",
         key: "parked",
-        label: "Idea to save for later",
+        label: "One item to park",
         multiline: true,
       }),
       s("Optional tag — one word so future-you recognizes it (e.g. marketing, kid, health).", {
-        type: "text",
-        key: "tag",
+        type: "text",        key: "tag",
         label: "Tag (optional)",
         optional: true,
       }),
       s("Say: \"Saved for later. Back to what I was doing.\""),
       s("Close the lot. No organizing tonight — review when you're ready."),
     ],
-    linkedSection: "brain-dump",
-    linkedLabel: "Open Clear My Mind to park it",
+    linkedSection: "parking-lot",
+    linkedLabel: "Park This Item",
     suggestLinkedFromStep: 1,
     linkedSuggestionHint:
-      "Park this in **Clear My Mind** (Later / Someday) — then return to your task.",
+      "Park this in the **Parking Lot** — then return to your task. Use Clear My Mind when many thoughts are competing.",
   },
   {
     id: "clear-my-mind-priority",
     categoryId: "calm",
     title: "Clear My Mind",
     helpsWith:
-      "Reducing mental clutter — dump, group, find priorities, and shape next steps (not mid-focus parking).",
+      "Empty everything competing for attention — dump, group, find priorities, and shape next steps (not parking one item).",
     timeLabel: "5–8 min",
     steps: [
       s("Open **Clear My Mind** beside us if several thoughts are swirling — one card at a time."),

@@ -2,29 +2,19 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
-  EVIDENCE_VAULT_BEGIN_DISCOVERY_LABEL,
-  EVIDENCE_VAULT_KEY_INVITATION,
-  EVIDENCE_VAULT_LEARN_WHY_LABEL,
-  EVIDENCE_VAULT_WHAT_IT_IS,
-  EVIDENCE_VAULT_WHY_LOCKED,
+  EVIDENCE_VAULT_KEY_OPEN_INSTRUCTION,
+  EVIDENCE_VAULT_DOOR_ACTION_LABEL,
 } from "./evidenceVaultExperience";
 
-describe("Evidence Vault locked-state copy", () => {
-  it("explains what the vault is and why it is locked", () => {
-    expect(EVIDENCE_VAULT_WHAT_IT_IS.toLowerCase()).toContain("progress");
-    expect(EVIDENCE_VAULT_WHY_LOCKED.toLowerCase()).toContain(
-      "six short discovery",
+describe("Evidence Vault locked-state copy (155–157)", () => {
+  it("shows only the moving-key instruction", () => {
+    expect(EVIDENCE_VAULT_KEY_OPEN_INSTRUCTION).toBe(
+      "Click the moving key to open the Vault.",
     );
-    expect(EVIDENCE_VAULT_KEY_INVITATION).not.toBe(
-      "The key is waiting when you are ready.",
-    );
-    expect(EVIDENCE_VAULT_BEGIN_DISCOVERY_LABEL).toBe(
-      "Begin Evidence Discovery",
-    );
-    expect(EVIDENCE_VAULT_LEARN_WHY_LABEL).toBe("Learn Why This Helps");
+    expect(EVIDENCE_VAULT_DOOR_ACTION_LABEL).toBe("Unlock the Evidence Vault");
   });
 
-  it("wires locked CTAs into VaultKeyInteraction", () => {
+  it("wires key-only locked UI — no Begin Discovery or Learn Why", () => {
     const source = readFileSync(
       resolve(
         process.cwd(),
@@ -32,8 +22,34 @@ describe("Evidence Vault locked-state copy", () => {
       ),
       "utf8",
     );
-    expect(source).toContain("evidence-vault-begin-discovery");
-    expect(source).toContain("evidence-vault-learn-why");
-    expect(source).not.toContain("The key is waiting when you are ready.");
+    expect(source).toContain("evidence-vault-key-instruction");
+    expect(source).toContain("EVIDENCE_VAULT_KEY_OPEN_INSTRUCTION");
+    expect(source).toContain("evidence-vault-use-key");
+    expect(source).not.toContain("evidence-vault-begin-discovery");
+    expect(source).not.toContain("evidence-vault-learn-why");
+    expect(source).not.toContain("Begin Evidence Discovery");
+    expect(source).not.toContain("Learn Why This Helps");
+  });
+
+  it("opens discovery without Discovery File cover or co-mounted home", () => {
+    const engine = readFileSync(
+      resolve(
+        process.cwd(),
+        "components/estate-collection/EstateCollectionRoomEngine.tsx",
+      ),
+      "utf8",
+    );
+    const discovery = readFileSync(
+      resolve(
+        process.cwd(),
+        "components/estate-collection/DiscoveryFileExperience.tsx",
+      ),
+      "utf8",
+    );
+    expect(engine).toContain('setVaultPanel("discovery")');
+    expect(engine).toContain('setFilePhase("open")');
+    expect(discovery).toContain("evidence-vault-discovery-how-do-i");
+    expect(discovery).not.toContain("discovery-file-folder");
+    expect(discovery).not.toContain("Open today's Discovery File");
   });
 });

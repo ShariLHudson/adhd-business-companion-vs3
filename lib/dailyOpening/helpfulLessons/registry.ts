@@ -9,18 +9,18 @@ export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
     id: "parking-lot",
     title: "Parking Lot",
     shortExplanation:
-      "Save an idea, task, or thought without interrupting what you are already doing. You can return to it later when you are ready.",
-    destinationId: "plan-my-day",
-    actionLabel: "Show Me",
+      "Not ready to deal with one thing yet? Park it here and review everything you've set aside when you're ready.",
+    destinationId: "parking-lot",
+    actionLabel: "Park This Item",
     eligibility: { tags: ["planning", "capture"] },
   },
   {
     id: "clear-my-mind",
     title: "Clear My Mind",
     shortExplanation:
-      "Set everything swirling in your head down in one place so you can breathe and see what actually needs attention.",
+      "Feeling overwhelmed? Put everything on your mind here. I'll help sort it into manageable next steps.",
     destinationId: "clear-my-mind",
-    actionLabel: "Show Me",
+    actionLabel: "Start Emptying My Mind",
     eligibility: { tags: ["overwhelm", "capture"] },
   },
   {
@@ -37,7 +37,7 @@ export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
     title: "Adapt My Day",
     shortExplanation:
       "When the day shifts, gently reshape an existing plan instead of starting from scratch.",
-    destinationId: "plan-my-day",
+    destinationId: "adapt-my-day",
     actionLabel: "Show Me",
     eligibility: { tags: ["planning"] },
   },

@@ -22,7 +22,7 @@ import {
 } from "@/lib/rhythms";
 
 export const PARKING_LOT_HOW_DO_I_COPY =
-  "Place something here when you do not want to deal with it yet. You can decide what to do with it later.";
+  "Park It saves one thing for later so you can stop thinking about it right now. The Parking Lot is where you review everything you parked — move to today's plan, create a reminder, add to a project, edit, delete, or leave parked. Use Clear My Mind when many thoughts are competing for attention.";
 
 const FIELD =
   "mt-1 w-full rounded-lg border border-[#d4cdc3] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
@@ -164,7 +164,7 @@ function ParkedItemRow({
                 onChanged();
               }}
             >
-              Move to Today
+              Move to Today's Plan
             </button>
             <button
               type="button"
@@ -187,7 +187,7 @@ function ParkedItemRow({
                 }
               }}
             >
-              Make Reminder
+              Create Reminder
             </button>
             {projects.length === 0 ? (
               <button
@@ -197,7 +197,7 @@ function ParkedItemRow({
                 title="Create a project first — this does not open Create."
                 data-testid={`parking-lot-move-project-${item.id}`}
               >
-                Move to Project (no projects yet)
+                Add to Project (no projects yet)
               </button>
             ) : (
               <div className="flex flex-wrap items-center gap-2">
@@ -231,7 +231,7 @@ function ParkedItemRow({
                     onChanged();
                   }}
                 >
-                  Move to Project
+                  Add to Project
                 </button>
               </div>
             )}
@@ -305,12 +305,11 @@ export function ParkingLotRoomPanel({
 
   useEffect(() => {
     if (!registerBack) return;
-    registerBack(() => {
-      onBack();
-      return true;
-    });
+    // No nested dismissible UI — return false so goBack can leave the section.
+    // Never call onBack/goBack here (that re-enters the interceptor and stack-overflows).
+    registerBack(() => false);
     return () => registerBack(null);
-  }, [registerBack, onBack]);
+  }, [registerBack]);
 
   // Failsafe — loading must never remain permanent.
   useEffect(() => {
@@ -417,7 +416,7 @@ export function ParkingLotRoomPanel({
               className={BTN_PRIMARY}
               data-testid="parking-lot-park-it"
             >
-              Park It
+              Park This Item
             </button>
           </form>
         </section>

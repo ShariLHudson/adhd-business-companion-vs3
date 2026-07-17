@@ -69,13 +69,15 @@ export function resolveHelpMeChooseSupportOptions(
         {
           id: "ov-clear-mind",
           title: "Clear My Mind",
-          benefit: "Set the swirl down when thoughts are crowding you.",
+          benefit:
+            "Empty everything competing for attention when many thoughts are crowding you.",
           destination: { kind: "clear-my-mind" },
         },
         {
           id: "ov-parking",
-          title: "Park one thing for later",
-          benefit: "Capture a task or idea without rebuilding your whole day.",
+          title: "Park It",
+          benefit:
+            "Save one task or idea for later so you can stop thinking about it right now.",
           destination: { kind: "section", section: "parking-lot" },
         },
         {
@@ -137,7 +139,8 @@ export function resolveHelpMeChooseSupportOptions(
         {
           id: "mind-clear",
           title: "Clear My Mind",
-          benefit: "Get the thoughts out of your head and onto a calm surface.",
+          benefit:
+            "Empty everything competing for attention onto a calm surface.",
           destination: { kind: "clear-my-mind" },
         },
         {

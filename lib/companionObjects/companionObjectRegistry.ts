@@ -35,7 +35,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
     replacesEmoji: "🧠",
     room: "window-seat",
     objectName: "Leather journal",
-    description: "Brain-dump and thought capture at the window seat.",
+    description:
+      "Empty everything competing for attention — many thoughts at once.",
     emotionalPurpose: "Make it safe to unload without organizing yet.",
   }),
   obj({
@@ -154,7 +155,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
     replacesEmoji: "📝",
     room: "workshop",
     objectName: "Seed packet / idea box",
-    description: "Ideas held for later without losing them.",
+    description:
+      "Save one thing for later so you can stop thinking about it right now.",
     emotionalPurpose: "Park without guilt — return when ready.",
   }),
   obj({

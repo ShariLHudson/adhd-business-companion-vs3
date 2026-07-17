@@ -8,14 +8,17 @@ import {
 export const CLEAR_MY_MIND_HEADER = "Clear My Mind";
 
 export const CLEAR_MY_MIND_WORKSPACE_SUBTITLE =
-  "Let's get it out of your head together.";
+  "Empty everything competing for attention.";
+
+/** Primary entry CTA — multi-thought unload, not Park It. */
+export const CLEAR_MY_MIND_START_CTA = "Start Emptying My Mind";
 
 /**
  * Entry greeting — Capture Mode only.
  * Capture first. Protect the user’s words. Organize only with permission.
  */
 export const CLEAR_MY_MIND_WELCOME_LINES = [
-  "Tell me everything that’s on your mind. Nothing has to be organized yet. As you type, I’ll safely capture your thoughts. When you’re finished, I’ll place them into a clear list while preserving your words, and you can quickly adjust anything I separated incorrectly.",
+  "Feeling overwhelmed? Put everything on your mind here. I'll help sort it into manageable next steps. Nothing has to be organized yet — I'll safely capture your words first.",
 ] as const;
 
 /** Post-capture reassurance — flat list first, no automatic analysis. */

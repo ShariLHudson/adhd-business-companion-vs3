@@ -42,9 +42,9 @@ export const EVIDENCE_VAULT_VIEW_ALL_LABEL = "View All" as const;
 export const EVIDENCE_VAULT_HOW_DO_I_LABEL = "How Do I?" as const;
 
 export const EVIDENCE_VAULT_HOW_DO_I_BODY = [
-  "Your Evidence Vault preserves what happened, what you learned, problems you solved, people you helped, things you created, and evidence of your growth.",
-  "You can keep attachments, files, links, and any other meaningful proof — not random scraps.",
-  "Return here when you need to see evidence instead of guessing. You do not have to remember everything alone.",
+  "Evidence means proof of your progress — what happened, what you learned, problems you solved, people you helped, things you created, and growth you want to remember.",
+  "Answer Today's Discovery questions in your own words. Skip any that do not fit. Attachments and links can sit with a discovery when they help you remember.",
+  "Save or continue later anytime. Your answers stay until you finish. Return here when you need to see evidence instead of guessing — you do not have to remember everything alone.",
 ].join("\n\n");
 
 export const EVIDENCE_VAULT_GENTLE_REMINDER =
