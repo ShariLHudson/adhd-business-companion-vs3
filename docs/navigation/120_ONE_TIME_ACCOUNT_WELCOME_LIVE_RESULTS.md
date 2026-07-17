@@ -3,6 +3,9 @@
 **Status:** `unit_verified` · authenticated preview rows **Pending**  
 **Do not deploy production** until authenticated live checklist passes.
 
+**Preview:** https://adhd-business-companion-vs3-9e2unspbn-shari-hudsons-projects.vercel.app  
+**Commit:** `77206a16`
+
 ## Root cause of repeated welcome
 
 1. **Account metadata sync could fail silently** — `updateUser` failures left completion only in localStorage; new browser / cleared storage / other device re-showed welcome.
