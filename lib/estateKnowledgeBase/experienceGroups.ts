@@ -4,6 +4,7 @@
 
 import experienceGroupsJson from "@/docs/estate-knowledge-base/estate-experience-groups.json";
 import { shouldBlockAutoPlayForAudioQuery } from "@/lib/estate/audioPlaybackGuard";
+import { mayOfferScenicPlaceSuggestions } from "@/lib/estate/scenicPlaceSuggestionPolicy";
 import { matchEstateAlias } from "./estateAliases";
 import {
   longestPhraseMatch,
@@ -19,6 +20,31 @@ type EstateExperienceGroupsFile = {
 };
 
 const FILE = experienceGroupsJson as EstateExperienceGroupsFile;
+
+/**
+ * Keywords that appear in ordinary English and must not open scenic menus
+ * from incidental phrasing ("still in the dryer", "I think I can…").
+ * Domain keywords (swim, music, piano) stay eligible without a place ask.
+ */
+const AMBIGUOUS_EXPERIENCE_KEYWORDS = new Set([
+  "peaceful",
+  "quiet",
+  "calm",
+  "calming",
+  "still",
+  "serene",
+  "restful",
+  "think",
+  "reflect",
+  "contemplate",
+  "nature",
+  "outside",
+  "relaxing",
+  "garden",
+  "green",
+  "renewal",
+  "fresh air",
+]);
 
 function normalizeIntent(text: string): string {
   return normalizeLocationPhrase(text);
@@ -40,6 +66,8 @@ export type ExperienceGroupMatch = {
   group: EstateExperienceGroup;
   matchedPhrase: string;
   locationIds: string[];
+  /** userMayAsk = explicit experience ask; keyword = weaker signal. */
+  matchSource: "userMayAsk" | "keyword";
 };
 
 function hasSpecificLocationMention(query: string): boolean {
@@ -55,6 +83,13 @@ function hasSpecificLocationMention(query: string): boolean {
     { probeText: probe },
   );
   return Boolean(official);
+}
+
+function mayMatchAmbiguousKeyword(query: string, keyword: string): boolean {
+  const normalizedKeyword = normalizeIntent(keyword);
+  if (!AMBIGUOUS_EXPERIENCE_KEYWORDS.has(normalizedKeyword)) return true;
+  // Unsolicited scenic menus stay off — ambiguous keywords need an explicit place ask.
+  return mayOfferScenicPlaceSuggestions(query);
 }
 
 export function matchExperienceGroupFromQuery(
@@ -74,18 +109,20 @@ export function matchExperienceGroupFromQuery(
           group,
           matchedPhrase: phrase,
           locationIds: [...group.locationIds],
+          matchSource: "userMayAsk",
         };
       }
     }
 
     for (const keyword of group.keywords) {
-      if (phraseContainedInText(normalized, keyword)) {
-        return {
-          group,
-          matchedPhrase: keyword,
-          locationIds: [...group.locationIds],
-        };
-      }
+      if (!phraseContainedInText(normalized, keyword)) continue;
+      if (!mayMatchAmbiguousKeyword(query, keyword)) continue;
+      return {
+        group,
+        matchedPhrase: keyword,
+        locationIds: [...group.locationIds],
+        matchSource: "keyword",
+      };
     }
   }
 

@@ -15,7 +15,7 @@ const COGNITIVE_OVERLOAD_RE =
 
 /** Large project / first-step paralysis — ask about the work, not calm places. */
 const TASK_BREAKDOWN_RE =
-  /\b(?:don'?t know (?:what|the) (?:first )?step|don'?t know where to begin|don'?t know where to start|not sure where to start|project (?:is )?(?:too big|huge)|huge project|big project|too big (?:to start|of a project)|what step to take first|first (?:concrete )?step|where (?:do i|should i) begin|overwhelm(?:ed)? (?:trying|with|by|about).{0,48}(?:project|task|finish|deadline|work)|trying to finish (?:this |my |the )?project|finish this project|stuck (?:on|with) (?:this |my |the )?project)\b/i;
+  /\b(?:don'?t know (?:what|the) (?:first )?step|don'?t know where to begin|don'?t know where to start|not sure where to start|project (?:is )?(?:too big|huge)|huge project|big project|too big (?:to start|of a project)|what step to take first|first (?:concrete )?step|where (?:do i|should i) begin|overwhelm(?:ed)? (?:trying|with|by|about).{0,48}(?:project|task|finish|deadline|work)|trying to finish (?:this |my |the )?project|finish this project|stuck (?:on|with) (?:this |my |the )?project|can'?t get myself to (?:start|begin|finish|work)|know what (?:to do|needs? (?:to be )?done).{0,48}can'?t|everything (?:seems?|feels?) (?:so )?(?:daunting|overwhelming)|(?:fold|folding|put away).{0,24}(?:laundry|clothes|rags)|laundry.{0,24}(?:dryer|fold|put away)|(?:still )?in the dryer|i (?:have|need) to (?:fold|do|finish|clean|put away))\b/i;
 
 /** Body/nervous-system calming — breathe / calm audio / stay and talk. */
 const EMOTIONAL_CALMING_RE =
@@ -30,6 +30,8 @@ export function isCognitiveOverloadNeed(text: string): boolean {
 }
 
 export function isTaskBreakdownNeed(text: string): boolean {
+  // Bare "procrastinate" / "why do I procrastinate" stay conversational.
+  // Task breakdown requires project / first-step / start-paralysis language.
   return TASK_BREAKDOWN_RE.test(text.trim());
 }
 
@@ -59,6 +61,10 @@ export function classifyOverwhelmNeed(text: string): OverwhelmNeedKind {
   return null;
 }
 
+/** Everyday chores / start friction — help with the task, not scenic menus. */
+const PRACTICAL_TASK_RE =
+  /\b(?:laundry|dryer|chores?|dishes|fold(?:ing)? (?:laundry|clothes|rags)|put away|cleaning rags|i need to fold|have to fold)\b/i;
+
 /** Block Peaceful Places / multi-destination scenic menus for this text. */
 export function shouldBlockScenicOverwhelmMenu(text: string): boolean {
   // Explicit scenic / place asks are never blocked by this helper.
@@ -67,9 +73,10 @@ export function shouldBlockScenicOverwhelmMenu(text: string): boolean {
   if (kind === "cognitive_overload" || kind === "task_breakdown") return true;
   // Emotional calming without a place ask — stay in conversation (no scenic list).
   if (kind === "emotional_calming") return true;
+  if (PRACTICAL_TASK_RE.test(text)) return true;
   // Bare overwhelm / stress language without an explicit place ask.
   if (
-    /\b(?:overwhelm(?:ed|ing)?|stress(?:ed|ful)?|anxious|anxiety|too much on my (?:brain|mind))\b/i.test(
+    /\b(?:overwhelm(?:ed|ing)?|stress(?:ed|ful)?|anxious|anxiety|too much on my (?:brain|mind)|daunting)\b/i.test(
       text,
     )
   ) {

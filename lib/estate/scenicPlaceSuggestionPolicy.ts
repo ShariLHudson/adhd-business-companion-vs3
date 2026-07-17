@@ -6,6 +6,8 @@
  * Explicit place / room / scenic asks still resolve.
  */
 
+import { shouldBlockScenicOverwhelmMenu } from "@/lib/conversation/overwhelmNeedClassifier";
+
 /** Kill-switch: unsolicited scenic place recommendations from ordinary chat. */
 export const scenicPlaceAutoSuggestionsEnabled = false;
 
@@ -120,8 +122,10 @@ export function isExplicitScenicPlaceRequest(text: string): boolean {
 /**
  * Whether companion conversation may offer Estate place recommendations.
  * When auto-suggestions are disabled, only explicit place asks pass.
+ * Task / overwhelm / laundry language never opens scenic menus (Phase A gate).
  */
 export function mayOfferScenicPlaceSuggestions(text: string): boolean {
+  if (shouldBlockScenicOverwhelmMenu(text)) return false;
   if (scenicPlaceAutoSuggestionsEnabled) return true;
   return isExplicitScenicPlaceRequest(text);
 }

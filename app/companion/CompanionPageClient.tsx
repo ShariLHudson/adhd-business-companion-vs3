@@ -103,21 +103,6 @@ const RemindersRoomPanel = dynamic(
     ),
   },
 );
-/** My Day shared entrance — Reminder vs Rhythm before either dedicated room. */
-const RemindersRhythmsEntrancePanel = dynamic(
-  () =>
-    import("@/components/companion/RemindersRhythmsEntrancePanel").then(
-      (mod) => ({
-        default: mod.RemindersRhythmsEntrancePanel,
-      }),
-    ),
-  {
-    ssr: false,
-    loading: () => (
-      <SparkLoadingState message="Loading Reminders / Rhythms…" size="md" />
-    ),
-  },
-);
 const RhythmsRoomPanel = dynamic(
   () =>
     import("@/components/companion/RhythmsRoomPanel").then((mod) => ({
@@ -142,7 +127,18 @@ const CalendarRoomPanel = dynamic(
     ),
   },
 );
-import { ParkingLotRoomPanel } from "@/components/companion/ParkingLotRoomPanel";
+const ParkingLotRoomPanel = dynamic(
+  () =>
+    import("@/components/companion/ParkingLotRoomPanel").then((mod) => ({
+      default: mod.ParkingLotRoomPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Parking Lot…" size="md" />
+    ),
+  },
+);
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -221,6 +217,7 @@ import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activit
 import {
   type FreshStartKind,
   freshStartCopy,
+  NEW_CONVERSATION_GREETING,
 } from "@/lib/freshStartCopy";
 import {
   beginContextualHelpSession,
@@ -941,10 +938,7 @@ import {
   researchIntelligenceHintForChat,
 } from "@/lib/researchIntelligence";
 import { elevateLifeExperienceHintForChat } from "@/lib/elevateLifeExperience";
-import {
-  humanConversationHintForChat,
-  enforceHumanConversation,
-} from "@/lib/humanConversation";
+import { humanConversationHintForChat } from "@/lib/humanConversation";
 import {
   isVagueOfferConfusion,
   repairNumberedEstateRoomMenu,
@@ -976,9 +970,7 @@ import {
   clearPendingChoice,
   hasActivePendingChoice,
   isCreateWorkflowContinuation,
-  isLikelyMenuSelectionInput,
   loadPendingChoice,
-  registerPendingChoiceFromAssistantText,
   resolvePendingChoiceTurn,
 } from "@/lib/pendingChoice";
 import {
@@ -2165,10 +2157,22 @@ import {
   playNotificationSoundForEvent,
   unlockNotificationSounds,
 } from "@/lib/notifications/playNotificationSound";
-import { resolveDeliverableSoundEvent } from "@/lib/notifications/resolveNotificationSoundEvent";
 import { buildSavedPatternsPromptHint } from "@/lib/patternAwareness";
 import { getActiveSupportStyleId, supportStyleHintForChat } from "@/lib/supportStyle";
 import { buildCuriosityBeforeCommandsPromptHint } from "@/lib/curiosityBeforeCommands";
+import { adhdStrategyHintForChat } from "@/lib/adhdEverydayStrategies";
+import { techFutureHintForChat } from "@/lib/technologyFutureIntelligence";
+import {
+  annotateTurnDecision,
+  applyShariVoiceLayer,
+  authorizeBreatheAutoOpen,
+  authorizeScenicPlaceMenu,
+  beginTurnDecision,
+  buildConversationDecision,
+  endTurnDecision,
+  getActiveTurnDecision,
+  logConversationDecision,
+} from "@/lib/conversationStabilization";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
   continuous: boolean;
@@ -2488,8 +2492,6 @@ export default function CompanionPageClient() {
     | null
     | "settings"
     | "profile"
-    | "my-business-estate"
-    | "profile-personal"
     | "people-i-help"
     | "signin"
     | "whats-new"
@@ -2501,14 +2503,11 @@ export default function CompanionPageClient() {
     useState<CrystalActivation | null>(null);
   const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
     useState(false);
-  const estateProfilePrimary =
-    overlay === "my-business-estate" || overlay === "profile";
-  const myProfilePersonalPrimary = overlay === "profile-personal";
+  const estateProfilePrimary = overlay === "profile";
   const peopleIHelpProfilePrimary = overlay === "people-i-help";
   const growthProfilePrimary = overlay === "growth-profile";
   const profileDestinationActive =
     estateProfilePrimary ||
-    myProfilePersonalPrimary ||
     peopleIHelpProfilePrimary ||
     growthProfilePrimary;
 
@@ -2602,6 +2601,12 @@ export default function CompanionPageClient() {
   const [triggeredBlock, setTriggeredBlock] = useState<TimeBlock | null>(null);
   // A time block starting in ~15 minutes (shows a gentle heads-up toast).
   const [warning, setWarning] = useState<TimeBlock | null>(null);
+  /** In-app notice when a rhythm/reminder chimes — so the sound always has a name. */
+  const [deliverableNotice, setDeliverableNotice] = useState<{
+    title: string;
+    body: string;
+    kind: "rhythm" | "reminder";
+  } | null>(null);
   const warnedRef = useRef<Set<string>>(new Set());
   const remindedRef = useRef<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -3146,48 +3151,39 @@ export default function CompanionPageClient() {
       setRecovery(null);
       return;
     }
-    // Use last *sent* user message only — never keystroke `input` (update-depth risk).
-    const recentText =
-      [...messages].reverse().find((m) => m.role === "user")?.content ??
-      undefined;
     const result = evaluateAndRecordCognitiveLoad({
       emotionalState: displayEmotion,
-      recentText,
+      recentText:
+        ([...messages].reverse().find((m) => m.role === "user")?.content ??
+          input.trim()) ||
+        undefined,
     });
-    setCognitiveLoad((prev) =>
-      prev?.score.level === result.score.level &&
-      prev.score.total === result.score.total
-        ? prev
-        : result,
-    );
+    setCognitiveLoad(result);
     const health = evaluateAndRecordUserHealth({
       emotionalState: displayEmotion,
-      text: recentText,
+      text:
+        ([...messages].reverse().find((m) => m.role === "user")?.content ??
+          input.trim()) ||
+        undefined,
       cognitiveLoadLevel: result.score.level,
       activationState: activationOffer?.state ?? null,
       primaryLoopType: loopOffer?.loopType ?? null,
     });
-    setUserHealth((prev) => (prev?.status === health.status ? prev : health));
+    setUserHealth(health);
     setRecovery(
       evaluateAndRecordRecovery({
         emotionalState: displayEmotion,
-        text: recentText,
+        text:
+          ([...messages].reverse().find((m) => m.role === "user")?.content ??
+            input.trim()) ||
+          undefined,
         cognitiveLoadLevel: result.score.level,
         activationState: activationOffer?.state ?? null,
         userHealthStatus: health.status,
         recognitionRecent: Boolean(recognitionMoment),
       }),
     );
-  }, [
-    hydrated,
-    intelligenceIdle,
-    homeCalm,
-    displayEmotion,
-    messages,
-    activationOffer?.state,
-    loopOffer?.loopType,
-    recognitionMoment,
-  ]);
+  }, [hydrated, intelligenceIdle, homeCalm, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
 
   useEffect(() => {
     if (!hydrated || !intelligenceIdle || homeCalm || splitCreateChat) {
@@ -3195,7 +3191,8 @@ export default function CompanionPageClient() {
       return;
     }
     const recentText =
-      [...messages].reverse().find((m) => m.role === "user")?.content ??
+      ([...messages].reverse().find((m) => m.role === "user")?.content ??
+        input.trim()) ||
       undefined;
     const loop = evaluateLoopIntelligence({
       text: recentText,
@@ -3229,13 +3226,13 @@ export default function CompanionPageClient() {
           dayDesignerSession && dayDesignerSession.step !== "complete",
         ),
       });
-    const next = !blockLoop && shouldSurfaceLoopOffer(loop) ? loop : null;
-    setLoopOffer((prev) =>
-      prev?.loopType === next?.loopType ? prev : next,
+    setLoopOffer(
+      !blockLoop && shouldSurfaceLoopOffer(loop) ? loop : null,
     );
   }, [
     hydrated,
     intelligenceIdle,
+    input,
     messages,
     cognitiveLoad?.score.level,
     activationOffer?.state,
@@ -3329,10 +3326,6 @@ export default function CompanionPageClient() {
     null,
   );
   const [estateGuideFlipbookOpen, setEstateGuideFlipbookOpen] = useState(false);
-  /** When set, open the Guide to this room spread; null opens from the cover. */
-  const [estateGuideInitialRoomId, setEstateGuideInitialRoomId] = useState<
-    string | null
-  >(null);
   const [justBeHereSession, setJustBeHereSession] =
     useState<JustBeHereSession | null>(null);
   const [justBeHerePhase, setJustBeHerePhase] = useState<
@@ -6928,63 +6921,67 @@ export default function CompanionPageClient() {
     }
 
     function check() {
-      if (!getPrefs().timeBlockAlerts) return;
       const now = Date.now();
-      const blocks = getTimeBlocks();
+      const timeBlockAlertsOn = getPrefs().timeBlockAlerts;
 
-      // 15-minute heads-up.
-      for (const b of blocks) {
-        if (b.status !== "pending" || warnedRef.current.has(b.id)) continue;
-        if (!b.date) continue; // unscheduled blocks never trigger
-        const start = blockDateTime(b).getTime();
-        const lead = start - 15 * 60 * 1000;
-        if (now >= lead && now < start) {
-          warnedRef.current.add(b.id);
-          setWarning(b);
-          unlockNotificationSounds();
-          playNotificationSoundForEvent("priority-alert", `time-block-warn:${b.id}`);
-          notify(
-            `Soon: ${b.title}`,
-            "Your momentum appointment begins in about 15 minutes.",
+      if (timeBlockAlertsOn) {
+        const blocks = getTimeBlocks();
+
+        // 15-minute heads-up.
+        for (const b of blocks) {
+          if (b.status !== "pending" || warnedRef.current.has(b.id)) continue;
+          if (!b.date) continue; // unscheduled blocks never trigger
+          const start = blockDateTime(b).getTime();
+          const lead = start - 15 * 60 * 1000;
+          if (now >= lead && now < start) {
+            warnedRef.current.add(b.id);
+            setWarning(b);
+            playChime();
+            notify(
+              `Soon: ${b.title}`,
+              "Your momentum appointment begins in about 15 minutes.",
+            );
+          }
+        }
+
+        // At-start trigger.
+        if (!triggeredBlock) {
+          const due = blocks.find(
+            (b) =>
+              b.status === "pending" &&
+              b.date &&
+              blockDateTime(b).getTime() <= now,
           );
+          if (due) {
+            setBlockStatus(due.id, "triggered");
+            setTriggeredBlock(due);
+            setWarning((w) => (w?.id === due.id ? null : w));
+            playChime();
+            notify(
+              `${due.title} — how did it go?`,
+              "Every outcome counts — open the app when you're ready.",
+            );
+          }
         }
       }
 
-      // At-start trigger.
-      if (!triggeredBlock) {
-        const due = blocks.find(
-          (b) =>
-            b.status === "pending" &&
-            b.date &&
-            blockDateTime(b).getTime() <= now,
-        );
-        if (due) {
-          setBlockStatus(due.id, "triggered");
-          setTriggeredBlock(due);
-          setWarning((w) => (w?.id === due.id ? null : w));
-          unlockNotificationSounds();
-          playNotificationSoundForEvent("priority-alert", `time-block:${due.id}`);
-          notify(
-            `${due.title} — how did it go?`,
-            "Every outcome counts — open the app when you're ready.",
-          );
-        }
-      }
-      // Chat reminders (P0.24) + Adaptive Rhythms — single load-managed path.
+      // Chat reminders (P0.24) + Adaptive Rhythms — independent of time-block toggle.
       for (const item of collectDueDeliverables(now)) {
         const key = deliverableOccurrenceKey(item);
         if (remindedRef.current.has(key)) continue;
         remindedRef.current.add(key);
-        if (shouldDeliverInApp() || shouldDeliverBrowserNotification()) {
-          unlockNotificationSounds();
-          playNotificationSoundForEvent(
-            resolveDeliverableSoundEvent(item),
-            `deliverable:${item.kind}:${item.id}`,
-          );
-          if (
-            shouldDeliverBrowserNotification() &&
-            getPrefs().desktopNotifications
-          ) {
+        const inApp = shouldDeliverInApp();
+        const browser = shouldDeliverBrowserNotification();
+        if (inApp || browser) {
+          playChime();
+          if (inApp) {
+            setDeliverableNotice({
+              title: item.title,
+              body: item.body,
+              kind: item.kind === "rhythm" ? "rhythm" : "reminder",
+            });
+          }
+          if (browser && getPrefs().desktopNotifications) {
             notify(item.title, item.body);
           }
         }
@@ -7080,9 +7077,6 @@ export default function CompanionPageClient() {
   }
 
   function handleInputChange(value: string) {
-    if (value === inputSnapshotRef.current && value === input) {
-      return;
-    }
     inputSnapshotRef.current = value;
     patchEstateRuntimeState({ inputBuffer: value });
     setInput(value);
@@ -7121,7 +7115,13 @@ export default function CompanionPageClient() {
     micExplicitStopRef.current = false;
     setIsListening(false);
     declinedConversationOffersRef.current = new Set();
-    setMessages([]);
+    // New Chat: approved welcome only. New Day: card owns welcome — keep chat empty.
+    const mode = options?.mode ?? "new-chat";
+    if (mode === "new-chat") {
+      setMessages([{ role: "assistant", content: NEW_CONVERSATION_GREETING }]);
+    } else {
+      setMessages([]);
+    }
     workspaceChatScopeRef.current = null;
     setInput("");
     inputSnapshotRef.current = "";
@@ -7183,11 +7183,10 @@ export default function CompanionPageClient() {
   }
 
   function requestClearTodayContext() {
-    // Conversations → New Chat: blank thread, wait for the member.
+    // Conversations → New Chat: fresh thread + approved welcome only.
     try {
       const preserveRoom = shouldPreserveRoomForFreshConversation();
       clearTodayContext({ preserveRoom, mode: "new-chat" });
-      setMessages([]);
       setGlobalDailyOpening(null);
       setDailyOpeningHelpSuggestions(null);
       setFreshStartRevision((revision) => revision + 1);
@@ -7253,7 +7252,6 @@ export default function CompanionPageClient() {
         resetPlanDay();
       } else if (freshStartDialog === "clear-context") {
         clearTodayContext({ preserveRoom, mode: "new-chat" });
-        setMessages([]);
         setGlobalDailyOpening(null);
         setDailyOpeningHelpSuggestions(null);
       }
@@ -10145,14 +10143,8 @@ export default function CompanionPageClient() {
     setPreviewTestRevision(getCompanionPreviewTestRevision());
   }
 
-  function openSparkEstateGuideCore(initialRoomId?: string | null) {
-    setEstateGuideInitialRoomId(initialRoomId ?? null);
+  function openSparkEstateGuideCore() {
     setEstateGuideFlipbookOpen(true);
-  }
-
-  function closeSparkEstateGuideCore() {
-    setEstateGuideFlipbookOpen(false);
-    setEstateGuideInitialRoomId(null);
   }
 
   function clearJustBeHereMode() {
@@ -10429,7 +10421,7 @@ export default function CompanionPageClient() {
     setPlanMyDayInitialRhythmsTab(null);
     setOverlay(null);
     setSettingsSection(null);
-    closeSparkEstateGuideCore();
+    setEstateGuideFlipbookOpen(false);
 
     recordEstateRoomTransition({
       toSection: "home",
@@ -12340,7 +12332,7 @@ export default function CompanionPageClient() {
       viewId,
       viewTitle: visualThinkingViewTitle(viewId),
       purposeAnswer: request.seedText,
-      ack: "Let's open Visual Thinking beside us.",
+      ack: "I'll bring that up.",
     });
     setMessages((prev) => [
       ...prev,
@@ -12555,7 +12547,43 @@ export default function CompanionPageClient() {
     recordPrimaryTurnFinalResponse(chatTurnRef.current, content);
   }
 
-  function finishEarlyChatTurn() {
+  /**
+   * Shari Voice Layer — every normal member-facing assistant string passes here
+   * before it is shown. Legal/safety/system copy may set bypassVoiceLayer.
+   */
+  function finalizeMemberFacingAssistantText(
+    content: string,
+    owner: string,
+    opts?: { bypassVoiceLayer?: boolean; bypassReason?: "legal" | "safety" | "system_required" },
+  ): string {
+    const decision = getActiveTurnDecision();
+    return applyShariVoiceLayer({
+      text: content,
+      userText: lastUserTextRef.current ?? undefined,
+      emotionalCondition: decision?.emotionalCondition,
+      contentPlanOwner: owner,
+      finalResponseOwner: owner,
+      bypassVoiceLayer: opts?.bypassVoiceLayer,
+      bypassReason: opts?.bypassReason,
+    }).text;
+  }
+
+  function finishEarlyChatTurn(ownerHint?: string) {
+    try {
+      const decision = getActiveTurnDecision();
+      if (decision) {
+        if (ownerHint) {
+          annotateTurnDecision({ finalResponseOwner: ownerHint });
+        }
+        logConversationDecision(decision, {
+          messageId: `turn-${chatTurnRef.current}`,
+          turnId: `turn-${chatTurnRef.current}`,
+        });
+        endTurnDecision();
+      }
+    } catch {
+      endTurnDecision();
+    }
     const turnState = activeChatTurnLifecycleRef.current;
     const finalize = () => {
       endVisibleThinking();
@@ -12578,20 +12606,29 @@ export default function CompanionPageClient() {
   ): boolean {
     if (!frictionlessAction.localReply) return false;
 
+    annotateTurnDecision({
+      finalResponseOwner: `frictionless:${frictionlessAction.category}`,
+      routeSelected: frictionlessAction.category,
+      actionExecuted: frictionlessAction.immediateEstatePlaceNavigate
+        ? "navigate_place"
+        : frictionlessAction.immediateVisualOpen
+          ? "open_visual"
+          : "local_reply",
+    });
+
+    const voicedLocalReply = finalizeMemberFacingAssistantText(
+      frictionlessAction.localReply!,
+      `frictionless:${frictionlessAction.category}`,
+    );
+
     if (activeChatTurnLifecycleRef.current) {
       markAssistantReplied(activeChatTurnLifecycleRef.current);
     }
     setMessages((prev) => [
       ...prev,
-      { role: "assistant", content: frictionlessAction.localReply! },
+      { role: "assistant", content: voicedLocalReply },
     ]);
-    recordPrimaryTurnResponse(frictionlessAction.localReply!);
-    if (!hasActivePendingChoice()) {
-      registerPendingChoiceFromAssistantText(
-        frictionlessAction.localReply!,
-        chatTurnRef.current,
-      );
-    }
+    recordPrimaryTurnResponse(voicedLocalReply);
 
     const chamberMemberConversationLocked = isChamberMemberConversationActive({
       activeSection: activeSectionRef.current,
@@ -13102,6 +13139,34 @@ export default function CompanionPageClient() {
     activePrimaryTurnRef.current = activePrimaryTurn;
     logPrimaryTurnClassification(chatTurnRef.current, trimmed, activePrimaryTurn);
 
+    /** Phase A — single immutable decision for this turn (permissions + logging). */
+    const turnId = `turn-${chatTurnRef.current}`;
+    const pendingSelectionActive = hasActivePendingChoice();
+    const turnConversationDecision = beginTurnDecision(
+      turnId,
+      buildConversationDecision({
+        userText: trimmed,
+        lastAssistantText: lastAssistantForPrimary,
+        activeWorkflow: null,
+        workspace: workspacePanelRef.current ?? null,
+        primaryTurnType: activePrimaryTurn.type,
+        pendingSelectionActive,
+      }),
+    );
+    if (techFutureHintForChat(trimmed)) {
+      turnConversationDecision.selectedIntelligence.push("technology_future");
+    }
+    if (adhdStrategyHintForChat(trimmed)) {
+      turnConversationDecision.selectedIntelligence.push("adhd_everyday_strategies");
+    }
+    if (pendingSelectionActive) {
+      annotateTurnDecision({ pendingState: "active" });
+    }
+    logConversationDecision(turnConversationDecision, {
+      messageId: turnId,
+      turnId,
+    });
+
     /**
      * Universal Access (#183) — explicit capability requests win over location.
      * Must run before Clear My Mind capture lock so CMM never denies another capability.
@@ -13110,6 +13175,11 @@ export default function CompanionPageClient() {
     if (!continuityLocksBroadRouting) {
       const myDayOpener = resolveMyDayAndWorkOpenerFromText(trimmed);
       if (myDayOpener) {
+        annotateTurnDecision({
+          finalResponseOwner: "my_day_opener",
+          routeSelected: "my_day",
+          actionExecuted: "open_my_day",
+        });
         lastUserTextRef.current = trimmed;
         const userMessage: Message = { role: "user", content: trimmed };
         if (fresh) clearConversation();
@@ -13121,30 +13191,36 @@ export default function CompanionPageClient() {
           savePrefs({ hasChatted: true });
           setHasChatted(true);
         }
-        finishEarlyChatTurn();
+        finishEarlyChatTurn("my_day_opener");
         finishLatencyTurn({ localReply: true });
         return;
       }
 
-      const pendingForUniversal = loadPendingChoice();
-      const skipUniversalForPendingMenu =
-        Boolean(pendingForUniversal?.choices.length) &&
-        isLikelyMenuSelectionInput(
-          trimmed,
-          pendingForUniversal!.choices.length,
-        );
-      const universalRequest = skipUniversalForPendingMenu
-        ? null
-        : resolveExplicitCapabilityIntent(trimmed);
-      if (universalRequest) {
+      const universalRequest = resolveExplicitCapabilityIntent(trimmed);
+      const breatheBlockedByDecision =
+        universalRequest?.capabilityId === "breathe" &&
+        !authorizeBreatheAutoOpen(trimmed);
+      if (universalRequest && !breatheBlockedByDecision) {
+        annotateTurnDecision({
+          finalResponseOwner: `universal:${universalRequest.capabilityId}`,
+          routeSelected: universalRequest.capabilityId,
+          actionExecuted:
+            universalRequest.capabilityId === "breathe"
+              ? "open_breathe"
+              : "open_capability",
+        });
         lastUserTextRef.current = trimmed;
         const userMessage: Message = { role: "user", content: trimmed };
         if (fresh) clearConversation();
         fulfillUniversalCapabilityRequest(universalRequest);
+        const voicedAck = finalizeMemberFacingAssistantText(
+          universalRequest.ack,
+          `universal:${universalRequest.capabilityId}`,
+        );
         setMessages((prev) => [
           ...(fresh ? [] : prev),
           userMessage,
-          { role: "assistant", content: universalRequest.ack },
+          { role: "assistant", content: voicedAck },
         ]);
         setInput("");
         voiceUsedRef.current = false;
@@ -13152,7 +13228,7 @@ export default function CompanionPageClient() {
           savePrefs({ hasChatted: true });
           setHasChatted(true);
         }
-        finishEarlyChatTurn();
+        finishEarlyChatTurn(`universal:${universalRequest.capabilityId}`);
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -13516,7 +13592,7 @@ export default function CompanionPageClient() {
           savePrefs({ hasChatted: true });
           setHasChatted(true);
         }
-        const reply =
+        const replyRaw =
           pendingResult.kind === "resolved"
             ? pendingResult.reply
             : pendingResult.kind === "unrecognized"
@@ -13526,20 +13602,40 @@ export default function CompanionPageClient() {
                 ? pendingResult.reply
               : (pendingResult.reply ??
                 "No problem — we can stay right here.");
+        const reply = finalizeMemberFacingAssistantText(
+          replyRaw,
+          "pending_choice",
+        );
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: reply },
         ]);
         recordPrimaryTurnResponse(reply);
         if (pendingResult.kind === "resolved") {
+          annotateTurnDecision({
+            pendingState: "resolved",
+            routeSelected:
+              pendingResult.action.placeId ??
+              pendingResult.action.section ??
+              pendingResult.action.capabilityId ??
+              "pending_choice",
+            actionExecuted: "resolve_pending_selection",
+            finalResponseOwner: "pending_choice",
+          });
           completePendingChoiceExecution({
             userText: trimmed,
             action: pendingResult.action,
             reply: pendingResult.reply,
           });
+        } else {
+          annotateTurnDecision({
+            pendingState: pendingResult.kind,
+            finalResponseOwner: "pending_choice",
+            actionExecuted: `pending_${pendingResult.kind}`,
+          });
         }
         setAwaitingUserConfirmation(null);
-        finishEarlyChatTurn();
+        finishEarlyChatTurn("pending_choice");
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -15169,21 +15265,30 @@ export default function CompanionPageClient() {
     }
 
     // Overwhelm / cognitive need wins before Estate Guide scenic menus.
-    // Bare overwhelm must never early-return into Peaceful Places / hammock lists.
+    // Phase A: authorizeScenicPlaceMenu is the single scenic permission check.
     const overwhelmNeedKind = classifyOverwhelmNeed(trimmed);
     const blockScenicEstateGuide =
-      !mayOfferScenicPlaceSuggestions(trimmed) &&
-      (shouldBlockScenicOverwhelmMenu(trimmed) ||
-        overwhelmNeedKind === "cognitive_overload" ||
-        overwhelmNeedKind === "task_breakdown" ||
-        overwhelmNeedKind === "emotional_calming" ||
-        detected === "overwhelmed" ||
-        detected === "burnout");
+      !authorizeScenicPlaceMenu(trimmed) ||
+      !mayOfferScenicPlaceSuggestions(trimmed) ||
+      shouldBlockScenicOverwhelmMenu(trimmed) ||
+      overwhelmNeedKind === "cognitive_overload" ||
+      overwhelmNeedKind === "task_breakdown" ||
+      overwhelmNeedKind === "emotional_calming" ||
+      detected === "overwhelmed" ||
+      detected === "burnout";
 
     if (!blockScenicEstateGuide && isEstateGuideQuestion(trimmed)) {
-      const guideReply = formatEstateGuideReply(resolveEstateGuideTurn(trimmed));
+      const guideReply = finalizeMemberFacingAssistantText(
+        formatEstateGuideReply(resolveEstateGuideTurn(trimmed)),
+        "estate_guide",
+      );
       markAssistantReplied(chatTurnState);
       recordPrimaryTurnResponse(guideReply);
+      annotateTurnDecision({
+        finalResponseOwner: "estate_guide",
+        routeSelected: "estate_guide",
+        actionExecuted: "local_reply",
+      });
       logConversationPipelineDiagnostic({
         turn: chatTurnRef.current,
         userText: trimmed,
@@ -15203,7 +15308,7 @@ export default function CompanionPageClient() {
         ...prev,
         { role: "assistant", content: guideReply },
       ]);
-      finishEarlyChatTurn();
+      finishEarlyChatTurn("estate_guide");
       finishLatencyTurn({ localReply: true });
       return;
     }
@@ -15211,6 +15316,7 @@ export default function CompanionPageClient() {
     // classifiedIntent.kind === "CHAT" — chat API path only.
 
     if (isChatRequestSuperseded(sendGeneration, chatRequestGenerationRef.current)) {
+      endTurnDecision();
       return;
     }
 
@@ -15224,14 +15330,23 @@ export default function CompanionPageClient() {
       requestAbort.signal.aborted;
     const finishLocalChatTurn = (assistantContent?: string) => {
       if (assistantContent) {
+        const voiced = finalizeMemberFacingAssistantText(
+          assistantContent,
+          "local_chat_turn",
+        );
         markAssistantReplied(chatTurnState);
-        recordPrimaryTurnResponse(assistantContent);
+        recordPrimaryTurnResponse(voiced);
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: assistantContent },
+          { role: "assistant", content: voiced },
         ]);
       }
-      finishEarlyChatTurn();
+      annotateTurnDecision({
+        finalResponseOwner: "local_chat_turn",
+        routeSelected: "natural_conversation",
+        actionExecuted: assistantContent ? "assistant_reply" : "empty",
+      });
+      finishEarlyChatTurn("local_chat_turn");
     };
     if (!getPrefs().hasChatted) {
       savePrefs({ hasChatted: true });
@@ -18138,6 +18253,8 @@ export default function CompanionPageClient() {
                 buildSavedPatternsPromptHint(),
                 supportStyleHintForChat(trimmed),
                 buildCuriosityBeforeCommandsPromptHint(),
+                adhdStrategyHintForChat(trimmed),
+                techFutureHintForChat(trimmed),
                 chamberMemberChatHint,
                 activeTaskLockHintForChat(estateTaskLockTurn.state),
                 estateConversationTurn && !taskLockBlocksEstateRouting
@@ -18583,14 +18700,11 @@ export default function CompanionPageClient() {
       latencyProfiler.measure("apiModel");
       latencyProfiler.mark("responseEnforcement");
 
-      const humanEnforced = enforceHumanConversation({
-        response: rawAssistantMsg,
-        userText: trimmed,
-        gentle: detected === "overwhelmed" || detected === "emotional",
-        seed: trimmed.length,
-        memoryConfidence: relationshipTurnClientMeta.memoryConfidence,
-      });
-      rawAssistantMsg = humanEnforced.message;
+      // Shari Voice Layer — final expression using live Conversation Style / Help Mode prefs.
+      rawAssistantMsg = finalizeMemberFacingAssistantText(
+        rawAssistantMsg,
+        "chat_api",
+      );
       applyAssistantTaskLockTurn({
         assistantText: rawAssistantMsg,
         priorUserText: trimmed,
@@ -23576,6 +23690,54 @@ export default function CompanionPageClient() {
             >
               <ProjectHomesPrototypePanel
                 onBack={navigateBackToEstateHome}
+                chatVisible={roomMenuChatVisible}
+                conversationScrollKey={estateChatScrollKey}
+                thread={
+                  <SimpleChat
+                    messages={messages}
+                    stateHint={stateHint}
+                    showHint={false}
+                    hideEmptyState
+                    isLoading={isLoading}
+                    thinkingMessage={visibleThinkingMessage}
+                    awaitingUserConfirmation={chatAwaitingConfirmation}
+                    thinkingEmotion={displayEmotion}
+                    workspacePanel={workspacePanel}
+                    workspaceActiveBeside={workspaceActiveBeside}
+                    formatParagraphs={formatAssistantParagraphs}
+                    afterLastAssistant={undefined}
+                  />
+                }
+                footer={
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What would you like to work on in this project?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
               />
             </EstateRoomErrorBoundary>
           )}
@@ -24262,9 +24424,8 @@ export default function CompanionPageClient() {
       <SparkEstateGuideChrome
         visible={showSparkEstateGuide}
         flipbookOpen={estateGuideFlipbookOpen}
-        initialRoomId={estateGuideInitialRoomId}
-        onOpen={() => openSparkEstateGuideCore(roomMenuRoomId)}
-        onClose={closeSparkEstateGuideCore}
+        onOpen={openSparkEstateGuideCore}
+        onClose={() => setEstateGuideFlipbookOpen(false)}
       />
       <SparkNoteChrome
         visible={showSparkEstateGuide}
@@ -24299,7 +24460,6 @@ export default function CompanionPageClient() {
                 openExploreSparkVisualExplorer();
               }
         }
-        onOpenSparkEstateGuide={() => openSparkEstateGuideCore(null)}
         onReturnToExploreEstate={
           exploreEstateReturnAvailable
             ? () => {

@@ -9,7 +9,8 @@ import {
   enforceRelationshipResponse,
   type RelationshipResponseEnforcementResult,
 } from "@/lib/relationshipResponseContract";
-import { enforceHumanConversation } from "@/lib/humanConversation";
+import { applyShariVoiceLayer } from "@/lib/conversationStabilization/shariVoiceLayer";
+import type { AiTone, HelpMode, SupportStyle } from "@/lib/companionStore";
 import type { RelationshipMemoryConfidence } from "@/lib/relationshipIntelligencePrompt";
 import {
   buildCoachingFallbackResponse,
@@ -120,6 +121,8 @@ export async function POST(request: NextRequest) {
     const coachingMode = (body.coachingMode as CoachingMode) ?? "today";
     const emotionalState = body.emotionalState as string | undefined;
     const dayState = body.dayState as string | undefined;
+    const dailyContextHint = body.dailyContextHint as string | undefined;
+    const guidedFieldHelpHint = body.guidedFieldHelpHint as string | undefined;
     const aiTone = body.aiTone as string | undefined;
     const helpMode = body.helpMode as string | undefined;
     const supportStyle = body.supportStyle as string | undefined;
@@ -164,6 +167,8 @@ export async function POST(request: NextRequest) {
     const systemPrompt = buildCompanionSystemPrompt(coachingMode, inputType, {
       emotionalState,
       dayState,
+      dailyContextHint,
+      guidedFieldHelpHint,
       aiTone,
       helpMode,
       supportStyle,
@@ -301,15 +306,22 @@ export async function POST(request: NextRequest) {
             });
             const message = resolved.usedCoachingFallback
               ? resolved.message
-              : enforceHumanConversation({
-                  response: fullText,
+              : applyShariVoiceLayer({
+                  text: fullText,
                   userText: userProbe,
+                  emotionalCondition: emotionalState,
+                  finalResponseOwner: "chat_api_stream",
+                  contentPlanOwner: "chat_api",
+                  profileOverride: {
+                    aiTone: aiTone as AiTone | undefined,
+                    helpMode: helpMode as HelpMode | undefined,
+                    supportStyle: supportStyle as SupportStyle | undefined,
+                    supportStyleId: supportStyle,
+                  },
                   gentle:
                     emotionalState?.toLowerCase().includes("overwhelm") ||
                     emotionalState?.toLowerCase().includes("emotional"),
-                  seed: userProbe.length,
-                  memoryConfidence,
-                }).message;
+                }).text;
             fullText = message;
 
             logRelationshipResponseTrace({
@@ -412,17 +424,24 @@ export async function POST(request: NextRequest) {
 
     const messageAfterRelationship = enforcement.message;
 
-    const humanEnforcement = enforceHumanConversation({
-      response: messageAfterRelationship,
+    const voiceResult = applyShariVoiceLayer({
+      text: messageAfterRelationship,
       userText: userProbe,
+      emotionalCondition: emotionalState,
+      finalResponseOwner: "chat_api",
+      contentPlanOwner: "chat_api",
+      profileOverride: {
+        aiTone: aiTone as AiTone | undefined,
+        helpMode: helpMode as HelpMode | undefined,
+        supportStyle: supportStyle as SupportStyle | undefined,
+        supportStyleId: supportStyle,
+      },
       gentle:
         emotionalState?.toLowerCase().includes("overwhelm") ||
         emotionalState?.toLowerCase().includes("emotional"),
-      seed: userProbe.length,
-      memoryConfidence,
     });
 
-    const message = humanEnforcement.message;
+    const message = voiceResult.text;
 
     logRelationshipResponseTrace({
       responseId: relationshipResponseId,

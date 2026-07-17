@@ -47,7 +47,7 @@ const CANCEL_RE =
   /\b(?:never\s*mind|nevermind|cancel|forget it|not anymore|don'?t worry|skip it|actually no|none of (?:those|these|them)|something else|go back)\b/i;
 
 const TOPIC_CHANGE_RE =
-  /\b(?:need help(?:\s+(?:writing|creating|drafting|building|with|to\b)|\b)|help me (?:create|write|writing|draft|build|make|plan)|help (?:writing|creating|drafting)|write (?:a|an|my)|create (?:a|an|my)|draft (?:a|an|my)|take me to|go to|open the|research|explain|what is|how do)\b/i;
+  /\b(?:need help(?:\s+(?:writing|creating|drafting|building|with|to\b)|\b)|help me (?:create|write|writing|draft|build|make|plan)|help (?:writing|creating|drafting)|write (?:a|an|my)|create (?:a|an|my)|draft (?:a|an|my)|take me to|go to|open the|research|explain|what is|how do|i need to (?:fold|do|finish|clean|put away)|laundry|fold (?:my |the )?laundry|in the dryer)\b/i;
 
 const UNRECOGNIZED_REPLY =
   "I'm not sure which option you meant.";

@@ -332,6 +332,8 @@ import {
   resolveHelpDiscoveryQuery,
 } from "./estateHelpDiscoveryIntelligence";
 import {
+  authorizeDirectNavigation,
+  authorizeScenicPlaceMenu,
   isConversationStabilizationEnabled,
   runConversationRoutingPipeline,
   shouldBlockEstateSubsystem,
@@ -1825,6 +1827,13 @@ function tryEstateGuideFlow(
   if (
     !userText ||
     !isEstateGuideQuestion(userText, input.lastAssistantText)
+  ) {
+    return null;
+  }
+  // Phase A: turn decision / scenic gate — do not invent place menus when denied.
+  if (
+    !authorizeScenicPlaceMenu(userText) &&
+    !/\bwhere (?:is|are)\b/i.test(userText)
   ) {
     return null;
   }
@@ -3536,6 +3545,10 @@ function tryEstateRecommendationInvitation(
   ) {
     return null;
   }
+  // Phase A: scenic/recommendation place offers obey turn decision.
+  if (!authorizeScenicPlaceMenu(userText)) {
+    return null;
+  }
   if (
     stabilization &&
     shouldBlockEstateSubsystem(stabilization, "recommendation")
@@ -3580,6 +3593,10 @@ function tryEstateNavigationIntelligence(
   if (!localReply) return null;
 
   if (shouldNavigateFromDecision(decision)) {
+    // Phase A: direct nav only when turn decision allows navigation.
+    if (!authorizeDirectNavigation(userText)) {
+      return null;
+    }
     const displayName =
       decision.choices?.[0]?.officialDisplayName ?? "that place";
     const hint = decision.choices?.[0]?.memberFacingHint;
@@ -3605,6 +3622,10 @@ function tryEstateNavigationIntelligence(
   }
 
   if (decision.kind === "offer_choices" && decision.choices?.length) {
+    // Phase A: multi-place scenic menus require scenic permission.
+    if (!authorizeScenicPlaceMenu(userText)) {
+      return null;
+    }
     const destinationChoices = decision.choices.map((choice, index) => ({
       label: String(index + 1),
       destinationId: choice.placeId,

@@ -21,7 +21,7 @@ export type BreatheLaunchOptions = {
  * Only explicit breathe / breathing-exercise language auto-opens.
  */
 export const BREATHE_UNIVERSAL_PATTERN =
-  /\b(?:help me breathe|let'?s breathe|i need to breathe|start(?:\s+a)?\s+breathing(?:\s+exercise)?|open(?:\s+the)?\s+breathe|take me to breathe|breathe(?:\s+and\s+reset)|breathing (?:exercise|reset)|let'?s do (?:a )?breathing(?:\s+(?:exercise|reset))?|box breathing|four[\s-]?seven[\s-]?eight|4[\s-]?7[\s-]?8(?:\s+breathing)?)\b/i;
+  /\b(?:help me breathe|let'?s breathe|i need to breathe|start(?:\s+a)?\s+breathing(?:\s+exercise)?|open(?:\s+the)?\s+breathing(?:\s+exercise)?|open(?:\s+the)?\s+breathe|take me to breathe|breathe(?:\s+and\s+reset)|breathing (?:exercise|reset)|let'?s do (?:a )?breathing(?:\s+(?:exercise|reset))?|box breathing|four[\s-]?seven[\s-]?eight|4[\s-]?7[\s-]?8(?:\s+breathing)?)\b/i;
 
 export const BREATHE_UNIVERSAL_ALIASES = [
   "help me breathe",

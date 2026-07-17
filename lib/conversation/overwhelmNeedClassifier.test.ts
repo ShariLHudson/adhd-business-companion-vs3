@@ -44,4 +44,16 @@ describe("overwhelmNeedClassifier", () => {
   it("brain-dump route prefers Clear My Mind for cognitive overload phrasing", () => {
     expect(detectOverwhelmTodayRoute(COGNITIVE)).toBe("brain_dump_primary");
   });
+
+  it("blocks scenic menus for laundry / start paralysis phrasing", () => {
+    const laundry =
+      "i have to fold and put away some laundry but its still in the dryer from this morning";
+    const stuck = "i know what to do, i just can't get myself to do stuff";
+    expect(classifyOverwhelmNeed(laundry)).toBe("task_breakdown");
+    expect(shouldBlockScenicOverwhelmMenu(laundry)).toBe(true);
+    expect(shouldBlockScenicOverwhelmMenu(stuck)).toBe(true);
+    expect(shouldBlockScenicOverwhelmMenu("i need to fold my laundry")).toBe(
+      true,
+    );
+  });
 });

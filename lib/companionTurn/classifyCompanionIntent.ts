@@ -10,6 +10,7 @@ import {
   type EstateActionExecutionPlan,
 } from "@/lib/estate/decisionKernel";
 import { primaryTurnAllowsKernel } from "@/lib/conversation/primaryTurnClassifier";
+import { shouldBlockScenicOverwhelmMenu } from "@/lib/conversation/overwhelmNeedClassifier";
 import type {
   ClassifiedCompanionIntent,
   ClassifyCompanionIntentInput,
@@ -117,6 +118,15 @@ export function classifyCompanionIntent(
       (plan.type === "navigate-place" &&
         !planOpensClearMyMindCapture(plan) &&
         !planOpensChamberMember(plan)))
+  ) {
+    return { kind: "CHAT", userText, plan: { type: "chat", userText } };
+  }
+
+  // Phase A — do not finish with place menus when overwhelm/task language owns the turn.
+  // Named-place disambiguation (e.g. Reading Nook) still proceeds.
+  if (
+    plan.type === "place-menu" &&
+    shouldBlockScenicOverwhelmMenu(userText)
   ) {
     return { kind: "CHAT", userText, plan: { type: "chat", userText } };
   }

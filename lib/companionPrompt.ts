@@ -6,8 +6,10 @@ import { TODAYS_LITTLE_SPARK_PROMPT_BLOCK } from "./todaysLittleSpark";
 import { ESTATE_BEHAVIORAL_RULES_BLOCK } from "./estateIntelligence/estateRoomLifecycle";
 import { momentumAppointmentHintForChat } from "./momentumAppointment";
 import { plainLanguageFormattingHintForPrompt } from "./plainLanguageFormatting";
-import { buildMemberTonePreferenceBlocks } from "./companionTonePreferences";
+import type { AiTone, HelpMode, SupportStyle } from "./companionStore";
+import { buildShariVoicePromptBlocks } from "./conversationStabilization/shariVoiceLayer";
 import { BANNED_UI_REFERENCE_HINT } from "./conversationFirstLanguage";
+import { GLOBAL_CONVERSATION_CONTINUITY_OVERRIDE_BLOCK } from "./conversationContinuity/globalConversationContinuityOverride";
 
 // Spark Studio Companion — AI Routing Engine. This system prompt drives Shari:
 // silently detect intent, category, and emotional state, then route to the
@@ -436,6 +438,10 @@ type PromptContext = {
   emotionalState?: string;
   coachingMode?: CoachingMode;
   dayState?: string;
+  /** Phase 3 — Daily Context Engine companion awareness block. */
+  dailyContextHint?: string;
+  /** Guided Business Profile Pass 1 — field help context packet. */
+  guidedFieldHelpHint?: string;
   aiTone?: string;
   helpMode?: string;
   supportStyle?: string;
@@ -464,6 +470,8 @@ export function buildCompanionSystemPrompt(
     COACHING_MODE_MODIFIERS[coachingMode] ?? COACHING_MODE_MODIFIERS.today;
 
   const blocks = [
+    // Continuity standard wins over room/Chamber/classifier/local workflow prompts.
+    GLOBAL_CONVERSATION_CONTINUITY_OVERRIDE_BLOCK,
     COMPANION_SYSTEM_PROMPT,
     getSparkCompanionPromptBlock(),
     ELEVATE_LIFE_EXPERIENCE_PROMPT_BLOCK,
@@ -477,8 +485,25 @@ export function buildCompanionSystemPrompt(
     tone,
   ];
 
-  if (context.aiTone || context.helpMode || context.supportStyle) {
-    blocks.push(...buildMemberTonePreferenceBlocks(normalizeTonePrefs(context)));
+  // Shari Voice Layer — always inject Conversation Style / Help Mode / Support Style.
+  // Defaults apply when the client omits fields; never silently skip the voice layer.
+  {
+    const prefs = normalizeTonePrefs(context);
+    blocks.push(
+      ...buildShariVoicePromptBlocks({
+        profile: {
+          aiTone: prefs.aiTone,
+          helpMode: prefs.helpMode,
+          supportStyleId: String(context.supportStyle ?? prefs.supportStyle),
+          supportStyleLegacy: prefs.supportStyle,
+          source:
+            context.aiTone || context.helpMode || context.supportStyle
+              ? "request_override"
+              : "defaults",
+        },
+        emotionalCondition: context.emotionalState,
+      }),
+    );
   }
 
   if (context.userName) {
@@ -491,6 +516,14 @@ export function buildCompanionSystemPrompt(
     blocks.push(
       `LEVEL 3 — TODAY'S REALITY (member context only — never changes who Spark is): ${context.dayState}\nHonor what they said they need most today. High overwhelm → grounding and one tiny step. Low energy → keep it to one small step. Do NOT change Conversation Style based on Today's Reality without member permission. Do not mention these settings unless they bring them up.`,
     );
+  }
+
+  if (context.dailyContextHint) {
+    blocks.push(context.dailyContextHint);
+  }
+
+  if (context.guidedFieldHelpHint) {
+    blocks.push(context.guidedFieldHelpHint);
   }
 
   if (context.emotionalState) {
