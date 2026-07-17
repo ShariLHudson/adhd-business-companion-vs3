@@ -11,7 +11,7 @@ describe("estateRoomInvitation", () => {
     const labels = set.items.map((item) => item.label);
     expect(labels).toContain("Clear My Mind");
     expect(labels).toContain("Journal Gazebo");
-    expect(labels).toContain("Peaceful Places");
+    expect(labels).toContain("Peaceful Moments");
     expect(labels).toContain("Talk with Shari");
     expect(labels).toContain("Visit Another Room");
     expect(labels).not.toContain("Just Talk with Shari");

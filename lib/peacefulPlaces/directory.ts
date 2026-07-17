@@ -1,6 +1,6 @@
 import type { SoundscapeMoodId } from "@/lib/soundscapes/types";
 
-export const PEACEFUL_PLACES_TITLE = "Peaceful Places" as const;
+export const PEACEFUL_PLACES_TITLE = "Peaceful Moments" as const;
 
 export const PEACEFUL_PLACES_SUBTITLE =
   "Take a gentle pause. Choose the place that feels right." as const;

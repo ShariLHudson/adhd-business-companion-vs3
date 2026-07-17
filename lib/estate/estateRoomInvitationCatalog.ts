@@ -46,7 +46,7 @@ export const ESTATE_ROOM_PRIMARY_CATALOG: Record<string, EstateRoomInvitationIte
   conservatory: [
     p("clear-my-mind", "🫧", "Clear My Mind", { kind: "brain-dump-engage" }),
     section("journal", "📝", "Journal Gazebo", "growth-journal"),
-    section("peaceful-places", "🎵", "Peaceful Places", "focus-audio"),
+    section("peaceful-places", "🎵", "Peaceful Moments", "focus-audio"),
     p("talk-shari", "💬", "Talk with Shari", { kind: "conversation" }),
   ],
   "clear-my-mind": [

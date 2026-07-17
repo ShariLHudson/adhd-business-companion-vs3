@@ -105,7 +105,7 @@ describe("welcomeHomeNavigationStructure", () => {
       "Parking Lot",
       "Breathe",
       "Spin the Wheel",
-      "Peaceful Places",
+      "Peaceful Moments",
       "Soundscapes",
     ]);
     expect(byId["my-story"]).toEqual([
@@ -136,7 +136,7 @@ describe("welcomeHomeNavigationStructure", () => {
     }
   });
 
-  it("opens Peaceful Places and Soundscapes as destinations, not nested flyouts", () => {
+  it("opens Peaceful Moments and Soundscapes as destinations, not nested flyouts", () => {
     const takeAMoment = WELCOME_HOME_NAV_CATEGORIES.find(
       (c) => c.id === "take-a-moment",
     );

@@ -110,7 +110,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "welcome-room": "Welcome Room",
   "life-experience": "Life Experience Room",
   "the-gallery": "Asset Library",
-  "focus-audio": "Peaceful Places",
+  "focus-audio": "Peaceful Moments",
   "focus-timer": "Focus",
   settings: "Settings",
   profile: "Profile",
@@ -390,7 +390,7 @@ export function detectAudioIntent(text: string): WorkspaceOffer | null {
   if (!isAudio) return null;
   return {
     section: "focus-audio",
-    buttonLabel: "Open Peaceful Places",
+    buttonLabel: "Open Peaceful Moments",
     line: audioSuggestionLine(categoryId),
   };
 }

@@ -121,7 +121,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
       { id: "spin-the-wheel", label: "Spin the Wheel" },
       {
         id: "peaceful-places",
-        label: "Peaceful Places",
+        label: "Peaceful Moments",
         selectionExperience: true,
       },
       {
