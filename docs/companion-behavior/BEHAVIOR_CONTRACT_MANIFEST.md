@@ -47,6 +47,10 @@ The package contains one authoritative copy of each document.
 |----|-------|------|
 | CB-004 | Cursor Global Reverse Engineering Prompt | `prompts/004_CURSOR_GLOBAL_REVERSE_ENGINEERING_PROMPT.md` |
 | CB-014 | Cursor Start Here | `prompts/014_CURSOR_START_HERE_IMPLEMENTATION_PROMPT.md` |
+| CB-018 | Cursor Audit CB-017 Conversation Progression | `prompts/018_CURSOR_AUDIT_CB_017_CONVERSATION_PROGRESSION.md` |
+| (file 022) | Cursor Audit CB-021 Advisory Handoff | `prompts/022_CURSOR_AUDIT_CB_021_ADVISORY_HANDOFF.md` |
+| CB-022 audit | Cursor Audit Global Chamber Topic Ownership | `prompts/080_CURSOR_AUDIT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP.md` |
+| CB-022 implement | Cursor Implement Global Chamber Topic Ownership Gate | `prompts/082_CURSOR_IMPLEMENT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_GATE.md` |
 
 ## Behavior contracts
 
@@ -59,8 +63,18 @@ The package contains one authoritative copy of each document.
 | CB-009 | Help Me Choose Next Step | `contracts/009_HELP_ME_CHOOSE_NEXT_STEP_BEHAVIOR_CONTRACT.md` | draft | TBD | not_started | unknown | unverified |
 | CB-010 | Overwhelm & Task Friction | `contracts/010_OVERWHELM_AND_TASK_FRICTION_BEHAVIOR_CONTRACT.md` | draft | frictionless + compound intent + Phase A decision | not_started | partial | preview_partial |
 | CB-011 | Return After Absence | `contracts/011_RETURN_AFTER_ABSENCE_BEHAVIOR_CONTRACT.md` | draft | arrival / daily opening | not_started | unknown | unverified |
+| CB-017 | Conversation Progression & Redundant Question Prevention | `contracts/017_CONVERSATION_PROGRESSION_AND_REDUNDANT_QUESTION_PREVENTION_CONTRACT.md` | **ready_for_audit** | TBD — recommend `lib/conversationStabilization/` progression boundary | **gap_map_complete** | **not_started** | **unverified** |
+| CB-021 | Advisory Handoff, Identity Continuity & Single-Response Ownership | `contracts/021_ADVISORY_HANDOFF_IDENTITY_CONTINUITY_AND_SINGLE_RESPONSE_OWNERSHIP_CONTRACT.md` | **ready_for_audit** | TBD — recommend advisory orchestration boundary before Chamber writers | **gap_map_complete** | **not_started** | **unverified** |
+| **CB-022** | **Global Chamber Topic Ownership & Context Preservation** | `contracts/022_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_AND_CONTEXT_PRESERVATION_CONTRACT.md` | **active** (preview) | `lib/conversationStabilization/activeTopicGate.ts` + `chamberNavigateGate.ts` | **gap_map_complete** | **partial** (`activeTopicOwnership.test.ts`) | **unverified** |
 
-Audit report for CB-007: `audits/007_NEW_CHAT_AND_CONTEXT_ISOLATION_GAP_MAP.md`
+Audit report for CB-007: `audits/007_NEW_CHAT_AND_CONTEXT_ISOLATION_GAP_MAP.md`  
+Live verification checklist: `audits/016_CB_007_AUTHENTICATED_PREVIEW_VERIFICATION_CHECKLIST.md`  
+Preview (`332d634`): https://adhd-business-companion-vs3-g80zvv8xp-shari-hudsons-projects.vercel.app  
+
+CB-017 gap map: `audits/017_CONVERSATION_PROGRESSION_GAP_MAP.md` · checklist `verification/019_…`  
+CB-021 gap map: `audits/021_ADVISORY_HANDOFF_AND_RESPONSE_OWNERSHIP_GAP_MAP.md` · checklist `verification/023_…`  
+CB-022 package note: `audits/084_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_MANIFEST_UPDATE.md` · checklist `verification/083_…` · audit prompt `prompts/080_…`  
+Governed by **CB-015**. CB-021 depends on CB-017. **CB-022** works with CB-017 + CB-021 as one global topic-ownership fix. Do not phrase-patch Finance/Content/Client Relationships intros or generic fallbacks alone.
 
 ---
 
@@ -76,9 +90,20 @@ Audit report for CB-007: `audits/007_NEW_CHAT_AND_CONTEXT_ISOLATION_GAP_MAP.md`
 | SPARK-025 / 152 / 156 / 173 behavior testing docs | CB-001 / CB-012 | Subordinate regression material |
 | `docs/ESTATE_BEHAVIORAL_CONSISTENCY.md`, `docs/V3_BEHAVIOR_RECOVERY.md` | CB-000 / CB-001 | Legacy consistency language — index only |
 | `docs/THE_MEMBER_WINS.md`, Relationship Constitution, Friend DNA | CB-000 | Emotional/product authority remains; behavior contracts add executable gates |
+| `lib/sparkConversation/coachingFallback.ts` `GENERIC_RECOVERY_BRIDGE` | CB-017 | Exact incident reset; must be gated by progression, not rewritten alone |
+| Help Me Choose stay-in-chat cues (`helpMeChooseNeeds.ts`) | CB-017 / CB-009 | Open questions without ActiveConversationStep registration |
+| Phase A `buildConversationDecision` | CB-017 | Closest spine; missing `answerStatus` / ProgressionDecision |
+| Chamber Finance `activationOpener` + alias `"money"` | CB-021 INC-001 | Topic keyword → navigate + intro; defeats Shari ownership |
+| Chamber Content `activationOpener` + alias `"content"` | CB-021 INC-002 | Same path — Instagram content question unanswered |
+| `estateCommandAckLine` (“Of course — here's Finance/Content.”) | CB-021 | Handoff ack as second visible writer |
+| Chamber NAVIGATE exempt from continuity `blockKernelNavigation` | CB-021 | Turn 2+ re-introduces specialist |
+| Generic help router / arrival greeting / kernel early-exit after Chamber select | **CB-022** (+ CB-017 / CB-021) | Active topic lost; question unanswered — **one global fix**, not per-member |
 
 ---
 
 ## Next contract to implement
 
-**CB-007** live preview verification (temp clears already shipped in `resetActiveConversation`). Voice on visible New Chat replies must satisfy **CB-015**. No Phase B composer migration.
+1. **CB-007** live preview verification still required before `live_verified`.  
+2. **CB-022** — Global Chamber Topic Ownership: **gap map complete**; implement only via `prompts/082_…` after acceptance. One Conversation Engine active-topic owner for all Chamber members. Do **not** create member-specific patches.  
+3. **CB-017** / **CB-021** (INC-001 Finance + INC-002 Content) — shared Chamber handoff path mapped; coordinate with CB-022 (topic preservation + single response owner). Voice must satisfy **CB-015**. No Phase B composer migration.  
+4. **Behavioral OS Packages 2–7** — Package 2 knowledge map complete; Package 3 conversation-engine gap map started with Content incident. Do not implement until shared boundary is approved.

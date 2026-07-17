@@ -59,6 +59,10 @@ import {
 } from "@/lib/chamber/chamberMemberAliases";
 import type { ChamberMemberId } from "@/lib/chamber/chamberMemberRegistry";
 import { getChamberMemberById } from "@/lib/chamber/chamberMemberRegistry";
+import {
+  buildChamberNavigateShariLine,
+  mayNavigateToChamberMember,
+} from "@/lib/conversationStabilization/chamberNavigateGate";
 
 export type EstateCommandKind = "direct" | "intent" | "hybrid" | "none";
 
@@ -499,9 +503,51 @@ export function detectIntentCommand(
   };
 }
 
+function buildChamberMemberNavigateCommand(
+  memberId: ChamberMemberId,
+): EstateCommandDecision | null {
+  const member = getChamberMemberById(memberId);
+  const label = chamberMemberShortLabel(memberId);
+  const entry = syntheticEntry(
+    "chamber-of-momentum",
+    "chamber-of-momentum",
+    member?.displayName ?? label,
+  );
+  const offer = workspaceOfferFromEntry(entry, undefined, {
+    section: "chamber-of-momentum",
+  });
+  if (!offer) return null;
+  offer.chamberMemberId = memberId;
+  offer.buttonLabel = `Talk with ${label}`;
+  offer.line = `Opening ${label} in the Chamber of Momentum.`;
+
+  return {
+    kind: "direct",
+    executeImmediately: true,
+    entryId: "chamber-of-momentum",
+    entry,
+    section: "chamber-of-momentum",
+    workspaceOffer: offer,
+    roomId: "chamber-of-momentum",
+  };
+}
+
 export function detectChamberMemberCommand(
   userText: string,
+  opts?: { menuSelectedMemberId?: string | null },
 ): EstateCommandDecision | null {
+  // CB-022 — bare aliases inside domain questions must not auto-NAVIGATE.
+  const gate = mayNavigateToChamberMember({
+    userText,
+    menuSelectedMemberId: opts?.menuSelectedMemberId,
+  });
+
+  if (gate.allow && opts?.menuSelectedMemberId) {
+    return buildChamberMemberNavigateCommand(
+      opts.menuSelectedMemberId as ChamberMemberId,
+    );
+  }
+
   const resolved = resolveChamberMemberFromText(userText);
   if (resolved.kind === "none") return null;
 
@@ -527,31 +573,12 @@ export function detectChamberMemberCommand(
     };
   }
 
-  const memberId = resolved.match.memberId;
-  const member = getChamberMemberById(memberId);
-  const label = chamberMemberShortLabel(memberId);
-  const entry = syntheticEntry(
-    "chamber-of-momentum",
-    "chamber-of-momentum",
-    member?.displayName ?? label,
-  );
-  const offer = workspaceOfferFromEntry(entry, undefined, {
-    section: "chamber-of-momentum",
-  });
-  if (!offer) return null;
-  offer.chamberMemberId = memberId as ChamberMemberId;
-  offer.buttonLabel = `Talk with ${label}`;
-  offer.line = `Opening ${label} in the Chamber of Momentum.`;
+  // CB-022 — only explicit / menu / bare-name requests navigate.
+  if (!gate.allow) {
+    return null;
+  }
 
-  return {
-    kind: "direct",
-    executeImmediately: true,
-    entryId: "chamber-of-momentum",
-    entry,
-    section: "chamber-of-momentum",
-    workspaceOffer: offer,
-    roomId: "chamber-of-momentum",
-  };
+  return buildChamberMemberNavigateCommand(resolved.match.memberId);
 }
 
 export function evaluateEstateCommand(
@@ -705,8 +732,8 @@ export function directEstateNavigationHintForChat(
 export function estateCommandAckLine(command: EstateCommandDecision): string {
   const memberId = command.workspaceOffer.chamberMemberId;
   if (memberId) {
-    const label = chamberMemberShortLabel(memberId);
-    return `Of course — here's ${label}.`;
+    // CB-022 — Shari-owned navigate line; never specialist “Of course — here's …”.
+    return buildChamberNavigateShariLine(memberId);
   }
   if (command.kind === "direct") {
     const id = command.roomId ?? command.entryId;

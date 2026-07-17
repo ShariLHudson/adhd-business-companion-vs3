@@ -1,11 +1,12 @@
 {
   "package": "Spark Estate Companion Behavior Foundation — Updated",
   "authoritative_root": "docs/companion-behavior",
-  "file_count": 16,
   "structure": {
     "standards": "docs/companion-behavior/standards",
     "contracts": "docs/companion-behavior/contracts",
-    "prompts": "docs/companion-behavior/prompts"
+    "prompts": "docs/companion-behavior/prompts",
+    "verification": "docs/companion-behavior/verification",
+    "audits": "docs/companion-behavior/audits"
   },
   "files": [
     "standards/000_SPARK_ESTATE_COMPANION_SUCCESS_STANDARD.md",
@@ -23,7 +24,18 @@
     "standards/012_LIVE_BEHAVIOR_RELEASE_GATE.md",
     "standards/013_BEHAVIOR_LIBRARY_BUILD_ORDER.md",
     "prompts/014_CURSOR_START_HERE_IMPLEMENTATION_PROMPT.md",
-    "standards/015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md"
+    "standards/015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md",
+    "contracts/017_CONVERSATION_PROGRESSION_AND_REDUNDANT_QUESTION_PREVENTION_CONTRACT.md",
+    "prompts/018_CURSOR_AUDIT_CB_017_CONVERSATION_PROGRESSION.md",
+    "verification/019_CB_017_LIVE_REGRESSION_CHECKLIST.md",
+    "contracts/021_ADVISORY_HANDOFF_IDENTITY_CONTINUITY_AND_SINGLE_RESPONSE_OWNERSHIP_CONTRACT.md",
+    "prompts/022_CURSOR_AUDIT_CB_021_ADVISORY_HANDOFF.md",
+    "contracts/022_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_AND_CONTEXT_PRESERVATION_CONTRACT.md",
+    "verification/023_CB_021_LIVE_REGRESSION_CHECKLIST.md",
+    "prompts/080_CURSOR_AUDIT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP.md",
+    "prompts/082_CURSOR_IMPLEMENT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_GATE.md",
+    "verification/083_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_LIVE_CHECKLIST.md",
+    "audits/084_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_MANIFEST_UPDATE.md"
   ],
   "authoritative_standards": [
     "000_SPARK_ESTATE_COMPANION_SUCCESS_STANDARD.md",
@@ -41,18 +53,41 @@
     "008_CONTINUE_WHERE_LEFT_OFF_BEHAVIOR_CONTRACT.md",
     "009_HELP_ME_CHOOSE_NEXT_STEP_BEHAVIOR_CONTRACT.md",
     "010_OVERWHELM_AND_TASK_FRICTION_BEHAVIOR_CONTRACT.md",
-    "011_RETURN_AFTER_ABSENCE_BEHAVIOR_CONTRACT.md"
+    "011_RETURN_AFTER_ABSENCE_BEHAVIOR_CONTRACT.md",
+    "017_CONVERSATION_PROGRESSION_AND_REDUNDANT_QUESTION_PREVENTION_CONTRACT.md",
+    "021_ADVISORY_HANDOFF_IDENTITY_CONTINUITY_AND_SINGLE_RESPONSE_OWNERSHIP_CONTRACT.md",
+    "022_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_AND_CONTEXT_PRESERVATION_CONTRACT.md"
   ],
   "prompts": [
     "004_CURSOR_GLOBAL_REVERSE_ENGINEERING_PROMPT.md",
-    "014_CURSOR_START_HERE_IMPLEMENTATION_PROMPT.md"
+    "014_CURSOR_START_HERE_IMPLEMENTATION_PROMPT.md",
+    "018_CURSOR_AUDIT_CB_017_CONVERSATION_PROGRESSION.md",
+    "022_CURSOR_AUDIT_CB_021_ADVISORY_HANDOFF.md",
+    "080_CURSOR_AUDIT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP.md",
+    "082_CURSOR_IMPLEMENT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_GATE.md"
+  ],
+  "verification": [
+    "verification/019_CB_017_LIVE_REGRESSION_CHECKLIST.md",
+    "verification/023_CB_021_LIVE_REGRESSION_CHECKLIST.md",
+    "verification/083_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_LIVE_CHECKLIST.md"
   ],
   "index": "PACKAGE_INDEX.md",
+  "audits": [
+    "audits/007_NEW_CHAT_AND_CONTEXT_ISOLATION_GAP_MAP.md",
+    "audits/016_CB_007_AUTHENTICATED_PREVIEW_VERIFICATION_CHECKLIST.md",
+    "audits/017_CONVERSATION_PROGRESSION_GAP_MAP.md",
+    "audits/021_ADVISORY_HANDOFF_AND_RESPONSE_OWNERSHIP_GAP_MAP.md",
+    "audits/084_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_MANIFEST_UPDATE.md"
+  ],
   "notes": [
     "Single source of truth for Companion Behavior Foundation.",
     "Do not duplicate full standards into .cursor/rules.",
     "Every visible user-facing response must comply with 015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md.",
     "Phase A conversation decision work remains separate until contracts are audited.",
+    "CB-017: gap_map_complete; do not phrase-patch generic fallback before progression owner exists.",
+    "CB-021: gap_map_complete; depends on CB-015 and CB-017; do not suppress Finance intro alone.",
+    "CB-022: gap_map_complete at docs/conversation-engine/audits/GLOBAL_CHAMBER_TOPIC_OWNERSHIP_GAP_MAP.md; implement not started; one global Conversation Engine active-topic owner — do not member-patch.",
+    "File prompts/022 is the CB-021 audit prompt; contract CB-022 is contracts/022_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_….md.",
     "Repo audits live under docs/companion-behavior/audits/ (not part of the zip package).",
     "Human package index: PACKAGE_INDEX.md"
   ]

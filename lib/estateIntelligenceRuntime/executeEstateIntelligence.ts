@@ -45,6 +45,10 @@ import {
 import { estateGuideHint } from "@/lib/sparkKnowledge/shariKnowledge";
 import { searchEstateBrain } from "@/lib/estateBrain/search";
 import {
+  shouldBlockGenericFallback,
+  topicPreservingFallbackLine,
+} from "@/lib/conversationStabilization/activeTopicGate";
+import {
   isConversationStabilizationEnabled,
   shouldBlockEstateSubsystem,
   tryStabilizationFastPath,
@@ -304,7 +308,9 @@ function executeFeature(
   const match = matchFeatureHowToGuide(userText);
   const localReply = match
     ? formatFeatureHowToResponse(match.guide)
-    : "Tell me what you're trying to do — settings, reminders, Clear My Mind, or something else — and I'll walk you through it.";
+    : shouldBlockGenericFallback()
+      ? topicPreservingFallbackLine()
+      : "Tell me what you're trying to do — settings, reminders, Clear My Mind, or something else — and I'll walk you through it.";
 
   const result: EstateIntelligenceRuntimeResult = {
     capability: "feature",

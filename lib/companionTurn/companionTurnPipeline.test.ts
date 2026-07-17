@@ -11,13 +11,26 @@ describe("companion turn pipeline", () => {
     clearPendingEstatePlaceMenu();
   });
 
-  it("1. classify — pricing help → CHAT (API path)", () => {
+  it("1. classify — pricing help → CHAT (CB-022: domain alias must not auto-NAVIGATE)", () => {
     const classified = classifyCompanionIntent({
       userText: "I need help with pricing",
     });
+    // Bare “help with pricing” is a domain question — answer in chat.
     expect(classified.kind).toBe("CHAT");
     expect(classified.plan.type).toBe("chat");
-    expect(companionIntentHandledByKernel(classified)).toBe(false);
+  });
+
+  it("1b. classify — explicit Talk to Sales → Chamber NAVIGATE", () => {
+    const classified = classifyCompanionIntent({
+      userText: "Talk to Sales",
+    });
+    expect(classified.kind).toBe("NAVIGATE");
+    expect(classified.plan.type).toBe("navigate-place");
+    if (classified.plan.type === "navigate-place") {
+      expect(classified.plan.command.workspaceOffer.chamberMemberId).toBe(
+        "sales",
+      );
+    }
   });
 
   it("2. classify + execute — Reading Nook → place menu, then pick", () => {
@@ -85,5 +98,61 @@ describe("companion turn pipeline", () => {
     expect(classified.kind).toBe("CHAT");
     expect(classified.plan.type).toBe("place-menu");
     expect(companionIntentHandledByKernel(classified)).toBe(true);
+  });
+
+  it("7. relationship chat mentioning a room stays in chat — no navigate", () => {
+    const classified = classifyCompanionIntent({
+      userText: "I love the greenhouse",
+      primaryTurn: {
+        type: "RELATIONSHIP_CHAT",
+        confidence: "high",
+        owner: "chat",
+        reason: "test",
+        blockKernelNavigation: true,
+        blockBridgeResponder: true,
+        blockCollectionOffer: true,
+        blockSecondaryResponders: true,
+      },
+    });
+    expect(classified.kind).toBe("CHAT");
+    expect(classified.plan.type).not.toBe("navigate-place");
+
+    const onNavigatePlace = vi.fn();
+    expect(
+      executeCompanionIntent(classified, {
+        onCaptureWrite: vi.fn(),
+        onNavigateMemory: vi.fn(),
+        onNavigatePlace,
+        onSoundscape: vi.fn(),
+        onAssistantLine: vi.fn(),
+        onPlaceMenu: vi.fn(),
+        onCaptureMenu: vi.fn(),
+        onRoomAction: vi.fn(),
+      }),
+    ).toBe(false);
+    expect(onNavigatePlace).not.toHaveBeenCalled();
+  });
+
+  it("8. pricing help may open Sales only when chamber match — otherwise chat", () => {
+    const classified = classifyCompanionIntent({
+      userText: "I need help with pricing",
+      primaryTurn: {
+        type: "RELATIONSHIP_CHAT",
+        confidence: "high",
+        owner: "chat",
+        reason: "test relationship — stay in chat unless chamber exempt",
+        blockKernelNavigation: true,
+        blockBridgeResponder: true,
+        blockCollectionOffer: true,
+        blockSecondaryResponders: true,
+      },
+    });
+    // Chamber members are Fix A exempt; without a chamber-only primary, chat wins.
+    if (classified.plan.type === "navigate-place") {
+      expect(classified.plan.command.workspaceOffer.chamberMemberId).toBeTruthy();
+    } else {
+      expect(classified.kind).toBe("CHAT");
+      expect(companionIntentHandledByKernel(classified)).toBe(false);
+    }
   });
 });

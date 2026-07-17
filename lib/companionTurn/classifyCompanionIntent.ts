@@ -16,6 +16,7 @@ import type {
   ClassifyCompanionIntentInput,
   CompanionIntentKind,
 } from "./types";
+import { shouldAllowChamberKernelExemption } from "@/lib/conversationStabilization/activeTopicGate";
 
 /**
  * Fix C — explicit "help me here / stay here" overrides.
@@ -110,14 +111,17 @@ export function classifyCompanionIntent(
   // Fix A — when the primary-turn verdict says this is a clear goal/help turn,
   // do not let the estate kernel divert it into room menus or room navigation.
   // Fix D — Clear My Mind capture is exempt and always opens.
-  // Chamber members are exempt — member asked for a person in the Chamber.
+  // CB-022 — Chamber NAVIGATE only when the shared navigate gate allows
+  // (explicit member request / menu / destination) — not bare topic aliases.
+  const chamberNavAllowed =
+    planOpensChamberMember(plan) && shouldAllowChamberKernelExemption(userText);
   if (
     input.primaryTurn &&
     !primaryTurnAllowsKernel(input.primaryTurn) &&
     (plan.type === "place-menu" ||
       (plan.type === "navigate-place" &&
         !planOpensClearMyMindCapture(plan) &&
-        !planOpensChamberMember(plan)))
+        !chamberNavAllowed))
   ) {
     return { kind: "CHAT", userText, plan: { type: "chat", userText } };
   }

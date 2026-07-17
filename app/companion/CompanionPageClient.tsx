@@ -2183,7 +2183,12 @@ import {
   buildConversationDecision,
   endTurnDecision,
   getActiveTurnDecision,
+  isBlockedGenericFallbackText,
   logConversationDecision,
+  markActiveTopicAnswered,
+  processActiveTopicOnUserTurn,
+  shouldAllowChamberKernelExemption,
+  type ProcessActiveTopicTurnResult,
 } from "@/lib/conversationStabilization";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
@@ -2739,6 +2744,8 @@ export default function CompanionPageClient() {
     useState<ChamberMemberId | null>(null);
   const activeChamberMemberIdRef = useRef<ChamberMemberId | null>(null);
   activeChamberMemberIdRef.current = activeChamberMemberId;
+  /** CB-022 — result of processActiveTopicOnUserTurn for the in-flight send. */
+  const activeTopicTurnRef = useRef<ProcessActiveTopicTurnResult | null>(null);
   /** Message index before the current Chamber member thread began. */
   const chamberThreadStartIndexRef = useRef<number | null>(null);
   const previousSectionForChamberRef = useRef<AppSection | null>(null);
@@ -9268,7 +9275,7 @@ export default function CompanionPageClient() {
 
     // Already in the Chamber — switch members without relaunching
     if (alreadyInChamber && memberId) {
-      inviteChamberMemberCore(memberId);
+      inviteChamberMemberCore(memberId, { skipOpener: true });
       return;
     }
 
@@ -9285,7 +9292,14 @@ export default function CompanionPageClient() {
     }
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
-    playPlaceFirstArrival("chamber-of-momentum");
+    // CB-022 — do not inject Chamber arrival greeting into chat when opening
+    // with a member (or while an unresolved topic owns the turn).
+    const skipArrivalGreeting =
+      Boolean(memberId) ||
+      Boolean(activeTopicTurnRef.current?.suppressChamberIntroWriters);
+    if (!skipArrivalGreeting) {
+      playPlaceFirstArrival("chamber-of-momentum");
+    }
     syncDirectEstateVisit({
       roomId: "chamber-of-momentum",
       section: "chamber-of-momentum",
@@ -9295,7 +9309,7 @@ export default function CompanionPageClient() {
     });
     openStandaloneFocusSectionCore("chamber-of-momentum");
     if (memberId) {
-      inviteChamberMemberCore(memberId);
+      inviteChamberMemberCore(memberId, { skipOpener: true });
     } else {
       setEstateRoomChatVisible(false);
     }
@@ -9320,12 +9334,22 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("visual-focus");
   }
 
-  function inviteChamberMemberCore(memberId: ChamberMemberId) {
+  function inviteChamberMemberCore(
+    memberId: ChamberMemberId,
+    opts?: { skipOpener?: boolean },
+  ) {
     const previousId = activeChamberMemberIdRef.current;
     const activation = activateChamberMember(memberId);
     if (!activation) return;
 
-    // Switching members: cancel prior stream and isolate histories completely.
+    // CB-022 — never surface specialist self-intro / activation opener as a
+    // visible writer. Activate quietly; Shari remains the only voice.
+    const skipOpener =
+      opts?.skipOpener !== false ||
+      previousId === memberId ||
+      Boolean(activeTopicTurnRef.current?.skipRepeatChamberActivation) ||
+      Boolean(activeTopicTurnRef.current?.suppressChamberIntroWriters);
+
     if (previousId && previousId !== memberId) {
       chatRequestGenerationRef.current += 1;
       supersedeInFlightChatRequest(chatRequestAbortRef.current);
@@ -9333,11 +9357,13 @@ export default function CompanionPageClient() {
       endVisibleThinking();
       setIsLoading(false);
       chamberThreadStartIndexRef.current = 0;
-      setMessages([
-        { role: "system", content: activation.messages.system },
-        { role: "assistant", content: activation.messages.assistant },
-      ]);
-    } else {
+      if (!skipOpener) {
+        setMessages([
+          { role: "system", content: activation.messages.system },
+          { role: "assistant", content: activation.messages.assistant },
+        ]);
+      }
+    } else if (!skipOpener) {
       setMessages((prev) => {
         chamberThreadStartIndexRef.current = prev.length;
         return [
@@ -13044,6 +13070,14 @@ export default function CompanionPageClient() {
     const lastAssistantForPrimary =
       [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
 
+    // CB-022 — authoritative active-topic owner (before Chamber NAVIGATE / fallbacks).
+    activeTopicTurnRef.current = processActiveTopicOnUserTurn({
+      userText: trimmed,
+      turn: chatTurnRef.current,
+      lastAssistantText: lastAssistantForPrimary,
+      activeChamberMemberId: activeChamberMemberIdRef.current,
+    });
+
     const confirmationReply =
       isConfirmationAcceptance(trimmed) || isConfirmationDecline(trimmed);
     if (!confirmationReply) {
@@ -15257,8 +15291,8 @@ export default function CompanionPageClient() {
           return;
         }
         // Chat-primary turns answer in conversation — do not swap rooms as a
-        // side effect of send. Clear My Mind + Chamber members stay exempt
-        // (explicit capability requests). DIRECT_COMMAND has blockKernel false.
+        // side effect of send. Clear My Mind stays exempt. CB-022 — Chamber
+        // members only when the shared navigate gate allows (not bare aliases).
         if (activePrimaryTurnRef.current?.blockKernelNavigation) {
           const roomId = command.roomId ?? command.entryId;
           const opensClearMyMind =
@@ -15268,14 +15302,20 @@ export default function CompanionPageClient() {
           const opensChamberMember = Boolean(
             command.workspaceOffer.chamberMemberId,
           );
-          if (!opensClearMyMind && !opensChamberMember) {
+          const chamberNavAllowed =
+            opensChamberMember && shouldAllowChamberKernelExemption(trimmed);
+          if (!opensClearMyMind && !chamberNavAllowed) {
             const offerLine =
               navigationLine?.trim() ||
               command.workspaceOffer.line?.trim() ||
               (command.entry?.name
                 ? `If you'd like, we could visit the ${command.entry.name} — just say when.`
                 : null);
-            if (offerLine) {
+            if (
+              offerLine &&
+              !isBlockedGenericFallbackText(offerLine) &&
+              !opensChamberMember
+            ) {
               markAssistantReplied(chatTurnState);
               recordPrimaryTurnResponse(offerLine);
               setMessages((prev) => [
@@ -19430,6 +19470,7 @@ export default function CompanionPageClient() {
       });
       if (message) {
         markAssistantReplied(chatTurnState);
+        markActiveTopicAnswered(chatTurnRef.current);
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: message },
@@ -22324,6 +22365,15 @@ export default function CompanionPageClient() {
         onShariGreeting={(message, roomId) => {
           const greeting = message.trim();
           if (!greeting) return;
+          // CB-022 — block Chamber arrival / generic greetings during unresolved topics.
+          if (isBlockedGenericFallbackText(greeting)) return;
+          if (
+            roomId === "chamber-of-momentum" &&
+            activeTopicTurnRef.current?.suppressChamberIntroWriters
+          ) {
+            setEstateRoomChatVisible(true);
+            return;
+          }
           setMessages((prev) => {
             if (
               prev.some(

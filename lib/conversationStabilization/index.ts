@@ -83,3 +83,44 @@ export {
   type ShariVoiceProfile,
   type ShariVoiceRuntimeMetadata,
 } from "./shariVoiceLayer";
+
+export {
+  type ActiveTopicConfidence,
+  type ActiveTopicState,
+  type ActiveTopicStatus,
+  isActiveTopicUnresolved,
+} from "./activeTopicTypes";
+
+export {
+  ACTIVE_TOPIC_STORAGE_KEY,
+  clearActiveTopic,
+  getActiveTopic,
+  loadActiveTopic,
+  patchActiveTopic,
+  resetActiveTopicStoreForTests,
+  saveActiveTopic,
+  setActiveTopicStatus,
+} from "./activeTopicStore";
+
+export {
+  acceptClarificationForActiveTopic,
+  chamberNavigateGateForText,
+  isBlockedGenericFallbackText,
+  isExplicitTopicChangeRequest,
+  markActiveTopicAnswered,
+  markActiveTopicCompleted,
+  processActiveTopicOnUserTurn,
+  resolveKnowledgeMemberForTopic,
+  shouldAllowChamberKernelExemption,
+  shouldBlockGenericFallback,
+  topicPreservingFallbackLine,
+  type ProcessActiveTopicTurnResult,
+} from "./activeTopicGate";
+
+export {
+  buildChamberNavigateShariLine,
+  isChamberSpecialistIntroText,
+  isExplicitChamberNavigationRequest,
+  mayNavigateToChamberMember,
+  type ChamberNavigateGateResult,
+} from "./chamberNavigateGate";

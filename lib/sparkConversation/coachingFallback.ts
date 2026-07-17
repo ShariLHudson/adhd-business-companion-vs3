@@ -19,6 +19,12 @@ import {
 } from "@/lib/conversation/shariCompanionEngine";
 
 import {
+  formatEmailAwaitingActionRecovery,
+  hasUsableApprovedEmailDraft,
+  loadUniversalCreationSession,
+} from "@/lib/universalCreation";
+
+import {
 
   formatEmotionalFirstOpening,
 
@@ -203,9 +209,37 @@ export function resolveRecoveryContinuation(input: RuntimeRecoveryInput): string
 
   }
 
+  try {
+    const session = loadUniversalCreationSession();
+    if (hasUsableApprovedEmailDraft(session)) {
+      return formatEmailAwaitingActionRecovery();
+    }
+  } catch {
+    /* recovery must never throw */
+  }
+
   if (isEstateGuideQuestion(userText)) {
 
     return formatEstateGuideReply(resolveEstateGuideTurn(userText));
+
+  }
+
+
+
+  // Coaching kinds win before bridge-blocked generic recovery (incl. CB-022 gate).
+  const kind = classifyCoachingFallbackKind(userText);
+
+  if (kind === "development_frustration") {
+
+    return gentleQuestionForKind(kind);
+
+  }
+
+
+
+  if (kind === "quit_temptation" || kind === "prioritization_overload") {
+
+    return gentleQuestionForKind(kind);
 
   }
 
@@ -230,24 +264,6 @@ export function resolveRecoveryContinuation(input: RuntimeRecoveryInput): string
       return buildBlockedTurnFallbackReply(userText);
 
     }
-
-  }
-
-
-
-  const kind = classifyCoachingFallbackKind(userText);
-
-  if (kind === "development_frustration") {
-
-    return gentleQuestionForKind(kind);
-
-  }
-
-
-
-  if (kind === "quit_temptation" || kind === "prioritization_overload") {
-
-    return gentleQuestionForKind(kind);
 
   }
 
@@ -299,6 +315,20 @@ export function resolveRecoveryContinuation(input: RuntimeRecoveryInput): string
 
       return gentleQuestionForKind(kind);
 
+    }
+
+    // CB-022 — never replace an unresolved domain topic with generic help.
+    // Lazy import avoids circular init with conversationStabilization.
+    try {
+      const {
+        shouldBlockGenericFallback,
+        topicPreservingFallbackLine,
+      } = require("@/lib/conversationStabilization/activeTopicGate") as typeof import("@/lib/conversationStabilization/activeTopicGate");
+      if (shouldBlockGenericFallback()) {
+        return topicPreservingFallbackLine();
+      }
+    } catch {
+      /* keep generic bridge if gate unavailable */
     }
 
     return GENERIC_RECOVERY_BRIDGE;
