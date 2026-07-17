@@ -73,6 +73,7 @@ export type HelpMeChooseSuggestion = {
 export type DailyOpeningChoiceAction =
   | { kind: "navigate"; destination: DailyOpeningDestination }
   | { kind: "show-help-me-choose" }
+  | { kind: "show-meaningful-start" }
   | { kind: "show-something-helpful" };
 
 export type DailyOpeningDiscoveryInvite = {
@@ -110,13 +111,13 @@ export type GlobalDailyOpeningResult = {
 };
 
 export const DAILY_OPENING_CHOICE_LABELS_CONTINUE_FALLBACK =
-  "Start With What Matters Today" as const;
+  "Start With What Matters Most" as const;
 
 export const DAILY_OPENING_CHOICE_LABELS: Record<
   DailyOpeningChoiceId,
   string
 > = {
-  "continue-meaningful-work": "Continue Meaningful Work",
+  "continue-meaningful-work": "Start With What Matters Most",
   "plan-or-adapt-my-day": "Plan or Adapt My Day",
   "help-me-choose": "Help Me Choose",
 };

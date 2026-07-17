@@ -195,10 +195,8 @@ describe("Global Daily Companion Experience — shared controller", () => {
       "continue-meaningful-work",
       opening,
     );
-    expect(action).toEqual({
-      kind: "navigate",
-      destination: { kind: "continue", option },
-    });
+    expect(action).toEqual({ kind: "show-meaningful-start" });
+    expect(option.title).toBeTruthy();
   });
 
   it("Plan or Adapt My Day navigates from canonical plan state", () => {

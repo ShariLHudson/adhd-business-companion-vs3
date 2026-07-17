@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
 import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
+import { GlobalSoundControl } from "@/components/companion/estate/GlobalSoundControl";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
 
 export type EstateTopRightChromeProps = {
@@ -12,9 +13,11 @@ export type EstateTopRightChromeProps = {
   roomId: string | null;
   chatVisible: boolean;
   soundEnabled?: boolean;
+  soundPlayingHint?: boolean;
   onEstateMenuAction: (actionId: EstateMenuActionId) => void;
   onToggleChat: () => void;
   onToggleSound?: () => void;
+  onOpenAudioSettings?: () => void;
   onBackToEstate: () => void;
   onExploreSpark?: () => void;
   onOpenSparkEstateGuide?: () => void;
@@ -55,9 +58,11 @@ export function EstateTopRightChrome({
   roomId,
   chatVisible,
   soundEnabled,
+  soundPlayingHint,
   onEstateMenuAction,
   onToggleChat,
   onToggleSound,
+  onOpenAudioSettings,
   onBackToEstate,
   onExploreSpark,
   onOpenSparkEstateGuide,
@@ -96,6 +101,13 @@ export function EstateTopRightChrome({
 
   return createPortal(
     <div className="estate-top-right-chrome" data-testid="estate-top-right-chrome">
+      <GlobalSoundControl
+        soundPlayingHint={soundPlayingHint}
+        onOpenAudioSettings={
+          onOpenAudioSettings ??
+          (() => onEstateMenuAction("experience-controls"))
+        }
+      />
       {showRoom && roomId ? (
         <EstateRoomExperienceMenu
           embedded

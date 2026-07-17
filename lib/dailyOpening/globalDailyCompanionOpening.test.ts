@@ -120,7 +120,7 @@ describe("GlobalDailyCompanionOpening — main choices", () => {
     expect(opening.choices).toHaveLength(3);
   });
 
-  it("marks exactly one card Recommended when continue work exists", () => {
+  it("marks exactly one card Recommended without resuming unfinished work titles", () => {
     const option = {
       id: "people:client-avatar",
       kind: "workspace" as const,
@@ -135,8 +135,8 @@ describe("GlobalDailyCompanionOpening — main choices", () => {
     });
     const cards = buildDailyOpeningChoiceCards(option);
     expect(cards.filter((c) => c.recommended)).toHaveLength(1);
-    expect(cards[0]?.title).toMatch(/Client Avatar/);
-    expect(cards[0]?.explanation).toMatch(/People I Help/);
+    expect(cards[0]?.title).toBe("Start With What Matters Most");
+    expect(cards[0]?.explanation).toMatch(/not a full day plan/i);
     expect(cards[0]?.estimateLabel).toBeTruthy();
   });
 
@@ -195,13 +195,9 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
       "continue-meaningful-work",
       opening,
     );
-    expect(action).toEqual({
-      kind: "navigate",
-      destination: { kind: "continue", option },
-    });
-    expect(buildDailyOpeningArrivalMessage(action.destination)).toMatch(
-      /Client Avatar/,
-    );
+    // Choice 1 is Meaningful Start — never resumes prior work automatically.
+    expect(action).toEqual({ kind: "show-meaningful-start" });
+    expect(option.title).toMatch(/Client Avatar/);
   });
 
   it("Plan or Adapt My Day navigates using canonical plan state", () => {
@@ -242,7 +238,9 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
     ] as const) {
       const action = resolveDailyOpeningChoiceAction(id, opening);
       expect(
-        action.kind === "navigate" || action.kind === "show-help-me-choose",
+        action.kind === "navigate" ||
+          action.kind === "show-help-me-choose" ||
+          action.kind === "show-meaningful-start",
       ).toBe(true);
     }
   });
@@ -349,7 +347,7 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
     expect(cards.map((c) => c.title).join(" ")).not.toMatch(
       /Help Me Restart|Check My Day/i,
     );
-    expect(cards[0]?.title).toBe("Start With What Matters Today");
+    expect(cards[0]?.title).toBe("Start With What Matters Most");
     expect(cards[1]?.title).toBe("Plan or Adapt My Day");
     expect(cards[2]?.title).toBe("Help Me Choose");
     expect(cards[0]?.supportLines?.length).toBeGreaterThanOrEqual(2);
@@ -376,7 +374,7 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
     expect(source).toContain("help-me-choose-needs");
   });
 
-  it("never uses a raw user sentence as the continue card title", () => {
+  it("never uses a raw user sentence as the Choice 1 card title", () => {
     const cards = buildDailyOpeningChoiceCards({
       id: "raw-continue",
       kind: "conversation",
@@ -394,7 +392,7 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
         ts: new Date().toISOString(),
       },
     });
-    expect(cards[0]?.title).toBe("Continue Your Hiring Decision");
+    expect(cards[0]?.title).toBe("Start With What Matters Most");
     expect(cards[0]?.title).not.toMatch(/whether i should/i);
   });
 

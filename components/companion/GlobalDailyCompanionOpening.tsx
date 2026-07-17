@@ -6,8 +6,11 @@ import type {
   DailyOpeningDiscoveryInvite,
 } from "@/lib/dailyOpening";
 import {
+  MEANINGFUL_START_ACTIONS,
   SHOW_ME_SOMETHING_HELPFUL_LABEL,
   TODAYS_WELCOME_CARD_VERSION,
+  type MeaningfulStartActionId,
+  type MeaningfulStartRecommendation,
 } from "@/lib/dailyOpening";
 import type { HelpfulLesson } from "@/lib/dailyOpening/helpfulLessons/types";
 import type {
@@ -56,11 +59,19 @@ type HelpfulLessonProps = {
   onMaybeLater: () => void;
 };
 
+type MeaningfulStartProps = {
+  mode: "meaningful-start";
+  recommendation: MeaningfulStartRecommendation;
+  onAction: (actionId: MeaningfulStartActionId) => void;
+  onBackToToday: () => void;
+};
+
 type Props =
   | MainProps
   | HelpNeedsProps
   | HelpSupportProps
-  | HelpfulLessonProps;
+  | HelpfulLessonProps
+  | MeaningfulStartProps;
 
 /**
  * Today's Welcome Card — shared Global Daily Companion Opening.
@@ -68,6 +79,77 @@ type Props =
  * Never render Show Me Something Helpful as a fourth primary card.
  */
 export function TodaysWelcomeCard(props: Props) {
+  if (props.mode === "meaningful-start") {
+    const rec = props.recommendation;
+    return (
+      <section
+        className="global-daily-opening todays-welcome-card"
+        data-testid="todays-welcome-card"
+        data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
+        data-mode="meaningful-start"
+        aria-label="Start with what matters most"
+      >
+        <header className="global-daily-opening__header">
+          <p className="global-daily-opening__eyebrow">Shari</p>
+          <h2 className="global-daily-opening__title">
+            Start With What Matters Most
+          </h2>
+          <p className="global-daily-opening__message">
+            {rec.clarifying
+              ? rec.title
+              : "Based on what is active right now, I think the most meaningful next step is:"}
+          </p>
+        </header>
+
+        {!rec.clarifying ? (
+          <div
+            className="global-daily-opening__meaningful"
+            data-testid="meaningful-start-recommendation"
+          >
+            <p className="global-daily-opening__meaningful-title">{rec.title}</p>
+            <p className="global-daily-opening__meaningful-reason">{rec.reason}</p>
+            <p className="global-daily-opening__message">
+              We can keep this small and work through it together.
+            </p>
+          </div>
+        ) : (
+          <p
+            className="global-daily-opening__message"
+            data-testid="meaningful-start-clarifying"
+          >
+            {rec.reason}
+          </p>
+        )}
+
+        <ul className="global-daily-opening__cards">
+          {MEANINGFUL_START_ACTIONS.map((action, index) => (
+            <li key={action.id} className="global-daily-opening__card-item">
+              <button
+                type="button"
+                className="global-daily-opening__card"
+                onClick={() => props.onAction(action.id)}
+                data-testid={`meaningful-start-action-${action.id}`}
+              >
+                <span className="global-daily-opening__card-title">
+                  {index + 1}. {action.label}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          className="global-daily-opening__back"
+          onClick={props.onBackToToday}
+          data-testid="global-daily-back-to-today"
+        >
+          Back to Today&apos;s Choices
+        </button>
+      </section>
+    );
+  }
+
   if (props.mode === "help-me-choose-needs") {
     return (
       <section

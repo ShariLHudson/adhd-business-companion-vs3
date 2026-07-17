@@ -72,7 +72,7 @@ describe("Welcome discovery vs Help Me Choose separation", () => {
       "plan-or-adapt-my-day",
       "help-me-choose",
     ]);
-    expect(cards[0]?.title).toBe("Start With What Matters Today");
+    expect(cards[0]?.title).toBe("Start With What Matters Most");
     expect(cards[2]?.title).toBe("Help Me Choose");
     expect(cards.some((c) => /show me something helpful/i.test(c.title))).toBe(
       false,
@@ -135,7 +135,13 @@ describe("Welcome discovery vs Help Me Choose separation", () => {
     expect(second?.lesson.id).not.toBe(first!.lesson.id);
   });
 
-  it("continue personalizes when unfinished work exists", () => {
+  it("Parking Lot lesson Show Me targets parking-lot — not Plan My Day", () => {
+    const parking = HELPFUL_LESSON_REGISTRY.find((l) => l.id === "parking-lot");
+    expect(parking?.destinationId).toBe("parking-lot");
+    expect(parking?.destinationId).not.toBe("plan-my-day");
+  });
+
+  it("Choice 1 stays Meaningful Start even when unfinished work exists", () => {
     vi.mocked(resolveCompanionContinue).mockReturnValue({
       mode: "single",
       option: {
@@ -153,14 +159,11 @@ describe("Welcome discovery vs Help Me Choose separation", () => {
     const continueCard = opening.choiceCards.find(
       (c) => c.id === "continue-meaningful-work",
     );
-    expect(continueCard?.title).toMatch(/Q3 proposal/i);
+    expect(continueCard?.title).toBe("Start With What Matters Most");
     const action = resolveDailyOpeningChoiceAction(
       "continue-meaningful-work",
       opening,
     );
-    expect(action.kind).toBe("navigate");
-    if (action.kind === "navigate") {
-      expect(action.destination.kind).toBe("continue");
-    }
+    expect(action).toEqual({ kind: "show-meaningful-start" });
   });
 });

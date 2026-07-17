@@ -139,22 +139,8 @@ export function resolveDailyOpeningChoiceAction(
     };
   }
 
-  // continue-meaningful-work
-  if (opening.continueOption) {
-    return {
-      kind: "navigate",
-      destination: {
-        kind: "continue",
-        option: opening.continueOption,
-      },
-    };
-  }
-
-  // No unfinished activity — Start With What Matters Today → Plan My Day.
-  return {
-    kind: "navigate",
-    destination: { kind: "plan-my-day" },
-  };
+  // continue-meaningful-work → Meaningful Start (never Plan My Day, never resume).
+  return { kind: "show-meaningful-start" };
 }
 
 export function resolveHelpMeChooseSuggestionDestination(

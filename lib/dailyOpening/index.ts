@@ -27,6 +27,15 @@ export {
 } from "./buildDailyOpeningWelcome";
 export { buildDailyOpeningChoiceCards } from "./buildDailyOpeningChoiceCards";
 export {
+  recommendMeaningfulStart,
+  nextMeaningfulStartRecommendation,
+  shariCueForMeaningfulStart,
+  MEANINGFUL_START_ACTIONS,
+  MEANINGFUL_START_CLARIFYING_PROMPT,
+  type MeaningfulStartRecommendation,
+  type MeaningfulStartActionId,
+} from "./meaningfulStart";
+export {
   HELP_ME_CHOOSE_NEED_OPTIONS,
   HELP_ME_CHOOSE_PROMPT,
   resolveHelpMeChooseSupportOptions,

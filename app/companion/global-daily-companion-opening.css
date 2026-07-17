@@ -274,6 +274,29 @@
   color: rgba(36, 30, 24, 0.96);
 }
 
+.global-daily-opening__meaningful {
+  margin: 0.35rem 0 0.15rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(30, 79, 79, 0.22);
+  background: rgba(30, 79, 79, 0.06);
+}
+
+.global-daily-opening__meaningful-title {
+  margin: 0;
+  font-size: clamp(1.05rem, 1.7vw, 1.2rem);
+  font-weight: 750;
+  line-height: 1.35;
+  color: rgba(22, 61, 61, 0.98);
+}
+
+.global-daily-opening__meaningful-reason {
+  margin: 0.45rem 0 0;
+  font-size: clamp(0.9rem, 1.4vw, 0.98rem);
+  line-height: 1.45;
+  color: rgba(60, 52, 44, 0.9);
+}
+
 .global-daily-opening__card-explain {
   display: block;
   font-size: clamp(0.88rem, 1.35vw, 0.96rem);

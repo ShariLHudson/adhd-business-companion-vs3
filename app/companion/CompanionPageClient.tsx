@@ -315,12 +315,17 @@ import {
   offerNextHelpfulLessonExcluding,
   markHelpfulLessonOpened,
   markHelpfulLessonDismissed,
+  recommendMeaningfulStart,
+  nextMeaningfulStartRecommendation,
+  shariCueForMeaningfulStart,
   type DailyOpeningEntryPoint,
   type GlobalDailyOpeningResult,
   type DailyOpeningChoiceId,
   type HelpMeChooseNeedId,
   type HelpMeChooseSupportOption,
   type HelpfulLessonOffer,
+  type MeaningfulStartRecommendation,
+  type MeaningfulStartActionId,
 } from "@/lib/dailyOpening";
 import {
   type AdaptedDayProposal,
@@ -3478,6 +3483,11 @@ export default function CompanionPageClient() {
     useState<HelpfulLessonOffer | null>(null);
   const [dailyOpeningAdaptCheckIn, setDailyOpeningAdaptCheckIn] =
     useState(false);
+  const [dailyOpeningMeaningfulStart, setDailyOpeningMeaningfulStart] =
+    useState<{
+      recommendation: MeaningfulStartRecommendation;
+      seenIds: string[];
+    } | null>(null);
   const dailyOpeningStartedRef = useRef(false);
   const [pendingDailyOpeningEntry, setPendingDailyOpeningEntry] =
     useState<DailyOpeningEntryPoint | null>(null);
@@ -3530,6 +3540,7 @@ export default function CompanionPageClient() {
     setDailyOpeningHelpMeChoose(null);
     setDailyOpeningHelpfulLesson(null);
     setDailyOpeningAdaptCheckIn(false);
+    setDailyOpeningMeaningfulStart(null);
     setMessages([]);
     markDailyOpeningPresented();
   }, [
@@ -7420,6 +7431,7 @@ export default function CompanionPageClient() {
     setDailyOpeningHelpMeChoose(null);
     setDailyOpeningHelpfulLesson(null);
     setDailyOpeningAdaptCheckIn(false);
+    setDailyOpeningMeaningfulStart(null);
     clearPendingChoice();
   }
 
@@ -7492,11 +7504,63 @@ export default function CompanionPageClient() {
     if (action.kind === "show-help-me-choose") {
       setDailyOpeningHelpfulLesson(null);
       setDailyOpeningAdaptCheckIn(false);
+      setDailyOpeningMeaningfulStart(null);
       setDailyOpeningHelpMeChoose({ step: "needs" });
       registerHelpMeChooseNeedsPending();
       return;
     }
-    navigateDailyOpeningDestination(action.destination);
+    if (action.kind === "show-meaningful-start") {
+      setDailyOpeningHelpfulLesson(null);
+      setDailyOpeningAdaptCheckIn(false);
+      setDailyOpeningHelpMeChoose(null);
+      const recommendation = recommendMeaningfulStart();
+      setDailyOpeningMeaningfulStart({
+        recommendation,
+        seenIds: [recommendation.id],
+      });
+      return;
+    }
+    if (action.kind === "navigate") {
+      navigateDailyOpeningDestination(action.destination);
+    }
+  }
+
+  function handleMeaningfulStartAction(actionId: MeaningfulStartActionId) {
+    const current = dailyOpeningMeaningfulStart;
+    if (!current) return;
+    if (actionId === "show-another") {
+      const next = nextMeaningfulStartRecommendation(
+        current.recommendation.id,
+        current.seenIds,
+      );
+      setDailyOpeningMeaningfulStart({
+        recommendation: next,
+        seenIds: [...current.seenIds, next.id],
+      });
+      return;
+    }
+    if (actionId === "plan-more") {
+      markTodaysWelcomeDismissedThisSession();
+      setGlobalDailyOpening(null);
+      clearDailyOpeningSubViews();
+      openPlanAdaptSharedCore("plan");
+      return;
+    }
+    if (actionId === "help-me-choose") {
+      setDailyOpeningMeaningfulStart(null);
+      setDailyOpeningHelpfulLesson(null);
+      setDailyOpeningAdaptCheckIn(false);
+      setDailyOpeningHelpMeChoose({ step: "needs" });
+      registerHelpMeChooseNeedsPending();
+      return;
+    }
+    // start-this
+    const cue = shariCueForMeaningfulStart(current.recommendation);
+    markTodaysWelcomeDismissedThisSession();
+    setGlobalDailyOpening(null);
+    clearDailyOpeningSubViews();
+    setMessages([{ role: "assistant", content: cue }]);
+    focusChatInput();
   }
 
   function handleShowSomethingHelpful() {
@@ -23029,6 +23093,15 @@ export default function CompanionPageClient() {
                           openPlanAdaptSharedCore("plan");
                         }}
                       />
+                    ) : dailyOpeningMeaningfulStart ? (
+                      <TodaysWelcomeCard
+                        mode="meaningful-start"
+                        recommendation={
+                          dailyOpeningMeaningfulStart.recommendation
+                        }
+                        onAction={handleMeaningfulStartAction}
+                        onBackToToday={handleGlobalDailyBackToToday}
+                      />
                     ) : dailyOpeningHelpfulLesson ? (
                       <TodaysWelcomeCard
                         mode="show-something-helpful"
@@ -24953,6 +25026,7 @@ export default function CompanionPageClient() {
             : "chat"
         }
         onEstateMenuAction={handleEstateMenuAction}
+        onOpenAudioSettings={() => handleEstateMenuAction("experience-controls")}
         onToggleChat={toggleEstateRoomChat}
         onToggleSound={
           justBeHereSession ? toggleJustBeHereSound : undefined
