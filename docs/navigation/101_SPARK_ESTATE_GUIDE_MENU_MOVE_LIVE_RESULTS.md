@@ -30,7 +30,8 @@
 
 ## Preview
 
-- Preview commit: _(filled after commit)_
-- Authenticated preview URL: _(filled after deploy)_
+- Preview commit: `6286c6f8`
+- Authenticated preview URL: https://adhd-business-companion-vs3-c3j0a9qp8-shari-hudsons-projects.vercel.app
+- Inspector: https://vercel.com/shari-hudsons-projects/adhd-business-companion-vs3/GtvcXmEXa4fgHonzh8VDPkvLrN97
 - Overall: **unit_verified** · live authenticated **Pending** (`101` checklist)
 - Deploy recommendation: **Do not deploy production**
