@@ -3,6 +3,10 @@
 **Status:** `unit_verified` · authenticated preview rows **Pending**  
 **Do not deploy production** until authenticated live checklist passes.
 
+**Preview commit:** `fe7c7423`  
+**Authenticated preview URL:** https://adhd-business-companion-vs3-2qa6avra3-shari-hudsons-projects.vercel.app  
+**Operator:** founder sign-in required (Vercel SSO).
+
 ## Automated (this preview commit)
 
 | Suite | Result |
@@ -26,7 +30,7 @@
 
 ## Result Template
 
-- Preview commit: _(filled after commit)_
+- Preview commit: `fe7c7423`
 - Intent owner: `lib/conversationStabilization/intentClassificationGate.ts` (`processIntentWorkflowOnUserTurn`)
 - Workflow-state owner: `lib/conversationStabilization/workflowResumeDecision.ts` (`resolveWorkflowResumeDecision`)
 - Strategy Library route: Welcome Home id `strategy-library` → section/panel `playbook` (`openStrategyLibraryCore`)
