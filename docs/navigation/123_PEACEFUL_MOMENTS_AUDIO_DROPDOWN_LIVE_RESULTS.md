@@ -3,6 +3,9 @@
 **Status:** `unit_verified` · authenticated preview rows **Pending**  
 **Do not deploy production** until authenticated live checklist passes.
 
+**Preview:** https://adhd-business-companion-vs3-i575ihev1-shari-hudsons-projects.vercel.app  
+**Commit:** `87910acd`
+
 ## Owners
 
 | Concern | Owner |
