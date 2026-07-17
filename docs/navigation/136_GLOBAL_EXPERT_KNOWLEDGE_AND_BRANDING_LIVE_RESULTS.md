@@ -3,8 +3,8 @@
 **Status:** `unit_verified` · authenticated preview optional  
 **Do not deploy production** until voice spot-check feels right on preview.
 
-**Preview:** _(fill after deploy)_  
-**Commit:** _(fill after commit)_
+**Preview:** https://adhd-business-companion-vs3-ejdam0nd8-shari-hudsons-projects.vercel.app  
+**Commit:** `fa0d9fc2`
 
 ## What shipped
 
