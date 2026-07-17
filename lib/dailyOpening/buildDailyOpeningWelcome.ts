@@ -1,6 +1,6 @@
 /**
  * Warm Shari welcome copy for the Global Daily Companion Opening card.
- * Structured header: greeting title · welcome line · three-choice intro.
+ * Structured header: greeting · presence · what you can do · discovery invite.
  */
 
 import { daysSinceRelationshipStart } from "@/lib/phase3AdaptiveRelationship";
@@ -20,6 +20,8 @@ export type DailyOpeningWelcomeParts = {
   greetingTitle: string;
   welcomeLine: string;
   choicesIntro: string;
+  /** Subtle discovery line under the welcome (pairs with Show Me Something Helpful). */
+  discoveryInviteLine: string;
   /** Joined greeting for back-compat callers and sentence-count gates. */
   welcomeMessage: string;
 };
@@ -31,11 +33,18 @@ const FIRST_60_TEACHING = [
   "Spark can notice strategies that seem to help you — like shorter sessions or fewer priorities. Nothing becomes a lasting pattern unless you choose to keep it.",
 ] as const;
 
+/** @deprecated Prefer SHOW_ME_SOMETHING_HELPFUL_LABEL — discovery is a secondary action, not a fourth card. */
 export const SOMETHING_HELPFUL_TO_KNOW_TODAY =
   "Something Helpful to Know Today" as const;
 
+export const SHOW_ME_SOMETHING_HELPFUL_LABEL =
+  "Show Me Something Helpful" as const;
+
+const DISCOVERY_INVITE_LINE =
+  "I can also show you one helpful part of Spark Estate that you may not have discovered yet.";
+
 const CHOICES_INTRO =
-  "Three simple ways to begin — pick what would help most, and I'll take you there.";
+  "You can return to something already in motion, shape today around the time and energy you have, or let me help you decide what would be most useful right now.";
 
 /** Preferred name first, then legal name — first significant token only. */
 export function resolveDailyOpeningMemberFirstName(): string | null {
@@ -58,8 +67,15 @@ export function resolveDailyOpeningMomentKind(
   return "explicit-new-day";
 }
 
-function joinWelcomeParts(parts: Omit<DailyOpeningWelcomeParts, "welcomeMessage">): string {
-  return [parts.greetingTitle, parts.welcomeLine, parts.choicesIntro]
+function joinWelcomeParts(
+  parts: Omit<DailyOpeningWelcomeParts, "welcomeMessage">,
+): string {
+  return [
+    parts.greetingTitle,
+    parts.welcomeLine,
+    parts.choicesIntro,
+    parts.discoveryInviteLine,
+  ]
     .map((s) => s.trim())
     .filter(Boolean)
     .join(" ");
@@ -78,8 +94,9 @@ export function buildDailyOpeningWelcomeParts(input: {
     const parts = {
       greetingTitle: name ? `Welcome home, ${name}.` : "Welcome home.",
       welcomeLine:
-        "Your work is still here, and we do not need to catch up on everything today.",
-      choicesIntro: "Let's choose one small place to begin.",
+        "It's good to see you. Your work is still here, and you do not have to catch up on everything today.",
+      choicesIntro: CHOICES_INTRO,
+      discoveryInviteLine: DISCOVERY_INVITE_LINE,
     };
     return { ...parts, welcomeMessage: joinWelcomeParts(parts) };
   }
@@ -87,18 +104,21 @@ export function buildDailyOpeningWelcomeParts(input: {
   if (input.momentKind === "same-day-return") {
     const parts = {
       greetingTitle: name ? `Welcome back, ${name}.` : "Welcome back.",
-      welcomeLine: "I'm glad you're here.",
-      choicesIntro:
-        "Three simple ways to pick up — choose what would help most, and I'll take you there.",
+      welcomeLine:
+        "It's good to see you. You do not have to remember everything or decide it all at once.",
+      choicesIntro: CHOICES_INTRO,
+      discoveryInviteLine: DISCOVERY_INVITE_LINE,
     };
     return { ...parts, welcomeMessage: joinWelcomeParts(parts) };
   }
 
   // first-of-day + explicit new day
   const parts = {
-    greetingTitle: name ? `Good morning, ${name}.` : "Good morning.",
-    welcomeLine: "I'm glad you're here.",
+    greetingTitle: name ? `Welcome back, ${name}.` : "Welcome back.",
+    welcomeLine:
+      "It's good to see you. You do not have to remember everything or decide it all at once.",
     choicesIntro: CHOICES_INTRO,
+    discoveryInviteLine: DISCOVERY_INVITE_LINE,
   };
   return { ...parts, welcomeMessage: joinWelcomeParts(parts) };
 }

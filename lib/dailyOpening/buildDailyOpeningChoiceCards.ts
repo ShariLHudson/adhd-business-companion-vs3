@@ -1,7 +1,7 @@
 /**
  * Rich choice cards for Global Daily Companion Opening.
- * Exactly three cards — title, support lines (why/where · what/when · how),
- * optional time estimate, one Recommended.
+ * Exactly three cards — Continue / Plan or Adapt / Help Me Choose.
+ * Show Me Something Helpful is a separate secondary action (not a card).
  */
 
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
@@ -45,7 +45,7 @@ function looksLikeRawUserDump(title: string): boolean {
 }
 
 function continueCardTitle(option: CompanionContinueOption | null): string {
-  if (!option) return "Review Where You Left Off";
+  if (!option) return "Start With What Matters Today";
   const title = option.title.trim();
   if (looksLikeRawUserDump(title)) {
     const typeLabel = option.homeResumeItem?.typeLabel?.trim();
@@ -54,16 +54,17 @@ function continueCardTitle(option: CompanionContinueOption | null): string {
       if (/^(your |my |the )/i.test(typeLabel)) return `Continue ${typeLabel}`;
       return `Continue Your ${typeLabel}`;
     }
-    return "Continue Where You Left Off";
+    return "Continue Where I Left Off";
   }
   if (/^continue\b/i.test(title)) return title;
+  if (/^(return to|resume)\b/i.test(title)) return title;
   if (/^(your |my |the )/i.test(title)) return `Continue ${title}`;
-  return `Continue Your ${title}`;
+  return `Continue ${title}`;
 }
 
 function continueWhy(option: CompanionContinueOption | null): string {
   if (!option) {
-    return "A gentle place to begin when nothing specific is waiting.";
+    return "Begin with one meaningful focus when nothing specific is waiting.";
   }
   const sub = option.subtitle?.trim();
   if (sub && !/help me restart|pick up where you left off/i.test(sub)) {
@@ -72,7 +73,7 @@ function continueWhy(option: CompanionContinueOption | null): string {
   if (option.homeResumeItem?.typeLabel) {
     return `You were in the middle of ${option.homeResumeItem.typeLabel}.`;
   }
-  return "Something meaningful is still open from last time.";
+  return "Return directly to the most meaningful thing already in progress.";
 }
 
 function continueWhere(option: CompanionContinueOption | null): string {
@@ -80,9 +81,9 @@ function continueWhere(option: CompanionContinueOption | null): string {
     return "We'll open one manageable next step — no catch-up list.";
   }
   if (option.homeResumeItem?.typeLabel) {
-    return `Takes you back to your ${option.homeResumeItem.typeLabel}.`;
+    return `Takes you straight back to your ${option.homeResumeItem.typeLabel}.`;
   }
-  return "Takes you back to where you stopped.";
+  return "Takes you directly there — no extra menu.";
 }
 
 function joinExplanation(lines: string[]): string {
@@ -99,12 +100,12 @@ export function buildDailyOpeningChoiceCards(
     continueWhere(continueOption),
   ];
   const planLines = [
-    "Build today's plan or adjust it to fit your time, energy, and priorities.",
-    "Helpful when your day needs shape — or the plan you have no longer fits.",
+    "Build today's plan or adjust it around what has changed.",
+    "Uses your real day plan — Plan when empty, Adapt when one already exists.",
   ];
   const helpLines = [
-    "I'll suggest three useful next steps based on where you are today.",
-    "You choose one, and I'll take you there.",
+    "Tell me what kind of support you need right now.",
+    "I'll offer a few need-based options — not another copy of these cards.",
   ];
 
   return [

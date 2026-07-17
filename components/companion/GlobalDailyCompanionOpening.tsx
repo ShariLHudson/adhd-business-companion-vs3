@@ -4,88 +4,98 @@ import type {
   DailyOpeningChoiceCard,
   DailyOpeningChoiceId,
   DailyOpeningDiscoveryInvite,
-  HelpMeChooseSuggestion,
 } from "@/lib/dailyOpening";
 import {
-  SOMETHING_HELPFUL_TO_KNOW_TODAY,
+  SHOW_ME_SOMETHING_HELPFUL_LABEL,
   TODAYS_WELCOME_CARD_VERSION,
 } from "@/lib/dailyOpening";
-import type { PlanOrAdaptChoiceCard } from "@/lib/dailyAdaptation";
-import { PLAN_OR_ADAPT_MESSAGE } from "@/lib/dailyAdaptation";
+import type { HelpfulLesson } from "@/lib/dailyOpening/helpfulLessons/types";
+import type {
+  HelpMeChooseNeedOption,
+  HelpMeChooseSupportOption,
+} from "@/lib/dailyOpening/helpMeChooseNeeds";
+import { HELP_ME_CHOOSE_PROMPT } from "@/lib/dailyOpening/helpMeChooseNeeds";
 
 type MainProps = {
   mode: "main";
   greetingTitle?: string;
   welcomeLine?: string;
   choicesIntro?: string;
+  discoveryInviteLine?: string;
   /** Joined fallback when structured fields are omitted. */
   welcomeMessage: string;
   teachingSentence?: string | null;
   choiceCards: DailyOpeningChoiceCard[];
   discovery?: DailyOpeningDiscoveryInvite | null;
   onSelect: (choiceId: DailyOpeningChoiceId) => void;
+  onShowSomethingHelpful?: () => void;
   onDiscoveryPrimary?: () => void;
   onDiscoveryDismiss?: () => void;
 };
 
-type HelpProps = {
-  mode: "help-me-choose";
-  suggestions: HelpMeChooseSuggestion[];
-  onSelectSuggestion: (suggestion: HelpMeChooseSuggestion) => void;
+type HelpNeedsProps = {
+  mode: "help-me-choose-needs";
+  needs: readonly HelpMeChooseNeedOption[];
+  onSelectNeed: (needId: HelpMeChooseNeedOption["id"]) => void;
   onBackToToday: () => void;
 };
 
-type PlanOrAdaptProps = {
-  mode: "plan-or-adapt";
-  choices: PlanOrAdaptChoiceCard[];
-  onSelect: (choiceId: PlanOrAdaptChoiceCard["id"]) => void;
+type HelpSupportProps = {
+  mode: "help-me-choose-support";
+  prompt: string;
+  options: HelpMeChooseSupportOption[];
+  onSelectSupport: (option: HelpMeChooseSupportOption) => void;
   onBackToToday: () => void;
 };
 
-type Props = MainProps | HelpProps | PlanOrAdaptProps;
+type HelpfulLessonProps = {
+  mode: "show-something-helpful";
+  lesson: HelpfulLesson;
+  onShowMe: () => void;
+  onSomethingElse: () => void;
+  onMaybeLater: () => void;
+};
+
+type Props =
+  | MainProps
+  | HelpNeedsProps
+  | HelpSupportProps
+  | HelpfulLessonProps;
 
 /**
  * Today's Welcome Card — shared Global Daily Companion Opening.
  * Used by first-of-day, absence return, Settings → New Day, and explicit New Day.
- * Never render as plain chat text or as a fourth discovery choice.
+ * Never render Show Me Something Helpful as a fourth primary card.
  */
 export function TodaysWelcomeCard(props: Props) {
-  if (props.mode === "help-me-choose") {
-    const suggestions = props.suggestions.slice(0, 3);
-    if (suggestions.length === 0) return null;
-
+  if (props.mode === "help-me-choose-needs") {
     return (
       <section
         className="global-daily-opening todays-welcome-card"
         data-testid="todays-welcome-card"
         data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
-        data-mode="help-me-choose"
+        data-mode="help-me-choose-needs"
         aria-label="Help me choose"
       >
         <header className="global-daily-opening__header">
           <p className="global-daily-opening__eyebrow">Shari</p>
-          <h2 className="global-daily-opening__title">
-            Here Are Three Good Options
-          </h2>
+          <h2 className="global-daily-opening__title">{HELP_ME_CHOOSE_PROMPT}</h2>
           <p className="global-daily-opening__message">
-            Choose one and I&apos;ll take you there.
+            Tell me what kind of support you need — not which room to open.
           </p>
         </header>
 
         <ul className="global-daily-opening__cards">
-          {suggestions.map((suggestion) => (
-            <li key={suggestion.id} className="global-daily-opening__card-item">
+          {props.needs.map((need, index) => (
+            <li key={need.id} className="global-daily-opening__card-item">
               <button
                 type="button"
                 className="global-daily-opening__card"
-                onClick={() => props.onSelectSuggestion(suggestion)}
-                data-testid={`global-daily-hmc-${suggestion.id}`}
+                onClick={() => props.onSelectNeed(need.id)}
+                data-testid={`global-daily-hmc-need-${need.id}`}
               >
                 <span className="global-daily-opening__card-title">
-                  {suggestion.title || suggestion.label}
-                </span>
-                <span className="global-daily-opening__card-explain">
-                  {suggestion.benefit}
+                  {index + 1}. {need.label}
                 </span>
               </button>
             </li>
@@ -104,58 +114,40 @@ export function TodaysWelcomeCard(props: Props) {
     );
   }
 
-  if (props.mode === "plan-or-adapt") {
-    const choices = props.choices.slice(0, 2);
-    if (choices.length === 0) return null;
+  if (props.mode === "help-me-choose-support") {
+    const options = props.options.slice(0, 4);
+    if (options.length === 0) return null;
 
     return (
       <section
         className="global-daily-opening todays-welcome-card"
         data-testid="todays-welcome-card"
         data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
-        data-mode="plan-or-adapt"
-        aria-label="Plan or Adapt My Day"
+        data-mode="help-me-choose-support"
+        aria-label="Help me choose — next step"
       >
         <header className="global-daily-opening__header">
           <p className="global-daily-opening__eyebrow">Shari</p>
-          <h2 className="global-daily-opening__title">
-            Plan or Adapt My Day
-          </h2>
+          <h2 className="global-daily-opening__title">{props.prompt}</h2>
           <p className="global-daily-opening__message">
-            {PLAN_OR_ADAPT_MESSAGE}
+            Choose one, and I&apos;ll take you there.
           </p>
         </header>
 
-        <ul className="global-daily-opening__cards global-daily-opening__cards--two">
-          {choices.map((choice) => (
-            <li key={choice.id} className="global-daily-opening__card-item">
+        <ul className="global-daily-opening__cards">
+          {options.map((option, index) => (
+            <li key={option.id} className="global-daily-opening__card-item">
               <button
                 type="button"
-                className={[
-                  "global-daily-opening__card",
-                  choice.recommended
-                    ? "global-daily-opening__card--recommended"
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                onClick={() => props.onSelect(choice.id)}
-                data-testid={`plan-or-adapt-${choice.id}`}
-                data-recommended={choice.recommended ? "true" : "false"}
+                className="global-daily-opening__card"
+                onClick={() => props.onSelectSupport(option)}
+                data-testid={`global-daily-hmc-support-${option.id}`}
               >
-                {choice.recommended ? (
-                  <span className="global-daily-opening__recommended">
-                    Recommended
-                  </span>
-                ) : null}
                 <span className="global-daily-opening__card-title">
-                  {choice.title}
+                  {index + 1}. {option.title}
                 </span>
                 <span className="global-daily-opening__card-explain">
-                  {choice.explanation}
-                </span>
-                <span className="global-daily-opening__card-estimate">
-                  {choice.buttonLabel}
+                  {option.benefit}
                 </span>
               </button>
             </li>
@@ -168,8 +160,65 @@ export function TodaysWelcomeCard(props: Props) {
           onClick={props.onBackToToday}
           data-testid="global-daily-back-to-today"
         >
-          Back to Today&apos;s Welcome Card
+          Back to Today&apos;s Choices
         </button>
+      </section>
+    );
+  }
+
+  if (props.mode === "show-something-helpful") {
+    const { lesson } = props;
+    return (
+      <section
+        className="global-daily-opening todays-welcome-card"
+        data-testid="todays-welcome-card"
+        data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
+        data-mode="show-something-helpful"
+        aria-label="Show me something helpful"
+      >
+        <header className="global-daily-opening__header">
+          <p className="global-daily-opening__eyebrow">Shari</p>
+          <h2 className="global-daily-opening__title">
+            Here&apos;s something that may be useful
+          </h2>
+        </header>
+
+        <div
+          className="global-daily-opening__lesson"
+          data-testid="helpful-lesson-offer"
+        >
+          <p className="global-daily-opening__lesson-title">{lesson.title}</p>
+          <p className="global-daily-opening__lesson-body">
+            {lesson.shortExplanation}
+          </p>
+        </div>
+
+        <div className="global-daily-opening__discovery-actions">
+          <button
+            type="button"
+            className="global-daily-opening__discovery-primary"
+            onClick={props.onShowMe}
+            data-testid="helpful-lesson-show-me"
+          >
+            {lesson.actionLabel || "Show Me"}
+          </button>
+          <button
+            type="button"
+            className="global-daily-opening__discovery-secondary"
+            onClick={props.onSomethingElse}
+            data-testid="helpful-lesson-something-else"
+          >
+            Something Else
+          </button>
+          <button
+            type="button"
+            className="global-daily-opening__back"
+            onClick={props.onMaybeLater}
+            data-testid="helpful-lesson-maybe-later"
+          >
+            Maybe Later
+          </button>
+        </div>
       </section>
     );
   }
@@ -183,8 +232,9 @@ export function TodaysWelcomeCard(props: Props) {
   const greetingTitle = props.greetingTitle?.trim() || null;
   const welcomeLine = props.welcomeLine?.trim() || null;
   const choicesIntro = props.choicesIntro?.trim() || null;
+  const discoveryInviteLine = props.discoveryInviteLine?.trim() || null;
   const useStructuredHeader = Boolean(
-    greetingTitle || welcomeLine || choicesIntro,
+    greetingTitle || welcomeLine || choicesIntro || discoveryInviteLine,
   );
 
   return (
@@ -218,11 +268,30 @@ export function TodaysWelcomeCard(props: Props) {
                 {choicesIntro}
               </p>
             ) : null}
+            {discoveryInviteLine ? (
+              <p
+                className="global-daily-opening__discovery-invite"
+                data-testid="global-daily-discovery-invite"
+              >
+                {discoveryInviteLine}
+              </p>
+            ) : null}
           </>
         ) : (
           <p className="global-daily-opening__message">{props.welcomeMessage}</p>
         )}
       </header>
+
+      {props.onShowSomethingHelpful ? (
+        <button
+          type="button"
+          className="global-daily-opening__secondary-action"
+          onClick={props.onShowSomethingHelpful}
+          data-testid="show-me-something-helpful"
+        >
+          {SHOW_ME_SOMETHING_HELPFUL_LABEL}
+        </button>
+      ) : null}
 
       <ul className="global-daily-opening__cards">
         {cards.map((card) => {
@@ -276,21 +345,6 @@ export function TodaysWelcomeCard(props: Props) {
           );
         })}
       </ul>
-
-      {props.teachingSentence ? (
-        <aside
-          className="global-daily-opening__lesson"
-          data-testid="global-daily-teaching"
-          aria-label={SOMETHING_HELPFUL_TO_KNOW_TODAY}
-        >
-          <p className="global-daily-opening__lesson-title">
-            {SOMETHING_HELPFUL_TO_KNOW_TODAY}
-          </p>
-          <p className="global-daily-opening__lesson-body">
-            {props.teachingSentence}
-          </p>
-        </aside>
-      ) : null}
 
       {discovery ? (
         <aside

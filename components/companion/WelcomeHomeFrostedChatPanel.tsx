@@ -46,12 +46,21 @@ export function WelcomeHomeFrostedChatPanel({
   useEffect(() => {
     const el = scrollRef.current;
     if (!el || !showMessages) return;
+    // Welcome Card must open at the top so the full Shari message is readable.
+    if (welcomeSlot && showGreeting) {
+      const toTop = () => {
+        el.scrollTop = 0;
+      };
+      toTop();
+      requestAnimationFrame(() => requestAnimationFrame(toTop));
+      return;
+    }
     const revealLatestFromTop = () => {
       scrollConversationToLatestExchange(el, { behavior: "auto" });
     };
     revealLatestFromTop();
     requestAnimationFrame(() => requestAnimationFrame(revealLatestFromTop));
-  }, [conversationScrollKey, showMessages, thread, showGreeting]);
+  }, [conversationScrollKey, showMessages, thread, showGreeting, welcomeSlot]);
 
   const panelClasses = estateRoom
     ? [

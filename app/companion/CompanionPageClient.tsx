@@ -257,15 +257,24 @@ import {
   filterLegacyDailyOpeningMessages,
   isSupersededWelcomeHomeGreeting,
   GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER,
+  HELP_ME_CHOOSE_NEED_OPTIONS,
+  resolveHelpMeChooseSupportOptions,
+  registerHelpMeChooseNeedsPending,
+  registerHelpMeChooseSupportPending,
+  offerNextHelpfulLesson,
+  offerNextHelpfulLessonExcluding,
+  markHelpfulLessonOpened,
+  markHelpfulLessonDismissed,
   type DailyOpeningEntryPoint,
   type GlobalDailyOpeningResult,
-  type HelpMeChooseSuggestion,
   type DailyOpeningChoiceId,
+  type HelpMeChooseNeedId,
+  type HelpMeChooseSupportOption,
+  type HelpfulLessonOffer,
 } from "@/lib/dailyOpening";
+import { clearPendingChoice } from "@/lib/pendingChoice/manager";
 import {
-  resolvePlanOrAdaptChoices,
   type AdaptedDayProposal,
-  type PlanOrAdaptChoiceId,
 } from "@/lib/dailyAdaptation";
 import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
@@ -3376,10 +3385,18 @@ export default function CompanionPageClient() {
   /** Global Daily Companion Experience — shared three-choice opening. */
   const [globalDailyOpening, setGlobalDailyOpening] =
     useState<GlobalDailyOpeningResult | null>(null);
-  const [dailyOpeningHelpSuggestions, setDailyOpeningHelpSuggestions] =
-    useState<HelpMeChooseSuggestion[] | null>(null);
-  const [dailyOpeningPlanOrAdapt, setDailyOpeningPlanOrAdapt] =
-    useState(false);
+  const [dailyOpeningHelpMeChoose, setDailyOpeningHelpMeChoose] = useState<
+    | null
+    | { step: "needs" }
+    | {
+        step: "support";
+        needId: HelpMeChooseNeedId;
+        prompt: string;
+        options: HelpMeChooseSupportOption[];
+      }
+  >(null);
+  const [dailyOpeningHelpfulLesson, setDailyOpeningHelpfulLesson] =
+    useState<HelpfulLessonOffer | null>(null);
   const [dailyOpeningAdaptCheckIn, setDailyOpeningAdaptCheckIn] =
     useState(false);
   const dailyOpeningStartedRef = useRef(false);
@@ -3431,8 +3448,8 @@ export default function CompanionPageClient() {
       entryPoint: "explicit-new-day",
     });
     setGlobalDailyOpening(opening);
-    setDailyOpeningHelpSuggestions(null);
-    setDailyOpeningPlanOrAdapt(false);
+    setDailyOpeningHelpMeChoose(null);
+    setDailyOpeningHelpfulLesson(null);
     setDailyOpeningAdaptCheckIn(false);
     setMessages([]);
     markDailyOpeningPresented();
@@ -7300,17 +7317,18 @@ export default function CompanionPageClient() {
     setActiveSection("home");
     setActiveNav("chat");
     setGlobalDailyOpening(result.opening);
-    setDailyOpeningHelpSuggestions(null);
-    setDailyOpeningPlanOrAdapt(false);
+    setDailyOpeningHelpMeChoose(null);
+    setDailyOpeningHelpfulLesson(null);
     setDailyOpeningAdaptCheckIn(false);
     // Card owns the welcome message — do not inject it as a chat bubble.
     setMessages([]);
   }
 
   function clearDailyOpeningSubViews() {
-    setDailyOpeningHelpSuggestions(null);
-    setDailyOpeningPlanOrAdapt(false);
+    setDailyOpeningHelpMeChoose(null);
+    setDailyOpeningHelpfulLesson(null);
     setDailyOpeningAdaptCheckIn(false);
+    clearPendingChoice();
   }
 
   function navigateDailyOpeningDestination(
@@ -7342,7 +7360,6 @@ export default function CompanionPageClient() {
             resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" }),
         );
         setDailyOpeningAdaptCheckIn(true);
-        setDailyOpeningPlanOrAdapt(false);
         return;
       case "clear-my-mind":
         openClearMyMindCore();
@@ -7355,6 +7372,17 @@ export default function CompanionPageClient() {
         return;
       case "section":
         openStandaloneFocusSectionCore(destination.section);
+        return;
+      case "stay-in-chat":
+        setMessages([
+          {
+            role: "assistant",
+            content:
+              destination.cue?.trim() ||
+              "I'm here. Tell me what would help most.",
+          },
+        ]);
+        focusChatInput();
         return;
       default:
         focusChatInput();
@@ -7369,28 +7397,126 @@ export default function CompanionPageClient() {
     if (!globalDailyOpening) setGlobalDailyOpening(opening);
     const action = resolveDailyOpeningChoiceAction(choiceId, opening);
     if (action.kind === "show-help-me-choose") {
-      setDailyOpeningHelpSuggestions(action.suggestions.slice(0, 3));
-      setDailyOpeningPlanOrAdapt(false);
+      setDailyOpeningHelpfulLesson(null);
       setDailyOpeningAdaptCheckIn(false);
-      return;
-    }
-    if (action.kind === "show-plan-or-adapt") {
-      setDailyOpeningPlanOrAdapt(true);
-      setDailyOpeningHelpSuggestions(null);
-      setDailyOpeningAdaptCheckIn(false);
+      setDailyOpeningHelpMeChoose({ step: "needs" });
+      registerHelpMeChooseNeedsPending();
       return;
     }
     navigateDailyOpeningDestination(action.destination);
   }
 
-  function handlePlanOrAdaptChoice(choiceId: PlanOrAdaptChoiceId) {
-    if (choiceId === "plan-my-day") {
-      // Plan My Day — no energy/motivation interview on entry.
-      navigateDailyOpeningDestination({ kind: "plan-my-day" });
+  function handleShowSomethingHelpful() {
+    const offer = offerNextHelpfulLesson();
+    if (!offer) return;
+    setDailyOpeningHelpMeChoose(null);
+    setDailyOpeningAdaptCheckIn(false);
+    setDailyOpeningHelpfulLesson(offer);
+  }
+
+  function handleHelpfulLessonShowMe() {
+    const offer = dailyOpeningHelpfulLesson;
+    if (!offer) return;
+    markHelpfulLessonOpened(offer.lesson.id);
+    const destId = offer.lesson.destinationId;
+    setDailyOpeningHelpfulLesson(null);
+    if (!destId) {
+      navigateDailyOpeningDestination({
+        kind: "stay-in-chat",
+        cue: `${offer.lesson.title} — ${offer.lesson.shortExplanation} Want to try it together?`,
+      });
       return;
     }
-    setDailyOpeningPlanOrAdapt(false);
-    setDailyOpeningAdaptCheckIn(true);
+    if (destId === "clear-my-mind") {
+      navigateDailyOpeningDestination({ kind: "clear-my-mind" });
+      return;
+    }
+    if (destId === "plan-my-day" || destId === "parking-lot") {
+      navigateDailyOpeningDestination(
+        destId === "parking-lot"
+          ? { kind: "section", section: "parking-lot" }
+          : { kind: "plan-my-day" },
+      );
+      return;
+    }
+    if (destId === "my-business-estate") {
+      navigateDailyOpeningDestination({ kind: "business-estate" });
+      return;
+    }
+    const sectionMap: Record<string, import("@/lib/companionUi").AppSection> = {
+      reminders: "reminders",
+      rhythms: "rhythms",
+      "decision-compass": "decision-compass",
+      chamber: "chamber-of-momentum",
+      boardroom: "boardroom",
+      projects: "projects",
+      "people-i-help": "client-avatars",
+      settings: "settings",
+      journal: "growth-journal",
+      "evidence-vault": "evidence-bank",
+      guidebook: "how-do-i",
+      "peaceful-places": "life-experience",
+    };
+    const section = sectionMap[destId];
+    if (section) {
+      navigateDailyOpeningDestination({ kind: "section", section });
+      return;
+    }
+    navigateDailyOpeningDestination({
+      kind: "stay-in-chat",
+      cue: `Let me show you ${offer.lesson.title}. ${offer.lesson.shortExplanation}`,
+    });
+  }
+
+  function handleHelpfulLessonSomethingElse() {
+    const currentId = dailyOpeningHelpfulLesson?.lesson.id;
+    const next = currentId
+      ? offerNextHelpfulLessonExcluding(currentId)
+      : offerNextHelpfulLesson();
+    if (!next) {
+      setDailyOpeningHelpfulLesson(null);
+      return;
+    }
+    setDailyOpeningHelpfulLesson(next);
+  }
+
+  function handleHelpfulLessonMaybeLater() {
+    if (dailyOpeningHelpfulLesson) {
+      markHelpfulLessonDismissed(dailyOpeningHelpfulLesson.lesson.id);
+    }
+    setDailyOpeningHelpfulLesson(null);
+  }
+
+  function handleHelpMeChooseNeed(needId: HelpMeChooseNeedId) {
+    const opening =
+      globalDailyOpening ??
+      todaysWelcomeOpening ??
+      resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
+    const options = resolveHelpMeChooseSupportOptions(
+      needId,
+      opening.continueOption,
+    );
+    if (options.length === 1 && options[0]?.destination.kind === "stay-in-chat") {
+      navigateDailyOpeningDestination(options[0].destination);
+      return;
+    }
+    const prompt =
+      needId === "overwhelmed"
+        ? "What kind of overwhelm is this?"
+        : needId === "not-sure"
+          ? "We can keep this simple."
+          : "What would help most?";
+    setDailyOpeningHelpMeChoose({
+      step: "support",
+      needId,
+      prompt,
+      options,
+    });
+    registerHelpMeChooseSupportPending(options);
+  }
+
+  function handleHelpMeChooseSupport(option: HelpMeChooseSupportOption) {
+    navigateDailyOpeningDestination(option.destination);
   }
 
   function finishAdaptMyDayToPlan(_proposal: AdaptedDayProposal) {
@@ -7398,10 +7524,6 @@ export default function CompanionPageClient() {
     setGlobalDailyOpening(null);
     clearDailyOpeningSubViews();
     openPlanMyDayCore();
-  }
-
-  function handleGlobalDailyHelpSuggestion(suggestion: HelpMeChooseSuggestion) {
-    navigateDailyOpeningDestination(suggestion.destination);
   }
 
   function handleGlobalDailyDiscoveryLearn() {
@@ -22558,7 +22680,6 @@ export default function CompanionPageClient() {
                       <AdaptMyDayCheckIn
                         onBack={() => {
                           setDailyOpeningAdaptCheckIn(false);
-                          setDailyOpeningPlanOrAdapt(true);
                         }}
                         onUsePlan={finishAdaptMyDayToPlan}
                         onAdjustPlan={finishAdaptMyDayToPlan}
@@ -22570,18 +22691,27 @@ export default function CompanionPageClient() {
                           openPlanMyDayCore();
                         }}
                       />
-                    ) : dailyOpeningPlanOrAdapt ? (
+                    ) : dailyOpeningHelpfulLesson ? (
                       <TodaysWelcomeCard
-                        mode="plan-or-adapt"
-                        choices={resolvePlanOrAdaptChoices()}
-                        onSelect={handlePlanOrAdaptChoice}
+                        mode="show-something-helpful"
+                        lesson={dailyOpeningHelpfulLesson.lesson}
+                        onShowMe={handleHelpfulLessonShowMe}
+                        onSomethingElse={handleHelpfulLessonSomethingElse}
+                        onMaybeLater={handleHelpfulLessonMaybeLater}
+                      />
+                    ) : dailyOpeningHelpMeChoose?.step === "needs" ? (
+                      <TodaysWelcomeCard
+                        mode="help-me-choose-needs"
+                        needs={HELP_ME_CHOOSE_NEED_OPTIONS}
+                        onSelectNeed={handleHelpMeChooseNeed}
                         onBackToToday={handleGlobalDailyBackToToday}
                       />
-                    ) : dailyOpeningHelpSuggestions ? (
+                    ) : dailyOpeningHelpMeChoose?.step === "support" ? (
                       <TodaysWelcomeCard
-                        mode="help-me-choose"
-                        suggestions={dailyOpeningHelpSuggestions}
-                        onSelectSuggestion={handleGlobalDailyHelpSuggestion}
+                        mode="help-me-choose-support"
+                        prompt={dailyOpeningHelpMeChoose.prompt}
+                        options={dailyOpeningHelpMeChoose.options}
+                        onSelectSupport={handleHelpMeChooseSupport}
                         onBackToToday={handleGlobalDailyBackToToday}
                       />
                     ) : (
@@ -22590,11 +22720,14 @@ export default function CompanionPageClient() {
                         greetingTitle={todaysWelcomeOpening.greetingTitle}
                         welcomeLine={todaysWelcomeOpening.welcomeLine}
                         choicesIntro={todaysWelcomeOpening.choicesIntro}
+                        discoveryInviteLine={
+                          todaysWelcomeOpening.discoveryInviteLine
+                        }
                         welcomeMessage={todaysWelcomeOpening.welcomeMessage}
-                        teachingSentence={todaysWelcomeOpening.teachingSentence}
                         choiceCards={todaysWelcomeOpening.choiceCards}
                         discovery={todaysWelcomeOpening.discovery}
                         onSelect={handleGlobalDailyOpeningChoice}
+                        onShowSomethingHelpful={handleShowSomethingHelpful}
                         onDiscoveryPrimary={handleGlobalDailyDiscoveryLearn}
                         onDiscoveryDismiss={handleGlobalDailyDiscoveryDismiss}
                       />

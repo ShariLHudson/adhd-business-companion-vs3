@@ -51,10 +51,10 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       momentKind: "first-of-day",
       memberFirstName: "Shari",
     });
-    expect(message).toMatch(/glad you're here/i);
+    expect(message).toMatch(/good to see you/i);
     expect(message).toMatch(/Shari/);
     expect(message).not.toMatch(/^What would help most today\??$/i);
-    expect(countWelcomeSentences(message)).toBeLessThanOrEqual(3);
+    expect(countWelcomeSentences(message)).toBeLessThanOrEqual(6);
   });
 
   it("same-day return uses return wording", () => {
@@ -63,8 +63,8 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       memberFirstName: "Shari",
     });
     expect(message).toMatch(/welcome back/i);
-    expect(message).toMatch(/glad you're here|three simple ways/i);
-    expect(countWelcomeSentences(message)).toBeLessThanOrEqual(3);
+    expect(message).toMatch(/good to see you|already in motion/i);
+    expect(countWelcomeSentences(message)).toBeLessThanOrEqual(6);
   });
 
   it("structures the morning greeting into title, welcome, and choices intro", () => {
@@ -72,9 +72,10 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       entryPoint: "first-platform-opening",
       memberFirstName: "Sarah",
     });
-    expect(opening.greetingTitle).toBe("Good morning, Sarah.");
-    expect(opening.welcomeLine).toMatch(/glad you're here/i);
-    expect(opening.choicesIntro).toMatch(/three simple ways/i);
+    expect(opening.greetingTitle).toBe("Welcome back, Sarah.");
+    expect(opening.welcomeLine).toMatch(/good to see you/i);
+    expect(opening.choicesIntro).toMatch(/already in motion/i);
+    expect(opening.discoveryInviteLine).toMatch(/helpful part of Spark Estate/i);
     expect(opening.welcomeMessage).toContain(opening.greetingTitle);
   });
 
@@ -84,18 +85,18 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       memberFirstName: "Shari",
     });
     expect(message).toMatch(/welcome home/i);
-    expect(message).toMatch(/do not need to catch up/i);
-    expect(message).toMatch(/one small place/i);
-    expect(countWelcomeSentences(message)).toBeLessThanOrEqual(3);
+    expect(message).toMatch(/do not have to catch up|still here/i);
+    expect(message).toMatch(/already in motion|helpful part/i);
+    expect(countWelcomeSentences(message)).toBeLessThanOrEqual(6);
   });
 
-  it("resolveGlobalDailyOpening keeps the message brief", () => {
+  it("resolveGlobalDailyOpening keeps the message useful without becoming a menu", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "first-platform-opening",
       memberFirstName: "Shari",
     });
     expect(countWelcomeSentences(opening.welcomeMessage)).toBeLessThanOrEqual(
-      3,
+      6,
     );
     expect(opening.greeting).toBe(opening.welcomeMessage);
   });
@@ -203,7 +204,7 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
     );
   });
 
-  it("Plan or Adapt My Day opens the Plan-vs-Adapt choice step", () => {
+  it("Plan or Adapt My Day navigates using canonical plan state", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "settings-new-day",
     });
@@ -211,24 +212,23 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
       "plan-or-adapt-my-day",
       opening,
     );
-    expect(action).toEqual({ kind: "show-plan-or-adapt" });
+    expect(action.kind).toBe("navigate");
+    if (action.kind === "navigate") {
+      expect(
+        action.destination.kind === "plan-my-day" ||
+          action.destination.kind === "adapt-my-day",
+      ).toBe(true);
+    }
   });
 
-  it("Help Me Choose stays in place with exactly three clickable suggestions", () => {
+  it("Help Me Choose opens the need-based flow (not Welcome card duplicates)", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "settings-new-day",
     });
     const action = resolveDailyOpeningChoiceAction("help-me-choose", opening);
-    expect(action.kind).toBe("show-help-me-choose");
-    if (action.kind !== "show-help-me-choose") return;
-    expect(action.suggestions).toHaveLength(3);
-    for (const suggestion of action.suggestions) {
-      expect(suggestion.title.trim().length).toBeGreaterThan(0);
-      expect(suggestion.benefit.trim().length).toBeGreaterThan(0);
-      expect(suggestion.destination.kind).toBeTruthy();
-    }
-    const again = resolveHelpMeChooseSuggestions();
-    expect(again).toHaveLength(3);
+    expect(action).toEqual({ kind: "show-help-me-choose" });
+    expect(opening.helpMeChooseSuggestions).toEqual([]);
+    expect(resolveHelpMeChooseSuggestions()).toEqual([]);
   });
 
   it("does not ask for a second confirmation before navigating", () => {
@@ -242,9 +242,7 @@ describe("GlobalDailyCompanionOpening — navigation", () => {
     ] as const) {
       const action = resolveDailyOpeningChoiceAction(id, opening);
       expect(
-        action.kind === "navigate" ||
-          action.kind === "show-help-me-choose" ||
-          action.kind === "show-plan-or-adapt",
+        action.kind === "navigate" || action.kind === "show-help-me-choose",
       ).toBe(true);
     }
   });
@@ -351,15 +349,15 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
     expect(cards.map((c) => c.title).join(" ")).not.toMatch(
       /Help Me Restart|Check My Day/i,
     );
-    expect(cards[0]?.title).toBe("Review Where You Left Off");
+    expect(cards[0]?.title).toBe("Start With What Matters Today");
     expect(cards[1]?.title).toBe("Plan or Adapt My Day");
     expect(cards[2]?.title).toBe("Help Me Choose");
     expect(cards[0]?.supportLines?.length).toBeGreaterThanOrEqual(2);
-    expect(cards[1]?.supportLines?.join(" ")).toMatch(/when/i);
-    expect(cards[2]?.supportLines?.join(" ")).toMatch(/three useful/i);
+    expect(cards[1]?.supportLines?.join(" ")).toMatch(/plan|adapt/i);
+    expect(cards[2]?.supportLines?.join(" ")).toMatch(/support|need/i);
   });
 
-  it("renders the platform lesson section below the choices", () => {
+  it("exposes Show Me Something Helpful as a secondary action (not a fourth card)", () => {
     const { readFileSync } = require("node:fs") as typeof import("node:fs");
     const { resolve } = require("node:path") as typeof import("node:path");
     const source = readFileSync(
@@ -370,12 +368,12 @@ describe("GlobalDailyCompanionOpening — input + a11y contracts", () => {
       resolve(process.cwd(), "lib/dailyOpening/buildDailyOpeningWelcome.ts"),
       "utf8",
     );
-    expect(source).toContain("SOMETHING_HELPFUL_TO_KNOW_TODAY");
-    expect(welcome).toContain("Something Helpful to Know Today");
-    expect(source).toContain("global-daily-opening__lesson");
-    const lessonIdx = source.indexOf("global-daily-opening__lesson");
-    const cardsIdx = source.indexOf('className="global-daily-opening__cards"');
-    expect(lessonIdx).toBeGreaterThan(cardsIdx);
+    expect(source).toContain("SHOW_ME_SOMETHING_HELPFUL_LABEL");
+    expect(source).toContain("show-me-something-helpful");
+    expect(source).toContain("onShowSomethingHelpful");
+    expect(welcome).toContain("Show Me Something Helpful");
+    expect(source).toContain('mode: "show-something-helpful"');
+    expect(source).toContain("help-me-choose-needs");
   });
 
   it("never uses a raw user sentence as the continue card title", () => {

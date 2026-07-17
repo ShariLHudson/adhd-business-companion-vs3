@@ -27,6 +27,8 @@ export function buildDailyOpeningArrivalMessage(
       return "Here you are. Your Business Estate is ready when you are.";
     case "section":
       return "Here you are.";
+    case "stay-in-chat":
+      return null;
     default:
       return null;
   }

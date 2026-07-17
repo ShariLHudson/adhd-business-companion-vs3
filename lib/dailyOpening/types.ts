@@ -50,8 +50,10 @@ export type DailyOpeningDestination =
   | { kind: "section"; section: AppSection }
   | { kind: "clear-my-mind" }
   | { kind: "explore-estate" }
-  | { kind: "business-estate" };
+  | { kind: "business-estate" }
+  | { kind: "stay-in-chat"; cue?: string };
 
+/** @deprecated Legacy destination-card Help Me Choose — use need-based flow. */
 export type HelpMeChooseSuggestion = {
   id: string;
   /** Display title on the suggestion card. */
@@ -61,7 +63,7 @@ export type HelpMeChooseSuggestion = {
   /** Back-compat alias for title. */
   label: string;
   destination:
-    | Exclude<DailyOpeningDestination, { kind: "continue" }>
+    | Exclude<DailyOpeningDestination, { kind: "continue" | "stay-in-chat" }>
     | {
         kind: "continue";
         option: CompanionContinueOption;
@@ -70,8 +72,8 @@ export type HelpMeChooseSuggestion = {
 
 export type DailyOpeningChoiceAction =
   | { kind: "navigate"; destination: DailyOpeningDestination }
-  | { kind: "show-help-me-choose"; suggestions: HelpMeChooseSuggestion[] }
-  | { kind: "show-plan-or-adapt" };
+  | { kind: "show-help-me-choose" }
+  | { kind: "show-something-helpful" };
 
 export type DailyOpeningDiscoveryInvite = {
   show: boolean;
@@ -90,6 +92,8 @@ export type GlobalDailyOpeningResult = {
   welcomeLine: string;
   /** Brief explanation of the three choices. */
   choicesIntro: string;
+  /** Discovery invite line for Show Me Something Helpful. */
+  discoveryInviteLine: string;
   /** Joined greeting for older callers / sentence-count gates. */
   welcomeMessage: string;
   /** Alias of welcomeMessage for older callers. */
@@ -100,9 +104,13 @@ export type GlobalDailyOpeningResult = {
   /** Flat labels derived from choiceCards (tests / legacy). */
   choices: DailyOpeningChoice[];
   continueOption: CompanionContinueOption | null;
+  /** @deprecated Empty — Help Me Choose uses need-based flow. */
   helpMeChooseSuggestions: HelpMeChooseSuggestion[];
   discovery: DailyOpeningDiscoveryInvite;
 };
+
+export const DAILY_OPENING_CHOICE_LABELS_CONTINUE_FALLBACK =
+  "Start With What Matters Today" as const;
 
 export const DAILY_OPENING_CHOICE_LABELS: Record<
   DailyOpeningChoiceId,

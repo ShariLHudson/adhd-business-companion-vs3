@@ -21,10 +21,38 @@ export {
   resolveFirst60TeachingSentence,
   countWelcomeSentences,
   SOMETHING_HELPFUL_TO_KNOW_TODAY,
+  SHOW_ME_SOMETHING_HELPFUL_LABEL,
   type DailyOpeningMomentKind,
   type DailyOpeningWelcomeParts,
 } from "./buildDailyOpeningWelcome";
 export { buildDailyOpeningChoiceCards } from "./buildDailyOpeningChoiceCards";
+export {
+  HELP_ME_CHOOSE_NEED_OPTIONS,
+  HELP_ME_CHOOSE_PROMPT,
+  resolveHelpMeChooseSupportOptions,
+  registerHelpMeChooseNeedsPending,
+  registerHelpMeChooseSupportPending,
+  type HelpMeChooseNeedId,
+  type HelpMeChooseNeedOption,
+  type HelpMeChooseSupportOption,
+} from "./helpMeChooseNeeds";
+export {
+  offerNextHelpfulLesson,
+  offerNextHelpfulLessonExcluding,
+  listEligibleHelpfulLessons,
+} from "./helpfulLessons/resolveHelpfulLesson";
+export {
+  markHelpfulLessonOpened,
+  markHelpfulLessonDismissed,
+  clearHelpfulLessonHistoryForTests,
+  loadHelpfulLessonHistory,
+} from "./helpfulLessons/history";
+export type {
+  HelpfulLesson,
+  HelpfulLessonHistory,
+  HelpfulLessonOffer,
+} from "./helpfulLessons/types";
+export { HELPFUL_LESSON_REGISTRY } from "./helpfulLessons/registry";
 export {
   resolveDailyOpeningDiscoveryInvite,
   markDailyOpeningDiscoveryPresented,

@@ -54,7 +54,8 @@
 }
 
 .global-daily-opening__welcome-line,
-.global-daily-opening__choices-intro {
+.global-daily-opening__choices-intro,
+.global-daily-opening__discovery-invite {
   margin: 0;
   font-size: clamp(0.98rem, 1.7vw, 1.12rem);
   font-weight: 500;
@@ -64,6 +65,29 @@
 
 .global-daily-opening__choices-intro {
   color: rgba(60, 52, 44, 0.86);
+}
+
+.global-daily-opening__discovery-invite {
+  color: rgba(60, 52, 44, 0.8);
+  font-size: clamp(0.92rem, 1.5vw, 1.05rem);
+}
+
+.global-daily-opening__secondary-action {
+  align-self: flex-start;
+  margin: 0.15rem 0 0.35rem;
+  padding: 0.35rem 0.15rem;
+  border: none;
+  background: transparent;
+  color: rgba(30, 79, 79, 0.92);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.global-daily-opening__secondary-action:hover {
+  color: rgba(22, 60, 60, 1);
 }
 
 .global-daily-opening__message {

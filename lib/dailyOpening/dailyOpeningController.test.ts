@@ -201,7 +201,7 @@ describe("Global Daily Companion Experience — shared controller", () => {
     });
   });
 
-  it("Plan or Adapt My Day opens the Plan-vs-Adapt choice step", () => {
+  it("Plan or Adapt My Day navigates from canonical plan state", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "settings-new-day",
     });
@@ -209,23 +209,22 @@ describe("Global Daily Companion Experience — shared controller", () => {
       "plan-or-adapt-my-day",
       opening,
     );
-    expect(action).toEqual({ kind: "show-plan-or-adapt" });
+    expect(action.kind).toBe("navigate");
+    if (action.kind === "navigate") {
+      expect(
+        action.destination.kind === "plan-my-day" ||
+          action.destination.kind === "adapt-my-day",
+      ).toBe(true);
+    }
   });
 
-  it("Help Me Choose produces exactly three actionable suggestions that navigate on first click", () => {
+  it("Help Me Choose opens need-based flow without destination-card duplicates", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "settings-new-day",
     });
     const action = resolveDailyOpeningChoiceAction("help-me-choose", opening);
-    expect(action.kind).toBe("show-help-me-choose");
-    if (action.kind !== "show-help-me-choose") return;
-    expect(action.suggestions).toHaveLength(3);
-    for (const suggestion of action.suggestions) {
-      expect(suggestion.label.trim().length).toBeGreaterThan(0);
-      expect(suggestion.destination.kind).not.toBe("help-me-choose");
-    }
-    const again = resolveHelpMeChooseSuggestions();
-    expect(again).toHaveLength(3);
+    expect(action).toEqual({ kind: "show-help-me-choose" });
+    expect(resolveHelpMeChooseSuggestions()).toEqual([]);
   });
 
   it("marks the calendar day so first platform opening is not duplicated", () => {
