@@ -3,8 +3,8 @@
 **Status:** `unit_verified` · authenticated preview **Pending**  
 **Do not deploy production** until `141_WELCOME_CHOICES_AND_GLOBAL_SOUND_LIVE_CHECKLIST.md` passes.
 
-**Preview:** _(filled after deploy)_  
-**Commits:** _(filled after push)_
+**Preview:** https://adhd-business-companion-vs3-qgbbti9lz-shari-hudsons-projects.vercel.app  
+**Commits:** `e2b328ca`
 
 ## Root cause — Choice 1 → Plan My Day
 
