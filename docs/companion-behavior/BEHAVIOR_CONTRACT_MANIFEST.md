@@ -1,5 +1,6 @@
-# Companion Behavior Contract Manifest
+# Spark Estate Companion Behavior Foundation Manifest
 
+**Package:** Spark Estate Companion Behavior Foundation — Updated  
 **Authoritative root:** `docs/companion-behavior/`  
 **Package index:** `docs/companion-behavior/MANIFEST.json`  
 **Method:** `standards/003_REVERSE_ENGINEERING_AND_IMPLEMENTATION_METHOD.md`  
@@ -7,6 +8,12 @@
 **Release gate:** `standards/012_LIVE_BEHAVIOR_RELEASE_GATE.md`
 
 Do not duplicate these standards into `.cursor/rules/`. One source of truth.
+
+## Governing note
+
+Every visible user-facing response must comply with `standards/015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md`.
+
+The package contains one authoritative copy of each document.
 
 ---
 
@@ -74,4 +81,4 @@ Audit report for CB-007: `audits/007_NEW_CHAT_AND_CONTEXT_ISOLATION_GAP_MAP.md`
 
 ## Next contract to implement
 
-**CB-007** — authoritative temp-state clears in `resetActiveConversation` (this implementation pass). Voice on visible New Chat replies must satisfy **CB-015**. No Phase B composer migration.
+**CB-007** live preview verification (temp clears already shipped in `resetActiveConversation`). Voice on visible New Chat replies must satisfy **CB-015**. No Phase B composer migration.

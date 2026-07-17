@@ -1,5 +1,5 @@
 {
-  "package": "Spark Estate Companion Behavior Foundation",
+  "package": "Spark Estate Companion Behavior Foundation — Updated",
   "authoritative_root": "docs/companion-behavior",
   "file_count": 16,
   "structure": {
@@ -25,19 +25,35 @@
     "prompts/014_CURSOR_START_HERE_IMPLEMENTATION_PROMPT.md",
     "standards/015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md"
   ],
-  "governing_standards": [
-    "000",
-    "001",
-    "003",
-    "005",
-    "012",
-    "013",
-    "015"
+  "authoritative_standards": [
+    "000_SPARK_ESTATE_COMPANION_SUCCESS_STANDARD.md",
+    "001_COMPANION_BEHAVIOR_ENGINE_STANDARD.md",
+    "003_REVERSE_ENGINEERING_AND_IMPLEMENTATION_METHOD.md",
+    "005_FRICTION_AND_DECISION_FATIGUE_STANDARD.md",
+    "012_LIVE_BEHAVIOR_RELEASE_GATE.md",
+    "013_BEHAVIOR_LIBRARY_BUILD_ORDER.md",
+    "015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md"
   ],
+  "contracts": [
+    "002_BEHAVIOR_CONTRACT_TEMPLATE.md",
+    "006_DEFAULT_COMPETENCE_AND_PROGRESSIVE_PERSONALIZATION_CONTRACT.md",
+    "007_NEW_CHAT_AND_CONTEXT_ISOLATION_BEHAVIOR_CONTRACT.md",
+    "008_CONTINUE_WHERE_LEFT_OFF_BEHAVIOR_CONTRACT.md",
+    "009_HELP_ME_CHOOSE_NEXT_STEP_BEHAVIOR_CONTRACT.md",
+    "010_OVERWHELM_AND_TASK_FRICTION_BEHAVIOR_CONTRACT.md",
+    "011_RETURN_AFTER_ABSENCE_BEHAVIOR_CONTRACT.md"
+  ],
+  "prompts": [
+    "004_CURSOR_GLOBAL_REVERSE_ENGINEERING_PROMPT.md",
+    "014_CURSOR_START_HERE_IMPLEMENTATION_PROMPT.md"
+  ],
+  "index": "PACKAGE_INDEX.md",
   "notes": [
     "Single source of truth for Companion Behavior Foundation.",
     "Do not duplicate full standards into .cursor/rules.",
-    "CB-015 governs every visible companion reply, including New Chat greetings.",
-    "Phase A conversation decision work remains separate until contracts are audited."
+    "Every visible user-facing response must comply with 015_ONE_COMPANION_IDENTITY_AND_SHARI_VOICE_STANDARD.md.",
+    "Phase A conversation decision work remains separate until contracts are audited.",
+    "Repo audits live under docs/companion-behavior/audits/ (not part of the zip package).",
+    "Human package index: PACKAGE_INDEX.md"
   ]
 }
