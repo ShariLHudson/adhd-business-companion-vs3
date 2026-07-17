@@ -1,0 +1,47 @@
+/* Sticky return control when a destination was opened from Profile */
+
+.profile-return-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.15rem 0.65rem;
+  margin: 0 0 0.35rem;
+  background: linear-gradient(
+    180deg,
+    rgba(250, 247, 242, 0.98) 55%,
+    rgba(250, 247, 242, 0) 100%
+  );
+}
+
+.profile-return-bar__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(30, 79, 79, 0.35);
+  background: rgba(30, 79, 79, 0.1);
+  color: #163d3d;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(42, 58, 38, 0.08);
+}
+
+.profile-return-bar__button:hover {
+  background: rgba(30, 79, 79, 0.16);
+}
+
+.profile-return-bar__button:focus-visible {
+  outline: 2px solid #1e4f4f;
+  outline-offset: 2px;
+}
+
+/* Settings modal — pin return above sheet content */
+.modal-sheet .profile-return-bar,
+[data-testid="settings-panel"] .profile-return-bar {
+  margin-bottom: 0.75rem;
+}

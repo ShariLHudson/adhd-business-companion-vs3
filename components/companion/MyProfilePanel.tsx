@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import {
+  clearProfilePersonalDraft,
+  loadProfilePersonalDraft,
+  saveProfilePersonalDraft,
+} from "@/lib/profile/profilePersonalDraft";
+import {
   profileDestinationBreadcrumb,
 } from "@/lib/profile/profileDestination";
 import {
@@ -40,22 +45,52 @@ export function MyProfilePanel({
   const [introduction, setIntroduction] = useState("");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [savedHint, setSavedHint] = useState<string | null>(null);
+  const [draftReady, setDraftReady] = useState(false);
 
   useEffect(() => {
     const sync = () => {
+      const draft = loadProfilePersonalDraft();
       const prefs = getPrefs();
-      setName(prefs.name ?? "");
-      setEmail(prefs.email ?? "");
+      setName(draft?.name ?? prefs.name ?? "");
+      setEmail(draft?.email ?? prefs.email ?? "");
       setPreferredName(
-        prefs.preferredName?.trim() || prefs.name?.split(/\s+/)[0] || "",
+        draft?.preferredName ??
+          (prefs.preferredName?.trim() ||
+            prefs.name?.split(/\s+/)[0] ||
+            ""),
       );
-      setIntroduction(prefs.personalIntroduction ?? "");
+      setIntroduction(
+        draft?.introduction ?? prefs.personalIntroduction ?? "",
+      );
       setImageUrl(userProfileImageUrl());
+      setDraftReady(true);
     };
     sync();
     window.addEventListener("companion-prefs-updated", sync);
     return () => window.removeEventListener("companion-prefs-updated", sync);
   }, []);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    const prefs = getPrefs();
+    const preferredFallback =
+      prefs.preferredName?.trim() || prefs.name?.split(/\s+/)[0] || "";
+    const matchesPrefs =
+      name === (prefs.name ?? "") &&
+      email === (prefs.email ?? "") &&
+      preferredName === preferredFallback &&
+      introduction === (prefs.personalIntroduction ?? "");
+    if (matchesPrefs) {
+      clearProfilePersonalDraft();
+      return;
+    }
+    saveProfilePersonalDraft({
+      name,
+      preferredName,
+      email,
+      introduction,
+    });
+  }, [draftReady, name, preferredName, email, introduction]);
 
   const initials = userProfileInitials({
     preferredName,
@@ -70,6 +105,7 @@ export function MyProfilePanel({
       preferredName: preferredName.trim(),
       personalIntroduction: introduction.trim(),
     });
+    clearProfilePersonalDraft();
     setSavedHint("Saved for you.");
     window.setTimeout(() => setSavedHint(null), 2200);
   }
@@ -97,7 +133,13 @@ export function MyProfilePanel({
           <p className="estate-workspace__kicker">
             {profileDestinationBreadcrumb("profile-personal")}
           </p>
-          <h1 className="estate-workspace__title">My Profile</h1>
+          <h1
+            id="my-profile-heading"
+            className="estate-workspace__title"
+            tabIndex={-1}
+          >
+            My Profile
+          </h1>
           <p className="my-profile-panel__lead">
             Information about you — not your business, and not the people you
             help.

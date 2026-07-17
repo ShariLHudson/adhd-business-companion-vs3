@@ -6,7 +6,9 @@ import { MyBusinessEstatePanel } from "@/components/companion/MyBusinessEstatePa
 import { MyProfilePanel } from "@/components/companion/MyProfilePanel";
 import { PeopleIHelpPanel } from "@/components/companion/PeopleIHelpPanel";
 import { GrowthProfileRoomPanel } from "@/components/companion/GrowthProfileRoomPanel";
+import { ProfileReturnBar } from "@/components/companion/ProfileReturnBar";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
+import type { NavigationOriginContext } from "@/lib/navigationOrigin";
 import {
   canonicalizeProfileDestinationOverlay,
   isProfileDestinationOverlay,
@@ -14,6 +16,7 @@ import {
   type ProfileDestinationOverlayId,
 } from "@/lib/profile/profileDestination";
 import "@/app/companion/profile-destination-host.css";
+import "@/app/companion/profile-return-bar.css";
 
 export type ProfileDestinationHostProps = {
   destination: ProfileDestinationOverlayId | null;
@@ -25,6 +28,7 @@ export type ProfileDestinationHostProps = {
     section?: "tone" | "plan" | "notifications" | "pattern",
   ) => void;
   onOpenExperienceControls?: () => void;
+  onReturnToProfileOrigin?: (origin: NavigationOriginContext) => void;
 };
 
 /**
@@ -40,6 +44,7 @@ export function ProfileDestinationHost({
   onOpenPeopleIHelp,
   onOpenSettings,
   onOpenExperienceControls,
+  onReturnToProfileOrigin,
 }: ProfileDestinationHostProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -104,6 +109,12 @@ export function ProfileDestinationHost({
       aria-label={profileDestinationTitle(canonical)}
     >
       <main className="estate-room-main profile-destination-host__main">
+        {onReturnToProfileOrigin ? (
+          <ProfileReturnBar
+            currentDestination={canonical}
+            onReturn={onReturnToProfileOrigin}
+          />
+        ) : null}
         {content}
       </main>
     </div>,

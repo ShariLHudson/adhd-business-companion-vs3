@@ -217,12 +217,20 @@ import { ProjectHomesPrototypePanel } from "@/components/companion/projectHomes"
 import { PROJECT_HOMES_ROOM_BACKGROUND } from "@/lib/projectHomes";
 import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
 import { ProfileDestinationHost } from "@/components/companion/ProfileDestinationHost";
+import { ProfileReturnBar } from "@/components/companion/ProfileReturnBar";
 import type { ProfileDestination } from "@/lib/profile/profileDestination";
 import {
+  canonicalizeProfileDestinationOverlay,
   isProfileDestinationOverlay,
   profileDestinationForMenuAction,
   resolveProfileDestinationNavigation,
 } from "@/lib/profile/profileDestination";
+import {
+  clearNavigationOrigin,
+  consumeNavigationOrigin,
+  setNavigationOrigin,
+  type NavigationOriginContext,
+} from "@/lib/navigationOrigin";
 import {
   requestOpenEstateHowToGuide,
   type EstateHowToGuideId,
@@ -6908,11 +6916,18 @@ export default function CompanionPageClient() {
     }
 
     if (overlay === "people-i-help") {
+      if (returnToProfileOrigin()) return;
       setOverlay(null);
       return;
     }
 
+    if (overlay === "settings") {
+      closeSettingsOverlay();
+      return;
+    }
+
     if (overlay) {
+      clearNavigationOrigin();
       setOverlay(null);
       setSettingsSection(null);
       return;
@@ -10382,6 +10397,70 @@ export default function CompanionPageClient() {
     }
   }
 
+  /** Capture Profile origin before leaving for Settings / nested destinations. */
+  function captureProfileLeaveOrigin(openedDestination: string) {
+    if (!isProfileDestinationOverlay(overlay)) return null;
+    const originRoute = canonicalizeProfileDestinationOverlay(overlay);
+    if (originRoute === openedDestination) return null;
+    const main = document.querySelector(
+      ".profile-destination-host__main",
+    ) as HTMLElement | null;
+    const activeSection = document
+      .querySelector("[data-profile-section].is-active, [data-profile-section][aria-expanded='true']")
+      ?.getAttribute("data-profile-section");
+    return setNavigationOrigin({
+      originDestination: "profile",
+      originRoute,
+      originSection: activeSection ?? undefined,
+      originScrollY: main?.scrollTop ?? window.scrollY ?? 0,
+      openedDestination,
+    });
+  }
+
+  function restoreProfileScrollAndFocus(origin: NavigationOriginContext) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const main = document.querySelector(
+          ".profile-destination-host__main",
+        ) as HTMLElement | null;
+        if (main && typeof origin.originScrollY === "number") {
+          main.scrollTop = origin.originScrollY;
+        }
+        if (origin.originSection) {
+          const section = document.querySelector(
+            `[data-profile-section="${origin.originSection}"]`,
+          ) as HTMLElement | null;
+          section?.scrollIntoView?.({ block: "nearest" });
+        }
+        const heading =
+          (document.getElementById("my-profile-heading") as HTMLElement | null) ??
+          (document.querySelector(
+            ".profile-destination-host .estate-workspace__title",
+          ) as HTMLElement | null);
+        heading?.focus?.({ preventScroll: true });
+      });
+    });
+  }
+
+  function returnToProfileOrigin(
+    originInput?: NavigationOriginContext | null,
+  ) {
+    const origin = originInput ?? consumeNavigationOrigin();
+    if (!origin) return false;
+    if (originInput) clearNavigationOrigin();
+    setSettingsSection(null);
+    setOverlay(origin.originRoute);
+    restoreProfileScrollAndFocus(origin);
+    return true;
+  }
+
+  function closeSettingsOverlay() {
+    if (returnToProfileOrigin()) return;
+    setOverlay(null);
+    setSettingsSection(null);
+    setActiveNav((nav) => (nav === "settings" ? "chat" : nav));
+  }
+
   function launchPreviewTestExperience(
     target: CompanionPreviewTestLaunchTarget,
     roomId?: string,
@@ -10737,6 +10816,7 @@ export default function CompanionPageClient() {
     setPlanMyDayInitialRhythmsTab(null);
     setOverlay(null);
     setSettingsSection(null);
+    clearNavigationOrigin();
     setEstateGuideFlipbookOpen(false);
 
     recordEstateRoomTransition({
@@ -24894,14 +24974,16 @@ export default function CompanionPageClient() {
           <ModalSheet
             portaled={portaledModalSheets}
             open={overlay === "settings"}
-            onClose={() => {
-              setOverlay(null);
-              setSettingsSection(null);
-              setActiveNav((nav) => (nav === "settings" ? "chat" : nav));
-            }}
+            onClose={closeSettingsOverlay}
             title="Settings"
             theme="estate-dark"
           >
+            <div className="px-5 pt-2">
+              <ProfileReturnBar
+                currentDestination="settings"
+                onReturn={returnToProfileOrigin}
+              />
+            </div>
             <SettingsPanel
               onSignIn={openSignIn}
               initialSection={settingsSection}
@@ -25120,12 +25202,17 @@ export default function CompanionPageClient() {
         growthProfileEmphasizeTimeline={growthProfileEmphasizeTimeline}
         onClose={goBack}
         onOpenEstatePlace={handleEstateMenuAction}
-        onOpenPeopleIHelp={() => openProfileDestinationCore("people-i-help")}
+        onOpenPeopleIHelp={() => {
+          captureProfileLeaveOrigin("people-i-help");
+          openProfileDestinationCore("people-i-help");
+        }}
         onOpenSettings={(section) => {
+          captureProfileLeaveOrigin("settings");
           setSettingsSection(section ?? null);
           setOverlay("settings");
         }}
         onOpenExperienceControls={() => setExperienceControlsOpen(true)}
+        onReturnToProfileOrigin={returnToProfileOrigin}
       />
 
       {guidedFieldHelpChatOpen
