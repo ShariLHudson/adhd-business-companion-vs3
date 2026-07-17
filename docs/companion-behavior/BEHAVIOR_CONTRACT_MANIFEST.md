@@ -51,6 +51,8 @@ The package contains one authoritative copy of each document.
 | (file 022) | Cursor Audit CB-021 Advisory Handoff | `prompts/022_CURSOR_AUDIT_CB_021_ADVISORY_HANDOFF.md` |
 | CB-022 audit | Cursor Audit Global Chamber Topic Ownership | `prompts/080_CURSOR_AUDIT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP.md` |
 | CB-022 implement | Cursor Implement Global Chamber Topic Ownership Gate | `prompts/082_CURSOR_IMPLEMENT_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_GATE.md` |
+| CB-022 addendum audit | Cursor Audit Intent / Workflow / Strategy Library | `prompts/086_CURSOR_AUDIT_GLOBAL_INTENT_WORKFLOW_AND_STRATEGY_LIBRARY.md` |
+| CB-022 addendum implement | Cursor Implement Intent / Workflow / Strategy Library Gate | `prompts/087_CURSOR_IMPLEMENT_GLOBAL_INTENT_WORKFLOW_AND_STRATEGY_LIBRARY_GATE.md` |
 
 ## Behavior contracts
 
@@ -104,6 +106,7 @@ Governed by **CB-015**. CB-021 depends on CB-017. **CB-022** works with CB-017 +
 ## Next contract to implement
 
 1. **CB-007** live preview verification still required before `live_verified`.  
-2. **CB-022** — Global Chamber Topic Ownership: **gap map complete**; implement only via `prompts/082_…` after acceptance. One Conversation Engine active-topic owner for all Chamber members. Do **not** create member-specific patches.  
+2. **CB-022** — Global Chamber Topic Ownership: **implemented on preview** (`c9f80d0c`); finish authenticated `083` before production.  
+2b. **CB-022 addendum** — Intent-first / stale workflow / Strategy Library: **implemented on preview**; finish authenticated `088` before production. Preserve Strategy Library under Get Advice. Do **not** phrase-patch VA.  
 3. **CB-017** / **CB-021** (INC-001 Finance + INC-002 Content) — shared Chamber handoff path mapped; coordinate with CB-022 (topic preservation + single response owner). Voice must satisfy **CB-015**. No Phase B composer migration.  
 4. **Behavioral OS Packages 2–7** — Package 2 knowledge map complete; Package 3 conversation-engine gap map started with Content incident. Do not implement until shared boundary is approved.

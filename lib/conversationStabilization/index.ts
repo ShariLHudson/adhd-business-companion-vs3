@@ -124,3 +124,47 @@ export {
   mayNavigateToChamberMember,
   type ChamberNavigateGateResult,
 } from "./chamberNavigateGate";
+
+export {
+  type IntentWorkflowState,
+  type IntentWorkflowStatus,
+  type RequestedArtifactType,
+  type StrategyClassificationStatus,
+  type StrategyContextSnapshot,
+  type StrategyEntryMode,
+  type StrategyLibraryOpenView,
+  type WorkflowResumeDecision,
+  type WorkflowResumeReason,
+} from "./intentWorkflowTypes";
+
+export {
+  INTENT_WORKFLOW_STORAGE_KEY,
+  clearIntentWorkflow,
+  getIntentWorkflow,
+  loadIntentWorkflow,
+  patchIntentWorkflow,
+  resetIntentWorkflowStoreForTests,
+  saveIntentWorkflow,
+  setIntentWorkflowStatus,
+  setStrategyClassification,
+} from "./intentWorkflowStore";
+
+export {
+  isDocumentWorkflowRejection,
+  isExplicitDocumentContinue,
+  isExplicitStrategyContinue,
+  resolveWorkflowResumeDecision,
+} from "./workflowResumeDecision";
+
+export {
+  buildStrategyApplyOpener,
+  buildStrategyBrowseOpener,
+  buildStrategyCreateOpener,
+  buildStrategyResumeOpener,
+  classifyRequestedArtifactType,
+  detectStrategyEntryMode,
+  processIntentWorkflowOnUserTurn,
+  resolveStrategyClassification,
+  type ProcessIntentWorkflowTurnResult,
+  type StrategyTurnAction,
+} from "./intentClassificationGate";

@@ -75,6 +75,7 @@ Every visible user-facing response must comply with **CB-015**.
 | CB-017 | Audit complete — implementation not started; recommend `lib/conversationStabilization/` progression boundary |
 | CB-021 | Audit complete — implementation not started; recommend advisory orchestration before Chamber writers |
 | **CB-022** | **Implemented (preview)** — gap map + `lib/conversationStabilization/activeTopic*` + chamber navigate gate; live checklist pending authenticated preview |
+| **CB-022 addendum** | **Implemented (preview)** — intent/workflow gate + Get Advice → Strategy Library; live `088` authenticated pending |
 
 ## Behavioral Operating System (Packages 2–7)
 

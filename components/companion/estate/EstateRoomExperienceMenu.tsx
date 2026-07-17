@@ -63,6 +63,8 @@ export type EstateRoomExperienceMenuProps = {
   onOpenHallOfAccomplishments?: () => void;
   onOpenChamber?: () => void;
   onOpenBoardroom?: () => void;
+  /** Get Advice → Strategy Library (playbook / StrategiesPanel). */
+  onOpenStrategyLibrary?: () => void;
   /** @deprecated Soundscapes open a dedicated selection screen. */
   onPlaySoundscape?: (track: unknown) => void;
   backdropSurface?: "chat" | "clear-my-mind";
@@ -99,6 +101,7 @@ export function EstateRoomExperienceMenu({
   onOpenHallOfAccomplishments,
   onOpenChamber,
   onOpenBoardroom,
+  onOpenStrategyLibrary,
   onOpenBreathe,
   onOpenPeacefulPlaces,
   onOpenSoundscapes,
@@ -186,6 +189,7 @@ export function EstateRoomExperienceMenu({
           "hall-of-accomplishments": onOpenHallOfAccomplishments,
           "chamber-of-momentum": onOpenChamber,
           boardroom: onOpenBoardroom,
+          "strategy-library": onOpenStrategyLibrary,
           "explore-estate": onExploreSpark,
           "spark-estate-guide": onOpenSparkEstateGuide,
         };
@@ -209,6 +213,7 @@ export function EstateRoomExperienceMenu({
       onOpenHallOfAccomplishments,
       onOpenChamber,
       onOpenBoardroom,
+      onOpenStrategyLibrary,
       onExploreSpark,
       onOpenSparkEstateGuide,
     ],

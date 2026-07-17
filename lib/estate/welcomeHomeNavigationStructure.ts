@@ -29,6 +29,7 @@ export type WelcomeHomeNavDestinationId =
   | "hall-of-accomplishments"
   | "chamber-of-momentum"
   | "boardroom"
+  | "strategy-library"
   | "explore-estate"
   | "spark-estate-guide";
 
@@ -104,6 +105,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
     destinations: [
       { id: "chamber-of-momentum", label: "Chamber of Momentum" },
       { id: "boardroom", label: "Boardroom" },
+      { id: "strategy-library", label: "Strategy Library" },
     ],
   },
 ] as const;

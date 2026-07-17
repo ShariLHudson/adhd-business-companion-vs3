@@ -175,8 +175,9 @@ export const LEGACY_WORKSPACE_MAP: readonly LegacyWorkspaceEntry[] = [
     experienceId: "business",
     spaceId: "round-table",
     toolId: "playbook",
-    memberFacingReplacement: "Business → Strategy",
-    notes: "Was standalone Strategies workspace.",
+    memberFacingReplacement: "Get Advice → Strategy Library",
+    notes:
+      "Preserved Strategy Library. Canonical Welcome Home placement: Get Advice → Strategy Library (section playbook). Alias hard-nav open strategies → same panel.",
   },
   {
     legacyId: "decision-compass",

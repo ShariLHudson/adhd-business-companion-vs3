@@ -60,7 +60,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(verification.roomMyWorkStudioItems).toBe(3);
     expect(verification.roomFocusItems).toBe(4);
     expect(verification.roomMyStoryItems).toBe(3);
-    expect(verification.roomKnowledgeItems).toBe(2);
+    expect(verification.roomKnowledgeItems).toBe(3);
     expect(verification.roomExperiencesItems).toBe(2);
     expect(verification.excludesLibraryAndCartography).toBe(true);
     expect(verification.peacefulPlacesStayInExperiences).toBe(true);
@@ -98,7 +98,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     ).toEqual(["journal", "evidence-vault", "hall-of-accomplishments"]);
     expect(
       SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS.map((item) => item.id),
-    ).toEqual(["chamber-of-momentum", "boardroom"]);
+    ).toEqual(["chamber-of-momentum", "boardroom", "strategy-library"]);
     expect(
       SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS.map((item) => item.id),
     ).toEqual(["peaceful-places", "soundscapes"]);

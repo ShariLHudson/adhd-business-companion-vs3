@@ -11,11 +11,30 @@ const BUSINESS_CREATE_RE =
   /\b(?:create|build|write|develop|draft)\b.{0,40}\b(?:marketing|sales|launch|content|product|visibility|business)\s+strategy\b|\b(?:marketing|sales|launch|content|product|visibility)\s+strategy\b|\bstrategy\s+(?:for|to)\s+(?:market|sell|launch|grow)/i;
 
 const AMBIGUOUS_CREATE_RE =
-  /\bhow\s+(?:do\s+i|can\s+i|to)\s+create\s+(?:a\s+)?strategy\b|\bhelp\s+me\s+create\s+(?:a\s+)?strategy\b|\bcreate\s+(?:a\s+)?strategy\b/i;
+  /\bhow\s+(?:do\s+i|can\s+i|to)\s+create\s+(?:a\s+)?strategy\b|\bhelp\s+me\s+create\s+(?:a\s+)?(?:new\s+)?strategy\b|\bcreate\s+(?:a\s+)?(?:new\s+)?strategy\b/i;
+
+const CUSTOM_STRATEGY_CREATE_RE =
+  /\b(?:create|build|need)\b[\s\S]{0,48}\b(?:new\s+)?strateg(?:y|ies)\b[\s\S]{0,80}\b(?:for|about|around|with)\b/i;
+
+const ADHD_AWARE_BUSINESS_RE =
+  /\bstrateg(?:y|ies)\b[\s\S]{0,80}\badhd\b|\badhd\b[\s\S]{0,80}\bstrateg(?:y|ies)\b/i;
 
 export function classifyStrategyIntent(text: string): StrategyIntentKind {
   const t = text.trim();
   if (!t) return "ambiguous";
+  // Custom strategy with topic/people — treat as business create (not category ask).
+  if (
+    CUSTOM_STRATEGY_CREATE_RE.test(t) ||
+    (/\bstrateg(?:y|ies)\b/i.test(t) &&
+      /\b(?:business|marketing|sales|communications?|communication|va|client)\b/i.test(
+        t,
+      ))
+  ) {
+    return "business_create";
+  }
+  if (ADHD_AWARE_BUSINESS_RE.test(t) && /\bbusiness\b/i.test(t)) {
+    return "business_create";
+  }
   if (AMBIGUOUS_CREATE_RE.test(t) && !BUSINESS_CREATE_RE.test(t) && !ADHD_APPLY_RE.test(t)) {
     return "ambiguous";
   }

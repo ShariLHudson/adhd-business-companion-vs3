@@ -85,6 +85,7 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(byId["get-advice"]).toEqual([
       "Chamber of Momentum",
       "Boardroom",
+      "Strategy Library",
     ]);
   });
 

@@ -13,7 +13,14 @@ import {
 } from "./storedContentNavigation";
 import type { ConversationOwner, ResolveActiveOwnerInput } from "./types";
 import { routeTurnToOwner, type OwnerTurnRouteResult } from "./routeTurnToOwner";
-import { clearUniversalCreationSession } from "@/lib/universalCreation";
+import { clearUniversalCreationSession, loadUniversalCreationSession } from "@/lib/universalCreation";
+import {
+  classifyRequestedArtifactType,
+} from "@/lib/conversationStabilization/intentClassificationGate";
+import { getIntentWorkflow } from "@/lib/conversationStabilization/intentWorkflowStore";
+import {
+  resolveWorkflowResumeDecision,
+} from "@/lib/conversationStabilization/workflowResumeDecision";
 import {
   clearRejectedRecoveryReply,
   detectWorkflowCorrection,
@@ -124,16 +131,46 @@ export function resolveContinuityTurnGate(
     isStickyContinuityOwner(owner.kind) &&
     canOwnerHandleTurn(owner, userText)
   ) {
-    const routed = routeTurnToOwner({
-      owner,
-      userText,
-      lastAssistantText: input.lastAssistantText,
-    });
-    if (routed.kind !== "unhandled") {
-      return { action: "route_to_owner", owner, routed };
+    // CB-022 addendum — semantic resume gate before sticky UC / artifact.
+    const isCreateOwner =
+      owner.kind === "guided_workflow" || owner.kind === "artifact";
+    if (isCreateOwner) {
+      const artifactType = classifyRequestedArtifactType(userText);
+      const resume = resolveWorkflowResumeDecision({
+        userText,
+        activeOwner: owner,
+        ucSession: loadUniversalCreationSession(),
+        intentState: getIntentWorkflow(),
+        currentArtifactType: artifactType,
+      });
+      if (!resume.shouldResume) {
+        clearConversationOwner();
+        clearUniversalCreationSession();
+        clearRejectedRecoveryReply();
+        // Fall through to current intent — do not route stale document.
+      } else {
+        const routed = routeTurnToOwner({
+          owner,
+          userText,
+          lastAssistantText: input.lastAssistantText,
+        });
+        if (routed.kind !== "unhandled") {
+          return { action: "route_to_owner", owner, routed };
+        }
+        clearConversationOwner();
+      }
+    } else {
+      const routed = routeTurnToOwner({
+        owner,
+        userText,
+        lastAssistantText: input.lastAssistantText,
+      });
+      if (routed.kind !== "unhandled") {
+        return { action: "route_to_owner", owner, routed };
+      }
+      // Stale domain record — clear pointer and fall through.
+      clearConversationOwner();
     }
-    // Stale domain record — clear pointer and fall through.
-    clearConversationOwner();
   }
 
   if (!input.suppressDestination) {

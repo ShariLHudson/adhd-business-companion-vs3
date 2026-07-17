@@ -3,6 +3,7 @@
  */
 
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
+import { isEmailAutomationOrInboxHelpRequest } from "@/lib/estate/emailAutomationHelp";
 import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { isVisualStructureExecution } from "@/lib/visualStructureRouting";
@@ -43,7 +44,11 @@ const ARTIFACT_INFERENCE: ReadonlyArray<{
   { re: /\bnewsletter\b/i, type: "newsletter" },
   { re: /\b(?:an? )?sop\b|standard operating procedure\b/i, type: "sop" },
   { re: /\bproposal\b/i, type: "proposal" },
-  { re: /\b(?:an? )?email\b/i, type: "email" },
+  // Require writing intent — bare "email" / "email system" is NOT Create.
+  {
+    re: /\b(?:write|draft|compose|send|craft)\b.{0,48}\b(?:an?\s+)?e-?mails?\b|\b(?:an?\s+)?e-?mail\s+to\b|\bhelp me (?:write|draft|compose)\b.{0,36}\be-?mails?\b/i,
+    type: "email",
+  },
   { re: /\bcourse\b/i, type: "course" },
 ];
 
@@ -58,14 +63,34 @@ export function inferDocumentTypeFromCreateText(
   return null;
 }
 
+/** Strategy Library / strategy builder — not Universal Creation document. */
+export function isStrategyCreateOrLibraryRequest(userText: string): boolean {
+  const t = userText.trim();
+  if (!t) return false;
+  if (!/\bstrateg(?:y|ies|ic)\b/i.test(t)) return false;
+  // Explicit non-strategy documents that merely mention strategy language later.
+  if (
+    /\b(?:create|write|draft|compose)\b[\s\S]{0,36}\b(?:letter|proposal|newsletter|sop)\b/i.test(
+      t,
+    ) &&
+    !/\bstrateg(?:y|ies)\b/i.test(t)
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function isSimpleCreateRequest(userText: string): boolean {
   const t = userText.trim();
   if (!t || EXPLICIT_ROOM_NAV_RE.test(t)) return false;
+  if (isEmailAutomationOrInboxHelpRequest(t)) return false;
   if (isKnowledgeQuestion(t)) return false;
   if (isProjectCreationIntent(t)) return false;
   if (isDevelopmentWorkFrustration(t)) return false;
   if (isVisualStructureExecution(t)) return false;
   if (isGoogleSheetWorthyRequest(t)) return false;
+  // CB-022 addendum — strategy ≠ document create.
+  if (isStrategyCreateOrLibraryRequest(t)) return false;
   if (SIMPLE_CREATE_VERB_RE.test(t)) return true;
   const inferred = inferDocumentTypeFromCreateText(t);
   if (

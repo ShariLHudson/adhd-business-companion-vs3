@@ -493,11 +493,6 @@ import {
 } from "@/lib/strategyApplyCoach";
 import { pickActiveProjectName } from "@/lib/strategyApplyOptions";
 import {
-  classifyStrategyIntent,
-  parseStrategyDisambiguationChoice,
-  strategyDisambiguationMessage,
-} from "@/lib/strategyRouting";
-import {
   resolveStrategyOpenFromChat,
   strategyOpenAck,
   type StrategyOpenTarget,
@@ -1163,6 +1158,7 @@ import {
 import {
   clearConversationOwner,
   continuityOwnerHintForChat,
+  getActiveConversationOwner,
   resolveContinuityTurnGate,
   setActiveConversationOwner,
 } from "@/lib/conversationContinuity";
@@ -2187,8 +2183,10 @@ import {
   logConversationDecision,
   markActiveTopicAnswered,
   processActiveTopicOnUserTurn,
+  processIntentWorkflowOnUserTurn,
   shouldAllowChamberKernelExemption,
   type ProcessActiveTopicTurnResult,
+  type ProcessIntentWorkflowTurnResult,
 } from "@/lib/conversationStabilization";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
@@ -2746,6 +2744,10 @@ export default function CompanionPageClient() {
   activeChamberMemberIdRef.current = activeChamberMemberId;
   /** CB-022 — result of processActiveTopicOnUserTurn for the in-flight send. */
   const activeTopicTurnRef = useRef<ProcessActiveTopicTurnResult | null>(null);
+  /** CB-022 addendum — intent / workflow resume gate for the in-flight send. */
+  const intentWorkflowTurnRef = useRef<ProcessIntentWorkflowTurnResult | null>(
+    null,
+  );
   /** Message index before the current Chamber member thread began. */
   const chamberThreadStartIndexRef = useRef<number | null>(null);
   const previousSectionForChamberRef = useRef<AppSection | null>(null);
@@ -11269,6 +11271,27 @@ export default function CompanionPageClient() {
     setDecisionCompassPrefill(null);
   }
 
+  /** Get Advice → Strategy Library (canonical Welcome Home destination). */
+  function openStrategyLibraryCore(opts?: {
+    openView?: "home" | "adhd" | "business" | "saved" | "recommended";
+    strategyId?: string;
+  }) {
+    setActiveSection("home");
+    activeSectionRef.current = "home";
+    setActiveNav("playbook");
+    patchWorkspacePanel("playbook");
+    setCompanionStandaloneSection(null);
+    setWorkspaceFirstSplit(false);
+    applyChatLayoutMode("split");
+    revealWorkspace();
+    setCoachingMode("playbook");
+    setStrategyPanelCommand({
+      key: Date.now(),
+      openView: opts?.openView ?? "home",
+      strategyId: opts?.strategyId,
+    });
+  }
+
   function startBusinessStrategyBuilder(typeLabel: string) {
     setBusinessStrategyDraft(null);
     setStrategyApplySession(null);
@@ -13078,6 +13101,30 @@ export default function CompanionPageClient() {
       activeChamberMemberId: activeChamberMemberIdRef.current,
     });
 
+    // CB-022 addendum — intent-first + WorkflowResumeDecision before Continuity/UC.
+    const continuityOwnerPeek = getActiveConversationOwner({
+      activeSection: activeSectionRef.current,
+    });
+    intentWorkflowTurnRef.current = processIntentWorkflowOnUserTurn({
+      userText: trimmed,
+      turn: chatTurnRef.current,
+      activeOwner: continuityOwnerPeek,
+      ucSession: loadUniversalCreationSession(),
+      hasActiveStrategySession: Boolean(
+        businessStrategySessionRef.current ||
+          (strategyApplySessionRef.current &&
+            strategyApplySessionRef.current.phase !== "done"),
+      ),
+    });
+    if (intentWorkflowTurnRef.current.invalidateStaleDocumentWorkflow) {
+      clearConversationOwner();
+      clearUniversalCreationSession();
+    }
+    setStrategyDisambiguationPending(
+      intentWorkflowTurnRef.current.strategyAction?.needsClassificationAsk ===
+        true,
+    );
+
     const confirmationReply =
       isConfirmationAcceptance(trimmed) || isConfirmationDecline(trimmed);
     if (!confirmationReply) {
@@ -13143,6 +13190,84 @@ export default function CompanionPageClient() {
     let primaryTurnDecision: PrimaryTurnDecision | null = null;
 
     try {
+    /**
+     * CB-022 addendum — Strategy Library / strategy modes claim the turn before
+     * Continuity sticky UC and CREATE fast path. One Shari response owner.
+     */
+    const intentWf = intentWorkflowTurnRef.current;
+    if (intentWf?.strategyAction) {
+      const action = intentWf.strategyAction;
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+
+      if (action.openLibrary) {
+        openStrategyLibraryCore({
+          openView: action.openView,
+        });
+      }
+
+      if (action.startBusinessBuilder) {
+        setBusinessStrategyDraft(null);
+        setStrategyApplySession(null);
+        clearStrategyApplySession();
+        const { session } = bootstrapBusinessStrategySession(
+          action.builderLabel ?? "Business Strategy",
+        );
+        setBusinessStrategySession(session);
+      }
+
+      if (action.startApplyCoach) {
+        const applyId = "shrink-first-step";
+        setBusinessStrategyDraft(null);
+        setBusinessStrategySession(null);
+        const boot = bootstrapStrategyApplySession(applyId, {
+          activeProjectName: pickActiveProjectName(),
+        });
+        if (boot) {
+          setStrategyApplySession(boot.session);
+          saveStrategyApplySession(boot.session, { workspacePanelOpen: true });
+          openStrategyLibraryCore({
+            openView: action.openView ?? "adhd",
+            strategyId: applyId,
+          });
+        }
+      }
+
+      setStrategyDisambiguationPending(action.needsClassificationAsk);
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: action.reply },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      recordPrimaryTurnResponse(action.reply);
+      markAssistantReplied(chatTurnState);
+      logConversationPipelineDiagnostic({
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        detectedIntent: "STRATEGY",
+        kernelHandled: false,
+        informationalChatBypass: true,
+        estateKernelForced: false,
+        taskLockBlocksEstate: true,
+        selectedHandler: `intent_workflow:strategy_${action.mode}`,
+        turnOwner: "shari",
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        primaryType: "TASK_REQUEST",
+        primaryOwner: "shari",
+        primaryConfidence: "high",
+      });
+      finishEarlyChatTurn("intent_workflow:strategy");
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     /**
      * Continuity ownership gate (Slice 2) — before primary / Decision Engine /
      * navigation / generic recovery. Active owner receives the turn unless the
@@ -13843,6 +13968,7 @@ export default function CompanionPageClient() {
 
     if (
       !continuityLocksBroadRouting &&
+      !intentWorkflowTurnRef.current?.blockCreateFastPath &&
       (isSimpleCreateRequest(trimmed) || universalCreationContinuation)
     ) {
       const createRouting = resolveIntentRouting({
@@ -14574,64 +14700,9 @@ export default function CompanionPageClient() {
       }
     }
 
-    if (strategyDisambiguationPending) {
-      const choice = parseStrategyDisambiguationChoice(trimmed);
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (choice === "business_create") {
-        setStrategyDisambiguationPending(false);
-        setMessages((prev) => [...prev, userMessage]);
-        setInput("");
-        startBusinessStrategyBuilder("Business Strategy");
-        return;
-      }
-      if (choice === "adhd_apply") {
-        setStrategyDisambiguationPending(false);
-        setMessages((prev) => [
-          ...prev,
-          userMessage,
-          {
-            role: "assistant",
-            content:
-              "Got it — **ADHD strategy to use now**. Open the **ADHD Strategies** dropdown and pick one, or tell me what's happening (focus, overwhelm, deciding, getting started…).",
-          },
-        ]);
-        setInput("");
-        return;
-      }
-    }
-
-    if (
-      workspacePanel === "playbook" &&
-      !strategyDisambiguationPending &&
-      classifyStrategyIntent(trimmed) === "business_create"
-    ) {
-      const userMessage: Message = { role: "user", content: trimmed };
-      setMessages((prev) => [...prev, userMessage]);
-      setInput("");
-      const typeMatch = trimmed.match(
-        /\b(marketing|sales|launch|content|product|visibility)\b/i,
-      );
-      const label = typeMatch
-        ? `${typeMatch[1]!.charAt(0).toUpperCase()}${typeMatch[1]!.slice(1).toLowerCase()} Strategy`
-        : "Business Strategy";
-      startBusinessStrategyBuilder(label);
-      return;
-    }
-
-    if (
-      /\bstrateg/i.test(trimmed) &&
-      /\b(?:create|how\s+do)/i.test(trimmed)
-    ) {
-      const userMessage: Message = { role: "user", content: trimmed };
-      setMessages((prev) => [
-        ...prev,
-        userMessage,
-        { role: "assistant", content: strategyDisambiguationMessage() },
-      ]);
-      setStrategyDisambiguationPending(true);
-      setInput("");
-      return;
-    }
+    // Strategy create / browse / apply / resume + classification are owned by
+    // processIntentWorkflowOnUserTurn (early in this send). Do not re-ask or
+    // re-enter Create Document from the late CPC strategy regex.
 
     const applySession = strategyApplySessionRef.current;
     const applyWorkflowActive =
@@ -24697,6 +24768,7 @@ export default function CompanionPageClient() {
         onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
         onOpenChamber={() => openChamberOfMomentumCore()}
         onOpenBoardroom={() => openBoardroomCore()}
+        onOpenStrategyLibrary={() => openStrategyLibraryCore()}
         onOpenBreathe={() => openBreatheOverlayCore()}
         onOpenPeacefulPlaces={() => openPeacefulPlacesCore({ animate: true })}
         onOpenSoundscapes={() => setSoundscapeSelectionOpen(true)}
