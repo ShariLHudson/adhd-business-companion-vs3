@@ -16,6 +16,17 @@ import {
   isStaleCreateOpener,
 } from "./builderKickoff";
 import {
+  createGuidedOpenerForType,
+  isBannedCreateReflectivePrompt,
+} from "./createGuidedConversation189";
+import { tryConversationRepair } from "./conversationRepairClarificationIntelligence";
+import {
+  applyGroundedAcknowledgement,
+  deliverConversationalResponse,
+} from "./conversationalIntelligence";
+import { runConversationQualityAndRhythm } from "./conversationQualityRhythmIntelligence";
+import { enforceHumanConversationGate } from "./humanConversationValidator";
+import {
   advanceAfterItemPick,
   advanceAfterDiscoveryAnswer,
   advanceToDiscovery,
@@ -706,16 +717,68 @@ export function bootstrapCreateBuilderSession(
 }
 
 function formatBuilderOpener(typeLabel: string, firstQuestion?: string): string {
-  const display = userFacingCreateTypeLabel(typeLabel) ?? typeLabel;
-  const intro =
-    `Let's think through your **${display}** together — no rush to draft.\n\n` +
-    `We'll explore the idea first; the workspace fills as you approve decisions.`;
+  const guided = createGuidedOpenerForType(typeLabel);
   if (firstQuestion?.trim()) {
-    const q = firstQuestion.trim();
-    return `${intro}\n\n**${q}**`;
+    const q = firstQuestion.replace(/\*\*/g, "").trim();
+    if (q && !isBannedCreateReflectivePrompt(q) && !guided.includes(q)) {
+      const display = userFacingCreateTypeLabel(typeLabel) ?? typeLabel;
+      return `We can build that ${display} together. ${q}`;
+    }
   }
-  const article = /^[aeiou]/i.test(display) ? "an" : "a";
-  return `${intro}\n\nWhat should we explore first for ${article} **${display}**?`;
+  return guided;
+}
+
+/** CRCI → CI → CQRI polish for Create replies (never RCI as question engine). */
+function polishCreateReply(
+  draft: string,
+  userText: string,
+  lastAssistantText: string,
+  opts?: { repairActive?: boolean },
+): string {
+  if (!draft.trim()) return draft;
+  const messages = [
+    ...(lastAssistantText.trim()
+      ? [{ role: "assistant" as const, content: lastAssistantText.trim() }]
+      : []),
+    { role: "user" as const, content: userText },
+  ];
+  const delivered = deliverConversationalResponse({
+    experienceId: "create",
+    draftText: draft,
+    userText,
+    responseKind: opts?.repairActive ? "clarification" : "other",
+    preferBrevity: true,
+    recentAssistantTexts: lastAssistantText.trim()
+      ? [lastAssistantText.trim()]
+      : [],
+  });
+  // Package 191 — grounded acknowledgement after CI, before CQRI.
+  const grounded = applyGroundedAcknowledgement({
+    draftText: delivered.text,
+    userText,
+    seed: userText.length + delivered.text.length,
+  });
+  const cqri = runConversationQualityAndRhythm({
+    experienceId: "create",
+    userText,
+    messages,
+    draftText: grounded.text,
+    responseKind: opts?.repairActive ? "repair" : "other",
+    repairActive: Boolean(opts?.repairActive),
+    thinkingMap: null,
+    recentPhraseUsage: lastAssistantText.trim()
+      ? [lastAssistantText.trim()]
+      : [],
+  });
+  // Package 209 — Human Conversation Validator before Create delivery
+  const hcv = enforceHumanConversationGate({
+    draftText: cqri.approvedText,
+    userText,
+    messages,
+    repairActive: Boolean(opts?.repairActive),
+    experienceId: "create",
+  });
+  return hcv.text;
 }
 
 export type CreateBuilderTurnResult = {
@@ -746,13 +809,35 @@ export function processCreateBuilderTurn(
     return { session, reply: "" };
   }
 
+  // CRCI — clarify confusion before advancing blueprint questions (package 189).
+  if (lastAssistantText.trim()) {
+    const repair = tryConversationRepair({
+      experienceId: "create",
+      userText: trimmed,
+      messages: [
+        { role: "assistant", content: lastAssistantText.trim() },
+        { role: "user", content: trimmed },
+      ],
+      previousAssistantText: lastAssistantText,
+    });
+    if (repair.needsRepair && repair.assistantText) {
+      return {
+        session,
+        reply: polishCreateReply(repair.assistantText, trimmed, lastAssistantText, {
+          repairActive: true,
+        }),
+      };
+    }
+  }
+
   if (session.phase === "pick-type") {
     const type = resolveBuilderType(trimmed);
     if (!type) {
+      // One clarifying question — blueprint selection, not reflective exploration.
       return {
         session,
         reply:
-          "Pick one from the dropdown — for example **Marketing Plan**, **Workshop**, **Lead Magnet**, or **SOP**.",
+          "Will people receive this before they buy, after they join, or both? Or tell me the creation type in a few words.",
       };
     }
     const next: CreateBuilderSession = {
@@ -761,6 +846,7 @@ export function processCreateBuilderTurn(
       phase: "discovery",
     };
     const first = discoveryQuestionsForState(type, next.workflow);
+    // Blueprint opener stays intact — CQRI must not strip the required question.
     return {
       session: next,
       reply: formatBuilderOpener(type, first?.prompt),

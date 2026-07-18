@@ -155,11 +155,12 @@ describe("createBuilderChat", () => {
     expect(discoveryReadyForDraft("Lead Magnet", session.workflow)).toBe(true);
   });
 
-  it("opens SOP builder with collaborative opener and first question", () => {
+  it("opens SOP builder with practical blueprint opener and first question", () => {
     const { session, opener } = bootstrapCreateBuilderSession("SOP");
     expect(session.phase).toBe("discovery");
-    expect(opener).toContain("Let's think through your **SOP** together");
+    expect(opener).toMatch(/We can build that SOP together/i);
     expect(opener).toContain("What process are we documenting?");
+    expect(opener).not.toMatch(/workspace fills/i);
   });
 
   it("requires approval before advancing SOP discovery", () => {
@@ -174,9 +175,9 @@ describe("createBuilderChat", () => {
     expect(turn.reply).toContain("Who performs");
   });
 
-  it("Newsletter opens collaboratively and asks for approval", () => {
+  it("Newsletter opens with blueprint question and asks for approval", () => {
     const { session, opener } = bootstrapCreateBuilderSession("Newsletter");
-    expect(opener).toContain("Let's think through your **Newsletter** together");
+    expect(opener).toMatch(/We can build that Newsletter together/i);
     const after = approveWith(
       answerWithApproval(session, "Perfectionism traps for founders"),
       "yes",
