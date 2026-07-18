@@ -33,6 +33,7 @@ export type EstateTopRightChromeProps = {
   onOpenCreateStudio?: () => void;
   onOpenClearMyMind?: () => void;
   onOpenParkingLot?: () => void;
+  onOpenTalkItOut?: () => void;
   onOpenSpinTheWheel?: () => void;
   onOpenDestinationGallery?: () => void;
   onOpenCartographersStudio?: () => void;
@@ -78,6 +79,7 @@ export function EstateTopRightChrome({
   onOpenCreateStudio,
   onOpenClearMyMind,
   onOpenParkingLot,
+  onOpenTalkItOut,
   onOpenSpinTheWheel,
   onOpenDestinationGallery,
   onOpenCartographersStudio,
@@ -131,6 +133,7 @@ export function EstateTopRightChrome({
           onOpenCreateStudio={onOpenCreateStudio}
           onOpenClearMyMind={onOpenClearMyMind}
           onOpenParkingLot={onOpenParkingLot}
+          onOpenTalkItOut={onOpenTalkItOut}
           onOpenSpinTheWheel={onOpenSpinTheWheel}
           onOpenDestinationGallery={onOpenDestinationGallery}
           onOpenCartographersStudio={onOpenCartographersStudio}

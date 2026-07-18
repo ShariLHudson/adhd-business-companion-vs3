@@ -49,6 +49,8 @@ export type AppSection =
   | "client-avatars"
   | "how-do-i"
   | "decision-compass"
+  /** Reflective thinking — one situation, one question at a time. */
+  | "talk-it-out"
   | "today"
   | "plan-my-day"
   /** Shared My Day window — Plan My Day / Adapt My Day. */
@@ -246,6 +248,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "visual-focus":
     case "destination-gallery":
     case "welcome-room":
+    case "talk-it-out":
       return "other";
     case "brain-dump":
       return "clear-my-mind";

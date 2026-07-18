@@ -22,6 +22,7 @@ export const ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS = [
   "reminders-rhythms",
   "calendar",
   "parking-lot",
+  "talk-it-out",
   "spin-wheel",
   "focus-audio",
   "games",

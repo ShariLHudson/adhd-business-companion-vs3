@@ -58,6 +58,7 @@ export type EstateRoomExperienceMenuProps = {
   onOpenCartographersStudio?: () => void;
   onOpenClearMyMind?: () => void;
   onOpenParkingLot?: () => void;
+  onOpenTalkItOut?: () => void;
   onOpenSpinTheWheel?: () => void;
   onOpenBreathe?: () => void;
   onOpenPeacefulPlaces?: () => void;
@@ -102,6 +103,7 @@ export function EstateRoomExperienceMenu({
   onOpenCreateStudio,
   onOpenClearMyMind,
   onOpenParkingLot,
+  onOpenTalkItOut,
   onOpenSpinTheWheel,
   onOpenDestinationGallery,
   onOpenCartographersStudio,
@@ -221,6 +223,7 @@ export function EstateRoomExperienceMenu({
           "cartographers-studio": onOpenCartographersStudio,
           "clear-my-mind": onOpenClearMyMind,
           "parking-lot": onOpenParkingLot,
+          "talk-it-out": onOpenTalkItOut,
           breathe: onOpenBreathe,
           "spin-the-wheel": onOpenSpinTheWheel,
           "peaceful-places": onOpenPeacefulPlaces,
@@ -247,6 +250,7 @@ export function EstateRoomExperienceMenu({
       onOpenCartographersStudio,
       onOpenClearMyMind,
       onOpenParkingLot,
+      onOpenTalkItOut,
       onOpenBreathe,
       onOpenSpinTheWheel,
       onOpenPeacefulPlaces,
@@ -368,12 +372,23 @@ export function EstateRoomExperienceMenu({
         type="button"
         role="menuitem"
         className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
-        aria-label={`Open ${dest.label}`}
+        aria-label={
+          dest.supportLine
+            ? `Open ${dest.label}. ${dest.supportLine}`
+            : `Open ${dest.label}`
+        }
         data-testid={`estate-open-${dest.id}`}
         onClick={() => closeAndRun(action)}
       >
-        <span className="estate-room-experience-menu__item-label">
-          {dest.label}
+        <span className="estate-room-experience-menu__item-copy">
+          <span className="estate-room-experience-menu__item-label">
+            {dest.label}
+          </span>
+          {dest.supportLine ? (
+            <span className="estate-room-experience-menu__item-support">
+              {dest.supportLine}
+            </span>
+          ) : null}
         </span>
         {dest.selectionExperience ? (
           <span

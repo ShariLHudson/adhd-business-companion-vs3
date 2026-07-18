@@ -32,12 +32,44 @@ export const HOW_DO_I_OPEN_LABELS: Partial<Record<AppSection, string>> = {
   focus: "Open Focus",
   "templates-library": "Open Templates",
   "brain-dump": "Open Clear My Mind",
+  "talk-it-out": "Open Talk It Out",
   energy: "Open Today's Reality",
   "business-profile": "Open Business Profile",
   settings: "Open Settings",
 };
 
 export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
+  {
+    id: "talk-it-out",
+    title: "Talk It Out",
+    question: "How do I talk something through with Shari?",
+    whatItIs:
+      "Talk through one situation in your own words. Shari asks thoughtful questions, notices what may matter, and helps you hear your own thinking — without rushing to advice.",
+    whenToUse:
+      "When you are unsure what you think, torn between feelings, replaying a situation, or not ready for formal decision analysis.",
+    steps: [
+      "Open Talk It Out.",
+      "Start in your own words — no need to organize first.",
+      "Answer one question at a time.",
+      "Pause, save a discovery, or end whenever you want.",
+      "Ask for another kind of help only if you want it.",
+    ],
+    keywords: [
+      "talk it out",
+      "talk through",
+      "think out loud",
+      "reflective",
+      "one question",
+      "help me think",
+      "unsure what i think",
+      "torn",
+      "replaying",
+      "not ready to decide",
+    ],
+    openSection: "talk-it-out",
+    openLabel: "Open Talk It Out",
+    askPrompt: "I want to talk something through — one question at a time.",
+  },
   {
     id: "decision-compass",
     title: "ADHD Decision Compass",
@@ -604,6 +636,7 @@ export type HowDoITopicGroup = {
 };
 
 const HOW_DO_I_TOPIC_GROUP_BY_ENTRY: Record<string, HowDoITopicGroupId> = {
+  "talk-it-out": "decisions",
   "decision-compass": "decisions",
   "create-strategy": "strategies",
   "use-strategies": "strategies",

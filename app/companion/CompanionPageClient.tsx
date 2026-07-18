@@ -189,6 +189,18 @@ const ParkingLotRoomPanel = dynamic(
     ),
   },
 );
+const TalkItOutPanel = dynamic(
+  () =>
+    import("@/components/companion/TalkItOutPanel").then((mod) => ({
+      default: mod.TalkItOutPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Talk It Out…" size="md" />
+    ),
+  },
+);
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -7604,6 +7616,10 @@ export default function CompanionPageClient() {
       navigateDailyOpeningDestination({ kind: "clear-my-mind" });
       return;
     }
+    if (destId === "talk-it-out") {
+      openTalkItOutCore();
+      return;
+    }
     if (destId === "parking-lot") {
       navigateDailyOpeningDestination({
         kind: "section",
@@ -8442,6 +8458,10 @@ export default function CompanionPageClient() {
 
   /** Walk user from How Do I into a tool — chat left with coach opener, workspace right. */
   function openHowDoIToolWalkthrough(targetSection: AppSection) {
+    if (targetSection === "talk-it-out") {
+      openTalkItOutCore();
+      return;
+    }
     setCrossWorkspaceBesideOffer(null);
     setGuideBesideSession(null);
     setCompanionStandaloneSection(null);
@@ -9235,6 +9255,19 @@ export default function CompanionPageClient() {
    * Parking Lot — dedicated estate room (Focus).
    * Never opens Plan My Day, Clear My Mind, Reminders, Settings, or Create.
    */
+  /**
+   * Talk It Out — reflective thinking (own experience, not Decision Compass / Journal / CMM).
+   */
+  function openTalkItOutCore(_options?: { skipCapture?: boolean }) {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    trackWorkspaceEcosystemEvent("talk-it-out");
+    noteWorkspaceOpened("talk-it-out", "standalone_room");
+    openStandaloneFocusSectionCore("talk-it-out");
+  }
+
   function openParkingLotCore() {
     leaveClearMyMindIfNavigatingAway();
     if (!confirmLeaveUnsavedWork()) return;
@@ -11154,6 +11187,10 @@ export default function CompanionPageClient() {
         if (action.toolId === "mind-map") {
           saveBrainDumpVisualVisible(true);
           saveBrainDumpVisualView("mindmap");
+        }
+        if (action.section === "talk-it-out") {
+          openTalkItOutCore();
+          break;
         }
         if (action.section === "decision-compass") {
           openDecisionCompass();
@@ -22902,6 +22939,7 @@ export default function CompanionPageClient() {
                   activeSection === "reminders-rhythms" ||
                   activeSection === "calendar" ||
                   activeSection === "parking-lot" ||
+                  activeSection === "talk-it-out" ||
                   activeSection === "spin-wheel" ||
                   activeSection === "create" ||
                   activeSection === "playbook"
@@ -22937,6 +22975,7 @@ export default function CompanionPageClient() {
           activeSection === "reminders-rhythms" ||
           activeSection === "calendar" ||
           activeSection === "parking-lot" ||
+          activeSection === "talk-it-out" ||
           activeSection === "spin-wheel" ||
           activeSection === "create" ||
           activeSection === "playbook"
@@ -24691,6 +24730,10 @@ export default function CompanionPageClient() {
             />
           ))}
 
+          {activeSection === "talk-it-out" && (
+            <TalkItOutPanel onBack={goBack} registerBack={registerBack} />
+          )}
+
           {activeSection === "spin-wheel" && (
             <SpinWheelPanel
               autoSpinWhenReady={spinWheelAutoSpin}
@@ -25147,6 +25190,7 @@ export default function CompanionPageClient() {
         onOpenCreateStudio={() => openCreateEstateCore()}
         onOpenClearMyMind={() => openClearMyMindCore()}
         onOpenParkingLot={() => openParkingLotCore()}
+        onOpenTalkItOut={() => openTalkItOutCore()}
         onOpenSpinTheWheel={() => openStandaloneFocusSectionCore("spin-wheel")}
         onOpenDestinationGallery={() => openDestinationGalleryCore()}
         onOpenCartographersStudio={() => openCartographersStudioCore()}

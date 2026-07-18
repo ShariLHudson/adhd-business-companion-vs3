@@ -26,6 +26,7 @@ export type WelcomeHomeNavDestinationId =
   | "cartographers-studio"
   | "clear-my-mind"
   | "parking-lot"
+  | "talk-it-out"
   | "breathe"
   | "spin-the-wheel"
   | "peaceful-places"
@@ -57,6 +58,8 @@ export type WelcomeHomeNavDropdownChild = {
 export type WelcomeHomeNavDestination = {
   id: WelcomeHomeNavDestinationId;
   label: string;
+  /** Optional one-line support text shown under the label (findability). */
+  supportLine?: string;
   /** Gallery / selection experiences may show a trailing affordance. */
   selectionExperience?: boolean;
   /**
@@ -115,6 +118,12 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
     id: "take-a-moment",
     label: "Take a Moment",
     destinations: [
+      {
+        id: "talk-it-out",
+        label: "Talk It Out",
+        supportLine:
+          "Think through one situation with Shari, one thoughtful question at a time.",
+      },
       { id: "clear-my-mind", label: "Clear My Mind" },
       { id: "parking-lot", label: "Parking Lot" },
       { id: "breathe", label: "Breathe" },

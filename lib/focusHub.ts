@@ -181,6 +181,13 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
         title: "",
 
         tools: [
+          tool(
+            "talk-it-out",
+            "Talk It Out",
+            { kind: "section", section: "talk-it-out", toolId: "talk-it-out" },
+            "Think through one situation with Shari, one thoughtful question at a time.",
+            "💬",
+          ),
 
           tool(
 
