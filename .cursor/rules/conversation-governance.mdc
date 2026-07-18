@@ -1,0 +1,35 @@
+# Conversation Governance (Packages 210–213)
+
+**Manifest:** `lib/conversationArchitecture/` · Docs: `docs/navigation/210_*` … `213_*`
+
+## Binding rules
+
+1. **No CIE bypass** for production conversational experiences — wire through `processConversationTurn` / HCV.
+2. **No duplicate generators** — one owner per responsibility (`CONVERSATION_OWNERSHIP`).
+3. **No hidden prompt chains.**
+4. **New patterns** → register in `lib/conversationDesignPatterns`.
+5. **Gold examples** → certify before runtime retrieval (`isFullyCertified` / package 213 plan).
+6. **Legacy paths** → remove after migration; do not add new ones.
+7. **Regression required** on conversation PRs.
+
+## Runtime order (do not invent parallel pipelines)
+
+Intent → State → Topic Anchor → Planning → Gold Retrieval → Draft → **Human Conversation Validator** → Regeneration → Final Validation → Response
+
+## PR review (all yes)
+
+Architecture compliance · Validator still on path · Shari voice · Regression coverage · No new experience-local pipeline · Gold cert if corpus changed
+
+## Release
+
+`checklistReleaseReady()` must be true before production deploy. Today: **not ready** while Shari / Chamber / Board / auth preview remain open.
+
+## Platform roadmap (214)
+
+Master implementation tracker: `lib/conversationArchitecture/platformRoadmap.ts`  
+Priority 1 (Stabilize CIE) = **complete** (`f0a36e7c`). Next: Welcome Home → finish Talk It Out (auth) → Create → Shari → Chamber → Board → ghosts → production certification.  
+Do not skip ahead to production while earlier priorities are open.
+
+## Master Feature Registry (215)
+
+`lib/conversationArchitecture/masterFeatureRegistry.ts` — every shippable feature must be registered and pass `meetsDefinitionOfComplete` / `assertRegisteredForProduction`. Align placement with `docs/estate/ESTATE_REGISTRY.md`; do not invent a parallel estate taxonomy.
