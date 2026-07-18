@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  SettingsDropdown,
+  SettingsHelpAccordion,
+  SettingsSaveStatus,
+  SettingsSection,
+  SettingsSlider,
+  SettingsToggle,
+  SETTINGS_SAVED_MESSAGE,
+  SETTINGS_TEXT,
+} from "@/components/companion/settings";
 import { NOTIFICATION_SOUND_FAMILIES } from "@/lib/notifications/notificationSoundCatalog";
 import {
   getNotificationSoundPrefs,
@@ -19,27 +29,43 @@ import type {
 
 type Props = {
   className?: string;
+  /** Entrance sounds view — one shared Learn more instead of per-family accordions. */
+  compactAbout?: boolean;
 };
 
-export function NotificationSoundPreferences({ className = "" }: Props) {
+const NONE_VALUE = "__none__";
+
+export function NotificationSoundPreferences({
+  className = "",
+  compactAbout = false,
+}: Props) {
   const [prefs, setPrefs] = useState<NotificationSoundPreferences>(() =>
     getNotificationSoundPrefs(),
   );
-  const [status, setStatus] = useState<string | null>(null);
+  const [savedVisible, setSavedVisible] = useState(false);
 
   useEffect(() => subscribeNotificationSoundPrefs(setPrefs), []);
 
-  function selectOption(
-    prefKey: (typeof NOTIFICATION_SOUND_FAMILIES)[number]["prefKey"],
-    optionId: NotificationSoundOptionId | null,
-  ) {
-    const next = saveNotificationSoundPrefs({ [prefKey]: optionId });
-    setPrefs(next);
-    setStatus("Saved. I'll use this for future notifications.");
-    window.setTimeout(() => setStatus(null), 2400);
+  function flashSaved() {
+    setSavedVisible(true);
+    window.setTimeout(() => setSavedVisible(false), 2400);
   }
 
-  function preview(optionId: NotificationSoundOptionId) {
+  function selectOption(
+    prefKey: (typeof NOTIFICATION_SOUND_FAMILIES)[number]["prefKey"],
+    rawValue: string,
+  ) {
+    const optionId =
+      rawValue === NONE_VALUE
+        ? null
+        : (rawValue as NotificationSoundOptionId);
+    const next = saveNotificationSoundPrefs({ [prefKey]: optionId });
+    setPrefs(next);
+    flashSaved();
+  }
+
+  function previewSelected(optionId: NotificationSoundOptionId | null) {
+    if (!optionId) return;
     unlockNotificationSounds();
     stopNotificationSoundPreview();
     playNotificationSoundOption(optionId, {
@@ -48,165 +74,152 @@ export function NotificationSoundPreferences({ className = "" }: Props) {
     });
   }
 
+  const visibleFamilies = NOTIFICATION_SOUND_FAMILIES.filter((family) => {
+    if (family.id === "reminder" || family.id === "rhythm") return true;
+    if (family.id === "shari-check-in") return true;
+    if (
+      family.id === "priority-alert" ||
+      family.id === "attention-needed"
+    ) {
+      return prefs.attentionNeededEnabled;
+    }
+    return true;
+  });
+
   return (
     <section
       className={`notification-sound-prefs ${className}`.trim()}
       data-testid="notification-sound-preferences"
       aria-label="Notification Sounds"
     >
-      <header className="mb-3">
-        <h3 className="text-base font-semibold text-[#2c2620]">
-          Notification Sounds
-        </h3>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Optional sound families help you recognize the kind of event — without
-          dozens of tones. Every category supports None. Desktop notifications
-          can stay on with sound off.
-        </p>
-      </header>
+      <SettingsSection
+        title="Notification Sounds"
+        explanation="Optional sound families help you recognize the kind of event — without dozens of tones. Every category supports None."
+        testId="notification-sounds-section"
+      >
+        <div className="flex flex-col gap-5">
+          <SettingsSlider
+            id="notification-volume"
+            label="Notification volume"
+            value={Math.round(prefs.masterNotificationVolume * 100)}
+            min={0}
+            max={100}
+            valueLabel={`${Math.round(prefs.masterNotificationVolume * 100)}%`}
+            onChange={(value) => {
+              const next = saveNotificationSoundPrefs({
+                masterNotificationVolume: value / 100,
+              });
+              setPrefs(next);
+            }}
+            testId="notification-volume-slider"
+          />
 
-      <label className="mb-4 flex flex-col gap-1.5 rounded-xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3">
-        <span className="text-sm font-semibold text-[#2c2620]">
-          Notification volume
-        </span>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={Math.round(prefs.masterNotificationVolume * 100)}
-          aria-label="Notification volume"
-          onChange={(event) => {
-            const next = saveNotificationSoundPrefs({
-              masterNotificationVolume: Number(event.target.value) / 100,
-            });
-            setPrefs(next);
-          }}
-          className="w-full accent-[#1e4f4f]"
-        />
-      </label>
+          <SettingsToggle
+            id="attention-needed-enabled"
+            label="Allow Attention Needed sounds"
+            description="Only for overdue or conflicting items — never for routine reminders."
+            checked={prefs.attentionNeededEnabled}
+            onChange={(checked) => {
+              const next = saveNotificationSoundPrefs({
+                attentionNeededEnabled: checked,
+              });
+              setPrefs(next);
+              flashSaved();
+            }}
+            testId="attention-needed-toggle"
+          />
 
-      <label className="mb-4 flex items-start gap-2.5 rounded-xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3">
-        <input
-          type="checkbox"
-          className="mt-1 accent-[#1e4f4f]"
-          checked={prefs.attentionNeededEnabled}
-          onChange={(event) => {
-            const next = saveNotificationSoundPrefs({
-              attentionNeededEnabled: event.target.checked,
-            });
-            setPrefs(next);
-            setStatus("Saved.");
-            window.setTimeout(() => setStatus(null), 2000);
-          }}
-        />
-        <span>
-          <span className="block text-sm font-semibold text-[#2c2620]">
-            Allow Attention Needed sounds
-          </span>
-          <span className="mt-0.5 block text-sm text-[#6b635a]">
-            Only for overdue or conflicting items — never for routine reminders.
-          </span>
-        </span>
-      </label>
+          <p className={`text-sm leading-relaxed ${SETTINGS_TEXT.helper}`}>
+            Celebration sounds follow your Celebrations preference (Quiet /
+            Simple / Full) — not a separate control here.
+          </p>
 
-      <p className="mb-3 rounded-xl border border-[#d4cdc3]/80 bg-[#f7f3ec] px-3.5 py-2.5 text-sm text-[#6b635a]">
-        Celebration sounds follow your Celebrations preference (Quiet / Simple /
-        Full) — not a separate intensity control here.
-      </p>
+          {visibleFamilies.map((family) => {
+            const selected = prefs[family.prefKey];
+            const dropdownValue = selected ?? NONE_VALUE;
+            const options = [
+              {
+                value: NONE_VALUE,
+                label: "None",
+                description:
+                  "No sound for this category. Visual notices still appear.",
+              },
+              ...family.options.map((option) => ({
+                value: option.id,
+                label: option.label,
+                description: option.description,
+              })),
+            ];
 
-      <div className="flex flex-col gap-4">
-        {NOTIFICATION_SOUND_FAMILIES.filter((family) => {
-          // Reminder + Rhythm always; Priority / Attention only when enabled.
-          if (family.id === "reminder" || family.id === "rhythm") return true;
-          if (family.id === "shari-check-in") return true;
-          if (
-            family.id === "priority-alert" ||
-            family.id === "attention-needed"
-          ) {
-            return prefs.attentionNeededEnabled;
-          }
-          return true;
-        }).map((family) => {
-          const selected = prefs[family.prefKey];
-          return (
-            <fieldset
-              key={family.id}
-              className="rounded-xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3"
-              data-testid={`notification-sound-family-${family.id}`}
-            >
-              <legend className="px-1 text-sm font-semibold text-[#2c2620]">
-                {family.label}
-              </legend>
-              <p className="mb-2.5 text-sm text-[#6b635a]">{family.description}</p>
-              <ul className="flex flex-col gap-1.5">
-                {family.options.map((option) => {
-                  const isSelected = selected === option.id;
-                  return (
-                    <li
-                      key={option.id}
-                      className="flex items-center gap-2 rounded-lg px-1 py-1"
-                    >
-                      <button
-                        type="button"
-                        className={`min-h-11 flex-1 rounded-lg border px-3 py-2 text-left text-sm ${
-                          isSelected
-                            ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06] font-semibold text-[#1e4f4f]"
-                            : "border-transparent text-[#2c2620] hover:bg-[#f5f1ea]"
-                        }`}
-                        aria-pressed={isSelected}
-                        aria-label={`${option.label}${isSelected ? " selected" : ""}`}
-                        onClick={() => selectOption(family.prefKey, option.id)}
-                      >
-                        {option.label}
-                        {isSelected ? " ✓" : ""}
-                        <span className="mt-0.5 block text-xs font-normal text-[#6b635a]">
-                          {option.description}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        className="min-h-11 min-w-11 rounded-lg border border-[#1e4f4f]/40 px-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
-                        aria-label={`Play ${option.label} preview`}
-                        onClick={() => preview(option.id)}
-                      >
-                        Play
-                      </button>
-                    </li>
-                  );
-                })}
-                <li className="flex items-center gap-2 rounded-lg px-1 py-1">
-                  <button
-                    type="button"
-                    className={`min-h-11 flex-1 rounded-lg border px-3 py-2 text-left text-sm ${
-                      selected === null
-                        ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06] font-semibold text-[#1e4f4f]"
-                        : "border-transparent text-[#2c2620] hover:bg-[#f5f1ea]"
-                    }`}
-                    aria-pressed={selected === null}
-                    aria-label={`Select no ${family.label.toLowerCase()}`}
-                    onClick={() => selectOption(family.prefKey, null)}
+            return (
+              <div
+                key={family.id}
+                data-testid={`notification-sound-family-${family.id}`}
+                className="border-t border-[#e5dfd6] pt-4 first:border-t-0 first:pt-0"
+              >
+                <SettingsDropdown
+                  id={`sound-family-${family.id}`}
+                  label={family.label}
+                  value={dropdownValue}
+                  options={options}
+                  onChange={(value) => selectOption(family.prefKey, value)}
+                  testId={`notification-sound-dropdown-${family.id}`}
+                />
+                {family.id === "attention-needed" ? (
+                  <p
+                    className={`mt-2 text-sm ${SETTINGS_TEXT.helper}`}
+                    data-testid="attention-needed-note"
                   >
-                    None{selected === null ? " ✓" : ""}
-                    <span className="mt-0.5 block text-xs font-normal text-[#6b635a]">
-                      No sound for this category. Visual notices still appear.
-                    </span>
-                  </button>
-                </li>
-              </ul>
-            </fieldset>
-          );
-        })}
-      </div>
+                    Used only for overdue or conflicting items.
+                  </p>
+                ) : null}
+                {!compactAbout ? (
+                  <SettingsHelpAccordion
+                    title="Learn more"
+                    testId={`notification-sound-help-${family.id}`}
+                  >
+                    {family.description}
+                  </SettingsHelpAccordion>
+                ) : null}
+                <button
+                  type="button"
+                  className="mt-3 min-h-11 rounded-lg border border-[#1e4f4f]/40 px-3 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f] disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={`Test ${family.label}`}
+                  disabled={selected === null}
+                  data-testid={`notification-sound-test-${family.id}`}
+                  onClick={() => previewSelected(selected)}
+                >
+                  Test sound
+                </button>
+              </div>
+            );
+          })}
 
-      {status ? (
-        <p
-          className="mt-3 text-sm text-[#1e4f4f]"
-          role="status"
-          data-testid="notification-sound-save-status"
-        >
-          {status}
-        </p>
-      ) : null}
+          {compactAbout ? (
+            <SettingsHelpAccordion
+              title="About notification sounds"
+              testId="notification-sound-help-compact"
+            >
+              <ul className="list-disc space-y-2 pl-5">
+                {visibleFamilies.map((family) => (
+                  <li key={family.id}>
+                    <span className="font-semibold text-[#1f1c19]">
+                      {family.label}:
+                    </span>{" "}
+                    {family.description}
+                  </li>
+                ))}
+              </ul>
+            </SettingsHelpAccordion>
+          ) : null}
+        </div>
+      </SettingsSection>
+
+      <SettingsSaveStatus
+        visible={savedVisible}
+        message={SETTINGS_SAVED_MESSAGE}
+        testId="notification-sound-save-status"
+      />
     </section>
   );
 }

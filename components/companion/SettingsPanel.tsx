@@ -28,6 +28,8 @@ import {
   type Plan,
 } from "@/lib/companionStore";
 import { SupportStylePanel } from "@/components/companion/SupportStylePanel";
+import { ConversationStylePanel } from "@/components/companion/ConversationStylePanel";
+import { HelpModePanel } from "@/components/companion/HelpModePanel";
 import { CuriosityBeforeCommandsPanel } from "@/components/companion/CuriosityBeforeCommandsPanel";
 import {
   catalogEntryForStyle,
@@ -62,7 +64,7 @@ import {
   type PersonalDate,
 } from "@/lib/recognition";
 
-import { AI_TONE_GUIDES, aiToneLabel } from "@/lib/aiToneGuide";
+import { aiToneLabel } from "@/lib/aiToneGuide";
 import { SettingsConnectionCard } from "@/components/companion/SettingsConnectionCard";
 import {
   buildSettingsConnectionCards,
@@ -78,29 +80,13 @@ import {
   type SocialProfilePrefKey,
 } from "@/lib/socialProfileUrls";
 
-const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = sortByDropdownLabel(
+const HELP_MODE_SUMMARY: { id: HelpMode; label: string }[] = sortByDropdownLabel(
   [
-  {
-    id: "step-by-step",
-    label: "Step-by-step guidance",
-    desc: "One small step at a time.",
-  },
-  {
-    id: "ask-first",
-    label: "Ask me questions first",
-    desc: "Clarify before suggesting.",
-  },
-  { id: "direct", label: "Direct answers", desc: "Lead with the answer." },
-  {
-    id: "concise",
-    label: "Concise replies",
-    desc: "Shorter sentences — still warm.",
-  },
-  {
-    id: "navigate",
-    label: "Take me to the right place",
-    desc: "Point me to the tool that fits.",
-  },
+    { id: "step-by-step", label: "Step-by-step guidance" },
+    { id: "ask-first", label: "Ask me questions first" },
+    { id: "direct", label: "Direct answers" },
+    { id: "concise", label: "Concise replies" },
+    { id: "navigate", label: "Take me to the right place" },
   ],
   (h) => h.label,
 );
@@ -118,6 +104,7 @@ import {
   setDefaultPlanningView,
   type PlanningViewMode,
 } from "@/lib/planMyDay";
+import { SETTINGS_SAVED_MESSAGE } from "@/lib/navigationOrigin";
 
 type Section =
   | "tone"
@@ -227,12 +214,18 @@ export function SettingsPanel({
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
   const [supportStyleSummary, setSupportStyleSummary] = useState("Adaptive");
   const [curiositySummary, setCuriositySummary] = useState(
-    "Ask based on the situation",
+    "Use the situation — Recommended",
   );
   const visualMode = useVisualMode();
   const [patternSummary, setPatternSummary] = useState("On");
   const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
   const [planningSavedFlash, setPlanningSavedFlash] = useState(false);
+  const [settingsSavedFlash, setSettingsSavedFlash] = useState(false);
+
+  function flashSettingsSaved() {
+    setSettingsSavedFlash(true);
+    window.setTimeout(() => setSettingsSavedFlash(false), 2200);
+  }
   const [plan, setPlan] = useState<Plan>("essential");
   const [advanced, setAdvanced] = useState(false);
   const [alerts, setAlerts] = useState(true);
@@ -300,7 +293,7 @@ export function SettingsPanel({
       const curiosity = getCuriosityBeforeCommandsPreference();
       setCuriositySummary(
         CURIOSITY_MODE_OPTIONS.find((o) => o.id === curiosity.mode)?.label ??
-          "Ask based on the situation",
+          "Use the situation — Recommended",
       );
     }
     {
@@ -375,11 +368,15 @@ export function SettingsPanel({
 
   const ROWS: { id: Section; label: string; value: string }[] = [
     { id: "tone", label: "Conversation Style", value: aiToneLabel(aiTone) },
-    { id: "help", label: "Help Mode", value: HELP_MODES.find((h) => h.id === helpMode)?.label ?? "" },
+    {
+      id: "help",
+      label: "Help Mode",
+      value: HELP_MODE_SUMMARY.find((h) => h.id === helpMode)?.label ?? "",
+    },
     { id: "support", label: "Support Style", value: supportStyleSummary },
     {
       id: "curiosity",
-      label: "Curiosity Before Commands",
+      label: "How Shari Invites Me",
       value: curiositySummary,
     },
     {
@@ -547,57 +544,10 @@ export function SettingsPanel({
   // ---- Sub-panels ---------------------------------------------------------
   if (open === "tone") {
     return (
-      <div className={wrap}>
+      <div className={wrap} data-testid="settings-conversation-style">
         {header("Conversation Style")}
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Choose how you&apos;d generally like me to communicate with you. This
-          is a long-term preference — it changes my delivery, not who I am.
-        </p>
-        <p className="mt-2 text-sm text-[#6b635a]">
-          If today is different, simply tell me — or update Today&apos;s Reality
-          — and I&apos;ll adapt to how you&apos;re doing today.
-        </p>
-        <div className="mt-4 flex flex-col gap-3">
-          {AI_TONE_GUIDES.map((tone) => {
-            const active = aiTone === tone.id;
-            return (
-              <button
-                key={tone.id}
-                type="button"
-                onClick={() => {
-                  setAiTone(tone.id);
-                  savePrefs({ aiTone: tone.id });
-                }}
-                className={`${CARD} ${
-                  active
-                    ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]"
-                    : "border-[#d4cdc3] hover:border-[#1e4f4f]/45"
-                }`}
-              >
-                <span className="flex items-center justify-between gap-2">
-                  <span className={MENU_LIST_LABEL}>
-                    {tone.label}
-                  </span>
-                  {active ? <span className="text-[#1e4f4f]">✓</span> : null}
-                </span>
-                <span className="mt-0.5 block text-sm text-[#6b635a]">
-                  {tone.desc}
-                </span>
-                <span className="mt-2 block text-sm text-[#4b463f]">
-                  <strong>Feels like:</strong> {tone.feelsLike}
-                </span>
-                <span className="mt-1 block text-sm text-[#4b463f]">
-                  <strong>Best for:</strong> {tone.bestFor}
-                </span>
-                <span className="mt-1 block text-sm text-[#4b463f]">
-                  <strong>What changes:</strong> {tone.whatChanges}
-                </span>
-                <span className="mt-2 block text-sm italic text-[#6b635a]">
-                  {tone.example}
-                </span>
-              </button>
-            );
-          })}
+        <div className="mt-3">
+          <ConversationStylePanel onSaved={setAiTone} />
         </div>
       </div>
     );
@@ -688,17 +638,11 @@ export function SettingsPanel({
   }
   if (open === "help") {
     return (
-      <div className={wrap}>
+      <div className={wrap} data-testid="settings-help-mode">
         {header("Help Mode")}
-        <p className="mt-1 text-sm text-[#6b635a]">What Shari does.</p>
-        <Options
-          items={HELP_MODES}
-          current={helpMode}
-          onPick={(v) => {
-            setHelpMode(v);
-            savePrefs({ helpMode: v });
-          }}
-        />
+        <div className="mt-3">
+          <HelpModePanel onSaved={setHelpMode} />
+        </div>
       </div>
     );
   }
@@ -715,7 +659,7 @@ export function SettingsPanel({
   if (open === "curiosity") {
     return (
       <div className={wrap} data-testid="settings-curiosity-before-commands">
-        {header("Curiosity Before Commands")}
+        {header("How Shari Invites Me")}
         <div className="mt-3">
           <CuriosityBeforeCommandsPanel />
         </div>
@@ -771,7 +715,8 @@ export function SettingsPanel({
             aria-live="polite"
             data-testid="planning-view-saved"
           >
-            Saved — Plan My Day will use {planningViewLabel(planningView)}.
+            {SETTINGS_SAVED_MESSAGE}. Plan My Day will use{" "}
+            {planningViewLabel(planningView)}.
           </p>
         ) : null}
       </div>
@@ -1125,6 +1070,15 @@ export function SettingsPanel({
     return (
       <div className={wrap}>
         {header("Notifications")}
+        {settingsSavedFlash ? (
+          <p
+            className="mt-2 text-sm font-medium text-[#1e4f4f]"
+            role="status"
+            data-testid="settings-saved"
+          >
+            {SETTINGS_SAVED_MESSAGE}
+          </p>
+        ) : null}
         <div className="mt-4 flex flex-col gap-2.5">
           <button
             type="button"
@@ -1132,6 +1086,7 @@ export function SettingsPanel({
               const on = !alerts;
               setAlerts(on);
               savePrefs({ timeBlockAlerts: on });
+              flashSettingsSaved();
             }}
             className={`${CARD} ${alerts ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3]"}`}
           >

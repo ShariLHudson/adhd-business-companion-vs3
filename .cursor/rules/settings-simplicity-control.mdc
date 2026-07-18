@@ -1,0 +1,39 @@
+# Settings Global Simplicity and Control™ (175)
+
+**Docs:** `docs/navigation/175_SETTINGS_GLOBAL_SIMPLICITY_AND_CONTROL_STANDARD.md` · Checklist: `docs/navigation/174_SETTINGS_SIMPLICITY_AND_CONTRAST_LIVE_CHECKLIST.md`
+
+## Standing rule
+
+Every Settings experience must minimize reading, visible choices, and decision fatigue.
+
+## Contrast
+
+- Light surface → dark readable text (`SETTINGS_TEXT` / `settingsTokens`)
+- Dark surface → light readable text
+- Disabled must remain readable; selected state must not rely on color alone
+
+## Correct controls
+
+| Need | Control |
+|------|---------|
+| On/off | `SettingsToggle` |
+| One of several | `SettingsDropdown` — never option card stacks |
+| Range | `SettingsSlider` |
+| Optional education | `SettingsHelpAccordion` (closed by default) |
+
+Shared home: `components/companion/settings/`
+
+## Default section structure
+
+1. One-sentence explanation
+2. Control
+3. Short selected-state description
+4. Optional Learn More
+
+## Save
+
+Show **Settings saved** · stay on page · preserve navigation origin and drafts · no auto-redirect
+
+## Quality test
+
+A first-time user should understand the setting, its current value, and how to change it within about ten seconds.

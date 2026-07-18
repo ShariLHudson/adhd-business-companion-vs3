@@ -2,6 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  SettingsHelpAccordion,
+  SettingsSaveStatus,
+  SettingsToggle,
+  SETTINGS_SAVED_MESSAGE,
+  SETTINGS_TEXT,
+} from "@/components/companion/settings";
+import {
   findConflictingSavedPatterns,
   listActiveUsablePatterns,
   listSavedPatterns,
@@ -88,7 +95,7 @@ export function PatternAwarenessPanel() {
     });
     setNoticeNew(nextNotice);
     setUseSaved(nextUse);
-    flash("ok", "Saved. You can change this anytime.");
+    flash("ok", SETTINGS_SAVED_MESSAGE);
   }
 
   function toggleContext(context: PatternUseContext) {
@@ -114,7 +121,7 @@ export function PatternAwarenessPanel() {
       setAdding(false);
       setSimilarPrompt(null);
       refresh();
-      flash("ok", "Saved. Spark will use this when it fits.");
+      flash("ok", SETTINGS_SAVED_MESSAGE);
       return;
     }
     if (result.reason === "similar-exists" && result.similar) {
@@ -149,128 +156,115 @@ export function PatternAwarenessPanel() {
       aria-label="Pattern Awareness"
     >
       <header className="mb-3">
-        <h3 className="text-base font-semibold text-[#2c2620]">
+        <h3 className={`text-base font-semibold ${SETTINGS_TEXT.secondary}`}>
           Pattern Awareness
         </h3>
-        <p className="mt-1 text-sm leading-relaxed text-[#6b635a]">
+        <p className={`mt-1 text-sm leading-relaxed ${SETTINGS_TEXT.helper}`}>
           Pattern Awareness helps Spark notice repeated things that may affect
-          how you work, plan, focus, and make progress. For example, Spark may
-          notice that you often have more energy in the morning, that certain
-          tasks are easier after a short break, or that large projects become
-          easier when the first step is made very small.
-        </p>
-        <p className="mt-2 text-sm leading-relaxed text-[#6b635a]">
-          Spark will show you what it noticed before saving it as an ongoing
-          pattern. You choose what to keep.
+          how you work — and you choose what to keep.
         </p>
       </header>
 
-      <div className="mb-4 rounded-xl border border-[#d4cdc3] bg-[#f7f3ec] px-3.5 py-3">
-        <p className="text-sm font-semibold text-[#2c2620]">Why This Can Help</p>
-        <p className="mt-1 text-sm text-[#6b635a]">
+      <div className="mb-4 flex flex-col gap-3 rounded-xl border border-[#d4cdc3] bg-white px-3.5 py-3">
+        <SettingsToggle
+          id="pattern-notice-new"
+          label="Notice New Patterns"
+          description="When on, Spark may gently offer patterns it noticed — never silent saves."
+          checked={noticeNew}
+          onChange={(checked) => persistControls(checked, useSaved)}
+          testId="pattern-notice-new"
+        />
+        <SettingsToggle
+          id="pattern-use-saved"
+          label="Use My Saved Patterns"
+          description="When on, active patterns can shape suggestions. When off, they stay stored but unused."
+          checked={useSaved}
+          onChange={(checked) => persistControls(noticeNew, checked)}
+          testId="pattern-use-saved"
+        />
+      </div>
+
+      <SettingsHelpAccordion title="Why this can help" testId="pattern-why-help">
+        <p>
           You should not have to rediscover the same things about yourself every
           week. Saved patterns can make suggestions more realistic, reduce
           repeated questions, and fit how you actually work.
         </p>
-        <ul className="mt-1.5 list-disc space-y-1 pl-4 text-sm text-[#6b635a]">
+        <ul className="mt-1.5 list-disc space-y-1 pl-4">
           <li>More realistic Plan My Day suggestions</li>
           <li>Fewer repeated questions</li>
           <li>Better timing and smaller first steps</li>
           <li>Earlier recognition of overload</li>
           <li>Support based on what has helped you before</li>
         </ul>
-      </div>
+      </SettingsHelpAccordion>
 
-      <details className="mb-4 rounded-xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3">
-        <summary className="cursor-pointer text-sm font-semibold text-[#2c2620]">
-          What Spark may notice
-        </summary>
-        <ul className="mt-2 space-y-2 text-sm text-[#6b635a]">
+      <SettingsHelpAccordion
+        title="What Spark may notice"
+        testId="pattern-what-may-notice"
+      >
+        <ul className="space-y-2">
           <li>
-            <span className="font-semibold text-[#2c2620]">Energy and Time</span>
+            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
+              Energy and Time
+            </span>
             — morning energy, slower starts, post-meeting dips
           </li>
           <li>
-            <span className="font-semibold text-[#2c2620]">Starting and Focus</span>
+            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
+              Starting and Focus
+            </span>
             — small first steps, timers, fewer options
           </li>
           <li>
-            <span className="font-semibold text-[#2c2620]">Planning and Workload</span>
+            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
+              Planning and Workload
+            </span>
             — fewer priorities, buffer time, realistic estimates
           </li>
           <li>
-            <span className="font-semibold text-[#2c2620]">Motivation</span>
+            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
+              Motivation
+            </span>
             — interest, accountability, visible progress
           </li>
           <li>
-            <span className="font-semibold text-[#2c2620]">Overwhelm and Recovery</span>
+            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
+              Overwhelm and Recovery
+            </span>
             — brain dumps before planning, quiet recovery time
           </li>
           <li>
-            <span className="font-semibold text-[#2c2620]">Communication and Learning</span>
+            <span className={`font-semibold ${SETTINGS_TEXT.secondary}`}>
+              Communication and Learning
+            </span>
             — one question at a time, examples, shorter replies
           </li>
         </ul>
-        <p className="mt-2 text-sm text-[#6b635a]">
+        <p className="mt-2">
           Spark will never treat a guess as fact, invent who you are, or save a
-          pattern without asking.
+          pattern without asking. You choose what to keep.
         </p>
-      </details>
+      </SettingsHelpAccordion>
 
-      <div className="mb-4 rounded-xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3">
-        <p className="text-sm font-semibold text-[#2c2620]">You Stay in Control</p>
-        <p className="mt-1 text-sm text-[#6b635a]">
+      <SettingsHelpAccordion
+        title="You stay in control"
+        testId="pattern-stay-in-control"
+      >
+        <p>
           Spark will not treat a possible pattern as permanent unless you save
           it. You can review, change, pause, or delete saved patterns anytime.
           If something no longer feels true, mark it outdated.
         </p>
-      </div>
+        <p className="mt-2">
+          Examples: {EXAMPLE_PATTERNS.join(" · ")}
+        </p>
+      </SettingsHelpAccordion>
 
-      <div className="mb-4 flex flex-col gap-2">
-        <label className="flex items-start gap-2.5 rounded-xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3">
-          <input
-            type="checkbox"
-            className="mt-1 accent-[#1e4f4f]"
-            checked={noticeNew}
-            onChange={(event) =>
-              persistControls(event.target.checked, useSaved)
-            }
-            data-testid="pattern-notice-new"
-          />
-          <span>
-            <span className="block text-sm font-semibold text-[#2c2620]">
-              Notice New Patterns
-            </span>
-            <span className="mt-0.5 block text-sm text-[#6b635a]">
-              When on, Spark may gently offer patterns it noticed — never silent
-              saves.
-            </span>
-          </span>
-        </label>
-        <label className="flex items-start gap-2.5 rounded-xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3">
-          <input
-            type="checkbox"
-            className="mt-1 accent-[#1e4f4f]"
-            checked={useSaved}
-            onChange={(event) =>
-              persistControls(noticeNew, event.target.checked)
-            }
-            data-testid="pattern-use-saved"
-          />
-          <span>
-            <span className="block text-sm font-semibold text-[#2c2620]">
-              Use My Saved Patterns
-            </span>
-            <span className="mt-0.5 block text-sm text-[#6b635a]">
-              When on, active patterns can shape suggestions. When off, they stay
-              stored but unused.
-            </span>
-          </span>
-        </label>
-      </div>
-
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <h4 className="text-sm font-semibold text-[#2c2620]">Saved Patterns</h4>
+      <div className="mb-3 mt-4 flex items-center justify-between gap-2">
+        <h4 className={`text-sm font-semibold ${SETTINGS_TEXT.secondary}`}>
+          My Patterns
+        </h4>
         <button
           type="button"
           className="rounded-lg border border-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
@@ -600,17 +594,12 @@ export function PatternAwarenessPanel() {
         </p>
       ) : null}
 
-      {status ? (
-        <p
-          className={`mt-3 text-sm ${
-            status.tone === "ok" ? "text-[#1e4f4f]" : "text-[#a85c4a]"
-          }`}
-          role="status"
-          data-testid="pattern-awareness-status"
-        >
-          {status.text}
-        </p>
-      ) : null}
+      <SettingsSaveStatus
+        visible={Boolean(status)}
+        message={status?.text ?? SETTINGS_SAVED_MESSAGE}
+        tone={status?.tone === "error" ? "error" : "ok"}
+        testId="pattern-awareness-status"
+      />
     </section>
   );
 }
