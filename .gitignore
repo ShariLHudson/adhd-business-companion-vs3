@@ -55,5 +55,8 @@ eng.traineddata
 # one-off GPT / navigation dump packets at repo root (local reference only)
 /GPT-*.docx
 /GPT-*.pdf
+/GPT-*.zip
 /personal-assistant-navigation.pdf
 /Spark_Estate_GPT_Reverse_Engineering_Report.docx
+.turbopack-build-log.txt
+/066_CURRENT_UNCOMMITTED_WORK_RECOVERY_REPORT.md
