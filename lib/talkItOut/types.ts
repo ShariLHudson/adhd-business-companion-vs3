@@ -43,6 +43,17 @@ export type TalkItOutSession = {
   thinkingMap?: ThinkingMap;
   /** CIE runtime state — packages 195–196; never show to members. */
   cieState?: ConversationRuntimeState;
+  /**
+   * Shari Response Engine — full member sentence echoed once per session max.
+   * Passed into LLM context as `verbatim_used` when model drafting is enabled.
+   */
+  verbatimUsed?: boolean;
+  /** Last reflective move was skip (question only) — never skip two turns in a row. */
+  lastMoveWasSkip?: boolean;
+  /** Fingerprint of the active worry for loop detection. */
+  worryFingerprint?: string | null;
+  /** Consecutive turns with the same worry fingerprint. */
+  worryRepeatCount?: number;
   createdAt: string;
   updatedAt: string;
 };

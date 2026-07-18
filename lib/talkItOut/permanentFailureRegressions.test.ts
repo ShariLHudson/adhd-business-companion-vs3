@@ -61,6 +61,10 @@ function advance(
       cieState: turn.cieState,
       usefulSummary: turn.usefulSummary,
       usedStrategyMoves: turn.usedStrategyMoves,
+      verbatimUsed: turn.verbatimUsed,
+      lastMoveWasSkip: turn.lastMoveWasSkip,
+      worryFingerprint: turn.worryFingerprint,
+      worryRepeatCount: turn.worryRepeatCount,
       topic:
         turn.thinkingMap?.topicAnchor?.primaryTopic ??
         turn.cieState?.topicAnchor?.primaryTopic,

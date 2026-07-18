@@ -166,6 +166,10 @@ export function appendTalkItOutMessages(
       | "title"
       | "topic"
       | "needsReentry"
+      | "verbatimUsed"
+      | "lastMoveWasSkip"
+      | "worryFingerprint"
+      | "worryRepeatCount"
     >
   >,
 ): TalkItOutSession {

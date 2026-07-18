@@ -16,27 +16,35 @@ export const SHARI_VOICE_OPENINGS = [
   "What feels hardest to judge about this right now?",
 ] as const;
 
-/** Soft observation stems — meaning/tension, not paraphrase. */
+/** Soft observation stems — meaning/tension, not paraphrase. Shari voice, not AI tells. */
 export const SHARI_OBSERVATIONS = [
-  "I wonder if the hard part is not the work itself, but that nothing feels like a safe place to begin.",
-  "It may be less about having too much, and more about everything feeling equally urgent.",
-  "There might be a tension between what you already know and what feels risky to act on.",
-  "Something here seems to be asking for clarity before courage — or maybe the other way around.",
-  "I am hearing a pull between protecting yourself and wanting to move forward.",
-  "This may be less about the decision, and more about what the decision would say about you.",
-  "It sounds like part of you is ready, and another part is still guarding something important.",
-  "Maybe the easy part to name is not the part that needs the most clarity.",
+  "The hard part may not be the work itself — nothing feels like a safe place to begin.",
+  "Less about having too much. More about everything feeling equally urgent.",
+  "Tension between what you already know and what feels risky to act on.",
+  "Clarity before courage — or maybe the other way around.",
+  "A pull between protecting yourself and wanting to move forward.",
+  "Less about the decision. More about what the decision would say about you.",
+  "Part of you is ready. Another part is still guarding something important.",
+  "The easy part to name is not the part that needs the most clarity.",
 ] as const;
 
 /** Phrases that must not dominate Talk It Out turns. */
 export const SHARI_VOICE_AVOID_DEFAULTS = [
   "It sounds like",
+  "It seems like",
+  "I hear you",
   "I hear you saying",
   "What I am hearing is",
   "Thank you for sharing",
   "That sounds difficult",
   "Let us explore that",
+  "Let's unpack",
+  "Let's dive in",
+  "Great question",
+  "That makes total sense",
   "How does that make you feel",
+  "I'm here to help",
+  "Let me know if there's anything else",
 ] as const;
 
 export type TalkItOutResponseKind =

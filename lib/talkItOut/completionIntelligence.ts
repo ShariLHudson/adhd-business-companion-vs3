@@ -72,13 +72,11 @@ export function buildCompletionResponse(input: {
     case "asks_summary":
     case "exact_match":
     case "user_clear":
-      return `${input.summary}\n\nYou do not have to settle everything today. We can stop here, or keep talking through the part that still feels unclear.`;
+      return `${input.summary}\n\nWhat's the smallest next move, in your words?`;
     case "user_done":
       return `${input.summary}\n\nWe can stop here. Nothing needs to be finished today.`;
-    case "practical_next": {
-      const topic = input.topicAnchor?.trim() || "this";
-      return `The next practical step could be defining what ${topic} needs in concrete terms. We can build that together when you are ready — or keep talking until it feels clearer.`;
-    }
+    case "practical_next":
+      return `There it is.\n\nWhat's the smallest next move, in your words?`;
     default:
       return input.summary;
   }
@@ -90,6 +88,9 @@ export const TIO_GENERIC_CLOSING_BANNED = [
   "I am here if you need me.",
   "What else would you like to discuss?",
   "Great job working through that.",
+  "Let me know if there's anything else",
+  "Great question",
+  "That makes total sense",
 ] as const;
 
 export function isGenericClosing(text: string): boolean {

@@ -64,6 +64,11 @@ import {
 } from "./questionIntelligence";
 import { TALK_IT_OUT_QUESTIONS } from "./questions";
 import {
+  applyShariResponseEngine,
+  scrubShariAiTells,
+  type ShariResponseEngineResult,
+} from "./shariResponseEngine";
+import {
   selectStrategyMove,
   type TioStrategyMoveId,
 } from "./strategyLibrary";
@@ -357,6 +362,11 @@ export type TalkItOutTurnResult = {
   designPatternId?: CdpPatternId;
   usefulSummary?: string;
   usedStrategyMoves?: string[];
+  /** Shari Response Engine session flags */
+  verbatimUsed?: boolean;
+  lastMoveWasSkip?: boolean;
+  worryFingerprint?: string | null;
+  worryRepeatCount?: number;
 };
 
 /**
@@ -429,7 +439,7 @@ function polishTalkItOutDelivery(input: {
       thinkingMap,
       validationMode: "permanent_bans_only",
     });
-    text = cie.assistantText;
+    text = scrubShariAiTells(cie.assistantText);
     if (
       /\btake your time(?: with that)?\b/i.test(text) ||
       /\bquieter question underneath\b/i.test(text) ||
@@ -578,7 +588,7 @@ function polishTalkItOutDelivery(input: {
     });
   }
 
-  return { text, cieState: cie.state };
+  return { text: scrubShariAiTells(text), cieState: cie.state };
 }
 
 export function buildTalkItOutTurn(
@@ -948,6 +958,18 @@ export function buildTalkItOutTurn(
     seed,
   );
 
+  // Shari Response Engine — turn structure, voice bans, verbatim / loop / distress
+  const shari: ShariResponseEngineResult = applyShariResponseEngine({
+    userText,
+    draftText: draft,
+    messages,
+    verbatimUsed: Boolean(session.verbatimUsed),
+    lastMoveWasSkip: Boolean(session.lastMoveWasSkip),
+    worryFingerprint: session.worryFingerprint ?? null,
+    worryRepeatCount: session.worryRepeatCount ?? 0,
+    seed,
+  });
+
   const thinkingMap: ThinkingMap = {
     ...rci.thinkingMap,
     topicAnchor,
@@ -957,13 +979,20 @@ export function buildTalkItOutTurn(
   const polished = polishTalkItOutDelivery({
     session,
     userText,
-    draftText: draft,
-    responseKind: rci.responseKind,
+    draftText: shari.text,
+    responseKind:
+      shari.mode === "distressed"
+        ? "gentle-observation"
+        : shari.mode === "closing" || shari.mode === "answer_redirect"
+          ? "thoughtful-question"
+          : rci.responseKind,
     repairActive: false,
     thinkingMap,
     topicAnchor,
+    validationMode:
+      shari.mode === "distressed" ? "permanent_bans_only" : "full",
   });
-  const assistantText = polished.text;
+  const assistantText = scrubShariAiTells(polished.text);
   if (polished.cieState.topicAnchor) {
     thinkingMap.topicAnchor = polished.cieState.topicAnchor;
   }
@@ -1021,12 +1050,21 @@ export function buildTalkItOutTurn(
 
   return {
     assistantText,
-    questionId,
+    questionId: shari.mode === "distressed" ? undefined : questionId,
     explicitHelpRequested: false,
     futureFeelingAsked,
-    responseKind,
+    responseKind:
+      shari.mode === "distressed"
+        ? "observation"
+        : shari.mode === "closing"
+          ? "observation_then_question"
+          : responseKind,
     thinkingMap,
     cieState: polished.cieState,
+    verbatimUsed: shari.verbatimUsed,
+    lastMoveWasSkip: shari.lastMoveWasSkip,
+    worryFingerprint: shari.worryFingerprint,
+    worryRepeatCount: shari.worryRepeatCount,
     strategyMove,
     designPatternId,
     usedStrategyMoves: [...(session.usedStrategyMoves ?? []), strategyMove],

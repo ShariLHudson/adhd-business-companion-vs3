@@ -11,5 +11,6 @@ export * from "./questionIntelligence";
 export * from "./completionIntelligence";
 export * from "./personalization";
 export * from "./reentry";
+export * from "./shariResponseEngine";
 
 export const TALK_IT_OUT_SECTION = "talk-it-out" as const;

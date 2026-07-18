@@ -202,6 +202,12 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
       thinkingMap: turn.thinkingMap ?? withUser.thinkingMap,
       cieState: turn.cieState ?? withUser.cieState,
       usefulSummary: turn.usefulSummary ?? withUser.usefulSummary,
+      verbatimUsed: turn.verbatimUsed ?? withUser.verbatimUsed,
+      lastMoveWasSkip: turn.lastMoveWasSkip ?? withUser.lastMoveWasSkip,
+      worryFingerprint:
+        turn.worryFingerprint ?? withUser.worryFingerprint ?? null,
+      worryRepeatCount:
+        turn.worryRepeatCount ?? withUser.worryRepeatCount ?? 0,
       topic:
         turn.thinkingMap?.topicAnchor?.primaryTopic ??
         turn.cieState?.topicAnchor?.primaryTopic ??
