@@ -26,7 +26,6 @@ describe("createCatalog", () => {
       "Marketing",
       "Planning",
       "Relationships",
-      "Strategies",
     ]);
   });
 

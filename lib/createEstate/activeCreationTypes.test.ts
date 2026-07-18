@@ -7,7 +7,7 @@ import {
 } from "./activeCreationTypes";
 
 describe("activeCreationTypes", () => {
-  it("hides routed catalog items from Create picker", () => {
+  it("hides routed, Strategy Library, and DEFAULT-only items from Create picker", () => {
     expect(
       isActiveCreationCatalogItem({
         label: "People I Help",
@@ -18,6 +18,15 @@ describe("activeCreationTypes", () => {
     expect(
       isActiveCreationCatalogItem({ label: "Email", emoji: "✉️" }),
     ).toBe(true);
+    expect(
+      isActiveCreationCatalogItem({
+        label: "Business Strategy",
+        emoji: "🏢",
+      }),
+    ).toBe(false);
+    expect(
+      isActiveCreationCatalogItem({ label: "Automation", emoji: "🔄" }),
+    ).toBe(false);
   });
 
   it("sorts categories and items alphabetically", () => {

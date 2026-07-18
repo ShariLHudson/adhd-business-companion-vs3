@@ -24,7 +24,7 @@ export type LegacyCreateWorkspaceDecision =
   | { kind: "prepared_state"; message: string };
 
 const PROJECT_CREATE_RE =
-  /\b(?:create|start|new|add|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\bturn\s+(?:this|it|that)\s+into\s+a\s+project\b|\borganize\s+(?:this|it|that)\s+as\s+a\s+project\b|\bhelp\s+me\s+(?:start|create|organize)\s+(?:a\s+)?(?:new\s+)?project\b/i;
+  /\b(?:create|start|new|add|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\b(?:want|need|like)\s+to\s+(?:create|start|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\bturn\s+(?:this|it|that)\s+into\s+a\s+project\b|\borganize\s+(?:this|it|that)\s+as\s+a\s+project\b|\bhelp\s+me\s+(?:start|create|organize)\s+(?:a\s+)?(?:new\s+)?project\b/i;
 
 const MAP_CREATE_RE =
   /\b(?:mind\s*maps?|workflow\s*maps?|decision\s*maps?|process\s*maps?|customer\s*journey\s*maps?)\b|\b(?:create|make|build|draw)\b.{0,48}\b(?:mind\s*map|workflow|decision\s*map|process\s*map|journey\s*map)\b|\bmap\s+(?:this|my|a|the)\s+(?:process|workflow|decision|journey)\b/i;
@@ -83,6 +83,11 @@ export function resolveLegacyCreateWorkspaceGuard(input: {
   itemType?: string | null;
   /** When true, panel is already open — allow in-place draft sync only. */
   alreadyOpen?: boolean;
+  /**
+   * My Work → Create picker selected a concrete creation type.
+   * Must open the guided Create workflow — not the chat prepared-state line.
+   */
+  estateCreateLaunch?: boolean;
 }): LegacyCreateWorkspaceDecision {
   const section = input.section;
   const userText = (input.userText ?? "").trim();
@@ -93,6 +98,15 @@ export function resolveLegacyCreateWorkspaceGuard(input: {
   }
 
   if (input.alreadyOpen && section === "content-generator") {
+    return { kind: "allow" };
+  }
+
+  // Estate Create: option click = launch. Chat-driven create still stays blocked.
+  if (
+    input.estateCreateLaunch &&
+    section === "content-generator" &&
+    Boolean(itemType?.trim())
+  ) {
     return { kind: "allow" };
   }
 

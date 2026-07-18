@@ -89,10 +89,13 @@ describe("My Work → Create navigation (116 / 149)", () => {
     );
   });
 
-  it("routes strategy browse to Strategy Library create path", () => {
+  it("does not offer Strategy Library inside Create (package 180)", () => {
+    const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const client = read("app/companion/CompanionPageClient.tsx");
-    expect(client).toMatch(
-      /onOpenStrategyCreate=\{\(\)\s*=>\s*openStrategyLibraryCore/,
-    );
+    expect(panel).not.toContain("create-estate-browse-strategy");
+    expect(panel).not.toContain("onOpenStrategyCreate");
+    expect(client).not.toContain("onOpenStrategyCreate");
+    expect(CREATE_ESTATE_HOW_DO_I).toMatch(/Get Advice/i);
+    expect(CREATE_ESTATE_HOW_DO_I).toMatch(/Strategy Library/i);
   });
 });

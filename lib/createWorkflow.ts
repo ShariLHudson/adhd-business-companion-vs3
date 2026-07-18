@@ -818,6 +818,29 @@ export function getDiscoveryQuestions(
   return DISCOVERY_BY_TYPE[typeLabel] ?? DEFAULT_DISCOVERY;
 }
 
+/**
+ * True when Create can launch a guided discovery sequence for this type.
+ * DEFAULT-only types stay hidden from the estate picker (package 180).
+ * Strategy Library / personal strategy browsing is not Create.
+ */
+export function hasLaunchableCreateWorkflow(typeLabel: string): boolean {
+  const label = typeLabel.trim();
+  if (!label) return false;
+  if (
+    label === "Strategy" ||
+    label === "Business Strategy" ||
+    label === "Personal Companion Strategy"
+  ) {
+    return false;
+  }
+  if (guidedDiscoveryQuestions(label)?.length) return true;
+  if (DISCOVERY_BY_TYPE[label]?.length) return true;
+  if (label === "Marketing Strategy" || label === "Content Strategy") {
+    return true;
+  }
+  return false;
+}
+
 export function categoryIdForType(typeLabel: string): string | null {
   for (const cat of CREATE_CATALOG) {
     if (cat.items.some((i) => i.label === typeLabel)) return cat.id;

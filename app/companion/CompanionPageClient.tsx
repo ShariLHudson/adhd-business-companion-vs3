@@ -5465,12 +5465,17 @@ export default function CompanionPageClient() {
    */
   function redirectLegacyCreateWorkspaceIfNeeded(
     section: AppSection,
-    opts?: { userText?: string | null; itemType?: string | null },
+    opts?: {
+      userText?: string | null;
+      itemType?: string | null;
+      estateCreateLaunch?: boolean;
+    },
   ): boolean {
     const decision = resolveLegacyCreateWorkspaceGuard({
       section,
       userText: opts?.userText ?? lastUserTextRef.current,
       itemType: opts?.itemType,
+      estateCreateLaunch: opts?.estateCreateLaunch,
       alreadyOpen:
         section === "content-generator" &&
         workspacePanelRef.current === "content-generator",
@@ -7822,6 +7827,9 @@ export default function CompanionPageClient() {
       redirectLegacyCreateWorkspaceIfNeeded("content-generator", {
         userText: prompt || opts?.hardNavCommand,
         itemType: opts?.artifactType,
+        estateCreateLaunch:
+          opts?.hardNavCommand === "my-work-create" &&
+          Boolean(opts?.artifactType?.trim()),
       })
     ) {
       return false;
@@ -24859,9 +24867,6 @@ export default function CompanionPageClient() {
                   artifactType: resolved.catalogLabel,
                 });
               }}
-              onOpenStrategyCreate={() =>
-                openStrategyLibraryCore({ openView: "business" })
-              }
               onOpenSavedDraft={(id) => {
                 openCreateDraftFromLibrary(id);
                 setActiveSection("home");

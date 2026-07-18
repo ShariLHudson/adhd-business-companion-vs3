@@ -16,15 +16,11 @@ import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
-const CARD =
-  "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-4 text-left transition-colors";
-
 type Props = {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
   /** Select a catalog creation type — opens its workflow immediately. */
   onSelectCreationType: (item: CreateCatalogItem) => void;
-  onOpenStrategyCreate: () => void;
   onOpenSavedDraft: (id: string) => void;
   onRenameDraft: (id: string, title: string) => void;
   onDuplicateDraft: (id: string) => void;
@@ -61,13 +57,13 @@ function SharedHowDoI() {
 
 /**
  * Welcome Home → My Work → Create
- * Categorized picker + Continue a Saved Creation (149–151).
+ * Categorized picker + Continue a Saved Creation (149–151, 180).
+ * Strategy Library is not offered here — Get Advice only.
  */
 export function CreateEstateEntrancePanel({
   onBack,
   registerBack,
   onSelectCreationType,
-  onOpenStrategyCreate,
   onOpenSavedDraft,
   onRenameDraft,
   onDuplicateDraft,
@@ -136,20 +132,6 @@ export function CreateEstateEntrancePanel({
             {CREATE_ESTATE_PICKER_HEADING}
           </h2>
           <CreateCatalogPicker onSelect={onSelectCreationType} />
-          <button
-            type="button"
-            className={CARD}
-            data-testid="create-estate-browse-strategy"
-            onClick={onOpenStrategyCreate}
-          >
-            <span className="block text-base font-semibold text-[#1f1c19]">
-              Strategy
-            </span>
-            <span className="mt-1 block text-sm text-[#4b463f]">
-              Opens Strategy Library create mode under Get Advice — not a second
-              strategy engine.
-            </span>
-          </button>
         </section>
 
         <section

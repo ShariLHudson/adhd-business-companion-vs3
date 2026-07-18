@@ -318,31 +318,8 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
       },
     ],
   },
-  {
-    id: "strategies",
-    label: "Strategies",
-    items: [
-      {
-        label: "Business Strategy",
-        emoji: "🏢",
-        matchTerms: [
-          "business strategy",
-          "strategic plan",
-          "strategy doc",
-        ],
-      },
-      {
-        label: "Personal Companion Strategy",
-        emoji: "🧠",
-        matchTerms: [
-          "personal companion strategy",
-          "personal strategy",
-          "companion strategy",
-          "adhd strategy",
-        ],
-      },
-    ],
-  },
+  // Strategies category removed from Create (package 180).
+  // Strategy Library lives under Get Advice — not a creation type.
 ];
 
 function escapeRegex(s: string): string {

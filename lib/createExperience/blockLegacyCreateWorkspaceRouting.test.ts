@@ -108,6 +108,28 @@ describe("blockLegacyCreateWorkspaceRouting", () => {
       }),
     ).toEqual({ kind: "allow" });
   });
+
+  it("allows estate Create picker launches with a concrete artifact type (180)", () => {
+    expect(
+      resolveLegacyCreateWorkspaceGuard({
+        section: "content-generator",
+        userText: "my-work-create",
+        itemType: "Email",
+        estateCreateLaunch: true,
+      }),
+    ).toEqual({ kind: "allow" });
+    // Without estateCreateLaunch, same open stays prepared-state.
+    expect(
+      resolveLegacyCreateWorkspaceGuard({
+        section: "content-generator",
+        userText: "my-work-create",
+        itemType: "Email",
+      }),
+    ).toEqual({
+      kind: "prepared_state",
+      message: CREATE_ROOM_PREPARED_STATE_MESSAGE,
+    });
+  });
 });
 
 describe("blockLegacyCreateWorkspaceRouting — CompanionPageClient wiring", () => {
@@ -148,8 +170,11 @@ describe("blockLegacyCreateWorkspaceRouting — CompanionPageClient wiring", () 
     );
   });
 
-  it("preserves explicit Chamber and Plan My Day time-block wiring", () => {
+  it("preserves explicit Chamber and Plan My Day calendar wiring", () => {
     expect(client).toContain("onOpenChamber={() => openChamberOfMomentumCore()}");
-    expect(client).toMatch(/openWorkspaceBesideChatCore\("time-block"/);
+    // Calendar items open Plan My Day — never legacy time-block split.
+    expect(client).toContain("function openCalendarItemCore");
+    expect(client).toContain("openPlanMyDayCore");
+    expect(client).not.toMatch(/openWorkspaceBesideChatCore\("time-block"/);
   });
 });

@@ -1,6 +1,7 @@
 /**
  * Creation types eligible for the Create picker.
  * Only types with a real in-Create workflow are shown — no dead placeholders.
+ * Strategy Library / advice destinations are never Create options (package 180).
  */
 
 import {
@@ -9,6 +10,7 @@ import {
   type CreateCatalogItem,
 } from "@/lib/createCatalog";
 import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
+import { hasLaunchableCreateWorkflow } from "@/lib/createWorkflow";
 
 export type ActiveCreationType = {
   id: string;
@@ -52,10 +54,35 @@ const PRINT_SUPPORT_LABELS = new Set(
   ].map((s) => s.toLowerCase()),
 );
 
+/** Labels that belong to Strategy Library / advice — never Create picker. */
+const STRATEGY_LIBRARY_CREATE_ALIASES = new Set(
+  [
+    "Strategy",
+    "Strategy Library",
+    "ADHD Entrepreneur Strategy Library",
+    "Browse Strategies",
+    "Find a Strategy",
+    "Build a Strategy",
+    "Strategy Guide",
+    "Strategy Concierge",
+    "Recommended Strategies",
+    "Saved Strategies",
+    "Business Strategy",
+    "Personal Companion Strategy",
+  ].map((s) => s.toLowerCase()),
+);
+
+export function isStrategyLibraryCreateAlias(label: string): boolean {
+  return STRATEGY_LIBRARY_CREATE_ALIASES.has(label.trim().toLowerCase());
+}
+
 export function isActiveCreationCatalogItem(item: CreateCatalogItem): boolean {
   // Routed tools open other rooms — not Create workflows.
   if (item.route) return false;
-  return Boolean(item.label.trim());
+  if (!item.label.trim()) return false;
+  if (isStrategyLibraryCreateAlias(item.label)) return false;
+  // No complete guided workflow = not visible (package 180 click contract).
+  return hasLaunchableCreateWorkflow(item.label);
 }
 
 /** Alphabetized categories with only clickable, workflow-backed items. */
@@ -65,7 +92,7 @@ export function listActiveCreationPickerCatalog(): CreateCatalogCategory[] {
       ...cat,
       items: cat.items.filter(isActiveCreationCatalogItem),
     }))
-    .filter((cat) => cat.items.length > 0);
+    .filter((cat) => cat.items.length > 0 && cat.id !== "strategies");
 }
 
 export function listActiveCreationTypes(): ActiveCreationType[] {
