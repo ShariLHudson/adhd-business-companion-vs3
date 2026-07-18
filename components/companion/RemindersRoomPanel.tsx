@@ -9,7 +9,6 @@ import {
   PersistentDifferenceCue,
   PreviewCard,
   ReminderActionsExplained,
-  ReminderStartExamples,
   RoomArrivalBlock,
 } from "@/components/companion/ReminderRhythmRoomChrome";
 import { NotificationSoundPreferences } from "@/components/companion/NotificationSoundPreferences";
@@ -40,7 +39,6 @@ import {
 } from "@/lib/reminders/reminderForm";
 import { scrollRoomListToTestId } from "@/lib/planMyDay/scrollRoomList";
 import {
-  REMINDER_START_EXAMPLES,
   buildReminderPreview,
   clearReminderFormDraft,
   loadReminderFormDraft,
@@ -465,6 +463,9 @@ function ReminderSection({
   testId,
   onChanged,
   onAddFocus,
+  collapsedByDefault = false,
+  hideEmptyCta = false,
+  emptyCtaLabel = "Add a Reminder",
 }: {
   title: string;
   empty: string;
@@ -472,40 +473,50 @@ function ReminderSection({
   testId: string;
   onChanged: () => void;
   onAddFocus: () => void;
+  collapsedByDefault?: boolean;
+  hideEmptyCta?: boolean;
+  emptyCtaLabel?: string;
 }) {
-  return (
-    <section className="mt-6" data-testid={testId}>
-      <h2 className="text-lg font-semibold text-[#1f1c19]">{title}</h2>
-      {items.length === 0 ? (
-        <div className="mt-2 rounded-xl border border-dashed border-[#d4cdc3] bg-white/70 px-4 py-5">
-          <p className="text-base text-[#6b635a]">{empty}</p>
+  const listBody =
+    items.length === 0 ? (
+      <div className="mt-2 rounded-xl border border-dashed border-[#d4cdc3] bg-white/70 px-4 py-5">
+        <p className="text-base text-[#6b635a]">{empty}</p>
+        {!hideEmptyCta ? (
           <button
             type="button"
             className={`${BTN_TEAL_SOFT} mt-3`}
             onClick={onAddFocus}
             data-testid={`${testId}-add-cta`}
           >
-            Add a Reminder
+            {emptyCtaLabel}
           </button>
-        </div>
-      ) : (
-        <ul className="mt-3 flex flex-col gap-3">
-          {items.map((r) => (
-            <ReminderRow key={r.id} reminder={r} onChanged={onChanged} />
-          ))}
-        </ul>
-      )}
+        ) : null}
+      </div>
+    ) : (
+      <ul className="mt-3 flex flex-col gap-3">
+        {items.map((r) => (
+          <ReminderRow key={r.id} reminder={r} onChanged={onChanged} />
+        ))}
+      </ul>
+    );
+
+  if (collapsedByDefault) {
+    return (
+      <details className="mt-6" data-testid={testId}>
+        <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]">
+          {title}
+        </summary>
+        {listBody}
+      </details>
+    );
+  }
+
+  return (
+    <section className="mt-6" data-testid={testId}>
+      <h2 className="text-lg font-semibold text-[#1f1c19]">{title}</h2>
+      {listBody}
     </section>
   );
-}
-
-function dateWithOffset(days: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
 }
 
 export function RemindersRoomPanel({
@@ -563,21 +574,6 @@ export function RemindersRoomPanel({
     }, 40);
   }
 
-  function applyExample(exampleId: string) {
-    const ex = REMINDER_START_EXAMPLES.find((e) => e.id === exampleId);
-    if (!ex) return;
-    const next: ReminderFormValues = {
-      title: ex.form.title,
-      date: dateWithOffset(ex.form.dateOffsetDays),
-      time: ex.form.time,
-      repeat: ex.form.repeat,
-      notes: ex.form.notes,
-      customRepeatNote: ex.form.customRepeatNote,
-    };
-    updateForm(next);
-    focusAddForm();
-  }
-
   function handleSave() {
     if (saving) return;
     if (!form.title.trim()) return;
@@ -618,6 +614,8 @@ export function RemindersRoomPanel({
     }
   }
 
+  const addLabel = embedded ? "Create a Reminder" : "Add a Reminder";
+
   const body = (
       <div
         className="plan-day-morning-note flex h-full min-h-0 flex-col"
@@ -646,7 +644,7 @@ export function RemindersRoomPanel({
           </header>
         ) : (
           <h2
-            className="plan-day-morning-note__title mt-2 text-xl"
+            className="mt-2 text-base font-semibold text-[#6b635a]"
             data-testid="reminders-title"
           >
             Reminders
@@ -671,12 +669,11 @@ export function RemindersRoomPanel({
               testIdPrefix="reminders"
             />
           ) : null}
-          <ReminderStartExamples onUse={applyExample} />
-          <ReminderActionsExplained />
+          {!embedded ? <ReminderActionsExplained /> : null}
 
           <section className="mt-6" data-testid="reminders-add-section">
             <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
-              Add a Reminder
+              {addLabel}
             </h2>
             {showAddForm || form.title.trim() ? (
               <>
@@ -707,7 +704,7 @@ export function RemindersRoomPanel({
                 data-testid="reminders-show-add-form"
                 onClick={focusAddForm}
               >
-                Add a Reminder
+                {addLabel}
               </button>
             )}
             {statusMessage ? (
@@ -737,6 +734,8 @@ export function RemindersRoomPanel({
             testId="reminders-upcoming"
             onChanged={refresh}
             onAddFocus={focusAddForm}
+            hideEmptyCta={embedded}
+            emptyCtaLabel={addLabel}
           />
           <ReminderSection
             title="Recurring"
@@ -745,6 +744,8 @@ export function RemindersRoomPanel({
             testId="reminders-recurring"
             onChanged={refresh}
             onAddFocus={focusAddForm}
+            hideEmptyCta={embedded}
+            emptyCtaLabel={addLabel}
           />
           <ReminderSection
             title="Completed"
@@ -753,17 +754,20 @@ export function RemindersRoomPanel({
             testId="reminders-completed"
             onChanged={refresh}
             onAddFocus={focusAddForm}
+            collapsedByDefault={embedded}
+            hideEmptyCta={embedded}
+            emptyCtaLabel={addLabel}
           />
 
-          <section
-            className="mt-8 border-t border-[#e7dfd4] pt-6"
-            data-testid="reminders-bottom-settings"
-          >
-            <RemindersNotificationSettings />
-            <div className="mt-6">
-              <NotificationSoundPreferences />
-            </div>
-            {!embedded ? (
+          {!embedded ? (
+            <section
+              className="mt-8 border-t border-[#e7dfd4] pt-6"
+              data-testid="reminders-bottom-settings"
+            >
+              <RemindersNotificationSettings />
+              <div className="mt-6">
+                <NotificationSoundPreferences />
+              </div>
               <button
                 type="button"
                 className={`${BTN_SECONDARY} mt-6`}
@@ -772,8 +776,8 @@ export function RemindersRoomPanel({
               >
                 Back
               </button>
-            ) : null}
-          </section>
+            </section>
+          ) : null}
         </div>
       </div>
   );

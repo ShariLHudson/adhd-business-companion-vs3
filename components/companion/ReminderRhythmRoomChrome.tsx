@@ -8,18 +8,13 @@ import {
   HOW_TO_USE_REMINDERS,
   HOW_TO_USE_RHYTHMS,
   REMINDER_ACTIONS,
-  REMINDER_START_EXAMPLES,
   REMINDERS_ARRIVAL,
-  RHYTHM_START_EXAMPLES,
-  RHYTHMS_ARE_FLEXIBLE,
   RHYTHMS_ARRIVAL,
   STILL_NOT_SURE,
 } from "@/lib/remindersVsRhythms";
 
 const BTN_PRIMARY =
   "rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white shadow-md transition-colors hover:bg-[#163a3a]";
-const BTN_SECONDARY =
-  "rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-sm font-semibold text-[#4b463f] hover:bg-[#f5f0ea]";
 const BTN_TEAL_SOFT =
   "rounded-xl border border-[#1e4f4f]/40 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10";
 
@@ -216,76 +211,6 @@ export function HowToUseBlock({ kind }: { kind: Kind }) {
   );
 }
 
-export function ReminderStartExamples({
-  onUse,
-}: {
-  onUse: (exampleId: string) => void;
-}) {
-  return (
-    <section className="mt-4" data-testid="reminders-start-examples">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-        Start with an example
-      </h3>
-      <ul className="mt-2 flex flex-col gap-2">
-        {REMINDER_START_EXAMPLES.map((ex) => (
-          <li
-            key={ex.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e7dfd4] bg-white/80 px-3 py-2"
-          >
-            <div>
-              <p className="font-semibold text-[#1f1c19]">{ex.title}</p>
-              <p className="text-sm text-[#6b635a]">{ex.hint}</p>
-            </div>
-            <button
-              type="button"
-              className={BTN_SECONDARY}
-              data-testid={`reminder-example-${ex.id}`}
-              onClick={() => onUse(ex.id)}
-            >
-              Use This Example
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-export function RhythmStartExamples({
-  onUse,
-}: {
-  onUse: (exampleId: string) => void;
-}) {
-  return (
-    <section className="mt-4" data-testid="rhythms-start-examples">
-      <h3 className="text-sm font-semibold uppercase tracking-wide text-[#6b635a]">
-        Start with an example
-      </h3>
-      <ul className="mt-2 flex flex-col gap-2">
-        {RHYTHM_START_EXAMPLES.map((ex) => (
-          <li
-            key={ex.id}
-            className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e7dfd4] bg-white/80 px-3 py-2"
-          >
-            <div>
-              <p className="font-semibold text-[#1f1c19]">{ex.title}</p>
-              <p className="text-sm text-[#6b635a]">{ex.hint}</p>
-            </div>
-            <button
-              type="button"
-              className={BTN_SECONDARY}
-              data-testid={`rhythm-example-${ex.id}`}
-              onClick={() => onUse(ex.id)}
-            >
-              Use This Example
-            </button>
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 export function ReminderActionsExplained() {
   const [open, setOpen] = useState(false);
   return (
@@ -307,45 +232,6 @@ export function ReminderActionsExplained() {
             </li>
           ))}
         </ul>
-      ) : null}
-    </section>
-  );
-}
-
-export function RhythmsAreFlexibleSection() {
-  const [open, setOpen] = useState(true);
-  return (
-    <section
-      className="mt-4 rounded-2xl border border-[#e7dfd4] bg-[#f7f3ec]/80 px-4 py-3"
-      data-testid="rhythms-are-flexible"
-    >
-      <button
-        type="button"
-        className="flex w-full items-center justify-between text-left"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className="text-base font-semibold text-[#1f1c19]">
-          {RHYTHMS_ARE_FLEXIBLE.title}
-        </span>
-        <span aria-hidden="true" className="text-[#1e4f4f]">
-          {open ? "−" : "+"}
-        </span>
-      </button>
-      {open ? (
-        <>
-          <p className="mt-2 text-sm leading-relaxed text-[#4b463f]">
-            {RHYTHMS_ARE_FLEXIBLE.body}
-          </p>
-          <ul className="mt-3 grid gap-1.5 text-sm text-[#4b463f] sm:grid-cols-2">
-            {RHYTHMS_ARE_FLEXIBLE.actions.map((a) => (
-              <li key={a.id}>
-                <span className="font-semibold text-[#1f1c19]">{a.label}:</span>{" "}
-                {a.meaning}
-              </li>
-            ))}
-          </ul>
-        </>
       ) : null}
     </section>
   );

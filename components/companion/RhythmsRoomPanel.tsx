@@ -7,9 +7,7 @@ import {
   HowToUseBlock,
   PersistentDifferenceCue,
   PreviewCard,
-  RhythmStartExamples,
   RoomArrivalBlock,
-  RhythmsAreFlexibleSection,
 } from "@/components/companion/ReminderRhythmRoomChrome";
 import { NotificationSoundPreferences } from "@/components/companion/NotificationSoundPreferences";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
@@ -23,6 +21,7 @@ import {
   pauseRhythm,
   resumeRhythm,
   skipRhythmOccurrence,
+  snoozeRhythm,
   updateMemberRhythm,
   type MemberRhythm,
   type RhythmCadence,
@@ -49,7 +48,6 @@ import {
 } from "@/lib/rhythms/rhythmForm";
 import { scrollRoomListToTestId } from "@/lib/planMyDay/scrollRoomList";
 import {
-  RHYTHM_START_EXAMPLES,
   buildRhythmPreview,
   clearRhythmFormDraft,
   loadRhythmFormDraft,
@@ -552,38 +550,6 @@ function RhythmRow({
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
-        <button
-          type="button"
-          className={BTN_TEAL_SOFT}
-          onClick={() => {
-            try {
-              completeRhythmOccurrence(rhythm.id);
-              setRowError(null);
-              onChanged();
-            } catch {
-              setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
-            }
-          }}
-          data-testid={`rhythms-complete-${rhythm.id}`}
-        >
-          Complete
-        </button>
-        <button
-          type="button"
-          className={BTN_SECONDARY}
-          onClick={() => {
-            try {
-              skipRhythmOccurrence(rhythm.id);
-              setRowError(null);
-              onChanged();
-            } catch {
-              setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
-            }
-          }}
-          data-testid={`rhythms-skip-${rhythm.id}`}
-        >
-          Skip
-        </button>
         {paused ? (
           <button
             type="button"
@@ -602,22 +568,56 @@ function RhythmRow({
             Resume
           </button>
         ) : (
-          <button
-            type="button"
-            className={BTN_TEAL_SOFT}
-            onClick={() => {
-              try {
-                pauseRhythm(rhythm.id);
-                setRowError(null);
-                onChanged();
-              } catch {
-                setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
-              }
-            }}
-            data-testid={`rhythms-pause-${rhythm.id}`}
-          >
-            Pause
-          </button>
+          <>
+            <button
+              type="button"
+              className={BTN_TEAL_SOFT}
+              onClick={() => {
+                try {
+                  completeRhythmOccurrence(rhythm.id);
+                  setRowError(null);
+                  onChanged();
+                } catch {
+                  setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+                }
+              }}
+              data-testid={`rhythms-complete-${rhythm.id}`}
+            >
+              Complete
+            </button>
+            <button
+              type="button"
+              className={BTN_SECONDARY}
+              onClick={() => {
+                try {
+                  snoozeRhythm(rhythm.id, 15);
+                  setRowError(null);
+                  onChanged();
+                } catch {
+                  setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+                }
+              }}
+              data-testid={`rhythms-snooze-${rhythm.id}`}
+            >
+              Snooze
+            </button>
+            <button
+              type="button"
+              className={BTN_SECONDARY}
+              onClick={() => {
+                try {
+                  skipRhythmOccurrence(rhythm.id);
+                  setRowError(null);
+                  onChanged();
+                } catch {
+                  setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+                }
+              }}
+              data-testid={`rhythms-skip-${rhythm.id}`}
+            >
+              Skip
+            </button>
+          </>
         )}
         <button
           type="button"
@@ -634,6 +634,25 @@ function RhythmRow({
           className="mt-2 flex flex-wrap gap-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2"
           data-testid={`rhythms-more-menu-${rhythm.id}`}
         >
+          {!paused ? (
+            <button
+              type="button"
+              className={BTN_SECONDARY}
+              onClick={() => {
+                try {
+                  pauseRhythm(rhythm.id);
+                  setRowError(null);
+                  onChanged();
+                  setMoreOpen(false);
+                } catch {
+                  setRowError(RHYTHM_SAVE_FAILURE_MESSAGE);
+                }
+              }}
+              data-testid={`rhythms-pause-${rhythm.id}`}
+            >
+              Pause
+            </button>
+          ) : null}
           <button
             type="button"
             className={BTN_SECONDARY}
@@ -644,7 +663,7 @@ function RhythmRow({
             }}
             data-testid={`rhythms-edit-${rhythm.id}`}
           >
-            Edit / Reschedule
+            Reschedule
           </button>
           <button
             type="button"
@@ -684,6 +703,8 @@ function RhythmListSection({
   testId,
   onChanged,
   onAddFocus,
+  collapsedByDefault = false,
+  hideEmptyCta = false,
 }: {
   title: string;
   empty: string;
@@ -691,13 +712,14 @@ function RhythmListSection({
   testId: string;
   onChanged: () => void;
   onAddFocus: () => void;
+  collapsedByDefault?: boolean;
+  hideEmptyCta?: boolean;
 }) {
-  return (
-    <section className="mt-6" data-testid={testId}>
-      <h2 className="text-lg font-semibold text-[#1f1c19]">{title}</h2>
-      {items.length === 0 ? (
-        <div className="mt-2 rounded-xl border border-dashed border-[#d4cdc3] bg-white/70 px-4 py-5">
-          <p className="text-base text-[#6b635a]">{empty}</p>
+  const listBody =
+    items.length === 0 ? (
+      <div className="mt-2 rounded-xl border border-dashed border-[#d4cdc3] bg-white/70 px-4 py-5">
+        <p className="text-base text-[#6b635a]">{empty}</p>
+        {!hideEmptyCta ? (
           <button
             type="button"
             className={`${BTN_TEAL_SOFT} mt-3`}
@@ -706,14 +728,31 @@ function RhythmListSection({
           >
             Create a Rhythm
           </button>
-        </div>
-      ) : (
-        <ul className="mt-3 flex flex-col gap-3">
-          {items.map((r) => (
-            <RhythmRow key={r.id} rhythm={r} onChanged={onChanged} />
-          ))}
-        </ul>
-      )}
+        ) : null}
+      </div>
+    ) : (
+      <ul className="mt-3 flex flex-col gap-3">
+        {items.map((r) => (
+          <RhythmRow key={r.id} rhythm={r} onChanged={onChanged} />
+        ))}
+      </ul>
+    );
+
+  if (collapsedByDefault) {
+    return (
+      <details className="mt-6" data-testid={testId}>
+        <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]">
+          {title}
+        </summary>
+        {listBody}
+      </details>
+    );
+  }
+
+  return (
+    <section className="mt-6" data-testid={testId}>
+      <h2 className="text-lg font-semibold text-[#1f1c19]">{title}</h2>
+      {listBody}
     </section>
   );
 }
@@ -772,28 +811,6 @@ export function RhythmsRoomPanel({
         .querySelector<HTMLInputElement>('[data-testid="rhythms-field-title"]')
         ?.focus();
     }, 40);
-  }
-
-  function applyExample(exampleId: string) {
-    const ex = RHYTHM_START_EXAMPLES.find((e) => e.id === exampleId);
-    if (!ex) return;
-    const next: RhythmFormValues = {
-      ...EMPTY_RHYTHM_FORM,
-      title: ex.form.title,
-      description: ex.form.description,
-      cadence: ex.form.cadence,
-      time: ex.form.time,
-      weekdays:
-        "weekdays" in ex.form && ex.form.weekdays
-          ? [...ex.form.weekdays]
-          : EMPTY_RHYTHM_FORM.weekdays,
-      dailyMode:
-        ex.form.cadence === "daily"
-          ? "every_day"
-          : EMPTY_RHYTHM_FORM.dailyMode,
-    };
-    updateForm(next);
-    focusAddForm();
   }
 
   function handleSave() {
@@ -870,7 +887,7 @@ export function RhythmsRoomPanel({
         ) : null}
         {embedded ? (
           <h2
-            className="plan-day-morning-note__title mt-2 text-xl"
+            className="mt-2 text-base font-semibold text-[#6b635a]"
             data-testid="rhythms-title"
           >
             Rhythms
@@ -898,8 +915,6 @@ export function RhythmsRoomPanel({
             testIdPrefix="rhythms"
           />
         ) : null}
-        <RhythmsAreFlexibleSection />
-        <RhythmStartExamples onUse={applyExample} />
 
         <section className="mt-6" data-testid="rhythms-add-section">
           <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
@@ -958,14 +973,16 @@ export function RhythmsRoomPanel({
           ) : null}
         </section>
 
-        <RhythmListSection
-          title="Today"
-          empty="Nothing due in today’s window yet."
-          items={lists.today}
-          testId="rhythms-today"
-          onChanged={refresh}
-          onAddFocus={focusAddForm}
-        />
+        {!embedded ? (
+          <RhythmListSection
+            title="Today"
+            empty="Nothing due in today’s window yet."
+            items={lists.today}
+            testId="rhythms-today"
+            onChanged={refresh}
+            onAddFocus={focusAddForm}
+          />
+        ) : null}
         <RhythmListSection
           title="Active"
           empty="No active rhythms yet."
@@ -973,6 +990,7 @@ export function RhythmsRoomPanel({
           testId="rhythms-active"
           onChanged={refresh}
           onAddFocus={focusAddForm}
+          hideEmptyCta={embedded}
         />
         <RhythmListSection
           title="Paused"
@@ -981,11 +999,15 @@ export function RhythmsRoomPanel({
           testId="rhythms-paused"
           onChanged={refresh}
           onAddFocus={focusAddForm}
+          collapsedByDefault={embedded}
+          hideEmptyCta={embedded}
         />
 
-        <section className="mt-8 border-t border-[#e7dfd4] pt-6">
-          <NotificationSoundPreferences />
-        </section>
+        {!embedded ? (
+          <section className="mt-8 border-t border-[#e7dfd4] pt-6">
+            <NotificationSoundPreferences />
+          </section>
+        ) : null}
       </div>
   );
 
