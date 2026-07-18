@@ -1,0 +1,67 @@
+---
+description: Spark Estate usability & reliability — guide-first UX, trust bugs before features, protect dirty tree
+alwaysApply: true
+---
+
+# Spark Estate — Easy to Use, Understand, and Trust
+
+Keep the estate metaphor, rooms, Chamber, and depth. **Do not** flatten into a dashboard. Members must get help without learning the whole estate.
+
+## Intended feeling
+
+Shari understands → explains why → offers few choices → **click means go**.
+
+Not: large menus, guessing which room holds the feature, software forms.
+
+## Primary daily path (do not invert)
+
+1. Today’s Welcome Card (Shari + three explained choices)
+2. One recommended destination with **why / where / what happens**
+3. Full menus, Explore Estate, Chamber roster = **optional browse only**
+
+## Every screen must answer
+
+Where am I? · What is this? · Why use it? · What first? · Can I leave safely?
+
+One primary action. Explain recommendations. No mystery locks without unlock path.
+
+## Reliability before features (order is binding)
+
+**Phase 1 — trust:** Parking Lot load states · Clear My Mind `originalText` · theme never `Other`/`**` · input update loops · Chamber dismiss on leave · current intent overrides stale workflows  
+
+**Phase 2 — conversation:** overwhelm by need (cognitive → Clear My Mind; task → first step; calming → restore) · one recommendation not four scenic places · curated place copy · contextual I’m Stuck  
+
+**Phase 3 — daily guidance:** Welcome Card · Adapt My Day **inside** Plan My Day  
+
+**Phase 4 — choice reduction:** Evidence Vault clarity · Chamber ≤3 recs then Browse All · Explore featured buckets · brief arrivals  
+
+Do not start later phases while Phase 1 bugs remain.
+
+## Non-negotiables
+
+| Rule | Detail |
+|------|--------|
+| User words are trusted | Never drop letters, strip apostrophes, or replace with analyzed text. Use `originalText` + optional `normalizedForAnalysis`. |
+| Current intent wins | Corrections cancel old workflows; no rejected-response repeats. |
+| Loading never permanent | Always resolve: loading → ready/empty/error + retry. |
+| Chamber / Board isolation | Leaving a member clears stream, persona, and temp state before next destination. |
+| Click = go | No second confirmation; close conflicting experiences; don’t restore unrelated chat. |
+
+## Shari voice (member-facing)
+
+Would a thoughtful human say this here? No workflow jargon · no raw Markdown/enums · no multi-place overwhelm menus · vary wording · acknowledge corrections once.
+
+## Git / dirty tree (critical on this repo)
+
+- **Never** `git add .` · `git clean` · hard reset · replace whole `CompanionPageClient.tsx` from HEAD while WIP exists  
+- Narrow `git add -- path` only; inspect staged hunks  
+- Do not mix Boardroom / Business Estate / portraits / Welcome styling into reliability commits  
+- Suggested commit prefixes: `fix:` trust bugs · `feat:` guidance/choice reduction — focused, reviewable
+
+## Quick regression targets
+
+`lib/clearMyMind/preserveCaptureText.test.ts` · `lib/planMyDay/parkingLotLoading.test.ts` · `lib/conversation/overwhelmNeedClassifier.test.ts` · `lib/conversationContinuity/workflowCorrection.test.ts` · `lib/chamber/chamberPerspectiveGuide.test.ts` · `lib/planMyDay/planOrAdaptInsidePlanMyDay.test.ts`
+
+## Done means
+
+Critical reliability verified · Welcome Card guides without estate mastery · Adapt My Day works inside Plan My Day · Production/Preview checked for Parking Lot freeze, CMM text, Chamber leak, wrong workflow resume.

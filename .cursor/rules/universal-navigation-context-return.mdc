@@ -1,0 +1,48 @@
+---
+description: Universal Navigation Context & Return — stack-based return with breadcrumbs on destinations; Living Places stay quiet
+alwaysApply: true
+---
+
+# Universal Navigation Context & Return Standard
+
+**Owners:** `lib/navigationContext/` · `NavigationReturnBar` · `ProfileReturnBar` (Profile consumer) · capture/restore in `CompanionPageClient.tsx`
+
+**Retires:** Global Return-to-Profile as a separate architecture — Profile is one implementation of this rule.
+
+## Purpose
+
+Whenever a member opens another destination, the platform remembers exact context and provides an easy return. Members explore naturally — they do not get lost.
+
+## Destinations (full return bar + breadcrumbs)
+
+Settings · Experience Controls · Chamber · Boardroom · Evidence Vault · Journal · Projects · Talk It Out · Profile · nested destination workflows
+
+Primary control: `← Back to [Origin]` (contextual — never hard-code per page).
+
+Breadcrumb: every segment clickable (e.g. `Projects › Website Redesign › Task Details`).
+
+## Living Places (minimal)
+
+Welcome Home + subtle leave/return only.
+
+- No persistent breadcrumb trail on glass
+- No History clock over the photograph
+- Leave **restores originating destination context** when the member entered from a destination — not always Welcome Home
+
+## Stack
+
+`pushFrame` before leave · `popFrame` / `jumpToIndex` on return · `clearStack` on login, sign-up, onboarding, emergency recovery, intentional Welcome Home start-over.
+
+Saving Settings must **not** clear the stack.
+
+## Context restore
+
+scroll · tab · section · accordion · filters · sort · search · selected record · drafts · editing field where practical
+
+## V2 (not V1)
+
+History clock (last 5–10 places) — defer until Previous Screen is proven.
+
+## Tests
+
+Stack unit tests · Profile migration regression · destination wiring · Living Place leave restores origin
