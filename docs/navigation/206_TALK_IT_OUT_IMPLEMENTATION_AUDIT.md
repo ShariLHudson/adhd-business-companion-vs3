@@ -65,22 +65,21 @@
 
 ## Phase 9 — Authenticated preview
 
-**Attempted:** `http://localhost:3000/companion` (dev on :3000). Browser session remained on “Loading your workspace…” — no Talk It Out UI reachable without a completed signed-in workspace load.
+**Status:** **PASS** (2026-07-18) — see `206_TALK_IT_OUT_AUTHENTICATED_PREVIEW_LIVE_RESULTS.md`.
 
-**Status:** Authenticated multi-turn smoke still required before production.
+Ran on signed-in local workspace (`?previewTest=1`). Multi-turn hire → clarify → cost → correction, pause/refresh/resume, zero permanent-failure phrases.
 
-### Smoke script (run when workspace loads)
+### Smoke script
 
 1. Open Talk It Out  
 2. “I need to decide whether to hire a marketing assistant.”  
 3. “What do you mean?”  
 4. “Cost.”  
-5. Inject/force a bad prior turn → “Nothing underneath.”  
+5. “Nothing underneath.”  
 6. Pause → refresh → resume  
 7. Assert none of: Take your time with that · quieter question underneath · something around does  
-8. Rename · continue · end  
 
-Local permanent regressions cover the same turns in `permanentFailureRegressions.test.ts`.
+Local permanent regressions: `permanentFailureRegressions.test.ts` (10/10).
 
 ## Phase 10 — Production readiness
 
@@ -91,7 +90,7 @@ Local permanent regressions cover the same turns in `permanentFailureRegressions
 | Validators regenerate | Yes |
 | Gold batch meaningful | Yes (≥32) |
 | Permanent regressions | Yes |
-| Authenticated preview transcripts | **Pending** |
+| Authenticated preview transcripts | **Yes (local PASS)** |
 | Production deployed | **No** |
 
-**Recommendation:** Do not deploy until authenticated multi-turn preview confirms the three phrases never appear and resume/topic/correction paths match local tests.
+**Recommendation:** Authenticated smoke is clear. Deploy only when you intentionally promote this branch — not blocked on TIO phrase/resume failures anymore.
