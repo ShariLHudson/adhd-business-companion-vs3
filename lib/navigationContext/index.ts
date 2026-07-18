@@ -1,13 +1,11 @@
-/**
- * Compatibility facade — Universal Navigation Context owns the stack.
- * Prefer `@/lib/navigationContext` for new call sites.
- */
-
+export * from "./types";
+export * from "./labels";
+export * from "./stack";
+export * from "./captureHelpers";
 export {
   type NavigationOriginContext,
   type ProfileBreadcrumbCrumb,
   PROFILE_SETTINGS_SECTION_LABELS,
-  SETTINGS_SAVED_MESSAGE,
   defaultProfileReturnLabel,
   labelForOpenedDestination,
   buildProfileReturnBreadcrumb,
@@ -19,4 +17,4 @@ export {
   subscribeNavigationOrigin,
   clearNavigationOriginForTests,
   NAVIGATION_ORIGIN_STORAGE_KEY,
-} from "@/lib/navigationContext";
+} from "./profileBridge";
