@@ -155,11 +155,17 @@ export function appendTalkItOutMessages(
     Pick<
       TalkItOutSession,
       | "usedQuestionIds"
+      | "usedStrategyMoves"
       | "explicitHelpRequested"
       | "futureFeelingAsked"
       | "userDiscoveries"
       | "userNamedNextSteps"
       | "thinkingMap"
+      | "cieState"
+      | "usefulSummary"
+      | "title"
+      | "topic"
+      | "needsReentry"
     >
   >,
 ): TalkItOutSession {
@@ -181,6 +187,7 @@ export function pauseTalkItOutSession(
   const next: TalkItOutSession = {
     ...session,
     status: "paused",
+    needsReentry: true,
     updatedAt: new Date().toISOString(),
   };
   upsertTalkItOutSession(next);
@@ -224,4 +231,37 @@ export function saveTalkItOutDiscovery(
 
 export function listPausedTalkItOutSessions(): TalkItOutSession[] {
   return loadTalkItOutSessions().filter((s) => s.status === "paused");
+}
+
+/** Package 200/205 — rename a saved conversation. */
+export function renameTalkItOutSession(
+  session: TalkItOutSession,
+  title: string,
+): TalkItOutSession {
+  const next: TalkItOutSession = {
+    ...session,
+    title: title.trim().slice(0, 80) || session.title,
+    updatedAt: new Date().toISOString(),
+  };
+  upsertTalkItOutSession(next);
+  return next;
+}
+
+/** Package 200/205 — delete a conversation from private history. */
+export function deleteTalkItOutSession(sessionId: string): void {
+  const all = loadTalkItOutSessions().filter((s) => s.id !== sessionId);
+  persistSessions(all);
+  if (getActiveTalkItOutSessionId() === sessionId) {
+    setActiveTalkItOutSessionId(null);
+  }
+}
+
+/** Start fresh without deleting prior history. */
+export function startFreshTalkItOutSession(): TalkItOutSession {
+  setActiveTalkItOutSessionId(null);
+  return createTalkItOutSession();
+}
+
+export function listTalkItOutHistory(): TalkItOutSession[] {
+  return loadTalkItOutSessions().filter((s) => s.messages.length > 1);
 }

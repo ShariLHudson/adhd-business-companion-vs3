@@ -7,7 +7,7 @@ import type { CrciMessage, CrciRepairTrigger } from "./types";
 const PATTERNS: { trigger: CrciRepairTrigger; re: RegExp }[] = [
   {
     trigger: "what-do-you-mean",
-    re: /\b(?:what do you mean|what(?:'s| is) that (?:supposed to )?mean|mean by that)\b/i,
+    re: /\b(?:what do you mean|what do(?:es)? that mean|what(?:'s| is) that (?:supposed to )?mean|mean by that)\b/i,
   },
   {
     trigger: "dont-understand",

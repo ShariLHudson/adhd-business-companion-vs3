@@ -2,6 +2,7 @@
  * Shared CRCI API — repair before reflective exploration.
  */
 
+import { buildTopicSafeClarificationRepair } from "@/lib/topicContinuityAnchorIntelligence";
 import { buildRepairAssistantText } from "./repairEngine";
 import { resolveRepairTrigger } from "./triggerDetection";
 import type { CrciRepairInput, CrciRepairResult } from "./types";
@@ -48,6 +49,35 @@ export function tryConversationRepair(
       trigger,
       assistantText:
         "I may have gotten ahead of myself. Tell me what felt unclear, and I'll stay with that.",
+      suppressReflectiveQuestions: true,
+      meta: { ownedConfusion: true, invitedCorrection: true },
+    };
+  }
+
+  // Package 193 — prefer topic-anchored repair when we know the subject
+  if (input.primaryTopic?.trim()) {
+    const anchored = buildTopicSafeClarificationRepair({
+      anchor: {
+        primaryTopic: input.primaryTopic.trim(),
+        topicType: "other",
+        conversationGoal: null,
+        topicConfidence: "high",
+        topicSourceTurnId: null,
+        currentFocus: null,
+        topicHistory: [input.primaryTopic.trim()],
+        topicChangeRequested: false,
+        topicChangeConfirmed: false,
+        lastClarificationRequest: input.userText.trim(),
+        topicDriftDetected: false,
+      },
+      previousAssistantText: previous,
+      userText: input.userText,
+      seed: input.userText.length + previous.length,
+    });
+    return {
+      needsRepair: true,
+      trigger,
+      assistantText: anchored,
       suppressReflectiveQuestions: true,
       meta: { ownedConfusion: true, invitedCorrection: true },
     };

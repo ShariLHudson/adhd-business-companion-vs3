@@ -16,6 +16,10 @@ import {
   buildSummary,
   buildTentativePattern,
 } from "./reflection";
+import {
+  containsUnsupportedHiddenMeaning,
+  draftReusesRejectedInterpretation,
+} from "./noHiddenMeaning";
 import { sanitizeAgainstUser } from "./repetitionGuard";
 import { RCI_COMPLETION_CHECK } from "./types";
 
@@ -109,10 +113,9 @@ export function selectReflectiveResponse(input: {
 
   let kind = pickKind(map, seed);
 
-  // First user turn: prefer observation or situation question over summary
-  if (map.turnCount <= 1) {
-    kind =
-      seed % 2 === 0 ? "gentle-observation" : "thoughtful-question";
+  // Package 192 — opening turns stay concrete; no hidden-meaning interpretation
+  if (map.turnCount <= 2 || !map.interpretationAllowed) {
+    kind = "thoughtful-question";
   }
 
   if (kind === "completion-check") {
@@ -146,66 +149,96 @@ export function selectReflectiveResponse(input: {
   }
 
   if (kind === "gentle-observation") {
-    const obs = buildGentleObservation(map, seed);
-    // Sometimes observation alone; sometimes + question
-    if (seed % 3 === 0 || obs.includes("?")) {
-      return {
-        kind,
-        text: sanitizeAgainstUser(userText, obs),
-        futureFeelingAsked: futureFeelingAlreadyAsked,
-        offeredCompletionCheck: false,
-        rejectedAsAlreadyAnswered: false,
-      };
+    if (!map.interpretationAllowed) {
+      kind = "thoughtful-question";
+    } else {
+      const obs = buildGentleObservation(map, seed);
+      if (
+        containsUnsupportedHiddenMeaning(obs) ||
+        draftReusesRejectedInterpretation(obs, map)
+      ) {
+        kind = "thoughtful-question";
+      } else if (seed % 3 === 0 || obs.includes("?")) {
+        return {
+          kind,
+          text: sanitizeAgainstUser(userText, obs),
+          futureFeelingAsked: futureFeelingAlreadyAsked,
+          offeredCompletionCheck: false,
+          rejectedAsAlreadyAnswered: false,
+        };
+      } else {
+        kind = "thoughtful-question";
+        const filtered = filterCandidateQuestions(
+          candidateQuestions,
+          map,
+          used,
+          userMessages,
+        ).sort((a, b) => {
+          const as = a.id.startsWith("sit-") ? 0 : 1;
+          const bs = b.id.startsWith("sit-") ? 0 : 1;
+          return as - bs;
+        });
+        const q = filtered[0];
+        if (q) {
+          const combined = `${obs}\n\n${q.text}`;
+          if (
+            !containsUnsupportedHiddenMeaning(combined) &&
+            !draftReusesRejectedInterpretation(combined, map)
+          ) {
+            return {
+              kind: "gentle-observation",
+              text: sanitizeAgainstUser(userText, combined),
+              questionId: q.id,
+              futureFeelingAsked: futureFeelingAlreadyAsked,
+              offeredCompletionCheck: false,
+              rejectedAsAlreadyAnswered: false,
+            };
+          }
+        }
+      }
     }
-    kind = "thoughtful-question";
-    const filtered = filterCandidateQuestions(
-      candidateQuestions,
-      map,
-      used,
-      userMessages,
-    ).sort((a, b) => {
-      const as = a.id.startsWith("sit-") ? 0 : 1;
-      const bs = b.id.startsWith("sit-") ? 0 : 1;
-      return as - bs;
-    });
-    const q = filtered[0];
-    if (q) {
-      return {
-        kind: "gentle-observation",
-        text: sanitizeAgainstUser(userText, `${obs}\n\n${q.text}`),
-        questionId: q.id,
-        futureFeelingAsked: futureFeelingAlreadyAsked,
-        offeredCompletionCheck: false,
-        rejectedAsAlreadyAnswered: false,
-      };
-    }
-    return {
-      kind: "gentle-observation",
-      text: sanitizeAgainstUser(userText, obs),
-      futureFeelingAsked: futureFeelingAlreadyAsked,
-      offeredCompletionCheck: false,
-      rejectedAsAlreadyAnswered: false,
-    };
   }
 
   if (kind === "tentative-pattern") {
-    return {
-      kind,
-      text: sanitizeAgainstUser(userText, buildTentativePattern(map, seed)),
-      futureFeelingAsked: futureFeelingAlreadyAsked,
-      offeredCompletionCheck: false,
-      rejectedAsAlreadyAnswered: false,
-    };
+    if (!map.interpretationAllowed) {
+      kind = "thoughtful-question";
+    } else {
+      const pattern = buildTentativePattern(map, seed);
+      if (
+        !containsUnsupportedHiddenMeaning(pattern) &&
+        !draftReusesRejectedInterpretation(pattern, map)
+      ) {
+        return {
+          kind,
+          text: sanitizeAgainstUser(userText, pattern),
+          futureFeelingAsked: futureFeelingAlreadyAsked,
+          offeredCompletionCheck: false,
+          rejectedAsAlreadyAnswered: false,
+        };
+      }
+      kind = "thoughtful-question";
+    }
   }
 
   if (kind === "connection") {
-    return {
-      kind,
-      text: sanitizeAgainstUser(userText, buildConnection(map, seed)),
-      futureFeelingAsked: futureFeelingAlreadyAsked,
-      offeredCompletionCheck: false,
-      rejectedAsAlreadyAnswered: false,
-    };
+    if (!map.interpretationAllowed) {
+      kind = "thoughtful-question";
+    } else {
+      const conn = buildConnection(map, seed);
+      if (
+        !containsUnsupportedHiddenMeaning(conn) &&
+        !draftReusesRejectedInterpretation(conn, map)
+      ) {
+        return {
+          kind,
+          text: sanitizeAgainstUser(userText, conn),
+          futureFeelingAsked: futureFeelingAlreadyAsked,
+          offeredCompletionCheck: false,
+          rejectedAsAlreadyAnswered: false,
+        };
+      }
+      kind = "thoughtful-question";
+    }
   }
 
   if (kind === "clarification") {
@@ -219,8 +252,20 @@ export function selectReflectiveResponse(input: {
   }
 
   // thoughtful-question — prefer situation-tuned (sit-*) candidates first
+  const hiddenQ =
+    /\b(?:really about|underneath|what else wants to be said|what feels unfinished|what matters most)\b/i;
   const filtered = filterCandidateQuestions(
-    candidateQuestions.filter((q) => q.area !== "future-feeling"),
+    candidateQuestions.filter((q) => {
+      if (q.area === "future-feeling") return false;
+      if (
+        !map.interpretationAllowed &&
+        (q.area === "meaning" || hiddenQ.test(q.text))
+      ) {
+        return false;
+      }
+      if (draftReusesRejectedInterpretation(q.text, map)) return false;
+      return true;
+    }),
     map,
     used,
     userMessages,
@@ -232,11 +277,17 @@ export function selectReflectiveResponse(input: {
   if (filtered.length === 0 && candidateQuestions.length > 0) {
     rejectedAsAlreadyAnswered = true;
   }
+
+  const hireFallback =
+    /\bhir|marketing|sales/i.test(userText) ||
+    /\bhir|marketing|sales/i.test(map.literalTopic ?? "");
   const q =
     filtered[0] ??
     ({
       id: "rci-fallback",
-      text: "What feels most important to understand next?",
+      text: hireFallback
+        ? "What is making you consider hiring someone now?"
+        : "What feels most important to understand next?",
     } satisfies RciCandidateQuestion);
 
   // Openers / delivery variation owned by Conversational Intelligence (183).

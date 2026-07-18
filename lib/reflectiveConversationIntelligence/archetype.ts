@@ -81,5 +81,14 @@ export function classifyConversationArchetype(
   ) {
     return "business-decision";
   }
+  // Hire / should-I framing is a business decision even without "decide"
+  if (
+    /\b(?:hir(?:e|ing)|outsourc|bring (?:someone|a person) (?:in|on))\b/.test(
+      blob,
+    ) ||
+    /\bshould i\b/.test(blob)
+  ) {
+    return "business-decision";
+  }
   return "other";
 }

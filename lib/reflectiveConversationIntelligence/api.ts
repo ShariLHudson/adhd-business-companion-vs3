@@ -4,6 +4,10 @@
  */
 
 import { markQuestionExplored, updateThinkingMap } from "./thinkingMap";
+import {
+  containsUnsupportedHiddenMeaning,
+  draftReusesRejectedInterpretation,
+} from "./noHiddenMeaning";
 import { selectReflectiveResponse } from "./responseSelection";
 import { ensureSingleQuestion } from "./repetitionGuard";
 import type { RciTurnInput, RciTurnResult } from "./types";
@@ -48,7 +52,20 @@ export function runReflectiveTurn(input: RciTurnInput): RciTurnResult {
     map = markQuestionExplored(map, selected.text);
   }
 
-  const assistantText = ensureSingleQuestion(selected.text);
+  let assistantText = ensureSingleQuestion(selected.text);
+  // Package 192 — never send unsupported hidden-meaning drafts
+  if (
+    containsUnsupportedHiddenMeaning(assistantText) ||
+    draftReusesRejectedInterpretation(assistantText, map)
+  ) {
+    const hire =
+      /\b(?:hir(?:e|ing)|marketing|sales)\b/i.test(userText) ||
+      /\b(?:hir|marketing|sales)\b/i.test(map.literalTopic ?? "");
+    assistantText = hire
+      ? "What is making you consider hiring someone now?"
+      : "What part of what you shared feels most useful to understand first?";
+  }
+
   const deepened =
     selected.kind !== "invite-continue" &&
     (Boolean(selected.questionId) ||

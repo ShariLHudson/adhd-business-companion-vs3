@@ -1,3 +1,4 @@
+import type { ConversationRuntimeState } from "@/lib/conversationIntelligenceEngine";
 import type { ThinkingMap } from "@/lib/reflectiveConversationIntelligence";
 
 export type TalkItOutMessageRole = "assistant" | "user";
@@ -26,14 +27,22 @@ export type TalkItOutSession = {
   status: TalkItOutSessionStatus;
   messages: TalkItOutMessage[];
   usedQuestionIds: string[];
+  /** Strategy moves already used this conversation (package 201). */
+  usedStrategyMoves?: string[];
   userDiscoveries: string[];
   userNamedNextSteps: string[];
   savedDiscoveries: TalkItOutSavedDiscovery[];
+  /** Latest useful grounded summary (packages 204–205). */
+  usefulSummary?: string;
+  /** Set on pause — cleared after grounded re-entry is delivered. */
+  needsReentry?: boolean;
   /** Only true after the member explicitly asks for more help / another perspective. */
   explicitHelpRequested: boolean;
   futureFeelingAsked: boolean;
   /** Hidden RCI Thinking Map — never show to members. */
   thinkingMap?: ThinkingMap;
+  /** CIE runtime state — packages 195–196; never show to members. */
+  cieState?: ConversationRuntimeState;
   createdAt: string;
   updatedAt: string;
 };

@@ -4,6 +4,8 @@
  * Never expose the map to members.
  */
 
+import type { TopicAnchor } from "@/lib/topicContinuityAnchorIntelligence";
+
 export type RciExperienceId =
   | "talk-it-out"
   | "journal-gazebo"
@@ -62,6 +64,14 @@ export type ThinkingMap = {
   archetype: RciConversationArchetype;
   turnCount: number;
   lastUserText: string | null;
+  /** Package 192 — literal topic + interpretation gates (never expose). */
+  rejectedInterpretations: string[];
+  userCorrections: string[];
+  literalTopic: string | null;
+  interpretationEvidenceCount: number;
+  interpretationAllowed: boolean;
+  /** Package 193 — protected Topic Anchor (never overwrite via clarification). */
+  topicAnchor?: TopicAnchor | null;
 };
 
 export type RciCandidateQuestion = {

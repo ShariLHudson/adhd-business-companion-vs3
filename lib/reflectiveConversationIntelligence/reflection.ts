@@ -13,6 +13,7 @@ const BY_ARCHETYPE: Record<RciConversationArchetype, readonly string[]> = {
     "I wonder whether the hard part is choosing — or trusting yourself after you choose.",
     "Tell me if this fits: it may be less about the options, and more about what each one would ask of you.",
     "I am curious whether one option feels safer, even if it is not the one you want.",
+    "Hiring help often comes down to cost, timing, and what you most want off your plate.",
   ],
   planning: [
     "I wonder if the plan is carrying more than a plan should — maybe a hope for certainty.",
@@ -56,8 +57,8 @@ const BY_ARCHETYPE: Record<RciConversationArchetype, readonly string[]> = {
   ],
   other: [
     "I wonder what feels most unfinished in what you just said.",
-    "Tell me if I am reading this wrong — there may be a quieter question underneath.",
     "I am curious which part of this keeps pulling your attention back.",
+    "What feels most useful to understand about this first?",
   ],
 };
 
@@ -91,11 +92,11 @@ export function buildConnection(map: ThinkingMap, seed: number): string {
     return `I am curious about the relationship between what you care about and what feels risky — they may be tugging on each other.`;
   }
   if (map.optionsNamed.length >= 2) {
-    return `I wonder how those options connect to what you want underneath — not just which one is easier.`;
+    return `I wonder how those options connect to the outcome you want — not just which one is easier.`;
   }
   return pick(
     [
-      "I am curious how the surface problem connects to what you want underneath.",
+      "I am curious how the pieces you named connect to each other.",
       "Tell me if this fits: two parts of what you said may be linked more than they look.",
     ],
     seed,
@@ -105,9 +106,9 @@ export function buildConnection(map: ThinkingMap, seed: number): string {
 export function buildInviteContinue(seed: number): string {
   return pick(
     [
-      "Tell me more about that part.",
-      "Stay with that for a moment — what else is true about it?",
-      "I am with you. What else wants to be said?",
+      "What else is true about that part?",
+      "Stay with that for a moment — what else belongs with it?",
+      "Which detail of that feels most useful to unpack next?",
     ],
     seed,
   );
@@ -131,7 +132,7 @@ export function buildSummary(map: ThinkingMap): string {
   if (map.goal) bits.push("what you are hoping for");
   if (map.optionsNamed.length) bits.push("the options you have already named");
   if (bits.length === 0) {
-    return "A few things seem clearer already — and there may still be a quieter piece underneath.";
+    return "A few things seem clearer already — what still feels unsettled for you?";
   }
   return `So far I am holding ${bits.slice(0, 3).join(", ")}. Does that match what feels most true?`;
 }

@@ -116,10 +116,10 @@ export function expressConversationalDraft(input: {
 
 /** Safe fallbacks when quality cert fails after expression. */
 export const CI_FALLBACKS = [
-  "What feels most unfinished in what you just said?",
   "Which part of that keeps pulling your attention?",
   "What would you most like to understand before you decide?",
-  "I am with you on this. What feels heaviest right now?",
+  "What feels heaviest in what you just shared?",
+  "What part of that decision still feels hardest to judge?",
 ] as const;
 
 export function fallbackExpression(userText: string, seed: number): string {

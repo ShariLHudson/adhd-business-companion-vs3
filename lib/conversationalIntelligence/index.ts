@@ -26,3 +26,16 @@ export {
   fallbackExpression,
 } from "./expressionEngine";
 export { deliverConversationalResponse } from "./api";
+export {
+  applyGroundedAcknowledgement,
+  buildGroundedFallback,
+  certifyGroundedAcknowledgement,
+  extractTopicCues,
+  isGenericAcknowledgement,
+  hasVaguePronounOpen,
+  hasTopicReference,
+} from "./groundedAcknowledgement";
+export type {
+  GroundedAckFailureCode,
+  GroundedAckResult,
+} from "./groundedAcknowledgement";

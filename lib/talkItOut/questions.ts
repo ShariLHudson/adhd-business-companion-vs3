@@ -20,7 +20,22 @@ export const TALK_IT_OUT_QUESTIONS: readonly TalkItOutQuestion[] = [
   {
     id: "m-really-about",
     area: "meaning",
-    text: "What do you think this situation is really about for you?",
+    text: "What part of this feels most central for you right now?",
+  },
+  {
+    id: "wh-hire-why",
+    area: "what-happened",
+    text: "What is making you consider hiring someone now?",
+  },
+  {
+    id: "wh-hire-plate",
+    area: "what-happened",
+    text: "What would you hope a marketing or sales person could take off your plate?",
+  },
+  {
+    id: "wh-hire-judge",
+    area: "what-happened",
+    text: "What feels hardest to judge right now — the cost, the timing, or what you would want them to accomplish?",
   },
   {
     id: "m-weight",
@@ -35,7 +50,8 @@ export const TALK_IT_OUT_QUESTIONS: readonly TalkItOutQuestion[] = [
   {
     id: "v-matters",
     area: "values",
-    text: "What matters most to you here?",
+    // Package 203/206 — concrete substitute; abstract "what matters most" banned
+    text: "What would you want this choice to protect?",
   },
   {
     id: "v-aligned",

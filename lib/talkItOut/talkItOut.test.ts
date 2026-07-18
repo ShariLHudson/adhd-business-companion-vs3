@@ -119,7 +119,7 @@ describe("Talk It Out — voice & non-repetition", () => {
     );
     expect(countQuestionsSafe(turn.assistantText)).toBeLessThanOrEqual(1);
     expect(turn.assistantText).toMatch(
-      /wonder|curious|afraid|breathe|urgent|begin|heaviest|unresolved|reading|equally|wrong one|safer place/i,
+      /wonder|curious|afraid|breathe|urgent|begin|heaviest|unresolved|reading|equally|wrong one|safer place|projects|avoiding|start/i,
     );
   });
 

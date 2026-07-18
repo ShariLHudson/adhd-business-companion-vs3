@@ -3,6 +3,12 @@
  */
 
 import { classifyConversationArchetype } from "./archetype";
+import {
+  countInterpretationEvidence,
+  extractLiteralTopic,
+  interpretationAllowedFromEvidence,
+} from "./noHiddenMeaning";
+import { updateTopicAnchor } from "@/lib/topicContinuityAnchorIntelligence";
 import type { RciMessage, ThinkingMap } from "./types";
 
 export function emptyThinkingMap(): ThinkingMap {
@@ -25,6 +31,12 @@ export function emptyThinkingMap(): ThinkingMap {
     archetype: "other",
     turnCount: 0,
     lastUserText: null,
+    rejectedInterpretations: [],
+    userCorrections: [],
+    literalTopic: null,
+    interpretationEvidenceCount: 0,
+    interpretationAllowed: false,
+    topicAnchor: null,
   };
 }
 
@@ -74,6 +86,12 @@ export function updateThinkingMap(
         questionsAnswered: [...previous.questionsAnswered],
         questionsWorthExploring: [...previous.questionsWorthExploring],
         emergingInsights: [...previous.emergingInsights],
+        rejectedInterpretations: [...(previous.rejectedInterpretations ?? [])],
+        userCorrections: [...(previous.userCorrections ?? [])],
+        literalTopic: previous.literalTopic ?? null,
+        interpretationEvidenceCount:
+          previous.interpretationEvidenceCount ?? 0,
+        interpretationAllowed: previous.interpretationAllowed ?? false,
       }
     : emptyThinkingMap();
 
@@ -86,7 +104,27 @@ export function updateThinkingMap(
   map.turnCount = Math.max(map.turnCount, userTurns);
   map.archetype = classifyConversationArchetype(t, messages);
 
-  if (!map.situation && t) {
+  // Package 193 — Topic Anchor before literal overwrite rules
+  map.topicAnchor = updateTopicAnchor({
+    previous: previous?.topicAnchor ?? map.topicAnchor,
+    userText: t,
+    messages: messages.map((m) => ({ role: m.role, content: m.content })),
+  });
+  if (map.topicAnchor.primaryTopic) {
+    map.literalTopic = map.topicAnchor.primaryTopic;
+  } else {
+    const literal = extractLiteralTopic(t);
+    if (literal) {
+      map.literalTopic = literal;
+    }
+  }
+
+  if (!map.situation && t && map.literalTopic) {
+    map.situation =
+      map.literalTopic.length <= 140
+        ? map.literalTopic
+        : `${map.literalTopic.slice(0, 137)}…`;
+  } else if (!map.situation && t) {
     map.situation = t.length <= 140 ? t : `${t.slice(0, 137)}…`;
   }
 
@@ -152,6 +190,16 @@ export function updateThinkingMap(
   while (map.questionsWorthExploring.length > 10) {
     map.questionsWorthExploring.shift();
   }
+
+  // Package 192 — interpretation only after enough grounded evidence
+  map.interpretationEvidenceCount = countInterpretationEvidence(
+    map,
+    t,
+    messages,
+  );
+  map.interpretationAllowed = interpretationAllowedFromEvidence(
+    map.interpretationEvidenceCount,
+  );
 
   return map;
 }

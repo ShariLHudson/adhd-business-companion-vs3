@@ -20,6 +20,7 @@ import {
   TALK_IT_OUT_TITLE,
   appendTalkItOutMessages,
   buildDiscoveryDraft,
+  buildTalkItOutReentry,
   buildTalkItOutTurn,
   createTalkItOutSession,
   endTalkItOutSession,
@@ -119,7 +120,33 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    setSession(resumeOrCreateTalkItOutSession());
+    let s = resumeOrCreateTalkItOutSession();
+    // Package 200/205 — grounded re-entry after pause (never "welcome back")
+    if (s.needsReentry && s.messages.some((m) => m.role === "user")) {
+      const reentry = buildTalkItOutReentry({
+        topicAnchor:
+          s.topic ??
+          s.thinkingMap?.topicAnchor?.primaryTopic ??
+          s.cieState?.topicAnchor?.primaryTopic,
+        currentFocus:
+          s.thinkingMap?.topicAnchor?.currentFocus ??
+          s.cieState?.currentFocus?.label,
+        usefulSummary: s.usefulSummary,
+      });
+      s = appendTalkItOutMessages(
+        s,
+        [
+          {
+            id: `tio-reentry-${Date.now()}`,
+            role: "assistant",
+            content: reentry,
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        { needsReentry: false },
+      );
+    }
+    setSession(s);
   }, []);
 
   useEffect(() => {
@@ -167,10 +194,18 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
       : withUser.usedQuestionIds;
     const next = appendTalkItOutMessages(withUser, [assistantMsg], {
       usedQuestionIds: used,
+      usedStrategyMoves:
+        turn.usedStrategyMoves ?? withUser.usedStrategyMoves,
       explicitHelpRequested:
         withUser.explicitHelpRequested || turn.explicitHelpRequested,
       futureFeelingAsked: turn.futureFeelingAsked,
       thinkingMap: turn.thinkingMap ?? withUser.thinkingMap,
+      cieState: turn.cieState ?? withUser.cieState,
+      usefulSummary: turn.usefulSummary ?? withUser.usefulSummary,
+      topic:
+        turn.thinkingMap?.topicAnchor?.primaryTopic ??
+        turn.cieState?.topicAnchor?.primaryTopic ??
+        withUser.topic,
     });
     setSession(next);
     const userTurns = next.messages.filter((m) => m.role === "user").length;

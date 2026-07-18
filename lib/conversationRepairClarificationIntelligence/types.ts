@@ -5,6 +5,7 @@
 
 export type CrciExperienceId =
   | "talk-it-out"
+  | "create"
   | "general-chat"
   | "journal-gazebo"
   | "decision-compass"
@@ -33,6 +34,8 @@ export type CrciRepairInput = {
   messages: readonly CrciMessage[];
   /** Last assistant turn Shari is clarifying — preferred over scanning history. */
   previousAssistantText?: string | null;
+  /** Package 193 — active primary topic for topic-safe repair. */
+  primaryTopic?: string | null;
 };
 
 export type CrciRepairResult = {

@@ -11,6 +11,7 @@ import type {
 
 export type CiExperienceId =
   | "talk-it-out"
+  | "create"
   | "journal-gazebo"
   | "decision-compass"
   | "chamber"

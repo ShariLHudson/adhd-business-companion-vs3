@@ -4,16 +4,69 @@
  */
 
 import { tryConversationRepair } from "@/lib/conversationRepairClarificationIntelligence";
-import { deliverConversationalResponse } from "@/lib/conversationalIntelligence";
 import {
+  applyGroundedAcknowledgement,
+  deliverConversationalResponse,
+} from "@/lib/conversationalIntelligence";
+import { runConversationQualityAndRhythm } from "@/lib/conversationQualityRhythmIntelligence";
+import {
+  applyUserCorrectionToMap,
+  buildDirectCorrectionRepair,
+  detectsDirectCorrection,
+  emptyThinkingMap,
+  extractLiteralTopic,
+  lastAssistantHadHiddenMeaning,
   runReflectiveTurn,
+  updateThinkingMap,
   type RciCandidateQuestion,
   type RciResponseKind,
   type ThinkingMap,
 } from "@/lib/reflectiveConversationIntelligence";
+import {
+  applyTopicContinuityValidation,
+  buildTopicSafeClarificationRepair,
+  buildUnconfirmedTopicChangePrompt,
+  detectsExplicitTopicChange,
+  hasActiveTopicAnchor,
+  isClarificationRequest,
+  recoverTopicFromHistory,
+  updateTopicAnchor,
+  type TopicAnchor,
+} from "@/lib/topicContinuityAnchorIntelligence";
+import { replaceBlockedDraft } from "@/lib/goldStandardConversationLibrary";
+import {
+  processConversationTurn,
+  type ConversationRuntimeState,
+} from "@/lib/conversationIntelligenceEngine";
+import {
+  selectConversationDesignPattern,
+  type CdpPatternId,
+} from "@/lib/conversationDesignPatterns";
 import { getPrefs } from "@/lib/companionStore";
 import { TALK_IT_OUT_HELP_OFFER, TALK_IT_OUT_OPENING } from "./copy";
+import {
+  buildCompletionResponse,
+  buildTalkItOutSummary,
+  detectCompletionSignal,
+  shouldStopQuestioning,
+} from "./completionIntelligence";
+import { classifyTalkItOutIntent } from "./modeBoundaries";
+import {
+  adaptDraftToPreferences,
+  applyExplicitPreferenceStatement,
+  loadTalkItOutPreferences,
+} from "./personalization";
+import {
+  extractAnsweredDutyHints,
+  filterQuestionCandidates,
+  groundedQuestionFallback,
+  validateTalkItOutQuestion,
+} from "./questionIntelligence";
 import { TALK_IT_OUT_QUESTIONS } from "./questions";
+import {
+  selectStrategyMove,
+  type TioStrategyMoveId,
+} from "./strategyLibrary";
 import type { TalkItOutQuestion, TalkItOutSession } from "./types";
 import {
   SHARI_OBSERVATIONS,
@@ -174,13 +227,14 @@ function areaForTurn(
   if (/\b(?:always|again|pattern|usually|before)\b/.test(t)) return "patterns";
   if (/\b(?:ready|today|possible|too much)\b/.test(t)) return "readiness";
   if (/\b(?:mean|afraid|really about|weight)\b/.test(t)) return "meaning";
-  if (userTurns <= 1) return "what-happened";
-  if (userTurns === 2) return "meaning";
-  if (userTurns === 3) return "values";
-  if (userTurns === 4) return "needs";
-  if (userTurns === 5) return "options";
+  // Package 192 — stay concrete early; do not jump to "meaning" on turn 2
+  if (userTurns <= 2) return "what-happened";
+  if (userTurns === 3) return "options";
+  if (userTurns === 4) return "values";
+  if (userTurns === 5) return "needs";
   if (userTurns === 6) return "trade-offs";
   if (userTurns === 7) return "patterns";
+  if (userTurns >= 8) return "meaning";
   return "readiness";
 }
 
@@ -193,6 +247,8 @@ function buildCandidateQuestions(
   const userTurns = session.messages.filter((m) => m.role === "user").length;
   const preferred = areaForTurn(userTurns, userText);
   const out: RciCandidateQuestion[] = [];
+  const hireLike = /\b(?:hir(?:e|ing)|marketing|sales)\b/i.test(userText);
+  const concreteContext = hireLike || /\b(?:cost|budget|client|project|role)\b/i.test(userText);
 
   for (const q of SITUATION_QUESTIONS[signal]) {
     if (!used.has(q.id)) {
@@ -200,16 +256,37 @@ function buildCandidateQuestions(
     }
   }
 
+  // Package 192/194 — concrete hire questions first on business decisions
+  if (hireLike) {
+    out.push({
+      id: "gsc-hire-why-now",
+      text: "What is making you consider hiring one now?",
+      area: "what-happened",
+    });
+    for (const q of TALK_IT_OUT_QUESTIONS) {
+      if (q.id.startsWith("wh-hire-") && !used.has(q.id)) {
+        out.push({ id: q.id, text: q.text, area: q.area });
+      }
+    }
+  }
+
   const preferredBank = TALK_IT_OUT_QUESTIONS.filter(
-    (q) => q.area === preferred && !used.has(q.id),
+    (q) =>
+      q.area === preferred &&
+      !used.has(q.id) &&
+      !q.id.startsWith("wh-hire-"),
   );
   const restBank = TALK_IT_OUT_QUESTIONS.filter(
-    (q) => q.area !== preferred && !used.has(q.id),
+    (q) =>
+      q.area !== preferred &&
+      !used.has(q.id) &&
+      !q.id.startsWith("wh-hire-"),
   );
   for (const q of [...preferredBank, ...restBank]) {
     out.push({ id: q.id, text: q.text, area: q.area });
   }
-  return out;
+  // Package 203 — drop abstract / banned probes when context is concrete
+  return filterQuestionCandidates(out, { concreteContext });
 }
 
 function mapRciKind(kind: RciResponseKind): TalkItOutResponseKind {
@@ -273,18 +350,410 @@ export type TalkItOutTurnResult = {
   responseKind?: TalkItOutResponseKind;
   /** Hidden Thinking Map — never show to members. */
   thinkingMap?: ThinkingMap;
+  /** CIE runtime state — packages 195–196; never show to members. */
+  cieState?: ConversationRuntimeState;
+  /** Packages 201 / 207 — internal move + shared pattern */
+  strategyMove?: TioStrategyMoveId;
+  designPatternId?: CdpPatternId;
+  usefulSummary?: string;
+  usedStrategyMoves?: string[];
 };
 
 /**
  * Build Shari's next Talk It Out turn via shared RCI.
  * Never auto-routes; help offer only when explicit.
  */
+function resolveActiveAnchor(
+  session: TalkItOutSession,
+  thinkingMap: ThinkingMap | undefined,
+  messages: { role: "user" | "assistant"; content: string }[],
+  userText: string,
+): TopicAnchor | null {
+  const fromMap = thinkingMap?.topicAnchor ?? session.thinkingMap?.topicAnchor;
+  const updated = updateTopicAnchor({
+    previous: fromMap,
+    userText,
+    messages,
+  });
+  if (hasActiveTopicAnchor(updated)) return updated;
+  return (
+    recoverTopicFromHistory(messages) ??
+    (thinkingMap?.literalTopic
+      ? updateTopicAnchor({
+          previous: null,
+          userText: thinkingMap.literalTopic,
+          messages: [],
+        })
+      : null)
+  );
+}
+
+function polishTalkItOutDelivery(input: {
+  session: TalkItOutSession;
+  userText: string;
+  draftText: string;
+  responseKind: RciResponseKind | "repair" | "clarification";
+  repairActive: boolean;
+  thinkingMap?: ThinkingMap;
+  topicAnchor?: TopicAnchor | null;
+  wasClarification?: boolean;
+  /** Permission offers / summaries — CIE only blocks permanent failure phrases. */
+  validationMode?: "full" | "permanent_bans_only";
+}): { text: string; cieState: ConversationRuntimeState } {
+  const messages = [
+    ...input.session.messages.map((m) => ({
+      role: m.role as "user" | "assistant",
+      content: m.content,
+      id: m.id,
+    })),
+    { role: "user" as const, content: input.userText },
+  ];
+  const thinkingMap = input.thinkingMap ?? input.session.thinkingMap ?? null;
+  const primaryTopic =
+    input.topicAnchor?.primaryTopic ??
+    thinkingMap?.literalTopic ??
+    input.session.thinkingMap?.literalTopic ??
+    null;
+
+  // Authored offers / summaries — CIE state + permanent ban gate only
+  if (input.validationMode === "permanent_bans_only") {
+    let text = input.draftText.trim();
+    const cie = processConversationTurn({
+      conversationId: input.session.id,
+      experienceId: "talk-it-out",
+      userText: input.userText,
+      messages,
+      priorState: input.session.cieState ?? null,
+      draftText: text,
+      repairActive: false,
+      thinkingMap,
+      validationMode: "permanent_bans_only",
+    });
+    text = cie.assistantText;
+    if (
+      /\btake your time(?: with that)?\b/i.test(text) ||
+      /\bquieter question underneath\b/i.test(text) ||
+      /\bsomething around does\b/i.test(text) ||
+      /\blet\'?s stay with\b/i.test(text) ||
+      /\bwhat part feels most useful\b/i.test(text)
+    ) {
+      text = groundedQuestionFallback({
+        topicAnchor: primaryTopic,
+        userText: input.userText,
+      });
+    }
+    return { text, cieState: cie.state };
+  }
+
+  let prefsTone: ReturnType<typeof getPrefs>["aiTone"] = "balanced";
+  try {
+    prefsTone = getPrefs().aiTone;
+  } catch {
+    /* SSR / tests */
+  }
+  const recentAssistantTexts = input.session.messages
+    .filter((m) => m.role === "assistant")
+    .map((m) => m.content)
+    .slice(-4);
+
+  const ciKind =
+    input.repairActive ||
+    input.responseKind === "repair" ||
+    input.responseKind === "clarification"
+      ? ("clarification" as const)
+      : input.responseKind;
+  const delivered = deliverConversationalResponse({
+    experienceId: "talk-it-out",
+    draftText: input.draftText,
+    userText: input.userText,
+    responseKind: ciKind,
+    archetype: input.thinkingMap?.archetype ?? input.session.thinkingMap?.archetype,
+    aiTone: prefsTone,
+    recentAssistantTexts,
+    preferBrevity: true,
+  });
+  const grounded = applyGroundedAcknowledgement({
+    draftText: delivered.text,
+    userText: input.userText,
+    seed: input.userText.length + delivered.text.length,
+    primaryTopic,
+  });
+  // Package 194 — block gold-standard anti-patterns (structure only, no verbatim scripts)
+  const goldSafe = replaceBlockedDraft({
+    draftText: grounded.text,
+    userText: input.userText,
+    topicAnchor: primaryTopic,
+    clarificationOrRepair: input.repairActive || input.wasClarification,
+    rejectedInterpretations: input.thinkingMap?.rejectedInterpretations,
+  });
+  // Package 193 — topic continuity before CQRI
+  const continuity = applyTopicContinuityValidation({
+    draftText: goldSafe.text,
+    userText: input.userText,
+    anchor: input.topicAnchor ?? null,
+    previousAssistantText: recentAssistantTexts[recentAssistantTexts.length - 1],
+    repairActive: input.repairActive,
+    wasClarification: input.wasClarification,
+  });
+  const cqri = runConversationQualityAndRhythm({
+    experienceId: "talk-it-out",
+    userText: input.userText,
+    messages: input.session.messages.map((m) => ({
+      role: m.role,
+      content: m.content,
+    })),
+    draftText: continuity.text,
+    responseKind: input.repairActive ? "repair" : input.responseKind,
+    archetype: input.thinkingMap?.archetype ?? input.session.thinkingMap?.archetype,
+    repairActive: input.repairActive,
+    thinkingMap: input.thinkingMap ?? input.session.thinkingMap ?? null,
+    recentPhraseUsage: recentAssistantTexts,
+  });
+
+  // Packages 195–199 — CIE orchestrates state, gold guidance, critical gates
+  const cie = processConversationTurn({
+    conversationId: input.session.id,
+    experienceId: "talk-it-out",
+    userText: input.userText,
+    messages,
+    priorState: input.session.cieState ?? null,
+    draftText: cqri.approvedText,
+    repairActive: input.repairActive || input.wasClarification,
+    thinkingMap,
+    validationMode: "full",
+  });
+
+  // Packages 203 / 205 — question quality + conversational preferences
+  const userMessages = messages
+    .filter((m) => m.role === "user")
+    .map((m) => m.content);
+  const dutyHints = extractAnsweredDutyHints(userMessages);
+  let text = cie.assistantText;
+  const qCheck = validateTalkItOutQuestion({
+    responseText: text,
+    userText: input.userText,
+    topicAnchor: primaryTopic,
+    priorAssistantTexts: recentAssistantTexts,
+    answeredDutyHints: dutyHints,
+    concreteContext: Boolean(
+      primaryTopic &&
+        /\b(?:hir|market|cost|role|client|project)\b/i.test(primaryTopic),
+    ),
+  });
+  if (!qCheck.passed) {
+    text = groundedQuestionFallback({
+      topicAnchor: primaryTopic,
+      userText: input.userText,
+      answeredDutyHints: dutyHints,
+    });
+  }
+  text = adaptDraftToPreferences(text, loadTalkItOutPreferences());
+
+  // Package 208 — corrections keep one natural follow-up (observation alone is incomplete)
+  if (
+    (input.repairActive || input.responseKind === "repair") &&
+    !/\?/.test(text) &&
+    primaryTopic
+  ) {
+    const follow = /\bhir|market|sales|assistant/i.test(primaryTopic)
+      ? "What is making you consider it now?"
+      : "What feels murkiest about it right now?";
+    text = `${text.replace(/[.!]+\s*$/, "")}. ${follow}`;
+  }
+
+  // Packages 206 / 208 — permanent ban list; never display known failures
+  if (
+    /\btake your time(?: with that)?\b/i.test(text) ||
+    /\bquieter question underneath\b/i.test(text) ||
+    /\bsomething around does\b/i.test(text) ||
+    /\baround does\b/i.test(text) ||
+    /\blet\'?s stay with\b/i.test(text) ||
+    /\bwhat part feels most useful\b/i.test(text) ||
+    /\bwhat matters most\b/i.test(text)
+  ) {
+    text = groundedQuestionFallback({
+      topicAnchor: primaryTopic,
+      userText: input.userText,
+      answeredDutyHints: dutyHints,
+    });
+  }
+
+  return { text, cieState: cie.state };
+}
+
 export function buildTalkItOutTurn(
   session: TalkItOutSession,
   userText: string,
 ): TalkItOutTurnResult {
-  const explicit = detectsExplicitHelpRequest(userText);
   const seed = session.messages.length + userText.length;
+  const messages = session.messages.map((m) => ({
+    role: m.role as "user" | "assistant",
+    content: m.content,
+  }));
+
+  // Package 205 — explicit conversational preferences win immediately
+  applyExplicitPreferenceStatement(userText);
+
+  // Package 193 — load / update Topic Anchor first
+  let topicAnchor = resolveActiveAnchor(
+    session,
+    session.thinkingMap,
+    messages,
+    userText,
+  );
+
+  // Explicit topic change without a clear new topic — ask, do not guess
+  if (
+    detectsExplicitTopicChange(userText) &&
+    topicAnchor?.topicChangeRequested &&
+    !topicAnchor.topicChangeConfirmed &&
+    hasActiveTopicAnchor(topicAnchor)
+  ) {
+    const thinkingMap: ThinkingMap = session.thinkingMap
+      ? { ...session.thinkingMap, topicAnchor }
+      : { ...emptyThinkingMap(), topicAnchor };
+    // Package 206 — every assistant path goes through CIE polish
+    const polished = polishTalkItOutDelivery({
+      session,
+      userText,
+      draftText: buildUnconfirmedTopicChangePrompt(topicAnchor.primaryTopic),
+      responseKind: "repair",
+      repairActive: true,
+      thinkingMap,
+      topicAnchor,
+    });
+    return {
+      assistantText: polished.text,
+      explicitHelpRequested: false,
+      futureFeelingAsked: session.futureFeelingAsked,
+      responseKind: "repair",
+      thinkingMap,
+      cieState: polished.cieState,
+      designPatternId: "CDP-CLARIFY-REQUEST",
+    };
+  }
+
+  // Package 192 — direct correction before help / CRCI / RCI
+  if (
+    detectsDirectCorrection(userText) ||
+    (lastAssistantHadHiddenMeaning(messages) &&
+      /^(?:no|nope|not really|wrong)\b/i.test(userText.trim()))
+  ) {
+    let baseMap = session.thinkingMap
+      ? { ...session.thinkingMap }
+      : emptyThinkingMap();
+    if (!baseMap.literalTopic) {
+      for (const m of messages) {
+        if (m.role !== "user") continue;
+        const lit = extractLiteralTopic(m.content);
+        if (lit) {
+          baseMap = {
+            ...baseMap,
+            literalTopic: lit,
+            situation: baseMap.situation ?? m.content.slice(0, 140),
+          };
+        }
+      }
+    }
+    if (!baseMap.literalTopic && topicAnchor?.primaryTopic) {
+      baseMap.literalTopic = topicAnchor.primaryTopic;
+    }
+    if (!baseMap.literalTopic) {
+      baseMap = updateThinkingMap(baseMap, "", messages);
+    }
+    const built = buildDirectCorrectionRepair({
+      map: baseMap,
+      messages,
+      seed,
+    });
+    const thinkingMap = applyUserCorrectionToMap(
+      baseMap,
+      userText,
+      built.rejectedInterpretation,
+    );
+    if (topicAnchor) {
+      thinkingMap.topicAnchor = { ...topicAnchor };
+      thinkingMap.literalTopic = topicAnchor.primaryTopic;
+    }
+    const polished = polishTalkItOutDelivery({
+      session,
+      userText,
+      draftText: built.text,
+      responseKind: "repair",
+      repairActive: true,
+      thinkingMap,
+      topicAnchor,
+    });
+    if (polished.cieState.topicAnchor) {
+      thinkingMap.topicAnchor = polished.cieState.topicAnchor;
+    }
+    return {
+      assistantText: polished.text,
+      explicitHelpRequested: false,
+      futureFeelingAsked: session.futureFeelingAsked,
+      responseKind: "repair",
+      thinkingMap,
+      cieState: polished.cieState,
+    };
+  }
+
+  // Package 193 — clarification request → topic-safe repair (anchor unchanged)
+  if (isClarificationRequest(userText)) {
+    const previous =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ??
+      "";
+    const repairDraft = topicAnchor
+      ? buildTopicSafeClarificationRepair({
+          anchor: topicAnchor,
+          previousAssistantText: previous,
+          userText,
+        })
+      : tryConversationRepair({
+          experienceId: "talk-it-out",
+          userText,
+          messages,
+          previousAssistantText: previous,
+          primaryTopic: null,
+        }).assistantText;
+    if (repairDraft) {
+      const thinkingMap: ThinkingMap = {
+        ...(session.thinkingMap ?? emptyThinkingMap()),
+        topicAnchor: topicAnchor
+          ? {
+              ...topicAnchor,
+              lastClarificationRequest: userText.trim().slice(0, 160),
+            }
+          : null,
+        literalTopic:
+          topicAnchor?.primaryTopic ??
+          session.thinkingMap?.literalTopic ??
+          null,
+      };
+      const polished = polishTalkItOutDelivery({
+        session,
+        userText,
+        draftText: repairDraft,
+        responseKind: "repair",
+        repairActive: true,
+        thinkingMap,
+        topicAnchor,
+        wasClarification: true,
+      });
+      if (polished.cieState.topicAnchor) {
+        thinkingMap.topicAnchor = polished.cieState.topicAnchor;
+      }
+      return {
+        assistantText: polished.text,
+        explicitHelpRequested: false,
+        futureFeelingAsked: session.futureFeelingAsked,
+        responseKind: "repair",
+        thinkingMap,
+        cieState: polished.cieState,
+      };
+    }
+  }
+
+  const explicit = detectsExplicitHelpRequest(userText);
 
   if (explicit) {
     const lead = pickRotating(
@@ -294,13 +763,118 @@ export function buildTalkItOutTurn(
       ],
       seed,
     );
+    {
+      const thinkingMap = session.thinkingMap ?? emptyThinkingMap();
+      const polished = polishTalkItOutDelivery({
+        session,
+        userText,
+        draftText: `${lead} ${TALK_IT_OUT_HELP_OFFER}`,
+        responseKind: "invite-continue",
+        repairActive: false,
+        thinkingMap,
+        topicAnchor,
+        validationMode: "permanent_bans_only",
+      });
+      return {
+        assistantText: polished.text,
+        explicitHelpRequested: true,
+        futureFeelingAsked: session.futureFeelingAsked,
+        helpOffer: TALK_IT_OUT_HELP_OFFER,
+        responseKind: "help_offer",
+        thinkingMap,
+        cieState: polished.cieState,
+        designPatternId: "CDP-TRANSITION-PERMISSION",
+        strategyMove: "transition_to_action",
+      };
+    }
+  }
+
+  // Package 204 — completion / summary before more reflective questions
+  const completionSignal = detectCompletionSignal(userText);
+  if (shouldStopQuestioning(completionSignal)) {
+    const topic =
+      topicAnchor?.primaryTopic ??
+      session.thinkingMap?.literalTopic ??
+      null;
+    const summary = buildTalkItOutSummary({
+      topicAnchor: topic,
+      knownFacts: session.cieState?.knownFacts
+        ?.filter((f) => f.status === "active")
+        .map((f) => f.fact),
+      currentFocus:
+        topicAnchor?.currentFocus ?? session.cieState?.currentFocus?.label,
+      concerns: session.thinkingMap?.concerns,
+    });
+    const draft = buildCompletionResponse({
+      signal: completionSignal,
+      summary,
+      topicAnchor: topic,
+    });
+    const thinkingMap: ThinkingMap = session.thinkingMap
+      ? { ...session.thinkingMap, topicAnchor }
+      : { ...emptyThinkingMap(), topicAnchor };
+    const polished = polishTalkItOutDelivery({
+      session,
+      userText,
+      draftText: draft,
+      responseKind: "summary",
+      repairActive: false,
+      thinkingMap,
+      topicAnchor,
+      validationMode: "permanent_bans_only",
+    });
     return {
-      assistantText: `${lead} ${TALK_IT_OUT_HELP_OFFER}`,
-      explicitHelpRequested: true,
+      assistantText: polished.text,
+      explicitHelpRequested: false,
       futureFeelingAsked: session.futureFeelingAsked,
-      helpOffer: TALK_IT_OUT_HELP_OFFER,
-      responseKind: "help_offer",
-      thinkingMap: session.thinkingMap,
+      responseKind: "observation",
+      thinkingMap,
+      cieState: polished.cieState,
+      usefulSummary: summary,
+      strategyMove: "summarize_what_became_clear",
+      designPatternId: "CDP-NATURAL-COMPLETION",
+      usedStrategyMoves: [
+        ...(session.usedStrategyMoves ?? []),
+        "summarize_what_became_clear",
+      ],
+    };
+  }
+
+  // Package 202 — mode boundaries (offer transition; never auto-launch)
+  const boundary = classifyTalkItOutIntent(userText);
+  if (
+    !boundary.stayInTalkItOut &&
+    boundary.transitionOffer &&
+    (boundary.intent === "creation" ||
+      boundary.intent === "planning" ||
+      boundary.intent === "formal_decision" ||
+      boundary.intent === "expert_advice" ||
+      boundary.intent === "reminder")
+  ) {
+    const thinkingMap = session.thinkingMap ?? emptyThinkingMap();
+    const polished = polishTalkItOutDelivery({
+      session,
+      userText,
+      draftText: boundary.transitionOffer,
+      responseKind: "invite-continue",
+      repairActive: false,
+      thinkingMap,
+      topicAnchor,
+      validationMode: "permanent_bans_only",
+    });
+    return {
+      assistantText: polished.text,
+      explicitHelpRequested: false,
+      futureFeelingAsked: session.futureFeelingAsked,
+      responseKind: "invite_continue",
+      thinkingMap,
+      cieState: polished.cieState,
+      strategyMove: "transition_to_action",
+      designPatternId: "CDP-TRANSITION-PERMISSION",
+      usedStrategyMoves: [
+        ...(session.usedStrategyMoves ?? []),
+        "transition_to_action",
+      ],
     };
   }
 
@@ -308,57 +882,63 @@ export function buildTalkItOutTurn(
   const repair = tryConversationRepair({
     experienceId: "talk-it-out",
     userText,
-    messages: session.messages.map((m) => ({
-      role: m.role,
-      content: m.content,
-    })),
+    messages,
+    primaryTopic: topicAnchor?.primaryTopic ?? null,
   });
   if (repair.needsRepair && repair.assistantText) {
-    let prefsTone: ReturnType<typeof getPrefs>["aiTone"] = "balanced";
-    try {
-      prefsTone = getPrefs().aiTone;
-    } catch {
-      /* SSR / tests */
-    }
-    const recentAssistantTexts = session.messages
-      .filter((m) => m.role === "assistant")
-      .map((m) => m.content)
-      .slice(-4);
-    const delivered = deliverConversationalResponse({
-      experienceId: "talk-it-out",
-      draftText: repair.assistantText,
+    const thinkingMap: ThinkingMap = {
+      ...(session.thinkingMap ?? emptyThinkingMap()),
+      topicAnchor,
+      literalTopic:
+        topicAnchor?.primaryTopic ?? session.thinkingMap?.literalTopic ?? null,
+    };
+    const polished = polishTalkItOutDelivery({
+      session,
       userText,
-      responseKind: "clarification",
-      archetype: session.thinkingMap?.archetype,
-      aiTone: prefsTone,
-      recentAssistantTexts,
-      preferBrevity: true,
+      draftText: repair.assistantText,
+      responseKind: "repair",
+      repairActive: true,
+      thinkingMap,
+      topicAnchor,
+      wasClarification: true,
     });
+    if (polished.cieState.topicAnchor) {
+      thinkingMap.topicAnchor = polished.cieState.topicAnchor;
+    }
     return {
-      assistantText: delivered.text,
+      assistantText: polished.text,
       explicitHelpRequested: false,
       futureFeelingAsked: session.futureFeelingAsked,
       responseKind: "repair",
-      thinkingMap: session.thinkingMap,
+      thinkingMap,
+      cieState: polished.cieState,
     };
   }
 
   const signal = detectSituation(userText);
   const candidates = buildCandidateQuestions(session, userText, signal);
-  const messages = session.messages.map((m) => ({
-    role: m.role,
-    content: m.content,
-  }));
+
+  const previousMap: ThinkingMap = {
+    ...(session.thinkingMap ?? emptyThinkingMap()),
+    topicAnchor,
+    literalTopic:
+      topicAnchor?.primaryTopic ?? session.thinkingMap?.literalTopic ?? null,
+  };
 
   const rci = runReflectiveTurn({
     experienceId: "talk-it-out",
     messages,
     userText,
-    previousMap: session.thinkingMap ?? null,
+    previousMap,
     usedQuestionIds: session.usedQuestionIds,
     candidateQuestions: candidates,
     futureFeelingAlreadyAsked: session.futureFeelingAsked,
   });
+
+  // Refresh anchor from RCI map (may set primary on opening turn)
+  topicAnchor =
+    rci.thinkingMap.topicAnchor ??
+    resolveActiveAnchor(session, rci.thinkingMap, messages, userText);
 
   const draft = maybeSituationLead(
     signal,
@@ -368,30 +948,25 @@ export function buildTalkItOutTurn(
     seed,
   );
 
-  const recentAssistantTexts = session.messages
-    .filter((m) => m.role === "assistant")
-    .map((m) => m.content)
-    .slice(-4);
+  const thinkingMap: ThinkingMap = {
+    ...rci.thinkingMap,
+    topicAnchor,
+    literalTopic: topicAnchor?.primaryTopic ?? rci.thinkingMap.literalTopic,
+  };
 
-  let prefsTone: ReturnType<typeof getPrefs>["aiTone"] = "balanced";
-  try {
-    prefsTone = getPrefs().aiTone;
-  } catch {
-    /* SSR / tests */
-  }
-
-  // CI — how Shari says the reflective move (package 183).
-  const delivered = deliverConversationalResponse({
-    experienceId: "talk-it-out",
-    draftText: draft,
+  const polished = polishTalkItOutDelivery({
+    session,
     userText,
+    draftText: draft,
     responseKind: rci.responseKind,
-    archetype: rci.thinkingMap.archetype,
-    aiTone: prefsTone,
-    recentAssistantTexts,
-    preferBrevity: rci.thinkingMap.archetype === "overwhelm",
+    repairActive: false,
+    thinkingMap,
+    topicAnchor,
   });
-  const assistantText = delivered.text;
+  const assistantText = polished.text;
+  if (polished.cieState.topicAnchor) {
+    thinkingMap.topicAnchor = polished.cieState.topicAnchor;
+  }
 
   // Ensure sit question id tracked when situation lead replaced text with sit observation that has ?
   let questionId = rci.questionId;
@@ -428,13 +1003,33 @@ export function buildTalkItOutTurn(
         : "observation_then_question";
   }
 
+  const hireLike = /\b(?:hir(?:e|ing)|marketing|sales)\b/i.test(userText);
+  const strategyMove = selectStrategyMove({
+    phase: polished.cieState.conversationPhase,
+    priorityEvent: polished.cieState.clarificationState?.repairRequired
+      ? "clarification_request"
+      : "normal",
+    turnCount: polished.cieState.turnCount,
+    usedMoves: session.usedStrategyMoves ?? [],
+    hireLike,
+  });
+  const designPatternId = selectConversationDesignPattern({
+    experienceId: "talk-it-out",
+    mode: polished.cieState.primaryMode,
+    completion: false,
+  });
+
   return {
     assistantText,
     questionId,
     explicitHelpRequested: false,
     futureFeelingAsked,
     responseKind,
-    thinkingMap: rci.thinkingMap,
+    thinkingMap,
+    cieState: polished.cieState,
+    strategyMove,
+    designPatternId,
+    usedStrategyMoves: [...(session.usedStrategyMoves ?? []), strategyMove],
   };
 }
 

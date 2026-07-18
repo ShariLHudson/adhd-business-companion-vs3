@@ -51,4 +51,4 @@ export const TALK_IT_OUT_HOW_DO_I_BODY = [
 ].join("\n\n");
 
 export const TALK_IT_OUT_INPUT_PLACEHOLDER =
-  "Type or speak in your own words…" as const;
+  "What would you like to talk through?" as const;

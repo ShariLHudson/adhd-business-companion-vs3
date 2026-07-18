@@ -6,7 +6,6 @@
 export const SHARI_VOICE_OPENINGS = [
   "Can I ask you something?",
   "I am curious about one part of that.",
-  "Tell me if I am reading this wrong.",
   "What keeps pulling your attention back to this?",
   "Which part feels heaviest right now?",
   "What do you think is making this harder than it looks?",
@@ -14,6 +13,7 @@ export const SHARI_VOICE_OPENINGS = [
   "Is there a part of this you already know the answer to but do not quite trust yet?",
   "What feels unresolved?",
   "What are you hoping will be different?",
+  "What feels hardest to judge about this right now?",
 ] as const;
 
 /** Soft observation stems — meaning/tension, not paraphrase. */
@@ -25,7 +25,7 @@ export const SHARI_OBSERVATIONS = [
   "I am hearing a pull between protecting yourself and wanting to move forward.",
   "This may be less about the decision, and more about what the decision would say about you.",
   "It sounds like part of you is ready, and another part is still guarding something important.",
-  "Maybe the surface issue is the easy one to name — and something underneath is doing more of the heavy lifting.",
+  "Maybe the easy part to name is not the part that needs the most clarity.",
 ] as const;
 
 /** Phrases that must not dominate Talk It Out turns. */

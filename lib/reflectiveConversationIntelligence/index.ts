@@ -46,3 +46,15 @@ export {
   usesAvoidedDefaultScript,
 } from "./repetitionGuard";
 export { runReflectiveTurn } from "./api";
+export {
+  applyUserCorrectionToMap,
+  buildDirectCorrectionRepair,
+  certifyNoHiddenMeaning,
+  containsUnsupportedHiddenMeaning,
+  countInterpretationEvidence,
+  detectsDirectCorrection,
+  extractLiteralTopic,
+  interpretationAllowedFromEvidence,
+  lastAssistantHadHiddenMeaning,
+} from "./noHiddenMeaning";
+export type { NoHiddenMeaningFailureCode } from "./noHiddenMeaning";
