@@ -42,3 +42,18 @@ next-env.d.ts
 
 # companion audit guardrail state (local)
 .companion-audit-state.json
+.audit-data.json
+
+# local extract / scratch (never commit)
+.tmp/
+.tmp-*
+eng.traineddata
+**/__pycache__/
+*.bak
+*.before-edge-fix.png
+
+# one-off GPT / navigation dump packets at repo root (local reference only)
+/GPT-*.docx
+/GPT-*.pdf
+/personal-assistant-navigation.pdf
+/Spark_Estate_GPT_Reverse_Engineering_Report.docx
