@@ -24,6 +24,7 @@ import {
   buildTalkItOutTurn,
   createTalkItOutSession,
   endTalkItOutSession,
+  fetchTalkItOutModelDraft,
   pauseTalkItOutSession,
   resumeOrCreateTalkItOutSession,
   saveTalkItOutDiscovery,
@@ -116,6 +117,7 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
   const [saveDraft, setSaveDraft] = useState<string | null>(null);
   const [offerSummary, setOfferSummary] = useState(false);
   const [showMoreControls, setShowMoreControls] = useState(false);
+  const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -167,12 +169,13 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
   const conversationStarted =
     (session?.messages.filter((m) => m.role === "user").length ?? 0) > 0;
 
-  const send = useCallback(() => {
-    if (!session || !input.trim()) return;
+  const send = useCallback(async () => {
+    if (!session || !input.trim() || sending) return;
     const userText = input.trim();
     setInput("");
     setStatusLine(null);
     setOfferSummary(false);
+    setSending(true);
 
     const userMsg = {
       id: `tio-u-${Date.now()}`,
@@ -181,44 +184,59 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
       createdAt: new Date().toISOString(),
     };
     const withUser = appendTalkItOutMessages(session, [userMsg]);
-    const turn = buildTalkItOutTurn(withUser, userText);
-    const assistantMsg = {
-      id: `tio-a-${Date.now()}`,
-      role: "assistant" as const,
-      content: turn.assistantText,
-      questionId: turn.questionId,
-      createdAt: new Date().toISOString(),
-    };
-    const used = turn.questionId
-      ? [...withUser.usedQuestionIds, turn.questionId]
-      : withUser.usedQuestionIds;
-    const next = appendTalkItOutMessages(withUser, [assistantMsg], {
-      usedQuestionIds: used,
-      usedStrategyMoves:
-        turn.usedStrategyMoves ?? withUser.usedStrategyMoves,
-      explicitHelpRequested:
-        withUser.explicitHelpRequested || turn.explicitHelpRequested,
-      futureFeelingAsked: turn.futureFeelingAsked,
-      thinkingMap: turn.thinkingMap ?? withUser.thinkingMap,
-      cieState: turn.cieState ?? withUser.cieState,
-      usefulSummary: turn.usefulSummary ?? withUser.usefulSummary,
-      verbatimUsed: turn.verbatimUsed ?? withUser.verbatimUsed,
-      lastMoveWasSkip: turn.lastMoveWasSkip ?? withUser.lastMoveWasSkip,
-      worryFingerprint:
-        turn.worryFingerprint ?? withUser.worryFingerprint ?? null,
-      worryRepeatCount:
-        turn.worryRepeatCount ?? withUser.worryRepeatCount ?? 0,
-      topic:
-        turn.thinkingMap?.topicAnchor?.primaryTopic ??
-        turn.cieState?.topicAnchor?.primaryTopic ??
-        withUser.topic,
-    });
-    setSession(next);
-    const userTurns = next.messages.filter((m) => m.role === "user").length;
-    if (userTurns >= 4 && userTurns % 4 === 0) {
-      setOfferSummary(true);
+    setSession(withUser);
+
+    try {
+      // Shari Response Engine — model drafts every reflective turn (no stock lines).
+      const { draft: modelDraft } = await fetchTalkItOutModelDraft({
+        session: withUser,
+        userText,
+      });
+      const turn = buildTalkItOutTurn(
+        withUser,
+        userText,
+        modelDraft ? { modelDraft } : undefined,
+      );
+      const assistantMsg = {
+        id: `tio-a-${Date.now()}`,
+        role: "assistant" as const,
+        content: turn.assistantText,
+        questionId: turn.questionId,
+        createdAt: new Date().toISOString(),
+      };
+      const used = turn.questionId
+        ? [...withUser.usedQuestionIds, turn.questionId]
+        : withUser.usedQuestionIds;
+      const next = appendTalkItOutMessages(withUser, [assistantMsg], {
+        usedQuestionIds: used,
+        usedStrategyMoves:
+          turn.usedStrategyMoves ?? withUser.usedStrategyMoves,
+        explicitHelpRequested:
+          withUser.explicitHelpRequested || turn.explicitHelpRequested,
+        futureFeelingAsked: turn.futureFeelingAsked,
+        thinkingMap: turn.thinkingMap ?? withUser.thinkingMap,
+        cieState: turn.cieState ?? withUser.cieState,
+        usefulSummary: turn.usefulSummary ?? withUser.usefulSummary,
+        verbatimUsed: turn.verbatimUsed ?? withUser.verbatimUsed,
+        lastMoveWasSkip: turn.lastMoveWasSkip ?? withUser.lastMoveWasSkip,
+        worryFingerprint:
+          turn.worryFingerprint ?? withUser.worryFingerprint ?? null,
+        worryRepeatCount:
+          turn.worryRepeatCount ?? withUser.worryRepeatCount ?? 0,
+        topic:
+          turn.thinkingMap?.topicAnchor?.primaryTopic ??
+          turn.cieState?.topicAnchor?.primaryTopic ??
+          withUser.topic,
+      });
+      setSession(next);
+      const userTurns = next.messages.filter((m) => m.role === "user").length;
+      if (userTurns >= 4 && userTurns % 4 === 0) {
+        setOfferSummary(true);
+      }
+    } finally {
+      setSending(false);
     }
-  }, [input, session]);
+  }, [input, session, sending]);
 
   const handlePause = () => {
     if (!session) return;
@@ -419,8 +437,8 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
               <button
                 type="button"
                 className={`${BTN_PRIMARY} mb-0.5 shrink-0`}
-                onClick={send}
-                disabled={!input.trim()}
+                onClick={() => void send()}
+                disabled={!input.trim() || sending}
                 data-testid="talk-it-out-send"
               >
                 Send

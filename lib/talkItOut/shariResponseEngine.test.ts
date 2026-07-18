@@ -3,10 +3,13 @@ import {
   TALK_IT_OUT_OPENING,
   TALK_IT_OUT_SHARI_OPENING,
   TALK_IT_OUT_SHARI_RESPONSE_ENGINE_PROMPT,
+  TALK_IT_OUT_STOCK_LINE_BANS,
   applyShariResponseEngine,
   buildShariResponseEngineLlmContext,
   countQuestionMarks,
+  isMechanicalFragment,
   scrubShariAiTells,
+  validateShariResponseEngineDraft,
 } from "@/lib/talkItOut";
 
 describe("Shari Response Engine", () => {
@@ -15,154 +18,81 @@ describe("Shari Response Engine", () => {
     expect(TALK_IT_OUT_OPENING).toBe(TALK_IT_OUT_SHARI_OPENING);
   });
 
-  it("exposes the full system prompt for every-turn LLM use", () => {
+  it("exposes the revised system prompt for every-turn LLM use", () => {
     expect(TALK_IT_OUT_SHARI_RESPONSE_ENGINE_PROMPT).toContain(
-      "What would you like to talk through?",
+      "Prove you understood by what you ask",
     );
     expect(TALK_IT_OUT_SHARI_RESPONSE_ENGINE_PROMPT).toContain(
-      "Never give advice",
+      "Most replies are just ONE good question",
+    );
+    expect(TALK_IT_OUT_SHARI_RESPONSE_ENGINE_PROMPT).toContain(
+      "never a stock phrase",
+    );
+    expect(TALK_IT_OUT_SHARI_RESPONSE_ENGINE_PROMPT).not.toContain(
+      "micro-quote: echo just the 1-3 word",
     );
     const ctx = buildShariResponseEngineLlmContext({
       messages: [{ role: "user", content: "I'm stuck on hiring." }],
-      verbatimUsed: false,
     });
     expect(ctx.systemPrompt).toBe(TALK_IT_OUT_SHARI_RESPONSE_ENGINE_PROMPT);
-    expect(ctx.verbatim_used).toBe(false);
   });
 
-  it("scrubs AI chatbot tells", () => {
+  it("scrubs AI chatbot tells and stock bans", () => {
     expect(
       scrubShariAiTells("It sounds like you're feeling torn. What's next?"),
     ).not.toMatch(/it sounds like/i);
     expect(scrubShariAiTells("Great question! What's hard?")).not.toMatch(
       /great question/i,
     );
+    for (const ban of TALK_IT_OUT_STOCK_LINE_BANS) {
+      expect(scrubShariAiTells(`${ban} What matters?`)).not.toContain(
+        ban.slice(0, 20),
+      );
+    }
   });
 
-  it("distressed turns drop the question", () => {
+  it("does not invent stock distress lines — keeps model draft", () => {
+    const draft =
+      "Scared she'd vanish if you said something real — that's worth sitting with. Has staying quiet kept her close?";
+    const result = validateShariResponseEngineDraft(draft);
+    expect(result.text).toMatch(/staying quiet/i);
+    expect(result.text).not.toMatch(/heavy one to carry/i);
+    expect(result.text).not.toMatch(/right here with it/i);
+  });
+
+  it("does not invent loop stock lines", () => {
+    const draft = "What keeps making you reopen the hire question this week?";
     const result = applyShariResponseEngine({
-      userText: "I'm terrified and falling apart about this.",
-      draftText: "You're scared.\n\nWhat feels hardest?",
-      messages: [],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      seed: 1,
+      userText: "I keep putting off hiring again.",
+      draftText: draft,
+      worryRepeatCount: 5,
     });
-    expect(result.mode).toBe("distressed");
-    expect(result.text).not.toContain("?");
-    expect(countQuestionMarks(result.text)).toBe(0);
-  });
-
-  it("redirects direct asks for the answer", () => {
-    const result = applyShariResponseEngine({
-      userText: "Just tell me what I should do.",
-      draftText: "You should hire someone.\n\nWhat role?",
-      messages: [],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      seed: 2,
-    });
-    expect(result.mode).toBe("answer_redirect");
-    expect(result.text).toMatch(/with you, not for you/i);
-    expect(countQuestionMarks(result.text)).toBe(1);
-    expect(result.text).not.toMatch(/you should/i);
-  });
-
-  it("closing names insight and asks for their smallest next move", () => {
-    const result = applyShariResponseEngine({
-      userText: "Oh. That's exactly it — I'm avoiding the hire.",
-      draftText: "Interesting.\n\nWhat else?",
-      messages: [],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      seed: 3,
-    });
-    expect(result.mode).toBe("closing");
-    expect(result.text).toMatch(/smallest next move/i);
-    expect(countQuestionMarks(result.text)).toBe(1);
-  });
-
-  it("names the loop after the same worry repeats 3 times", () => {
-    const worry = "I keep putting off hiring a marketing person again.";
-    let fingerprint: string | null = null;
-    let count = 0;
-    let last = applyShariResponseEngine({
-      userText: worry,
-      draftText: "Hiring is hard.\n\nWhat is making you consider it now?",
-      messages: [],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      worryFingerprint: fingerprint,
-      worryRepeatCount: count,
-      seed: 4,
-    });
-    fingerprint = last.worryFingerprint;
-    count = last.worryRepeatCount;
-    last = applyShariResponseEngine({
-      userText: worry,
-      draftText: "Still circling.\n\nWhat is making you consider it now?",
-      messages: [{ role: "user", content: worry }],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      worryFingerprint: fingerprint,
-      worryRepeatCount: count,
-      seed: 5,
-    });
-    fingerprint = last.worryFingerprint;
-    count = last.worryRepeatCount;
-    last = applyShariResponseEngine({
-      userText: worry,
-      draftText: "Still circling.\n\nWhat is making you consider it now?",
-      messages: [
-        { role: "user", content: worry },
-        { role: "user", content: worry },
-      ],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      worryFingerprint: fingerprint,
-      worryRepeatCount: count,
-      seed: 6,
-    });
-    expect(last.mode).toBe("loop_named");
-    expect(last.text).toMatch(/same worry keeps circling/i);
-    expect(countQuestionMarks(last.text)).toBe(1);
-  });
-
-  it("never skips two turns in a row", () => {
-    const short = "I'm stuck.";
-    const first = applyShariResponseEngine({
-      userText: short,
-      draftText: "Stuck.\n\nWhat feels unfinished?",
-      messages: [],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      seed: 7,
-    });
-    // short/clear → skip allowed first
-    expect(first.lastMoveWasSkip).toBe(true);
-
-    const second = applyShariResponseEngine({
-      userText: short,
-      draftText: "Still stuck.\n\nWhat feels unfinished?",
-      messages: [{ role: "user", content: short }],
-      verbatimUsed: false,
-      lastMoveWasSkip: true,
-      seed: 8,
-    });
-    expect(second.lastMoveWasSkip).toBe(false);
-    expect(second.lastMove).not.toBe("skip");
+    expect(result.text).toBe(draft);
+    expect(result.text).not.toMatch(/same worry keeps circling/i);
   });
 
   it("keeps at most one question mark", () => {
-    const result = applyShariResponseEngine({
-      userText: "I have three projects and no idea where to start this week.",
-      draftText:
-        "A lot at once.\n\nWhich one first? And what about the others?",
-      messages: [],
-      verbatimUsed: false,
-      lastMoveWasSkip: false,
-      seed: 9,
-    });
+    const result = validateShariResponseEngineDraft(
+      "Which one first? And what about the others?",
+    );
     expect(countQuestionMarks(result.text)).toBe(1);
+  });
+
+  it("strips mechanical fragment preambles", () => {
+    expect(isMechanicalFragment("Again.")).toBe(true);
+    const result = validateShariResponseEngineDraft(
+      "Again. What do you do with that feeling once it passes?",
+    );
+    expect(result.text).not.toMatch(/^Again\./);
+    expect(result.text).toMatch(/feeling once it passes/i);
+    expect(countQuestionMarks(result.text)).toBe(1);
+  });
+
+  it("allows a question-only turn", () => {
+    const result = validateShariResponseEngineDraft(
+      "What is making you consider a marketing hire this week?",
+    );
+    expect(result.questionOnly).toBe(true);
+    expect(result.questionCount).toBe(1);
   });
 });

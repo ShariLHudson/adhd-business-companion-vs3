@@ -112,6 +112,62 @@ export async function POST(request: NextRequest) {
     const messages = body.messages as ChatMessage[];
     const userProbe = messages[messages.length - 1]?.content ?? "";
     const relationshipResponseId = createRelationshipResponseId();
+    const talkItOutShariEngine = Boolean(body.talkItOutShariEngine);
+    const systemPromptOverride =
+      typeof body.systemPromptOverride === "string"
+        ? body.systemPromptOverride.trim()
+        : "";
+
+    if (!Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json(
+        { error: "Messages are required." },
+        { status: 400 },
+      );
+    }
+
+    // Talk It Out Shari Response Engine — sole system prompt, no companion stack.
+    if (talkItOutShariEngine && systemPromptOverride) {
+      if (!apiKey) {
+        console.error("Talk It Out: OpenAI API key is not configured.");
+        return NextResponse.json(
+          { error: "Model unavailable.", message: "" },
+          { status: 503 },
+        );
+      }
+      const openAiBody = {
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPromptOverride },
+          ...messages,
+        ],
+        temperature: 0.7,
+      };
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(openAiBody),
+      });
+      if (!response.ok) {
+        console.error("Talk It Out OpenAI error:", await response.text());
+        return NextResponse.json(
+          { error: "Model unavailable.", message: "" },
+          { status: 502 },
+        );
+      }
+      const data = await response.json();
+      const message =
+        (data.choices?.[0]?.message?.content as string | undefined)?.trim() ??
+        "";
+      return NextResponse.json({
+        message,
+        relationshipResponseId,
+        talkItOutShariEngine: true,
+        usedCoachingFallback: false,
+      });
+    }
 
     if (!apiKey) {
       console.error("Companion chat: OpenAI API key is not configured.");
@@ -156,13 +212,6 @@ export async function POST(request: NextRequest) {
     const intelligenceContext = body.intelligenceContext as string | undefined;
     const hiddenIntentHint = body.hiddenIntentHint as string | undefined;
     const streamRequested = Boolean(body.stream);
-
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { error: "Messages are required." },
-        { status: 400 },
-      );
-    }
 
     const systemPrompt = buildCompanionSystemPrompt(coachingMode, inputType, {
       emotionalState,

@@ -64,9 +64,8 @@ import {
 } from "./questionIntelligence";
 import { TALK_IT_OUT_QUESTIONS } from "./questions";
 import {
-  applyShariResponseEngine,
   scrubShariAiTells,
-  type ShariResponseEngineResult,
+  validateShariResponseEngineDraft,
 } from "./shariResponseEngine";
 import {
   selectStrategyMove,
@@ -594,6 +593,7 @@ function polishTalkItOutDelivery(input: {
 export function buildTalkItOutTurn(
   session: TalkItOutSession,
   userText: string,
+  options?: { modelDraft?: string },
 ): TalkItOutTurnResult {
   const seed = session.messages.length + userText.length;
   const messages = session.messages.map((m) => ({
@@ -935,70 +935,79 @@ export function buildTalkItOutTurn(
       topicAnchor?.primaryTopic ?? session.thinkingMap?.literalTopic ?? null,
   };
 
-  const rci = runReflectiveTurn({
-    experienceId: "talk-it-out",
-    messages,
-    userText,
-    previousMap,
-    usedQuestionIds: session.usedQuestionIds,
-    candidateQuestions: candidates,
-    futureFeelingAlreadyAsked: session.futureFeelingAsked,
-  });
+  const modelDraft = options?.modelDraft?.trim() ?? "";
+  const usedModelDraft = modelDraft.length > 0;
+
+  const rci = usedModelDraft
+    ? null
+    : runReflectiveTurn({
+        experienceId: "talk-it-out",
+        messages,
+        userText,
+        previousMap,
+        usedQuestionIds: session.usedQuestionIds,
+        candidateQuestions: candidates,
+        futureFeelingAlreadyAsked: session.futureFeelingAsked,
+      });
 
   // Refresh anchor from RCI map (may set primary on opening turn)
   topicAnchor =
-    rci.thinkingMap.topicAnchor ??
-    resolveActiveAnchor(session, rci.thinkingMap, messages, userText);
+    rci?.thinkingMap.topicAnchor ??
+    resolveActiveAnchor(
+      session,
+      rci?.thinkingMap ?? session.thinkingMap,
+      messages,
+      userText,
+    );
 
-  const draft = maybeSituationLead(
-    signal,
-    userText,
-    rci.assistantText,
-    rci.responseKind,
-    seed,
+  const offlineDraft = rci
+    ? maybeSituationLead(
+        signal,
+        userText,
+        rci.assistantText,
+        rci.responseKind,
+        seed,
+      )
+    : "";
+
+  // Prefer model draft (Shari Response Engine). Offline tests use RCI draft.
+  // Validate only — never invent stock distress / loop / acknowledgment lines.
+  const shari = validateShariResponseEngineDraft(
+    usedModelDraft ? modelDraft : offlineDraft,
   );
 
-  // Shari Response Engine — turn structure, voice bans, verbatim / loop / distress
-  const shari: ShariResponseEngineResult = applyShariResponseEngine({
-    userText,
-    draftText: draft,
-    messages,
-    verbatimUsed: Boolean(session.verbatimUsed),
-    lastMoveWasSkip: Boolean(session.lastMoveWasSkip),
-    worryFingerprint: session.worryFingerprint ?? null,
-    worryRepeatCount: session.worryRepeatCount ?? 0,
-    seed,
-  });
-
   const thinkingMap: ThinkingMap = {
-    ...rci.thinkingMap,
+    ...(rci?.thinkingMap ?? session.thinkingMap ?? emptyThinkingMap()),
     topicAnchor,
-    literalTopic: topicAnchor?.primaryTopic ?? rci.thinkingMap.literalTopic,
+    literalTopic:
+      topicAnchor?.primaryTopic ??
+      rci?.thinkingMap.literalTopic ??
+      session.thinkingMap?.literalTopic ??
+      null,
   };
 
   const polished = polishTalkItOutDelivery({
     session,
     userText,
     draftText: shari.text,
-    responseKind:
-      shari.mode === "distressed"
-        ? "gentle-observation"
-        : shari.mode === "closing" || shari.mode === "answer_redirect"
-          ? "thoughtful-question"
-          : rci.responseKind,
+    responseKind: usedModelDraft
+      ? "thoughtful-question"
+      : (rci?.responseKind ?? "thoughtful-question"),
     repairActive: false,
     thinkingMap,
     topicAnchor,
-    validationMode:
-      shari.mode === "distressed" ? "permanent_bans_only" : "full",
+    // Model drafts: ban scrub only — avoid grounded-ack / soft shells rewriting Shari
+    validationMode: usedModelDraft ? "permanent_bans_only" : "full",
   });
-  const assistantText = scrubShariAiTells(polished.text);
+  const assistantText = scrubShariAiTells(
+    validateShariResponseEngineDraft(polished.text).text,
+  );
   if (polished.cieState.topicAnchor) {
     thinkingMap.topicAnchor = polished.cieState.topicAnchor;
   }
 
   // Ensure sit question id tracked when situation lead replaced text with sit observation that has ?
-  let questionId = rci.questionId;
+  let questionId = rci?.questionId;
   if (
     !questionId &&
     signal !== "general" &&
@@ -1012,7 +1021,8 @@ export function buildTalkItOutTurn(
     if (sit) questionId = sit.id;
   }
 
-  let futureFeelingAsked = rci.futureFeelingAsked;
+  let futureFeelingAsked =
+    rci?.futureFeelingAsked ?? session.futureFeelingAsked;
   if (
     signal === "admin-avoidance" &&
     /feel|tomorrow|hanging/i.test(assistantText)
@@ -1020,16 +1030,11 @@ export function buildTalkItOutTurn(
     futureFeelingAsked = true;
   }
 
-  let responseKind = mapRciKind(rci.responseKind);
-  if (
-    assistantText.includes("?") &&
-    (rci.responseKind === "gentle-observation" ||
-      draft.includes("\n\n"))
-  ) {
-    responseKind =
-      rci.responseKind === "future-feeling"
-        ? "future_feeling"
-        : "observation_then_question";
+  let responseKind = mapRciKind(rci?.responseKind ?? "thoughtful-question");
+  if (assistantText.includes("?")) {
+    responseKind = shari.questionOnly
+      ? "question"
+      : "observation_then_question";
   }
 
   const hireLike = /\b(?:hir(?:e|ing)|marketing|sales)\b/i.test(userText);
@@ -1050,21 +1055,16 @@ export function buildTalkItOutTurn(
 
   return {
     assistantText,
-    questionId: shari.mode === "distressed" ? undefined : questionId,
+    questionId,
     explicitHelpRequested: false,
     futureFeelingAsked,
-    responseKind:
-      shari.mode === "distressed"
-        ? "observation"
-        : shari.mode === "closing"
-          ? "observation_then_question"
-          : responseKind,
+    responseKind,
     thinkingMap,
     cieState: polished.cieState,
-    verbatimUsed: shari.verbatimUsed,
-    lastMoveWasSkip: shari.lastMoveWasSkip,
-    worryFingerprint: shari.worryFingerprint,
-    worryRepeatCount: shari.worryRepeatCount,
+    verbatimUsed: session.verbatimUsed,
+    lastMoveWasSkip: shari.questionOnly,
+    worryFingerprint: session.worryFingerprint ?? null,
+    worryRepeatCount: session.worryRepeatCount ?? 0,
     strategyMove,
     designPatternId,
     usedStrategyMoves: [...(session.usedStrategyMoves ?? []), strategyMove],
