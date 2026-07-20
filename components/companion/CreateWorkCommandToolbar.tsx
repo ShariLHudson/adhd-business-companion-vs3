@@ -3,11 +3,7 @@
 import { useState } from "react";
 import { ExportActions } from "@/components/companion/ExportActions";
 import {
-  archiveActiveWorkspace,
-  moveActiveWorkspaceToTrash,
-} from "@/lib/activeWorkspaceRegistry";
-import {
-  duplicateCreationWorkspace,
+  dispatchCreateWorkCommand,
   resolveCreateWorkCommands,
   type CreateWorkCommandId,
 } from "@/lib/createCommands";
@@ -25,7 +21,7 @@ type Props = {
 
 /**
  * 084 — Work-level Create commands on Estate Create.
- * Section actions stay on Current Focus / Workshop Map.
+ * All actions go through dispatchCreateWorkCommand.
  */
 export function CreateWorkCommandToolbar({
   workflow,
@@ -43,6 +39,7 @@ export function CreateWorkCommandToolbar({
   const commands = resolveCreateWorkCommands({
     workflow,
     hasDraftText: Boolean(draftText),
+    workId: workspaceId,
   });
 
   function flash(message: string) {
@@ -51,98 +48,61 @@ export function CreateWorkCommandToolbar({
   }
 
   function run(id: CreateWorkCommandId) {
-    const def = commands.find((c) => c.id === id);
-    if (!def?.enabled) return;
-
-    switch (id) {
-      case "save":
-        onSave?.();
-        flash(
-          onSave
-            ? "Saving…"
-            : "Use Save in Current Focus — that’s the durable path.",
-        );
-        break;
-      case "rename":
-        onRename?.();
-        break;
-      case "duplicate": {
-        const copy = duplicateCreationWorkspace(workflow);
-        onWorkflowChange(copy);
-        flash("Duplicated with a new Work ID.");
-        break;
-      }
-      case "archive":
-        if (workspaceId) {
-          if (onArchive) onArchive(workspaceId);
-          else archiveActiveWorkspace(workspaceId);
-          flash("Archived — restore anytime from Recently removed.");
-        }
-        break;
-      case "trash":
-        if (workspaceId) {
-          if (onTrash) onTrash(workspaceId);
-          else moveActiveWorkspaceToTrash(workspaceId);
-          flash("Moved to Trash — same Work ID on restore.");
-        }
-        break;
-      case "print":
-      case "export":
-      case "share":
-        setShowExport(true);
-        break;
-      default:
-        break;
+    if (id === "rename") {
+      onRename?.();
+      return;
     }
+    const result = dispatchCreateWorkCommand({
+      commandId: id,
+      workflow,
+      workId: workspaceId,
+      hasDraftText: Boolean(draftText),
+      onSave,
+      onArchive,
+      onTrash,
+      onExportSurface: () => setShowExport(true),
+    });
+    if (!result.ok) {
+      flash(result.disabledReason ?? "That isn’t available right now.");
+      return;
+    }
+    if (result.workflow !== workflow) {
+      onWorkflowChange(result.workflow);
+    }
+    if (result.openExport) setShowExport(true);
+    if (result.message) flash(result.message);
   }
 
   return (
     <div
-      className="mt-3 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-3 py-2"
+      className="mb-3 flex flex-wrap items-center gap-2"
       data-testid="create-work-command-toolbar"
       data-workspace-id={workspaceId || undefined}
     >
-      <div className="flex flex-wrap gap-1.5">
-        {commands.map((cmd) =>
-          cmd.available ? (
-            <button
-              key={cmd.id}
-              type="button"
-              disabled={!cmd.enabled}
-              data-testid={`create-cmd-${cmd.id}`}
-              onClick={() => run(cmd.id)}
-              className="rounded-lg border border-[#d4cdc3] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#4b463f] hover:bg-[#faf7f2] disabled:cursor-not-allowed disabled:opacity-35"
-            >
-              {cmd.label}
-            </button>
-          ) : null,
-        )}
-      </div>
-      {note ? (
-        <p
-          className="mt-2 text-xs text-[#6b635a]"
-          data-testid="create-cmd-note"
-          role="status"
+      {commands.map((cmd) => (
+        <button
+          key={cmd.id}
+          type="button"
+          data-testid={`create-cmd-${cmd.id}`}
+          disabled={!cmd.enabled}
+          title={cmd.disabledReason}
+          onClick={() => run(cmd.id)}
+          className="rounded-lg border border-[#1e4f4f]/25 bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
         >
+          {cmd.label}
+        </button>
+      ))}
+      {note ? (
+        <span className="text-xs font-medium text-[#5c5346]" role="status">
           {note}
-        </p>
+        </span>
       ) : null}
       {showExport && draftText ? (
-        <div className="mt-3 border-t border-[#e7dfd4] pt-3" data-testid="create-cmd-export-panel">
+        <div className="w-full pt-1">
           <ExportActions
-            text={draftText}
-            title={workflow.selectedTemplateName ?? undefined}
-            variant="workspace"
-            compact
-            social
+            title={workflow.selectedTemplateName || "Creation"}
+            content={draftText}
           />
-          <button
-            type="button"
-            className="mt-2 text-xs font-semibold text-[#6b635a] underline"
-            onClick={() => setShowExport(false)}
-          >
-            Hide export options
-          </button>
         </div>
       ) : null}
     </div>
