@@ -12,6 +12,7 @@ import {
 import { tryResolveSectionOptionApproval } from "./createSectionDiscovery";
 import { assistantOfferedWorkspaceAdd } from "./workspaceApprovalSync";
 import { findCatalogItem } from "./createCatalog";
+import { applySectionLifecycleTransition } from "@/lib/createSectionLifecycle";
 import {
   defaultTemplateFor,
   findCustomTemplate,
@@ -154,54 +155,23 @@ export function updateWorkspaceV2SectionContent(
   sectionId: string,
   content: string,
 ): CreateWorkflowState {
-  const skipped = (workflow.skippedSectionIds ?? []).filter(
-    (id) => id !== sectionId,
-  );
-  const prior = (workflow.sectionContent?.[sectionId] ?? "").trim();
-  const next = content.trim();
-  const completed = new Set(workflow.completedSectionIds ?? []);
-  // Meaningful edit reopens Complete for Now (formatting-only keeps status).
-  const meaningful =
-    completed.has(sectionId) &&
-    prior.replace(/\s+/g, " ") !== next.replace(/\s+/g, " ");
-  if (meaningful) completed.delete(sectionId);
-  return {
-    ...workflow,
-    skippedSectionIds: skipped,
-    completedSectionIds: [...completed],
-    sectionContent: {
-      ...workflow.sectionContent,
-      [sectionId]: content,
-    },
-  };
+  return applySectionLifecycleTransition(workflow, sectionId, {
+    type: "edit",
+    content,
+  });
 }
 
 /**
  * 077_006 — Complete for Now. Milestone, not a lock. Preserves content + version.
+ * Delegates to `lib/createSectionLifecycle` (sole transition owner).
  */
 export function markSectionCompleteForNow(
   workflow: CreateWorkflowState,
   sectionId: string,
 ): CreateWorkflowState {
-  const content = (workflow.sectionContent?.[sectionId] ?? "").trim();
-  const completed = new Set(workflow.completedSectionIds ?? []);
-  completed.add(sectionId);
-  const skipped = (workflow.skippedSectionIds ?? []).filter(
-    (id) => id !== sectionId,
-  );
-  const versions = { ...(workflow.completedSectionVersions ?? {}) };
-  versions[sectionId] = {
-    content,
-    completedAt: new Date().toISOString(),
-  };
-  return {
-    ...workflow,
-    skippedSectionIds: skipped,
-    completedSectionIds: [...completed],
-    completedSectionVersions: versions,
-    // Keep content; stay on section so member can reopen/edit without lock
-    activeSectionId: workflow.activeSectionId ?? sectionId,
-  };
+  return applySectionLifecycleTransition(workflow, sectionId, {
+    type: "complete_for_now",
+  });
 }
 
 /**
@@ -211,19 +181,9 @@ export function reopenSectionForEditing(
   workflow: CreateWorkflowState,
   sectionId: string,
 ): CreateWorkflowState {
-  const completed = (workflow.completedSectionIds ?? []).filter(
-    (id) => id !== sectionId,
-  );
-  const skipped = (workflow.skippedSectionIds ?? []).filter(
-    (id) => id !== sectionId,
-  );
-  return {
-    ...workflow,
-    completedSectionIds: completed,
-    skippedSectionIds: skipped,
-    activeSectionId: sectionId,
-    showAllWorkspaceSections: workflow.showAllWorkspaceSections ?? true,
-  };
+  return applySectionLifecycleTransition(workflow, sectionId, {
+    type: "reopen",
+  });
 }
 
 export function toggleWorkspaceV2SectionSkipped(
@@ -232,19 +192,13 @@ export function toggleWorkspaceV2SectionSkipped(
 ): CreateWorkflowState {
   const skipped = new Set(workflow.skippedSectionIds ?? []);
   if (skipped.has(sectionId)) {
-    skipped.delete(sectionId);
-  } else {
-    skipped.add(sectionId);
+    return applySectionLifecycleTransition(workflow, sectionId, {
+      type: "unskip",
+    });
   }
-  // 077 — Skip for Now preserves content; section stays openable
-  const completed = (workflow.completedSectionIds ?? []).filter(
-    (id) => id !== sectionId,
-  );
-  return {
-    ...workflow,
-    skippedSectionIds: [...skipped],
-    completedSectionIds: completed,
-  };
+  return applySectionLifecycleTransition(workflow, sectionId, {
+    type: "skip_for_now",
+  });
 }
 
 export function renameWorkspaceV2Section(
