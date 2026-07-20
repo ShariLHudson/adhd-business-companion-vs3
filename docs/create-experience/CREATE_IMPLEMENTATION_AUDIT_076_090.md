@@ -1,15 +1,41 @@
 # Create Implementation Audit — Standards 076–090
 
-**Status:** Phase 1 complete (code inspection + architecture deep-dive). Browser certification **not** started.  
-**Date:** 2026-07-20  
+**Status:** Phase 1 audit superseded for foundation capabilities by Phase 2 baseline.  
+**Date:** 2026-07-20 (Phase 2 update)  
 **Branch:** `deploy/companion-app-v3`  
 **Standards commit:** `81128ff3` — docs ingest only  
-**Audit commit:** `05bc0135` (this file; follow-up notes below)  
+**Phase 1 audit commit:** `05bc0135`  
+**Foundation baseline commit:** `de0af701` — `feat(create): certify universal Create foundation with Event reference implementation`  
 **Prompt:** `091_CURSOR_CREATE_IMPLEMENTATION_AUDIT_BUILD_CERTIFY_COMMIT_PUSH_PROMPT.md`  
-**Conclusion for Phase 1:** `CREATE IMPLEMENTATION NOT READY`  
-**Deep-dive:** [Audit Create routes/UI](11494c85-5575-4e5f-aacf-9fed6f90d893)
+**Phase 1 conclusion (historical):** `CREATE IMPLEMENTATION NOT READY`  
+**Phase 2 conclusion:** `CREATE FOUNDATION BASELINE CERTIFIED` (automated production matrix + Event reference). **Not** “Create finished.” Full 076–090 and single-runtime extensibility still open.
 
-This audit maps the **current repository implementation** against committed Universal Creation standards 076–090. Documentation ingestion is **not** implementation completion.
+> **Stale-audit warning:** Earlier code cross-checks (including post–Phase-1 subagent scans) that mark Full Workshop Map, Complete for Now, trash/restore, or command library as **Missing** are outdated relative to `de0af701`. Prefer the Phase 2 supersession table below.
+
+---
+
+## Phase 2 supersession (2026-07-20, commit `de0af701`)
+
+| Capability | Phase 1 / stale scan | After `de0af701` | Evidence |
+|------------|----------------------|------------------|----------|
+| Full Workshop Map (077/080) | Missing / Partial | **Implemented** (shared runtime; Event configures) | `lib/workTypeSchema/`, Estate `CreateWorkspaceV2Panel` map rows, `openWorkshopMapSection` |
+| Every map row → Current Focus | Unknown | **Implemented** (certified) | `productionCreateFoundation.cert.test.ts` |
+| Complete for Now / Reopen | Missing | **Implemented** | `markSectionCompleteForNow`, `reopenSectionForEditing`, Focus buttons |
+| Save honesty (“Saved securely”) | Uncertified | **Implemented** on Current Focus path | `creationDurable/saveState`, Focus recovery buffer |
+| Continue Archive / Trash / Restore | Partial / Missing trash | **Implemented** (registry mutations) | `activeWorkspaceRegistry` + Active Work “Recently removed” |
+| Work command library (084 subset) | Missing | **Partial → Implemented** for Estate work commands | `lib/createCommands/`, `CreateWorkCommandToolbar` |
+| Production certification | Not started | **Automated matrix green** (37 checks; 52 related tests) | `lib/createCertification/productionCreateFoundation.cert.test.ts` |
+| Single runtime per concern / config-only Work Types | — | **Not yet** | Dual status (facilitated vs EventSection); multi save stores; multi Continue lists; schema-first bootstrap incomplete |
+| Browser keyboard / live Print-PDF / offline queue | — | **Still open** | Manual / Preview follow-up |
+| Help Me Think / 082 full / 085 native DOCX / 088 prefs / 089 multi-tab | Missing / Partial | **Still open** | Unchanged by Phase 2 |
+
+**Architecture rule going forward:** Event (and every Work Type) **configures** `workTypeSchema` + domain adapter; shared Create owns map open, save labels, complete/reopen, Continue mutations, and work commands. Do not reintroduce Event-only forks of those behaviors.
+
+---
+
+**Deep-dive (Phase 1):** [Audit Create routes/UI](11494c85-5575-4e5f-aacf-9fed6f90d893)
+
+This audit maps the **current repository implementation** against committed Universal Creation standards 076–090. Documentation ingestion is **not** implementation completion. Sections below retain Phase 1 detail; where they conflict with the Phase 2 table, **Phase 2 wins**.
 
 Classification legend:
 
@@ -27,9 +53,9 @@ Classification legend:
 
 ## A. Current Create Architecture Map
 
-**Live platform:** Create Estate on `/companion` (`activeSection === "create"`) → `CurrentFocusInteraction` + `CreateWorkspaceV2Panel` + `creationDurable` + `activeWorkspaceRegistry`.
+**Live platform:** Create Estate on `/companion` (`activeSection === "create"`) → `CurrentFocusInteraction` + `CreateWorkspaceV2Panel` (Workshop Map) + `creationDurable` + `activeWorkspaceRegistry` + `CreateWorkCommandToolbar`.
 
-**Target still largely unimplemented as first-class UI:** 077 Full Workshop Map, universal toolbar, Complete for Now, Help Me Think on Focus. No dedicated `/create` route and no `WorkshopMap` / `FullWorkshopMap` component. Event may wrap the panel in “See the full … map” (`workspace-full-map-disclosure`).
+**Phase 2 baseline (see supersession table):** shared Workshop Map via `lib/workTypeSchema/`, Complete for Now / Reopen, durable save honesty on Focus, Continue trash/restore, Estate command toolbar. Still open: Help Me Think on Focus, dedicated `/create` route, single-runtime cleanup, browser/offline cert. Legacy Event disclosure (`workspace-full-map-disclosure`) is not the primary map path.
 
 ### Entry / routes
 
