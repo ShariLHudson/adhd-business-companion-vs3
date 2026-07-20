@@ -3,15 +3,37 @@
  */
 
 import { sortDropdownLabels } from "./dropdownSort";
-import type { CreateWorkflowState } from "./createWorkflow";
-import { buildBriefFromDiscovery, resolvedTypeLabel } from "./createWorkflow";
-import { outlineSectionBriefLines } from "./createSectionDiscovery";
+import {
+  resolvedTypeLabel,
+  type CreateTemplateSection,
+  type CreateWorkflowState,
+} from "./createWorkflowState";
 import { CREATE_WORKSPACE_V2 } from "./createWorkspaceFlags";
 import { effectiveSubtypeLabel, OTHER_OPTION } from "./createTypePickers";
 import { EVENT_PLAN_MAP_SECTIONS } from "@/lib/workTypeSchema/schemas/eventPlanMap";
 import { workshopMapToTemplateSections } from "@/lib/workTypeSchema/ensureMapSections";
 
-export type CreateTemplateSection = { id: string; label: string };
+export type { CreateTemplateSection };
+
+/** Local brief helper — never import createWorkflow (cycle break). */
+function briefFromDiscoveryAnswers(
+  typeLabel: string,
+  answers: Record<string, string>,
+  subtype?: string | null,
+): string {
+  const header = subtype
+    ? `Creating: ${typeLabel} (${subtype})`
+    : `Creating: ${typeLabel}`;
+  const lines = Object.entries(answers)
+    .filter(([, v]) => Boolean(v?.trim()))
+    .map(([key, value]) => `${key}\n${value.trim()}`);
+  if (!lines.length) {
+    return subtype
+      ? `Create a ${typeLabel} — ${subtype}.`
+      : `Create a ${typeLabel}.`;
+  }
+  return [header, ...lines].join("\n\n");
+}
 
 export type CreateTemplatePreset = {
   id: string;
@@ -569,26 +591,44 @@ export function newSectionId(): string {
 }
 
 export function buildFullCreateBrief(state: CreateWorkflowState): string {
-  if (CREATE_WORKSPACE_V2 && state.workspaceFirst && state.useTemplate) {
-    // Lazy: avoid createTemplates ↔ createWorkspaceV2 circular init (Vercel/webpack).
-    const { buildWorkspaceV2Brief } =
-      require("./createWorkspaceV2") as typeof import("./createWorkspaceV2");
-    const workspaceBrief = buildWorkspaceV2Brief(state);
-    if (workspaceBrief.trim()) {
-      return buildGenerationBrief(state, workspaceBrief);
-    }
-  }
   const typeLabel = resolvedTypeLabel(state);
   const subtype = effectiveSubtypeLabel(
     state.selectedSubtype,
     state.customSubtype,
   );
-  const discoveryBrief = buildBriefFromDiscovery(
+
+  // Workspace-first brief without importing createWorkspaceV2 (Vercel cycle break).
+  if (CREATE_WORKSPACE_V2 && state.workspaceFirst && state.useTemplate) {
+    const header = subtype
+      ? `Creating: ${typeLabel} (${subtype})`
+      : `Creating: ${typeLabel}`;
+    const skipped = new Set(state.skippedSectionIds ?? []);
+    const lines = (resolveTemplateSections(state) ?? [])
+      .map((s) => {
+        if (skipped.has(s.id)) {
+          return `${s.label}\n[Section marked N/A — omit or minimize in draft]`;
+        }
+        const content = state.sectionContent?.[s.id]?.trim();
+        if (!content) return null;
+        return `${s.label}\n${content}`;
+      })
+      .filter(Boolean) as string[];
+    if (lines.length > 0) {
+      return buildGenerationBrief(state, `${header}\n\n${lines.join("\n\n")}`);
+    }
+  }
+
+  const discoveryBrief = briefFromDiscoveryAnswers(
     typeLabel,
     state.discoveryAnswers,
     subtype,
   );
-  const sectionLines = outlineSectionBriefLines(state);
+  const sectionLines = (resolveTemplateSections(state) ?? [])
+    .map((s) => {
+      const content = state.sectionContent?.[s.id]?.trim();
+      return content ? `${s.label}\n${content}` : null;
+    })
+    .filter(Boolean) as string[];
   const withSections =
     sectionLines.length > 0
       ? `${discoveryBrief}\n\nTemplate sections:\n${sectionLines.join("\n\n")}`

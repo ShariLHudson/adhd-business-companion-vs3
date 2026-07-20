@@ -3,7 +3,7 @@
  * Must not import createTemplates / createWorkspaceV2 (cycle break).
  */
 
-import type { CreateWorkflowState } from "./createWorkflow";
+import type { CreateWorkflowState } from "./createWorkflowState";
 
 export function setWorkspaceV2ActiveSection(
   workflow: CreateWorkflowState,

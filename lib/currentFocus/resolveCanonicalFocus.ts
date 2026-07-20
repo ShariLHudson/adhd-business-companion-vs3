@@ -12,9 +12,11 @@ import {
   getEventRecord,
   nextFoundationQuestion,
 } from "@/lib/eventsIntelligence";
-import { workspaceV2Sections } from "@/lib/createWorkspaceV2";
-import type { CreateWorkflowState } from "@/lib/createWorkflow";
-import { resolvedTypeLabel } from "@/lib/createWorkflow";
+import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
+import {
+  resolvedTypeLabel,
+  type CreateWorkflowState,
+} from "@/lib/createWorkflowState";
 import {
   ensureRuntimeCreationRecord,
   getRuntimeCreationRecord,

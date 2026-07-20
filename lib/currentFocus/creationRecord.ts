@@ -14,9 +14,11 @@ import {
   safeLocalStorageSet,
 } from "@/lib/companionStorageRecovery";
 import { isAuthoritativelyDurable } from "@/lib/creationDurable/verifiedRegistry";
-import type { CreateTemplateSection } from "@/lib/createTemplates";
-import type { CreateWorkflowState } from "@/lib/createWorkflow";
-import { resolvedTypeLabel } from "@/lib/createWorkflow";
+import {
+  resolvedTypeLabel,
+  type CreateTemplateSection,
+  type CreateWorkflowState,
+} from "@/lib/createWorkflowState";
 import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
 import {
   buildCanonicalKnownFacts,

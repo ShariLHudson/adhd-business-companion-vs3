@@ -5,17 +5,17 @@
 
 import { resolveHumanReadableTitle } from "@/lib/activeWorkspaceRegistry/humanReadableIdentity";
 import { mayApplyEventWorkspace } from "@/lib/creationIdentity/deriveCreationIdentity";
-import type { CreateTemplateSection } from "@/lib/createTemplates";
-import type { CreateWorkflowState } from "@/lib/createWorkflow";
+import type { CreateTemplateSection } from "@/lib/createWorkflowState";
+import type { CreateWorkflowState } from "@/lib/createWorkflowState";
 import { coerceCreationDestinationQuestionMode } from "@/lib/currentFocus/questionMode";
 import { buildEventDiscoveryTransition } from "@/lib/discoveryToWorkspace";
 import type { EventRecord } from "@/lib/eventsIntelligence/types";
+import { applyWorkTypeMapToCreateWorkflow } from "@/lib/workTypeSchema/applyWorkTypeMapToWorkflow";
+import { workshopMapToTemplateSections } from "@/lib/workTypeSchema/ensureMapSections";
 import {
-  applyWorkTypeMapToCreateWorkflow,
   EVENT_PLAN_SCHEMA,
   ensureEventPlanSchemaRegistered,
-  workshopMapToTemplateSections,
-} from "@/lib/workTypeSchema";
+} from "@/lib/workTypeSchema/schemas/eventPlan";
 import { buildEventCreationWorkspace } from "./buildEventWorkspace";
 
 ensureEventPlanSchemaRegistered();

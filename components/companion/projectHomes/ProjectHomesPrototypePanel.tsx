@@ -43,7 +43,7 @@ import {
   archiveActiveWorkspace,
   listRecoverableWorkspaces,
   restoreActiveWorkspace,
-} from "@/lib/activeWorkspaceRegistry";
+} from "@/lib/activeWorkspaceRegistry/registry";
 import {
   listActiveWorkCards,
   PROJECTS_BROWSE_EXAMPLES_LABEL,

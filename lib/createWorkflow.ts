@@ -25,169 +25,30 @@ import {
   templateFieldToDiscoveryQuestion,
 } from "./createGuidedBridge";
 
-export type DiscoverySubphase = "questions" | "sections";
-
 export { catalogCategory, dropdownItemsInCategory, catalogTypesPickerLabel } from "./createCatalog";
 import { sortByDropdownLabel } from "./dropdownSort";
-import type { CreateTemplateSection } from "./createTemplates";
 
-export type DraftStatus = "idle" | "building" | "ready" | "error";
-
-/** Who asks discovery questions — Create workspace alone, or conversational guidance (066). */
-/**
- * create_only — panel/workspace interaction
- * current_focus — 066 Creation Destination (sole interaction owner)
- * split_screen — LEGACY; rejected for Creation Destinations
- */
-export type CreateQuestionMode =
-  | "create_only"
-  | "current_focus"
-  | "split_screen";
-
-export type CreateWorkflowStep =
-  | "category"
-  | "type"
-  | "confirm"
-  | "template"
-  | "discovery"
-  | "add-detail"
-  | "readiness"
-  | "improve"
-  | "export";
-
-export type { CreateTemplateSection };
-
-export type DiscoveryQuestion = {
-  id: string;
-  prompt: string;
-  why: string;
-  placeholder?: string;
-};
-
-/** Awaiting user approval before writing to the template. */
-export type PendingFieldApproval = {
-  kind: "discovery" | "section";
-  questionId?: string;
-  sectionId?: string;
-  sectionLabel?: string;
-  fieldLabel?: string;
-  summary: string;
-  rawAnswer: string;
-};
-
-export type CreateWorkflowState = {
-  step: CreateWorkflowStep;
-  categoryId: string | null;
-  /** Primary item type (e.g. Newsletter, SOP). */
-  selectedTypeLabel: string | null;
-  /** Subtype within the item (e.g. Educational, Client Onboarding). */
-  selectedSubtype: string | null;
-  /** When item type is Other — free-text label. */
-  customTypeLabel: string | null;
-  /** When subtype is Other — free-text detail. */
-  customSubtype: string | null;
-  discoveryAnswers: Record<string, string>;
-  /** Explicit content per template section id (split-screen section discovery). */
-  sectionContent?: Record<string, string>;
-  /** Section currently being filled in chat. */
-  activeSectionId?: string | null;
-  /** After initial questions: collaborate on empty template sections. */
-  discoverySubphase?: DiscoverySubphase | null;
-  /** Numbered options from the last Discovery Help reply (awaiting user pick). */
-  pendingSectionOptions?: string[] | null;
-  discoveryIndex: number;
-  readinessConfirmed: boolean;
-  buildApproved: boolean;
-  /** Preset or custom template id; "none" = freeform. */
-  selectedTemplateId: string | null;
-  selectedTemplateName: string | null;
-  templateSections: CreateTemplateSection[] | null;
-  useTemplate: boolean;
-  draftStatus: DraftStatus;
-  draftContent: string | null;
-  /** Stable id shared between chat builder and Create panel. */
-  sessionId?: string | null;
-  /** Question ids skipped — not required for readiness or brief. */
-  skippedQuestionIds?: string[];
-  /** Template section ids marked Skip for Now (still openable; content preserved). */
-  skippedSectionIds?: string[];
-  /** Sections the member marked Complete for Now (not locked; reopen anytime). */
-  completedSectionIds?: string[];
-  /** Last completed content snapshot per section — revision preserve (077_006). */
-  completedSectionVersions?: Record<
-    string,
-    { content: string; completedAt: string }
-  >;
-  /** create_only = panel asks questions; split_screen = chat asks, panel shows output. */
-  questionMode: CreateQuestionMode;
-  /** User must approve before this summary is saved to the template. */
-  pendingFieldApproval?: PendingFieldApproval | null;
-  /** Workspace-first Create V2 — user edits sections; chat does not auto-fill. */
-  workspaceFirst?: boolean;
-  /** Purpose-built Creation Workspace (event, etc.) — not a generic project folder. */
-  creationWorkspaceKind?: "event" | null;
-  /** Canonical Event Record id when creationWorkspaceKind is event. */
-  eventRecordId?: string | null;
-  /** Sections to emphasize now; full map remains in templateSections. */
-  focusSectionIds?: string[];
-  /** When false, UI can collapse non-focus sections under "full event map". */
-  showAllWorkspaceSections?: boolean;
-  /** 058 — What We Already Know (member-facing). */
-  workspaceKnownFacts?: string[];
-  /** 058 — Current Focus recommendation. */
-  workspaceCurrentFocus?: {
-    title: string;
-    reason: string;
-    actionLabel: string;
-    estimatedEffort?: string | null;
-    assetTypeId?: string | null;
-    sectionId?: string | null;
-  } | null;
-  /** 058 — Member-facing phase (never internal IDs). */
-  workspacePhaseLabel?: string | null;
-  /** 060 — ≤3 secondary recommendations under Current Focus. */
-  workspaceSecondaryRecommendations?: {
-    title: string;
-    reason: string;
-  }[];
-  /** 061 — Universal Creation State (shared lifecycle). */
-  universalCreationState?: string | null;
-  /**
-   * Creation Identity — permanent three-field rule.
-   * originalRequest never mutates; never used as the display title.
-   */
-  originalRequest?: string | null;
-  /** Internal routing intent (e.g. "Create Checklist") — not the workspace name. */
-  workingIntent?: string | null;
-};
-
-export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
-  step: "category",
-  categoryId: null,
-  selectedTypeLabel: null,
-  selectedSubtype: null,
-  customTypeLabel: null,
-  customSubtype: null,
-  discoveryAnswers: {},
-  sectionContent: {},
-  activeSectionId: null,
-  discoverySubphase: null,
-  pendingSectionOptions: null,
-  discoveryIndex: 0,
-  readinessConfirmed: false,
-  buildApproved: false,
-  selectedTemplateId: null,
-  selectedTemplateName: null,
-  templateSections: null,
-  useTemplate: true,
-  draftStatus: "idle",
-  draftContent: null,
-  questionMode: "create_only",
-  pendingFieldApproval: null,
-  completedSectionIds: [],
-  completedSectionVersions: {},
-  skippedSectionIds: [],
-};
+export type {
+  CreateTemplateSection,
+  CreateWorkflowState,
+  CreateWorkflowStep,
+  CreateQuestionMode,
+  DiscoveryQuestion,
+  DiscoverySubphase,
+  DraftStatus,
+  PendingFieldApproval,
+} from "./createWorkflowState";
+export {
+  EMPTY_CREATE_WORKFLOW,
+  resolvedTypeLabel,
+} from "./createWorkflowState";
+import {
+  EMPTY_CREATE_WORKFLOW,
+  resolvedTypeLabel,
+  type CreateTemplateSection,
+  type CreateWorkflowState,
+  type DiscoveryQuestion,
+} from "./createWorkflowState";
 
 const DEFAULT_DISCOVERY: DiscoveryQuestion[] = [
   {
@@ -943,14 +804,6 @@ export function workflowStepLabel(step: CreateWorkflowStep): string {
 }
 
 /** Resolved label used for discovery, briefs, and generation. */
-export function resolvedTypeLabel(state: CreateWorkflowState): string {
-  return (
-    effectiveCreateTypeLabel(state.selectedTypeLabel, state.customTypeLabel) ||
-    state.selectedTypeLabel?.trim() ||
-    ""
-  );
-}
-
 export function discoveryIndexForAnswers(
   typeLabel: string,
   answers: Record<string, string>,

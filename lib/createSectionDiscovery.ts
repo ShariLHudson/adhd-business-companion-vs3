@@ -21,7 +21,8 @@ import {
   CREATE_THINKING_PARTNER_PRINCIPLES,
   DRAFT_WITH_WHAT_WE_HAVE_PROMPT,
 } from "./createVision";
-import { CREATE_WORKSPACE_V2, formatCreateWorkspaceV2ExplorationHint } from "./createWorkspaceV2";
+import { CREATE_WORKSPACE_V2 } from "./createWorkspaceFlags";
+import { formatCreateWorkspaceV2ExplorationHint } from "./createWorkspaceExplorationHint";
 import { extractNumberedOptions, parseOptionSelection } from "./workspaceSop";
 
 /** Discovery question id → template section id, per item type. */

@@ -9,8 +9,11 @@ import {
   getLastLocalStorageWriteDiagnostic,
   safeLocalStorageSet,
 } from "@/lib/companionStorageRecovery";
-import type { CreateWorkflowState } from "@/lib/createWorkflow";
-import { EMPTY_CREATE_WORKFLOW, resolvedTypeLabel } from "@/lib/createWorkflow";
+import {
+  EMPTY_CREATE_WORKFLOW,
+  resolvedTypeLabel,
+  type CreateWorkflowState,
+} from "@/lib/createWorkflowState";
 import {
   getAuthoritativeDurableVersion,
   isAuthoritativelyDurable,
@@ -447,7 +450,9 @@ export async function restoreActiveWorkspaceDurable(
     );
     const runtime = getRuntimeCreationRecord(id);
     if (runtime) {
-      const { EMPTY_CREATE_WORKFLOW } = await import("@/lib/createWorkflow");
+      const { EMPTY_CREATE_WORKFLOW } = await import(
+        "@/lib/createWorkflowState"
+      );
       const wf = {
         ...EMPTY_CREATE_WORKFLOW,
         sessionId: id,
