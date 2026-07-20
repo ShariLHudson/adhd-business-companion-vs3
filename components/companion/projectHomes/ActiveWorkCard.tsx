@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { PROJECTS_CONTINUE_LABEL } from "@/lib/projects/activeWork";
-import type { ActiveWorkCardModel } from "@/lib/projects/activeWork";
+import { PROJECTS_CONTINUE_LABEL } from "@/lib/projects/activeWork/copy";
+import type { ActiveWorkCardModel } from "@/lib/projects/activeWork/types";
 import { formatProjectHomeDate } from "@/lib/projectHomes/sampleProjects";
 
 type Props = {

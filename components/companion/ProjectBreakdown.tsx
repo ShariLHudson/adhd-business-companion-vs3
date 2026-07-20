@@ -8,7 +8,7 @@ import {
   toggleProjectItemDone,
   type ProjectItem,
   type ProjectItemKind,
-} from "@/lib/companionStore";
+} from "@/lib/companionProjectsStore";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 
 type Props = {

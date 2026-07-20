@@ -10,11 +10,11 @@ describe("Project Homes Create import safety", () => {
     const panel = await import(
       "@/components/companion/projectHomes/ProjectHomesPrototypePanel"
     );
-    const activeWork = await import("@/lib/projects/activeWork");
-    const core = await import("@/lib/activeWorkspaceRegistry/registryCore");
+    const lite = await import("@/lib/projects/projectsContinueLite");
+    const projectsStore = await import("@/lib/companionProjectsStore");
     expect(typeof panel.ProjectHomesPrototypePanel).toBe("function");
-    expect(typeof activeWork.listActiveWorkCards).toBe("function");
-    expect(typeof core.listActiveWorkspaces).toBe("function");
+    expect(typeof lite.listLiteActiveWorkCards).toBe("function");
+    expect(typeof projectsStore.getProjects).toBe("function");
   });
 
   it("listActiveCreationWorkspaces does not import humanReadableIdentity", () => {
@@ -42,7 +42,7 @@ describe("Project Homes Create import safety", () => {
     );
   });
 
-  it("panel never references fat registry module", () => {
+  it("panel never references Create registry / fat companionStore", () => {
     const src = readFileSync(
       join(
         process.cwd(),
@@ -50,13 +50,34 @@ describe("Project Homes Create import safety", () => {
       ),
       "utf8",
     );
-    expect(src).toContain("registryCore");
+    expect(src).toContain("projectsContinueLite");
+    expect(src).toContain("companionProjectsEvents");
     expect(src).not.toMatch(
       /from ["']@\/lib\/activeWorkspaceRegistry\/registry["']/,
     );
     expect(src).not.toMatch(
-      /import\(["']@\/lib\/activeWorkspaceRegistry\/registry["']\)/,
+      /from ["']@\/lib\/activeWorkspaceRegistry\/registryCore["']/,
     );
+    expect(src).not.toMatch(/from ["']@\/lib\/companionStore["']/);
+    expect(src).not.toMatch(
+      /from ["']@\/lib\/currentFocus\/creationRecord["']/,
+    );
+    expect(src).not.toMatch(/from ["']@\/lib\/navigationContext["']/);
+  });
+
+  it("homeActions and ProjectBreakdown use companionProjectsStore leaf", () => {
+    const homeActions = readFileSync(
+      join(process.cwd(), "lib/projectHomes/homeActions.ts"),
+      "utf8",
+    );
+    const breakdown = readFileSync(
+      join(process.cwd(), "components/companion/ProjectBreakdown.tsx"),
+      "utf8",
+    );
+    expect(homeActions).toContain("companionProjectsStore");
+    expect(homeActions).not.toMatch(/from ["']@\/lib\/companionStore["']/);
+    expect(breakdown).toContain("companionProjectsStore");
+    expect(breakdown).not.toMatch(/from ["']@\/lib\/companionStore["']/);
   });
 
   it("registryCore has no persist trace / creationRecord static imports", () => {
@@ -68,6 +89,7 @@ describe("Project Homes Create import safety", () => {
     expect(src).not.toMatch(
       /from ["']@\/lib\/currentFocus\/creationRecord["']/,
     );
+    expect(src).not.toMatch(/creationDurable/);
   });
 
   it("projectHomes barrel exports lazy panel gate", () => {

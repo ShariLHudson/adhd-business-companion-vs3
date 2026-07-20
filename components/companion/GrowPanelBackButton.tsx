@@ -4,7 +4,7 @@ import {
   BACK_TO_ESTATE,
   formatAppBackLabel,
   isEstateHomeDestination,
-} from "@/lib/navigationBack";
+} from "@/lib/navigationBackLabels";
 
 type Props = {
   onBack: () => void;

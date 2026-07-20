@@ -68,14 +68,17 @@ export {
   peekRegistryWorkspaceEntry,
   readLastActiveWorkspaceId,
   removeActiveWorkspaceFromContinue,
-  removeActiveWorkspaceFromContinueDurable,
   restoreActiveWorkspace,
-  restoreActiveWorkspaceDurable,
   setLastActiveWorkspaceId,
   touchActiveWorkspace,
   upsertActiveWorkspace,
   wasLastRegistryPersistDurable,
 } from "./registryCore";
+
+export {
+  removeActiveWorkspaceFromContinueDurable,
+  restoreActiveWorkspaceDurable,
+} from "./registryDurable";
 
 function draftStateFromWorkflow(
   workflow: CreateWorkflowState,

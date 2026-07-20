@@ -1,19 +1,21 @@
 /**
  * Global navigation back labels — ADHD Business Ecosystem standard.
  * Format: "Back to [Previous Page]"
+ *
+ * Pure label helpers: navigationBackLabels (Create-graph safe).
+ * Section ↔ title mapping may load workspaceMode — keep off Project Homes.
  */
 
 import type { AppSection } from "./companionUi";
 import { workspaceAreaTitle } from "./workspaceMode";
 
-/**
- * Persistent top-left return control (106–108).
- * Prefer this label everywhere — one authoritative Welcome Home action.
- */
-export const WELCOME_HOME_NAV_LABEL = "Welcome Home";
-
-/** @deprecated Prefer WELCOME_HOME_NAV_LABEL — kept for legacy string matches. */
-export const BACK_TO_ESTATE = WELCOME_HOME_NAV_LABEL;
+export {
+  BACK_TO_ESTATE,
+  WELCOME_HOME_NAV_LABEL,
+  formatAppBackLabel,
+  isEstateHomeDestination,
+  normalizeBackDestination,
+} from "./navigationBackLabels";
 
 /** Destination key when returning from a room to Welcome Home (estate entrance). */
 export const NAV_HOME = "Estate";
@@ -62,38 +64,4 @@ const TRADEMARK_SECTION_TITLES: Partial<Record<AppSection, string>> = {
  */
 export function navigationDestinationForSection(section: AppSection): string {
   return TRADEMARK_SECTION_TITLES[section] ?? workspaceAreaTitle(section);
-}
-
-/** True when a back destination means the Spark Estate home. */
-export function isEstateHomeDestination(
-  destination: string | null | undefined,
-): boolean {
-  if (!destination) return false;
-  const normalized = normalizeBackDestination(destination).toLowerCase();
-  return (
-    normalized === "home" ||
-    normalized === "estate" ||
-    normalized === "welcome home" ||
-    normalized === "return to estate" ||
-    normalized === "back to estate" ||
-    normalized === "back to welcome home"
-  );
-}
-
-/**
- * Standard label: "Back to Clear My Mind"
- * Pass the destination only — not the full "Back to" prefix.
- */
-export function formatAppBackLabel(destination: string): string {
-  const trimmed = destination.trim();
-  if (!trimmed) return "Back";
-  if (isEstateHomeDestination(trimmed)) return BACK_TO_ESTATE;
-  if (/^back to\b/i.test(trimmed)) return trimmed;
-  return `Back to ${trimmed}`;
-}
-
-/** Strip "Back to " prefix when migrating legacy labels. */
-export function normalizeBackDestination(label: string | null | undefined): string {
-  if (!label) return "";
-  return label.replace(/^back to\s+/i, "").trim();
 }

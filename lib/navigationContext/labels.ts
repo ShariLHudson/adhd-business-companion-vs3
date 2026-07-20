@@ -1,14 +1,11 @@
-import { formatAppBackLabel } from "@/lib/navigationBack";
+import { formatAppBackLabel } from "@/lib/navigationBackLabels";
 import {
-  DESTINATION_LABELS,
   type NavigationBreadcrumbCrumb,
   type NavigationFrame,
   type NavigationStackState,
 } from "./types";
 
-export function labelForDestinationId(destinationId: string): string {
-  return DESTINATION_LABELS[destinationId] ?? destinationId;
-}
+export { labelForDestinationId } from "./destinationLabels";
 
 export function backLabelForFrame(frame: NavigationFrame | null | undefined): string {
   if (!frame) return "Back";

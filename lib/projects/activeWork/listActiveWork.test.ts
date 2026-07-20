@@ -29,7 +29,7 @@ describe("057 — Projects Active Work", () => {
       "utf8",
     );
     expect(panel).toContain("onStartSomethingNew");
-    expect(panel).toContain("listActiveWorkCards");
+    expect(panel).toContain("listLiteActiveWorkCards");
     expect(panel).not.toContain("Create a Project Home");
     expect(panel).toContain("onRemoveActiveWork");
   });

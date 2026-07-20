@@ -4,13 +4,17 @@ import { useEffect, useState } from "react";
 import {
   backLabelForFrame,
   buildStackBreadcrumb,
+} from "@/lib/navigationContext/labels";
+import {
   getNavigationStack,
   peekNavigationFrame,
   subscribeNavigationStack,
-  type NavigationBreadcrumbCrumb,
-  type NavigationFrame,
-  type NavigationStackState,
-} from "@/lib/navigationContext";
+} from "@/lib/navigationContext/stack";
+import type {
+  NavigationBreadcrumbCrumb,
+  NavigationFrame,
+  NavigationStackState,
+} from "@/lib/navigationContext/types";
 import "@/app/companion/profile-return-bar.css";
 
 type Props = {

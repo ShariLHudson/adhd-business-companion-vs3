@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./destinationLabels";
 export * from "./labels";
 export * from "./stack";
 export * from "./captureHelpers";

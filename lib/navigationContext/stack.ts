@@ -11,7 +11,7 @@ import {
   type NavigationFrameKind,
   type NavigationStackState,
 } from "./types";
-import { labelForDestinationId } from "./labels";
+import { labelForDestinationId } from "./destinationLabels";
 
 let memoryStack: NavigationStackState = { frames: [] };
 

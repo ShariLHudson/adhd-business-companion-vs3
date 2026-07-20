@@ -348,22 +348,37 @@ function newBrainDumpId(): string {
   return `bd-${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function writeBrainDumps(next: BrainDumpEntry[]): BrainDumpEntry[] {
+function writeBrainDumps(next: BrainDumpEntry[]): BrainDumpEntry[] | null {
   if (typeof window === "undefined") return next;
   if (!safeLocalStorageSet(BRAIN_DUMP_LIST_KEY, JSON.stringify(next))) {
-    return getBrainDumps();
+    return null;
   }
   return next;
 }
 
-/** Save multiple captured thoughts atomically — one card per line/thought. */
-export function addBrainDumps(
+export type AddBrainDumpsResult = {
+  ok: boolean;
+  /** Full list after a successful write, or the prior list when save failed. */
+  entries: BrainDumpEntry[];
+  /** Newly created entries — empty when save failed. */
+  created: BrainDumpEntry[];
+};
+
+/**
+ * Persist captured thoughts and confirm they round-trip from storage.
+ * Never report success unless localStorage retained the new entries.
+ */
+export function tryAddBrainDumps(
   texts: string[],
   opts?: { captureSessionId?: string },
-): BrainDumpEntry[] {
-  if (typeof window === "undefined") return getBrainDumps();
+): AddBrainDumpsResult {
+  if (typeof window === "undefined") {
+    return { ok: false, entries: [], created: [] };
+  }
   const parts = texts.map((t) => t.trim()).filter(Boolean);
-  if (!parts.length) return getBrainDumps();
+  if (!parts.length) {
+    return { ok: false, entries: getBrainDumps(), created: [] };
+  }
 
   const baseMs = Date.now();
   const newEntries: BrainDumpEntry[] = parts.map((text, index) => ({
@@ -373,7 +388,32 @@ export function addBrainDumps(
     createdAt: new Date(baseMs + index).toISOString(),
     captureSessionId: opts?.captureSessionId,
   }));
-  return writeBrainDumps([...newEntries, ...getBrainDumps()]);
+  const next = [...newEntries, ...getBrainDumps()];
+  const written = writeBrainDumps(next);
+  if (!written) {
+    return { ok: false, entries: getBrainDumps(), created: [] };
+  }
+
+  const confirmed = getBrainDumps();
+  const persisted = newEntries.every((entry) =>
+    confirmed.some(
+      (c) =>
+        c.id === entry.id &&
+        (c.originalText ?? c.text) === (entry.originalText ?? entry.text),
+    ),
+  );
+  if (!persisted) {
+    return { ok: false, entries: confirmed, created: [] };
+  }
+  return { ok: true, entries: written, created: newEntries };
+}
+
+/** Save multiple captured thoughts atomically — one card per line/thought. */
+export function addBrainDumps(
+  texts: string[],
+  opts?: { captureSessionId?: string },
+): BrainDumpEntry[] {
+  return tryAddBrainDumps(texts, opts).entries;
 }
 
 export function addBrainDump(
@@ -404,11 +444,14 @@ export function updateBrainDump(
     }
     return merged;
   });
-  return writeBrainDumps(next);
+  return writeBrainDumps(next) ?? getBrainDumps();
 }
 
 export function deleteBrainDump(id: string): BrainDumpEntry[] {
-  return writeBrainDumps(getBrainDumps().filter((e) => e.id !== id));
+  return (
+    writeBrainDumps(getBrainDumps().filter((e) => e.id !== id)) ??
+    getBrainDumps()
+  );
 }
 
 // ---- Templates Library ----------------------------------------------------
@@ -1906,42 +1949,38 @@ export function saveDayState(
 }
 
 // ---- Projects (living containers of active work) --------------------------
+// Implementation lives in companionProjectsStore (Project Homes / Turbopack leaf).
 
-export type ProjectStatus =
-  | "not-started"
-  | "in-progress"
-  | "active-focus"
-  | "paused"
-  | "completed";
+export type {
+  Project,
+  ProjectHorizon,
+  ProjectItem,
+  ProjectItemKind,
+  ProjectStatus,
+  SaveProjectResult,
+} from "./companionProjectsStore";
 
-// Time horizon — only "now" projects are actively managed by the AI.
-export type ProjectHorizon = "now" | "soon" | "later";
+export {
+  PROJECT_HORIZON_LABEL,
+  PROJECT_PALETTE,
+  PROJECT_STATUS_LABEL,
+  deleteProject,
+  deleteProjectItem,
+  emitProjectsUpdated,
+  getActiveProjects,
+  getOpenProjectTasks,
+  getProjectItems,
+  getProjects,
+  saveProject,
+  saveProjectItem,
+  saveProjectWithResult,
+  toggleProjectItemDone,
+} from "./companionProjectsStore";
 
-export type Project = {
-  id: string;
-  name: string;
-  goal: string;
-  /** Clear goals between outcome and tasks. */
-  goals: string[];
-  horizon: ProjectHorizon;
-  status: ProjectStatus;
-  nextAction: string;
-  notes?: string;
-  color: string;
-  createdAt: string;
-  updatedAt: string;
-};
+export { PROJECTS_UPDATED_EVENT } from "./companionProjectsEvents";
 
 // Calm, distinct palette projects draw from (teal / purple / gray / blue …).
-export const PROJECT_PALETTE = [
-  "#1e4f4f",
-  "#9a6fb0",
-  "#6b6b6b",
-  "#2f4f7a",
-  "#a85c4a",
-  "#6b8e23",
-  "#c08a3e",
-];
+// PROJECT_PALETTE re-exported above from companionProjectsStore.
 
 // MEANING palette — calm, earthy, muted. Color quietly encodes the type.
 export const CONTEXT_COLOR: Record<string, string> = {
@@ -1991,242 +2030,6 @@ export function contextColor(type?: string, mode?: string): string {
 export function topicColor(topic?: string, mode?: string): string {
   const map = mode === "decorative" ? TOPIC_COLOR_DECOR : TOPIC_COLOR;
   return (topic && map[topic]) || (mode === "decorative" ? "#94a3b8" : "#9a8f82");
-}
-
-export const PROJECT_STATUS_LABEL: Record<ProjectStatus, string> = {
-  "not-started": "Not started",
-  "in-progress": "In progress",
-  "active-focus": "Active focus",
-  paused: "Paused",
-  completed: "Completed",
-};
-
-export const PROJECT_HORIZON_LABEL: Record<ProjectHorizon, string> = {
-  now: "Now",
-  soon: "Soon",
-  later: "Parked",
-};
-
-const PROJECTS_KEY = "companion-projects-v1";
-
-function readProjects(): Project[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(PROJECTS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter(
-        (p): p is Project =>
-          p && typeof p.id === "string" && typeof p.name === "string",
-      )
-      .map((p) => ({
-        ...p,
-        goals: Array.isArray(p.goals)
-          ? p.goals.filter((g): g is string => typeof g === "string")
-          : [],
-      }));
-  } catch {
-    return [];
-  }
-}
-
-function writeProjects(list: Project[]) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(PROJECTS_KEY, JSON.stringify(list));
-  } catch {
-    /* noop */
-  }
-}
-
-export function getProjects(): Project[] {
-  return readProjects();
-}
-
-export function saveProject(
-  input: Partial<Project> & { id?: string },
-): Project[] {
-  const now = new Date().toISOString();
-  const list = readProjects();
-  if (input.id) {
-    const next = list.map((p) =>
-      p.id === input.id ? { ...p, ...input, updatedAt: now } : p,
-    );
-    writeProjects(next);
-    const up = next.find((p) => p.id === input.id);
-    if (up)
-      setLastActivity({
-        kind: "project",
-        title: up.name,
-        subtitle: "Project",
-        projectId: up.id,
-      });
-    return next;
-  }
-  const project: Project = {
-    id: newId(),
-    name: input.name?.trim() || "Untitled project",
-    goal: input.goal ?? "",
-    goals: input.goals ?? [],
-    horizon: input.horizon ?? "now",
-    status: input.status ?? "in-progress",
-    nextAction: input.nextAction ?? "",
-    notes: input.notes,
-    color:
-      input.color ?? PROJECT_PALETTE[list.length % PROJECT_PALETTE.length]!,
-    createdAt: now,
-    updatedAt: now,
-  };
-  const next = [project, ...list];
-  writeProjects(next);
-  setLastActivity({
-    kind: "project",
-    title: project.name,
-    subtitle: "Project",
-    projectId: project.id,
-  });
-  return next;
-}
-
-export function deleteProject(id: string): Project[] {
-  const next = readProjects().filter((p) => p.id !== id);
-  writeProjects(next);
-  deleteProjectItemsForProject(id);
-  return next;
-}
-
-// ---- Project breakdown (sections → tasks → subtasks) ----------------------
-
-export type ProjectItemKind = "section" | "task" | "subtask";
-
-export type ProjectItem = {
-  id: string;
-  projectId: string;
-  parentId?: string;
-  kind: ProjectItemKind;
-  title: string;
-  done: boolean;
-  sortOrder: number;
-  createdAt: string;
-};
-
-const PROJECT_ITEMS_KEY = "companion-project-items-v1";
-
-function readProjectItems(): ProjectItem[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(PROJECT_ITEMS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (i): i is ProjectItem =>
-        i &&
-        typeof i.id === "string" &&
-        typeof i.projectId === "string" &&
-        typeof i.title === "string",
-    );
-  } catch {
-    return [];
-  }
-}
-
-function writeProjectItems(list: ProjectItem[]) {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(PROJECT_ITEMS_KEY, JSON.stringify(list));
-  } catch {
-    /* noop */
-  }
-}
-
-export function getProjectItems(projectId?: string): ProjectItem[] {
-  const list = readProjectItems();
-  const filtered = projectId
-    ? list.filter((i) => i.projectId === projectId)
-    : list;
-  return filtered.sort((a, b) => a.sortOrder - b.sortOrder);
-}
-
-export function saveProjectItem(
-  input: Partial<ProjectItem> & {
-    projectId: string;
-    kind: ProjectItemKind;
-    title: string;
-    parentId?: string;
-  },
-): ProjectItem[] {
-  const list = readProjectItems();
-  const now = new Date().toISOString();
-  if (input.id) {
-    const next = list.map((i) =>
-      i.id === input.id ? { ...i, ...input, title: input.title.trim() || i.title } : i,
-    );
-    writeProjectItems(next);
-    return next.filter((i) => i.projectId === input.projectId);
-  }
-  const siblings = list.filter(
-    (i) =>
-      i.projectId === input.projectId && i.parentId === input.parentId,
-  );
-  const item: ProjectItem = {
-    id: newId(),
-    projectId: input.projectId,
-    parentId: input.parentId,
-    kind: input.kind,
-    title: input.title.trim() || "Untitled",
-    done: false,
-    sortOrder: siblings.length,
-    createdAt: now,
-  };
-  const next = [...list, item];
-  writeProjectItems(next);
-  return next.filter((i) => i.projectId === input.projectId);
-}
-
-export function toggleProjectItemDone(id: string): ProjectItem[] {
-  const list = readProjectItems();
-  const target = list.find((i) => i.id === id);
-  if (!target) return list;
-  const next = list.map((i) =>
-    i.id === id ? { ...i, done: !i.done } : i,
-  );
-  writeProjectItems(next);
-  return next.filter((i) => i.projectId === target.projectId);
-}
-
-export function deleteProjectItem(id: string): ProjectItem[] {
-  const list = readProjectItems();
-  const target = list.find((i) => i.id === id);
-  if (!target) return list;
-  const removeIds = new Set<string>([id]);
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const i of list) {
-      if (i.parentId && removeIds.has(i.parentId) && !removeIds.has(i.id)) {
-        removeIds.add(i.id);
-        changed = true;
-      }
-    }
-  }
-  const next = list.filter((i) => !removeIds.has(i.id));
-  writeProjectItems(next);
-  return next.filter((i) => i.projectId === target.projectId);
-}
-
-function deleteProjectItemsForProject(projectId: string) {
-  const next = readProjectItems().filter((i) => i.projectId !== projectId);
-  writeProjectItems(next);
-}
-
-/** Open tasks and subtasks across active projects — for Day Designer. */
-export function getOpenProjectTasks(limit = 12): ProjectItem[] {
-  return readProjectItems()
-    .filter((i) => (i.kind === "task" || i.kind === "subtask") && !i.done)
-    .slice(0, limit);
 }
 
 // ---- Continue memory -----------------------------------------------------

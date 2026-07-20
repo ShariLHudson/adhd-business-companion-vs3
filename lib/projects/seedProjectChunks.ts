@@ -1,4 +1,4 @@
-import { saveProjectItem } from "@/lib/companionStore";
+import { saveProjectItem } from "@/lib/companionProjectsStore";
 
 /** Seed project task sections from New Project planning — mirrors guided breakdown chunks. */
 export function seedProjectChunks(

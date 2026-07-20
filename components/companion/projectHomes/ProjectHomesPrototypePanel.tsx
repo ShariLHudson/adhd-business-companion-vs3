@@ -11,7 +11,7 @@ import {
   popNavigationFrame,
   pushNavigationFrame,
   setNavigationCurrent,
-} from "@/lib/navigationContext";
+} from "@/lib/navigationContext/stack";
 import { ActiveWorkCard } from "@/components/companion/projectHomes/ActiveWorkCard";
 import {
   ProjectHomeCard,
@@ -45,13 +45,8 @@ import type {
   ProjectHomeRoomId,
   ProjectHomeView,
 } from "@/lib/projectHomes/types";
+import { PROJECTS_UPDATED_EVENT } from "@/lib/companionProjectsEvents";
 import {
-  archiveActiveWorkspace,
-  listRecoverableWorkspaces,
-  restoreActiveWorkspace,
-} from "@/lib/activeWorkspaceRegistry/registryCore";
-import {
-  listActiveWorkCards,
   PROJECTS_BROWSE_EXAMPLES_LABEL,
   PROJECTS_CURRENT_WORK_HEADING,
   PROJECTS_EMPTY_ENCOURAGEMENT,
@@ -61,8 +56,14 @@ import {
   PROJECTS_LANDING_TITLE,
   PROJECTS_RECENT_INSPIRATIONS_LABEL,
   PROJECTS_START_NEW_LABEL,
-  type ActiveWorkCardModel,
-} from "@/lib/projects/activeWork";
+} from "@/lib/projects/activeWork/copy";
+import type { ActiveWorkCardModel } from "@/lib/projects/activeWork/types";
+import {
+  archiveLiteActiveWorkspace,
+  listLiteActiveWorkCards,
+  listLiteRecoverableWorkspaces,
+  restoreLiteActiveWorkspace,
+} from "@/lib/projects/projectsContinueLite";
 import {
   addProjectPiece,
   detectProjectCreateFlavor,
@@ -75,7 +76,6 @@ import {
   shouldDivertEventCreateToWorkspace,
   updateProjectPiece,
 } from "@/lib/projects/projectPieces190";
-import { PROJECTS_UPDATED_EVENT } from "@/lib/companionStore";
 import "@/app/companion/project-homes.css";
 
 type Props = {
@@ -147,11 +147,11 @@ export function ProjectHomesPrototypePanel({
     [memberHomes],
   );
   const activeWork = useMemo(
-    () => listActiveWorkCards(myProjects),
+    () => listLiteActiveWorkCards(myProjects),
     [myProjects, activeWorkRevision],
   );
   const recoverableWork = useMemo(
-    () => listRecoverableWorkspaces(),
+    () => listLiteRecoverableWorkspaces(),
     [activeWorkRevision],
   );
 
@@ -169,13 +169,13 @@ export function ProjectHomesPrototypePanel({
   function archiveActiveWorkCard(work: ActiveWorkCardModel) {
     if (work.sourceKind !== "creation_workspace") return;
     if (onArchiveActiveWork) onArchiveActiveWork(work);
-    else archiveActiveWorkspace(work.id);
+    else archiveLiteActiveWorkspace(work.id);
     setActiveWorkRevision((n) => n + 1);
   }
 
   function restoreRecoverable(workspaceId: string) {
     if (onRestoreActiveWork) onRestoreActiveWork(workspaceId);
-    else restoreActiveWorkspace(workspaceId);
+    else restoreLiteActiveWorkspace(workspaceId);
     setActiveWorkRevision((n) => n + 1);
   }
 
