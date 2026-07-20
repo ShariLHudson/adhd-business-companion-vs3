@@ -59,6 +59,13 @@ export const SAMPLE_PROJECT_HOMES: ProjectHomeRecord[] = [
 export const SAMPLE_PROJECTS_GALLERY_NOTE =
   "Sample projects are examples to help you explore.";
 
+export const EXPLORE_EXAMPLES_SECTION_NOTE =
+  "These are labeled samples — not your saved projects. Open one to look around.";
+
+/** Calm invite when samples are hidden (default). */
+export const VIEW_SAMPLE_PROJECTS_PROMPT =
+  "Curious how a Project Home can look? You can open a sample anytime.";
+
 export function isSampleProjectHome(
   project: Pick<ProjectHomeRecord, "id" | "isSample">,
 ): boolean {

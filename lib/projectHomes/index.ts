@@ -19,6 +19,8 @@ export {
   PROJECT_HOME_STATUS_LABEL,
   SAMPLE_PROJECT_HOMES,
   SAMPLE_PROJECTS_GALLERY_NOTE,
+  EXPLORE_EXAMPLES_SECTION_NOTE,
+  VIEW_SAMPLE_PROJECTS_PROMPT,
   formatProjectHomeDate,
   isSampleProjectHome,
 } from "./sampleProjects";
@@ -33,15 +35,37 @@ export {
 } from "./workspaceContent";
 
 export {
+  DEFAULT_PROJECT_HOME_ROOM,
   newProjectHomeId,
+  mapProjectToHomeRecord,
+  loadMemberProjectHomesFromStore,
+  mergeMemberHomesWithStore,
+  exploreExampleHomes,
   renameProjectHome,
   duplicateProjectHome,
+  createPersistedProjectHome,
+  createPersistedProjectHomeWithResult,
   archiveProjectHome,
+  restoreProjectHome,
+  setProjectHomeCurrentFocus,
+  completeProjectHome,
+  reopenProjectHome,
   deleteProjectHome,
   visibleGalleryHomes,
   ensureCompanionProject,
   addSectionToHome,
   addTaskToHome,
+  addSubtaskToHome,
+  renameHomeItem,
+  deleteHomeItem,
+  toggleHomeItemDone,
+  moveTaskToSection,
+  applyApprovedShariTask,
   addNoteToHome,
   listHomeProjectItems,
+} from "./homeActions";
+
+export type {
+  DeleteProjectHomeResult,
+  CreatePersistedProjectHomeResult,
 } from "./homeActions";

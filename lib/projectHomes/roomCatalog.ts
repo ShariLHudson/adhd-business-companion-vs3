@@ -69,6 +69,42 @@ export const PROJECT_HOME_ROOMS: readonly ProjectHomeRoomDefinition[] = [
     },
   },
   {
+    id: "social-studio",
+    name: "Social Studio",
+    /** Aligns with Create Studio — Social Post lives under creative-studio in the Estate Registry */
+    placeId: "creative-studio",
+    description:
+      "Content calendars, posts, campaigns, captions, and social presence.",
+    recommendVoice:
+      "it is a calm studio for content calendars, posts, and social campaigns",
+    recommendWhen: [
+      "social media",
+      "social post",
+      "content calendar",
+      "instagram",
+      "facebook",
+      "linkedin",
+      "tiktok",
+      "twitter",
+      "threads",
+      "reel",
+      "carousel",
+      "caption",
+      "hashtag",
+      "campaign",
+      "social",
+    ],
+    artwork: {
+      // Reuses Create Studio plate (creative-studio → art-studio-background.png in estatePlaceMedia)
+      backgroundUrl: "/backgrounds/art-studio-background.png",
+      source: "placeholder",
+      isPlaceholder: true,
+      placeholderNote:
+        "Reuses Create Studio / Art Studio plate until dedicated Social Studio artwork exists",
+      dedicatedArtworkPath: "/backgrounds/social-studio-background.png",
+    },
+  },
+  {
     id: "strategy-conference",
     name: "Strategy Conference Room",
     placeId: "strategy-studio",

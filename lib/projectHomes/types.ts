@@ -93,6 +93,8 @@ export type ProjectHomeRecord = {
 export type ProjectHomeView =
   | "gallery"
   | "create-purpose"
+  | "create-why"
+  | "create-pieces"
   | "create-home"
   | "detail";
 
