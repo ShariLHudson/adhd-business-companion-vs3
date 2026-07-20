@@ -813,7 +813,9 @@ export function CreateWorkspaceV2Panel({
                 const result = saveWorkspaceV2Blueprint(workflow, blueprintName);
                 if (result) {
                   onWorkflowChange(result.workflow);
-                  setSaveNote(`Saved blueprint “${result.saved.name}”.`);
+                  setSaveNote(
+                    `Blueprint “${result.saved.name}” kept on this device — not saved securely yet.`,
+                  );
                   window.setTimeout(() => setSaveNote(null), 4000);
                 }
               }}

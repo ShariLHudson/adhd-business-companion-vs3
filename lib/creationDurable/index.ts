@@ -51,6 +51,17 @@ export {
   labelForCreationSaveState,
   creationSaveStateTone,
 } from "./saveState";
+export type {
+  DurableSavePipelineState,
+  LocalCreateStoreClass,
+  SavePipelineInput,
+} from "./savePipeline";
+export {
+  resolveDurableSavePipeline,
+  isDurableSaveAcknowledged,
+  toDurableSavePipelineState,
+  classifyCreatePersistencePath,
+} from "./savePipeline";
 export {
   FOCUS_RECOVERY_BUFFER_KEY,
   writeFocusRecoveryBuffer,
