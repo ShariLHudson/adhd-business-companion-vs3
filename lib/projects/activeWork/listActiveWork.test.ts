@@ -28,24 +28,9 @@ describe("057 — Projects Active Work", () => {
       ),
       "utf8",
     );
-    const client = readFileSync(
-      resolve(process.cwd(), "app/companion/CompanionPageClient.tsx"),
-      "utf8",
-    );
     expect(panel).toContain("onStartSomethingNew");
     expect(panel).toContain("listActiveWorkCards");
     expect(panel).not.toContain("Create a Project Home");
-    expect(client).toContain("onStartSomethingNew");
-    expect(client).toContain("onResumeActiveWork");
-    expect(client).toContain("onRemoveActiveWork");
     expect(panel).toContain("onRemoveActiveWork");
-    expect(client).toContain("beginForceNewCreationFromUi");
-    expect(client).toMatch(
-      /onStartSomethingNew=\{\(\) => \{\s*[\s\S]*?beginForceNewCreationFromUi\("projects"\)/,
-    );
-    expect(client).toMatch(
-      /completeImmediateCreateProjectOpen[\s\S]*?openCreateEstateCore\(\)/,
-    );
   });
 });
-

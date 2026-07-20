@@ -19,26 +19,32 @@ import {
 } from "@/components/companion/projectHomes/ProjectHomeCard";
 import { ProjectHomeDetail } from "@/components/companion/projectHomes/ProjectHomeDetail";
 import {
-  EXPLORE_EXAMPLES_SECTION_NOTE,
-  PROJECT_HOMES_ROOM_BACKGROUND,
-  SAMPLE_PROJECT_HOMES,
   archiveProjectHome,
   createPersistedProjectHomeWithResult,
   deleteProjectHome,
   exploreExampleHomes,
-  getProjectHomeBackgroundUrl,
-  getProjectHomeRoom,
-  listProjectHomeRooms,
   loadMemberProjectHomesFromStore,
   mergeMemberHomesWithStore,
-  recommendProjectHome,
   renameProjectHome,
   duplicateProjectHome,
   visibleGalleryHomes,
-  type ProjectHomeRecord,
-  type ProjectHomeRoomId,
-  type ProjectHomeView,
-} from "@/lib/projectHomes";
+} from "@/lib/projectHomes/homeActions";
+import {
+  getProjectHomeBackgroundUrl,
+  getProjectHomeRoom,
+  listProjectHomeRooms,
+  PROJECT_HOMES_ROOM_BACKGROUND,
+  recommendProjectHome,
+} from "@/lib/projectHomes/roomCatalog";
+import {
+  EXPLORE_EXAMPLES_SECTION_NOTE,
+  SAMPLE_PROJECT_HOMES,
+} from "@/lib/projectHomes/sampleProjects";
+import type {
+  ProjectHomeRecord,
+  ProjectHomeRoomId,
+  ProjectHomeView,
+} from "@/lib/projectHomes/types";
 import {
   archiveActiveWorkspace,
   listRecoverableWorkspaces,
@@ -185,11 +191,6 @@ export function ProjectHomesPrototypePanel({
 
   useEffect(() => {
     refreshMemberHomes([]);
-    // Heal Create registry after mount — never static-import fat registry here.
-    void import("@/lib/activeWorkspaceRegistry/registry").then((m) => {
-      m.hydrateActiveWorkspaceRegistryFromRuntimeRecords();
-      setActiveWorkRevision((n) => n + 1);
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only load
   }, []);
 

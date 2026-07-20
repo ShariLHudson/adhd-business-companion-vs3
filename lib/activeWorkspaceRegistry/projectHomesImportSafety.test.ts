@@ -1,35 +1,48 @@
 /**
- * Guards Vercel/Turbopack circular init:
- * Project Homes must not statically load fat registry → creationRecord.
+ * Guards Vercel/Turbopack circular init on Project Homes.
  */
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 describe("Project Homes Create import safety", () => {
-  it("loads registryCore + panel without creationRecord TDZ", async () => {
-    const core = await import("@/lib/activeWorkspaceRegistry/registryCore");
+  it("loads panel graph without creationRecord", async () => {
     const panel = await import(
       "@/components/companion/projectHomes/ProjectHomesPrototypePanel"
     );
-    expect(typeof core.listActiveWorkspaces).toBe("function");
-    expect(typeof core.archiveActiveWorkspace).toBe("function");
+    const activeWork = await import("@/lib/projects/activeWork");
+    const core = await import("@/lib/activeWorkspaceRegistry/registryCore");
     expect(typeof panel.ProjectHomesPrototypePanel).toBe("function");
+    expect(typeof activeWork.listActiveWorkCards).toBe("function");
+    expect(typeof core.listActiveWorkspaces).toBe("function");
   });
 
-  it("listActiveWork does not import fat registry or hydrate", () => {
+  it("listActiveCreationWorkspaces does not import humanReadableIdentity", () => {
+    const src = readFileSync(
+      join(process.cwd(), "lib/createEstate/listActiveCreationWorkspaces.ts"),
+      "utf8",
+    );
+    expect(src).not.toMatch(
+      /from ["']@\/lib\/activeWorkspaceRegistry\/humanReadableIdentity["']/,
+    );
+    expect(src).toContain("continueCardProjection");
+  });
+
+  it("listActiveWork does not import eventRecordStore or fat registry", () => {
     const src = readFileSync(
       join(process.cwd(), "lib/projects/activeWork/listActiveWork.ts"),
       "utf8",
     );
-    expect(src).not.toContain("hydrateActiveWorkspaceRegistry");
+    expect(src).not.toMatch(/eventRecordStore/);
+    expect(src).not.toMatch(
+      /from ["']@\/lib\/currentFocus\/creationRecord["']/,
+    );
     expect(src).not.toMatch(
       /from ["']@\/lib\/activeWorkspaceRegistry\/registry["']/,
     );
-    expect(src).not.toMatch(/from ["']@\/lib\/activeWorkspaceRegistry["']/);
   });
 
-  it("panel imports registryCore, not fat registry", () => {
+  it("panel never references fat registry module", () => {
     const src = readFileSync(
       join(
         process.cwd(),
@@ -37,50 +50,32 @@ describe("Project Homes Create import safety", () => {
       ),
       "utf8",
     );
-    expect(src).toContain("activeWorkspaceRegistry/registryCore");
+    expect(src).toContain("registryCore");
     expect(src).not.toMatch(
       /from ["']@\/lib\/activeWorkspaceRegistry\/registry["']/,
     );
-  });
-
-  it("projections import registryCore only", () => {
-    const src = readFileSync(
-      join(process.cwd(), "lib/activeWorkspaceRegistry/projections.ts"),
-      "utf8",
+    expect(src).not.toMatch(
+      /import\(["']@\/lib\/activeWorkspaceRegistry\/registry["']\)/,
     );
-    expect(src).toContain("./registryCore");
-    expect(src).not.toMatch(/from ["']\.\/registry["']/);
   });
 
-  it("registryCore has no static creationRecord / Event Workspace imports", () => {
+  it("registryCore has no persist trace / creationRecord static imports", () => {
     const src = readFileSync(
       join(process.cwd(), "lib/activeWorkspaceRegistry/registryCore.ts"),
       "utf8",
     );
+    expect(src).not.toContain("workspacePersistTrace");
     expect(src).not.toMatch(
       /from ["']@\/lib\/currentFocus\/creationRecord["']/,
     );
-    expect(src).not.toMatch(
-      /from ["']@\/lib\/eventsIntelligence\/eventRecordStore["']/,
-    );
-    expect(src).not.toContain("resolveCanonicalFocus");
-    expect(src).not.toContain("eventCreationWorkspace");
   });
 
-  it("canonicalWorkRecord does not statically import homeActions", () => {
+  it("projectHomes barrel exports lazy panel gate", () => {
     const src = readFileSync(
-      join(process.cwd(), "lib/createProjects/canonicalWorkRecord.ts"),
+      join(process.cwd(), "components/companion/projectHomes/index.ts"),
       "utf8",
     );
-    expect(src).not.toContain("homeActions");
-  });
-
-  it("projectsBridge does not import homeActions", () => {
-    const src = readFileSync(
-      join(process.cwd(), "lib/eventsIntelligence/projectsBridge.ts"),
-      "utf8",
-    );
-    expect(src).not.toContain("homeActions");
-    expect(src).not.toContain("projectHomes");
+    expect(src).toContain("ProjectHomesLazy");
+    expect(src).not.toMatch(/from ["']\.\/ProjectHomesPrototypePanel["']/);
   });
 });

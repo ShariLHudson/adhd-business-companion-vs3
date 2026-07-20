@@ -1,15 +1,13 @@
 /**
  * 056 / 071 — Active Creation Workspaces.
  * Canonical source: Active Workspace Registry projections only.
- * Event Records heal into the registry — they are not a parallel Continue list.
+ * Light card projection only — Continue card leaf, not Create write identity.
  */
 
-import {
-  buildWorkspaceIdentityCard,
-  listActiveContinueProjection,
-  type ActiveWorkspaceEntry,
-} from "@/lib/activeWorkspaceRegistry";
-import type { EventLifecyclePhase } from "@/lib/eventsIntelligence";
+import { continueCardFromRegistryEntry } from "@/lib/activeWorkspaceRegistry/continueCardProjection";
+import { listActiveContinueProjection } from "@/lib/activeWorkspaceRegistry/projections";
+import type { ActiveWorkspaceEntry } from "@/lib/activeWorkspaceRegistry/types";
+import type { EventLifecyclePhase } from "@/lib/eventsIntelligence/types";
 
 export type ActiveCreationWorkspaceSummary = {
   id: string;
@@ -51,7 +49,7 @@ export function creationWorkspacePhaseLabel(
 }
 
 function fromRegistry(entry: ActiveWorkspaceEntry): ActiveCreationWorkspaceSummary {
-  const card = buildWorkspaceIdentityCard(entry);
+  const card = continueCardFromRegistryEntry(entry);
   return {
     id: entry.workspaceId,
     title: card.title,

@@ -7,10 +7,8 @@
 import {
   ACTIVE_WORKSPACE_REGISTRY_KEY,
   LAST_ACTIVE_WORKSPACE_KEY,
-  getLastLocalStorageWriteDiagnostic,
   safeLocalStorageSet,
 } from "@/lib/companionStorageRecovery";
-import { traceWorkspacePersist } from "./workspacePersistTrace";
 import type { ActiveWorkspaceEntry } from "./types";
 
 const STORAGE_KEY = ACTIVE_WORKSPACE_REGISTRY_KEY;
@@ -70,16 +68,6 @@ function writeStore(store: Store): boolean {
   } else {
     lastRegistryPersistDurable = false;
   }
-  const diag = getLastLocalStorageWriteDiagnostic();
-  const id = store.mostRecentId || Object.keys(store.byId)[0] || "unknown";
-  traceWorkspacePersist(
-    "registry_write",
-    id,
-    lastRegistryPersistDurable,
-    lastRegistryPersistDurable
-      ? `bytes=${payload.length}`
-      : `REJECTED stage=${diag?.stage} err=${diag?.errorName ?? "?"} bytes=${payload.length} storageChars≈${diag?.approxStorageChars ?? "?"}`,
-  );
   return lastRegistryPersistDurable;
 }
 
