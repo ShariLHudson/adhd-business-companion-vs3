@@ -1,11 +1,13 @@
 # Create Implementation Audit — Standards 076–090
 
-**Status:** Phase 1 complete (code inspection). Browser certification **not** started.  
+**Status:** Phase 1 complete (code inspection + architecture deep-dive). Browser certification **not** started.  
 **Date:** 2026-07-20  
 **Branch:** `deploy/companion-app-v3`  
 **Standards commit:** `81128ff3` — docs ingest only  
+**Audit commit:** `05bc0135` (this file; follow-up notes below)  
 **Prompt:** `091_CURSOR_CREATE_IMPLEMENTATION_AUDIT_BUILD_CERTIFY_COMMIT_PUSH_PROMPT.md`  
-**Conclusion for Phase 1:** `CREATE IMPLEMENTATION NOT READY`
+**Conclusion for Phase 1:** `CREATE IMPLEMENTATION NOT READY`  
+**Deep-dive:** [Audit Create routes/UI](11494c85-5575-4e5f-aacf-9fed6f90d893)
 
 This audit maps the **current repository implementation** against committed Universal Creation standards 076–090. Documentation ingestion is **not** implementation completion.
 
@@ -25,60 +27,83 @@ Classification legend:
 
 ## A. Current Create Architecture Map
 
+**Live platform:** Create Estate on `/companion` (`activeSection === "create"`) → `CurrentFocusInteraction` + `CreateWorkspaceV2Panel` + `creationDurable` + `activeWorkspaceRegistry`.
+
+**Target still largely unimplemented as first-class UI:** 077 Full Workshop Map, universal toolbar, Complete for Now, Help Me Think on Focus. No dedicated `/create` route and no `WorkshopMap` / `FullWorkshopMap` component. Event may wrap the panel in “See the full … map” (`workspace-full-map-disclosure`).
+
 ### Entry / routes
 
 | Surface | Path / owner | Role |
 |---------|--------------|------|
-| Estate Create entrance | `CreateEstateEntrancePanel.tsx` | Begin / continue Create |
-| Create working destination | `CreateEstateWorkingPanel.tsx` + `CreateWorkspaceV2Panel.tsx` | Primary Creation Destination UI |
-| Companion orchestration | `app/companion/CompanionPageClient.tsx` | Routes intent → Create / Projects / UC |
-| Universal Creation discovery | `CreateDiscoveryWorkspace.tsx` | Pre-workspace Q&A (should not own Foundation types) |
-| Projects Continue | `ProjectHomesPrototypePanel.tsx` + `ActiveWorkCard.tsx` | Continue Your Work cards |
-| Legacy shells | `ContentGeneratorPanel.tsx`, older create builder paths | Still present; quarantine rules exist |
+| Sole Create surface | `app/companion/page.tsx` → `CompanionPageClient` | `activeSection === "create"` |
+| Entrance | `CreateEstateEntrancePanel.tsx` | Begin / Continue / Start New / drafts / catalog |
+| Working destination | `CreateEstateWorkingPanel.tsx` | When `workspaceFirst && phase === "workspace"` |
+| Current Focus UI | `CurrentFocusInteraction.tsx` | Continue · Give me ideas · I'm not sure · Skip |
+| Live “map” | `CreateWorkspaceV2Panel.tsx` | Section cards, N/A, Need Ideas, Build Draft |
+| UC discovery | `CreateDiscoveryWorkspace.tsx` | Pre-workspace Q&A (must not own Foundation types) |
+| Projects Continue | `ProjectHomesPrototypePanel.tsx` + `ActiveWorkCard.tsx` | Continue Your Work |
+| Legacy split Create | `ContentGeneratorPanel.tsx` + `openCreateWorkspace.ts` | Quarantined; still hosts `ExportActions` |
+| Export API | `app/api/google/create-doc/route.ts` | Google Doc via `ExportActions` |
 
 ### Core libraries
 
 | Library | Role |
 |---------|------|
-| `lib/createWorkflow.ts` | In-memory/session Create workflow state |
-| `lib/createWorkflowRecordStore.ts` | Persist workflow record (localStorage) |
-| `lib/createEstate/` | Destination begin outcomes, launchers, active workspace listing |
-| `lib/currentFocus/` | Current Focus model, runtime creation records |
+| `lib/createWorkflow.ts` / `createWorkspaceV2.ts` | Workflow + workspace-first sections |
+| `lib/createEstate/` | Begin outcome, active list, quarantine |
+| `lib/currentFocus/` | Focus resolve/submit, runtime records |
 | `lib/activeWorkspaceRegistry/` | Continue registry, rename, remove/archive |
-| `lib/creationDurable/` | Authoritative Supabase persistence (`companion_creation_workspaces`) |
-| `lib/creationIdentity/` | Classification / Foundation routing helpers |
-| `lib/eventCreationWorkspace/` | Event section bind + Event workshop enrichment |
-| `lib/eventsIntelligence/` | Event records, lifecycle |
-| `lib/createTemplates` / workspace V2 sections | Section schema for templates |
-| `lib/createCertification/` | Journey/certification tooling (docs + assessors) |
-| `lib/projects/activeWork/` | Continue card models |
+| `lib/creationDurable/` | Authoritative Supabase persist/hydrate/mutate |
+| `lib/creationIdentity/` | Foundation classification / routing |
+| `lib/eventCreationWorkspace/` | Event Full-map section set → workflow |
+| `lib/universalCreationEntrypoint/` + `universalCreationEngine/` | Begin / force-new / workspace resolve |
+| `lib/facilitatedCreation/` | Section status / open gates |
+| `lib/createProjects/` | Canonical work ↔ Project Homes |
+| `lib/createTemplates.ts` | Template sections |
+| `lib/companionStorageRecovery.ts` | Canonical Create LS keys |
 
 ### Persistence path (actual)
 
 ```text
-Member edit
-  → React / CreateWorkflowState
-  → runtime creation record (localStorage spark.runtimeCreationRecords.v1)
-  → active workspace registry (spark.activeWorkspaceRegistry.v1)
-  → optional workflow record (companion-create-workflow-record-v1)
-  → durable upsert (companion_creation_workspaces) when authenticated
-  → verify / mark authoritative
+Member edit → CreateWorkflowState → runtime LS → registry LS
+  → durable upsert (companion_creation_workspaces) when authed
+  → verify → applyVerifiedCreationToCaches
 ```
 
-**Source of truth per 076/089:** database. **Today:** local layers are still heavily used; durable path exists but UI often does not wait for verified durable success before implying progress.
+| Key | Role |
+|-----|------|
+| `spark.runtimeCreationRecords.v1` | Runtime creation records |
+| `spark.activeWorkspaceRegistry.v1` | Continue / Active Work registry |
+| `spark.lastActiveWorkspaceId.v1` | Last active workspace |
+| `spark.creationDurableCache.v1` | Optional cache (**never** durable success) |
+| `companion-create-workflow-record-v1` | Workflow record |
+| `companion-create-workflow-saved-v1` | Save-for-later |
+| `companion-events-intelligence-v1` | Event records (merged into active list) |
+
+**SoT per 076/089:** database. Resume UX still often LS-first; durable honesty before “Saved” not certified.
 
 ### Database
 
-- Table: `companion_creation_workspaces` (`supabase/companion_creation_workspaces_schema.sql`)
-- Status field supports `active` / `archived` (archive mutation added in uncommitted `persistCreationArchive`)
+- `companion_creation_workspaces` — schema in `supabase/companion_creation_workspaces_schema.sql`
+- Archive via uncommitted `persistCreationArchive`
 
 ### Tests (sample)
 
-- Create Estate / launchers / scroll contracts under `lib/createEstate/*.test.ts`
-- Durable creation: `lib/creationDurable/creationDurable.test.ts`
-- Remove Continue: `lib/activeWorkspaceRegistry/removeActiveWorkspace.test.ts` (uncommitted)
-- Foundation routing / Checklist handoff tests under `lib/creationIdentity/` (when present)
-- Certification journeys: `lib/createCertification/*`
+- Estate / Begin / quarantine: `lib/createEstate/*.test.ts`
+- Durable / registry / focus: `creationDurable.test.ts`, `removeActiveWorkspace.test.ts`, `currentFocus/*`
+- Event / engine: `eventCreationWorkspace.test.ts`, `universalCreationEngine.test.ts`
+- Certification: `lib/createCertification/*`
+
+### Live sketch
+
+```text
+Entrance (Begin|Continue|New)
+  → CreateEstateWorkingPanel
+        ├─ CurrentFocusInteraction (ideas / not sure / skip)
+        └─ CreateWorkspaceV2Panel (section cards ≈ map)
+  → creationDurable → companion_creation_workspaces
+  → registry/runtime LS → ActiveWorkCard / resume lists
+```
 
 ---
 
@@ -86,15 +111,18 @@ Member edit
 
 | Control | Location | Issue |
 |---------|----------|-------|
-| Continue card `···` Delete | `ActiveWorkCard` (uncommitted wiring) | Partial: archive/remove exists in registry; Trash/restore/permanent delete per 084 **Missing**; browser cert pending |
-| Full Workshop Map section rows | Event destination | Partial: Event has sections via Event workspace; **not** verified that every 077 Event map row is clickable with editor + complete/reopen |
-| “Complete for Now” | Section UI | Missing / unclear as distinct member action; lifecycle language incomplete |
-| Version history / compare | Create workspace | Missing as member-facing Create command |
-| Export DOCX / Markdown / HTML from Create workspace | Create toolbar | Missing as Create-native; `ExportActions` covers copy/print/Google for artifact text elsewhere |
-| Branch / Move / Save as Template | Work commands | Missing or only partial elsewhere |
-| Multi-tab conflict warning | Persistence UI | Missing |
-| Offline / failed-save recovery chrome | Create UI | Missing / Partial (durable fail messages exist in mutate layer; not full 089 UI) |
-| Ask Chamber / Ask Board from section | Contextual actions | Partial at Estate level; not certified as section-scoped Create actions |
+| Continue `···` Delete | `ActiveWorkCard` (uncommitted) | Archive/remove only; Trash/restore/permanent **Missing**; browser cert pending |
+| Full Workshop Map (077) | Specs; runtime ≈ `CreateWorkspaceV2Panel` + disclosure | No dedicated map component; Event rows not browser-certified |
+| Complete for Now | Section UI | **Missing**; SectionCard uses **N/A / Undo N/A** |
+| Help Me Think | Specs / Talk It Out | **Not** on `CurrentFocusInteraction` |
+| Universal toolbar (077_008) | Spec | No Create Estate toolbar |
+| Export/print on Estate working | `CreateEstateWorkingPanel` | `ExportActions` on **legacy** ContentGenerator/Gallery/Email only |
+| DOCX / MD / HTML Create-native | Create toolbar | Missing |
+| Version history / compare | Create | Missing |
+| Branch / Move / Save as Template | Work commands | Missing |
+| Multi-tab conflict | Persistence UI | Missing |
+| Offline / failed-save chrome | Create UI | Partial (mutate fail copy; not full 089) |
+| Ask Chamber / Board from section | Contextual | Not section-scoped Create actions |
 
 ---
 
@@ -106,8 +134,8 @@ Member edit
 | Active work list | `activeWorkspaceRegistry`, `listActiveCreationWorkspaces`, Event records, Projects Continue cards |
 | Titles / identity | `humanReadableIdentity`, runtime records, durable registry, workflow `selectedTemplateName` |
 | Event sections | `eventsIntelligence` + `eventCreationWorkspace` + Create Foundation Current Focus |
-| Export / print | `ExportActions`, Founder exports, Gallery, ContentGenerator — not one Create Output Engine (085) |
-| “I’m not sure” / ideas | `currentFocus` guidance strings, GuidedAssistanceBar, conversation stuck protocol, standards 077/076 thinking |
+| Export / print | `ExportActions` on legacy ContentGenerator / Gallery / Email — **not** Estate working panel; Founder exports separate; not one Create Output Engine (085) |
+| “I’m not sure” / ideas | `CurrentFocusInteraction` + Need Ideas on section cards + GuidedAssistanceBar + conversation stuck protocol + 077/076 thinking specs |
 
 ---
 
@@ -181,10 +209,11 @@ Do **not** start broad UI until each slice has browser evidence.
 | Full Workshop Map | Partially Implemented | Event sections exist; not certified as 077 map with all required rows |
 | Every section row clickable | Unknown / Partial | Needs browser proof |
 | Section editor (edit/save/autosave) | Partially Implemented | Current Focus + section content |
-| Complete for Now | Missing / Partial | Vocabulary in standards; member action not certified |
-| Reopen after complete | Missing / Partial | Must never permanently lock |
-| Prev / Next / Return to map | Partially Implemented | Navigation exists in workspace V2 patterns |
-| Give Me Ideas / I’m Not Sure / Help Me Think | Partially Implemented | Guidance labels; not full 077 contextual engines |
+| Complete for Now | Missing | Spec only; UI uses N/A / Undo N/A on section cards |
+| Reopen after complete | Missing / Partial | Must never permanently lock; no Complete-for-Now path to reopen |
+| Prev / Next / Return to map | Partially Implemented | Workspace V2 patterns; not certified as 077 map nav |
+| Give Me Ideas / I’m Not Sure | Partially Implemented | On `CurrentFocusInteraction` (+ Need Ideas on cards) |
+| Help Me Think | Missing on Create Focus | Spec / Talk It Out findability only |
 | Workshop Map → Projects | Partially Implemented | Continue cards / project links |
 
 ---
