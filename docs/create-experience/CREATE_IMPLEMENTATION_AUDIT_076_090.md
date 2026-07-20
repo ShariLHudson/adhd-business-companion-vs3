@@ -33,6 +33,25 @@
 
 ---
 
+## Phase 3 — Runtime consolidation (093)
+
+**Certification doc:** [CREATE_RUNTIME_CONSOLIDATION_CERTIFICATION.md](./CREATE_RUNTIME_CONSOLIDATION_CERTIFICATION.md)  
+**Decision:** `UNIVERSAL CREATE RUNTIME CONSOLIDATION PARTIALLY COMPLETE`
+
+| Concern | Former parallel owners | Final authoritative owner | Adapters retained |
+|---------|------------------------|---------------------------|-------------------|
+| Workshop Map / bootstrap | `createTemplates` + Event apply | `workTypeSchema` → `initializeWorkspaceV2Workflow` | Event `applyEventWorkspaceToCreateWorkflow`; template fallback for unregistered types |
+| Section status | Facilitated + EventSection | `lib/createSectionLifecycle` | `toEventSectionDomainStatus` / `syncEventSectionsFromCreateWorkflow` |
+| Continue | Registry + Event gap-fill in `listActiveCreationWorkspaces` | `listActiveContinueProjection` (registry heal only) | Hydrate from runtime/Event into registry |
+| Durable save | Focus badge + blueprint “Saved” copy | `resolveDurableSavePipeline` | LS/bookmarks classified `local_*` |
+| Commands | Toolbar inline mutations | `dispatchCreateWorkCommand` | `ExportActions` as print/export primitive |
+| Work runtime | Ad hoc store composition | `resolveCreateWorkRuntime` | Legacy workflow / Event fields |
+| Contextual assistance | Ideas / Not Sure only | `lib/createContextualAssistance` | Shared packet for all Work Types |
+
+**Remaining exceptions:** product SOP/Checklist schemas not registered yet; ActiveWorkCard not fully on dispatcher; Preview smoke not run; offline queue incomplete.
+
+---
+
 **Deep-dive (Phase 1):** [Audit Create routes/UI](11494c85-5575-4e5f-aacf-9fed6f90d893)
 
 This audit maps the **current repository implementation** against committed Universal Creation standards 076–090. Documentation ingestion is **not** implementation completion. Sections below retain Phase 1 detail; where they conflict with the Phase 2 table, **Phase 2 wins**.
