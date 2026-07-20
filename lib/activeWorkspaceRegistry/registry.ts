@@ -233,14 +233,10 @@ export function getMostRecentActiveWorkspace(): ActiveWorkspaceEntry | null {
 }
 
 export function listActiveWorkspaces(): ActiveWorkspaceEntry[] {
-  // 072 — heal whenever no *active* entries (not only when store is empty)
+  // Heal missing runtime/Event into registry. Never resurrect archived/trashed
+  // (hydrate skips ids already present, including non-active).
   if (typeof window !== "undefined") {
-    const activeCount = Object.values(readStore().byId).filter(
-      (e) => e.status === "active",
-    ).length;
-    if (activeCount === 0) {
-      hydrateActiveWorkspaceRegistryFromRuntimeRecords();
-    }
+    hydrateActiveWorkspaceRegistryFromRuntimeRecords();
   }
   return Object.values(readStore().byId)
     .filter((e) => e.status === "active")

@@ -68,6 +68,17 @@ export {
 } from "./humanReadableIdentity";
 
 export {
+  getContinueProjection,
+  getMostRecentContinueWorkspace,
+  listActiveContinueProjection,
+  listArchivedContinueProjection,
+  listRecentContinueProjection,
+  listResumableContinueProjection,
+  listTrashedContinueProjection,
+  type ContinueProjectionKind,
+} from "./projections";
+
+export {
   dumpWorkspacePersistence,
   explainRuntimeDurableFalse,
   getWorkspacePersistTraces,
