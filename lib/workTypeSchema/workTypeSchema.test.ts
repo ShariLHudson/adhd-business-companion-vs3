@@ -18,7 +18,7 @@ import {
 
 describe("080 shared Work Type schema + Workshop Map", () => {
   beforeEach(() => {
-    clearWorkTypeSchemaRegistryForTests();
+    // Avoid clearing the shared in-memory registry — parallel vitest files share it.
     ensureEventPlanSchemaRegistered();
   });
 

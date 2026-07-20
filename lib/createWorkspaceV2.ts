@@ -13,6 +13,12 @@ import { tryResolveSectionOptionApproval } from "./createSectionDiscovery";
 import { assistantOfferedWorkspaceAdd } from "./workspaceApprovalSync";
 import { findCatalogItem } from "./createCatalog";
 import { applySectionLifecycleTransition } from "@/lib/createSectionLifecycle";
+import { applyWorkTypeMapToCreateWorkflow } from "@/lib/workTypeSchema/applyWorkTypeMapToWorkflow";
+import {
+  getWorkTypeSchemaForCreateLabel,
+  resolveWorkTypeIdFromLabel,
+} from "@/lib/workTypeSchema/registry";
+import { ensureEventPlanSchemaRegistered } from "@/lib/workTypeSchema/schemas/eventPlan";
 import {
   defaultTemplateFor,
   findCustomTemplate,
@@ -32,6 +38,10 @@ import {
   resolvedTypeLabel,
   type CreateWorkflowState,
 } from "./createWorkflow";
+
+// Direct schema import avoids barrel cycle via openWorkshopMapSection.
+ensureEventPlanSchemaRegistered();
+
 export const CREATE_WORKSPACE_V2 = true;
 
 /** Blueprint-backed types for workspace-first Create. */
@@ -67,6 +77,10 @@ export function shouldUseCreateBuilderChatTurns(): boolean {
   return !CREATE_WORKSPACE_V2;
 }
 
+/**
+ * Schema-first bootstrap: Work Type Registry → Schema → Workspace sections.
+ * Templates may enrich naming; they do not define the map when a schema exists.
+ */
 export function initializeWorkspaceV2Workflow(
   typeLabel: string,
   customLabel?: string,
@@ -80,33 +94,70 @@ export function initializeWorkspaceV2Workflow(
       : advanceAfterCustomItem(customLabel?.trim() || trimmed);
 
   const itemType = resolvedTypeLabel(picked) || trimmed;
-  const preset = defaultTemplateFor(itemType, picked.selectedSubtype);
-  // 073 — never surface "Default Workshop Template" (or any Default * Template) as the title
-  const presetIsTechnical =
-    /^default\b.+\btemplate$/i.test(preset.name.trim()) ||
-    /\bcreation workspace\b/i.test(preset.name);
-  const withTemplate = initializeTemplateForWorkflow({
+  const schema = getWorkTypeSchemaForCreateLabel(itemType);
+  const resolvedWorkTypeId =
+    schema?.workTypeId ?? resolveWorkTypeIdFromLabel(itemType);
+
+  const shell = initializeTemplateForWorkflow({
     ...picked,
     categoryId: categoryIdForType(itemType) ?? picked.categoryId,
     selectedTypeLabel: trimmed === OTHER_OPTION ? OTHER_OPTION : trimmed,
     customTypeLabel:
-      trimmed === OTHER_OPTION ? customLabel?.trim() || "Custom" : picked.customTypeLabel,
+      trimmed === OTHER_OPTION
+        ? customLabel?.trim() || "Custom"
+        : picked.customTypeLabel,
     step: "discovery",
     questionMode: "current_focus",
     useTemplate: true,
     sectionContent: {},
     skippedSectionIds: [],
+    completedSectionIds: [],
     discoveryAnswers: {},
     discoverySubphase: null,
     activeSectionId: null,
     pendingFieldApproval: null,
     discoveryIndex: 0,
+    templateSections: [],
+    selectedTemplateId: null,
+    selectedTemplateName: null,
+    workspaceFirst: true,
+  });
+
+  if (schema) {
+    return {
+      ...applyWorkTypeMapToCreateWorkflow(shell, schema, {
+        showAllSections: true,
+        preserveActiveSection: false,
+        selectedTemplateId: `${schema.workTypeId}-workspace`,
+      }),
+      // Member-facing name — never "Default * Template"
+      selectedTemplateName: schema.displayName,
+    };
+  }
+
+  // Transitional: labels without a registered schema still use templates.
+  // Resolved-but-unregistered ids (sop, checklist, …) keep template maps until
+  // those schemas ship — they must not invent a second runtime.
+  if (
+    resolvedWorkTypeId &&
+    process.env.NODE_ENV !== "production" &&
+    typeof console !== "undefined"
+  ) {
+    console.warn(
+      `[create] Work Type "${resolvedWorkTypeId}" has no registered schema; using template bootstrap for "${itemType}".`,
+    );
+  }
+
+  const preset = defaultTemplateFor(itemType, picked.selectedSubtype);
+  const presetIsTechnical =
+    /^default\b.+\btemplate$/i.test(preset.name.trim()) ||
+    /\bcreation workspace\b/i.test(preset.name);
+  return {
+    ...shell,
     templateSections: [...preset.sections],
     selectedTemplateId: preset.id,
     selectedTemplateName: presetIsTechnical ? null : preset.name,
-    workspaceFirst: true,
-  });
-  return withTemplate;
+  };
 }
 
 export function workspaceV2Sections(

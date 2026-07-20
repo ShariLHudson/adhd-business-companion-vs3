@@ -37,6 +37,7 @@ export function resolveWorkTypeIdFromLabel(
   if (/checklist/.test(t)) return "checklist";
   if (/proposal/.test(t)) return "proposal";
   if (/marketing/.test(t)) return "marketing_plan";
+  if (t === "cert probe" || t === "cert_probe") return "cert_probe";
   return null;
 }
 
