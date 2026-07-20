@@ -1,22 +1,48 @@
 /**
- * My Work → Create — estate entrance copy (116–118, 149–151, 180).
+ * My Work → Create — estate entrance copy (116–118, 149–151, 180, 056).
  */
 
 export const CREATE_ESTATE_WINDOW_TITLE = "Create";
 
 export const CREATE_ESTATE_EXPLANATION =
-  "Make something new with Shari—from a quick email or checklist to a presentation, client resource, marketing plan, or larger deliverable.";
+  "Tell Shari what you want to create, and she will help you shape it one step at a time.";
 
 export const CREATE_VS_PROJECTS_CUE =
   "Create makes an output. Projects organize ongoing work. You do not need a Project for every creation.";
 
 export const CREATE_ESTATE_HOW_DO_I = [
-  "Use Create when you want to make something — an email, checklist, presentation, client resource, marketing plan, or other supported work.",
-  "Choose a creation type under What Do You Want to Create. Categories stay collapsed until you open one, or search to filter. Each option opens a guided workflow right away.",
-  "Continue a Saved Creation resumes a draft you saved on purpose — at the exact step where you left.",
+  "Use Create when you want to make something — an email, checklist, presentation, client resource, marketing plan, event, or other supported work.",
+  "Start by telling Shari what you want to create in plain language. Spark Estate opens or resumes the right Creation Workspace — you never choose where the work belongs.",
+  "Continue Where You Left Off shows active Creation Workspaces. Older document drafts stay available under progressive disclosure.",
+  "Browse for inspiration is optional — categories help you explore types, not required navigation.",
   "Create is different from Projects: Create makes an output; Projects organize ongoing work. For finding and applying strategies, use Strategy Library under Get Advice — it is not part of Create.",
 ].join("\n\n");
 
-export const CREATE_ESTATE_PICKER_HEADING = "What Do You Want to Create?";
+/** Optional browse — not the primary path (056). */
+export const CREATE_ESTATE_PICKER_HEADING = "Browse for inspiration";
 
-export const CREATE_ESTATE_CONTINUE_HEADING = "Continue a Saved Creation";
+/** Active Creation Workspaces (056) — one primary resume story. */
+export const CREATE_ESTATE_CONTINUE_HEADING = "Continue Where You Left Off";
+
+/**
+ * When active work exists — explicit choice between resume and force-new.
+ * Does not replace resume-by-default for ambiguous Begin / Create entry.
+ */
+export const CREATE_ESTATE_START_NEW_LABEL = "Start Something New";
+
+export function createEstateContinueCurrentLabel(title: string): string {
+  const t = title.trim() || "your current work";
+  return `Continue “${t}”`;
+}
+
+export const CREATE_ESTATE_ACTIVE_CHOICE_HEADING = "What would you like to do?";
+
+export const CREATE_ESTATE_DRAFTS_HEADING = "Older document drafts";
+
+export const CREATE_ESTATE_COMPOSER_PLACEHOLDER =
+  "I want to create…";
+
+export const CREATE_ESTATE_BEGIN_LABEL = "Begin";
+
+export const CREATE_ESTATE_CONTINUE_EMPTY =
+  "When you start something, Spark will keep it here for you. Just tell Shari what you want to create above.";
