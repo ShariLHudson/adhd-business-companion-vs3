@@ -33,7 +33,7 @@ import {
   loadWorkflowRecord,
 } from "@/lib/createWorkflowRecordStore";
 import { resolveFocusForCreationDestination } from "@/lib/currentFocus/resolveCanonicalFocus";
-import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
+import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace/applyWorkspaceToCreateWorkflow";
 import {
   cancelEventRecord,
   listEventRecords,

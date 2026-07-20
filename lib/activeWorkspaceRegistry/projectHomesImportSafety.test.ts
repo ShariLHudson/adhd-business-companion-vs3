@@ -53,5 +53,55 @@ describe("Project Homes Create import safety", () => {
       /from ["']@\/lib\/eventsIntelligence["']/,
     );
     expect(src).toContain("eventsIntelligence/eventRecordStore");
+    expect(src).not.toMatch(/from ["']@\/lib\/projectHomes["']/);
+  });
+
+  it("breaks Events ↔ Event Workspace barrel SCC", () => {
+    const resolveCreation = readFileSync(
+      join(process.cwd(), "lib/creationEcosystem/resolveCreation.ts"),
+      "utf8",
+    );
+    expect(resolveCreation).not.toMatch(
+      /from ["']@\/lib\/eventsIntelligence["']/,
+    );
+
+    const buildWs = readFileSync(
+      join(process.cwd(), "lib/eventCreationWorkspace/buildEventWorkspace.ts"),
+      "utf8",
+    );
+    expect(buildWs).not.toMatch(
+      /from ["']@\/lib\/eventsIntelligence\/eventCapabilityRegistry["']/,
+    );
+    expect(buildWs).toContain(
+      "eventCapabilityRegistry/dynamicSectionRuntime",
+    );
+
+    const guide = readFileSync(
+      join(process.cwd(), "lib/eventsIntelligence/guideEventPlanning.ts"),
+      "utf8",
+    );
+    expect(guide).not.toMatch(
+      /from ["']@\/lib\/eventCreationWorkspace["']/,
+    );
+
+    const registry = readFileSync(
+      join(process.cwd(), "lib/activeWorkspaceRegistry/registry.ts"),
+      "utf8",
+    );
+    expect(registry).not.toMatch(
+      /from ["']@\/lib\/eventCreationWorkspace["']/,
+    );
+    expect(registry).toContain(
+      "eventCreationWorkspace/applyWorkspaceToCreateWorkflow",
+    );
+  });
+
+  it("loads Project Homes Active Work graph without circular TDZ", async () => {
+    const activeWork = await import("@/lib/projects/activeWork");
+    const panel = await import(
+      "@/components/companion/projectHomes/ProjectHomesPrototypePanel"
+    );
+    expect(typeof activeWork.listActiveWorkCards).toBe("function");
+    expect(typeof panel.ProjectHomesPrototypePanel).toBe("function");
   });
 });

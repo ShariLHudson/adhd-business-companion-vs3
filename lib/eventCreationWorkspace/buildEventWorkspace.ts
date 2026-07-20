@@ -8,7 +8,7 @@ import {
   buildSectionAssetPanel,
   buildWorkspaceFocusedRecommendations,
 } from "@/lib/eventsIntelligence/eventAssetRegistry/sectionCapabilityPanel";
-import { buildFocusSectionRuntimePanels } from "@/lib/eventsIntelligence/eventCapabilityRegistry";
+import { buildFocusSectionRuntimePanels } from "@/lib/eventsIntelligence/eventCapabilityRegistry/dynamicSectionRuntime";
 import {
   allEventWorkspaceSectionDefs,
   focusSectionIdsForEventType,

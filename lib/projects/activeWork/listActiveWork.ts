@@ -7,10 +7,8 @@ import { hydrateActiveWorkspaceRegistryFromRuntimeRecords } from "@/lib/activeWo
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import { listEventRecords } from "@/lib/eventsIntelligence/eventRecordStore";
 import type { EventRecord } from "@/lib/eventsIntelligence/types";
-import {
-  PROJECT_HOME_STATUS_LABEL,
-  type ProjectHomeRecord,
-} from "@/lib/projectHomes";
+import { PROJECT_HOME_STATUS_LABEL } from "@/lib/projectHomes/sampleProjects";
+import type { ProjectHomeRecord } from "@/lib/projectHomes/types";
 import type { ActiveWorkCardModel } from "./types";
 
 function progressFromEvent(record: EventRecord): number | null {
