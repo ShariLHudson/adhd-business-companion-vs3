@@ -25,6 +25,10 @@ type Props = {
   onSubmit: (response: string) => void;
   onIdeas: () => void;
   onUnsure: () => void;
+  /** 082 — Help Me Think (section-scoped). */
+  onHelpThink?: () => void;
+  onShowExamples?: () => void;
+  onReviewThis?: () => void;
   onSkip?: () => void;
   onRetry?: () => void;
   /** Optional external save state override (tests / parent). */
@@ -47,6 +51,9 @@ export function CurrentFocusInteraction({
   onSubmit,
   onIdeas,
   onUnsure,
+  onHelpThink,
+  onShowExamples,
+  onReviewThis,
   onSkip,
   onRetry,
   saveStateOverride = null,
@@ -243,6 +250,17 @@ export function CurrentFocusInteraction({
         >
           {focus.completionCriteria || "Continue"}
         </button>
+        {onHelpThink ? (
+          <button
+            type="button"
+            disabled={locked}
+            onClick={onHelpThink}
+            className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
+            data-testid="current-focus-help-think"
+          >
+            Help me think
+          </button>
+        ) : null}
         <button
           type="button"
           disabled={locked}
@@ -261,6 +279,28 @@ export function CurrentFocusInteraction({
         >
           I&apos;m not sure
         </button>
+        {onShowExamples ? (
+          <button
+            type="button"
+            disabled={locked}
+            onClick={onShowExamples}
+            className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
+            data-testid="current-focus-examples"
+          >
+            Show examples
+          </button>
+        ) : null}
+        {onReviewThis ? (
+          <button
+            type="button"
+            disabled={locked}
+            onClick={onReviewThis}
+            className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
+            data-testid="current-focus-review"
+          >
+            Review this
+          </button>
+        ) : null}
         {onSkip ? (
           <button
             type="button"

@@ -23,6 +23,7 @@ import {
   markSectionCompleteForNow,
   reopenSectionForEditing,
 } from "@/lib/createWorkspaceV2";
+import { runCreateAssistance } from "@/lib/createContextualAssistance";
 import { resolveFacilitatedSectionStatus } from "@/lib/facilitatedCreation";
 import { openWorkshopMapSection } from "@/lib/workTypeSchema";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
@@ -391,14 +392,64 @@ export function CreateEstateWorkingPanel({
                   responseType: "multiline",
                 });
               }}
-              onIdeas={onNeedIdeasInFocus}
-              onUnsure={() =>
+              onIdeas={() => {
+                const sectionId = canonicalFocus.sectionId;
+                if (sectionId) {
+                  const result = runCreateAssistance({
+                    workflow,
+                    sectionId,
+                    actionId: "give_me_ideas",
+                  });
+                  setLocalGuidance(result.guidance);
+                }
+                onNeedIdeasInFocus();
+              }}
+              onUnsure={() => {
+                const sectionId = canonicalFocus.sectionId;
+                if (sectionId) {
+                  const result = runCreateAssistance({
+                    workflow,
+                    sectionId,
+                    actionId: "im_not_sure",
+                  });
+                  setLocalGuidance(result.guidance);
+                }
                 onSubmitCurrentFocus({
                   focus: canonicalFocus,
                   response: "",
                   responseType: "unsure",
-                })
-              }
+                });
+              }}
+              onHelpThink={() => {
+                const sectionId = canonicalFocus.sectionId;
+                if (!sectionId) return;
+                const result = runCreateAssistance({
+                  workflow,
+                  sectionId,
+                  actionId: "help_me_think",
+                });
+                setLocalGuidance(result.guidance);
+              }}
+              onShowExamples={() => {
+                const sectionId = canonicalFocus.sectionId;
+                if (!sectionId) return;
+                const result = runCreateAssistance({
+                  workflow,
+                  sectionId,
+                  actionId: "show_examples",
+                });
+                setLocalGuidance(result.guidance);
+              }}
+              onReviewThis={() => {
+                const sectionId = canonicalFocus.sectionId;
+                if (!sectionId) return;
+                const result = runCreateAssistance({
+                  workflow,
+                  sectionId,
+                  actionId: "review_this",
+                });
+                setLocalGuidance(result.guidance);
+              }}
               onSkip={() =>
                 onSubmitCurrentFocus({
                   focus: canonicalFocus,
