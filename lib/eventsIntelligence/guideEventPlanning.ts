@@ -43,10 +43,8 @@ import {
   suggestNextAssets,
 } from "@/lib/createAssets";
 import { acknowledgeEstablishedLead } from "@/lib/eventCreationWorkspace/buildEventWorkspace";
-import {
-  connectEventRecordToProjectHome,
-  syncEventRecordToProjects,
-} from "./projectsBridge";
+import { syncEventRecordToProjects } from "./projectsBridge";
+import { connectEventRecordToProjectHome } from "./projectsBridgeHomes";
 import type {
   EventRecord,
   EventSectionId,

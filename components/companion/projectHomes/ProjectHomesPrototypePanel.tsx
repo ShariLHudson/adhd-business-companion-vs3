@@ -43,7 +43,7 @@ import {
   archiveActiveWorkspace,
   listRecoverableWorkspaces,
   restoreActiveWorkspace,
-} from "@/lib/activeWorkspaceRegistry/registry";
+} from "@/lib/activeWorkspaceRegistry/registryCore";
 import {
   listActiveWorkCards,
   PROJECTS_BROWSE_EXAMPLES_LABEL,
@@ -185,7 +185,11 @@ export function ProjectHomesPrototypePanel({
 
   useEffect(() => {
     refreshMemberHomes([]);
-    // Hydrate once on mount from companion-projects-v1
+    // Heal Create registry after mount — never static-import fat registry here.
+    void import("@/lib/activeWorkspaceRegistry/registry").then((m) => {
+      m.hydrateActiveWorkspaceRegistryFromRuntimeRecords();
+      setActiveWorkRevision((n) => n + 1);
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only load
   }, []);
 

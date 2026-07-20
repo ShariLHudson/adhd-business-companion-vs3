@@ -31,11 +31,11 @@ export {
   EVENT_RECORDS_STORAGE_KEY,
 } from "./eventRecordStore";
 export {
-  connectEventRecordToProjectHome,
   syncEventRecordToProjects,
   eventRecordToCanonicalWork,
   addConfirmedEventTask,
 } from "./projectsBridge";
+export { connectEventRecordToProjectHome } from "./projectsBridgeHomes";
 export {
   EVENT_SECTION_DEFS,
   EVENT_080_WORKSHOP_MAP_IDS,

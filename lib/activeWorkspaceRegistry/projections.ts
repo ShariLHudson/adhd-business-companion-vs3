@@ -7,7 +7,7 @@ import {
   listActiveWorkspaces,
   listRecoverableWorkspaces,
   getMostRecentActiveWorkspace,
-} from "./registry";
+} from "./registryCore";
 import type { ActiveWorkspaceEntry } from "./types";
 
 export type ContinueProjectionKind =

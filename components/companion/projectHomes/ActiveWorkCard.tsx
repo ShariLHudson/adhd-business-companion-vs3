@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PROJECTS_CONTINUE_LABEL } from "@/lib/projects/activeWork";
 import type { ActiveWorkCardModel } from "@/lib/projects/activeWork";
-import { formatProjectHomeDate } from "@/lib/projectHomes";
+import { formatProjectHomeDate } from "@/lib/projectHomes/sampleProjects";
 
 type Props = {
   work: ActiveWorkCardModel;

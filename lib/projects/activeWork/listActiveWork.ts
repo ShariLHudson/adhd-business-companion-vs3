@@ -3,7 +3,6 @@
  * Creation Workspaces first; member projects that aren't already linked.
  */
 
-import { hydrateActiveWorkspaceRegistryFromRuntimeRecords } from "@/lib/activeWorkspaceRegistry/registry";
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import { listEventRecords } from "@/lib/eventsIntelligence/eventRecordStore";
 import type { EventRecord } from "@/lib/eventsIntelligence/types";
@@ -81,8 +80,7 @@ function fromMemberProject(home: ProjectHomeRecord): ActiveWorkCardModel {
 export function listActiveWorkCards(
   memberHomes: readonly ProjectHomeRecord[] = [],
 ): ActiveWorkCardModel[] {
-  // 074 — Projects reads persisted registry (heal from runtime after refresh)
-  hydrateActiveWorkspaceRegistryFromRuntimeRecords();
+  // Hydrate is async from Project Homes mount — never pull creationRecord here.
   const events = listEventRecords();
   const eventById = new Map(events.map((e) => [e.id, e]));
   const linkedCompanionIds = new Set(

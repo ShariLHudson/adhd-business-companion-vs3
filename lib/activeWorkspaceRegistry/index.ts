@@ -5,31 +5,36 @@ export type {
   ActiveWorkspaceStatus,
 } from "./types";
 
+/** Light Continueread/archive APIs — safe for Project Homes. */
 export {
   archiveActiveWorkspace,
   clearActiveWorkspaceRegistryForTests,
   getActiveWorkspace,
   getMostRecentActiveWorkspace,
-  hydrateActiveWorkspaceRegistryFromRuntimeRecords,
   listActiveWorkspaces,
   listRecoverableWorkspaces,
   moveActiveWorkspaceToTrash,
   peekRegistryWorkspaceEntry,
-  permanentlyDeleteActiveWorkspace,
   readLastActiveWorkspaceId,
   removeActiveWorkspaceFromContinue,
   removeActiveWorkspaceFromContinueDurable,
   restoreActiveWorkspace,
   restoreActiveWorkspaceDurable,
   setLastActiveWorkspaceId,
+  touchActiveWorkspace,
+  upsertActiveWorkspace,
+  wasLastRegistryPersistDurable,
+} from "./registryCore";
+
+/** Create-heavy APIs — pull creationRecord / Event hydrate. */
+export {
+  hydrateActiveWorkspaceRegistryFromRuntimeRecords,
+  permanentlyDeleteActiveWorkspace,
   registerCreationDestinationWorkspace,
   renameActiveWorkspaceTitle,
   renameActiveWorkspaceTitleDurable,
   syncRegistryFromRuntimeRecord,
-  touchActiveWorkspace,
-  upsertActiveWorkspace,
   verifyCreationWorkspaceDurable,
-  wasLastRegistryPersistDurable,
 } from "./registry";
 
 export {
