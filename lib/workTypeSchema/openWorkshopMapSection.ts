@@ -3,7 +3,7 @@
  */
 
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
-import { setWorkspaceV2ActiveSection } from "@/lib/createWorkspaceV2";
+import { setWorkspaceV2ActiveSection } from "@/lib/createWorkspaceActiveSection";
 
 export function openWorkshopMapSection(
   workflow: CreateWorkflowState,

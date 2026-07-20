@@ -39,10 +39,16 @@ import {
   type CreateWorkflowState,
 } from "./createWorkflow";
 
-// Direct schema import avoids barrel cycle via openWorkshopMapSection.
-ensureEventPlanSchemaRegistered();
+import { CREATE_WORKSPACE_V2 } from "./createWorkspaceFlags";
+import { setWorkspaceV2ActiveSection } from "./createWorkspaceActiveSection";
+import {
+  workspaceV2Sections,
+  type WorkspaceV2SectionView,
+} from "./createWorkspaceSections";
 
-export const CREATE_WORKSPACE_V2 = true;
+export { CREATE_WORKSPACE_V2 };
+export { setWorkspaceV2ActiveSection };
+export { workspaceV2Sections, type WorkspaceV2SectionView };
 
 /** Blueprint-backed types for workspace-first Create. */
 export const CREATE_V2_BLUEPRINT_TYPES = [
@@ -58,11 +64,6 @@ export const CREATE_V2_BLUEPRINT_TYPES = [
   "Social Post",
   OTHER_OPTION,
 ] as const;
-
-export type WorkspaceV2SectionView = CreateTemplateSection & {
-  content: string;
-  skipped: boolean;
-};
 
 export function isCreateV2BlueprintType(typeLabel: string | null | undefined): boolean {
   const t = typeLabel?.trim();
@@ -92,6 +93,9 @@ export function initializeWorkspaceV2Workflow(
     : trimmed === OTHER_OPTION
       ? advanceAfterCustomItem(customLabel?.trim() || "Custom")
       : advanceAfterCustomItem(customLabel?.trim() || trimmed);
+
+  // Register leaf schemas on first bootstrap — not at module evaluate time.
+  ensureEventPlanSchemaRegistered();
 
   const itemType = resolvedTypeLabel(picked) || trimmed;
   const schema = getWorkTypeSchemaForCreateLabel(itemType);
@@ -158,19 +162,6 @@ export function initializeWorkspaceV2Workflow(
     selectedTemplateId: preset.id,
     selectedTemplateName: presetIsTechnical ? null : preset.name,
   };
-}
-
-export function workspaceV2Sections(
-  workflow: CreateWorkflowState,
-): WorkspaceV2SectionView[] {
-  const sections = resolveTemplateSections(workflow) ?? [];
-  const skipped = new Set(workflow.skippedSectionIds ?? []);
-  const content = workflow.sectionContent ?? {};
-  return sections.map((s) => ({
-    ...s,
-    content: content[s.id] ?? "",
-    skipped: skipped.has(s.id),
-  }));
 }
 
 export function workspaceV2HasBuildableContent(workflow: CreateWorkflowState): boolean {
@@ -366,13 +357,6 @@ export function isCreateWorkspaceV2Phase(
     return false;
   }
   return true;
-}
-
-export function setWorkspaceV2ActiveSection(
-  workflow: CreateWorkflowState,
-  sectionId: string,
-): CreateWorkflowState {
-  return { ...workflow, activeSectionId: sectionId };
 }
 
 export type WorkspaceV2SectionAcceptance = {

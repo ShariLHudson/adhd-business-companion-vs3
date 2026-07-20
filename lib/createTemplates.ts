@@ -6,7 +6,7 @@ import { sortDropdownLabels } from "./dropdownSort";
 import type { CreateWorkflowState } from "./createWorkflow";
 import { buildBriefFromDiscovery, resolvedTypeLabel } from "./createWorkflow";
 import { outlineSectionBriefLines } from "./createSectionDiscovery";
-import { buildWorkspaceV2Brief, CREATE_WORKSPACE_V2 } from "./createWorkspaceV2";
+import { CREATE_WORKSPACE_V2 } from "./createWorkspaceFlags";
 import { effectiveSubtypeLabel, OTHER_OPTION } from "./createTypePickers";
 import { EVENT_PLAN_MAP_SECTIONS } from "@/lib/workTypeSchema/schemas/eventPlanMap";
 import { workshopMapToTemplateSections } from "@/lib/workTypeSchema/ensureMapSections";
@@ -570,6 +570,9 @@ export function newSectionId(): string {
 
 export function buildFullCreateBrief(state: CreateWorkflowState): string {
   if (CREATE_WORKSPACE_V2 && state.workspaceFirst && state.useTemplate) {
+    // Lazy: avoid createTemplates ↔ createWorkspaceV2 circular init (Vercel/webpack).
+    const { buildWorkspaceV2Brief } =
+      require("./createWorkspaceV2") as typeof import("./createWorkspaceV2");
     const workspaceBrief = buildWorkspaceV2Brief(state);
     if (workspaceBrief.trim()) {
       return buildGenerationBrief(state, workspaceBrief);

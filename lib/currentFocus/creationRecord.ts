@@ -17,7 +17,7 @@ import { isAuthoritativelyDurable } from "@/lib/creationDurable/verifiedRegistry
 import type { CreateTemplateSection } from "@/lib/createTemplates";
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { resolvedTypeLabel } from "@/lib/createWorkflow";
-import { workspaceV2Sections } from "@/lib/createWorkspaceV2";
+import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
 import {
   buildCanonicalKnownFacts,
   knownFactDisplayLines,

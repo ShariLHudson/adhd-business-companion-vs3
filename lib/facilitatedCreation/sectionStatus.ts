@@ -4,7 +4,7 @@
  */
 
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
-import { workspaceV2Sections } from "@/lib/createWorkspaceV2";
+import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
 import {
   resolveCreateSectionLifecycleStatus,
   type CreateSectionLifecycleStatus,

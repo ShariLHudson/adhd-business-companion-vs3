@@ -13,7 +13,10 @@ import {
   getLocalStorageWriteDiagnosticLog,
   type LocalStorageWriteDiagnostic,
 } from "@/lib/companionStorageRecovery";
-import { getEventRecord, verifyEventRecordDurable } from "@/lib/eventsIntelligence/eventRecordStore";
+import {
+  getEventRecord,
+  verifyEventRecordDurable,
+} from "@/lib/eventsIntelligence/eventRecordStore";
 import {
   getRuntimeCreationRecord,
   verifyRuntimeRecordDurable,

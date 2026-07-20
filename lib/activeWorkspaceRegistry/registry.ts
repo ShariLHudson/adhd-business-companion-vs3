@@ -30,7 +30,6 @@ import {
   loadWorkflowRecord,
 } from "@/lib/createWorkflowRecordStore";
 import { resolveFocusForCreationDestination } from "@/lib/currentFocus/resolveCanonicalFocus";
-import { workspaceV2Sections } from "@/lib/createWorkspaceV2";
 import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
 import {
   cancelEventRecord,
@@ -43,6 +42,7 @@ import {
   resolveHumanReadableTitle,
   sanitizeMemberFacingTitle,
 } from "./humanReadableIdentity";
+import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
 import { traceWorkspacePersist } from "./workspacePersistenceDiagnostics";
 import type {
   ActiveWorkspaceDraftState,
