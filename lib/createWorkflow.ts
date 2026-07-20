@@ -33,8 +33,16 @@ import type { CreateTemplateSection } from "./createTemplates";
 
 export type DraftStatus = "idle" | "building" | "ready" | "error";
 
-/** Who asks discovery questions — Create panel alone, or Chat in split view. */
-export type CreateQuestionMode = "create_only" | "split_screen";
+/** Who asks discovery questions — Create workspace alone, or conversational guidance (066). */
+/**
+ * create_only — panel/workspace interaction
+ * current_focus — 066 Creation Destination (sole interaction owner)
+ * split_screen — LEGACY; rejected for Creation Destinations
+ */
+export type CreateQuestionMode =
+  | "create_only"
+  | "current_focus"
+  | "split_screen";
 
 export type CreateWorkflowStep =
   | "category"
@@ -101,14 +109,56 @@ export type CreateWorkflowState = {
   sessionId?: string | null;
   /** Question ids skipped — not required for readiness or brief. */
   skippedQuestionIds?: string[];
-  /** Template section ids marked N/A by the user (workspace-first Create). */
+  /** Template section ids marked Skip for Now (still openable; content preserved). */
   skippedSectionIds?: string[];
+  /** Sections the member marked Complete for Now (not locked; reopen anytime). */
+  completedSectionIds?: string[];
+  /** Last completed content snapshot per section — revision preserve (077_006). */
+  completedSectionVersions?: Record<
+    string,
+    { content: string; completedAt: string }
+  >;
   /** create_only = panel asks questions; split_screen = chat asks, panel shows output. */
   questionMode: CreateQuestionMode;
   /** User must approve before this summary is saved to the template. */
   pendingFieldApproval?: PendingFieldApproval | null;
   /** Workspace-first Create V2 — user edits sections; chat does not auto-fill. */
   workspaceFirst?: boolean;
+  /** Purpose-built Creation Workspace (event, etc.) — not a generic project folder. */
+  creationWorkspaceKind?: "event" | null;
+  /** Canonical Event Record id when creationWorkspaceKind is event. */
+  eventRecordId?: string | null;
+  /** Sections to emphasize now; full map remains in templateSections. */
+  focusSectionIds?: string[];
+  /** When false, UI can collapse non-focus sections under "full event map". */
+  showAllWorkspaceSections?: boolean;
+  /** 058 — What We Already Know (member-facing). */
+  workspaceKnownFacts?: string[];
+  /** 058 — Current Focus recommendation. */
+  workspaceCurrentFocus?: {
+    title: string;
+    reason: string;
+    actionLabel: string;
+    estimatedEffort?: string | null;
+    assetTypeId?: string | null;
+    sectionId?: string | null;
+  } | null;
+  /** 058 — Member-facing phase (never internal IDs). */
+  workspacePhaseLabel?: string | null;
+  /** 060 — ≤3 secondary recommendations under Current Focus. */
+  workspaceSecondaryRecommendations?: {
+    title: string;
+    reason: string;
+  }[];
+  /** 061 — Universal Creation State (shared lifecycle). */
+  universalCreationState?: string | null;
+  /**
+   * Creation Identity — permanent three-field rule.
+   * originalRequest never mutates; never used as the display title.
+   */
+  originalRequest?: string | null;
+  /** Internal routing intent (e.g. "Create Checklist") — not the workspace name. */
+  workingIntent?: string | null;
 };
 
 export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
@@ -134,6 +184,8 @@ export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
   draftContent: null,
   questionMode: "create_only",
   pendingFieldApproval: null,
+  completedSectionIds: [],
+  completedSectionVersions: {},
   skippedSectionIds: [],
 };
 
@@ -372,6 +424,29 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       placeholder: "Slides, workbook, facilitator guide…",
     },
   ],
+  "Event Plan": [
+    {
+      id: "purpose",
+      prompt: "What is this event for — and what should people leave with?",
+      why: "So the whole plan serves one clear purpose.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is this gathering for?",
+      why: "So venue, tone, and marketing fit the right people.",
+    },
+    {
+      id: "timing",
+      prompt: "When is it, or what timing are you aiming for?",
+      why: "So dates and the run of show have a real anchor.",
+      placeholder: "A weekend in October, two days next spring…",
+    },
+    {
+      id: "scale",
+      prompt: "About how many people, and how intimate or large should it feel?",
+      why: "So budget, venue, and staffing stay realistic.",
+    },
+  ],
   Strategy: [
     {
       id: "strategy-kind",
@@ -489,7 +564,7 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   "Client Onboarding": [
     {
       id: "client",
-      prompt: "Who is the client you're onboarding?",
+      prompt: "Who will receive this onboarding guide?",
       why: "So steps fit how you actually work together.",
     },
     {
@@ -963,10 +1038,14 @@ export function mergeCreateWorkflow(
             : "idle",
     draftContent: incoming.draftContent ?? local.draftContent,
     questionMode:
-      incoming.questionMode === "split_screen" ||
-      local.questionMode === "split_screen"
-        ? "split_screen"
-        : "create_only",
+      incoming.questionMode === "current_focus" ||
+      local.questionMode === "current_focus"
+        ? "current_focus"
+        : incoming.questionMode === "split_screen" ||
+            local.questionMode === "split_screen"
+          ? // 066 — never promote split_screen for Creation Destinations
+            "current_focus"
+          : "create_only",
     step:
       stepRank[incoming.step] >= stepRank[local.step]
         ? incoming.step

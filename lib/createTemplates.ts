@@ -8,6 +8,8 @@ import { buildBriefFromDiscovery, resolvedTypeLabel } from "./createWorkflow";
 import { outlineSectionBriefLines } from "./createSectionDiscovery";
 import { buildWorkspaceV2Brief, CREATE_WORKSPACE_V2 } from "./createWorkspaceV2";
 import { effectiveSubtypeLabel, OTHER_OPTION } from "./createTypePickers";
+import { EVENT_PLAN_MAP_SECTIONS } from "@/lib/workTypeSchema/schemas/eventPlanMap";
+import { workshopMapToTemplateSections } from "@/lib/workTypeSchema/ensureMapSections";
 
 export type CreateTemplateSection = { id: string; label: string };
 
@@ -82,6 +84,10 @@ const WORKSHOP_SECTIONS: CreateTemplateSection[] = [
   section("materials", "Materials Needed"),
   section("closing", "Closing & Next Steps"),
 ];
+
+/** Event Plan map — from shared Work Type schema (080), not a parallel list. */
+const EVENT_PLAN_SECTIONS: CreateTemplateSection[] =
+  workshopMapToTemplateSections(EVENT_PLAN_MAP_SECTIONS);
 
 const PROPOSAL_SECTIONS: CreateTemplateSection[] = [
   section("summary", "Executive Summary"),
@@ -215,6 +221,12 @@ const PRESET_TEMPLATES: CreateTemplatePreset[] = [
     name: "Default Workshop Template",
     itemType: "Workshop",
     sections: [...WORKSHOP_SECTIONS],
+  },
+  {
+    id: "event-plan-default",
+    name: "Default Event Plan Template",
+    itemType: "Event Plan",
+    sections: [...EVENT_PLAN_SECTIONS],
   },
   {
     id: "proposal-default",

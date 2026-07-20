@@ -39,6 +39,7 @@ export const CREATE_V2_BLUEPRINT_TYPES = [
   "Newsletter",
   "Lead Magnet",
   "Workshop",
+  "Event Plan",
   "Offer",
   "Course Outline",
   "SOP",
@@ -79,6 +80,10 @@ export function initializeWorkspaceV2Workflow(
 
   const itemType = resolvedTypeLabel(picked) || trimmed;
   const preset = defaultTemplateFor(itemType, picked.selectedSubtype);
+  // 073 — never surface "Default Workshop Template" (or any Default * Template) as the title
+  const presetIsTechnical =
+    /^default\b.+\btemplate$/i.test(preset.name.trim()) ||
+    /\bcreation workspace\b/i.test(preset.name);
   const withTemplate = initializeTemplateForWorkflow({
     ...picked,
     categoryId: categoryIdForType(itemType) ?? picked.categoryId,
@@ -86,7 +91,7 @@ export function initializeWorkspaceV2Workflow(
     customTypeLabel:
       trimmed === OTHER_OPTION ? customLabel?.trim() || "Custom" : picked.customTypeLabel,
     step: "discovery",
-    questionMode: "split_screen",
+    questionMode: "current_focus",
     useTemplate: true,
     sectionContent: {},
     skippedSectionIds: [],
@@ -97,7 +102,7 @@ export function initializeWorkspaceV2Workflow(
     discoveryIndex: 0,
     templateSections: [...preset.sections],
     selectedTemplateId: preset.id,
-    selectedTemplateName: preset.name,
+    selectedTemplateName: presetIsTechnical ? null : preset.name,
     workspaceFirst: true,
   });
   return withTemplate;
@@ -149,14 +154,75 @@ export function updateWorkspaceV2SectionContent(
   sectionId: string,
   content: string,
 ): CreateWorkflowState {
-  const skipped = (workflow.skippedSectionIds ?? []).filter((id) => id !== sectionId);
+  const skipped = (workflow.skippedSectionIds ?? []).filter(
+    (id) => id !== sectionId,
+  );
+  const prior = (workflow.sectionContent?.[sectionId] ?? "").trim();
+  const next = content.trim();
+  const completed = new Set(workflow.completedSectionIds ?? []);
+  // Meaningful edit reopens Complete for Now (formatting-only keeps status).
+  const meaningful =
+    completed.has(sectionId) &&
+    prior.replace(/\s+/g, " ") !== next.replace(/\s+/g, " ");
+  if (meaningful) completed.delete(sectionId);
   return {
     ...workflow,
     skippedSectionIds: skipped,
+    completedSectionIds: [...completed],
     sectionContent: {
       ...workflow.sectionContent,
       [sectionId]: content,
     },
+  };
+}
+
+/**
+ * 077_006 — Complete for Now. Milestone, not a lock. Preserves content + version.
+ */
+export function markSectionCompleteForNow(
+  workflow: CreateWorkflowState,
+  sectionId: string,
+): CreateWorkflowState {
+  const content = (workflow.sectionContent?.[sectionId] ?? "").trim();
+  const completed = new Set(workflow.completedSectionIds ?? []);
+  completed.add(sectionId);
+  const skipped = (workflow.skippedSectionIds ?? []).filter(
+    (id) => id !== sectionId,
+  );
+  const versions = { ...(workflow.completedSectionVersions ?? {}) };
+  versions[sectionId] = {
+    content,
+    completedAt: new Date().toISOString(),
+  };
+  return {
+    ...workflow,
+    skippedSectionIds: skipped,
+    completedSectionIds: [...completed],
+    completedSectionVersions: versions,
+    // Keep content; stay on section so member can reopen/edit without lock
+    activeSectionId: workflow.activeSectionId ?? sectionId,
+  };
+}
+
+/**
+ * 077_006 — Reopen a Complete for Now section. Content + prior version preserved.
+ */
+export function reopenSectionForEditing(
+  workflow: CreateWorkflowState,
+  sectionId: string,
+): CreateWorkflowState {
+  const completed = (workflow.completedSectionIds ?? []).filter(
+    (id) => id !== sectionId,
+  );
+  const skipped = (workflow.skippedSectionIds ?? []).filter(
+    (id) => id !== sectionId,
+  );
+  return {
+    ...workflow,
+    completedSectionIds: completed,
+    skippedSectionIds: skipped,
+    activeSectionId: sectionId,
+    showAllWorkspaceSections: workflow.showAllWorkspaceSections ?? true,
   };
 }
 
@@ -170,14 +236,14 @@ export function toggleWorkspaceV2SectionSkipped(
   } else {
     skipped.add(sectionId);
   }
-  const nextContent = { ...workflow.sectionContent };
-  if (skipped.has(sectionId)) {
-    delete nextContent[sectionId];
-  }
+  // 077 — Skip for Now preserves content; section stays openable
+  const completed = (workflow.completedSectionIds ?? []).filter(
+    (id) => id !== sectionId,
+  );
   return {
     ...workflow,
     skippedSectionIds: [...skipped],
-    sectionContent: nextContent,
+    completedSectionIds: completed,
   };
 }
 
@@ -451,7 +517,7 @@ export function formatCreateWorkspaceV2ExplorationHint(
 
   return [
     `CREATE V2 SUPPORT (mandatory — overrides approval / auto-apply hints):`,
-    `- Active: **${display}** workspace beside chat. User types in section boxes; chat never writes there.`,
+    `- Active: **${display}** living workspace (066). User types in section boxes; conversation supports the work, not a second pane.`,
     focus ? `- They are brainstorming **${focus}**.` : "",
     userText.trim() ? `- User said: "${userText.trim()}"` : "",
     "- Give ideas, examples, research, suggestions, or feedback only.",
@@ -580,12 +646,11 @@ export function bootstrapCreateWorkspaceV2FromWorkflow(
   return {
     session: {
       typeLabel: resolved,
-      workflow: { ...workflow, questionMode: "split_screen" },
+      workflow: { ...workflow, questionMode: "current_focus" },
       phase: "workspace",
     },
     opener:
-      `Your **${display}** workspace is open — edit sections on the right. ` +
-      `Chat is here when you want ideas or a second opinion.`,
+      `Your **${display}** workspace is ready — we'll shape it together in Current Focus.`,
   };
 }
 
@@ -603,9 +668,7 @@ export function bootstrapWorkspaceV2Session(
       phase: "workspace",
     },
     opener:
-      `Your **${display}** blueprint is open beside you.\n\n` +
-      `Sections start empty — we'll shape them one at a time. ` +
-      `Chat is here when you want ideas; only what you share fills each section.`,
+      `Let's shape your **${display}** together in Current Focus.`,
   };
 }
 
@@ -618,20 +681,13 @@ export function formatCreateWorkspaceV2ChatHint(
   const sections = workspaceV2Sections(session.workflow);
   const filled = sections.filter((s) => s.skipped || s.content.trim()).length;
 
+  // 066 — Creation is Focus-owned; chat must not drive section capture
   return [
-    `ACTIVE MODE: ${display} (Workspace-first Create).`,
-    "CREATE V2 RULES (mandatory — override any conflicting hint about auto-apply, approval, or filling fields):",
-    "- The workspace panel is the source of truth — the user types and pastes into sections directly.",
-    "- Chat SUPPORTS ONLY: brainstorm, research, examples, wording suggestions, section review, feedback.",
-    "- Chat NEVER writes to workspace sections. Never auto-fill fields from chat.",
-    "- Never ask permission to save, approve, or apply chat content to the workspace.",
-    "- NEVER offer to insert, apply, or save chat content into the workspace.",
-    "- When sharing ideas, end with copy guidance, e.g.: Here are some ideas for **Purpose**. Copy any parts you like into the Purpose box.",
-    "- NEVER ask discovery form questions to fill the workspace. NEVER mark sections complete.",
-    "- NEVER generate a full draft in chat — user clicks Build Draft in the workspace when ready.",
-    "- When they ask for ideas: give 3–5 concrete options in chat only.",
-    `- Artifact: ${type}. Workspace sections: ${sections.length} (${filled} with content or N/A).`,
-    "FACILITATED CREATION: Shari facilitates — member owns the business. One question at a time.",
-    'Never say finished/complete/final unless member asks to finalize. Say "what we have so far" or "working draft".',
+    `ACTIVE MODE: ${display} (Estate Creation — Current Focus owns answers).`,
+    "STANDARD 066 RULES:",
+    "- Current Focus is the only answer surface.",
+    "- Never ask the member to paste into section fields from chat.",
+    "- Never open or reference a companion side panel for Creation.",
+    `- Artifact: ${type}. Sections with notes: ${filled}/${sections.length}.`,
   ].join("\n");
 }

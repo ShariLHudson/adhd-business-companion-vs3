@@ -7,6 +7,8 @@ export type FacilitatedSectionStatus =
   | "not_started"
   | "in_progress"
   | "complete"
+  | "complete_for_now"
+  | "skipped_for_now"
   | "needs_review";
 
 export type FacilitatedCreationPhase =
@@ -37,5 +39,7 @@ export const FACILITATED_SECTION_STATUS_LABELS: Record<
   not_started: "Not Started",
   in_progress: "In Progress",
   complete: "Complete",
+  complete_for_now: "Complete for Now",
+  skipped_for_now: "Skipped for Now",
   needs_review: "Needs Review",
 };
