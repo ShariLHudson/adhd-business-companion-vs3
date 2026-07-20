@@ -1,6 +1,7 @@
 /**
- * 074 — Browser-observable Create/Event persistence trace.
- * Founder Validation: window.__SPARK_WORKSPACE_PERSIST__
+ * 074 — Browser-observable Create/Event persistence dump (founder tools).
+ * Trace writes live in workspacePersistTrace.ts (leaf — no creationRecord).
+ * Do not import this module from registry.ts or the Project Homes path.
  */
 
 import {
@@ -21,6 +22,20 @@ import {
   getRuntimeCreationRecord,
   verifyRuntimeRecordDurable,
 } from "@/lib/currentFocus/creationRecord";
+import {
+  clearWorkspacePersistTracesForTests,
+  getWorkspacePersistTraces,
+  traceWorkspacePersist,
+  type WorkspacePersistPhase,
+  type WorkspacePersistTraceEntry,
+} from "./workspacePersistTrace";
+
+export type { WorkspacePersistPhase, WorkspacePersistTraceEntry };
+export {
+  clearWorkspacePersistTracesForTests,
+  getWorkspacePersistTraces,
+  traceWorkspacePersist,
+};
 
 function registryHasWorkspace(workspaceId: string): boolean {
   if (typeof window === "undefined" || !workspaceId) return false;
@@ -50,37 +65,8 @@ function registryTitle(workspaceId: string): string | null {
   }
 }
 
-export type WorkspacePersistPhase =
-  | "begin"
-  | "focus_save"
-  | "build_draft"
-  | "rename"
-  | "event_write"
-  | "runtime_write"
-  | "registry_write"
-  | "readback"
-  | "pre_refresh_dump"
-  | "auth_reclaim"
-  | "hydrate_registry"
-  | "hydrate_event_fallback"
-  | "restore_builder_session"
-  | "projects_resolve"
-  | "mounted_workspace"
-  | "step";
-
-export type WorkspacePersistTraceEntry = {
-  at: string;
-  phase: WorkspacePersistPhase;
-  workspaceId: string;
-  ok: boolean;
-  detail?: string;
-  keys?: Record<string, boolean>;
-  write?: LocalStorageWriteDiagnostic | null;
-};
-
 export type RuntimeDurableExplanation = {
   runtimeDurable: false;
-  /** Exact branch that returned false */
   because: string;
   lineHint: string;
   lsRawLength: number | null;
@@ -93,7 +79,6 @@ export type RuntimeDurableExplanation = {
 export type WorkspacePersistDump = {
   workspaceId: string;
   runtimePresent: boolean;
-  /** true when getRuntimeCreationRecord hits memory but LS verify fails */
   runtimeMemoryOnly: boolean;
   eventPresent: boolean;
   registryPresent: boolean;
@@ -110,9 +95,6 @@ export type WorkspacePersistDump = {
   lastWrite: LocalStorageWriteDiagnostic | null;
   recentWrites: LocalStorageWriteDiagnostic[];
 };
-
-const TRACE_CAP = 120;
-const traces: WorkspacePersistTraceEntry[] = [];
 
 function lsHas(key: string): boolean {
   if (typeof window === "undefined") return false;
@@ -137,10 +119,6 @@ export function storageKeyPresence(): Record<string, boolean> {
   };
 }
 
-/**
- * Exact reason runtimeDurable is false — Founder Validation.
- * Mirrors branches in creationRecord.verifyRuntimeRecordDurable.
- */
 export function explainRuntimeDurableFalse(
   workspaceId: string,
 ): RuntimeDurableExplanation | null {
@@ -272,7 +250,6 @@ export function dumpWorkspacePersistence(workspaceId: string): WorkspacePersistD
     registryPresent: inRegistry,
     runtimeDurable,
     eventDurable,
-    // 074+ — authoritative DB verify only (not LS/Event alone)
     creationDurable: runtimeDurable,
     lastActiveId,
     title: registryTitle(id) ?? runtime?.title ?? event?.title ?? null,
@@ -290,61 +267,3 @@ export function dumpWorkspacePersistence(workspaceId: string): WorkspacePersistD
   };
 }
 
-function publishWindowApi(): void {
-  if (typeof window === "undefined") return;
-  const w = window as Window & {
-    __SPARK_WORKSPACE_PERSIST__?: {
-      traces: WorkspacePersistTraceEntry[];
-      dump: typeof dumpWorkspacePersistence;
-      explain: typeof explainRuntimeDurableFalse;
-      last: WorkspacePersistTraceEntry | null;
-    };
-  };
-  w.__SPARK_WORKSPACE_PERSIST__ = {
-    traces: [...traces],
-    dump: dumpWorkspacePersistence,
-    explain: explainRuntimeDurableFalse,
-    last: traces[traces.length - 1] ?? null,
-  };
-}
-
-export function traceWorkspacePersist(
-  phase: WorkspacePersistPhase,
-  workspaceId: string,
-  ok: boolean,
-  detail?: string,
-): WorkspacePersistTraceEntry {
-  const entry: WorkspacePersistTraceEntry = {
-    at: new Date().toISOString(),
-    phase,
-    workspaceId: workspaceId.trim(),
-    ok,
-    detail,
-    keys: storageKeyPresence(),
-    write: getLastLocalStorageWriteDiagnostic(),
-  };
-  traces.push(entry);
-  if (traces.length > TRACE_CAP) traces.shift();
-  publishWindowApi();
-  if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
-    console.info(
-      "[SPARK_WORKSPACE_PERSIST]",
-      phase,
-      workspaceId,
-      ok,
-      detail ?? "",
-      entry.write && !entry.write.ok
-        ? `writeFail=${entry.write.stage}/${entry.write.errorName}`
-        : "",
-    );
-  }
-  return entry;
-}
-
-export function getWorkspacePersistTraces(): WorkspacePersistTraceEntry[] {
-  return [...traces];
-}
-
-export function clearWorkspacePersistTracesForTests(): void {
-  traces.length = 0;
-}

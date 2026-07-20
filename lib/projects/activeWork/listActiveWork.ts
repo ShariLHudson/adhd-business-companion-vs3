@@ -5,10 +5,8 @@
 
 import { hydrateActiveWorkspaceRegistryFromRuntimeRecords } from "@/lib/activeWorkspaceRegistry/registry";
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
-import {
-  listEventRecords,
-  type EventRecord,
-} from "@/lib/eventsIntelligence";
+import { listEventRecords } from "@/lib/eventsIntelligence/eventRecordStore";
+import type { EventRecord } from "@/lib/eventsIntelligence/types";
 import {
   PROJECT_HOME_STATUS_LABEL,
   type ProjectHomeRecord,

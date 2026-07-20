@@ -8,10 +8,8 @@ import {
   buildWorkspaceCurrentFocus,
   isEventFoundationReady,
 } from "@/lib/discoveryToWorkspace";
-import {
-  getEventRecord,
-  nextFoundationQuestion,
-} from "@/lib/eventsIntelligence";
+import { getEventRecord } from "@/lib/eventsIntelligence/eventRecordStore";
+import { nextFoundationQuestion } from "@/lib/eventsIntelligence/lifecycle";
 import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
 import {
   resolvedTypeLabel,

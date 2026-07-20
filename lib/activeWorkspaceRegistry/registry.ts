@@ -46,7 +46,7 @@ import {
   sanitizeMemberFacingTitle,
 } from "./humanReadableIdentity";
 import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
-import { traceWorkspacePersist } from "./workspacePersistenceDiagnostics";
+import { traceWorkspacePersist } from "./workspacePersistTrace";
 import type {
   ActiveWorkspaceDraftState,
   ActiveWorkspaceEntry,

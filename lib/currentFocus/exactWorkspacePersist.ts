@@ -16,7 +16,7 @@ import { loadWorkflowRecord } from "@/lib/createWorkflowRecordStore";
 import { workflowStateFromRecord } from "@/lib/createWorkflowRecord";
 import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
 import { getEventRecord } from "@/lib/eventsIntelligence/eventRecordStore";
-import { traceWorkspacePersist } from "@/lib/activeWorkspaceRegistry/workspacePersistenceDiagnostics";
+import { traceWorkspacePersist } from "@/lib/activeWorkspaceRegistry/workspacePersistTrace";
 
 /**
  * Hydrate exact Create workflow from persistence — NO bootstrap / NO new template.

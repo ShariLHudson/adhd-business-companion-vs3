@@ -1,8 +1,11 @@
 /**
- * Guards the Vercel webpack failure:
- * ProjectHomes → registry → creationRecord must not circular-init.
+ * Guards the Vercel/Turbopack failure:
+ * ProjectHomes → listActiveWork → listActiveCreationWorkspaces must not
+ * load workspacePersistenceDiagnostics (creationRecord circular init).
  */
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 describe("Project Homes Create import safety", () => {
   it("loads registry + creationRecord without circular TDZ", async () => {
@@ -11,5 +14,44 @@ describe("Project Homes Create import safety", () => {
     expect(typeof registry.listActiveWorkspaces).toBe("function");
     expect(typeof creation.ensureRuntimeCreationRecord).toBe("function");
     expect(typeof registry.archiveActiveWorkspace).toBe("function");
+  });
+
+  it("listActiveCreationWorkspaces does not import the fat barrel or diagnostics", () => {
+    const src = readFileSync(
+      join(process.cwd(), "lib/createEstate/listActiveCreationWorkspaces.ts"),
+      "utf8",
+    );
+    expect(src).not.toMatch(
+      /from ["']@\/lib\/activeWorkspaceRegistry["']/,
+    );
+    expect(src).not.toContain("workspacePersistenceDiagnostics");
+  });
+
+  it("registry does not import workspacePersistenceDiagnostics", () => {
+    const src = readFileSync(
+      join(process.cwd(), "lib/activeWorkspaceRegistry/registry.ts"),
+      "utf8",
+    );
+    expect(src).not.toContain("workspacePersistenceDiagnostics");
+    expect(src).toContain("workspacePersistTrace");
+  });
+
+  it("barrel does not re-export dumpWorkspacePersistence", () => {
+    const src = readFileSync(
+      join(process.cwd(), "lib/activeWorkspaceRegistry/index.ts"),
+      "utf8",
+    );
+    expect(src).not.toMatch(/dumpWorkspacePersistence/);
+  });
+
+  it("listActiveWork imports eventRecordStore leaf, not eventsIntelligence barrel", () => {
+    const src = readFileSync(
+      join(process.cwd(), "lib/projects/activeWork/listActiveWork.ts"),
+      "utf8",
+    );
+    expect(src).not.toMatch(
+      /from ["']@\/lib\/eventsIntelligence["']/,
+    );
+    expect(src).toContain("eventsIntelligence/eventRecordStore");
   });
 });

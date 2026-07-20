@@ -3,7 +3,7 @@
  * Never "Shaping" in one place and "Draft ready" in another.
  */
 
-import type { CreateWorkflowState } from "@/lib/createWorkflow";
+import type { CreateWorkflowState } from "@/lib/createWorkflowState";
 import type { ActiveWorkspaceDraftState, ActiveWorkspaceEntry } from "./types";
 
 export type CanonicalWorkspaceStatus =

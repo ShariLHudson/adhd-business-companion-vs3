@@ -7,7 +7,7 @@ import { registerCreationDestinationWorkspace } from "@/lib/activeWorkspaceRegis
 import { persistCreationFocusAnswer } from "@/lib/creationDurable";
 import { persistCreationContinuitySnapshot } from "@/lib/creationContinuity";
 import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
-import { traceWorkspacePersist } from "@/lib/activeWorkspaceRegistry/workspacePersistenceDiagnostics";
+import { traceWorkspacePersist } from "@/lib/activeWorkspaceRegistry/workspacePersistTrace";
 import {
   applyFoundationAnswerToEventRecord,
   fillEventSectionFromGuide,

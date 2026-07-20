@@ -78,14 +78,16 @@ export {
   type ContinueProjectionKind,
 } from "./projections";
 
+/** Persist trace leaf — safe for Continue / Project Homes. */
 export {
-  dumpWorkspacePersistence,
-  explainRuntimeDurableFalse,
   getWorkspacePersistTraces,
-  storageKeyPresence,
   traceWorkspacePersist,
-  type RuntimeDurableExplanation,
-  type WorkspacePersistDump,
   type WorkspacePersistPhase,
   type WorkspacePersistTraceEntry,
-} from "./workspacePersistenceDiagnostics";
+} from "./workspacePersistTrace";
+
+/**
+ * Heavy dump/explain stays off the barrel so Project Homes never loads
+ * diagnostics → creationRecord → circular init on Vercel/Turbopack.
+ * Import from `@/lib/activeWorkspaceRegistry/workspacePersistenceDiagnostics`.
+ */
