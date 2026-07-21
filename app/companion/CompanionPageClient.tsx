@@ -565,6 +565,7 @@ import {
   applyCreateDiscoveryFromChat,
   answeredDiscoveryCount,
   resolvedTypeLabel,
+  type CreateWorkflowState,
 } from "@/lib/createWorkflow";
 import { logCreateBuild, resolveCreateWorkspacePhase } from "@/lib/createBuild";
 import {
@@ -581,7 +582,13 @@ import { registerCreationDestinationWorkspace } from "@/lib/activeWorkspaceRegis
 import { syncCanonicalWorkFromCreateWorkflow } from "@/lib/createProjects/syncCanonicalWorkFromCreate";
 import { connectCanonicalWorkToProjectHome } from "@/lib/createProjects/connectCanonicalWorkToProjectHome";
 import { runCreateAssistance } from "@/lib/createContextualAssistance";
-import { forceNewCreationAcknowledgment } from "@/lib/universalCreationEntrypoint";
+import {
+  enterCreationFromCreate,
+  forceNewCreationAcknowledgment,
+} from "@/lib/universalCreationEntrypoint";
+import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
+import { getEventRecord } from "@/lib/eventsIntelligence/eventRecordStore";
+import { mayApplyEventWorkspace } from "@/lib/creationIdentity/deriveCreationIdentity";
 import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import type { ActiveWorkCardModel } from "@/lib/projects/activeWork/types";
 import {
@@ -11108,7 +11115,7 @@ export default function CompanionPageClient() {
         openCalendarCore();
         break;
       case "projects":
-        openProjectHomesPrototypeCore();
+        openStandaloneFocusSectionCore("projects");
         break;
       case "journal":
         openGrowthDestinationCore("growth-journal");
@@ -11656,10 +11663,41 @@ export default function CompanionPageClient() {
   }
 
   /** From Create estate entrance — mount the Create Estate workspace host. */
+  /**
+   * Synchronous Event Record bind for Estate Begin (058/059).
+   * Never defer with setTimeout — blank Workshop Map / Current Focus was the race.
+   */
+  function bindEventRecord(
+    workflow: CreateWorkflowState,
+    opts: { userText: string; artifactType: string },
+  ): CreateWorkflowState {
+    if (!mayApplyEventWorkspace(opts.artifactType)) return workflow;
+    const text = opts.userText.trim() || `Create ${opts.artifactType}`;
+    const entry = enterCreationFromCreate({
+      userText: text,
+      forceNew: true,
+    });
+    const eventId = entry.eventRecordId;
+    if (!eventId) return workflow;
+    const record = getEventRecord(eventId);
+    if (!record) return workflow;
+    return applyEventWorkspaceToCreateWorkflow(
+      {
+        ...workflow,
+        originalRequest: workflow.originalRequest || text,
+        selectedTypeLabel: opts.artifactType,
+        eventRecordId: eventId,
+        sessionId: workflow.sessionId || eventId,
+      },
+      record,
+    );
+  }
+
   function startFreshCreateFromEstate(opts?: {
     artifactType?: string;
     initialPrompt?: string;
     resumeWorkspaceId?: string;
+    isEventDomain?: boolean;
   }): boolean {
     // Never call openCreateWorkspace
     const resumeWorkspaceId = opts?.resumeWorkspaceId?.trim();
@@ -11672,19 +11710,27 @@ export default function CompanionPageClient() {
       const artifactType = opts?.artifactType?.trim();
       if (!artifactType) return false;
       const boot = bootstrapWorkspaceV2Session(artifactType);
-      const workflow = {
+      const prompt = opts?.initialPrompt?.trim() || "";
+      let workflow: CreateWorkflowState = {
         ...boot.session.workflow,
         sessionId: boot.session.workflow.sessionId ?? newCreateSessionId(),
         selectedTypeLabel: artifactType,
+        originalRequest: prompt || boot.session.workflow.originalRequest,
         questionMode: coerceCreationDestinationQuestionMode("current_focus"),
         workspaceFirst: true,
-        discoveryAnswers: opts?.initialPrompt?.trim()
+        discoveryAnswers: prompt
           ? {
               ...boot.session.workflow.discoveryAnswers,
-              purpose: opts.initialPrompt.trim(),
+              purpose: prompt,
             }
           : boot.session.workflow.discoveryAnswers,
       };
+      if (opts?.isEventDomain || mayApplyEventWorkspace(artifactType)) {
+        workflow = bindEventRecord(workflow, {
+          userText: prompt || `Create ${artifactType}`,
+          artifactType,
+        });
+      }
       session = {
         ...boot.session,
         typeLabel: artifactType,
@@ -25169,6 +25215,7 @@ export default function CompanionPageClient() {
                 void startFreshCreateFromEstate({
                   artifactType: outcome.artifactType,
                   initialPrompt: outcome.text,
+                  isEventDomain: outcome.isEventDomain,
                 });
               }}
               onSelectCreationType={(item) => {
@@ -25500,7 +25547,7 @@ export default function CompanionPageClient() {
         onOpenRhythms={() => openRemindersRhythmsCore("rhythms")}
         onOpenReminders={() => openRemindersRhythmsCore("reminders")}
         onOpenCalendar={() => openCalendarCore()}
-        onOpenProjects={() => openProjectHomesPrototypeCore()}
+        onOpenProjects={() => openStandaloneFocusSectionCore("projects")}
         onOpenCreateStudio={() => openCreateEstateCore()}
         onOpenClearMyMind={() => openClearMyMindCore()}
         onOpenParkingLot={() => openParkingLotCore()}
