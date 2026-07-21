@@ -1,7 +1,7 @@
 /**
- * 106 — Estate Awareness Hooks.
- * Expose relationship contracts and routing points only.
- * Does not implement Business Pulse, Wins, Hall, Vault, Gardens, Round Table, or Chamber systems.
+ * 106 / 101 — Estate Awareness Hooks.
+ * 101 implements recognition surfaces via `lib/progressRecognition`.
+ * Round Table and Chamber remain contract-only.
  */
 
 export type EstateAwarenessSurfaceId =
@@ -17,10 +17,13 @@ export type EstateAwarenessSurfaceId =
 export type EstateAwarenessHook = {
   surfaceId: EstateAwarenessSurfaceId;
   label: string;
-  /** Routing point later prompts may consume — not a live UI open. */
+  /** Routing point later prompts may consume — not always a live UI open. */
   routingKey: string;
   relationshipKinds: readonly string[];
-  implementedHere: false;
+  /** True when 101 progress recognition owns the surface logic. */
+  implementedHere: boolean;
+  /** Module path for implemented surfaces. */
+  implementationModule?: string;
 };
 
 export const ESTATE_AWARENESS_HOOKS: readonly EstateAwarenessHook[] = [
@@ -28,43 +31,49 @@ export const ESTATE_AWARENESS_HOOKS: readonly EstateAwarenessHook[] = [
     surfaceId: "business_pulse",
     label: "Business Pulse",
     routingKey: "estate.awareness.business_pulse",
-    relationshipKinds: ["supports", "informs"],
-    implementedHere: false,
+    relationshipKinds: ["supports", "informs", "related_to"],
+    implementedHere: true,
+    implementationModule: "lib/progressRecognition/businessPulse.ts",
   },
   {
     surfaceId: "wins",
     label: "Wins",
     routingKey: "estate.awareness.wins",
     relationshipKinds: ["related_to"],
-    implementedHere: false,
+    implementedHere: true,
+    implementationModule: "lib/progressRecognition/adapters.ts",
   },
   {
     surfaceId: "hall_of_accomplishments",
     label: "Hall of Accomplishments",
     routingKey: "estate.awareness.hall_of_accomplishments",
     relationshipKinds: ["related_to"],
-    implementedHere: false,
+    implementedHere: true,
+    implementationModule: "lib/progressRecognition/adapters.ts",
   },
   {
     surfaceId: "evidence_vault",
     label: "Evidence Vault",
     routingKey: "estate.awareness.evidence_vault",
     relationshipKinds: ["related_to"],
-    implementedHere: false,
+    implementedHere: true,
+    implementationModule: "lib/progressRecognition/evidenceBoundary.ts",
   },
   {
     surfaceId: "celebration_garden",
     label: "Celebration Garden",
     routingKey: "estate.awareness.celebration_garden",
     relationshipKinds: ["related_to"],
-    implementedHere: false,
+    implementedHere: true,
+    implementationModule: "lib/progressRecognition/celebrationRouting.ts",
   },
   {
     surfaceId: "celebration_hall",
     label: "Celebration Hall",
     routingKey: "estate.awareness.celebration_hall",
     relationshipKinds: ["related_to"],
-    implementedHere: false,
+    implementedHere: true,
+    implementationModule: "lib/progressRecognition/celebrationRouting.ts",
   },
   {
     surfaceId: "round_table",

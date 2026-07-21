@@ -11,6 +11,7 @@ import {
 } from "@/lib/universalWorkEngine";
 import { listEstateAwarenessHooks } from "@/lib/universalBlueprintInterface";
 import { SparkBlueprintHome } from "@/components/companion/SparkBlueprintHome";
+import { BusinessPulsePanel } from "@/components/companion/progressRecognition";
 import { BlueprintBuilderMode } from "./BlueprintBuilderMode";
 import { BlueprintCapabilityManifestPanel } from "./BlueprintCapabilityManifestPanel";
 import { BlueprintCalendarPanel } from "./BlueprintCalendarPanel";
@@ -27,6 +28,7 @@ type PanelId =
   | "visual"
   | "relationships"
   | "versions"
+  | "business_pulse"
   | "estate_hooks";
 
 type Props = {
@@ -75,6 +77,7 @@ export function BlueprintExperienceShell({
             ["visual", "Visual Thinking"],
             ["relationships", "Used By"],
             ["versions", "Versions"],
+            ["business_pulse", "Business Pulse"],
             ["estate_hooks", "Estate Hooks"],
           ] as const
         ).map(([id, label]) => (
@@ -240,11 +243,21 @@ export function BlueprintExperienceShell({
           </ul>
         </section>
       ) : null}
+      {panel === "business_pulse" ? (
+        <section className="bp-exp-panel" data-testid="blueprint-business-pulse">
+          <h3 className="bp-exp-title">Business Pulse</h3>
+          <BusinessPulsePanel
+            onOpenGarden={() => onNavigate?.({ kind: "place", id: "gardens" })}
+            onOpenHall={() => onNavigate?.({ kind: "place", id: "portfolio" })}
+          />
+        </section>
+      ) : null}
       {panel === "estate_hooks" ? (
         <section className="bp-exp-panel" data-testid="blueprint-estate-hooks">
           <h3 className="bp-exp-title">Estate awareness hooks</h3>
           <p className="bp-exp-muted">
-            Routing contracts for later prompts — not implemented here.
+            Recognition surfaces route through progress recognition (101). Round
+            Table and Chamber remain contracts only.
           </p>
           <ul>
             {listEstateAwarenessHooks().map((hook) => (
@@ -252,9 +265,14 @@ export function BlueprintExperienceShell({
                 key={hook.surfaceId}
                 data-testid={`estate-hook-${hook.surfaceId}`}
                 data-routing-key={hook.routingKey}
+                data-implemented={hook.implementedHere ? "true" : "false"}
               >
                 {hook.label}
-                <span className="bp-exp-muted"> · {hook.routingKey}</span>
+                <span className="bp-exp-muted">
+                  {" "}
+                  · {hook.routingKey}
+                  {hook.implementedHere ? " · live" : " · contract"}
+                </span>
               </li>
             ))}
           </ul>

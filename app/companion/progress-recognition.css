@@ -1,0 +1,109 @@
+/* 101 — Progress recognition · Business Pulse · celebration (calm, not dashboard) */
+
+.progress-pulse,
+.progress-review,
+.progress-celebrate-here,
+.progress-sound-picker {
+  --pr-ink: rgba(42, 34, 28, 0.92);
+  --pr-muted: rgba(42, 34, 28, 0.72);
+  --pr-glass: rgba(255, 250, 244, 0.82);
+  --pr-line: rgba(90, 70, 50, 0.18);
+  color: var(--pr-ink);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.45;
+}
+
+.progress-pulse,
+.progress-review {
+  background: var(--pr-glass);
+  border: 1px solid var(--pr-line);
+  border-radius: 16px;
+  padding: 1.1rem 1.25rem;
+  max-width: 36rem;
+}
+
+.progress-pulse-primary {
+  font-size: 1.25rem;
+  margin: 0 0 0.65rem;
+}
+
+.progress-pulse-changes {
+  margin: 0 0 0.75rem;
+  padding-left: 1.1rem;
+  color: var(--pr-muted);
+}
+
+.progress-pulse-next {
+  margin: 0 0 0.9rem;
+  font-size: 1.05rem;
+}
+
+.progress-pulse-disclosure,
+.progress-review-choices,
+.progress-pulse-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.progress-pulse-btn {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.55rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid var(--pr-line);
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--pr-ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1rem;
+}
+
+.progress-pulse-btn:hover,
+.progress-pulse-btn:focus-visible {
+  outline: 2px solid rgba(120, 90, 60, 0.45);
+  outline-offset: 2px;
+}
+
+.progress-pulse-btn-primary,
+.progress-pulse-btn.is-selected {
+  background: rgba(120, 90, 60, 0.14);
+}
+
+.progress-pulse-detail {
+  margin: 0.75rem 0 0;
+  padding-left: 1.1rem;
+  color: var(--pr-muted);
+}
+
+.progress-celebrate-here {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--pr-line);
+  background: rgba(255, 248, 235, 0.9);
+}
+
+.progress-celebrate-here-soft {
+  margin: 0.35rem 0 0.65rem;
+  color: var(--pr-muted);
+  font-size: 0.98rem;
+}
+
+.progress-sound-picker {
+  margin-top: 0.75rem;
+}
+
+.progress-review-prompt {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-celebrate-here,
+  .progress-pulse,
+  .progress-review {
+    animation: none !important;
+    transition: none !important;
+  }
+}

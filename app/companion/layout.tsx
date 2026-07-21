@@ -59,6 +59,7 @@ import "./companion-chat-surface.css";
 import "./companion-layout-layers.css";
 import "./universal-blueprint-interface.css";
 import "./blueprint-experience.css";
+import "./progress-recognition.css";
 
 export const dynamic = "force-dynamic";
 
