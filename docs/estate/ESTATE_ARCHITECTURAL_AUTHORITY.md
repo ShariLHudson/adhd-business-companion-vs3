@@ -46,7 +46,7 @@ The following are **subordinate** — useful only where they **align** with the 
 
 Conversation specs (105–119) and Relationship Constitution remain binding for **how Spark speaks**. Estate architectural authority governs **what members see and where they are**.
 
-**Product bridge (112–125):** Connected Work/relationship product law is **[112](../product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md)**. Master product constitution series is **113–117** ([113](../constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md) · [index](../constitution/README.md)). Product & experience reference is **[125 — Design Bible](../design-bible/125_SPARK_ESTATE_DESIGN_BIBLE.md)**; UX standards **118–124** ([design-system](../design-system/README.md)). Place canon (this manifest) and product constitution remain complementary — neither replaces the other.
+**Product bridge (112–125 · 128):** Connected Work/relationship product law is **[112](../product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md)**. Master product constitution series is **113–117** ([113](../constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md) · [index](../constitution/README.md)). Binding simplicity / cognitive-load law is **[128](../constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md)**. Product & experience reference is **[125 — Design Bible](../design-bible/125_SPARK_ESTATE_DESIGN_BIBLE.md)**; UX standards **118–124** ([design-system](../design-system/README.md)). Place canon (this manifest) and product constitution remain complementary — neither replaces the other.
 
 ---
 

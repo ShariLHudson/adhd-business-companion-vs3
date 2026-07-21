@@ -1,0 +1,64 @@
+---
+description: Spec 128 — Simplicity & Cognitive Load Constitution; every feature must reduce mental load and pass simplicity/ADHD gates
+alwaysApply: true
+---
+
+# Spark Estate Simplicity & Cognitive Load Constitution™ (128)
+
+**Full document:** `docs/constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md`
+
+**Binding product law** — not a UI redesign brief. Capability may grow; member cognitive effort must shrink.
+
+## Mission
+
+Every release reduces cognitive effort. The platform removes mental load — it does not transfer it to the user.
+
+## Constitutional principle
+
+Members think about business, ideas, goals, clients, future — **never** platform, navigation, configuration, architecture, or internal concepts.
+
+## Fifteen rules (summary)
+
+1. Hide complexity — if Spark can decide, don't ask  
+2. Every screen answers one question — one purpose, one primary action, one next step  
+3. Remove decisions — eliminate, don't add  
+4. Progressive disclosure  
+5. Never expose architecture (Blueprint, Registry, Work ID, Runtime, Identity, Relationship Graph, Launch Contract, etc.)  
+6. One thing at a time  
+7. Never punish exploration (change mind, undo, convert, move without loss)  
+8. Always protect momentum  
+9. Recommend before asking  
+10. Everything should feel recoverable  
+11. Navigation should disappear  
+12. Every feature must reduce anxiety  
+13. Every feature must reduce EF load (memory, planning, decision, organization, switching, initiation)  
+14. Companion before interface  
+15. Ultimate test — “It just knows” = pass; “I had to figure out the platform” = fail  
+
+## Before any member-facing release — Simplicity Audit (all must pass)
+
+1. What decision did we remove?  
+2. What complexity did we hide?  
+3. What cognitive load did we reduce?  
+4. What anxiety did we eliminate?  
+5. Can a first-time user succeed immediately?  
+6. Does this require learning the system?  
+7. Does this interrupt momentum?  
+8. Does this expose architecture?  
+9. Does this create a dead end?  
+10. Does this feel like Spark — calm, guided, intelligent?  
+
+Any fail → **not ready**.
+
+## Certification (incomplete without all)
+
+Functional · Accessibility · Performance · Conversation · **Simplicity** · **Cognitive Load** · **ADHD Experience**
+
+A feature that works but overwhelms is incomplete.
+
+## Final principle
+
+Intelligence = how little the user must think about the system while getting meaningful work done.
+
+**Types:** `lib/sparkSimplicityConstitution/types.ts`  
+Also: [The Member Wins™](../docs/THE_MEMBER_WINS.md) · [Spec 103](../docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md) · [113 Product Constitution](../docs/constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md)

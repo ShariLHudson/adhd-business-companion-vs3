@@ -47,6 +47,8 @@ If legacy code or older docs conflict → **change implementation**, not the can
 **Estate Intelligence Architecture (BINDING):** `docs/estate/ESTATE_INTELLIGENCE_ARCHITECTURE.md` — capability-first routing (Intent → Capability → Expert → Experience → Tool). **Intent-First Navigation:** `docs/estate/INTENT_FIRST_ESTATE_NAVIGATION.md` — goals not rooms; `intentCategories.ts`, `environmentRegistry.ts`, `routeIntentFirstNavigation.ts`. **Coaching Before Navigation:** `docs/estate/ESTATE_COACHING_ARCHITECTURE.md` — coach first, navigate last; `estateCoaching.ts`, `estateCoachingRegistry.ts`. **Discovery Mode:** `docs/estate/ESTATE_DISCOVERY_MODE.md` — understand goal/obstacle/outcome before routing; `discoveryMode.ts`. Registries: `capabilityRegistry.ts`, `expertRegistry.ts`, `routeEstateIntelligence.ts`.
 
 **Restoration:** `docs/estate/ARCHITECTURAL_RESTORATION.md` · **Cleanup:** `docs/ESTATE_CLEANUP_ROADMAP.md`
+
+**Simplicity & Cognitive Load (128 — BINDING):** `docs/constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md` — every release must reduce cognitive effort; never expose architecture; simplicity / cognitive load / ADHD experience certification required. Cursor rule: `.cursor/rules/simplicity-cognitive-load-constitution.mdc`.
 <!-- END:estate-architectural-authority -->
 
 <!-- BEGIN:companion-dna -->
