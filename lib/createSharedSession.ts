@@ -2,6 +2,7 @@
  * Shared Create session — chat and workspace read/write the same workflow state.
  */
 
+import { allocateCanonicalWorkId } from "@/lib/universalWorkEngine";
 import { logCreateBuild } from "./createBuild";
 import {
   answeredDiscoveryCount,
@@ -65,7 +66,7 @@ export function logSharedCreateSession(
 }
 
 export function newCreateSessionId(): string {
-  return `create-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  return allocateCanonicalWorkId({ origin: "create" });
 }
 
 export function withSharedSessionId(

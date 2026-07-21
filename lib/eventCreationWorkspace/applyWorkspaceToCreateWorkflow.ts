@@ -12,13 +12,11 @@ import { buildEventDiscoveryTransition } from "@/lib/discoveryToWorkspace";
 import type { EventRecord } from "@/lib/eventsIntelligence/types";
 import { applyWorkTypeMapToCreateWorkflow } from "@/lib/workTypeSchema/applyWorkTypeMapToWorkflow";
 import { workshopMapToTemplateSections } from "@/lib/workTypeSchema/ensureMapSections";
-import {
-  EVENT_PLAN_SCHEMA,
-  ensureEventPlanSchemaRegistered,
-} from "@/lib/workTypeSchema/schemas/eventPlan";
+import { EVENT_PLAN_SCHEMA } from "@/lib/workTypeSchema/schemas/eventPlan";
+import { ensureEventPlanWorkTypeRegistered } from "@/lib/universalWorkEngine";
 import { buildEventCreationWorkspace } from "./buildEventWorkspace";
 
-ensureEventPlanSchemaRegistered();
+ensureEventPlanWorkTypeRegistered();
 
 export function eventWorkspaceTemplateSections(): CreateTemplateSection[] {
   return workshopMapToTemplateSections(EVENT_PLAN_SCHEMA.sections);

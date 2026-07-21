@@ -162,7 +162,7 @@ describe("072 — Exact workspace persistence", () => {
   });
 
   it("registry + Welcome Home / Projects surfaces find work after hydrate", () => {
-    const workflow = initializeWorkspaceV2Workflow("SOP");
+    const workflow = initializeWorkspaceV2Workflow("Newsletter");
     const entry = registerCreationDestinationWorkspace({
       ...workflow,
       sessionId: "ws-072-surfaces",

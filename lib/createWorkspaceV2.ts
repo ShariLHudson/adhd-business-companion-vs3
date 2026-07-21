@@ -18,7 +18,13 @@ import {
   getWorkTypeSchemaForCreateLabel,
   resolveWorkTypeIdFromLabel,
 } from "@/lib/workTypeSchema/registry";
-import { ensureEventPlanSchemaRegistered } from "@/lib/workTypeSchema/schemas/eventPlan";
+import {
+  UnknownWorkTypeError,
+  ensureEventPlanWorkTypeRegistered,
+  getWorkTypePackage,
+  requireSchemaForWorkTypeId,
+} from "@/lib/universalWorkEngine";
+import { ensureCertProbeSchemaRegistered } from "@/lib/workTypeSchema/schemas/certProbe";
 import {
   defaultTemplateFor,
   findCustomTemplate,
@@ -94,13 +100,22 @@ export function initializeWorkspaceV2Workflow(
       ? advanceAfterCustomItem(customLabel?.trim() || "Custom")
       : advanceAfterCustomItem(customLabel?.trim() || trimmed);
 
-  // Register leaf schemas on first bootstrap — not at module evaluate time.
-  ensureEventPlanSchemaRegistered();
+  // Register Event Plan through the Universal Work Engine (authoritative).
+  ensureEventPlanWorkTypeRegistered();
 
   const itemType = resolvedTypeLabel(picked) || trimmed;
-  const schema = getWorkTypeSchemaForCreateLabel(itemType);
-  const resolvedWorkTypeId =
-    schema?.workTypeId ?? resolveWorkTypeIdFromLabel(itemType);
+  const resolvedWorkTypeId = resolveWorkTypeIdFromLabel(itemType);
+  // Certification probe may register on demand; product Work Types must be pre-registered.
+  if (resolvedWorkTypeId === "cert_probe") {
+    ensureCertProbeSchemaRegistered();
+  }
+  // Resolved Work Type IDs must be registered packages — never silent template fallthrough.
+  if (resolvedWorkTypeId && !getWorkTypePackage(resolvedWorkTypeId)) {
+    throw new UnknownWorkTypeError(resolvedWorkTypeId);
+  }
+  const schema = resolvedWorkTypeId
+    ? requireSchemaForWorkTypeId(resolvedWorkTypeId)
+    : getWorkTypeSchemaForCreateLabel(itemType);
 
   const shell = initializeTemplateForWorkflow({
     ...picked,
@@ -139,19 +154,7 @@ export function initializeWorkspaceV2Workflow(
     };
   }
 
-  // Transitional: labels without a registered schema still use templates.
-  // Resolved-but-unregistered ids (sop, checklist, …) keep template maps until
-  // those schemas ship — they must not invent a second runtime.
-  if (
-    resolvedWorkTypeId &&
-    process.env.NODE_ENV !== "production" &&
-    typeof console !== "undefined"
-  ) {
-    console.warn(
-      `[create] Work Type "${resolvedWorkTypeId}" has no registered schema; using template bootstrap for "${itemType}".`,
-    );
-  }
-
+  // Only freeform labels with no resolved Work Type ID may use templates.
   const preset = defaultTemplateFor(itemType, picked.selectedSubtype);
   const presetIsTechnical =
     /^default\b.+\btemplate$/i.test(preset.name.trim()) ||
@@ -490,33 +493,7 @@ export function shouldSuppressLegacyCreateChatHints(
   return Boolean(CREATE_WORKSPACE_V2 && workflow?.workspaceFirst);
 }
 
-export function formatCreateWorkspaceV2ExplorationHint(
-  session: { typeLabel: string | null; workflow: CreateWorkflowState },
-  userText: string,
-  sectionLabel?: string | null,
-): string {
-  const type = session.typeLabel ?? "content";
-  const display = userFacingCreateTypeLabel(type) ?? type;
-  const active = session.workflow.activeSectionId
-    ? (resolveTemplateSections(session.workflow) ?? []).find(
-        (s) => s.id === session.workflow.activeSectionId,
-      )?.label
-    : null;
-  const focus = sectionLabel ?? active;
-
-  return [
-    `CREATE V2 SUPPORT (mandatory — overrides approval / auto-apply hints):`,
-    `- Active: **${display}** living workspace (066). User types in section boxes; conversation supports the work, not a second pane.`,
-    focus ? `- They are brainstorming **${focus}**.` : "",
-    userText.trim() ? `- User said: "${userText.trim()}"` : "",
-    "- Give ideas, examples, research, suggestions, or feedback only.",
-    "- Do not ask permission to save, approve, or apply chat text to the workspace.",
-    `- End with copy guidance, e.g.: Here are some ideas for **${focus ?? "this section"}**. Copy any parts you like into that box.`,
-    "- Never use fill tags or approval-style buttons in chat.",
-  ]
-    .filter(Boolean)
-    .join("\n");
-}
+export { formatCreateWorkspaceV2ExplorationHint } from "./createWorkspaceExplorationHint";
 
 export function needIdeasPromptForSection(
   typeLabel: string,

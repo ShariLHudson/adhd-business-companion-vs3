@@ -43,6 +43,7 @@ import {
   suggestNextAssets,
 } from "@/lib/createAssets";
 import { acknowledgeEstablishedLead } from "@/lib/eventCreationWorkspace/buildEventWorkspace";
+import { allocateCanonicalWorkId } from "@/lib/universalWorkEngine";
 import { syncEventRecordToProjects } from "./projectsBridge";
 import { connectEventRecordToProjectHome } from "./projectsBridgeHomes";
 import type {
@@ -51,8 +52,12 @@ import type {
   EventsIntelligenceTurnResult,
 } from "./types";
 
+/** New Event master identity — Universal Work Engine owns the mint. */
 function newEventId(): string {
-  return `evt-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return allocateCanonicalWorkId({
+    origin: "event",
+    workTypeId: "event_plan",
+  });
 }
 
 /**
@@ -182,8 +187,9 @@ function createEventRecordFromIntent(
             : "Hybrid",
   });
 
+  const workId = newEventId();
   const record: EventRecord = {
-    id: newEventId(),
+    id: workId,
     title: intent.titleHint,
     eventType: intent.eventType,
     eventTypeLabel: intent.eventTypeLabel,
@@ -207,7 +213,8 @@ function createEventRecordFromIntent(
     conversationContext: intent.rawText,
     projectHomeId: null,
     companionProjectId: null,
-    canonicalWorkId: null,
+    // Same master identity — Projects must not mint a competing Work ID.
+    canonicalWorkId: workId,
     createdAt: now,
     updatedAt: now,
   };

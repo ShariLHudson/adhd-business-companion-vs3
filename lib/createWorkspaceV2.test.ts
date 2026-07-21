@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { UnknownWorkTypeError } from "@/lib/universalWorkEngine";
 import { validateCreateForBuild } from "./createBuild";
 import { buildFullCreateBrief } from "./createTemplates";
 import { OTHER_OPTION } from "./createTypePickers";
@@ -42,13 +43,22 @@ describe("createWorkspaceV2", () => {
   });
 
   it("allows N/A sections and validates build readiness", () => {
-    let wf = initializeWorkspaceV2Workflow("SOP");
+    let wf = initializeWorkspaceV2Workflow("Newsletter");
     const sectionId = wf.templateSections?.[0]?.id;
     expect(sectionId).toBeTruthy();
     wf = toggleWorkspaceV2SectionSkipped(wf, sectionId!);
     expect(workspaceV2HasBuildableContent(wf)).toBe(true);
     const validation = validateCreateForBuild(wf);
     expect(validation.readyToBuild).toBe(true);
+  });
+
+  it("fails visibly for resolved but unregistered Work Types (no template fallthrough)", () => {
+    expect(() => initializeWorkspaceV2Workflow("SOP")).toThrow(
+      UnknownWorkTypeError,
+    );
+    expect(() => initializeWorkspaceV2Workflow("Marketing Plan")).toThrow(
+      UnknownWorkTypeError,
+    );
   });
 
   it("supports adding custom sections", () => {

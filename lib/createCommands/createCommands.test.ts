@@ -47,7 +47,7 @@ describe("084 Create work commands", () => {
     };
     const copy = duplicateCreationWorkspace(original);
     expect(copy.sessionId).not.toBe("ws-original");
-    expect(copy.sessionId).toMatch(/^ws-/);
+    expect(copy.sessionId).toMatch(/^work-/);
     expect(copy.sectionContent?.purpose).toBe("Rest and clarity");
     expect(copy.selectedTemplateName).toMatch(/copy/i);
   });

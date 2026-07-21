@@ -1,7 +1,10 @@
 /**
  * Shared canonical work record — Create shapes the work; Projects carries it forward.
  * One record; two Estate rooms. Never duplicate Create drafts into disconnected Projects.
+ * Identity minting is owned by the Universal Work Engine.
  */
+
+import { allocateCanonicalWorkId } from "@/lib/universalWorkEngine";
 
 export type CanonicalWorkKind =
   | "creation"
@@ -50,7 +53,7 @@ export type CanonicalWorkRecord = {
 const STORAGE_KEY = "companion-canonical-work-v1";
 
 function newId(): string {
-  return `cw-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return allocateCanonicalWorkId({ origin: "projects" });
 }
 
 function readAll(): CanonicalWorkRecord[] {

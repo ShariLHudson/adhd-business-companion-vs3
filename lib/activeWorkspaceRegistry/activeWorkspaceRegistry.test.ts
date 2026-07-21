@@ -80,9 +80,9 @@ describe("071 — Active Workspace Registry", () => {
   });
 
   it("consent offer resumes instead of starting Create when work exists", () => {
-    const workflow = initializeWorkspaceV2Workflow("SOP");
+    const workflow = initializeWorkspaceV2Workflow("Newsletter");
     registerCreationDestinationWorkspace(workflow);
-    const offer = buildCreateConsentOffer("Continue my SOP");
+    const offer = buildCreateConsentOffer("Continue my Newsletter");
     expect(offer).toMatch(/reopened/i);
     expect(offer).not.toMatch(/I can help you build that in Create/i);
   });

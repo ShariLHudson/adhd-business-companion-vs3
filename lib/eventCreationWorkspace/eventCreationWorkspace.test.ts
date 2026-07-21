@@ -120,7 +120,8 @@ describe("Event Creation Workspace", () => {
     const record = getActiveEventRecord();
     expect(record).toBeTruthy();
     const checklist = {
-      ...initializeWorkspaceV2Workflow("Checklist"),
+      // Freeform document type (no registered Work Type package yet).
+      ...initializeWorkspaceV2Workflow("Email"),
       workingIntent: "Create Checklist",
       selectedTypeLabel: "Checklist",
       selectedTemplateName: "Client Onboarding Checklist",

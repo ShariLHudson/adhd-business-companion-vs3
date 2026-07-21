@@ -50,7 +50,7 @@ describe("066 — Legacy Creation runtime retirement", () => {
 
   it("Focus submit advances non-event Creation via Runtime Creation Record", async () => {
     const workflow = {
-      ...initializeWorkspaceV2Workflow("SOP"),
+      ...initializeWorkspaceV2Workflow("Newsletter"),
     };
     const record = ensureRuntimeCreationRecord(workflow);
     const withId = { ...workflow, sessionId: record.id };

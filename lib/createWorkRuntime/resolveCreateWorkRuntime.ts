@@ -12,6 +12,7 @@ import {
   getWorkTypeSchemaForCreateLabel,
   resolveWorkTypeIdFromLabel,
 } from "@/lib/workTypeSchema/registry";
+import { coalesceWorkflowWorkId } from "@/lib/universalWorkEngine";
 import { resolvedTypeLabel } from "@/lib/createWorkflow";
 import type { CreateWorkRuntimeContext } from "./types";
 
@@ -25,17 +26,11 @@ export type ResolveCreateWorkRuntimeInput = {
 /**
  * Build the shared Create runtime context from the existing authoritative stores.
  * CreateWorkflowState remains the section/content owner; registry owns Continue;
- * creationDurable owns save truth.
+ * creationDurable owns save truth. Work identity coalesces through UWE.
  */
 export function resolveCreateWorkRuntime(
   input: ResolveCreateWorkRuntimeInput,
 ): CreateWorkRuntimeContext {
-  const workId =
-    input.workId?.trim() ||
-    input.workflow.sessionId?.trim() ||
-    input.workflow.eventRecordId?.trim() ||
-    "";
-
   const typeLabel =
     resolvedTypeLabel(input.workflow) ||
     input.workflow.selectedTypeLabel ||
@@ -43,6 +38,14 @@ export function resolveCreateWorkRuntime(
   const workTypeId =
     resolveWorkTypeIdFromLabel(typeLabel) ||
     (input.workflow.creationWorkspaceKind === "event" ? "event_plan" : null);
+  const workId =
+    coalesceWorkflowWorkId({
+      workId: input.workId,
+      sessionId: input.workflow.sessionId,
+      eventRecordId: input.workflow.eventRecordId,
+      workTypeId,
+    }) ?? "";
+
   const schema =
     getWorkTypeSchema(workTypeId) ||
     getWorkTypeSchemaForCreateLabel(typeLabel);

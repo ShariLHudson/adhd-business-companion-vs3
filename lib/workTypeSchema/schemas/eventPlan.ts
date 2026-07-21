@@ -1,9 +1,10 @@
 /**
  * 080 — Event Plan Work Type registration (config only).
+ * Authoritative registration lives in the Universal Work Engine Event package.
  */
 
 import type { WorkTypeSchema } from "../types";
-import { registerWorkTypeSchema } from "../registry";
+import { ensureEventPlanWorkTypeRegistered } from "@/lib/universalWorkEngine/packages/eventPlan/registerEventPlanWorkType";
 import {
   EVENT_PLAN_DEFAULT_FOCUS,
   EVENT_PLAN_MAP_SECTIONS,
@@ -23,9 +24,9 @@ export const EVENT_PLAN_SCHEMA: WorkTypeSchema = {
   defaultFocusSectionIds: EVENT_PLAN_DEFAULT_FOCUS,
 };
 
-/** Idempotent registration — call from Event adapters / Create boot. */
+/** Idempotent — delegates to Universal Work Engine Event package. */
 export function ensureEventPlanSchemaRegistered(): void {
-  registerWorkTypeSchema(EVENT_PLAN_SCHEMA);
+  ensureEventPlanWorkTypeRegistered();
 }
 
 ensureEventPlanSchemaRegistered();

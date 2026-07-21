@@ -5,18 +5,12 @@
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { ensureRuntimeCreationRecord } from "@/lib/currentFocus/creationRecord";
 import { registerCreationDestinationWorkspace } from "@/lib/activeWorkspaceRegistry";
-
-function newWorkspaceId(): string {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `ws-${crypto.randomUUID()}`;
-  }
-  return `ws-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-}
+import { allocateCanonicalWorkId } from "@/lib/universalWorkEngine";
 
 export function duplicateCreationWorkspace(
   workflow: CreateWorkflowState,
 ): CreateWorkflowState {
-  const nextId = newWorkspaceId();
+  const nextId = allocateCanonicalWorkId({ origin: "duplicate" });
   const titleBase =
     workflow.selectedTemplateName?.trim() ||
     workflow.selectedTypeLabel?.trim() ||

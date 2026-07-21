@@ -162,7 +162,7 @@ describe("Production Create foundation certification (Event reference)", () => {
       );
       const copy = duplicateCreationWorkspace(workflow);
       expect(copy.sessionId).not.toBe(workId);
-      expect(copy.sessionId).toMatch(/^ws-/);
+      expect(copy.sessionId).toMatch(/^work-/);
       expect(copy.sectionContent).toEqual(workflow.sectionContent);
 
       renameActiveWorkspaceTitle(workId, "Renamed Meetup");

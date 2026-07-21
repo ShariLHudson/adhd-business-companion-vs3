@@ -15,6 +15,7 @@ import {
   type CreateSectionLifecycleTransition,
 } from "@/lib/createSectionLifecycle";
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
+import { coalesceWorkflowWorkId } from "@/lib/universalWorkEngine";
 import { duplicateCreationWorkspace } from "./duplicateCreationWorkspace";
 import { resolveCreateWorkCommands } from "./resolveCreateWorkCommands";
 import type { CreateWorkCommandId } from "./types";
@@ -52,6 +53,11 @@ function resolveWorkId(
   explicit?: string | null,
 ): string {
   return (
+    coalesceWorkflowWorkId({
+      workId: explicit,
+      sessionId: workflow.sessionId,
+      eventRecordId: workflow.eventRecordId,
+    }) ||
     explicit?.trim() ||
     workflow.sessionId?.trim() ||
     workflow.eventRecordId?.trim() ||

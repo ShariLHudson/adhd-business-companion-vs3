@@ -21,7 +21,6 @@ import {
   isLegacyCreateSplitActive,
   LEGACY_CREATE_SPLIT_SHELL,
 } from "@/lib/createEstate/legacyCreateShellQuarantine";
-import { defaultTemplateFor } from "@/lib/createTemplates";
 import { hasLaunchableCreateWorkflow } from "@/lib/createWorkflow";
 
 function read(pathFromRoot: string): string {
@@ -45,11 +44,12 @@ describe("Create ↔ Projects canonical work", () => {
 
   it("Event Plan is launchable and has event sections", () => {
     expect(hasLaunchableCreateWorkflow("Event Plan")).toBe(true);
-    const sections = defaultTemplateFor("Event Plan").sections.map((s) =>
-      s.label.toLowerCase(),
+    // Authoritative map comes from Universal Work Engine Event package / schema.
+    const sections = (initializeWorkspaceV2Workflow("Event Plan").templateSections ?? []).map(
+      (s) => (s.id || s.label).toLowerCase(),
     );
     for (const needed of [
-      "event type",
+      "event_type",
       "purpose",
       "audience",
       "outcomes",
@@ -60,9 +60,9 @@ describe("Create ↔ Projects canonical work", () => {
       "vendors",
       "volunteers",
       "marketing",
-      "attendee experience",
-      "run of show",
-      "follow-up",
+      "attendee_experience",
+      "run_of_show",
+      "post_event_follow_up",
       "registration",
       "agenda",
     ]) {

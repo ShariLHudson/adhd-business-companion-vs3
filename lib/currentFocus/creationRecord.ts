@@ -20,6 +20,7 @@ import {
   type CreateWorkflowState,
 } from "@/lib/createWorkflowState";
 import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
+import { allocateCanonicalWorkId } from "@/lib/universalWorkEngine";
 import {
   buildCanonicalKnownFacts,
   knownFactDisplayLines,
@@ -170,7 +171,7 @@ export function ensureRuntimeCreationRecord(
   const id =
     workflow.eventRecordId?.trim() ||
     workflow.sessionId?.trim() ||
-    `creation-${Date.now()}`;
+    allocateCanonicalWorkId({ origin: "create" });
   const existing = getRuntimeCreationRecord(id);
   const typeLabel = resolvedTypeLabel(workflow) || "Creation";
   const templateSections = sectionsFromWorkflow(workflow, existing);

@@ -7,6 +7,7 @@ import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { resolvedTypeLabel } from "@/lib/createWorkflow";
 import { workspaceV2Sections } from "@/lib/createWorkspaceV2";
 import type { RuntimeCreationRecord } from "@/lib/currentFocus/creationRecord";
+import { allocateCanonicalWorkId } from "@/lib/universalWorkEngine";
 import type {
   AuthoritativeCreationPayload,
   AuthoritativeCreationRecord,
@@ -192,7 +193,7 @@ export function buildAuthoritativeFromWorkflow(input: {
     input.workflow.eventRecordId?.trim() ||
     input.workflow.sessionId?.trim() ||
     input.previous?.workspaceId ||
-    `creation-${Date.now()}`;
+    allocateCanonicalWorkId({ origin: "create" });
   const now = new Date().toISOString();
   const originalRequest =
     input.originalRequest?.trim() ||
