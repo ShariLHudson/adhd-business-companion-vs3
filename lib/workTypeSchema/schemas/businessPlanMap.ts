@@ -1,6 +1,6 @@
 /**
  * Leaf data only — no imports from Create runtime (avoids circular deps).
- * Business Plan section map (201–214 handmade / service / creator Business Blueprints).
+ * Business Plan section map (201–224 handmade / service / creator / organizing).
  */
 
 import type { WorkTypeMapSectionDef } from "../types";
@@ -149,6 +149,42 @@ export const BUSINESS_PLAN_MAP_SECTIONS: readonly WorkTypeMapSectionDef[] = [
   { id: "creator_analytics", title: "Creator Analytics" },
   { id: "content_asset_library", title: "Content Asset Library" },
   { id: "creator_operations", title: "Creator Operations" },
+  // 219–224 Professional Organizing
+  { id: "organizing_clients", title: "Organizing Clients" },
+  { id: "organizing_services", title: "Organizing Services" },
+  { id: "organizing_inquiry", title: "Organizing Inquiry" },
+  { id: "organizing_assessment", title: "Organizing Assessment" },
+  { id: "organizing_proposal", title: "Organizing Proposal" },
+  { id: "organizing_delivery", title: "Organizing Delivery" },
+  { id: "organizing_maintenance", title: "Organizing Maintenance" },
+  { id: "organizing_privacy", title: "Organizing Privacy and Safety" },
+  { id: "organizing_growth", title: "Organizing Growth" },
+  { id: "organizing_operations", title: "Organizing Operations" },
+  { id: "space_users", title: "Space Users" },
+  { id: "current_state_space", title: "Current-State Space Map" },
+  { id: "sort_decide", title: "Sort and Decide" },
+  { id: "space_design", title: "Space Design" },
+  { id: "labels_containers", title: "Labels and Containers" },
+  { id: "accessibility_flow", title: "Accessibility and Flow" },
+  { id: "maintenance_space", title: "Space Maintenance" },
+  { id: "info_inventory", title: "Information Inventory" },
+  { id: "naming_structure", title: "Naming and Structure" },
+  { id: "retrieval_rules", title: "Retrieval Rules" },
+  { id: "permissions_archives", title: "Permissions and Archives" },
+  { id: "email_notes_photos", title: "Email Notes and Photos" },
+  { id: "digital_maintenance", title: "Digital Maintenance" },
+  { id: "workflow_map", title: "Workflow Map" },
+  { id: "roles_handoffs", title: "Roles and Handoffs" },
+  { id: "sop_design", title: "SOP Design" },
+  { id: "recurring_rhythms", title: "Recurring Rhythms" },
+  { id: "visibility_ops", title: "Operational Visibility" },
+  { id: "ops_maintenance", title: "Procedure Maintenance" },
+  { id: "priority_structure", title: "Priority Structure" },
+  { id: "initiative_map", title: "Initiative Map" },
+  { id: "decision_log_org", title: "Decision Visibility" },
+  { id: "meeting_rhythms", title: "Meeting Rhythms" },
+  { id: "alignment_load", title: "Alignment and Load" },
+  { id: "management_cadence", title: "Management Cadence" },
 ];
 
 export const BUSINESS_PLAN_DEFAULT_FOCUS: readonly string[] = [

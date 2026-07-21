@@ -1,5 +1,5 @@
 /**
- * Business Plan map groups — schema config only (201–214).
+ * Business Plan map groups — schema config only (201–224).
  */
 
 import type { BlueprintGroup } from "../../blueprints/types";
@@ -267,10 +267,90 @@ export const BUSINESS_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
     ],
   },
   {
+    groupId: "professional_organizing_business",
+    title: "Professional Organizing Business",
+    description: "Specialty, services, assessment, delivery, and maintenance offers.",
+    order: 14,
+    collapsedByDefault: true,
+    sectionIds: [
+      "organizing_clients",
+      "organizing_services",
+      "organizing_inquiry",
+      "organizing_assessment",
+      "organizing_proposal",
+      "organizing_delivery",
+      "organizing_maintenance",
+      "organizing_privacy",
+      "organizing_growth",
+      "organizing_operations",
+    ],
+  },
+  {
+    groupId: "physical_space_organizing",
+    title: "Physical Space Organizing",
+    description: "Purpose, zones, decisions, and maintenance for physical spaces.",
+    order: 15,
+    collapsedByDefault: true,
+    sectionIds: [
+      "space_users",
+      "current_state_space",
+      "sort_decide",
+      "space_design",
+      "labels_containers",
+      "accessibility_flow",
+      "maintenance_space",
+    ],
+  },
+  {
+    groupId: "digital_information_organizing",
+    title: "Digital and Information Organizing",
+    description: "Inventory, naming, retrieval, permissions, and maintenance.",
+    order: 16,
+    collapsedByDefault: true,
+    sectionIds: [
+      "info_inventory",
+      "naming_structure",
+      "retrieval_rules",
+      "permissions_archives",
+      "email_notes_photos",
+      "digital_maintenance",
+    ],
+  },
+  {
+    groupId: "operational_procedural_organizing",
+    title: "Operational and Procedural Organizing",
+    description: "Workflows, SOPs, handoffs, and procedure maintenance.",
+    order: 17,
+    collapsedByDefault: true,
+    sectionIds: [
+      "workflow_map",
+      "roles_handoffs",
+      "sop_design",
+      "recurring_rhythms",
+      "visibility_ops",
+      "ops_maintenance",
+    ],
+  },
+  {
+    groupId: "strategic_management_organizing",
+    title: "Strategic and Management Organizing",
+    description: "Priorities, initiatives, decisions, and management cadence.",
+    order: 18,
+    collapsedByDefault: true,
+    sectionIds: [
+      "priority_structure",
+      "initiative_map",
+      "decision_log_org",
+      "meeting_rhythms",
+      "alignment_load",
+      "management_cadence",
+    ],
+  },
+  {
     groupId: "stewardship",
     title: "Money and Stewardship",
     description: "Profit, taxes, analytics, linked work, and review.",
-    order: 14,
+    order: 19,
     collapsedByDefault: true,
     sectionIds: [
       "expenses_taxes",

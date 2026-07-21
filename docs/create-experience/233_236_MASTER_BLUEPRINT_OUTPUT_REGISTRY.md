@@ -147,6 +147,16 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.product_photography` | 1.0.0 | business_plan | Alt text patterns | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Marketplace image checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Professional Organizing Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Organizing Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Specialty Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Service Suite | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Qualification Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Organizing Assessment | assessment | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Organizing Project Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Maintenance Offer | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.professional_organizing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Service Business Operating Plan | plan | composed | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Service Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Service Menu | document | draft_only | blocked | Create (unspecified) | yes |
@@ -399,5 +409,28 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | assumptions and risks | document | draft_only | blocked | Create (unspecified) | yes |
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | review checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | print/export output | document | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.digital_information` | 1.0.0 | business_plan | Digital Information Organization Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.digital_information` | 1.0.0 | business_plan | Information Inventory | document | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.digital_information` | 1.0.0 | business_plan | Naming Convention Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.digital_information` | 1.0.0 | business_plan | Retrieval Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.digital_information` | 1.0.0 | business_plan | Digital Maintenance Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.digital_information` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `organizing.operational_procedural` | 1.0.0 | business_plan | Operational Organization Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.operational_procedural` | 1.0.0 | business_plan | Workflow Map | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.operational_procedural` | 1.0.0 | business_plan | Roles and Handoffs Chart | document | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.operational_procedural` | 1.0.0 | business_plan | SOP Draft | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.operational_procedural` | 1.0.0 | business_plan | Recurring Rhythm Calendar | calendar | connected | blocked | Create (unspecified) | yes |
+| `organizing.operational_procedural` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `organizing.physical_space` | 1.0.0 | business_plan | Physical Space Organization Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.physical_space` | 1.0.0 | business_plan | Current-State Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.physical_space` | 1.0.0 | business_plan | Zone Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.physical_space` | 1.0.0 | business_plan | Maintenance Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.physical_space` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `organizing.strategic_management` | 1.0.0 | business_plan | Strategic Organization Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.strategic_management` | 1.0.0 | business_plan | Priority Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.strategic_management` | 1.0.0 | business_plan | Initiative Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.strategic_management` | 1.0.0 | business_plan | Decision Visibility Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.strategic_management` | 1.0.0 | business_plan | Management Cadence | document | draft_only | blocked | Create (unspecified) | yes |
+| `organizing.strategic_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 
-**Total outputs:** 391
+**Total outputs:** 424

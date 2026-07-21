@@ -1,5 +1,5 @@
 /**
- * 201–214 — Business Plan Work Type + Handmade / Service / Creator Business Blueprints.
+ * 201–224 — Business Plan Work Type + Handmade / Service / Creator / Organizing Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -13,14 +13,19 @@ import {
   CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
   COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+  OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+  PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
+  STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
   addWorkMilestone,
   addWorkTask,
   answerBlueprintQuestion,
@@ -97,7 +102,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with fourteen Business Blueprints", () => {
+  it("registers Business Plan Work Type with nineteen Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -116,9 +121,14 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
         MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
         CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
+        PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+        PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
+        DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
+        OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+        STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(14);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(19);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -138,6 +148,11 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
       MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
       CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
+      PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+      PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
+      DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
+      OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+      STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -204,7 +219,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     expect(active).toContain("listings_seo");
   });
 
-  it("203–214 depth modes preserve one Work ID and reveal domain sections", () => {
+  it("203–224 depth modes preserve one Work ID and reveal domain sections", () => {
     const cases: {
       blueprintId: string;
       guidedSection: string;
@@ -253,6 +268,26 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
         guidedSection: "content_production_system",
+      },
+      {
+        blueprintId: PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "organizing_inquiry",
+      },
+      {
+        blueprintId: PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
+        guidedSection: "space_design",
+      },
+      {
+        blueprintId: DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
+        guidedSection: "naming_structure",
+      },
+      {
+        blueprintId: OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+        guidedSection: "sop_design",
+      },
+      {
+        blueprintId: STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
+        guidedSection: "meeting_rhythms",
       },
     ];
     for (const c of cases) {
@@ -444,6 +479,20 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       originalUserMessage: "Help me plan a book launch",
     });
     expect(bookLaunch.blueprintId).not.toBe(AUTHOR_BUSINESS_BLUEPRINT_ID);
+
+    const physical = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me with physical space organizing for my home office",
+    });
+    expect(physical.blueprintId).toBe(PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID);
+
+    const organizingBiz = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a professional organizing business",
+    });
+    expect(organizingBiz.blueprintId).toBe(
+      PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+    );
 
     const marketing = inferWorkTypeAndBlueprint({
       origin: "create",

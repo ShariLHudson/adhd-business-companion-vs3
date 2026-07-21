@@ -24,6 +24,7 @@ Every gap must be remediated or the production promise removed.
 | critical | `business.inventory_pricing` | Dead inventory decisions | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | critical | `business.membership` | Membership Pricing Model | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
 | critical | `business.membership` | Membership Health Dashboard | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
+| critical | `business.professional_organizing` | Pricing Model | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
 | critical | `business.service` | Pricing Calculator | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
 | critical | `event.book_launch` | Inventory and preorder checklist | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | critical | `event.book_launch` | Budget view | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
@@ -36,6 +37,7 @@ Every gap must be remediated or the production promise removed.
 | critical | `event.retreat` | Budget view | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
 | critical | `event.summit` | Budget view | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
 | critical | `event.workshop` | Budget view | No hand-authored Createability Manifest; deliverable promise unverified | implement_structured |
+| critical | `organizing.digital_information` | Information Inventory | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `bp-event-three-day-retreat` | Follow-up integration plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `business.author` | Author Business Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `business.author` | Book Development Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
@@ -58,6 +60,8 @@ Every gap must be remediated or the production promise removed.
 | high | `business.holiday_planner` | Launch timeline | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `business.membership` | Membership Business Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `business.product_photography` | Product Photography Plan | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
+| high | `business.professional_organizing` | Professional Organizing Business Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| high | `business.professional_organizing` | Organizing Project Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `business.service` | Service Business Operating Plan | No hand-authored Createability Manifest; deliverable promise unverified | implement_composed |
 | high | `business.speaker` | Speaker Business Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `business.speaker` | Speaker Preparation Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
@@ -151,6 +155,11 @@ Every gap must be remediated or the production promise removed.
 | high | `marketing_plan.simple` | channel plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `marketing_plan.simple` | measurement plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | high | `marketing_plan.simple` | print/export output | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| high | `organizing.digital_information` | Digital Information Organization Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| high | `organizing.operational_procedural` | Operational Organization Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| high | `organizing.physical_space` | Physical Space Organization Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| high | `organizing.physical_space` | Zone Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| high | `organizing.strategic_management` | Strategic Organization Plan | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | moderate | `bp-event-book-signing` | Event listing copy | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | moderate | `bp-event-business-luncheon` | Luncheon brief | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | moderate | `bp-event-business-luncheon` | Invitation copy | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
@@ -207,6 +216,8 @@ Every gap must be remediated or the production promise removed.
 | moderate | `event.workshop` | Accessibility checklist | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | moderate | `event.workshop` | Promotion brief | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | moderate | `marketing_plan.simple` | review checklist | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| moderate | `organizing.digital_information` | Digital Maintenance Checklist | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| moderate | `organizing.physical_space` | Maintenance Checklist | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `bp-event-book-signing` | Signing table run-of-show | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `bp-event-book-signing` | Thank-you / next-read note | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `bp-event-business-luncheon` | Follow-up message draft | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
@@ -291,6 +302,13 @@ Every gap must be remediated or the production promise removed.
 | low | `business.product_photography` | Editing workflow | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `business.product_photography` | Alt text patterns | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `business.product_photography` | Next actions list | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
+| low | `business.professional_organizing` | Organizing Business Snapshot | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `business.professional_organizing` | Specialty Map | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `business.professional_organizing` | Service Suite | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `business.professional_organizing` | Qualification Guide | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `business.professional_organizing` | Organizing Assessment | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `business.professional_organizing` | Maintenance Offer | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `business.professional_organizing` | Next actions list | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
 | low | `business.service` | Service Business Snapshot | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `business.service` | Service Menu | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `business.service` | Inquiry Workflow | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
@@ -398,5 +416,20 @@ Every gap must be remediated or the production promise removed.
 | low | `marketing_plan.simple` | task list | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `marketing_plan.simple` | milestone view | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
 | low | `marketing_plan.simple` | assumptions and risks | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.digital_information` | Naming Convention Guide | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.digital_information` | Retrieval Rules | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.digital_information` | Next actions list | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
+| low | `organizing.operational_procedural` | Workflow Map | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.operational_procedural` | Roles and Handoffs Chart | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.operational_procedural` | SOP Draft | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.operational_procedural` | Recurring Rhythm Calendar | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
+| low | `organizing.operational_procedural` | Next actions list | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
+| low | `organizing.physical_space` | Current-State Map | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.physical_space` | Next actions list | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
+| low | `organizing.strategic_management` | Priority Map | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.strategic_management` | Initiative Map | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.strategic_management` | Decision Visibility Guide | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.strategic_management` | Management Cadence | No hand-authored Createability Manifest; deliverable promise unverified | label_draft_only |
+| low | `organizing.strategic_management` | Next actions list | No hand-authored Createability Manifest; deliverable promise unverified | connect_destination |
 
-**Open gaps:** 391
+**Open gaps:** 424

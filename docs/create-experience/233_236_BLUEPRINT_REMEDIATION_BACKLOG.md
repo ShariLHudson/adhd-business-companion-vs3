@@ -24,6 +24,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.inventory_pricing` — **Dead inventory decisions** → label_draft_only
 - [ ] `business.membership` — **Membership Pricing Model** → implement_structured
 - [ ] `business.membership` — **Membership Health Dashboard** → implement_structured
+- [ ] `business.professional_organizing` — **Pricing Model** → implement_structured
 - [ ] `business.service` — **Pricing Calculator** → implement_structured
 - [ ] `event.book_launch` — **Inventory and preorder checklist** → label_draft_only
 - [ ] `event.book_launch` — **Budget view** → implement_structured
@@ -36,6 +37,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `event.retreat` — **Budget view** → implement_structured
 - [ ] `event.summit` — **Budget view** → implement_structured
 - [ ] `event.workshop` — **Budget view** → implement_structured
+- [ ] `organizing.digital_information` — **Information Inventory** → label_draft_only
 
 ## high
 
@@ -61,6 +63,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.holiday_planner` — **Launch timeline** → label_draft_only
 - [ ] `business.membership` — **Membership Business Plan** → label_draft_only
 - [ ] `business.product_photography` — **Product Photography Plan** → connect_destination
+- [ ] `business.professional_organizing` — **Professional Organizing Business Plan** → label_draft_only
+- [ ] `business.professional_organizing` — **Organizing Project Plan** → label_draft_only
 - [ ] `business.service` — **Service Business Operating Plan** → implement_composed
 - [ ] `business.speaker` — **Speaker Business Plan** → label_draft_only
 - [ ] `business.speaker` — **Speaker Preparation Plan** → label_draft_only
@@ -154,6 +158,11 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `marketing_plan.simple` — **channel plan** → label_draft_only
 - [ ] `marketing_plan.simple` — **measurement plan** → label_draft_only
 - [ ] `marketing_plan.simple` — **print/export output** → label_draft_only
+- [ ] `organizing.digital_information` — **Digital Information Organization Plan** → label_draft_only
+- [ ] `organizing.operational_procedural` — **Operational Organization Plan** → label_draft_only
+- [ ] `organizing.physical_space` — **Physical Space Organization Plan** → label_draft_only
+- [ ] `organizing.physical_space` — **Zone Plan** → label_draft_only
+- [ ] `organizing.strategic_management` — **Strategic Organization Plan** → label_draft_only
 
 ## moderate
 
@@ -213,6 +222,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `event.workshop` — **Accessibility checklist** → label_draft_only
 - [ ] `event.workshop` — **Promotion brief** → label_draft_only
 - [ ] `marketing_plan.simple` — **review checklist** → label_draft_only
+- [ ] `organizing.digital_information` — **Digital Maintenance Checklist** → label_draft_only
+- [ ] `organizing.physical_space` — **Maintenance Checklist** → label_draft_only
 
 ## low
 
@@ -300,6 +311,13 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.product_photography` — **Editing workflow** → label_draft_only
 - [ ] `business.product_photography` — **Alt text patterns** → label_draft_only
 - [ ] `business.product_photography` — **Next actions list** → connect_destination
+- [ ] `business.professional_organizing` — **Organizing Business Snapshot** → label_draft_only
+- [ ] `business.professional_organizing` — **Specialty Map** → label_draft_only
+- [ ] `business.professional_organizing` — **Service Suite** → label_draft_only
+- [ ] `business.professional_organizing` — **Qualification Guide** → label_draft_only
+- [ ] `business.professional_organizing` — **Organizing Assessment** → label_draft_only
+- [ ] `business.professional_organizing` — **Maintenance Offer** → label_draft_only
+- [ ] `business.professional_organizing` — **Next actions list** → connect_destination
 - [ ] `business.service` — **Service Business Snapshot** → label_draft_only
 - [ ] `business.service` — **Service Menu** → label_draft_only
 - [ ] `business.service` — **Inquiry Workflow** → label_draft_only
@@ -407,3 +425,18 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `marketing_plan.simple` — **task list** → label_draft_only
 - [ ] `marketing_plan.simple` — **milestone view** → label_draft_only
 - [ ] `marketing_plan.simple` — **assumptions and risks** → label_draft_only
+- [ ] `organizing.digital_information` — **Naming Convention Guide** → label_draft_only
+- [ ] `organizing.digital_information` — **Retrieval Rules** → label_draft_only
+- [ ] `organizing.digital_information` — **Next actions list** → connect_destination
+- [ ] `organizing.operational_procedural` — **Workflow Map** → label_draft_only
+- [ ] `organizing.operational_procedural` — **Roles and Handoffs Chart** → label_draft_only
+- [ ] `organizing.operational_procedural` — **SOP Draft** → label_draft_only
+- [ ] `organizing.operational_procedural` — **Recurring Rhythm Calendar** → connect_destination
+- [ ] `organizing.operational_procedural` — **Next actions list** → connect_destination
+- [ ] `organizing.physical_space` — **Current-State Map** → label_draft_only
+- [ ] `organizing.physical_space` — **Next actions list** → connect_destination
+- [ ] `organizing.strategic_management` — **Priority Map** → label_draft_only
+- [ ] `organizing.strategic_management` — **Initiative Map** → label_draft_only
+- [ ] `organizing.strategic_management` — **Decision Visibility Guide** → label_draft_only
+- [ ] `organizing.strategic_management` — **Management Cadence** → label_draft_only
+- [ ] `organizing.strategic_management` — **Next actions list** → connect_destination

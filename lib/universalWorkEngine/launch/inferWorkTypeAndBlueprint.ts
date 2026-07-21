@@ -19,14 +19,19 @@ import {
   CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
   COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+  OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+  PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
+  STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
 } from "../packages/businessPlan/businessBlueprintDefinitions";
 import {
   BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
@@ -114,6 +119,12 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-membership": MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
   "bp-content-creator": CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
   "bp-content-creator-business": CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
+  "bp-professional-organizing": PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+  "bp-organizing-business": PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+  "bp-physical-space-organizing": PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
+  "bp-digital-information-organizing": DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
+  "bp-operational-organizing": OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+  "bp-strategic-organizing": STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -200,6 +211,32 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(content\s+creator\s+business|creator\s+business(?:\s+blueprint)?|business\.content_creator)\b/i,
     blueprintId: CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Delivery organizing before generic organizing business
+    re: /\b(physical\s+space\s+organiz(?:e|ing)|home\s+organiz(?:e|ing)|room\s+organiz(?:e|ing)|office\s+organiz(?:e|ing)|organizing\.physical_space)\b/i,
+    blueprintId: PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(digital\s+(?:and\s+)?information\s+organiz(?:e|ing)|digital\s+organiz(?:e|ing)|file\s+organiz(?:e|ing)|organizing\.digital_information)\b/i,
+    blueprintId: DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(operational\s+(?:and\s+)?procedural\s+organiz(?:e|ing)|sop\s+organiz(?:e|ing)|workflow\s+organiz(?:e|ing)|organizing\.operational_procedural)\b/i,
+    blueprintId: OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(strategic\s+(?:and\s+)?management\s+organiz(?:e|ing)|management\s+organiz(?:e|ing)|strategic\s+organiz(?:e|ing)|organizing\.strategic_management)\b/i,
+    blueprintId: STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(professional\s+organizing(?:\s+business)?|organizing\s+business|organizer\s+business|business\.professional_organizing)\b/i,
+    blueprintId: PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -368,7 +405,7 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
   if (
     !workTypeId &&
     message &&
-    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner|speaker\s+business|speaking\s+business|coaching\s+business|coach\s+business|consulting\s+business|consultant\s+business|service\s+business(?:\s+operating)?|author\s+business|course\s+creator|course\s+business|membership\s+business|content\s+creator\s+business|creator\s+business)\b/i.test(
+    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner|speaker\s+business|speaking\s+business|coaching\s+business|coach\s+business|consulting\s+business|consultant\s+business|service\s+business(?:\s+operating)?|author\s+business|course\s+creator|course\s+business|membership\s+business|content\s+creator\s+business|creator\s+business|professional\s+organizing|organizing\s+business|physical\s+space\s+organiz|digital\s+organiz|sop\s+organiz|strategic\s+organiz|management\s+organiz)\b/i.test(
       message,
     )
   ) {

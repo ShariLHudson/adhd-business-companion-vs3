@@ -138,7 +138,7 @@
 |-----------|--------------------------------|
 | `event_plan` | Workshop, webinar, retreat, conference, summit, launches, challenge, masterclass, fundraiser/gala, networking, luncheon, … |
 | `marketing_plan` | `marketing_plan.simple` |
-| `business_plan` | `business.craft_show` … `business.holiday_planner` · `business.speaker` · `business.coaching` · `business.consulting` · `business.service` · `business.author` · `business.course_creator` · `business.membership` · `business.content_creator` |
+| `business_plan` | `business.craft_show` … `business.holiday_planner` · `business.speaker` · `business.coaching` · `business.consulting` · `business.service` · `business.author` · `business.course_creator` · `business.membership` · `business.content_creator` · `business.professional_organizing` · `organizing.physical_space` · `organizing.digital_information` · `organizing.operational_procedural` · `organizing.strategic_management` |
 
 **Registry:** `lib/universalWorkEngine/blueprints/registry.ts`  
 **Target ID style (312):** `blueprint.event.workshop` (map via aliases; do not break current dotted IDs abruptly)
@@ -212,6 +212,8 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | 342 | Agent runtime audit — blocked until capability contracts |
 | Create-experience hardening / reports | `docs/create-experience/` (096–106 era + Blueprint certs) |
 | **233–236** Blueprint Createability | `docs/create-experience/standards/233_*`…`236_*` · runtime `lib/universalWorkEngine/blueprints/createability/` · masters `233_236_*` |
+| **219–224** Professional Organizing Collection | `docs/create-experience/219_*`…`224_*` · runtime `organizingProfessionalCollectionDefinitions.ts` |
+| **273–278** Blueprint Profile Context Connection | `docs/create-experience/standards/273_*`…`278_*` · runtime `lib/universalWorkEngine/blueprints/profileContext/` · masters `273_278_*` |
 | Navigation welcome docs | `docs/navigation/119–121` |
 
 ---
