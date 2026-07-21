@@ -1,6 +1,6 @@
 /**
  * Leaf data only — no imports from Create runtime (avoids circular deps).
- * Business Plan section map (201–240 handmade / service / creator / organizing / retail / commerce / hospitality).
+ * Business Plan section map (201–244 handmade / service / creator / organizing / retail / commerce / hospitality / field).
  */
 
 import type { WorkTypeMapSectionDef } from "../types";
@@ -302,6 +302,49 @@ export const BUSINESS_PLAN_MAP_SECTIONS: readonly WorkTypeMapSectionDef[] = [
   { id: "venue_guest_xp", title: "Venue Guest Experience" },
   { id: "venue_maintenance", title: "Venue Maintenance" },
   { id: "venue_growth", title: "Venue Growth" },
+  // 241–244 Field / Home / Property
+  { id: "gc_lead_qualify", title: "Lead Qualification" },
+  { id: "gc_site_assessment", title: "Site Assessment" },
+  { id: "gc_scope", title: "Scope of Work" },
+  { id: "gc_proposal", title: "Proposal and Agreement" },
+  { id: "gc_project_planning", title: "Construction Project Planning" },
+  { id: "gc_crew_subs", title: "Crew and Subcontractor Coordination" },
+  { id: "gc_change_mgmt", title: "Change Management" },
+  { id: "gc_client_comms", title: "Construction Client Communication" },
+  { id: "gc_quality_safety", title: "Quality Safety and Closeout" },
+  { id: "gc_performance", title: "Contractor Business Performance" },
+  { id: "hs_inquiry", title: "Home Service Inquiry" },
+  { id: "hs_estimate_booking", title: "Estimate and Booking" },
+  { id: "hs_routing", title: "Routing and Scheduling" },
+  { id: "hs_delivery", title: "Home Service Delivery" },
+  { id: "hs_comms", title: "Home Service Communication" },
+  { id: "hs_recurring", title: "Recurring Service" },
+  { id: "hs_team_field", title: "Home Service Team and Field Ops" },
+  { id: "hs_inventory", title: "Home Service Inventory and Equipment" },
+  { id: "hs_safety", title: "Home Service Safety Privacy and Risk" },
+  { id: "hs_performance", title: "Home Service Performance and Growth" },
+  { id: "pm_owner", title: "Owner Acquisition and Onboarding" },
+  { id: "pm_property", title: "Property Onboarding" },
+  { id: "pm_resident", title: "Resident and Tenant Journey" },
+  { id: "pm_leasing", title: "Leasing Operations" },
+  { id: "pm_maintenance", title: "Maintenance Coordination" },
+  { id: "pm_vendors", title: "Property Vendor Management" },
+  { id: "pm_inspections", title: "Inspections and Condition" },
+  { id: "pm_financials", title: "Property Financial Ops" },
+  { id: "pm_comms", title: "Property Communication and Issues" },
+  { id: "pm_str", title: "Short-Term Rental Adaptation" },
+  { id: "pm_portfolio", title: "Portfolio Performance" },
+  { id: "field_job_intake", title: "Field Job Intake" },
+  { id: "field_dispatch", title: "Scheduling and Dispatch" },
+  { id: "field_prep", title: "Pre-Visit Prep" },
+  { id: "field_arrival", title: "Arrival and Check-In" },
+  { id: "field_execution", title: "Field Execution" },
+  { id: "field_comms", title: "Field Communication" },
+  { id: "field_completion", title: "Completion and Verification" },
+  { id: "field_safety", title: "Field Safety and Incident" },
+  { id: "field_vehicle_stock", title: "Vehicle Equipment and Stock" },
+  { id: "field_team", title: "Field Team Performance and Training" },
+  { id: "field_analytics", title: "Field Analytics and Improvement" },
 ];
 
 export const BUSINESS_PLAN_DEFAULT_FOCUS: readonly string[] = [

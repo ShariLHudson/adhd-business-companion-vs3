@@ -27,6 +27,10 @@
 - `business.content_creator` · active_business → `business.business_id` · wire_profile_load
 - `business.content_creator` · purpose → `business.vision` · wire_profile_load
 - `business.content_creator` · vision → `business.vision` · wire_profile_load
+- `business.contractor_construction` · active_business → `business.business_id` · wire_profile_load
+- `business.contractor_construction` · purpose → `business.vision` · wire_profile_load
+- `business.contractor_construction` · vision → `business.vision` · wire_profile_load
+- `business.contractor_construction` · constraints → `business.constraints` · wire_profile_load
 - `business.course_creator` · active_business → `business.business_id` · wire_profile_load
 - `business.course_creator` · purpose → `business.vision` · wire_profile_load
 - `business.course_creator` · vision → `business.vision` · wire_profile_load
@@ -41,11 +45,7 @@
 - `business.ecommerce` · channels → `business.channels` · wire_profile_load
 - `business.etsy` · active_business → `business.business_id` · wire_profile_load
 - `business.etsy` · purpose → `business.vision` · wire_profile_load
-- `business.etsy` · vision → `business.vision` · wire_profile_load
-- `business.handmade_online_store` · active_business → `business.business_id` · wire_profile_load
-- `business.handmade_online_store` · purpose → `business.vision` · wire_profile_load
-- `business.handmade_online_store` · vision → `business.vision` · wire_profile_load
-- …and 119 more
+- …and 135 more
 
 ## high
 
@@ -60,6 +60,7 @@
 - `business.coaching` · offers → `offer.name` · implement_prefill
 - `business.content_creator` · audience → `client_avatar.description` · implement_prefill
 - `business.content_creator` · buyers → `client_avatar.description` · implement_prefill
+- `business.contractor_construction` · offers → `offer.name` · implement_prefill
 - `business.course_creator` · course → `offer.name` · implement_prefill
 - `business.course_creator` · learner → `client_avatar.description` · implement_prefill
 - `business.course_creator` · demand → `client_avatar.goals` · implement_prefill
@@ -80,20 +81,21 @@
 - `business.handmade_online_store` · audience → `client_avatar.description` · implement_prefill
 - `business.handmade_online_store` · customers → `client_avatar.description` · implement_prefill
 - `business.handmade_online_store` · pricing → `offer.description` · implement_prefill
+- `business.home_service` · offers → `offer.name` · implement_prefill
+- `business.home_service` · pricing → `offer.description` · implement_prefill
 - `business.hospitality` · audience → `client_avatar.description` · implement_prefill
 - `business.hospitality` · customers → `client_avatar.description` · implement_prefill
 - `business.hospitality` · clients → `client_avatar.description` · implement_prefill
 - `business.membership` · membership → `offer.name` · implement_prefill
 - `business.membership` · member → `client_avatar.description` · implement_prefill
 - `business.membership` · fit → `client_avatar.description` · implement_prefill
-- `business.membership` · non_fit → `client_avatar.frustrations` · implement_prefill
-- `business.membership` · membership_model → `offer.description` · implement_prefill
-- `business.membership` · model → `offer.description` · implement_prefill
-- …and 43 more
+- …and 49 more
 
 ## moderate
 
 - `business.author` · author_identity → `business_dna.positioning` · suppress_repeat_question
+- `business.contractor_construction` · specialty → `business_dna.positioning` · suppress_repeat_question
+- `business.home_service` · specialty → `business_dna.positioning` · suppress_repeat_question
 - `business.hospitality` · specialty → `business_dna.positioning` · suppress_repeat_question
 - `business.professional_organizing` · specialty → `business_dna.positioning` · suppress_repeat_question
 - `business.restaurant` · specialty → `business_dna.positioning` · suppress_repeat_question
@@ -137,10 +139,10 @@
 - `business.content_creator` · topics → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.content_creator` · next_action → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.content_creator` · next_step → `blueprint_session.current_goal` · suppress_repeat_question
+- `business.contractor_construction` · services → `product_or_service.name` · suppress_repeat_question
+- `business.contractor_construction` · next_action → `blueprint_session.current_goal` · suppress_repeat_question
+- `business.contractor_construction` · next_step → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.course_creator` · next_action → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.course_creator` · next_step → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.craft_show` · products → `product_or_service.name` · suppress_repeat_question
-- `business.craft_show` · next_actions → `blueprint_session.current_goal` · suppress_repeat_question
-- `business.ecommerce` · products → `product_or_service.name` · suppress_repeat_question
-- `business.ecommerce` · next_action → `blueprint_session.current_goal` · suppress_repeat_question
-- …and 238 more
+- …and 248 more

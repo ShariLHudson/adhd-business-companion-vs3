@@ -1,5 +1,5 @@
 /**
- * 201–240 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality Blueprints.
+ * 201–244 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -13,19 +13,23 @@ import {
   CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
   COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
   DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
   ECOMMERCE_BUSINESS_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+  HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
   HOSPITALITY_BUSINESS_BLUEPRINT_ID,
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+  MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
   OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
   PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+  PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
@@ -114,7 +118,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with thirty-one Business Blueprints", () => {
+  it("registers Business Plan Work Type with thirty-five Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -150,9 +154,13 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         RESTAURANT_BUSINESS_BLUEPRINT_ID,
         TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
         VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
+        CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+        HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
+        PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+        MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(31);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(35);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -189,6 +197,10 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       RESTAURANT_BUSINESS_BLUEPRINT_ID,
       TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
       VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
+      CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+      HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
+      PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+      MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -372,6 +384,22 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
         guidedSection: "venue_capacity",
+      },
+      {
+        blueprintId: CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "gc_scope",
+      },
+      {
+        blueprintId: HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "hs_inquiry",
+      },
+      {
+        blueprintId: PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "pm_property",
+      },
+      {
+        blueprintId: MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+        guidedSection: "field_dispatch",
       },
     ];
     for (const c of cases) {
@@ -642,6 +670,42 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       originalUserMessage: "Help me build a venue experience business",
     });
     expect(venue.blueprintId).toBe(VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID);
+
+    const contractor = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a contractor construction business",
+    });
+    expect(contractor.blueprintId).toBe(
+      CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const homeService = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a home service business",
+    });
+    expect(homeService.blueprintId).toBe(HOME_SERVICE_BUSINESS_BLUEPRINT_ID);
+
+    const propertyMgmt = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a property management business",
+    });
+    expect(propertyMgmt.blueprintId).toBe(
+      PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const fieldOps = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me with mobile field service operations",
+    });
+    expect(fieldOps.blueprintId).toBe(
+      MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+    );
+
+    const genericService = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a service business operating system",
+    });
+    expect(genericService.blueprintId).toBe(SERVICE_BUSINESS_BLUEPRINT_ID);
 
     const marketing = inferWorkTypeAndBlueprint({
       origin: "create",

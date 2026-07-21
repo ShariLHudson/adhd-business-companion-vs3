@@ -11,7 +11,7 @@
 4. Rollback and validation required for each migration slice.
 
 **Open duplicate concepts:** 14
-**Open Blueprint gaps:** 1369
+**Open Blueprint gaps:** 1461
 
 ## Non-negotiable
 

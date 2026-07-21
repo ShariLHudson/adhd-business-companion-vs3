@@ -73,6 +73,15 @@
 | `business.content_creator` | topics | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.content_creator` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.content_creator` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.contractor_construction` | active_business | `business.business_id` | business | blocked |
+| `business.contractor_construction` | purpose | `business.vision` | business | blocked |
+| `business.contractor_construction` | vision | `business.vision` | business | blocked |
+| `business.contractor_construction` | specialty | `business_dna.positioning` | business_dna | blocked |
+| `business.contractor_construction` | services | `product_or_service.name` | product_or_service | blocked |
+| `business.contractor_construction` | offers | `offer.name` | offer | blocked |
+| `business.contractor_construction` | constraints | `business.constraints` | business | blocked |
+| `business.contractor_construction` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.contractor_construction` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.course_creator` | active_business | `business.business_id` | business | blocked |
 | `business.course_creator` | purpose | `business.vision` | business | blocked |
 | `business.course_creator` | vision | `business.vision` | business | blocked |
@@ -137,6 +146,13 @@
 | `business.holiday_planner` | launch | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.holiday_planner` | timeline | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.holiday_planner` | next_actions | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.home_service` | active_business | `business.business_id` | business | blocked |
+| `business.home_service` | services | `product_or_service.name` | product_or_service | blocked |
+| `business.home_service` | offers | `offer.name` | offer | blocked |
+| `business.home_service` | specialty | `business_dna.positioning` | business_dna | blocked |
+| `business.home_service` | pricing | `offer.description` | offer | blocked |
+| `business.home_service` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.home_service` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.hospitality` | active_business | `business.business_id` | business | blocked |
 | `business.hospitality` | purpose | `business.vision` | business | blocked |
 | `business.hospitality` | vision | `business.vision` | business | blocked |
@@ -195,6 +211,15 @@
 | `business.professional_organizing` | offers | `offer.name` | offer | blocked |
 | `business.professional_organizing` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.professional_organizing` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.property_management` | active_business | `business.business_id` | business | blocked |
+| `business.property_management` | purpose | `business.vision` | business | blocked |
+| `business.property_management` | vision | `business.vision` | business | blocked |
+| `business.property_management` | model | `offer.description` | offer | blocked |
+| `business.property_management` | clients | `client_avatar.description` | client_avatar | blocked |
+| `business.property_management` | audience | `client_avatar.description` | client_avatar | blocked |
+| `business.property_management` | constraints | `business.constraints` | business | blocked |
+| `business.property_management` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.property_management` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.restaurant` | active_business | `business.business_id` | business | blocked |
 | `business.restaurant` | purpose | `business.vision` | business | blocked |
 | `business.restaurant` | vision | `business.vision` | business | blocked |
@@ -472,6 +497,15 @@
 | `marketing_plan.simple` | energy | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `marketing_plan.simple` | risks | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `marketing_plan.simple` | assumptions | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `operations.mobile_field_service` | active_business | `business.business_id` | business | blocked |
+| `operations.mobile_field_service` | purpose | `business.vision` | business | blocked |
+| `operations.mobile_field_service` | process | `business.description` | business | blocked |
+| `operations.mobile_field_service` | workflow | `business.description` | business | blocked |
+| `operations.mobile_field_service` | roles | `business.constraints` | business | blocked |
+| `operations.mobile_field_service` | constraints | `business.constraints` | business | blocked |
+| `operations.mobile_field_service` | systems | `business.description` | business | blocked |
+| `operations.mobile_field_service` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `operations.mobile_field_service` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `organizing.digital_information` | active_business | `business.business_id` | business | blocked |
 | `organizing.digital_information` | purpose | `business.vision` | business | blocked |
 | `organizing.digital_information` | vision | `business.vision` | business | blocked |
@@ -533,4 +567,4 @@
 | `retail.store_management` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `retail.store_management` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 
-**Rows:** 527
+**Rows:** 561

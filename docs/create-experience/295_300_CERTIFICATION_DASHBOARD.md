@@ -18,18 +18,21 @@ Authority legend: **fully_create** · **prepare** · **user_provided** · **comp
 | `business.coaching` | **blocked** | 27 | 0 | 27 | 27 | 6 | 15 | 4 | 2 | 39 |
 | `business.consulting` | **blocked** | 29 | 0 | 29 | 29 | 7 | 16 | 4 | 2 | 41 |
 | `business.content_creator` | **blocked** | 29 | 0 | 29 | 29 | 7 | 14 | 6 | 2 | 41 |
+| `business.contractor_construction` | **blocked** | 26 | 0 | 26 | 26 | 8 | 8 | 5 | 5 | 38 |
 | `business.course_creator` | **blocked** | 28 | 0 | 28 | 28 | 8 | 15 | 3 | 2 | 40 |
 | `business.craft_show` | **blocked** | 35 | 0 | 35 | 35 | 10 | 13 | 8 | 4 | 47 |
 | `business.ecommerce` | **blocked** | 32 | 0 | 32 | 32 | 9 | 10 | 11 | 2 | 44 |
 | `business.etsy` | **blocked** | 23 | 0 | 23 | 23 | 8 | 7 | 6 | 2 | 35 |
 | `business.handmade_online_store` | **blocked** | 36 | 0 | 36 | 36 | 8 | 17 | 9 | 2 | 48 |
 | `business.holiday_planner` | **blocked** | 21 | 0 | 21 | 21 | 3 | 13 | 3 | 2 | 33 |
+| `business.home_service` | **blocked** | 23 | 0 | 23 | 23 | 8 | 9 | 4 | 2 | 35 |
 | `business.hospitality` | **blocked** | 19 | 0 | 19 | 19 | 8 | 3 | 6 | 2 | 31 |
 | `business.inventory_pricing` | **blocked** | 21 | 0 | 21 | 21 | 6 | 8 | 5 | 2 | 33 |
 | `business.membership` | **blocked** | 28 | 0 | 28 | 28 | 7 | 15 | 3 | 3 | 41 |
 | `business.product_based` | **blocked** | 29 | 0 | 29 | 29 | 7 | 14 | 6 | 2 | 41 |
 | `business.product_photography` | **blocked** | 21 | 0 | 21 | 21 | 5 | 9 | 4 | 3 | 33 |
 | `business.professional_organizing` | **blocked** | 29 | 0 | 29 | 29 | 7 | 12 | 7 | 3 | 41 |
+| `business.property_management` | **blocked** | 22 | 0 | 22 | 22 | 6 | 8 | 6 | 2 | 34 |
 | `business.restaurant` | **blocked** | 21 | 0 | 21 | 21 | 7 | 6 | 6 | 2 | 33 |
 | `business.retail_store` | **blocked** | 24 | 0 | 24 | 24 | 6 | 5 | 9 | 4 | 37 |
 | `business.service` | **blocked** | 27 | 0 | 27 | 27 | 10 | 11 | 4 | 2 | 39 |
@@ -50,6 +53,7 @@ Authority legend: **fully_create** · **prepare** · **user_provided** · **comp
 | `event.webinar` | **blocked** | 42 | 0 | 42 | 42 | 11 | 26 | 3 | 2 | 54 |
 | `event.workshop` | **blocked** | 54 | 0 | 54 | 54 | 16 | 34 | 3 | 1 | 66 |
 | `marketing_plan.simple` | **blocked** | 30 | 0 | 30 | 30 | 10 | 14 | 4 | 2 | 42 |
+| `operations.mobile_field_service` | **blocked** | 21 | 0 | 21 | 21 | 6 | 11 | 2 | 2 | 33 |
 | `organizing.digital_information` | **blocked** | 19 | 0 | 19 | 19 | 5 | 7 | 5 | 2 | 31 |
 | `organizing.operational_procedural` | **blocked** | 17 | 0 | 17 | 17 | 7 | 5 | 2 | 3 | 29 |
 | `organizing.physical_space` | **blocked** | 16 | 0 | 16 | 16 | 6 | 4 | 4 | 2 | 28 |
@@ -58,4 +62,4 @@ Authority legend: **fully_create** · **prepare** · **user_provided** · **comp
 | `retail.merchandising_promotions_cx` | **blocked** | 19 | 0 | 19 | 19 | 6 | 3 | 7 | 3 | 31 |
 | `retail.store_management` | **blocked** | 15 | 0 | 15 | 15 | 5 | 6 | 2 | 2 | 27 |
 
-**Pass:** 0 · **Blocked:** 48 · **Total:** 48
+**Pass:** 0 · **Blocked:** 52 · **Total:** 52

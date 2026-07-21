@@ -11,6 +11,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.author` — **Author Financial Model** → implement_structured
 - [ ] `business.coaching` — **Coaching Pricing Model** → implement_structured
 - [ ] `business.consulting` — **Pricing Model** → implement_structured
+- [ ] `business.contractor_construction` — **Estimate and Pricing Model** → implement_structured
 - [ ] `business.course_creator` — **Course Pricing Model** → implement_structured
 - [ ] `business.course_creator` — **Course KPI Dashboard** → implement_structured
 - [ ] `business.craft_show` — **Product and pricing sheet** → implement_structured
@@ -21,6 +22,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.etsy` — **Pricing and profitability view** → implement_structured
 - [ ] `business.handmade_online_store` — **Product and pricing sheet** → implement_structured
 - [ ] `business.holiday_planner` — **Seasonal inventory targets** → label_draft_only
+- [ ] `business.home_service` — **Pricing Model** → implement_structured
+- [ ] `business.home_service` — **Inquiry Scorecard** → implement_structured
 - [ ] `business.hospitality` — **Revenue Dashboard** → implement_structured
 - [ ] `business.inventory_pricing` — **Inventory and Pricing Plan** → implement_structured
 - [ ] `business.inventory_pricing` — **Cost of goods sheet** → implement_structured
@@ -30,6 +33,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.membership` — **Membership Health Dashboard** → implement_structured
 - [ ] `business.product_based` — **Cost and Pricing Architecture** → implement_structured
 - [ ] `business.professional_organizing` — **Pricing Model** → implement_structured
+- [ ] `business.property_management` — **Portfolio Dashboard Outline** → implement_structured
 - [ ] `business.restaurant` — **Food Cost Model** → implement_structured
 - [ ] `business.retail_store` — **Financial Model** → implement_structured
 - [ ] `business.service` — **Pricing Calculator** → implement_structured
@@ -63,6 +67,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.consulting` — **Delivery Plan** → label_draft_only
 - [ ] `business.content_creator` — **Content Creator Business Plan** → label_draft_only
 - [ ] `business.content_creator` — **Audience Growth Plan** → label_draft_only
+- [ ] `business.contractor_construction` — **Project Plan Template** → label_draft_only
 - [ ] `business.course_creator` — **Course Creator Business Plan** → label_draft_only
 - [ ] `business.course_creator` — **Content Production Plan** → label_draft_only
 - [ ] `business.craft_show` — **Craft Show Business Plan** → label_draft_only
@@ -75,6 +80,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.handmade_online_store` — **Launch / promotion outline** → label_draft_only
 - [ ] `business.holiday_planner` — **Holiday Product Plan** → label_draft_only
 - [ ] `business.holiday_planner` — **Launch timeline** → label_draft_only
+- [ ] `business.home_service` — **Recurring Maintenance Plan** → label_draft_only
 - [ ] `business.hospitality` — **Hospitality Operating Plan** → implement_composed
 - [ ] `business.membership` — **Membership Business Plan** → label_draft_only
 - [ ] `business.product_based` — **Validation Plan** → label_draft_only
@@ -200,6 +206,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `bp-event-online-workshop` — **Registration page copy** → label_draft_only
 - [ ] `bp-event-online-workshop` — **Follow-up email** → label_draft_only
 - [ ] `bp-event-three-day-retreat` — **Care & safety brief** → label_draft_only
+- [ ] `business.contractor_construction` — **Closeout Checklist** → label_draft_only
 - [ ] `business.craft_show` — **POS and checkout checklist** → label_draft_only
 - [ ] `business.etsy` — **Shop setup checklist** → label_draft_only
 - [ ] `business.etsy` — **Listing and SEO checklist** → label_draft_only
@@ -207,10 +214,12 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.handmade_online_store` — **Listing and SEO checklist** → label_draft_only
 - [ ] `business.handmade_online_store` — **Photography checklist** → label_draft_only
 - [ ] `business.handmade_online_store` — **Email and social rhythm** → label_draft_only
+- [ ] `business.home_service` — **Service Delivery Checklist** → label_draft_only
 - [ ] `business.product_based` — **Product Opportunity Brief** → label_draft_only
 - [ ] `business.product_based` — **Product Brief** → label_draft_only
 - [ ] `business.product_based` — **Packaging Brief** → label_draft_only
 - [ ] `business.product_photography` — **Marketplace image checklist** → label_draft_only
+- [ ] `business.property_management` — **Property Onboarding Checklist** → label_draft_only
 - [ ] `business.service` — **Proposal and Agreement Checklist** → label_draft_only
 - [ ] `business.speaker` — **Signature Talk Brief** → label_draft_only
 - [ ] `event.book_launch` — **Book positioning brief** → label_draft_only
@@ -251,6 +260,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `event.workshop` — **Accessibility checklist** → label_draft_only
 - [ ] `event.workshop` — **Promotion brief** → label_draft_only
 - [ ] `marketing_plan.simple` — **review checklist** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Job Intake Checklist** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Field Execution Checklist** → label_draft_only
 - [ ] `organizing.digital_information` — **Digital Maintenance Checklist** → label_draft_only
 - [ ] `organizing.physical_space` — **Maintenance Checklist** → label_draft_only
 - [ ] `retail.store_management` — **Daily Checklist** → label_draft_only
@@ -299,6 +310,12 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.content_creator` — **Media Kit Structure** → label_draft_only
 - [ ] `business.content_creator` — **Creator Operating System** → implement_composed
 - [ ] `business.content_creator` — **Next actions list** → connect_destination
+- [ ] `business.contractor_construction` — **Contractor Business Snapshot** → label_draft_only
+- [ ] `business.contractor_construction` — **Ideal Project Profile** → connect_destination
+- [ ] `business.contractor_construction` — **Scope of Work Template** → label_draft_only
+- [ ] `business.contractor_construction` — **Proposal Template** → label_draft_only
+- [ ] `business.contractor_construction` — **Change Order Path** → label_draft_only
+- [ ] `business.contractor_construction` — **Next actions list** → connect_destination
 - [ ] `business.course_creator` — **Course Opportunity Statement** → label_draft_only
 - [ ] `business.course_creator` — **Learner Profile** → label_draft_only
 - [ ] `business.course_creator` — **Course Model Comparison** → label_draft_only
@@ -330,6 +347,10 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.holiday_planner` — **Marketing campaign outline** → label_draft_only
 - [ ] `business.holiday_planner` — **Event integration notes** → label_draft_only
 - [ ] `business.holiday_planner` — **Next actions list** → connect_destination
+- [ ] `business.home_service` — **Home Service Menu** → label_draft_only
+- [ ] `business.home_service` — **Booking Workflow** → label_draft_only
+- [ ] `business.home_service` — **Routing Rules** → label_draft_only
+- [ ] `business.home_service` — **Next actions list** → connect_destination
 - [ ] `business.hospitality` — **Guest Journey Map** → label_draft_only
 - [ ] `business.hospitality` — **SOP Library** → label_draft_only
 - [ ] `business.hospitality` — **Next actions list** → connect_destination
@@ -360,6 +381,11 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.professional_organizing` — **Organizing Assessment** → label_draft_only
 - [ ] `business.professional_organizing` — **Maintenance Offer** → label_draft_only
 - [ ] `business.professional_organizing` — **Next actions list** → connect_destination
+- [ ] `business.property_management` — **Property Management Snapshot** → label_draft_only
+- [ ] `business.property_management` — **Owner Onboarding Pack** → label_draft_only
+- [ ] `business.property_management` — **Maintenance Priority Rules** → label_draft_only
+- [ ] `business.property_management` — **Vendor Directory Template** → label_draft_only
+- [ ] `business.property_management` — **Next actions list** → connect_destination
 - [ ] `business.restaurant` — **Menu Engineering Sheet** → label_draft_only
 - [ ] `business.restaurant` — **Kitchen Workflow** → label_draft_only
 - [ ] `business.restaurant` — **Food Safety Flags** → label_draft_only
@@ -501,6 +527,12 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `marketing_plan.simple` — **task list** → label_draft_only
 - [ ] `marketing_plan.simple` — **milestone view** → label_draft_only
 - [ ] `marketing_plan.simple` — **assumptions and risks** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Field Service Profile** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Dispatch Board Rules** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Pre-Visit Prep Pack** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Completion Workflow** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Safety and Incident Path** → label_draft_only
+- [ ] `operations.mobile_field_service` — **Next actions list** → connect_destination
 - [ ] `organizing.digital_information` — **Naming Convention Guide** → label_draft_only
 - [ ] `organizing.digital_information` — **Retrieval Rules** → label_draft_only
 - [ ] `organizing.digital_information` — **Next actions list** → connect_destination

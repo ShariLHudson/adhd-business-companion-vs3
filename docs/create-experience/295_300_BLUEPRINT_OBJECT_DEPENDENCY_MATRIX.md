@@ -188,6 +188,32 @@
 | `business.content_creator` | `create_artifact` | **prepare** | createability_destination | blocked | Media Kit Structure |
 | `business.content_creator` | `create_artifact` | **fully_create** | createability_destination | blocked | Creator Operating System |
 | `business.content_creator` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
+| `business.contractor_construction` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `business.contractor_construction` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `business.contractor_construction` | `business` | **user_provided** | system_required | blocked | active_business |
+| `business.contractor_construction` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `business.contractor_construction` | `create_artifact` | **fully_create** | deliverable | blocked | Contractor Business Snapshot |
+| `business.contractor_construction` | `project` | **completed_elsewhere** | deliverable | blocked | Ideal Project Profile |
+| `business.contractor_construction` | `template` | **fully_create** | deliverable | blocked | Scope of Work Template |
+| `business.contractor_construction` | `pricing_model` | **prepare** | deliverable | blocked | Estimate and Pricing Model |
+| `business.contractor_construction` | `proposal` | **fully_create** | deliverable | blocked | Proposal Template |
+| `business.contractor_construction` | `project` | **completed_elsewhere** | deliverable | blocked | Project Plan Template |
+| `business.contractor_construction` | `create_artifact` | **prepare** | deliverable | blocked | Change Order Path |
+| `business.contractor_construction` | `checklist` | **fully_create** | deliverable | blocked | Closeout Checklist |
+| `business.contractor_construction` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `business.contractor_construction` | `business` | **user_provided** | known_context | blocked | purpose |
+| `business.contractor_construction` | `business` | **user_provided** | known_context | blocked | vision |
+| `business.contractor_construction` | `service` | **user_provided** | known_context | blocked | services |
+| `business.contractor_construction` | `offer` | **user_provided** | known_context | blocked | offers |
+| `business.contractor_construction` | `create_artifact` | **prepare** | createability_destination | blocked | Contractor Business Snapshot |
+| `business.contractor_construction` | `project` | **completed_elsewhere** | createability_destination | blocked | Ideal Project Profile |
+| `business.contractor_construction` | `template` | **prepare** | createability_destination | blocked | Scope of Work Template |
+| `business.contractor_construction` | `pricing_model` | **fully_create** | createability_destination | blocked | Estimate and Pricing Model |
+| `business.contractor_construction` | `proposal` | **prepare** | createability_destination | blocked | Proposal Template |
+| `business.contractor_construction` | `project` | **prepare** | createability_destination | blocked | Project Plan Template |
+| `business.contractor_construction` | `create_artifact` | **prepare** | createability_destination | blocked | Change Order Path |
+| `business.contractor_construction` | `checklist` | **prepare** | createability_destination | blocked | Closeout Checklist |
+| `business.contractor_construction` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 | `business.course_creator` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
 | `business.course_creator` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
 | `business.course_creator` | `business` | **user_provided** | system_required | blocked | active_business |
@@ -363,6 +389,29 @@
 | `business.holiday_planner` | `create_artifact` | **prepare** | createability_destination | blocked | Marketing campaign outline |
 | `business.holiday_planner` | `create_artifact` | **prepare** | createability_destination | blocked | Event integration notes |
 | `business.holiday_planner` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
+| `business.home_service` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `business.home_service` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `business.home_service` | `business` | **user_provided** | system_required | blocked | active_business |
+| `business.home_service` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `business.home_service` | `create_artifact` | **prepare** | deliverable | blocked | Home Service Menu |
+| `business.home_service` | `pricing_model` | **prepare** | deliverable | blocked | Pricing Model |
+| `business.home_service` | `dashboard` | **prepare** | deliverable | blocked | Inquiry Scorecard |
+| `business.home_service` | `template` | **fully_create** | deliverable | blocked | Booking Workflow |
+| `business.home_service` | `create_artifact` | **prepare** | deliverable | blocked | Routing Rules |
+| `business.home_service` | `checklist` | **fully_create** | deliverable | blocked | Service Delivery Checklist |
+| `business.home_service` | `create_artifact` | **fully_create** | deliverable | blocked | Recurring Maintenance Plan |
+| `business.home_service` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `business.home_service` | `service` | **user_provided** | known_context | blocked | services |
+| `business.home_service` | `offer` | **user_provided** | known_context | blocked | offers |
+| `business.home_service` | `pricing_model` | **user_provided** | known_context | blocked | pricing |
+| `business.home_service` | `create_artifact` | **prepare** | createability_destination | blocked | Home Service Menu |
+| `business.home_service` | `pricing_model` | **fully_create** | createability_destination | blocked | Pricing Model |
+| `business.home_service` | `dashboard` | **fully_create** | createability_destination | blocked | Inquiry Scorecard |
+| `business.home_service` | `template` | **prepare** | createability_destination | blocked | Booking Workflow |
+| `business.home_service` | `create_artifact` | **prepare** | createability_destination | blocked | Routing Rules |
+| `business.home_service` | `checklist` | **prepare** | createability_destination | blocked | Service Delivery Checklist |
+| `business.home_service` | `create_artifact` | **prepare** | createability_destination | blocked | Recurring Maintenance Plan |
+| `business.home_service` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 | `business.hospitality` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
 | `business.hospitality` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
 | `business.hospitality` | `business` | **user_provided** | system_required | blocked | active_business |
@@ -510,6 +559,28 @@
 | `business.professional_organizing` | `project` | **prepare** | createability_destination | blocked | Organizing Project Plan |
 | `business.professional_organizing` | `offer` | **prepare** | createability_destination | blocked | Maintenance Offer |
 | `business.professional_organizing` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
+| `business.property_management` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `business.property_management` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `business.property_management` | `business` | **user_provided** | system_required | blocked | active_business |
+| `business.property_management` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `business.property_management` | `create_artifact` | **fully_create** | deliverable | blocked | Property Management Snapshot |
+| `business.property_management` | `create_artifact` | **prepare** | deliverable | blocked | Owner Onboarding Pack |
+| `business.property_management` | `checklist` | **fully_create** | deliverable | blocked | Property Onboarding Checklist |
+| `business.property_management` | `create_artifact` | **prepare** | deliverable | blocked | Maintenance Priority Rules |
+| `business.property_management` | `vendor_account` | **user_provided** | deliverable | blocked | Vendor Directory Template |
+| `business.property_management` | `dashboard` | **prepare** | deliverable | blocked | Portfolio Dashboard Outline |
+| `business.property_management` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `business.property_management` | `business` | **user_provided** | known_context | blocked | purpose |
+| `business.property_management` | `business` | **user_provided** | known_context | blocked | vision |
+| `business.property_management` | `client_avatar` | **user_provided** | known_context | blocked | clients |
+| `business.property_management` | `client_avatar` | **user_provided** | known_context | blocked | audience |
+| `business.property_management` | `create_artifact` | **prepare** | createability_destination | blocked | Property Management Snapshot |
+| `business.property_management` | `create_artifact` | **prepare** | createability_destination | blocked | Owner Onboarding Pack |
+| `business.property_management` | `checklist` | **prepare** | createability_destination | blocked | Property Onboarding Checklist |
+| `business.property_management` | `create_artifact` | **prepare** | createability_destination | blocked | Maintenance Priority Rules |
+| `business.property_management` | `vendor_account` | **prepare** | createability_destination | blocked | Vendor Directory Template |
+| `business.property_management` | `dashboard` | **fully_create** | createability_destination | blocked | Portfolio Dashboard Outline |
+| `business.property_management` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 | `business.restaurant` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
 | `business.restaurant` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
 | `business.restaurant` | `business` | **user_provided** | system_required | blocked | active_business |
@@ -1251,6 +1322,27 @@
 | `marketing_plan.simple` | `create_artifact` | **prepare** | createability_destination | blocked | assumptions and risks |
 | `marketing_plan.simple` | `checklist` | **prepare** | createability_destination | blocked | review checklist |
 | `marketing_plan.simple` | `create_artifact` | **prepare** | createability_destination | blocked | print/export output |
+| `operations.mobile_field_service` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `operations.mobile_field_service` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `operations.mobile_field_service` | `business` | **user_provided** | system_required | blocked | active_business |
+| `operations.mobile_field_service` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | deliverable | blocked | Field Service Profile |
+| `operations.mobile_field_service` | `checklist` | **fully_create** | deliverable | blocked | Job Intake Checklist |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | deliverable | blocked | Dispatch Board Rules |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | deliverable | blocked | Pre-Visit Prep Pack |
+| `operations.mobile_field_service` | `checklist` | **fully_create** | deliverable | blocked | Field Execution Checklist |
+| `operations.mobile_field_service` | `template` | **fully_create** | deliverable | blocked | Completion Workflow |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | deliverable | blocked | Safety and Incident Path |
+| `operations.mobile_field_service` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `operations.mobile_field_service` | `business` | **user_provided** | known_context | blocked | purpose |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | createability_destination | blocked | Field Service Profile |
+| `operations.mobile_field_service` | `checklist` | **prepare** | createability_destination | blocked | Job Intake Checklist |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | createability_destination | blocked | Dispatch Board Rules |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | createability_destination | blocked | Pre-Visit Prep Pack |
+| `operations.mobile_field_service` | `checklist` | **prepare** | createability_destination | blocked | Field Execution Checklist |
+| `operations.mobile_field_service` | `template` | **prepare** | createability_destination | blocked | Completion Workflow |
+| `operations.mobile_field_service` | `create_artifact` | **prepare** | createability_destination | blocked | Safety and Incident Path |
+| `operations.mobile_field_service` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 | `organizing.digital_information` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
 | `organizing.digital_information` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
 | `organizing.digital_information` | `business` | **user_provided** | system_required | blocked | active_business |
@@ -1375,4 +1467,4 @@
 | `retail.store_management` | `create_artifact` | **prepare** | createability_destination | blocked | Shift Handoff Guide |
 | `retail.store_management` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 
-**Rows:** 1369
+**Rows:** 1461

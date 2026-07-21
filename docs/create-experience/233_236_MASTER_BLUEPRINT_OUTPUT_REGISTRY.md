@@ -72,6 +72,15 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.content_creator` | 1.0.0 | business_plan | Media Kit Structure | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.content_creator` | 1.0.0 | business_plan | Creator Operating System | document | composed | blocked | Create (unspecified) | yes |
 | `business.content_creator` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Contractor Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Ideal Project Profile | project | connected | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Scope of Work Template | template | draft_only | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Estimate and Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Proposal Template | template | draft_only | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Project Plan Template | template | draft_only | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Change Order Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Closeout Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.contractor_construction` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.course_creator` | 1.0.0 | business_plan | Course Creator Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.course_creator` | 1.0.0 | business_plan | Course Opportunity Statement | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.course_creator` | 1.0.0 | business_plan | Learner Profile | document | draft_only | blocked | Create (unspecified) | yes |
@@ -132,6 +141,14 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.holiday_planner` | 1.0.0 | business_plan | Marketing campaign outline | campaign | draft_only | blocked | Create (unspecified) | yes |
 | `business.holiday_planner` | 1.0.0 | business_plan | Event integration notes | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.holiday_planner` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Home Service Menu | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Inquiry Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Booking Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Routing Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Service Delivery Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Recurring Maintenance Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.home_service` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.hospitality` | 1.0.0 | business_plan | Hospitality Operating Plan | plan | composed | blocked | Create (unspecified) | yes |
 | `business.hospitality` | 1.0.0 | business_plan | Guest Journey Map | map | draft_only | blocked | Create (unspecified) | yes |
 | `business.hospitality` | 1.0.0 | business_plan | SOP Library | workflow | draft_only | blocked | Create (unspecified) | yes |
@@ -182,6 +199,13 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.professional_organizing` | 1.0.0 | business_plan | Organizing Project Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.professional_organizing` | 1.0.0 | business_plan | Maintenance Offer | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.professional_organizing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.property_management` | 1.0.0 | business_plan | Property Management Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.property_management` | 1.0.0 | business_plan | Owner Onboarding Pack | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.property_management` | 1.0.0 | business_plan | Property Onboarding Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.property_management` | 1.0.0 | business_plan | Maintenance Priority Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.property_management` | 1.0.0 | business_plan | Vendor Directory Template | template | draft_only | blocked | Create (unspecified) | yes |
+| `business.property_management` | 1.0.0 | business_plan | Portfolio Dashboard Outline | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.property_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.restaurant` | 1.0.0 | business_plan | Restaurant Operating Plan | plan | composed | blocked | Create (unspecified) | yes |
 | `business.restaurant` | 1.0.0 | business_plan | Menu Engineering Sheet | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.restaurant` | 1.0.0 | business_plan | Food Cost Model | financial_model | structured | blocked | Create (unspecified) | yes |
@@ -480,6 +504,14 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | assumptions and risks | document | draft_only | blocked | Create (unspecified) | yes |
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | review checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | print/export output | document | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Field Service Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Job Intake Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Dispatch Board Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Pre-Visit Prep Pack | document | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Field Execution Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Completion Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Safety and Incident Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `operations.mobile_field_service` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `organizing.digital_information` | 1.0.0 | business_plan | Digital Information Organization Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `organizing.digital_information` | 1.0.0 | business_plan | Information Inventory | document | draft_only | blocked | Create (unspecified) | yes |
 | `organizing.digital_information` | 1.0.0 | business_plan | Naming Convention Guide | document | draft_only | blocked | Create (unspecified) | yes |
@@ -519,4 +551,4 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `retail.store_management` | 1.0.0 | business_plan | Shift Handoff Guide | document | draft_only | blocked | Create (unspecified) | yes |
 | `retail.store_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 
-**Total outputs:** 510
+**Total outputs:** 542

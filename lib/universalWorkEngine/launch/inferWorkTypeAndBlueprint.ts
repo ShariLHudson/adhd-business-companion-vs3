@@ -30,8 +30,12 @@ import {
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+  HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
   HOSPITALITY_BUSINESS_BLUEPRINT_ID,
+  MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+  PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
@@ -158,6 +162,12 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-travel-business": TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
   "bp-venue-experience": VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
   "bp-venue-business": VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
+  "bp-contractor": CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+  "bp-contractor-construction": CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+  "bp-home-service": HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
+  "bp-property-management": PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+  "bp-mobile-field-service": MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+  "bp-field-service": MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -244,6 +254,27 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(consulting\s+business|consultant\s+business|consulting\s+blueprint|business\.consulting)\b/i,
     blueprintId: CONSULTING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Field/home/property before generic service and before hospitality lodging
+    re: /\b(mobile\s+(?:and\s+)?field\s+service|field\s+service\s+operations|field\s+dispatch|operations\.mobile_field_service)\b/i,
+    blueprintId: MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(contractor(?:\s+(?:and\s+)?construction)?(?:\s+business)?|construction\s+business|general\s+contractor(?:\s+business)?|business\.contractor_construction)\b/i,
+    blueprintId: CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(home\s+service(?:\s+business)?|residential\s+service\s+business|business\.home_service)\b/i,
+    blueprintId: HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(property\s+management(?:\s+business)?|property\s+manager\s+business|business\.property_management)\b/i,
+    blueprintId: PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {

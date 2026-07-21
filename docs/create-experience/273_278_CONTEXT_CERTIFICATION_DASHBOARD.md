@@ -14,18 +14,21 @@
 | `business.coaching` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.consulting` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 20 |
 | `business.content_creator` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 22 |
+| `business.contractor_construction` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.course_creator` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.craft_show` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.ecommerce` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.etsy` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.handmade_online_store` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.holiday_planner` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
+| `business.home_service` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 17 |
 | `business.hospitality` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.inventory_pricing` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.membership` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.product_based` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 22 |
 | `business.product_photography` | 1.0.0 | **blocked** | 6 | 0 | 6 | 6 | 16 |
 | `business.professional_organizing` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
+| `business.property_management` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.restaurant` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.retail_store` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 22 |
 | `business.service` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
@@ -46,6 +49,7 @@
 | `event.webinar` | 1.0.0 | **blocked** | 17 | 0 | 17 | 17 | 27 |
 | `event.workshop` | 1.0.0 | **blocked** | 20 | 0 | 20 | 20 | 30 |
 | `marketing_plan.simple` | 1.0.0 | **blocked** | 23 | 0 | 23 | 23 | 33 |
+| `operations.mobile_field_service` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `organizing.digital_information` | 1.0.0 | **blocked** | 8 | 0 | 8 | 8 | 18 |
 | `organizing.operational_procedural` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `organizing.physical_space` | 1.0.0 | **blocked** | 8 | 0 | 8 | 8 | 18 |
@@ -54,6 +58,6 @@
 | `retail.merchandising_promotions_cx` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `retail.store_management` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 
-**Pass:** 0 · **Blocked:** 48 · **Total:** 48
+**Pass:** 0 · **Blocked:** 52 · **Total:** 52
 
 Production rule: Createability **and** Context Connection must both pass.
