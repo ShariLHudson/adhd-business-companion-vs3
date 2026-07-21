@@ -71,11 +71,13 @@ export function resolveWorkTypeIdFromMemberLabel(
   if (/checklist/.test(t)) return "checklist";
   if (/proposal/.test(t)) return "proposal";
   if (
-    /\b(craft\s+show\s+(?:business|blueprint)|handmade|maker\s+business|etsy\s+(?:shop|store)|art\s+fair\s+business)\b/.test(
+    /\b(craft\s+show\s+(?:business|blueprint)|handmade|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+(?:product\s+)?planner|seasonal\s+planner|art\s+fair\s+business)\b/.test(
       t,
     ) ||
     (t.includes("business plan") &&
-      /\b(craft|handmade|maker|show|store|etsy)\b/.test(t))
+      /\b(craft|handmade|maker|show|store|etsy|holiday|inventory|photography)\b/.test(
+        t,
+      ))
   ) {
     return "business_plan";
   }

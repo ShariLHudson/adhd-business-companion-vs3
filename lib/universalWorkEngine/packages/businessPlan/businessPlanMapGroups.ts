@@ -1,5 +1,5 @@
 /**
- * Business Plan map groups — schema config only (201–202).
+ * Business Plan map groups — schema config only (201–206).
  */
 
 import type { BlueprintGroup } from "../../blueprints/types";
@@ -18,6 +18,8 @@ export const BUSINESS_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
       "positioning",
       "pricing",
       "inventory",
+      "shop_setup",
+      "branding",
     ],
   },
   {
@@ -54,17 +56,70 @@ export const BUSINESS_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
       "shipping_packaging",
       "customer_service",
       "reviews_reputation",
+      "ads",
       "email_marketing",
       "social_pinterest",
       "launches_promotions",
+      "seasonal_planning",
       "automation",
+    ],
+  },
+  {
+    groupId: "product_photography",
+    title: "Product Photography",
+    description: "Shot lists, lighting, styling, editing, and marketplace specs.",
+    order: 3,
+    collapsedByDefault: true,
+    sectionIds: [
+      "shot_lists",
+      "lighting",
+      "backgrounds",
+      "styling",
+      "lifestyle_images",
+      "video_clips",
+      "editing_workflow",
+      "image_organization",
+      "accessibility_alt_text",
+      "marketplace_image_requirements",
+    ],
+  },
+  {
+    groupId: "inventory_pricing",
+    title: "Inventory and Pricing",
+    description: "Costs, margins, forecasting, and stock decisions.",
+    order: 4,
+    collapsedByDefault: true,
+    sectionIds: [
+      "cost_of_goods",
+      "labor_cost",
+      "overhead",
+      "profit_margin",
+      "inventory_forecasting",
+      "bundles",
+      "seasonal_stock",
+      "reorder_points",
+      "best_sellers",
+      "dead_inventory",
+    ],
+  },
+  {
+    groupId: "holiday_collections",
+    title: "Holiday Collections",
+    description: "Seasonal collections, production, and launch timing.",
+    order: 5,
+    collapsedByDefault: true,
+    sectionIds: [
+      "collection_planning",
+      "production_schedule",
+      "launch_timeline",
+      "seasonal_campaigns",
     ],
   },
   {
     groupId: "stewardship",
     title: "Money and Stewardship",
     description: "Profit, taxes, analytics, linked work, and review.",
-    order: 3,
+    order: 6,
     collapsedByDefault: true,
     sectionIds: [
       "expenses_taxes",

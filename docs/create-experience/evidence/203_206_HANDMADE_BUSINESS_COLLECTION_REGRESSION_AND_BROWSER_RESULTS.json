@@ -1,0 +1,31 @@
+{
+  "date": "2026-07-21",
+  "prompts": ["203", "204", "205", "206"],
+  "workTypeId": "business_plan",
+  "blueprintIds": [
+    "business.etsy",
+    "business.product_photography",
+    "business.inventory_pricing",
+    "business.holiday_planner"
+  ],
+  "verdict": "BLUEPRINT PRODUCTION CERTIFIED",
+  "businessPlanBlueprintCount": 6,
+  "suites": {
+    "businessPlan.foundation.cert.test.ts": { "passed": 9, "failed": 0 },
+    "handmadeBusinessCollection.browserChecklist.test.tsx": {
+      "passed": 4,
+      "failed": 0
+    },
+    "craftShowBusiness.browserChecklist.test.tsx": { "passed": 1, "failed": 0 },
+    "handmadeOnlineStoreBusiness.browserChecklist.test.tsx": {
+      "passed": 1,
+      "failed": 0
+    },
+    "createFastPath.test.ts": { "passed": 19, "failed": 0 }
+  },
+  "totals": { "files": 5, "passed": 34, "failed": 0 },
+  "notes": [
+    "Etsy NL resolves to business.etsy before handmade online store",
+    "Holiday product planner NL before Event product launch language"
+  ]
+}

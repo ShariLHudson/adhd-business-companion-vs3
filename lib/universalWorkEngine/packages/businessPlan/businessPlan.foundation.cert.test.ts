@@ -1,5 +1,5 @@
 /**
- * 201–202 — Business Plan Work Type + Crafter Business Blueprints foundation.
+ * 201–206 — Business Plan Work Type + Handmade / Crafter Business Blueprints foundation.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -8,7 +8,11 @@ import { join } from "node:path";
 import {
   BUSINESS_PLAN_BLUEPRINT_IDS,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+  HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+  INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+  PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   addWorkMilestone,
   addWorkTask,
   answerBlueprintQuestion,
@@ -67,7 +71,7 @@ function walkTsFiles(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-describe("201–202 — Business Plan Work Type foundation", () => {
+describe("201–206 — Business Plan Work Type foundation", () => {
   beforeEach(() => {
     resetWorkIdentityStoreForTests();
     resetWorkRelationshipsForTests();
@@ -85,23 +89,31 @@ describe("201–202 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with both crafter Blueprints", () => {
+  it("registers Business Plan Work Type with six handmade Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
       expect.arrayContaining([
         CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
         HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+        ETSY_BUSINESS_BLUEPRINT_ID,
+        PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+        INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+        HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(2);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(6);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
-  it("registers both Blueprints on business_plan only", () => {
+  it("registers all Business Blueprints on business_plan only", () => {
     for (const id of [
       CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
       HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+      ETSY_BUSINESS_BLUEPRINT_ID,
+      PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+      INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+      HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -168,6 +180,44 @@ describe("201–202 — Business Plan Work Type foundation", () => {
     expect(active).toContain("listings_seo");
   });
 
+  it("203–206 depth modes preserve one Work ID and reveal domain sections", () => {
+    const cases: {
+      blueprintId: string;
+      guidedSection: string;
+    }[] = [
+      { blueprintId: ETSY_BUSINESS_BLUEPRINT_ID, guidedSection: "listings_seo" },
+      {
+        blueprintId: PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "lighting",
+      },
+      {
+        blueprintId: INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "reorder_points",
+      },
+      {
+        blueprintId: HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "seasonal_campaigns",
+      },
+    ];
+    for (const c of cases) {
+      const init = initializeWorkFromBlueprint({
+        workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+        blueprintId: c.blueprintId,
+        depthMode: "quick_start",
+        origin: "create",
+      });
+      changeBlueprintDepthMode(init.workId, "guided_build");
+      expect(getWorkBlueprintState(init.workId)?.workId).toBe(init.workId);
+      const bp = getBlueprint(c.blueprintId)!;
+      const active = resolveActiveSections(
+        bp.sections,
+        getWorkBlueprintState(init.workId)!,
+        "guided_build",
+      ).visibleSectionIds;
+      expect(active).toContain(c.guidedSection);
+    }
+  });
+
   it("tasks, milestones, research, and projects use universal infrastructure", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
@@ -231,7 +281,7 @@ describe("201–202 — Business Plan Work Type foundation", () => {
     ).toBe(true);
   });
 
-  it("NL resolves craft show business and handmade store; Event and Marketing stay distinct", () => {
+  it("NL resolves handmade Business Blueprints; Event and Marketing stay distinct", () => {
     expect(isBusinessPlanCreationRequest("Help me build a craft show business")).toBe(
       true,
     );
@@ -251,6 +301,31 @@ describe("201–202 — Business Plan Work Type foundation", () => {
     });
     expect(store.workTypeId).toBe(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(store.blueprintId).toBe(HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID);
+
+    const etsy = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me grow my Etsy shop",
+    });
+    expect(etsy.workTypeId).toBe(BUSINESS_PLAN_WORK_TYPE_ID);
+    expect(etsy.blueprintId).toBe(ETSY_BUSINESS_BLUEPRINT_ID);
+
+    const photo = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me plan product photography for my listings",
+    });
+    expect(photo.blueprintId).toBe(PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID);
+
+    const inventory = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me with inventory and pricing",
+    });
+    expect(inventory.blueprintId).toBe(INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID);
+
+    const holiday = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me use the holiday product planner",
+    });
+    expect(holiday.blueprintId).toBe(HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID);
 
     const marketing = inferWorkTypeAndBlueprint({
       origin: "create",

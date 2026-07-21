@@ -14,7 +14,11 @@ import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/market
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import {
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+  HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+  INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+  PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
 } from "../packages/businessPlan/businessBlueprintDefinitions";
 import {
   BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
@@ -78,6 +82,14 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-craft-show": CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
   "bp-handmade-online-store": HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   "bp-handmade-store": HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+  "bp-etsy-business": ETSY_BUSINESS_BLUEPRINT_ID,
+  "bp-etsy": ETSY_BUSINESS_BLUEPRINT_ID,
+  "bp-product-photography": PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  "bp-product-photography-studio": PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  "bp-inventory-pricing": INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+  "bp-inventory-and-pricing": INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+  "bp-holiday-product-planner": HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+  "bp-holiday-planner": HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -97,7 +109,29 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
-    re: /\b(handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store)|business\.handmade_online_store)\b/i,
+    // Etsy-specific before multi-marketplace handmade store
+    re: /\b(etsy\s+(?:business|blueprint|shop|store)|business\.etsy)\b/i,
+    blueprintId: ETSY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(product\s+photography(?:\s+(?:studio|blueprint))?|photography\s+studio\s+blueprint|business\.product_photography)\b/i,
+    blueprintId: PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(inventory\s+(?:and\s+)?pricing(?:\s+blueprint)?|pricing\s+and\s+inventory|business\.inventory_pricing)\b/i,
+    blueprintId: INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Holiday product planner before Event product launch language
+    re: /\b(holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner|christmas\s+collection\s+planner|business\.holiday_planner)\b/i,
+    blueprintId: HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|business\.handmade_online_store)\b/i,
     blueprintId: HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
@@ -263,11 +297,11 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
     workTypeId = MARKETING_PLAN_WORK_TYPE_ID;
   }
 
-  // Default Business Plan when message clearly asks for crafter business blueprints
+  // Default Business Plan when message clearly asks for crafter / handmade business blueprints
   if (
     !workTypeId &&
     message &&
-    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store))\b/i.test(
+    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner)\b/i.test(
       message,
     )
   ) {
