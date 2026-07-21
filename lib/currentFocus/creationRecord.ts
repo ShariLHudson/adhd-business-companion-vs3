@@ -245,15 +245,19 @@ export function ensureRuntimeCreationRecord(
     templateSections,
     schemaVersion: WORKSPACE_SCHEMA_VERSION,
     focusSectionId:
-      workflow.workspaceCurrentFocus?.sectionId ??
-      focusSection?.id ??
-      existing?.focusSectionId ??
-      templateSections[0]?.id ??
+      workflow.activeSectionId?.trim() ||
+      workflow.workspaceCurrentFocus?.sectionId ||
+      focusSection?.id ||
+      existing?.focusSectionId ||
+      templateSections[0]?.id ||
       null,
     currentFocusTitle:
-      workflow.workspaceCurrentFocus?.title ??
-      focusSection?.label ??
-      existing?.currentFocusTitle ??
+      (workflow.activeSectionId &&
+        templateSections.find((s) => s.id === workflow.activeSectionId)
+          ?.label) ||
+      workflow.workspaceCurrentFocus?.title ||
+      focusSection?.label ||
+      existing?.currentFocusTitle ||
       null,
     selectedTemplateId:
       workflow.selectedTemplateId ?? existing?.selectedTemplateId ?? null,

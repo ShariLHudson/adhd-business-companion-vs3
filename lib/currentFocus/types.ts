@@ -32,6 +32,8 @@ export type CanonicalCurrentFocus = {
   sectionId?: string | null;
   assetTypeId?: string | null;
   introductoryGuidance?: string | null;
+  /** Latest saved section body — editor seeds from this when opening the section. */
+  savedContent?: string | null;
 };
 
 export type SubmitCurrentFocusResponseInput = {

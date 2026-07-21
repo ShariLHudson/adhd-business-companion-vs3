@@ -1,22 +1,14 @@
 /**
- * 077 — Shared map → Current Focus open. Work-type agnostic.
+ * 077 / 098 — Shared map → Current Focus open. Work-type agnostic.
+ * Authoritative selection via Universal Work Engine section runtime.
  */
 
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
-import { setWorkspaceV2ActiveSection } from "@/lib/createWorkspaceActiveSection";
+import { selectWorkSection } from "@/lib/universalWorkEngine";
 
 export function openWorkshopMapSection(
   workflow: CreateWorkflowState,
   sectionId: string,
 ): CreateWorkflowState {
-  const id = sectionId.trim();
-  if (!id) return workflow;
-  return setWorkspaceV2ActiveSection(
-    {
-      ...workflow,
-      showAllWorkspaceSections: true,
-      workspaceFirst: true,
-    },
-    id,
-  );
+  return selectWorkSection(workflow, sectionId);
 }

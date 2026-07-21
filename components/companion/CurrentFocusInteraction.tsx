@@ -62,21 +62,23 @@ export function CurrentFocusInteraction({
     typeof window !== "undefined"
       ? readFocusRecoveryBuffer(focus.creationId, focus.focusId)
       : null;
-  const [draft, setDraft] = useState(() => recovered ?? "");
+  const seedContent = () =>
+    recovered ?? focus.savedContent?.trim() ?? "";
+  const [draft, setDraft] = useState(seedContent);
   const [localLocked, setLocalLocked] = useState(false);
   const [recoveredOnce, setRecoveredOnce] = useState(() => Boolean(recovered));
   const focusIdRef = useRef(focus.focusId);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const autosaveTimer = useRef<number | null>(null);
 
-  // Synchronous reset when focus advances (before paint — no leftover Outcomes text)
+  // Synchronous reset when focus advances (before paint — no leftover prior section)
   if (focusIdRef.current !== focus.focusId) {
     focusIdRef.current = focus.focusId;
     const nextRecovered =
       typeof window !== "undefined"
         ? readFocusRecoveryBuffer(focus.creationId, focus.focusId)
         : null;
-    setDraft(nextRecovered ?? "");
+    setDraft(nextRecovered ?? focus.savedContent?.trim() ?? "");
     setRecoveredOnce(Boolean(nextRecovered));
     if (localLocked) {
       setLocalLocked(false);
@@ -190,7 +192,7 @@ export function CurrentFocusInteraction({
       </p>
 
       <textarea
-        key={focus.focusId}
+        key={`${focus.creationId}:${focus.sectionId ?? focus.focusId}`}
         ref={textareaRef}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
@@ -199,8 +201,9 @@ export function CurrentFocusInteraction({
         placeholder="Answer here…"
         className="w-full resize-y rounded-xl border border-[#cfc6b8] bg-white px-3 py-3 text-base leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#8a7a68] focus:outline-none focus:ring-2 focus:ring-[#c4b8a8]/50"
         data-testid="current-focus-response"
+        data-section-id={focus.sectionId ?? undefined}
         data-initial-empty={draft === "" ? "true" : "false"}
-        aria-label="Current Focus response"
+        aria-label={`Current Focus response for ${focus.title}`}
       />
 
       {guidance ? (

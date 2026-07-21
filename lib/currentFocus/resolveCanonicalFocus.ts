@@ -240,6 +240,7 @@ function focusFromActiveSection(
     contextVersion: version || 1,
     sectionId: section.id,
     assetTypeId: null,
+    savedContent: section.content,
     introductoryGuidance:
       "Opened from your Full Workshop Map. Your work stays with this section.",
   };

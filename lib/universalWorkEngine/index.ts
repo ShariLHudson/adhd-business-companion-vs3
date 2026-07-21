@@ -92,3 +92,28 @@ export {
 } from "./boundaries/durableAccessGuard";
 
 export { ensureEventPlanWorkTypeRegistered } from "./packages/eventPlan/registerEventPlanWorkType";
+
+export type {
+  WorkSection,
+  WorkSectionStatus,
+  AssembledWorkOutput,
+  AssembleWorkValidation,
+} from "./sectionRuntime/types";
+export {
+  listOrderedWorkSections,
+  resolveActiveSectionId,
+  getActiveWorkSection,
+  selectWorkSection,
+  updateWorkSectionContent,
+  completeWorkSection,
+  reopenWorkSection,
+  resolveWorkIdFromWorkflow,
+  completeItNow,
+  createUniversalSectionRuntime,
+} from "./sectionRuntime/universalSectionRuntime";
+export {
+  assembleWorkFromWorkflow,
+  validateWorkForAssembly,
+  applyAssembledOutputToWorkflow,
+  markAssembledOutputStale,
+} from "./sectionRuntime/assembleWork";

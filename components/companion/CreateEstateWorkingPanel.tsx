@@ -25,6 +25,7 @@ import {
 } from "@/lib/createWorkspaceV2";
 import { runCreateAssistance } from "@/lib/createContextualAssistance";
 import { resolveFacilitatedSectionStatus } from "@/lib/facilitatedCreation";
+import { completeItNow } from "@/lib/universalWorkEngine";
 import { openWorkshopMapSection } from "@/lib/workTypeSchema";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
@@ -126,14 +127,22 @@ export function CreateEstateWorkingPanel({
     }
   }, [focusSubmitting, focusFailure]);
 
+  const activeSectionContent =
+    workflow.activeSectionId && workflow.sectionContent
+      ? workflow.sectionContent[workflow.activeSectionId] ?? ""
+      : "";
   const canonicalFocus = useMemo(
     () => resolveFocusForCreationDestination(workflow),
     [
       workflow.eventRecordId,
       workflow.sessionId,
+      workflow.activeSectionId,
+      activeSectionContent,
       workflow.sectionContent,
       workflow.skippedSectionIds,
+      workflow.completedSectionIds,
       workflow.workspaceCurrentFocus?.title,
+      workflow.workspaceCurrentFocus?.sectionId,
       workflow.workspaceKnownFacts?.join("|"),
       workflow.draftContent,
       workflow.selectedTypeLabel,
@@ -357,7 +366,7 @@ export function CreateEstateWorkingPanel({
             ) : null}
 
             <CurrentFocusInteraction
-              key={canonicalFocus.focusId}
+              key={`${canonicalFocus.creationId}:${canonicalFocus.sectionId ?? canonicalFocus.focusId}`}
               focus={{
                 ...canonicalFocus,
                 // Never echo purpose as intro when they match.
@@ -513,15 +522,59 @@ export function CreateEstateWorkingPanel({
               </div>
             ) : null}
 
-            <button
-              type="button"
-              onClick={onBuildDraftInFocus}
-              disabled={building || focusSubmitting}
-              className="mt-2 text-sm font-semibold text-[#1e4f4f] underline disabled:opacity-40"
-              data-testid="current-focus-build-draft"
-            >
-              {building ? "Building your draft…" : "Build a draft here"}
-            </button>
+            <div className="mt-2 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={onBuildDraftInFocus}
+                disabled={building || focusSubmitting}
+                className="text-sm font-semibold text-[#1e4f4f] underline disabled:opacity-40"
+                data-testid="current-focus-build-draft"
+              >
+                {building ? "Building your draft…" : "Build a draft here"}
+              </button>
+              <button
+                type="button"
+                disabled={focusSubmitting}
+                data-testid="complete-it-now"
+                onClick={() => {
+                  const result = completeItNow(workflow);
+                  if (!result.ok) {
+                    setLocalGuidance(
+                      result.validation.message ||
+                        "A few sections still need a little more before we assemble the full piece.",
+                    );
+                    return;
+                  }
+                  setLocalGuidance(null);
+                  onWorkflowChange(result.workflow);
+                }}
+                className="rounded-xl border border-[#1e4f4f]/35 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
+              >
+                Complete It Now
+              </button>
+            </div>
+
+            {workflow.assembledOutput?.body ? (
+              <section
+                className="mt-4 rounded-2xl border border-[#c9bfb0] bg-[#faf7f2] px-4 py-3"
+                data-testid="assembled-complete-piece"
+                data-work-id={workflow.assembledOutput.workId}
+                data-stale={workflow.assembledOutput.stale ? "true" : "false"}
+              >
+                <h3 className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+                  Complete piece
+                </h3>
+                {workflow.assembledOutput.stale ? (
+                  <p className="mt-1 text-sm text-[#5c4030]">
+                    Sections changed since this was assembled. Complete It Now
+                    again to refresh.
+                  </p>
+                ) : null}
+                <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-[#1f1c19]">
+                  {workflow.assembledOutput.body}
+                </pre>
+              </section>
+            ) : null}
 
             {workflow.workspaceSecondaryRecommendations &&
             workflow.workspaceSecondaryRecommendations.length > 0 ? (
