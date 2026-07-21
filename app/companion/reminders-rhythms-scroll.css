@@ -1,0 +1,5 @@
+/* Reminders / Rhythms room list scroll helpers */
+.reminders-rhythms-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
