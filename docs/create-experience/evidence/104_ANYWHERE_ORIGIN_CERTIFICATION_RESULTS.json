@@ -1,0 +1,3505 @@
+{
+  "schemaVersion": "104.1",
+  "workTypeId": "event_plan",
+  "commitUnderTest": "62a06287d66cf721b1af1b3a68a83ef2992769b1",
+  "environment": "vitest/node; win32; node v24.11.1",
+  "generatedAt": "2026-07-21T15:30:56.283Z",
+  "testCommand": "npx vitest run lib/universalWorkEngine/launch/certification/anywhereOriginCertification.cert.test.ts",
+  "levels": {
+    "L1_architecture": {
+      "status": "pass",
+      "notes": "UWE identity, Work Type registry, Blueprint registry, durable boundaries"
+    },
+    "L2_automated": {
+      "status": "pass",
+      "notes": "core scenarios + matrices; 507 passed / 0 failed"
+    },
+    "L3_experience": {
+      "status": "pass",
+      "notes": "jsdom founder checklist (102) + launch contract UX copy checks"
+    },
+    "L4_adhd": {
+      "status": "pass",
+      "notes": "three paths, progressive disclosure, save reassurance, depth safety"
+    },
+    "L5_domain": {
+      "status": "pass",
+      "notes": "five Event Blueprints exercised across required origin matrix"
+    },
+    "L6_production": {
+      "status": "pass",
+      "notes": "no automatic release blockers; residual conditions documented"
+    }
+  },
+  "originMatrix": [
+    {
+      "origin": "create",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-91ac239253174faf",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=create bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-9c35e1a8f31e4e93",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=projects bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "strategies",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-288b901293d64d0f",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=strategies bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-51c90cfa393c4607",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=blueprints bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "cartography",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-10caf96e3eb24c43",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=cartography bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-7c3b0037470b49be",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=body_doubling bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-6107e1289d0e400b",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=conversation bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "chamber",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-d4a27fb033204144",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=chamber bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "board",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-dba3737789164688",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=board bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "research",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-372fd0283851490f",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=research bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "clear_my_mind",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-2ae92c7e7ae04391",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=clear_my_mind bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "tasks",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-fe1e785ac81d4b76",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=tasks bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "welcome_home",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-bf4feb3ad0d64386",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=welcome_home bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "templates",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-506be234d8be40a6",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=templates bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "create",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-1d3c28266c614839",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=create bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-f28cc9217922445b",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=projects bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "strategies",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-b64cc1b9c4974b7a",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=strategies bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-e1daf282685e49d8",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=blueprints bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "cartography",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-3378921fc9674e48",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=cartography bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-ed2f29ae6dd345bf",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=body_doubling bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-e6c6adc17a2e4ee6",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=conversation bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "chamber",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-03b00c915e2c478e",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=chamber bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "board",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-80c2cbed88d24b9d",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=board bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "research",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-1a63d4b657dd4a82",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=research bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "clear_my_mind",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-6edbd3fcb9ad4746",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=clear_my_mind bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "tasks",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-7d265441902d4170",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=tasks bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "welcome_home",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-a783d7b91d8746d1",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=welcome_home bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "templates",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-214849750a084b04",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=templates bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    }
+  ],
+  "blueprintMatrix": [
+    {
+      "origin": "create",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-1b8af898ef3148c0",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=create bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-5fcf10bbb75c4fe8",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=projects bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-084578663a264144",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=blueprints bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-f5bca9a3acc64c49",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=conversation bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "blueprintId": "bp-event-business-luncheon",
+      "passed": true,
+      "workId": "work-fa60db2cb0ee46ca",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=body_doubling bp=bp-event-business-luncheon decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "create",
+      "blueprintId": "bp-event-online-workshop",
+      "passed": true,
+      "workId": "work-081546d47cdf44b0",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=create bp=bp-event-online-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "blueprintId": "bp-event-online-workshop",
+      "passed": true,
+      "workId": "work-61c570aff95b41ba",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=projects bp=bp-event-online-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "blueprintId": "bp-event-online-workshop",
+      "passed": true,
+      "workId": "work-d35fa2a45ada449d",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=blueprints bp=bp-event-online-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "blueprintId": "bp-event-online-workshop",
+      "passed": true,
+      "workId": "work-ae36dc9105bc42a9",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=conversation bp=bp-event-online-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "blueprintId": "bp-event-online-workshop",
+      "passed": true,
+      "workId": "work-f0200085b7414a9a",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=body_doubling bp=bp-event-online-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "create",
+      "blueprintId": "bp-event-one-day-workshop",
+      "passed": true,
+      "workId": "work-09f52128ce4b4f10",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=create bp=bp-event-one-day-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "blueprintId": "bp-event-one-day-workshop",
+      "passed": true,
+      "workId": "work-ae40a5f3c9ad4769",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=projects bp=bp-event-one-day-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "blueprintId": "bp-event-one-day-workshop",
+      "passed": true,
+      "workId": "work-9f4f855fb9bb474b",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=blueprints bp=bp-event-one-day-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "blueprintId": "bp-event-one-day-workshop",
+      "passed": true,
+      "workId": "work-d97534e25969453d",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=conversation bp=bp-event-one-day-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "blueprintId": "bp-event-one-day-workshop",
+      "passed": true,
+      "workId": "work-7d2fca19ce884266",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=body_doubling bp=bp-event-one-day-workshop decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "create",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-7709b00038954883",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=create bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-df923bf5469f4bae",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=projects bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-484a63f4c8f84179",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=blueprints bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-cd078b90289b43bd",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=conversation bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "blueprintId": "bp-event-three-day-retreat",
+      "passed": true,
+      "workId": "work-3d60545172954324",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=body_doubling bp=bp-event-three-day-retreat decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "create",
+      "blueprintId": "bp-event-book-signing",
+      "passed": true,
+      "workId": "work-11920a2d989742c7",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=create bp=bp-event-book-signing decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "blueprintId": "bp-event-book-signing",
+      "passed": true,
+      "workId": "work-053f82bef4564f7a",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=projects bp=bp-event-book-signing decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "blueprintId": "bp-event-book-signing",
+      "passed": true,
+      "workId": "work-911b28a10e4a4237",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=blueprints bp=bp-event-book-signing decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "blueprintId": "bp-event-book-signing",
+      "passed": true,
+      "workId": "work-27107475f0de4fc6",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=conversation bp=bp-event-book-signing decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "blueprintId": "bp-event-book-signing",
+      "passed": true,
+      "workId": "work-3ab9ea02bde54b1e",
+      "checks": [
+        {
+          "id": "matrix_launch",
+          "passed": true,
+          "detail": "origin=body_doubling bp=bp-event-book-signing decision=create_new",
+          "blocker": true
+        },
+        {
+          "id": "matrix_blueprint",
+          "passed": true,
+          "detail": "blueprint registered",
+          "blocker": true
+        }
+      ]
+    }
+  ],
+  "coreScenarios": [
+    {
+      "origin": "create",
+      "passed": true,
+      "workId": "work-29cd8934a2f34c62",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-29cd8934a2f34c62 from create",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=create; create work=work-29cd8934a2f34c62; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-29cd8934a2f34c62",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-29cd8934a2f34c62",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-29cd8934a2f34c62",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-2f67101f-b applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-07ee500a"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-bc45b38c"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "projects",
+      "passed": true,
+      "workId": "work-6eb6cbf46a144e05",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-6eb6cbf46a144e05 from projects",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=projects; create work=work-6eb6cbf46a144e05; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-6eb6cbf46a144e05",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-6eb6cbf46a144e05",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-6eb6cbf46a144e05",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-696af93e-4 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-3b2da94d"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-7b0f8653"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "strategies",
+      "passed": true,
+      "workId": "work-4059e75f83584b64",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-4059e75f83584b64 from strategies",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=strategies; create work=work-4059e75f83584b64; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-4059e75f83584b64",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-4059e75f83584b64",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-4059e75f83584b64",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-f8ed8915-9 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-42be85ee"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-9e6e3ec2"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "blueprints",
+      "passed": true,
+      "workId": "work-e435c1918da1481b",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-e435c1918da1481b from blueprints",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=blueprints; create work=work-e435c1918da1481b; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-e435c1918da1481b",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-e435c1918da1481b",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-e435c1918da1481b",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-ab82c9cf-b applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-1884e334"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-c44d9210"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "cartography",
+      "passed": true,
+      "workId": "work-a76fb7a5f2b54453",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-a76fb7a5f2b54453 from cartography",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=cartography; create work=work-a76fb7a5f2b54453; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-a76fb7a5f2b54453",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-a76fb7a5f2b54453",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-a76fb7a5f2b54453",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-bb4f14b9-c applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-3695025f"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-97db691d"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "body_doubling",
+      "passed": true,
+      "workId": "work-02832c2522794eef",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-02832c2522794eef from body_doubling",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=body_doubling; create work=work-02832c2522794eef; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-02832c2522794eef",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-02832c2522794eef",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-02832c2522794eef",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-aede25c4-4 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-2270b499"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-64fbbb84"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "conversation",
+      "passed": true,
+      "workId": "work-f857ee1988ea4ef4",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-f857ee1988ea4ef4 from conversation",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=conversation; create work=work-f857ee1988ea4ef4; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-f857ee1988ea4ef4",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-f857ee1988ea4ef4",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-f857ee1988ea4ef4",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-4960cff2-b applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-9c7231b7"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-a620e798"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "chamber",
+      "passed": true,
+      "workId": "work-5c9dc3cea8344aa7",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-5c9dc3cea8344aa7 from chamber",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=chamber; create work=work-5c9dc3cea8344aa7; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-5c9dc3cea8344aa7",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-5c9dc3cea8344aa7",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-5c9dc3cea8344aa7",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-552f38ff-3 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-337e21ce"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-afa69176"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "board",
+      "passed": true,
+      "workId": "work-05feeb7699cb4713",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-05feeb7699cb4713 from board",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=board; create work=work-05feeb7699cb4713; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-05feeb7699cb4713",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-05feeb7699cb4713",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-05feeb7699cb4713",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-0de981ed-5 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-e4152977"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-d70a0092"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "research",
+      "passed": true,
+      "workId": "work-2d9ee6fc6dea40cb",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-2d9ee6fc6dea40cb from research",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=research; create work=work-2d9ee6fc6dea40cb; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-2d9ee6fc6dea40cb",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-2d9ee6fc6dea40cb",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-2d9ee6fc6dea40cb",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-eea68289-9 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-4c3d7f41"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-2df6566d"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "clear_my_mind",
+      "passed": true,
+      "workId": "work-6e355d729eae4492",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-6e355d729eae4492 from clear_my_mind",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=clear_my_mind; create work=work-6e355d729eae4492; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-6e355d729eae4492",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-6e355d729eae4492",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-6e355d729eae4492",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-7a68e8c9-4 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-b42869f5"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-a1743b73"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "tasks",
+      "passed": true,
+      "workId": "work-b6942146d3594da2",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-b6942146d3594da2 from tasks",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=tasks; create work=work-b6942146d3594da2; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-b6942146d3594da2",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-b6942146d3594da2",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-b6942146d3594da2",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-4421a4ec-8 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-7a24e186"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-3bd4218c"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "welcome_home",
+      "passed": true,
+      "workId": "work-a8091df35bc04ed2",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-a8091df35bc04ed2 from welcome_home",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=welcome_home; create work=work-a8091df35bc04ed2; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-a8091df35bc04ed2",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-a8091df35bc04ed2",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-a8091df35bc04ed2",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-2db3d59e-e applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from create same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-a31c2bd8"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-ad90d88a"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    },
+    {
+      "origin": "templates",
+      "passed": true,
+      "workId": "work-4f604645895e4e92",
+      "stepsPassed": 27,
+      "stepsTotal": 30,
+      "checks": [
+        {
+          "id": "s1_begin",
+          "passed": true,
+          "detail": "Began Work work-4f604645895e4e92 from templates",
+          "blocker": true
+        },
+        {
+          "id": "s2_launch_contract",
+          "passed": true,
+          "detail": "Launch routingNote=origin=templates; create work=work-4f604645895e4e92; bp=bp-event-business-luncheon; legacyAlias=false"
+        },
+        {
+          "id": "s5_canonical_id",
+          "passed": true,
+          "detail": "Work ID format work-4f604645895e4e92",
+          "blocker": true
+        },
+        {
+          "id": "s6_type_blueprint",
+          "passed": true,
+          "detail": "type=event_plan bp=bp-event-business-luncheon",
+          "blocker": true
+        },
+        {
+          "id": "s3_duplicate_detection",
+          "passed": true,
+          "detail": "dup decision=continue_existing prevented=true",
+          "blocker": true
+        },
+        {
+          "id": "s4_continue_same_id",
+          "passed": true,
+          "detail": "continue workId=work-4f604645895e4e92",
+          "blocker": true
+        },
+        {
+          "id": "s7_depth",
+          "passed": true,
+          "detail": "depth=guided_build"
+        },
+        {
+          "id": "s8_answer",
+          "passed": true,
+          "detail": "domain purpose answered"
+        },
+        {
+          "id": "s9_11_resume",
+          "passed": true,
+          "detail": "session resume location preserved",
+          "blocker": true
+        },
+        {
+          "id": "s12_depth_same_id",
+          "passed": true,
+          "detail": "depth change workId=work-4f604645895e4e92",
+          "blocker": true
+        },
+        {
+          "id": "s13_17_research",
+          "passed": true,
+          "detail": "research research-f7fcb3dc-3 applied",
+          "blocker": true
+        },
+        {
+          "id": "s_research_no_silent",
+          "passed": true,
+          "detail": "unapproved research cannot apply",
+          "blocker": true
+        },
+        {
+          "id": "s18_project",
+          "passed": true,
+          "detail": "project relationship attached"
+        },
+        {
+          "id": "s19_tasks",
+          "passed": true,
+          "detail": "task and milestone created"
+        },
+        {
+          "id": "s20_cartography",
+          "passed": true,
+          "detail": "cartography refs Work without copying content",
+          "blocker": true
+        },
+        {
+          "id": "s21_chamber",
+          "passed": true,
+          "detail": "chamber advisory then approved continue",
+          "blocker": true
+        },
+        {
+          "id": "s22_board",
+          "passed": true,
+          "detail": "board recommendation advisory until approved",
+          "blocker": true
+        },
+        {
+          "id": "s23_shari_talk",
+          "passed": true,
+          "detail": "talk-only does not mutate Work",
+          "blocker": true
+        },
+        {
+          "id": "s24_shari_work",
+          "passed": true,
+          "detail": "work-on-this requires approval",
+          "blocker": true
+        },
+        {
+          "id": "s25_body_doubling",
+          "passed": true,
+          "detail": "body doubling attaches to Work",
+          "blocker": true
+        },
+        {
+          "id": "s26_28_reopen",
+          "passed": true,
+          "detail": "reopen from welcome_home same Work",
+          "blocker": true
+        },
+        {
+          "id": "s29_no_dup_master",
+          "passed": true,
+          "detail": "masters stable; other same-bp works=0",
+          "blocker": true
+        },
+        {
+          "id": "s_personal_blueprint",
+          "passed": true,
+          "detail": "saved personal bp bp-personal-event-business-luncheon-fbc25d2c"
+        },
+        {
+          "id": "s_company_blueprint",
+          "passed": true,
+          "detail": "saved company bp bp-company-event-business-luncheon-9411cafe"
+        },
+        {
+          "id": "s30_archive",
+          "passed": true,
+          "detail": "archived",
+          "blocker": true
+        },
+        {
+          "id": "s30_restore_reopen",
+          "passed": true,
+          "detail": "restored and reopened",
+          "blocker": true
+        },
+        {
+          "id": "s_history",
+          "passed": true,
+          "detail": "blueprint audit history present"
+        }
+      ]
+    }
+  ],
+  "identityChecks": [
+    {
+      "id": "id_canonical_format",
+      "passed": true,
+      "detail": "new id work-9a050ffe474149ba",
+      "blocker": true
+    },
+    {
+      "id": "id_legacy_adopt",
+      "passed": true,
+      "detail": "legacy event id adopted without minting duplicate master",
+      "blocker": true
+    },
+    {
+      "id": "id_no_auto_merge_unrelated",
+      "passed": true,
+      "detail": "unrelated titles stay separate",
+      "blocker": true
+    },
+    {
+      "id": "id_identical_intent_no_dup",
+      "passed": true,
+      "detail": "same intent decision=continue_existing",
+      "blocker": true
+    },
+    {
+      "id": "id_force_new_copy",
+      "passed": true,
+      "detail": "forceNew creates related new Work",
+      "blocker": true
+    }
+  ],
+  "integrityChecks": [
+    {
+      "id": "integrity_prior_work",
+      "passed": true,
+      "detail": "prior-work path creates new Work with provenance",
+      "blocker": true
+    },
+    {
+      "id": "integrity_source_unchanged",
+      "passed": true,
+      "detail": "source Work unchanged",
+      "blocker": true
+    }
+  ],
+  "securityChecks": [
+    {
+      "id": "sec_boundary_suite",
+      "passed": true,
+      "detail": "architecture boundary suite present"
+    },
+    {
+      "id": "sec_confidential_reuse",
+      "passed": true,
+      "detail": "confidential known-context requires approval",
+      "blocker": true
+    },
+    {
+      "id": "sec_company_scope",
+      "passed": true,
+      "detail": "company Blueprint scope gate exists",
+      "blocker": true
+    }
+  ],
+  "adhdChecks": [
+    {
+      "id": "adhd_three_paths",
+      "passed": true,
+      "detail": "max three primary start paths",
+      "blocker": true
+    },
+    {
+      "id": "adhd_progressive_filters",
+      "passed": true,
+      "detail": "catalogue uses progressive disclosure",
+      "blocker": true
+    },
+    {
+      "id": "adhd_save_reassure",
+      "passed": true,
+      "detail": "save/resume reassurance present",
+      "blocker": true
+    },
+    {
+      "id": "adhd_depth_no_restart",
+      "passed": true,
+      "detail": "depth change does not force restart",
+      "blocker": true
+    }
+  ],
+  "performanceChecks": [
+    {
+      "id": "perf_launch_batch",
+      "passed": true,
+      "detail": "14 origin launches in 5ms"
+    },
+    {
+      "id": "perf_registry_bounded",
+      "passed": true,
+      "detail": "registry lookup bounded to registered Blueprints"
+    }
+  ],
+  "releaseBlockers": [],
+  "conditions": [
+    {
+      "condition": "Durable Blueprint Supabase store remains follow-on (in-memory registry certified)",
+      "owner": "UWE / Create durable",
+      "followUp": "Complete durable Blueprint persistence without changing launch contract"
+    },
+    {
+      "condition": "CompanionPageClient platformIntent host string scan still WIP-dirty",
+      "owner": "Companion host",
+      "followUp": "Re-bind remaining open*Core work starts through launch contract when CPC stabilizes"
+    }
+  ],
+  "totals": {
+    "checksPassed": 507,
+    "checksFailed": 0,
+    "originsCovered": 14,
+    "blueprintsCovered": 5
+  },
+  "verdict": "WORK TYPE PRODUCTION CERTIFIED"
+}

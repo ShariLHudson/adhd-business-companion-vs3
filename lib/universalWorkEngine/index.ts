@@ -231,6 +231,17 @@ export { EVENT_PLAN_BLUEPRINT_IDS } from "./packages/eventPlan/eventBlueprintDef
 export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";
 export { ensureEventBlueprintIntelligenceRegistered } from "./packages/eventPlan/eventBlueprintIntelligence";
 
+/** Work lifecycle — archive / restore (same Work ID) */
+export {
+  archiveWork,
+  restoreWork,
+  getWorkLifecycleStatus,
+  listArchivedWorkIds,
+  resetWorkArchiveForTests,
+  assertNoOrphanArchivedWorks,
+} from "./lifecycle/workArchive";
+export type { WorkLifecycleStatus } from "./lifecycle/workArchive";
+
 /** 103 — Anywhere-Origin Universal Work Routing */
 export type {
   ShariWorkMode,
