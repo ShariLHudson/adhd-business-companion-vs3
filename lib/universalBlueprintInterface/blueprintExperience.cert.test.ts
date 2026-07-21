@@ -97,11 +97,19 @@ describe("106 Blueprint Experience Completion", () => {
     expect(pending.explanation).toMatch(/Linked/i);
   });
 
-  it("estate awareness hooks are contracts only", () => {
+  it("estate awareness hooks mark recognition live and Round Table/Chamber as contracts", () => {
     const hooks = listEstateAwarenessHooks();
     expect(hooks.length).toBe(8);
-    expect(hooks.every((h) => h.implementedHere === false)).toBe(true);
     expect(hooks.map((h) => h.surfaceId)).toContain("evidence_vault");
+    expect(
+      hooks.find((h) => h.surfaceId === "business_pulse")?.implementedHere,
+    ).toBe(true);
+    expect(
+      hooks.find((h) => h.surfaceId === "round_table")?.implementedHere,
+    ).toBe(false);
+    expect(
+      hooks.find((h) => h.surfaceId === "chamber_members")?.implementedHere,
+    ).toBe(false);
   });
 
   it("builder restore and required/optional preserve stable section ids", () => {
