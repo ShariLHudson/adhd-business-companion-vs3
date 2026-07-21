@@ -8,6 +8,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 ## critical
 
 - [ ] `bp-event-book-signing` — **Inventory checklist** → label_draft_only
+- [ ] `business.coaching` — **Coaching Pricing Model** → implement_structured
+- [ ] `business.consulting` — **Pricing Model** → implement_structured
 - [ ] `business.craft_show` — **Product and pricing sheet** → implement_structured
 - [ ] `business.craft_show` — **Inventory checklist** → label_draft_only
 - [ ] `business.etsy` — **Pricing and profitability view** → implement_structured
@@ -17,6 +19,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.inventory_pricing` — **Cost of goods sheet** → implement_structured
 - [ ] `business.inventory_pricing` — **Pricing sheet** → implement_structured
 - [ ] `business.inventory_pricing` — **Dead inventory decisions** → label_draft_only
+- [ ] `business.service` — **Pricing Calculator** → implement_structured
 - [ ] `event.book_launch` — **Inventory and preorder checklist** → label_draft_only
 - [ ] `event.book_launch` — **Budget view** → implement_structured
 - [ ] `event.challenge` — **Budget view** → implement_structured
@@ -32,6 +35,9 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 ## high
 
 - [ ] `bp-event-three-day-retreat` — **Follow-up integration plan** → label_draft_only
+- [ ] `business.coaching` — **Coaching Business Plan** → label_draft_only
+- [ ] `business.consulting` — **Consulting Business Plan** → label_draft_only
+- [ ] `business.consulting` — **Delivery Plan** → label_draft_only
 - [ ] `business.craft_show` — **Craft Show Business Plan** → label_draft_only
 - [ ] `business.craft_show` — **Linked Event plan recommendations** → label_draft_only
 - [ ] `business.etsy` — **Etsy Business Plan** → label_draft_only
@@ -41,6 +47,9 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.holiday_planner` — **Holiday Product Plan** → label_draft_only
 - [ ] `business.holiday_planner` — **Launch timeline** → label_draft_only
 - [ ] `business.product_photography` — **Product Photography Plan** → connect_destination
+- [ ] `business.service` — **Service Business Operating Plan** → implement_composed
+- [ ] `business.speaker` — **Speaker Business Plan** → label_draft_only
+- [ ] `business.speaker` — **Speaker Preparation Plan** → label_draft_only
 - [ ] `event.book_launch` — **Concise Book Launch Plan** → label_draft_only
 - [ ] `event.book_launch` — **Complete Book Launch Plan** → label_draft_only
 - [ ] `event.book_launch` — **Risk and contingency plan** → label_draft_only
@@ -150,6 +159,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.handmade_online_store` — **Photography checklist** → label_draft_only
 - [ ] `business.handmade_online_store` — **Email and social rhythm** → label_draft_only
 - [ ] `business.product_photography` — **Marketplace image checklist** → label_draft_only
+- [ ] `business.service` — **Proposal and Agreement Checklist** → label_draft_only
+- [ ] `business.speaker` — **Signature Talk Brief** → label_draft_only
 - [ ] `event.book_launch` — **Book positioning brief** → label_draft_only
 - [ ] `event.book_launch` — **Bookseller coordination brief** → label_draft_only
 - [ ] `event.book_launch` — **AV and livestream checklist** → label_draft_only
@@ -202,6 +213,22 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `bp-event-three-day-retreat` — **Retreat overview** → label_draft_only
 - [ ] `bp-event-three-day-retreat` — **Three-day agenda** → label_draft_only
 - [ ] `bp-event-three-day-retreat` — **Packing list** → label_draft_only
+- [ ] `business.coaching` — **Scope and Boundary Statement** → label_draft_only
+- [ ] `business.coaching` — **Client Fit Profile** → label_draft_only
+- [ ] `business.coaching` — **Coaching Offer Suite** → label_draft_only
+- [ ] `business.coaching` — **Coaching Framework** → label_draft_only
+- [ ] `business.coaching` — **Discovery Conversation Guide** → label_draft_only
+- [ ] `business.coaching` — **Coaching Welcome Packet** → label_draft_only
+- [ ] `business.coaching` — **Session Template** → label_draft_only
+- [ ] `business.coaching` — **Next actions list** → connect_destination
+- [ ] `business.consulting` — **Consulting Position** → label_draft_only
+- [ ] `business.consulting` — **Consulting Service Suite** → label_draft_only
+- [ ] `business.consulting` — **Diagnostic Framework** → label_draft_only
+- [ ] `business.consulting` — **Qualification Guide** → label_draft_only
+- [ ] `business.consulting` — **Proposal Architecture** → label_draft_only
+- [ ] `business.consulting` — **Engagement Charter** → label_draft_only
+- [ ] `business.consulting` — **Outcome Report** → label_draft_only
+- [ ] `business.consulting` — **Next actions list** → connect_destination
 - [ ] `business.craft_show` — **Booth design notes** → connect_destination
 - [ ] `business.craft_show` — **Annual show calendar** → connect_destination
 - [ ] `business.craft_show` — **Packing and load list** → label_draft_only
@@ -229,6 +256,20 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.product_photography` — **Editing workflow** → label_draft_only
 - [ ] `business.product_photography` — **Alt text patterns** → label_draft_only
 - [ ] `business.product_photography` — **Next actions list** → connect_destination
+- [ ] `business.service` — **Service Business Snapshot** → label_draft_only
+- [ ] `business.service` — **Service Menu** → label_draft_only
+- [ ] `business.service` — **Inquiry Workflow** → label_draft_only
+- [ ] `business.service` — **Standard Delivery Workflow** → label_draft_only
+- [ ] `business.service` — **Change Request Guide** → label_draft_only
+- [ ] `business.service` — **Follow-Up Sequence** → label_draft_only
+- [ ] `business.service` — **Next actions list** → connect_destination
+- [ ] `business.speaker` — **Speaker Positioning Statement** → label_draft_only
+- [ ] `business.speaker` — **Audience and Buyer Map** → label_draft_only
+- [ ] `business.speaker` — **Speaking Offer Suite** → label_draft_only
+- [ ] `business.speaker` — **Speaker Fee Calculator** → label_draft_only
+- [ ] `business.speaker` — **Booking Pipeline** → label_draft_only
+- [ ] `business.speaker` — **Follow-Up System** → label_draft_only
+- [ ] `business.speaker` — **Next actions list** → connect_destination
 - [ ] `event.book_launch` — **One-page author goals overview** → label_draft_only
 - [ ] `event.book_launch` — **Program and reading rundown** → label_draft_only
 - [ ] `event.book_launch` — **Signing table run-of-show** → label_draft_only

@@ -138,7 +138,7 @@
 |-----------|--------------------------------|
 | `event_plan` | Workshop, webinar, retreat, conference, summit, launches, challenge, masterclass, fundraiser/gala, networking, luncheon, … |
 | `marketing_plan` | `marketing_plan.simple` |
-| `business_plan` | `business.craft_show`, `business.handmade_online_store`, `business.etsy`, `business.product_photography`, `business.inventory_pricing`, `business.holiday_planner` |
+| `business_plan` | `business.craft_show`, `business.handmade_online_store`, `business.etsy`, `business.product_photography`, `business.inventory_pricing`, `business.holiday_planner`, `business.speaker`, `business.coaching`, `business.consulting`, `business.service` |
 
 **Registry:** `lib/universalWorkEngine/blueprints/registry.ts`  
 **Target ID style (312):** `blueprint.event.workshop` (map via aliases; do not break current dotted IDs abruptly)

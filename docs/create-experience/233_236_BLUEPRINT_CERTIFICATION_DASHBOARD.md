@@ -12,12 +12,16 @@ Foundation / Work-Type certification is **necessary but not sufficient**. Produc
 | `bp-event-one-day-workshop` | 1.0.0 | **blocked** | 4 | 0 | 4 | 4 | 4 |
 | `bp-event-online-workshop` | 1.0.0 | **blocked** | 4 | 0 | 4 | 4 | 4 |
 | `bp-event-three-day-retreat` | 1.0.0 | **blocked** | 5 | 0 | 5 | 5 | 5 |
+| `business.coaching` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
+| `business.consulting` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 11 |
 | `business.craft_show` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 12 |
 | `business.etsy` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 7 |
 | `business.handmade_online_store` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 12 |
 | `business.holiday_planner` | 1.0.0 | **blocked** | 8 | 0 | 8 | 8 | 8 |
 | `business.inventory_pricing` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 7 |
 | `business.product_photography` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 7 |
+| `business.service` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
+| `business.speaker` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
 | `event.book_launch` | 1.0.0 | **blocked** | 20 | 0 | 20 | 20 | 20 |
 | `event.challenge` | 1.0.0 | **blocked** | 20 | 0 | 20 | 20 | 20 |
 | `event.conference` | 1.0.0 | **blocked** | 22 | 0 | 22 | 22 | 22 |
@@ -31,7 +35,7 @@ Foundation / Work-Type certification is **necessary but not sufficient**. Produc
 | `event.workshop` | 1.0.0 | **blocked** | 24 | 0 | 24 | 24 | 24 |
 | `marketing_plan.simple` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 12 |
 
-**Createability-certified:** 0 / 23
+**Createability-certified:** 0 / 27
 
 ## Release rule
 

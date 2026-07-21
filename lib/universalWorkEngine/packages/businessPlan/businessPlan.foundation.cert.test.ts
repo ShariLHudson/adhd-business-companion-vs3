@@ -1,5 +1,5 @@
 /**
- * 201–206 — Business Plan Work Type + Handmade / Crafter Business Blueprints foundation.
+ * 201–210 — Business Plan Work Type + Handmade / Service-Expert Business Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -7,12 +7,16 @@ import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
   BUSINESS_PLAN_BLUEPRINT_IDS,
+  COACHING_BUSINESS_BLUEPRINT_ID,
+  CONSULTING_BUSINESS_BLUEPRINT_ID,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  SERVICE_BUSINESS_BLUEPRINT_ID,
+  SPEAKER_BUSINESS_BLUEPRINT_ID,
   addWorkMilestone,
   addWorkTask,
   answerBlueprintQuestion,
@@ -89,7 +93,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with six handmade Blueprints", () => {
+  it("registers Business Plan Work Type with ten Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -100,9 +104,13 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
         INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
         HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+        SPEAKER_BUSINESS_BLUEPRINT_ID,
+        COACHING_BUSINESS_BLUEPRINT_ID,
+        CONSULTING_BUSINESS_BLUEPRINT_ID,
+        SERVICE_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(6);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(10);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -114,6 +122,10 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
       INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
       HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+      SPEAKER_BUSINESS_BLUEPRINT_ID,
+      COACHING_BUSINESS_BLUEPRINT_ID,
+      CONSULTING_BUSINESS_BLUEPRINT_ID,
+      SERVICE_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -180,7 +192,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     expect(active).toContain("listings_seo");
   });
 
-  it("203–206 depth modes preserve one Work ID and reveal domain sections", () => {
+  it("203–210 depth modes preserve one Work ID and reveal domain sections", () => {
     const cases: {
       blueprintId: string;
       guidedSection: string;
@@ -197,6 +209,22 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
         guidedSection: "seasonal_campaigns",
+      },
+      {
+        blueprintId: SPEAKER_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "speaker_marketing",
+      },
+      {
+        blueprintId: COACHING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "discovery_enrollment",
+      },
+      {
+        blueprintId: CONSULTING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "diagnostic_method",
+      },
+      {
+        blueprintId: SERVICE_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "inquiry_qualification",
       },
     ];
     for (const c of cases) {
@@ -326,6 +354,36 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       originalUserMessage: "Help me use the holiday product planner",
     });
     expect(holiday.blueprintId).toBe(HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID);
+
+    const speaker = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a speaker business",
+    });
+    expect(speaker.workTypeId).toBe(BUSINESS_PLAN_WORK_TYPE_ID);
+    expect(speaker.blueprintId).toBe(SPEAKER_BUSINESS_BLUEPRINT_ID);
+
+    const coaching = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me plan my coaching business",
+    });
+    expect(coaching.blueprintId).toBe(COACHING_BUSINESS_BLUEPRINT_ID);
+
+    const consulting = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a consulting business",
+    });
+    expect(consulting.blueprintId).toBe(CONSULTING_BUSINESS_BLUEPRINT_ID);
+
+    const service = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me create a service business operating blueprint",
+    });
+    expect(service.blueprintId).toBe(SERVICE_BUSINESS_BLUEPRINT_ID);
+
+    expect(isBusinessPlanCreationRequest("Help me build a speaker business")).toBe(
+      true,
+    );
+    expect(isBusinessPlanCreationRequest("speaker business")).toBe(true);
 
     const marketing = inferWorkTypeAndBlueprint({
       origin: "create",

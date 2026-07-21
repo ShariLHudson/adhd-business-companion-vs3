@@ -1,5 +1,5 @@
 /**
- * Business Plan map groups — schema config only (201–206).
+ * Business Plan map groups — schema config only (201–210).
  */
 
 import type { BlueprintGroup } from "../../blueprints/types";
@@ -116,10 +116,85 @@ export const BUSINESS_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
     ],
   },
   {
+    groupId: "speaker_business",
+    title: "Speaker Business",
+    description: "Talks, buyers, booking, fees, and delivery.",
+    order: 6,
+    collapsedByDefault: true,
+    sectionIds: [
+      "audience_buyer_architecture",
+      "signature_talk_portfolio",
+      "speaking_offers",
+      "speaker_marketing",
+      "booking_pipeline",
+      "speaker_proposal",
+      "event_preparation",
+      "delivery_experience",
+      "post_event_followup",
+      "speaker_operations",
+    ],
+  },
+  {
+    groupId: "coaching_business",
+    title: "Coaching Business",
+    description: "Fit, offers, enrollment, delivery, and renewal.",
+    order: 7,
+    collapsedByDefault: true,
+    sectionIds: [
+      "client_fit",
+      "coaching_offers",
+      "coaching_framework",
+      "coaching_marketing",
+      "discovery_enrollment",
+      "coaching_onboarding",
+      "coaching_delivery",
+      "completion_renewal",
+      "coaching_operations",
+    ],
+  },
+  {
+    groupId: "consulting_business",
+    title: "Consulting Business",
+    description: "Diagnosis, proposals, delivery, and closeout.",
+    order: 8,
+    collapsedByDefault: true,
+    sectionIds: [
+      "service_architecture",
+      "diagnostic_method",
+      "lead_generation",
+      "qualification_discovery",
+      "proposal_contract",
+      "engagement_kickoff",
+      "consulting_delivery",
+      "client_communication",
+      "outcomes_closeout",
+      "consulting_operations",
+    ],
+  },
+  {
+    groupId: "service_operating",
+    title: "Service Operating",
+    description: "Menu, inquiry, delivery, payment, and retention.",
+    order: 9,
+    collapsedByDefault: true,
+    sectionIds: [
+      "service_menu",
+      "client_acquisition",
+      "inquiry_qualification",
+      "estimate_proposal",
+      "service_onboarding",
+      "delivery_workflow",
+      "change_issue_management",
+      "completion_payment",
+      "followup_retention",
+      "service_operations",
+    ],
+  },
+  {
     groupId: "stewardship",
     title: "Money and Stewardship",
     description: "Profit, taxes, analytics, linked work, and review.",
-    order: 6,
+    order: 10,
     collapsedByDefault: true,
     sectionIds: [
       "expenses_taxes",

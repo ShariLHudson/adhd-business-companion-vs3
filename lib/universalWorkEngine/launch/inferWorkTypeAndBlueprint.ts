@@ -13,12 +13,16 @@ import { BUSINESS_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/busines
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import {
+  COACHING_BUSINESS_BLUEPRINT_ID,
+  CONSULTING_BUSINESS_BLUEPRINT_ID,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  SERVICE_BUSINESS_BLUEPRINT_ID,
+  SPEAKER_BUSINESS_BLUEPRINT_ID,
 } from "../packages/businessPlan/businessBlueprintDefinitions";
 import {
   BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
@@ -90,6 +94,14 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-inventory-and-pricing": INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   "bp-holiday-product-planner": HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
   "bp-holiday-planner": HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
+  "bp-speaker-business": SPEAKER_BUSINESS_BLUEPRINT_ID,
+  "bp-speaker": SPEAKER_BUSINESS_BLUEPRINT_ID,
+  "bp-coaching-business": COACHING_BUSINESS_BLUEPRINT_ID,
+  "bp-coaching": COACHING_BUSINESS_BLUEPRINT_ID,
+  "bp-consulting-business": CONSULTING_BUSINESS_BLUEPRINT_ID,
+  "bp-consulting": CONSULTING_BUSINESS_BLUEPRINT_ID,
+  "bp-service-business": SERVICE_BUSINESS_BLUEPRINT_ID,
+  "bp-service-operating": SERVICE_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -133,6 +145,27 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|business\.handmade_online_store)\b/i,
     blueprintId: HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Speaker / coaching / consulting before generic service operating
+    re: /\b(speaker\s+business|speaking\s+business|speaker\s+blueprint|business\.speaker)\b/i,
+    blueprintId: SPEAKER_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(coaching\s+business|coach\s+business|coaching\s+blueprint|business\.coaching)\b/i,
+    blueprintId: COACHING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(consulting\s+business|consultant\s+business|consulting\s+blueprint|business\.consulting)\b/i,
+    blueprintId: CONSULTING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(service\s+business(?:\s+operating)?|service\s+operating\s+blueprint|service\s+business\s+blueprint|business\.service)\b/i,
+    blueprintId: SERVICE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -297,11 +330,11 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
     workTypeId = MARKETING_PLAN_WORK_TYPE_ID;
   }
 
-  // Default Business Plan when message clearly asks for crafter / handmade business blueprints
+  // Default Business Plan when message clearly asks for Business Blueprints
   if (
     !workTypeId &&
     message &&
-    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner)\b/i.test(
+    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner|speaker\s+business|speaking\s+business|coaching\s+business|coach\s+business|consulting\s+business|consultant\s+business|service\s+business(?:\s+operating)?)\b/i.test(
       message,
     )
   ) {

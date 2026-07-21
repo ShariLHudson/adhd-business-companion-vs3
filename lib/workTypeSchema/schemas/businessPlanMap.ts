@@ -1,6 +1,6 @@
 /**
  * Leaf data only — no imports from Create runtime (avoids circular deps).
- * Business Plan section map (201–206 handmade / crafter Business Blueprints).
+ * Business Plan section map (201–210 handmade / service-expert Business Blueprints).
  */
 
 import type { WorkTypeMapSectionDef } from "../types";
@@ -68,6 +68,46 @@ export const BUSINESS_PLAN_MAP_SECTIONS: readonly WorkTypeMapSectionDef[] = [
   { id: "next_actions", title: "Next Actions" },
   { id: "review_rhythm", title: "Review Rhythm" },
   { id: "post_show_review", title: "Post-Show Review" },
+  // 207–210 Service & Expert
+  { id: "audience_buyer_architecture", title: "Audience and Buyer Architecture" },
+  { id: "signature_talk_portfolio", title: "Signature Talk Portfolio" },
+  { id: "speaking_offers", title: "Speaking Offers" },
+  { id: "speaker_marketing", title: "Speaker Marketing" },
+  { id: "booking_pipeline", title: "Booking Pipeline" },
+  { id: "speaker_proposal", title: "Speaker Proposal" },
+  { id: "event_preparation", title: "Event Preparation" },
+  { id: "delivery_experience", title: "Delivery and Experience" },
+  { id: "post_event_followup", title: "Post-Event Follow-Up" },
+  { id: "speaker_operations", title: "Speaker Operations" },
+  { id: "client_fit", title: "Client Fit" },
+  { id: "coaching_offers", title: "Coaching Offers" },
+  { id: "coaching_framework", title: "Coaching Framework" },
+  { id: "coaching_marketing", title: "Coaching Marketing" },
+  { id: "discovery_enrollment", title: "Discovery and Enrollment" },
+  { id: "coaching_onboarding", title: "Coaching Onboarding" },
+  { id: "coaching_delivery", title: "Coaching Delivery" },
+  { id: "completion_renewal", title: "Completion and Renewal" },
+  { id: "coaching_operations", title: "Coaching Operations" },
+  { id: "service_architecture", title: "Service Architecture" },
+  { id: "diagnostic_method", title: "Diagnostic Method" },
+  { id: "lead_generation", title: "Lead Generation" },
+  { id: "qualification_discovery", title: "Qualification and Discovery" },
+  { id: "proposal_contract", title: "Proposal and Contract" },
+  { id: "engagement_kickoff", title: "Engagement Kickoff" },
+  { id: "consulting_delivery", title: "Consulting Delivery" },
+  { id: "client_communication", title: "Client Communication" },
+  { id: "outcomes_closeout", title: "Outcomes and Closeout" },
+  { id: "consulting_operations", title: "Consulting Operations" },
+  { id: "service_menu", title: "Service Menu" },
+  { id: "client_acquisition", title: "Client Acquisition" },
+  { id: "inquiry_qualification", title: "Inquiry and Qualification" },
+  { id: "estimate_proposal", title: "Estimate and Proposal" },
+  { id: "service_onboarding", title: "Service Onboarding" },
+  { id: "delivery_workflow", title: "Delivery Workflow" },
+  { id: "change_issue_management", title: "Change and Issue Management" },
+  { id: "completion_payment", title: "Completion and Payment" },
+  { id: "followup_retention", title: "Follow-Up and Retention" },
+  { id: "service_operations", title: "Service Operations" },
 ];
 
 export const BUSINESS_PLAN_DEFAULT_FOCUS: readonly string[] = [
