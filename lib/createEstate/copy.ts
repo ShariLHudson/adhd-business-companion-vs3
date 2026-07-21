@@ -1,6 +1,10 @@
 /**
- * My Work → Create — estate entrance copy (116–118, 149–151, 180, 056).
+ * My Work → Create — estate entrance copy (116–118, 149–151, 180, 056, 127).
  */
+
+/** Spec 127 governing principle — one primary next step on every Create screen. */
+export const CREATE_ONE_FOCUS_PRINCIPLE =
+  "One question. One focus. Everything else can wait.";
 
 export const CREATE_ESTATE_WINDOW_TITLE = "Create";
 

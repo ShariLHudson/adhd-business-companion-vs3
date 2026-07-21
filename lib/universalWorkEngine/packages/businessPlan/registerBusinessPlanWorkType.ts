@@ -48,7 +48,7 @@ export function ensureBusinessPlanWorkTypeRegistered(): void {
     },
     sections: BUSINESS_PLAN_MAP_SECTIONS,
     mapGroups: BUSINESS_PLAN_MAP_GROUPS,
-    groupMapThreshold: 10,
+    groupMapThreshold: 6,
     defaultFocusSectionIds: BUSINESS_PLAN_DEFAULT_FOCUS,
     questionDefinitionIds: ["business-plan-foundation"],
     deliverableIds: ["business-plan-crafter"],

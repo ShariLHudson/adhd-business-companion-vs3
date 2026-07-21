@@ -17,13 +17,16 @@ describe("076/077 Creation save state", () => {
     localStorage.clear();
   });
 
-  it("never labels local-only as Saved", () => {
-    for (const state of ["local_only", "dirty", "failed"] as const) {
+  it("never labels local-only as Saved (127 save states)", () => {
+    for (const state of ["dirty", "failed"] as const) {
       const label = labelForCreationSaveState(state);
       expect(label.startsWith("Saved")).toBe(false);
       expect(label).not.toBe("Saved");
     }
-    expect(labelForCreationSaveState("saved")).toBe("Saved securely");
+    expect(labelForCreationSaveState("local_only")).toBe("Draft Saved");
+    expect(labelForCreationSaveState("saved")).toBe("Saved");
+    expect(labelForCreationSaveState("saving")).toBe("Saving…");
+    expect(labelForCreationSaveState("dirty")).toBe("Unsaved Changes");
   });
 
   it("resolve prefers failure over saving", () => {

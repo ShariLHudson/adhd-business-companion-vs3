@@ -49,7 +49,7 @@ export function ensureMarketingPlanWorkTypeRegistered(): void {
     },
     sections: MARKETING_PLAN_MAP_SECTIONS,
     mapGroups: MARKETING_PLAN_MAP_GROUPS,
-    groupMapThreshold: 10,
+    groupMapThreshold: 6,
     defaultFocusSectionIds: MARKETING_PLAN_DEFAULT_FOCUS,
     questionDefinitionIds: ["marketing-plan-foundation"],
     deliverableIds: ["marketing-plan-simple"],

@@ -11,7 +11,7 @@ export const EVENT_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
     title: "Foundation",
     description: "Why this gathering exists and who it serves.",
     order: 0,
-    collapsedByDefault: false,
+    collapsedByDefault: true,
     sectionIds: [
       "event_type",
       "purpose",
@@ -22,7 +22,7 @@ export const EVENT_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
   },
   {
     groupId: "planning",
-    title: "Planning",
+    title: "Venue & Budget",
     description: "When, where, and what it costs.",
     order: 1,
     collapsedByDefault: true,
@@ -37,7 +37,7 @@ export const EVENT_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
   },
   {
     groupId: "program",
-    title: "Program",
+    title: "Content",
     description: "What people experience.",
     order: 2,
     collapsedByDefault: true,
@@ -52,7 +52,7 @@ export const EVENT_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
   },
   {
     groupId: "promotion",
-    title: "Promotion",
+    title: "Marketing",
     description: "How people find and join.",
     order: 3,
     collapsedByDefault: true,
@@ -65,8 +65,8 @@ export const EVENT_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
   },
   {
     groupId: "event_day",
-    title: "Event Day",
-    description: "Delivery and on-site care.",
+    title: "Delivery",
+    description: "On-site care and run of show.",
     order: 4,
     collapsedByDefault: true,
     sectionIds: [
@@ -82,7 +82,7 @@ export const EVENT_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
   },
   {
     groupId: "after_the_event",
-    title: "After the Event",
+    title: "Follow-Up",
     description: "Follow-through and learning.",
     order: 5,
     collapsedByDefault: true,

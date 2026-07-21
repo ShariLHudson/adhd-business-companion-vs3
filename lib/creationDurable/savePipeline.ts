@@ -1,6 +1,6 @@
 /**
  * Sole durable save contract owner for Create.
- * Local caches / drafts / bookmarks must never claim “Saved securely”.
+ * Local caches / drafts / bookmarks must never claim “Saved” (member label).
  */
 
 import {
@@ -89,7 +89,7 @@ export function resolveDurableSavePipeline(
   };
 }
 
-/** True only when member-facing copy may say Saved securely. */
+/** True only when member-facing copy may say Saved (durable ack). */
 export function isDurableSaveAcknowledged(input: SavePipelineInput): boolean {
   return resolveDurableSavePipeline(input).pipeline === "saved_securely";
 }

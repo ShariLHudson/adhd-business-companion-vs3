@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ExportActions } from "@/components/companion/ExportActions";
 import {
   dispatchCreateWorkCommand,
@@ -19,9 +19,19 @@ type Props = {
   onTrash?: (workspaceId: string) => void;
 };
 
+const MORE_COMMAND_IDS: readonly CreateWorkCommandId[] = [
+  "rename",
+  "duplicate",
+  "export",
+  "print",
+  "share",
+  "archive",
+  "trash",
+];
+
 /**
- * 084 — Work-level Create commands on Estate Create.
- * All actions go through dispatchCreateWorkCommand.
+ * 084 / 127 — Work-level Create commands.
+ * Primary: Save. Secondary actions live under More (…).
  */
 export function CreateWorkCommandToolbar({
   workflow,
@@ -32,7 +42,9 @@ export function CreateWorkCommandToolbar({
   onTrash,
 }: Props) {
   const [showExport, setShowExport] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const moreRef = useRef<HTMLDivElement | null>(null);
   const draftText = workflow.draftContent?.trim() || "";
   const workspaceId =
     workflow.sessionId?.trim() || workflow.eventRecordId?.trim() || "";
@@ -41,6 +53,19 @@ export function CreateWorkCommandToolbar({
     hasDraftText: Boolean(draftText),
     workId: workspaceId,
   });
+  const byId = new Map(commands.map((c) => [c.id, c]));
+  const saveCmd = byId.get("save");
+
+  useEffect(() => {
+    if (!moreOpen) return;
+    function onDoc(e: MouseEvent) {
+      if (!moreRef.current?.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [moreOpen]);
 
   function flash(message: string) {
     setNote(message);
@@ -48,6 +73,7 @@ export function CreateWorkCommandToolbar({
   }
 
   function run(id: CreateWorkCommandId) {
+    setMoreOpen(false);
     if (id === "rename") {
       onRename?.();
       return;
@@ -78,20 +104,60 @@ export function CreateWorkCommandToolbar({
       className="mb-3 flex flex-wrap items-center gap-2"
       data-testid="create-work-command-toolbar"
       data-workspace-id={workspaceId || undefined}
+      data-action-bar="simplified"
     >
-      {commands.map((cmd) => (
+      <button
+        type="button"
+        data-testid="create-cmd-save"
+        data-primary-action="save"
+        disabled={!saveCmd?.enabled}
+        title={saveCmd?.disabledReason}
+        onClick={() => run("save")}
+        className="rounded-lg bg-[#1e4f4f] px-3.5 py-1.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
+      >
+        Save
+      </button>
+
+      <div className="relative" ref={moreRef}>
         <button
-          key={cmd.id}
           type="button"
-          data-testid={`create-cmd-${cmd.id}`}
-          disabled={!cmd.enabled}
-          title={cmd.disabledReason}
-          onClick={() => run(cmd.id)}
-          className="rounded-lg border border-[#1e4f4f]/25 bg-white/90 px-2.5 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
+          data-testid="create-cmd-more"
+          aria-expanded={moreOpen}
+          aria-haspopup="menu"
+          onClick={() => setMoreOpen((o) => !o)}
+          className="rounded-lg border border-[#1e4f4f]/25 bg-white/90 px-2.5 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+          title="More actions"
         >
-          {cmd.label}
+          More…
         </button>
-      ))}
+        {moreOpen ? (
+          <div
+            role="menu"
+            data-testid="create-cmd-more-menu"
+            className="absolute left-0 z-20 mt-1 min-w-[11rem] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-md"
+          >
+            {MORE_COMMAND_IDS.map((id) => {
+              const cmd = byId.get(id);
+              if (!cmd?.available) return null;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="menuitem"
+                  data-testid={`create-cmd-${id}`}
+                  disabled={!cmd.enabled}
+                  title={cmd.disabledReason}
+                  onClick={() => run(id)}
+                  className="block w-full px-3 py-2 text-left text-sm text-[#1f1c19] hover:bg-[#faf7f2] disabled:opacity-40"
+                >
+                  {cmd.label}
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
+
       {note ? (
         <span className="text-xs font-medium text-[#5c5346]" role="status">
           {note}

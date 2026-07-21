@@ -1,6 +1,6 @@
 # 127 — Create Experience Simplification & ADHD Optimization
 
-**Status:** P0 slice shipped (companion-first gates)  
+**Status:** P0 shipped · Refinements 20–30 landed (map Focus Mode + quieter chrome)  
 **Date:** 2026-07-21  
 **Related:** Spec 104 Create Philosophy · 056 Create Redesign · Primary Action Feedback · Spec 073 Human-Readable Identity
 
@@ -14,6 +14,12 @@ Transform Create from architecture-first into companion-first:
 - No dead-end / orphaned work states
 - Calm first experience (Spark Estate standard)
 
+## Governing principle (req 30)
+
+> One question. One focus. Everything else can wait.
+
+Runtime: `CREATE_ONE_FOCUS_PRINCIPLE` in `lib/createEstate/copy.ts`.
+
 ## Hidden from members
 
 UWE · Blueprint Framework · Routing · Relationships · Work Types · Depth Engine — implementation only.
@@ -25,6 +31,7 @@ UWE · Blueprint Framework · Routing · Relationships · Work Types · Depth En
 | Blueprint | Guided Framework · Proven Planning Method · Recommended Structure |
 | Work Type | kind of plan / what you're creating |
 | Registry / Builder / Runtime / Identity IDs | human titles only |
+| Track Execution Quietly | Keep with my projects (quiet progress stays invisible) |
 
 ## Flow (max two decisions)
 
@@ -41,6 +48,18 @@ UWE · Blueprint Framework · Routing · Relationships · Work Types · Depth En
 8. No Work / Blueprint IDs in member-facing Create ack  
 9. Immediate Open action after successful structure create  
 
+## Refinements 20–30 (working document chrome)
+
+| # | Concern | Runtime |
+|---|---------|---------|
+| 20–21, 26–28 | Workshop Map modes + Current Focus dominance | `GroupedWorkshopMap` · `workshopMapModes.ts` · `CreateEstateWorkingPanel` |
+| 22 | Save + More action bar | `CreateWorkCommandToolbar` |
+| 23 | Honest save labels | `creationDurable/saveState.ts` · `CurrentFocusInteraction` |
+| 24 | Quiet project bridge (no phrase in UI) | `CreateEstateWorkingPanel` |
+| 25 | Continue Working lists all active Work | `CreateWorkspaceResumeList` |
+| 27 | Human map categories | `EVENT_PLAN_MAP_GROUPS` · `BUSINESS_PLAN_MAP_GROUPS` · marketing groups |
+| 29–30 | Conversation-first + one focus | Entrance confirm gate preserved · principle copy |
+
 ## Runtime owners
 
 | Concern | Code |
@@ -50,12 +69,15 @@ UWE · Blueprint Framework · Routing · Relationships · Work Types · Depth En
 | Skip Start Method | `UniversalBlueprintInterface` `companionLed` |
 | Auto-broaden browse | `browseCompatibleBlueprintsAutoBroaden` |
 | Quick Start focus slice | `lib/createEstate/quickStartFocusSections.ts` |
+| Map modes | `lib/createEstate/workshopMapModes.ts` |
 | Continue Working | Create entrance + `CreateWorkspaceResumeList` |
 
 ## Tests
 
 - `lib/createEstate/resolveCreateBeginOutcome.test.ts`
+- `lib/createEstate/workshopMapModes.test.ts`
 - `lib/universalBlueprintInterface/browseBlueprints.autoBroaden.test.ts`
+- `lib/creationDurable/saveState.test.ts`
 - Updated UBI Create-entrance wiring + browser checklist (no ID chrome)
 
 ## Backlog (deferred)

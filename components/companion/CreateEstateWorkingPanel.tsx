@@ -17,6 +17,7 @@ import {
   extractTitleFromDraftContent,
   resolveHumanReadableTitle,
 } from "@/lib/activeWorkspaceRegistry/humanReadableIdentity";
+import { CREATE_ONE_FOCUS_PRINCIPLE } from "@/lib/createEstate/copy";
 import { CREATE_BACK_TO_FOCUS_DESTINATION } from "@/lib/createGuidedConversation189";
 import type { CreateWorkspacePhase } from "@/lib/createBuild";
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
@@ -272,32 +273,15 @@ export function CreateEstateWorkingPanel({
                     </button>
                   </form>
                 ) : (
-                  <>
-                    <h1
-                      className="plan-day-morning-note__title"
-                      data-testid="create-estate-working-title"
-                      data-creation-workspace={
-                        isEventWorkspace ? "event" : "create"
-                      }
-                    >
-                      {workspaceTitle}
-                    </h1>
-                    {onRenameTitle ? (
-                      <button
-                        type="button"
-                        className="rounded-lg border border-[#d4cdc3] bg-white/80 px-2.5 py-1 text-sm text-[#4b463f] hover:bg-[#f5f0e8]"
-                        data-testid="create-estate-rename"
-                        data-primary-action="save"
-                        aria-label="Rename this work"
-                        onClick={() => {
-                          setRenameDraft(workspaceTitle);
-                          setRenaming(true);
-                        }}
-                      >
-                        Rename
-                      </button>
-                    ) : null}
-                  </>
+                  <h1
+                    className="plan-day-morning-note__title"
+                    data-testid="create-estate-working-title"
+                    data-creation-workspace={
+                      isEventWorkspace ? "event" : "create"
+                    }
+                  >
+                    {workspaceTitle}
+                  </h1>
                 )}
               </div>
               <p
@@ -307,9 +291,7 @@ export function CreateEstateWorkingPanel({
                 {typeLabel} · {statusLabel}
               </p>
               <p className="mt-1 max-w-xl text-sm leading-relaxed text-[#4b463f]">
-                {isEventWorkspace
-                  ? "Your work is already underway. We focus on what matters now — everything stays connected to this same creation."
-                  : "We'll shape this together in Current Focus. The map below shows what we've gathered."}
+                {CREATE_ONE_FOCUS_PRINCIPLE}
               </p>
             </div>
             {projectWorthy && !isEventWorkspace ? (
@@ -330,10 +312,10 @@ export function CreateEstateWorkingPanel({
                   <button
                     type="button"
                     onClick={onConnectProjectHome}
-                    className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                    className="rounded-xl border border-[#c9bfb0] bg-white/80 px-4 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#f5f0e8]"
                     data-testid="create-connect-project-home"
                   >
-                    Track execution quietly
+                    Keep with my projects
                   </button>
                 )}
               </div>
@@ -393,17 +375,18 @@ export function CreateEstateWorkingPanel({
 
           <section
             id="workspace-current-focus"
-            className="mt-3 max-w-2xl rounded-2xl border border-[#c9bfb0] bg-white/90 px-4 py-3 shadow-sm"
+            className="mt-3 max-w-2xl rounded-2xl border-2 border-[#1e4f4f]/45 bg-white px-5 py-5 shadow-md ring-1 ring-[#1e4f4f]/10"
             data-testid="workspace-current-focus"
+            data-focus-dominant="true"
             aria-labelledby="workspace-current-focus-heading"
           >
             <h2
               id="workspace-current-focus-heading"
-              className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]"
+              className="text-sm font-bold uppercase tracking-wide text-[#1e4f4f]"
             >
               Current Focus
             </h2>
-            <p className="mt-1 text-lg font-semibold text-[#1f1c19]">
+            <p className="mt-2 text-2xl font-semibold leading-snug text-[#1f1c19]">
               {canonicalFocus.title}
             </p>
             {canonicalFocus.purpose &&
@@ -803,16 +786,16 @@ export function CreateEstateWorkingPanel({
           </section>
 
           <section
-            className="mt-4 max-w-2xl"
+            className="mt-6 max-w-2xl opacity-95"
             data-testid="workspace-full-map-disclosure"
-            aria-label="Full Workshop Map"
+            data-workshop-map-secondary="true"
+            aria-label="Workshop Map"
           >
-            <h2 className="mb-2 text-sm font-semibold text-[#4b463f]">
-              {`Full ${typeLabel.replace(/\s*plan$/i, "").trim() || "Work"} Workshop Map`}
+            <h2 className="mb-1 text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+              Your plan
             </h2>
-            <p className="mb-3 text-xs leading-relaxed text-[#6b635a]">
-              Every section is openable. Tap a row to work on it in Current Focus —
-              nothing stays locked.
+            <p className="mb-3 text-xs leading-relaxed text-[#9a8f82]">
+              Secondary to Current Focus — open a step when you want it.
             </p>
             <CreateWorkspaceV2Panel
               workflow={workflow}

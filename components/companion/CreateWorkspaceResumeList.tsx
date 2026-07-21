@@ -109,8 +109,8 @@ export function CreateWorkspaceResumeList({ onResume }: Props) {
                 <span className="mt-0.5 block text-sm text-[#6b635a]">
                   Last worked: {lastWorked}
                 </span>
-                <span className="mt-2 inline-block text-sm font-semibold text-[#3d3429]">
-                  {busyId === ws.id ? "Continuing…" : "Continue"}
+                <span className="mt-2 inline-block text-sm font-semibold text-[#1e4f4f]">
+                  {busyId === ws.id ? "Continuing…" : "Continue →"}
                 </span>
               </button>
             </li>

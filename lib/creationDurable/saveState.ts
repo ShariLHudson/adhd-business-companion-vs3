@@ -43,25 +43,29 @@ export function resolveCreationSaveState(
   return "clean";
 }
 
-/** Member-facing labels — never “Saved” for local-only. */
+/**
+ * Member-facing labels (127 req 23).
+ * Never show “Unsaved Changes” unless resolveCreationSaveState returned dirty.
+ * Never label local-only as Saved.
+ */
 export function labelForCreationSaveState(state: CreationSaveState): string {
   switch (state) {
     case "clean":
       return "";
     case "dirty":
-      return "Unsaved changes";
+      return "Unsaved Changes";
     case "saving":
-      return "Saving securely…";
+      return "Saving…";
     case "saved":
-      return "Saved securely";
+      return "Saved";
     case "retrying":
       return "Trying again…";
     case "failed":
-      return "Not saved securely yet";
+      return "Not saved yet";
     case "conflict":
       return "Save conflict — both versions kept";
     case "local_only":
-      return "On this device — not saved securely yet";
+      return "Draft Saved";
     default:
       return "";
   }

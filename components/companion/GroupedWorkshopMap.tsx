@@ -8,6 +8,17 @@ import {
   FACILITATED_SECTION_STATUS_LABELS,
 } from "@/lib/facilitatedCreation";
 import {
+  formatCategoryProgressLine,
+  formatPlanProgressSummary,
+  isWorkshopMapFullUnlocked,
+  noteWorkshopMapVisit,
+  readWorkshopMapModePreference,
+  resolveFocusModeSectionIds,
+  WORKSHOP_MAP_MODE_LABELS,
+  writeWorkshopMapModePreference,
+  type WorkshopMapPresentationMode,
+} from "@/lib/createEstate/workshopMapModes";
+import {
   resolveWorkshopMapForWorkflow,
   type WorkshopMapGroupView,
 } from "@/lib/universalWorkEngine";
@@ -111,6 +122,11 @@ function GroupBlock({
   if (!sectionIds.length) return null;
   const panelId = `workshop-map-group-panel-${group.groupId}`;
   const headerId = `workshop-map-group-header-${group.groupId}`;
+  const progress = formatCategoryProgressLine({
+    title: group.title,
+    completedCount: group.completedCount,
+    totalCount: group.totalCount,
+  });
 
   return (
     <div
@@ -132,7 +148,7 @@ function GroupBlock({
             {group.title}
           </span>
           <span className="text-xs font-medium text-[#6b635a]">
-            {group.completedCount} of {group.totalCount} complete
+            {progress}
             <span className="ml-2 text-[#9a8f82]" aria-hidden="true">
               {open ? "▾" : "▸"}
             </span>
@@ -161,7 +177,8 @@ function GroupBlock({
 }
 
 /**
- * Estate Workshop Map — flat for short maps, grouped/collapsible for long ones.
+ * Estate Workshop Map — Focus / Organized / Full modes (127).
+ * Categories collapse by default; one category open at a time.
  */
 export function GroupedWorkshopMap({
   workflow,
@@ -171,14 +188,7 @@ export function GroupedWorkshopMap({
   focusSet,
 }: Props) {
   const allSections = workspaceV2Sections(workflow);
-  const mapSections = showAll
-    ? allSections
-    : allSections.filter((s) => focusSet.has(s.id) || s.content.trim());
-  const visibleIds = useMemo(
-    () => new Set(mapSections.map((s) => s.id)),
-    [mapSections],
-  );
-  const mapHidden = allSections.length - mapSections.length;
+  const completedIds = new Set(workflow.completedSectionIds ?? []);
 
   const resolved = useMemo(
     () =>
@@ -196,154 +206,208 @@ export function GroupedWorkshopMap({
     ],
   );
 
-  const [openGroupIds, setOpenGroupIds] = useState<string[]>(
-    () => resolved.initiallyOpenGroupIds,
+  const [mapMode, setMapMode] = useState<WorkshopMapPresentationMode>("focus");
+  const [fullUnlocked, setFullUnlocked] = useState(false);
+  const [openGroupId, setOpenGroupId] = useState<string | null>(
+    () => resolved.initiallyOpenGroupIds[0] ?? null,
   );
-  const [pinned, setPinned] = useState<Set<string>>(new Set());
-  const [mapMenuOpen, setMapMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMapMode(readWorkshopMapModePreference());
+    setFullUnlocked(isWorkshopMapFullUnlocked());
+    noteWorkshopMapVisit({
+      completedSectionCount: completedIds.size,
+    });
+    // Mount-only familiarity + preference hydrate.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+  }, []);
 
   useEffect(() => {
     const activeGroup = resolved.groups.find((g) =>
       g.sectionIds.includes(workflow.activeSectionId ?? ""),
     );
-    if (!activeGroup) return;
-    setOpenGroupIds((prev) =>
-      prev.includes(activeGroup.groupId)
-        ? prev
-        : [...prev, activeGroup.groupId],
-    );
-  }, [workflow.activeSectionId, resolved.groups]);
+    if (activeGroup) {
+      setOpenGroupId(activeGroup.groupId);
+      return;
+    }
+    if (!openGroupId && resolved.initiallyOpenGroupIds[0]) {
+      setOpenGroupId(resolved.initiallyOpenGroupIds[0]!);
+    }
+  }, [workflow.activeSectionId, resolved.groups, resolved.initiallyOpenGroupIds, openGroupId]);
+
+  function selectMode(mode: WorkshopMapPresentationMode) {
+    if (mode === "full" && !fullUnlocked && !isWorkshopMapFullUnlocked()) {
+      return;
+    }
+    setMapMode(mode);
+    writeWorkshopMapModePreference(mode);
+    if (mode === "organized" || mode === "full") {
+      setFullUnlocked(true);
+    }
+    if (mode === "full") {
+      onWorkflowChange({
+        ...workflow,
+        showAllWorkspaceSections: true,
+      });
+    } else if (mode === "focus") {
+      onWorkflowChange({
+        ...workflow,
+        showAllWorkspaceSections: false,
+      });
+    }
+  }
 
   function toggleGroup(groupId: string) {
-    setOpenGroupIds((prev) => {
-      const isOpen = prev.includes(groupId);
-      if (isOpen) {
-        setPinned((p) => {
-          const next = new Set(p);
-          next.delete(groupId);
-          return next;
+    // One category at a time (127 req 20).
+    setOpenGroupId((prev) => (prev === groupId ? null : groupId));
+  }
+
+  const isSectionComplete = (sectionId: string) => {
+    const section = allSections.find((s) => s.id === sectionId);
+    if (!section) return false;
+    if (section.skipped) return true;
+    if (completedIds.has(sectionId)) return true;
+    return Boolean(section.content.trim());
+  };
+
+  const focusSectionIds = useMemo(
+    () =>
+      resolveFocusModeSectionIds({
+        orderedSectionIds: resolved.flatSectionIds.length
+          ? resolved.flatSectionIds
+          : allSections.map((s) => s.id),
+        activeSectionId: workflow.activeSectionId,
+        isComplete: isSectionComplete,
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- completeness derived from workflow
+    [
+      resolved.flatSectionIds,
+      allSections,
+      workflow.activeSectionId,
+      workflow.sectionContent,
+      workflow.completedSectionIds,
+      workflow.skippedSectionIds,
+    ],
+  );
+
+  const effectiveMode: WorkshopMapPresentationMode =
+    mapMode === "full" && !fullUnlocked && !isWorkshopMapFullUnlocked()
+      ? "focus"
+      : mapMode;
+
+  const useGrouped =
+    (effectiveMode === "organized" || effectiveMode === "full") &&
+    resolved.mode === "grouped";
+
+  const visibleIds = useMemo(() => {
+    if (effectiveMode === "focus") {
+      return new Set(focusSectionIds);
+    }
+    if (effectiveMode === "organized" && !showAll && focusSet.size > 0) {
+      return new Set(
+        allSections
+          .filter((s) => focusSet.has(s.id) || s.content.trim() || focusSectionIds.includes(s.id))
+          .map((s) => s.id),
+      );
+    }
+    return new Set(allSections.map((s) => s.id));
+  }, [
+    effectiveMode,
+    focusSectionIds,
+    showAll,
+    focusSet,
+    allSections,
+  ]);
+
+  const activeGroup = resolved.groups.find((g) =>
+    g.sectionIds.includes(workflow.activeSectionId ?? ""),
+  );
+  const categoriesComplete = resolved.groups.filter(
+    (g) => g.totalCount > 0 && g.completedCount >= g.totalCount,
+  ).length;
+  const progressLine =
+    useGrouped && activeGroup
+      ? formatCategoryProgressLine({
+          title: activeGroup.title,
+          completedCount: activeGroup.completedCount,
+          totalCount: activeGroup.totalCount,
+        })
+      : formatPlanProgressSummary({
+          categoriesComplete,
+          categoriesTotal: resolved.groups.length || allSections.length,
+          activeCategoryTitle: activeGroup?.title,
         });
-        return prev.filter((id) => id !== groupId);
-      }
-      setPinned((p) => new Set(p).add(groupId));
-      return [...prev, groupId];
-    });
-  }
 
-  function expandAll() {
-    setOpenGroupIds(resolved.groups.map((g) => g.groupId));
-    setPinned(new Set(resolved.groups.map((g) => g.groupId)));
-    setMapMenuOpen(false);
-  }
-
-  function collapseAll() {
-    const activeGroup = resolved.groups.find((g) =>
-      g.sectionIds.includes(workflow.activeSectionId ?? ""),
-    );
-    setOpenGroupIds(activeGroup ? [activeGroup.groupId] : []);
-    setPinned(new Set());
-    setMapMenuOpen(false);
-  }
-
-  const filledCount = allSections.filter((s) => s.content.trim()).length;
+  const listSectionIds =
+    effectiveMode === "focus"
+      ? focusSectionIds
+      : allSections.map((s) => s.id).filter((id) => visibleIds.has(id));
 
   return (
     <div
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-3"
       data-testid="create-workspace-v2-presentation"
       data-answer-capture="disabled"
       data-creation-interaction-owner="current_focus"
       data-workshop-map="estate"
-      data-workshop-map-mode={resolved.mode}
+      data-workshop-map-mode={effectiveMode}
+      data-workshop-map-grouped={useGrouped ? "true" : "false"}
     >
-      <div className="flex items-start justify-between gap-2">
-        <p className="text-sm leading-relaxed text-[#4b463f]">
-          Every section opens in Current Focus above. Tap a row to work on it —
-          nothing stays locked.
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p
+          className="text-sm font-medium text-[#1e4f4f]"
+          data-testid="workshop-map-progress"
+        >
+          {progressLine}
         </p>
-        {resolved.mode === "grouped" ? (
-          <div className="relative shrink-0">
-            <button
-              type="button"
-              className="rounded-lg px-2 py-1 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
-              aria-expanded={mapMenuOpen}
-              data-testid="workshop-map-secondary-menu"
-              onClick={() => setMapMenuOpen((o) => !o)}
-            >
-              Map options
-            </button>
-            {mapMenuOpen ? (
-              <div
-                className="absolute right-0 z-10 mt-1 min-w-[10rem] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-sm"
-                data-testid="workshop-map-secondary-menu-panel"
+        <div
+          className="flex flex-wrap gap-1"
+          role="group"
+          aria-label="Workshop map view"
+          data-testid="workshop-map-mode-switcher"
+        >
+          {(["focus", "organized", "full"] as const).map((mode) => {
+            const locked = mode === "full" && !fullUnlocked && !isWorkshopMapFullUnlocked();
+            if (locked) return null;
+            return (
+              <button
+                key={mode}
+                type="button"
+                data-testid={`workshop-map-mode-${mode}`}
+                aria-pressed={effectiveMode === mode}
+                onClick={() => selectMode(mode)}
+                className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-colors ${
+                  effectiveMode === mode
+                    ? "bg-[#1e4f4f] text-white"
+                    : "bg-[#faf7f2] text-[#6b635a] hover:bg-[#f0ebe3]"
+                }`}
               >
-                <button
-                  type="button"
-                  className="block w-full px-3 py-2 text-left text-sm text-[#1f1c19] hover:bg-[#faf7f2]"
-                  data-testid="workshop-map-expand-all"
-                  onClick={expandAll}
-                >
-                  Expand all
-                </button>
-                <button
-                  type="button"
-                  className="block w-full px-3 py-2 text-left text-sm text-[#1f1c19] hover:bg-[#faf7f2]"
-                  data-testid="workshop-map-collapse-all"
-                  onClick={collapseAll}
-                >
-                  Collapse all
-                </button>
-              </div>
-            ) : null}
-          </div>
-        ) : null}
+                {WORKSHOP_MAP_MODE_LABELS[mode]}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      {!showAll && mapHidden > 0 ? (
-        <button
-          type="button"
-          className="w-full rounded-xl border border-[#c9bfb0] bg-white/70 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-          data-testid="workshop-map-show-full"
-          onClick={() =>
-            onWorkflowChange({
-              ...workflow,
-              showAllWorkspaceSections: true,
-            })
-          }
-        >
-          Show full workshop map ({mapHidden} more sections)
-        </button>
-      ) : null}
-      {showAll && focusSet.size > 0 ? (
-        <button
-          type="button"
-          className="w-full rounded-xl border border-transparent px-4 py-2 text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]"
-          data-testid="workshop-map-show-focus"
-          onClick={() =>
-            onWorkflowChange({
-              ...workflow,
-              showAllWorkspaceSections: false,
-            })
-          }
-        >
-          Show what matters now
-        </button>
-      ) : null}
+      <p className="text-xs leading-relaxed text-[#6b635a]">
+        {effectiveMode === "focus"
+          ? "Today’s next steps — everything else can wait."
+          : effectiveMode === "organized"
+            ? "Your plan by area. Open one category at a time."
+            : "The full plan — open any section in Current Focus."}
+      </p>
 
-      {resolved.mode === "grouped" ? (
+      {useGrouped ? (
         <div
           className="flex flex-col gap-2"
           role="list"
-          aria-label="Grouped Workshop Map"
+          aria-label="Organized Workshop Map"
         >
           {resolved.groups.map((group) => (
             <GroupBlock
               key={group.groupId}
               group={group}
-              open={
-                openGroupIds.includes(group.groupId) ||
-                pinned.has(group.groupId)
-              }
+              open={openGroupId === group.groupId}
               onToggle={() => toggleGroup(group.groupId)}
               workflow={workflow}
               onOpenSection={onOpenSection}
@@ -355,12 +419,14 @@ export function GroupedWorkshopMap({
         <ul
           className="flex flex-col gap-2"
           role="list"
-          aria-label="Full Workshop Map"
+          aria-label={
+            effectiveMode === "focus" ? "Focus Workshop Map" : "Workshop Map"
+          }
         >
-          {mapSections.map((section) => (
+          {listSectionIds.map((sectionId) => (
             <SectionRow
-              key={section.id}
-              sectionId={section.id}
+              key={sectionId}
+              sectionId={sectionId}
               workflow={workflow}
               onOpenSection={onOpenSection}
             />
@@ -368,10 +434,12 @@ export function GroupedWorkshopMap({
         </ul>
       )}
 
-      <p className="text-xs text-[#9a8f82]">
-        {filledCount} of {allSections.length} sections have notes
-        {mapHidden > 0 ? ` · ${mapHidden} more in the full map` : ""}
-        {resolved.mode === "grouped" ? " · grouped map" : ""}
+      <p className="text-xs text-[#9a8f82]" data-testid="workshop-map-reassurance">
+        {useGrouped
+          ? "You have a plan — work one area at a time."
+          : effectiveMode === "focus"
+            ? "A few steps now. The rest waits until you’re ready."
+            : `${allSections.filter((s) => s.content.trim() || s.skipped).length} of ${allSections.length} sections touched`}
       </p>
     </div>
   );

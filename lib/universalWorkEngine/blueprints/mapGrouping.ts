@@ -5,8 +5,11 @@
 
 import type { BlueprintGroup, BlueprintSectionDef } from "./types";
 
-/** Maps with this many sections (or more) use groups when groups are defined. */
-export const DEFAULT_GROUP_MAP_THRESHOLD = 12;
+/**
+ * Maps with this many sections (or more) use groups when groups are defined.
+ * Spec 127 req 20 — organize when Work has more than 5 sections.
+ */
+export const DEFAULT_GROUP_MAP_THRESHOLD = 6;
 
 export type WorkshopMapSectionInput = {
   id: string;
@@ -104,7 +107,7 @@ export function buildWorkshopMapGroups(input: {
     ).length;
     views.push({
       groupId: "group-other",
-      title: "Other",
+      title: "More to cover",
       order: 999,
       sectionIds: orphanIds,
       completedCount,
@@ -116,14 +119,17 @@ export function buildWorkshopMapGroups(input: {
   return { mode: "grouped", groups: views, flatSectionIds };
 }
 
-/** Which group should start open: active section's group, else first non-default-collapsed. */
+/**
+ * Which group should start open (one at a time).
+ * Prefer Current Focus category; else previous fully-complete category; else first open-by-default.
+ */
 export function resolveInitiallyOpenGroupIds(input: {
   groups: readonly WorkshopMapGroupView[];
   activeSectionId?: string | null;
   pinnedOpenGroupIds?: readonly string[];
 }): string[] {
   if (input.pinnedOpenGroupIds?.length) {
-    return [...input.pinnedOpenGroupIds];
+    return [input.pinnedOpenGroupIds[0]!];
   }
   if (input.activeSectionId) {
     const host = input.groups.find((g) =>
@@ -131,6 +137,10 @@ export function resolveInitiallyOpenGroupIds(input: {
     );
     if (host) return [host.groupId];
   }
+  const previousComplete = [...input.groups]
+    .reverse()
+    .find((g) => g.totalCount > 0 && g.completedCount >= g.totalCount);
+  if (previousComplete) return [previousComplete.groupId];
   const first = input.groups.find((g) => !g.collapsedByDefault) ?? input.groups[0];
   return first ? [first.groupId] : [];
 }

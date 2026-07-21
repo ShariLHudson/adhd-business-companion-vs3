@@ -194,6 +194,9 @@ describe("Estate Create shell ownership", () => {
     expect(panel).toContain('presentation="estate"');
     expect(panel).toContain("CreateWorkspaceV2Panel");
     expect(panel).toContain("create-connect-project-home");
+    expect(panel).toContain("Keep with my projects");
+    expect(panel).not.toMatch(/Track [Ee]xecution [Qq]uietly/);
+    expect(panel).toContain('data-focus-dominant="true"');
     expect(panel).not.toMatch(/import.*WorkspaceLayout/);
     expect(panel).not.toContain("ContentGeneratorPanel");
   });

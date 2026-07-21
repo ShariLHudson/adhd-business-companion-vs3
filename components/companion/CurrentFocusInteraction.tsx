@@ -164,14 +164,18 @@ export function CurrentFocusInteraction({
   }, [contentKey, localLocked, submitting, draft]);
 
   const locked = Boolean(submitting) || localLocked;
+  // 127 req 23 — Unsaved only when draft differs from last saved section content.
+  const savedBaseline =
+    typeof focus.savedContent === "string" ? focus.savedContent : "";
+  const draftDiffersFromSaved = draft.trim() !== savedBaseline.trim();
   const saveState =
     saveStateOverride ??
     resolveCreationSaveState({
       submitting: Boolean(submitting) || localLocked,
       failureMessage,
       lastDurableOk,
-      dirty: Boolean(draft.trim()),
-      hasLocalRecovery: recoveredOnce && Boolean(draft.trim()),
+      dirty: draftDiffersFromSaved,
+      hasLocalRecovery: recoveredOnce && draftDiffersFromSaved,
     });
 
   function handleSubmit() {

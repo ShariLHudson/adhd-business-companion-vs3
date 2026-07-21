@@ -50,7 +50,7 @@ export function ensureEventPlanWorkTypeRegistered(): void {
     },
     sections: EVENT_PLAN_MAP_SECTIONS,
     mapGroups: EVENT_PLAN_MAP_GROUPS,
-    groupMapThreshold: 12,
+    groupMapThreshold: 6,
     defaultFocusSectionIds: EVENT_PLAN_DEFAULT_FOCUS,
     questionDefinitionIds: ["event-foundation"],
     deliverableIds: ["event-plan-brief"],

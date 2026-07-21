@@ -341,13 +341,14 @@ describe("Production Create foundation certification (Event reference)", () => {
   });
 
   describe("Recovery + save honesty", () => {
-    it("local / offline / failed never claim Saved securely", () => {
-      for (const state of ["local_only", "dirty", "failed", "saving"] as const) {
+    it("local / offline / failed never claim Saved (127 labels)", () => {
+      for (const state of ["dirty", "failed", "saving"] as const) {
         expect(labelForCreationSaveState(state).startsWith("Saved")).toBe(
           false,
         );
       }
-      expect(labelForCreationSaveState("saved")).toBe("Saved securely");
+      expect(labelForCreationSaveState("local_only")).toBe("Draft Saved");
+      expect(labelForCreationSaveState("saved")).toBe("Saved");
 
       expect(
         resolveCreationSaveState({
@@ -443,7 +444,9 @@ describe("Production Create foundation certification (Event reference)", () => {
         "utf8",
       );
       expect(toolbarSrc).toContain("data-workspace-id");
-      expect(toolbarSrc).toContain("data-testid={`create-cmd-${cmd.id}`}");
+      expect(toolbarSrc).toContain('data-testid="create-cmd-save"');
+      expect(toolbarSrc).toContain('data-testid="create-cmd-more"');
+      expect(toolbarSrc).toContain("data-testid={`create-cmd-${id}`}");
       expect(toolbarSrc).toContain("ExportActions");
       expect(
         withDraft.map((c) => c.id).filter((id) =>
@@ -454,18 +457,21 @@ describe("Production Create foundation certification (Event reference)", () => {
 
     it("accessibility contracts: map rows, focus field, commands", () => {
       const mapSrc = readFileSync(
-        join(process.cwd(), "components/companion/CreateWorkspaceV2Panel.tsx"),
+        join(process.cwd(), "components/companion/GroupedWorkshopMap.tsx"),
         "utf8",
       );
       expect(mapSrc).toContain("aria-label={`${section.label}");
       expect(mapSrc).toContain("workshop-map-row-");
       expect(mapSrc).toContain('role="list"');
+      expect(mapSrc).toContain("workshop-map-mode-switcher");
 
       const focusSrc = readFileSync(
         join(process.cwd(), "components/companion/CurrentFocusInteraction.tsx"),
         "utf8",
       );
-      expect(focusSrc).toContain("Current Focus response for");
+      expect(focusSrc).toMatch(/Writing \$\{focus\.title\}|aria-label=\{`Writing/);
+      expect(focusSrc).toContain("current-focus-need-a-hand");
+      expect(focusSrc).toContain('data-primary-action="save-section"');
       expect(focusSrc).toContain("CreationSaveStateBadge");
       expect(focusSrc).toContain("current-focus-save");
 
