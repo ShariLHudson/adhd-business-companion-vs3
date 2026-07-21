@@ -35,7 +35,7 @@ export function replyForDecision(input: {
         : "This looks connected to something you’re already building. Would you like to connect this rather than create another copy?";
     case "create_new":
       return input.blueprintTitle
-        ? `I found a Blueprint that fits — ${input.blueprintTitle}. We can begin from there.`
+        ? `I found a proven structure that fits — ${input.blueprintTitle}. We can begin from there.`
         : "This may deserve its own plan. We can begin whenever you’re ready.";
     case "clarify":
       return "I want to make sure we open the right thing — continue what you started, or begin something new?";

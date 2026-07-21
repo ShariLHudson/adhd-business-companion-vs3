@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
-  browseCompatibleBlueprints,
+  browseCompatibleBlueprintsAutoBroaden,
   defaultRecommendedBlueprintIds,
   type BlueprintBrowserItem,
   type BlueprintBrowserSourceFilter,
@@ -27,7 +27,7 @@ const SOURCES: { id: BlueprintBrowserSourceFilter; label: string }[] = [
 ];
 
 /**
- * Universal Blueprint browser — registry-backed, Work Type filtered.
+ * Guided structure browser — registry-backed, auto-broadens empty filters (127).
  */
 export function UniversalBlueprintBrowser({
   workTypeId,
@@ -50,9 +50,9 @@ export function UniversalBlueprintBrowser({
     [workTypeId],
   );
 
-  const items = useMemo(
+  const browseResult = useMemo(
     () =>
-      browseCompatibleBlueprints({
+      browseCompatibleBlueprintsAutoBroaden({
         workTypeId,
         search,
         source,
@@ -71,6 +71,7 @@ export function UniversalBlueprintBrowser({
       recommendedBlueprintIds,
     ],
   );
+  const items = browseResult.items;
 
   return (
     <section
@@ -81,10 +82,10 @@ export function UniversalBlueprintBrowser({
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 id="ubi-browser-heading" className="text-xl">
-            Choose a Blueprint
+            Choose a recommended structure
           </h2>
           <p className="ubi-muted mt-1">
-            Only Blueprints that fit this kind of work are shown.
+            Only structures that fit this kind of work are shown.
           </p>
         </div>
         {onBack ? (
@@ -100,7 +101,7 @@ export function UniversalBlueprintBrowser({
       </div>
 
       <label className="mt-4 block">
-        <span className="sr-only">Search Blueprints</span>
+        <span className="sr-only">Search structures</span>
         <input
           className="ubi-field"
           value={search}
@@ -110,7 +111,7 @@ export function UniversalBlueprintBrowser({
         />
       </label>
 
-      <div className="ubi-chip-row mt-3" role="toolbar" aria-label="Blueprint source">
+      <div className="ubi-chip-row mt-3" role="toolbar" aria-label="Structure source">
         {SOURCES.map((s) => (
           <button
             key={s.id}
@@ -184,9 +185,20 @@ export function UniversalBlueprintBrowser({
         </div>
       ) : null}
 
+      {browseResult.broadenNote ? (
+        <p
+          className="ubi-muted mt-3 text-sm"
+          data-testid="ubi-browser-broadened"
+          role="status"
+        >
+          {browseResult.broadenNote}
+        </p>
+      ) : null}
+
       {items.length === 0 ? (
         <p className="ubi-muted mt-4" data-testid="ubi-browser-empty">
-          No matching Blueprints yet. Try another filter, or start from scratch.
+          Nothing fits yet — describe what you want to create above, and Shari
+          will choose a structure with you.
         </p>
       ) : (
         <ul
@@ -197,6 +209,8 @@ export function UniversalBlueprintBrowser({
           }
           data-testid="ubi-browser-results"
           data-view={view}
+          data-broadened={browseResult.broadened ? "true" : "false"}
+          data-effective-source={browseResult.effectiveSource}
         >
           {items.map((item) => (
             <li key={item.blueprintId}>

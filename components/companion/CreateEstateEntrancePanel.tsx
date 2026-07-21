@@ -9,8 +9,12 @@ import { AppBackButton } from "@/components/companion/AppBackButton";
 import { UniversalBlueprintInterface } from "@/components/companion/universalBlueprint";
 import {
   CREATE_ESTATE_ACTIVE_CHOICE_HEADING,
+  CREATE_ESTATE_ADVANCED_HEADING,
+  CREATE_ESTATE_ADVANCED_HINT,
   CREATE_ESTATE_BEGIN_LABEL,
   CREATE_ESTATE_COMPOSER_PLACEHOLDER,
+  CREATE_ESTATE_CONFIRM_OTHER,
+  CREATE_ESTATE_CONFIRM_YES,
   CREATE_ESTATE_CONTINUE_EMPTY,
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_DRAFTS_HEADING,
@@ -21,9 +25,14 @@ import {
   CREATE_VS_PROJECTS_CUE,
   createEstateContinueCurrentLabel,
 } from "@/lib/createEstate/copy";
+import {
+  createOpenPlanLabel,
+  createWorkReadyMessage,
+} from "@/lib/createEstate/createIntentConfirmation";
 import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import {
+  confirmCreateBeginToOpen,
   resolveCreateBeginOutcome,
   type CreateBeginOutcome,
 } from "@/lib/createEstate/resolveCreateBeginOutcome";
@@ -93,10 +102,19 @@ export function CreateEstateEntrancePanel({
   const [startNewBusy, setStartNewBusy] = useState(false);
   const [beginFeedback, setBeginFeedback] = useState<string | null>(null);
   const [beginFeedbackKind, setBeginFeedbackKind] = useState<
-    "clarify" | "error" | "progress" | null
+    "clarify" | "error" | "progress" | "confirm" | null
   >(null);
-  const [blueprintPathOpen, setBlueprintPathOpen] = useState(false);
+  const [pendingConfirm, setPendingConfirm] = useState<Extract<
+    CreateBeginOutcome,
+    { kind: "confirm" }
+  > | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [blueprintWorkAck, setBlueprintWorkAck] = useState<string | null>(null);
+  const [blueprintOpenLabel, setBlueprintOpenLabel] = useState("Open My Plan");
+  const [pendingOpenOutcome, setPendingOpenOutcome] = useState<Extract<
+    CreateBeginOutcome,
+    { kind: "open" }
+  > | null>(null);
   const [blueprintWorkTypeId, setBlueprintWorkTypeId] = useState<string>(
     EVENT_PLAN_WORK_TYPE_ID,
   );
@@ -126,11 +144,55 @@ export function CreateEstateEntrancePanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only
   }, []);
 
+  function openConfirmed(outcome: Extract<CreateBeginOutcome, { kind: "open" }>) {
+    // 103 / 105 — Event and Marketing Plan Begin resolve through Anywhere-Origin
+    if (outcome.isEventDomain || outcome.isMarketingPlanDomain) {
+      const anywhere = launchFromCreate({
+        originalUserMessage: outcome.text,
+        candidateWorkTypeId: outcome.isMarketingPlanDomain
+          ? MARKETING_PLAN_WORK_TYPE_ID
+          : EVENT_PLAN_WORK_TYPE_ID,
+      });
+      if (anywhere.decision === "clarify") {
+        setBeginFeedback(anywhere.reply);
+        setBeginFeedbackKind("clarify");
+        setPendingConfirm(null);
+        setBeginBusy(false);
+        return;
+      }
+      if (anywhere.decision === "continue_existing" && anywhere.reply) {
+        setBlueprintWorkAck(anywhere.reply);
+      }
+      if (outcome.isMarketingPlanDomain) {
+        setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID);
+      }
+    }
+
+    void (async () => {
+      try {
+        setBeginFeedback("Saving your workspace securely…");
+        setBeginFeedbackKind("progress");
+        await Promise.resolve(onBeginCreate(outcome));
+        setBeginFeedback(null);
+        setBeginFeedbackKind(null);
+        setPendingConfirm(null);
+      } catch {
+        setBeginFeedback(
+          "I couldn't save that creation yet. Your words are still here — Retry, or pick a type below.",
+        );
+        setBeginFeedbackKind("error");
+      } finally {
+        setBeginBusy(false);
+      }
+    })();
+  }
+
   function submitPrompt() {
     // P0 — every Begin click produces visible feedback (never silent)
     setBeginBusy(true);
     setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
     setBeginFeedbackKind("progress");
+    setPendingConfirm(null);
 
     const outcome = resolveCreateBeginOutcome(prompt);
 
@@ -148,45 +210,31 @@ export function CreateEstateEntrancePanel({
       return;
     }
 
-    // 103 / 105 — Event and Marketing Plan Begin resolve through Anywhere-Origin
-    if (outcome.isEventDomain || outcome.isMarketingPlanDomain) {
-      const anywhere = launchFromCreate({
-        originalUserMessage: outcome.text,
-        candidateWorkTypeId: outcome.isMarketingPlanDomain
-          ? MARKETING_PLAN_WORK_TYPE_ID
-          : EVENT_PLAN_WORK_TYPE_ID,
-      });
-      if (anywhere.decision === "clarify") {
-        setBeginFeedback(anywhere.reply);
-        setBeginFeedbackKind("clarify");
-        setBeginBusy(false);
-        return;
-      }
-      if (anywhere.decision === "continue_existing" && anywhere.reply) {
-        setBlueprintWorkAck(anywhere.reply);
-      }
-      if (outcome.isMarketingPlanDomain) {
-        setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID);
-      }
+    // Spec 127 — never silently create; confirm inferred type first.
+    if (outcome.kind === "confirm") {
+      setPendingConfirm(outcome);
+      setBeginFeedback(outcome.message);
+      setBeginFeedbackKind("confirm");
+      setBeginBusy(false);
+      return;
     }
 
-    void (async () => {
-      try {
-        setBeginFeedback("Saving your workspace securely…");
-        setBeginFeedbackKind("progress");
-        await Promise.resolve(onBeginCreate(outcome));
-        // Success transitions away to workspace; keep brief progress if still mounted
-        setBeginFeedback(null);
-        setBeginFeedbackKind(null);
-      } catch {
-        setBeginFeedback(
-          "I couldn't save that creation yet. Your words are still here — Retry, or pick a type below.",
-        );
-        setBeginFeedbackKind("error");
-      } finally {
-        setBeginBusy(false);
-      }
-    })();
+    // Defensive — resolveCreateBeginOutcome no longer returns open.
+    openConfirmed(outcome);
+  }
+
+  function acceptConfirm() {
+    if (!pendingConfirm) return;
+    setBeginBusy(true);
+    openConfirmed(confirmCreateBeginToOpen(pendingConfirm));
+  }
+
+  function declineConfirm() {
+    setPendingConfirm(null);
+    setBeginFeedback(
+      "No problem — tell me a little more about what you'd like to create, or pick another direction below.",
+    );
+    setBeginFeedbackKind("clarify");
   }
 
   return (
@@ -284,9 +332,14 @@ export function CreateEstateEntrancePanel({
             value={prompt}
             onChange={(e) => {
               setPrompt(e.target.value);
-              if (beginFeedbackKind === "clarify" || beginFeedbackKind === "error") {
+              if (
+                beginFeedbackKind === "clarify" ||
+                beginFeedbackKind === "error" ||
+                beginFeedbackKind === "confirm"
+              ) {
                 setBeginFeedback(null);
                 setBeginFeedbackKind(null);
+                setPendingConfirm(null);
               }
             }}
             onKeyDown={(e) => {
@@ -315,7 +368,7 @@ export function CreateEstateEntrancePanel({
               {beginBusy ? "Beginning…" : CREATE_ESTATE_BEGIN_LABEL}
             </button>
             {beginFeedback ? (
-              <p
+              <div
                 role="status"
                 aria-live="polite"
                 className={
@@ -328,8 +381,34 @@ export function CreateEstateEntrancePanel({
                 data-testid="create-estate-begin-feedback"
                 data-begin-feedback={beginFeedbackKind ?? "none"}
               >
-                {beginFeedback}
-              </p>
+                <p>{beginFeedback}</p>
+                {beginFeedbackKind === "confirm" && pendingConfirm ? (
+                  <div
+                    className="mt-3 flex flex-col gap-2 sm:flex-row"
+                    data-testid="create-estate-intent-confirm"
+                  >
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="rounded-xl bg-[#3d3429] px-5 py-2.5 text-sm font-semibold text-[#f7f2ea] transition hover:bg-[#2c241c] disabled:opacity-70"
+                      data-testid="create-estate-confirm-yes"
+                      data-primary-action="begin"
+                      onClick={acceptConfirm}
+                    >
+                      {CREATE_ESTATE_CONFIRM_YES}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                      data-testid="create-estate-confirm-other"
+                      onClick={declineConfirm}
+                    >
+                      {CREATE_ESTATE_CONFIRM_OTHER}
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             ) : null}
           </div>
         </section>
@@ -379,23 +458,22 @@ export function CreateEstateEntrancePanel({
 
         <details
           className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-          data-testid="create-estate-blueprint-paths"
-          open={blueprintPathOpen}
+          data-testid="create-estate-advanced"
+          open={advancedOpen}
           onToggle={(e) =>
-            setBlueprintPathOpen((e.target as HTMLDetailsElement).open)
+            setAdvancedOpen((e.target as HTMLDetailsElement).open)
           }
         >
           <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
-            Start with a Blueprint
+            {CREATE_ESTATE_ADVANCED_HEADING}
           </summary>
           <p className="mt-2 text-sm text-[#6b635a]">
-            Scratch, Blueprint, or previous work — one calm path at a time.
-            Event and Marketing Plan Blueprints share the same registry.
+            {CREATE_ESTATE_ADVANCED_HINT}
           </p>
           <div
             className="mt-3 flex flex-wrap gap-2"
             role="group"
-            aria-label="Blueprint work type"
+            aria-label="Kind of plan"
           >
             <button
               type="button"
@@ -426,25 +504,41 @@ export function CreateEstateEntrancePanel({
           <div className="mt-3">
             <UniversalBlueprintInterface
               workTypeId={blueprintWorkTypeId}
-              onStartFromScratch={() => {
-                setBlueprintPathOpen(false);
-                if (blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID) {
-                  setPrompt("I want to create a simple marketing plan from scratch");
-                  setBeginFeedback(
-                    "Describe what you want to market above, then press Begin — no Blueprint required.",
-                  );
-                } else {
-                  setPrompt("I want to plan an event from scratch");
-                  setBeginFeedback(
-                    "Describe your event above, then press Begin — no Blueprint required.",
-                  );
+              companionLed
+              openWorkLabel={blueprintOpenLabel}
+              onOpenWork={() => {
+                if (pendingOpenOutcome) {
+                  void openConfirmed(pendingOpenOutcome);
+                  return;
                 }
-                setBeginFeedbackKind("clarify");
+                const label =
+                  blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
+                    ? "Marketing Plan"
+                    : "Event Plan";
+                void openConfirmed({
+                  kind: "open",
+                  text: `Open my ${label}`,
+                  artifactType: label,
+                  isEventDomain: blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
+                  isMarketingPlanDomain:
+                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
+                });
               }}
-              onWorkReady={(state) => {
-                setBlueprintWorkAck(
-                  `Started ${state.blueprintId} as ${state.workId}. Depth can change anytime without starting over.`,
-                );
+              onWorkReady={() => {
+                const label =
+                  blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
+                    ? "Marketing Plan"
+                    : "Event Plan";
+                setBlueprintOpenLabel(createOpenPlanLabel(label));
+                setBlueprintWorkAck(createWorkReadyMessage(label));
+                setPendingOpenOutcome({
+                  kind: "open",
+                  text: prompt.trim() || `Continue my ${label}`,
+                  artifactType: label,
+                  isEventDomain: blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
+                  isMarketingPlanDomain:
+                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
+                });
               }}
             />
           </div>

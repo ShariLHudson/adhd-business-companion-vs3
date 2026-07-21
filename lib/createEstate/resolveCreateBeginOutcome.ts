@@ -1,7 +1,8 @@
 /**
- * Create Begin — exactly two member-facing outcomes:
- * 1) Open workspace with identified type + Current Focus
- * 2) Clarify when ambiguous
+ * Create Begin — member-facing outcomes:
+ * 1) Confirm inferred type (high/medium confidence) — never silent create
+ * 2) Clarify when ambiguous or low confidence
+ * 3) Open only after member confirms (panel converts confirm → open)
  * Never silent no-op.
  *
  * Leaf-only — no universalCreationEntrypoint / Events barrel
@@ -17,12 +18,27 @@ import {
 } from "@/lib/primaryActionFeedback";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform/oneCreationPlatform";
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
+import {
+  createIntentConfirmMessage,
+  createIntentSoftConfirmMessage,
+  scoreCreateIntentConfidence,
+  type CreateIntentConfidence,
+} from "./createIntentConfirmation";
 
 export type CreateBeginOutcome =
   | {
       kind: "clarify";
       message: string;
-      reason: "empty" | "ambiguous" | "entrypoint_clarify";
+      reason: "empty" | "ambiguous" | "entrypoint_clarify" | "low_confidence";
+    }
+  | {
+      kind: "confirm";
+      text: string;
+      artifactType: string;
+      message: string;
+      confidence: Exclude<CreateIntentConfidence, "low">;
+      isEventDomain: boolean;
+      isMarketingPlanDomain: boolean;
     }
   | {
       kind: "open";
@@ -36,19 +52,62 @@ export type CreateBeginOutcome =
       message: string;
     };
 
-function resolveArtifactType(text: string): string | null {
-  const fromCatalog = matchCatalogFromText(text)?.type?.trim() || null;
-  if (fromCatalog) return fromCatalog;
+type ResolvedArtifact = {
+  artifactType: string;
+  fromCatalog: boolean;
+  fromPromptDetect: boolean;
+};
+
+function resolveArtifactType(text: string): ResolvedArtifact | null {
+  const catalogMatch = matchCatalogFromText(text)?.type?.trim() || null;
+  if (catalogMatch) {
+    return {
+      artifactType: catalogMatch,
+      fromCatalog: true,
+      fromPromptDetect: false,
+    };
+  }
   const fromPrompt = detectCreateTypeFromPrompt(text)?.trim() || null;
-  if (fromPrompt) return fromPrompt;
-  if (isMarketingPlanCreationRequest(text)) return "Marketing Plan";
-  if (isEventDomainCreationRequest(text)) return "Event Plan";
+  if (fromPrompt) {
+    return {
+      artifactType: fromPrompt,
+      fromCatalog: false,
+      fromPromptDetect: true,
+    };
+  }
+  if (isMarketingPlanCreationRequest(text)) {
+    return {
+      artifactType: "Marketing Plan",
+      fromCatalog: false,
+      fromPromptDetect: false,
+    };
+  }
+  if (isEventDomainCreationRequest(text)) {
+    return {
+      artifactType: "Event Plan",
+      fromCatalog: false,
+      fromPromptDetect: false,
+    };
+  }
   return null;
 }
 
+/** Convert a confirmed intent into the open outcome parents already wire. */
+export function confirmCreateBeginToOpen(
+  outcome: Extract<CreateBeginOutcome, { kind: "confirm" }>,
+): Extract<CreateBeginOutcome, { kind: "open" }> {
+  return {
+    kind: "open",
+    text: outcome.text,
+    artifactType: outcome.artifactType,
+    isEventDomain: outcome.isEventDomain,
+    isMarketingPlanDomain: outcome.isMarketingPlanDomain,
+  };
+}
+
 /**
- * Resolve Begin click into open | clarify | error.
- * Always returns a member-visible outcome.
+ * Resolve Begin click into confirm | clarify | error.
+ * Never returns open — creation requires an explicit Yes.
  */
 export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome {
   const text = userText.trim();
@@ -61,8 +120,8 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
   }
 
   try {
-    const artifactType = resolveArtifactType(text);
-    if (!artifactType) {
+    const resolved = resolveArtifactType(text);
+    if (!resolved) {
       return {
         kind: "clarify",
         message: CREATE_BEGIN_AMBIGUOUS_MESSAGE,
@@ -72,13 +131,37 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
 
     const isMarketingPlanDomain =
       isMarketingPlanCreationRequest(text) ||
-      /marketing\s+plan/i.test(artifactType);
-    return {
-      kind: "open",
+      /marketing\s+plan/i.test(resolved.artifactType);
+    const isEventDomain =
+      isEventDomainCreationRequest(text) && !isMarketingPlanDomain;
+
+    const confidence = scoreCreateIntentConfidence({
       text,
-      artifactType,
-      isEventDomain:
-        isEventDomainCreationRequest(text) && !isMarketingPlanDomain,
+      artifactType: resolved.artifactType,
+      fromCatalog: resolved.fromCatalog,
+      fromPromptDetect: resolved.fromPromptDetect,
+      isMarketingPlanDomain,
+      isEventDomain,
+    });
+
+    if (confidence === "low") {
+      return {
+        kind: "clarify",
+        message: CREATE_BEGIN_AMBIGUOUS_MESSAGE,
+        reason: "low_confidence",
+      };
+    }
+
+    return {
+      kind: "confirm",
+      text,
+      artifactType: resolved.artifactType,
+      message:
+        confidence === "high"
+          ? createIntentConfirmMessage(resolved.artifactType)
+          : createIntentSoftConfirmMessage(resolved.artifactType),
+      confidence,
+      isEventDomain,
       isMarketingPlanDomain,
     };
   } catch {
@@ -93,5 +176,6 @@ export function createBeginOutcomeIsVisible(
   outcome: CreateBeginOutcome,
 ): boolean {
   if (outcome.kind === "open") return true;
+  if (outcome.kind === "confirm") return Boolean(outcome.message.trim());
   return Boolean(outcome.message.trim());
 }

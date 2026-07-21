@@ -230,7 +230,7 @@ describe("102 Universal Blueprint Interface", () => {
     }
   });
 
-  it("Create entrance wires the three start paths", () => {
+  it("Create entrance wires companion-led Customize (no Start Method)", () => {
     const panel = readFileSync(
       resolve(
         process.cwd(),
@@ -239,7 +239,10 @@ describe("102 Universal Blueprint Interface", () => {
       "utf8",
     );
     expect(panel).toContain("UniversalBlueprintInterface");
-    expect(panel).toContain("create-estate-blueprint-paths");
-    expect(panel).toContain("onStartFromScratch");
+    expect(panel).toContain("create-estate-advanced");
+    expect(panel).toContain("companionLed");
+    expect(panel).toContain("create-estate-intent-confirm");
+    expect(panel).not.toContain("create-estate-blueprint-paths");
+    expect(panel).not.toContain("Start with a Blueprint");
   });
 });

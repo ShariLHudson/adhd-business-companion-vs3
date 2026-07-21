@@ -21,8 +21,17 @@ export const CREATE_ESTATE_HOW_DO_I = [
 /** Optional browse — not the primary path (056). */
 export const CREATE_ESTATE_PICKER_HEADING = "Browse for inspiration";
 
-/** Active Creation Workspaces (056) — one primary resume story. */
-export const CREATE_ESTATE_CONTINUE_HEADING = "Continue Where You Left Off";
+/** Active Creation Workspaces (056 / 127) — unified Active Work resume. */
+export const CREATE_ESTATE_CONTINUE_HEADING = "Continue Working";
+
+/** Spec 127 — confirmation CTA labels. */
+export const CREATE_ESTATE_CONFIRM_YES = "Yes, let's begin";
+export const CREATE_ESTATE_CONFIRM_OTHER = "Choose something else";
+
+/** Advanced / Customize — delayed structure browsing (no Start Method). */
+export const CREATE_ESTATE_ADVANCED_HEADING = "Customize";
+export const CREATE_ESTATE_ADVANCED_HINT =
+  "Optional — browse a recommended structure if you already know the shape you want. Shari usually chooses this for you.";
 
 /**
  * When active work exists — explicit choice between resume and force-new.

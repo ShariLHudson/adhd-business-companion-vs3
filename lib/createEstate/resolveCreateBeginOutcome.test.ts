@@ -5,9 +5,16 @@ import {
   PRIMARY_ACTION_FEEDBACK_RULE,
 } from "@/lib/primaryActionFeedback";
 import {
+  confirmCreateBeginToOpen,
   createBeginOutcomeIsVisible,
   resolveCreateBeginOutcome,
 } from "./resolveCreateBeginOutcome";
+import {
+  createIntentConfirmMessage,
+  createOpenPlanLabel,
+  createWorkReadyMessage,
+} from "./createIntentConfirmation";
+import { progressiveQuickStartSectionIds } from "./quickStartFocusSections";
 
 describe("Create Begin — always one of two outcomes", () => {
   it("declares platform primary-action feedback rule", () => {
@@ -33,41 +40,80 @@ describe("Create Begin — always one of two outcomes", () => {
     expect(createBeginOutcomeIsVisible(outcome)).toBe(true);
   });
 
-  it("clear workshop Begin → open with artifact type", () => {
+  it("clear workshop Begin → confirm (never silent open)", () => {
     const outcome = resolveCreateBeginOutcome(
       "I want to create a workshop for ADHD founders",
     );
-    expect(outcome.kind).toBe("open");
-    if (outcome.kind === "open") {
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind === "confirm") {
       expect(outcome.artifactType.toLowerCase()).toMatch(/workshop/);
       expect(outcome.text).toMatch(/workshop/i);
+      expect(outcome.message).toMatch(/sounds like|think a/i);
+      expect(["high", "medium"]).toContain(outcome.confidence);
     }
   });
 
-  it("clear email Begin → open", () => {
+  it("clear email Begin → confirm", () => {
     const outcome = resolveCreateBeginOutcome(
       "Help me write a welcome email for new clients",
     );
-    expect(outcome.kind).toBe("open");
-    if (outcome.kind === "open") {
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind === "confirm") {
       expect(outcome.artifactType).toBeTruthy();
       expect(outcome.isMarketingPlanDomain).toBe(false);
     }
   });
 
-  it("marketing plan Begin → open with Marketing Plan domain", () => {
+  it("marketing plan Begin → confirm with Marketing Plan domain", () => {
     const outcome = resolveCreateBeginOutcome(
       "Help me create a simple marketing plan",
     );
-    expect(outcome.kind).toBe("open");
-    if (outcome.kind === "open") {
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind === "confirm") {
       expect(outcome.artifactType).toMatch(/marketing plan/i);
       expect(outcome.isMarketingPlanDomain).toBe(true);
       expect(outcome.isEventDomain).toBe(false);
+      expect(outcome.confidence).toBe("high");
+      expect(outcome.message).toBe(
+        createIntentConfirmMessage(outcome.artifactType),
+      );
     }
   });
 
-  it("entrance panel wires Begin feedback + onBeginCreate", async () => {
+  it("confirm → open only after explicit conversion (no silent create)", () => {
+    const outcome = resolveCreateBeginOutcome(
+      "Help me create a simple marketing plan",
+    );
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind !== "confirm") return;
+    const open = confirmCreateBeginToOpen(outcome);
+    expect(open.kind).toBe("open");
+    expect(open.artifactType).toBe(outcome.artifactType);
+    expect(open.text).toBe(outcome.text);
+  });
+
+  it("member-facing copy never exposes Blueprint / Work Type jargon", () => {
+    expect(createWorkReadyMessage("Marketing Plan")).toBe(
+      "Your Marketing Plan is ready.",
+    );
+    expect(createOpenPlanLabel("Marketing Plan")).toBe("Open My Marketing Plan");
+    expect(createIntentConfirmMessage("Marketing Plan")).not.toMatch(
+      /blueprint|work type|registry|runtime/i,
+    );
+  });
+
+  it("Quick Start progressive focus never dumps every section", () => {
+    const ids = Array.from({ length: 16 }, (_, i) => `section_${i + 1}`);
+    const focus = progressiveQuickStartSectionIds({
+      visibleSectionIds: ids,
+      completedSectionIds: ["section_1", "section_2"],
+    });
+    expect(focus).toHaveLength(5);
+    expect(focus[0]).toBe("section_3");
+    expect(focus).not.toContain("section_1");
+  });
+
+  it("entrance panel wires Begin feedback + intent confirm + onBeginCreate", async () => {
     const { readFileSync } = await import("fs");
     const { resolve } = await import("path");
     const panel = readFileSync(
@@ -77,7 +123,11 @@ describe("Create Begin — always one of two outcomes", () => {
     expect(panel).toContain("onBeginCreate");
     expect(panel).toContain("resolveCreateBeginOutcome");
     expect(panel).toContain("create-estate-begin-feedback");
+    expect(panel).toContain("create-estate-intent-confirm");
+    expect(panel).toContain("confirmCreateBeginToOpen");
     expect(panel).toContain("data-primary-action=\"begin\"");
+    expect(panel).toContain("companionLed");
+    expect(panel).not.toContain("Start with a Blueprint");
     expect(panel).not.toContain("onConversationalCreate");
   });
 

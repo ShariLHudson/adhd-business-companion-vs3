@@ -190,7 +190,9 @@ describe("102 founder browser checklist", () => {
     expect(container.querySelector("[data-testid='ubi-active-work']")).toBeTruthy();
     expect(readyWorkIds.length).toBe(1);
     const workId1 = readyWorkIds[0]!;
-    expect(text(container, "ubi-active-work-id")).toContain(workId1);
+    // Spec 127 — member-facing success; Work IDs stay off-screen
+    expect(text(container, "ubi-work-ready-message")).toMatch(/ready/i);
+    expect(container.querySelector("[data-testid='ubi-active-work-id']")).toBeNull();
 
     const stateAfterInit = getWorkBlueprintState(workId1)!;
     expect(stateAfterInit.depthMode).toBe("quick_start");
@@ -252,7 +254,7 @@ describe("102 founder browser checklist", () => {
 
     // Resume should restore the active Work surface (not an empty active step)
     expect(container.querySelector("[data-testid='ubi-active-work']")).toBeTruthy();
-    expect(text(container, "ubi-active-work-id")).toContain(workId1);
+    expect(text(container, "ubi-work-ready-message")).toMatch(/ready/i);
 
     // 5. Build From Previous Work (after Event exists)
     act(() => {

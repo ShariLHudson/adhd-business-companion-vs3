@@ -55,18 +55,21 @@ describe("My Work → Create navigation (116 / 149)", () => {
   it("CreateEstateEntrancePanel shows picker + continue (no Browse / Start With)", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-entrance");
-    expect(panel).toContain("create-estate-how-do-i");
+    expect(panel).toContain("create-estate-intent-confirm");
+    expect(panel).toContain("create-estate-advanced");
     expect(panel).toContain("CreateCatalogPicker");
     expect(panel).toContain("CreateDraftResumeList");
     expect(panel).toContain("CREATE_ESTATE_PICKER_HEADING");
     expect(panel).toContain("CREATE_ESTATE_CONTINUE_HEADING");
+    expect(panel).toContain("companionLed");
     expect(panel).not.toContain("CREATE_ESTATE_START_CHOICES");
     expect(panel).not.toContain("Browse things I can create");
     expect(panel).not.toContain("Start with what I need");
+    expect(panel).not.toContain("Start with a Blueprint");
     expect(CREATE_ESTATE_WINDOW_TITLE).toBe("Create");
-    expect(CREATE_ESTATE_PICKER_HEADING).toBe("What Do You Want to Create?");
-    expect(CREATE_ESTATE_CONTINUE_HEADING).toBe("Continue a Saved Creation");
-    expect(CREATE_ESTATE_EXPLANATION).toMatch(/Make something new/i);
+    expect(CREATE_ESTATE_PICKER_HEADING).toBe("Browse for inspiration");
+    expect(CREATE_ESTATE_CONTINUE_HEADING).toBe("Continue Working");
+    expect(CREATE_ESTATE_EXPLANATION).toMatch(/create/i);
     expect(CREATE_VS_PROJECTS_CUE).toMatch(/Projects organize/i);
     expect(CREATE_ESTATE_HOW_DO_I).toMatch(/Create is different from Projects/i);
   });

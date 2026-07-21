@@ -47,9 +47,21 @@ type Props = {
   onStartFromScratch?: () => void;
   /** Called when UWE Work is initialized or resumed. */
   onWorkReady?: (state: WorkBlueprintState, startPath: BlueprintStartPath) => void;
+  /**
+   * Spec 127 — primary Open after successful creation.
+   * Host opens the working document; never expose Work IDs.
+   */
+  onOpenWork?: (state: WorkBlueprintState) => void;
+  /** Human label for Open CTA (e.g. "Open My Marketing Plan"). */
+  openWorkLabel?: string | null;
   onClose?: () => void;
   /** When set, open directly into active depth/save controls for this Work. */
   resumeWorkId?: string | null;
+  /**
+   * Spec 127 — companion chooses approach; skip Start Method (Scratch / Blueprint / Previous).
+   * Default false preserves legacy browser checklists.
+   */
+  companionLed?: boolean;
 };
 
 /**
@@ -65,13 +77,17 @@ export function UniversalBlueprintInterface({
   companyRole,
   onStartFromScratch,
   onWorkReady,
+  onOpenWork,
+  openWorkLabel,
   onClose,
   resumeWorkId,
+  companionLed = false,
 }: Props) {
-  const [step, setStep] = useState<Step>("entry");
+  const [step, setStep] = useState<Step>(companionLed ? "browser" : "entry");
   const [selected, setSelected] = useState<BlueprintBrowserItem | null>(null);
-  const [depthMode, setDepthMode] =
-    useState<BlueprintDepthMode>("guided_build");
+  const [depthMode, setDepthMode] = useState<BlueprintDepthMode>(
+    companionLed ? "quick_start" : "guided_build",
+  );
   const [active, setActive] = useState<WorkBlueprintState | null>(null);
   const [startPath, setStartPath] = useState<BlueprintStartPath | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,6 +96,13 @@ export function UniversalBlueprintInterface({
   useEffect(() => {
     ensureEventBlueprintsRegistered();
   }, []);
+
+  useEffect(() => {
+    if (companionLed && step === "entry" && !resumeWorkId && !active) {
+      setStep("browser");
+      setStartPath("start_from_blueprint");
+    }
+  }, [companionLed, step, resumeWorkId, active]);
 
   useEffect(() => {
     if (!resumeWorkId) return;
@@ -135,6 +158,8 @@ export function UniversalBlueprintInterface({
     persist(state, path, approvedKeys);
     onWorkReady?.(state, path);
   };
+
+  const openLabel = openWorkLabel?.trim() || "Open My Plan";
 
   const runInitialize = (decision?: KnownContextReuseDecision) => {
     if (!selected) return;
@@ -210,7 +235,11 @@ export function UniversalBlueprintInterface({
         <UniversalBlueprintBrowser
           workTypeId={workTypeId}
           recentBlueprintIds={recentBlueprintIds}
-          onBack={() => setStep("entry")}
+          onBack={
+            companionLed
+              ? onClose
+              : () => setStep("entry")
+          }
           onSelect={(item) => {
             setSelected(item);
             setStep("preview");
@@ -279,31 +308,80 @@ export function UniversalBlueprintInterface({
       {step === "active" && active ? (
         <section data-testid="ubi-active-work">
           <h2 className="text-xl">You’re underway</h2>
-          <p className="ubi-muted mt-2">
-            Work is saved. Depth can change anytime without creating a
-            duplicate.
+          <p className="ubi-muted mt-2" data-testid="ubi-work-ready-message">
+            Your plan is ready. You can leave and come back anytime — nothing
+            important gets lost.
           </p>
-          <p
-            className="mt-3 rounded-xl bg-[#e8f0f0] px-3 py-2 text-sm font-semibold text-[#1e4f4f]"
-            data-testid="ubi-active-work-id"
-          >
-            Continuing {active.workId}
-          </p>
-          <div className="mt-4">
-            <BlueprintDepthControls
-              workId={active.workId}
-              onChanged={(mode, workId) => {
-                setActive((prev) =>
-                  prev ? { ...prev, depthMode: mode, workId: workId as typeof prev.workId } : prev,
-                );
-                if (startPath) {
-                  persist(
-                    { ...active, depthMode: mode, workId: workId as typeof active.workId },
-                    startPath,
+          {onOpenWork ? (
+            <button
+              type="button"
+              className="ubi-primary mt-4"
+              data-testid="ubi-open-my-plan"
+              data-primary-action="open"
+              onClick={() => onOpenWork(active)}
+            >
+              {openLabel}
+            </button>
+          ) : null}
+          <div className={companionLed ? "mt-4" : "mt-4"}>
+            {companionLed ? (
+              <details data-testid="ubi-advanced-depth">
+                <summary className="cursor-pointer text-sm font-semibold text-[#4b463f]">
+                  Customize depth
+                </summary>
+                <div className="mt-3">
+                  <BlueprintDepthControls
+                    workId={active.workId}
+                    onChanged={(mode, workId) => {
+                      setActive((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              depthMode: mode,
+                              workId: workId as typeof prev.workId,
+                            }
+                          : prev,
+                      );
+                      if (startPath) {
+                        persist(
+                          {
+                            ...active,
+                            depthMode: mode,
+                            workId: workId as typeof active.workId,
+                          },
+                          startPath,
+                        );
+                      }
+                    }}
+                  />
+                </div>
+              </details>
+            ) : (
+              <BlueprintDepthControls
+                workId={active.workId}
+                onChanged={(mode, workId) => {
+                  setActive((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          depthMode: mode,
+                          workId: workId as typeof prev.workId,
+                        }
+                      : prev,
                   );
-                }
-              }}
-            />
+                  if (startPath) {
+                    persist(
+                      {
+                        ...active,
+                        depthMode: mode,
+                        workId: workId as typeof active.workId,
+                      },
+                      startPath,
+                    );
+                  }
+                }}
+              />
+            )}
           </div>
           <button
             type="button"
@@ -311,7 +389,7 @@ export function UniversalBlueprintInterface({
             data-testid="ubi-open-save-as"
             onClick={() => setStep("save_as")}
           >
-            Save as Blueprint…
+            {companionLed ? "Save as a personal structure…" : "Save as Blueprint…"}
           </button>
         </section>
       ) : null}
@@ -322,11 +400,11 @@ export function UniversalBlueprintInterface({
           companyId={companyId}
           companyRole={companyRole}
           onCancel={() => setStep("active")}
-          onSaved={(blueprintId, category) => {
+          onSaved={(_blueprintId, category) => {
             setStatus(
               category === "company"
-                ? `Saved as a Company Blueprint (${blueprintId}).`
-                : `Saved as a Personal Blueprint (${blueprintId}).`,
+                ? "Saved as a company structure you can reuse."
+                : "Saved as a personal structure you can reuse.",
             );
             setStep("active");
           }}

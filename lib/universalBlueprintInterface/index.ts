@@ -21,8 +21,11 @@ export type {
 
 export {
   browseCompatibleBlueprints,
+  browseCompatibleBlueprintsAutoBroaden,
+  BLUEPRINT_SOURCE_BROADEN_ORDER,
   resolveBrowserBlueprint,
   defaultRecommendedBlueprintIds,
+  type BroadenedBlueprintBrowse,
 } from "./browseBlueprints";
 
 export {

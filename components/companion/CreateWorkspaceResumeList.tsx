@@ -88,6 +88,14 @@ export function CreateWorkspaceResumeList({ onResume }: Props) {
                     ? ` · ${ws.statusLabel || ws.phaseLabel}`
                     : ""}
                 </span>
+                {ws.currentFocusTitle ? (
+                  <span
+                    className="mt-1 block text-sm font-medium text-[#1e4f4f]"
+                    data-testid="create-workspace-current-focus"
+                  >
+                    Current Focus: {ws.currentFocusTitle}
+                  </span>
+                ) : null}
                 {ws.nextAction ? (
                   <span className="mt-1 block text-sm text-[#4b463f]">
                     {ws.nextAction}
@@ -100,6 +108,9 @@ export function CreateWorkspaceResumeList({ onResume }: Props) {
                 ) : null}
                 <span className="mt-0.5 block text-sm text-[#6b635a]">
                   Last worked: {lastWorked}
+                </span>
+                <span className="mt-2 inline-block text-sm font-semibold text-[#3d3429]">
+                  {busyId === ws.id ? "Continuing…" : "Continue"}
                 </span>
               </button>
             </li>

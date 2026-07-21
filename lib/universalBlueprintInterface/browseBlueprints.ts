@@ -12,7 +12,12 @@ import {
 import type {
   BlueprintBrowserItem,
   BlueprintBrowserQuery,
+  BlueprintBrowserSourceFilter,
 } from "./types";
+
+/** Spec 127 — never leave an empty guided-structure search. */
+export const BLUEPRINT_SOURCE_BROADEN_ORDER: readonly BlueprintBrowserSourceFilter[] =
+  ["company", "personal", "spark", "recommended", "all"];
 
 function matchesSearch(bp: BlueprintDefinition, search: string): boolean {
   const q = search.trim().toLowerCase();
@@ -98,6 +103,85 @@ export function browseCompatibleBlueprints(
   });
 
   return items;
+}
+
+export type BroadenedBlueprintBrowse = {
+  items: BlueprintBrowserItem[];
+  /** Source actually used after auto-broaden (may differ from request). */
+  effectiveSource: BlueprintBrowserSourceFilter;
+  /** True when filters were widened because the first pass was empty. */
+  broadened: boolean;
+  /** Human note when results were widened — no empty dead-end. */
+  broadenNote: string | null;
+};
+
+/**
+ * Spec 127 — Never empty Blueprint/structure search.
+ * Auto-broaden: Company → Personal → Spark → Recommended → All.
+ */
+export function browseCompatibleBlueprintsAutoBroaden(
+  query: BlueprintBrowserQuery,
+): BroadenedBlueprintBrowse {
+  const requested = query.source ?? "recommended";
+  const startIdx = Math.max(
+    0,
+    BLUEPRINT_SOURCE_BROADEN_ORDER.indexOf(
+      requested === "recent" || requested === "previous_work"
+        ? "all"
+        : requested,
+    ),
+  );
+
+  // Always try requested first (including recent / previous_work), then broaden.
+  const firstPass = browseCompatibleBlueprints(query);
+  if (firstPass.length > 0) {
+    return {
+      items: firstPass,
+      effectiveSource: requested,
+      broadened: false,
+      broadenNote: null,
+    };
+  }
+
+  for (let i = startIdx; i < BLUEPRINT_SOURCE_BROADEN_ORDER.length; i++) {
+    const source = BLUEPRINT_SOURCE_BROADEN_ORDER[i]!;
+    if (source === requested) continue;
+    const items = browseCompatibleBlueprints({ ...query, source });
+    if (items.length > 0) {
+      return {
+        items,
+        effectiveSource: source,
+        broadened: true,
+        broadenNote:
+          "I widened the list so you still have options — nothing matching that filter yet.",
+      };
+    }
+  }
+
+  // Last resort: clear search + all sources.
+  if (query.search?.trim()) {
+    const items = browseCompatibleBlueprints({
+      ...query,
+      search: "",
+      source: "all",
+    });
+    if (items.length > 0) {
+      return {
+        items,
+        effectiveSource: "all",
+        broadened: true,
+        broadenNote:
+          "Nothing matched that search, so here are the structures that fit this kind of work.",
+      };
+    }
+  }
+
+  return {
+    items: [],
+    effectiveSource: "all",
+    broadened: true,
+    broadenNote: null,
+  };
 }
 
 /** Resolve a Blueprint for preview/use — fail safely and visibly. */
