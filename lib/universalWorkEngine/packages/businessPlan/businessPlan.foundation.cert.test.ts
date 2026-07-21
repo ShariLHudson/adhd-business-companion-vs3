@@ -1,5 +1,5 @@
 /**
- * 201–248 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness Blueprints.
+ * 201–252 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -17,7 +17,9 @@ import {
   CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
   DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
   ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
+  FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
   FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
@@ -26,8 +28,10 @@ import {
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
   MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+  NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
   PET_SERVICE_BUSINESS_BLUEPRINT_ID,
   OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
+  PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
   PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
@@ -122,7 +126,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with thirty-nine Business Blueprints", () => {
+  it("registers Business Plan Work Type with forty-three Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -166,9 +170,13 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
         FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
         PET_SERVICE_BUSINESS_BLUEPRINT_ID,
+        EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
+        NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
+        PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
+        FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(39);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(43);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -213,6 +221,10 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
       FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
       PET_SERVICE_BUSINESS_BLUEPRINT_ID,
+      EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
+      NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
+      PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
+      FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -428,6 +440,22 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: PET_SERVICE_BUSINESS_BLUEPRINT_ID,
         guidedSection: "pet_scheduling",
+      },
+      {
+        blueprintId: EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "et_curriculum",
+      },
+      {
+        blueprintId: NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "np_program_plans",
+      },
+      {
+        blueprintId: PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "ps_engagement",
+      },
+      {
+        blueprintId: FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "fm_member_onboarding",
       },
     ];
     for (const c of cases) {
@@ -754,6 +782,37 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       originalUserMessage: "Help me build a pet service business",
     });
     expect(pet.blueprintId).toBe(PET_SERVICE_BUSINESS_BLUEPRINT_ID);
+
+    const education = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build an education and training business",
+    });
+    expect(education.blueprintId).toBe(EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID);
+
+    const nonprofit = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me with a nonprofit and foundation blueprint",
+    });
+    expect(nonprofit.blueprintId).toBe(
+      NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const publicSector = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me with a public sector and community blueprint",
+    });
+    expect(publicSector.blueprintId).toBe(
+      PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const faithOrg = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage:
+        "Help me with a faith and membership organization blueprint",
+    });
+    expect(faithOrg.blueprintId).toBe(
+      FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
+    );
 
     const genericService = inferWorkTypeAndBlueprint({
       origin: "create",

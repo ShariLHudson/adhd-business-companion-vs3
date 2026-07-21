@@ -32,13 +32,17 @@ import {
   ECOMMERCE_BUSINESS_BLUEPRINT_ID,
   BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
   CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+  EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
+  FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
   FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
   HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
   HOSPITALITY_BUSINESS_BLUEPRINT_ID,
   MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+  NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
   PET_SERVICE_BUSINESS_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
   PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+  PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
   WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
@@ -180,6 +184,14 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-fitness": FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
   "bp-pet-service": PET_SERVICE_BUSINESS_BLUEPRINT_ID,
   "bp-pet": PET_SERVICE_BUSINESS_BLUEPRINT_ID,
+  "bp-education-training": EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
+  "bp-education": EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
+  "bp-nonprofit-foundation": NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
+  "bp-nonprofit": NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
+  "bp-public-sector-community": PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
+  "bp-public-sector": PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
+  "bp-faith-membership-org": FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
+  "bp-faith-organization": FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -323,9 +335,21 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Education/training before digital course creator
+    re: /\b(education\s+(?:and\s+)?training(?:\s+business)?|training\s+business|tutoring\s+business|corporate\s+learning(?:\s+business)?|instructional\s+business|business\.education_training)\b/i,
+    blueprintId: EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     // Course creator before membership / content creator
     re: /\b(course\s+creator(?:\s+business)?|course\s+business|online\s+course\s+business|business\.course_creator)\b/i,
     blueprintId: COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Faith/member org before paid creator membership
+    re: /\b(faith\s+(?:and\s+)?membership\s+organization|faith\s+(?:community|organization)(?:\s+blueprint)?|membership\s+organization(?:\s+blueprint)?|congregation(?:\s+blueprint)?|business\.faith_membership_org)\b/i,
+    blueprintId: FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -337,6 +361,17 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(membership\s+business|membership\s+blueprint|membership\s+community\s+business|business\.membership)\b/i,
     blueprintId: MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Nonprofit / public sector before generic consulting and service
+    re: /\b(nonprofit(?:\s+(?:and\s+)?foundation)?(?:\s+blueprint)?|foundation\s+blueprint|nonprofit\s+business|business\.nonprofit_foundation)\b/i,
+    blueprintId: NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(public\s+sector(?:\s+(?:and\s+)?community)?(?:\s+blueprint)?|civic\s+(?:initiative|blueprint)|municipal\s+(?:initiative|blueprint)|community\s+initiative(?:\s+blueprint)?|business\.public_sector_community)\b/i,
+    blueprintId: PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
