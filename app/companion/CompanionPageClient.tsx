@@ -141,6 +141,18 @@ const CreateEstateEntrancePanel = dynamic(
     ),
   },
 );
+const CreateEstateWorkingPanel = dynamic(
+  () =>
+    import("@/components/companion/CreateEstateWorkingPanel").then((mod) => ({
+      default: mod.CreateEstateWorkingPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Create…" size="md" />
+    ),
+  },
+);
 const RemindersRoomPanel = dynamic(
   () =>
     import("@/components/companion/RemindersRoomPanel").then((mod) => ({
@@ -225,8 +237,16 @@ import {
   resolveBoardroomEntryIntent,
   type BoardroomEntryIntent,
 } from "@/lib/boardroom";
-import { ProjectHomesPrototypePanel } from "@/components/companion/projectHomes";
-import { PROJECT_HOMES_ROOM_BACKGROUND } from "@/lib/projectHomes";
+import { PROJECT_HOMES_ROOM_BACKGROUND } from "@/lib/projectHomes/roomCatalog";
+
+/** Lazy — keeps Project Homes off Create registry / creationRecord init graph. */
+const ProjectHomesPrototypePanel = dynamic(
+  () =>
+    import("@/components/companion/projectHomes/ProjectHomesPrototypePanel").then(
+      (m) => m.ProjectHomesPrototypePanel,
+    ),
+  { ssr: false },
+);
 import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
 import { ProfileDestinationHost } from "@/components/companion/ProfileDestinationHost";
 import { ProfileReturnBar } from "@/components/companion/ProfileReturnBar";
@@ -546,7 +566,24 @@ import {
   answeredDiscoveryCount,
   resolvedTypeLabel,
 } from "@/lib/createWorkflow";
-import { logCreateBuild } from "@/lib/createBuild";
+import { logCreateBuild, resolveCreateWorkspacePhase } from "@/lib/createBuild";
+import {
+  beginCreationDestinationSession,
+  coerceCreationDestinationQuestionMode,
+  endCreationDestinationSession,
+  forbidCompanionSidePanelDuringCreation,
+  hydrateExactBuilderSession,
+  ideasGuidanceForFocus,
+  resolveCanonicalCurrentFocus,
+  submitCurrentFocusResponse,
+} from "@/lib/currentFocus";
+import { registerCreationDestinationWorkspace } from "@/lib/activeWorkspaceRegistry";
+import { syncCanonicalWorkFromCreateWorkflow } from "@/lib/createProjects/syncCanonicalWorkFromCreate";
+import { connectCanonicalWorkToProjectHome } from "@/lib/createProjects/connectCanonicalWorkToProjectHome";
+import { runCreateAssistance } from "@/lib/createContextualAssistance";
+import { forceNewCreationAcknowledgment } from "@/lib/universalCreationEntrypoint";
+import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActiveCreationWorkspaces";
+import type { ActiveWorkCardModel } from "@/lib/projects/activeWork/types";
 import {
   logChatBuildDraftTriggered,
   type CreateBuildDraftHandler,
@@ -2534,10 +2571,12 @@ export default function CompanionPageClient() {
     applyChatLayoutMode("workspace-focus");
   }, [applyChatLayoutMode]);
   const openChatBesideWorkspace = useCallback(() => {
+    if (forbidCompanionSidePanelDuringCreation()) return;
     applyChatLayoutMode("split");
     setChatFocusSeq((n) => n + 1);
   }, [applyChatLayoutMode]);
   const ensureSplitBesideChatLayout = useCallback(() => {
+    if (forbidCompanionSidePanelDuringCreation()) return;
     applyChatLayoutMode("split");
   }, [applyChatLayoutMode]);
   const stayInCreateSplitScreen = useCallback(() => {
@@ -3852,6 +3891,20 @@ export default function CompanionPageClient() {
     useState<CreateBuilderSession | null>(null);
   const createBuilderSessionRef = useRef<CreateBuilderSession | null>(null);
   createBuilderSessionRef.current = createBuilderSession;
+  const [createFocusGuidance, setCreateFocusGuidance] = useState<string | null>(null);
+  const [createFocusFailure, setCreateFocusFailure] = useState<string | null>(null);
+  const [createFocusSubmitting, setCreateFocusSubmitting] = useState(false);
+  const [createPreservedResponse, setCreatePreservedResponse] = useState<string | null>(null);
+  const [createLinkedProjectHomeId, setCreateLinkedProjectHomeId] = useState<string | null>(null);
+  const createEstateWorkingActive =
+    activeSection === "create" &&
+    createBuilderSession?.phase === "workspace" &&
+    Boolean(createBuilderSession.typeLabel);
+  useEffect(() => {
+    if (createEstateWorkingActive) {
+      setEstateRoomChatVisible(false);
+    }
+  }, [createEstateWorkingActive]);
   const splitCreateBuilder =
     splitCreateChat && Boolean(createBuilderSession);
   const [businessStrategySession, setBusinessStrategySession] =
@@ -7553,6 +7606,13 @@ export default function CompanionPageClient() {
       });
       return;
     }
+    if (action.kind === "resume-active-work") {
+      markTodaysWelcomeDismissedThisSession();
+      setGlobalDailyOpening(null);
+      clearDailyOpeningSubViews();
+      resumeActiveWorkspaceEntry(action.workspaceId);
+      return;
+    }
     if (action.kind === "navigate") {
       navigateDailyOpeningDestination(action.destination);
     }
@@ -8042,8 +8102,8 @@ export default function CompanionPageClient() {
       openNavSectionDirectCore(GALLERY_HOME_SECTION, nav ?? "growth");
       return;
     }
-    if (section === "content-generator") {
-      openCreateWorkspace({ source: "ui_nav" });
+    if (section === "content-generator" || section === "create") {
+      openCreateEstateCore();
       return;
     }
 
@@ -8177,7 +8237,7 @@ export default function CompanionPageClient() {
   }
 
   function openCreateDirect() {
-    openCreateWorkspace({ source: "ui_nav" });
+    openCreateEstateCore();
   }
 
   /** Menu navigation — open the workspace directly without forcing chat. */
@@ -10621,6 +10681,12 @@ export default function CompanionPageClient() {
       toggleJustBeHereChat();
       return;
     }
+    if (
+      activeSectionRef.current === "create" ||
+      forbidCompanionSidePanelDuringCreation()
+    ) {
+      return;
+    }
     setEstateRoomChatVisible((visible) => {
       const next = !visible;
       patchExperienceControlPrefs({
@@ -10633,6 +10699,13 @@ export default function CompanionPageClient() {
   function setEstateRoomChatVisiblePreserving(visible: boolean) {
     if (justBeHereSession) {
       setJustBeHereChatVisible(visible);
+      return;
+    }
+    if (
+      visible &&
+      (activeSectionRef.current === "create" ||
+        forbidCompanionSidePanelDuringCreation())
+    ) {
       return;
     }
     patchExperienceControlPrefs({
@@ -11066,7 +11139,7 @@ export default function CompanionPageClient() {
         openFocusAudioCore();
         break;
       case "content-create":
-        openCreateWorkspace({ source: "hard_nav", hardNavCommand: "create" });
+        openCreateEstateCore();
         break;
       case "strategies":
         openBeside("playbook");
@@ -11582,28 +11655,109 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("create");
   }
 
-  /** From Create estate entrance — begin fresh Universal Create (no stale resume). */
+  /** From Create estate entrance — mount the Create Estate workspace host. */
   function startFreshCreateFromEstate(opts?: {
     artifactType?: string;
     initialPrompt?: string;
-  }) {
-    const opened = openCreateWorkspace({
-      source: "hard_nav",
-      hardNavCommand: "my-work-create",
-      artifactType: opts?.artifactType,
-      initialPrompt: opts?.initialPrompt,
+    resumeWorkspaceId?: string;
+  }): boolean {
+    // Never call openCreateWorkspace
+    const resumeWorkspaceId = opts?.resumeWorkspaceId?.trim();
+    let session: CreateBuilderSession | null;
+
+    if (resumeWorkspaceId) {
+      session = hydrateExactBuilderSession(resumeWorkspaceId);
+      if (!session) return false;
+    } else {
+      const artifactType = opts?.artifactType?.trim();
+      if (!artifactType) return false;
+      const boot = bootstrapWorkspaceV2Session(artifactType);
+      const workflow = {
+        ...boot.session.workflow,
+        sessionId: boot.session.workflow.sessionId ?? newCreateSessionId(),
+        selectedTypeLabel: artifactType,
+        questionMode: coerceCreationDestinationQuestionMode("current_focus"),
+        workspaceFirst: true,
+        discoveryAnswers: opts?.initialPrompt?.trim()
+          ? {
+              ...boot.session.workflow.discoveryAnswers,
+              purpose: opts.initialPrompt.trim(),
+            }
+          : boot.session.workflow.discoveryAnswers,
+      };
+      session = {
+        ...boot.session,
+        typeLabel: artifactType,
+        phase: "workspace",
+        workflow,
+      };
+    }
+
+    const workflow = {
+      ...session.workflow,
+      questionMode: coerceCreationDestinationQuestionMode("current_focus"),
+      workspaceFirst: true,
+    };
+    const workspaceId = workflow.sessionId || workflow.eventRecordId;
+    if (!workspaceId) return false;
+
+    const estateSession = {
+      ...session,
+      phase: "workspace" as const,
+      workflow,
+    };
+    createPanelWorkflowRef.current = workflow;
+    createBuilderSessionRef.current = estateSession;
+    setCreateBuilderSession(estateSession);
+    createBuilderBootstrappedRef.current = true;
+    beginCreationDestinationSession(workspaceId);
+    registerCreationDestinationWorkspace(workflow, {
+      projectHomeId: createLinkedProjectHomeId,
     });
-    if (!opened) return;
-    setEstateRoomChatVisible(true);
-    const opener = opts?.artifactType
-      ? `Let's make a ${opts.artifactType}. What should it accomplish?`
-      : "What would you like to make? Say it in your own words — email, checklist, presentation, strategy, or something else.";
-    setMessages((prev) => {
-      const last = prev[prev.length - 1];
-      if (last?.role === "assistant" && last.content === opener) return prev;
-      return [...prev, { role: "assistant", content: opener }];
+    syncCanonicalWorkFromCreateWorkflow({
+      workflow,
+      createWorkflowId: workflow.sessionId,
+      projectHomeId: createLinkedProjectHomeId,
     });
-    requestChatInputFocus();
+    setActiveSection("create");
+    activeSectionRef.current = "create";
+    setActiveNav("create");
+    setEstateRoomChatVisible(false);
+    return true;
+  }
+
+  function resumeActiveWorkspaceEntry(workspaceId: string): {
+    ok: boolean;
+    acknowledgment?: string;
+  } {
+    const id = workspaceId.replace(/^workspace:/, "").trim();
+    if (!id) {
+      return { ok: false, acknowledgment: "I couldn't find that work to reopen." };
+    }
+    const ok = startFreshCreateFromEstate({ resumeWorkspaceId: id });
+    if (!ok) {
+      return {
+        ok: false,
+        acknowledgment: "I couldn't reopen that workspace yet. Please try again.",
+      };
+    }
+    return {
+      ok: true,
+      acknowledgment: "I've reopened your work. We can continue from Current Focus.",
+    };
+  }
+
+  function beginForceNewCreationFromUi(_source: "create" | string): void {
+    createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
+    createBuilderBootstrappedRef.current = false;
+    setCreateBuilderSession(null);
+    endCreationDestinationSession();
+    setCreateFocusGuidance(null);
+    setCreateFocusFailure(null);
+    setCreatePreservedResponse(null);
+    setCreateLinkedProjectHomeId(null);
+    openCreateEstateCore();
+    void forceNewCreationAcknowledgment;
   }
 
   function startBusinessStrategyBuilder(typeLabel: string) {
@@ -14878,13 +15032,10 @@ export default function CompanionPageClient() {
       clearFrictionlessPending();
       if (
         hardNav.target.kind === "workspace" &&
-        hardNav.target.section === CREATE_PANEL_SECTION
+        (hardNav.target.section === CREATE_PANEL_SECTION ||
+          hardNav.target.section === "create")
       ) {
-        openCreateWorkspace({
-          source: "hard_nav",
-          initialPrompt: trimmed,
-          hardNavCommand: trimmed,
-        });
+        openCreateEstateCore();
       } else {
         switch (hardNav.target.kind) {
           case "workspace":
@@ -24369,6 +24520,17 @@ export default function CompanionPageClient() {
             >
               <ProjectHomesPrototypePanel
                 onBack={navigateBackToEstateHome}
+                onStartSomethingNew={() => beginForceNewCreationFromUi("create")}
+                onResumeActiveWork={(work: ActiveWorkCardModel) => {
+                  const id =
+                    work.eventRecordId ||
+                    work.id.replace(/^workspace:/, "").replace(/^project:/, "");
+                  if (work.sourceKind === "creation_workspace") {
+                    resumeActiveWorkspaceEntry(id);
+                    return;
+                  }
+                  // Member project detail remains panel-local.
+                }}
                 chatVisible={roomMenuChatVisible}
                 conversationScrollKey={estateChatScrollKey}
                 thread={
@@ -24857,28 +25019,175 @@ export default function CompanionPageClient() {
           {activeSection === "playbook" &&
             renderStrategyLibraryEstate({ registerBack })}
 
-          {activeSection === "create" && (
+          {activeSection === "create" &&
+            createEstateWorkingActive &&
+            createBuilderSession && (
+              <CreateEstateWorkingPanel
+                workflow={createBuilderSession.workflow}
+                workspacePhase={resolveCreateWorkspacePhase({
+                  draft: createBuilderSession.workflow.draftContent || "",
+                  draftStatus: createBuilderSession.workflow.draftStatus,
+                  buildApproved: Boolean(createBuilderSession.workflow.buildApproved),
+                  step: createBuilderSession.workflow.step,
+                  builderPhase: createBuilderSession.phase,
+                })}
+                loadingMessageIndex={0}
+                building={createFocusSubmitting}
+                projectHomeId={createLinkedProjectHomeId}
+                onBack={() => {
+                  endCreationDestinationSession();
+                  setCreateBuilderSession(null);
+                  createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
+                  openCreateEstateCore();
+                }}
+                registerBack={registerBack}
+                onWorkflowChange={(workflow) => {
+                  createPanelWorkflowRef.current = workflow;
+                  setCreateBuilderSession((prev) =>
+                    prev ? { ...prev, workflow } : prev,
+                  );
+                  registerCreationDestinationWorkspace(workflow, {
+                    projectHomeId: createLinkedProjectHomeId,
+                  });
+                  syncCanonicalWorkFromCreateWorkflow({
+                    workflow,
+                    createWorkflowId: workflow.sessionId,
+                    projectHomeId: createLinkedProjectHomeId,
+                  });
+                }}
+                onNeedIdeasInFocus={() => {
+                  const focus = resolveCanonicalCurrentFocus({
+                    creationId:
+                      createBuilderSession.workflow.sessionId ||
+                      createBuilderSession.workflow.eventRecordId ||
+                      "",
+                    workflow: createBuilderSession.workflow,
+                  });
+                  if (!focus) return;
+                  const assist = runCreateAssistance({
+                    workflow: createBuilderSession.workflow,
+                    sectionId: focus.sectionId || focus.focusId,
+                    actionId: "give_me_ideas",
+                  });
+                  setCreateFocusGuidance(
+                    assist.guidance || ideasGuidanceForFocus(focus),
+                  );
+                  setCreateFocusFailure(null);
+                }}
+                onBuildDraftInFocus={() => {
+                  const focus = resolveCanonicalCurrentFocus({
+                    creationId:
+                      createBuilderSession.workflow.sessionId ||
+                      createBuilderSession.workflow.eventRecordId ||
+                      "",
+                    workflow: createBuilderSession.workflow,
+                  });
+                  if (!focus) return;
+                  const assist = runCreateAssistance({
+                    workflow: createBuilderSession.workflow,
+                    sectionId: focus.sectionId || focus.focusId,
+                    actionId: "review_this",
+                  });
+                  setCreateFocusGuidance(assist.guidance);
+                }}
+                onConnectProjectHome={() => {
+                  const work = syncCanonicalWorkFromCreateWorkflow({
+                    workflow: createBuilderSession.workflow,
+                    createWorkflowId: createBuilderSession.workflow.sessionId,
+                    projectHomeId: createLinkedProjectHomeId,
+                  });
+                  const linked = connectCanonicalWorkToProjectHome({ work });
+                  if (linked.projectHomeId) {
+                    setCreateLinkedProjectHomeId(linked.projectHomeId);
+                    registerCreationDestinationWorkspace(
+                      createBuilderSession.workflow,
+                      { projectHomeId: linked.projectHomeId },
+                    );
+                  }
+                }}
+                onOpenProjectHome={() => {
+                  if (createLinkedProjectHomeId) {
+                    openProjectHomesPrototypeCore();
+                  }
+                }}
+                onSubmitCurrentFocus={async (input) => {
+                  setCreateFocusSubmitting(true);
+                  setCreateFocusFailure(null);
+                  try {
+                    const creationId =
+                      input.focus.creationId ||
+                      createBuilderSession.workflow.sessionId ||
+                      "";
+                    const result = await submitCurrentFocusResponse(
+                      {
+                        requestId: `focus-${Date.now()}`,
+                        contextVersion: 1,
+                        creationId,
+                        focus: input.focus,
+                        response: input.response,
+                        responseType: input.responseType,
+                      },
+                      { workflow: createBuilderSession.workflow },
+                    );
+                    if (result.updatedWorkflow) {
+                      createPanelWorkflowRef.current = result.updatedWorkflow;
+                      setCreateBuilderSession((prev) =>
+                        prev
+                          ? { ...prev, workflow: result.updatedWorkflow! }
+                          : prev,
+                      );
+                      syncCanonicalWorkFromCreateWorkflow({
+                        workflow: result.updatedWorkflow,
+                        createWorkflowId: result.updatedWorkflow.sessionId,
+                        projectHomeId: createLinkedProjectHomeId,
+                      });
+                    }
+                    if (!result.ok) {
+                      setCreateFocusFailure(result.failureMessage);
+                      setCreatePreservedResponse(result.preservedResponse);
+                    } else {
+                      setCreateFocusGuidance(result.confirmationGuidance);
+                      setCreatePreservedResponse(null);
+                    }
+                  } finally {
+                    setCreateFocusSubmitting(false);
+                  }
+                }}
+                focusGuidance={createFocusGuidance}
+                focusFailure={createFocusFailure}
+                focusSubmitting={createFocusSubmitting}
+                preservedResponse={createPreservedResponse}
+              />
+            )}
+
+          {activeSection === "create" && !createEstateWorkingActive && (
             <CreateEstateEntrancePanel
               onBack={goBack}
               registerBack={registerBack}
+              onBeginCreate={(outcome) => {
+                // Never call Estate open without artifactType
+                void startFreshCreateFromEstate({
+                  artifactType: outcome.artifactType,
+                  initialPrompt: outcome.text,
+                });
+              }}
               onSelectCreationType={(item) => {
                 const resolved = resolveCreateLauncherType(item.label);
                 startFreshCreateFromEstate({
                   artifactType: resolved.catalogLabel,
                 });
+                setEstateRoomChatVisible(false);
               }}
+              onResumeCreationWorkspace={(workspace: ActiveCreationWorkspaceSummary) =>
+                resumeActiveWorkspaceEntry(workspace.id)
+              }
+              onStartSomethingNew={() => beginForceNewCreationFromUi("create")}
               onOpenSavedDraft={(id) => {
                 openCreateDraftFromLibrary(id);
-                setActiveSection("home");
-                activeSectionRef.current = "home";
+                setActiveSection("create");
+                activeSectionRef.current = "create";
                 setActiveNav("create");
-                patchWorkspacePanel("content-generator");
-                setCompanionStandaloneSection(null);
-                setWorkspaceFirstSplit(false);
-                applyChatLayoutMode("split");
-                revealWorkspace();
-                setEstateRoomChatVisible(true);
-                requestChatInputFocus();
+                setEstateRoomChatVisible(false);
               }}
               onRenameDraft={(id, title) => renameCreateDraftEntry(id, title)}
               onDuplicateDraft={(id) => {
@@ -25221,6 +25530,10 @@ export default function CompanionPageClient() {
           roomId={roomMenuRoomId ?? "welcome-home"}
           chatVisible={roomMenuChatVisible}
           onSetChatVisible={setEstateRoomChatVisiblePreserving}
+          allowConversationToggle={
+            activeSection !== "create" &&
+            !forbidCompanionSidePanelDuringCreation()
+          }
           onOpenNotifications={() => {
             setExperienceControlsOpen(false);
             handleEstateMenuAction("notifications");
@@ -25239,7 +25552,9 @@ export default function CompanionPageClient() {
       {!roomMenuChatVisible &&
       !experienceControlsOpen &&
       roomMenuRoomId !== "evidence-vault" &&
-      activeSection !== "evidence-bank" ? (
+      activeSection !== "evidence-bank" &&
+      activeSection !== "create" &&
+      !forbidCompanionSidePanelDuringCreation() ? (
         <button
           type="button"
           className="conversation-visibility-chip"
