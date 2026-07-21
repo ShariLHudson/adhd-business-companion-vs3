@@ -469,90 +469,100 @@ export function CreateEstateWorkingPanel({
               onRetry={onRetryCurrentFocus}
             />
 
-            {canonicalFocus.sectionId ? (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {resolveFacilitatedSectionStatus(
-                  {
-                    id: canonicalFocus.sectionId,
-                    content:
-                      workflow.sectionContent?.[canonicalFocus.sectionId] ??
-                      "",
-                    skipped: Boolean(
-                      workflow.skippedSectionIds?.includes(
-                        canonicalFocus.sectionId,
+            {/* Work-level next steps — not competing with writing this section */}
+            <details
+              className="mt-3 max-w-2xl rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/60 px-3 py-2"
+              data-testid="section-when-ready"
+            >
+              <summary className="cursor-pointer text-sm font-medium text-[#6b635a]">
+                When you&apos;re ready
+              </summary>
+              <p className="mt-2 text-xs leading-relaxed text-[#9a8f82]">
+                Finish this section first if you can. These are for after — or
+                when you want to pause.
+              </p>
+              <div className="mt-2 flex flex-col gap-2">
+                {canonicalFocus.sectionId ? (
+                  resolveFacilitatedSectionStatus(
+                    {
+                      id: canonicalFocus.sectionId,
+                      content:
+                        workflow.sectionContent?.[canonicalFocus.sectionId] ??
+                        "",
+                      skipped: Boolean(
+                        workflow.skippedSectionIds?.includes(
+                          canonicalFocus.sectionId,
+                        ),
                       ),
-                    ),
-                  },
-                  workflow,
-                ) === "complete_for_now" ? (
-                  <button
-                    type="button"
-                    data-testid="section-reopen"
-                    disabled={focusSubmitting}
-                    onClick={() =>
-                      onWorkflowChange(
-                        reopenSectionForEditing(
-                          workflow,
-                          canonicalFocus.sectionId!,
-                        ),
-                      )
+                    },
+                    workflow,
+                  ) === "complete_for_now" ? (
+                    <button
+                      type="button"
+                      data-testid="section-reopen"
+                      disabled={focusSubmitting}
+                      onClick={() =>
+                        onWorkflowChange(
+                          reopenSectionForEditing(
+                            workflow,
+                            canonicalFocus.sectionId!,
+                          ),
+                        )
+                      }
+                      className="rounded-xl border border-[#1e4f4f]/30 bg-white px-3 py-2 text-left text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
+                    >
+                      Reopen this section
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      data-testid="section-complete-for-now"
+                      disabled={focusSubmitting}
+                      onClick={() =>
+                        onWorkflowChange(
+                          markSectionCompleteForNow(
+                            workflow,
+                            canonicalFocus.sectionId!,
+                          ),
+                        )
+                      }
+                      className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-left text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2] disabled:opacity-40"
+                    >
+                      Done with this section
+                    </button>
+                  )
+                ) : null}
+                <button
+                  type="button"
+                  disabled={focusSubmitting}
+                  data-testid="complete-it-now"
+                  onClick={() => {
+                    const result = completeItNow(workflow);
+                    if (!result.ok) {
+                      setLocalGuidance(
+                        result.validation.message ||
+                          "A few sections still need a little more before we assemble the full piece.",
+                      );
+                      return;
                     }
-                    className="rounded-xl border border-[#1e4f4f]/30 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
-                  >
-                    Reopen
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    data-testid="section-complete-for-now"
-                    disabled={focusSubmitting}
-                    onClick={() =>
-                      onWorkflowChange(
-                        markSectionCompleteForNow(
-                          workflow,
-                          canonicalFocus.sectionId!,
-                        ),
-                      )
-                    }
-                    className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2] disabled:opacity-40"
-                  >
-                    Complete for Now
-                  </button>
-                )}
+                    setLocalGuidance(null);
+                    onWorkflowChange(result.workflow);
+                  }}
+                  className="rounded-xl border border-[#1e4f4f]/25 bg-white px-3 py-2 text-left text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
+                >
+                  Assemble the full piece
+                </button>
+                <button
+                  type="button"
+                  onClick={onBuildDraftInFocus}
+                  disabled={building || focusSubmitting}
+                  className="px-1 py-1 text-left text-sm font-medium text-[#6b635a] underline disabled:opacity-40"
+                  data-testid="current-focus-build-draft"
+                >
+                  {building ? "Building your draft…" : "Build a polished draft"}
+                </button>
               </div>
-            ) : null}
-
-            <div className="mt-2 flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={onBuildDraftInFocus}
-                disabled={building || focusSubmitting}
-                className="text-sm font-semibold text-[#1e4f4f] underline disabled:opacity-40"
-                data-testid="current-focus-build-draft"
-              >
-                {building ? "Building your draft…" : "Build a draft here"}
-              </button>
-              <button
-                type="button"
-                disabled={focusSubmitting}
-                data-testid="complete-it-now"
-                onClick={() => {
-                  const result = completeItNow(workflow);
-                  if (!result.ok) {
-                    setLocalGuidance(
-                      result.validation.message ||
-                        "A few sections still need a little more before we assemble the full piece.",
-                    );
-                    return;
-                  }
-                  setLocalGuidance(null);
-                  onWorkflowChange(result.workflow);
-                }}
-                className="rounded-xl border border-[#1e4f4f]/35 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
-              >
-                Complete It Now
-              </button>
-            </div>
+            </details>
 
             {workflow.assembledOutput?.body ? (
               <section
@@ -566,8 +576,8 @@ export function CreateEstateWorkingPanel({
                 </h3>
                 {workflow.assembledOutput.stale ? (
                   <p className="mt-1 text-sm text-[#5c4030]">
-                    Sections changed since this was assembled. Complete It Now
-                    again to refresh.
+                    Sections changed since this was assembled. Open “When
+                    you&apos;re ready” to assemble again.
                   </p>
                 ) : null}
                 <pre className="mt-2 whitespace-pre-wrap font-sans text-sm leading-relaxed text-[#1f1c19]">

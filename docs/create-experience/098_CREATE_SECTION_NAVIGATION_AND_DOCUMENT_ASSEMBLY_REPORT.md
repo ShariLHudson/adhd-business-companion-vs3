@@ -52,6 +52,24 @@ Secondary gaps:
 
 ---
 
+## UX requirement — one primary decision (098 addendum)
+
+Create must not present a wall of equal choices (save · ideas · review · brainstorm · skip · complete · build · fill · help).
+
+**Rule:** Every section presents only the controls needed to complete that section. Secondary AI assistance is available without competing with the primary writing flow. Minimize decision fatigue — one clear next step at a time.
+
+| Mode | What the member sees |
+|------|----------------------|
+| **Writing this section** | Prompt · editor · one primary **Save this section** · quiet save badge |
+| **Need a hand?** | Progressive disclosure — ideas, examples, review, unsure, skip |
+| **When you're ready** | Done with this section · Assemble the full piece · polished draft — work-level, not writing competitors |
+
+Silent orientation: *“You're writing this section. Everything else can wait.”*
+
+Aligns with Spec 103 / T-003: one primary action · max 3 visible choices · calm before complexity.
+
+---
+
 ## Independent save behavior
 
 - Section bodies live in `workflow.sectionContent[sectionId]`

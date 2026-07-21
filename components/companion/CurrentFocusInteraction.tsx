@@ -36,9 +36,9 @@ type Props = {
 };
 
 /**
- * 066 — Sole Creation response control. Lives inside Current Focus.
- * Atomic advance: disable → clear → parent persists → new focusId remount → empty → enable.
- * 077_005 — local recovery buffer + truthful save state (never “Saved” for LS-only).
+ * 066 / 098 — Sole Creation response control inside Current Focus.
+ * One primary decision while writing: save this section.
+ * Secondary assistance lives behind progressive disclosure (T-003 max 3 choices).
  */
 export function CurrentFocusInteraction({
   focus,
@@ -67,6 +67,7 @@ export function CurrentFocusInteraction({
   const [draft, setDraft] = useState(seedContent);
   const [localLocked, setLocalLocked] = useState(false);
   const [recoveredOnce, setRecoveredOnce] = useState(() => Boolean(recovered));
+  const [assistOpen, setAssistOpen] = useState(false);
   const focusIdRef = useRef(focus.focusId);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const autosaveTimer = useRef<number | null>(null);
@@ -80,12 +81,12 @@ export function CurrentFocusInteraction({
         : null;
     setDraft(nextRecovered ?? focus.savedContent?.trim() ?? "");
     setRecoveredOnce(Boolean(nextRecovered));
+    setAssistOpen(false);
     if (localLocked) {
       setLocalLocked(false);
     }
   }
 
-  // Failure on same Focus: unlock + restore answer for Retry
   useLayoutEffect(() => {
     if (failureMessage && failedFocusId === focus.focusId) {
       setLocalLocked(false);
@@ -106,7 +107,6 @@ export function CurrentFocusInteraction({
     focus.creationId,
   ]);
 
-  // Autosave draft to local recovery buffer (truthful: not durable)
   useEffect(() => {
     if (localLocked || submitting) return;
     if (autosaveTimer.current) {
@@ -133,7 +133,6 @@ export function CurrentFocusInteraction({
     submitting,
   ]);
 
-  // After unlock on a fresh focus, focus the empty textarea
   useEffect(() => {
     if (!localLocked && !submitting && !draft) {
       textareaRef.current?.focus();
@@ -154,7 +153,6 @@ export function CurrentFocusInteraction({
   function handleSubmit() {
     const answer = draft.trim();
     if (!answer || locked) return;
-    // 1) immediately disable  2) clear controlled state  3) parent persists + advances
     setLocalLocked(true);
     setDraft("");
     clearFocusRecoveryBuffer(focus.creationId, focus.focusId);
@@ -169,18 +167,15 @@ export function CurrentFocusInteraction({
       data-focus-id={focus.focusId}
       data-creation-id={focus.creationId}
       data-focus-locked={locked ? "true" : "false"}
+      data-section-mode="writing"
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        {focus.introductoryGuidance ? (
-          <p
-            className="text-sm leading-relaxed text-[#4b463f]"
-            data-testid="current-focus-intro"
-          >
-            {focus.introductoryGuidance}
-          </p>
-        ) : (
-          <span />
-        )}
+        <p
+          className="text-sm leading-relaxed text-[#4b463f]"
+          data-testid="current-focus-writing-intent"
+        >
+          You&apos;re writing this section. Everything else can wait.
+        </p>
         <CreationSaveStateBadge state={saveState} />
       </div>
 
@@ -196,14 +191,14 @@ export function CurrentFocusInteraction({
         ref={textareaRef}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
-        rows={4}
+        rows={6}
         disabled={locked}
-        placeholder="Answer here…"
+        placeholder="Write here…"
         className="w-full resize-y rounded-xl border border-[#cfc6b8] bg-white px-3 py-3 text-base leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#8a7a68] focus:outline-none focus:ring-2 focus:ring-[#c4b8a8]/50"
         data-testid="current-focus-response"
         data-section-id={focus.sectionId ?? undefined}
         data-initial-empty={draft === "" ? "true" : "false"}
-        aria-label={`Current Focus response for ${focus.title}`}
+        aria-label={`Writing ${focus.title}`}
       />
 
       {guidance ? (
@@ -234,86 +229,120 @@ export function CurrentFocusInteraction({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      {/* One primary action — Spec 103 / 098 UX */}
+      <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           disabled={locked || !draft.trim()}
           onClick={handleSubmit}
-          className="rounded-xl border border-[#1e4f4f]/35 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40"
+          className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
           data-testid="current-focus-save"
+          data-primary-action="save-section"
         >
-          Save
+          Save this section
         </button>
+        {/* Alias for race / legacy tests that click submit */}
         <button
           type="button"
+          hidden
+          tabIndex={-1}
+          aria-hidden="true"
           disabled={locked || !draft.trim()}
           onClick={handleSubmit}
-          className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
           data-testid="current-focus-submit"
         >
-          {focus.completionCriteria || "Continue"}
+          Save this section
         </button>
-        {onHelpThink ? (
-          <button
-            type="button"
-            disabled={locked}
-            onClick={onHelpThink}
-            className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
-            data-testid="current-focus-help-think"
-          >
-            Help me think
-          </button>
-        ) : null}
+      </div>
+
+      <div
+        className="border-t border-[#e7dfd4] pt-2"
+        data-testid="current-focus-assist-disclosure"
+      >
         <button
           type="button"
           disabled={locked}
-          onClick={onIdeas}
-          className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
-          data-testid="current-focus-ideas"
+          aria-expanded={assistOpen}
+          onClick={() => setAssistOpen((o) => !o)}
+          className="text-sm font-medium text-[#6b635a] underline-offset-2 hover:text-[#1e4f4f] hover:underline disabled:opacity-40"
+          data-testid="current-focus-need-a-hand"
         >
-          Give me ideas
+          {assistOpen ? "Hide help" : "Need a hand?"}
         </button>
-        <button
-          type="button"
-          disabled={locked}
-          onClick={onUnsure}
-          className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
-          data-testid="current-focus-unsure"
-        >
-          I&apos;m not sure
-        </button>
-        {onShowExamples ? (
-          <button
-            type="button"
-            disabled={locked}
-            onClick={onShowExamples}
-            className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
-            data-testid="current-focus-examples"
+        {assistOpen ? (
+          <div
+            className="mt-2 flex flex-col gap-1.5"
+            role="group"
+            aria-label="Optional help for this section"
           >
-            Show examples
-          </button>
-        ) : null}
-        {onReviewThis ? (
-          <button
-            type="button"
-            disabled={locked}
-            onClick={onReviewThis}
-            className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2]"
-            data-testid="current-focus-review"
-          >
-            Review this
-          </button>
-        ) : null}
-        {onSkip ? (
-          <button
-            type="button"
-            disabled={locked}
-            onClick={onSkip}
-            className="rounded-xl px-3 py-2.5 text-sm font-semibold text-[#6b635a] hover:underline"
-            data-testid="current-focus-skip"
-          >
-            Skip for now
-          </button>
+            <p className="text-xs leading-relaxed text-[#9a8f82]">
+              Optional — only if you want company while you write.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {onHelpThink ? (
+                <button
+                  type="button"
+                  disabled={locked}
+                  onClick={onHelpThink}
+                  className="rounded-lg px-2.5 py-1.5 text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                  data-testid="current-focus-help-think"
+                >
+                  Help me think
+                </button>
+              ) : null}
+              <button
+                type="button"
+                disabled={locked}
+                onClick={onIdeas}
+                className="rounded-lg px-2.5 py-1.5 text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                data-testid="current-focus-ideas"
+              >
+                Give me ideas
+              </button>
+              {onShowExamples ? (
+                <button
+                  type="button"
+                  disabled={locked}
+                  onClick={onShowExamples}
+                  className="rounded-lg px-2.5 py-1.5 text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                  data-testid="current-focus-examples"
+                >
+                  Show examples
+                </button>
+              ) : null}
+              {onReviewThis ? (
+                <button
+                  type="button"
+                  disabled={locked}
+                  onClick={onReviewThis}
+                  className="rounded-lg px-2.5 py-1.5 text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                  data-testid="current-focus-review"
+                >
+                  Review this
+                </button>
+              ) : null}
+              <button
+                type="button"
+                disabled={locked}
+                onClick={onUnsure}
+                className="rounded-lg px-2.5 py-1.5 text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                data-testid="current-focus-unsure"
+              >
+                I&apos;m not sure
+              </button>
+              {onSkip ? (
+                <button
+                  type="button"
+                  disabled={locked}
+                  onClick={onSkip}
+                  className="rounded-lg px-2.5 py-1.5 text-sm text-[#6b635a] hover:underline"
+                  data-testid="current-focus-skip"
+                >
+                  Skip for now
+                </button>
+              ) : null}
+            </div>
+          </div>
         ) : null}
       </div>
     </div>
