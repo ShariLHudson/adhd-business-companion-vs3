@@ -1,4 +1,4 @@
-# Spark Estate™ — Architectural Authority
+# Spark Estate — Architectural Authority
 
 | Field | Value |
 |-------|-------|
@@ -46,6 +46,8 @@ The following are **subordinate** — useful only where they **align** with the 
 
 Conversation specs (105–119) and Relationship Constitution remain binding for **how Spark speaks**. Estate architectural authority governs **what members see and where they are**.
 
+**Product bridge (112–113):** Connected Work/relationship product law is **[112](../product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md)**. Master product constitution series is **113–117** ([113](../constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md) · [index](../constitution/README.md)). Place canon (this manifest) and product constitution remain complementary — neither replaces the other.
+
 ---
 
 ## Canonical place registry (Phase A)
@@ -86,7 +88,7 @@ Conversation specs (105–119) and Relationship Constitution remain binding for 
 
 ## P0 canon errata (pre–Phase D.1)
 
-**[P0_CANON_ERRATA.md](./P0_CANON_ERRATA.md)** — binding resolutions: Celebration Room™ id, Reading Nook ≠ Library, wins simplification, Guidebook as object, My Thoughts non-canon, Room Catalog 03 retired.
+**[P0_CANON_ERRATA.md](./P0_CANON_ERRATA.md)** — binding resolutions: Celebration Room id, Reading Nook ≠ Library, wins simplification, Guidebook as object, My Thoughts non-canon, Room Catalog 03 retired.
 
 ## Runtime shell (Phase D.1)
 
@@ -143,6 +145,6 @@ Legacy behavior that fails the authorities is **debt to remove**, not precedent 
 
 ## Heart (immutable)
 
-> *Spark Estate™ is not a place you use. It is a place where you are welcomed home.*
+> *Spark Estate is not a place you use. It is a place where you are welcomed home.*
 
 Everything else serves that sentence.

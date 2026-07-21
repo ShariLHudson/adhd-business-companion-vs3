@@ -17,9 +17,11 @@
 | Document | Path | Purpose | When to use | Authority |
 |----------|------|---------|-------------|-----------|
 | Founder Experience Constitution™ | `docs/founder/FOUNDER_EXPERIENCE_CONSTITUTION.md` | How Founder must feel | Any Founder UI or copy | Constitution |
+| Spark Estate Product Constitution (113) | `docs/constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md` | Master Estate product principles; series **113–117** | Work identity, companion platform, future features | Constitution |
 | Entrepreneurial Transformation Constitution™ | `docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md` | Member growth and hero principle | Ecosystem experiences | Constitution |
 | Relationship Constitution | `docs/RELATIONSHIP_CONSTITUTION.md` | How people feel in UI and rooms | All member-facing work | Constitution |
 | The Friend We All Deserve™ | `docs/THE_FRIEND_WE_ALL_DESERVE.md` | How Spark speaks | Conversation and prompts | Constitution |
+| Universal Work & Relationship Platform (112) | `docs/product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md` | Completes Product Specification Series | Connected Work / Blueprints / recognition | Specification |
 
 ---
 

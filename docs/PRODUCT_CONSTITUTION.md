@@ -10,6 +10,8 @@ This is **not** a feature. It is the foundation that every future screen, workfl
 
 **Related:** [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) · [Development Governance](./DEVELOPMENT_GOVERNANCE.md) · [Screen Certification](./SCREEN_CERTIFICATION.md) · [UX Punch List](./UX_PUNCH_LIST.md) · [Reminder Chat Intake](./REMINDER_CHAT_INTAKE.md)
 
+**Spark Estate Product Constitution series (distinct):** Master product principles for Estate Work/companion platform behavior live in **[113 — Spark Estate Product Constitution](./constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md)** and expand through **114–117** ([series index](./constitution/README.md)). Bridge specification: **[112 — Universal Work & Relationship Platform](./product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md)**. P0.58 Gate 10 remains binding for ADHD ecosystem screen certification; 113–117 govern Estate product constitutionality.
+
 ---
 
 ## 1. Companion Constitution

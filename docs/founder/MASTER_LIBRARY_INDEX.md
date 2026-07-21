@@ -18,10 +18,18 @@
 | Name | Purpose | Category | Authority | Location | NotebookLM | Related Systems | Owner | Updated |
 |------|---------|----------|-----------|----------|------------|-----------------|-------|---------|
 | Founder Experience Constitution™ | Supreme authority for how Founder feels | Constitutions | Constitution | `docs/founder/FOUNDER_EXPERIENCE_CONSTITUTION.md` | Yes | Founder Studio, Executive Resources Center | Shari | 2026-07-06 |
+| Spark Estate Product Constitution (113) | Master product principles; governs series 113–117 | Constitutions | Constitution | `docs/constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md` | Yes | Spark Estate, Universal Work, Shari | Shari | 2026-07-21 |
 | Relationship Constitution | How people feel in UI and rooms | Constitutions | Constitution | `docs/RELATIONSHIP_CONSTITUTION.md` | Yes | Spark Companion, Spark Estate | Shari | 2026-07-01 |
 | The Friend We All Deserve™ | How Spark speaks — companion DNA | Constitutions | Constitution | `docs/THE_FRIEND_WE_ALL_DESERVE.md` | Yes | Spark Companion | Shari | 2026-07-01 |
 | Discovery Key Constitution | Gentle estate discovery | Estate | Constitution | `docs/estate-intelligence/discovery-key/DiscoveryKey-Constitution.md` | No | Discovery Key, Spark Estate | Shari | 2026-07-06 |
 | Spark Estate Bible | Official estate canon | Estate | Constitution | `docs/estate/Spark Estate Bible.md` | Yes | Spark Estate | Shari | 2026-07-01 |
+
+### Product specifications (Bridge Series)
+
+| Name | Purpose | Category | Authority | Location | NotebookLM | Related Systems | Owner | Updated |
+|------|---------|----------|-----------|----------|------------|-----------------|-------|---------|
+| Universal Work & Relationship Platform (112) | Completes Product Specification Series — one Work, many views | Product Specifications | Specification | `docs/product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md` | Yes | UWE, Create, Projects, Blueprints, Pulse | Shari | 2026-07-21 |
+| Constitution series index (113–117) | Master + specialized constitutions | Constitutions | Reference | `docs/constitution/README.md` | No | Spark Estate | Shari | 2026-07-21 |
 
 ---
 

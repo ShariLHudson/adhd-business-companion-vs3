@@ -3,7 +3,7 @@
 
 **Version:** 1.0  
 **Status:** Canonical — awaiting approval  
-**Authority:** Subordinate to Product Constitution · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md)  
+**Authority:** Subordinate to Spark Estate Product Constitution series **113–117** ([113 master](../constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md) · [series index](../constitution/README.md)) · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md). The Design Bible implements constitutional principles; it does not override them. (ADHD ecosystem Gate-10 law remains [`PRODUCT_CONSTITUTION.md`](../PRODUCT_CONSTITUTION.md) for screen certification.)  
 **Governs:** Every room · object · navigation card · photograph · illustration · motion layer · animation
 
 **Sibling documents:**
