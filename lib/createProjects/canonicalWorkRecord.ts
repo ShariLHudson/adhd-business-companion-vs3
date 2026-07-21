@@ -46,6 +46,11 @@ export type CanonicalWorkRecord = {
   projectHomeId?: string | null;
   companionProjectId?: string | null;
   conversationContext?: string;
+  /** Shared with Create — last active Workshop Map section. */
+  activeSectionId?: string | null;
+  /** Assembled full piece from Complete It Now (same Work ID). */
+  assembledBody?: string | null;
+  assembledStale?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -141,6 +146,18 @@ export function upsertCanonicalWorkRecord(
         : existing?.companionProjectId ?? null,
     conversationContext:
       partial.conversationContext ?? existing?.conversationContext,
+    activeSectionId:
+      partial.activeSectionId !== undefined
+        ? partial.activeSectionId
+        : existing?.activeSectionId ?? null,
+    assembledBody:
+      partial.assembledBody !== undefined
+        ? partial.assembledBody
+        : existing?.assembledBody ?? null,
+    assembledStale:
+      partial.assembledStale !== undefined
+        ? partial.assembledStale
+        : existing?.assembledStale ?? false,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
   };

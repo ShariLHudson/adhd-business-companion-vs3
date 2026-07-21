@@ -6,6 +6,7 @@
 import type { CreateWorkflowState } from "./createWorkflowState";
 
 export type WorkspaceV2SectionView = {
+  optional?: boolean;
   id: string;
   label: string;
   content: string;

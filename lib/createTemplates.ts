@@ -127,6 +127,15 @@ const MARKETING_PLAN_SECTIONS: CreateTemplateSection[] = [
   section("metrics", "Goals & Metrics"),
 ];
 
+/** Transitional campaign map (until a Marketing Campaign Work Type package ships). */
+const MARKETING_CAMPAIGN_SECTIONS: CreateTemplateSection[] = [
+  section("intro", "Introduction"),
+  section("main", "Main Content"),
+  section("cta", "Call to Action"),
+  section("distribution", "Distribution"),
+  section("metrics", "Metrics"),
+];
+
 const LEAD_MAGNET_SECTIONS: CreateTemplateSection[] = [
   section("audience", "Who is it for?"),
   section("problem", "Problem"),
@@ -261,6 +270,12 @@ const PRESET_TEMPLATES: CreateTemplatePreset[] = [
     name: "Default Marketing Plan Template",
     itemType: "Marketing Plan",
     sections: [...MARKETING_PLAN_SECTIONS],
+  },
+  {
+    id: "marketing-campaign-default",
+    name: "Marketing Campaign",
+    itemType: "Marketing Campaign",
+    sections: [...MARKETING_CAMPAIGN_SECTIONS],
   },
   {
     id: "lead-magnet-default",

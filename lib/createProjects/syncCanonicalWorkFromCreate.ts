@@ -9,6 +9,10 @@ import {
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { resolvedTypeLabel } from "@/lib/createWorkflow";
 import {
+  resolveActiveSectionId,
+  resolveWorkIdFromWorkflow,
+} from "@/lib/universalWorkEngine";
+import {
   upsertCanonicalWorkRecord,
   type CanonicalWorkRecord,
 } from "./canonicalWorkRecord";
@@ -32,17 +36,28 @@ export function syncCanonicalWorkFromCreateWorkflow(input: {
     input.workflow.discoveryAnswers?.topic?.trim() ||
     "";
   const audience = input.workflow.discoveryAnswers?.audience?.trim() || "";
+  const workId =
+    resolveWorkIdFromWorkflow(input.workflow) ||
+    input.createWorkflowId ||
+    input.workflow.sessionId ||
+    undefined;
 
   return upsertCanonicalWorkRecord({
+    id: workId,
     title,
     workType: typeLabel,
     purpose,
     audience,
     kind: input.projectHomeId ? "creation_with_project" : "creation",
-    status: "drafting",
+    status: input.workflow.assembledOutput && !input.workflow.assembledOutput.stale
+      ? "complete"
+      : "drafting",
     sections,
     createWorkflowId: input.createWorkflowId ?? input.workflow.sessionId ?? null,
     projectHomeId: input.projectHomeId ?? null,
     conversationContext: input.conversationContext,
+    activeSectionId: resolveActiveSectionId(input.workflow),
+    assembledBody: input.workflow.assembledOutput?.body ?? null,
+    assembledStale: input.workflow.assembledOutput?.stale ?? false,
   });
 }

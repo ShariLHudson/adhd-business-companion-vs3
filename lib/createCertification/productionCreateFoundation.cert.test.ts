@@ -465,7 +465,7 @@ describe("Production Create foundation certification (Event reference)", () => {
         join(process.cwd(), "components/companion/CurrentFocusInteraction.tsx"),
         "utf8",
       );
-      expect(focusSrc).toContain('aria-label="Current Focus response"');
+      expect(focusSrc).toContain("Current Focus response for");
       expect(focusSrc).toContain("CreationSaveStateBadge");
       expect(focusSrc).toContain("current-focus-save");
 

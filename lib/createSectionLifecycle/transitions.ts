@@ -97,6 +97,10 @@ export function applySectionLifecycleTransition(
           ...workflow.sectionContent,
           [sectionId]: transition.content,
         },
+        // Section edits invalidate Complete It Now output until reassembled.
+        assembledOutput: workflow.assembledOutput
+          ? { ...workflow.assembledOutput, stale: true }
+          : workflow.assembledOutput,
       };
     }
 

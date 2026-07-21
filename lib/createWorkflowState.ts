@@ -97,6 +97,14 @@ export type CreateWorkflowState = {
   universalCreationState?: string | null;
   originalRequest?: string | null;
   workingIntent?: string | null;
+  /** Complete It Now — assembled full piece (same Work ID). */
+  assembledOutput?: {
+    workId: string;
+    assembledAt: string;
+    stale: boolean;
+    body: string;
+    sectionIds: readonly string[];
+  } | null;
 };
 
 export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {

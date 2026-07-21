@@ -19,10 +19,10 @@ import {
   resolveWorkTypeIdFromLabel,
 } from "@/lib/workTypeSchema/registry";
 import {
-  UnknownWorkTypeError,
   ensureEventPlanWorkTypeRegistered,
   getWorkTypePackage,
   requireSchemaForWorkTypeId,
+  selectWorkSection,
 } from "@/lib/universalWorkEngine";
 import { ensureCertProbeSchemaRegistered } from "@/lib/workTypeSchema/schemas/certProbe";
 import {
@@ -105,16 +105,17 @@ export function initializeWorkspaceV2Workflow(
 
   const itemType = resolvedTypeLabel(picked) || trimmed;
   const resolvedWorkTypeId = resolveWorkTypeIdFromLabel(itemType);
-  // Certification probe may register on demand; product Work Types must be pre-registered.
+  // Certification probe may register on demand.
   if (resolvedWorkTypeId === "cert_probe") {
     ensureCertProbeSchemaRegistered();
   }
-  // Resolved Work Type IDs must be registered packages — never silent template fallthrough.
-  if (resolvedWorkTypeId && !getWorkTypePackage(resolvedWorkTypeId)) {
-    throw new UnknownWorkTypeError(resolvedWorkTypeId);
-  }
-  const schema = resolvedWorkTypeId
-    ? requireSchemaForWorkTypeId(resolvedWorkTypeId)
+  // Registered packages are authoritative. Unregistered candidates (e.g. marketing_plan
+  // before its package ships) stay on transitional templates — never pretend they are registered.
+  const registeredPackage = resolvedWorkTypeId
+    ? getWorkTypePackage(resolvedWorkTypeId)
+    : null;
+  const schema = registeredPackage
+    ? requireSchemaForWorkTypeId(resolvedWorkTypeId!)
     : getWorkTypeSchemaForCreateLabel(itemType);
 
   const shell = initializeTemplateForWorkflow({
@@ -143,7 +144,7 @@ export function initializeWorkspaceV2Workflow(
   });
 
   if (schema) {
-    return {
+    const mapped = {
       ...applyWorkTypeMapToCreateWorkflow(shell, schema, {
         showAllSections: true,
         preserveActiveSection: false,
@@ -152,19 +153,23 @@ export function initializeWorkspaceV2Workflow(
       // Member-facing name — never "Default * Template"
       selectedTemplateName: schema.displayName,
     };
+    const firstId = mapped.templateSections?.[0]?.id;
+    return firstId ? selectWorkSection(mapped, firstId) : mapped;
   }
 
-  // Only freeform labels with no resolved Work Type ID may use templates.
+  // Unregistered / freeform labels use transitional templates.
   const preset = defaultTemplateFor(itemType, picked.selectedSubtype);
   const presetIsTechnical =
     /^default\b.+\btemplate$/i.test(preset.name.trim()) ||
     /\bcreation workspace\b/i.test(preset.name);
-  return {
+  const templated = {
     ...shell,
     templateSections: [...preset.sections],
     selectedTemplateId: preset.id,
     selectedTemplateName: presetIsTechnical ? null : preset.name,
   };
+  const firstId = templated.templateSections?.[0]?.id;
+  return firstId ? selectWorkSection(templated, firstId) : templated;
 }
 
 export function workspaceV2HasBuildableContent(workflow: CreateWorkflowState): boolean {

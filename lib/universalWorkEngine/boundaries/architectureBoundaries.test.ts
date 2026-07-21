@@ -5,7 +5,6 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { describe, expect, it, beforeEach } from "vitest";
-import { initializeWorkspaceV2Workflow } from "@/lib/createWorkspaceV2";
 import {
   APPROVED_DURABLE_TABLE,
   UnknownWorkTypeError,
@@ -127,7 +126,9 @@ describe("Universal Work Engine — architecture boundaries", () => {
       UnknownWorkTypeError,
     );
     expect(() => requireWorkTypePackage("sop")).toThrow(UnknownWorkTypeError);
-    expect(() => initializeWorkspaceV2Workflow("Marketing Plan")).toThrow(
+    // Bootstrap may use transitional templates for unregistered labels;
+    // the registry itself never silently accepts unknown IDs.
+    expect(() => requireWorkTypePackage("marketing_plan")).toThrow(
       UnknownWorkTypeError,
     );
   });

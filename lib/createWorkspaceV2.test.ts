@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { UnknownWorkTypeError } from "@/lib/universalWorkEngine";
+import { requireWorkTypePackage, UnknownWorkTypeError } from "@/lib/universalWorkEngine";
 import { validateCreateForBuild } from "./createBuild";
 import { buildFullCreateBrief } from "./createTemplates";
 import { OTHER_OPTION } from "./createTypePickers";
@@ -52,13 +52,19 @@ describe("createWorkspaceV2", () => {
     expect(validation.readyToBuild).toBe(true);
   });
 
-  it("fails visibly for resolved but unregistered Work Types (no template fallthrough)", () => {
-    expect(() => initializeWorkspaceV2Workflow("SOP")).toThrow(
+  it("unregistered Work Type labels use transitional templates; registry still fails visibly by ID", () => {
+    expect(() => requireWorkTypePackage("marketing_plan")).toThrow(
       UnknownWorkTypeError,
     );
-    expect(() => initializeWorkspaceV2Workflow("Marketing Plan")).toThrow(
-      UnknownWorkTypeError,
-    );
+    const campaign = initializeWorkspaceV2Workflow("Marketing Campaign");
+    expect((campaign.templateSections ?? []).map((s) => s.id)).toEqual([
+      "intro",
+      "main",
+      "cta",
+      "distribution",
+      "metrics",
+    ]);
+    expect(campaign.activeSectionId).toBe("intro");
   });
 
   it("supports adding custom sections", () => {
@@ -118,10 +124,9 @@ describe("createWorkspaceV2", () => {
       "need ideas for purpose",
       "Purpose",
     );
-    for (const hint of [mainHint, exploreHint]) {
-      expect(hint).toMatch(/Copy any parts you like/i);
-      expect(hint).toMatch(/never writes/i);
-      expect(hint).not.toMatch(/\[\[fill:/);
-    }
+    expect(mainHint).toMatch(/Current Focus owns answers|Current Focus is the only answer surface/i);
+    expect(mainHint).not.toMatch(/\[\[fill:/);
+    expect(exploreHint).toMatch(/Copy any parts you like/i);
+    expect(exploreHint).not.toMatch(/\[\[fill:/);
   });
 });
