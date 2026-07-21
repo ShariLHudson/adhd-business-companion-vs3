@@ -26,7 +26,7 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(welcomeHomeNavMaxDepth()).toBe(3);
   });
 
-  it("places Wander the Grounds + Spark Estate Guide under Spark Estate (last)", () => {
+  it("places Wander the Grounds and Spark Estate Guide under Spark Estate", () => {
     const sparkEstate = WELCOME_HOME_NAV_CATEGORIES.find(
       (c) => c.id === "spark-estate",
     );
@@ -101,6 +101,7 @@ describe("welcomeHomeNavigationStructure", () => {
       "Cartographer’s Studio",
     ]);
     expect(byId["take-a-moment"]).toEqual([
+      "Talk It Out",
       "Clear My Mind",
       "Parking Lot",
       "Breathe",
@@ -108,6 +109,10 @@ describe("welcomeHomeNavigationStructure", () => {
       "Peaceful Moments",
       "Soundscapes",
     ]);
+    const talk = WELCOME_HOME_NAV_CATEGORIES.find(
+      (c) => c.id === "take-a-moment",
+    )?.destinations.find((d) => d.id === "talk-it-out");
+    expect(talk?.supportLine).toMatch(/one thoughtful question/i);
     expect(byId["my-story"]).toEqual([
       "Journal Gazebo",
       "Evidence Vault",

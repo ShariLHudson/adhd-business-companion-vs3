@@ -1,6 +1,6 @@
 /**
- * 100 — Spark Estate Guide moves to Welcome Home → Spark Estate submenu.
- * No bottom-corner launcher; no auto-mount on arrival.
+ * 096 — Spark Estate Guide lives under Welcome Home → Spark Estate (with Wander).
+ * Still: no bottom-corner launcher; no auto-mount on arrival.
  */
 
 import { describe, expect, it } from "vitest";
@@ -12,8 +12,8 @@ function readSrc(relativePath: string): string {
   return readFileSync(resolve(process.cwd(), relativePath), "utf8");
 }
 
-describe("sparkEstateGuideMenuMove (100)", () => {
-  it("places Spark Estate last with Wander the Grounds + Spark Estate Guide", () => {
+describe("sparkEstateGuideMenuMove (100 / 096)", () => {
+  it("places Spark Estate last with Wander + Guide destinations", () => {
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
       "my-work",
@@ -37,7 +37,7 @@ describe("sparkEstateGuideMenuMove (100)", () => {
     expect(WELCOME_HOME_NAV_CATEGORIES.at(-1)?.id).toBe("spark-estate");
   });
 
-  it("menu routes children independently without a Wander-only top-level strip", () => {
+  it("menu routes Wander and Guide openers", () => {
     const menu = readSrc(
       "components/companion/estate/EstateRoomExperienceMenu.tsx",
     );
