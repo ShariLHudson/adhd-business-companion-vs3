@@ -9,8 +9,8 @@
 
 Isolation tests (no leak across businesses, avatars, users, or sessions) require a live Business Estate context envelope. Until then, Gate 15 fails closed.
 
-| Blueprints audited | 36 |
-| Blocked or failed | 36 |
+| Blueprints audited | 40 |
+| Blocked or failed | 40 |
 
 ## Required cases (pending live wire)
 

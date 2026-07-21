@@ -45,7 +45,7 @@
 - `business.handmade_online_store` · channels → `business.channels` · wire_profile_load
 - `business.holiday_planner` · active_business → `business.business_id` · wire_profile_load
 - `business.holiday_planner` · purpose → `business.vision` · wire_profile_load
-- …and 68 more
+- …and 87 more
 
 ## high
 
@@ -86,15 +86,16 @@
 - `business.professional_organizing` · audience → `client_avatar.description` · implement_prefill
 - `business.professional_organizing` · payers → `client_avatar.description` · implement_prefill
 - `business.professional_organizing` · offers → `offer.name` · implement_prefill
-- `business.service` · delivery → `offer.description` · implement_prefill
-- `business.speaker` · audience → `client_avatar.description` · implement_prefill
-- `business.speaker` · buyers → `client_avatar.description` · implement_prefill
-- …and 13 more
+- `business.retail_store` · audience → `client_avatar.description` · implement_prefill
+- `business.retail_store` · customers → `client_avatar.description` · implement_prefill
+- `business.retail_store` · clients → `client_avatar.description` · implement_prefill
+- …and 20 more
 
 ## moderate
 
 - `business.author` · author_identity → `business_dna.positioning` · suppress_repeat_question
 - `business.professional_organizing` · specialty → `business_dna.positioning` · suppress_repeat_question
+- `business.retail_store` · specialty → `business_dna.positioning` · suppress_repeat_question
 - `organizing.strategic_management` · strategy → `business_dna.positioning` · suppress_repeat_question
 
 ## low
@@ -139,4 +140,4 @@
 - `business.craft_show` · next_actions → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.etsy` · shop_setup → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.etsy` · status → `blueprint_session.current_goal` · suppress_repeat_question
-- …and 204 more
+- …and 216 more

@@ -25,6 +25,7 @@ Foundation / Work-Type certification is **necessary but not sufficient**. Produc
 | `business.membership` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 11 |
 | `business.product_photography` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 7 |
 | `business.professional_organizing` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
+| `business.retail_store` | 1.0.0 | **blocked** | 6 | 0 | 6 | 6 | 6 |
 | `business.service` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
 | `business.speaker` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
 | `event.book_launch` | 1.0.0 | **blocked** | 20 | 0 | 20 | 20 | 20 |
@@ -43,8 +44,11 @@ Foundation / Work-Type certification is **necessary but not sufficient**. Produc
 | `organizing.operational_procedural` | 1.0.0 | **blocked** | 6 | 0 | 6 | 6 | 6 |
 | `organizing.physical_space` | 1.0.0 | **blocked** | 5 | 0 | 5 | 5 | 5 |
 | `organizing.strategic_management` | 1.0.0 | **blocked** | 6 | 0 | 6 | 6 | 6 |
+| `retail.inventory_purchasing_vendor` | 1.0.0 | **blocked** | 5 | 0 | 5 | 5 | 5 |
+| `retail.merchandising_promotions_cx` | 1.0.0 | **blocked** | 5 | 0 | 5 | 5 | 5 |
+| `retail.store_management` | 1.0.0 | **blocked** | 5 | 0 | 5 | 5 | 5 |
 
-**Createability-certified:** 0 / 36
+**Createability-certified:** 0 / 40
 
 ## Release rule
 

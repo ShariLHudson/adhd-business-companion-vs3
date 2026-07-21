@@ -1,5 +1,5 @@
 /**
- * Business Plan map groups — schema config only (201–224).
+ * Business Plan map groups — schema config only (201–228).
  */
 
 import type { BlueprintGroup } from "../../blueprints/types";
@@ -347,10 +347,85 @@ export const BUSINESS_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
     ],
   },
   {
+    groupId: "retail_store_business",
+    title: "Retail Store Business",
+    description: "Concept, assortment, margins, layout, staffing, and store economics.",
+    order: 19,
+    collapsedByDefault: true,
+    sectionIds: [
+      "retail_customers",
+      "retail_assortment",
+      "retail_layout_flow",
+      "retail_marketing",
+      "retail_sales_ops",
+      "retail_staffing",
+      "retail_loss_prevention",
+      "retail_growth",
+      "retail_kpi_dashboard",
+    ],
+  },
+  {
+    groupId: "retail_store_management",
+    title: "Retail Store Management",
+    description: "Opening, closing, cash, scheduling, incidents, and reviews.",
+    order: 20,
+    collapsedByDefault: true,
+    sectionIds: [
+      "retail_opening",
+      "retail_closing",
+      "retail_cash_handling",
+      "retail_scheduling",
+      "retail_customer_service",
+      "retail_visual_standards",
+      "retail_daily_tasks",
+      "retail_incidents",
+      "retail_safety",
+      "retail_ops_reviews",
+    ],
+  },
+  {
+    groupId: "retail_inventory_purchasing_vendor",
+    title: "Retail Inventory Purchasing and Vendors",
+    description: "Forecasting, purchasing, receiving, reorder, shrink, and scorecards.",
+    order: 21,
+    collapsedByDefault: true,
+    sectionIds: [
+      "retail_demand_forecast",
+      "retail_purchasing_workflow",
+      "retail_vendor_selection",
+      "retail_receiving",
+      "retail_inventory_control",
+      "retail_reorder_points",
+      "retail_markdown_strategy",
+      "retail_shrink",
+      "retail_returns",
+      "retail_vendor_scorecards",
+    ],
+  },
+  {
+    groupId: "retail_merchandising_promotions_cx",
+    title: "Retail Merchandising Promotions and Experience",
+    description: "Visual merchandising, promotions, loyalty, and customer journey.",
+    order: 22,
+    collapsedByDefault: true,
+    sectionIds: [
+      "retail_visual_merch",
+      "retail_seasonal_planning",
+      "retail_endcaps_displays",
+      "retail_promotions",
+      "retail_loyalty",
+      "retail_customer_journey",
+      "retail_store_events",
+      "retail_upsell_cross",
+      "retail_atmosphere",
+      "retail_experience_measurement",
+    ],
+  },
+  {
     groupId: "stewardship",
     title: "Money and Stewardship",
     description: "Profit, taxes, analytics, linked work, and review.",
-    order: 19,
+    order: 23,
     collapsedByDefault: true,
     sectionIds: [
       "expenses_taxes",

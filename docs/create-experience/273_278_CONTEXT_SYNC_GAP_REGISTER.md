@@ -57,6 +57,9 @@
 | critical | `business.professional_organizing` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.professional_organizing` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.professional_organizing` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.retail_store` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.retail_store` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.retail_store` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.service` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.service` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.service` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
@@ -113,6 +116,22 @@
 | critical | `organizing.strategic_management` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `organizing.strategic_management` | priorities | `business.goals` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `organizing.strategic_management` | goals | `business.goals` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.inventory_purchasing_vendor` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.inventory_purchasing_vendor` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.inventory_purchasing_vendor` | constraints | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.inventory_purchasing_vendor` | channels | `business.channels` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.merchandising_promotions_cx` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.merchandising_promotions_cx` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.merchandising_promotions_cx` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.merchandising_promotions_cx` | channels | `business.channels` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.merchandising_promotions_cx` | calendar | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.store_management` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.store_management` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.store_management` | process | `business.description` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.store_management` | workflow | `business.description` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.store_management` | roles | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.store_management` | owners | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `retail.store_management` | handoffs | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | high | `bp-event-business-luncheon` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.author` | readers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.author` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -150,6 +169,10 @@
 | high | `business.professional_organizing` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.professional_organizing` | payers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.professional_organizing` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.retail_store` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.retail_store` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.retail_store` | clients | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.retail_store` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.service` | delivery | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.speaker` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.speaker` | buyers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -166,8 +189,12 @@
 | high | `event.workshop` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `marketing_plan.simple` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `organizing.physical_space` | users | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `retail.inventory_purchasing_vendor` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `retail.merchandising_promotions_cx` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `retail.merchandising_promotions_cx` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | moderate | `business.author` | author_identity | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | moderate | `business.professional_organizing` | specialty | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| moderate | `business.retail_store` | specialty | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | moderate | `organizing.strategic_management` | strategy | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `bp-event-book-signing` | book_title | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `bp-event-book-signing` | inventory | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -236,6 +263,10 @@
 | low | `business.professional_organizing` | services | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.professional_organizing` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.professional_organizing` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.retail_store` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.retail_store` | services | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.retail_store` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.retail_store` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.service` | service | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.service` | services | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.service` | packages | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -413,5 +444,13 @@
 | low | `organizing.physical_space` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `organizing.strategic_management` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `organizing.strategic_management` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.inventory_purchasing_vendor` | inventory | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.inventory_purchasing_vendor` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.inventory_purchasing_vendor` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.inventory_purchasing_vendor` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.merchandising_promotions_cx` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.merchandising_promotions_cx` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.store_management` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `retail.store_management` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 
-**Open gaps:** 408
+**Open gaps:** 447

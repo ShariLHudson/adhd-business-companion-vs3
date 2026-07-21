@@ -29,6 +29,10 @@ import {
   PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+  RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
+  RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
+  RETAIL_STORE_BUSINESS_BLUEPRINT_ID,
+  RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
   STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
@@ -125,6 +129,12 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-digital-information-organizing": DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
   "bp-operational-organizing": OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
   "bp-strategic-organizing": STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
+  "bp-retail-store": RETAIL_STORE_BUSINESS_BLUEPRINT_ID,
+  "bp-retail-store-business": RETAIL_STORE_BUSINESS_BLUEPRINT_ID,
+  "bp-retail-store-management": RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
+  "bp-retail-inventory": RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
+  "bp-retail-purchasing": RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
+  "bp-retail-merchandising": RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -152,6 +162,27 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(product\s+photography(?:\s+(?:studio|blueprint))?|photography\s+studio\s+blueprint|business\.product_photography)\b/i,
     blueprintId: PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Retail delivery before generic retail store business and before handmade inventory pricing
+    re: /\b(retail\s+store\s+management|store\s+operations\s+manual|store\s+opening\s+(?:and\s+)?closing|retail\.store_management)\b/i,
+    blueprintId: RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(retail\s+inventory|inventory\s+purchasing|purchasing\s+(?:and\s+)?vendor|vendor\s+scorecards|retail\.inventory_purchasing_vendor)\b/i,
+    blueprintId: RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(visual\s+merchandising|retail\s+merchandising|merchandising\s+(?:and\s+)?promotions|retail\s+customer\s+experience|retail\.merchandising_promotions_cx)\b/i,
+    blueprintId: RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(retail\s+store(?:\s+business)?|brick[\s-]?and[\s-]?mortar(?:\s+store|\s+business)?|retail\s+business(?:\s+blueprint)?|business\.retail_store)\b/i,
+    blueprintId: RETAIL_STORE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {

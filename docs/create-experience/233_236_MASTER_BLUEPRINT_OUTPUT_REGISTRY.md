@@ -157,6 +157,12 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.professional_organizing` | 1.0.0 | business_plan | Organizing Project Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.professional_organizing` | 1.0.0 | business_plan | Maintenance Offer | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.professional_organizing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.retail_store` | 1.0.0 | business_plan | Retail Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.retail_store` | 1.0.0 | business_plan | Assortment Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.retail_store` | 1.0.0 | business_plan | Financial Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.retail_store` | 1.0.0 | business_plan | Launch Roadmap | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.retail_store` | 1.0.0 | business_plan | Operating Calendar | calendar | composed | blocked | Create (unspecified) | yes |
+| `business.retail_store` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Service Business Operating Plan | plan | composed | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Service Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Service Menu | document | draft_only | blocked | Create (unspecified) | yes |
@@ -432,5 +438,20 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `organizing.strategic_management` | 1.0.0 | business_plan | Decision Visibility Guide | document | draft_only | blocked | Create (unspecified) | yes |
 | `organizing.strategic_management` | 1.0.0 | business_plan | Management Cadence | document | draft_only | blocked | Create (unspecified) | yes |
 | `organizing.strategic_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `retail.inventory_purchasing_vendor` | 1.0.0 | business_plan | Inventory Policy | document | draft_only | blocked | Create (unspecified) | yes |
+| `retail.inventory_purchasing_vendor` | 1.0.0 | business_plan | Purchasing Calendar | calendar | connected | blocked | Create (unspecified) | yes |
+| `retail.inventory_purchasing_vendor` | 1.0.0 | business_plan | Vendor Scorecards | document | draft_only | blocked | Create (unspecified) | yes |
+| `retail.inventory_purchasing_vendor` | 1.0.0 | business_plan | Stock Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `retail.inventory_purchasing_vendor` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `retail.merchandising_promotions_cx` | 1.0.0 | business_plan | Merchandising Calendar | calendar | connected | blocked | Create (unspecified) | yes |
+| `retail.merchandising_promotions_cx` | 1.0.0 | business_plan | Promotion Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `retail.merchandising_promotions_cx` | 1.0.0 | business_plan | Customer Journey Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `retail.merchandising_promotions_cx` | 1.0.0 | business_plan | Experience Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `retail.merchandising_promotions_cx` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `retail.store_management` | 1.0.0 | business_plan | Store Operations Manual | document | draft_only | blocked | Create (unspecified) | yes |
+| `retail.store_management` | 1.0.0 | business_plan | Daily Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `retail.store_management` | 1.0.0 | business_plan | Weekly Manager Review | document | draft_only | blocked | Create (unspecified) | yes |
+| `retail.store_management` | 1.0.0 | business_plan | Shift Handoff Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `retail.store_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 
-**Total outputs:** 424
+**Total outputs:** 445

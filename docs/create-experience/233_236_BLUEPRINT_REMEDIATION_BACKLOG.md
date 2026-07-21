@@ -25,6 +25,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.membership` — **Membership Pricing Model** → implement_structured
 - [ ] `business.membership` — **Membership Health Dashboard** → implement_structured
 - [ ] `business.professional_organizing` — **Pricing Model** → implement_structured
+- [ ] `business.retail_store` — **Financial Model** → implement_structured
 - [ ] `business.service` — **Pricing Calculator** → implement_structured
 - [ ] `event.book_launch` — **Inventory and preorder checklist** → label_draft_only
 - [ ] `event.book_launch` — **Budget view** → implement_structured
@@ -38,6 +39,9 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `event.summit` — **Budget view** → implement_structured
 - [ ] `event.workshop` — **Budget view** → implement_structured
 - [ ] `organizing.digital_information` — **Information Inventory** → label_draft_only
+- [ ] `retail.inventory_purchasing_vendor` — **Inventory Policy** → label_draft_only
+- [ ] `retail.inventory_purchasing_vendor` — **Stock Dashboard** → implement_structured
+- [ ] `retail.merchandising_promotions_cx` — **Experience Scorecard** → implement_structured
 
 ## high
 
@@ -65,6 +69,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.product_photography` — **Product Photography Plan** → connect_destination
 - [ ] `business.professional_organizing` — **Professional Organizing Business Plan** → label_draft_only
 - [ ] `business.professional_organizing` — **Organizing Project Plan** → label_draft_only
+- [ ] `business.retail_store` — **Assortment Plan** → label_draft_only
+- [ ] `business.retail_store` — **Launch Roadmap** → label_draft_only
 - [ ] `business.service` — **Service Business Operating Plan** → implement_composed
 - [ ] `business.speaker` — **Speaker Business Plan** → label_draft_only
 - [ ] `business.speaker` — **Speaker Preparation Plan** → label_draft_only
@@ -163,6 +169,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `organizing.physical_space` — **Physical Space Organization Plan** → label_draft_only
 - [ ] `organizing.physical_space` — **Zone Plan** → label_draft_only
 - [ ] `organizing.strategic_management` — **Strategic Organization Plan** → label_draft_only
+- [ ] `retail.merchandising_promotions_cx` — **Promotion Plan** → label_draft_only
 
 ## moderate
 
@@ -224,6 +231,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `marketing_plan.simple` — **review checklist** → label_draft_only
 - [ ] `organizing.digital_information` — **Digital Maintenance Checklist** → label_draft_only
 - [ ] `organizing.physical_space` — **Maintenance Checklist** → label_draft_only
+- [ ] `retail.store_management` — **Daily Checklist** → label_draft_only
 
 ## low
 
@@ -318,6 +326,9 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.professional_organizing` — **Organizing Assessment** → label_draft_only
 - [ ] `business.professional_organizing` — **Maintenance Offer** → label_draft_only
 - [ ] `business.professional_organizing` — **Next actions list** → connect_destination
+- [ ] `business.retail_store` — **Retail Business Snapshot** → label_draft_only
+- [ ] `business.retail_store` — **Operating Calendar** → implement_composed
+- [ ] `business.retail_store` — **Next actions list** → connect_destination
 - [ ] `business.service` — **Service Business Snapshot** → label_draft_only
 - [ ] `business.service` — **Service Menu** → label_draft_only
 - [ ] `business.service` — **Inquiry Workflow** → label_draft_only
@@ -440,3 +451,13 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `organizing.strategic_management` — **Decision Visibility Guide** → label_draft_only
 - [ ] `organizing.strategic_management` — **Management Cadence** → label_draft_only
 - [ ] `organizing.strategic_management` — **Next actions list** → connect_destination
+- [ ] `retail.inventory_purchasing_vendor` — **Purchasing Calendar** → connect_destination
+- [ ] `retail.inventory_purchasing_vendor` — **Vendor Scorecards** → label_draft_only
+- [ ] `retail.inventory_purchasing_vendor` — **Next actions list** → connect_destination
+- [ ] `retail.merchandising_promotions_cx` — **Merchandising Calendar** → connect_destination
+- [ ] `retail.merchandising_promotions_cx` — **Customer Journey Map** → label_draft_only
+- [ ] `retail.merchandising_promotions_cx` — **Next actions list** → connect_destination
+- [ ] `retail.store_management` — **Store Operations Manual** → label_draft_only
+- [ ] `retail.store_management` — **Weekly Manager Review** → label_draft_only
+- [ ] `retail.store_management` — **Shift Handoff Guide** → label_draft_only
+- [ ] `retail.store_management` — **Next actions list** → connect_destination

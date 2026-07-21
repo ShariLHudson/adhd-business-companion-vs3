@@ -1,6 +1,6 @@
 /**
  * Leaf data only — no imports from Create runtime (avoids circular deps).
- * Business Plan section map (201–224 handmade / service / creator / organizing).
+ * Business Plan section map (201–228 handmade / service / creator / organizing / retail).
  */
 
 import type { WorkTypeMapSectionDef } from "../types";
@@ -185,6 +185,46 @@ export const BUSINESS_PLAN_MAP_SECTIONS: readonly WorkTypeMapSectionDef[] = [
   { id: "meeting_rhythms", title: "Meeting Rhythms" },
   { id: "alignment_load", title: "Alignment and Load" },
   { id: "management_cadence", title: "Management Cadence" },
+  // 225–228 Retail Collection
+  { id: "retail_customers", title: "Retail Customers and Market" },
+  { id: "retail_assortment", title: "Product Assortment Strategy" },
+  { id: "retail_layout_flow", title: "Store Layout and Customer Flow" },
+  { id: "retail_marketing", title: "Retail Marketing and Promotions" },
+  { id: "retail_sales_ops", title: "Retail Sales Operations" },
+  { id: "retail_staffing", title: "Retail Staffing and Culture" },
+  { id: "retail_loss_prevention", title: "Risk and Loss Prevention" },
+  { id: "retail_growth", title: "Retail Growth Roadmap" },
+  { id: "retail_kpi_dashboard", title: "Retail KPI Dashboard" },
+  { id: "retail_opening", title: "Opening Procedures" },
+  { id: "retail_closing", title: "Closing Procedures" },
+  { id: "retail_cash_handling", title: "Cash Handling" },
+  { id: "retail_scheduling", title: "Staff Scheduling" },
+  { id: "retail_customer_service", title: "Customer Service Standards" },
+  { id: "retail_visual_standards", title: "Visual Standards" },
+  { id: "retail_daily_tasks", title: "Daily Task Management" },
+  { id: "retail_incidents", title: "Incident Handling" },
+  { id: "retail_safety", title: "Store Safety" },
+  { id: "retail_ops_reviews", title: "Daily and Weekly Reviews" },
+  { id: "retail_demand_forecast", title: "Demand Forecasting" },
+  { id: "retail_purchasing_workflow", title: "Purchasing Workflow" },
+  { id: "retail_vendor_selection", title: "Vendor Selection" },
+  { id: "retail_receiving", title: "Receiving" },
+  { id: "retail_inventory_control", title: "Inventory Control" },
+  { id: "retail_reorder_points", title: "Reorder Points" },
+  { id: "retail_markdown_strategy", title: "Overstock and Markdown Strategy" },
+  { id: "retail_shrink", title: "Shrink Management" },
+  { id: "retail_returns", title: "Returns" },
+  { id: "retail_vendor_scorecards", title: "Supplier Scorecards" },
+  { id: "retail_visual_merch", title: "Visual Merchandising" },
+  { id: "retail_seasonal_planning", title: "Seasonal Merchandising Planning" },
+  { id: "retail_endcaps_displays", title: "Endcaps and Displays" },
+  { id: "retail_promotions", title: "Retail Promotions" },
+  { id: "retail_loyalty", title: "Loyalty" },
+  { id: "retail_customer_journey", title: "Customer Journey" },
+  { id: "retail_store_events", title: "In-Store Events" },
+  { id: "retail_upsell_cross", title: "Upselling and Cross-Selling" },
+  { id: "retail_atmosphere", title: "Store Atmosphere" },
+  { id: "retail_experience_measurement", title: "Experience Performance Measurement" },
 ];
 
 export const BUSINESS_PLAN_DEFAULT_FOCUS: readonly string[] = [

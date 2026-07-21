@@ -23,6 +23,7 @@
 | `business.membership` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.product_photography` | 1.0.0 | **blocked** | 6 | 0 | 6 | 6 | 16 |
 | `business.professional_organizing` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
+| `business.retail_store` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 22 |
 | `business.service` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.speaker` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `event.book_launch` | 1.0.0 | **blocked** | 14 | 0 | 14 | 14 | 24 |
@@ -41,7 +42,10 @@
 | `organizing.operational_procedural` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `organizing.physical_space` | 1.0.0 | **blocked** | 8 | 0 | 8 | 8 | 18 |
 | `organizing.strategic_management` | 1.0.0 | **blocked** | 8 | 0 | 8 | 8 | 18 |
+| `retail.inventory_purchasing_vendor` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
+| `retail.merchandising_promotions_cx` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
+| `retail.store_management` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 
-**Pass:** 0 · **Blocked:** 36 · **Total:** 36
+**Pass:** 0 · **Blocked:** 40 · **Total:** 40
 
 Production rule: Createability **and** Context Connection must both pass.

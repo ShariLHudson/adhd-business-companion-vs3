@@ -163,6 +163,18 @@
 | `business.professional_organizing` | offers | `offer.name` | offer | blocked |
 | `business.professional_organizing` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.professional_organizing` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.retail_store` | active_business | `business.business_id` | business | blocked |
+| `business.retail_store` | purpose | `business.vision` | business | blocked |
+| `business.retail_store` | vision | `business.vision` | business | blocked |
+| `business.retail_store` | specialty | `business_dna.positioning` | business_dna | blocked |
+| `business.retail_store` | audience | `client_avatar.description` | client_avatar | blocked |
+| `business.retail_store` | customers | `client_avatar.description` | client_avatar | blocked |
+| `business.retail_store` | clients | `client_avatar.description` | client_avatar | blocked |
+| `business.retail_store` | products | `product_or_service.name` | product_or_service | blocked |
+| `business.retail_store` | offers | `offer.name` | offer | blocked |
+| `business.retail_store` | services | `product_or_service.name` | product_or_service | blocked |
+| `business.retail_store` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.retail_store` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.service` | active_business | `business.business_id` | business | blocked |
 | `business.service` | purpose | `business.vision` | business | blocked |
 | `business.service` | vision | `business.vision` | business | blocked |
@@ -413,5 +425,32 @@
 | `organizing.strategic_management` | goals | `business.goals` | business | blocked |
 | `organizing.strategic_management` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `organizing.strategic_management` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `retail.inventory_purchasing_vendor` | active_business | `business.business_id` | business | blocked |
+| `retail.inventory_purchasing_vendor` | purpose | `business.vision` | business | blocked |
+| `retail.inventory_purchasing_vendor` | inventory | `product_or_service.name` | product_or_service | blocked |
+| `retail.inventory_purchasing_vendor` | constraints | `business.constraints` | business | blocked |
+| `retail.inventory_purchasing_vendor` | channels | `business.channels` | business | blocked |
+| `retail.inventory_purchasing_vendor` | offers | `offer.name` | offer | blocked |
+| `retail.inventory_purchasing_vendor` | products | `product_or_service.name` | product_or_service | blocked |
+| `retail.inventory_purchasing_vendor` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `retail.inventory_purchasing_vendor` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `retail.merchandising_promotions_cx` | active_business | `business.business_id` | business | blocked |
+| `retail.merchandising_promotions_cx` | purpose | `business.vision` | business | blocked |
+| `retail.merchandising_promotions_cx` | vision | `business.vision` | business | blocked |
+| `retail.merchandising_promotions_cx` | audience | `client_avatar.description` | client_avatar | blocked |
+| `retail.merchandising_promotions_cx` | offers | `offer.name` | offer | blocked |
+| `retail.merchandising_promotions_cx` | channels | `business.channels` | business | blocked |
+| `retail.merchandising_promotions_cx` | calendar | `business.constraints` | business | blocked |
+| `retail.merchandising_promotions_cx` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `retail.merchandising_promotions_cx` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `retail.store_management` | active_business | `business.business_id` | business | blocked |
+| `retail.store_management` | purpose | `business.vision` | business | blocked |
+| `retail.store_management` | process | `business.description` | business | blocked |
+| `retail.store_management` | workflow | `business.description` | business | blocked |
+| `retail.store_management` | roles | `business.constraints` | business | blocked |
+| `retail.store_management` | owners | `business.constraints` | business | blocked |
+| `retail.store_management` | handoffs | `business.constraints` | business | blocked |
+| `retail.store_management` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `retail.store_management` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 
-**Rows:** 408
+**Rows:** 447
