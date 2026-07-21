@@ -370,7 +370,7 @@ describe("132 — Product Launch Event Blueprint foundation", () => {
   });
 
   it("Summit and existing Event Blueprints remain registered", () => {
-    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(13);
+    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(14);
     for (const id of [
       "bp-event-business-luncheon",
       "bp-event-online-workshop",
@@ -385,6 +385,7 @@ describe("132 — Product Launch Event Blueprint foundation", () => {
       SUMMIT_EVENT_BLUEPRINT_ID,
       PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
       "event.book_launch",
+      "event.challenge",
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
     }

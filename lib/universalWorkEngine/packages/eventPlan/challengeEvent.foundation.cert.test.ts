@@ -1,11 +1,14 @@
 /**
- * 131 — Summit Event Blueprint foundation + certification.
+ * 134 — Challenge Event Blueprint foundation + certification.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
+  CHALLENGE_EVENT_BLUEPRINT_ID,
   CONFERENCE_EVENT_BLUEPRINT_ID,
   NETWORKING_EVENT_BLUEPRINT_ID,
+  PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
   RETREAT_EVENT_BLUEPRINT_ID,
   SUMMIT_EVENT_BLUEPRINT_ID,
   WEBINAR_EVENT_BLUEPRINT_ID,
@@ -67,7 +70,7 @@ function walkTsFiles(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-describe("131 — Summit Event Blueprint foundation", () => {
+describe("134 — Challenge Event Blueprint foundation", () => {
   beforeEach(() => {
     resetWorkIdentityStoreForTests();
     resetWorkRelationshipsForTests();
@@ -83,15 +86,15 @@ describe("131 — Summit Event Blueprint foundation", () => {
   });
 
   it("registers through the universal registry on event_plan only", () => {
-    expect(isBlueprintRegistered(SUMMIT_EVENT_BLUEPRINT_ID)).toBe(true);
-    const bp = getBlueprint(SUMMIT_EVENT_BLUEPRINT_ID)!;
-    expect(bp.title).toBe("Summit");
+    expect(isBlueprintRegistered(CHALLENGE_EVENT_BLUEPRINT_ID)).toBe(true);
+    const bp = getBlueprint(CHALLENGE_EVENT_BLUEPRINT_ID)!;
+    expect(bp.title).toBe("Challenge");
     expect(bp.compatibleWorkTypeIds).toEqual([EVENT_PLAN_WORK_TYPE_ID]);
     expect(bp.category).toBe("spark");
-    expect(EVENT_PLAN_BLUEPRINT_IDS).toContain(SUMMIT_EVENT_BLUEPRINT_ID);
+    expect(EVENT_PLAN_BLUEPRINT_IDS).toContain(CHALLENGE_EVENT_BLUEPRINT_ID);
     expect(
       listBlueprints({ workTypeId: EVENT_PLAN_WORK_TYPE_ID }).some(
-        (b) => b.blueprintId === SUMMIT_EVENT_BLUEPRINT_ID,
+        (b) => b.blueprintId === CHALLENGE_EVENT_BLUEPRINT_ID,
       ),
     ).toBe(true);
   });
@@ -100,15 +103,15 @@ describe("131 — Summit Event Blueprint foundation", () => {
     const files = walkTsFiles(PACKAGE_DIR);
     for (const file of files) {
       const src = readFileSync(file, "utf8");
-      expect(src).not.toMatch(/createPrivateSummitRuntime|summitEventStore/);
-      expect(src).not.toMatch(/localStorage\.setItem\(\s*["']summit/);
+      expect(src).not.toMatch(/createPrivateChallengeRuntime|challengeEventStore/);
+      expect(src).not.toMatch(/localStorage\.setItem\(\s*["']challenge/);
     }
   });
 
   it("three depth modes preserve one Work ID", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       depthMode: "quick_start",
       origin: "create",
     });
@@ -118,40 +121,42 @@ describe("131 — Summit Event Blueprint foundation", () => {
     changeBlueprintDepthMode(workId, "complete_planning");
     expect(getWorkBlueprintState(workId)?.workId).toBe(workId);
     expect(getWorkBlueprintState(workId)?.blueprintId).toBe(
-      SUMMIT_EVENT_BLUEPRINT_ID,
+      CHALLENGE_EVENT_BLUEPRINT_ID,
     );
   });
 
-  it("conditional sponsor and partner sections appear with known context", () => {
+  it("conditional prizes and pricing sections appear with known context", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "create",
     });
     mergeKnownContext(init.workId, {
-      has_sponsors: "true",
-      has_partners: "true",
+      has_prizes: "true",
+      is_paid: "true",
     });
     const state = getWorkBlueprintState(init.workId)!;
-    const bp = getBlueprint(SUMMIT_EVENT_BLUEPRINT_ID)!;
+    const bp = getBlueprint(CHALLENGE_EVENT_BLUEPRINT_ID)!;
     const active = resolveActiveSections(
       bp.sections,
       state,
       "guided_build",
     ).visibleSectionIds;
-    expect(active).toContain("sponsors");
-    expect(active).toContain("vendors");
+    expect(active).toContain("swag");
+    expect(active).toContain("revenue_pricing");
+    expect(active).toContain("attendee_experience");
     expect(active).toContain("speakers");
-    expect(active).toContain("hospitality");
   });
 
-  it("surfaces summit forgotten items and adaptive purpose question", () => {
-    const bp = getBlueprint(SUMMIT_EVENT_BLUEPRINT_ID)!;
-    expect(bp.commonlyForgottenItems.some((i) => /briefing/i.test(i))).toBe(
+  it("surfaces challenge forgotten items and adaptive purpose question", () => {
+    const bp = getBlueprint(CHALLENGE_EVENT_BLUEPRINT_ID)!;
+    expect(bp.commonlyForgottenItems.some((i) => /missed-day/i.test(i))).toBe(
       true,
     );
-    expect(bp.commonlyForgottenItems.some((i) => /VIP/i.test(i))).toBe(true);
+    expect(bp.commonlyForgottenItems.some((i) => /welcome flow/i.test(i))).toBe(
+      true,
+    );
     const purposeQ = bp.adaptiveQuestions.find((q) => q.id === "q_purpose");
     expect(purposeQ?.sectionId).toBe("purpose");
   });
@@ -159,18 +164,18 @@ describe("131 — Summit Event Blueprint foundation", () => {
   it("tasks and milestones use universal infrastructure", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "create",
     });
     addWorkTask({
       workId: init.workId,
-      title: "Prepare executive briefing packets",
-      sectionId: "communications",
+      title: "Design check-ins and missed-day recovery",
+      sectionId: "attendee_experience",
     });
     addWorkMilestone({
       workId: init.workId,
-      title: "Vision and outcomes approved",
+      title: "Purpose and outcomes approved",
     });
     expect(listWorkTasks(init.workId).length).toBeGreaterThanOrEqual(1);
     expect(listWorkMilestones(init.workId).length).toBeGreaterThanOrEqual(1);
@@ -179,7 +184,7 @@ describe("131 — Summit Event Blueprint foundation", () => {
   it("research requires approve before apply", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "research",
     });
@@ -187,12 +192,12 @@ describe("131 — Summit Event Blueprint foundation", () => {
       target: {
         kind: "section",
         workId: init.workId,
-        sectionId: "venue",
+        sectionId: "format",
       },
-      researchQuestion: "Which venues support private executive roundtables?",
-      researchMode: "venue_scan",
+      researchQuestion: "Which challenge lengths retain habit practice?",
+      researchMode: "quick_check",
       originatingExperience: "create",
-      findings: "Breakout suites near the main room reduce VIP friction.",
+      findings: "Seven-day challenges convert well for first-time cohorts.",
     });
     submitResearchForReview(draft.id);
     expect(() => applyApprovedResearch(draft.id, ["change"])).toThrow();
@@ -200,18 +205,18 @@ describe("131 — Summit Event Blueprint foundation", () => {
       target: {
         kind: "section",
         workId: init.workId,
-        sectionId: "technology",
+        sectionId: "communications",
       },
-      researchQuestion: "Livestream redundancy options",
+      researchQuestion: "Reminder formats that reduce drop-off",
       researchMode: "quick_check",
       originatingExperience: "create",
-      findings: "Dual encode paths reduce drop risk.",
-      proposedActions: ["Add dual encode path"],
+      findings: "Short morning reminders outperform long evening digests.",
+      proposedActions: ["Use short morning reminders"],
     });
     submitResearchForReview(approved.id);
     approveResearch(approved.id);
     const applied = applyApprovedResearch(approved.id, [
-      "Add dual encode livestream redundancy",
+      "Use short morning reminders",
     ]);
     expect(applied.approvalStatus).toBe("applied");
   });
@@ -219,15 +224,15 @@ describe("131 — Summit Event Blueprint foundation", () => {
   it("Project and cartography relationships attach to canonical Work", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       depthMode: "quick_start",
       origin: "projects",
     });
     linkWorkRelationship({
       fromWorkId: init.workId,
-      toRef: { kind: "project", id: "proj-leadership-summit" },
+      toRef: { kind: "project", id: "proj-habit-challenge" },
       relationship: "supports",
-      note: "Leadership alignment",
+      note: "Habit challenge",
     });
     expect(
       listWorkRelationships(init.workId).some((r) => r.toRef.kind === "project"),
@@ -237,57 +242,63 @@ describe("131 — Summit Event Blueprint foundation", () => {
   it("skip remains recoverable; answer advances purpose", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       depthMode: "quick_start",
       origin: "create",
     });
-    skipBlueprintQuestion(init.workId, "q_program");
-    recoverSkippedQuestion(init.workId, "q_program");
+    skipBlueprintQuestion(init.workId, "q_accountability");
+    recoverSkippedQuestion(init.workId, "q_accountability");
     answerBlueprintQuestion(
       init.workId,
       "q_purpose",
-      "Align partners on one shared growth priority for the year",
+      "Help busy founders take one focused action each morning",
     );
     expect(
       getWorkBlueprintState(init.workId)?.answeredQuestions.q_purpose,
-    ).toMatch(/shared growth/i);
+    ).toMatch(/focused action/i);
   });
 
-  it("NL and Create launch resolve summit; conference stays distinct", () => {
+  it("NL and Create launch resolve challenge; workshop stays distinct", () => {
     const inferred = inferWorkTypeAndBlueprint({
       origin: "conversation",
-      originalUserMessage: "Help me plan a summit",
+      originalUserMessage: "Help me plan a 7-day challenge",
     });
     expect(inferred.workTypeId).toBe(EVENT_PLAN_WORK_TYPE_ID);
-    expect(inferred.blueprintId).toBe(SUMMIT_EVENT_BLUEPRINT_ID);
+    expect(inferred.blueprintId).toBe(CHALLENGE_EVENT_BLUEPRINT_ID);
 
-    const conference = inferWorkTypeAndBlueprint({
+    const habit = inferWorkTypeAndBlueprint({
       origin: "create",
-      originalUserMessage: "Help me plan a conference",
+      originalUserMessage: "Help me host a habit challenge",
     });
-    expect(conference.blueprintId).toBe(CONFERENCE_EVENT_BLUEPRINT_ID);
+    expect(habit.blueprintId).toBe(CHALLENGE_EVENT_BLUEPRINT_ID);
+
+    const workshop = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me plan a workshop",
+    });
+    expect(workshop.blueprintId).toBe(WORKSHOP_EVENT_BLUEPRINT_ID);
 
     const fromCreate = launchFromCreate({
-      originalUserMessage: "Use the Summit Blueprint",
-      candidateBlueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      originalUserMessage: "Use the Challenge Blueprint",
+      candidateBlueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
       forceNew: true,
     });
     expect(fromCreate.workId).toBeTruthy();
     expect(getWorkBlueprintState(fromCreate.workId!)?.blueprintId).toBe(
-      SUMMIT_EVENT_BLUEPRINT_ID,
+      CHALLENGE_EVENT_BLUEPRINT_ID,
     );
 
     const talk = launchFromShari({
-      originalUserMessage: "Just talk through this summit with me",
+      originalUserMessage: "Just talk through this challenge with me",
       shariMode: "talk_only",
     });
     expect(talk.talkOnly).toBe(true);
 
     const fromShari = launchFromShari({
-      originalUserMessage: "Continue the summit I started",
+      originalUserMessage: "Continue the challenge I started",
       relatedWorkId: fromCreate.workId!,
-      candidateBlueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      candidateBlueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       shariMode: "work_on_this",
     });
     expect(fromShari.workId ?? fromCreate.workId).toBe(fromCreate.workId);
@@ -296,62 +307,62 @@ describe("131 — Summit Event Blueprint foundation", () => {
   it("Chamber, Board, Body Doubling, and deliverables stay on universal owners", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "projects",
     });
     const workId = init.workId;
-    const bp = getBlueprint(SUMMIT_EVENT_BLUEPRINT_ID)!;
+    const bp = getBlueprint(CHALLENGE_EVENT_BLUEPRINT_ID)!;
     expect(bp.chamberRoutingRecommendations).toEqual(
-      expect.arrayContaining(["events", "leadership"]),
+      expect.arrayContaining(["events", "learning", "momentum"]),
     );
     expect(bp.boardReviewRecommendations).toEqual(
-      expect.arrayContaining(["summit vision", "accessibility"]),
+      expect.arrayContaining(["challenge purpose", "accountability design"]),
     );
     expect(bp.deliverables).toEqual(
       expect.arrayContaining([
-        "Executive briefing packet",
-        "VIP logistics plan",
+        "Daily content calendar",
+        "Missed-day recovery plan",
       ]),
     );
 
     const bd = launchFromOrigin("body_doubling", {
-      originalUserMessage: "Body double with me while I build the briefing packets",
+      originalUserMessage: "Body double with me while I write day-one content",
       relatedWorkId: workId,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      bodyDoublingSessionId: "bd-sm-1",
-      sectionId: "communications",
+      bodyDoublingSessionId: "bd-ch-1",
+      sectionId: "agenda",
     });
     expect(bd.workId ?? workId).toBe(workId);
 
     const chamber = launchFromOrigin("chamber", {
-      originalUserMessage: "Ask Leadership Intelligence to review the vision",
+      originalUserMessage: "Ask Learning Intelligence to review the daily rhythm",
       relatedWorkId: workId,
-      chamberMemberId: "leadership",
+      chamberMemberId: "learning",
       applyApproved: true,
     });
     expect(chamber.workId ?? workId).toBe(workId);
 
     const board = launchFromOrigin("board", {
-      originalUserMessage: "Have the Board review the strategic outcomes",
+      originalUserMessage: "Have the Board review the accountability design",
       relatedWorkId: workId,
-      boardReviewId: "br-sm-outcomes",
+      boardReviewId: "br-ch-accountability",
       applyApproved: true,
     });
     expect(board.workId ?? workId).toBe(workId);
   });
 
-  it("duplicate prevention does not invent a second summit Work", () => {
+  it("duplicate prevention does not invent a second challenge Work", () => {
     const first = launchFromCreate({
-      originalUserMessage: "Help me plan a summit",
-      candidateBlueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      originalUserMessage: "Help me plan a 7-day challenge",
+      candidateBlueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
       forceNew: true,
     });
     expect(first.workId).toBeTruthy();
     const second = launchFromCreate({
-      originalUserMessage: "Help me plan a summit",
-      candidateBlueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
+      originalUserMessage: "Help me plan a 7-day challenge",
+      candidateBlueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
     });
     expect(["continue_existing", "clarify", "create_new"]).toContain(
@@ -362,7 +373,7 @@ describe("131 — Summit Event Blueprint foundation", () => {
     }
   });
 
-  it("Conference and existing Event Blueprints remain registered", () => {
+  it("Book Launch and existing Event Blueprints remain registered", () => {
     expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(14);
     for (const id of [
       "bp-event-business-luncheon",
@@ -376,9 +387,9 @@ describe("131 — Summit Event Blueprint foundation", () => {
       RETREAT_EVENT_BLUEPRINT_ID,
       CONFERENCE_EVENT_BLUEPRINT_ID,
       SUMMIT_EVENT_BLUEPRINT_ID,
-      "event.product_launch",
-      "event.book_launch",
-      "event.challenge",
+      PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
+      BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
+      CHALLENGE_EVENT_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
     }

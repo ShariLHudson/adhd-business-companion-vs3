@@ -354,7 +354,7 @@ describe("126 — Networking Event Blueprint foundation", () => {
   });
 
   it("existing Event Blueprints remain registered", () => {
-    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(13);
+    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(14);
     for (const id of [
       "bp-event-business-luncheon",
       "bp-event-online-workshop",
@@ -369,6 +369,7 @@ describe("126 — Networking Event Blueprint foundation", () => {
       "event.summit",
       "event.product_launch",
       "event.book_launch",
+      "event.challenge",
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
     }

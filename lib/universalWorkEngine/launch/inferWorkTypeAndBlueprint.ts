@@ -13,6 +13,7 @@ import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/market
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import {
   BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
+  CHALLENGE_EVENT_BLUEPRINT_ID,
   CONFERENCE_EVENT_BLUEPRINT_ID,
   NETWORKING_EVENT_BLUEPRINT_ID,
   PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
@@ -54,6 +55,9 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-book-launch": BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
   "bp-event-book-launch": BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
   "bp-book-launch-event": BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
+  "bp-challenge": CHALLENGE_EVENT_BLUEPRINT_ID,
+  "bp-event-challenge": CHALLENGE_EVENT_BLUEPRINT_ID,
+  "bp-challenge-event": CHALLENGE_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
@@ -71,6 +75,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(networking\s+event|business\s+mixer|networking\s+mixer|speed\s+networking)\b/i,
     blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Challenge before bare workshop/webinar so "7-day challenge" etc. stay here
+    re: /\b(\d+[-\s]?day\s+challenge|(?:habit|business|health|community)\s+challenge|challenge\s+(?:event|blueprint|series)|(?:plan|host|run|design)\s+a\s+challenge)\b/i,
+    blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
@@ -217,7 +227,7 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
   if (
     !workTypeId &&
     message &&
-    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar|conference|summit|launch)\b/i.test(
+    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar|conference|summit|launch|challenge)\b/i.test(
       message,
     )
   ) {
