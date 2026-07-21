@@ -28,6 +28,30 @@ const EVENT_HINTS: { match: RegExp; id: string; title: string; why: string }[] =
     why: "Webinars succeed with rehearsal, moderation, engagement, and a clear replay path.",
   },
   {
+    match: /retreat|lodging|wellness|downtime|integration/i,
+    id: "event-has-retreat-care",
+    title: "Retreat care and rhythm thinking is present",
+    why: "Retreats succeed when rest, lodging, care, and follow-through are planned on purpose.",
+  },
+  {
+    match: /conference|track|sponsor|exhibitor|keynote|badge/i,
+    id: "event-has-conference-ops",
+    title: "Conference operations thinking is present",
+    why: "Conferences succeed when program, sponsors, production, and attendee journey are planned together.",
+  },
+  {
+    match: /summit|executive|vip|roundtable|keynote|strategic/i,
+    id: "event-has-summit-alignment",
+    title: "Summit alignment thinking is present",
+    why: "Summits succeed when vision, VIP care, program quality, and follow-through are planned together.",
+  },
+  {
+    match: /launch|offer|demo|checkout|onboarding|affiliate|messaging|positioning/i,
+    id: "event-has-product-launch",
+    title: "Product launch thinking is present",
+    why: "Launches succeed when offer clarity, demo readiness, conversion path, and customer success are planned together.",
+  },
+  {
     match: /risk|contingency/i,
     id: "event-has-risk",
     title: "Risk thinking is present",
@@ -100,6 +124,30 @@ const EVENT_SUGGEST_IF_MISSING: {
     test: (t) => !/rehearsal|moderator|replay|tech/i.test(t),
     title: "Consider rehearsal and moderator support",
     why: "Webinars often fail from untested tech or an unmanaged chat and Q&A.",
+  },
+  {
+    id: "event-suggest-rest-integration",
+    test: (t) => !/rest|downtime|quiet|integration|lodging/i.test(t),
+    title: "Consider rest, lodging, and integration",
+    why: "Retreats often pack the schedule and leave no quiet space or return plan.",
+  },
+  {
+    id: "event-suggest-speaker-sponsor-ops",
+    test: (t) => !/speaker|sponsor|exhibitor|av|wayfinding|badge/i.test(t),
+    title: "Consider speakers, sponsors, and production ops",
+    why: "Conferences often underplan green rooms, sponsor deliverables, and attendee wayfinding.",
+  },
+  {
+    id: "event-suggest-vip-followthrough",
+    test: (t) => !/vip|executive|briefing|commitment|follow/i.test(t),
+    title: "Consider VIP care and post-summit commitments",
+    why: "Summits often underplan executive briefings and who owns decisions afterward.",
+  },
+  {
+    id: "event-suggest-launch-conversion",
+    test: (t) => !/demo|checkout|onboarding|offer|affiliate|messaging/i.test(t),
+    title: "Consider demo, checkout, and onboarding readiness",
+    why: "Product launches often underplan rehearsal, payment testing, and what happens after someone buys.",
   },
 ];
 

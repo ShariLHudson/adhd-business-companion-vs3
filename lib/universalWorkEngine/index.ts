@@ -248,6 +248,14 @@ export {
   EVENT_BLUEPRINT_WORKSHOP,
   WEBINAR_EVENT_BLUEPRINT_ID,
   EVENT_BLUEPRINT_WEBINAR,
+  RETREAT_EVENT_BLUEPRINT_ID,
+  EVENT_BLUEPRINT_RETREAT,
+  CONFERENCE_EVENT_BLUEPRINT_ID,
+  EVENT_BLUEPRINT_CONFERENCE,
+  SUMMIT_EVENT_BLUEPRINT_ID,
+  EVENT_BLUEPRINT_SUMMIT,
+  PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
+  EVENT_BLUEPRINT_PRODUCT_LAUNCH,
 } from "./packages/eventPlan/eventBlueprintDefinitions";
 export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";
 export { ensureEventBlueprintIntelligenceRegistered } from "./packages/eventPlan/eventBlueprintIntelligence";

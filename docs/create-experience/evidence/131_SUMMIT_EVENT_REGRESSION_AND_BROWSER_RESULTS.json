@@ -1,0 +1,10 @@
+{
+  "prompt": "131",
+  "blueprintId": "event.summit",
+  "workTypeId": "event_plan",
+  "date": "2026-07-21",
+  "verdict": "BLUEPRINT PRODUCTION CERTIFIED",
+  "eventBlueprintCount": 11,
+  "totals": { "files": 21, "passed": 146, "failed": 0 },
+  "blockers": []
+}

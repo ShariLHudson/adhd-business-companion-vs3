@@ -12,7 +12,11 @@ import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import {
+  CONFERENCE_EVENT_BLUEPRINT_ID,
   NETWORKING_EVENT_BLUEPRINT_ID,
+  PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
+  RETREAT_EVENT_BLUEPRINT_ID,
+  SUMMIT_EVENT_BLUEPRINT_ID,
   WEBINAR_EVENT_BLUEPRINT_ID,
   WORKSHOP_EVENT_BLUEPRINT_ID,
 } from "../packages/eventPlan/eventBlueprintDefinitions";
@@ -35,6 +39,17 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-webinar": WEBINAR_EVENT_BLUEPRINT_ID,
   "bp-event-webinar": WEBINAR_EVENT_BLUEPRINT_ID,
   "bp-webinar-event": WEBINAR_EVENT_BLUEPRINT_ID,
+  "bp-event-retreat": RETREAT_EVENT_BLUEPRINT_ID,
+  "bp-general-retreat": RETREAT_EVENT_BLUEPRINT_ID,
+  "bp-conference": CONFERENCE_EVENT_BLUEPRINT_ID,
+  "bp-event-conference": CONFERENCE_EVENT_BLUEPRINT_ID,
+  "bp-conference-event": CONFERENCE_EVENT_BLUEPRINT_ID,
+  "bp-summit": SUMMIT_EVENT_BLUEPRINT_ID,
+  "bp-event-summit": SUMMIT_EVENT_BLUEPRINT_ID,
+  "bp-summit-event": SUMMIT_EVENT_BLUEPRINT_ID,
+  "bp-product-launch": PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
+  "bp-event-product-launch": PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
+  "bp-product-launch-event": PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
@@ -55,8 +70,24 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
+    // Product launch before bare webinar so "webinar launch" stays on this Blueprint
+    re: /\b(product\s+launch|launch\s+event|webinar\s+launch|hybrid\s+launch|(?:software|service|membership|course|consumer)\s+launch|vip\s+preview|public\s+launch|launch\s+(?:a|my|the)\s+(?:product|offer|course|membership|service))\b/i,
+    blueprintId: PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
     re: /\bwebinar\b/i,
     blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\bconference\b/i,
+    blueprintId: CONFERENCE_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\bsummit\b/i,
+    blueprintId: SUMMIT_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
@@ -75,8 +106,14 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
-    re: /\b(three[-\s]?day\s+retreat|retreat\s+blueprint|retreat)\b/i,
+    re: /\b(three[-\s]?day\s+retreat)\b/i,
     blueprintId: "bp-event-three-day-retreat",
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Bare "retreat" → general Retreat Blueprint (three-day specialty pattern above wins)
+    re: /\bretreat\b/i,
+    blueprintId: RETREAT_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
@@ -170,7 +207,7 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
   if (
     !workTypeId &&
     message &&
-    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar)\b/i.test(
+    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar|conference|summit|launch)\b/i.test(
       message,
     )
   ) {
