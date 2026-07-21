@@ -215,6 +215,74 @@ export function softDeleteBlueprintSection(
   );
 }
 
+/** Restore a soft-deleted section into its previous group (or first group). */
+export function restoreBlueprintSection(
+  blueprintId: string,
+  sectionId: string,
+  options?: { asNewVersion?: boolean; groupId?: string },
+): BlueprintDefinition {
+  const bp = requireBlueprint(blueprintId);
+  const target = bp.sections.find((s) => s.id === sectionId);
+  if (!target) throw new Error(`Section "${sectionId}" not found`);
+  if (!target.softDeleted) return bp;
+  const groups = ensureGroups(bp);
+  const preferred =
+    options?.groupId ??
+    target.groupId ??
+    groups[0]?.groupId ??
+    null;
+  const sections = bp.sections.map((s) =>
+    s.id === sectionId
+      ? {
+          ...s,
+          softDeleted: false,
+          groupId: preferred ?? s.groupId,
+        }
+      : s,
+  );
+  const nextGroups = preferred
+    ? groups.map((g) =>
+        g.groupId === preferred && !g.sectionIds.includes(sectionId)
+          ? { ...g, sectionIds: [...g.sectionIds, sectionId] }
+          : g,
+      )
+    : groups;
+  return commitStructure(
+    bp,
+    { ...bp, sections, groups: nextGroups },
+    `restore_section:${sectionId}`,
+    options?.asNewVersion !== false,
+  );
+}
+
+/** Mark a section required or optional (role + required flag). */
+export function setBlueprintSectionRole(
+  blueprintId: string,
+  sectionId: string,
+  role: "required" | "optional",
+  options?: { asNewVersion?: boolean },
+): BlueprintDefinition {
+  const bp = requireBlueprint(blueprintId);
+  if (!bp.sections.some((s) => s.id === sectionId && !s.softDeleted)) {
+    throw new Error(`Section "${sectionId}" not found`);
+  }
+  const sections = bp.sections.map((s) =>
+    s.id === sectionId
+      ? {
+          ...s,
+          role,
+          required: role === "required",
+        }
+      : s,
+  );
+  return commitStructure(
+    bp,
+    { ...bp, sections },
+    `set_section_role:${sectionId}:${role}`,
+    options?.asNewVersion !== false,
+  );
+}
+
 export function moveBlueprintSection(
   blueprintId: string,
   sectionId: string,

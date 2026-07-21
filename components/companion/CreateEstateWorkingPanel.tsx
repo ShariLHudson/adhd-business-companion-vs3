@@ -7,9 +7,9 @@ import { CreateWorkspaceV2Panel } from "@/components/companion/CreateWorkspaceV2
 import { CreateWorkCommandToolbar } from "@/components/companion/CreateWorkCommandToolbar";
 import { CurrentFocusInteraction } from "@/components/companion/CurrentFocusInteraction";
 import { ConnectedWorkDisclosure } from "@/components/companion/ConnectedWorkDisclosure";
-import { SparkBlueprintHome } from "@/components/companion/SparkBlueprintHome";
 import {
   BlueprintDepthControls,
+  BlueprintExperienceShell,
   SaveAsBlueprintReviewPanel,
 } from "@/components/companion/universalBlueprint";
 import { canonicalStatusFromWorkflow } from "@/lib/activeWorkspaceRegistry/canonicalStatus";
@@ -741,7 +741,7 @@ export function CreateEstateWorkingPanel({
                 ) : null}
                 {openBlueprintHomeId ? (
                   <div className="mt-3">
-                    <SparkBlueprintHome
+                    <BlueprintExperienceShell
                       blueprintId={openBlueprintHomeId}
                       onClose={() => setOpenBlueprintHomeId(null)}
                     />

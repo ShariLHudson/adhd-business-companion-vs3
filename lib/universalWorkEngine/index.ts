@@ -205,6 +205,8 @@ export {
   renameBlueprintSection,
   duplicateBlueprintSection,
   softDeleteBlueprintSection,
+  restoreBlueprintSection,
+  setBlueprintSectionRole,
   moveBlueprintSection,
   moveBlueprintSectionToGroup,
   addBlueprintGroup,

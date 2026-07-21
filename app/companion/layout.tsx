@@ -58,6 +58,7 @@ import "./spark-note.css";
 import "./companion-chat-surface.css";
 import "./companion-layout-layers.css";
 import "./universal-blueprint-interface.css";
+import "./blueprint-experience.css";
 
 export const dynamic = "force-dynamic";
 

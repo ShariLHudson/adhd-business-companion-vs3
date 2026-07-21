@@ -1,0 +1,254 @@
+/* 106 — Blueprint Experience Completion */
+
+.bp-experience-shell {
+  --bp-ink: #2f2a24;
+  --bp-muted: #6b635a;
+  --bp-line: #e7dfd4;
+  --bp-surface: rgba(255, 252, 245, 0.94);
+  --bp-accent: #1e4f4f;
+  max-width: 48rem;
+  color: var(--bp-ink);
+}
+
+.bp-exp-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.bp-exp-nav-btn,
+.bp-exp-btn {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--bp-line);
+  background: var(--bp-surface);
+  color: var(--bp-ink);
+  font-size: 0.95rem;
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.bp-exp-nav-btn.is-active,
+.bp-exp-btn-primary {
+  background: var(--bp-accent);
+  border-color: var(--bp-accent);
+  color: #fff;
+}
+
+.bp-exp-btn-ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+.bp-exp-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.bp-exp-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.bp-exp-panel {
+  border: 1px solid var(--bp-line);
+  border-radius: 1.1rem;
+  background: var(--bp-surface);
+  padding: 1.1rem 1.15rem;
+  margin-bottom: 0.75rem;
+}
+
+.bp-exp-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.85rem;
+}
+
+.bp-exp-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.bp-exp-title {
+  margin: 0.2rem 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.bp-exp-subtitle {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.bp-exp-muted {
+  color: var(--bp-muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.bp-exp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.bp-exp-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+}
+
+.bp-exp-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0.65rem 0;
+  font-size: 0.92rem;
+}
+
+.bp-exp-input {
+  min-height: 2.75rem;
+  border: 1px solid var(--bp-line);
+  border-radius: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 1rem;
+  background: #fff;
+}
+
+.bp-exp-fieldset {
+  border: 1px solid var(--bp-line);
+  border-radius: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  margin: 0.75rem 0;
+}
+
+.bp-exp-radio {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  margin: 0.45rem 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.bp-exp-confirm {
+  margin-top: 0.85rem;
+  padding: 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid #d8c4a8;
+  background: #fff8ef;
+}
+
+.bp-exp-status {
+  margin-top: 0.75rem;
+  color: var(--bp-accent);
+  font-size: 0.95rem;
+}
+
+.bp-exp-details {
+  margin-top: 0.85rem;
+}
+
+.bp-builder-groups,
+.bp-builder-sections {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bp-builder-group {
+  border: 1px solid var(--bp-line);
+  border-radius: 0.9rem;
+  padding: 0.55rem;
+  margin-bottom: 0.55rem;
+}
+
+.bp-builder-group.is-selected,
+.bp-builder-section.is-selected {
+  outline: 2px solid color-mix(in srgb, var(--bp-accent) 40%, transparent);
+}
+
+.bp-builder-group-row,
+.bp-builder-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+
+.bp-builder-select {
+  flex: 1 1 10rem;
+  text-align: left;
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  min-height: 2.5rem;
+  cursor: pointer;
+}
+
+.bp-builder-section-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.bp-builder-inspector {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--bp-line);
+}
+
+.bp-cap-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+}
+
+.bp-cap-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--bp-line);
+}
+
+.bp-cc-grid {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0.85rem 0 0;
+}
+
+.bp-cc-grid dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.bp-cc-grid dd {
+  margin: 0.2rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bp-exp-nav-btn,
+  .bp-exp-btn,
+  .bp-builder-select {
+    transition: none;
+  }
+}
