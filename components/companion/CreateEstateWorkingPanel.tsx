@@ -8,6 +8,10 @@ import { CreateWorkCommandToolbar } from "@/components/companion/CreateWorkComma
 import { CurrentFocusInteraction } from "@/components/companion/CurrentFocusInteraction";
 import { ConnectedWorkDisclosure } from "@/components/companion/ConnectedWorkDisclosure";
 import { SparkBlueprintHome } from "@/components/companion/SparkBlueprintHome";
+import {
+  BlueprintDepthControls,
+  SaveAsBlueprintReviewPanel,
+} from "@/components/companion/universalBlueprint";
 import { canonicalStatusFromWorkflow } from "@/lib/activeWorkspaceRegistry/canonicalStatus";
 import {
   extractTitleFromDraftContent,
@@ -29,6 +33,7 @@ import { runCreateAssistance } from "@/lib/createContextualAssistance";
 import { resolveFacilitatedSectionStatus } from "@/lib/facilitatedCreation";
 import {
   completeItNow,
+  getWorkBlueprintState,
   saveStructureAsBlueprint,
 } from "@/lib/universalWorkEngine";
 import { openWorkshopMapSection } from "@/lib/workTypeSchema";
@@ -186,6 +191,15 @@ export function CreateEstateWorkingPanel({
   const [blueprintSavedAck, setBlueprintSavedAck] = useState<string | null>(
     null,
   );
+  const [saveAsBlueprintOpen, setSaveAsBlueprintOpen] = useState(false);
+  const uweWorkId =
+    workflow.sessionId ||
+    workflow.eventRecordId ||
+    canonicalFocus?.creationId ||
+    null;
+  const uweBlueprintState = uweWorkId
+    ? getWorkBlueprintState(uweWorkId)
+    : null;
 
   useDismissibleWindow({
     open: true,
@@ -611,6 +625,39 @@ export function CreateEstateWorkingPanel({
                 >
                   {building ? "Building your draft…" : "Build a polished draft"}
                 </button>
+                {uweBlueprintState && uweWorkId ? (
+                  <div
+                    className="rounded-xl border border-[#e7dfd4] bg-white/90 p-3"
+                    data-testid="create-uwe-blueprint-controls"
+                  >
+                    <BlueprintDepthControls workId={uweWorkId} />
+                    <button
+                      type="button"
+                      className="mt-3 rounded-xl border border-[#1e4f4f]/30 bg-white px-3 py-2 text-left text-sm font-semibold text-[#1e4f4f]"
+                      data-testid="create-save-as-blueprint-open"
+                      onClick={() => setSaveAsBlueprintOpen((o) => !o)}
+                    >
+                      Save as Personal or Company Blueprint…
+                    </button>
+                    {saveAsBlueprintOpen ? (
+                      <div className="mt-3">
+                        <SaveAsBlueprintReviewPanel
+                          workId={uweWorkId}
+                          onCancel={() => setSaveAsBlueprintOpen(false)}
+                          onSaved={(blueprintId, category) => {
+                            setBlueprintSavedAck(
+                              category === "company"
+                                ? `Saved Company Blueprint ${blueprintId}.`
+                                : `Saved Personal Blueprint ${blueprintId}.`,
+                            );
+                            setOpenBlueprintHomeId(blueprintId);
+                            setSaveAsBlueprintOpen(false);
+                          }}
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
                 <button
                   type="button"
                   disabled={focusSubmitting}

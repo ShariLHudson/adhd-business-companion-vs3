@@ -6,6 +6,7 @@ import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeL
 import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomShell";
 import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspaceResumeList";
 import { AppBackButton } from "@/components/companion/AppBackButton";
+import { UniversalBlueprintInterface } from "@/components/companion/universalBlueprint";
 import {
   CREATE_ESTATE_ACTIVE_CHOICE_HEADING,
   CREATE_ESTATE_BEGIN_LABEL,
@@ -34,6 +35,7 @@ import {
   CREATE_GUIDED_SUPPORT_LINE,
 } from "@/lib/createGuidedConversation189";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
+import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 type Props = {
@@ -91,6 +93,8 @@ export function CreateEstateEntrancePanel({
   const [beginFeedbackKind, setBeginFeedbackKind] = useState<
     "clarify" | "error" | "progress" | null
   >(null);
+  const [blueprintPathOpen, setBlueprintPathOpen] = useState(false);
+  const [blueprintWorkAck, setBlueprintWorkAck] = useState<string | null>(null);
 
   useDismissibleWindow({
     open: true,
@@ -345,6 +349,50 @@ export function CreateEstateEntrancePanel({
             </details>
           ) : null}
         </section>
+
+        <details
+          className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
+          data-testid="create-estate-blueprint-paths"
+          open={blueprintPathOpen}
+          onToggle={(e) =>
+            setBlueprintPathOpen((e.target as HTMLDetailsElement).open)
+          }
+        >
+          <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
+            Start with a Blueprint
+          </summary>
+          <p className="mt-2 text-sm text-[#6b635a]">
+            Scratch, Blueprint, or previous work — one calm path at a time. Event
+            Blueprints appear from the shared registry.
+          </p>
+          <div className="mt-3">
+            <UniversalBlueprintInterface
+              workTypeId={EVENT_PLAN_WORK_TYPE_ID}
+              onStartFromScratch={() => {
+                setBlueprintPathOpen(false);
+                setPrompt("I want to plan an event from scratch");
+                setBeginFeedback(
+                  "Describe your event above, then press Begin — no Blueprint required.",
+                );
+                setBeginFeedbackKind("clarify");
+              }}
+              onWorkReady={(state) => {
+                setBlueprintWorkAck(
+                  `Started ${state.blueprintId} as ${state.workId}. Depth can change anytime without starting over.`,
+                );
+              }}
+            />
+          </div>
+          {blueprintWorkAck ? (
+            <p
+              className="mt-3 text-sm text-[#1e4f4f]"
+              data-testid="create-estate-blueprint-work-ack"
+              role="status"
+            >
+              {blueprintWorkAck}
+            </p>
+          ) : null}
+        </details>
 
         <details
           className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"

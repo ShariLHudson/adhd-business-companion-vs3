@@ -29,6 +29,7 @@ import "./companion-chat.css";
 import "./spark-thinking-flame.css";
 import "./shari-presence-flame.css";
 import "./plan-day-experience.css";
+import "./reminders-rhythms-scroll.css";
 import "./growth-story-hub.css";
 import "./welcome-home-first-launch.css";
 import "./global-daily-companion-opening.css";
@@ -56,6 +57,7 @@ import "./spark-estate-guide.css";
 import "./spark-note.css";
 import "./companion-chat-surface.css";
 import "./companion-layout-layers.css";
+import "./universal-blueprint-interface.css";
 
 export const dynamic = "force-dynamic";
 

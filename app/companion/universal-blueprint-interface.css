@@ -1,0 +1,183 @@
+/* Universal Blueprint Interface — calm progressive disclosure */
+
+.ubi-root {
+  --ubi-ink: #2f2a24;
+  --ubi-muted: #6b635a;
+  --ubi-line: #e7dfd4;
+  --ubi-surface: rgba(255, 252, 245, 0.92);
+  --ubi-accent: #1e4f4f;
+  --ubi-accent-soft: #e8f0f0;
+  max-width: 42rem;
+  color: var(--ubi-ink);
+}
+
+.ubi-root h2,
+.ubi-root h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ubi-path-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ubi-path-btn {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--ubi-line);
+  border-radius: 1rem;
+  background: var(--ubi-surface);
+  padding: 1rem 1.1rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.ubi-path-btn:hover,
+.ubi-path-btn:focus-visible {
+  border-color: #cfc6b8;
+  background: #fff;
+  outline: 2px solid color-mix(in srgb, var(--ubi-accent) 35%, transparent);
+  outline-offset: 2px;
+}
+
+.ubi-path-btn[data-primary="true"] {
+  border-color: color-mix(in srgb, var(--ubi-accent) 45%, var(--ubi-line));
+  background: var(--ubi-accent-soft);
+}
+
+.ubi-path-btn__title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.ubi-path-btn__hint {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--ubi-muted);
+  line-height: 1.45;
+}
+
+.ubi-panel {
+  border: 1px solid var(--ubi-line);
+  border-radius: 1rem;
+  background: var(--ubi-surface);
+  padding: 1rem 1.1rem;
+}
+
+.ubi-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ubi-list-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--ubi-line);
+  border-radius: 0.85rem;
+  background: #fff;
+  padding: 0.85rem 1rem;
+}
+
+.ubi-list-item:hover,
+.ubi-list-item:focus-visible,
+.ubi-list-item[aria-selected="true"] {
+  border-color: var(--ubi-accent);
+  outline: none;
+}
+
+.ubi-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 0.85rem;
+  background: var(--ubi-accent);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.75rem 1.1rem;
+}
+
+.ubi-primary:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.ubi-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cfc6b8;
+  border-radius: 0.85rem;
+  background: #faf7f2;
+  color: var(--ubi-ink);
+  font-weight: 600;
+  padding: 0.7rem 1rem;
+}
+
+.ubi-field {
+  width: 100%;
+  border: 1px solid #cfc6b8;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.65rem 0.8rem;
+  font-size: 1rem;
+  color: var(--ubi-ink);
+}
+
+.ubi-field:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ubi-accent) 40%, transparent);
+  outline-offset: 1px;
+}
+
+.ubi-muted {
+  color: var(--ubi-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.ubi-status {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--ubi-accent);
+}
+
+.ubi-error {
+  margin-top: 0.75rem;
+  font-size: 0.95rem;
+  color: #8b3a2b;
+}
+
+.ubi-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.ubi-chip {
+  border: 1px solid var(--ubi-line);
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ubi-muted);
+}
+
+.ubi-chip[aria-pressed="true"] {
+  border-color: var(--ubi-accent);
+  background: var(--ubi-accent-soft);
+  color: var(--ubi-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ubi-path-btn {
+    transition: none;
+  }
+}
