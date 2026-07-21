@@ -30,12 +30,16 @@ import {
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
   CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
+  FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
   HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
   HOSPITALITY_BUSINESS_BLUEPRINT_ID,
   MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+  PET_SERVICE_BUSINESS_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
   PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+  WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
@@ -168,6 +172,14 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-property-management": PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
   "bp-mobile-field-service": MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
   "bp-field-service": MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+  "bp-wellness-practice": WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
+  "bp-wellness": WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
+  "bp-beauty-personal-care": BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
+  "bp-beauty": BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
+  "bp-fitness-studio-coaching": FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
+  "bp-fitness": FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
+  "bp-pet-service": PET_SERVICE_BUSINESS_BLUEPRINT_ID,
+  "bp-pet": PET_SERVICE_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -247,6 +259,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Fitness studio/coaching before generic business coaching
+    re: /\b(fitness\s+studio(?:\s+(?:and\s+)?coaching)?(?:\s+business)?|fitness\s+coaching(?:\s+business)?|personal\s+trainer(?:\s+business)?|gym\s+business|yoga\s+studio(?:\s+business)?|pilates\s+studio(?:\s+business)?|business\.fitness_studio_coaching)\b/i,
+    blueprintId: FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     re: /\b(coaching\s+business|coach\s+business|coaching\s+blueprint|business\.coaching)\b/i,
     blueprintId: COACHING_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
@@ -254,6 +272,22 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(consulting\s+business|consultant\s+business|consulting\s+blueprint|business\.consulting)\b/i,
     blueprintId: CONSULTING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Wellness / beauty / pet before generic service; pet before home_service
+    re: /\b(wellness\s+practice(?:\s+business)?|massage\s+(?:practice|business)|holistic\s+wellness(?:\s+business)?|breathwork\s+(?:business|practice)|mindfulness\s+(?:business|practice)|business\.wellness_practice)\b/i,
+    blueprintId: WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(beauty\s+(?:and\s+)?personal\s+care(?:\s+business)?|salon(?:\s+business)?|barber(?:\s+business)?|nail\s+salon(?:\s+business)?|esthetics?\s+business|lash\s+(?:and\s+)?brow(?:\s+business)?|mobile\s+beauty(?:\s+business)?|business\.beauty_personal_care)\b/i,
+    blueprintId: BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(pet\s+service(?:\s+business)?|dog\s+walking(?:\s+business)?|pet\s+sitting(?:\s+business)?|pet\s+grooming(?:\s+business)?|dog\s+daycare(?:\s+business)?|pet\s+boarding(?:\s+business)?|business\.pet_service)\b/i,
+    blueprintId: PET_SERVICE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
