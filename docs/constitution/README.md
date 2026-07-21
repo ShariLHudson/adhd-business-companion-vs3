@@ -32,6 +32,7 @@ When documents conflict:
 | # | Document | Role |
 |---|----------|------|
 | **112** | [Universal Work & Relationship Platform](../product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md) | Completes the Product Specification Series; hands off to Constitution series 113–117 |
+| **126** | [First-Time Welcome Experience Standard](../product-specifications/126_FIRST_TIME_WELCOME_EXPERIENCE_STANDARD.md) | Constitutional product rule — one-time Welcome Experience; never a recurring interruption |
 
 ## Downstream Design System
 

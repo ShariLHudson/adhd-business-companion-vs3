@@ -7,14 +7,19 @@
 import { getCompanionSupabase } from "@/lib/supabase/companionClient";
 import { markWelcomeIntroSeen } from "@/lib/welcomeHome/firstLaunchPersistence";
 import { hasEstablishedAccountWelcomeEvidence } from "./establishedAccount";
-import type { FirstLoginWelcomeRecord } from "./types";
+import type { FirstLoginWelcomeRecord, MarkWelcomeCompletedOptions } from "./types";
+import { resolveWelcomeDisposition } from "./welcomeExperienceConstitution";
 
 const META_COMPLETED = "welcome_completed_at";
 const META_AUDIO = "welcome_audio_played_at";
+const META_DISPOSITION = "welcome_disposition";
+const META_PLATFORM_VERSION = "welcome_platform_version";
 const LOCAL_PREFIX = "companion-first-login-welcome-v1:";
 const PUSH_RETRIES = 3;
 
 const completionWriteInFlight = new Set<string>();
+/** In-memory cache for Node tests / SSR — never sole durable SoT in browser. */
+const memoryLocal = new Map<string, FirstLoginWelcomeRecord>();
 
 function localKey(userId: string): string {
   return `${LOCAL_PREFIX}${userId}`;
@@ -28,16 +33,23 @@ function canUseLocalStorage(): boolean {
   }
 }
 
-function readLocal(userId: string): FirstLoginWelcomeRecord {
-  if (!canUseLocalStorage()) {
-    return { welcomeCompletedAt: null, welcomeAudioPlayedAt: null };
-  }
+function emptyRecord(): FirstLoginWelcomeRecord {
+  return {
+    welcomeCompletedAt: null,
+    welcomeAudioPlayedAt: null,
+    welcomeDisposition: null,
+    welcomePlatformVersion: null,
+  };
+}
+
+function parseRecord(raw: string): FirstLoginWelcomeRecord {
   try {
-    const raw = localStorage.getItem(localKey(userId));
-    if (!raw) {
-      return { welcomeCompletedAt: null, welcomeAudioPlayedAt: null };
-    }
     const parsed = JSON.parse(raw) as Partial<FirstLoginWelcomeRecord>;
+    const disposition =
+      parsed.welcomeDisposition === "completed" ||
+      parsed.welcomeDisposition === "skipped"
+        ? parsed.welcomeDisposition
+        : null;
     return {
       welcomeCompletedAt:
         typeof parsed.welcomeCompletedAt === "string"
@@ -47,13 +59,31 @@ function readLocal(userId: string): FirstLoginWelcomeRecord {
         typeof parsed.welcomeAudioPlayedAt === "string"
           ? parsed.welcomeAudioPlayedAt
           : null,
+      welcomeDisposition: disposition,
+      welcomePlatformVersion:
+        typeof parsed.welcomePlatformVersion === "string"
+          ? parsed.welcomePlatformVersion
+          : null,
     };
   } catch {
-    return { welcomeCompletedAt: null, welcomeAudioPlayedAt: null };
+    return emptyRecord();
   }
 }
 
+function readLocal(userId: string): FirstLoginWelcomeRecord {
+  if (canUseLocalStorage()) {
+    try {
+      const raw = localStorage.getItem(localKey(userId));
+      if (raw) return parseRecord(raw);
+    } catch {
+      /* fall through */
+    }
+  }
+  return memoryLocal.get(userId) ?? emptyRecord();
+}
+
 function writeLocal(userId: string, record: FirstLoginWelcomeRecord): void {
+  memoryLocal.set(userId, record);
   if (!canUseLocalStorage()) return;
   try {
     localStorage.setItem(localKey(userId), JSON.stringify(record));
@@ -70,12 +100,22 @@ function metadataString(
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function dispositionFromMetadata(
+  metadata: Record<string, unknown> | undefined,
+): FirstLoginWelcomeRecord["welcomeDisposition"] {
+  const value = metadataString(metadata, META_DISPOSITION);
+  if (value === "completed" || value === "skipped") return value;
+  return null;
+}
+
 export function recordFromUserMetadata(
   metadata: Record<string, unknown> | undefined,
 ): FirstLoginWelcomeRecord {
   return {
     welcomeCompletedAt: metadataString(metadata, META_COMPLETED),
     welcomeAudioPlayedAt: metadataString(metadata, META_AUDIO),
+    welcomeDisposition: dispositionFromMetadata(metadata),
+    welcomePlatformVersion: metadataString(metadata, META_PLATFORM_VERSION),
   };
 }
 
@@ -89,6 +129,10 @@ export function mergeWelcomeRecords(
       server.welcomeCompletedAt ?? local.welcomeCompletedAt ?? null,
     welcomeAudioPlayedAt:
       server.welcomeAudioPlayedAt ?? local.welcomeAudioPlayedAt ?? null,
+    welcomeDisposition:
+      server.welcomeDisposition ?? local.welcomeDisposition ?? null,
+    welcomePlatformVersion:
+      server.welcomePlatformVersion ?? local.welcomePlatformVersion ?? null,
   };
 }
 
@@ -193,6 +237,8 @@ export async function loadFirstLoginWelcomeRecord(
     merged = {
       welcomeCompletedAt: at,
       welcomeAudioPlayedAt: merged.welcomeAudioPlayedAt ?? at,
+      welcomeDisposition: merged.welcomeDisposition ?? "completed",
+      welcomePlatformVersion: merged.welcomePlatformVersion ?? null,
     };
     writeLocal(userId, merged);
     return merged;
@@ -231,11 +277,20 @@ export async function markWelcomeAudioPlayed(
 /**
  * Member finished or dismissed the welcome gate. Also mirrors Welcome Home intro
  * so the cinematic arrival does not auto-play. Idempotent — never clears completion.
+ * Skip and complete both suppress automatic replay (126).
  */
 export async function markWelcomeCompleted(
   userId: string,
-  at: string = new Date().toISOString(),
+  atOrOptions: string | MarkWelcomeCompletedOptions = new Date().toISOString(),
 ): Promise<FirstLoginWelcomeRecord> {
+  const options: MarkWelcomeCompletedOptions =
+    typeof atOrOptions === "string" ? { at: atOrOptions } : atOrOptions ?? {};
+  const at = options.at ?? new Date().toISOString();
+  const disposition = resolveWelcomeDisposition({
+    skipped: Boolean(options.skipped),
+  });
+  const platformVersion = options.platformVersion?.trim() || null;
+
   if (completionWriteInFlight.has(userId)) {
     const local = readLocal(userId);
     if (local.welcomeCompletedAt) return local;
@@ -253,13 +308,21 @@ export async function markWelcomeCompleted(
     const next: FirstLoginWelcomeRecord = {
       welcomeCompletedAt: at,
       welcomeAudioPlayedAt: current.welcomeAudioPlayedAt ?? at,
+      welcomeDisposition: disposition,
+      welcomePlatformVersion:
+        platformVersion ?? current.welcomePlatformVersion ?? null,
     };
     writeLocal(userId, next);
     markWelcomeIntroSeen();
-    const ok = await pushMetadata({
+    const patch: Record<string, string> = {
       [META_COMPLETED]: next.welcomeCompletedAt!,
       [META_AUDIO]: next.welcomeAudioPlayedAt!,
-    });
+      [META_DISPOSITION]: disposition,
+    };
+    if (next.welcomePlatformVersion) {
+      patch[META_PLATFORM_VERSION] = next.welcomePlatformVersion;
+    }
+    const ok = await pushMetadata(patch);
     if (!ok) {
       logWelcomePersistenceFailure(
         "markWelcomeCompleted: metadata sync failed — local + intro marked; retry on next load",
@@ -273,7 +336,12 @@ export async function markWelcomeCompleted(
 
 /** Manual replay must not clear completion. Tests only. */
 export function resetFirstLoginWelcomeLocalForTests(userId: string): void {
-  if (!canUseLocalStorage()) return;
-  localStorage.removeItem(localKey(userId));
+  memoryLocal.delete(userId);
   completionWriteInFlight.delete(userId);
+  if (!canUseLocalStorage()) return;
+  try {
+    localStorage.removeItem(localKey(userId));
+  } catch {
+    /* ignore */
+  }
 }

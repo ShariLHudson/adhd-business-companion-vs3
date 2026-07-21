@@ -218,26 +218,39 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     }
   }, [playExperience, voiceMuted, toggleVoice, markAudioOnce]);
 
+  const finishWelcome = useCallback(
+    async (skipped: boolean) => {
+      if (!userId) return;
+      void stopExperience();
+      destroyWelcomeHomeAudioManager();
+      await markWelcomeCompleted(userId, {
+        skipped,
+        platformVersion:
+          process.env.NEXT_PUBLIC_APP_VERSION?.trim() ||
+          process.env.npm_package_version?.trim() ||
+          "0.1.0",
+      });
+      setPhase("completed");
+    },
+    [userId, stopExperience],
+  );
+
   const handleEnter = useCallback(async () => {
-    if (!userId) return;
-    void stopExperience();
-    destroyWelcomeHomeAudioManager();
-    await markWelcomeCompleted(userId);
-    setPhase("completed");
-  }, [userId, stopExperience]);
+    await finishWelcome(false);
+  }, [finishWelcome]);
 
   /** Stop the recording and go straight to Welcome Home — one-time welcome ends. */
   const handleStopAndContinue = useCallback(async () => {
     void markAudioOnce();
-    await handleEnter();
-  }, [markAudioOnce, handleEnter]);
+    await finishWelcome(true);
+  }, [markAudioOnce, finishWelcome]);
 
   /** Skip listening entirely — still ends the one-time welcome for this account. */
   const handleContinueWithoutAudio = useCallback(async () => {
     void stopExperience();
     void markAudioOnce();
-    await handleEnter();
-  }, [stopExperience, markAudioOnce, handleEnter]);
+    await finishWelcome(true);
+  }, [stopExperience, markAudioOnce, finishWelcome]);
 
   const handleMute = useCallback(() => {
     const nextMuted = !voiceMuted;

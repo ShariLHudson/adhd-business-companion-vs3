@@ -1,6 +1,7 @@
 export type {
   FirstLoginWelcomeRecord,
   FirstLoginWelcomeState,
+  MarkWelcomeCompletedOptions,
 } from "./types";
 export {
   FIRST_LOGIN_HOW_THIS_WORKS,
@@ -25,3 +26,13 @@ export {
   resetFirstLoginWelcomeLocalForTests,
   type LoadFirstLoginWelcomeOptions,
 } from "./persistence";
+export {
+  FIRST_TIME_WELCOME_CERTIFICATION_CHECKLIST,
+  FIRST_TIME_WELCOME_STANDARD_ID,
+  WELCOME_MANUAL_REPLAY_MUST_NOT_RESET_COMPLETION,
+  WELCOME_SKIP_COUNTS_AS_COMPLETION,
+  resolveWelcomeDisposition,
+  shouldSuppressAutomaticWelcome,
+  type FirstTimeWelcomeCertificationItem,
+  type WelcomeExperienceDisposition,
+} from "./welcomeExperienceConstitution";

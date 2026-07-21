@@ -7,6 +7,7 @@ This folder holds product-level specifications that define how the platform beha
 | # | Document | Role |
 |---|----------|------|
 | **112** | [Universal Work & Relationship Platform Specification](./112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md) | Completes the Product Specification Series — one Work identity, many views, relationships over copies |
+| **126** | [First-Time Welcome Experience Standard](./126_FIRST_TIME_WELCOME_EXPERIENCE_STANDARD.md) | Constitutional rule — Welcome Experience plays once per user; never auto-repeats |
 
 Related Create / experience standards (not renumbered into this series):
 
