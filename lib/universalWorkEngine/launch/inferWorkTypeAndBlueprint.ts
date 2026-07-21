@@ -12,6 +12,7 @@ import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import {
+  BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
   CONFERENCE_EVENT_BLUEPRINT_ID,
   NETWORKING_EVENT_BLUEPRINT_ID,
   PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
@@ -50,6 +51,9 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-product-launch": PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
   "bp-event-product-launch": PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
   "bp-product-launch-event": PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
+  "bp-book-launch": BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
+  "bp-event-book-launch": BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
+  "bp-book-launch-event": BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
@@ -67,6 +71,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(networking\s+event|business\s+mixer|networking\s+mixer|speed\s+networking)\b/i,
     blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Book launch before product launch / launch event so book language stays distinct
+    re: /\b(book\s+launch|launch\s+(?:a|my|the)\s+book|author\s+launch|bookstore\s+launch|library\s+launch|vip\s+reader\s+launch)\b/i,
+    blueprintId: BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {

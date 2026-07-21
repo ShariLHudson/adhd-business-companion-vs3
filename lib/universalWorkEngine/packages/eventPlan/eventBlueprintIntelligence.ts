@@ -52,6 +52,12 @@ const EVENT_HINTS: { match: RegExp; id: string; title: string; why: string }[] =
     why: "Launches succeed when offer clarity, demo readiness, conversion path, and customer success are planned together.",
   },
   {
+    match: /book launch|reading|signing|bookseller|preorder|author|readership/i,
+    id: "event-has-book-launch",
+    title: "Book launch thinking is present",
+    why: "Book launches succeed when author care, reader journey, inventory, and follow-through are planned together.",
+  },
+  {
     match: /risk|contingency/i,
     id: "event-has-risk",
     title: "Risk thinking is present",
@@ -148,6 +154,12 @@ const EVENT_SUGGEST_IF_MISSING: {
     test: (t) => !/demo|checkout|onboarding|offer|affiliate|messaging/i.test(t),
     title: "Consider demo, checkout, and onboarding readiness",
     why: "Product launches often underplan rehearsal, payment testing, and what happens after someone buys.",
+  },
+  {
+    id: "event-suggest-book-launch-ops",
+    test: (t) => !/reading|signing|bookseller|inventory|preorder|author/i.test(t),
+    title: "Consider reading, signing, and bookseller ops",
+    why: "Book launches often underplan inventory, signing flow, and what happens after readers leave.",
   },
 ];
 

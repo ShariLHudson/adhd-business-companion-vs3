@@ -76,8 +76,8 @@ describe("Universal Blueprint Framework — certification", () => {
   });
 
   it("Event Blueprints use the universal registry (eleven Spark Event BPs)", () => {
-    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(12);
-    expect(EVENT_PLAN_BLUEPRINT_DEFINITIONS).toHaveLength(12);
+    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(13);
+    expect(EVENT_PLAN_BLUEPRINT_DEFINITIONS).toHaveLength(13);
     for (const id of EVENT_PLAN_BLUEPRINT_IDS) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = requireBlueprint(id);

@@ -347,7 +347,7 @@ function runPerformanceChecks(): CertCheckResult[] {
     ),
     check(
       "perf_registry_bounded",
-      listBlueprints({ workTypeId: "event_plan" }).length === 12 ||
+      listBlueprints({ workTypeId: "event_plan" }).length === 13 ||
         listBlueprints({ workTypeId: "event_plan" }).length >= 5,
       "registry lookup bounded to registered Blueprints",
     ),
@@ -510,8 +510,8 @@ export function runAnywhereOriginCertification(input?: {
       notes: "three paths, progressive disclosure, save reassurance, depth safety",
     },
     L5_domain: {
-      status: EVENT_PLAN_BLUEPRINT_IDS.length === 12 && matrixAllPass ? "pass" : "fail",
-      notes: "twelve Event Blueprints exercised across required origin matrix",
+      status: EVENT_PLAN_BLUEPRINT_IDS.length === 13 && matrixAllPass ? "pass" : "fail",
+      notes: "thirteen Event Blueprints exercised across required origin matrix",
     },
     L6_production: {
       status:
