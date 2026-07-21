@@ -26,3 +26,6 @@ export {
 } from "./blueprintRegistry";
 
 export { resolvePlatformIntentRoute } from "./resolvePlatformIntentRoute";
+
+/** 103 — platformIntent CreateBlueprint aliases resolve through UWE Anywhere-Origin */
+export { resolvePlatformIntentViaAnywhereOrigin } from "@/lib/universalWorkEngine/launch/bridgePlatformIntent";

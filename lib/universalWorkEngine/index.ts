@@ -10,6 +10,7 @@ export type {
   CanonicalWorkId,
   WorkIdentityRecord,
   WorkOrigin,
+  AnywhereWorkOrigin,
   WorkTypePackage,
   WorkTypeCapabilityFlags,
   WorkTypeMapGroupConfig,
@@ -24,7 +25,7 @@ export type {
   WorkRelationshipSourceEntityType,
   WorkRelationshipTargetType,
 } from "./types";
-export { UnknownWorkTypeError } from "./types";
+export { UnknownWorkTypeError, ANYWHERE_WORK_ORIGINS } from "./types";
 
 export {
   allocateCanonicalWorkId,
@@ -229,3 +230,41 @@ export { ensureEventBlueprintsRegistered } from "./packages/eventPlan/registerEv
 export { EVENT_PLAN_BLUEPRINT_IDS } from "./packages/eventPlan/eventBlueprintDefinitions";
 export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";
 export { ensureEventBlueprintIntelligenceRegistered } from "./packages/eventPlan/eventBlueprintIntelligence";
+
+/** 103 — Anywhere-Origin Universal Work Routing */
+export type {
+  ShariWorkMode,
+  UniversalLaunchRequestedMode,
+  UniversalLaunchContract,
+  AnywhereOriginDecision,
+  DuplicateRiskAssessment,
+  AnywhereOriginResolution,
+  OriginLaunchHints,
+  AnywhereNlExample,
+} from "./launch";
+export {
+  resolveAnywhereOriginWork,
+  inferWorkTypeAndBlueprint,
+  mapLegacyCreateBlueprintToUwe,
+  findRelatedWork,
+  assessDuplicateRisk,
+  launchFromOrigin,
+  launchFromCreate,
+  launchFromProjects,
+  launchFromStrategies,
+  launchFromBlueprints,
+  launchFromCartography,
+  launchFromBodyDoubling,
+  launchFromShari,
+  launchFromChamber,
+  launchFromBoard,
+  launchFromResearch,
+  launchFromClearMyMind,
+  launchFromTasks,
+  launchFromWelcomeHome,
+  launchFromTemplates,
+  REQUIRED_ANYWHERE_ORIGINS,
+  ANYWHERE_ORIGIN_NL_EXAMPLES,
+  resolveNlExample,
+  resolvePlatformIntentViaAnywhereOrigin,
+} from "./launch";

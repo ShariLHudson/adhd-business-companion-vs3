@@ -17,14 +17,41 @@ export type WorkOrigin =
   | "create"
   | "event"
   | "projects"
+  | "strategies"
+  | "blueprints"
   | "chamber"
   | "board"
   | "cartography"
   | "body_doubling"
   | "conversation"
+  | "research"
+  | "clear_my_mind"
+  | "tasks"
+  | "welcome_home"
+  | "templates"
   | "duplicate"
   | "migration"
   | "unknown";
+
+/** All Estate origins that may launch or continue Universal Work (103). */
+export const ANYWHERE_WORK_ORIGINS = [
+  "create",
+  "projects",
+  "strategies",
+  "blueprints",
+  "cartography",
+  "body_doubling",
+  "conversation",
+  "chamber",
+  "board",
+  "research",
+  "clear_my_mind",
+  "tasks",
+  "welcome_home",
+  "templates",
+] as const satisfies readonly WorkOrigin[];
+
+export type AnywhereWorkOrigin = (typeof ANYWHERE_WORK_ORIGINS)[number];
 
 export type WorkIdentityRecord = {
   /** Sole authoritative master identity. */

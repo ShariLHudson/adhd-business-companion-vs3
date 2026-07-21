@@ -36,6 +36,7 @@ import {
 } from "@/lib/createGuidedConversation189";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
+import { launchFromCreate } from "@/lib/universalWorkEngine";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 type Props = {
@@ -141,6 +142,23 @@ export function CreateEstateEntrancePanel({
       setBeginFeedbackKind("error");
       setBeginBusy(false);
       return;
+    }
+
+    // 103 — Event-domain Begin also resolves through Anywhere-Origin (no private path)
+    if (outcome.isEventDomain) {
+      const anywhere = launchFromCreate({
+        originalUserMessage: outcome.text,
+        candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
+      });
+      if (anywhere.decision === "clarify") {
+        setBeginFeedback(anywhere.reply);
+        setBeginFeedbackKind("clarify");
+        setBeginBusy(false);
+        return;
+      }
+      if (anywhere.decision === "continue_existing" && anywhere.reply) {
+        setBlueprintWorkAck(anywhere.reply);
+      }
     }
 
     void (async () => {
