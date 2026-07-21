@@ -319,9 +319,13 @@ Architecture v2 must stay invisible. Members should not learn registries, owners
 
 ## 12. Recommended next implementation bundle
 
-**Next upload / build target:**  
+**Adaptive layer (landed):** specs **306–310** + plan **[311 Adaptive Intelligence Implementation Plan](./311_ADAPTIVE_INTELLIGENCE_IMPLEMENTATION_PLAN.md)**.
+
+**Smallest safe code slice (from 311):** Adaptive Context read façade over DayState / Adapt My Day / Support Style — not a five-engine build.
+
+**Foundation code still next:**  
 **Architecture v2 Bundle A+B (contracts + Domain Capability Registry façade + naming standard)**  
-with a seed Collection definition document for Handmade Business Collection ownership (Marketing + Events + Finance as contributors; Systems optional).
+with a seed Collection definition for Handmade Business Collection ownership (Marketing + Events + Finance as contributors; Systems optional).
 
 **Explicitly out of scope for next bundle:**
 
@@ -330,6 +334,7 @@ with a seed Collection definition document for Handmade Business Collection owne
 - Parallel Blueprint registries  
 - Replacing Estate Brain routing  
 - Merging Board into Chamber  
+- Implementing all of 306–310 in one PR  
 
 ---
 
@@ -363,11 +368,15 @@ with a seed Collection definition document for Handmade Business Collection owne
 | 304 | `docs/architecture-v2/304_COLLECTION_OWNERSHIP_AND_CONTRIBUTOR_ARCHITECTURE.md` |
 | Upload order | `docs/architecture-v2/README_UPLOAD_ORDER.md` |
 | This audit | `docs/architecture-v2/305_ARCHITECTURE_V2_FOUNDATION_AUDIT.md` |
+| 306–310 | Adaptive Intelligence Architecture specs |
+| 311 | [Adaptive Intelligence Implementation Plan](./311_ADAPTIVE_INTELLIGENCE_IMPLEMENTATION_PLAN.md) |
 
 ---
 
 ## 15. Completion statement
 
 Architecture v2 foundation specs are in-repo. The platform is **not** ready to declare Collections/Capabilities production-certified under 300–304, because Domain Capability Registry, Collection Registry, and uniform Member manifests do not yet exist.
+
+Adaptive Intelligence specs **306–310** and plan **311** extend this audit — adapters over existing Profile / DayState / UWE / Brain, not parallel engines.
 
 Existing UWE, Event/Marketing/Business Blueprints, Chamber, Board, and Estate Brain remain authoritative for their current domains. Next work must map and façade — not fork.
