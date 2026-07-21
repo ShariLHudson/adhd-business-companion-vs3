@@ -7,9 +7,11 @@ import {
   getActiveEventRecord,
   getEventRecord,
   listEventRecords,
+} from "@/lib/eventsIntelligence/eventRecordStore";
+import {
   listEventAssetInstances,
   resolveEventAssetDefinition,
-} from "@/lib/eventsIntelligence";
+} from "@/lib/eventsIntelligence/eventAssetRegistry";
 import type { ExistingWorkMatch } from "./types";
 
 /**

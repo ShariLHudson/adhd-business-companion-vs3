@@ -3,6 +3,9 @@
  * 1) Open workspace with identified type + Current Focus
  * 2) Clarify when ambiguous
  * Never silent no-op.
+ *
+ * Leaf-only — no universalCreationEntrypoint / Events barrel
+ * (Vercel/Turbopack: Create Entrance must not init Events ↔ registry SCC).
  */
 
 import { matchCatalogFromText } from "@/lib/createCatalog";
@@ -12,8 +15,6 @@ import {
   CREATE_BEGIN_EMPTY_MESSAGE,
   CREATE_BEGIN_ERROR_MESSAGE,
 } from "@/lib/primaryActionFeedback";
-import { enterCreationFromCreate } from "@/lib/universalCreationEntrypoint";
-import type { UniversalCreationEntrypointResult } from "@/lib/universalCreationEntrypoint/types";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform/oneCreationPlatform";
 
 export type CreateBeginOutcome =
@@ -26,7 +27,6 @@ export type CreateBeginOutcome =
       kind: "open";
       text: string;
       artifactType: string;
-      entry: UniversalCreationEntrypointResult;
       isEventDomain: boolean;
     }
   | {
@@ -34,17 +34,11 @@ export type CreateBeginOutcome =
       message: string;
     };
 
-function resolveArtifactType(
-  text: string,
-  entry: UniversalCreationEntrypointResult,
-): string | null {
-  const fromBlueprint = entry.blueprint?.catalogType?.trim() || null;
-  if (fromBlueprint) return fromBlueprint;
+function resolveArtifactType(text: string): string | null {
   const fromCatalog = matchCatalogFromText(text)?.type?.trim() || null;
   if (fromCatalog) return fromCatalog;
   const fromPrompt = detectCreateTypeFromPrompt(text)?.trim() || null;
   if (fromPrompt) return fromPrompt;
-  if (entry.engineResult?.handled) return "Event Plan";
   if (isEventDomainCreationRequest(text)) return "Event Plan";
   return null;
 }
@@ -64,34 +58,8 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
   }
 
   try {
-    const entry = enterCreationFromCreate({ userText: text });
-
-    if (entry.action === "clarify") {
-      return {
-        kind: "clarify",
-        message:
-          entry.reply?.trim() ||
-          entry.clarifyingQuestion?.trim() ||
-          CREATE_BEGIN_AMBIGUOUS_MESSAGE,
-        reason: "entrypoint_clarify",
-      };
-    }
-
-    const artifactType = resolveArtifactType(text, entry);
+    const artifactType = resolveArtifactType(text);
     if (!artifactType) {
-      return {
-        kind: "clarify",
-        message: CREATE_BEGIN_AMBIGUOUS_MESSAGE,
-        reason: "ambiguous",
-      };
-    }
-
-    // Low-confidence / stay without a type → clarify (Create surface never silent)
-    if (
-      entry.action === "stay_conversation" &&
-      entry.confidence === "low" &&
-      !entry.blueprint?.catalogType
-    ) {
       return {
         kind: "clarify",
         message: CREATE_BEGIN_AMBIGUOUS_MESSAGE,
@@ -103,7 +71,6 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       kind: "open",
       text,
       artifactType,
-      entry,
       isEventDomain: isEventDomainCreationRequest(text),
     };
   } catch {

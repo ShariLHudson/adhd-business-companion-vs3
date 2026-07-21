@@ -7,7 +7,6 @@
 import { continueCardFromRegistryEntry } from "@/lib/activeWorkspaceRegistry/continueCardProjection";
 import { listActiveContinueProjection } from "@/lib/activeWorkspaceRegistry/projections";
 import type { ActiveWorkspaceEntry } from "@/lib/activeWorkspaceRegistry/types";
-import type { EventLifecyclePhase } from "@/lib/eventsIntelligence/types";
 
 export type ActiveCreationWorkspaceSummary = {
   id: string;
@@ -29,7 +28,8 @@ export type ActiveCreationWorkspaceSummary = {
   progressSummary?: string;
 };
 
-const PHASE_LABEL: Record<EventLifecyclePhase, string> = {
+/** Phase labels — string keys only (no Events types graph). */
+const PHASE_LABEL: Record<string, string> = {
   discovery: "Discovery",
   viability: "Viability",
   strategy: "Strategy",
@@ -42,9 +42,7 @@ const PHASE_LABEL: Record<EventLifecyclePhase, string> = {
   debrief_reuse: "Debrief",
 };
 
-export function creationWorkspacePhaseLabel(
-  phase: EventLifecyclePhase,
-): string {
+export function creationWorkspacePhaseLabel(phase: string): string {
   return PHASE_LABEL[phase] ?? "In progress";
 }
 

@@ -6,7 +6,7 @@ import {
   classifyPlatformIntent,
   looksLikeKnowledgeQuestion,
 } from "@/lib/platformIntent/classifyPlatformIntent";
-import { detectEventIntent } from "@/lib/eventsIntelligence";
+import { detectEventIntent } from "@/lib/eventsIntelligence/detectEventIntent";
 import type { EntrypointConfidence } from "./types";
 import { isForceNewCreationRequest } from "./forceNewIntent";
 

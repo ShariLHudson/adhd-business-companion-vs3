@@ -9,7 +9,10 @@
 
 import { buildCreationConversationContext, resolveLargerCreation } from "@/lib/creationEcosystem";
 import { openConnectedAssetEditor } from "@/lib/connectedAssetEditor";
-import { getEventRecord, setActiveEventRecordId } from "@/lib/eventsIntelligence";
+import {
+  getEventRecord,
+  setActiveEventRecordId,
+} from "@/lib/eventsIntelligence/eventRecordStore";
 import type { EventSectionId } from "@/lib/eventsIntelligence/types";
 import { resolvePlatformIntentRoute } from "@/lib/platformIntent";
 import {
