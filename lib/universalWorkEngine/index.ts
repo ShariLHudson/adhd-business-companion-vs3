@@ -240,7 +240,11 @@ export type {
   SparkBlueprintHomeModel,
 } from "./blueprints";
 export { ensureEventBlueprintsRegistered } from "./packages/eventPlan/registerEventBlueprints";
-export { EVENT_PLAN_BLUEPRINT_IDS } from "./packages/eventPlan/eventBlueprintDefinitions";
+export {
+  EVENT_PLAN_BLUEPRINT_IDS,
+  NETWORKING_EVENT_BLUEPRINT_ID,
+  EVENT_BLUEPRINT_NETWORKING_EVENT,
+} from "./packages/eventPlan/eventBlueprintDefinitions";
 export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";
 export { ensureEventBlueprintIntelligenceRegistered } from "./packages/eventPlan/eventBlueprintIntelligence";
 

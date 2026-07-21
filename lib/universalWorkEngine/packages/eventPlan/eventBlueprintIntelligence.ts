@@ -10,6 +10,12 @@ import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/eventPlanM
 
 const EVENT_HINTS: { match: RegExp; id: string; title: string; why: string }[] = [
   {
+    match: /connection|networking|mixer/i,
+    id: "event-has-connection-design",
+    title: "Connection design is present",
+    why: "Networking events succeed when how people meet is planned on purpose.",
+  },
+  {
     match: /risk|contingency/i,
     id: "event-has-risk",
     title: "Risk thinking is present",
@@ -64,6 +70,12 @@ const EVENT_SUGGEST_IF_MISSING: {
     test: (t) => !/follow[- ]?up|thank|feedback/i.test(t),
     title: "Follow-up section may be missing",
     why: "After the event, a clear follow-up path turns the day into lasting relationships.",
+  },
+  {
+    id: "event-suggest-connection-support",
+    test: (t) => !/connection|alone|facilitat|host/i.test(t),
+    title: "Consider host support for alone or shy guests",
+    why: "Networking events often leave people stranded without a clear first conversation.",
   },
 ];
 
