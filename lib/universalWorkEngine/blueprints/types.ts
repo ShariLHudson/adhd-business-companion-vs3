@@ -4,6 +4,7 @@
  */
 
 import type { CanonicalWorkId, WorkOrigin, WorkRelationshipKind } from "../types";
+import type { BlueprintCreateabilityManifest } from "./createability/types";
 
 export type BlueprintCategory =
   | "spark"
@@ -152,6 +153,11 @@ export type BlueprintDefinition = {
   riskPrompts: readonly string[];
   researchPrompts: readonly string[];
   deliverables: readonly string[];
+  /**
+   * Typed Output Createability Manifest (233–236).
+   * When omitted, deliverables[] seed a provisional blocked manifest for audit only.
+   */
+  createabilityManifest?: BlueprintCreateabilityManifest;
   chamberRoutingRecommendations: readonly string[];
   boardReviewRecommendations: readonly string[];
   projectBridgeRecommendations: readonly string[];

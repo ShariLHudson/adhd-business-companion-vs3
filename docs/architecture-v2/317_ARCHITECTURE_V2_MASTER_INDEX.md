@@ -187,6 +187,7 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | 324 | Privacy / adaptation audit |
 | 325 | Observability plan — **O1** architecture health report (no UX change) |
 | Create-experience hardening / reports | `docs/create-experience/` (096–106 era + Blueprint certs) |
+| **233–236** Blueprint Createability | `docs/create-experience/standards/233_*`…`236_*` · runtime `lib/universalWorkEngine/blueprints/createability/` · masters `233_236_*` |
 | Navigation welcome docs | `docs/navigation/119–121` |
 
 ---

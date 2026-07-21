@@ -253,6 +253,13 @@ export {
   buildSparkBlueprintHome,
   publishBlueprintVersion,
   clearBlueprintIntelligencePackagesForTests,
+  certifyBlueprintCreateability,
+  buildBlueprintCreateabilityAudit,
+  resolveCreateabilityManifest,
+  seedCreateabilityManifestFromDeliverables,
+  validateCreateabilityManifest,
+  BLUEPRINT_CREATEABILITY_STANDARD_ID,
+  BLUEPRINT_CREATEABILITY_CERTIFICATION_ID,
 } from "./blueprints";
 export type {
   BlueprintHealthSnapshot,
@@ -260,6 +267,9 @@ export type {
   BlueprintImpactPreview,
   BlueprintCertificationResult,
   SparkBlueprintHomeModel,
+  BlueprintCreateabilityManifest,
+  BlueprintCreateabilityCertification,
+  BlueprintCreateabilityAuditBundle,
 } from "./blueprints";
 export { ensureEventBlueprintsRegistered } from "./packages/eventPlan/registerEventBlueprints";
 export {

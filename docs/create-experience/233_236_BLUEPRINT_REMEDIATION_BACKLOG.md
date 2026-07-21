@@ -1,0 +1,324 @@
+# Blueprint Remediation Backlog
+
+**Standard:** 235 Priority Rules
+**Generated:** 2026-07-21
+
+Fix first: user-visible outputs · purpose-central · shared · Project handoff · calculations · export · connected destinations.
+
+## critical
+
+- [ ] `bp-event-book-signing` — **Inventory checklist** → label_draft_only
+- [ ] `business.craft_show` — **Product and pricing sheet** → implement_structured
+- [ ] `business.craft_show` — **Inventory checklist** → label_draft_only
+- [ ] `business.etsy` — **Pricing and profitability view** → implement_structured
+- [ ] `business.handmade_online_store` — **Product and pricing sheet** → implement_structured
+- [ ] `business.holiday_planner` — **Seasonal inventory targets** → label_draft_only
+- [ ] `business.inventory_pricing` — **Inventory and Pricing Plan** → implement_structured
+- [ ] `business.inventory_pricing` — **Cost of goods sheet** → implement_structured
+- [ ] `business.inventory_pricing` — **Pricing sheet** → implement_structured
+- [ ] `business.inventory_pricing` — **Dead inventory decisions** → label_draft_only
+- [ ] `event.book_launch` — **Inventory and preorder checklist** → label_draft_only
+- [ ] `event.book_launch` — **Budget view** → implement_structured
+- [ ] `event.challenge` — **Budget view** → implement_structured
+- [ ] `event.conference` — **Budget and revenue view** → implement_structured
+- [ ] `event.fundraiser_gala` — **Budget and accountability view** → implement_structured
+- [ ] `event.masterclass` — **Budget view** → implement_structured
+- [ ] `event.networking_event` — **Budget view** → implement_structured
+- [ ] `event.product_launch` — **Budget view** → implement_structured
+- [ ] `event.retreat` — **Budget view** → implement_structured
+- [ ] `event.summit` — **Budget view** → implement_structured
+- [ ] `event.workshop` — **Budget view** → implement_structured
+
+## high
+
+- [ ] `bp-event-three-day-retreat` — **Follow-up integration plan** → label_draft_only
+- [ ] `business.craft_show` — **Craft Show Business Plan** → label_draft_only
+- [ ] `business.craft_show` — **Linked Event plan recommendations** → label_draft_only
+- [ ] `business.etsy` — **Etsy Business Plan** → label_draft_only
+- [ ] `business.handmade_online_store` — **Handmade Online Store Plan** → label_draft_only
+- [ ] `business.handmade_online_store` — **Marketplace focus plan** → label_draft_only
+- [ ] `business.handmade_online_store` — **Launch / promotion outline** → label_draft_only
+- [ ] `business.holiday_planner` — **Holiday Product Plan** → label_draft_only
+- [ ] `business.holiday_planner` — **Launch timeline** → label_draft_only
+- [ ] `business.product_photography` — **Product Photography Plan** → connect_destination
+- [ ] `event.book_launch` — **Concise Book Launch Plan** → label_draft_only
+- [ ] `event.book_launch` — **Complete Book Launch Plan** → label_draft_only
+- [ ] `event.book_launch` — **Risk and contingency plan** → label_draft_only
+- [ ] `event.book_launch` — **Metrics plan** → label_draft_only
+- [ ] `event.book_launch` — **Post-launch review** → label_draft_only
+- [ ] `event.book_launch` — **Milestone plan** → label_draft_only
+- [ ] `event.book_launch` — **Printable launch-day packet** → label_draft_only
+- [ ] `event.challenge` — **Concise Challenge Plan** → label_draft_only
+- [ ] `event.challenge` — **Complete Challenge Plan** → label_draft_only
+- [ ] `event.challenge` — **Missed-day recovery plan** → label_draft_only
+- [ ] `event.challenge` — **Moderation and support plan** → label_draft_only
+- [ ] `event.challenge` — **Follow-up and next-step plan** → label_draft_only
+- [ ] `event.challenge` — **Metrics plan** → label_draft_only
+- [ ] `event.challenge` — **Milestone plan** → label_draft_only
+- [ ] `event.conference` — **Concise Conference Plan** → label_draft_only
+- [ ] `event.conference` — **Complete Conference Plan** → label_draft_only
+- [ ] `event.conference` — **Sponsor package brief** → label_draft_only
+- [ ] `event.conference` — **Exhibitor operations plan** → label_draft_only
+- [ ] `event.conference` — **Registration plan** → label_draft_only
+- [ ] `event.conference` — **Venue and hotel plan** → label_draft_only
+- [ ] `event.conference` — **Risk and emergency plan** → label_draft_only
+- [ ] `event.conference` — **Marketing plan brief** → label_draft_only
+- [ ] `event.conference` — **Follow-up plan** → label_draft_only
+- [ ] `event.conference` — **Metrics plan** → label_draft_only
+- [ ] `event.conference` — **Milestone plan** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Concise Fundraiser / Gala Plan** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Complete Fundraiser / Gala Plan** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Seating and hospitality plan** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Risk and backup plan** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Stewardship and receipt plan** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Metrics plan** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Milestone plan** → label_draft_only
+- [ ] `event.masterclass` — **Concise Masterclass Plan** → label_draft_only
+- [ ] `event.masterclass` — **Complete Masterclass Plan** → label_draft_only
+- [ ] `event.masterclass` — **Participant support plan** → label_draft_only
+- [ ] `event.masterclass` — **Follow-up and application plan** → label_draft_only
+- [ ] `event.masterclass` — **Metrics plan** → label_draft_only
+- [ ] `event.masterclass` — **Milestone plan** → label_draft_only
+- [ ] `event.networking_event` — **Concise Networking Event Plan** → label_draft_only
+- [ ] `event.networking_event` — **Complete Networking Event Plan** → label_draft_only
+- [ ] `event.networking_event` — **Staff and volunteer plan** → label_draft_only
+- [ ] `event.networking_event` — **Risk and contingency plan** → label_draft_only
+- [ ] `event.networking_event` — **Follow-up plan** → label_draft_only
+- [ ] `event.networking_event` — **Success-measure plan** → label_draft_only
+- [ ] `event.networking_event` — **Milestone plan** → label_draft_only
+- [ ] `event.product_launch` — **Concise Product Launch Plan** → label_draft_only
+- [ ] `event.product_launch` — **Complete Product Launch Plan** → label_draft_only
+- [ ] `event.product_launch` — **Risk and contingency plan** → label_draft_only
+- [ ] `event.product_launch` — **Launch communications schedule** → label_draft_only
+- [ ] `event.product_launch` — **Customer onboarding plan** → label_draft_only
+- [ ] `event.product_launch` — **Analytics plan** → label_draft_only
+- [ ] `event.product_launch` — **Post-launch review** → label_draft_only
+- [ ] `event.product_launch` — **Milestone plan** → label_draft_only
+- [ ] `event.product_launch` — **Printable launch-day packet** → label_draft_only
+- [ ] `event.retreat` — **Concise Retreat Plan** → label_draft_only
+- [ ] `event.retreat` — **Complete Retreat Plan** → label_draft_only
+- [ ] `event.retreat` — **Lodging and rooming plan** → label_draft_only
+- [ ] `event.retreat` — **Meals and dietary plan** → label_draft_only
+- [ ] `event.retreat` — **Transportation plan** → label_draft_only
+- [ ] `event.retreat` — **Risk and contingency plan** → label_draft_only
+- [ ] `event.retreat` — **Follow-up and integration plan** → label_draft_only
+- [ ] `event.retreat` — **Evaluation plan** → label_draft_only
+- [ ] `event.retreat` — **Milestone plan** → label_draft_only
+- [ ] `event.summit` — **Concise Summit Plan** → label_draft_only
+- [ ] `event.summit` — **Complete Summit Plan** → label_draft_only
+- [ ] `event.summit` — **VIP logistics plan** → label_draft_only
+- [ ] `event.summit` — **Security and risk plan** → label_draft_only
+- [ ] `event.summit` — **Follow-up and commitments plan** → label_draft_only
+- [ ] `event.summit` — **Success metrics plan** → label_draft_only
+- [ ] `event.summit` — **Milestone plan** → label_draft_only
+- [ ] `event.webinar` — **Concise Webinar Plan** → label_draft_only
+- [ ] `event.webinar` — **Complete Webinar Plan** → label_draft_only
+- [ ] `event.webinar` — **Recording and replay plan** → label_draft_only
+- [ ] `event.webinar` — **Follow-up email plan** → label_draft_only
+- [ ] `event.webinar` — **Metrics plan** → label_draft_only
+- [ ] `event.webinar` — **Milestone plan** → label_draft_only
+- [ ] `event.workshop` — **Concise Workshop Plan** → label_draft_only
+- [ ] `event.workshop` — **Complete Workshop Plan** → label_draft_only
+- [ ] `event.workshop` — **Room setup plan** → label_draft_only
+- [ ] `event.workshop` — **Virtual production plan** → label_draft_only
+- [ ] `event.workshop` — **Risk and contingency plan** → label_draft_only
+- [ ] `event.workshop` — **Follow-up plan** → label_draft_only
+- [ ] `event.workshop` — **Evaluation plan** → label_draft_only
+- [ ] `event.workshop` — **Milestone plan** → label_draft_only
+- [ ] `marketing_plan.simple` — **concise Marketing Plan** → label_draft_only
+- [ ] `marketing_plan.simple` — **detailed Marketing Plan** → label_draft_only
+- [ ] `marketing_plan.simple` — **one-page action plan** → label_draft_only
+- [ ] `marketing_plan.simple` — **channel plan** → label_draft_only
+- [ ] `marketing_plan.simple` — **measurement plan** → label_draft_only
+- [ ] `marketing_plan.simple` — **print/export output** → label_draft_only
+
+## moderate
+
+- [ ] `bp-event-book-signing` — **Event listing copy** → label_draft_only
+- [ ] `bp-event-business-luncheon` — **Luncheon brief** → label_draft_only
+- [ ] `bp-event-business-luncheon` — **Invitation copy** → label_draft_only
+- [ ] `bp-event-business-luncheon` — **Day-of checklist** → label_draft_only
+- [ ] `bp-event-one-day-workshop` — **Facilitator brief** → label_draft_only
+- [ ] `bp-event-online-workshop` — **Registration page copy** → label_draft_only
+- [ ] `bp-event-online-workshop` — **Follow-up email** → label_draft_only
+- [ ] `bp-event-three-day-retreat` — **Care & safety brief** → label_draft_only
+- [ ] `business.craft_show` — **POS and checkout checklist** → label_draft_only
+- [ ] `business.etsy` — **Shop setup checklist** → label_draft_only
+- [ ] `business.etsy` — **Listing and SEO checklist** → label_draft_only
+- [ ] `business.etsy` — **Photography checklist** → label_draft_only
+- [ ] `business.handmade_online_store` — **Listing and SEO checklist** → label_draft_only
+- [ ] `business.handmade_online_store` — **Photography checklist** → label_draft_only
+- [ ] `business.handmade_online_store` — **Email and social rhythm** → label_draft_only
+- [ ] `business.product_photography` — **Marketplace image checklist** → label_draft_only
+- [ ] `event.book_launch` — **Book positioning brief** → label_draft_only
+- [ ] `event.book_launch` — **Bookseller coordination brief** → label_draft_only
+- [ ] `event.book_launch` — **AV and livestream checklist** → label_draft_only
+- [ ] `event.book_launch` — **Accessibility checklist** → label_draft_only
+- [ ] `event.challenge` — **Technology and replay checklist** → label_draft_only
+- [ ] `event.challenge` — **Printable host checklist** → label_draft_only
+- [ ] `event.conference` — **AV and production checklist** → label_draft_only
+- [ ] `event.conference` — **Accessibility checklist** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Sponsor benefits brief** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Auction and checkout checklist** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Giving technology checklist** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Accessibility checklist** → label_draft_only
+- [ ] `event.masterclass` — **Demonstration checklist** → label_draft_only
+- [ ] `event.masterclass` — **Technology and replay checklist** → label_draft_only
+- [ ] `event.masterclass` — **Accessibility checklist** → label_draft_only
+- [ ] `event.networking_event` — **Invitation copy brief** → label_draft_only
+- [ ] `event.networking_event` — **Venue checklist** → label_draft_only
+- [ ] `event.networking_event` — **Equipment checklist** → label_draft_only
+- [ ] `event.networking_event` — **Accessibility checklist** → label_draft_only
+- [ ] `event.product_launch` — **Messaging and positioning brief** → label_draft_only
+- [ ] `event.product_launch` — **Registration and sales checklist** → label_draft_only
+- [ ] `event.product_launch` — **Technology and checkout checklist** → label_draft_only
+- [ ] `event.product_launch` — **Accessibility checklist** → label_draft_only
+- [ ] `event.retreat` — **Accessibility and wellness checklist** → label_draft_only
+- [ ] `event.retreat` — **Safety and emergency brief** → label_draft_only
+- [ ] `event.summit` — **Roundtable facilitation brief** → label_draft_only
+- [ ] `event.summit` — **Sponsor and partner brief** → label_draft_only
+- [ ] `event.summit` — **Production and livestream checklist** → label_draft_only
+- [ ] `event.summit` — **Accessibility checklist** → label_draft_only
+- [ ] `event.webinar` — **Landing page brief** → label_draft_only
+- [ ] `event.webinar` — **Tech rehearsal checklist** → label_draft_only
+- [ ] `event.webinar` — **Accessibility checklist** → label_draft_only
+- [ ] `event.workshop` — **Participant workbook brief** → label_draft_only
+- [ ] `event.workshop` — **Participant materials checklist** → label_draft_only
+- [ ] `event.workshop` — **Equipment checklist** → label_draft_only
+- [ ] `event.workshop` — **Accessibility checklist** → label_draft_only
+- [ ] `event.workshop` — **Promotion brief** → label_draft_only
+- [ ] `marketing_plan.simple` — **review checklist** → label_draft_only
+
+## low
+
+- [ ] `bp-event-book-signing` — **Signing table run-of-show** → label_draft_only
+- [ ] `bp-event-book-signing` — **Thank-you / next-read note** → label_draft_only
+- [ ] `bp-event-business-luncheon` — **Follow-up message draft** → label_draft_only
+- [ ] `bp-event-one-day-workshop` — **Day agenda** → label_draft_only
+- [ ] `bp-event-one-day-workshop` — **Participant prep note** → label_draft_only
+- [ ] `bp-event-one-day-workshop` — **Follow-up packet** → label_draft_only
+- [ ] `bp-event-online-workshop` — **Workshop outline** → label_draft_only
+- [ ] `bp-event-online-workshop` — **Slide / workbook stub** → connect_destination
+- [ ] `bp-event-three-day-retreat` — **Retreat overview** → label_draft_only
+- [ ] `bp-event-three-day-retreat` — **Three-day agenda** → label_draft_only
+- [ ] `bp-event-three-day-retreat` — **Packing list** → label_draft_only
+- [ ] `business.craft_show` — **Booth design notes** → connect_destination
+- [ ] `business.craft_show` — **Annual show calendar** → connect_destination
+- [ ] `business.craft_show` — **Packing and load list** → label_draft_only
+- [ ] `business.craft_show` — **Lead capture script** → label_draft_only
+- [ ] `business.craft_show` — **Expense and tax tracker outline** → label_draft_only
+- [ ] `business.craft_show` — **Post-show review template** → label_draft_only
+- [ ] `business.craft_show` — **Next actions list** → connect_destination
+- [ ] `business.etsy` — **Shipping profile notes** → label_draft_only
+- [ ] `business.etsy` — **Next actions list** → connect_destination
+- [ ] `business.handmade_online_store` — **Shipping and packaging standards** → label_draft_only
+- [ ] `business.handmade_online_store` — **Customer service notes** → label_draft_only
+- [ ] `business.handmade_online_store` — **Profitability view** → label_draft_only
+- [ ] `business.handmade_online_store` — **Linked campaign Work recommendations** → label_draft_only
+- [ ] `business.handmade_online_store` — **Next actions list** → connect_destination
+- [ ] `business.holiday_planner` — **Collection outline** → label_draft_only
+- [ ] `business.holiday_planner` — **Production schedule** → label_draft_only
+- [ ] `business.holiday_planner` — **Marketing campaign outline** → label_draft_only
+- [ ] `business.holiday_planner` — **Event integration notes** → label_draft_only
+- [ ] `business.holiday_planner` — **Next actions list** → connect_destination
+- [ ] `business.inventory_pricing` — **Margin targets** → label_draft_only
+- [ ] `business.inventory_pricing` — **Reorder point notes** → label_draft_only
+- [ ] `business.inventory_pricing` — **Next actions list** → connect_destination
+- [ ] `business.product_photography` — **Priority shot list** → label_draft_only
+- [ ] `business.product_photography` — **Lighting and background standards** → label_draft_only
+- [ ] `business.product_photography` — **Editing workflow** → label_draft_only
+- [ ] `business.product_photography` — **Alt text patterns** → label_draft_only
+- [ ] `business.product_photography` — **Next actions list** → connect_destination
+- [ ] `event.book_launch` — **One-page author goals overview** → label_draft_only
+- [ ] `event.book_launch` — **Program and reading rundown** → label_draft_only
+- [ ] `event.book_launch` — **Signing table run-of-show** → label_draft_only
+- [ ] `event.book_launch` — **Media kit** → label_draft_only
+- [ ] `event.book_launch` — **Marketing schedule** → label_draft_only
+- [ ] `event.book_launch` — **Follow-up and review path** → label_draft_only
+- [ ] `event.book_launch` — **Task list** → label_draft_only
+- [ ] `event.challenge` — **One-page purpose overview** → label_draft_only
+- [ ] `event.challenge` — **Daily content calendar** → connect_destination
+- [ ] `event.challenge` — **Welcome flow** → label_draft_only
+- [ ] `event.challenge` — **Check-in and accountability guide** → label_draft_only
+- [ ] `event.challenge` — **Live session schedule** → label_draft_only
+- [ ] `event.challenge` — **Resource pack** → label_draft_only
+- [ ] `event.challenge` — **Communications and reminder schedule** → label_draft_only
+- [ ] `event.challenge` — **Accessibility and timezone notes** → label_draft_only
+- [ ] `event.challenge` — **Challenge review** → label_draft_only
+- [ ] `event.challenge` — **Task list** → label_draft_only
+- [ ] `event.conference` — **One-page overview** → label_draft_only
+- [ ] `event.conference` — **Program and track map** → label_draft_only
+- [ ] `event.conference` — **Speaker guide** → label_draft_only
+- [ ] `event.conference` — **Volunteer briefing** → label_draft_only
+- [ ] `event.conference` — **Attendee communication schedule** → label_draft_only
+- [ ] `event.conference` — **Post-conference review** → label_draft_only
+- [ ] `event.conference` — **Task list** → label_draft_only
+- [ ] `event.conference` — **Printable conference-day packet** → label_draft_only
+- [ ] `event.fundraiser_gala` — **One-page mission overview** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Fundraising goals sheet** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Program rundown** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Volunteer briefing** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Post-event review** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Task list** → label_draft_only
+- [ ] `event.fundraiser_gala` — **Printable event-day packet** → label_draft_only
+- [ ] `event.masterclass` — **One-page promise overview** → label_draft_only
+- [ ] `event.masterclass` — **Curriculum rundown** → label_draft_only
+- [ ] `event.masterclass` — **Worksheet / workbook pack** → label_draft_only
+- [ ] `event.masterclass` — **Guided implementation guide** → label_draft_only
+- [ ] `event.masterclass` — **Pre-work and expectations note** → label_draft_only
+- [ ] `event.masterclass` — **Promotion schedule** → label_draft_only
+- [ ] `event.masterclass` — **Masterclass review** → label_draft_only
+- [ ] `event.masterclass` — **Task list** → label_draft_only
+- [ ] `event.masterclass` — **Printable session-day packet** → label_draft_only
+- [ ] `event.networking_event` — **One-page overview** → label_draft_only
+- [ ] `event.networking_event` — **Run of show** → label_draft_only
+- [ ] `event.networking_event` — **Host and facilitator guide** → label_draft_only
+- [ ] `event.networking_event` — **Attendee communication schedule** → label_draft_only
+- [ ] `event.networking_event` — **Post-event review** → label_draft_only
+- [ ] `event.networking_event` — **Task list** → label_draft_only
+- [ ] `event.networking_event` — **Printable event-day packet** → label_draft_only
+- [ ] `event.product_launch` — **One-page vision and offer overview** → label_draft_only
+- [ ] `event.product_launch` — **Demo rundown** → label_draft_only
+- [ ] `event.product_launch` — **Marketing and PR schedule** → label_draft_only
+- [ ] `event.product_launch` — **Affiliate asset pack** → label_draft_only
+- [ ] `event.product_launch` — **Task list** → label_draft_only
+- [ ] `event.retreat` — **One-page overview** → label_draft_only
+- [ ] `event.retreat` — **Daily agenda and rhythm** → label_draft_only
+- [ ] `event.retreat` — **Facilitator and care guide** → label_draft_only
+- [ ] `event.retreat` — **Packing list** → label_draft_only
+- [ ] `event.retreat` — **Prep packet / communications schedule** → label_draft_only
+- [ ] `event.retreat` — **Post-retreat review** → label_draft_only
+- [ ] `event.retreat` — **Task list** → label_draft_only
+- [ ] `event.retreat` — **Printable retreat-day packet** → label_draft_only
+- [ ] `event.summit` — **One-page vision overview** → label_draft_only
+- [ ] `event.summit` — **Program rundown** → label_draft_only
+- [ ] `event.summit` — **Keynote and speaker guide** → label_draft_only
+- [ ] `event.summit` — **Executive briefing packet** → label_draft_only
+- [ ] `event.summit` — **Communications schedule** → label_draft_only
+- [ ] `event.summit` — **Post-summit review** → label_draft_only
+- [ ] `event.summit` — **Task list** → label_draft_only
+- [ ] `event.summit` — **Printable summit-day packet** → label_draft_only
+- [ ] `event.webinar` — **One-page overview** → label_draft_only
+- [ ] `event.webinar` — **Timed agenda** → label_draft_only
+- [ ] `event.webinar` — **Slide outline** → connect_destination
+- [ ] `event.webinar` — **Host and moderator guide** → label_draft_only
+- [ ] `event.webinar` — **Reminder sequence** → label_draft_only
+- [ ] `event.webinar` — **Live production rundown** → label_draft_only
+- [ ] `event.webinar` — **Post-event review** → label_draft_only
+- [ ] `event.webinar` — **Task list** → label_draft_only
+- [ ] `event.webinar` — **Printable webinar-day packet** → label_draft_only
+- [ ] `event.workshop` — **One-page overview** → label_draft_only
+- [ ] `event.workshop` — **Detailed agenda** → label_draft_only
+- [ ] `event.workshop` — **Run of show** → label_draft_only
+- [ ] `event.workshop` — **Facilitator guide** → label_draft_only
+- [ ] `event.workshop` — **Co-facilitator guide** → label_draft_only
+- [ ] `event.workshop` — **Activity instructions** → label_draft_only
+- [ ] `event.workshop` — **Registration communication schedule** → label_draft_only
+- [ ] `event.workshop` — **Post-workshop review** → label_draft_only
+- [ ] `event.workshop` — **Task list** → label_draft_only
+- [ ] `event.workshop` — **Printable workshop-day packet** → label_draft_only
+- [ ] `marketing_plan.simple` — **audience and message summary** → label_draft_only
+- [ ] `marketing_plan.simple` — **simple activity calendar** → connect_destination
+- [ ] `marketing_plan.simple` — **task list** → label_draft_only
+- [ ] `marketing_plan.simple` — **milestone view** → label_draft_only
+- [ ] `marketing_plan.simple` — **assumptions and risks** → label_draft_only
