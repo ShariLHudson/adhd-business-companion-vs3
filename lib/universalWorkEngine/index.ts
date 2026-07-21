@@ -204,7 +204,28 @@ export {
   listStructureUndo,
   resetStructureUndoForTests,
   saveStructureAsBlueprint,
+  evaluateBlueprintHealth,
+  assertHealthDoesNotMutate,
+  setBlueprintSuggestionDisposition,
+  resetBlueprintSuggestionDispositionsForTests,
+  summarizeBlueprintUsage,
+  previewBlueprintImpact,
+  formatWhereThisIsUsed,
+  certifyBlueprint,
+  resetBlueprintProfilesForTests,
+  upsertBlueprintIntelligenceProfile,
+  buildSparkBlueprintHome,
+  publishBlueprintVersion,
+  clearBlueprintIntelligencePackagesForTests,
+} from "./blueprints";
+export type {
+  BlueprintHealthSnapshot,
+  BlueprintUsageSummary,
+  BlueprintImpactPreview,
+  BlueprintCertificationResult,
+  SparkBlueprintHomeModel,
 } from "./blueprints";
 export { ensureEventBlueprintsRegistered } from "./packages/eventPlan/registerEventBlueprints";
 export { EVENT_PLAN_BLUEPRINT_IDS } from "./packages/eventPlan/eventBlueprintDefinitions";
 export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";
+export { ensureEventBlueprintIntelligenceRegistered } from "./packages/eventPlan/eventBlueprintIntelligence";

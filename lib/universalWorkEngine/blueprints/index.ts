@@ -140,3 +140,37 @@ export {
   saveStructureAsBlueprint,
 } from "./saveStructureAsBlueprint";
 export type { SaveStructureAsBlueprintInput } from "./saveStructureAsBlueprint";
+
+export type {
+  BlueprintVisibility,
+  BlueprintLifecycleStatus,
+  BlueprintHealthFinding,
+  BlueprintHealthSnapshot,
+  BlueprintUsageSummary,
+  BlueprintImpactPreview,
+  BlueprintCertificationResult,
+  SparkBlueprintHomeModel,
+  BlueprintSuggestionDisposition,
+} from "./intelligence";
+export {
+  evaluateBlueprintHealth,
+  evaluateBlueprintHealthRaw,
+  assertHealthDoesNotMutate,
+  registerBlueprintIntelligencePackage,
+  getBlueprintIntelligencePackage,
+  clearBlueprintIntelligencePackagesForTests,
+  resetBlueprintSuggestionDispositionsForTests,
+  listBlueprintSuggestionDispositions,
+  setBlueprintSuggestionDisposition,
+  filterVisibleHealthFindings,
+  summarizeBlueprintUsage,
+  previewBlueprintImpact,
+  formatWhereThisIsUsed,
+  certifyBlueprint,
+  certifyBlueprintDefinition,
+  resetBlueprintProfilesForTests,
+  getBlueprintIntelligenceProfile,
+  upsertBlueprintIntelligenceProfile,
+  buildSparkBlueprintHome,
+  publishBlueprintVersion,
+} from "./intelligence";
