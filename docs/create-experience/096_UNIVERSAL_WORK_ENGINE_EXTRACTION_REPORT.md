@@ -4,7 +4,8 @@
 **Authority:** `095_CREATE_CORE_OWNERSHIP_AUDIT.md`  
 **Scope:** Consolidate certified Create Event into one Universal Work Engine  
 **Out of scope (honored):** Marketing Plan · additional Work Types · Chamber-specific creation experiences  
-**Commit:** Not created (per instruction — reports + tests first)
+**Commit:** `834646b9`  
+**Tag:** `milestone/universal-work-engine-foundation`
 
 ---
 
