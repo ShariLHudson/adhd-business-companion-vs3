@@ -19,6 +19,10 @@
 |------|---------|----------|-----------|----------|------------|-----------------|-------|---------|
 | Founder Experience Constitution™ | Supreme authority for how Founder feels | Constitutions | Constitution | `docs/founder/FOUNDER_EXPERIENCE_CONSTITUTION.md` | Yes | Founder Studio, Executive Resources Center | Shari | 2026-07-06 |
 | Spark Estate Product Constitution (113) | Master product principles; governs series 113–117 | Constitutions | Constitution | `docs/constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md` | Yes | Spark Estate, Universal Work, Shari | Shari | 2026-07-21 |
+| Shari Companion Constitution (114) | How Shari behaves across the Estate | Constitutions | Constitution | `docs/constitution/114_SHARI_COMPANION_CONSTITUTION.md` | Yes | Shari, Spark Estate | Shari | 2026-07-21 |
+| Universal Conversation Architecture (115) | One conversation lifecycle in every room | Constitutions | Constitution | `docs/constitution/115_UNIVERSAL_CONVERSATION_ARCHITECTURE.md` | Yes | Conversation, Spark Estate | Shari | 2026-07-21 |
+| Estate Navigation Constitution (116) | Intent-first navigation; return-to-work | Constitutions | Constitution | `docs/constitution/116_ESTATE_NAVIGATION_CONSTITUTION.md` | Yes | Navigation, Spark Estate | Shari | 2026-07-21 |
+| Trust, Memory & Relationship Constitution (117) | Trust, memory, relationships over copies | Constitutions | Constitution | `docs/constitution/117_TRUST_MEMORY_AND_RELATIONSHIP_CONSTITUTION.md` | Yes | Trust, Memory, Work relationships | Shari | 2026-07-21 |
 | Relationship Constitution | How people feel in UI and rooms | Constitutions | Constitution | `docs/RELATIONSHIP_CONSTITUTION.md` | Yes | Spark Companion, Spark Estate | Shari | 2026-07-01 |
 | The Friend We All Deserve™ | How Spark speaks — companion DNA | Constitutions | Constitution | `docs/THE_FRIEND_WE_ALL_DESERVE.md` | Yes | Spark Companion | Shari | 2026-07-01 |
 | Discovery Key Constitution | Gentle estate discovery | Estate | Constitution | `docs/estate-intelligence/discovery-key/DiscoveryKey-Constitution.md` | No | Discovery Key, Spark Estate | Shari | 2026-07-06 |
@@ -29,7 +33,26 @@
 | Name | Purpose | Category | Authority | Location | NotebookLM | Related Systems | Owner | Updated |
 |------|---------|----------|-----------|----------|------------|-----------------|-------|---------|
 | Universal Work & Relationship Platform (112) | Completes Product Specification Series — one Work, many views | Product Specifications | Specification | `docs/product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md` | Yes | UWE, Create, Projects, Blueprints, Pulse | Shari | 2026-07-21 |
-| Constitution series index (113–117) | Master + specialized constitutions | Constitutions | Reference | `docs/constitution/README.md` | No | Spark Estate | Shari | 2026-07-21 |
+| Constitution series index (113–117) | Master + specialized constitutions — series complete | Constitutions | Reference | `docs/constitution/README.md` | No | Spark Estate | Shari | 2026-07-21 |
+
+### Design Bible (125)
+
+| Name | Purpose | Category | Authority | Location | NotebookLM | Related Systems | Owner | Updated |
+|------|---------|----------|-----------|----------|------------|-----------------|-------|---------|
+| Spark Estate Design Bible (125) | Definitive product & experience reference | Design Bible | Product Reference | `docs/design-bible/125_SPARK_ESTATE_DESIGN_BIBLE.md` | Yes | Entire Spark Estate | Shari | 2026-07-21 |
+
+### Design System series (118–124)
+
+| Name | Purpose | Category | Authority | Location | NotebookLM | Related Systems | Owner | Updated |
+|------|---------|----------|-----------|----------|------------|-----------------|-------|---------|
+| Design System series index (118–124) | Interaction · rooms · Pulse · recognition · a11y · quality gates | Design System | Standard | `docs/design-system/README.md` | No | Spark Estate UX | Shari | 2026-07-21 |
+| Universal Interaction Patterns (118) | One primary action; progressive disclosure | Design System | Standard | `docs/design-system/118_UNIVERSAL_INTERACTION_PATTERNS.md` | Yes | All experiences | Shari | 2026-07-21 |
+| Room Experience Standards (119) | Room feel and behavior | Design System | Standard | `docs/design-system/119_ROOM_EXPERIENCE_STANDARDS.md` | Yes | Estate rooms | Shari | 2026-07-21 |
+| Relationship and Connection UX (120) | Connected To… surfaces | Design System | Standard | `docs/design-system/120_RELATIONSHIP_AND_CONNECTION_UX_STANDARDS.md` | Yes | Work relationships | Shari | 2026-07-21 |
+| Business Pulse UX Standards (121) | Calm progress awareness UI | Design System | Standard | `docs/design-system/121_BUSINESS_PULSE_UX_STANDARDS.md` | Yes | Business Pulse | Shari | 2026-07-21 |
+| Recognition and Celebration UX (122) | Wins, Hall, Garden, celebration UX | Design System | Standard | `docs/design-system/122_RECOGNITION_AND_CELEBRATION_UX_STANDARDS.md` | Yes | Recognition | Shari | 2026-07-21 |
+| Accessibility and ADHD Experience (123) | Sensory safety; ADHD-first | Design System | Standard | `docs/design-system/123_ACCESSIBILITY_AND_ADHD_EXPERIENCE_STANDARDS.md` | Yes | Accessibility | Shari | 2026-07-21 |
+| Certification and Quality Gates (124) | Experience · a11y · technical · user gates | Design System | Standard | `docs/design-system/124_CERTIFICATION_AND_QUALITY_GATES.md` | Yes | Certification | Shari | 2026-07-21 |
 
 ---
 

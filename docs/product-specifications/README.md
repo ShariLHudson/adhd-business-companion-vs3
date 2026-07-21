@@ -17,13 +17,8 @@ After 112, authority continues in the **Spark Estate Product Constitution series
 | # | Document | Role |
 |---|----------|------|
 | **113** | [Spark Estate Product Constitution](../constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md) | Master constitutional principles |
-| **114–117** | *(forthcoming)* | Specialized constitutions expanding 113 |
+| **114–117** | [Specialized constitutions](../constitution/README.md) | Shari · Conversation · Navigation · Trust/Memory/Relationships — **in repo** |
+| **118–124** | [Design System](../design-system/README.md) | Interaction · rooms · Pulse · recognition · a11y · quality gates |
+| **125** | [Design Bible](../design-bible/125_SPARK_ESTATE_DESIGN_BIBLE.md) | Definitive product & experience reference |
 
-See [`docs/constitution/README.md`](../constitution/README.md).
-
-## Upload order (Bridge Series)
-
-1. File 112 — this series  
-2. File 113 — Constitution series master  
-
-Do not begin Constitution expansion work (114–117) until 112 and 113 are in the repository and indexed.
+See [`docs/constitution/README.md`](../constitution/README.md) — series **113–117** is complete.

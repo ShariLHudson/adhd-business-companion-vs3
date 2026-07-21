@@ -14,4 +14,4 @@ Series indexes:
 - [`docs/product-specifications/README.md`](../product-specifications/README.md)
 - [`docs/constitution/README.md`](../constitution/README.md)
 
-Remaining Blueprint / Work Type implementation must preserve one canonical Work identity and relationships over copies per 112, under constitutional principles in 113–117.
+Remaining Blueprint / Work Type implementation must preserve one canonical Work identity and relationships over copies per 112, under constitutional principles in 113–117, and Design System standards **118–124** ([`docs/design-system/`](../design-system/README.md)).

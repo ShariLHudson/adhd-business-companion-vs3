@@ -18,10 +18,16 @@
 |----------|------|---------|-------------|-----------|
 | Founder Experience Constitution™ | `docs/founder/FOUNDER_EXPERIENCE_CONSTITUTION.md` | How Founder must feel | Any Founder UI or copy | Constitution |
 | Spark Estate Product Constitution (113) | `docs/constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md` | Master Estate product principles; series **113–117** | Work identity, companion platform, future features | Constitution |
+| Shari Companion Constitution (114) | `docs/constitution/114_SHARI_COMPANION_CONSTITUTION.md` | How Shari behaves everywhere | Companion orchestration | Constitution |
+| Universal Conversation Architecture (115) | `docs/constitution/115_UNIVERSAL_CONVERSATION_ARCHITECTURE.md` | One conversation lifecycle across rooms | Conversation continuity | Constitution |
+| Estate Navigation Constitution (116) | `docs/constitution/116_ESTATE_NAVIGATION_CONSTITUTION.md` | Intent-first, reversible navigation | Rooms and return-to-work | Constitution |
+| Trust, Memory & Relationship Constitution (117) | `docs/constitution/117_TRUST_MEMORY_AND_RELATIONSHIP_CONSTITUTION.md` | Trust, memory, relationships over copies | Work graph and privacy | Constitution |
 | Entrepreneurial Transformation Constitution™ | `docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md` | Member growth and hero principle | Ecosystem experiences | Constitution |
 | Relationship Constitution | `docs/RELATIONSHIP_CONSTITUTION.md` | How people feel in UI and rooms | All member-facing work | Constitution |
 | The Friend We All Deserve™ | `docs/THE_FRIEND_WE_ALL_DESERVE.md` | How Spark speaks | Conversation and prompts | Constitution |
 | Universal Work & Relationship Platform (112) | `docs/product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md` | Completes Product Specification Series | Connected Work / Blueprints / recognition | Specification |
+| Spark Estate Design Bible (125) | `docs/design-bible/125_SPARK_ESTATE_DESIGN_BIBLE.md` | Definitive product & experience reference | Unifies Constitution, Design System, Work, Pulse | Product Reference |
+| Design System series (118–124) | `docs/design-system/README.md` | Interaction, room, Pulse, recognition, a11y, quality gates | UX standards under Constitution 113–117 | Standard |
 
 ---
 

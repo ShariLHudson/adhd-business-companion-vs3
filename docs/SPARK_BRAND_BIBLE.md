@@ -35,12 +35,14 @@ It goes beyond software. It defines:
 | 1 | [Spark Constitution™](./SPARK_CONSTITUTION.md) | Highest law — governs everything |
 | 2 | [Spark Manifesto™](./SPARK_MANIFESTO.md) | Public why — heart and promise |
 | 3 | Spark Estate Product Constitution series **113–117** ([113](./constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md) · [index](./constitution/README.md)) | Master product principles; specialized constitutions expand 113 |
-| 4 | **Spark Brand Bible™** (this document) | Identity handbook — how Spark shows up (implements 113–117; does not override) |
-| 5 | [Spark Operating Manual™](./SPARK_OPERATING_MANUAL.md) | How Spark behaves — implementation standard |
-| 6 | Certified Product Specifications (incl. [112](./product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md)) | Connected Work & relationship platform model |
-| 7 | Child specs | Conversation, UX, Institute, Brain, etc. |
+| 4 | Spark Estate Design Bible **125** ([125](./design-bible/125_SPARK_ESTATE_DESIGN_BIBLE.md) · [index](./design-bible/README.md)) | Definitive product & experience reference |
+| 5 | **Spark Brand Bible™** (this document) | Identity handbook — how Spark shows up (implements 113–117 and 125; does not override) |
+| 6 | [Spark Operating Manual™](./SPARK_OPERATING_MANUAL.md) | How Spark behaves — implementation standard |
+| 7 | Certified Product Specifications (incl. [112](./product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md)) | Connected Work & relationship platform model |
+| 8 | Design System series **118–124** ([index](./design-system/README.md)) | Interaction, room, Pulse, recognition, a11y, and quality gates |
+| 9 | Child specs | Conversation, UX, Institute, Brain, etc. |
 
-When in doubt: **Constitution → Manifesto → Product Constitution 113–117 → Brand Bible → Operating Manual → Spec**.
+When in doubt: **Constitution → Manifesto → Product Constitution 113–117 → Design Bible 125 → Brand Bible → Operating Manual → Spec → Design System 118–124**.
 
 ---
 
