@@ -60,8 +60,16 @@
 | **315** | Platform Governance Constitution | Series constitution |
 | **316** | Governance & Registry Audit | Registry audit + slices |
 | **317** | This Master Index | Catalog |
+| **318** | Universal Knowledge, Retrieval & Provenance | Retrieval priority + contribution provenance |
+| **319** | Shari Conversation Orchestration & Response | Orchestration locks / response architecture |
+| **320** | Privacy, Trust, Consent & User Control | Data classes, consent, temporary vs durable |
+| **321** | Intelligence Observability & Architecture Health | Health checks / quality signals |
+| **322** | Platform Master Index & Documentation Graph | Machine-readable doc graph (extends 317) |
+| **323** | Knowledge & Provenance Audit | Map retrieval / provenance / Shari locks |
+| **324** | Privacy & Adaptation Audit | Profile fields · consent gaps · temp context |
+| **325** | Observability Implementation Plan | Visibility-first slices (O1 health report) |
 
-**Bundle READMEs:** `README_UPLOAD_ORDER.md` (300) · `306_310_ADAPTIVE_INTELLIGENCE_README.md` · `311_315_PLATFORM_GOVERNANCE_README.md`  
+**Bundle READMEs:** `README_UPLOAD_ORDER.md` (300) · `306_310_ADAPTIVE_INTELLIGENCE_README.md` · `311_315_PLATFORM_GOVERNANCE_README.md` · `318_322_KNOWLEDGE_TRUST_OBSERVABILITY_README.md`  
 **Archived alternate 311:** `bundle-sources/311_ADAPTIVE_INTELLIGENCE_IMPLEMENTATION_PLAN_GOVERNANCE_BUNDLE.md`
 
 ---
@@ -162,7 +170,7 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | Welcome (126) | `lib/firstLoginWelcome/welcomeExperienceConstitution.ts` |
 | Client-Relationships library | `docs/chamber-knowledge/client-relationships/` + 075 gate |
 | Events Member packages | `docs/visual-spark-studios/Events-Intelligence/` bundles |
-| Architecture audits | `305`, `311`, `316` |
+| Architecture audits | `305`, `311`, `316`, `323`, `324` · plan `325` |
 
 **Framework:** [314](./314_UNIVERSAL_TESTING_AND_CERTIFICATION_FRAMEWORK.md)
 
@@ -175,6 +183,9 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | 305 | Foundation audit |
 | 311 | Adaptive implementation plan (authoritative) |
 | 316 | Governance/registry audit + slices G0–G4 |
+| 323 | Knowledge / provenance audit |
+| 324 | Privacy / adaptation audit |
+| 325 | Observability plan — **O1** architecture health report (no UX change) |
 | Create-experience hardening / reports | `docs/create-experience/` (096–106 era + Blueprint certs) |
 | Navigation welcome docs | `docs/navigation/119–121` |
 
@@ -191,16 +202,17 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 
 ---
 
-## 13. Recommended next actions (from 316 + 311)
+## 13. Recommended next actions (from 316 · 311 · 325)
 
-1. **G1** — Registry kernel types (312) — no live migration  
-2. **Adaptive Context façade** — 311 Slice 1 / 308  
-3. **G2** — Read adapters (UWE Blueprints, Chamber aliases)  
-4. **Domain Capability façade + Workshop Collection pilot**  
-5. Business Identity Registry definitions  
-6. Certification Registry  
+1. **O1** — Architecture Health Report collectors (325) — visibility only  
+2. **G1** — Registry kernel types (312) — no live migration  
+3. **Adaptive Context façade** — 311 Slice 1 / 308 / 324  
+4. **Provenance / retrieval-priority contract types** — 323 / 318 (types only)  
+5. **G2** — Read adapters (UWE Blueprints, Chamber aliases)  
+6. **Domain Capability façade + Workshop Collection pilot**  
+7. Business Identity Registry definitions · Certification Registry · Doc graph (322 / O2)  
 
-**Forbidden until audits say otherwise:** broad registry rewrite · second profile · shadow Work · overwriting authoritative 311 with bundle draft
+**Forbidden until audits say otherwise:** new retrieval stack · second profile · new logging product · shadow Work · broad registry rewrite · overwriting authoritative 311 with bundle draft
 
 ---
 
