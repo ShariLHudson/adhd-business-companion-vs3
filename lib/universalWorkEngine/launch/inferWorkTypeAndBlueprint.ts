@@ -50,14 +50,18 @@ import {
   PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
   REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
   CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+  AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+  CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
   DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
   FRANCHISE_BUSINESS_BLUEPRINT_ID,
   MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
   MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
+  PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
   RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
   RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
   SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
   SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
+  WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
   WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
   WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
@@ -241,6 +245,17 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-dealer-reseller-channel-partner":
     DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
   "bp-dealer": DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
+  "bp-photography-videography": PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  "bp-photography": PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  "bp-videography": PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  "bp-wedding-celebration-professional":
+    WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
+  "bp-wedding": WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
+  "bp-cleaning-janitorial": CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+  "bp-cleaning": CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+  "bp-automotive-repair-detailing":
+    AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+  "bp-auto-repair": AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -271,6 +286,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Photography/videography before creative_agency_studio and content_creator
+    re: /\b(photography(?:\s+and\s+videography)?(?:\s+business)?|videography(?:\s+business)?|photo\s+(?:and\s+)?video(?:\s+business)?|business\.photography_videography)\b/i,
+    blueprintId: PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     // Franchise before retail_store / restaurant / hospitality / service
     re: /\b(franchise(?:\s+business)?|franchisor(?:\s+business)?|business\.franchise)\b/i,
     blueprintId: FRANCHISE_BUSINESS_BLUEPRINT_ID,
@@ -286,6 +307,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     // Rental/equipment hire before venue_experience / ecommerce
     re: /\b(rental(?:\s+(?:and\s+)?equipment\s+hire)(?:\s+business)?|equipment\s+hire(?:\s+business)?|equipment\s+rental(?:\s+business)?|business\.rental_equipment_hire)\b/i,
     blueprintId: RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Automotive before home_service and dealer_reseller
+    re: /\b(automotive(?:\s+repair)?(?:\s+and\s+detailing)?(?:\s+business)?|auto\s+repair(?:\s+business)?|auto\s+detailing(?:\s+business)?|car\s+detailing(?:\s+business)?|business\.automotive_repair_detailing)\b/i,
+    blueprintId: AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -443,6 +470,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Cleaning/janitorial before home_service
+    re: /\b(cleaning(?:\s+and\s+janitorial)?(?:\s+business)?|janitorial(?:\s+business)?|business\.cleaning_janitorial)\b/i,
+    blueprintId: CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     re: /\b(home\s+service(?:\s+business)?|residential\s+service\s+business|business\.home_service)\b/i,
     blueprintId: HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
@@ -530,6 +563,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(travel\s+(?:and\s+)?tourism(?:\s+business)?|tour\s+operator(?:\s+business)?|travel\s+agency(?:\s+business)?|tourism\s+business|business\.travel_tourism)\b/i,
     blueprintId: TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Wedding/celebration professional before venue_experience / hospitality
+    re: /\b(wedding(?:\s+and\s+celebration)?(?:\s+professional|\s+business)?|celebration\s+professional(?:\s+blueprint)?|wedding\s+planner(?:\s+business)?|business\.wedding_celebration_professional)\b/i,
+    blueprintId: WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {

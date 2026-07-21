@@ -1,5 +1,5 @@
 /**
- * 201–268 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community / Regulated Professional / Manufacturing Logistics Agriculture / Tech Media Creative / Scale Location Channel Blueprints.
+ * 201–272 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community / Regulated Professional / Manufacturing Logistics Agriculture / Tech Media Creative / Scale Location Channel / Local Consumer Service Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -9,11 +9,15 @@ import {
   ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
   AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
   AUTHOR_BUSINESS_BLUEPRINT_ID,
+  AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+  CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
   CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
   BUSINESS_PLAN_BLUEPRINT_IDS,
   DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
   COACHING_BUSINESS_BLUEPRINT_ID,
   FRANCHISE_BUSINESS_BLUEPRINT_ID,
+  PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
   CONSULTING_BUSINESS_BLUEPRINT_ID,
   CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
   COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
@@ -142,7 +146,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with fifty-nine Business Blueprints", () => {
+  it("registers Business Plan Work Type with sixty-three Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -206,9 +210,13 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
         RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
         DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
+        PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+        WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
+        CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+        AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(59);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(63);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -273,6 +281,10 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
       RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
       DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
+      PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+      WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
+      CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+      AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -568,6 +580,22 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
         guidedSection: "ch_tiers",
+      },
+      {
+        blueprintId: PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "pv_offers",
+      },
+      {
+        blueprintId: WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "wc_budget",
+      },
+      {
+        blueprintId: CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "cl_delivery",
+      },
+      {
+        blueprintId: AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "auto_inspect",
       },
     ];
     for (const c of cases) {
@@ -1044,6 +1072,40 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
     );
 
+    const photographyVideography = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage:
+        "Help me build a photography and videography business",
+    });
+    expect(photographyVideography.blueprintId).toBe(
+      PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const weddingCelebration = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a wedding planner business",
+    });
+    expect(weddingCelebration.blueprintId).toBe(
+      WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const cleaningJanitorial = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a cleaning and janitorial business",
+    });
+    expect(cleaningJanitorial.blueprintId).toBe(
+      CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const automotive = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage:
+        "Help me build an automotive repair and detailing business",
+    });
+    expect(automotive.blueprintId).toBe(
+      AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+    );
+
     expect(isBusinessPlanCreationRequest("franchise business")).toBe(true);
     expect(isBusinessPlanCreationRequest("business.multi_location")).toBe(true);
     expect(
@@ -1051,6 +1113,16 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ).toBe(true);
     expect(
       isBusinessPlanCreationRequest("business.dealer_reseller_channel_partner"),
+    ).toBe(true);
+    expect(
+      isBusinessPlanCreationRequest("photography and videography business"),
+    ).toBe(true);
+    expect(
+      isBusinessPlanCreationRequest("business.wedding_celebration_professional"),
+    ).toBe(true);
+    expect(isBusinessPlanCreationRequest("janitorial business")).toBe(true);
+    expect(
+      isBusinessPlanCreationRequest("business.automotive_repair_detailing"),
     ).toBe(true);
 
     const genericService = inferWorkTypeAndBlueprint({
