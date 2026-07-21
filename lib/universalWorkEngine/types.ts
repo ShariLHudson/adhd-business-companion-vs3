@@ -215,7 +215,11 @@ export type WorkRelationshipTargetType =
   | "journal-entry"
   | "evidence"
   | "person"
-  | "goal";
+  | "goal"
+  /** 101 — progress recognition (distinct from evidence) */
+  | "win"
+  | "accomplishment"
+  | "celebration";
 
 export type WorkRelationship = {
   id: string;
