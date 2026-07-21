@@ -7,6 +7,7 @@ import { CreateWorkspaceV2Panel } from "@/components/companion/CreateWorkspaceV2
 import { CreateWorkCommandToolbar } from "@/components/companion/CreateWorkCommandToolbar";
 import { CurrentFocusInteraction } from "@/components/companion/CurrentFocusInteraction";
 import { ConnectedWorkDisclosure } from "@/components/companion/ConnectedWorkDisclosure";
+import { SparkBlueprintHome } from "@/components/companion/SparkBlueprintHome";
 import { canonicalStatusFromWorkflow } from "@/lib/activeWorkspaceRegistry/canonicalStatus";
 import {
   extractTitleFromDraftContent,
@@ -179,6 +180,9 @@ export function CreateEstateWorkingPanel({
   const [saveBlueprintOpen, setSaveBlueprintOpen] = useState(false);
   const [blueprintNameDraft, setBlueprintNameDraft] = useState("");
   const [blueprintDescDraft, setBlueprintDescDraft] = useState("");
+  const [openBlueprintHomeId, setOpenBlueprintHomeId] = useState<string | null>(
+    null,
+  );
   const [blueprintSavedAck, setBlueprintSavedAck] = useState<string | null>(
     null,
   );
@@ -665,6 +669,7 @@ export function CreateEstateWorkingPanel({
                           setBlueprintSavedAck(
                             `Saved “${saved.title}” (${saved.blueprintId} @ ${saved.version}).`,
                           );
+                          setOpenBlueprintHomeId(saved.blueprintId);
                           setSaveBlueprintOpen(false);
                         } catch (err) {
                           setLocalGuidance(
@@ -686,6 +691,14 @@ export function CreateEstateWorkingPanel({
                   >
                     {blueprintSavedAck}
                   </p>
+                ) : null}
+                {openBlueprintHomeId ? (
+                  <div className="mt-3">
+                    <SparkBlueprintHome
+                      blueprintId={openBlueprintHomeId}
+                      onClose={() => setOpenBlueprintHomeId(null)}
+                    />
+                  </div>
                 ) : null}
               </div>
             </details>
