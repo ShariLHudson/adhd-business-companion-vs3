@@ -1,6 +1,6 @@
 /**
  * Leaf data only — no imports from Create runtime (avoids circular deps).
- * Business Plan section map (201–232 handmade / service / creator / organizing / retail / commerce).
+ * Business Plan section map (201–240 handmade / service / creator / organizing / retail / commerce / hospitality).
  */
 
 import type { WorkTypeMapSectionDef } from "../types";
@@ -266,6 +266,42 @@ export const BUSINESS_PLAN_MAP_SECTIONS: readonly WorkTypeMapSectionDef[] = [
   { id: "sub_experience", title: "Subscription Customer Experience" },
   { id: "sub_analytics", title: "Subscription Analytics" },
   { id: "sub_growth", title: "Subscription Growth and Resilience" },
+  // 237–240 Hospitality & Travel
+  { id: "hosp_guest_personas", title: "Guest Personas" },
+  { id: "hosp_reservations", title: "Reservations" },
+  { id: "hosp_guest_journey", title: "Guest Journey" },
+  { id: "hosp_housekeeping", title: "Housekeeping and Maintenance" },
+  { id: "hosp_staffing", title: "Hospitality Staffing" },
+  { id: "hosp_service_partners", title: "Food and Service Partners" },
+  { id: "hosp_guest_recovery", title: "Guest Recovery" },
+  { id: "hosp_kpis", title: "Hospitality KPIs" },
+  { id: "rest_menu", title: "Menu Engineering" },
+  { id: "rest_kitchen", title: "Kitchen Operations" },
+  { id: "rest_foh", title: "Front of House" },
+  { id: "rest_staffing", title: "Restaurant Staffing" },
+  { id: "rest_vendors", title: "Restaurant Vendor Management" },
+  { id: "rest_food_safety", title: "Food Safety Review Flags" },
+  { id: "rest_marketing", title: "Restaurant Marketing" },
+  { id: "rest_financials", title: "Restaurant Financial Performance" },
+  { id: "travel_profiles", title: "Traveler Profiles" },
+  { id: "travel_itinerary", title: "Itinerary Design" },
+  { id: "travel_suppliers", title: "Travel Supplier Management" },
+  { id: "travel_bookings", title: "Travel Bookings" },
+  { id: "travel_risk", title: "Travel Risk Planning" },
+  { id: "travel_cx", title: "Travel Customer Experience" },
+  { id: "travel_partnerships", title: "Travel Partnerships" },
+  { id: "travel_seasonal", title: "Travel Seasonal Planning" },
+  { id: "travel_operations", title: "Travel Operations" },
+  { id: "travel_kpis", title: "Travel KPIs" },
+  { id: "venue_capacity", title: "Venue Capacity Planning" },
+  { id: "venue_bookings", title: "Venue Bookings" },
+  { id: "venue_event_coord", title: "Venue Event Coordination" },
+  { id: "venue_vendors", title: "Venue Vendors" },
+  { id: "venue_safety", title: "Venue Safety" },
+  { id: "venue_revenue", title: "Venue Revenue Streams" },
+  { id: "venue_guest_xp", title: "Venue Guest Experience" },
+  { id: "venue_maintenance", title: "Venue Maintenance" },
+  { id: "venue_growth", title: "Venue Growth" },
 ];
 
 export const BUSINESS_PLAN_DEFAULT_FOCUS: readonly string[] = [

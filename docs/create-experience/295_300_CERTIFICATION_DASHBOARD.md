@@ -24,15 +24,19 @@ Authority legend: **fully_create** · **prepare** · **user_provided** · **comp
 | `business.etsy` | **blocked** | 23 | 0 | 23 | 23 | 8 | 7 | 6 | 2 | 35 |
 | `business.handmade_online_store` | **blocked** | 36 | 0 | 36 | 36 | 8 | 17 | 9 | 2 | 48 |
 | `business.holiday_planner` | **blocked** | 21 | 0 | 21 | 21 | 3 | 13 | 3 | 2 | 33 |
+| `business.hospitality` | **blocked** | 19 | 0 | 19 | 19 | 8 | 3 | 6 | 2 | 31 |
 | `business.inventory_pricing` | **blocked** | 21 | 0 | 21 | 21 | 6 | 8 | 5 | 2 | 33 |
 | `business.membership` | **blocked** | 28 | 0 | 28 | 28 | 7 | 15 | 3 | 3 | 41 |
 | `business.product_based` | **blocked** | 29 | 0 | 29 | 29 | 7 | 14 | 6 | 2 | 41 |
 | `business.product_photography` | **blocked** | 21 | 0 | 21 | 21 | 5 | 9 | 4 | 3 | 33 |
 | `business.professional_organizing` | **blocked** | 29 | 0 | 29 | 29 | 7 | 12 | 7 | 3 | 41 |
+| `business.restaurant` | **blocked** | 21 | 0 | 21 | 21 | 7 | 6 | 6 | 2 | 33 |
 | `business.retail_store` | **blocked** | 24 | 0 | 24 | 24 | 6 | 5 | 9 | 4 | 37 |
 | `business.service` | **blocked** | 27 | 0 | 27 | 27 | 10 | 11 | 4 | 2 | 39 |
 | `business.speaker` | **blocked** | 27 | 0 | 27 | 27 | 6 | 14 | 5 | 2 | 39 |
 | `business.subscription_commerce` | **blocked** | 30 | 0 | 30 | 30 | 7 | 15 | 5 | 3 | 42 |
+| `business.travel_tourism` | **blocked** | 23 | 0 | 23 | 23 | 6 | 8 | 7 | 2 | 35 |
+| `business.venue_experience` | **blocked** | 21 | 0 | 21 | 21 | 9 | 5 | 5 | 2 | 33 |
 | `business.wholesale` | **blocked** | 29 | 0 | 29 | 29 | 8 | 11 | 8 | 2 | 41 |
 | `event.book_launch` | **blocked** | 46 | 0 | 46 | 46 | 13 | 29 | 3 | 1 | 58 |
 | `event.challenge` | **blocked** | 46 | 0 | 46 | 46 | 13 | 28 | 3 | 2 | 58 |
@@ -54,4 +58,4 @@ Authority legend: **fully_create** · **prepare** · **user_provided** · **comp
 | `retail.merchandising_promotions_cx` | **blocked** | 19 | 0 | 19 | 19 | 6 | 3 | 7 | 3 | 31 |
 | `retail.store_management` | **blocked** | 15 | 0 | 15 | 15 | 5 | 6 | 2 | 2 | 27 |
 
-**Pass:** 0 · **Blocked:** 44 · **Total:** 44
+**Pass:** 0 · **Blocked:** 48 · **Total:** 48

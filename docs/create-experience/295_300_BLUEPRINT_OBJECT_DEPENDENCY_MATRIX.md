@@ -363,6 +363,25 @@
 | `business.holiday_planner` | `create_artifact` | **prepare** | createability_destination | blocked | Marketing campaign outline |
 | `business.holiday_planner` | `create_artifact` | **prepare** | createability_destination | blocked | Event integration notes |
 | `business.holiday_planner` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
+| `business.hospitality` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `business.hospitality` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `business.hospitality` | `business` | **user_provided** | system_required | blocked | active_business |
+| `business.hospitality` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `business.hospitality` | `create_artifact` | **fully_create** | deliverable | blocked | Hospitality Operating Plan |
+| `business.hospitality` | `create_artifact` | **fully_create** | deliverable | blocked | Guest Journey Map |
+| `business.hospitality` | `template` | **fully_create** | deliverable | blocked | SOP Library |
+| `business.hospitality` | `dashboard` | **prepare** | deliverable | blocked | Revenue Dashboard |
+| `business.hospitality` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `business.hospitality` | `business` | **user_provided** | known_context | blocked | purpose |
+| `business.hospitality` | `business` | **user_provided** | known_context | blocked | vision |
+| `business.hospitality` | `client_avatar` | **user_provided** | known_context | blocked | audience |
+| `business.hospitality` | `client_avatar` | **user_provided** | known_context | blocked | customers |
+| `business.hospitality` | `client_avatar` | **user_provided** | known_context | blocked | clients |
+| `business.hospitality` | `create_artifact` | **fully_create** | createability_destination | blocked | Hospitality Operating Plan |
+| `business.hospitality` | `create_artifact` | **prepare** | createability_destination | blocked | Guest Journey Map |
+| `business.hospitality` | `template` | **prepare** | createability_destination | blocked | SOP Library |
+| `business.hospitality` | `dashboard` | **fully_create** | createability_destination | blocked | Revenue Dashboard |
+| `business.hospitality` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 | `business.inventory_pricing` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
 | `business.inventory_pricing` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
 | `business.inventory_pricing` | `business` | **user_provided** | system_required | blocked | active_business |
@@ -491,6 +510,27 @@
 | `business.professional_organizing` | `project` | **prepare** | createability_destination | blocked | Organizing Project Plan |
 | `business.professional_organizing` | `offer` | **prepare** | createability_destination | blocked | Maintenance Offer |
 | `business.professional_organizing` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
+| `business.restaurant` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `business.restaurant` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `business.restaurant` | `business` | **user_provided** | system_required | blocked | active_business |
+| `business.restaurant` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `business.restaurant` | `create_artifact` | **fully_create** | deliverable | blocked | Restaurant Operating Plan |
+| `business.restaurant` | `create_artifact` | **prepare** | deliverable | blocked | Menu Engineering Sheet |
+| `business.restaurant` | `create_artifact` | **prepare** | deliverable | blocked | Food Cost Model |
+| `business.restaurant` | `template` | **fully_create** | deliverable | blocked | Kitchen Workflow |
+| `business.restaurant` | `create_artifact` | **prepare** | deliverable | blocked | Food Safety Flags |
+| `business.restaurant` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `business.restaurant` | `business` | **user_provided** | known_context | blocked | purpose |
+| `business.restaurant` | `business` | **user_provided** | known_context | blocked | vision |
+| `business.restaurant` | `product` | **user_provided** | known_context | blocked | products |
+| `business.restaurant` | `offer` | **user_provided** | known_context | blocked | offers |
+| `business.restaurant` | `service` | **user_provided** | known_context | blocked | services |
+| `business.restaurant` | `create_artifact` | **fully_create** | createability_destination | blocked | Restaurant Operating Plan |
+| `business.restaurant` | `create_artifact` | **prepare** | createability_destination | blocked | Menu Engineering Sheet |
+| `business.restaurant` | `create_artifact` | **fully_create** | createability_destination | blocked | Food Cost Model |
+| `business.restaurant` | `template` | **prepare** | createability_destination | blocked | Kitchen Workflow |
+| `business.restaurant` | `create_artifact` | **prepare** | createability_destination | blocked | Food Safety Flags |
+| `business.restaurant` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 | `business.retail_store` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
 | `business.retail_store` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
 | `business.retail_store` | `business` | **user_provided** | system_required | blocked | active_business |
@@ -599,6 +639,50 @@
 | `business.subscription_commerce` | `create_artifact` | **prepare** | createability_destination | blocked | Retention Journey |
 | `business.subscription_commerce` | `dashboard` | **fully_create** | createability_destination | blocked | KPI Dashboard |
 | `business.subscription_commerce` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
+| `business.travel_tourism` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `business.travel_tourism` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `business.travel_tourism` | `business` | **user_provided** | system_required | blocked | active_business |
+| `business.travel_tourism` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `business.travel_tourism` | `create_artifact` | **fully_create** | deliverable | blocked | Travel Business Snapshot |
+| `business.travel_tourism` | `create_artifact` | **fully_create** | deliverable | blocked | Traveler Profile Map |
+| `business.travel_tourism` | `create_artifact` | **prepare** | deliverable | blocked | Signature Itinerary |
+| `business.travel_tourism` | `vendor_account` | **user_provided** | deliverable | blocked | Supplier Map |
+| `business.travel_tourism` | `template` | **fully_create** | deliverable | blocked | Booking Workflow |
+| `business.travel_tourism` | `risk` | **prepare** | deliverable | blocked | Risk Plan |
+| `business.travel_tourism` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `business.travel_tourism` | `business` | **user_provided** | known_context | blocked | purpose |
+| `business.travel_tourism` | `business` | **user_provided** | known_context | blocked | vision |
+| `business.travel_tourism` | `client_avatar` | **user_provided** | known_context | blocked | audience |
+| `business.travel_tourism` | `client_avatar` | **user_provided** | known_context | blocked | customers |
+| `business.travel_tourism` | `client_avatar` | **user_provided** | known_context | blocked | clients |
+| `business.travel_tourism` | `create_artifact` | **prepare** | createability_destination | blocked | Travel Business Snapshot |
+| `business.travel_tourism` | `create_artifact` | **prepare** | createability_destination | blocked | Traveler Profile Map |
+| `business.travel_tourism` | `create_artifact` | **prepare** | createability_destination | blocked | Signature Itinerary |
+| `business.travel_tourism` | `vendor_account` | **prepare** | createability_destination | blocked | Supplier Map |
+| `business.travel_tourism` | `template` | **prepare** | createability_destination | blocked | Booking Workflow |
+| `business.travel_tourism` | `risk` | **prepare** | createability_destination | blocked | Risk Plan |
+| `business.travel_tourism` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
+| `business.venue_experience` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
+| `business.venue_experience` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
+| `business.venue_experience` | `business` | **user_provided** | system_required | blocked | active_business |
+| `business.venue_experience` | `project` | **completed_elsewhere** | system_required | blocked | create_to_project_link |
+| `business.venue_experience` | `create_artifact` | **fully_create** | deliverable | blocked | Venue Operating Plan |
+| `business.venue_experience` | `create_artifact` | **fully_create** | deliverable | blocked | Capacity Plan |
+| `business.venue_experience` | `template` | **fully_create** | deliverable | blocked | Booking Workflow |
+| `business.venue_experience` | `vendor_account` | **user_provided** | deliverable | blocked | Vendor Rules |
+| `business.venue_experience` | `create_artifact` | **fully_create** | deliverable | blocked | Safety Ownership Map |
+| `business.venue_experience` | `create_artifact` | **fully_create** | deliverable | blocked | Revenue Stream Map |
+| `business.venue_experience` | `checklist` | **fully_create** | deliverable | blocked | Next actions list |
+| `business.venue_experience` | `business` | **user_provided** | known_context | blocked | purpose |
+| `business.venue_experience` | `business` | **user_provided** | known_context | blocked | vision |
+| `business.venue_experience` | `inventory_item` | **user_provided** | known_context | blocked | inventory |
+| `business.venue_experience` | `create_artifact` | **fully_create** | createability_destination | blocked | Venue Operating Plan |
+| `business.venue_experience` | `create_artifact` | **prepare** | createability_destination | blocked | Capacity Plan |
+| `business.venue_experience` | `template` | **prepare** | createability_destination | blocked | Booking Workflow |
+| `business.venue_experience` | `vendor_account` | **prepare** | createability_destination | blocked | Vendor Rules |
+| `business.venue_experience` | `create_artifact` | **prepare** | createability_destination | blocked | Safety Ownership Map |
+| `business.venue_experience` | `create_artifact` | **prepare** | createability_destination | blocked | Revenue Stream Map |
+| `business.venue_experience` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 | `business.wholesale` | `universal_work` | **fully_create** | system_required | blocked | canonical_universal_work |
 | `business.wholesale` | `create_artifact` | **fully_create** | system_required | blocked | create_artifact_sot |
 | `business.wholesale` | `business` | **user_provided** | system_required | blocked | active_business |
@@ -1291,4 +1375,4 @@
 | `retail.store_management` | `create_artifact` | **prepare** | createability_destination | blocked | Shift Handoff Guide |
 | `retail.store_management` | `checklist` | **completed_elsewhere** | createability_destination | blocked | Next actions list |
 
-**Rows:** 1285
+**Rows:** 1369

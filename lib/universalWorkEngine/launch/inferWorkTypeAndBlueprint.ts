@@ -30,13 +30,17 @@ import {
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  HOSPITALITY_BUSINESS_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+  RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
   RETAIL_STORE_BUSINESS_BLUEPRINT_ID,
   RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
   SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
+  TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
+  VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
   WHOLESALE_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
   STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
@@ -146,6 +150,14 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-wholesale": WHOLESALE_BUSINESS_BLUEPRINT_ID,
   "bp-wholesale-business": WHOLESALE_BUSINESS_BLUEPRINT_ID,
   "bp-subscription-commerce": SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
+  "bp-hospitality": HOSPITALITY_BUSINESS_BLUEPRINT_ID,
+  "bp-hospitality-business": HOSPITALITY_BUSINESS_BLUEPRINT_ID,
+  "bp-restaurant": RESTAURANT_BUSINESS_BLUEPRINT_ID,
+  "bp-restaurant-business": RESTAURANT_BUSINESS_BLUEPRINT_ID,
+  "bp-travel-tourism": TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
+  "bp-travel-business": TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
+  "bp-venue-experience": VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
+  "bp-venue-business": VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -272,6 +284,27 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     // Ecommerce after handmade/Etsy-specific patterns (those appear earlier)
     re: /\b(ecommerce(?:\s+business)?|e[\s-]?commerce(?:\s+business)?|online\s+store\s+business|dtc(?:\s+store|\s+business)?|shopify\s+(?:store|business)|business\.ecommerce)\b/i,
     blueprintId: ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Hospitality delivery before generic hospitality business; before Event retreat language
+    re: /\b(restaurant(?:\s+(?:and\s+food\s+service|business|blueprint))?|food\s+(?:truck|service)\s+business|café\s+business|cafe\s+business|bakery\s+business|catering\s+business|business\.restaurant)\b/i,
+    blueprintId: RESTAURANT_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(travel\s+(?:and\s+)?tourism(?:\s+business)?|tour\s+operator(?:\s+business)?|travel\s+agency(?:\s+business)?|tourism\s+business|business\.travel_tourism)\b/i,
+    blueprintId: TRAVEL_TOURISM_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(venue\s+(?:and\s+)?experience(?:\s+business)?|venue\s+business(?:\s+blueprint)?|experience\s+venue\s+business|business\.venue_experience)\b/i,
+    blueprintId: VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(hospitality(?:\s+business)?|hotel\s+business|bed\s+and\s+breakfast(?:\s+business)?|b\s*&\s*b\s+business|vacation\s+rental(?:\s+business)?|inn\s+business|business\.hospitality)\b/i,
+    blueprintId: HOSPITALITY_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {

@@ -138,7 +138,7 @@
 |-----------|--------------------------------|
 | `event_plan` | Workshop, webinar, retreat, conference, summit, launches, challenge, masterclass, fundraiser/gala, networking, luncheon, … |
 | `marketing_plan` | `marketing_plan.simple` |
-| `business_plan` | handmade/service/creator/organizing/retail packs · `business.ecommerce` · `business.product_based` · `business.wholesale` · `business.subscription_commerce` |
+| `business_plan` | handmade/service/creator/organizing/retail/commerce packs · `business.hospitality` · `business.restaurant` · `business.travel_tourism` · `business.venue_experience` |
 
 **Registry:** `lib/universalWorkEngine/blueprints/registry.ts`  
 **Target ID style (312):** `blueprint.event.workshop` (map via aliases; do not break current dotted IDs abruptly)
@@ -215,6 +215,7 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | **219–224** Professional Organizing Collection | `docs/create-experience/219_*`…`224_*` · runtime `organizingProfessionalCollectionDefinitions.ts` |
 | **225–228** Retail Collection | `docs/create-experience/225_*`…`228_*` · runtime `retailCollectionDefinitions.ts` |
 | **229–232** Product & Commerce | `docs/create-experience/229_*`…`232_*` · runtime `productCommerceCollectionDefinitions.ts` |
+| **237–240** Hospitality & Travel | `docs/create-experience/237_*`…`240_*` · runtime `hospitalityTravelCollectionDefinitions.ts` |
 | **273–278** Blueprint Profile Context Connection | `docs/create-experience/standards/273_*`…`278_*` · runtime `lib/universalWorkEngine/blueprints/profileContext/` · masters `273_278_*` |
 | **295–300** Master Shared Object Library | `docs/create-experience/standards/295_*`…`300_*` · runtime `lib/universalWorkEngine/blueprints/sharedObjects/` · masters `295_300_*` (distinct from Architecture v2 `300_*`) |
 | Navigation welcome docs | `docs/navigation/119–121` |

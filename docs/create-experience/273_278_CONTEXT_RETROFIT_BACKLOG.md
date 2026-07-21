@@ -45,7 +45,7 @@
 - `business.handmade_online_store` · active_business → `business.business_id` · wire_profile_load
 - `business.handmade_online_store` · purpose → `business.vision` · wire_profile_load
 - `business.handmade_online_store` · vision → `business.vision` · wire_profile_load
-- …and 105 more
+- …and 119 more
 
 ## high
 
@@ -80,22 +80,25 @@
 - `business.handmade_online_store` · audience → `client_avatar.description` · implement_prefill
 - `business.handmade_online_store` · customers → `client_avatar.description` · implement_prefill
 - `business.handmade_online_store` · pricing → `offer.description` · implement_prefill
+- `business.hospitality` · audience → `client_avatar.description` · implement_prefill
+- `business.hospitality` · customers → `client_avatar.description` · implement_prefill
+- `business.hospitality` · clients → `client_avatar.description` · implement_prefill
 - `business.membership` · membership → `offer.name` · implement_prefill
 - `business.membership` · member → `client_avatar.description` · implement_prefill
 - `business.membership` · fit → `client_avatar.description` · implement_prefill
 - `business.membership` · non_fit → `client_avatar.frustrations` · implement_prefill
 - `business.membership` · membership_model → `offer.description` · implement_prefill
 - `business.membership` · model → `offer.description` · implement_prefill
-- `business.product_based` · demand → `client_avatar.goals` · implement_prefill
-- `business.product_based` · validation → `client_avatar.goals` · implement_prefill
-- `business.product_based` · audience → `client_avatar.description` · implement_prefill
-- …and 36 more
+- …and 43 more
 
 ## moderate
 
 - `business.author` · author_identity → `business_dna.positioning` · suppress_repeat_question
+- `business.hospitality` · specialty → `business_dna.positioning` · suppress_repeat_question
 - `business.professional_organizing` · specialty → `business_dna.positioning` · suppress_repeat_question
+- `business.restaurant` · specialty → `business_dna.positioning` · suppress_repeat_question
 - `business.retail_store` · specialty → `business_dna.positioning` · suppress_repeat_question
+- `business.travel_tourism` · specialty → `business_dna.positioning` · suppress_repeat_question
 - `organizing.strategic_management` · strategy → `business_dna.positioning` · suppress_repeat_question
 
 ## low
@@ -140,4 +143,4 @@
 - `business.craft_show` · next_actions → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.ecommerce` · products → `product_or_service.name` · suppress_repeat_question
 - `business.ecommerce` · next_action → `blueprint_session.current_goal` · suppress_repeat_question
-- …and 227 more
+- …and 238 more

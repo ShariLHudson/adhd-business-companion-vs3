@@ -21,6 +21,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.etsy` — **Pricing and profitability view** → implement_structured
 - [ ] `business.handmade_online_store` — **Product and pricing sheet** → implement_structured
 - [ ] `business.holiday_planner` — **Seasonal inventory targets** → label_draft_only
+- [ ] `business.hospitality` — **Revenue Dashboard** → implement_structured
 - [ ] `business.inventory_pricing` — **Inventory and Pricing Plan** → implement_structured
 - [ ] `business.inventory_pricing` — **Cost of goods sheet** → implement_structured
 - [ ] `business.inventory_pricing` — **Pricing sheet** → implement_structured
@@ -29,6 +30,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.membership` — **Membership Health Dashboard** → implement_structured
 - [ ] `business.product_based` — **Cost and Pricing Architecture** → implement_structured
 - [ ] `business.professional_organizing` — **Pricing Model** → implement_structured
+- [ ] `business.restaurant` — **Food Cost Model** → implement_structured
 - [ ] `business.retail_store` — **Financial Model** → implement_structured
 - [ ] `business.service` — **Pricing Calculator** → implement_structured
 - [ ] `business.subscription_commerce` — **KPI Dashboard** → implement_structured
@@ -73,18 +75,23 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.handmade_online_store` — **Launch / promotion outline** → label_draft_only
 - [ ] `business.holiday_planner` — **Holiday Product Plan** → label_draft_only
 - [ ] `business.holiday_planner` — **Launch timeline** → label_draft_only
+- [ ] `business.hospitality` — **Hospitality Operating Plan** → implement_composed
 - [ ] `business.membership` — **Membership Business Plan** → label_draft_only
 - [ ] `business.product_based` — **Validation Plan** → label_draft_only
 - [ ] `business.product_based` — **Launch Plan** → label_draft_only
 - [ ] `business.product_photography` — **Product Photography Plan** → connect_destination
 - [ ] `business.professional_organizing` — **Professional Organizing Business Plan** → label_draft_only
 - [ ] `business.professional_organizing` — **Organizing Project Plan** → label_draft_only
+- [ ] `business.restaurant` — **Restaurant Operating Plan** → implement_composed
 - [ ] `business.retail_store` — **Assortment Plan** → label_draft_only
 - [ ] `business.retail_store` — **Launch Roadmap** → label_draft_only
 - [ ] `business.service` — **Service Business Operating Plan** → implement_composed
 - [ ] `business.speaker` — **Speaker Business Plan** → label_draft_only
 - [ ] `business.speaker` — **Speaker Preparation Plan** → label_draft_only
 - [ ] `business.subscription_commerce` — **Acquisition Plan** → label_draft_only
+- [ ] `business.travel_tourism` — **Risk Plan** → label_draft_only
+- [ ] `business.venue_experience` — **Venue Operating Plan** → implement_composed
+- [ ] `business.venue_experience` — **Capacity Plan** → label_draft_only
 - [ ] `business.wholesale` — **Sales Plan** → label_draft_only
 - [ ] `event.book_launch` — **Concise Book Launch Plan** → label_draft_only
 - [ ] `event.book_launch` — **Complete Book Launch Plan** → label_draft_only
@@ -323,6 +330,9 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.holiday_planner` — **Marketing campaign outline** → label_draft_only
 - [ ] `business.holiday_planner` — **Event integration notes** → label_draft_only
 - [ ] `business.holiday_planner` — **Next actions list** → connect_destination
+- [ ] `business.hospitality` — **Guest Journey Map** → label_draft_only
+- [ ] `business.hospitality` — **SOP Library** → label_draft_only
+- [ ] `business.hospitality` — **Next actions list** → connect_destination
 - [ ] `business.inventory_pricing` — **Margin targets** → label_draft_only
 - [ ] `business.inventory_pricing` — **Reorder point notes** → label_draft_only
 - [ ] `business.inventory_pricing` — **Next actions list** → connect_destination
@@ -350,6 +360,10 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.professional_organizing` — **Organizing Assessment** → label_draft_only
 - [ ] `business.professional_organizing` — **Maintenance Offer** → label_draft_only
 - [ ] `business.professional_organizing` — **Next actions list** → connect_destination
+- [ ] `business.restaurant` — **Menu Engineering Sheet** → label_draft_only
+- [ ] `business.restaurant` — **Kitchen Workflow** → label_draft_only
+- [ ] `business.restaurant` — **Food Safety Flags** → label_draft_only
+- [ ] `business.restaurant` — **Next actions list** → connect_destination
 - [ ] `business.retail_store` — **Retail Business Snapshot** → label_draft_only
 - [ ] `business.retail_store` — **Operating Calendar** → implement_composed
 - [ ] `business.retail_store` — **Next actions list** → connect_destination
@@ -376,6 +390,17 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.subscription_commerce` — **Recurring Fulfillment Workflow** → label_draft_only
 - [ ] `business.subscription_commerce` — **Retention Journey** → label_draft_only
 - [ ] `business.subscription_commerce` — **Next actions list** → connect_destination
+- [ ] `business.travel_tourism` — **Travel Business Snapshot** → label_draft_only
+- [ ] `business.travel_tourism` — **Traveler Profile Map** → label_draft_only
+- [ ] `business.travel_tourism` — **Signature Itinerary** → label_draft_only
+- [ ] `business.travel_tourism` — **Supplier Map** → label_draft_only
+- [ ] `business.travel_tourism` — **Booking Workflow** → label_draft_only
+- [ ] `business.travel_tourism` — **Next actions list** → connect_destination
+- [ ] `business.venue_experience` — **Booking Workflow** → label_draft_only
+- [ ] `business.venue_experience` — **Vendor Rules** → label_draft_only
+- [ ] `business.venue_experience` — **Safety Ownership Map** → label_draft_only
+- [ ] `business.venue_experience` — **Revenue Stream Map** → label_draft_only
+- [ ] `business.venue_experience` — **Next actions list** → connect_destination
 - [ ] `business.wholesale` — **Wholesale Readiness Assessment** → label_draft_only
 - [ ] `business.wholesale` — **Account Segment Map** → label_draft_only
 - [ ] `business.wholesale` — **Wholesale Price List and Terms** → label_draft_only

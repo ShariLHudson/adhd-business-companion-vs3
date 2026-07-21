@@ -20,15 +20,19 @@
 | `business.etsy` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.handmade_online_store` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.holiday_planner` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
+| `business.hospitality` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.inventory_pricing` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.membership` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.product_based` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 22 |
 | `business.product_photography` | 1.0.0 | **blocked** | 6 | 0 | 6 | 6 | 16 |
 | `business.professional_organizing` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
+| `business.restaurant` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `business.retail_store` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 22 |
 | `business.service` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.speaker` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `business.subscription_commerce` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
+| `business.travel_tourism` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
+| `business.venue_experience` | 1.0.0 | **blocked** | 8 | 0 | 8 | 8 | 18 |
 | `business.wholesale` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 21 |
 | `event.book_launch` | 1.0.0 | **blocked** | 14 | 0 | 14 | 14 | 24 |
 | `event.challenge` | 1.0.0 | **blocked** | 13 | 0 | 13 | 13 | 23 |
@@ -50,6 +54,6 @@
 | `retail.merchandising_promotions_cx` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 | `retail.store_management` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 19 |
 
-**Pass:** 0 · **Blocked:** 44 · **Total:** 44
+**Pass:** 0 · **Blocked:** 48 · **Total:** 48
 
 Production rule: Createability **and** Context Connection must both pass.

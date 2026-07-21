@@ -49,6 +49,9 @@
 | critical | `business.handmade_online_store` | channels | `business.channels` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.holiday_planner` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.holiday_planner` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.hospitality` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.hospitality` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.hospitality` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.inventory_pricing` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.inventory_pricing` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.inventory_pricing` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
@@ -66,6 +69,9 @@
 | critical | `business.professional_organizing` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.professional_organizing` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.professional_organizing` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.restaurant` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.restaurant` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.restaurant` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.retail_store` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.retail_store` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.retail_store` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
@@ -80,6 +86,14 @@
 | critical | `business.subscription_commerce` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.subscription_commerce` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.subscription_commerce` | constraints | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.travel_tourism` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.travel_tourism` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.travel_tourism` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.venue_experience` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.venue_experience` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.venue_experience` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.venue_experience` | space | `business.location` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.venue_experience` | constraints | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.wholesale` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.wholesale` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.wholesale` | constraints | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
@@ -181,6 +195,9 @@
 | high | `business.handmade_online_store` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.handmade_online_store` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.handmade_online_store` | pricing | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.hospitality` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.hospitality` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.hospitality` | clients | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.membership` | membership | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.membership` | member | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.membership` | fit | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -194,6 +211,7 @@
 | high | `business.professional_organizing` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.professional_organizing` | payers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.professional_organizing` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.restaurant` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.retail_store` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.retail_store` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.retail_store` | clients | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -206,6 +224,9 @@
 | high | `business.subscription_commerce` | membership_model | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.subscription_commerce` | delivery | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.subscription_commerce` | pricing | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.travel_tourism` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.travel_tourism` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.travel_tourism` | clients | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.wholesale` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.wholesale` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.wholesale` | pricing | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -227,8 +248,11 @@
 | high | `retail.merchandising_promotions_cx` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `retail.merchandising_promotions_cx` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | moderate | `business.author` | author_identity | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| moderate | `business.hospitality` | specialty | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | moderate | `business.professional_organizing` | specialty | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| moderate | `business.restaurant` | specialty | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | moderate | `business.retail_store` | specialty | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| moderate | `business.travel_tourism` | specialty | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | moderate | `organizing.strategic_management` | strategy | `business_dna.positioning` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `bp-event-book-signing` | book_title | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `bp-event-book-signing` | inventory | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -286,6 +310,8 @@
 | low | `business.holiday_planner` | launch | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.holiday_planner` | timeline | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.holiday_planner` | next_actions | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.hospitality` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.hospitality` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.inventory_pricing` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.inventory_pricing` | cost_of_goods | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.inventory_pricing` | materials | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -304,6 +330,10 @@
 | low | `business.professional_organizing` | services | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.professional_organizing` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.professional_organizing` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.restaurant` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.restaurant` | services | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.restaurant` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.restaurant` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.retail_store` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.retail_store` | services | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.retail_store` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -322,6 +352,11 @@
 | low | `business.speaker` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.subscription_commerce` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.subscription_commerce` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.travel_tourism` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.travel_tourism` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.venue_experience` | inventory | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.venue_experience` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.venue_experience` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.wholesale` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.wholesale` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `event.book_launch` | author_goals | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -498,4 +533,4 @@
 | low | `retail.store_management` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `retail.store_management` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 
-**Open gaps:** 492
+**Open gaps:** 527

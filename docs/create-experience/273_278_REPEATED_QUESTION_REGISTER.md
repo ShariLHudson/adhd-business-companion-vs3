@@ -67,6 +67,9 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.holiday_planner` | `q_production` | production, schedule | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.holiday_planner` | `q_launch` | launch, timeline | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.holiday_planner` | `q_next` | next_actions | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.hospitality` | `q_property` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.hospitality` | `q_guests` | audience, customers, clients | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.hospitality` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_vision` | purpose, vision | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_products` | products | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_cogs` | cost_of_goods, materials | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -88,6 +91,9 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.professional_organizing` | `q_clients` | clients, audience, payers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.professional_organizing` | `q_services` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.professional_organizing` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.restaurant` | `q_concept` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.restaurant` | `q_menu` | products, offers, services | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.restaurant` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.retail_store` | `q_concept` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.retail_store` | `q_customers` | audience, customers, clients | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.retail_store` | `q_assortment` | products, offers, services | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -104,6 +110,12 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.subscription_commerce` | `q_model` | model, membership_model, delivery | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.subscription_commerce` | `q_economics` | pricing, constraints | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.subscription_commerce` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.travel_tourism` | `q_travel` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.travel_tourism` | `q_travelers` | audience, customers, clients | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.travel_tourism` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.venue_experience` | `q_venue` | purpose, vision, space | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.venue_experience` | `q_capacity` | constraints, inventory | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.venue_experience` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.wholesale` | `q_readiness` | purpose, constraints, stage | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.wholesale` | `q_accounts` | audience, customers, channels | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.wholesale` | `q_terms` | pricing, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -220,4 +232,4 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `retail.store_management` | `q_roles` | roles, owners, handoffs | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `retail.store_management` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 
-**At-risk questions:** 212
+**At-risk questions:** 224

@@ -137,6 +137,15 @@
 | `business.holiday_planner` | launch | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.holiday_planner` | timeline | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.holiday_planner` | next_actions | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.hospitality` | active_business | `business.business_id` | business | blocked |
+| `business.hospitality` | purpose | `business.vision` | business | blocked |
+| `business.hospitality` | vision | `business.vision` | business | blocked |
+| `business.hospitality` | specialty | `business_dna.positioning` | business_dna | blocked |
+| `business.hospitality` | audience | `client_avatar.description` | client_avatar | blocked |
+| `business.hospitality` | customers | `client_avatar.description` | client_avatar | blocked |
+| `business.hospitality` | clients | `client_avatar.description` | client_avatar | blocked |
+| `business.hospitality` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.hospitality` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.inventory_pricing` | active_business | `business.business_id` | business | blocked |
 | `business.inventory_pricing` | purpose | `business.vision` | business | blocked |
 | `business.inventory_pricing` | vision | `business.vision` | business | blocked |
@@ -186,6 +195,15 @@
 | `business.professional_organizing` | offers | `offer.name` | offer | blocked |
 | `business.professional_organizing` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.professional_organizing` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.restaurant` | active_business | `business.business_id` | business | blocked |
+| `business.restaurant` | purpose | `business.vision` | business | blocked |
+| `business.restaurant` | vision | `business.vision` | business | blocked |
+| `business.restaurant` | specialty | `business_dna.positioning` | business_dna | blocked |
+| `business.restaurant` | products | `product_or_service.name` | product_or_service | blocked |
+| `business.restaurant` | offers | `offer.name` | offer | blocked |
+| `business.restaurant` | services | `product_or_service.name` | product_or_service | blocked |
+| `business.restaurant` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.restaurant` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.retail_store` | active_business | `business.business_id` | business | blocked |
 | `business.retail_store` | purpose | `business.vision` | business | blocked |
 | `business.retail_store` | vision | `business.vision` | business | blocked |
@@ -231,6 +249,23 @@
 | `business.subscription_commerce` | constraints | `business.constraints` | business | blocked |
 | `business.subscription_commerce` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.subscription_commerce` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.travel_tourism` | active_business | `business.business_id` | business | blocked |
+| `business.travel_tourism` | purpose | `business.vision` | business | blocked |
+| `business.travel_tourism` | vision | `business.vision` | business | blocked |
+| `business.travel_tourism` | specialty | `business_dna.positioning` | business_dna | blocked |
+| `business.travel_tourism` | audience | `client_avatar.description` | client_avatar | blocked |
+| `business.travel_tourism` | customers | `client_avatar.description` | client_avatar | blocked |
+| `business.travel_tourism` | clients | `client_avatar.description` | client_avatar | blocked |
+| `business.travel_tourism` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.travel_tourism` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.venue_experience` | active_business | `business.business_id` | business | blocked |
+| `business.venue_experience` | purpose | `business.vision` | business | blocked |
+| `business.venue_experience` | vision | `business.vision` | business | blocked |
+| `business.venue_experience` | space | `business.location` | business | blocked |
+| `business.venue_experience` | constraints | `business.constraints` | business | blocked |
+| `business.venue_experience` | inventory | `product_or_service.name` | product_or_service | blocked |
+| `business.venue_experience` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.venue_experience` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.wholesale` | active_business | `business.business_id` | business | blocked |
 | `business.wholesale` | purpose | `business.vision` | business | blocked |
 | `business.wholesale` | constraints | `business.constraints` | business | blocked |
@@ -498,4 +533,4 @@
 | `retail.store_management` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `retail.store_management` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 
-**Rows:** 492
+**Rows:** 527

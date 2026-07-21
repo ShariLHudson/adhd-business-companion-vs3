@@ -1,5 +1,5 @@
 /**
- * Business Plan map groups — schema config only (201–232).
+ * Business Plan map groups — schema config only (201–240).
  */
 
 import type { BlueprintGroup } from "../../blueprints/types";
@@ -498,10 +498,81 @@ export const BUSINESS_PLAN_MAP_GROUPS: readonly BlueprintGroup[] = [
     ],
   },
   {
+    groupId: "hospitality_business",
+    title: "Hospitality Business",
+    description: "Guests, reservations, journey, housekeeping, and recovery.",
+    order: 27,
+    collapsedByDefault: true,
+    sectionIds: [
+      "hosp_guest_personas",
+      "hosp_reservations",
+      "hosp_guest_journey",
+      "hosp_housekeeping",
+      "hosp_staffing",
+      "hosp_service_partners",
+      "hosp_guest_recovery",
+      "hosp_kpis",
+    ],
+  },
+  {
+    groupId: "restaurant_food_service",
+    title: "Restaurant and Food Service",
+    description: "Menu, kitchen, FOH, vendors, safety, and financials.",
+    order: 28,
+    collapsedByDefault: true,
+    sectionIds: [
+      "rest_menu",
+      "rest_kitchen",
+      "rest_foh",
+      "rest_staffing",
+      "rest_vendors",
+      "rest_food_safety",
+      "rest_marketing",
+      "rest_financials",
+    ],
+  },
+  {
+    groupId: "travel_tourism_business",
+    title: "Travel and Tourism",
+    description: "Travelers, itineraries, suppliers, bookings, and risk.",
+    order: 29,
+    collapsedByDefault: true,
+    sectionIds: [
+      "travel_profiles",
+      "travel_itinerary",
+      "travel_suppliers",
+      "travel_bookings",
+      "travel_risk",
+      "travel_cx",
+      "travel_partnerships",
+      "travel_seasonal",
+      "travel_operations",
+      "travel_kpis",
+    ],
+  },
+  {
+    groupId: "venue_experience_business",
+    title: "Venue and Experience",
+    description: "Capacity, bookings, coordination, safety, and revenue.",
+    order: 30,
+    collapsedByDefault: true,
+    sectionIds: [
+      "venue_capacity",
+      "venue_bookings",
+      "venue_event_coord",
+      "venue_vendors",
+      "venue_safety",
+      "venue_revenue",
+      "venue_guest_xp",
+      "venue_maintenance",
+      "venue_growth",
+    ],
+  },
+  {
     groupId: "stewardship",
     title: "Money and Stewardship",
     description: "Profit, taxes, analytics, linked work, and review.",
-    order: 27,
+    order: 31,
     collapsedByDefault: true,
     sectionIds: [
       "expenses_taxes",
