@@ -108,24 +108,9 @@ export function CreateEstateWorkingPanel({
   /** 076_017 — brief durable ack only after verified save (never LS-only). */
   const [lastDurableOk, setLastDurableOk] = useState<boolean | null>(null);
   const wasSubmittingRef = useRef(false);
-
-  useEffect(() => {
-    if (focusSubmitting) {
-      wasSubmittingRef.current = true;
-      setLastDurableOk(null);
-      return;
-    }
-    if (wasSubmittingRef.current) {
-      wasSubmittingRef.current = false;
-      if (focusFailure?.trim()) {
-        setLastDurableOk(false);
-      } else {
-        setLastDurableOk(true);
-        const clear = window.setTimeout(() => setLastDurableOk(null), 4000);
-        return () => window.clearTimeout(clear);
-      }
-    }
-  }, [focusSubmitting, focusFailure]);
+  /** Focus id at submit start — owns preserved failure text after async save. */
+  const submittingFocusIdRef = useRef<string | null>(null);
+  const failedFocusIdRef = useRef<string | null>(null);
 
   const activeSectionContent =
     workflow.activeSectionId && workflow.sectionContent
@@ -148,6 +133,42 @@ export function CreateEstateWorkingPanel({
       workflow.selectedTypeLabel,
     ],
   );
+
+  useEffect(() => {
+    if (focusSubmitting) {
+      wasSubmittingRef.current = true;
+      setLastDurableOk(null);
+      return;
+    }
+    if (wasSubmittingRef.current) {
+      wasSubmittingRef.current = false;
+      if (focusFailure?.trim()) {
+        setLastDurableOk(false);
+      } else {
+        setLastDurableOk(true);
+        const clear = window.setTimeout(() => setLastDurableOk(null), 4000);
+        return () => window.clearTimeout(clear);
+      }
+    }
+  }, [focusSubmitting, focusFailure]);
+
+  // Lock failure ownership to the Focus that was submitting — not the map target.
+  useEffect(() => {
+    if (focusSubmitting && canonicalFocus?.focusId) {
+      submittingFocusIdRef.current = canonicalFocus.focusId;
+    }
+  }, [focusSubmitting, canonicalFocus?.focusId]);
+
+  useEffect(() => {
+    if (focusFailure && preservedResponse) {
+      if (!failedFocusIdRef.current) {
+        failedFocusIdRef.current =
+          submittingFocusIdRef.current ?? canonicalFocus?.focusId ?? null;
+      }
+    } else if (!focusFailure) {
+      failedFocusIdRef.current = null;
+    }
+  }, [focusFailure, preservedResponse, canonicalFocus?.focusId]);
 
   const [localGuidance, setLocalGuidance] = useState<string | null>(null);
   const guidance = focusGuidance ?? localGuidance;
@@ -391,7 +412,9 @@ export function CreateEstateWorkingPanel({
               lastDurableOk={lastDurableOk}
               initialResponse={preservedResponse}
               failedFocusId={
-                focusFailure && preservedResponse ? canonicalFocus.focusId : null
+                focusFailure && preservedResponse
+                  ? failedFocusIdRef.current
+                  : null
               }
               onSubmit={(response) => {
                 setLocalGuidance(null);

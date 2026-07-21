@@ -65,6 +65,11 @@ export {
 } from "./resolveCanonicalFocus";
 
 export {
+  resolveSectionEditorSeed,
+  sectionEditorContentKey,
+} from "./sectionEditorContent";
+
+export {
   ideasGuidanceForFocus,
   submitCurrentFocusResponse,
 } from "./submitCurrentFocusResponse";

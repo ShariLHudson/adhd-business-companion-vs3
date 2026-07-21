@@ -4,6 +4,10 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { CreationSaveStateBadge } from "@/components/companion/CreationSaveStateBadge";
 import type { CanonicalCurrentFocus } from "@/lib/currentFocus";
 import {
+  resolveSectionEditorSeed,
+  sectionEditorContentKey,
+} from "@/lib/currentFocus/sectionEditorContent";
+import {
   clearFocusRecoveryBuffer,
   readFocusRecoveryBuffer,
   resolveCreationSaveState,
@@ -37,8 +41,7 @@ type Props = {
 
 /**
  * 066 / 098 — Sole Creation response control inside Current Focus.
- * One primary decision while writing: save this section.
- * Secondary assistance lives behind progressive disclosure (T-003 max 3 choices).
+ * Editor is bound per workId + sectionId — never a shared draft buffer.
  */
 export function CurrentFocusInteraction({
   focus,
@@ -58,34 +61,42 @@ export function CurrentFocusInteraction({
   onRetry,
   saveStateOverride = null,
 }: Props) {
-  const recovered =
-    typeof window !== "undefined"
-      ? readFocusRecoveryBuffer(focus.creationId, focus.focusId)
-      : null;
-  const seedContent = () =>
-    recovered ?? focus.savedContent?.trim() ?? "";
-  const [draft, setDraft] = useState(seedContent);
+  const contentKey = sectionEditorContentKey(focus);
+  const [draft, setDraft] = useState(() => resolveSectionEditorSeed(focus));
   const [localLocked, setLocalLocked] = useState(false);
-  const [recoveredOnce, setRecoveredOnce] = useState(() => Boolean(recovered));
+  const [recoveredOnce, setRecoveredOnce] = useState(() =>
+    Boolean(
+      typeof window !== "undefined" &&
+        readFocusRecoveryBuffer(focus.creationId, focus.focusId),
+    ),
+  );
   const [assistOpen, setAssistOpen] = useState(false);
-  const focusIdRef = useRef(focus.focusId);
+  const contentKeyRef = useRef(contentKey);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const autosaveTimer = useRef<number | null>(null);
+  /** Ignore autosave until after a section bind reset commits. */
+  const bindGenerationRef = useRef(0);
 
-  // Synchronous reset when focus advances (before paint — no leftover prior section)
-  if (focusIdRef.current !== focus.focusId) {
-    focusIdRef.current = focus.focusId;
-    const nextRecovered =
-      typeof window !== "undefined"
-        ? readFocusRecoveryBuffer(focus.creationId, focus.focusId)
-        : null;
-    setDraft(nextRecovered ?? focus.savedContent?.trim() ?? "");
-    setRecoveredOnce(Boolean(nextRecovered));
+  // Rebind only when workId+sectionId changes — never carry prior section draft.
+  useLayoutEffect(() => {
+    contentKeyRef.current = contentKey;
+    bindGenerationRef.current += 1;
+
+    const seed = resolveSectionEditorSeed(focus);
+    setDraft(seed);
+    setRecoveredOnce(
+      Boolean(readFocusRecoveryBuffer(focus.creationId, focus.focusId)),
+    );
     setAssistOpen(false);
-    if (localLocked) {
-      setLocalLocked(false);
+    setLocalLocked(false);
+
+    if (autosaveTimer.current) {
+      window.clearTimeout(autosaveTimer.current);
+      autosaveTimer.current = null;
     }
-  }
+    // focus fields are read when contentKey changes (section switch / remount).
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: identity key only
+  }, [contentKey]);
 
   useLayoutEffect(() => {
     if (failureMessage && failedFocusId === focus.focusId) {
@@ -109,13 +120,25 @@ export function CurrentFocusInteraction({
 
   useEffect(() => {
     if (localLocked || submitting) return;
+    const generation = bindGenerationRef.current;
+    const boundFocusId = focus.focusId;
+    const boundCreationId = focus.creationId;
+    const boundKey = contentKey;
+
     if (autosaveTimer.current) {
       window.clearTimeout(autosaveTimer.current);
     }
     autosaveTimer.current = window.setTimeout(() => {
+      // Drop stale writes if the member already switched sections.
+      if (
+        bindGenerationRef.current !== generation ||
+        contentKeyRef.current !== boundKey
+      ) {
+        return;
+      }
       writeFocusRecoveryBuffer({
-        creationId: focus.creationId,
-        focusId: focus.focusId,
+        creationId: boundCreationId,
+        focusId: boundFocusId,
         text: draft,
       });
       if (draft.trim()) setRecoveredOnce(true);
@@ -127,6 +150,7 @@ export function CurrentFocusInteraction({
     };
   }, [
     draft,
+    contentKey,
     focus.creationId,
     focus.focusId,
     localLocked,
@@ -137,7 +161,7 @@ export function CurrentFocusInteraction({
     if (!localLocked && !submitting && !draft) {
       textareaRef.current?.focus();
     }
-  }, [focus.focusId, localLocked, submitting, draft]);
+  }, [contentKey, localLocked, submitting, draft]);
 
   const locked = Boolean(submitting) || localLocked;
   const saveState =
@@ -166,6 +190,8 @@ export function CurrentFocusInteraction({
       data-testid="current-focus-interaction"
       data-focus-id={focus.focusId}
       data-creation-id={focus.creationId}
+      data-section-id={focus.sectionId ?? undefined}
+      data-content-key={contentKey}
       data-focus-locked={locked ? "true" : "false"}
       data-section-mode="writing"
     >
@@ -187,7 +213,7 @@ export function CurrentFocusInteraction({
       </p>
 
       <textarea
-        key={`${focus.creationId}:${focus.sectionId ?? focus.focusId}`}
+        key={contentKey}
         ref={textareaRef}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
@@ -197,6 +223,7 @@ export function CurrentFocusInteraction({
         className="w-full resize-y rounded-xl border border-[#cfc6b8] bg-white px-3 py-3 text-base leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#8a7a68] focus:outline-none focus:ring-2 focus:ring-[#c4b8a8]/50"
         data-testid="current-focus-response"
         data-section-id={focus.sectionId ?? undefined}
+        data-content-key={contentKey}
         data-initial-empty={draft === "" ? "true" : "false"}
         aria-label={`Writing ${focus.title}`}
       />

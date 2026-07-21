@@ -45,6 +45,8 @@ function focusFromEventRecord(
   if (!isEventFoundationReady(record)) {
     const q = nextFoundationQuestion(record);
     if (!q) return null;
+    const sectionSaved =
+      record.sections.find((s) => s.id === q.sectionId)?.content ?? "";
     return {
       focusId: q.id,
       creationId: record.id,
@@ -63,6 +65,7 @@ function focusFromEventRecord(
       contextVersion: version,
       sectionId: q.sectionId,
       assetTypeId: null,
+      savedContent: sectionSaved,
       // One guidance line only — never repeat purpose/prompt.
       introductoryGuidance: `We'll take this one decision at a time. Your answer stays with this ${noun}.`,
     };
@@ -79,6 +82,10 @@ function focusFromEventRecord(
   const action =
     packFocus.actionLabel?.trim() ||
     `Continue with ${packFocus.title}`;
+  const packSectionId = packFocus.sectionId ?? null;
+  const packSaved = packSectionId
+    ? (record.sections.find((s) => s.id === packSectionId)?.content ?? "")
+    : "";
   return {
     focusId,
     creationId: record.id,
@@ -91,8 +98,9 @@ function focusFromEventRecord(
     completionCriteria: packFocus.actionLabel || "Continue",
     nextTransition: "next_recommendation",
     contextVersion: version,
-    sectionId: packFocus.sectionId ?? null,
+    sectionId: packSectionId,
     assetTypeId: packFocus.assetTypeId ?? null,
+    savedContent: packSaved,
     introductoryGuidance: null,
   };
 }
@@ -185,6 +193,7 @@ function focusFromRuntimeRecord(
     contextVersion: version,
     sectionId: next.id,
     assetTypeId: null,
+    savedContent: next.content ?? "",
     introductoryGuidance:
       "Answer here — your work stays in this workspace.",
   };
@@ -241,8 +250,7 @@ function focusFromActiveSection(
     sectionId: section.id,
     assetTypeId: null,
     savedContent: section.content,
-    introductoryGuidance:
-      "Opened from your Full Workshop Map. Your work stays with this section.",
+    introductoryGuidance: null,
   };
 }
 

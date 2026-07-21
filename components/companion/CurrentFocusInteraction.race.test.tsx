@@ -12,6 +12,7 @@ import type { CanonicalCurrentFocus } from "@/lib/currentFocus";
 function makeFocus(
   focusId: string,
   prompt: string,
+  savedContent: string = "",
 ): CanonicalCurrentFocus {
   return {
     focusId,
@@ -27,6 +28,7 @@ function makeFocus(
     contextVersion: 1,
     sectionId: focusId.replace("section:", ""),
     introductoryGuidance: null,
+    savedContent,
   };
 }
 
@@ -131,6 +133,55 @@ describe("Current Focus textarea race", () => {
     );
     expect(box().value).not.toMatch(/weekly plan|actually stick/i);
     expect(box().value).not.toMatch(/wilHalf/i);
+  });
+
+  it("section switch loads that section's savedContent or empty — never prior section text", () => {
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+
+    const intro = makeFocus("section:intro", "Introduction?", "Intro words");
+    act(() => {
+      root.render(
+        <CurrentFocusInteraction
+          key={`${intro.creationId}:${intro.sectionId}`}
+          focus={intro}
+          guidance={null}
+          failureMessage={null}
+          submitting={false}
+          onSubmit={() => {}}
+          onIdeas={() => {}}
+          onUnsure={() => {}}
+        />,
+      );
+    });
+
+    const box = () =>
+      container.querySelector(
+        "[data-testid='current-focus-response']",
+      ) as HTMLTextAreaElement;
+
+    expect(box().value).toBe("Intro words");
+
+    const main = makeFocus("section:main", "Main Content?", "");
+    act(() => {
+      root.render(
+        <CurrentFocusInteraction
+          key={`${main.creationId}:${main.sectionId}`}
+          focus={main}
+          guidance={null}
+          failureMessage={null}
+          submitting={false}
+          onSubmit={() => {}}
+          onIdeas={() => {}}
+          onUnsure={() => {}}
+        />,
+      );
+    });
+
+    expect(box().value).toBe("");
+    expect(box().value).not.toBe("Intro words");
+    expect(box().getAttribute("data-content-key")).toBe("ws-race-1::main");
   });
 
   it("does not restore a prior failed answer onto the next focus", () => {
