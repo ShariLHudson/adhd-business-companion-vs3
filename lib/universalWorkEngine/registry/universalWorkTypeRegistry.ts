@@ -70,6 +70,15 @@ export function resolveWorkTypeIdFromMemberLabel(
   if (/\bsop\b|standard operating/.test(t)) return "sop";
   if (/checklist/.test(t)) return "checklist";
   if (/proposal/.test(t)) return "proposal";
+  if (
+    /\b(craft\s+show\s+(?:business|blueprint)|handmade|maker\s+business|etsy\s+(?:shop|store)|art\s+fair\s+business)\b/.test(
+      t,
+    ) ||
+    (t.includes("business plan") &&
+      /\b(craft|handmade|maker|show|store|etsy)\b/.test(t))
+  ) {
+    return "business_plan";
+  }
   if (/marketing/.test(t)) return "marketing_plan";
   if (t === "cert probe" || t === "cert_probe") return "cert_probe";
   return null;

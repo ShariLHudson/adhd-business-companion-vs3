@@ -9,6 +9,7 @@ import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform";
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
+import { isBusinessPlanCreationRequest } from "@/lib/universalWorkEngine/packages/businessPlan/isBusinessPlanCreationRequest";
 import { isVisualStructureExecution } from "@/lib/visualStructureRouting";
 import { shouldOfferVisualThinkingRecommendation } from "@/lib/visualThinkingOverreach";
 import { pluginById } from "./documentRegistry";
@@ -95,6 +96,8 @@ export function isSimpleCreateRequest(userText: string): boolean {
   if (isEventDomainCreationRequest(t)) return false;
   // 105 — Marketing Plan Work Type → UWE, never document fast-path
   if (isMarketingPlanCreationRequest(t)) return false;
+  // 201–202 — Business Plan Work Type (crafter blueprints) → UWE, never document fast-path
+  if (isBusinessPlanCreationRequest(t)) return false;
   // CB-022 addendum — strategy ≠ document create.
   if (isStrategyCreateOrLibraryRequest(t)) return false;
   if (SIMPLE_CREATE_VERB_RE.test(t)) return true;

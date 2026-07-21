@@ -36,3 +36,8 @@ export {
   MARKETING_PLAN_DEFAULT_FOCUS,
   MARKETING_PLAN_WORK_TYPE_ID,
 } from "./schemas/marketingPlanMap";
+export {
+  BUSINESS_PLAN_MAP_SECTIONS,
+  BUSINESS_PLAN_DEFAULT_FOCUS,
+  BUSINESS_PLAN_WORK_TYPE_ID,
+} from "./schemas/businessPlanMap";

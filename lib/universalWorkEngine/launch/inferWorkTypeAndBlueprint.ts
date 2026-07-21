@@ -9,8 +9,13 @@ import {
   listBlueprints,
 } from "../blueprints/registry";
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
+import { BUSINESS_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/businessPlanMap";
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
+import {
+  CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+} from "../packages/businessPlan/businessBlueprintDefinitions";
 import {
   BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
   CHALLENGE_EVENT_BLUEPRINT_ID,
@@ -69,6 +74,10 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-gala": FUNDRAISER_GALA_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
+  "bp-craft-show-business": CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  "bp-craft-show": CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  "bp-handmade-online-store": HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+  "bp-handmade-store": HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -80,6 +89,17 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     re: /\b(simple\s+)?marketing\s+plan\b|\bmarketing\s+blueprint\b|\bmarket(?:ing)?\s+this\s+offer\b/i,
     blueprintId: MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
     workTypeId: MARKETING_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Business Blueprints before Event "show"/"launch" language
+    re: /\b(craft\s+show\s+business|craft\s+show\s+blueprint|business\.craft_show)\b/i,
+    blueprintId: CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store)|business\.handmade_online_store)\b/i,
+    blueprintId: HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
     re: /\b(networking\s+event|business\s+mixer|networking\s+mixer|speed\s+networking)\b/i,
@@ -241,6 +261,17 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
     /\b(marketing\s+plan|market(?:ing)?\s+this\s+offer)\b/i.test(message)
   ) {
     workTypeId = MARKETING_PLAN_WORK_TYPE_ID;
+  }
+
+  // Default Business Plan when message clearly asks for crafter business blueprints
+  if (
+    !workTypeId &&
+    message &&
+    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store))\b/i.test(
+      message,
+    )
+  ) {
+    workTypeId = BUSINESS_PLAN_WORK_TYPE_ID;
   }
 
   // Default Event Work Type when message clearly asks for event planning

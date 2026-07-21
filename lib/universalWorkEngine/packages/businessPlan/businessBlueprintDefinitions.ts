@@ -1,0 +1,707 @@
+/**
+ * Business Plan — domain Blueprint *definitions* only (201–202).
+ * Registered through the Universal Blueprint registry (no private runtime).
+ * These are Business Blueprints — not Event Blueprints.
+ */
+
+import type { BlueprintDefinition, BlueprintGroup } from "../../blueprints/types";
+import { ALL_BLUEPRINT_DEPTH_MODES } from "../../blueprints/types";
+import { BUSINESS_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/businessPlanMap";
+import { BUSINESS_PLAN_MAP_GROUPS } from "./businessPlanMapGroups";
+
+const BUSINESS_WORK = [BUSINESS_PLAN_WORK_TYPE_ID] as const;
+
+export const CRAFT_SHOW_BUSINESS_BLUEPRINT_ID = "business.craft_show" as const;
+export const HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID =
+  "business.handmade_online_store" as const;
+
+type BusinessBlueprintSeed = Omit<
+  BlueprintDefinition,
+  "compatibleWorkTypeIds" | "supportedDepthModes" | "category"
+> & {
+  category?: BlueprintDefinition["category"];
+};
+
+function groupsForSections(sectionIds: readonly string[]): BlueprintGroup[] {
+  const set = new Set(sectionIds);
+  return BUSINESS_PLAN_MAP_GROUPS.map((g) => ({
+    ...g,
+    sectionIds: g.sectionIds.filter((id) => set.has(id)),
+  })).filter((g) => g.sectionIds.length > 0);
+}
+
+function businessBlueprint(seed: BusinessBlueprintSeed): BlueprintDefinition {
+  const sectionIds = seed.sections.map((s) => s.id);
+  return {
+    ...seed,
+    category: seed.category ?? "spark",
+    compatibleWorkTypeIds: BUSINESS_WORK,
+    supportedDepthModes: ALL_BLUEPRINT_DEPTH_MODES,
+    groups: seed.groups ?? groupsForSections(sectionIds),
+  };
+}
+
+const SHARED_HIDDEN = {
+  id: "system_work_meta",
+  title: "System",
+  role: "hidden_system" as const,
+};
+
+/**
+ * 201 — Craft Show Business Blueprint.
+ * Ongoing business OS that can generate linked Event Work for shows.
+ */
+export const BUSINESS_BLUEPRINT_CRAFT_SHOW = businessBlueprint({
+  blueprintId: CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  version: "1.0.0",
+  title: "Craft Show Business",
+  description:
+    "Build an operating system for handmade businesses that sell at craft shows, art fairs, festivals, vendor markets, holiday markets, and pop-ups — including the path to linked Event plans for each show.",
+  intendedUse:
+    "Ongoing craft-show businesses that need products, booth, calendar, travel, POS, leads, money, and post-show learning in one Work.",
+  complexity: "complex",
+  sections: [
+    { id: "purpose_vision", title: "Business Vision", role: "required" },
+    { id: "products_offers", title: "Products", role: "required" },
+    { id: "customers_audience", title: "Customers", role: "required" },
+    {
+      id: "positioning",
+      title: "Positioning",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    { id: "pricing", title: "Pricing", role: "required" },
+    { id: "inventory", title: "Inventory", role: "required" },
+    {
+      id: "booth_design",
+      title: "Booth Design",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "show_discovery",
+      title: "Show Discovery",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "jury_applications",
+      title: "Jury Applications",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "annual_calendar",
+      title: "Annual Calendar",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "travel_logistics",
+      title: "Travel and Logistics",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "packing_loading",
+      title: "Packing and Vehicle Loading",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "pos_checkout",
+      title: "POS and Checkout",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "lead_capture",
+      title: "Lead Capture and Email Growth",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "customer_relationships",
+      title: "Repeat Customers",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "vendor_documents",
+      title: "Vendor Documents",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "restocking_seasonal",
+      title: "Restocking and Seasonal Planning",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "expenses_taxes",
+      title: "Expenses and Taxes",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    { id: "profitability", title: "Profitability", role: "required" },
+    {
+      id: "analytics",
+      title: "Analytics",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "linked_event_work",
+      title: "Linked Show Event Plans",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    { id: "next_actions", title: "Next Actions", role: "required" },
+    {
+      id: "post_show_review",
+      title: "Post-Show Reviews",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "review_rhythm",
+      title: "Review Rhythm",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    SHARED_HIDDEN,
+  ],
+  adaptiveQuestions: [
+    {
+      id: "q_vision",
+      prompt: "What kind of handmade business are you building through shows and markets?",
+      lowerFrictionPrompt: "What handmade business are you building?",
+      sectionId: "purpose_vision",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["purpose", "vision"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_products",
+      prompt: "What do you sell, and which products are show-ready right now?",
+      lowerFrictionPrompt: "What do you sell at shows?",
+      sectionId: "products_offers",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["products", "offers"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_customers",
+      prompt: "Who buys from you at shows, and what makes them stop at your booth?",
+      lowerFrictionPrompt: "Who buys from you?",
+      sectionId: "customers_audience",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["audience", "customers"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_pricing",
+      prompt: "How do you price for materials, time, booth fees, and profit?",
+      lowerFrictionPrompt: "How do you price?",
+      sectionId: "pricing",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["pricing"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_calendar",
+      prompt: "Which shows or markets matter most this season?",
+      lowerFrictionPrompt: "Which shows matter most?",
+      sectionId: "annual_calendar",
+      requiredInModes: ["guided_build", "complete_planning"],
+      knownContextKeys: ["calendar", "shows"],
+      postponable: true,
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_next",
+      prompt: "What is the single most helpful next action for the business this week?",
+      lowerFrictionPrompt: "What is the next helpful action?",
+      sectionId: "next_actions",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["next_actions"],
+      materialChangeNextStep: true,
+    },
+  ],
+  suggestedTasks: [
+    { id: "t_vision", title: "Clarify business vision and show goals", sectionId: "purpose_vision" },
+    { id: "t_products", title: "Lock show-ready product mix", sectionId: "products_offers" },
+    { id: "t_pricing", title: "Validate pricing against booth and travel costs", sectionId: "pricing" },
+    {
+      id: "t_calendar",
+      title: "Build or update annual show calendar",
+      sectionId: "annual_calendar",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_booth",
+      title: "Refine booth design and packing list",
+      sectionId: "booth_design",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_pos",
+      title: "Confirm POS, receipts, and offline backup",
+      sectionId: "pos_checkout",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_leads",
+      title: "Set lead capture and follow-up path",
+      sectionId: "lead_capture",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_linked_event",
+      title: "Create linked Event plan for next confirmed show",
+      sectionId: "linked_event_work",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+  ],
+  suggestedMilestones: [
+    { id: "m_vision", title: "Vision and products clear" },
+    { id: "m_pricing", title: "Pricing and inventory ready" },
+    { id: "m_calendar", title: "Season calendar set", depthModes: ["guided_build", "complete_planning"] },
+    { id: "m_booth", title: "Booth and packing ready", depthModes: ["guided_build", "complete_planning"] },
+    { id: "m_ops", title: "POS and documents ready", depthModes: ["complete_planning"] },
+    { id: "m_review", title: "Post-show review rhythm active", depthModes: ["guided_build", "complete_planning"] },
+  ],
+  commonlyForgottenItems: [
+    "Booth fee vs profit math",
+    "Offline POS backup",
+    "Lead capture without awkwardness",
+    "Packing list and load order",
+    "Vendor insurance / documents",
+    "Restock plan after a strong day",
+    "Tax tracking for cash and card",
+    "Linked Event plan for each confirmed show",
+    "Post-show review within one week",
+  ],
+  riskPrompts: [
+    "What if a show underperforms after booth and travel costs?",
+    "What if POS or internet fails on site?",
+    "How will inventory and restock keep up mid-season?",
+    "Who captures emails without pressure?",
+    "Which shows deserve a linked Event plan vs a pass?",
+  ],
+  researchPrompts: [
+    "Compare local craft shows and holiday markets for your category",
+    "Research booth layouts that convert without clutter",
+    "Benchmark pricing for handmade work in this niche",
+    "Identify jury photo and application requirements",
+    "Review POS options with offline mode",
+  ],
+  deliverables: [
+    "Craft Show Business Plan",
+    "Product and pricing sheet",
+    "Inventory checklist",
+    "Booth design notes",
+    "Annual show calendar",
+    "Packing and load list",
+    "POS and checkout checklist",
+    "Lead capture script",
+    "Expense and tax tracker outline",
+    "Post-show review template",
+    "Linked Event plan recommendations",
+    "Next actions list",
+  ],
+  chamberRoutingRecommendations: [
+    "events",
+    "marketing",
+    "finance",
+    "sales",
+    "networking",
+  ],
+  boardReviewRecommendations: [
+    "business vision",
+    "pricing and profitability",
+    "show calendar",
+    "inventory readiness",
+    "lead capture",
+    "tax and expense tracking",
+  ],
+  projectBridgeRecommendations: [
+    "Bridge when a show is confirmed, inventory is locked, or a linked Event plan begins",
+  ],
+  cartographyRelationshipRecommendations: [
+    {
+      relationship: "supports",
+      note: "Supports handmade business and seasonal revenue goals",
+    },
+    {
+      relationship: "informs",
+      note: "May inform linked Event plans for craft shows and markets",
+    },
+    {
+      relationship: "related_to",
+      note: "May connect to online store, email, or product development work",
+    },
+  ],
+  completionCriteria: [
+    "Vision clear",
+    "Products and pricing set",
+    "Customers understood",
+    "Inventory plan exists",
+    "Profitability framed",
+    "Next actions clear",
+    "Show calendar and booth planned (Guided+)",
+    "Linked Event path understood (Guided+)",
+  ],
+  certificationRules: [
+    "business_plan.foundation",
+    "business_plan.map",
+    "business_plan.depth",
+  ],
+  domainExtensions: {
+    linkedEventTypes: [
+      "Craft show",
+      "Holiday market",
+      "Vendor fair",
+      "Pop-up shop",
+      "Art festival",
+    ],
+    successModel:
+      "The business becomes easier to run across a season of shows — not only prepared for one weekend.",
+    posOptions: ["Square", "Stripe", "Cash + backup card reader"],
+  },
+});
+
+/**
+ * 202 — Handmade Online Store Business Blueprint.
+ */
+export const BUSINESS_BLUEPRINT_HANDMADE_ONLINE_STORE = businessBlueprint({
+  blueprintId: HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+  version: "1.0.0",
+  title: "Handmade Online Store",
+  description:
+    "Operate a handmade ecommerce business across marketplaces with clear products, listings, shipping, customer care, growth, and profitability — and room to link campaign or launch Work when needed.",
+  intendedUse:
+    "Etsy, Shopify, Amazon Handmade, Faire, and social-shop businesses that need an ongoing operating system, not a one-time listing checklist.",
+  complexity: "complex",
+  sections: [
+    { id: "purpose_vision", title: "Business Vision", role: "required" },
+    { id: "products_offers", title: "Product Creation", role: "required" },
+    { id: "customers_audience", title: "Customers", role: "required" },
+    {
+      id: "positioning",
+      title: "Positioning",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    { id: "pricing", title: "Pricing", role: "required" },
+    { id: "inventory", title: "Inventory", role: "required" },
+    {
+      id: "photography",
+      title: "Photography",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "listings_seo",
+      title: "Listings, Keywords, and SEO",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "marketplaces",
+      title: "Marketplaces and Channels",
+      role: "required",
+    },
+    {
+      id: "shipping_packaging",
+      title: "Shipping and Packaging",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "customer_service",
+      title: "Customer Service",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "reviews_reputation",
+      title: "Reviews and Reputation",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "email_marketing",
+      title: "Email Marketing",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "social_pinterest",
+      title: "Social and Pinterest",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "launches_promotions",
+      title: "Launches and Promotions",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "automation",
+      title: "Automation",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "expenses_taxes",
+      title: "Expenses and Taxes",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    { id: "profitability", title: "Profitability", role: "required" },
+    {
+      id: "analytics",
+      title: "Analytics",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    {
+      id: "linked_event_work",
+      title: "Linked Launch and Campaign Work",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    { id: "next_actions", title: "Next Actions", role: "required" },
+    {
+      id: "review_rhythm",
+      title: "Review Rhythm",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    SHARED_HIDDEN,
+  ],
+  adaptiveQuestions: [
+    {
+      id: "q_vision",
+      prompt: "What handmade online business are you building, and what should feel easier?",
+      lowerFrictionPrompt: "What online handmade business are you building?",
+      sectionId: "purpose_vision",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["purpose", "vision"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_products",
+      prompt: "What do you make and sell, and which products should be primary?",
+      lowerFrictionPrompt: "What do you sell online?",
+      sectionId: "products_offers",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["products", "offers"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_customers",
+      prompt: "Who buys from you online, and what are they hoping the product will do?",
+      lowerFrictionPrompt: "Who buys from you online?",
+      sectionId: "customers_audience",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["audience", "customers"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_marketplaces",
+      prompt:
+        "Which platforms matter most right now — Etsy, Shopify, Amazon Handmade, Faire, social shops, or others?",
+      lowerFrictionPrompt: "Which platforms matter most?",
+      sectionId: "marketplaces",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["marketplaces", "channels"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_pricing",
+      prompt: "How do you price for materials, time, fees, shipping, and profit?",
+      lowerFrictionPrompt: "How do you price online?",
+      sectionId: "pricing",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["pricing"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_next",
+      prompt: "What is the single most helpful next action for the store this week?",
+      lowerFrictionPrompt: "What is the next helpful action?",
+      sectionId: "next_actions",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["next_actions"],
+      materialChangeNextStep: true,
+    },
+  ],
+  suggestedTasks: [
+    { id: "t_vision", title: "Clarify store vision and primary products", sectionId: "purpose_vision" },
+    { id: "t_marketplaces", title: "Choose primary marketplace focus", sectionId: "marketplaces" },
+    { id: "t_pricing", title: "Validate pricing against fees and shipping", sectionId: "pricing" },
+    {
+      id: "t_photos",
+      title: "Improve product photography set",
+      sectionId: "photography",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_listings",
+      title: "Refresh listings, keywords, and SEO",
+      sectionId: "listings_seo",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_shipping",
+      title: "Standardize shipping and packaging",
+      sectionId: "shipping_packaging",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_email",
+      title: "Set simple email follow-up path",
+      sectionId: "email_marketing",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+    {
+      id: "t_linked",
+      title: "Plan linked launch or holiday campaign Work",
+      sectionId: "linked_event_work",
+      depthModes: ["guided_build", "complete_planning"],
+    },
+  ],
+  suggestedMilestones: [
+    { id: "m_vision", title: "Vision and products clear" },
+    { id: "m_platforms", title: "Primary platforms chosen" },
+    { id: "m_listings", title: "Core listings strong", depthModes: ["guided_build", "complete_planning"] },
+    { id: "m_ops", title: "Shipping and service ready", depthModes: ["guided_build", "complete_planning"] },
+    { id: "m_growth", title: "Email / social rhythm started", depthModes: ["complete_planning"] },
+    { id: "m_review", title: "Profit and analytics review active", depthModes: ["guided_build", "complete_planning"] },
+  ],
+  commonlyForgottenItems: [
+    "Marketplace fees in pricing",
+    "Shipping dimensional weight",
+    "Photography consistency",
+    "Keyword research before rewriting titles",
+    "Review request path",
+    "Inventory sync across platforms",
+    "Packaging that protects and feels personal",
+    "Linked launch/campaign Work for holidays",
+    "Automation that reduces admin without hiding problems",
+  ],
+  riskPrompts: [
+    "What if fees and ads erase profit?",
+    "What if inventory drifts across marketplaces?",
+    "How will customer service keep up during a launch?",
+    "Which platform deserves focus before adding another?",
+    "What campaign Work should stay linked instead of reinvented?",
+  ],
+  researchPrompts: [
+    "Compare marketplace fees for this product type",
+    "Research listing SEO patterns for handmade niches",
+    "Benchmark shipping and packaging costs",
+    "Identify Pinterest or social formats that fit handmade work",
+    "Review automation tools that stay simple for solo makers",
+  ],
+  deliverables: [
+    "Handmade Online Store Plan",
+    "Product and pricing sheet",
+    "Marketplace focus plan",
+    "Listing and SEO checklist",
+    "Photography checklist",
+    "Shipping and packaging standards",
+    "Customer service notes",
+    "Email and social rhythm",
+    "Launch / promotion outline",
+    "Profitability view",
+    "Linked campaign Work recommendations",
+    "Next actions list",
+  ],
+  chamberRoutingRecommendations: [
+    "marketing",
+    "content",
+    "sales",
+    "systems",
+    "finance",
+  ],
+  boardReviewRecommendations: [
+    "business vision",
+    "marketplace focus",
+    "pricing and profitability",
+    "listing quality",
+    "shipping readiness",
+    "growth rhythm",
+  ],
+  projectBridgeRecommendations: [
+    "Bridge when a launch begins, a marketplace expands, or holiday campaign Work starts",
+  ],
+  cartographyRelationshipRecommendations: [
+    {
+      relationship: "supports",
+      note: "Supports handmade ecommerce and revenue goals",
+    },
+    {
+      relationship: "informs",
+      note: "May inform product launches, flash sales, and holiday campaigns",
+    },
+    {
+      relationship: "related_to",
+      note: "May connect to craft-show business, email, or content work",
+    },
+  ],
+  completionCriteria: [
+    "Vision clear",
+    "Products and pricing set",
+    "Customers understood",
+    "Primary marketplaces chosen",
+    "Inventory plan exists",
+    "Profitability framed",
+    "Next actions clear",
+    "Listings and shipping planned (Guided+)",
+    "Linked campaign path understood (Guided+)",
+  ],
+  certificationRules: [
+    "business_plan.foundation",
+    "business_plan.map",
+    "business_plan.depth",
+  ],
+  domainExtensions: {
+    platforms: [
+      "Etsy",
+      "Shopify",
+      "Pinterest",
+      "Amazon Handmade",
+      "Faire",
+      "WooCommerce",
+      "Squarespace",
+      "Big Cartel",
+      "TikTok Shop",
+      "Facebook Shop",
+      "Instagram Shop",
+    ],
+    linkedWorkTypes: [
+      "Product launches",
+      "Flash sales",
+      "Holiday campaigns",
+      "Live shopping",
+      "Customer appreciation events",
+    ],
+    successModel:
+      "The store becomes calmer to run across platforms — listings, shipping, care, and profit stay visible together.",
+  },
+});
+
+export const BUSINESS_PLAN_BLUEPRINT_DEFINITIONS: readonly BlueprintDefinition[] =
+  [
+    BUSINESS_BLUEPRINT_CRAFT_SHOW,
+    BUSINESS_BLUEPRINT_HANDMADE_ONLINE_STORE,
+  ];
+
+export const BUSINESS_PLAN_BLUEPRINT_IDS = BUSINESS_PLAN_BLUEPRINT_DEFINITIONS.map(
+  (b) => b.blueprintId,
+) as readonly string[];

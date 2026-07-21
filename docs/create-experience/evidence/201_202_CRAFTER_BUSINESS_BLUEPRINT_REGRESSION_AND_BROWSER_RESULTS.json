@@ -1,0 +1,24 @@
+{
+  "date": "2026-07-21",
+  "prompts": ["201", "202"],
+  "workTypeId": "business_plan",
+  "blueprintIds": [
+    "business.craft_show",
+    "business.handmade_online_store"
+  ],
+  "verdict": "BLUEPRINT PRODUCTION CERTIFIED",
+  "suites": {
+    "businessPlan.foundation.cert.test.ts": { "passed": 8, "failed": 0 },
+    "craftShowBusiness.browserChecklist.test.tsx": { "passed": 1, "failed": 0 },
+    "handmadeOnlineStoreBusiness.browserChecklist.test.tsx": {
+      "passed": 1,
+      "failed": 0
+    },
+    "createFastPath.test.ts": { "passed": 19, "failed": 0 }
+  },
+  "totals": { "files": 4, "passed": 29, "failed": 0 },
+  "notes": [
+    "Business Plan Work Type added alongside Event Plan and Marketing Plan",
+    "Bare craft show and bare business plan document create intentionally excluded from Business Plan detection"
+  ]
+}

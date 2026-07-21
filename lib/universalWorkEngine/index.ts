@@ -7,6 +7,8 @@ import "./packages/eventPlan/registerEventPlanWorkType";
 import "./packages/eventPlan/registerEventBlueprints";
 import "./packages/marketingPlan/registerMarketingPlanWorkType";
 import "./packages/marketingPlan/registerMarketingPlanBlueprints";
+import "./packages/businessPlan/registerBusinessPlanWorkType";
+import "./packages/businessPlan/registerBusinessPlanBlueprints";
 
 export type {
   CanonicalWorkId,
@@ -109,6 +111,18 @@ export {
 } from "./packages/marketingPlan/marketingPlanBlueprint";
 export { MARKETING_PLAN_MAP_GROUPS } from "./packages/marketingPlan/marketingPlanMapGroups";
 export { isMarketingPlanCreationRequest } from "./packages/marketingPlan/isMarketingPlanCreationRequest";
+export { ensureBusinessPlanWorkTypeRegistered } from "./packages/businessPlan/registerBusinessPlanWorkType";
+export { ensureBusinessPlanBlueprintsRegistered } from "./packages/businessPlan/registerBusinessPlanBlueprints";
+export {
+  BUSINESS_PLAN_BLUEPRINT_IDS,
+  CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
+  HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
+  BUSINESS_PLAN_BLUEPRINT_DEFINITIONS,
+  BUSINESS_BLUEPRINT_CRAFT_SHOW,
+  BUSINESS_BLUEPRINT_HANDMADE_ONLINE_STORE,
+} from "./packages/businessPlan/businessBlueprintDefinitions";
+export { BUSINESS_PLAN_MAP_GROUPS } from "./packages/businessPlan/businessPlanMapGroups";
+export { isBusinessPlanCreationRequest } from "./packages/businessPlan/isBusinessPlanCreationRequest";
 
 export type {
   WorkSection,
