@@ -216,6 +216,7 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | **225–228** Retail Collection | `docs/create-experience/225_*`…`228_*` · runtime `retailCollectionDefinitions.ts` |
 | **229–232** Product & Commerce | `docs/create-experience/229_*`…`232_*` · runtime `productCommerceCollectionDefinitions.ts` |
 | **273–278** Blueprint Profile Context Connection | `docs/create-experience/standards/273_*`…`278_*` · runtime `lib/universalWorkEngine/blueprints/profileContext/` · masters `273_278_*` |
+| **295–300** Master Shared Object Library | `docs/create-experience/standards/295_*`…`300_*` · runtime `lib/universalWorkEngine/blueprints/sharedObjects/` · masters `295_300_*` (distinct from Architecture v2 `300_*`) |
 | Navigation welcome docs | `docs/navigation/119–121` |
 
 ---

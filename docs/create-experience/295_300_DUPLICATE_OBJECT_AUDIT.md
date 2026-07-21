@@ -1,0 +1,21 @@
+# Duplicate Object Audit
+
+**Standard:** 300 Phase 2
+**Generated:** 2026-07-21
+
+| Concept | Object type | Model class | Finding | Remediation |
+|---|---|---|---|---|
+| person | `person` | unknown_requiring_review | Repo must prove a single canonical person model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| business | `business` | unknown_requiring_review | Repo must prove a single canonical business model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| client_account | `client_account` | unknown_requiring_review | Repo must prove a single canonical client_account model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| offer | `offer` | unknown_requiring_review | Repo must prove a single canonical offer model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| product | `product` | unknown_requiring_review | Repo must prove a single canonical product model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| service | `service` | unknown_requiring_review | Repo must prove a single canonical service model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| pricing_model | `pricing_model` | unknown_requiring_review | Repo must prove a single canonical pricing_model model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| proposal | `proposal` | unknown_requiring_review | Repo must prove a single canonical proposal model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| project | `project` | unknown_requiring_review | Repo must prove a single canonical project model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| task | `task` | unknown_requiring_review | Repo must prove a single canonical task model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| location | `location` | unknown_requiring_review | Repo must prove a single canonical location model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| asset | `asset` | unknown_requiring_review | Repo must prove a single canonical asset model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| metric_definition | `metric_definition` | unknown_requiring_review | Repo must prove a single canonical metric_definition model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |
+| create_artifact | `create_artifact` | unknown_requiring_review | Repo must prove a single canonical create_artifact model; competing Blueprint-local stores require migration (300 Phase 2–3). | Classify existing models as canonical / extension / duplicate_requiring_migration; migrate before production cert. |

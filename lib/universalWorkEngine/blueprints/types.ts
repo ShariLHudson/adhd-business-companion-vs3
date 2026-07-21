@@ -6,6 +6,7 @@
 import type { CanonicalWorkId, WorkOrigin, WorkRelationshipKind } from "../types";
 import type { BlueprintCreateabilityManifest } from "./createability/types";
 import type { BlueprintProfileContextManifest } from "./profileContext/types";
+import type { BlueprintSharedObjectManifest } from "./sharedObjects/types";
 
 export type BlueprintCategory =
   | "spark"
@@ -164,6 +165,12 @@ export type BlueprintDefinition = {
    * When omitted, adaptiveQuestions[].knownContextKeys seed a provisional blocked manifest.
    */
   profileContextManifest?: BlueprintProfileContextManifest;
+  /**
+   * Shared Object Library Manifest (295–300).
+   * When omitted, deliverables + knownContext + createability seed a provisional blocked manifest.
+   * Every dependency declares creation authority: fully_create | prepare | user_provided | completed_elsewhere.
+   */
+  sharedObjectManifest?: BlueprintSharedObjectManifest;
   chamberRoutingRecommendations: readonly string[];
   boardReviewRecommendations: readonly string[];
   projectBridgeRecommendations: readonly string[];
