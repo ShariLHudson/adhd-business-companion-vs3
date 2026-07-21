@@ -7,6 +7,7 @@ import type {
   CanonicalWorkId,
   WorkRelationship,
   WorkRelationshipKind,
+  WorkRelationshipSourceEntityType,
 } from "../types";
 import { resolveCanonicalWorkId } from "../identity/resolveWorkIdentity";
 
@@ -27,11 +28,30 @@ export function resetWorkRelationshipsForTests(): void {
   edges.length = 0;
 }
 
+function edgeKey(e: {
+  fromWorkId: string;
+  sourceEntityType?: string;
+  sourceEntityId?: string;
+  toRef: { kind: string; id: string };
+  relationship: string;
+}): string {
+  return [
+    e.fromWorkId,
+    e.sourceEntityType ?? "work",
+    e.sourceEntityId ?? e.fromWorkId,
+    e.toRef.kind,
+    e.toRef.id,
+    e.relationship,
+  ].join("::");
+}
+
 export function linkWorkRelationship(input: {
   fromWorkId: string;
   toRef: WorkRelationship["toRef"];
   relationship: WorkRelationshipKind;
   note?: string | null;
+  sourceEntityType?: WorkRelationshipSourceEntityType;
+  sourceEntityId?: string;
 }): WorkRelationship {
   const fromWorkId = resolveCanonicalWorkId(input.fromWorkId, {
     adoptIfMissing: true,
@@ -39,22 +59,42 @@ export function linkWorkRelationship(input: {
   if (!fromWorkId) {
     throw new Error("fromWorkId is required for Cartography relationship");
   }
+  let toRef = input.toRef;
   // Cartography node / project refs must not invent a second work body.
-  if (input.toRef.kind === "work") {
-    const toWork = resolveCanonicalWorkId(input.toRef.id, {
+  if (toRef.kind === "work") {
+    const toWork = resolveCanonicalWorkId(toRef.id, {
       adoptIfMissing: true,
     });
     if (toWork) {
-      input = {
-        ...input,
-        toRef: { kind: "work", id: toWork },
-      };
+      toRef = { kind: "work", id: toWork };
     }
   }
+
+  const sourceEntityType = input.sourceEntityType ?? "work";
+  const sourceEntityId =
+    input.sourceEntityId?.trim() ||
+    (sourceEntityType === "work" ? fromWorkId : "");
+
+  if (sourceEntityType !== "work" && !sourceEntityId) {
+    throw new Error("sourceEntityId is required for group/section relationships");
+  }
+
+  const candidate = {
+    fromWorkId: fromWorkId as string,
+    sourceEntityType,
+    sourceEntityId: sourceEntityId || fromWorkId,
+    toRef,
+    relationship: input.relationship,
+  };
+  const existing = edges.find((e) => edgeKey(e) === edgeKey(candidate));
+  if (existing) return existing;
+
   const edge: WorkRelationship = {
     id: newEdgeId(),
     fromWorkId: fromWorkId as CanonicalWorkId,
-    toRef: input.toRef,
+    sourceEntityType,
+    sourceEntityId: sourceEntityId || fromWorkId,
+    toRef,
     relationship: input.relationship,
     createdAt: nowIso(),
     note: input.note ?? null,
@@ -63,16 +103,43 @@ export function linkWorkRelationship(input: {
   return edge;
 }
 
+export function unlinkWorkRelationship(relationshipId: string): boolean {
+  const idx = edges.findIndex((e) => e.id === relationshipId);
+  if (idx < 0) return false;
+  edges.splice(idx, 1);
+  return true;
+}
+
 export function listWorkRelationships(
   workId: string,
+  filter?: {
+    sourceEntityType?: WorkRelationshipSourceEntityType;
+    sourceEntityId?: string;
+    targetKind?: WorkRelationship["toRef"]["kind"];
+  },
 ): WorkRelationship[] {
   const canonical = resolveCanonicalWorkId(workId, { adoptIfMissing: true });
   if (!canonical) return [];
-  return edges.filter(
-    (e) =>
+  return edges.filter((e) => {
+    const onWork =
       e.fromWorkId === canonical ||
-      (e.toRef.kind === "work" && e.toRef.id === canonical),
-  );
+      (e.toRef.kind === "work" && e.toRef.id === canonical);
+    if (!onWork) return false;
+    if (
+      filter?.sourceEntityType &&
+      (e.sourceEntityType ?? "work") !== filter.sourceEntityType
+    ) {
+      return false;
+    }
+    if (
+      filter?.sourceEntityId &&
+      (e.sourceEntityId ?? e.fromWorkId) !== filter.sourceEntityId
+    ) {
+      return false;
+    }
+    if (filter?.targetKind && e.toRef.kind !== filter.targetKind) return false;
+    return true;
+  });
 }
 
 /** Bridge prior stub: expose work-centric node refs without copying content. */

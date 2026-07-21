@@ -55,6 +55,15 @@ export type WorkTypeLifecycleConfig = {
   domainPhases?: readonly string[];
 };
 
+export type WorkTypeMapGroupConfig = {
+  groupId: string;
+  title: string;
+  description?: string;
+  order: number;
+  collapsedByDefault?: boolean;
+  sectionIds: readonly string[];
+};
+
 export type WorkTypePackage = {
   workTypeId: string;
   version: string;
@@ -66,6 +75,10 @@ export type WorkTypePackage = {
   lifecycle: WorkTypeLifecycleConfig;
   /** Workshop Map sections — structure only. */
   sections: readonly { id: string; title: string; optional?: boolean }[];
+  /** Optional collapsible map groups (099). */
+  mapGroups?: readonly WorkTypeMapGroupConfig[];
+  /** Section count at/above which grouped map UI is used when mapGroups exist. */
+  groupMapThreshold?: number;
   defaultFocusSectionIds?: readonly string[];
   /** Question / deliverable ids — domain configuration references. */
   questionDefinitionIds?: readonly string[];
@@ -160,11 +173,31 @@ export type WorkRelationshipKind =
   | "part_of"
   | "visualizes";
 
+export type WorkRelationshipSourceEntityType = "work" | "group" | "section";
+
+export type WorkRelationshipTargetType =
+  | "work"
+  | "cartography_node"
+  | "project"
+  | "blueprint"
+  | "calendar-event"
+  | "visual-thinking"
+  | "task"
+  | "research"
+  | "file"
+  | "journal-entry"
+  | "evidence"
+  | "person"
+  | "goal";
+
 export type WorkRelationship = {
   id: string;
   fromWorkId: CanonicalWorkId;
+  /** Defaults to work when omitted (legacy edges). */
+  sourceEntityType?: WorkRelationshipSourceEntityType;
+  sourceEntityId?: string;
   toRef: {
-    kind: "work" | "cartography_node" | "project" | "blueprint";
+    kind: WorkRelationshipTargetType;
     id: string;
   };
   relationship: WorkRelationshipKind;

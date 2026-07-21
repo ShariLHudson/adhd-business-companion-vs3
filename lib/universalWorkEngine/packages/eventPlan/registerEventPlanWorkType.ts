@@ -12,6 +12,9 @@ import { registerWorkTypePackage } from "../../registry/universalWorkTypeRegistr
 import { registerSchemaAsWorkTypePackage } from "../../registry/bridgeWorkTypeSchema";
 import { registerWorkTypeSchema } from "@/lib/workTypeSchema/registry";
 import type { WorkTypeSchema } from "@/lib/workTypeSchema/types";
+import { EVENT_PLAN_BLUEPRINT_IDS } from "./eventBlueprintDefinitions";
+import { EVENT_PLAN_MAP_GROUPS } from "./eventPlanMapGroups";
+import { ensureEventBlueprintsRegistered } from "./registerEventBlueprints";
 
 export const EVENT_PLAN_PACKAGE_VERSION = "1.0.0";
 
@@ -24,12 +27,13 @@ const EVENT_PLAN_SCHEMA: WorkTypeSchema = {
 
 /** Idempotent — safe from Create boot and Event adapters. */
 export function ensureEventPlanWorkTypeRegistered(): void {
+  ensureEventBlueprintsRegistered();
   registerWorkTypePackage({
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
     version: EVENT_PLAN_PACKAGE_VERSION,
     displayName: "Event Plan",
     creationExperienceId: "create",
-    blueprintIds: ["bp-event-plan", "bp-workshop", "bp-retreat-event"],
+    blueprintIds: EVENT_PLAN_BLUEPRINT_IDS,
     lifecycle: {
       usesUniversalSectionLifecycle: true,
       domainPhases: [
@@ -45,6 +49,8 @@ export function ensureEventPlanWorkTypeRegistered(): void {
       ],
     },
     sections: EVENT_PLAN_MAP_SECTIONS,
+    mapGroups: EVENT_PLAN_MAP_GROUPS,
+    groupMapThreshold: 12,
     defaultFocusSectionIds: EVENT_PLAN_DEFAULT_FOCUS,
     questionDefinitionIds: ["event-foundation"],
     deliverableIds: ["event-plan-brief"],

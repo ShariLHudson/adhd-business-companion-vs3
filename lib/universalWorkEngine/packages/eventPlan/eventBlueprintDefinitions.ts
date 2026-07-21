@@ -1,0 +1,645 @@
+/**
+ * Event Plan — domain Blueprint *definitions* only.
+ * Registered through the Universal Blueprint registry (no private runtime).
+ */
+
+import type { BlueprintDefinition, BlueprintGroup } from "../../blueprints/types";
+import { ALL_BLUEPRINT_DEPTH_MODES } from "../../blueprints/types";
+import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/eventPlanMap";
+import { EVENT_PLAN_MAP_GROUPS } from "./eventPlanMapGroups";
+
+const EVENT_WORK = [EVENT_PLAN_WORK_TYPE_ID] as const;
+
+type EventBlueprintSeed = Omit<
+  BlueprintDefinition,
+  "compatibleWorkTypeIds" | "supportedDepthModes" | "category"
+> & {
+  category?: BlueprintDefinition["category"];
+};
+
+/** Keep Event map groups that still contain sections on this Blueprint. */
+function groupsForSections(
+  sectionIds: readonly string[],
+): BlueprintGroup[] {
+  const set = new Set(sectionIds);
+  return EVENT_PLAN_MAP_GROUPS.map((g) => ({
+    ...g,
+    sectionIds: g.sectionIds.filter((id) => set.has(id)),
+  })).filter((g) => g.sectionIds.length > 0);
+}
+
+function eventBlueprint(seed: EventBlueprintSeed): BlueprintDefinition {
+  const sectionIds = seed.sections.map((s) => s.id);
+  return {
+    ...seed,
+    category: seed.category ?? "spark",
+    compatibleWorkTypeIds: EVENT_WORK,
+    supportedDepthModes: ALL_BLUEPRINT_DEPTH_MODES,
+    groups: seed.groups ?? groupsForSections(sectionIds),
+  };
+}
+
+const SHARED_HIDDEN = {
+  id: "system_work_meta",
+  title: "System",
+  role: "hidden_system" as const,
+};
+
+export const EVENT_BLUEPRINT_BUSINESS_LUNCHEON = eventBlueprint({
+  blueprintId: "bp-event-business-luncheon",
+  version: "1.0.0",
+  title: "Business Luncheon",
+  description:
+    "Plan a professional midday gathering with hosting, catering, and follow-up.",
+  intendedUse: "Client hospitality, networking lunches, and partner briefings.",
+  complexity: "moderate",
+  sections: [
+    { id: "event_type", title: "Event Type", role: "required", defaultValue: "Business Luncheon" },
+    { id: "purpose", title: "Purpose", role: "required" },
+    { id: "outcomes", title: "Outcomes", role: "required" },
+    { id: "audience", title: "Audience", role: "required" },
+    { id: "format", title: "Format", role: "required", defaultValue: "In-person lunch" },
+    { id: "dates", title: "Date and Time", role: "required" },
+    { id: "venue", title: "Venue", role: "required" },
+    { id: "budget", title: "Budget", role: "required" },
+    { id: "hospitality", title: "Food and Hospitality", role: "required" },
+    { id: "communications", title: "Communication Plan", role: "required" },
+    {
+      id: "sponsors",
+      title: "Sponsors",
+      role: "conditional",
+      condition: { kind: "known_context_truthy", key: "has_sponsors" },
+    },
+    {
+      id: "post_event_follow_up",
+      title: "Follow-Up",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "guided_build" },
+    },
+    {
+      id: "measurement",
+      title: "Evaluation",
+      role: "optional",
+      condition: { kind: "depth_at_least", mode: "complete_planning" },
+    },
+    SHARED_HIDDEN,
+  ],
+  defaultValues: {
+    event_type: "Business Luncheon",
+    format: "In-person lunch",
+  },
+  adaptiveQuestions: [
+    {
+      id: "q_purpose",
+      prompt: "What is the main reason for this luncheon?",
+      lowerFrictionPrompt: "What's this lunch for, in one line?",
+      sectionId: "purpose",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["purpose"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_guest_count",
+      prompt: "About how many guests are you expecting?",
+      lowerFrictionPrompt: "Rough guest count?",
+      sectionId: "audience",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["guest_count", "audience"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_dietary",
+      prompt: "Any dietary needs or hospitality constraints we should plan for?",
+      sectionId: "hospitality",
+      requiredInModes: ["guided_build", "complete_planning"],
+      dependencies: ["q_guest_count"],
+      postponable: true,
+      materialChangeNextStep: false,
+    },
+    {
+      id: "q_sponsors",
+      prompt: "Will this luncheon have sponsors?",
+      sectionId: "sponsors",
+      requiredInModes: ["complete_planning"],
+      knownContextKeys: ["has_sponsors"],
+      postponable: true,
+      materialChangeNextStep: true,
+      inferFromContext: { key: "has_sponsors", asAnswer: "yes" },
+    },
+  ],
+  suggestedTasks: [
+    { id: "t_confirm_venue", title: "Confirm venue and room setup", sectionId: "venue" },
+    { id: "t_menu", title: "Finalize menu and dietary accommodations", sectionId: "hospitality" },
+    { id: "t_invites", title: "Send invitations", sectionId: "communications", depthModes: ["guided_build", "complete_planning"] },
+    { id: "t_followups", title: "Schedule thank-you follow-ups", sectionId: "post_event_follow_up", depthModes: ["complete_planning"] },
+  ],
+  suggestedMilestones: [
+    { id: "m_invites_out", title: "Invitations sent" },
+    { id: "m_final_headcount", title: "Final headcount locked", depthModes: ["guided_build", "complete_planning"] },
+    { id: "m_day_of", title: "Day-of run-of-show ready", depthModes: ["complete_planning"] },
+  ],
+  commonlyForgottenItems: [
+    "Dietary restrictions list",
+    "Place cards / seating plan",
+    "AV for brief remarks",
+    "Parking or arrival instructions",
+    "Thank-you notes within 48 hours",
+  ],
+  riskPrompts: [
+    "What if the headcount drops sharply after the catering guarantee?",
+    "Is there a backup host if the primary speaker cancels?",
+  ],
+  researchPrompts: [
+    "Compare two nearby venues for noise level at lunch hour",
+    "Typical per-person catering cost for this guest count",
+  ],
+  deliverables: [
+    "Luncheon brief",
+    "Invitation copy",
+    "Day-of checklist",
+    "Follow-up message draft",
+  ],
+  chamberRoutingRecommendations: ["events", "hospitality"],
+  boardReviewRecommendations: ["Budget approval before catering deposit"],
+  projectBridgeRecommendations: ["Bridge luncheon as a Project when invites go out"],
+  cartographyRelationshipRecommendations: [
+    { relationship: "supports", note: "Link to related client or partnership work" },
+  ],
+  completionCriteria: [
+    "Purpose and outcomes clear",
+    "Venue and date confirmed",
+    "Hospitality plan covers dietary needs",
+    "Follow-up owner assigned (Guided+)",
+  ],
+  certificationRules: ["event.foundation", "event.map", "event.focus"],
+  domainExtensions: {
+    peopleAndRoles: ["Host", "Emcee", "Catering contact", "Registration greeter"],
+    budgetConsiderations: ["Venue minimum", "Per-person catering", "Gratuity", "Printed materials"],
+    timelineRecommendations: [
+      "4 weeks: hold venue",
+      "2 weeks: invitations",
+      "72 hours: final headcount",
+      "Same day: follow-up queue",
+    ],
+    communications: ["Save-the-date", "Formal invite", "Day-before reminder", "Thank-you"],
+    followUpRequirements: ["Thank-you within 48 hours", "Capture introductions made"],
+  },
+});
+
+export const EVENT_BLUEPRINT_ONLINE_WORKSHOP = eventBlueprint({
+  blueprintId: "bp-event-online-workshop",
+  version: "1.0.0",
+  title: "Online Workshop",
+  description: "Design a live virtual workshop with platform, engagement, and follow-up.",
+  intendedUse: "Remote teaching, masterclasses, and live cohort sessions.",
+  complexity: "moderate",
+  sections: [
+    { id: "event_type", title: "Event Type", role: "required", defaultValue: "Online Workshop" },
+    { id: "purpose", title: "Purpose", role: "required" },
+    { id: "outcomes", title: "Outcomes", role: "required" },
+    { id: "audience", title: "Audience", role: "required" },
+    { id: "format", title: "Format", role: "required", defaultValue: "Online / live" },
+    { id: "dates", title: "Date and Time", role: "required" },
+    { id: "venue", title: "Online Platform", role: "required" },
+    { id: "agenda", title: "Program and Agenda", role: "required" },
+    { id: "technology", title: "Equipment and Technology", role: "required" },
+    { id: "registration", title: "Registration", role: "required" },
+    { id: "marketing", title: "Marketing", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    {
+      id: "recording_plan",
+      title: "Recording and Replay",
+      role: "conditional",
+      condition: { kind: "known_context_truthy", key: "will_record" },
+    },
+    { id: "post_event_follow_up", title: "Follow-Up", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    { id: "measurement", title: "Evaluation", role: "optional", condition: { kind: "depth_at_least", mode: "complete_planning" } },
+    SHARED_HIDDEN,
+  ],
+  adaptiveQuestions: [
+    {
+      id: "q_purpose",
+      prompt: "What should participants be able to do after this workshop?",
+      lowerFrictionPrompt: "What should they walk away able to do?",
+      sectionId: "outcomes",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["outcomes", "purpose"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_platform",
+      prompt: "Which platform will you use (Zoom, Meet, etc.)?",
+      sectionId: "venue",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["platform", "venue"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_record",
+      prompt: "Will you record the session for replay?",
+      sectionId: "recording_plan",
+      requiredInModes: ["guided_build", "complete_planning"],
+      knownContextKeys: ["will_record"],
+      postponable: true,
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_tech_rehearsal",
+      prompt: "When will you run a tech rehearsal?",
+      sectionId: "technology",
+      requiredInModes: ["complete_planning"],
+      dependencies: ["q_platform"],
+      postponable: true,
+      materialChangeNextStep: false,
+    },
+  ],
+  suggestedTasks: [
+    { id: "t_platform", title: "Create workshop meeting link", sectionId: "venue" },
+    { id: "t_agenda", title: "Draft timed agenda with breaks", sectionId: "agenda" },
+    { id: "t_rehearsal", title: "Schedule tech rehearsal", sectionId: "technology", depthModes: ["complete_planning"] },
+  ],
+  suggestedMilestones: [
+    { id: "m_reg_open", title: "Registration open" },
+    { id: "m_rehearsal_done", title: "Tech rehearsal complete", depthModes: ["complete_planning"] },
+  ],
+  commonlyForgottenItems: [
+    "Backup host account",
+    "Waiting room / admit settings",
+    "Captioning or accessibility options",
+    "Breakout room plan",
+    "Replay delivery permissions",
+  ],
+  riskPrompts: [
+    "What if the host loses connection mid-session?",
+    "How will you handle late joiners without derailing the agenda?",
+  ],
+  researchPrompts: [
+    "Best engagement tools for this workshop length",
+    "Accessibility checklist for the chosen platform",
+  ],
+  deliverables: ["Workshop outline", "Slide / workbook stub", "Registration page copy", "Follow-up email"],
+  chamberRoutingRecommendations: ["events", "education"],
+  boardReviewRecommendations: ["Confirm recording and privacy policy before marketing"],
+  projectBridgeRecommendations: ["Bridge when registration opens"],
+  cartographyRelationshipRecommendations: [
+    { relationship: "related_to", note: "Link to curriculum or offer work" },
+  ],
+  completionCriteria: [
+    "Outcomes defined",
+    "Platform and time set",
+    "Agenda timed",
+    "Registration path ready",
+  ],
+  certificationRules: ["event.foundation", "event.map", "event.focus"],
+  domainExtensions: {
+    peopleAndRoles: ["Host", "Co-facilitator", "Tech support", "Chat moderator"],
+    budgetConsiderations: ["Platform plan limits", "Paid ads", "Replay hosting"],
+    timelineRecommendations: ["2 weeks: registration", "1 week: reminder sequence", "Day-before: tech check"],
+    communications: ["Announcement", "Confirmation", "Reminder", "Replay + resources"],
+    followUpRequirements: ["Send resources within 24 hours", "Collect feedback survey"],
+  },
+});
+
+export const EVENT_BLUEPRINT_ONE_DAY_WORKSHOP = eventBlueprint({
+  blueprintId: "bp-event-one-day-workshop",
+  version: "1.0.0",
+  title: "One-Day Workshop",
+  description: "Plan a full-day in-person or hybrid workshop with agenda, logistics, and delivery.",
+  intendedUse: "Intensive skill days, offsites, and facilitated working sessions.",
+  complexity: "complex",
+  sections: [
+    { id: "event_type", title: "Event Type", role: "required", defaultValue: "One-Day Workshop" },
+    { id: "purpose", title: "Purpose", role: "required" },
+    { id: "outcomes", title: "Outcomes", role: "required" },
+    { id: "audience", title: "Audience", role: "required" },
+    { id: "format", title: "Format", role: "required" },
+    { id: "dates", title: "Date and Time", role: "required" },
+    { id: "venue", title: "Venue or Online Platform", role: "required" },
+    { id: "budget", title: "Budget", role: "required" },
+    { id: "agenda", title: "Program and Agenda", role: "required" },
+    { id: "speakers", title: "Speakers and Facilitators", role: "required" },
+    {
+      id: "hospitality",
+      title: "Food and Hospitality",
+      role: "conditional",
+      condition: {
+        kind: "or",
+        conditions: [
+          { kind: "known_context_equals", key: "format", value: "in_person" },
+          { kind: "question_equals", questionId: "q_format", value: "in_person" },
+        ],
+      },
+    },
+    { id: "supplies", title: "Supplies", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    { id: "run_of_show", title: "Run of Show", role: "optional", condition: { kind: "depth_at_least", mode: "complete_planning" } },
+    { id: "post_event_follow_up", title: "Follow-Up", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    SHARED_HIDDEN,
+  ],
+  adaptiveQuestions: [
+    {
+      id: "q_purpose",
+      prompt: "What transformation should this day create?",
+      lowerFrictionPrompt: "What should be different by the end of the day?",
+      sectionId: "purpose",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["purpose"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_format",
+      prompt: "Is this in person, online, or hybrid?",
+      sectionId: "format",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["format"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_facilitator",
+      prompt: "Who is facilitating, and do they need a co-facilitator?",
+      sectionId: "speakers",
+      requiredInModes: ["guided_build", "complete_planning"],
+      dependencies: ["q_purpose"],
+      postponable: true,
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_materials",
+      prompt: "What materials must be printed or shipped beforehand?",
+      sectionId: "supplies",
+      requiredInModes: ["complete_planning"],
+      postponable: true,
+      materialChangeNextStep: false,
+    },
+  ],
+  suggestedTasks: [
+    { id: "t_agenda_blocks", title: "Block the day into timed segments", sectionId: "agenda" },
+    { id: "t_venue", title: "Confirm venue and room layout", sectionId: "venue" },
+    { id: "t_ros", title: "Draft run of show", sectionId: "run_of_show", depthModes: ["complete_planning"] },
+  ],
+  suggestedMilestones: [
+    { id: "m_agenda_locked", title: "Agenda locked" },
+    { id: "m_materials_ready", title: "Materials ready", depthModes: ["complete_planning"] },
+  ],
+  commonlyForgottenItems: [
+    "Break and lunch timing",
+    "Name badges",
+    "Parking and signage",
+    "Backup facilitator",
+    "End-of-day energy / closing ritual",
+  ],
+  riskPrompts: [
+    "What if the room is too small for the final headcount?",
+    "Where will you cut if the morning runs long?",
+  ],
+  researchPrompts: [
+    "Facilitation patterns for full-day energy management",
+    "Comparable workshop agendas for this outcome",
+  ],
+  deliverables: ["Day agenda", "Facilitator brief", "Participant prep note", "Follow-up packet"],
+  chamberRoutingRecommendations: ["events", "education"],
+  boardReviewRecommendations: ["Approve budget before venue deposit"],
+  projectBridgeRecommendations: ["Bridge when first deposit is paid"],
+  cartographyRelationshipRecommendations: [
+    { relationship: "implements", note: "May implement a training or offer goal" },
+  ],
+  completionCriteria: [
+    "Outcomes and agenda aligned",
+    "Format and venue set",
+    "Facilitator confirmed",
+    "Follow-up plan exists (Guided+)",
+  ],
+  certificationRules: ["event.foundation", "event.map", "event.focus"],
+  domainExtensions: {
+    peopleAndRoles: ["Lead facilitator", "Assistant", "Logistics lead", "Registration"],
+    budgetConsiderations: ["Venue", "Catering", "Materials", "Facilitator fee"],
+    timelineRecommendations: ["6 weeks: hold date", "3 weeks: materials", "1 week: final roster"],
+    communications: ["Invite", "Prep email", "Day-of logistics", "Thank-you + next step"],
+    followUpRequirements: ["Send workbook/resources", "Collect NPS or qualitative feedback"],
+  },
+});
+
+export const EVENT_BLUEPRINT_THREE_DAY_RETREAT = eventBlueprint({
+  blueprintId: "bp-event-three-day-retreat",
+  version: "1.0.0",
+  title: "Three-Day Retreat",
+  description: "Plan an immersive multi-day retreat with lodging, program, and care.",
+  intendedUse: "Leadership retreats, immersive intensives, and restorative gatherings.",
+  complexity: "complex",
+  sections: [
+    { id: "event_type", title: "Event Type", role: "required", defaultValue: "Three-Day Retreat" },
+    { id: "purpose", title: "Purpose", role: "required" },
+    { id: "outcomes", title: "Outcomes", role: "required" },
+    { id: "audience", title: "Audience", role: "required" },
+    { id: "format", title: "Format", role: "required", defaultValue: "In-person retreat" },
+    { id: "dates", title: "Date and Time", role: "required" },
+    { id: "venue", title: "Venue / Lodging", role: "required" },
+    { id: "budget", title: "Budget", role: "required" },
+    { id: "agenda", title: "Program and Agenda", role: "required" },
+    { id: "hospitality", title: "Food and Hospitality", role: "required" },
+    { id: "staff", title: "Team", role: "required" },
+    { id: "safety", title: "Safety", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    { id: "contingencies", title: "Risk and Contingencies", role: "optional", condition: { kind: "depth_at_least", mode: "complete_planning" } },
+    {
+      id: "volunteers",
+      title: "Volunteers and Team",
+      role: "conditional",
+      condition: { kind: "known_context_truthy", key: "needs_volunteers" },
+    },
+    { id: "post_event_follow_up", title: "Follow-Up", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    SHARED_HIDDEN,
+  ],
+  adaptiveQuestions: [
+    {
+      id: "q_purpose",
+      prompt: "What is the heart of this retreat for participants?",
+      lowerFrictionPrompt: "What's the heart of this retreat?",
+      sectionId: "purpose",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["purpose"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_lodging",
+      prompt: "Where will people sleep, and who books lodging?",
+      sectionId: "venue",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["venue", "lodging"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_care",
+      prompt: "What care, accessibility, or safety needs should shape the program?",
+      sectionId: "safety",
+      requiredInModes: ["guided_build", "complete_planning"],
+      postponable: true,
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_volunteers",
+      prompt: "Do you need volunteers beyond the core team?",
+      sectionId: "volunteers",
+      requiredInModes: ["complete_planning"],
+      knownContextKeys: ["needs_volunteers"],
+      postponable: true,
+      materialChangeNextStep: true,
+    },
+  ],
+  suggestedTasks: [
+    { id: "t_hold_venue", title: "Hold lodging and meeting spaces", sectionId: "venue" },
+    { id: "t_day_themes", title: "Name each day's theme", sectionId: "agenda" },
+    { id: "t_safety", title: "Draft safety and emergency contacts", sectionId: "safety", depthModes: ["complete_planning"] },
+  ],
+  suggestedMilestones: [
+    { id: "m_deposit", title: "Venue deposit paid" },
+    { id: "m_roster", title: "Final roster locked", depthModes: ["guided_build", "complete_planning"] },
+    { id: "m_pack_list", title: "Packing list sent", depthModes: ["complete_planning"] },
+  ],
+  commonlyForgottenItems: [
+    "Quiet / rest options between sessions",
+    "Dietary list per meal",
+    "Travel day buffers",
+    "Emergency contacts",
+    "Integration / re-entry support after day three",
+  ],
+  riskPrompts: [
+    "What is the cancellation and weather plan?",
+    "Who holds medical / emergency information on-site?",
+  ],
+  researchPrompts: [
+    "Retreat venue accessibility audit",
+    "Typical staffing ratios for this group size",
+  ],
+  deliverables: ["Retreat overview", "Three-day agenda", "Packing list", "Care & safety brief", "Follow-up integration plan"],
+  chamberRoutingRecommendations: ["events", "wellbeing"],
+  boardReviewRecommendations: ["Board review of total budget and liability coverage"],
+  projectBridgeRecommendations: ["Bridge as a Project at deposit"],
+  cartographyRelationshipRecommendations: [
+    { relationship: "part_of", note: "May sit under a larger leadership or offer program" },
+  ],
+  completionCriteria: [
+    "Purpose and daily themes clear",
+    "Lodging and meals planned",
+    "Team roles assigned",
+    "Safety plan present (Guided+)",
+  ],
+  certificationRules: ["event.foundation", "event.map", "event.focus", "event.continue"],
+  domainExtensions: {
+    peopleAndRoles: ["Retreat lead", "Care lead", "Logistics", "Facilitators", "On-call support"],
+    budgetConsiderations: ["Lodging", "Meals", "Travel stipends", "Insurance", "Materials"],
+    timelineRecommendations: ["12 weeks: venue", "6 weeks: invitations", "2 weeks: packing list", "1 week: final logistics"],
+    communications: ["Invitation", "Prep packet", "Daily orientation notes", "Closing + integration"],
+    followUpRequirements: ["Integration check-in within one week", "Photo / memory share with permission"],
+  },
+});
+
+export const EVENT_BLUEPRINT_BOOK_SIGNING = eventBlueprint({
+  blueprintId: "bp-event-book-signing",
+  version: "1.0.0",
+  title: "Book Signing",
+  description: "Plan a book signing or launch appearance with inventory, flow, and promotion.",
+  intendedUse: "Author appearances, bookstore events, and launch signings.",
+  complexity: "simple",
+  sections: [
+    { id: "event_type", title: "Event Type", role: "required", defaultValue: "Book Signing" },
+    { id: "purpose", title: "Purpose", role: "required" },
+    { id: "audience", title: "Audience", role: "required" },
+    { id: "dates", title: "Date and Time", role: "required" },
+    { id: "venue", title: "Venue", role: "required" },
+    { id: "marketing", title: "Marketing", role: "required" },
+    { id: "swag", title: "Books and Materials", role: "required" },
+    { id: "run_of_show", title: "Run of Show", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    {
+      id: "sponsors",
+      title: "Partners / Sponsors",
+      role: "conditional",
+      condition: { kind: "known_context_truthy", key: "has_partner" },
+    },
+    { id: "post_event_follow_up", title: "Follow-Up", role: "optional", condition: { kind: "depth_at_least", mode: "guided_build" } },
+    SHARED_HIDDEN,
+  ],
+  adaptiveQuestions: [
+    {
+      id: "q_title",
+      prompt: "Which book (or books) are you signing?",
+      lowerFrictionPrompt: "Which book is this for?",
+      sectionId: "purpose",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["book_title", "purpose"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_inventory",
+      prompt: "How many copies will you bring, and who supplies them?",
+      sectionId: "swag",
+      requiredInModes: ["quick_start", "guided_build", "complete_planning"],
+      knownContextKeys: ["inventory"],
+      materialChangeNextStep: true,
+    },
+    {
+      id: "q_partner",
+      prompt: "Is a bookstore or partner hosting with you?",
+      sectionId: "sponsors",
+      requiredInModes: ["guided_build", "complete_planning"],
+      knownContextKeys: ["has_partner"],
+      postponable: true,
+      materialChangeNextStep: true,
+    },
+  ],
+  suggestedTasks: [
+    { id: "t_inventory", title: "Confirm book inventory and pre-orders", sectionId: "swag" },
+    { id: "t_promo", title: "Publish event listing", sectionId: "marketing" },
+    { id: "t_table_flow", title: "Plan signing table flow", sectionId: "run_of_show", depthModes: ["guided_build", "complete_planning"] },
+  ],
+  suggestedMilestones: [
+    { id: "m_listing_live", title: "Event listing live" },
+    { id: "m_books_on_site", title: "Books confirmed on-site", depthModes: ["complete_planning"] },
+  ],
+  commonlyForgottenItems: [
+    "Sharpie / pen kit",
+    "Table sign with book title",
+    "Payment / preorder pickup process",
+    "Photo permission",
+    "Spillover seating line management",
+  ],
+  riskPrompts: [
+    "What if inventory sells out early?",
+    "Who handles accessibility for the signing line?",
+  ],
+  researchPrompts: [
+    "Comparable turnout for this venue and genre",
+    "Local media / newsletter listing deadlines",
+  ],
+  deliverables: ["Event listing copy", "Inventory checklist", "Signing table run-of-show", "Thank-you / next-read note"],
+  chamberRoutingRecommendations: ["events", "content"],
+  boardReviewRecommendations: [],
+  projectBridgeRecommendations: ["Bridge when listing goes live"],
+  cartographyRelationshipRecommendations: [
+    { relationship: "supports", note: "Supports book / content launch work" },
+  ],
+  completionCriteria: [
+    "Book and date clear",
+    "Venue confirmed",
+    "Inventory plan set",
+    "Promotion path started",
+  ],
+  certificationRules: ["event.foundation", "event.map"],
+  domainExtensions: {
+    peopleAndRoles: ["Author", "Host / bookseller", "Line helper", "Photographer (optional)"],
+    budgetConsiderations: ["Venue fee", "Inventory", "Travel", "Promo boost"],
+    timelineRecommendations: ["4 weeks: listing", "2 weeks: reminders", "Day-of: inventory check"],
+    communications: ["Listing", "Social reminder", "Day-of story", "Thank-you"],
+    followUpRequirements: ["Post event photos with permission", "Share purchase / review link"],
+  },
+});
+
+/** All Event Spark Blueprints registered through the universal framework. */
+export const EVENT_PLAN_BLUEPRINT_DEFINITIONS: readonly BlueprintDefinition[] = [
+  EVENT_BLUEPRINT_BUSINESS_LUNCHEON,
+  EVENT_BLUEPRINT_ONLINE_WORKSHOP,
+  EVENT_BLUEPRINT_ONE_DAY_WORKSHOP,
+  EVENT_BLUEPRINT_THREE_DAY_RETREAT,
+  EVENT_BLUEPRINT_BOOK_SIGNING,
+];
+
+export const EVENT_PLAN_BLUEPRINT_IDS = EVENT_PLAN_BLUEPRINT_DEFINITIONS.map(
+  (b) => b.blueprintId,
+) as readonly string[];

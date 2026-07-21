@@ -4,6 +4,7 @@
  */
 
 import "./packages/eventPlan/registerEventPlanWorkType";
+import "./packages/eventPlan/registerEventBlueprints";
 
 export type {
   CanonicalWorkId,
@@ -11,6 +12,7 @@ export type {
   WorkOrigin,
   WorkTypePackage,
   WorkTypeCapabilityFlags,
+  WorkTypeMapGroupConfig,
   WorkTask,
   WorkMilestone,
   WorkTaskStatus,
@@ -19,6 +21,8 @@ export type {
   ResearchApprovalStatus,
   WorkRelationship,
   WorkRelationshipKind,
+  WorkRelationshipSourceEntityType,
+  WorkRelationshipTargetType,
 } from "./types";
 export { UnknownWorkTypeError } from "./types";
 
@@ -79,6 +83,7 @@ export {
 
 export {
   linkWorkRelationship,
+  unlinkWorkRelationship,
   listWorkRelationships,
   cartographyRefsForWork,
   resetWorkRelationshipsForTests,
@@ -117,3 +122,89 @@ export {
   applyAssembledOutputToWorkflow,
   markAssembledOutputStale,
 } from "./sectionRuntime/assembleWork";
+
+/** Universal Blueprint Framework */
+export type {
+  BlueprintCategory,
+  BlueprintDepthMode,
+  BlueprintComplexity,
+  BlueprintDefinition,
+  BlueprintSectionDef,
+  BlueprintGroup,
+  BlueprintAdaptiveQuestion,
+  WorkBlueprintState,
+  AdaptiveQuestionDecision,
+  SaveAsBlueprintReview,
+  BuildFromPreviousOptions,
+  BlueprintAuditEvent,
+  BlueprintProvenance,
+  WorkshopMapGroupView,
+  SaveStructureAsBlueprintInput,
+} from "./blueprints";
+export {
+  UnknownBlueprintError,
+  IncompatibleBlueprintError,
+  ALL_BLUEPRINT_DEPTH_MODES,
+  DEFAULT_GROUP_MAP_THRESHOLD,
+  registerBlueprint,
+  getBlueprint,
+  requireBlueprint,
+  resolveBlueprintVersion,
+  listBlueprints,
+  listBlueprintVersions,
+  isBlueprintRegistered,
+  isBlueprintCompatibleWithWorkType,
+  clearBlueprintRegistryForTests,
+  evaluateBlueprintCondition,
+  resolveActiveSections,
+  recordBlueprintAudit,
+  listBlueprintAudit,
+  resetBlueprintAuditForTests,
+  getWorkBlueprintState,
+  requireWorkBlueprintState,
+  listWorkBlueprintStates,
+  resetWorkBlueprintStateForTests,
+  evaluateAdaptiveQuestion,
+  listAdaptiveQuestionDecisions,
+  answerBlueprintQuestion,
+  skipBlueprintQuestion,
+  recoverSkippedQuestion,
+  mergeKnownContext,
+  questionsForDepthMode,
+  assertBlueprintCompatible,
+  initializeWorkFromBlueprint,
+  changeBlueprintDepthMode,
+  upgradeWorkBlueprint,
+  approveBlueprintOverwrite,
+  adaptBlueprintForContext,
+  updateWorkSectionFromBlueprintState,
+  sanitizeInstanceSpecificContent,
+  prepareSaveAsBlueprint,
+  confirmSaveAsBlueprint,
+  buildWorkFromPreviousWork,
+  provenanceForWork,
+  duplicateBlueprint,
+  inheritBlueprint,
+  shouldUseGroupedMap,
+  buildWorkshopMapGroups,
+  resolveInitiallyOpenGroupIds,
+  resolveWorkshopMapForWorkflow,
+  addBlueprintSection,
+  renameBlueprintSection,
+  duplicateBlueprintSection,
+  softDeleteBlueprintSection,
+  moveBlueprintSection,
+  moveBlueprintSectionToGroup,
+  addBlueprintGroup,
+  renameBlueprintGroup,
+  deleteBlueprintGroup,
+  moveBlueprintGroup,
+  undoBlueprintStructure,
+  previewBlueprintStructureUpdate,
+  listStructureUndo,
+  resetStructureUndoForTests,
+  saveStructureAsBlueprint,
+} from "./blueprints";
+export { ensureEventBlueprintsRegistered } from "./packages/eventPlan/registerEventBlueprints";
+export { EVENT_PLAN_BLUEPRINT_IDS } from "./packages/eventPlan/eventBlueprintDefinitions";
+export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";

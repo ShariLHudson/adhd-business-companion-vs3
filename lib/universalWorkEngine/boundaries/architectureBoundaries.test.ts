@@ -9,8 +9,10 @@ import {
   APPROVED_DURABLE_TABLE,
   UnknownWorkTypeError,
   allocateCanonicalWorkId,
+  clearBlueprintRegistryForTests,
   clearWorkTypePackageRegistryForTests,
   coalesceWorkflowWorkId,
+  ensureEventBlueprintsRegistered,
   ensureEventPlanWorkTypeRegistered,
   getWorkTypePackage,
   linkWorkRelationship,
@@ -59,8 +61,10 @@ describe("Universal Work Engine — architecture boundaries", () => {
     resetWorkRelationshipsForTests();
     resetWorkTasksForTests();
     resetResearchAttachmentsForTests();
+    clearBlueprintRegistryForTests();
     clearWorkTypePackageRegistryForTests();
     ensureEventPlanWorkTypeRegistered();
+    ensureEventBlueprintsRegistered();
   });
 
   it("Universal Work Engine core does not import Event Intelligence packages", () => {
