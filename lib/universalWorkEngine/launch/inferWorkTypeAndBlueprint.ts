@@ -50,7 +50,11 @@ import {
   PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
   REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
   CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+  DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
+  FRANCHISE_BUSINESS_BLUEPRINT_ID,
   MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+  MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
+  RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
   RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
   SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
   SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
@@ -228,6 +232,15 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-creative-agency": CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
   "bp-research-innovation-lab": RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
   "bp-research-lab": RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
+  "bp-franchise": FRANCHISE_BUSINESS_BLUEPRINT_ID,
+  "bp-franchise-business": FRANCHISE_BUSINESS_BLUEPRINT_ID,
+  "bp-multi-location": MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
+  "bp-multi-location-business": MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
+  "bp-rental-equipment-hire": RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
+  "bp-equipment-hire": RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
+  "bp-dealer-reseller-channel-partner":
+    DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
+  "bp-dealer": DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -255,6 +268,30 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(product\s+photography(?:\s+(?:studio|blueprint))?|photography\s+studio\s+blueprint|business\.product_photography)\b/i,
     blueprintId: PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Franchise before retail_store / restaurant / hospitality / service
+    re: /\b(franchise(?:\s+business)?|franchisor(?:\s+business)?|business\.franchise)\b/i,
+    blueprintId: FRANCHISE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Multi-location before retail_store
+    re: /\b(multi[\s-]?location(?:\s+business)?|multi[\s-]?site(?:\s+business)?|business\.multi_location)\b/i,
+    blueprintId: MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Rental/equipment hire before venue_experience / ecommerce
+    re: /\b(rental(?:\s+(?:and\s+)?equipment\s+hire)(?:\s+business)?|equipment\s+hire(?:\s+business)?|equipment\s+rental(?:\s+business)?|business\.rental_equipment_hire)\b/i,
+    blueprintId: RENTAL_EQUIPMENT_HIRE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Dealer/reseller/channel before wholesale_distribution and business.wholesale
+    re: /\b(dealer(?:\s+(?:reseller|channel))?|reseller(?:\s+channel)?|channel\s+partner(?:\s+blueprint)?|dealer\s+reseller\s+and\s+channel\s+partner|business\.dealer_reseller_channel_partner)\b/i,
+    blueprintId: DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
