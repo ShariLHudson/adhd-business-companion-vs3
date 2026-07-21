@@ -115,7 +115,7 @@ export const ESTATE_COACHING_PRESCRIPTIONS: Record<
       id: "creative-create",
       humanLabel: "Start making something — even a rough draft",
       spaceId: "creative-studio",
-      openSection: "content-generator",
+      openSection: "create",
     }),
     rx({
       id: "creative-observatory",
@@ -184,10 +184,10 @@ export const ESTATE_COACHING_PRESCRIPTIONS: Record<
   ],
   decision: [
     rx({
-      id: "decision-round-table",
+      id: "decision-talk-it-out",
       humanLabel: "Talk it through together",
-      spaceId: "decision-compass",
-      openSection: "decision-compass",
+      spaceId: "talk-it-out",
+      openSection: "talk-it-out",
     }),
     rx({
       id: "decision-boardroom",
@@ -238,7 +238,7 @@ export const ESTATE_COACHING_PRESCRIPTIONS: Record<
       id: "growth-create",
       humanLabel: "Build something new for the business",
       spaceId: "creative-studio",
-      openSection: "content-generator",
+      openSection: "create",
     }),
     rx({
       id: "growth-momentum-plan",

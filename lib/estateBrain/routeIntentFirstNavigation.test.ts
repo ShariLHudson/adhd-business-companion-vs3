@@ -12,13 +12,14 @@ describe("Intent-First Estate Navigation", () => {
     expect(intent?.category).toBe("create");
   });
 
-  it("routes SOP to Create Studio + SOP capability", () => {
+  it("routes SOP to Create Studio + Estate Create section", () => {
     const route = resolveIntentFirstRoute("Help me write an SOP");
     expect(route?.intentCategory).toBe("create");
     expect(route?.environmentId).toBe("create-studio");
     expect(route?.environmentName).toBe("Create Studio");
     expect(route?.capabilityId).toBe("create.sop");
     expect(route?.spaceId).toBe("creative-studio");
+    expect(route?.toolId).toBe("create");
     expect(route?.immediateNavigate).toBe(true);
   });
 

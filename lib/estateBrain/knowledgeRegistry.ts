@@ -16,7 +16,8 @@ const CREATE: EstateKnowledgeEntry = {
     "Making and drafting — emails, documents, visuals, templates, and new project shells.",
   experienceId: "create",
   spaceId: "creative-studio",
-  primarySection: "content-generator",
+  /** 096 — Estate Create (Welcome Home → Create), not legacy content-generator. */
+  primarySection: "create",
   capabilities: [
     "Email",
     "Newsletter",
@@ -264,6 +265,7 @@ const THINK: EstateKnowledgeEntry = {
   spaceId: "decision-compass",
   primarySection: "decision-compass",
   capabilities: [
+    "Talk It Out",
     "Decision Compass",
     "Pros and Cons",
     "SWOT",
@@ -273,11 +275,13 @@ const THINK: EstateKnowledgeEntry = {
     "Notes",
   ],
   suggestedActivities: [
+    "Talk something through",
     "Work through a decision",
     "Research a topic",
     "Study with Great Thinkers",
   ],
   tools: [
+    "Talk It Out",
     "Decision Compass",
     "Pros & Cons",
     "SWOT",
@@ -286,8 +290,18 @@ const THINK: EstateKnowledgeEntry = {
     "Study",
     "Learning",
   ],
-  relatedSpaceIds: ["study-hall", "library", "observatory", "round-table"],
+  relatedSpaceIds: [
+    "talk-it-out",
+    "study-hall",
+    "library",
+    "observatory",
+    "round-table",
+  ],
   triggers: [
+    "talk it out",
+    "talk through",
+    "think out loud",
+    "help me think",
     "decide",
     "decision",
     "help me decide",
@@ -507,6 +521,7 @@ const EXPLORE: EstateKnowledgeEntry = {
   description: "Map, guidebook, seasonal discovery, and visit another room.",
   experienceId: "explore",
   spaceId: "welcome-home",
+  /** 096 — Wander the Grounds is the member-facing Explore open. */
   primarySection: "home",
   capabilities: [
     "Estate Map",
@@ -514,11 +529,13 @@ const EXPLORE: EstateKnowledgeEntry = {
     "Guidebook",
     "Seasonal Events",
     "Hidden Discoveries",
+    "Wander the Grounds",
+    "Spark Estate Guide",
   ],
   suggestedActivities: [
-    "Show the estate map",
+    "Wander the Grounds",
+    "Open the Spark Estate Guide",
     "Visit another room",
-    "Browse the guidebook",
   ],
   tools: ["Estate Map", "Visit Another Room", "Estate Guide", "Guidebook"],
   relatedSpaceIds: ["library", "homestead", "gardens"],
@@ -526,13 +543,23 @@ const EXPLORE: EstateKnowledgeEntry = {
     "estate map",
     "visit another room",
     "wander",
+    "wander the grounds",
     "explore",
     "guidebook",
+    "spark estate guide",
     "show me the estate",
     "discover",
     "where can i go",
   ],
-  aliases: ["homestead", "welcome home", "map"],
+  aliases: [
+    "homestead",
+    "welcome home",
+    "map",
+    "wander-the-grounds",
+    "explore-estate",
+    "spark-estate-guide",
+    "estate-guidebook",
+  ],
   defaultGreeting: "Where should we wander?",
   nextSuggestions: ["Restore", "Create", "Journal"],
   userNeeds: ["orient"],
@@ -540,6 +567,32 @@ const EXPLORE: EstateKnowledgeEntry = {
 
 /** Individual spaces — extend experiences with physical places */
 const SPACES: EstateKnowledgeEntry[] = [
+  {
+    id: "parking-lot",
+    kind: "space",
+    name: "Parking Lot",
+    purpose: "Hold thoughts safely for later.",
+    description:
+      "A calm holding place for unfinished thoughts — nothing has to be decided now.",
+    experienceId: "restore",
+    spaceId: "parking-lot",
+    primarySection: "parking-lot",
+    capabilities: ["Park a thought", "Review parked items", "Return later"],
+    suggestedActivities: ["Park something for later", "Review what you parked"],
+    tools: ["Parking Lot"],
+    relatedSpaceIds: ["clear-my-mind", "journal", "goals-projects"],
+    triggers: [
+      "parking lot",
+      "park this",
+      "hold this thought",
+      "save for later",
+      "not now",
+    ],
+    aliases: ["parking-lot", "parked thoughts"],
+    defaultGreeting: "What would you like to park for later?",
+    nextSuggestions: ["Clear My Mind", "Projects", "Journal"],
+    userNeeds: ["overwhelmed", "focus"],
+  },
   {
     id: "clear-my-mind",
     kind: "space",

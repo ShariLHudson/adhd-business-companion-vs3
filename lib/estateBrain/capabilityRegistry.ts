@@ -111,7 +111,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["email", "e-mail", "write an email", "draft email"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["copywriter"],
   }),
   cap({
@@ -121,7 +121,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["newsletter"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["copywriter", "marketing-expert"],
   }),
   cap({
@@ -131,7 +131,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["sop", "standard operating", "procedure"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["instructional-designer"],
   }),
   cap({
@@ -141,7 +141,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["proposal"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["copywriter", "sales-expert"],
   }),
   cap({
@@ -151,7 +151,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["blog", "blog post", "article"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["copywriter"],
   }),
   cap({
@@ -161,7 +161,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["social post", "social media", "instagram", "linkedin post"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["copywriter", "marketing-expert"],
   }),
   cap({
@@ -171,7 +171,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["presentation", "slides", "deck"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["writing-coach"],
   }),
   cap({
@@ -181,7 +181,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["ai image", "generate image", "create image", "picture"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["graphic-design-advisor"],
   }),
   cap({
@@ -208,7 +208,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["whiteboard", "brainstorm"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["writing-coach", "business-strategist"],
   }),
   cap({
@@ -218,7 +218,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["template"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["instructional-designer"],
   }),
   cap({
@@ -235,7 +235,7 @@ const CREATE: EstateCapability[] = [
     ],
     experienceId: "create",
     spaceId: "decision-compass",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["writing-coach"],
   }),
   cap({
@@ -245,7 +245,7 @@ const CREATE: EstateCapability[] = [
     triggers: ["write", "draft", "create", "build", "make", "design"],
     experienceId: "create",
     spaceId: "creative-studio",
-    toolId: "content-generator",
+    toolId: "create",
     expertIds: ["copywriter", "writing-coach"],
   }),
 ];
@@ -386,9 +386,41 @@ const RESTORE: EstateCapability[] = [
     toolId: "brain-dump",
     expertIds: ["adhd-coach"],
   }),
+  cap({
+    id: "restore.parking-lot",
+    name: "Parking Lot",
+    category: "restore",
+    triggers: [
+      "parking lot",
+      "park this",
+      "hold this thought",
+      "save for later",
+      "not now but later",
+    ],
+    experienceId: "restore",
+    spaceId: "parking-lot",
+    toolId: "parking-lot",
+    expertIds: ["adhd-coach", "productivity-specialist"],
+  }),
 ];
 
 const JOURNAL: EstateCapability[] = [
+  cap({
+    id: "journal.evidence-vault",
+    name: "Evidence Vault",
+    category: "journal",
+    triggers: [
+      "evidence vault",
+      "evidence bank",
+      "proof of progress",
+      "show my evidence",
+      "growth evidence",
+    ],
+    experienceId: "grow",
+    spaceId: "evidence-vault",
+    toolId: "evidence-bank",
+    expertIds: ["adhd-coach", "executive-coach"],
+  }),
   cap({
     id: "journal.reflect",
     name: "Reflection",
@@ -432,6 +464,25 @@ const BUSINESS: EstateCapability[] = [
 ];
 
 const LEARN: EstateCapability[] = [
+  cap({
+    id: "learn.talk-it-out",
+    name: "Talk It Out",
+    category: "learn",
+    triggers: [
+      "talk it out",
+      "talk through",
+      "think out loud",
+      "help me think",
+      "talk this through",
+      "reflect with me",
+      "one question at a time",
+    ],
+    experienceId: "think",
+    spaceId: "talk-it-out",
+    toolId: "talk-it-out",
+    expertIds: ["adhd-coach", "executive-coach"],
+    immediateNavigate: true,
+  }),
   cap({
     id: "learn.thinkers",
     name: "Great Thinkers",
