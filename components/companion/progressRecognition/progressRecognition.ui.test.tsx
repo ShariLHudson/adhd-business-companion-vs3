@@ -3,8 +3,8 @@
  * @vitest-environment jsdom
  */
 
-import { describe, expect, it, beforeEach } from "vitest";
-import { createRoot } from "react-dom/client";
+import { describe, expect, it, beforeEach, afterEach, vi } from "vitest";
+import { createRoot, type Root } from "react-dom/client";
 import { act } from "react";
 import { BusinessPulsePanel } from "./BusinessPulsePanel";
 import { RecognitionReviewPrompt } from "./RecognitionReviewPrompt";
@@ -14,48 +14,50 @@ import {
   type RecognitionCandidate,
 } from "@/lib/progressRecognition";
 
-function render(node: React.ReactNode) {
-  const host = document.createElement("div");
-  document.body.appendChild(host);
-  const root = createRoot(host);
-  act(() => {
-    root.render(node);
-  });
-  return {
-    container: host,
-    unmount: () => {
-      act(() => root.unmount());
-      host.remove();
-    },
-  };
-}
-
 describe("101 progress recognition UI", () => {
+  let container: HTMLDivElement;
+  let root: Root;
+
   beforeEach(() => {
+    (
+      globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT?: boolean }
+    ).IS_REACT_ACT_ENVIRONMENT = true;
     resetProgressRecognitionAdaptersForTests();
     resetRecognitionPreferencesForTests();
-    document.body.innerHTML = "";
+    container = document.createElement("div");
+    document.body.appendChild(container);
+    root = createRoot(container);
+  });
+
+  afterEach(() => {
+    act(() => {
+      root.unmount();
+    });
+    container.remove();
+    vi.unstubAllGlobals();
   });
 
   it("Business Pulse shows primary statement without forcing detail panels open", () => {
-    const { container, unmount } = render(
-      <BusinessPulsePanel
-        model={{
-          primaryStatement: "Everything is moving steadily.",
-          meaningfulChanges: ["One meaningful win this stretch."],
-          workInMotionCount: 1,
-          recentWinCount: 1,
-          recentAccomplishmentCount: 0,
-          recentEvidenceCount: 0,
-          nextHelpfulStep: "Continue the Work that feels most alive today.",
-          disclosure: {
-            seeWhatMovedForward: ["Win: Clarified offer"],
-            seeConnections: [],
-            reviewWinsAndAccomplishments: ["Clarified offer"],
-          },
-        }}
-      />,
-    );
+    act(() => {
+      root.render(
+        <BusinessPulsePanel
+          model={{
+            primaryStatement: "Everything is moving steadily.",
+            meaningfulChanges: ["One meaningful win this stretch."],
+            workInMotionCount: 1,
+            recentWinCount: 1,
+            recentAccomplishmentCount: 0,
+            recentEvidenceCount: 0,
+            nextHelpfulStep: "Continue the Work that feels most alive today.",
+            disclosure: {
+              seeWhatMovedForward: ["Win: Clarified offer"],
+              seeConnections: [],
+              reviewWinsAndAccomplishments: ["Clarified offer"],
+            },
+          }}
+        />,
+      );
+    });
     expect(
       container.querySelector("[data-testid='pulse-primary']")?.textContent,
     ).toMatch(/moving steadily/);
@@ -71,7 +73,6 @@ describe("101 progress recognition UI", () => {
     expect(
       container.querySelector("[data-testid='pulse-detail-moved']"),
     ).toBeTruthy();
-    unmount();
   });
 
   it("recognition review offers save/celebrate/decline", () => {
@@ -86,15 +87,14 @@ describe("101 progress recognition UI", () => {
       factors: ["meaningful_section"],
       detectedAt: "2026-07-21T10:00:00.000Z",
     };
-    const { container, unmount } = render(
-      <RecognitionReviewPrompt candidate={candidate} />,
-    );
+    act(() => {
+      root.render(<RecognitionReviewPrompt candidate={candidate} />);
+    });
     expect(
       container.querySelector("[data-testid='review-choice-save_win']"),
     ).toBeTruthy();
     expect(
       container.querySelector("[data-testid='review-choice-not_this_time']"),
     ).toBeTruthy();
-    unmount();
   });
 });

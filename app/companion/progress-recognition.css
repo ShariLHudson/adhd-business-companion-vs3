@@ -99,10 +99,16 @@
   font-size: 1.15rem;
 }
 
+.progress-return-bar {
+  margin-top: 0.75rem;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .progress-celebrate-here,
   .progress-pulse,
-  .progress-review {
+  .progress-review,
+  .progress-return-bar,
+  .progress-sound-picker {
     animation: none !important;
     transition: none !important;
   }

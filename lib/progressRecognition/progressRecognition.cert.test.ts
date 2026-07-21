@@ -2,7 +2,7 @@
  * 101 — Boundaries, recognition, celebration, pulse, conversation certification.
  */
 
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   assertCompletionKindsNeverAutoEvidence,
   assertNotEvidenceByDefault,
@@ -30,10 +30,38 @@ import {
   saveWinRecord,
   setRecognitionPreferences,
   wouldDuplicateRecognition,
+  removeRecognition,
+  listAccomplishmentRecords,
   RECOGNITION_LANGUAGE,
   RECOGNITION_SURFACE_BOUNDARIES,
 } from "./index";
 import { applyRecognitionReviewChoice } from "./applyReviewChoice";
+import { getEvidenceEntries } from "@/lib/evidenceBankStore";
+
+function stubBrowserStorage() {
+  const store = new Map<string, string>();
+  const api = {
+    getItem: (k: string) => store.get(k) ?? null,
+    setItem: (k: string, v: string) => {
+      store.set(k, v);
+    },
+    removeItem: (k: string) => {
+      store.delete(k);
+    },
+    clear: () => store.clear(),
+    key: (i: number) => [...store.keys()][i] ?? null,
+    get length() {
+      return store.size;
+    },
+  };
+  vi.stubGlobal("localStorage", api);
+  vi.stubGlobal("window", {
+    localStorage: api,
+    dispatchEvent: () => true,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  });
+}
 
 describe("101 progress recognition — boundaries", () => {
   beforeEach(() => {
@@ -106,6 +134,42 @@ describe("101 progress recognition — boundaries", () => {
       pattern: "Send three days before",
     });
     expect("evidenceId" in saved).toBe(true);
+  });
+
+  it("removing recognition does not delete Evidence or peer records", () => {
+    stubBrowserStorage();
+    try {
+      const win = saveWinRecord({
+        title: "Momentum win",
+        significance: "meaningful",
+        sourceType: "section",
+        sourceId: "sec-rm",
+        occurredAt: "2026-07-21T09:00:00.000Z",
+      });
+      expect("winId" in win).toBe(true);
+      const acc = saveAccomplishmentRecord({
+        title: "Durable finish",
+        sourceType: "blueprint",
+        sourceId: "bp-rm",
+        occurredAt: "2026-07-21T09:30:00.000Z",
+      });
+      expect("accomplishmentId" in acc).toBe(true);
+      const evidence = saveEvidenceRecognitionRecord({
+        discovery: "Lesson from the finish",
+        sourceId: "bp-rm",
+      });
+      expect("evidenceId" in evidence).toBe(true);
+      const evidenceId = (evidence as { evidenceId: string }).evidenceId;
+
+      removeRecognition("win", (win as { winId: string }).winId);
+      expect(
+        listWinRecords().some((w) => w.winId === (win as { winId: string }).winId),
+      ).toBe(false);
+      expect(listAccomplishmentRecords().length).toBeGreaterThanOrEqual(1);
+      expect(getEvidenceEntries().some((e) => e.id === evidenceId)).toBe(true);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
 

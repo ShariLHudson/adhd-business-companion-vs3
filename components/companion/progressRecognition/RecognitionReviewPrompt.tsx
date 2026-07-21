@@ -4,12 +4,14 @@ import {
   applyRecognitionReviewChoice,
   buildRecognitionReviewOffer,
   resolveCelebrationChoice,
+  type CelebrationRecord,
   type RecognitionCandidate,
   type ReviewChoiceResult,
 } from "@/lib/progressRecognition";
 import { useState } from "react";
 import { CelebrateHereBanner } from "./CelebrateHereBanner";
 import { CelebrationSoundPicker } from "./CelebrationSoundPicker";
+import { RecognitionReturnBar } from "./RecognitionReturnBar";
 
 type Props = {
   candidate: RecognitionCandidate;
@@ -20,6 +22,7 @@ type Props = {
     placeId?: string;
   };
   onNavigate?: (placeId: string) => void;
+  onReturn?: (returnPath: NonNullable<CelebrationRecord["returnPath"]>) => void;
   onComplete?: (result: ReviewChoiceResult) => void;
   onDismiss?: () => void;
 };
@@ -31,6 +34,7 @@ export function RecognitionReviewPrompt({
   candidate,
   returnPath,
   onNavigate,
+  onReturn,
   onComplete,
   onDismiss,
 }: Props) {
@@ -38,6 +42,9 @@ export function RecognitionReviewPrompt({
   const [result, setResult] = useState<ReviewChoiceResult | null>(null);
   const [celebrateHere, setCelebrateHere] = useState<string | null>(null);
   const [soundOpen, setSoundOpen] = useState(false);
+  const [activeReturnPath, setActiveReturnPath] = useState<
+    NonNullable<CelebrationRecord["returnPath"]> | null
+  >(returnPath ?? null);
 
   if (!offer && !result) {
     return null;
@@ -103,6 +110,11 @@ export function RecognitionReviewPrompt({
                     choiceId: c.id,
                     offer: celebrationOffer,
                   });
+                  if (resolved.celebration?.returnPath) {
+                    setActiveReturnPath(resolved.celebration.returnPath);
+                  } else if (celebrationOffer.returnPath) {
+                    setActiveReturnPath(celebrationOffer.returnPath);
+                  }
                   if (resolved.celebrateInPlace) {
                     setCelebrateHere(candidate.title);
                   }
@@ -135,6 +147,13 @@ export function RecognitionReviewPrompt({
             setCelebrateHere(null);
             onDismiss?.();
           }}
+        />
+      ) : null}
+
+      {activeReturnPath && onReturn ? (
+        <RecognitionReturnBar
+          returnPath={activeReturnPath}
+          onReturn={onReturn}
         />
       ) : null}
     </div>
