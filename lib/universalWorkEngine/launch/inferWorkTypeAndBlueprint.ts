@@ -13,13 +13,17 @@ import { BUSINESS_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/busines
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import {
+  AUTHOR_BUSINESS_BLUEPRINT_ID,
   COACHING_BUSINESS_BLUEPRINT_ID,
   CONSULTING_BUSINESS_BLUEPRINT_ID,
+  CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
+  COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+  MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
@@ -102,6 +106,14 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-consulting": CONSULTING_BUSINESS_BLUEPRINT_ID,
   "bp-service-business": SERVICE_BUSINESS_BLUEPRINT_ID,
   "bp-service-operating": SERVICE_BUSINESS_BLUEPRINT_ID,
+  "bp-author-business": AUTHOR_BUSINESS_BLUEPRINT_ID,
+  "bp-author": AUTHOR_BUSINESS_BLUEPRINT_ID,
+  "bp-course-creator": COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
+  "bp-course-creator-business": COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
+  "bp-membership-business": MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+  "bp-membership": MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+  "bp-content-creator": CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
+  "bp-content-creator-business": CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -166,6 +178,28 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(service\s+business(?:\s+operating)?|service\s+operating\s+blueprint|service\s+business\s+blueprint|business\.service)\b/i,
     blueprintId: SERVICE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Author before Event book launch language
+    re: /\b(author\s+business|author\s+blueprint|business\.author)\b/i,
+    blueprintId: AUTHOR_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Course creator before membership / content creator
+    re: /\b(course\s+creator(?:\s+business)?|course\s+business|online\s+course\s+business|business\.course_creator)\b/i,
+    blueprintId: COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(membership\s+business|membership\s+blueprint|membership\s+community\s+business|business\.membership)\b/i,
+    blueprintId: MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(content\s+creator\s+business|creator\s+business(?:\s+blueprint)?|business\.content_creator)\b/i,
+    blueprintId: CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -334,7 +368,7 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
   if (
     !workTypeId &&
     message &&
-    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner|speaker\s+business|speaking\s+business|coaching\s+business|coach\s+business|consulting\s+business|consultant\s+business|service\s+business(?:\s+operating)?)\b/i.test(
+    /\b(craft\s+show\s+business|handmade\s+online\s+store|handmade\s+(?:business|shop|store)|maker\s+business|etsy\s+(?:shop|store|business)|product\s+photography|inventory\s+(?:and\s+)?pricing|holiday\s+product\s+planner|holiday\s+(?:collection|planner)|seasonal\s+(?:product\s+)?planner|speaker\s+business|speaking\s+business|coaching\s+business|coach\s+business|consulting\s+business|consultant\s+business|service\s+business(?:\s+operating)?|author\s+business|course\s+creator|course\s+business|membership\s+business|content\s+creator\s+business|creator\s+business)\b/i.test(
       message,
     )
   ) {

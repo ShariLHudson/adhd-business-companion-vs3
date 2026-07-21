@@ -8,8 +8,11 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 ## critical
 
 - [ ] `bp-event-book-signing` — **Inventory checklist** → label_draft_only
+- [ ] `business.author` — **Author Financial Model** → implement_structured
 - [ ] `business.coaching` — **Coaching Pricing Model** → implement_structured
 - [ ] `business.consulting` — **Pricing Model** → implement_structured
+- [ ] `business.course_creator` — **Course Pricing Model** → implement_structured
+- [ ] `business.course_creator` — **Course KPI Dashboard** → implement_structured
 - [ ] `business.craft_show` — **Product and pricing sheet** → implement_structured
 - [ ] `business.craft_show` — **Inventory checklist** → label_draft_only
 - [ ] `business.etsy` — **Pricing and profitability view** → implement_structured
@@ -19,6 +22,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.inventory_pricing` — **Cost of goods sheet** → implement_structured
 - [ ] `business.inventory_pricing` — **Pricing sheet** → implement_structured
 - [ ] `business.inventory_pricing` — **Dead inventory decisions** → label_draft_only
+- [ ] `business.membership` — **Membership Pricing Model** → implement_structured
+- [ ] `business.membership` — **Membership Health Dashboard** → implement_structured
 - [ ] `business.service` — **Pricing Calculator** → implement_structured
 - [ ] `event.book_launch` — **Inventory and preorder checklist** → label_draft_only
 - [ ] `event.book_launch` — **Budget view** → implement_structured
@@ -35,9 +40,17 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 ## high
 
 - [ ] `bp-event-three-day-retreat` — **Follow-up integration plan** → label_draft_only
+- [ ] `business.author` — **Author Business Plan** → label_draft_only
+- [ ] `business.author` — **Book Development Plan** → label_draft_only
+- [ ] `business.author` — **Author Platform Plan** → label_draft_only
+- [ ] `business.author` — **Book Marketing Plan** → label_draft_only
 - [ ] `business.coaching` — **Coaching Business Plan** → label_draft_only
 - [ ] `business.consulting` — **Consulting Business Plan** → label_draft_only
 - [ ] `business.consulting` — **Delivery Plan** → label_draft_only
+- [ ] `business.content_creator` — **Content Creator Business Plan** → label_draft_only
+- [ ] `business.content_creator` — **Audience Growth Plan** → label_draft_only
+- [ ] `business.course_creator` — **Course Creator Business Plan** → label_draft_only
+- [ ] `business.course_creator` — **Content Production Plan** → label_draft_only
 - [ ] `business.craft_show` — **Craft Show Business Plan** → label_draft_only
 - [ ] `business.craft_show` — **Linked Event plan recommendations** → label_draft_only
 - [ ] `business.etsy` — **Etsy Business Plan** → label_draft_only
@@ -46,6 +59,7 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.handmade_online_store` — **Launch / promotion outline** → label_draft_only
 - [ ] `business.holiday_planner` — **Holiday Product Plan** → label_draft_only
 - [ ] `business.holiday_planner` — **Launch timeline** → label_draft_only
+- [ ] `business.membership` — **Membership Business Plan** → label_draft_only
 - [ ] `business.product_photography` — **Product Photography Plan** → connect_destination
 - [ ] `business.service` — **Service Business Operating Plan** → implement_composed
 - [ ] `business.speaker` — **Speaker Business Plan** → label_draft_only
@@ -213,6 +227,12 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `bp-event-three-day-retreat` — **Retreat overview** → label_draft_only
 - [ ] `bp-event-three-day-retreat` — **Three-day agenda** → label_draft_only
 - [ ] `bp-event-three-day-retreat` — **Packing list** → label_draft_only
+- [ ] `business.author` — **Author Positioning Statement** → label_draft_only
+- [ ] `business.author` — **Reader and Buyer Map** → label_draft_only
+- [ ] `business.author` — **Book Portfolio Map** → label_draft_only
+- [ ] `business.author` — **Publishing Path Comparison** → label_draft_only
+- [ ] `business.author` — **Distribution Strategy** → label_draft_only
+- [ ] `business.author` — **Next actions list** → connect_destination
 - [ ] `business.coaching` — **Scope and Boundary Statement** → label_draft_only
 - [ ] `business.coaching` — **Client Fit Profile** → label_draft_only
 - [ ] `business.coaching` — **Coaching Offer Suite** → label_draft_only
@@ -229,6 +249,22 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.consulting` — **Engagement Charter** → label_draft_only
 - [ ] `business.consulting` — **Outcome Report** → label_draft_only
 - [ ] `business.consulting` — **Next actions list** → connect_destination
+- [ ] `business.content_creator` — **Creator Positioning** → label_draft_only
+- [ ] `business.content_creator` — **Audience Map** → label_draft_only
+- [ ] `business.content_creator` — **Content Pillar Map** → label_draft_only
+- [ ] `business.content_creator` — **Platform Role Map** → label_draft_only
+- [ ] `business.content_creator` — **Content Production Workflow** → label_draft_only
+- [ ] `business.content_creator` — **Monetization Map** → label_draft_only
+- [ ] `business.content_creator` — **Media Kit Structure** → label_draft_only
+- [ ] `business.content_creator` — **Creator Operating System** → implement_composed
+- [ ] `business.content_creator` — **Next actions list** → connect_destination
+- [ ] `business.course_creator` — **Course Opportunity Statement** → label_draft_only
+- [ ] `business.course_creator` — **Learner Profile** → label_draft_only
+- [ ] `business.course_creator` — **Course Model Comparison** → label_draft_only
+- [ ] `business.course_creator` — **Learning Outcome Map** → label_draft_only
+- [ ] `business.course_creator` — **Curriculum Map** → label_draft_only
+- [ ] `business.course_creator` — **Enrollment Strategy** → label_draft_only
+- [ ] `business.course_creator` — **Next actions list** → connect_destination
 - [ ] `business.craft_show` — **Booth design notes** → connect_destination
 - [ ] `business.craft_show` — **Annual show calendar** → connect_destination
 - [ ] `business.craft_show` — **Packing and load list** → label_draft_only
@@ -251,6 +287,14 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.inventory_pricing` — **Margin targets** → label_draft_only
 - [ ] `business.inventory_pricing` — **Reorder point notes** → label_draft_only
 - [ ] `business.inventory_pricing` — **Next actions list** → connect_destination
+- [ ] `business.membership` — **Membership Promise** → label_draft_only
+- [ ] `business.membership` — **Member Profile** → label_draft_only
+- [ ] `business.membership` — **Membership Model Comparison** → label_draft_only
+- [ ] `business.membership` — **Value Pillars** → label_draft_only
+- [ ] `business.membership` — **Member Onboarding** → label_draft_only
+- [ ] `business.membership` — **Membership Operating Calendar** → implement_composed
+- [ ] `business.membership` — **Retention System** → label_draft_only
+- [ ] `business.membership` — **Next actions list** → connect_destination
 - [ ] `business.product_photography` — **Priority shot list** → label_draft_only
 - [ ] `business.product_photography` — **Lighting and background standards** → label_draft_only
 - [ ] `business.product_photography` — **Editing workflow** → label_draft_only

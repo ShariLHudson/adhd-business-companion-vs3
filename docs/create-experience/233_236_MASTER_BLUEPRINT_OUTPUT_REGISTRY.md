@@ -29,6 +29,17 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `bp-event-three-day-retreat` | 1.0.0 | event_plan | Packing list | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `bp-event-three-day-retreat` | 1.0.0 | event_plan | Care & safety brief | brief | draft_only | blocked | Create (unspecified) | yes |
 | `bp-event-three-day-retreat` | 1.0.0 | event_plan | Follow-up integration plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Author Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Author Positioning Statement | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Reader and Buyer Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Book Portfolio Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Publishing Path Comparison | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Book Development Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Author Platform Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Book Marketing Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Distribution Strategy | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Author Financial Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.author` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.coaching` | 1.0.0 | business_plan | Coaching Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.coaching` | 1.0.0 | business_plan | Scope and Boundary Statement | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.coaching` | 1.0.0 | business_plan | Client Fit Profile | document | draft_only | blocked | Create (unspecified) | yes |
@@ -50,6 +61,28 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.consulting` | 1.0.0 | business_plan | Delivery Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.consulting` | 1.0.0 | business_plan | Outcome Report | report | draft_only | blocked | Create (unspecified) | yes |
 | `business.consulting` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Content Creator Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Creator Positioning | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Audience Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Content Pillar Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Platform Role Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Content Production Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Audience Growth Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Monetization Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Media Kit Structure | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Creator Operating System | document | composed | blocked | Create (unspecified) | yes |
+| `business.content_creator` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Course Creator Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Course Opportunity Statement | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Learner Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Course Model Comparison | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Learning Outcome Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Curriculum Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Content Production Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Course Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Enrollment Strategy | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Course KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.course_creator` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.craft_show` | 1.0.0 | business_plan | Craft Show Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.craft_show` | 1.0.0 | business_plan | Product and pricing sheet | financial_model | structured | blocked | Create (unspecified) | yes |
 | `business.craft_show` | 1.0.0 | business_plan | Inventory checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
@@ -96,6 +129,17 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.inventory_pricing` | 1.0.0 | business_plan | Reorder point notes | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.inventory_pricing` | 1.0.0 | business_plan | Dead inventory decisions | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.inventory_pricing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Membership Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Membership Promise | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Member Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Membership Model Comparison | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Value Pillars | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Membership Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Member Onboarding | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Membership Operating Calendar | calendar | composed | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Retention System | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Membership Health Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.membership` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Product Photography Plan | visual_asset | connected | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Priority shot list | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Lighting and background standards | document | draft_only | blocked | Create (unspecified) | yes |
@@ -356,4 +400,4 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | review checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `marketing_plan.simple` | 1.0.0 | marketing_plan | print/export output | document | draft_only | blocked | Create (unspecified) | yes |
 
-**Total outputs:** 347
+**Total outputs:** 391

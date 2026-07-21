@@ -1,6 +1,6 @@
 /**
  * Leaf data only — no imports from Create runtime (avoids circular deps).
- * Business Plan section map (201–210 handmade / service-expert Business Blueprints).
+ * Business Plan section map (201–214 handmade / service / creator Business Blueprints).
  */
 
 import type { WorkTypeMapSectionDef } from "../types";
@@ -108,6 +108,47 @@ export const BUSINESS_PLAN_MAP_SECTIONS: readonly WorkTypeMapSectionDef[] = [
   { id: "completion_payment", title: "Completion and Payment" },
   { id: "followup_retention", title: "Follow-Up and Retention" },
   { id: "service_operations", title: "Service Operations" },
+  // 211–214 Creator & Knowledge
+  { id: "reader_market_architecture", title: "Reader and Market Architecture" },
+  { id: "book_portfolio_strategy", title: "Book Portfolio Strategy" },
+  { id: "publishing_path", title: "Publishing Path" },
+  { id: "book_development_workflow", title: "Book Development Workflow" },
+  { id: "author_platform", title: "Author Platform" },
+  { id: "book_marketing", title: "Book Marketing" },
+  { id: "sales_distribution", title: "Sales and Distribution" },
+  { id: "book_to_business", title: "Book-to-Business Expansion" },
+  { id: "author_operations", title: "Author Operations" },
+  { id: "learner_demand_validation", title: "Learner and Demand Validation" },
+  { id: "course_model", title: "Course Model" },
+  { id: "learning_outcomes", title: "Learning Outcomes" },
+  { id: "curriculum_sequence", title: "Curriculum and Sequence" },
+  { id: "content_production", title: "Course Content Production" },
+  { id: "student_experience", title: "Student Experience" },
+  { id: "course_enrollment", title: "Course Enrollment" },
+  { id: "course_delivery_ops", title: "Course Delivery Operations" },
+  { id: "course_measurement", title: "Course Measurement" },
+  { id: "course_portfolio_growth", title: "Course Portfolio Growth" },
+  { id: "member_profile_fit", title: "Member Profile and Fit" },
+  { id: "membership_model", title: "Membership Model" },
+  { id: "value_architecture", title: "Value Architecture" },
+  { id: "member_onboarding", title: "Member Onboarding" },
+  { id: "membership_rhythm", title: "Membership Rhythm" },
+  { id: "community_health", title: "Community Health" },
+  { id: "retention_renewal", title: "Retention and Renewal" },
+  { id: "membership_growth", title: "Membership Growth" },
+  { id: "membership_operations", title: "Membership Operations" },
+  { id: "membership_measurement", title: "Membership Measurement" },
+  { id: "creator_audience", title: "Creator Audience" },
+  { id: "content_pillars", title: "Content Pillars" },
+  { id: "platform_strategy", title: "Platform Strategy" },
+  { id: "content_production_system", title: "Content Production System" },
+  { id: "audience_growth", title: "Audience Growth" },
+  { id: "trust_relationship", title: "Trust and Relationship" },
+  { id: "creator_monetization", title: "Creator Monetization" },
+  { id: "sponsorship_partnerships", title: "Sponsorship and Partnerships" },
+  { id: "creator_analytics", title: "Creator Analytics" },
+  { id: "content_asset_library", title: "Content Asset Library" },
+  { id: "creator_operations", title: "Creator Operations" },
 ];
 
 export const BUSINESS_PLAN_DEFAULT_FOCUS: readonly string[] = [
