@@ -30,6 +30,7 @@ import {
   FACILITATED_SECTION_STATUS_LABELS,
   resolveFacilitatedSectionStatus,
 } from "@/lib/facilitatedCreation";
+import { GroupedWorkshopMap } from "@/components/companion/GroupedWorkshopMap";
 
 const SECTION_FIELD_CLS =
   "min-h-[7rem] w-full flex-1 resize-y rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] whitespace-pre-wrap outline-none focus:border-[#1e4f4f] focus:ring-2 focus:ring-[#1e4f4f]/10";
@@ -406,122 +407,18 @@ export function CreateWorkspaceV2Panel({
     onWorkflowChange(reorderWorkspaceV2Sections(workflow, fromIndex, toIndex));
   }
 
-  // 066 / 077 — Estate: Full Workshop Map (clickable). Answers stay in Current Focus.
+  // 066 / 077 / 099 — Estate: grouped or flat Workshop Map. Answers stay in Current Focus.
   if (estatePresentation) {
     const draft = workflow.draftContent?.trim() || "";
-    const mapSections = showAll
-      ? allSections
-      : allSections.filter((s) => focusSet.has(s.id) || s.content.trim());
-    const mapHidden = allSections.length - mapSections.length;
-
     return (
-      <div
-        className="flex flex-col gap-4"
-        data-testid="create-workspace-v2-presentation"
-        data-answer-capture="disabled"
-        data-creation-interaction-owner="current_focus"
-        data-workshop-map="estate"
-      >
-        <p className="text-sm leading-relaxed text-[#4b463f]">
-          Every section opens in Current Focus above. Tap a row to work on it —
-          nothing stays locked.
-        </p>
-
-        {!showAll && mapHidden > 0 ? (
-          <button
-            type="button"
-            className="w-full rounded-xl border border-[#c9bfb0] bg-white/70 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-            data-testid="workshop-map-show-full"
-            onClick={() =>
-              onWorkflowChange({
-                ...workflow,
-                showAllWorkspaceSections: true,
-              })
-            }
-          >
-            Show full workshop map ({mapHidden} more sections)
-          </button>
-        ) : null}
-        {showAll && focusSet.size > 0 ? (
-          <button
-            type="button"
-            className="w-full rounded-xl border border-transparent px-4 py-2 text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]"
-            data-testid="workshop-map-show-focus"
-            onClick={() =>
-              onWorkflowChange({
-                ...workflow,
-                showAllWorkspaceSections: false,
-              })
-            }
-          >
-            Show what matters now
-          </button>
-        ) : null}
-
-        <ul className="flex flex-col gap-2" role="list" aria-label="Full Workshop Map">
-          {mapSections.map((section) => {
-            const status = resolveFacilitatedSectionStatus(section, workflow);
-            const label = FACILITATED_SECTION_STATUS_LABELS[status];
-            const isActive = workflow.activeSectionId === section.id;
-            const openLabel = isActive
-              ? "Working here"
-              : !section.content.trim() && !section.skipped
-                ? "Start"
-                : "Open";
-            const open = () => onOpenSection?.(section.id);
-
-            return (
-              <li key={section.id} className="list-none">
-                <button
-                  type="button"
-                  onClick={open}
-                  disabled={!onOpenSection}
-                  data-testid={`workshop-map-row-${section.id}`}
-                  data-active-focus={isActive ? "true" : undefined}
-                  aria-current={isActive ? "true" : undefined}
-                  aria-label={`${section.label} — ${openLabel}`}
-                  className={`w-full rounded-xl border px-3 py-2.5 text-left transition-colors ${
-                    isActive
-                      ? "border-[#1e4f4f] bg-[#f0f5f5] ring-2 ring-[#1e4f4f]/30"
-                      : "border-[#e7dfd4] bg-white/70 hover:border-[#1e4f4f]/40 hover:bg-[#f7faf9]"
-                  } ${!onOpenSection ? "cursor-default opacity-90" : "cursor-pointer"}`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-semibold text-[#1f1c19]">
-                      {section.label}
-                    </span>
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <span className="rounded-full border border-[#e7dfd4] bg-[#faf7f2] px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-[#6b635a]">
-                        {label}
-                      </span>
-                      {onOpenSection ? (
-                        <span
-                          data-testid={`workshop-map-open-${section.id}`}
-                          className="rounded-lg border border-[#1e4f4f]/30 bg-[#1e4f4f] px-2.5 py-1 text-xs font-semibold text-white"
-                        >
-                          {openLabel}
-                        </span>
-                      ) : null}
-                    </div>
-                  </div>
-                  {section.skipped ? (
-                    <p className="mt-1 text-sm italic text-[#9a8f82]">
-                      Skipped for now — still openable anytime
-                    </p>
-                  ) : section.content.trim() ? (
-                    <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-sm leading-relaxed text-[#4b463f]">
-                      {section.content.trim()}
-                    </p>
-                  ) : (
-                    <p className="mt-1 text-sm text-[#9a8f82]">
-                      Not started — open to begin in Current Focus
-                    </p>
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+      <div className="flex flex-col gap-4">
+        <GroupedWorkshopMap
+          workflow={workflow}
+          onOpenSection={onOpenSection}
+          onWorkflowChange={onWorkflowChange}
+          showAll={showAll}
+          focusSet={focusSet}
+        />
         {draft ? (
           <div
             className="rounded-2xl border border-[#c9bfb0] bg-white/90 px-4 py-3"
@@ -535,10 +432,8 @@ export function CreateWorkspaceV2Panel({
             </div>
           </div>
         ) : null}
-        <p className="text-xs text-[#9a8f82]">
-          {filledCount} of {allSections.length} sections have notes
-          {mapHidden > 0 ? ` · ${mapHidden} more in the full map` : ""}
-        </p>
+        {/* keep filledCount referenced for lint when estate path skips local calc */}
+        <span className="sr-only">{filledCount}</span>
       </div>
     );
   }

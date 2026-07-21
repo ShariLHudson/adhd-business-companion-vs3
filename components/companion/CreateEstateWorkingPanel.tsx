@@ -6,6 +6,7 @@ import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomSh
 import { CreateWorkspaceV2Panel } from "@/components/companion/CreateWorkspaceV2Panel";
 import { CreateWorkCommandToolbar } from "@/components/companion/CreateWorkCommandToolbar";
 import { CurrentFocusInteraction } from "@/components/companion/CurrentFocusInteraction";
+import { ConnectedWorkDisclosure } from "@/components/companion/ConnectedWorkDisclosure";
 import { canonicalStatusFromWorkflow } from "@/lib/activeWorkspaceRegistry/canonicalStatus";
 import {
   extractTitleFromDraftContent,
@@ -25,7 +26,10 @@ import {
 } from "@/lib/createWorkspaceV2";
 import { runCreateAssistance } from "@/lib/createContextualAssistance";
 import { resolveFacilitatedSectionStatus } from "@/lib/facilitatedCreation";
-import { completeItNow } from "@/lib/universalWorkEngine";
+import {
+  completeItNow,
+  saveStructureAsBlueprint,
+} from "@/lib/universalWorkEngine";
 import { openWorkshopMapSection } from "@/lib/workTypeSchema";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
@@ -172,6 +176,12 @@ export function CreateEstateWorkingPanel({
 
   const [localGuidance, setLocalGuidance] = useState<string | null>(null);
   const guidance = focusGuidance ?? localGuidance;
+  const [saveBlueprintOpen, setSaveBlueprintOpen] = useState(false);
+  const [blueprintNameDraft, setBlueprintNameDraft] = useState("");
+  const [blueprintDescDraft, setBlueprintDescDraft] = useState("");
+  const [blueprintSavedAck, setBlueprintSavedAck] = useState<string | null>(
+    null,
+  );
 
   useDismissibleWindow({
     open: true,
@@ -492,6 +502,19 @@ export function CreateEstateWorkingPanel({
               onRetry={onRetryCurrentFocus}
             />
 
+            <div className="mt-3 max-w-2xl">
+              <ConnectedWorkDisclosure
+                workId={
+                  canonicalFocus.creationId ||
+                  workflow.sessionId ||
+                  workflow.eventRecordId ||
+                  ""
+                }
+                sectionId={canonicalFocus.sectionId}
+                onOpenProject={onOpenProjectHome}
+              />
+            </div>
+
             {/* Work-level next steps — not competing with writing this section */}
             <details
               className="mt-3 max-w-2xl rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/60 px-3 py-2"
@@ -584,6 +607,86 @@ export function CreateEstateWorkingPanel({
                 >
                   {building ? "Building your draft…" : "Build a polished draft"}
                 </button>
+                <button
+                  type="button"
+                  disabled={focusSubmitting}
+                  data-testid="save-structure-as-blueprint"
+                  onClick={() => {
+                    setBlueprintNameDraft(
+                      `${typeLabel} structure`.trim() || "My blueprint",
+                    );
+                    setBlueprintDescDraft("");
+                    setSaveBlueprintOpen((o) => !o);
+                    setBlueprintSavedAck(null);
+                  }}
+                  className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-left text-sm font-semibold text-[#4b463f] hover:bg-[#faf7f2] disabled:opacity-40"
+                >
+                  Save structure as blueprint
+                </button>
+                {saveBlueprintOpen ? (
+                  <div
+                    className="flex flex-col gap-2 rounded-xl border border-[#e7dfd4] bg-white/90 p-3"
+                    data-testid="save-structure-as-blueprint-form"
+                  >
+                    <label className="text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+                      Blueprint name
+                      <input
+                        className="mt-1 w-full rounded-lg border border-[#cfc6b8] px-2 py-1.5 text-sm"
+                        value={blueprintNameDraft}
+                        onChange={(e) => setBlueprintNameDraft(e.target.value)}
+                        data-testid="save-structure-blueprint-name"
+                      />
+                    </label>
+                    <label className="text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+                      Description (optional)
+                      <input
+                        className="mt-1 w-full rounded-lg border border-[#cfc6b8] px-2 py-1.5 text-sm"
+                        value={blueprintDescDraft}
+                        onChange={(e) => setBlueprintDescDraft(e.target.value)}
+                        data-testid="save-structure-blueprint-description"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      data-testid="save-structure-blueprint-confirm"
+                      className="rounded-lg bg-[#1e4f4f] px-3 py-2 text-sm font-semibold text-white"
+                      onClick={() => {
+                        try {
+                          const saved = saveStructureAsBlueprint({
+                            workflow,
+                            name: blueprintNameDraft,
+                            description: blueprintDescDraft,
+                            category: "personal",
+                            workId:
+                              workflow.sessionId ||
+                              workflow.eventRecordId ||
+                              canonicalFocus.creationId,
+                          });
+                          setBlueprintSavedAck(
+                            `Saved “${saved.title}” (${saved.blueprintId} @ ${saved.version}).`,
+                          );
+                          setSaveBlueprintOpen(false);
+                        } catch (err) {
+                          setLocalGuidance(
+                            err instanceof Error
+                              ? err.message
+                              : "I couldn't save that structure just now.",
+                          );
+                        }
+                      }}
+                    >
+                      Save blueprint
+                    </button>
+                  </div>
+                ) : null}
+                {blueprintSavedAck ? (
+                  <p
+                    className="text-xs leading-relaxed text-[#1e4f4f]"
+                    data-testid="save-structure-blueprint-ack"
+                  >
+                    {blueprintSavedAck}
+                  </p>
+                ) : null}
               </div>
             </details>
 
