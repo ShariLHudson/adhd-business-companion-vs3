@@ -260,6 +260,8 @@ export {
   EVENT_BLUEPRINT_BOOK_LAUNCH,
   CHALLENGE_EVENT_BLUEPRINT_ID,
   EVENT_BLUEPRINT_CHALLENGE,
+  MASTERCLASS_EVENT_BLUEPRINT_ID,
+  EVENT_BLUEPRINT_MASTERCLASS,
 } from "./packages/eventPlan/eventBlueprintDefinitions";
 export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";
 export { ensureEventBlueprintIntelligenceRegistered } from "./packages/eventPlan/eventBlueprintIntelligence";

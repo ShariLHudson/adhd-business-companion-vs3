@@ -15,6 +15,7 @@ import {
   BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
   CHALLENGE_EVENT_BLUEPRINT_ID,
   CONFERENCE_EVENT_BLUEPRINT_ID,
+  MASTERCLASS_EVENT_BLUEPRINT_ID,
   NETWORKING_EVENT_BLUEPRINT_ID,
   PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
   RETREAT_EVENT_BLUEPRINT_ID,
@@ -58,6 +59,9 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-challenge": CHALLENGE_EVENT_BLUEPRINT_ID,
   "bp-event-challenge": CHALLENGE_EVENT_BLUEPRINT_ID,
   "bp-challenge-event": CHALLENGE_EVENT_BLUEPRINT_ID,
+  "bp-masterclass": MASTERCLASS_EVENT_BLUEPRINT_ID,
+  "bp-event-masterclass": MASTERCLASS_EVENT_BLUEPRINT_ID,
+  "bp-masterclass-event": MASTERCLASS_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
@@ -81,6 +85,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     // Challenge before bare workshop/webinar so "7-day challenge" etc. stay here
     re: /\b(\d+[-\s]?day\s+challenge|(?:habit|business|health|community)\s+challenge|challenge\s+(?:event|blueprint|series)|(?:plan|host|run|design)\s+a\s+challenge)\b/i,
     blueprintId: CHALLENGE_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Masterclass before workshop/webinar so premium teaching language stays here
+    re: /\b(master\s*class|masterclass)\b/i,
+    blueprintId: MASTERCLASS_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
@@ -227,7 +237,7 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
   if (
     !workTypeId &&
     message &&
-    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar|conference|summit|launch|challenge)\b/i.test(
+    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar|conference|summit|launch|challenge|masterclass|master\s*class)\b/i.test(
       message,
     )
   ) {

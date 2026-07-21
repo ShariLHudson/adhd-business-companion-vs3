@@ -374,7 +374,7 @@ describe("134 — Challenge Event Blueprint foundation", () => {
   });
 
   it("Book Launch and existing Event Blueprints remain registered", () => {
-    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(14);
+    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(15);
     for (const id of [
       "bp-event-business-luncheon",
       "bp-event-online-workshop",
@@ -390,6 +390,7 @@ describe("134 — Challenge Event Blueprint foundation", () => {
       PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
       BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
       CHALLENGE_EVENT_BLUEPRINT_ID,
+      "event.masterclass",
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
     }

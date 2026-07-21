@@ -64,6 +64,12 @@ const EVENT_HINTS: { match: RegExp; id: string; title: string; why: string }[] =
     why: "Challenges succeed when daily action, accountability, recovery, and completion are planned together.",
   },
   {
+    match: /masterclass|promise|curriculum|demonstration|implementation|worksheet|learning outcome/i,
+    id: "event-has-masterclass-depth",
+    title: "Masterclass depth thinking is present",
+    why: "Masterclasses succeed when expert teaching, demos, guided implementation, and follow-through are planned together.",
+  },
+  {
     match: /risk|contingency/i,
     id: "event-has-risk",
     title: "Risk thinking is present",
@@ -172,6 +178,12 @@ const EVENT_SUGGEST_IF_MISSING: {
     test: (t) => !/accountability|check-in|missed|daily|habit|reminder/i.test(t),
     title: "Consider daily accountability and missed-day recovery",
     why: "Challenges often underplan reminders, check-ins, and what happens when someone falls behind.",
+  },
+  {
+    id: "event-suggest-masterclass-implementation",
+    test: (t) => !/implementation|demonstration|worksheet|curriculum|promise|pre-work/i.test(t),
+    title: "Consider demos, worksheets, and guided implementation",
+    why: "Masterclasses often underplan practice time and what people do after the teaching ends.",
   },
 ];
 

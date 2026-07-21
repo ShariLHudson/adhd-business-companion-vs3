@@ -1,0 +1,10 @@
+{
+  "prompt": "135",
+  "blueprintId": "event.masterclass",
+  "workTypeId": "event_plan",
+  "date": "2026-07-21",
+  "verdict": "BLUEPRINT PRODUCTION CERTIFIED",
+  "eventBlueprintCount": 15,
+  "totals": { "files": 14, "passed": 163, "failed": 0 },
+  "blockers": []
+}
