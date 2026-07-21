@@ -1,11 +1,13 @@
 /**
- * 201–252 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community Blueprints.
+ * 201–260 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community / Regulated Professional / Manufacturing Logistics Agriculture Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import {
+  ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+  AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
   AUTHOR_BUSINESS_BLUEPRINT_ID,
   BUSINESS_PLAN_BLUEPRINT_IDS,
   COACHING_BUSINESS_BLUEPRINT_ID,
@@ -25,7 +27,10 @@ import {
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
   HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
   HOSPITALITY_BUSINESS_BLUEPRINT_ID,
+  INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
+  LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+  LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
   MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
   MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
   NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
@@ -37,12 +42,14 @@ import {
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
+  REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
   RETAIL_STORE_BUSINESS_BLUEPRINT_ID,
   RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
+  SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
   STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
   SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
@@ -50,6 +57,7 @@ import {
   VENUE_EXPERIENCE_BUSINESS_BLUEPRINT_ID,
   WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
   WHOLESALE_BUSINESS_BLUEPRINT_ID,
+  WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
   addWorkMilestone,
   addWorkTask,
   answerBlueprintQuestion,
@@ -126,7 +134,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with forty-three Business Blueprints", () => {
+  it("registers Business Plan Work Type with fifty-one Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -174,9 +182,17 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
         PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
         FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
+        LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+        ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+        INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+        REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+        SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+        WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
+        LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+        AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(43);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(51);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -225,6 +241,14 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
       PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
       FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
+      LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+      ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+      INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+      REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+      SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+      WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
+      LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+      AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -456,6 +480,38 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
         guidedSection: "fm_member_onboarding",
+      },
+      {
+        blueprintId: LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "legal_conflict",
+      },
+      {
+        blueprintId: ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "acct_monthly",
+      },
+      {
+        blueprintId: INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "ins_renewals",
+      },
+      {
+        blueprintId: REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "re_transaction",
+      },
+      {
+        blueprintId: SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "mfg_bom",
+      },
+      {
+        blueprintId: WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "wd_inventory",
+      },
+      {
+        blueprintId: LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "log_dispatch",
+      },
+      {
+        blueprintId: AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "ag_enterprise",
       },
     ];
     for (const c of cases) {
@@ -812,6 +868,66 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     });
     expect(faithOrg.blueprintId).toBe(
       FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const legalServices = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a legal services business",
+    });
+    expect(legalServices.blueprintId).toBe(LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID);
+
+    const accounting = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage:
+        "Help me with an accounting bookkeeping tax practice",
+    });
+    expect(accounting.blueprintId).toBe(
+      ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const insurance = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build an insurance agency business",
+    });
+    expect(insurance.blueprintId).toBe(INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID);
+
+    const realEstate = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage:
+        "Help me build a real estate brokerage agent business",
+    });
+    expect(realEstate.blueprintId).toBe(
+      REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const smallMfg = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a small manufacturing business",
+    });
+    expect(smallMfg.blueprintId).toBe(SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID);
+
+    const wholesaleDist = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a wholesale distribution business",
+    });
+    expect(wholesaleDist.blueprintId).toBe(
+      WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const logistics = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a logistics transportation business",
+    });
+    expect(logistics.blueprintId).toBe(
+      LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const agriculture = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build an agriculture farm rural business",
+    });
+    expect(agriculture.blueprintId).toBe(
+      AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
     );
 
     const genericService = inferWorkTypeAndBlueprint({

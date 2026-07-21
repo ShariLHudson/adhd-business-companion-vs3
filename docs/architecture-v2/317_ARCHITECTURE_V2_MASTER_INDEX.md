@@ -219,6 +219,9 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | **241–244** Field Home Property | `docs/create-experience/241_*`…`244_*` · runtime `fieldHomePropertyCollectionDefinitions.ts` |
 | **245–248** Wellness Personal Care Pet | `docs/create-experience/245_*`…`248_*` · runtime `wellnessPersonalCarePetCollectionDefinitions.ts` |
 | **249–252** Education Nonprofit Public | `docs/create-experience/249_*`…`252_*` · runtime `educationCommunityOrgCollectionDefinitions.ts` |
+| **253–256** Regulated Professional Services | `docs/create-experience/253_*`…`256_*` · runtime `regulatedProfessionalServicesCollectionDefinitions.ts` |
+| **257–260** Manufacturing Logistics Agriculture | `docs/create-experience/257_*`…`260_*` · runtime `manufacturingLogisticsAgricultureCollectionDefinitions.ts` |
+
 | **273–278** Blueprint Profile Context Connection | `docs/create-experience/standards/273_*`…`278_*` · runtime `lib/universalWorkEngine/blueprints/profileContext/` · masters `273_278_*` |
 | **295–300** Master Shared Object Library | `docs/create-experience/standards/295_*`…`300_*` · runtime `lib/universalWorkEngine/blueprints/sharedObjects/` · masters `295_300_*` (distinct from Architecture v2 `300_*`) |
 | Navigation welcome docs | `docs/navigation/119–121` |

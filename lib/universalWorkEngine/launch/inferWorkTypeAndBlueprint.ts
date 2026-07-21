@@ -30,6 +30,8 @@ import {
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+  AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
   BEAUTY_PERSONAL_CARE_BUSINESS_BLUEPRINT_ID,
   CONTRACTOR_CONSTRUCTION_BUSINESS_BLUEPRINT_ID,
   EDUCATION_TRAINING_BUSINESS_BLUEPRINT_ID,
@@ -37,13 +39,19 @@ import {
   FITNESS_STUDIO_COACHING_BUSINESS_BLUEPRINT_ID,
   HOME_SERVICE_BUSINESS_BLUEPRINT_ID,
   HOSPITALITY_BUSINESS_BLUEPRINT_ID,
+  INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+  LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+  LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
   MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
   NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
   PET_SERVICE_BUSINESS_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
   PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
   PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
+  REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+  SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
   WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
+  WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
@@ -192,6 +200,22 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-public-sector": PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
   "bp-faith-membership-org": FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
   "bp-faith-organization": FAITH_MEMBERSHIP_ORG_BUSINESS_BLUEPRINT_ID,
+  "bp-legal-services": LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+  "bp-legal": LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+  "bp-accounting-bookkeeping-tax": ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+  "bp-accounting": ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+  "bp-insurance-agency": INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+  "bp-insurance": INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+  "bp-real-estate-brokerage-agent": REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+  "bp-real-estate": REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+  "bp-small-manufacturing": SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+  "bp-manufacturing": SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+  "bp-wholesale-distribution": WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
+  "bp-logistics-transportation": LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+  "bp-logistics": LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+  "bp-agriculture-farm-rural": AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
+  "bp-agriculture": AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
+  "bp-farm": AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -219,6 +243,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(product\s+photography(?:\s+(?:studio|blueprint))?|photography\s+studio\s+blueprint|business\.product_photography)\b/i,
     blueprintId: PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Full distribution OS before product-commerce wholesale partnership
+    re: /\b(wholesale\s+(?:and\s+)?distribution(?:\s+business)?|distribution\s+business|warehouse\s+distribution(?:\s+business)?|business\.wholesale_distribution)\b/i,
+    blueprintId: WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -287,6 +317,28 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Regulated professional services before generic service
+    re: /\b(legal\s+services(?:\s+business)?|law\s+firm(?:\s+business)?|attorney\s+practice|business\.legal_services)\b/i,
+    blueprintId: LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(accounting(?:\s+(?:bookkeeping|tax))?(?:\s+(?:and\s+)?(?:bookkeeping|tax))?(?:\s+practice|\s+business)?|bookkeeping(?:\s+practice|\s+business)?|tax\s+practice(?:\s+business)?|business\.accounting_bookkeeping_tax)\b/i,
+    blueprintId: ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(insurance\s+agency(?:\s+business)?|insurance\s+broker(?:\s+business)?|business\.insurance_agency)\b/i,
+    blueprintId: INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Real estate brokerage before property management
+    re: /\b(real\s+estate\s+(?:brokerage|agent)(?:\s+business)?|real\s+estate\s+brokerage\s+and\s+agent|realtor(?:\s+business)?|business\.real_estate_brokerage_agent)\b/i,
+    blueprintId: REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     // Wellness / beauty / pet before generic service; pet before home_service
     re: /\b(wellness\s+practice(?:\s+business)?|massage\s+(?:practice|business)|holistic\s+wellness(?:\s+business)?|breathwork\s+(?:business|practice)|mindfulness\s+(?:business|practice)|business\.wellness_practice)\b/i,
     blueprintId: WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
@@ -300,6 +352,22 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(pet\s+service(?:\s+business)?|dog\s+walking(?:\s+business)?|pet\s+sitting(?:\s+business)?|pet\s+grooming(?:\s+business)?|dog\s+daycare(?:\s+business)?|pet\s+boarding(?:\s+business)?|business\.pet_service)\b/i,
     blueprintId: PET_SERVICE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Manufacturing / logistics / agriculture before field-home and product sell-side
+    re: /\b(small\s+manufacturing(?:\s+business)?|manufacturing\s+business|contract\s+manufactur(?:er|ing)|business\.small_manufacturing)\b/i,
+    blueprintId: SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(logistics(?:\s+(?:and\s+)?transportation)?(?:\s+business)?|freight(?:\s+business)?|fleet\s+(?:and\s+)?(?:delivery|logistics)(?:\s+business)?|business\.logistics_transportation)\b/i,
+    blueprintId: LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(agriculture(?:\s+(?:farm|rural))?(?:\s+business)?|farm(?:\s+and\s+rural)?(?:\s+business)?|ranch(?:\s+business)?|csa(?:\s+business)?|business\.agriculture_farm_rural)\b/i,
+    blueprintId: AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
