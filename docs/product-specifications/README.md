@@ -8,6 +8,12 @@ This folder holds product-level specifications that define how the platform beha
 |---|----------|------|
 | **112** | [Universal Work & Relationship Platform Specification](./112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md) | Completes the Product Specification Series — one Work identity, many views, relationships over copies |
 
+Related Create / experience standards (not renumbered into this series):
+
+| # | Document | Role |
+|---|----------|------|
+| **091** | [Workspace Environment Personalization Standard](../create-experience/standards/091_WORKSPACE_ENVIRONMENT_PERSONALIZATION_STANDARD.md) | Every major work area shows a place-like environment; Work Type defaults, member prefs, themes, accessibility |
+
 Earlier implementation reports for Create / Universal Work Engine / Blueprints live under [`docs/create-experience/`](../create-experience/) (e.g. 096–106). Those are delivery evidence; **112** is the product specification that governs the connected model.
 
 ## Bridge to Constitution
