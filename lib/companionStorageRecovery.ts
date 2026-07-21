@@ -36,11 +36,121 @@ const TRIMMABLE_KEYS = [
   "companion-frictionless-pending-v1",
 ] as const;
 
-/** Keys kept even during aggressive auth recovery (member prefs + active session). */
+/** 074 — Creation durability keys must survive aggressive auth reclaim. */
+export const RUNTIME_CREATION_RECORDS_KEY = "spark.runtimeCreationRecords.v1";
+export const ACTIVE_WORKSPACE_REGISTRY_KEY = "spark.activeWorkspaceRegistry.v1";
+export const LAST_ACTIVE_WORKSPACE_KEY = "spark.lastActiveWorkspaceId.v1";
+export const CREATE_WORKFLOW_RECORD_KEY = "companion-create-workflow-record-v1";
+export const EVENT_RECORDS_STORAGE_KEY = "companion-events-intelligence-v1";
+
+/** Keys that must get aggressive reclaim retry when a write hits quota. */
+export const CREATION_DURABILITY_KEYS = new Set([
+  RUNTIME_CREATION_RECORDS_KEY,
+  ACTIVE_WORKSPACE_REGISTRY_KEY,
+  LAST_ACTIVE_WORKSPACE_KEY,
+  CREATE_WORKFLOW_RECORD_KEY,
+  EVENT_RECORDS_STORAGE_KEY,
+  "companion-events-intelligence-active-id",
+  "companion-creation-continuity-v1",
+  "companion-create-workflow-saved-v1",
+]);
+
+/** Keys kept even during aggressive auth recovery (member prefs + active session + Create). */
 const AUTH_RECOVERY_PROTECTED_KEYS = new Set([
   COMPANION_AUTH_STORAGE_KEY,
   "companion-prefs-v1",
+  ...CREATION_DURABILITY_KEYS,
 ]);
+
+export type LocalStorageWriteDiagnostic = {
+  at: string;
+  key: string;
+  ok: boolean;
+  bytes: number;
+  /** Exact stage that decided the outcome */
+  stage:
+    | "ssr_no_window"
+    | "first_try"
+    | "after_headroom"
+    | "after_aggressive"
+    | "readback_mismatch"
+    | "quota_exhausted"
+    | "security_blocked"
+    | "unknown_error";
+  errorName?: string;
+  errorMessage?: string;
+  headroomFreed?: number;
+  aggressiveFreed?: number;
+  approxStorageChars?: number;
+};
+
+let lastWriteDiagnostic: LocalStorageWriteDiagnostic | null = null;
+const writeDiagnosticLog: LocalStorageWriteDiagnostic[] = [];
+const WRITE_LOG_CAP = 40;
+
+export function getLastLocalStorageWriteDiagnostic(): LocalStorageWriteDiagnostic | null {
+  return lastWriteDiagnostic;
+}
+
+export function getLocalStorageWriteDiagnosticLog(): LocalStorageWriteDiagnostic[] {
+  return [...writeDiagnosticLog];
+}
+
+export function clearLocalStorageWriteDiagnosticsForTests(): void {
+  lastWriteDiagnostic = null;
+  writeDiagnosticLog.length = 0;
+}
+
+function approxLocalStorageChars(): number {
+  if (typeof window === "undefined") return 0;
+  let total = 0;
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const k = localStorage.key(i);
+      if (!k) continue;
+      const v = localStorage.getItem(k);
+      total += k.length + (v?.length ?? 0);
+    }
+  } catch {
+    /* ignore */
+  }
+  return total;
+}
+
+function recordWriteDiagnostic(
+  partial: Omit<LocalStorageWriteDiagnostic, "at">,
+): void {
+  const entry: LocalStorageWriteDiagnostic = {
+    ...partial,
+    at: new Date().toISOString(),
+  };
+  lastWriteDiagnostic = entry;
+  writeDiagnosticLog.push(entry);
+  if (writeDiagnosticLog.length > WRITE_LOG_CAP) writeDiagnosticLog.shift();
+  if (typeof window !== "undefined") {
+    const w = window as Window & {
+      __SPARK_LS_WRITE__?: {
+        last: LocalStorageWriteDiagnostic | null;
+        log: LocalStorageWriteDiagnostic[];
+      };
+    };
+    w.__SPARK_LS_WRITE__ = {
+      last: entry,
+      log: [...writeDiagnosticLog],
+    };
+    if (process.env.NODE_ENV !== "production") {
+      console.info(
+        "[SPARK_LS_WRITE]",
+        entry.key,
+        entry.ok ? "ok" : "FAIL",
+        entry.stage,
+        entry.errorName ?? "",
+        `bytes=${entry.bytes}`,
+        `storageChars≈${entry.approxStorageChars ?? "?"}`,
+      );
+    }
+  }
+}
 
 export function reclaimCompanionStorageHeadroom(): number {
   if (typeof window === "undefined") return 0;
@@ -68,6 +178,8 @@ export function reclaimAggressiveCompanionStorage(): number {
     for (let i = localStorage.length - 1; i >= 0; i -= 1) {
       const key = localStorage.key(i);
       if (!key || AUTH_RECOVERY_PROTECTED_KEYS.has(key)) continue;
+      // Note: Create durability uses spark.* (dot). Aggressive only sweeps
+      // companion-* and spark-* (hyphen) regenerable caches — never Create keys.
       if (!key.startsWith("companion-") && !key.startsWith("spark-")) continue;
       const value = localStorage.getItem(key);
       if (!value) continue;
@@ -99,39 +211,169 @@ export function isStorageQuotaError(err: unknown): boolean {
   return false;
 }
 
-function tryLocalStorageSet(key: string, value: string): boolean {
+type TrySetResult = {
+  ok: boolean;
+  errorName?: string;
+  errorMessage?: string;
+  readbackMismatch?: boolean;
+};
+
+function tryLocalStorageSet(key: string, value: string): TrySetResult {
   try {
     localStorage.setItem(key, value);
-    return localStorage.getItem(key) === value;
-  } catch {
-    return false;
+    const read = localStorage.getItem(key);
+    if (read === value) return { ok: true };
+    return {
+      ok: false,
+      readbackMismatch: true,
+      errorName: "ReadbackMismatch",
+      errorMessage: `getItem length ${read?.length ?? 0} !== set length ${value.length}`,
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      errorName: err instanceof Error ? err.name : "Error",
+      errorMessage: err instanceof Error ? err.message : String(err),
+    };
   }
+}
+
+function shouldAggressiveRetry(key: string): boolean {
+  return (
+    key === COMPANION_AUTH_STORAGE_KEY || CREATION_DURABILITY_KEYS.has(key)
+  );
 }
 
 /** Best-effort localStorage write — never throws on quota. */
 export function safeLocalStorageSet(key: string, value: string): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === "undefined") {
+    recordWriteDiagnostic({
+      key,
+      ok: false,
+      bytes: value.length,
+      stage: "ssr_no_window",
+      approxStorageChars: 0,
+    });
+    return false;
+  }
 
-  if (tryLocalStorageSet(key, value)) return true;
+  const bytes = value.length;
+  const approx = () => approxLocalStorageChars();
 
-  reclaimCompanionStorageHeadroom();
+  let prior: string | null = null;
+  try {
+    prior = localStorage.getItem(key);
+  } catch {
+    prior = null;
+  }
+
+  const first = tryLocalStorageSet(key, value);
+  if (first.ok) {
+    recordWriteDiagnostic({
+      key,
+      ok: true,
+      bytes,
+      stage: "first_try",
+      approxStorageChars: approx(),
+    });
+    return true;
+  }
+
+  const headroomFreed = reclaimCompanionStorageHeadroom();
   try {
     localStorage.removeItem(key);
   } catch {
     /* noop */
   }
-  if (tryLocalStorageSet(key, value)) return true;
+  const afterHeadroom = tryLocalStorageSet(key, value);
+  if (afterHeadroom.ok) {
+    recordWriteDiagnostic({
+      key,
+      ok: true,
+      bytes,
+      stage: "after_headroom",
+      errorName: first.errorName,
+      errorMessage: first.errorMessage,
+      headroomFreed,
+      approxStorageChars: approx(),
+    });
+    return true;
+  }
 
-  if (key === COMPANION_AUTH_STORAGE_KEY) {
-    reclaimAggressiveCompanionStorage();
+  // 074 — Auth AND Creation durability keys get aggressive reclaim (Founder: Create
+  // writes were failing here while memory kept runtimePresent:true).
+  if (shouldAggressiveRetry(key)) {
+    const aggressiveFreed = reclaimAggressiveCompanionStorage();
     try {
       localStorage.removeItem(key);
     } catch {
       /* noop */
     }
-    return tryLocalStorageSet(key, value);
+    const afterAggressive = tryLocalStorageSet(key, value);
+    if (afterAggressive.ok) {
+      recordWriteDiagnostic({
+        key,
+        ok: true,
+        bytes,
+        stage: "after_aggressive",
+        errorName: afterHeadroom.errorName ?? first.errorName,
+        errorMessage: afterHeadroom.errorMessage ?? first.errorMessage,
+        headroomFreed,
+        aggressiveFreed,
+        approxStorageChars: approx(),
+      });
+      return true;
+    }
+
+    const failStage =
+      afterAggressive.readbackMismatch || afterHeadroom.readbackMismatch
+        ? "readback_mismatch"
+        : isStorageQuotaError({ name: afterAggressive.errorName }) ||
+            first.errorName === "QuotaExceededError"
+          ? "quota_exhausted"
+          : afterAggressive.errorName === "SecurityError"
+            ? "security_blocked"
+            : "unknown_error";
+
+    if (prior != null) {
+      try {
+        localStorage.setItem(key, prior);
+      } catch {
+        /* ignore */
+      }
+    }
+    recordWriteDiagnostic({
+      key,
+      ok: false,
+      bytes,
+      stage: failStage,
+      errorName: afterAggressive.errorName ?? first.errorName,
+      errorMessage: afterAggressive.errorMessage ?? first.errorMessage,
+      headroomFreed,
+      aggressiveFreed,
+      approxStorageChars: approx(),
+    });
+    return false;
   }
 
+  // Non-durability keys: restore prior, no aggressive reclaim
+  if (prior != null) {
+    try {
+      localStorage.setItem(key, prior);
+    } catch {
+      /* ignore */
+    }
+  }
+  recordWriteDiagnostic({
+    key,
+    ok: false,
+    bytes,
+    stage: first.readbackMismatch ? "readback_mismatch" : "quota_exhausted",
+    errorName: first.errorName,
+    errorMessage: first.errorMessage,
+    headroomFreed,
+    approxStorageChars: approx(),
+  });
   return false;
 }
 
