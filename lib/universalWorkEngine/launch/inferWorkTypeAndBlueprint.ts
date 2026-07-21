@@ -15,6 +15,7 @@ import {
   BOOK_LAUNCH_EVENT_BLUEPRINT_ID,
   CHALLENGE_EVENT_BLUEPRINT_ID,
   CONFERENCE_EVENT_BLUEPRINT_ID,
+  FUNDRAISER_GALA_EVENT_BLUEPRINT_ID,
   MASTERCLASS_EVENT_BLUEPRINT_ID,
   NETWORKING_EVENT_BLUEPRINT_ID,
   PRODUCT_LAUNCH_EVENT_BLUEPRINT_ID,
@@ -62,6 +63,10 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-masterclass": MASTERCLASS_EVENT_BLUEPRINT_ID,
   "bp-event-masterclass": MASTERCLASS_EVENT_BLUEPRINT_ID,
   "bp-masterclass-event": MASTERCLASS_EVENT_BLUEPRINT_ID,
+  "bp-fundraiser-gala": FUNDRAISER_GALA_EVENT_BLUEPRINT_ID,
+  "bp-event-fundraiser-gala": FUNDRAISER_GALA_EVENT_BLUEPRINT_ID,
+  "bp-fundraiser": FUNDRAISER_GALA_EVENT_BLUEPRINT_ID,
+  "bp-gala": FUNDRAISER_GALA_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
@@ -91,6 +96,11 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     // Masterclass before workshop/webinar so premium teaching language stays here
     re: /\b(master\s*class|masterclass)\b/i,
     blueprintId: MASTERCLASS_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\b(fundraiser|fundraising\s+(?:gala|dinner|event)|charity\s+gala|benefit\s+(?:dinner|concert|gala)|silent\s+auction|live\s+auction|giving\s+day|donor\s+appreciation|capital\s+campaign\s+event|\bgala\b)\b/i,
+    blueprintId: FUNDRAISER_GALA_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
@@ -237,7 +247,7 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
   if (
     !workTypeId &&
     message &&
-    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar|conference|summit|launch|challenge|masterclass|master\s*class)\b/i.test(
+    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar|conference|summit|launch|challenge|masterclass|master\s*class|fundraiser|gala|auction)\b/i.test(
       message,
     )
   ) {

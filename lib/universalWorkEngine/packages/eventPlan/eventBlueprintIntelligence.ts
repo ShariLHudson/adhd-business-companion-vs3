@@ -70,6 +70,12 @@ const EVENT_HINTS: { match: RegExp; id: string; title: string; why: string }[] =
     why: "Masterclasses succeed when expert teaching, demos, guided implementation, and follow-through are planned together.",
   },
   {
+    match: /fundraiser|gala|donor|sponsor|auction|stewardship|pledge|mission|giving/i,
+    id: "event-has-fundraiser-gala",
+    title: "Fundraiser / gala thinking is present",
+    why: "Fundraisers succeed when mission story, donor care, giving path, and stewardship are planned together.",
+  },
+  {
     match: /risk|contingency/i,
     id: "event-has-risk",
     title: "Risk thinking is present",
@@ -184,6 +190,12 @@ const EVENT_SUGGEST_IF_MISSING: {
     test: (t) => !/implementation|demonstration|worksheet|curriculum|promise|pre-work/i.test(t),
     title: "Consider demos, worksheets, and guided implementation",
     why: "Masterclasses often underplan practice time and what people do after the teaching ends.",
+  },
+  {
+    id: "event-suggest-fundraiser-stewardship",
+    test: (t) => !/donor|stewardship|auction|sponsor|pledge|receipt|mission/i.test(t),
+    title: "Consider donor stewardship and giving ops",
+    why: "Fundraisers often underplan checkout, receipts, and what happens after guests leave.",
   },
 ];
 

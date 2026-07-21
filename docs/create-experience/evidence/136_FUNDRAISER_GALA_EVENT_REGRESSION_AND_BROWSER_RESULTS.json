@@ -1,0 +1,10 @@
+{
+  "prompt": "136",
+  "blueprintId": "event.fundraiser_gala",
+  "workTypeId": "event_plan",
+  "date": "2026-07-21",
+  "verdict": "BLUEPRINT PRODUCTION CERTIFIED",
+  "eventBlueprintCount": 16,
+  "totals": { "files": 15, "passed": 176, "failed": 0 },
+  "blockers": []
+}

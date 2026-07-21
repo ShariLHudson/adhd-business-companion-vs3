@@ -357,7 +357,7 @@ describe("130 — Conference Event Blueprint foundation", () => {
   });
 
   it("Retreat, Webinar, Workshop, Networking, and existing Event Blueprints remain registered", () => {
-    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(15);
+    expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(16);
     for (const id of [
       "bp-event-business-luncheon",
       "bp-event-online-workshop",
@@ -374,6 +374,7 @@ describe("130 — Conference Event Blueprint foundation", () => {
       "event.book_launch",
       "event.challenge",
       "event.masterclass",
+      "event.fundraiser_gala",
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
     }
