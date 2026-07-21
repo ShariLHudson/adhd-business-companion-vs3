@@ -16,6 +16,7 @@ import {
   CREATE_BEGIN_ERROR_MESSAGE,
 } from "@/lib/primaryActionFeedback";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform/oneCreationPlatform";
+import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
 
 export type CreateBeginOutcome =
   | {
@@ -28,6 +29,7 @@ export type CreateBeginOutcome =
       text: string;
       artifactType: string;
       isEventDomain: boolean;
+      isMarketingPlanDomain: boolean;
     }
   | {
       kind: "error";
@@ -39,6 +41,7 @@ function resolveArtifactType(text: string): string | null {
   if (fromCatalog) return fromCatalog;
   const fromPrompt = detectCreateTypeFromPrompt(text)?.trim() || null;
   if (fromPrompt) return fromPrompt;
+  if (isMarketingPlanCreationRequest(text)) return "Marketing Plan";
   if (isEventDomainCreationRequest(text)) return "Event Plan";
   return null;
 }
@@ -67,11 +70,16 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       };
     }
 
+    const isMarketingPlanDomain =
+      isMarketingPlanCreationRequest(text) ||
+      /marketing\s+plan/i.test(artifactType);
     return {
       kind: "open",
       text,
       artifactType,
-      isEventDomain: isEventDomainCreationRequest(text),
+      isEventDomain:
+        isEventDomainCreationRequest(text) && !isMarketingPlanDomain,
+      isMarketingPlanDomain,
     };
   } catch {
     return {

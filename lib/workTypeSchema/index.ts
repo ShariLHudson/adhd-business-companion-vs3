@@ -31,3 +31,8 @@ export {
   EVENT_PLAN_DEFAULT_FOCUS,
   EVENT_PLAN_WORK_TYPE_ID,
 } from "./schemas/eventPlanMap";
+export {
+  MARKETING_PLAN_MAP_SECTIONS,
+  MARKETING_PLAN_DEFAULT_FOCUS,
+  MARKETING_PLAN_WORK_TYPE_ID,
+} from "./schemas/marketingPlanMap";

@@ -31,17 +31,23 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   plugin({
     id: "email",
     createItemType: "Email",
-    detectPatterns: [/\b(?:an? )?email\b/i],
+    detectPatterns: [
+      /\b(?:write|draft|compose|send|craft)\b.{0,48}\b(?:an?\s+)?e-?mails?\b/i,
+      /\b(?:an?\s+)?e-?mail\s+to\b/i,
+      /\bhelp me (?:write|draft|compose)\b.{0,36}\be-?mails?\b/i,
+      /\bneed(?:s|ed)? to (?:write|draft|compose|send)\b.{0,36}\be-?mails?\b/i,
+    ],
     enhancements: [
       { id: "subject-lines", label: "Subject line options", description: "A few subject lines to choose from" },
       { id: "preview-text", label: "Preview text", description: "Inbox preview that supports the subject" },
       { id: "cta-variants", label: "Call to action options", description: "Clear next-step wording" },
     ],
     completionActions: [
-      { id: "copy", label: "Copy text" },
-      { id: "google-docs", label: "Open in Google Docs" },
-      { id: "save-template", label: "Save as Template" },
-      { id: "attach-project", label: "Attach to Project" },
+      { id: "copy", label: "Copy Email" },
+      { id: "gmail-draft", label: "Create Gmail Draft" },
+      { id: "send", label: "Send Email" },
+      { id: "make-changes", label: "Make Changes" },
+      { id: "save", label: "Save for Later" },
     ],
     uncertaintyPaths: ["recommend", "examples", "teach"],
   }),
@@ -177,7 +183,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     id: "business_plan",
     createItemType: "Marketing Plan",
     detectPatterns: [
-      /\b(?:business plan|marketing plan|social media campaign|social campaign)\b/i,
+      // Marketing Plan Work Type (105) is UWE — keep business plan + social campaign here
+      /\b(?:business plan|social media campaign|social campaign)\b/i,
     ],
     enhancements: [
       { id: "executive-summary", label: "Executive summary", description: "One-page overview" },
@@ -331,10 +338,12 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     ],
     uncertaintyPaths: ["recommend", "examples"],
   }),
+  // Sprint 2 — Workshop / Webinar are Event subtypes (045–065), not documents.
+  // Profiles retained only so old sessions can resolve labels; detectPatterns empty.
   plugin({
     id: "workshop",
     createItemType: "Document",
-    detectPatterns: [/\bworkshop\b/i],
+    detectPatterns: [],
     enhancements: [
       { id: "agenda", label: "Session agenda", description: "Timed flow for delivery" },
       { id: "worksheets", label: "Participant worksheets", description: "Hands-on exercises" },
@@ -350,7 +359,7 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   plugin({
     id: "webinar",
     createItemType: "Document",
-    detectPatterns: [/\bwebinar\b/i],
+    detectPatterns: [],
     enhancements: [
       { id: "slides", label: "Slide outline", description: "Key beats for each section" },
       { id: "registration", label: "Registration page copy", description: "Title and promise for sign-ups" },

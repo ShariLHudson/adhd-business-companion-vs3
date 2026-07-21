@@ -36,6 +36,7 @@ import {
 } from "@/lib/createGuidedConversation189";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
+import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { launchFromCreate } from "@/lib/universalWorkEngine";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
@@ -96,6 +97,9 @@ export function CreateEstateEntrancePanel({
   >(null);
   const [blueprintPathOpen, setBlueprintPathOpen] = useState(false);
   const [blueprintWorkAck, setBlueprintWorkAck] = useState<string | null>(null);
+  const [blueprintWorkTypeId, setBlueprintWorkTypeId] = useState<string>(
+    EVENT_PLAN_WORK_TYPE_ID,
+  );
 
   useDismissibleWindow({
     open: true,
@@ -144,11 +148,13 @@ export function CreateEstateEntrancePanel({
       return;
     }
 
-    // 103 — Event-domain Begin also resolves through Anywhere-Origin (no private path)
-    if (outcome.isEventDomain) {
+    // 103 / 105 — Event and Marketing Plan Begin resolve through Anywhere-Origin
+    if (outcome.isEventDomain || outcome.isMarketingPlanDomain) {
       const anywhere = launchFromCreate({
         originalUserMessage: outcome.text,
-        candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
+        candidateWorkTypeId: outcome.isMarketingPlanDomain
+          ? MARKETING_PLAN_WORK_TYPE_ID
+          : EVENT_PLAN_WORK_TYPE_ID,
       });
       if (anywhere.decision === "clarify") {
         setBeginFeedback(anywhere.reply);
@@ -158,6 +164,9 @@ export function CreateEstateEntrancePanel({
       }
       if (anywhere.decision === "continue_existing" && anywhere.reply) {
         setBlueprintWorkAck(anywhere.reply);
+      }
+      if (outcome.isMarketingPlanDomain) {
+        setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID);
       }
     }
 
@@ -380,18 +389,56 @@ export function CreateEstateEntrancePanel({
             Start with a Blueprint
           </summary>
           <p className="mt-2 text-sm text-[#6b635a]">
-            Scratch, Blueprint, or previous work — one calm path at a time. Event
-            Blueprints appear from the shared registry.
+            Scratch, Blueprint, or previous work — one calm path at a time.
+            Event and Marketing Plan Blueprints share the same registry.
           </p>
+          <div
+            className="mt-3 flex flex-wrap gap-2"
+            role="group"
+            aria-label="Blueprint work type"
+          >
+            <button
+              type="button"
+              className={`rounded-full px-3 py-1.5 text-sm ${
+                blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID
+                  ? "bg-[#1e4f4f] text-white"
+                  : "bg-[#f4efe7] text-[#1f1c19]"
+              }`}
+              aria-pressed={blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID}
+              onClick={() => setBlueprintWorkTypeId(EVENT_PLAN_WORK_TYPE_ID)}
+            >
+              Event Plan
+            </button>
+            <button
+              type="button"
+              className={`rounded-full px-3 py-1.5 text-sm ${
+                blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
+                  ? "bg-[#1e4f4f] text-white"
+                  : "bg-[#f4efe7] text-[#1f1c19]"
+              }`}
+              aria-pressed={blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID}
+              data-testid="create-estate-blueprint-marketing"
+              onClick={() => setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID)}
+            >
+              Marketing Plan
+            </button>
+          </div>
           <div className="mt-3">
             <UniversalBlueprintInterface
-              workTypeId={EVENT_PLAN_WORK_TYPE_ID}
+              workTypeId={blueprintWorkTypeId}
               onStartFromScratch={() => {
                 setBlueprintPathOpen(false);
-                setPrompt("I want to plan an event from scratch");
-                setBeginFeedback(
-                  "Describe your event above, then press Begin — no Blueprint required.",
-                );
+                if (blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID) {
+                  setPrompt("I want to create a simple marketing plan from scratch");
+                  setBeginFeedback(
+                    "Describe what you want to market above, then press Begin — no Blueprint required.",
+                  );
+                } else {
+                  setPrompt("I want to plan an event from scratch");
+                  setBeginFeedback(
+                    "Describe your event above, then press Begin — no Blueprint required.",
+                  );
+                }
                 setBeginFeedbackKind("clarify");
               }}
               onWorkReady={(state) => {

@@ -51,6 +51,19 @@ describe("Create Begin — always one of two outcomes", () => {
     expect(outcome.kind).toBe("open");
     if (outcome.kind === "open") {
       expect(outcome.artifactType).toBeTruthy();
+      expect(outcome.isMarketingPlanDomain).toBe(false);
+    }
+  });
+
+  it("marketing plan Begin → open with Marketing Plan domain", () => {
+    const outcome = resolveCreateBeginOutcome(
+      "Help me create a simple marketing plan",
+    );
+    expect(outcome.kind).toBe("open");
+    if (outcome.kind === "open") {
+      expect(outcome.artifactType).toMatch(/marketing plan/i);
+      expect(outcome.isMarketingPlanDomain).toBe(true);
+      expect(outcome.isEventDomain).toBe(false);
     }
   });
 

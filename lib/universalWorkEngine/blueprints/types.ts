@@ -70,6 +70,22 @@ export type BlueprintAdaptiveQuestion = {
   prompt: string;
   /** Lower-friction wording when adaptive engine prefers it. */
   lowerFrictionPrompt?: string;
+  /** Depth-specific wording (overrides prompt when present for that mode). */
+  promptByDepth?: Partial<Readonly<Record<BlueprintDepthMode, string>>>;
+  /** Extra-soft wording when member energy is low. */
+  lowEnergyPrompt?: string;
+  /** Why Spark asks — domain guidance (not shown as a form label by default). */
+  purpose?: string;
+  whyItMatters?: string;
+  examples?: readonly string[];
+  dontKnowBehavior?: string;
+  skipBehavior?: string;
+  postponeBehavior?: string;
+  followUpRules?: string;
+  sectionsAffected?: readonly string[];
+  deliverablesAffected?: readonly string[];
+  tasksAffected?: readonly string[];
+  researchOpportunities?: readonly string[];
   sectionId?: string;
   /** Modes where this question is considered. */
   requiredInModes: readonly BlueprintDepthMode[];

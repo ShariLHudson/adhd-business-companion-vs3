@@ -90,6 +90,28 @@ export function evaluateAdaptiveQuestion(
     };
   }
 
+  const lowEnergy =
+    state.knownContext.low_energy === "true" ||
+    state.knownContext.energy === "low";
+  if (lowEnergy && question.lowEnergyPrompt?.trim()) {
+    return {
+      action: "ask",
+      questionId: question.id,
+      prompt: question.lowEnergyPrompt,
+      reason: "low_energy",
+    };
+  }
+
+  const depthPrompt = question.promptByDepth?.[state.depthMode]?.trim();
+  if (depthPrompt) {
+    return {
+      action: "ask",
+      questionId: question.id,
+      prompt: depthPrompt,
+      reason: `depth_${state.depthMode}`,
+    };
+  }
+
   const useLowerFriction =
     state.depthMode === "quick_start" && Boolean(question.lowerFrictionPrompt);
 

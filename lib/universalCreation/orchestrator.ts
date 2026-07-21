@@ -80,8 +80,26 @@ export function detectUniversalDocumentType(
   const t = userText.trim();
   if (!t) return null;
   if (isEmailAutomationOrInboxHelpRequest(t)) return null;
+  // 105 — Marketing Plan Work Type never becomes a document type
+  if (
+    /\b(?:simple\s+)?marketing\s+plans?\b|\bmarket(?:ing)?\s+this\s+offer\b/i.test(
+      t,
+    )
+  ) {
+    return null;
+  }
+  // Sprint 2 — Event domain never becomes a document type
+  // (workshop/webinar plugins retired; keep belt-and-suspenders)
+  if (
+    /\b(?:workshop|webinar|conference|retreat|summit|meetup|networking\s+event|launch\s+event|event\s+plan)\b/i.test(
+      t,
+    )
+  ) {
+    return null;
+  }
   for (const plugin of UNIVERSAL_DOCUMENT_PLUGINS) {
     if (plugin.id === "document") continue;
+    if (plugin.id === "workshop" || plugin.id === "webinar") continue;
     if (plugin.detectPatterns.some((re) => re.test(t))) return plugin.id;
   }
   if (isRegistryArtifactExecution(t)) return "document";

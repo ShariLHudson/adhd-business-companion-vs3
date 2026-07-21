@@ -1,11 +1,14 @@
 /**
- * CREATE fast path — simple creation requests bypass estate routing.
+ * CREATE fast path — simple *document* creation requests.
+ * Sprint 2: Event-domain language never enters this path (045–065 owns Events).
  */
 
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
 import { isEmailAutomationOrInboxHelpRequest } from "@/lib/estate/emailAutomationHelp";
 import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
+import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform";
+import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
 import { isVisualStructureExecution } from "@/lib/visualStructureRouting";
 import { shouldOfferVisualThinkingRecommendation } from "@/lib/visualThinkingOverreach";
 import { pluginById } from "./documentRegistry";
@@ -31,15 +34,14 @@ const ARTIFACT_INFERENCE: ReadonlyArray<{
 }> = [
   { re: /\b(?:sales funnel|marketing funnel|lead funnel|conversion funnel)\b/i, type: "sales_funnel" },
   { re: /\b(?:website copy|web copy|homepage|home page|landing page|site copy)\b/i, type: "website" },
-  { re: /\bworkshop\b/i, type: "workshop" },
-  { re: /\bwebinar\b/i, type: "webinar" },
+  // Workshop / webinar are Event Workspace (055/051) — never document fast-path
   { re: /\bpresentation\b/i, type: "presentation" },
   { re: /\b(?:lead magnet|lead-magnet)\b/i, type: "guide" },
   { re: /\bclient avatar\b/i, type: "guide" },
   { re: /\bonboarding guide\b/i, type: "training_manual" },
   { re: /\b(?:social media campaign|social campaign)\b/i, type: "business_plan" },
   { re: /\blinkedin post\b/i, type: "social_post" },
-  { re: /\bmarketing plan\b/i, type: "business_plan" },
+  // Marketing Plan Work Type (105) resolves through UWE — not document UC
   { re: /\bbusiness plan\b/i, type: "business_plan" },
   { re: /\bnewsletter\b/i, type: "newsletter" },
   { re: /\b(?:an? )?sop\b|standard operating procedure\b/i, type: "sop" },
@@ -89,6 +91,10 @@ export function isSimpleCreateRequest(userText: string): boolean {
   if (isDevelopmentWorkFrustration(t)) return false;
   if (isVisualStructureExecution(t)) return false;
   if (isGoogleSheetWorthyRequest(t)) return false;
+  // Sprint 2 — Event domain → 045/051, never document fast-path
+  if (isEventDomainCreationRequest(t)) return false;
+  // 105 — Marketing Plan Work Type → UWE, never document fast-path
+  if (isMarketingPlanCreationRequest(t)) return false;
   // CB-022 addendum — strategy ≠ document create.
   if (isStrategyCreateOrLibraryRequest(t)) return false;
   if (SIMPLE_CREATE_VERB_RE.test(t)) return true;

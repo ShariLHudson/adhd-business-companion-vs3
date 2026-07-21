@@ -14,6 +14,8 @@ import {
   coalesceWorkflowWorkId,
   ensureEventBlueprintsRegistered,
   ensureEventPlanWorkTypeRegistered,
+  ensureMarketingPlanBlueprintsRegistered,
+  ensureMarketingPlanWorkTypeRegistered,
   getWorkTypePackage,
   linkWorkRelationship,
   requireWorkTypePackage,
@@ -65,6 +67,8 @@ describe("Universal Work Engine — architecture boundaries", () => {
     clearWorkTypePackageRegistryForTests();
     ensureEventPlanWorkTypeRegistered();
     ensureEventBlueprintsRegistered();
+    ensureMarketingPlanWorkTypeRegistered();
+    ensureMarketingPlanBlueprintsRegistered();
   });
 
   it("Universal Work Engine core does not import Event Intelligence packages", () => {
@@ -126,15 +130,12 @@ describe("Universal Work Engine — architecture boundaries", () => {
   });
 
   it("unknown Work Types fail visibly (no silent fallthrough)", () => {
-    expect(() => requireWorkTypePackage("marketing_plan")).toThrow(
-      UnknownWorkTypeError,
-    );
     expect(() => requireWorkTypePackage("sop")).toThrow(UnknownWorkTypeError);
-    // Bootstrap may use transitional templates for unregistered labels;
-    // the registry itself never silently accepts unknown IDs.
-    expect(() => requireWorkTypePackage("marketing_plan")).toThrow(
+    expect(() => requireWorkTypePackage("unknown_future_work_type")).toThrow(
       UnknownWorkTypeError,
     );
+    // marketing_plan is a registered Work Type package (105) — not an unknown fallthrough
+    expect(getWorkTypePackage("marketing_plan")?.workTypeId).toBe("marketing_plan");
   });
 
   it("Work Type packages and Event intelligence do not mint competing Work ID prefixes", () => {

@@ -5,6 +5,8 @@
 
 import "./packages/eventPlan/registerEventPlanWorkType";
 import "./packages/eventPlan/registerEventBlueprints";
+import "./packages/marketingPlan/registerMarketingPlanWorkType";
+import "./packages/marketingPlan/registerMarketingPlanBlueprints";
 
 export type {
   CanonicalWorkId,
@@ -98,6 +100,15 @@ export {
 } from "./boundaries/durableAccessGuard";
 
 export { ensureEventPlanWorkTypeRegistered } from "./packages/eventPlan/registerEventPlanWorkType";
+export { ensureMarketingPlanWorkTypeRegistered } from "./packages/marketingPlan/registerMarketingPlanWorkType";
+export { ensureMarketingPlanBlueprintsRegistered } from "./packages/marketingPlan/registerMarketingPlanBlueprints";
+export {
+  MARKETING_PLAN_BLUEPRINT_IDS,
+  MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
+  MARKETING_PLAN_BLUEPRINT_DEFINITIONS,
+} from "./packages/marketingPlan/marketingPlanBlueprint";
+export { MARKETING_PLAN_MAP_GROUPS } from "./packages/marketingPlan/marketingPlanMapGroups";
+export { isMarketingPlanCreationRequest } from "./packages/marketingPlan/isMarketingPlanCreationRequest";
 
 export type {
   WorkSection,

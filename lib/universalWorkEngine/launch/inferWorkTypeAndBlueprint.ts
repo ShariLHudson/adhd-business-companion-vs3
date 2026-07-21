@@ -9,6 +9,8 @@ import {
   listBlueprints,
 } from "../blueprints/registry";
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
+import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
+import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import type { UniversalLaunchContract } from "./types";
 
 /** Map legacy platformIntent CreateBlueprint ids → Universal Blueprint ids. */
@@ -21,6 +23,8 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-book-signing": "bp-event-book-signing",
   "bp-business-luncheon": "bp-event-business-luncheon",
   "bp-three-day-retreat": "bp-event-three-day-retreat",
+  "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
+  "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -28,6 +32,11 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   blueprintId: string;
   workTypeId: string;
 }[] = [
+  {
+    re: /\b(simple\s+)?marketing\s+plan\b|\bmarketing\s+blueprint\b|\bmarket(?:ing)?\s+this\s+offer\b/i,
+    blueprintId: MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
+    workTypeId: MARKETING_PLAN_WORK_TYPE_ID,
+  },
   {
     re: /\b(business\s+luncheon|luncheon)\b/i,
     blueprintId: "bp-event-business-luncheon",
@@ -124,6 +133,15 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
     !isBlueprintCompatibleWithWorkType(blueprintId, workTypeId)
   ) {
     return { workTypeId, blueprintId: null, fromLegacyAlias };
+  }
+
+  // Default Marketing Plan when message clearly asks for marketing planning
+  if (
+    !workTypeId &&
+    message &&
+    /\b(marketing\s+plan|market(?:ing)?\s+this\s+offer)\b/i.test(message)
+  ) {
+    workTypeId = MARKETING_PLAN_WORK_TYPE_ID;
   }
 
   // Default Event Work Type when message clearly asks for event planning

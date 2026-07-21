@@ -5,6 +5,8 @@
 
 import { ensureEventBlueprintsRegistered } from "../packages/eventPlan/registerEventBlueprints";
 import { ensureEventPlanWorkTypeRegistered } from "../packages/eventPlan/registerEventPlanWorkType";
+import { ensureMarketingPlanBlueprintsRegistered } from "../packages/marketingPlan/registerMarketingPlanBlueprints";
+import { ensureMarketingPlanWorkTypeRegistered } from "../packages/marketingPlan/registerMarketingPlanWorkType";
 import { initializeWorkFromBlueprint } from "../blueprints/initializeFromBlueprint";
 import { getWorkBlueprintState, putWorkBlueprintState } from "../blueprints/workBlueprintStateStore";
 import { getBlueprint } from "../blueprints/registry";
@@ -217,6 +219,8 @@ export function resolveAnywhereOriginWork(
 ): AnywhereOriginResolution {
   ensureEventPlanWorkTypeRegistered();
   ensureEventBlueprintsRegistered();
+  ensureMarketingPlanWorkTypeRegistered();
+  ensureMarketingPlanBlueprintsRegistered();
 
   const mode = classifyIntentMode(contract);
   const talkOnly =
