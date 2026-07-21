@@ -1,10 +1,12 @@
 /**
- * 126 — Networking Event Blueprint foundation + certification.
+ * 128 — Webinar Event Blueprint foundation + certification.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   NETWORKING_EVENT_BLUEPRINT_ID,
+  WEBINAR_EVENT_BLUEPRINT_ID,
+  WORKSHOP_EVENT_BLUEPRINT_ID,
   addWorkMilestone,
   addWorkTask,
   answerBlueprintQuestion,
@@ -62,7 +64,7 @@ function walkTsFiles(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-describe("126 — Networking Event Blueprint foundation", () => {
+describe("128 — Webinar Event Blueprint foundation", () => {
   beforeEach(() => {
     resetWorkIdentityStoreForTests();
     resetWorkRelationshipsForTests();
@@ -78,15 +80,15 @@ describe("126 — Networking Event Blueprint foundation", () => {
   });
 
   it("registers through the universal registry on event_plan only", () => {
-    expect(isBlueprintRegistered(NETWORKING_EVENT_BLUEPRINT_ID)).toBe(true);
-    const bp = getBlueprint(NETWORKING_EVENT_BLUEPRINT_ID)!;
-    expect(bp.title).toBe("Networking Event");
+    expect(isBlueprintRegistered(WEBINAR_EVENT_BLUEPRINT_ID)).toBe(true);
+    const bp = getBlueprint(WEBINAR_EVENT_BLUEPRINT_ID)!;
+    expect(bp.title).toBe("Webinar");
     expect(bp.compatibleWorkTypeIds).toEqual([EVENT_PLAN_WORK_TYPE_ID]);
     expect(bp.category).toBe("spark");
-    expect(EVENT_PLAN_BLUEPRINT_IDS).toContain(NETWORKING_EVENT_BLUEPRINT_ID);
+    expect(EVENT_PLAN_BLUEPRINT_IDS).toContain(WEBINAR_EVENT_BLUEPRINT_ID);
     expect(
       listBlueprints({ workTypeId: EVENT_PLAN_WORK_TYPE_ID }).some(
-        (b) => b.blueprintId === NETWORKING_EVENT_BLUEPRINT_ID,
+        (b) => b.blueprintId === WEBINAR_EVENT_BLUEPRINT_ID,
       ),
     ).toBe(true);
   });
@@ -95,15 +97,15 @@ describe("126 — Networking Event Blueprint foundation", () => {
     const files = walkTsFiles(PACKAGE_DIR);
     for (const file of files) {
       const src = readFileSync(file, "utf8");
-      expect(src).not.toMatch(/createPrivateNetworkingRuntime|networkingEventStore/);
-      expect(src).not.toMatch(/localStorage\.setItem\(\s*["']networking/);
+      expect(src).not.toMatch(/createPrivateWebinarRuntime|webinarEventStore/);
+      expect(src).not.toMatch(/localStorage\.setItem\(\s*["']webinar/);
     }
   });
 
   it("three depth modes preserve one Work ID", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       depthMode: "quick_start",
       origin: "create",
     });
@@ -113,57 +115,61 @@ describe("126 — Networking Event Blueprint foundation", () => {
     changeBlueprintDepthMode(workId, "complete_planning");
     expect(getWorkBlueprintState(workId)?.workId).toBe(workId);
     expect(getWorkBlueprintState(workId)?.blueprintId).toBe(
-      NETWORKING_EVENT_BLUEPRINT_ID,
+      WEBINAR_EVENT_BLUEPRINT_ID,
     );
   });
 
-  it("conditional sponsor and virtual sections appear with known context", () => {
+  it("conditional recording and paid sections appear with known context", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "create",
     });
     mergeKnownContext(init.workId, {
-      has_sponsors: "true",
-      is_virtual_or_hybrid: "true",
+      will_record: "true",
+      is_paid: "true",
     });
     const state = getWorkBlueprintState(init.workId)!;
-    const bp = getBlueprint(NETWORKING_EVENT_BLUEPRINT_ID)!;
+    const bp = getBlueprint(WEBINAR_EVENT_BLUEPRINT_ID)!;
     const active = resolveActiveSections(
       bp.sections,
       state,
       "guided_build",
     ).visibleSectionIds;
-    expect(active).toContain("sponsors");
+    expect(active).toContain("swag");
+    expect(active).toContain("revenue_pricing");
     expect(active).toContain("technology");
     expect(active).toContain("attendee_experience");
-    expect(active).toContain("accessibility");
   });
 
-  it("surfaces networking forgotten items and adaptive purpose question", () => {
-    const bp = getBlueprint(NETWORKING_EVENT_BLUEPRINT_ID)!;
-    expect(bp.commonlyForgottenItems.some((i) => /alone/i.test(i))).toBe(true);
-    expect(bp.commonlyForgottenItems.some((i) => /badge/i.test(i))).toBe(true);
-    const purposeQ = bp.adaptiveQuestions.find((q) => q.id === "q_purpose");
-    expect(purposeQ?.sectionId).toBe("purpose");
+  it("surfaces webinar forgotten items and adaptive CTA question", () => {
+    const bp = getBlueprint(WEBINAR_EVENT_BLUEPRINT_ID)!;
+    expect(bp.commonlyForgottenItems.some((i) => /rehearsal/i.test(i))).toBe(
+      true,
+    );
+    expect(bp.commonlyForgottenItems.some((i) => /moderator/i.test(i))).toBe(
+      true,
+    );
+    const outcomesQ = bp.adaptiveQuestions.find((q) => q.id === "q_outcomes");
+    expect(outcomesQ?.sectionId).toBe("outcomes");
   });
 
   it("tasks and milestones use universal infrastructure", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "create",
     });
     addWorkTask({
       workId: init.workId,
-      title: "Draft connection prompts",
-      sectionId: "agenda",
+      title: "Schedule tech rehearsal",
+      sectionId: "technology",
     });
     addWorkMilestone({
       workId: init.workId,
-      title: "Format selected",
+      title: "Purpose and CTA approved",
     });
     expect(listWorkTasks(init.workId).length).toBeGreaterThanOrEqual(1);
     expect(listWorkMilestones(init.workId).length).toBeGreaterThanOrEqual(1);
@@ -172,7 +178,7 @@ describe("126 — Networking Event Blueprint foundation", () => {
   it("research requires approve before apply", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "research",
     });
@@ -182,10 +188,10 @@ describe("126 — Networking Event Blueprint foundation", () => {
         workId: init.workId,
         sectionId: "venue",
       },
-      researchQuestion: "Which rooms support conversation acoustics?",
-      researchMode: "venue_scan",
+      researchQuestion: "Which platform fits 200 registrants with polls?",
+      researchMode: "quick_check",
       originatingExperience: "create",
-      findings: "Soft surfaces reduce echo.",
+      findings: "Platforms with native Q&A reduce moderator load.",
     });
     submitResearchForReview(draft.id);
     expect(() => applyApprovedResearch(draft.id, ["change"])).toThrow();
@@ -193,18 +199,18 @@ describe("126 — Networking Event Blueprint foundation", () => {
       target: {
         kind: "section",
         workId: init.workId,
-        sectionId: "venue",
+        sectionId: "technology",
       },
-      researchQuestion: "Quiet corner options",
+      researchQuestion: "Captioning options",
       researchMode: "quick_check",
       originatingExperience: "create",
-      findings: "Side rooms help.",
-      proposedActions: ["Prefer side rooms"],
+      findings: "Live captions improve accessibility.",
+      proposedActions: ["Enable live captions"],
     });
     submitResearchForReview(approved.id);
     approveResearch(approved.id);
     const applied = applyApprovedResearch(approved.id, [
-      "Prefer quieter side rooms for conversation",
+      "Enable live captions for the webinar",
     ]);
     expect(applied.approvalStatus).toBe("applied");
   });
@@ -212,75 +218,75 @@ describe("126 — Networking Event Blueprint foundation", () => {
   it("Project and cartography relationships attach to canonical Work", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       depthMode: "quick_start",
       origin: "projects",
     });
     linkWorkRelationship({
       fromWorkId: init.workId,
-      toRef: { kind: "project", id: "proj-community" },
+      toRef: { kind: "project", id: "proj-webinar-series" },
       relationship: "supports",
-      note: "Community growth",
+      note: "Customer education",
     });
     expect(
       listWorkRelationships(init.workId).some((r) => r.toRef.kind === "project"),
     ).toBe(true);
   });
 
-  it("skip remains recoverable; answer advances purpose", () => {
+  it("skip remains recoverable; answer advances outcomes", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       depthMode: "quick_start",
       origin: "create",
     });
-    skipBlueprintQuestion(init.workId, "q_capacity");
-    recoverSkippedQuestion(init.workId, "q_capacity");
+    skipBlueprintQuestion(init.workId, "q_record");
+    recoverSkippedQuestion(init.workId, "q_record");
     answerBlueprintQuestion(
       init.workId,
-      "q_purpose",
-      "Help local founders make warm introductions",
+      "q_outcomes",
+      "Book a clarity call after the demo",
     );
     expect(
-      getWorkBlueprintState(init.workId)?.answeredQuestions.q_purpose,
-    ).toMatch(/warm introductions/i);
+      getWorkBlueprintState(init.workId)?.answeredQuestions.q_outcomes,
+    ).toMatch(/clarity call/i);
   });
 
-  it("NL and Create launch resolve networking blueprint", () => {
+  it("NL and Create launch resolve webinar; workshop stays distinct", () => {
     const inferred = inferWorkTypeAndBlueprint({
       origin: "conversation",
-      originalUserMessage: "Help me plan a networking event",
+      originalUserMessage: "Help me plan a webinar",
     });
     expect(inferred.workTypeId).toBe(EVENT_PLAN_WORK_TYPE_ID);
-    expect(inferred.blueprintId).toBe(NETWORKING_EVENT_BLUEPRINT_ID);
+    expect(inferred.blueprintId).toBe(WEBINAR_EVENT_BLUEPRINT_ID);
 
-    const mixer = inferWorkTypeAndBlueprint({
+    const workshop = inferWorkTypeAndBlueprint({
       origin: "create",
-      originalUserMessage: "I want to host a business mixer",
+      originalUserMessage: "Help me plan a workshop",
     });
-    expect(mixer.blueprintId).toBe(NETWORKING_EVENT_BLUEPRINT_ID);
+    expect(workshop.blueprintId).toBe(WORKSHOP_EVENT_BLUEPRINT_ID);
 
     const fromCreate = launchFromCreate({
-      originalUserMessage: "Use the Networking Event Blueprint",
-      candidateBlueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      originalUserMessage: "Use the Webinar Blueprint",
+      candidateBlueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
       forceNew: true,
     });
     expect(fromCreate.workId).toBeTruthy();
     expect(getWorkBlueprintState(fromCreate.workId!)?.blueprintId).toBe(
-      NETWORKING_EVENT_BLUEPRINT_ID,
+      WEBINAR_EVENT_BLUEPRINT_ID,
     );
 
     const talk = launchFromShari({
-      originalUserMessage: "Just talk through this networking event with me",
+      originalUserMessage: "Just talk through this webinar with me",
       shariMode: "talk_only",
     });
     expect(talk.talkOnly).toBe(true);
 
     const fromShari = launchFromShari({
-      originalUserMessage: "Continue the mixer I started",
+      originalUserMessage: "Continue the webinar I started",
       relatedWorkId: fromCreate.workId!,
-      candidateBlueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      candidateBlueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       shariMode: "work_on_this",
     });
     expect(fromShari.workId ?? fromCreate.workId).toBe(fromCreate.workId);
@@ -289,34 +295,33 @@ describe("126 — Networking Event Blueprint foundation", () => {
   it("Chamber, Board, Body Doubling, and deliverables stay on universal owners", () => {
     const init = initializeWorkFromBlueprint({
       workTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       depthMode: "guided_build",
       origin: "projects",
     });
     const workId = init.workId;
-    const bp = getBlueprint(NETWORKING_EVENT_BLUEPRINT_ID)!;
+    const bp = getBlueprint(WEBINAR_EVENT_BLUEPRINT_ID)!;
     expect(bp.chamberRoutingRecommendations).toEqual(
-      expect.arrayContaining(["events"]),
+      expect.arrayContaining(["events", "presentations"]),
     );
     expect(bp.boardReviewRecommendations).toEqual(
-      expect.arrayContaining(["budget", "accessibility"]),
+      expect.arrayContaining(["outcomes and CTA", "accessibility"]),
     );
     expect(bp.deliverables).toEqual(
-      expect.arrayContaining(["Run of show", "Host and facilitator guide"]),
+      expect.arrayContaining(["Host and moderator guide", "Tech rehearsal checklist"]),
     );
 
     const bd = launchFromOrigin("body_doubling", {
-      originalUserMessage:
-        "Body double with me while I build the guest list",
+      originalUserMessage: "Body double with me while I build the slides",
       relatedWorkId: workId,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
-      bodyDoublingSessionId: "bd-net-1",
-      sectionId: "audience",
+      bodyDoublingSessionId: "bd-wb-1",
+      sectionId: "production",
     });
     expect(bd.workId ?? workId).toBe(workId);
 
     const chamber = launchFromOrigin("chamber", {
-      originalUserMessage: "Ask Events Intelligence to review the event flow",
+      originalUserMessage: "Ask Events Intelligence to review the run of show",
       relatedWorkId: workId,
       chamberMemberId: "events",
       applyApproved: true,
@@ -324,25 +329,25 @@ describe("126 — Networking Event Blueprint foundation", () => {
     expect(chamber.workId ?? workId).toBe(workId);
 
     const board = launchFromOrigin("board", {
-      originalUserMessage: "Have the Board review the budget",
+      originalUserMessage: "Have the Board review the CTA",
       relatedWorkId: workId,
-      boardReviewId: "br-net-budget",
+      boardReviewId: "br-wb-cta",
       applyApproved: true,
     });
     expect(board.workId ?? workId).toBe(workId);
   });
 
-  it("duplicate prevention does not invent a second networking Work", () => {
+  it("duplicate prevention does not invent a second webinar Work", () => {
     const first = launchFromCreate({
-      originalUserMessage: "Help me plan a networking event",
-      candidateBlueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      originalUserMessage: "Help me plan a webinar",
+      candidateBlueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
       forceNew: true,
     });
     expect(first.workId).toBeTruthy();
     const second = launchFromCreate({
-      originalUserMessage: "Help me plan a networking event",
-      candidateBlueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+      originalUserMessage: "Help me plan a webinar",
+      candidateBlueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
       candidateWorkTypeId: EVENT_PLAN_WORK_TYPE_ID,
     });
     expect(["continue_existing", "clarify", "create_new"]).toContain(
@@ -353,7 +358,7 @@ describe("126 — Networking Event Blueprint foundation", () => {
     }
   });
 
-  it("existing Event Blueprints remain registered", () => {
+  it("Workshop, Networking, and existing Event Blueprints remain registered", () => {
     expect(EVENT_PLAN_BLUEPRINT_IDS).toHaveLength(8);
     for (const id of [
       "bp-event-business-luncheon",
@@ -362,8 +367,8 @@ describe("126 — Networking Event Blueprint foundation", () => {
       "bp-event-three-day-retreat",
       "bp-event-book-signing",
       NETWORKING_EVENT_BLUEPRINT_ID,
-      "event.workshop",
-      "event.webinar",
+      WORKSHOP_EVENT_BLUEPRINT_ID,
+      WEBINAR_EVENT_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
     }

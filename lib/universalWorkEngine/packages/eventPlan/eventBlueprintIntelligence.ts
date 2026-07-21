@@ -22,6 +22,12 @@ const EVENT_HINTS: { match: RegExp; id: string; title: string; why: string }[] =
     why: "Workshops succeed when practice and facilitation are planned, not only content.",
   },
   {
+    match: /webinar|replay|moderator|poll|caption/i,
+    id: "event-has-webinar-production",
+    title: "Webinar production thinking is present",
+    why: "Webinars succeed with rehearsal, moderation, engagement, and a clear replay path.",
+  },
+  {
     match: /risk|contingency/i,
     id: "event-has-risk",
     title: "Risk thinking is present",
@@ -88,6 +94,12 @@ const EVENT_SUGGEST_IF_MISSING: {
     test: (t) => !/practice|activity|debrief|exercise/i.test(t),
     title: "Consider practice and debrief space",
     why: "Workshops often overload content and leave too little time to practice or reflect.",
+  },
+  {
+    id: "event-suggest-rehearsal-moderator",
+    test: (t) => !/rehearsal|moderator|replay|tech/i.test(t),
+    title: "Consider rehearsal and moderator support",
+    why: "Webinars often fail from untested tech or an unmanaged chat and Q&A.",
   },
 ];
 

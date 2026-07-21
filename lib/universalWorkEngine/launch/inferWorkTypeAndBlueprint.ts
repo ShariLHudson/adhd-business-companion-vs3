@@ -13,6 +13,7 @@ import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/market
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
 import {
   NETWORKING_EVENT_BLUEPRINT_ID,
+  WEBINAR_EVENT_BLUEPRINT_ID,
   WORKSHOP_EVENT_BLUEPRINT_ID,
 } from "../packages/eventPlan/eventBlueprintDefinitions";
 import type { UniversalLaunchContract } from "./types";
@@ -31,6 +32,9 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-networking": NETWORKING_EVENT_BLUEPRINT_ID,
   "bp-workshop-event": WORKSHOP_EVENT_BLUEPRINT_ID,
   "bp-event-workshop": WORKSHOP_EVENT_BLUEPRINT_ID,
+  "bp-webinar": WEBINAR_EVENT_BLUEPRINT_ID,
+  "bp-event-webinar": WEBINAR_EVENT_BLUEPRINT_ID,
+  "bp-webinar-event": WEBINAR_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
@@ -48,6 +52,11 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(networking\s+event|business\s+mixer|networking\s+mixer|speed\s+networking)\b/i,
     blueprintId: NETWORKING_EVENT_BLUEPRINT_ID,
+    workTypeId: EVENT_PLAN_WORK_TYPE_ID,
+  },
+  {
+    re: /\bwebinar\b/i,
+    blueprintId: WEBINAR_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
@@ -161,7 +170,7 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
   if (
     !workTypeId &&
     message &&
-    /\b(event|workshop|retreat|luncheon|signing|networking|mixer)\b/i.test(
+    /\b(event|workshop|retreat|luncheon|signing|networking|mixer|webinar)\b/i.test(
       message,
     )
   ) {

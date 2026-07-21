@@ -26,7 +26,7 @@ describe("104 Anywhere-Origin certification", () => {
     expect(result.schemaVersion).toBe("104.1");
     expect(result.workTypeId).toBe("event_plan");
     expect(result.totals.originsCovered).toBe(14);
-    expect(result.totals.blueprintsCovered).toBe(7);
+    expect(result.totals.blueprintsCovered).toBe(8);
     expect(result.coreScenarios).toHaveLength(14);
     expect(result.releaseBlockers).toEqual([]);
     expect(result.levels.L1_architecture.status).toBe("pass");
