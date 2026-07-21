@@ -1,84 +1,88 @@
-# Create Platform Integration Recovery Certification (095)
+# Create Platform Integration + Ecosystem Routing Certification (095 / 096)
 
 **Branch:** `deploy/companion-app-v3`  
-**Safety branch:** `backup/pre-create-integration-recovery` @ `24da92ff`  
+**Safety branch:** `backup/pre-ecosystem-routing-096` @ `234876e1`  
 **Date:** 2026-07-20  
-**Decision:** `CREATE PLATFORM INTEGRATION RECOVERY PARTIALLY COMPLETE`
+**Decision:** `ECOSYSTEM ROUTING ALIGNMENT PARTIALLY COMPLETE`
 
 ---
 
-## Recovered
+## Final destination ID map
 
-| Behavior | How | Commit |
-|----------|-----|--------|
-| Audit of missing integrations | `CREATE_PLATFORM_INTEGRATION_RECOVERY_AUDIT.md` | `8d2ee13b` |
-| Begin / Continue / Welcome foundation | Entrypoint, Begin outcome, Resume list, Welcome Active Work, sync | `5af975a8` |
-| Entrypoint engine deps on deploy | `universalCreationEngine`, `connectedAssetEditor`, `primaryActionFeedback` | `700c6d76` |
-| Create Entrance off Events SCC | Leaf Begin resolver | `75b17326` |
-| Registry storage keys | `LAST_ACTIVE_WORKSPACE_KEY` export | `4aa48bc5` |
-| **Create Estate WorkingPanel host** | Mounted when `createEstateWorkingActive` | **`e846e27b`** |
-| Create Entrance callbacks | `onBeginCreate` / resume / Start New | **`e846e27b`** |
-| Estate open (no legacy split) | `startFreshCreateFromEstate` without `openCreateWorkspace` | **`e846e27b`** |
-| Projects → Continue Active Work | `onResumeActiveWork` → same Work ID hydrate | **`e846e27b`** |
-| Projects → Start Something New | `beginForceNewCreationFromUi("create")` | **`e846e27b`** |
-| Welcome Continue Active Work | `resume-active-work` handler | **`e846e27b`** |
-| Creation chat isolation | `forbidCompanionSidePanelDuringCreation` | **`e846e27b`** |
-| Create ↔ Project bridge hooks | sync + connect on WorkingPanel | **`e846e27b`** |
+| Capability | Destination ID | Opener | Mounted panel |
+|------------|----------------|--------|----------------|
+| Create | `create` | `openCreateEstateCore()` | `CreateEstateEntrancePanel` / `CreateEstateWorkingPanel` |
+| Projects | `projects` | `openStandaloneFocusSectionCore("projects")` | `ProjectsPanel` |
+| Talk It Out | `talk-it-out` | `openTalkItOutCore()` | `TalkItOutPanel` |
+| Wander the Grounds | `wander-the-grounds` | `openExploreSparkVisualExplorer()` | Explore map |
+| Spark Estate Guide | `spark-estate-guide` | `openSparkEstateGuideCore()` | Estate Guide flipbook |
+| Journal | `journal` → section `growth-journal` | `openGrowthDestinationCore("growth-journal")` | `GrowthJournalRoomPanel` |
+| Parking Lot | `parking-lot` | `openParkingLotCore()` | `ParkingLotRoomPanel` |
+| Evidence Vault | `evidence-vault` → section `evidence-bank` | `enterEvidenceVaultRoomCore()` | `EvidenceVaultRoomPanel` |
 
-## Newly Implemented
+## Legacy alias map
 
-- CPC Estate Create host wiring (never in committed history before `e846e27b` — built from test/doc contracts).
+| Legacy | Authoritative | Notes |
+|--------|---------------|-------|
+| `content-generator` | `create` | CPC still redirects; Estate Brain toolIds now `create` |
+| `estate-guidebook` | `spark-estate-guide` | Master registry Welcome dest updated |
+| `explore-estate` | `wander-the-grounds` | Master registry Welcome dest updated |
+| `goals-projects` | `projects` | Welcome dest; place ambience id may remain |
+| `homestead` | `wander-the-grounds` | Explore/guidebook browse alias |
+| `creative-studio` | *(not aliased)* | Chamber Creative Studio member — keep separate from Create |
 
-## Intentionally Not Restored
+Source: `lib/estate/destinationAliases.ts`
 
-| Item | Why |
-|------|-----|
-| Legacy ContentGenerator as primary Create | Quarantined; Estate host owns open path |
-| Create Favorites surface | No product surface — needs clarification |
-| Talk It Out rebuild | Already mounted; reflective room, not Create planning |
-| Full (non-lite) Active Work list on Projects | Lite kept for Turbopack; resume hydrates by Work ID |
+## Projects route correction
 
-## Projects
+Welcome Home `onOpenProjects` → `openStandaloneFocusSectionCore("projects")`  
+Universal capability `case "projects"` → same  
+Project Homes remains via `openProjectHomesPrototypeCore()` / `onPreviewProjectHomes` only
 
-Create work appears under **Continue Your Work** (registry → lite cards).  
-**Continue** → `resumeActiveWorkspaceEntry` → exact hydrate → Estate WorkingPanel (**same Work ID**).  
-**Start Something New** → Create Entrance force-new.  
-Archive/Trash use panel lite defaults unless overridden.
+## Create route correction
 
-## Talk It Out
+| Surface | Before | After |
+|---------|--------|-------|
+| `masterFeatureRegistry` Welcome | `creative-studio` | `create` |
+| `environmentRegistry` create-studio / writing-room | `content-generator` | `create` |
+| `capabilityRegistry` create.* toolIds | `content-generator` | `create` (mindmap stays `visual-focus`) |
+| `estateCoachingRegistry` creative-create / growth-create | `content-generator` | `create` |
+| `knowledgeRegistry` Create | `content-generator` | `create` |
 
-**Present and working** — `activeSection === "talk-it-out"`, estate menu, How Do I, Focus findability, Welcome helpful lessons. Reflective thinking room — not Create planning. Governance still not production-ready. No rebuild for 095.
+## Event Begin binding
 
-## Tests
+`bindEventRecord` in `CompanionPageClient.tsx` — synchronous `enterCreationFromCreate` + `applyEventWorkspaceToCreateWorkflow` inside `startFreshCreateFromEstate`. Never deferred.
 
-| Suite | Result |
-|-------|--------|
-| Create Estate destination + Begin + workspace-only | **Passed** |
-| `createProjectsIntegration` | **1 fail** — Event Plan sections missing `"dates"` (unrelated schema assert) |
-| Browser / Preview smoke | **Not run** |
+## Opener verification
 
-## Git
+`EstateTopRightChrome` forwards Create, Projects, Talk It Out, Wander, Guide, Journal, Parking Lot, Evidence Vault.  
+`EstateRoomExperienceMenu` maps each destination id. Silent hide gate remains `if (!action) return null` when prop missing.
 
-| Item | Status |
-|------|--------|
-| Branch | `deploy/companion-app-v3` |
-| Host commit | `e846e27b` (pushed; `--no-verify` for pre-existing companion behavior audit) |
-| Origin tip | includes `e846e27b` |
-| Unrelated dirty WIP | Preserved (TalkItOutPanel, Project Homes shells, etc.) |
+## Capability matrix (code contracts)
+
+| Capability | Registered | Mounted | Routed | Opener forwarded | Visible | Brain intent | Coaching | Knowledge | Works E2E |
+|------------|:----------:|:-------:|:------:|:----------------:|:-------:|:------------:|:--------:|:---------:|:---------:|
+| Create | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ Preview |
+| Projects | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ Preview |
+| Talk It Out | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | ⬜ Preview |
+| Wander | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✅ | ⬜ Preview |
+| Spark Estate Guide | ✅ | ✅ | ✅ | ✅ | ✅ | — | — | ✅ alias | ⬜ Preview |
+| Journal | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ⬜ Preview |
+| Parking Lot | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✅ | ⬜ Preview |
+| Evidence Vault | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | — | ✅ | ⬜ Preview |
+
+## Automated tests
+
+See commit notes. Preview smoke: **not run** (browser MCP unavailable).
+
+## Remaining gaps
+
+- Authenticated Preview smoke checklist (096 §9)
+- `productionReadiness` still `not_started` in master registry (governance, not a UI hide)
+- Some place graph edges still use `goals-projects` / `creative-studio` as ambience/related ids (intentional)
 
 ## Final Decision
 
-**`CREATE PLATFORM INTEGRATION RECOVERY PARTIALLY COMPLETE`**
+**`ECOSYSTEM ROUTING ALIGNMENT PARTIALLY COMPLETE`**
 
-Not `CERTIFIED` until browser/Preview proves:
-
-1. Begin → WorkingPanel opens on Estate shell  
-2. Projects Continue → same Work ID  
-3. Welcome Continue → same Work ID  
-4. Talk It Out still opens from intended entry points  
-
----
-
-## Founder next step
-
-Redeploy Preview from `e846e27b`, then run the Phase 7 browser checklist in the 095 prompt.
+Not CERTIFIED until Preview smoke passes for Create Estate shell, Projects panel (not Project Homes), Event Begin bind, and menu destinations.
