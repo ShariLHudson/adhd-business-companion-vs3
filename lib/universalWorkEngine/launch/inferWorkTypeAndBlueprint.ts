@@ -49,7 +49,11 @@ import {
   PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
   PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
   REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+  CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+  MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+  RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
   SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+  SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
   WELLNESS_PRACTICE_BUSINESS_BLUEPRINT_ID,
   WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
@@ -216,6 +220,14 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-agriculture-farm-rural": AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
   "bp-agriculture": AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
   "bp-farm": AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
+  "bp-software-saas": SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
+  "bp-saas": SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
+  "bp-media-publishing": MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+  "bp-media": MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+  "bp-creative-agency-studio": CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+  "bp-creative-agency": CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+  "bp-research-innovation-lab": RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
+  "bp-research-lab": RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -309,6 +321,18 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(coaching\s+business|coach\s+business|coaching\s+blueprint|business\.coaching)\b/i,
     blueprintId: COACHING_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Creative agency before generic consulting/service
+    re: /\b(creative\s+agency(?:\s+(?:and\s+)?studio)?(?:\s+business)?|creative\s+studio(?:\s+business)?|design\s+agency(?:\s+business)?|business\.creative_agency_studio)\b/i,
+    blueprintId: CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Research lab before consulting
+    re: /\b(research\s+(?:and\s+)?innovation\s+lab(?:\s+blueprint)?|innovation\s+lab(?:\s+blueprint)?|research\s+lab(?:\s+blueprint)?|business\.research_innovation_lab)\b/i,
+    blueprintId: RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -443,6 +467,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Software/SaaS before product-based and ecommerce
+    re: /\b(software\s+(?:and\s+)?saas(?:\s+business)?|saas\s+business|software\s+business(?:\s+blueprint)?|business\.software_saas)\b/i,
+    blueprintId: SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     // Product-based before general ecommerce
     re: /\b(product[\s-]?based(?:\s+business)?|product\s+line\s+business|product\s+business\s+blueprint|business\.product_based)\b/i,
     blueprintId: PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
@@ -473,6 +503,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(hospitality(?:\s+business)?|hotel\s+business|bed\s+and\s+breakfast(?:\s+business)?|b\s*&\s*b\s+business|vacation\s+rental(?:\s+business)?|inn\s+business|business\.hospitality)\b/i,
     blueprintId: HOSPITALITY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Media publishing before solo content creator
+    re: /\b(media\s+(?:and\s+)?publishing(?:\s+business)?|publishing\s+business|media\s+business(?:\s+blueprint)?|newsletter\s+business|podcast\s+business|business\.media_publishing)\b/i,
+    blueprintId: MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {

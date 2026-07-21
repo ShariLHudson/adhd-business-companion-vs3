@@ -1,5 +1,5 @@
 /**
- * 201–260 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community / Regulated Professional / Manufacturing Logistics Agriculture Blueprints.
+ * 201–264 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community / Regulated Professional / Manufacturing Logistics Agriculture / Tech Media Creative Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -9,6 +9,7 @@ import {
   ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
   AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
   AUTHOR_BUSINESS_BLUEPRINT_ID,
+  CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
   BUSINESS_PLAN_BLUEPRINT_IDS,
   COACHING_BUSINESS_BLUEPRINT_ID,
   CONSULTING_BUSINESS_BLUEPRINT_ID,
@@ -31,6 +32,7 @@ import {
   INVENTORY_PRICING_BUSINESS_BLUEPRINT_ID,
   LEGAL_SERVICES_BUSINESS_BLUEPRINT_ID,
   LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
+  MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
   MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
   MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
   NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
@@ -43,6 +45,7 @@ import {
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
   REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
+  RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
   RESTAURANT_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
@@ -50,6 +53,7 @@ import {
   RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
   SMALL_MANUFACTURING_BUSINESS_BLUEPRINT_ID,
+  SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
   STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
   SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
@@ -134,7 +138,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with fifty-one Business Blueprints", () => {
+  it("registers Business Plan Work Type with fifty-five Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -190,9 +194,13 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
         LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
         AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
+        SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
+        MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+        CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+        RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(51);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(55);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -249,6 +257,10 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       WHOLESALE_DISTRIBUTION_BUSINESS_BLUEPRINT_ID,
       LOGISTICS_TRANSPORTATION_BUSINESS_BLUEPRINT_ID,
       AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
+      SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
+      MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+      CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+      RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -512,6 +524,22 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
         guidedSection: "ag_enterprise",
+      },
+      {
+        blueprintId: SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "saas_roadmap",
+      },
+      {
+        blueprintId: MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "media_calendar",
+      },
+      {
+        blueprintId: CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "agency_catalog",
+      },
+      {
+        blueprintId: RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "lab_experiment",
       },
     ];
     for (const c of cases) {
@@ -928,6 +956,37 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     });
     expect(agriculture.blueprintId).toBe(
       AGRICULTURE_FARM_RURAL_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const softwareSaas = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a software and saas business",
+    });
+    expect(softwareSaas.blueprintId).toBe(SOFTWARE_SAAS_BUSINESS_BLUEPRINT_ID);
+
+    const mediaPublishing = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a media publishing business",
+    });
+    expect(mediaPublishing.blueprintId).toBe(
+      MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const creativeAgency = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a creative agency studio business",
+    });
+    expect(creativeAgency.blueprintId).toBe(
+      CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const researchLab = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage:
+        "Help me with a research and innovation lab blueprint",
+    });
+    expect(researchLab.blueprintId).toBe(
+      RESEARCH_INNOVATION_LAB_BUSINESS_BLUEPRINT_ID,
     );
 
     const genericService = inferWorkTypeAndBlueprint({
