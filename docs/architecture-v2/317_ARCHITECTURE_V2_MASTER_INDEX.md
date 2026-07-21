@@ -68,8 +68,17 @@
 | **323** | Knowledge & Provenance Audit | Map retrieval / provenance / Shari locks |
 | **324** | Privacy & Adaptation Audit | Profile fields · consent gaps · temp context |
 | **325** | Observability Implementation Plan | Visibility-first slices (O1 health report) |
+| **326** | Architecture Gap Analysis | Specs vs repo before runtime composition |
+| **327** | Capability Execution & Contribution Runtime | Executable capability contract |
+| **328** | Collection Composition & Orchestration Runtime | Collection as orchestrated experience |
+| **329** | Universal Output Synthesis & Artifact Architecture | Canonical Output contract |
+| **330** | Work / Collection / Blueprint / Project Bridge | Create SoT · Projects execute |
+| **331** | Runtime Resilience, Recovery & Safe Degradation | Failure must not cost thinking |
+| **332** | Runtime Composition Implementation Plan | **R1** vertical proof slice |
+| **333** | Work / Project Bridge Audit | Handoff declared ≠ implemented |
+| **334** | Resilience & Recovery Audit | Composition failure gaps |
 
-**Bundle READMEs:** `README_UPLOAD_ORDER.md` (300) · `306_310_ADAPTIVE_INTELLIGENCE_README.md` · `311_315_PLATFORM_GOVERNANCE_README.md` · `318_322_KNOWLEDGE_TRUST_OBSERVABILITY_README.md`  
+**Bundle READMEs:** `README_UPLOAD_ORDER.md` (300) · `306_310_ADAPTIVE_INTELLIGENCE_README.md` · `311_315_PLATFORM_GOVERNANCE_README.md` · `318_322_KNOWLEDGE_TRUST_OBSERVABILITY_README.md` · `327_331_RUNTIME_COMPOSITION_README.md`  
 **Archived alternate 311:** `bundle-sources/311_ADAPTIVE_INTELLIGENCE_IMPLEMENTATION_PLAN_GOVERNANCE_BUNDLE.md`
 
 ---
@@ -170,7 +179,7 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | Welcome (126) | `lib/firstLoginWelcome/welcomeExperienceConstitution.ts` |
 | Client-Relationships library | `docs/chamber-knowledge/client-relationships/` + 075 gate |
 | Events Member packages | `docs/visual-spark-studios/Events-Intelligence/` bundles |
-| Architecture audits | `305`, `311`, `316`, `323`, `324` · plan `325` |
+| Architecture audits | `305`, `311`, `316`, `323`, `324`, `326`, `333`, `334` · plans `325`, `332` |
 
 **Framework:** [314](./314_UNIVERSAL_TESTING_AND_CERTIFICATION_FRAMEWORK.md)
 
@@ -186,6 +195,10 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | 323 | Knowledge / provenance audit |
 | 324 | Privacy / adaptation audit |
 | 325 | Observability plan — **O1** architecture health report (no UX change) |
+| 326 | Architecture gap analysis (pre–runtime composition) |
+| 332 | Runtime composition plan — **R1** vertical proof |
+| 333 | Work / Project bridge audit |
+| 334 | Resilience / recovery audit |
 | Create-experience hardening / reports | `docs/create-experience/` (096–106 era + Blueprint certs) |
 | **233–236** Blueprint Createability | `docs/create-experience/standards/233_*`…`236_*` · runtime `lib/universalWorkEngine/blueprints/createability/` · masters `233_236_*` |
 | Navigation welcome docs | `docs/navigation/119–121` |
@@ -203,17 +216,17 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 
 ---
 
-## 13. Recommended next actions (from 316 · 311 · 325)
+## 13. Recommended next actions (from 316 · 311 · 325 · 332)
 
-1. **O1** — Architecture Health Report collectors (325) — visibility only  
-2. **G1** — Registry kernel types (312) — no live migration  
-3. **Adaptive Context façade** — 311 Slice 1 / 308 / 324  
-4. **Provenance / retrieval-priority contract types** — 323 / 318 (types only)  
-5. **G2** — Read adapters (UWE Blueprints, Chamber aliases)  
-6. **Domain Capability façade + Workshop Collection pilot**  
-7. Business Identity Registry definitions · Certification Registry · Doc graph (322 / O2)  
+1. **R1** — Runtime composition vertical proof (332) — one capability · Collection · Work · Output · Project handoff · recovery test  
+2. **O1** — Architecture Health Report collectors (325) — visibility only  
+3. **G1** — Registry kernel types (312) — no live migration  
+4. **Adaptive Context façade** — 311 Slice 1 / 308 / 324  
+5. **Provenance / retrieval-priority contract types** — 323 / 318 (types only)  
+6. **Createability remediation** — hand-authored manifests for pilot Blueprint (233–236)  
+7. **G2** — Read adapters · Domain Capability façade · Doc graph (322 / O2)  
 
-**Forbidden until audits say otherwise:** new retrieval stack · second profile · new logging product · shadow Work · broad registry rewrite · overwriting authoritative 311 with bundle draft
+**Forbidden until audits say otherwise:** parallel runtime · second Work engine · shadow Project SoT · new retrieval stack · second profile · new logging product · broad registry rewrite · overwriting authoritative 311 with bundle draft
 
 ---
 
