@@ -16,6 +16,12 @@ const EVENT_HINTS: { match: RegExp; id: string; title: string; why: string }[] =
     why: "Networking events succeed when how people meet is planned on purpose.",
   },
   {
+    match: /learning|practice|facilitat|activity|workbook/i,
+    id: "event-has-learning-practice",
+    title: "Learning and practice design is present",
+    why: "Workshops succeed when practice and facilitation are planned, not only content.",
+  },
+  {
     match: /risk|contingency/i,
     id: "event-has-risk",
     title: "Risk thinking is present",
@@ -76,6 +82,12 @@ const EVENT_SUGGEST_IF_MISSING: {
     test: (t) => !/connection|alone|facilitat|host/i.test(t),
     title: "Consider host support for alone or shy guests",
     why: "Networking events often leave people stranded without a clear first conversation.",
+  },
+  {
+    id: "event-suggest-practice-debrief",
+    test: (t) => !/practice|activity|debrief|exercise/i.test(t),
+    title: "Consider practice and debrief space",
+    why: "Workshops often overload content and leave too little time to practice or reflect.",
   },
 ];
 

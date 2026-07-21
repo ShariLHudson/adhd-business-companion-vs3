@@ -244,6 +244,8 @@ export {
   EVENT_PLAN_BLUEPRINT_IDS,
   NETWORKING_EVENT_BLUEPRINT_ID,
   EVENT_BLUEPRINT_NETWORKING_EVENT,
+  WORKSHOP_EVENT_BLUEPRINT_ID,
+  EVENT_BLUEPRINT_WORKSHOP,
 } from "./packages/eventPlan/eventBlueprintDefinitions";
 export { EVENT_PLAN_MAP_GROUPS } from "./packages/eventPlan/eventPlanMapGroups";
 export { ensureEventBlueprintIntelligenceRegistered } from "./packages/eventPlan/eventBlueprintIntelligence";

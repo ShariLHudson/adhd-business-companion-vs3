@@ -11,7 +11,10 @@ import {
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
-import { NETWORKING_EVENT_BLUEPRINT_ID } from "../packages/eventPlan/eventBlueprintDefinitions";
+import {
+  NETWORKING_EVENT_BLUEPRINT_ID,
+  WORKSHOP_EVENT_BLUEPRINT_ID,
+} from "../packages/eventPlan/eventBlueprintDefinitions";
 import type { UniversalLaunchContract } from "./types";
 
 /** Map legacy platformIntent CreateBlueprint ids → Universal Blueprint ids. */
@@ -26,6 +29,8 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-three-day-retreat": "bp-event-three-day-retreat",
   "bp-networking-event": NETWORKING_EVENT_BLUEPRINT_ID,
   "bp-networking": NETWORKING_EVENT_BLUEPRINT_ID,
+  "bp-workshop-event": WORKSHOP_EVENT_BLUEPRINT_ID,
+  "bp-event-workshop": WORKSHOP_EVENT_BLUEPRINT_ID,
   "bp-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
   "bp-simple-marketing-plan": MARKETING_PLAN_SIMPLE_BLUEPRINT_ID,
 };
@@ -71,14 +76,14 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
-    re: /\b(online\s+workshop)\b/i,
-    blueprintId: "bp-event-online-workshop",
+    re: /\b(workshop\s+blueprint|workshop\s+plan|half[-\s]?day\s+workshop|full[-\s]?day\s+workshop|host\s+a\s+workshop|plan\s+a\s+workshop|design\s+a\s+workshop)\b/i,
+    blueprintId: WORKSHOP_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
   {
-    // Bare "workshop" only when not already a more specific event phrase
+    // Bare "workshop" → general Workshop Blueprint (specific online/one-day patterns above win)
     re: /\bworkshop\b/i,
-    blueprintId: "bp-event-online-workshop",
+    blueprintId: WORKSHOP_EVENT_BLUEPRINT_ID,
     workTypeId: EVENT_PLAN_WORK_TYPE_ID,
   },
 ];
