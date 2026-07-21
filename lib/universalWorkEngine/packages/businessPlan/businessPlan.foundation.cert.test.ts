@@ -1,5 +1,5 @@
 /**
- * 201–272 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community / Regulated Professional / Manufacturing Logistics Agriculture / Tech Media Creative / Scale Location Channel / Local Consumer Service Blueprints.
+ * 201–282 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce / Hospitality / Field / Wellness / Education Community / Regulated Professional / Manufacturing Logistics Agriculture / Tech Media Creative / Scale Location Channel / Local Consumer Service / Financial Investment Property Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -11,12 +11,16 @@ import {
   AUTHOR_BUSINESS_BLUEPRINT_ID,
   AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
   CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+  COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
   CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
   BUSINESS_PLAN_BLUEPRINT_IDS,
   DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
   COACHING_BUSINESS_BLUEPRINT_ID,
   FRANCHISE_BUSINESS_BLUEPRINT_ID,
+  INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+  INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
   PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+  PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
   WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
   CONSULTING_BUSINESS_BLUEPRINT_ID,
   CONTENT_CREATOR_BUSINESS_BLUEPRINT_ID,
@@ -146,7 +150,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with sixty-three Business Blueprints", () => {
+  it("registers Business Plan Work Type with sixty-seven Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -214,9 +218,13 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
         CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
         AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+        INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+        COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
+        PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
+        INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(63);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(67);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -285,6 +293,10 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       WEDDING_CELEBRATION_PROFESSIONAL_BUSINESS_BLUEPRINT_ID,
       CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
       AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+      INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+      COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
+      PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
+      INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -596,6 +608,22 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
         guidedSection: "auto_inspect",
+      },
+      {
+        blueprintId: INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "iw_review",
+      },
+      {
+        blueprintId: COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "cre_market",
+      },
+      {
+        blueprintId: PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "pd_milestones",
+      },
+      {
+        blueprintId: INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "ih_pipeline",
       },
     ];
     for (const c of cases) {
@@ -1106,6 +1134,38 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
     );
 
+    const investmentWealth = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build an investment and wealth business",
+    });
+    expect(investmentWealth.blueprintId).toBe(
+      INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const commercialRe = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a commercial real estate business",
+    });
+    expect(commercialRe.blueprintId).toBe(
+      COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const propertyDev = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a property development business",
+    });
+    expect(propertyDev.blueprintId).toBe(
+      PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
+    );
+
+    const holding = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build an investor and holding company",
+    });
+    expect(holding.blueprintId).toBe(
+      INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
+    );
+
     expect(isBusinessPlanCreationRequest("franchise business")).toBe(true);
     expect(isBusinessPlanCreationRequest("business.multi_location")).toBe(true);
     expect(
@@ -1123,6 +1183,18 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     expect(isBusinessPlanCreationRequest("janitorial business")).toBe(true);
     expect(
       isBusinessPlanCreationRequest("business.automotive_repair_detailing"),
+    ).toBe(true);
+    expect(
+      isBusinessPlanCreationRequest("investment and wealth business"),
+    ).toBe(true);
+    expect(
+      isBusinessPlanCreationRequest("business.commercial_real_estate"),
+    ).toBe(true);
+    expect(
+      isBusinessPlanCreationRequest("property development business"),
+    ).toBe(true);
+    expect(
+      isBusinessPlanCreationRequest("business.investor_holding_company"),
     ).toBe(true);
 
     const genericService = inferWorkTypeAndBlueprint({

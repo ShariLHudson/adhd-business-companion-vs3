@@ -46,14 +46,18 @@ import {
   NONPROFIT_FOUNDATION_BUSINESS_BLUEPRINT_ID,
   PET_SERVICE_BUSINESS_BLUEPRINT_ID,
   PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+  PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
   PROPERTY_MANAGEMENT_BUSINESS_BLUEPRINT_ID,
   PUBLIC_SECTOR_COMMUNITY_BUSINESS_BLUEPRINT_ID,
   REAL_ESTATE_BROKERAGE_AGENT_BUSINESS_BLUEPRINT_ID,
   CREATIVE_AGENCY_STUDIO_BUSINESS_BLUEPRINT_ID,
   AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
   CLEANING_JANITORIAL_BUSINESS_BLUEPRINT_ID,
+  COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
   DEALER_RESELLER_CHANNEL_PARTNER_BUSINESS_BLUEPRINT_ID,
   FRANCHISE_BUSINESS_BLUEPRINT_ID,
+  INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+  INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
   MEDIA_PUBLISHING_BUSINESS_BLUEPRINT_ID,
   MULTI_LOCATION_BUSINESS_BLUEPRINT_ID,
   PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
@@ -256,6 +260,13 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-automotive-repair-detailing":
     AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
   "bp-auto-repair": AUTOMOTIVE_REPAIR_DETAILING_BUSINESS_BLUEPRINT_ID,
+  "bp-investment-wealth": INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+  "bp-wealth": INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+  "bp-commercial-real-estate": COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
+  "bp-cre": COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
+  "bp-property-development": PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
+  "bp-investor-holding-company": INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
+  "bp-holding-company": INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -289,6 +300,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     // Photography/videography before creative_agency_studio and content_creator
     re: /\b(photography(?:\s+and\s+videography)?(?:\s+business)?|videography(?:\s+business)?|photo\s+(?:and\s+)?video(?:\s+business)?|business\.photography_videography)\b/i,
     blueprintId: PHOTOGRAPHY_VIDEOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Holding / investor portfolio before franchise and multi_location
+    re: /\b(investor(?:\s+and\s+)?holding\s+company|holding\s+company(?:\s+blueprint)?|multi[\s-]?entity\s+(?:portfolio|holding)|portfolio\s+holding(?:\s+company)?|business\.investor_holding_company)\b/i,
+    blueprintId: INVESTOR_HOLDING_COMPANY_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -411,6 +428,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Investment/wealth before accounting/tax and insurance
+    re: /\b(investment(?:\s+and\s+)?wealth(?:\s+business)?|wealth\s+management(?:\s+business)?|financial\s+planning(?:\s+business|\s+practice)?|advisory\s+(?:and\s+)?wealth(?:\s+business)?|business\.investment_wealth)\b/i,
+    blueprintId: INVESTMENT_WEALTH_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     re: /\b(accounting(?:\s+(?:bookkeeping|tax))?(?:\s+(?:and\s+)?(?:bookkeeping|tax))?(?:\s+practice|\s+business)?|bookkeeping(?:\s+practice|\s+business)?|tax\s+practice(?:\s+business)?|business\.accounting_bookkeeping_tax)\b/i,
     blueprintId: ACCOUNTING_BOOKKEEPING_TAX_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
@@ -418,6 +441,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(insurance\s+agency(?:\s+business)?|insurance\s+broker(?:\s+business)?|business\.insurance_agency)\b/i,
     blueprintId: INSURANCE_AGENCY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Commercial RE before residential brokerage and property management
+    re: /\b(commercial\s+real\s+estate(?:\s+business)?|cre(?:\s+business)?|commercial\s+(?:brokerage|leasing|acquisitions?)(?:\s+business)?|business\.commercial_real_estate)\b/i,
+    blueprintId: COMMERCIAL_REAL_ESTATE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -462,6 +491,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     // Field/home/property before generic service and before hospitality lodging
     re: /\b(mobile\s+(?:and\s+)?field\s+service|field\s+service\s+operations|field\s+dispatch|operations\.mobile_field_service)\b/i,
     blueprintId: MOBILE_FIELD_SERVICE_OPERATIONS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Property development before contractor_construction
+    re: /\b(property\s+development(?:\s+business)?|real\s+estate\s+development(?:\s+business)?|land\s+development(?:\s+business)?|development\s+blueprint|business\.property_development)\b/i,
+    blueprintId: PROPERTY_DEVELOPMENT_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
