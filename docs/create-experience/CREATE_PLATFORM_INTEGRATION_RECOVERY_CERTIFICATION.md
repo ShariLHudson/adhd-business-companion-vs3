@@ -9,73 +9,76 @@
 
 ## Recovered
 
-| Behavior | How |
-|----------|-----|
-| Audit of missing integrations | `CREATE_PLATFORM_INTEGRATION_RECOVERY_AUDIT.md` — `8d2ee13b` |
-| Begin / Continue / Welcome foundation modules | Universal entrypoint, Begin outcome, Resume list, Welcome Active Work, sync canonical — `5af975a8` |
-| Create Estate WorkingPanel host | Mounted in CPC when `createEstateWorkingActive` (staged, pending commit) |
-| Create Entrance callbacks | `onBeginCreate` / `onResumeCreationWorkspace` / `onStartSomethingNew` (staged) |
-| Estate open without legacy split | `startFreshCreateFromEstate` no longer calls `openCreateWorkspace` (staged) |
-| Projects → Continue Active Work | `onResumeActiveWork` → `resumeActiveWorkspaceEntry` (staged) |
-| Projects → Start Something New | `onStartSomethingNew` → `beginForceNewCreationFromUi("create")` (staged) |
-| Welcome Continue Active Work | `resume-active-work` handled in `handleGlobalDailyOpeningChoice` (staged) |
-| Creation chat isolation | `forbidCompanionSidePanelDuringCreation` gates (staged) |
-| Create ↔ Project bridge hooks | `syncCanonicalWorkFromCreateWorkflow` + `connectCanonicalWorkToProjectHome` on WorkingPanel (staged) |
+| Behavior | How | Commit |
+|----------|-----|--------|
+| Audit of missing integrations | `CREATE_PLATFORM_INTEGRATION_RECOVERY_AUDIT.md` | `8d2ee13b` |
+| Begin / Continue / Welcome foundation | Entrypoint, Begin outcome, Resume list, Welcome Active Work, sync | `5af975a8` |
+| Entrypoint engine deps on deploy | `universalCreationEngine`, `connectedAssetEditor`, `primaryActionFeedback` | `700c6d76` |
+| Create Entrance off Events SCC | Leaf Begin resolver | `75b17326` |
+| Registry storage keys | `LAST_ACTIVE_WORKSPACE_KEY` export | `4aa48bc5` |
+| **Create Estate WorkingPanel host** | Mounted when `createEstateWorkingActive` | **`e846e27b`** |
+| Create Entrance callbacks | `onBeginCreate` / resume / Start New | **`e846e27b`** |
+| Estate open (no legacy split) | `startFreshCreateFromEstate` without `openCreateWorkspace` | **`e846e27b`** |
+| Projects → Continue Active Work | `onResumeActiveWork` → same Work ID hydrate | **`e846e27b`** |
+| Projects → Start Something New | `beginForceNewCreationFromUi("create")` | **`e846e27b`** |
+| Welcome Continue Active Work | `resume-active-work` handler | **`e846e27b`** |
+| Creation chat isolation | `forbidCompanionSidePanelDuringCreation` | **`e846e27b`** |
+| Create ↔ Project bridge hooks | sync + connect on WorkingPanel | **`e846e27b`** |
 
 ## Newly Implemented
 
-- CPC Estate Create host wiring (never existed in committed history — implemented from test/doc contracts).
+- CPC Estate Create host wiring (never in committed history before `e846e27b` — built from test/doc contracts).
 
 ## Intentionally Not Restored
 
 | Item | Why |
 |------|-----|
-| Legacy ContentGenerator as primary Create | Quarantined; Estate host replaces open path |
-| Create Favorites surface | No product surface / Needs clarification |
-| Talk It Out rebuild | Already mounted and wired; not a Create planner |
-| Full Active Work list (non-lite) on Projects panel | Lite projection kept for Turbopack safety; resume uses Work ID hydrate |
+| Legacy ContentGenerator as primary Create | Quarantined; Estate host owns open path |
+| Create Favorites surface | No product surface — needs clarification |
+| Talk It Out rebuild | Already mounted; reflective room, not Create planning |
+| Full (non-lite) Active Work list on Projects | Lite kept for Turbopack; resume hydrates by Work ID |
 
 ## Projects
 
-Create work appears under **Continue Your Work** via registry → `projectsContinueLite` cards.  
-**Continue** now calls `resumeActiveWorkspaceEntry` → hydrate exact workspace → Estate WorkingPanel with the **same Work ID**.  
-**Start Something New** opens Create Entrance force-new (new workspace).  
-Archive/Trash still use panel lite defaults unless parent overrides.
+Create work appears under **Continue Your Work** (registry → lite cards).  
+**Continue** → `resumeActiveWorkspaceEntry` → exact hydrate → Estate WorkingPanel (**same Work ID**).  
+**Start Something New** → Create Entrance force-new.  
+Archive/Trash use panel lite defaults unless overridden.
 
 ## Talk It Out
 
-**Present and working** as `activeSection === "talk-it-out"` with estate menu, How Do I, Focus help findability, and Welcome helpful lessons. Reflective room — not Create planning. Governance still marks not production-ready. No code restore required for 095.
+**Present and working** — `activeSection === "talk-it-out"`, estate menu, How Do I, Focus findability, Welcome helpful lessons. Reflective thinking room — not Create planning. Governance still not production-ready. No rebuild for 095.
 
 ## Tests
 
 | Suite | Result |
 |-------|--------|
-| `createEstateDestination` + `resolveCreateBeginOutcome` + `creationWorkspaceOnly` | **21 passed** |
-| Create host contract (agent run) | **14/14 passed** |
-| Browser / Preview smoke (Projects ↔ Create, Talk It Out) | **Not run** |
-| Event Plan unrelated assertion | 1 known unrelated fail in broader suite |
+| Create Estate destination + Begin + workspace-only | **Passed** |
+| `createProjectsIntegration` | **1 fail** — Event Plan sections missing `"dates"` (unrelated schema assert) |
+| Browser / Preview smoke | **Not run** |
 
 ## Git
 
 | Item | Status |
 |------|--------|
-| Pushed | `8d2ee13b` (audit), `5af975a8` (foundation) |
-| Staged local | `CompanionPageClient.tsx` (+356/−41 Create host) |
-| Blocked | Pre-commit **companion behavior audit** (33 pre-existing focus failures) — needs explicit `--no-verify` approval or audit exemption |
-| Unrelated dirty tree | Preserved (not staged) |
+| Branch | `deploy/companion-app-v3` |
+| Host commit | `e846e27b` (pushed; `--no-verify` for pre-existing companion behavior audit) |
+| Origin tip | includes `e846e27b` |
+| Unrelated dirty WIP | Preserved (TalkItOutPanel, Project Homes shells, etc.) |
 
 ## Final Decision
 
 **`CREATE PLATFORM INTEGRATION RECOVERY PARTIALLY COMPLETE`**
 
-Not `CERTIFIED` until:
+Not `CERTIFIED` until browser/Preview proves:
 
-1. CPC host commit is on `origin/deploy/companion-app-v3`
-2. Browser/Preview proves Projects resume, Welcome resume, Begin → WorkingPanel, same Work ID
-3. Talk It Out entry smoke (confirm still opens from intended points)
+1. Begin → WorkingPanel opens on Estate shell  
+2. Projects Continue → same Work ID  
+3. Welcome Continue → same Work ID  
+4. Talk It Out still opens from intended entry points  
 
 ---
 
-## Ask for Founder
+## Founder next step
 
-Approve `git commit --no-verify` for the staged `CompanionPageClient.tsx` Create host wiring? Hook failures are the existing companion behavior audit (focus), not Create host contract tests (those pass).
+Redeploy Preview from `e846e27b`, then run the Phase 7 browser checklist in the 095 prompt.
