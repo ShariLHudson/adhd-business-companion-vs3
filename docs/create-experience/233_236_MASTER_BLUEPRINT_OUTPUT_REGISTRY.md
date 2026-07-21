@@ -95,6 +95,16 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.craft_show` | 1.0.0 | business_plan | Post-show review template | template | draft_only | blocked | Create (unspecified) | yes |
 | `business.craft_show` | 1.0.0 | business_plan | Linked Event plan recommendations | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.craft_show` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Ecommerce Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Customer Journey Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Assortment Architecture | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Storefront Improvement Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Channel Role Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Inventory and Fulfillment Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Marketing Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Etsy Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Shop setup checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Listing and SEO checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
@@ -140,6 +150,16 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.membership` | 1.0.0 | business_plan | Retention System | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.membership` | 1.0.0 | business_plan | Membership Health Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
 | `business.membership` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Product Opportunity Brief | brief | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Validation Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Product Brief | brief | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Sourcing Strategy | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Cost and Pricing Architecture | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Quality Standard | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Packaging Brief | brief | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Channel Strategy | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Launch Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.product_based` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Product Photography Plan | visual_asset | connected | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Priority shot list | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.product_photography` | 1.0.0 | business_plan | Lighting and background standards | document | draft_only | blocked | Create (unspecified) | yes |
@@ -183,6 +203,26 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.speaker` | 1.0.0 | business_plan | Speaker Preparation Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.speaker` | 1.0.0 | business_plan | Follow-Up System | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.speaker` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Subscription Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Model Decision | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Offer Suite | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Economics Model | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Purchasing Calendar | calendar | connected | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Acquisition Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Onboarding Journey | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Recurring Fulfillment Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Retention Journey | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Wholesale Readiness Assessment | assessment | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Account Segment Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Wholesale Price List and Terms | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Line Sheet | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Sales Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Order Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Retail Partner Toolkit | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Wholesale KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.wholesale` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `event.book_launch` | 1.0.0 | event_plan | Concise Book Launch Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `event.book_launch` | 1.0.0 | event_plan | Complete Book Launch Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `event.book_launch` | 1.0.0 | event_plan | One-page author goals overview | brief | draft_only | blocked | Create (unspecified) | yes |
@@ -454,4 +494,4 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `retail.store_management` | 1.0.0 | business_plan | Shift Handoff Guide | document | draft_only | blocked | Create (unspecified) | yes |
 | `retail.store_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 
-**Total outputs:** 445
+**Total outputs:** 485

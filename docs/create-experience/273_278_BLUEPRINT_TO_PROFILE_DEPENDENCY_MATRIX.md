@@ -95,6 +95,17 @@
 | `business.craft_show` | calendar | `business.constraints` | business | blocked |
 | `business.craft_show` | shows | `business.channels` | business | blocked |
 | `business.craft_show` | next_actions | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.ecommerce` | active_business | `business.business_id` | business | blocked |
+| `business.ecommerce` | purpose | `business.vision` | business | blocked |
+| `business.ecommerce` | vision | `business.vision` | business | blocked |
+| `business.ecommerce` | channels | `business.channels` | business | blocked |
+| `business.ecommerce` | audience | `client_avatar.description` | client_avatar | blocked |
+| `business.ecommerce` | customers | `client_avatar.description` | client_avatar | blocked |
+| `business.ecommerce` | clients | `client_avatar.description` | client_avatar | blocked |
+| `business.ecommerce` | products | `product_or_service.name` | product_or_service | blocked |
+| `business.ecommerce` | offers | `offer.name` | offer | blocked |
+| `business.ecommerce` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.ecommerce` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.etsy` | active_business | `business.business_id` | business | blocked |
 | `business.etsy` | purpose | `business.vision` | business | blocked |
 | `business.etsy` | vision | `business.vision` | business | blocked |
@@ -146,6 +157,18 @@
 | `business.membership` | model | `offer.description` | offer | blocked |
 | `business.membership` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.membership` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.product_based` | active_business | `business.business_id` | business | blocked |
+| `business.product_based` | purpose | `business.vision` | business | blocked |
+| `business.product_based` | vision | `business.vision` | business | blocked |
+| `business.product_based` | products | `product_or_service.name` | product_or_service | blocked |
+| `business.product_based` | demand | `client_avatar.goals` | client_avatar | blocked |
+| `business.product_based` | validation | `client_avatar.goals` | client_avatar | blocked |
+| `business.product_based` | audience | `client_avatar.description` | client_avatar | blocked |
+| `business.product_based` | systems | `business.description` | business | blocked |
+| `business.product_based` | inventory | `product_or_service.name` | product_or_service | blocked |
+| `business.product_based` | constraints | `business.constraints` | business | blocked |
+| `business.product_based` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.product_based` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.product_photography` | active_business | `business.business_id` | business | blocked |
 | `business.product_photography` | purpose | `business.vision` | business | blocked |
 | `business.product_photography` | vision | `business.vision` | business | blocked |
@@ -197,6 +220,28 @@
 | `business.speaker` | topics | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.speaker` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `business.speaker` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.subscription_commerce` | active_business | `business.business_id` | business | blocked |
+| `business.subscription_commerce` | purpose | `business.vision` | business | blocked |
+| `business.subscription_commerce` | vision | `business.vision` | business | blocked |
+| `business.subscription_commerce` | offers | `offer.name` | offer | blocked |
+| `business.subscription_commerce` | model | `offer.description` | offer | blocked |
+| `business.subscription_commerce` | membership_model | `offer.description` | offer | blocked |
+| `business.subscription_commerce` | delivery | `offer.description` | offer | blocked |
+| `business.subscription_commerce` | pricing | `offer.description` | offer | blocked |
+| `business.subscription_commerce` | constraints | `business.constraints` | business | blocked |
+| `business.subscription_commerce` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.subscription_commerce` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.wholesale` | active_business | `business.business_id` | business | blocked |
+| `business.wholesale` | purpose | `business.vision` | business | blocked |
+| `business.wholesale` | constraints | `business.constraints` | business | blocked |
+| `business.wholesale` | stage | `business.stage` | business | blocked |
+| `business.wholesale` | audience | `client_avatar.description` | client_avatar | blocked |
+| `business.wholesale` | customers | `client_avatar.description` | client_avatar | blocked |
+| `business.wholesale` | channels | `business.channels` | business | blocked |
+| `business.wholesale` | pricing | `offer.description` | offer | blocked |
+| `business.wholesale` | offers | `offer.name` | offer | blocked |
+| `business.wholesale` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
+| `business.wholesale` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `event.book_launch` | active_business | `business.business_id` | business | blocked |
 | `event.book_launch` | purpose | `business.vision` | business | blocked |
 | `event.book_launch` | author_goals | `blueprint_session.current_goal` | blueprint_session | blocked |
@@ -453,4 +498,4 @@
 | `retail.store_management` | next_action | `blueprint_session.current_goal` | blueprint_session | blocked |
 | `retail.store_management` | next_step | `blueprint_session.current_goal` | blueprint_session | blocked |
 
-**Rows:** 447
+**Rows:** 492

@@ -18,16 +18,20 @@ Foundation / Work-Type certification is **necessary but not sufficient**. Produc
 | `business.content_creator` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 11 |
 | `business.course_creator` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 11 |
 | `business.craft_show` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 12 |
+| `business.ecommerce` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
 | `business.etsy` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 7 |
 | `business.handmade_online_store` | 1.0.0 | **blocked** | 12 | 0 | 12 | 12 | 12 |
 | `business.holiday_planner` | 1.0.0 | **blocked** | 8 | 0 | 8 | 8 | 8 |
 | `business.inventory_pricing` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 7 |
 | `business.membership` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 11 |
+| `business.product_based` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
 | `business.product_photography` | 1.0.0 | **blocked** | 7 | 0 | 7 | 7 | 7 |
 | `business.professional_organizing` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
 | `business.retail_store` | 1.0.0 | **blocked** | 6 | 0 | 6 | 6 | 6 |
 | `business.service` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
 | `business.speaker` | 1.0.0 | **blocked** | 10 | 0 | 10 | 10 | 10 |
+| `business.subscription_commerce` | 1.0.0 | **blocked** | 11 | 0 | 11 | 11 | 11 |
+| `business.wholesale` | 1.0.0 | **blocked** | 9 | 0 | 9 | 9 | 9 |
 | `event.book_launch` | 1.0.0 | **blocked** | 20 | 0 | 20 | 20 | 20 |
 | `event.challenge` | 1.0.0 | **blocked** | 20 | 0 | 20 | 20 | 20 |
 | `event.conference` | 1.0.0 | **blocked** | 22 | 0 | 22 | 22 | 22 |
@@ -48,7 +52,7 @@ Foundation / Work-Type certification is **necessary but not sufficient**. Produc
 | `retail.merchandising_promotions_cx` | 1.0.0 | **blocked** | 5 | 0 | 5 | 5 | 5 |
 | `retail.store_management` | 1.0.0 | **blocked** | 5 | 0 | 5 | 5 | 5 |
 
-**Createability-certified:** 0 / 40
+**Createability-certified:** 0 / 44
 
 ## Release rule
 

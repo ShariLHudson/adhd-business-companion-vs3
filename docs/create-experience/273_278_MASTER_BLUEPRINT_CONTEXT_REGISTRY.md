@@ -98,6 +98,17 @@ Provisional rows remain **blocked** until Business Estate load/prefill/sync is c
 | `business.craft_show` | 1.0.0 | business_plan | calendar | `business.constraints` | business | blocked | yes |
 | `business.craft_show` | 1.0.0 | business_plan | shows | `business.channels` | business | blocked | yes |
 | `business.craft_show` | 1.0.0 | business_plan | next_actions | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | active_business | `business.business_id` | business | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | purpose | `business.vision` | business | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | vision | `business.vision` | business | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | channels | `business.channels` | business | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | audience | `client_avatar.description` | client_avatar | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | customers | `client_avatar.description` | client_avatar | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | clients | `client_avatar.description` | client_avatar | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | products | `product_or_service.name` | product_or_service | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | offers | `offer.name` | offer | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | next_action | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.ecommerce` | 1.0.0 | business_plan | next_step | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 | `business.etsy` | 1.0.0 | business_plan | active_business | `business.business_id` | business | blocked | yes |
 | `business.etsy` | 1.0.0 | business_plan | purpose | `business.vision` | business | blocked | yes |
 | `business.etsy` | 1.0.0 | business_plan | vision | `business.vision` | business | blocked | yes |
@@ -149,6 +160,18 @@ Provisional rows remain **blocked** until Business Estate load/prefill/sync is c
 | `business.membership` | 1.0.0 | business_plan | model | `offer.description` | offer | blocked | yes |
 | `business.membership` | 1.0.0 | business_plan | next_action | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 | `business.membership` | 1.0.0 | business_plan | next_step | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | active_business | `business.business_id` | business | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | purpose | `business.vision` | business | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | vision | `business.vision` | business | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | products | `product_or_service.name` | product_or_service | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | demand | `client_avatar.goals` | client_avatar | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | validation | `client_avatar.goals` | client_avatar | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | audience | `client_avatar.description` | client_avatar | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | systems | `business.description` | business | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | inventory | `product_or_service.name` | product_or_service | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | constraints | `business.constraints` | business | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | next_action | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.product_based` | 1.0.0 | business_plan | next_step | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 | `business.product_photography` | 1.0.0 | business_plan | active_business | `business.business_id` | business | blocked | yes |
 | `business.product_photography` | 1.0.0 | business_plan | purpose | `business.vision` | business | blocked | yes |
 | `business.product_photography` | 1.0.0 | business_plan | vision | `business.vision` | business | blocked | yes |
@@ -200,6 +223,28 @@ Provisional rows remain **blocked** until Business Estate load/prefill/sync is c
 | `business.speaker` | 1.0.0 | business_plan | topics | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 | `business.speaker` | 1.0.0 | business_plan | next_action | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 | `business.speaker` | 1.0.0 | business_plan | next_step | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | active_business | `business.business_id` | business | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | purpose | `business.vision` | business | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | vision | `business.vision` | business | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | offers | `offer.name` | offer | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | model | `offer.description` | offer | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | membership_model | `offer.description` | offer | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | delivery | `offer.description` | offer | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | pricing | `offer.description` | offer | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | constraints | `business.constraints` | business | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | next_action | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.subscription_commerce` | 1.0.0 | business_plan | next_step | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | active_business | `business.business_id` | business | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | purpose | `business.vision` | business | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | constraints | `business.constraints` | business | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | stage | `business.stage` | business | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | audience | `client_avatar.description` | client_avatar | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | customers | `client_avatar.description` | client_avatar | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | channels | `business.channels` | business | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | pricing | `offer.description` | offer | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | offers | `offer.name` | offer | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | next_action | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
+| `business.wholesale` | 1.0.0 | business_plan | next_step | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 | `event.book_launch` | 1.0.0 | event_plan | active_business | `business.business_id` | business | blocked | yes |
 | `event.book_launch` | 1.0.0 | event_plan | purpose | `business.vision` | business | blocked | yes |
 | `event.book_launch` | 1.0.0 | event_plan | author_goals | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
@@ -456,4 +501,4 @@ Provisional rows remain **blocked** until Business Estate load/prefill/sync is c
 | `retail.store_management` | 1.0.0 | business_plan | next_action | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 | `retail.store_management` | 1.0.0 | business_plan | next_step | `blueprint_session.current_goal` | blueprint_session | blocked | yes |
 
-**Total dependencies:** 447
+**Total dependencies:** 492

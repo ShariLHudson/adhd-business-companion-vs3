@@ -35,6 +35,10 @@
 | critical | `business.craft_show` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.craft_show` | calendar | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.craft_show` | shows | `business.channels` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.ecommerce` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.ecommerce` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.ecommerce` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.ecommerce` | channels | `business.channels` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.etsy` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.etsy` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.etsy` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
@@ -51,6 +55,11 @@
 | critical | `business.membership` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.membership` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.membership` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.product_based` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.product_based` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.product_based` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.product_based` | systems | `business.description` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.product_based` | constraints | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.product_photography` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.product_photography` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.product_photography` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
@@ -67,6 +76,15 @@
 | critical | `business.speaker` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.speaker` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `business.speaker` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.subscription_commerce` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.subscription_commerce` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.subscription_commerce` | vision | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.subscription_commerce` | constraints | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.wholesale` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.wholesale` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.wholesale` | constraints | `business.constraints` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.wholesale` | stage | `business.stage` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
+| critical | `business.wholesale` | channels | `business.channels` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `event.book_launch` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `event.book_launch` | purpose | `business.vision` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
 | critical | `event.challenge` | active_business | `business.business_id` | No live profile wire; knownContextKey promise unverified | wire_profile_load |
@@ -153,6 +171,10 @@
 | high | `business.craft_show` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.craft_show` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.craft_show` | pricing | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.ecommerce` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.ecommerce` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.ecommerce` | clients | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.ecommerce` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.etsy` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.etsy` | pricing | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.handmade_online_store` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -165,6 +187,9 @@
 | high | `business.membership` | non_fit | `client_avatar.frustrations` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.membership` | membership_model | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.membership` | model | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.product_based` | demand | `client_avatar.goals` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.product_based` | validation | `client_avatar.goals` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.product_based` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.professional_organizing` | clients | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.professional_organizing` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.professional_organizing` | payers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -176,6 +201,15 @@
 | high | `business.service` | delivery | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.speaker` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `business.speaker` | buyers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.subscription_commerce` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.subscription_commerce` | model | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.subscription_commerce` | membership_model | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.subscription_commerce` | delivery | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.subscription_commerce` | pricing | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.wholesale` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.wholesale` | customers | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.wholesale` | pricing | `offer.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
+| high | `business.wholesale` | offers | `offer.name` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `event.book_launch` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `event.challenge` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
 | high | `event.conference` | audience | `client_avatar.description` | No live profile wire; knownContextKey promise unverified | implement_prefill |
@@ -234,6 +268,9 @@
 | low | `business.course_creator` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.craft_show` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.craft_show` | next_actions | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.ecommerce` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.ecommerce` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.ecommerce` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.etsy` | shop_setup | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.etsy` | status | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.etsy` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -257,6 +294,10 @@
 | low | `business.inventory_pricing` | next_actions | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.membership` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.membership` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.product_based` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.product_based` | inventory | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.product_based` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.product_based` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.product_photography` | products | `product_or_service.name` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.product_photography` | shot_lists | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.product_photography` | next_actions | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -279,6 +320,10 @@
 | low | `business.speaker` | topics | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.speaker` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `business.speaker` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.subscription_commerce` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.subscription_commerce` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.wholesale` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
+| low | `business.wholesale` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `event.book_launch` | author_goals | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `event.book_launch` | book_title | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `event.book_launch` | positioning | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
@@ -453,4 +498,4 @@
 | low | `retail.store_management` | next_action | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 | low | `retail.store_management` | next_step | `blueprint_session.current_goal` | No live profile wire; knownContextKey promise unverified | suppress_repeat_question |
 
-**Open gaps:** 447
+**Open gaps:** 492

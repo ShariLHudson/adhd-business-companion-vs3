@@ -1,6 +1,6 @@
 /**
  * Leaf data only — no imports from Create runtime (avoids circular deps).
- * Business Plan section map (201–228 handmade / service / creator / organizing / retail).
+ * Business Plan section map (201–232 handmade / service / creator / organizing / retail / commerce).
  */
 
 import type { WorkTypeMapSectionDef } from "../types";
@@ -225,6 +225,47 @@ export const BUSINESS_PLAN_MAP_SECTIONS: readonly WorkTypeMapSectionDef[] = [
   { id: "retail_upsell_cross", title: "Upselling and Cross-Selling" },
   { id: "retail_atmosphere", title: "Store Atmosphere" },
   { id: "retail_experience_measurement", title: "Experience Performance Measurement" },
+  // 229–232 Product & Commerce
+  { id: "ecom_customer_journey", title: "Ecommerce Customer Journey" },
+  { id: "ecom_assortment", title: "Ecommerce Assortment" },
+  { id: "ecom_storefront", title: "Storefront and Conversion" },
+  { id: "ecom_channels", title: "Ecommerce Channel Strategy" },
+  { id: "ecom_fulfillment", title: "Ecommerce Inventory and Fulfillment" },
+  { id: "ecom_service_returns", title: "Ecommerce Service and Returns" },
+  { id: "ecom_acquisition", title: "Ecommerce Acquisition" },
+  { id: "ecom_retention", title: "Ecommerce Retention" },
+  { id: "ecom_analytics", title: "Ecommerce Analytics" },
+  { id: "ecom_operations_growth", title: "Ecommerce Operations and Growth" },
+  { id: "product_validation", title: "Product Validation" },
+  { id: "product_architecture", title: "Product Architecture" },
+  { id: "product_sourcing", title: "Sourcing and Production" },
+  { id: "product_quality", title: "Quality and Compliance" },
+  { id: "product_packaging", title: "Packaging and Brand Experience" },
+  { id: "product_channels", title: "Product Channel and Distribution" },
+  { id: "product_launch", title: "Product Launch" },
+  { id: "product_inventory_cash", title: "Product Inventory and Cash Flow" },
+  { id: "product_lifecycle", title: "Product Lifecycle" },
+  { id: "product_growth", title: "Product Growth and Expansion" },
+  { id: "wholesale_accounts", title: "Wholesale Account Segments" },
+  { id: "wholesale_line_sheet", title: "Line Sheet and Sales Materials" },
+  { id: "wholesale_acquisition", title: "Wholesale Account Acquisition" },
+  { id: "wholesale_order_ops", title: "Wholesale Order Operations" },
+  { id: "wholesale_retailer_support", title: "Retailer Support" },
+  { id: "wholesale_account_mgmt", title: "Wholesale Account Management" },
+  { id: "wholesale_reps", title: "Distributor and Rep Management" },
+  { id: "wholesale_channel_risk", title: "Wholesale Channel Risk" },
+  { id: "wholesale_analytics", title: "Wholesale Analytics" },
+  { id: "wholesale_growth", title: "Wholesale Growth" },
+  { id: "sub_model", title: "Subscription Model" },
+  { id: "sub_offer_tiers", title: "Subscription Offer and Tiers" },
+  { id: "sub_demand_inventory", title: "Subscription Demand and Inventory" },
+  { id: "sub_acquisition", title: "Subscription Acquisition" },
+  { id: "sub_onboarding", title: "Subscription Onboarding" },
+  { id: "sub_fulfillment", title: "Recurring Fulfillment" },
+  { id: "sub_retention", title: "Subscription Retention and Churn" },
+  { id: "sub_experience", title: "Subscription Customer Experience" },
+  { id: "sub_analytics", title: "Subscription Analytics" },
+  { id: "sub_growth", title: "Subscription Growth and Resilience" },
 ];
 
 export const BUSINESS_PLAN_DEFAULT_FOCUS: readonly string[] = [

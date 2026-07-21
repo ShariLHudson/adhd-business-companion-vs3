@@ -29,11 +29,15 @@ import {
   PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
+  ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
   RETAIL_STORE_BUSINESS_BLUEPRINT_ID,
   RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
   SERVICE_BUSINESS_BLUEPRINT_ID,
+  SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
+  WHOLESALE_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
   STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
 } from "../packages/businessPlan/businessBlueprintDefinitions";
@@ -135,6 +139,13 @@ const LEGACY_CREATE_BP_TO_UWE: Record<string, string> = {
   "bp-retail-inventory": RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   "bp-retail-purchasing": RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
   "bp-retail-merchandising": RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
+  "bp-ecommerce": ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  "bp-ecommerce-business": ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+  "bp-product-based": PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+  "bp-product-based-business": PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+  "bp-wholesale": WHOLESALE_BUSINESS_BLUEPRINT_ID,
+  "bp-wholesale-business": WHOLESALE_BUSINESS_BLUEPRINT_ID,
+  "bp-subscription-commerce": SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
 };
 
 const MESSAGE_BLUEPRINT_PATTERNS: {
@@ -162,6 +173,12 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
   {
     re: /\b(product\s+photography(?:\s+(?:studio|blueprint))?|photography\s+studio\s+blueprint|business\.product_photography)\b/i,
     blueprintId: PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Wholesale (sell into stores) before brick-and-mortar retail store OS
+    re: /\b(wholesale(?:\s+(?:and\s+retail\s+)?(?:partnership|business|blueprint))?|line\s+sheet|sell\s+to\s+stores|business\.wholesale)\b/i,
+    blueprintId: WHOLESALE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
@@ -235,8 +252,26 @@ const MESSAGE_BLUEPRINT_PATTERNS: {
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {
+    // Subscription commerce before community membership
+    re: /\b(subscription\s+commerce|subscription\s+box|replenishment\s+subscription|subscription\s+business(?:\s+blueprint)?|business\.subscription_commerce)\b/i,
+    blueprintId: SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
     re: /\b(membership\s+business|membership\s+blueprint|membership\s+community\s+business|business\.membership)\b/i,
     blueprintId: MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Product-based before general ecommerce
+    re: /\b(product[\s-]?based(?:\s+business)?|product\s+line\s+business|product\s+business\s+blueprint|business\.product_based)\b/i,
+    blueprintId: PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+    workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
+  },
+  {
+    // Ecommerce after handmade/Etsy-specific patterns (those appear earlier)
+    re: /\b(ecommerce(?:\s+business)?|e[\s-]?commerce(?:\s+business)?|online\s+store\s+business|dtc(?:\s+store|\s+business)?|shopify\s+(?:store|business)|business\.ecommerce)\b/i,
+    blueprintId: ECOMMERCE_BUSINESS_BLUEPRINT_ID,
     workTypeId: BUSINESS_PLAN_WORK_TYPE_ID,
   },
   {

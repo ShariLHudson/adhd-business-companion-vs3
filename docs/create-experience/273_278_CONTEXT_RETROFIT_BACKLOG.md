@@ -35,17 +35,17 @@
 - `business.craft_show` · vision → `business.vision` · wire_profile_load
 - `business.craft_show` · calendar → `business.constraints` · wire_profile_load
 - `business.craft_show` · shows → `business.channels` · wire_profile_load
+- `business.ecommerce` · active_business → `business.business_id` · wire_profile_load
+- `business.ecommerce` · purpose → `business.vision` · wire_profile_load
+- `business.ecommerce` · vision → `business.vision` · wire_profile_load
+- `business.ecommerce` · channels → `business.channels` · wire_profile_load
 - `business.etsy` · active_business → `business.business_id` · wire_profile_load
 - `business.etsy` · purpose → `business.vision` · wire_profile_load
 - `business.etsy` · vision → `business.vision` · wire_profile_load
 - `business.handmade_online_store` · active_business → `business.business_id` · wire_profile_load
 - `business.handmade_online_store` · purpose → `business.vision` · wire_profile_load
 - `business.handmade_online_store` · vision → `business.vision` · wire_profile_load
-- `business.handmade_online_store` · marketplaces → `business.channels` · wire_profile_load
-- `business.handmade_online_store` · channels → `business.channels` · wire_profile_load
-- `business.holiday_planner` · active_business → `business.business_id` · wire_profile_load
-- `business.holiday_planner` · purpose → `business.vision` · wire_profile_load
-- …and 87 more
+- …and 105 more
 
 ## high
 
@@ -70,6 +70,10 @@
 - `business.craft_show` · audience → `client_avatar.description` · implement_prefill
 - `business.craft_show` · customers → `client_avatar.description` · implement_prefill
 - `business.craft_show` · pricing → `offer.description` · implement_prefill
+- `business.ecommerce` · audience → `client_avatar.description` · implement_prefill
+- `business.ecommerce` · customers → `client_avatar.description` · implement_prefill
+- `business.ecommerce` · clients → `client_avatar.description` · implement_prefill
+- `business.ecommerce` · offers → `offer.name` · implement_prefill
 - `business.etsy` · offers → `offer.name` · implement_prefill
 - `business.etsy` · pricing → `offer.description` · implement_prefill
 - `business.handmade_online_store` · offers → `offer.name` · implement_prefill
@@ -82,14 +86,10 @@
 - `business.membership` · non_fit → `client_avatar.frustrations` · implement_prefill
 - `business.membership` · membership_model → `offer.description` · implement_prefill
 - `business.membership` · model → `offer.description` · implement_prefill
-- `business.professional_organizing` · clients → `client_avatar.description` · implement_prefill
-- `business.professional_organizing` · audience → `client_avatar.description` · implement_prefill
-- `business.professional_organizing` · payers → `client_avatar.description` · implement_prefill
-- `business.professional_organizing` · offers → `offer.name` · implement_prefill
-- `business.retail_store` · audience → `client_avatar.description` · implement_prefill
-- `business.retail_store` · customers → `client_avatar.description` · implement_prefill
-- `business.retail_store` · clients → `client_avatar.description` · implement_prefill
-- …and 20 more
+- `business.product_based` · demand → `client_avatar.goals` · implement_prefill
+- `business.product_based` · validation → `client_avatar.goals` · implement_prefill
+- `business.product_based` · audience → `client_avatar.description` · implement_prefill
+- …and 36 more
 
 ## moderate
 
@@ -138,6 +138,6 @@
 - `business.course_creator` · next_step → `blueprint_session.current_goal` · suppress_repeat_question
 - `business.craft_show` · products → `product_or_service.name` · suppress_repeat_question
 - `business.craft_show` · next_actions → `blueprint_session.current_goal` · suppress_repeat_question
-- `business.etsy` · shop_setup → `blueprint_session.current_goal` · suppress_repeat_question
-- `business.etsy` · status → `blueprint_session.current_goal` · suppress_repeat_question
-- …and 216 more
+- `business.ecommerce` · products → `product_or_service.name` · suppress_repeat_question
+- `business.ecommerce` · next_action → `blueprint_session.current_goal` · suppress_repeat_question
+- …and 227 more

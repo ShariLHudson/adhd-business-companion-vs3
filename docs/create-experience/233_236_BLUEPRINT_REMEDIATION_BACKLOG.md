@@ -15,6 +15,9 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.course_creator` — **Course KPI Dashboard** → implement_structured
 - [ ] `business.craft_show` — **Product and pricing sheet** → implement_structured
 - [ ] `business.craft_show` — **Inventory checklist** → label_draft_only
+- [ ] `business.ecommerce` — **Pricing Model** → implement_structured
+- [ ] `business.ecommerce` — **Inventory and Fulfillment Workflow** → label_draft_only
+- [ ] `business.ecommerce` — **KPI Dashboard** → implement_structured
 - [ ] `business.etsy` — **Pricing and profitability view** → implement_structured
 - [ ] `business.handmade_online_store` — **Product and pricing sheet** → implement_structured
 - [ ] `business.holiday_planner` — **Seasonal inventory targets** → label_draft_only
@@ -24,9 +27,12 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.inventory_pricing` — **Dead inventory decisions** → label_draft_only
 - [ ] `business.membership` — **Membership Pricing Model** → implement_structured
 - [ ] `business.membership` — **Membership Health Dashboard** → implement_structured
+- [ ] `business.product_based` — **Cost and Pricing Architecture** → implement_structured
 - [ ] `business.professional_organizing` — **Pricing Model** → implement_structured
 - [ ] `business.retail_store` — **Financial Model** → implement_structured
 - [ ] `business.service` — **Pricing Calculator** → implement_structured
+- [ ] `business.subscription_commerce` — **KPI Dashboard** → implement_structured
+- [ ] `business.wholesale` — **Wholesale KPI Dashboard** → implement_structured
 - [ ] `event.book_launch` — **Inventory and preorder checklist** → label_draft_only
 - [ ] `event.book_launch` — **Budget view** → implement_structured
 - [ ] `event.challenge` — **Budget view** → implement_structured
@@ -59,6 +65,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.course_creator` — **Content Production Plan** → label_draft_only
 - [ ] `business.craft_show` — **Craft Show Business Plan** → label_draft_only
 - [ ] `business.craft_show` — **Linked Event plan recommendations** → label_draft_only
+- [ ] `business.ecommerce` — **Storefront Improvement Plan** → label_draft_only
+- [ ] `business.ecommerce` — **Marketing Plan** → label_draft_only
 - [ ] `business.etsy` — **Etsy Business Plan** → label_draft_only
 - [ ] `business.handmade_online_store` — **Handmade Online Store Plan** → label_draft_only
 - [ ] `business.handmade_online_store` — **Marketplace focus plan** → label_draft_only
@@ -66,6 +74,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.holiday_planner` — **Holiday Product Plan** → label_draft_only
 - [ ] `business.holiday_planner` — **Launch timeline** → label_draft_only
 - [ ] `business.membership` — **Membership Business Plan** → label_draft_only
+- [ ] `business.product_based` — **Validation Plan** → label_draft_only
+- [ ] `business.product_based` — **Launch Plan** → label_draft_only
 - [ ] `business.product_photography` — **Product Photography Plan** → connect_destination
 - [ ] `business.professional_organizing` — **Professional Organizing Business Plan** → label_draft_only
 - [ ] `business.professional_organizing` — **Organizing Project Plan** → label_draft_only
@@ -74,6 +84,8 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.service` — **Service Business Operating Plan** → implement_composed
 - [ ] `business.speaker` — **Speaker Business Plan** → label_draft_only
 - [ ] `business.speaker` — **Speaker Preparation Plan** → label_draft_only
+- [ ] `business.subscription_commerce` — **Acquisition Plan** → label_draft_only
+- [ ] `business.wholesale` — **Sales Plan** → label_draft_only
 - [ ] `event.book_launch` — **Concise Book Launch Plan** → label_draft_only
 - [ ] `event.book_launch` — **Complete Book Launch Plan** → label_draft_only
 - [ ] `event.book_launch` — **Risk and contingency plan** → label_draft_only
@@ -188,6 +200,9 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.handmade_online_store` — **Listing and SEO checklist** → label_draft_only
 - [ ] `business.handmade_online_store` — **Photography checklist** → label_draft_only
 - [ ] `business.handmade_online_store` — **Email and social rhythm** → label_draft_only
+- [ ] `business.product_based` — **Product Opportunity Brief** → label_draft_only
+- [ ] `business.product_based` — **Product Brief** → label_draft_only
+- [ ] `business.product_based` — **Packaging Brief** → label_draft_only
 - [ ] `business.product_photography` — **Marketplace image checklist** → label_draft_only
 - [ ] `business.service` — **Proposal and Agreement Checklist** → label_draft_only
 - [ ] `business.speaker` — **Signature Talk Brief** → label_draft_only
@@ -291,6 +306,11 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.craft_show` — **Expense and tax tracker outline** → label_draft_only
 - [ ] `business.craft_show` — **Post-show review template** → label_draft_only
 - [ ] `business.craft_show` — **Next actions list** → connect_destination
+- [ ] `business.ecommerce` — **Ecommerce Business Snapshot** → label_draft_only
+- [ ] `business.ecommerce` — **Customer Journey Map** → label_draft_only
+- [ ] `business.ecommerce` — **Assortment Architecture** → label_draft_only
+- [ ] `business.ecommerce` — **Channel Role Map** → label_draft_only
+- [ ] `business.ecommerce` — **Next actions list** → connect_destination
 - [ ] `business.etsy` — **Shipping profile notes** → label_draft_only
 - [ ] `business.etsy` — **Next actions list** → connect_destination
 - [ ] `business.handmade_online_store` — **Shipping and packaging standards** → label_draft_only
@@ -314,6 +334,10 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.membership` — **Membership Operating Calendar** → implement_composed
 - [ ] `business.membership` — **Retention System** → label_draft_only
 - [ ] `business.membership` — **Next actions list** → connect_destination
+- [ ] `business.product_based` — **Sourcing Strategy** → label_draft_only
+- [ ] `business.product_based` — **Quality Standard** → label_draft_only
+- [ ] `business.product_based` — **Channel Strategy** → label_draft_only
+- [ ] `business.product_based` — **Next actions list** → connect_destination
 - [ ] `business.product_photography` — **Priority shot list** → label_draft_only
 - [ ] `business.product_photography` — **Lighting and background standards** → label_draft_only
 - [ ] `business.product_photography` — **Editing workflow** → label_draft_only
@@ -343,6 +367,22 @@ Fix first: user-visible outputs · purpose-central · shared · Project handoff 
 - [ ] `business.speaker` — **Booking Pipeline** → label_draft_only
 - [ ] `business.speaker` — **Follow-Up System** → label_draft_only
 - [ ] `business.speaker` — **Next actions list** → connect_destination
+- [ ] `business.subscription_commerce` — **Subscription Snapshot** → label_draft_only
+- [ ] `business.subscription_commerce` — **Model Decision** → label_draft_only
+- [ ] `business.subscription_commerce` — **Offer Suite** → label_draft_only
+- [ ] `business.subscription_commerce` — **Economics Model** → label_draft_only
+- [ ] `business.subscription_commerce` — **Purchasing Calendar** → connect_destination
+- [ ] `business.subscription_commerce` — **Onboarding Journey** → label_draft_only
+- [ ] `business.subscription_commerce` — **Recurring Fulfillment Workflow** → label_draft_only
+- [ ] `business.subscription_commerce` — **Retention Journey** → label_draft_only
+- [ ] `business.subscription_commerce` — **Next actions list** → connect_destination
+- [ ] `business.wholesale` — **Wholesale Readiness Assessment** → label_draft_only
+- [ ] `business.wholesale` — **Account Segment Map** → label_draft_only
+- [ ] `business.wholesale` — **Wholesale Price List and Terms** → label_draft_only
+- [ ] `business.wholesale` — **Line Sheet** → label_draft_only
+- [ ] `business.wholesale` — **Order Workflow** → label_draft_only
+- [ ] `business.wholesale` — **Retail Partner Toolkit** → label_draft_only
+- [ ] `business.wholesale` — **Next actions list** → connect_destination
 - [ ] `event.book_launch` — **One-page author goals overview** → label_draft_only
 - [ ] `event.book_launch` — **Program and reading rundown** → label_draft_only
 - [ ] `event.book_launch` — **Signing table run-of-show** → label_draft_only

@@ -1,5 +1,5 @@
 /**
- * 201–228 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail Blueprints.
+ * 201–232 — Business Plan Work Type + Handmade / Service / Creator / Organizing / Retail / Commerce Blueprints.
  * @vitest-environment node
  */
 import { beforeEach, describe, expect, it } from "vitest";
@@ -14,6 +14,7 @@ import {
   COURSE_CREATOR_BUSINESS_BLUEPRINT_ID,
   CRAFT_SHOW_BUSINESS_BLUEPRINT_ID,
   DIGITAL_INFORMATION_ORGANIZING_BLUEPRINT_ID,
+  ECOMMERCE_BUSINESS_BLUEPRINT_ID,
   ETSY_BUSINESS_BLUEPRINT_ID,
   HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID,
   HOLIDAY_PRODUCT_PLANNER_BUSINESS_BLUEPRINT_ID,
@@ -21,6 +22,7 @@ import {
   MEMBERSHIP_BUSINESS_BLUEPRINT_ID,
   OPERATIONAL_PROCEDURAL_ORGANIZING_BLUEPRINT_ID,
   PHYSICAL_SPACE_ORGANIZING_BLUEPRINT_ID,
+  PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
   PRODUCT_PHOTOGRAPHY_BUSINESS_BLUEPRINT_ID,
   PROFESSIONAL_ORGANIZING_BUSINESS_BLUEPRINT_ID,
   RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
@@ -30,6 +32,8 @@ import {
   SERVICE_BUSINESS_BLUEPRINT_ID,
   SPEAKER_BUSINESS_BLUEPRINT_ID,
   STRATEGIC_MANAGEMENT_ORGANIZING_BLUEPRINT_ID,
+  SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
+  WHOLESALE_BUSINESS_BLUEPRINT_ID,
   addWorkMilestone,
   addWorkTask,
   answerBlueprintQuestion,
@@ -106,7 +110,7 @@ describe("201–206 — Business Plan Work Type foundation", () => {
     ensureBusinessPlanBlueprintsRegistered();
   });
 
-  it("registers Business Plan Work Type with twenty-three Business Blueprints", () => {
+  it("registers Business Plan Work Type with twenty-seven Business Blueprints", () => {
     const pkg = requireWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID);
     expect(pkg.displayName).toBe("Business Plan");
     expect(pkg.blueprintIds).toEqual(
@@ -134,9 +138,13 @@ describe("201–206 — Business Plan Work Type foundation", () => {
         RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
         RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
         RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
+        ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+        PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+        WHOLESALE_BUSINESS_BLUEPRINT_ID,
+        SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
       ]),
     );
-    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(23);
+    expect(BUSINESS_PLAN_BLUEPRINT_IDS).toHaveLength(27);
     expect(getWorkTypePackage(BUSINESS_PLAN_WORK_TYPE_ID)?.version).toBe("1.0.0");
   });
 
@@ -165,6 +173,10 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       RETAIL_STORE_MANAGEMENT_BLUEPRINT_ID,
       RETAIL_INVENTORY_PURCHASING_VENDOR_BLUEPRINT_ID,
       RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
+      ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+      PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+      WHOLESALE_BUSINESS_BLUEPRINT_ID,
+      SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
     ]) {
       expect(isBlueprintRegistered(id)).toBe(true);
       const bp = getBlueprint(id)!;
@@ -316,6 +328,22 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       {
         blueprintId: RETAIL_MERCHANDISING_PROMOTIONS_CX_BLUEPRINT_ID,
         guidedSection: "retail_promotions",
+      },
+      {
+        blueprintId: ECOMMERCE_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "ecom_storefront",
+      },
+      {
+        blueprintId: PRODUCT_BASED_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "product_validation",
+      },
+      {
+        blueprintId: WHOLESALE_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "wholesale_line_sheet",
+      },
+      {
+        blueprintId: SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
+        guidedSection: "sub_retention",
       },
     ];
     for (const c of cases) {
@@ -541,6 +569,27 @@ describe("201–206 — Business Plan Work Type foundation", () => {
       originalUserMessage: "Help me build a retail store business",
     });
     expect(retailStore.blueprintId).toBe(RETAIL_STORE_BUSINESS_BLUEPRINT_ID);
+
+    const ecommerce = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build an ecommerce business",
+    });
+    expect(ecommerce.blueprintId).toBe(ECOMMERCE_BUSINESS_BLUEPRINT_ID);
+
+    const handmadeStore = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me build a handmade online store",
+    });
+    expect(handmadeStore.blueprintId).toBe(HANDMADE_ONLINE_STORE_BUSINESS_BLUEPRINT_ID);
+
+    const subscription = inferWorkTypeAndBlueprint({
+      origin: "create",
+      originalUserMessage: "Help me plan a subscription box business",
+    });
+    expect(subscription.blueprintId).toBe(
+      SUBSCRIPTION_COMMERCE_BUSINESS_BLUEPRINT_ID,
+    );
+    // membership business remains distinct (asserted earlier in this test)
 
     const marketing = inferWorkTypeAndBlueprint({
       origin: "create",

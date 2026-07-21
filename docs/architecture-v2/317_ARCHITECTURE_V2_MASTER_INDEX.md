@@ -138,7 +138,7 @@
 |-----------|--------------------------------|
 | `event_plan` | Workshop, webinar, retreat, conference, summit, launches, challenge, masterclass, fundraiser/gala, networking, luncheon, … |
 | `marketing_plan` | `marketing_plan.simple` |
-| `business_plan` | `business.craft_show` … `business.holiday_planner` · `business.speaker` · `business.coaching` · `business.consulting` · `business.service` · `business.author` · `business.course_creator` · `business.membership` · `business.content_creator` · `business.professional_organizing` · `organizing.*` · `business.retail_store` · `retail.store_management` · `retail.inventory_purchasing_vendor` · `retail.merchandising_promotions_cx` |
+| `business_plan` | handmade/service/creator/organizing/retail packs · `business.ecommerce` · `business.product_based` · `business.wholesale` · `business.subscription_commerce` |
 
 **Registry:** `lib/universalWorkEngine/blueprints/registry.ts`  
 **Target ID style (312):** `blueprint.event.workshop` (map via aliases; do not break current dotted IDs abruptly)
@@ -214,6 +214,7 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | **233–236** Blueprint Createability | `docs/create-experience/standards/233_*`…`236_*` · runtime `lib/universalWorkEngine/blueprints/createability/` · masters `233_236_*` |
 | **219–224** Professional Organizing Collection | `docs/create-experience/219_*`…`224_*` · runtime `organizingProfessionalCollectionDefinitions.ts` |
 | **225–228** Retail Collection | `docs/create-experience/225_*`…`228_*` · runtime `retailCollectionDefinitions.ts` |
+| **229–232** Product & Commerce | `docs/create-experience/229_*`…`232_*` · runtime `productCommerceCollectionDefinitions.ts` |
 | **273–278** Blueprint Profile Context Connection | `docs/create-experience/standards/273_*`…`278_*` · runtime `lib/universalWorkEngine/blueprints/profileContext/` · masters `273_278_*` |
 | Navigation welcome docs | `docs/navigation/119–121` |
 

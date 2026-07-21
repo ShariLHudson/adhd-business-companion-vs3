@@ -20,6 +20,7 @@ export function mapKnownContextKey(key: string): MappedContextKey {
     purpose: { canonicalFieldId: "business.vision", entity: "business" },
     vision: { canonicalFieldId: "business.vision", entity: "business" },
     mission: { canonicalFieldId: "business.mission", entity: "business" },
+    stage: { canonicalFieldId: "business.stage", entity: "business" },
     specialty: {
       canonicalFieldId: "business_dna.positioning",
       entity: "business_dna",
