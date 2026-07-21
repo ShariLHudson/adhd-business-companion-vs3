@@ -3,8 +3,22 @@
 **Date:** 2026-07-21  
 **Governing specs:** 306–310 (`docs/architecture-v2/`)  
 **Prerequisite audit:** [305 Architecture v2 Foundation Audit](./305_ARCHITECTURE_V2_FOUNDATION_AUDIT.md)  
+**Governance series:** [315 Platform Governance Constitution](./315_SPARK_ESTATE_PLATFORM_GOVERNANCE_CONSTITUTION.md) · [316 Governance Audit](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md)  
 **Mode:** Plan only — do **not** implement all five adaptive systems in one change  
 **Verdict:** Extend existing Profile, Business Estate, DayState, Estate Brain, UWE, and recommendation services — never fork a second user-profile or shadow Work runtime
+
+### Reconciliation note (311–315 governance bundle)
+
+The Platform Governance Runtime zip also contained a shorter `311_ADAPTIVE_INTELLIGENCE_IMPLEMENTATION_PLAN.md`.  
+**This repository-grounded plan remains authoritative.** The shorter bundle draft is archived at  
+`bundle-sources/311_ADAPTIVE_INTELLIGENCE_IMPLEMENTATION_PLAN_GOVERNANCE_BUNDLE.md`.
+
+| Topic | Repo 311 (this file) | Bundle 311 | Resolution |
+|-------|----------------------|------------|------------|
+| First code slice | Adaptive Context façade (308) | Registry foundation first | **Keep Adaptive Context first**; registries follow 312 + 316 |
+| Pilot Collection | Handmade / Marketing / Events seeds | Workshop Collection | **Adopt Workshop as Collection pilot** after Domain Capability façade (aligns with Events strength) |
+| Phases | Slices 1–5 mapped to 305 | Phases 0–9 including registry-first | Merge: Phase 0 = done via 305/311/316; registry = after Adaptive Context types |
+| Completion verdicts | Implementation guidance | IMPLEMENTATION PLAN APPROVED / … | Use in 316/317 reviews |
 
 ---
 

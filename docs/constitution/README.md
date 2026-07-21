@@ -33,6 +33,7 @@ When documents conflict:
 |---|----------|------|
 | **112** | [Universal Work & Relationship Platform](../product-specifications/112_UNIVERSAL_WORK_AND_RELATIONSHIP_PLATFORM_SPECIFICATION.md) | Completes the Product Specification Series; hands off to Constitution series 113–117 |
 | **126** | [First-Time Welcome Experience Standard](../product-specifications/126_FIRST_TIME_WELCOME_EXPERIENCE_STANDARD.md) | Constitutional product rule — one-time Welcome Experience; never a recurring interruption |
+| **315** | [Platform Governance Constitution](../architecture-v2/315_SPARK_ESTATE_PLATFORM_GOVERNANCE_CONSTITUTION.md) | Architecture v2 platform / intelligence / Work governance (see also [317 Master Index](../architecture-v2/317_ARCHITECTURE_V2_MASTER_INDEX.md)) |
 
 ## Downstream Design System
 
