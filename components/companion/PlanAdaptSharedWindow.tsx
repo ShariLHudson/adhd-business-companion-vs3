@@ -81,19 +81,14 @@ function SharedHowDoI() {
 }
 
 function PlanChildContent({
+  items,
+  setItems,
   onOpenAdapt,
 }: {
+  items: PlanDayItem[];
+  setItems: (items: PlanDayItem[]) => void;
   onOpenAdapt: () => void;
 }) {
-  const [items, setItems] = useState<PlanDayItem[]>([]);
-
-  useEffect(() => {
-    setItems(loadTodayPlanItems());
-    const onUpdate = () => setItems(loadTodayPlanItems());
-    window.addEventListener(PLAN_MY_DAY_UPDATED, onUpdate);
-    return () => window.removeEventListener(PLAN_MY_DAY_UPDATED, onUpdate);
-  }, []);
-
   const listItems = items.filter(
     (item) => isMeaningfulPlanItem(item) && !item.done,
   );
@@ -104,9 +99,6 @@ function PlanChildContent({
       data-testid="plan-adapt-shared-plan-content"
     >
       <div data-testid="plan-day-section-todays-list">
-        <h2 className="mb-3 text-lg font-semibold text-[#1f1c19]">
-          Today&apos;s List
-        </h2>
         <PlanDaySimpleAdd
           onAdd={(raw) => {
             const titles = parseMindCapture(raw);
@@ -183,6 +175,8 @@ export function PlanAdaptSharedWindow({
   const [activeChild, setActiveChild] = useState<PlanAdaptSharedChildId | null>(
     initialChild,
   );
+  // Lift plan items above Plan/Adapt children so Adapt cannot remount an empty list.
+  const [items, setItems] = useState<PlanDayItem[]>(() => loadTodayPlanItems());
 
   useDismissibleWindow({
     open: true,
@@ -195,13 +189,27 @@ export function PlanAdaptSharedWindow({
   }, [initialChild]);
 
   useEffect(() => {
+    setItems(loadTodayPlanItems());
+    const onUpdate = () => setItems(loadTodayPlanItems());
+    window.addEventListener(PLAN_MY_DAY_UPDATED, onUpdate);
+    return () => window.removeEventListener(PLAN_MY_DAY_UPDATED, onUpdate);
+  }, []);
+
+  useEffect(() => {
     if (!registerBack) return;
     registerBack(() => false);
     return () => registerBack(null);
   }, [registerBack]);
 
   function applyProposal(proposal: AdaptedDayProposal) {
-    applyAdaptedDayProposal(proposal);
+    const next = applyAdaptedDayProposal(proposal, items);
+    if (next.length > 0) {
+      setItems(next);
+    } else {
+      // Never blank the visible list after accepting an adapted plan.
+      const recovered = loadTodayPlanItems();
+      if (recovered.length > 0) setItems(recovered);
+    }
     setActiveChild("plan");
   }
 
@@ -241,11 +249,12 @@ export function PlanAdaptSharedWindow({
           <div
             className={activeChild === "plan" ? CARD_SELECTED : CARD}
             data-testid="plan-adapt-shared-choice-plan"
-            aria-pressed={activeChild === "plan"}
           >
             <button
               type="button"
-              className="w-full text-left"
+              className="flex h-full w-full flex-col text-left"
+              data-testid="plan-adapt-open-plan"
+              aria-pressed={activeChild === "plan"}
               onClick={() => setActiveChild("plan")}
             >
               <span className="block text-lg font-semibold text-[#1f1c19]">
@@ -268,25 +277,21 @@ export function PlanAdaptSharedWindow({
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-            </button>
-            <button
-              type="button"
-              className={`${OPEN_BTN} mt-4`}
-              data-testid="plan-adapt-open-plan"
-              onClick={() => setActiveChild("plan")}
-            >
-              {PLAN_MY_DAY_ITEM.openLabel}
+              <span className={`${OPEN_BTN} mt-4`} aria-hidden="true">
+                {PLAN_MY_DAY_ITEM.openLabel}
+              </span>
             </button>
           </div>
 
           <div
             className={activeChild === "adapt" ? CARD_SELECTED : CARD}
             data-testid="plan-adapt-shared-choice-adapt"
-            aria-pressed={activeChild === "adapt"}
           >
             <button
               type="button"
-              className="w-full text-left"
+              className="flex h-full w-full flex-col text-left"
+              data-testid="plan-adapt-open-adapt"
+              aria-pressed={activeChild === "adapt"}
               onClick={() => setActiveChild("adapt")}
             >
               <span className="block text-lg font-semibold text-[#1f1c19]">
@@ -309,20 +314,19 @@ export function PlanAdaptSharedWindow({
                   <li key={line}>{line}</li>
                 ))}
               </ul>
-            </button>
-            <button
-              type="button"
-              className={`${OPEN_BTN} mt-4`}
-              data-testid="plan-adapt-open-adapt"
-              onClick={() => setActiveChild("adapt")}
-            >
-              {ADAPT_MY_DAY_ITEM.openLabel}
+              <span className={`${OPEN_BTN} mt-4`} aria-hidden="true">
+                {ADAPT_MY_DAY_ITEM.openLabel}
+              </span>
             </button>
           </div>
         </div>
 
         {activeChild === "plan" ? (
-          <PlanChildContent onOpenAdapt={() => setActiveChild("adapt")} />
+          <PlanChildContent
+            items={items}
+            setItems={setItems}
+            onOpenAdapt={() => setActiveChild("adapt")}
+          />
         ) : null}
 
         {activeChild === "adapt" ? (
@@ -331,6 +335,7 @@ export function PlanAdaptSharedWindow({
             data-testid="plan-adapt-shared-adapt-content"
           >
             <AdaptMyDayCheckIn
+              planItems={items}
               onBack={() => setActiveChild(null)}
               onUsePlan={applyProposal}
               onAdjustPlan={applyProposal}

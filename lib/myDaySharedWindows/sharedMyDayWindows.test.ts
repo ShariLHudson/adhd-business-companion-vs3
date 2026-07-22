@@ -27,7 +27,7 @@ describe("shared My Day windows (103–105)", () => {
     expect(REMINDER_ITEM.description).toMatch(/specific thing/i);
     expect(RHYTHM_ITEM.description).toMatch(/recurring support/i);
     expect(REMINDER_VS_RHYTHM_DIFFERENCE).toMatch(
-      /one specific action.*repeatedly over time/i,
+      /one specific thing.*return to something regularly/i,
     );
   });
 
@@ -51,6 +51,13 @@ describe("shared My Day windows (103–105)", () => {
     expect(source).toContain("PLAN_MY_DAY_ITEM.supports");
     expect(source).toContain("ADAPT_MY_DAY_ITEM.supports");
     expect(source).not.toContain("reminders-how-do-i");
+    // Spec 136 — one primary open control per choice (no nested twin buttons).
+    expect(source.match(/data-testid="plan-adapt-open-plan"/g)?.length).toBe(1);
+    expect(source.match(/data-testid="plan-adapt-open-adapt"/g)?.length).toBe(
+      1,
+    );
+    // Today's List heading lives in PlanDaySimpleList only — not duplicated here.
+    expect(source).not.toMatch(/<h2[^>]*>[\s\S]*?Today/);
   });
 
   it("Plan/Adapt copy includes supports lists and open labels", () => {
@@ -60,18 +67,23 @@ describe("shared My Day windows (103–105)", () => {
     expect(ADAPT_MY_DAY_ITEM.supports.length).toBeGreaterThan(3);
   });
 
-  it("RemindersRhythmsEntrancePanel is a shared window with inline content", () => {
+  it("RemindersRhythmsEntrancePanel is a shared window with tabs", () => {
     const source = read(
       "components/companion/RemindersRhythmsEntrancePanel.tsx",
     );
     expect(source).toContain('data-shared-window="true"');
-    expect(source).toContain("reminders-rhythms-shared-how-do-i");
+    expect(source).toContain("reminders-rhythms-tabs");
+    expect(source).toContain("reminders-rhythms-tab-today");
+    expect(source).toContain("reminders-rhythms-tab-reminders");
+    expect(source).toContain("reminders-rhythms-tab-rhythms");
     expect(source).toContain("reminders-rhythms-difference-cue");
+    expect(source).toContain("reminders-rhythms-whats-difference");
     expect(source).toContain("RemindersRoomPanel");
     expect(source).toContain("RhythmsRoomPanel");
     expect(source).toContain("embedded");
     expect(source).toContain("REMINDER_VS_RHYTHM_DIFFERENCE");
-    expect(source).toContain("reminders-rhythms-shared-how-do-i-toggle");
+    expect(source).toContain("REMINDERS_RHYTHMS_TAB_STORAGE_KEY");
+    expect(source).not.toContain("entrance-reminder-card");
   });
 
   it("Welcome Home parents open shared windows", () => {

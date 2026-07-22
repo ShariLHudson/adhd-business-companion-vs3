@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   getEstateAudioSettings,
   patchEstateAudioSettings,
@@ -37,7 +43,11 @@ export type ExperienceControlsOverlayProps = {
   roomId: string;
   chatVisible: boolean;
   onSetChatVisible: (visible: boolean) => void;
+  /** When false (e.g. Clear My Mind), hide Show/Hide Conversation controls. */
+  allowConversationToggle?: boolean;
   onOpenNotifications?: () => void;
+  /** Profile return control when opened from My Profile — reusable origin context. */
+  profileReturnSlot?: ReactNode;
 };
 
 /**
@@ -50,15 +60,18 @@ export function ExperienceControlsOverlay({
   roomId,
   chatVisible,
   onSetChatVisible,
+  allowConversationToggle = true,
   onOpenNotifications,
+  profileReturnSlot,
 }: ExperienceControlsOverlayProps) {
   const [prefs, setPrefs] = useState<ExperienceControlPrefs>(() =>
     getExperienceControlPrefs(),
   );
   const [fullscreen, setFullscreen] = useState(false);
   const [estateSoundsOn, setEstateSoundsOn] = useState(true);
-  const [musicOn, setMusicOn] = useState(false);
   const [volume, setVolume] = useState(0.85);
+  const [masterSilenced, setMasterSilenced] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   const syncPrefs = useCallback(() => {
     const next = getExperienceControlPrefs();
@@ -68,17 +81,20 @@ export function ExperienceControlsOverlay({
 
   const syncAudio = useCallback(() => {
     const audio = getEstateAudioSettings();
-    setMusicOn(audio.soundscapeOverlayEnabled && !audio.silenced);
+    setMasterSilenced(audio.silenced);
     setVolume(audio.masterVolume);
     const ambiencePref = getExperienceControlPrefs().estateSoundsEnabled;
     if (roomId === "welcome-home") {
       setEstateSoundsOn(
         ambiencePref &&
           isEstateAmbienceEnabled() &&
-          activeEstateAmbienceRoomId() === "welcome-home",
+          activeEstateAmbienceRoomId() === "welcome-home" &&
+          !audio.silenced,
       );
     } else {
-      setEstateSoundsOn(ambiencePref && isEstateAmbienceEnabled() && !audio.silenced);
+      setEstateSoundsOn(
+        ambiencePref && isEstateAmbienceEnabled() && !audio.silenced,
+      );
     }
   }, [roomId]);
 
@@ -108,6 +124,12 @@ export function ExperienceControlsOverlay({
   }, [open, onClose]);
 
   useEffect(() => {
+    if (!open) return;
+    // Immediate keyboard entry — Close is the reversible exit (Spec 132).
+    closeButtonRef.current?.focus();
+  }, [open]);
+
+  useEffect(() => {
     applyExperienceControlPresentation(getExperienceControlPrefs());
   }, []);
 
@@ -120,11 +142,16 @@ export function ExperienceControlsOverlay({
     onSetChatVisible(visible);
   };
 
-  const setEstateSounds = (enabled: boolean) => {
+  const setPlaceAmbience = (enabled: boolean) => {
     patchExperienceControlPrefs({ estateSoundsEnabled: enabled });
     if (!enabled) {
       setEstateAmbienceEnabled(false);
-      void stopAllAudio();
+      patchEstateAudioSettings({ ambienceEnabled: false });
+      setEstateSoundsOn(false);
+      return;
+    }
+    if (getEstateAudioSettings().silenced) {
+      // Master Sound Off wins — do not start ambience until header Sound On.
       setEstateSoundsOn(false);
       return;
     }
@@ -150,13 +177,6 @@ export function ExperienceControlsOverlay({
       soundscapeOverlayEnabled: false,
       autoplayAllowed: false,
     });
-    setMusicOn(false);
-  };
-
-  const setMusic = (enabled: boolean) => {
-    patchExperienceControlPrefs({ musicEnabled: enabled });
-    patchEstateAudioSettings({ soundscapeOverlayEnabled: enabled });
-    setMusicOn(enabled);
   };
 
   const setShariVoice = (enabled: boolean) => {
@@ -207,6 +227,7 @@ export function ExperienceControlsOverlay({
         <header className="experience-controls-overlay__header">
           <h2 className="experience-controls-overlay__title">Experience Controls</h2>
           <button
+            ref={closeButtonRef}
             type="button"
             className="experience-controls-overlay__close"
             data-testid="experience-controls-close"
@@ -216,61 +237,68 @@ export function ExperienceControlsOverlay({
             Close
           </button>
         </header>
+        {profileReturnSlot ? (
+          <div
+            className="experience-controls-overlay__profile-return px-4 pt-2"
+            data-testid="experience-controls-profile-return"
+          >
+            {profileReturnSlot}
+          </div>
+        ) : null}
 
         <div className="experience-controls-overlay__scroll">
-          <section className="experience-controls-overlay__section" aria-label="Conversation">
-            <h3 className="experience-controls-overlay__section-title">Conversation</h3>
-            <p className="experience-controls-overlay__status">
-              Conversation: {chatVisible ? "Showing" : "Hidden"}
-            </p>
-            <div className="experience-controls-overlay__row">
-              <button
-                type="button"
-                className={
-                  chatVisible
-                    ? "experience-controls-overlay__choice experience-controls-overlay__choice--active"
-                    : "experience-controls-overlay__choice"
-                }
-                data-testid="experience-controls-show-conversation"
-                aria-pressed={chatVisible}
-                onClick={() => setConversationVisible(true)}
-              >
-                Show Conversation
-              </button>
-              <button
-                type="button"
-                className={
-                  !chatVisible
-                    ? "experience-controls-overlay__choice experience-controls-overlay__choice--active"
-                    : "experience-controls-overlay__choice"
-                }
-                data-testid="experience-controls-hide-conversation"
-                aria-pressed={!chatVisible}
-                onClick={() => setConversationVisible(false)}
-              >
-                Hide Conversation
-              </button>
-            </div>
-          </section>
+          {allowConversationToggle ? (
+            <section className="experience-controls-overlay__section" aria-label="Conversation">
+              <h3 className="experience-controls-overlay__section-title">Conversation</h3>
+              <p className="experience-controls-overlay__status">
+                Conversation: {chatVisible ? "Showing" : "Hidden"}
+              </p>
+              <div className="experience-controls-overlay__row">
+                <button
+                  type="button"
+                  className={
+                    chatVisible
+                      ? "experience-controls-overlay__choice experience-controls-overlay__choice--active"
+                      : "experience-controls-overlay__choice"
+                  }
+                  data-testid="experience-controls-show-conversation"
+                  aria-pressed={chatVisible}
+                  onClick={() => setConversationVisible(true)}
+                >
+                  Show Conversation
+                </button>
+                <button
+                  type="button"
+                  className={
+                    !chatVisible
+                      ? "experience-controls-overlay__choice experience-controls-overlay__choice--active"
+                      : "experience-controls-overlay__choice"
+                  }
+                  data-testid="experience-controls-hide-conversation"
+                  aria-pressed={!chatVisible}
+                  onClick={() => setConversationVisible(false)}
+                >
+                  Hide Conversation
+                </button>
+              </div>
+            </section>
+          ) : null}
 
           <section className="experience-controls-overlay__section" aria-label="Sound">
             <h3 className="experience-controls-overlay__section-title">Sound</h3>
+            <p className="experience-controls-overlay__status">
+              {masterSilenced
+                ? "Sound Off is on in the header. Turn Sound On there before playing anything."
+                : "Master Sound On/Off lives in the header. Choose a soundscape or use Play where you are."}
+            </p>
             <label className="experience-controls-overlay__toggle">
-              <span>Estate Sounds</span>
+              <span>Place ambience</span>
               <input
                 type="checkbox"
                 checked={estateSoundsOn}
+                disabled={masterSilenced}
                 data-testid="experience-controls-estate-sounds"
-                onChange={(event) => setEstateSounds(event.target.checked)}
-              />
-            </label>
-            <label className="experience-controls-overlay__toggle">
-              <span>Music</span>
-              <input
-                type="checkbox"
-                checked={musicOn}
-                data-testid="experience-controls-music"
-                onChange={(event) => setMusic(event.target.checked)}
+                onChange={(event) => setPlaceAmbience(event.target.checked)}
               />
             </label>
             <label className="experience-controls-overlay__toggle">
@@ -289,6 +317,7 @@ export function ExperienceControlsOverlay({
                 min={0}
                 max={100}
                 value={Math.round(volume * 100)}
+                disabled={masterSilenced}
                 data-testid="experience-controls-volume"
                 aria-label="Volume"
                 onChange={(event) =>
@@ -296,9 +325,6 @@ export function ExperienceControlsOverlay({
                 }
               />
             </label>
-            <p className="experience-controls-overlay__status">
-              Sound stays off until you choose Play or turn Estate Sounds on.
-            </p>
             <button
               type="button"
               className="experience-controls-overlay__choice"

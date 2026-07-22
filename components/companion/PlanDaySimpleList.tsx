@@ -65,7 +65,7 @@ export function PlanDaySimpleList({
               <button
                 type="button"
                 onClick={() => onComplete(item.id)}
-                className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#c9bfb0] text-base text-[#1e4f4f] hover:bg-[#f5f0ea]"
+                className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-[#c9bfb0] text-base text-[#1e4f4f] hover:bg-[#f5f0ea] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
                 aria-label={`Complete ${item.title}`}
                 data-testid={`plan-day-simple-complete-${item.id}`}
               >
@@ -117,7 +117,7 @@ export function PlanDaySimpleList({
                   <button
                     type="button"
                     onClick={() => beginEdit(item)}
-                    className="rounded-md px-2 py-1 text-base text-[#6b635a] hover:bg-[#f5f0ea] hover:text-[#1e4f4f]"
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 py-1 text-base text-[#6b635a] hover:bg-[#f5f0ea] hover:text-[#1e4f4f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
                     aria-label={`Edit ${item.title}`}
                     data-testid={`plan-day-simple-edit-${item.id}`}
                   >
@@ -126,7 +126,7 @@ export function PlanDaySimpleList({
                   <button
                     type="button"
                     onClick={() => onDelete(item.id)}
-                    className="rounded-md px-2 py-1 text-base text-[#6b635a] hover:bg-[#f5f0ea] hover:text-[#1e4f4f]"
+                    className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md px-2 py-1 text-base text-[#6b635a] hover:bg-[#f5f0ea] hover:text-[#1e4f4f] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
                     aria-label={`Delete ${item.title}`}
                     data-testid={`plan-day-simple-delete-${item.id}`}
                   >

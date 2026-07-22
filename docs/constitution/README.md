@@ -17,6 +17,8 @@ This series is the master constitutional layer for Spark Estate product behavior
 | **131** | [Create Intelligence & Intent Constitution](./131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | **In repo** | Binding Create intent law — infer goals not keywords; confidence-based alternatives; Intent Memory™ future |
 | **132** | [Experience Perfection & Momentum Protection](./132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) | **In repo** | Binding momentum / polish law — never surprise; intentional navigation; Ten-Second Rule; 12/10 cert |
 
+**Platform polish (craftsmanship, not a new constitution):** [136 Platform Polish Phase 1](../platform/136_PLATFORM_POLISH_PHASE_1_REPORT.md) — refinement under **128** + **132**; see also [317 Master Index §12](../architecture-v2/317_ARCHITECTURE_V2_MASTER_INDEX.md).
+
 ## Order of authority (from 113)
 
 When documents conflict:

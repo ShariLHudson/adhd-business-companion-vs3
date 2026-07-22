@@ -243,6 +243,7 @@ See full table in [316 §2](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md).
 | **058 / 077 / 079** | Workspace experience standards |
 | **088** | Preferences (incl. workspace environment 088_007) |
 | Spec 108 / 109 | Environment integration / frosted workspace |
+| **136** | [Platform Polish Phase 1](../platform/136_PLATFORM_POLISH_PHASE_1_REPORT.md) — craftsmanship / trust / nav density (prompt [136_CURSOR…](../platform/136_CURSOR_PLATFORM_POLISH_PHASE_1.md)); binds 128 · 132; Create 127–135 unchanged |
 
 ---
 
