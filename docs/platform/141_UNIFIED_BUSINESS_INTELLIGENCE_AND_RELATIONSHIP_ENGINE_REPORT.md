@@ -2,6 +2,7 @@
 
 **Date:** 2026-07-21  
 **Branch:** `deploy/companion-app-v3`  
+**Commit:** `ceec4082b959cf6fd8bbe2aa3d9ce21054f3e044`  
 **Binds:** Spec **117** Business Brain · Spec **128** · Spec **132** · Constitution **113** / **117**  
 **Verdict:** **Provisional** — Phase 1 foundation shipped; full Parts 1–16 deferred  
 
