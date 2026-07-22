@@ -72,6 +72,7 @@ export function ConnectedWorkDisclosure({
       sourceEntityId: sectionId ?? workId,
       toRef: { kind: targetKind, id },
       relationship: "related_to",
+      edgeSource: "explicit_user_link",
       note:
         targetKind === "calendar-event" || targetKind === "visual-thinking"
           ? "Linked from Create — open destination when ready"

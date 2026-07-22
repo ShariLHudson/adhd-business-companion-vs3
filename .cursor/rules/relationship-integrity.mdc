@@ -1,0 +1,44 @@
+# Relationship Integrity Rule™ (Platform Law — 141)
+
+**Constitution bridge:** `docs/constitution/117_TRUST_MEMORY_AND_RELATIONSHIP_CONSTITUTION.md` · Article in `113`  
+**Binds:** Spec **117** Business Brain · Spec **128** · Spec **132** · Intelligence Blueprint  
+**Certification:** `docs/platform/141_*`  
+**Runtime:** `lib/intelligence/relationshipIntegrity.ts` · `ensureCreateLineage.ts`
+
+## Principle
+
+**Everything Knows What It Belongs To.** One business memory, many windows.
+
+Relationships preserve trust. Spark must never invent edges from similar names or titles alone.
+
+## Allowed edge sources (only these)
+
+1. **Creation flow lineage** — Work created from a Project, Blueprint, Map node, or explicit related Work id  
+2. **Explicit user link** — member chose Connect / Related To  
+3. **Shared Work / Project context** — already on the same Work or Project container  
+4. **User confirmation** — when a match is ambiguous, ask before linking  
+
+## Forbidden
+
+- Auto-creating graph edges from title / name similarity alone  
+- Fuzzy “looks related” linking without confirmation  
+- Duplicate linking that invents a second Work body  
+- Surfacing invented connections in Projects hub, Pulse, or Related To  
+
+## Suggestion vs edge
+
+`findRelatedWork` may surface `similar_title_or_intent` / `same_work_type` as **suggestions** for duplicate-risk UI.
+
+Those signals must call `relationshipLinkDecision()` — they are **never** sufficient alone for durable edges.
+
+## Projects hub
+
+Surface related Work / Maps / Strategies / Conversations / Evidence / Wins **only** when store hooks or trusted edges already exist (`projectRelatedWork.ts`).
+
+## Before shipping relationship UI or auto-link
+
+- [ ] Edge has a trusted `edgeSource`?  
+- [ ] No title-only invention?  
+- [ ] Ambiguous → confirm with member?  
+- [ ] Deduped (no duplicate Work identity)?  
+- [ ] Passes trust (117) and momentum (132)?  

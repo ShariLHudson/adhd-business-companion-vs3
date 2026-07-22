@@ -26,6 +26,7 @@ import {
   type SuggestNextStepHelperId,
 } from "@/lib/projects/suggestNextStepHelpers";
 import { summarizeRelatedProjectWork } from "@/lib/projects/projectRelatedWork";
+import { RelatedToPanel } from "@/components/companion/RelatedToPanel";
 
 type Props = {
   project: ProjectHomeRecord;
@@ -733,6 +734,40 @@ export function ProjectHomeDetail({ project, onProjectChange }: Props) {
             </p>
           )}
         </div>
+        <RelatedToPanel
+          title="Related Work & maps"
+          testId="project-home-related-to"
+          hideEmpty
+          groups={[
+            {
+              id: "work",
+              label: "Work",
+              items: relatedFromStore.workTitles,
+              emptyHint: "Work linked to this project will appear here.",
+            },
+            {
+              id: "maps",
+              label: "Maps",
+              items: relatedFromStore.mapTitles,
+              emptyHint: "Maps connected through Work will appear here.",
+            },
+            {
+              id: "strategies",
+              label: "Strategies",
+              items: relatedFromStore.strategyTitles,
+            },
+            {
+              id: "evidence",
+              label: "Evidence",
+              items: relatedFromStore.evidenceTitles,
+            },
+            {
+              id: "wins",
+              label: "Wins",
+              items: relatedFromStore.winTitles,
+            },
+          ]}
+        />
         <ConnectedPlacesSection projectHomeId={project.projectHomeId} />
       </ProjectHomeDrawer>
 

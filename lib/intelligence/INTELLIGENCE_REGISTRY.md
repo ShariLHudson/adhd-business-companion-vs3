@@ -28,6 +28,8 @@ connectionIds?,           // Living Intelligence Graph
 intelligenceMeta?         // per-engine enrichments — never bulk-expose in UI
 ```
 
+**Relationship Integrity Rule™ (Prompt 141):** Durable edges only from creation lineage · explicit member link · shared Work/Project context · user confirmation. Never invent from title similarity. Runtime: `relationshipIntegrity.ts` · UWE `workRelationships.edgeSource` · gap register: `relationshipGraphParticipation.ts`. Docs: `docs/platform/141_*`.
+
 ---
 
 ## Sprint gate (every feature)
@@ -74,7 +76,8 @@ If any answer is "unknown" — redesign before shipping.
 | **Snippet** | `snippet` | `companionStore` → `Snippet` | Reusable copy | Content, Automation |
 | **Content draft** | `content-draft` | PostCraft / ecosystem APIs; `lib/artifactState/` universal artifact memory | Drafts, publishing, facilitated creation | Content, SEO, Social, GHL |
 | **Momentum event** | `momentum-event` | `companionStore` momentum | Movement XP (no streaks) | Growth, Recovery, Pattern |
-| **Reminder** | `reminder` | `reminderAt` on thought + scheduling | Thought reminders | Calendar, Automation, Recovery |
+| **Reminder** | `reminder` | `lib/reminderStore.ts` + Adaptive Rhythms Load Manager | One-time / discrete prompts | Calendar, Automation, Recovery, Rhythms |
+| **Rhythm** | `rhythm` | `lib/rhythms/` — Adaptive Rhythms (ongoing support; CONV-040 / ADHD-017); distinct from reminders | Recurring support without guilt | Companion Presence, Recovery, Calendar, Estate, Plan My Day |
 | **Founder event** | `founder-event` | `lib/ecosystem/events` | Analytics, dashboard | Founder, Business, Ecosystem |
 | **Intelligence signal** | `intelligence-signal` | `lib/intelligence-layer/signalStore` | Trust inspector (internal) | All engines via signal bus |
 

@@ -11,7 +11,10 @@ import { initializeWorkFromBlueprint } from "../blueprints/initializeFromBluepri
 import { getWorkBlueprintState, putWorkBlueprintState } from "../blueprints/workBlueprintStateStore";
 import { getBlueprint } from "../blueprints/registry";
 import { allocateCanonicalWorkId } from "../identity/allocateCanonicalWorkId";
-import { linkWorkRelationship } from "../cartography/workRelationships";
+import {
+  ensureCreateLineage,
+  lineageRefsFromExplicitContext,
+} from "@/lib/intelligence/ensureCreateLineage";
 import { getWorkIdentity } from "../identity/workIdentityStore";
 import type { BlueprintDepthMode, CanonicalWorkId, WorkOrigin } from "../types";
 import { assessDuplicateRisk } from "./duplicateRisk";
@@ -85,65 +88,37 @@ function attachOriginRelationships(
 ): AnywhereOriginAttachedRelationship[] {
   const attached: AnywhereOriginAttachedRelationship[] = [];
 
-  const link = (
-    kind: AnywhereOriginAttachedRelationship["kind"],
-    targetType: string,
-    targetId: string,
-    note?: string,
-  ) => {
-    if (!targetId.trim()) return;
-    if (
-      targetType === "project" ||
-      targetType === "cartography_node" ||
-      targetType === "blueprint" ||
-      targetType === "task" ||
-      targetType === "research" ||
-      targetType === "work"
-    ) {
-      linkWorkRelationship({
-        fromWorkId: workId,
-        toRef: {
-          kind: targetType as
-            | "project"
-            | "cartography_node"
-            | "blueprint"
-            | "task"
-            | "research"
-            | "work",
-          id: targetId,
-        },
-        relationship: kind,
-        note: note ?? null,
-      });
-    }
-    attached.push({ kind, targetType, targetId, note: note ?? null });
-  };
+  const blueprintId =
+    (contract.candidateBlueprintId
+      ? getBlueprint(contract.candidateBlueprintId)?.blueprintId
+      : null) ??
+    contract.candidateBlueprintId ??
+    null;
 
-  if (contract.projectId) {
-    link("part_of", "project", contract.projectId, "Project connection");
-  }
-  if (contract.cartographyNodeId) {
-    link(
-      "visualizes",
-      "cartography_node",
-      contract.cartographyNodeId,
-      "Cartography node",
-    );
-  }
-  if (contract.candidateBlueprintId) {
-    const bp =
-      getBlueprint(contract.candidateBlueprintId)?.blueprintId ??
-      contract.candidateBlueprintId;
-    link("implements", "blueprint", bp, "Blueprint");
-  }
-  if (contract.taskId) {
-    link("related_to", "task", contract.taskId, "Task provenance");
-  }
-  if (contract.researchRecordId) {
-    link("informs", "research", contract.researchRecordId, "Research");
-  }
-  if (contract.relatedWorkId && contract.relatedWorkId !== workId) {
-    link("related_to", "work", contract.relatedWorkId, "Connected work");
+  // Relationship Integrity (141): lineage only from explicit contract fields.
+  const lineage = ensureCreateLineage({
+    workId,
+    edgeSource: "creation_flow_lineage",
+    refs: lineageRefsFromExplicitContext({
+      projectId: contract.projectId,
+      cartographyNodeId: contract.cartographyNodeId,
+      blueprintId,
+      relatedWorkId:
+        contract.relatedWorkId && contract.relatedWorkId !== workId
+          ? contract.relatedWorkId
+          : null,
+      taskId: contract.taskId,
+      researchRecordId: contract.researchRecordId,
+    }),
+  });
+
+  for (const edge of lineage.linked) {
+    attached.push({
+      kind: edge.relationship as AnywhereOriginAttachedRelationship["kind"],
+      targetType: edge.toRef.kind,
+      targetId: edge.toRef.id,
+      note: edge.note ?? null,
+    });
   }
 
   // Provenance in knownContext for Chamber / Board / CMM / Body Doubling / conversation

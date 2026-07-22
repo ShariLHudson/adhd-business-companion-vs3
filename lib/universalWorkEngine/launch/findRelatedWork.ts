@@ -1,5 +1,10 @@
 /**
  * Search related existing Work before creating a duplicate.
+ *
+ * Relationship Integrity (141): results here are suggestions for the member /
+ * duplicate-risk UI. Match reasons like `similar_title_or_intent` and
+ * `same_work_type` must NEVER auto-create graph edges — use
+ * `relationshipLinkDecision()` / `mayAutoLinkFromMatchReasons()` first.
  */
 
 import { listWorkRelationships } from "../cartography/workRelationships";

@@ -6,10 +6,16 @@
 import type {
   CanonicalWorkId,
   WorkRelationship,
+  WorkRelationshipEdgeSource,
   WorkRelationshipKind,
   WorkRelationshipSourceEntityType,
+  WorkRelationshipTargetType,
 } from "../types";
 import { resolveCanonicalWorkId } from "../identity/resolveWorkIdentity";
+import {
+  canCreateRelationshipEdge,
+  type RelationshipEdgeSource,
+} from "@/lib/intelligence/relationshipIntegrity";
 
 const edges: WorkRelationship[] = [];
 
@@ -52,7 +58,21 @@ export function linkWorkRelationship(input: {
   note?: string | null;
   sourceEntityType?: WorkRelationshipSourceEntityType;
   sourceEntityId?: string;
+  /**
+   * Relationship Integrity (141) — required for new edges.
+   * Defaults to explicit_user_link (member chose Connect).
+   * Never invent from title similarity.
+   */
+  edgeSource?: WorkRelationshipEdgeSource | RelationshipEdgeSource;
 }): WorkRelationship {
+  const edgeSource: WorkRelationshipEdgeSource =
+    input.edgeSource ?? "explicit_user_link";
+  if (!canCreateRelationshipEdge(edgeSource)) {
+    throw new Error(
+      "Relationship Integrity: edge source is not trusted — refuse inventing edges from name similarity",
+    );
+  }
+
   const fromWorkId = resolveCanonicalWorkId(input.fromWorkId, {
     adoptIfMissing: true,
   });
@@ -98,6 +118,7 @@ export function linkWorkRelationship(input: {
     relationship: input.relationship,
     createdAt: nowIso(),
     note: input.note ?? null,
+    edgeSource,
   };
   edges.push(edge);
   return edge;
@@ -140,6 +161,23 @@ export function listWorkRelationships(
     if (filter?.targetKind && e.toRef.kind !== filter.targetKind) return false;
     return true;
   });
+}
+
+/** Reverse lookup — edges pointing at a project, map node, evidence, etc. */
+export function listWorkRelationshipsForTarget(input: {
+  kind: WorkRelationshipTargetType;
+  id: string;
+}): WorkRelationship[] {
+  const id = input.id?.trim();
+  if (!id) return [];
+  return edges.filter(
+    (e) => e.toRef.kind === input.kind && e.toRef.id === id,
+  );
+}
+
+/** All edges (tests / certification inventory helpers). */
+export function listAllWorkRelationships(): WorkRelationship[] {
+  return [...edges];
 }
 
 /** Bridge prior stub: expose work-centric node refs without copying content. */

@@ -25,6 +25,7 @@ export type {
   ResearchAttachmentTarget,
   ResearchApprovalStatus,
   WorkRelationship,
+  WorkRelationshipEdgeSource,
   WorkRelationshipKind,
   WorkRelationshipSourceEntityType,
   WorkRelationshipTargetType,
@@ -90,6 +91,8 @@ export {
   linkWorkRelationship,
   unlinkWorkRelationship,
   listWorkRelationships,
+  listWorkRelationshipsForTarget,
+  listAllWorkRelationships,
   cartographyRefsForWork,
   resetWorkRelationshipsForTests,
 } from "./cartography/workRelationships";

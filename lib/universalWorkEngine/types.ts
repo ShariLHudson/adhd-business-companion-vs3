@@ -221,6 +221,13 @@ export type WorkRelationshipTargetType =
   | "accomplishment"
   | "celebration";
 
+/** Trusted provenance for durable edges (Prompt 141 Relationship Integrity). */
+export type WorkRelationshipEdgeSource =
+  | "creation_flow_lineage"
+  | "explicit_user_link"
+  | "shared_work_project_context"
+  | "user_confirmed";
+
 export type WorkRelationship = {
   id: string;
   fromWorkId: CanonicalWorkId;
@@ -234,6 +241,8 @@ export type WorkRelationship = {
   relationship: WorkRelationshipKind;
   createdAt: string;
   note?: string | null;
+  /** How this edge was earned — never title similarity alone (141). */
+  edgeSource?: WorkRelationshipEdgeSource;
 };
 
 export class UnknownWorkTypeError extends Error {

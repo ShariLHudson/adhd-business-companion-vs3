@@ -554,6 +554,29 @@ Certification track: `docs/platform/137_*`
 
 ---
 
+# Article — Relationship Integrity Rule™
+
+**Platform law (Prompt 141).** Extends Article trust / relationship principles and Constitution **117**. Binds Spec **117** Business Brain · Spec **128** · Spec **132**.
+
+Spark Estate is one unified business ecosystem with shared relationship understanding.
+
+**Everything Knows What It Belongs To.** Features must not operate in isolation. Relationships connect Work, Projects, Maps, Strategies, Conversations, Evidence, and Wins — as **one business memory, many windows**.
+
+Durable edges may be created only from:
+
+1. Creation flow lineage  
+2. Explicit member links  
+3. Shared Work / Project context  
+4. Member confirmation when ambiguous  
+
+**Never invent relationships from similar names or titles alone.**
+
+Cursor rule: `.cursor/rules/relationship-integrity.mdc`  
+Runtime: `lib/intelligence/relationshipIntegrity.ts`  
+Certification track: `docs/platform/141_*`
+
+---
+
 # Constitutional Review Test
 
 Before approving any implementation, ask:
