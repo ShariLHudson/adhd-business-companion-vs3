@@ -18,7 +18,7 @@ type Props = {
   onBack?: () => void;
   onReturnToEstate?: () => void;
   onSelectCrystal?: (crystal: DestinationCrystal) => void;
-  /** Pass-1 prepared destination (Document / Store / Share / Print / Design). */
+  /** Prepared destination (Document / Store / Share / Print / Design). */
   prepared?: CrystalActivation | null;
   onClearPrepared?: () => void;
   exportText?: string;
@@ -43,7 +43,10 @@ export function DestinationGalleryPanel({
   exportTitle = "Spark work",
   onOpenConnections,
 }: Props) {
-  const showPrepared = prepared != null && prepared.kind !== "open_calendar";
+  const showPrepared =
+    prepared != null &&
+    prepared.kind !== "open_calendar" &&
+    prepared.kind !== "open_external_url";
   const [activatingId, setActivatingId] =
     useState<DestinationCrystalId | null>(null);
   const [flash, setFlash] = useState<{ x: string; y: string } | null>(null);
@@ -221,6 +224,10 @@ function PreparedDestinationView({
   onOpenConnections?: () => void;
 }) {
   const hasExportable = exportText.trim().length > 0;
+  const showConnectionsCta =
+    prepared.shouldOpenConnections === true ||
+    prepared.kind === "needs_connection" ||
+    prepared.kind === "prepared_store";
 
   return (
     <div
@@ -230,19 +237,28 @@ function PreparedDestinationView({
     >
       <div className="destination-gallery-prepared__whisper">
         <h2 className="font-serif text-2xl">{prepared.title}</h2>
-        {prepared.kind === "design_pending" ? (
+        <p
+          className="mt-3 text-base leading-relaxed text-[#f7f0e4]"
+          data-testid={
+            prepared.kind === "needs_connection"
+              ? "destination-needs-connection-message"
+              : prepared.crystalId === "create"
+                ? "destination-design-pending-message"
+                : undefined
+          }
+          aria-live="polite"
+        >
+          {prepared.body}
+        </p>
+
+        {prepared.preferenceLabel ? (
           <p
-            className="mt-3 text-base leading-relaxed text-[#f7f0e4]"
-            data-testid="destination-design-pending-message"
-            aria-live="polite"
+            className="mt-2 text-sm text-[#e8dcc8]"
+            data-testid="destination-preference-label"
           >
-            {prepared.body}
+            Preference: {prepared.preferenceLabel}
           </p>
-        ) : (
-          <p className="mt-3 text-sm leading-relaxed text-[#e8dcc8]">
-            {prepared.body}
-          </p>
-        )}
+        ) : null}
 
         {prepared.kind === "prepared_share" ? (
           <div
@@ -259,22 +275,16 @@ function PreparedDestinationView({
           </div>
         ) : null}
 
-        {prepared.kind === "prepared_store" ? (
-          <div className="mt-4" data-testid="destination-store-prepared">
-            <p className="text-sm text-[#e8dcc8]">
-              Connect Google Drive in Connections when you want Spark to store
-              files for you.
-            </p>
-            {onOpenConnections ? (
-              <button
-                type="button"
-                className="destination-gallery-panel__chrome-btn mt-4"
-                data-testid="destination-store-open-connections"
-                onClick={onOpenConnections}
-              >
-                Open Connections
-              </button>
-            ) : null}
+        {showConnectionsCta && onOpenConnections ? (
+          <div className="mt-4" data-testid="destination-open-connections">
+            <button
+              type="button"
+              className="destination-gallery-panel__chrome-btn mt-2"
+              data-testid="destination-store-open-connections"
+              onClick={onOpenConnections}
+            >
+              Open Connections
+            </button>
           </div>
         ) : null}
 

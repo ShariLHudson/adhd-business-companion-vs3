@@ -5,4 +5,7 @@
 
 export * from "./constants";
 export * from "./crystalActivation";
+export * from "./crystalConnectionMapping";
 export * from "./crystalLayout";
+export * from "./destinationRegistry";
+export * from "./resolveCrystalLaunch";

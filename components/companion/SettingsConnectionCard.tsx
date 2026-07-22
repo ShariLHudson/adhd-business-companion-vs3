@@ -7,6 +7,8 @@ type Props = {
   onConnectOutlook?: () => void;
   onManageGoogle?: () => void;
   onManageOutlook?: () => void;
+  onConnectCanva?: () => void;
+  onManageCanva?: () => void;
 };
 
 /**
@@ -17,6 +19,8 @@ export function SettingsConnectionCard({
   onConnectOutlook,
   onManageGoogle,
   onManageOutlook,
+  onConnectCanva,
+  onManageCanva,
 }: Props) {
   const connected = card.status === "connected";
   const unavailable = card.status === "unavailable";
@@ -41,14 +45,32 @@ export function SettingsConnectionCard({
       <p className="mt-3 text-sm font-semibold text-[#1f1c19]">
         Status:{" "}
         <span className={connected ? "text-[#1e4f4f]" : "text-[#6b635a]"}>
-          {connected ? "Connected" : unavailable ? "Unavailable" : "Not Connected"}
+          {connected
+            ? "Connected"
+            : unavailable
+              ? "Unavailable"
+              : "Not Connected"}
         </span>
       </p>
 
       {connected && card.accountEmail ? (
         <p className="mt-1 text-sm text-[#6b635a]">
           Connected as:{" "}
-          <span className="font-semibold text-[#1e4f4f]">{card.accountEmail}</span>
+          <span className="font-semibold text-[#1e4f4f]">
+            {card.accountEmail}
+          </span>
+        </p>
+      ) : null}
+
+      {connected && card.destinationUrl ? (
+        <p
+          className="mt-1 break-all text-sm text-[#6b635a]"
+          data-testid={`settings-connection-url-${card.id}`}
+        >
+          Destination:{" "}
+          <span className="font-semibold text-[#1e4f4f]">
+            {card.destinationUrl}
+          </span>
         </p>
       ) : null}
 
@@ -62,6 +84,7 @@ export function SettingsConnectionCard({
           type="button"
           onClick={() => {
             if (card.kind === "outlook-calendar") onManageOutlook?.();
+            else if (card.kind === "canva") onManageCanva?.();
             else onManageGoogle?.();
           }}
           className="mt-4 rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
@@ -73,6 +96,15 @@ export function SettingsConnectionCard({
         <button
           type="button"
           onClick={() => onConnectOutlook?.()}
+          className="mt-4 inline-block rounded-lg bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+          data-testid={`settings-connection-connect-${card.id}`}
+        >
+          {card.connectLabel}
+        </button>
+      ) : card.kind === "canva" ? (
+        <button
+          type="button"
+          onClick={() => onConnectCanva?.()}
           className="mt-4 inline-block rounded-lg bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
           data-testid={`settings-connection-connect-${card.id}`}
         >

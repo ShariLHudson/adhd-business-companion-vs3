@@ -68,9 +68,19 @@ import { aiToneLabel } from "@/lib/aiToneGuide";
 import { SettingsConnectionCard } from "@/components/companion/SettingsConnectionCard";
 import {
   buildSettingsConnectionCards,
+  connectCanvaLocal,
   connectOutlookCalendarLocal,
+  disconnectCanvaLocal,
   disconnectOutlookCalendarLocal,
+  isCanvaConnected,
   isOutlookCalendarConnected,
+  readCanvaConnection,
+  readDigitalWorkspacePreferences,
+  updateCanvaDestinationUrl,
+  verifyCanvaConnection,
+  writeDigitalWorkspacePreferences,
+  type DocumentsProviderPreference,
+  type PrintingPreference,
   type SettingsConnectionId,
 } from "@/lib/connections";
 import {
@@ -253,6 +263,15 @@ export function SettingsPanel({
     email: string | null;
   }>({ configured: false, connected: false, email: null });
   const [outlookConnected, setOutlookConnected] = useState(false);
+  const [canvaConnected, setCanvaConnected] = useState(false);
+  const [canvaDestinationUrl, setCanvaDestinationUrl] = useState<string | null>(
+    null,
+  );
+  const [canvaDraftUrl, setCanvaDraftUrl] = useState("");
+  const [canvaFeedback, setCanvaFeedback] = useState<string | null>(null);
+  const [workspacePrefs, setWorkspacePrefs] = useState(() =>
+    readDigitalWorkspacePreferences(),
+  );
   const [managingConnectionId, setManagingConnectionId] =
     useState<SettingsConnectionId | null>(null);
   const [celebrationMode, setCelebrationMode] =
@@ -271,16 +290,43 @@ export function SettingsPanel({
   function refreshOutlook() {
     setOutlookConnected(isOutlookCalendarConnected());
   }
+  function refreshCanva() {
+    const record = readCanvaConnection();
+    setCanvaConnected(isCanvaConnected());
+    setCanvaDestinationUrl(record.destinationUrl);
+    if (record.destinationUrl) setCanvaDraftUrl(record.destinationUrl);
+  }
+  function refreshWorkspacePrefs() {
+    setWorkspacePrefs(readDigitalWorkspacePreferences());
+  }
   useEffect(() => {
     refreshGoogle();
     refreshOutlook();
+    refreshCanva();
+    refreshWorkspacePrefs();
     const syncOutlook = () => refreshOutlook();
+    const syncCanva = () => refreshCanva();
+    const syncPrefs = () => refreshWorkspacePrefs();
     window.addEventListener("companion-outlook-calendar-updated", syncOutlook);
-    return () =>
+    window.addEventListener("companion-canva-connection-updated", syncCanva);
+    window.addEventListener(
+      "companion-digital-workspace-preferences-updated",
+      syncPrefs,
+    );
+    return () => {
       window.removeEventListener(
         "companion-outlook-calendar-updated",
         syncOutlook,
       );
+      window.removeEventListener(
+        "companion-canva-connection-updated",
+        syncCanva,
+      );
+      window.removeEventListener(
+        "companion-digital-workspace-preferences-updated",
+        syncPrefs,
+      );
+    };
   }, []);
 
   useEffect(() => {
@@ -574,41 +620,65 @@ export function SettingsPanel({
       setRegion(next.region);
       setDateFormat(next.dateFormat);
       setTimeFormat(next.timeFormat);
+      flashSettingsSaved();
     }
+    const languagesUnified =
+      interfaceLanguage === responseLanguage &&
+      responseLanguage === contentLanguage &&
+      contentLanguage === voiceLanguage;
     return (
-      <div className={wrap}>
+      <div className={wrap} data-testid="settings-language">
         {header(t("settings.language"))}
         <p className="mt-1 text-sm text-[#6b635a]">{t("settings.languageHint")}</p>
         <div className="mt-6 flex flex-col gap-5">
           <LanguageField
-            id="lang-response"
-            label={t("settings.companionResponseLanguage")}
+            id="lang-app"
+            label="App Language"
             hint="Sets interface, chat, content, and voice together."
             value={responseLanguage}
             options={SORTED_LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ responseLanguage: v as LanguageCode })}
           />
-          <LanguageField
-            id="lang-interface"
-            label={t("settings.interfaceLanguage")}
-            value={interfaceLanguage}
-            options={SORTED_LANGUAGE_OPTIONS}
-            onChange={(v) => saveLang({ interfaceLanguage: v as LanguageCode })}
-          />
-          <LanguageField
-            id="lang-content"
-            label={t("settings.contentLanguage")}
-            value={contentLanguage}
-            options={SORTED_LANGUAGE_OPTIONS}
-            onChange={(v) => saveLang({ contentLanguage: v as LanguageCode })}
-          />
-          <LanguageField
-            id="lang-voice"
-            label={t("settings.voiceLanguage")}
-            value={voiceLanguage}
-            options={SORTED_LANGUAGE_OPTIONS}
-            onChange={(v) => saveLang({ voiceLanguage: v as LanguageCode })}
-          />
+          <details
+            className="rounded-xl border border-[#d4cdc3] bg-white/70 px-3.5 py-3"
+            data-testid="settings-language-customize"
+            open={!languagesUnified ? true : undefined}
+          >
+            <summary className="cursor-pointer text-sm font-semibold text-[#1e4f4f]">
+              Customize individually
+            </summary>
+            <p className="mt-2 text-sm text-[#6b635a]">
+              Only needed if you want different languages for different parts of
+              Spark.
+            </p>
+            <div className="mt-4 flex flex-col gap-4">
+              <LanguageField
+                id="lang-interface"
+                label={t("settings.interfaceLanguage")}
+                value={interfaceLanguage}
+                options={SORTED_LANGUAGE_OPTIONS}
+                onChange={(v) =>
+                  saveLang({ interfaceLanguage: v as LanguageCode })
+                }
+              />
+              <LanguageField
+                id="lang-content"
+                label={t("settings.contentLanguage")}
+                value={contentLanguage}
+                options={SORTED_LANGUAGE_OPTIONS}
+                onChange={(v) =>
+                  saveLang({ contentLanguage: v as LanguageCode })
+                }
+              />
+              <LanguageField
+                id="lang-voice"
+                label={t("settings.voiceLanguage")}
+                value={voiceLanguage}
+                options={SORTED_LANGUAGE_OPTIONS}
+                onChange={(v) => saveLang({ voiceLanguage: v as LanguageCode })}
+              />
+            </div>
+          </details>
           <LanguageField
             id="lang-region"
             label="Region / Date Format"
@@ -633,6 +703,14 @@ export function SettingsPanel({
             onChange={(v) => saveLang({ timeFormat: v as TimeFormat })}
           />
         </div>
+        {settingsSavedFlash ? (
+          <p
+            className="mt-3 text-center text-sm font-semibold text-[#1e4f4f]"
+            role="status"
+          >
+            {SETTINGS_SAVED_MESSAGE}
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -671,12 +749,14 @@ export function SettingsPanel({
       <div className={wrap}>
         {header("Appearance")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Choose how color appears across the app. Pick a mode, preview it, then save.
+          Choose how color appears across the app. Your choice saves as soon as
+          you tap a mode.
         </p>
         <VisualColorModePicker
           current={visualMode}
           onSave={(v) => {
             savePrefs({ visualMode: v });
+            flashSettingsSaved();
           }}
         />
       </div>
@@ -1158,15 +1238,31 @@ export function SettingsPanel({
     const connectionCards = buildSettingsConnectionCards({
       google: g,
       outlookConnected,
+      canvaConnected,
+      canvaDestinationUrl,
       googleAuthHref: "/api/google/auth?returnTo=/companion?settings=connections",
     });
+
+    function applyCanvaUrl(raw: string) {
+      const result = canvaConnected
+        ? updateCanvaDestinationUrl(raw)
+        : connectCanvaLocal(raw);
+      if (!result.ok) {
+        setCanvaFeedback(result.reason);
+        return;
+      }
+      setCanvaFeedback("Canva is connected. The Design crystal will open this link.");
+      refreshCanva();
+      setManagingConnectionId("canva");
+    }
 
     return (
       <div className={wrap} data-testid="settings-connections">
         {header("Connections")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Connect the calendars and Google services Spark uses today — and
-          prepare Outlook Calendar for when you&apos;re ready.
+          Your Digital Workspace Preferences — connect services once, choose where
+          Document, Print, Calendar, and Storage should go, and Spark uses those
+          defaults quietly across the Estate.
         </p>
 
         <div className="mt-4 flex flex-col gap-3">
@@ -1179,6 +1275,10 @@ export function SettingsPanel({
                   refreshOutlook();
                   setManagingConnectionId(null);
                 }}
+                onConnectCanva={() => {
+                  setCanvaFeedback(null);
+                  setManagingConnectionId("canva");
+                }}
                 onManageGoogle={() =>
                   setManagingConnectionId((current) =>
                     current === card.id ? null : card.id,
@@ -1189,8 +1289,90 @@ export function SettingsPanel({
                     current === card.id ? null : card.id,
                   )
                 }
+                onManageCanva={() => {
+                  setCanvaFeedback(null);
+                  setManagingConnectionId((current) =>
+                    current === card.id ? null : card.id,
+                  );
+                }}
               />
-              {managingConnectionId === card.id && card.status === "connected" ? (
+              {managingConnectionId === card.id && card.kind === "canva" ? (
+                <div
+                  className="mt-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-4 py-3"
+                  data-testid="settings-connection-manage-panel-canva"
+                >
+                  <label
+                    className={LABEL}
+                    htmlFor="canva-destination-url"
+                  >
+                    Canva destination link
+                  </label>
+                  <input
+                    id="canva-destination-url"
+                    value={canvaDraftUrl}
+                    onChange={(e) => setCanvaDraftUrl(e.target.value)}
+                    placeholder="https://www.canva.com"
+                    className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                    data-testid="settings-canva-url-input"
+                  />
+                  {canvaFeedback ? (
+                    <p
+                      className="mt-2 text-sm text-[#1e4f4f]"
+                      data-testid="settings-canva-feedback"
+                      aria-live="polite"
+                    >
+                      {canvaFeedback}
+                    </p>
+                  ) : null}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => applyCanvaUrl(canvaDraftUrl)}
+                      className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                      data-testid="settings-canva-save"
+                    >
+                      {canvaConnected ? "Update Canva link" : "Connect Canva"}
+                    </button>
+                    {canvaConnected ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const result = verifyCanvaConnection();
+                            setCanvaFeedback(
+                              result.ok
+                                ? "Canva link looks good."
+                                : result.reason,
+                            );
+                            refreshCanva();
+                          }}
+                          className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+                          data-testid="settings-canva-verify"
+                        >
+                          Verify
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            disconnectCanvaLocal();
+                            setCanvaDraftUrl("");
+                            setCanvaFeedback("Canva disconnected.");
+                            refreshCanva();
+                            setManagingConnectionId(null);
+                          }}
+                          className="rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
+                          data-testid="settings-canva-disconnect"
+                        >
+                          Disconnect
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
+              {managingConnectionId === card.id &&
+              card.status === "connected" &&
+              card.kind !== "canva" ? (
                 <div
                   className="mt-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-4 py-3"
                   data-testid={`settings-connection-manage-panel-${card.id}`}
@@ -1242,6 +1424,98 @@ export function SettingsPanel({
               ) : null}
             </div>
           ))}
+        </div>
+
+        <div
+          className="mt-6 rounded-xl border border-[#e7dfd4] bg-white/85 px-4 py-4"
+          data-testid="digital-workspace-preferences"
+        >
+          <p className="text-base font-semibold text-[#1f1c19]">
+            Preferred destinations
+          </p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Crystals use these defaults so you don&apos;t have to choose every
+            time.
+          </p>
+
+          <label className={`${LABEL} mt-4`} htmlFor="pref-documents">
+            Documents
+          </label>
+          <select
+            id="pref-documents"
+            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
+            value={workspacePrefs.documents}
+            data-testid="pref-documents"
+            onChange={(e) => {
+              const documents = e.target.value as DocumentsProviderPreference;
+              setWorkspacePrefs(
+                writeDigitalWorkspacePreferences({ documents }),
+              );
+            }}
+          >
+            <option value="google-docs">Google Docs</option>
+            <option value="microsoft-word">Microsoft Word</option>
+            <option value="spark-estate">Spark Estate Documents</option>
+            <option value="local">Local Documents</option>
+          </select>
+
+          <label className={`${LABEL} mt-4`} htmlFor="pref-printing">
+            Printing
+          </label>
+          <select
+            id="pref-printing"
+            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
+            value={workspacePrefs.printing}
+            data-testid="pref-printing"
+            onChange={(e) => {
+              const printing = e.target.value as PrintingPreference;
+              setWorkspacePrefs(
+                writeDigitalWorkspacePreferences({ printing }),
+              );
+            }}
+          >
+            <option value="save-pdf">Save as PDF</option>
+            <option value="print-dialog">Print dialog</option>
+            <option value="preferred-provider">Preferred print provider</option>
+          </select>
+
+          <label className={`${LABEL} mt-4`} htmlFor="pref-calendar">
+            Calendar
+          </label>
+          <select
+            id="pref-calendar"
+            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
+            value={workspacePrefs.calendar}
+            data-testid="pref-calendar"
+            onChange={(e) => {
+              const calendar = e.target.value as "google" | "outlook";
+              setWorkspacePrefs(
+                writeDigitalWorkspacePreferences({ calendar }),
+              );
+            }}
+          >
+            <option value="google">Google Calendar</option>
+            <option value="outlook">Outlook Calendar</option>
+          </select>
+
+          <label className={`${LABEL} mt-4`} htmlFor="pref-storage">
+            Storage
+          </label>
+          <select
+            id="pref-storage"
+            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
+            value={workspacePrefs.storage}
+            data-testid="pref-storage"
+            onChange={(e) => {
+              const storage = e.target
+                .value as "google-drive" | "onedrive" | "dropbox";
+              setWorkspacePrefs(writeDigitalWorkspacePreferences({ storage }));
+            }}
+          >
+            <option value="google-drive">Google Drive</option>
+            <option value="onedrive">OneDrive (when connected)</option>
+            <option value="dropbox">Dropbox (when connected)</option>
+          </select>
         </div>
 
         <div className="mt-4 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/70 px-4 py-3">

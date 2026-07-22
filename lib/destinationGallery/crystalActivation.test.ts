@@ -10,7 +10,7 @@ import {
 } from "./crystalActivation";
 import type { DestinationCrystalId } from "./constants";
 
-describe("Destination Gallery crystalActivation (pass 1)", () => {
+describe("Destination Gallery crystalActivation (Prompt 142)", () => {
   const ids: DestinationCrystalId[] = [
     "schedule",
     "write",
@@ -21,26 +21,41 @@ describe("Destination Gallery crystalActivation (pass 1)", () => {
   ];
 
   it("maps every crystal id to a safe activation kind", () => {
-    expect(resolveCrystalActivation("schedule").kind).toBe("open_calendar");
+    expect(resolveCrystalActivation("schedule").kind).toBe("needs_connection");
     expect(resolveCrystalActivation("write").kind).toBe("prepared_document");
     expect(resolveCrystalActivation("save").kind).toBe("prepared_store");
     expect(resolveCrystalActivation("spark-social-media").kind).toBe(
-      "prepared_share",
+      "needs_connection",
     );
     expect(resolveCrystalActivation("print").kind).toBe("prepared_print");
-    expect(resolveCrystalActivation("create").kind).toBe("design_pending");
+    expect(resolveCrystalActivation("create").kind).toBe("needs_connection");
   });
 
-  it("only Schedule leaves the gallery", () => {
+  it("opens Canva when connected with a destination URL", () => {
+    const activation = resolveCrystalActivation("create", {
+      connections: {
+        google: { configured: true, connected: false, email: null },
+        outlookConnected: false,
+        canvaConnected: true,
+      },
+      canvaDestinationUrl: "https://www.canva.com/",
+    });
+    expect(activation.kind).toBe("open_external_url");
+    expect(activation.externalUrl).toBe("https://www.canva.com/");
+    expect(crystalLeavesGallery(activation.kind)).toBe(true);
+  });
+
+  it("only Schedule and external Canva leave the gallery by default", () => {
     for (const id of ids) {
       const activation = resolveCrystalActivation(id);
-      expect(crystalLeavesGallery(activation.kind)).toBe(id === "schedule");
+      expect(crystalLeavesGallery(activation.kind)).toBe(false);
     }
   });
 
-  it("Design stays pending and forbids legacy Create", () => {
+  it("Design forbids legacy Create and guides to Connections when disconnected", () => {
     const design = resolveCrystalActivation("create");
-    expect(design.body).toBe("Design connection is being prepared.");
+    expect(design.body).toMatch(/Canva/i);
+    expect(design.shouldOpenConnections).toBe(true);
     expect(isLegacyCreateForbidden(design.kind)).toBe(true);
   });
 
@@ -53,6 +68,7 @@ describe("Destination Gallery crystalActivation (pass 1)", () => {
     expect(client).toContain("function handleSelectDestinationCrystal");
     expect(client).toContain('activation.kind === "open_calendar"');
     expect(client).toContain("openCalendarCore()");
+    expect(client).toContain('activation.kind === "open_external_url"');
     expect(client).toContain("setDestinationCrystalPrepared(activation)");
 
     const handler = client.match(

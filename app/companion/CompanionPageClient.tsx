@@ -1737,6 +1737,11 @@ import {
   type CrystalActivation,
   type DestinationCrystal,
 } from "@/lib/destinationGallery";
+import {
+  isCanvaConnected,
+  readCanvaConnection,
+  readDigitalWorkspacePreferences,
+} from "@/lib/connections";
 import { resolveMyDayAndWorkOpenerFromText } from "@/lib/estate/myDayAndWorkNavigation";
 import { ensureChamberDemoDataSeeded } from "@/lib/estate/chamber/seedChamberDemoData";
 import { isChamberDemoMode } from "@/lib/estate/chamber/chamberDemoMode";
@@ -9379,18 +9384,47 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Destination Gallery crystal activation (pass 1).
-   * Schedule → Connected Calendars. Other crystals → prepared states in-gallery.
-   * Never opens content-generator, Evidence Vault, Saved Work, or legacy Create.
+   * Destination Gallery crystal activation (Prompt 142).
+   * Schedule → Calendar. Canva → preferred URL or Connections guide.
+   * Other crystals → preference-aware prepared states. Never legacy Create.
    */
   function handleSelectDestinationCrystal(crystal: DestinationCrystal) {
-    const activation = resolveCrystalActivation(crystal.id);
+    const canva = readCanvaConnection();
+    const activation = resolveCrystalActivation(crystal.id, {
+      connections: {
+        google: {
+          configured: true,
+          connected: false,
+          email: null,
+        },
+        outlookConnected: false,
+        canvaConnected: isCanvaConnected(),
+      },
+      preferences: readDigitalWorkspacePreferences(),
+      canvaDestinationUrl: canva.destinationUrl,
+    });
     if (activation.kind === "open_calendar") {
       setDestinationCrystalPrepared(null);
       openCalendarCore();
       return;
     }
-    // Design and other prepared states stay in Destination Gallery.
+    if (
+      activation.kind === "open_external_url" &&
+      activation.externalUrl?.trim()
+    ) {
+      setDestinationCrystalPrepared(null);
+      try {
+        window.open(activation.externalUrl, "_blank", "noopener,noreferrer");
+      } catch {
+        setDestinationCrystalPrepared({
+          ...activation,
+          kind: "needs_connection",
+          body: "Something got tangled opening that destination. You can update the link in Connections.",
+          shouldOpenConnections: true,
+        });
+      }
+      return;
+    }
     setDestinationCrystalPrepared(activation);
   }
 

@@ -142,7 +142,15 @@ describe("DestinationGalleryPanel crystal object navigation", () => {
     render({ onSelectCrystal });
     clickCrystal("schedule");
     expect(onSelectCrystal.mock.calls[0]?.[0]?.id).toBe("schedule");
-    expect(resolveCrystalActivation("schedule").kind).toBe("open_calendar");
+    expect(
+      resolveCrystalActivation("schedule", {
+        connections: {
+          google: { configured: true, connected: true, email: "a@x.com" },
+          outlookConnected: false,
+          canvaConnected: false,
+        },
+      }).kind,
+    ).toBe("open_calendar");
   });
 
   it("clicking Document activates document handler", () => {
@@ -167,9 +175,16 @@ describe("DestinationGalleryPanel crystal object navigation", () => {
     render({ onSelectCrystal });
     clickCrystal("spark-social-media");
     expect(onSelectCrystal.mock.calls[0]?.[0]?.id).toBe("spark-social-media");
-    expect(resolveCrystalActivation("spark-social-media").kind).toBe(
-      "prepared_share",
-    );
+    expect(
+      resolveCrystalActivation("spark-social-media", {
+        connections: {
+          google: { configured: true, connected: false, email: null },
+          outlookConnected: false,
+          canvaConnected: false,
+          socialProfiles: { linkedin: true },
+        },
+      }).kind,
+    ).toBe("prepared_share");
   });
 
   it("clicking Print activates print handler", () => {
@@ -185,14 +200,23 @@ describe("DestinationGalleryPanel crystal object navigation", () => {
     render({ onSelectCrystal });
     clickCrystal("create");
     expect(onSelectCrystal.mock.calls[0]?.[0]?.id).toBe("create");
-    expect(resolveCrystalActivation("create").kind).toBe("design_pending");
+    const design = resolveCrystalActivation("create");
+    expect(design.kind).toBe("needs_connection");
 
-    render({ prepared: resolveCrystalActivation("create") });
+    render({
+      prepared: design,
+      onOpenConnections: vi.fn(),
+    });
     expect(
       container.querySelector(
-        '[data-testid="destination-design-pending-message"]',
+        '[data-testid="destination-needs-connection-message"]',
       )?.textContent,
-    ).toBe("Design connection is being prepared.");
+    ).toMatch(/Canva/i);
+    expect(
+      container.querySelector(
+        '[data-testid="destination-store-open-connections"]',
+      ),
+    ).toBeTruthy();
     expect(container.textContent).not.toContain("Create Studio");
     expect(container.textContent).not.toContain("content-generator");
   });

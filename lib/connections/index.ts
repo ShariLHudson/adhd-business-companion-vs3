@@ -18,3 +18,30 @@ export {
   resetOutlookCalendarConnectionForTests,
   type OutlookCalendarConnectionRecord,
 } from "./outlookCalendarConnection";
+
+export {
+  connectCanvaLocal,
+  disconnectCanvaLocal,
+  isCanvaConnected,
+  normalizeCanvaDestinationUrl,
+  readCanvaConnection,
+  resetCanvaConnectionForTests,
+  updateCanvaDestinationUrl,
+  verifyCanvaConnection,
+  type CanvaConnectionRecord,
+} from "./canvaConnection";
+
+export {
+  DEFAULT_DIGITAL_WORKSPACE_PREFERENCES,
+  DOCUMENTS_PROVIDER_LABELS,
+  PRINTING_PREFERENCE_LABELS,
+  readDigitalWorkspacePreferences,
+  resetDigitalWorkspacePreferencesForTests,
+  writeDigitalWorkspacePreferences,
+  type CalendarProviderPreference,
+  type DigitalWorkspacePreferences,
+  type DocumentsProviderPreference,
+  type EmailProviderPreference,
+  type PrintingPreference,
+  type StorageProviderPreference,
+} from "./digitalWorkspacePreferences";
