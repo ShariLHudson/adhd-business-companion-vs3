@@ -35,13 +35,22 @@ export function BoardDirectorGalleryCard({
 
   return (
     <article
-      className={`board-director-gallery-card${
+      className={`board-director-gallery-card board-director-card${
         included ? " board-director-gallery-card--included" : ""
       }`}
       role="listitem"
       data-testid={`board-director-gallery-card-${director.id}`}
       data-included={included ? "true" : "false"}
+      data-selected={included ? "true" : "false"}
     >
+      {included ? (
+        <span
+          aria-hidden="true"
+          className="board-director-gallery-card__selected-check selection-check"
+        >
+          ✓
+        </span>
+      ) : null}
       <button
         type="button"
         className="board-director-gallery-card__art-btn"

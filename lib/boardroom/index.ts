@@ -38,6 +38,8 @@ export {
   BOARDROOM_WELCOME_MESSAGE,
   BOARDROOM_HOME_PRIMARY_CHOICES,
   BOARDROOM_HOW_TO_USE_POINTS,
+  BOARDROOM_HOW_TO_SUMMARY_LABEL,
+  BOARDROOM_CHAMBER_CONTRAST_BLURB,
   resolveBoardroomEntryIntent,
   boardroomViewFromEntryIntent,
   shouldOpenThomasFromEntry,

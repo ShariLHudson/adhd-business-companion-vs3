@@ -13,8 +13,9 @@ export const BOARDROOM_HOME_PRIMARY_CHOICES = [
     id: "bring-decision",
     title: "Bring a Decision to the Board",
     description:
-      "Explore an important decision, opportunity, or problem with selected Directors.",
+      "State your decision, accept recommended Directors, and hear distinct perspectives.",
     testId: "boardroom-start-discussion",
+    prominence: "primary" as const,
   },
   {
     id: "meet-directors",
@@ -22,15 +23,21 @@ export const BOARDROOM_HOME_PRIMARY_CHOICES = [
     description:
       "Get to know who sits around the Round Table and how each Director thinks.",
     testId: "boardroom-meet-directors",
+    prominence: "secondary" as const,
   },
   {
     id: "review-past",
-    title: "Review Past Board Discussions",
+    title: "Past Discussions",
     description:
       "Return to previous discussions, recommendations, and outcomes.",
     testId: "boardroom-review-past",
+    prominence: "secondary" as const,
   },
 ] as const;
+
+/** Short Board-versus-Chamber explanation near Boardroom entry. */
+export const BOARDROOM_CHAMBER_CONTRAST_BLURB =
+  "The Board helps you evaluate important decisions from several perspectives. When you need deep subject-specific help, Spark Estate may suggest the right Chamber Intelligence—with your permission.";
 
 export type BoardroomHomePrimaryChoiceId =
   (typeof BOARDROOM_HOME_PRIMARY_CHOICES)[number]["id"];
@@ -50,12 +57,14 @@ export type BoardroomEntryIntent =
   | "past";
 
 export const BOARDROOM_HOW_TO_USE_POINTS = [
-  "The Board helps you examine decisions from several thoughtful perspectives.",
+  "Bring a decision, accept the recommended Directors, or customize who sits at the table.",
   "You remain the decision-maker — Directors advise; they do not choose for you.",
   "Each Director brings a different lens to the Round Table.",
   "The Board does not replace Chamber specialists.",
   "When you are ready to implement, Spark may later hand work to the Chamber — with your permission.",
 ] as const;
+
+export const BOARDROOM_HOW_TO_SUMMARY_LABEL = "How the Boardroom Works";
 
 /**
  * Resolve a chat / command phrase into a Boardroom entry intent.

@@ -1,5 +1,10 @@
 import type { AdvisoryMember, AdvisoryMemberId } from "@/lib/advisory/types";
 import { getBoardMemberDefinition } from "@/lib/advisory/members/boardMembers";
+import {
+  boardPossessiveMatter,
+  resolveAddressNameForBoard,
+  type BoardPersonalizationOptions,
+} from "@/lib/board/resolveBoardAddressName";
 import { resolveBoardMembers } from "./recommendBoard";
 import type {
   BoardDecisionBrief,
@@ -33,6 +38,7 @@ function buildMemberTurn(
   situation: string,
   style: BoardDiscussionStyle,
   index: number,
+  personalization?: BoardPersonalizationOptions,
 ): BoardMemberTurn {
   const concern = member.primaryConcerns[index % member.primaryConcerns.length] ??
     member.primaryConcerns[0] ??
@@ -46,6 +52,8 @@ function buildMemberTurn(
   const question =
     member.typicalQuestions[index % member.typicalQuestions.length] ??
     "What would make this decision feel clear?";
+  const addressName = resolveAddressNameForBoard(personalization);
+  const questionMatter = boardPossessiveMatter(addressName, "question");
 
   const challengeBoost = style === "challenge-thinking";
   const quick = style === "quick-review";
@@ -97,11 +105,15 @@ function buildMemberTurn(
     `May not fit if ${concern.toLowerCase()} is already under pressure.`,
   ];
 
+  const perspectiveLead = addressName
+    ? `We are evaluating ${questionMatter} about “${clip(situation, 72)}”. ${addressName}, from my seat as ${member.role}: ${member.decisionStyle}`
+    : `We are evaluating ${questionMatter} about “${clip(situation, 72)}”. From my seat as ${member.role}: ${member.decisionStyle}`;
+
   return {
     memberId: member.id,
     memberName: member.name,
     memberRole: member.role,
-    perspective: `${member.role}: ${member.decisionStyle}`,
+    perspective: perspectiveLead,
     pros,
     cons,
     risks,

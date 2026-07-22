@@ -129,16 +129,27 @@
 .round-table-seat {
   position: absolute;
   z-index: 2;
-  width: 2.6rem;
-  height: 2.6rem;
+  width: 4.6rem;
+  height: 4.4rem;
   margin: 0;
   padding: 0;
   border: none;
   background: transparent;
   transform: translate(-50%, -50%);
   cursor: pointer;
-  border-radius: 999px;
-  transition: transform 0.22s ease, filter 0.22s ease;
+  border-radius: 0.65rem;
+  transition: transform 0.22s ease, filter 0.22s ease, opacity 0.22s ease;
+}
+
+.round-table-seat--dimmed {
+  opacity: 0.55;
+  filter: brightness(0.78) saturate(0.75);
+}
+
+.round-table-seat--included {
+  opacity: 1;
+  filter: brightness(1.08) saturate(1.1);
+  z-index: 3;
 }
 
 .round-table-seat__marker {
@@ -193,27 +204,36 @@
   transform: translate(-50%, -50%) scale(1.06);
 }
 
-.round-table-seat__tooltip {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 0.35rem);
-  transform: translateX(-50%);
-  white-space: nowrap;
-  padding: 0.28rem 0.55rem;
-  border-radius: 0.45rem;
-  background: rgba(22, 18, 14, 0.92);
-  border: 1px solid rgba(201, 166, 107, 0.4);
-  color: rgba(255, 248, 235, 0.98);
-  font-size: 0.75rem;
-  font-weight: 600;
-  opacity: 0;
+.round-table-seat__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.05rem;
+  width: 100%;
+  padding: 0 0.1rem;
   pointer-events: none;
-  transition: opacity 0.18s ease;
+  text-align: center;
 }
 
-.round-table-seat--hover .round-table-seat__tooltip,
-.round-table-seat:focus-visible .round-table-seat__tooltip {
-  opacity: 1;
+.round-table-seat__label-name {
+  display: block;
+  max-width: 4.5rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: rgba(255, 248, 235, 0.96);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+  white-space: normal;
+}
+
+.round-table-seat__label-role {
+  display: block;
+  max-width: 4.5rem;
+  font-size: 0.55rem;
+  font-weight: 500;
+  line-height: 1.1;
+  color: rgba(255, 236, 200, 0.82);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
 }
 
 .round-table-overlay__hover-name {

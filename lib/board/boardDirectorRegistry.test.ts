@@ -106,6 +106,52 @@ describe("Board of Directors — Slice 1 registry", () => {
     }
   });
 
+  it("wires Victoria Hayes and Sofia Ramirez to their own portrait assets", () => {
+    const victoria = getBoardDirectorById("strategy-director")!;
+    const sofia = getBoardDirectorById("customer-market")!;
+    const chair = getBoardDirectorById("board-chair")!;
+
+    expect(victoria.portraitPath).toBe(
+      `${BOARD_DIRECTOR_ASSET_BASE}/victoria-hayes-strategy-director.png`,
+    );
+    expect(sofia.portraitPath).toBe(
+      `${BOARD_DIRECTOR_ASSET_BASE}/sofia-ramirez-customer-and-market-director.png`,
+    );
+    expect(victoria.galleryCardPath).toBe(
+      `${BOARD_DIRECTOR_ASSET_BASE}/strategy-director-gallery-portrait.png`,
+    );
+    expect(sofia.galleryCardPath).toBe(
+      `${BOARD_DIRECTOR_ASSET_BASE}/customer-market-gallery-portrait.png`,
+    );
+
+    expect(resolveBoardDirectorPortraitPath(victoria)).toBe(
+      victoria.portraitPath,
+    );
+    expect(resolveBoardDirectorPortraitPath(sofia)).toBe(sofia.portraitPath);
+    expect(resolveBoardDirectorPortraitPath(victoria)).not.toBe(
+      chair.portraitPath,
+    );
+    expect(resolveBoardDirectorPortraitPath(sofia)).not.toBe(
+      chair.portraitPath,
+    );
+  });
+
+  it("wires Carlos Rivera to values-and-trust portrait asset", () => {
+    const carlos = getBoardDirectorById("values-trust")!;
+    const chair = getBoardDirectorById("board-chair")!;
+
+    expect(carlos.portraitPath).toBe(
+      `${BOARD_DIRECTOR_ASSET_BASE}/carlos-rivera-values-and-trust.png`,
+    );
+    expect(carlos.galleryCardPath).toBe(
+      `${BOARD_DIRECTOR_ASSET_BASE}/values-trust-gallery-portrait.png`,
+    );
+    expect(resolveBoardDirectorPortraitPath(carlos)).toBe(carlos.portraitPath);
+    expect(resolveBoardDirectorPortraitPath(carlos)).not.toBe(
+      chair.portraitPath,
+    );
+  });
+
   it("resolves Compact Gallery Card art for every Director (not design sheets)", () => {
     for (const d of BOARD_DIRECTORS) {
       const path = resolveBoardDirectorGalleryCardPath(d);

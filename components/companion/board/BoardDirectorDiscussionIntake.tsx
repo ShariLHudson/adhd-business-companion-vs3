@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { BoardDirectorId } from "@/lib/board";
-import { getBoardDirectorById } from "@/lib/board";
+import {
+  getBoardDirectorById,
+  recommendBoardDirectorsForDecision,
+} from "@/lib/board";
 import { THOMAS_ELLISON_DIRECTOR_ID } from "@/lib/board/visibleDirectors";
 import {
   advanceDecisionToReview,
@@ -79,8 +82,10 @@ export function BoardDirectorDiscussionIntake({
   const [confirmStartOver, setConfirmStartOver] = useState(false);
   const [editStep, setEditStep] = useState<BoardIntakeStep | null>(null);
   const [selectionError, setSelectionError] = useState<string | null>(null);
-  const [showCompactSelector, setShowCompactSelector] = useState(
-    () => initialDirectorIds.length === 0,
+  /** Customize path — single list interface (not shown with recommended preview). */
+  const [customizeDirectors, setCustomizeDirectors] = useState(false);
+  const [recommendedApplied, setRecommendedApplied] = useState(
+    () => initialDirectorIds.length > 0,
   );
   const submitLockRef = useRef(false);
 
@@ -94,6 +99,7 @@ export function BoardDirectorDiscussionIntake({
   useEffect(() => {
     if (initialDirectorIds.length === 0) return;
     setDraft((prev) => updateDraftDirectors(prev, initialDirectorIds));
+    setRecommendedApplied(true);
   }, [initialDirectorIds]);
 
   useEffect(() => {
@@ -102,6 +108,23 @@ export function BoardDirectorDiscussionIntake({
       prev.sourceContext ? prev : { ...prev, sourceContext },
     );
   }, [sourceContext]);
+
+  /** Auto-recommend Directors once a decision is known and none are selected. */
+  useEffect(() => {
+    if (draft.currentStep !== "review" && draft.currentStep !== "ready_to_begin") {
+      return;
+    }
+    if (draft.selectedDirectorIds.length > 0 || recommendedApplied) return;
+    if (!draft.decision.trim()) return;
+    const rec = recommendBoardDirectorsForDecision(draft.decision);
+    setDraft((prev) => updateDraftDirectors(prev, rec.directorIds));
+    setRecommendedApplied(true);
+  }, [
+    draft.currentStep,
+    draft.decision,
+    draft.selectedDirectorIds.length,
+    recommendedApplied,
+  ]);
 
   function persistDraft(next: BoardDiscussionIntakeDraft) {
     setDraft(next);
@@ -255,16 +278,26 @@ export function BoardDirectorDiscussionIntake({
         ) : null}
         <div className="boardroom-director-intake__turns">
           {result.turns.map((turn) => {
+            const director =
+              turn.directorId != null
+                ? getBoardDirectorById(turn.directorId)
+                : null;
             const speaker =
               turn.speakerName ||
-              (turn.directorId
-                ? getBoardDirectorById(turn.directorId)?.name
-                : null) ||
+              director?.name ||
               (turn.role === "chair"
                 ? chair?.name ?? "Chair"
                 : turn.role === "director"
                   ? "Director"
                   : "Boardroom note");
+            const roleLabel =
+              director?.shortRole ||
+              director?.boardRole ||
+              (turn.role === "chair"
+                ? "Chair"
+                : turn.role === "director"
+                  ? "Director"
+                  : null);
             return (
               <article
                 key={turn.id}
@@ -274,6 +307,9 @@ export function BoardDirectorDiscussionIntake({
                 data-director-id={turn.directorId ?? undefined}
               >
                 <p className="boardroom-card__title">{speaker}</p>
+                {roleLabel ? (
+                  <p className="boardroom-card__meta">{roleLabel}</p>
+                ) : null}
                 <p className="boardroom-card__meta whitespace-pre-wrap">
                   {turn.text}
                 </p>
@@ -290,9 +326,25 @@ export function BoardDirectorDiscussionIntake({
             <p className="boardroom-card__meta whitespace-pre-wrap">
               {result.decisionRecord.summary}
             </p>
-            <p className="boardroom-card__meta mt-2">
-              Recommendation: {result.decisionRecord.finalRecommendation}
-            </p>
+            {result.decisionRecord.relatedWork &&
+            result.decisionRecord.relatedWork.length > 0 ? (
+              <div
+                className="mt-2"
+                data-testid="board-discussion-related-work"
+              >
+                <p className="boardroom-card__title">Related Work</p>
+                <ul
+                  className="boardroom-card__meta"
+                  style={{ margin: "0.35rem 0 0", paddingLeft: "1.1rem" }}
+                >
+                  {result.decisionRecord.relatedWork.map((ref) => (
+                    <li key={`${ref.sourceType}-${ref.sourceId}`}>
+                      {ref.label || ref.topic || ref.sourceType}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         ) : null}
         <BoardDiscussionOutcomePanel
@@ -438,25 +490,27 @@ export function BoardDirectorDiscussionIntake({
           ) : null}
         </div>
 
-        {showCompactSelector || draft.selectedDirectorIds.length === 0 ? (
-          <div className="mt-4">
-            <CompactBoardDirectorSelector
-              selectedIds={draft.selectedDirectorIds}
-              decisionText={draft.decision}
-              onChange={(ids) => {
-                persistDraft(updateDraftDirectors(draft, ids));
-                setSelectionError(null);
-              }}
-              onLearnAbout={
-                onChooseDirectors
-                  ? () => {
-                      onChooseDirectors();
-                    }
-                  : undefined
-              }
-            />
-          </div>
-        ) : null}
+        <div className="mt-4">
+          <CompactBoardDirectorSelector
+            mode={customizeDirectors ? "customize" : "recommended"}
+            selectedIds={draft.selectedDirectorIds}
+            decisionText={draft.decision}
+            autoSelectRecommended={!recommendedApplied}
+            onRequestCustomize={() => setCustomizeDirectors(true)}
+            onChange={(ids) => {
+              persistDraft(updateDraftDirectors(draft, ids));
+              setRecommendedApplied(true);
+              setSelectionError(null);
+            }}
+            onLearnAbout={
+              onChooseDirectors
+                ? () => {
+                    onChooseDirectors();
+                  }
+                : undefined
+            }
+          />
+        </div>
 
         <div className="boardroom-actions" style={{ flexWrap: "wrap" }}>
           <button
@@ -473,19 +527,19 @@ export function BoardDirectorDiscussionIntake({
             className="boardroom-btn boardroom-btn--secondary"
             data-testid="board-director-intake-choose-directors"
             onClick={() => {
-              if (showCompactSelector && onChooseDirectors) {
+              if (customizeDirectors && onChooseDirectors) {
                 onChooseDirectors();
                 return;
               }
-              setShowCompactSelector((v) => !v);
+              setCustomizeDirectors((v) => !v);
             }}
           >
-            {showCompactSelector
+            {customizeDirectors
               ? onChooseDirectors
-                ? "Browse full biographies"
-                : "Hide director list"
+                ? "View the Round Table"
+                : "Hide Customize"
               : directors.length > 0
-                ? "Change Directors"
+                ? "Customize"
                 : "Choose Directors"}
           </button>
           <button

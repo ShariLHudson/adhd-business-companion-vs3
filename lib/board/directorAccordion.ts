@@ -15,6 +15,21 @@ export const BOARD_DIRECTOR_ACCORDION_SECTION_IDS = [
   "youll-enjoy-working-with-me",
 ] as const;
 
+/** Shown first on profile overview — reduce default cognitive load. */
+export const BOARD_DIRECTOR_PRIMARY_ACCORDION_SECTION_IDS = [
+  "how-i-think",
+  "what-i-protect",
+  "when-youll-want-me",
+] as const;
+
+/** Deeper material behind “More About This Director”. */
+export const BOARD_DIRECTOR_MORE_ACCORDION_SECTION_IDS = [
+  "questions-ill-ask",
+  "decision-i-helped-guide",
+  "how-i-work-with-founders",
+  "youll-enjoy-working-with-me",
+] as const;
+
 export type BoardDirectorAccordionSectionId =
   (typeof BOARD_DIRECTOR_ACCORDION_SECTION_IDS)[number];
 
@@ -37,6 +52,19 @@ const TITLES: Record<BoardDirectorAccordionSectionId, string> = {
   "youll-enjoy-working-with-me": "You'll Enjoy Working With Me If",
 };
 
+function sectionFromId(
+  director: BoardDirectorDefinition,
+  id: BoardDirectorAccordionSectionId,
+): BoardDirectorAccordionSection {
+  const bodyLines = sectionBodyLines(director, id);
+  return {
+    id,
+    title: TITLES[id],
+    preview: sectionPreview(director, id, bodyLines),
+    bodyLines,
+  };
+}
+
 /**
  * Build accordion sections for any Director from registry fields.
  * Single implementation — never special-case a Director by name.
@@ -44,15 +72,27 @@ const TITLES: Record<BoardDirectorAccordionSectionId, string> = {
 export function getDirectorAccordionSections(
   director: BoardDirectorDefinition,
 ): BoardDirectorAccordionSection[] {
-  return BOARD_DIRECTOR_ACCORDION_SECTION_IDS.map((id) => {
-    const bodyLines = sectionBodyLines(director, id);
-    return {
-      id,
-      title: TITLES[id],
-      preview: sectionPreview(director, id, bodyLines),
-      bodyLines,
-    };
-  });
+  return BOARD_DIRECTOR_ACCORDION_SECTION_IDS.map((id) =>
+    sectionFromId(director, id),
+  );
+}
+
+/** Three overview sections shown before “More About This Director”. */
+export function getDirectorPrimaryAccordionSections(
+  director: BoardDirectorDefinition,
+): BoardDirectorAccordionSection[] {
+  return BOARD_DIRECTOR_PRIMARY_ACCORDION_SECTION_IDS.map((id) =>
+    sectionFromId(director, id),
+  );
+}
+
+/** Deeper sections — only after the member opens More. */
+export function getDirectorMoreAccordionSections(
+  director: BoardDirectorDefinition,
+): BoardDirectorAccordionSection[] {
+  return BOARD_DIRECTOR_MORE_ACCORDION_SECTION_IDS.map((id) =>
+    sectionFromId(director, id),
+  );
 }
 
 function sectionPreview(

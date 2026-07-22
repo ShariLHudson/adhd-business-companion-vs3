@@ -24,7 +24,9 @@ describe("BoardroomRoomPanel home restoration", () => {
       expect(html).toContain(choice.description);
     }
     expect(html).toContain('data-testid="boardroom-how-to-use"');
-    expect(html).toContain("How to Use the Boardroom");
+    expect(html).toContain("How the Boardroom Works");
+    expect(html).toContain("boardroom-chamber-contrast");
+    expect(html).toContain("boardroom-home__action-card--primary");
     expect(html).not.toContain("Start a Board Discussion");
     expect(html).not.toContain('data-testid="boardroom-my-place-at-the-table"');
     expect(html).not.toContain('data-testid="board-director-profile-board-chair"');

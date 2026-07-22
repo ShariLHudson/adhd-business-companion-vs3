@@ -93,7 +93,7 @@ export function RoundTableOverlay({
           <div>
             <p className="round-table-overlay__kicker">Board of Directors</p>
             <h2 id={titleId} className="round-table-overlay__title">
-              Round Table
+              Choose Directors
             </h2>
           </div>
           <button
@@ -147,6 +147,15 @@ export function RoundTableOverlay({
                 );
               }
 
+              const role =
+                seat.kind === "director" && seat.directorId
+                  ? getBoardDirectorById(seat.directorId)?.shortRole
+                  : null;
+              const dimUnselected =
+                seat.kind === "director" &&
+                includedDirectorIds.length > 0 &&
+                !isIncluded;
+
               return (
                 <button
                   key={seat.seatId}
@@ -158,6 +167,7 @@ export function RoundTableOverlay({
                     seat.chairHighlight ? "round-table-seat--chair" : "",
                     isActive ? "round-table-seat--active" : "",
                     isIncluded ? "round-table-seat--included" : "",
+                    dimUnselected ? "round-table-seat--dimmed" : "",
                     hoveredSeatId === seat.seatId
                       ? "round-table-seat--hover"
                       : "",
@@ -168,9 +178,19 @@ export function RoundTableOverlay({
                   data-testid={`round-table-seat-${seat.seatId}`}
                   data-director-id={seat.directorId ?? undefined}
                   data-seat-kind={seat.kind}
-                  aria-label={name}
+                  data-selected={
+                    seat.kind === "director"
+                      ? isIncluded
+                        ? "true"
+                        : "false"
+                      : undefined
+                  }
+                  aria-label={role ? `${name}, ${role}` : name}
+                  aria-pressed={
+                    seat.kind === "director" ? isIncluded : undefined
+                  }
                   aria-current={isActive ? "true" : undefined}
-                  title={name}
+                  title={role ? `${name} — ${role}` : name}
                   onMouseEnter={() => setHoveredSeatId(seat.seatId)}
                   onMouseLeave={() => setHoveredSeatId(null)}
                   onFocus={() => setHoveredSeatId(seat.seatId)}
@@ -186,7 +206,12 @@ export function RoundTableOverlay({
                   }}
                 >
                   <span className="round-table-seat__marker" aria-hidden />
-                  <span className="round-table-seat__tooltip">{name}</span>
+                  <span className="round-table-seat__label">
+                    <span className="round-table-seat__label-name">{name}</span>
+                    {role ? (
+                      <span className="round-table-seat__label-role">{role}</span>
+                    ) : null}
+                  </span>
                 </button>
               );
             })}
@@ -202,7 +227,7 @@ export function RoundTableOverlay({
             </p>
           ) : (
             <p className="round-table-overlay__hover-name round-table-overlay__hover-name--hint">
-              Hover a chair to see who sits there
+              Each Director&apos;s name is shown at their seat
             </p>
           )}
         </div>
@@ -242,7 +267,7 @@ export function RoundTableOverlay({
 
 function resolveSeatDisplayName(seat: RoundTableSeat | undefined): string {
   if (!seat) return "";
-  if (seat.kind === "member") return "My Place at the Table";
+  if (seat.kind === "member") return "Your seat";
   if (seat.kind === "empty" || !seat.directorId) return seat.label;
   const d = getBoardDirectorById(seat.directorId);
   return d?.name ?? seat.label;

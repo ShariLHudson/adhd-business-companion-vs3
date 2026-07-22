@@ -4,6 +4,11 @@
  */
 
 import type { BoardDirectorDefinition } from "@/lib/board/types";
+import {
+  boardPossessiveMatter,
+  resolveAddressNameForBoard,
+  type BoardPersonalizationOptions,
+} from "@/lib/board/resolveBoardAddressName";
 
 const BOARD_CONSENSUS_GUARD =
   /\b(the board (agrees|thinks|recommends)|as a board|we all agree|board consensus)\b/i;
@@ -16,12 +21,19 @@ const BOARD_CONSENSUS_GUARD =
 export function craftMeetDirectorReply(
   director: BoardDirectorDefinition,
   memberText: string,
+  personalization?: BoardPersonalizationOptions,
 ): string {
   const trimmed = memberText.trim();
+  const addressName = resolveAddressNameForBoard(personalization);
+  const questionMatter = boardPossessiveMatter(addressName, "question");
+  const withAddress = (sentence: string) =>
+    addressName ? `${addressName}, ${sentence}` : sentence;
+
   if (!trimmed) {
     return (
-      `From my seat as ${director.boardRole}, I need a clearer sense of the decision. ` +
-      (director.questionsAsked[0] ?? "What decision are we examining?")
+      withAddress(
+        `From my seat as ${director.boardRole}, I need a clearer sense of ${questionMatter}. `,
+      ) + (director.questionsAsked[0] ?? "What decision are we examining?")
     );
   }
 
@@ -58,7 +70,9 @@ export function craftMeetDirectorReply(
     const question =
       director.questionsAsked[0] ?? "What decision are we actually making?";
     const parts = [
-      `Looking through ${lens}: let's clarify the actual decision before we rush.`,
+      withAddress(
+        `We are evaluating ${questionMatter}. Looking through ${lens}: let's clarify the actual decision before we rush.`,
+      ),
       `I'd want us to name where we agree, where we still differ, and what must remain true a year from now.`,
       wantsManyViews
         ? `If several perspectives are needed, take this to a Board discussion — I'll chair, and we won't pretend one voice is the whole table.`
@@ -82,7 +96,9 @@ export function craftMeetDirectorReply(
 
   const watch = director.watchesFor[0];
   const parts = [
-    `Speaking only from my perspective as ${director.shortRole} — I look at this through ${lens}.`,
+    withAddress(
+      `Speaking only from my perspective as ${director.shortRole} — I look at ${questionMatter} through ${lens}.`,
+    ),
     watch
       ? `I would watch carefully for ${watch} before moving ahead.`
       : null,

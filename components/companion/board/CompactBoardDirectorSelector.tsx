@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 import {
   CORE_BOARD_DIRECTOR_IDS,
   getBoardDirectorById,
@@ -15,16 +15,25 @@ import "@/app/companion/board-director-meet.css";
 type Props = {
   selectedIds: readonly BoardDirectorId[];
   onChange: (ids: BoardDirectorId[]) => void;
-  /** Decision text drives Select Recommended Directors */
+  /** Decision text drives Recommended Directors */
   decisionText?: string;
   /** Optional: open full biography without leaving selection */
   onLearnAbout?: (directorId: BoardDirectorId) => void;
   className?: string;
+  /**
+   * recommended — default path (preview + Use Recommended / Customize)
+   * customize — single list interface (Core Board under More)
+   */
+  mode?: "recommended" | "customize";
+  /** When mode is recommended, notify parent that Customize was chosen */
+  onRequestCustomize?: () => void;
+  /** Auto-apply recommendation when selection is empty */
+  autoSelectRecommended?: boolean;
 };
 
 /**
  * Compact Director selector — photo, name, role, one-line specialty, checkbox.
- * Full biographies stay behind “Learn about…” (Prompt 145).
+ * Default path recommends Directors; Customize shows one list interface.
  */
 export function CompactBoardDirectorSelector({
   selectedIds,
@@ -32,11 +41,26 @@ export function CompactBoardDirectorSelector({
   decisionText = "",
   onLearnAbout,
   className,
+  mode = "customize",
+  onRequestCustomize,
+  autoSelectRecommended = false,
 }: Props) {
   const listId = useId();
   const [expandedId, setExpandedId] = useState<BoardDirectorId | null>(null);
+  const [showMoreBulk, setShowMoreBulk] = useState(false);
   const directors = listVisibleBoardDirectors();
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const recommendation = useMemo(
+    () => recommendBoardDirectorsForDecision(decisionText || "general"),
+    [decisionText],
+  );
+
+  useEffect(() => {
+    if (!autoSelectRecommended) return;
+    if (selectedIds.length > 0) return;
+    onChange([...recommendation.directorIds]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- apply once when empty
+  }, [autoSelectRecommended, decisionText]);
 
   function setSelection(ids: readonly BoardDirectorId[]) {
     onChange([...ids]);
@@ -51,8 +75,7 @@ export function CompactBoardDirectorSelector({
   }
 
   function selectRecommended() {
-    const rec = recommendBoardDirectorsForDecision(decisionText || "general");
-    setSelection(rec.directorIds);
+    setSelection(recommendation.directorIds);
   }
 
   function selectCore() {
@@ -75,19 +98,123 @@ export function CompactBoardDirectorSelector({
     setExpandedId((prev) => (prev === id ? null : id));
   }
 
+  if (mode === "recommended") {
+    const recommendedNames = recommendation.directorIds
+      .map((id) => getBoardDirectorById(id))
+      .filter(Boolean);
+
+    return (
+      <div
+        className={`compact-board-director-selector compact-board-director-selector--recommended${
+          className ? ` ${className}` : ""
+        }`}
+        data-testid="compact-board-director-selector"
+        data-mode="recommended"
+      >
+        <p className="boardroom-purpose" data-testid="board-recommended-intro">
+          These Directors are especially well suited to help with this decision.
+        </p>
+        <ul
+          className="compact-board-director-selector__list"
+          aria-label="Recommended Directors"
+          data-testid="board-recommended-preview"
+        >
+          {recommendedNames.map((d) => {
+            if (!d) return null;
+            const selected = selectedSet.has(d.id);
+            const portrait = resolveBoardDirectorPortraitPath(d);
+            return (
+              <li
+                key={d.id}
+                className={`compact-board-director-selector__row board-director-card${
+                  selected
+                    ? " compact-board-director-selector__row--selected"
+                    : ""
+                }`}
+                data-testid={`compact-director-row-${d.id}`}
+                data-selected={selected ? "true" : "false"}
+              >
+                {selected ? (
+                  <span
+                    aria-hidden="true"
+                    className="compact-board-director-selector__check-badge selection-check"
+                  >
+                    ✓
+                  </span>
+                ) : null}
+                <span className="compact-board-director-selector__label">
+                  <span className="compact-board-director-selector__photo">
+                    <Image
+                      src={portrait}
+                      alt=""
+                      width={48}
+                      height={48}
+                      className="compact-board-director-selector__img"
+                      unoptimized
+                    />
+                  </span>
+                  <span className="compact-board-director-selector__copy">
+                    <span className="compact-board-director-selector__name">
+                      {d.name}
+                    </span>
+                    <span className="compact-board-director-selector__role">
+                      {d.shortRole}
+                    </span>
+                    <span className="compact-board-director-selector__specialty">
+                      {recommendation.rationaleByDirector[d.id] ||
+                        d.decisionLens[0] ||
+                        d.boardRole}
+                    </span>
+                  </span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+        <div className="boardroom-actions" style={{ flexWrap: "wrap" }}>
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--primary"
+            data-testid="compact-select-recommended"
+            onClick={selectRecommended}
+          >
+            Use Recommended Directors
+          </button>
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--secondary"
+            data-testid="compact-customize-directors"
+            onClick={() => {
+              selectRecommended();
+              onRequestCustomize?.();
+            }}
+          >
+            Customize
+          </button>
+        </div>
+        {recommendation.offerDevilsAdvocate ? (
+          <p className="boardroom-purpose" data-testid="board-offer-devils-advocate">
+            {recommendation.offerDevilsAdvocateReason}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <div
       className={`compact-board-director-selector${className ? ` ${className}` : ""}`}
       data-testid="compact-board-director-selector"
+      data-mode="customize"
     >
       <p className="boardroom-purpose" id={`${listId}-label`}>
-        Choose who sits at the Round Table. Expand a biography only if you want
-        more detail.
+        Choose Directors for this discussion. One selection list — portraits,
+        roles, and clear selected states.
       </p>
       <div
         className="compact-board-director-selector__bulk"
         role="group"
-        aria-label="Quick director selection"
+        aria-label="Director selection shortcuts"
       >
         <button
           type="button"
@@ -95,15 +222,7 @@ export function CompactBoardDirectorSelector({
           data-testid="compact-select-recommended"
           onClick={selectRecommended}
         >
-          Select Recommended Directors
-        </button>
-        <button
-          type="button"
-          className="boardroom-btn boardroom-btn--secondary"
-          data-testid="compact-select-core"
-          onClick={selectCore}
-        >
-          Select Core Board
+          Use Recommended Directors
         </button>
         <button
           type="button"
@@ -121,7 +240,33 @@ export function CompactBoardDirectorSelector({
         >
           Clear Selection
         </button>
+        <button
+          type="button"
+          className="boardroom-btn boardroom-btn--ghost"
+          data-testid="compact-selection-more"
+          aria-expanded={showMoreBulk}
+          onClick={() => setShowMoreBulk((v) => !v)}
+        >
+          More
+        </button>
       </div>
+      {showMoreBulk ? (
+        <div
+          className="compact-board-director-selector__bulk"
+          role="group"
+          aria-label="More selection options"
+          data-testid="compact-selection-more-menu"
+        >
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--secondary"
+            data-testid="compact-select-core"
+            onClick={selectCore}
+          >
+            Use Core Board
+          </button>
+        </div>
+      ) : null}
 
       <ul
         className="compact-board-director-selector__list"
@@ -142,7 +287,7 @@ export function CompactBoardDirectorSelector({
           return (
             <li
               key={d.id}
-              className={`compact-board-director-selector__row${
+              className={`compact-board-director-selector__row board-director-card${
                 selected
                   ? " compact-board-director-selector__row--selected"
                   : ""
@@ -152,6 +297,14 @@ export function CompactBoardDirectorSelector({
               data-testid={`compact-director-row-${d.id}`}
               data-selected={selected ? "true" : "false"}
             >
+              {selected ? (
+                <span
+                  aria-hidden="true"
+                  className="compact-board-director-selector__check-badge selection-check"
+                >
+                  ✓
+                </span>
+              ) : null}
               <label
                 htmlFor={inputId}
                 className="compact-board-director-selector__label"
@@ -193,7 +346,7 @@ export function CompactBoardDirectorSelector({
                 aria-expanded={expanded}
                 onClick={() => learnAbout(d.id)}
               >
-                Learn About This Director
+                View Profile
               </button>
               {expanded && !onLearnAbout ? (
                 <div

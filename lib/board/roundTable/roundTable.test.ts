@@ -49,10 +49,10 @@ describe("Round Table seats", () => {
     expect(chair?.label).toMatch(/Thomas/i);
   });
 
-  it("includes My Place at the Table as the member seat", () => {
+  it("includes Your seat as the member seat", () => {
     const member = ROUND_TABLE_SEATS.find((s) => s.kind === "member");
     expect(member?.seatId).toBe("member-place");
-    expect(member?.label).toBe("My Place at the Table");
+    expect(member?.label).toBe("Your seat");
   });
 });
 

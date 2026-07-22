@@ -12,7 +12,7 @@ export const BOARD_MEMBER_TITLE = "Director" as const;
 export const BOARD_PRIMARY_ACTIONS = [
   "Meet the Directors",
   "Bring a Decision to the Board",
-  "Review Past Board Discussions",
+  "Past Discussions",
   "Add the Devil’s Advocate",
   "Return to the Estate",
 ] as const;

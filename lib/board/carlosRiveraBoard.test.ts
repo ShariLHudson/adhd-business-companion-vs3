@@ -56,9 +56,9 @@ describe("Carlos Rivera — visible Values & Trust Director", () => {
     expect(carlos.isCoreDirector).toBe(false);
     expect(carlos.isOptionalDirector).toBe(true);
     expect(carlos.portraitPath).toBe(
-      "/board-of-directors/carlos-rivera-portrait.png",
+      "/board-of-directors/carlos-rivera-values-and-trust.png",
     );
-    expect(carlos.portraitPath).not.toMatch(/amara|delgado|values-and-trust/i);
+    expect(carlos.portraitPath).not.toMatch(/amara|delgado|carlos-rivera-portrait/i);
   });
 
   it("is visible in Meet the Directors with the approved Directors", () => {
@@ -94,7 +94,7 @@ describe("Carlos Rivera — visible Values & Trust Director", () => {
     expect(meetDirectorCtaLabel(carlos)).toBe("Meet Carlos");
     expect(getDirectorAccordionSections(carlos).length).toBe(7);
     expect(resolveBoardDirectorPortraitPath(carlos)).toBe(
-      "/board-of-directors/carlos-rivera-portrait.png",
+      "/board-of-directors/carlos-rivera-values-and-trust.png",
     );
   });
 });

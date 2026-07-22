@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   acceptBoardRecommendation,
   type BoardDirectorDiscussionRecord,
 } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
 import {
+  BOARD_OUTCOME_MORE,
+  BOARD_OUTCOME_NEXT_STEP_CHOICES,
   BOARD_OUTCOME_PRIMARY,
-  BOARD_OUTCOME_SECONDARY,
-  nextRevealCount,
+  recommendNextStepDestination,
   type BoardOutcomeSecondaryActionId,
 } from "@/lib/board/boardDiscussion/boardOutcomeActions";
 
@@ -25,7 +26,8 @@ type Props = {
 };
 
 /**
- * One primary action, then progressive secondary integration options (Prompt 145).
+ * Finish line — at most three visible choices after recommendation.
+ * Less common actions live under More.
  */
 export function BoardDiscussionOutcomePanel({
   record,
@@ -38,28 +40,62 @@ export function BoardDiscussionOutcomePanel({
     record.recommendationAcceptedAt ||
       record.status === "recommendation-accepted",
   );
-  const [revealCount, setRevealCount] = useState(accepted ? 3 : 0);
+  /** Decision Record is created with the discussion — do not duplicate Save. */
+  const decisionSaved = Boolean(record.decisionRecord);
+  const [showNextStepChoices, setShowNextStepChoices] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  function useRecommendation() {
+  const recommendedDestination = useMemo(
+    () =>
+      recommendNextStepDestination({
+        hasProjectContext: Boolean(
+          record.sourceContext?.projectId ||
+            record.sourceContext?.projectName ||
+            record.sourceContext?.workTitle,
+        ),
+        mentionsTodayOrDay: /\b(today|tomorrow|this week|plan my day)\b/i.test(
+          [
+            record.answers.decision,
+            record.decisionRecord?.nextUsefulStep,
+            record.decisionRecord?.finalRecommendation,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        ),
+      }),
+    [record],
+  );
+
+  function useNextStep() {
     const next = acceptBoardRecommendation(record);
     onRecordChange(next);
-    setRevealCount(3);
+    setShowNextStepChoices(true);
     setStatusMessage(
       sourceLabel
-        ? `This recommendation is ready to attach to ${sourceLabel}.`
-        : "This recommendation is ready. Choose what should happen next.",
+        ? `This next step is ready to attach to ${sourceLabel}.`
+        : "Choose where this next step should go.",
     );
   }
 
-  const visible = BOARD_OUTCOME_SECONDARY.slice(0, revealCount);
-  const canShowMore = revealCount < BOARD_OUTCOME_SECONDARY.length;
+  function runAction(actionId: BoardOutcomeSecondaryActionId, label: string) {
+    onSecondaryAction?.(actionId, record);
+    setStatusMessage(`Noted — ${label}.`);
+    if (actionId === "save-decision" || actionId === "record-as-decision") {
+      const next = acceptBoardRecommendation(record, "Save Decision");
+      onRecordChange(next);
+    }
+  }
+
+  const visibleCount =
+    1 + (!decisionSaved ? 1 : 0) + 1; /* primary + optional save + more */
 
   return (
     <div
       className="board-discussion-outcome"
       data-testid="board-discussion-outcome"
       data-accepted={accepted ? "true" : "false"}
+      data-visible-actions={String(Math.min(visibleCount, 3))}
     >
       {!accepted ? (
         <div className="boardroom-actions">
@@ -67,7 +103,7 @@ export function BoardDiscussionOutcomePanel({
             type="button"
             className="boardroom-btn boardroom-btn--primary"
             data-testid={BOARD_OUTCOME_PRIMARY.testId}
-            onClick={useRecommendation}
+            onClick={useNextStep}
           >
             {BOARD_OUTCOME_PRIMARY.label}
           </button>
@@ -90,35 +126,63 @@ export function BoardDiscussionOutcomePanel({
                 record.sourceContext.projectName}
             </p>
           ) : null}
+
+          {showNextStepChoices ? (
+            <div
+              className="boardroom-card-list"
+              data-testid="board-outcome-next-step-choices"
+            >
+              <p className="boardroom-purpose">
+                Recommended:{" "}
+                {BOARD_OUTCOME_NEXT_STEP_CHOICES.find(
+                  (c) => c.id === recommendedDestination,
+                )?.label || "Add to Plan"}
+              </p>
+              <div className="boardroom-actions" style={{ flexWrap: "wrap" }}>
+                {BOARD_OUTCOME_NEXT_STEP_CHOICES.map((choice) => (
+                  <button
+                    key={choice.id}
+                    type="button"
+                    className={
+                      choice.id === recommendedDestination
+                        ? "boardroom-btn boardroom-btn--primary"
+                        : "boardroom-btn boardroom-btn--secondary"
+                    }
+                    data-testid={choice.testId}
+                    title={choice.hint}
+                    onClick={() => runAction(choice.id, choice.label)}
+                  >
+                    {choice.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           <div
             className="boardroom-actions"
             style={{ flexWrap: "wrap" }}
             data-testid="board-outcome-secondary-actions"
           >
-            {visible.map((action) => (
+            {!decisionSaved ? (
               <button
-                key={action.id}
                 type="button"
                 className="boardroom-btn boardroom-btn--secondary"
-                data-testid={action.testId}
-                onClick={() => {
-                  onSecondaryAction?.(action.id, record);
-                  setStatusMessage(`Noted — ${action.label}.`);
-                }}
+                data-testid="board-outcome-record-decision"
+                onClick={() => runAction("save-decision", "Save Decision")}
               >
-                {action.label}
-              </button>
-            ))}
-            {canShowMore ? (
-              <button
-                type="button"
-                className="boardroom-btn boardroom-btn--ghost"
-                data-testid="board-outcome-show-more"
-                onClick={() => setRevealCount((n) => nextRevealCount(n))}
-              >
-                Show more options
+                Save Decision
               </button>
             ) : null}
+            <button
+              type="button"
+              className="boardroom-btn boardroom-btn--ghost"
+              data-testid="board-outcome-show-more"
+              aria-expanded={moreOpen}
+              onClick={() => setMoreOpen((v) => !v)}
+            >
+              More
+            </button>
             {onReturnToSource ? (
               <button
                 type="button"
@@ -131,6 +195,28 @@ export function BoardDiscussionOutcomePanel({
               </button>
             ) : null}
           </div>
+
+          {moreOpen ? (
+            <div
+              className="boardroom-actions"
+              style={{ flexWrap: "wrap" }}
+              data-testid="board-outcome-more-menu"
+              role="menu"
+            >
+              {BOARD_OUTCOME_MORE.map((action) => (
+                <button
+                  key={action.id}
+                  type="button"
+                  role="menuitem"
+                  className="boardroom-btn boardroom-btn--ghost"
+                  data-testid={action.testId}
+                  onClick={() => runAction(action.id, action.label)}
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </>
       )}
     </div>

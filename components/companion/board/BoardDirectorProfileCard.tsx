@@ -137,7 +137,7 @@ export function BoardDirectorProfileCard({
               onClick={onOpenPlaceAtTable}
               disabled={faded}
             >
-              My Place at the Table
+              View the Round Table
             </button>
           ) : null}
         </div>

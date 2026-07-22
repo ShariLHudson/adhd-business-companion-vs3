@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import {
-  getDirectorAccordionSections,
+  getDirectorMoreAccordionSections,
+  getDirectorPrimaryAccordionSections,
+  type BoardDirectorAccordionSection,
   type BoardDirectorAccordionSectionId,
 } from "@/lib/board/directorAccordion";
 import type { BoardDirectorDefinition } from "@/lib/board/types";
@@ -14,23 +17,21 @@ type Props = {
   disabled?: boolean;
 };
 
-/**
- * Shared Director profile accordion — same implementation for every Director.
- * Only one panel open at a time; last open id remembered by parent session store.
- */
-export function BoardDirectorProfileAccordion({
+function AccordionSectionList({
   director,
+  sections,
   openSectionId,
   onToggleSection,
-  disabled = false,
-}: Props) {
-  const sections = getDirectorAccordionSections(director);
-
+  disabled,
+}: {
+  director: BoardDirectorDefinition;
+  sections: BoardDirectorAccordionSection[];
+  openSectionId: BoardDirectorAccordionSectionId | null;
+  onToggleSection: (id: BoardDirectorAccordionSectionId) => void;
+  disabled?: boolean;
+}) {
   return (
-    <div
-      className="board-director-accordion"
-      data-testid={`board-director-accordion-${director.id}`}
-    >
+    <>
       {sections.map((section) => {
         const open = openSectionId === section.id;
         const panelId = `board-director-accordion-panel-${director.id}-${section.id}`;
@@ -96,6 +97,63 @@ export function BoardDirectorProfileAccordion({
           </div>
         );
       })}
+    </>
+  );
+}
+
+/**
+ * Shared Director profile accordion — three overview sections first,
+ * deeper material under More About This Director.
+ */
+export function BoardDirectorProfileAccordion({
+  director,
+  openSectionId,
+  onToggleSection,
+  disabled = false,
+}: Props) {
+  const [moreOpen, setMoreOpen] = useState(false);
+  const primary = getDirectorPrimaryAccordionSections(director);
+  const more = getDirectorMoreAccordionSections(director);
+
+  return (
+    <div
+      className="board-director-accordion"
+      data-testid={`board-director-accordion-${director.id}`}
+    >
+      <AccordionSectionList
+        director={director}
+        sections={primary}
+        openSectionId={openSectionId}
+        onToggleSection={onToggleSection}
+        disabled={disabled}
+      />
+
+      <div className="board-director-accordion__more">
+        <button
+          type="button"
+          className="board-director-accordion__more-toggle"
+          data-testid="board-director-accordion-more"
+          aria-expanded={moreOpen}
+          disabled={disabled}
+          onClick={() => setMoreOpen((v) => !v)}
+        >
+          {moreOpen ? "Hide more about this Director" : "More About This Director"}
+        </button>
+        {moreOpen ? (
+          <div
+            className="board-director-accordion__more-panel"
+            data-testid="board-director-accordion-more-panel"
+          >
+            <AccordionSectionList
+              director={director}
+              sections={more}
+              openSectionId={openSectionId}
+              onToggleSection={onToggleSection}
+              disabled={disabled}
+            />
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

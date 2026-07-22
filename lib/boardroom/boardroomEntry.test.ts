@@ -5,7 +5,9 @@
 
 import { describe, expect, it } from "vitest";
 import {
+  BOARDROOM_CHAMBER_CONTRAST_BLURB,
   BOARDROOM_HOME_PRIMARY_CHOICES,
+  BOARDROOM_HOW_TO_SUMMARY_LABEL,
   BOARDROOM_HOW_TO_USE_POINTS,
   BOARDROOM_WELCOME_MESSAGE,
   boardroomViewFromEntryIntent,
@@ -48,13 +50,14 @@ describe("Boardroom home entry", () => {
     expect(BOARDROOM_HOME_PRIMARY_CHOICES.map((c) => c.title)).toEqual([
       "Bring a Decision to the Board",
       "Meet the Directors",
-      "Review Past Board Discussions",
+      "Past Discussions",
     ]);
     expect(
       BOARDROOM_HOME_PRIMARY_CHOICES.some((c) =>
         c.title.toLowerCase().includes("how to use"),
       ),
     ).toBe(false);
+    expect(BOARDROOM_HOME_PRIMARY_CHOICES[0]?.prominence).toBe("primary");
   });
 
   it("maps primary choices to intake, gallery, and history views", () => {
@@ -65,10 +68,12 @@ describe("Boardroom home entry", () => {
     expect(boardroomViewFromEntryIntent("past")).toBe("past");
   });
 
-  it("How to Use is secondary guidance, not a primary choice", () => {
+  it("How the Boardroom Works is secondary guidance, not a primary choice", () => {
+    expect(BOARDROOM_HOW_TO_SUMMARY_LABEL).toBe("How the Boardroom Works");
     expect(BOARDROOM_HOW_TO_USE_POINTS.length).toBeGreaterThanOrEqual(4);
     expect(BOARDROOM_HOW_TO_USE_POINTS.join(" ")).toMatch(/decision-maker/i);
     expect(BOARDROOM_HOW_TO_USE_POINTS.join(" ")).toMatch(/Chamber/i);
+    expect(BOARDROOM_CHAMBER_CONTRAST_BLURB).toMatch(/Chamber Intelligence/i);
     expect(
       BOARDROOM_HOME_PRIMARY_CHOICES.find((c) => c.id === "how-to"),
     ).toBeUndefined();

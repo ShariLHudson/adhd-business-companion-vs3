@@ -20,7 +20,11 @@ export {
 } from "@/lib/board/boardDirectorRegistry";
 export {
   BOARD_DIRECTOR_ACCORDION_SECTION_IDS,
+  BOARD_DIRECTOR_PRIMARY_ACCORDION_SECTION_IDS,
+  BOARD_DIRECTOR_MORE_ACCORDION_SECTION_IDS,
   getDirectorAccordionSections,
+  getDirectorPrimaryAccordionSections,
+  getDirectorMoreAccordionSections,
   toggleDirectorAccordion,
   type BoardDirectorAccordionSection,
   type BoardDirectorAccordionSectionId,
@@ -29,7 +33,22 @@ export { BOARD_DIRECTOR_NARRATIVES } from "@/lib/board/directorProfileNarratives
 export {
   recommendBoardDirectorsForDecision,
   recommendationIncludesDevilsAdvocateAutomatically,
+  coreBoardDirectorIds,
+  recommendedMatchesCoreBoard,
 } from "@/lib/board/recommendBoardDirectors";
+export {
+  DIRECTOR_RESPONSE_PROFILES,
+  SHARED_PROHIBITED_BOARD_PHRASES,
+  getDirectorResponseProfile,
+  type DirectorResponseProfile,
+} from "@/lib/board/directorResponseProfiles";
+export { buildDirectorPerspectiveText } from "@/lib/board/buildDirectorPerspectiveText";
+export {
+  matterIdFromTopic,
+  relatedWorkFromBoardDecision,
+  type RelatedMatterReference,
+  type RelatedMatterSourceType,
+} from "@/lib/board/relatedMatter";
 export * from "@/lib/board/meetDirector";
 export * from "@/lib/board/boardReview";
 export * from "@/lib/board/roundTable";
@@ -123,10 +142,25 @@ export {
   type CallTheBoardPayload,
 } from "@/lib/board/callTheBoard";
 export {
+  boardMemberAddressPromptInstruction,
+  boardPossessiveMatter,
+  resolveAddressNameForBoard,
+  resolveBoardAddressName,
+  type BoardAddressNameSource,
+  type BoardMatterKind,
+  type BoardPersonalizationOptions,
+} from "@/lib/board/resolveBoardAddressName";
+export {
   BOARD_OUTCOME_PRIMARY,
   BOARD_OUTCOME_SECONDARY,
+  BOARD_OUTCOME_VISIBLE_SECONDARY,
+  BOARD_OUTCOME_NEXT_STEP_CHOICES,
+  BOARD_OUTCOME_MORE,
   nextRevealCount,
+  recommendNextStepDestination,
   visibleSecondaryOutcomeActions,
   type BoardOutcomePrimaryActionId,
+  type BoardOutcomeNextStepChoiceId,
   type BoardOutcomeSecondaryActionId,
 } from "@/lib/board/boardDiscussion/boardOutcomeActions";
+export { synthesizeBoardDecisionRecord } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";

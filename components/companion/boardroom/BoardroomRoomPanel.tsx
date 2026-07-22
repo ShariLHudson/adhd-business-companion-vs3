@@ -32,6 +32,8 @@ import {
   BOARDROOM_WELCOME_MESSAGE,
   BOARDROOM_HOME_PRIMARY_CHOICES,
   BOARDROOM_HOW_TO_USE_POINTS,
+  BOARDROOM_HOW_TO_SUMMARY_LABEL,
+  BOARDROOM_CHAMBER_CONTRAST_BLURB,
   boardroomViewFromEntryIntent,
   shouldOpenCarlosFromEntry,
   shouldOpenDavidFromEntry,
@@ -513,16 +515,13 @@ export function BoardroomRoomPanel({
           {view === "how-to" ? (
             <div data-testid="boardroom-how-to-view">
               <p className="boardroom-kicker">Boardroom</p>
-              <h2 className="boardroom-title">How to Use the Boardroom</h2>
+              <h2 className="boardroom-title">{BOARDROOM_HOW_TO_SUMMARY_LABEL}</h2>
               <div className="boardroom-gold-rule" aria-hidden />
               <div className="boardroom-how-to">
                 <WorkspaceAreaWorksGuide areaId="boardroom" />
               </div>
               <p className="boardroom-purpose mt-4">
-                Meet the Directors privately first if you like. When you are
-                ready, include the Chair in a Board Review and start a
-                discussion — one question at a time. The Chamber helps with
-                implementation later; the Board helps you decide.
+                {BOARDROOM_CHAMBER_CONTRAST_BLURB}
               </p>
               <div className="boardroom-actions">
                 <button
@@ -720,10 +719,19 @@ export function BoardroomRoomPanel({
                     <button
                       key={member.id}
                       type="button"
-                      className={`boardroom-card${selected ? " boardroom-card--selected" : ""}`}
+                      className={`boardroom-card board-director-card${selected ? " boardroom-card--selected" : ""}`}
                       onClick={() => toggleMember(member.id)}
                       aria-pressed={selected}
+                      data-selected={selected ? "true" : "false"}
                     >
+                      {selected ? (
+                        <span
+                          aria-hidden="true"
+                          className="boardroom-card__selection-check selection-check"
+                        >
+                          ✓
+                        </span>
+                      ) : null}
                       <div className="boardroom-card__title">{member.name}</div>
                       <div className="boardroom-card__meta">
                         <strong>{member.role}</strong>
@@ -906,6 +914,13 @@ function HomeView({
     "review-past": onReviewPast,
   };
 
+  const primary = BOARDROOM_HOME_PRIMARY_CHOICES.find(
+    (c) => c.id === "bring-decision",
+  )!;
+  const secondary = BOARDROOM_HOME_PRIMARY_CHOICES.filter(
+    (c) => c.id !== "bring-decision",
+  );
+
   return (
     <div className="boardroom-home" data-testid="boardroom-home">
       <p className="boardroom-kicker">Spark Estate</p>
@@ -917,6 +932,12 @@ function HomeView({
       >
         {BOARDROOM_WELCOME_MESSAGE}
       </p>
+      <p
+        className="boardroom-home__chamber-blurb"
+        data-testid="boardroom-chamber-contrast"
+      >
+        {BOARDROOM_CHAMBER_CONTRAST_BLURB}
+      </p>
 
       <div
         className="boardroom-home__actions"
@@ -924,22 +945,41 @@ function HomeView({
         aria-label="Boardroom primary choices"
         data-testid="boardroom-primary-choices"
       >
-        {BOARDROOM_HOME_PRIMARY_CHOICES.map((choice) => (
-          <button
-            key={choice.id}
-            type="button"
-            role="listitem"
-            className="boardroom-home__action-card"
-            data-testid={choice.testId}
-            data-choice-id={choice.id}
-            onClick={choiceHandlers[choice.id]}
-          >
-            <span className="boardroom-home__action-title">{choice.title}</span>
-            <span className="boardroom-home__action-meta">
-              {choice.description}
-            </span>
-          </button>
-        ))}
+        <button
+          type="button"
+          role="listitem"
+          className="boardroom-home__action-card boardroom-home__action-card--primary"
+          data-testid={primary.testId}
+          data-choice-id={primary.id}
+          onClick={choiceHandlers[primary.id]}
+        >
+          <span className="boardroom-home__action-title">{primary.title}</span>
+          <span className="boardroom-home__action-meta">
+            {primary.description}
+          </span>
+        </button>
+        <div
+          className="boardroom-home__secondary-actions"
+          role="group"
+          aria-label="More Boardroom destinations"
+        >
+          {secondary.map((choice) => (
+            <button
+              key={choice.id}
+              type="button"
+              role="listitem"
+              className="boardroom-home__action-card boardroom-home__action-card--secondary"
+              data-testid={choice.testId}
+              data-choice-id={choice.id}
+              onClick={choiceHandlers[choice.id]}
+            >
+              <span className="boardroom-home__action-title">{choice.title}</span>
+              <span className="boardroom-home__action-meta">
+                {choice.description}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <details
@@ -947,7 +987,7 @@ function HomeView({
         data-testid="boardroom-how-to-use"
       >
         <summary className="boardroom-home__how-to-summary">
-          How to Use the Boardroom
+          {BOARDROOM_HOW_TO_SUMMARY_LABEL}
         </summary>
         <ul className="boardroom-home__how-to-list">
           {BOARDROOM_HOW_TO_USE_POINTS.map((point) => (
@@ -967,6 +1007,7 @@ function DirectorPastDetailView({
   onBack: () => void;
 }) {
   const decision = record.decisionRecord;
+  const relatedWork = decision?.relatedWork ?? [];
   return (
     <div data-testid="board-director-past-detail">
       <p className="boardroom-kicker">Decision Record</p>
@@ -976,29 +1017,40 @@ function DirectorPastDetailView({
       {decision ? (
         <div className="boardroom-card-list mt-4">
           <div className="boardroom-card">
-            <div className="boardroom-card__title">Summary</div>
+            <div className="boardroom-card__title">Decision Record</div>
             <div className="boardroom-card__meta whitespace-pre-wrap">
               {decision.summary}
             </div>
           </div>
           <div className="boardroom-card">
-            <div className="boardroom-card__title">Key risks</div>
+            <div className="boardroom-card__title">Risks or unknowns</div>
             <div className="boardroom-card__meta whitespace-pre-wrap">
               {decision.keyRisks}
             </div>
           </div>
           <div className="boardroom-card">
-            <div className="boardroom-card__title">Final recommendation</div>
+            <div className="boardroom-card__title">Next useful step</div>
             <div className="boardroom-card__meta whitespace-pre-wrap">
-              {decision.finalRecommendation}
+              {decision.nextUsefulStep || decision.finalRecommendation}
             </div>
           </div>
-          {decision.relatedProjectName ? (
-            <div className="boardroom-card">
-              <div className="boardroom-card__title">Related Project</div>
-              <div className="boardroom-card__meta">
-                {decision.relatedProjectName}
-              </div>
+          {relatedWork.length > 0 || decision.relatedProjectName ? (
+            <div
+              className="boardroom-card"
+              data-testid="board-decision-related-work"
+            >
+              <div className="boardroom-card__title">Related Work</div>
+              <ul className="boardroom-card__meta" style={{ margin: 0, paddingLeft: "1.1rem" }}>
+                {relatedWork.map((ref) => (
+                  <li key={`${ref.sourceType}-${ref.sourceId}`}>
+                    {ref.label || ref.topic || ref.sourceType}
+                  </li>
+                ))}
+                {decision.relatedProjectName &&
+                !relatedWork.some((r) => r.sourceType === "project") ? (
+                  <li>{decision.relatedProjectName}</li>
+                ) : null}
+              </ul>
             </div>
           ) : null}
           <div className="boardroom-card">
@@ -1061,8 +1113,8 @@ function PastListView({
       <h2 className="boardroom-title">Past Discussions</h2>
       <div className="boardroom-gold-rule" aria-hidden />
       <p className="boardroom-purpose">
-        Decisions you chose to preserve. Board history stays separate from
-        Chamber advice and research notes.
+        Previous Board discussions you can reopen. Related Chamber or research
+        work may appear on each record when linked.
       </p>
 
       {!hasAny ? (
@@ -1078,24 +1130,42 @@ function PastListView({
           {boardDirectorItems.length > 0 ? (
             <div className="boardroom-card-list" data-testid="board-director-past-list">
               <p className="boardroom-past-section-label">Board of Directors</p>
-              {boardDirectorItems.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="boardroom-card"
-                  data-testid={`board-director-past-${item.id}`}
-                  onClick={() => onOpenDirectorPast(item)}
-                >
-                  <div className="boardroom-card__title">{item.title}</div>
-                  <div className="boardroom-card__meta">
-                    {formatDate(item.createdAt)} ·{" "}
-                    {item.directorIds
-                      .map((id) => getBoardDirectorById(id)?.name)
-                      .filter(Boolean)
-                      .join(", ")}
+              {boardDirectorItems.map((item) => {
+                const direction =
+                  item.decisionRecord?.currentDirection ||
+                  item.decisionRecord?.nextUsefulStep ||
+                  (item.status === "recommendation-accepted"
+                    ? "Recommendation accepted"
+                    : "In progress");
+                const directors = item.directorIds
+                  .map((id) => getBoardDirectorById(id)?.name)
+                  .filter(Boolean)
+                  .join(", ");
+                return (
+                  <div
+                    key={item.id}
+                    className="boardroom-card boardroom-past-card"
+                    data-testid={`board-director-past-${item.id}`}
+                  >
+                    <div className="boardroom-card__title">{item.title}</div>
+                    <div className="boardroom-card__meta">
+                      {formatDate(item.createdAt)}
+                    </div>
+                    <div className="boardroom-card__meta">{directors}</div>
+                    <div className="boardroom-card__meta">{direction}</div>
+                    <div className="boardroom-actions" style={{ marginTop: "0.65rem" }}>
+                      <button
+                        type="button"
+                        className="boardroom-btn boardroom-btn--secondary"
+                        data-testid={`board-director-past-open-${item.id}`}
+                        onClick={() => onOpenDirectorPast(item)}
+                      >
+                        Open
+                      </button>
+                    </div>
                   </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
           ) : null}
           {advisoryItems.length > 0 ? (

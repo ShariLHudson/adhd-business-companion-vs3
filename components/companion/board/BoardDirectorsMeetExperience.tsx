@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  getBoardDirectorById,
   toggleDirectorAccordion,
-  type BoardDirectorDefinition,
   type BoardDirectorId,
 } from "@/lib/board";
 import { listVisibleBoardDirectors } from "@/lib/board/visibleDirectors";
@@ -21,11 +19,9 @@ import {
 import {
   addDirectorToBoardReview,
   createEmptyBoardReviewState,
-  dismissFirstJoinInvite,
   isDirectorIncludedInBoardReview,
   removeDirectorFromBoardReview,
   startBoardReview,
-  suggestDirectorsFromBoardRelationships,
   type BoardReviewState,
 } from "@/lib/board/boardReview";
 import {
@@ -48,7 +44,6 @@ import {
 import { BoardDirectorProfileCard } from "@/components/companion/board/BoardDirectorProfileCard";
 import { BoardDirectorGalleryCard } from "@/components/companion/board/BoardDirectorGalleryCard";
 import { MeetDirectorConversationOverlay } from "@/components/companion/board/MeetDirectorConversationOverlay";
-import { BoardReviewFirstJoinInvite } from "@/components/companion/board/BoardReviewFirstJoinInvite";
 import { BoardReviewTray } from "@/components/companion/board/BoardReviewTray";
 import { CompactBoardDirectorSelector } from "@/components/companion/board/CompactBoardDirectorSelector";
 import { RoundTableOverlay } from "@/components/companion/board/RoundTableOverlay";
@@ -127,21 +122,6 @@ export function BoardDirectorsMeetExperience({
     onBoardReviewIdsChange?.(boardReview.selectedDirectorIds);
   }, [boardReview.selectedDirectorIds, onBoardReviewIdsChange]);
 
-  const suggestedDirectors = useMemo(() => {
-    if (!boardReview.showFirstJoinInvite) return [];
-    const ids = suggestDirectorsFromBoardRelationships(
-      boardReview.selectedDirectorIds,
-      boardReview.lastJoinedDirectorId,
-    );
-    return ids
-      .map((id) => getBoardDirectorById(id))
-      .filter((d): d is BoardDirectorDefinition => Boolean(d));
-  }, [boardReview]);
-
-  const joinedDirector = boardReview.lastJoinedDirectorId
-    ? getBoardDirectorById(boardReview.lastJoinedDirectorId)
-    : null;
-
   function openProfile(id: BoardDirectorId, opts?: { fromTable?: boolean }) {
     setProfileTransitionKey((k) => k + 1);
     setState((prev) => {
@@ -184,13 +164,6 @@ export function BoardDirectorsMeetExperience({
     setBoardReview((prev) => removeDirectorFromBoardReview(prev, id));
   }
 
-  function inviteSuggested(id: BoardDirectorId) {
-    setBoardReview((prev) =>
-      dismissFirstJoinInvite(addDirectorToBoardReview(prev, id)),
-    );
-    openProfile(id);
-  }
-
   function openMyPlaceAtTheTable() {
     const active =
       state.route.screen === "gallery" ? null : state.route.directorId;
@@ -225,19 +198,6 @@ export function BoardDirectorsMeetExperience({
   );
 
 
-  const firstJoin =
-    boardReview.showFirstJoinInvite && joinedDirector ? (
-      <BoardReviewFirstJoinInvite
-        joinedDirector={joinedDirector}
-        suggestions={suggestedDirectors}
-        onInviteSuggestion={inviteSuggested}
-        onDismiss={() =>
-          setBoardReview((prev) => dismissFirstJoinInvite(prev))
-        }
-        onBrowseDirectors={backToGallery}
-      />
-    ) : null;
-
   const roundTableOverlay = (
     <RoundTableOverlay
       open={roundTable.open}
@@ -253,10 +213,10 @@ export function BoardDirectorsMeetExperience({
     <button
       type="button"
       className="boardroom-btn boardroom-btn--secondary board-directors-meet__table-btn"
-      data-testid="board-my-place-at-the-table"
+      data-testid="board-view-round-table"
       onClick={openMyPlaceAtTheTable}
     >
-      My Place at the Table
+      View the Round Table
     </button>
   );
 
@@ -284,7 +244,6 @@ export function BoardDirectorsMeetExperience({
         </p>
         <div className="board-directors-meet__nav-actions">{placeAtTableBtn}</div>
         {reviewTray}
-        {firstJoin}
         <CompactBoardDirectorSelector
           selectedIds={boardReview.selectedDirectorIds}
           onChange={(ids) => {
@@ -360,7 +319,6 @@ export function BoardDirectorsMeetExperience({
         {placeAtTableBtn}
       </div>
       {reviewTray}
-      {firstJoin}
       <div
         key={`${director.id}-${profileTransitionKey}`}
         className="board-director-profile-transition"

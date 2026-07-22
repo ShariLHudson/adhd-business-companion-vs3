@@ -53,7 +53,7 @@ export const ROUND_TABLE_SEATS: readonly RoundTableSeat[] = (() => {
     x: memberPos.x,
     y: memberPos.y,
     kind: "member",
-    label: "My Place at the Table",
+    label: "Your seat",
   });
 
   for (let i = 0; i < CHAIR_AND_FUTURE_SLOTS; i++) {
