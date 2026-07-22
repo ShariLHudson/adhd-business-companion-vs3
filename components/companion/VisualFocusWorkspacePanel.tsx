@@ -3,6 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { VisualFocusPurposeAnchor } from "@/components/companion/VisualFocusPurposeAnchor";
 import { CartographersStudioRoom } from "@/components/companion/cartographersStudio/CartographersStudioRoom";
+import { MapEntryPanel } from "@/components/companion/cartographersStudio/MapEntryPanel";
+import { MapGuidedBuilder } from "@/components/companion/cartographersStudio/MapGuidedBuilder";
+import { MyMapsPanel } from "@/components/companion/cartographersStudio/MyMapsPanel";
 import { MindMapDiscoveryInterview } from "@/components/companion/cartographersStudio/MindMapDiscoveryInterview";
 import { MindMapEditableCanvas } from "@/components/companion/cartographersStudio/MindMapEditableCanvas";
 import { VisualFocusVisualCanvas } from "@/components/companion/visualFocus/VisualFocusVisualCanvas";
@@ -28,8 +31,12 @@ import {
   CARTOGRAPHERS_RETURN_TO_ESTATE,
   CARTOGRAPHERS_STUDIO_BACKGROUND,
   CARTOGRAPHERS_UPDATE_MAP,
+  getCartographyMapDefinition,
+  type CartographersFramedMapId,
 } from "@/lib/cartographersStudio";
 import { CartographersContextualHelp } from "@/components/companion/cartographersStudio/CartographersContextualHelp";
+import { buildDraftFromGuidedAnswers } from "@/lib/visualFocus/guidedBuilder";
+import { printVisualFocusMap } from "@/lib/visualFocus/printMap";
 import {
   applyCanonicalRootChange,
   canvasSyncStatusLabel,
@@ -318,6 +325,16 @@ export function VisualFocusWorkspacePanel({
   const [mindMapDiscoverySeed, setMindMapDiscoverySeed] = useState<
     string | undefined
   >(undefined);
+  const [entryMapId, setEntryMapId] =
+    useState<CartographersFramedMapId | null>(null);
+  const [guidedMapId, setGuidedMapId] =
+    useState<CartographersFramedMapId | null>(null);
+  const [guidedInitialAnswers, setGuidedInitialAnswers] = useState<
+    Record<string, string> | undefined
+  >(undefined);
+  const [myMapsOpen, setMyMapsOpen] = useState(false);
+  const [mapUpdatedAck, setMapUpdatedAck] = useState<string | null>(null);
+  const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [showDraftReview, setShowDraftReview] = useState(false);
   const [atlasSaveAck, setAtlasSaveAck] = useState<string | null>(null);
   const [showBuildPanel, setShowBuildPanel] = useState(true);
@@ -340,6 +357,11 @@ export function VisualFocusWorkspacePanel({
     setWorkspaceMode("build");
     setMindMapDiscoveryOpen(false);
     setMindMapDiscoverySeed(undefined);
+    setEntryMapId(null);
+    setGuidedMapId(null);
+    setGuidedInitialAnswers(undefined);
+    setMyMapsOpen(false);
+    setMoreMenuOpen(false);
     setShowDraftReview(false);
   }, []);
 
@@ -350,6 +372,8 @@ export function VisualFocusWorkspacePanel({
     setWorkspaceMode("build");
     setShowDraftReview(false);
     setPendingCreateMode(null);
+    setEntryMapId(null);
+    setGuidedMapId(null);
     setMindMapDiscoverySeed(seedText?.trim() || undefined);
     setMindMapDiscoveryOpen(true);
   }, []);
@@ -480,7 +504,52 @@ export function VisualFocusWorkspacePanel({
   }
 
   function handleSelectMindMapFromRoom() {
-    openMindMapDiscovery();
+    setEntryMapId("mind-map");
+  }
+
+  function handleSelectWallMap(id: CartographersFramedMapId) {
+    setGuidedMapId(null);
+    setMindMapDiscoveryOpen(false);
+    setEntryMapId(id);
+  }
+
+  function beginSelectedMap(id: CartographersFramedMapId) {
+    const def = getCartographyMapDefinition(id);
+    setEntryMapId(null);
+    if (def.builderType === "mind-map-discovery") {
+      openMindMapDiscovery();
+      return;
+    }
+    setGuidedInitialAnswers(undefined);
+    setGuidedMapId(id);
+  }
+
+  function handleGuidedComplete(
+    wallId: CartographersFramedMapId,
+    answers: Record<string, string>,
+  ) {
+    const def = getCartographyMapDefinition(wallId);
+    const draft = buildDraftFromGuidedAnswers(def, answers);
+    const map = createAndActivateMap(def.visualFocusMode, draft.title);
+    const seeded: VisualFocusMap = {
+      ...map,
+      title: draft.title,
+      root: draft.root,
+      summary: draft.summaryHint,
+      lifecycleStatus: "draft",
+    };
+    const withLayout = generateVisualFocusMap(seeded);
+    const saved = persist(withLayout);
+    setActive(saved);
+    setMaps(listVisualFocusMaps());
+    setView("workspace");
+    setWorkspaceMode("generated");
+    setMindHistory(null);
+    setGuidedMapId(null);
+    setGuidedInitialAnswers(undefined);
+    setShowDraftReview(false);
+    setMapUpdatedAck("Your map is ready.");
+    window.setTimeout(() => setMapUpdatedAck(null), 3200);
   }
 
   function handleMindMapDiscoveryComplete(answers: {
@@ -506,6 +575,30 @@ export function VisualFocusWorkspacePanel({
     setShowDraftReview(true);
     setMindMapDiscoveryOpen(false);
     setMindMapDiscoverySeed(undefined);
+  }
+
+  function handleEditActiveMap() {
+    if (!active) return;
+    setMoreMenuOpen(false);
+    setWorkspaceMode("build");
+    setShowDraftReview(false);
+    if (active.mode === "mind-map") {
+      setMindHistory(createMindMapHistory(active.root));
+    }
+  }
+
+  function handlePrintActiveMap() {
+    if (!active) return;
+    setMoreMenuOpen(false);
+    printVisualFocusMap(active);
+  }
+
+  function handleRenameActiveMap(title: string) {
+    if (!active) return;
+    const saved = persist({ ...active, title, updatedAt: new Date().toISOString() });
+    setActive(saved);
+    setMapUpdatedAck("Your map has been updated.");
+    window.setTimeout(() => setMapUpdatedAck(null), 3200);
   }
 
   function handleCreate(mode: VisualFocusMode, purposeAnswer: string) {
@@ -660,40 +753,109 @@ export function VisualFocusWorkspacePanel({
       data-visual-focus-view={view}
       data-workspace-mode={workspaceMode}
     >
+      <ConfirmDialog
+        open={Boolean(hubDeleteMap)}
+        title="Delete this map?"
+        message={
+          hubDeleteMap
+            ? `"${hubDeleteMap.title?.trim() || "Untitled map"}" will be removed from My Maps. This cannot be undone.`
+            : "This cannot be undone."
+        }
+        confirmLabel="Delete Map"
+        cancelLabel="Cancel"
+        destructive
+        onCancel={() => setHubDeleteMapId(null)}
+        onConfirm={() => {
+          if (!hubDeleteMapId) return;
+          deleteVisualFocusMap(hubDeleteMapId);
+          setHubDeleteMapId(null);
+          if (active?.id === hubDeleteMapId) {
+            backToStudio();
+          }
+          reload();
+          setMyMapsOpen(true);
+          setMapUpdatedAck("Map deleted.");
+          window.setTimeout(() => setMapUpdatedAck(null), 2800);
+        }}
+      />
       {view === "hub" ? (
         <>
           <CartographersStudioRoom
             continueThinking={continueThinking}
             onSelectMindMap={handleSelectMindMapFromRoom}
+            onSelectWallMap={handleSelectWallMap}
             onOpenMap={handleOpenMap}
             onRemoveMap={handleRemoveContinueThinkingMap}
             onDeleteMap={handleRequestDeleteContinueThinkingMap}
+            onViewMyMaps={() => setMyMapsOpen(true)}
             onReturnToEstate={onReturnToEstate ?? onClose ?? onBack}
             onBack={onBack}
             onClose={onClose}
           />
-          <ConfirmDialog
-            open={Boolean(hubDeleteMap)}
-            title="Delete Map"
-            message={
-              hubDeleteMap
-                ? `Delete "${hubDeleteMap.title}" permanently? This cannot be undone.`
-                : "This action cannot be undone."
-            }
-            confirmLabel="Delete"
-            cancelLabel="Cancel"
-            destructive
-            onCancel={() => setHubDeleteMapId(null)}
-            onConfirm={() => {
-              if (!hubDeleteMapId) return;
-              deleteVisualFocusMap(hubDeleteMapId);
-              setHubDeleteMapId(null);
-              if (active?.id === hubDeleteMapId) {
-                backToStudio();
+          {entryMapId ? (
+            <MapEntryPanel
+              definition={getCartographyMapDefinition(entryMapId)}
+              existingMaps={maps}
+              onClose={() => setEntryMapId(null)}
+              onBegin={() => beginSelectedMap(entryMapId)}
+              onContinue={(mapId) => {
+                setEntryMapId(null);
+                handleOpenMap(mapId);
+              }}
+              onViewMyMaps={() => {
+                setEntryMapId(null);
+                setMyMapsOpen(true);
+              }}
+            />
+          ) : null}
+          {guidedMapId ? (
+            <MapGuidedBuilder
+              key={guidedMapId}
+              definition={getCartographyMapDefinition(guidedMapId)}
+              initialAnswers={guidedInitialAnswers}
+              onCancel={() => {
+                setGuidedMapId(null);
+                setGuidedInitialAnswers(undefined);
+              }}
+              onComplete={(answers) =>
+                handleGuidedComplete(guidedMapId, answers)
               }
-              reload();
-            }}
-          />
+            />
+          ) : null}
+          {myMapsOpen ? (
+            <MyMapsPanel
+              maps={maps.filter((m) => m.lifecycleStatus !== "deleted")}
+              onClose={() => setMyMapsOpen(false)}
+              onCreate={() => {
+                setMyMapsOpen(false);
+              }}
+              onOpen={(id) => {
+                setMyMapsOpen(false);
+                handleOpenMap(id);
+              }}
+              onEdit={(id) => {
+                setMyMapsOpen(false);
+                openMapWorkspace(id, false);
+              }}
+              onPrint={(id) => {
+                const map = getVisualFocusMapById(id);
+                if (map) printVisualFocusMap(map);
+              }}
+              onRename={(id, title) => {
+                const map = getVisualFocusMapById(id);
+                if (!map) return;
+                saveVisualFocusMap({
+                  ...map,
+                  title,
+                  updatedAt: new Date().toISOString(),
+                });
+                reload();
+              }}
+              onDelete={(id) => {
+                setHubDeleteMapId(id);
+              }}
+            />
+          ) : null}
           {mindMapDiscoveryOpen ? (
             <div className="cartographers-discovery-layer">
               <MindMapDiscoveryInterview
@@ -713,6 +875,11 @@ export function VisualFocusWorkspacePanel({
               onCancel={() => setPendingCreateMode(null)}
               onConfirm={(answer) => handleCreate(pendingCreateMode, answer)}
             />
+          ) : null}
+          {mapUpdatedAck ? (
+            <p className="cartographers-atlas-ack" role="status" aria-live="polite">
+              {mapUpdatedAck}
+            </p>
           ) : null}
         </>
       ) : active ? (
@@ -869,9 +1036,14 @@ export function VisualFocusWorkspacePanel({
             ) : showGenerated ? (
               <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-                    Strategic view
-                  </p>
+                  <div>
+                    <h2 className="text-lg font-semibold text-[#1f1c19]">
+                      {active.title?.trim() || "Untitled map"}
+                    </h2>
+                    <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                      Visual map
+                    </p>
+                  </div>
                   <div className="flex flex-wrap items-center gap-2">
                     {canvasSyncStatus !== "synced" ? (
                       <p
@@ -889,9 +1061,89 @@ export function VisualFocusWorkspacePanel({
                     ) : null}
                     <button
                       type="button"
+                      className="rounded-lg border border-[#1e4f4f] bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#163b3b]"
+                      data-testid="cartographers-edit-map"
+                      onClick={handleEditActiveMap}
+                    >
+                      Edit Map
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
+                      data-testid="cartographers-print-map"
+                      onClick={handlePrintActiveMap}
+                    >
+                      Print
+                    </button>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
+                        data-testid="cartographers-map-more"
+                        aria-expanded={moreMenuOpen}
+                        aria-haspopup="menu"
+                        onClick={() => setMoreMenuOpen((o) => !o)}
+                      >
+                        More
+                      </button>
+                      {moreMenuOpen ? (
+                        <ul
+                          className="cartographers-my-maps__menu"
+                          role="menu"
+                          style={{ right: 0, left: "auto" }}
+                        >
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={() => {
+                                const next = window.prompt(
+                                  "Rename this map",
+                                  active.title,
+                                );
+                                if (next != null) {
+                                  handleRenameActiveMap(next.trim() || active.title);
+                                }
+                                setMoreMenuOpen(false);
+                              }}
+                            >
+                              Rename
+                            </button>
+                          </li>
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={handlePrintActiveMap}
+                            >
+                              Print
+                            </button>
+                          </li>
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              className="cartographers-my-maps__danger"
+                              onClick={() => {
+                                setMoreMenuOpen(false);
+                                setHubDeleteMapId(active.id);
+                              }}
+                            >
+                              Delete
+                            </button>
+                          </li>
+                        </ul>
+                      ) : null}
+                    </div>
+                    <button
+                      type="button"
                       className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
                       data-testid="cartographers-update-map"
-                      onClick={handleRefreshCanvas}
+                      onClick={() => {
+                        handleRefreshCanvas();
+                        setMapUpdatedAck("Your map has been updated.");
+                        window.setTimeout(() => setMapUpdatedAck(null), 3200);
+                      }}
                     >
                       {CARTOGRAPHERS_UPDATE_MAP}
                     </button>
@@ -901,6 +1153,11 @@ export function VisualFocusWorkspacePanel({
                     />
                   </div>
                 </div>
+                {mapUpdatedAck ? (
+                  <p className="cartographers-atlas-ack" role="status" aria-live="polite">
+                    {mapUpdatedAck}
+                  </p>
+                ) : null}
                 <div
                   className={`flex min-h-0 flex-1 flex-col gap-4 ${
                     intelligenceViewMode === "canvas-intelligence"
@@ -1043,14 +1300,25 @@ export function VisualFocusWorkspacePanel({
                   />
                 )}
                 {canGenerateVisualFocusMap(active) ? (
-                  <div className="sticky bottom-4 mt-6 flex justify-center">
+                  <div className="sticky bottom-4 mt-6 flex justify-center gap-3">
                     <button
                       type="button"
-                      onClick={handleGenerate}
+                      onClick={() => {
+                        handleGenerate();
+                        setMapUpdatedAck("Your map has been updated.");
+                        window.setTimeout(() => setMapUpdatedAck(null), 3200);
+                      }}
                       className="rounded-full bg-[#1e4f4f] px-6 py-3 text-sm font-bold text-white shadow-md hover:bg-[#163b3b]"
                       data-testid="visual-focus-generate"
                     >
                       {generateMapLabelForMode(active.mode)}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handlePrintActiveMap}
+                      className="rounded-full border border-[#c9bfb0] bg-white px-6 py-3 text-sm font-bold text-[#1e4f4f]"
+                    >
+                      Print
                     </button>
                   </div>
                 ) : (
