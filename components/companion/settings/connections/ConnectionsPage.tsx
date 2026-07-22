@@ -20,6 +20,7 @@ import {
 } from "@/lib/connections";
 import { OnlinePresenceSection } from "@/components/companion/settings/profile/OnlinePresenceSection";
 import { ServiceManagePanel } from "@/components/companion/settings/connected-services/ServiceManagePanel";
+import { SettingsDropdown } from "@/components/companion/settings";
 
 type GoogleSnap = {
   configured: boolean;
@@ -45,8 +46,11 @@ type Props = {
 };
 
 /**
- * Settings → Connections — Services (expandable categories) + Social Media.
- * Single source of truth; no Preferred Destinations / browser shortcuts.
+ * Settings → Connections — Services + Social Media.
+ * Services are presented as a single dropdown — pick a service category to
+ * see and connect it. Only one category's connections are open at a time;
+ * choosing another category replaces it. Single source of truth; no
+ * Preferred Destinations / browser shortcuts.
  */
 export function ConnectionsPage({
   google,
@@ -64,7 +68,8 @@ export function ConnectionsPage({
   wrapClassName,
   returnToQuery = "/companion?settings=connections",
 }: Props) {
-  const [expanded, setExpanded] = useState<ServiceCategoryId | null>("calendar");
+  const [selectedCategory, setSelectedCategory] =
+    useState<ServiceCategoryId>("calendar");
   const [managingId, setManagingId] = useState<SettingsConnectionId | null>(
     null,
   );
@@ -77,6 +82,17 @@ export function ConnectionsPage({
     canvaConnected,
     googleAuthHref,
   });
+
+  const activeCategory =
+    categories.find((c) => c.id === selectedCategory) ?? categories[0] ?? null;
+
+  const categoryOptions = categories.map((category) => ({
+    value: category.id,
+    label:
+      category.connectedCount > 0
+        ? `${category.label} — ${category.connectedCount} ready`
+        : category.label,
+  }));
 
   const manageCards = buildSettingsConnectionCards({
     google,
@@ -224,132 +240,102 @@ export function ConnectionsPage({
           already use.
         </p>
 
-        <div className="mt-3 flex flex-col gap-2">
-          {categories.map((category) => {
-            const isOpen = expanded === category.id;
-            return (
-              <div
-                key={category.id}
-                className="rounded-xl border border-[#d4cdc3] bg-white/85"
-                data-testid={`connections-category-${category.id}`}
-              >
-                <button
-                  type="button"
-                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
-                  aria-expanded={isOpen}
-                  onClick={() =>
-                    setExpanded((current) =>
-                      current === category.id ? null : category.id,
-                    )
-                  }
-                  data-testid={`connections-category-toggle-${category.id}`}
-                >
-                  <span className="text-base font-semibold text-[#1f1c19]">
-                    {category.label}
-                  </span>
-                  <span className="text-sm text-[#6b635a]">
-                    {category.connectedCount > 0
-                      ? `${category.connectedCount} ready`
-                      : "Add"}
-                    <span className="ml-2" aria-hidden>
-                      {isOpen ? "▾" : "▸"}
-                    </span>
-                  </span>
-                </button>
-
-                {isOpen ? (
-                  <ul className="border-t border-[#e7dfd4] px-2 py-2">
-                    {category.items.map((item) => (
-                      <li key={item.id} className="py-1">
-                        <button
-                          type="button"
-                          className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-[#1e4f4f]/[0.05]"
-                          onClick={() => selectService(item.id)}
-                          data-testid={`connections-service-${item.id}`}
-                          data-connection-status={
-                            item.showConnectedCheck
-                              ? "connected"
-                              : "disconnected"
-                          }
-                        >
-                          <span className="text-sm font-semibold text-[#1f1c19]">
-                            {item.label}
-                          </span>
-                          <span className="text-sm font-semibold text-[#1e4f4f]">
-                            {item.showConnectedCheck
-                              ? "Connected ✓"
-                              : item.status === "needs_attention"
-                                ? "Needs attention"
-                                : "Connect"}
-                          </span>
-                        </button>
-                        {isManagingItem(item.id) && managingId ? (
-                          <div className="px-2 pb-2">
-                            {(() => {
-                              const card = manageCardFor(managingId);
-                              if (!card) return null;
-                              return (
-                                <ServiceManagePanel
-                                  card={card}
-                                  canvaDraftUrl={canvaDraftUrl}
-                                  canvaFeedback={canvaFeedback}
-                                  onCanvaDraftChange={onCanvaDraftChange}
-                                  onCanvaSave={() =>
-                                    applyCanvaUrl(canvaDraftUrl)
-                                  }
-                                  onCanvaVerify={() => {
-                                    const result = verifyCanvaConnection();
-                                    onCanvaFeedback(
-                                      result.ok
-                                        ? "Canva link looks good."
-                                        : result.reason,
-                                    );
-                                    refreshCanva();
-                                  }}
-                                  onDisconnect={() => {
-                                    if (card.kind === "google") {
-                                      disconnectGoogle();
-                                    } else if (
-                                      card.kind === "outlook-calendar"
-                                    ) {
-                                      disconnectOutlookCalendarLocal();
-                                      refreshOutlook();
-                                      setManagingId(null);
-                                      flashMsg(
-                                        "Outlook Calendar disconnected.",
-                                      );
-                                    } else {
-                                      disconnectCanvaLocal();
-                                      onCanvaDraftChange("");
-                                      onCanvaFeedback(null);
-                                      refreshCanva();
-                                      setManagingId(null);
-                                      flashMsg("Canva disconnected.");
-                                    }
-                                  }}
-                                  onReconnect={
-                                    card.kind === "google"
-                                      ? () => {
-                                          if (typeof window !== "undefined") {
-                                            window.location.href =
-                                              googleAuthHref;
-                                          }
-                                        }
-                                      : undefined
-                                  }
-                                />
-                              );
-                            })()}
-                          </div>
-                        ) : null}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
-            );
-          })}
+        <div className="mt-3">
+          <SettingsDropdown
+            id="connections-service-category"
+            label="Choose a service to connect"
+            value={selectedCategory}
+            options={categoryOptions}
+            onChange={(next) => setSelectedCategory(next as ServiceCategoryId)}
+            testId="connections-service-select"
+          />
         </div>
+
+        {activeCategory ? (
+          <div
+            className="mt-3 rounded-xl border border-[#d4cdc3] bg-white/85"
+            data-testid={`connections-category-${activeCategory.id}`}
+          >
+            <ul className="px-2 py-2">
+              {activeCategory.items.map((item) => (
+                <li key={item.id} className="py-1">
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left hover:bg-[#1e4f4f]/[0.05]"
+                    onClick={() => selectService(item.id)}
+                    data-testid={`connections-service-${item.id}`}
+                    data-connection-status={
+                      item.showConnectedCheck ? "connected" : "disconnected"
+                    }
+                  >
+                    <span className="text-sm font-semibold text-[#1f1c19]">
+                      {item.label}
+                    </span>
+                    <span className="text-sm font-semibold text-[#1e4f4f]">
+                      {item.showConnectedCheck
+                        ? "Connected ✓"
+                        : item.status === "needs_attention"
+                          ? "Needs attention"
+                          : "Connect"}
+                    </span>
+                  </button>
+                  {isManagingItem(item.id) && managingId ? (
+                    <div className="px-2 pb-2">
+                      {(() => {
+                        const card = manageCardFor(managingId);
+                        if (!card) return null;
+                        return (
+                          <ServiceManagePanel
+                            card={card}
+                            canvaDraftUrl={canvaDraftUrl}
+                            canvaFeedback={canvaFeedback}
+                            onCanvaDraftChange={onCanvaDraftChange}
+                            onCanvaSave={() => applyCanvaUrl(canvaDraftUrl)}
+                            onCanvaVerify={() => {
+                              const result = verifyCanvaConnection();
+                              onCanvaFeedback(
+                                result.ok
+                                  ? "Canva link looks good."
+                                  : result.reason,
+                              );
+                              refreshCanva();
+                            }}
+                            onDisconnect={() => {
+                              if (card.kind === "google") {
+                                disconnectGoogle();
+                              } else if (card.kind === "outlook-calendar") {
+                                disconnectOutlookCalendarLocal();
+                                refreshOutlook();
+                                setManagingId(null);
+                                flashMsg("Outlook Calendar disconnected.");
+                              } else {
+                                disconnectCanvaLocal();
+                                onCanvaDraftChange("");
+                                onCanvaFeedback(null);
+                                refreshCanva();
+                                setManagingId(null);
+                                flashMsg("Canva disconnected.");
+                              }
+                            }}
+                            onReconnect={
+                              card.kind === "google"
+                                ? () => {
+                                    if (typeof window !== "undefined") {
+                                      window.location.href = googleAuthHref;
+                                    }
+                                  }
+                                : undefined
+                            }
+                          />
+                        );
+                      })()}
+                    </div>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </section>
 
       <section className="mt-8" data-testid="connections-social-media">
