@@ -9,7 +9,7 @@ import {
   CREATE_ESTATE_CONFIRM_CANCEL,
   CREATE_ESTATE_CONFIRM_OTHER,
   CREATE_ESTATE_MANAGE_WORK_LABEL,
-  CREATE_ESTATE_PREVIOUS_WORK_EMPTY,
+  CREATE_ESTATE_SAVED_CREATIONS_EMPTY,
 } from "./copy";
 import {
   createConfirmPrimaryLabel,
@@ -50,16 +50,18 @@ describe("Create polish 130 certification", () => {
     expect(createConfirmPrimaryLabel("Blog Post")).toBe("Create Blog Post");
   });
 
-  it("entrance wires catalog confirm from Explore Ideas + Cancel", () => {
+  it("entrance wires catalog confirm from every discovery path + Cancel", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
     expect(panel).toContain("resolveCatalogCreateConfirm");
     expect(panel).toContain("requestCatalogConfirm");
     expect(panel).toContain("onRequestCreate={requestCatalogConfirm}");
     expect(panel).not.toContain("requestFrameworkConfirm");
     expect(panel).toContain("create-estate-confirm-cancel");
     expect(panel).toContain("createConfirmPrimaryLabel");
-    expect(explore).toContain("CREATE_ESTATE_PREVIOUS_WORK_EMPTY");
+    const findPrevious = read(
+      "components/companion/CreateFindPreviousWorkPanel.tsx",
+    );
+    expect(findPrevious).toContain("CREATE_ESTATE_SAVED_CREATIONS_EMPTY");
     expect(CREATE_ESTATE_CONFIRM_CANCEL).toBe("Cancel");
     expect(CREATE_ESTATE_CONFIRM_OTHER).toBe("Choose something else");
   });
@@ -82,10 +84,14 @@ describe("Create polish 130 certification", () => {
     expect(resolveWorkTypeVisual("Workshop").kind).toBe("workshop");
   });
 
-  it("empty Previous Work teaches", () => {
-    expect(CREATE_ESTATE_PREVIOUS_WORK_EMPTY).toMatch(/No older drafts/i);
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
-    expect(explore).toContain("create-estate-previous-work-empty");
+  it("empty Find Previous Work teaches instead of showing a blank list", () => {
+    expect(CREATE_ESTATE_SAVED_CREATIONS_EMPTY).toBe(
+      "Your saved creations will appear here.",
+    );
+    const findPrevious = read(
+      "components/companion/CreateFindPreviousWorkPanel.tsx",
+    );
+    expect(findPrevious).toContain("create-find-previous-work-empty");
   });
 
   it("post-create Undo eligible until meaningful edit or timeout", () => {
@@ -131,7 +137,7 @@ describe("Create polish 130 certification", () => {
   it("preserves 127/129 confirm gate and hierarchy", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-intent-confirm");
-    expect(panel).toContain("create-estate-explore-ideas");
+    expect(panel).toContain("create-estate-browse-more");
     expect(panel).toContain("CreateWorkspaceResumeList");
   });
 });

@@ -122,12 +122,13 @@ describe("Spec 135 — Create 12/10 certification polish", () => {
     expect(listSessionCreateIntentCorrections().length).toBeLessThanOrEqual(24);
   });
 
-  it("Explore Ideas no longer duplicates Continue Working list", () => {
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
-    expect(explore).not.toContain("CreateWorkspaceResumeList");
-    expect(explore).not.toContain("create-explore-continue-working");
-    expect(explore).toContain("create-explore-continue-something");
-    expect(explore).toContain("create-estate-previous-work");
+  it("Find Previous Work no longer duplicates Continue Working list", () => {
+    const findPrevious = read(
+      "components/companion/CreateFindPreviousWorkPanel.tsx",
+    );
+    expect(findPrevious).not.toContain("CreateWorkspaceResumeList");
+    expect(findPrevious).toContain("CreateDraftResumeList");
+    expect(findPrevious).toContain("create-find-previous-work-empty");
   });
 
   it("entrance Escape cancels confirm before leaving Create", () => {

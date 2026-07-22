@@ -1,17 +1,17 @@
 /**
- * Spec 133 — Create Discovery Experience Redesign certification (entrance wiring).
+ * Spec 133 → Create Simplification & Category Evaluation.
+ * Explore Ideas (single collapsed discovery surface) was superseded by two
+ * clearly separate optional sections: Find Previous Work and Browse More.
+ * This certifies the entrance no longer offers a single dense discovery
+ * surface and instead keeps the default screen calm (Parts 1–4).
  */
 
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
-  CREATE_ESTATE_EXPLORE_IDEAS_HEADING,
-  CREATE_ESTATE_MORE_WAYS_HEADING,
-  CREATE_ESTATE_CONTINUE_SOMETHING_HEADING,
-  CREATE_ESTATE_INSPIRATION_HEADING,
-  CREATE_ESTATE_CATEGORIES_HEADING,
-  CREATE_ESTATE_RECOMMENDED_HEADING,
+  CREATE_ESTATE_BROWSE_MORE_HEADING,
+  CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
 } from "./copy";
 import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
 
@@ -19,49 +19,47 @@ function read(pathFromRoot: string): string {
   return readFileSync(resolve(process.cwd(), pathFromRoot), "utf8");
 }
 
-describe("Spec 133 — Create Explore Ideas discovery", () => {
-  it("replaces More Ways to Start with Explore Ideas on entrance", () => {
+describe("Create Simplification — Find Previous Work + Browse More replace Explore Ideas", () => {
+  it("entrance no longer wires the old single Explore Ideas surface", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    expect(panel).toContain("create-estate-explore-ideas");
-    expect(panel).toContain("CreateExploreIdeasPanel");
-    expect(panel).toContain("CREATE_ESTATE_EXPLORE_IDEAS_HEADING");
+    expect(panel).not.toContain("CreateExploreIdeasPanel");
+    expect(panel).not.toContain('data-testid="create-estate-explore-ideas"');
+    expect(panel).toContain("create-estate-find-previous-work");
+    expect(panel).toContain("create-estate-browse-more");
     expect(panel).not.toContain("create-estate-guided-frameworks");
     expect(panel).not.toContain("UniversalBlueprintInterface");
     expect(panel).not.toContain("CreateCatalogPicker");
     expect(panel).not.toContain("create-estate-blueprint-marketing");
     expect(panel).not.toMatch(/aria-pressed=\{blueprintWorkTypeId/);
-    expect(CREATE_ESTATE_EXPLORE_IDEAS_HEADING).toBe("Explore Ideas");
-    expect(CREATE_ESTATE_MORE_WAYS_HEADING).toBe("Explore Ideas");
+    expect(CREATE_ESTATE_BROWSE_MORE_HEADING).toBe("Browse More");
+    expect(CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING).toBe(
+      "Find Previous Work",
+    );
   });
 
-  it("Explore Ideas body has continue → search → recommended → categories", () => {
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
-    const continueAt = explore.indexOf(
-      'data-testid="create-explore-continue-something"',
+  it("Browse More opens curated categories, not a full catalog dump", () => {
+    const browse = read(
+      "components/companion/CreateBrowseCategoriesPanel.tsx",
     );
-    const searchAt = explore.indexOf('data-testid="create-explore-inspiration"');
-    const recommendedAt = explore.indexOf(
-      'data-testid="create-explore-recommended"',
-    );
-    const categoriesAt = explore.indexOf(
-      'data-testid="create-explore-categories"',
-    );
-    expect(continueAt).toBeGreaterThan(-1);
-    expect(searchAt).toBeGreaterThan(continueAt);
-    expect(recommendedAt).toBeGreaterThan(searchAt);
-    expect(categoriesAt).toBeGreaterThan(recommendedAt);
-    expect(explore).toContain("create-estate-previous-work");
-    expect(explore).toContain("create-explore-search");
-    expect(explore).toContain("create-explore-category-cards");
-    expect(explore).toContain("create-explore-idea-preview");
-    expect(explore).toContain("onRequestCreate");
-    expect(CREATE_ESTATE_CONTINUE_SOMETHING_HEADING).toBe("Continue Something");
-    expect(CREATE_ESTATE_INSPIRATION_HEADING).toBe("I Need Inspiration");
-    expect(CREATE_ESTATE_RECOMMENDED_HEADING).toBe("Recommended For Me");
-    expect(CREATE_ESTATE_CATEGORIES_HEADING).toBe("Show Me Categories");
+    expect(browse).toContain("create-browse-category-cards");
+    expect(browse).toContain("create-browse-parent-cards");
+    expect(browse).toContain("create-browse-subtypes");
+    expect(browse).toContain("onRequestCreate");
   });
 
-  it("preserves 130/131 confirm gate from Explore Create", () => {
+  it("Find Previous Work is a distinct section from Browse More", () => {
+    const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
+    const prevAt = panel.indexOf('data-testid="create-estate-find-previous-work"');
+    const browseAt = panel.indexOf('data-testid="create-estate-browse-more"');
+    expect(prevAt).toBeGreaterThan(-1);
+    expect(browseAt).toBeGreaterThan(prevAt);
+    const findPrevious = read(
+      "components/companion/CreateFindPreviousWorkPanel.tsx",
+    );
+    expect(findPrevious).toContain("CreateDraftResumeList");
+  });
+
+  it("preserves 130/131 confirm gate from every discovery path", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-intent-confirm");
     expect(panel).toContain("requestCatalogConfirm");
@@ -72,34 +70,15 @@ describe("Spec 133 — Create Explore Ideas discovery", () => {
     expect(SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS).toBe(3);
   });
 
-  it("explained source chips — not bare Spark / Company / Personal", () => {
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
-    const types = read("lib/createEstate/exploreIdeas/types.ts");
-    expect(explore).toContain("EXPLORE_IDEA_SOURCE_CHIPS");
-    expect(types).toContain("Spark Recommended");
-    expect(types).toContain("Built by Spark Estate");
-    expect(types).toContain("Created by your organization");
-    expect(types).toContain("Created by you");
-    expect(types).toContain("Used recently");
-    expect(explore).not.toMatch(/aria-label="Structure source"/);
-  });
-
-  it("Previous Work stays near top of Continue Something (not buried)", () => {
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
-    const continueAt = explore.indexOf("create-explore-continue-something");
-    const previousAt = explore.indexOf("create-estate-previous-work");
-    const categoriesAt = explore.indexOf("create-explore-categories");
-    expect(previousAt).toBeGreaterThan(continueAt);
-    expect(previousAt).toBeLessThan(categoriesAt);
-  });
-
-  it("hierarchy on entrance: Continue → Start New → Explore Ideas", () => {
+  it("hierarchy on entrance: Continue → composer → Find Previous Work → Browse More", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const continueAt = panel.indexOf('data-testid="create-estate-continue"');
     const startAt = panel.indexOf('data-testid="create-estate-composer"');
-    const exploreAt = panel.indexOf('data-testid="create-estate-explore-ideas"');
+    const prevAt = panel.indexOf('data-testid="create-estate-find-previous-work"');
+    const browseAt = panel.indexOf('data-testid="create-estate-browse-more"');
     expect(continueAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(continueAt);
-    expect(exploreAt).toBeGreaterThan(startAt);
+    expect(prevAt).toBeGreaterThan(startAt);
+    expect(browseAt).toBeGreaterThan(prevAt);
   });
 });

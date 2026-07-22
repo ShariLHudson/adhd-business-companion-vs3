@@ -13,8 +13,9 @@ import {
   resolveCreateExitDestination,
 } from "@/lib/createGuidedConversation189";
 import {
+  CREATE_ESTATE_BROWSE_MORE_HEADING,
   CREATE_ESTATE_CONTINUE_HEADING,
-  CREATE_ESTATE_EXPLORE_IDEAS_HEADING,
+  CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
   CREATE_ESTATE_START_NEW_HEADING,
   CREATE_VS_PROJECTS_CUE,
 } from "./copy";
@@ -37,16 +38,25 @@ describe("Create polish 129 certification", () => {
     expect(CREATE_ESTATE_CONTINUE_HEADING).toBe("Continue Working");
   });
 
-  it("merges Customize + Browse into Explore Ideas (133)", () => {
+  it("Browse More + Find Previous Work replace Customize/Browse/Explore Ideas (Create Simplification)", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
-    expect(panel).toContain("create-estate-explore-ideas");
-    expect(panel).toContain("CREATE_ESTATE_EXPLORE_IDEAS_HEADING");
-    expect(panel).toContain("CreateExploreIdeasPanel");
-    expect(explore).toContain("create-estate-previous-work");
+    const findPrevious = read(
+      "components/companion/CreateFindPreviousWorkPanel.tsx",
+    );
+    expect(panel).toContain("create-estate-browse-more");
+    expect(panel).toContain("create-estate-find-previous-work");
+    expect(panel).toContain("CREATE_ESTATE_BROWSE_MORE_HEADING");
+    expect(panel).toContain("CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING");
+    expect(panel).toContain("CreateBrowseCategoriesPanel");
+    expect(panel).toContain("CreateFindPreviousWorkPanel");
+    expect(findPrevious).toContain("CreateDraftResumeList");
     expect(panel).not.toContain('data-testid="create-estate-advanced"');
     expect(panel).not.toContain("create-estate-guided-frameworks");
-    expect(CREATE_ESTATE_EXPLORE_IDEAS_HEADING).toBe("Explore Ideas");
+    expect(panel).not.toContain("CreateExploreIdeasPanel");
+    expect(CREATE_ESTATE_BROWSE_MORE_HEADING).toBe("Browse More");
+    expect(CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING).toBe(
+      "Find Previous Work",
+    );
   });
 
   it("shows intro guidance once — no Projects cue on entrance", () => {
@@ -82,14 +92,14 @@ describe("Create polish 129 certification", () => {
     expect(working).not.toContain("CREATE_BACK_TO_FOCUS_DESTINATION");
   });
 
-  it("hierarchy: Continue Working before Start Something New before Explore Ideas", () => {
+  it("hierarchy: Continue Working before composer before Browse More", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const continueAt = panel.indexOf('data-testid="create-estate-continue"');
     const startAt = panel.indexOf('data-testid="create-estate-composer"');
-    const exploreAt = panel.indexOf('data-testid="create-estate-explore-ideas"');
+    const browseAt = panel.indexOf('data-testid="create-estate-browse-more"');
     expect(continueAt).toBeGreaterThan(-1);
     expect(startAt).toBeGreaterThan(continueAt);
-    expect(exploreAt).toBeGreaterThan(startAt);
+    expect(browseAt).toBeGreaterThan(startAt);
     expect(CREATE_ESTATE_START_NEW_HEADING).toBe("Start Something New");
   });
 

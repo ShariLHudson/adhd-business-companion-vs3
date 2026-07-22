@@ -8,9 +8,10 @@ import { resolve } from "node:path";
 import { ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS } from "@/lib/estate/estateFullBleedPanelSections";
 import { WELCOME_HOME_NAV_CATEGORIES } from "@/lib/estate/welcomeHomeNavigationStructure";
 import {
+  CREATE_ESTATE_BROWSE_MORE_HEADING,
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_EXPLANATION,
-  CREATE_ESTATE_EXPLORE_IDEAS_HEADING,
+  CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
   CREATE_ESTATE_HOW_DO_I,
   CREATE_ESTATE_WINDOW_TITLE,
   CREATE_VS_PROJECTS_CUE,
@@ -31,7 +32,6 @@ describe("Build → Create navigation (116 / 149)", () => {
       "create",
       "projects",
       "cartographers-studio",
-      "destination-gallery",
     ]);
   });
 
@@ -52,23 +52,31 @@ describe("Build → Create navigation (116 / 149)", () => {
     expect(client).toContain("resolveCreateLauncherType");
   });
 
-  it("CreateEstateEntrancePanel shows Explore Ideas + continue (no Browse / Start With)", () => {
+  it("CreateEstateEntrancePanel shows Find Previous Work + Browse More + continue (no Browse / Start With)", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
+    const findPrevious = read(
+      "components/companion/CreateFindPreviousWorkPanel.tsx",
+    );
     expect(panel).toContain("create-estate-entrance");
     expect(panel).toContain("create-estate-intent-confirm");
-    expect(panel).toContain("create-estate-explore-ideas");
-    expect(panel).toContain("CreateExploreIdeasPanel");
-    expect(explore).toContain("CreateDraftResumeList");
+    expect(panel).toContain("create-estate-find-previous-work");
+    expect(panel).toContain("create-estate-browse-more");
+    expect(panel).toContain("CreateFindPreviousWorkPanel");
+    expect(panel).toContain("CreateBrowseCategoriesPanel");
+    expect(findPrevious).toContain("CreateDraftResumeList");
     expect(panel).toContain("CREATE_ESTATE_CONTINUE_HEADING");
-    expect(panel).toContain("CREATE_ESTATE_EXPLORE_IDEAS_HEADING");
+    expect(panel).toContain("CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING");
+    expect(panel).toContain("CREATE_ESTATE_BROWSE_MORE_HEADING");
     expect(panel).not.toContain("CREATE_ESTATE_START_CHOICES");
     expect(panel).not.toContain("Browse things I can create");
     expect(panel).not.toContain("Start with what I need");
     expect(panel).not.toContain("Start with a Blueprint");
     expect(panel).not.toContain("UniversalBlueprintInterface");
     expect(CREATE_ESTATE_WINDOW_TITLE).toBe("Create");
-    expect(CREATE_ESTATE_EXPLORE_IDEAS_HEADING).toBe("Explore Ideas");
+    expect(CREATE_ESTATE_BROWSE_MORE_HEADING).toBe("Browse More");
+    expect(CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING).toBe(
+      "Find Previous Work",
+    );
     expect(CREATE_ESTATE_CONTINUE_HEADING).toBe("Continue Working");
     expect(CREATE_ESTATE_EXPLANATION).toMatch(/create/i);
     expect(CREATE_VS_PROJECTS_CUE).toMatch(/Projects organize/i);
