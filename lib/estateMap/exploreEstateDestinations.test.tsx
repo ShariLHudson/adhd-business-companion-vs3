@@ -192,6 +192,18 @@ describe("Explore Estate visual destinations", () => {
     }
   });
 
+  it("lists Explore Estate cards alphabetically within each category", () => {
+    const groups = getExploreEstateCategoryGroups();
+    expect(groups.length).toBeGreaterThan(0);
+    for (const group of groups) {
+      const names = group.destinations.map((d) => d.name);
+      const sorted = [...names].sort((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: "base" }),
+      );
+      expect(names, group.id).toEqual(sorted);
+    }
+  });
+
   it("resolves required background assets on disk", () => {
     const destinations = getExploreEstateDestinations();
     for (const [id, expectedPath] of Object.entries(
@@ -289,6 +301,14 @@ describe("Explore Estate visual destinations", () => {
     expect(indoor?.destinations.some((d) => d.name === "Discovery Room")).toBe(
       true,
     );
+    expect(
+      indoor?.destinations.some((d) => d.name === "Hall of Achievements"),
+    ).toBe(false);
+    const reflection = groups.find((g) => g.id === "reflection");
+    expect(reflection?.label).toBe("Reflection and Progress");
+    expect(
+      reflection?.destinations.some((d) => d.name === "Hall of Achievements"),
+    ).toBe(true);
     const outside = groups.find((g) => g.id === "grounds");
     expect(outside?.destinations.some((d) => d.name === "Woodland Path")).toBe(
       true,
