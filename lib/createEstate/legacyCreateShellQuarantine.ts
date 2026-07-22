@@ -1,3 +1,5 @@
+import { CREATE_BACKGROUND_SRC } from "@/lib/estateExperienceBackgrounds";
+
 /**
  * Ghost ownership quarantine — legacy Create split shell.
  *
@@ -29,7 +31,7 @@ export const LEGACY_CREATE_SPLIT_SHELL = {
   replacedBy: {
     shell: "CreateEstateRoomShell",
     panel: "CreateEstateWorkingPanel",
-    roomBg: "/backgrounds/art-studio-background.png",
+    roomBg: CREATE_BACKGROUND_SRC,
   },
   rule: "Create shapes the work. Projects carries the work forward.",
 };

@@ -1,6 +1,10 @@
 /**
  * Estate Intelligence Router — capability-first decision tree.
  *
+ * **P0-05:** Primary Estate routing intelligence (Routing Ownership Contract).
+ * Companion path: `resolveFrictionlessAction` → this module.
+ * @see lib/estateBrain/routingOwnershipContract.ts
+ *
  * User Message → Intent → Capability → Expert → Experience → Tool → Conversation
  */
 

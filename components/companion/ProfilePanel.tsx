@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
-import { requestWelcomeHomeReplay } from "@/lib/welcomeHome";
 import { GettingToKnowYouPanel } from "@/components/companion/GettingToKnowYouPanel";
 import { ActiveCompanionsPicker } from "@/components/companion/ActiveCompanionsPicker";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -19,7 +18,7 @@ const SUPPORT_PHONE_TEL = "+15159549177";
 const GHL_BILLING_URL = "";
 
 /** Settings sections Profile may deep-link into (companion prefs only — not app config). */
-export type ProfileSettingsSection = "tone" | "plan";
+export type ProfileSettingsSection = "tone" | "plan" | "profile";
 
 type PrefLink =
   | {
@@ -114,6 +113,30 @@ export function ProfilePanel({
       <p className="mt-1 text-sm text-[#6b635a]">
         Who you are and what Shari should know about you and your business.
       </p>
+
+      <div className="mt-5">
+        <a
+          href={settingsHref("profile")}
+          onClick={(e) => {
+            e.preventDefault();
+            onOpenSettings?.("profile");
+          }}
+          className={linkBtn}
+          data-testid="profile-online-presence-link"
+        >
+          <span aria-hidden="true" className="text-xl">
+            🌐
+          </span>
+          <span>
+            <span className="block text-base font-semibold text-[#1f1c19]">
+              Online Presence
+            </span>
+            <span className="block text-sm text-[#6b635a]">
+              Website and social profile links — Settings → Profile.
+            </span>
+          </span>
+        </a>
+      </div>
 
       {/* Account — always at top */}
       <div className="mt-5 rounded-2xl border border-[#1e4f4f]/25 bg-[#1e4f4f]/[0.05] p-4">
@@ -274,25 +297,6 @@ export function ProfilePanel({
             </a>
           );
         })}
-        <button
-          type="button"
-          onClick={() => requestWelcomeHomeReplay()}
-          className={linkBtn}
-          data-testid="listen-to-sharis-welcome"
-        >
-          <span aria-hidden="true" className="text-xl">
-            🎧
-          </span>
-          <span>
-            <span className="block text-base font-semibold text-[#1f1c19]">
-              Listen to Shari&apos;s Welcome
-            </span>
-            <span className="block text-sm text-[#6b635a]">
-              Replay the welcome conversation anytime — it will not open on its
-              own again.
-            </span>
-          </span>
-        </button>
       </div>
 
       <ActiveCompanionsPicker />

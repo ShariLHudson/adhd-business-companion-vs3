@@ -1,10 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  MEMBER_CALENDAR_EXTERNAL_URLS,
-  readPreferredCalendarProvider,
-} from "@/lib/calendar/memberCalendarDestination";
 import { compareDropdownLabels, sortByDropdownLabel } from "@/lib/dropdownSort";
 import {
   getPrefs,
@@ -65,30 +61,15 @@ import {
 } from "@/lib/recognition";
 
 import { aiToneLabel } from "@/lib/aiToneGuide";
-import { SettingsConnectionCard } from "@/components/companion/SettingsConnectionCard";
+import { ConnectedServicesPage } from "@/components/companion/settings/connected-services/ConnectedServicesPage";
+import { DefaultsPage } from "@/components/companion/settings/defaults/DefaultsPage";
+import { OnlinePresenceSection } from "@/components/companion/settings/profile/OnlinePresenceSection";
 import {
-  buildSettingsConnectionCards,
-  connectCanvaLocal,
   connectOutlookCalendarLocal,
-  disconnectCanvaLocal,
-  disconnectOutlookCalendarLocal,
   isCanvaConnected,
   isOutlookCalendarConnected,
   readCanvaConnection,
-  readDigitalWorkspacePreferences,
-  updateCanvaDestinationUrl,
-  verifyCanvaConnection,
-  writeDigitalWorkspacePreferences,
-  type DocumentsProviderPreference,
-  type PrintingPreference,
-  type SettingsConnectionId,
 } from "@/lib/connections";
-import {
-  SOCIAL_PROFILE_FIELDS,
-  socialProfileOpenHref,
-  socialProfileUrlHint,
-  type SocialProfilePrefKey,
-} from "@/lib/socialProfileUrls";
 
 const HELP_MODE_SUMMARY: { id: HelpMode; label: string }[] = sortByDropdownLabel(
   [
@@ -130,7 +111,9 @@ type Section =
   | "pattern"
   | "plan"
   | "advanced"
+  | "profile"
   | "connections"
+  | "defaults"
   | "account"
   | "new-day"
   | "replay-welcome";
@@ -241,15 +224,6 @@ export function SettingsPanel({
   const [alerts, setAlerts] = useState(true);
   const [desktop, setDesktop] = useState(true);
   const [perm, setPerm] = useState<NotifPerm>("default");
-  const [socialUrls, setSocialUrls] = useState<
-    Record<SocialProfilePrefKey, string>
-  >({
-    facebookUrl: "",
-    instagramUrl: "",
-    linkedinUrl: "",
-    tiktokUrl: "",
-    pinterestUrl: "",
-  });
   const [interfaceLanguage, setInterfaceLanguage] = useState<LanguageCode>("en");
   const [responseLanguage, setResponseLanguage] = useState<LanguageCode>("en");
   const [contentLanguage, setContentLanguage] = useState<LanguageCode>("en");
@@ -269,11 +243,6 @@ export function SettingsPanel({
   );
   const [canvaDraftUrl, setCanvaDraftUrl] = useState("");
   const [canvaFeedback, setCanvaFeedback] = useState<string | null>(null);
-  const [workspacePrefs, setWorkspacePrefs] = useState(() =>
-    readDigitalWorkspacePreferences(),
-  );
-  const [managingConnectionId, setManagingConnectionId] =
-    useState<SettingsConnectionId | null>(null);
   const [celebrationMode, setCelebrationMode] =
     useState<CelebrationMode>("full");
   const [birthdayMonth, setBirthdayMonth] = useState<number | "">("");
@@ -296,23 +265,14 @@ export function SettingsPanel({
     setCanvaDestinationUrl(record.destinationUrl);
     if (record.destinationUrl) setCanvaDraftUrl(record.destinationUrl);
   }
-  function refreshWorkspacePrefs() {
-    setWorkspacePrefs(readDigitalWorkspacePreferences());
-  }
   useEffect(() => {
     refreshGoogle();
     refreshOutlook();
     refreshCanva();
-    refreshWorkspacePrefs();
     const syncOutlook = () => refreshOutlook();
     const syncCanva = () => refreshCanva();
-    const syncPrefs = () => refreshWorkspacePrefs();
     window.addEventListener("companion-outlook-calendar-updated", syncOutlook);
     window.addEventListener("companion-canva-connection-updated", syncCanva);
-    window.addEventListener(
-      "companion-digital-workspace-preferences-updated",
-      syncPrefs,
-    );
     return () => {
       window.removeEventListener(
         "companion-outlook-calendar-updated",
@@ -321,10 +281,6 @@ export function SettingsPanel({
       window.removeEventListener(
         "companion-canva-connection-updated",
         syncCanva,
-      );
-      window.removeEventListener(
-        "companion-digital-workspace-preferences-updated",
-        syncPrefs,
       );
     };
   }, []);
@@ -359,13 +315,6 @@ export function SettingsPanel({
     setAdvanced(p.advancedAiTools);
     setAlerts(p.timeBlockAlerts);
     setDesktop(p.desktopNotifications);
-    setSocialUrls({
-      facebookUrl: p.facebookUrl ?? "",
-      instagramUrl: p.instagramUrl ?? "",
-      linkedinUrl: p.linkedinUrl ?? "",
-      tiktokUrl: p.tiktokUrl ?? "",
-      pinterestUrl: p.pinterestUrl ?? "",
-    });
     setInterfaceLanguage(p.interfaceLanguage);
     setResponseLanguage(p.responseLanguage);
     setContentLanguage(p.contentLanguage);
@@ -464,12 +413,36 @@ export function SettingsPanel({
     { id: "plan", label: "Plan & voice", value: PLAN_LABEL[plan] },
     { id: "advanced", label: "Advanced AI tools", value: advanced ? "On" : "Off" },
     {
-      id: "connections",
-      label: "Connections",
+      id: "profile",
+      label: "Profile",
       value: (() => {
-        const linked = Object.values(socialUrls).filter((v) => v.trim()).length;
-        return linked > 0 ? `${linked} linked` : "Not set";
+        const p = getPrefs();
+        const linked = [
+          p.websiteUrl,
+          p.facebookUrl,
+          p.instagramUrl,
+          p.linkedinUrl,
+          p.tiktokUrl,
+          p.pinterestUrl,
+        ].filter((v) => (v ?? "").trim()).length;
+        return linked > 0 ? `${linked} online link${linked === 1 ? "" : "s"}` : "Online presence";
       })(),
+    },
+    {
+      id: "connections",
+      label: "Connected Services",
+      value: (() => {
+        let n = 0;
+        if (g.connected) n += 1;
+        if (outlookConnected) n += 1;
+        if (canvaConnected) n += 1;
+        return n > 0 ? `${n} connected` : "None connected";
+      })(),
+    },
+    {
+      id: "defaults",
+      label: "Defaults",
+      value: "Documents, storage, calendar, print",
     },
     {
       id: "account",
@@ -1234,404 +1207,60 @@ export function SettingsPanel({
       </div>
     );
   }
-  if (open === "connections") {
-    const connectionCards = buildSettingsConnectionCards({
-      google: g,
-      outlookConnected,
-      canvaConnected,
-      canvaDestinationUrl,
-      googleAuthHref: "/api/google/auth?returnTo=/companion?settings=connections",
-    });
-
-    function applyCanvaUrl(raw: string) {
-      const result = canvaConnected
-        ? updateCanvaDestinationUrl(raw)
-        : connectCanvaLocal(raw);
-      if (!result.ok) {
-        setCanvaFeedback(result.reason);
-        return;
-      }
-      setCanvaFeedback("Canva is connected. The Design crystal will open this link.");
-      refreshCanva();
-      setManagingConnectionId("canva");
-    }
-
+  if (open === "profile") {
     return (
-      <div className={wrap} data-testid="settings-connections">
-        {header("Connections")}
+      <div className={wrap} data-testid="settings-profile">
+        {header("Profile")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Your Digital Workspace Preferences — connect services once, choose where
-          Document, Print, Calendar, and Storage should go, and Spark uses those
-          defaults quietly across the Estate.
+          Personal and online presence details Spark can use when sharing your work.
         </p>
-
-        <div className="mt-4 flex flex-col gap-3">
-          {connectionCards.map((card) => (
-            <div key={card.id}>
-              <SettingsConnectionCard
-                card={card}
-                onConnectOutlook={() => {
-                  connectOutlookCalendarLocal();
-                  refreshOutlook();
-                  setManagingConnectionId(null);
-                }}
-                onConnectCanva={() => {
-                  setCanvaFeedback(null);
-                  setManagingConnectionId("canva");
-                }}
-                onManageGoogle={() =>
-                  setManagingConnectionId((current) =>
-                    current === card.id ? null : card.id,
-                  )
-                }
-                onManageOutlook={() =>
-                  setManagingConnectionId((current) =>
-                    current === card.id ? null : card.id,
-                  )
-                }
-                onManageCanva={() => {
-                  setCanvaFeedback(null);
-                  setManagingConnectionId((current) =>
-                    current === card.id ? null : card.id,
-                  );
-                }}
-              />
-              {managingConnectionId === card.id && card.kind === "canva" ? (
-                <div
-                  className="mt-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-4 py-3"
-                  data-testid="settings-connection-manage-panel-canva"
-                >
-                  <label
-                    className={LABEL}
-                    htmlFor="canva-destination-url"
-                  >
-                    Canva destination link
-                  </label>
-                  <input
-                    id="canva-destination-url"
-                    value={canvaDraftUrl}
-                    onChange={(e) => setCanvaDraftUrl(e.target.value)}
-                    placeholder="https://www.canva.com"
-                    className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                    data-testid="settings-canva-url-input"
-                  />
-                  {canvaFeedback ? (
-                    <p
-                      className="mt-2 text-sm text-[#1e4f4f]"
-                      data-testid="settings-canva-feedback"
-                      aria-live="polite"
-                    >
-                      {canvaFeedback}
-                    </p>
-                  ) : null}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => applyCanvaUrl(canvaDraftUrl)}
-                      className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-                      data-testid="settings-canva-save"
-                    >
-                      {canvaConnected ? "Update Canva link" : "Connect Canva"}
-                    </button>
-                    {canvaConnected ? (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const result = verifyCanvaConnection();
-                            setCanvaFeedback(
-                              result.ok
-                                ? "Canva link looks good."
-                                : result.reason,
-                            );
-                            refreshCanva();
-                          }}
-                          className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-                          data-testid="settings-canva-verify"
-                        >
-                          Verify
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            disconnectCanvaLocal();
-                            setCanvaDraftUrl("");
-                            setCanvaFeedback("Canva disconnected.");
-                            refreshCanva();
-                            setManagingConnectionId(null);
-                          }}
-                          className="rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
-                          data-testid="settings-canva-disconnect"
-                        >
-                          Disconnect
-                        </button>
-                      </>
-                    ) : null}
-                  </div>
-                </div>
-              ) : null}
-              {managingConnectionId === card.id &&
-              card.status === "connected" &&
-              card.kind !== "canva" ? (
-                <div
-                  className="mt-2 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-4 py-3"
-                  data-testid={`settings-connection-manage-panel-${card.id}`}
-                >
-                  {card.kind === "google" ? (
-                    <div className="flex flex-wrap gap-2">
-                      <a
-                        href="/api/google/auth?returnTo=/companion?settings=connections"
-                        className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-                      >
-                        Reconnect
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          fetch("/api/google/disconnect", { method: "POST" })
-                            .then(() => {
-                              refreshGoogle();
-                              setManagingConnectionId(null);
-                            })
-                            .catch(() => {})
-                        }
-                        className="rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
-                      >
-                        Disconnect
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col gap-2">
-                      <p className="text-sm text-[#6b635a]">
-                        Outlook Calendar is prepared in Spark. Microsoft Graph
-                        sync will plug into this same connection when it&apos;s
-                        ready — no second calendar system.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          disconnectOutlookCalendarLocal();
-                          refreshOutlook();
-                          setManagingConnectionId(null);
-                        }}
-                        className="self-start rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
-                      >
-                        Disconnect
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : null}
-            </div>
-          ))}
+        <div className="mt-5">
+          <OnlinePresenceSection />
         </div>
-
-        <div
-          className="mt-6 rounded-xl border border-[#e7dfd4] bg-white/85 px-4 py-4"
-          data-testid="digital-workspace-preferences"
-        >
-          <p className="text-base font-semibold text-[#1f1c19]">
-            Preferred destinations
-          </p>
-          <p className="mt-1 text-sm text-[#6b635a]">
-            Crystals use these defaults so you don&apos;t have to choose every
-            time.
-          </p>
-
-          <label className={`${LABEL} mt-4`} htmlFor="pref-documents">
-            Documents
-          </label>
-          <select
-            id="pref-documents"
-            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
-            value={workspacePrefs.documents}
-            data-testid="pref-documents"
-            onChange={(e) => {
-              const documents = e.target.value as DocumentsProviderPreference;
-              setWorkspacePrefs(
-                writeDigitalWorkspacePreferences({ documents }),
-              );
-            }}
-          >
-            <option value="google-docs">Google Docs</option>
-            <option value="microsoft-word">Microsoft Word</option>
-            <option value="spark-estate">Spark Estate Documents</option>
-            <option value="local">Local Documents</option>
-          </select>
-
-          <label className={`${LABEL} mt-4`} htmlFor="pref-printing">
-            Printing
-          </label>
-          <select
-            id="pref-printing"
-            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
-            value={workspacePrefs.printing}
-            data-testid="pref-printing"
-            onChange={(e) => {
-              const printing = e.target.value as PrintingPreference;
-              setWorkspacePrefs(
-                writeDigitalWorkspacePreferences({ printing }),
-              );
-            }}
-          >
-            <option value="save-pdf">Save as PDF</option>
-            <option value="print-dialog">Print dialog</option>
-            <option value="preferred-provider">Preferred print provider</option>
-          </select>
-
-          <label className={`${LABEL} mt-4`} htmlFor="pref-calendar">
-            Calendar
-          </label>
-          <select
-            id="pref-calendar"
-            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
-            value={workspacePrefs.calendar}
-            data-testid="pref-calendar"
-            onChange={(e) => {
-              const calendar = e.target.value as "google" | "outlook";
-              setWorkspacePrefs(
-                writeDigitalWorkspacePreferences({ calendar }),
-              );
-            }}
-          >
-            <option value="google">Google Calendar</option>
-            <option value="outlook">Outlook Calendar</option>
-          </select>
-
-          <label className={`${LABEL} mt-4`} htmlFor="pref-storage">
-            Storage
-          </label>
-          <select
-            id="pref-storage"
-            className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19]"
-            value={workspacePrefs.storage}
-            data-testid="pref-storage"
-            onChange={(e) => {
-              const storage = e.target
-                .value as "google-drive" | "onedrive" | "dropbox";
-              setWorkspacePrefs(writeDigitalWorkspacePreferences({ storage }));
-            }}
-          >
-            <option value="google-drive">Google Drive</option>
-            <option value="onedrive">OneDrive (when connected)</option>
-            <option value="dropbox">Dropbox (when connected)</option>
-          </select>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/70 px-4 py-3">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-            Shortcuts — open in your browser
-          </p>
-          <p className="mt-1 text-xs text-[#9a8f82]">
-            These open the service; they don&apos;t change your Spark connection.
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {[
-              {
-                label: "My Calendar",
-                url:
-                  readPreferredCalendarProvider() === "outlook"
-                    ? MEMBER_CALENDAR_EXTERNAL_URLS.outlook
-                    : MEMBER_CALENDAR_EXTERNAL_URLS.google,
-              },
-              { label: "Docs", url: "https://docs.google.com" },
-              { label: "Drive", url: "https://drive.google.com" },
-              {
-                label: "Outlook Calendar",
-                url: MEMBER_CALENDAR_EXTERNAL_URLS.outlook,
-              },
-              {
-                label: "Google Calendar",
-                url: MEMBER_CALENDAR_EXTERNAL_URLS.google,
-              },
-            ].map((link) => (
-              <a
-                key={link.label}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-lg border border-[#1e4f4f]/30 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-              >
-                {link.label}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <p className="mt-5 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-          Social profile links
-        </p>
-        <div className="mt-2 flex flex-col gap-4">
-          {SOCIAL_PROFILE_FIELDS.map((platform) => {
-            const value = socialUrls[platform.prefKey] ?? "";
-            const openHref = socialProfileOpenHref(value);
-            const hint = socialProfileUrlHint(platform.id, value);
-            return (
-              <div key={platform.id} data-testid={`social-profile-${platform.id}`}>
-                <label className={LABEL} htmlFor={`conn-${platform.id}`}>
-                  {platform.label}
-                </label>
-                <input
-                  id={`conn-${platform.id}`}
-                  value={value}
-                  onChange={(e) => {
-                    const next = e.target.value;
-                    setSocialUrls((prev) => ({
-                      ...prev,
-                      [platform.prefKey]: next,
-                    }));
-                    savePrefs({ [platform.prefKey]: next });
-                  }}
-                  placeholder={platform.placeholder}
-                  className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                  data-testid={`social-profile-input-${platform.id}`}
-                />
-                {hint ? (
-                  <p
-                    className="mt-1 text-xs text-[#6b635a]"
-                    data-testid={`social-profile-hint-${platform.id}`}
-                  >
-                    {hint}
-                  </p>
-                ) : null}
-                {value.trim() ? (
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {openHref ? (
-                      <a
-                        href={openHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="rounded-lg border border-[#1e4f4f]/30 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-                        data-testid={`social-profile-open-${platform.id}`}
-                      >
-                        {platform.openLabel}
-                      </a>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSocialUrls((prev) => ({
-                          ...prev,
-                          [platform.prefKey]: "",
-                        }));
-                        savePrefs({ [platform.prefKey]: "" });
-                      }}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
-                      data-testid={`social-profile-clear-${platform.id}`}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-        <p className="mt-4 text-sm text-[#9a8f82]">
-          Social posts use copy-and-paste: the app copies your text and opens
-          your profile page so you can paste it there.
-        </p>
       </div>
+    );
+  }
+  if (open === "connections") {
+    return (
+      <ConnectedServicesPage
+        google={g}
+        outlookConnected={outlookConnected}
+        canvaConnected={canvaConnected}
+        canvaDestinationUrl={canvaDestinationUrl}
+        canvaDraftUrl={canvaDraftUrl}
+        canvaFeedback={canvaFeedback}
+        onCanvaDraftChange={setCanvaDraftUrl}
+        onCanvaFeedback={setCanvaFeedback}
+        refreshGoogle={refreshGoogle}
+        refreshOutlook={refreshOutlook}
+        refreshCanva={refreshCanva}
+        header={header}
+        wrapClassName={wrap}
+      />
+    );
+  }
+  if (open === "defaults") {
+    return (
+      <DefaultsPage
+        connections={{
+          googleConfigured: g.configured,
+          googleConnected: g.connected,
+          outlookConnected,
+        }}
+        onRequestConnectGoogle={() => {
+          if (typeof window !== "undefined") {
+            window.location.href =
+              "/api/google/auth?returnTo=/companion?settings=connections";
+          }
+        }}
+        onRequestConnectOutlook={() => {
+          connectOutlookCalendarLocal();
+          refreshOutlook();
+          setOpen("connections");
+        }}
+        header={header}
+        wrapClassName={wrap}
+      />
     );
   }
   if (open === "account") {

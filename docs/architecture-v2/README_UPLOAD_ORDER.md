@@ -1,53 +1,50 @@
-# Spark Estate Architecture v2 — Foundation Bundle
+# Spark Estate Platform Governance & Runtime — Files 311–315
 
 ## Upload order
 
-1. `300_SPARK_ESTATE_INTELLIGENCE_ARCHITECTURE_V2.md`
-2. `301_UNIVERSAL_INTELLIGENCE_OBJECT_MODEL.md`
-3. `302_CHAMBER_MEMBER_CANONICAL_ARCHITECTURE.md`
-4. `303_CAPABILITY_REGISTRY_AND_GRAPH_ARCHITECTURE.md`
-5. `304_COLLECTION_OWNERSHIP_AND_CONTRIBUTOR_ARCHITECTURE.md`
+1. `311_ADAPTIVE_INTELLIGENCE_IMPLEMENTATION_PLAN.md`
+2. `312_UNIVERSAL_REGISTRY_ARCHITECTURE.md`
+3. `313_INTELLIGENCE_LIFECYCLE_VERSIONING_AND_MAINTENANCE.md`
+4. `314_UNIVERSAL_TESTING_AND_CERTIFICATION_FRAMEWORK.md`
+5. `315_SPARK_ESTATE_PLATFORM_GOVERNANCE_CONSTITUTION.md`
 
 ## Cursor instruction
 
-Treat File 300 as the governing platform architecture.
+Treat File 315 as the governing Constitution for this series.
 
-Use Files 301–304 to audit the existing repository before implementing new infrastructure.
-
-First produce:
-
-- architecture ownership audit
-- registry inventory
-- current Chamber Member file-family inventory
-- existing collection/blueprint inventory
-- duplicate-risk report
-- migration plan
-- blockers
-- recommended implementation sequence
-
-Do not immediately rewrite all Chamber Member files.
-
-Do not create parallel registries.
-
-Do not break existing certified Universal Work Engine, Event Work Type, Blueprint Framework, or existing Member bundles.
-
-Preserve existing Member knowledge, routing, implementation, retrieval, conversation, testing, and certification work and map it into the new canonical architecture.
-
-## Required audit report
+Reconcile File 311 with the repository-generated adaptive implementation plan if one already exists. Preserve the stronger, more repository-grounded content and report material conflicts.
 
 Create:
 
-`docs/architecture-v2/305_ARCHITECTURE_V2_FOUNDATION_AUDIT.md`
+- `docs/architecture-v2/316_GOVERNANCE_AND_REGISTRY_AUDIT.md`
+- `docs/architecture-v2/317_ARCHITECTURE_V2_MASTER_INDEX.md`
 
-The report must identify:
+The audit must identify:
 
-- existing authoritative owners
-- missing registries
-- duplicate or overlapping concepts
-- current Member capability-like assets
-- current Collections
-- current business-profile data
-- current adaptive context data
+- current registries
+- authoritative owners
+- duplicated registry behavior
+- current certification patterns
+- current versioning patterns
+- missing maintenance ownership
 - migration risks
-- compatibility risks
-- recommended next implementation bundle
+- governance conflicts
+- recommended smallest implementation slice
+
+The Master Index must catalog:
+
+- constitutional documents
+- architecture documents
+- Chamber Members
+- capabilities
+- Collections
+- Blueprints
+- Business identities
+- Work Types
+- registries
+- certification reports
+- implementation reports
+
+Do not implement a broad registry rewrite until the audit is complete.
+
+Do not commit or push until the audit, index, blocker review, and recommended implementation sequence are complete.

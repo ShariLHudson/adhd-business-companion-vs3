@@ -1,7 +1,6 @@
 /**
- * Settings → Connections catalog.
- * Digital Workspace Preferences: auth + preferred destinations (Prompt 142).
- * Google services share existing OAuth; Sheets/Forms stay in architecture but are hidden from this page.
+ * Settings → Connected Services catalog.
+ * Auth lives here; destination defaults live under Settings → Defaults.
  */
 
 export type SettingsConnectionId =
@@ -29,7 +28,12 @@ export type SettingsConnectionKind = "google" | "outlook-calendar" | "canva";
 
 export type SettingsConnectionStatus =
   | "connected"
+  | "disconnected"
+  | "needs_attention"
+  | "connecting"
+  /** @deprecated prefer disconnected — kept for older callers */
   | "not-connected"
+  /** @deprecated prefer needs_attention */
   | "unavailable";
 
 export type SettingsConnectionCardDef = {
@@ -37,8 +41,9 @@ export type SettingsConnectionCardDef = {
   title: string;
   description: string;
   kind: SettingsConnectionKind;
-  /** Shown on Settings → Connections */
+  /** Shown on Settings → Connected Services */
   visible: true;
+  openUrl?: string;
 };
 
 export type SettingsConnectionCardState = SettingsConnectionCardDef & {
@@ -52,50 +57,51 @@ export type SettingsConnectionCardState = SettingsConnectionCardDef & {
   connectHref: string | null;
 };
 
-/** Member-facing Connections cards — Sheets/Forms intentionally omitted. */
+/** Member-facing Connected Services cards — Sheets/Forms intentionally omitted. */
 export const SETTINGS_CONNECTION_CARDS: readonly SettingsConnectionCardDef[] = [
   {
     id: "google-calendar",
     title: "Google Calendar",
-    description:
-      "Connect Google Calendar so Spark can include your appointments in daily planning.",
+    description: "Add Google events and use them when shaping your day.",
     kind: "google",
     visible: true,
+    openUrl: "https://calendar.google.com",
   },
   {
     id: "google-docs",
     title: "Google Docs",
-    description:
-      "Save drafts and documents directly to Google Docs when you choose to export.",
+    description: "Save and open documents through Google Docs.",
     kind: "google",
     visible: true,
+    openUrl: "https://docs.google.com",
   },
   {
     id: "google-drive",
     title: "Google Drive",
-    description: "Keep files Spark creates for you in your Google Drive.",
+    description: "Save and open files through Google Drive.",
     kind: "google",
     visible: true,
+    openUrl: "https://drive.google.com",
   },
   {
     id: "outlook-calendar",
     title: "Outlook Calendar",
-    description:
-      "Connect your Microsoft Outlook calendar so Spark can include your appointments in your daily planning.",
+    description: "Add Outlook events and use them when shaping your day.",
     kind: "outlook-calendar",
     visible: true,
+    openUrl: "https://outlook.office.com/calendar/",
   },
   {
     id: "canva",
     title: "Canva",
-    description:
-      "Save your preferred Canva homepage or workspace link. The Design crystal opens it when you’re ready.",
+    description: "Open your Canva workspace when you’re ready to design.",
     kind: "canva",
     visible: true,
+    openUrl: "https://www.canva.com",
   },
 ] as const;
 
-/** Catalog of services still supported in product code but not shown on Connections. */
+/** Catalog of services still supported in product code but not shown on Connected Services. */
 export const SETTINGS_CONNECTIONS_HIDDEN_FROM_UI: readonly {
   id: SettingsConnectionHiddenId;
   title: string;
@@ -104,17 +110,17 @@ export const SETTINGS_CONNECTIONS_HIDDEN_FROM_UI: readonly {
   {
     id: "google-sheets",
     title: "Google Sheets",
-    reason: "Roadmap — export/backend retained; hidden from Connections UI.",
+    reason: "Roadmap — export/backend retained; hidden from Connected Services UI.",
   },
   {
     id: "google-forms",
     title: "Google Forms",
-    reason: "Roadmap — export/backend retained; hidden from Connections UI.",
+    reason: "Roadmap — export/backend retained; hidden from Connected Services UI.",
   },
   {
     id: "google-slides",
     title: "Google Slides",
-    reason: "Coming soon — preference slot reserved in Digital Workspace Preferences.",
+    reason: "Coming soon — preference slot reserved in Defaults.",
   },
   {
     id: "microsoft-excel",
@@ -124,18 +130,17 @@ export const SETTINGS_CONNECTIONS_HIDDEN_FROM_UI: readonly {
   {
     id: "microsoft-word",
     title: "Microsoft Word",
-    reason:
-      "Preference available under Digital Workspace Preferences; OAuth deferred.",
+    reason: "Export as Word file under Defaults — not a connected service.",
   },
   {
     id: "onedrive",
     title: "Microsoft OneDrive",
-    reason: "Coming soon — storage preference reserved.",
+    reason: "Coming soon — hidden until a working integration ships.",
   },
   {
     id: "dropbox",
     title: "Dropbox",
-    reason: "Coming soon — storage preference reserved.",
+    reason: "Coming soon — hidden until a working integration ships.",
   },
   {
     id: "onenote",
@@ -150,12 +155,12 @@ export const SETTINGS_CONNECTIONS_HIDDEN_FROM_UI: readonly {
   {
     id: "printing",
     title: "Printing",
-    reason: "Configured as a Printing preference, not a separate OAuth card.",
+    reason: "Configured under Defaults → Printing, not a separate OAuth card.",
   },
   {
     id: "pdf-export",
     title: "PDF Export",
-    reason: "Configured as a Printing preference (Save as PDF).",
+    reason: "Configured under Defaults → Printing (Save as PDF).",
   },
 ] as const;
 
@@ -165,56 +170,91 @@ export type GoogleConnectionSnapshot = {
   email: string | null;
 };
 
+export function normalizeConnectionStatus(
+  status: SettingsConnectionStatus,
+): "connected" | "disconnected" | "needs_attention" | "connecting" {
+  if (status === "connected") return "connected";
+  if (status === "connecting") return "connecting";
+  if (status === "needs_attention" || status === "unavailable") {
+    return "needs_attention";
+  }
+  return "disconnected";
+}
+
+export function connectionStatusLabel(
+  status: SettingsConnectionStatus,
+): string {
+  switch (normalizeConnectionStatus(status)) {
+    case "connected":
+      return "Connected";
+    case "connecting":
+      return "Connecting";
+    case "needs_attention":
+      return "Needs attention";
+    default:
+      return "Not connected";
+  }
+}
+
 export function buildSettingsConnectionCards(input: {
   google: GoogleConnectionSnapshot;
   outlookConnected: boolean;
   canvaConnected?: boolean;
   canvaDestinationUrl?: string | null;
   googleAuthHref?: string;
+  connectingId?: SettingsConnectionId | null;
 }): SettingsConnectionCardState[] {
   const googleHref = input.googleAuthHref ?? "/api/google/auth";
 
   return SETTINGS_CONNECTION_CARDS.map((card) => {
     if (card.kind === "google") {
-      const status: SettingsConnectionStatus = !input.google.configured
-        ? "unavailable"
-        : input.google.connected
-          ? "connected"
-          : "not-connected";
+      const connecting = input.connectingId === card.id;
+      const status: SettingsConnectionStatus = connecting
+        ? "connecting"
+        : !input.google.configured
+          ? "needs_attention"
+          : input.google.connected
+            ? "connected"
+            : "disconnected";
       return {
         ...card,
         status,
         accountEmail: input.google.connected ? input.google.email : null,
-        connectLabel:
-          card.id === "google-calendar"
-            ? "Connect Google Calendar"
-            : card.id === "google-docs"
-              ? "Connect Google Docs"
-              : "Connect Google Drive",
-        manageLabel: "Manage Connection",
-        connectHref: status === "unavailable" ? null : googleHref,
+        connectLabel: "Connect",
+        manageLabel: "Manage",
+        connectHref: status === "needs_attention" ? null : googleHref,
       };
     }
 
     if (card.kind === "canva") {
+      const connecting = input.connectingId === card.id;
       const connected = input.canvaConnected === true;
       return {
         ...card,
-        status: connected ? "connected" : "not-connected",
+        status: connecting
+          ? "connecting"
+          : connected
+            ? "connected"
+            : "disconnected",
         accountEmail: null,
         destinationUrl: input.canvaDestinationUrl ?? null,
-        connectLabel: "Connect Canva",
-        manageLabel: "Manage Canva",
+        openUrl: input.canvaDestinationUrl || card.openUrl,
+        connectLabel: "Connect",
+        manageLabel: "Manage",
         connectHref: null,
       };
     }
 
     return {
       ...card,
-      status: input.outlookConnected ? "connected" : "not-connected",
+      status: input.connectingId === card.id
+        ? "connecting"
+        : input.outlookConnected
+          ? "connected"
+          : "disconnected",
       accountEmail: null,
-      connectLabel: "Connect Outlook Calendar",
-      manageLabel: "Manage Connection",
+      connectLabel: "Connect",
+      manageLabel: "Manage",
       connectHref: null,
     };
   });

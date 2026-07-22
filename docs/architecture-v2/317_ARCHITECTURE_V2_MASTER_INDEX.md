@@ -2,7 +2,8 @@
 
 **Date:** 2026-07-21  
 **Purpose:** Catalog constitutional, architecture, registry, certification, and implementation documents for Spark Estate Architecture v2  
-**Governance:** [315 Platform Governance Constitution](./315_SPARK_ESTATE_PLATFORM_GOVERNANCE_CONSTITUTION.md)
+**Governance:** [315 Platform Governance Constitution](./315_SPARK_ESTATE_PLATFORM_GOVERNANCE_CONSTITUTION.md)  
+**Production readiness (docs vs runtime):** [SPARK_ESTATE_PRODUCTION_READINESS_AUDIT.md](./SPARK_ESTATE_PRODUCTION_READINESS_AUDIT.md)
 
 ---
 

@@ -2310,7 +2310,9 @@ export type Prefs = {
   /** User-uploaded portrait — data URL; never Shari/companion images. */
   profileImage?: string;
   howToMemory: string;
-  // Connections — where finished content gets sent / pasted.
+  /** Personal / business website — Settings → Profile → Online Presence. */
+  websiteUrl: string;
+  // Online Presence — where finished content gets sent / pasted.
   facebookUrl: string;
   instagramUrl: string;
   linkedinUrl: string;
@@ -2341,6 +2343,7 @@ const DEFAULT_PREFS: Prefs = {
   personalIntroduction: "",
   profileImage: "",
   howToMemory: "",
+  websiteUrl: "",
   facebookUrl: "",
   instagramUrl: "",
   linkedinUrl: "",
@@ -2367,6 +2370,8 @@ export function getPrefs(): Prefs {
     merged.visualMode = normalizeVisualMode(merged.visualMode);
     merged.aiTone = normalizeAiTone(merged.aiTone);
     // Legacy prefs may omit newer social URL keys — keep empty strings.
+    merged.websiteUrl =
+      typeof merged.websiteUrl === "string" ? merged.websiteUrl : "";
     merged.facebookUrl = typeof merged.facebookUrl === "string" ? merged.facebookUrl : "";
     merged.instagramUrl = typeof merged.instagramUrl === "string" ? merged.instagramUrl : "";
     merged.linkedinUrl = typeof merged.linkedinUrl === "string" ? merged.linkedinUrl : "";

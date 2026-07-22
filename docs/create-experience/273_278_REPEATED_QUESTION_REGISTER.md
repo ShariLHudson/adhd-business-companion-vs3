@@ -21,10 +21,25 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `bp-event-three-day-retreat` | `q_purpose` | purpose | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `bp-event-three-day-retreat` | `q_lodging` | venue, lodging | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `bp-event-three-day-retreat` | `q_volunteers` | needs_volunteers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.accounting_bookkeeping_tax` | `q_model` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.accounting_bookkeeping_tax` | `q_close` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.accounting_bookkeeping_tax` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.agriculture_farm_rural` | `q_enterprises` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.agriculture_farm_rural` | `q_channels` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.agriculture_farm_rural` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.author` | `q_vision` | purpose, vision, author_identity | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.author` | `q_readers` | readers, audience, buyers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.author` | `q_path` | publishing_path, publish | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.author` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.automotive_repair_detailing` | `q_model` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.automotive_repair_detailing` | `q_estimate` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.automotive_repair_detailing` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.beauty_personal_care` | `q_position` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.beauty_personal_care` | `q_menu` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.beauty_personal_care` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.cleaning_janitorial` | `q_model` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.cleaning_janitorial` | `q_routing` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.cleaning_janitorial` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.coaching` | `q_vision` | purpose, vision, coaching_focus | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.coaching` | `q_fit` | ideal_client, fit, non_fit | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.coaching` | `q_offer` | offers, format | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -50,15 +65,33 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.craft_show` | `q_pricing` | pricing | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.craft_show` | `q_calendar` | calendar, shows | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.craft_show` | `q_next` | next_actions | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.creative_agency_studio` | `q_studio` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.creative_agency_studio` | `q_catalog` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.creative_agency_studio` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.dealer_reseller_channel_partner` | `q_channel` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.dealer_reseller_channel_partner` | `q_tiers` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.dealer_reseller_channel_partner` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.ecommerce` | `q_foundation` | purpose, vision, channels | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.ecommerce` | `q_customers` | audience, customers, clients | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.ecommerce` | `q_assortment` | products, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.ecommerce` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.education_training` | `q_position` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.education_training` | `q_programs` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.education_training` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.etsy` | `q_vision` | purpose, vision | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.etsy` | `q_setup` | shop_setup, status | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.etsy` | `q_products` | products, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.etsy` | `q_pricing` | pricing | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.etsy` | `q_next` | next_actions | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.faith_membership_org` | `q_community` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.faith_membership_org` | `q_ministries` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.faith_membership_org` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.fitness_studio_coaching` | `q_position` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.fitness_studio_coaching` | `q_programs` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.fitness_studio_coaching` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.franchise` | `q_readiness` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.franchise` | `q_model` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.franchise` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.handmade_online_store` | `q_vision` | purpose, vision | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.handmade_online_store` | `q_products` | products, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.handmade_online_store` | `q_customers` | audience, customers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -76,15 +109,39 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.hospitality` | `q_property` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.hospitality` | `q_guests` | audience, customers, clients | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.hospitality` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.insurance_agency` | `q_lines` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.insurance_agency` | `q_renewals` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.insurance_agency` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_vision` | purpose, vision | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_products` | products | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_cogs` | cost_of_goods, materials | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_margin` | margin, profit_margin | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.inventory_pricing` | `q_next` | next_actions | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.legal_services` | `q_practice` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.legal_services` | `q_intake` | services, constraints | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.legal_services` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.logistics_transportation` | `q_model` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.logistics_transportation` | `q_dispatch` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.logistics_transportation` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.media_publishing` | `q_brand` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.media_publishing` | `q_calendar` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.media_publishing` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.membership` | `q_vision` | purpose, vision, membership | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.membership` | `q_member` | member, fit, non_fit | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.membership` | `q_model` | membership_model, model | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.membership` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.multi_location` | `q_network` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.multi_location` | `q_standards` | services, offers, constraints | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.multi_location` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.nonprofit_foundation` | `q_mission` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.nonprofit_foundation` | `q_programs` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.nonprofit_foundation` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.pet_service` | `q_model` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.pet_service` | `q_fit` | services, constraints | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.pet_service` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.photography_videography` | `q_niche` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.photography_videography` | `q_packages` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.photography_videography` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.product_based` | `q_opportunity` | purpose, vision, products | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.product_based` | `q_validation` | demand, validation, audience | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.product_based` | `q_production` | systems, inventory, constraints | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -100,6 +157,18 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.property_management` | `q_model` | purpose, vision, model | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.property_management` | `q_owners` | clients, audience, constraints | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.property_management` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.public_sector_community` | `q_initiative` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.public_sector_community` | `q_stakeholders` | audience, customers, clients | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.public_sector_community` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.real_estate_brokerage_agent` | `q_model` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.real_estate_brokerage_agent` | `q_tx` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.real_estate_brokerage_agent` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.rental_equipment_hire` | `q_assets` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.rental_equipment_hire` | `q_reservation` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.rental_equipment_hire` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.research_innovation_lab` | `q_lab` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.research_innovation_lab` | `q_experiment` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.research_innovation_lab` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.restaurant` | `q_concept` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.restaurant` | `q_menu` | products, offers, services | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.restaurant` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -111,6 +180,12 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.service` | `q_menu` | services, packages, exclusions | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.service` | `q_delivery` | delivery, workflow | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.service` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.small_manufacturing` | `q_products` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.small_manufacturing` | `q_bom` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.small_manufacturing` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.software_saas` | `q_product` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.software_saas` | `q_roadmap` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.software_saas` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.speaker` | `q_vision` | purpose, vision, speaker_identity | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.speaker` | `q_buyers` | audience, buyers, organizers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.speaker` | `q_talk` | signature_talk, topics | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -125,10 +200,19 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `business.venue_experience` | `q_venue` | purpose, vision, space | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.venue_experience` | `q_capacity` | constraints, inventory | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.venue_experience` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wedding_celebration_professional` | `q_role` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wedding_celebration_professional` | `q_capacity` | services, offers, constraints | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wedding_celebration_professional` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wellness_practice` | `q_scope` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wellness_practice` | `q_offers` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wellness_practice` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.wholesale` | `q_readiness` | purpose, constraints, stage | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.wholesale` | `q_accounts` | audience, customers, channels | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.wholesale` | `q_terms` | pricing, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `business.wholesale` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wholesale_distribution` | `q_model` | purpose, vision, specialty | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wholesale_distribution` | `q_inventory` | services, offers | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
+| high | `business.wholesale_distribution` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `event.book_launch` | `q_purpose` | purpose, author_goals | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `event.book_launch` | `q_book` | book_title, positioning | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `event.book_launch` | `q_audience` | audience | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
@@ -244,4 +328,4 @@ Questions that declare knownContextKeys while Context Connection is uncertified 
 | high | `retail.store_management` | `q_roles` | roles, owners, handoffs | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 | high | `retail.store_management` | `q_next` | next_action, next_step | Question declares knownContextKeys but Context Connection is not certified — risk of asking again. |
 
-**At-risk questions:** 236
+**At-risk questions:** 320

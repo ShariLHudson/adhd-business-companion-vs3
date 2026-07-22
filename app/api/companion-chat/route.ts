@@ -19,12 +19,32 @@ import {
 import { sanitizeBridgeFromReply } from "@/lib/sparkConversation/bridgeResponderGuard";
 import { shariCompanionHintForChat } from "@/lib/conversation/shariCompanionEngine";
 import { buildCanonContextBlockForChat } from "@/lib/canonContext";
+import { enforceHumanConversation } from "@/lib/humanConversation";
 import {
   buildRelationshipResponseTraceSummary,
   createRelationshipResponseId,
   firstParagraphForTrace,
   logRelationshipResponseTrace,
 } from "@/lib/relationshipResponseTrace";
+
+/** Structured alert for companion-chat 503s — visible in server logs / APM. */
+function logCompanionChatServiceUnavailable(input: {
+  reason: string;
+  status: 503 | 502;
+  talkItOut?: boolean;
+  userPreview?: string;
+  detail?: string;
+}) {
+  console.error("[companion-chat-503]", {
+    alert: "companion_chat_service_unavailable",
+    status: input.status,
+    reason: input.reason,
+    talkItOut: Boolean(input.talkItOut),
+    userPreview: input.userPreview?.slice(0, 120) ?? null,
+    detail: input.detail?.slice(0, 240) ?? null,
+    at: new Date().toISOString(),
+  });
+}
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -100,6 +120,8 @@ async function parseCompanionChatBody(
 }
 
 export async function POST(request: NextRequest) {
+  let userProbe = "";
+  let talkItOutShariEngine = false;
   try {
     const apiKey = resolveOpenAiApiKey();
     const body = await parseCompanionChatBody(request);
@@ -110,9 +132,9 @@ export async function POST(request: NextRequest) {
       );
     }
     const messages = body.messages as ChatMessage[];
-    const userProbe = messages[messages.length - 1]?.content ?? "";
+    userProbe = messages[messages.length - 1]?.content ?? "";
     const relationshipResponseId = createRelationshipResponseId();
-    const talkItOutShariEngine = Boolean(body.talkItOutShariEngine);
+    talkItOutShariEngine = Boolean(body.talkItOutShariEngine);
     const systemPromptOverride =
       typeof body.systemPromptOverride === "string"
         ? body.systemPromptOverride.trim()
@@ -128,7 +150,12 @@ export async function POST(request: NextRequest) {
     // Talk It Out Shari Response Engine — sole system prompt, no companion stack.
     if (talkItOutShariEngine && systemPromptOverride) {
       if (!apiKey) {
-        console.error("Talk It Out: OpenAI API key is not configured.");
+        logCompanionChatServiceUnavailable({
+          reason: "openai_api_key_missing",
+          status: 503,
+          talkItOut: true,
+          userPreview: userProbe,
+        });
         return NextResponse.json(
           { error: "Model unavailable.", message: "" },
           { status: 503 },
@@ -151,7 +178,14 @@ export async function POST(request: NextRequest) {
         body: JSON.stringify(openAiBody),
       });
       if (!response.ok) {
-        console.error("Talk It Out OpenAI error:", await response.text());
+        const detail = await response.text();
+        logCompanionChatServiceUnavailable({
+          reason: "openai_upstream_error",
+          status: 502,
+          talkItOut: true,
+          userPreview: userProbe,
+          detail,
+        });
         return NextResponse.json(
           { error: "Model unavailable.", message: "" },
           { status: 502 },
@@ -490,7 +524,17 @@ export async function POST(request: NextRequest) {
         emotionalState?.toLowerCase().includes("emotional"),
     });
 
-    const message = voiceResult.text;
+    // Must define before JSON return — prior code referenced undefined
+    // `humanEnforcement` and crashed every successful turn in development.
+    const humanEnforcement = enforceHumanConversation({
+      response: voiceResult.text,
+      userText: userProbe,
+      memoryConfidence,
+      gentle:
+        emotionalState?.toLowerCase().includes("overwhelm") ||
+        emotionalState?.toLowerCase().includes("emotional"),
+    });
+    const message = humanEnforcement.message;
 
     logRelationshipResponseTrace({
       responseId: relationshipResponseId,
@@ -583,7 +627,26 @@ export async function POST(request: NextRequest) {
           : {}),
     });
   } catch (error) {
+    const detail =
+      error instanceof Error ? error.message : String(error ?? "unknown");
+    logCompanionChatServiceUnavailable({
+      reason: "unhandled_route_exception",
+      status: 503,
+      talkItOut: talkItOutShariEngine,
+      userPreview: userProbe,
+      detail,
+    });
     console.error("Companion chat error:", error);
-    return coachingFallbackJsonResponse("", createRelationshipResponseId(), []);
+    const relationshipResponseId = createRelationshipResponseId();
+    const fallback = buildCoachingFallbackResponse(userProbe || "help");
+    return NextResponse.json(
+      {
+        error: "Model unavailable.",
+        message: sanitizeBridgeFromReply(fallback, userProbe),
+        relationshipResponseId,
+        usedCoachingFallback: true,
+      },
+      { status: 503 },
+    );
   }
 }

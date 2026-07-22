@@ -1,7 +1,7 @@
 /**
  * Digital Workspace Preferences — preferred destinations for Spark Hands.
- * Connections Settings is the single source of truth for auth + preferences.
- * Crystals launch using these defaults so members are not re-asked every time.
+ * Settings → Defaults is the source of truth for destination preferences.
+ * Settings → Connected Services owns auth. Crystals use these defaults quietly.
  */
 
 const STORAGE_KEY = "companion-digital-workspace-preferences-v1";
@@ -17,6 +17,7 @@ export type PrintingPreference = "print-dialog" | "save-pdf" | "preferred-provid
 export type CalendarProviderPreference = "google" | "outlook";
 
 export type StorageProviderPreference =
+  | "spark-estate"
   | "google-drive"
   | "onedrive"
   | "dropbox";
@@ -47,10 +48,11 @@ export type DigitalWorkspacePreferences = {
 
 export const DEFAULT_DIGITAL_WORKSPACE_PREFERENCES: DigitalWorkspacePreferences =
   {
-    documents: "google-docs",
+    /** Built-in fallbacks — no connection required for a calm first visit. */
+    documents: "spark-estate",
     printing: "save-pdf",
     calendar: "google",
-    storage: "google-drive",
+    storage: "spark-estate",
     email: "gmail",
     destinationUrls: {},
   };
@@ -87,7 +89,10 @@ function isCalendar(value: unknown): value is CalendarProviderPreference {
 
 function isStorage(value: unknown): value is StorageProviderPreference {
   return (
-    value === "google-drive" || value === "onedrive" || value === "dropbox"
+    value === "spark-estate" ||
+    value === "google-drive" ||
+    value === "onedrive" ||
+    value === "dropbox"
   );
 }
 
@@ -174,13 +179,29 @@ export const DOCUMENTS_PROVIDER_LABELS: Record<
   string
 > = {
   "google-docs": "Google Docs",
-  "microsoft-word": "Microsoft Word",
+  "microsoft-word": "Microsoft Word file",
   "spark-estate": "Spark Estate Documents",
   local: "Local Documents",
 };
 
 export const PRINTING_PREFERENCE_LABELS: Record<PrintingPreference, string> = {
-  "print-dialog": "Print dialog",
+  "print-dialog": "Open print dialog",
   "save-pdf": "Save as PDF",
   "preferred-provider": "Preferred print provider",
+};
+
+export const STORAGE_PROVIDER_LABELS: Record<StorageProviderPreference, string> =
+  {
+    "spark-estate": "Spark Estate",
+    "google-drive": "Google Drive",
+    onedrive: "OneDrive",
+    dropbox: "Dropbox",
+  };
+
+export const CALENDAR_PROVIDER_LABELS: Record<
+  CalendarProviderPreference,
+  string
+> = {
+  google: "Google Calendar",
+  outlook: "Outlook Calendar",
 };

@@ -4,7 +4,10 @@ import {
   chamberMemberTalkLabel,
   getChamberMemberCardDisplay,
 } from "./chamberMemberCardDisplay";
-import { chamberMemberHintForChat } from "./chamberMemberPrompt";
+import {
+  CHAMBER_SHARED_RESPONSE_POLICY,
+  chamberMemberHintForChat,
+} from "./chamberMemberPrompt";
 
 describe("chamberMemberCardDisplay", () => {
   it("returns curated finance card copy", () => {
@@ -26,13 +29,27 @@ describe("chamberMemberCardDisplay", () => {
 });
 
 describe("chamberMemberPrompt", () => {
-  it("keeps finance identity and ADHD-first rules in chat hint", () => {
+  it("keeps finance identity with answer-first Chamber policy", () => {
     const member = getChamberMemberById("finance");
     const hint = chamberMemberHintForChat(member!);
     expect(hint).toContain("Finance Intelligence");
     expect(hint).toContain("CHAMBER MEMBER ACTIVE");
-    expect(hint).toContain("NOT ChatGPT");
-    expect(hint).toContain("Reduce friction");
-    expect(hint).toContain("ONE clear next step");
+    expect(hint).toContain("not ChatGPT");
+    expect(hint).toContain("Shari remains the speaking voice");
+    expect(hint).toContain("CHAMBER SHARED RESPONSE POLICY");
+    expect(hint).toContain("Answer first");
+    expect(hint).toContain("CLEAR OBJECTIVE RULE");
+    expect(hint).toContain("NOT Talk It Out");
+    expect(hint).toContain("I'm here — tell me what you need");
+    expect(hint).toContain("Stay strictly on-topic");
+    expect(hint).toContain("SILENT CHECK");
+    expect(hint).toContain("DISABLED FALLBACK");
+    expect(hint).toContain("Which platform matters most");
+    expect(hint).not.toContain("ONE good follow-up question");
+    expect(hint).not.toMatch(/You are NOT Shari/);
+    expect(CHAMBER_SHARED_RESPONSE_POLICY).toContain(
+      "Answer first when the objective is already clear",
+    );
+    expect(CHAMBER_SHARED_RESPONSE_POLICY).toContain("from THIS member");
   });
 });

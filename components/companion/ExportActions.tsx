@@ -14,7 +14,7 @@ import {
 
 // Send a finished piece where it's going: copy, print, push to a new Google
 // Doc, download, or copy-and-open the right social network to paste into.
-// Uses the user's saved profile URLs (Settings → Connections) when present.
+// Uses the user's saved profile URLs (Settings → Profile → Online Presence) when present.
 const SOCIAL_META = [
   { name: "Facebook", fallback: "https://www.facebook.com/", color: "#1877f2" },
   { name: "Instagram", fallback: "https://www.instagram.com/", color: "#c13584" },
@@ -23,6 +23,8 @@ const SOCIAL_META = [
     fallback: "https://www.linkedin.com/feed/?shareActive=true",
     color: "#0a66c2",
   },
+  { name: "TikTok", fallback: "https://www.tiktok.com/", color: "#010101" },
+  { name: "Pinterest", fallback: "https://www.pinterest.com/", color: "#e60023" },
 ];
 
 function esc(s: string) {
@@ -100,6 +102,8 @@ export function ExportActions({
     Facebook: prefs.facebookUrl,
     Instagram: prefs.instagramUrl,
     LinkedIn: prefs.linkedinUrl,
+    TikTok: prefs.tiktokUrl,
+    Pinterest: prefs.pinterestUrl,
   };
   const social_list = SOCIAL_META.map((s) => ({
     name: s.name,

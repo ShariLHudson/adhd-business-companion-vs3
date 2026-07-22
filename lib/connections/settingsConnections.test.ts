@@ -63,7 +63,7 @@ describe("settings connections catalog", () => {
       true,
     );
     expect(cards.find((c) => c.id === "outlook-calendar")?.status).toBe(
-      "not-connected",
+      "disconnected",
     );
   });
 
@@ -82,14 +82,14 @@ describe("settings connections catalog", () => {
     expect(isOutlookCalendarConnected()).toBe(false);
   });
 
-  it("surfaces Canva connection status on the Connections card", () => {
+  it("surfaces Canva connection status on the Connected Services card", () => {
     const disconnected = buildSettingsConnectionCards({
       google: { configured: true, connected: false, email: null },
       outlookConnected: false,
       canvaConnected: false,
     });
     expect(disconnected.find((c) => c.id === "canva")?.status).toBe(
-      "not-connected",
+      "disconnected",
     );
     const connected = buildSettingsConnectionCards({
       google: { configured: true, connected: false, email: null },

@@ -1,5 +1,5 @@
 /**
- * Canva connection — Settings → Connections / Digital Workspace Preferences.
+ * Canva connection — Settings → Connected Services.
  * Stores the member's preferred Canva destination URL (homepage or workspace).
  * No OAuth in V1 — URL destination is the connection.
  */

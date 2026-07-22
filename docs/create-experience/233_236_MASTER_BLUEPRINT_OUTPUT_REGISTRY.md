@@ -29,6 +29,22 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `bp-event-three-day-retreat` | 1.0.0 | event_plan | Packing list | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `bp-event-three-day-retreat` | 1.0.0 | event_plan | Care & safety brief | brief | draft_only | blocked | Create (unspecified) | yes |
 | `bp-event-three-day-retreat` | 1.0.0 | event_plan | Follow-up integration plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Practice Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Client Onboarding Pack | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Monthly Close Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Review and QC Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Tax Workflow Path | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Pricing and Capacity Plan | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Records and Security Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.accounting_bookkeeping_tax` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Farm Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Enterprise Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Costing Model | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Input and Supplier Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Harvest and Inventory Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Sales Channel Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Risk Review | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.agriculture_farm_rural` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.author` | 1.0.0 | business_plan | Author Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.author` | 1.0.0 | business_plan | Author Positioning Statement | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.author` | 1.0.0 | business_plan | Reader and Buyer Map | map | draft_only | blocked | Create (unspecified) | yes |
@@ -40,6 +56,33 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.author` | 1.0.0 | business_plan | Distribution Strategy | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.author` | 1.0.0 | business_plan | Author Financial Model | financial_model | structured | blocked | Create (unspecified) | yes |
 | `business.author` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Shop Service Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Vehicle Intake Record | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Inspection Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Estimate and Approval Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Work Order Template | template | draft_only | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Parts Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Final QC and Release Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.automotive_repair_detailing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Beauty Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Service Menu | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Appointment Duration Standards | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Service Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Chair or Room Capacity Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Booking Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Client Intake Form | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Sanitation Review Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Aftercare Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Retail Product Assortment | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.beauty_personal_care` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Cleaning Service Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Site Walkthrough Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Recurring Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Zone and Task Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Quality Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Route Schedule | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Chemical Register | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.cleaning_janitorial` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.coaching` | 1.0.0 | business_plan | Coaching Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.coaching` | 1.0.0 | business_plan | Scope and Boundary Statement | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.coaching` | 1.0.0 | business_plan | Client Fit Profile | document | draft_only | blocked | Create (unspecified) | yes |
@@ -104,6 +147,23 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.craft_show` | 1.0.0 | business_plan | Post-show review template | template | draft_only | blocked | Create (unspecified) | yes |
 | `business.craft_show` | 1.0.0 | business_plan | Linked Event plan recommendations | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.craft_show` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Service Catalog | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Proposal Template | template | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Creative Brief | brief | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Production Schedule | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Review Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Brand Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Asset Registry | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Client Reporting | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.creative_agency_studio` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Channel Strategy Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Partner Tier Model | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Partner Onboarding Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Channel Price List | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Deal Registration Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Enablement Playbook | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Partner Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.dealer_reseller_channel_partner` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.ecommerce` | 1.0.0 | business_plan | Ecommerce Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.ecommerce` | 1.0.0 | business_plan | Customer Journey Map | map | draft_only | blocked | Create (unspecified) | yes |
 | `business.ecommerce` | 1.0.0 | business_plan | Assortment Architecture | document | draft_only | blocked | Create (unspecified) | yes |
@@ -114,6 +174,17 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.ecommerce` | 1.0.0 | business_plan | Marketing Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.ecommerce` | 1.0.0 | business_plan | KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
 | `business.ecommerce` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Program Architecture | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Curriculum Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Learning Paths | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Lesson Plans | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Assessments | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Instructor Guides | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Student Onboarding | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Training Schedules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Certification Workflows | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.education_training` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Etsy Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Shop setup checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Listing and SEO checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
@@ -121,6 +192,34 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.etsy` | 1.0.0 | business_plan | Shipping profile notes | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Pricing and profitability view | financial_model | structured | blocked | Create (unspecified) | yes |
 | `business.etsy` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Ministry Plans | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Volunteer Schedules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Event Plans | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Care Workflows | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Member Onboarding | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Communication Calendar | calendar | connected | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Annual Ministry Roadmap | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.faith_membership_org` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Fitness Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Scope and Referral Statement | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Service Menu | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | One-to-One Program | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Group Program | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Membership or Package Model | package | composed | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Readiness Questionnaire | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Client Welcome Packet | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Class Run Sheet | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Progression Framework | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.fitness_studio_coaching` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Franchise Readiness Assessment | assessment | draft_only | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Replicable Business Model | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Unit Economics Model | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Territory Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Franchisee Onboarding Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Operations Manual Architecture | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Network Performance Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.franchise` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.handmade_online_store` | 1.0.0 | business_plan | Handmade Online Store Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.handmade_online_store` | 1.0.0 | business_plan | Product and pricing sheet | financial_model | structured | blocked | Create (unspecified) | yes |
 | `business.handmade_online_store` | 1.0.0 | business_plan | Marketplace focus plan | plan | draft_only | blocked | Create (unspecified) | yes |
@@ -154,6 +253,14 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.hospitality` | 1.0.0 | business_plan | SOP Library | workflow | draft_only | blocked | Create (unspecified) | yes |
 | `business.hospitality` | 1.0.0 | business_plan | Revenue Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
 | `business.hospitality` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Agency Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Prospect Qualification Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Needs Discovery Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Quote-to-Bind Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Renewal Calendar Rules | calendar | connected | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Claims Support Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Compliance and Records Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.insurance_agency` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.inventory_pricing` | 1.0.0 | business_plan | Inventory and Pricing Plan | financial_model | structured | blocked | Create (unspecified) | yes |
 | `business.inventory_pricing` | 1.0.0 | business_plan | Cost of goods sheet | financial_model | structured | blocked | Create (unspecified) | yes |
 | `business.inventory_pricing` | 1.0.0 | business_plan | Margin targets | document | draft_only | blocked | Create (unspecified) | yes |
@@ -161,6 +268,31 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.inventory_pricing` | 1.0.0 | business_plan | Reorder point notes | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.inventory_pricing` | 1.0.0 | business_plan | Dead inventory decisions | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.inventory_pricing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Legal Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Practice Area Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Conflict-Check Intake Record | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Engagement Letter Draft | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Matter Plan Template | template | draft_only | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Billing and Collections Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Referral Boundary Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.legal_services` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Transport Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Shipment Intake Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Pricing and Quoting Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Dispatch Board Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Pickup and Delivery Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Safety Stop Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Billing and Claims Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.logistics_transportation` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Editorial Strategy | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Publishing Calendar | calendar | connected | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Content Pipeline | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Sponsorship Kit | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Distribution Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Audience Growth Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Monetization Model | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Performance Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.media_publishing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.membership` | 1.0.0 | business_plan | Membership Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.membership` | 1.0.0 | business_plan | Membership Promise | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.membership` | 1.0.0 | business_plan | Member Profile | document | draft_only | blocked | Create (unspecified) | yes |
@@ -172,6 +304,41 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.membership` | 1.0.0 | business_plan | Retention System | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.membership` | 1.0.0 | business_plan | Membership Health Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
 | `business.membership` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.multi_location` | 1.0.0 | business_plan | Network Operating Model | document | composed | blocked | Create (unspecified) | yes |
+| `business.multi_location` | 1.0.0 | business_plan | Location Register | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.multi_location` | 1.0.0 | business_plan | Location Launch Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.multi_location` | 1.0.0 | business_plan | Network Standards Register | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.multi_location` | 1.0.0 | business_plan | Location KPI Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.multi_location` | 1.0.0 | business_plan | Expansion Pipeline | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.multi_location` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Mission Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Strategic Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Program Plans | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Volunteer Handbook | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Fundraising Campaigns | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Grant Tracker | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Board Agenda | timeline | draft_only | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Impact Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.nonprofit_foundation` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Pet Service Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Service Area | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Service Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Pet Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Veterinary and Emergency Authorization Draft | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Key and Home Access Record | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Daily Route | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Visit Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Escape or Missing-Pet Protocol Draft | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Recurring Care Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.pet_service` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Service Menu | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Package Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Creative Brief | brief | draft_only | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Shot List | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Call Sheet | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Rights and Release Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Gallery Delivery Workflow | workflow | draft_only | blocked | Create (unspecified) | yes |
+| `business.photography_videography` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.product_based` | 1.0.0 | business_plan | Product Opportunity Brief | brief | draft_only | blocked | Create (unspecified) | yes |
 | `business.product_based` | 1.0.0 | business_plan | Validation Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.product_based` | 1.0.0 | business_plan | Product Brief | brief | draft_only | blocked | Create (unspecified) | yes |
@@ -206,6 +373,38 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.property_management` | 1.0.0 | business_plan | Vendor Directory Template | template | draft_only | blocked | Create (unspecified) | yes |
 | `business.property_management` | 1.0.0 | business_plan | Portfolio Dashboard Outline | dashboard | structured | blocked | Create (unspecified) | yes |
 | `business.property_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Initiative Charter | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Stakeholder Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Communication Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Meeting Agendas | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Community Engagement Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Risk Log | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Progress Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.public_sector_community` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.real_estate_brokerage_agent` | 1.0.0 | business_plan | Brokerage Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.real_estate_brokerage_agent` | 1.0.0 | business_plan | Lead Management Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.real_estate_brokerage_agent` | 1.0.0 | business_plan | Listing Strategy Brief | brief | draft_only | blocked | Create (unspecified) | yes |
+| `business.real_estate_brokerage_agent` | 1.0.0 | business_plan | Buyer Journey Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.real_estate_brokerage_agent` | 1.0.0 | business_plan | Transaction Coordination Checklist | checklist | draft_only | blocked | Create (unspecified) | yes |
+| `business.real_estate_brokerage_agent` | 1.0.0 | business_plan | Closing and Post-Close Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.real_estate_brokerage_agent` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Rental Business Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Asset Catalog | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Reservation Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Agreement Draft | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Release and Return Checklists | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Maintenance Schedule | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Utilization Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.rental_equipment_hire` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Research Charter | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Experiment Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Hypothesis Tracker | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Validation Report | report | draft_only | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Prototype Roadmap | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Opportunity Portfolio | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Innovation Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.research_innovation_lab` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.restaurant` | 1.0.0 | business_plan | Restaurant Operating Plan | plan | composed | blocked | Create (unspecified) | yes |
 | `business.restaurant` | 1.0.0 | business_plan | Menu Engineering Sheet | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.restaurant` | 1.0.0 | business_plan | Food Cost Model | financial_model | structured | blocked | Create (unspecified) | yes |
@@ -228,6 +427,25 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.service` | 1.0.0 | business_plan | Change Request Guide | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Follow-Up Sequence | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.service` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | Manufacturing Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | Product Definition | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | BOM and Routing | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | Costing Model | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | Work Order Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | Quality Checkpoints | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | Inventory and Traceability Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.small_manufacturing` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Product Vision | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Product Requirements | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Roadmap | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Feature Backlog | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Release Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | User Personas | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Customer Onboarding | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Support Workflows | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.software_saas` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.speaker` | 1.0.0 | business_plan | Speaker Business Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `business.speaker` | 1.0.0 | business_plan | Speaker Positioning Statement | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.speaker` | 1.0.0 | business_plan | Audience and Buyer Map | map | draft_only | blocked | Create (unspecified) | yes |
@@ -263,6 +481,25 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.venue_experience` | 1.0.0 | business_plan | Safety Ownership Map | map | draft_only | blocked | Create (unspecified) | yes |
 | `business.venue_experience` | 1.0.0 | business_plan | Revenue Stream Map | map | draft_only | blocked | Create (unspecified) | yes |
 | `business.venue_experience` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Celebration Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Event Budget | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Vendor Matrix | matrix | draft_only | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Master Timeline | timeline | draft_only | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Event-Day Run Sheet | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Contingency Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Post-Event Scorecard | dashboard | structured | blocked | Create (unspecified) | yes |
+| `business.wedding_celebration_professional` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Wellness Practice Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Scope of Practice Statement | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Service Boundary Guide | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Referral and Escalation Criteria | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Ideal Client Profile | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Service Menu | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Wellness Pricing Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Capacity Plan | plan | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Intake and Consent Drafts | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Client Journey Map | map | draft_only | blocked | Create (unspecified) | yes |
+| `business.wellness_practice` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `business.wholesale` | 1.0.0 | business_plan | Wholesale Readiness Assessment | assessment | draft_only | blocked | Create (unspecified) | yes |
 | `business.wholesale` | 1.0.0 | business_plan | Account Segment Map | map | draft_only | blocked | Create (unspecified) | yes |
 | `business.wholesale` | 1.0.0 | business_plan | Wholesale Price List and Terms | document | draft_only | blocked | Create (unspecified) | yes |
@@ -272,6 +509,14 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `business.wholesale` | 1.0.0 | business_plan | Retail Partner Toolkit | document | draft_only | blocked | Create (unspecified) | yes |
 | `business.wholesale` | 1.0.0 | business_plan | Wholesale KPI Dashboard | dashboard | structured | blocked | Create (unspecified) | yes |
 | `business.wholesale` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Distribution Model Snapshot | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Catalog Structure | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Pricing and Margin Model | financial_model | structured | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Account Qualification Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Purchasing Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Inventory Planning Rules | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Warehouse Path | document | draft_only | blocked | Create (unspecified) | yes |
+| `business.wholesale_distribution` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 | `event.book_launch` | 1.0.0 | event_plan | Concise Book Launch Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `event.book_launch` | 1.0.0 | event_plan | Complete Book Launch Plan | plan | draft_only | blocked | Create (unspecified) | yes |
 | `event.book_launch` | 1.0.0 | event_plan | One-page author goals overview | brief | draft_only | blocked | Create (unspecified) | yes |
@@ -551,4 +796,4 @@ Provisional rows are seeded from `deliverables[]` and remain **blocked** until h
 | `retail.store_management` | 1.0.0 | business_plan | Shift Handoff Guide | document | draft_only | blocked | Create (unspecified) | yes |
 | `retail.store_management` | 1.0.0 | business_plan | Next actions list | project | connected | blocked | Create (unspecified) | yes |
 
-**Total outputs:** 542
+**Total outputs:** 787

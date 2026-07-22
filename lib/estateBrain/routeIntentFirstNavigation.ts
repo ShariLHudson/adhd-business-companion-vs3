@@ -29,6 +29,7 @@ import type {
   EstateEnvironmentChoice,
 } from "./intelligenceTypes";
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
+import { hasLeadingExplicitNavigationVerb } from "@/lib/estate/explicitNavigationVerb";
 
 export type { EstateEnvironmentChoice };
 
@@ -136,6 +137,11 @@ export function resolveIntentFirstRoute(
 ): EstateIntelligenceRoute | null {
   const text = userText.trim();
   if (!text) return null;
+
+  // Explicit navigation verbs → destination/kernel routing first, not capability/create.
+  if (hasLeadingExplicitNavigationVerb(text)) {
+    return null;
+  }
 
   if (isProjectCreationIntent(text)) {
     const environment =
