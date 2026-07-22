@@ -3,6 +3,7 @@
 **Status:** Provisional (code certified; browser matrix not fully run this session)  
 **Date:** 2026-07-21  
 **Branch:** `deploy/companion-app-v3`  
+**Code commit:** `c5cc936c` (implementation landed; subject line was briefly mislabeled during a concurrent Cartography push — this cert is authoritative)  
 **Principle:** A strategy should reduce decisions — not create new ones.
 
 ## Assessment
