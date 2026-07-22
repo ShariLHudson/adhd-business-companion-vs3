@@ -2,19 +2,27 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomShell";
-import { CreateExploreIdeasPanel } from "@/components/companion/CreateExploreIdeasPanel";
+import { CreateBrowseCategoriesPanel } from "@/components/companion/CreateBrowseCategoriesPanel";
+import { CreateFindPreviousWorkPanel } from "@/components/companion/CreateFindPreviousWorkPanel";
 import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspaceResumeList";
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import {
-  CREATE_ESTATE_BEGIN_LABEL,
-  CREATE_ESTATE_COMPOSER_PLACEHOLDER,
+  CREATE_ESTATE_BROWSE_MORE_HEADING,
+  CREATE_ESTATE_BROWSE_MORE_HINT,
+  CREATE_ESTATE_BROWSE_MORE_LABEL,
   CREATE_ESTATE_CONFIRM_CANCEL,
   CREATE_ESTATE_CONFIRM_OTHER,
   CREATE_ESTATE_CONTINUE_HEADING,
-  CREATE_ESTATE_EXPLORE_IDEAS_HEADING,
-  CREATE_ESTATE_EXPLORE_IDEAS_HINT,
-  CREATE_ESTATE_START_NEW_HEADING,
+  CREATE_ESTATE_CREATE_FROM_SCRATCH_LABEL,
+  CREATE_ESTATE_DEFAULT_SUGGESTED_CHOICES,
+  CREATE_ESTATE_DESCRIBE_PLACEHOLDER,
+  CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING,
+  CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT,
+  CREATE_ESTATE_HELP_ME_CHOOSE_LABEL,
+  CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE,
+  CREATE_ESTATE_START_CREATING_LABEL,
   CREATE_ESTATE_START_NEW_LABEL,
+  CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
 } from "@/lib/createEstate/copy";
 import {
@@ -25,6 +33,9 @@ import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreat
 import {
   resolveSuggestionContext,
 } from "@/lib/createEstate/contextAwareSuggestions";
+import { buildExploreIdeaRecommendations } from "@/lib/createEstate/exploreIdeas/recommendations";
+import { queryExploreIdeas } from "@/lib/createEstate/exploreIdeas/search";
+import type { ExploreIdeaResult } from "@/lib/createEstate/exploreIdeas/types";
 import {
   confirmCreateBeginToOpen,
   resolveCatalogCreateConfirm,
@@ -34,7 +45,7 @@ import {
 } from "@/lib/createEstate/resolveCreateBeginOutcome";
 import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
 import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
-import { listCreateDraftEntries } from "@/lib/createDraftLibrary";
+import { findCatalogItem } from "@/lib/createCatalog";
 import {
   CREATE_BEGIN_PROGRESS_MESSAGE,
 } from "@/lib/primaryActionFeedback";
@@ -81,10 +92,14 @@ type Props = {
 };
 
 /**
- * Welcome Home → Create (056 / 127 / 129 / 131 / 133)
- * Hierarchy: Continue Working (if any) → Start Something New → Explore Ideas (collapsed).
- * Spec 131 — ≤3 visible decision layers; Continue Working hidden when empty.
- * Spec 133 — one discovery experience (no framework tabs / duplicate browse chains).
+ * Welcome Home → Create (056 / 127 / 129 / 131 / 133 / Create Simplification).
+ * Hierarchy: Continue Working (if any) → What would you like to create? →
+ * Find Previous Work (collapsed) → Browse More (collapsed).
+ *
+ * Create Simplification & Category Evaluation — the default screen answers
+ * one question ("What would you like to create?") with ≤4 suggested choices
+ * and no source filters. Previous work and full category browsing are both
+ * optional, collapsed, and never shown by default (Parts 1–4).
  */
 export function CreateEstateEntrancePanel({
   onBack,
@@ -105,7 +120,6 @@ export function CreateEstateEntrancePanel({
   const [activeWorkspaces, setActiveWorkspaces] = useState<
     ActiveCreationWorkspaceSummary[]
   >([]);
-  const [draftCount, setDraftCount] = useState(0);
   const [beginBusy, setBeginBusy] = useState(false);
   const [startNewBusy, setStartNewBusy] = useState(false);
   const [beginFeedback, setBeginFeedback] = useState<string | null>(null);
@@ -116,14 +130,49 @@ export function CreateEstateEntrancePanel({
     CreateBeginOutcome,
     { kind: "confirm" }
   > | null>(null);
-  const [exploreOpen, setExploreOpen] = useState(false);
+  const [helpMeChooseOpen, setHelpMeChooseOpen] = useState(false);
+  const [findPreviousWorkOpen, setFindPreviousWorkOpen] = useState(false);
+  const [browseMoreOpen, setBrowseMoreOpen] = useState(false);
   const confirmRegionRef = useRef<HTMLDivElement | null>(null);
+  const browseMoreRef = useRef<HTMLDetailsElement | null>(null);
 
   const exitDestination = resolveCreateExitDestination(exitOriginHint);
   const suggestionContext = useMemo(
     () => resolveSuggestionContext(activeWorkspaces),
     [activeWorkspaces],
   );
+
+  // Part 1 — ≤4 suggested choices, personalized when Spark has something
+  // honest to recommend; otherwise the calm defaults (Email, Social Post,
+  // Client Onboarding, Workshop).
+  const suggestedChoices = useMemo(() => {
+    const personalized = buildExploreIdeaRecommendations({
+      workspaces: activeWorkspaces,
+      suggestionContext,
+    }).map((rec) => rec.result.label);
+    const merged: string[] = [];
+    for (const label of personalized) {
+      if (merged.length >= 4) break;
+      if (!merged.includes(label)) merged.push(label);
+    }
+    for (const label of CREATE_ESTATE_DEFAULT_SUGGESTED_CHOICES) {
+      if (merged.length >= 4) break;
+      if (!merged.includes(label)) merged.push(label);
+    }
+    return merged.slice(0, 4);
+  }, [activeWorkspaces, suggestionContext]);
+
+  // Part 10 — the same field doubles as natural-language search. Two
+  // characters is enough to start narrowing; never a separate search box.
+  const trimmedPrompt = prompt.trim();
+  const searchResults = useMemo<ExploreIdeaResult[]>(() => {
+    if (trimmedPrompt.length < 2) return [];
+    return queryExploreIdeas({
+      search: trimmedPrompt,
+      suggestionContext,
+    }).slice(0, 5);
+  }, [trimmedPrompt, suggestionContext]);
+  const isSearching = trimmedPrompt.length >= 2;
 
   // Spec 132 — Escape dismisses the confirm layer before leaving Create.
   useDismissibleWindow({
@@ -155,7 +204,6 @@ export function CreateEstateEntrancePanel({
   useEffect(() => {
     const list = listActiveCreationWorkspaces();
     setActiveWorkspaces(list);
-    setDraftCount(listCreateDraftEntries().length);
   }, []);
 
   useEffect(() => {
@@ -182,6 +230,9 @@ export function CreateEstateEntrancePanel({
   }
 
   function requestCatalogConfirm(item: CreateCatalogItem) {
+    // A choice from suggested chips, search results, or Browse More /
+    // Help Me Choose all land here — the confirm gate never differs by path.
+    setHelpMeChooseOpen(false);
     const resolved = resolveCreateLauncherType(item.label);
     showConfirm(
       resolveCatalogCreateConfirm({
@@ -225,7 +276,7 @@ export function CreateEstateEntrancePanel({
         setPendingConfirm(null);
       } catch {
         setBeginFeedback(
-          "I couldn't save that creation yet. Your words are still here — Retry, or explore ideas below.",
+          "I couldn't save that creation yet. Your words are still here — Retry, or tell me a little more above.",
         );
         setBeginFeedbackKind("error");
       } finally {
@@ -235,7 +286,7 @@ export function CreateEstateEntrancePanel({
   }
 
   function submitPrompt() {
-    // P0 — every Begin click produces visible feedback (never silent)
+    // P0 — every Start Creating click produces visible feedback (never silent)
     setBeginBusy(true);
     setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
     setBeginFeedbackKind("progress");
@@ -276,7 +327,7 @@ export function CreateEstateEntrancePanel({
   function declineConfirm() {
     setPendingConfirm(null);
     setBeginFeedback(
-      "No problem — tell me a little more about what you'd like to create, or open Explore Ideas below.",
+      "No problem — tell me a little more about what you'd like to create, or use Help Me Choose below.",
     );
     setBeginFeedbackKind("clarify");
   }
@@ -285,6 +336,23 @@ export function CreateEstateEntrancePanel({
     setPendingConfirm(null);
     setBeginFeedback(null);
     setBeginFeedbackKind(null);
+  }
+
+  function clearFeedbackOnEdit() {
+    if (
+      beginFeedbackKind === "clarify" ||
+      beginFeedbackKind === "error" ||
+      beginFeedbackKind === "confirm"
+    ) {
+      setBeginFeedback(null);
+      setBeginFeedbackKind(null);
+      setPendingConfirm(null);
+    }
+  }
+
+  function openBrowseMore() {
+    setBrowseMoreOpen(true);
+    browseMoreRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   return (
@@ -335,7 +403,7 @@ export function CreateEstateEntrancePanel({
           </section>
         ) : null}
 
-        {/* 2 — Start Something New */}
+        {/* 2 — What would you like to create? (Part 1 — the default screen) */}
         <section
           className="mt-6 flex flex-col gap-3"
           data-testid="create-estate-composer"
@@ -345,21 +413,13 @@ export function CreateEstateEntrancePanel({
             id="create-estate-composer-heading"
             className="text-lg font-semibold text-[#1f1c19]"
           >
-            {CREATE_ESTATE_START_NEW_HEADING}
+            {CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING}
           </h2>
           <textarea
             value={prompt}
             onChange={(e) => {
               setPrompt(e.target.value);
-              if (
-                beginFeedbackKind === "clarify" ||
-                beginFeedbackKind === "error" ||
-                beginFeedbackKind === "confirm"
-              ) {
-                setBeginFeedback(null);
-                setBeginFeedbackKind(null);
-                setPendingConfirm(null);
-              }
+              clearFeedbackOnEdit();
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
@@ -367,46 +427,155 @@ export function CreateEstateEntrancePanel({
                 if (!beginBusy) submitPrompt();
               }
             }}
-            rows={4}
-            placeholder={CREATE_ESTATE_COMPOSER_PLACEHOLDER}
+            rows={3}
+            placeholder={CREATE_ESTATE_DESCRIBE_PLACEHOLDER}
             className="w-full max-w-2xl resize-y rounded-2xl border border-[#cfc6b8] bg-white/95 px-4 py-4 text-lg leading-relaxed text-[#1f1c19] shadow-sm placeholder:text-[#9a8f82] focus:border-[#8a7a68] focus:outline-none focus:ring-2 focus:ring-[#c4b8a8]/60"
             data-testid="create-estate-nl-input"
-            aria-label={CREATE_ESTATE_COMPOSER_PLACEHOLDER}
+            aria-label={CREATE_ESTATE_DESCRIBE_PLACEHOLDER}
             disabled={beginBusy}
           />
-          <div className="flex flex-col items-start gap-2">
-            <button
-              type="button"
-              onClick={submitPrompt}
-              disabled={beginBusy}
-              aria-busy={beginBusy}
-              className="rounded-xl bg-[#3d3429] px-6 py-3 text-base font-semibold text-[#f7f2ea] transition enabled:hover:bg-[#2c241c] disabled:cursor-wait disabled:opacity-70"
-              data-testid="create-estate-begin"
-              data-primary-action="begin"
+
+          {/* Part 1 — ≤4 suggested choices while the field is empty/short. */}
+          {!isSearching ? (
+            <ul
+              className="flex max-w-2xl flex-wrap gap-2"
+              data-testid="create-estate-suggested-choices"
+              aria-label="Suggested things to create"
             >
-              {beginBusy ? "Beginning…" : CREATE_ESTATE_BEGIN_LABEL}
-            </button>
-            {hasWorkspaces ? (
+              {suggestedChoices.map((label) => (
+                <li key={label}>
+                  <button
+                    type="button"
+                    disabled={beginBusy}
+                    className="rounded-full border border-[#cfc6b8] bg-white px-4 py-2 text-sm font-semibold text-[#3d3429] transition hover:border-[#1e4f4f]/45 hover:bg-[#f3ebe0] disabled:opacity-70"
+                    data-testid="create-estate-suggested-choice"
+                    onClick={() => {
+                      const item = findCatalogItem(label);
+                      if (item) requestCatalogConfirm(item);
+                    }}
+                  >
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+
+          {/* Part 10 — the description field doubles as natural-language search. */}
+          {isSearching ? (
+            searchResults.length > 0 ? (
+              <ul
+                className="flex max-w-2xl flex-col gap-1.5"
+                data-testid="create-estate-search-results"
+                aria-label="Matching ideas"
+              >
+                {searchResults.map((result) => (
+                  <li key={result.id}>
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="flex w-full items-center gap-2 rounded-xl border border-[#e7dfd4] bg-white/90 px-4 py-2.5 text-left text-base text-[#1f1c19] transition hover:border-[#cfc6b8] disabled:opacity-70"
+                      data-testid="create-estate-search-result"
+                      onClick={() => {
+                        if (result.catalogItem) {
+                          requestCatalogConfirm(result.catalogItem);
+                        }
+                      }}
+                    >
+                      <span aria-hidden="true">{result.emoji}</span>
+                      <span className="font-semibold">{result.label}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div
+                className="flex max-w-2xl flex-col gap-2"
+                data-testid="create-estate-search-empty"
+              >
+                <p className="text-sm leading-relaxed text-[#6b635a]">
+                  {CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE}
+                </p>
+                <button
+                  type="button"
+                  disabled={beginBusy}
+                  onClick={submitPrompt}
+                  className="self-start rounded-xl border border-[#cfc6b8] bg-white px-4 py-2 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                  data-testid="create-estate-create-from-scratch"
+                >
+                  {CREATE_ESTATE_CREATE_FROM_SCRATCH_LABEL}
+                </button>
+              </div>
+            )
+          ) : null}
+
+          <div className="flex flex-col items-start gap-2">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                disabled={startNewBusy || beginBusy}
-                aria-busy={startNewBusy}
-                onClick={() => {
-                  setStartNewBusy(true);
-                  void (async () => {
-                    try {
-                      await Promise.resolve(onStartSomethingNew());
-                    } finally {
-                      setStartNewBusy(false);
-                    }
-                  })();
-                }}
-                className="text-sm font-semibold text-[#1e4f4f] hover:underline disabled:opacity-70"
-                data-testid="create-estate-start-new"
+                onClick={submitPrompt}
+                disabled={beginBusy}
+                aria-busy={beginBusy}
+                className="rounded-xl bg-[#3d3429] px-6 py-3 text-base font-semibold text-[#f7f2ea] transition enabled:hover:bg-[#2c241c] disabled:cursor-wait disabled:opacity-70"
+                data-testid="create-estate-start-creating"
+                data-primary-action="begin"
               >
-                {startNewBusy ? "Starting…" : CREATE_ESTATE_START_NEW_LABEL}
+                {beginBusy ? "Beginning…" : CREATE_ESTATE_START_CREATING_LABEL}
               </button>
+              <button
+                type="button"
+                disabled={beginBusy}
+                aria-pressed={helpMeChooseOpen}
+                onClick={() => setHelpMeChooseOpen((open) => !open)}
+                className="rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                data-testid="create-estate-help-me-choose"
+              >
+                {CREATE_ESTATE_HELP_ME_CHOOSE_LABEL}
+              </button>
+              <button
+                type="button"
+                onClick={openBrowseMore}
+                className="text-sm font-semibold text-[#1e4f4f] hover:underline"
+                data-testid="create-estate-browse-more-link"
+              >
+                {CREATE_ESTATE_BROWSE_MORE_LABEL}
+              </button>
+              {hasWorkspaces ? (
+                <button
+                  type="button"
+                  disabled={startNewBusy || beginBusy}
+                  aria-busy={startNewBusy}
+                  onClick={() => {
+                    setStartNewBusy(true);
+                    void (async () => {
+                      try {
+                        await Promise.resolve(onStartSomethingNew());
+                      } finally {
+                        setStartNewBusy(false);
+                      }
+                    })();
+                  }}
+                  className="text-sm font-semibold text-[#1e4f4f] hover:underline disabled:opacity-70"
+                  data-testid="create-estate-start-new"
+                >
+                  {startNewBusy ? "Starting…" : CREATE_ESTATE_START_NEW_LABEL}
+                </button>
+              ) : null}
+            </div>
+
+            {/* Part 9 — Help Me Choose is one guided question at a time. */}
+            {helpMeChooseOpen ? (
+              <div
+                className="max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/80 px-4 py-3"
+                data-testid="create-estate-help-me-choose-body"
+              >
+                <CreateBrowseCategoriesPanel
+                  mode="guided"
+                  onRequestCreate={requestCatalogConfirm}
+                />
+              </div>
             ) : null}
+
             {beginFeedback ? (
               <div
                 ref={confirmRegionRef}
@@ -498,34 +667,59 @@ export function CreateEstateEntrancePanel({
           </div>
         </section>
 
-        {/* 3 — Explore Ideas (Optional) — Spec 133 one discovery experience */}
+        {/* 3 — Find Previous Work (Part 2 — separate from idea discovery) */}
         <details
           className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-          data-testid="create-estate-explore-ideas"
-          data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
-          open={exploreOpen}
+          data-testid="create-estate-find-previous-work"
+          open={findPreviousWorkOpen}
           onToggle={(e) =>
-            setExploreOpen((e.target as HTMLDetailsElement).open)
+            setFindPreviousWorkOpen((e.target as HTMLDetailsElement).open)
           }
         >
           <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
-            {CREATE_ESTATE_EXPLORE_IDEAS_HEADING}
+            {CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING}
           </summary>
           <p className="mt-2 text-sm text-[#6b635a]">
-            {CREATE_ESTATE_EXPLORE_IDEAS_HINT}
+            {CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT}
           </p>
 
-          {exploreOpen ? (
-            <CreateExploreIdeasPanel
-              activeWorkspaces={activeWorkspaces}
-              draftCount={draftCount}
-              suggestionContext={suggestionContext}
-              onOpenSavedDraft={onOpenSavedDraft}
-              onRenameDraft={onRenameDraft}
-              onDuplicateDraft={onDuplicateDraft}
-              onDeleteDraft={onDeleteDraft}
-              onRequestCreate={requestCatalogConfirm}
-            />
+          {findPreviousWorkOpen ? (
+            <div className="mt-3">
+              <CreateFindPreviousWorkPanel
+                onOpen={onOpenSavedDraft}
+                onRename={onRenameDraft}
+                onDuplicate={onDuplicateDraft}
+                onDelete={onDeleteDraft}
+              />
+            </div>
+          ) : null}
+        </details>
+
+        {/* 4 — Browse More (Part 4 — short category list, not the full catalog) */}
+        <details
+          ref={browseMoreRef}
+          className="mt-3 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
+          data-testid="create-estate-browse-more"
+          data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
+          open={browseMoreOpen}
+          onToggle={(e) =>
+            setBrowseMoreOpen((e.target as HTMLDetailsElement).open)
+          }
+        >
+          <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
+            {CREATE_ESTATE_BROWSE_MORE_HEADING}
+          </summary>
+          <p className="mt-2 text-sm text-[#6b635a]">
+            {CREATE_ESTATE_BROWSE_MORE_HINT}
+          </p>
+
+          {browseMoreOpen ? (
+            <div className="mt-3">
+              <CreateBrowseCategoriesPanel
+                mode="browse"
+                onRequestCreate={requestCatalogConfirm}
+              />
+            </div>
           ) : null}
         </details>
       </div>
