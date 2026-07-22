@@ -1,6 +1,10 @@
 /**
  * Universal Work Engine — public API.
  * Work Type packages and experiences import from here only.
+ *
+ * P0-03 role: **canonical Work identity + work-type blueprints**.
+ * Create open/resume → `lib/universalCreationEntrypoint` (not this module).
+ * @see lib/createEstate/createOwnershipContract.ts
  */
 
 import "./packages/eventPlan/registerEventPlanWorkType";
@@ -114,6 +118,15 @@ export {
 } from "./packages/marketingPlan/marketingPlanBlueprint";
 export { MARKETING_PLAN_MAP_GROUPS } from "./packages/marketingPlan/marketingPlanMapGroups";
 export { isMarketingPlanCreationRequest } from "./packages/marketingPlan/isMarketingPlanCreationRequest";
+export { ensureFacebookCommunityWorkTypeRegistered } from "./packages/facebookCommunity/registerFacebookCommunityWorkType";
+export { ensureFacebookCommunityBlueprintsRegistered } from "./packages/facebookCommunity/registerFacebookCommunityBlueprints";
+export {
+  FACEBOOK_COMMUNITY_BLUEPRINT_IDS,
+  FACEBOOK_COMMUNITY_SIMPLE_BLUEPRINT_ID,
+  FACEBOOK_COMMUNITY_BLUEPRINT_DEFINITIONS,
+} from "./packages/facebookCommunity/facebookCommunityBlueprint";
+export { FACEBOOK_COMMUNITY_MAP_GROUPS } from "./packages/facebookCommunity/facebookCommunityMapGroups";
+export { isFacebookCommunityCreationRequest } from "./packages/facebookCommunity/isFacebookCommunityCreationRequest";
 export { ensureBusinessPlanWorkTypeRegistered } from "./packages/businessPlan/registerBusinessPlanWorkType";
 export { ensureBusinessPlanBlueprintsRegistered } from "./packages/businessPlan/registerBusinessPlanBlueprints";
 export {

@@ -20,6 +20,7 @@ import {
 } from "@/lib/primaryActionFeedback";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform/oneCreationPlatform";
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
+import { isFacebookCommunityCreationRequest } from "@/lib/universalWorkEngine/packages/facebookCommunity/isFacebookCommunityCreationRequest";
 import {
   createIntentAlternativesMessage,
   createIntentConfirmMessage,
@@ -46,6 +47,7 @@ export type CreateBeginOutcome =
       confidence: Exclude<CreateIntentConfidence, "low">;
       isEventDomain: boolean;
       isMarketingPlanDomain: boolean;
+      isFacebookCommunityDomain: boolean;
       /** Spec 131 Rule 2 — also-considered when medium confidence */
       alsoConsidered?: string[];
     }
@@ -55,6 +57,7 @@ export type CreateBeginOutcome =
       artifactType: string;
       isEventDomain: boolean;
       isMarketingPlanDomain: boolean;
+      isFacebookCommunityDomain: boolean;
     }
   | {
       kind: "error";
@@ -80,6 +83,7 @@ function gatherCreateTypeCandidates(text: string): string[] {
   push(detectPromotionalDeliverableIntent(text));
   push(matchCatalogFromText(text)?.type ?? null);
   push(detectCreateTypeFromPrompt(text));
+  if (isFacebookCommunityCreationRequest(text)) push("Facebook Community");
   if (isMarketingPlanCreationRequest(text)) push("Marketing Plan");
   if (isEventDomainCreationRequest(text)) push("Event Plan");
 
@@ -125,6 +129,14 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
       fromPromotionalIntent: false,
     };
   }
+  if (isFacebookCommunityCreationRequest(text)) {
+    return {
+      artifactType: "Facebook Community",
+      fromCatalog: false,
+      fromPromptDetect: false,
+      fromPromotionalIntent: false,
+    };
+  }
   if (isMarketingPlanCreationRequest(text)) {
     return {
       artifactType: "Marketing Plan",
@@ -154,6 +166,7 @@ export function confirmCreateBeginToOpen(
     artifactType: outcome.artifactType,
     isEventDomain: outcome.isEventDomain,
     isMarketingPlanDomain: outcome.isMarketingPlanDomain,
+    isFacebookCommunityDomain: outcome.isFacebookCommunityDomain,
   };
 }
 
@@ -181,11 +194,16 @@ export function switchCreateBeginConfirmType(
       ...gatherCreateTypeCandidates(outcome.text),
     ],
   );
+  const isFacebookCommunityDomain =
+    isFacebookCommunityCreationRequest(outcome.text) ||
+    /facebook\s*(community|group)/i.test(label);
   const isMarketingPlanDomain =
-    isMarketingPlanCreationRequest(outcome.text) ||
-    /marketing\s+plan/i.test(label);
+    !isFacebookCommunityDomain &&
+    (isMarketingPlanCreationRequest(outcome.text) ||
+      /marketing\s+plan/i.test(label));
   const isEventDomain =
     !isMarketingPlanDomain &&
+    !isFacebookCommunityDomain &&
     (isEventDomainCreationRequest(outcome.text) ||
       /\b(event|workshop|retreat|webinar|conference)\b/i.test(label));
 
@@ -200,6 +218,7 @@ export function switchCreateBeginConfirmType(
     confidence: "high",
     isEventDomain,
     isMarketingPlanDomain,
+    isFacebookCommunityDomain,
     alsoConsidered: also.length > 0 ? also : undefined,
   };
 }
@@ -217,10 +236,15 @@ export function resolveCatalogCreateConfirm(input: {
   const text =
     input.requestText?.trim() ||
     `Create a ${label}`;
+  const isFacebookCommunityDomain =
+    isFacebookCommunityCreationRequest(text) ||
+    /facebook\s*(community|group)/i.test(label);
   const isMarketingPlanDomain =
-    isMarketingPlanCreationRequest(text) || /marketing\s+plan/i.test(label);
+    !isFacebookCommunityDomain &&
+    (isMarketingPlanCreationRequest(text) || /marketing\s+plan/i.test(label));
   const isEventDomain =
     !isMarketingPlanDomain &&
+    !isFacebookCommunityDomain &&
     (isEventDomainCreationRequest(text) ||
       /\b(event|workshop|retreat|webinar|conference)\b/i.test(label));
 
@@ -232,6 +256,7 @@ export function resolveCatalogCreateConfirm(input: {
     confidence: "high",
     isEventDomain,
     isMarketingPlanDomain,
+    isFacebookCommunityDomain,
   };
 }
 
@@ -259,12 +284,18 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       };
     }
 
+    const isFacebookCommunityDomain =
+      (isFacebookCommunityCreationRequest(text) ||
+        /facebook\s*(community|group)/i.test(resolved.artifactType)) &&
+      !resolved.fromPromotionalIntent;
     const isMarketingPlanDomain =
-      isMarketingPlanCreationRequest(text) ||
-      /marketing\s+plan/i.test(resolved.artifactType);
+      !isFacebookCommunityDomain &&
+      (isMarketingPlanCreationRequest(text) ||
+        /marketing\s+plan/i.test(resolved.artifactType));
     const isEventDomain =
       isEventDomainCreationRequest(text) &&
       !isMarketingPlanDomain &&
+      !isFacebookCommunityDomain &&
       !resolved.fromPromotionalIntent;
 
     const confidence = scoreCreateIntentConfidence({
@@ -274,6 +305,7 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       fromPromptDetect: resolved.fromPromptDetect,
       isMarketingPlanDomain,
       isEventDomain,
+      isFacebookCommunityDomain,
       fromPromotionalIntent: resolved.fromPromotionalIntent,
     });
 
@@ -311,6 +343,7 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       confidence,
       isEventDomain,
       isMarketingPlanDomain,
+      isFacebookCommunityDomain,
       ...(alsoConsidered.length > 0 ? { alsoConsidered } : {}),
     };
   } catch {

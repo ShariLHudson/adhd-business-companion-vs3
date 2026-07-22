@@ -273,6 +273,14 @@ export const CREATE_PARENT_TYPES: readonly CreateParentType[] = [
     hint: "Tactics and dates for reaching the right people",
     catalogLabels: ["Marketing Plan"],
   },
+  {
+    id: "facebook-community",
+    label: "Facebook Community",
+    emoji: "👥",
+    categoryId: "market_sell",
+    hint: "A guided Facebook group — positioned, branded, and ready to grow",
+    catalogLabels: ["Facebook Community"],
+  },
 
   // ── Work With Clients ─────────────────────────────────────────────────
   {

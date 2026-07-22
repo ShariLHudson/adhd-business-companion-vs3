@@ -56,6 +56,7 @@ import {
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
+import { FACEBOOK_COMMUNITY_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/facebookCommunityMap";
 import { launchFromCreate } from "@/lib/universalWorkEngine";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
@@ -249,13 +250,20 @@ export function CreateEstateEntrancePanel({
   }, []);
 
   function openConfirmed(outcome: Extract<CreateBeginOutcome, { kind: "open" }>) {
-    // 103 / 105 — Event and Marketing Plan Begin resolve through Anywhere-Origin
-    if (outcome.isEventDomain || outcome.isMarketingPlanDomain) {
+    // 103 / 105 — Event, Marketing Plan, and Facebook Community Begin resolve
+    // through Anywhere-Origin (587–598).
+    if (
+      outcome.isEventDomain ||
+      outcome.isMarketingPlanDomain ||
+      outcome.isFacebookCommunityDomain
+    ) {
       const anywhere = launchFromCreate({
         originalUserMessage: outcome.text,
-        candidateWorkTypeId: outcome.isMarketingPlanDomain
-          ? MARKETING_PLAN_WORK_TYPE_ID
-          : EVENT_PLAN_WORK_TYPE_ID,
+        candidateWorkTypeId: outcome.isFacebookCommunityDomain
+          ? FACEBOOK_COMMUNITY_WORK_TYPE_ID
+          : outcome.isMarketingPlanDomain
+            ? MARKETING_PLAN_WORK_TYPE_ID
+            : EVENT_PLAN_WORK_TYPE_ID,
       });
       if (anywhere.decision === "clarify") {
         setBeginFeedback(anywhere.reply);

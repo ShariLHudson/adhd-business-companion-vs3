@@ -351,6 +351,14 @@ export const CREATE_OPTION_AUDIT: CreateOptionAudit[] = [
     reason:
       "Working, high-traffic flow with its own guided questions. Kept distinct from Marketing Strategy (plan = tactics/dates; strategy = direction) and from Marketing Campaign (a single sequence).",
   },
+  {
+    currentName: "Facebook Community",
+    currentCategory: "Content",
+    keep: true,
+    newParentType: "Facebook Community",
+    reason:
+      "A complete guided experience (positioning, naming, setup, welcome, launch, growth, moderation, analytics) — genuinely different from a single Facebook Post and too broad to fold into Social Content. Kept as its own parent type under Market & Sell (587–598).",
+  },
 
   // ── Relationships ───────────────────────────────────────────────────
   {

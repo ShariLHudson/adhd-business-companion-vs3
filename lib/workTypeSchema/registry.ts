@@ -36,6 +36,7 @@ export function resolveWorkTypeIdFromLabel(
   if (/\bsop\b|standard operating/.test(t)) return "sop";
   if (/checklist/.test(t)) return "checklist";
   if (/proposal/.test(t)) return "proposal";
+  if (/facebook\s*(community|group)/.test(t)) return "facebook_community";
   if (/marketing/.test(t)) return "marketing_plan";
   if (t === "cert probe" || t === "cert_probe") return "cert_probe";
   return null;
