@@ -60,6 +60,8 @@ export function PlanMyDayCompleteWorkflow({
   );
   const [showConstraints, setShowConstraints] = useState(false);
   const [avoidanceDismissed, setAvoidanceDismissed] = useState(false);
+  /** Once the member picks a style card, stop auto-following the suggestion. */
+  const [styleChosenByUser, setStyleChosenByUser] = useState(false);
 
   useEffect(() => {
     setWorkflow(loadPlanWorkflowState());
@@ -85,6 +87,32 @@ export function PlanMyDayCompleteWorkflow({
       }),
     [workflow.energy, workflow.motivation, activeItems.length],
   );
+
+  // Keep the highlighted style in sync with the live recommendation unless the
+  // member explicitly chose a different card.
+  useEffect(() => {
+    if (styleChosenByUser) return;
+    setWorkflow((prev) => {
+      if (!prev.energy && !prev.motivation) return prev;
+      if (
+        prev.planningStyle === styleSuggestion.style &&
+        prev.styleRecommendation === styleSuggestion.reason
+      ) {
+        return prev;
+      }
+      return savePlanWorkflowState({
+        ...prev,
+        planningStyle: styleSuggestion.style,
+        styleRecommendation: styleSuggestion.reason,
+      });
+    });
+  }, [
+    styleChosenByUser,
+    styleSuggestion.style,
+    styleSuggestion.reason,
+    workflow.energy,
+    workflow.motivation,
+  ]);
 
   const avoidanceOffer = useMemo(
     () => (avoidanceDismissed ? null : buildAvoidanceOffer(activeItems)),
@@ -176,8 +204,9 @@ export function PlanMyDayCompleteWorkflow({
   }
 
   const planned = workflow.stage === "planned" || workflow.stage === "started";
-  const effectiveStyle =
-    workflow.planningStyle ?? styleSuggestion.style ?? "balanced";
+  const effectiveStyle = styleChosenByUser
+    ? (workflow.planningStyle ?? styleSuggestion.style ?? "balanced")
+    : (styleSuggestion.style ?? workflow.planningStyle ?? "balanced");
 
   return (
     <div
@@ -240,15 +269,16 @@ export function PlanMyDayCompleteWorkflow({
                     aria-pressed={selected}
                     className={selected ? CHOICE_SELECTED : CHOICE_BTN}
                     data-testid={`plan-day-energy-${opt.id}`}
-                    onClick={() =>
+                    onClick={() => {
+                      setStyleChosenByUser(false);
                       persist({
                         ...workflow,
                         energy: toggleOptional(
                           workflow.energy,
                           opt.id as PlanWorkflowEnergy,
                         ),
-                      })
-                    }
+                      });
+                    }}
                   >
                     {opt.label}
                   </button>
@@ -271,15 +301,16 @@ export function PlanMyDayCompleteWorkflow({
                     aria-pressed={selected}
                     className={selected ? CHOICE_SELECTED : CHOICE_BTN}
                     data-testid={`plan-day-motivation-${opt.id}`}
-                    onClick={() =>
+                    onClick={() => {
+                      setStyleChosenByUser(false);
                       persist({
                         ...workflow,
                         motivation: toggleOptional(
                           workflow.motivation,
                           opt.id as PlanWorkflowMotivation,
                         ),
-                      })
-                    }
+                      });
+                    }}
                   >
                     {opt.label}
                   </button>
@@ -308,13 +339,14 @@ export function PlanMyDayCompleteWorkflow({
                     aria-pressed={selected}
                     className={selected ? CHOICE_SELECTED : CHOICE_BTN}
                     data-testid={`plan-day-style-${opt.id}`}
-                    onClick={() =>
+                    onClick={() => {
+                      setStyleChosenByUser(true);
                       persist({
                         ...workflow,
                         planningStyle: opt.id as PlanWorkflowStyle,
                         styleRecommendation: styleSuggestion.reason,
-                      })
-                    }
+                      });
+                    }}
                   >
                     <span className="block">{opt.label}</span>
                     <span className="mt-0.5 block text-xs font-normal text-[#6b635a]">
@@ -354,10 +386,11 @@ export function PlanMyDayCompleteWorkflow({
           data-testid="plan-day-open-constraints"
           onClick={() => {
             setShowConstraints(true);
+            setStyleChosenByUser(false);
             persist({
               ...workflow,
               stage: "constraints",
-              planningStyle: workflow.planningStyle ?? styleSuggestion.style,
+              planningStyle: styleSuggestion.style,
               styleRecommendation: styleSuggestion.reason,
             });
           }}
@@ -589,7 +622,7 @@ export function PlanMyDayCompleteWorkflow({
               type="button"
               className="rounded-xl border border-[#c9bfb0] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] transition-colors hover:bg-[#f5f0ea] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
               data-testid="plan-day-adjust-plan"
-              onClick={onOpenAdapt}
+              onClick={() => setShowConstraints(true)}
             >
               Adjust This Plan
             </button>

@@ -111,7 +111,7 @@ describe("resolvePlanDayChapter", () => {
       "@/lib/planMyDay/companionBrainClient/planDayJourney"
     );
     expect(planDayChapterSubtitle(resolvePlanDayChapter({ orienting: true, openItemId: null }))).toBe(
-      "Today's Plan",
+      "Start My Day",
     );
     expect(
       planDayChapterSubtitle(
@@ -128,6 +128,17 @@ describe("resolvePlanDayChapter", () => {
         resolvePlanDayChapter({ orienting: false, openItemId: "x", detailMode: "form" }),
       ),
     ).toBe("Working Together");
+  });
+});
+
+describe("shouldSkipOrientation", () => {
+  it("skips when meaningful plan items already exist for today", async () => {
+    const { shouldSkipOrientation } = await import(
+      "@/lib/planMyDay/companionBrainClient/presentJudgment"
+    );
+    expect(shouldSkipOrientation("orienting", null, true)).toBe(true);
+    expect(shouldSkipOrientation("orienting", null, false)).toBe(false);
+    expect(shouldSkipOrientation("living", null, false)).toBe(true);
   });
 });
 

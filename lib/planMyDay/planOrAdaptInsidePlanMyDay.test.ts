@@ -17,19 +17,18 @@ describe("Plan or Adapt inside Plan My Day", () => {
     expect(withPlan.find((c) => c.id === "plan-my-day")?.recommended).toBe(false);
   });
 
-  it("wires Adapt and complete Plan workflow into the shared Plan Adapt window", () => {
+  it("wires Adapt and progressive Plan journey into the shared Plan Adapt window", () => {
     const shared = readFileSync(
       resolve(process.cwd(), "components/companion/PlanAdaptSharedWindow.tsx"),
       "utf8",
     );
     expect(shared).toContain("AdaptMyDayCheckIn");
-    expect(shared).toContain("PlanMyDayCompleteWorkflow");
-    expect(shared).toContain("PlanDaySimpleList");
-    expect(shared).toContain("PlanDaySimpleAdd");
+    expect(shared).toContain("ProgressivePlanMyDay");
+    expect(shared).not.toContain("PlanMyDayCompleteWorkflow");
     expect(shared).not.toContain("AdjustMyDayPanel");
   });
 
-  it("routes generic Plan My Day opens to the shared complete workflow", () => {
+  it("routes generic Plan My Day opens to the shared progressive Plan path", () => {
     const cpc = readFileSync(
       resolve(process.cwd(), "app/companion/CompanionPageClient.tsx"),
       "utf8",
@@ -41,16 +40,14 @@ describe("Plan or Adapt inside Plan My Day", () => {
     expect(cpc).toContain('case "plan-my-day":');
     expect(cpc).toContain('openPlanAdaptSharedCore("plan")');
 
-    const workflow = readFileSync(
-      resolve(
-        process.cwd(),
-        "components/companion/PlanMyDayCompleteWorkflow.tsx",
-      ),
+    const progressive = readFileSync(
+      resolve(process.cwd(), "components/companion/ProgressivePlanMyDay.tsx"),
       "utf8",
     );
-    expect(workflow).toContain("aria-pressed");
-    expect(workflow).toContain("plan-day-style-recommendation");
-    expect(workflow).toContain("Today&apos;s Most Important Task");
-    expect(workflow).toContain("plan-day-energy-groups");
+    expect(progressive).toContain("plan-day-progressive");
+    expect(progressive).toContain("on your mind today?");
+    expect(progressive).toContain("Still about the same?");
+    expect(progressive).not.toContain("Matched to Energy");
+    expect(progressive).not.toContain("Suggested Order");
   });
 });

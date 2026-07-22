@@ -10,6 +10,7 @@ import { evaluatePlanningTableRoom } from "@/lib/planningTableRoom";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { EcosystemNavigationBar } from "@/components/companion/EcosystemNavigationBar";
 import { PlanDayHelpIcon } from "@/components/companion/PlanDayHelpIcon";
+import { PlanDayHowDoI } from "@/components/companion/PlanDayHowDoI";
 import { PlanDayShariPresence } from "@/components/companion/PlanDayShariPresence";
 
 type Props = {
@@ -24,19 +25,65 @@ type Props = {
   hideHelp?: boolean;
   /** Morning Room — no portrait, no external title chrome */
   morningRoom?: boolean;
+  /**
+   * Today's Plan member order:
+   * How Do I? → Previous Screen → Plan My Day → (children)
+   */
+  memberOrderLayout?: boolean;
 };
 
-function MorningRoomNav({ onBack }: { onBack: () => void }) {
+function PreviousScreenButton({ onBack }: { onBack: () => void }) {
   return (
     <button
       type="button"
       className="plan-day-morning-note__previous"
       onClick={onBack}
       data-testid="app-back-button"
+      aria-label="Previous Screen"
     >
       <span aria-hidden="true">←</span>
       <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
     </button>
+  );
+}
+
+function MemberOrderHeader({
+  onBack,
+  headerActions,
+  morningRoom,
+}: {
+  onBack: () => void;
+  headerActions?: React.ReactNode;
+  morningRoom: boolean;
+}) {
+  return (
+    <header
+      className={
+        morningRoom
+          ? "plan-day-member-order-header"
+          : "plan-day-member-order-header mx-auto w-full max-w-3xl"
+      }
+      data-testid="plan-day-member-order-header"
+    >
+      <PlanDayHowDoI />
+      <div className="mt-3">
+        <PreviousScreenButton onBack={onBack} />
+      </div>
+      <div className="mt-4 flex items-start justify-between gap-3">
+        <h1
+          className={
+            morningRoom
+              ? "plan-day-morning-note__title"
+              : "text-2xl font-semibold text-[#1f1c19] lg:text-3xl"
+          }
+        >
+          {PLAN_MY_DAY_TITLE}
+        </h1>
+        {headerActions ? (
+          <div className="flex shrink-0 items-center gap-2">{headerActions}</div>
+        ) : null}
+      </div>
+    </header>
   );
 }
 
@@ -52,12 +99,51 @@ export function PlanDayJourneyShell({
   headerActions,
   hideHelp = false,
   morningRoom = false,
+  memberOrderLayout = false,
 }: Props) {
   const subtitle = planDayChapterSubtitle(chapter);
   const room = useMemo(
     () => evaluatePlanningTableRoom({ chapter }),
     [chapter],
   );
+
+  if (memberOrderLayout) {
+    if (morningRoom) {
+      return (
+        <div
+          className="plan-day-morning-room-content"
+          data-chapter={chapter}
+          data-room-whisper={room.roomWhisper}
+          data-member-order="true"
+        >
+          <MemberOrderHeader
+            onBack={onBack}
+            headerActions={headerActions}
+            morningRoom
+          />
+          {children}
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className="plan-day-journey flex min-h-0 flex-1 flex-col"
+        data-chapter={chapter}
+        data-room-whisper={room.roomWhisper}
+        data-member-order="true"
+      >
+        <MemberOrderHeader
+          onBack={onBack}
+          headerActions={headerActions}
+          morningRoom={false}
+        />
+        <div className="plan-day-journey-body mx-auto flex w-full max-w-3xl flex-1 flex-col">
+          {children}
+        </div>
+      </div>
+    );
+  }
 
   if (morningRoom) {
     return (
@@ -66,7 +152,7 @@ export function PlanDayJourneyShell({
         data-chapter={chapter}
         data-room-whisper={room.roomWhisper}
       >
-        <MorningRoomNav onBack={onBack} />
+        <PreviousScreenButton onBack={onBack} />
         {children}
       </div>
     );

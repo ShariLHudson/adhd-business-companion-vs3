@@ -18,7 +18,11 @@ import {
   type DailyAdaptationEnergyLevel,
   type DailyAdaptationMotivationLevel,
 } from "@/lib/dailyAdaptation";
-import { readTodayPlanItems } from "@/lib/planMyDay/planDayItems";
+import {
+  loadTodayPlanItems,
+  readTodayPlanItems,
+} from "@/lib/planMyDay/planDayItems";
+import type { PlanDayItem } from "@/lib/planMyDay/types";
 import { todayStr } from "@/lib/companionStore";
 
 type Step =
@@ -34,6 +38,8 @@ type Props = {
   onAdjustPlan: (proposal: AdaptedDayProposal) => void;
   onStartFirstStep: (proposal: AdaptedDayProposal) => void;
   onKeepCurrentPlan: () => void;
+  /** Live Today's List from the shared window — used if storage briefly looks empty. */
+  planItems?: PlanDayItem[];
 };
 
 const BUCKET_LABELS: Record<string, string> = {
@@ -52,6 +58,7 @@ export function AdaptMyDayCheckIn({
   onAdjustPlan,
   onStartFirstStep,
   onKeepCurrentPlan,
+  planItems,
 }: Props) {
   const prior = useMemo(() => loadTodaysAdaptationCheckIn(), []);
   const [step, setStep] = useState<Step>(prior ? "recheck" : "energy");
@@ -67,6 +74,14 @@ export function AdaptMyDayCheckIn({
   const [note, setNote] = useState(prior?.note ?? "");
   const [proposal, setProposal] = useState<AdaptedDayProposal | null>(null);
 
+  function resolvePlanItemsForAdapt(): PlanDayItem[] {
+    const hydrated = loadTodayPlanItems();
+    if (hydrated.length > 0) return hydrated;
+    const stored = readTodayPlanItems();
+    if (stored.length > 0) return stored;
+    return planItems?.filter((item) => !item.done && item.title.trim()) ?? [];
+  }
+
   function finishCheckIn(
     nextEnergy: DailyAdaptationEnergyLevel,
     nextMotivation: DailyAdaptationMotivationLevel,
@@ -81,7 +96,7 @@ export function AdaptMyDayCheckIn({
       note: note.trim() || undefined,
     };
     saveTodaysAdaptationCheckIn(checkIn);
-    const nextProposal = proposeAdaptedDay(checkIn, readTodayPlanItems());
+    const nextProposal = proposeAdaptedDay(checkIn, resolvePlanItemsForAdapt());
     setProposal(nextProposal);
     setStep("proposal");
   }
@@ -139,7 +154,7 @@ export function AdaptMyDayCheckIn({
 
   function handleUsePlan() {
     if (!proposal) return;
-    applyAdaptedDayProposal(proposal);
+    applyAdaptedDayProposal(proposal, resolvePlanItemsForAdapt());
     onUsePlan(proposal);
   }
 
@@ -374,7 +389,10 @@ export function AdaptMyDayCheckIn({
           <button
             type="button"
             className="global-daily-opening__discovery-secondary"
-            onClick={() => onAdjustPlan(proposal)}
+            onClick={() => {
+              applyAdaptedDayProposal(proposal, resolvePlanItemsForAdapt());
+              onAdjustPlan(proposal);
+            }}
             data-testid="adapt-adjust-plan"
           >
             Adjust It
@@ -383,7 +401,7 @@ export function AdaptMyDayCheckIn({
             type="button"
             className="global-daily-opening__discovery-secondary"
             onClick={() => {
-              applyAdaptedDayProposal(proposal);
+              applyAdaptedDayProposal(proposal, resolvePlanItemsForAdapt());
               onStartFirstStep(proposal);
             }}
             data-testid="adapt-start-first"

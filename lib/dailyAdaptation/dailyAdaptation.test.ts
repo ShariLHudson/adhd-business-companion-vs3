@@ -3,6 +3,7 @@
  */
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+  applyAdaptedDayProposal,
   clearTodaysAdaptationCheckInForTests,
   guidanceForPosture,
   hasActivePlanForToday,
@@ -13,7 +14,10 @@ import {
   saveTodaysAdaptationCheckIn,
   shouldAskWhatChanged,
 } from "./index";
-import { saveTodayPlanItems } from "@/lib/planMyDay/planDayItems";
+import {
+  loadTodayPlanItems,
+  saveTodayPlanItems,
+} from "@/lib/planMyDay/planDayItems";
 import { todayStr } from "@/lib/companionStore";
 import type { PlanDayItem } from "@/lib/planMyDay/types";
 import { resolveDailyOpeningChoiceAction, resolveGlobalDailyOpening } from "@/lib/dailyOpening";
@@ -159,5 +163,32 @@ describe("Adaptation guidance postures", () => {
     expect(shouldAskWhatChanged("variable", "motivated", false)).toBe(true);
     expect(shouldAskWhatChanged("steady", "enough-to-start", false)).toBe(false);
     expect(shouldAskWhatChanged("steady", "enough-to-start", true)).toBe(true);
+  });
+
+  it("Use This Plan merges adaptations without wiping Today's List", () => {
+    const plan = [
+      item({ id: "1", title: "Reply to client emails", priority: "medium" }),
+      item({ id: "2", title: "Finish the quarterly report", priority: "high" }),
+      item({ id: "3", title: "Water plants", priority: "low" }),
+    ];
+    saveTodayPlanItems(plan);
+    const proposal = proposeAdaptedDay(
+      {
+        date: todayStr(),
+        capturedAt: new Date().toISOString(),
+        energyLevel: "very-low",
+        motivationLevel: "none",
+      },
+      plan,
+    );
+    expect(proposal.startWithTitle).toBeTruthy();
+    const applied = applyAdaptedDayProposal(proposal, plan);
+    expect(applied.length).toBe(3);
+    expect(applied.map((i) => i.title).sort()).toEqual(
+      plan.map((i) => i.title).sort(),
+    );
+    const reloaded = loadTodayPlanItems();
+    expect(reloaded.filter((i) => !i.done).length).toBe(3);
+    expect(reloaded.some((i) => i.column === "doing")).toBe(true);
   });
 });

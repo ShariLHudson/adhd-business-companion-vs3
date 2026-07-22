@@ -15,5 +15,4 @@ export const PLAN_MY_DAY_MORNING_COPY = {
   previousScreen: "Previous Screen",
   yesFeelsRight: "Yes — This feels right",
   notRightNow: "Not Right Now",
-  helpMeFigureItOut: "Help Me Figure It Out",
 } as const;

@@ -40,8 +40,17 @@ export function resolveInitialPlanningView(
   );
 }
 
+/**
+ * Settings → Planning default.
+ * Also aligns last-used so Plan My Day opens with this layout
+ * (last-used otherwise wins over default after in-room switches).
+ */
 export function setDefaultPlanningView(mode: PlanningViewMode): Prefs {
-  return savePrefs({ defaultPlanningView: mode });
+  if (!VALID_VIEWS.includes(mode)) return getPrefs();
+  return savePrefs({
+    defaultPlanningView: mode,
+    lastPlanningView: mode,
+  });
 }
 
 export function setLastPlanningView(mode: PlanningViewMode): Prefs {

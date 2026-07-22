@@ -24589,6 +24589,7 @@ export default function CompanionPageClient() {
               onOpenAppointment={(appointmentId) =>
                 openCalendarItemCore(appointmentId, "planning-calendar")
               }
+              onOpenAdaptMyDay={() => openAdaptMyDayCore()}
               initialOpenItemId={planMyDayOpenItemId}
               initialPlanningArea={planMyDayInitialArea}
               initialRhythmsTab={planMyDayInitialRhythmsTab}

@@ -63,6 +63,14 @@ export type PlanDayItem = {
   focusRank?: number;
   /** Owner user id when authenticated — prevents cross-account leakage on shared devices */
   ownerUserId?: string;
+  /** Manual list order (lower = earlier). Locked items keep relative slots. */
+  sortOrder?: number;
+  /** Member locked this row in place (appointments also lock via sourceTimeBlockId). */
+  positionLocked?: boolean;
+  /** Prefer near the top of the flexible slots. */
+  pinnedToTop?: boolean;
+  /** Preferred start time HH:MM when flexible scheduling allows. */
+  preferredTime?: string;
 };
 
 export const PLAN_PRIORITY_OPTIONS: {

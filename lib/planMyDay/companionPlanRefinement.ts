@@ -6,6 +6,7 @@
 
 import type { PlanDayItem } from "./types";
 import {
+  detectDeepFocusWork,
   detectFocusWork,
   detectQuickTask,
   estimateTaskMinutes,
@@ -83,11 +84,14 @@ export function recommendPlanningStyle(input: {
 }
 
 export function mitReason(title: string, style: PlanWorkflowStyle): string {
-  if (detectFocusWork(title)) {
-    return `This looks like the work that moves something real forward — a strong Main Focus for a ${style} day.`;
-  }
   if (detectQuickTask(title) && style === "gentle") {
     return "Starting with a small clear win can rebuild momentum without asking for a full deep-work block.";
+  }
+  if (detectDeepFocusWork(title) && style !== "gentle") {
+    return `This looks like the work that moves something real forward — a strong Main Focus for a ${style} day.`;
+  }
+  if (detectFocusWork(title) && style !== "gentle") {
+    return `This looks like the work that moves something real forward — a strong Main Focus for a ${style} day.`;
   }
   return "This is the clearest next move from your list — everything else can support it.";
 }
@@ -113,16 +117,13 @@ export function priorityBandLabel(band: PriorityBand): string {
 export function taskEnergyFit(title: string): TaskEnergyFit {
   if (detectFocusWork(title) && !detectQuickTask(title)) return "high";
   if (
-    /\b(call|meeting|plan|review|discuss|client)\b/i.test(title) &&
-    !detectQuickTask(title)
-  ) {
-    return "medium";
-  }
-  if (
     detectQuickTask(title) ||
-    /\b(email|paperwork|admin|file|sort|tidy|invoice)\b/i.test(title)
+    /\b(email|paperwork|admin|file|sort|tidy|invoice|reply)\b/i.test(title)
   ) {
     return "low";
+  }
+  if (/\b(call|meeting|plan|review|discuss|client)\b/i.test(title)) {
+    return "medium";
   }
   return "medium";
 }

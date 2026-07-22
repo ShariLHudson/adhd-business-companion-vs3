@@ -1,5 +1,9 @@
 import type { PlanDayItem } from "@/lib/planMyDay/types";
-import { isPlanItemActive } from "@/lib/planMyDay/planDayItems";
+import {
+  detectFocusWork,
+  detectQuickTask,
+  estimateTaskMinutes,
+} from "@/lib/planMyDay/completePlanWorkflow";
 import {
   guidanceForPosture,
   recoveryBreakMinutesForPosture,
@@ -11,21 +15,50 @@ import type {
   DailyAdaptationCheckIn,
 } from "./types";
 
-function activeFocusItems(items: PlanDayItem[]): PlanDayItem[] {
+function adaptableItems(items: PlanDayItem[]): PlanDayItem[] {
   return items.filter(
     (item) =>
-      isPlanItemActive(item) &&
+      Boolean(item.title?.trim()) &&
       !item.done &&
-      item.column !== "parked" &&
       item.column !== "done",
   );
 }
 
-function priorityWeight(item: PlanDayItem): number {
-  if (item.priority === "high") return 3;
-  if (item.priority === "medium") return 2;
-  if (item.priority === "low") return 1;
-  return 2;
+function easeScore(item: PlanDayItem): number {
+  const minutes =
+    item.durationMinutes && item.durationMinutes > 0
+      ? item.durationMinutes
+      : estimateTaskMinutes(item.title);
+  const quick = detectQuickTask(item.title) ? 0 : 1;
+  const deepFocus =
+    detectFocusWork(item.title) && !detectQuickTask(item.title) ? 1 : 0;
+  const priorityBoost =
+    item.priority === "high" ? 0 : item.priority === "low" ? 2 : 1;
+  return minutes + quick * 20 + deepFocus * 40 + priorityBoost * 5;
+}
+
+function sortForPosture(
+  items: PlanDayItem[],
+  posture: ReturnType<typeof resolveAdaptationPosture>,
+): PlanDayItem[] {
+  const lowCapacity =
+    posture === "low-energy-low-motivation" ||
+    posture === "low-energy-high-motivation" ||
+    posture === "high-energy-low-motivation";
+
+  return [...items].sort((a, b) => {
+    if (lowCapacity) {
+      const ease = easeScore(a) - easeScore(b);
+      if (ease !== 0) return ease;
+    }
+    const priorityWeight = (item: PlanDayItem): number => {
+      if (item.priority === "high") return 3;
+      if (item.priority === "medium") return 2;
+      if (item.priority === "low") return 1;
+      return 2;
+    };
+    return priorityWeight(b) - priorityWeight(a);
+  });
 }
 
 /**
@@ -42,9 +75,7 @@ export function proposeAdaptedDay(
   );
   const guidance = guidanceForPosture(posture);
   const recoveryBreakMinutes = recoveryBreakMinutesForPosture(posture);
-  const focus = activeFocusItems(planItems).sort(
-    (a, b) => priorityWeight(b) - priorityWeight(a),
-  );
+  const focus = sortForPosture(adaptableItems(planItems), posture);
 
   const adapted: AdaptedPlanItem[] = [];
 

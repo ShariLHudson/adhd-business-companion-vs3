@@ -98,6 +98,26 @@ describe("complete Plan My Day workflow (125–127)", () => {
     expect(plan.priorityBandById[plan.primaryOutcomeId!]).toBe("highest");
     expect(plan.energyFitById["5"]).toBe("low");
     expect(plan.recommendedView).toBeTruthy();
+    // Gentle/low-energy leads with an easy start, not deep focus work.
+    expect(plan.primaryOutcomeId).not.toBe("1");
+    expect(plan.primaryOutcomeId).not.toBe("4");
+  });
+
+  it("prefers easier starts over high-effort focus work on a Gentle low-energy day", () => {
+    const items = [
+      item("report", "Finish the quarterly report"),
+      item("email", "Reply to client emails"),
+    ];
+    const plan = buildCompleteDayPlan({
+      items,
+      availableMinutes: 120,
+      energy: "very-low",
+      motivation: "low",
+      planningStyle: "gentle",
+    });
+    expect(plan.primaryOutcomeId).toBe("email");
+    expect(plan.priorityBandById.email).toBe("highest");
+    expect(plan.parkedTaskIds).toContain("report");
   });
 
   it("builds a flexible plan when time/energy/motivation are omitted", () => {
@@ -134,18 +154,24 @@ describe("complete Plan My Day workflow (125–127)", () => {
     expect(saved.stage).toBe("constraints");
   });
 
-  it("wires shared Plan child to parse and workflow UI", () => {
+  it("wires shared Plan child to progressive journey UI", () => {
     const { readFileSync } = require("node:fs") as typeof import("node:fs");
     const { resolve } = require("node:path") as typeof import("node:path");
     const source = readFileSync(
       resolve(process.cwd(), "components/companion/PlanAdaptSharedWindow.tsx"),
       "utf8",
     );
-    expect(source).toContain("parseMindCapture");
-    expect(source).toContain("addQuickPlanItems");
-    expect(source).toContain("PlanMyDayCompleteWorkflow");
+    expect(source).toContain("ProgressivePlanMyDay");
     expect(source).toContain('onOpenAdapt={() => setActiveChild("adapt")}');
     expect(source).toContain("plan-adapt-shared-choices");
     expect(source).toContain("plan-adapt-shared-how-do-i");
+
+    const progressive = readFileSync(
+      resolve(process.cwd(), "components/companion/ProgressivePlanMyDay.tsx"),
+      "utf8",
+    );
+    expect(progressive).toContain("parseMindCapture");
+    expect(progressive).toContain("addQuickPlanItems");
+    expect(progressive).toContain("buildProgressiveTodayPlan");
   });
 });

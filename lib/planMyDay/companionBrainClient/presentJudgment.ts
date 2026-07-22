@@ -223,11 +223,12 @@ export function dayModeAtmosphereClass(dayMode: DayMode): string {
 export function shouldSkipOrientation(
   sessionPhase: "orienting" | "living" | "flexible",
   openItemId?: string | null,
+  hasMeaningfulPlanToday?: boolean,
 ): boolean {
   if (openItemId) return true;
+  if (hasMeaningfulPlanToday) return true;
   return sessionPhase === "living";
 }
-
 export type LivingBoardPartition = {
   focus: PlanDayItem[];
   ready: PlanDayItem[];

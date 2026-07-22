@@ -13,7 +13,7 @@ export type PlanDayJourneyChapter =
 export const PLAN_MY_DAY_TITLE = "Plan My Day";
 
 const CHAPTER_SUBTITLES: Record<PlanDayJourneyChapter, string> = {
-  gateway: "Today's Plan",
+  gateway: "Start My Day",
   "flexible-planning": "Choose Your Path",
   "todays-reality": "Today's Reality",
   "todays-plan": "Today's Plan",

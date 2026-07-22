@@ -11,7 +11,6 @@ import {
   isMeaningfulPlanItem,
   isPlanItemActive,
   loadTodayPlanItems,
-  parseMindCapture,
   readTodayPlanItems,
   movePlanItemKanban,
   finishPlanItem,
@@ -20,6 +19,7 @@ import {
   PLAN_MY_DAY_UPDATED,
   resolveInitialPlanningView,
   PLANNING_VIEW_OPTIONS,
+  saveTodayPlanItems,
   setLastPlanningView,
   updatePlanItem,
   deletePlanItem,
@@ -43,6 +43,10 @@ import {
   shouldSkipOrientation,
   usePlanDayCompanionCycle,
 } from "@/lib/planMyDay/companionBrainClient";
+import {
+  ensureSortOrders,
+  movePlanItemRelative,
+} from "@/lib/planMyDay/todaysPlanReorder";
 import {
   diffBoardCuration,
   formatBoardStewardshipMessage,
@@ -85,8 +89,7 @@ import {
   PLAN_DAY_IM_STUCK_BUTTON_LABEL,
   requestPlanDayImStuck,
 } from "@/lib/planMyDay/planDayImStuck";
-import { PlanDaySimpleAdd } from "@/components/companion/PlanDaySimpleAdd";
-import { PlanDaySimpleList } from "@/components/companion/PlanDaySimpleList";
+import { ProgressivePlanMyDay } from "@/components/companion/ProgressivePlanMyDay";
 import { PlanDayPreviousDayPrompt } from "@/components/companion/PlanDayPreviousDayPrompt";
 import { PlanDayPreviousDayReview } from "@/components/companion/PlanDayPreviousDayReview";
 import {
@@ -969,6 +972,39 @@ export function PlanMyDayPanel({
     setLastPlanningView(mode);
   }
 
+  /** Merge a reordered section subset back into the full today's items array. */
+  function mergeSectionOrderIntoItems(
+    all: PlanDayItem[],
+    orderedSection: PlanDayItem[],
+  ): PlanDayItem[] {
+    const byId = new Map(all.map((i) => [i.id, i]));
+    const orderedIds = new Set(orderedSection.map((i) => i.id));
+    const rest = all.filter((i) => !orderedIds.has(i.id));
+    return [
+      ...orderedSection.map((i) => ({ ...byId.get(i.id)!, ...i })),
+      ...rest,
+    ];
+  }
+
+  /** Today's Items — move an item up/down within its own Living Board section. */
+  function handleLivingBoardMoveItem(
+    sectionItems: PlanDayItem[],
+    id: string,
+    direction: "up" | "down",
+  ) {
+    const reordered = movePlanItemRelative(
+      ensureSortOrders(sectionItems),
+      id,
+      direction,
+    );
+    refresh(saveTodayPlanItems(mergeSectionOrderIntoItems(items, reordered)));
+  }
+
+  /** Today's Items — remove opens the calm "Remove from today?" confirm. */
+  function handleLivingBoardDeleteItem(id: string) {
+    handleOpenItem(id, "delete-confirm");
+  }
+
   function renderTaskView() {
     return (
       <>
@@ -987,6 +1023,8 @@ export function PlanMyDayPanel({
             onOpen={(id) => handleOpenItem(id)}
             holdingTransparencyLine={holdingTransparency}
             completedToday={completedToday}
+            onMoveItem={handleLivingBoardMoveItem}
+            onDeleteItem={handleLivingBoardDeleteItem}
           />
         ) : null}
         {view === "timeline" ? (
@@ -1017,9 +1055,6 @@ export function PlanMyDayPanel({
   }
 
   if (standalone) {
-    const listItems = items.filter(
-      (item) => isMeaningfulPlanItem(item) && !item.done,
-    );
     return (
       <PlanMyDayMorningRoomShell onOutsideDismiss={() => onBack?.()}>
         <div
@@ -1036,36 +1071,19 @@ export function PlanMyDayPanel({
             memberOrderLayout
             hideHelp
           >
-            <div className="mt-6 flex flex-col gap-8 pb-10">
-              <PlanDaySimpleAdd
-                onAdd={(raw) => {
-                  const titles = parseMindCapture(raw);
-                  const parts = titles.length > 0 ? titles : [raw.trim()];
-                  for (const title of parts) {
-                    if (!title) continue;
-                    handleAdd({ title, column: "today" });
-                  }
-                }}
-              />
-              <PlanDaySimpleList
-                items={listItems}
-                onComplete={handleCompleteItem}
-                onEdit={(id, title) =>
-                  refresh(updatePlanItem(items, id, { title }))
-                }
-                onDelete={(id) => refresh(deletePlanItem(items, id))}
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  requestPlanDayImStuck(listItems.map((item) => item.title))
-                }
-                className="self-start rounded-xl border border-[#c9bfb0] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f5f0ea]"
-                data-testid="plan-day-im-stuck"
-              >
-                {PLAN_DAY_IM_STUCK_BUTTON_LABEL}
-              </button>
-            </div>
+            <ProgressivePlanMyDay
+              items={items}
+              onItemsChange={(next) => refresh(next)}
+              onOpenAdapt={onOpenAdaptMyDay}
+              onImStuck={(extras) =>
+                requestPlanDayImStuck(
+                  items
+                    .filter((item) => isMeaningfulPlanItem(item) && !item.done)
+                    .map((item) => item.title),
+                  extras,
+                )
+              }
+            />
           </PlanDayJourneyShell>
         </div>
       </PlanMyDayMorningRoomShell>
@@ -1281,6 +1299,7 @@ export function PlanMyDayPanel({
             data-testid="plan-day-adapt-my-day"
           >
             <AdaptMyDayCheckIn
+              planItems={items}
               onBack={closeTodaysReality}
               onUsePlan={finishAdaptInsidePlan}
               onAdjustPlan={finishAdaptInsidePlan}

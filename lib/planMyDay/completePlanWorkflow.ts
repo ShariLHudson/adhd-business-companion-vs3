@@ -166,29 +166,39 @@ export function detectErrandTask(title: string): boolean {
 }
 
 export function detectFocusWork(title: string): boolean {
-  return /\b(work on|project|write|build|app|platform|code|draft|plan|meeting|client|proposal)\b/i.test(
+  return /\b(work on|project|write|build|app|platform|code|draft|plan|meeting|client|proposal|report|quarterly)\b/i.test(
     title,
   );
 }
 
 export function detectQuickTask(title: string): boolean {
-  return /\b(water|plants?|email|text|quick|tidy|dish|trash|feed|call)\b/i.test(
+  return /\b(water|plants?|email|text|quick|tidy|dish|trash|feed|call|reply)\b/i.test(
     title,
   );
 }
 
+/** Deep focus — excludes quick replies/emails even when "client" appears. */
+export function detectDeepFocusWork(title: string): boolean {
+  return detectFocusWork(title) && !detectQuickTask(title);
+}
+
 export function estimateTaskMinutes(title: string): number {
-  if (detectQuickTask(title) && !detectFocusWork(title)) return 15;
+  if (detectQuickTask(title) && !detectDeepFocusWork(title)) return 15;
   if (detectErrandTask(title)) return 45;
-  if (detectFocusWork(title)) return 60;
+  if (detectDeepFocusWork(title)) return 60;
+  if (detectFocusWork(title)) return 30;
   return 30;
 }
 
 export function tagTask(title: string): string[] {
   const tags: string[] = [];
   if (detectErrandTask(title)) tags.push("errand");
-  if (detectFocusWork(title)) tags.push("focus work");
-  if (detectQuickTask(title)) tags.push("quick task");
+  if (detectDeepFocusWork(title)) tags.push("focus work");
+  else if (detectFocusWork(title) && detectQuickTask(title))
+    tags.push("quick task");
+  if (detectQuickTask(title)) {
+    if (!tags.includes("quick task")) tags.push("quick task");
+  }
   if (tags.length === 0) tags.push("should do today");
   return tags;
 }
@@ -261,26 +271,38 @@ export function buildCompleteDayPlan(
 
   const lowEnergyDay =
     input.energy === "very-low" || input.energy === "low";
+  const lowMotivationDay =
+    input.motivation === "very-low" || input.motivation === "low";
+  const protectEnergyDay =
+    style === "gentle" || lowEnergyDay || lowMotivationDay;
 
   const scored = [...active].sort((a, b) => {
-    if (lowEnergyDay) {
-      const order = { low: 0, medium: 1, high: 2 } as const;
-      const ae = order[energyFitById[a.id] ?? "medium"];
-      const be = order[energyFitById[b.id] ?? "medium"];
+    const aMins = estimatesById[a.id] ?? 30;
+    const bMins = estimatesById[b.id] ?? 30;
+    const aQuick = detectQuickTask(a.title) ? 0 : 1;
+    const bQuick = detectQuickTask(b.title) ? 0 : 1;
+    const aDeep = detectDeepFocusWork(a.title) ? 1 : 0;
+    const bDeep = detectDeepFocusWork(b.title) ? 1 : 0;
+    const energyOrder = { low: 0, medium: 1, high: 2 } as const;
+    const ae = energyOrder[energyFitById[a.id] ?? "medium"];
+    const be = energyOrder[energyFitById[b.id] ?? "medium"];
+
+    // Gentle / low capacity: easier-to-start work first — protect energy.
+    if (protectEnergyDay) {
+      if (aQuick !== bQuick) return aQuick - bQuick;
       if (ae !== be) return ae - be;
+      if (aDeep !== bDeep) return aDeep - bDeep;
+      if (aMins !== bMins) return aMins - bMins;
+      return 0;
     }
-    const aFocus = detectFocusWork(a.title) ? 0 : 1;
-    const bFocus = detectFocusWork(b.title) ? 0 : 1;
+
+    const aFocus = detectDeepFocusWork(a.title) ? 0 : 1;
+    const bFocus = detectDeepFocusWork(b.title) ? 0 : 1;
     const aErrand = detectErrandTask(a.title) ? 0 : 1;
     const bErrand = detectErrandTask(b.title) ? 0 : 1;
     if (style === "focused") return aFocus - bFocus || aErrand - bErrand;
-    if (style === "gentle") {
-      const aQuick = detectQuickTask(a.title) ? 0 : 1;
-      const bQuick = detectQuickTask(b.title) ? 0 : 1;
-      return aQuick - bQuick || aErrand - bErrand;
-    }
-    // balanced: focus, then errands, then quick
-    return aFocus - bFocus || aErrand - bErrand;
+    // balanced: meaningful focus, then errands, then quick
+    return aFocus - bFocus || aErrand - bErrand || aQuick - bQuick;
   });
 
   const maxToday =
@@ -294,7 +316,18 @@ export function buildCompleteDayPlan(
 
   for (const item of scored) {
     const mins = estimatesById[item.id] ?? 30;
-    const isQuick = detectQuickTask(item.title) && !detectFocusWork(item.title);
+    const isQuick =
+      detectQuickTask(item.title) && !detectDeepFocusWork(item.title);
+    // On gentle/low-capacity days, park oversized deep-focus items first.
+    if (
+      protectEnergyDay &&
+      detectDeepFocusWork(item.title) &&
+      mins >= 45 &&
+      ordered.some((o) => detectQuickTask(o.title))
+    ) {
+      parked.push(item);
+      continue;
+    }
     if (ordered.length >= maxToday || mins > budget) {
       parked.push(item);
       continue;

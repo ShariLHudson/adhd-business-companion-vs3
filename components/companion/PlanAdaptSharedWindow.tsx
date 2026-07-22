@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AdaptMyDayCheckIn } from "@/components/companion/AdaptMyDayCheckIn";
-import { PlanDaySimpleAdd } from "@/components/companion/PlanDaySimpleAdd";
-import { PlanDaySimpleList } from "@/components/companion/PlanDaySimpleList";
-import { PlanMyDayCompleteWorkflow } from "@/components/companion/PlanMyDayCompleteWorkflow";
+import { ProgressivePlanMyDay } from "@/components/companion/ProgressivePlanMyDay";
 import { PlanMyDayMorningRoomShell } from "@/components/companion/PlanMyDayMorningRoomShell";
 import {
   applyAdaptedDayProposal,
@@ -18,22 +16,12 @@ import {
   type PlanAdaptSharedChildId,
 } from "@/lib/myDaySharedWindows";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
-import {
-  PLAN_DAY_IM_STUCK_BUTTON_LABEL,
-  requestPlanDayImStuck,
-} from "@/lib/planMyDay/planDayImStuck";
+import { requestPlanDayImStuck } from "@/lib/planMyDay/planDayImStuck";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
-import { parseMindCapture } from "@/lib/planMyDay/morningConversation";
 import {
-  addQuickPlanItems,
-  deletePlanItem,
-  finishPlanItem,
   isMeaningfulPlanItem,
-  loadPlanWorkflowState,
   loadTodayPlanItems,
   PLAN_MY_DAY_UPDATED,
-  savePlanWorkflowState,
-  updatePlanItem,
   type PlanDayItem,
 } from "@/lib/planMyDay";
 
@@ -95,70 +83,22 @@ function PlanChildContent({
 
   return (
     <div
-      className="mt-4 flex flex-col gap-8 pb-6"
+      className="mt-4 flex flex-col gap-6 pb-6"
       data-testid="plan-adapt-shared-plan-content"
     >
       <div data-testid="plan-day-section-todays-list">
-        <PlanDaySimpleAdd
-          onAdd={(raw) => {
-            const titles = parseMindCapture(raw);
-            const toAdd = titles.length > 0 ? titles : [raw.trim()];
-            const next = addQuickPlanItems(toAdd, items);
-            setItems(next);
-            const prior = loadPlanWorkflowState();
-            savePlanWorkflowState({
-              ...prior,
-              sourceInputs: [...prior.sourceInputs, raw.trim()].filter(Boolean),
-              stage:
-                prior.stage === "planned" || prior.stage === "started"
-                  ? prior.stage
-                  : "capture",
-            });
-          }}
-        />
-        <div className="mt-6">
-          <PlanDaySimpleList
-            items={listItems}
-            onComplete={(id) => {
-              const result = finishPlanItem(items, id);
-              if (result) setItems(result.items);
-            }}
-            onEdit={(id, title) => {
-              setItems(updatePlanItem(items, id, { title }));
-            }}
-            onDelete={(id) => {
-              setItems(deletePlanItem(items, id));
-            }}
-          />
-        </div>
-      </div>
-
-      <PlanMyDayCompleteWorkflow
-        items={items}
-        onItemsChange={setItems}
-        onOpenAdapt={onOpenAdapt}
-        onImStuck={(extras) =>
-          requestPlanDayImStuck(
-            listItems.map((item) => item.title),
-            extras,
-          )
-        }
-      />
-
-      {listItems.length === 0 ? (
-        <button
-          type="button"
-          onClick={() =>
-            requestPlanDayImStuck(listItems.map((item) => item.title), {
-              activeStep: "capture",
-            })
+        <ProgressivePlanMyDay
+          items={items}
+          onItemsChange={setItems}
+          onOpenAdapt={onOpenAdapt}
+          onImStuck={(extras) =>
+            requestPlanDayImStuck(
+              listItems.map((item) => item.title),
+              extras,
+            )
           }
-          className="self-start rounded-xl border border-[#c9bfb0] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f5f0ea]"
-          data-testid="plan-day-im-stuck"
-        >
-          {PLAN_DAY_IM_STUCK_BUTTON_LABEL}
-        </button>
-      ) : null}
+        />
+      </div>
     </div>
   );
 }
