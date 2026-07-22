@@ -88,7 +88,13 @@ type Props = {
    * Event intention → Event Creation Workspace (skips generic pieces interview).
    */
   onLaunchEventWorkspace?: (intention: string) => void;
-  /** 057 — Start Something New → Create conversational entry (never Project Home wizard). */
+  /**
+   * Optional override for "Start Something New" — when provided, takes over
+   * instead of the built-in new-project questions below. Not wired by
+   * CompanionPageClient for the Projects landing button (Start New Project
+   * Routing Fix): Projects must open its own new-project setup flow, never
+   * Create. Reserved for a future explicit Create handoff, if one is added.
+   */
   onStartSomethingNew?: () => void;
   /** 057 — Resume Creation Workspace from Active Work card. */
   onResumeActiveWork?: (work: ActiveWorkCardModel) => void;
@@ -198,18 +204,19 @@ export function ProjectHomesPrototypePanel({
   }, []);
 
   useEffect(() => {
-    // 057 — deep links that asked for Project Home create → Create front door
+    // Start New Project Routing Fix — deep links that ask for the new-project
+    // flow open the built-in wizard here unless an explicit override callback
+    // is provided.
     if (
-      initialView === "create-purpose" ||
-      initialView === "create-why" ||
-      initialView === "create-pieces" ||
-      initialView === "create-home"
+      onStartSomethingNew &&
+      (initialView === "create-purpose" ||
+        initialView === "create-why" ||
+        initialView === "create-pieces" ||
+        initialView === "create-home")
     ) {
-      if (onStartSomethingNew) {
-        onStartSomethingNew();
-        setView("gallery");
-        return;
-      }
+      onStartSomethingNew();
+      setView("gallery");
+      return;
     }
     if (initialView && initialView !== "gallery") {
       setView(initialView);
@@ -241,7 +248,9 @@ export function ProjectHomesPrototypePanel({
         : PROJECT_HOMES_ROOM_BACKGROUND;
 
   function beginCreate() {
-    // 057 — never lead with Project Home creation; Create is the front door
+    // Start New Project Routing Fix — Start Something New opens the
+    // Project setup flow below by default (never Create). onStartSomethingNew
+    // is only honored when a caller explicitly overrides it.
     if (onStartSomethingNew) {
       onStartSomethingNew();
       return;

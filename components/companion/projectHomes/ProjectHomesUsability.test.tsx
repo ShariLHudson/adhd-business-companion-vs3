@@ -245,6 +245,52 @@ describe("Project Homes UI usability", () => {
     }
   });
 
+  it("Start Something New opens the Project setup flow, never Create (Start New Project Routing Fix)", () => {
+    // Mirrors CompanionPageClient — Start Something New is no longer wired
+    // to a Create callback, so clicking it must land on the built-in
+    // new-project questions, not any Create surface.
+    act(() => {
+      root.render(<ProjectHomesPrototypePanel onBack={() => undefined} />);
+    });
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="projects-start-something-new"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(
+      container.querySelector('[data-testid="project-homes-create-purpose"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="project-home-intention-input"]'),
+    ).toBeTruthy();
+    expect(container.textContent).not.toMatch(/create-estate|content-generator/i);
+  });
+
+  it("an explicit onStartSomethingNew override still takes precedence (future Create handoff hook)", () => {
+    const onStartSomethingNew = vi.fn();
+    act(() => {
+      root.render(
+        <ProjectHomesPrototypePanel
+          onBack={() => undefined}
+          onStartSomethingNew={onStartSomethingNew}
+        />,
+      );
+    });
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="projects-start-something-new"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onStartSomethingNew).toHaveBeenCalledTimes(1);
+    expect(
+      container.querySelector('[data-testid="project-homes-create-purpose"]'),
+    ).toBeNull();
+  });
+
   it("gallery hydrates companion-projects-v1 into Active Work cards", () => {
     const list = saveProject({
       name: "Hydrated Member Project",

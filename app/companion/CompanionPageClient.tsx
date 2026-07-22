@@ -1685,6 +1685,7 @@ import type {
   ImmediateCreateProjectOpenPayload,
   ImmediateMomentumOpenPayload,
 } from "@/lib/createExperience/createExperienceRouting";
+import type { ProjectHomeView } from "@/lib/projectHomes/types";
 import {
   CREATE_ROOM_PREPARED_STATE_MESSAGE,
   resolveLegacyCreateWorkspaceGuard,
@@ -4528,6 +4529,14 @@ export default function CompanionPageClient() {
     useState<WorkspaceFieldId | null>(null);
   const [workspaceFocusStamp, setWorkspaceFocusStamp] = useState(0);
   const [projectsBootstrapCreate, setProjectsBootstrapCreate] = useState(false);
+  /**
+   * Routing fix — Start New Project must open the Project setup flow, never
+   * Create. Defaults to "gallery"; callers that need to land directly on the
+   * new-project questions (e.g. a "start a new project" chat command) pass
+   * "create-purpose" through openProjectHomesPrototypeCore().
+   */
+  const [projectHomesInitialView, setProjectHomesInitialView] =
+    useState<ProjectHomeView>("gallery");
   const [workspaceChatFill, setWorkspaceChatFill] = useState<{
     field: WorkspaceFieldId;
     value: string;
@@ -9569,11 +9578,19 @@ export default function CompanionPageClient() {
     setEstateRoomChatVisible(false);
   }
 
-  /** Design prototype — Project Homes as Estate places (no project storage). */
-  function openProjectHomesPrototypeCore() {
+  /**
+   * Design prototype — Project Homes as Estate places (no project storage).
+   * `initialView` lets callers land directly on the new-project questions
+   * (Start New Project routing fix) — defaults to the gallery so ordinary
+   * navigation into Projects is unaffected.
+   */
+  function openProjectHomesPrototypeCore(
+    initialView: ProjectHomeView = "gallery",
+  ) {
     leaveClearMyMindIfNavigatingAway();
     pauseActiveArtifactIfLeavingCreate("project-homes");
     setOverlay(null);
+    setProjectHomesInitialView(initialView);
     preloadRoomBackground(PROJECT_HOMES_ROOM_BACKGROUND);
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
@@ -13271,7 +13288,9 @@ export default function CompanionPageClient() {
     payload: ImmediateCreateProjectOpenPayload,
   ) {
     clearFrictionlessOfferState();
-    openProjectHomesPrototypeCore();
+    // Routing fix — "start a new project" opens the Project setup flow
+    // directly (never Create).
+    openProjectHomesPrototypeCore("create-purpose");
     if (payload.followUpLine?.trim()) {
       postCreateTransparencyMessage(payload.followUpLine);
     }
@@ -24754,6 +24773,7 @@ export default function CompanionPageClient() {
             >
               <ProjectHomesPrototypePanel
                 onBack={navigateBackToEstateHome}
+                initialView={projectHomesInitialView}
                 onCallTheBoard={(project) => {
                   const payload = buildCallTheBoardContext({
                     source: "project-home",
@@ -24768,7 +24788,6 @@ export default function CompanionPageClient() {
                     sourceContext: payload,
                   });
                 }}
-                onStartSomethingNew={() => beginForceNewCreationFromUi("create")}
                 onResumeActiveWork={(work: ActiveWorkCardModel) => {
                   const id =
                     work.eventRecordId ||
