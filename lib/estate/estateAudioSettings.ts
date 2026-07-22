@@ -22,9 +22,10 @@ export type EstateAudioSettings = {
   /** Silence Estate / globalMuted — disables environmental audio. */
   silenced: boolean;
   /**
-   * First-login Shari welcome greeting audio (default off — opt-in).
-   * Off = skip autoplay and do not offer Play on the first-login gate.
-   * Welcome audio never plays again after the first login either way.
+   * Welcome greeting audio preference (default off).
+   * Does not block the one-time first-login gate autoplay — that path is
+   * eligible once unless Estate is silenced (see isWelcomeGreetingAudioEnabled).
+   * After welcome completion, this toggle gates any returning / general replay.
    */
   welcomeGreetingAudioEnabled: boolean;
 };
@@ -111,10 +112,27 @@ export function isEstateSilenced(): boolean {
   return readRaw().silenced;
 }
 
-/** Whether the one-time first-login welcome greeting may be offered / played. */
-export function isWelcomeGreetingAudioEnabled(): boolean {
+export type WelcomeGreetingAudioOptions = {
+  /**
+   * When true, the member is on the unfinished first-login welcome gate.
+   * Eligible for one autoplay / Play offer even when the Settings default is off.
+   * Still blocked when Estate is silenced.
+   */
+  firstLoginWelcomeIncomplete?: boolean;
+};
+
+/**
+ * Whether welcome greeting audio may be offered / played.
+ * First unfinished login gate: allowed unless silenced (Settings default ignored).
+ * Returning / general paths: require welcomeGreetingAudioEnabled and not silenced.
+ */
+export function isWelcomeGreetingAudioEnabled(
+  options?: WelcomeGreetingAudioOptions,
+): boolean {
   const s = readRaw();
-  return s.welcomeGreetingAudioEnabled && !s.silenced;
+  if (s.silenced) return false;
+  if (options?.firstLoginWelcomeIncomplete) return true;
+  return s.welcomeGreetingAudioEnabled;
 }
 
 /** True when automatic starts (room entry, login) are allowed. Default false. */

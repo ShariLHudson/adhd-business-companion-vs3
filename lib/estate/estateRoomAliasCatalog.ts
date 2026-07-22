@@ -646,14 +646,16 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "peaceful-places",
-    officialName: "Peaceful Places",
+    officialName: "Peaceful Moments",
     aliases: [
+      "peaceful moments",
+      "peaceful moment",
       "peaceful places",
       "peaceful place",
       "pleasure places",
       "pleasure place",
     ],
-    route: "home",
+    route: "focus-audio",
     roomType: "restoration",
   },
   {

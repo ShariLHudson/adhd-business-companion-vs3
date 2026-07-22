@@ -6,15 +6,19 @@ import {
   EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS,
   type ExperienceSoundscapeTrack,
 } from "@/lib/soundscapes/experienceSoundscapesMenu";
+import type { EstateAudioPlayResult } from "@/lib/estate/estateAudioService";
 
 export type SoundscapeSelectionOverlayProps = {
   open: boolean;
   onClose: () => void;
-  onPlay: (track: ExperienceSoundscapeTrack) => void;
+  onPlay: (
+    track: ExperienceSoundscapeTrack,
+  ) => void | Promise<void | EstateAudioPlayResult>;
 };
 
 /**
  * Dedicated Soundscapes selection — not a third-level Welcome Home flyout.
+ * Playback only; master Sound On/Off stays in the header.
  */
 export function SoundscapeSelectionOverlay({
   open,
@@ -22,11 +26,17 @@ export function SoundscapeSelectionOverlay({
   onPlay,
 }: SoundscapeSelectionOverlayProps) {
   const [mounted, setMounted] = useState(false);
+  const [playError, setPlayError] = useState<string | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setPlayError(null);
+      setPlayingId(null);
+      return;
+    }
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
@@ -62,6 +72,10 @@ export function SoundscapeSelectionOverlay({
             Close
           </button>
         </header>
+        <p className="soundscape-selection-overlay__hint">
+          Choose a track to play. Use Sound On/Off in the header for all Estate
+          sound.
+        </p>
         <ul className="soundscape-selection-overlay__list">
           {EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS.map((track) => (
             <li key={track.id}>
@@ -69,9 +83,23 @@ export function SoundscapeSelectionOverlay({
                 type="button"
                 className="soundscape-selection-overlay__item"
                 data-testid={`soundscape-play-${track.id}`}
+                disabled={playingId === track.id}
                 onClick={() => {
-                  onPlay(track);
-                  onClose();
+                  setPlayError(null);
+                  setPlayingId(track.id);
+                  void Promise.resolve(onPlay(track)).then((result) => {
+                    setPlayingId(null);
+                    if (
+                      result &&
+                      typeof result === "object" &&
+                      "ok" in result &&
+                      result.ok === false
+                    ) {
+                      setPlayError(result.message);
+                      return;
+                    }
+                    onClose();
+                  });
                 }}
               >
                 {track.title}
@@ -79,6 +107,15 @@ export function SoundscapeSelectionOverlay({
             </li>
           ))}
         </ul>
+        {playError ? (
+          <p
+            className="soundscape-selection-overlay__error"
+            data-testid="soundscape-play-error"
+            role="status"
+          >
+            {playError}
+          </p>
+        ) : null}
       </div>
     </div>,
     document.body,

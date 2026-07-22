@@ -44,6 +44,20 @@ describe("estateAudioSettings (133 opt-in)", () => {
     expect(isWelcomeGreetingAudioEnabled()).toBe(true);
   });
 
+  it("first unfinished login welcome is eligible even when Settings default is off", () => {
+    expect(getEstateAudioSettings().welcomeGreetingAudioEnabled).toBe(false);
+    expect(
+      isWelcomeGreetingAudioEnabled({ firstLoginWelcomeIncomplete: true }),
+    ).toBe(true);
+  });
+
+  it("silence still blocks first unfinished login welcome audio", () => {
+    patchEstateAudioSettings({ silenced: true });
+    expect(
+      isWelcomeGreetingAudioEnabled({ firstLoginWelcomeIncomplete: true }),
+    ).toBe(false);
+  });
+
   it("exposes AudioPreference view", () => {
     const pref = toAudioPreference();
     expect(pref.autoplayAllowed).toBe(false);

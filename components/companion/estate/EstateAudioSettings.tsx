@@ -80,8 +80,8 @@ export function EstateAudioSettings({ placeId, className }: Props) {
       aria-label="Estate audio"
     >
       <p className="estate-audio-settings__intro">
-        Sound is opt-in. Nothing starts until you choose Play or turn a layer
-        on. Adjust it here anytime.
+        Master Sound On/Off lives in the header. Here you choose which layers
+        may play after you press Play — nothing starts on its own.
       </p>
 
       <label className="estate-audio-settings__row">
@@ -96,8 +96,9 @@ export function EstateAudioSettings({ placeId, className }: Props) {
         />
         <span>Welcome greeting audio</span>
         <span className="estate-audio-settings__hint">
-          Optional spoken welcome on a brand-new member&apos;s first login —
-          never autoplays unless you enable it
+          Spoken welcome on a brand-new member&apos;s first login autoplays once
+          (unless Estate is silenced). After that, this toggle controls whether
+          welcome greeting audio may play again
         </span>
       </label>
 
@@ -155,7 +156,7 @@ export function EstateAudioSettings({ placeId, className }: Props) {
         className="estate-audio-settings__silence"
         data-testid="estate-audio-stop-all-sound"
         onClick={() => {
-          void stopAllAudio();
+          void stopAllAudio({ silenceEstate: true });
           apply({
             silenced: true,
             ambienceEnabled: false,
@@ -167,17 +168,14 @@ export function EstateAudioSettings({ placeId, className }: Props) {
         Stop All Sound
       </button>
 
-      <button
-        type="button"
-        className="estate-audio-settings__silence"
-        onClick={() =>
-          apply({
-            silenced: !settings.silenced,
-          })
-        }
-      >
-        {settings.silenced ? "Restore Estate sound" : "Silence Estate"}
-      </button>
+      {settings.silenced ? (
+        <p
+          className="estate-audio-settings__hint"
+          data-testid="estate-audio-master-hint"
+        >
+          Sound Off is on. Use Sound On in the header to allow playback again.
+        </p>
+      ) : null}
     </div>
   );
 }
