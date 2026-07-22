@@ -15,6 +15,11 @@ import {
   CARTOGRAPHERS_FRAMED_MAPS,
   wallSelectableFramedMaps,
 } from "./framedMaps";
+import {
+  assertWallMapRegistryComplete,
+  cartographyWallMaps,
+  wallMapsForRow,
+} from "./wallMaps";
 import { buildDraftFromGuidedAnswers } from "@/lib/visualFocus/guidedBuilder";
 import { buildVisualLayout } from "@/lib/visualFocus/visualLayout";
 import { buildVisualFocusPrintHtml } from "@/lib/visualFocus/printMap";
@@ -26,6 +31,28 @@ describe("Cartography map registry (room completion)", () => {
       expect(
         CARTOGRAPHY_MAP_REGISTRY.some((e) => e.canonicalId === frame.id),
       ).toBe(true);
+    }
+  });
+
+  it("canonical wall registry has exact order and names", () => {
+    expect(assertWallMapRegistryComplete()).toBe(true);
+    expect(wallMapsForRow("top").map((m) => m.name)).toEqual([
+      "Mind Map",
+      "Decision Map",
+      "Journey Map",
+      "Process Map",
+      "Relationship Map",
+    ]);
+    expect(wallMapsForRow("bottom").map((m) => m.name)).toEqual([
+      "Timeline Map",
+      "Strategy Map",
+      "Opportunity Map",
+      "System Map",
+      "Priority Map",
+    ]);
+    for (const wall of cartographyWallMaps) {
+      expect(canonicalMapName(wall.id)).toBe(wall.name);
+      expect(wall.builderType).toBe(wall.id);
     }
   });
 
@@ -49,6 +76,8 @@ describe("Cartography map registry (room completion)", () => {
       expect(frame.nameplate).toBe(canonicalMapName(frame.id));
       expect(frame.visualFocusMode).toBe(visualFocusModeForWallMap(frame.id));
     }
+    expect(CARTOGRAPHERS_FRAMED_MAPS.map((m) => m.id)).toContain("system-map");
+    expect(CARTOGRAPHERS_FRAMED_MAPS.map((m) => m.id)).not.toContain("project-map");
   });
 
   it("Decision Map name is canonical (not Decision Tree)", () => {
@@ -59,6 +88,11 @@ describe("Cartography map registry (room completion)", () => {
     );
     expect(entry?.wallLabel).toBe("Decision Map");
     expect(entry?.galleryLabel).toBe("Decision Map");
+  });
+
+  it("Timeline Map and System Map use exact canonical names", () => {
+    expect(canonicalMapName("timeline-map")).toBe("Timeline Map");
+    expect(canonicalMapName("system-map")).toBe("System Map");
   });
 
   it("naming matrix rows are complete for report export", () => {

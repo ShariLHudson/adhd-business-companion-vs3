@@ -73,12 +73,23 @@ function treeTemplate(mode: VisualFocusMode): { title: string; root: VisualFocus
       };
     case "project-map":
       return {
-        title: "Course Launch",
-        root: node("Course Launch", [
+        title: "Website Redesign",
+        root: node("Website Redesign", [
           node("Content"),
           node("Landing Page"),
           node("Emails"),
           node("Promotion"),
+        ]),
+      };
+    case "system-map":
+      return {
+        title: "Client onboarding system",
+        root: node("Client onboarding system", [
+          node("Inquiry"),
+          node("Discovery call"),
+          node("Proposal"),
+          node("Kickoff"),
+          node("Delivery"),
         ]),
       };
     case "relationship-map":

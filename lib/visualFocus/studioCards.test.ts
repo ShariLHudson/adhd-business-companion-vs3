@@ -18,6 +18,7 @@ const MODES: VisualFocusMode[] = [
   "journey-map",
   "timeline-map",
   "opportunity-map",
+  "system-map",
   "priority-map",
   "visual-kanban",
   "business-canvas",

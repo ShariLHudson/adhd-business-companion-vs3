@@ -636,6 +636,84 @@
   padding: 0;
 }
 
+/* Diegetic wall slot: framed hotspot + always-visible parchment label */
+.cartographers-wall-slot {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cartographers-wall-slot > .cartographers-hotspot--frame {
+  position: absolute;
+  inset: 0 0 1.55rem 0;
+  width: auto;
+  height: auto;
+  pointer-events: auto;
+}
+
+.cartographers-wall-slot > .cartographers-wall-label {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  z-index: 3;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.cartographers-wall-label {
+  min-height: 1.45rem;
+  max-width: 100%;
+  white-space: nowrap;
+  border-radius: 0.3rem;
+  border: 1px solid #c4a574;
+  background: linear-gradient(180deg, #fffdf8 0%, #f3ebe0 100%);
+  padding: 0.22rem 0.4rem;
+  font-size: clamp(0.52rem, 1.05vw, 0.68rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: #163c3c;
+  box-shadow:
+    0 2px 8px rgba(12, 8, 6, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease;
+}
+
+.cartographers-wall-label--center {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  transform: translateX(-50%);
+  min-height: 1.7rem;
+  padding: 0.35rem 0.75rem;
+  font-size: clamp(0.72rem, 1.5vw, 0.95rem);
+}
+
+.cartographers-wall-slot--hover .cartographers-wall-label,
+.cartographers-wall-label:hover,
+.cartographers-wall-label:focus-visible,
+.cartographers-hotspot--center-map:hover .cartographers-wall-label,
+.cartographers-hotspot--center-map:focus-visible .cartographers-wall-label {
+  transform: translateX(-50%) scale(1.04);
+  border-color: #b8956a;
+  box-shadow:
+    0 3px 12px rgba(12, 8, 6, 0.35),
+    0 0 0 2px rgba(30, 79, 79, 0.28);
+  outline: none;
+}
+
+.cartographers-wall-label:focus-visible {
+  outline: 2px solid #1e4f4f;
+  outline-offset: 2px;
+}
+
+/* Legacy frame-btn styles retained for non-wall consumers */
 .cartographers-frame-btn {
   display: flex;
   max-width: 92%;
@@ -650,21 +728,6 @@
     0 2px 10px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 248, 235, 0.12);
   pointer-events: none;
-  transition:
-    background 160ms ease,
-    border-color 160ms ease,
-    transform 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.cartographers-frame-btn--center {
-  max-width: 70%;
-  padding: 0.55rem 1rem;
-}
-
-.cartographers-frame-btn--ready {
-  border-color: rgba(240, 217, 168, 0.85);
-  background: rgba(30, 79, 79, 0.88);
 }
 
 .cartographers-frame-btn__name {
@@ -674,31 +737,6 @@
   letter-spacing: 0.03em;
   text-align: center;
   color: #f5e6c8;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
-}
-
-.cartographers-frame-btn--center .cartographers-frame-btn__name {
-  font-size: clamp(0.72rem, 1.6vw, 0.95rem);
-  letter-spacing: 0.05em;
-}
-
-.cartographers-hotspot--frame:hover .cartographers-frame-btn,
-.cartographers-hotspot--frame:focus-visible .cartographers-frame-btn,
-.cartographers-hotspot--center-map:hover .cartographers-frame-btn,
-.cartographers-hotspot--center-map:focus-visible .cartographers-frame-btn {
-  transform: scale(1.04);
-  border-color: rgba(255, 236, 210, 0.95);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.4),
-    0 0 0 2px rgba(240, 217, 168, 0.35);
-}
-
-.cartographers-hotspot--frame.cartographers-hotspot--live:hover .cartographers-frame-btn,
-.cartographers-hotspot--frame.cartographers-hotspot--live:focus-visible
-  .cartographers-frame-btn,
-.cartographers-hotspot--center-map:hover .cartographers-frame-btn--ready,
-.cartographers-hotspot--center-map:focus-visible .cartographers-frame-btn--ready {
-  background: rgba(36, 96, 96, 0.95);
 }
 
 .cartographers-hotspot__label {
@@ -789,22 +827,9 @@
 }
 
 /* Prompt 140 — Continue Mapping re-entry (not nested accordion) */
+/* Saved maps resume via chrome "Resume Previous Map" / My Maps — not a wall overlay */
 .cartographers-continue-mapping {
-  position: absolute;
-  z-index: 4;
-  left: 1rem;
-  bottom: 4.5rem;
-  width: min(18rem, calc(100% - 2rem));
-  border-radius: 1rem;
-  border: 1px solid rgba(255, 253, 248, 0.4);
-  background: linear-gradient(
-    165deg,
-    rgba(255, 253, 248, 0.9),
-    rgba(245, 239, 230, 0.84)
-  );
-  box-shadow: 0 12px 28px rgba(12, 8, 6, 0.28);
-  padding: 0.85rem 1rem;
-  pointer-events: auto;
+  display: none;
 }
 
 .cartographers-continue-mapping--empty {

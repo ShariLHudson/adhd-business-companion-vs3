@@ -126,6 +126,14 @@ const ACCENTS: Record<VisualFocusMode, VisualFocusStudioAccent> = {
     actionFg: "text-yellow-950",
     actionHover: "hover:bg-yellow-50",
   },
+  "system-map": {
+    borderTop: "border-t-stone-600",
+    headerBg: "bg-gradient-to-br from-stone-50/90 to-white",
+    iconRing: "bg-stone-100 text-stone-800",
+    actionBorder: "border-stone-300",
+    actionFg: "text-stone-900",
+    actionHover: "hover:bg-stone-50",
+  },
   "priority-map": {
     borderTop: "border-t-rose-500",
     headerBg: "bg-gradient-to-br from-rose-50/90 to-white",
@@ -326,7 +334,7 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
     whyItHelps:
       "Project maps turn overwhelming projects into manageable visual stages.",
     exampleLines: [
-      "Course Launch",
+      "Website Redesign",
       "├ Content",
       "├ Landing Page",
       "├ Emails",
@@ -382,7 +390,7 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
   },
   {
     mode: "timeline-map",
-    title: "Timeline",
+    title: "Timeline Map",
     emoji: "📅",
     whatItIs: "Place events in order and see what comes next.",
     whenToUse: "When sequence and approximate timing matter most.",
@@ -397,7 +405,7 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
     useWhen: ["launches", "campaigns", "personal milestones"],
     whyItHelps: "It turns a swirl of dates into a calm sequence.",
     exampleLines: ["Outline", "→ Build", "→ Open cart", "→ Close"],
-    actionLabel: "Create Timeline",
+    actionLabel: "Create Timeline Map",
     accent: ACCENTS["timeline-map"],
     keywords: ["timeline", "milestones", "schedule", "sequence", "dates"],
   },
@@ -421,6 +429,28 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
     actionLabel: "Create Opportunity Map",
     accent: ACCENTS["opportunity-map"],
     keywords: ["opportunity", "possibilities", "risk", "benefit", "ideas"],
+  },
+  {
+    mode: "system-map",
+    title: "System Map",
+    emoji: "🕸️",
+    whatItIs: "See how people, processes, and information work together.",
+    whenToUse:
+      "When you need dependencies, bottlenecks, or how the parts connect.",
+    youWillReceive: [
+      "Visual system map",
+      "Major components",
+      "Flows and dependencies",
+      "Friction points",
+      "Suggested improvements",
+    ],
+    bestFor: "Understanding how a system really works",
+    useWhen: ["onboarding systems", "delivery operations", "tech stacks"],
+    whyItHelps: "It makes invisible handoffs visible so the whole can improve.",
+    exampleLines: ["Inquiry", "→ Discovery", "→ Proposal", "→ Kickoff"],
+    actionLabel: "Create System Map",
+    accent: ACCENTS["system-map"],
+    keywords: ["system", "components", "flow", "dependency", "bottleneck"],
   },
   {
     mode: "priority-map",

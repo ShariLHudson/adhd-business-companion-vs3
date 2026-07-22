@@ -34,7 +34,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
       "When you already need a ranked decision, a step-by-step process, or a dated schedule — those want Decision, Process, or Timeline maps.",
     example:
       "Center: “Product launch.” Branches: audience, offer, channels, timeline worries, open questions.",
-    relatedMethods: ["Strategy Map", "Project Map", "Opportunity Map"],
+    relatedMethods: ["Strategy Map", "System Map", "Opportunity Map"],
     canCreate: true,
   },
   {
@@ -84,7 +84,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
       "When you are still inventing the idea — Mind Map first, process later.",
     example:
       "Lead → discovery call → proposal → kickoff → delivery → follow-up.",
-    relatedMethods: ["Timeline Map", "Journey Map", "Project Map"],
+    relatedMethods: ["Timeline Map", "Journey Map", "System Map"],
     canCreate: true,
   },
   {
@@ -98,7 +98,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     bestUsedFor:
       "Client experience, reader journeys, personal transformation arcs, or go-to-market paths.",
     whenNotToUse:
-      "When you need a pure task breakdown — Project Map is clearer for that.",
+      "When you need a pure step sequence — Process Map is clearer for that.",
     example:
       "Stranger → curious visitor → first win → loyal member.",
     relatedMethods: ["Process Map", "Timeline Map", "Relationship Map"],
@@ -106,7 +106,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
   },
   {
     id: "timeline-map",
-    name: "Timeline",
+    name: "Timeline Map",
     hoverBlurb: "Place events in order and see what comes next.",
     whatItIs: "Events and milestones placed in order across time.",
     whyItWorks:
@@ -117,7 +117,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
       "When relationships or options matter more than dates.",
     example:
       "Research week → draft week → soft launch → full launch.",
-    relatedMethods: ["Project Map", "Process Map", "Priority Map"],
+    relatedMethods: ["System Map", "Process Map", "Priority Map"],
     canCreate: true,
   },
   {
@@ -134,24 +134,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
       "When you only need a quick idea dump — Mind Map is lighter.",
     example:
       "Vision → three priorities → supporting initiatives → next actions.",
-    relatedMethods: ["Mind Map", "Project Map", "Priority Map"],
-    canCreate: true,
-  },
-  {
-    id: "project-map",
-    name: "Project Map",
-    hoverBlurb: "Break a large initiative into phases, deliverables, and tasks.",
-    whatItIs:
-      "Phases, deliverables, and tasks for one initiative, held in one place.",
-    whyItWorks:
-      "Big work becomes navigable without losing the whole picture.",
-    bestUsedFor:
-      "Launches, builds, client engagements, or any multi-step initiative.",
-    whenNotToUse:
-      "When you are still deciding what the project is — Mind Map or Opportunity Map first.",
-    example:
-      "Phase 1 research → Phase 2 build → Phase 3 launch, each with deliverables.",
-    relatedMethods: ["Timeline Map", "Strategy Map", "Process Map"],
+    relatedMethods: ["Mind Map", "System Map", "Priority Map"],
     canCreate: true,
   },
   {
@@ -172,6 +155,23 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     canCreate: true,
   },
   {
+    id: "system-map",
+    name: "System Map",
+    hoverBlurb: "See how people, processes, and information work together.",
+    whatItIs:
+      "A view of components, flows, dependencies, and friction points in one system.",
+    whyItWorks:
+      "It makes invisible handoffs and bottlenecks visible so you can improve the whole, not just one step.",
+    bestUsedFor:
+      "Onboarding systems, delivery operations, tech stacks, or any multi-part process web.",
+    whenNotToUse:
+      "When you only need a linear checklist — Process Map or Timeline Map is lighter.",
+    example:
+      "Inquiry → discovery → proposal → kickoff, with tools and people attached to each stage.",
+    relatedMethods: ["Process Map", "Relationship Map", "Strategy Map"],
+    canCreate: true,
+  },
+  {
     id: "priority-map",
     name: "Priority Map",
     hoverBlurb: "Sort what matters by impact, urgency, and effort.",
@@ -185,7 +185,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
       "When you do not yet know what the options are — gather with a Mind Map first.",
     example:
       "High impact / low effort in the “do now” zone; the rest parked or deferred.",
-    relatedMethods: ["Decision Map", "Timeline Map", "Project Map"],
+    relatedMethods: ["Decision Map", "Timeline Map", "System Map"],
     canCreate: true,
   },
 ] as const;

@@ -133,11 +133,14 @@ export const CARTOGRAPHY_MAP_REGISTRY: readonly CartographyMapRegistryEntry[] = 
   ]),
   entryFromDefinition(getCartographyMapDefinition("journey-map")),
   entryFromDefinition(getCartographyMapDefinition("timeline-map"), [
-    "Timeline Map",
+    "Timeline",
   ]),
   entryFromDefinition(getCartographyMapDefinition("strategy-map")),
-  entryFromDefinition(getCartographyMapDefinition("project-map")),
   entryFromDefinition(getCartographyMapDefinition("opportunity-map")),
+  entryFromDefinition(getCartographyMapDefinition("system-map"), [
+    "Project Map",
+    "Systems Map",
+  ]),
   entryFromDefinition(getCartographyMapDefinition("priority-map")),
   {
     canonicalId: "visual-kanban",

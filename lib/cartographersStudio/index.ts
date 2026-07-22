@@ -49,6 +49,18 @@ export {
 } from "./mapDefinitions";
 
 export {
+  cartographyWallMaps,
+  CARTOGRAPHY_WALL_HOTSPOTS,
+  wallMapsInDisplayOrder,
+  wallMapsForRow,
+  getWallMapById,
+  assertWallMapRegistryComplete,
+  type CartographyWallMap,
+  type CartographyWallMapId,
+  type CartographyWallRow,
+} from "./wallMaps";
+
+export {
   CARTOGRAPHERS_ATLAS_ENTRIES,
   CARTOGRAPHERS_ATLAS_INTRO,
   getAtlasEntry,

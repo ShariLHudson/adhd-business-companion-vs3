@@ -20,6 +20,7 @@ export type VisualFocusMode =
   | "journey-map"
   | "timeline-map"
   | "opportunity-map"
+  | "system-map"
   | "priority-map"
   | "visual-kanban"
   | "business-canvas";
@@ -237,7 +238,7 @@ export const VISUAL_FOCUS_MODE_META: {
   },
   {
     id: "timeline-map",
-    label: "Timeline",
+    label: "Timeline Map",
     emoji: "📅",
     desc: "Events and milestones in order.",
   },
@@ -246,6 +247,12 @@ export const VISUAL_FOCUS_MODE_META: {
     label: "Opportunity Map",
     emoji: "✨",
     desc: "Possibilities with benefits, risks, and first steps.",
+  },
+  {
+    id: "system-map",
+    label: "System Map",
+    emoji: "🕸️",
+    desc: "How people, processes, and information work together.",
   },
   {
     id: "priority-map",

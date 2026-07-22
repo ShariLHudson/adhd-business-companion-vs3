@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import {
-  CARTOGRAPHERS_CONTINUE_MAPPING,
   CARTOGRAPHERS_EXIT,
   CARTOGRAPHERS_FRAMED_MAPS,
   CARTOGRAPHERS_HELP,
@@ -12,12 +11,17 @@ import {
   CARTOGRAPHERS_STUDIO_BACKGROUND,
   CARTOGRAPHERS_WELCOME_REQUEST_EVENT,
   dismissCartographersWelcome,
+  getFramedMapById,
   wallSelectableFramedMaps,
   type CartographersFramedMap,
   type CartographersFramedMapId,
 } from "@/lib/cartographersStudio";
+import {
+  CARTOGRAPHY_WALL_HOTSPOTS,
+  cartographyWallMaps,
+  wallMapsInDisplayOrder,
+} from "@/lib/cartographersStudio/wallMaps";
 import type { VisualFocusMap } from "@/lib/visualFocus";
-import { studioCardTitleForMode } from "@/lib/visualFocus/studioCards";
 import { CartographersAtlasOverlay } from "./CartographersAtlasOverlay";
 import { CartographersContextualHelp } from "./CartographersContextualHelp";
 import { CartographersStudioWelcomePanel } from "./CartographersStudioWelcomePanel";
@@ -30,23 +34,6 @@ const CENTER_MAP_HOTSPOT = {
   height: "28%",
   transform: "translate(-50%, -50%)",
 } as const;
-
-/** Wall-frame positions for all ten maps. */
-const FRAME_HOTSPOTS: Record<
-  CartographersFramedMapId,
-  { left: string; top: string; width: string; height: string }
-> = {
-  "mind-map": { left: "22%", top: "18%", width: "14%", height: "16%" },
-  "decision-map": { left: "30%", top: "14%", width: "11%", height: "14%" },
-  "relationship-map": { left: "42%", top: "14%", width: "11%", height: "14%" },
-  "process-map": { left: "54%", top: "14%", width: "11%", height: "14%" },
-  "journey-map": { left: "66%", top: "14%", width: "11%", height: "14%" },
-  "timeline-map": { left: "18%", top: "30%", width: "11%", height: "14%" },
-  "strategy-map": { left: "30%", top: "30%", width: "11%", height: "14%" },
-  "project-map": { left: "42%", top: "30%", width: "11%", height: "14%" },
-  "opportunity-map": { left: "54%", top: "30%", width: "11%", height: "14%" },
-  "priority-map": { left: "66%", top: "30%", width: "11%", height: "14%" },
-};
 
 export function CartographersStudioRoom({
   continueThinking,
@@ -81,6 +68,7 @@ export function CartographersStudioRoom({
   const [showWelcome, setShowWelcome] = useState(false);
   const [contextualHelpOpen, setContextualHelpOpen] = useState(false);
   const selectableFrames = wallSelectableFramedMaps();
+  const wallOrder = wallMapsInDisplayOrder();
 
   useEffect(() => {
     const reopen = () => setShowWelcome(true);
@@ -220,42 +208,7 @@ export function CartographersStudioRoom({
         </div>
       </div>
 
-      {latestMap ? (
-        <div
-          className="cartographers-continue-mapping"
-          data-testid="cartographers-continue-mapping"
-        >
-          <p className="cartographers-continue-mapping__eyebrow">
-            {CARTOGRAPHERS_CONTINUE_MAPPING}
-          </p>
-          <p className="cartographers-continue-mapping__title">
-            {latestMap.title?.trim() || "Untitled map"}
-          </p>
-          <p className="cartographers-continue-mapping__meta">
-            {studioCardTitleForMode(latestMap.mode)}
-            {latestMap.updatedAt
-              ? ` · Last edited ${new Date(latestMap.updatedAt).toLocaleString()}`
-              : ""}
-          </p>
-          <button
-            type="button"
-            className="cartographers-continue-mapping__cta"
-            data-testid="cartographers-continue-mapping-cta"
-            onClick={() => beginWorking(() => onOpenMap(latestMap.id))}
-          >
-            Continue
-          </button>
-        </div>
-      ) : (
-        <p
-          className="cartographers-continue-mapping cartographers-continue-mapping--empty"
-          data-testid="cartographers-continue-mapping-empty"
-        >
-          Your completed maps will appear here.
-        </p>
-      )}
-
-      {/* Mobile / accessible gallery — do not force tiny background taps */}
+      {/* Mobile / accessible gallery — same registry as desktop wall */}
       <nav
         className="cartographers-mobile-gallery"
         aria-label="Map types"
@@ -263,36 +216,41 @@ export function CartographersStudioRoom({
       >
         <p className="cartographers-mobile-gallery__label">Choose a map</p>
         <ul className="cartographers-mobile-gallery__list">
-          {selectableFrames.map((map) => (
-            <li key={map.id}>
-              <button
-                type="button"
-                className="cartographers-mobile-gallery__item"
-                data-testid={`cartographers-gallery-${map.id}`}
-                aria-label={`Open ${map.nameplate}`}
-                onClick={() => openWallMap(map.id)}
-              >
-                <span className="cartographers-mobile-gallery__name">
-                  {map.nameplate}
-                </span>
-                <span className="cartographers-mobile-gallery__blurb">
-                  {map.hoverBlurb}
-                </span>
-              </button>
-            </li>
-          ))}
+          {wallOrder.map((wall) => {
+            const frame = getFramedMapById(wall.id);
+            if (!frame?.wallSelectable) return null;
+            return (
+              <li key={wall.id}>
+                <button
+                  type="button"
+                  className="cartographers-mobile-gallery__item"
+                  data-testid={`cartographers-gallery-${wall.id}`}
+                  aria-label={`Open ${wall.name}`}
+                  onClick={() => openWallMap(wall.id)}
+                >
+                  <span className="cartographers-mobile-gallery__name">
+                    {wall.name}
+                  </span>
+                  <span className="cartographers-mobile-gallery__blurb">
+                    {frame.hoverBlurb}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </nav>
 
       <div className="cartographers-immersive__hotspots" aria-label="Room objects">
-        {selectableFrames.map((map) => {
-          const box = FRAME_HOTSPOTS[map.id];
+        {wallOrder.map((wall) => {
+          const frame = selectableFrames.find((m) => m.id === wall.id);
+          if (!frame) return null;
+          const box = CARTOGRAPHY_WALL_HOTSPOTS[wall.id];
           return (
-            <button
-              key={map.id}
-              type="button"
-              className={`cartographers-hotspot cartographers-hotspot--frame cartographers-hotspot--live${
-                hoveredFrameId === map.id ? " cartographers-hotspot--hover" : ""
+            <div
+              key={wall.id}
+              className={`cartographers-wall-slot${
+                hoveredFrameId === wall.id ? " cartographers-wall-slot--hover" : ""
               }`}
               style={{
                 left: box.left,
@@ -300,31 +258,56 @@ export function CartographersStudioRoom({
                 width: box.width,
                 height: box.height,
               }}
-              data-testid={`cartographers-frame-${map.id}`}
-              data-interactive="true"
-              aria-label={`Open ${map.nameplate}`}
-              onMouseEnter={() => setHoveredFrameId(map.id)}
-              onMouseLeave={() =>
-                setHoveredFrameId((current) =>
-                  current === map.id ? null : current,
-                )
-              }
-              onFocus={() => setHoveredFrameId(map.id)}
-              onBlur={() =>
-                setHoveredFrameId((current) =>
-                  current === map.id ? null : current,
-                )
-              }
-              onClick={() => openWallMap(map.id)}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                setLearnMap(map);
-              }}
+              data-testid={`cartographers-wall-slot-${wall.id}`}
             >
-              <span className="cartographers-frame-btn cartographers-frame-btn--ready">
-                <span className="cartographers-frame-btn__name">{map.nameplate}</span>
-              </span>
-            </button>
+              <button
+                type="button"
+                className="cartographers-hotspot cartographers-hotspot--frame cartographers-hotspot--live"
+                data-testid={`cartographers-frame-${wall.id}`}
+                data-interactive="true"
+                aria-label={`Open ${wall.name}`}
+                onMouseEnter={() => setHoveredFrameId(wall.id)}
+                onMouseLeave={() =>
+                  setHoveredFrameId((current) =>
+                    current === wall.id ? null : current,
+                  )
+                }
+                onFocus={() => setHoveredFrameId(wall.id)}
+                onBlur={() =>
+                  setHoveredFrameId((current) =>
+                    current === wall.id ? null : current,
+                  )
+                }
+                onClick={() => openWallMap(wall.id)}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  setLearnMap(frame);
+                }}
+              >
+                <span className="sr-only">{wall.name}</span>
+              </button>
+              <button
+                type="button"
+                className="cartographers-wall-label"
+                data-testid={`cartographers-label-${wall.id}`}
+                aria-label={`Open ${wall.name}`}
+                onMouseEnter={() => setHoveredFrameId(wall.id)}
+                onMouseLeave={() =>
+                  setHoveredFrameId((current) =>
+                    current === wall.id ? null : current,
+                  )
+                }
+                onFocus={() => setHoveredFrameId(wall.id)}
+                onBlur={() =>
+                  setHoveredFrameId((current) =>
+                    current === wall.id ? null : current,
+                  )
+                }
+                onClick={() => openWallMap(wall.id)}
+              >
+                {wall.name}
+              </button>
+            </div>
           );
         })}
 
@@ -347,8 +330,8 @@ export function CartographersStudioRoom({
           onClick={() => openWallMap("mind-map")}
           aria-label="Open Mind Map workspace — center map"
         >
-          <span className="cartographers-frame-btn cartographers-frame-btn--center cartographers-frame-btn--ready">
-            <span className="cartographers-frame-btn__name">Mind Map</span>
+          <span className="cartographers-wall-label cartographers-wall-label--center">
+            Mind Map
           </span>
         </button>
 
@@ -397,6 +380,11 @@ export function CartographersStudioRoom({
       <p className="cartographers-immersive__hint" data-testid="cartographers-room-hint">
         {CARTOGRAPHERS_ROOM_INTRO.mindMapReady}
       </p>
+
+      {/* Registry length guard for tests / future slots */}
+      <span className="sr-only" data-testid="cartographers-wall-count">
+        {cartographyWallMaps.length}
+      </span>
 
       {showWelcome ? (
         <CartographersStudioWelcomePanel onDismiss={dismissWelcome} />

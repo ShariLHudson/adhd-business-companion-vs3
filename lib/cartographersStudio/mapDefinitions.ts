@@ -8,13 +8,13 @@ import type { VisualFocusMode } from "@/lib/visualFocus/types";
 export type CartographersFramedMapId =
   | "mind-map"
   | "decision-map"
-  | "relationship-map"
-  | "process-map"
   | "journey-map"
+  | "process-map"
+  | "relationship-map"
   | "timeline-map"
   | "strategy-map"
-  | "project-map"
   | "opportunity-map"
+  | "system-map"
   | "priority-map";
 
 export type CartographyStepDefinition = {
@@ -306,7 +306,7 @@ export const CARTOGRAPHY_MAP_DEFINITIONS: readonly CartographyMapDefinition[] = 
   },
   {
     id: "timeline-map",
-    name: "Timeline",
+    name: "Timeline Map",
     shortDescription: "Place events in order and see what comes next.",
     whenUseful: "When sequence and approximate timing matter more than branching.",
     outcomeDescription:
@@ -320,7 +320,7 @@ export const CARTOGRAPHY_MAP_DEFINITIONS: readonly CartographyMapDefinition[] = 
         title: "Getting Clear",
         question: "What is this timeline about?",
         fieldKey: "subject",
-        example: "Course launch",
+        example: "Product launch season",
       },
       {
         id: "beginning",
@@ -414,54 +414,6 @@ export const CARTOGRAPHY_MAP_DEFINITIONS: readonly CartographyMapDefinition[] = 
     isActive: true,
   },
   {
-    id: "project-map",
-    name: "Project Map",
-    shortDescription: "Break a large initiative into phases, deliverables, and tasks.",
-    whenUseful:
-      "When a project feels overwhelming and you need structure without a task list.",
-    outcomeDescription:
-      "A visual breakdown of phases and deliverables you can keep editing.",
-    route: "cartographers-studio / project-map",
-    visualFocusMode: "project-map",
-    builderType: "guided-steps",
-    steps: [
-      {
-        id: "project",
-        title: "Getting Clear",
-        question: "What project are you breaking down?",
-        fieldKey: "project",
-        example: "Course launch",
-      },
-      {
-        id: "phases",
-        title: "Adding Details",
-        question: "What are the major phases?",
-        fieldKey: "phases",
-        inputKind: "list",
-        example: "Content, landing page, emails, promotion",
-      },
-      {
-        id: "deliverables",
-        title: "Adding Details",
-        question: "What key deliverables sit under those phases?",
-        fieldKey: "deliverables",
-        inputKind: "list",
-        optional: true,
-      },
-      {
-        id: "first",
-        title: "Reviewing",
-        question: "What is the natural first piece to start?",
-        fieldKey: "first",
-        optional: true,
-      },
-    ],
-    resultRenderer: "vertical-flow",
-    supportsPrint: true,
-    supportsDuplicate: true,
-    isActive: true,
-  },
-  {
     id: "opportunity-map",
     name: "Opportunity Map",
     shortDescription: "Explore possibilities, benefits, risks, and first steps.",
@@ -513,6 +465,65 @@ export const CARTOGRAPHY_MAP_DEFINITIONS: readonly CartographyMapDefinition[] = 
       },
     ],
     resultRenderer: "opportunity-radar",
+    supportsPrint: true,
+    supportsDuplicate: true,
+    isActive: true,
+  },
+  {
+    id: "system-map",
+    name: "System Map",
+    shortDescription:
+      "See how people, processes, and information work together.",
+    whenUseful:
+      "When you need to understand dependencies, bottlenecks, or how the parts connect.",
+    outcomeDescription:
+      "A visual system of components, flows, dependencies, and improvement points.",
+    route: "cartographers-studio / system-map",
+    visualFocusMode: "system-map",
+    builderType: "guided-steps",
+    steps: [
+      {
+        id: "system",
+        title: "Getting Clear",
+        question: "What system are you mapping?",
+        fieldKey: "system",
+        example: "Client onboarding",
+      },
+      {
+        id: "components",
+        title: "Adding Details",
+        question: "What are the major components?",
+        fieldKey: "components",
+        inputKind: "list",
+        example: "Inquiry form, discovery call, proposal, kickoff",
+      },
+      {
+        id: "flow",
+        title: "Adding Details",
+        question: "How does information or work flow between them?",
+        fieldKey: "flow",
+        inputKind: "multiline",
+        optional: true,
+        example: "Inquiry → call → proposal → kickoff",
+      },
+      {
+        id: "dependencies",
+        title: "Connecting Ideas",
+        question: "Where are the key dependencies?",
+        fieldKey: "dependencies",
+        inputKind: "list",
+        optional: true,
+      },
+      {
+        id: "risks",
+        title: "Reviewing",
+        question: "Where do failures or bottlenecks show up?",
+        fieldKey: "risks",
+        inputKind: "list",
+        optional: true,
+      },
+    ],
+    resultRenderer: "vertical-flow",
     supportsPrint: true,
     supportsDuplicate: true,
     isActive: true,

@@ -32,14 +32,15 @@ const LEARN_TIPS: Record<CartographersFramedMapId, string> = {
     "Capture and expand ideas without structuring them first. Spark groups related thoughts into branches.",
   "decision-map":
     "Compare choices, criteria, and tradeoffs when you need a clear decision.",
+  "journey-map": "Chart the path from where you are to where you want to go.",
+  "process-map": "See steps, bottlenecks, and flow from start to finish.",
   "relationship-map":
     "Reveal how people, ideas, or systems connect and influence one another.",
-  "process-map": "See steps, bottlenecks, and flow from start to finish.",
-  "journey-map": "Chart the path from where you are to where you want to go.",
   "timeline-map": "Sequence milestones across past, present, and future.",
   "strategy-map": "Connect vision, priorities, and action into one course.",
-  "project-map": "Break a large initiative into phases, deliverables, and tasks.",
   "opportunity-map": "Explore possibilities, benefits, risks, and first steps.",
+  "system-map":
+    "See how people, processes, and information work together — and where friction hides.",
   "priority-map": "Sort what matters by impact, urgency, and effort.",
 };
 

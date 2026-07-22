@@ -130,5 +130,7 @@ describe("Cartographer framed maps", () => {
     const live = CARTOGRAPHERS_FRAMED_MAPS.filter((m) => m.interactive);
     expect(live).toHaveLength(10);
     expect(live.map((m) => m.id)).toContain("mind-map");
+    expect(live.map((m) => m.id)).toContain("system-map");
+    expect(live.map((m) => m.id)).not.toContain("project-map");
   });
 });

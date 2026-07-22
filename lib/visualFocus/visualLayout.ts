@@ -15,6 +15,7 @@ function layoutKindForMode(
   switch (mode) {
     case "relationship-map":
     case "project-map":
+    case "system-map":
       return "vertical-flow";
     case "decision-tree":
       return "decision-branch";

@@ -53,6 +53,8 @@ export function buildDraftFromGuidedAnswers(
       return buildStrategy(answers);
     case "project-map":
       return buildProject(answers);
+    case "system-map":
+      return buildSystem(answers);
     case "opportunity-map":
       return buildOpportunity(answers);
     case "priority-map":
@@ -241,6 +243,29 @@ function buildProject(answers: Record<string, string>): GuidedDraftResult {
   };
 }
 
+function buildSystem(answers: Record<string, string>): GuidedDraftResult {
+  const system = text(answers.system, "System");
+  const components = splitList(answers.components);
+  const flow = text(answers.flow, "");
+  const dependencies = splitList(answers.dependencies);
+  const risks = splitList(answers.risks);
+  const children: VisualFocusNode[] = (
+    components.length ? components : ["Component A", "Component B"]
+  ).map((c) => node(c));
+  if (flow) children.push(node("How it flows", [node(flow)]));
+  if (dependencies.length) {
+    children.push(node("Dependencies", dependencies.map((d) => node(d))));
+  }
+  if (risks.length) {
+    children.push(node("Friction points", risks.map((r) => node(r))));
+  }
+  return {
+    title: system,
+    root: node(system, children),
+    summaryHint: "System components, flows, and friction points.",
+  };
+}
+
 function buildOpportunity(answers: Record<string, string>): GuidedDraftResult {
   const focus = text(answers.focus, "Opportunities");
   const opportunities = splitList(answers.opportunities);
@@ -303,7 +328,9 @@ export function defaultTitleForMode(mode: VisualFocusMode): string {
     case "journey-map":
       return "Journey Map";
     case "timeline-map":
-      return "Timeline";
+      return "Timeline Map";
+    case "system-map":
+      return "System Map";
     case "opportunity-map":
       return "Opportunity Map";
     case "priority-map":
