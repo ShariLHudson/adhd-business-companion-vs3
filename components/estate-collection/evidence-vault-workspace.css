@@ -158,7 +158,10 @@
   position: fixed;
   left: 50%;
   bottom: calc(max(1.25rem, env(safe-area-inset-bottom, 0px)) + 5.5rem);
-  z-index: 7;
+  /* Above the browse/insights/search modal (z-index 24) so delete/save
+     confirmation is still visible while a panel is open — primary action
+     feedback must never be silently hidden behind a modal. */
+  z-index: 30;
   transform: translateX(-50%);
   margin: 0;
   padding: 0.5rem 0.85rem;

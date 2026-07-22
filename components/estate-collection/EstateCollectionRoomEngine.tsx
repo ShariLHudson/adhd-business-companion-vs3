@@ -350,9 +350,22 @@ export function EstateCollectionRoomEngine({
     openJournalFromInterior();
   }
 
-  function browseArchiveFromHome() {
+  function openBrowsePanel() {
     setVaultMode("browse");
     setVaultPanel("browse");
+  }
+
+  /**
+   * Primary "see all discoveries" action (Evidence Vault home + action bar).
+   * Always clears any filter left over from a prior visit — this is the
+   * one reliable way back to everything, not a filtered slice of it.
+   */
+  function browseArchiveFromHome() {
+    setBrowseState({
+      ...DEFAULT_COLLECTION_BROWSE_STATE,
+      visibleCount: browse.pageSize,
+    });
+    openBrowsePanel();
   }
 
   function openHomeCategory(category: EvidenceVaultHomeCategory) {
@@ -363,7 +376,7 @@ export function EstateCollectionRoomEngine({
       search: "",
       visibleCount: browse.pageSize,
     }));
-    browseArchiveFromHome();
+    openBrowsePanel();
   }
 
   function searchBrowseFromHome(query: string) {
@@ -373,7 +386,7 @@ export function EstateCollectionRoomEngine({
       category: null,
       visibleCount: browse.pageSize,
     }));
-    browseArchiveFromHome();
+    openBrowsePanel();
   }
 
   const closeVaultPanel = useCallback(() => {
@@ -400,8 +413,7 @@ export function EstateCollectionRoomEngine({
           setActivePrompt(null);
           return;
         case "browse-archive":
-          setVaultMode("browse");
-          setVaultPanel("browse");
+          browseArchiveFromHome();
           return;
         case "search-discoveries":
           setVaultMode("browse");
@@ -491,6 +503,15 @@ export function EstateCollectionRoomEngine({
     setAttachments([]);
     setEditingId(null);
     setActivePrompt(null);
+  }
+
+  /** Removes a saved entry and always leaves calm, visible confirmation. */
+  function removeItem(itemId: string) {
+    if (!adapter.removeItem) return;
+    adapter.removeItem(itemId);
+    if (editingId === itemId) resetCompose();
+    setStatusMessage(display.removedMessage ?? "Removed.");
+    reload();
   }
 
   function openNewDiscovery() {
@@ -704,11 +725,7 @@ export function EstateCollectionRoomEngine({
                               }
                               onRemove={
                                 adapter.removeItem
-                                  ? () => {
-                                      adapter.removeItem?.(item.id);
-                                      if (editingId === item.id) resetCompose();
-                                      reload();
-                                    }
+                                  ? () => removeItem(item.id)
                                   : undefined
                               }
                             />
@@ -900,11 +917,7 @@ export function EstateCollectionRoomEngine({
                         }
                         onRemove={
                           adapter.removeItem
-                            ? () => {
-                                adapter.removeItem?.(item.id);
-                                if (editingId === item.id) resetCompose();
-                                reload();
-                              }
+                            ? () => removeItem(item.id)
                             : undefined
                         }
                       />

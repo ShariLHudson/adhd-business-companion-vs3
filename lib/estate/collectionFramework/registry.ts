@@ -74,7 +74,7 @@ const GREENHOUSE_CATEGORIES = [
   { value: "character", label: "Character" },
 ] as const;
 
-/** Evidence Vault categories (246/248) — proof for hard days. */
+/** Evidence Vault categories (246/248) — soft themes for discoveries on hard days. */
 const EVIDENCE_CATEGORIES = [
   { value: "Small Win", label: "Small win" },
   { value: "Testimonial", label: "Testimonial" },
@@ -208,6 +208,7 @@ const ROOM_CONFIGS = {
         previewLines: 8,
       },
       removeLabel: "Remove page",
+      removedMessage: "That page has been removed.",
     },
     sparkSuggestionLines: [
       "I'd love to preserve this in your Journal Gazebo — would you like to rest it on a quiet page?",
@@ -308,6 +309,7 @@ const ROOM_CONFIGS = {
         previewLines: 5,
       },
       removeLabel: "Let go",
+      removedMessage: "Let go, quietly.",
     },
     sparkSuggestionLines: [
       "This sounds like something still growing — would you like to place it in the Growth Greenhouse?",
@@ -319,15 +321,15 @@ const ROOM_CONFIGS = {
     placeId: "evidence-vault",
     section: "evidence-bank" as AppSection,
     roomName: "Evidence Vault",
-    kicker: "Your personal intelligence library",
+    kicker: "Your private discovery library",
     description:
-      "Preserve meaningful experiences so Spark can gradually transform them into understanding, patterns, and wisdom.",
+      "Preserve meaningful discoveries about yourself, your work, and the difference you make — so Spark can help you rediscover patterns and wisdom later.",
     backgroundImage: EVIDENCE_VAULT_ROOM_BG,
     imagePlaceId: "evidence-vault",
     openingSparkPrompt:
-      "Every discovery you preserve becomes another piece of evidence. Over time, Spark connects experiences, notices patterns, and helps you rediscover the wisdom you've already earned.",
+      "Every discovery you preserve becomes something you can return to. Over time, Spark connects experiences, notices patterns, and helps you rediscover the wisdom you've already earned.",
     returnSparkPrompt:
-      "Welcome back. Your vault is growing — each piece of evidence helps Spark understand your story a little more clearly.",
+      "Welcome back. Your vault is growing — each discovery helps Spark understand your story a little more clearly.",
     suggestedPrompts: [
       "What surprised you today?",
       "What lesson almost slipped by unnoticed?",
@@ -353,55 +355,55 @@ const ROOM_CONFIGS = {
         },
         {
           id: "problem",
-          label: "Problem Solved",
-          placeholder: "What was the challenge — and how did you meet it?",
+          label: "Problem Moved Forward",
+          placeholder: "What did you figure out, improve, or make easier?",
           rows: 3,
           kind: "textarea",
         },
         {
           id: "whoBenefited",
-          label: "People Helped",
-          placeholder: "Who felt the difference?",
+          label: "Someone You Helped",
+          placeholder: "Who did you help, and what difference did it make?",
           rows: 2,
           kind: "textarea",
         },
         {
           id: "whyApproach",
-          label: "What Improved",
-          placeholder: "What is better now?",
+          label: "What Changed",
+          placeholder: "What is different now?",
           rows: 2,
           kind: "textarea",
         },
         {
           id: "whatIDid",
-          label: "Progress Made",
-          placeholder: "What moved forward?",
+          label: "About Yourself",
+          placeholder: "What did this show you about how you think, work, or care?",
           rows: 2,
           kind: "textarea",
         },
         {
           id: "lessonsLearned",
-          label: "Lesson Learned",
-          placeholder: "What did this teach you?",
+          label: "Lesson or Pattern",
+          placeholder: "What did you learn or notice?",
           rows: 3,
           kind: "textarea",
         },
         {
           id: "whyItMattered",
-          label: "Why It Matters",
-          placeholder: "Why will you want to remember this?",
+          label: "Why It May Matter Later",
+          placeholder: "What would future you want to remember?",
           rows: 3,
           kind: "textarea",
         },
         {
           id: "category",
-          label: "Kind of evidence",
+          label: "Kind of discovery",
           kind: "select",
           options: EVIDENCE_CATEGORIES,
         },
         {
           id: "noteOrLink",
-          label: "Supporting Evidence",
+          label: "Supporting note or link",
           placeholder: "Link, reference, or short note…",
           kind: "text",
         },
@@ -450,6 +452,7 @@ const ROOM_CONFIGS = {
         previewLines: 4,
       },
       removeLabel: "Remove from vault",
+      removedMessage: "That discovery has been removed from your vault.",
     },
     sparkSuggestionLines: [
       "Would you like to preserve this discovery in your Evidence Vault?",
@@ -550,6 +553,7 @@ const ROOM_CONFIGS = {
         previewLines: 2,
       },
       removeLabel: "Remove from shelf",
+      removedMessage: "That volume has been removed from the shelf.",
     },
     sparkSuggestionLines: [
       "This belongs in your Achievement Library — would you like help placing it on the shelf?",
@@ -577,7 +581,7 @@ const ROOM_CONFIGS = {
     ],
     followUpQuestions: [
       "What made this possible?",
-      "Should we save proof in the Evidence Vault too?",
+      "Should we preserve this discovery in the Evidence Vault too?",
       "Who helped you get here?",
     ],
     collectionTitle: "In bloom",
@@ -655,6 +659,7 @@ const ROOM_CONFIGS = {
         previewLines: 4,
       },
       removeLabel: "Clear from garden",
+      removedMessage: "That bloom has been cleared from the garden.",
     },
     sparkSuggestionLines: [
       "Would you like to visit the Celebration Garden to mark this progress?",
@@ -743,6 +748,7 @@ const ROOM_CONFIGS = {
         previewLines: 5,
       },
       removeLabel: "Remove chapter",
+      removedMessage: "That chapter has been removed from the Hall.",
     },
     sparkSuggestionLines: [
       "This feels like a Celebration Room moment — a chapter worth honoring. Shall we?",

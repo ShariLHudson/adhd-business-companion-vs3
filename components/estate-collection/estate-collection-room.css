@@ -778,6 +778,55 @@
   cursor: pointer;
 }
 
+/* Calm inline confirm — replaces the action row, never a browser popup. */
+.estate-collection-card__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-top: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.6rem;
+  background: rgba(139, 105, 20, 0.08);
+}
+
+.estate-collection-card__confirm-text {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 12rem;
+  font-size: 0.95rem;
+  color: #4a4540;
+}
+
+.estate-collection-card__confirm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+}
+
+.estate-collection-card__confirm-keep {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1a4a47;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.estate-collection-card__confirm-remove {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.95rem;
+  color: #8a3b2f;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
 .estate-collection-card--treasured {
   border-bottom-color: rgba(201, 166, 107, 0.45);
 }

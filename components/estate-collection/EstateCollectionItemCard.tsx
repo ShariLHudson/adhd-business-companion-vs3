@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type {
   EstateCollectionCardFormat,
   EstateCollectionDisplayStyle,
@@ -39,6 +42,7 @@ export function EstateCollectionItemCard({
   onEdit,
   onToggleFavorite,
 }: Props) {
+  const [confirmingRemove, setConfirmingRemove] = useState(false);
   const bodyClass = [
     "estate-collection-card__body",
     `estate-collection-card__body--${card.bodyEmphasis}`,
@@ -143,36 +147,71 @@ export function EstateCollectionItemCard({
           : null}
       </div>
 
-      <div className="estate-collection-card__actions">
-        {onToggleFavorite ? (
-          <button
-            type="button"
-            className="estate-collection-card__favorite"
-            aria-pressed={Boolean(item.favorite)}
-            onClick={onToggleFavorite}
-          >
-            {item.favorite ? "Treasured" : card.favoriteLabel}
-          </button>
-        ) : null}
-        {onEdit ? (
-          <button
-            type="button"
-            className="estate-collection-card__edit"
-            onClick={onEdit}
-          >
-            {card.editLabel}
-          </button>
-        ) : null}
-        {onRemove ? (
-          <button
-            type="button"
-            className="estate-collection-card__remove"
-            onClick={onRemove}
-          >
-            {removeLabel}
-          </button>
-        ) : null}
-      </div>
+      {confirmingRemove ? (
+        <div
+          className="estate-collection-card__confirm"
+          role="group"
+          aria-label="Confirm removal"
+          data-testid={`estate-collection-confirm-${item.id}`}
+        >
+          <p className="estate-collection-card__confirm-text">
+            Remove this for good? It can&rsquo;t be brought back.
+          </p>
+          <div className="estate-collection-card__confirm-actions">
+            <button
+              type="button"
+              className="estate-collection-card__confirm-keep"
+              onClick={() => setConfirmingRemove(false)}
+              data-testid={`estate-collection-confirm-keep-${item.id}`}
+            >
+              Keep it
+            </button>
+            <button
+              type="button"
+              className="estate-collection-card__confirm-remove"
+              onClick={() => {
+                setConfirmingRemove(false);
+                onRemove?.();
+              }}
+              data-testid={`estate-collection-confirm-remove-${item.id}`}
+            >
+              Yes, {removeLabel.toLowerCase()}
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="estate-collection-card__actions">
+          {onToggleFavorite ? (
+            <button
+              type="button"
+              className="estate-collection-card__favorite"
+              aria-pressed={Boolean(item.favorite)}
+              onClick={onToggleFavorite}
+            >
+              {item.favorite ? "Treasured" : card.favoriteLabel}
+            </button>
+          ) : null}
+          {onEdit ? (
+            <button
+              type="button"
+              className="estate-collection-card__edit"
+              onClick={onEdit}
+            >
+              {card.editLabel}
+            </button>
+          ) : null}
+          {onRemove ? (
+            <button
+              type="button"
+              className="estate-collection-card__remove"
+              onClick={() => setConfirmingRemove(true)}
+              data-testid={`estate-collection-remove-${item.id}`}
+            >
+              {removeLabel}
+            </button>
+          ) : null}
+        </div>
+      )}
     </article>
   );
 }

@@ -239,7 +239,7 @@ function evidenceFieldsFromCapture(
     ["Confidence boost", capture.confidenceBoost],
     ["Note / link", capture.noteOrLink],
     ["Who benefited", capture.whoBenefited],
-    ["What this proves", capture.lessonsLearned],
+    ["What you learned or noticed", capture.lessonsLearned],
     ["Hall candidate", capture.hallCandidate],
   ];
   return pairs

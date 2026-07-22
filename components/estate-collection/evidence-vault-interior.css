@@ -39,8 +39,11 @@
     max(1rem, env(safe-area-inset-left));
 }
 
+/* Legacy: home should unmount when discovery opens; if still mounted, hide fully. */
 .evidence-vault-interior--behind-discovery {
-  opacity: 0.35;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .evidence-vault-interior--behind-discovery .evidence-vault-interior__folio {

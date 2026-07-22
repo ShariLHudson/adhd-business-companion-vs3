@@ -62,7 +62,7 @@ describe("EvidenceVaultInterior home", () => {
     expect(
       container.querySelector('[data-testid="evidence-vault-add-evidence"]')
         ?.textContent,
-    ).toMatch(/Create Evidence/);
+    ).toMatch(/Preserve a Discovery/);
     expect(
       container.querySelector('[data-testid="evidence-vault-home"]'),
     ).toBeTruthy();

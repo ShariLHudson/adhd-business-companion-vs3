@@ -113,6 +113,8 @@ export type EstateCollectionDisplayConfig = {
   style: EstateCollectionDisplayStyle;
   card: EstateCollectionCardFormat;
   removeLabel?: string;
+  /** Calm confirmation shown after a member removes an entry — never silent. */
+  removedMessage?: string;
 };
 
 /** Optional labeled line on a saved card (e.g. vault “Proves”). */
