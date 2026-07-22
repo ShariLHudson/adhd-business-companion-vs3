@@ -2,44 +2,54 @@ import type { ConnectedPlaceShortcut, ProjectHomeRoomId } from "./types";
 
 /**
  * Connected Places — navigation shortcuts only.
- * Prototype display; does not open live destinations or duplicate project data.
+ * Each entry pairs the Estate name with a plain-language explanation so no
+ * one needs to learn the metaphor before using it. Only entries marked
+ * "active" are wired to a real destination today (Connected Places
+ * Completion) — everything else stays honestly labeled "comingLater"
+ * rather than shown as a working button.
  */
 export const CONNECTED_PLACES: readonly ConnectedPlaceShortcut[] = [
   {
+    id: "boardroom",
+    label: "Boardroom",
+    blurb: "Get multiple perspectives on an important decision.",
+    destinationHint: "boardroom",
+    status: "active",
+  },
+  {
     id: "cartography",
     label: "Cartography",
-    blurb: "Map the work when it needs to be seen.",
+    blurb: "Map ideas, decisions, steps, or relationships visually.",
     destinationHint: "visual-focus",
+    status: "comingLater",
   },
   {
     id: "chamber-of-momentum",
     label: "Chamber of Momentum",
-    blurb: "Keep momentum close when the project is in motion.",
+    blurb: "Work with a specialist for this part of your project.",
     destinationHint: "chamber-of-momentum",
-  },
-  {
-    id: "boardroom",
-    label: "Boardroom",
-    blurb: "Bring hard choices to the table.",
-    destinationHint: "boardroom",
+    status: "comingLater",
   },
   {
     id: "journal-gazebo",
     label: "Journal Gazebo",
     blurb: "Reflect without forcing a finish line.",
     destinationHint: "growth-journal",
+    status: "comingLater",
   },
   {
     id: "evidence-vault",
     label: "Evidence Vault",
     blurb: "Preserve discoveries about what is working.",
     destinationHint: "evidence-bank",
+    status: "comingLater",
   },
   {
     id: "hall-of-accomplishment",
     label: "Hall of Accomplishment",
-    blurb: "Honor wins that belong to this work.",
+    blurb: "Save completed milestones and accomplishments.",
     destinationHint: "growth-portfolio",
+    status: "comingLater",
   },
 ] as const;
 
@@ -80,4 +90,22 @@ export function connectedPlacesForProjectHome(
     if (!ordered.some((p) => p.id === place.id)) ordered.push(place);
   }
   return ordered;
+}
+
+/** Genuinely wired destinations for this Project Home — safe to show as primary options. */
+export function activeConnectedPlaces(
+  roomId: ProjectHomeRoomId,
+): ConnectedPlaceShortcut[] {
+  return connectedPlacesForProjectHome(roomId).filter(
+    (p) => p.status === "active",
+  );
+}
+
+/** Not-yet-integrated destinations — must stay demoted, never a prominent card. */
+export function comingLaterConnectedPlaces(
+  roomId: ProjectHomeRoomId,
+): ConnectedPlaceShortcut[] {
+  return connectedPlacesForProjectHome(roomId).filter(
+    (p) => p.status === "comingLater",
+  );
 }

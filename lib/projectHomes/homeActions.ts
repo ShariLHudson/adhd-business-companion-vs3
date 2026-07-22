@@ -19,6 +19,14 @@ import {
 import { seedProjectChunks } from "@/lib/projects/seedProjectChunks";
 import { normalizeProjectPieces } from "@/lib/projects/projectPieces190";
 import { isSampleProjectHome, SAMPLE_PROJECT_HOMES } from "./sampleProjects";
+import {
+  buildProjectContext,
+  buildProjectContextFromHome,
+  deriveCurrentFocusArea,
+  generateNextStepSuggestion,
+  generateNextStepSuggestions,
+  type NextStepSuggestion,
+} from "./nextStepEngine";
 import type {
   ProjectHomeRecord,
   ProjectHomeRoomId,
@@ -52,6 +60,12 @@ function mapProjectStatusToHomeStatus(
 /**
  * Maps a companion-projects-v1 Project into a gallery ProjectHomeRecord.
  * Uses sensible defaults for room/status fields the store does not carry.
+ *
+ * Current Focus (an area of attention) and Your Next Step (one concrete
+ * action) are computed independently — never the same raw string
+ * (Next-Step Intelligence). When the member has not chosen a focus/next
+ * step yet, both are generated from project context rather than defaulted
+ * to a shared placeholder.
  */
 export function mapProjectToHomeRecord(
   project: Project,
@@ -61,11 +75,18 @@ export function mapProjectToHomeRecord(
     project.goal?.trim() ||
     project.notes?.trim() ||
     "A project you are building in Spark.";
-  const focus =
-    project.nextAction?.trim() ||
-    "Open this Project Home when you are ready";
   const roomFromStore =
     (project.projectHomeRoomId as ProjectHomeRoomId | undefined) ?? undefined;
+  const savedFocus = project.nextAction?.trim();
+  const context = buildProjectContext(
+    { projectId: project.id, title: project.name, purpose, currentFocus: savedFocus },
+    getProjectItems(project.id),
+  );
+  const currentFocus = savedFocus || deriveCurrentFocusArea(context);
+  const savedNextStep = project.nextStepSuggestion?.trim();
+  const nextSuggestedStep =
+    savedNextStep ||
+    generateNextStepSuggestion({ ...context, currentFocus }).title;
   return {
     id: project.id,
     name: project.name,
@@ -73,9 +94,9 @@ export function mapProjectToHomeRecord(
     projectHomeId:
       options?.projectHomeId ?? roomFromStore ?? DEFAULT_PROJECT_HOME_ROOM,
     status: mapProjectStatusToHomeStatus(project.status),
-    currentFocus: focus,
+    currentFocus,
     lastWorkedAt: project.updatedAt || project.createdAt,
-    nextSuggestedStep: focus,
+    nextSuggestedStep,
     atmosphereNote: undefined,
     personalization: {},
     isSample: false,
@@ -124,17 +145,14 @@ export function mergeMemberHomesWithStore(
       atmosphereNote: local.atmosphereNote ?? storeHome.atmosphereNote,
       personalization: local.personalization ?? storeHome.personalization,
       archived: local.archived,
-      // Prefer richer purpose/focus from Project Home when store goal is empty
+      // Prefer richer purpose from Project Home when store goal is empty
       purpose: storeHome.purpose || local.purpose,
-      currentFocus:
-        storeHome.currentFocus !== "Open this Project Home when you are ready"
-          ? storeHome.currentFocus
-          : local.currentFocus,
-      nextSuggestedStep:
-        storeHome.nextSuggestedStep !==
-        "Open this Project Home when you are ready"
-          ? storeHome.nextSuggestedStep
-          : local.nextSuggestedStep,
+      // storeHome's Current Focus / Next Step are always derived from the
+      // authoritative persisted project (saved value or freshly generated
+      // by the Next-Step Intelligence engine) — prefer them over any
+      // transient, unsynced local React state.
+      currentFocus: storeHome.currentFocus || local.currentFocus,
+      nextSuggestedStep: storeHome.nextSuggestedStep || local.nextSuggestedStep,
     };
   });
 
@@ -229,20 +247,45 @@ export function createPersistedProjectHomeWithResult(input: {
   name: string;
   purpose: string;
   projectHomeId: ProjectHomeRoomId;
+  /** Explicit override only — most callers should omit and let the engine derive it. */
   currentFocus?: string;
+  /** Explicit override only — most callers should omit and let the engine derive it. */
   nextSuggestedStep?: string;
   atmosphereNote?: string;
+  /** Flexible main pieces (facts) — seeded as sections after create; never
+   * copied verbatim into Current Focus or Your Next Step. */
   pieces?: readonly string[];
 }): CreatePersistedProjectHomeResult {
   const now = new Date().toISOString();
-  const focus =
-    input.currentFocus?.trim() ||
-    normalizeProjectPieces(input.pieces ?? [])[0] ||
-    "Settle into this Project Home";
+  const pieces = normalizeProjectPieces(input.pieces ?? []);
+  // Pieces are facts the member already knows ("Date: mid-September, one
+  // Saturday morning") — never a next step. Build context from them so the
+  // engine can tell a fact ("Date: ...") apart from an action ("Choose the
+  // exact Saturday...").
+  const draftContext = buildProjectContext(
+    {
+      projectId: "draft",
+      title: input.name,
+      purpose: input.purpose,
+      currentFocus: input.currentFocus?.trim(),
+      extraEntries: pieces,
+    },
+    [],
+  );
+  const focusArea = input.currentFocus?.trim() || deriveCurrentFocusArea(draftContext);
+  const nextStep: NextStepSuggestion = input.nextSuggestedStep?.trim()
+    ? { title: input.nextSuggestedStep.trim(), reason: "", source: "user", confidence: 1 }
+    : generateNextStepSuggestion({ ...draftContext, currentFocus: focusArea });
+
   const saved = saveProjectWithResult({
     name: input.name.trim() || "Untitled project",
     goal: input.purpose.trim(),
-    nextAction: focus,
+    nextAction: focusArea,
+    nextStepSuggestion: nextStep.title,
+    nextStepSuggestionReason: nextStep.reason,
+    nextStepSuggestionSource: nextStep.source,
+    nextStepSuggestionConfidence: nextStep.confidence,
+    nextStepSuggestionUpdatedAt: now,
     status: "in-progress",
     horizon: "now",
     archived: false,
@@ -255,12 +298,9 @@ export function createPersistedProjectHomeWithResult(input: {
       error: "Could not save the project. Please try again.",
     };
   }
-  const pieces = normalizeProjectPieces(input.pieces ?? []);
   if (pieces.length > 0) {
-    const first = seedProjectChunks(saved.project.id, pieces);
-    if (first && first !== focus) {
-      saveProject({ id: saved.project.id, nextAction: first });
-    }
+    // Facts become Project Plan sections — never Current Focus / Next Step text.
+    seedProjectChunks(saved.project.id, pieces);
   }
   const home = mapProjectToHomeRecord(saved.project, {
     projectHomeId: input.projectHomeId,
@@ -269,9 +309,6 @@ export function createPersistedProjectHomeWithResult(input: {
     home: {
       ...home,
       atmosphereNote: input.atmosphereNote,
-      currentFocus: focus,
-      nextSuggestedStep:
-        input.nextSuggestedStep ?? home.nextSuggestedStep,
       lastWorkedAt: now,
     },
     persisted: true,
@@ -326,6 +363,11 @@ export function restoreProjectHome(
   return next;
 }
 
+/**
+ * Updates Current Focus (the area of attention) only. Never writes the
+ * same text into Your Next Step — Current Focus and Your Next Step must
+ * stay distinct (Next-Step Intelligence).
+ */
 export function setProjectHomeCurrentFocus(
   home: ProjectHomeRecord,
   focus: string,
@@ -336,7 +378,6 @@ export function setProjectHomeCurrentFocus(
   const next: ProjectHomeRecord = {
     ...home,
     currentFocus: trimmed,
-    nextSuggestedStep: trimmed,
     lastWorkedAt: new Date().toISOString(),
   };
   if (
@@ -347,6 +388,61 @@ export function setProjectHomeCurrentFocus(
     saveProject({ id: home.companionProjectId, nextAction: trimmed });
   }
   return next;
+}
+
+/**
+ * Saves a chosen Your Next Step (generated or member-edited) distinctly
+ * from Current Focus. Replacing the next step only changes this field —
+ * Current Focus, tasks, and history are untouched.
+ */
+export function setProjectHomeNextStep(
+  home: ProjectHomeRecord,
+  suggestion: NextStepSuggestion,
+  options?: { syncCompanionStore?: boolean },
+): ProjectHomeRecord {
+  const trimmed = suggestion.title.trim();
+  if (!trimmed) return home;
+  const next: ProjectHomeRecord = {
+    ...home,
+    nextSuggestedStep: trimmed,
+    lastWorkedAt: new Date().toISOString(),
+  };
+  if (
+    options?.syncCompanionStore !== false &&
+    home.companionProjectId &&
+    !isSampleProjectHome(home)
+  ) {
+    saveProject({
+      id: home.companionProjectId,
+      nextStepSuggestion: trimmed,
+      nextStepSuggestionReason: suggestion.reason,
+      nextStepSuggestionSource: suggestion.source,
+      nextStepSuggestionConfidence: suggestion.confidence,
+      nextStepSuggestionUpdatedAt: new Date().toISOString(),
+    });
+  }
+  return next;
+}
+
+/**
+ * Generates fresh Your-Next-Step suggestions from this Project Home's live
+ * context (facts, constraints, completed/open tasks). Read-only — does not
+ * persist anything. Returns a primary suggestion plus alternates for
+ * "Show Another".
+ */
+export function suggestNextStepsForHome(
+  home: ProjectHomeRecord,
+  options?: { count?: number; exclude?: readonly string[] },
+): NextStepSuggestion[] {
+  const context = buildProjectContextFromHome(home);
+  const exclude = [
+    ...(options?.exclude ?? []),
+    home.nextSuggestedStep,
+  ].filter(Boolean);
+  return generateNextStepSuggestions(context, {
+    count: options?.count ?? 3,
+    exclude,
+  });
 }
 
 export function completeProjectHome(
@@ -449,7 +545,8 @@ export function ensureCompanionProject(
         id: existing.id,
         name: home.name,
         goal: home.purpose,
-        nextAction: home.nextSuggestedStep || home.currentFocus,
+        nextAction: home.currentFocus,
+        nextStepSuggestion: home.nextSuggestedStep,
         projectHomeRoomId: home.projectHomeId,
         archived: home.archived,
       });
@@ -460,7 +557,8 @@ export function ensureCompanionProject(
     id: home.companionProjectId,
     name: home.name,
     goal: home.purpose,
-    nextAction: home.nextSuggestedStep || home.currentFocus,
+    nextAction: home.currentFocus,
+    nextStepSuggestion: home.nextSuggestedStep,
     horizon: "now",
     status: "in-progress",
     projectHomeRoomId: home.projectHomeId,

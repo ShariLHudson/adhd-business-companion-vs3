@@ -13,6 +13,7 @@ import { saveProject } from "@/lib/companionStore";
 import {
   EXPLORE_EXAMPLES_SECTION_NOTE,
   SAMPLE_PROJECT_HOMES,
+  createPersistedProjectHomeWithResult,
   prototypeRecentProgress,
   prototypeRecentWins,
   prototypeRelatedConversations,
@@ -443,9 +444,16 @@ describe("Project Homes UI usability", () => {
       container.querySelector('[data-testid="project-home-tool-ask-shari"]')
         ?.textContent,
     ).toContain("Being prepared");
+    // Not-yet-wired tools (Ask Chamber, Cartographer, Clear My Mind) no
+    // longer render as individual "Being prepared" cards — they are named
+    // once in a compact "Coming later" line (Connected Places Completion).
     expect(
       container.querySelector('[data-testid="project-home-tool-clear-my-mind"]'),
-    ).toBeTruthy();
+    ).toBeNull();
+    expect(
+      container.querySelector('[data-testid="project-home-tools-coming-later"]')
+        ?.textContent,
+    ).toContain("Clear My Mind");
     expect(
       container.querySelectorAll('[data-testid^="project-home-tool-"] button')
         .length,
@@ -535,6 +543,67 @@ describe("Project Homes UI usability", () => {
     expect(html).toContain('aria-disabled="true"');
     expect(html).not.toContain("<button");
     expect(html).toContain('data-testid="project-homes-connected-places"');
+  });
+
+  it("Suggest Next Step generates a real, actionable suggestion distinct from Current Focus", () => {
+    const home = createPersistedProjectHomeWithResult({
+      name: "Fall Workshop",
+      purpose: "Host a small business workshop this fall",
+      projectHomeId: "study-hall",
+      pieces: ["Date: mid-September, one Saturday morning"],
+    }).home!;
+    const onProjectChange = vi.fn();
+
+    act(() => {
+      root.render(
+        <ProjectHomeDetail project={home} onProjectChange={onProjectChange} />,
+      );
+    });
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="project-home-drawer-toggle-plan"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="project-home-suggest-suggest"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    const card = container.querySelector(
+      '[data-testid="project-home-suggestion-card"]',
+    );
+    expect(card).toBeTruthy();
+    const suggestionTitle = container.querySelector(
+      '[data-testid="project-home-suggestion-title"]',
+    )?.textContent;
+    expect(suggestionTitle).toBeTruthy();
+    // The suggestion is never a copy of Current Focus or the raw setup fact.
+    expect(suggestionTitle).not.toBe(home.currentFocus);
+    expect(suggestionTitle).not.toContain(
+      "Date: mid-September, one Saturday morning",
+    );
+    expect(
+      container.querySelectorAll(
+        '[data-testid="project-home-suggestion-card"] button',
+      ).length,
+    ).toBeGreaterThan(0);
+
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="project-home-suggestion-use"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onProjectChange).toHaveBeenCalled();
+    const updated = onProjectChange.mock.calls.at(-1)?.[0];
+    expect(updated.nextSuggestedStep).toBe(suggestionTitle);
+    expect(updated.nextSuggestedStep).not.toBe(updated.currentFocus);
   });
 
   it("Projects owns the screen — no frosted chat, Journal, or disabled fields", () => {

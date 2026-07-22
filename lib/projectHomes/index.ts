@@ -15,6 +15,8 @@ export { PROJECTS_BACKGROUND_SRC } from "@/lib/estateExperienceBackgrounds";
 export {
   CONNECTED_PLACES,
   connectedPlacesForProjectHome,
+  activeConnectedPlaces,
+  comingLaterConnectedPlaces,
 } from "./connectedPlaces";
 
 export {
@@ -50,6 +52,8 @@ export {
   archiveProjectHome,
   restoreProjectHome,
   setProjectHomeCurrentFocus,
+  setProjectHomeNextStep,
+  suggestNextStepsForHome,
   completeProjectHome,
   reopenProjectHome,
   deleteProjectHome,
@@ -71,3 +75,20 @@ export type {
   DeleteProjectHomeResult,
   CreatePersistedProjectHomeResult,
 } from "./homeActions";
+
+export {
+  classifyProjectType,
+  classifyFreeTextEntries,
+  deriveCurrentFocusArea,
+  generateNextStepSuggestion,
+  generateNextStepSuggestions,
+  buildProjectContext,
+  buildProjectContextFromHome,
+} from "./nextStepEngine";
+
+export type {
+  ProjectTypeCategory,
+  ProjectContext,
+  NextStepSuggestion,
+  NextStepSuggestionSource,
+} from "./nextStepEngine";

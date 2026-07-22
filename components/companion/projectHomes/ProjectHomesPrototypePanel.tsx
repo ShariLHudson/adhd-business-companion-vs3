@@ -326,14 +326,14 @@ export function ProjectHomesPrototypePanel({
     if (!purpose.trim() || !selectedRoomId) return;
     setCreateError(null);
     const room = getProjectHomeRoom(selectedRoomId);
+    // Pieces are facts the member already knows (e.g. "Date: mid-September,
+    // one Saturday morning") — they become Project Plan sections, never
+    // Current Focus or Your Next Step text. The Next-Step Intelligence
+    // engine derives both from project context (see createPersistedProjectHomeWithResult).
     const result = createPersistedProjectHomeWithResult({
       name: draftName.trim() || intention.trim().slice(0, 64) || `${room.name} Project`,
       purpose: purpose.trim(),
       projectHomeId: selectedRoomId,
-      currentFocus:
-        pieces.find((p) => p.trim())?.trim() ||
-        "Settle into this Project Home",
-      nextSuggestedStep: `Spend a few quiet minutes in the ${room.name}`,
       atmosphereNote: room.description,
       pieces,
     });

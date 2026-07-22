@@ -12,19 +12,27 @@ import {
 import {
   SAMPLE_PROJECT_HOMES,
   SAMPLE_PROJECTS_GALLERY_NOTE,
+  activeConnectedPlaces,
   addNoteToHome,
   addSectionToHome,
   addTaskToHome,
   archiveProjectHome,
+  classifyFreeTextEntries,
+  comingLaterConnectedPlaces,
   createPersistedProjectHome,
+  createPersistedProjectHomeWithResult,
   deleteProjectHome,
   duplicateProjectHome,
+  generateNextStepSuggestion,
+  generateNextStepSuggestions,
   isSampleProjectHome,
   loadMemberProjectHomesFromStore,
   mapProjectToHomeRecord,
   mergeMemberHomesWithStore,
   prototypeOpenQuestions,
   renameProjectHome,
+  setProjectHomeNextStep,
+  suggestNextStepsForHome,
   visibleGalleryHomes,
   type ProjectHomeRecord,
 } from "@/lib/projectHomes";
@@ -239,8 +247,12 @@ describe("projectHomes usability", () => {
       "Coming soon — this connection is being prepared.",
     );
     expect(source).not.toContain("onPlacePress");
-    expect(source).not.toContain("onClick");
+    // Boardroom is the one genuinely wired Connected Place — it may use
+    // onClick, but only through the explicit onCallTheBoard hand-off, and
+    // only once the caller provides both a project and the handler.
+    expect(source).toContain("onCallTheBoard");
     expect(source).toContain('aria-disabled="true"');
+    expect(source).toContain("Coming later:");
   });
 
   it("keeps Open Questions helper available without requiring it on the home", () => {
@@ -275,5 +287,150 @@ describe("projectHomes usability", () => {
     expect(css).toContain(".project-homes-drawer");
     expect(css).toContain(".project-homes-drawer__toggle");
     expect(css).toContain(".project-homes-tool-item--preparing");
+  });
+});
+
+describe("Next-Step Intelligence", () => {
+  beforeEach(() => {
+    localStorage.removeItem(PROJECTS_KEY);
+    localStorage.removeItem(PROJECT_ITEMS_KEY);
+  });
+
+  afterEach(() => {
+    localStorage.removeItem(PROJECTS_KEY);
+    localStorage.removeItem(PROJECT_ITEMS_KEY);
+  });
+
+  it("classifies setup pieces as facts, not next steps", () => {
+    const { facts, constraints, questions } = classifyFreeTextEntries([
+      "Date: mid-September, one Saturday morning",
+      "Budget: no more than $500 for the venue",
+      "Who is coming to this?",
+    ]);
+    expect(facts).toContain("Date: mid-September, one Saturday morning");
+    expect(constraints).toContain(
+      "Budget: no more than $500 for the venue",
+    );
+    expect(questions).toContain("Who is coming to this?");
+  });
+
+  it("never suggests a next step that restates a known fact verbatim", () => {
+    const suggestion = generateNextStepSuggestion({
+      projectId: "p1",
+      projectType: "event",
+      title: "Fall Workshop",
+      knownFacts: [
+        "Audience: local small business owners",
+        "Date: mid-September, one Saturday morning",
+      ],
+      constraints: [],
+      completedTasks: [],
+      openTasks: [],
+      milestones: [],
+      unresolvedQuestions: [],
+    });
+    expect(suggestion.title).not.toBe(
+      "Date: mid-September, one Saturday morning",
+    );
+    expect(suggestion.title).not.toBe("Audience: local small business owners");
+    expect(suggestion.title.toLowerCase()).not.toContain("mid-september");
+    // A vague date should produce a concrete, actionable refinement.
+    expect(suggestion.title.toLowerCase()).toContain("saturday");
+    expect(suggestion.confidence).toBeGreaterThan(0);
+  });
+
+  it("creating a Project Home from setup pieces keeps Current Focus and Your Next Step distinct", () => {
+    const result = createPersistedProjectHomeWithResult({
+      name: "Fall Workshop",
+      purpose: "Host a small business workshop this fall",
+      projectHomeId: "study-hall",
+      pieces: [
+        "Date: mid-September, one Saturday morning",
+        "Audience: local small business owners",
+      ],
+    });
+    expect(result.persisted).toBe(true);
+    const home = result.home!;
+    expect(home.currentFocus).toBeTruthy();
+    expect(home.nextSuggestedStep).toBeTruthy();
+    expect(home.currentFocus).not.toBe(home.nextSuggestedStep);
+    // Neither field is a verbatim copy of a setup fact.
+    expect(home.currentFocus).not.toBe(
+      "Date: mid-September, one Saturday morning",
+    );
+    expect(home.nextSuggestedStep).not.toBe(
+      "Date: mid-September, one Saturday morning",
+    );
+    expect(home.nextSuggestedStep).not.toBe(
+      "Audience: local small business owners",
+    );
+  });
+
+  it("Suggest Next Step generates real alternatives instead of echoing the current step", () => {
+    const home = createPersistedProjectHomeWithResult({
+      name: "Fall Workshop",
+      purpose: "Host a small business workshop this fall",
+      projectHomeId: "study-hall",
+      pieces: ["Date: mid-September, one Saturday morning"],
+    }).home!;
+
+    const suggestions = suggestNextStepsForHome(home, { count: 3 });
+    expect(suggestions.length).toBeGreaterThan(0);
+    for (const suggestion of suggestions) {
+      expect(suggestion.title).not.toBe(home.nextSuggestedStep);
+      expect(suggestion.title.trim().length).toBeGreaterThan(0);
+    }
+    // Alternatives (when present) are genuinely different from each other.
+    const titles = suggestions.map((s) => s.title);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it("accepting a suggested next step persists it distinctly from Current Focus", () => {
+    const home = createPersistedProjectHomeWithResult({
+      name: "Fall Workshop",
+      purpose: "Host a small business workshop this fall",
+      projectHomeId: "study-hall",
+      pieces: ["Date: mid-September, one Saturday morning"],
+    }).home!;
+
+    const [suggestion] = suggestNextStepsForHome(home, { count: 1 });
+    expect(suggestion).toBeTruthy();
+    const updated = setProjectHomeNextStep(home, suggestion!);
+    expect(updated.nextSuggestedStep).toBe(suggestion!.title);
+    expect(updated.currentFocus).toBe(home.currentFocus);
+    const stored = getProjects().find((p) => p.id === home.companionProjectId);
+    expect(stored?.nextStepSuggestion).toBe(suggestion!.title);
+    expect(stored?.nextAction).toBe(home.currentFocus);
+  });
+
+  it("generateNextStepSuggestions never repeats the same title twice", () => {
+    const suggestions = generateNextStepSuggestions(
+      {
+        projectId: "p2",
+        projectType: "general",
+        title: "Untitled",
+        knownFacts: [],
+        constraints: [],
+        completedTasks: [],
+        openTasks: [],
+        milestones: [],
+        unresolvedQuestions: [],
+      },
+      { count: 3 },
+    );
+    const titles = suggestions.map((s) => s.title);
+    expect(new Set(titles).size).toBe(titles.length);
+  });
+
+  it("Connected Places: only active destinations are eligible for buttons; the rest stay demoted", () => {
+    const active = activeConnectedPlaces("study-hall");
+    const comingLater = comingLaterConnectedPlaces("study-hall");
+    expect(active.every((p) => p.status === "active")).toBe(true);
+    expect(comingLater.every((p) => p.status === "comingLater")).toBe(true);
+    expect(active.some((p) => p.id === "boardroom")).toBe(true);
+    // Non-wired destinations must never appear in the active list.
+    for (const place of comingLater) {
+      expect(active.some((p) => p.id === place.id)).toBe(false);
+    }
   });
 });

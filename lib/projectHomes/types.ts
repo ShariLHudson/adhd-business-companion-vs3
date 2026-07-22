@@ -122,7 +122,14 @@ export type ProjectHomeRecommendation = {
 export type ConnectedPlaceShortcut = {
   id: string;
   label: string;
+  /** Plain-language explanation shown at the point of choice (no metaphor required). */
   blurb: string;
   /** Estate destination hint for a future router — unused in prototype */
   destinationHint: string;
+  /**
+   * "active" = genuinely wired and safe to present as a primary option.
+   * "comingLater" = not yet integrated — must not appear as a prominent
+   * card or an active-looking control (Connected Places Completion).
+   */
+  status: "active" | "comingLater";
 };

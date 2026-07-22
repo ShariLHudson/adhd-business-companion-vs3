@@ -578,6 +578,13 @@
   color: #5c534a;
 }
 
+.project-homes-connected__coming-later {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #6b635a;
+}
+
 .project-homes-field label {
   display: block;
   font-size: 0.7rem;
@@ -788,6 +795,63 @@
 
 .project-homes-connections-preparing {
   margin-top: 0.65rem;
+}
+
+/* Suggest Next Step — interactive suggestion card (Next-Step Intelligence) */
+.project-homes-suggestion-card {
+  margin-top: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.95rem;
+  border: 1px solid #d8ccb6;
+  background: rgba(250, 247, 242, 0.92);
+}
+
+.project-homes-suggestion-card__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #1f1c19;
+}
+
+.project-homes-suggestion-card__reason {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #5c534a;
+}
+
+.project-homes-suggestion-card__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #5c534a;
+}
+
+.project-homes-suggestion-card__edit {
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid #c9bfb0;
+  background: #fff;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.95rem;
+  color: #1f1c19;
+  resize: vertical;
+}
+
+.project-homes-suggestion-card__edit:focus {
+  outline: none;
+  border-color: #1e4f4f;
+}
+
+.project-homes-suggestion-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .project-homes-structure__placeholder {
@@ -1017,7 +1081,7 @@
   color: #4b463f;
 }
 
-/* Separate frosted chat — Show Conversation / Experience Controls */
+/* Separate frosted chat — Experience Controls */
 .companion-project-homes-active .project-homes__chat-panel.estate-room-frosted-chat {
   z-index: 40;
 }

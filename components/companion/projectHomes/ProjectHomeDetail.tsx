@@ -17,6 +17,9 @@ import {
   prototypeUpcomingMilestones,
   resolveProjectHomeArtwork,
   setProjectHomeCurrentFocus,
+  setProjectHomeNextStep,
+  suggestNextStepsForHome,
+  type NextStepSuggestion,
   type ProjectHomeRecord,
 } from "@/lib/projectHomes";
 import { ConnectedPlacesSection } from "@/components/companion/projectHomes/ConnectedPlacesSection";
@@ -37,31 +40,42 @@ type Props = {
 
 type DrawerId = "plan" | "tools" | "progress" | "connections";
 
+/**
+ * Project Tools — only genuinely functional tools render as buttons.
+ * Everything else is honestly demoted to a small "Coming later" line
+ * instead of a matching row of "Being prepared" cards (Connected Places
+ * Completion). Blurbs are plain language, not Estate jargon.
+ */
 const PROJECT_TOOLS = [
   {
     id: "ask-shari",
     label: "Ask Shari",
     blurb: "Talk through this project beside you.",
-  },
-  {
-    id: "ask-chamber",
-    label: "Ask Chamber",
-    blurb: "Quiet counsel when you want another view.",
+    status: "active",
   },
   {
     id: "ask-board",
     label: "Call the Board",
-    blurb: "Bring this project’s decision to the Round Table.",
+    blurb: "Get multiple perspectives on an important decision.",
+    status: "active",
+  },
+  {
+    id: "ask-chamber",
+    label: "Ask Chamber",
+    blurb: "Work with a specialist for this part of your project.",
+    status: "comingLater",
   },
   {
     id: "cartographer",
     label: "Cartographer",
-    blurb: "Map the path when the terrain feels wide.",
+    blurb: "Map ideas, decisions, steps, or relationships visually.",
+    status: "comingLater",
   },
   {
     id: "clear-my-mind",
     label: "Clear My Mind",
-    blurb: "Set the noise down before you continue.",
+    blurb: "Get distracting thoughts out of your head.",
+    status: "comingLater",
   },
 ] as const;
 
@@ -132,6 +146,15 @@ export function ProjectHomeDetail({
   const [shariSuggestion, setShariSuggestion] = useState<string | null>(null);
   const [moreOpen, setMoreOpen] = useState(false);
   const [helperMessage, setHelperMessage] = useState<string | null>(null);
+  const [suggestionQueue, setSuggestionQueue] = useState<{
+    queue: NextStepSuggestion[];
+    pos: number;
+  } | null>(null);
+  const [editingSuggestion, setEditingSuggestion] = useState(false);
+  const [suggestionDraft, setSuggestionDraft] = useState("");
+  const activeSuggestion = suggestionQueue
+    ? suggestionQueue.queue[suggestionQueue.pos] ?? null
+    : null;
 
   const items = useMemo(() => {
     void itemsTick;
@@ -190,21 +213,99 @@ export function ProjectHomeDetail({
   }
 
   function handleSuggestHelper(id: SuggestNextStepHelperId) {
+    if (id === "suggest") {
+      openSuggestNextStep();
+      return;
+    }
     const helper = SUGGEST_NEXT_STEP_HELPERS.find((h) => h.id === id);
     if (!helper) return;
     const guidance = helper.localGuidance({
       name: project.name,
       goal: project.purpose,
-      nextAction: project.nextSuggestedStep || project.currentFocus,
+      nextAction: project.nextSuggestedStep,
     });
     setHelperMessage(guidance);
-    if (id !== "matters") {
-      onProjectChange({
-        ...project,
-        nextSuggestedStep: guidance,
-        currentFocus: project.currentFocus || guidance,
-      });
+  }
+
+  /**
+   * Suggest Next Step — generates a real, project-aware action (never a
+   * copy of Current Focus or raw setup text) and lets the member choose
+   * what happens with it (Next-Step Intelligence).
+   */
+  function openSuggestNextStep() {
+    const queue = suggestNextStepsForHome(project, { count: 3 });
+    setHelperMessage(null);
+    setEditingSuggestion(false);
+    if (queue.length === 0) {
+      setActionMessage(
+        "I don't have a new direction to suggest yet — add a note or a task and try again.",
+      );
+      return;
     }
+    setSuggestionQueue({ queue, pos: 0 });
+  }
+
+  function handleShowAnotherSuggestion() {
+    if (!suggestionQueue) return;
+    const { queue, pos } = suggestionQueue;
+    if (pos + 1 < queue.length) {
+      setSuggestionQueue({ queue, pos: pos + 1 });
+      return;
+    }
+    const seenTitles = queue.map((s) => s.title);
+    const more = suggestNextStepsForHome(project, {
+      count: 1,
+      exclude: seenTitles,
+    });
+    if (more.length === 0) {
+      setActionMessage(
+        "That's every direction I can see right now — you know this project best.",
+      );
+      return;
+    }
+    setSuggestionQueue({ queue: [...queue, ...more], pos: pos + 1 });
+  }
+
+  function handleUseSuggestion(suggestion: NextStepSuggestion) {
+    const next = setProjectHomeNextStep(project, suggestion);
+    onProjectChange(next);
+    setSuggestionQueue(null);
+    setEditingSuggestion(false);
+    setActionMessage("Saved as your next step.");
+  }
+
+  function handleBeginEditSuggestion() {
+    if (!activeSuggestion) return;
+    setSuggestionDraft(activeSuggestion.title);
+    setEditingSuggestion(true);
+  }
+
+  function handleSaveEditedSuggestion() {
+    const trimmed = suggestionDraft.trim();
+    if (!trimmed) return;
+    const next = setProjectHomeNextStep(project, {
+      title: trimmed,
+      reason: activeSuggestion?.reason ?? "",
+      source: "user",
+      confidence: 1,
+    });
+    onProjectChange(next);
+    setSuggestionQueue(null);
+    setEditingSuggestion(false);
+    setActionMessage("Saved as your next step.");
+  }
+
+  function handleAddSuggestionToTasks() {
+    if (!activeSuggestion) return;
+    const { home } = addTaskToHome(project, activeSuggestion.title);
+    refreshItems(home);
+    setActionMessage("Added to tasks.");
+    setSuggestionQueue(null);
+  }
+
+  function handleDismissSuggestion() {
+    setSuggestionQueue(null);
+    setEditingSuggestion(false);
   }
 
   function handleSaveFocus() {
@@ -388,6 +489,105 @@ export function ProjectHomeDetail({
           >
             {helperMessage}
           </p>
+        ) : null}
+        {activeSuggestion ? (
+          <div
+            className="project-homes-suggestion-card"
+            data-testid="project-home-suggestion-card"
+            role="status"
+          >
+            {editingSuggestion ? (
+              <>
+                <label
+                  className="project-homes-suggestion-card__label"
+                  htmlFor="project-home-suggestion-edit"
+                >
+                  Edit this step
+                </label>
+                <textarea
+                  id="project-home-suggestion-edit"
+                  value={suggestionDraft}
+                  onChange={(e) => setSuggestionDraft(e.target.value)}
+                  className="project-homes-suggestion-card__edit"
+                  data-testid="project-home-suggestion-edit-input"
+                  rows={2}
+                />
+                <div className="project-homes-suggestion-card__actions">
+                  <button
+                    type="button"
+                    className="project-homes-btn project-homes-btn--primary"
+                    onClick={handleSaveEditedSuggestion}
+                    data-testid="project-home-suggestion-save-edit"
+                  >
+                    Save this step
+                  </button>
+                  <button
+                    type="button"
+                    className="project-homes-btn project-homes-btn--ghost"
+                    onClick={() => setEditingSuggestion(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p
+                  className="project-homes-suggestion-card__title"
+                  data-testid="project-home-suggestion-title"
+                >
+                  {activeSuggestion.title}
+                </p>
+                {activeSuggestion.reason ? (
+                  <p className="project-homes-suggestion-card__reason">
+                    {activeSuggestion.reason}
+                  </p>
+                ) : null}
+                <div className="project-homes-suggestion-card__actions">
+                  <button
+                    type="button"
+                    className="project-homes-btn project-homes-btn--primary"
+                    onClick={() => handleUseSuggestion(activeSuggestion)}
+                    data-testid="project-home-suggestion-use"
+                  >
+                    Use this step
+                  </button>
+                  <button
+                    type="button"
+                    className="project-homes-btn project-homes-btn--secondary"
+                    onClick={handleShowAnotherSuggestion}
+                    data-testid="project-home-suggestion-another"
+                  >
+                    Show another
+                  </button>
+                  <button
+                    type="button"
+                    className="project-homes-btn project-homes-btn--ghost"
+                    onClick={handleBeginEditSuggestion}
+                    data-testid="project-home-suggestion-edit"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="project-homes-btn project-homes-btn--ghost"
+                    onClick={handleAddSuggestionToTasks}
+                    data-testid="project-home-suggestion-add-task"
+                  >
+                    Add to tasks
+                  </button>
+                  <button
+                    type="button"
+                    className="project-homes-btn project-homes-btn--ghost"
+                    onClick={handleDismissSuggestion}
+                    data-testid="project-home-suggestion-not-now"
+                  >
+                    Not now
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         ) : null}
       </section>
 
@@ -618,56 +818,70 @@ export function ProjectHomeDetail({
           className="project-homes-tools-list"
           data-testid="project-home-tools-list"
         >
-          {PROJECT_TOOLS.map((tool) => (
-            <li key={tool.id}>
-              {tool.id === "ask-shari" && !sample ? (
-                <button
-                  type="button"
-                  className="project-homes-tool-item"
-                  data-testid={`project-home-tool-${tool.id}`}
-                  onClick={handleProposeShariTask}
-                >
-                  <span className="project-homes-tool-item__label">
-                    {tool.label}
-                  </span>
-                  <span className="project-homes-tool-item__blurb">
-                    {tool.blurb}
-                  </span>
-                </button>
-              ) : tool.id === "ask-board" && onCallTheBoard && !sample ? (
-                <button
-                  type="button"
-                  className="project-homes-tool-item"
-                  data-testid={`project-home-tool-${tool.id}`}
-                  onClick={() => onCallTheBoard(project)}
-                >
-                  <span className="project-homes-tool-item__label">
-                    {tool.label}
-                  </span>
-                  <span className="project-homes-tool-item__blurb">
-                    {tool.blurb}
-                  </span>
-                </button>
-              ) : (
-                <div
-                  className="project-homes-tool-item project-homes-tool-item--preparing"
-                  data-testid={`project-home-tool-${tool.id}`}
-                  aria-disabled="true"
-                >
-                  <span className="project-homes-tool-item__label">
-                    {tool.label}
-                  </span>
-                  <span className="project-homes-tool-item__blurb">
-                    {tool.blurb}
-                  </span>
-                  <span className="project-homes-tool-item__status">
-                    Being prepared
-                  </span>
-                </div>
-              )}
-            </li>
-          ))}
+          {PROJECT_TOOLS.filter((tool) => tool.status === "active").map(
+            (tool) => (
+              <li key={tool.id}>
+                {tool.id === "ask-shari" && !sample ? (
+                  <button
+                    type="button"
+                    className="project-homes-tool-item"
+                    data-testid={`project-home-tool-${tool.id}`}
+                    onClick={handleProposeShariTask}
+                  >
+                    <span className="project-homes-tool-item__label">
+                      {tool.label}
+                    </span>
+                    <span className="project-homes-tool-item__blurb">
+                      {tool.blurb}
+                    </span>
+                  </button>
+                ) : tool.id === "ask-board" && onCallTheBoard && !sample ? (
+                  <button
+                    type="button"
+                    className="project-homes-tool-item"
+                    data-testid={`project-home-tool-${tool.id}`}
+                    onClick={() => onCallTheBoard(project)}
+                  >
+                    <span className="project-homes-tool-item__label">
+                      {tool.label}
+                    </span>
+                    <span className="project-homes-tool-item__blurb">
+                      {tool.blurb}
+                    </span>
+                  </button>
+                ) : (
+                  <div
+                    className="project-homes-tool-item project-homes-tool-item--preparing"
+                    data-testid={`project-home-tool-${tool.id}`}
+                    aria-disabled="true"
+                  >
+                    <span className="project-homes-tool-item__label">
+                      {tool.label}
+                    </span>
+                    <span className="project-homes-tool-item__blurb">
+                      {tool.blurb}
+                    </span>
+                    <span className="project-homes-tool-item__status">
+                      Being prepared
+                    </span>
+                  </div>
+                )}
+              </li>
+            ),
+          )}
         </ul>
+        {PROJECT_TOOLS.some((tool) => tool.status === "comingLater") ? (
+          <p
+            className="project-homes-connected__coming-later"
+            data-testid="project-home-tools-coming-later"
+          >
+            Coming later:{" "}
+            {PROJECT_TOOLS.filter((tool) => tool.status === "comingLater")
+              .map((tool) => tool.label)
+              .join(", ")}
+            .
+          </p>
+        ) : null}
       </ProjectHomeDrawer>
 
       <ProjectHomeDrawer
@@ -798,7 +1012,11 @@ export function ProjectHomeDetail({
             },
           ]}
         />
-        <ConnectedPlacesSection projectHomeId={project.projectHomeId} />
+        <ConnectedPlacesSection
+          projectHomeId={project.projectHomeId}
+          project={!sample ? project : undefined}
+          onCallTheBoard={!sample ? onCallTheBoard : undefined}
+        />
       </ProjectHomeDrawer>
 
       <p className="project-homes-prototype-note">
