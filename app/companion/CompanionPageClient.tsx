@@ -10216,6 +10216,12 @@ export default function CompanionPageClient() {
       openClearMyMindCore();
       return;
     }
+    /**
+     * Reflection routing fix — Journal / Hall of Accomplishments (and every
+     * other growth destination) must never fall back to Clear My Mind just
+     * because Clear My Mind Mode was still active from an earlier visit.
+     */
+    leaveClearMyMindIfNavigatingAway();
     /** Evidence Vault — EST-001 place-first (room + welcome before form). */
     if (resolved === "evidence-bank") {
       enterEvidenceVaultRoomCore({
@@ -10276,6 +10282,13 @@ export default function CompanionPageClient() {
     workspaceMode?: "arrive" | "add" | "browse";
     skipWelcome?: boolean;
   }) {
+    /**
+     * Reflection routing fix — Evidence Vault must never fall back to Clear My
+     * Mind just because Clear My Mind Mode was still active from an earlier
+     * visit. Direct callers (menu, universal access, Chamber) bypass
+     * openGrowthDestinationCore, so this must be exited here too.
+     */
+    leaveClearMyMindIfNavigatingAway();
     if (isBreatheDestinationActive(breatheDestination)) {
       closeBreatheOverlayCore({ resume: true });
     }
@@ -20785,11 +20798,16 @@ export default function CompanionPageClient() {
     /**
      * While Clear My Mind Mode is active, refuse estate room hops that would
      * replace the workspace with frosted chat (Wander / go-to-room).
-     * Member exits only via Back, Welcome Home, or explicit leave phrases.
+     * Reflection destinations (Journal, Evidence Vault, Hall of Accomplishments)
+     * and every other dedicated-panel room are explicit, named requests — not
+     * the ambient "Wander" case this guard exists for — so they must open
+     * normally instead of snapping back to Clear My Mind.
+     * Member exits Clear My Mind only via Back, Welcome Home, or explicit
+     * leave phrases.
      */
     if (
-      isClearMyMindModeActive() ||
-      activeSectionRef.current === "brain-dump"
+      (isClearMyMindModeActive() || activeSectionRef.current === "brain-dump") &&
+      !isDedicatedEstateRoomPanelSection(command.section)
     ) {
       openClearMyMindCore({ silent: true });
       finishEarlyChatTurn();
