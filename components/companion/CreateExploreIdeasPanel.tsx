@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeList";
-import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspaceResumeList";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { objectIdForEmoji } from "@/lib/companionObjects";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
@@ -10,7 +9,6 @@ import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActi
 import type { CreateSuggestionContext } from "@/lib/createEstate/contextAwareSuggestions";
 import {
   CREATE_ESTATE_CATEGORIES_HEADING,
-  CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_CONTINUE_SOMETHING_HEADING,
   CREATE_ESTATE_IDEA_PREVIEW_BACK,
   CREATE_ESTATE_IDEA_PREVIEW_CREATE,
@@ -40,10 +38,6 @@ type Props = {
   activeWorkspaces: readonly ActiveCreationWorkspaceSummary[];
   draftCount: number;
   suggestionContext: CreateSuggestionContext;
-  onResumeCreationWorkspace: (
-    workspace: ActiveCreationWorkspaceSummary,
-  ) => void | { ok: boolean; acknowledgment?: string };
-  onRenameWorkspace?: (id: string, title: string) => void | Promise<void>;
   onOpenSavedDraft: (id: string) => void;
   onRenameDraft: (id: string, title: string) => void;
   onDuplicateDraft: (id: string) => void;
@@ -53,16 +47,15 @@ type Props = {
 };
 
 /**
- * Spec 133 — Explore Ideas discovery.
- * Hierarchy: Continue → Search → Recommended → Categories.
+ * Spec 133 / 135 — Explore Ideas discovery.
+ * Hierarchy: Continue Something (recent + previous) → Search → Recommended → Categories.
+ * Active Continue Working stays on Create home only (one mental model).
  * One result list for search OR category. Confirm gate stays with parent.
  */
 export function CreateExploreIdeasPanel({
   activeWorkspaces,
   draftCount,
   suggestionContext,
-  onResumeCreationWorkspace,
-  onRenameWorkspace,
   onOpenSavedDraft,
   onRenameDraft,
   onDuplicateDraft,
@@ -77,7 +70,6 @@ export function CreateExploreIdeasPanel({
   const [previewIdea, setPreviewIdea] = useState<ExploreIdeaResult | null>(null);
   const [showCategories, setShowCategories] = useState(false);
 
-  const hasWorkspaces = activeWorkspaces.length > 0;
   const recentLabels = useMemo(
     () => recentLabelsFromWorkspaces(activeWorkspaces),
     [activeWorkspaces],
@@ -189,20 +181,10 @@ export function CreateExploreIdeasPanel({
         >
           {CREATE_ESTATE_CONTINUE_SOMETHING_HEADING}
         </h3>
-
-        {hasWorkspaces ? (
-          <div className="mt-3" data-testid="create-explore-continue-working">
-            <h4 className="text-sm font-semibold text-[#3d3429]">
-              {CREATE_ESTATE_CONTINUE_HEADING}
-            </h4>
-            <div className="mt-2">
-              <CreateWorkspaceResumeList
-                onResume={onResumeCreationWorkspace}
-                onRename={onRenameWorkspace ?? undefined}
-              />
-            </div>
-          </div>
-        ) : null}
+        <p className="mt-1 text-sm leading-relaxed text-[#6b635a]">
+          Active work stays under Continue Working above. Here you can reopen
+          older drafts or jump from something recent.
+        </p>
 
         <div className="mt-3" data-testid="create-explore-recent-work">
           <h4 className="text-sm font-semibold text-[#3d3429]">

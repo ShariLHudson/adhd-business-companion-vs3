@@ -18,8 +18,8 @@ export const CREATE_VS_PROJECTS_CUE =
 export const CREATE_ESTATE_HOW_DO_I = [
   "Use Create when you want to make something — an email, checklist, presentation, client resource, marketing plan, event, or other supported work.",
   "Start by telling Shari what you want to create in plain language. Spark Estate opens or resumes the right Creation Workspace — you never choose where the work belongs.",
-  "Continue Working shows active Creation Workspaces. Older drafts stay under Explore Ideas → Continue Something.",
-  "Explore Ideas is optional — one place to continue, search, browse categories, or see recommendations. Most people just tell Shari above.",
+  "Continue Working shows active Creation Workspaces on Create home. Older drafts stay under Explore Ideas → Continue Something.",
+  "Explore Ideas is optional — one place for older drafts, search, categories, and recommendations. Most people just tell Shari above.",
   "Create is different from Projects: Create makes an output; Projects organize ongoing work. For finding and applying strategies, use Strategy Library under Guidance — it is not part of Create.",
 ].join("\n\n");
 
@@ -27,7 +27,7 @@ export const CREATE_ESTATE_HOW_DO_I = [
 export const CREATE_ESTATE_EXPLORE_IDEAS_HEADING = "Explore Ideas";
 
 export const CREATE_ESTATE_EXPLORE_IDEAS_HINT =
-  "Optional — continue something, search for inspiration, or browse categories. Most people just tell Shari above.";
+  "Optional — reopen older drafts, search for inspiration, or browse categories. Active work stays under Continue Working above.";
 
 /** @deprecated Spec 133 — use CREATE_ESTATE_EXPLORE_IDEAS_HEADING. */
 export const CREATE_ESTATE_MORE_WAYS_HEADING = CREATE_ESTATE_EXPLORE_IDEAS_HEADING;

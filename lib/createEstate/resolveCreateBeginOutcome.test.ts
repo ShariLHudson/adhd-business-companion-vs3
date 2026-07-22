@@ -136,7 +136,9 @@ describe("Create Begin — always one of two outcomes", () => {
     expect(panel).toContain("create-estate-intent-confirm");
     expect(panel).toContain("confirmCreateBeginToOpen");
     expect(panel).toContain("data-primary-action=\"begin\"");
-    expect(panel).toContain("companionLed");
+    // Spec 132 / 135 — intentional Escape + confirm layer before leave
+    expect(panel).toContain("useDismissibleWindow");
+    expect(panel).toContain("closeOnEscape");
     expect(panel).not.toContain("Start with a Blueprint");
     expect(panel).not.toContain("onConversationalCreate");
   });

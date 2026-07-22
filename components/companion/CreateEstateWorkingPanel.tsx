@@ -726,10 +726,11 @@ export function CreateEstateWorkingPanel({
                           workId={uweWorkId}
                           onCancel={() => setSaveAsBlueprintOpen(false)}
                           onSaved={(blueprintId, category) => {
+                            // Spec 128 / 135 — never surface Blueprint IDs to members.
                             setBlueprintSavedAck(
                               category === "company"
-                                ? `Saved Company Blueprint ${blueprintId}.`
-                                : `Saved Personal Blueprint ${blueprintId}.`,
+                                ? "Saved as a Company blueprint. You can open it anytime from your library."
+                                : "Saved as a Personal blueprint. You can open it anytime from your library.",
                             );
                             setOpenBlueprintHomeId(blueprintId);
                             setSaveAsBlueprintOpen(false);
@@ -795,7 +796,9 @@ export function CreateEstateWorkingPanel({
                               canonicalFocus.creationId,
                           });
                           setBlueprintSavedAck(
-                            `Saved “${saved.title}” (${saved.blueprintId} @ ${saved.version}).`,
+                            saved.title?.trim()
+                              ? `Saved “${saved.title.trim()}”. You can open it anytime from your library.`
+                              : "Saved. You can open it anytime from your library.",
                           );
                           setOpenBlueprintHomeId(saved.blueprintId);
                           setSaveBlueprintOpen(false);

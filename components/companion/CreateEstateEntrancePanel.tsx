@@ -125,11 +125,26 @@ export function CreateEstateEntrancePanel({
     [activeWorkspaces],
   );
 
+  // Spec 132 — Escape dismisses the confirm layer before leaving Create.
   useDismissibleWindow({
     open: true,
     onClose: onBack,
-    closeOnEscape: true,
+    closeOnEscape: beginFeedbackKind !== "confirm",
   });
+
+  useEffect(() => {
+    if (beginFeedbackKind !== "confirm" || !pendingConfirm) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      setPendingConfirm(null);
+      setBeginFeedback(null);
+      setBeginFeedbackKind(null);
+    }
+    window.addEventListener("keydown", onKeyDown, true);
+    return () => window.removeEventListener("keydown", onKeyDown, true);
+  }, [beginFeedbackKind, pendingConfirm]);
 
   useEffect(() => {
     if (!registerBack) return;
@@ -505,8 +520,6 @@ export function CreateEstateEntrancePanel({
               activeWorkspaces={activeWorkspaces}
               draftCount={draftCount}
               suggestionContext={suggestionContext}
-              onResumeCreationWorkspace={onResumeCreationWorkspace}
-              onRenameWorkspace={onRenameWorkspace}
               onOpenSavedDraft={onOpenSavedDraft}
               onRenameDraft={onRenameDraft}
               onDuplicateDraft={onDuplicateDraft}

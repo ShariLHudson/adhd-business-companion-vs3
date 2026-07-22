@@ -30,6 +30,7 @@ import {
   scoreCreateIntentConfidence,
   type CreateIntentConfidence,
 } from "./createIntentConfirmation";
+import { recordCreateIntentCorrection } from "./intentCorrectionHooks";
 
 export type CreateBeginOutcome =
   | {
@@ -81,6 +82,16 @@ function gatherCreateTypeCandidates(text: string): string[] {
   push(detectCreateTypeFromPrompt(text));
   if (isMarketingPlanCreationRequest(text)) push("Marketing Plan");
   if (isEventDomainCreationRequest(text)) push("Event Plan");
+
+  // Spec 135 / 131 — when uncertain, surface up to 3 calm alternatives from wording.
+  const t = text.toLowerCase();
+  if (/\bworkshop\b/.test(t)) push("Workshop");
+  if (/\b(retreat|webinar|summit|conference|event)\b/.test(t)) {
+    push("Event Plan");
+  }
+  if (/\b(newsletter|email)\b/.test(t)) push("Newsletter");
+  if (/\b(blog|article|post)\b/.test(t)) push("Blog Post");
+  if (/\b(marketing|campaign|launch)\b/.test(t)) push("Marketing Plan");
   return out;
 }
 
@@ -156,11 +167,18 @@ export function switchCreateBeginConfirmType(
 ): Extract<CreateBeginOutcome, { kind: "confirm" }> {
   const label = humanCreateTypeLabel(nextArtifactType);
   const previous = humanCreateTypeLabel(outcome.artifactType);
+  // Spec 131 Rule 13 — session correction hook (Intent Memory™ still future).
+  recordCreateIntentCorrection({
+    requestText: outcome.text,
+    fromType: previous,
+    toType: label,
+  });
   const also = limitAlsoConsidered(
     label,
     [
       previous,
       ...(outcome.alsoConsidered ?? []),
+      ...gatherCreateTypeCandidates(outcome.text),
     ],
   );
   const isMarketingPlanDomain =
