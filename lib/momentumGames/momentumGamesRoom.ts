@@ -1,4 +1,4 @@
-import { GAME_ROOM_BG } from "@/lib/companionHomestead";
+import { QUICK_RECHARGE_BG } from "@/lib/supportExperiences/supportExperienceRegistry";
 
-/** Momentum Games — recreation room scene behind playful resets. */
-export const MOMENTUM_GAMES_ROOM_BG = GAME_ROOM_BG;
+/** Quick Recharge — dedicated game-room scene behind playful, energizing resets. */
+export const MOMENTUM_GAMES_ROOM_BG = QUICK_RECHARGE_BG;

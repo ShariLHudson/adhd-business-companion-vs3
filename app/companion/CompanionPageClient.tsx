@@ -25187,7 +25187,7 @@ export default function CompanionPageClient() {
               <MomentumBuildersPanel
                 variant="quick-recharge"
                 panelTitle="Quick Recharge"
-                panelIntro="Simple activities for when your brain needs a reset."
+                panelIntro="Refresh your attention with a short, energizing reset."
                 backDestination="Quick Recharge"
                 menuBackDestination="Focus"
                 onLaunchExternal={handleMomentumBuilderLaunch}
