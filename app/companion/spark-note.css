@@ -1,25 +1,43 @@
-/* Spark Note — Daily Spark companion (collapsed anchor + immersive expanded card) */
+/* Spark Note — Daily Spark companion (collapsed anchor + immersive expanded card)
+   Visual redesign: illustrated collectible treasure card — parchment, gold frame,
+   deep-teal category badge, storybook illustration, grouped insight panels,
+   and a prominent "Spark in Action" moment. See docs/spark-card/ for the
+   approved redesign report. All existing Spark Card data/behavior preserved —
+   this file changes presentation only. */
 
 :root {
   --spark-note-anchor-size: clamp(3.25rem, 11vw, 4.75rem);
   --estate-chrome-bottom-right-inset-x: max(0.85rem, env(safe-area-inset-right, 0px));
   --estate-chrome-bottom-right-inset-y: max(1rem, env(safe-area-inset-bottom, 0px));
-  --spark-note-parchment: #f6f0e4;
-  --spark-note-parchment-deep: #ebe3d4;
-  --spark-note-gold: #c9a227;
-  --spark-note-gold-soft: rgba(201, 162, 39, 0.45);
-  --spark-note-teal: #1e5c5c;
-  --spark-note-teal-deep: #164848;
-  --spark-note-ink: #2c2820;
+
+  /* Parchment + treasure-card base */
+  --spark-note-parchment: #f8f1e2;
+  --spark-note-parchment-deep: #efe1c4;
+  --spark-note-parchment-edge: #e6d4a8;
+
+  /* Approved Spark Estate palette (visual redesign tokens) */
+  --spark-note-teal: #0f6f7c;
+  --spark-note-teal-deep: #0b4f59;
+  --spark-note-aqua: #30b6d5;
+  --spark-note-gold: #c9922e;
+  --spark-note-gold-bright: #f5c16c;
+  --spark-note-gold-light: #ffd98a;
+  --spark-note-bronze: #a9741f;
+  --spark-note-gold-soft: rgba(201, 146, 46, 0.45);
+  --spark-note-ink: #2e2e2e;
   --spark-note-ink-soft: #5c5348;
-  --spark-note-title-size: clamp(1.65rem, 4vw, 2.15rem);
+  --spark-note-rose: #a8465a;
+
+  --spark-note-title-size: clamp(1.75rem, 4vw, 2.35rem);
   --spark-note-message-size: clamp(1.05rem, 2.4vw, 1.2rem);
   --spark-note-body-size: var(--spark-note-message-size);
   --spark-note-insight-size: clamp(0.98rem, 2.1vw, 1.1rem);
   --spark-note-button-size: clamp(1rem, 2vw, 1.125rem);
+  --spark-note-script-font: "Segoe Script", "Bradley Hand", "Comic Sans MS", cursive;
+  --spark-note-serif-font: Georgia, "Times New Roman", serif;
 }
 
-/* ——— Collapsed anchor ——— */
+/* ═══════════════════════ Collapsed anchor ═══════════════════════ */
 .spark-note-anchor {
   position: fixed;
   bottom: var(--estate-chrome-bottom-right-inset-y);
@@ -29,6 +47,7 @@
 }
 
 .spark-note-anchor__card {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,7 +58,7 @@
   margin: 0;
   padding: 0.45rem 0.35rem 0.5rem;
   border: 1px solid var(--spark-note-gold-soft);
-  border-radius: 0.35rem 0.55rem 0.55rem 0.35rem;
+  border-radius: 0.35rem 0.65rem 0.65rem 0.35rem;
   background:
     linear-gradient(
       155deg,
@@ -49,12 +68,27 @@
     );
   box-shadow:
     0 6px 18px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   cursor: pointer;
   text-align: center;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
+}
+
+/* Decorative folded-corner seal — collectible feel, not a notification badge */
+.spark-note-anchor__seal {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 0.9rem;
+  height: 0.9rem;
+  background:
+    linear-gradient(135deg, transparent 50%, var(--spark-note-gold-bright) 50.5%);
+  border-radius: 0 0.6rem 0 0.5rem;
+  opacity: 0.85;
+  pointer-events: none;
 }
 
 .spark-note-anchor__card:hover {
@@ -75,11 +109,24 @@
   justify-content: center;
   width: 2.15rem;
   height: 2.15rem;
-  border-radius: 0.35rem;
+  border-radius: 0.4rem;
   background: linear-gradient(160deg, var(--spark-note-teal) 0%, var(--spark-note-teal-deep) 100%);
-  border: 1.5px solid var(--spark-note-gold);
+  border: 1.5px solid var(--spark-note-gold-bright);
   color: #f5d76e;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 2px 6px rgba(15, 111, 124, 0.35);
+}
+
+/* Subtle category tint — same shape, quiet color cue, no extra elements */
+.spark-note-anchor[data-diversity-category="nature"] .spark-note-anchor__flame-wrap,
+.spark-note-anchor[data-diversity-category="kindness"] .spark-note-anchor__flame-wrap {
+  background: linear-gradient(160deg, #3f7a52 0%, #275136 100%);
+}
+
+.spark-note-anchor[data-diversity-category="fun_celebrations"] .spark-note-anchor__flame-wrap,
+.spark-note-anchor[data-diversity-category="fun_facts"] .spark-note-anchor__flame-wrap {
+  background: linear-gradient(160deg, #a8465a 0%, #6f2c3a 100%);
 }
 
 .spark-note-anchor__flame {
@@ -88,16 +135,16 @@
 }
 
 .spark-note-anchor__identity {
-  font-family: "Segoe Script", "Bradley Hand", cursive;
-  font-size: 0.58rem;
+  font-family: var(--spark-note-script-font);
+  font-size: 0.6rem;
   line-height: 1.15;
-  color: #8b6914;
+  color: var(--spark-note-bronze);
 }
 
 .spark-note-anchor__hint {
   display: block;
   width: 100%;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--spark-note-serif-font);
   font-size: 0.52rem;
   font-weight: 650;
   line-height: 1.2;
@@ -108,7 +155,7 @@
   padding: 0 0.1rem;
 }
 
-/* ——— Expanded collectible Daily Spark ——— */
+/* ═══════════════════════ Expanded collectible Daily Spark ═══════════════════════ */
 .spark-note-expanded {
   position: fixed;
   inset: 0;
@@ -128,7 +175,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 18%, rgba(30, 92, 92, 0.14), transparent 52%),
+    radial-gradient(ellipse at 50% 18%, rgba(15, 111, 124, 0.16), transparent 52%),
     linear-gradient(180deg, rgba(26, 24, 20, 0.48) 0%, rgba(26, 24, 20, 0.68) 100%);
   backdrop-filter: blur(3px);
 }
@@ -138,13 +185,20 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: min(26rem, 100%);
+  width: min(28rem, 100%);
   max-height: calc(100dvh - 1.5rem);
   overflow: hidden auto;
-  padding: 1.15rem 1.15rem 1.2rem;
+  padding: 1.3rem 1.3rem 1.35rem;
   border: 2px solid var(--spark-note-gold-soft);
-  border-radius: 1rem;
+  border-radius: 1.15rem;
   background:
+    repeating-linear-gradient(
+      168deg,
+      rgba(180, 150, 100, 0.03) 0px,
+      rgba(180, 150, 100, 0.03) 2px,
+      transparent 2px,
+      transparent 5px
+    ),
     linear-gradient(
       168deg,
       rgba(255, 252, 245, 0.99) 0%,
@@ -152,18 +206,143 @@
       var(--spark-note-parchment-deep) 100%
     );
   box-shadow:
-    0 20px 48px rgba(0, 0, 0, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.34);
+    0 24px 56px rgba(0, 0, 0, 0.34),
+    0 0 0 5px rgba(255, 252, 245, 0.85),
+    0 0 0 6px var(--spark-note-gold-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
+@media (min-width: 720px) {
+  .spark-note-expanded__card {
+    width: min(34rem, 100%);
+    padding: 1.6rem 1.9rem 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .spark-note-expanded__card {
+    width: min(38rem, 100%);
+  }
+}
+
+/* Ornamental gold corner flourishes — storybook treasure-card frame */
+.spark-note-expanded__ornaments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.spark-note-expanded__ornament {
+  position: absolute;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid var(--spark-note-gold);
+  opacity: 0.55;
+}
+
+.spark-note-expanded__ornament--tl {
+  top: 0.55rem;
+  left: 0.55rem;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 0.35rem 0 0 0;
+}
+
+.spark-note-expanded__ornament--tr {
+  top: 0.55rem;
+  right: 0.55rem;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 0.35rem 0 0;
+}
+
+.spark-note-expanded__ornament--bl {
+  bottom: 0.55rem;
+  left: 0.55rem;
+  border-right: none;
+  border-top: none;
+  border-radius: 0 0 0 0.35rem;
+}
+
+.spark-note-expanded__ornament--br {
+  bottom: 0.55rem;
+  right: 0.55rem;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 0.35rem 0;
+}
+
+/* ——— Top line: category badge + close ——— */
+.spark-note-expanded__topline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.65rem;
+}
+
+.spark-note-expanded__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.32rem 0.7rem 0.34rem 0.55rem;
+  border-radius: 0.25rem 0.65rem 0.25rem 0.65rem;
+  background: linear-gradient(155deg, var(--spark-note-teal) 0%, var(--spark-note-teal-deep) 100%);
+  border: 1px solid var(--spark-note-gold-bright);
+  box-shadow:
+    0 2px 8px rgba(11, 79, 89, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.18);
+}
+
+.spark-note-expanded__badge-icon {
+  font-size: 0.9rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
+}
+
+.spark-note-expanded__badge-text {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--spark-note-gold-light);
+}
+
+.spark-note-expanded__close {
+  flex-shrink: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(92, 83, 72, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--spark-note-ink-soft);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.spark-note-expanded__close:hover {
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--spark-note-ink);
+}
+
+.spark-note-expanded__close:focus-visible {
+  outline: 2px solid var(--spark-note-teal);
+  outline-offset: 2px;
+}
+
+/* Legacy ribbon selector kept for print / backward styling safety */
 .spark-note-expanded__ribbon {
   align-self: flex-start;
   margin: 0 0 0.65rem;
   padding: 0.28rem 0.75rem 0.3rem;
   border-radius: 0.2rem 0.55rem 0.2rem 0.55rem;
-  background:
-    linear-gradient(135deg, #c9a227 0%, #e4c45a 45%, #b8921f 100%);
+  background: linear-gradient(135deg, #c9a227 0%, #e4c45a 45%, #b8921f 100%);
   color: #2c2410;
   font-size: 0.68rem;
   font-weight: 750;
@@ -174,23 +353,30 @@
 
 .spark-note-expanded__card--saved {
   text-align: center;
-  padding: 1.35rem 1.15rem 1.15rem;
+  padding: 1.6rem 1.3rem 1.35rem;
+}
+
+.spark-note-expanded__saved-flame {
+  display: block;
+  font-size: 2.2rem;
+  margin-bottom: 0.35rem;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
 }
 
 .spark-note-expanded__kicker {
-  margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #8b6914;
+  margin: 0 0 0.15rem;
+  font-family: var(--spark-note-script-font);
+  font-size: clamp(1.05rem, 2.6vw, 1.3rem);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--spark-note-bronze);
 }
 
 .spark-note-expanded__header {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  margin-bottom: 0.55rem;
+  margin-bottom: 0.15rem;
 }
 
 .spark-note-expanded__flame {
@@ -213,18 +399,26 @@
   color: var(--spark-note-teal-deep);
 }
 
+/* ——— Main illustration ——— */
 .spark-note-expanded__art {
   position: relative;
   width: 100%;
   aspect-ratio: 16 / 10;
-  max-height: 11.5rem;
-  margin: 0.35rem 0 0.85rem;
+  max-height: 13rem;
+  margin: 0.4rem 0 1rem;
   overflow: hidden;
-  border-radius: 0.75rem;
-  border: 1.5px solid rgba(201, 162, 39, 0.42);
+  border-radius: 0.85rem;
+  border: 2px solid var(--spark-note-gold);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 255, 255, 0.35),
-    0 8px 22px rgba(42, 58, 38, 0.12);
+    0 0 0 4px rgba(255, 252, 245, 0.7),
+    0 0 0 5px var(--spark-note-gold-soft),
+    0 10px 24px rgba(42, 58, 38, 0.16);
+}
+
+@media (min-width: 720px) {
+  .spark-note-expanded__art {
+    max-height: 16rem;
+  }
 }
 
 .spark-note-expanded__art-image {
@@ -232,6 +426,19 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: saturate(0.92) sepia(0.06) contrast(1.02);
+}
+
+/* Warm storybook vignette over every illustration — softens photographic
+   stock imagery toward the illustrated/vintage-editorial tone in the brief. */
+.spark-note-expanded__art-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(45, 32, 18, 0.22) 100%),
+    linear-gradient(180deg, rgba(201, 146, 46, 0.08) 0%, transparent 22%, transparent 78%, rgba(45, 32, 18, 0.1) 100%);
+  mix-blend-mode: multiply;
 }
 
 /* Themed collectible art — never an empty panel */
@@ -243,17 +450,17 @@
   gap: 0.25rem;
   background:
     radial-gradient(circle at 50% 38%, rgba(255, 252, 245, 0.22), transparent 58%),
-    linear-gradient(155deg, rgba(30, 92, 92, 0.42) 0%, rgba(22, 72, 72, 0.62) 100%);
+    linear-gradient(155deg, rgba(15, 111, 124, 0.48) 0%, rgba(11, 79, 89, 0.68) 100%);
 }
 
 .spark-note-expanded__art-emblem {
-  font-size: clamp(2.1rem, 8vw, 2.65rem);
+  font-size: clamp(2.4rem, 9vw, 3rem);
   line-height: 1;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
 }
 
 .spark-note-expanded__art-caption {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -318,50 +525,66 @@
 }
 
 .spark-note-expanded__title {
-  margin: 0 0 0.35rem;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.35rem, 3.4vw, 1.7rem);
+  margin: 0 0 0.3rem;
+  font-family: var(--spark-note-serif-font);
+  font-size: var(--spark-note-title-size);
   font-weight: 700;
-  line-height: 1.22;
+  line-height: 1.2;
   text-align: left;
   color: var(--spark-note-teal-deep);
 }
 
 .spark-note-expanded__subtitle {
-  margin: 0 0 0.55rem;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.95rem;
+  margin: 0;
+  font-family: var(--spark-note-serif-font);
+  font-size: clamp(1rem, 2.2vw, 1.1rem);
   font-style: italic;
-  line-height: 1.4;
-  color: #5a5044;
+  line-height: 1.45;
+  color: var(--spark-note-ink-soft);
+}
+
+.spark-note-expanded__divider {
+  display: block;
+  width: 3.5rem;
+  height: 3px;
+  margin: 0.7rem 0 0;
+  background: linear-gradient(90deg, var(--spark-note-gold) 0%, var(--spark-note-gold-bright) 60%, transparent 100%);
+  border-radius: 2px;
 }
 
 .spark-note-expanded__sections {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  margin-top: 0.1rem;
+  gap: 0.9rem;
+  margin-top: 0.15rem;
 }
 
 .spark-note-expanded__section {
-  padding-left: 0.55rem;
-  border-left: 2px solid rgba(201, 162, 39, 0.32);
+  padding-left: 0;
 }
 
 .spark-note-expanded__section-title {
-  margin: 0 0 0.3rem;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 0.82rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #1a3d5c;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.4rem;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--spark-note-teal-deep);
+}
+
+.spark-note-expanded__section-icon {
+  font-size: 0.95rem;
 }
 
 .spark-note-expanded__section-copy {
-  margin: 0 0 0.45rem;
-  font-size: 0.9rem;
-  line-height: 1.55;
-  color: #2f3a3a;
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--spark-note-ink);
 }
 
 .spark-note-expanded__section-copy:last-child {
@@ -369,11 +592,106 @@
 }
 
 .spark-note-expanded__section-copy--quiet {
-  font-size: 0.84rem;
+  font-size: 0.86rem;
   color: #4a5560;
   font-style: italic;
 }
 
+/* Storybook drop cap on the opening line of the Story section */
+.spark-note-expanded__section--story .spark-note-expanded__section-copy:first-of-type::first-letter {
+  float: left;
+  font-family: var(--spark-note-serif-font);
+  font-size: 2.5em;
+  line-height: 0.82;
+  font-weight: 700;
+  padding: 0.04em 0.1em 0 0;
+  color: var(--spark-note-teal);
+}
+
+/* ——— Supporting insight panels ——— */
+.spark-note-expanded__panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.7rem;
+}
+
+.spark-note-expanded__panel {
+  padding: 0.75rem 0.85rem 0.8rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(201, 146, 46, 0.28);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.spark-note-expanded__panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.3rem;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--spark-note-teal-deep);
+}
+
+.spark-note-expanded__panel-icon {
+  font-size: 0.95rem;
+}
+
+.spark-note-expanded__panel-copy {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  font-weight: 600;
+  color: var(--spark-note-ink);
+}
+
+/* ——— Spark in Action — prominent warm accent moment ——— */
+.spark-note-expanded__action {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, rgba(168, 70, 90, 0.14) 0%, rgba(201, 146, 46, 0.14) 100%);
+  border: 1.5px solid rgba(168, 70, 90, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.spark-note-expanded__action-icon {
+  flex-shrink: 0;
+  font-size: 1.4rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.18));
+}
+
+.spark-note-expanded__action-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.spark-note-expanded__action-title {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--spark-note-rose);
+}
+
+.spark-note-expanded__action-text {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.45;
+  color: var(--spark-note-teal-deep);
+}
+
+/* Legacy takeaway/spark section selectors kept for print safety */
 .spark-note-expanded__section--takeaway .spark-note-expanded__section-copy {
   font-weight: 600;
   color: #1a3d5c;
@@ -385,35 +703,41 @@
   font-weight: 650;
 }
 
-.spark-note-expanded__more {
-  margin-top: 0.85rem;
+/* ——— Tell Me More ——— */
+.spark-note-expanded__more,
+.spark-note-expanded__more-wrap {
+  margin-top: 0.95rem;
 }
 
 .spark-note-expanded__more-toggle {
   width: 100%;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid rgba(201, 162, 39, 0.4);
-  border-radius: 0.55rem;
-  background: rgba(255, 252, 245, 0.72);
-  color: #1a3d5c;
-  font-size: 0.82rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px dashed rgba(201, 146, 46, 0.5);
+  border-radius: 0.6rem;
+  background: rgba(255, 252, 245, 0.6);
+  color: var(--spark-note-teal-deep);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 0.84rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   cursor: pointer;
 }
 
 .spark-note-expanded__more-toggle[aria-expanded="true"] {
-  border-color: rgba(30, 92, 92, 0.45);
-  background: rgba(30, 92, 92, 0.08);
+  border-style: solid;
+  border-color: rgba(15, 111, 124, 0.45);
+  background: rgba(15, 111, 124, 0.08);
 }
 
 .spark-note-expanded__more-panel {
-  margin-top: 0.55rem;
-  padding: 0.65rem 0.7rem;
-  border-left: 2px solid rgba(201, 162, 39, 0.35);
+  margin-top: 0.6rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.6rem;
+  background: rgba(239, 225, 196, 0.42);
+  border-left: 3px solid var(--spark-note-gold);
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.5rem;
 }
 
 .spark-note-expanded__related-label {
@@ -422,7 +746,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #8b6914;
+  color: var(--spark-note-bronze);
 }
 
 .spark-note-expanded__related ul {
@@ -451,9 +775,18 @@
   color: var(--spark-note-teal-deep);
 }
 
+/* ——— Footer line ——— */
+.spark-note-expanded__footer {
+  margin: 0.9rem 0 0;
+  text-align: center;
+  font-family: var(--spark-note-script-font);
+  font-size: clamp(1rem, 2.4vw, 1.15rem);
+  color: var(--spark-note-bronze);
+}
+
 .spark-note-expanded__message {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--spark-note-serif-font);
   font-size: var(--spark-note-message-size);
   line-height: 1.4;
   color: var(--spark-note-ink-soft);
@@ -471,11 +804,12 @@
   overflow: hidden;
 }
 
+/* ——— Actions ——— */
 .spark-note-expanded__actions {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
-  margin-top: 0.95rem;
+  margin-top: 1rem;
 }
 
 .spark-note-expanded__actions--save {
@@ -487,14 +821,53 @@
 .spark-note-expanded__actions--collection {
   flex-direction: row;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
   gap: 0.4rem;
-  margin-top: 0.85rem;
+  margin-top: 0.95rem;
 }
 
 .spark-note-expanded__btn--favorite-on {
-  border-color: rgba(201, 162, 39, 0.55);
-  color: #8b6914;
+  border-color: rgba(201, 146, 46, 0.55);
+  color: var(--spark-note-bronze);
+}
+
+.spark-note-expanded__more-menu-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.spark-note-expanded__more-menu {
+  position: absolute;
+  bottom: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  min-width: 8.5rem;
+  padding: 0.35rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(201, 146, 46, 0.35);
+  background: rgba(255, 252, 245, 0.98);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
+}
+
+.spark-note-expanded__more-menu-item {
+  padding: 0.5rem 0.6rem;
+  border: none;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--spark-note-ink);
+  font-size: 0.86rem;
+  font-weight: 650;
+  text-align: left;
+  cursor: pointer;
+}
+
+.spark-note-expanded__more-menu-item:hover,
+.spark-note-expanded__more-menu-item:focus-visible {
+  background: rgba(15, 111, 124, 0.1);
+  outline: none;
 }
 
 .spark-note-expanded__share-status {
@@ -507,7 +880,9 @@
 @media print {
   .spark-note-expanded__backdrop,
   .spark-note-expanded__actions,
+  .spark-note-expanded__close,
   .spark-note-expanded__more-toggle,
+  .spark-note-expanded__more-menu,
   .spark-note-expanded__share-status {
     display: none !important;
   }
@@ -542,22 +917,22 @@
 .spark-note-expanded__btn--save {
   width: auto;
   min-width: 6.5rem;
-  padding: 0.38rem 0.9rem;
-  font-size: 0.78rem;
+  padding: 0.42rem 0.9rem;
+  font-size: 0.8rem;
   font-weight: 650;
   letter-spacing: 0.03em;
 }
 
 .spark-note-expanded__btn--primary {
-  border: 1.5px solid rgba(201, 162, 39, 0.55);
-  background: linear-gradient(135deg, #f5d76e 0%, var(--spark-note-gold) 55%, #b8921f 100%);
+  border: 1.5px solid rgba(201, 146, 46, 0.55);
+  background: linear-gradient(135deg, var(--spark-note-gold-light) 0%, var(--spark-note-gold-bright) 55%, var(--spark-note-bronze) 100%);
   color: #2c2410;
-  box-shadow: 0 6px 16px rgba(201, 162, 39, 0.24);
+  box-shadow: 0 6px 16px rgba(201, 146, 46, 0.28);
 }
 
 .spark-note-expanded__btn--ghost {
-  border: 1px solid rgba(92, 83, 72, 0.22);
-  background: transparent;
+  border: 1px solid rgba(92, 83, 72, 0.24);
+  background: rgba(255, 255, 255, 0.4);
   color: var(--spark-note-ink-soft);
   font-weight: 650;
 }
@@ -566,9 +941,15 @@
   transform: translateY(-1px);
 }
 
+.spark-note-expanded__btn:focus-visible,
+.spark-note-expanded__more-toggle:focus-visible {
+  outline: 2px solid var(--spark-note-teal);
+  outline-offset: 2px;
+}
+
 .spark-note-expanded__saved-title {
   margin: 0 0 0.45rem;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--spark-note-serif-font);
   font-size: var(--spark-note-title-size);
   font-weight: 700;
   color: #1a3d5c;
@@ -581,7 +962,7 @@
   color: var(--spark-note-ink-soft);
 }
 
-/* ——— My Spark Collection ——— */
+/* ═══════════════════════ My Spark Collection ═══════════════════════ */
 .spark-note-collection {
   position: fixed;
   inset: 0;
@@ -612,9 +993,43 @@
   max-height: min(92dvh, 52rem);
   overflow: hidden;
   border: 2px solid var(--spark-note-gold-soft);
-  border-radius: 1rem;
+  border-radius: 1.1rem;
   background: linear-gradient(160deg, rgba(255, 252, 245, 0.99) 0%, var(--spark-note-parchment) 100%);
-  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.38);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, 0.38),
+    0 0 0 5px rgba(255, 252, 245, 0.8),
+    0 0 0 6px var(--spark-note-gold-soft);
+}
+
+.spark-note-collection__ornaments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.spark-note-collection__ornament {
+  position: absolute;
+  width: 1.15rem;
+  height: 1.15rem;
+  border: 2px solid var(--spark-note-gold);
+  opacity: 0.5;
+}
+
+.spark-note-collection__ornament--tl {
+  top: 0.6rem;
+  left: 0.6rem;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 0.35rem 0 0 0;
+}
+
+.spark-note-collection__ornament--tr {
+  top: 0.6rem;
+  right: 0.6rem;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 0.35rem 0 0;
 }
 
 .spark-note-collection__header {
@@ -622,7 +1037,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(201, 162, 39, 0.22);
+  border-bottom: 1px solid rgba(201, 146, 46, 0.22);
 }
 
 .spark-note-collection__back,
@@ -638,7 +1053,7 @@
 .spark-note-collection__title {
   flex: 1;
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--spark-note-serif-font);
   font-size: clamp(1.75rem, 3vw, 2.25rem);
   color: #1a3d5c;
 }
@@ -673,7 +1088,7 @@
 .spark-note-collection__input,
 .spark-note-collection__select {
   width: 100%;
-  border: 1px solid rgba(201, 162, 39, 0.35);
+  border: 1px solid rgba(201, 146, 46, 0.35);
   border-radius: 0.6rem;
   padding: 0.65rem 0.8rem;
   font-size: clamp(1.125rem, 1.8vw, 1.25rem);
@@ -711,8 +1126,9 @@
   gap: 0.25rem;
   padding: 0.85rem 0.95rem;
   border-radius: 0.65rem;
-  border: 1px solid rgba(201, 162, 39, 0.24);
-  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(201, 146, 46, 0.24);
+  border-left: 3px solid var(--spark-note-gold);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .spark-note-collection__item-meta {
@@ -736,7 +1152,7 @@
 }
 
 .spark-note-collection__item-title {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--spark-note-serif-font);
   font-size: clamp(1.375rem, 2.2vw, 1.625rem);
   font-weight: 700;
   color: var(--spark-note-ink);
@@ -750,7 +1166,12 @@
 
 @media (max-width: 720px) {
   .spark-note-expanded__card {
-    width: min(22rem, 100%);
+    width: min(23rem, 100%);
+    padding: 1.1rem 1.05rem 1.2rem;
+  }
+
+  .spark-note-expanded__panels {
+    grid-template-columns: 1fr;
   }
 
   .spark-note-collection__filter-row {

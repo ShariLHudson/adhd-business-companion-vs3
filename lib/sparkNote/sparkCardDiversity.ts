@@ -202,6 +202,35 @@ export function diversityCategoryLabel(
   return SPARK_CARD_DIVERSITY_CATEGORY_LABELS[id];
 }
 
+/**
+ * Small emblem per diversity category — used on the category badge
+ * (visual redesign, no change to the approved category set/labels).
+ */
+export const SPARK_CARD_DIVERSITY_CATEGORY_ICON: Record<
+  SparkCardDiversityCategoryId,
+  string
+> = {
+  fun_celebrations: "🎉",
+  innovation: "💡",
+  remarkable_people: "🧭",
+  amazing_places: "🗺️",
+  nature: "🌿",
+  history: "📜",
+  fun_facts: "🎲",
+  kindness: "💗",
+  curiosity: "🔎",
+  inspiration: "✨",
+  books_ideas: "📖",
+  creativity: "🎨",
+  science_technology: "🔬",
+};
+
+export function diversityCategoryIcon(
+  id: SparkCardDiversityCategoryId,
+): string {
+  return SPARK_CARD_DIVERSITY_CATEGORY_ICON[id] ?? "✨";
+}
+
 /** Ribbon label for expanded / collection display. */
 export function resolveSparkCardCategoryRibbon(
   source: DiversitySource,

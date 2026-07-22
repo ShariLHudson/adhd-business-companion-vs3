@@ -2,8 +2,10 @@ import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
 import { SPARK_NOTE_CATALOG } from "./catalog";
 import { resolveSparkCardArtAsset } from "./sparkCardArtRegistry";
 import {
+  diversityCategoryIcon,
   resolveSparkCardCategoryRibbon,
   resolveSparkCardDiversityCategory,
+  SPARK_CARD_OUTCOME_FEELINGS,
   type SparkCardDiversityCategoryId,
 } from "./sparkCardDiversity";
 
@@ -173,6 +175,8 @@ export type SparkCardTellMeMore = {
 
 export type SparkCardSimplifiedPresentation = {
   categoryRibbon: string;
+  /** Small emblem for the category badge — visual redesign, additive. */
+  categoryIcon: string;
   diversityCategory: SparkCardDiversityCategoryId;
   title: string;
   subtitle: string;
@@ -266,6 +270,7 @@ export function resolveSparkCardSimplifiedPresentation(
       tags: card.tags,
       title: card.title,
     }),
+    categoryIcon: diversityCategoryIcon(diversityCategory),
     diversityCategory,
     title: card.title,
     subtitle: card.teaser?.trim() || "A small idea waiting to brighten your day.",
@@ -274,6 +279,27 @@ export function resolveSparkCardSimplifiedPresentation(
     sparkInAction: resolveSparkInAction(card),
     tellMeMore: resolveSparkCardTellMeMore(card),
   };
+}
+
+/**
+ * Stable, non-cryptographic string hash — deterministic footer selection
+ * (same card always shows the same warm footer line).
+ */
+function stableStringHash(value: string): number {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash * 31 + value.charCodeAt(i)) | 0;
+  }
+  return Math.abs(hash);
+}
+
+/**
+ * Small warm footer / card-identity line — approved outcome-feeling copy,
+ * chosen deterministically per card (never fabricated per render).
+ */
+export function resolveSparkCardFooterLine(card: SparkNoteDailyCard): string {
+  const index = stableStringHash(card.id) % SPARK_CARD_OUTCOME_FEELINGS.length;
+  return SPARK_CARD_OUTCOME_FEELINGS[index];
 }
 
 export type SparkCardHeroVisual =
