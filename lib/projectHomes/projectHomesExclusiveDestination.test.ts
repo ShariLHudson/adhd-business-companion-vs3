@@ -56,14 +56,10 @@ describe("Project Homes exclusive destination ownership", () => {
       /activeSection === "growth-journal"[\s\S]*?<GrowthJournalRoomPanel/,
     );
     expect(client).toContain('data-project-homes-active={');
-    expect(client).toContain('activeSection !== "project-homes"');
     expect(client).toContain("syncDirectEstateVisit(null)");
-    // Show Conversation chip must exclude Projects
-    const chipBlock = client.slice(
-      client.indexOf("show-conversation-chip") - 500,
-      client.indexOf("show-conversation-chip") + 80,
-    );
-    expect(chipBlock).toContain('activeSection !== "project-homes"');
+    // Show Conversation control has been removed entirely — nothing to exclude.
+    expect(client).not.toContain("show-conversation-chip");
+    expect(client).not.toContain("Show Conversation");
   });
 
   it("Project Homes panel never mounts Journal Gazebo or frosted chat chrome", () => {

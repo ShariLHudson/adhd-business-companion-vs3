@@ -94,8 +94,7 @@
 .soundscape-selection-overlay__close:focus-visible,
 .experience-controls-overlay__choice:focus-visible,
 .soundscape-selection-overlay__item:focus-visible,
-.experience-controls-overlay__backdrop:focus-visible,
-.conversation-visibility-chip:focus-visible {
+.experience-controls-overlay__backdrop:focus-visible {
   outline: 2px solid rgba(255, 220, 160, 0.95);
   outline-offset: 2px;
 }
@@ -208,24 +207,6 @@
   color: inherit;
   font-size: 1rem;
   cursor: pointer;
-}
-
-.conversation-visibility-chip {
-  position: fixed;
-  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100110;
-  min-height: 2.75rem;
-  padding: 0.55rem 1.1rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 236, 200, 0.42);
-  background: rgba(32, 26, 20, 0.88);
-  color: rgba(255, 252, 245, 0.98);
-  font-size: 1rem;
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.32);
-  pointer-events: auto;
 }
 
 /* Presentation modes — do not change route or unload destination */

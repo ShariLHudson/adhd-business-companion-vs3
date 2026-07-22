@@ -2893,10 +2893,10 @@ export default function CompanionPageClient() {
   const instituteLearningHintRef = useRef<string | null>(null);
   const stablesLearningHintRef = useRef<string | null>(null);
   const previousMomentumPathIdRef = useRef<string | null>(null);
-  const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(() => {
-    if (typeof window === "undefined") return true;
-    return getExperienceControlPrefs().conversationVisibility !== "hidden";
-  });
+  // Conversation is always shown by default — the manual Show/Hide Conversation
+  // control has been removed, so no stale "hidden" preference can strand a
+  // returning member without a way back to their conversation.
+  const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(true);
   const [experienceControlsOpen, setExperienceControlsOpen] = useState(false);
   const [soundscapeSelectionOpen, setSoundscapeSelectionOpen] = useState(false);
   useEffect(() => {
@@ -10899,24 +10899,6 @@ export default function CompanionPageClient() {
       });
       return next;
     });
-  }
-
-  function setEstateRoomChatVisiblePreserving(visible: boolean) {
-    if (justBeHereSession) {
-      setJustBeHereChatVisible(visible);
-      return;
-    }
-    if (
-      visible &&
-      (activeSectionRef.current === "create" ||
-        forbidCompanionSidePanelDuringCreation())
-    ) {
-      return;
-    }
-    patchExperienceControlPrefs({
-      conversationVisibility: visible ? "showing" : "hidden",
-    });
-    setEstateRoomChatVisible(visible);
   }
 
   /**
@@ -25885,13 +25867,6 @@ export default function CompanionPageClient() {
           open={experienceControlsOpen}
           onClose={() => setExperienceControlsOpen(false)}
           roomId={roomMenuRoomId ?? "welcome-home"}
-          chatVisible={roomMenuChatVisible}
-          onSetChatVisible={setEstateRoomChatVisiblePreserving}
-          allowConversationToggle={
-            activeSection !== "create" &&
-            activeSection !== "project-homes" &&
-            !forbidCompanionSidePanelDuringCreation()
-          }
           onOpenNotifications={() => {
             setExperienceControlsOpen(false);
             handleEstateMenuAction("notifications");
@@ -25906,23 +25881,6 @@ export default function CompanionPageClient() {
           void playExperienceSoundscapeTrack(track);
         }}
       />
-
-      {!roomMenuChatVisible &&
-      !experienceControlsOpen &&
-      roomMenuRoomId !== "evidence-vault" &&
-      activeSection !== "evidence-bank" &&
-      activeSection !== "create" &&
-      activeSection !== "project-homes" &&
-      !forbidCompanionSidePanelDuringCreation() ? (
-        <button
-          type="button"
-          className="conversation-visibility-chip"
-          data-testid="show-conversation-chip"
-          onClick={() => setEstateRoomChatVisiblePreserving(true)}
-        >
-          Show Conversation
-        </button>
-      ) : null}
 
       <ProfileDestinationHost
         destination={

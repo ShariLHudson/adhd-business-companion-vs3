@@ -41,10 +41,6 @@ export type ExperienceControlsOverlayProps = {
   open: boolean;
   onClose: () => void;
   roomId: string;
-  chatVisible: boolean;
-  onSetChatVisible: (visible: boolean) => void;
-  /** When false (e.g. Clear My Mind), hide Show/Hide Conversation controls. */
-  allowConversationToggle?: boolean;
   onOpenNotifications?: () => void;
   /** Profile return control when opened from My Profile — reusable origin context. */
   profileReturnSlot?: ReactNode;
@@ -58,9 +54,6 @@ export function ExperienceControlsOverlay({
   open,
   onClose,
   roomId,
-  chatVisible,
-  onSetChatVisible,
-  allowConversationToggle = true,
   onOpenNotifications,
   profileReturnSlot,
 }: ExperienceControlsOverlayProps) {
@@ -134,13 +127,6 @@ export function ExperienceControlsOverlay({
   }, []);
 
   if (!open) return null;
-
-  const setConversationVisible = (visible: boolean) => {
-    patchExperienceControlPrefs({
-      conversationVisibility: visible ? "showing" : "hidden",
-    });
-    onSetChatVisible(visible);
-  };
 
   const setPlaceAmbience = (enabled: boolean) => {
     patchExperienceControlPrefs({ estateSoundsEnabled: enabled });
@@ -247,43 +233,6 @@ export function ExperienceControlsOverlay({
         ) : null}
 
         <div className="experience-controls-overlay__scroll">
-          {allowConversationToggle ? (
-            <section className="experience-controls-overlay__section" aria-label="Conversation">
-              <h3 className="experience-controls-overlay__section-title">Conversation</h3>
-              <p className="experience-controls-overlay__status">
-                Conversation: {chatVisible ? "Showing" : "Hidden"}
-              </p>
-              <div className="experience-controls-overlay__row">
-                <button
-                  type="button"
-                  className={
-                    chatVisible
-                      ? "experience-controls-overlay__choice experience-controls-overlay__choice--active"
-                      : "experience-controls-overlay__choice"
-                  }
-                  data-testid="experience-controls-show-conversation"
-                  aria-pressed={chatVisible}
-                  onClick={() => setConversationVisible(true)}
-                >
-                  Show Conversation
-                </button>
-                <button
-                  type="button"
-                  className={
-                    !chatVisible
-                      ? "experience-controls-overlay__choice experience-controls-overlay__choice--active"
-                      : "experience-controls-overlay__choice"
-                  }
-                  data-testid="experience-controls-hide-conversation"
-                  aria-pressed={!chatVisible}
-                  onClick={() => setConversationVisible(false)}
-                >
-                  Hide Conversation
-                </button>
-              </div>
-            </section>
-          ) : null}
-
           <section className="experience-controls-overlay__section" aria-label="Sound">
             <h3 className="experience-controls-overlay__section-title">Sound</h3>
             <p className="experience-controls-overlay__status">

@@ -69,26 +69,16 @@ describe("066 Finalization — workspace-only Creation", () => {
     expect(client).toMatch(
       /ensureSplitBesideChatLayout[\s\S]{0,200}forbidCompanionSidePanelDuringCreation/,
     );
-    expect(client).toMatch(
-      /setEstateRoomChatVisible[\s\S]{0,300}forbidCompanionSidePanelDuringCreation/,
-    );
   });
 
-  it("Show Conversation chip and Experience Controls cannot reopen Creation chat", () => {
+  it("Show Conversation control (chip + Experience Controls toggle) has been fully removed", () => {
     const client = readFileSync(
       resolve(process.cwd(), "app/companion/CompanionPageClient.tsx"),
       "utf8",
     );
-    const chipAt = client.indexOf('data-testid="show-conversation-chip"');
-    expect(chipAt).toBeGreaterThan(0);
-    const beforeChip = client.slice(Math.max(0, chipAt - 800), chipAt);
-    expect(beforeChip).toContain("forbidCompanionSidePanelDuringCreation()");
-    expect(beforeChip).toContain('activeSection !== "create"');
-    const toggleAt = client.indexOf("allowConversationToggle=");
-    expect(toggleAt).toBeGreaterThan(0);
-    const toggleSlice = client.slice(toggleAt, toggleAt + 450);
-    expect(toggleSlice).toContain("forbidCompanionSidePanelDuringCreation()");
-    expect(toggleSlice).toContain('activeSection !== "create"');
+    expect(client).not.toContain('data-testid="show-conversation-chip"');
+    expect(client).not.toContain("allowConversationToggle");
+    expect(client).not.toContain("Show Conversation");
   });
 
   it("createEstateWorkingActive never calls setEstateRoomChatVisible(true)", () => {
