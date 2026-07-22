@@ -125,10 +125,10 @@ describe("Mind Map editing + history", () => {
 });
 
 describe("Cartographer framed maps", () => {
-  it("exposes ten wall maps with only Mind Map interactive", () => {
+  it("exposes ten wall maps, all interactive after guided-builder cartography", () => {
     expect(CARTOGRAPHERS_FRAMED_MAPS).toHaveLength(10);
     const live = CARTOGRAPHERS_FRAMED_MAPS.filter((m) => m.interactive);
-    expect(live).toHaveLength(1);
-    expect(live[0]?.id).toBe("mind-map");
+    expect(live).toHaveLength(10);
+    expect(live.map((m) => m.id)).toContain("mind-map");
   });
 });
