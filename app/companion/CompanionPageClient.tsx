@@ -62,6 +62,9 @@ import {
 } from "@/components/companion/ActiveWorkspaceBar";
 import { FocusAreaPanel } from "@/components/companion/FocusAreaPanel";
 import { FocusMyBrainRoomShell } from "@/components/companion/FocusMyBrainRoomShell";
+import { FocusLibraryRoomShell } from "@/components/companion/FocusLibraryRoomShell";
+import { FocusLibraryPanel } from "@/components/companion/FocusLibraryPanel";
+import { focusWorkflowBackgroundOverride } from "@/lib/supportExperiences/supportExperienceRegistry";
 import {
   CompanionActivitiesPanel,
   EMPTY_ACTIVITY_SESSION,
@@ -3496,14 +3499,26 @@ export default function CompanionPageClient() {
     onEstateSectionChanged(activeSection);
   }, [welcomeHomePrimary, activeSection, preferEverydayConversation]);
 
+  /** Focus Library — own destination layered on the existing "focus" section. */
+  const [focusLibraryActive, setFocusLibraryActive] = useState(false);
+
   // Help Me Right Now is retired — legacy links land on Focus instead.
   useEffect(() => {
     if (activeSection !== "activities") return;
     setActivitySession(EMPTY_ACTIVITY_SESSION);
+    setFocusLibraryActive(false);
     setActiveSection("focus");
     activeSectionRef.current = "focus";
     setActiveNav("focus");
   }, [activeSection]);
+
+  // Focus Library is a distinct destination layered on "focus" — clear it
+  // the moment the member leaves Focus so the plain Focus hub returns next time.
+  useEffect(() => {
+    if (activeSection !== "focus" && focusLibraryActive) {
+      setFocusLibraryActive(false);
+    }
+  }, [activeSection, focusLibraryActive]);
 
   /**
    * Breathe Universal Access destination — not a room.
@@ -9178,6 +9193,17 @@ export default function CompanionPageClient() {
   }
 
   /**
+   * Focus Library — the focus resource collection (music, sounds, guided
+   * focus, timers, saved favorites). Opens on the existing "focus" section
+   * (already a full standalone estate room) with its own component and its
+   * own tea-room background — never Clear My Mind, never a blank page.
+   */
+  function openFocusLibraryCore() {
+    setFocusLibraryActive(true);
+    openStandaloneFocusSectionCore("focus");
+  }
+
+  /**
    * Breathe Universal Access destination (#183).
    * Full-screen scene replaces the current room; workspace stays mounted in memory.
    * Pauses an active focus timer; progress is preserved until resume.
@@ -11363,6 +11389,7 @@ export default function CompanionPageClient() {
         openCalendarItemCore(timeBlockFocusId, "tool");
         break;
       case "activities":
+        setFocusLibraryActive(false);
         openStandaloneFocusSectionCore("focus");
         break;
       case "guided-exercises":
@@ -22833,14 +22860,16 @@ export default function CompanionPageClient() {
     openSectionBesideChatCore(section, undefined, { userInitiated: true });
   }
 
-  const focusSanctuaryFullBleed = isFocusSanctuaryFullBleed(
-    activeSection,
-    activitySession,
-  );
+  const focusSanctuaryFullBleed =
+    isFocusSanctuaryFullBleed(activeSection, activitySession) ||
+    // Guided exercises now always render inside the floating-workflow room
+    // shell (Take a Quiet Moment browse landing included) — see FocusMyBrainRoomShell.
+    activeSection === "guided-exercises";
   const focusWorkflowSanctuary =
     focusSanctuaryFullBleed &&
-    Boolean(activitySession.activityId) &&
-    activitySession.phase !== "browse";
+    (activeSection === "guided-exercises" ||
+      (Boolean(activitySession.activityId) &&
+        activitySession.phase !== "browse"));
 
   const peacefulPlacesChromeActive =
     activeSection === "focus-audio" &&
@@ -25097,7 +25126,13 @@ export default function CompanionPageClient() {
           activitySession.phase !== "browse" &&
           activitySession.activityId &&
           !isGuidedExerciseActivity(activitySession.activityId) ? (
-            <FocusMyBrainRoomShell floatingWorkflow>
+            <FocusMyBrainRoomShell
+              floatingWorkflow
+              backgroundImageOverride={focusWorkflowBackgroundOverride(
+                "focus",
+                activitySession.activityId,
+              )}
+            >
               <CompanionActivitiesPanel
                 sanctuary
                 variant="help-now"
@@ -25116,6 +25151,10 @@ export default function CompanionPageClient() {
                 onDecisionCompassComplete={handleDecisionCompassComplete}
               />
             </FocusMyBrainRoomShell>
+          ) : activeSection === "focus" && focusLibraryActive ? (
+            <FocusLibraryRoomShell>
+              <FocusLibraryPanel onAction={handleFocusHubAction} />
+            </FocusLibraryRoomShell>
           ) : activeSection === "focus" ? (
             <FocusAreaPanel standalone onAction={handleFocusHubAction} />
           ) : null}
@@ -25128,9 +25167,14 @@ export default function CompanionPageClient() {
             />
           )}
 
-          {activeSection === "guided-exercises" &&
-          (focusWorkflowSanctuary ? (
-            <FocusMyBrainRoomShell floatingWorkflow>
+          {activeSection === "guided-exercises" && (
+            <FocusMyBrainRoomShell
+              floatingWorkflow
+              backgroundImageOverride={focusWorkflowBackgroundOverride(
+                "guided-exercises",
+                activitySession.activityId,
+              )}
+            >
               <CompanionActivitiesPanel
                 sanctuary
                 variant="guided"
@@ -25149,24 +25193,7 @@ export default function CompanionPageClient() {
                 onDecisionCompassComplete={handleDecisionCompassComplete}
               />
             </FocusMyBrainRoomShell>
-          ) : (
-            <CompanionActivitiesPanel
-              variant="guided"
-              session={activitySession}
-              onSessionChange={setActivitySession}
-              onOpenBeside={handleActivityOpenBeside}
-              onOpenDecisionCompass={() => openDecisionCompass()}
-              onClose={() => goBack()}
-              registerBack={registerBack}
-              onBeforeActivityStart={pushNavigationRestore}
-              returnToLabel={activityReturnLabel ?? undefined}
-              onExitActivity={handleExitActivity}
-              decisionCompassPrefill={decisionCompassPrefill}
-              decisionCompassSession={decisionCompassSession}
-              onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
-              onDecisionCompassComplete={handleDecisionCompassComplete}
-            />
-          ))}
+          )}
 
           {activeSection === "talk-it-out" && (
             <TalkItOutPanel onBack={goBack} registerBack={registerBack} />
@@ -25813,7 +25840,7 @@ export default function CompanionPageClient() {
         onOpenBoardroom={() => openBoardroomCore()}
         onOpenStrategyLibrary={() => openStrategyLibraryCore()}
         onOpenBreathe={() => openBreatheOverlayCore()}
-        onOpenFocusLibrary={() => openStandaloneFocusSectionCore("focus")}
+        onOpenFocusLibrary={() => openFocusLibraryCore()}
         onOpenFocusTimer={() =>
           openStandaloneFocusSectionCore("focus-timer")
         }

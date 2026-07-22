@@ -10482,6 +10482,128 @@ body:has(.companion-root[data-journal-gazebo-active])
     clamp(1.1rem, 3.4vw, 1.45rem);
 }
 
+/* ── Focus Library room — dedicated tea-room scene, own destination ── */
+.focus-library-room {
+  position: relative;
+  width: 100vw;
+  min-height: 100dvh;
+  min-height: 100svh;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
+}
+
+.focus-library-room__cinematic {
+  z-index: 0;
+}
+
+.focus-library-room__scroll {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.focus-library-room__center {
+  display: flex;
+  min-height: 100dvh;
+  min-height: 100svh;
+  align-items: flex-start;
+  justify-content: center;
+  padding:
+    clamp(1.25rem, 4vh, 2.25rem) clamp(1.25rem, 4.5vw, 2.5rem)
+    clamp(1.75rem, 5vw, 3rem);
+}
+
+.focus-library-room__workspace {
+  width: min(100%, clamp(27.5rem, 90vw, 36rem));
+  max-height: min(72vh, 38rem);
+  overflow-y: auto;
+  padding: clamp(1rem, 3vw, 1.35rem) clamp(1rem, 3.2vw, 1.4rem)
+    clamp(1.1rem, 3.4vw, 1.45rem);
+}
+
+.focus-library-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.focus-library-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.focus-library-panel__title {
+  font-size: clamp(1.35rem, 2.6vw, 1.6rem);
+  font-weight: 600;
+  color: #2f2a22;
+}
+
+.focus-library-panel__intro {
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+  color: #5c5346;
+}
+
+.focus-library-panel__categories {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.focus-library-panel__category {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(120, 100, 70, 0.16);
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.focus-library-panel__category:hover,
+.focus-library-panel__category:focus-visible {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(120, 100, 70, 0.32);
+}
+
+.focus-library-panel__category--static {
+  cursor: default;
+}
+
+.focus-library-panel__category-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.focus-library-panel__category-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.focus-library-panel__category-label {
+  font-weight: 600;
+  color: #2f2a22;
+  font-size: 1rem;
+}
+
+.focus-library-panel__category-desc {
+  font-size: 0.9rem;
+  color: #5c5346;
+}
+
 /* ── Momentum Games panel ── */
 .momentum-games-panel {
   display: flex;
