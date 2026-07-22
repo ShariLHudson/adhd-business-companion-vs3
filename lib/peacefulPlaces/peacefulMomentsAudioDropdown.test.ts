@@ -76,15 +76,17 @@ describe("Peaceful Moments audio dropdown (137–139)", () => {
     expect(panel).not.toContain("journal");
   });
 
-  it("Welcome Home Reflect → Browse more labels Peaceful Moments", () => {
-    const takeAMoment = WELCOME_HOME_NAV_CATEGORIES.find(
+  it("Welcome Home Audio labels Peaceful Moments (Prompt 144)", () => {
+    const audio = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "audio");
+    const peaceful = audio?.destinations.find((d) => d.id === "peaceful-places");
+    expect(peaceful?.label).toBe("Peaceful Moments");
+    const reflect = WELCOME_HOME_NAV_CATEGORIES.find(
       (c) => c.id === "take-a-moment",
     );
-    const browse = takeAMoment?.destinations.find((d) => d.id === "reflect-more");
-    const peaceful = browse?.dropdownChildren?.find(
-      (d) => d.id === "peaceful-places",
-    );
-    expect(peaceful?.label).toBe("Peaceful Moments");
+    const browse = reflect?.destinations.find((d) => d.id === "reflect-more");
+    expect(
+      browse?.dropdownChildren?.some((d) => d.id === "peaceful-places"),
+    ).toBe(false);
   });
 
   it("does not embed Soundscapes ambient tracks in Peaceful Moments", () => {

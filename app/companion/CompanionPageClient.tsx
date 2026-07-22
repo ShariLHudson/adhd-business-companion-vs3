@@ -25600,6 +25600,7 @@ export default function CompanionPageClient() {
         onOpenBreathe={() => openBreatheOverlayCore()}
         onOpenPeacefulPlaces={() => openPeacefulPlacesCore({ animate: true })}
         onOpenSoundscapes={() => setSoundscapeSelectionOpen(true)}
+        onOpenFocusAudio={() => openFocusAudioCore()}
       />
 
       <GlobalOverlayHost>

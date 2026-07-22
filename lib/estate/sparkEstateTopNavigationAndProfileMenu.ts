@@ -86,7 +86,7 @@ export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = REFLECT_FLAT.filter((d) =>
   ["clear-my-mind", "parking-lot", "breathe", "spin-the-wheel"].includes(d.id),
 );
 
-/** Journal / Evidence / Hall — under Reflect → Browse more (139). */
+/** Journal / Evidence / Hall — under Focus & Reflection → Browse more (139 / 144). */
 export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS = REFLECT_FLAT.filter((d) =>
   (WELCOME_HOME_MY_STORY_DESTINATION_IDS as readonly string[]).includes(d.id),
 );

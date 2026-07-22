@@ -1,9 +1,12 @@
 /**
- * Spec 129 — map current app section → Welcome Home destination for active highlight.
+ * Spec 129 / Prompt 144 — map current app section → Welcome Home destination for active highlight.
  */
 
 import type { WelcomeHomeNavDestinationId } from "./welcomeHomeNavigationStructure";
-import { WELCOME_HOME_NAV_CATEGORIES } from "./welcomeHomeNavigationStructure";
+import {
+  WELCOME_HOME_NAV_CATEGORIES,
+  resolveWelcomeHomeDestinationAlias,
+} from "./welcomeHomeNavigationStructure";
 
 const SECTION_TO_DESTINATION: Record<string, WelcomeHomeNavDestinationId> = {
   create: "create",
@@ -23,7 +26,7 @@ const SECTION_TO_DESTINATION: Record<string, WelcomeHomeNavDestinationId> = {
   breathe: "breathe",
   "spin-wheel": "spin-the-wheel",
   "peaceful-places": "peaceful-places",
-  "focus-audio": "peaceful-places",
+  "focus-audio": "focus-audio",
   journal: "journal",
   "growth-journal": "journal",
   "evidence-vault": "evidence-vault",
@@ -48,6 +51,10 @@ function destinationMatches(
   candidateId: string,
 ): boolean {
   if (candidateId === destinationId) return true;
+  const canonical = resolveWelcomeHomeDestinationAlias(
+    candidateId as WelcomeHomeNavDestinationId,
+  );
+  if (canonical === destinationId) return true;
   return false;
 }
 
@@ -55,14 +62,17 @@ export function welcomeHomeCategoryForDestination(
   destinationId: WelcomeHomeNavDestinationId | null | undefined,
 ): string | null {
   if (!destinationId) return null;
+  const resolved = resolveWelcomeHomeDestinationAlias(destinationId);
   for (const category of WELCOME_HOME_NAV_CATEGORIES) {
     for (const dest of category.destinations) {
-      if (destinationMatches(destinationId, dest.id)) {
+      if (destinationMatches(resolved, dest.id) || destinationMatches(destinationId, dest.id)) {
         return category.id;
       }
       if (
-        dest.dropdownChildren?.some((child) =>
-          destinationMatches(destinationId, child.id),
+        dest.dropdownChildren?.some(
+          (child) =>
+            destinationMatches(resolved, child.id) ||
+            destinationMatches(destinationId, child.id),
         )
       ) {
         return category.id;

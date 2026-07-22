@@ -109,12 +109,14 @@ describe("Create polish 129 certification", () => {
     expect(working).toContain("applyRename");
   });
 
-  it("groups Welcome Home as Today / Work to Create / Reflect / Guidance / Estate", () => {
+  it("groups Welcome Home by intention (Prompt 144)", () => {
     const labels = WELCOME_HOME_NAV_CATEGORIES.map((c) => c.label);
     expect(labels).toEqual([
       "Today",
       "Work to Create",
-      "Reflect",
+      "Focus & Reflection",
+      "Audio",
+      "Cartography",
       "Guidance",
       "Estate",
     ]);
@@ -122,6 +124,7 @@ describe("Create polish 129 certification", () => {
     expect(labels).not.toContain("My Day");
     expect(labels).not.toContain("Get Advice");
     expect(labels).not.toContain("Spark Estate");
+    expect(labels).not.toContain("Reflect");
   });
 
   it("maps Create section to active Welcome Home destination", () => {

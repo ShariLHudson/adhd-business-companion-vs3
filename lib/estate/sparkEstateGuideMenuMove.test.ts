@@ -18,6 +18,8 @@ describe("sparkEstateGuideMenuMove (100 / 096)", () => {
       "my-day",
       "my-work",
       "take-a-moment",
+      "audio",
+      "cartography",
       "get-advice",
       "spark-estate",
     ]);

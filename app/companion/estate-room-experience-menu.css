@@ -306,6 +306,23 @@
   outline-offset: 1px;
 }
 
+.estate-room-experience-menu__category-text {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.estate-room-experience-menu__category-subtitle {
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgba(43, 38, 33, 0.62);
+}
+
 .estate-room-experience-menu__category-label {
   line-height: 1.2;
 }

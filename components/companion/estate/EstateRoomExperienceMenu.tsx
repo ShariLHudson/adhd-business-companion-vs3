@@ -10,6 +10,7 @@ import { useIdleChromeReveal } from "@/lib/estate/useIdleChromeReveal";
 import { resolveWanderRoomDisplayName } from "@/lib/estate/manifest/estateWanderMode";
 import {
   WELCOME_HOME_NAV_CATEGORIES,
+  resolveWelcomeHomeDestinationAlias,
   type WelcomeHomeFocusedPanelId,
   type WelcomeHomeNavDropdownId,
   type WelcomeHomeNavDestination,
@@ -17,6 +18,7 @@ import {
   type WelcomeHomeNavDropdownChildId,
 } from "@/lib/estate/welcomeHomeNavigationStructure";
 import { welcomeHomeCategoryForDestination } from "@/lib/estate/welcomeHomeActiveDestination";
+import { isNavLearningModeEnabled } from "@/lib/estate/navLearningMode";
 
 export type EstateRoomExperienceMenuProps = {
   roomId: string;
@@ -71,8 +73,10 @@ export type EstateRoomExperienceMenuProps = {
   onOpenHallOfAccomplishments?: () => void;
   onOpenChamber?: () => void;
   onOpenBoardroom?: () => void;
-  /** Get Advice → Strategy Library (playbook / StrategiesPanel). */
+  /** Work to Create → Strategies (playbook / StrategiesPanel). */
   onOpenStrategyLibrary?: () => void;
+  /** Audio → Focus Audio (when available; falls back to Peaceful Moments). */
+  onOpenFocusAudio?: () => void;
   /** @deprecated Soundscapes open a dedicated selection screen. */
   onPlaySoundscape?: (track: unknown) => void;
   backdropSurface?: "chat" | "clear-my-mind";
@@ -117,6 +121,7 @@ export function EstateRoomExperienceMenu({
   onOpenChamber,
   onOpenBoardroom,
   onOpenStrategyLibrary,
+  onOpenFocusAudio,
   onOpenBreathe,
   onOpenPeacefulPlaces,
   onOpenSoundscapes,
@@ -129,6 +134,7 @@ export function EstateRoomExperienceMenu({
   /** Which My Day nested dropdown is expanded (at most one). */
   const [expandedDropdown, setExpandedDropdown] =
     useState<WelcomeHomeNavDropdownId | null>(null);
+  const [learningMode, setLearningMode] = useState(true);
   const rootRef = useRef<HTMLDivElement>(null);
   const placeDisplayName = resolveWanderRoomDisplayName(roomId);
 
@@ -139,6 +145,14 @@ export function EstateRoomExperienceMenu({
     });
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    setLearningMode(isNavLearningModeEnabled());
+    const sync = () => setLearningMode(isNavLearningModeEnabled());
+    window.addEventListener("companion-nav-learning-mode-updated", sync);
+    return () =>
+      window.removeEventListener("companion-nav-learning-mode-updated", sync);
+  }, []);
 
   useEffect(() => {
     if (faded) setOpen(false);
@@ -192,6 +206,7 @@ export function EstateRoomExperienceMenu({
 
   const destinationAction = useCallback(
     (id: WelcomeHomeNavDestinationId): (() => void) | undefined => {
+      const canonical = resolveWelcomeHomeDestinationAlias(id);
       const map: Record<WelcomeHomeNavDestinationId, (() => void) | undefined> =
         {
           // Parents open shared windows (103–105).
@@ -209,6 +224,10 @@ export function EstateRoomExperienceMenu({
           "spin-the-wheel": onOpenSpinTheWheel,
           "peaceful-places": onOpenPeacefulPlaces,
           soundscapes: onOpenSoundscapes,
+          "nature-sounds": onOpenPeacefulPlaces,
+          "focus-audio": onOpenFocusAudio ?? onOpenPeacefulPlaces,
+          "guided-audio": onOpenSoundscapes,
+          "relaxation-audio": onOpenSoundscapes,
           journal: onOpenJournal,
           "evidence-vault": onOpenEvidenceVault,
           "hall-of-accomplishments": onOpenHallOfAccomplishments,
@@ -221,7 +240,7 @@ export function EstateRoomExperienceMenu({
           "explore-estate": onExploreSpark,
           "spark-estate-guide": onOpenSparkEstateGuide,
         };
-      return map[id];
+      return map[canonical] ?? map[id];
     },
     [
       onOpenAdaptPlanMyDay,
@@ -238,6 +257,7 @@ export function EstateRoomExperienceMenu({
       onOpenSpinTheWheel,
       onOpenPeacefulPlaces,
       onOpenSoundscapes,
+      onOpenFocusAudio,
       onOpenJournal,
       onOpenEvidenceVault,
       onOpenHallOfAccomplishments,
@@ -551,8 +571,18 @@ export function EstateRoomExperienceMenu({
                             openFocusedPanel(category.id);
                           }}
                         >
-                          <span className="estate-room-experience-menu__category-label">
-                            {category.label}
+                          <span className="estate-room-experience-menu__category-text">
+                            <span className="estate-room-experience-menu__category-label">
+                              {category.label}
+                            </span>
+                            {learningMode && category.subtitle ? (
+                              <span
+                                className="estate-room-experience-menu__category-subtitle"
+                                data-testid={`welcome-home-category-subtitle-${category.id}`}
+                              >
+                                {category.subtitle}
+                              </span>
+                            ) : null}
                           </span>
                           <span
                             className="estate-room-experience-menu__category-chevron"
