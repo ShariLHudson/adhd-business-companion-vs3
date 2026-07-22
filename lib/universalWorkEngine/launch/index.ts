@@ -49,3 +49,10 @@ export {
 } from "./naturalLanguageExamples";
 export type { AnywhereNlExample } from "./naturalLanguageExamples";
 export { resolvePlatformIntentViaAnywhereOrigin } from "./bridgePlatformIntent";
+
+/**
+ * 104 — Anywhere-Origin certification (Node/fs) lives under ./certification/
+ * and must NOT be re-exported here. Importing it from this barrel pulls
+ * `node:fs` / `node:path` into the companion client bundle (UnhandledSchemeError).
+ * Cert runners/tests import `@/lib/universalWorkEngine/launch/certification/...` directly.
+ */
