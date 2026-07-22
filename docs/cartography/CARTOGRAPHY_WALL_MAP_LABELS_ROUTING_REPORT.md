@@ -10,6 +10,7 @@
 
 1. **Canonical wall registry** — `lib/cartographersStudio/wallMaps.ts` (`cartographyWallMaps`) owns exact names, row/position order, and builder ids.
 2. **Wall order** — Top: Mind, Decision, Journey, Process, Relationship · Bottom: Timeline Map, Strategy, Opportunity, System, Priority.
+   **Superseded 2026-07-22** — see `docs/cartography/CARTOGRAPHY_WALL_MAP_ORDER_CORRECTION_REPORT.md`: top row corrected to Mind, Decision, **Relationship**, Process, **Journey**.
 3. **System Map** replaces Project Map on the wall (Project Map remains a non-wall Visual Focus mode).
 4. **Always-visible parchment labels** — cream plate, dark teal text, gold border; frame + label share the same open handler.
 5. **Course Launch overlay removed** from the default room — resume lives under Resume Previous Map / My Maps only.

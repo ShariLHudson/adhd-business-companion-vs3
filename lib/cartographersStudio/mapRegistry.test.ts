@@ -39,9 +39,9 @@ describe("Cartography map registry (room completion)", () => {
     expect(wallMapsForRow("top").map((m) => m.name)).toEqual([
       "Mind Map",
       "Decision Map",
-      "Journey Map",
-      "Process Map",
       "Relationship Map",
+      "Process Map",
+      "Journey Map",
     ]);
     expect(wallMapsForRow("bottom").map((m) => m.name)).toEqual([
       "Timeline Map",

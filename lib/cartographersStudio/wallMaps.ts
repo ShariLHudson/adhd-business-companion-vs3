@@ -8,9 +8,9 @@ export type CartographyWallRow = "top" | "bottom";
 export type CartographyWallMapId =
   | "mind-map"
   | "decision-map"
-  | "journey-map"
-  | "process-map"
   | "relationship-map"
+  | "process-map"
+  | "journey-map"
   | "timeline-map"
   | "strategy-map"
   | "opportunity-map"
@@ -27,7 +27,7 @@ export type CartographyWallMap = {
 
 /**
  * Exact wall order (left → right within each row).
- * Top: Mind, Decision, Journey, Process, Relationship
+ * Top: Mind, Decision, Relationship, Process, Journey
  * Bottom: Timeline, Strategy, Opportunity, System, Priority
  */
 export const cartographyWallMaps: readonly CartographyWallMap[] = [
@@ -40,11 +40,11 @@ export const cartographyWallMaps: readonly CartographyWallMap[] = [
     builderType: "decision-map",
   },
   {
-    id: "journey-map",
-    name: "Journey Map",
+    id: "relationship-map",
+    name: "Relationship Map",
     row: "top",
     position: 3,
-    builderType: "journey-map",
+    builderType: "relationship-map",
   },
   {
     id: "process-map",
@@ -54,11 +54,11 @@ export const cartographyWallMaps: readonly CartographyWallMap[] = [
     builderType: "process-map",
   },
   {
-    id: "relationship-map",
-    name: "Relationship Map",
+    id: "journey-map",
+    name: "Journey Map",
     row: "top",
     position: 5,
-    builderType: "relationship-map",
+    builderType: "journey-map",
   },
   {
     id: "timeline-map",
@@ -104,9 +104,9 @@ export const CARTOGRAPHY_WALL_HOTSPOTS: Record<
 > = {
   "mind-map": { left: "22%", top: "18%", width: "14%", height: "16%" },
   "decision-map": { left: "30%", top: "14%", width: "11%", height: "14%" },
-  "journey-map": { left: "42%", top: "14%", width: "11%", height: "14%" },
+  "relationship-map": { left: "42%", top: "14%", width: "11%", height: "14%" },
   "process-map": { left: "54%", top: "14%", width: "11%", height: "14%" },
-  "relationship-map": { left: "66%", top: "14%", width: "11%", height: "14%" },
+  "journey-map": { left: "66%", top: "14%", width: "11%", height: "14%" },
   "timeline-map": { left: "18%", top: "30%", width: "11%", height: "14%" },
   "strategy-map": { left: "30%", top: "30%", width: "11%", height: "14%" },
   "opportunity-map": { left: "42%", top: "30%", width: "11%", height: "14%" },
@@ -141,7 +141,7 @@ export function assertWallMapRegistryComplete(): boolean {
   const bottom = wallMapsForRow("bottom").map((m) => m.name);
   return (
     top.join("|") ===
-      "Mind Map|Decision Map|Journey Map|Process Map|Relationship Map" &&
+      "Mind Map|Decision Map|Relationship Map|Process Map|Journey Map" &&
     bottom.join("|") ===
       "Timeline Map|Strategy Map|Opportunity Map|System Map|Priority Map"
   );
