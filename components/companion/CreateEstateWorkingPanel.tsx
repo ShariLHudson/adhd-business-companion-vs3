@@ -17,8 +17,19 @@ import {
   extractTitleFromDraftContent,
   resolveHumanReadableTitle,
 } from "@/lib/activeWorkspaceRegistry/humanReadableIdentity";
-import { renameActiveWorkspaceTitleDurable } from "@/lib/activeWorkspaceRegistry";
+import {
+  getActiveWorkspace,
+  moveActiveWorkspaceToTrash,
+  renameActiveWorkspaceTitleDurable,
+} from "@/lib/activeWorkspaceRegistry";
 import { CREATE_ONE_FOCUS_PRINCIPLE } from "@/lib/createEstate/copy";
+import { createTitleFromIntent } from "@/lib/createEstate/createTitleFromIntent";
+import {
+  hasMeaningfulCreateEdit,
+  isPostCreateUndoEligible,
+  POST_CREATE_UNDO_HINT,
+  POST_CREATE_UNDO_LABEL,
+} from "@/lib/createEstate/postCreateUndo";
 import { CREATE_RETURN_TO_CREATE } from "@/lib/createGuidedConversation189";
 import type { CreateWorkspacePhase } from "@/lib/createBuild";
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
@@ -104,19 +115,30 @@ export function CreateEstateWorkingPanel({
     resolvedTypeLabel(workflow) ||
     "Creation";
   const isEventWorkspace = workflow.creationWorkspaceKind === "event";
-  // 073 — human-readable work title; never Default * Template / bare "Workshop"
-  // Prefer confirmed selectedTemplateName — never re-mash from section text.
+  // 073 / 130 — human-readable work title from intent, not template names.
+  const intentTitle = createTitleFromIntent({
+    requestText: workflow.originalRequest,
+    artifactType: typeLabel,
+    templateName: workflow.selectedTemplateName,
+  });
   const workspaceTitle = resolveHumanReadableTitle({
-    memberTitle: workflow.selectedTemplateName,
+    memberTitle: intentTitle,
     confirmedFocusTitle: workflow.selectedTemplateName,
     draftTitle: extractTitleFromDraftContent(workflow.draftContent, typeLabel),
     creationType: typeLabel,
-    requestText: null,
+    requestText: workflow.originalRequest,
   });
   const statusLabel = canonicalStatusFromWorkflow(workflow);
   const projectWorthy = isProjectWorthyCreateType(typeLabel);
   const [renaming, setRenaming] = useState(false);
   const [renameDraft, setRenameDraft] = useState(workspaceTitle);
+  const [undoDismissed, setUndoDismissed] = useState(false);
+  const [nowTick, setNowTick] = useState(() => Date.now());
+  const workId =
+    workflow.sessionId?.trim() || workflow.eventRecordId?.trim() || "";
+  const registryCreatedAt = workId
+    ? getActiveWorkspace(workId)?.createdAt ?? null
+    : null;
 
   /** Spec 129 — rename always works; durable by default when parent omits handler. */
   function applyRename(nextTitle: string) {
@@ -236,6 +258,38 @@ export function CreateEstateWorkingPanel({
     return () => registerBack(null);
   }, [registerBack]);
 
+  const meaningfulEdit = hasMeaningfulCreateEdit({
+    draftContent: workflow.draftContent,
+    sectionContent: workflow.sectionContent,
+    discoveryAnswers: workflow.discoveryAnswers,
+  });
+
+  const showUndo =
+    !undoDismissed &&
+    isPostCreateUndoEligible({
+      createdAt: registryCreatedAt,
+      hasMeaningfulEdit: meaningfulEdit,
+      nowMs: nowTick,
+    });
+
+  useEffect(() => {
+    if (!showUndo && undoDismissed) return;
+    if (meaningfulEdit) return;
+    const id = window.setInterval(() => setNowTick(Date.now()), 5000);
+    return () => window.clearInterval(id);
+  }, [showUndo, undoDismissed, meaningfulEdit]);
+
+  function handleUndoCreate() {
+    if (!workId) {
+      setUndoDismissed(true);
+      onBack();
+      return;
+    }
+    moveActiveWorkspaceToTrash(workId);
+    setUndoDismissed(true);
+    onBack();
+  }
+
   return (
     <div
       className="create-estate-working flex h-full min-h-0 max-h-full flex-col overflow-hidden create-estate-working--scroll-host"
@@ -255,6 +309,25 @@ export function CreateEstateWorkingPanel({
             onBack={onBack}
             size="compact"
           />
+
+          {showUndo ? (
+            <div
+              className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#d4cdc3] bg-[#faf7f2] px-3 py-2"
+              data-testid="create-estate-undo-create"
+              role="status"
+            >
+              <p className="text-sm text-[#4b463f]">{POST_CREATE_UNDO_HINT}</p>
+              <button
+                type="button"
+                className="rounded-lg border border-[#cfc6b8] bg-white px-3 py-1.5 text-sm font-semibold text-[#3d3429] hover:bg-[#f3ebe0]"
+                data-testid="create-estate-undo-create-btn"
+                data-primary-action="undo"
+                onClick={handleUndoCreate}
+              >
+                {POST_CREATE_UNDO_LABEL}
+              </button>
+            </div>
+          ) : null}
 
           <div className="mt-1 flex flex-wrap items-start justify-between gap-3">
             <div>

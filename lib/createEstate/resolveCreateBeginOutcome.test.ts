@@ -7,9 +7,11 @@ import {
 import {
   confirmCreateBeginToOpen,
   createBeginOutcomeIsVisible,
+  resolveCatalogCreateConfirm,
   resolveCreateBeginOutcome,
 } from "./resolveCreateBeginOutcome";
 import {
+  createConfirmPrimaryLabel,
   createIntentConfirmMessage,
   createOpenPlanLabel,
   createWorkReadyMessage,
@@ -48,7 +50,7 @@ describe("Create Begin — always one of two outcomes", () => {
     if (outcome.kind === "confirm") {
       expect(outcome.artifactType.toLowerCase()).toMatch(/workshop/);
       expect(outcome.text).toMatch(/workshop/i);
-      expect(outcome.message).toMatch(/sounds like|think a/i);
+      expect(outcome.message).toMatch(/looks like|think a|think an/i);
       expect(["high", "medium"]).toContain(outcome.confidence);
     }
   });
@@ -90,6 +92,14 @@ describe("Create Begin — always one of two outcomes", () => {
     expect(open.kind).toBe("open");
     expect(open.artifactType).toBe(outcome.artifactType);
     expect(open.text).toBe(outcome.text);
+  });
+
+  it("catalog pick → confirm with Create {Type} primary label", () => {
+    const confirm = resolveCatalogCreateConfirm({ label: "Email" });
+    expect(confirm.kind).toBe("confirm");
+    expect(confirm.confidence).toBe("high");
+    expect(createConfirmPrimaryLabel(confirm.artifactType)).toBe("Create Email");
+    expect(confirmCreateBeginToOpen(confirm).kind).toBe("open");
   });
 
   it("member-facing copy never exposes Blueprint / Work Type jargon", () => {

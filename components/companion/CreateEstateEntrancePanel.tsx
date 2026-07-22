@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CreateCatalogPicker } from "@/components/companion/CreateCatalogPicker";
 import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeList";
 import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomShell";
@@ -11,8 +11,8 @@ import {
   CREATE_ESTATE_BEGIN_LABEL,
   CREATE_ESTATE_COMPANY_TEMPLATES_HEADING,
   CREATE_ESTATE_COMPOSER_PLACEHOLDER,
+  CREATE_ESTATE_CONFIRM_CANCEL,
   CREATE_ESTATE_CONFIRM_OTHER,
-  CREATE_ESTATE_CONFIRM_YES,
   CREATE_ESTATE_CONTINUE_EMPTY,
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_GUIDED_FRAMEWORKS_HEADING,
@@ -21,12 +21,14 @@ import {
   CREATE_ESTATE_MORE_WAYS_HINT,
   CREATE_ESTATE_PERSONAL_TEMPLATES_HEADING,
   CREATE_ESTATE_PICKER_HEADING,
+  CREATE_ESTATE_PREVIOUS_WORK_EMPTY,
   CREATE_ESTATE_PREVIOUS_WORK_HEADING,
   CREATE_ESTATE_START_NEW_HEADING,
   CREATE_ESTATE_START_NEW_LABEL,
   CREATE_ESTATE_WINDOW_TITLE,
 } from "@/lib/createEstate/copy";
 import {
+  createConfirmPrimaryLabel,
   createOpenPlanLabel,
   createWorkReadyMessage,
 } from "@/lib/createEstate/createIntentConfirmation";
@@ -38,9 +40,12 @@ import {
 } from "@/lib/createEstate/contextAwareSuggestions";
 import {
   confirmCreateBeginToOpen,
+  resolveCatalogCreateConfirm,
   resolveCreateBeginOutcome,
   type CreateBeginOutcome,
 } from "@/lib/createEstate/resolveCreateBeginOutcome";
+import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
+import { listCreateDraftEntries } from "@/lib/createDraftLibrary";
 import {
   CREATE_BEGIN_PROGRESS_MESSAGE,
 } from "@/lib/primaryActionFeedback";
@@ -94,7 +99,7 @@ export function CreateEstateEntrancePanel({
   onBack,
   registerBack,
   onBeginCreate,
-  onSelectCreationType,
+  onSelectCreationType: _onSelectCreationType,
   onResumeCreationWorkspace,
   onStartSomethingNew,
   onOpenSavedDraft,
@@ -109,6 +114,7 @@ export function CreateEstateEntrancePanel({
   const [activeWorkspaces, setActiveWorkspaces] = useState<
     ActiveCreationWorkspaceSummary[]
   >([]);
+  const [draftCount, setDraftCount] = useState(0);
   const [beginBusy, setBeginBusy] = useState(false);
   const [startNewBusy, setStartNewBusy] = useState(false);
   const [beginFeedback, setBeginFeedback] = useState<string | null>(null);
@@ -132,6 +138,7 @@ export function CreateEstateEntrancePanel({
   const [templateSourceHint, setTemplateSourceHint] = useState<
     "personal" | "company" | null
   >(null);
+  const confirmRegionRef = useRef<HTMLDivElement | null>(null);
 
   const exitDestination = resolveCreateExitDestination(exitOriginHint);
   const suggestionContext = useMemo(
@@ -155,9 +162,50 @@ export function CreateEstateEntrancePanel({
     const list = listActiveCreationWorkspaces();
     setActiveWorkspaces(list);
     setBlueprintWorkTypeId(inferPreferredWorkTypeIdFromActiveWork(list));
+    setDraftCount(listCreateDraftEntries().length);
   }, []);
 
+  useEffect(() => {
+    if (beginFeedbackKind !== "confirm" || !pendingConfirm) return;
+    confirmRegionRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+    const yes = confirmRegionRef.current?.querySelector<HTMLButtonElement>(
+      '[data-testid="create-estate-confirm-yes"]',
+    );
+    yes?.focus();
+  }, [beginFeedbackKind, pendingConfirm]);
+
   const hasWorkspaces = activeWorkspaces.length > 0;
+
+  function showConfirm(
+    outcome: Extract<CreateBeginOutcome, { kind: "confirm" }>,
+  ) {
+    setPendingConfirm(outcome);
+    setBeginFeedback(outcome.message);
+    setBeginFeedbackKind("confirm");
+    setBeginBusy(false);
+  }
+
+  function requestCatalogConfirm(item: CreateCatalogItem) {
+    const resolved = resolveCreateLauncherType(item.label);
+    showConfirm(
+      resolveCatalogCreateConfirm({
+        label: resolved.catalogLabel,
+        requestText: prompt.trim() || null,
+      }),
+    );
+  }
+
+  function requestFrameworkConfirm(label: string) {
+    showConfirm(
+      resolveCatalogCreateConfirm({
+        label,
+        requestText: prompt.trim() || `Open my ${label}`,
+      }),
+    );
+  }
 
   useEffect(() => {
     onRestoreContinuity?.();
@@ -231,12 +279,9 @@ export function CreateEstateEntrancePanel({
       return;
     }
 
-    // Spec 127 — never silently create; confirm inferred type first.
+    // Spec 127 / 130 — never silently create; confirm inferred type first.
     if (outcome.kind === "confirm") {
-      setPendingConfirm(outcome);
-      setBeginFeedback(outcome.message);
-      setBeginFeedbackKind("confirm");
-      setBeginBusy(false);
+      showConfirm(outcome);
       return;
     }
 
@@ -256,6 +301,12 @@ export function CreateEstateEntrancePanel({
       "No problem — tell me a little more about what you'd like to create, or open More Ways to Start below.",
     );
     setBeginFeedbackKind("clarify");
+  }
+
+  function cancelConfirm() {
+    setPendingConfirm(null);
+    setBeginFeedback(null);
+    setBeginFeedbackKind(null);
   }
 
   return (
@@ -386,6 +437,7 @@ export function CreateEstateEntrancePanel({
             ) : null}
             {beginFeedback ? (
               <div
+                ref={confirmRegionRef}
                 role="status"
                 aria-live="polite"
                 className={
@@ -401,8 +453,10 @@ export function CreateEstateEntrancePanel({
                 <p>{beginFeedback}</p>
                 {beginFeedbackKind === "confirm" && pendingConfirm ? (
                   <div
-                    className="mt-3 flex flex-col gap-2 sm:flex-row"
+                    className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap"
                     data-testid="create-estate-intent-confirm"
+                    role="group"
+                    aria-label="Confirm what to create"
                   >
                     <button
                       type="button"
@@ -412,7 +466,7 @@ export function CreateEstateEntrancePanel({
                       data-primary-action="begin"
                       onClick={acceptConfirm}
                     >
-                      {CREATE_ESTATE_CONFIRM_YES}
+                      {createConfirmPrimaryLabel(pendingConfirm.artifactType)}
                     </button>
                     <button
                       type="button"
@@ -422,6 +476,15 @@ export function CreateEstateEntrancePanel({
                       onClick={declineConfirm}
                     >
                       {CREATE_ESTATE_CONFIRM_OTHER}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="rounded-xl px-5 py-2.5 text-sm font-semibold text-[#6b635a] transition hover:underline disabled:opacity-70"
+                      data-testid="create-estate-confirm-cancel"
+                      onClick={cancelConfirm}
+                    >
+                      {CREATE_ESTATE_CONFIRM_CANCEL}
                     </button>
                   </div>
                 ) : null}
@@ -533,23 +596,16 @@ export function CreateEstateEntrancePanel({
                   companionLed
                   openWorkLabel={blueprintOpenLabel}
                   onOpenWork={() => {
+                    // Spec 130 — frameworks still confirm before Work opens.
                     if (pendingOpenOutcome) {
-                      void openConfirmed(pendingOpenOutcome);
+                      requestFrameworkConfirm(pendingOpenOutcome.artifactType);
                       return;
                     }
                     const label =
                       blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
                         ? "Marketing Plan"
                         : "Event Plan";
-                    void openConfirmed({
-                      kind: "open",
-                      text: `Open my ${label}`,
-                      artifactType: label,
-                      isEventDomain:
-                        blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
-                      isMarketingPlanDomain:
-                        blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
-                    });
+                    requestFrameworkConfirm(label);
                   }}
                   onWorkReady={() => {
                     const label =
@@ -593,11 +649,12 @@ export function CreateEstateEntrancePanel({
               </h3>
               <p className="mt-1 text-sm text-[#6b635a]">
                 Optional — explore types if you prefer browsing. You can always
-                describe what you want above instead.
+                describe what you want above instead. Choosing a type asks for
+                confirmation before anything is created.
               </p>
               <div className="mt-3">
                 <CreateCatalogPicker
-                  onSelect={onSelectCreationType}
+                  onSelect={requestCatalogConfirm}
                   suggestionContext={suggestionContext}
                 />
               </div>
@@ -614,12 +671,21 @@ export function CreateEstateEntrancePanel({
                 {CREATE_ESTATE_PREVIOUS_WORK_HEADING}
               </h3>
               <div className="mt-2">
-                <CreateDraftResumeList
-                  onOpen={onOpenSavedDraft}
-                  onRename={onRenameDraft}
-                  onDuplicate={onDuplicateDraft}
-                  onDelete={onDeleteDraft}
-                />
+                {draftCount === 0 ? (
+                  <p
+                    className="text-sm leading-relaxed text-[#6b635a]"
+                    data-testid="create-estate-previous-work-empty"
+                  >
+                    {CREATE_ESTATE_PREVIOUS_WORK_EMPTY}
+                  </p>
+                ) : (
+                  <CreateDraftResumeList
+                    onOpen={onOpenSavedDraft}
+                    onRename={onRenameDraft}
+                    onDuplicate={onDuplicateDraft}
+                    onDelete={onDeleteDraft}
+                  />
+                )}
               </div>
             </section>
           </div>

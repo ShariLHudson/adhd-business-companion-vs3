@@ -38,6 +38,7 @@ import {
   resolveHumanReadableTitle,
   sanitizeMemberFacingTitle,
 } from "./humanReadableIdentity";
+import { createTitleFromIntent } from "@/lib/createEstate/createTitleFromIntent";
 import { workspaceV2Sections } from "@/lib/createWorkspaceSections";
 import { traceWorkspacePersist } from "./workspacePersistTrace";
 import type {
@@ -168,6 +169,7 @@ export function registerCreationDestinationWorkspace(
     draftContent,
   });
   const requestHint = [
+    workflow.originalRequest,
     Object.values(workflow.discoveryAnswers ?? {})
       .filter((v) => v?.trim())
       .join(" "),
@@ -176,14 +178,20 @@ export function registerCreationDestinationWorkspace(
       .slice(0, 2)
       .join(" "),
   ]
-    .filter(Boolean)
+    .filter((v) => typeof v === "string" && v.trim())
     .join(" ")
     .trim();
+  // Spec 130 — prefer intent titles over template/schema display names.
+  const intentTitle = createTitleFromIntent({
+    requestText: workflow.originalRequest || requestHint || null,
+    artifactType: typeLabel,
+    templateName: workflow.selectedTemplateName,
+  });
   const title = resolveHumanReadableTitle({
-    memberTitle: workflow.selectedTemplateName,
+    memberTitle: intentTitle,
     existingTitle: runtime.title,
     draftTitle: extractTitleFromDraftContent(draftContent, typeLabel),
-    requestText: requestHint || null,
+    requestText: workflow.originalRequest || requestHint || null,
     creationType: typeLabel,
   });
 

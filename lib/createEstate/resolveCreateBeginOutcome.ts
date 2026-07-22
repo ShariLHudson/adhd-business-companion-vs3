@@ -21,6 +21,7 @@ import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packag
 import {
   createIntentConfirmMessage,
   createIntentSoftConfirmMessage,
+  humanCreateTypeLabel,
   scoreCreateIntentConfidence,
   type CreateIntentConfidence,
 } from "./createIntentConfirmation";
@@ -102,6 +103,37 @@ export function confirmCreateBeginToOpen(
     artifactType: outcome.artifactType,
     isEventDomain: outcome.isEventDomain,
     isMarketingPlanDomain: outcome.isMarketingPlanDomain,
+  };
+}
+
+/**
+ * Spec 130 — Browse Ideas / Guided Frameworks / recommendations.
+ * Catalog picks still require explicit confirmation before Work exists.
+ */
+export function resolveCatalogCreateConfirm(input: {
+  label: string;
+  /** Optional member wording to preserve for titles */
+  requestText?: string | null;
+}): Extract<CreateBeginOutcome, { kind: "confirm" }> {
+  const label = humanCreateTypeLabel(input.label);
+  const text =
+    input.requestText?.trim() ||
+    `Create a ${label}`;
+  const isMarketingPlanDomain =
+    isMarketingPlanCreationRequest(text) || /marketing\s+plan/i.test(label);
+  const isEventDomain =
+    !isMarketingPlanDomain &&
+    (isEventDomainCreationRequest(text) ||
+      /\b(event|workshop|retreat|webinar|conference)\b/i.test(label));
+
+  return {
+    kind: "confirm",
+    text,
+    artifactType: label,
+    message: createIntentConfirmMessage(label),
+    confidence: "high",
+    isEventDomain,
+    isMarketingPlanDomain,
   };
 }
 

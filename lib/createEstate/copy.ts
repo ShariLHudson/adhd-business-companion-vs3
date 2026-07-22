@@ -47,9 +47,24 @@ export const CREATE_ESTATE_ADVANCED_HINT = CREATE_ESTATE_GUIDED_FRAMEWORKS_HINT;
 /** Active Creation Workspaces (056 / 127 / 129) — unified resume. */
 export const CREATE_ESTATE_CONTINUE_HEADING = "Continue Working";
 
-/** Spec 127 — confirmation CTA labels. */
+/**
+ * Spec 127 / 130 — confirmation CTA labels.
+ * Primary label is dynamic via createConfirmPrimaryLabel (Create Blog Post).
+ */
 export const CREATE_ESTATE_CONFIRM_YES = "Yes, let's begin";
 export const CREATE_ESTATE_CONFIRM_OTHER = "Choose something else";
+export const CREATE_ESTATE_CONFIRM_CANCEL = "Cancel";
+
+/** Spec 130 — Manage My Work (Continue Working cleanup). */
+export const CREATE_ESTATE_MANAGE_WORK_LABEL = "Manage My Work";
+export const CREATE_ESTATE_MANAGE_WORK_DONE = "Done managing";
+export const CREATE_ESTATE_MANAGE_ARCHIVE = "Archive";
+export const CREATE_ESTATE_MANAGE_TRASH = "Move to Trash";
+export const CREATE_ESTATE_MANAGE_RESTORE = "Restore";
+export const CREATE_ESTATE_MANAGE_DELETE = "Delete permanently";
+export const CREATE_ESTATE_MANAGE_RECOVERABLE_HEADING = "Archived & Trash";
+export const CREATE_ESTATE_MANAGE_SELECT_HINT =
+  "Select work to archive, move to Trash, restore, or delete permanently.";
 
 /**
  * When active work exists — force-new under Start Something New.
@@ -74,4 +89,10 @@ export const CREATE_ESTATE_COMPOSER_PLACEHOLDER =
 export const CREATE_ESTATE_BEGIN_LABEL = "Begin";
 
 export const CREATE_ESTATE_CONTINUE_EMPTY =
-  "When you start something, Spark will keep it here for you. Just tell Shari what you want to create above.";
+  "Nothing in progress yet. Tell Shari what you want to create above — Begin will confirm the type, then your work will live here so you can continue anytime.";
+
+/** Spec 130 — Previous Work empty state teaches instead of blank. */
+export const CREATE_ESTATE_PREVIOUS_WORK_EMPTY =
+  "No older drafts here yet. When you save a document draft, it will appear here so you can reopen, rename, or clear it. Most people start with Start Something New above.";
+
+export const CREATE_ESTATE_UNDO_CREATE_LABEL = "Undo create";

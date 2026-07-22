@@ -1,6 +1,7 @@
 /**
- * Spec 127 — Create Experience Simplification.
+ * Spec 127 / 130 — Create Experience Simplification.
  * Intent confirmation before Work creation. Never silently mint the wrong type.
+ * One Creation Rule™ — every path confirms before Work exists.
  */
 
 export type CreateIntentConfidence = "high" | "medium" | "low";
@@ -17,16 +18,24 @@ export function humanCreateTypeLabel(artifactType: string): string {
     .trim() || "plan";
 }
 
-/** Shari confirmation — high confidence. */
+/** Shari confirmation — high confidence (130 wording). */
 export function createIntentConfirmMessage(artifactType: string): string {
   const label = humanCreateTypeLabel(artifactType);
-  return `It sounds like you'd like to create a ${label}. Does that sound right?`;
+  const article = /^[aeiou]/i.test(label) ? "an" : "a";
+  return `It looks like you'd like to create ${article} ${label}.`;
 }
 
 /** Soft confirm when match is plausible but not ironclad. */
 export function createIntentSoftConfirmMessage(artifactType: string): string {
   const label = humanCreateTypeLabel(artifactType);
-  return `I think a ${label} fits what you described — shall we start there?`;
+  const article = /^[aeiou]/i.test(label) ? "an" : "a";
+  return `I think ${article} ${label} fits what you described — shall we start there?`;
+}
+
+/** Primary confirm CTA — Create Blog Post / Create Marketing Plan. */
+export function createConfirmPrimaryLabel(artifactType: string): string {
+  const label = humanCreateTypeLabel(artifactType);
+  return `Create ${label}`;
 }
 
 export function createOpenPlanLabel(artifactType: string): string {
