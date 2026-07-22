@@ -76,10 +76,14 @@ export type WelcomeHomeNavCategory = {
 };
 
 /** Five intent categories — depth two, or three when a My Day dropdown expands. */
+/**
+ * Spec 129 — Today / Create / Reflect / Guidance / Estate style grouping.
+ * Category ids stay stable for routing; member-facing labels use the simpler names.
+ */
 export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   {
     id: "my-day",
-    label: "My Day",
+    label: "Today",
     destinations: [
       {
         id: "adapt-plan-my-day",
@@ -102,7 +106,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   },
   {
     id: "my-work",
-    label: "My Work",
+    label: "Create",
     destinations: [
       { id: "create", label: "Create" },
       { id: "projects", label: "Projects" },
@@ -116,7 +120,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   },
   {
     id: "take-a-moment",
-    label: "Take a Moment",
+    label: "Reflect",
     destinations: [
       {
         id: "talk-it-out",
@@ -151,7 +155,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   },
   {
     id: "get-advice",
-    label: "Get Advice",
+    label: "Guidance",
     destinations: [
       { id: "chamber-of-momentum", label: "Chamber of Momentum" },
       { id: "boardroom", label: "Boardroom" },
@@ -160,7 +164,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   },
   {
     id: "spark-estate",
-    label: "Spark Estate",
+    label: "Estate",
     destinations: [
       { id: "wander-the-grounds", label: "Wander the Grounds" },
       { id: "spark-estate-guide", label: "Spark Estate Guide" },

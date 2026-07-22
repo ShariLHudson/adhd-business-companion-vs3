@@ -11,6 +11,7 @@ import {
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_EXPLANATION,
   CREATE_ESTATE_HOW_DO_I,
+  CREATE_ESTATE_MORE_WAYS_HEADING,
   CREATE_ESTATE_PICKER_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
   CREATE_VS_PROJECTS_CUE,
@@ -52,22 +53,24 @@ describe("My Work → Create navigation (116 / 149)", () => {
     expect(client).toContain("resolveCreateLauncherType");
   });
 
-  it("CreateEstateEntrancePanel shows picker + continue (no Browse / Start With)", () => {
+  it("CreateEstateEntrancePanel shows More Ways + continue (no Browse / Start With)", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-entrance");
     expect(panel).toContain("create-estate-intent-confirm");
-    expect(panel).toContain("create-estate-advanced");
+    expect(panel).toContain("create-estate-more-ways");
     expect(panel).toContain("CreateCatalogPicker");
     expect(panel).toContain("CreateDraftResumeList");
     expect(panel).toContain("CREATE_ESTATE_PICKER_HEADING");
     expect(panel).toContain("CREATE_ESTATE_CONTINUE_HEADING");
+    expect(panel).toContain("CREATE_ESTATE_MORE_WAYS_HEADING");
     expect(panel).toContain("companionLed");
     expect(panel).not.toContain("CREATE_ESTATE_START_CHOICES");
     expect(panel).not.toContain("Browse things I can create");
     expect(panel).not.toContain("Start with what I need");
     expect(panel).not.toContain("Start with a Blueprint");
     expect(CREATE_ESTATE_WINDOW_TITLE).toBe("Create");
-    expect(CREATE_ESTATE_PICKER_HEADING).toBe("Browse for inspiration");
+    expect(CREATE_ESTATE_PICKER_HEADING).toBe("Browse Ideas");
+    expect(CREATE_ESTATE_MORE_WAYS_HEADING).toBe("More Ways to Start (Optional)");
     expect(CREATE_ESTATE_CONTINUE_HEADING).toBe("Continue Working");
     expect(CREATE_ESTATE_EXPLANATION).toMatch(/create/i);
     expect(CREATE_VS_PROJECTS_CUE).toMatch(/Projects organize/i);
@@ -98,7 +101,7 @@ describe("My Work → Create navigation (116 / 149)", () => {
     expect(panel).not.toContain("create-estate-browse-strategy");
     expect(panel).not.toContain("onOpenStrategyCreate");
     expect(client).not.toContain("onOpenStrategyCreate");
-    expect(CREATE_ESTATE_HOW_DO_I).toMatch(/Get Advice/i);
+    expect(CREATE_ESTATE_HOW_DO_I).toMatch(/Guidance/i);
     expect(CREATE_ESTATE_HOW_DO_I).toMatch(/Strategy Library/i);
   });
 });

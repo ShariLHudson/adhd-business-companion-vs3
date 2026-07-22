@@ -17,8 +17,9 @@ import {
   extractTitleFromDraftContent,
   resolveHumanReadableTitle,
 } from "@/lib/activeWorkspaceRegistry/humanReadableIdentity";
+import { renameActiveWorkspaceTitleDurable } from "@/lib/activeWorkspaceRegistry";
 import { CREATE_ONE_FOCUS_PRINCIPLE } from "@/lib/createEstate/copy";
-import { CREATE_BACK_TO_FOCUS_DESTINATION } from "@/lib/createGuidedConversation189";
+import { CREATE_RETURN_TO_CREATE } from "@/lib/createGuidedConversation189";
 import type { CreateWorkspacePhase } from "@/lib/createBuild";
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { isProjectWorthyCreateType } from "@/lib/createProjects/canonicalWorkRecord";
@@ -116,6 +117,27 @@ export function CreateEstateWorkingPanel({
   const projectWorthy = isProjectWorthyCreateType(typeLabel);
   const [renaming, setRenaming] = useState(false);
   const [renameDraft, setRenameDraft] = useState(workspaceTitle);
+
+  /** Spec 129 — rename always works; durable by default when parent omits handler. */
+  function applyRename(nextTitle: string) {
+    const next = nextTitle.trim();
+    if (!next) return;
+    if (onRenameTitle) {
+      onRenameTitle(next);
+      return;
+    }
+    const workId = workflow.sessionId || workflow.eventRecordId || "";
+    if (!workId) return;
+    void renameActiveWorkspaceTitleDurable(workId, next, workflow).then(
+      (result) => {
+        if (!result.ok) return;
+        onWorkflowChange({
+          ...workflow,
+          selectedTemplateName: result.entry.title,
+        });
+      },
+    );
+  }
   /** 076_017 — brief durable ack only after verified save (never LS-only). */
   const [lastDurableOk, setLastDurableOk] = useState<boolean | null>(null);
   const wasSubmittingRef = useRef(false);
@@ -229,7 +251,7 @@ export function CreateEstateWorkingPanel({
           data-testid="create-estate-working-panel"
         >
           <AppBackButton
-            destination={CREATE_BACK_TO_FOCUS_DESTINATION}
+            destination={CREATE_RETURN_TO_CREATE}
             onBack={onBack}
             size="compact"
           />
@@ -242,10 +264,7 @@ export function CreateEstateWorkingPanel({
                     className="flex flex-wrap items-center gap-2"
                     onSubmit={(e) => {
                       e.preventDefault();
-                      const next = renameDraft.trim();
-                      if (next && onRenameTitle) {
-                        onRenameTitle(next);
-                      }
+                      applyRename(renameDraft);
                       setRenaming(false);
                     }}
                   >
@@ -273,15 +292,21 @@ export function CreateEstateWorkingPanel({
                     </button>
                   </form>
                 ) : (
-                  <h1
-                    className="plan-day-morning-note__title"
+                  <button
+                    type="button"
+                    className="plan-day-morning-note__title text-left hover:underline"
                     data-testid="create-estate-working-title"
                     data-creation-workspace={
                       isEventWorkspace ? "event" : "create"
                     }
+                    aria-label={`Rename ${workspaceTitle}`}
+                    onClick={() => {
+                      setRenameDraft(workspaceTitle);
+                      setRenaming(true);
+                    }}
                   >
                     {workspaceTitle}
-                  </h1>
+                  </button>
                 )}
               </div>
               <p
@@ -325,14 +350,10 @@ export function CreateEstateWorkingPanel({
           <CreateWorkCommandToolbar
             workflow={workflow}
             onWorkflowChange={onWorkflowChange}
-            onRename={
-              onRenameTitle
-                ? () => {
-                    setRenameDraft(workspaceTitle);
-                    setRenaming(true);
-                  }
-                : undefined
-            }
+            onRename={() => {
+              setRenameDraft(workspaceTitle);
+              setRenaming(true);
+            }}
             onSave={() => {
               // Durable save path is Current Focus Save — surface it.
               document

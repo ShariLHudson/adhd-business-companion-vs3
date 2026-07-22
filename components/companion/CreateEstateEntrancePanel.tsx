@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CreateCatalogPicker } from "@/components/companion/CreateCatalogPicker";
 import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeList";
 import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomShell";
@@ -8,22 +8,23 @@ import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspac
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import { UniversalBlueprintInterface } from "@/components/companion/universalBlueprint";
 import {
-  CREATE_ESTATE_ACTIVE_CHOICE_HEADING,
-  CREATE_ESTATE_ADVANCED_HEADING,
-  CREATE_ESTATE_ADVANCED_HINT,
   CREATE_ESTATE_BEGIN_LABEL,
+  CREATE_ESTATE_COMPANY_TEMPLATES_HEADING,
   CREATE_ESTATE_COMPOSER_PLACEHOLDER,
   CREATE_ESTATE_CONFIRM_OTHER,
   CREATE_ESTATE_CONFIRM_YES,
   CREATE_ESTATE_CONTINUE_EMPTY,
   CREATE_ESTATE_CONTINUE_HEADING,
-  CREATE_ESTATE_DRAFTS_HEADING,
-  CREATE_ESTATE_EXPLANATION,
+  CREATE_ESTATE_GUIDED_FRAMEWORKS_HEADING,
+  CREATE_ESTATE_GUIDED_FRAMEWORKS_HINT,
+  CREATE_ESTATE_MORE_WAYS_HEADING,
+  CREATE_ESTATE_MORE_WAYS_HINT,
+  CREATE_ESTATE_PERSONAL_TEMPLATES_HEADING,
   CREATE_ESTATE_PICKER_HEADING,
+  CREATE_ESTATE_PREVIOUS_WORK_HEADING,
+  CREATE_ESTATE_START_NEW_HEADING,
   CREATE_ESTATE_START_NEW_LABEL,
   CREATE_ESTATE_WINDOW_TITLE,
-  CREATE_VS_PROJECTS_CUE,
-  createEstateContinueCurrentLabel,
 } from "@/lib/createEstate/copy";
 import {
   createOpenPlanLabel,
@@ -31,6 +32,10 @@ import {
 } from "@/lib/createEstate/createIntentConfirmation";
 import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
+import {
+  inferPreferredWorkTypeIdFromActiveWork,
+  resolveSuggestionContext,
+} from "@/lib/createEstate/contextAwareSuggestions";
 import {
   confirmCreateBeginToOpen,
   resolveCreateBeginOutcome,
@@ -40,8 +45,8 @@ import {
   CREATE_BEGIN_PROGRESS_MESSAGE,
 } from "@/lib/primaryActionFeedback";
 import {
-  CREATE_BACK_TO_FOCUS_DESTINATION,
   CREATE_GUIDED_SUPPORT_LINE,
+  resolveCreateExitDestination,
 } from "@/lib/createGuidedConversation189";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
@@ -71,15 +76,19 @@ type Props = {
   onStartSomethingNew: () => void | Promise<void>;
   onOpenSavedDraft: (id: string) => void;
   onRenameDraft: (id: string, title: string) => void;
+  /** Spec 129 — rename active Work; syncs registry + durable store. */
+  onRenameWorkspace?: (id: string, title: string) => void | Promise<void>;
   onDuplicateDraft: (id: string) => void;
   onDeleteDraft: (id: string) => void;
   /** Sprint 2 — restore Workspace after refresh / return */
   onRestoreContinuity?: () => void;
+  /** Optional origin hint for exit label (Welcome Home vs My Focus). */
+  exitOriginHint?: string | null;
 };
 
 /**
- * Welcome Home → My Work → Create (056)
- * Conversational entry primary · categories optional · workspaces to continue.
+ * Welcome Home → Create (056 / 127 / 129)
+ * Hierarchy: Continue Working → Start Something New → More Ways (collapsed).
  */
 export function CreateEstateEntrancePanel({
   onBack,
@@ -90,9 +99,11 @@ export function CreateEstateEntrancePanel({
   onStartSomethingNew,
   onOpenSavedDraft,
   onRenameDraft,
+  onRenameWorkspace,
   onDuplicateDraft,
   onDeleteDraft,
   onRestoreContinuity,
+  exitOriginHint,
 }: Props) {
   const [prompt, setPrompt] = useState("");
   const [activeWorkspaces, setActiveWorkspaces] = useState<
@@ -108,7 +119,7 @@ export function CreateEstateEntrancePanel({
     CreateBeginOutcome,
     { kind: "confirm" }
   > | null>(null);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [moreWaysOpen, setMoreWaysOpen] = useState(false);
   const [blueprintWorkAck, setBlueprintWorkAck] = useState<string | null>(null);
   const [blueprintOpenLabel, setBlueprintOpenLabel] = useState("Open My Plan");
   const [pendingOpenOutcome, setPendingOpenOutcome] = useState<Extract<
@@ -117,6 +128,15 @@ export function CreateEstateEntrancePanel({
   > | null>(null);
   const [blueprintWorkTypeId, setBlueprintWorkTypeId] = useState<string>(
     EVENT_PLAN_WORK_TYPE_ID,
+  );
+  const [templateSourceHint, setTemplateSourceHint] = useState<
+    "personal" | "company" | null
+  >(null);
+
+  const exitDestination = resolveCreateExitDestination(exitOriginHint);
+  const suggestionContext = useMemo(
+    () => resolveSuggestionContext(activeWorkspaces),
+    [activeWorkspaces],
   );
 
   useDismissibleWindow({
@@ -132,11 +152,12 @@ export function CreateEstateEntrancePanel({
   }, [registerBack]);
 
   useEffect(() => {
-    setActiveWorkspaces(listActiveCreationWorkspaces());
+    const list = listActiveCreationWorkspaces();
+    setActiveWorkspaces(list);
+    setBlueprintWorkTypeId(inferPreferredWorkTypeIdFromActiveWork(list));
   }, []);
 
   const hasWorkspaces = activeWorkspaces.length > 0;
-  const mostRecent = activeWorkspaces[0] ?? null;
 
   useEffect(() => {
     onRestoreContinuity?.();
@@ -232,7 +253,7 @@ export function CreateEstateEntrancePanel({
   function declineConfirm() {
     setPendingConfirm(null);
     setBeginFeedback(
-      "No problem — tell me a little more about what you'd like to create, or pick another direction below.",
+      "No problem — tell me a little more about what you'd like to create, or open More Ways to Start below.",
     );
     setBeginFeedbackKind("clarify");
   }
@@ -244,7 +265,7 @@ export function CreateEstateEntrancePanel({
         data-testid="create-estate-entrance"
       >
         <AppBackButton
-          destination={CREATE_BACK_TO_FOCUS_DESTINATION}
+          destination={exitDestination}
           onBack={onBack}
           size="compact"
         />
@@ -262,71 +283,46 @@ export function CreateEstateEntrancePanel({
         >
           {CREATE_GUIDED_SUPPORT_LINE}
         </p>
-        <p
-          className="max-w-xl text-sm leading-relaxed text-[#6b635a]"
-          data-testid="create-vs-projects-cue"
-        >
-          {CREATE_VS_PROJECTS_CUE}
-        </p>
-        <p className="sr-only" data-testid="create-estate-legacy-explanation">
-          {CREATE_ESTATE_EXPLANATION}
-        </p>
 
-        {mostRecent ? (
-          <section
-            className="mt-4 flex max-w-2xl flex-col gap-3 rounded-2xl border border-[#e7dfd4] bg-white/80 px-4 py-4"
-            data-testid="create-estate-active-choice"
-            aria-labelledby="create-estate-active-choice-heading"
-          >
-            <h2
-              id="create-estate-active-choice-heading"
-              className="text-lg font-semibold text-[#1f1c19]"
-            >
-              {CREATE_ESTATE_ACTIVE_CHOICE_HEADING}
-            </h2>
-            <p className="text-sm leading-relaxed text-[#6b635a]">
-              You already have work in motion. Continue it, or start a separate
-              new creation.
-            </p>
-            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-              <button
-                type="button"
-                onClick={() => onResumeCreationWorkspace(mostRecent)}
-                className="rounded-xl bg-[#3d3429] px-5 py-3 text-base font-semibold text-[#f7f2ea] transition hover:bg-[#2c241c]"
-                data-testid="create-estate-continue-current"
-              >
-                {createEstateContinueCurrentLabel(mostRecent.title)}
-              </button>
-              <button
-                type="button"
-                disabled={startNewBusy || beginBusy}
-                aria-busy={startNewBusy}
-                onClick={() => {
-                  setStartNewBusy(true);
-                  void (async () => {
-                    try {
-                      await Promise.resolve(onStartSomethingNew());
-                    } finally {
-                      setStartNewBusy(false);
-                    }
-                  })();
-                }}
-                className="rounded-xl border border-[#cfc6b8] bg-[#faf7f2] px-5 py-3 text-base font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
-                data-testid="create-estate-start-new"
-              >
-                {startNewBusy ? "Starting…" : CREATE_ESTATE_START_NEW_LABEL}
-              </button>
-            </div>
-          </section>
-        ) : null}
-
+        {/* 1 — Continue Working (one resume path) */}
         <section
-          className="mt-4 flex flex-col gap-3"
+          className="mt-4"
+          data-testid="create-estate-continue"
+          aria-labelledby="create-estate-continue-heading"
+        >
+          <h2
+            id="create-estate-continue-heading"
+            className="text-lg font-semibold text-[#1f1c19]"
+          >
+            {CREATE_ESTATE_CONTINUE_HEADING}
+          </h2>
+          <div className="mt-3">
+            <CreateWorkspaceResumeList
+              onResume={onResumeCreationWorkspace}
+              onRename={onRenameWorkspace ?? undefined}
+            />
+          </div>
+          {!hasWorkspaces ? (
+            <p
+              className="mt-3 text-sm text-[#6b635a]"
+              data-testid="create-estate-continue-empty"
+            >
+              {CREATE_ESTATE_CONTINUE_EMPTY}
+            </p>
+          ) : null}
+        </section>
+
+        {/* 2 — Start Something New */}
+        <section
+          className="mt-6 flex flex-col gap-3"
           data-testid="create-estate-composer"
           aria-labelledby="create-estate-composer-heading"
         >
-          <h2 id="create-estate-composer-heading" className="sr-only">
-            What do you want to create?
+          <h2
+            id="create-estate-composer-heading"
+            className="text-lg font-semibold text-[#1f1c19]"
+          >
+            {CREATE_ESTATE_START_NEW_HEADING}
           </h2>
           <textarea
             value={prompt}
@@ -367,6 +363,27 @@ export function CreateEstateEntrancePanel({
             >
               {beginBusy ? "Beginning…" : CREATE_ESTATE_BEGIN_LABEL}
             </button>
+            {hasWorkspaces ? (
+              <button
+                type="button"
+                disabled={startNewBusy || beginBusy}
+                aria-busy={startNewBusy}
+                onClick={() => {
+                  setStartNewBusy(true);
+                  void (async () => {
+                    try {
+                      await Promise.resolve(onStartSomethingNew());
+                    } finally {
+                      setStartNewBusy(false);
+                    }
+                  })();
+                }}
+                className="text-sm font-semibold text-[#1e4f4f] hover:underline disabled:opacity-70"
+                data-testid="create-estate-start-new"
+              >
+                {startNewBusy ? "Starting…" : CREATE_ESTATE_START_NEW_LABEL}
+              </button>
+            ) : null}
             {beginFeedback ? (
               <div
                 role="status"
@@ -413,37 +430,189 @@ export function CreateEstateEntrancePanel({
           </div>
         </section>
 
-        <section
-          className="mt-6"
-          data-testid="create-estate-continue"
-          aria-labelledby="create-estate-continue-heading"
+        {/* 3 — More Ways to Start (Optional) — advanced tools collapsed */}
+        <details
+          className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
+          data-testid="create-estate-more-ways"
+          open={moreWaysOpen}
+          onToggle={(e) =>
+            setMoreWaysOpen((e.target as HTMLDetailsElement).open)
+          }
         >
-          <h2
-            id="create-estate-continue-heading"
-            className="text-lg font-semibold text-[#1f1c19]"
-          >
-            {CREATE_ESTATE_CONTINUE_HEADING}
-          </h2>
-          <div className="mt-3">
-            <CreateWorkspaceResumeList onResume={onResumeCreationWorkspace} />
-          </div>
-          {!hasWorkspaces ? (
-            <p
-              className="mt-3 text-sm text-[#6b635a]"
-              data-testid="create-estate-continue-empty"
+          <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
+            {CREATE_ESTATE_MORE_WAYS_HEADING}
+          </summary>
+          <p className="mt-2 text-sm text-[#6b635a]">
+            {CREATE_ESTATE_MORE_WAYS_HINT}
+          </p>
+
+          <div className="mt-4 flex flex-col gap-5">
+            <section
+              data-testid="create-estate-guided-frameworks"
+              aria-labelledby="create-estate-guided-heading"
             >
-              {CREATE_ESTATE_CONTINUE_EMPTY}
-            </p>
-          ) : null}
-          {/* P0-006 — one resume story; drafts only when no Creation Workspaces */}
-          {!hasWorkspaces ? (
-            <details
-              className="mt-5 max-w-2xl rounded-xl border border-[#e7dfd4] bg-white/50 px-3 py-2"
-              data-testid="create-estate-drafts"
+              <h3
+                id="create-estate-guided-heading"
+                className="text-base font-semibold text-[#1f1c19]"
+              >
+                {CREATE_ESTATE_GUIDED_FRAMEWORKS_HEADING}
+              </h3>
+              <p className="mt-1 text-sm text-[#6b635a]">
+                {CREATE_ESTATE_GUIDED_FRAMEWORKS_HINT}
+              </p>
+              <div
+                className="mt-3 flex flex-wrap gap-2"
+                role="group"
+                aria-label="Kind of plan"
+              >
+                <button
+                  type="button"
+                  className={`rounded-full px-3 py-1.5 text-sm ${
+                    blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID
+                      ? "bg-[#1e4f4f] text-white"
+                      : "bg-[#f4efe7] text-[#1f1c19]"
+                  }`}
+                  aria-pressed={blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID}
+                  onClick={() => setBlueprintWorkTypeId(EVENT_PLAN_WORK_TYPE_ID)}
+                >
+                  Event Plan
+                </button>
+                <button
+                  type="button"
+                  className={`rounded-full px-3 py-1.5 text-sm ${
+                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
+                      ? "bg-[#1e4f4f] text-white"
+                      : "bg-[#f4efe7] text-[#1f1c19]"
+                  }`}
+                  aria-pressed={
+                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
+                  }
+                  data-testid="create-estate-blueprint-marketing"
+                  onClick={() =>
+                    setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID)
+                  }
+                >
+                  Marketing Plan
+                </button>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className={`rounded-full px-3 py-1.5 text-sm ${
+                    templateSourceHint === "personal"
+                      ? "bg-[#3d3429] text-[#f7f2ea]"
+                      : "border border-[#cfc6b8] bg-white text-[#3d3429]"
+                  }`}
+                  data-testid="create-estate-personal-templates"
+                  onClick={() => setTemplateSourceHint("personal")}
+                >
+                  {CREATE_ESTATE_PERSONAL_TEMPLATES_HEADING}
+                </button>
+                <button
+                  type="button"
+                  className={`rounded-full px-3 py-1.5 text-sm ${
+                    templateSourceHint === "company"
+                      ? "bg-[#3d3429] text-[#f7f2ea]"
+                      : "border border-[#cfc6b8] bg-white text-[#3d3429]"
+                  }`}
+                  data-testid="create-estate-company-templates"
+                  onClick={() => setTemplateSourceHint("company")}
+                >
+                  {CREATE_ESTATE_COMPANY_TEMPLATES_HEADING}
+                </button>
+              </div>
+              {templateSourceHint ? (
+                <p className="mt-2 text-sm text-[#6b635a]" role="status">
+                  Showing {templateSourceHint === "personal" ? "personal" : "company"}{" "}
+                  structures when available for this kind of work.
+                </p>
+              ) : null}
+              <div className="mt-3">
+                <UniversalBlueprintInterface
+                  workTypeId={blueprintWorkTypeId}
+                  companionLed
+                  openWorkLabel={blueprintOpenLabel}
+                  onOpenWork={() => {
+                    if (pendingOpenOutcome) {
+                      void openConfirmed(pendingOpenOutcome);
+                      return;
+                    }
+                    const label =
+                      blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
+                        ? "Marketing Plan"
+                        : "Event Plan";
+                    void openConfirmed({
+                      kind: "open",
+                      text: `Open my ${label}`,
+                      artifactType: label,
+                      isEventDomain:
+                        blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
+                      isMarketingPlanDomain:
+                        blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
+                    });
+                  }}
+                  onWorkReady={() => {
+                    const label =
+                      blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
+                        ? "Marketing Plan"
+                        : "Event Plan";
+                    setBlueprintOpenLabel(createOpenPlanLabel(label));
+                    setBlueprintWorkAck(createWorkReadyMessage(label));
+                    setPendingOpenOutcome({
+                      kind: "open",
+                      text: prompt.trim() || `Continue my ${label}`,
+                      artifactType: label,
+                      isEventDomain:
+                        blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
+                      isMarketingPlanDomain:
+                        blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
+                    });
+                  }}
+                />
+              </div>
+              {blueprintWorkAck ? (
+                <p
+                  className="mt-3 text-sm text-[#1e4f4f]"
+                  data-testid="create-estate-blueprint-work-ack"
+                  role="status"
+                >
+                  {blueprintWorkAck}
+                </p>
+              ) : null}
+            </section>
+
+            <section
+              data-testid="create-estate-picker"
+              aria-labelledby="create-estate-picker-heading"
             >
-              <summary className="cursor-pointer text-sm font-semibold uppercase tracking-wide text-[#9a8f82]">
-                {CREATE_ESTATE_DRAFTS_HEADING}
-              </summary>
+              <h3
+                id="create-estate-picker-heading"
+                className="text-base font-semibold text-[#1f1c19]"
+              >
+                {CREATE_ESTATE_PICKER_HEADING}
+              </h3>
+              <p className="mt-1 text-sm text-[#6b635a]">
+                Optional — explore types if you prefer browsing. You can always
+                describe what you want above instead.
+              </p>
+              <div className="mt-3">
+                <CreateCatalogPicker
+                  onSelect={onSelectCreationType}
+                  suggestionContext={suggestionContext}
+                />
+              </div>
+            </section>
+
+            <section
+              data-testid="create-estate-previous-work"
+              aria-labelledby="create-estate-previous-work-heading"
+            >
+              <h3
+                id="create-estate-previous-work-heading"
+                className="text-base font-semibold text-[#1f1c19]"
+              >
+                {CREATE_ESTATE_PREVIOUS_WORK_HEADING}
+              </h3>
               <div className="mt-2">
                 <CreateDraftResumeList
                   onOpen={onOpenSavedDraft}
@@ -452,123 +621,7 @@ export function CreateEstateEntrancePanel({
                   onDelete={onDeleteDraft}
                 />
               </div>
-            </details>
-          ) : null}
-        </section>
-
-        <details
-          className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-          data-testid="create-estate-advanced"
-          open={advancedOpen}
-          onToggle={(e) =>
-            setAdvancedOpen((e.target as HTMLDetailsElement).open)
-          }
-        >
-          <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
-            {CREATE_ESTATE_ADVANCED_HEADING}
-          </summary>
-          <p className="mt-2 text-sm text-[#6b635a]">
-            {CREATE_ESTATE_ADVANCED_HINT}
-          </p>
-          <div
-            className="mt-3 flex flex-wrap gap-2"
-            role="group"
-            aria-label="Kind of plan"
-          >
-            <button
-              type="button"
-              className={`rounded-full px-3 py-1.5 text-sm ${
-                blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID
-                  ? "bg-[#1e4f4f] text-white"
-                  : "bg-[#f4efe7] text-[#1f1c19]"
-              }`}
-              aria-pressed={blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID}
-              onClick={() => setBlueprintWorkTypeId(EVENT_PLAN_WORK_TYPE_ID)}
-            >
-              Event Plan
-            </button>
-            <button
-              type="button"
-              className={`rounded-full px-3 py-1.5 text-sm ${
-                blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
-                  ? "bg-[#1e4f4f] text-white"
-                  : "bg-[#f4efe7] text-[#1f1c19]"
-              }`}
-              aria-pressed={blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID}
-              data-testid="create-estate-blueprint-marketing"
-              onClick={() => setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID)}
-            >
-              Marketing Plan
-            </button>
-          </div>
-          <div className="mt-3">
-            <UniversalBlueprintInterface
-              workTypeId={blueprintWorkTypeId}
-              companionLed
-              openWorkLabel={blueprintOpenLabel}
-              onOpenWork={() => {
-                if (pendingOpenOutcome) {
-                  void openConfirmed(pendingOpenOutcome);
-                  return;
-                }
-                const label =
-                  blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
-                    ? "Marketing Plan"
-                    : "Event Plan";
-                void openConfirmed({
-                  kind: "open",
-                  text: `Open my ${label}`,
-                  artifactType: label,
-                  isEventDomain: blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
-                  isMarketingPlanDomain:
-                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
-                });
-              }}
-              onWorkReady={() => {
-                const label =
-                  blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
-                    ? "Marketing Plan"
-                    : "Event Plan";
-                setBlueprintOpenLabel(createOpenPlanLabel(label));
-                setBlueprintWorkAck(createWorkReadyMessage(label));
-                setPendingOpenOutcome({
-                  kind: "open",
-                  text: prompt.trim() || `Continue my ${label}`,
-                  artifactType: label,
-                  isEventDomain: blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
-                  isMarketingPlanDomain:
-                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
-                });
-              }}
-            />
-          </div>
-          {blueprintWorkAck ? (
-            <p
-              className="mt-3 text-sm text-[#1e4f4f]"
-              data-testid="create-estate-blueprint-work-ack"
-              role="status"
-            >
-              {blueprintWorkAck}
-            </p>
-          ) : null}
-        </details>
-
-        <details
-          className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-          data-testid="create-estate-picker"
-        >
-          <summary
-            id="create-estate-picker-heading"
-            className="cursor-pointer text-lg font-semibold text-[#1f1c19]"
-          >
-            {CREATE_ESTATE_PICKER_HEADING}
-          </summary>
-          <p className="mt-2 text-sm text-[#6b635a]">
-            Optional — explore types if you prefer browsing. You can always
-            describe what you want above instead.
-          </p>
-          <div className="mt-3">
-            <CreateCatalogPicker onSelect={onSelectCreationType} />
+            </section>
           </div>
         </details>
       </div>

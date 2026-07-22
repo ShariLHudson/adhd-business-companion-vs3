@@ -10,9 +10,9 @@ import {
   processCreateBuilderTurn,
 } from "@/lib/createBuilderChat";
 import {
-  CREATE_BACK_TO_FOCUS_DESTINATION,
-  CREATE_BACK_TO_FOCUS_LABEL,
   CREATE_GUIDED_SUPPORT_LINE,
+  CREATE_RETURN_TO_CREATE,
+  CREATE_RETURN_TO_WELCOME_HOME,
   createGuidedOpenerForType,
   firstBlueprintQuestionForType,
   isBannedCreateReflectivePrompt,
@@ -25,9 +25,12 @@ function read(pathFromRoot: string): string {
 }
 
 describe("create guided conversation 189", () => {
-  it("formats Back to Focus for Create chrome", () => {
-    expect(formatAppBackLabel(CREATE_BACK_TO_FOCUS_DESTINATION)).toBe(
-      CREATE_BACK_TO_FOCUS_LABEL,
+  it("formats Return to Welcome Home / Create for Create chrome", () => {
+    expect(formatAppBackLabel(CREATE_RETURN_TO_WELCOME_HOME)).toBe(
+      CREATE_RETURN_TO_WELCOME_HOME,
+    );
+    expect(formatAppBackLabel(CREATE_RETURN_TO_CREATE)).toBe(
+      CREATE_RETURN_TO_CREATE,
     );
   });
 
@@ -92,10 +95,9 @@ describe("create guided conversation 189", () => {
   it("WorkspaceLayout supports Create minimalChrome", () => {
     const layout = read("components/companion/WorkspaceLayout.tsx");
     expect(layout).toContain("minimalChrome");
-    const client = read("app/companion/CompanionPageClient.tsx");
-    expect(client).toContain("minimalChrome={workspacePanel === \"content-generator\"}");
-    expect(client).toContain("CREATE_BACK_TO_FOCUS_DESTINATION");
-    expect(client).toContain("createGuidedOpenerForType");
+    const content = read("components/companion/ContentGeneratorPanel.tsx");
+    expect(content).toContain("CreateGuidedMinimalPanel");
+    expect(content).toMatch(/createGuidedOpenerForType|CreateGuidedMinimalPanel/);
   });
 
   it("ContentGeneratorPanel hides early clutter for new creates", () => {

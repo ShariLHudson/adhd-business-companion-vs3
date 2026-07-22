@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { listActiveCreationPickerCatalog } from "@/lib/createEstate/activeCreationTypes";
+import {
+  filterCatalogByWorkContext,
+  type CreateSuggestionContext,
+} from "@/lib/createEstate/contextAwareSuggestions";
 import { compareDropdownLabels } from "@/lib/dropdownSort";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
@@ -13,10 +17,13 @@ export function CreateCatalogPicker({
   onSelect,
   highlightLabel,
   compact = false,
+  suggestionContext,
 }: {
   onSelect: (item: CreateCatalogItem) => void;
   highlightLabel?: string | null;
   compact?: boolean;
+  /** Spec 129 — filter browse ideas to match current Work context. */
+  suggestionContext?: CreateSuggestionContext | null;
 }) {
   const [filter, setFilter] = useState("");
   const [categoryId, setCategoryId] = useState<string | typeof NO_CATEGORY>(
@@ -24,7 +31,11 @@ export function CreateCatalogPicker({
   );
 
   /** Only workflow-backed types — never inactive placeholders. */
-  const catalog = useMemo(() => listActiveCreationPickerCatalog(), []);
+  const catalog = useMemo(() => {
+    const base = listActiveCreationPickerCatalog();
+    if (!suggestionContext) return base;
+    return filterCatalogByWorkContext(base, suggestionContext);
+  }, [suggestionContext]);
 
   const categoryOptions = useMemo(
     () =>

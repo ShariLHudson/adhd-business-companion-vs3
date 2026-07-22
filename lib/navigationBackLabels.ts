@@ -19,6 +19,7 @@ export function isEstateHomeDestination(
     normalized === "estate" ||
     normalized === "welcome home" ||
     normalized === "return to estate" ||
+    normalized === "return to welcome home" ||
     normalized === "back to estate" ||
     normalized === "back to welcome home"
   );
@@ -26,12 +27,14 @@ export function isEstateHomeDestination(
 
 /**
  * Standard label: "Back to Clear My Mind"
- * Pass the destination only — not the full "Back to" prefix.
+ * Pass the destination only — not the full "Back to" / "Return to" prefix.
+ * Spec 129 — estate home → "Return to Welcome Home"; other "Return to …" pass through.
  */
 export function formatAppBackLabel(destination: string): string {
   const trimmed = destination.trim();
   if (!trimmed) return "Back";
-  if (isEstateHomeDestination(trimmed)) return BACK_TO_ESTATE;
+  if (isEstateHomeDestination(trimmed)) return "Return to Welcome Home";
+  if (/^return to\b/i.test(trimmed)) return trimmed;
   if (/^back to\b/i.test(trimmed)) return trimmed;
   return `Back to ${trimmed}`;
 }

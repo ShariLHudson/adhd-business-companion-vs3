@@ -55,10 +55,10 @@ describe("Create morning-room scroll contract (133)", () => {
     );
   });
 
-  it("Create entrance keeps How Do I and picker clickable targets", () => {
+  it("Create entrance keeps More Ways and picker clickable targets", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     const copy = read("lib/createEstate/copy.ts");
-    expect(panel).toContain("create-estate-how-do-i");
+    expect(panel).toContain("create-estate-more-ways");
     expect(panel).toContain("CreateCatalogPicker");
     expect(panel).toContain("onSelectCreationType");
     expect(copy).toContain("CREATE_ESTATE_PICKER_HEADING");

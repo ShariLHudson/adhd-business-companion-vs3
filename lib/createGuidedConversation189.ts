@@ -6,14 +6,36 @@ import { facilitationQuestionsForType } from "@/lib/facilitatedCreation/facilita
 import { getDiscoveryQuestions } from "@/lib/createWorkflow";
 import { userFacingCreateTypeLabel } from "@/lib/createTypePickers";
 
-/** Destination only — AppBackButton formats as "Back to Focus". */
-export const CREATE_BACK_TO_FOCUS_DESTINATION = "Focus" as const;
+/**
+ * Spec 129 — exit labels name the destination (never ambiguous "Focus").
+ * Pass full "Return to …" strings — formatAppBackLabel preserves them.
+ */
+export const CREATE_RETURN_TO_WELCOME_HOME =
+  "Return to Welcome Home" as const;
+export const CREATE_RETURN_TO_MY_FOCUS = "Return to My Focus" as const;
+export const CREATE_RETURN_TO_CREATE = "Return to Create" as const;
 
-/** Full visible label when not using AppBackButton. */
-export const CREATE_BACK_TO_FOCUS_LABEL = "Back to Focus" as const;
+/** @deprecated Spec 129 — prefer CREATE_RETURN_TO_WELCOME_HOME / MY_FOCUS. */
+export const CREATE_BACK_TO_FOCUS_DESTINATION = CREATE_RETURN_TO_WELCOME_HOME;
+
+/** @deprecated Spec 129 — prefer CREATE_RETURN_TO_WELCOME_HOME. */
+export const CREATE_BACK_TO_FOCUS_LABEL = CREATE_RETURN_TO_WELCOME_HOME;
 
 export const CREATE_GUIDED_SUPPORT_LINE =
   "Tell Shari what you want to create, and she will help you shape it one step at a time." as const;
+
+/** Pick a clear Create exit label from an optional origin hint. */
+export function resolveCreateExitDestination(
+  originHint?: string | null,
+): typeof CREATE_RETURN_TO_WELCOME_HOME | typeof CREATE_RETURN_TO_MY_FOCUS {
+  const n = (originHint ?? "").trim().toLowerCase();
+  if (
+    /\b(focus|plan my day|adapt my day|today'?s focus|my focus)\b/.test(n)
+  ) {
+    return CREATE_RETURN_TO_MY_FOCUS;
+  }
+  return CREATE_RETURN_TO_WELCOME_HOME;
+}
 
 export const CREATE_INTENT_COMPOSER_PLACEHOLDER =
   "What would you like to create?" as const;

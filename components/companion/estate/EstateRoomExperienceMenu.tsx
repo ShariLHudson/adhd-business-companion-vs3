@@ -16,10 +16,13 @@ import {
   type WelcomeHomeNavDestinationId,
   type WelcomeHomeNavDropdownChildId,
 } from "@/lib/estate/welcomeHomeNavigationStructure";
+import { welcomeHomeCategoryForDestination } from "@/lib/estate/welcomeHomeActiveDestination";
 
 export type EstateRoomExperienceMenuProps = {
   roomId: string;
   visible?: boolean;
+  /** Spec 129 — highlight where the member is now. */
+  activeDestinationId?: WelcomeHomeNavDestinationId | null;
   /** When true, shift left so the estate menu trigger stays at the corner. */
   withEstateMenu?: boolean;
   /** When true, render inline inside EstateTopRightChrome (no separate portal). */
@@ -86,6 +89,7 @@ export type EstateRoomExperienceMenuProps = {
 export function EstateRoomExperienceMenu({
   roomId,
   visible = true,
+  activeDestinationId = null,
   withEstateMenu = false,
   embedded = false,
   onBackToEstate,
@@ -291,6 +295,7 @@ export function EstateRoomExperienceMenu({
     WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === focusedPanel) ?? null;
   const activePanelLabel = activeCategory?.label ?? null;
   const activeDestinations = activeCategory?.destinations ?? null;
+  const activeCategoryId = welcomeHomeCategoryForDestination(activeDestinationId);
 
   const renderDestinationButton = (dest: WelcomeHomeNavDestination) => {
     const children = dest.dropdownChildren;
@@ -366,18 +371,26 @@ export function EstateRoomExperienceMenu({
 
     const action = destinationAction(dest.id);
     if (!action) return null;
+    const isHere = activeDestinationId === dest.id;
     return (
       <button
         key={dest.id}
         type="button"
         role="menuitem"
-        className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+        className={[
+          "estate-room-experience-menu__item estate-room-experience-menu__item--nav",
+          isHere ? "estate-room-experience-menu__item--active" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
         aria-label={
           dest.supportLine
             ? `Open ${dest.label}. ${dest.supportLine}`
             : `Open ${dest.label}`
         }
+        aria-current={isHere ? "page" : undefined}
         data-testid={`estate-open-${dest.id}`}
+        data-nav-active={isHere ? "true" : undefined}
         onClick={() => closeAndRun(action)}
       >
         <span className="estate-room-experience-menu__item-copy">
@@ -515,11 +528,20 @@ export function EstateRoomExperienceMenu({
                             category.id === "spark-estate"
                               ? "estate-room-experience-menu__category--spark-estate"
                               : "",
+                            category.id === activeCategoryId
+                              ? "estate-room-experience-menu__category--active"
+                              : "",
                           ]
                             .filter(Boolean)
                             .join(" ")}
                           aria-expanded={false}
+                          aria-current={
+                            category.id === activeCategoryId ? "true" : undefined
+                          }
                           data-testid={`estate-room-menu-section-${category.id}`}
+                          data-nav-active={
+                            category.id === activeCategoryId ? "true" : undefined
+                          }
                           onClick={() => {
                             bumpVisibility();
                             openFocusedPanel(category.id);

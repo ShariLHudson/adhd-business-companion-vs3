@@ -6,12 +6,15 @@ import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
 import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
 import { GlobalSoundControl } from "@/components/companion/estate/GlobalSoundControl";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
+import type { WelcomeHomeNavDestinationId } from "@/lib/estate/welcomeHomeNavigationStructure";
 
 export type EstateTopRightChromeProps = {
   showProfile: boolean;
   showRoom: boolean;
   roomId: string | null;
   chatVisible: boolean;
+  /** Spec 129 — current Welcome Home destination for orientation highlight. */
+  activeDestinationId?: WelcomeHomeNavDestinationId | null;
   soundEnabled?: boolean;
   soundPlayingHint?: boolean;
   onEstateMenuAction: (actionId: EstateMenuActionId) => void;
@@ -58,6 +61,7 @@ export function EstateTopRightChrome({
   showRoom,
   roomId,
   chatVisible,
+  activeDestinationId = null,
   soundEnabled,
   soundPlayingHint,
   onEstateMenuAction,
@@ -115,6 +119,7 @@ export function EstateTopRightChrome({
           embedded
           roomId={roomId}
           chatVisible={chatVisible}
+          activeDestinationId={activeDestinationId}
           soundEnabled={soundEnabled}
           onToggleChat={onToggleChat}
           onToggleSound={onToggleSound}

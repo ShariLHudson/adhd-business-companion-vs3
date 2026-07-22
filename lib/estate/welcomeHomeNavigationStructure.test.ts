@@ -13,7 +13,7 @@ import {
 } from "./welcomeHomeNavigationStructure";
 
 describe("welcomeHomeNavigationStructure", () => {
-  it("has six categories with Spark Estate last and max depth three for My Day dropdowns", () => {
+  it("has six categories with Estate last and max depth three for Today dropdowns", () => {
     expect(WELCOME_HOME_NAV_CATEGORIES).toHaveLength(6);
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
@@ -23,14 +23,22 @@ describe("welcomeHomeNavigationStructure", () => {
       "get-advice",
       "spark-estate",
     ]);
+    expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.label)).toEqual([
+      "Today",
+      "Create",
+      "Reflect",
+      "My Story",
+      "Guidance",
+      "Estate",
+    ]);
     expect(welcomeHomeNavMaxDepth()).toBe(3);
   });
 
-  it("places Wander the Grounds and Spark Estate Guide under Spark Estate", () => {
+  it("places Wander the Grounds and Spark Estate Guide under Estate", () => {
     const sparkEstate = WELCOME_HOME_NAV_CATEGORIES.find(
       (c) => c.id === "spark-estate",
     );
-    expect(sparkEstate?.label).toBe("Spark Estate");
+    expect(sparkEstate?.label).toBe("Estate");
     expect(sparkEstate?.destinations.map((d) => d.id)).toEqual([
       "wander-the-grounds",
       "spark-estate-guide",
@@ -43,8 +51,9 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(WELCOME_HOME_WANDER_GROUNDS.label).toBe("Wander the Grounds");
   });
 
-  it("My Day has two dropdown groups plus Calendar — children are independently routable", () => {
+  it("Today has two dropdown groups plus Calendar — children are independently routable", () => {
     const myDay = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day");
+    expect(myDay?.label).toBe("Today");
     expect(myDay?.destinations.map((d) => d.id)).toEqual([
       "adapt-plan-my-day",
       "calendar",

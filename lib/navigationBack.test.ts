@@ -16,11 +16,15 @@ describe("navigationBack", () => {
       "Back to Clear My Mind",
     );
     expect(formatAppBackLabel(NAV_MY_THOUGHTS)).toBe("Back to My Thoughts");
-    expect(formatAppBackLabel(NAV_HOME)).toBe(BACK_TO_ESTATE);
-    expect(formatAppBackLabel("Home")).toBe(BACK_TO_ESTATE);
-    expect(formatAppBackLabel("Back to Home")).toBe(BACK_TO_ESTATE);
-    expect(formatAppBackLabel("Return to Estate")).toBe(BACK_TO_ESTATE);
+    expect(formatAppBackLabel(NAV_HOME)).toBe("Return to Welcome Home");
+    expect(formatAppBackLabel("Home")).toBe("Return to Welcome Home");
+    expect(formatAppBackLabel("Back to Home")).toBe("Return to Welcome Home");
+    expect(formatAppBackLabel("Return to Estate")).toBe("Return to Welcome Home");
+    expect(formatAppBackLabel("Return to Welcome Home")).toBe(
+      "Return to Welcome Home",
+    );
     expect(isEstateHomeDestination("Estate")).toBe(true);
+    expect(BACK_TO_ESTATE).toBe("Welcome Home");
   });
 
   it("flags immersive rooms with in-panel chat back", () => {
