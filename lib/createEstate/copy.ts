@@ -17,9 +17,9 @@ export const CREATE_VS_PROJECTS_CUE =
 
 export const CREATE_ESTATE_HOW_DO_I = [
   "Use Create when you want to make something — an email, checklist, presentation, client resource, marketing plan, event, or other supported work.",
-  "Start by telling Shari what you want to create in plain language. Spark Estate opens or resumes the right Creation Workspace — you never choose where the work belongs.",
-  "Continue Working shows active Creation Workspaces on Create home. Older drafts stay under Explore Ideas → Continue Something.",
-  "Explore Ideas is optional — one place for older drafts, search, categories, and recommendations. Most people just tell Shari above.",
+  "Start by telling Shari what you want to create in plain language, or pick one of the suggested choices. Spark Estate opens or resumes the right Creation Workspace — you never choose where the work belongs.",
+  "Continue Working shows active Creation Workspaces on Create home. Older saved drafts stay under Find Previous Work.",
+  "Find Previous Work and Browse More are both optional — most people just tell Shari above. Browse More shows a short list of categories, not the whole catalog.",
   "Create is different from Projects: Create makes an output; Projects organize ongoing work. For finding and applying strategies, use Strategy Library under Guidance — it is not part of Create.",
 ].join("\n\n");
 
@@ -130,3 +130,61 @@ export const CREATE_ESTATE_PREVIOUS_WORK_EMPTY =
   "No older drafts here yet. When you save a document draft, it will appear here so you can reopen, rename, or clear it. Most people start with Start Something New above — or search Explore Ideas for inspiration.";
 
 export const CREATE_ESTATE_UNDO_CREATE_LABEL = "Undo create";
+
+/**
+ * Create Simplification & Category Evaluation — simplified default screen.
+ * Replaces the composer/Begin framing with "What would you like to create?"
+ * so the default screen answers one question before any browsing happens.
+ */
+export const CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING =
+  "What would you like to create?";
+
+export const CREATE_ESTATE_DESCRIBE_PLACEHOLDER =
+  "Describe it or search ideas — e.g. email, workshop, client onboarding...";
+
+/** New primary label — clearer intent than the bare "Begin". */
+export const CREATE_ESTATE_START_CREATING_LABEL = "Start Creating";
+
+/** Guided narrowing when the member does not know what to call it yet. */
+export const CREATE_ESTATE_HELP_ME_CHOOSE_LABEL = "Help Me Choose";
+
+export const CREATE_ESTATE_HELP_ME_CHOOSE_QUESTION =
+  "What are you hoping to create?";
+
+export const CREATE_ESTATE_HELP_ME_CHOOSE_HINT =
+  "Pick the area that fits best — Shari will narrow it down from there.";
+
+/** Optional secondary — full curated category browse. */
+export const CREATE_ESTATE_BROWSE_MORE_LABEL = "Browse More";
+
+export const CREATE_ESTATE_BROWSE_MORE_HEADING = "Browse More";
+
+export const CREATE_ESTATE_BROWSE_MORE_HINT =
+  "A short list of categories — pick one to see a few ideas, not the whole catalog.";
+
+/** Up to four suggested choices shown beside the description field (Part 1). */
+export const CREATE_ESTATE_DEFAULT_SUGGESTED_CHOICES = [
+  "Email",
+  "Social Post",
+  "Client Onboarding",
+  "Workshop",
+] as const;
+
+/** Part 2 — previous work lives in its own section, separate from idea discovery. */
+export const CREATE_ESTATE_FIND_PREVIOUS_WORK_HEADING = "Find Previous Work";
+
+export const CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT =
+  "Work already in progress stays under Continue Working above. Reopen something recent or older here.";
+
+export const CREATE_ESTATE_RECENT_SECTION_HEADING = "Recent";
+
+export const CREATE_ESTATE_OLDER_WORK_HEADING = "Older Work";
+
+export const CREATE_ESTATE_SAVED_CREATIONS_EMPTY =
+  "Your saved creations will appear here.";
+
+/** Part 11 — no search results, still helpful. */
+export const CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE =
+  "I could not find an exact match, but I can still help you create it.";
+
+export const CREATE_ESTATE_CREATE_FROM_SCRATCH_LABEL = "Create From Scratch";
