@@ -7,11 +7,11 @@ import {
   resolveSparkCardFooterLine,
   resolveSparkCardHeroVisual,
   resolveSparkCardSimplifiedPresentation,
+  resolveSparkCardThemedScene,
   SPARK_CARD_SECTION_SPARK_IN_ACTION,
   SPARK_CARD_SECTION_STORY,
   SPARK_CARD_SECTION_TELL_ME_MORE,
   SPARK_CARD_SECTION_TODAYS_SPARK,
-  SPARK_CARD_CATEGORY_EMBLEM,
 } from "@/lib/sparkNote/sparkCardCollectibleDisplay";
 import {
   getFavoriteSparkIds,
@@ -29,17 +29,55 @@ type Props = {
 
 type ViewPhase = "keepsake" | "saved";
 
+/**
+ * Illustrated hero scene — medallion emblem, scattered motifs, and a small
+ * "washi tape" + "stamp" ephemera treatment. Renders whenever no genuinely
+ * topic-specific photo exists, so cards never fall back to a single lonely
+ * icon in a blank box (see Spark Card Imagery fix report).
+ */
+function SparkCardIllustratedScene({
+  card,
+  scene,
+}: {
+  card: SparkNoteDailyCard;
+  scene: ReturnType<typeof resolveSparkCardThemedScene>;
+}) {
+  return (
+    <div
+      className="spark-note-expanded__art-scene"
+      data-diversity-category={scene.diversityCategory}
+      role="img"
+      aria-label={scene.alt}
+    >
+      <span className="spark-note-expanded__art-tape" aria-hidden />
+      <span className="spark-note-expanded__art-medallion" aria-hidden>
+        <span className="spark-note-expanded__art-medallion-emblem">
+          {scene.emblem}
+        </span>
+      </span>
+      <div className="spark-note-expanded__art-motifs" aria-hidden>
+        {scene.motifs.map((motif, index) => (
+          <span
+            key={`${card.id}-motif-${index}`}
+            className={`spark-note-expanded__art-motif spark-note-expanded__art-motif--${index + 1}`}
+          >
+            {motif}
+          </span>
+        ))}
+      </div>
+      <span className="spark-note-expanded__art-stamp" aria-hidden>
+        ✦
+      </span>
+      <span className="spark-note-expanded__art-caption" aria-hidden>
+        {scene.caption}
+      </span>
+    </div>
+  );
+}
+
 function SparkCardArt({ card }: { card: SparkNoteDailyCard }) {
   const hero = useMemo(() => resolveSparkCardHeroVisual(card), [card]);
-  const themed = useMemo(() => {
-    if (hero.kind === "themed") return hero;
-    return {
-      kind: "themed" as const,
-      category: card.category,
-      emblem: SPARK_CARD_CATEGORY_EMBLEM[card.category] ?? "✨",
-      alt: hero.alt,
-    };
-  }, [card, hero]);
+  const fallbackScene = useMemo(() => resolveSparkCardThemedScene(card), [card]);
   const [photoFailed, setPhotoFailed] = useState(false);
   const showPhoto = hero.kind === "photo" && !photoFailed;
 
@@ -48,12 +86,11 @@ function SparkCardArt({ card }: { card: SparkNoteDailyCard }) {
       className={[
         "spark-note-expanded__art",
         showPhoto ? "" : "spark-note-expanded__art--themed",
-        showPhoto ? "" : `spark-note-expanded__art--${themed.category}`,
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      {showPhoto ? (
+      {showPhoto && hero.kind === "photo" ? (
         <img
           src={hero.src}
           alt={hero.alt}
@@ -61,14 +98,10 @@ function SparkCardArt({ card }: { card: SparkNoteDailyCard }) {
           onError={() => setPhotoFailed(true)}
         />
       ) : (
-        <>
-          <span className="spark-note-expanded__art-emblem" aria-hidden>
-            {themed.emblem}
-          </span>
-          <span className="spark-note-expanded__art-caption">
-            {card.categoryLabel}
-          </span>
-        </>
+        <SparkCardIllustratedScene
+          card={card}
+          scene={hero.kind === "themed" ? hero : fallbackScene}
+        />
       )}
       <span className="spark-note-expanded__art-frame" aria-hidden />
     </div>
@@ -172,6 +205,13 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   function handlePrint() {
     setMoreMenuOpen(false);
     if (typeof window === "undefined") return;
+    // Tell Me More is conditionally mounted — open it first so the printed
+    // page includes the new discoveries/visuals, not a blank placeholder.
+    if (hasTellMeMore && !tellMeMoreOpen) {
+      setTellMeMoreOpen(true);
+      window.requestAnimationFrame(() => window.print());
+      return;
+    }
     window.print();
   }
 
@@ -216,6 +256,13 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const tellMeMore = presentation.tellMeMore;
   const hasTellMeMore =
     tellMeMore.facts.length > 0 ||
+    Boolean(tellMeMore.lookCloser) ||
+    Boolean(tellMeMore.deeperStory) ||
+    Boolean(tellMeMore.whatHappenedNext) ||
+    Boolean(tellMeMore.unexpectedConnection) ||
+    Boolean(tellMeMore.tryThis) ||
+    tellMeMore.gallery.length > 0 ||
+    tellMeMore.timeline.length > 0 ||
     Boolean(tellMeMore.reflectionPrompt) ||
     tellMeMore.related.length > 0;
 
@@ -333,16 +380,121 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                 className="spark-note-expanded__more-panel"
                 data-testid="spark-note-tell-me-more"
               >
-                {tellMeMore.facts.map((fact, index) => (
-                  <p key={`fact-${index}`} className="spark-note-expanded__section-copy">
-                    {fact}
-                  </p>
-                ))}
+                {/* 1 — visual reveal comes first, never a paragraph */}
+                {tellMeMore.gallery.length > 0 ? (
+                  <div className="spark-note-expanded__more-gallery">
+                    <p className="spark-note-expanded__more-section-label">
+                      See It Differently
+                    </p>
+                    <div className="spark-note-expanded__more-gallery-row">
+                      {tellMeMore.gallery.map((item, index) => (
+                        <div
+                          key={`gallery-${index}`}
+                          className="spark-note-expanded__more-gallery-chip"
+                        >
+                          <span aria-hidden>{item.emblem}</span>
+                          <span className="spark-note-expanded__more-gallery-caption">
+                            {item.caption}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* 2 — surprising fact / look closer detail */}
+                {tellMeMore.lookCloser ? (
+                  <div className="spark-note-expanded__more-block">
+                    <p className="spark-note-expanded__more-section-label">
+                      Look Closer
+                    </p>
+                    <p className="spark-note-expanded__section-copy">
+                      {tellMeMore.lookCloser}
+                    </p>
+                  </div>
+                ) : null}
+
+                {tellMeMore.facts.length > 0 ? (
+                  <div className="spark-note-expanded__more-facts">
+                    {tellMeMore.facts.map((fact, index) => (
+                      <p key={`fact-${index}`} className="spark-note-expanded__more-fact">
+                        <span aria-hidden>✦</span> {fact}
+                      </p>
+                    ))}
+                  </div>
+                ) : null}
+
+                {/* 3 — deeper story, a genuinely separate story beat */}
+                {tellMeMore.deeperStory ? (
+                  <div className="spark-note-expanded__more-block">
+                    <p className="spark-note-expanded__more-section-label">
+                      Behind The Scenes
+                    </p>
+                    <p className="spark-note-expanded__section-copy">
+                      {tellMeMore.deeperStory}
+                    </p>
+                  </div>
+                ) : null}
+
+                {tellMeMore.whatHappenedNext ? (
+                  <div className="spark-note-expanded__more-block">
+                    <p className="spark-note-expanded__more-section-label">
+                      What Happened Next
+                    </p>
+                    <p className="spark-note-expanded__section-copy">
+                      {tellMeMore.whatHappenedNext}
+                    </p>
+                  </div>
+                ) : null}
+
+                {tellMeMore.unexpectedConnection ? (
+                  <div className="spark-note-expanded__more-block">
+                    <p className="spark-note-expanded__more-section-label">
+                      Surprising Connection
+                    </p>
+                    <p className="spark-note-expanded__section-copy">
+                      {tellMeMore.unexpectedConnection}
+                    </p>
+                  </div>
+                ) : null}
+
+                {/* 4 — image / timeline visual module */}
+                {tellMeMore.timeline.length > 0 ? (
+                  <div className="spark-note-expanded__more-timeline">
+                    <p className="spark-note-expanded__more-section-label">
+                      A Small Timeline
+                    </p>
+                    <ol>
+                      {tellMeMore.timeline.map((step, index) => (
+                        <li key={`timeline-${index}`}>
+                          <span className="spark-note-expanded__more-timeline-label">
+                            {step.label}
+                          </span>
+                          {step.detail ? (
+                            <span className="spark-note-expanded__more-timeline-detail">
+                              {step.detail}
+                            </span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
+
+                {/* 5 — optional reflection / try this */}
+                {tellMeMore.tryThis ? (
+                  <div className="spark-note-expanded__more-try">
+                    <span aria-hidden>🌟</span>
+                    <p>{tellMeMore.tryThis}</p>
+                  </div>
+                ) : null}
+
                 {tellMeMore.reflectionPrompt ? (
                   <p className="spark-note-expanded__section-copy spark-note-expanded__section-copy--quiet">
                     A question to sit with: {tellMeMore.reflectionPrompt}
                   </p>
                 ) : null}
+
                 {tellMeMore.related.length > 0 ? (
                   <div className="spark-note-expanded__related">
                     <p className="spark-note-expanded__related-label">
@@ -359,6 +511,13 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                       ))}
                     </ul>
                   </div>
+                ) : null}
+
+                {/* 6 — sources */}
+                {tellMeMore.sources.length > 0 ? (
+                  <p className="spark-note-expanded__more-sources">
+                    {tellMeMore.sources.join(" ")}
+                  </p>
                 ) : null}
               </div>
             ) : null}

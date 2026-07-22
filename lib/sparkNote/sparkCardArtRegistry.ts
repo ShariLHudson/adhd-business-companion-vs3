@@ -166,12 +166,16 @@ const SPARK_CARD_CATEGORY_ART: Record<SparkNoteCategory, SparkCardArtAsset> = {
 };
 
 /**
- * Resolve a meaningful hero image for collectible Spark Cards.
- * Prefers catalog imageSrc, then topic match, then category artwork.
+ * Resolve an explicit or topic-specific photo match only — never the
+ * generic per-category stock photo. Returns `null` when nothing genuinely
+ * topic-specific exists, so the caller can render the illustrated themed
+ * scene instead of recycling the same handful of category photos across
+ * every card that shares a legacy category (the "sparse / generic imagery"
+ * problem — see docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md).
  */
-export function resolveSparkCardArtAsset(
+export function resolveSparkCardSpecificArtAsset(
   card: SparkNoteDailyCard,
-): SparkCardArtAsset {
+): SparkCardArtAsset | null {
   const explicit = card.imageSrc?.trim() || card.thumbnailSrc?.trim();
   if (explicit) {
     return {
@@ -193,6 +197,22 @@ export function resolveSparkCardArtAsset(
       return entry.asset;
     }
   }
+
+  return null;
+}
+
+/**
+ * Resolve a meaningful hero image for collectible Spark Cards.
+ * Prefers catalog imageSrc, then topic match, then category artwork.
+ * @deprecated Prefer `resolveSparkCardSpecificArtAsset` + the illustrated
+ * themed scene for the hero visual — kept for any legacy callers that need
+ * a guaranteed real-photo fallback (e.g. supplementary Tell Me More art).
+ */
+export function resolveSparkCardArtAsset(
+  card: SparkNoteDailyCard,
+): SparkCardArtAsset {
+  const specific = resolveSparkCardSpecificArtAsset(card);
+  if (specific) return specific;
 
   return (
     SPARK_CARD_CATEGORY_ART[card.category] ?? {

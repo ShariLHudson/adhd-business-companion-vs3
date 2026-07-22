@@ -231,6 +231,55 @@ export function diversityCategoryIcon(
   return SPARK_CARD_DIVERSITY_CATEGORY_ICON[id] ?? "✨";
 }
 
+/**
+ * Supporting motif emblems per diversity category — used to build a small
+ * illustrated hero *scene* (medallion + scattered motifs + ephemera) instead
+ * of one lonely icon in a blank box. Additive; does not change the single
+ * `diversityCategoryIcon()` badge emblem used elsewhere.
+ */
+export const SPARK_CARD_DIVERSITY_HERO_MOTIFS: Record<
+  SparkCardDiversityCategoryId,
+  readonly string[]
+> = {
+  fun_celebrations: ["🎈", "🎊", "🎂", "🪅", "🎇"],
+  innovation: ["⚙️", "🔧", "🧪", "📐", "🔩"],
+  remarkable_people: ["🧵", "🖋️", "🎓", "🕰️", "🗝️"],
+  amazing_places: ["🧭", "🏛️", "🚂", "🏞️", "📍"],
+  nature: ["🍃", "🦋", "🐝", "🌾", "🐚"],
+  history: ["📯", "🕯️", "🗺️", "⚔️", "🏺"],
+  fun_facts: ["🎲", "🔍", "❓", "🧩", "🃏"],
+  kindness: ["💌", "🕊️", "🤝", "🌼", "🧸"],
+  curiosity: ["🔭", "🧭", "💭", "🪄", "🔦"],
+  inspiration: ["🌅", "🕊️", "🎯", "🌟", "🪶"],
+  books_ideas: ["📚", "🖋️", "🔖", "💡", "🗂️"],
+  creativity: ["🎨", "✂️", "🖌️", "🎭", "🧵"],
+  science_technology: ["🔬", "🛰️", "⚛️", "💻", "🧲"],
+};
+
+/** Deterministic pick of `count` supporting motifs for a given card id. */
+export function pickDiversityHeroMotifs(
+  id: SparkCardDiversityCategoryId,
+  seed: string,
+  count = 3,
+): string[] {
+  const bank = SPARK_CARD_DIVERSITY_HERO_MOTIFS[id] ?? SPARK_CARD_DIVERSITY_HERO_MOTIFS.curiosity;
+  const start = stableSeedIndex(seed, bank.length);
+  const picked: string[] = [];
+  for (let i = 0; i < Math.min(count, bank.length); i += 1) {
+    picked.push(bank[(start + i) % bank.length]!);
+  }
+  return picked;
+}
+
+/** Stable, non-cryptographic seed → index helper shared by generator + motifs. */
+export function stableSeedIndex(seed: string, modulo: number): number {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) {
+    hash = (hash * 31 + seed.charCodeAt(i)) | 0;
+  }
+  return modulo > 0 ? Math.abs(hash) % modulo : 0;
+}
+
 /** Ribbon label for expanded / collection display. */
 export function resolveSparkCardCategoryRibbon(
   source: DiversitySource,

@@ -58,6 +58,7 @@ function entryToCard(
     thumbnailAlt: entry.thumbnailAlt,
     tags: entry.tags,
     source,
+    expanded: entry.expanded,
   };
 }
 

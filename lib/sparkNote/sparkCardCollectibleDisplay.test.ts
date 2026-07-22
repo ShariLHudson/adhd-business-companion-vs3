@@ -6,12 +6,62 @@ import {
   resolveSparkCardHeroVisual,
   resolveSparkCardMoreToDiscover,
   resolveSparkCardSimplifiedPresentation,
+  resolveSparkCardTellMeMore,
+  resolveSparkCardThemedScene,
   resolveSparkInAction,
   resolveTodaysSpark,
   splitSparkCardStoryParagraphs,
 } from "./sparkCardCollectibleDisplay";
 import { resolveSparkCardArtAsset } from "./sparkCardArtRegistry";
+import { SPARK_NOTE_CATALOG } from "./catalog";
 import type { SparkNoteDailyCard } from "./types";
+
+/** Normalize the same way the implementation does, for test-side comparison. */
+function norm(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function frontTexts(card: SparkNoteDailyCard): string[] {
+  const presentation = resolveSparkCardSimplifiedPresentation(card);
+  return [
+    presentation.title,
+    presentation.subtitle,
+    ...presentation.storyParagraphs,
+    presentation.todaysSpark,
+    presentation.sparkInAction,
+  ]
+    .filter((v): v is string => Boolean(v && v.trim()))
+    .map(norm);
+}
+
+function catalogEntryToDailyCard(
+  entry: (typeof SPARK_NOTE_CATALOG)[number],
+): SparkNoteDailyCard {
+  return {
+    id: entry.id,
+    category: entry.category,
+    categoryLabel: entry.categoryLabel,
+    sparkType: entry.sparkType ?? "story",
+    title: entry.title,
+    shortTitle: entry.shortTitle ?? entry.title,
+    teaser: entry.teaser,
+    whatHappened: entry.whatHappened,
+    whyInteresting: entry.whyInteresting,
+    whyItMatters: entry.whyItMatters,
+    sparkApplication: entry.sparkApplication,
+    imageSrc: entry.imageSrc,
+    thumbnailSrc: entry.thumbnailSrc,
+    thumbnailAlt: entry.thumbnailAlt,
+    tags: entry.tags,
+    source: "library",
+    expanded: entry.expanded,
+  };
+}
 
 const sampleCard: SparkNoteDailyCard = {
   id: "SPARK-INV-001",
@@ -144,5 +194,144 @@ describe("sparkCardCollectibleDisplay", () => {
       thumbnailSrc: "",
     });
     expect(asset.src.length).toBeGreaterThan(0);
+  });
+
+  // ——— Tell Me More must be genuinely NEW content, never a repeat/rephrase
+  // of the front ("Tell Me More content ≠ front story fields" requirement).
+  // See docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md
+
+  it("Tell Me More is never empty for a card with no authored expanded content", () => {
+    const tellMeMore = resolveSparkCardTellMeMore(sampleCard);
+    expect(tellMeMore.facts.length).toBeGreaterThan(0);
+    expect(tellMeMore.deeperStory).toBeTruthy();
+    expect(tellMeMore.lookCloser).toBeTruthy();
+    expect(tellMeMore.meetsNewInformationRequirement).toBe(true);
+    expect(tellMeMore.newDiscoveryCategories.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("Tell Me More fields never duplicate the front title, subtitle, story, or takeaways", () => {
+    const front = frontTexts(sampleCard);
+    const tellMeMore = resolveSparkCardTellMeMore(sampleCard);
+
+    const expandedTexts = [
+      tellMeMore.lookCloser,
+      tellMeMore.deeperStory,
+      tellMeMore.whatHappenedNext,
+      tellMeMore.unexpectedConnection,
+      tellMeMore.tryThis,
+      ...tellMeMore.facts,
+    ].filter((v): v is string => Boolean(v));
+
+    expect(expandedTexts.length).toBeGreaterThan(0);
+    for (const text of expandedTexts) {
+      const normalized = norm(text);
+      for (const frontText of front) {
+        expect(normalized).not.toBe(frontText);
+        if (normalized.length > 12) expect(frontText).not.toContain(normalized);
+        if (frontText.length > 12) expect(normalized).not.toContain(frontText);
+      }
+    }
+  });
+
+  it("drops a hand-authored expanded field that duplicates the front, keeping content genuinely new", () => {
+    const duplicatingCard: SparkNoteDailyCard = {
+      ...sampleCard,
+      expanded: {
+        // Deliberately the same as whyItMatters (Today's Spark) — must be
+        // rejected by the duplication check, not shown as if it were new.
+        lookCloser: sampleCard.whyItMatters,
+        deeperStory: "A detail that never appears anywhere on the front of the card.",
+      },
+    };
+    const tellMeMore = resolveSparkCardTellMeMore(duplicatingCard);
+    expect(tellMeMore.lookCloser).not.toBe(sampleCard.whyItMatters);
+    expect(tellMeMore.deeperStory).toBe(
+      "A detail that never appears anywhere on the front of the card.",
+    );
+  });
+
+  it("every card in the full library produces Tell Me More content distinct from its own front", () => {
+    for (const entry of SPARK_NOTE_CATALOG) {
+      const card = catalogEntryToDailyCard(entry);
+      const front = frontTexts(card);
+      const tellMeMore = resolveSparkCardTellMeMore(card);
+      const expandedTexts = [
+        tellMeMore.lookCloser,
+        tellMeMore.deeperStory,
+        tellMeMore.whatHappenedNext,
+        tellMeMore.unexpectedConnection,
+        tellMeMore.tryThis,
+        ...tellMeMore.facts,
+      ].filter((v): v is string => Boolean(v));
+
+      for (const text of expandedTexts) {
+        const normalized = norm(text);
+        const duplicate = front.some(
+          (frontText) =>
+            frontText === normalized ||
+            (normalized.length > 12 && frontText.includes(normalized)) ||
+            (frontText.length > 12 && normalized.includes(frontText)),
+        );
+        expect(duplicate, `card ${card.id}: "${text}" duplicates front content`).toBe(
+          false,
+        );
+      }
+    }
+  });
+
+  it("every card in the full library meets the new-information requirement", () => {
+    for (const entry of SPARK_NOTE_CATALOG) {
+      const card = catalogEntryToDailyCard(entry);
+      const tellMeMore = resolveSparkCardTellMeMore(card);
+      expect(
+        tellMeMore.meetsNewInformationRequirement,
+        `card ${card.id} does not meet the >=3 new-discovery-category requirement`,
+      ).toBe(true);
+    }
+  });
+
+  // ——— Imagery: illustrated themed scene (fun, topic-specific, never a
+  // single lonely icon) — used whenever no genuinely specific photo exists.
+
+  it("themed scene returns a medallion emblem plus multiple supporting motifs", () => {
+    const scene = resolveSparkCardThemedScene(sampleCard);
+    expect(scene.kind).toBe("themed");
+    expect(scene.emblem.length).toBeGreaterThan(0);
+    expect(scene.motifs.length).toBeGreaterThanOrEqual(3);
+    expect(scene.caption.length).toBeGreaterThan(0);
+    expect(scene.diversityCategory).toBe("innovation");
+  });
+
+  it("themed scene motifs are deterministic per card id", () => {
+    const first = resolveSparkCardThemedScene(sampleCard);
+    const second = resolveSparkCardThemedScene(sampleCard);
+    expect(second.motifs).toEqual(first.motifs);
+  });
+
+  it("themed scene motifs vary across cards in different diversity categories", () => {
+    const invention = resolveSparkCardThemedScene(sampleCard);
+    const nature = resolveSparkCardThemedScene({
+      ...sampleCard,
+      id: "SPARK-NATURE-TEST-001",
+      category: "fun_fact",
+      categoryLabel: "Nature",
+      tags: ["nature", "wildlife"],
+      title: "A quiet forest discovery",
+    });
+    expect(nature.diversityCategory).toBe("nature");
+    expect(nature.motifs).not.toEqual(invention.motifs);
+  });
+
+  it("falls back to the illustrated themed scene when no specific photo exists for a card", () => {
+    const visual = resolveSparkCardHeroVisual({
+      ...sampleCard,
+      id: "SPARK-NO-PHOTO-TEST-001",
+      imageSrc: "",
+      thumbnailSrc: "",
+      title: "A card with no bespoke photo anywhere in the registry",
+      shortTitle: "No photo card",
+      tags: [],
+    });
+    expect(visual.kind).toBe("themed");
   });
 });

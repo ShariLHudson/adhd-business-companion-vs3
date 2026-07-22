@@ -1,5 +1,50 @@
-import type { SparkNoteCatalogEntry } from "../types";
+import type { SparkNoteCatalogEntry, SparkNoteExpandedContent } from "../types";
 import type { SparkAudience, SparkContentRecord, SparkDateRules, SparkTone } from "./types";
+
+function buildExpandedFromRecord(
+  record: SparkContentRecord,
+): SparkNoteExpandedContent | undefined {
+  const hasAny =
+    Boolean(record.expanded_look_closer?.trim()) ||
+    Boolean(record.expanded_deeper_story?.trim()) ||
+    Boolean(record.expanded_what_happened_next?.trim()) ||
+    Boolean(record.expanded_unexpected_connection?.trim()) ||
+    Boolean(record.expanded_new_facts?.length) ||
+    Boolean(record.expanded_try_this?.trim()) ||
+    Boolean(record.expanded_gallery?.length) ||
+    Boolean(record.expanded_timeline?.length) ||
+    Boolean(record.expanded_sources?.length);
+  if (!hasAny) return undefined;
+
+  return {
+    lookCloser: record.expanded_look_closer,
+    deeperStory: record.expanded_deeper_story,
+    whatHappenedNext: record.expanded_what_happened_next,
+    unexpectedConnection: record.expanded_unexpected_connection,
+    newFacts: record.expanded_new_facts,
+    tryThis: record.expanded_try_this,
+    gallery: record.expanded_gallery,
+    timeline: record.expanded_timeline,
+    sources: record.expanded_sources,
+  };
+}
+
+function expandedToRecordFields(
+  expanded: SparkNoteExpandedContent | undefined,
+): Partial<SparkContentRecord> {
+  if (!expanded) return {};
+  return {
+    expanded_look_closer: expanded.lookCloser,
+    expanded_deeper_story: expanded.deeperStory,
+    expanded_what_happened_next: expanded.whatHappenedNext,
+    expanded_unexpected_connection: expanded.unexpectedConnection,
+    expanded_new_facts: expanded.newFacts,
+    expanded_try_this: expanded.tryThis,
+    expanded_gallery: expanded.gallery,
+    expanded_timeline: expanded.timeline,
+    expanded_sources: expanded.sources,
+  };
+}
 
 const DEFAULT_AUDIENCE: SparkAudience[] = ["Everyone"];
 const DEFAULT_TONE: SparkTone = "curious";
@@ -51,6 +96,7 @@ export function catalogEntryToRecord(entry: SparkNoteCatalogEntry): SparkContent
     priority: entry.priority,
     cooldown_days: entry.cooldownDays,
     regions: entry.regions,
+    ...expandedToRecordFields(entry.expanded),
   };
 }
 
@@ -80,6 +126,9 @@ export function recordToCatalogEntry(record: SparkContentRecord): SparkNoteCatal
     cooldownDays: record.cooldown_days,
     regions: record.regions,
   };
+
+  const expanded = buildExpandedFromRecord(record);
+  if (expanded) entry.expanded = expanded;
 
   const rules = record.date_rules;
   if (rules.type === "specific_date") {

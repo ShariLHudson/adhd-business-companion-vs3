@@ -3,6 +3,19 @@ import type { WelcomeSeason } from "@/lib/welcomeLivingRoom";
 
 import type { SparkNoteCategory, SparkNoteType } from "../types";
 
+/** JSON-authorable "Tell Me More" second layer — snake_case, additive/optional. */
+export type SparkExpandedContentFields = {
+  expanded_look_closer?: string;
+  expanded_deeper_story?: string;
+  expanded_what_happened_next?: string;
+  expanded_unexpected_connection?: string;
+  expanded_new_facts?: string[];
+  expanded_try_this?: string;
+  expanded_gallery?: { emblem: string; caption: string }[];
+  expanded_timeline?: { label: string; detail?: string }[];
+  expanded_sources?: string[];
+};
+
 /** Audience tags for future personalization (content database protocol). */
 export type SparkAudience =
   | "Everyone"
@@ -59,7 +72,7 @@ export type SparkContentRecord = {
   priority?: number;
   cooldown_days?: number;
   regions?: RegionCode[];
-};
+} & SparkExpandedContentFields;
 
 export type SparkDailySelectionReason = "personal" | "date" | "library";
 

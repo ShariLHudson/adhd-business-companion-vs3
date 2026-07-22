@@ -19,6 +19,45 @@ export type SparkNoteCategory =
 
 export type SparkNoteType = "quick" | "story" | "deep";
 
+/** One illustrated chip in a Tell Me More gallery — a visual module, not decoration only. */
+export type SparkNoteExpandedGalleryItem = {
+  emblem: string;
+  caption: string;
+};
+
+/** One step in a Tell Me More mini timeline — a visual module, not a paragraph. */
+export type SparkNoteExpandedTimelineItem = {
+  label: string;
+  detail?: string;
+};
+
+/**
+ * Second-layer "Tell Me More" content — authored independently from the
+ * front (`teaser` / `whatHappened` / `whyItMatters` / `sparkApplication`).
+ * Every field here must be genuinely new information, never a rephrase of
+ * the front. See docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md
+ */
+export type SparkNoteExpandedContent = {
+  /** A specific "zoom in" detail — not mentioned anywhere on the front. */
+  lookCloser?: string;
+  /** Behind-the-scenes context — a second story beat, not a rephrase. */
+  deeperStory?: string;
+  /** What happened after / because of the front's story. */
+  whatHappenedNext?: string;
+  /** A surprising link between this Spark and today / modern life. */
+  unexpectedConnection?: string;
+  /** New facts — never a repeat of front copy. */
+  newFacts?: string[];
+  /** One small, concrete thing to try right now — distinct from Spark In Action. */
+  tryThis?: string;
+  /** Small illustrated gallery — visual module. */
+  gallery?: SparkNoteExpandedGalleryItem[];
+  /** Mini timeline — visual module for sequence-driven Sparks. */
+  timeline?: SparkNoteExpandedTimelineItem[];
+  /** Attribution / further reading, when relevant. */
+  sources?: string[];
+};
+
 export type SparkNoteReaction =
   | "loved"
   | "smile"
@@ -62,6 +101,8 @@ export type SparkNoteCatalogEntry = {
   cooldownDays?: number;
   /** Content tags for future interest matching and admin. */
   tags?: string[];
+  /** Authored second-layer "Tell Me More" content — optional; generator fills gaps. */
+  expanded?: SparkNoteExpandedContent;
 };
 
 export type SparkNoteDailyCard = {
@@ -82,6 +123,8 @@ export type SparkNoteDailyCard = {
   tags?: string[];
   /** personal | date | library */
   source: "personal" | "date" | "library";
+  /** Authored second-layer "Tell Me More" content — optional; generator fills gaps. */
+  expanded?: SparkNoteExpandedContent;
 };
 
 export type EvaluateDailySparkNoteInput = {

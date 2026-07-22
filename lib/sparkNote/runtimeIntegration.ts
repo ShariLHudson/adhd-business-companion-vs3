@@ -43,6 +43,7 @@ function catalogEntryToFallbackCard(
     thumbnailAlt: entry.thumbnailAlt,
     tags: entry.tags,
     source: "library",
+    expanded: entry.expanded,
   };
 }
 

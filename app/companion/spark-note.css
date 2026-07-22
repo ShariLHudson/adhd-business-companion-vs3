@@ -516,6 +516,187 @@
     linear-gradient(145deg, #4a3d62 0%, #322848 100%);
 }
 
+/* ——— Illustrated hero scene — fun, topic-specific imagery ———
+   Renders whenever no genuinely topic-specific photo exists (explicit image
+   or a matched person/object/topic). Replaces a single lonely emoji with a
+   small illustrated "scene": a medallion emblem, 3 scattered supporting
+   motifs, and a bit of vintage-ephemera flourish (tape + stamp), tinted by
+   diversity category so the ~90% of cards without a bespoke photo still
+   feel playful and topic-flavored instead of generic. See
+   docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md */
+.spark-note-expanded__art-scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 255, 255, 0.24), transparent 46%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.14), transparent 42%),
+    linear-gradient(155deg, var(--spark-note-teal) 0%, var(--spark-note-teal-deep) 100%);
+}
+
+.spark-note-expanded__art-scene[data-diversity-category="innovation"],
+.spark-note-expanded__art-scene[data-diversity-category="science_technology"] {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(245, 215, 110, 0.32), transparent 48%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(150deg, #2a5f6e 0%, #17414c 100%);
+}
+
+.spark-note-expanded__art-scene[data-diversity-category="remarkable_people"],
+.spark-note-expanded__art-scene[data-diversity-category="inspiration"] {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(201, 162, 39, 0.34), transparent 48%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(150deg, #3d4a3a 0%, #232c22 100%);
+}
+
+.spark-note-expanded__art-scene[data-diversity-category="history"],
+.spark-note-expanded__art-scene[data-diversity-category="fun_celebrations"] {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(232, 196, 140, 0.36), transparent 48%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(150deg, #5c4030 0%, #3a2718 100%);
+}
+
+.spark-note-expanded__art-scene[data-diversity-category="fun_facts"],
+.spark-note-expanded__art-scene[data-diversity-category="curiosity"] {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(180, 210, 255, 0.32), transparent 48%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(150deg, #3a4a62 0%, #232c3d 100%);
+}
+
+.spark-note-expanded__art-scene[data-diversity-category="creativity"],
+.spark-note-expanded__art-scene[data-diversity-category="books_ideas"] {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(200, 230, 180, 0.34), transparent 48%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(150deg, #3d5c48 0%, #23392c 100%);
+}
+
+.spark-note-expanded__art-scene[data-diversity-category="kindness"],
+.spark-note-expanded__art-scene[data-diversity-category="nature"] {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(180, 220, 190, 0.34), transparent 48%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(150deg, #2f5c46 0%, #1c3a2c 100%);
+}
+
+.spark-note-expanded__art-scene[data-diversity-category="amazing_places"] {
+  background:
+    radial-gradient(circle at 28% 22%, rgba(255, 210, 180, 0.34), transparent 48%),
+    radial-gradient(circle at 76% 72%, rgba(255, 255, 255, 0.12), transparent 42%),
+    linear-gradient(150deg, #6b4a3a 0%, #402a20 100%);
+}
+
+/* Central medallion holding the category emblem */
+.spark-note-expanded__art-medallion {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(3.6rem, 14vw, 4.6rem);
+  height: clamp(3.6rem, 14vw, 4.6rem);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 252, 245, 0.96), rgba(255, 248, 232, 0.72) 60%, rgba(201, 146, 46, 0.3) 100%);
+  border: 2px solid var(--spark-note-gold-bright);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.spark-note-expanded__art-medallion-emblem {
+  font-size: clamp(1.7rem, 6vw, 2.2rem);
+  line-height: 1;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+}
+
+/* Scattered supporting motifs — small "stickers", never one lonely icon */
+.spark-note-expanded__art-motifs {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.spark-note-expanded__art-motif {
+  position: absolute;
+  font-size: clamp(1.1rem, 4vw, 1.45rem);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.28));
+  opacity: 0.94;
+}
+
+.spark-note-expanded__art-motif--1 {
+  top: 14%;
+  left: 11%;
+  transform: rotate(-10deg);
+}
+
+.spark-note-expanded__art-motif--2 {
+  top: 16%;
+  right: 12%;
+  transform: rotate(9deg);
+}
+
+.spark-note-expanded__art-motif--3 {
+  bottom: 15%;
+  left: 16%;
+  transform: rotate(6deg);
+}
+
+/* Washi-tape ephemera flourish */
+.spark-note-expanded__art-tape {
+  position: absolute;
+  top: -0.35rem;
+  left: 14%;
+  z-index: 2;
+  width: 3.2rem;
+  height: 0.95rem;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 216, 138, 0.85) 0,
+    rgba(255, 216, 138, 0.85) 6px,
+    rgba(245, 193, 108, 0.85) 6px,
+    rgba(245, 193, 108, 0.85) 12px
+  );
+  opacity: 0.85;
+  transform: rotate(-6deg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Postage-stamp ephemera flourish */
+.spark-note-expanded__art-stamp {
+  position: absolute;
+  bottom: 0.55rem;
+  right: 0.65rem;
+  z-index: 2;
+  width: 1.4rem;
+  height: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: var(--spark-note-gold-light);
+  border: 1.5px dashed rgba(255, 248, 235, 0.7);
+  border-radius: 0.2rem;
+  transform: rotate(8deg);
+}
+
+.spark-note-expanded__art-scene .spark-note-expanded__art-caption {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  text-align: center;
+}
+
 .spark-note-expanded__content {
   display: flex;
   flex-direction: column;
@@ -737,7 +918,129 @@
   border-left: 3px solid var(--spark-note-gold);
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.65rem;
+}
+
+/* Shared small-caps label used above every Tell Me More sub-section, so the
+   panel reads as distinct "new discoveries" rather than one long paragraph. */
+.spark-note-expanded__more-section-label {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--spark-note-bronze);
+}
+
+.spark-note-expanded__more-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* "See It Differently" — a small visual reveal, first thing in the panel so
+   Tell Me More always opens with something to look at, not just words. */
+.spark-note-expanded__more-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.spark-note-expanded__more-gallery-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.spark-note-expanded__more-gallery-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.75);
+  border: 1px solid rgba(201, 146, 46, 0.35);
+  font-size: 0.78rem;
+  color: #2f3a3a;
+}
+
+.spark-note-expanded__more-gallery-chip span[aria-hidden] {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.spark-note-expanded__more-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.spark-note-expanded__more-fact {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: #2f3a3a;
+}
+
+.spark-note-expanded__more-fact span[aria-hidden] {
+  color: var(--spark-note-gold-bright);
+  margin-right: 0.15rem;
+}
+
+/* A Small Timeline — sequenced "what happened" beats, distinct from the
+   free-flowing story paragraphs on the front of the card. */
+.spark-note-expanded__more-timeline ol {
+  margin: 0;
+  padding-left: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.spark-note-expanded__more-timeline li {
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: #2f3a3a;
+}
+
+.spark-note-expanded__more-timeline-label {
+  font-weight: 700;
+  color: var(--spark-note-teal-deep);
+  margin-right: 0.35rem;
+}
+
+.spark-note-expanded__more-timeline-detail {
+  color: #2f3a3a;
+}
+
+.spark-note-expanded__more-try {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.55rem;
+  background: rgba(15, 111, 124, 0.08);
+  border: 1px solid rgba(15, 111, 124, 0.25);
+}
+
+.spark-note-expanded__more-try p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--spark-note-teal-deep);
+  font-weight: 600;
+}
+
+.spark-note-expanded__more-sources {
+  margin: 0.1rem 0 0;
+  font-size: 0.68rem;
+  color: var(--spark-note-ink-soft);
+  opacity: 0.75;
+}
+
+.spark-note-expanded__section-copy--quiet {
+  font-style: italic;
+  opacity: 0.85;
 }
 
 .spark-note-expanded__related-label {

@@ -1,13 +1,16 @@
 import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
 import { SPARK_NOTE_CATALOG } from "./catalog";
-import { resolveSparkCardArtAsset } from "./sparkCardArtRegistry";
+import { resolveSparkCardSpecificArtAsset } from "./sparkCardArtRegistry";
 import {
   diversityCategoryIcon,
+  diversityCategoryLabel,
+  pickDiversityHeroMotifs,
   resolveSparkCardCategoryRibbon,
   resolveSparkCardDiversityCategory,
   SPARK_CARD_OUTCOME_FEELINGS,
   type SparkCardDiversityCategoryId,
 } from "./sparkCardDiversity";
+import { generateSparkCardExpandedContent } from "./sparkCardTellMeMoreGenerator";
 
 /** Simplified default-view section labels — treasure card, not article. */
 export const SPARK_CARD_SECTION_STORY = "The Story" as const;
@@ -167,11 +170,95 @@ export type SparkCardRelatedSpark = {
   categoryRibbon: string;
 };
 
+export type SparkCardGalleryItem = { emblem: string; caption: string };
+export type SparkCardTimelineItem = { label: string; detail?: string };
+
+/**
+ * Which "new information" category a Tell Me More field satisfies — used to
+ * verify the expanded card adds at least three genuinely new discoveries
+ * (see prompt's New-Information Requirement).
+ */
+export type SparkCardNewDiscoveryCategory =
+  | "new_fact"
+  | "new_context"
+  | "new_consequence"
+  | "new_connection"
+  | "new_practical_use"
+  | "new_visual_detail"
+  | "new_source";
+
+export type SparkCardTellMeMoreVisualModule = "gallery" | "timeline" | "lookCloser";
+
 export type SparkCardTellMeMore = {
+  /** Genuinely new facts only — never a repeat of front copy. */
   facts: string[];
   reflectionPrompt: string | null;
   related: SparkCardRelatedSpark[];
+  /** "Zoom in" detail not present anywhere on the front. */
+  lookCloser: string | null;
+  /** A second story beat — behind-the-scenes context, not a rephrase. */
+  deeperStory: string | null;
+  /** What happened after / because of the front's story. */
+  whatHappenedNext: string | null;
+  /** A surprising link between this Spark and today. */
+  unexpectedConnection: string | null;
+  /** One small, concrete thing to try — distinct from Spark In Action. */
+  tryThis: string | null;
+  /** Illustrated gallery chips — a visual module, not decoration only. */
+  gallery: SparkCardGalleryItem[];
+  /** Mini timeline — a visual module for sequence-driven Sparks. */
+  timeline: SparkCardTimelineItem[];
+  sources: string[];
+  /** Which visual modules are present — first section shown must be visual. */
+  visualModules: SparkCardTellMeMoreVisualModule[];
+  /** New-information categories satisfied by this expanded content. */
+  newDiscoveryCategories: SparkCardNewDiscoveryCategory[];
+  /** True when >= 3 genuinely new discovery categories are present. */
+  meetsNewInformationRequirement: boolean;
 };
+
+/** Normalize for a lightweight duplication check against front content. */
+function normalizeForDuplicateCheck(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}\s]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * True when `candidate` is the same as, or substantially contained within,
+ * one of the front's texts — the duplication check the prompt requires
+ * before treating expanded content as genuinely new.
+ */
+function isDuplicateOfFrontContent(
+  candidate: string,
+  normalizedFrontTexts: readonly string[],
+): boolean {
+  const norm = normalizeForDuplicateCheck(candidate);
+  if (!norm) return true;
+  return normalizedFrontTexts.some((front) => {
+    if (!front) return false;
+    if (front === norm) return true;
+    if (norm.length > 12 && front.includes(norm)) return true;
+    if (front.length > 12 && norm.includes(front)) return true;
+    return false;
+  });
+}
+
+function resolveFrontContentFingerprints(card: SparkNoteDailyCard): string[] {
+  return [
+    card.title,
+    card.shortTitle,
+    card.teaser,
+    card.whatHappened,
+    resolveTodaysSpark(card),
+    resolveSparkInAction(card),
+  ]
+    .filter((value): value is string => Boolean(value && value.trim()))
+    .map(normalizeForDuplicateCheck);
+}
 
 export type SparkCardSimplifiedPresentation = {
   categoryRibbon: string;
@@ -227,28 +314,106 @@ function resolveRelatedSparks(card: SparkNoteDailyCard): SparkCardRelatedSpark[]
     }));
 }
 
+/**
+ * Tell Me More — the genuinely-new second layer.
+ *
+ * Merges hand-authored `card.expanded` (per-field priority) with the
+ * category generator fallback, then runs a duplication check against every
+ * front field so nothing repeats or lightly rephrases the front. See
+ * docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md.
+ */
 export function resolveSparkCardTellMeMore(
   card: SparkNoteDailyCard,
 ): SparkCardTellMeMore {
-  const facts: string[] = [];
-  const more = resolveSparkCardMoreToDiscover(card);
-  if (more) facts.push(more);
-  if (
-    card.whyInteresting?.trim() &&
-    card.whyInteresting.trim() !== more?.trim()
-  ) {
-    facts.push(card.whyInteresting.trim());
+  const frontFingerprints = resolveFrontContentFingerprints(card);
+  const generated = generateSparkCardExpandedContent(card);
+  const authored = card.expanded;
+
+  function pickNewString(
+    authoredValue?: string,
+    generatedValue?: string,
+  ): string | null {
+    const candidate = authoredValue?.trim() || generatedValue?.trim() || "";
+    if (!candidate) return null;
+    return isDuplicateOfFrontContent(candidate, frontFingerprints)
+      ? null
+      : candidate;
   }
+
+  const lookCloser = pickNewString(authored?.lookCloser, generated.lookCloser);
+  const deeperStory = pickNewString(authored?.deeperStory, generated.deeperStory);
+  const whatHappenedNext = pickNewString(
+    authored?.whatHappenedNext,
+    generated.whatHappenedNext,
+  );
+  const unexpectedConnection = pickNewString(
+    authored?.unexpectedConnection,
+    generated.unexpectedConnection,
+  );
+  const tryThis = pickNewString(authored?.tryThis, generated.tryThis);
+
+  const legacyMoreToDiscover = resolveSparkCardMoreToDiscover(card);
+  const candidateFacts = [
+    ...(authored?.newFacts ?? []),
+    ...(generated.newFacts ?? []),
+    legacyMoreToDiscover,
+    card.whyInteresting?.trim(),
+  ].filter((value): value is string => Boolean(value && value.trim()));
+
+  const seenFacts = new Set<string>();
+  const facts: string[] = [];
+  for (const fact of candidateFacts) {
+    const norm = normalizeForDuplicateCheck(fact);
+    if (!norm || seenFacts.has(norm)) continue;
+    if (isDuplicateOfFrontContent(fact, frontFingerprints)) continue;
+    seenFacts.add(norm);
+    facts.push(fact.trim());
+    if (facts.length >= 4) break; // keepsake card, not an essay
+  }
+
+  const gallery =
+    authored?.gallery?.length ? authored.gallery : generated.gallery ?? [];
+  const timeline =
+    authored?.timeline?.length ? authored.timeline : generated.timeline ?? [];
+  const sources =
+    authored?.sources?.length ? authored.sources : generated.sources ?? [];
 
   const reflection =
     card.sparkApplication?.trim().endsWith("?")
       ? card.sparkApplication.trim()
       : null;
 
+  const visualModules: SparkCardTellMeMoreVisualModule[] = [];
+  if (gallery.length > 0) visualModules.push("gallery");
+  if (timeline.length > 0) visualModules.push("timeline");
+  if (lookCloser) visualModules.push("lookCloser");
+
+  const newDiscoveryCategories: SparkCardNewDiscoveryCategory[] = [];
+  if (facts.length > 0) newDiscoveryCategories.push("new_fact");
+  if (deeperStory) newDiscoveryCategories.push("new_context");
+  if (whatHappenedNext) newDiscoveryCategories.push("new_consequence");
+  if (unexpectedConnection) newDiscoveryCategories.push("new_connection");
+  if (tryThis) newDiscoveryCategories.push("new_practical_use");
+  if (gallery.length > 0 || timeline.length > 0 || lookCloser) {
+    newDiscoveryCategories.push("new_visual_detail");
+  }
+  if (sources.length > 0) newDiscoveryCategories.push("new_source");
+
   return {
     facts,
     reflectionPrompt: reflection,
     related: resolveRelatedSparks(card),
+    lookCloser,
+    deeperStory,
+    whatHappenedNext,
+    unexpectedConnection,
+    tryThis,
+    gallery,
+    timeline,
+    sources,
+    visualModules,
+    newDiscoveryCategories,
+    meetsNewInformationRequirement: newDiscoveryCategories.length >= 3,
   };
 }
 
@@ -307,7 +472,11 @@ export type SparkCardHeroVisual =
   | {
       kind: "themed";
       category: SparkNoteCategory;
+      diversityCategory: SparkCardDiversityCategoryId;
       emblem: string;
+      /** Small supporting motifs — an illustrated scene, not a single icon. */
+      motifs: string[];
+      caption: string;
       alt: string;
     };
 
@@ -330,20 +499,48 @@ export const SPARK_CARD_CATEGORY_EMBLEM: Record<SparkNoteCategory, string> = {
 
 /**
  * Hero visual for expanded Spark Cards — always returns something displayable.
- * Prefers catalog image; falls back to category-themed collectible art.
+ *
+ * Only uses a real photo when it is genuinely topic-specific (an explicit
+ * catalog image, or a matched person/object/topic). Everything else renders
+ * the illustrated themed scene (medallion emblem + supporting motifs) so the
+ * ~90% of the library without a specific photo never recycles the same
+ * handful of generic per-category stock photos — see
+ * docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md.
  */
 export function resolveSparkCardHeroVisual(
   card: SparkNoteDailyCard,
 ): SparkCardHeroVisual {
-  const asset = resolveSparkCardArtAsset(card);
-  if (asset.src) {
-    return { kind: "photo", src: asset.src, alt: asset.alt };
+  const specific = resolveSparkCardSpecificArtAsset(card);
+  if (specific) {
+    return { kind: "photo", src: specific.src, alt: specific.alt };
   }
+
+  return resolveSparkCardThemedScene(card);
+}
+
+/**
+ * Illustrated themed scene payload — medallion emblem + supporting motifs +
+ * caption ribbon. Used as the default hero when no specific photo exists,
+ * and as the graceful fallback if a specific photo fails to load at runtime.
+ */
+export function resolveSparkCardThemedScene(
+  card: Pick<SparkNoteDailyCard, "id" | "category" | "categoryLabel" | "tags" | "title">,
+): Extract<SparkCardHeroVisual, { kind: "themed" }> {
+  const diversityCategory = resolveSparkCardDiversityCategory({
+    category: card.category,
+    categoryLabel: card.categoryLabel,
+    tags: card.tags,
+    title: card.title,
+  });
+
   return {
     kind: "themed",
     category: card.category,
-    emblem: SPARK_CARD_CATEGORY_EMBLEM[card.category] ?? "✨",
-    alt: asset.alt,
+    diversityCategory,
+    emblem: diversityCategoryIcon(diversityCategory),
+    motifs: pickDiversityHeroMotifs(diversityCategory, card.id, 3),
+    caption: diversityCategoryLabel(diversityCategory),
+    alt: `Illustrated ${diversityCategoryLabel(diversityCategory)} discovery — ${card.title}`,
   };
 }
 
