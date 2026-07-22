@@ -28,7 +28,7 @@ import type {
   EstateCapability,
   EstateEnvironmentChoice,
 } from "./intelligenceTypes";
-import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
+import { isProjectCreationIntent } from "@/lib/createExperience/projectCreationIntent";
 import { hasLeadingExplicitNavigationVerb } from "@/lib/estate/explicitNavigationVerb";
 
 export type { EstateEnvironmentChoice };

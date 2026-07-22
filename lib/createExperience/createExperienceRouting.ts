@@ -24,6 +24,9 @@ import {
   resolvedArtifactFromSessionContext,
 } from "@/lib/conversationSession";
 import type { UniversalCreationSession } from "@/lib/universalCreation/types";
+import { isProjectCreationIntent } from "./projectCreationIntent";
+
+export { isProjectCreationIntent } from "./projectCreationIntent";
 
 export const CREATE_EXPERIENCE_ARRIVAL_PROMPT =
   estateExperienceArrivalPrompt("create");
@@ -42,9 +45,6 @@ export type ImmediateCreateOpenPayload = {
   /** Member sees this first */
   arrivalLine: string;
 };
-
-const PROJECT_CREATE_RE =
-  /\b(?:create|start|new|add|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\b(?:want|need|like)\s+to\s+(?:create|start|begin)\s+(?:a\s+)?(?:new\s+)?project\b|\bturn\s+(?:this|it|that)\s+into\s+a\s+project\b|\borganize\s+(?:this|it|that)\s+as\s+a\s+project\b|\bhelp\s+me\s+(?:start|create|organize)\s+(?:a\s+)?(?:new\s+)?project\b/i;
 
 /** Explicit go/open/show Projects — never multi-place soft invites. */
 const PROJECTS_NAVIGATION_RE =
@@ -70,31 +70,32 @@ function followUpForItemType(
   }
 
   const t = itemType.toLowerCase();
+  // 067 — invite into work; do not claim "opened" before verify
   if (t === "sop") {
-    return "I've opened a new SOP. What process are we documenting today?";
+    return "Let's shape your SOP. What process are we documenting today?";
   }
   if (t === "email") {
-    return "I've opened a new email. Who is it for, and what's the main point?";
+    return "Let's shape your email. Who is it for, and what's the main point?";
   }
   if (t.includes("newsletter")) {
-    return "I've opened a newsletter draft. What's this one about?";
+    return "Let's shape your newsletter. What's this one about?";
   }
   if (t.includes("mind map") || t === "mind map") {
-    return "Mind map is ready. What should we map first?";
+    return "Let's start your mind map. What should we map first?";
   }
   if (t.includes("flowchart") || t.includes("process map")) {
-    return "Flowchart is open. What's the process we're laying out?";
+    return "Let's lay out your flowchart. What's the process?";
   }
   if (t.includes("checklist")) {
-    return "Checklist is ready. What are we checking off?";
+    return "Let's build your checklist. What are we checking off?";
   }
   if (t.includes("proposal")) {
-    return "Proposal draft is open. Who is it for?";
+    return "Let's shape your proposal. Who is it for?";
   }
   if (t.includes("funnel") || t.includes("sales funnel")) {
-    return "Funnel workspace is open. What are we building this funnel for?";
+    return "Let's shape your funnel. What are we building this for?";
   }
-  return `I've opened a new ${itemType}. What should we make first?`;
+  return `Let's shape your ${itemType}. What should we make first?`;
 }
 
 function arrivalLineForIntent(userText: string): string {
@@ -128,17 +129,14 @@ export const MOMENTUM_ESTATE_PLACE_ID =
 export type ImmediateCreateProjectOpenPayload = {
   userText: string;
   experienceId: "create";
-  /** Estate Projects destination — never legacy split ProjectsPanel. */
-  estatePlaceId: "project-homes";
-  toolSection: "project-homes";
-  /** Open Project Homes on the create-purpose step. */
-  initialView: "create-purpose";
+  /**
+   * 057 — New work begins in Create (conversational entry).
+   * Projects continues Active Work; it never opens a Project Home creation screen.
+   */
+  estatePlaceId: typeof CREATE_ESTATE_PLACE_ID;
+  toolSection: "create";
   followUpLine: string;
 };
-
-export function isProjectCreationIntent(userText: string): boolean {
-  return PROJECT_CREATE_RE.test(userText.trim());
-}
 
 /** Member asked to go to / open Projects — route directly, no soft invites. */
 export function isExplicitProjectsNavigationIntent(userText: string): boolean {
@@ -160,14 +158,14 @@ export function resolveImmediateCreateProjectAction(
 ): ImmediateCreateProjectOpenPayload | null {
   const text = userText.trim();
   if (!isProjectCreationIntent(text)) return null;
-  const arrival = "Let's bring that project to life.";
-  const followUp = "What should we call it?";
+  const arrival = "Let's bring that to life.";
+  const followUp =
+    "Tell me what you want to create — we'll shape it together in the workspace.";
   return {
     userText: text,
     experienceId: "create",
-    estatePlaceId: "project-homes",
-    toolSection: "project-homes",
-    initialView: "create-purpose",
+    estatePlaceId: CREATE_ESTATE_PLACE_ID,
+    toolSection: "create",
     followUpLine: `${arrival}\n\n${followUp}`,
   };
 }

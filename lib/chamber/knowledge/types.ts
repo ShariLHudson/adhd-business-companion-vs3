@@ -20,11 +20,31 @@ export type ChamberKnowledgeLibraryStatus =
   | "architecture-pack-only"
   | "not-built";
 
+/** Optional readiness of a registered knowledge file for user-facing retrieval. */
+export type ChamberKnowledgeDocStatus =
+  | "canonical"
+  | "approved"
+  | "reference"
+  | "unavailable"
+  | "exclude-from-retrieval";
+
 export type ChamberKnowledgeDocRef = {
   /** Repo-relative path from process.cwd() */
   path: string;
   /** Short role for retrieval selection */
   role: string;
+  /** Human title (internal; never shown as a menu) */
+  title?: string;
+  /** Inventory category (e.g. architecture-pack, kmg-library) */
+  category?: string;
+  /** Ownership / topic tags for selective retrieval */
+  ownershipTags?: readonly string[];
+  /** Version or pack id string */
+  version?: string;
+  /** Retrieval eligibility */
+  status?: ChamberKnowledgeDocStatus;
+  /** Lower number = higher priority when capping context */
+  retrievalPriority?: number;
 };
 
 /**
@@ -81,6 +101,10 @@ export type ChamberKnowledgeRetrievalSlice = {
 export type LoadChamberKnowledgeOptions = {
   /** Optional domain hint to prefer certain doc roles (e.g. "safety", "frameworks") */
   domainHint?: string | null;
-  /** When true, skip fs.existsSync (unit tests with mocked pack) */
+  /**
+   * Retained for API compatibility. `loadChamberKnowledge` is browser-safe and
+   * never touches the filesystem. Use `loadChamberKnowledgeVerified` (Node-only)
+   * when disk checks are required.
+   */
   skipFilesystemCheck?: boolean;
 };

@@ -2,12 +2,14 @@
  * Load Chamber knowledge retrieval slice for an active member conversation.
  * Extends existing Chamber persona path — selects paths + contracts; does not
  * dump entire libraries into the prompt.
+ *
+ * Browser-safe: no node:fs / node:path. Disk verification lives in
+ * verifyChamberKnowledgePaths.ts (Node / tests only).
  */
 
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
 import { getChamberKnowledgePack } from "./chamberKnowledgeRegistry";
 import { clientRelationshipsRolesForHint } from "./clientRelationshipsContracts";
+import { knowledgeManagementSelectPaths } from "./knowledgeManagementContracts";
 import {
   eventsIntelligenceRetrievalPath,
 } from "@/lib/eventsIntelligence/knowledgeManifest";
@@ -15,21 +17,6 @@ import type {
   ChamberKnowledgeRetrievalSlice,
   LoadChamberKnowledgeOptions,
 } from "./types";
-
-function verifyPaths(paths: readonly string[]): {
-  filesVerified: boolean;
-  missingPaths: string[];
-} {
-  const missing: string[] = [];
-  for (const rel of paths) {
-    const abs = resolve(process.cwd(), rel);
-    if (!existsSync(abs)) missing.push(rel);
-  }
-  return {
-    filesVerified: missing.length === 0,
-    missingPaths: missing,
-  };
-}
 
 function selectPathsForMember(
   memberId: string,
@@ -50,17 +37,31 @@ function selectPathsForMember(
     return pack.docs.filter((d) => roles.has(d.role)).map((d) => d.path);
   }
 
-  if (pack.contract?.defaultRetrievalRoles?.length) {
-    const roles = new Set(pack.contract.defaultRetrievalRoles);
-    return pack.docs.filter((d) => roles.has(d.role)).map((d) => d.path);
+  if (pack.memberId === "knowledge-management") {
+    return knowledgeManagementSelectPaths(pack.docs, domainHint);
   }
 
-  return pack.docs.map((d) => d.path);
+  if (pack.contract?.defaultRetrievalRoles?.length) {
+    const roles = new Set(pack.contract.defaultRetrievalRoles);
+    return pack.docs
+      .filter((d) => d.status !== "exclude-from-retrieval")
+      .filter((d) => d.status !== "unavailable")
+      .filter((d) => roles.has(d.role))
+      .map((d) => d.path);
+  }
+
+  return pack.docs
+    .filter((d) => d.status !== "exclude-from-retrieval")
+    .filter((d) => d.status !== "unavailable")
+    .map((d) => d.path);
 }
 
 /**
  * Resolve the knowledge slice for Chamber chat / tests.
  * Safe when pack is docs-only: returns empty paths + null contract.
+ *
+ * Does not touch the filesystem. For disk verification in Node, use
+ * `loadChamberKnowledgeVerified` from `./verifyChamberKnowledgePaths`.
  */
 export function loadChamberKnowledge(
   memberId: string,
@@ -82,10 +83,6 @@ export function loadChamberKnowledge(
   }
 
   const selectedPaths = selectPathsForMember(memberId, options.domainHint);
-  const check =
-    options.skipFilesystemCheck || selectedPaths.length === 0
-      ? { filesVerified: true, missingPaths: [] as string[] }
-      : verifyPaths(selectedPaths);
 
   return {
     memberId: pack.memberId,
@@ -93,8 +90,10 @@ export function loadChamberKnowledge(
     libraryVersion: pack.contract?.libraryVersion ?? null,
     docsRoot: pack.docsRoot,
     selectedPaths,
-    filesVerified: check.filesVerified,
-    missingPaths: check.missingPaths,
+    // Client-safe default: skip disk I/O. Callers that need verification
+    // must use loadChamberKnowledgeVerified (Node-only module).
+    filesVerified: true,
+    missingPaths: [],
     contract: pack.contract,
     runtimeBridge: pack.runtimeBridge ?? null,
   };
