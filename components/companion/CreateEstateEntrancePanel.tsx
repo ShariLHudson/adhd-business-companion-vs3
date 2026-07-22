@@ -13,7 +13,6 @@ import {
   CREATE_ESTATE_COMPOSER_PLACEHOLDER,
   CREATE_ESTATE_CONFIRM_CANCEL,
   CREATE_ESTATE_CONFIRM_OTHER,
-  CREATE_ESTATE_CONTINUE_EMPTY,
   CREATE_ESTATE_CONTINUE_HEADING,
   CREATE_ESTATE_GUIDED_FRAMEWORKS_HEADING,
   CREATE_ESTATE_GUIDED_FRAMEWORKS_HINT,
@@ -42,8 +41,10 @@ import {
   confirmCreateBeginToOpen,
   resolveCatalogCreateConfirm,
   resolveCreateBeginOutcome,
+  switchCreateBeginConfirmType,
   type CreateBeginOutcome,
 } from "@/lib/createEstate/resolveCreateBeginOutcome";
+import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
 import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
 import { listCreateDraftEntries } from "@/lib/createDraftLibrary";
 import {
@@ -92,8 +93,9 @@ type Props = {
 };
 
 /**
- * Welcome Home → Create (056 / 127 / 129)
- * Hierarchy: Continue Working → Start Something New → More Ways (collapsed).
+ * Welcome Home → Create (056 / 127 / 129 / 131)
+ * Hierarchy: Continue Working (if any) → Start Something New → More Ways (collapsed).
+ * Spec 131 — ≤3 visible decision layers; Continue Working hidden when empty.
  */
 export function CreateEstateEntrancePanel({
   onBack,
@@ -335,33 +337,27 @@ export function CreateEstateEntrancePanel({
           {CREATE_GUIDED_SUPPORT_LINE}
         </p>
 
-        {/* 1 — Continue Working (one resume path) */}
-        <section
-          className="mt-4"
-          data-testid="create-estate-continue"
-          aria-labelledby="create-estate-continue-heading"
-        >
-          <h2
-            id="create-estate-continue-heading"
-            className="text-lg font-semibold text-[#1f1c19]"
+        {/* 1 — Continue Working (Spec 131 Rule 11 — hide when empty) */}
+        {hasWorkspaces ? (
+          <section
+            className="mt-4"
+            data-testid="create-estate-continue"
+            aria-labelledby="create-estate-continue-heading"
           >
-            {CREATE_ESTATE_CONTINUE_HEADING}
-          </h2>
-          <div className="mt-3">
-            <CreateWorkspaceResumeList
-              onResume={onResumeCreationWorkspace}
-              onRename={onRenameWorkspace ?? undefined}
-            />
-          </div>
-          {!hasWorkspaces ? (
-            <p
-              className="mt-3 text-sm text-[#6b635a]"
-              data-testid="create-estate-continue-empty"
+            <h2
+              id="create-estate-continue-heading"
+              className="text-lg font-semibold text-[#1f1c19]"
             >
-              {CREATE_ESTATE_CONTINUE_EMPTY}
-            </p>
-          ) : null}
-        </section>
+              {CREATE_ESTATE_CONTINUE_HEADING}
+            </h2>
+            <div className="mt-3">
+              <CreateWorkspaceResumeList
+                onResume={onResumeCreationWorkspace}
+                onRename={onRenameWorkspace ?? undefined}
+              />
+            </div>
+          </section>
+        ) : null}
 
         {/* 2 — Start Something New */}
         <section
@@ -453,39 +449,72 @@ export function CreateEstateEntrancePanel({
                 <p>{beginFeedback}</p>
                 {beginFeedbackKind === "confirm" && pendingConfirm ? (
                   <div
-                    className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap"
+                    className="mt-3 flex flex-col gap-2"
                     data-testid="create-estate-intent-confirm"
                     role="group"
                     aria-label="Confirm what to create"
                   >
-                    <button
-                      type="button"
-                      disabled={beginBusy}
-                      className="rounded-xl bg-[#3d3429] px-5 py-2.5 text-sm font-semibold text-[#f7f2ea] transition hover:bg-[#2c241c] disabled:opacity-70"
-                      data-testid="create-estate-confirm-yes"
-                      data-primary-action="begin"
-                      onClick={acceptConfirm}
-                    >
-                      {createConfirmPrimaryLabel(pendingConfirm.artifactType)}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={beginBusy}
-                      className="rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
-                      data-testid="create-estate-confirm-other"
-                      onClick={declineConfirm}
-                    >
-                      {CREATE_ESTATE_CONFIRM_OTHER}
-                    </button>
-                    <button
-                      type="button"
-                      disabled={beginBusy}
-                      className="rounded-xl px-5 py-2.5 text-sm font-semibold text-[#6b635a] transition hover:underline disabled:opacity-70"
-                      data-testid="create-estate-confirm-cancel"
-                      onClick={cancelConfirm}
-                    >
-                      {CREATE_ESTATE_CONFIRM_CANCEL}
-                    </button>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                      <button
+                        type="button"
+                        disabled={beginBusy}
+                        className="rounded-xl bg-[#3d3429] px-5 py-2.5 text-sm font-semibold text-[#f7f2ea] transition hover:bg-[#2c241c] disabled:opacity-70"
+                        data-testid="create-estate-confirm-yes"
+                        data-primary-action="begin"
+                        onClick={acceptConfirm}
+                      >
+                        {createConfirmPrimaryLabel(pendingConfirm.artifactType)}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={beginBusy}
+                        className="rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                        data-testid="create-estate-confirm-other"
+                        onClick={declineConfirm}
+                      >
+                        {CREATE_ESTATE_CONFIRM_OTHER}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={beginBusy}
+                        className="rounded-xl px-5 py-2.5 text-sm font-semibold text-[#6b635a] transition hover:underline disabled:opacity-70"
+                        data-testid="create-estate-confirm-cancel"
+                        onClick={cancelConfirm}
+                      >
+                        {CREATE_ESTATE_CONFIRM_CANCEL}
+                      </button>
+                    </div>
+                    {pendingConfirm.alsoConsidered &&
+                    pendingConfirm.alsoConsidered.length > 0 ? (
+                      <div
+                        className="flex flex-col gap-1.5"
+                        data-testid="create-estate-also-considered"
+                      >
+                        <p className="text-sm text-[#6b635a]">Also considered:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {pendingConfirm.alsoConsidered.map((alt) => (
+                            <button
+                              key={alt}
+                              type="button"
+                              disabled={beginBusy}
+                              className="rounded-full border border-[#cfc6b8] bg-white px-3 py-1.5 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                              data-testid="create-estate-also-considered-option"
+                              data-also-considered={alt}
+                              onClick={() => {
+                                showConfirm(
+                                  switchCreateBeginConfirmType(
+                                    pendingConfirm,
+                                    alt,
+                                  ),
+                                );
+                              }}
+                            >
+                              {createConfirmPrimaryLabel(alt)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
@@ -493,10 +522,11 @@ export function CreateEstateEntrancePanel({
           </div>
         </section>
 
-        {/* 3 — More Ways to Start (Optional) — advanced tools collapsed */}
+        {/* 3 — More Ways to Start (Optional) — Spec 131 ≤3 decision layers */}
         <details
           className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
           data-testid="create-estate-more-ways"
+          data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
           open={moreWaysOpen}
           onToggle={(e) =>
             setMoreWaysOpen((e.target as HTMLDetailsElement).open)
@@ -558,38 +588,48 @@ export function CreateEstateEntrancePanel({
                   Marketing Plan
                 </button>
               </div>
-              <div className="mt-2 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  className={`rounded-full px-3 py-1.5 text-sm ${
-                    templateSourceHint === "personal"
-                      ? "bg-[#3d3429] text-[#f7f2ea]"
-                      : "border border-[#cfc6b8] bg-white text-[#3d3429]"
-                  }`}
-                  data-testid="create-estate-personal-templates"
-                  onClick={() => setTemplateSourceHint("personal")}
-                >
-                  {CREATE_ESTATE_PERSONAL_TEMPLATES_HEADING}
-                </button>
-                <button
-                  type="button"
-                  className={`rounded-full px-3 py-1.5 text-sm ${
-                    templateSourceHint === "company"
-                      ? "bg-[#3d3429] text-[#f7f2ea]"
-                      : "border border-[#cfc6b8] bg-white text-[#3d3429]"
-                  }`}
-                  data-testid="create-estate-company-templates"
-                  onClick={() => setTemplateSourceHint("company")}
-                >
-                  {CREATE_ESTATE_COMPANY_TEMPLATES_HEADING}
-                </button>
-              </div>
-              {templateSourceHint ? (
-                <p className="mt-2 text-sm text-[#6b635a]" role="status">
-                  Showing {templateSourceHint === "personal" ? "personal" : "company"}{" "}
-                  structures when available for this kind of work.
-                </p>
-              ) : null}
+              {/* Spec 131 Rule 7 — templates as progressive layer (not always-visible 4th decision) */}
+              <details
+                className="mt-2 rounded-xl border border-[#e7dfd4] bg-white/80 px-3 py-2"
+                data-testid="create-estate-template-source"
+              >
+                <summary className="cursor-pointer text-sm font-semibold text-[#3d3429]">
+                  Templates (optional)
+                </summary>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      templateSourceHint === "personal"
+                        ? "bg-[#3d3429] text-[#f7f2ea]"
+                        : "border border-[#cfc6b8] bg-white text-[#3d3429]"
+                    }`}
+                    data-testid="create-estate-personal-templates"
+                    onClick={() => setTemplateSourceHint("personal")}
+                  >
+                    {CREATE_ESTATE_PERSONAL_TEMPLATES_HEADING}
+                  </button>
+                  <button
+                    type="button"
+                    className={`rounded-full px-3 py-1.5 text-sm ${
+                      templateSourceHint === "company"
+                        ? "bg-[#3d3429] text-[#f7f2ea]"
+                        : "border border-[#cfc6b8] bg-white text-[#3d3429]"
+                    }`}
+                    data-testid="create-estate-company-templates"
+                    onClick={() => setTemplateSourceHint("company")}
+                  >
+                    {CREATE_ESTATE_COMPANY_TEMPLATES_HEADING}
+                  </button>
+                </div>
+                {templateSourceHint ? (
+                  <p className="mt-2 text-sm text-[#6b635a]" role="status">
+                    Showing{" "}
+                    {templateSourceHint === "personal" ? "personal" : "company"}{" "}
+                    structures when available for this kind of work.
+                  </p>
+                ) : null}
+              </details>
               <div className="mt-3">
                 <UniversalBlueprintInterface
                   workTypeId={blueprintWorkTypeId}

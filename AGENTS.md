@@ -49,6 +49,8 @@ If legacy code or older docs conflict → **change implementation**, not the can
 **Restoration:** `docs/estate/ARCHITECTURAL_RESTORATION.md` · **Cleanup:** `docs/ESTATE_CLEANUP_ROADMAP.md`
 
 **Simplicity & Cognitive Load (128 — BINDING):** `docs/constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md` — every release must reduce cognitive effort; never expose architecture; simplicity / cognitive load / ADHD experience certification required. Cursor rule: `.cursor/rules/simplicity-cognitive-load-constitution.mdc`.
+
+**Create Intelligence & Intent (131 — BINDING):** `docs/constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md` — infer Create goals not keywords; confidence-based alternatives; never silent Work create (130). Cursor rule: `.cursor/rules/create-intelligence-intent-constitution.mdc`.
 <!-- END:estate-architectural-authority -->
 
 <!-- BEGIN:companion-dna -->

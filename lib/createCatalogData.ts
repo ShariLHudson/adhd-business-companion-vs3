@@ -151,6 +151,23 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
           "webinar",
         ],
       },
+      {
+        label: "Event Plan",
+        emoji: "🎪",
+        matchTerms: [
+          "event",
+          "event plan",
+          "product launch event",
+          "launch event",
+          "launch party",
+          "retreat",
+          "retreat weekend",
+          "summit",
+          "conference",
+          "gathering",
+          "meetup",
+        ],
+      },
     ],
   },
   {
@@ -241,9 +258,23 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         ],
       },
       {
+        label: "Flyer",
+        emoji: "📄",
+        matchTerms: [
+          "flyer",
+          "flier",
+          "brochure",
+          "handout",
+          "one-pager",
+          "one pager",
+          "rack card",
+          "promotional material",
+        ],
+      },
+      {
         label: "Launch Plan",
         emoji: "🚀",
-        matchTerms: ["launch plan", "product launch"],
+        matchTerms: ["launch plan", "go to market launch", "gtm launch"],
       },
       {
         label: "Marketing Strategy",

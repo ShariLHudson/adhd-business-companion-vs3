@@ -1,0 +1,64 @@
+---
+description: Spec 131 — Create Intelligence & Intent Constitution; infer goals not keywords; confidence-based alternatives; never silent create
+alwaysApply: true
+---
+
+# Create Intelligence & Intent Constitution™ (131)
+
+**Full document:** `docs/constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md`
+
+**Binding product law** for Create intent. Understand what the member wants to accomplish — not keyword match. Users never learn to “talk to the system.”
+
+## Mission
+
+Infer the user’s goal, not just their words. Outcomes → intentions → artifacts.
+
+## Conflict rules
+
+- **128** wins on complexity / architecture exposure / ADHD certification  
+- **130** One Creation Rule — never silently create Work  
+- **131** governs how intent is understood before confirmation  
+
+## Fifteen rules (summary)
+
+1. Intent before artifact — flyer for workshop = promotional deliverable, not Workshop Plan  
+2. Offer smart alternatives when confidence &lt; ~95% — most likely + also considered  
+3. Never make users rewrite  
+4. Intent categories first (document/project/plan/strategy/campaign/communication/deliverable/business asset/event), then Work Type  
+5. Recognize relationships — NEW vs supporting EXISTING  
+6. Suggest before asking again — “I think you meant one of these”  
+7. More Ways to Start calm — ≤3 visible decision layers  
+8. One search, many results  
+9. Context beats catalogs  
+10. Navigation should confirm location  
+11. Empty states match reality — Continue Working disappears if none  
+12. Confidence drives behavior — VH recommend / medium 2–4 options / low one question / never silent guess  
+13. Learn from corrections (V1 hooks; Intent Memory™ future)  
+14. Measure success = correct work on first attempt  
+15. Certification gates — all must pass before Create intent work is complete  
+
+## Confidence bands (Rule 12)
+
+| Band | Behavior |
+|------|----------|
+| Very high | Recommend · confirm Yes / Choose something else |
+| Medium | Most likely + also-considered options |
+| Low | One clarifying question |
+| Any | Never silent Work creation |
+
+## Before shipping Create intent / Begin / catalog routing
+
+- [ ] Intent before artifact (promo for event ≠ event plan)?  
+- [ ] Medium confidence surfaces alternatives?  
+- [ ] Confirm still required before Work exists (130)?  
+- [ ] Continue Working hidden when empty?  
+- [ ] More Ways ≤3 decision layers?  
+- [ ] No architecture / Work Type jargon in member copy (128)?  
+
+## Intent Memory™
+
+Per-member pattern learning is a **future capability**. V1 may keep correction-ready hooks only. Do not build a new durable preference store without Spec 112 permission paths.
+
+**Types:** `lib/sparkCreateIntentConstitution/types.ts`  
+**Runtime:** `lib/createEstate/createIntentConfirmation.ts` · `resolveCreateBeginOutcome.ts`  
+Also: [128](../docs/constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) · [130](../docs/create-experience/130_CREATE_EXPERIENCE_FINAL_POLISH_AND_CERTIFICATION.md)

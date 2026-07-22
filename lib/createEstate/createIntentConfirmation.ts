@@ -1,7 +1,8 @@
 /**
- * Spec 127 / 130 — Create Experience Simplification.
+ * Spec 127 / 130 / 131 — Create Experience Simplification + Intent Constitution.
  * Intent confirmation before Work creation. Never silently mint the wrong type.
  * One Creation Rule™ — every path confirms before Work exists.
+ * Spec 131 — intent before artifact; smart alternatives below ~95% confidence.
  */
 
 export type CreateIntentConfidence = "high" | "medium" | "low";
@@ -32,6 +33,29 @@ export function createIntentSoftConfirmMessage(artifactType: string): string {
   return `I think ${article} ${label} fits what you described — shall we start there?`;
 }
 
+/**
+ * Spec 131 Rule 2 / 6 — medium confidence: most likely + also considered.
+ * Never implies Work already exists.
+ */
+export function createIntentAlternativesMessage(
+  mostLikely: string,
+  alsoConsidered: readonly string[],
+): string {
+  const primary = humanCreateTypeLabel(mostLikely);
+  const article = /^[aeiou]/i.test(primary) ? "an" : "a";
+  if (alsoConsidered.length === 0) {
+    return createIntentSoftConfirmMessage(mostLikely);
+  }
+  const also = alsoConsidered
+    .map((t) => humanCreateTypeLabel(t))
+    .filter(Boolean)
+    .slice(0, 3);
+  if (also.length === 0) {
+    return createIntentSoftConfirmMessage(mostLikely);
+  }
+  return `I think you meant ${article} ${primary}. I also considered: ${also.join(", ")}.`;
+}
+
 /** Primary confirm CTA — Create Blog Post / Create Marketing Plan. */
 export function createConfirmPrimaryLabel(artifactType: string): string {
   const label = humanCreateTypeLabel(artifactType);
@@ -51,9 +75,26 @@ export function createWorkReadyMessage(artifactType: string): string {
 }
 
 /**
+ * Spec 131 Rule 1 — Intent before artifact.
+ * Promotional material *for* an event/workshop is a deliverable, not the event plan.
+ */
+export function detectPromotionalDeliverableIntent(text: string): string | null {
+  const t = text.trim().toLowerCase();
+  if (!t) return null;
+  if (
+    !/\b(flyer|flier|brochure|handout|one[\s-]?pager|rack\s*card|promotional\s+material)\b/.test(
+      t,
+    )
+  ) {
+    return null;
+  }
+  return "Flyer";
+}
+
+/**
  * Score how sure we are about the inferred create type.
  * High → confirm with Yes / Choose something else.
- * Medium → soft confirm.
+ * Medium → soft confirm + also-considered when available (131).
  * Low → one clarifying question (never create).
  */
 export function scoreCreateIntentConfidence(input: {
@@ -63,6 +104,8 @@ export function scoreCreateIntentConfidence(input: {
   fromPromptDetect: boolean;
   isMarketingPlanDomain: boolean;
   isEventDomain: boolean;
+  /** Spec 131 — intent-before-artifact promotional override */
+  fromPromotionalIntent?: boolean;
 }): CreateIntentConfidence {
   const text = input.text.trim().toLowerCase();
   const type = input.artifactType.trim().toLowerCase();
@@ -72,6 +115,15 @@ export function scoreCreateIntentConfidence(input: {
   const explicit =
     typeWord.length >= 3 &&
     new RegExp(`\\b${typeWord.replace(/\s+/g, "\\s+")}\\b`, "i").test(text);
+
+  // Promo deliverable named explicitly — high when wording is clear.
+  if (input.fromPromotionalIntent && explicit) {
+    return "high";
+  }
+  // Flyer for workshop — intent clear enough to recommend, still confirm (130).
+  if (input.fromPromotionalIntent) {
+    return "medium";
+  }
 
   if (
     input.isMarketingPlanDomain ||
@@ -85,4 +137,23 @@ export function scoreCreateIntentConfidence(input: {
   }
   if (input.fromPromptDetect) return "medium";
   return "low";
+}
+
+/** Cap also-considered options (Rule 2 / 12 — medium: 2–4). */
+export function limitAlsoConsidered(
+  primary: string,
+  candidates: readonly string[],
+  max = 3,
+): string[] {
+  const primaryKey = humanCreateTypeLabel(primary).toLowerCase();
+  const out: string[] = [];
+  for (const raw of candidates) {
+    const label = humanCreateTypeLabel(raw);
+    if (!label) continue;
+    if (label.toLowerCase() === primaryKey) continue;
+    if (out.some((x) => x.toLowerCase() === label.toLowerCase())) continue;
+    out.push(label);
+    if (out.length >= max) break;
+  }
+  return out;
 }

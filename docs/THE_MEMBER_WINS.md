@@ -46,6 +46,7 @@ When in conflict:
 | [Spec 111 — Spark Hospitality](./SPARK_HOSPITALITY_FRAMEWORK.md) | Emotional operating system |
 | [Spec 100 — Transformation Constitution](./ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md) | Why Spark exists — capability growth |
 | [128 — Simplicity & Cognitive Load](./constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) | How ease is audited — every release must reduce cognitive effort |
+| [131 — Create Intelligence & Intent](./constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | How Create understands goals — outcomes before artifacts; no “talk to the system” |
 | [Architecture Freeze](./SPARK_CONVERSATION_ARCHITECTURE_FREEZE.md) | Specs change only when testing proves better member experience |
 | [Parking Lot](./PARKING_LOT.md) | Future ideas wait — current milestone serves the member **now** |
 

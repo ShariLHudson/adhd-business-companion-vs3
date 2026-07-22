@@ -26,8 +26,9 @@
 | **116** | [Estate Navigation Constitution](../constitution/116_ESTATE_NAVIGATION_CONSTITUTION.md) | Intent-first navigation |
 | **117** | [Trust, Memory & Relationship](../constitution/117_TRUST_MEMORY_AND_RELATIONSHIP_CONSTITUTION.md) | Trust / memory |
 | **128** | [Simplicity & Cognitive Load Constitution](../constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) | Binding release gates — hide complexity; simplicity / ADHD certification |
+| **131** | [Create Intelligence & Intent Constitution](../constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | Binding Create intent — infer goals not keywords; confidence-based alternatives |
 
-**Conflict rule:** On Work identity and source-of-truth, **315 + UWE (112)** prevail for platform runtime. On companion voice and hospitality, **113–117** prevail. On mental load, architecture exposure, and ADHD/simplicity certification, **128** prevails over feature convenience. See [316 §9](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md). *(Create Blueprint track `128_webinar_event` is a different series.)*
+**Conflict rule:** On Work identity and source-of-truth, **315 + UWE (112)** prevail for platform runtime. On companion voice and hospitality, **113–117** prevail. On mental load, architecture exposure, and ADHD/simplicity certification, **128** prevails over feature convenience. On Create Begin / intent understanding, **131** prevails (after **130** confirm-before-create). See [316 §9](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md). *(Create Blueprint track `128_webinar_event` is a different series.)*
 
 ### 1.3 Estate place canon (places, not intelligence OS)
 

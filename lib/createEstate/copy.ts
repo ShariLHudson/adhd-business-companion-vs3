@@ -88,6 +88,10 @@ export const CREATE_ESTATE_COMPOSER_PLACEHOLDER =
 
 export const CREATE_ESTATE_BEGIN_LABEL = "Begin";
 
+/**
+ * Spec 131 Rule 11 — Continue Working is omitted when empty (not shown with this copy).
+ * Kept for how-do-I / migration references only.
+ */
 export const CREATE_ESTATE_CONTINUE_EMPTY =
   "Nothing in progress yet. Tell Shari what you want to create above — Begin will confirm the type, then your work will live here so you can continue anytime.";
 

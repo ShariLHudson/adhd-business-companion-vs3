@@ -5,6 +5,8 @@
  * 3) Open only after member confirms (panel converts confirm → open)
  * Never silent no-op.
  *
+ * Spec 131 — intent before artifact; medium confidence surfaces also-considered.
+ *
  * Leaf-only — no universalCreationEntrypoint / Events barrel
  * (Vercel/Turbopack: Create Entrance must not init Events ↔ registry SCC).
  */
@@ -19,9 +21,12 @@ import {
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform/oneCreationPlatform";
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
 import {
+  createIntentAlternativesMessage,
   createIntentConfirmMessage,
   createIntentSoftConfirmMessage,
+  detectPromotionalDeliverableIntent,
   humanCreateTypeLabel,
+  limitAlsoConsidered,
   scoreCreateIntentConfidence,
   type CreateIntentConfidence,
 } from "./createIntentConfirmation";
@@ -40,6 +45,8 @@ export type CreateBeginOutcome =
       confidence: Exclude<CreateIntentConfidence, "low">;
       isEventDomain: boolean;
       isMarketingPlanDomain: boolean;
+      /** Spec 131 Rule 2 — also-considered when medium confidence */
+      alsoConsidered?: string[];
     }
   | {
       kind: "open";
@@ -57,15 +64,45 @@ type ResolvedArtifact = {
   artifactType: string;
   fromCatalog: boolean;
   fromPromptDetect: boolean;
+  fromPromotionalIntent: boolean;
 };
 
+/** Gather plausible types for also-considered (does not create Work). */
+function gatherCreateTypeCandidates(text: string): string[] {
+  const out: string[] = [];
+  const push = (v: string | null | undefined) => {
+    const t = v?.trim();
+    if (!t) return;
+    if (out.some((x) => x.toLowerCase() === t.toLowerCase())) return;
+    out.push(t);
+  };
+  push(detectPromotionalDeliverableIntent(text));
+  push(matchCatalogFromText(text)?.type ?? null);
+  push(detectCreateTypeFromPrompt(text));
+  if (isMarketingPlanCreationRequest(text)) push("Marketing Plan");
+  if (isEventDomainCreationRequest(text)) push("Event Plan");
+  return out;
+}
+
 function resolveArtifactType(text: string): ResolvedArtifact | null {
+  // Spec 131 Rule 1 — Intent before artifact (flyer for workshop ≠ Workshop).
+  const promo = detectPromotionalDeliverableIntent(text);
+  if (promo) {
+    return {
+      artifactType: promo,
+      fromCatalog: false,
+      fromPromptDetect: false,
+      fromPromotionalIntent: true,
+    };
+  }
+
   const catalogMatch = matchCatalogFromText(text)?.type?.trim() || null;
   if (catalogMatch) {
     return {
       artifactType: catalogMatch,
       fromCatalog: true,
       fromPromptDetect: false,
+      fromPromotionalIntent: false,
     };
   }
   const fromPrompt = detectCreateTypeFromPrompt(text)?.trim() || null;
@@ -74,6 +111,7 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
       artifactType: fromPrompt,
       fromCatalog: false,
       fromPromptDetect: true,
+      fromPromotionalIntent: false,
     };
   }
   if (isMarketingPlanCreationRequest(text)) {
@@ -81,6 +119,7 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
       artifactType: "Marketing Plan",
       fromCatalog: false,
       fromPromptDetect: false,
+      fromPromotionalIntent: false,
     };
   }
   if (isEventDomainCreationRequest(text)) {
@@ -88,6 +127,7 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
       artifactType: "Event Plan",
       fromCatalog: false,
       fromPromptDetect: false,
+      fromPromotionalIntent: false,
     };
   }
   return null;
@@ -103,6 +143,46 @@ export function confirmCreateBeginToOpen(
     artifactType: outcome.artifactType,
     isEventDomain: outcome.isEventDomain,
     isMarketingPlanDomain: outcome.isMarketingPlanDomain,
+  };
+}
+
+/**
+ * Spec 131 Rule 3 — switch most-likely without rewriting the request.
+ * Keeps original text; updates type + message for re-confirm.
+ */
+export function switchCreateBeginConfirmType(
+  outcome: Extract<CreateBeginOutcome, { kind: "confirm" }>,
+  nextArtifactType: string,
+): Extract<CreateBeginOutcome, { kind: "confirm" }> {
+  const label = humanCreateTypeLabel(nextArtifactType);
+  const previous = humanCreateTypeLabel(outcome.artifactType);
+  const also = limitAlsoConsidered(
+    label,
+    [
+      previous,
+      ...(outcome.alsoConsidered ?? []),
+    ],
+  );
+  const isMarketingPlanDomain =
+    isMarketingPlanCreationRequest(outcome.text) ||
+    /marketing\s+plan/i.test(label);
+  const isEventDomain =
+    !isMarketingPlanDomain &&
+    (isEventDomainCreationRequest(outcome.text) ||
+      /\b(event|workshop|retreat|webinar|conference)\b/i.test(label));
+
+  return {
+    kind: "confirm",
+    text: outcome.text,
+    artifactType: label,
+    message:
+      also.length > 0
+        ? createIntentAlternativesMessage(label, also)
+        : createIntentConfirmMessage(label),
+    confidence: "high",
+    isEventDomain,
+    isMarketingPlanDomain,
+    alsoConsidered: also.length > 0 ? also : undefined,
   };
 }
 
@@ -165,7 +245,9 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       isMarketingPlanCreationRequest(text) ||
       /marketing\s+plan/i.test(resolved.artifactType);
     const isEventDomain =
-      isEventDomainCreationRequest(text) && !isMarketingPlanDomain;
+      isEventDomainCreationRequest(text) &&
+      !isMarketingPlanDomain &&
+      !resolved.fromPromotionalIntent;
 
     const confidence = scoreCreateIntentConfidence({
       text,
@@ -174,6 +256,7 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       fromPromptDetect: resolved.fromPromptDetect,
       isMarketingPlanDomain,
       isEventDomain,
+      fromPromotionalIntent: resolved.fromPromotionalIntent,
     });
 
     if (confidence === "low") {
@@ -184,17 +267,33 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       };
     }
 
+    const alsoConsidered =
+      confidence === "medium"
+        ? limitAlsoConsidered(
+            resolved.artifactType,
+            gatherCreateTypeCandidates(text),
+          )
+        : [];
+
+    const message =
+      confidence === "high"
+        ? createIntentConfirmMessage(resolved.artifactType)
+        : alsoConsidered.length > 0
+          ? createIntentAlternativesMessage(
+              resolved.artifactType,
+              alsoConsidered,
+            )
+          : createIntentSoftConfirmMessage(resolved.artifactType);
+
     return {
       kind: "confirm",
       text,
       artifactType: resolved.artifactType,
-      message:
-        confidence === "high"
-          ? createIntentConfirmMessage(resolved.artifactType)
-          : createIntentSoftConfirmMessage(resolved.artifactType),
+      message,
       confidence,
       isEventDomain,
       isMarketingPlanDomain,
+      ...(alsoConsidered.length > 0 ? { alsoConsidered } : {}),
     };
   } catch {
     return {

@@ -89,6 +89,24 @@ Update this section when the milestone changes.
 - **Tags:** wisdom layer · observation · future
 - **Build gate:** Documented only · tag archetypes in Learning Log during Observation Mode · Rule of Three + Evolution Board before any runtime change
 
+### Navigation History clock (V2) — 2026-07-18
+
+- **Idea:** Header History control (clock icon) listing last 5–10 places with jump-to-context restore
+- **Why it matters:** Skip retracing deep nested stacks without turning Living Places into dashboards
+- **Member Wins check:** yes (when Previous Screen is already trusted)
+- **Suggested spec/home:** [UNIVERSAL_NAVIGATION_CONTEXT_RETURN.md](./navigation/UNIVERSAL_NAVIGATION_CONTEXT_RETURN.md) · V2 section
+- **Tags:** ux · navigation · estate
+- **Build gate:** After Universal Return V1 is stable in authenticated preview · resolve stale entries, privacy, duplicates, session boundaries, cognitive load · never float History over Living Place photographs
+
+### Create Intent Memory™ — 2026-07-21
+
+- **Idea:** Per-member pattern learning from Create intent corrections (e.g. when they reject Flyer → Workshop, or always mean Lead Magnet when they say “freebie”) to bias medium-confidence ranking over time
+- **Why it matters:** Fewer confirmations for returning members; adapts to how *they* speak without teaching “system language”
+- **Member Wins check:** yes
+- **Suggested spec/home:** [131 Create Intent Constitution — Future capability](./constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) · Spec 112 memory permission
+- **Tags:** create · intelligence · personalization · memory
+- **Build gate:** After 131 V1 hooks (also-considered + correction switch) prove useful · explicit Spec 112 permission path · no surveillance feeling · never override clear wording
+
 ### (template)
 
 ```markdown
