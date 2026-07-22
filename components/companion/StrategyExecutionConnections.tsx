@@ -14,6 +14,10 @@ import {
   shouldOfferBoardReview,
   shouldOfferVisualThinking,
 } from "@/lib/strategyLibrary/strategyDetailTemplate";
+import {
+  buildCallTheBoardContext,
+  prepareCallTheBoard,
+} from "@/lib/board/callTheBoard";
 
 type Props = {
   strategy: Strategy;
@@ -177,14 +181,25 @@ export function StrategyExecutionConnections({
           {showOptionalReviews && shouldOfferBoardReview(strategy) ? (
             <ActionButton
               testId="strategy-connect-board"
-              label="Review with Board"
+              label="Call the Board"
               primary={false}
               onClick={() => {
+                const payload = buildCallTheBoardContext({
+                  source: "strategy",
+                  strategyId: strategy.id,
+                  strategyTitle: strategy.title,
+                  projectId: currentFocus?.id ?? null,
+                  projectName: currentFocus?.name ?? null,
+                  projectFocus: currentFocus?.name ?? null,
+                  workTitle: strategy.title,
+                });
+                prepareCallTheBoard(payload);
                 setNotice(
-                  "Board review is optional — open the Board when you want a stress-test, or stay here.",
+                  "Bringing this strategy to the Round Table with your Current Focus.",
                 );
+                onOpen?.("boardroom");
                 onAsk?.(
-                  `I'd like the Board to review my strategy “${strategy.title}” — pros, cons, and risks only.`,
+                  `I'd like the Board to review my strategy “${strategy.title}”.`,
                 );
               }}
             />

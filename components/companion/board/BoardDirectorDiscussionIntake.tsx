@@ -23,19 +23,25 @@ import {
   skipBoardIntakeStep,
   updateDraftDirectors,
   upsertBoardDirectorDiscussion,
+  type BoardDiscussionContext,
   type BoardDiscussionIntakeDraft,
   type BoardDirectorDiscussionRecord,
   type BoardIntakeStep,
 } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
+import { CompactBoardDirectorSelector } from "@/components/companion/board/CompactBoardDirectorSelector";
+import { BoardDiscussionOutcomePanel } from "@/components/companion/board/BoardDiscussionOutcomePanel";
 import "@/app/companion/boardroom.css";
 
 type Props = {
   initialDirectorIds: readonly BoardDirectorId[];
   /** When true, discard any saved draft and start a fresh decision ask. */
   forceFreshDecision?: boolean;
+  /** Current Focus / Call the Board context */
+  sourceContext?: BoardDiscussionContext | null;
   onCancel: () => void;
   onComplete: (record: BoardDirectorDiscussionRecord) => void;
   onChooseDirectors?: () => void;
+  onReturnToSource?: () => void;
 };
 
 /**
@@ -45,16 +51,25 @@ type Props = {
 export function BoardDirectorDiscussionIntake({
   initialDirectorIds,
   forceFreshDecision = false,
+  sourceContext = null,
   onCancel,
   onComplete,
   onChooseDirectors,
+  onReturnToSource,
 }: Props) {
   const [draft, setDraft] = useState<BoardDiscussionIntakeDraft>(() => {
     if (forceFreshDecision) {
       clearBoardIntakeDraft();
-      return createEmptyBoardIntakeDraft(initialDirectorIds);
+      return createEmptyBoardIntakeDraft(
+        initialDirectorIds,
+        sourceContext ?? undefined,
+      );
     }
-    return resolveInitialBoardIntakeDraft(initialDirectorIds);
+    const resolved = resolveInitialBoardIntakeDraft(initialDirectorIds);
+    if (sourceContext && !resolved.sourceContext) {
+      return { ...resolved, sourceContext };
+    }
+    return resolved;
   });
   const [answer, setAnswer] = useState("");
   const [result, setResult] = useState<BoardDirectorDiscussionRecord | null>(
@@ -64,6 +79,9 @@ export function BoardDirectorDiscussionIntake({
   const [confirmStartOver, setConfirmStartOver] = useState(false);
   const [editStep, setEditStep] = useState<BoardIntakeStep | null>(null);
   const [selectionError, setSelectionError] = useState<string | null>(null);
+  const [showCompactSelector, setShowCompactSelector] = useState(
+    () => initialDirectorIds.length === 0,
+  );
   const submitLockRef = useRef(false);
 
   const chair = getBoardDirectorById(THOMAS_ELLISON_DIRECTOR_ID);
@@ -77,6 +95,13 @@ export function BoardDirectorDiscussionIntake({
     if (initialDirectorIds.length === 0) return;
     setDraft((prev) => updateDraftDirectors(prev, initialDirectorIds));
   }, [initialDirectorIds]);
+
+  useEffect(() => {
+    if (!sourceContext) return;
+    setDraft((prev) =>
+      prev.sourceContext ? prev : { ...prev, sourceContext },
+    );
+  }, [sourceContext]);
 
   function persistDraft(next: BoardDiscussionIntakeDraft) {
     setDraft(next);
@@ -205,6 +230,10 @@ export function BoardDirectorDiscussionIntake({
     const names = result.directorIds
       .map((id) => getBoardDirectorById(id)?.name)
       .filter(Boolean);
+    const focusLabel =
+      result.sourceContext?.workTitle ||
+      result.sourceContext?.projectName ||
+      null;
     return (
       <div
         className="boardroom-director-intake"
@@ -214,30 +243,71 @@ export function BoardDirectorDiscussionIntake({
         <p className="boardroom-kicker">Board Discussion</p>
         <h2 className="boardroom-title">{result.title}</h2>
         <p className="boardroom-purpose">
-          Discussion begun with {names.join(", ") || "your selected Directors"}.
+          Discussion with {names.join(", ") || "your selected Directors"}.
         </p>
+        {focusLabel ? (
+          <p
+            className="boardroom-purpose"
+            data-testid="board-discussion-current-focus"
+          >
+            Current Focus: {focusLabel}
+          </p>
+        ) : null}
         <div className="boardroom-director-intake__turns">
-          {result.turns.map((turn) => (
-            <article
-              key={turn.id}
-              className="boardroom-card"
-              data-testid={`board-director-turn-${turn.role}`}
-            >
-              <p className="boardroom-card__title">
-                {turn.role === "chair"
-                  ? chair?.name ?? "Chair"
-                  : "Boardroom note"}
-              </p>
-              <p className="boardroom-card__meta whitespace-pre-wrap">
-                {turn.text}
-              </p>
-            </article>
-          ))}
+          {result.turns.map((turn) => {
+            const speaker =
+              turn.speakerName ||
+              (turn.directorId
+                ? getBoardDirectorById(turn.directorId)?.name
+                : null) ||
+              (turn.role === "chair"
+                ? chair?.name ?? "Chair"
+                : turn.role === "director"
+                  ? "Director"
+                  : "Boardroom note");
+            return (
+              <article
+                key={turn.id}
+                className="boardroom-card"
+                data-testid={`board-director-turn-${turn.role}`}
+                data-speaker={speaker}
+                data-director-id={turn.directorId ?? undefined}
+              >
+                <p className="boardroom-card__title">{speaker}</p>
+                <p className="boardroom-card__meta whitespace-pre-wrap">
+                  {turn.text}
+                </p>
+              </article>
+            );
+          })}
         </div>
+        {result.decisionRecord ? (
+          <div
+            className="boardroom-card mt-4"
+            data-testid="board-decision-record-summary"
+          >
+            <p className="boardroom-card__title">Decision Record</p>
+            <p className="boardroom-card__meta whitespace-pre-wrap">
+              {result.decisionRecord.summary}
+            </p>
+            <p className="boardroom-card__meta mt-2">
+              Recommendation: {result.decisionRecord.finalRecommendation}
+            </p>
+          </div>
+        ) : null}
+        <BoardDiscussionOutcomePanel
+          record={result}
+          onRecordChange={(next) => {
+            const saved = upsertBoardDirectorDiscussion(next);
+            setResult(saved);
+          }}
+          sourceLabel={focusLabel}
+          onReturnToSource={onReturnToSource}
+        />
         <div className="boardroom-actions">
           <button
             type="button"
-            className="boardroom-btn boardroom-btn--primary"
+            className="boardroom-btn boardroom-btn--ghost"
             data-testid="board-director-discussion-done"
             onClick={() => onComplete(result)}
           >
@@ -356,7 +426,37 @@ export function BoardDirectorDiscussionIntake({
                 : "None selected yet"}
             </div>
           </div>
+          {draft.sourceContext?.projectName ||
+          draft.sourceContext?.workTitle ? (
+            <div className="boardroom-card" data-testid="board-intake-current-focus">
+              <div className="boardroom-card__title">Current Focus</div>
+              <div className="boardroom-card__meta">
+                {draft.sourceContext.workTitle ||
+                  draft.sourceContext.projectName}
+              </div>
+            </div>
+          ) : null}
         </div>
+
+        {showCompactSelector || draft.selectedDirectorIds.length === 0 ? (
+          <div className="mt-4">
+            <CompactBoardDirectorSelector
+              selectedIds={draft.selectedDirectorIds}
+              decisionText={draft.decision}
+              onChange={(ids) => {
+                persistDraft(updateDraftDirectors(draft, ids));
+                setSelectionError(null);
+              }}
+              onLearnAbout={
+                onChooseDirectors
+                  ? () => {
+                      onChooseDirectors();
+                    }
+                  : undefined
+              }
+            />
+          </div>
+        ) : null}
 
         <div className="boardroom-actions" style={{ flexWrap: "wrap" }}>
           <button
@@ -368,18 +468,26 @@ export function BoardDirectorDiscussionIntake({
           >
             Begin Board Discussion
           </button>
-          {onChooseDirectors ? (
-            <button
-              type="button"
-              className="boardroom-btn boardroom-btn--secondary"
-              data-testid="board-director-intake-choose-directors"
-              onClick={onChooseDirectors}
-            >
-              {directors.length > 0
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--secondary"
+            data-testid="board-director-intake-choose-directors"
+            onClick={() => {
+              if (showCompactSelector && onChooseDirectors) {
+                onChooseDirectors();
+                return;
+              }
+              setShowCompactSelector((v) => !v);
+            }}
+          >
+            {showCompactSelector
+              ? onChooseDirectors
+                ? "Browse full biographies"
+                : "Hide director list"
+              : directors.length > 0
                 ? "Change Directors"
                 : "Choose Directors"}
-            </button>
-          ) : null}
+          </button>
           <button
             type="button"
             className="boardroom-btn boardroom-btn--secondary"

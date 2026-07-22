@@ -1317,3 +1317,118 @@
     animation: none;
   }
 }
+
+/* Compact Director selector (Prompt 145) */
+.compact-board-director-selector {
+  margin-top: 1rem;
+}
+
+.compact-board-director-selector__bulk {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.compact-board-director-selector__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.compact-board-director-selector__row {
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 247, 0.72);
+  padding: 0.65rem 0.75rem;
+}
+
+.compact-board-director-selector__row--selected {
+  border-color: rgba(30, 79, 79, 0.55);
+  box-shadow: 0 0 0 2px rgba(30, 79, 79, 0.12);
+  background: rgba(30, 79, 79, 0.06);
+}
+
+.compact-board-director-selector__label {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.compact-board-director-selector__photo {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(30, 79, 79, 0.08);
+}
+
+.compact-board-director-selector__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.compact-board-director-selector__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.compact-board-director-selector__name {
+  font-weight: 650;
+  color: #1f1c19;
+}
+
+.compact-board-director-selector__role {
+  font-size: 0.9rem;
+  color: #1e4f4f;
+}
+
+.compact-board-director-selector__specialty {
+  font-size: 0.85rem;
+  color: #4b463f;
+  line-height: 1.35;
+}
+
+.compact-board-director-selector__check {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: #1e4f4f;
+}
+
+.compact-board-director-selector__learn {
+  margin-top: 0.45rem;
+  margin-left: 3.75rem;
+  border: 0;
+  background: transparent;
+  color: #1e4f4f;
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.compact-board-director-selector__learn:focus-visible {
+  outline: 2px solid rgba(201, 166, 107, 0.8);
+  outline-offset: 2px;
+}
+
+.compact-board-director-selector__bio {
+  margin: 0.5rem 0 0 3.75rem;
+  font-size: 0.9rem;
+  color: #4b463f;
+  line-height: 1.45;
+}
+
+.compact-board-director-selector__opening {
+  margin-top: 0.5rem;
+  font-style: italic;
+}

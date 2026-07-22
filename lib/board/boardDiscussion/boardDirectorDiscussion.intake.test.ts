@@ -117,7 +117,9 @@ describe("Board intake state machine", () => {
     expect(record.answers.decision).toContain("keep this client");
     expect(record.answers["why-now"]).toContain("same problems");
     expect(record.turns.some((t) => t.role === "chair")).toBe(true);
-    expect(record.turns[0]?.text).toContain("Does that capture");
+    expect(record.turns[0]?.text).toContain(
+      "I'll invite each Director to speak in their role",
+    );
     expect(record.directorIds).toContain("board-chair");
     expect(record.status).toBe("in-progress");
   });

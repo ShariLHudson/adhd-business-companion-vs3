@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowPanelBackButton } from "@/components/companion/GrowPanelBackButton";
@@ -24,7 +24,10 @@ import {
 import {
   clearBoardIntakeDraft,
   listBoardDirectorDiscussions,
+  type BoardDiscussionContext,
+  type BoardDirectorDiscussionRecord,
 } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
+import { peekCallTheBoard } from "@/lib/board/callTheBoard";
 import {
   BOARDROOM_WELCOME_MESSAGE,
   BOARDROOM_HOME_PRIMARY_CHOICES,
@@ -70,6 +73,9 @@ type Props = {
    * Remount via parent `key` so stale subviews cannot hijack a new entry.
    */
   entryIntent?: BoardroomEntryIntent;
+  /** Current Focus / Call the Board context (Prompt 145). */
+  sourceContext?: BoardDiscussionContext | null;
+  onReturnToSource?: () => void;
   /** Supporting Shari chat — not the primary Boardroom interface. */
   shariChatOpen?: boolean;
   onToggleShariChat?: (open: boolean) => void;
@@ -97,15 +103,28 @@ function newId(): string {
 export function BoardroomRoomPanel({
   onBack,
   entryIntent = "home",
+  sourceContext = null,
+  onReturnToSource,
   shariChatOpen = false,
   onToggleShariChat,
   thread,
   footer,
   conversationScrollKey,
 }: Props) {
-  const [view, setView] = useState<BoardroomView>(() =>
-    boardroomViewFromEntryIntent(entryIntent),
+  const [view, setView] = useState<BoardroomView>(() => {
+    const pendingCall = peekCallTheBoard();
+    if (pendingCall || sourceContext) return "board-director-intake";
+    return boardroomViewFromEntryIntent(entryIntent);
+  });
+  const [callContext, setCallContext] = useState<BoardDiscussionContext | null>(
+    () => sourceContext ?? peekCallTheBoard(),
   );
+  const [directorPastDetail, setDirectorPastDetail] =
+    useState<BoardDirectorDiscussionRecord | null>(null);
+
+  useEffect(() => {
+    if (sourceContext) setCallContext(sourceContext);
+  }, [sourceContext]);
   const [meetRoundTableOpen, setMeetRoundTableOpen] = useState(false);
   const [meetInitialDirectorId] = useState<BoardDirectorId | null>(() => {
     if (shouldOpenThomasFromEntry(entryIntent)) return THOMAS_ELLISON_DIRECTOR_ID;
@@ -530,11 +549,13 @@ export function BoardroomRoomPanel({
                   : []
               }
               forceFreshDecision={forceFreshBoardIntake}
+              sourceContext={callContext}
               onCancel={startHome}
               onChooseDirectors={() => {
                 setForceFreshBoardIntake(false);
                 setView("meet-directors");
               }}
+              onReturnToSource={onReturnToSource}
               onComplete={() => {
                 refresh();
                 startHome();
@@ -558,12 +579,20 @@ export function BoardroomRoomPanel({
             />
           ) : null}
           {view === "past" ? (
-            <PastListView
-              advisoryItems={allPast}
-              boardDirectorItems={boardDirectorPast}
-              onOpenAdvisory={openPast}
-              onBack={startHome}
-            />
+            directorPastDetail ? (
+              <DirectorPastDetailView
+                record={directorPastDetail}
+                onBack={() => setDirectorPastDetail(null)}
+              />
+            ) : (
+              <PastListView
+                advisoryItems={allPast}
+                boardDirectorItems={boardDirectorPast}
+                onOpenAdvisory={openPast}
+                onOpenDirectorPast={(item) => setDirectorPastDetail(item)}
+                onBack={startHome}
+              />
+            )
           ) : null}
 
           {view === "past-detail" && detail ? (
@@ -930,15 +959,97 @@ function HomeView({
   );
 }
 
+function DirectorPastDetailView({
+  record,
+  onBack,
+}: {
+  record: BoardDirectorDiscussionRecord;
+  onBack: () => void;
+}) {
+  const decision = record.decisionRecord;
+  return (
+    <div data-testid="board-director-past-detail">
+      <p className="boardroom-kicker">Decision Record</p>
+      <h2 className="boardroom-title">{record.title}</h2>
+      <div className="boardroom-gold-rule" aria-hidden />
+      <p className="boardroom-purpose">{formatDate(record.createdAt)}</p>
+      {decision ? (
+        <div className="boardroom-card-list mt-4">
+          <div className="boardroom-card">
+            <div className="boardroom-card__title">Summary</div>
+            <div className="boardroom-card__meta whitespace-pre-wrap">
+              {decision.summary}
+            </div>
+          </div>
+          <div className="boardroom-card">
+            <div className="boardroom-card__title">Key risks</div>
+            <div className="boardroom-card__meta whitespace-pre-wrap">
+              {decision.keyRisks}
+            </div>
+          </div>
+          <div className="boardroom-card">
+            <div className="boardroom-card__title">Final recommendation</div>
+            <div className="boardroom-card__meta whitespace-pre-wrap">
+              {decision.finalRecommendation}
+            </div>
+          </div>
+          {decision.relatedProjectName ? (
+            <div className="boardroom-card">
+              <div className="boardroom-card__title">Related Project</div>
+              <div className="boardroom-card__meta">
+                {decision.relatedProjectName}
+              </div>
+            </div>
+          ) : null}
+          <div className="boardroom-card">
+            <div className="boardroom-card__title">Participating Directors</div>
+            <div className="boardroom-card__meta">
+              {decision.participatingDirectors
+                .map((id) => getBoardDirectorById(id)?.name)
+                .filter(Boolean)
+                .join(", ")}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="boardroom-director-intake__turns mt-4">
+          {record.turns.map((turn) => (
+            <article key={turn.id} className="boardroom-card">
+              <p className="boardroom-card__title">
+                {turn.speakerName || turn.role}
+              </p>
+              <p className="boardroom-card__meta whitespace-pre-wrap">
+                {turn.text}
+              </p>
+            </article>
+          ))}
+        </div>
+      )}
+      <div className="boardroom-actions">
+        <button
+          type="button"
+          className="boardroom-btn boardroom-btn--ghost"
+          onClick={onBack}
+          data-testid="board-director-past-detail-back"
+        >
+          Back to Past Discussions
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function PastListView({
   advisoryItems,
   boardDirectorItems,
   onOpenAdvisory,
+  onOpenDirectorPast,
   onBack,
 }: {
   advisoryItems: BoardroomDiscussionRecord[];
   boardDirectorItems: ReturnType<typeof listBoardDirectorDiscussions>;
   onOpenAdvisory: (id: string) => void;
+  onOpenDirectorPast: (item: BoardDirectorDiscussionRecord) => void;
   onBack: () => void;
 }) {
   const hasAny =
@@ -968,10 +1079,12 @@ function PastListView({
             <div className="boardroom-card-list" data-testid="board-director-past-list">
               <p className="boardroom-past-section-label">Board of Directors</p>
               {boardDirectorItems.map((item) => (
-                <div
+                <button
                   key={item.id}
+                  type="button"
                   className="boardroom-card"
                   data-testid={`board-director-past-${item.id}`}
+                  onClick={() => onOpenDirectorPast(item)}
                 >
                   <div className="boardroom-card__title">{item.title}</div>
                   <div className="boardroom-card__meta">
@@ -981,7 +1094,7 @@ function PastListView({
                       .filter(Boolean)
                       .join(", ")}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           ) : null}

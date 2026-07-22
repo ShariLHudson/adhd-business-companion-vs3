@@ -237,6 +237,10 @@ import {
   resolveBoardroomEntryIntent,
   type BoardroomEntryIntent,
 } from "@/lib/boardroom";
+import {
+  buildCallTheBoardContext,
+  prepareCallTheBoard,
+} from "@/lib/board/callTheBoard";
 import { PROJECT_HOMES_ROOM_BACKGROUND } from "@/lib/projectHomes/roomCatalog";
 
 /** Lazy — keeps Project Homes off Create registry / creationRecord init graph. */
@@ -2892,6 +2896,14 @@ export default function CompanionPageClient() {
   const [boardroomEntryKey, setBoardroomEntryKey] = useState(0);
   const [boardroomEntryIntent, setBoardroomEntryIntent] =
     useState<BoardroomEntryIntent>("home");
+  const [boardroomSourceContext, setBoardroomSourceContext] = useState<{
+    source?: string;
+    note?: string;
+    projectId?: string | null;
+    projectName?: string | null;
+    strategyId?: string | null;
+    workTitle?: string | null;
+  } | null>(null);
   const [evidenceVaultArrivalKey, setEvidenceVaultArrivalKey] = useState(0);
   const momentumBuilderRoomExperience = useMemo(() => {
     if (!momentumBuilderPrimary) return null;
@@ -9429,20 +9441,38 @@ export default function CompanionPageClient() {
     setDestinationCrystalPrepared(activation);
   }
 
-  function openBoardroomCore(options?: { intent?: BoardroomEntryIntent }) {
+  function openBoardroomCore(options?: {
+    intent?: BoardroomEntryIntent;
+    sourceContext?: {
+      source?: string;
+      note?: string;
+      projectId?: string | null;
+      projectName?: string | null;
+      strategyId?: string | null;
+      workTitle?: string | null;
+    } | null;
+  }) {
     pauseActiveArtifactIfLeavingCreate("boardroom");
     setOverlay(null);
     setBoardroomShariChatOpen(false);
     const intent = options?.intent ?? "home";
     const alreadyInBoardroom = activeSectionRef.current === "boardroom";
     setBoardroomEntryIntent(intent);
+    if (options?.sourceContext !== undefined) {
+      setBoardroomSourceContext(options.sourceContext);
+    } else if (intent === "home") {
+      setBoardroomSourceContext(null);
+    }
     /**
-     * Remount when entering Boardroom, or when forcing Home from navigation.
-     * Do NOT remount while already inside on a non-home re-entry — that wiped
-     * in-progress Board intake (concerns → Q1 restart). Intake draft is also
-     * persisted as a second safety net.
+     * Remount when entering Boardroom, forcing Home, or Call the Board intake
+     * with fresh source context. Do NOT remount while already inside on a
+     * non-home re-entry — that wiped in-progress Board intake.
      */
-    if (!alreadyInBoardroom || intent === "home") {
+    if (
+      !alreadyInBoardroom ||
+      intent === "home" ||
+      (intent === "intake" && options?.sourceContext)
+    ) {
       setBoardroomEntryKey((k) => k + 1);
     }
     preloadRoomBackground(BOARDROOM_ROOM_BG);
@@ -24537,6 +24567,7 @@ export default function CompanionPageClient() {
               <BoardroomRoomPanel
                 key={boardroomEntryKey}
                 entryIntent={boardroomEntryIntent}
+                sourceContext={boardroomSourceContext}
                 onBack={navigateBackToEstateHome}
                 shariChatOpen={boardroomShariChatOpen}
                 onToggleShariChat={setBoardroomShariChatOpen}
@@ -24598,6 +24629,20 @@ export default function CompanionPageClient() {
             >
               <ProjectHomesPrototypePanel
                 onBack={navigateBackToEstateHome}
+                onCallTheBoard={(project) => {
+                  const payload = buildCallTheBoardContext({
+                    source: "project-home",
+                    projectId: project.id,
+                    projectName: project.name,
+                    projectFocus: project.currentFocus,
+                    workTitle: project.currentFocus || project.name,
+                  });
+                  prepareCallTheBoard(payload);
+                  openBoardroomCore({
+                    intent: "intake",
+                    sourceContext: payload,
+                  });
+                }}
                 onStartSomethingNew={() => beginForceNewCreationFromUi("create")}
                 onResumeActiveWork={(work: ActiveWorkCardModel) => {
                   const id =

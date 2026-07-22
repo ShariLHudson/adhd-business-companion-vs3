@@ -50,6 +50,7 @@ import { BoardDirectorGalleryCard } from "@/components/companion/board/BoardDire
 import { MeetDirectorConversationOverlay } from "@/components/companion/board/MeetDirectorConversationOverlay";
 import { BoardReviewFirstJoinInvite } from "@/components/companion/board/BoardReviewFirstJoinInvite";
 import { BoardReviewTray } from "@/components/companion/board/BoardReviewTray";
+import { CompactBoardDirectorSelector } from "@/components/companion/board/CompactBoardDirectorSelector";
 import { RoundTableOverlay } from "@/components/companion/board/RoundTableOverlay";
 import "@/app/companion/board-director-meet.css";
 
@@ -101,6 +102,7 @@ export function BoardDirectorsMeetExperience({
     createEmptyDirectorSessionStore,
   );
   const [profileTransitionKey, setProfileTransitionKey] = useState(0);
+  const [showFullBiographies, setShowFullBiographies] = useState(false);
 
   const directors = listVisibleBoardDirectors();
   const director = resolveMeetRouteDirector(state.route);
@@ -276,26 +278,56 @@ export function BoardDirectorsMeetExperience({
         <h1 className="boardroom-title">Meet the Directors</h1>
         <div className="boardroom-gold-rule" aria-hidden />
         <p className="boardroom-purpose">
-          Get to know who sits around the Round Table and how each Director
-          thinks. Use the Round Table to see their chairs — your Board Review
+          Choose Directors for a Board Review with a compact list first. Full
+          biographies stay available when you want them — your Board Review
           stays with you.
         </p>
         <div className="board-directors-meet__nav-actions">{placeAtTableBtn}</div>
         {reviewTray}
         {firstJoin}
-        <div className="board-directors-meet__grid" role="list">
-          {directors.map((d) => (
-            <BoardDirectorGalleryCard
-              key={d.id}
-              director={d}
-              included={isDirectorIncludedInBoardReview(boardReview, d.id)}
-              onOpenProfile={() => openProfile(d.id)}
-              onMeet={() => startMeet(d.id)}
-              onInclude={() => includeDirector(d.id)}
-              onRemove={() => removeDirector(d.id)}
-            />
-          ))}
+        <CompactBoardDirectorSelector
+          selectedIds={boardReview.selectedDirectorIds}
+          onChange={(ids) => {
+            setBoardReview((prev) => {
+              let next = {
+                ...createEmptyBoardReviewState(),
+                reviewStarted: prev.reviewStarted,
+              };
+              for (const id of ids) {
+                next = addDirectorToBoardReview(next, id);
+              }
+              return next;
+            });
+          }}
+          onLearnAbout={(id) => openProfile(id)}
+        />
+        <div className="boardroom-actions" style={{ marginTop: "1rem" }}>
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--ghost"
+            data-testid="board-meet-toggle-biographies"
+            onClick={() => setShowFullBiographies((v) => !v)}
+          >
+            {showFullBiographies
+              ? "Hide full biographies"
+              : "Browse full biographies"}
+          </button>
         </div>
+        {showFullBiographies ? (
+          <div className="board-directors-meet__grid" role="list">
+            {directors.map((d) => (
+              <BoardDirectorGalleryCard
+                key={d.id}
+                director={d}
+                included={isDirectorIncludedInBoardReview(boardReview, d.id)}
+                onOpenProfile={() => openProfile(d.id)}
+                onMeet={() => startMeet(d.id)}
+                onInclude={() => includeDirector(d.id)}
+                onRemove={() => removeDirector(d.id)}
+              />
+            ))}
+          </div>
+        ) : null}
         {roundTableOverlay}
       </div>
     );

@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { BoardDirectorDiscussionIntake } from "@/components/companion/board/BoardDirectorDiscussionIntake";
 import {
-  advanceDecisionToReview,
   canBeginBoardDiscussion,
   clearBoardIntakeDraft,
   createBoardDirectorDiscussionFromDraft,
@@ -54,8 +53,6 @@ describe("Board discussion — Chair optional + Start Discussion", () => {
     };
     draft = skipBoardIntakeStep(draft);
     expect(draft.decision).toBe("Hire or wait");
-    expect(draft.currentStep).toBe("options");
-    draft = advanceDecisionToReview(draft);
     expect(draft.currentStep).toBe("review");
   });
 

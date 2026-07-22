@@ -80,6 +80,8 @@ import "@/app/companion/project-homes.css";
 
 type Props = {
   onBack: () => void;
+  /** Call the Board with Current Focus from a Project Home (Prompt 145). */
+  onCallTheBoard?: (project: ProjectHomeRecord) => void;
   /** When opening from "create a project", land on create-purpose. */
   initialView?: ProjectHomeView;
   /**
@@ -110,6 +112,7 @@ type Props = {
 
 export function ProjectHomesPrototypePanel({
   onBack,
+  onCallTheBoard,
   initialView = "gallery",
   onLaunchEventWorkspace,
   onStartSomethingNew,
@@ -1047,6 +1050,7 @@ export function ProjectHomesPrototypePanel({
           <ProjectHomeDetail
             project={active}
             onProjectChange={updateActiveProject}
+            onCallTheBoard={onCallTheBoard}
           />
         ) : null}
 

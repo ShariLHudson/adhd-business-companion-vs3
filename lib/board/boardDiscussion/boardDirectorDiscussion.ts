@@ -68,6 +68,11 @@ const QUESTION_PROMPT_BY_STEP: Record<
 export type BoardDiscussionContext = {
   source?: string;
   note?: string;
+  /** Current Focus / Project awareness (Prompt 145) */
+  projectId?: string | null;
+  projectName?: string | null;
+  strategyId?: string | null;
+  workTitle?: string | null;
 };
 
 export type BoardDiscussionIntakeDraft = {
@@ -91,6 +96,33 @@ export type BoardDirectorDiscussionIntakeState = {
   currentStep?: BoardIntakeStep;
 };
 
+export type BoardDirectorDiscussionTurn = {
+  id: string;
+  role: "chair" | "moderator" | "director";
+  /** Present when role is director (or chair speaking as named Director) */
+  directorId?: BoardDirectorId;
+  speakerName?: string;
+  text: string;
+};
+
+/** Structured Decision Record — searchable Board history (Prompt 145). */
+export type BoardDecisionRecord = {
+  decisionTitle: string;
+  date: string;
+  participatingDirectors: BoardDirectorId[];
+  summary: string;
+  keyRisks: string;
+  opportunities: string;
+  finalRecommendation: string;
+  userFinalChoice?: string | null;
+  relatedProjectId?: string | null;
+  relatedProjectName?: string | null;
+  relatedStrategyId?: string | null;
+  relatedCartographyMapId?: string | null;
+  relatedEvidenceId?: string | null;
+  relatedWinId?: string | null;
+};
+
 export type BoardDirectorDiscussionRecord = {
   id: string;
   title: string;
@@ -99,8 +131,12 @@ export type BoardDirectorDiscussionRecord = {
   /** Board Director IDs only — never Chamber IDs */
   directorIds: BoardDirectorId[];
   answers: Record<BoardDirectorIntakeStepId, string>;
-  turns: Array<{ id: string; role: "chair" | "moderator"; text: string }>;
-  status: "in-progress" | "ended";
+  turns: BoardDirectorDiscussionTurn[];
+  status: "in-progress" | "ended" | "recommendation-accepted";
+  sourceContext?: BoardDiscussionContext;
+  decisionRecord?: BoardDecisionRecord;
+  /** Member accepted “Use This Recommendation” */
+  recommendationAcceptedAt?: string | null;
 };
 
 export const BOARD_DIRECTOR_DISCUSSIONS_STORAGE_KEY =
@@ -112,6 +148,7 @@ export const BOARD_DIRECTOR_INTAKE_DRAFT_STORAGE_KEY =
 
 export function createEmptyBoardIntakeDraft(
   directorIds: readonly BoardDirectorId[] = [],
+  sourceContext?: BoardDiscussionContext,
 ): BoardDiscussionIntakeDraft {
   const ids = [...directorIds];
   return {
@@ -119,6 +156,7 @@ export function createEmptyBoardIntakeDraft(
     importance: "",
     options: [],
     concerns: "",
+    sourceContext,
     selectedDirectorIds: ids,
     currentStep: "decision",
     chairConfirmed: ids.includes(THOMAS_ELLISON_DIRECTOR_ID),
@@ -159,7 +197,11 @@ export function canBeginBoardDiscussion(
   );
 }
 
-/** Skip an optional intake question (importance / options / concerns). */
+/**
+ * Skip Optional Details — first-class workflow (Prompt 145).
+ * Leaves the decision intact, clears unanswered optional fields from the
+ * current step forward, and advances to review. Never stores prompt copy.
+ */
 export function skipBoardIntakeStep(
   draft: BoardDiscussionIntakeDraft,
 ): BoardDiscussionIntakeDraft {
@@ -167,18 +209,18 @@ export function skipBoardIntakeStep(
   if (draft.currentStep === "decision") return draft;
   const next: BoardDiscussionIntakeDraft = {
     ...draft,
+    currentStep: "review",
     updatedAt: new Date().toISOString(),
   };
-  switch (draft.currentStep) {
-    case "importance":
-      next.currentStep = "options";
-      break;
-    case "options":
-      next.currentStep = "concerns";
-      break;
-    case "concerns":
-      next.currentStep = "review";
-      break;
+  if (draft.currentStep === "importance") {
+    next.importance = "";
+    next.options = [];
+    next.concerns = "";
+  } else if (draft.currentStep === "options") {
+    next.options = [];
+    next.concerns = "";
+  } else if (draft.currentStep === "concerns") {
+    next.concerns = "";
   }
   return next;
 }
@@ -483,17 +525,37 @@ export function draftToAnswerRecord(
   };
 }
 
+const SKIPPED_OPTIONAL_LABEL = "No additional concerns were provided.";
+
+/** Never treat instructional placeholder prompts as member answers. */
+export function formatOptionalAnswerForDisplay(
+  value: string | undefined | null,
+  emptyLabel = SKIPPED_OPTIONAL_LABEL,
+): string | null {
+  const trimmed = (value ?? "").trim();
+  if (!trimmed) return null;
+  // Guard against leaked prompt copy if it ever was stored.
+  if (
+    /^(what matters most to you|the options you are weighing|the concerns you are carrying)$/i.test(
+      trimmed,
+    )
+  ) {
+    return null;
+  }
+  return trimmed;
+}
+
 export function buildChairOpeningAndSummary(
   answers: Partial<Record<BoardDirectorIntakeStepId, string>>,
   directorIds: readonly BoardDirectorId[] = [],
-): BoardDirectorDiscussionRecord["turns"] {
+): BoardDirectorDiscussionTurn[] {
   const chairIncluded = directorIds.includes(THOMAS_ELLISON_DIRECTOR_ID);
   const chair = getBoardDirectorById(THOMAS_ELLISON_DIRECTOR_ID);
   const name = chair?.name ?? "Thomas Ellison";
   const decision = answers.decision?.trim() || "this decision";
-  const why = answers["why-now"]?.trim() || "what matters most to you";
-  const options = answers.options?.trim() || "the options you are weighing";
-  const concerns = answers.concerns?.trim() || "the concerns you are carrying";
+  const why = formatOptionalAnswerForDisplay(answers["why-now"]);
+  const options = formatOptionalAnswerForDisplay(answers.options);
+  const concerns = formatOptionalAnswerForDisplay(answers.concerns);
   const participants = directorIds
     .map((id) => getBoardDirectorById(id)?.name)
     .filter(Boolean)
@@ -502,57 +564,64 @@ export function buildChairOpeningAndSummary(
     ? `At the table: ${participants}.`
     : "At the table: the Directors you selected.";
 
+  const stamp = Date.now().toString(36);
+
   if (chairIncluded) {
+    const openLines = [
+      `I'm ${name}, Chair of the Board.`,
+      `We're examining: ${decision}.`,
+      why ? `It matters now because: ${why}.` : null,
+      options ? `Options under consideration: ${options}` : null,
+      concerns ? `Concerns already named: ${concerns}` : null,
+      !why && !options && !concerns
+        ? "No additional optional details were provided — we'll work with the decision as stated."
+        : null,
+      participantLine,
+      `I'll keep us focused on long-term direction, Board alignment, and a clear recommendation — without making the decision for you.`,
+      `I'll invite each Director to speak in their role.`,
+    ].filter(Boolean) as string[];
+
+    const summaryLines = [
+      "Chair summary:",
+      `Decision: ${decision}`,
+      why ? `Why now: ${why}` : null,
+      options ? `Options: ${options}` : null,
+      concerns ? `Concerns: ${concerns}` : null,
+      "What I protect: tomorrow's stability as well as today's opportunity.",
+      "Recommendation: name the real decision in one sentence, then choose the option that best protects long-term strength — or pause for one missing fact before you commit.",
+    ].filter(Boolean) as string[];
+
     return [
       {
-        id: `chair-open-${Date.now().toString(36)}`,
+        id: `chair-open-${stamp}`,
         role: "chair",
-        text: [
-          `I'm ${name}, Chair of the Board.`,
-          `We're examining: ${decision}.`,
-          `It matters now because: ${why}.`,
-          `Options under consideration: ${options}`,
-          `Concerns already named: ${concerns}`,
-          participantLine,
-          `I'll keep us focused on long-term direction, Board alignment, and a clear recommendation — without making the decision for you.`,
-          `Does that capture what you brought, or should we adjust anything before we continue?`,
-        ].join("\n\n"),
+        directorId: THOMAS_ELLISON_DIRECTOR_ID,
+        speakerName: name,
+        text: openLines.join("\n\n"),
       },
       {
-        id: `chair-summary-${Date.now().toString(36)}`,
+        id: `chair-summary-${stamp}`,
         role: "chair",
-        text: [
-          "Chair summary:",
-          `Decision: ${decision}`,
-          `Why now: ${why}`,
-          `Options: ${options}`,
-          `Concerns: ${concerns}`,
-          "What I protect: tomorrow's stability as well as today's opportunity.",
-          "Recommendation: name the real decision in one sentence, then choose the option that best protects long-term strength — or pause for one missing fact before you commit.",
-        ].join("\n\n"),
-      },
-      {
-        id: `mod-${Date.now().toString(36)}`,
-        role: "moderator",
-        text: "I've brought this to the Directors you selected. Let's look at it from their different perspectives.",
+        directorId: THOMAS_ELLISON_DIRECTOR_ID,
+        speakerName: name,
+        text: summaryLines.join("\n\n"),
       },
     ];
   }
 
   return [
     {
-      id: `mod-open-${Date.now().toString(36)}`,
+      id: `mod-open-${stamp}`,
       role: "moderator",
       text: [
         `I've brought this to the Directors you selected. Let's look at it from their different perspectives.`,
         `We're examining: ${decision}.`,
-        why !== "what matters most to you" ? `What matters now: ${why}.` : "",
-        options !== "the options you are weighing"
-          ? `Options on the table: ${options}`
-          : "",
-        concerns !== "the concerns you are carrying"
-          ? `Concerns named: ${concerns}`
-          : "",
+        why ? `What matters now: ${why}.` : null,
+        options ? `Options on the table: ${options}` : null,
+        concerns ? `Concerns named: ${concerns}` : null,
+        !why && !options && !concerns
+          ? "No additional optional details were provided."
+          : null,
         participantLine,
         `I'll invite each Director to contribute in their role — without making the decision for you.`,
       ]
@@ -560,6 +629,101 @@ export function buildChairOpeningAndSummary(
         .join("\n\n"),
     },
   ];
+}
+
+/**
+ * One spoken turn per selected Director (Prompt 145).
+ * Chair may facilitate separately; other Directors are never replaced by the Chair.
+ */
+export function buildDirectorPerspectiveTurns(
+  answers: Partial<Record<BoardDirectorIntakeStepId, string>>,
+  directorIds: readonly BoardDirectorId[],
+): BoardDirectorDiscussionTurn[] {
+  const decision = answers.decision?.trim() || "this decision";
+  const stamp = Date.now().toString(36);
+  const turns: BoardDirectorDiscussionTurn[] = [];
+
+  for (const id of directorIds) {
+    if (id === THOMAS_ELLISON_DIRECTOR_ID) continue;
+    const director = getBoardDirectorById(id);
+    if (!director) continue;
+    const lens = director.decisionLens[0] ?? director.purpose;
+    const question = director.questionsAsked[0];
+    turns.push({
+      id: `dir-${id}-${stamp}`,
+      role: "director",
+      directorId: id,
+      speakerName: director.name,
+      text: [
+        `I'm ${director.name}, ${director.shortRole}.`,
+        `Looking at “${decision}” through my lens: ${lens}`,
+        question
+          ? `One question I'd want answered before we commit: ${question}`
+          : null,
+        `My current recommendation: protect what matters in my domain, then choose the smallest honest next step that still moves the decision forward.`,
+      ]
+        .filter(Boolean)
+        .join("\n\n"),
+    });
+  }
+
+  return turns;
+}
+
+export function buildBoardDiscussionTurns(
+  answers: Partial<Record<BoardDirectorIntakeStepId, string>>,
+  directorIds: readonly BoardDirectorId[],
+): BoardDirectorDiscussionTurn[] {
+  const opening = buildChairOpeningAndSummary(answers, directorIds);
+  const perspectives = buildDirectorPerspectiveTurns(answers, directorIds);
+  const stamp = Date.now().toString(36);
+  const close: BoardDirectorDiscussionTurn = {
+    id: `mod-close-${stamp}`,
+    role: "moderator",
+    text:
+      "You've heard each selected Director. When you're ready, you can use the recommendation as your working choice — or keep refining.",
+  };
+  return [...opening, ...perspectives, close];
+}
+
+export function buildDecisionRecordFromDiscussion(
+  record: Pick<
+    BoardDirectorDiscussionRecord,
+    "title" | "createdAt" | "directorIds" | "answers" | "turns" | "sourceContext"
+  >,
+): BoardDecisionRecord {
+  const concerns =
+    formatOptionalAnswerForDisplay(record.answers.concerns) ??
+    SKIPPED_OPTIONAL_LABEL;
+  const why = formatOptionalAnswerForDisplay(record.answers["why-now"]);
+  const options = formatOptionalAnswerForDisplay(record.answers.options);
+  const recommendationTurn =
+    record.turns.find((t) => t.role === "chair" && /Recommendation:/i.test(t.text)) ??
+    record.turns.find((t) => t.role === "director");
+  return {
+    decisionTitle: record.title,
+    date: record.createdAt,
+    participatingDirectors: [...record.directorIds],
+    summary: [
+      record.answers.decision.trim(),
+      why ? `Why now: ${why}` : null,
+      options ? `Options: ${options}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    keyRisks: concerns,
+    opportunities: why ?? "Opportunity details were not expanded in this session.",
+    finalRecommendation:
+      recommendationTurn?.text.split("Recommendation:")[1]?.trim() ??
+      "Review each Director’s perspective, then choose the path that best protects long-term strength.",
+    userFinalChoice: null,
+    relatedProjectId: record.sourceContext?.projectId ?? null,
+    relatedProjectName: record.sourceContext?.projectName ?? null,
+    relatedStrategyId: record.sourceContext?.strategyId ?? null,
+    relatedCartographyMapId: null,
+    relatedEvidenceId: null,
+    relatedWinId: null,
+  };
 }
 
 export function createBoardDirectorDiscussionFromDraft(
@@ -571,16 +735,38 @@ export function createBoardDirectorDiscussionFromDraft(
   const directorIds = [...normalized.selectedDirectorIds];
   const title =
     answers.decision.trim().slice(0, 72) || "Board discussion";
-  return {
+  const turns = buildBoardDiscussionTurns(answers, directorIds);
+  const base: BoardDirectorDiscussionRecord = {
     id: `bdd-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`,
     title,
     createdAt: now,
     updatedAt: now,
     directorIds,
     answers,
-    turns: buildChairOpeningAndSummary(answers, directorIds),
+    turns,
     status: "in-progress",
+    sourceContext: normalized.sourceContext,
   };
+  return {
+    ...base,
+    decisionRecord: buildDecisionRecordFromDiscussion(base),
+  };
+}
+
+export function acceptBoardRecommendation(
+  record: BoardDirectorDiscussionRecord,
+  userChoice?: string | null,
+): BoardDirectorDiscussionRecord {
+  const decisionRecord: BoardDecisionRecord = {
+    ...(record.decisionRecord ?? buildDecisionRecordFromDiscussion(record)),
+    userFinalChoice: userChoice?.trim() || "Use this recommendation",
+  };
+  return upsertBoardDirectorDiscussion({
+    ...record,
+    status: "recommendation-accepted",
+    recommendationAcceptedAt: new Date().toISOString(),
+    decisionRecord,
+  });
 }
 
 export function createBoardDirectorDiscussion(

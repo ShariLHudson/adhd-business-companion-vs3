@@ -31,6 +31,8 @@ import { RelatedToPanel } from "@/components/companion/RelatedToPanel";
 type Props = {
   project: ProjectHomeRecord;
   onProjectChange: (next: ProjectHomeRecord) => void;
+  /** Call the Board with this project’s Current Focus (Prompt 145). */
+  onCallTheBoard?: (project: ProjectHomeRecord) => void;
 };
 
 type DrawerId = "plan" | "tools" | "progress" | "connections";
@@ -48,8 +50,8 @@ const PROJECT_TOOLS = [
   },
   {
     id: "ask-board",
-    label: "Ask Board",
-    blurb: "A calm sounding board for decisions.",
+    label: "Call the Board",
+    blurb: "Bring this project’s decision to the Round Table.",
   },
   {
     id: "cartographer",
@@ -109,7 +111,11 @@ function ProjectHomeDrawer({
 }
 
 /** Project Home workspace — focus first, details behind estate drawers. */
-export function ProjectHomeDetail({ project, onProjectChange }: Props) {
+export function ProjectHomeDetail({
+  project,
+  onProjectChange,
+  onCallTheBoard,
+}: Props) {
   const room = getProjectHomeRoom(project.projectHomeId);
   const artwork = resolveProjectHomeArtwork(project);
   const cover = getProjectHomeBackgroundUrl(project);
@@ -334,6 +340,16 @@ export function ProjectHomeDetail({ project, onProjectChange }: Props) {
           >
             Continue with this step
           </button>
+          {onCallTheBoard && !sample ? (
+            <button
+              type="button"
+              className="project-homes-btn project-homes-btn--secondary"
+              data-testid="project-home-call-the-board"
+              onClick={() => onCallTheBoard(project)}
+            >
+              Call the Board
+            </button>
+          ) : null}
           {continueMessage ? (
             <p
               className="project-homes-action-message"
@@ -610,6 +626,20 @@ export function ProjectHomeDetail({ project, onProjectChange }: Props) {
                   className="project-homes-tool-item"
                   data-testid={`project-home-tool-${tool.id}`}
                   onClick={handleProposeShariTask}
+                >
+                  <span className="project-homes-tool-item__label">
+                    {tool.label}
+                  </span>
+                  <span className="project-homes-tool-item__blurb">
+                    {tool.blurb}
+                  </span>
+                </button>
+              ) : tool.id === "ask-board" && onCallTheBoard && !sample ? (
+                <button
+                  type="button"
+                  className="project-homes-tool-item"
+                  data-testid={`project-home-tool-${tool.id}`}
+                  onClick={() => onCallTheBoard(project)}
                 >
                   <span className="project-homes-tool-item__label">
                     {tool.label}
