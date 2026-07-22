@@ -5229,8 +5229,8 @@ export default function CompanionPageClient() {
           });
           openSectionBesideChatCore("projects", "projects");
         } else {
-          setActiveSection("projects");
-          setActiveNav("projects");
+          // Legacy blue ProjectsPanel — always land on Project Homes (vision-room plate).
+          openProjectHomesPrototypeCore();
         }
         appendRecoveryMessage(
           resumeReceiptForContinuityType("project", item.title),
@@ -5422,7 +5422,8 @@ export default function CompanionPageClient() {
       );
     } else if (a.kind === "project") {
       setProjectContinueId(a.projectId ?? null);
-      setActiveSection("projects");
+      // Legacy blue ProjectsPanel — always land on Project Homes (vision-room plate).
+      openProjectHomesPrototypeCore();
     } else {
       setActiveNav("chat");
       setActiveSection("home");

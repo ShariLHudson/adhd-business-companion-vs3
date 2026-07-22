@@ -1,8 +1,19 @@
 .project-homes-prototype {
   position: relative;
+  z-index: 20;
+  isolation: isolate;
   min-height: 100dvh;
   min-height: 100svh;
   overflow: hidden;
+  pointer-events: auto;
+}
+
+.project-homes-create {
+  width: min(36rem, 100%);
+}
+
+.project-homes-create--event .project-homes-kicker {
+  color: #4a5c3a;
 }
 
 .project-homes-prototype__cinematic {
@@ -39,15 +50,15 @@
   padding: clamp(1rem, 2.5vw, 1.85rem);
 }
 
-/* Stronger frost for Projects room — dark text readable over project-room.png */
+/* Glass frost for Projects — translucent so inspiring-vision plate shows through */
 .project-homes-workspace.estate-workspace.companion-workspace-frosted {
-  background: rgba(255, 252, 245, 0.9);
+  background: rgba(255, 252, 245, 0.64);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.62);
   box-shadow:
-    0 24px 56px rgba(42, 58, 38, 0.14),
-    0 2px 0 rgba(255, 255, 255, 0.5) inset;
+    0 24px 56px rgba(24, 40, 52, 0.16),
+    0 2px 0 rgba(255, 255, 255, 0.48) inset;
   color: #1f1c19;
 }
 
@@ -83,6 +94,56 @@
   font-size: 0.92rem;
   line-height: 1.45;
   color: #4b463f;
+}
+
+.project-homes-gallery-section {
+  margin-top: 1.75rem;
+}
+
+.project-homes-gallery-section__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.project-homes-gallery-section__title {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3d3832;
+}
+
+.project-homes-sample-prompt {
+  margin-top: 1.75rem;
+  max-width: 36rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.project-homes-sample-prompt .project-homes-sample-note {
+  margin-top: 0;
+}
+
+.project-homes-gallery-section .project-homes-sample-note {
+  margin-top: 0.45rem;
+}
+
+.project-homes-gallery-section .project-homes-grid {
+  margin-top: 0.9rem;
+}
+
+.project-homes-empty {
+  margin-top: 0.75rem;
+  max-width: 36rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #2d2926;
 }
 
 .project-homes-title-row {
@@ -336,12 +397,22 @@
   padding: 0.45rem 0.35rem 0.35rem;
 }
 
-.project-home-card__delete-confirm p {
-  margin: 0 0.35rem 0.55rem;
+.project-home-card__delete-confirm p,
+.project-home-card__delete-title,
+.project-home-card__delete-explain {
+  margin: 0 0.35rem 0.45rem;
   font-size: 0.88rem;
-  font-weight: 600;
   line-height: 1.35;
   color: #1f1c19;
+}
+
+.project-home-card__delete-title {
+  font-weight: 600;
+}
+
+.project-home-card__delete-explain {
+  font-weight: 500;
+  color: #4b463f;
 }
 
 .project-home-card__delete-actions {
@@ -564,7 +635,22 @@
   color: #2d2926;
 }
 
-.project-homes-structure__toggle {
+.project-homes-drawer {
+  border-radius: 0.95rem;
+  border: 1px solid #e4ddd2;
+  background: rgba(250, 247, 242, 0.72);
+  padding: 0.85rem 1rem;
+  margin-top: 0.85rem;
+  border-top: none;
+  padding-top: 0.85rem;
+}
+
+.project-homes-drawer--open {
+  background: rgba(250, 247, 242, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.project-homes-drawer__toggle {
   display: flex;
   width: 100%;
   align-items: center;
@@ -578,18 +664,134 @@
   text-align: left;
 }
 
-.project-homes-structure__toggle h3 {
+.project-homes-drawer__toggle h3 {
   margin: 0;
 }
 
-.project-homes-structure__toggle:focus-visible {
+.project-homes-drawer__chevron {
+  flex-shrink: 0;
+  color: #5c534a;
+  font-size: 0.95rem;
+}
+
+.project-homes-drawer__toggle:focus-visible {
   outline: 2px solid rgba(30, 79, 79, 0.65);
   outline-offset: 3px;
   border-radius: 0.35rem;
 }
 
+.project-homes-drawer__body {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #efe8de;
+}
+
+.project-homes-drawer__lead {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #4b463f;
+}
+
+.project-homes-drawer__subtitle {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #3d3832;
+}
+
+.project-homes-drawer__body > div:first-of-type .project-homes-drawer__subtitle {
+  margin-top: 0;
+}
+
+.project-homes-drawer .project-homes-connected {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #efe8de;
+}
+
+.project-homes-drawer__empty {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: #5c534a;
+}
+
+.project-homes-primary-action {
+  margin-top: 0.85rem;
+}
+
+.project-homes-plan-lists {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.65rem;
+}
+
+.project-homes-plan-list-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #2d2926;
+}
+
+.project-homes-plan-actions {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid #efe8de;
+}
+
+.project-homes-tools-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.project-homes-tool-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid #e4ddd2;
+  background: #faf7f2;
+}
+
+.project-homes-tool-item--preparing {
+  cursor: default;
+  opacity: 0.92;
+  background: #f3eee6;
+}
+
+.project-homes-tool-item__label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f1c19;
+}
+
+.project-homes-tool-item__blurb {
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: #4b463f;
+}
+
+.project-homes-tool-item__status {
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5c534a;
+}
+
+.project-homes-connections-preparing {
+  margin-top: 0.65rem;
+}
+
 .project-homes-structure__placeholder {
-  margin-top: 0.55rem;
+  margin-top: 0.35rem;
   font-size: 0.95rem;
   line-height: 1.5;
   color: #2d2926;
@@ -813,4 +1015,77 @@
   font-size: 0.85rem;
   line-height: 1.45;
   color: #4b463f;
+}
+
+/* Separate frosted chat — Show Conversation / Experience Controls */
+.companion-project-homes-active .project-homes__chat-panel.estate-room-frosted-chat {
+  z-index: 40;
+}
+
+/* 057 — Active Work cards (Projects continues work; no Project Home chrome) */
+.active-work-card {
+  min-height: auto;
+  cursor: default;
+  background: rgba(250, 247, 242, 0.95);
+  border: 1px solid #d4cdc3;
+  box-shadow: 0 8px 24px rgba(45, 41, 38, 0.08);
+}
+
+.active-work-card:hover {
+  transform: none;
+  border-color: #c4b8a8;
+}
+
+.active-work-card__body {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.1rem 1.1rem;
+  color: #1f1c19;
+}
+
+.active-work-card__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #1f1c19;
+}
+
+.active-work-card__meta,
+.active-work-card__progress,
+.active-work-card__updated,
+.active-work-card__waiting {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6b635a;
+}
+
+.active-work-card__focus,
+.active-work-card__next {
+  margin: 0.15rem 0 0;
+  font-size: 0.95rem;
+  color: #4b463f;
+}
+
+.active-work-card__label {
+  display: block;
+  margin-bottom: 0.1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.active-work-card__continue {
+  margin-top: 0.65rem;
+  align-self: flex-start;
+}
+
+.project-homes-actions {
+  flex-wrap: wrap;
+  gap: 0.65rem;
 }

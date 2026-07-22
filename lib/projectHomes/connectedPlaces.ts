@@ -32,7 +32,7 @@ export const CONNECTED_PLACES: readonly ConnectedPlaceShortcut[] = [
   {
     id: "evidence-vault",
     label: "Evidence Vault",
-    blurb: "Gather proof of what is working.",
+    blurb: "Preserve discoveries about what is working.",
     destinationHint: "evidence-bank",
   },
   {
@@ -47,6 +47,11 @@ export const CONNECTED_PLACES: readonly ConnectedPlaceShortcut[] = [
 const ROOM_PRIORITY: Partial<Record<ProjectHomeRoomId, string[]>> = {
   "writing-room": ["journal-gazebo", "cartography", "hall-of-accomplishment"],
   "art-studio": ["cartography", "hall-of-accomplishment", "journal-gazebo"],
+  "social-studio": [
+    "cartography",
+    "chamber-of-momentum",
+    "hall-of-accomplishment",
+  ],
   "strategy-conference": [
     "boardroom",
     "chamber-of-momentum",

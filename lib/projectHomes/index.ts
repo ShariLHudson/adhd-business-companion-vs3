@@ -10,6 +10,8 @@ export {
   getProjectHomeBackgroundUrl,
 } from "./roomCatalog";
 
+export { PROJECTS_BACKGROUND_SRC } from "@/lib/estateExperienceBackgrounds";
+
 export {
   CONNECTED_PLACES,
   connectedPlacesForProjectHome,

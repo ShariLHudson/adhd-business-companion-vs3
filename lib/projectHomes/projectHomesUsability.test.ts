@@ -219,7 +219,7 @@ describe("projectHomes usability", () => {
       ".project-homes-workspace.estate-workspace.companion-workspace-frosted",
     );
     expect(css).toMatch(
-      /background:\s*rgba\(255,\s*252,\s*245,\s*0\.9\)/,
+      /background:\s*rgba\(255,\s*252,\s*245,\s*0\.64\)/,
     );
     expect(css).toContain(".project-home-card:focus-visible");
     expect(css).toContain(".project-home-card__open");

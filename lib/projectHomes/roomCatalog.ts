@@ -1,3 +1,4 @@
+import { PROJECTS_BACKGROUND_SRC } from "@/lib/estateExperienceBackgrounds";
 import type {
   ProjectHomeArtwork,
   ProjectHomeRecommendation,
@@ -10,8 +11,7 @@ import type {
  * Permanent Projects room plate (gallery / arrive).
  * Individual Project Homes still keep their own room artwork when opened.
  */
-export const PROJECT_HOMES_ROOM_BACKGROUND =
-  "/backgrounds/project-room.png" as const;
+export const PROJECT_HOMES_ROOM_BACKGROUND = PROJECTS_BACKGROUND_SRC;
 
 /**
  * Project Homes available for projects.
