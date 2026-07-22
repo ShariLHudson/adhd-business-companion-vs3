@@ -3,9 +3,11 @@
  * Tone and routing stay in the Companion OS; this only shapes coaching choices.
  */
 
-import { getProjects } from "./companionStore";
 import type { AppSection } from "./companionUi";
+import { pickActiveProjectName } from "./strategyLibrary/pickActiveProject";
 import { getStrategy, resolveSubcat, type Strategy } from "./strategySystem";
+
+export { pickActiveProjectName } from "./strategyLibrary/pickActiveProject";
 
 export type StrategyApplyContext = {
   strategyTitle: string;
@@ -403,20 +405,6 @@ const STRATEGY_APPLY_OVERRIDES: Record<string, StrategyApplyOption[]> = {
   "good-enough-direction": CATEGORY_APPLY_OPTIONS["business-decisions"]!,
   "test-before-scale": CATEGORY_APPLY_OPTIONS["business-decisions"]!,
 };
-
-export function pickActiveProjectName(): string | null {
-  const projects = getProjects();
-  const focus = projects.find((p) => p.status === "active-focus");
-  if (focus?.name?.trim()) return focus.name.trim();
-  const now = projects.find(
-    (p) =>
-      p.horizon === "now" &&
-      p.status !== "completed",
-  );
-  if (now?.name?.trim()) return now.name.trim();
-  const inProgress = projects.find((p) => p.status === "in-progress");
-  return inProgress?.name?.trim() ?? null;
-}
 
 export function resolveStrategyCategoryId(
   strategyId?: string,

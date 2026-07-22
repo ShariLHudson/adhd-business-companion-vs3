@@ -7,6 +7,7 @@
 | **Binds** | Spec 128 (Simplicity & Cognitive Load) · Spec 132 (Momentum Protection) · Capture Before Classification (137) |
 | **Prompt** | `docs/cartography/140_CURSOR_CARTOGRAPHY_AND_VISUAL_THINKING_12_10_COMPLETION_PROMPT.md` |
 | **Evidence** | `docs/cartography/evidence/140_CARTOGRAPHY_BROWSER_AND_REGRESSION_RESULTS.json` |
+| **Commit** | `77b520bb` (UI/lib/docs) + follow-up CPC side-chat routing (no auto beside-chat) |
 
 ---
 

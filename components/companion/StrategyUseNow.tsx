@@ -17,6 +17,7 @@ export function StrategyUseNow({
   onOpen,
   onAsk,
   onStartStrategyApply,
+  onActivated,
 }: {
   strategyTitle: string;
   strategyId?: string;
@@ -25,6 +26,8 @@ export function StrategyUseNow({
   onAsk?: (prompt: string) => void;
   /** Guided coach flow — preferred when available. */
   onStartStrategyApply?: (strategyId: string) => void;
+  /** Prompt 143 — reveal the simplified action footer after primary use */
+  onActivated?: () => void;
 }) {
   const activeProjectName = useMemo(() => pickActiveProjectName(), []);
   const options = useMemo(
@@ -47,6 +50,7 @@ export function StrategyUseNow({
   );
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [showAlternates, setShowAlternates] = useState(false);
   const activeOption: StrategyApplyOption | null =
     options.find((o) => o.id === (selectedId ?? suggestedId)) ?? options[0] ?? null;
 
@@ -68,6 +72,7 @@ export function StrategyUseNow({
   }
 
   function useStrategy() {
+    onActivated?.();
     if (onStartStrategyApply && strategyId) {
       onStartStrategyApply(strategyId);
       return;
@@ -82,11 +87,14 @@ export function StrategyUseNow({
     Boolean(activeOption && (onAsk || activeOption.section));
 
   return (
-    <div className="mt-8 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] p-4">
-      <p className="text-base font-semibold text-[#1f1c19]">Use this strategy</p>
+    <div
+      className="mt-8 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] p-4"
+      data-testid="strategy-use-now"
+    >
+      <p className="text-base font-semibold text-[#1f1c19]">Use This Strategy</p>
       {activeProjectName ? (
         <p className="mt-1 text-xs text-[#9a8f82]">
-          Current focus: {activeProjectName} — we&apos;ll weave it in only if it
+          Current Focus: {activeProjectName} — we&apos;ll weave it in only if it
           fits.
         </p>
       ) : null}
@@ -95,42 +103,50 @@ export function StrategyUseNow({
         type="button"
         onClick={useStrategy}
         disabled={!canUse}
+        data-testid="strategy-use-this-primary"
         className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
       >
-        Use this strategy →
+        Use This Strategy
       </button>
 
       {options.length > 1 ? (
-        <>
-          <p className="mt-4 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-            Or choose a different move
-          </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {options.map((opt) => {
-              const active = (selectedId ?? suggestedId) === opt.id;
-              const isSuggested = !selectedId && suggestedId === opt.id;
-              return (
-                <button
-                  key={opt.id}
-                  type="button"
-                  onClick={() => setSelectedId(opt.id)}
-                  className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                    active
-                      ? "border-[#1e4f4f] bg-[#1e4f4f] text-white"
-                      : isSuggested
-                        ? "border-[#1e4f4f]/50 bg-[#1e4f4f]/[0.08] text-[#1e4f4f]"
-                        : "border-[#1e4f4f]/25 bg-white text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-          {activeOption && selectedId ? (
+        <div className="mt-3">
+          <button
+            type="button"
+            className="text-sm font-semibold text-[#1e4f4f] hover:underline"
+            data-testid="strategy-use-alternates-toggle"
+            onClick={() => setShowAlternates((v) => !v)}
+          >
+            {showAlternates ? "Hide other ways" : "Other ways to use this…"}
+          </button>
+          {showAlternates ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {options.map((opt) => {
+                const active = (selectedId ?? suggestedId) === opt.id;
+                const isSuggested = !selectedId && suggestedId === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setSelectedId(opt.id)}
+                    className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                      active
+                        ? "border-[#1e4f4f] bg-[#1e4f4f] text-white"
+                        : isSuggested
+                          ? "border-[#1e4f4f]/50 bg-[#1e4f4f]/[0.08] text-[#1e4f4f]"
+                          : "border-[#1e4f4f]/25 bg-white text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : null}
+          {activeOption && selectedId && showAlternates ? (
             <p className="mt-2 text-sm text-[#6b635a]">{activeOption.hint}</p>
           ) : null}
-        </>
+        </div>
       ) : activeOption ? (
         <p className="mt-2 text-sm text-[#6b635a]">{activeOption.hint}</p>
       ) : null}

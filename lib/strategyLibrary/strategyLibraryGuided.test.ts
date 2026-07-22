@@ -161,13 +161,17 @@ describe("Execution connections (128)", () => {
     });
   });
 
-  it("exposes Plan My Day, Project, Reminder, Rhythm actions in UI", () => {
+  it("exposes Prompt 143 action footer labels (primary path + More…)", () => {
     const ui = read("components/companion/StrategyExecutionConnections.tsx");
-    expect(ui).toContain("Add to Plan My Day");
-    expect(ui).toContain("Connect to Project");
+    const panel = read("components/companion/StrategiesPanel.tsx");
+    expect(ui).toContain("Add to Today's Plan");
+    expect(ui).toContain("Connect to Current Project");
+    expect(ui).toContain("Ask Shari");
+    expect(ui).toContain("More…");
     expect(ui).toContain("Create Reminder");
-    expect(ui).toContain("Create Rhythm");
-    expect(ui).toContain("Review with Board");
-    expect(ui).toContain("Visualize This");
+    expect(ui).toContain("createNew: true");
+    expect(panel).toContain("activated={strategyActivated}");
+    expect(panel).toContain("strategy-library-browse-all");
+    expect(panel).toContain("STRATEGY_RECOMMENDATION_LIMIT");
   });
 });

@@ -5312,7 +5312,8 @@ export default function CompanionPageClient() {
 
   function openVisualFocusMapCore(mapId: string, preferGenerated = true) {
     queueVisualFocusOpen(mapId, preferGenerated);
-    openWorkspaceBesideChatCore("visual-focus", workspaceOpenAck("visual-focus"));
+    // Prompt 140 — Cartography never auto-opens beside chat.
+    openCartographersStudioCore();
   }
 
   function openDecisionCompass(prefill?: DecisionCompassPrefill | null) {
@@ -13076,9 +13077,8 @@ export default function CompanionPageClient() {
     if (isMindMap) {
       // Same Discovery Interview as the Mind Map frame — never the old dashboard.
       requestMindMapDiscoveryOpen(prompt || undefined);
-      openSectionBesideChatCore("visual-focus", undefined, {
-        userInitiated: true,
-      });
+      // Prompt 140 — full map workspace; no automatic side chat.
+      openCartographersStudioCore();
       clearVisualThinkingMenuPending();
       clearFrictionlessPending();
       clearPendingAcceptanceAuthority();
@@ -13095,7 +13095,7 @@ export default function CompanionPageClient() {
 
     const map = createAndActivateMap(input.mode, prompt || undefined);
     queueVisualFocusOpen(map.id);
-    openSectionBesideChatCore("visual-focus", undefined, { userInitiated: true });
+    openCartographersStudioCore();
     clearVisualThinkingMenuPending();
     clearFrictionlessPending();
     clearPendingAcceptanceAuthority();
@@ -13433,9 +13433,7 @@ export default function CompanionPageClient() {
 
     if (!chamberMemberConversationLocked && frictionlessAction.immediateCartographersStudioOpen) {
       requestVisualFocusStudio();
-      openSectionBesideChatCore("visual-focus", undefined, {
-        userInitiated: true,
-      });
+      openCartographersStudioCore();
       setInput("");
       setAwaitingUserConfirmation(null);
       finishEarlyChatTurn();
