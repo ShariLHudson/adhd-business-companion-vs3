@@ -12,6 +12,8 @@ import {
   filterHallEntries,
   getPortfolioEntries,
   GROWTH_PORTFOLIO_UPDATED_EVENT,
+  HALL_ACHIEVEMENT_OTHER_VALUE,
+  HALL_ACHIEVEMENT_TYPE_OPTIONS,
   HALL_ACHIEVEMENT_TYPES,
   type PortfolioEntry,
 } from "@/lib/growthPortfolioStore";
@@ -40,11 +42,15 @@ export function GrowthPortfolioPanel({
   const [achievementType, setAchievementType] = useState<string>(
     HALL_ACHIEVEMENT_TYPES[0]!,
   );
+  const [customAchievementType, setCustomAchievementType] = useState("");
   const [projectName, setProjectName] = useState("");
   const [year, setYear] = useState(String(new Date().getFullYear()));
   const [filterType, setFilterType] = useState("");
   const [filterYear, setFilterYear] = useState("");
   const [filterQuery, setFilterQuery] = useState("");
+  const [justSavedTitle, setJustSavedTitle] = useState<string | null>(null);
+
+  const isOtherType = achievementType === HALL_ACHIEVEMENT_OTHER_VALUE;
 
   useEffect(() => {
     const load = () => setEntries(getPortfolioEntries());
@@ -70,20 +76,44 @@ export function GrowthPortfolioPanel({
     return [...set].sort((a, b) => b.localeCompare(a));
   }, [entries]);
 
+  // Filter dropdown should include any custom "Other" types members have
+  // already saved, not just the preset list — so past custom accomplishments
+  // stay easy to find later.
+  const filterTypeOptions = useMemo(() => {
+    const custom = new Set<string>();
+    for (const e of entries) {
+      const t = e.achievementType;
+      if (t && !(HALL_ACHIEVEMENT_TYPES as readonly string[]).includes(t)) {
+        custom.add(t);
+      }
+    }
+    return [...HALL_ACHIEVEMENT_TYPES, ...[...custom].sort((a, b) => a.localeCompare(b))];
+  }, [entries]);
+
+  const trimmedCustomType = customAchievementType.trim();
+  const canSave = title.trim().length > 0 && (!isOtherType || trimmedCustomType.length > 0);
+
   function handleAdd() {
-    if (!title.trim()) return;
-    createPortfolioEntry({
+    if (!canSave) return;
+    const resolvedType = isOtherType ? trimmedCustomType : achievementType;
+    const entry = createPortfolioEntry({
       title: title.trim(),
       description: description.trim(),
       attachments: [],
-      achievementType,
+      achievementType: resolvedType,
       projectName: projectName.trim() || undefined,
       year: year.trim() || undefined,
     });
     setTitle("");
     setDescription("");
     setProjectName("");
+    setCustomAchievementType("");
+    setAchievementType(HALL_ACHIEVEMENT_TYPES[0]!);
     setShowAdd(false);
+    // Primary Action Feedback™ — the click always ends in a visible outcome:
+    // the new entry appears in the Hall and a brief confirmation names it.
+    setJustSavedTitle(entry.title);
+    window.setTimeout(() => setJustSavedTitle(null), 4000);
   }
 
   return (
@@ -108,7 +138,16 @@ export function GrowthPortfolioPanel({
           <button
             type="button"
             className="rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163c3c]"
-            onClick={() => setShowAdd((v) => !v)}
+            onClick={() =>
+              setShowAdd((v) => {
+                const next = !v;
+                if (!next) {
+                  setCustomAchievementType("");
+                  setAchievementType(HALL_ACHIEVEMENT_TYPES[0]!);
+                }
+                return next;
+              })
+            }
             data-testid="hall-add-achievement"
           >
             {showAdd ? "Cancel" : "Add achievement"}
@@ -127,7 +166,7 @@ export function GrowthPortfolioPanel({
             aria-label="Filter by type"
           >
             <option value="">All types</option>
-            {HALL_ACHIEVEMENT_TYPES.map((t) => (
+            {filterTypeOptions.map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>
@@ -160,13 +199,26 @@ export function GrowthPortfolioPanel({
                 onChange={(e) => setAchievementType(e.target.value)}
                 className="mt-1 w-full rounded-xl border border-[#c9bfb0] px-3 py-2 text-sm font-normal text-[#1f1c19]"
               >
-                {HALL_ACHIEVEMENT_TYPES.map((t) => (
+                {HALL_ACHIEVEMENT_TYPE_OPTIONS.map((t) => (
                   <option key={t} value={t}>
-                    {t}
+                    {t === HALL_ACHIEVEMENT_OTHER_VALUE ? "Something else" : t}
                   </option>
                 ))}
               </select>
             </label>
+            {isOtherType ? (
+              <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                What kind of accomplishment is this?
+                <input
+                  value={customAchievementType}
+                  onChange={(e) => setCustomAchievementType(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-[#c9bfb0] px-3 py-2 text-sm font-normal text-[#1f1c19]"
+                  placeholder="e.g. Marathon finished, Patent filed…"
+                  autoFocus
+                  data-testid="hall-custom-type-input"
+                />
+              </label>
+            ) : null}
             <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
               Title
               <input
@@ -208,12 +260,23 @@ export function GrowthPortfolioPanel({
             <button
               type="button"
               onClick={handleAdd}
-              disabled={!title.trim()}
+              disabled={!canSave}
               className="mt-4 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
+              data-testid="hall-save-to-hall"
             >
               Save to Hall
             </button>
           </div>
+        ) : null}
+
+        {justSavedTitle ? (
+          <p
+            className="mb-4 rounded-xl border border-[#cfe3d6] bg-[#f1f8f3] px-4 py-2 text-sm font-medium text-[#2f5a3f]"
+            role="status"
+            data-testid="hall-save-confirmation"
+          >
+            Added “{justSavedTitle}” to your Hall.
+          </p>
         ) : null}
 
         {filtered.length === 0 ? (

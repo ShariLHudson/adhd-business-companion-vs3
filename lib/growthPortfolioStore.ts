@@ -23,6 +23,20 @@ export const HALL_ACHIEVEMENT_TYPES = [
 
 export type HallAchievementType = (typeof HALL_ACHIEVEMENT_TYPES)[number];
 
+/**
+ * Sentinel value shown at the end of the type picker so members are never
+ * limited to the preset list. Choosing it asks one short follow-up
+ * question for a custom label, which is then saved as the entry's actual
+ * `achievementType` (never persisted as the literal word "Other").
+ */
+export const HALL_ACHIEVEMENT_OTHER_VALUE = "Other" as const;
+
+/** Full set of selectable options in the Add form's Type picker. */
+export const HALL_ACHIEVEMENT_TYPE_OPTIONS = [
+  ...HALL_ACHIEVEMENT_TYPES,
+  HALL_ACHIEVEMENT_OTHER_VALUE,
+] as const;
+
 export type PortfolioEntry = {
   id: string;
   title: string;
