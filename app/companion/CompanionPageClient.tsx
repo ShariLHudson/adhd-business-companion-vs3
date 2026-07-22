@@ -10990,6 +10990,14 @@ export default function CompanionPageClient() {
       return;
     }
 
+    /** Breathe is a dedicated overlay experience, not a direct-navigation room. */
+    if (placeId === "breathe") {
+      markExploreEstateReturnPending();
+      setExploreEstateReturnAvailable(true);
+      openBreatheOverlayCore();
+      return;
+    }
+
     /** Close Explore before the room hop — never leave the map covering arrival. */
     dismissTransientEstateExperiencesForDestinationSwitch({
       destinationId: placeId,
@@ -11025,9 +11033,28 @@ export default function CompanionPageClient() {
       return;
     }
 
-    runDirectEstateRoomNavigation(command, `Explore Estate: ${location.name}`, undefined, {
-      skipAssistantMessage: true,
-    });
+    /**
+     * Explore-only destinations (e.g. Horizon Point, Estate Back Deck) may not
+     * yet have a registry background plate. Fall back to the exact photograph
+     * shown on the Explore card so the arrival scene always matches what the
+     * member selected — never a generic/default background.
+     */
+    const hasRegistryBackground = Boolean(
+      resolveEstateRoomBackgroundImage(commandPlace),
+    );
+    const commandWithFallbackBg =
+      !hasRegistryBackground && dest?.imagePath
+        ? { ...command, backgroundImageOverride: command.backgroundImageOverride ?? dest.imagePath }
+        : command;
+
+    runDirectEstateRoomNavigation(
+      commandWithFallbackBg,
+      `Explore Estate: ${location.name}`,
+      undefined,
+      {
+        skipAssistantMessage: true,
+      },
+    );
   }
 
   function toggleJustBeHereSound() {

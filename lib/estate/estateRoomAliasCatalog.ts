@@ -746,4 +746,55 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
     route: null,
     roomType: "profile",
   },
+  /**
+   * Explore Estate destinationId override — `momentum-institute` already owns
+   * the spoken aliases ("chamber of momentum" etc.). This entry only lets a
+   * direct-navigation call using the runtime id `chamber-of-momentum` resolve
+   * (Explore Estate / Wander card select uses this id, not the legacy one).
+   * @see lib/estateMap/exploreEstateDestinations.ts DESTINATION_ID_OVERRIDES
+   */
+  {
+    roomId: "chamber-of-momentum",
+    officialName: "Chamber of Momentum",
+    aliases: ["chamber-of-momentum"],
+    route: "chamber-of-momentum",
+    roomType: "learning",
+  },
+  {
+    roomId: "cartographers-studio",
+    officialName: "Cartographer's Studio",
+    aliases: [
+      "cartographers studio",
+      "cartographer's studio",
+      "cartographer studio",
+      "the cartographer's studio",
+    ],
+    route: "visual-focus",
+    roomType: "research",
+  },
+  {
+    roomId: "horizon-point",
+    officialName: "Horizon Point",
+    aliases: ["horizon point", "the horizon point"],
+    route: "home",
+    roomType: "nature",
+  },
+  {
+    roomId: "estate-back-deck",
+    officialName: "Estate Back Deck",
+    aliases: ["estate back deck", "the estate back deck", "back deck"],
+    route: "home",
+    roomType: "restoration",
+  },
+  {
+    roomId: "back-fireside-deck-rain",
+    officialName: "Back Fireside Deck Rain",
+    aliases: [
+      "back fireside deck rain",
+      "rainy fireside deck",
+      "fireside deck in the rain",
+    ],
+    route: "home",
+    roomType: "restoration",
+  },
 ] as const;
