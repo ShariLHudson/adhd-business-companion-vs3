@@ -16,3 +16,5 @@ export * from "./discoveryInterview";
 export * from "./mindMapEditing";
 export * from "./mindMapHistory";
 export * from "./canvasSync";
+export * from "./printMap";
+export * from "./guidedBuilder";

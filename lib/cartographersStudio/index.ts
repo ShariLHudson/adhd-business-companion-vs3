@@ -32,9 +32,21 @@ export {
   productionWallMaps,
   namingMatrixRow,
   assertMindMapNamingConsistent,
+  assertAllWallMapsActiveAndNamed,
+  canonicalMapName,
+  getCartographyMapDefinition,
+  getCartographyMapDefinitionByMode,
+  visualFocusModeForWallMap,
   type CartographyMapRegistryEntry,
   type CartographyProductionStatus,
 } from "./mapRegistry";
+
+export {
+  CARTOGRAPHY_MAP_DEFINITIONS,
+  activeCartographyMaps,
+  type CartographyMapDefinition,
+  type CartographyStepDefinition,
+} from "./mapDefinitions";
 
 export {
   CARTOGRAPHERS_ATLAS_ENTRIES,

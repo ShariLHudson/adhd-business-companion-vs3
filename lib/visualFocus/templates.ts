@@ -91,6 +91,57 @@ function treeTemplate(mode: VisualFocusMode): { title: string; root: VisualFocus
           node("Revenue"),
         ]),
       };
+    case "process-map":
+      return {
+        title: "Client onboarding",
+        root: node("Client onboarding", [
+          node("Inquiry"),
+          node("Discovery call"),
+          node("Proposal"),
+          node("Kickoff"),
+          node("Delivery"),
+          node("Follow-up"),
+        ]),
+      };
+    case "journey-map":
+      return {
+        title: "From curious to enrolled",
+        root: node("Curious visitor", [
+          node("Discover"),
+          node("Consider"),
+          node("Decide"),
+          node("Begin"),
+          node("Thrive"),
+        ]),
+      };
+    case "timeline-map":
+      return {
+        title: "Launch timeline",
+        root: node("Launch timeline", [
+          node("Outline"),
+          node("Build"),
+          node("Open cart"),
+          node("Close cart"),
+        ]),
+      };
+    case "opportunity-map":
+      return {
+        title: "Growth opportunities",
+        root: node("Growth opportunities", [
+          node("New offer"),
+          node("Partnership"),
+          node("Content series"),
+        ]),
+      };
+    case "priority-map":
+      return {
+        title: "This month’s priorities",
+        root: node("This month’s priorities", [
+          node("High impact"),
+          node("Urgent"),
+          node("Later"),
+        ]),
+      };
     case "visual-kanban":
       return { title: card?.title ?? "Visual Board", root: node("Visual Kanban") };
     case "business-canvas":

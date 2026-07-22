@@ -6,13 +6,16 @@ import {
   CARTOGRAPHERS_ATLAS_INTRO,
   type CartographersAtlasEntry,
 } from "@/lib/cartographersStudio/atlas";
+import type { CartographersFramedMapId } from "@/lib/cartographersStudio";
 
 export function CartographersAtlasOverlay({
   onClose,
   onCreateMindMap,
+  onCreateMap,
 }: {
   onClose: () => void;
   onCreateMindMap: () => void;
+  onCreateMap?: (id: CartographersFramedMapId) => void;
 }) {
   const [selectedId, setSelectedId] = useState(
     CARTOGRAPHERS_ATLAS_ENTRIES[0]!.id,
@@ -20,6 +23,15 @@ export function CartographersAtlasOverlay({
   const selected =
     CARTOGRAPHERS_ATLAS_ENTRIES.find((entry) => entry.id === selectedId) ??
     CARTOGRAPHERS_ATLAS_ENTRIES[0]!;
+
+  function createSelected() {
+    onClose();
+    if (onCreateMap) {
+      onCreateMap(selected.id);
+      return;
+    }
+    onCreateMindMap();
+  }
 
   return (
     <div
@@ -74,13 +86,7 @@ export function CartographersAtlasOverlay({
             ))}
           </nav>
 
-          <AtlasEntryDetail
-            entry={selected}
-            onCreateMindMap={() => {
-              onClose();
-              onCreateMindMap();
-            }}
-          />
+          <AtlasEntryDetail entry={selected} onCreate={createSelected} />
         </div>
       </div>
     </div>
@@ -89,10 +95,10 @@ export function CartographersAtlasOverlay({
 
 function AtlasEntryDetail({
   entry,
-  onCreateMindMap,
+  onCreate,
 }: {
   entry: CartographersAtlasEntry;
-  onCreateMindMap: () => void;
+  onCreate: () => void;
 }) {
   return (
     <article
@@ -117,14 +123,12 @@ function AtlasEntryDetail({
             type="button"
             className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163c3c]"
             data-testid="atlas-create-this-map"
-            onClick={onCreateMindMap}
+            onClick={onCreate}
           >
             Create This Map
           </button>
         ) : (
-          <p className="text-sm text-[#9a8f82]">
-            Coming soon — Mind Map is ready to create today.
-          </p>
+          <p className="text-sm text-[#9a8f82]">Coming soon.</p>
         )}
       </div>
     </article>

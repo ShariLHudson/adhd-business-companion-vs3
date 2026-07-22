@@ -14,6 +14,11 @@ const MODES: VisualFocusMode[] = [
   "strategy-map",
   "relationship-map",
   "project-map",
+  "process-map",
+  "journey-map",
+  "timeline-map",
+  "opportunity-map",
+  "priority-map",
   "visual-kanban",
   "business-canvas",
 ];
@@ -38,11 +43,12 @@ describe("visualFocus studioCards", () => {
     }
   });
 
-  it("decision tree card distinguishes from Decision Compass", () => {
+  it("Decision Map card distinguishes from Decision Compass", () => {
     const card = getStudioCardByMode("decision-tree");
-    expect(card?.subtitle).toMatch(/what happens/i);
+    expect(card?.title).toBe("Decision Map");
+    expect(card?.subtitle).toMatch(/compare options/i);
     expect(card?.boundaryNote).toMatch(/Decision Compass/i);
-    expect(card?.actionLabel).toMatch(/path map/i);
+    expect(card?.actionLabel).toMatch(/decision map/i);
   });
 
   it("visual kanban avoids Done column in example", () => {

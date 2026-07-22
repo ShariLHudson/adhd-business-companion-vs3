@@ -52,7 +52,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "Options A/B/C against criteria like energy cost, revenue, and alignment with your season.",
     relatedMethods: ["Priority Map", "Opportunity Map", "Mind Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "relationship-map",
@@ -69,7 +69,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "You, clients, partners, and content channels with arrows for who influences whom.",
     relatedMethods: ["Journey Map", "Strategy Map", "Mind Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "process-map",
@@ -85,7 +85,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "Lead → discovery call → proposal → kickoff → delivery → follow-up.",
     relatedMethods: ["Timeline Map", "Journey Map", "Project Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "journey-map",
@@ -102,7 +102,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "Stranger → curious visitor → first win → loyal member.",
     relatedMethods: ["Process Map", "Timeline Map", "Relationship Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "timeline-map",
@@ -118,7 +118,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "Research week → draft week → soft launch → full launch.",
     relatedMethods: ["Project Map", "Process Map", "Priority Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "strategy-map",
@@ -135,7 +135,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "Vision → three priorities → supporting initiatives → next actions.",
     relatedMethods: ["Mind Map", "Project Map", "Priority Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "project-map",
@@ -152,7 +152,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "Phase 1 research → Phase 2 build → Phase 3 launch, each with deliverables.",
     relatedMethods: ["Timeline Map", "Strategy Map", "Process Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "opportunity-map",
@@ -169,7 +169,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "Three opportunity cards with upside, risk, and a smallest next step.",
     relatedMethods: ["Decision Map", "Mind Map", "Strategy Map"],
-    canCreate: false,
+    canCreate: true,
   },
   {
     id: "priority-map",
@@ -186,7 +186,7 @@ export const CARTOGRAPHERS_ATLAS_ENTRIES: readonly CartographersAtlasEntry[] = [
     example:
       "High impact / low effort in the “do now” zone; the rest parked or deferred.",
     relatedMethods: ["Decision Map", "Timeline Map", "Project Map"],
-    canCreate: false,
+    canCreate: true,
   },
 ] as const;
 

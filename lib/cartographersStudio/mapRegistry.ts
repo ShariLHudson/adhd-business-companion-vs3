@@ -1,6 +1,6 @@
 /**
- * Canonical Cartography map registry (Prompt 140).
- * Inspected from framedMaps, atlas, studioCards, and Visual Focus modes.
+ * Canonical Cartography map registry.
+ * Derived from mapDefinitions — wall, gallery, atlas, routes, and capabilities.
  */
 
 import { CARTOGRAPHERS_ATLAS_ENTRIES } from "./atlas";
@@ -8,6 +8,16 @@ import {
   CARTOGRAPHERS_FRAMED_MAPS,
   type CartographersFramedMapId,
 } from "./framedMaps";
+import {
+  assertWallMapNamingConsistent,
+  CARTOGRAPHY_MAP_DEFINITIONS,
+  canonicalMapName,
+  getCartographyMapDefinition,
+  getCartographyMapDefinitionByMode,
+  visualFocusModeForWallMap,
+  wallMapIdForVisualFocusMode,
+  type CartographyMapDefinition,
+} from "./mapDefinitions";
 import { VISUAL_FOCUS_STUDIO_CARDS } from "@/lib/visualFocus/studioCards";
 import type { VisualFocusMode } from "@/lib/visualFocus/types";
 
@@ -29,6 +39,15 @@ export type CartographyMapRegistryEntry = {
   editingOps: string[];
   productionStatus: CartographyProductionStatus;
   wallSelectable: boolean;
+  /** Prompt completion fields */
+  builderType: CartographyMapDefinition["builderType"] | "studio-hub";
+  resultRenderer: string;
+  supportsPrint: boolean;
+  supportsDuplicate: boolean;
+  isActive: boolean;
+  shortDescription: string;
+  steps: CartographyMapDefinition["steps"];
+  visualFocusMode?: VisualFocusMode;
 };
 
 const WALL_BY_ID = Object.fromEntries(
@@ -40,15 +59,11 @@ const ATLAS_BY_ID = Object.fromEntries(
 ) as Record<CartographersFramedMapId, (typeof CARTOGRAPHERS_ATLAS_ENTRIES)[number]>;
 
 /** Studio hub cards that are Visual Focus modes (not wall-only map types). */
-const STUDIO_MODE_TO_WALL: Partial<
+export const STUDIO_MODE_TO_WALL: Partial<
   Record<VisualFocusMode, CartographersFramedMapId>
-> = {
-  "mind-map": "mind-map",
-  "decision-tree": "decision-map",
-  "relationship-map": "relationship-map",
-  "strategy-map": "strategy-map",
-  "project-map": "project-map",
-};
+> = Object.fromEntries(
+  CARTOGRAPHY_MAP_DEFINITIONS.map((d) => [d.visualFocusMode, d.id]),
+) as Partial<Record<VisualFocusMode, CartographersFramedMapId>>;
 
 const SHARED_EDIT_OPS = [
   "add-node",
@@ -63,153 +78,67 @@ const SHARED_EDIT_OPS = [
   "save",
   "archive",
   "delete-map",
+  "print",
 ] as const;
 
-export const CARTOGRAPHY_MAP_REGISTRY: readonly CartographyMapRegistryEntry[] = [
-  {
-    canonicalId: "mind-map",
-    canonicalName: "Mind Map",
-    previousLabels: ["Mind map", "mindmap", "Visual Mind Map"],
-    wallLabel: WALL_BY_ID["mind-map"]?.nameplate ?? "Mind Map",
-    galleryLabel:
-      VISUAL_FOCUS_STUDIO_CARDS.find((c) => c.mode === "mind-map")?.title ??
-      "Mind Map",
-    atlasLabel: ATLAS_BY_ID["mind-map"]?.name ?? "Mind Map",
-    route: "visual-focus / cartographers-studio / mind-map",
-    purpose: WALL_BY_ID["mind-map"]?.hoverBlurb ?? "",
+function galleryLabelForMode(mode: VisualFocusMode, fallback: string): string {
+  return (
+    VISUAL_FOCUS_STUDIO_CARDS.find((c) => c.mode === mode)?.title ?? fallback
+  );
+}
+
+function entryFromDefinition(
+  def: CartographyMapDefinition,
+  previousLabels: string[] = [],
+): CartographyMapRegistryEntry {
+  return {
+    canonicalId: def.id,
+    canonicalName: def.name,
+    previousLabels,
+    wallLabel: WALL_BY_ID[def.id]?.nameplate ?? def.name,
+    galleryLabel: galleryLabelForMode(def.visualFocusMode, def.name),
+    atlasLabel: ATLAS_BY_ID[def.id]?.name ?? def.name,
+    route: def.route,
+    purpose: def.shortDescription,
     persistenceStore: "localStorage visual-focus maps (VisualFocusMap)",
-    editingOps: [...SHARED_EDIT_OPS, "connect-relationship", "notes"],
-    productionStatus: "production",
-    wallSelectable: true,
-  },
-  {
-    canonicalId: "decision-map",
-    canonicalName: "Decision Map",
-    previousLabels: ["Decision Tree", "decision-tree", "Path Map"],
-    wallLabel: WALL_BY_ID["decision-map"]?.nameplate ?? "Decision Map",
-    galleryLabel:
-      VISUAL_FOCUS_STUDIO_CARDS.find((c) => c.mode === "decision-tree")?.title ??
-      "Decision Tree",
-    atlasLabel: ATLAS_BY_ID["decision-map"]?.name ?? "Decision Map",
-    route: "visual-focus / decision-tree (studio) · wall learn-only",
-    purpose: WALL_BY_ID["decision-map"]?.hoverBlurb ?? "",
-    persistenceStore: "localStorage visual-focus maps when created via studio",
     editingOps: [...SHARED_EDIT_OPS],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "relationship-map",
-    canonicalName: "Relationship Map",
-    previousLabels: [],
-    wallLabel: "Relationship Map",
-    galleryLabel: "Relationship Map",
-    atlasLabel: "Relationship Map",
-    route: "visual-focus / relationship-map · wall learn-only",
-    purpose: WALL_BY_ID["relationship-map"]?.hoverBlurb ?? "",
-    persistenceStore: "localStorage visual-focus maps when created via studio",
-    editingOps: [...SHARED_EDIT_OPS],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "process-map",
-    canonicalName: "Process Map",
-    previousLabels: ["Process Flow", "process-flow"],
-    wallLabel: "Process Map",
-    galleryLabel: null,
-    atlasLabel: "Process Map",
-    route: "wall / atlas learn-only",
-    purpose: WALL_BY_ID["process-map"]?.hoverBlurb ?? "",
-    persistenceStore: "none (not production)",
-    editingOps: [],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "journey-map",
-    canonicalName: "Journey Map",
-    previousLabels: [],
-    wallLabel: "Journey Map",
-    galleryLabel: null,
-    atlasLabel: "Journey Map",
-    route: "wall / atlas learn-only",
-    purpose: WALL_BY_ID["journey-map"]?.hoverBlurb ?? "",
-    persistenceStore: "none (not production)",
-    editingOps: [],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "timeline-map",
-    canonicalName: "Timeline",
-    previousLabels: ["Timeline Map"],
-    wallLabel: "Timeline",
-    galleryLabel: null,
-    atlasLabel: ATLAS_BY_ID["timeline-map"]?.name ?? "Timeline",
-    route: "wall / atlas learn-only",
-    purpose: WALL_BY_ID["timeline-map"]?.hoverBlurb ?? "",
-    persistenceStore: "none (not production)",
-    editingOps: [],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "strategy-map",
-    canonicalName: "Strategy Map",
-    previousLabels: [],
-    wallLabel: "Strategy Map",
-    galleryLabel: "Strategy Map",
-    atlasLabel: "Strategy Map",
-    route: "visual-focus / strategy-map · wall learn-only",
-    purpose: WALL_BY_ID["strategy-map"]?.hoverBlurb ?? "",
-    persistenceStore: "localStorage visual-focus maps when created via studio",
-    editingOps: [...SHARED_EDIT_OPS],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "project-map",
-    canonicalName: "Project Map",
-    previousLabels: [],
-    wallLabel: "Project Map",
-    galleryLabel: "Project Map",
-    atlasLabel: "Project Map",
-    route: "visual-focus / project-map · wall learn-only",
-    purpose: WALL_BY_ID["project-map"]?.hoverBlurb ?? "",
-    persistenceStore: "localStorage visual-focus maps when created via studio",
-    editingOps: [...SHARED_EDIT_OPS],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "opportunity-map",
-    canonicalName: "Opportunity Map",
-    previousLabels: [],
-    wallLabel: "Opportunity Map",
-    galleryLabel: null,
-    atlasLabel: "Opportunity Map",
-    route: "wall / atlas learn-only",
-    purpose: WALL_BY_ID["opportunity-map"]?.hoverBlurb ?? "",
-    persistenceStore: "none (not production)",
-    editingOps: [],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
-  {
-    canonicalId: "priority-map",
-    canonicalName: "Priority Map",
-    previousLabels: [],
-    wallLabel: "Priority Map",
-    galleryLabel: null,
-    atlasLabel: "Priority Map",
-    route: "wall / atlas learn-only",
-    purpose: WALL_BY_ID["priority-map"]?.hoverBlurb ?? "",
-    persistenceStore: "none (not production)",
-    editingOps: [],
-    productionStatus: "hidden-pending",
-    wallSelectable: false,
-  },
+    productionStatus: def.isActive ? "production" : "hidden-pending",
+    wallSelectable: def.isActive,
+    builderType: def.builderType,
+    resultRenderer: def.resultRenderer,
+    supportsPrint: def.supportsPrint,
+    supportsDuplicate: Boolean(def.supportsDuplicate),
+    isActive: def.isActive,
+    shortDescription: def.shortDescription,
+    steps: def.steps,
+    visualFocusMode: def.visualFocusMode,
+  };
+}
+
+export const CARTOGRAPHY_MAP_REGISTRY: readonly CartographyMapRegistryEntry[] = [
+  entryFromDefinition(getCartographyMapDefinition("mind-map"), [
+    "Mind map",
+    "mindmap",
+    "Visual Mind Map",
+  ]),
+  entryFromDefinition(getCartographyMapDefinition("decision-map"), [
+    "Decision Tree",
+    "decision-tree",
+    "Path Map",
+  ]),
+  entryFromDefinition(getCartographyMapDefinition("relationship-map")),
+  entryFromDefinition(getCartographyMapDefinition("process-map"), [
+    "Process Flow",
+    "process-flow",
+  ]),
+  entryFromDefinition(getCartographyMapDefinition("journey-map")),
+  entryFromDefinition(getCartographyMapDefinition("timeline-map"), [
+    "Timeline Map",
+  ]),
+  entryFromDefinition(getCartographyMapDefinition("strategy-map")),
+  entryFromDefinition(getCartographyMapDefinition("project-map")),
+  entryFromDefinition(getCartographyMapDefinition("opportunity-map")),
+  entryFromDefinition(getCartographyMapDefinition("priority-map")),
   {
     canonicalId: "visual-kanban",
     canonicalName: "Visual Kanban",
@@ -220,9 +149,17 @@ export const CARTOGRAPHY_MAP_REGISTRY: readonly CartographyMapRegistryEntry[] = 
     route: "visual-focus / visual-kanban (studio hub)",
     purpose: "Sort and group ideas across columns.",
     persistenceStore: "localStorage visual-focus maps",
-    editingOps: ["add-card", "rename", "move-column", "save", "archive", "delete-map"],
-    productionStatus: "hidden-pending",
+    editingOps: ["add-card", "rename", "move-column", "save", "archive", "delete-map", "print"],
+    productionStatus: "production",
     wallSelectable: false,
+    builderType: "studio-hub",
+    resultRenderer: "kanban-columns",
+    supportsPrint: true,
+    supportsDuplicate: true,
+    isActive: true,
+    shortDescription: "Sort and group ideas across columns.",
+    steps: [],
+    visualFocusMode: "visual-kanban",
   },
   {
     canonicalId: "business-canvas",
@@ -241,9 +178,18 @@ export const CARTOGRAPHY_MAP_REGISTRY: readonly CartographyMapRegistryEntry[] = 
       "save",
       "archive",
       "delete-map",
+      "print",
     ],
-    productionStatus: "hidden-pending",
+    productionStatus: "production",
     wallSelectable: false,
+    builderType: "studio-hub",
+    resultRenderer: "business-canvas-grid",
+    supportsPrint: true,
+    supportsDuplicate: true,
+    isActive: true,
+    shortDescription: "See how the parts of a business fit together.",
+    steps: [],
+    visualFocusMode: "business-canvas",
   },
 ] as const;
 
@@ -280,8 +226,26 @@ export function assertMindMapNamingConsistent(): boolean {
   return (
     mind.canonicalName === mind.wallLabel &&
     mind.canonicalName === mind.galleryLabel &&
-    mind.canonicalName === mind.atlasLabel
+    mind.canonicalName === mind.atlasLabel &&
+    assertWallMapNamingConsistent()
   );
 }
 
-export { STUDIO_MODE_TO_WALL };
+export function assertAllWallMapsActiveAndNamed(): boolean {
+  const wallEntries = CARTOGRAPHY_MAP_REGISTRY.filter((e) => e.wallLabel);
+  return wallEntries.every(
+    (e) =>
+      e.wallSelectable &&
+      e.isActive &&
+      e.canonicalName === e.wallLabel &&
+      (e.atlasLabel == null || e.canonicalName === e.atlasLabel),
+  );
+}
+
+export {
+  canonicalMapName,
+  getCartographyMapDefinition,
+  getCartographyMapDefinitionByMode,
+  visualFocusModeForWallMap,
+  wallMapIdForVisualFocusMode,
+};

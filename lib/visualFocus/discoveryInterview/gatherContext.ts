@@ -9,6 +9,7 @@ import { readCompanionConversationState } from "@/lib/companionConversationConte
 import { resumeClearMyMindSession } from "@/lib/clearMyMindSessionStore";
 import { getSessionThoughts } from "@/lib/thinkingSpace/queries";
 import { getGrowthMemoryEntries } from "@/lib/growthJournalStore";
+import { extractHumanReadableJournalText } from "@/lib/journalGazebo/journalHtmlIntegrity";
 import { loadProjectContinuity } from "@/lib/projectContinuityStore";
 import { listContinueThinkingMaps } from "@/lib/visualFocus/continueThinking";
 
@@ -169,7 +170,8 @@ export function gatherMindMapDiscoveryContext(options?: {
         `${journal.length} recent journal/reflection note${journal.length === 1 ? "" : "s"}.`,
       );
       for (const entry of journal) {
-        ideaLines.push(entry.body.slice(0, 280));
+        const readable = extractHumanReadableJournalText(entry.body, 280);
+        if (readable) ideaLines.push(readable);
       }
     }
   } catch {

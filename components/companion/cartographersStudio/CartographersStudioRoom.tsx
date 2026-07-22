@@ -31,7 +31,7 @@ const CENTER_MAP_HOTSPOT = {
   transform: "translate(-50%, -50%)",
 } as const;
 
-/** Wall-frame positions — Mind Map frame only is interactive. */
+/** Wall-frame positions for all ten maps. */
 const FRAME_HOTSPOTS: Record<
   CartographersFramedMapId,
   { left: string; top: string; width: string; height: string }
@@ -51,16 +51,21 @@ const FRAME_HOTSPOTS: Record<
 export function CartographersStudioRoom({
   continueThinking,
   onSelectMindMap,
+  onSelectWallMap,
   onOpenMap,
+  onViewMyMaps,
   onBack,
   onClose,
   onReturnToEstate,
 }: {
   continueThinking: VisualFocusMap[];
   onSelectMindMap: () => void;
+  /** Opens entry for any wall map (including Mind Map). */
+  onSelectWallMap?: (id: CartographersFramedMapId) => void;
   onOpenMap: (id: string) => void;
   onRemoveMap?: (id: string) => void;
   onDeleteMap?: (id: string) => void;
+  onViewMyMaps?: () => void;
   /** @deprecated Removed from production chrome — kept for call-site compatibility. */
   onWorkWithShari?: () => void;
   onBack?: () => void;
@@ -94,8 +99,14 @@ export function CartographersStudioRoom({
     action();
   }
 
-  function handleFrameSelect(id: CartographersFramedMapId) {
-    if (id === "mind-map") beginWorking(onSelectMindMap);
+  function openWallMap(id: CartographersFramedMapId) {
+    beginWorking(() => {
+      if (onSelectWallMap) {
+        onSelectWallMap(id);
+        return;
+      }
+      if (id === "mind-map") onSelectMindMap();
+    });
   }
 
   const exit = onClose ?? onBack;
@@ -139,6 +150,16 @@ export function CartographersStudioRoom({
           ) : null}
         </div>
         <div className="cartographers-immersive__chrome-actions">
+          {onViewMyMaps ? (
+            <button
+              type="button"
+              className="cartographers-chrome-link"
+              data-testid="cartographers-my-maps"
+              onClick={() => beginWorking(onViewMyMaps)}
+            >
+              My Maps
+            </button>
+          ) : null}
           {continueThinking.length > 0 ? (
             <div className="cartographers-immersive__resume">
               <button
@@ -230,12 +251,40 @@ export function CartographersStudioRoom({
           className="cartographers-continue-mapping cartographers-continue-mapping--empty"
           data-testid="cartographers-continue-mapping-empty"
         >
-          No saved maps yet — open Mind Map when you are ready to capture.
+          Your completed maps will appear here.
         </p>
       )}
 
+      {/* Mobile / accessible gallery — do not force tiny background taps */}
+      <nav
+        className="cartographers-mobile-gallery"
+        aria-label="Map types"
+        data-testid="cartographers-mobile-gallery"
+      >
+        <p className="cartographers-mobile-gallery__label">Choose a map</p>
+        <ul className="cartographers-mobile-gallery__list">
+          {selectableFrames.map((map) => (
+            <li key={map.id}>
+              <button
+                type="button"
+                className="cartographers-mobile-gallery__item"
+                data-testid={`cartographers-gallery-${map.id}`}
+                aria-label={`Open ${map.nameplate}`}
+                onClick={() => openWallMap(map.id)}
+              >
+                <span className="cartographers-mobile-gallery__name">
+                  {map.nameplate}
+                </span>
+                <span className="cartographers-mobile-gallery__blurb">
+                  {map.hoverBlurb}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
       <div className="cartographers-immersive__hotspots" aria-label="Room objects">
-        {/* Prompt 140 — only production-ready wall buttons are selectable. */}
         {selectableFrames.map((map) => {
           const box = FRAME_HOTSPOTS[map.id];
           return (
@@ -266,7 +315,7 @@ export function CartographersStudioRoom({
                   current === map.id ? null : current,
                 )
               }
-              onClick={() => handleFrameSelect(map.id)}
+              onClick={() => openWallMap(map.id)}
               onContextMenu={(e) => {
                 e.preventDefault();
                 setLearnMap(map);
@@ -295,7 +344,7 @@ export function CartographersStudioRoom({
           className="cartographers-hotspot cartographers-hotspot--center-map cartographers-hotspot--live"
           data-testid="cartographers-center-map"
           style={CENTER_MAP_HOTSPOT}
-          onClick={() => beginWorking(onSelectMindMap)}
+          onClick={() => openWallMap("mind-map")}
           aria-label="Open Mind Map workspace — center map"
         >
           <span className="cartographers-frame-btn cartographers-frame-btn--center cartographers-frame-btn--ready">
@@ -310,7 +359,7 @@ export function CartographersStudioRoom({
           style={{ left: "8%", top: "55%", width: "10%", height: "16%" }}
           onClick={() =>
             setObjectTip(
-              "Telescope — zoom out to see related projects, goals, and connected maps. Full big-picture view arrives after Mind Map feels complete.",
+              "Telescope — zoom out to see related projects, goals, and connected maps.",
             )
           }
           aria-label="Telescope"
@@ -325,7 +374,7 @@ export function CartographersStudioRoom({
           style={{ left: "86%", top: "48%", width: "10%", height: "14%" }}
           onClick={() =>
             setObjectTip(
-              "Globe — browse map types by category. Mind Map is open today; other methods unlock when this path is ready.",
+              "Globe — browse every map type. Each framed map on the wall is ready to open.",
             )
           }
           aria-label="Globe"
@@ -383,10 +432,10 @@ export function CartographersStudioRoom({
                   className="cartographers-chrome-link cartographers-chrome-link--ink cartographers-chrome-link--strong"
                   onClick={() => {
                     setLearnMap(null);
-                    beginWorking(onSelectMindMap);
+                    openWallMap(learnMap.id);
                   }}
                 >
-                  Begin Discovery
+                  Begin My Map
                 </button>
               ) : null}
             </div>
@@ -397,7 +446,8 @@ export function CartographersStudioRoom({
       {atlasOpen ? (
         <CartographersAtlasOverlay
           onClose={() => setAtlasOpen(false)}
-          onCreateMindMap={() => beginWorking(onSelectMindMap)}
+          onCreateMindMap={() => openWallMap("mind-map")}
+          onCreateMap={(id) => openWallMap(id)}
         />
       ) : null}
 

@@ -1,21 +1,16 @@
 /**
  * Cartographer's Studio — ten framed wall maps (195 / 227).
- * Only Mind Map is interactive for the MVP vertical slice (221).
+ * Every active wall map opens its guided map experience.
  */
 
 import type { VisualFocusMode } from "@/lib/visualFocus/types";
+import {
+  CARTOGRAPHY_MAP_DEFINITIONS,
+  getCartographyMapDefinition,
+  type CartographersFramedMapId,
+} from "./mapDefinitions";
 
-export type CartographersFramedMapId =
-  | "mind-map"
-  | "decision-map"
-  | "relationship-map"
-  | "process-map"
-  | "journey-map"
-  | "timeline-map"
-  | "strategy-map"
-  | "project-map"
-  | "opportunity-map"
-  | "priority-map";
+export type { CartographersFramedMapId };
 
 export type CartographersFramedMap = {
   id: CartographersFramedMapId;
@@ -24,103 +19,42 @@ export type CartographersFramedMap = {
   hoverBlurb: string;
   /** Short learn tip (right-click / long-press). */
   learnTip: string;
-  /** MVP: only mind-map starts Discovery Interview. */
+  /** Opens a working map experience. */
   interactive: boolean;
-  /**
-   * Prompt 140 — wall hotspot may open the map only when true.
-   * Non-production maps stay in Atlas teaching; no selectable wall open.
-   */
+  /** Wall hotspot may open the map. */
   wallSelectable: boolean;
-  /** Maps to Visual Focus mode when interactive. */
-  visualFocusMode?: VisualFocusMode;
+  /** Maps to Visual Focus mode. */
+  visualFocusMode: VisualFocusMode;
 };
 
-export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
-  {
-    id: "mind-map",
-    nameplate: "Mind Map",
-    hoverBlurb: "Organize ideas and discover connections.",
-    learnTip:
-      "Capture and expand ideas without structuring them first. Spark groups related thoughts into branches.",
-    interactive: true,
-    wallSelectable: true,
-    visualFocusMode: "mind-map",
-  },
-  {
-    id: "decision-map",
-    nameplate: "Decision Map",
-    hoverBlurb: "Compare options before making a choice.",
-    learnTip: "Compare choices, criteria, and tradeoffs when you need a clear decision.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "relationship-map",
-    nameplate: "Relationship Map",
-    hoverBlurb: "Understand how people, ideas, or systems connect.",
-    learnTip: "Reveal how people, ideas, or systems connect and influence one another.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "process-map",
-    nameplate: "Process Map",
-    hoverBlurb: "See steps, bottlenecks, and flow from start to finish.",
-    learnTip: "See steps, bottlenecks, and flow from start to finish.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "journey-map",
-    nameplate: "Journey Map",
-    hoverBlurb: "Chart the path from where you are to where you want to go.",
-    learnTip: "Chart the path from where you are to where you want to go.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "timeline-map",
-    nameplate: "Timeline",
-    hoverBlurb: "Place events in order and see what comes next.",
-    learnTip: "Sequence milestones across past, present, and future.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "strategy-map",
-    nameplate: "Strategy Map",
-    hoverBlurb: "Connect vision, priorities, and action into one course.",
-    learnTip: "Connect vision, priorities, and action into one course.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "project-map",
-    nameplate: "Project Map",
-    hoverBlurb: "Break a large initiative into phases, deliverables, and tasks.",
-    learnTip: "Break a large initiative into phases, deliverables, and tasks.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "opportunity-map",
-    nameplate: "Opportunity Map",
-    hoverBlurb: "Explore possibilities, benefits, risks, and first steps.",
-    learnTip: "Explore possibilities, benefits, risks, and first steps.",
-    interactive: false,
-    wallSelectable: false,
-  },
-  {
-    id: "priority-map",
-    nameplate: "Priority Map",
-    hoverBlurb: "Sort what matters by impact, urgency, and effort.",
-    learnTip: "Sort what matters by impact, urgency, and effort.",
-    interactive: false,
-    wallSelectable: false,
-  },
-] as const;
+const LEARN_TIPS: Record<CartographersFramedMapId, string> = {
+  "mind-map":
+    "Capture and expand ideas without structuring them first. Spark groups related thoughts into branches.",
+  "decision-map":
+    "Compare choices, criteria, and tradeoffs when you need a clear decision.",
+  "relationship-map":
+    "Reveal how people, ideas, or systems connect and influence one another.",
+  "process-map": "See steps, bottlenecks, and flow from start to finish.",
+  "journey-map": "Chart the path from where you are to where you want to go.",
+  "timeline-map": "Sequence milestones across past, present, and future.",
+  "strategy-map": "Connect vision, priorities, and action into one course.",
+  "project-map": "Break a large initiative into phases, deliverables, and tasks.",
+  "opportunity-map": "Explore possibilities, benefits, risks, and first steps.",
+  "priority-map": "Sort what matters by impact, urgency, and effort.",
+};
 
-/** Wall hotspots that may open a working map (Prompt 140 — hide broken selectors). */
+export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] =
+  CARTOGRAPHY_MAP_DEFINITIONS.map((def) => ({
+    id: def.id,
+    nameplate: def.name,
+    hoverBlurb: def.shortDescription,
+    learnTip: LEARN_TIPS[def.id],
+    interactive: def.isActive,
+    wallSelectable: def.isActive,
+    visualFocusMode: def.visualFocusMode,
+  }));
+
+/** Wall hotspots that may open a working map. */
 export function wallSelectableFramedMaps(): readonly CartographersFramedMap[] {
   return CARTOGRAPHERS_FRAMED_MAPS.filter((m) => m.wallSelectable);
 }
@@ -131,13 +65,19 @@ export function getFramedMapById(
   return CARTOGRAPHERS_FRAMED_MAPS.find((m) => m.id === id);
 }
 
+export function framedMapForVisualFocusMode(
+  mode: VisualFocusMode,
+): CartographersFramedMap | undefined {
+  return CARTOGRAPHERS_FRAMED_MAPS.find((m) => m.visualFocusMode === mode);
+}
+
 export const CARTOGRAPHERS_ROOM_INTRO = {
   plaque: "Cartographer's Studio",
   tagline: "Every map tells a story. Every story reveals a path.",
   welcome:
     "Choose a framed map on the wall, or open the Atlas when you want to learn first.",
   instruction: "Click any map to open it and start working.",
-  mindMapReady: "Mind Map is ready today. Other map types are on the way.",
+  mindMapReady: "Every map on the wall is ready — choose the one you need.",
 } as const;
 
 /** @deprecated Prefer CartographersAtlas overlay — kept for import compatibility. */
@@ -145,5 +85,5 @@ export const CARTOGRAPHERS_ATLAS_TEASER = {
   title: "Cartographer's Atlas",
   body: "Learn what each map is for, then create one when you're ready.",
   mindMapAction: "Create This Map",
-  comingSoon: "Mind Map is ready to create today.",
+  comingSoon: getCartographyMapDefinition("mind-map").name + " and every wall map are ready to create.",
 } as const;

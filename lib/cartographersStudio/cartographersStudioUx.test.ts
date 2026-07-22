@@ -33,9 +33,10 @@ describe("Cartographer Studio UX refinement", () => {
     ).toBe("Organize ideas and discover connections.");
   });
 
-  it("only Mind Map wall button is selectable (Prompt 140)", () => {
+  it("every framed wall map is selectable (room completion)", () => {
     const selectable = CARTOGRAPHERS_FRAMED_MAPS.filter((m) => m.wallSelectable);
-    expect(selectable.map((m) => m.id)).toEqual(["mind-map"]);
+    expect(selectable).toHaveLength(CARTOGRAPHERS_FRAMED_MAPS.length);
+    expect(selectable.every((m) => m.interactive)).toBe(true);
   });
 
   it("room intro tells visitors to click any map", () => {
@@ -57,7 +58,7 @@ describe("Cartographer Studio UX refinement", () => {
     expect(mind?.canCreate).toBe(true);
     expect(
       CARTOGRAPHERS_ATLAS_ENTRIES.filter((e) => e.canCreate),
-    ).toHaveLength(1);
+    ).toHaveLength(CARTOGRAPHERS_ATLAS_ENTRIES.length);
   });
 
   it.each([

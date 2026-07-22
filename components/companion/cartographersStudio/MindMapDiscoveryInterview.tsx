@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
 import {
   MIND_MAP_DISCOVERY_QUESTIONS,
   hasEnoughForMindMapFirstDraft,
@@ -307,9 +308,9 @@ export function MindMapDiscoveryInterview({
         className="fixed inset-0 z-50 flex items-center justify-center bg-black/35 p-4"
         data-testid="mind-map-discovery-building"
       >
-        <p className="rounded-2xl bg-[#fffdf8] px-6 py-4 text-sm text-[#6b635a]">
-          Building your first draft…
-        </p>
+        <div className="rounded-2xl bg-[#fffdf8] px-6 py-5 shadow-xl">
+          <SparkLoadingState message="Building your first draft…" size="md" />
+        </div>
       </div>
     );
   }

@@ -16,6 +16,11 @@ export type VisualFocusMode =
   | "project-map"
   | "strategy-map"
   | "relationship-map"
+  | "process-map"
+  | "journey-map"
+  | "timeline-map"
+  | "opportunity-map"
+  | "priority-map"
   | "visual-kanban"
   | "business-canvas";
 
@@ -122,6 +127,11 @@ export type VisualFocusVisualLayout = {
     | "radial"
     | "vertical-flow"
     | "decision-branch"
+    | "process-flow"
+    | "journey-stages"
+    | "timeline"
+    | "opportunity-radar"
+    | "priority-matrix"
     | "kanban-columns"
     | "business-canvas-grid";
 };
@@ -191,9 +201,9 @@ export const VISUAL_FOCUS_MODE_META: {
   },
   {
     id: "decision-tree",
-    label: "Decision Tree",
+    label: "Decision Map",
     emoji: "🔀",
-    desc: "Yes / no branches and paths toward a choice.",
+    desc: "Compare options, benefits, and concerns before choosing.",
   },
   {
     id: "project-map",
@@ -212,6 +222,36 @@ export const VISUAL_FOCUS_MODE_META: {
     label: "Relationship Map",
     emoji: "🤝",
     desc: "Clients, partners, referrals, and network connections.",
+  },
+  {
+    id: "process-map",
+    label: "Process Map",
+    emoji: "🔁",
+    desc: "Steps, handoffs, and flow from start to finish.",
+  },
+  {
+    id: "journey-map",
+    label: "Journey Map",
+    emoji: "🧭",
+    desc: "Stages from where you are to where you want to go.",
+  },
+  {
+    id: "timeline-map",
+    label: "Timeline",
+    emoji: "📅",
+    desc: "Events and milestones in order.",
+  },
+  {
+    id: "opportunity-map",
+    label: "Opportunity Map",
+    emoji: "✨",
+    desc: "Possibilities with benefits, risks, and first steps.",
+  },
+  {
+    id: "priority-map",
+    label: "Priority Map",
+    emoji: "📌",
+    desc: "Sort what matters by impact, urgency, and effort.",
   },
   {
     id: "visual-kanban",

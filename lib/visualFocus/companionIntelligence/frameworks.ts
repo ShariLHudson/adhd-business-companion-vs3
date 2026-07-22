@@ -11,6 +11,11 @@ const CURRENT_MODES: VisualFocusMode[] = [
   "strategy-map",
   "relationship-map",
   "project-map",
+  "process-map",
+  "journey-map",
+  "timeline-map",
+  "opportunity-map",
+  "priority-map",
   "visual-kanban",
   "business-canvas",
 ];

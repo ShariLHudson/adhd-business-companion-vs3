@@ -1,16 +1,26 @@
 import { describe, expect, it } from "vitest";
 import {
+  assertAllWallMapsActiveAndNamed,
   assertMindMapNamingConsistent,
   CARTOGRAPHY_MAP_REGISTRY,
+  canonicalMapName,
   namingMatrixRow,
   productionWallMaps,
+  visualFocusModeForWallMap,
 } from "./mapRegistry";
+import {
+  CARTOGRAPHY_MAP_DEFINITIONS,
+} from "./mapDefinitions";
 import {
   CARTOGRAPHERS_FRAMED_MAPS,
   wallSelectableFramedMaps,
 } from "./framedMaps";
+import { buildDraftFromGuidedAnswers } from "@/lib/visualFocus/guidedBuilder";
+import { buildVisualLayout } from "@/lib/visualFocus/visualLayout";
+import { buildVisualFocusPrintHtml } from "@/lib/visualFocus/printMap";
+import type { VisualFocusMap } from "@/lib/visualFocus/types";
 
-describe("Cartography map registry (Prompt 140)", () => {
+describe("Cartography map registry (room completion)", () => {
   it("registers every framed wall map", () => {
     for (const frame of CARTOGRAPHERS_FRAMED_MAPS) {
       expect(
@@ -29,17 +39,26 @@ describe("Cartography map registry (Prompt 140)", () => {
     expect(mind?.wallSelectable).toBe(true);
   });
 
-  it("only Mind Map is a production wall-selectable map", () => {
-    expect(productionWallMaps().map((m) => m.canonicalId)).toEqual(["mind-map"]);
-    expect(wallSelectableFramedMaps().map((m) => m.id)).toEqual(["mind-map"]);
+  it("every wall map is active, labeled, and selectable", () => {
+    expect(assertAllWallMapsActiveAndNamed()).toBe(true);
+    expect(productionWallMaps()).toHaveLength(10);
+    expect(wallSelectableFramedMaps()).toHaveLength(10);
     for (const frame of CARTOGRAPHERS_FRAMED_MAPS) {
-      if (frame.id === "mind-map") {
-        expect(frame.wallSelectable).toBe(true);
-        expect(frame.interactive).toBe(true);
-      } else {
-        expect(frame.wallSelectable).toBe(false);
-      }
+      expect(frame.wallSelectable).toBe(true);
+      expect(frame.interactive).toBe(true);
+      expect(frame.nameplate).toBe(canonicalMapName(frame.id));
+      expect(frame.visualFocusMode).toBe(visualFocusModeForWallMap(frame.id));
     }
+  });
+
+  it("Decision Map name is canonical (not Decision Tree)", () => {
+    expect(canonicalMapName("decision-map")).toBe("Decision Map");
+    expect(canonicalMapName("decision-tree")).toBe("Decision Map");
+    const entry = CARTOGRAPHY_MAP_REGISTRY.find(
+      (e) => e.canonicalId === "decision-map",
+    );
+    expect(entry?.wallLabel).toBe("Decision Map");
+    expect(entry?.galleryLabel).toBe("Decision Map");
   });
 
   it("naming matrix rows are complete for report export", () => {
@@ -49,6 +68,50 @@ describe("Cartography map registry (Prompt 140)", () => {
       expect(row.canonicalName).toBeTruthy();
       expect(row.route).toBeTruthy();
       expect(row.status).toBeTruthy();
+    }
+  });
+
+  it("every active wall map has guided steps and print support", () => {
+    for (const def of CARTOGRAPHY_MAP_DEFINITIONS) {
+      expect(def.isActive).toBe(true);
+      expect(def.supportsPrint).toBe(true);
+      expect(def.steps.length).toBeGreaterThan(0);
+      expect(def.name).toBe(canonicalMapName(def.id));
+    }
+  });
+
+  it("guided drafts produce visual layouts for every wall map mode", () => {
+    for (const def of CARTOGRAPHY_MAP_DEFINITIONS) {
+      if (def.builderType === "mind-map-discovery") continue;
+      const answers: Record<string, string> = {};
+      for (const step of def.steps) {
+        answers[step.fieldKey] =
+          step.inputKind === "list"
+            ? "Alpha, Beta, Gamma"
+            : `Sample ${step.fieldKey}`;
+      }
+      const draft = buildDraftFromGuidedAnswers(def, answers);
+      expect(draft.title.trim().length).toBeGreaterThan(0);
+      expect(draft.root.children.length).toBeGreaterThan(0);
+      const map: VisualFocusMap = {
+        id: `test-${def.id}`,
+        title: draft.title,
+        mode: def.visualFocusMode,
+        root: draft.root,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        workflowStage: "generated",
+      };
+      const layout = buildVisualLayout(map);
+      expect(layout.nodes.length).toBeGreaterThan(1);
+      expect(layout.edges.length).toBeGreaterThan(0);
+      const html = buildVisualFocusPrintHtml({
+        ...map,
+        visualLayout: layout,
+        summary: draft.summaryHint,
+      });
+      expect(html).toContain(def.name);
+      expect(html).toContain(draft.title);
     }
   });
 });
