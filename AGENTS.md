@@ -51,6 +51,8 @@ If legacy code or older docs conflict → **change implementation**, not the can
 **Simplicity & Cognitive Load (128 — BINDING):** `docs/constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md` — every release must reduce cognitive effort; never expose architecture; simplicity / cognitive load / ADHD experience certification required. Cursor rule: `.cursor/rules/simplicity-cognitive-load-constitution.mdc`.
 
 **Create Intelligence & Intent (131 — BINDING):** `docs/constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md` — infer Create goals not keywords; confidence-based alternatives; never silent Work create (130). Cursor rule: `.cursor/rules/create-intelligence-intent-constitution.mdc`.
+
+**Experience Perfection & Momentum Protection (132 — BINDING):** `docs/constitution/132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md` — never surprise; intentional navigation; interface truthfulness; Ten-Second Rule; 12/10 cert. Cursor rule: `.cursor/rules/experience-perfection-momentum-protection.mdc`.
 <!-- END:estate-architectural-authority -->
 
 <!-- BEGIN:companion-dna -->

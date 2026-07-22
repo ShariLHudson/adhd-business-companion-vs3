@@ -51,6 +51,7 @@ import {
 } from "@/lib/universalWorkEngine";
 import { openWorkshopMapSection } from "@/lib/workTypeSchema";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
+import { SPARK_MOMENTUM_SOFT_LEAVE_CONFIRM } from "@/lib/sparkMomentumProtection/types";
 
 type Props = {
   workflow: CreateWorkflowState;
@@ -246,10 +247,19 @@ export function CreateEstateWorkingPanel({
     ? getWorkBlueprintState(uweWorkId)
     : null;
 
+  const meaningfulEdit = hasMeaningfulCreateEdit({
+    draftContent: workflow.draftContent,
+    sectionContent: workflow.sectionContent,
+    discoveryAnswers: workflow.discoveryAnswers,
+  });
+
   useDismissibleWindow({
     open: true,
     onClose: onBack,
     closeOnEscape: true,
+    isDirty: meaningfulEdit,
+    confirmDiscard: () =>
+      window.confirm(SPARK_MOMENTUM_SOFT_LEAVE_CONFIRM),
   });
 
   useEffect(() => {
@@ -257,12 +267,6 @@ export function CreateEstateWorkingPanel({
     registerBack(() => false);
     return () => registerBack(null);
   }, [registerBack]);
-
-  const meaningfulEdit = hasMeaningfulCreateEdit({
-    draftContent: workflow.draftContent,
-    sectionContent: workflow.sectionContent,
-    discoveryAnswers: workflow.discoveryAnswers,
-  });
 
   const showUndo =
     !undoDismissed &&

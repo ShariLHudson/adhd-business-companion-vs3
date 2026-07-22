@@ -248,6 +248,7 @@ On Work identity and platform source-of-truth, **315 + UWE (112)** still prevail
 | [Spec 100 Transformation](../ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md) | Capability growth; 128 requires capability without added platform burden |
 | [Create 127](../create-experience/127_CREATE_EXPERIENCE_SIMPLIFICATION.md) | Create-specific application of these principles |
 | [131 Create Intent](./131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | Create intent intelligence; 128 still wins on cognitive-load / architecture exposure |
+| [132 Momentum Protection](./132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) | Momentum / polish / Ten-Second Rule; 128 still wins on complexity exposure |
 | [PRODUCT_CONSTITUTION.md](../PRODUCT_CONSTITUTION.md) | ADHD ecosystem Gate 10; 128 strengthens Estate simplicity / ADHD experience certification |
 
 ---

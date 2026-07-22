@@ -1,0 +1,64 @@
+---
+description: Spec 132 — Experience Perfection & Momentum Protection; never surprise; Ten-Second Rule; 12/10 cert
+alwaysApply: true
+---
+
+# Experience Perfection and Momentum Protection Standard™ (132)
+
+**Full document:** `docs/constitution/132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md`
+
+**Binding product law** for momentum, polish, and intentional navigation. Complements **128** (simplicity / cognitive load) and **131** (Create intent) — does not replace them.
+
+## Mission
+
+Platform evaluated on protecting momentum. Preserve thinking, reduce interruption, maintain trust. Small inconsistencies interrupt cognitive flow — eliminate them.
+
+## Constitutional principle
+
+Never surprise the user. Never interrupt momentum. Never make recovery harder than continuation.
+
+## Twelve rules (summary)
+
+1. Protect momentum above everything — when two behaviors are valid, choose the less interruptive  
+2. Intentional navigation — Escape closes / collapses / cancels / dismisses before changing location  
+3. Protect in-progress thinking — unfinished work needs an intentional leave decision  
+4. One navigation path — one obvious route to each major destination  
+5. Interface truthfulness — progress, counts, labels, statuses, steps, Current Focus always agree  
+6. Never create hidden anxiety — no “4 steps / 3 visible” doubt  
+7. Progressive disclosure stays calm — optional panels must not become dashboards  
+8. Momentum recovery — help continue (“Ready to continue?”) never “start over”  
+9. Every interaction builds trust — remove uncertainty  
+10. Interface polish matters — tiny issues erode trust at this quality level  
+11. Measure momentum loss — hesitation, wrong nav, recoveries, abandoned work (not vanity clicks)  
+12. Final 12/10 certification — six reviewer questions; any yes → keep refining  
+
+## Ten-Second Rule™ (permanent release gate)
+
+> Can a first-time user understand what to do within ten seconds without docs or teaching?
+
+**No → do not ship.**
+
+## Ultimate product principle
+
+User almost forgets they're using the platform — “I just kept working.”
+
+## Before shipping member-facing UX (all must pass)
+
+- [ ] Least-interruptive behavior chosen when alternatives exist?  
+- [ ] Escape dismisses layers before unexpected navigation?  
+- [ ] Unfinished work requires intentional leave (soft recovery)?  
+- [ ] One obvious path — no duplicate Create→Create mazes?  
+- [ ] Counts / steps / labels / Current Focus truthful?  
+- [ ] Ten-Second Rule passes?  
+- [ ] 12/10 cert questions would all answer **no** (nothing interrupted / surprised / confused)?  
+
+## Conflict rules
+
+- **128** wins on complexity / architecture exposure / ADHD certification  
+- **130** One Creation Rule — never silently create Work  
+- **131** governs Create intent before confirmation  
+- **132** governs momentum, navigation surprise, truthfulness, polish, Ten-Second Rule  
+
+**Types:** `lib/sparkMomentumProtection/types.ts`  
+**Runtime:** `lib/windowDismiss/` · Create Escape dirty guard  
+Also: [128](../docs/constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) · [131](../docs/constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md)

@@ -1,6 +1,6 @@
 # Spark Estate™ Product Constitution Series
 
-**Series range: 113–117** — **complete in repo** · **128** Simplicity & Cognitive Load · **131** Create Intelligence & Intent — **binding extensions**
+**Series range: 113–117** — **complete in repo** · **128** Simplicity & Cognitive Load · **131** Create Intelligence & Intent · **132** Momentum Protection — **binding extensions**
 
 This series is the master constitutional layer for Spark Estate product behavior. It is distinct from the Estate place canon (`docs/estate/`) and from the ADHD ecosystem Product Constitution (`docs/PRODUCT_CONSTITUTION.md`, P0.58).
 
@@ -15,6 +15,7 @@ This series is the master constitutional layer for Spark Estate product behavior
 | **117** | [Trust, Memory & Relationship Constitution](./117_TRUST_MEMORY_AND_RELATIONSHIP_CONSTITUTION.md) | **In repo** | Trust, memory, privacy, relationships over copies |
 | **128** | [Simplicity & Cognitive Load Constitution](./128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) | **In repo** | Binding release gates — every feature must reduce cognitive effort; simplicity / ADHD certification |
 | **131** | [Create Intelligence & Intent Constitution](./131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | **In repo** | Binding Create intent law — infer goals not keywords; confidence-based alternatives; Intent Memory™ future |
+| **132** | [Experience Perfection & Momentum Protection](./132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) | **In repo** | Binding momentum / polish law — never surprise; intentional navigation; Ten-Second Rule; 12/10 cert |
 
 ## Order of authority (from 113)
 
@@ -24,14 +25,15 @@ When documents conflict:
 2. **This Product Constitution (113)**  
 3. **Simplicity & Cognitive Load (128)** on mental-load, architecture exposure, and ADHD/simplicity certification gates  
 4. **Create Intelligence & Intent (131)** on Create Begin / intent understanding (after 130 One Creation Rule)  
-5. Specialized Constitutions **114–117**  
-6. **Design Bible (125)** — [`docs/design-bible/`](../design-bible/README.md)  
-7. Certified Product Specifications (including **112**)  
-8. Design System and UX Standards (**118–124**) — [`docs/design-system/`](../design-system/README.md)  
-9. Implementation documentation  
-10. Local feature convenience  
+5. **Experience Perfection & Momentum Protection (132)** on momentum, intentional navigation, truthfulness, polish, Ten-Second Rule  
+6. Specialized Constitutions **114–117**  
+7. **Design Bible (125)** — [`docs/design-bible/`](../design-bible/README.md)  
+8. Certified Product Specifications (including **112**)  
+9. Design System and UX Standards (**118–124**) — [`docs/design-system/`](../design-system/README.md)  
+10. Implementation documentation  
+11. Local feature convenience  
 
-> **Numeral note:** Create Blueprint track `docs/create-experience/128_webinar_event/` is a different series. Constitution **128** (this index) governs Estate-wide simplicity and cognitive load. Constitution **131** governs Create intent intelligence (not Blueprint track 131).
+> **Numeral note:** Create Blueprint track `docs/create-experience/128_webinar_event/` · `131_summit_event/` · `132_product_launch_event/` are a different series. Constitution **128** governs Estate-wide simplicity and cognitive load. Constitution **131** governs Create intent intelligence. Constitution **132** governs momentum protection / Ten-Second Rule (not Blueprint Product Launch Event 132).
 
 ## Bridge from Product Specifications
 
@@ -41,6 +43,7 @@ When documents conflict:
 | **126** | [First-Time Welcome Experience Standard](../product-specifications/126_FIRST_TIME_WELCOME_EXPERIENCE_STANDARD.md) | Constitutional product rule — one-time Welcome Experience; never a recurring interruption |
 | **128** | [Simplicity & Cognitive Load Constitution](./128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) | Binding governance — capability growth must reduce cognitive effort |
 | **131** | [Create Intelligence & Intent Constitution](./131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | Binding Create intent — outcomes before artifacts; confidence-based alternatives |
+| **132** | [Experience Perfection & Momentum Protection](./132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) | Binding momentum / polish — never surprise; Ten-Second Rule; 12/10 cert |
 | **315** | [Platform Governance Constitution](../architecture-v2/315_SPARK_ESTATE_PLATFORM_GOVERNANCE_CONSTITUTION.md) | Architecture v2 platform / intelligence / Work governance (see also [317 Master Index](../architecture-v2/317_ARCHITECTURE_V2_MASTER_INDEX.md)) |
 
 ## Downstream Design System

@@ -2,6 +2,10 @@
  * Spark Estate — shared window dismiss policy.
  * Outside click and Escape use the same path.
  * Nested windows: only the topmost layer receives Escape.
+ *
+ * Spec 132 Rule 2 (Intentional Navigation): Escape / outside dismiss
+ * closes, collapses, cancels, or dismisses before unexpected location change.
+ * @see docs/constitution/132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md
  */
 
 import {

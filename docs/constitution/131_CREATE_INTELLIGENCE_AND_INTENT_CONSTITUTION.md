@@ -187,6 +187,7 @@ When this Constitution conflicts with feature convenience or keyword shortcuts:
 | [130 Create Polish](../create-experience/130_CREATE_EXPERIENCE_FINAL_POLISH_AND_CERTIFICATION.md) | Confirm-everywhere; 131 enriches *what* is confirmed |
 | [127 Create Simplification](../create-experience/127_CREATE_EXPERIENCE_SIMPLIFICATION.md) | Companion-first Create; 131 deepens intent intelligence |
 | [Spec 104](../CREATE_EXPERIENCE_PHILOSOPHY.md) | Intent before output; 131 is constitutional enforcement for Create routing |
+| [132 Momentum Protection](./132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) | Protects flow once Create work is open; Escape / soft leave / Ten-Second Rule |
 
 ---
 

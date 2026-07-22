@@ -107,6 +107,15 @@ Update this section when the milestone changes.
 - **Tags:** create · intelligence · personalization · memory
 - **Build gate:** After 131 V1 hooks (also-considered + correction switch) prove useful · explicit Spec 112 permission path · no surveillance feeling · never override clear wording
 
+### Momentum Loss Metrics instrumentation — 2026-07-21
+
+- **Idea:** Instrument Spec 132 Rule 11 momentum-loss metrics (hesitation, unexpected navigation, wrong assumptions, recoveries, repeated clicks, backtracking, searching, abandoned work) for usability review — not vanity click counts
+- **Why it matters:** Measures whether releases protect thinking; better signal than engagement vanity metrics
+- **Member Wins check:** yes (invisible measurement; never surfaces as gamification)
+- **Suggested spec/home:** [132 Momentum Protection — Rule 11](./constitution/132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) · `SparkMomentumLossMetricId` in `lib/sparkMomentumProtection/types.ts`
+- **Tags:** analytics · usability · momentum · measurement
+- **Build gate:** After 132 V1 Escape / soft-leave hooks prove stable · privacy-safe aggregation · founder-only review surfaces · never member-facing streaks or shame
+
 ### (template)
 
 ```markdown

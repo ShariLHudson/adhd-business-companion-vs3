@@ -27,8 +27,9 @@
 | **117** | [Trust, Memory & Relationship](../constitution/117_TRUST_MEMORY_AND_RELATIONSHIP_CONSTITUTION.md) | Trust / memory |
 | **128** | [Simplicity & Cognitive Load Constitution](../constitution/128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) | Binding release gates — hide complexity; simplicity / ADHD certification |
 | **131** | [Create Intelligence & Intent Constitution](../constitution/131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | Binding Create intent — infer goals not keywords; confidence-based alternatives |
+| **132** | [Experience Perfection & Momentum Protection](../constitution/132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) | Binding momentum / polish — never surprise; intentional navigation; Ten-Second Rule |
 
-**Conflict rule:** On Work identity and source-of-truth, **315 + UWE (112)** prevail for platform runtime. On companion voice and hospitality, **113–117** prevail. On mental load, architecture exposure, and ADHD/simplicity certification, **128** prevails over feature convenience. On Create Begin / intent understanding, **131** prevails (after **130** confirm-before-create). See [316 §9](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md). *(Create Blueprint track `128_webinar_event` is a different series.)*
+**Conflict rule:** On Work identity and source-of-truth, **315 + UWE (112)** prevail for platform runtime. On companion voice and hospitality, **113–117** prevail. On mental load, architecture exposure, and ADHD/simplicity certification, **128** prevails over feature convenience. On Create Begin / intent understanding, **131** prevails (after **130** confirm-before-create). On momentum, intentional navigation, interface truthfulness, polish, and the Ten-Second Rule, **132** prevails. See [316 §9](./316_GOVERNANCE_AND_REGISTRY_AUDIT.md). *(Create Blueprint track `128_webinar_event` / `132_product_launch_event` is a different series.)*
 
 ### 1.3 Estate place canon (places, not intelligence OS)
 
