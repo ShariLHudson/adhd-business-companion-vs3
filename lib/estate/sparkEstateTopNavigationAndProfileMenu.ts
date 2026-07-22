@@ -1,7 +1,7 @@
 /**
  * Spark Estate — top navigation and profile menu.
  *
- * Welcome Home (room menu) = where to go (six categories; Spark Estate last).
+ * Welcome Home (room menu) = where to go (five categories; Estate last).
  * SH profile menu = My Spark Estate + Experience Controls + Settings.
  * Experience Controls open as an overlay — never navigate away.
  *
@@ -25,7 +25,11 @@ import {
   validateWanderPick,
   type EstateWanderPick,
 } from "@/lib/estate/manifest/estateWanderMode";
-import { WELCOME_HOME_NAV_CATEGORIES } from "@/lib/estate/welcomeHomeNavigationStructure";
+import {
+  WELCOME_HOME_MY_STORY_DESTINATION_IDS,
+  WELCOME_HOME_NAV_CATEGORIES,
+  welcomeHomeFlattenCategoryDestinations,
+} from "@/lib/estate/welcomeHomeNavigationStructure";
 
 export const SPARK_ESTATE_TOP_NAVIGATION_PRINCIPLE =
   "Only two permanent top-right controls — Welcome Home navigation and User Profile — no additional standalone navigation buttons.";
@@ -52,7 +56,6 @@ export const SPARK_ESTATE_TOP_NAVIGATION_CONTROLS = [
 export const SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS = [
   { id: "conversation-visibility", label: "Show or Hide Conversation" },
   { id: "estate-sounds", label: "Estate Sounds" },
-  { id: "music", label: "Music" },
   { id: "shari-voice", label: "Shari Voice" },
   { id: "volume", label: "Volume" },
   { id: "estate-background", label: "Estate Background" },
@@ -77,14 +80,16 @@ export const SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS =
 /** Create submenu removed — no third-level flyouts. */
 export const SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS = [] as const;
 
-export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = WELCOME_HOME_NAV_CATEGORIES.find(
-  (c) => c.id === "take-a-moment",
-)!.destinations.filter((d) =>
+const REFLECT_FLAT = welcomeHomeFlattenCategoryDestinations("take-a-moment");
+
+export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = REFLECT_FLAT.filter((d) =>
   ["clear-my-mind", "parking-lot", "breathe", "spin-the-wheel"].includes(d.id),
 );
 
-export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS =
-  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-story")!.destinations;
+/** Journal / Evidence / Hall — under Reflect → Browse more (139). */
+export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS = REFLECT_FLAT.filter((d) =>
+  (WELCOME_HOME_MY_STORY_DESTINATION_IDS as readonly string[]).includes(d.id),
+);
 
 export const SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "get-advice")!.destinations;
@@ -96,9 +101,7 @@ export const SPARK_ESTATE_ROOM_MENU_SECTIONS = [
 export const SPARK_ESTATE_ROOM_MENU_SPARK_ESTATE_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "spark-estate")!.destinations;
 
-export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = WELCOME_HOME_NAV_CATEGORIES.find(
-  (c) => c.id === "take-a-moment",
-)!.destinations.filter((d) =>
+export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = REFLECT_FLAT.filter((d) =>
   ["peaceful-places", "soundscapes"].includes(d.id),
 );
 
@@ -284,7 +287,7 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
       experiencesIds.includes("soundscapes") &&
       !experiencesIds.includes("breathe" as never) &&
       focusIds.includes("breathe"),
-    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 6,
+    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 5,
     experienceControlsNotInWelcomeHome: !WELCOME_HOME_NAV_CATEGORIES.some((c) =>
       /experience controls/i.test(c.label),
     ),
@@ -332,7 +335,7 @@ export function formatSparkEstateTopNavigationReport(
   lines.push(`  Controls: ${verification.controlCount}`);
   lines.push(`  Profile menu: ${verification.profileMenuAligned ? "pass" : "fail"}`);
   lines.push(
-    `  Six categories (Spark Estate last): ${verification.welcomeHomeHasFiveCategories ? "pass" : "fail"}`,
+    `  Five categories (Estate last): ${verification.welcomeHomeHasFiveCategories ? "pass" : "fail"}`,
   );
   lines.push(
     `  EC off Welcome Home: ${verification.experienceControlsNotInWelcomeHome ? "pass" : "fail"}`,

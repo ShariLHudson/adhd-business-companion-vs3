@@ -71,9 +71,11 @@ describe("Welcome Home focused submenu", () => {
           onExploreSpark={onExploreSpark}
           onOpenSparkEstateGuide={onOpenSparkEstateGuide}
           onOpenStrategyLibrary={onOpenStrategyLibrary}
+          onOpenCreateStudio={() => undefined}
           onOpenProjects={() => undefined}
           onOpenDestinationGallery={() => undefined}
           onOpenCartographersStudio={() => undefined}
+          onOpenTalkItOut={() => undefined}
           onOpenClearMyMind={() => undefined}
           onOpenParkingLot={() => undefined}
           onOpenBreathe={() => undefined}
@@ -110,7 +112,7 @@ describe("Welcome Home focused submenu", () => {
     });
   }
 
-  it("opens with six top-level categories ending in Spark Estate — no destinations yet", () => {
+  it("opens with five top-level categories ending in Estate — no destinations yet", () => {
     renderMenu();
     openMenu();
     const panel = container.querySelector(
@@ -153,7 +155,7 @@ describe("Welcome Home focused submenu", () => {
     expect(
       container.querySelector('[data-testid="welcome-home-submenu-heading"]')
         ?.textContent,
-    ).toBe("My Day");
+    ).toBe("Today");
 
     const labels = Array.from(
       container.querySelectorAll(
@@ -318,7 +320,7 @@ describe("Welcome Home focused submenu", () => {
     },
   );
 
-  it("Spark Estate replaces top-level with Wander the Grounds + Spark Estate Guide", () => {
+  it("Estate replaces top-level with Wander the Grounds + Spark Estate Guide", () => {
     renderMenu();
     openMenu();
     openCategory("spark-estate");
@@ -335,7 +337,7 @@ describe("Welcome Home focused submenu", () => {
     expect(
       container.querySelector('[data-testid="welcome-home-submenu-heading"]')
         ?.textContent,
-    ).toBe("Spark Estate");
+    ).toBe("Estate");
 
     const labels = Array.from(
       container.querySelectorAll(

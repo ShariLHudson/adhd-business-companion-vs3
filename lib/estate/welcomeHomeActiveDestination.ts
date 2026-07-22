@@ -7,25 +7,33 @@ import { WELCOME_HOME_NAV_CATEGORIES } from "./welcomeHomeNavigationStructure";
 
 const SECTION_TO_DESTINATION: Record<string, WelcomeHomeNavDestinationId> = {
   create: "create",
+  "content-generator": "create",
   projects: "projects",
   "destination-gallery": "destination-gallery",
   "cartographers-studio": "cartographers-studio",
   "plan-my-day": "adapt-plan-my-day",
+  "adapt-plan-my-day": "adapt-plan-my-day",
   calendar: "calendar",
+  "reminders-rhythms": "reminders-rhythms",
+  reminders: "reminders-rhythms",
+  rhythms: "reminders-rhythms",
   "brain-dump": "clear-my-mind",
   "parking-lot": "parking-lot",
   "talk-it-out": "talk-it-out",
   breathe: "breathe",
   "spin-wheel": "spin-the-wheel",
   "peaceful-places": "peaceful-places",
+  "focus-audio": "peaceful-places",
   journal: "journal",
   "growth-journal": "journal",
   "evidence-vault": "evidence-vault",
+  "evidence-bank": "evidence-vault",
   "growth-portfolio": "hall-of-accomplishments",
   "chamber-of-momentum": "chamber-of-momentum",
   boardroom: "boardroom",
   playbook: "strategy-library",
   "strategy-library": "strategy-library",
+  soundscapes: "soundscapes",
 };
 
 export function welcomeHomeDestinationForSection(
@@ -35,13 +43,30 @@ export function welcomeHomeDestinationForSection(
   return SECTION_TO_DESTINATION[section] ?? null;
 }
 
+function destinationMatches(
+  destinationId: WelcomeHomeNavDestinationId,
+  candidateId: string,
+): boolean {
+  if (candidateId === destinationId) return true;
+  return false;
+}
+
 export function welcomeHomeCategoryForDestination(
   destinationId: WelcomeHomeNavDestinationId | null | undefined,
 ): string | null {
   if (!destinationId) return null;
   for (const category of WELCOME_HOME_NAV_CATEGORIES) {
-    if (category.destinations.some((d) => d.id === destinationId)) {
-      return category.id;
+    for (const dest of category.destinations) {
+      if (destinationMatches(destinationId, dest.id)) {
+        return category.id;
+      }
+      if (
+        dest.dropdownChildren?.some((child) =>
+          destinationMatches(destinationId, child.id),
+        )
+      ) {
+        return category.id;
+      }
     }
   }
   return null;

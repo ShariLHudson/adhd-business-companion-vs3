@@ -4,8 +4,10 @@ import { resolve } from "node:path";
 import {
   WELCOME_HOME_FORBIDDEN_LABELS,
   WELCOME_HOME_MY_DAY_DROPDOWN_IDS,
+  WELCOME_HOME_MY_STORY_DESTINATION_IDS,
   WELCOME_HOME_NAV_CATEGORIES,
   WELCOME_HOME_WANDER_GROUNDS,
+  welcomeHomeFlattenCategoryDestinations,
   welcomeHomeHasExperienceControls,
   welcomeHomeMyDayDestinationIds,
   welcomeHomeMyDayDropdown,
@@ -13,13 +15,12 @@ import {
 } from "./welcomeHomeNavigationStructure";
 
 describe("welcomeHomeNavigationStructure", () => {
-  it("has six categories with Estate last and max depth three for Today dropdowns", () => {
-    expect(WELCOME_HOME_NAV_CATEGORIES).toHaveLength(6);
+  it("has five categories with Estate last and max depth three for dropdowns", () => {
+    expect(WELCOME_HOME_NAV_CATEGORIES).toHaveLength(5);
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
       "my-work",
       "take-a-moment",
-      "my-story",
       "get-advice",
       "spark-estate",
     ]);
@@ -27,7 +28,6 @@ describe("welcomeHomeNavigationStructure", () => {
       "Today",
       "Create",
       "Reflect",
-      "My Story",
       "Guidance",
       "Estate",
     ]);
@@ -96,7 +96,7 @@ describe("welcomeHomeNavigationStructure", () => {
     expect(myDay?.destinations.some((d) => d.id === "rhythms")).toBe(false);
   });
 
-  it("lists exact destinations for every category", () => {
+  it("lists exact destinations for every category — Reflect is 3 + Browse more", () => {
     const byId = Object.fromEntries(
       WELCOME_HOME_NAV_CATEGORIES.map((c) => [
         c.id,
@@ -113,20 +113,30 @@ describe("welcomeHomeNavigationStructure", () => {
       "Talk It Out",
       "Clear My Mind",
       "Parking Lot",
-      "Breathe",
-      "Spin the Wheel",
-      "Peaceful Moments",
-      "Soundscapes",
+      "Browse more",
     ]);
     const talk = WELCOME_HOME_NAV_CATEGORIES.find(
       (c) => c.id === "take-a-moment",
     )?.destinations.find((d) => d.id === "talk-it-out");
     expect(talk?.supportLine).toMatch(/one thoughtful question/i);
-    expect(byId["my-story"]).toEqual([
-      "Journal Gazebo",
-      "Evidence Vault",
-      "Hall of Accomplishments",
+
+    const browse = welcomeHomeMyDayDropdown("reflect-more");
+    expect(browse?.dropdownChildren?.map((c) => c.id)).toEqual([
+      "breathe",
+      "spin-the-wheel",
+      "peaceful-places",
+      "soundscapes",
+      "journal",
+      "evidence-vault",
+      "hall-of-accomplishments",
     ]);
+
+    const reflectFlat = welcomeHomeFlattenCategoryDestinations("take-a-moment");
+    expect(
+      WELCOME_HOME_MY_STORY_DESTINATION_IDS.every((id) =>
+        reflectFlat.some((d) => d.id === id),
+      ),
+    ).toBe(true);
     expect(byId["get-advice"]).toEqual([
       "Chamber of Momentum",
       "Boardroom",
@@ -150,11 +160,9 @@ describe("welcomeHomeNavigationStructure", () => {
     }
   });
 
-  it("opens Peaceful Moments and Soundscapes as destinations, not nested flyouts", () => {
-    const takeAMoment = WELCOME_HOME_NAV_CATEGORIES.find(
-      (c) => c.id === "take-a-moment",
-    );
-    expect(takeAMoment?.destinations.map((d) => d.id)).toEqual(
+  it("opens Peaceful Moments and Soundscapes from Browse more, not nested flyouts elsewhere", () => {
+    const browse = welcomeHomeMyDayDropdown("reflect-more");
+    expect(browse?.dropdownChildren?.map((d) => d.id)).toEqual(
       expect.arrayContaining(["peaceful-places", "soundscapes"]),
     );
     const source = readFileSync(

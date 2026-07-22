@@ -40,12 +40,11 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS.length).toBeGreaterThanOrEqual(8);
   });
 
-  it("documents Welcome Home as six categories with Spark Estate last", () => {
+  it("documents Welcome Home as five categories with Estate last", () => {
     expect(SPARK_ESTATE_ROOM_MENU_SECTIONS.map((s) => s.id)).toEqual([
       "my-day",
       "my-work",
       "take-a-moment",
-      "my-story",
       "get-advice",
       "spark-estate",
     ]);

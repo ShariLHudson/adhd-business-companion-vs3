@@ -13,19 +13,18 @@ function readSrc(relativePath: string): string {
 }
 
 describe("sparkEstateGuideMenuMove (100 / 096)", () => {
-  it("places Spark Estate last with Wander + Guide destinations", () => {
+  it("places Estate last with Wander + Guide destinations", () => {
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
       "my-work",
       "take-a-moment",
-      "my-story",
       "get-advice",
       "spark-estate",
     ]);
     const sparkEstate = WELCOME_HOME_NAV_CATEGORIES.find(
       (c) => c.id === "spark-estate",
     );
-    expect(sparkEstate?.label).toBe("Spark Estate");
+    expect(sparkEstate?.label).toBe("Estate");
     expect(sparkEstate?.destinations.map((d) => d.id)).toEqual([
       "wander-the-grounds",
       "spark-estate-guide",

@@ -61,8 +61,8 @@ describe("shared My Day windows (103–105)", () => {
   });
 
   it("Plan/Adapt copy includes supports lists and open labels", () => {
-    expect(PLAN_MY_DAY_ITEM.openLabel).toBe("Open Plan My Day");
-    expect(ADAPT_MY_DAY_ITEM.openLabel).toBe("Open Adapt My Day");
+    expect(PLAN_MY_DAY_ITEM.openLabel).toBe("Plan My Day");
+    expect(ADAPT_MY_DAY_ITEM.openLabel).toBe("Adapt My Day");
     expect(PLAN_MY_DAY_ITEM.supports.length).toBeGreaterThan(3);
     expect(ADAPT_MY_DAY_ITEM.supports.length).toBeGreaterThan(3);
   });

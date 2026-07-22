@@ -11,7 +11,7 @@ import { resolveWanderRoomDisplayName } from "@/lib/estate/manifest/estateWander
 import {
   WELCOME_HOME_NAV_CATEGORIES,
   type WelcomeHomeFocusedPanelId,
-  type WelcomeHomeMyDayDropdownId,
+  type WelcomeHomeNavDropdownId,
   type WelcomeHomeNavDestination,
   type WelcomeHomeNavDestinationId,
   type WelcomeHomeNavDropdownChildId,
@@ -128,7 +128,7 @@ export function EstateRoomExperienceMenu({
     useState<WelcomeHomeFocusedPanelId | null>(null);
   /** Which My Day nested dropdown is expanded (at most one). */
   const [expandedDropdown, setExpandedDropdown] =
-    useState<WelcomeHomeMyDayDropdownId | null>(null);
+    useState<WelcomeHomeNavDropdownId | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const placeDisplayName = resolveWanderRoomDisplayName(roomId);
 
@@ -190,29 +190,6 @@ export function EstateRoomExperienceMenu({
     [bumpVisibility],
   );
 
-  const dropdownChildAction = useCallback(
-    (id: WelcomeHomeNavDropdownChildId): (() => void) | undefined => {
-      const map: Record<
-        WelcomeHomeNavDropdownChildId,
-        (() => void) | undefined
-      > = {
-        "plan-my-day": onOpenPlanMyDay ?? onOpenAdaptPlanMyDay,
-        "adapt-my-day": onOpenAdaptMyDay ?? onOpenAdaptPlanMyDay,
-        reminders: onOpenReminders ?? onOpenRemindersRhythms,
-        rhythms: onOpenRhythms ?? onOpenRemindersRhythms,
-      };
-      return map[id];
-    },
-    [
-      onOpenPlanMyDay,
-      onOpenAdaptMyDay,
-      onOpenAdaptPlanMyDay,
-      onOpenReminders,
-      onOpenRhythms,
-      onOpenRemindersRhythms,
-    ],
-  );
-
   const destinationAction = useCallback(
     (id: WelcomeHomeNavDestinationId): (() => void) | undefined => {
       const map: Record<WelcomeHomeNavDestinationId, (() => void) | undefined> =
@@ -235,6 +212,8 @@ export function EstateRoomExperienceMenu({
           journal: onOpenJournal,
           "evidence-vault": onOpenEvidenceVault,
           "hall-of-accomplishments": onOpenHallOfAccomplishments,
+          // Browse more expands in-place — no parent navigation.
+          "reflect-more": undefined,
           "chamber-of-momentum": onOpenChamber,
           boardroom: onOpenBoardroom,
           "strategy-library": onOpenStrategyLibrary,
@@ -270,6 +249,31 @@ export function EstateRoomExperienceMenu({
     ],
   );
 
+  const dropdownChildAction = useCallback(
+    (id: WelcomeHomeNavDropdownChildId): (() => void) | undefined => {
+      const myDayMap: Partial<
+        Record<WelcomeHomeNavDropdownChildId, (() => void) | undefined>
+      > = {
+        "plan-my-day": onOpenPlanMyDay ?? onOpenAdaptPlanMyDay,
+        "adapt-my-day": onOpenAdaptMyDay ?? onOpenAdaptPlanMyDay,
+        reminders: onOpenReminders ?? onOpenRemindersRhythms,
+        rhythms: onOpenRhythms ?? onOpenRemindersRhythms,
+      };
+      if (id in myDayMap) return myDayMap[id];
+      // Reflect → Browse more children share destination openers.
+      return destinationAction(id as WelcomeHomeNavDestinationId);
+    },
+    [
+      onOpenPlanMyDay,
+      onOpenAdaptMyDay,
+      onOpenAdaptPlanMyDay,
+      onOpenReminders,
+      onOpenRhythms,
+      onOpenRemindersRhythms,
+      destinationAction,
+    ],
+  );
+
   const openFocusedPanel = useCallback((id: WelcomeHomeFocusedPanelId) => {
     setExpandedDropdown(null);
     setFocusedPanel(id);
@@ -282,7 +286,7 @@ export function EstateRoomExperienceMenu({
   }, [bumpVisibility]);
 
   const toggleDropdown = useCallback(
-    (id: WelcomeHomeMyDayDropdownId) => {
+    (id: WelcomeHomeNavDropdownId) => {
       bumpVisibility();
       setExpandedDropdown((current) => (current === id ? null : id));
     },
@@ -300,7 +304,7 @@ export function EstateRoomExperienceMenu({
   const renderDestinationButton = (dest: WelcomeHomeNavDestination) => {
     const children = dest.dropdownChildren;
     if (children && children.length > 0) {
-      const dropdownId = dest.id as WelcomeHomeMyDayDropdownId;
+      const dropdownId = dest.id as WelcomeHomeNavDropdownId;
       const isExpanded = expandedDropdown === dropdownId;
       const parentAction = destinationAction(dest.id);
       return (

@@ -18,7 +18,7 @@ export const PLAN_MY_DAY_ITEM = {
     "placing tasks into the day",
     "creating a starting plan",
   ] as const,
-  openLabel: "Open Plan My Day",
+  openLabel: "Plan My Day",
 };
 
 export const ADAPT_MY_DAY_ITEM = {
@@ -35,7 +35,7 @@ export const ADAPT_MY_DAY_ITEM = {
     "reduced time",
     "reshaping the current day without starting over",
   ] as const,
-  openLabel: "Open Adapt My Day",
+  openLabel: "Adapt My Day",
 };
 
 export const REMINDER_ITEM = {

@@ -56,8 +56,13 @@ describe("096 — Welcome Home catalog", () => {
     expect(byId["my-work"]).toContain("projects");
     expect(byId["take-a-moment"]).toContain("talk-it-out");
     expect(byId["take-a-moment"]).toContain("parking-lot");
-    expect(byId["my-story"]).toContain("journal");
-    expect(byId["my-story"]).toContain("evidence-vault");
+    expect(byId["take-a-moment"]).toContain("reflect-more");
+    const browse = WELCOME_HOME_NAV_CATEGORIES.find(
+      (c) => c.id === "take-a-moment",
+    )?.destinations.find((d) => d.id === "reflect-more");
+    expect(browse?.dropdownChildren?.map((c) => c.id)).toEqual(
+      expect.arrayContaining(["journal", "evidence-vault"]),
+    );
     expect(byId["spark-estate"]).toEqual([
       "wander-the-grounds",
       "spark-estate-guide",

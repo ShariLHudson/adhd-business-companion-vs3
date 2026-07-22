@@ -111,11 +111,14 @@ describe("Create polish 129 certification", () => {
 
   it("groups Welcome Home as Today / Create / Reflect / Guidance / Estate", () => {
     const labels = WELCOME_HOME_NAV_CATEGORIES.map((c) => c.label);
-    expect(labels).toContain("Today");
-    expect(labels).toContain("Create");
-    expect(labels).toContain("Reflect");
-    expect(labels).toContain("Guidance");
-    expect(labels).toContain("Estate");
+    expect(labels).toEqual([
+      "Today",
+      "Create",
+      "Reflect",
+      "Guidance",
+      "Estate",
+    ]);
+    expect(labels).not.toContain("My Story");
     expect(labels).not.toContain("My Day");
     expect(labels).not.toContain("Get Advice");
     expect(labels).not.toContain("Spark Estate");
@@ -123,6 +126,7 @@ describe("Create polish 129 certification", () => {
 
   it("maps Create section to active Welcome Home destination", () => {
     expect(welcomeHomeDestinationForSection("create")).toBe("create");
+    expect(welcomeHomeDestinationForSection("content-generator")).toBe("create");
     const menu = read("components/companion/estate/EstateRoomExperienceMenu.tsx");
     expect(menu).toContain("activeDestinationId");
     expect(menu).toContain("data-nav-active");
