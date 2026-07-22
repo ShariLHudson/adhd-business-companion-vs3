@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   CREATE_BACKGROUND_SRC,
+  PROFILE_BACKGROUND_SRC,
   PROJECTS_BACKGROUND_SRC,
 } from "@/lib/estateExperienceBackgrounds";
 import { CREATIVE_STUDIO_ROOM_BG } from "@/lib/creativeStudio/creativeStudioRoom";
@@ -27,9 +28,19 @@ describe("estateExperienceBackgrounds", () => {
     );
   });
 
+  it("defines the My Profile Writing Room public background URL", () => {
+    expect(PROFILE_BACKGROUND_SRC).toBe(
+      "/backgrounds/writing-room-background.png",
+    );
+  });
+
   it("ships the Create and Projects PNG plates in public/", () => {
     expect(existsSync(publicPathFromUrl(CREATE_BACKGROUND_SRC))).toBe(true);
     expect(existsSync(publicPathFromUrl(PROJECTS_BACKGROUND_SRC))).toBe(true);
+  });
+
+  it("ships the My Profile Writing Room PNG plate in public/", () => {
+    expect(existsSync(publicPathFromUrl(PROFILE_BACKGROUND_SRC))).toBe(true);
   });
 
   it("Create shells resolve the shared Create background", () => {
@@ -72,5 +83,16 @@ describe("estateExperienceBackgrounds", () => {
     expect(client).toContain('data-create-estate-working={');
     expect(client).toContain('data-project-homes-active={');
     expect(client).toContain('roomId="goals-projects"');
+  });
+
+  it("My Profile shell wires PROFILE_BACKGROUND_SRC as a full-bleed plate", () => {
+    const profileShell = readRepo(
+      "components/companion/MyProfileRoomShell.tsx",
+    );
+    const panel = readRepo("components/companion/MyProfilePanel.tsx");
+    expect(profileShell).toContain("PROFILE_BACKGROUND_SRC");
+    expect(profileShell).toContain("CinematicBackground");
+    expect(profileShell).toContain('placement="absolute"');
+    expect(panel).toContain("MyProfileRoomShell");
   });
 });
