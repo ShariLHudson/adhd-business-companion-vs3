@@ -11,6 +11,7 @@ import {
   getChamberMemberCardDisplay,
 } from "@/lib/chamber/chamberMemberCardDisplay";
 import { EstateHowToOpenControls } from "@/components/companion/EstateHowToOpenControls";
+import { HowThisFitsTogetherLink } from "@/components/companion/HowThisFitsTogetherLink";
 import { CHAMBER_HOW_TO_GUIDE } from "@/lib/estateRoomGuides";
 import "@/app/companion/chamber-member-gallery.css";
 import "@/app/companion/estate-how-to-guide.css";
@@ -117,6 +118,10 @@ export function ChamberMemberGallery({
             className="chamber-member-gallery__how-to"
           />
         ) : null}
+        <HowThisFitsTogetherLink
+          areaOrPlaceId="chamber-of-momentum"
+          className="how-this-fits-link--inline how-this-fits-link--on-dark mt-3"
+        />
       </header>
       <div
         className="chamber-member-gallery__scroll"

@@ -33,6 +33,7 @@ export type HowDoIBrowseTopSection = {
 const NEW_USER_START_ARTICLE_IDS = [
   "first-5-minutes",
   "frequently-asked-questions",
+  "how-everything-works-together",
   "how-the-ecosystem-works",
   "meet-your-companion",
   "understanding-the-main-areas",
@@ -91,7 +92,14 @@ const ADDITIONAL_HELP_SUBGROUPS: readonly HowDoIBrowseSubgroup[] = [
   {
     id: "companion-features",
     label: "Companion Features",
-    articleIds: ["chat-companion", "chat-workspace", "memory", "privacy", "voice-conversations"],
+    articleIds: [
+      "chat-companion",
+      "chat-workspace",
+      "how-everything-works-together",
+      "memory",
+      "privacy",
+      "voice-conversations",
+    ],
   },
   {
     id: "productivity-growth",

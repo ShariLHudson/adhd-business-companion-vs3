@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
+import { EstateOrientationHost } from "@/components/companion/EstateOrientationHost";
 import { FirstLoginWelcomeGate } from "@/components/companion/FirstLoginWelcomeOverlay";
 import { EstateRouteRecovery } from "@/components/companion/estate/EstateRouteRecovery";
 import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
@@ -19,6 +20,7 @@ import {
   isCompanionWebpackChunkFailure,
   reloadOnceForStaleCompanionChunk,
 } from "@/lib/companionWebpackChunkFailure";
+import { asError, safeErrorMessage } from "@/lib/safeErrorDisplay";
 import "@/app/companion/estate-route-recovery.css";
 import "@/app/companion/spark-thinking-flame.css";
 
@@ -46,32 +48,37 @@ function routeWorkspaceLoadFailure(err: unknown): void {
   );
 }
 
-type EstateErrorBoundaryState = { hasError: boolean };
+type EstateErrorBoundaryState = {
+  hasError: boolean;
+  caught: unknown;
+};
 
 /**
  * In-app recovery — avoids a separate `app/companion/error` chunk that can
  * ChunkLoadError when the dev bundle is stale.
+ * Never surfaces DOM Events as "[object Event]".
  */
 class EstateErrorBoundary extends Component<
   { children: ReactNode; onReturnToEstate?: () => void },
   EstateErrorBoundaryState
 > {
-  state: EstateErrorBoundaryState = { hasError: false };
+  state: EstateErrorBoundaryState = { hasError: false, caught: null };
 
-  static getDerivedStateFromError(): EstateErrorBoundaryState {
-    return { hasError: true };
+  static getDerivedStateFromError(error: unknown): EstateErrorBoundaryState {
+    return { hasError: true, caught: error };
   }
 
-  componentDidCatch(error: Error) {
-    logWorkspaceLoadFailure(error);
+  componentDidCatch(error: unknown) {
+    logWorkspaceLoadFailure(asError(error));
   }
 
   private handleRetry = () => {
-    this.setState({ hasError: false });
+    this.setState({ hasError: false, caught: null });
   };
 
   render() {
     if (this.state.hasError) {
+      const detail = safeErrorMessage(this.state.caught);
       return (
         <EstateRouteRecovery
           message={ESTATE_WORKSPACE_LOAD_RECOVERY}
@@ -82,7 +89,13 @@ class EstateErrorBoundary extends Component<
               window.location.assign("/companion?section=home");
             })
           }
-          error={new Error("Companion workspace failed to render")}
+          error={
+            new Error(
+              detail && detail !== "Unknown error"
+                ? `Companion workspace failed to render: ${detail}`
+                : "Companion workspace failed to render",
+            )
+          }
         />
       );
     }
@@ -166,6 +179,7 @@ export function CompanionPageLoader() {
       <EstateErrorBoundary>
         <FirstLoginWelcomeGate>
           <AuthenticatedCompanionShell />
+          <EstateOrientationHost />
         </FirstLoginWelcomeGate>
       </EstateErrorBoundary>
     </CompanionAuthGate>

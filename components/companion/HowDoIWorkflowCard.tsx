@@ -5,6 +5,10 @@ import type { AppSection } from "@/lib/companionUi";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { objectIdForEmoji } from "@/lib/companionObjects";
+import { requestOpenHowSparkEstateWorksTogether } from "@/lib/estateOrientation";
+
+const OPEN_ESTATE_ORIENTATION_PROMPT =
+  "__open_how_spark_estate_works_together__";
 
 const GOLD_LABEL = "text-xs font-bold uppercase tracking-wide text-[#b45309]";
 
@@ -127,7 +131,20 @@ export function HowDoIWorkflowCard({
                     {article.openLabel ?? "Open Settings"} →
                   </button>
                 ) : null}
-                {article.askPrompt && onAsk && !article.openSection ? (
+                {article.askPrompt === OPEN_ESTATE_ORIENTATION_PROMPT ? (
+                  <button
+                    type="button"
+                    onClick={() => requestOpenHowSparkEstateWorksTogether()}
+                    className="rounded-lg bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                    data-testid="how-do-i-open-estate-orientation"
+                  >
+                    {article.openLabel ?? "Show me how everything works together"}
+                  </button>
+                ) : null}
+                {article.askPrompt &&
+                article.askPrompt !== OPEN_ESTATE_ORIENTATION_PROMPT &&
+                onAsk &&
+                !article.openSection ? (
                   <button
                     type="button"
                     onClick={() => onAsk(article.askPrompt!)}

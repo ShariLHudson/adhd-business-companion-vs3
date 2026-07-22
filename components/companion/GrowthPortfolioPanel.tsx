@@ -5,6 +5,7 @@ import { PortfolioRoomShell } from "@/components/companion/PortfolioRoomShell";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
+import { HowThisFitsTogetherLink } from "@/components/companion/HowThisFitsTogetherLink";
 import {
   createPortfolioEntry,
   deletePortfolioEntry,
@@ -97,6 +98,10 @@ export function GrowthPortfolioPanel({
             Look what you&apos;ve accomplished — milestones, launches, certifications,
             awards, and finished work worth celebrating.
           </p>
+          <HowThisFitsTogetherLink
+            areaOrPlaceId="hall-of-accomplishments"
+            className="how-this-fits-link--inline mt-2"
+          />
         </header>
 
         <div className="mb-4 flex flex-wrap items-center gap-2">

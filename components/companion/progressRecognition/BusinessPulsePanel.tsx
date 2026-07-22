@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { HowThisFitsTogetherLink } from "@/components/companion/HowThisFitsTogetherLink";
 import {
   buildBusinessPulse,
   type BusinessPulseModel,
@@ -34,6 +35,10 @@ export function BusinessPulsePanel({
       <p className="progress-pulse-primary" data-testid="pulse-primary">
         {model.primaryStatement}
       </p>
+      <HowThisFitsTogetherLink
+        areaOrPlaceId="business-pulse"
+        className="how-this-fits-link--inline"
+      />
       <ul className="progress-pulse-changes" data-testid="pulse-changes">
         {model.meaningfulChanges.map((line) => (
           <li key={line}>{line}</li>

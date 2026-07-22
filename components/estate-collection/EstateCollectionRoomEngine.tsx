@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
+import { HowThisFitsTogetherLink } from "@/components/companion/HowThisFitsTogetherLink";
+import { hasHowThisFitsTogetherLink } from "@/lib/estateOrientation";
 import type { GrowthAttachment } from "@/lib/growthAttachments";
 import {
   emptyCaptureValues,
@@ -780,6 +782,12 @@ export function EstateCollectionRoomEngine({
             <p className="estate-workspace__kicker">{room.kicker}</p>
             <h1 className="estate-workspace__title">{room.roomName}</h1>
             <p className="estate-workspace__lead">{room.description}</p>
+            {hasHowThisFitsTogetherLink(roomId) ? (
+              <HowThisFitsTogetherLink
+                areaOrPlaceId={roomId}
+                className="how-this-fits-link--inline mt-2"
+              />
+            ) : null}
           </header>
 
           <section

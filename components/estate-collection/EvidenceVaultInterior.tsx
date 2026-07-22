@@ -25,6 +25,7 @@ import {
   shouldShowGentleReminder,
   type EvidenceVaultHomeCategory,
 } from "@/lib/estate/evidenceVaultHome";
+import { HowThisFitsTogetherLink } from "@/components/companion/HowThisFitsTogetherLink";
 import { EvidenceVaultHome } from "./EvidenceVaultHome";
 import "./evidence-vault-interior.css";
 
@@ -188,6 +189,7 @@ export function EvidenceVaultInterior({
             {EVIDENCE_VAULT_HOW_DO_I_BODY.split("\n\n").map((paragraph) => (
               <p key={paragraph.slice(0, 24)}>{paragraph}</p>
             ))}
+            <HowThisFitsTogetherLink areaOrPlaceId="evidence-vault" />
           </div>
         </details>
 

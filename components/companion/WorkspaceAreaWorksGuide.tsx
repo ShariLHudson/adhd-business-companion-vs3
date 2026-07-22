@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { HowThisFitsTogetherLink } from "@/components/companion/HowThisFitsTogetherLink";
+import { getRoomOrientation } from "@/lib/estateOrientation";
 import { initialSectionOpen } from "@/lib/expandableUi";
 import { getWorkspaceHelpContent } from "@/lib/workspaceHelpContent";
 
@@ -9,9 +11,11 @@ const GOLD_LABEL = "text-xs font-bold uppercase tracking-wide text-[#b45309]";
 /**
  * Single workspace help dropdown — PostCraft How To style.
  * Replaces "How This Area Works", "What Is This?", "How To Use This?", etc.
+ * When estate orientation exists, answers What / Why / How it connects first.
  */
 export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
   const help = getWorkspaceHelpContent(areaId);
+  const orientation = getRoomOrientation(areaId);
   const [open, setOpen] = useState(initialSectionOpen);
 
   if (!help) return null;
@@ -59,18 +63,28 @@ export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
       {open ? (
         <div className="workspace-area-works-guide__body border-t border-[#efe8de] px-4 pb-4 pt-3">
           <section>
-            <p className={GOLD_LABEL}>What this area is</p>
+            <p className={GOLD_LABEL}>What is this?</p>
             <p className="workspace-area-works-guide__copy mt-1 text-sm leading-relaxed text-[#2d2926]">
-              {help.whatItIs}
+              {orientation?.whatIsThis ?? help.whatItIs}
             </p>
           </section>
 
           <section className="mt-3">
-            <p className={GOLD_LABEL}>When to use it</p>
+            <p className={GOLD_LABEL}>Why would I use it?</p>
             <p className="workspace-area-works-guide__copy mt-1 text-sm leading-relaxed text-[#2d2926]">
-              {help.whenToUse}
+              {orientation?.whyWouldIUseIt ?? help.whenToUse}
             </p>
           </section>
+
+          {orientation ? (
+            <section className="mt-3">
+              <p className={GOLD_LABEL}>How does it connect?</p>
+              <p className="workspace-area-works-guide__copy mt-1 text-sm leading-relaxed text-[#2d2926]">
+                {orientation.howItConnects}
+              </p>
+              <HowThisFitsTogetherLink areaOrPlaceId={areaId} />
+            </section>
+          ) : null}
 
           <section className="mt-3">
             <p className={GOLD_LABEL}>Recommended workflow</p>
@@ -92,7 +106,7 @@ export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
             </section>
           ) : null}
 
-          {help.relatedAreas ? (
+          {!orientation && help.relatedAreas ? (
             <section className="mt-3">
               <p className={GOLD_LABEL}>How it connects</p>
               <p className="workspace-area-works-guide__copy mt-1 text-sm leading-relaxed text-[#4b463f]">

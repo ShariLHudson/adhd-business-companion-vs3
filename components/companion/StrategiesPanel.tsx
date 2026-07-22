@@ -41,6 +41,7 @@ import {
   userStrategiesFor,
   type UserStrategy,
 } from "@/lib/userStrategies";
+import { HowThisFitsTogetherLink } from "@/components/companion/HowThisFitsTogetherLink";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { StrategyApplyPanel } from "@/components/companion/StrategyApplyPanel";
@@ -120,9 +121,9 @@ export function StrategiesPanel({
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
   onContextChange?: (detail: import("@/lib/workspaceAwareness").WorkspacePanelDetail) => void;
-  /** Start business strategy builder beside chat (Create flow). */
+  /** Start business strategy builder (Create flow). */
   onStartBusinessStrategy?: (typeLabel: string) => void;
-  /** Start ADHD strategy apply coach beside chat. */
+  /** Start ADHD strategy apply coach. */
   onStartStrategyApply?: (strategyId: string) => void;
   onOpenActivity?: (activityId: string) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
@@ -403,12 +404,13 @@ export function StrategiesPanel({
                 </span>
               </button>
               {howDoIOpen ? (
-                <p
-                  className="plan-day-how-do-i__body mt-2 max-w-xl whitespace-pre-line text-sm leading-relaxed text-[#4b463f]"
+                <div
+                  className="plan-day-how-do-i__body mt-2 max-w-xl text-sm leading-relaxed text-[#4b463f]"
                   data-testid="strategy-library-how-do-i-body"
                 >
-                  {STRATEGY_LIBRARY_HOW_DO_I}
-                </p>
+                  <p className="whitespace-pre-line">{STRATEGY_LIBRARY_HOW_DO_I}</p>
+                  <HowThisFitsTogetherLink areaOrPlaceId="playbook" />
+                </div>
               ) : null}
             </div>
 
