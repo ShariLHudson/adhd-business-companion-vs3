@@ -1,0 +1,40 @@
+# Capture Before Classification™ (Platform Law — 137)
+
+**Constitution bridge:** `docs/constitution/113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md` (Capture Before Classification article)  
+**Binds:** Spec **128** (Simplicity) · Spec **132** (Momentum)  
+**Certification:** `docs/platform/137_*`
+
+## Principle
+
+Spark Estate must **never** require classification before capture.
+
+Capture first. Organize later. Auto-organize whenever possible.
+
+## Applies to
+
+Projects · Tasks · Notes · Ideas · Evidence · Journal · Clear My Mind · Parking Lot / Park It · any future capture surface
+
+## Required behavior
+
+- Member can capture without naming a section, folder, label, status, color, horizon, owner, or destination
+- Default bucket is Inbox (or equivalent) — never “Where should this go?”
+- Organization is optional, progressive, and often suggested later (Yes / Later / Keep as Inbox)
+- Metadata (color, status, horizon, priority, labels) stays hidden until meaningful work exists
+
+## Forbidden
+
+- Blocking Add Task / capture behind Create Section
+- Multi-step filing before the first word is saved
+- Forcing taxonomy, tags, or rooms as a gate to capture
+- Inventing classification UI that increases EF load
+
+## Reference pattern
+
+Clear My Mind — capture continuously; organize elsewhere later.
+
+## Before shipping any capture UI
+
+- [ ] Can the member save without classifying?
+- [ ] Is organize optional and later?
+- [ ] Does this reduce decisions vs add them (128)?
+- [ ] Does this protect momentum (132)?

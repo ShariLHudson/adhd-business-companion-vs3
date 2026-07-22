@@ -13,6 +13,7 @@ import {
   PROJECT_STATUS_LABEL,
   saveProject,
   saveProjectItem,
+  saveProjectWithResult,
   timeBlocksForProject,
   type Project,
   type ProjectHorizon,
@@ -20,6 +21,18 @@ import {
 } from "@/lib/companionStore";
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { seedProjectChunks } from "@/lib/projects/seedProjectChunks";
+import {
+  addProjectPiece,
+  emptyProjectPiecesDraft,
+  PROJECT_PIECES_PROMPT,
+  removeProjectPiece,
+  updateProjectPiece,
+} from "@/lib/projects/projectPieces190";
+import {
+  getSuggestNextStepHelper,
+  SUGGEST_NEXT_STEP_HELPERS,
+  type SuggestNextStepHelperId,
+} from "@/lib/projects/suggestNextStepHelpers";
 import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 import { ProjectAssetsPanel } from "@/components/companion/ProjectAssetsPanel";
@@ -36,7 +49,6 @@ import {
   type ProjectListSort,
   type TimeBlockDateGroup,
 } from "@/lib/projectGrouping";
-import { initialSectionOpen } from "@/lib/expandableUi";
 import type { AppSection } from "@/lib/companionUi";
 import type {
   WorkspaceFieldId,
@@ -150,18 +162,15 @@ export function ProjectsPanel({
   );
   const [listQuery, setListQuery] = useState("");
   const [listSort, setListSort] = useState<ProjectListSort>("recent");
-  const [expandedListIds, setExpandedListIds] = useState<Record<string, boolean>>(
-    {},
-  );
-  const [recentSectionOpen, setRecentSectionOpen] = useState(initialSectionOpen);
-  const [allProjectsSectionOpen, setAllProjectsSectionOpen] = useState(initialSectionOpen);
-  const [completedOpen, setCompletedOpen] = useState(initialSectionOpen);
+  /** View All / Completed — start closed; Continue Project is never nested. */
+  const [viewAllOpen, setViewAllOpen] = useState(false);
+  const [completedOpen, setCompletedOpen] = useState(false);
 
   // Guided create
   const [step, setStep] = useState(0);
   const [what, setWhat] = useState("");
   const [why, setWhy] = useState("");
-  const [chunks, setChunks] = useState(["", "", ""]);
+  const [chunks, setChunks] = useState<string[]>([""]);
 
   const CREATE_STEP_COUNT = 3;
 
@@ -197,6 +206,10 @@ export function ProjectsPanel({
 
   useEffect(() => {
     setProjects(getProjects());
+    const onUpdated = () => setProjects(getProjects());
+    window.addEventListener("companion-projects-updated", onUpdated);
+    return () =>
+      window.removeEventListener("companion-projects-updated", onUpdated);
   }, []);
 
   useEffect(() => {
@@ -334,6 +347,13 @@ export function ProjectsPanel({
     [projects],
   );
 
+  /** Primary resume target — never behind nested accordions. */
+  const continueProject = recentProjects[0] ?? null;
+  const recentBesideContinue = useMemo(
+    () => recentProjects.slice(1),
+    [recentProjects],
+  );
+
   const filteredProjects = useMemo(() => {
     const q = listQuery.trim().toLowerCase();
     const base = sortProjects(projects, listSort);
@@ -358,28 +378,10 @@ export function ProjectsPanel({
 
   const allProjectsList = useMemo(() => activeProjects, [activeProjects]);
 
-  function toggleListSection(id: string) {
-    if (id === "recent-projects") {
-      setRecentSectionOpen((o) => !o);
-      return;
-    }
-    if (id === "all-projects") {
-      setAllProjectsSectionOpen((o) => !o);
-      return;
-    }
-    if (id === "completed-projects") {
-      setCompletedOpen((o) => !o);
-    }
-  }
-
   function openProject(id: string) {
     setDetailId(id);
-    setDetailSectionsOpen({});
+    setDetailSectionsOpen({ tasks: true });
     setView("detail");
-  }
-
-  function toggleListExpand(id: string) {
-    setExpandedListIds((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
   function startCreate() {
@@ -389,7 +391,7 @@ export function ProjectsPanel({
   function startBlankCreate() {
     setWhat("");
     setWhy("");
-    setChunks(["", "", ""]);
+    setChunks(emptyProjectPiecesDraft());
     setStep(0);
     setView("create");
   }
@@ -452,14 +454,18 @@ export function ProjectsPanel({
 
   function finishCreate() {
     const name = what.trim() || "Untitled project";
-    const next = saveProject({
+    const result = saveProjectWithResult({
       name,
       goal: why.trim(),
       status: "in-progress",
       nextAction: "",
+      archived: false,
     });
-    setProjects(next);
-    const created = next[0]!;
+    if (!result.persisted || !result.project) {
+      return;
+    }
+    setProjects(result.projects);
+    const created = result.project;
     const seededFirst = seedProjectChunks(created.id, chunks);
     if (seededFirst) {
       patch(created.id, { nextAction: seededFirst });
@@ -594,7 +600,11 @@ export function ProjectsPanel({
     }
   }, [workspaceWorkflowAction, view, step, what]);
 
-  async function generateNextAction(p: Project, modifier?: string) {
+  async function generateNextAction(
+    p: Project,
+    helperId: SuggestNextStepHelperId = "suggest",
+  ) {
+    const helper = getSuggestNextStepHelper(helperId);
     setGenerating(true);
     setBackups([]);
     try {
@@ -609,7 +619,7 @@ export function ProjectsPanel({
           lastAction: p.nextAction,
           energy: day?.energy ?? "medium",
           overwhelm: day?.overwhelm ?? "low",
-          modifier,
+          modifier: helper.apiModifier,
         }),
       });
       const data = await res.json();
@@ -617,12 +627,28 @@ export function ProjectsPanel({
         patch(p.id, {
           nextAction: data.nextAction,
           status: (data.status as ProjectStatus) ?? p.status,
+          horizon: "now",
         });
         setBackups(Array.isArray(data.backups) ? data.backups : []);
         logMomentum("move", `Moved forward: ${p.name}`);
+        return;
       }
+      /* Honest local guidance — never pretend the brain answered */
+      const local = helper.localGuidance({
+        name: p.name,
+        goal: p.goal,
+        nextAction: p.nextAction ?? "",
+      });
+      patch(p.id, { nextAction: local, horizon: "now" });
+      setBackups([]);
     } catch {
-      /* keep the existing next action */
+      const local = helper.localGuidance({
+        name: p.name,
+        goal: p.goal,
+        nextAction: p.nextAction ?? "",
+      });
+      patch(p.id, { nextAction: local, horizon: "now" });
+      setBackups([]);
     } finally {
       setGenerating(false);
     }
@@ -635,77 +661,49 @@ export function ProjectsPanel({
   }
 
   function renderListRow(p: Project) {
-    const expanded = Boolean(expandedListIds[p.id]);
+    const focus =
+      p.nextAction?.trim() || p.goal?.trim() || "Continue when you're ready";
     return (
-      <li key={p.id} className="border-b border-[#e7dfd4]/70 last:border-b-0">
-        <div className="flex items-center gap-1 py-1.5 pl-1 pr-0.5">
-          <button
-            type="button"
-            onClick={() => toggleListExpand(p.id)}
-            className="flex min-w-0 flex-1 items-center gap-2 text-left"
-            aria-expanded={expanded}
-            aria-label={expanded ? `Collapse ${p.name}` : `Expand ${p.name}`}
-          >
-            <span className="w-3 shrink-0 text-center text-[10px] text-[#9a8f82]">
-              {expanded ? "▼" : "▶"}
-            </span>
-            {colorOn ? (
-              <span
-                className="h-2 w-2 shrink-0 rounded-full"
-                style={{ backgroundColor: p.color }}
-                aria-hidden
-              />
-            ) : null}
-            <span className="min-w-0 truncate text-sm font-medium text-[#1f1c19]">
+      <li
+        key={p.id}
+        className="border-b border-[#e7dfd4]/70 last:border-b-0"
+        data-testid={`project-list-row-${p.id}`}
+      >
+        <div className="flex items-center gap-2 py-2 pl-2 pr-1">
+          {colorOn && hasMeaningfulProjectWork(p) ? (
+            <span
+              className="h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: p.color }}
+              aria-hidden
+            />
+          ) : null}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-[#1f1c19]">
               {p.name}
-            </span>
-            <span className="shrink-0 rounded bg-[#f0f5f5] px-1.5 py-0.5 text-[10px] font-semibold text-[#4b6b6b]">
-              {PROJECT_STATUS_LABEL[p.status]}
-            </span>
-          </button>
+            </p>
+            <p className="mt-0.5 truncate text-xs text-[#6b635a]">
+              <span className="font-semibold text-[#1f1c19]">Focus:</span> {focus}
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => openProject(p.id)}
-            className="shrink-0 rounded px-2 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+            className="shrink-0 rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#163a3a]"
+            data-testid={`project-list-continue-${p.id}`}
           >
-            Open
+            Continue →
           </button>
         </div>
-        {expanded ? (
-          <div className="border-t border-[#e7dfd4]/50 bg-[#faf7f2]/50 px-3 py-2 text-xs leading-relaxed text-[#6b635a]">
-            {p.goal.trim() ? (
-              <p>
-                <span className="font-semibold text-[#1f1c19]">Outcome:</span>{" "}
-                {p.goal}
-              </p>
-            ) : (
-              <p className="text-[#9a8f82]">No outcome written yet.</p>
-            )}
-            {p.nextAction?.trim() ? (
-              <p className="mt-1">
-                <span className="font-semibold text-[#1f1c19]">Next:</span>{" "}
-                {p.nextAction}
-              </p>
-            ) : null}
-            <div className="mt-2 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => openProject(p.id)}
-                className="rounded bg-[#1e4f4f] px-2 py-1 text-xs font-semibold text-white hover:bg-[#163a3a]"
-              >
-                Open project
-              </button>
-              <button
-                type="button"
-                onClick={() => toggleListExpand(p.id)}
-                className="rounded px-2 py-1 text-xs font-semibold text-[#6b635a] hover:bg-black/5"
-              >
-                Collapse
-              </button>
-            </div>
-          </div>
-        ) : null}
       </li>
+    );
+  }
+
+  function hasMeaningfulProjectWork(p: Project): boolean {
+    return Boolean(
+      p.nextAction?.trim() ||
+        p.goal?.trim() ||
+        (p.goals && p.goals.length > 0) ||
+        getProjectItems(p.id).length > 0,
     );
   }
 
@@ -797,13 +795,13 @@ export function ProjectsPanel({
     const isLast = step === CREATE_STEP_COUNT - 1;
     const stepTitle =
       step === 0
-        ? "What are you trying to build?"
+        ? "What are you working on?"
         : step === 1
-          ? "Why does this matter right now?"
-          : "What are the main pieces?";
+          ? "What would you like this project to accomplish?"
+          : PROJECT_PIECES_PROMPT;
     const stepHint =
       step === 2
-        ? "Big pieces, not micro-tasks — optional, and you can add more later in Tasks."
+        ? "One piece, several, or none yet — add another whenever you see more."
         : null;
 
     return (
@@ -815,6 +813,12 @@ export function ProjectsPanel({
         </p>
         <p className="mt-2 text-2xl font-semibold leading-snug text-[#1f1c19]">
           {stepTitle}
+        </p>
+        <p
+          className="mt-1 text-xs font-bold uppercase tracking-wide text-[#1e4f4f]"
+          data-testid="project-create-field-requirement"
+        >
+          {step === 0 ? "Required" : "Optional"}
         </p>
         {stepHint ? (
           <p className="mt-2 text-base text-[#6b635a]">{stepHint}</p>
@@ -851,29 +855,54 @@ export function ProjectsPanel({
             placeholder={
               step === 0
                 ? "e.g. Grow my Instagram audience"
-                : "A sentence on why it matters"
+                : "Optional — a sentence on why it matters"
             }
             className="mt-6 flex-1"
             inputClassName="min-h-[140px] flex-1 resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             micTitle={stepTitle}
           />
         ) : (
-          <div className="mt-6 flex flex-col gap-3">
+          <div
+            className="mt-6 flex flex-col gap-3"
+            data-testid="project-create-pieces"
+          >
             {chunks.map((chunk, index) => (
-              <label key={index} className="block text-sm font-semibold text-[#6b635a]">
-                Piece {index + 1}
-                <input
-                  value={chunk}
-                  onChange={(e) => {
-                    const next = [...chunks];
-                    next[index] = e.target.value;
-                    setChunks(next);
-                  }}
-                  placeholder={index === 0 ? "e.g. Content plan" : "Optional"}
-                  className="mt-1 w-full rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                />
-              </label>
+              <div key={index} className="flex items-end gap-2">
+                <label className="block min-w-0 flex-1 text-sm font-semibold text-[#6b635a]">
+                  Piece {index + 1}{" "}
+                  <span className="font-normal normal-case text-[#9a8f82]">
+                    (optional)
+                  </span>
+                  <input
+                    value={chunk}
+                    onChange={(e) =>
+                      setChunks(updateProjectPiece(chunks, index, e.target.value))
+                    }
+                    placeholder={index === 0 ? "e.g. Content plan" : "Optional"}
+                    className="mt-1 w-full rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                    data-testid={`project-create-piece-${index}`}
+                  />
+                </label>
+                {chunks.length > 1 ? (
+                  <button
+                    type="button"
+                    className="mb-0.5 shrink-0 rounded-lg px-2 py-2 text-sm font-semibold text-[#8a5a4a]"
+                    onClick={() => setChunks(removeProjectPiece(chunks, index))}
+                    data-testid={`project-create-piece-remove-${index}`}
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
             ))}
+            <button
+              type="button"
+              className="self-start text-sm font-semibold text-[#1e4f4f]"
+              onClick={() => setChunks(addProjectPiece(chunks))}
+              data-testid="project-create-add-piece"
+            >
+              Add another piece
+            </button>
           </div>
         )}
         {sopSession && onSopFieldChange && step < 2 ? (
@@ -900,8 +929,9 @@ export function ProjectsPanel({
             disabled={step === 0 && !what.trim()}
             onClick={() => (isLast ? finishCreate() : setStep(step + 1))}
             className="rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white disabled:bg-[#9aaba8]"
+            data-testid="project-create-primary"
           >
-            {isLast ? "Create project" : "Next"}
+            {isLast ? "Create Project" : "Next"}
           </button>
         </div>
         </div>
@@ -954,26 +984,84 @@ export function ProjectsPanel({
         </label>
 
         <div className="mt-4 flex flex-col gap-1">
+          <section
+            className="space-y-4 rounded-xl border border-[#e4ddd2] bg-white/90 p-4"
+            data-testid="project-smart-overview"
+          >
+            <label className="block text-xs font-semibold text-[#6b635a]">
+              Outcome
+              <VoiceAnswerField
+                id="workspace-field-project-goal"
+                value={current.goal}
+                onChange={(v) => patch(current.id, { goal: v })}
+                placeholder="Why does this matter right now?"
+                className="mt-1"
+                inputClassName="min-h-[72px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                micTitle="Outcome — why it matters"
+              />
+            </label>
+
+            <div id="workspace-field-project-next-action">
+              <label className="block text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+                Next step
+                <VoiceAnswerField
+                  value={current.nextAction}
+                  onChange={(v) =>
+                    patch(current.id, { nextAction: v, horizon: "now" })
+                  }
+                  placeholder="One small step you could take next"
+                  className="mt-1"
+                  inputClassName="min-h-[56px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-base font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  micTitle="Next step"
+                />
+              </label>
+              {backups.length > 0 && (
+                <div className="mt-2 flex flex-col gap-1">
+                  {backups.map((b) => (
+                    <button
+                      key={b}
+                      type="button"
+                      onClick={() => useBackup(current, b)}
+                      className="text-left text-sm text-[#1e4f4f] hover:underline"
+                    >
+                      ↳ {b}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div
+                className="mt-3 flex flex-wrap gap-2"
+                data-testid="project-suggest-helpers"
+              >
+                {SUGGEST_NEXT_STEP_HELPERS.map((helper) => (
+                  <button
+                    key={helper.id}
+                    type="button"
+                    onClick={() => generateNextAction(current, helper.id)}
+                    disabled={generating}
+                    data-testid={`project-suggest-${helper.id}`}
+                    className={
+                      helper.id === "suggest"
+                        ? "rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+                        : "rounded-lg border border-[#1e4f4f]/30 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] disabled:opacity-50"
+                    }
+                  >
+                    {generating && helper.id === "suggest"
+                      ? "Thinking…"
+                      : helper.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+
           <CollapsibleSection
-            id="overview"
-            title="Overview"
-            open={!!detailSectionsOpen.overview}
+            id="project-details"
+            title="Project Details"
+            open={!!detailSectionsOpen["project-details"]}
             onToggle={toggleDetailSection}
           >
             <div className="space-y-4 rounded-xl border border-[#e4ddd2] bg-white/90 p-4">
-              <label className="block text-xs font-semibold text-[#6b635a]">
-                Outcome
-                <VoiceAnswerField
-                  id="workspace-field-project-goal"
-                  value={current.goal}
-                  onChange={(v) => patch(current.id, { goal: v })}
-                  placeholder="Why does this matter right now?"
-                  className="mt-1"
-                  inputClassName="min-h-[72px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                  micTitle="Outcome — why it matters"
-                />
-              </label>
-
               <div id="workspace-field-project-goals">
                 <p className="text-xs font-semibold text-[#6b635a]">Goals</p>
                 <ul className="mt-2 space-y-2">
@@ -1031,64 +1119,6 @@ export function ProjectsPanel({
                 </div>
               </div>
 
-              {current.horizon === "now" && (
-                <div id="workspace-field-project-next-action">
-                  <label className="block text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-                    Next step
-                    <VoiceAnswerField
-                      value={current.nextAction}
-                      onChange={(v) => patch(current.id, { nextAction: v })}
-                      placeholder="One small step you could take next"
-                      className="mt-1"
-                      inputClassName="min-h-[56px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-base font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                      micTitle="Next step"
-                    />
-                  </label>
-                  {backups.length > 0 && (
-                    <div className="mt-2 flex flex-col gap-1">
-                      {backups.map((b) => (
-                        <button
-                          key={b}
-                          type="button"
-                          onClick={() => useBackup(current, b)}
-                          className="text-left text-sm text-[#1e4f4f] hover:underline"
-                        >
-                          ↳ {b}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => generateNextAction(current)}
-                      disabled={generating}
-                      className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
-                    >
-                      {generating ? "Thinking…" : "Suggest next step"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => generateNextAction(current, "smaller")}
-                      disabled={generating}
-                      className="rounded-lg border border-[#1e4f4f]/30 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f]"
-                    >
-                      Smaller step
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {current.horizon !== "now" && (
-                <button
-                  type="button"
-                  onClick={() => patch(current.id, { horizon: "now" })}
-                  className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
-                >
-                  Activate project
-                </button>
-              )}
-
               <div className="flex flex-wrap gap-2 border-t border-[#e4ddd2] pt-3">
                 <button
                   type="button"
@@ -1113,62 +1143,76 @@ export function ProjectsPanel({
                 </button>
               </div>
 
-              <div className="grid gap-3 border-t border-[#e4ddd2] pt-3 sm:grid-cols-2">
-                <label className="text-xs font-semibold text-[#6b635a]">
-                  Horizon
-                  <select
-                    value={current.horizon}
-                    onChange={(e) =>
-                      patch(current.id, {
-                        horizon: e.target.value as ProjectHorizon,
-                      })
-                    }
-                    className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-sm"
-                  >
-                    {(["now", "soon", "later"] as ProjectHorizon[]).map((h) => (
-                      <option key={h} value={h}>
-                        {PROJECT_HORIZON_LABEL[h]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="text-xs font-semibold text-[#6b635a]">
-                  Status
-                  <select
-                    value={current.status}
-                    onChange={(e) =>
-                      patch(current.id, {
-                        status: e.target.value as ProjectStatus,
-                      })
-                    }
-                    className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-sm"
-                  >
-                    {SORTED_STATUSES.map((s) => (
-                      <option key={s} value={s}>
-                        {PROJECT_STATUS_LABEL[s]}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
+              {hasMeaningfulProjectWork(current) ? (
+                <>
+                  <div className="grid gap-3 border-t border-[#e4ddd2] pt-3 sm:grid-cols-2">
+                    <label className="text-xs font-semibold text-[#6b635a]">
+                      Horizon
+                      <select
+                        value={current.horizon}
+                        onChange={(e) =>
+                          patch(current.id, {
+                            horizon: e.target.value as ProjectHorizon,
+                          })
+                        }
+                        className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-sm"
+                      >
+                        {(["now", "soon", "later"] as ProjectHorizon[]).map(
+                          (h) => (
+                            <option key={h} value={h}>
+                              {PROJECT_HORIZON_LABEL[h]}
+                            </option>
+                          ),
+                        )}
+                      </select>
+                    </label>
+                    <label className="text-xs font-semibold text-[#6b635a]">
+                      Status
+                      <select
+                        value={current.status}
+                        onChange={(e) =>
+                          patch(current.id, {
+                            status: e.target.value as ProjectStatus,
+                          })
+                        }
+                        className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-sm"
+                      >
+                        {SORTED_STATUSES.map((s) => (
+                          <option key={s} value={s}>
+                            {PROJECT_STATUS_LABEL[s]}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
 
-              <div className="flex flex-wrap gap-2">
-                {PROJECT_PALETTE.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-label="Set project color"
-                    onClick={() => patch(current.id, { color: c })}
-                    className="h-6 w-6 rounded-full"
-                    style={{
-                      background: c,
-                      outline:
-                        current.color === c ? "2px solid #1f1c19" : "none",
-                      outlineOffset: "2px",
-                    }}
-                  />
-                ))}
-              </div>
+                  <div className="flex flex-wrap gap-2">
+                    {PROJECT_PALETTE.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        aria-label="Set project color"
+                        onClick={() => patch(current.id, { color: c })}
+                        className="h-6 w-6 rounded-full"
+                        style={{
+                          background: c,
+                          outline:
+                            current.color === c ? "2px solid #1f1c19" : "none",
+                          outlineOffset: "2px",
+                        }}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <p
+                  className="border-t border-[#e4ddd2] pt-3 text-sm text-[#6b635a]"
+                  data-testid="project-metadata-deferred"
+                >
+                  Status, color, and horizon appear once there&apos;s meaningful
+                  work to organize.
+                </p>
+              )}
 
               <button
                 type="button"
@@ -1341,7 +1385,7 @@ export function ProjectsPanel({
           <WorkspaceAreaWorksGuide areaId="projects" />
           <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">Projects</p>
           <p className="mt-1 text-base text-[#6b635a]">
-            Your filing cabinet — pick a project when you&apos;re ready.
+            Capture first. Continue where you left off — organize later.
           </p>
           {onPreviewProjectHomes ? (
             <button
@@ -1428,43 +1472,87 @@ export function ProjectsPanel({
           ) : null}
         </div>
       ) : (
-        <div className="mt-4 flex flex-col gap-1">
-          {recentProjects.length > 0 ? (
-            <CollapsibleSection
-              id="recent-projects"
-              title="Recent Projects"
-              count={recentProjects.length}
-              open={recentSectionOpen}
-              onToggle={toggleListSection}
+        <div className="mt-4 flex flex-col gap-4">
+          {continueProject ? (
+            <section
+              className="rounded-xl border border-[#1e4f4f]/25 bg-white/90 p-4"
+              data-testid="projects-continue-project"
             >
-              {projectListUl(recentProjects)}
-            </CollapsibleSection>
+              <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+                Continue Project
+              </p>
+              <p className="mt-1 text-lg font-semibold text-[#1f1c19]">
+                {continueProject.name}
+              </p>
+              <p className="mt-1 text-sm text-[#6b635a]">
+                <span className="font-semibold text-[#1f1c19]">
+                  Current Focus:
+                </span>{" "}
+                {continueProject.nextAction?.trim() ||
+                  continueProject.goal?.trim() ||
+                  "Open and take the next small step"}
+              </p>
+              <button
+                type="button"
+                onClick={() => openProject(continueProject.id)}
+                className="mt-3 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                data-testid="projects-continue-cta"
+              >
+                Continue →
+              </button>
+            </section>
           ) : null}
 
-          <CollapsibleSection
-            id="all-projects"
-            title="All Projects"
-            count={allProjectsList.length}
-            open={allProjectsSectionOpen}
-            onToggle={toggleListSection}
-          >
-            {allProjectsList.length === 0 ? (
-              <p className="text-sm text-[#6b635a]">No active projects yet.</p>
-            ) : (
-              projectListUl(allProjectsList)
-            )}
-          </CollapsibleSection>
+          {recentBesideContinue.length > 0 ? (
+            <section data-testid="projects-recent-projects">
+              <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                Recent Projects
+              </p>
+              <div className="mt-2">{projectListUl(recentBesideContinue)}</div>
+            </section>
+          ) : null}
 
-          {completedProjects.length > 0 ? (
-            <CollapsibleSection
-              id="completed-projects"
-              title="Completed"
-              count={completedProjects.length}
-              open={completedOpen}
-              onToggle={toggleListSection}
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setViewAllOpen((o) => !o)}
+              className="rounded-lg border border-[#1e4f4f]/30 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f]"
+              data-testid="projects-view-all"
+              aria-expanded={viewAllOpen}
             >
+              {viewAllOpen ? "Hide all" : "View All"}
+              {allProjectsList.length > 0
+                ? ` (${allProjectsList.length})`
+                : ""}
+            </button>
+            {completedProjects.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setCompletedOpen((o) => !o)}
+                className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-black/5"
+                data-testid="projects-view-completed"
+                aria-expanded={completedOpen}
+              >
+                {completedOpen ? "Hide completed" : "Completed"} (
+                {completedProjects.length})
+              </button>
+            ) : null}
+          </div>
+
+          {viewAllOpen ? (
+            <section data-testid="projects-view-all-list">
+              {allProjectsList.length === 0 ? (
+                <p className="text-sm text-[#6b635a]">No active projects yet.</p>
+              ) : (
+                projectListUl(allProjectsList)
+              )}
+            </section>
+          ) : null}
+
+          {completedOpen && completedProjects.length > 0 ? (
+            <section data-testid="projects-completed-list">
               {projectListUl(completedProjects)}
-            </CollapsibleSection>
+            </section>
           ) : null}
         </div>
       )}

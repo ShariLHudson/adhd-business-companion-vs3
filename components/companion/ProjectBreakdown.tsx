@@ -10,6 +10,15 @@ import {
   type ProjectItemKind,
 } from "@/lib/companionProjectsStore";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
+import {
+  PROJECT_INBOX_LABEL,
+  addInboxTask,
+  applyInboxGrouping,
+  listInboxTasks,
+  listRootSections,
+  suggestInboxGrouping,
+  type InboxGroupingSuggestion,
+} from "@/lib/projects/projectInbox";
 
 type Props = {
   projectId: string;
@@ -25,9 +34,12 @@ function childKind(parent: ProjectItem | undefined): ProjectItemKind {
 export function ProjectBreakdown({ projectId, embedded = false }: Props) {
   const [items, setItems] = useState<ProjectItem[]>([]);
   const [newSection, setNewSection] = useState("");
+  const [newInboxTask, setNewInboxTask] = useState("");
   const [addingUnder, setAddingUnder] = useState<string | null>(null);
   const [newChild, setNewChild] = useState("");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
+  /** null = show when available; false = Later / Keep as Inbox dismissed this session */
+  const [groupingDismissed, setGroupingDismissed] = useState(false);
 
   const refresh = useCallback(
     () => setItems(getProjectItems(projectId)),
@@ -36,12 +48,23 @@ export function ProjectBreakdown({ projectId, embedded = false }: Props) {
 
   useEffect(() => {
     refresh();
-  }, [refresh]);
+    setGroupingDismissed(false);
+  }, [refresh, projectId]);
 
-  const roots = useMemo(
-    () => items.filter((i) => !i.parentId && i.kind === "section"),
-    [items],
+  const sections = useMemo(
+    () => listRootSections(projectId, items),
+    [items, projectId],
   );
+
+  const inboxTasks = useMemo(
+    () => listInboxTasks(projectId, items),
+    [items, projectId],
+  );
+
+  const groupingSuggestion = useMemo((): InboxGroupingSuggestion | null => {
+    if (groupingDismissed) return null;
+    return suggestInboxGrouping(inboxTasks);
+  }, [inboxTasks, groupingDismissed]);
 
   const childrenOf = (parentId: string) =>
     items.filter((i) => i.parentId === parentId);
@@ -55,6 +78,15 @@ export function ProjectBreakdown({ projectId, embedded = false }: Props) {
     if (!title) return;
     saveProjectItem({ projectId, kind: "section", title });
     setNewSection("");
+    refresh();
+  }
+
+  function addTaskToInbox() {
+    const title = newInboxTask.trim();
+    if (!title) return;
+    addInboxTask(projectId, title);
+    setNewInboxTask("");
+    setGroupingDismissed(false);
     refresh();
   }
 
@@ -81,6 +113,13 @@ export function ProjectBreakdown({ projectId, embedded = false }: Props) {
 
   function remove(id: string) {
     deleteProjectItem(id);
+    refresh();
+  }
+
+  function acceptGrouping() {
+    if (!groupingSuggestion) return;
+    applyInboxGrouping(projectId, groupingSuggestion);
+    setGroupingDismissed(true);
     refresh();
   }
 
@@ -135,6 +174,9 @@ export function ProjectBreakdown({ projectId, embedded = false }: Props) {
         key={item.id}
         className="rounded-lg bg-[#faf6f0]/80 p-2"
         style={{ marginLeft: Math.min(depth, 4) * 8 }}
+        data-testid={
+          depth === 0 && !item.parentId ? "project-inbox-task" : undefined
+        }
       >
         <div className="flex items-start gap-2">
           <input
@@ -186,20 +228,105 @@ export function ProjectBreakdown({ projectId, embedded = false }: Props) {
 
   const body = (
     <>
-      {roots.length === 0 ? (
-        <p className="text-sm text-[#6b635a]">
-          No tasks yet — add a section to break this project down.
+      <div
+        className="rounded-xl border border-[#e4ddd2] bg-[#faf7f2]/90 p-3"
+        data-testid="project-inbox"
+      >
+        <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+          {PROJECT_INBOX_LABEL}
         </p>
-      ) : (
-        <div className="flex flex-col gap-2">
-          {roots.map((section) => renderNode(section, 0))}
+        <p className="mt-1 text-xs text-[#6b635a]">
+          Capture first — organize later. No section needed.
+        </p>
+        {inboxTasks.length === 0 && sections.length === 0 ? (
+          <p className="mt-2 text-sm text-[#6b635a]" data-testid="project-inbox-empty">
+            Nothing captured yet. Add a task below.
+          </p>
+        ) : null}
+        {inboxTasks.length > 0 ? (
+          <div className="mt-2 flex flex-col gap-1.5">
+            {inboxTasks.map((task) => renderNode(task, 0))}
+          </div>
+        ) : null}
+        <div className="mt-3 flex gap-2">
+          <input
+            value={newInboxTask}
+            onChange={(e) => setNewInboxTask(e.target.value)}
+            placeholder="Add a task…"
+            aria-label="Add task to Inbox"
+            data-testid="project-inbox-task-input"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                addTaskToInbox();
+              }
+            }}
+            className="flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm outline-none focus:border-[#1e4f4f]"
+          />
+          <button
+            type="button"
+            onClick={addTaskToInbox}
+            disabled={!newInboxTask.trim()}
+            data-testid="project-inbox-add-task"
+            className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:bg-[#9aaba8]"
+          >
+            + Task
+          </button>
         </div>
-      )}
+        {groupingSuggestion ? (
+          <div
+            className="mt-3 rounded-lg border border-[#1e4f4f]/20 bg-white/90 p-3"
+            data-testid="project-inbox-grouping-suggestion"
+            role="status"
+          >
+            <p className="text-sm text-[#1f1c19]">
+              These look like{" "}
+              <span className="font-semibold">{groupingSuggestion.label}</span>
+              . Group them?
+            </p>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white"
+                data-testid="project-inbox-group-yes"
+                onClick={acceptGrouping}
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                className="rounded-lg border border-[#1e4f4f]/30 px-3 py-1.5 text-xs font-semibold text-[#1e4f4f]"
+                data-testid="project-inbox-group-later"
+                onClick={() => setGroupingDismissed(true)}
+              >
+                Later
+              </button>
+              <button
+                type="button"
+                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-[#6b635a]"
+                data-testid="project-inbox-group-keep"
+                onClick={() => setGroupingDismissed(true)}
+              >
+                Keep as Inbox
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {sections.length > 0 ? (
+        <div className="mt-3 flex flex-col gap-2" data-testid="project-sections">
+          {sections.map((section) => renderNode(section, 0))}
+        </div>
+      ) : null}
+
       <div className="mt-3 flex gap-2">
         <input
           value={newSection}
           onChange={(e) => setNewSection(e.target.value)}
-          placeholder="New section (e.g. Marketing)"
+          placeholder="Optional section (e.g. Marketing)"
+          aria-label="Optional new section"
+          data-testid="project-section-input"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -211,7 +338,9 @@ export function ProjectBreakdown({ projectId, embedded = false }: Props) {
         <button
           type="button"
           onClick={addSection}
-          className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+          disabled={!newSection.trim()}
+          data-testid="project-add-section"
+          className="rounded-lg border border-[#1e4f4f]/30 px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/5 disabled:opacity-50"
         >
           + Section
         </button>

@@ -528,6 +528,32 @@ A feature that cannot answer these questions should not be built yet.
 
 ---
 
+# Article — Capture Before Classification™
+
+**Platform law (Prompt 137).** Extends Article IV and Spec **128** / **132**.
+
+Spark Estate must never require classification, filing, sectioning, labeling, or destination choice before a member can capture.
+
+This applies across:
+
+- Projects (tasks land in Inbox; sections are optional and later)
+- Tasks
+- Notes and ideas
+- Evidence
+- Journal
+- Clear My Mind (already capture-first — the reference pattern)
+- Parking Lot / Park It
+- any future capture surface
+
+**Capture first. Organize later. Auto-organize whenever possible.**
+
+Members may group when ready. Spark may gently suggest grouping. Spark must never block capture behind “Where should this go?”
+
+Cursor rule: `.cursor/rules/capture-before-classification.mdc`  
+Certification track: `docs/platform/137_*`
+
+---
+
 # Constitutional Review Test
 
 Before approving any implementation, ask:

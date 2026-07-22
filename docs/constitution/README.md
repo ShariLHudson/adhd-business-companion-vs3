@@ -16,8 +16,11 @@ This series is the master constitutional layer for Spark Estate product behavior
 | **128** | [Simplicity & Cognitive Load Constitution](./128_SPARK_ESTATE_SIMPLICITY_AND_COGNITIVE_LOAD_CONSTITUTION.md) | **In repo** | Binding release gates — every feature must reduce cognitive effort; simplicity / ADHD certification |
 | **131** | [Create Intelligence & Intent Constitution](./131_CREATE_INTELLIGENCE_AND_INTENT_CONSTITUTION.md) | **In repo** | Binding Create intent law — infer goals not keywords; confidence-based alternatives; Intent Memory™ future |
 | **132** | [Experience Perfection & Momentum Protection](./132_EXPERIENCE_PERFECTION_AND_MOMENTUM_PROTECTION_STANDARD.md) | **In repo** | Binding momentum / polish law — never surprise; intentional navigation; Ten-Second Rule; 12/10 cert |
+| **137 bridge** | Capture Before Classification™ in [113 Product Constitution](./113_SPARK_ESTATE_PRODUCT_CONSTITUTION.md) | **In repo** | Never require classification before capture — Projects Inbox + platform-wide; Cursor rule `.cursor/rules/capture-before-classification.mdc` |
 
 **Platform polish (craftsmanship, not a new constitution):** [136 Platform Polish Phase 1](../platform/136_PLATFORM_POLISH_PHASE_1_REPORT.md) — refinement under **128** + **132**; see also [317 Master Index §12](../architecture-v2/317_ARCHITECTURE_V2_MASTER_INDEX.md).
+
+**Projects 12/10 certification (137):** [Prompt](../platform/137_CURSOR_PROJECTS_12_10_CERTIFICATION_AND_MOMENTUM_PROMPT.md) · [Report](../platform/137_PROJECTS_12_10_CERTIFICATION_AND_MOMENTUM_REPORT.md) — capture-first Inbox, momentum resume, Capture Before Classification™.
 
 ## Order of authority (from 113)
 

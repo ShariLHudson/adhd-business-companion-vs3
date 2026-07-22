@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
           ? "The user said they can't do this right now — simplify drastically to the tiniest starting point, or suggest a reset."
           : modifier === "breakdown"
             ? "Break the current next action into its single smallest first step."
-            : "";
+            : modifier === "matters"
+              ? "Focus only on what matters most for the stated goal — ignore secondary tasks; name the single highest-leverage next action."
+              : "";
 
     const userMessage = `Project: ${name}
 Goal: ${goal || "(not set)"}

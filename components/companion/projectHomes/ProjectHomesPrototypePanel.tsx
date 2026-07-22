@@ -290,7 +290,6 @@ export function ProjectHomesPrototypePanel({
   }
 
   function continueFromWhy() {
-    if (!purpose.trim()) return;
     setView("create-pieces");
   }
 
@@ -696,7 +695,15 @@ export function ProjectHomesPrototypePanel({
                 : "Say it in your own words. You can shape the details next."}
             </p>
             <div className="project-homes-field mt-4">
-              <label htmlFor="project-home-intention">{intentionPrompt}</label>
+              <label htmlFor="project-home-intention">
+                {intentionPrompt}{" "}
+                <span
+                  className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]"
+                  data-testid="project-homes-intention-required"
+                >
+                  Required
+                </span>
+              </label>
               <textarea
                 id="project-home-intention"
                 rows={4}
@@ -769,7 +776,15 @@ export function ProjectHomesPrototypePanel({
                 : "One clear sentence is enough. You do not need a full plan yet."}
             </p>
             <div className="project-homes-field mt-4">
-              <label htmlFor="project-home-purpose">{purposePrompt}</label>
+              <label htmlFor="project-home-purpose">
+                {purposePrompt}{" "}
+                <span
+                  className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]"
+                  data-testid="project-homes-purpose-optional"
+                >
+                  Optional
+                </span>
+              </label>
               <textarea
                 id="project-home-purpose"
                 rows={4}
@@ -777,8 +792,8 @@ export function ProjectHomesPrototypePanel({
                 onChange={(e) => setPurpose(e.target.value)}
                 placeholder={
                   createFlavor === "event"
-                    ? "What success looks like for this gathering…"
-                    : "What success looks like for this project…"
+                    ? "Optional — what success looks like for this gathering…"
+                    : "Optional — what success looks like for this project…"
                 }
                 data-testid="project-home-purpose-input"
                 autoFocus
@@ -788,8 +803,8 @@ export function ProjectHomesPrototypePanel({
               <button
                 type="button"
                 className="project-homes-btn project-homes-btn--primary"
-                disabled={!purpose.trim()}
                 onClick={continueFromWhy}
+                data-testid="project-homes-continue-purpose"
               >
                 Continue
               </button>
@@ -816,6 +831,12 @@ export function ProjectHomesPrototypePanel({
                 : "New Project · Step 3"}
             </p>
             <h1 className="project-homes-title">{piecesPrompt}</h1>
+            <p
+              className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]"
+              data-testid="project-homes-pieces-optional"
+            >
+              Optional
+            </p>
             <p className="project-homes-lead">
               {createFlavor === "event"
                 ? "Date, place, guests, program — one piece at a time is enough."

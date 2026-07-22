@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   getProjectItems,
   getProjects,
+  saveProject,
 } from "@/lib/companionStore";
 import {
   SAMPLE_PROJECT_HOMES,
@@ -15,9 +16,14 @@ import {
   addSectionToHome,
   addTaskToHome,
   archiveProjectHome,
+  createPersistedProjectHome,
   deleteProjectHome,
   duplicateProjectHome,
   isSampleProjectHome,
+  loadMemberProjectHomesFromStore,
+  mapProjectToHomeRecord,
+  mergeMemberHomesWithStore,
+  prototypeOpenQuestions,
   renameProjectHome,
   visibleGalleryHomes,
   type ProjectHomeRecord,
@@ -62,14 +68,89 @@ describe("projectHomes usability", () => {
     }
   });
 
+  it("hydrates member Project Homes from companion-projects-v1 only", () => {
+    expect(PROJECTS_KEY).toBe("companion-projects-v1");
+    saveProject({
+      name: "Stored Workshop",
+      goal: "Fill the room",
+      nextAction: "Write the outline",
+      horizon: "now",
+      status: "in-progress",
+    });
+    const homes = loadMemberProjectHomesFromStore();
+    expect(homes).toHaveLength(1);
+    expect(homes[0]?.name).toBe("Stored Workshop");
+    expect(homes[0]?.purpose).toBe("Fill the room");
+    expect(homes[0]?.companionProjectId).toBe(homes[0]?.id);
+    expect(homes[0]?.isSample).toBe(false);
+    expect(homes.every((h) => !isSampleProjectHome(h))).toBe(true);
+    expect(localStorage.getItem(PROJECTS_KEY)).toBeTruthy();
+  });
+
+  it("maps store projects with defaults and never duplicates by companion id", () => {
+    const list = saveProject({
+      name: "Brand Refresh",
+      goal: "Warm palette",
+    });
+    const project = list[0]!;
+    const mapped = mapProjectToHomeRecord(project, {
+      projectHomeId: "art-studio",
+    });
+    expect(mapped.projectHomeId).toBe("art-studio");
+    expect(mapped.companionProjectId).toBe(project.id);
+
+    const local = {
+      ...mapped,
+      id: "ph-local-temp",
+      companionProjectId: project.id,
+      projectHomeId: "art-studio" as const,
+      archived: false,
+    };
+    const merged = mergeMemberHomesWithStore(
+      [local],
+      loadMemberProjectHomesFromStore(),
+    );
+    expect(merged).toHaveLength(1);
+    expect(merged[0]?.companionProjectId).toBe(project.id);
+    expect(merged[0]?.projectHomeId).toBe("art-studio");
+  });
+
+  it("persists created Project Homes into companion-projects-v1", () => {
+    const home = createPersistedProjectHome({
+      name: "Quiet Chapter",
+      purpose: "Finish chapter one",
+      projectHomeId: "writing-room",
+    });
+    expect(home.companionProjectId).toBeTruthy();
+    expect(getProjects().some((p) => p.id === home.companionProjectId)).toBe(
+      true,
+    );
+    expect(loadMemberProjectHomesFromStore().map((h) => h.name)).toContain(
+      "Quiet Chapter",
+    );
+    expect(localStorage.getItem(PROJECTS_KEY)).toContain("Quiet Chapter");
+  });
+
+  it("keeps samples separate from store-backed member homes", () => {
+    saveProject({ name: "Real Member Work", goal: "Ship" });
+    const members = loadMemberProjectHomesFromStore();
+    expect(members.some((h) => h.name === "Real Member Work")).toBe(true);
+    for (const sample of SAMPLE_PROJECT_HOMES) {
+      expect(members.some((h) => h.id === sample.id)).toBe(false);
+    }
+  });
+
   it("renames, duplicates, archives, and hides archived from gallery", () => {
     const homes = [memberHome()];
-    const renamed = renameProjectHome(homes, "ph-member-1", "Renamed Home");
+    const renamed = renameProjectHome(homes, "ph-member-1", "Renamed Home", {
+      syncCompanionStore: false,
+    });
     expect(renamed[0]?.name).toBe("Renamed Home");
 
     const { homes: withCopy, duplicate } = duplicateProjectHome(
       renamed,
       "ph-member-1",
+      { syncCompanionStore: false },
     );
     expect(duplicate?.id).not.toBe("ph-member-1");
     expect(duplicate?.isSample).toBe(false);
@@ -116,11 +197,11 @@ describe("projectHomes usability", () => {
 
     const task = addTaskToHome(home, "Draft intro");
     home = task.home;
-    expect(
-      getProjectItems(home.companionProjectId).some(
-        (i) => i.kind === "task" && i.title === "Draft intro",
-      ),
-    ).toBe(true);
+    const inboxTask = getProjectItems(home.companionProjectId!).find(
+      (i) => i.kind === "task" && i.title === "Draft intro",
+    );
+    expect(inboxTask).toBeTruthy();
+    expect(inboxTask?.parentId).toBeFalsy();
 
     home = addNoteToHome(home, "Keep the tone gentle");
     const stored = getProjects().find((p) => p.id === home.companionProjectId);
@@ -160,5 +241,39 @@ describe("projectHomes usability", () => {
     expect(source).not.toContain("onPlacePress");
     expect(source).not.toContain("onClick");
     expect(source).toContain('aria-disabled="true"');
+  });
+
+  it("keeps Open Questions helper available without requiring it on the home", () => {
+    const sample = SAMPLE_PROJECT_HOMES[0]!;
+    const questions = prototypeOpenQuestions(sample);
+    expect(questions.length).toBeGreaterThan(0);
+    expect(questions[0]).toContain(sample.currentFocus);
+
+    const detailPath = join(
+      process.cwd(),
+      "components/companion/projectHomes/ProjectHomeDetail.tsx",
+    );
+    const detail = readFileSync(detailPath, "utf8");
+    expect(detail).toContain("Your Next Step");
+    expect(detail).toContain("Current Focus");
+    expect(detail).toContain('id="plan"');
+    expect(detail).toContain('id="tools"');
+    expect(detail).toContain('id="progress"');
+    expect(detail).toContain('id="connections"');
+    expect(detail).not.toContain("Open Questions");
+    expect(detail).not.toContain("Next Suggested Step");
+    expect(detail).not.toContain("prototypeOpenQuestions");
+    expect(detail).not.toMatch(/saved-work|\/create\b/);
+  });
+
+  it("styles estate drawers for progressive disclosure", () => {
+    const cssPath = join(
+      process.cwd(),
+      "app/companion/project-homes.css",
+    );
+    const css = readFileSync(cssPath, "utf8");
+    expect(css).toContain(".project-homes-drawer");
+    expect(css).toContain(".project-homes-drawer__toggle");
+    expect(css).toContain(".project-homes-tool-item--preparing");
   });
 });
