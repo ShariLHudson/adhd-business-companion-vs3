@@ -96,6 +96,8 @@ export type VisualFocusMapSnapshot = Pick<
   | "businessCanvasWorkflow"
   | "businessCanvasChange"
   | "businessCanvasImpactAnalysis"
+  | "detailLevel"
+  | "research"
 >;
 
 export type VisualFocusMapVersion = {
@@ -165,6 +167,13 @@ export type VisualFocusMap = {
   draftExplanation?: string;
   /** Near-duplicate ideas Spark merged or flagged. */
   draftDuplicates?: string[];
+  /**
+   * Research-assisted building (universal cartography intelligence).
+   * Present only when Spark researched/built the map; optional and additive so
+   * existing maps are unaffected. Detail level can change in place.
+   */
+  detailLevel?: import("./researchAssisted/types").MapDetailLevel;
+  research?: import("./researchAssisted/types").ResearchAssistedMapMeta;
   businessCanvas?: BusinessCanvasData;
   kanban?: {
     columns: VisualKanbanColumn[];

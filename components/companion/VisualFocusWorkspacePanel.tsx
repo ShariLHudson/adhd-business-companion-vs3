@@ -5,12 +5,16 @@ import { VisualFocusPurposeAnchor } from "@/components/companion/VisualFocusPurp
 import { CartographersStudioRoom } from "@/components/companion/cartographersStudio/CartographersStudioRoom";
 import { MapEntryPanel } from "@/components/companion/cartographersStudio/MapEntryPanel";
 import { MapGuidedBuilder } from "@/components/companion/cartographersStudio/MapGuidedBuilder";
+import { MapResearchEntry } from "@/components/companion/cartographersStudio/MapResearchEntry";
 import { MyMapsPanel } from "@/components/companion/cartographersStudio/MyMapsPanel";
 import { MindMapDiscoveryInterview } from "@/components/companion/cartographersStudio/MindMapDiscoveryInterview";
 import { MindMapEditableCanvas } from "@/components/companion/cartographersStudio/MindMapEditableCanvas";
 import { VisualFocusVisualCanvas } from "@/components/companion/visualFocus/VisualFocusVisualCanvas";
-import { VisualFocusIntelligencePanel } from "@/components/companion/visualFocus/VisualFocusIntelligencePanel";
-import { IntelligenceViewModeToggle } from "@/components/companion/visualFocus/IntelligenceViewModeToggle";
+import {
+  CompanionInsightsReveal,
+  type CompanionInsightsPhase,
+} from "@/components/companion/visualFocus/CompanionInsightsReveal";
+import { DecisionSummarySheet } from "@/components/companion/visualFocus/DecisionSummarySheet";
 import { BusinessCanvasHealthOverviewPanel } from "@/components/companion/visualFocus/BusinessCanvasHealthOverviewPanel";
 import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
 import { BusinessCanvasInteractiveCanvas } from "@/components/companion/visualFocus/BusinessCanvasInteractiveCanvas";
@@ -36,6 +40,10 @@ import {
 } from "@/lib/cartographersStudio";
 import { CartographersContextualHelp } from "@/components/companion/cartographersStudio/CartographersContextualHelp";
 import { buildDraftFromGuidedAnswers } from "@/lib/visualFocus/guidedBuilder";
+import {
+  buildResearchAssistedDraft,
+  type MapDetailLevel,
+} from "@/lib/visualFocus/researchAssisted";
 import { printVisualFocusMap } from "@/lib/visualFocus/printMap";
 import {
   applyCanonicalRootChange,
@@ -49,6 +57,7 @@ import {
   VISUAL_FOCUS_SHOW_STUDIO,
   VISUAL_FOCUS_OPEN_REQUESTED,
   VISUAL_FOCUS_MIND_MAP_DISCOVERY_REQUESTED,
+  canBuildDecisionSummary,
   canGenerateVisualFocusMap,
   clearActiveVisualFocusMapSelection,
   consumeVisualFocusOpen,
@@ -104,6 +113,16 @@ function updateNodeTree(
     ...root,
     children: root.children.map((c) => updateNodeTree(c, nodeId, updater)),
   };
+}
+
+/** Total nodes in a tree, including the root. */
+function countTreeNodes(root: VisualFocusNode): number {
+  return 1 + root.children.reduce((sum, c) => sum + countTreeNodes(c), 0);
+}
+
+/** Top-level branch labels — the "few items" shown in the collapsed summary. */
+function topLevelBranchLabels(root: VisualFocusNode): string[] {
+  return root.children.map((c) => c.label.trim()).filter(Boolean);
 }
 
 function VisualFocusTreeEditor({
@@ -332,12 +351,13 @@ export function VisualFocusWorkspacePanel({
   const [guidedInitialAnswers, setGuidedInitialAnswers] = useState<
     Record<string, string> | undefined
   >(undefined);
+  const [researchMapId, setResearchMapId] =
+    useState<CartographersFramedMapId | null>(null);
   const [myMapsOpen, setMyMapsOpen] = useState(false);
   const [mapUpdatedAck, setMapUpdatedAck] = useState<string | null>(null);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const [showDraftReview, setShowDraftReview] = useState(false);
   const [atlasSaveAck, setAtlasSaveAck] = useState<string | null>(null);
-  const [showBuildPanel, setShowBuildPanel] = useState(true);
   const [mindHistory, setMindHistory] = useState<MindMapHistoryState | null>(
     null,
   );
@@ -349,6 +369,30 @@ export function VisualFocusWorkspacePanel({
   const [contextualHelpOpen, setContextualHelpOpen] = useState(false);
   const [canvasSyncStatus, setCanvasSyncStatus] =
     useState<CanvasSyncStatus>("synced");
+  // Progressive disclosure — intelligence is earned, revealed one at a time.
+  const [insightsPhase, setInsightsPhase] =
+    useState<CompanionInsightsPhase>("invite");
+  const [insightRevealCount, setInsightRevealCount] = useState(1);
+  const [analyzeMenuOpen, setAnalyzeMenuOpen] = useState(false);
+  const [structureExpanded, setStructureExpanded] = useState(false);
+  const [decisionSummaryOpen, setDecisionSummaryOpen] = useState(false);
+
+  // Reset the calm disclosure state each time a different map is opened, so
+  // no map ever arrives with the intelligence panel already screaming.
+  useEffect(() => {
+    setInsightsPhase("invite");
+    setInsightRevealCount(1);
+    setAnalyzeMenuOpen(false);
+    setStructureExpanded(false);
+    setDecisionSummaryOpen(false);
+    setIntelligenceViewMode("canvas-intelligence");
+  }, [active?.id]);
+
+  const revealInsights = useCallback(() => {
+    setInsightsPhase("sequential");
+    setInsightRevealCount(1);
+    setAnalyzeMenuOpen(false);
+  }, []);
 
   const showStudioHub = useCallback(() => {
     clearActiveVisualFocusMapSelection();
@@ -360,6 +404,7 @@ export function VisualFocusWorkspacePanel({
     setEntryMapId(null);
     setGuidedMapId(null);
     setGuidedInitialAnswers(undefined);
+    setResearchMapId(null);
     setMyMapsOpen(false);
     setMoreMenuOpen(false);
     setShowDraftReview(false);
@@ -374,6 +419,7 @@ export function VisualFocusWorkspacePanel({
     setPendingCreateMode(null);
     setEntryMapId(null);
     setGuidedMapId(null);
+    setResearchMapId(null);
     setMindMapDiscoverySeed(seedText?.trim() || undefined);
     setMindMapDiscoveryOpen(true);
   }, []);
@@ -509,6 +555,7 @@ export function VisualFocusWorkspacePanel({
 
   function handleSelectWallMap(id: CartographersFramedMapId) {
     setGuidedMapId(null);
+    setResearchMapId(null);
     setMindMapDiscoveryOpen(false);
     setEntryMapId(id);
   }
@@ -516,12 +563,60 @@ export function VisualFocusWorkspacePanel({
   function beginSelectedMap(id: CartographersFramedMapId) {
     const def = getCartographyMapDefinition(id);
     setEntryMapId(null);
+    setResearchMapId(null);
     if (def.builderType === "mind-map-discovery") {
       openMindMapDiscovery();
       return;
     }
     setGuidedInitialAnswers(undefined);
     setGuidedMapId(id);
+  }
+
+  /** Open the research-assisted entry — Spark researches and builds a draft. */
+  function openResearchEntry(id: CartographersFramedMapId) {
+    setEntryMapId(null);
+    setGuidedMapId(null);
+    setMindMapDiscoveryOpen(false);
+    setResearchMapId(id);
+  }
+
+  /** Build a first useful map from research at the chosen detail level. */
+  function handleResearchComplete(
+    wallId: CartographersFramedMapId,
+    topic: string,
+    detailLevel: MapDetailLevel,
+  ) {
+    const def = getCartographyMapDefinition(wallId);
+    const draft = buildResearchAssistedDraft({
+      mapType: def.visualFocusMode,
+      topic,
+      detailLevel,
+    });
+    const map = createAndActivateMap(def.visualFocusMode, draft.title);
+    const seeded: VisualFocusMap = {
+      ...map,
+      title: draft.title,
+      root: draft.root,
+      summary: draft.summaryHint,
+      detailLevel,
+      research: draft.research,
+      lifecycleStatus: "draft",
+    };
+    const withLayout = generateVisualFocusMap(seeded);
+    const saved = persist(withLayout);
+    setActive(saved);
+    setMaps(listVisualFocusMaps());
+    setView("workspace");
+    setWorkspaceMode(def.visualFocusMode === "mind-map" ? "build" : "generated");
+    setMindHistory(
+      def.visualFocusMode === "mind-map"
+        ? createMindMapHistory(saved.root)
+        : null,
+    );
+    setResearchMapId(null);
+    setShowDraftReview(false);
+    setMapUpdatedAck("I built a first version we can refine together.");
+    window.setTimeout(() => setMapUpdatedAck(null), 3600);
   }
 
   function handleGuidedComplete(
@@ -648,6 +743,21 @@ export function VisualFocusWorkspacePanel({
       setCanvasSyncStatus("map-updated");
       window.setTimeout(() => setCanvasSyncStatus("synced"), 2400);
     }
+  }
+
+  function handleAddAnotherBranch() {
+    if (!active) return;
+    const root = active.root;
+    const next: VisualFocusNode = {
+      ...root,
+      collapsed: false,
+      children: [
+        ...root.children,
+        { id: newId("n"), label: "New branch", children: [] },
+      ],
+    };
+    persistOutlineRoot(next);
+    setStructureExpanded(true);
   }
 
   function persistBusinessCanvas(
@@ -798,6 +908,7 @@ export function VisualFocusWorkspacePanel({
               existingMaps={maps}
               onClose={() => setEntryMapId(null)}
               onBegin={() => beginSelectedMap(entryMapId)}
+              onResearchBuild={() => openResearchEntry(entryMapId)}
               onContinue={(mapId) => {
                 setEntryMapId(null);
                 handleOpenMap(mapId);
@@ -819,6 +930,18 @@ export function VisualFocusWorkspacePanel({
               }}
               onComplete={(answers) =>
                 handleGuidedComplete(guidedMapId, answers)
+              }
+            />
+          ) : null}
+          {researchMapId ? (
+            <MapResearchEntry
+              key={`research-${researchMapId}`}
+              definition={getCartographyMapDefinition(researchMapId)}
+              onCancel={() => setResearchMapId(null)}
+              onBuildFromKnown={() => beginSelectedMap(researchMapId)}
+              onThinkItThrough={() => beginSelectedMap(researchMapId)}
+              onResearch={(topic, detailLevel) =>
+                handleResearchComplete(researchMapId, topic, detailLevel)
               }
             />
           ) : null}
@@ -956,6 +1079,13 @@ export function VisualFocusWorkspacePanel({
             />
           ) : null}
 
+          {decisionSummaryOpen ? (
+            <DecisionSummarySheet
+              map={active}
+              onClose={() => setDecisionSummaryOpen(false)}
+            />
+          ) : null}
+
           <div className="cartographers-discovery-table__focus">
             {active.mode === "mind-map" &&
             active.discoveryInterview &&
@@ -1059,22 +1189,104 @@ export function VisualFocusWorkspacePanel({
                         {canvasSyncStatusLabel(canvasSyncStatus)}
                       </p>
                     ) : null}
+                    {/* Canvas — just the map, no intelligence */}
                     <button
                       type="button"
-                      className="rounded-lg border border-[#1e4f4f] bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#163b3b]"
-                      data-testid="cartographers-edit-map"
-                      onClick={handleEditActiveMap}
+                      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold ${
+                        intelligenceViewMode === "canvas-only"
+                          ? "border-[#1e4f4f] bg-[#1e4f4f] text-white"
+                          : "border-[#c9bfb0] bg-white text-[#1e4f4f] hover:bg-[#faf7f2]"
+                      }`}
+                      data-testid="cartographers-view-canvas"
+                      aria-pressed={intelligenceViewMode === "canvas-only"}
+                      onClick={() => {
+                        setIntelligenceViewMode("canvas-only");
+                        setAnalyzeMenuOpen(false);
+                        setMoreMenuOpen(false);
+                      }}
                     >
-                      Edit Map
+                      Canvas
                     </button>
-                    <button
-                      type="button"
-                      className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
-                      data-testid="cartographers-print-map"
-                      onClick={handlePrintActiveMap}
-                    >
-                      Print
-                    </button>
+                    {/* Analyze — earned intelligence, offers the three layouts */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
+                        data-testid="cartographers-analyze"
+                        aria-expanded={analyzeMenuOpen}
+                        aria-haspopup="menu"
+                        onClick={() => {
+                          setMoreMenuOpen(false);
+                          setAnalyzeMenuOpen((o) => !o);
+                        }}
+                      >
+                        Analyze
+                      </button>
+                      {analyzeMenuOpen ? (
+                        <ul
+                          className="cartographers-my-maps__menu"
+                          role="menu"
+                          data-testid="cartographers-analyze-menu"
+                          style={{ right: 0, left: "auto" }}
+                        >
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              data-testid="cartographers-analyze-canvas-intelligence"
+                              onClick={() => {
+                                setIntelligenceViewMode("canvas-intelligence");
+                                revealInsights();
+                              }}
+                            >
+                              Canvas + Intelligence
+                            </button>
+                          </li>
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              data-testid="cartographers-analyze-canvas-only"
+                              onClick={() => {
+                                setIntelligenceViewMode("canvas-only");
+                                setAnalyzeMenuOpen(false);
+                              }}
+                            >
+                              Canvas Only
+                            </button>
+                          </li>
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              data-testid="cartographers-analyze-intelligence-only"
+                              onClick={() => {
+                                setIntelligenceViewMode("intelligence-only");
+                                revealInsights();
+                              }}
+                            >
+                              Intelligence Only
+                            </button>
+                          </li>
+                        </ul>
+                      ) : null}
+                    </div>
+                    {/* Decision Summary — permission-gated one-page synthesis */}
+                    {canBuildDecisionSummary(active) ? (
+                      <button
+                        type="button"
+                        className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
+                        data-testid="cartographers-decision-summary"
+                        onClick={() => {
+                          setMoreMenuOpen(false);
+                          setAnalyzeMenuOpen(false);
+                          setDecisionSummaryOpen(true);
+                        }}
+                      >
+                        Decision Summary
+                      </button>
+                    ) : null}
+                    {/* More — quieter map management */}
                     <div className="relative">
                       <button
                         type="button"
@@ -1082,7 +1294,10 @@ export function VisualFocusWorkspacePanel({
                         data-testid="cartographers-map-more"
                         aria-expanded={moreMenuOpen}
                         aria-haspopup="menu"
-                        onClick={() => setMoreMenuOpen((o) => !o)}
+                        onClick={() => {
+                          setAnalyzeMenuOpen(false);
+                          setMoreMenuOpen((o) => !o);
+                        }}
                       >
                         More
                       </button>
@@ -1092,6 +1307,15 @@ export function VisualFocusWorkspacePanel({
                           role="menu"
                           style={{ right: 0, left: "auto" }}
                         >
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
+                              onClick={handleEditActiveMap}
+                            >
+                              Edit Map
+                            </button>
+                          </li>
                           <li role="none">
                             <button
                               type="button"
@@ -1123,6 +1347,23 @@ export function VisualFocusWorkspacePanel({
                             <button
                               type="button"
                               role="menuitem"
+                              onClick={() => {
+                                setMoreMenuOpen(false);
+                                handleRefreshCanvas();
+                                setMapUpdatedAck("Your map has been updated.");
+                                window.setTimeout(
+                                  () => setMapUpdatedAck(null),
+                                  3200,
+                                );
+                              }}
+                            >
+                              {CARTOGRAPHERS_UPDATE_MAP}
+                            </button>
+                          </li>
+                          <li role="none">
+                            <button
+                              type="button"
+                              role="menuitem"
                               className="cartographers-my-maps__danger"
                               onClick={() => {
                                 setMoreMenuOpen(false);
@@ -1135,22 +1376,6 @@ export function VisualFocusWorkspacePanel({
                         </ul>
                       ) : null}
                     </div>
-                    <button
-                      type="button"
-                      className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
-                      data-testid="cartographers-update-map"
-                      onClick={() => {
-                        handleRefreshCanvas();
-                        setMapUpdatedAck("Your map has been updated.");
-                        window.setTimeout(() => setMapUpdatedAck(null), 3200);
-                      }}
-                    >
-                      {CARTOGRAPHERS_UPDATE_MAP}
-                    </button>
-                    <IntelligenceViewModeToggle
-                      mode={intelligenceViewMode}
-                      onChange={setIntelligenceViewMode}
-                    />
                   </div>
                 </div>
                 {mapUpdatedAck ? (
@@ -1171,61 +1396,89 @@ export function VisualFocusWorkspacePanel({
                   <BusinessCanvasHealthOverviewPanel health={active.businessCanvasHealth} />
                 ) : null}
                 {intelligenceViewMode !== "intelligence-only" &&
-                showBuildPanel &&
                 active.mode !== "business-canvas" ? (
-                  <aside className="w-full shrink-0 overflow-y-auto lg:w-64 xl:w-72">
+                  <aside
+                    className="w-full shrink-0 overflow-y-auto lg:w-64 xl:w-72"
+                    data-testid="visual-focus-structure"
+                  >
                     <div className="mb-2 flex items-center justify-between">
                       <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-                        Input structure
+                        {active.mode === "visual-kanban" && active.kanban
+                          ? `Cards (${Object.keys(active.kanban.cards).length})`
+                          : `Nodes (${countTreeNodes(active.root)})`}
                       </p>
                       <button
                         type="button"
-                        className="text-xs text-[#9a8f82] lg:hidden"
-                        onClick={() => setShowBuildPanel(false)}
+                        className="text-xs font-semibold text-[#1e4f4f] hover:underline"
+                        data-testid="visual-focus-structure-edit"
+                        aria-expanded={structureExpanded}
+                        onClick={() => setStructureExpanded((e) => !e)}
                       >
-                        Hide
+                        {structureExpanded ? "Done" : "Edit"}
                       </button>
                     </div>
-                    {active.mode === "visual-kanban" && active.kanban ? (
-                      <VisualFocusKanbanEditor
-                        columns={active.kanban.columns}
-                        cards={active.kanban.cards}
-                        onChange={(columns, cards) => {
-                          const updated = { ...active, kanban: { columns, cards } };
-                          if (mapHasPublishedCanvas(active) || workspaceMode === "generated") {
-                            setCanvasSyncStatus("updating");
-                            persist(
-                              generateVisualFocusMap({
-                                ...updated,
-                                workflowStage: "build",
-                              }),
-                            );
-                            setWorkspaceMode("generated");
-                            setCanvasSyncStatus("map-updated");
-                            window.setTimeout(
-                              () => setCanvasSyncStatus("synced"),
-                              2400,
-                            );
-                          } else {
-                            persist(updated);
-                          }
-                        }}
-                      />
+                    {structureExpanded ? (
+                      active.mode === "visual-kanban" && active.kanban ? (
+                        <VisualFocusKanbanEditor
+                          columns={active.kanban.columns}
+                          cards={active.kanban.cards}
+                          onChange={(columns, cards) => {
+                            const updated = { ...active, kanban: { columns, cards } };
+                            if (mapHasPublishedCanvas(active) || workspaceMode === "generated") {
+                              setCanvasSyncStatus("updating");
+                              persist(
+                                generateVisualFocusMap({
+                                  ...updated,
+                                  workflowStage: "build",
+                                }),
+                              );
+                              setWorkspaceMode("generated");
+                              setCanvasSyncStatus("map-updated");
+                              window.setTimeout(
+                                () => setCanvasSyncStatus("synced"),
+                                2400,
+                              );
+                            } else {
+                              persist(updated);
+                            }
+                          }}
+                        />
+                      ) : (
+                        <VisualFocusTreeEditor
+                          root={active.root}
+                          onChange={(root) => persistOutlineRoot(root)}
+                        />
+                      )
                     ) : (
-                      <VisualFocusTreeEditor
-                        root={active.root}
-                        onChange={(root) => persistOutlineRoot(root)}
-                      />
+                      <div data-testid="visual-focus-structure-summary">
+                        <ul className="flex flex-col gap-1">
+                          {(active.mode === "visual-kanban" && active.kanban
+                            ? Object.values(active.kanban.cards).map((c) => c.label)
+                            : topLevelBranchLabels(active.root)
+                          )
+                            .slice(0, 4)
+                            .map((label, index) => (
+                              <li
+                                key={`${label}-${index}`}
+                                className="truncate rounded-lg border border-[#e7dfd4] bg-white px-3 py-1.5 text-sm font-medium text-[#2f261f]"
+                              >
+                                {label?.trim() || "Untitled branch"}
+                              </li>
+                            ))}
+                        </ul>
+                        {active.mode !== "visual-kanban" ? (
+                          <button
+                            type="button"
+                            className="mt-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+                            data-testid="visual-focus-add-another"
+                            onClick={handleAddAnotherBranch}
+                          >
+                            + Add Another
+                          </button>
+                        ) : null}
+                      </div>
                     )}
                   </aside>
-                ) : showBuildPanel && active.mode !== "business-canvas" ? (
-                  <button
-                    type="button"
-                    className="self-start text-xs font-semibold text-[#1e4f4f] lg:hidden"
-                    onClick={() => setShowBuildPanel(true)}
-                  >
-                    Show input structure
-                  </button>
                 ) : null}
                 {intelligenceViewMode !== "intelligence-only" ? (
                 <main className="min-h-0 flex-1 space-y-4">
@@ -1257,8 +1510,23 @@ export function VisualFocusWorkspacePanel({
                 </main>
                 ) : null}
                 {intelligenceViewMode !== "canvas-only" ? (
-                <VisualFocusIntelligencePanel
+                <CompanionInsightsReveal
                   analysis={intelligenceAnalysis(active)}
+                  phase={insightsPhase}
+                  revealCount={insightRevealCount}
+                  onYes={() => {
+                    setInsightsPhase("sequential");
+                    setInsightRevealCount(1);
+                  }}
+                  onNotYet={() => setInsightsPhase("teaser")}
+                  onShowInsights={() => {
+                    setInsightsPhase("sequential");
+                    setInsightRevealCount(1);
+                  }}
+                  onRevealNext={() =>
+                    setInsightRevealCount((c) => c + 1)
+                  }
+                  onShowAll={() => setInsightsPhase("all")}
                   onSectionHighlight={
                     active.mode === "business-canvas"
                       ? handleIntelligenceSectionHighlight

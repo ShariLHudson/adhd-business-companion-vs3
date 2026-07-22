@@ -18,3 +18,5 @@ export * from "./mindMapHistory";
 export * from "./canvasSync";
 export * from "./printMap";
 export * from "./guidedBuilder";
+export * from "./decisionSummary";
+export * from "./researchAssisted";

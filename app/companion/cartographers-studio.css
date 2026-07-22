@@ -1419,6 +1419,28 @@
   padding: 0.7rem 1.25rem;
 }
 .cartographers-map-entry__primary:disabled { opacity: 0.45; }
+/* Research-assisted entry — detail-level choices stack full width. */
+.cartographers-guided__actions--stack {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+.cartographers-research-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-align: left;
+  padding: 0.75rem 1.05rem;
+}
+.cartographers-research-mode__label {
+  font-size: 1rem;
+  font-weight: 700;
+}
+.cartographers-research-mode__hint {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.85;
+}
 .cartographers-map-entry__secondary {
   border-radius: 999px;
   border: 1px solid #c9bfb0;
@@ -1623,4 +1645,62 @@
   .cartographers-guided__actions {
     display: none !important;
   }
+}
+
+/* ---- Map feel (Prompt: progressive-disclosure redesign, goal 8) ---- */
+/* Slightly larger, softer nodes with a subtle appear animation and a
+   gentle active/hover highlight. Motion respects prefers-reduced-motion. */
+.cartographers-map-node {
+  animation: cartographers-node-appear 0.34s ease-out both;
+  transition: box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.cartographers-map-node:hover,
+.cartographers-map-node:focus-visible,
+.cartographers-map-node:focus-within {
+  box-shadow: 0 8px 22px rgba(30, 79, 79, 0.16);
+}
+@keyframes cartographers-node-appear {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 8px)) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cartographers-map-node {
+    animation: none;
+  }
+}
+
+/* ---- Decision Summary (goal 10) — calm one-page synthesis ---- */
+.cartographers-decision-summary {
+  max-width: 34rem;
+  text-align: left;
+}
+.cartographers-decision-summary__list {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.cartographers-decision-summary__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+.cartographers-decision-summary__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b635a;
+}
+.cartographers-decision-summary__value {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: #2f261f;
 }

@@ -7,6 +7,7 @@ export function MapEntryPanel({
   definition,
   existingMaps,
   onBegin,
+  onResearchBuild,
   onContinue,
   onViewMyMaps,
   onClose,
@@ -14,6 +15,8 @@ export function MapEntryPanel({
   definition: CartographyMapDefinition;
   existingMaps: VisualFocusMap[];
   onBegin: () => void;
+  /** Research-assisted building — Spark researches and builds a first version. */
+  onResearchBuild?: () => void;
   onContinue: (mapId: string) => void;
   onViewMyMaps: () => void;
   onClose: () => void;
@@ -67,6 +70,16 @@ export function MapEntryPanel({
           >
             Begin My Map
           </button>
+          {onResearchBuild ? (
+            <button
+              type="button"
+              className="cartographers-map-entry__secondary"
+              data-testid="cartography-research-build"
+              onClick={onResearchBuild}
+            >
+              I’m not sure — research &amp; build it with me
+            </button>
+          ) : null}
           {latestDraft ? (
             <button
               type="button"

@@ -24,8 +24,9 @@ function VisualEdge({
         x2={`${x2}%`}
         y2={`${y2}%`}
         stroke="#1e4f4f"
-        strokeWidth="2"
-        strokeOpacity="0.35"
+        strokeWidth="1.75"
+        strokeOpacity="0.22"
+        strokeLinecap="round"
         markerEnd="url(#vf-arrow)"
       />
       {label ? (
@@ -76,7 +77,7 @@ export function VisualFocusVisualCanvas({
             refY="4"
             orient="auto"
           >
-            <path d="M0,0 L8,4 L0,8 Z" fill="#1e4f4f" fillOpacity="0.45" />
+            <path d="M0,0 L8,4 L0,8 Z" fill="#1e4f4f" fillOpacity="0.35" />
           </marker>
         </defs>
         {layout.edges.map((edge) => {
@@ -98,7 +99,8 @@ export function VisualFocusVisualCanvas({
         {layout.nodes.map((node) => (
           <div
             key={node.id}
-            className="absolute max-w-[220px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 bg-white px-4 py-3 shadow-sm"
+            tabIndex={0}
+            className="cartographers-map-node absolute max-w-[240px] -translate-x-1/2 -translate-y-1/2 rounded-2xl border-2 bg-white px-5 py-3.5 shadow-sm outline-none"
             style={{
               left: `${node.x}%`,
               top: `${node.y}%`,
@@ -106,7 +108,7 @@ export function VisualFocusVisualCanvas({
             }}
             data-testid={`visual-focus-node-${node.id}`}
           >
-            <p className="text-sm font-semibold leading-snug text-[#1f1c19]">
+            <p className="text-[15px] font-semibold leading-snug text-[#1f1c19]">
               {node.label}
             </p>
           </div>
