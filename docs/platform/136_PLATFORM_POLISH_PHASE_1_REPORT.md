@@ -5,6 +5,7 @@
 **Binds:** Spec **128** · Spec **132**  
 **Create architecture:** untouched (127–135 remain authority)  
 **Certification verdict:** **Provisional** — high-traffic polish shipped; full-platform 12/10 **not** claimed  
+**Commit:** `37333e362fe6d366d9d41856584f6f9a1aaa638f` · pushed to `deploy/companion-app-v3`  
 
 ---
 
