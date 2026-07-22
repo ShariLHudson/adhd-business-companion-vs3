@@ -16,24 +16,26 @@ import {
   welcomeHomeNavMaxDepth,
 } from "./welcomeHomeNavigationStructure";
 
-describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
-  it("has intention categories with Estate last and max depth three", () => {
+describe("welcomeHomeNavigationStructure (Prompt 146)", () => {
+  it("has finalized intention categories with Estate last", () => {
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
       "my-work",
+      "get-advice",
       "take-a-moment",
       "audio",
-      "cartography",
-      "get-advice",
+      "chamber",
+      "board",
       "spark-estate",
     ]);
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.label)).toEqual([
       "Today",
       "Work to Create",
+      "Guidance",
       "Focus & Reflection",
       "Audio",
-      "Cartography",
-      "Guidance",
+      "Chamber",
+      "Board",
       "Estate",
     ]);
     expect(welcomeHomeNavMaxDepth()).toBe(3);
@@ -42,7 +44,7 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
     }
   });
 
-  it("keeps Today planning destinations unchanged (Plan My Day lives here)", () => {
+  it("keeps Today planning destinations (Schedule label for calendar)", () => {
     const myDay = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day");
     expect(myDay?.label).toBe("Today");
     expect(myDay?.destinations.map((d) => d.id)).toEqual([
@@ -52,7 +54,7 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
     ]);
     expect(myDay?.destinations.map((d) => d.label)).toEqual([
       "Plan My Day / Adapt My Day",
-      "Calendar",
+      "Schedule",
       "Reminders / Rhythms",
     ]);
     expect(welcomeHomeMyDayDestinationIds()).toHaveLength(3);
@@ -81,7 +83,7 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
     expect(WELCOME_HOME_WANDER_GROUNDS.label).toBe("Wander the Grounds");
   });
 
-  it("reshapes Work to Create, Focus & Reflection, Audio, and Cartography", () => {
+  it("puts Cartography under Work to Create and Strategies under Guidance", () => {
     const byId = Object.fromEntries(
       WELCOME_HOME_NAV_CATEGORIES.map((c) => [
         c.id,
@@ -89,44 +91,30 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
       ]),
     );
     expect(byId["my-work"]).toEqual([
-      "Create New Work",
+      "Create",
       "Projects",
-      "Strategies",
+      "Templates",
+      "Blueprints",
+      "Cartography",
+      "Continue Working",
       "Spin the Wheel",
-      "Destination Gallery",
     ]);
+    expect(byId["get-advice"]).toEqual(["Strategies"]);
     expect(byId["take-a-moment"]).toEqual([
       "Talk It Out",
       "Clear My Mind",
       "Parking Lot",
       "Breathe",
-      "Browse more",
+      "Journal",
+      "Evidence Vault",
+      "Hall of Accomplishments",
     ]);
-    expect(byId["audio"]).toEqual([
-      "Peaceful Moments",
-      "Soundscapes",
-      "Nature Sounds",
-      "Focus Audio",
-      "Guided Audio",
-      "Relaxation Audio",
-    ]);
-    expect(byId["cartography"]).toEqual(["Cartographer’s Studio"]);
-    expect(byId["get-advice"]).toEqual([
-      "Chamber of Momentum",
-      "Boardroom",
-    ]);
+    expect(byId["audio"]).toEqual(["Peaceful Moments", "Soundscapes"]);
+    expect(byId["chamber"]).toEqual(["Chamber of Momentum"]);
+    expect(byId["board"]).toEqual(["Boardroom"]);
 
-    const browse = welcomeHomeMyDayDropdown("reflect-more");
-    expect(browse?.dropdownChildren?.map((c) => c.id)).toEqual([
-      "journal",
-      "evidence-vault",
-      "hall-of-accomplishments",
-    ]);
-    expect(browse?.dropdownChildren?.map((c) => c.id)).not.toContain(
-      "peaceful-places",
-    );
-    expect(browse?.dropdownChildren?.map((c) => c.id)).not.toContain(
-      "spin-the-wheel",
+    expect(WELCOME_HOME_NAV_CATEGORIES.some((c) => c.id === "cartography")).toBe(
+      false,
     );
 
     const reflectFlat = welcomeHomeFlattenCategoryDestinations("take-a-moment");
@@ -135,11 +123,11 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
         reflectFlat.some((d) => d.id === id),
       ),
     ).toBe(true);
-    expect(reflectFlat.some((d) => d.id === "breathe")).toBe(true);
     expect(reflectFlat.some((d) => d.id === "peaceful-places")).toBe(false);
+    expect(reflectFlat.some((d) => d.id === "strategy-library")).toBe(false);
   });
 
-  it("aliases Audio destinations without breaking routing", () => {
+  it("aliases retired Audio destinations without listing them in the menu", () => {
     expect(resolveWelcomeHomeDestinationAlias("nature-sounds")).toBe(
       "peaceful-places",
     );
@@ -149,9 +137,17 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
     expect(resolveWelcomeHomeDestinationAlias("relaxation-audio")).toBe(
       "soundscapes",
     );
+    expect(resolveWelcomeHomeDestinationAlias("focus-audio")).toBe(
+      "peaceful-places",
+    );
     expect(WELCOME_HOME_DESTINATION_ALIASES["explore-estate"]).toBe(
       "wander-the-grounds",
     );
+    const audio = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "audio");
+    expect(audio?.destinations.map((d) => d.id)).toEqual([
+      "peaceful-places",
+      "soundscapes",
+    ]);
   });
 
   it("never includes Experience Controls in Welcome Home categories", () => {
@@ -166,11 +162,7 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
     }
   });
 
-  it("opens Peaceful Moments and Soundscapes from Audio, not Focus & Reflection", () => {
-    const audio = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "audio");
-    expect(audio?.destinations.map((d) => d.id)).toEqual(
-      expect.arrayContaining(["peaceful-places", "soundscapes", "focus-audio"]),
-    );
+  it("opens Peaceful Moments and Soundscapes from Audio only", () => {
     const source = readFileSync(
       resolve(
         process.cwd(),
@@ -180,7 +172,8 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
     );
     expect(source).toMatch(/onOpenPeacefulPlaces/);
     expect(source).toMatch(/onOpenSoundscapes/);
-    expect(source).toMatch(/onOpenFocusAudio/);
+    expect(source).toMatch(/onOpenTemplates/);
+    expect(source).toMatch(/onOpenContinueWorking/);
     expect(source).toMatch(/welcome-home-category-subtitle/);
     expect(source).not.toMatch(/data-testid="estate-room-chat-toggle"/);
   });
@@ -198,8 +191,5 @@ describe("welcomeHomeNavigationStructure (Prompt 144)", () => {
     expect(source).toMatch(/‹ Back to Welcome Home/);
     expect(source).not.toMatch(/expandedCategory/);
     expect(source).toMatch(/onOpenReminders/);
-    expect(source).toMatch(/onOpenPlanMyDay/);
-    expect(source).toMatch(/dropdownChildren/);
-    expect(source).toMatch(/openFocusedPanel\(category\.id\)/);
   });
 });

@@ -61,6 +61,10 @@ export type EstateRoomExperienceMenuProps = {
   onOpenCreateStudio?: () => void;
   onOpenDestinationGallery?: () => void;
   onOpenCartographersStudio?: () => void;
+  /** Work to Create → Templates library. */
+  onOpenTemplates?: () => void;
+  /** Work to Create → Continue Working (resume last meaningful work). */
+  onOpenContinueWorking?: () => void;
   onOpenClearMyMind?: () => void;
   onOpenParkingLot?: () => void;
   onOpenTalkItOut?: () => void;
@@ -115,6 +119,8 @@ export function EstateRoomExperienceMenu({
   onOpenSpinTheWheel,
   onOpenDestinationGallery,
   onOpenCartographersStudio,
+  onOpenTemplates,
+  onOpenContinueWorking,
   onOpenJournal,
   onOpenEvidenceVault,
   onOpenHallOfAccomplishments,
@@ -215,8 +221,10 @@ export function EstateRoomExperienceMenu({
           "reminders-rhythms": onOpenRemindersRhythms,
           create: onOpenCreateStudio,
           projects: onOpenProjects,
+          templates: onOpenTemplates,
           "destination-gallery": onOpenDestinationGallery,
           "cartographers-studio": onOpenCartographersStudio,
+          "continue-working": onOpenContinueWorking ?? onOpenProjects,
           "clear-my-mind": onOpenClearMyMind,
           "parking-lot": onOpenParkingLot,
           "talk-it-out": onOpenTalkItOut,
@@ -250,6 +258,8 @@ export function EstateRoomExperienceMenu({
       onOpenProjects,
       onOpenDestinationGallery,
       onOpenCartographersStudio,
+      onOpenTemplates,
+      onOpenContinueWorking,
       onOpenClearMyMind,
       onOpenParkingLot,
       onOpenTalkItOut,

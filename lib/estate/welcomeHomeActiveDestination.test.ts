@@ -30,7 +30,9 @@ describe("welcomeHomeActiveDestination (Prompt 144)", () => {
     expect(welcomeHomeDestinationForSection("evidence-vault")).toBe(
       "evidence-vault",
     );
-    expect(welcomeHomeDestinationForSection("focus-audio")).toBe("focus-audio");
+    expect(welcomeHomeDestinationForSection("focus-audio")).toBe(
+      "peaceful-places",
+    );
     expect(welcomeHomeDestinationForSection("peaceful-places")).toBe(
       "peaceful-places",
     );
@@ -43,7 +45,7 @@ describe("welcomeHomeActiveDestination (Prompt 144)", () => {
     expect(welcomeHomeDestinationForSection("create")).toBe("create");
   });
 
-  it("resolves intention categories after Prompt 144 reorganization", () => {
+  it("resolves intention categories after Prompt 146 finalization", () => {
     expect(welcomeHomeCategoryForDestination("journal")).toBe("take-a-moment");
     expect(welcomeHomeCategoryForDestination("evidence-vault")).toBe(
       "take-a-moment",
@@ -57,11 +59,16 @@ describe("welcomeHomeActiveDestination (Prompt 144)", () => {
     expect(welcomeHomeCategoryForDestination("breathe")).toBe("take-a-moment");
     expect(welcomeHomeCategoryForDestination("create")).toBe("my-work");
     expect(welcomeHomeCategoryForDestination("strategy-library")).toBe(
-      "my-work",
+      "get-advice",
     );
     expect(welcomeHomeCategoryForDestination("spin-the-wheel")).toBe("my-work");
     expect(welcomeHomeCategoryForDestination("cartographers-studio")).toBe(
-      "cartography",
+      "my-work",
     );
+    expect(welcomeHomeCategoryForDestination("chamber-of-momentum")).toBe(
+      "chamber",
+    );
+    expect(welcomeHomeCategoryForDestination("boardroom")).toBe("board");
+    expect(welcomeHomeCategoryForDestination("templates")).toBe("my-work");
   });
 });

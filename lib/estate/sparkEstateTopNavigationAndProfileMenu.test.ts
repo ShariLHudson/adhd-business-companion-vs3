@@ -40,12 +40,15 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS.length).toBeGreaterThanOrEqual(8);
   });
 
-  it("documents Welcome Home as five categories with Estate last", () => {
+  it("documents Welcome Home categories with Estate last (Prompt 146)", () => {
     expect(SPARK_ESTATE_ROOM_MENU_SECTIONS.map((s) => s.id)).toEqual([
       "my-day",
       "my-work",
-      "take-a-moment",
       "get-advice",
+      "take-a-moment",
+      "audio",
+      "chamber",
+      "board",
       "spark-estate",
     ]);
     expect(SPARK_ESTATE_ROOM_MENU_EXPERIENCE_ITEMS).toHaveLength(0);
@@ -56,10 +59,10 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     expect(verification.roomExperienceItems).toBe(0);
     expect(verification.roomNavigationItems).toBe(0);
     expect(verification.roomMyDayWorkItems).toBe(3);
-    expect(verification.roomMyWorkStudioItems).toBe(4);
+    expect(verification.roomMyWorkStudioItems).toBe(7);
     expect(verification.roomFocusItems).toBe(4);
     expect(verification.roomMyStoryItems).toBe(3);
-    expect(verification.roomKnowledgeItems).toBe(3);
+    expect(verification.roomKnowledgeItems).toBe(1);
     expect(verification.roomExperiencesItems).toBe(2);
     expect(verification.excludesLibraryAndCartography).toBe(true);
     expect(verification.peacefulPlacesStayInExperiences).toBe(true);
@@ -73,7 +76,7 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
       SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS.map((item) => item.label),
     ).toEqual([
       "Plan My Day / Adapt My Day",
-      "Calendar",
+      "Schedule",
       "Reminders / Rhythms",
     ]);
     expect(
@@ -81,22 +84,25 @@ describe("sparkEstateTopNavigationAndProfileMenu", () => {
     ).toEqual([
       "create",
       "projects",
+      "templates",
       "destination-gallery",
       "cartographers-studio",
+      "continue-working",
+      "spin-the-wheel",
     ]);
     expect(SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS).toEqual([]);
     expect(SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS.map((item) => item.id)).toEqual([
+      "talk-it-out",
       "clear-my-mind",
       "parking-lot",
       "breathe",
-      "spin-the-wheel",
     ]);
     expect(
       SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS.map((item) => item.id),
     ).toEqual(["journal", "evidence-vault", "hall-of-accomplishments"]);
     expect(
       SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS.map((item) => item.id),
-    ).toEqual(["chamber-of-momentum", "boardroom", "strategy-library"]);
+    ).toEqual(["strategy-library"]);
     expect(
       SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS.map((item) => item.id),
     ).toEqual(["peaceful-places", "soundscapes"]);

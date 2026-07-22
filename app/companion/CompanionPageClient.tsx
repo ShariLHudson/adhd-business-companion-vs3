@@ -25632,6 +25632,21 @@ export default function CompanionPageClient() {
         onOpenSpinTheWheel={() => openStandaloneFocusSectionCore("spin-wheel")}
         onOpenDestinationGallery={() => openDestinationGalleryCore()}
         onOpenCartographersStudio={() => openCartographersStudioCore()}
+        onOpenTemplates={() =>
+          openStandaloneFocusSectionCore("templates-library")
+        }
+        onOpenContinueWorking={() => {
+          const resolution = resolveCompanionContinue();
+          if (resolution.mode === "single") {
+            handleCompanionContinueOption(resolution.option);
+            return;
+          }
+          if (resolution.mode === "choose" && resolution.options[0]) {
+            handleCompanionContinueOption(resolution.options[0]);
+            return;
+          }
+          openStandaloneFocusSectionCore("projects");
+        }}
         onOpenEvidenceVault={() =>
           enterEvidenceVaultRoomCore({ userIntent: "room-menu:evidence-vault" })
         }

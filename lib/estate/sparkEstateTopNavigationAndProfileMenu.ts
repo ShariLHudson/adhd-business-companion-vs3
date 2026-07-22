@@ -83,14 +83,15 @@ export const SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS = [] as const;
 const REFLECT_FLAT = welcomeHomeFlattenCategoryDestinations("take-a-moment");
 
 export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = REFLECT_FLAT.filter((d) =>
-  ["clear-my-mind", "parking-lot", "breathe", "spin-the-wheel"].includes(d.id),
+  ["clear-my-mind", "parking-lot", "breathe", "talk-it-out"].includes(d.id),
 );
 
-/** Journal / Evidence / Hall — under Focus & Reflection → Browse more (139 / 144). */
+/** Journal / Evidence / Hall — under Focus & Reflection (Prompt 146). */
 export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS = REFLECT_FLAT.filter((d) =>
   (WELCOME_HOME_MY_STORY_DESTINATION_IDS as readonly string[]).includes(d.id),
 );
 
+/** Guidance = Strategies (Prompt 146). */
 export const SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "get-advice")!.destinations;
 
@@ -101,9 +102,9 @@ export const SPARK_ESTATE_ROOM_MENU_SECTIONS = [
 export const SPARK_ESTATE_ROOM_MENU_SPARK_ESTATE_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "spark-estate")!.destinations;
 
-export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = REFLECT_FLAT.filter((d) =>
-  ["peaceful-places", "soundscapes"].includes(d.id),
-);
+/** Audio menu — Peaceful Moments + Soundscapes only. */
+export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS =
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "audio")!.destinations;
 
 export const SPARK_ESTATE_PROFILE_MENU_ITEMS: readonly {
   id: EstateMenuActionId | "conversations" | "my-spark-estate";
@@ -201,6 +202,7 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
   roomExperiencesItems: number;
   excludesLibraryAndCartography: boolean;
   peacefulPlacesStayInExperiences: boolean;
+  /** Prompt 146 — eight Welcome Home categories (Estate last). */
   welcomeHomeHasFiveCategories: boolean;
   experienceControlsNotInWelcomeHome: boolean;
   wanderManifestRuleReady: boolean;
@@ -287,7 +289,7 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
       experiencesIds.includes("soundscapes") &&
       !experiencesIds.includes("breathe" as never) &&
       focusIds.includes("breathe"),
-    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 5,
+    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 8,
     experienceControlsNotInWelcomeHome: !WELCOME_HOME_NAV_CATEGORIES.some((c) =>
       /experience controls/i.test(c.label),
     ),

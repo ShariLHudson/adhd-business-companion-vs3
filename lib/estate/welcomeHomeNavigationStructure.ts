@@ -3,11 +3,11 @@
  * Answers: Where do I want to go?
  * Experience Controls live under SH, not here.
  *
- * Prompt 144 — intention-based IA:
- * Today · Work to Create · Focus & Reflection · Audio · Cartography · Guidance · Estate
+ * Prompt 146 — finalized intention IA:
+ * Today · Work to Create · Guidance · Focus & Reflection · Audio · Chamber · Board · Estate
  *
- * Today keeps its planning destinations (Plan My Day lives here — daily starting category).
- * Audio is separated from reflection. Cartography is its own visual-thinking hub.
+ * Work to Create = building. Guidance = advice/approaches (Strategies).
+ * Audio = Peaceful Moments + Soundscapes only. Cartography lives under Work to Create.
  */
 
 export type WelcomeHomeNavCategoryId =
@@ -15,8 +15,9 @@ export type WelcomeHomeNavCategoryId =
   | "my-work"
   | "take-a-moment"
   | "audio"
-  | "cartography"
   | "get-advice"
+  | "chamber"
+  | "board"
   | "spark-estate";
 
 export type WelcomeHomeNavDestinationId =
@@ -25,7 +26,9 @@ export type WelcomeHomeNavDestinationId =
   | "reminders-rhythms"
   | "create"
   | "projects"
+  | "templates"
   | "destination-gallery"
+  | "continue-working"
   | "strategy-library"
   | "spin-the-wheel"
   | "cartographers-studio"
@@ -91,16 +94,15 @@ export type WelcomeHomeNavCategory = {
   id: WelcomeHomeNavCategoryId;
   label: string;
   /**
-   * Short intention subtitle — learning mode / first-time orientation (Prompt 144).
-   * Answers the category question without cluttering power use.
+   * Short intention subtitle — learning mode / first-time orientation.
    */
   subtitle: string;
   destinations: readonly WelcomeHomeNavDestination[];
 };
 
 /**
- * Prompt 144 — intention categories.
- * Category ids stay stable for routing where possible (`my-day`, `my-work`, `take-a-moment`, …).
+ * Prompt 146 — finalized intention categories.
+ * Category ids stay stable for routing where possible (`my-day`, `my-work`, …).
  */
 export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   {
@@ -119,7 +121,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
       },
       {
         id: "calendar",
-        label: "Calendar",
+        label: "Schedule",
         supportLine: "See today’s schedule at a glance.",
       },
       {
@@ -136,12 +138,12 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   {
     id: "my-work",
     label: "Work to Create",
-    subtitle: "Build projects, plans, and new ideas.",
+    subtitle: "Build projects, plans, maps, and new ideas.",
     destinations: [
       {
         id: "create",
-        label: "Create New Work",
-        supportLine: "Start something new, or continue work already underway.",
+        label: "Create",
+        supportLine: "Start something new.",
       },
       {
         id: "projects",
@@ -149,20 +151,42 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
         supportLine: "Pick up a project and the next small step.",
       },
       {
-        id: "strategy-library",
-        label: "Strategies",
-        supportLine: "Return to strategies you’ve already trusted.",
+        id: "templates",
+        label: "Templates",
+        supportLine: "Begin from a trusted starting shape.",
+      },
+      {
+        id: "destination-gallery",
+        label: "Blueprints",
+        supportLine: "Choose a place that fits the work you want to do.",
+        selectionExperience: true,
+      },
+      {
+        id: "cartographers-studio",
+        label: "Cartography",
+        supportLine: "Map ideas so the path forward is easier to see.",
+      },
+      {
+        id: "continue-working",
+        label: "Continue Working",
+        supportLine: "Return to work already underway.",
       },
       {
         id: "spin-the-wheel",
         label: "Spin the Wheel",
         supportLine: "Optional inspiration when you want a gentle nudge.",
       },
+    ],
+  },
+  {
+    id: "get-advice",
+    label: "Guidance",
+    subtitle: "Approaches and advice that help you think before you build.",
+    destinations: [
       {
-        id: "destination-gallery",
-        label: "Destination Gallery",
-        supportLine: "Choose a place that fits the work you want to do.",
-        selectionExperience: true,
+        id: "strategy-library",
+        label: "Strategies",
+        supportLine: "Choose a direction with enough calm that the next step feels clear.",
       },
     ],
   },
@@ -193,21 +217,26 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
         supportLine: "A short pause to regulate before the next step.",
       },
       {
-        id: "reflect-more",
-        label: "Browse more",
-        supportLine: "Capture learning and remember progress when you want it.",
-        dropdownChildren: [
-          { id: "journal", label: "Journal" },
-          { id: "evidence-vault", label: "Evidence Vault" },
-          { id: "hall-of-accomplishments", label: "Hall of Accomplishments" },
-        ],
+        id: "journal",
+        label: "Journal",
+        supportLine: "Write privately; return when you want.",
+      },
+      {
+        id: "evidence-vault",
+        label: "Evidence Vault",
+        supportLine: "Keep proof of progress where you can find it.",
+      },
+      {
+        id: "hall-of-accomplishments",
+        label: "Hall of Accomplishments",
+        supportLine: "Remember what you’ve already built.",
       },
     ],
   },
   {
     id: "audio",
     label: "Audio",
-    subtitle: "Music, soundscapes, and guided audio for focus and calm.",
+    subtitle: "Calming and focus sounds — nothing else.",
     destinations: [
       {
         id: "peaceful-places",
@@ -221,53 +250,25 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
         supportLine: "Background atmospheres while you work or rest.",
         selectionExperience: true,
       },
-      {
-        id: "nature-sounds",
-        label: "Nature Sounds",
-        supportLine: "Opens Peaceful Moments for natural listening.",
-        selectionExperience: true,
-      },
-      {
-        id: "focus-audio",
-        label: "Focus Audio",
-        supportLine: "Audio that supports concentration.",
-      },
-      {
-        id: "guided-audio",
-        label: "Guided Audio",
-        supportLine: "Opens Soundscapes for guided listening options.",
-        selectionExperience: true,
-      },
-      {
-        id: "relaxation-audio",
-        label: "Relaxation Audio",
-        supportLine: "Opens Soundscapes for calm listening.",
-        selectionExperience: true,
-      },
     ],
   },
   {
-    id: "cartography",
-    label: "Cartography",
-    subtitle: "See your ideas, projects, and business from a new perspective.",
-    destinations: [
-      {
-        id: "cartographers-studio",
-        label: "Cartographer’s Studio",
-        supportLine: "Map ideas so the path forward is easier to see.",
-      },
-    ],
-  },
-  {
-    id: "get-advice",
-    label: "Guidance",
-    subtitle: "Expert specialists and trusted advisors when you need them.",
+    id: "chamber",
+    label: "Chamber",
+    subtitle: "Specialists when you want a focused point of view.",
     destinations: [
       {
         id: "chamber-of-momentum",
         label: "Chamber of Momentum",
         supportLine: "Think with advisors who know your kind of work.",
       },
+    ],
+  },
+  {
+    id: "board",
+    label: "Board",
+    subtitle: "Calm counsel for important decisions.",
+    destinations: [
       {
         id: "boardroom",
         label: "Boardroom",
@@ -295,22 +296,28 @@ export const WELCOME_HOME_WANDER_GROUNDS = {
   label: "Wander the Grounds",
 } as const;
 
-/** Learning / capture destinations under Focus & Reflection → Browse more. */
+/** Learning / capture destinations under Focus & Reflection. */
 export const WELCOME_HOME_MY_STORY_DESTINATION_IDS = [
   "journal",
   "evidence-vault",
   "hall-of-accomplishments",
 ] as const;
 
-/** Alias destinations that open an existing experience (Prompt 144 cross-nav). */
+/**
+ * Alias destinations that open an existing experience.
+ * Kept for deep links / older help copy even when not listed in Audio menu.
+ */
 export const WELCOME_HOME_DESTINATION_ALIASES: Partial<
   Record<WelcomeHomeNavDestinationId, WelcomeHomeNavDestinationId>
 > = {
   "nature-sounds": "peaceful-places",
   "guided-audio": "soundscapes",
   "relaxation-audio": "soundscapes",
+  "focus-audio": "peaceful-places",
   /** Legacy explore id */
   "explore-estate": "wander-the-grounds",
+  /** Legacy browse-more parent — Journal is direct under Focus & Reflection */
+  "reflect-more": "journal",
 };
 
 export type WelcomeHomeFocusedPanelId = WelcomeHomeNavCategoryId;
@@ -333,7 +340,6 @@ export const WELCOME_HOME_MY_DAY_DROPDOWN_IDS = [
 /** All expandable Welcome Home dropdown groups. */
 export const WELCOME_HOME_NAV_DROPDOWN_IDS = [
   ...WELCOME_HOME_MY_DAY_DROPDOWN_IDS,
-  "reflect-more",
 ] as const;
 
 export type WelcomeHomeMyDayDropdownId =
@@ -363,8 +369,7 @@ export function resolveWelcomeHomeDestinationAlias(
 }
 
 /**
- * Flatten category destinations, expanding Focus & Reflection “Browse more”
- * so verification exports still see journal / evidence / hall.
+ * Flatten category destinations (Focus & Reflection no longer uses Browse more).
  */
 export function welcomeHomeFlattenCategoryDestinations(
   categoryId: WelcomeHomeNavCategoryId,
@@ -379,14 +384,6 @@ export function welcomeHomeFlattenCategoryDestinations(
         out.push({
           id: child.id as WelcomeHomeNavDestinationId,
           label: child.label,
-          supportLine:
-            child.id === "journal"
-              ? "Write privately; return when you want."
-              : child.id === "evidence-vault"
-                ? "Keep proof of progress where you can find it."
-                : child.id === "hall-of-accomplishments"
-                  ? "Remember what you’ve already built."
-                  : undefined,
         });
       }
       continue;

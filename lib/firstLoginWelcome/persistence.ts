@@ -224,6 +224,8 @@ export async function loadFirstLoginWelcomeRecord(
 
   if (isWelcomeCompleted(merged)) {
     writeLocal(userId, merged);
+    // Keep Welcome Home cinematic in sync — never re-intro after account complete.
+    markWelcomeIntroSeen();
     return merged;
   }
 

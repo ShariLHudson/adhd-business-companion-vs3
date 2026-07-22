@@ -46,20 +46,20 @@ const PLACES: EstateOrientationPlace[] = [
     name: "Cartography",
     summary: "Relationships, patterns, and the bigger picture.",
     whatIsThis:
-      "Cartography helps you see relationships, patterns, and the bigger picture when your thinking needs space to spread out.",
+      "Cartography lives under Work to Create — a place to see relationships, patterns, and the bigger picture when your thinking needs space to spread out.",
     whyWouldIUseIt:
       "Use it when ideas feel tangled, or when you want to understand how pieces of your business relate before you decide what to do next.",
     howItConnects:
-      "Maps can clarify what belongs in a Project or Strategy. They do not invent connections — they help you notice the ones already forming in your work.",
+      "Maps can clarify what belongs in a Project. They do not invent connections — they help you notice the ones already forming in your work.",
   },
   {
     id: "strategies",
     name: "Strategies",
-    summary: "Plan before you build.",
+    summary: "Guidance before you build.",
     whatIsThis:
-      "Strategies is where you plan before you build — choosing a direction with enough calm that the next step feels clear.",
+      "Strategies lives under Guidance — approaches that help you think better before you create new work.",
     whyWouldIUseIt:
-      "Use it when you want guidance or a thoughtful approach before diving into creation or project work.",
+      "Use it when you want a thoughtful approach, not when you are already ready to draft or build.",
     howItConnects:
       "A good strategy often points toward Create or Projects. It stays useful later when Business Pulse or Evidence helps you see what actually worked.",
   },

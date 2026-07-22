@@ -17,10 +17,11 @@ describe("sparkEstateGuideMenuMove (100 / 096)", () => {
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.id)).toEqual([
       "my-day",
       "my-work",
+      "get-advice",
       "take-a-moment",
       "audio",
-      "cartography",
-      "get-advice",
+      "chamber",
+      "board",
       "spark-estate",
     ]);
     const sparkEstate = WELCOME_HOME_NAV_CATEGORIES.find(
