@@ -233,7 +233,23 @@ export async function submitCurrentFocusResponse(
     contextVersion: input.contextVersion,
     workflow: opts?.workflow,
   });
-  if (!focus || focus.focusId !== input.focusId) {
+  // Deterministic Focus binding:
+  // - No canonical focus resolves → we cannot safely persist; preserve words.
+  // - A focusId was supplied and it does not match the resolved focus → the
+  //   member's answer belongs to a Focus that has since advanced (real stale
+  //   race). Preserve the words and ask them to retry against the live Focus.
+  // - No focusId supplied (contract gap, not a stale race) → bind to the
+  //   resolved focus rather than silently failing every Save.
+  const suppliedFocusId = input.focusId?.trim();
+  if (!focus) {
+    return fail(
+      preserved,
+      "This Focus moved — your words are still here. Retry against the current question.",
+      focus,
+      opts?.workflow,
+    );
+  }
+  if (suppliedFocusId && suppliedFocusId !== focus.focusId) {
     return fail(
       preserved,
       "This Focus moved — your words are still here. Retry against the current question.",

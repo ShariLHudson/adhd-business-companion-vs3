@@ -25385,16 +25385,26 @@ export default function CompanionPageClient() {
                       input.focus.creationId ||
                       createBuilderSession.workflow.sessionId ||
                       "";
+                    const requestId = `focus-${Date.now()}`;
+                    // Bind the submission to the exact Focus the member was
+                    // answering. Passing the whole focus object (or a hardcoded
+                    // contextVersion) desynchronizes the durable applicability
+                    // check and makes every Save fail with "This Focus moved".
                     const result = await submitCurrentFocusResponse(
                       {
-                        requestId: `focus-${Date.now()}`,
-                        contextVersion: 1,
+                        requestId,
+                        contextVersion: input.focus.contextVersion,
                         creationId,
-                        focus: input.focus,
+                        focusId: input.focus.focusId,
                         response: input.response,
                         responseType: input.responseType,
                       },
-                      { workflow: createBuilderSession.workflow },
+                      {
+                        workflow: createBuilderSession.workflow,
+                        activeRequestId: requestId,
+                        activeContextVersion: input.focus.contextVersion,
+                        activeCreationId: creationId,
+                      },
                     );
                     if (result.updatedWorkflow) {
                       createPanelWorkflowRef.current = result.updatedWorkflow;
