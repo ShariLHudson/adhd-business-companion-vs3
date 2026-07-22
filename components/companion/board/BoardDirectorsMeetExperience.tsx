@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  CORE_BOARD_DIRECTOR_IDS,
+  recommendBoardDirectorsForDecision,
   toggleDirectorAccordion,
   type BoardDirectorId,
 } from "@/lib/board";
@@ -45,7 +47,6 @@ import { BoardDirectorProfileCard } from "@/components/companion/board/BoardDire
 import { BoardDirectorGalleryCard } from "@/components/companion/board/BoardDirectorGalleryCard";
 import { MeetDirectorConversationOverlay } from "@/components/companion/board/MeetDirectorConversationOverlay";
 import { BoardReviewTray } from "@/components/companion/board/BoardReviewTray";
-import { CompactBoardDirectorSelector } from "@/components/companion/board/CompactBoardDirectorSelector";
 import { RoundTableOverlay } from "@/components/companion/board/RoundTableOverlay";
 import "@/app/companion/board-director-meet.css";
 
@@ -97,9 +98,14 @@ export function BoardDirectorsMeetExperience({
     createEmptyDirectorSessionStore,
   );
   const [profileTransitionKey, setProfileTransitionKey] = useState(0);
-  const [showFullBiographies, setShowFullBiographies] = useState(false);
+  const [showMoreSelectionOptions, setShowMoreSelectionOptions] =
+    useState(false);
 
   const directors = listVisibleBoardDirectors();
+  const recommendation = useMemo(
+    () => recommendBoardDirectorsForDecision("general"),
+    [],
+  );
   const director = resolveMeetRouteDirector(state.route);
   const meetActive = isMeetConversationActive(state);
   const activeDirectorId =
@@ -162,6 +168,36 @@ export function BoardDirectorsMeetExperience({
 
   function removeDirector(id: BoardDirectorId) {
     setBoardReview((prev) => removeDirectorFromBoardReview(prev, id));
+  }
+
+  /** Replace the entire Board Review selection (bulk selection shortcuts). */
+  function replaceBoardReviewSelection(ids: readonly BoardDirectorId[]) {
+    setBoardReview((prev) => {
+      let next = {
+        ...createEmptyBoardReviewState(),
+        reviewStarted: prev.reviewStarted,
+      };
+      for (const id of ids) {
+        next = addDirectorToBoardReview(next, id);
+      }
+      return next;
+    });
+  }
+
+  function selectRecommendedDirectors() {
+    replaceBoardReviewSelection(recommendation.directorIds);
+  }
+
+  function selectAllDirectors() {
+    replaceBoardReviewSelection(directors.map((d) => d.id));
+  }
+
+  function selectCoreDirectors() {
+    replaceBoardReviewSelection(CORE_BOARD_DIRECTOR_IDS);
+  }
+
+  function clearDirectorSelection() {
+    replaceBoardReviewSelection([]);
   }
 
   function openMyPlaceAtTheTable() {
@@ -238,55 +274,80 @@ export function BoardDirectorsMeetExperience({
         <h1 className="boardroom-title">Meet the Directors</h1>
         <div className="boardroom-gold-rule" aria-hidden />
         <p className="boardroom-purpose">
-          Choose Directors for a Board Review with a compact list first. Full
-          biographies stay available when you want them — your Board Review
-          stays with you.
+          Each card shows a Director&rsquo;s portrait, role, and decision
+          lens. Meet anyone, or add them to your Board Review.
         </p>
         <div className="board-directors-meet__nav-actions">{placeAtTableBtn}</div>
         {reviewTray}
-        <CompactBoardDirectorSelector
-          selectedIds={boardReview.selectedDirectorIds}
-          onChange={(ids) => {
-            setBoardReview((prev) => {
-              let next = {
-                ...createEmptyBoardReviewState(),
-                reviewStarted: prev.reviewStarted,
-              };
-              for (const id of ids) {
-                next = addDirectorToBoardReview(next, id);
-              }
-              return next;
-            });
-          }}
-          onLearnAbout={(id) => openProfile(id)}
-        />
-        <div className="boardroom-actions" style={{ marginTop: "1rem" }}>
+        <div
+          className="compact-board-director-selector__bulk"
+          role="group"
+          aria-label="Director selection shortcuts"
+        >
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--secondary"
+            data-testid="compact-select-recommended"
+            onClick={selectRecommendedDirectors}
+          >
+            Use Recommended Directors
+          </button>
           <button
             type="button"
             className="boardroom-btn boardroom-btn--ghost"
-            data-testid="board-meet-toggle-biographies"
-            onClick={() => setShowFullBiographies((v) => !v)}
+            data-testid="compact-select-all"
+            onClick={selectAllDirectors}
           >
-            {showFullBiographies
-              ? "Hide full biographies"
-              : "Browse full biographies"}
+            Select All
+          </button>
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--ghost"
+            data-testid="compact-clear-selection"
+            onClick={clearDirectorSelection}
+          >
+            Clear Selection
+          </button>
+          <button
+            type="button"
+            className="boardroom-btn boardroom-btn--ghost"
+            data-testid="compact-selection-more"
+            aria-expanded={showMoreSelectionOptions}
+            onClick={() => setShowMoreSelectionOptions((v) => !v)}
+          >
+            More
           </button>
         </div>
-        {showFullBiographies ? (
-          <div className="board-directors-meet__grid" role="list">
-            {directors.map((d) => (
-              <BoardDirectorGalleryCard
-                key={d.id}
-                director={d}
-                included={isDirectorIncludedInBoardReview(boardReview, d.id)}
-                onOpenProfile={() => openProfile(d.id)}
-                onMeet={() => startMeet(d.id)}
-                onInclude={() => includeDirector(d.id)}
-                onRemove={() => removeDirector(d.id)}
-              />
-            ))}
+        {showMoreSelectionOptions ? (
+          <div
+            className="compact-board-director-selector__bulk"
+            role="group"
+            aria-label="More selection options"
+            data-testid="compact-selection-more-menu"
+          >
+            <button
+              type="button"
+              className="boardroom-btn boardroom-btn--secondary"
+              data-testid="compact-select-core"
+              onClick={selectCoreDirectors}
+            >
+              Use Core Board
+            </button>
           </div>
         ) : null}
+        <div className="board-directors-meet__grid" role="list">
+          {directors.map((d) => (
+            <BoardDirectorGalleryCard
+              key={d.id}
+              director={d}
+              included={isDirectorIncludedInBoardReview(boardReview, d.id)}
+              onOpenProfile={() => openProfile(d.id)}
+              onMeet={() => startMeet(d.id)}
+              onInclude={() => includeDirector(d.id)}
+              onRemove={() => removeDirector(d.id)}
+            />
+          ))}
+        </div>
         {roundTableOverlay}
       </div>
     );
