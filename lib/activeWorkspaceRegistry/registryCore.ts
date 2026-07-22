@@ -9,7 +9,7 @@ import {
   LAST_ACTIVE_WORKSPACE_KEY,
   safeLocalStorageSet,
 } from "@/lib/companionStorageRecovery";
-import type { ActiveWorkspaceEntry } from "./types";
+import type { ActiveWorkspaceEntry, ActiveWorkspaceStatus } from "./types";
 
 const STORAGE_KEY = ACTIVE_WORKSPACE_REGISTRY_KEY;
 
@@ -90,14 +90,30 @@ export function readLastActiveWorkspaceId(): string | null {
   }
 }
 
+/** Statuses only Restore (explicit member action) may clear. */
+const RECOVERABLE_OR_DELETED_STATUSES: ReadonlySet<ActiveWorkspaceStatus> =
+  new Set(["archived", "trashed", "deleted"]);
+
 export function upsertActiveWorkspace(
   entry: ActiveWorkspaceEntry,
 ): ActiveWorkspaceEntry {
   const store = readStore();
+  const existing = store.byId[entry.workspaceId];
+  const incomingStatus = entry.status || "active";
+  // Registration/autosave/hydrate writes default to "active" without knowing
+  // whether the member already moved this work to Archive/Trash or deleted
+  // it. Never let a background write silently resurrect it — only an
+  // explicit restoreActiveWorkspace() call may bring it back to Continue.
+  const status: ActiveWorkspaceStatus =
+    existing &&
+    RECOVERABLE_OR_DELETED_STATUSES.has(existing.status) &&
+    incomingStatus === "active"
+      ? existing.status
+      : incomingStatus;
   const next: ActiveWorkspaceEntry = {
     ...entry,
     lastActivityAt: entry.lastActivityAt || new Date().toISOString(),
-    status: entry.status || "active",
+    status,
   };
   store.byId[next.workspaceId] = next;
   if (next.status === "active") {

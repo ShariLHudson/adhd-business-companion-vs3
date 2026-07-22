@@ -114,4 +114,43 @@ describe("084 Continue disposition — Archive / Trash / Delete / Restore", () =
     expect(restoreActiveWorkspace(id)).toBeNull();
     expect(listActiveWorkspaces()).toHaveLength(0);
   });
+
+  it("a background re-registration (autosave/hydrate) never resurrects Trash", () => {
+    const id = "ws-trash-then-autosave";
+    seedWork(id, "Undo Create Then Autosave Draft");
+    moveActiveWorkspaceToTrash(id);
+    expect(peekRegistryWorkspaceEntry(id)?.status).toBe("trashed");
+
+    // Simulate a stray background write still referencing the same
+    // workspace/session id (e.g. registerCreationDestinationWorkspace,
+    // syncRegistryFromRuntimeRecord, or DB hydrate) after Move to Trash.
+    seedWork(id, "Undo Create Then Autosave Draft");
+
+    expect(peekRegistryWorkspaceEntry(id)?.status).toBe("trashed");
+    expect(listActiveWorkspaces()).toHaveLength(0);
+    expect(listActiveWorkCards([])).toHaveLength(0);
+  });
+
+  it("a background re-registration never resurrects Archive either", () => {
+    const id = "ws-archive-then-autosave";
+    seedWork(id, "Archived Then Autosave Draft");
+    archiveActiveWorkspace(id);
+    expect(peekRegistryWorkspaceEntry(id)?.status).toBe("archived");
+
+    seedWork(id, "Archived Then Autosave Draft");
+
+    expect(peekRegistryWorkspaceEntry(id)?.status).toBe("archived");
+    expect(listActiveWorkspaces()).toHaveLength(0);
+  });
+
+  it("explicit Restore still brings Trash back to Continue", () => {
+    const id = "ws-trash-then-restore";
+    seedWork(id, "Trash Then Restore Doc");
+    moveActiveWorkspaceToTrash(id);
+    expect(listActiveWorkspaces()).toHaveLength(0);
+
+    const restored = restoreActiveWorkspace(id);
+    expect(restored?.status).toBe("active");
+    expect(listActiveWorkspaces().map((e) => e.workspaceId)).toEqual([id]);
+  });
 });

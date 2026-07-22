@@ -170,6 +170,46 @@ describe("continuityManifest", () => {
     expect(listHomeResumeCandidates()[0]?.title).toBe("My post");
   });
 
+  it("never resurfaces an archived (soft-removed) Project Home", () => {
+    localStorage.setItem(
+      "companion-projects-v1",
+      JSON.stringify([
+        {
+          id: "p-archived",
+          name: "Archived Project",
+          goal: "",
+          goals: [],
+          horizon: "now",
+          status: "in-progress",
+          nextAction: "Step",
+          color: "#1e4f4f",
+          archived: true,
+          createdAt: "2026-06-01T12:00:00.000Z",
+          updatedAt: "2026-06-12T12:00:00.000Z",
+        },
+        {
+          id: "p-active",
+          name: "Active Project",
+          goal: "",
+          goals: [],
+          horizon: "now",
+          status: "in-progress",
+          nextAction: "Step",
+          color: "#1e4f4f",
+          createdAt: "2026-06-01T12:00:00.000Z",
+          updatedAt: "2026-06-11T12:00:00.000Z",
+        },
+      ]),
+    );
+
+    const manifest = buildContinuityManifest();
+    const projectItems = manifest.items.filter((i) => i.type === "project");
+    expect(projectItems.map((i) => i.title)).toEqual(["Active Project"]);
+    expect(projectItems.some((i) => i.title === "Archived Project")).toBe(
+      false,
+    );
+  });
+
   it("home resume ignores navigation-only projects", () => {
     localStorage.setItem(
       "companion-projects-v1",

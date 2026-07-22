@@ -12,7 +12,7 @@ import {
 } from "./strategyApplySessionStore";
 import { clientAvatarStepLabel } from "./clientAvatarCoach";
 import type { IdealClientAvatar } from "./companionStore";
-import { getAvatars, getProjects } from "./companionStore";
+import { getActiveProjects, getAvatars } from "./companionStore";
 import { loadCreateSession } from "./createSessionStore";
 import {
   loadSavedWorkflowRecord,
@@ -33,6 +33,10 @@ import {
   visualFocusContinuityLocation,
 } from "./visualFocus/myWorkIntegration";
 import { studioCardTitleForMode } from "./visualFocus/studioCards";
+import {
+  listActiveWorkspaces,
+  resolveHumanReadableTitle,
+} from "./activeWorkspaceRegistry";
 
 export const CONTINUITY_STORAGE_KEYS = {
   createSession: "companion-create-session-v1",
@@ -51,6 +55,7 @@ export const CONTINUITY_STORAGE_KEYS = {
 export type ContinuityItemType =
   | "create-draft"
   | "create-saved-for-later"
+  | "active-creation"
   | "project"
   | "client-avatar"
   | "workspace-sop"
@@ -61,6 +66,7 @@ export type ContinuityItemType =
 
 export type ContinuityResumeAction =
   | "restore-create"
+  | "restore-active-creation"
   | "open-projects"
   | "open-client-avatars"
   | "open-saved-work"
@@ -92,6 +98,7 @@ export type ContinuityManifest = {
 /** Types surfaced on calm-home Resume Where You Left Off. */
 export const HOME_RESUME_CONTINUITY_TYPES: ReadonlySet<ContinuityItemType> =
   new Set([
+    "active-creation",
     "create-draft",
     "create-saved-for-later",
     "workspace-sop",
@@ -313,8 +320,10 @@ function workspaceSopItem(): ContinuityManifestItem | null {
 }
 
 function projectItems(): ContinuityManifestItem[] {
-  return getProjects()
-    .filter((p) => p.status !== "completed")
+  // getActiveProjects() already excludes archived + completed projects —
+  // an archived Project Home (soft-removed from the gallery) must never
+  // reappear on Welcome Home's Continue Where You Left Off.
+  return getActiveProjects()
     .map((p) => ({
       id: `project:${p.id}`,
       title: p.name,
@@ -384,9 +393,47 @@ function visualFocusMapItems(): ContinuityManifestItem[] {
   }));
 }
 
+function continueLabelForCreation(creationType: string): string {
+  const t = creationType.trim().toLowerCase();
+  if (/workshop/.test(t)) return "Continue Your Workshop";
+  if (/sop/.test(t)) return "Continue Your SOP";
+  if (/course/.test(t)) return "Continue Your Course";
+  if (/project/.test(t)) return "Continue Your Project";
+  if (/email|newsletter|document|letter/.test(t)) return "Continue Your Draft";
+  if (/event|retreat/.test(t)) return "Continue Your Event";
+  return `Continue Your ${creationType.trim() || "Creation"}`;
+}
+
+function activeCreationItems(): ContinuityManifestItem[] {
+  return listActiveWorkspaces().map((w) => {
+    // 073 — sanitize legacy technical titles on Welcome Home
+    const title =
+      resolveHumanReadableTitle({
+        existingTitle: w.title,
+        creationType: w.creationType,
+      }) || w.title;
+    return {
+      id: `active-creation:${w.workspaceId}`,
+      title,
+      type: "active-creation" as const,
+      lastTouchedAt: w.lastActivityAt,
+      location: w.creationType,
+      storageKey: "spark.activeWorkspaceRegistry.v1",
+      resumeAction: "restore-active-creation" as const,
+      nextStep: w.currentFocusTitle
+        ? `Next step: ${w.currentFocusTitle}`
+        : continueLabelForCreation(w.creationType),
+      projectId: w.projectHomeId ?? undefined,
+    };
+  });
+}
+
 /** Aggregate all resumable work from local storage. */
 export function buildContinuityManifest(): ContinuityManifest {
   const items: ContinuityManifestItem[] = [];
+
+  // 071 — Active Creation Workspaces first-class (never orphaned)
+  items.push(...activeCreationItems());
 
   const workflow = loadWorkflowRecord();
   if (workflow) {
