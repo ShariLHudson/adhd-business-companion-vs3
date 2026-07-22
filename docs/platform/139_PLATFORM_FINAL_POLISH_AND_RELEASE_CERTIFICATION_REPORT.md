@@ -7,6 +7,7 @@
 **Mode:** Craftsmanship  
 **Binds:** Spec **128** · Spec **131** · Spec **132** · Capture Before Classification™ (**137**)  
 **Parents:** 135 Create Provisional · 136 Platform Phase 1 Provisional · 137 Projects Provisional  
+**Commit:** `46febd14` · pushed to `deploy/companion-app-v3`  
 
 ---
 
