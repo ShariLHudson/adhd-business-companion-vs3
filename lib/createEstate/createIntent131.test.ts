@@ -78,13 +78,15 @@ describe("Spec 131 — Create intent intelligence", () => {
 
   it("Rule 11 — Continue Working omitted when empty; Rule 7 layers capped", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
+    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
     expect(panel).toContain("hasWorkspaces ? (");
     expect(panel).toContain('data-testid="create-estate-continue"');
     expect(panel).not.toContain("create-estate-continue-empty");
     expect(panel).toContain("create-estate-also-considered");
     expect(panel).toContain("switchCreateBeginConfirmType");
-    expect(panel).toContain("create-estate-template-source");
+    expect(panel).toContain("create-estate-explore-ideas");
     expect(panel).toContain("data-max-decision-layers=");
+    expect(explore).toContain("data-max-decision-layers=");
     expect(SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS).toBe(3);
   });
 

@@ -55,15 +55,16 @@ describe("Create morning-room scroll contract (133)", () => {
     );
   });
 
-  it("Create entrance keeps More Ways and picker clickable targets", () => {
+  it("Create entrance keeps Explore Ideas clickable targets", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
+    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
     const copy = read("lib/createEstate/copy.ts");
-    expect(panel).toContain("create-estate-more-ways");
-    expect(panel).toContain("CreateCatalogPicker");
+    expect(panel).toContain("create-estate-explore-ideas");
+    expect(panel).toContain("CreateExploreIdeasPanel");
     expect(panel).toContain("onSelectCreationType");
-    expect(copy).toContain("CREATE_ESTATE_PICKER_HEADING");
+    expect(copy).toContain("CREATE_ESTATE_EXPLORE_IDEAS_HEADING");
     expect(copy).toContain("CREATE_ESTATE_CONTINUE_HEADING");
-    expect(panel).toContain("CreateDraftResumeList");
+    expect(explore).toContain("CreateDraftResumeList");
     expect(panel).toContain("useDismissibleWindow");
     expect(panel).toContain("onOutsideDismiss");
     expect(panel).not.toContain("pointer-events-none");

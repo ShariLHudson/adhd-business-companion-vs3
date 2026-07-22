@@ -50,14 +50,16 @@ describe("Create polish 130 certification", () => {
     expect(createConfirmPrimaryLabel("Blog Post")).toBe("Create Blog Post");
   });
 
-  it("entrance wires catalog + framework confirm + Cancel", () => {
+  it("entrance wires catalog confirm from Explore Ideas + Cancel", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
+    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
     expect(panel).toContain("resolveCatalogCreateConfirm");
     expect(panel).toContain("requestCatalogConfirm");
-    expect(panel).toContain("requestFrameworkConfirm");
+    expect(panel).toContain("onRequestCreate={requestCatalogConfirm}");
+    expect(panel).not.toContain("requestFrameworkConfirm");
     expect(panel).toContain("create-estate-confirm-cancel");
     expect(panel).toContain("createConfirmPrimaryLabel");
-    expect(panel).toContain("CREATE_ESTATE_PREVIOUS_WORK_EMPTY");
+    expect(explore).toContain("CREATE_ESTATE_PREVIOUS_WORK_EMPTY");
     expect(CREATE_ESTATE_CONFIRM_CANCEL).toBe("Cancel");
     expect(CREATE_ESTATE_CONFIRM_OTHER).toBe("Choose something else");
   });
@@ -82,8 +84,8 @@ describe("Create polish 130 certification", () => {
 
   it("empty Previous Work teaches", () => {
     expect(CREATE_ESTATE_PREVIOUS_WORK_EMPTY).toMatch(/No older drafts/i);
-    const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
-    expect(panel).toContain("create-estate-previous-work-empty");
+    const explore = read("components/companion/CreateExploreIdeasPanel.tsx");
+    expect(explore).toContain("create-estate-previous-work-empty");
   });
 
   it("post-create Undo eligible until meaningful edit or timeout", () => {
@@ -129,7 +131,7 @@ describe("Create polish 130 certification", () => {
   it("preserves 127/129 confirm gate and hierarchy", () => {
     const panel = read("components/companion/CreateEstateEntrancePanel.tsx");
     expect(panel).toContain("create-estate-intent-confirm");
-    expect(panel).toContain("create-estate-more-ways");
+    expect(panel).toContain("create-estate-explore-ideas");
     expect(panel).toContain("CreateWorkspaceResumeList");
   });
 });

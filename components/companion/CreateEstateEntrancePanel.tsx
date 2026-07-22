@@ -1,40 +1,28 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CreateCatalogPicker } from "@/components/companion/CreateCatalogPicker";
-import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeList";
 import { CreateEstateRoomShell } from "@/components/companion/CreateEstateRoomShell";
+import { CreateExploreIdeasPanel } from "@/components/companion/CreateExploreIdeasPanel";
 import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspaceResumeList";
 import { AppBackButton } from "@/components/companion/AppBackButton";
-import { UniversalBlueprintInterface } from "@/components/companion/universalBlueprint";
 import {
   CREATE_ESTATE_BEGIN_LABEL,
-  CREATE_ESTATE_COMPANY_TEMPLATES_HEADING,
   CREATE_ESTATE_COMPOSER_PLACEHOLDER,
   CREATE_ESTATE_CONFIRM_CANCEL,
   CREATE_ESTATE_CONFIRM_OTHER,
   CREATE_ESTATE_CONTINUE_HEADING,
-  CREATE_ESTATE_GUIDED_FRAMEWORKS_HEADING,
-  CREATE_ESTATE_GUIDED_FRAMEWORKS_HINT,
-  CREATE_ESTATE_MORE_WAYS_HEADING,
-  CREATE_ESTATE_MORE_WAYS_HINT,
-  CREATE_ESTATE_PERSONAL_TEMPLATES_HEADING,
-  CREATE_ESTATE_PICKER_HEADING,
-  CREATE_ESTATE_PREVIOUS_WORK_EMPTY,
-  CREATE_ESTATE_PREVIOUS_WORK_HEADING,
+  CREATE_ESTATE_EXPLORE_IDEAS_HEADING,
+  CREATE_ESTATE_EXPLORE_IDEAS_HINT,
   CREATE_ESTATE_START_NEW_HEADING,
   CREATE_ESTATE_START_NEW_LABEL,
   CREATE_ESTATE_WINDOW_TITLE,
 } from "@/lib/createEstate/copy";
 import {
   createConfirmPrimaryLabel,
-  createOpenPlanLabel,
-  createWorkReadyMessage,
 } from "@/lib/createEstate/createIntentConfirmation";
 import type { ActiveCreationWorkspaceSummary } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import { listActiveCreationWorkspaces } from "@/lib/createEstate/listActiveCreationWorkspaces";
 import {
-  inferPreferredWorkTypeIdFromActiveWork,
   resolveSuggestionContext,
 } from "@/lib/createEstate/contextAwareSuggestions";
 import {
@@ -93,9 +81,10 @@ type Props = {
 };
 
 /**
- * Welcome Home → Create (056 / 127 / 129 / 131)
- * Hierarchy: Continue Working (if any) → Start Something New → More Ways (collapsed).
+ * Welcome Home → Create (056 / 127 / 129 / 131 / 133)
+ * Hierarchy: Continue Working (if any) → Start Something New → Explore Ideas (collapsed).
  * Spec 131 — ≤3 visible decision layers; Continue Working hidden when empty.
+ * Spec 133 — one discovery experience (no framework tabs / duplicate browse chains).
  */
 export function CreateEstateEntrancePanel({
   onBack,
@@ -127,19 +116,7 @@ export function CreateEstateEntrancePanel({
     CreateBeginOutcome,
     { kind: "confirm" }
   > | null>(null);
-  const [moreWaysOpen, setMoreWaysOpen] = useState(false);
-  const [blueprintWorkAck, setBlueprintWorkAck] = useState<string | null>(null);
-  const [blueprintOpenLabel, setBlueprintOpenLabel] = useState("Open My Plan");
-  const [pendingOpenOutcome, setPendingOpenOutcome] = useState<Extract<
-    CreateBeginOutcome,
-    { kind: "open" }
-  > | null>(null);
-  const [blueprintWorkTypeId, setBlueprintWorkTypeId] = useState<string>(
-    EVENT_PLAN_WORK_TYPE_ID,
-  );
-  const [templateSourceHint, setTemplateSourceHint] = useState<
-    "personal" | "company" | null
-  >(null);
+  const [exploreOpen, setExploreOpen] = useState(false);
   const confirmRegionRef = useRef<HTMLDivElement | null>(null);
 
   const exitDestination = resolveCreateExitDestination(exitOriginHint);
@@ -163,7 +140,6 @@ export function CreateEstateEntrancePanel({
   useEffect(() => {
     const list = listActiveCreationWorkspaces();
     setActiveWorkspaces(list);
-    setBlueprintWorkTypeId(inferPreferredWorkTypeIdFromActiveWork(list));
     setDraftCount(listCreateDraftEntries().length);
   }, []);
 
@@ -200,15 +176,6 @@ export function CreateEstateEntrancePanel({
     );
   }
 
-  function requestFrameworkConfirm(label: string) {
-    showConfirm(
-      resolveCatalogCreateConfirm({
-        label,
-        requestText: prompt.trim() || `Open my ${label}`,
-      }),
-    );
-  }
-
   useEffect(() => {
     onRestoreContinuity?.();
     // Once on entrance mount — restore after refresh / return
@@ -231,12 +198,6 @@ export function CreateEstateEntrancePanel({
         setBeginBusy(false);
         return;
       }
-      if (anywhere.decision === "continue_existing" && anywhere.reply) {
-        setBlueprintWorkAck(anywhere.reply);
-      }
-      if (outcome.isMarketingPlanDomain) {
-        setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID);
-      }
     }
 
     void (async () => {
@@ -249,7 +210,7 @@ export function CreateEstateEntrancePanel({
         setPendingConfirm(null);
       } catch {
         setBeginFeedback(
-          "I couldn't save that creation yet. Your words are still here — Retry, or pick a type below.",
+          "I couldn't save that creation yet. Your words are still here — Retry, or explore ideas below.",
         );
         setBeginFeedbackKind("error");
       } finally {
@@ -300,7 +261,7 @@ export function CreateEstateEntrancePanel({
   function declineConfirm() {
     setPendingConfirm(null);
     setBeginFeedback(
-      "No problem — tell me a little more about what you'd like to create, or open More Ways to Start below.",
+      "No problem — tell me a little more about what you'd like to create, or open Explore Ideas below.",
     );
     setBeginFeedbackKind("clarify");
   }
@@ -522,213 +483,37 @@ export function CreateEstateEntrancePanel({
           </div>
         </section>
 
-        {/* 3 — More Ways to Start (Optional) — Spec 131 ≤3 decision layers */}
+        {/* 3 — Explore Ideas (Optional) — Spec 133 one discovery experience */}
         <details
           className="mt-6 max-w-2xl rounded-2xl border border-[#e7dfd4] bg-white/70 px-4 py-3"
-          data-testid="create-estate-more-ways"
+          data-testid="create-estate-explore-ideas"
           data-max-decision-layers={SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS}
-          open={moreWaysOpen}
+          open={exploreOpen}
           onToggle={(e) =>
-            setMoreWaysOpen((e.target as HTMLDetailsElement).open)
+            setExploreOpen((e.target as HTMLDetailsElement).open)
           }
         >
           <summary className="cursor-pointer text-lg font-semibold text-[#1f1c19]">
-            {CREATE_ESTATE_MORE_WAYS_HEADING}
+            {CREATE_ESTATE_EXPLORE_IDEAS_HEADING}
           </summary>
           <p className="mt-2 text-sm text-[#6b635a]">
-            {CREATE_ESTATE_MORE_WAYS_HINT}
+            {CREATE_ESTATE_EXPLORE_IDEAS_HINT}
           </p>
 
-          <div className="mt-4 flex flex-col gap-5">
-            <section
-              data-testid="create-estate-guided-frameworks"
-              aria-labelledby="create-estate-guided-heading"
-            >
-              <h3
-                id="create-estate-guided-heading"
-                className="text-base font-semibold text-[#1f1c19]"
-              >
-                {CREATE_ESTATE_GUIDED_FRAMEWORKS_HEADING}
-              </h3>
-              <p className="mt-1 text-sm text-[#6b635a]">
-                {CREATE_ESTATE_GUIDED_FRAMEWORKS_HINT}
-              </p>
-              <div
-                className="mt-3 flex flex-wrap gap-2"
-                role="group"
-                aria-label="Kind of plan"
-              >
-                <button
-                  type="button"
-                  className={`rounded-full px-3 py-1.5 text-sm ${
-                    blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID
-                      ? "bg-[#1e4f4f] text-white"
-                      : "bg-[#f4efe7] text-[#1f1c19]"
-                  }`}
-                  aria-pressed={blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID}
-                  onClick={() => setBlueprintWorkTypeId(EVENT_PLAN_WORK_TYPE_ID)}
-                >
-                  Event Plan
-                </button>
-                <button
-                  type="button"
-                  className={`rounded-full px-3 py-1.5 text-sm ${
-                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
-                      ? "bg-[#1e4f4f] text-white"
-                      : "bg-[#f4efe7] text-[#1f1c19]"
-                  }`}
-                  aria-pressed={
-                    blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
-                  }
-                  data-testid="create-estate-blueprint-marketing"
-                  onClick={() =>
-                    setBlueprintWorkTypeId(MARKETING_PLAN_WORK_TYPE_ID)
-                  }
-                >
-                  Marketing Plan
-                </button>
-              </div>
-              {/* Spec 131 Rule 7 — templates as progressive layer (not always-visible 4th decision) */}
-              <details
-                className="mt-2 rounded-xl border border-[#e7dfd4] bg-white/80 px-3 py-2"
-                data-testid="create-estate-template-source"
-              >
-                <summary className="cursor-pointer text-sm font-semibold text-[#3d3429]">
-                  Templates (optional)
-                </summary>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <button
-                    type="button"
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      templateSourceHint === "personal"
-                        ? "bg-[#3d3429] text-[#f7f2ea]"
-                        : "border border-[#cfc6b8] bg-white text-[#3d3429]"
-                    }`}
-                    data-testid="create-estate-personal-templates"
-                    onClick={() => setTemplateSourceHint("personal")}
-                  >
-                    {CREATE_ESTATE_PERSONAL_TEMPLATES_HEADING}
-                  </button>
-                  <button
-                    type="button"
-                    className={`rounded-full px-3 py-1.5 text-sm ${
-                      templateSourceHint === "company"
-                        ? "bg-[#3d3429] text-[#f7f2ea]"
-                        : "border border-[#cfc6b8] bg-white text-[#3d3429]"
-                    }`}
-                    data-testid="create-estate-company-templates"
-                    onClick={() => setTemplateSourceHint("company")}
-                  >
-                    {CREATE_ESTATE_COMPANY_TEMPLATES_HEADING}
-                  </button>
-                </div>
-                {templateSourceHint ? (
-                  <p className="mt-2 text-sm text-[#6b635a]" role="status">
-                    Showing{" "}
-                    {templateSourceHint === "personal" ? "personal" : "company"}{" "}
-                    structures when available for this kind of work.
-                  </p>
-                ) : null}
-              </details>
-              <div className="mt-3">
-                <UniversalBlueprintInterface
-                  workTypeId={blueprintWorkTypeId}
-                  companionLed
-                  openWorkLabel={blueprintOpenLabel}
-                  onOpenWork={() => {
-                    // Spec 130 — frameworks still confirm before Work opens.
-                    if (pendingOpenOutcome) {
-                      requestFrameworkConfirm(pendingOpenOutcome.artifactType);
-                      return;
-                    }
-                    const label =
-                      blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
-                        ? "Marketing Plan"
-                        : "Event Plan";
-                    requestFrameworkConfirm(label);
-                  }}
-                  onWorkReady={() => {
-                    const label =
-                      blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID
-                        ? "Marketing Plan"
-                        : "Event Plan";
-                    setBlueprintOpenLabel(createOpenPlanLabel(label));
-                    setBlueprintWorkAck(createWorkReadyMessage(label));
-                    setPendingOpenOutcome({
-                      kind: "open",
-                      text: prompt.trim() || `Continue my ${label}`,
-                      artifactType: label,
-                      isEventDomain:
-                        blueprintWorkTypeId === EVENT_PLAN_WORK_TYPE_ID,
-                      isMarketingPlanDomain:
-                        blueprintWorkTypeId === MARKETING_PLAN_WORK_TYPE_ID,
-                    });
-                  }}
-                />
-              </div>
-              {blueprintWorkAck ? (
-                <p
-                  className="mt-3 text-sm text-[#1e4f4f]"
-                  data-testid="create-estate-blueprint-work-ack"
-                  role="status"
-                >
-                  {blueprintWorkAck}
-                </p>
-              ) : null}
-            </section>
-
-            <section
-              data-testid="create-estate-picker"
-              aria-labelledby="create-estate-picker-heading"
-            >
-              <h3
-                id="create-estate-picker-heading"
-                className="text-base font-semibold text-[#1f1c19]"
-              >
-                {CREATE_ESTATE_PICKER_HEADING}
-              </h3>
-              <p className="mt-1 text-sm text-[#6b635a]">
-                Optional — explore types if you prefer browsing. You can always
-                describe what you want above instead. Choosing a type asks for
-                confirmation before anything is created.
-              </p>
-              <div className="mt-3">
-                <CreateCatalogPicker
-                  onSelect={requestCatalogConfirm}
-                  suggestionContext={suggestionContext}
-                />
-              </div>
-            </section>
-
-            <section
-              data-testid="create-estate-previous-work"
-              aria-labelledby="create-estate-previous-work-heading"
-            >
-              <h3
-                id="create-estate-previous-work-heading"
-                className="text-base font-semibold text-[#1f1c19]"
-              >
-                {CREATE_ESTATE_PREVIOUS_WORK_HEADING}
-              </h3>
-              <div className="mt-2">
-                {draftCount === 0 ? (
-                  <p
-                    className="text-sm leading-relaxed text-[#6b635a]"
-                    data-testid="create-estate-previous-work-empty"
-                  >
-                    {CREATE_ESTATE_PREVIOUS_WORK_EMPTY}
-                  </p>
-                ) : (
-                  <CreateDraftResumeList
-                    onOpen={onOpenSavedDraft}
-                    onRename={onRenameDraft}
-                    onDuplicate={onDuplicateDraft}
-                    onDelete={onDeleteDraft}
-                  />
-                )}
-              </div>
-            </section>
-          </div>
+          {exploreOpen ? (
+            <CreateExploreIdeasPanel
+              activeWorkspaces={activeWorkspaces}
+              draftCount={draftCount}
+              suggestionContext={suggestionContext}
+              onResumeCreationWorkspace={onResumeCreationWorkspace}
+              onRenameWorkspace={onRenameWorkspace}
+              onOpenSavedDraft={onOpenSavedDraft}
+              onRenameDraft={onRenameDraft}
+              onDuplicateDraft={onDuplicateDraft}
+              onDeleteDraft={onDeleteDraft}
+              onRequestCreate={requestCatalogConfirm}
+            />
+          ) : null}
         </details>
       </div>
     </CreateEstateRoomShell>
