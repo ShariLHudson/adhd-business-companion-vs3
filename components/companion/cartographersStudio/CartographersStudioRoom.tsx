@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  CARTOGRAPHERS_CONTINUE_MAPPING,
   CARTOGRAPHERS_EXIT,
   CARTOGRAPHERS_FRAMED_MAPS,
   CARTOGRAPHERS_HELP,
@@ -11,11 +12,14 @@ import {
   CARTOGRAPHERS_STUDIO_BACKGROUND,
   CARTOGRAPHERS_WELCOME_REQUEST_EVENT,
   dismissCartographersWelcome,
+  wallSelectableFramedMaps,
   type CartographersFramedMap,
   type CartographersFramedMapId,
 } from "@/lib/cartographersStudio";
 import type { VisualFocusMap } from "@/lib/visualFocus";
+import { studioCardTitleForMode } from "@/lib/visualFocus/studioCards";
 import { CartographersAtlasOverlay } from "./CartographersAtlasOverlay";
+import { CartographersContextualHelp } from "./CartographersContextualHelp";
 import { CartographersStudioWelcomePanel } from "./CartographersStudioWelcomePanel";
 
 /** Approximate hotspot over the main table map (percent of viewport). */
@@ -70,6 +74,8 @@ export function CartographersStudioRoom({
   const [hoveredFrameId, setHoveredFrameId] =
     useState<CartographersFramedMapId | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [contextualHelpOpen, setContextualHelpOpen] = useState(false);
+  const selectableFrames = wallSelectableFramedMaps();
 
   useEffect(() => {
     const reopen = () => setShowWelcome(true);
@@ -174,7 +180,7 @@ export function CartographersStudioRoom({
             type="button"
             className="cartographers-chrome-link"
             data-testid="cartographers-help"
-            onClick={() => setShowWelcome(true)}
+            onClick={() => setContextualHelpOpen(true)}
             aria-label="Help — how to use Cartographer's Studio"
           >
             {CARTOGRAPHERS_HELP}
@@ -193,16 +199,52 @@ export function CartographersStudioRoom({
         </div>
       </div>
 
+      {latestMap ? (
+        <div
+          className="cartographers-continue-mapping"
+          data-testid="cartographers-continue-mapping"
+        >
+          <p className="cartographers-continue-mapping__eyebrow">
+            {CARTOGRAPHERS_CONTINUE_MAPPING}
+          </p>
+          <p className="cartographers-continue-mapping__title">
+            {latestMap.title?.trim() || "Untitled map"}
+          </p>
+          <p className="cartographers-continue-mapping__meta">
+            {studioCardTitleForMode(latestMap.mode)}
+            {latestMap.updatedAt
+              ? ` · Last edited ${new Date(latestMap.updatedAt).toLocaleString()}`
+              : ""}
+          </p>
+          <button
+            type="button"
+            className="cartographers-continue-mapping__cta"
+            data-testid="cartographers-continue-mapping-cta"
+            onClick={() => beginWorking(() => onOpenMap(latestMap.id))}
+          >
+            Continue
+          </button>
+        </div>
+      ) : (
+        <p
+          className="cartographers-continue-mapping cartographers-continue-mapping--empty"
+          data-testid="cartographers-continue-mapping-empty"
+        >
+          No saved maps yet — open Mind Map when you are ready to capture.
+        </p>
+      )}
+
       <div className="cartographers-immersive__hotspots" aria-label="Room objects">
-        {CARTOGRAPHERS_FRAMED_MAPS.map((map) => {
+        {/* Prompt 140 — only production-ready wall buttons are selectable. */}
+        {selectableFrames.map((map) => {
           const box = FRAME_HOTSPOTS[map.id];
           return (
             <button
               key={map.id}
               type="button"
-              className={`cartographers-hotspot cartographers-hotspot--frame${
-                map.interactive ? " cartographers-hotspot--live" : ""
-              }${hoveredFrameId === map.id ? " cartographers-hotspot--hover" : ""}`}
+              className={`cartographers-hotspot cartographers-hotspot--frame cartographers-hotspot--live${
+                hoveredFrameId === map.id ? " cartographers-hotspot--hover" : ""
+              }`}
               style={{
                 left: box.left,
                 top: box.top,
@@ -210,12 +252,8 @@ export function CartographersStudioRoom({
                 height: box.height,
               }}
               data-testid={`cartographers-frame-${map.id}`}
-              data-interactive={map.interactive ? "true" : "false"}
-              aria-label={
-                map.interactive
-                  ? `Open ${map.nameplate}`
-                  : `${map.nameplate} — ${map.hoverBlurb}`
-              }
+              data-interactive="true"
+              aria-label={`Open ${map.nameplate}`}
               onMouseEnter={() => setHoveredFrameId(map.id)}
               onMouseLeave={() =>
                 setHoveredFrameId((current) =>
@@ -228,20 +266,13 @@ export function CartographersStudioRoom({
                   current === map.id ? null : current,
                 )
               }
-              onClick={() => {
-                if (map.interactive) handleFrameSelect(map.id);
-                else setLearnMap(map);
-              }}
+              onClick={() => handleFrameSelect(map.id)}
               onContextMenu={(e) => {
                 e.preventDefault();
                 setLearnMap(map);
               }}
             >
-              <span
-                className={`cartographers-frame-btn${
-                  map.interactive ? " cartographers-frame-btn--ready" : ""
-                }`}
-              >
+              <span className="cartographers-frame-btn cartographers-frame-btn--ready">
                 <span className="cartographers-frame-btn__name">{map.nameplate}</span>
               </span>
             </button>
@@ -320,6 +351,17 @@ export function CartographersStudioRoom({
 
       {showWelcome ? (
         <CartographersStudioWelcomePanel onDismiss={dismissWelcome} />
+      ) : null}
+
+      {contextualHelpOpen ? (
+        <CartographersContextualHelp
+          map={null}
+          onClose={() => setContextualHelpOpen(false)}
+          onBrowseMapTypes={() => {
+            setContextualHelpOpen(false);
+            setAtlasOpen(true);
+          }}
+        />
       ) : null}
 
       {learnMap ? (

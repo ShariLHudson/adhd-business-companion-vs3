@@ -1,0 +1,35 @@
+{
+  "prompt": 140,
+  "date": "2026-07-21",
+  "branch": "deploy/companion-app-v3",
+  "certification": "provisional",
+  "browser": {
+    "status": "not_run",
+    "notes": "Authenticated Preview and MCP walkthrough not completed this session"
+  },
+  "accessibility": {
+    "status": "partial_code_only",
+    "notes": "Contextual help dialog roles present; no live a11y audit"
+  },
+  "regressions": {
+    "planned": [
+      "lib/visualFocus/canvasSync.test.ts",
+      "lib/cartographersStudio/mapRegistry.test.ts",
+      "lib/cartographersStudio/cartographersStudioUx.test.ts",
+      "lib/estate/welcomeHomeNavigationStructure.test.ts",
+      "lib/createEstate/createPolish129.test.ts"
+    ],
+    "status": "ran",
+    "totals": {
+      "files": 5,
+      "passed": 36,
+      "failed": 3,
+      "notes": "3 failures in cartographersStudioUx frictionlessActionLayer paths (immediateVisualOpen / beginner choice) — pre-existing WIP, not introduced by Prompt 140 canvas/help/nav changes. New canvasSync + mapRegistry + nav label tests passed."
+    }
+  },
+  "sideChatAutoOpen": "fixed_in_code",
+  "workToCreateLabel": "fixed_in_code",
+  "helpNavigatesAway": "fixed_in_code",
+  "canvasOutlineSync": "fixed_in_code",
+  "wallNonProductionHidden": "fixed_in_code"
+}

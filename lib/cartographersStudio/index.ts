@@ -9,8 +9,12 @@ export {
   CARTOGRAPHERS_ATLAS_SAVE_LINE,
   CARTOGRAPHERS_RETURN_TO_ESTATE,
   CARTOGRAPHERS_RESUME_PREVIOUS,
+  CARTOGRAPHERS_CONTINUE_MAPPING,
   CARTOGRAPHERS_HELP,
+  CARTOGRAPHERS_BROWSE_MAP_TYPES,
   CARTOGRAPHERS_EXIT,
+  CARTOGRAPHERS_UPDATE_MAP,
+  CARTOGRAPHERS_ASK_SHARI,
 } from "./media";
 
 export {
@@ -18,9 +22,19 @@ export {
   CARTOGRAPHERS_ROOM_INTRO,
   CARTOGRAPHERS_ATLAS_TEASER,
   getFramedMapById,
+  wallSelectableFramedMaps,
   type CartographersFramedMap,
   type CartographersFramedMapId,
 } from "./framedMaps";
+
+export {
+  CARTOGRAPHY_MAP_REGISTRY,
+  productionWallMaps,
+  namingMatrixRow,
+  assertMindMapNamingConsistent,
+  type CartographyMapRegistryEntry,
+  type CartographyProductionStatus,
+} from "./mapRegistry";
 
 export {
   CARTOGRAPHERS_ATLAS_ENTRIES,

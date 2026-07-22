@@ -3,7 +3,7 @@
  * Answers: Where do I want to go?
  * Experience Controls live under SH, not here.
  *
- * Spec 129 / 139 — five intent categories (Today · Create · Reflect · Guidance · Estate).
+ * Spec 129 / 139 / 140 — five intent categories (Today · Work to Create · Reflect · Guidance · Estate).
  * Reflect shows three primary destinations + Browse more (progressive disclosure).
  *
  * My Day restores two nested dropdown groups (098):
@@ -86,7 +86,7 @@ export type WelcomeHomeNavCategory = {
 };
 
 /**
- * Spec 129 — Today / Create / Reflect / Guidance / Estate.
+ * Spec 129 / 140 — Today / Work to Create / Reflect / Guidance / Estate.
  * Category ids stay stable for routing; member-facing labels use the simpler names.
  * Spec 139 — My Story destinations live under Reflect → Browse more (one fewer top-level decision).
  */
@@ -116,7 +116,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
   },
   {
     id: "my-work",
-    label: "Create",
+    label: "Work to Create",
     destinations: [
       {
         id: "create",

@@ -26,7 +26,7 @@ describe("welcomeHomeNavigationStructure", () => {
     ]);
     expect(WELCOME_HOME_NAV_CATEGORIES.map((c) => c.label)).toEqual([
       "Today",
-      "Create",
+      "Work to Create",
       "Reflect",
       "Guidance",
       "Estate",

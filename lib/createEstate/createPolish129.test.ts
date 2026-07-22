@@ -109,11 +109,11 @@ describe("Create polish 129 certification", () => {
     expect(working).toContain("applyRename");
   });
 
-  it("groups Welcome Home as Today / Create / Reflect / Guidance / Estate", () => {
+  it("groups Welcome Home as Today / Work to Create / Reflect / Guidance / Estate", () => {
     const labels = WELCOME_HOME_NAV_CATEGORIES.map((c) => c.label);
     expect(labels).toEqual([
       "Today",
-      "Create",
+      "Work to Create",
       "Reflect",
       "Guidance",
       "Estate",

@@ -26,6 +26,11 @@ export type CartographersFramedMap = {
   learnTip: string;
   /** MVP: only mind-map starts Discovery Interview. */
   interactive: boolean;
+  /**
+   * Prompt 140 — wall hotspot may open the map only when true.
+   * Non-production maps stay in Atlas teaching; no selectable wall open.
+   */
+  wallSelectable: boolean;
   /** Maps to Visual Focus mode when interactive. */
   visualFocusMode?: VisualFocusMode;
 };
@@ -38,6 +43,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     learnTip:
       "Capture and expand ideas without structuring them first. Spark groups related thoughts into branches.",
     interactive: true,
+    wallSelectable: true,
     visualFocusMode: "mind-map",
   },
   {
@@ -46,6 +52,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Compare options before making a choice.",
     learnTip: "Compare choices, criteria, and tradeoffs when you need a clear decision.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "relationship-map",
@@ -53,6 +60,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Understand how people, ideas, or systems connect.",
     learnTip: "Reveal how people, ideas, or systems connect and influence one another.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "process-map",
@@ -60,6 +68,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "See steps, bottlenecks, and flow from start to finish.",
     learnTip: "See steps, bottlenecks, and flow from start to finish.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "journey-map",
@@ -67,6 +76,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Chart the path from where you are to where you want to go.",
     learnTip: "Chart the path from where you are to where you want to go.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "timeline-map",
@@ -74,6 +84,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Place events in order and see what comes next.",
     learnTip: "Sequence milestones across past, present, and future.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "strategy-map",
@@ -81,6 +92,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Connect vision, priorities, and action into one course.",
     learnTip: "Connect vision, priorities, and action into one course.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "project-map",
@@ -88,6 +100,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Break a large initiative into phases, deliverables, and tasks.",
     learnTip: "Break a large initiative into phases, deliverables, and tasks.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "opportunity-map",
@@ -95,6 +108,7 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Explore possibilities, benefits, risks, and first steps.",
     learnTip: "Explore possibilities, benefits, risks, and first steps.",
     interactive: false,
+    wallSelectable: false,
   },
   {
     id: "priority-map",
@@ -102,8 +116,14 @@ export const CARTOGRAPHERS_FRAMED_MAPS: readonly CartographersFramedMap[] = [
     hoverBlurb: "Sort what matters by impact, urgency, and effort.",
     learnTip: "Sort what matters by impact, urgency, and effort.",
     interactive: false,
+    wallSelectable: false,
   },
 ] as const;
+
+/** Wall hotspots that may open a working map (Prompt 140 — hide broken selectors). */
+export function wallSelectableFramedMaps(): readonly CartographersFramedMap[] {
+  return CARTOGRAPHERS_FRAMED_MAPS.filter((m) => m.wallSelectable);
+}
 
 export function getFramedMapById(
   id: CartographersFramedMapId,

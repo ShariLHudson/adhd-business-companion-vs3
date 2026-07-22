@@ -20,5 +20,10 @@ export const CARTOGRAPHERS_ATLAS_SAVE_LINE =
 /** Estate-themed chrome labels (room immersion). */
 export const CARTOGRAPHERS_RETURN_TO_ESTATE = "Return to Estate" as const;
 export const CARTOGRAPHERS_RESUME_PREVIOUS = "Resume Previous Map" as const;
+export const CARTOGRAPHERS_CONTINUE_MAPPING = "Continue Mapping" as const;
 export const CARTOGRAPHERS_HELP = "Help" as const;
+/** Navigation to map types — never labeled Help (Prompt 140). */
+export const CARTOGRAPHERS_BROWSE_MAP_TYPES = "Browse Map Types" as const;
 export const CARTOGRAPHERS_EXIT = "Exit" as const;
+export const CARTOGRAPHERS_UPDATE_MAP = "Update Map" as const;
+export const CARTOGRAPHERS_ASK_SHARI = "Ask Shari" as const;

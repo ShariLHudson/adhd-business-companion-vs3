@@ -27,8 +27,16 @@ import {
   CARTOGRAPHERS_RESUME_PREVIOUS,
   CARTOGRAPHERS_RETURN_TO_ESTATE,
   CARTOGRAPHERS_STUDIO_BACKGROUND,
-  requestCartographersWelcome,
+  CARTOGRAPHERS_UPDATE_MAP,
 } from "@/lib/cartographersStudio";
+import { CartographersContextualHelp } from "@/components/companion/cartographersStudio/CartographersContextualHelp";
+import {
+  applyCanonicalRootChange,
+  canvasSyncStatusLabel,
+  mapHasPublishedCanvas,
+  refreshCanvasFromOutline,
+  type CanvasSyncStatus,
+} from "@/lib/visualFocus/canvasSync";
 import {
   VISUAL_FOCUS_UPDATED,
   VISUAL_FOCUS_SHOW_STUDIO,
@@ -321,6 +329,9 @@ export function VisualFocusWorkspacePanel({
     useState<IntelligenceViewMode>("canvas-intelligence");
   const [intelligenceHighlightSection, setIntelligenceHighlightSection] =
     useState<BusinessCanvasSectionId | null>(null);
+  const [contextualHelpOpen, setContextualHelpOpen] = useState(false);
+  const [canvasSyncStatus, setCanvasSyncStatus] =
+    useState<CanvasSyncStatus>("synced");
 
   const showStudioHub = useCallback(() => {
     clearActiveVisualFocusMapSelection();
@@ -512,10 +523,38 @@ export function VisualFocusWorkspacePanel({
 
   function handleGenerate() {
     if (!active) return;
+    setCanvasSyncStatus("updating");
     const generated = generateVisualFocusMap(active);
     const saved = persist(generated);
     setActive(saved);
     setWorkspaceMode("generated");
+    setCanvasSyncStatus("map-updated");
+    window.setTimeout(() => setCanvasSyncStatus("synced"), 2400);
+  }
+
+  function handleRefreshCanvas() {
+    if (!active) return;
+    setCanvasSyncStatus("updating");
+    const refreshed = refreshCanvasFromOutline(active);
+    const saved = persist(refreshed);
+    setActive(saved);
+    setWorkspaceMode("generated");
+    setCanvasSyncStatus("map-updated");
+    window.setTimeout(() => setCanvasSyncStatus("synced"), 2400);
+  }
+
+  function persistOutlineRoot(root: VisualFocusNode) {
+    if (!active) return;
+    const next = applyCanonicalRootChange(active, root);
+    if (mapHasPublishedCanvas(active)) {
+      setCanvasSyncStatus("updating");
+      setWorkspaceMode("generated");
+    }
+    persist(next);
+    if (mapHasPublishedCanvas(active)) {
+      setCanvasSyncStatus("map-updated");
+      window.setTimeout(() => setCanvasSyncStatus("synced"), 2400);
+    }
   }
 
   function persistBusinessCanvas(
@@ -711,10 +750,8 @@ export function VisualFocusWorkspacePanel({
                 type="button"
                 className="cartographers-chrome-link"
                 data-testid="cartographers-workspace-help"
-                onClick={() => {
-                  requestCartographersWelcome();
-                  backToStudio();
-                }}
+                onClick={() => setContextualHelpOpen(true)}
+                aria-label="Help for this map"
               >
                 {CARTOGRAPHERS_HELP}
               </button>
@@ -739,6 +776,17 @@ export function VisualFocusWorkspacePanel({
             >
               {atlasSaveAck}
             </p>
+          ) : null}
+
+          {contextualHelpOpen ? (
+            <CartographersContextualHelp
+              map={active}
+              onClose={() => setContextualHelpOpen(false)}
+              onBrowseMapTypes={() => {
+                setContextualHelpOpen(false);
+                backToStudio();
+              }}
+            />
           ) : null}
 
           <div className="cartographers-discovery-table__focus">
@@ -824,10 +872,34 @@ export function VisualFocusWorkspacePanel({
                   <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
                     Strategic view
                   </p>
-                  <IntelligenceViewModeToggle
-                    mode={intelligenceViewMode}
-                    onChange={setIntelligenceViewMode}
-                  />
+                  <div className="flex flex-wrap items-center gap-2">
+                    {canvasSyncStatus !== "synced" ? (
+                      <p
+                        className={`cartographers-canvas-sync${
+                          canvasSyncStatus === "sync-needed"
+                            ? " cartographers-canvas-sync--needed"
+                            : ""
+                        }`}
+                        role="status"
+                        aria-live="polite"
+                        data-testid="cartographers-canvas-sync-status"
+                      >
+                        {canvasSyncStatusLabel(canvasSyncStatus)}
+                      </p>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#faf7f2]"
+                      data-testid="cartographers-update-map"
+                      onClick={handleRefreshCanvas}
+                    >
+                      {CARTOGRAPHERS_UPDATE_MAP}
+                    </button>
+                    <IntelligenceViewModeToggle
+                      mode={intelligenceViewMode}
+                      onChange={setIntelligenceViewMode}
+                    />
+                  </div>
                 </div>
                 <div
                   className={`flex min-h-0 flex-1 flex-col gap-4 ${
@@ -863,24 +935,29 @@ export function VisualFocusWorkspacePanel({
                         cards={active.kanban.cards}
                         onChange={(columns, cards) => {
                           const updated = { ...active, kanban: { columns, cards } };
-                          persist(
-                            workspaceMode === "generated"
-                              ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
-                              : updated,
-                          );
+                          if (mapHasPublishedCanvas(active) || workspaceMode === "generated") {
+                            setCanvasSyncStatus("updating");
+                            persist(
+                              generateVisualFocusMap({
+                                ...updated,
+                                workflowStage: "build",
+                              }),
+                            );
+                            setWorkspaceMode("generated");
+                            setCanvasSyncStatus("map-updated");
+                            window.setTimeout(
+                              () => setCanvasSyncStatus("synced"),
+                              2400,
+                            );
+                          } else {
+                            persist(updated);
+                          }
                         }}
                       />
                     ) : (
                       <VisualFocusTreeEditor
                         root={active.root}
-                        onChange={(root) => {
-                          const updated = { ...active, root };
-                          persist(
-                            workspaceMode === "generated"
-                              ? generateVisualFocusMap({ ...updated, workflowStage: "build" })
-                              : updated,
-                          );
-                        }}
+                        onChange={(root) => persistOutlineRoot(root)}
                       />
                     )}
                   </aside>
@@ -962,7 +1039,7 @@ export function VisualFocusWorkspacePanel({
                 ) : (
                   <VisualFocusTreeEditor
                     root={active.root}
-                    onChange={(root) => persist({ ...active, root })}
+                    onChange={(root) => persistOutlineRoot(root)}
                   />
                 )}
                 {canGenerateVisualFocusMap(active) ? (

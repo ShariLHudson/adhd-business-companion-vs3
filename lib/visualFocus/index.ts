@@ -15,3 +15,4 @@ export * from "./myWorkIntegration";
 export * from "./discoveryInterview";
 export * from "./mindMapEditing";
 export * from "./mindMapHistory";
+export * from "./canvasSync";
