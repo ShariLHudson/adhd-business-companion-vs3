@@ -257,9 +257,10 @@ describe("Welcome Home menu — action wiring", () => {
     expect(source).toMatch(
       /const handleCompanionBack = \(\) => \{\s*\/\/[^\n]*\s*navigateBackToEstateHome\(\);\s*\}/,
     );
-    expect(roomMenuSource).toMatch(/Wander the Grounds/);
+    expect(roomMenuSource).toMatch(/Wander the Grounds|Wander the Estate/);
     expect(roomMenuSource).toMatch(/spark-estate/);
     expect(roomMenuSource).toMatch(/"wander-the-grounds":\s*onExploreSpark/);
+    expect(roomMenuSource).toMatch(/onOpenFocusLibrary/);
 
     // Must not fall back to member overrides, login art, or history restore.
     const lobbyFn = source.match(

@@ -24,14 +24,14 @@ function read(pathFromRoot: string): string {
   return readFileSync(resolve(process.cwd(), pathFromRoot), "utf8");
 }
 
-describe("My Work → Create navigation (116 / 149)", () => {
-  it("places Create first under My Work", () => {
-    const myWork = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-work");
-    expect(myWork?.destinations.map((d) => d.id)).toEqual([
+describe("Build → Create navigation (116 / 149)", () => {
+  it("places Create first under Build", () => {
+    const build = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "build");
+    expect(build?.destinations.map((d) => d.id)).toEqual([
       "create",
       "projects",
-      "destination-gallery",
       "cartographers-studio",
+      "destination-gallery",
     ]);
   });
 

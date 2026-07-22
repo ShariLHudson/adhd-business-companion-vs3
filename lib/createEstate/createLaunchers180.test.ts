@@ -68,10 +68,10 @@ describe("180 — Create launch contract", () => {
     ).toEqual({ kind: "allow" });
   });
 
-  it("wires picker select → startFreshCreateFromEstate with my-work-create", () => {
+  it("wires picker select → startFreshCreateFromEstate", () => {
     const client = read("app/companion/CompanionPageClient.tsx");
     expect(client).toContain("function startFreshCreateFromEstate");
-    expect(client).toContain('hardNavCommand: "my-work-create"');
+    expect(client).toContain("startFreshCreateFromEstate({");
     expect(client).toContain("estateCreateLaunch:");
     expect(client).toContain("onSelectCreationType");
     expect(client).toContain("resolveCreateLauncherType");
@@ -104,14 +104,17 @@ describe("180 — Strategy Library removed from Create", () => {
     expect(panel).not.toMatch(/Strategy Library create mode/i);
   });
 
-  it("Strategy Library remains under Get Advice", () => {
+  it("Strategies remains under Guidance with Chamber and Board", () => {
     const advice = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "get-advice");
-    expect(advice?.destinations.some((d) => d.id === "strategy-library")).toBe(
-      true,
-    );
+    expect(advice?.label).toBe("Guidance");
+    expect(advice?.destinations.map((d) => d.id)).toEqual([
+      "chamber-of-momentum",
+      "boardroom",
+      "strategy-library",
+    ]);
     expect(
       advice?.destinations.find((d) => d.id === "strategy-library")?.label,
-    ).toBe("Strategy Library");
+    ).toBe("Strategies");
   });
 });
 

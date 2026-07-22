@@ -16,6 +16,7 @@ const AREA_TO_PLACE: Record<string, EstateOrientationPlaceId> = {
   projects: "projects",
   "project-homes": "projects",
   "my-work": "projects",
+  build: "projects",
   // Cartography
   cartography: "cartography",
   "cartographers-studio": "cartography",

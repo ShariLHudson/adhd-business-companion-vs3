@@ -47,6 +47,13 @@ export type EstateTopRightChromeProps = {
   onOpenBoardroom?: () => void;
   onOpenStrategyLibrary?: () => void;
   onOpenBreathe?: () => void;
+  onOpenFocusLibrary?: () => void;
+  onOpenFocusTimer?: () => void;
+  onOpenTimeBlocking?: () => void;
+  onOpenBodyDouble?: () => void;
+  onOpenTemplates?: () => void;
+  onOpenContinueWorking?: () => void;
+  onOpenFocusAudio?: () => void;
   onOpenPeacefulPlaces?: () => void;
   onOpenSoundscapes?: () => void;
   backdropSurface?: "chat" | "clear-my-mind";
@@ -94,6 +101,13 @@ export function EstateTopRightChrome({
   onOpenBoardroom,
   onOpenStrategyLibrary,
   onOpenBreathe,
+  onOpenFocusLibrary,
+  onOpenFocusTimer,
+  onOpenTimeBlocking,
+  onOpenBodyDouble,
+  onOpenTemplates,
+  onOpenContinueWorking,
+  onOpenFocusAudio,
   onOpenPeacefulPlaces,
   onOpenSoundscapes,
   backdropSurface,
@@ -149,6 +163,13 @@ export function EstateTopRightChrome({
           onOpenBoardroom={onOpenBoardroom}
           onOpenStrategyLibrary={onOpenStrategyLibrary}
           onOpenBreathe={onOpenBreathe}
+          onOpenFocusLibrary={onOpenFocusLibrary}
+          onOpenFocusTimer={onOpenFocusTimer}
+          onOpenTimeBlocking={onOpenTimeBlocking}
+          onOpenBodyDouble={onOpenBodyDouble}
+          onOpenTemplates={onOpenTemplates}
+          onOpenContinueWorking={onOpenContinueWorking}
+          onOpenFocusAudio={onOpenFocusAudio}
           onOpenPeacefulPlaces={onOpenPeacefulPlaces}
           onOpenSoundscapes={onOpenSoundscapes}
           backdropSurface={backdropSurface}
