@@ -35,7 +35,7 @@ export function CreateEstateRoomShell({
       data-estate-atmosphere="create"
     >
       <CinematicBackground
-        preset="plan-my-day"
+        preset="creative-studio"
         mode="image"
         imageUrl={CREATE_BACKGROUND_SRC}
         imageStyle={roomBackgroundImageStyle(CREATE_BACKGROUND_SRC)}

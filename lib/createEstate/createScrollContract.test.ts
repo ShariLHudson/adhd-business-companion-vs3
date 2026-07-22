@@ -78,10 +78,11 @@ describe("Create morning-room scroll contract (133)", () => {
     expect(shell).toContain("CinematicBackground");
   });
 
-  it("Create full-bleed uses morning-room chrome class", () => {
+  it("Create full-bleed uses companion-create-active + Art Studio plate", () => {
     const client = read("app/companion/CompanionPageClient.tsx");
-    expect(client).toMatch(
-      /activeSection === "create"[\s\S]{0,120}companion-plan-my-day-active/,
-    );
+    expect(client).toContain('activeSection === "create"');
+    expect(client).toContain("companion-create-active");
+    expect(client).toContain('roomId="creative-studio"');
+    expect(client).toContain("createWorkspaceActive");
   });
 });

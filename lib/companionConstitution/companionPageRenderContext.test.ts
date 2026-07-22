@@ -112,6 +112,27 @@ describe("companionPageRenderContext", () => {
     });
   });
 
+  it("suppresses legacy wallpaper for Create and Project Homes estate plates", () => {
+    expect(
+      buildCompanionPageRenderContext({
+        activeSection: "create",
+        workspacePanel: null,
+        workspaceBesideChat: false,
+        displayEmotion: "building",
+        messageCount: 0,
+      }).globalBackground.suppress,
+    ).toBe(true);
+    expect(
+      buildCompanionPageRenderContext({
+        activeSection: "project-homes",
+        workspacePanel: null,
+        workspaceBesideChat: false,
+        displayEmotion: "building",
+        messageCount: 0,
+      }).globalBackground.suppress,
+    ).toBe(true);
+  });
+
   it("flags lower-layer place overrides in development", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const previousEnv = process.env.NODE_ENV;

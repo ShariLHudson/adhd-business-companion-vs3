@@ -8,6 +8,7 @@ import { HomesteadSceneProvider } from "@/lib/homesteadScene";
 import { resolveCompanionSupabaseEnv } from "@/lib/supabase/resolveCompanionSupabaseEnv";
 import { isBrowserSafeSupabaseKey } from "@/lib/supabase/supabaseKeyRoles";
 import "./cinematic-background.css";
+import "./create-projects-atmosphere.css";
 import "./estate-light-flicker.css";
 import "./destination-gallery-crystals.css";
 import "./crystal-actions.css";

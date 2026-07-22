@@ -79,22 +79,25 @@ describe("096 — Welcome Home catalog", () => {
   });
 });
 
-describe("096 — Projects Welcome opens ProjectsPanel", () => {
-  it("CPC Welcome opener uses projects section, not project-homes", () => {
+describe("096 — Projects Welcome opens Project Homes (vision-room plate)", () => {
+  it("CPC Welcome opener routes Projects to Project Homes — not legacy ProjectsPanel", () => {
     const client = read("app/companion/CompanionPageClient.tsx");
-    expect(client).toContain(
-      'onOpenProjects={() => openStandaloneFocusSectionCore("projects")}',
-    );
-    expect(client).not.toMatch(
+    expect(client).toMatch(
       /onOpenProjects=\{\(\) => openProjectHomesPrototypeCore\(\)\}/,
+    );
+    expect(client).not.toContain(
+      'onOpenProjects={() => openStandaloneFocusSectionCore("projects")}',
     );
     const universal = client.slice(
       client.indexOf('case "calendar":'),
       client.indexOf('case "journal":'),
     );
     expect(universal).toContain('case "projects":');
-    expect(universal).toContain('openStandaloneFocusSectionCore("projects")');
-    expect(universal).not.toContain("openProjectHomesPrototypeCore()");
+    expect(universal).toContain("openProjectHomesPrototypeCore()");
+    // Central redirect: any leftover "projects" standalone open → Project Homes.
+    expect(client).toMatch(
+      /function openStandaloneFocusSectionCore[\s\S]*?if \(section === "projects"\) \{\s*openProjectHomesPrototypeCore\(\);/,
+    );
   });
 
   it("master registry Welcome dest is projects", () => {

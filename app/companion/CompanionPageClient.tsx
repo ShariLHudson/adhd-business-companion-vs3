@@ -7756,7 +7756,7 @@ export default function CompanionPageClient() {
       "decision-compass": "decision-compass",
       chamber: "chamber-of-momentum",
       boardroom: "boardroom",
-      projects: "projects",
+      projects: "project-homes",
       "people-i-help": "client-avatars",
       settings: "settings",
       journal: "growth-journal",
@@ -7856,7 +7856,7 @@ export default function CompanionPageClient() {
       "decision-compass": "decision-compass",
       chamber: "chamber-of-momentum",
       boardroom: "boardroom",
-      projects: "projects",
+      projects: "project-homes",
       "people-i-help": "client-avatars",
       settings: "settings",
       journal: "growth-journal",
@@ -9133,6 +9133,11 @@ export default function CompanionPageClient() {
 
   /** Standalone focus tools (Clear My Mind, spin wheel, energy, etc.). */
   function openStandaloneFocusSectionCore(section: AppSection) {
+    // Legacy blue ProjectsPanel — always land on Project Homes (vision-room plate).
+    if (section === "projects") {
+      openProjectHomesPrototypeCore();
+      return;
+    }
     const resolvedSection = section === "games" ? "quick-recharge" : section;
     dismissTransientEstateExperiencesForDestinationSwitch({
       destinationId: resolvedSection,
@@ -9990,7 +9995,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (section === "projects") {
-      openStandaloneFocusSectionCore("projects");
+      openProjectHomesPrototypeCore();
       return;
     }
     openStandaloneFocusSectionCore(section);
@@ -11251,7 +11256,7 @@ export default function CompanionPageClient() {
         openCalendarCore();
         break;
       case "projects":
-        openStandaloneFocusSectionCore("projects");
+        openProjectHomesPrototypeCore();
         break;
       case "journal":
         openGrowthDestinationCore("growth-journal");
@@ -22929,9 +22934,14 @@ export default function CompanionPageClient() {
   const clearMyMindWorkspaceActive =
     activeSection === "brain-dump" || isClearMyMindModeActive();
 
+  /** Create estate + legacy content-generator — page-level Art Studio plate. */
   const createWorkspaceActive =
     workspacePanel === "content-generator" ||
-    activeSection === "content-generator";
+    activeSection === "content-generator" ||
+    activeSection === "create";
+
+  /** Projects estate room — page-level inspiring-vision plate. */
+  const projectsEstateActive = activeSection === "project-homes";
 
   const sparkEstateShellPlaceId = resolveSparkEstateShellPlaceId({
     clearMyMindWorkspaceActive,
@@ -23119,6 +23129,12 @@ export default function CompanionPageClient() {
       data-journal-gazebo-active={
         activeSection === "growth-journal" ? "" : undefined
       }
+      data-create-estate-working={
+        activeSection === "create" ? "" : undefined
+      }
+      data-project-homes-active={
+        activeSection === "project-homes" ? "" : undefined
+      }
       data-estate-room-chat-visible={
         roomMenuChatVisible ? "true" : "false"
       }
@@ -23203,6 +23219,11 @@ export default function CompanionPageClient() {
           roomId="creative-studio"
           imageUrl={CREATIVE_STUDIO_ROOM_BG}
         />
+      ) : projectsEstateActive && !sparkEstateShellPlaceId ? (
+        <EstateRoomFullBleedBackground
+          roomId="goals-projects"
+          imageUrl={PROJECT_HOMES_ROOM_BACKGROUND}
+        />
       ) : (
         <CompanionBackground
           page={scenePage}
@@ -23279,7 +23300,6 @@ export default function CompanionPageClient() {
                   activeSection === "parking-lot" ||
                   activeSection === "talk-it-out" ||
                   activeSection === "spin-wheel" ||
-                  activeSection === "create" ||
                   activeSection === "playbook"
                 ? "pl-0 companion-plan-my-day-active"
               : activeSection === "brain-dump"
@@ -23315,7 +23335,6 @@ export default function CompanionPageClient() {
           activeSection === "parking-lot" ||
           activeSection === "talk-it-out" ||
           activeSection === "spin-wheel" ||
-          activeSection === "create" ||
           activeSection === "playbook"
             ? "companion-plan-my-day-active"
             : ""
@@ -24527,7 +24546,7 @@ export default function CompanionPageClient() {
                 });
                 openSectionBesideChatCore("projects", "projects");
               }}
-              onOpenProjects={() => openSectionBesideChatCore("projects", "projects")}
+              onOpenProjects={() => openProjectHomesPrototypeCore()}
               onOpenCalendar={() => openCalendarCore()}
               onOpenAppointment={(appointmentId) =>
                 openCalendarItemCore(appointmentId, "planning-calendar")
@@ -25711,7 +25730,7 @@ export default function CompanionPageClient() {
         onOpenRhythms={() => openRemindersRhythmsCore("rhythms")}
         onOpenReminders={() => openRemindersRhythmsCore("reminders")}
         onOpenCalendar={() => openCalendarCore()}
-        onOpenProjects={() => openStandaloneFocusSectionCore("projects")}
+        onOpenProjects={() => openProjectHomesPrototypeCore()}
         onOpenCreateStudio={() => openCreateEstateCore()}
         onOpenClearMyMind={() => openClearMyMindCore()}
         onOpenParkingLot={() => openParkingLotCore()}
@@ -25732,7 +25751,7 @@ export default function CompanionPageClient() {
             handleCompanionContinueOption(resolution.options[0]);
             return;
           }
-          openStandaloneFocusSectionCore("projects");
+          openProjectHomesPrototypeCore();
         }}
         onOpenEvidenceVault={() =>
           enterEvidenceVaultRoomCore({ userIntent: "room-menu:evidence-vault" })
@@ -25767,6 +25786,7 @@ export default function CompanionPageClient() {
           onSetChatVisible={setEstateRoomChatVisiblePreserving}
           allowConversationToggle={
             activeSection !== "create" &&
+            activeSection !== "project-homes" &&
             !forbidCompanionSidePanelDuringCreation()
           }
           onOpenNotifications={() => {
@@ -25789,6 +25809,7 @@ export default function CompanionPageClient() {
       roomMenuRoomId !== "evidence-vault" &&
       activeSection !== "evidence-bank" &&
       activeSection !== "create" &&
+      activeSection !== "project-homes" &&
       !forbidCompanionSidePanelDuringCreation() ? (
         <button
           type="button"

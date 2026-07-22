@@ -147,6 +147,22 @@ function resolveGlobalBackgroundIntent(
       suppress: false,
     };
   }
+
+  // Create / Projects own photographic plates — never leave a random wallpaper under them.
+  if (
+    input.activeSection === "create" ||
+    input.activeSection === "project-homes" ||
+    input.activeSection === "content-generator" ||
+    input.workspacePanel === "content-generator"
+  ) {
+    return {
+      scenePage: sceneForContext(input.displayEmotion, input.activeSection),
+      sceneSeed: input.activeSection,
+      clearMyMind: false,
+      suppress: true,
+    };
+  }
+
   return {
     scenePage: sceneForContext(input.displayEmotion, input.activeSection),
     sceneSeed: input.activeSection,
