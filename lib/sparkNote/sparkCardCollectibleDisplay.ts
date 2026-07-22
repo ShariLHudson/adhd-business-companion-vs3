@@ -1,11 +1,24 @@
 import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
+import { SPARK_NOTE_CATALOG } from "./catalog";
 import { resolveSparkCardArtAsset } from "./sparkCardArtRegistry";
+import {
+  resolveSparkCardCategoryRibbon,
+  resolveSparkCardDiversityCategory,
+  type SparkCardDiversityCategoryId,
+} from "./sparkCardDiversity";
 
-/** Expanded card section labels — collectible discovery voice. */
+/** Simplified default-view section labels — treasure card, not article. */
 export const SPARK_CARD_SECTION_STORY = "The Story" as const;
-export const SPARK_CARD_SECTION_WHY = "Why It Matters" as const;
-export const SPARK_CARD_SECTION_DISCOVER = "More To Discover" as const;
-export const SPARK_CARD_SECTION_SPARK = "Spark It" as const;
+export const SPARK_CARD_SECTION_TODAYS_SPARK = "Today's Spark" as const;
+export const SPARK_CARD_SECTION_SPARK_IN_ACTION = "Spark In Action" as const;
+export const SPARK_CARD_SECTION_TELL_ME_MORE = "Tell Me More" as const;
+
+/** @deprecated Prefer SPARK_CARD_SECTION_TODAYS_SPARK — kept for older references. */
+export const SPARK_CARD_SECTION_WHY = SPARK_CARD_SECTION_TODAYS_SPARK;
+/** @deprecated Prefer SPARK_CARD_SECTION_TELL_ME_MORE */
+export const SPARK_CARD_SECTION_DISCOVER = SPARK_CARD_SECTION_TELL_ME_MORE;
+/** @deprecated Prefer SPARK_CARD_SECTION_SPARK_IN_ACTION */
+export const SPARK_CARD_SECTION_SPARK = SPARK_CARD_SECTION_SPARK_IN_ACTION;
 
 const SPARK_CARD_MORE_TO_DISCOVER_BY_ID: Record<string, string> = {
   "SPARK-INV-001":
@@ -53,6 +66,22 @@ const SPARK_CARD_MORE_TO_DISCOVER_BY_CATEGORY: Partial<
     "Growth sparks often connect a small daily choice to a larger identity you are still becoming.",
 };
 
+const DIVERSITY_TINY_ACTIONS: Record<SparkCardDiversityCategoryId, string> = {
+  fun_celebrations: "Share one cheerful fact with someone today.",
+  innovation: "Write down one idea you once set aside.",
+  remarkable_people: "Thank someone who quietly made something better.",
+  amazing_places: "Notice one beautiful detail in the place you are today.",
+  nature: "Step outside for two minutes and notice one living thing.",
+  history: "Tell someone one surprising thing from the past you just learned.",
+  fun_facts: "Smile and share one surprising fact with a friend.",
+  kindness: "Leave someone a short encouraging note.",
+  curiosity: "Ask one curious question today — and wait for the answer.",
+  inspiration: "Write one sentence about what this spark stirred in you.",
+  books_ideas: "Jot down one idea worth keeping before the day ends.",
+  creativity: "Make one tiny creative mark — a doodle, a line, a phrase.",
+  science_technology: "Wonder out loud how one everyday tool actually works.",
+};
+
 /** Supplemental discovery copy — dates, context, lesser-known angles. */
 export function resolveSparkCardMoreToDiscover(
   card: SparkNoteDailyCard,
@@ -69,11 +98,182 @@ export function resolveSparkCardBriefInsight(
   card: SparkNoteDailyCard,
 ): string | null {
   const candidate =
+    card.whyItMatters?.trim() ||
     card.sparkApplication?.trim() ||
     card.whyInteresting?.trim() ||
-    card.whyItMatters?.trim() ||
     null;
   return candidate;
+}
+
+/** Split story into short paragraphs (3–5 when possible). */
+export function splitSparkCardStoryParagraphs(story: string): string[] {
+  const trimmed = story.trim();
+  if (!trimmed) return [];
+
+  const byBlank = trimmed
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  if (byBlank.length >= 2) return byBlank.slice(0, 5);
+
+  const sentences = trimmed
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  if (sentences.length <= 3) return [trimmed];
+
+  const paragraphs: string[] = [];
+  const chunkSize = Math.ceil(sentences.length / Math.min(5, Math.ceil(sentences.length / 2)));
+  for (let i = 0; i < sentences.length; i += chunkSize) {
+    paragraphs.push(sentences.slice(i, i + chunkSize).join(" "));
+  }
+  return paragraphs.slice(0, 5);
+}
+
+/**
+ * Today's Spark — one meaningful takeaway (not a multi-panel lesson).
+ */
+export function resolveTodaysSpark(card: SparkNoteDailyCard): string {
+  return (
+    card.whyItMatters?.trim() ||
+    card.teaser?.trim() ||
+    "A small spark can change how you see the day."
+  );
+}
+
+/**
+ * Spark In Action — one tiny action under ~five minutes.
+ * Reflection questions from the catalog become concrete micro-actions.
+ */
+export function resolveSparkInAction(card: SparkNoteDailyCard): string {
+  const raw = card.sparkApplication?.trim() ?? "";
+  if (raw && !raw.endsWith("?")) return raw;
+
+  const diversity = resolveSparkCardDiversityCategory({
+    category: card.category,
+    categoryLabel: card.categoryLabel,
+    tags: card.tags,
+    title: card.title,
+  });
+  return DIVERSITY_TINY_ACTIONS[diversity];
+}
+
+export type SparkCardRelatedSpark = {
+  id: string;
+  title: string;
+  categoryRibbon: string;
+};
+
+export type SparkCardTellMeMore = {
+  facts: string[];
+  reflectionPrompt: string | null;
+  related: SparkCardRelatedSpark[];
+};
+
+export type SparkCardSimplifiedPresentation = {
+  categoryRibbon: string;
+  diversityCategory: SparkCardDiversityCategoryId;
+  title: string;
+  subtitle: string;
+  storyParagraphs: string[];
+  todaysSpark: string;
+  sparkInAction: string;
+  tellMeMore: SparkCardTellMeMore;
+};
+
+function resolveRelatedSparks(card: SparkNoteDailyCard): SparkCardRelatedSpark[] {
+  const diversity = resolveSparkCardDiversityCategory({
+    category: card.category,
+    categoryLabel: card.categoryLabel,
+    tags: card.tags,
+    title: card.title,
+  });
+  const tagSet = new Set((card.tags ?? []).map((t) => t.toLowerCase()));
+
+  return SPARK_NOTE_CATALOG.filter((entry) => entry.id !== card.id)
+    .map((entry) => {
+      const entryDiversity = resolveSparkCardDiversityCategory({
+        category: entry.category,
+        categoryLabel: entry.categoryLabel,
+        tags: entry.tags,
+        title: entry.title,
+      });
+      const sharedTags = (entry.tags ?? []).filter((t) =>
+        tagSet.has(t.toLowerCase()),
+      ).length;
+      const score =
+        (entryDiversity === diversity ? 3 : 0) +
+        sharedTags +
+        (entry.category === card.category ? 1 : 0);
+      return { entry, score };
+    })
+    .filter((row) => row.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map(({ entry }) => ({
+      id: entry.id,
+      title: entry.shortTitle ?? entry.title,
+      categoryRibbon: resolveSparkCardCategoryRibbon({
+        category: entry.category,
+        categoryLabel: entry.categoryLabel,
+        tags: entry.tags,
+        title: entry.title,
+      }),
+    }));
+}
+
+export function resolveSparkCardTellMeMore(
+  card: SparkNoteDailyCard,
+): SparkCardTellMeMore {
+  const facts: string[] = [];
+  const more = resolveSparkCardMoreToDiscover(card);
+  if (more) facts.push(more);
+  if (
+    card.whyInteresting?.trim() &&
+    card.whyInteresting.trim() !== more?.trim()
+  ) {
+    facts.push(card.whyInteresting.trim());
+  }
+
+  const reflection =
+    card.sparkApplication?.trim().endsWith("?")
+      ? card.sparkApplication.trim()
+      : null;
+
+  return {
+    facts,
+    reflectionPrompt: reflection,
+    related: resolveRelatedSparks(card),
+  };
+}
+
+/** Default-view presentation — calm treasure card. */
+export function resolveSparkCardSimplifiedPresentation(
+  card: SparkNoteDailyCard,
+): SparkCardSimplifiedPresentation {
+  const diversityCategory = resolveSparkCardDiversityCategory({
+    category: card.category,
+    categoryLabel: card.categoryLabel,
+    tags: card.tags,
+    title: card.title,
+  });
+
+  return {
+    categoryRibbon: resolveSparkCardCategoryRibbon({
+      category: card.category,
+      categoryLabel: card.categoryLabel,
+      tags: card.tags,
+      title: card.title,
+    }),
+    diversityCategory,
+    title: card.title,
+    subtitle: card.teaser?.trim() || "A small idea waiting to brighten your day.",
+    storyParagraphs: splitSparkCardStoryParagraphs(card.whatHappened),
+    todaysSpark: resolveTodaysSpark(card),
+    sparkInAction: resolveSparkInAction(card),
+    tellMeMore: resolveSparkCardTellMeMore(card),
+  };
 }
 
 export type SparkCardHeroVisual =
@@ -119,4 +319,16 @@ export function resolveSparkCardHeroVisual(
     emblem: SPARK_CARD_CATEGORY_EMBLEM[card.category] ?? "✨",
     alt: asset.alt,
   };
+}
+
+/** Share / clipboard text for a simplified Spark Card. */
+export function buildSparkCardShareText(card: SparkNoteDailyCard): string {
+  const presentation = resolveSparkCardSimplifiedPresentation(card);
+  return [
+    presentation.title,
+    presentation.subtitle,
+    "",
+    `Today's Spark: ${presentation.todaysSpark}`,
+    `Spark In Action: ${presentation.sparkInAction}`,
+  ].join("\n");
 }

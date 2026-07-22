@@ -44,6 +44,7 @@ import {
 } from "@/lib/gallery";
 import { GalleryExperiencePanel } from "@/components/companion/GalleryExperiencePanel";
 import { DestinationGalleryPanel } from "@/components/companion/destinationGallery/DestinationGalleryPanel";
+import { CrystalActionsPanel } from "@/components/companion/crystalActions/CrystalActionsPanel";
 import { LifeExperienceRoomPanel } from "@/components/companion/LifeExperienceRoomPanel";
 import { DecisionCompassWorkspace } from "@/components/companion/DecisionCompassWorkspace";
 import { BreatheDestinationHost } from "@/components/companion/BreatheDestinationHost";
@@ -359,6 +360,8 @@ import {
   offerNextHelpfulLessonExcluding,
   markHelpfulLessonOpened,
   markHelpfulLessonDismissed,
+  markFirst60DiscoveryExplored,
+  markFirst60DiscoverySkipped,
   recommendMeaningfulStart,
   nextMeaningfulStartRecommendation,
   shariCueForMeaningfulStart,
@@ -1600,7 +1603,7 @@ import {
   type EstateMenuShellActionId,
   type ProfileEstateRoomId,
 } from "@/lib/growth/profileEstateRooms";
-import { CREATIVE_STUDIO_ROOM_BG } from "@/lib/creativeStudio/creativeStudioRoom";
+import { CREATE_BACKGROUND_SRC as CREATIVE_STUDIO_ROOM_BG } from "@/lib/estateExperienceBackgrounds";
 import { CELEBRATION_GARDEN_ROOM_BG } from "@/lib/celebrationGarden/celebrationGardenRoom";
 import { STORY_LIBRARY_ROOM_BG } from "@/lib/storyLibrary/storyLibraryRoom";
 import { CAPTURE_MOMENT_ROOM_BG } from "@/lib/captureMoment/captureMomentRoom";
@@ -1736,16 +1739,22 @@ import {
 import { CHAMBER_OF_MOMENTUM_ROOM_BG } from "@/lib/estate/chamber/chamberOfMomentumRoomRegistry";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio";
 import {
-  DESTINATION_GALLERY_BG,
+  getDestinationCrystal,
   resolveCrystalActivation,
   type CrystalActivation,
   type DestinationCrystal,
+  type DestinationCrystalId,
 } from "@/lib/destinationGallery";
 import {
   isCanvaConnected,
   readCanvaConnection,
   readDigitalWorkspacePreferences,
 } from "@/lib/connections";
+import {
+  CRYSTAL_ACTIONS_OPEN_EVENT,
+  type CrystalActionItemKind,
+  type CrystalActionsOpenDetail,
+} from "@/lib/crystalActions";
 import { resolveMyDayAndWorkOpenerFromText } from "@/lib/estate/myDayAndWorkNavigation";
 import { ensureChamberDemoDataSeeded } from "@/lib/estate/chamber/seedChamberDemoData";
 import { isChamberDemoMode } from "@/lib/estate/chamber/chamberDemoMode";
@@ -2652,6 +2661,18 @@ export default function CompanionPageClient() {
   /** Destination Gallery pass-1 prepared crystal (Document / Store / Share / Print / Design). */
   const [destinationCrystalPrepared, setDestinationCrystalPrepared] =
     useState<CrystalActivation | null>(null);
+  /** Crystal Actions — contextual overlay (Destination Gallery room retired from menus). */
+  const [crystalActionsKind, setCrystalActionsKind] =
+    useState<CrystalActionItemKind | null>(null);
+  useEffect(() => {
+    function onOpenCrystalActions(event: Event) {
+      const detail = (event as CustomEvent<CrystalActionsOpenDetail>).detail;
+      if (detail?.itemKind) setCrystalActionsKind(detail.itemKind);
+    }
+    window.addEventListener(CRYSTAL_ACTIONS_OPEN_EVENT, onOpenCrystalActions);
+    return () =>
+      window.removeEventListener(CRYSTAL_ACTIONS_OPEN_EVENT, onOpenCrystalActions);
+  }, []);
   const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
     useState(false);
   /** Legacy "profile" overlay id + current My Business Estate destination. */
@@ -7812,16 +7833,71 @@ export default function CompanionPageClient() {
     openPlanAdaptSharedCore("plan");
   }
 
+  function navigateFirst60DiscoveryDestination(destinationId: string) {
+    if (destinationId === "clear-my-mind") {
+      navigateDailyOpeningDestination({ kind: "clear-my-mind" });
+      return;
+    }
+    if (destinationId === "plan-my-day") {
+      navigateDailyOpeningDestination({ kind: "plan-my-day" });
+      return;
+    }
+    if (destinationId === "adapt-my-day") {
+      navigateDailyOpeningDestination({ kind: "adapt-my-day" });
+      return;
+    }
+    if (destinationId === "my-business-estate") {
+      navigateDailyOpeningDestination({ kind: "business-estate" });
+      return;
+    }
+    const sectionMap: Record<string, import("@/lib/companionUi").AppSection> = {
+      reminders: "reminders",
+      rhythms: "rhythms",
+      "decision-compass": "decision-compass",
+      chamber: "chamber-of-momentum",
+      boardroom: "boardroom",
+      projects: "projects",
+      "people-i-help": "client-avatars",
+      settings: "settings",
+      journal: "growth-journal",
+      "evidence-vault": "evidence-bank",
+      guidebook: "how-do-i",
+      "peaceful-places": "life-experience",
+      create: "create",
+      "focus-conservatory": "focus",
+      "celebration-garden": "wins-this-week",
+      library: "templates-library",
+    };
+    const section = sectionMap[destinationId];
+    if (section) {
+      navigateDailyOpeningDestination({ kind: "section", section });
+      return;
+    }
+    navigateDailyOpeningDestination({
+      kind: "stay-in-chat",
+      cue: "I can show you that part of the Estate whenever you're ready — just tell me what you're curious about.",
+    });
+  }
+
   function handleGlobalDailyDiscoveryLearn() {
     markDailyOpeningDiscoveryPresented();
     const opening =
       globalDailyOpening ??
       todaysWelcomeOpening ??
       resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
+    const discoveryId = opening.discovery.discoveryId;
+    const destinationId = opening.discovery.destinationId;
+    if (discoveryId) {
+      markFirst60DiscoveryExplored(discoveryId);
+    }
     setGlobalDailyOpening({
       ...opening,
       discovery: { ...opening.discovery, show: false },
     });
+    if (destinationId) {
+      navigateFirst60DiscoveryDestination(destinationId);
+      return;
+    }
     handleWelcomeHomeDiscoveryInvite();
   }
 
@@ -7831,6 +7907,10 @@ export default function CompanionPageClient() {
       globalDailyOpening ??
       todaysWelcomeOpening ??
       resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
+    const discoveryId = opening.discovery.discoveryId;
+    if (discoveryId) {
+      markFirst60DiscoverySkipped(discoveryId);
+    }
     setGlobalDailyOpening({
       ...opening,
       discovery: { ...opening.discovery, show: false },
@@ -9374,26 +9454,17 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Destination Gallery — Architecture 156 crystals (not Asset Library / the-gallery).
+   * Crystal Actions — contextual next steps (Destination Gallery room retired from menus).
+   * Underlying crystal routing remains via handleSelectDestinationCrystal.
    */
-  function openDestinationGalleryCore() {
+  function openDestinationGalleryCore(itemKind: CrystalActionItemKind = "document") {
     leaveClearMyMindIfNavigatingAway();
     setOverlay(null);
     setDestinationCrystalPrepared(null);
-    preloadRoomBackground(DESTINATION_GALLERY_BG.split("?")[0] ?? DESTINATION_GALLERY_BG);
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
-    syncDirectEstateVisit({
-      roomId: "destination-gallery",
-      section: "destination-gallery",
-      userIntent: "destination-gallery",
-      userMessageCountAtArrival: messages.filter((m) => m.role === "user")
-        .length,
-    });
     trackWorkspaceEcosystemEvent("destination-gallery");
-    noteWorkspaceOpened("destination-gallery", "standalone_room");
-    openStandaloneFocusSectionCore("destination-gallery");
-    setEstateRoomChatVisible(false);
+    setCrystalActionsKind(itemKind);
   }
 
   /**
@@ -23517,11 +23588,11 @@ export default function CompanionPageClient() {
                         mode="main"
                         greetingTitle={todaysWelcomeOpening.greetingTitle}
                         welcomeLine={todaysWelcomeOpening.welcomeLine}
-                        choicesIntro={todaysWelcomeOpening.choicesIntro}
-                        discoveryInviteLine={
-                          todaysWelcomeOpening.discoveryInviteLine
-                        }
                         welcomeMessage={todaysWelcomeOpening.welcomeMessage}
+                        encouragementLine={
+                          todaysWelcomeOpening.encouragementLine
+                        }
+                        teachingSentence={todaysWelcomeOpening.teachingSentence}
                         choiceCards={todaysWelcomeOpening.choiceCards}
                         discovery={todaysWelcomeOpening.discovery}
                         onSelect={handleGlobalDailyOpeningChoice}
@@ -24410,6 +24481,22 @@ export default function CompanionPageClient() {
               />
             </EstateRoomErrorBoundary>
           )}
+
+          {crystalActionsKind ? (
+            <CrystalActionsPanel
+              itemKind={crystalActionsKind}
+              open
+              onClose={() => setCrystalActionsKind(null)}
+              onAction={({ crystalRoute }) => {
+                setCrystalActionsKind(null);
+                if (!crystalRoute) return;
+                const crystal = getDestinationCrystal(
+                  crystalRoute as DestinationCrystalId,
+                );
+                if (crystal) handleSelectDestinationCrystal(crystal);
+              }}
+            />
+          ) : null}
 
           {activeSection === "adapt-plan-my-day" && (
             <PlanAdaptSharedWindow

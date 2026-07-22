@@ -19,12 +19,24 @@ export {
   resolveDailyOpeningMemberFirstName,
   resolveDailyOpeningMomentKind,
   resolveFirst60TeachingSentence,
+  resolveTodaysEncouragement,
   countWelcomeSentences,
   SOMETHING_HELPFUL_TO_KNOW_TODAY,
   SHOW_ME_SOMETHING_HELPFUL_LABEL,
   type DailyOpeningMomentKind,
   type DailyOpeningWelcomeParts,
 } from "./buildDailyOpeningWelcome";
+export {
+  resolveWelcomeDayIndex,
+  resolveDiscoveryForWelcomeDay,
+  markFirst60DiscoveryExplored,
+  markFirst60DiscoverySkipped,
+  clearFirst60ProgressForTests,
+  FIRST_60_DISCOVERY_CATALOG,
+  FIRST_60_DAYS_GUIDED_LENGTH,
+  type First60DiscoveryId,
+  type WelcomeExperiencePhase,
+} from "./first60Days";
 export { buildDailyOpeningChoiceCards } from "./buildDailyOpeningChoiceCards";
 export {
   recommendMeaningfulStart,

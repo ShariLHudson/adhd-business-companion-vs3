@@ -72,31 +72,23 @@ describe("Settings simplicity & contrast standard (173–175)", () => {
     expect(appearance).not.toContain("Save Changes");
   });
 
-  it("splits Connected Services, Defaults, and Profile Online Presence", () => {
+  it("Connections has Services + Social Media only — no Defaults or destination duplicates", () => {
     const settings = read("components/companion/SettingsPanel.tsx");
-    const connected = read(
-      "components/companion/settings/connected-services/ConnectedServicesPage.tsx",
+    const connections = read(
+      "components/companion/settings/connections/ConnectionsPage.tsx",
     );
-    const defaults = read(
-      "components/companion/settings/defaults/DefaultsPage.tsx",
-    );
-    const presence = read(
-      "components/companion/settings/profile/OnlinePresenceSection.tsx",
-    );
-    expect(settings).toContain('label: "Connected Services"');
-    expect(settings).toContain('label: "Defaults"');
-    expect(settings).toContain('id: "profile"');
-    expect(settings).toContain("ConnectedServicesPage");
-    expect(settings).toContain("DefaultsPage");
-    expect(settings).toContain("OnlinePresenceSection");
-    expect(connected).toContain("Connected Services");
-    expect(connected).not.toContain("Preferred destinations");
-    expect(connected).not.toContain("Shortcuts — open in your browser");
-    expect(connected).not.toContain("Social profile links");
-    expect(defaults).toContain("Defaults");
-    expect(defaults).toContain("pref-documents");
-    expect(presence).toContain("Online Presence");
-    expect(presence).toContain("websiteUrl");
+    expect(settings).toContain('label: "Connections"');
+    expect(settings).not.toContain('label: "Defaults"');
+    expect(settings).not.toContain('label: "Connected Services"');
+    expect(settings).toContain("ConnectionsPage");
+    expect(connections).toContain("Connections");
+    expect(connections).toContain("connections-services");
+    expect(connections).toContain("connections-social-media");
+    expect(connections).toContain("OnlinePresenceSection");
+    expect(connections).not.toContain("Preferred destinations");
+    expect(connections).not.toContain("Shortcuts — open in your browser");
+    expect(connections).not.toContain("Browser Shortcuts");
+    expect(connections).not.toContain("Destination Gallery");
   });
 
   it("dropdown select uses shared field surface with dark text", () => {

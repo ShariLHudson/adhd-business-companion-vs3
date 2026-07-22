@@ -13,6 +13,20 @@ export {
 } from "./settingsConnectionCatalog";
 
 export {
+  SERVICE_CATEGORIES,
+  buildServiceCategories,
+  resolveServiceItemStatus,
+  type ServiceCategoriesSnapshot,
+  type ServiceCategoryDef,
+  type ServiceCategoryId,
+  type ServiceCategoryState,
+  type ServiceItemDef,
+  type ServiceItemId,
+  type ServiceItemKind,
+  type ServiceItemState,
+} from "./serviceCategories";
+
+export {
   maybeAutoSelectSoleCalendar,
   resolveCalendarDefaults,
   resolveDocumentDefaults,

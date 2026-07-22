@@ -6,21 +6,30 @@ import type { HelpfulLesson } from "./types";
  */
 export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
   {
+    id: "park-it",
+    title: "Park It",
+    shortExplanation:
+      "Have one thing you are not ready to deal with? Park it here so you can stop carrying it in your head.",
+    destinationId: "parking-lot",
+    actionLabel: "Park This",
+    eligibility: { tags: ["planning", "capture"] },
+  },
+  {
     id: "parking-lot",
     title: "Parking Lot",
     shortExplanation:
-      "Not ready to deal with one thing yet? Park it here and review everything you've set aside when you're ready.",
+      "Your Parking Lot is a safe place for things you are not ready to act on yet. Review and organize what you parked when you are ready.",
     destinationId: "parking-lot",
-    actionLabel: "Park This Item",
-    eligibility: { tags: ["planning", "capture"] },
+    actionLabel: "View My Parking Lot",
+    eligibility: { tags: ["planning"] },
   },
   {
     id: "clear-my-mind",
     title: "Clear My Mind",
     shortExplanation:
-      "Feeling overwhelmed? Put everything on your mind here. I'll help sort it into manageable next steps.",
+      "Have a lot swirling around in your head? Put everything here—tasks, ideas, worries, reminders, and unfinished thoughts.",
     destinationId: "clear-my-mind",
-    actionLabel: "Start Emptying My Mind",
+    actionLabel: "Empty My Mind",
     eligibility: { tags: ["overwhelm", "capture"] },
   },
   {
@@ -68,6 +77,15 @@ export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
     eligibility: { tags: ["support"] },
   },
   {
+    id: "talk-it-out",
+    title: "Talk It Out",
+    shortExplanation:
+      "Think through one situation with Shari, one thoughtful question at a time.",
+    destinationId: "talk-it-out",
+    actionLabel: "Show Me",
+    eligibility: { tags: ["decision", "support"] },
+  },
+  {
     id: "decision-compass",
     title: "Decision Compass",
     shortExplanation:
@@ -98,7 +116,7 @@ export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
     id: "evidence-vault",
     title: "Evidence Vault",
     shortExplanation:
-      "Keep proof of progress and wins so hard days do not erase what you have already done.",
+      "Keep meaningful discoveries about yourself and your work so hard days do not erase what you have already learned.",
     destinationId: "evidence-vault",
     actionLabel: "Show Me",
     eligibility: { tags: ["memory", "recognition"] },
@@ -174,15 +192,6 @@ export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
     destinationId: "settings",
     actionLabel: "Show Me",
     eligibility: { voiceOnly: true, tags: ["restoration"] },
-  },
-  {
-    id: "estate-guide",
-    title: "Spark Estate Guide",
-    shortExplanation:
-      "A quiet guidebook to the Estate — discovered like a book, not a help-center menu.",
-    destinationId: "guidebook",
-    actionLabel: "Show Me",
-    eligibility: { tags: ["discovery"] },
   },
 ] as const;
 

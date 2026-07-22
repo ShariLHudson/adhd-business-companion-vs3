@@ -41,11 +41,14 @@ describe("defaults availability", () => {
   });
 
   it("flags Google Docs default when Google is disconnected", () => {
-    const group = resolveDocumentDefaults(basePrefs(), {
-      googleConfigured: true,
-      googleConnected: false,
-      outlookConnected: false,
-    });
+    const group = resolveDocumentDefaults(
+      { ...basePrefs(), documents: "google-docs" },
+      {
+        googleConfigured: true,
+        googleConnected: false,
+        outlookConnected: false,
+      },
+    );
     expect(group.needsAttention).toBe(true);
     expect(group.options.find((o) => o.id === "spark-estate")?.selectable).toBe(
       true,

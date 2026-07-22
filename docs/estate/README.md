@@ -1,4 +1,4 @@
-# Spark Estate™ — Documentation
+# Spark Estate — Documentation
 
 ## Architectural authority (binding)
 
@@ -41,9 +41,13 @@ Implementation must align. Legacy code and older docs are subordinate. If confli
 
 **[ESTATE_TURN_ORCHESTRATION_PLAN.md](./ESTATE_TURN_ORCHESTRATION_PLAN.md)** — how `evaluateEstateTurn()` becomes the single routing orchestrator; active task lock; correction override; shadow mode wiring order. **No runtime changes until approved.**
 
-### Companion DNA — The Friend We All Deserve™
+### Companion DNA — The Friend We All Deserve
 
 **[THE_FRIEND_WE_ALL_DESERVE.md](../THE_FRIEND_WE_ALL_DESERVE.md)** — **read first before conversation logic and prompts.** Sibling to the Estate Constitution: Estate governs places; Spark governs friendship.
+
+### First 60 Days Welcome Experience (Welcome Home)
+
+**[FIRST_60_DAYS_WELCOME_EXPERIENCE.md](./FIRST_60_DAYS_WELCOME_EXPERIENCE.md)** — four-section daily Welcome Home (welcome · optional discovery · three actions · encouragement); guided days 1–60, adaptive after. Runtime: `lib/dailyOpening/first60Days/`.
 
 ### Conversation & creation architecture (binding)
 
@@ -93,7 +97,7 @@ Implementation must align. Legacy code and older docs are subordinate. If confli
 
 ### P0 — Canon errata (pre–Phase D.1)
 
-**[P0_CANON_ERRATA.md](./P0_CANON_ERRATA.md)** — Celebration Room™ id, Reading Nook ≠ Library, wins routing, Guidebook object, My Thoughts retired from canon, Catalog 03 historical. Minimal registry sync.
+**[P0_CANON_ERRATA.md](./P0_CANON_ERRATA.md)** — Celebration Room id, Reading Nook ≠ Library, wins routing, Guidebook object, My Thoughts retired from canon, Catalog 03 historical. Minimal registry sync.
 
 ---
 
@@ -114,16 +118,16 @@ Synced hints for matched places — must align with Bible place types and Consti
 
 | Place | Document | Registry ID |
 |-------|----------|-------------|
-| Momentum Institute™ | [momentum-institute.md](./momentum-institute.md) | `momentum-institute` |
+| Momentum Institute | [momentum-institute.md](./momentum-institute.md) | `momentum-institute` |
 | Welcome Home | [welcome-home.md](./welcome-home.md) | `welcome-home` |
-| Creative Studio™ | [creative-studio.md](./creative-studio.md) | `creative-studio` |
-| Observatory™ | [observatory.md](./observatory.md) | `observatory` |
-| Coffee House™ | [coffee-house.md](./coffee-house.md) | `coffee-house` |
-| Peaceful Places™ | [peaceful-places.md](./peaceful-places.md) | `peaceful-places` |
-| Decision Compass™ | [decision-compass.md](./decision-compass.md) | `decision-compass` |
-| Clear My Mind™ | [clear-my-mind.md](./clear-my-mind.md) | `clear-my-mind` |
-| Momentum Builder™ | [momentum-builder.md](./momentum-builder.md) | `momentum-builder` |
-| Growth Journal™ | [growth-journal.md](./growth-journal.md) | `growth-journal` |
+| Creative Studio | [creative-studio.md](./creative-studio.md) | `creative-studio` |
+| Observatory | [observatory.md](./observatory.md) | `observatory` |
+| Coffee House | [coffee-house.md](./coffee-house.md) | `coffee-house` |
+| Peaceful Places | [peaceful-places.md](./peaceful-places.md) | `peaceful-places` |
+| Decision Compass | [decision-compass.md](./decision-compass.md) | `decision-compass` |
+| Clear My Mind | [clear-my-mind.md](./clear-my-mind.md) | `clear-my-mind` |
+| Momentum Builder | [momentum-builder.md](./momentum-builder.md) | `momentum-builder` |
+| Growth Journal | [growth-journal.md](./growth-journal.md) | `growth-journal` |
 
 **Sync rule:** When room knowledge changes → update `lib/estateKnowledge/` and verify against Bible + Constitution.
 

@@ -20,7 +20,7 @@ import {
 
 } from "@/lib/sparkNote/mySparksCollection";
 
-
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 type Props = {
 
@@ -35,6 +35,10 @@ type Props = {
 /** Personal collection of saved Daily Sparks — separate from today's discovery. */
 
 export function SparkNoteMyCollection({ onClose, onBack }: Props) {
+  const { requestClose, onBackdropClick } = useDismissibleWindow({
+    open: true,
+    onClose,
+  });
 
   const saved = resolveMySparksCollection();
 
@@ -90,7 +94,11 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
 
     >
 
-      <div className="spark-note-collection__backdrop" aria-hidden onClick={onClose} />
+      <div
+        className="spark-note-collection__backdrop"
+        aria-hidden
+        onClick={() => onBackdropClick()}
+      />
 
       <div className="spark-note-collection__card">
 
@@ -110,7 +118,7 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
 
             className="spark-note-collection__close"
 
-            onClick={onClose}
+            onClick={() => requestClose()}
 
             aria-label="Close"
 

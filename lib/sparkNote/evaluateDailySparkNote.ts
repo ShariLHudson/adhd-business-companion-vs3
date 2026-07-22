@@ -15,7 +15,10 @@ import {
   recordDailySparkSelection,
   sparkNoteOnCooldown,
 } from "./persistence";
-import { filterLibraryCandidatePool } from "./librarySelection";
+import {
+  filterLibraryCandidatePool,
+  shouldYieldCalendarSparkForVariety,
+} from "./librarySelection";
 import { pickAffinityWeightedFromPool } from "./preferenceLearning";
 import { resolveFallbackSparkCard } from "./runtimeIntegration";
 import { currentSparkSeason, matchesSeasonEntry } from "./seasonalPersonality";
@@ -107,7 +110,11 @@ function resolveFromCatalog(
       ),
   ).sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 
-  if (dateCandidates.length > 0) {
+  // Calendar delights are welcome — but not when celebrations would dominate.
+  if (
+    dateCandidates.length > 0 &&
+    !shouldYieldCalendarSparkForVariety(dateCandidates[0]!)
+  ) {
     return entryToCard(dateCandidates[0]!, "date");
   }
 
@@ -119,7 +126,8 @@ function resolveFromCatalog(
         entry.id,
         entry.cooldownDays ?? DEFAULT_SPARK_NOTE_COOLDOWN_DAYS,
         now,
-      ),
+      ) &&
+      !shouldYieldCalendarSparkForVariety(entry),
   ).sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 
   if (seasonalCandidates.length > 0) {

@@ -15,10 +15,12 @@ import {
   resolveDailyOpeningMomentKind,
   resolveFirst60TeachingSentence,
 } from "./buildDailyOpeningWelcome";
+import { resolveWelcomeDayIndex } from "./first60Days";
 import { resolveDailyOpeningDiscoveryInvite } from "./resolveDiscoveryInvite";
 import { resolveMeaningfulContinueForWelcome } from "./resolveMeaningfulContinue";
 import { readDailyOpeningPresentedDay } from "./dailyOpeningDay";
 import { todayStr } from "@/lib/companionStore";
+import { resolveWelcomeActiveWork } from "@/lib/welcomeHome/resolveWelcomeActiveWork";
 import {
   DAILY_OPENING_CHOICE_LABELS,
   type DailyOpeningChoice,
@@ -66,9 +68,13 @@ export function resolveGlobalDailyOpening(
 
   const memberFirstName =
     input.memberFirstName?.trim() || resolveDailyOpeningMemberFirstName();
+  const now = input.now ?? new Date();
+  const { dayIndex: welcomeDayIndex, phase: welcomePhase } =
+    resolveWelcomeDayIndex(now);
   const built = buildDailyOpeningWelcomeParts({
     momentKind,
     memberFirstName,
+    now,
   });
   const override = input.greeting?.trim();
   // Prefer warm card copy; only honor override when it is clearly personalized
@@ -86,7 +92,9 @@ export function resolveGlobalDailyOpening(
     ? override!
     : built.welcomeMessage;
 
-  const choiceCards = buildDailyOpeningChoiceCards(continueOption);
+  // 073/074 — one current Active Workspace for the first Welcome card
+  const activeWork = resolveWelcomeActiveWork();
+  const choiceCards = buildDailyOpeningChoiceCards(continueOption, activeWork);
   const choices: DailyOpeningChoice[] = choiceCards.map((card) => ({
     id: card.id,
     label: card.title,
@@ -96,8 +104,10 @@ export function resolveGlobalDailyOpening(
     entryPoint: input.entryPoint,
     momentKind,
     suppressForRecovery: input.suppressDiscoveryForRecovery,
-    now: input.now,
+    now,
   });
+
+  const encouragementLine = resolveFirst60TeachingSentence(now);
 
   return {
     entryPoint: input.entryPoint,
@@ -108,10 +118,14 @@ export function resolveGlobalDailyOpening(
     discoveryInviteLine,
     welcomeMessage,
     greeting: welcomeMessage,
-    teachingSentence: resolveFirst60TeachingSentence(input.now),
+    teachingSentence: encouragementLine,
+    encouragementLine,
+    welcomeDayIndex,
+    welcomePhase,
     choiceCards,
     choices,
     continueOption,
+    activeWork,
     helpMeChooseSuggestions: [],
     discovery,
   };
@@ -139,7 +153,13 @@ export function resolveDailyOpeningChoiceAction(
     };
   }
 
-  // continue-meaningful-work → Meaningful Start (never Plan My Day, never resume).
+  // First card = current work when Active Workspace exists; otherwise Meaningful Start.
+  if (opening.activeWork?.workspaceId) {
+    return {
+      kind: "resume-active-work",
+      workspaceId: opening.activeWork.workspaceId,
+    };
+  }
   return { kind: "show-meaningful-start" };
 }
 

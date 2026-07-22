@@ -35,12 +35,13 @@ export const VISUAL_TYPES: Record<VisualTypeId, VisualTypeDef> = {
   },
   decision_tree: {
     status: "available",
-    label: "Decision Tree",
+    label: "Decision Map",
     viewId: "decision-tree",
     mode: "decision-tree",
     aliases: [/\bdecision\s*trees?\b/i, /\bdecision\s*maps?\b/i],
   },
   flowchart: {
+    // Cartography / Visual Thinking Process Flow (process map path)
     status: "available",
     label: "Flowchart",
     viewId: "process-flow",
@@ -49,6 +50,7 @@ export const VISUAL_TYPES: Record<VisualTypeId, VisualTypeDef> = {
       /\bflowcharts?\b/i,
       /\bflow\s*charts?\b/i,
       /\bprocess\s*flows?\b/i,
+      /\bprocess\s*maps?\b/i,
     ],
   },
   diagram: {

@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildSparkCardShareText,
   resolveSparkCardBriefInsight,
   resolveSparkCardHeroVisual,
   resolveSparkCardMoreToDiscover,
+  resolveSparkCardSimplifiedPresentation,
+  resolveSparkInAction,
+  resolveTodaysSpark,
+  splitSparkCardStoryParagraphs,
 } from "./sparkCardCollectibleDisplay";
 import { resolveSparkCardArtAsset } from "./sparkCardArtRegistry";
 import type { SparkNoteDailyCard } from "./types";
@@ -11,28 +16,64 @@ import type { SparkNoteDailyCard } from "./types";
 const sampleCard: SparkNoteDailyCard = {
   id: "SPARK-INV-001",
   category: "invention",
-  categoryLabel: "Innovation",
+  categoryLabel: "Invention",
   sparkType: "story",
   title: "The Post-it Note",
   shortTitle: "The Post-it Note",
   teaser: "A mistake that became one of the world's most useful inventions.",
-  whatHappened: "Long story that should not appear on the keepsake card.",
-  whyItMatters: "Secondary insight fallback.",
-  sparkApplication: "What idea deserves another chance?",
+  whatHappened:
+    "A scientist was trying to create a very strong adhesive. Instead, he created something unusual. For years, the discovery did not have an obvious purpose. Another employee saw the possibility. The mistake became an invention.",
+  whyItMatters:
+    "Some of the best ideas come from noticing a possibility inside an unexpected result.",
+  sparkApplication:
+    "What idea have you dismissed because it did not work the way you originally imagined?",
   source: "library",
 };
 
 describe("sparkCardCollectibleDisplay", () => {
-  it("prefers spark application as the brief insight", () => {
+  it("builds the simplified treasure presentation", () => {
+    const presentation = resolveSparkCardSimplifiedPresentation(sampleCard);
+    expect(presentation.categoryRibbon).toBe("Innovation");
+    expect(presentation.title).toBe(sampleCard.title);
+    expect(presentation.subtitle).toBe(sampleCard.teaser);
+    expect(presentation.storyParagraphs.length).toBeGreaterThanOrEqual(1);
+    expect(presentation.todaysSpark).toBe(sampleCard.whyItMatters);
+    expect(presentation.sparkInAction.length).toBeGreaterThan(0);
+    expect(presentation.sparkInAction.endsWith("?")).toBe(false);
+    expect(presentation.tellMeMore.facts.length).toBeGreaterThan(0);
+  });
+
+  it("uses whyItMatters as Today's Spark takeaway", () => {
+    expect(resolveTodaysSpark(sampleCard)).toBe(sampleCard.whyItMatters);
+  });
+
+  it("converts reflective questions into tiny actions", () => {
+    expect(resolveSparkInAction(sampleCard)).toMatch(/idea|Write|Thank|Ask/i);
+    expect(
+      resolveSparkInAction({
+        ...sampleCard,
+        sparkApplication: "Write down one new idea.",
+      }),
+    ).toBe("Write down one new idea.");
+  });
+
+  it("splits long stories into short paragraphs", () => {
+    const paragraphs = splitSparkCardStoryParagraphs(sampleCard.whatHappened);
+    expect(paragraphs.length).toBeGreaterThanOrEqual(2);
+    expect(paragraphs.length).toBeLessThanOrEqual(5);
+  });
+
+  it("prefers why it matters as the brief insight", () => {
     expect(resolveSparkCardBriefInsight(sampleCard)).toBe(
-      sampleCard.sparkApplication,
+      sampleCard.whyItMatters,
     );
   });
 
-  it("falls back when spark application is empty", () => {
+  it("falls back when takeaway is empty", () => {
     expect(
       resolveSparkCardBriefInsight({
         ...sampleCard,
+        whyItMatters: "",
         sparkApplication: "",
         whyInteresting: "A surprising lab detail.",
       }),
@@ -75,7 +116,7 @@ describe("sparkCardCollectibleDisplay", () => {
     }
   });
 
-  it("provides More To Discover for story cards", () => {
+  it("provides More To Discover facts for Tell Me More", () => {
     expect(resolveSparkCardMoreToDiscover(sampleCard)).toMatch(/Post-it/i);
     expect(
       resolveSparkCardMoreToDiscover({
@@ -87,6 +128,13 @@ describe("sparkCardCollectibleDisplay", () => {
         title: "Be Yourself",
       }),
     ).toMatch(/Oscar Wilde/i);
+  });
+
+  it("builds share text from the simplified card", () => {
+    const text = buildSparkCardShareText(sampleCard);
+    expect(text).toContain(sampleCard.title);
+    expect(text).toContain("Today's Spark:");
+    expect(text).toContain("Spark In Action:");
   });
 
   it("uses themed collectible art only when art registry has no src", () => {

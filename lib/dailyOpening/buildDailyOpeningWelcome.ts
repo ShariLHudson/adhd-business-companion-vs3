@@ -3,11 +3,16 @@
  * Structured header: greeting · presence · what you can do · discovery invite.
  */
 
-import { daysSinceRelationshipStart } from "@/lib/phase3AdaptiveRelationship";
+import { listActiveWorkspaces } from "@/lib/activeWorkspaceRegistry";
 import {
   resolveUserDisplayNameSource,
   significantNameTokens,
 } from "@/lib/userProfileDisplay";
+import {
+  resolveFirst60Encouragement,
+  resolveFirst60WelcomeLine,
+  resolveWelcomeDayIndex,
+} from "./first60Days";
 import type { DailyOpeningEntryPoint } from "./types";
 
 export type DailyOpeningMomentKind =
@@ -25,13 +30,6 @@ export type DailyOpeningWelcomeParts = {
   /** Joined greeting for back-compat callers and sentence-count gates. */
   welcomeMessage: string;
 };
-
-const FIRST_60_TEACHING = [
-  "Personalizing your Business Estate is optional, but every detail you add helps me support you more personally.",
-  "Your Client Avatar helps me make better suggestions for your offers, content, and messaging.",
-  "Spark remembers what matters so you do not have to hold it all alone.",
-  "Spark can notice strategies that seem to help you — like shorter sessions or fewer priorities. Nothing becomes a lasting pattern unless you choose to keep it.",
-] as const;
 
 /** @deprecated Prefer SHOW_ME_SOMETHING_HELPFUL_LABEL — discovery is a secondary action, not a fourth card. */
 export const SOMETHING_HELPFUL_TO_KNOW_TODAY =
@@ -84,17 +82,26 @@ function joinWelcomeParts(
 export function buildDailyOpeningWelcomeParts(input: {
   momentKind: DailyOpeningMomentKind;
   memberFirstName?: string | null;
+  now?: Date;
+  /** When false, do not persist welcome rotation (tests). */
+  persistWelcomeRotation?: boolean;
 }): DailyOpeningWelcomeParts {
   const name =
     input.memberFirstName?.trim() ||
     resolveDailyOpeningMemberFirstName() ||
     null;
+  const now = input.now ?? new Date();
+  const { dayIndex } = resolveWelcomeDayIndex(now);
+  const persist = input.persistWelcomeRotation !== false;
 
   if (input.momentKind === "absence-return") {
+    // 074 — only claim work is here when registry has active work
+    const hasActiveWork = listActiveWorkspaces().length > 0;
     const parts = {
       greetingTitle: name ? `Welcome home, ${name}.` : "Welcome home.",
-      welcomeLine:
-        "It's good to see you. Your work is still here, and you do not have to catch up on everything today.",
+      welcomeLine: hasActiveWork
+        ? "It's good to see you. Your work is still here, and you do not have to catch up on everything today."
+        : "It's good to see you. You do not have to catch up on everything today.",
       choicesIntro: CHOICES_INTRO,
       discoveryInviteLine: DISCOVERY_INVITE_LINE,
     };
@@ -112,11 +119,14 @@ export function buildDailyOpeningWelcomeParts(input: {
     return { ...parts, welcomeMessage: joinWelcomeParts(parts) };
   }
 
-  // first-of-day + explicit new day
+  // first-of-day + explicit new day — unique rotating welcome line
+  const daily = resolveFirst60WelcomeLine({
+    dayIndex,
+    persist,
+  });
   const parts = {
     greetingTitle: name ? `Welcome back, ${name}.` : "Welcome back.",
-    welcomeLine:
-      "It's good to see you. You do not have to remember everything or decide it all at once.",
+    welcomeLine: daily.text,
     choicesIntro: CHOICES_INTRO,
     discoveryInviteLine: DISCOVERY_INVITE_LINE,
   };
@@ -131,14 +141,27 @@ export function buildDailyOpeningWelcomeMessage(input: {
   return buildDailyOpeningWelcomeParts(input).welcomeMessage;
 }
 
-/** One short teaching sentence during the first 60 days — never a fourth choice. */
+/**
+ * Today's Encouragement — brief rotating thought (all relationship days).
+ * Kept as resolveFirst60TeachingSentence for back-compat exports.
+ */
 export function resolveFirst60TeachingSentence(
   now = new Date(),
+  options?: { persist?: boolean },
 ): string | null {
-  const days = daysSinceRelationshipStart(now);
-  if (days < 0 || days >= 60) return null;
-  const index = days % FIRST_60_TEACHING.length;
-  return FIRST_60_TEACHING[index] ?? null;
+  const { dayIndex } = resolveWelcomeDayIndex(now);
+  return resolveFirst60Encouragement({
+    dayIndex,
+    persist: options?.persist,
+  }).text;
+}
+
+/** Alias — prefer this name in First 60 Days Welcome Experience. */
+export function resolveTodaysEncouragement(
+  now = new Date(),
+  options?: { persist?: boolean },
+): string | null {
+  return resolveFirst60TeachingSentence(now, options);
 }
 
 export function countWelcomeSentences(message: string): number {

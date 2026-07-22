@@ -56,6 +56,7 @@ describe("Welcome discovery vs Help Me Choose separation", () => {
     const parts = buildDailyOpeningWelcomeParts({
       momentKind: "same-day-return",
       memberFirstName: "Shari",
+      persistWelcomeRotation: false,
     });
     expect(parts.greetingTitle).toMatch(/Welcome back, Shari/);
     expect(parts.welcomeLine).toMatch(/do not have to remember everything/i);
@@ -135,9 +136,13 @@ describe("Welcome discovery vs Help Me Choose separation", () => {
     expect(second?.lesson.id).not.toBe(first!.lesson.id);
   });
 
-  it("Parking Lot lesson Show Me targets parking-lot — not Plan My Day", () => {
+  it("Parking Lot and Park It lessons target parking-lot — not Plan My Day", () => {
     const parking = HELPFUL_LESSON_REGISTRY.find((l) => l.id === "parking-lot");
+    const parkIt = HELPFUL_LESSON_REGISTRY.find((l) => l.id === "park-it");
     expect(parking?.destinationId).toBe("parking-lot");
+    expect(parking?.actionLabel).toMatch(/View My Parking Lot/i);
+    expect(parkIt?.destinationId).toBe("parking-lot");
+    expect(parkIt?.actionLabel).toMatch(/Park This/i);
     expect(parking?.destinationId).not.toBe("plan-my-day");
   });
 

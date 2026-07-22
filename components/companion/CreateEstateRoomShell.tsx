@@ -3,10 +3,11 @@
 import { useEffect, type ReactNode } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
 import { HomesteadRoomSignatureMotion } from "@/components/companion/homesteadRoom/HomesteadRoomSignatureMotion";
-import { CREATIVE_STUDIO_ROOM_BG } from "@/lib/creativeStudio/creativeStudioRoom";
+import { CREATE_BACKGROUND_SRC } from "@/lib/estateExperienceBackgrounds";
 import { handleMorningRoomOutsideClick } from "@/lib/planMyDay/morningRoomOutsideDismiss";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
+import "@/app/companion/create-projects-atmosphere.css";
 
 type Props = {
   children: ReactNode;
@@ -15,28 +16,33 @@ type Props = {
 
 /**
  * Create estate room — Creative Studio backdrop, frosted workspace.
- * Same scroll/dismiss contract as Plan My Day / Strategy Library.
+ * Scroll contract (global Create rule): one flex-bounded scrollport
+ * (`create-estate-shared-scroll`) — never clip; no nested max-height trap.
  */
 export function CreateEstateRoomShell({
   children,
   onOutsideDismiss,
 }: Props) {
   useEffect(() => {
-    preloadRoomBackground(CREATIVE_STUDIO_ROOM_BG);
+    preloadRoomBackground(CREATE_BACKGROUND_SRC);
   }, []);
 
   return (
     <div
-      className="plan-my-day-morning-room h-full min-h-0"
+      className="plan-my-day-morning-room h-full min-h-0 estate-atmosphere estate-atmosphere--create"
       data-testid="create-estate-room"
       data-homestead-room="creative-studio"
+      data-estate-atmosphere="create"
     >
       <CinematicBackground
         preset="plan-my-day"
         mode="image"
-        imageStyle={roomBackgroundImageStyle(CREATIVE_STUDIO_ROOM_BG)}
+        imageUrl={CREATE_BACKGROUND_SRC}
+        imageStyle={roomBackgroundImageStyle(CREATE_BACKGROUND_SRC)}
         placement="fixed"
-        className="plan-my-day-morning-room__cinematic"
+        className="plan-my-day-morning-room__cinematic estate-atmosphere__cinematic"
+        showBottomFade={false}
+        gradientStrength={0}
       />
       <HomesteadRoomSignatureMotion roomId="study" />
       <div
@@ -49,6 +55,7 @@ export function CreateEstateRoomShell({
         }
         onClick={(e) => handleMorningRoomOutsideClick(e, onOutsideDismiss)}
         data-testid="create-estate-shared-scroll"
+        data-create-estate-shared-scroll="true"
       >
         <div className="plan-my-day-morning-room__center">
           <div

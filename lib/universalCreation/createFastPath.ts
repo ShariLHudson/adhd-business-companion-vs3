@@ -12,6 +12,10 @@ import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packag
 import { isBusinessPlanCreationRequest } from "@/lib/universalWorkEngine/packages/businessPlan/isBusinessPlanCreationRequest";
 import { isVisualStructureExecution } from "@/lib/visualStructureRouting";
 import { shouldOfferVisualThinkingRecommendation } from "@/lib/visualThinkingOverreach";
+import {
+  detectVisualTypeInText,
+  isVisualCreateIntent,
+} from "@/lib/visualTypeAvailability";
 import { pluginById } from "./documentRegistry";
 import type { UniversalDocumentType } from "./types";
 
@@ -91,6 +95,8 @@ export function isSimpleCreateRequest(userText: string): boolean {
   if (isProjectCreationIntent(t)) return false;
   if (isDevelopmentWorkFrustration(t)) return false;
   if (isVisualStructureExecution(t)) return false;
+  // Named visual types (flowchart, mind map, …) — never document Create / Crystal Actions.
+  if (isVisualCreateIntent(t) && detectVisualTypeInText(t)) return false;
   if (isGoogleSheetWorthyRequest(t)) return false;
   // Sprint 2 — Event domain → 045/051, never document fast-path
   if (isEventDomainCreationRequest(t)) return false;

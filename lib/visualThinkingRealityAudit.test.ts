@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { clearCompanionConversationState } from "./companionConversationContext/store";
 import { resolveFrictionlessAction } from "./frictionlessActionLayer";
 import { resolveIntentRouting } from "./intentRoutingIntelligence";
 import { isKnowledgeQuestion } from "./knowledgeIntelligence";
@@ -30,6 +31,9 @@ function routeAudit(input: string, lastAssistant?: string) {
 }
 
 describe("P0.20.2 Visual Thinking Reality Audit", () => {
+  beforeEach(() => {
+    clearCompanionConversationState();
+  });
   describe("Part 2 — Learn must NOT open Visual Thinking", () => {
     const learnCases = [
       "What is a flowchart?",
@@ -84,6 +88,8 @@ describe("P0.20.2 Visual Thinking Reality Audit", () => {
       ["Create a mind map", "mind-map"],
       ["Open a mind map", "mind-map"],
       ["Build a decision tree", "decision-tree"],
+      ["Create a flowchart", "process-flow"],
+      ["Create a hierarchy tree", "hierarchy-tree"],
     ];
 
     it.each(directCases)('"%s" → %s', (input, viewId) => {
@@ -94,11 +100,7 @@ describe("P0.20.2 Visual Thinking Reality Audit", () => {
   });
 
   describe("Part 3b — Planned types do not open", () => {
-    const plannedCases = [
-      "Create a flowchart",
-      "Create a hierarchy tree",
-      "Create a funnel map",
-    ];
+    const plannedCases = ["Create a funnel map"];
 
     it.each(plannedCases)('"%s" → planned message, no open', (input) => {
       const { frictionless } = routeAudit(input);
@@ -118,9 +120,13 @@ describe("P0.20.2 Visual Thinking Reality Audit", () => {
       )).toContain("project-map");
     });
 
-    it("book writing offers menu", () => {
+    it("book writing does not force an immediate visual open", () => {
+      // "write a …" is a document create verb — Create owns the turn unless the
+      // member asks to visualize. Path B recommendation still applies to softer
+      // goals (course launch, organize ideas).
       const { frictionless } = routeAudit("I want to write a book");
-      expect(frictionless.pendingAction?.type).toBe("visual_recommendation");
+      expect(frictionless.immediateVisualOpen).toBeUndefined();
+      expect(frictionless.pendingAction?.type).not.toBe("visual_thinking_menu");
     });
 
     it("organize ideas offers menu", () => {
@@ -130,19 +136,18 @@ describe("P0.20.2 Visual Thinking Reality Audit", () => {
   });
 
   describe("Part 5 — Conversion uses prior content", () => {
-    it("turn into flowchart is blocked when planned", () => {
+    it("turn into flowchart opens Process Flow", () => {
       const prior = "Onboarding: signup, email, kickoff call.";
       const { frictionless } = routeAudit("Turn this into a flowchart", prior);
-      expect(frictionless.immediateVisualOpen).toBeUndefined();
-      expect(frictionless.localReply).toMatch(/aren't fully built/i);
+      expect(frictionless.immediateVisualOpen?.viewId).toBe("process-flow");
     });
 
-    it("turn into hierarchy is blocked when planned", () => {
+    it("turn into hierarchy opens Hierarchy Tree", () => {
       const { frictionless } = routeAudit(
         "Turn this into a hierarchy",
         "Book parts: intro, chapters, appendix.",
       );
-      expect(frictionless.immediateVisualOpen).toBeUndefined();
+      expect(frictionless.immediateVisualOpen?.viewId).toBe("hierarchy-tree");
     });
 
     it('visualize this defaults to mind-map', () => {
@@ -191,8 +196,6 @@ describe("P0.20.2 Visual Thinking Reality Audit", () => {
     );
 
     const plannedViews = [
-      { label: "Flowchart", viewId: "process-flow", phrase: "create a flowchart" },
-      { label: "Hierarchy Tree", viewId: "hierarchy-tree", phrase: "create a hierarchy tree" },
       { label: "Funnel Map", viewId: "funnel-map", phrase: "create a funnel map" },
     ];
 
@@ -200,6 +203,11 @@ describe("P0.20.2 Visual Thinking Reality Audit", () => {
       expect(VISUAL_THINKING_VIEW_LIBRARY.find((v) => v.id === viewId)).toBeTruthy();
       const { frictionless } = routeAudit(phrase);
       expect(frictionless.immediateVisualOpen).toBeUndefined();
+    });
+
+    it("Flowchart opens Process Flow from chat (Cartography path)", () => {
+      const { frictionless } = routeAudit("create a flowchart");
+      expect(frictionless.immediateVisualOpen?.viewId).toBe("process-flow");
     });
 
     const aliasViews: { label: string; viewId: string; phrase: string; mode: string }[] = [
@@ -224,7 +232,7 @@ describe("P0.20.2 Visual Thinking Reality Audit", () => {
 
     it("flowchart and process flow share decision-tree renderer (no dedicated flowchart mode)", () => {
       expect(detectExplicitVisualView("flowchart")?.mode).toBe("decision-tree");
-      expect(getStudioCardByMode("decision-tree")?.title).toMatch(/Decision Tree/);
+      expect(getStudioCardByMode("decision-tree")?.title).toMatch(/Decision Map/);
     });
   });
 });

@@ -98,11 +98,14 @@
   color: rgba(36, 30, 24, 0.94);
 }
 
-.global-daily-opening__teaching {
-  margin: 0.15rem 0 0;
+.global-daily-opening__teaching,
+.global-daily-opening__encouragement {
+  margin: 0.35rem 0 0;
   font-size: clamp(0.9rem, 1.4vw, 0.98rem);
-  line-height: 1.4;
+  line-height: 1.45;
   color: rgba(60, 52, 44, 0.82);
+  font-style: italic;
+  text-align: center;
 }
 
 .global-daily-opening__lesson {
@@ -324,18 +327,34 @@
   background: rgba(255, 255, 255, 0.55);
 }
 
+.global-daily-opening__discovery-eyebrow {
+  margin: 0 0 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(30, 79, 79, 0.72);
+}
+
 .global-daily-opening__discovery-title {
   margin: 0;
-  font-size: 0.86rem;
+  font-size: 0.98rem;
   font-weight: 700;
-  color: rgba(36, 30, 24, 0.9);
+  color: rgba(36, 30, 24, 0.94);
 }
 
 .global-daily-opening__discovery-line {
-  margin: 0.25rem 0 0.55rem;
+  margin: 0.25rem 0 0;
   font-size: 0.88rem;
   line-height: 1.4;
   color: rgba(60, 52, 44, 0.82);
+}
+
+.global-daily-opening__discovery-why-today {
+  margin: 0.35rem 0 0.55rem;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  color: rgba(60, 52, 44, 0.72);
 }
 
 .global-daily-opening__discovery-actions {

@@ -6,6 +6,7 @@
 
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
 import type { AppSection } from "@/lib/companionUi";
+import type { WelcomeActiveWorkCard } from "@/lib/welcomeHome/resolveWelcomeActiveWork";
 import type { DailyOpeningMomentKind } from "./buildDailyOpeningWelcome";
 
 export type { DailyOpeningMomentKind };
@@ -74,14 +75,26 @@ export type DailyOpeningChoiceAction =
   | { kind: "navigate"; destination: DailyOpeningDestination }
   | { kind: "show-help-me-choose" }
   | { kind: "show-meaningful-start" }
-  | { kind: "show-something-helpful" };
+  | { kind: "show-something-helpful" }
+  /** First Welcome card — resume the single current Active Workspace. */
+  | { kind: "resume-active-work"; workspaceId: string };
 
 export type DailyOpeningDiscoveryInvite = {
   show: boolean;
+  /** Section label — e.g. Today's Discovery. */
   title: string;
+  /** One-sentence why this discovery helps. */
   line: string;
   primaryLabel: string;
   secondaryLabel: string;
+  /** Catalog id when a concrete discovery is offered. */
+  discoveryId?: string;
+  /** Soft "why today" line under the why. */
+  whyToday?: string;
+  /** Navigable destination for Explore. */
+  destinationId?: string;
+  /** Feature display name (Plan My Day, Chamber, …). */
+  featureTitle?: string;
 };
 
 export type GlobalDailyOpeningResult = {
@@ -99,12 +112,23 @@ export type GlobalDailyOpeningResult = {
   welcomeMessage: string;
   /** Alias of welcomeMessage for older callers. */
   greeting: string;
-  /** Optional first-60-days teaching line (never a fourth choice). */
+  /**
+   * Optional encouragement / first-60 teaching line (never a fourth choice).
+   * Prefer encouragementLine in UI.
+   */
   teachingSentence: string | null;
+  /** Today's Encouragement — brief rotating thought. */
+  encouragementLine: string | null;
+  /** 1-based welcome day index (Day 1 = first relationship day). */
+  welcomeDayIndex: number;
+  /** guided = days 1–60; adaptive = day 61+. */
+  welcomePhase: "guided" | "adaptive";
   choiceCards: DailyOpeningChoiceCard[];
   /** Flat labels derived from choiceCards (tests / legacy). */
   choices: DailyOpeningChoice[];
   continueOption: CompanionContinueOption | null;
+  /** 073/074 — canonical Active Workspace card when registry has work */
+  activeWork: WelcomeActiveWorkCard | null;
   /** @deprecated Empty — Help Me Choose uses need-based flow. */
   helpMeChooseSuggestions: HelpMeChooseSuggestion[];
   discovery: DailyOpeningDiscoveryInvite;

@@ -61,11 +61,8 @@ import {
 } from "@/lib/recognition";
 
 import { aiToneLabel } from "@/lib/aiToneGuide";
-import { ConnectedServicesPage } from "@/components/companion/settings/connected-services/ConnectedServicesPage";
-import { DefaultsPage } from "@/components/companion/settings/defaults/DefaultsPage";
-import { OnlinePresenceSection } from "@/components/companion/settings/profile/OnlinePresenceSection";
+import { ConnectionsPage } from "@/components/companion/settings/connections/ConnectionsPage";
 import {
-  connectOutlookCalendarLocal,
   isCanvaConnected,
   isOutlookCalendarConnected,
   readCanvaConnection,
@@ -113,6 +110,7 @@ type Section =
   | "advanced"
   | "profile"
   | "connections"
+  /** @deprecated Redirects to Connections — preferred destinations removed from settings UI */
   | "defaults"
   | "account"
   | "new-day"
@@ -413,9 +411,13 @@ export function SettingsPanel({
     { id: "plan", label: "Plan & voice", value: PLAN_LABEL[plan] },
     { id: "advanced", label: "Advanced AI tools", value: advanced ? "On" : "Off" },
     {
-      id: "profile",
-      label: "Profile",
+      id: "connections",
+      label: "Connections",
       value: (() => {
+        let n = 0;
+        if (g.connected) n += 1;
+        if (outlookConnected) n += 1;
+        if (canvaConnected) n += 1;
         const p = getPrefs();
         const linked = [
           p.websiteUrl,
@@ -425,24 +427,12 @@ export function SettingsPanel({
           p.tiktokUrl,
           p.pinterestUrl,
         ].filter((v) => (v ?? "").trim()).length;
-        return linked > 0 ? `${linked} online link${linked === 1 ? "" : "s"}` : "Online presence";
+        if (n === 0 && linked === 0) return "Services & social";
+        const parts: string[] = [];
+        if (n > 0) parts.push(`${n} service${n === 1 ? "" : "s"}`);
+        if (linked > 0) parts.push(`${linked} social`);
+        return parts.join(" · ");
       })(),
-    },
-    {
-      id: "connections",
-      label: "Connected Services",
-      value: (() => {
-        let n = 0;
-        if (g.connected) n += 1;
-        if (outlookConnected) n += 1;
-        if (canvaConnected) n += 1;
-        return n > 0 ? `${n} connected` : "None connected";
-      })(),
-    },
-    {
-      id: "defaults",
-      label: "Defaults",
-      value: "Documents, storage, calendar, print",
     },
     {
       id: "account",
@@ -1212,17 +1202,22 @@ export function SettingsPanel({
       <div className={wrap} data-testid="settings-profile">
         {header("Profile")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Personal and online presence details Spark can use when sharing your work.
+          Website and social links live under Connections → Social Media.
         </p>
-        <div className="mt-5">
-          <OnlinePresenceSection />
-        </div>
+        <button
+          type="button"
+          className="mt-4 rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+          onClick={() => setOpen("connections")}
+          data-testid="settings-profile-open-connections"
+        >
+          Open Connections
+        </button>
       </div>
     );
   }
-  if (open === "connections") {
+  if (open === "connections" || open === "defaults") {
     return (
-      <ConnectedServicesPage
+      <ConnectionsPage
         google={g}
         outlookConnected={outlookConnected}
         canvaConnected={canvaConnected}
@@ -1239,36 +1234,12 @@ export function SettingsPanel({
       />
     );
   }
-  if (open === "defaults") {
-    return (
-      <DefaultsPage
-        connections={{
-          googleConfigured: g.configured,
-          googleConnected: g.connected,
-          outlookConnected,
-        }}
-        onRequestConnectGoogle={() => {
-          if (typeof window !== "undefined") {
-            window.location.href =
-              "/api/google/auth?returnTo=/companion?settings=connections";
-          }
-        }}
-        onRequestConnectOutlook={() => {
-          connectOutlookCalendarLocal();
-          refreshOutlook();
-          setOpen("connections");
-        }}
-        header={header}
-        wrapClassName={wrap}
-      />
-    );
-  }
   if (open === "account") {
     return (
       <div className={wrap}>
         {header("Sign-in & security")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Sign in, sign out, and manage access. Name and email live in Profile.
+          Sign in, sign out, and manage access.
         </p>
         <div className="mt-4 flex flex-col gap-4">
           {authConfigured ? (

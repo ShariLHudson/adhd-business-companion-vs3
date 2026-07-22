@@ -70,6 +70,8 @@ describe("Destination Gallery crystalActivation (Prompt 142)", () => {
     expect(client).toContain("openCalendarCore()");
     expect(client).toContain('activation.kind === "open_external_url"');
     expect(client).toContain("setDestinationCrystalPrepared(activation)");
+    expect(client).toContain("CrystalActionsPanel");
+    expect(client).toContain("setCrystalActionsKind");
 
     const handler = client.match(
       /function handleSelectDestinationCrystal\([\s\S]*?\n  \}/,

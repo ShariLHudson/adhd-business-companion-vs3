@@ -50,13 +50,15 @@ export const SPARK_CARD_VISUAL_IMPLEMENTATION = {
 
 export const SPARK_CARD_CONTENT_STRUCTURE = {
   header: "Daily Spark",
+  /** Simplified treasure layout — see Content Diversity Rule + redesign prompt. */
   mainMessage: [
-    "curiosity",
-    "inspiration",
-    "discovery",
+    "category ribbon",
+    "title",
+    "subtitle",
     "story",
-    "fun fact",
-    "spark connection",
+    "today's spark",
+    "spark in action",
+    "tell me more (optional)",
   ],
 } as const;
 
@@ -90,9 +92,27 @@ export const SPARK_CARD_PERSONAL_REFLECTION_TONES = [
 export const SPARK_CARD_ACTIONS = [
   {
     id: "save-spark",
-    label: "Save Spark",
+    label: "Save",
     purpose: "Keep the Daily Spark as a collectible in My Spark Collection.",
     implementation: "SparkNoteExpanded primary action",
+  },
+  {
+    id: "favorite-spark",
+    label: "Favorite",
+    purpose: "Star the Spark in the personal collection without leaving the card.",
+    implementation: "SparkNoteExpanded favorite toggle",
+  },
+  {
+    id: "share-spark",
+    label: "Share",
+    purpose: "Share or copy today's Spark text.",
+    implementation: "SparkNoteExpanded share action",
+  },
+  {
+    id: "print-spark",
+    label: "Print",
+    purpose: "Optional print of the keepsake card.",
+    implementation: "SparkNoteExpanded print action",
   },
   {
     id: "close-backdrop",

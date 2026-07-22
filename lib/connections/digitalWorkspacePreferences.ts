@@ -1,7 +1,7 @@
 /**
  * Digital Workspace Preferences — preferred destinations for Spark Hands.
- * Settings → Defaults is the source of truth for destination preferences.
- * Settings → Connected Services owns auth. Crystals use these defaults quietly.
+ * Connections owns which services are available. Crystal Actions remember
+ * destination choices quietly (no separate Defaults settings page).
  */
 
 const STORAGE_KEY = "companion-digital-workspace-preferences-v1";

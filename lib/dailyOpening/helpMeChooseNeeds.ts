@@ -70,14 +70,14 @@ export function resolveHelpMeChooseSupportOptions(
           id: "ov-clear-mind",
           title: "Clear My Mind",
           benefit:
-            "Empty everything competing for attention when many thoughts are crowding you.",
+            "Best when there is more than one thing on your mind — empty everything competing for attention.",
           destination: { kind: "clear-my-mind" },
         },
         {
           id: "ov-parking",
           title: "Park It",
           benefit:
-            "Save one task or idea for later so you can stop thinking about it right now.",
+            "Best for one task, idea, worry, follow-up, or reminder you are not ready to deal with yet.",
           destination: { kind: "section", section: "parking-lot" },
         },
         {
@@ -129,12 +129,10 @@ export function resolveHelpMeChooseSupportOptions(
       return [
         {
           id: "mind-talk",
-          title: "Talk with me",
-          benefit: "Say it in your own words; we can sort it from there.",
-          destination: {
-            kind: "stay-in-chat",
-            cue: "I'm listening. What's on your mind?",
-          },
+          title: "Talk It Out",
+          benefit:
+            "Think through one situation with Shari, one thoughtful question at a time.",
+          destination: { kind: "section", section: "talk-it-out" },
         },
         {
           id: "mind-clear",
@@ -166,12 +164,10 @@ export function resolveHelpMeChooseSupportOptions(
         },
         {
           id: "dec-talk",
-          title: "Talk it through with me",
-          benefit: "Stay here and we'll untangle it together.",
-          destination: {
-            kind: "stay-in-chat",
-            cue: "What decision are you holding — and what makes it feel hard right now?",
-          },
+          title: "Talk It Out",
+          benefit:
+            "Reflect first with one question at a time — before formal comparison.",
+          destination: { kind: "section", section: "talk-it-out" },
         },
       ];
     case "not-sure":

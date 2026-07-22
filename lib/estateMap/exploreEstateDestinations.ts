@@ -103,11 +103,11 @@ const IMAGE_PATH_OVERRIDES: Readonly<Record<string, string>> = {
   "round-table": "/backgrounds/round-table-boardroom-background.png",
   "destination-gallery": "/backgrounds/destination-gallery-background.png",
   "art-studio": "/backgrounds/art-studio-background.png",
-  "project-room": "/backgrounds/project-room.png",
+  "project-room": "/backgrounds/inspiring-vision-room-background.png",
   portfolio: "/backgrounds/hall-of-achievements-room-background.png",
   "game-room": "/backgrounds/game-room-background.png",
   "gallery-of-firsts": "/backgrounds/gallery-background.png",
-  "creative-studio": "/backgrounds/creative-studio-background.png",
+  "creative-studio": "/backgrounds/art-studio-background.png",
   "cartographers-studio":
     "/backgrounds/cartoghraphers-studio-background.png",
   "woodland-path": "/backgrounds/woodland-pathway.png",
@@ -384,20 +384,8 @@ function supplementalDestination(
 /** Extra approved destinations with assets that are not navigable in the manifest. */
 function buildSupplementalDestinations(): EstateExploreDestination[] {
   return [
-    supplementalDestination({
-      id: "destination-gallery",
-      name: "Destination Gallery",
-      aliases: ["destination gallery", "the destination gallery"],
-      category: "work",
-      imagePath: "/backgrounds/destination-gallery-background.png",
-      description: "Choose where a prepared piece should go next.",
-      destinationType: "room",
-      destinationId: "destination-gallery",
-      isAvailable: true,
-      focalPosition: "center",
-      imageReady: true,
-      purpose: "Destination",
-    }),
+    // Destination Gallery retired from Explore menus — Crystal Actions is contextual.
+    // Routing/registry for destination-gallery remains elsewhere.
     supplementalDestination({
       id: "founder-office",
       name: "Founder Office",
@@ -422,7 +410,7 @@ function buildSupplementalDestinations(): EstateExploreDestination[] {
       name: "Project Room",
       aliases: ["project room", "the project room", "goals and projects"],
       category: "rooms",
-      imagePath: "/backgrounds/project-room.png",
+      imagePath: "/backgrounds/inspiring-vision-room-background.png",
       description: "A calm indoor space for the work you are building.",
       destinationType: "room",
       destinationId: "goals-projects",
@@ -736,11 +724,11 @@ export const EXPLORE_ESTATE_REQUIRED_BACKGROUNDS: Readonly<
   Record<string, string>
 > = {
   "art-studio": "/backgrounds/art-studio-background.png",
-  "project-room": "/backgrounds/project-room.png",
+  "project-room": "/backgrounds/inspiring-vision-room-background.png",
   portfolio: "/backgrounds/hall-of-achievements-room-background.png",
   "game-room": "/backgrounds/game-room-background.png",
   "gallery-of-firsts": "/backgrounds/gallery-background.png",
-  "creative-studio": "/backgrounds/creative-studio-background.png",
+  "creative-studio": "/backgrounds/art-studio-background.png",
   "cartographers-studio":
     "/backgrounds/cartoghraphers-studio-background.png",
   "estate-gardens": "/backgrounds/estate-garden-background.png",

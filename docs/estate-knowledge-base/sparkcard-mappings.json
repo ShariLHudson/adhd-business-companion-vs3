@@ -1,7 +1,7 @@
 {
   "registry": "sparkcard-mappings",
   "version": "1.0.0",
-  "description": "Links Estate Knowledge Base entities to Spark Cards™. Future: populated from Spark Card registry.",
+  "description": "Links Estate Knowledge Base entities to Spark Cards. Future: populated from Spark Card registry.",
   "itemSchema": {
     "id": "string",
     "sourceType": "room | feature | tool | discovery",

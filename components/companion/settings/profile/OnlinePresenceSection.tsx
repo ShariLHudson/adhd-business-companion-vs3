@@ -15,7 +15,7 @@ type Props = {
 };
 
 /**
- * Settings → Profile → Online Presence (website + social URLs).
+ * Settings → Connections → Social Media (website + social URLs).
  * Optional fields; soft URL hints; never blocks saving other fields.
  */
 export function OnlinePresenceSection({ showHeading = true }: Props) {

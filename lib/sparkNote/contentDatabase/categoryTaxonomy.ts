@@ -1,7 +1,10 @@
 import type { SparkNoteCategory } from "../types";
+import { SPARK_CARD_DIVERSITY_CATEGORY_LABELS } from "../sparkCardDiversity";
 
 /**
  * Category taxonomy per SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md
+ * Member-facing ribbons follow Content Diversity Rule approved catalog.
+ * @see docs/platform/SPARK_CARD_CONTENT_DIVERSITY_RULE.md
  */
 export const SPARK_MASTER_CATEGORY_LABELS = [
   "Inventions",
@@ -15,6 +18,11 @@ export const SPARK_MASTER_CATEGORY_LABELS = [
   "Personal Growth",
   "Seasonal Sparks",
 ] as const;
+
+/** Approved diversity ribbons for rotation + display. */
+export const SPARK_APPROVED_DIVERSITY_LABELS = Object.values(
+  SPARK_CARD_DIVERSITY_CATEGORY_LABELS,
+);
 
 /** Suggested personalization tags from the master standard. */
 export const SPARK_MASTER_RECOMMENDED_TAGS = [

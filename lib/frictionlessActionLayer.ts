@@ -3,6 +3,12 @@
  * Chat is the front door — act, ask one question, or open the right tool.
  * Runs before relationship reflection.
  *
+ * **P0-05 Routing Ownership:** Companion live hub. Estate place/capability
+ * intelligence owner is `lib/estateBrain/` (`resolveEstateIntelligenceImmediateAction`
+ * / `routeEstateIntelligence`). `lib/estateIntelligence` and
+ * `lib/estateCapabilityRegistry` are adapters — not parallel production owners.
+ * @see lib/estateBrain/routingOwnershipContract.ts
+ *
  * **Phase C — adapter:** Estate navigation branches should call `goToPlace` via
  * `resolveEstatePlace` — not legacy section routing alone.
  *
@@ -4010,16 +4016,8 @@ function resolveFrictionlessActionImpl(
     });
   }
 
-  if (isConversationStabilizationEnabled() && routingPipeline.fastPath) {
-    return finish(
-      tryConversationStabilizationFlow(
-        input,
-        routing,
-        routingPipeline.fastPath,
-      ),
-    );
-  }
-
+  // Named visual structures (flowchart, mind map, …) before Create document fast-path.
+  // Otherwise "create a flowchart" is claimed as universal_creation (execute_inline).
   const visualBeginnerBeforeEstate = tryVisualBeginnerChoiceFlow(input, routing);
   if (visualBeginnerBeforeEstate) {
     return finish(visualBeginnerBeforeEstate);
@@ -4028,6 +4026,16 @@ function resolveFrictionlessActionImpl(
   const visualStructureBeforeEstate = tryVisualStructureEarlyFlow(input, routing);
   if (visualStructureBeforeEstate) {
     return finish(visualStructureBeforeEstate);
+  }
+
+  if (isConversationStabilizationEnabled() && routingPipeline.fastPath) {
+    return finish(
+      tryConversationStabilizationFlow(
+        input,
+        routing,
+        routingPipeline.fastPath,
+      ),
+    );
   }
 
   const visualRecommendationBeforeEstate = tryVisualRecommendationFlow(

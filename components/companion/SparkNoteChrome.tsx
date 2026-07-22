@@ -38,16 +38,8 @@ export function SparkNoteChrome({
 
   useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    if (view === "collapsed") return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setView(view === "collection" ? "expanded" : "collapsed");
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [view]);
+  // Escape / outside dismiss lives on SparkNoteExpanded + SparkNoteMyCollection
+  // via useDismissibleWindow (shared Estate behavior).
 
   const { card } = useMemo(
     () =>

@@ -1,0 +1,77 @@
+/**
+ * Create + Projects — shared full-bleed atmosphere.
+ * Dark scrim keeps content readable; warm vs bright tint tells the story.
+ * Glass cards stay Spec 109 frosted (cream + dark text) over the image.
+ */
+
+.estate-atmosphere {
+  --estate-atmosphere-overlay: rgba(18, 16, 14, 0.5);
+  --estate-atmosphere-tint: transparent;
+  --estate-atmosphere-blur: 1.25px;
+  --estate-atmosphere-accent: rgba(201, 166, 107, 0.18);
+}
+
+/* Create — warm studio light (“ideas are born”) */
+.estate-atmosphere--create {
+  --estate-atmosphere-overlay: rgba(32, 22, 14, 0.52);
+  --estate-atmosphere-tint: rgba(180, 110, 55, 0.14);
+  --estate-atmosphere-accent: rgba(232, 176, 110, 0.22);
+}
+
+/* Projects home plate — brighter momentum (“ideas become reality”) */
+.estate-atmosphere--projects {
+  --estate-atmosphere-overlay: rgba(16, 24, 32, 0.45);
+  --estate-atmosphere-tint: rgba(120, 168, 196, 0.12);
+  --estate-atmosphere-accent: rgba(140, 190, 210, 0.16);
+}
+
+/* Individual Project Home rooms — same readability, lighter story tint */
+.estate-atmosphere--project-home {
+  --estate-atmosphere-overlay: rgba(18, 16, 14, 0.42);
+  --estate-atmosphere-tint: rgba(90, 120, 140, 0.08);
+  --estate-atmosphere-accent: rgba(140, 190, 210, 0.1);
+}
+
+.estate-atmosphere__cinematic .cinematic-background__image {
+  filter: blur(var(--estate-atmosphere-blur));
+  transform: none !important;
+  background-size: cover !important;
+  background-position: center center !important;
+}
+
+.estate-atmosphere__cinematic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      165deg,
+      var(--estate-atmosphere-tint) 0%,
+      transparent 42%,
+      var(--estate-atmosphere-accent) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--estate-atmosphere-overlay) 0%,
+      rgba(12, 12, 12, 0.48) 55%,
+      var(--estate-atmosphere-overlay) 100%
+    );
+}
+
+/* Create frosted workspace — slightly more glass so the studio shows through */
+[data-testid="create-estate-room"]
+  .plan-my-day-morning-room__workspace.plan-my-day-morning-room__workspace--room-list {
+  background: rgba(255, 252, 245, 0.62);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow:
+    0 18px 48px rgba(42, 32, 24, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.45) inset;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estate-atmosphere__cinematic .cinematic-background__image {
+    filter: none;
+  }
+}

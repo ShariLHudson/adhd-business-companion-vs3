@@ -8,6 +8,7 @@
 **Related indexes:** [317 Master Index](./317_ARCHITECTURE_V2_MASTER_INDEX.md) · [ESTATE_REGISTRY](../estate/ESTATE_REGISTRY.md) · [ESTATE_BRAIN](../estate/ESTATE_BRAIN.md) · [INTELLIGENCE_REGISTRY](../../lib/intelligence/INTELLIGENCE_REGISTRY.md)
 
 **P0-01 report:** [P0_01_CHAMBER_KNOWLEDGE_RETRIEVAL_WIRING_REPORT.md](./P0_01_CHAMBER_KNOWLEDGE_RETRIEVAL_WIRING_REPORT.md)  
+**P0-01B (Knowledge member):** [P0_01B_KNOWLEDGE_CHAMBER_RETRIEVAL_WIRING_REPORT.md](./P0_01B_KNOWLEDGE_CHAMBER_RETRIEVAL_WIRING_REPORT.md)  
 **P0-06 deferral:** [P0_06_MEMORY_CENTER_V1_DEFERRAL.md](./P0_06_MEMORY_CENTER_V1_DEFERRAL.md)
 
 ---
@@ -27,7 +28,7 @@
 
 **Dashboard notes (2026-07-22 session):**
 
-- **Chamber Retrieval:** Founder-approved CR library + Events bridge wired via `lib/chamber/knowledge/` into `chamberMemberHintForChat` (P0-01). 1 fully · 1 partially · 22 docs/specialty-only. Not production-certified (no 429 red-team suite).
+- **Chamber Retrieval:** CR + Knowledge + Events bridge wired via `lib/chamber/knowledge/` into `chamberMemberHintForChat` (P0-01 / P0-01B). 2 fully · 1 partially · 21 docs/specialty-only. Runtime improved; still 🟡 overall. Not production-certified (Knowledge browser NOT_RUN; no 429 red-team suite).
 - **Create:** Ownership contract `lib/createEstate/createOwnershipContract.ts` — entry=`universalCreationEntrypoint`, Work=`UWE`, UI=`createEstate`, lifecycle=`UCE`; dual stacks adapter/quarantine (P0-03). Foundation unit cert **PASS** (`productionCreateFoundation.cert.test.ts`); matrix browser still **NOT_RUN** → **not CERTIFIED** (P0-02).
 - **Routing:** Contract `lib/estateBrain/routingOwnershipContract.ts` — Companion → `resolveFrictionlessAction` → Estate Brain primary; `estateIntelligence` / capability registry = adapters (P0-05).
 - **Memory:** Spec 112 types only — **explicitly deferred for V1** (P0-06). See deferral note.
@@ -52,7 +53,7 @@
 | # | Blocker | Why it blocks production trust |
 |---|---------|--------------------------------|
 | 1 | **Chamber domain packs 408–586 claim completion without verified runtime** | Every FINAL manifest sampled: `repository implementation: not verified` · `production certification: pending` |
-| 2 | **Most Chamber domain packs still docs-only (CR now wired)** | CR library enters chat via `lib/chamber/knowledge/` (P0-01); 22 other members still specialty/docs-only; 429 suite absent |
+| 2 | **Most Chamber domain packs still docs-only (CR + Knowledge wired)** | CR + Knowledge enter chat via `lib/chamber/knowledge/` (P0-01 / P0-01B); 21 other members still specialty/docs-only; Knowledge NOT_CERTIFIED (browser NOT_RUN); 429 suite absent |
 | 3 | **Create standards 045–069 not CERTIFIED** | `lib/createCertification/traceabilityMatrix.ts` — browser `NOT_RUN`; zero honest CERTIFIED rows |
 | 4 | **Dual/triple Create stacks** | `universalCreation` · `universalCreationEngine` · `universalWorkEngine` · thin `platformIntent` blueprints |
 | 5 | **Multi-owner routing** | Estate Brain + `estateIntelligence` + `estateNavigationIntelligence` + frictionless + dual capability registries |
@@ -109,7 +110,7 @@
 | Area | Implemented | Partial | Docs only | Missing | Inconsistent | Readiness |
 |------|:-----------:|:-------:|:---------:|:-------:|:------------:|-----------|
 | **A. Routing** | Estate Brain search, Welcome IA, CDN lexicon, frictionless hub | Intent-first underused in chat; adapters | Full 310 “universal capability routing” product | Single production owner contract | Dual capability registries; Brain vs estateIntelligence | **~55%** |
-| **B. Retrieval** | Estate Brain place search; Evidence Vault UI; Work provenance partial; **Chamber CR contracts + Events bridge** (`lib/chamber/knowledge/`) | Events `knowledgeManifest` paths; canon context blocks; CR path selection | Arch 318 universal retrieval; other Chamber libraries | Spec 117 BusinessBrain retrieve executor; full library body RAG | `lib/businessBrain` ≠ Spec 117 member memory | **~45%** |
+| **B. Retrieval** | Estate Brain place search; Evidence Vault UI; Work provenance partial; **Chamber CR + Knowledge contracts + Events bridge** (`lib/chamber/knowledge/`) | Events `knowledgeManifest` paths; canon context blocks; CR + Knowledge path selection | Arch 318 universal retrieval; other Chamber libraries | Spec 117 BusinessBrain retrieve executor; full library body RAG | `lib/businessBrain` ≠ Spec 117 member memory | **~50%** |
 | **C. Create** | Create Estate Begin→Focus→Map (Event/Mkt/Biz Plan foundation); Spec 131 intent | UCE/UWE/assets/trust stack; createability audits | Full 201–294 deliverable promises; 047 full ecosystems | Named output synthesis engine; CERTIFIED 045–069 | Dual/triple stacks; quarantine leftovers | **~50%** foundation / **~25%** catalog promises |
 | **D. Visual intelligence** | Mind Map + Cartographers room; recommendation helpers; Evidence 245–252 engines partial | Atlas overlay; hidden map modes; sparkVisualEngine | Most 200–220 map standards; Creative Studio 455–466; Content visuals 451; Event visuals 438 | Transform engine 219; present mode 239; a11y cert 240 | Availability vs mapRegistry | **~35%** |
 | **E. Memory** | Adaptive estate prefs; session local helpers; Institute/stores | Core Memory module exists | Spec 112 Memory Center product; full four-type OS | Memory Center UI; chat-path Core Memory | companionMemory vs Spec 112 vs Core Memory | **~25%** |
@@ -131,7 +132,7 @@
 | **Horizons** | 491–502 | `not verified` | No foresight runtime matching pack | **Docs only** |
 | **Human Resources** | 503–514 | `not verified` | Chamber id `people-culture` card only | **Docs only** |
 | **Innovations** | 515–526 | `not verified` | Card only | **Docs only** |
-| **Knowledge** | 527–538 | `not verified` | Institute / sparkKnowledge adjacent — not pack completion | **Partial** (adjacent) / pack **Docs only** |
+| **Knowledge** | 527–538 | `not verified` (pack cert) | **Runtime retrieval wired** (`lib/chamber/knowledge/` P0-01B); browser NOT_RUN → NOT_CERTIFIED | **Partial** (retrieval wired; pack/browser cert pending) |
 | **Leadership** | 539–550 | Status pending (short manifest) | Card only; Board Directors ≠ Leadership pack | **Docs only** |
 | **Learning** | 551–562 | `not verified` | `lib/momentumInstitute/` is real Learning-adjacent surface | **Partial** (Institute) / pack cert **Docs** |
 | **Marketing** | 563–574 | `not verified` | UWE `marketingPlan` work type + Create maps — not full 563–574 intelligence | **Partial** foundation / pack **Docs** |
@@ -160,7 +161,7 @@
 
 | ID | Area | Claim / source | Runtime evidence | Status | Impact | Next action |
 |----|------|----------------|------------------|--------|--------|-------------|
-| **P0-01** | F / packs | CR 419–430 + `430` manifest complete architecture | **Wired 2026-07-22:** `lib/chamber/knowledge/` registry + CR contracts + Events bridge → `chamberMemberHintForChat` → companion-chat `intentHint`. Report: `P0_01_CHAMBER_KNOWLEDGE_RETRIEVAL_WIRING_REPORT.md`. 429 suite still absent. | **Partial → runtime wired** (CR fully; Events partially; other members docs/specialty) | CR chat now loads canonical owns/safety/retrieval contracts | Finish remaining member libraries per 075 gate; add 429 smoke suite |
+| **P0-01** | F / packs | CR 419–430 + Knowledge 527–538 + Events bridge | **Wired 2026-07-22:** `lib/chamber/knowledge/` registry + CR + Knowledge contracts + Events bridge → `chamberMemberHintForChat` → companion-chat `intentHint`. Reports: `P0_01_…` + `P0_01B_KNOWLEDGE_…`. Knowledge browser NOT_RUN → NOT_CERTIFIED. 429 suite still absent. | **Partial → runtime wired** (CR + Knowledge fully; Events partially; other members docs/specialty) | CR + Knowledge chat load canonical owns/safety/retrieval contracts | Browser-validate Knowledge (P0-01B checklist); finish remaining libraries per 075 gate; add 429 smoke suite |
 | **P0-02** | C | Create CERTIFIED 045–069 / hardening 066–074 | **2026-07-22:** Foundation unit suite **PASS** (`lib/createCertification/productionCreateFoundation.cert.test.ts` — 14 tests). `traceabilityMatrix.ts` browser remains **NOT_RUN**; `assessCertification` correctly blocks CERTIFIED without browser. Hardening still “Ready for Certification: No”. | Partial (unit advanced; browser open) | False trust if marked CERTIFIED | Authenticated Founder browser J-001…J-008 + emotional audit before any CERTIFIED row |
 | **P0-03** | C | Single creation runtime | **Ownership contract landed:** `lib/createEstate/createOwnershipContract.ts` — entry=`universalCreationEntrypoint`; work=`UWE`; UI=`createEstate`; lifecycle=`UCE`. `universalCreation` + `platformIntent/blueprintRegistry` marked adapter-only; legacy split shell remains quarantined. | **Partial → ownership enforced** (stacks not deleted) | Wrong room / duplicate Work / trust breaks | Retarget remaining openCreateWorkspace callers; do not expand adapter registries |
 | **P0-04** | C | Createability / honest outputs (233–236, 201–294) | Gap register critical rows; createability package audits ≠ deliverables | Partial | “Creates X” without manifest = Spec 067/069 violation | Ship only manifested outputs; hide unmanifested claims |
@@ -214,7 +215,7 @@ Treat as **Preview / founder-usable** with honest limitations — not as “Cham
 | Create Estate Begin → clarify/confirm → Workspace + Current Focus + Workshop Map | `resolveCreateBeginOutcome`, CreateWorkspaceV2, foundation cert tests | Browser NOT_RUN; Event-shaped strongest |
 | UWE Event / Marketing / Business Plan work types | `lib/universalWorkEngine/packages/*` | Not all industry deliverables |
 | Events Intelligence foundation | `lib/eventsIntelligence/*` Record, assets, capabilities, guide planning | 433–438 incomplete |
-| Chamber browse → invite → single-member chat + dismiss isolation | `lib/chamber/*`, chamber components | Knowledge depth = prompt specialty, not libraries |
+| Chamber browse → invite → single-member chat + dismiss isolation | `lib/chamber/*`, chamber components | CR + Knowledge libraries on chat path; other members still specialty-prompt |
 | Board Path A (intake → template Director voices → outcomes / Call the Board) | `lib/board/*` | Not multi-round LLM debate; dual Advisory risk |
 | Cartographers Mind Map (discovery → draft → canvas → save) | `lib/visualFocus/*`, cartographersStudio | Other maps hidden-pending |
 | Evidence Vault + confidence/retrieval helpers | Evidence UI + `confidenceRecoveryEngine` / 251–252 tests | Full garden/timeline products thinner |
@@ -229,7 +230,7 @@ Treat as **Preview / founder-usable** with honest limitations — not as “Cham
 Ordered by doc volume vs runtime emptiness:
 
 1. **Chamber production packs 408–418, 443–466, 467–550, 563–586** — architecture “complete,” implementation “not verified” (self-stated).
-2. **Client Relationships 419–430 + chamber-knowledge library** — approved knowledge **wired** into Chamber chat (P0-01); pack production certification + 429 suite still open.
+2. **Client Relationships 419–430 + Knowledge 527–538** — CR + Knowledge **wired** into Chamber chat (P0-01 / P0-01B); Knowledge browser NOT_RUN → NOT_CERTIFIED; 429 suite still open.
 3. **Create blueprints 201–294 createability promises** — registries + gap register; not production deliverables.
 4. **Recognition map standards 200–220 (except Mind Map)** — behavioral docs; wall honesty = Mind Map only.
 5. **Creative Studio intelligence 455–466** — almost no runtime beyond room chrome.
@@ -368,7 +369,7 @@ All of the following include **repository implementation: not verified** and/or 
 
 ```
 lib/chamber/chamberMemberRegistry.ts
-lib/chamber/knowledge/                 # P0-01 CR + Events bridge
+lib/chamber/knowledge/                 # P0-01 CR + Knowledge + Events bridge
 lib/board/boardDirectorRegistry.ts
 lib/eventsIntelligence/
 lib/createEstate/resolveCreateBeginOutcome.ts

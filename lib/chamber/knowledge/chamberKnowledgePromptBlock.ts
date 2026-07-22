@@ -37,11 +37,29 @@ export function formatChamberKnowledgePromptBlock(
       ? "\nRuntime bridge: Events Intelligence (lib/eventsIntelligence) — keep using Event Record / foundation guide behavior."
       : "";
 
+  const knowledgeMatchNote =
+    c.memberId === "knowledge-management"
+      ? [
+          "",
+          "KNOWLEDGE MATCH / HONESTY POSTURE (BINDING):",
+          "- Strong match: apply library guidance warmly as Shari.",
+          "- Weak match: say the library only partly covers this — do not overclaim.",
+          "- No match: admit the library does not support the claim; offer a next knowledge step or a handoff.",
+          "- Conflicting sources: name the conflict; compare authority, scope, and recency; do not silently pick one.",
+          "- Stale source: label as outdated / needing review; never present as current truth.",
+          "- Separate evidence, interpretation, and assumption in plain language.",
+          "- Offer Learning / Projects / Momentum / Create / other members — never auto-launch destinations.",
+          "- Create only when they explicitly want a knowledge artifact (brief, map, glossary, article).",
+          "- Automatic knowledge visuals are unavailable — do not offer them.",
+        ].join("\n")
+      : "";
+
   return [
     `CHAMBER KNOWLEDGE LIBRARY ACTIVE (BINDING — ${c.memberId}):`,
     `Library version: ${c.libraryVersion}`,
     `Wiring: ${slice.wiringStatus}`,
     bridgeNote,
+    knowledgeMatchNote,
     "",
     "PRIMARY OWNERSHIP (stay in lane):",
     ...c.primaryOwns.map((line) => `- ${line}`),

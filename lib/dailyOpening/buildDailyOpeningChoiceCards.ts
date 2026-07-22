@@ -1,11 +1,13 @@
 /**
  * Rich choice cards for Global Daily Companion Opening.
- * Exactly three cards — Meaningful Start / Plan or Adapt / Help Me Choose.
- * Show Me Something Helpful is a separate secondary action (not a card).
+ * Exactly three cards — Continue / Plan or Adapt / Help Me Choose.
+ * When Active Workspace exists, the first card is current work only
+ * (never a list of document cards). Show Me Something Helpful stays secondary.
  */
 
 import { hasActivePlanForToday } from "@/lib/dailyAdaptation/hasActivePlanToday";
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
+import type { WelcomeActiveWorkCard } from "@/lib/welcomeHome/resolveWelcomeActiveWork";
 import type {
   DailyOpeningChoiceCard,
   DailyOpeningChoiceId,
@@ -18,13 +20,42 @@ function joinExplanation(lines: string[]): string {
 
 export function buildDailyOpeningChoiceCards(
   _continueOption: CompanionContinueOption | null,
+  activeWork?: WelcomeActiveWorkCard | null,
 ): DailyOpeningChoiceCard[] {
   const hasPlan = hasActivePlanForToday();
 
-  const meaningfulLines = [
-    "One meaningful next step — not a full day plan.",
-    "We’ll recommend a small starting point you can begin right away.",
-  ];
+  const firstCard: DailyOpeningChoiceCard = activeWork
+    ? {
+        id: "continue-meaningful-work",
+        title: "Continue Where You Left Off",
+        supportLines: [
+          activeWork.title,
+          activeWork.statusLabel,
+          "Continue →",
+        ].filter(Boolean),
+        explanation: joinExplanation([
+          activeWork.title,
+          activeWork.statusLabel,
+          "Continue →",
+        ]),
+        estimateLabel: null,
+        recommended: true,
+      }
+    : {
+        id: "continue-meaningful-work",
+        title: DAILY_OPENING_CHOICE_LABELS_CONTINUE_FALLBACK,
+        supportLines: [
+          "One meaningful next step — not a full day plan.",
+          "We’ll recommend a small starting point you can begin right away.",
+        ],
+        explanation: joinExplanation([
+          "One meaningful next step — not a full day plan.",
+          "We’ll recommend a small starting point you can begin right away.",
+        ]),
+        estimateLabel: "About 2 minutes",
+        recommended: !hasPlan,
+      };
+
   const planLines = [
     "Build today's plan or adjust it around what has changed.",
     "Uses your real day plan — Plan when empty, Adapt when one already exists.",
@@ -35,21 +66,14 @@ export function buildDailyOpeningChoiceCards(
   ];
 
   return [
-    {
-      id: "continue-meaningful-work",
-      title: DAILY_OPENING_CHOICE_LABELS_CONTINUE_FALLBACK,
-      supportLines: meaningfulLines,
-      explanation: joinExplanation(meaningfulLines),
-      estimateLabel: "About 2 minutes",
-      recommended: !hasPlan,
-    },
+    firstCard,
     {
       id: "plan-or-adapt-my-day",
       title: "Plan or Adapt My Day",
       supportLines: planLines,
       explanation: joinExplanation(planLines),
       estimateLabel: "About 5 minutes",
-      recommended: hasPlan,
+      recommended: activeWork ? false : hasPlan,
     },
     {
       id: "help-me-choose",

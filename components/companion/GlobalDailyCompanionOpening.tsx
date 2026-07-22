@@ -18,6 +18,7 @@ import type {
   HelpMeChooseSupportOption,
 } from "@/lib/dailyOpening/helpMeChooseNeeds";
 import { HELP_ME_CHOOSE_PROMPT } from "@/lib/dailyOpening/helpMeChooseNeeds";
+import type { WelcomeActiveWorkCard } from "@/lib/welcomeHome/resolveWelcomeActiveWork";
 
 type MainProps = {
   mode: "main";
@@ -27,10 +28,17 @@ type MainProps = {
   discoveryInviteLine?: string;
   /** Joined fallback when structured fields are omitted. */
   welcomeMessage: string;
+  /** @deprecated Prefer encouragementLine */
   teachingSentence?: string | null;
+  /** Today's Encouragement — brief rotating thought. */
+  encouragementLine?: string | null;
   choiceCards: DailyOpeningChoiceCard[];
   discovery?: DailyOpeningDiscoveryInvite | null;
+  /** 073/074 — Active Workspace from canonical registry */
+  activeWork?: WelcomeActiveWorkCard | null;
   onSelect: (choiceId: DailyOpeningChoiceId) => void;
+  onContinueActiveWork?: (work: WelcomeActiveWorkCard) => void;
+  /** Optional fallback when Today's Discovery is hidden. */
   onShowSomethingHelpful?: () => void;
   onDiscoveryPrimary?: () => void;
   onDiscoveryDismiss?: () => void;
@@ -310,14 +318,14 @@ export function TodaysWelcomeCard(props: Props) {
 
   const discovery =
     props.discovery?.show === true ? props.discovery : null;
+  const encouragement =
+    props.encouragementLine?.trim() ||
+    props.teachingSentence?.trim() ||
+    null;
 
   const greetingTitle = props.greetingTitle?.trim() || null;
   const welcomeLine = props.welcomeLine?.trim() || null;
-  const choicesIntro = props.choicesIntro?.trim() || null;
-  const discoveryInviteLine = props.discoveryInviteLine?.trim() || null;
-  const useStructuredHeader = Boolean(
-    greetingTitle || welcomeLine || choicesIntro || discoveryInviteLine,
-  );
+  const useStructuredHeader = Boolean(greetingTitle || welcomeLine);
 
   return (
     <section
@@ -327,8 +335,12 @@ export function TodaysWelcomeCard(props: Props) {
       data-mode="main"
       aria-label="Today's Welcome Card"
     >
-      <header className="global-daily-opening__header">
-        <p className="global-daily-opening__eyebrow">Shari</p>
+      {/* 1. Today's Welcome */}
+      <header
+        className="global-daily-opening__header"
+        data-testid="todays-welcome-section"
+      >
+        <p className="global-daily-opening__eyebrow">Today&apos;s Welcome</p>
         {useStructuredHeader ? (
           <>
             {greetingTitle ? (
@@ -340,22 +352,11 @@ export function TodaysWelcomeCard(props: Props) {
               </h2>
             ) : null}
             {welcomeLine ? (
-              <p className="global-daily-opening__welcome-line">{welcomeLine}</p>
-            ) : null}
-            {choicesIntro ? (
               <p
-                className="global-daily-opening__choices-intro"
-                data-testid="global-daily-choices-intro"
+                className="global-daily-opening__welcome-line"
+                data-testid="global-daily-welcome-line"
               >
-                {choicesIntro}
-              </p>
-            ) : null}
-            {discoveryInviteLine ? (
-              <p
-                className="global-daily-opening__discovery-invite"
-                data-testid="global-daily-discovery-invite"
-              >
-                {discoveryInviteLine}
+                {welcomeLine}
               </p>
             ) : null}
           </>
@@ -364,7 +365,48 @@ export function TodaysWelcomeCard(props: Props) {
         )}
       </header>
 
-      {props.onShowSomethingHelpful ? (
+      {/* 2. Today's Discovery — optional; Explore or Skip, never guilt */}
+      {discovery ? (
+        <aside
+          className="global-daily-opening__discovery"
+          data-testid="global-daily-discovery"
+          aria-label={discovery.title}
+        >
+          <p className="global-daily-opening__discovery-eyebrow">
+            {discovery.title}
+          </p>
+          <p className="global-daily-opening__discovery-title">
+            {discovery.featureTitle?.trim() || discovery.title}
+          </p>
+          <p className="global-daily-opening__discovery-line">{discovery.line}</p>
+          {discovery.whyToday?.trim() ? (
+            <p
+              className="global-daily-opening__discovery-why-today"
+              data-testid="global-daily-discovery-why-today"
+            >
+              {discovery.whyToday}
+            </p>
+          ) : null}
+          <div className="global-daily-opening__discovery-actions">
+            <button
+              type="button"
+              className="global-daily-opening__discovery-primary"
+              onClick={props.onDiscoveryPrimary}
+              data-testid="global-daily-discovery-learn"
+            >
+              {discovery.primaryLabel}
+            </button>
+            <button
+              type="button"
+              className="global-daily-opening__discovery-secondary"
+              onClick={props.onDiscoveryDismiss}
+              data-testid="global-daily-discovery-later"
+            >
+              {discovery.secondaryLabel}
+            </button>
+          </div>
+        </aside>
+      ) : props.onShowSomethingHelpful ? (
         <button
           type="button"
           className="global-daily-opening__secondary-action"
@@ -375,7 +417,11 @@ export function TodaysWelcomeCard(props: Props) {
         </button>
       ) : null}
 
-      <ul className="global-daily-opening__cards">
+      {/* 3. Three familiar action cards */}
+      <ul
+        className="global-daily-opening__cards"
+        data-testid="todays-action-cards"
+      >
         {cards.map((card) => {
           const supportLines =
             card.supportLines?.map((line) => line.trim()).filter(Boolean) ??
@@ -428,35 +474,14 @@ export function TodaysWelcomeCard(props: Props) {
         })}
       </ul>
 
-      {discovery ? (
-        <aside
-          className="global-daily-opening__discovery"
-          data-testid="global-daily-discovery"
-          aria-label={discovery.title}
+      {/* 4. Today's Encouragement */}
+      {encouragement ? (
+        <p
+          className="global-daily-opening__encouragement"
+          data-testid="todays-encouragement"
         >
-          <p className="global-daily-opening__discovery-title">
-            {discovery.title}
-          </p>
-          <p className="global-daily-opening__discovery-line">{discovery.line}</p>
-          <div className="global-daily-opening__discovery-actions">
-            <button
-              type="button"
-              className="global-daily-opening__discovery-primary"
-              onClick={props.onDiscoveryPrimary}
-              data-testid="global-daily-discovery-learn"
-            >
-              {discovery.primaryLabel}
-            </button>
-            <button
-              type="button"
-              className="global-daily-opening__discovery-secondary"
-              onClick={props.onDiscoveryDismiss}
-              data-testid="global-daily-discovery-later"
-            >
-              {discovery.secondaryLabel}
-            </button>
-          </div>
-        </aside>
+          {encouragement}
+        </p>
       ) : null}
     </section>
   );

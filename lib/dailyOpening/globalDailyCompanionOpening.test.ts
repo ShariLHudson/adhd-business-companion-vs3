@@ -51,7 +51,7 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       momentKind: "first-of-day",
       memberFirstName: "Shari",
     });
-    expect(message).toMatch(/good to see you/i);
+    expect(message).toMatch(/welcome back|glad you're here|good to see you|good to have you|settle in|peaceful|fresh morning|I'm here|I'm with you/i);
     expect(message).toMatch(/Shari/);
     expect(message).not.toMatch(/^What would help most today\??$/i);
     expect(countWelcomeSentences(message)).toBeLessThanOrEqual(6);
@@ -73,10 +73,11 @@ describe("GlobalDailyCompanionOpening — welcome message", () => {
       memberFirstName: "Sarah",
     });
     expect(opening.greetingTitle).toBe("Welcome back, Sarah.");
-    expect(opening.welcomeLine).toMatch(/good to see you/i);
+    expect(opening.welcomeLine.length).toBeGreaterThan(20);
     expect(opening.choicesIntro).toMatch(/already in motion/i);
     expect(opening.discoveryInviteLine).toMatch(/helpful part of Spark Estate/i);
     expect(opening.welcomeMessage).toContain(opening.greetingTitle);
+    expect(opening.encouragementLine).toBeTruthy();
   });
 
   it("long absence uses Return Plan tone", () => {
@@ -140,6 +141,27 @@ describe("GlobalDailyCompanionOpening — main choices", () => {
     expect(cards[0]?.estimateLabel).toBeTruthy();
   });
 
+  it("first card is current work when Active Workspace exists", () => {
+    const cards = buildDailyOpeningChoiceCards(null, {
+      title: "Simple Productivity System Workshop",
+      creationType: "Workshop",
+      statusLabel: "Draft Ready",
+      currentFocusOrNext: null,
+      progressSummary: "Draft ready",
+      lastWorkedLabel: "Just now",
+      lastWorkedAt: new Date().toISOString(),
+      workspaceId: "ws-welcome-1",
+      continueLabel: "Continue",
+    });
+    expect(cards[0]?.title).toBe("Continue Where You Left Off");
+    expect(cards[0]?.supportLines?.[0]).toBe(
+      "Simple Productivity System Workshop",
+    );
+    expect(cards[0]?.supportLines).toContain("Draft Ready");
+    expect(cards[0]?.recommended).toBe(true);
+    expect(cards).toHaveLength(3);
+  });
+
   it("does not place discovery inside the primary three choices", () => {
     const opening = resolveGlobalDailyOpening({
       entryPoint: "first-platform-opening",
@@ -148,8 +170,14 @@ describe("GlobalDailyCompanionOpening — main choices", () => {
     expect(opening.choiceCards).toHaveLength(3);
     expect(opening.choiceCards.map((c) => c.id)).not.toContain("discovery");
     if (opening.discovery.show) {
-      expect(opening.discovery.title).toMatch(/discover/i);
+      expect(opening.discovery.title).toMatch(/today'?s discovery/i);
+      expect(opening.discovery.primaryLabel).toBe("Explore");
+      expect(opening.discovery.secondaryLabel).toBe("Skip");
+      expect(opening.discovery.discoveryId).toBeTruthy();
+      expect(opening.discovery.featureTitle).toBeTruthy();
     }
+    expect(opening.encouragementLine).toBeTruthy();
+    expect(opening.welcomeDayIndex).toBeGreaterThanOrEqual(1);
   });
 
   it("hides discovery after absence or recovery", () => {

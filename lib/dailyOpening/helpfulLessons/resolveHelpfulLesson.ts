@@ -21,13 +21,25 @@ export function isHelpfulLessonEligible(lesson: HelpfulLesson): boolean {
     // Prefer live places when id matches estate places; section-like ids may still be ok.
     const placeId = lesson.destinationId;
     if (
-      /^(clear-my-mind|plan-my-day|evidence-vault|peaceful-places|chamber|decision-compass|journal|reminders|rhythms)/i.test(
+      /^(clear-my-mind|plan-my-day|evidence-vault|peaceful-places|chamber|decision-compass|talk-it-out|journal|reminders|rhythms)/i.test(
         placeId,
       ) &&
       !isLiveEstatePlace(placeId) &&
-      !["plan-my-day", "clear-my-mind", "reminders", "rhythms", "settings", "guidebook", "projects", "people-i-help", "my-business-estate", "boardroom", "chamber"].includes(
-        placeId,
-      )
+      ![
+        "plan-my-day",
+        "adapt-my-day",
+        "parking-lot",
+        "park-it",
+        "clear-my-mind",
+        "reminders",
+        "rhythms",
+        "settings",
+        "projects",
+        "people-i-help",
+        "my-business-estate",
+        "boardroom",
+        "chamber",
+      ].includes(placeId)
     ) {
       return false;
     }

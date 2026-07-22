@@ -15,6 +15,11 @@ import {
   CLIENT_RELATIONSHIPS_RUNTIME_CONTRACT,
 } from "./clientRelationshipsContracts";
 import {
+  KNOWLEDGE_MANAGEMENT_DOCS,
+  KNOWLEDGE_MANAGEMENT_DOCS_ROOT,
+  KNOWLEDGE_MANAGEMENT_RUNTIME_CONTRACT,
+} from "./knowledgeManagementContracts";
+import {
   EVENTS_INTELLIGENCE_CANONICAL_FILES,
   EVENTS_INTELLIGENCE_ROOT,
 } from "@/lib/eventsIntelligence/knowledgeManifest";
@@ -97,6 +102,16 @@ const APPROVED_AND_BRIDGED: Partial<Record<ChamberMemberId, PackSeed>> = {
     contract: EVENTS_RUNTIME_CONTRACT,
     runtimeBridge: "eventsIntelligence",
   },
+  "knowledge-management": {
+    displayName: "Knowledge Management Intelligence",
+    libraryStatus: "runtime-canonical",
+    wiringStatus: "fully",
+    docsRoot: KNOWLEDGE_MANAGEMENT_DOCS_ROOT,
+    architecturePackNote: "527–538 Knowledge completion packs + KMG library",
+    docs: KNOWLEDGE_MANAGEMENT_DOCS,
+    contract: KNOWLEDGE_MANAGEMENT_RUNTIME_CONTRACT,
+    runtimeBridge: null,
+  },
 };
 
 /** Architecture-v2 pack notes for members without chamber-knowledge libraries yet. */
@@ -109,7 +124,6 @@ const ARCH_PACK_NOTES: Partial<Record<ChamberMemberId, string>> = {
   horizons: "491–502 Horizons",
   "people-culture": "503–514 Human Resources",
   innovations: "515–526 Innovations",
-  "knowledge-management": "527–538 Knowledge",
   leadership: "539–550 Leadership",
   learning: "551–562 Learning",
   marketing: "563–574 Marketing",
