@@ -103,10 +103,20 @@ export function ProgressivePlanMyDay({
   const [breakDraft, setBreakDraft] = useState("");
   /** Adjust This Plan — in-place rearrange/edit/delete, never Adapt My Day. */
   const [adjustOpen, setAdjustOpen] = useState(false);
+  /** Optimize My Day — honest, visible feedback every time (never a silent no-op). */
+  const [optimizeNotice, setOptimizeNotice] = useState<string | null>(null);
 
   useEffect(() => {
     setFlow(loadProgressivePlanState());
   }, []);
+
+  // Belt-and-suspenders: never carry an open "+ Add" form across a stage
+  // change — each stage starts with the calm, collapsed control. `go()`
+  // below already closes it synchronously; this covers any other path.
+  const stageForAddReset = flow.stage;
+  useEffect(() => {
+    setShowAdd(false);
+  }, [stageForAddReset]);
 
   const listItems = useMemo(() => activeList(items), [items]);
   const name = memberFirstName();
@@ -118,6 +128,7 @@ export function ProgressivePlanMyDay({
   }
 
   function go(stage: ProgressivePlanStage, patch?: Partial<ProgressivePlanState>) {
+    setShowAdd(false);
     persistFlow(advanceProgressiveStage(flow, stage, patch));
   }
 
@@ -191,6 +202,25 @@ export function ProgressivePlanMyDay({
     transform: (active: PlanDayItem[]) => PlanDayItem[],
   ) {
     commitItems(mergeOrderedIntoFull(items, transform(listItems)));
+  }
+
+  /**
+   * Optimize My Day — rearranges flexible (unscheduled) tasks around fixed
+   * appointments and locked items, using priority plus learned scheduling
+   * patterns. Locked/timed items never move. Always gives honest, visible
+   * feedback — never a silent no-op (Primary Action Feedback™).
+   */
+  function runOptimizeMyDay() {
+    const before = listItems.map((i) => i.id);
+    const optimized = optimizeDayAroundLocks(listItems);
+    const changed = before.some((id, index) => optimized[index]?.id !== id);
+    applyListTransform(() => optimized);
+    setOptimizeNotice(
+      changed
+        ? "Optimized — flexible tasks moved around your fixed times and locked items."
+        : "Your day's already in a good order — nothing needed to change.",
+    );
+    window.setTimeout(() => setOptimizeNotice(null), 4500);
   }
 
   function handleBuildDay() {
@@ -325,6 +355,17 @@ export function ProgressivePlanMyDay({
           >
             Does anything else need to happen today?
           </p>
+          {listItems.length > 0 ? (
+            <PlanDaySimpleList
+              mode="calm-list"
+              title="Added so far"
+              items={listItems}
+              onEdit={(id, title) =>
+                onItemsChange(updatePlanItem(items, id, { title }))
+              }
+              onDelete={(id) => onItemsChange(deletePlanItem(items, id))}
+            />
+          ) : null}
           {showAdd ? (
             <PlanDaySimpleAdd
               onAdd={(raw) => {
@@ -627,6 +668,26 @@ export function ProgressivePlanMyDay({
             }
           />
 
+          {showAdd ? (
+            <PlanDaySimpleAdd
+              onAdd={(raw) => {
+                const titles = parseMindCapture(raw);
+                const parts = titles.length > 0 ? titles : [raw.trim()];
+                onItemsChange(addQuickPlanItems(parts, items));
+                setShowAdd(false);
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              className={SECONDARY}
+              data-testid="plan-day-today-add-item"
+              onClick={() => setShowAdd(true)}
+            >
+              + Add Item
+            </button>
+          )}
+
           {reshapeOffer ? (
             <div
               className="rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-4 py-3"
@@ -745,16 +806,20 @@ export function ProgressivePlanMyDay({
                   </button>
                   <button
                     type="button"
-                    className="w-full px-3 py-2 text-left text-sm font-semibold text-[#1f1c19] hover:bg-[#f5f0ea]"
+                    className="flex w-full flex-col px-3 py-2 text-left hover:bg-[#f5f0ea]"
                     data-testid="plan-day-more-optimize"
+                    aria-label="Optimize My Day — rearrange flexible tasks around your fixed times and locked items"
                     onClick={() => {
-                      applyListTransform((active) =>
-                        optimizeDayAroundLocks(active),
-                      );
+                      runOptimizeMyDay();
                       setMoreOpen(false);
                     }}
                   >
-                    Optimize My Day
+                    <span className="text-sm font-semibold text-[#1f1c19]">
+                      Optimize My Day
+                    </span>
+                    <span className="text-xs font-normal text-[#6b635a]">
+                      Reorder flexible tasks around your fixed times
+                    </span>
                   </button>
                   <button
                     type="button"
@@ -795,16 +860,31 @@ export function ProgressivePlanMyDay({
           </div>
 
           {listItems.some((i) => !i.sourceTimeBlockId && i.flexible !== false) ? (
-            <button
-              type="button"
-              className={SECONDARY}
-              data-testid="plan-day-optimize-inline"
-              onClick={() =>
-                applyListTransform((active) => optimizeDayAroundLocks(active))
-              }
+            <div className="flex flex-col items-start gap-1">
+              <button
+                type="button"
+                className={SECONDARY}
+                data-testid="plan-day-optimize-inline"
+                onClick={runOptimizeMyDay}
+              >
+                Optimize My Day
+              </button>
+              <p className="text-sm text-[#6b635a]">
+                Reorders your flexible tasks around fixed times and
+                priorities — anything locked or scheduled stays put.
+              </p>
+            </div>
+          ) : null}
+
+          {optimizeNotice ? (
+            <p
+              className="companion-fade-in rounded-xl border border-[#c5e0e0] bg-[#f0f8f8] px-4 py-3 text-base font-semibold text-[#1e4f4f]"
+              role="status"
+              aria-live="polite"
+              data-testid="plan-day-optimize-notice"
             >
-              Optimize My Day
-            </button>
+              {optimizeNotice}
+            </p>
           ) : null}
 
           {flow.energy ? (

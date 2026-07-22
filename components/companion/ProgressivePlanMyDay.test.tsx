@@ -2,7 +2,7 @@
  * Progressive Plan My Day stage journey.
  * @vitest-environment jsdom
  */
-import { act } from "react";
+import { act, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ProgressivePlanMyDay } from "@/components/companion/ProgressivePlanMyDay";
@@ -12,7 +12,7 @@ import {
   writeEnergyBaseline,
 } from "@/lib/planMyDay/progressivePlanFlow";
 import { todayStr } from "@/lib/companionStore";
-import type { PlanDayItem } from "@/lib/planMyDay";
+import { saveTodayPlanItems, type PlanDayItem } from "@/lib/planMyDay";
 
 const sample: PlanDayItem[] = [
   {
@@ -23,6 +23,35 @@ const sample: PlanDayItem[] = [
     flexible: true,
   },
 ];
+
+function setInputValue(
+  el: HTMLInputElement | HTMLTextAreaElement | null,
+  value: string,
+) {
+  if (!el) return;
+  const setter = Object.getOwnPropertyDescriptor(
+    Object.getPrototypeOf(el),
+    "value",
+  )?.set;
+  act(() => {
+    setter?.call(el, value);
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+}
+
+/**
+ * Mirrors how a real host (PlanMyDayPanel) wires ProgressivePlanMyDay —
+ * items live in the parent and flow back down as a fresh prop, so an
+ * added item is visible on the very next render (no extra "build" step).
+ */
+function ProgressiveHarness({
+  initialItems,
+}: {
+  initialItems: PlanDayItem[];
+}) {
+  const [items, setItems] = useState<PlanDayItem[]>(initialItems);
+  return <ProgressivePlanMyDay items={items} onItemsChange={setItems} />;
+}
 
 describe("ProgressivePlanMyDay", () => {
   let container: HTMLDivElement;
@@ -334,5 +363,199 @@ describe("ProgressivePlanMyDay", () => {
 
     expect(latest.find((i) => i.id === "1")?.sortOrder).toBe(2);
     expect(latest.find((i) => i.id === "2")?.sortOrder).toBe(1);
+  });
+
+  it("anything-else stage shows items already captured immediately — no waiting for the list step", () => {
+    // Matches production: the host loads/persists today's items before this
+    // component mounts, so storage and the `items` prop already agree.
+    saveTodayPlanItems(sample);
+    act(() => {
+      root.render(<ProgressiveHarness initialItems={sample} />);
+    });
+    act(() => {
+      (
+        container.querySelector(
+          "[data-testid='plan-day-already-know']",
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    // The item captured before this step is already visible — not hidden
+    // until the member reaches the "list" stage.
+    expect(container.textContent).toContain("Write Proposal");
+
+    act(() => {
+      (
+        container.querySelector(
+          "[data-testid='plan-day-add-something']",
+        ) as HTMLButtonElement
+      ).click();
+    });
+    setInputValue(
+      container.querySelector(
+        "[data-testid='plan-day-simple-input']",
+      ) as HTMLInputElement,
+      "Call the vet",
+    );
+    act(() => {
+      (
+        container.querySelector(
+          "[data-testid='plan-day-simple-add-button']",
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    // Added item appears right away, on this same screen.
+    expect(container.textContent).toContain("Call the vet");
+  });
+
+  it("today stage lets members add another item and see it immediately — no Archive/rebuild required", () => {
+    saveProgressivePlanState({
+      date: todayStr(),
+      stage: "today",
+      usableMinutes: 240,
+      energy: "steady",
+    });
+    act(() => {
+      root.render(<ProgressiveHarness initialItems={sample} />);
+    });
+
+    expect(container.textContent).not.toContain("Call the vet");
+    expect(
+      container.querySelector("[data-testid='plan-day-today-add-item']"),
+    ).toBeTruthy();
+
+    act(() => {
+      (
+        container.querySelector(
+          "[data-testid='plan-day-today-add-item']",
+        ) as HTMLButtonElement
+      ).click();
+    });
+    setInputValue(
+      container.querySelector(
+        "[data-testid='plan-day-simple-input']",
+      ) as HTMLInputElement,
+      "Call the vet",
+    );
+    act(() => {
+      (
+        container.querySelector(
+          "[data-testid='plan-day-simple-add-button']",
+        ) as HTMLButtonElement
+      ).click();
+    });
+
+    // Visible immediately in the TODAY list — no Archive / Start Fresh,
+    // no re-answering usable time or energy, no rebuild.
+    expect(container.textContent).toContain("Call the vet");
+    expect(
+      container.querySelector("[data-testid='plan-day-progressive-today']"),
+    ).toBeTruthy();
+    // Add form collapses back to the calm control, ready for the next add.
+    expect(
+      container.querySelector("[data-testid='plan-day-today-add-item']"),
+    ).toBeTruthy();
+  });
+
+  it("Optimize My Day always gives visible feedback — never a silent no-op", () => {
+    const locked: PlanDayItem = {
+      id: "lock-1",
+      title: "9am doctor appointment",
+      column: "today",
+      done: false,
+      startTime: "09:00",
+      flexible: false,
+      sourceTimeBlockId: "tb-1",
+    };
+    const flexA: PlanDayItem = {
+      id: "flex-a",
+      title: "Reply to emails",
+      column: "today",
+      done: false,
+      flexible: true,
+      priority: "low",
+      sortOrder: 2,
+    };
+    const flexB: PlanDayItem = {
+      id: "flex-b",
+      title: "Draft the quarterly report",
+      column: "today",
+      done: false,
+      flexible: true,
+      priority: "high",
+      sortOrder: 3,
+    };
+    saveProgressivePlanState({
+      date: todayStr(),
+      stage: "today",
+      usableMinutes: 240,
+      energy: "steady",
+    });
+    act(() => {
+      root.render(
+        <ProgressiveHarness initialItems={[locked, flexA, flexB]} />,
+      );
+    });
+
+    const optimizeButton = container.querySelector(
+      "[data-testid='plan-day-optimize-inline']",
+    ) as HTMLButtonElement | null;
+    expect(optimizeButton).toBeTruthy();
+
+    act(() => {
+      optimizeButton?.click();
+    });
+
+    // Every click produces an honest, visible message — never nothing.
+    const notice = container.querySelector(
+      "[data-testid='plan-day-optimize-notice']",
+    );
+    expect(notice).toBeTruthy();
+    expect(notice?.textContent).toBeTruthy();
+
+    // Clicking again once already optimized still gives feedback, honestly
+    // saying nothing needed to change (not a repeat of the first message).
+    act(() => {
+      (
+        container.querySelector(
+          "[data-testid='plan-day-optimize-inline']",
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(
+      container.querySelector("[data-testid='plan-day-optimize-notice']")
+        ?.textContent,
+    ).toMatch(/already in a good order/i);
+  });
+
+  it("Optimize My Day is explained in plain language near the control and in the More menu", () => {
+    saveProgressivePlanState({
+      date: todayStr(),
+      stage: "today",
+      usableMinutes: 240,
+      energy: "steady",
+    });
+    act(() => {
+      root.render(<ProgressiveHarness initialItems={[...sample]} />);
+    });
+
+    expect(container.textContent).toMatch(
+      /Reorders your flexible tasks around fixed times/i,
+    );
+
+    act(() => {
+      (
+        container.querySelector(
+          "[data-testid='plan-day-more-menu-toggle']",
+        ) as HTMLButtonElement
+      ).click();
+    });
+    const optimizeMenuItem = container.querySelector(
+      "[data-testid='plan-day-more-optimize']",
+    );
+    expect(optimizeMenuItem?.textContent).toMatch(
+      /Reorder flexible tasks around your fixed times/i,
+    );
   });
 });
