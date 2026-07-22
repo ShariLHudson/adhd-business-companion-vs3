@@ -34,6 +34,19 @@ describe("Intent-First Estate Navigation", () => {
     expect(action?.kind).toBe("visual");
   });
 
+  it("routes 'new project' intent to Momentum/Project Homes, never Create (Start New Project Routing Fix)", () => {
+    const route = resolveIntentFirstRoute("start a new project");
+    expect(route?.category).toBe("momentum");
+    expect(route?.experienceId).toBe("momentum");
+    expect(route?.spaceId).toBe("goals-projects");
+    expect(route?.toolId).toBe("projects");
+
+    const action = resolveEstateIntelligenceImmediateAction(
+      "start a new project",
+    );
+    expect(action?.kind).toBe("create-project");
+  });
+
   it("routes marketing strategy to Momentum", () => {
     const route = resolveIntentFirstRoute(
       "I need to build my marketing strategy",

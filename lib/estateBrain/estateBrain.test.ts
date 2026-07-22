@@ -24,6 +24,15 @@ describe("Estate Brain search", () => {
     expect(result.best?.entry.experienceId).toBe("momentum");
   });
 
+  it("routes 'new project' to Momentum, never Create (Start New Project Routing Fix)", () => {
+    const result = searchEstateBrain("new project");
+    expect(result.best?.entry.experienceId).toBe("momentum");
+    const createMatch = result.matches.find(
+      (m) => m.entry.experienceId === "create",
+    );
+    expect(createMatch).toBeUndefined();
+  });
+
   it("finds restore spaces when overwhelmed", () => {
     const matches = searchEstateBrainByNeed("overwhelmed");
     const names = matches.map((m) => m.entry.name);
@@ -47,6 +56,11 @@ describe("Estate Brain search", () => {
     expect(resolveExperienceFromBrain("draft a newsletter")).toBe("create");
     expect(resolveExperienceFromBrain("weekly planning")).toBe("momentum");
     expect(resolveExperienceFromBrain("journal gratitude")).toBe("journal");
+  });
+
+  it("resolveExperienceFromBrain routes 'new project' to Momentum, never Create", () => {
+    expect(resolveExperienceFromBrain("new project")).toBe("momentum");
+    expect(resolveExperienceFromBrain("start a new project")).toBe("momentum");
   });
 
   it("whatCanIDoHere returns capabilities for Journal Gazebo", () => {

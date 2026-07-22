@@ -1,11 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { detectResearchLevel } from "./researchRouting";
 import {
+  resolveEstateIntelligenceImmediateAction,
   resolveEstateIntelligenceRoute,
   resolveImmediateResearchOpen,
 } from "./routeEstateIntelligence";
 
 describe("Estate Intelligence routing", () => {
+  it("routes 'new project' to Momentum, never Create (Start New Project Routing Fix)", () => {
+    const route = resolveEstateIntelligenceRoute("start a new project");
+    expect(route?.category).toBe("momentum");
+    expect(route?.experienceId).toBe("momentum");
+    expect(route?.spaceId).toBe("goals-projects");
+
+    const action = resolveEstateIntelligenceImmediateAction(
+      "start a new project",
+    );
+    expect(action?.kind).toBe("create-project");
+    expect(action?.route.experienceId).toBe("momentum");
+    expect(action?.route.category).toBe("momentum");
+  });
+
   it("routes write email to Create + Copywriter", () => {
     const route = resolveEstateIntelligenceRoute("I need to write an email");
     expect(route?.category).toBe("create");

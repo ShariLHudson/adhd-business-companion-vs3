@@ -67,7 +67,10 @@ function scoreQueryAgainstEntry(
 
   for (const cap of entry.capabilities) {
     const c = normalize(cap);
-    if (tokens.some((t) => c.includes(t) || t.length >= 4 && c.includes(t))) {
+    const capTokens = tokenize(cap);
+    // Match on whole tokens only — a short query token like "new" must not
+    // substring-match into an unrelated capability like "Newsletter".
+    if (capTokens.some((ct) => tokens.includes(ct))) {
       bump(map, entry, 12, `capability: ${cap}`);
     }
     if (q.includes(c)) {

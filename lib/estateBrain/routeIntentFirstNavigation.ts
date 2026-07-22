@@ -144,32 +144,35 @@ export function resolveIntentFirstRoute(
   }
 
   if (isProjectCreationIntent(text)) {
+    // Start New Project Routing Fix — "new project" intent opens the Project
+    // setup flow in Momentum/Project Homes, never Create. Create remains for
+    // creating content; a Create → Project handoff stays intentional-only.
     const environment =
-      estateEnvironmentById("create-studio") ??
-      ESTATE_ENVIRONMENTS.find((e) => e.spaceId === "creative-studio")!;
-    const capability = estateCapabilityById("create.general");
-    const experience = estateBrainEntryById("create");
+      estateEnvironmentById("momentum") ??
+      ESTATE_ENVIRONMENTS.find((e) => e.spaceId === "goals-projects")!;
+    const capability = estateCapabilityById("momentum.projects");
+    const experience = estateBrainEntryById("momentum");
     return {
       userText: text,
-      intentCategory: "create",
+      intentCategory: "plan",
       environmentId: environment.id,
       environmentName: environment.name,
-      capabilityId: capability?.id ?? "create.general",
-      capabilityName: capability?.name ?? "Create",
-      category: "create",
+      capabilityId: capability?.id ?? "momentum.projects",
+      capabilityName: capability?.name ?? "Projects",
+      category: "momentum",
       expertIds: capability?.expertIds ?? [],
       expertNames: estateExpertNames(capability?.expertIds ?? []),
-      experienceId: "create",
-      experienceName: experience?.name ?? "Create",
+      experienceId: "momentum",
+      experienceName: experience?.name ?? "Momentum",
       spaceId: environment.spaceId,
       toolId: "projects",
       confidence: "high",
       immediateNavigate: true,
       answerInConversation: false,
-      followUpLine: "Let's bring that project to life.",
+      followUpLine: "Let's set up your new project.",
       nextExperienceSuggestions: environment.suggestedNextSpaceIds,
       matchScore: 40,
-      matchReasons: ["new project creation → Create"],
+      matchReasons: ["new project creation → Projects"],
     };
   }
 
