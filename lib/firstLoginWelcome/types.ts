@@ -30,6 +30,8 @@ export type FirstLoginWelcomeRecord = {
 export type MarkWelcomeCompletedOptions = {
   /** When true, records disposition as skipped (still suppresses automatic replay). */
   skipped?: boolean;
+  /** Close / Escape / dismiss without finishing audio (still suppresses automatic replay). */
+  dismissed?: boolean;
   /** Platform version string shown during this Welcome Experience. */
   platformVersion?: string | null;
   at?: string;

@@ -64,12 +64,18 @@ export const FIRST_TIME_WELCOME_CERTIFICATION_CHECKLIST: readonly FirstTimeWelco
     },
   ] as const;
 
-export type WelcomeExperienceDisposition = "completed" | "skipped";
+export type WelcomeExperienceDisposition =
+  | "completed"
+  | "skipped"
+  | "dismissed";
 
 export function resolveWelcomeDisposition(input: {
-  skipped: boolean;
+  skipped?: boolean;
+  dismissed?: boolean;
 }): WelcomeExperienceDisposition {
-  return input.skipped ? "skipped" : "completed";
+  if (input.dismissed) return "dismissed";
+  if (input.skipped) return "skipped";
+  return "completed";
 }
 
 /** True when automatic display must be suppressed. */

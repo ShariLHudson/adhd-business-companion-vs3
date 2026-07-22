@@ -6,9 +6,11 @@ import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { objectIdForEmoji } from "@/lib/companionObjects";
 import { requestOpenHowSparkEstateWorksTogether } from "@/lib/estateOrientation";
+import { requestWelcomeHomeReplay } from "@/lib/welcomeHome";
 
 const OPEN_ESTATE_ORIENTATION_PROMPT =
   "__open_how_spark_estate_works_together__";
+const REPLAY_WELCOME_PROMPT = "__replay_welcome__";
 
 const GOLD_LABEL = "text-xs font-bold uppercase tracking-wide text-[#b45309]";
 
@@ -141,8 +143,19 @@ export function HowDoIWorkflowCard({
                     {article.openLabel ?? "Show me how everything works together"}
                   </button>
                 ) : null}
+                {article.askPrompt === REPLAY_WELCOME_PROMPT ? (
+                  <button
+                    type="button"
+                    onClick={() => requestWelcomeHomeReplay()}
+                    className="rounded-lg bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                    data-testid="how-do-i-replay-welcome"
+                  >
+                    {article.openLabel ?? "Replay Welcome"}
+                  </button>
+                ) : null}
                 {article.askPrompt &&
                 article.askPrompt !== OPEN_ESTATE_ORIENTATION_PROMPT &&
+                article.askPrompt !== REPLAY_WELCOME_PROMPT &&
                 onAsk &&
                 !article.openSection ? (
                   <button

@@ -12,7 +12,7 @@ describe("FirstLoginWelcomeGate — one-time welcome behavior", () => {
     expect(source).toContain("handleStopAndContinue");
     expect(source).toContain("FIRST_LOGIN_WELCOME_STOP");
     expect(source).toMatch(/markWelcomeCompleted\(userId/);
-    expect(source).toContain("finishWelcome(true)");
+    expect(source).toContain("finishWelcome({ skipped: true })");
     expect(source).toContain("skipped");
     expect(source).toContain('data-testid="first-login-stop-welcome"');
   });
@@ -28,6 +28,12 @@ describe("FirstLoginWelcomeGate — one-time welcome behavior", () => {
     expect(source).toContain('prev === "not_required" || prev === "completed"');
     expect(source).toContain("metadataCompletedAt");
     expect(source).toContain("accountCreatedAt");
+  });
+
+  it("marks welcome complete when audio ends or Escape dismisses (146)", () => {
+    expect(source).toMatch(/voiceState !== "ended"/);
+    expect(source).toMatch(/event\.key !== "Escape"/);
+    expect(source).toMatch(/dismissed:\s*true/);
   });
 
   it("does not autoplay when welcome audio was already started once", () => {

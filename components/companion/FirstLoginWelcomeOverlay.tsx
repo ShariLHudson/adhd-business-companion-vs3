@@ -153,6 +153,20 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     }
   }, [voiceState, markAudioOnce]);
 
+  /** Watched to the end — mark account complete so it never auto-plays again (146). */
+  useEffect(() => {
+    if (voiceState !== "ended" || !userId) return;
+    if (phase === "completed" || phase === "not_required") return;
+    void markAudioOnce();
+    void markWelcomeCompleted(userId, {
+      skipped: false,
+      platformVersion:
+        process.env.NEXT_PUBLIC_APP_VERSION?.trim() ||
+        process.env.npm_package_version?.trim() ||
+        "0.1.0",
+    });
+  }, [voiceState, userId, phase, markAudioOnce]);
+
   useEffect(() => {
     if (!welcomeRequired) return;
     stopAllEstateEnvironmentalAudio();
@@ -219,12 +233,13 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
   }, [playExperience, voiceMuted, toggleVoice, markAudioOnce]);
 
   const finishWelcome = useCallback(
-    async (skipped: boolean) => {
+    async (opts: { skipped?: boolean; dismissed?: boolean } = {}) => {
       if (!userId) return;
       void stopExperience();
       destroyWelcomeHomeAudioManager();
       await markWelcomeCompleted(userId, {
-        skipped,
+        skipped: Boolean(opts.skipped),
+        dismissed: Boolean(opts.dismissed),
         platformVersion:
           process.env.NEXT_PUBLIC_APP_VERSION?.trim() ||
           process.env.npm_package_version?.trim() ||
@@ -235,21 +250,33 @@ function FirstLoginWelcomeGateInner({ children }: Props) {
     [userId, stopExperience],
   );
 
+  /** Escape / close counts as dismiss — still one-time complete (146). */
+  useEffect(() => {
+    if (!welcomeRequired) return;
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      void finishWelcome({ dismissed: true });
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [welcomeRequired, finishWelcome]);
+
   const handleEnter = useCallback(async () => {
-    await finishWelcome(false);
+    await finishWelcome({ skipped: false });
   }, [finishWelcome]);
 
   /** Stop the recording and go straight to Welcome Home — one-time welcome ends. */
   const handleStopAndContinue = useCallback(async () => {
     void markAudioOnce();
-    await finishWelcome(true);
+    await finishWelcome({ skipped: true });
   }, [markAudioOnce, finishWelcome]);
 
   /** Skip listening entirely — still ends the one-time welcome for this account. */
   const handleContinueWithoutAudio = useCallback(async () => {
     void stopExperience();
     void markAudioOnce();
-    await finishWelcome(true);
+    await finishWelcome({ skipped: true });
   }, [stopExperience, markAudioOnce, finishWelcome]);
 
   const handleMute = useCallback(() => {

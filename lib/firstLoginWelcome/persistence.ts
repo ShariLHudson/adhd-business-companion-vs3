@@ -47,7 +47,8 @@ function parseRecord(raw: string): FirstLoginWelcomeRecord {
     const parsed = JSON.parse(raw) as Partial<FirstLoginWelcomeRecord>;
     const disposition =
       parsed.welcomeDisposition === "completed" ||
-      parsed.welcomeDisposition === "skipped"
+      parsed.welcomeDisposition === "skipped" ||
+      parsed.welcomeDisposition === "dismissed"
         ? parsed.welcomeDisposition
         : null;
     return {
@@ -104,7 +105,9 @@ function dispositionFromMetadata(
   metadata: Record<string, unknown> | undefined,
 ): FirstLoginWelcomeRecord["welcomeDisposition"] {
   const value = metadataString(metadata, META_DISPOSITION);
-  if (value === "completed" || value === "skipped") return value;
+  if (value === "completed" || value === "skipped" || value === "dismissed") {
+    return value;
+  }
   return null;
 }
 
@@ -288,6 +291,7 @@ export async function markWelcomeCompleted(
   const at = options.at ?? new Date().toISOString();
   const disposition = resolveWelcomeDisposition({
     skipped: Boolean(options.skipped),
+    dismissed: Boolean(options.dismissed),
   });
   const platformVersion = options.platformVersion?.trim() || null;
 

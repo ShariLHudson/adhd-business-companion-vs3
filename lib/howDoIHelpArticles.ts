@@ -86,6 +86,36 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     askPrompt: "I'm new — help me understand how you work as my companion.",
   },
   {
+    id: "replay-welcome",
+    categoryId: "getting-started",
+    title: "Replay Welcome",
+    emoji: "🏡",
+    featured: false,
+    whatItIs:
+      "Hear Shari’s Welcome Home arrival again — a calm cinematic return to the front door. This never resets your first-time onboarding; you’ve already been introduced.",
+    whenToUse:
+      "When you want to revisit the welcome on purpose — from Help, Settings, or Learn Spark Estate — not when Spark decides for you.",
+    workflow: [
+      "Open Replay Welcome from Help, Settings, or the Estate menu.",
+      "Enjoy the silent Welcome Home arrival again.",
+      "Continue wherever you left off — your account still remembers you’ve been welcomed.",
+    ],
+    tips: [
+      "Automatic welcome plays only once for a brand-new account.",
+      "Skipping or closing the first welcome also counts as complete.",
+    ],
+    keywords: [
+      "replay welcome",
+      "welcome again",
+      "hear welcome",
+      "first time welcome",
+      "welcome video",
+      "welcome audio",
+    ],
+    openLabel: "Replay Welcome",
+    askPrompt: "__replay_welcome__",
+  },
+  {
     id: "how-everything-works-together",
     categoryId: "getting-started",
     title: "How Everything Works Together",

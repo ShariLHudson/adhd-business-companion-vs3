@@ -35,8 +35,9 @@ describe("126 First-Time Welcome Experience constitution", () => {
     expect(WELCOME_SKIP_COUNTS_AS_COMPLETION).toBe(true);
   });
 
-  it("treats skip and complete as suppressible dispositions", () => {
+  it("treats skip, dismiss, and complete as suppressible dispositions", () => {
     expect(resolveWelcomeDisposition({ skipped: true })).toBe("skipped");
+    expect(resolveWelcomeDisposition({ dismissed: true })).toBe("dismissed");
     expect(resolveWelcomeDisposition({ skipped: false })).toBe("completed");
     expect(
       shouldSuppressAutomaticWelcome({
