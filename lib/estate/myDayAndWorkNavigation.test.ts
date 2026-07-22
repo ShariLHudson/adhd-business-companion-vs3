@@ -37,6 +37,9 @@ describe("My Day & Work navigation contract", () => {
     expect(resolveMyDayAndWorkOpenerFromText("Open Projects")).toBe(
       "project-homes",
     );
+    expect(resolveMyDayAndWorkOpenerFromText("go to projects")).toBe(
+      "project-homes",
+    );
     expect(getMyDayAndWorkDestination("projects").opener).toBe("project-homes");
   });
 

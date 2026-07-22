@@ -35,7 +35,13 @@ export const MY_DAY_AND_WORK_DESTINATIONS = [
     label: "Projects",
     /** Approved current Projects experience — Project Homes (not legacy blue ProjectsPanel). */
     opener: "project-homes",
-    aliases: ["projects", "open projects", "my projects", "project homes"],
+    aliases: [
+      "projects",
+      "open projects",
+      "go to projects",
+      "my projects",
+      "project homes",
+    ],
   },
   {
     id: "clear-my-mind",
@@ -149,7 +155,9 @@ export function resolveMyDayAndWorkOpenerFromText(
     return "cartographers-studio";
   }
   if (
-    /\b(?:open|show|take me to)\s+(?:my\s+)?projects?\b/i.test(normalized) ||
+    /\b(?:open|show|take me to|go to|bring me to|head to)\s+(?:my\s+|the\s+)?(?:goals\s*(?:&|and)\s*)?projects?\b/i.test(
+      normalized,
+    ) ||
     /\bproject\s+homes?\b/i.test(normalized) ||
     /\b(?:i need to see|see|view)\b[\s\S]{0,40}\b(?:all\s+)?(?:my\s+)?(?:current\s+)?projects?\b/i.test(
       normalized,

@@ -1,7 +1,7 @@
 /**
  * Spark Estate — top navigation and profile menu.
  *
- * Welcome Home (room menu) = where to go (five categories; Estate last).
+ * Welcome Home (room menu) = where to go (Build · Guidance · Focus · Reflection · Spark Estates).
  * SH profile menu = My Spark Estate + Experience Controls + Settings.
  * Experience Controls open as an overlay — never navigate away.
  *
@@ -75,23 +75,30 @@ export const SPARK_ESTATE_ROOM_MENU_MY_DAY_WORK_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-day")!.destinations;
 
 export const SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS =
-  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "my-work")!.destinations;
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "build")!.destinations;
 
 /** Create submenu removed — no third-level flyouts. */
 export const SPARK_ESTATE_ROOM_MENU_CREATE_SUBMENU_ITEMS = [] as const;
 
-const REFLECT_FLAT = welcomeHomeFlattenCategoryDestinations("take-a-moment");
+const FOCUS_FLAT = welcomeHomeFlattenCategoryDestinations("take-a-moment");
+const REFLECT_FLAT = welcomeHomeFlattenCategoryDestinations("reflection");
 
-export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = REFLECT_FLAT.filter((d) =>
-  ["clear-my-mind", "parking-lot", "breathe", "talk-it-out"].includes(d.id),
+export const SPARK_ESTATE_ROOM_MENU_FOCUS_ITEMS = FOCUS_FLAT.filter((d) =>
+  [
+    "clear-my-mind",
+    "parking-lot",
+    "breathe",
+    "talk-it-out",
+    "focus-library",
+  ].includes(d.id),
 );
 
-/** Journal / Evidence / Hall — under Focus & Reflection (Prompt 146). */
+/** Journal / Evidence / Hall — under Reflection. */
 export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS = REFLECT_FLAT.filter((d) =>
   (WELCOME_HOME_MY_STORY_DESTINATION_IDS as readonly string[]).includes(d.id),
 );
 
-/** Guidance = Strategies (Prompt 146). */
+/** Guidance = Chamber · Boardroom · Strategies. */
 export const SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "get-advice")!.destinations;
 
@@ -100,7 +107,8 @@ export const SPARK_ESTATE_ROOM_MENU_SECTIONS = [
 ] as const;
 
 export const SPARK_ESTATE_ROOM_MENU_SPARK_ESTATE_ITEMS =
-  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "spark-estate")!.destinations;
+  WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "spark-estates")!
+    .destinations;
 
 /** Audio menu — Peaceful Moments + Soundscapes only. */
 export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS =
@@ -202,7 +210,7 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
   roomExperiencesItems: number;
   excludesLibraryAndCartography: boolean;
   peacefulPlacesStayInExperiences: boolean;
-  /** Prompt 146 — eight Welcome Home categories (Estate last). */
+  /** Welcome Home categories with Spark Estates last (before Welcome Home return). */
   welcomeHomeHasFiveCategories: boolean;
   experienceControlsNotInWelcomeHome: boolean;
   wanderManifestRuleReady: boolean;
@@ -289,7 +297,7 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
       experiencesIds.includes("soundscapes") &&
       !experiencesIds.includes("breathe" as never) &&
       focusIds.includes("breathe"),
-    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 8,
+    welcomeHomeHasFiveCategories: WELCOME_HOME_NAV_CATEGORIES.length === 7,
     experienceControlsNotInWelcomeHome: !WELCOME_HOME_NAV_CATEGORIES.some((c) =>
       /experience controls/i.test(c.label),
     ),
@@ -337,7 +345,7 @@ export function formatSparkEstateTopNavigationReport(
   lines.push(`  Controls: ${verification.controlCount}`);
   lines.push(`  Profile menu: ${verification.profileMenuAligned ? "pass" : "fail"}`);
   lines.push(
-    `  Five categories (Estate last): ${verification.welcomeHomeHasFiveCategories ? "pass" : "fail"}`,
+    `  Categories (Spark Estates last): ${verification.welcomeHomeHasFiveCategories ? "pass" : "fail"}`,
   );
   lines.push(
     `  EC off Welcome Home: ${verification.experienceControlsNotInWelcomeHome ? "pass" : "fail"}`,

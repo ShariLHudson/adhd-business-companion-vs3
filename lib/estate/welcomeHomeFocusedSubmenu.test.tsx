@@ -112,7 +112,7 @@ describe("Welcome Home focused submenu", () => {
     });
   }
 
-  it("opens with five top-level categories ending in Estate — no destinations yet", () => {
+  it("opens with top-level categories ending in Spark Estates — no destinations yet", () => {
     renderMenu();
     openMenu();
     const panel = container.querySelector(
@@ -127,7 +127,12 @@ describe("Welcome Home focused submenu", () => {
       ).toBeTruthy();
     }
     expect(
-      container.querySelector('[data-testid="estate-room-menu-section-spark-estate"]'),
+      container.querySelector(
+        '[data-testid="estate-room-menu-section-spark-estates"]',
+      ),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="estate-return-to-estate"]'),
     ).toBeTruthy();
     expect(
       container.querySelector('[data-testid="estate-open-adapt-plan-my-day"]'),
@@ -180,7 +185,7 @@ describe("Welcome Home focused submenu", () => {
     ).toBeTruthy();
 
     expect(
-      container.querySelector('[data-testid="estate-room-menu-section-my-work"]'),
+      container.querySelector('[data-testid="estate-room-menu-section-build"]'),
     ).toBeFalsy();
     expect(
       container.querySelector(
@@ -189,7 +194,7 @@ describe("Welcome Home focused submenu", () => {
     ).toBeFalsy();
     expect(
       container.querySelector(
-        '[data-testid="estate-room-menu-section-spark-estate"]',
+        '[data-testid="estate-room-menu-section-spark-estates"]',
       ),
     ).toBeFalsy();
   });
@@ -320,10 +325,10 @@ describe("Welcome Home focused submenu", () => {
     },
   );
 
-  it("Estate replaces top-level with Wander the Grounds + Spark Estate Guide", () => {
+  it("Spark Estates replaces top-level with Wander the Estate + Spark Estate Guide", () => {
     renderMenu();
     openMenu();
-    openCategory("spark-estate");
+    openCategory("spark-estates");
 
     expect(
       container
@@ -337,17 +342,17 @@ describe("Welcome Home focused submenu", () => {
     expect(
       container.querySelector('[data-testid="welcome-home-submenu-heading"]')
         ?.textContent,
-    ).toBe("Estate");
+    ).toBe("Spark Estates");
 
     const labels = Array.from(
       container.querySelectorAll(
-        '[data-testid="welcome-home-submenu-spark-estate"] .estate-room-experience-menu__item-label',
+        '[data-testid="welcome-home-submenu-spark-estates"] .estate-room-experience-menu__item-label',
       ),
     ).map((el) => el.textContent?.trim());
-    expect(labels).toEqual(["Wander the Grounds", "Spark Estate Guide"]);
+    expect(labels).toEqual(["Wander the Estate", "Spark Estate Guide"]);
 
     for (const category of WELCOME_HOME_NAV_CATEGORIES) {
-      if (category.id === "spark-estate") continue;
+      if (category.id === "spark-estates") continue;
       expect(
         container.querySelector(
           `[data-testid="estate-room-menu-section-${category.id}"]`,
@@ -359,7 +364,7 @@ describe("Welcome Home focused submenu", () => {
   it("Spark Estate Guide destination opens once and closes the menu", () => {
     renderMenu();
     openMenu();
-    openCategory("spark-estate");
+    openCategory("spark-estates");
     act(() => {
       (
         container.querySelector(
@@ -374,10 +379,10 @@ describe("Welcome Home focused submenu", () => {
     ).toBeFalsy();
   });
 
-  it("Wander the Grounds opens Explore without opening the Guide", () => {
+  it("Wander the Estate opens Explore without opening the Guide", () => {
     renderMenu();
     openMenu();
-    openCategory("spark-estate");
+    openCategory("spark-estates");
     act(() => {
       (
         container.querySelector(

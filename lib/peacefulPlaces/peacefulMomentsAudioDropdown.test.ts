@@ -80,12 +80,17 @@ describe("Peaceful Moments audio dropdown (137–139)", () => {
     const audio = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "audio");
     const peaceful = audio?.destinations.find((d) => d.id === "peaceful-places");
     expect(peaceful?.label).toBe("Peaceful Moments");
-    const reflect = WELCOME_HOME_NAV_CATEGORIES.find(
+    const focus = WELCOME_HOME_NAV_CATEGORIES.find(
       (c) => c.id === "take-a-moment",
     );
-    const browse = reflect?.destinations.find((d) => d.id === "reflect-more");
+    const reflection = WELCOME_HOME_NAV_CATEGORIES.find(
+      (c) => c.id === "reflection",
+    );
+    expect(focus?.destinations.some((d) => d.id === "peaceful-places")).toBe(
+      false,
+    );
     expect(
-      browse?.dropdownChildren?.some((d) => d.id === "peaceful-places"),
+      reflection?.destinations.some((d) => d.id === "peaceful-places"),
     ).toBe(false);
   });
 

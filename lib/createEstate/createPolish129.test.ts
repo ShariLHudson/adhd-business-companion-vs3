@@ -109,22 +109,24 @@ describe("Create polish 129 certification", () => {
     expect(working).toContain("applyRename");
   });
 
-  it("groups Welcome Home by intention (Prompt 144)", () => {
+  it("groups Welcome Home by intention (Build / Guidance / Reflection)", () => {
     const labels = WELCOME_HOME_NAV_CATEGORIES.map((c) => c.label);
     expect(labels).toEqual([
       "Today",
-      "Work to Create",
-      "Focus & Reflection",
-      "Audio",
-      "Cartography",
+      "Build",
       "Guidance",
-      "Estate",
+      "Focus",
+      "Reflection",
+      "Audio",
+      "Spark Estates",
     ]);
     expect(labels).not.toContain("My Story");
     expect(labels).not.toContain("My Day");
     expect(labels).not.toContain("Get Advice");
-    expect(labels).not.toContain("Spark Estate");
-    expect(labels).not.toContain("Reflect");
+    expect(labels).not.toContain("Work to Create");
+    expect(labels).not.toContain("Focus & Reflection");
+    expect(labels).not.toContain("Chamber");
+    expect(labels).not.toContain("Board");
   });
 
   it("maps Create section to active Welcome Home destination", () => {

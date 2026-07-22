@@ -7,7 +7,7 @@
 
 ## Mission
 
-Finalize Welcome one-time behavior and intention-based navigation so Spark Estate matches the approved mental model: Work to Create · Guidance · Focus & Reflection · Audio.
+Finalize Welcome one-time behavior and intention-based navigation so Spark Estate matches the approved mental model: Today · Build · Guidance · Focus · Reflection · Audio · Spark Estates.
 
 ## PART 1 — Opening Welcome (one-time)
 
@@ -29,40 +29,42 @@ Browser multi-device matrix: provisional.
 
 Retired menu rows (Nature / Focus / Guided / Relaxation) remain as **aliases** for deep links — not listed in the menu.
 
-## PART 3 — Cartography under Work to Create
+## PART 3 — Cartography under Build
 
-Top-level **Cartography** category removed. **Cartography** is a Work to Create destination (Cartographer’s Studio).
+Top-level **Cartography** category removed. **Cartography** is a Build destination (Cartographer’s Studio).
 
-## PART 4 — Strategies under Guidance
+## PART 4 — Guidance (Chamber · Board · Strategies)
 
-**Guidance** = Strategies only (thinking / approaches — not creation).
+**Guidance** = Chamber of Momentum · Boardroom · Strategies.
 
-Chamber and Board are first-class top-level categories.
+Chamber and Board are **not** separate top-level categories.
 
 ## PART 5 — Final Welcome Home structure
 
 | Menu | Destinations |
 |------|----------------|
-| Today | Plan My Day / Adapt · Schedule · Reminders / Rhythms |
-| Work to Create | Create · Projects · Templates · Blueprints · Cartography · Continue Working · Spin the Wheel |
-| Guidance | Strategies |
-| Focus & Reflection | Talk It Out · Clear My Mind · Parking Lot · Breathe · Journal · Evidence Vault · Hall |
+| Today | Plan My Day / Adapt My Day · Calendar · Reminders / Rhythms |
+| Build | Create · Projects · Cartography · Destination Gallery |
+| Guidance | Chamber of Momentum · Boardroom · Strategies |
+| Focus | Talk It Out · Clear My Mind · Parking Lot · Breathe · Focus Library (Start focus session · Time blocking · Body double · Timers) |
+| Reflection | Journal · Evidence Vault · Hall of Accomplishments |
 | Audio | Peaceful Moments · Soundscapes |
-| Chamber | Chamber of Momentum |
-| Board | Boardroom |
-| Estate | Wander the Grounds · Spark Estate Guide |
+| Spark Estates | Wander the Estate · Spark Estate Guide |
+| Welcome Home | Return to living room (menu chrome control, last) |
+
+Templates · Blueprints/Continue Working · Spin are not listed in this primary IA (may remain reachable elsewhere).
 
 Business Estate · Connections · Settings remain on the SH profile menu (unchanged).
 
 ## PART 6 — Help / onboarding
 
-How Everything Works Together copy updated: Cartography under Work to Create; Strategies under Guidance.
+How Everything Works Together copy: Cartography under Build; Chamber / Board / Strategies under Guidance.
 
 ## PART 7 — Certification
 
 | Check | Status |
 |-------|--------|
-| Menu openers wired (Templates, Continue Working, Cartography) | Pass |
+| Menu openers wired (Build destinations, Guidance, Focus Library children) | Pass |
 | Active category highlight | Pass (unit) |
 | No duplicate Audio destinations | Pass |
 | No orphan Cartography category | Pass |

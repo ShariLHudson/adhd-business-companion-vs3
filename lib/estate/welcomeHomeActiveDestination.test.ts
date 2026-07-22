@@ -45,10 +45,13 @@ describe("welcomeHomeActiveDestination (Prompt 144)", () => {
     expect(welcomeHomeDestinationForSection("create")).toBe("create");
   });
 
-  it("resolves intention categories after Prompt 146 finalization", () => {
-    expect(welcomeHomeCategoryForDestination("journal")).toBe("take-a-moment");
+  it("resolves intention categories for the current Welcome Home IA", () => {
+    expect(welcomeHomeCategoryForDestination("journal")).toBe("reflection");
     expect(welcomeHomeCategoryForDestination("evidence-vault")).toBe(
-      "take-a-moment",
+      "reflection",
+    );
+    expect(welcomeHomeCategoryForDestination("hall-of-accomplishments")).toBe(
+      "reflection",
     );
     expect(welcomeHomeCategoryForDestination("peaceful-places")).toBe("audio");
     expect(welcomeHomeCategoryForDestination("soundscapes")).toBe("audio");
@@ -57,18 +60,23 @@ describe("welcomeHomeActiveDestination (Prompt 144)", () => {
       "take-a-moment",
     );
     expect(welcomeHomeCategoryForDestination("breathe")).toBe("take-a-moment");
-    expect(welcomeHomeCategoryForDestination("create")).toBe("my-work");
+    expect(welcomeHomeCategoryForDestination("focus-library")).toBe(
+      "take-a-moment",
+    );
+    expect(welcomeHomeCategoryForDestination("start-focus-session")).toBe(
+      "take-a-moment",
+    );
+    expect(welcomeHomeCategoryForDestination("create")).toBe("build");
     expect(welcomeHomeCategoryForDestination("strategy-library")).toBe(
       "get-advice",
     );
-    expect(welcomeHomeCategoryForDestination("spin-the-wheel")).toBe("my-work");
     expect(welcomeHomeCategoryForDestination("cartographers-studio")).toBe(
-      "my-work",
+      "build",
     );
     expect(welcomeHomeCategoryForDestination("chamber-of-momentum")).toBe(
-      "chamber",
+      "get-advice",
     );
-    expect(welcomeHomeCategoryForDestination("boardroom")).toBe("board");
-    expect(welcomeHomeCategoryForDestination("templates")).toBe("my-work");
+    expect(welcomeHomeCategoryForDestination("boardroom")).toBe("get-advice");
   });
 });
+

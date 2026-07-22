@@ -52,18 +52,27 @@ describe("096 — Welcome Home catalog", () => {
         c.destinations.map((d) => d.id),
       ]),
     );
-    expect(byId["my-work"]).toContain("create");
-    expect(byId["my-work"]).toContain("projects");
+    expect(byId.build).toContain("create");
+    expect(byId.build).toContain("projects");
     expect(byId["take-a-moment"]).toContain("talk-it-out");
     expect(byId["take-a-moment"]).toContain("parking-lot");
-    expect(byId["take-a-moment"]).toContain("reflect-more");
-    const browse = WELCOME_HOME_NAV_CATEGORIES.find(
-      (c) => c.id === "take-a-moment",
-    )?.destinations.find((d) => d.id === "reflect-more");
-    expect(browse?.dropdownChildren?.map((c) => c.id)).toEqual(
-      expect.arrayContaining(["journal", "evidence-vault"]),
+    expect(byId["take-a-moment"]).toContain("focus-library");
+    expect(byId["take-a-moment"]).not.toContain("journal");
+    expect(byId.reflection).toEqual(
+      expect.arrayContaining([
+        "journal",
+        "evidence-vault",
+        "hall-of-accomplishments",
+      ]),
     );
-    expect(byId["spark-estate"]).toEqual([
+    expect(byId["get-advice"]).toEqual(
+      expect.arrayContaining([
+        "chamber-of-momentum",
+        "boardroom",
+        "strategy-library",
+      ]),
+    );
+    expect(byId["spark-estates"]).toEqual([
       "wander-the-grounds",
       "spark-estate-guide",
     ]);

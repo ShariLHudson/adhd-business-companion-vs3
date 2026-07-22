@@ -61,15 +61,23 @@ export type EstateRoomExperienceMenuProps = {
   onOpenCreateStudio?: () => void;
   onOpenDestinationGallery?: () => void;
   onOpenCartographersStudio?: () => void;
-  /** Work to Create → Templates library. */
+  /** Legacy Build → Templates library (not in primary IA). */
   onOpenTemplates?: () => void;
-  /** Work to Create → Continue Working (resume last meaningful work). */
+  /** Legacy Build → Continue Working (not in primary IA). */
   onOpenContinueWorking?: () => void;
   onOpenClearMyMind?: () => void;
   onOpenParkingLot?: () => void;
   onOpenTalkItOut?: () => void;
   onOpenSpinTheWheel?: () => void;
   onOpenBreathe?: () => void;
+  /** Focus → Focus Library parent (Focus hub). */
+  onOpenFocusLibrary?: () => void;
+  /** Focus Library → Start focus session / Timers. */
+  onOpenFocusTimer?: () => void;
+  /** Focus Library → Time blocking (closest: calendar / time-block). */
+  onOpenTimeBlocking?: () => void;
+  /** Focus Library → Body double strategy. */
+  onOpenBodyDouble?: () => void;
   onOpenPeacefulPlaces?: () => void;
   onOpenSoundscapes?: () => void;
   onOpenJournal?: () => void;
@@ -77,7 +85,7 @@ export type EstateRoomExperienceMenuProps = {
   onOpenHallOfAccomplishments?: () => void;
   onOpenChamber?: () => void;
   onOpenBoardroom?: () => void;
-  /** Work to Create → Strategies (playbook / StrategiesPanel). */
+  /** Guidance → Strategies (playbook / StrategiesPanel). */
   onOpenStrategyLibrary?: () => void;
   /** Audio → Focus Audio (when available; falls back to Peaceful Moments). */
   onOpenFocusAudio?: () => void;
@@ -128,6 +136,10 @@ export function EstateRoomExperienceMenu({
   onOpenBoardroom,
   onOpenStrategyLibrary,
   onOpenFocusAudio,
+  onOpenFocusLibrary,
+  onOpenFocusTimer,
+  onOpenTimeBlocking,
+  onOpenBodyDouble,
   onOpenBreathe,
   onOpenPeacefulPlaces,
   onOpenSoundscapes,
@@ -229,6 +241,11 @@ export function EstateRoomExperienceMenu({
           "parking-lot": onOpenParkingLot,
           "talk-it-out": onOpenTalkItOut,
           breathe: onOpenBreathe,
+          "focus-library": onOpenFocusLibrary ?? onOpenFocusTimer,
+          "start-focus-session": onOpenFocusTimer,
+          "time-blocking": onOpenTimeBlocking ?? onOpenCalendar,
+          "body-double": onOpenBodyDouble ?? onOpenStrategyLibrary,
+          timers: onOpenFocusTimer,
           "spin-the-wheel": onOpenSpinTheWheel,
           "peaceful-places": onOpenPeacefulPlaces,
           soundscapes: onOpenSoundscapes,
@@ -264,6 +281,10 @@ export function EstateRoomExperienceMenu({
       onOpenParkingLot,
       onOpenTalkItOut,
       onOpenBreathe,
+      onOpenFocusLibrary,
+      onOpenFocusTimer,
+      onOpenTimeBlocking,
+      onOpenBodyDouble,
       onOpenSpinTheWheel,
       onOpenPeacefulPlaces,
       onOpenSoundscapes,
@@ -281,16 +302,20 @@ export function EstateRoomExperienceMenu({
 
   const dropdownChildAction = useCallback(
     (id: WelcomeHomeNavDropdownChildId): (() => void) | undefined => {
-      const myDayMap: Partial<
+      const nestedMap: Partial<
         Record<WelcomeHomeNavDropdownChildId, (() => void) | undefined>
       > = {
         "plan-my-day": onOpenPlanMyDay ?? onOpenAdaptPlanMyDay,
         "adapt-my-day": onOpenAdaptMyDay ?? onOpenAdaptPlanMyDay,
         reminders: onOpenReminders ?? onOpenRemindersRhythms,
         rhythms: onOpenRhythms ?? onOpenRemindersRhythms,
+        "start-focus-session": onOpenFocusTimer,
+        "time-blocking": onOpenTimeBlocking ?? onOpenCalendar,
+        "body-double": onOpenBodyDouble ?? onOpenStrategyLibrary,
+        timers: onOpenFocusTimer,
       };
-      if (id in myDayMap) return myDayMap[id];
-      // Reflect → Browse more children share destination openers.
+      if (id in nestedMap) return nestedMap[id];
+      // Reflection / Audio children share destination openers.
       return destinationAction(id as WelcomeHomeNavDestinationId);
     },
     [
@@ -300,6 +325,11 @@ export function EstateRoomExperienceMenu({
       onOpenReminders,
       onOpenRhythms,
       onOpenRemindersRhythms,
+      onOpenFocusTimer,
+      onOpenTimeBlocking,
+      onOpenCalendar,
+      onOpenBodyDouble,
+      onOpenStrategyLibrary,
       destinationAction,
     ],
   );
@@ -559,6 +589,7 @@ export function EstateRoomExperienceMenu({
                           type="button"
                           className={[
                             "estate-room-experience-menu__category",
+                            category.id === "spark-estates" ||
                             category.id === "spark-estate"
                               ? "estate-room-experience-menu__category--spark-estate"
                               : "",

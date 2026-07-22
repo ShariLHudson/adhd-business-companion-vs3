@@ -40,6 +40,10 @@ const SECTION_TO_DESTINATION: Record<string, WelcomeHomeNavDestinationId> = {
   playbook: "strategy-library",
   "strategy-library": "strategy-library",
   soundscapes: "soundscapes",
+  focus: "focus-library",
+  "focus-timer": "start-focus-session",
+  "time-block": "time-blocking",
+  "focus-studio": "focus-library",
 };
 
 export function welcomeHomeDestinationForSection(

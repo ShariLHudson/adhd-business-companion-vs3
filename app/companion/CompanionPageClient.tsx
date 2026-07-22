@@ -25658,6 +25658,14 @@ export default function CompanionPageClient() {
         onOpenBoardroom={() => openBoardroomCore()}
         onOpenStrategyLibrary={() => openStrategyLibraryCore()}
         onOpenBreathe={() => openBreatheOverlayCore()}
+        onOpenFocusLibrary={() => openStandaloneFocusSectionCore("focus")}
+        onOpenFocusTimer={() =>
+          openStandaloneFocusSectionCore("focus-timer")
+        }
+        onOpenTimeBlocking={() =>
+          openStandaloneFocusSectionCore("time-block")
+        }
+        onOpenBodyDouble={() => startStrategyApplyCoach("body-double")}
         onOpenPeacefulPlaces={() => openPeacefulPlacesCore({ animate: true })}
         onOpenSoundscapes={() => setSoundscapeSelectionOpen(true)}
         onOpenFocusAudio={() => openFocusAudioCore()}
