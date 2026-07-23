@@ -54,17 +54,36 @@ describe("conversationContinuity — Slice 2 gate", () => {
     vi.restoreAllMocks();
   });
 
-  it("newsletter purpose stays inside newsletter creation and skips primary classify", () => {
-    const classifySpy = vi.spyOn(
-      primaryTurnClassifier,
-      "classifyPrimaryConversationTurn",
-    );
+  it("newsletter purpose leaves UC discovery for Create Foundation handoff", () => {
     const start = startUniversalCreationTurn("I need to write a newsletter.", 1);
     expect(start?.kind).toBe("question");
     saveUniversalCreationSession(start!.session);
 
     const purpose =
       "To introduce my ADHD app to new users and explain how it all works.";
+    const gate = resolveContinuityTurnGate({
+      userText: purpose,
+      lastAssistantText: formatUniversalCreationTurnReply(start!),
+    });
+
+    // Newsletter is a Create Foundation document type — continuity must not
+    // keep looping UC discovery once Foundation claims the work.
+    expect(["exit_document_mode", "fall_through"]).toContain(gate.action);
+  });
+
+  it("non-foundation create answer stays inside UC and skips primary classify", () => {
+    const classifySpy = vi.spyOn(
+      primaryTurnClassifier,
+      "classifyPrimaryConversationTurn",
+    );
+    const start = startUniversalCreationTurn(
+      "I need to write a client email.",
+      1,
+    );
+    expect(start?.kind).toBe("question");
+    saveUniversalCreationSession(start!.session);
+
+    const purpose = "To thank them for the call and confirm next steps.";
     const gate = resolveContinuityTurnGate({
       userText: purpose,
       lastAssistantText: formatUniversalCreationTurnReply(start!),
@@ -77,9 +96,8 @@ describe("conversationContinuity — Slice 2 gate", () => {
     if (gate.action !== "route_to_owner") return;
     expect(gate.routed.kind).toBe("universal_creation");
     if (gate.routed.kind === "universal_creation") {
-      expect(gate.routed.session.documentType).toBe("newsletter");
-      expect(gate.routed.reply).not.toMatch(/how (?:the )?app works as a product/i);
-      expect(gate.routed.turn.kind).toBe("question");
+      expect(gate.routed.session.documentType).toMatch(/email|letter/i);
+      expect(["question", "message", "ready"]).toContain(gate.routed.turn.kind);
     }
   });
 
@@ -175,6 +193,24 @@ describe("conversationContinuity — Slice 2 gate", () => {
       expect(gate.routed.draft.currentStep).toBe("review");
       expect(gate.routed.reply).toMatch(/review|Board discussion/i);
     }
+  });
+
+  it("direct navigation outranks Board intake awaiting-answer", () => {
+    let draft = createEmptyBoardIntakeDraft(["board-chair"]);
+    draft = answerBoardIntakeStep(draft, "Should we raise prices?");
+    draft = answerBoardIntakeStep(draft, "Cash flow is tight.");
+    draft = answerBoardIntakeStep(draft, "Raise, hold, or package");
+    draft = answerBoardIntakeStep(draft, "Losing loyal members.");
+    saveBoardIntakeDraft(draft);
+    expect(getActiveConversationOwner().kind).toBe("board_intake");
+
+    const gate = resolveContinuityTurnGate({
+      userText: "go to the music room",
+    });
+
+    expect(gate.action).toBe("fall_through");
+    expect(gate.intentBucket).toBe("navigation");
+    expect(gate.action).not.toBe("route_to_owner");
   });
 
   it("stored-project request works when no stronger owner exists", () => {
