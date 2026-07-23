@@ -274,6 +274,83 @@
   gap: clamp(0.65rem, 1.5vw, 0.9rem);
 }
 
+.jg-journal-picker__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.jg-journal-picker__remove {
+  border: 0;
+  background: transparent;
+  padding: 0.1rem 0.15rem;
+  font-family: "Lora", Georgia, serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  color: rgba(255, 248, 235, 0.55);
+  cursor: pointer;
+  text-align: center;
+}
+
+.jg-journal-picker__remove:hover {
+  color: rgba(232, 196, 160, 0.92);
+}
+
+.jg-journal-picker__confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 10.5rem;
+  padding: 0.75rem 0.7rem;
+  border-radius: 0.7rem;
+  background: rgba(28, 20, 14, 0.72);
+  border: 1px solid rgba(232, 212, 160, 0.28);
+}
+
+.jg-journal-picker__confirm-text {
+  margin: 0;
+  font-family: "Lora", Georgia, serif;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(255, 248, 235, 0.88);
+}
+
+.jg-journal-picker__confirm-name {
+  margin: 0;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(232, 212, 160, 0.95);
+}
+
+.jg-journal-picker__confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: auto;
+}
+
+.jg-journal-picker__confirm-keep,
+.jg-journal-picker__confirm-remove {
+  border: 0;
+  border-radius: 0.45rem;
+  padding: 0.45rem 0.55rem;
+  font-family: "Lora", Georgia, serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.jg-journal-picker__confirm-keep {
+  background: rgba(255, 248, 235, 0.12);
+  color: rgba(255, 248, 235, 0.9);
+}
+
+.jg-journal-picker__confirm-remove {
+  background: rgba(120, 56, 40, 0.55);
+  color: rgba(255, 236, 220, 0.95);
+}
+
 .jg-journal-picker__item {
   display: flex;
   flex-direction: column;
@@ -388,6 +465,13 @@
   font-size: 1.05rem;
   font-weight: 600;
   color: rgba(255, 248, 235, 0.95);
+}
+
+.jg-journal-picker__resume {
+  font-family: "Lora", Georgia, serif;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: rgba(232, 212, 160, 0.82);
 }
 
 .jg-journal-picker__owner {

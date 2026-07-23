@@ -2,7 +2,8 @@
 
 **Checklist:** `083_GLOBAL_CHAMBER_TOPIC_OWNERSHIP_LIVE_CHECKLIST.md`  
 **Date:** 2026-07-17  
-**Build:** preview (see commit after deploy)
+**Build:** preview commit `c9f80d0c`  
+**Preview URL:** https://adhd-business-companion-vs3-hp8e519gq-shari-hudsons-projects.vercel.app
 
 ## Automated coverage (pre-preview)
 
@@ -25,8 +26,8 @@
 | 8 Generic fallback suppression | **Pending live** | Unit: bridge/settings/arrival strings blocked |
 | 9 Single Shari ownership | **Pending live** | Unit: `responseOwner: "shari"`; openers skipped in CPC |
 
-**Authenticated preview URL:** fill after `vercel --preview` deploy.  
-**Operator:** founder sign-in required (Vercel SSO).
+**Authenticated preview URL:** https://adhd-business-companion-vs3-hp8e519gq-shari-hudsons-projects.vercel.app  
+**Operator:** founder sign-in required (Vercel SSO). Live rows above remain **Pending live** until signed-in checklist is run.
 
 ## Decision
 

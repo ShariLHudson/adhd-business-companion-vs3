@@ -174,7 +174,14 @@ function sanitizeStyle(style: string): string {
 
 /** Strip unsafe markup while keeping basic formatting. */
 export function sanitizePageHtml(html: string): string {
-  if (!html || typeof document === "undefined") return html;
+  if (!html) return "";
+  if (typeof document === "undefined") {
+    // Avoid persisting raw markup when DOM sanitizer is unavailable.
+    return html
+      .replace(/<(script|style|iframe|object|embed)\b[\s\S]*?<\/\1\s*>/gi, "")
+      .replace(/<\/?(?:script|style|iframe|object|embed)[^>]*>/gi, "")
+      .replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+  }
   const root = document.createElement("div");
   root.innerHTML = html;
 

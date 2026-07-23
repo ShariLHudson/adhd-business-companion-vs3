@@ -15,6 +15,7 @@ import {
 } from "./dismissActiveChamberConversation";
 import { planWelcomeHomeDestinationSwitch } from "@/lib/estate/welcomeHomeDestinationSwitch";
 import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import path from "node:path";
 
 describe("dismissActiveChamberConversation planner", () => {
@@ -142,6 +143,22 @@ describe("destination switch includes Chamber teardown", () => {
 });
 
 describe("CompanionPageClient Chamber exit wiring", () => {
+  it("wires inviteChamberMemberCore to clear prior threads on member switch", () => {
+    const source = readFileSync(
+      join(process.cwd(), "app/companion/CompanionPageClient.tsx"),
+      "utf8",
+    );
+    expect(source).toContain("planChamberMemberInvite");
+    expect(source).toContain("addToConversation");
+    expect(source).toContain("clearActiveTopic");
+    expect(source).toMatch(
+      /if \(invitePlan\.clearActiveTopic\) \{[\s\S]*?clearActiveTopic\(\)/,
+    );
+    expect(source).toMatch(
+      /if \(invitePlan\.clearMessages\) \{[\s\S]*?setMessages\(\[\]\)/,
+    );
+  });
+
   it("wires dismissActiveChamberConversationCore into destination switch and member invite", () => {
     const source = readFileSync(
       path.join(process.cwd(), "app/companion/CompanionPageClient.tsx"),
@@ -156,11 +173,11 @@ describe("CompanionPageClient Chamber exit wiring", () => {
       /if \(plan\.clearActiveChamberConversation\) \{[\s\S]*?dismissActiveChamberConversationCore/,
     );
     expect(source).toMatch(
-      /previousId && previousId !== memberId[\s\S]*?supersedeInFlightChatRequest/,
+      /if \(invitePlan\.abortInFlight\) \{[\s\S]*?supersedeInFlightChatRequest/,
     );
     expect(source).toContain("isChamberMemberConversationActive");
     expect(source).toMatch(
-      /chamberConversationActive && activeChamberMemberIdRef\.current/,
+      /chamberConversationActive[\s\S]*?activeChamberMemberIdRef\.current/,
     );
     // Do not restore sticky member outside Chamber
     expect(source).toMatch(

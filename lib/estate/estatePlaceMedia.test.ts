@@ -38,8 +38,11 @@ describe("estatePlaceMedia", () => {
   });
 
   it("wires room-named celebration ambience", () => {
+    // On-disk plate is `reflections-of-triumph.mp3` — see audioAssets.ts
+    // CELEBRATION_ROOM_AMBIENCE_MP3 for why the original `-celebration-garden`
+    // filename was never on disk.
     expect(CANONICAL_PLACE_AMBIENCE["celebration-room"]?.src).toContain(
-      "celebration-garden",
+      "reflections-of-triumph",
     );
   });
 

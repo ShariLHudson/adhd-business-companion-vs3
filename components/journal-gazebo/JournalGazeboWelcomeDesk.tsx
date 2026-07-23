@@ -8,6 +8,7 @@ type Props = {
   journals: JournalGazeboConfig[];
   onCreateJournal: () => void;
   onOpenJournal: (journal: JournalGazeboConfig) => void;
+  onBrowseJournals?: () => void;
 };
 
 /**
@@ -18,6 +19,7 @@ export function JournalGazeboWelcomeDesk({
   journals,
   onCreateJournal,
   onOpenJournal,
+  onBrowseJournals,
 }: Props) {
   return (
     <div
@@ -33,6 +35,7 @@ export function JournalGazeboWelcomeDesk({
             journals={journals}
             onCreateJournal={onCreateJournal}
             onOpenJournal={onOpenJournal}
+            onBrowseJournals={onBrowseJournals}
           />
         </div>
       </JournalGazeboTableActionsPortal>

@@ -1,4 +1,5 @@
 import type { JournalEntry } from "@/lib/growthJournalStore";
+import { formatPrefsClockTime } from "@/lib/companionStore";
 import { JOURNAL_FONT_OPTIONS } from "./catalog";
 import { penRenderProfile } from "./penRender";
 import { sanitizePageHtml, type TypingStyle } from "./writingSurface";
@@ -53,10 +54,7 @@ function formatEntryDate(iso: string): string {
 }
 
 function formatEntryTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return formatPrefsClockTime(new Date(iso));
 }
 
 function stationeryStyles(): string {

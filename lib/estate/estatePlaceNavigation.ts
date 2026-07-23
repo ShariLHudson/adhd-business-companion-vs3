@@ -742,8 +742,16 @@ function shouldAutoNavigateFromResolution(
   ) {
     return true;
   }
-  const words = text.trim().split(/\s+/).filter(Boolean).length;
-  if (resolution.kind === "exact-place" && words <= 8) return true;
+  // Bare exact place name only ("Greenhouse", "Apple Orchard") — not
+  // "I love the greenhouse" style chat. Chat mentions become offers.
+  if (resolution.kind === "exact-place") {
+    const normalized = text.trim().replace(/[®.!?]+$/g, "");
+    const alias = resolution.matchedAlias?.trim().toLowerCase();
+    if (alias && normalized.toLowerCase() === alias) return true;
+    if (alias && normalized.toLowerCase() === `the ${alias}`) return true;
+    const words = normalized.split(/\s+/).filter(Boolean).length;
+    return words <= 4 && Boolean(resolution.placeId);
+  }
   return false;
 }
 

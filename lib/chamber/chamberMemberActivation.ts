@@ -1,8 +1,10 @@
 /**
- * Chamber Member activation — invite a member into the current conversation
- * without clearing thread or project context.
+ * Chamber Member activation — persist the active member + invite copy.
+ * Visible thread isolation (fresh vs add-to-conversation) is owned by
+ * `planChamberMemberInvite` / CompanionPageClient — not this storage helper.
  */
 
+import { clearChamberCertifiedRuntime } from "./chamberCertifiedState";
 import {
   getChamberMemberById,
   type ChamberMember,
@@ -76,6 +78,9 @@ export function activateChamberMember(
 ): { member: ChamberMember; messages: ChamberMemberInviteMessages } | null {
   const member = getChamberMemberById(memberId);
   if (!member) return null;
+
+  // Fresh member → fresh Topic Anchor / CIE certification state
+  clearChamberCertifiedRuntime();
 
   const state: ActiveChamberMemberState = {
     id: member.id,

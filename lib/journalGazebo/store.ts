@@ -6,6 +6,7 @@ import {
   deleteJournalEntry,
 } from "@/lib/growthJournalStore";
 import { todaysPageJournalDefaults } from "./defaults";
+import { sanitizeJournalHtmlForStorage } from "./journalHtmlIntegrity";
 import type { JournalGazeboConfig } from "./types";
 import { journalConfigTag, parseJournalConfigTag } from "./types";
 
@@ -348,6 +349,42 @@ export function updateJournalConfig(
   return next;
 }
 
+/**
+ * Remove a journal volume from the library (config + session pointers + entries).
+ * Callers should also clear page storage via clearJournalPageData.
+ */
+export function deleteJournalConfig(id: string): boolean {
+  const configs = readConfigs();
+  const remaining = configs.filter((c) => c.id !== id);
+  if (remaining.length === configs.length) return false;
+
+  const entries = getEntriesForJournal(id);
+  writeConfigs(remaining);
+
+  const session = readSession();
+  const nextActive =
+    session.activeJournalId === id
+      ? remaining[0]?.id ?? null
+      : session.activeJournalId;
+  const editingBelongsHere =
+    !!session.editingEntryId &&
+    entries.some((entry) => entry.id === session.editingEntryId);
+  writeSession({
+    ...session,
+    activeJournalId: nextActive,
+    editingEntryId: editingBelongsHere ? null : session.editingEntryId,
+    completedCeremonies: session.completedCeremonies.filter(
+      (ceremonyId) => ceremonyId !== id,
+    ),
+    journalCreated: remaining.length > 0 ? session.journalCreated : false,
+  });
+
+  for (const entry of entries) {
+    deleteJournalEntry(entry.id);
+  }
+  return true;
+}
+
 export function hasVisitedJournalGazebo(): boolean {
   return hasJournalGazeboVisited();
 }
@@ -372,7 +409,7 @@ export function saveJournalPage(input: {
   entryId?: string | null;
   title?: string;
 }): { entryId: string; ok: boolean } {
-  const body = input.body.trim();
+  const body = sanitizeJournalHtmlForStorage(input.body).trim();
   if (!body) return { entryId: input.entryId ?? "", ok: false };
 
   const tag = journalConfigTag(input.configId);

@@ -65,7 +65,7 @@ export function chamberMemberHintForChat(
         ].join("\n")
       : "";
 
-  /** Approved / runtime-canonical knowledge packs (CR, Events bridge, …). */
+  /** Approved / runtime-canonical knowledge packs (CR, Knowledge, Events bridge). */
   const knowledgeBlock = chamberKnowledgeHintForChat(member.id, {
     domainHint: options?.domainHint,
     skipFilesystemCheck: true,

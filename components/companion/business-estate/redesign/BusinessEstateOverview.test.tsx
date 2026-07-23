@@ -30,7 +30,7 @@ describe("BusinessEstateOverview", () => {
     container.remove();
   });
 
-  it("shows one reassurance, one recommendation, and a progress overview", () => {
+  it("defaults to Next Helpful Step without a room-status wall", () => {
     const html = renderToStaticMarkup(
       <BusinessEstateOverview
         onClose={() => {}}
@@ -46,8 +46,35 @@ describe("BusinessEstateOverview", () => {
     );
     expect((html.match(/data-testid="be-next-step"/g) ?? []).length).toBe(1);
     expect(html).toMatch(/Start Business Basics/i);
-    expect(html).toContain('data-testid="be-progress-strip"');
-    expect(html).toContain("Business Estate Overview");
+    expect(html).toMatch(/greet you and your business by name/i);
+    // Full room browse starts collapsed
+    expect(html).not.toContain('data-testid="be-progress-strip"');
+    expect(html).toContain('data-testid="be-overview-browse-toggle"');
+    expect(html).toContain("Browse all rooms (optional)");
+  });
+
+  it("reveals visual room browse when requested", () => {
+    act(() => {
+      root.render(
+        <BusinessEstateOverview
+          onClose={vi.fn()}
+          onStartBusinessBasics={vi.fn()}
+          onEnterRoom={vi.fn()}
+        />,
+      );
+    });
+    act(() => {
+      container
+        .querySelector<HTMLButtonElement>(
+          '[data-testid="be-overview-browse-toggle"]',
+        )
+        ?.click();
+    });
+    expect(
+      container.querySelector('[data-testid="be-progress-strip"]'),
+    ).toBeTruthy();
+    expect(container.textContent).toContain("Rooms at a glance");
+    expect(container.textContent).toContain("Identity Office");
   });
 
   it("uses a compact Coming Later teaser instead of five inactive rows", () => {
@@ -73,6 +100,13 @@ describe("BusinessEstateOverview", () => {
     act(() => {
       container
         .querySelector<HTMLButtonElement>(
+          '[data-testid="be-overview-browse-toggle"]',
+        )
+        ?.click();
+    });
+    act(() => {
+      container
+        .querySelector<HTMLButtonElement>(
           '[data-testid="be-group-toggle-keep-moving"]',
         )
         ?.click();
@@ -80,7 +114,6 @@ describe("BusinessEstateOverview", () => {
     expect(container.textContent).toContain("More Support Is Coming");
     expect(container.textContent).toContain("Coming Later");
     expect(container.textContent).toContain("See What's Coming");
-    // Names stay hidden until optional expand — not five inactive rows
     expect(container.textContent).not.toContain("Wins and Evidence");
     expect(
       container.querySelectorAll('[data-testid^="be-entry-"]').length,
@@ -109,25 +142,14 @@ describe("BusinessEstateOverview", () => {
         />,
       );
     });
-
-    expect(
-      container
-        .querySelector('[data-testid="be-group-understand"]')
-        ?.getAttribute("data-open"),
-    ).toBe("false");
-    expect(
-      container
-        .querySelector('[data-testid="be-group-guide"]')
-        ?.getAttribute("data-open"),
-    ).toBe("false");
-
     act(() => {
       container
         .querySelector<HTMLButtonElement>(
-          '[data-testid="be-group-toggle-understand"]',
+          '[data-testid="be-overview-browse-toggle"]',
         )
         ?.click();
     });
+
     expect(
       container
         .querySelector('[data-testid="be-group-understand"]')
@@ -188,6 +210,7 @@ describe("IdentityOfficeEntrance", () => {
     expect(html).toContain("Start Business Basics");
     expect(html).toContain("Back to My Business Estate");
     expect(html).toContain("My Business Estate › Identity Office");
+    expect(html).toMatch(/greet you and your business by name/i);
     expect(html).not.toContain("Need Another Perspective");
     expect(html).not.toContain("Guiding Principles");
     expect(html).not.toContain("Definition of Success");

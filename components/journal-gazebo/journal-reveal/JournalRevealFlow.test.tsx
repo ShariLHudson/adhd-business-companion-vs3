@@ -198,13 +198,15 @@ describe("Journal reveal Experience wiring", () => {
     expect(source).toContain("handleJournalRevealComplete");
   });
 
-  it("Dear Friend and Begin Writing remain on the open book", () => {
+  it("Dear Friend stays on the open book; Begin writing is only in page nav", () => {
     const openBook = readFileSync(
       join(process.cwd(), "components/journal-gazebo/JournalGazeboOpenBook.tsx"),
       "utf8",
     );
     expect(openBook).toContain("FirstOpenWelcomePage");
-    expect(openBook).toContain("jg-begin-writing");
+    expect(openBook).not.toContain("jg-begin-writing");
+    expect(openBook).toContain('nextLabel={pageIndex === 0 ? "Begin writing" : "Next"}');
     expect(openBook).toContain('setTurning("forward")');
+    expect(openBook).toContain('setTurning("back")');
   });
 });

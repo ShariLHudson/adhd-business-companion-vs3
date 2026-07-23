@@ -22,10 +22,17 @@ import "@/app/companion/chamber-of-momentum.css";
 import "@/app/companion/chamber-member-gallery.css";
 import "@/app/companion/estate-how-to-guide.css";
 
+export type ChamberInviteMemberOptions = {
+  addToConversation?: boolean;
+};
+
 type Props = {
   onBack: () => void;
   activeMemberId: ChamberMemberId | null;
-  onInviteMember: (memberId: ChamberMemberId) => void;
+  onInviteMember: (
+    memberId: ChamberMemberId,
+    opts?: ChamberInviteMemberOptions,
+  ) => void;
   onEndMemberConversation: () => void;
 };
 
@@ -41,9 +48,16 @@ export function ChamberOfMomentumEntryPanel({
     : null;
   const [howToOpen, setHowToOpen] = useState(false);
   const [browseAllMembers, setBrowseAllMembers] = useState(false);
+  const [addingMember, setAddingMember] = useState(false);
 
   const openHowTo = useCallback(() => setHowToOpen(true), []);
   const closeHowTo = useCallback(() => setHowToOpen(false), []);
+
+  useEffect(() => {
+    if (!activeMemberId) {
+      setAddingMember(false);
+    }
+  }, [activeMemberId]);
 
   useEffect(() => {
     if (consumePendingEstateHowToGuide("chamber-of-momentum")) {
@@ -51,6 +65,12 @@ export function ChamberOfMomentumEntryPanel({
     }
     return subscribeEstateHowToGuideOpen("chamber-of-momentum", openHowTo);
   }, [openHowTo]);
+
+  function handleTalkWithMember(memberId: ChamberMemberId) {
+    const addToConversation = addingMember && Boolean(activeMemberId);
+    setAddingMember(false);
+    onInviteMember(memberId, addToConversation ? { addToConversation: true } : undefined);
+  }
 
   return (
     <ChamberOfMomentumRoomShell>
@@ -67,20 +87,44 @@ export function ChamberOfMomentumEntryPanel({
           <GrowPanelBackButton onBack={onBack} label="Estate" />
         ) : null}
         {activeMember ? (
-          <ChamberActiveMemberCard
-            member={activeMember}
-            onEndConversation={onEndMemberConversation}
-          />
+          <>
+            <ChamberActiveMemberCard
+              member={activeMember}
+              onEndConversation={() => {
+                setAddingMember(false);
+                onEndMemberConversation();
+              }}
+              onInviteAnother={() => setAddingMember((prev) => !prev)}
+              invitingAnother={addingMember}
+            />
+            {addingMember ? (
+              <div
+                className="chamber-entry__add-member"
+                data-testid="chamber-add-member-gallery"
+              >
+                <p className="chamber-entry__add-member-note">
+                  Choose who to bring into this conversation. Your current
+                  thread stays.
+                </p>
+                <ChamberMemberGallery
+                  activeMemberId={activeMemberId}
+                  onTalkWithMember={handleTalkWithMember}
+                  howToOpen={howToOpen}
+                  onOpenHowTo={openHowTo}
+                />
+              </div>
+            ) : null}
+          </>
         ) : browseAllMembers ? (
           <ChamberMemberGallery
             activeMemberId={activeMemberId}
-            onTalkWithMember={onInviteMember}
+            onTalkWithMember={handleTalkWithMember}
             howToOpen={howToOpen}
             onOpenHowTo={openHowTo}
           />
         ) : (
           <ChamberPerspectiveGuide
-            onTalkWithMember={onInviteMember}
+            onTalkWithMember={handleTalkWithMember}
             onBrowseAll={() => setBrowseAllMembers(true)}
           />
         )}
@@ -91,6 +135,7 @@ export function ChamberOfMomentumEntryPanel({
           onPrimaryAction={() => {
             closeHowTo();
             if (activeMember) {
+              setAddingMember(false);
               onEndMemberConversation();
             }
             window.setTimeout(() => {

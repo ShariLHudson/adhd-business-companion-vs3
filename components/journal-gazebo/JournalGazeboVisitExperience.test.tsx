@@ -64,7 +64,7 @@ describe("Journal Gazebo letter desk actions", () => {
     expect(document.querySelector("[data-testid='jg-return-desk-note']")).toBeNull();
     expect(document.querySelector(".jg-welcome-note")).toBeNull();
     expect(document.body.textContent).toContain("Create New Journal");
-    expect(document.body.textContent).toContain("Write");
+    expect(document.body.textContent).toContain("Begin where left off");
   });
 
   it("returning desk also shows Create and Write", async () => {
@@ -85,8 +85,9 @@ describe("Journal Gazebo letter desk actions", () => {
     expect(document.querySelector("[data-testid='jg-return-desk-note']")).toBeNull();
   });
 
-  it("Write with one journal opens it", () => {
+  it("Write with one journal opens the browse chooser", () => {
     let opened: string | null = null;
+    let browsed = false;
     const journal = sample("Reflection Journal", "r1");
     act(() => {
       root.render(
@@ -97,6 +98,9 @@ describe("Journal Gazebo letter desk actions", () => {
           onOpenJournal={(j) => {
             opened = j.id;
           }}
+          onBrowseJournals={() => {
+            browsed = true;
+          }}
         />,
       );
     });
@@ -105,10 +109,12 @@ describe("Journal Gazebo letter desk actions", () => {
         .querySelector<HTMLButtonElement>("[data-testid='jg-write-journal']")
         ?.click();
     });
-    expect(opened).toBe("r1");
+    expect(browsed).toBe(true);
+    expect(opened).toBeNull();
   });
 
-  it("Write with multiple journals shows selection", () => {
+  it("Write with multiple journals opens the browse chooser", () => {
+    let browsed = false;
     act(() => {
       root.render(
         <JournalGazeboTableActions
@@ -120,6 +126,9 @@ describe("Journal Gazebo letter desk actions", () => {
           ]}
           onCreateJournal={() => {}}
           onOpenJournal={() => {}}
+          onBrowseJournals={() => {
+            browsed = true;
+          }}
         />,
       );
     });
@@ -128,12 +137,11 @@ describe("Journal Gazebo letter desk actions", () => {
         .querySelector<HTMLButtonElement>("[data-testid='jg-write-journal']")
         ?.click();
     });
-    const menu = container.querySelector("[data-testid='jg-journal-select-menu']");
-    expect(menu).toBeTruthy();
-    expect(menu?.textContent).toContain("Business Journal");
+    expect(browsed).toBe(true);
   });
 
-  it("journal picker uses Choose a journal title", () => {
+  it("journal picker uses Choose a journal title and can remove", () => {
+    let removedId: string | null = null;
     act(() => {
       root.render(
         <JournalGazeboJournalPicker
@@ -142,11 +150,28 @@ describe("Journal Gazebo letter desk actions", () => {
             sample("Ideas Journal", "i1"),
           ]}
           onSelect={() => {}}
+          onRemove={(journal) => {
+            removedId = journal.id;
+          }}
           onClose={() => {}}
         />,
       );
     });
     expect(container.textContent).toContain("Choose a journal:");
+    expect(container.textContent).toContain("Remove from shelf");
+    act(() => {
+      container
+        .querySelector<HTMLButtonElement>("[data-testid='jg-remove-journal-b1']")
+        ?.click();
+    });
+    act(() => {
+      container
+        .querySelector<HTMLButtonElement>(
+          "[data-testid='jg-remove-journal-confirm-b1']",
+        )
+        ?.click();
+    });
+    expect(removedId).toBe("b1");
   });
 });
 

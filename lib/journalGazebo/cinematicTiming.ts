@@ -35,10 +35,10 @@ export const CINEMATIC = {
   titleLingerMs: pace(2000),
   bookmarkLingerMs: pace(1800),
   journalCoverOpenMs: pace(5800),
-  pageTurnMs: pace(2400),
-  pageTurnPauseMs: pace(700),
+  pageTurnMs: pace(1100),
+  pageTurnPauseMs: pace(220),
   /** Linger on a finished page before the turn arrow feels ready */
-  pageAdmireMs: pace(1200),
+  pageAdmireMs: pace(380),
   cameraShiftJournalMs: pace(2800),
   handcraftPauseMs: pace(2200),
   /** Finished journal alone — admire before wrapping */

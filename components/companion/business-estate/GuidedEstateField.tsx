@@ -43,6 +43,8 @@ type Props = {
   fieldId: string;
   isActive: boolean;
   sectionValues: Record<string, string>;
+  /** When true, field-level help row is hidden (section help lives under the field). */
+  hideHelpActions?: boolean;
 };
 
 type DisclosureKey = "why" | "shari" | "examples" | "choose" | "develop" | "draft";
@@ -109,6 +111,7 @@ export function GuidedEstateField({
   fieldId,
   isActive,
   sectionValues: _sectionValues,
+  hideHelpActions = false,
 }: Props) {
   const guidance = getGuidedFieldDef(sectionId, fieldKey);
   const fieldPath = `${sectionId}.${fieldKey}`;
@@ -267,7 +270,7 @@ export function GuidedEstateField({
   }
 
   function buildDevelopDraft(): string {
-    const qs = guidance.guidedQuestions ?? [];
+    const qs = guidance?.guidedQuestions ?? [];
     const lines = qs
       .map((q) => {
         const a = developAnswers[q]?.trim();
@@ -612,6 +615,8 @@ export function GuidedEstateField({
         </select>
       </label>
 
+      {!hideHelpActions ? (
+      <>
       <div className="guided-estate-field__help-row">
         {guidance.allowImNotSure ? (
           <button
@@ -691,9 +696,8 @@ export function GuidedEstateField({
             ) : null}
             {helpEntry?.availableActions.includes("ask_an_expert") ? null : null}
             <p className="guided-estate-field__help-menu-note">
-              For another perspective, use Need Another Perspective? at the top
-              of this area (Chamber or Board). For research, use Research This
-              With Shari.
+              For another perspective, use Need Another Perspective? at the
+              bottom of this area (Chamber or Board).
             </p>
           </div>
         </details>
@@ -962,6 +966,8 @@ export function GuidedEstateField({
         <p className="guided-estate-field__notice" role="status">
           {helpNotice}
         </p>
+      ) : null}
+      </>
       ) : null}
     </div>
   );

@@ -1,0 +1,54 @@
+/* Business Estate section help — under the active working field */
+
+.business-estate-section-help {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.65rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  border-radius: 0.85rem;
+  background: rgba(255, 252, 245, 0.88);
+}
+
+.business-estate-section-help__label {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 650;
+  color: rgba(22, 18, 14, 0.95);
+}
+
+.business-estate-section-help__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: stretch;
+}
+
+.business-estate-section-help__actions .guided-stage__talk-btn,
+.business-estate-section-help__actions .guided-estate-field__help-btn {
+  display: block;
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgba(30, 79, 79, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.95);
+  color: rgba(22, 58, 58, 0.98);
+}
+
+.business-estate-section-help__actions .guided-stage__talk-btn:hover,
+.business-estate-section-help__actions .guided-estate-field__help-btn:hover {
+  background: rgba(240, 245, 245, 0.98);
+}
+
+.business-estate-section-help__actions .guided-stage__talk-btn:focus-visible,
+.business-estate-section-help__actions .guided-estate-field__help-btn:focus-visible {
+  outline: 2px solid rgba(30, 79, 79, 0.4);
+  outline-offset: 2px;
+}

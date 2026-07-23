@@ -1,35 +1,23 @@
 "use client";
 
 import {
-  lazy,
-  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  type ComponentType,
 } from "react";
 import { CINEMATIC } from "@/lib/journalGazebo/cinematicTiming";
 import { JOURNAL_GAZEBO_BACKGROUND_URL } from "@/lib/journalGazebo/journalGazeboMedia";
 import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
 import { EstateImmersiveHomeLink } from "@/components/companion/EstateImmersiveHomeLink";
-import { SparkEstateGuideAnchor } from "@/components/companion/SparkEstateGuideAnchor";
-import { appendDictationToBody, plainTextFromHtml, type TypingStyle } from "@/lib/journalGazebo/writingSurface";
-
-type EstateGuideFlipbookProps = {
-  open: boolean;
-  onClose: () => void;
-  initialRoomId?: string | null;
-};
-
-const EstateGuideFlipbookLazy = lazy(async () => {
-  const mod = await import("@/components/estate-guide/EstateGuideFlipbook");
-  return {
-    default: mod.EstateGuideFlipbook as ComponentType<EstateGuideFlipbookProps>,
-  };
-});
+import {
+  appendDictationToBody,
+  plainTextFromHtml,
+  sanitizePageHtml,
+  type TypingStyle,
+} from "@/lib/journalGazebo/writingSurface";
 import { useSpeechToText } from "@/lib/growth/useSpeechToText";
 import {
   createJournalConfig,
@@ -59,6 +47,7 @@ import {
   JOURNAL_OPEN_TODAY_SPARK,
   JOURNAL_PAGE_SAVED,
   JOURNAL_READY_SPARK,
+  JOURNAL_REMOVED_NOTE,
   JOURNAL_TOOLS,
   JOURNAL_WRITING_DESK_ARRIVAL,
 } from "@/lib/journalGazebo/hospitality";
@@ -97,6 +86,7 @@ import { JournalGazeboJournalPicker } from "./JournalGazeboJournalPicker";
 import { JournalGazeboSanctuaryDesk } from "./JournalGazeboSanctuaryDesk";
 import {
   getLibraryJournals,
+  removeJournalFromLibrary,
 } from "@/lib/journalGazebo/journalLibrary";
 import { JournalGazeboWritingPreferences } from "./JournalGazeboWritingPreferences";
 import { JournalGazeboWritingPage } from "./JournalGazeboWritingPage";
@@ -105,6 +95,7 @@ import {
   LAST_WRITING_PAGE_INDEX,
   getJournalPlace,
   getPageBody,
+  journalHasResumableWriting,
   resolvePageTypingStyle,
   resolveResumePageIndex,
   saveJournalPlace,
@@ -179,9 +170,6 @@ export function JournalGazeboExperience({
   );
   const [sessionScenes, setSessionScenes] = useState<JournalSessionScenes | null>(null);
   const [sceneSettled, setSceneSettled] = useState(false);
-  const [estateGuideOpen, setEstateGuideOpen] = useState(false);
-  /** Mount flipbook chunk only while open (brief keep-alive after close). */
-  const [estateGuideMounted, setEstateGuideMounted] = useState(false);
   const [journalPickerOpen, setJournalPickerOpen] = useState(false);
   const [writingPrefsOpen, setWritingPrefsOpen] = useState(false);
   const [pageTypingStyle, setPageTypingStyle] = useState<TypingStyle | null>(null);
@@ -380,13 +368,36 @@ export function JournalGazeboExperience({
     estateMoment === "letter-fading" ||
     estateMoment === "letter-closing";
 
+  const flushLiveWritingPage = useCallback((): string => {
+    if (!config || bookPageIndex < FIRST_WRITING_PAGE_INDEX) return body;
+    const live = paperRef.current
+      ? sanitizePageHtml(paperRef.current.innerHTML)
+      : body;
+    // Sync React state + storage from the live editor before any navigation.
+    if (live !== body) {
+      setBody(live);
+    }
+    savePageBody(config.id, bookPageIndex, live);
+    const style =
+      pageTypingStyle ?? resolvePageTypingStyle(config.id, bookPageIndex, config);
+    savePageTypingStyle(config.id, bookPageIndex, style);
+    saveJournalPlace(config.id, { pageIndex: bookPageIndex, tasselY });
+    return live;
+  }, [body, bookPageIndex, config, pageTypingStyle, tasselY]);
+
   const handleBookPageIndexChange = useCallback(
     (next: number) => {
       if (!config) return;
       const currentStyle =
         pageTypingStyle ?? resolvePageTypingStyle(config.id, bookPageIndex, config);
       if (bookPageIndex >= FIRST_WRITING_PAGE_INDEX) {
-        savePageBody(config.id, bookPageIndex, body);
+        // Prefer the live editor. If it already unmounted for a page-turn,
+        // OpenBook flushed storage first — do not overwrite with stale React state.
+        if (paperRef.current) {
+          const live = sanitizePageHtml(paperRef.current.innerHTML);
+          savePageBody(config.id, bookPageIndex, live);
+          if (live !== body) setBody(live);
+        }
         savePageTypingStyle(config.id, bookPageIndex, currentStyle);
       } else if (bookPageIndex === 0 && dedicationHtml.trim()) {
         savePageBody(config.id, 0, dedicationHtml);
@@ -448,10 +459,18 @@ export function JournalGazeboExperience({
   const persistOpenJournalPlace = useCallback(() => {
     if (!config) return;
     if (bookPageIndex >= FIRST_WRITING_PAGE_INDEX) {
-      savePageBody(config.id, bookPageIndex, body);
+      // Live editor wins over React state (typing may not have flushed yet).
+      const live = paperRef.current
+        ? sanitizePageHtml(paperRef.current.innerHTML)
+        : body;
+      savePageBody(config.id, bookPageIndex, live);
+      if (live !== body) setBody(live);
       const style =
         pageTypingStyle ?? resolvePageTypingStyle(config.id, bookPageIndex, config);
       savePageTypingStyle(config.id, bookPageIndex, style);
+      if (plainTextFromHtml(live).trim()) {
+        markJournalCeremonyComplete(config.id);
+      }
     } else if (bookPageIndex === 0 && dedicationHtml.trim()) {
       savePageBody(config.id, 0, dedicationHtml);
     }
@@ -467,19 +486,26 @@ export function JournalGazeboExperience({
 
   const openJournalAtSavedPlace = useCallback((journal: JournalGazeboConfig) => {
     const ceremonyDone = hasCompletedJournalCeremony(journal.id);
+    const canResumeWriting =
+      ceremonyDone || journalHasResumableWriting(journal.id);
     const place = getJournalPlace(journal.id);
     setConfig(journal);
     setCenteredBookActive(true);
     setTasselY(place.tasselY);
-    openCompletedRef.current = ceremonyDone;
-    if (ceremonyDone) {
+    openCompletedRef.current = canResumeWriting;
+    if (canResumeWriting) {
+      // Writing already exists — never force the cover/ceremony restart.
+      if (!ceremonyDone) {
+        markJournalCeremonyComplete(journal.id);
+      }
       const page = resolveResumePageIndex(journal.id);
       setBookPageIndex(page);
       setBody(getPageBody(journal.id, page));
       setPageTypingStyle(resolvePageTypingStyle(journal.id, page, journal));
-      setPhase("writing");
+      setPhase(page >= FIRST_WRITING_PAGE_INDEX ? "writing" : "ceremony");
       setDeskCamera("writing");
       setDeskOpen(false);
+      window.setTimeout(() => paperRef.current?.focus(), 350);
       return;
     }
     setBookPageIndex(0);
@@ -509,16 +535,17 @@ export function JournalGazeboExperience({
     }
     if (config) {
       const place = getJournalPlace(config.id);
-      setBookPageIndex(place.pageIndex);
+      const page = resolveResumePageIndex(config.id);
+      setBookPageIndex(page);
       setTasselY(place.tasselY);
-      setBody(getPageBody(config.id, place.pageIndex));
-      if (place.pageIndex < FIRST_WRITING_PAGE_INDEX) {
+      setBody(getPageBody(config.id, page));
+      if (page < FIRST_WRITING_PAGE_INDEX) {
         setDedicationHtml(getPageBody(config.id, 0));
       }
-      if (place.pageIndex >= FIRST_WRITING_PAGE_INDEX) {
-        setPageTypingStyle(resolvePageTypingStyle(config.id, place.pageIndex, config));
+      if (page >= FIRST_WRITING_PAGE_INDEX) {
+        setPageTypingStyle(resolvePageTypingStyle(config.id, page, config));
       }
-      setPhase(place.pageIndex >= FIRST_WRITING_PAGE_INDEX ? "writing" : "ceremony");
+      setPhase(page >= FIRST_WRITING_PAGE_INDEX ? "writing" : "ceremony");
       return;
     }
     enterWriting();
@@ -545,8 +572,15 @@ export function JournalGazeboExperience({
     const currentStyle =
       pageTypingStyle ?? resolvePageTypingStyle(config.id, bookPageIndex, config);
     if (bookPageIndex >= FIRST_WRITING_PAGE_INDEX) {
-      savePageBody(config.id, bookPageIndex, body);
+      const live = paperRef.current
+        ? sanitizePageHtml(paperRef.current.innerHTML)
+        : body;
+      savePageBody(config.id, bookPageIndex, live);
+      if (live !== body) setBody(live);
       savePageTypingStyle(config.id, bookPageIndex, currentStyle);
+      if (plainTextFromHtml(live).trim()) {
+        markJournalCeremonyComplete(config.id);
+      }
     } else if (bookPageIndex === 0 && dedicationHtml.trim()) {
       savePageBody(config.id, 0, dedicationHtml);
     }
@@ -659,11 +693,12 @@ export function JournalGazeboExperience({
   const beginWriting = useCallback(
     (journal: JournalGazeboConfig) => {
       const place = getJournalPlace(journal.id);
-      const page = Math.max(place.pageIndex, FIRST_WRITING_PAGE_INDEX);
+      const page = resolveResumePageIndex(journal.id);
       setConfig(journal);
       setCenteredBookActive(true);
       setBookPageIndex(page);
       setBody(getPageBody(journal.id, page));
+      setPageTypingStyle(resolvePageTypingStyle(journal.id, page, journal));
       setTasselY(place.tasselY);
       setPhase("writing");
       setDeskOpen(false);
@@ -902,8 +937,9 @@ export function JournalGazeboExperience({
     setPhase("creating");
   }
 
-  /** Write — open one journal, or show selection when several exist. */
+  /** Write — show the journal list so resume/remove stay visible. */
   function handleOpenMyJournal(journal?: JournalGazeboConfig) {
+    persistOpenJournalPlace();
     refreshLibrary();
     const journals = getLibraryJournals();
     if (journals.length === 0) {
@@ -914,11 +950,7 @@ export function JournalGazeboExperience({
       openSelectedJournal(journal);
       return;
     }
-    if (journals.length === 1) {
-      openSelectedJournal(journals[0]!);
-      return;
-    }
-    persistOpenJournalPlace();
+    // Always show the chooser when journals exist (even if only one).
     setJournalPickerOpen(true);
   }
 
@@ -991,6 +1023,39 @@ export function JournalGazeboExperience({
     window.setTimeout(() => setSparkLine(null), CINEMATIC.sparkLineMs);
   }
 
+  /** Flush every open page + bookmark so reopen resumes here (up to 200 pages). */
+  function handleSaveJournal() {
+    if (!config) return;
+    if (autosaveRef.current) {
+      window.clearTimeout(autosaveRef.current);
+      autosaveRef.current = null;
+    }
+    if (bookPageIndex >= FIRST_WRITING_PAGE_INDEX) {
+      const live = flushLiveWritingPage();
+      markJournalCeremonyComplete(config.id);
+      if (plainTextFromHtml(live).trim()) {
+        const result = saveJournalPage({
+          configId: config.id,
+          body: live,
+          entryId,
+          title: config.name,
+        });
+        if (result.ok) {
+          setEntryId(result.entryId);
+        }
+      }
+    } else if (bookPageIndex === 0 && dedicationHtml.trim()) {
+      savePageBody(config.id, 0, dedicationHtml);
+      saveJournalPlace(config.id, { pageIndex: bookPageIndex, tasselY });
+    } else {
+      persistOpenJournalPlace();
+    }
+    const touched = updateJournalConfig(config.id, {});
+    if (touched) setConfig(touched);
+    refreshLibrary();
+    setSavedNote(JOURNAL_PAGE_SAVED);
+  }
+
   function handleStepBackIntoGazebo() {
     if (isListening) stopListening();
     setWritingPrefsOpen(false);
@@ -999,15 +1064,25 @@ export function JournalGazeboExperience({
     setDeskCamera("wide");
     setEstateMoment("rest");
     if (config) {
+      if (autosaveRef.current) {
+        window.clearTimeout(autosaveRef.current);
+        autosaveRef.current = null;
+      }
       if (bookPageIndex === 0 && dedicationHtml.trim()) {
         savePageBody(config.id, 0, dedicationHtml);
       }
       saveJournalPlace(config.id, { pageIndex: bookPageIndex, tasselY });
       if (bookPageIndex >= FIRST_WRITING_PAGE_INDEX) {
-        savePageBody(config.id, bookPageIndex, body);
-        const style =
-          pageTypingStyle ?? resolvePageTypingStyle(config.id, bookPageIndex, config);
-        savePageTypingStyle(config.id, bookPageIndex, style);
+        const live = flushLiveWritingPage();
+        if (plainTextFromHtml(live).trim()) {
+          const result = saveJournalPage({
+            configId: config.id,
+            body: live,
+            entryId,
+            title: config.name,
+          });
+          if (result.ok) setEntryId(result.entryId);
+        }
       }
       if (!hasCompletedJournalCeremony(config.id)) {
         markJournalCeremonyComplete(config.id);
@@ -1121,18 +1196,6 @@ export function JournalGazeboExperience({
     return [];
   }, [libraryJournals, config]);
 
-  const showEstateGuide = !estateGuideOpen;
-
-  useEffect(() => {
-    if (estateGuideOpen) {
-      setEstateGuideMounted(true);
-      return;
-    }
-    if (!estateGuideMounted) return;
-    const timer = window.setTimeout(() => setEstateGuideMounted(false), 400);
-    return () => window.clearTimeout(timer);
-  }, [estateGuideOpen, estateGuideMounted]);
-
   function handleChooseAnotherJournal() {
     persistOpenJournalPlace();
     setCenteredBookActive(false);
@@ -1148,12 +1211,45 @@ export function JournalGazeboExperience({
       handleWelcomeCreateJournal();
       return;
     }
+    // Always show the picker so a single journal can still be removed.
     setPhase("gazebo-rest");
-    if (journals.length === 1) {
-      openSelectedJournal(journals[0]!);
+    setConfig(null);
+    setJournalPickerOpen(true);
+  }
+
+  function handleBrowseJournals() {
+    persistOpenJournalPlace();
+    refreshLibrary();
+    const journals = getLibraryJournals();
+    if (journals.length === 0) {
+      handleWelcomeCreateJournal();
       return;
     }
-    setConfig(null);
+    setJournalPickerOpen(true);
+  }
+
+  function handleRemoveJournal(journal: JournalGazeboConfig) {
+    const removedId = journal.id;
+    const wasOpen = config?.id === removedId;
+    removeJournalFromLibrary(removedId);
+    refreshLibrary();
+    const remaining = getLibraryJournals();
+    if (wasOpen || !config) {
+      setCenteredBookActive(false);
+      setDeskOpen(false);
+      setBody("");
+      setEntryId(null);
+      setBookPageIndex(0);
+      setConfig(null);
+      setPhase("gazebo-rest");
+      setDeskCamera("wide");
+    }
+    setSparkLine(JOURNAL_REMOVED_NOTE);
+    window.setTimeout(() => setSparkLine(null), CINEMATIC.sparkLineMs);
+    if (remaining.length === 0) {
+      setJournalPickerOpen(false);
+      return;
+    }
     setJournalPickerOpen(true);
   }
 
@@ -1250,47 +1346,21 @@ export function JournalGazeboExperience({
         />
       ) : null}
 
-      {showEstateGuide ? (
-        <SparkEstateGuideAnchor
-          onClick={() => setEstateGuideOpen(true)}
-          className="journal-gazebo__estate-guide"
-        />
-      ) : null}
-
-      {estateGuideMounted ? (
-        <Suspense
-          fallback={
-            estateGuideOpen ? (
-              <div
-                className="eg-flipbook eg-flipbook--loading"
-                role="status"
-                aria-live="polite"
-                data-testid="estate-guide-loading"
-              >
-                <p className="eg-flipbook__loading-label">Opening the Guide…</p>
-              </div>
-            ) : null
-          }
-        >
-          <EstateGuideFlipbookLazy
-            open={estateGuideOpen}
-            onClose={() => setEstateGuideOpen(false)}
-            initialRoomId="writing-gazebo"
-          />
-        </Suspense>
-      ) : null}
-
       {journalPickerOpen ? (
         <JournalGazeboJournalPicker
           journals={libraryJournals}
           activeJournalId={config?.id}
           onSelect={openSelectedJournal}
+          onRemove={handleRemoveJournal}
           onClose={() => setJournalPickerOpen(false)}
         />
       ) : null}
 
       {showJournalDone ? (
-        <JournalGazeboDoneButton onDone={handleStepBackIntoGazebo} />
+        <JournalGazeboDoneButton
+          onSave={handleSaveJournal}
+          onDone={handleStepBackIntoGazebo}
+        />
       ) : null}
 
       {showJournalOptions && config ? (
@@ -1442,6 +1512,7 @@ export function JournalGazeboExperience({
           journals={libraryJournals}
           onCreateJournal={handleWelcomeCreateJournal}
           onOpenJournal={handleOpenMyJournal}
+          onBrowseJournals={handleBrowseJournals}
         />
       ) : null}
 
@@ -1452,6 +1523,7 @@ export function JournalGazeboExperience({
           sceneComposed={sceneReady}
           onCreateJournal={handleWelcomeCreateJournal}
           onOpenJournal={handleOpenMyJournal}
+          onBrowseJournals={handleBrowseJournals}
           onJournalClick={
             featuredJournal
               ? () => openSelectedJournal(featuredJournal)

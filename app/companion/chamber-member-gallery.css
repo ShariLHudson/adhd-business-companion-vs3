@@ -285,6 +285,15 @@
   color: rgba(26, 61, 92, 0.9);
 }
 
+.chamber-active-member__actions {
+  align-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.chamber-active-member__invite,
 .chamber-active-member__end {
   align-self: center;
   padding: 0.45rem 0.7rem;
@@ -296,6 +305,22 @@
   font-weight: 650;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.chamber-active-member__invite[aria-pressed="true"] {
+  border-style: solid;
+  background: rgba(30, 79, 79, 0.08);
+}
+
+.chamber-entry__add-member {
+  margin-top: 0.75rem;
+}
+
+.chamber-entry__add-member-note {
+  margin: 0 0 0.65rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: #3d3830;
 }
 
 .chamber-active-member__sr-only {

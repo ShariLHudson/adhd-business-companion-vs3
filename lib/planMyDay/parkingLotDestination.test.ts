@@ -6,9 +6,8 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS } from "@/lib/estate/estateFullBleedPanelSections";
 import { sidebarNavForSection } from "@/lib/companionUi";
-
-const HOW_DO_I =
-  "Park It saves one thing for later so you can stop thinking about it right now.";
+import { PARKING_LOT_HOW_DO_I_COPY } from "@/lib/parkingLotCopy";
+import { PARK_IT_PRIMARY_CTA } from "@/lib/parkItCopy";
 
 function read(pathFromRoot: string): string {
   return readFileSync(resolve(process.cwd(), pathFromRoot), "utf8");
@@ -33,7 +32,7 @@ describe("Parking Lot dedicated destination", () => {
 
   it("openParkingLotCore opens parking-lot — not Plan My Day, CMM, Reminders, Settings, or Create", () => {
     const fn = client.match(
-      /function openParkingLotCore\(\) \{[\s\S]*?\n  \}/,
+      /function openParkingLotCore(?:\([^)]*\))?\s*\{[\s\S]*?\n  \}/,
     )?.[0];
     expect(fn).toBeTruthy();
     expect(fn).toContain('openStandaloneFocusSectionCore("parking-lot")');
@@ -66,12 +65,16 @@ describe("Parking Lot dedicated destination", () => {
     expect(panel).toContain("parking-lot-add-section");
     expect(panel).toContain("parking-lot-items-section");
     expect(panel).toContain("PARKING_LOT_HOW_DO_I_COPY");
-    expect(panel).toContain(HOW_DO_I);
+    expect(panel).toContain(PARKING_LOT_HOW_DO_I_COPY.slice(0, 40));
     expect(panel).toContain("Leave Parked");
-    expect(panel).toContain("Move to Today's Plan");
+    expect(panel).toContain("Move to Today");
     expect(panel).toContain("Create Reminder");
     expect(panel).toContain("Add to Project");
-    expect(panel).toContain("Park This Item");
+    expect(panel).toContain("PARK_IT_PRIMARY_CTA");
+    expect(PARK_IT_PRIMARY_CTA).toBe("Park This");
+    expect(panel).toContain("parking-lot-loading");
+    expect(panel).toContain("parking-lot-error");
+    expect(panel).toContain("parking-lot-retry");
     expect(panel).not.toContain("openCreateWorkspace");
 
     const howDoI = panel.indexOf('data-testid="parking-lot-how-do-i"');

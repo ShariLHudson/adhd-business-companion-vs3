@@ -1,7 +1,11 @@
 "use client";
 
 import { journalCoverTitle } from "@/lib/journalGazebo/coverArt";
-import { JOURNAL_LIBRARY_SHELF_LABEL } from "@/lib/journalGazebo/hospitality";
+import {
+  JOURNAL_LIBRARY_SHELF_LABEL,
+  journalResumeActionLabel,
+} from "@/lib/journalGazebo/hospitality";
+import { resolveResumePageIndex } from "@/lib/journalGazebo/journalPageStorage";
 import type { JournalGazeboConfig } from "@/lib/journalGazebo/types";
 
 type Props = {
@@ -37,6 +41,9 @@ export function JournalGazeboLibraryShelf({
           {journals.map((journal) => {
             const title = journalCoverTitle(journal);
             const isActive = journal.id === activeJournalId;
+            const resumeLabel = journalResumeActionLabel(
+              resolveResumePageIndex(journal.id),
+            );
             const Tag = onSelectJournal ? "button" : "li";
 
             return (
@@ -51,7 +58,10 @@ export function JournalGazeboLibraryShelf({
                   .join(" ")}
                 data-leather={journal.leatherColor}
                 onClick={onSelectJournal ? () => onSelectJournal(journal) : undefined}
-                title={title}
+                title={`${title} — ${resumeLabel}`}
+                data-testid={
+                  onSelectJournal ? `jg-shelf-resume-${journal.id}` : undefined
+                }
               >
                 <span className="jg-library-shelf__spine" aria-hidden="true">
                   <span
@@ -63,7 +73,9 @@ export function JournalGazeboLibraryShelf({
                 </span>
                 <span className="jg-library-shelf__cover" aria-hidden="true" />
                 {onSelectJournal ? (
-                  <span className="jg-library-shelf__sr-only">Open {title}</span>
+                  <span className="jg-library-shelf__sr-only">
+                    {title}. {resumeLabel}
+                  </span>
                 ) : null}
               </Tag>
             );

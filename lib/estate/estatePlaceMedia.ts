@@ -17,9 +17,18 @@ import { enrichAmbienceProfileWithIntent } from "./estatePlaceAmbienceIntent";
 import { getPlaceMedia } from "./manifest/estatePlaceMasterManifest";
 import {
   APPLE_ORCHARD_AMBIENCE_MP3,
+  CELEBRATION_ROOM_AMBIENCE_MP3,
   COFFEE_HOUSE_AMBIENCE_MP3,
+  EVENING_HEARTH_AMBIENCE_MP3,
+  EXERCISE_ROOM_AMBIENCE_MP3,
+  GALLERY_REFLECTIONS_AMBIENCE_MP3,
+  GAZEBO_JOURNAL_AMBIENCE_MP3,
+  GREENHOUSE_BIRDS_AMBIENCE_MP3,
   MUSIC_LOFT_AMBIENCE_MP3,
   OCEAN_CONSERVATORY_AMBIENCE_MP3,
+  ORCHARD_BIRDS_AMBIENCE_MP3,
+  TIN_ROOF_RAIN_AMBIENCE_MP3,
+  WELCOME_ROOM_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 
 /** Build a public URL for a backgrounds filename (handles spaces). */
@@ -40,7 +49,9 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "clear-my-mind": estateBackgroundPath(
     "treehouse-possibility-reflection-desk-background.png",
   ),
-  "destination-gallery": estateBackgroundPath("destination-gallery.png"),
+  "destination-gallery": estateBackgroundPath(
+    "destination-gallery-background.png",
+  ),
   "coffee-house": estateBackgroundPath("tea-room-background.webp"),
   "tea-room": estateBackgroundPath("tea-room-background.webp"),
   "dining-room": estateBackgroundPath("room-dining-room-background.png"),
@@ -53,7 +64,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "music-room": estateBackgroundPath("writing-room-background.png"),
   greenhouse: estateBackgroundPath("greenhouse-background.png"),
   "apple-orchard": estateBackgroundPath("apple-orchard-kinsey-background.png"),
-  gardens: estateBackgroundPath("swing-background.png"),
+  gardens: estateBackgroundPath("celebrations-garden-background.png"),
   "celebration-room": estateBackgroundPath("room-celebration-hall-background.png"),
   "reading-nook": estateBackgroundPath("reading-nook-window background.png"),
   library: estateBackgroundPath("room-library-estate-background.png"),
@@ -91,7 +102,9 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "evidence-vault": estateBackgroundPath("evidence-vault-room-static.png"),
   "gallery-of-firsts": estateBackgroundPath("gallery-background.png"),
   portfolio: estateBackgroundPath("hall-of-achievements-room-background.png"),
-  "goals-projects": estateBackgroundPath("project-room.png"),
+  "goals-projects": estateBackgroundPath(
+    "inspiring-vision-room-background.png",
+  ),
   "peaceful-places": estateBackgroundPath("water-seat-at-pond-background.png"),
   "seat-at-pond": estateBackgroundPath("water-seat-at-pond-background.png"),
   "reflection-pond": estateBackgroundPath("water-seat-at-pond-background.png"),
@@ -163,7 +176,7 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
     estateBackgroundPath("sunroom-background.png"),
   ],
   "destination-gallery": [
-    estateBackgroundPath("destination-gallery.png"),
+    estateBackgroundPath("destination-gallery-background.png"),
   ],
   library: [
     estateBackgroundPath("reading-nook-under-stairway-background.png"),
@@ -183,7 +196,7 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
     estateBackgroundPath("welcome-home-background.png"),
   ],
   gardens: [
-    estateBackgroundPath("spark-estate-photo-background.png"),
+    estateBackgroundPath("celebrations-garden-background.png"),
   ],
   "apple-orchard": [
     estateBackgroundPath("apple-orchard-kinsey-background.png"),
@@ -238,12 +251,12 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
   Record<string, EstateArrivalAmbienceProfile>
 > = {
   greenhouse: {
-    src: estateAudioPath("greenhouse-birds-ambience.mp3"),
+    src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
     volume: 0.07,
     character: "soft greenhouse hush, birdsong",
   },
   "growth-profile": {
-    src: estateAudioPath("greenhouse-birds-ambience.mp3"),
+    src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
     volume: 0.07,
     character: "soft greenhouse hush, birdsong",
   },
@@ -258,42 +271,42 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
     character: "gentle piano, warm listening room",
   },
   "celebration-room": {
-    src: estateAudioPath("reflections-of-triumph-celebration-garden.mp3"),
+    src: CELEBRATION_ROOM_AMBIENCE_MP3,
     volume: 0.12,
     character: "quiet triumph, garden reflections",
   },
   gardens: {
-    src: estateAudioPath("reflections-of-triumph-celebration-garden.mp3"),
+    src: CELEBRATION_ROOM_AMBIENCE_MP3,
     volume: 0.11,
     character: "garden hush, soft celebration air",
   },
   library: {
-    src: estateAudioPath("reflections-of-triumph-gallery.mp3"),
+    src: GALLERY_REFLECTIONS_AMBIENCE_MP3,
     volume: 0.12,
     character: "gallery hush, reflective stillness",
   },
   "momentum-institute": {
-    src: estateAudioPath("reflections-of-triumph-gallery.mp3"),
+    src: GALLERY_REFLECTIONS_AMBIENCE_MP3,
     volume: 0.13,
     character: "study hall hush, quiet prestige",
   },
   observatory: {
-    src: estateAudioPath("reflections-of-triumph-gallery.mp3"),
+    src: GALLERY_REFLECTIONS_AMBIENCE_MP3,
     volume: 0.11,
     character: "quiet study, distant night air",
   },
   "evidence-vault": {
-    src: estateAudioPath("reflections-of-triumph-gallery.mp3"),
+    src: GALLERY_REFLECTIONS_AMBIENCE_MP3,
     volume: 0.1,
     character: "archive hush, soft wood",
   },
   journal: {
-    src: estateAudioPath("freesound_community-mustique-water-fountain-27721.mp3"),
+    src: GAZEBO_JOURNAL_AMBIENCE_MP3,
     volume: 0.1,
     character: "gazebo fountain, garden hush",
   },
   "growth-journal": {
-    src: estateAudioPath("freesound_community-mustique-water-fountain-27721.mp3"),
+    src: GAZEBO_JOURNAL_AMBIENCE_MP3,
     volume: 0.1,
     character: "gazebo fountain, garden hush",
   },
@@ -303,12 +316,12 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
     character: "orchard ambience, open air",
   },
   "reading-nook": {
-    src: estateAudioPath("peaceful-places/evening-hearth-ambience.mp3"),
+    src: EVENING_HEARTH_AMBIENCE_MP3,
     volume: 0.12,
     character: "fireplace crackle, page turns, soft house air",
   },
   "back-deck": {
-    src: estateAudioPath("RAINMetl-Gentle_rain_on_a_tin-Elevenlabs.mp3"),
+    src: TIN_ROOF_RAIN_AMBIENCE_MP3,
     volume: 0.11,
     character: "rain on the roof, wind through trees",
   },
@@ -318,44 +331,42 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
     character: "indoor aquarium, gentle water hush, living tank",
   },
   stables: {
-    src: estateAudioPath("reflections-of-triumph-gallery.mp3"),
+    src: GALLERY_REFLECTIONS_AMBIENCE_MP3,
     volume: 0.09,
     character: "horses shifting, leather creaks, distant birds",
   },
   "garden-path": {
-    src: estateAudioPath("greenhouse-birds-ambience.mp3"),
+    src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
     volume: 0.1,
     character: "irrigation water, birds, wind through plants",
   },
   "peaceful-places": {
-    src: estateAudioPath("RAINMetl-Gentle_rain_on_a_tin-Elevenlabs.mp3"),
+    src: TIN_ROOF_RAIN_AMBIENCE_MP3,
     volume: 0.12,
     character: "gentle rain, still restoration",
   },
   "seat-at-pond": {
-    src: estateAudioPath(
-      "nils_vega-birds-singing-in-early-summer-359446.mp3",
-    ),
+    src: ORCHARD_BIRDS_AMBIENCE_MP3,
     volume: 0.1,
     character: "pond birds, water edge",
   },
   "game-room": {
-    src: estateAudioPath("pulse-of-momentum-energy-exercise-room.mp3"),
+    src: EXERCISE_ROOM_AMBIENCE_MP3,
     volume: 0.13,
     character: "pulse of momentum, light energy, movement room air",
   },
   "welcome-home": {
-    src: estateAudioPath("welcome-room/welcome-room-ambience.mp3"),
+    src: WELCOME_ROOM_AMBIENCE_MP3,
     volume: 0.12,
     character: "warm hearth, welcome home",
   },
   sunroom: {
-    src: estateAudioPath("welcome-room/welcome-room-ambience.mp3"),
+    src: WELCOME_ROOM_AMBIENCE_MP3,
     volume: 0.12,
     character: "sunroom warmth, quiet welcome",
   },
   "goals-projects": {
-    src: estateAudioPath("reflections-of-triumph-gallery.mp3"),
+    src: GALLERY_REFLECTIONS_AMBIENCE_MP3,
     volume: 0.06,
     character: "boardroom hush, room tone only",
   },

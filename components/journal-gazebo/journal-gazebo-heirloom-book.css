@@ -1184,7 +1184,11 @@
 
 .jg-open-book__spread--turning-forward .jg-page-curl--single .jg-page-curl__sheet {
   /* Must stay linear — eased multi-keyframe turns look like staged steps */
-  animation: jg-page-curl-peel var(--jg-page-turn-ms, 2.4s) linear forwards;
+  animation: jg-page-curl-peel var(--jg-page-turn-ms, 1.3s) linear forwards;
+}
+
+.jg-open-book__spread--turning-back .jg-page-curl--single .jg-page-curl__sheet {
+  animation: jg-page-curl-peel-back var(--jg-page-turn-ms, 1.3s) linear forwards;
 }
 
 .jg-page-under--single {

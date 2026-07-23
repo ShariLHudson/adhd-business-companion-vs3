@@ -8,6 +8,7 @@ import {
   LAST_WRITING_PAGE_INDEX,
   MAX_JOURNAL_WRITING_PAGES,
 } from "./bookCeremony";
+import { sanitizeJournalHtmlForStorage } from "./journalHtmlIntegrity";
 import type { TypingStyle } from "./writingSurface";
 import { typingStyleFromConfig } from "./writingSurface";
 import type { JournalGazeboConfig } from "./types";
@@ -33,33 +34,50 @@ let memoryPlaces: Record<string, JournalPlace> = {};
 let memoryBodies: Record<string, Record<number, string>> = {};
 let memoryPageStyles: Record<string, Record<number, TypingStyle>> = {};
 let memoryScrolls: Record<string, Record<number, number>> = {};
+/** After quota errors, keep memory as source of truth — never reload stale local. */
+let localStorageBlocked = false;
 
 function safeGet(key: string): string | null {
   if (typeof window === "undefined") return null;
+  if (!localStorageBlocked) {
+    try {
+      const fromLocal = localStorage.getItem(key);
+      if (fromLocal != null) return fromLocal;
+    } catch {
+      localStorageBlocked = true;
+    }
+  }
   try {
-    return localStorage.getItem(key) ?? sessionStorage.getItem(key);
+    return sessionStorage.getItem(key);
   } catch {
     return null;
   }
 }
 
-function safeSet(key: string, value: string): void {
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(key, value);
-    return;
-  } catch {
-    /* fall through */
+function safeSet(key: string, value: string): boolean {
+  if (typeof window === "undefined") return false;
+  if (!localStorageBlocked) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch {
+      localStorageBlocked = true;
+    }
   }
   try {
     sessionStorage.setItem(key, value);
+    return true;
   } catch {
-    /* ignore */
+    return false;
   }
 }
 
 function readPlaces(): Record<string, JournalPlace> {
   if (typeof window === "undefined") return memoryPlaces;
+  // While blocked, memory already has the latest writes for this session.
+  if (localStorageBlocked && Object.keys(memoryPlaces).length > 0) {
+    return memoryPlaces;
+  }
   const raw = safeGet(PLACE_STORAGE_KEY);
   if (raw) {
     try {
@@ -85,6 +103,9 @@ function writePlaces(places: Record<string, JournalPlace>): void {
 
 function readBodies(): Record<string, Record<number, string>> {
   if (typeof window === "undefined") return memoryBodies;
+  if (localStorageBlocked && Object.keys(memoryBodies).length > 0) {
+    return memoryBodies;
+  }
   const raw = safeGet(BODIES_STORAGE_KEY);
   if (raw) {
     try {
@@ -161,10 +182,21 @@ export function getLastWrittenPageIndex(journalId: string): number {
   return last;
 }
 
-/** Page to open when returning to a journal (saved place ∪ last written). */
+/**
+ * Page to open when returning to a journal.
+ * Bookmark wins so the member can go back, finish a page, Save, and resume there.
+ * Falls back to the last written page when the bookmark is still the default
+ * and later pages already have words.
+ */
 export function resolveResumePageIndex(journalId: string): number {
-  const place = getJournalPlace(journalId).pageIndex;
+  const place = clampWritingPageIndex(getJournalPlace(journalId).pageIndex);
   const written = getLastWrittenPageIndex(journalId);
+  if (place > FIRST_WRITING_PAGE_INDEX) {
+    return place;
+  }
+  if (pageHasWriting(getPageBody(journalId, place))) {
+    return place;
+  }
   return clampWritingPageIndex(Math.max(place, written));
 }
 
@@ -174,21 +206,43 @@ export function isJournalWritingFull(journalId: string): boolean {
 
 export function getPageBody(journalId: string, pageIndex: number): string {
   const bodies = readBodies();
-  return bodies[journalId]?.[pageIndex] ?? "";
+  const raw = bodies[journalId]?.[pageIndex] ?? "";
+  if (!raw) return "";
+  const safe = sanitizeJournalHtmlForStorage(raw);
+  // Heal previously corrupted pages on read so the next open is clean.
+  if (safe !== raw) {
+    const journalBodies = { ...(bodies[journalId] ?? {}), [pageIndex]: safe };
+    writeBodies({ ...bodies, [journalId]: journalBodies });
+  }
+  return safe;
 }
 
 export function savePageBody(
   journalId: string,
   pageIndex: number,
   body: string,
+  options?: { allowEmptyWipe?: boolean },
 ): void {
+  const safe = sanitizeJournalHtmlForStorage(body);
   const bodies = readBodies();
-  const journalBodies = { ...(bodies[journalId] ?? {}), [pageIndex]: body };
+  const existing = bodies[journalId]?.[pageIndex] ?? "";
+  // Never replace real writing with an empty editor remount / race.
+  if (
+    !pageHasWriting(safe) &&
+    pageHasWriting(existing) &&
+    !options?.allowEmptyWipe
+  ) {
+    return;
+  }
+  const journalBodies = { ...(bodies[journalId] ?? {}), [pageIndex]: safe };
   writeBodies({ ...bodies, [journalId]: journalBodies });
 }
 
 function readPageStyles(): Record<string, Record<number, TypingStyle>> {
   if (typeof window === "undefined") return memoryPageStyles;
+  if (localStorageBlocked && Object.keys(memoryPageStyles).length > 0) {
+    return memoryPageStyles;
+  }
   const raw = safeGet(STYLES_STORAGE_KEY);
   if (raw) {
     try {
@@ -237,6 +291,9 @@ export function resolvePageTypingStyle(
 
 function readScrolls(): Record<string, Record<number, number>> {
   if (typeof window === "undefined") return memoryScrolls;
+  if (localStorageBlocked && Object.keys(memoryScrolls).length > 0) {
+    return memoryScrolls;
+  }
   const raw = safeGet(SCROLL_STORAGE_KEY);
   if (raw) {
     try {
@@ -270,11 +327,31 @@ export function savePageScroll(
   writeScrolls({ ...scrolls, [journalId]: journalScrolls });
 }
 
+/** Drop all saved pages, bookmark, styles, and scroll for one journal. */
+export function clearJournalPageData(journalId: string): void {
+  const places = { ...readPlaces() };
+  delete places[journalId];
+  writePlaces(places);
+
+  const bodies = { ...readBodies() };
+  delete bodies[journalId];
+  writeBodies(bodies);
+
+  const styles = { ...readPageStyles() };
+  delete styles[journalId];
+  writePageStyles(styles);
+
+  const scrolls = { ...readScrolls() };
+  delete scrolls[journalId];
+  writeScrolls(scrolls);
+}
+
 export function resetJournalPageStorage(): void {
   memoryPlaces = {};
   memoryBodies = {};
   memoryPageStyles = {};
   memoryScrolls = {};
+  localStorageBlocked = false;
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(PLACE_STORAGE_KEY);
@@ -284,4 +361,21 @@ export function resetJournalPageStorage(): void {
   } catch {
     /* ignore */
   }
+  try {
+    sessionStorage.removeItem(PLACE_STORAGE_KEY);
+    sessionStorage.removeItem(BODIES_STORAGE_KEY);
+    sessionStorage.removeItem(STYLES_STORAGE_KEY);
+    sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/** True when a journal already has writing or a bookmark past the cover. */
+export function journalHasResumableWriting(journalId: string): boolean {
+  const place = getJournalPlace(journalId).pageIndex;
+  if (place > FIRST_WRITING_PAGE_INDEX) return true;
+  if (pageHasWriting(getPageBody(journalId, place))) return true;
+  return getLastWrittenPageIndex(journalId) > FIRST_WRITING_PAGE_INDEX
+    || pageHasWriting(getPageBody(journalId, FIRST_WRITING_PAGE_INDEX));
 }

@@ -1,4 +1,6 @@
+import { clearJournalPageData } from "./journalPageStorage";
 import {
+  deleteJournalConfig,
   getJournalConfigs,
   hasCompletedJournalCeremony,
 } from "./store";
@@ -23,4 +25,10 @@ export function getLibraryJournals(): JournalGazeboConfig[] {
 
 export function hasMultipleJournals(): boolean {
   return getLibraryJournals().length > 1;
+}
+
+/** Remove a journal from the shelf and clear its saved pages. */
+export function removeJournalFromLibrary(journalId: string): boolean {
+  clearJournalPageData(journalId);
+  return deleteJournalConfig(journalId);
 }

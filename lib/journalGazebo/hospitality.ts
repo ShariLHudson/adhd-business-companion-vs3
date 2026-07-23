@@ -50,8 +50,8 @@ export const JOURNAL_TABLE_CREATE = {
 
 /** Table sanctuary — write in an existing journal. */
 export const JOURNAL_TABLE_WRITE = {
-  title: "Write",
-  subtitle: "Continue where you left off.",
+  title: "Begin where left off",
+  subtitle: "Open this journal on the page you were writing.",
 } as const;
 
 /** @deprecated Prefer JOURNAL_TABLE_WRITE */
@@ -65,13 +65,36 @@ export const JOURNAL_WELCOME_OPEN_TODAY = JOURNAL_TABLE_WRITE;
 
 export const JOURNAL_LIBRARY_SHELF_LABEL = "My special journals";
 
+export const JOURNAL_SAVE_LABEL = "Save";
+
+export const JOURNAL_SAVE_HINT =
+  "Keep every page safe. Next time you open this journal, you'll return to this page.";
+
 export const JOURNAL_DONE_LABEL = "Done";
 
 export const JOURNAL_DONE_HINT = "Return to the gazebo and rest your journal on the shelf.";
 
 export const JOURNAL_PICKER_TITLE = "Choose a journal:";
 
-export const JOURNAL_PICKER_SUBTITLE = "Pick up where you left off.";
+export const JOURNAL_PICKER_SUBTITLE = "Pick up where you left off — or remove one from the shelf.";
+
+export const JOURNAL_REMOVE_LABEL = "Remove from shelf";
+
+export const JOURNAL_REMOVE_CONFIRM =
+  "Remove this journal from your shelf? Your pages in it will be gone.";
+
+export const JOURNAL_REMOVE_CONFIRM_YES = "Remove it";
+
+export const JOURNAL_REMOVE_CONFIRM_NO = "Keep it";
+
+export const JOURNAL_REMOVED_NOTE = "It's off the shelf.";
+
+export const JOURNAL_BEGIN_WHERE_LEFT_OFF = "Begin where left off";
+
+export function journalResumeActionLabel(pageIndex: number): string {
+  const page = Math.max(1, Math.floor(pageIndex));
+  return `Begin where left off · page ${page}`;
+}
 
 export const JOURNAL_DESIGN_COVER_PROMPT =
   "Create the cover that feels most like you.";

@@ -4,6 +4,7 @@
  */
 
 import { clearActiveChamberMember } from "./chamberMemberActivation";
+import { clearChamberCertifiedRuntime } from "./chamberCertifiedState";
 import { stripChamberMemberActivationMessages } from "./chamberMemberActivation";
 
 export type DismissActiveChamberConversationInput = {
@@ -83,6 +84,7 @@ export function planDismissActiveChamberConversation(
 
 /** Clear sticky Chamber member session storage. */
 export function dismissActiveChamberConversationStorage(): void {
+  clearChamberCertifiedRuntime();
   clearActiveChamberMember();
 }
 

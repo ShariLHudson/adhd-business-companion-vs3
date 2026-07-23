@@ -133,26 +133,32 @@ export function bringParkingLotItemToToday(itemId: string): PlanDayItem[] {
   const deferred = readDeferred();
   let found: PlanDayItem | null = null;
   const nextDeferred: Record<string, PlanDayItem[]> = {};
+  const now = new Date().toISOString();
 
   for (const [date, list] of Object.entries(deferred)) {
-    const kept: PlanDayItem[] = [];
-    for (const item of list) {
-      if (item.id === itemId) {
-        found = {
-          ...item,
-          column: "ready",
-          done: false,
-        };
-      } else {
-        kept.push(item);
-      }
-    }
-    if (kept.length > 0) nextDeferred[date] = kept;
+    nextDeferred[date] = list.map((item) => {
+      if (item.id !== itemId) return item;
+      found = item;
+      return {
+        ...item,
+        parkStatus: "moved-to-today" as const,
+        updatedAt: now,
+      };
+    });
   }
 
   if (!found) return readTodayPlanItems();
   writeDeferred(nextDeferred);
-  return saveTodayPlanItems([...readTodayPlanItems(), found]);
+  const todayItem: PlanDayItem = {
+    ...found,
+    id: uid(),
+    column: "ready",
+    done: false,
+    parkStatus: undefined,
+    updatedAt: now,
+    createdAt: now,
+  };
+  return saveTodayPlanItems([...readTodayPlanItems(), todayItem]);
 }
 
 function writeDeferred(data: Record<string, PlanDayItem[]>): void {
@@ -811,13 +817,34 @@ export function parkPlanItem(items: PlanDayItem[], id: string): PlanDayItem[] {
  * Park free-form text in the intentional Parking Lot (deferred someday hold).
  * Reuses companion-plan-my-day-deferred-v1 — does not create a second store.
  */
+/** True when an active parked item already has the same title (duplicate guard). */
+export function parkingLotHasActiveTitle(title: string): boolean {
+  const needle = title.trim().toLowerCase();
+  if (!needle) return false;
+  return readPlanningParkingLotItems().some(
+    (item) => item.title.trim().toLowerCase() === needle,
+  );
+}
+
 export function addParkingLotItem(input: {
   title: string;
   source?: PlanDayItemSource;
   notes?: string;
+  reviewDate?: string;
+  parkCategory?: string;
+  tags?: string[];
+  /** When true (default), skip create if an active item with the same title exists. */
+  preventDuplicate?: boolean;
 }): PlanDayItem | null {
   const title = input.title.trim();
   if (!title) return null;
+  if (input.preventDuplicate !== false && parkingLotHasActiveTitle(title)) {
+    return (
+      readPlanningParkingLotItems().find(
+        (item) => item.title.trim().toLowerCase() === title.toLowerCase(),
+      ) ?? null
+    );
+  }
   const now = new Date().toISOString();
   const owner = getPlanDayOwnerUserId();
   const item: PlanDayItem = {
@@ -826,7 +853,11 @@ export function addParkingLotItem(input: {
     column: "ready",
     done: false,
     notes: input.notes?.trim() || undefined,
-    source: input.source ?? "manual",
+    source: input.source ?? "park-it",
+    parkStatus: "parked",
+    reviewDate: input.reviewDate?.trim() || undefined,
+    parkCategory: input.parkCategory?.trim() || undefined,
+    tags: input.tags?.filter((t) => t.trim()).map((t) => t.trim()),
     createdAt: now,
     updatedAt: now,
     ownerUserId: owner ?? undefined,
@@ -846,7 +877,11 @@ export function parkingLotSourceLabel(
 ): string | null {
   if (!source) return null;
   if (source === "clear-my-mind") return "Clear My Mind";
-  if (source === "manual") return "Added directly";
+  if (source === "park-it") return "Park It";
+  if (source === "manual") return "Park It";
+  if (source === "conversation") return "Conversation";
+  if (source === "project") return "Project";
+  if (source === "other") return "Other";
   if (
     source === "time-block" ||
     source === "day-designer" ||
@@ -857,10 +892,24 @@ export function parkingLotSourceLabel(
   return null;
 }
 
-/** Intentional Parking Lot only (not dated “send later” holds). */
+/** Intentional Parking Lot — active parked items only (not resolved/archived/moved). */
 export function readPlanningParkingLotItems(): PlanDayItem[] {
   const deferred = readDeferred();
-  return (deferred[PLAN_PARKING_HOLD_KEY] ?? []).filter((i) => !i.done);
+  return (deferred[PLAN_PARKING_HOLD_KEY] ?? []).filter((i) => {
+    if (i.done) return false;
+    const status = i.parkStatus ?? "parked";
+    return (
+      status === "parked" ||
+      status === "review-soon" ||
+      status === "needs-decision"
+    );
+  });
+}
+
+/** All parking-lot records including resolved/archived/moved (for filters). */
+export function readAllParkingLotItems(): PlanDayItem[] {
+  const deferred = readDeferred();
+  return deferred[PLAN_PARKING_HOLD_KEY] ?? [];
 }
 
 /** Deferred items keyed by date (excludes intentional someday parking). */
@@ -886,7 +935,20 @@ export function readDatedDeferredPlanItems(): {
 export function updateDeferredPlanItem(
   itemId: string,
   patch: Partial<
-    Pick<PlanDayItem, "title" | "notes" | "durationMinutes" | "priority">
+    Pick<
+      PlanDayItem,
+      | "title"
+      | "notes"
+      | "durationMinutes"
+      | "priority"
+      | "reviewDate"
+      | "parkStatus"
+      | "parkCategory"
+      | "tags"
+      | "reminderId"
+      | "projectId"
+      | "done"
+    >
   >,
 ): void {
   const deferred = readDeferred();

@@ -113,7 +113,7 @@ export const CHAMBER_MEMBERS: readonly ChamberMember[] = [
     howTheyHelp:
       "Plan event purpose, structure agendas, manage logistics thinking, and create experiences people remember for the right reasons.",
     activationOpener:
-      "I'm Events Intelligence. Are you planning something people will gather for? Tell me the occasion and we'll shape it step by step.",
+      "I'm Events Intelligence. Tell me what you're creating — a retreat, workshop, webinar, conference, or any gathering — and I'll start planning with you right away, one clear step at a time.",
   },
   {
     id: "finance",

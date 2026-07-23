@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -865,6 +866,12 @@ export function FounderWorkspacePage() {
             >
               {showChat ? "Hide chat" : "Show chat"}
             </button>
+            <Link
+              href="/founder/validation"
+              className="rounded-lg border border-[#1e4f4f] bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90"
+            >
+              Validation Mode
+            </Link>
             <button
               type="button"
               onClick={() => void signOut()}

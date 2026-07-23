@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useId, useRef } from "react";
+import { useEffect, useId, useRef } from "react";
 import type { ChamberMember } from "@/lib/chamber/chamberMemberRegistry";
 import {
   chamberMemberTalkLabel,
   getChamberMemberCardDisplay,
 } from "@/lib/chamber/chamberMemberCardDisplay";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "@/app/companion/chamber-member-gallery.css";
 
 type Props = {
@@ -25,10 +26,10 @@ export function ChamberMemberProfileModal({
   const titleId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-
-  const requestClose = useCallback(() => {
-    onClose();
-  }, [onClose]);
+  const { requestClose, onBackdropClick } = useDismissibleWindow({
+    open,
+    onClose,
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -39,18 +40,6 @@ export function ChamberMemberProfileModal({
       document.body.style.overflow = previousOverflow;
     };
   }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      event.preventDefault();
-      event.stopPropagation();
-      requestClose();
-    };
-    window.addEventListener("keydown", onKeyDown, true);
-    return () => window.removeEventListener("keydown", onKeyDown, true);
-  }, [open, requestClose]);
 
   if (!open || !member) return null;
 
@@ -66,7 +55,7 @@ export function ChamberMemberProfileModal({
         type="button"
         className="chamber-member-profile__backdrop"
         aria-label="Close member profile"
-        onClick={requestClose}
+        onClick={() => onBackdropClick()}
         tabIndex={-1}
       />
       <div

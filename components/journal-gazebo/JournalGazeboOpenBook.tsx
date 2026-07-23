@@ -14,7 +14,6 @@ import { CREATION_CEREMONY_PAGE_COUNT, volumePageLabel } from "@/lib/journalGaze
 import { journalCoverImageUrl, journalCoverTitle } from "@/lib/journalGazebo/coverArt";
 import { CINEMATIC } from "@/lib/journalGazebo/cinematicTiming";
 import {
-  JOURNAL_CREATION_BEGIN_WRITING,
   JOURNAL_PAGE_PLACEHOLDER,
 } from "@/lib/journalGazebo/hospitality";
 import { buildJournalPageHeader } from "@/lib/journalGazebo/journalPageHeader";
@@ -318,7 +317,12 @@ export function JournalGazeboOpenBook({
 
   useEffect(() => {
     setPageReady(false);
-    const timer = window.setTimeout(() => setPageReady(true), CINEMATIC.pageAdmireMs);
+    // Ceremony can linger briefly; writing pages should feel ready to turn sooner.
+    const admire =
+      pageIndex >= FIRST_WRITING_PAGE_INDEX
+        ? Math.min(CINEMATIC.pageAdmireMs, 220)
+        : CINEMATIC.pageAdmireMs;
+    const timer = window.setTimeout(() => setPageReady(true), admire);
     return () => window.clearTimeout(timer);
   }, [pageIndex]);
 
@@ -336,7 +340,18 @@ export function JournalGazeboOpenBook({
       ? pageReady && pageIndex < FIRST_WRITING_PAGE_INDEX
       : pageReady && isWritingPage && (canTurnForward || atLastWritingPage));
 
+  /** Persist live editor HTML before any remount/turn can wipe it. */
+  const flushLiveEditor = useCallback(() => {
+    if (pageIndex < FIRST_WRITING_PAGE_INDEX) return;
+    const el = paperRef.current;
+    if (!el) return;
+    const live = sanitizePageHtml(el.innerHTML);
+    savePageBody(config.id, pageIndex, live);
+    onBodyChange(live);
+  }, [config.id, onBodyChange, pageIndex, paperRef]);
+
   const turnForward = useCallback(() => {
+    flushLiveEditor();
     if (atLastWritingPage) {
       // Experience clamps and shows JOURNAL_FULL_SPARK.
       onPageIndexChange(pageIndex + 1);
@@ -357,6 +372,7 @@ export function JournalGazeboOpenBook({
     atLastWritingPage,
     canTurnForward,
     clearTurnTimers,
+    flushLiveEditor,
     onPageIndexChange,
     pageIndex,
     scheduleTurn,
@@ -364,6 +380,7 @@ export function JournalGazeboOpenBook({
 
   const turnCeremonyForward = useCallback(() => {
     if (!pageReady || turning) return;
+    flushLiveEditor();
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     playJournalPageTurnSound(CINEMATIC.pageTurnMs);
     if (reduced) {
@@ -377,6 +394,7 @@ export function JournalGazeboOpenBook({
     scheduleTurn(() => setTurning(null), CINEMATIC.pageTurnMs + CINEMATIC.pageTurnPauseMs);
   }, [
     clearTurnTimers,
+    flushLiveEditor,
     onPageIndexChange,
     pageIndex,
     pageReady,
@@ -385,15 +403,28 @@ export function JournalGazeboOpenBook({
   ]);
 
   const goBack = useCallback(() => {
-    if (!canGoBack) return;
+    if (!canGoBack || turning) return;
+    flushLiveEditor();
     if (pageIndex === 0 && view === "open") {
       playJournalPageTurnSound(Math.round(CINEMATIC.pageTurnMs * 0.55));
       onRequestClose?.();
       return;
     }
+    // Instant back — no reverse curl (it remounted the editor and felt broken).
     playJournalPageTurnSound(Math.round(CINEMATIC.pageTurnMs * 0.55));
+    clearTurnTimers();
+    setTurning(null);
     onPageIndexChange(pageIndex - 1);
-  }, [canGoBack, onPageIndexChange, onRequestClose, pageIndex, view]);
+  }, [
+    canGoBack,
+    clearTurnTimers,
+    flushLiveEditor,
+    onPageIndexChange,
+    onRequestClose,
+    pageIndex,
+    turning,
+    view,
+  ]);
 
   const handleWritingOverflow = useCallback(
     (overflowHtml: string) => {
@@ -434,8 +465,10 @@ export function JournalGazeboOpenBook({
   }
 
   function renderWritingPage(forIndex: number, editable: boolean) {
+    // Never mount a live editor during a page-turn curl — remounts can emit empty HTML.
+    const liveEditable = editable && !turning && forIndex === pageIndex;
     const pageStyle =
-      editable && pageTypingStyle
+      liveEditable && pageTypingStyle
         ? pageTypingStyle
         : resolvePageTypingStyle(config.id, forIndex, config);
     const prompt = promptForWritingPage(forIndex);
@@ -461,7 +494,7 @@ export function JournalGazeboOpenBook({
             {prompt}
           </p>
         ) : null}
-        {editable ? (
+        {liveEditable ? (
           <JournalGazeboWritingSurface
             editorRef={paperRef}
             config={config}
@@ -493,7 +526,11 @@ export function JournalGazeboOpenBook({
           <JournalGazeboWritingSurface
             config={config}
             typingStyle={pageStyle}
-            html={getPageBody(config.id, forIndex)}
+            html={
+              forIndex === pageIndex && plainTextFromHtml(body).trim()
+                ? body
+                : getPageBody(config.id, forIndex)
+            }
             readOnly
             journalId={config.id}
             pageIndex={forIndex}
@@ -835,15 +872,18 @@ export function JournalGazeboOpenBook({
             >
               {turning === "forward" ? (
                 <div className="jg-page-under jg-page-under--single" aria-hidden="true">
-                  {renderSinglePageLeaf(pageIndex + 1, true)}
+                  {renderSinglePageLeaf(pageIndex + 1, false)}
                 </div>
               ) : null}
 
               {turning === "forward" ? (
-                <div className="jg-page-curl jg-page-curl--single" aria-hidden="true">
+                <div
+                  className="jg-page-curl jg-page-curl--single"
+                  aria-hidden="true"
+                >
                   <div className="jg-page-curl__sheet">
                     <div className="jg-page-curl__face">
-                      {renderSinglePageLeaf(pageIndex, true)}
+                      {renderSinglePageLeaf(pageIndex, false)}
                     </div>
                     <div
                       className="jg-page-curl__back jg-book-paper"
@@ -862,16 +902,6 @@ export function JournalGazeboOpenBook({
             </div>
           </div>
         </div>
-        {pageIndex === 0 && pageReady && !turning ? (
-          <button
-            type="button"
-            className="jg-open-book__begin-writing"
-            onClick={goNext}
-            data-testid="jg-begin-writing"
-          >
-            {JOURNAL_CREATION_BEGIN_WRITING}
-          </button>
-        ) : null}
       </div>
       </>
     );

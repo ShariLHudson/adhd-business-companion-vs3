@@ -6,8 +6,12 @@ import {
 import {
   addQuickPlanItem,
   countActivePlanItems,
+  hasMeaningfulPlanItemsForDate,
+  hasMeaningfulPlanItemsForToday,
+  isMeaningfulPlanItem,
   isPlanItemActive,
   loadTodayPlanItems,
+  normalizePlanningDate,
   readTodayPlanItems,
   movePlanItemKanban,
   currentFocusItem,
@@ -49,6 +53,12 @@ describe("planMyDay view resolution", () => {
     setDefaultPlanningView("kanban");
     setLastPlanningView("timeline");
     expect(resolveInitialPlanningView("low")).toBe("timeline");
+  });
+
+  it("Settings default also aligns last-used so Plan My Day opens with it", () => {
+    setLastPlanningView("timeline");
+    setDefaultPlanningView("cards");
+    expect(resolveInitialPlanningView("high")).toBe("cards");
   });
 
   it("uses default when no last-used view", () => {
@@ -179,6 +189,69 @@ describe("planMyDay quick access", () => {
   });
 });
 
+describe("planMyDay daily state (planning date)", () => {
+  beforeEach(() => {
+    for (const k of Object.keys(lsStore)) delete lsStore[k];
+    const storage = {
+      getItem: (k: string) => lsStore[k] ?? null,
+      setItem: (k: string, v: string) => {
+        lsStore[k] = v;
+      },
+      removeItem: (k: string) => {
+        delete lsStore[k];
+      },
+    };
+    vi.stubGlobal("window", { dispatchEvent: vi.fn(), localStorage: storage });
+    vi.stubGlobal("localStorage", storage);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("normalizePlanningDate uses local YYYY-MM-DD", () => {
+    expect(normalizePlanningDate("2026-07-12")).toBe("2026-07-12");
+    expect(normalizePlanningDate(new Date(2026, 6, 12))).toBe("2026-07-12");
+  });
+
+  it("empty today envelope is Start My Day (no meaningful items)", () => {
+    const today = todayStr();
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({ date: today, items: [] });
+    expect(hasMeaningfulPlanItemsForToday()).toBe(false);
+    expect(hasMeaningfulPlanItemsForDate(today)).toBe(false);
+  });
+
+  it("wrong-date envelope does not count as today's plan", () => {
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({
+      date: "2020-01-01",
+      items: [{ id: "a", title: "Old", column: "ready", done: false }],
+    });
+    expect(hasMeaningfulPlanItemsForToday()).toBe(false);
+  });
+
+  it("saved item for today unlocks Today's Plan without a setup flag", () => {
+    const today = todayStr();
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({ date: today, items: [] });
+    expect(hasMeaningfulPlanItemsForToday()).toBe(false);
+
+    const next = addQuickPlanItem("Write newsletter");
+    expect(next[0]?.planningDate).toBe(today);
+    expect(isMeaningfulPlanItem(next[0]!)).toBe(true);
+    expect(hasMeaningfulPlanItemsForToday()).toBe(true);
+  });
+
+  it("legacy items without planningDate still count via envelope date", () => {
+    const today = todayStr();
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({
+      date: today,
+      items: [
+        { id: "legacy", title: "Call bank", column: "today", done: false },
+      ],
+    });
+    expect(hasMeaningfulPlanItemsForToday()).toBe(true);
+  });
+});
+
 describe("planMyDay safe interaction", () => {
   const base: PlanDayItem = {
     id: "x",
@@ -279,5 +352,50 @@ describe("planMyDay kanban", () => {
       },
     ];
     expect(currentFocusItem(withDoing)?.id).toBe("b");
+  });
+});
+
+describe("planMyDay user-created items", () => {
+  beforeEach(() => {
+    const storage = {
+      getItem: (k: string) => lsStore[k] ?? null,
+      setItem: (k: string, v: string) => {
+        lsStore[k] = v;
+      },
+      removeItem: (k: string) => {
+        delete lsStore[k];
+      },
+    };
+    vi.stubGlobal("window", { dispatchEvent: vi.fn() });
+    vi.stubGlobal("localStorage", storage);
+    Object.keys(lsStore).forEach((k) => delete lsStore[k]);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    Object.keys(lsStore).forEach((k) => delete lsStore[k]);
+  });
+
+  it("adds a manual item to a chosen day area with source and timestamps", () => {
+    const next = addQuickPlanItem({
+      title: "Write welcome note",
+      column: "today",
+      notes: "Keep it short",
+      source: "manual",
+    });
+    expect(next).toHaveLength(1);
+    expect(next[0]?.title).toBe("Write welcome note");
+    expect(next[0]?.column).toBe("today");
+    expect(next[0]?.source).toBe("manual");
+    expect(next[0]?.notes).toBe("Keep it short");
+    expect(next[0]?.createdAt).toBeTruthy();
+    expect(next[0]?.updatedAt).toBeTruthy();
+    expect(readTodayPlanItems()).toHaveLength(1);
+  });
+
+  it("defaults new items to Considering Today when column omitted", () => {
+    const next = addQuickPlanItem("Quick thought");
+    expect(next[0]?.column).toBe("ready");
+    expect(next[0]?.source).toBe("manual");
   });
 });

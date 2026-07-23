@@ -10,6 +10,7 @@ type Props = {
   sceneComposed?: boolean;
   onCreateJournal: () => void;
   onOpenJournal: (journal: JournalGazeboConfig) => void;
+  onBrowseJournals?: () => void;
   onJournalClick?: () => void;
 };
 
@@ -21,6 +22,7 @@ export function JournalGazeboSanctuaryDesk({
   journals,
   onCreateJournal,
   onOpenJournal,
+  onBrowseJournals,
 }: Props) {
   return (
     <div
@@ -36,6 +38,7 @@ export function JournalGazeboSanctuaryDesk({
             journals={journals}
             onCreateJournal={onCreateJournal}
             onOpenJournal={onOpenJournal}
+            onBrowseJournals={onBrowseJournals}
           />
         </div>
       </JournalGazeboTableActionsPortal>

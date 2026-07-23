@@ -3180,6 +3180,10 @@
   left: auto;
   transform: none;
   pointer-events: none;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.55rem;
 }
 
 .jg-journal-done__plaque {
@@ -3222,6 +3226,20 @@
 .jg-journal-done__plaque:focus-visible {
   outline: 2px solid rgba(212, 184, 112, 0.75);
   outline-offset: 3px;
+}
+
+.jg-journal-done__plaque:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+.jg-journal-done__plaque--save {
+  border-color: rgba(196, 168, 120, 0.55);
+  background:
+    radial-gradient(circle at 30% 22%, rgba(72, 62, 48, 0.42), transparent 54%),
+    linear-gradient(168deg, #3a342c 0%, #2c2822 44%, #1f1c18 100%);
+  color: #e2d2b0;
 }
 
 .jg-journal-done__title {

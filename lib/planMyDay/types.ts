@@ -20,10 +20,37 @@ export type PlanItemPriority = "low" | "medium" | "high";
 /** Where a plan item came from — for memory, not member-facing chrome. */
 export type PlanDayItemSource =
   | "manual"
+  | "park-it"
   | "clear-my-mind"
+  | "conversation"
+  | "project"
+  | "other"
   | "time-block"
   | "day-designer"
   | "rhythm";
+
+/** Parking Lot lifecycle — optional; missing means actively parked. */
+export type ParkedItemStatus =
+  | "parked"
+  | "review-soon"
+  | "needs-decision"
+  | "moved-to-today"
+  | "reminder-created"
+  | "added-to-project"
+  | "resolved"
+  | "archived";
+
+/** Optional soft category for parked items — never required at capture. */
+export type ParkedItemCategory =
+  | "Business"
+  | "Client"
+  | "Content"
+  | "Idea"
+  | "Personal"
+  | "Follow-Up"
+  | "Worry / Concern"
+  | "Someday"
+  | "Other";
 
 export type PlanDayItem = {
   id: string;
@@ -50,7 +77,7 @@ export type PlanDayItem = {
   projectId?: string;
   /** Linked momentum appointment, when seeded from a time block */
   sourceTimeBlockId?: string;
-  /** Provenance — manual add, Clear My Mind, seed sources, etc. */
+  /** Provenance — Park It, Clear My Mind, conversation, etc. */
   source?: PlanDayItemSource;
   relatedFileLabels?: string[];
   createdAt?: string;
@@ -63,6 +90,16 @@ export type PlanDayItem = {
   focusRank?: number;
   /** Owner user id when authenticated — prevents cross-account leakage on shared devices */
   ownerUserId?: string;
+  /** Parking Lot status — optional; defaults to parked when absent */
+  parkStatus?: ParkedItemStatus;
+  /** Optional YYYY-MM-DD review date — never required at capture */
+  reviewDate?: string;
+  /** Optional parked-item category label */
+  parkCategory?: ParkedItemCategory | string;
+  /** Optional tags for search */
+  tags?: string[];
+  /** Linked reminder id when created from Parking Lot */
+  reminderId?: string;
   /** Manual list order (lower = earlier). Locked items keep relative slots. */
   sortOrder?: number;
   /** Member locked this row in place (appointments also lock via sourceTimeBlockId). */

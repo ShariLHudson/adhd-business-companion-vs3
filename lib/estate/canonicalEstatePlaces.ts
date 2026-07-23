@@ -1218,7 +1218,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     id: "evidence-vault",
     officialName: "Evidence Vault",
     category: "destination",
-    primaryFeeling: "Confidence, proof, self-trust",
+    primaryFeeling: "Clarity, self-trust, grounded confidence",
     backgroundImage: "/backgrounds/evidence-vault-room-static.png",
     aliases: [
       "evidence vault",
@@ -1235,13 +1235,13 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     permanentObjects: ["Vault latch", "Shelves", "Warm lamp"],
     seasonalObjects: [],
     interactiveObjects: [
-      "Add memory of win",
+      "Preserve a discovery",
       "Open shelf entry (conversation-led)",
     ],
     relatedPlaces: ["journal", "growth-profile", "portfolio"],
     status: "live",
     expansionNotes:
-      "Private proof & encouragement — not Gallery, Portfolio, Celebration Garden, or Wins",
+      "Private discoveries & encouragement — not Gallery, Hall of Accomplishments, Celebration Garden, or Achievement Library",
   },
   {
     id: "portfolio",
@@ -1275,7 +1275,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Goals & Projects",
     category: "destination",
     primaryFeeling: "Direction, ownership, honest ambition",
-    backgroundImage: "/backgrounds/project-room.png",
+    backgroundImage: "/backgrounds/inspiring-vision-room-background.png",
     aliases: [
       "goals and projects",
       "my projects",

@@ -19,6 +19,7 @@ type Props = {
   journals: JournalGazeboConfig[];
   onCreateJournal: () => void;
   onOpenJournal: (journal: JournalGazeboConfig) => void;
+  onBrowseJournals?: () => void;
 };
 
 /** Gazebo welcome — estate green plaques anchored to the viewport (always visible). */
@@ -27,6 +28,7 @@ export function JournalGazeboEstateDesk({
   journals,
   onCreateJournal,
   onOpenJournal,
+  onBrowseJournals,
 }: Props) {
   if (!showWelcome) return null;
 
@@ -35,6 +37,7 @@ export function JournalGazeboEstateDesk({
       journals={journals}
       onCreateJournal={onCreateJournal}
       onOpenJournal={onOpenJournal}
+      onBrowseJournals={onBrowseJournals}
     />
   );
 }

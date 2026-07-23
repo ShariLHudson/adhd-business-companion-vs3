@@ -8,10 +8,18 @@ import "@/app/companion/chamber-member-gallery.css";
 type Props = {
   member: ChamberMember;
   onEndConversation: () => void;
+  /** Keep the current thread and choose another member to join it. */
+  onInviteAnother?: () => void;
+  invitingAnother?: boolean;
 };
 
 /** Compact identity strip — portrait, name, and purpose while talking with a member. */
-export function ChamberActiveMemberCard({ member, onEndConversation }: Props) {
+export function ChamberActiveMemberCard({
+  member,
+  onEndConversation,
+  onInviteAnother,
+  invitingAnother = false,
+}: Props) {
   const display = getChamberMemberCardDisplay(member);
 
   return (
@@ -34,14 +42,27 @@ export function ChamberActiveMemberCard({ member, onEndConversation }: Props) {
         <p className="chamber-active-member__specialty">{display.specialtyLine}</p>
         <p className="chamber-active-member__purpose">{display.purposeStatement}</p>
       </div>
-      <button
-        type="button"
-        className="chamber-active-member__end"
-        data-testid="chamber-active-member-end"
-        onClick={onEndConversation}
-      >
-        Return to gallery
-      </button>
+      <div className="chamber-active-member__actions">
+        {onInviteAnother ? (
+          <button
+            type="button"
+            className="chamber-active-member__invite"
+            data-testid="chamber-active-member-invite-another"
+            aria-pressed={invitingAnother}
+            onClick={onInviteAnother}
+          >
+            {invitingAnother ? "Choose below…" : "Invite another member"}
+          </button>
+        ) : null}
+        <button
+          type="button"
+          className="chamber-active-member__end"
+          data-testid="chamber-active-member-end"
+          onClick={onEndConversation}
+        >
+          Return to gallery
+        </button>
+      </div>
     </aside>
   );
 }

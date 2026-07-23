@@ -29,7 +29,7 @@ describe("BusinessBasicsFlow", () => {
     container.remove();
   });
 
-  it("shows only one question at a time", () => {
+  it("shows only one question at a time with styled card and primary continue", () => {
     act(() => {
       root.render(
         <BusinessBasicsFlow
@@ -38,15 +38,58 @@ describe("BusinessBasicsFlow", () => {
         />,
       );
     });
-    expect(
-      container.querySelector('[data-testid="be-basics-flow"]'),
-    ).toBeTruthy();
+    const flow = container.querySelector('[data-testid="be-basics-flow"]');
+    expect(flow).toBeTruthy();
+    expect(flow?.className).toMatch(/be-basics--card/);
     expect(
       container.querySelector('[data-testid="be-basics-prompt"]')?.textContent,
     ).toMatch(/name of your business/i);
+    expect(
+      container.querySelector('[data-testid="be-basics-value"]')?.textContent,
+    ).toMatch(/greet you and your business by name/i);
+    expect(
+      container
+        .querySelector('[data-testid="be-basics-save-continue"]')
+        ?.className,
+    ).toMatch(/be-btn--primary/);
+    const skip = container.querySelector('[data-testid="be-basics-skip"]');
+    expect(skip?.className).toMatch(/be-basics__skip-link/);
+    expect(skip?.tagName).toBe("BUTTON");
+    expect(container.textContent).toMatch(/Skipping is fine/i);
     expect(container.textContent).not.toMatch(
       /Where would you say your business is right now/i,
     );
+  });
+
+  it("autosaves typed answers without waiting for Save and Continue", async () => {
+    vi.useFakeTimers();
+    act(() => {
+      root.render(
+        <BusinessBasicsFlow
+          onExitToEntrance={vi.fn()}
+          onFinished={vi.fn()}
+        />,
+      );
+    });
+    const input = container.querySelector<HTMLInputElement>(
+      '[data-testid="be-basics-input"]',
+    );
+    expect(input).toBeTruthy();
+    act(() => {
+      if (!input) return;
+      const native = Object.getOwnPropertyDescriptor(
+        window.HTMLInputElement.prototype,
+        "value",
+      );
+      native?.set?.call(input, "Autosave Co");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(readIdentityField("businessName")).toBe("");
+    await act(async () => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(readIdentityField("businessName")).toBe("Autosave Co");
+    vi.useRealTimers();
   });
 
   it("saves answers and advances, then shows pause after two questions", () => {

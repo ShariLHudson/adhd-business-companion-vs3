@@ -77,7 +77,11 @@ export function IdentityOfficeEntrance({
           <p className="be-identity-entrance__meta">
             {hasProgress
               ? `You completed ${progress.answered} of ${progress.total} questions. Your answers are saved.`
-              : "3 short questions · About 3 minutes"}
+              : "Helps Shari greet you and your business by name instead of generic advice."}
+          </p>
+          <p className="be-identity-entrance__optional">
+            Nothing here has to be completed all at once — every answer simply
+            helps Spark understand your business a little better.
           </p>
           <button
             type="button"

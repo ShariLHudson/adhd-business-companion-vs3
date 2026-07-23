@@ -367,7 +367,10 @@
 }
 
 .jg-table-actions__menu-item {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
   width: 100%;
   margin: 0;
   padding: 0.55rem 0.85rem;
@@ -380,6 +383,19 @@
   color: rgba(212, 184, 112, 0.92);
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
+}
+
+.jg-table-actions__menu-title {
+  display: block;
+}
+
+.jg-table-actions__menu-resume {
+  display: block;
+  font-family: "Lora", Georgia, serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  color: rgba(212, 184, 112, 0.68);
 }
 
 .jg-table-actions__menu-item:hover,

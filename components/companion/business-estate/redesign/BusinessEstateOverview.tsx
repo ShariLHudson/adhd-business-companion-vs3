@@ -29,6 +29,7 @@ export function BusinessEstateOverview({
   onOpenPeopleIHelp,
   howToControl,
 }: Props) {
+  const [browseOpen, setBrowseOpen] = useState(false);
   const [openGroupId, setOpenGroupId] = useState<EstateGroupId | null>(null);
   const recommendation = getEstateRecommendation();
 
@@ -50,8 +51,9 @@ export function BusinessEstateOverview({
     setOpenGroupId((prev) => (prev === id ? null : id));
   }
 
-  function chooseSomethingElse() {
-    setOpenGroupId("understand");
+  function openBrowse(preferGroup?: EstateGroupId) {
+    setBrowseOpen(true);
+    setOpenGroupId(preferGroup ?? "understand");
   }
 
   return (
@@ -91,21 +93,44 @@ export function BusinessEstateOverview({
       <BusinessEstateRecommendationCard
         recommendation={recommendation}
         onPrimary={() => handlePrimary(recommendation)}
-        onChooseSomethingElse={chooseSomethingElse}
+        onChooseSomethingElse={() => openBrowse("understand")}
       />
 
-      <BusinessEstateProgressStrip
-        onEnterRoom={onEnterRoom}
-        onOpenPeopleIHelp={onOpenPeopleIHelp}
-      />
+      <div className="be-overview__browse-toggle">
+        <button
+          type="button"
+          className="be-overview__browse-link"
+          onClick={() =>
+            browseOpen ? setBrowseOpen(false) : openBrowse("understand")
+          }
+          aria-expanded={browseOpen}
+          data-testid="be-overview-browse-toggle"
+        >
+          {browseOpen
+            ? "Hide room browse"
+            : "Browse all rooms (optional)"}
+        </button>
+        <p className="be-overview__browse-hint">
+          One clear next step is enough — browse only when you want to explore.
+        </p>
+      </div>
 
-      <BusinessEstateGroupAccordion
-        groups={BUSINESS_ESTATE_BROWSE_GROUPS}
-        openGroupId={openGroupId}
-        onToggleGroup={toggleGroup}
-        onEnterRoom={onEnterRoom}
-        onOpenPeopleIHelp={onOpenPeopleIHelp}
-      />
+      {browseOpen ? (
+        <>
+          <BusinessEstateProgressStrip
+            onEnterRoom={onEnterRoom}
+            onOpenPeopleIHelp={onOpenPeopleIHelp}
+            visualOnly
+          />
+          <BusinessEstateGroupAccordion
+            groups={BUSINESS_ESTATE_BROWSE_GROUPS}
+            openGroupId={openGroupId}
+            onToggleGroup={toggleGroup}
+            onEnterRoom={onEnterRoom}
+            onOpenPeopleIHelp={onOpenPeopleIHelp}
+          />
+        </>
+      ) : null}
     </div>
   );
 }

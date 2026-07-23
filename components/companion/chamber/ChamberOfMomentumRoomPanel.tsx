@@ -4,11 +4,15 @@ import type { ReactNode } from "react";
 import { EstateRoomChatChrome } from "@/components/companion/estate/EstateRoomChatChrome";
 import { ChamberOfMomentumEntryPanel } from "@/components/companion/chamber/ChamberOfMomentumEntryPanel";
 import type { ChamberMemberId } from "@/lib/chamber/chamberMemberRegistry";
+import type { ChamberInviteMemberOptions } from "@/components/companion/chamber/ChamberOfMomentumEntryPanel";
 
 type Props = {
   onBack: () => void;
   activeMemberId: ChamberMemberId | null;
-  onInviteMember: (memberId: ChamberMemberId) => void;
+  onInviteMember: (
+    memberId: ChamberMemberId,
+    opts?: ChamberInviteMemberOptions,
+  ) => void;
   onEndMemberConversation: () => void;
   thread: ReactNode;
   footer: ReactNode;

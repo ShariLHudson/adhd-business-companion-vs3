@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { journalCoverTitle } from "@/lib/journalGazebo/coverArt";
 import {
   JOURNAL_TABLE_CREATE,
   JOURNAL_TABLE_WRITE,
@@ -14,6 +12,8 @@ type Props = {
   journals: JournalGazeboConfig[];
   onCreateJournal: () => void;
   onOpenJournal: (journal: JournalGazeboConfig) => void;
+  /** When several journals exist — open the chooser (includes remove). */
+  onBrowseJournals?: () => void;
   /** Photo-plate welcome scene uses absolute positioning on the desk image. */
   layout?: "welcome-plate" | "sanctuary";
   /**
@@ -49,43 +49,28 @@ export function JournalGazeboTableActions({
   journals,
   onCreateJournal,
   onOpenJournal,
+  onBrowseJournals,
   layout = "welcome-plate",
   mode = "returning",
 }: Props) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const menuId = useId();
   const showWrite = mode === "returning";
-  const hasMultiple = journals.length > 1;
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onPointerDown = (event: MouseEvent) => {
-      if (!menuRef.current?.contains(event.target as Node)) {
-        setMenuOpen(false);
-      }
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
-    };
-    window.addEventListener("pointerdown", onPointerDown);
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      window.removeEventListener("pointerdown", onPointerDown);
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [menuOpen]);
+  const hasChooser = journals.length >= 1;
 
   function handleWrite() {
     if (journals.length === 0) {
       onCreateJournal();
       return;
     }
+    // Always open the chooser so the member sees their journals and can resume.
+    if (onBrowseJournals) {
+      onBrowseJournals();
+      return;
+    }
     if (journals.length === 1) {
       onOpenJournal(journals[0]!);
       return;
     }
-    setMenuOpen((open) => !open);
+    onOpenJournal(journals[0]!);
   }
 
   return (
@@ -115,27 +100,17 @@ export function JournalGazeboTableActions({
       </button>
 
       {showWrite ? (
-        <div
-          ref={menuRef}
-          className={[
-            "jg-table-actions__open-wrap",
-            menuOpen ? "jg-table-actions__open-wrap--open" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
+        <div className="jg-table-actions__open-wrap">
           <button
             type="button"
             className="jg-table-actions__plaque jg-table-actions__plaque--open"
             onClick={handleWrite}
-            aria-haspopup={hasMultiple ? "listbox" : undefined}
-            aria-expanded={hasMultiple ? menuOpen : undefined}
-            aria-controls={hasMultiple ? menuId : undefined}
+            aria-haspopup={hasChooser ? "dialog" : undefined}
             data-testid="jg-write-journal"
           >
             <span className="jg-table-actions__plaque-title">
               {JOURNAL_TABLE_WRITE.title}
-              {hasMultiple ? (
+              {hasChooser ? (
                 <span className="jg-table-actions__caret" aria-hidden="true">
                   ▼
                 </span>
@@ -146,32 +121,6 @@ export function JournalGazeboTableActions({
             </span>
             <WelcomeDeskQuillIcon />
           </button>
-
-          {hasMultiple && menuOpen ? (
-            <ul
-              id={menuId}
-              className="jg-table-actions__menu"
-              role="listbox"
-              aria-label="Choose a journal"
-              data-testid="jg-journal-select-menu"
-            >
-              {journals.map((journal) => (
-                <li key={journal.id} role="none">
-                  <button
-                    type="button"
-                    className="jg-table-actions__menu-item"
-                    role="option"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      onOpenJournal(journal);
-                    }}
-                  >
-                    {journalCoverTitle(journal)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : null}
         </div>
       ) : null}
     </div>

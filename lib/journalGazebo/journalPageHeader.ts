@@ -1,5 +1,7 @@
 /** Handwritten-style page header — memory, not metadata. */
 
+import { formatPrefsClockTime } from "@/lib/companionStore";
+
 export type JournalPageHeader = {
   lines: readonly string[];
 };
@@ -40,10 +42,7 @@ function shortDate(date: Date): string {
 }
 
 function clockTime(date: Date): string {
-  return date.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return formatPrefsClockTime(date);
 }
 
 /** Varies layout by day — always warm, never like a system timestamp. */
