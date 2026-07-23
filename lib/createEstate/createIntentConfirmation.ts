@@ -103,6 +103,7 @@ export function scoreCreateIntentConfidence(input: {
   fromCatalog: boolean;
   fromPromptDetect: boolean;
   isMarketingPlanDomain: boolean;
+  isBusinessPlanDomain?: boolean;
   isEventDomain: boolean;
   isFacebookCommunityDomain?: boolean;
   /** Spec 131 — intent-before-artifact promotional override */
@@ -128,6 +129,7 @@ export function scoreCreateIntentConfidence(input: {
 
   if (
     input.isMarketingPlanDomain ||
+    input.isBusinessPlanDomain ||
     input.isEventDomain ||
     input.isFacebookCommunityDomain ||
     (input.fromCatalog && explicit)

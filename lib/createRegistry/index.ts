@@ -60,6 +60,16 @@ export {
   registryItemFromParentType,
 } from "./adapters";
 
+export {
+  GUIDED_CREATE_CERTIFICATION_SNAPSHOTS,
+  getGuidedCertificationSnapshot,
+  type GuidedCertCheckStatus,
+  type GuidedCertDimension,
+  type GuidedCertDimensionResult,
+  type GuidedCertEvidenceLevel,
+  type GuidedTypeCertificationSnapshot,
+} from "./certification/guidedCreateCertification";
+
 import { CREATION_REGISTRY_SEED_ITEMS } from "./items.seed";
 import type { CreationRegistryItem } from "./types";
 import { computeIsUserVisible } from "./visibility";

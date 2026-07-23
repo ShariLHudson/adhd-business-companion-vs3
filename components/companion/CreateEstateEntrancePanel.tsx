@@ -55,6 +55,7 @@ import {
 } from "@/lib/createGuidedConversation189";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
+import { BUSINESS_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/businessPlanMap";
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
 import { FACEBOOK_COMMUNITY_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/facebookCommunityMap";
 import { launchFromCreate } from "@/lib/universalWorkEngine";
@@ -250,20 +251,24 @@ export function CreateEstateEntrancePanel({
   }, []);
 
   function openConfirmed(outcome: Extract<CreateBeginOutcome, { kind: "open" }>) {
-    // 103 / 105 — Event, Marketing Plan, and Facebook Community Begin resolve
-    // through Anywhere-Origin (587–598).
+    // Guided UWE types — Event, Marketing Plan, Business Plan, Facebook Community
+    // resolve through Anywhere-Origin before Estate open (clarify when needed).
     if (
       outcome.isEventDomain ||
       outcome.isMarketingPlanDomain ||
+      outcome.isBusinessPlanDomain ||
       outcome.isFacebookCommunityDomain
     ) {
+      const candidateWorkTypeId = outcome.isFacebookCommunityDomain
+        ? FACEBOOK_COMMUNITY_WORK_TYPE_ID
+        : outcome.isMarketingPlanDomain
+          ? MARKETING_PLAN_WORK_TYPE_ID
+          : outcome.isBusinessPlanDomain
+            ? BUSINESS_PLAN_WORK_TYPE_ID
+            : EVENT_PLAN_WORK_TYPE_ID;
       const anywhere = launchFromCreate({
         originalUserMessage: outcome.text,
-        candidateWorkTypeId: outcome.isFacebookCommunityDomain
-          ? FACEBOOK_COMMUNITY_WORK_TYPE_ID
-          : outcome.isMarketingPlanDomain
-            ? MARKETING_PLAN_WORK_TYPE_ID
-            : EVENT_PLAN_WORK_TYPE_ID,
+        candidateWorkTypeId,
       });
       if (anywhere.decision === "clarify") {
         setBeginFeedback(anywhere.reply);
@@ -276,7 +281,8 @@ export function CreateEstateEntrancePanel({
 
     void (async () => {
       try {
-        setBeginFeedback("Saving your workspace securely…");
+        // Progress only — do not claim durable "saved" before persist ack.
+        setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
         setBeginFeedbackKind("progress");
         await Promise.resolve(onBeginCreate(outcome));
         setBeginFeedback(null);
@@ -284,7 +290,7 @@ export function CreateEstateEntrancePanel({
         setPendingConfirm(null);
       } catch {
         setBeginFeedback(
-          "I couldn't save that creation yet. Your words are still here — Retry, or tell me a little more above.",
+          "I couldn't open that creation yet. Your words are still here — Retry, or tell me a little more above.",
         );
         setBeginFeedbackKind("error");
       } finally {

@@ -42,6 +42,7 @@ describe("creation registry seed integrity", () => {
   it("four seeds remain hidden under the current unverified state", () => {
     expect(CREATION_REGISTRY_SEED_ITEMS).toHaveLength(4);
     for (const item of CREATION_REGISTRY_SEED_ITEMS) {
+      expect(item.lifecycleStatus).toBe("testing");
       expect(item.lifecycleStatus).not.toBe("ready");
       expect(item.routeVerified).toBe(false);
       expect(item.saveVerified).toBe(false);

@@ -62,3 +62,11 @@ Do not invert that relationship when wiring handoff later.
 ## UI migration
 
 Happens in later PRs (Browse 7→9, Help Me Choose, Begin matching, Based on Your Business). This module may stay unused by UI until those PRs land.
+
+## Guided certification
+
+Four UWE seeds use lifecycle `testing` after the jsdom integration pack. Verification flags stay `false` until authenticated founder/browser journeys pass. See:
+
+- `certification/guidedCreateCertification.ts`
+- `__tests__/guidedCreateCertification.integration.test.ts`
+- `docs/create-experience/create-registry-audit/guided-create-certification-report.md`

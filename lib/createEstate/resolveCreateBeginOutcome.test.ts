@@ -66,6 +66,18 @@ describe("Create Begin — always one of two outcomes", () => {
     }
   });
 
+  it("business plan Begin → confirm with Business Plan domain", () => {
+    const outcome = resolveCreateBeginOutcome("Help me create a business plan");
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind === "confirm") {
+      expect(outcome.artifactType).toMatch(/business plan/i);
+      expect(outcome.isBusinessPlanDomain).toBe(true);
+      expect(outcome.isMarketingPlanDomain).toBe(false);
+      expect(outcome.isEventDomain).toBe(false);
+      expect(outcome.confidence).toBe("high");
+    }
+  });
+
   it("marketing plan Begin → confirm with Marketing Plan domain", () => {
     const outcome = resolveCreateBeginOutcome(
       "Help me create a simple marketing plan",
@@ -74,6 +86,7 @@ describe("Create Begin — always one of two outcomes", () => {
     if (outcome.kind === "confirm") {
       expect(outcome.artifactType).toMatch(/marketing plan/i);
       expect(outcome.isMarketingPlanDomain).toBe(true);
+      expect(outcome.isBusinessPlanDomain).toBe(false);
       expect(outcome.isEventDomain).toBe(false);
       expect(outcome.confidence).toBe("high");
       expect(outcome.message).toBe(

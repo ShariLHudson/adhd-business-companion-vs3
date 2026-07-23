@@ -19,6 +19,7 @@ import {
   CREATE_BEGIN_ERROR_MESSAGE,
 } from "@/lib/primaryActionFeedback";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform/oneCreationPlatform";
+import { isBusinessPlanCreationRequest } from "@/lib/universalWorkEngine/packages/businessPlan/isBusinessPlanCreationRequest";
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
 import { isFacebookCommunityCreationRequest } from "@/lib/universalWorkEngine/packages/facebookCommunity/isFacebookCommunityCreationRequest";
 import {
@@ -47,6 +48,7 @@ export type CreateBeginOutcome =
       confidence: Exclude<CreateIntentConfidence, "low">;
       isEventDomain: boolean;
       isMarketingPlanDomain: boolean;
+      isBusinessPlanDomain: boolean;
       isFacebookCommunityDomain: boolean;
       /** Spec 131 Rule 2 — also-considered when medium confidence */
       alsoConsidered?: string[];
@@ -57,6 +59,7 @@ export type CreateBeginOutcome =
       artifactType: string;
       isEventDomain: boolean;
       isMarketingPlanDomain: boolean;
+      isBusinessPlanDomain: boolean;
       isFacebookCommunityDomain: boolean;
     }
   | {
@@ -85,6 +88,7 @@ function gatherCreateTypeCandidates(text: string): string[] {
   push(detectCreateTypeFromPrompt(text));
   if (isFacebookCommunityCreationRequest(text)) push("Facebook Community");
   if (isMarketingPlanCreationRequest(text)) push("Marketing Plan");
+  if (isBusinessPlanCreationRequest(text)) push("Business Plan");
   if (isEventDomainCreationRequest(text)) push("Event Plan");
 
   // Spec 135 / 131 — when uncertain, surface up to 3 calm alternatives from wording.
@@ -150,6 +154,14 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
       fromPromotionalIntent: false,
     };
   }
+  if (isBusinessPlanCreationRequest(text)) {
+    return {
+      artifactType: "Business Plan",
+      fromCatalog: false,
+      fromPromptDetect: false,
+      fromPromotionalIntent: false,
+    };
+  }
   if (isEventDomainCreationRequest(text)) {
     return {
       artifactType: "Event Plan",
@@ -159,6 +171,48 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
     };
   }
   return null;
+}
+
+/** Shared domain flags for confirm / open outcomes. */
+export function resolveGuidedCreateDomainFlags(input: {
+  text: string;
+  artifactType: string;
+  fromPromotionalIntent?: boolean;
+}): {
+  isFacebookCommunityDomain: boolean;
+  isMarketingPlanDomain: boolean;
+  isBusinessPlanDomain: boolean;
+  isEventDomain: boolean;
+} {
+  const label = input.artifactType;
+  const text = input.text;
+  const promo = Boolean(input.fromPromotionalIntent);
+
+  const isFacebookCommunityDomain =
+    (isFacebookCommunityCreationRequest(text) ||
+      /facebook\s*(community|group)/i.test(label)) &&
+    !promo;
+  const isMarketingPlanDomain =
+    !isFacebookCommunityDomain &&
+    (isMarketingPlanCreationRequest(text) || /marketing\s+plan/i.test(label));
+  const isBusinessPlanDomain =
+    !isFacebookCommunityDomain &&
+    !isMarketingPlanDomain &&
+    (isBusinessPlanCreationRequest(text) || /business\s+plan/i.test(label));
+  const isEventDomain =
+    !isMarketingPlanDomain &&
+    !isBusinessPlanDomain &&
+    !isFacebookCommunityDomain &&
+    !promo &&
+    (isEventDomainCreationRequest(text) ||
+      /\b(event|workshop|retreat|webinar|conference)\b/i.test(label));
+
+  return {
+    isFacebookCommunityDomain,
+    isMarketingPlanDomain,
+    isBusinessPlanDomain,
+    isEventDomain,
+  };
 }
 
 /** Convert a confirmed intent into the open outcome parents already wire. */
@@ -171,6 +225,7 @@ export function confirmCreateBeginToOpen(
     artifactType: outcome.artifactType,
     isEventDomain: outcome.isEventDomain,
     isMarketingPlanDomain: outcome.isMarketingPlanDomain,
+    isBusinessPlanDomain: outcome.isBusinessPlanDomain,
     isFacebookCommunityDomain: outcome.isFacebookCommunityDomain,
   };
 }
@@ -199,18 +254,10 @@ export function switchCreateBeginConfirmType(
       ...gatherCreateTypeCandidates(outcome.text),
     ],
   );
-  const isFacebookCommunityDomain =
-    isFacebookCommunityCreationRequest(outcome.text) ||
-    /facebook\s*(community|group)/i.test(label);
-  const isMarketingPlanDomain =
-    !isFacebookCommunityDomain &&
-    (isMarketingPlanCreationRequest(outcome.text) ||
-      /marketing\s+plan/i.test(label));
-  const isEventDomain =
-    !isMarketingPlanDomain &&
-    !isFacebookCommunityDomain &&
-    (isEventDomainCreationRequest(outcome.text) ||
-      /\b(event|workshop|retreat|webinar|conference)\b/i.test(label));
+  const domains = resolveGuidedCreateDomainFlags({
+    text: outcome.text,
+    artifactType: label,
+  });
 
   return {
     kind: "confirm",
@@ -221,9 +268,7 @@ export function switchCreateBeginConfirmType(
         ? createIntentAlternativesMessage(label, also)
         : createIntentConfirmMessage(label),
     confidence: "high",
-    isEventDomain,
-    isMarketingPlanDomain,
-    isFacebookCommunityDomain,
+    ...domains,
     alsoConsidered: also.length > 0 ? also : undefined,
   };
 }
@@ -241,17 +286,10 @@ export function resolveCatalogCreateConfirm(input: {
   const text =
     input.requestText?.trim() ||
     `Create a ${label}`;
-  const isFacebookCommunityDomain =
-    isFacebookCommunityCreationRequest(text) ||
-    /facebook\s*(community|group)/i.test(label);
-  const isMarketingPlanDomain =
-    !isFacebookCommunityDomain &&
-    (isMarketingPlanCreationRequest(text) || /marketing\s+plan/i.test(label));
-  const isEventDomain =
-    !isMarketingPlanDomain &&
-    !isFacebookCommunityDomain &&
-    (isEventDomainCreationRequest(text) ||
-      /\b(event|workshop|retreat|webinar|conference)\b/i.test(label));
+  const domains = resolveGuidedCreateDomainFlags({
+    text,
+    artifactType: label,
+  });
 
   return {
     kind: "confirm",
@@ -259,9 +297,7 @@ export function resolveCatalogCreateConfirm(input: {
     artifactType: label,
     message: createIntentConfirmMessage(label),
     confidence: "high",
-    isEventDomain,
-    isMarketingPlanDomain,
-    isFacebookCommunityDomain,
+    ...domains,
   };
 }
 
@@ -289,19 +325,26 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       };
     }
 
-    const isFacebookCommunityDomain =
-      (isFacebookCommunityCreationRequest(text) ||
-        /facebook\s*(community|group)/i.test(resolved.artifactType)) &&
-      !resolved.fromPromotionalIntent;
-    const isMarketingPlanDomain =
-      !isFacebookCommunityDomain &&
-      (isMarketingPlanCreationRequest(text) ||
-        /marketing\s+plan/i.test(resolved.artifactType));
-    const isEventDomain =
-      isEventDomainCreationRequest(text) &&
-      !isMarketingPlanDomain &&
-      !isFacebookCommunityDomain &&
-      !resolved.fromPromotionalIntent;
+    const {
+      isFacebookCommunityDomain,
+      isMarketingPlanDomain,
+      isBusinessPlanDomain,
+      isEventDomain,
+    } = resolveGuidedCreateDomainFlags({
+      text,
+      artifactType: resolved.artifactType,
+      fromPromotionalIntent: resolved.fromPromotionalIntent,
+    });
+
+    // Event domain Begin historically required the event detector (not only label)
+    // so catalog "Workshop" still qualifies when wording is event-like.
+    const isEventDomainBegin =
+      isEventDomain ||
+      (isEventDomainCreationRequest(text) &&
+        !isMarketingPlanDomain &&
+        !isBusinessPlanDomain &&
+        !isFacebookCommunityDomain &&
+        !resolved.fromPromotionalIntent);
 
     const confidence = scoreCreateIntentConfidence({
       text,
@@ -309,7 +352,8 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       fromCatalog: resolved.fromCatalog,
       fromPromptDetect: resolved.fromPromptDetect,
       isMarketingPlanDomain,
-      isEventDomain,
+      isBusinessPlanDomain,
+      isEventDomain: isEventDomainBegin,
       isFacebookCommunityDomain,
       fromPromotionalIntent: resolved.fromPromotionalIntent,
     });
@@ -346,8 +390,9 @@ export function resolveCreateBeginOutcome(userText: string): CreateBeginOutcome 
       artifactType: resolved.artifactType,
       message,
       confidence,
-      isEventDomain,
+      isEventDomain: isEventDomainBegin,
       isMarketingPlanDomain,
+      isBusinessPlanDomain,
       isFacebookCommunityDomain,
       ...(alsoConsidered.length > 0 ? { alsoConsidered } : {}),
     };

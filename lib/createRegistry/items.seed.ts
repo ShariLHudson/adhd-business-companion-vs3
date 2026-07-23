@@ -4,8 +4,9 @@
  * Runtime IDs match workTypeSchema / UWE packages:
  * event_plan · marketing_plan · business_plan · facebook_community
  *
- * None are ready. Browser/Founder certification is NOT_RUN → all verification
- * flags false → computeIsUserVisible === false (intentional).
+ * Lifecycle: testing (jsdom integration pack exists; authenticated browser NOT_RUN).
+ * All verification flags remain false → computeIsUserVisible === false (intentional).
+ * See certification/guidedCreateCertification.ts + guided-create-certification-report.md.
  */
 
 import type { CreationRegistryItem } from "./types";
@@ -22,8 +23,9 @@ export type GuidedCreationRegistryId =
   (typeof GUIDED_CREATION_REGISTRY_IDS)[number];
 
 /**
- * Honest verification baseline from create-registry-audit-matrix.md:
- * code paths exist; browser/founder certification NOT_RUN → all false.
+ * Honest verification baseline:
+ * jsdom/integration coverage is not founder/authenticated browser proof.
+ * Do not set these true until Ready requirements are genuinely met.
  */
 const UNVERIFIED = {
   routeVerified: false,
@@ -80,7 +82,7 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
     recommendedBoardRoles: [],
     builderType: "multi-asset-workspace",
     route: "create/uwe/event_plan",
-    lifecycleStatus: "needs-audit",
+    lifecycleStatus: "testing",
     priority: "release-essential",
     ...UNVERIFIED,
     owner: "universal-work-engine",
@@ -93,8 +95,8 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
       "Workshop resolves through event subtypes — not a separate registry seed yet.",
     ],
     auditNotes: [
-      "Audit: working-with-limitations; foundation tests exist; browser NOT_RUN.",
-      "Master inventory starting status: Needs audit.",
+      "2026-07-23 guided cert: jsdom integration pack pass; founder/browser NOT_RUN.",
+      "Workshop → event_plan (subtype), not a separate registry id.",
     ],
     legacyParentTypeId: "event",
     legacyCatalogLabels: ["Event Plan", "Workshop"],
@@ -136,7 +138,7 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
     recommendedBoardRoles: [],
     builderType: "multi-asset-workspace",
     route: "create/uwe/marketing_plan",
-    lifecycleStatus: "needs-audit",
+    lifecycleStatus: "testing",
     priority: "release-essential",
     ...UNVERIFIED,
     owner: "universal-work-engine",
@@ -146,8 +148,8 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
     ],
     implementationNotes: ["Legacy Browse parent id: marketing-plan."],
     auditNotes: [
-      "Audit: working-with-limitations; one blueprint depth; browser NOT_RUN.",
-      "Master inventory starting status: Needs audit.",
+      "2026-07-23 guided cert: jsdom integration pack pass; founder/browser NOT_RUN.",
+      "Verification flags remain false until authenticated Estate journey passes.",
     ],
     legacyParentTypeId: "marketing-plan",
     legacyCatalogLabels: ["Marketing Plan"],
@@ -189,7 +191,7 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
     recommendedBoardRoles: [],
     builderType: "multi-asset-workspace",
     route: "create/uwe/business_plan",
-    lifecycleStatus: "needs-audit",
+    lifecycleStatus: "testing",
     priority: "release-essential",
     ...UNVERIFIED,
     owner: "universal-work-engine",
@@ -202,8 +204,8 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
       "Deliverable manifests still a known gap per audit.",
     ],
     auditNotes: [
-      "Audit: working-with-limitations; industry blueprints registered; browser NOT_RUN.",
-      "Master inventory starting status: Needs audit.",
+      "2026-07-23 guided cert: Begin now sets isBusinessPlanDomain + Anywhere-Origin.",
+      "jsdom integration pack pass; founder/browser NOT_RUN.",
     ],
     legacyParentTypeId: "business-plan",
     legacyCatalogLabels: ["Business Plan"],
@@ -248,7 +250,7 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
     recommendedBoardRoles: [],
     builderType: "multi-asset-workspace",
     route: "create/uwe/facebook_community",
-    lifecycleStatus: "needs-audit",
+    lifecycleStatus: "testing",
     priority: "release-essential",
     ...UNVERIFIED,
     owner: "universal-work-engine",
@@ -258,8 +260,8 @@ export const CREATION_REGISTRY_SEED_ITEMS: readonly CreationRegistryItem[] = [
     ],
     implementationNotes: ["Legacy Browse parent id: facebook-community."],
     auditNotes: [
-      "Audit: working-with-limitations; live registration tests; browser NOT_RUN.",
-      "Master inventory starting status: Needs audit.",
+      "2026-07-23 guided cert: jsdom integration pack pass; founder/browser NOT_RUN.",
+      "Project bridge is explicit (never auto-convert).",
     ],
     legacyParentTypeId: "facebook-community",
     legacyCatalogLabels: ["Facebook Community"],
