@@ -8,7 +8,7 @@
  * (+ Welcome Home return control last in the menu chrome)
  *
  * Build = create / projects / maps / gallery.
- * Guidance = Chamber · Board · Strategies.
+ * Guidance = Chamber · Board · Strategy Chamber.
  * Focus = clarity tools + Focus Library (sessions, blocking, body double, timers).
  * Reflection = Journal · Evidence Vault · Hall of Accomplishments.
  * Audio = Peaceful Moments + Soundscapes only.
@@ -196,7 +196,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
       },
       {
         id: "strategy-library",
-        label: "Strategies",
+        label: "Strategy Chamber",
         supportLine: "Choose a direction with enough calm that the next step feels clear.",
       },
     ],

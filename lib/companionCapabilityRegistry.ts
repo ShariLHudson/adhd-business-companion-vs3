@@ -158,7 +158,7 @@ const STANDARD_OUTCOMES: CapabilityOutcomeSignal[] = [
 ];
 
 const PERMISSION =
-  "Want to stay in chat, or open this beside us? I'll stay with you either way.";
+  "Want to stay in conversation, or open this so we can work on it together? I'll stay with you either way.";
 
 function workspaceEntry(
   partial: Omit<
@@ -298,7 +298,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
     whyItHelps:
       "Clear My Mind unloads everything visually without organizing yet — reduces overwhelm.",
     offerTemplate: (label) =>
-      `It sounds like you're carrying a lot mentally. **${label}** was built for this — get everything out without fixing it all at once.\n\nWould you like to stay in chat, or move into **${label}** beside us?`,
+      `It sounds like you're carrying a lot mentally. **${label}** was built for this — get everything out without fixing it all at once.\n\nWould you like to stay in conversation, or move into **${label}**?`,
     firstStepHint: "Capture one cluster of thoughts — no sorting required.",
   }),
   workspaceEntry({
@@ -326,7 +326,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
     whyItHelps:
       "Decision Compass walks options step by step — without a pros-and-cons lecture in chat.",
     offerTemplate: (label) =>
-      `When a decision feels stuck, lists in chat usually add noise. **${label}** helps you think it through visually.\n\nWant to stay here, or open **${label}** beside us?`,
+      `When a decision feels stuck, lists in chat usually add noise. **${label}** helps you think it through visually.\n\nWant to stay here, or open **${label}**?`,
     firstStepHint: "Name the decision in one sentence — options come next.",
   }),
   workspaceEntry({
@@ -379,7 +379,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
     contextContract: { ...CONTEXT_WORKSPACE, energyLevel: true },
     whyItHelps: "Today's Reality retunes the plan to real energy — without guilt or a full replan.",
     offerTemplate: (label) =>
-      `Today isn't matching how you expected to feel. **${label}** helps update reality without starting over.\n\nOpen **${label}** beside us, or stay in chat?`,
+      `Today isn't matching how you expected to feel. **${label}** helps update reality without starting over.\n\nOpen **${label}**, or stay in conversation?`,
     firstStepHint: "Name what changed about today's energy — one honest line.",
   }),
   workspaceEntry({
@@ -408,7 +408,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
     whyItHelps:
       "Create builds content in context with your audience — not generic idea lists.",
     offerTemplate: (label) =>
-      `Content lands better in context. **${label}** can brainstorm and draft with your audience in mind.\n\nStay in chat, or open **${label}** beside us?`,
+      `Content lands better in context. **${label}** can brainstorm and draft with your audience in mind.\n\nStay in conversation, or open **${label}**?`,
     firstStepHint: "Pick one format and one audience — draft the hook line.",
   }),
   workspaceEntry({
@@ -463,7 +463,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
   }),
   workspaceEntry({
     id: "strategies",
-    name: "Strategies",
+    name: "Strategy Chamber",
     category: "knowledge_ecosystem",
     status: "production",
     ownerModule: "lib/strategySystem.ts",
@@ -610,7 +610,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
     category: "communication_ecosystem",
     status: "partial",
     ownerModule: "app/api/google/",
-    appSection: "google-workspace",
+    appSection: "calendar",
     interventionBucket: "workspace_open",
     intentPatterns: [/\b(?:my calendar|schedule (?:a |the )?meeting|google calendar|what'?s on today)\b/i],
     needMapping: {
@@ -934,7 +934,7 @@ export function capabilityRoutingHintForChat(text: string): string | null {
     return [
       `CAPABILITY REGISTRY (workspace): **${workspace.featureLabel}** [${workspace.section}]`,
       workspace.whyItHelps,
-      "Permission-first: stay in chat or open beside chat. Pass context. First step inside the feature.",
+      "Permission-first: stay in conversation or open the feature. Pass context. First step inside the feature.",
     ].join(" ");
   }
 

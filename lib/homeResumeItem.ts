@@ -44,7 +44,9 @@ export function homeResumeFromContinuityItem(
 
 function continuityToHomeResume(item: ContinuityManifestItem): HomeResumeItem {
   const kind: HomeResumeItemKind =
-    item.type === "create-draft" || item.type === "create-saved-for-later"
+    item.type === "create-draft" ||
+    item.type === "create-saved-for-later" ||
+    item.type === "active-creation"
       ? "create"
       : item.type === "workspace-sop"
         ? "workspace"
@@ -79,12 +81,15 @@ function continuityToHomeResume(item: ContinuityManifestItem): HomeResumeItem {
 
 function resumeTypeLabel(type: ContinuityManifestItem["type"]): string {
   switch (type) {
+    case "active-creation":
+      // 073 — type metadata only; card title is the human-readable work name
+      return "In progress";
     case "visual-focus-map":
       return "Visual Thinking";
     case "decision-compass":
       return "Decision Compass";
     case "strategy-apply":
-      return "Strategies";
+      return "Strategy Chamber";
     case "project":
       return "Projects";
     case "workspace-sop":
@@ -120,8 +125,8 @@ export function homeResumeItemFromActivityId(
       kind: "decision-compass",
       title: activity.title,
       typeLabel: "Decision Compass",
-      lastAction: "Pick up your Decision Compass beside chat",
-      nextStep: "Pick up your Decision Compass beside chat",
+      lastAction: "Pick up your Decision Compass",
+      nextStep: "Pick up your Decision Compass",
       ts: updatedAt,
       activityId: "decision-compass",
     };

@@ -45,7 +45,7 @@ export const HOMESTEAD_OTHER_DROPDOWN_ITEMS: readonly HomesteadSignpostItem[] = 
     objectId: "welcome-room",
   },
   { id: "how-do-i", label: "How Do I?", tier: "knowledge", objectId: "help" },
-  { id: "playbook", label: "Strategies", tier: "knowledge", objectId: "playbook" },
+  { id: "playbook", label: "Strategy Chamber", tier: "knowledge", objectId: "playbook" },
   {
     id: "visual-thinking",
     label: "Visual Thinking",

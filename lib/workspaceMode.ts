@@ -1,9 +1,9 @@
 // Workspace Mode — the brain. Decides when "doing" beats "talking" and which
-// surface should open BESIDE chat (collaborative action) vs. take over the
+// surface should open as Current Focus (collaborative action) vs. take over the
 // screen (standalone). Pure logic, no UI — page.tsx wires the layout to this.
 //
-// Principle: Chat + Doing, not Chat → Tool → Chat → Tool. The conversation
-// stays alive while the work happens.
+// Principle: One experience — conversation continues inside the workspace.
+// Dual split (chat left / work right) is retired.
 //
 // Mixed messages ("create a workshop but I'm exhausted") → validate emotion
 // first, then offer workspace — never let emotional tools erase concrete work.
@@ -79,12 +79,12 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "google-workspace": "Google Workspace",
   "templates-library": "Templates",
   "saved-work": "Created Content",
-  playbook: "Strategies",
+  playbook: "Strategy Chamber",
   "how-do-i": "How Do I",
   "momentum-institute": "Chamber of Momentum",
   "chamber-of-momentum": "Chamber of Momentum",
   "chamber-project-entry": "Chamber of Momentum",
-  "project-homes": "Project Homes",
+  "project-homes": "Projects",
   "brain-dump": "Clear My Mind",
   "time-block": "Calendar",
   "email-generator": "Email",
@@ -237,7 +237,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
   if (catalog?.route) {
     return {
       section: catalog.route,
-      buttonLabel: "Open & Keep Chatting",
+      buttonLabel: "Open Workspace",
       topic: catalog.route,
       topicLabel: workspaceTitle(catalog.route),
     };
@@ -245,7 +245,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
   if (catalog?.type) {
     return {
       section: "content-generator",
-      buttonLabel: "Open Create",
+      buttonLabel: "Let's Create",
       topic: catalog.type.toLowerCase(),
       topicLabel: catalog.type,
     };
@@ -291,7 +291,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
       )?.[1] ?? "template";
     return {
       section: "templates-library",
-      buttonLabel: "Open Template & Keep Chatting",
+      buttonLabel: "Open Template",
       topic,
       topicLabel: topic,
     };
@@ -357,18 +357,18 @@ function buildOfferLine(target: WorkspaceTarget, mixed: boolean): string {
       return "I can open a template and we'll work through it together — want to?";
     }
     if (target.section === "time-block") {
-      return "Want to open the planner and map it out side-by-side?";
+      return "Want to open the planner and map it out together?";
     }
     if (target.section === "brain-dump") {
       return multiItemWorkspaceOfferLine("brain-dump");
     }
-    return "Would it help if we worked on that together, side-by-side?";
+    return "Would it help if we worked on that together in the workspace?";
   }
 
   if (target.topic === "workshop") {
     return (
-      "This workshop feels big, and your energy is low. We don't need to figure it all out in chat. " +
-      "I can open a Workshop Builder and walk you through one small field at a time. " +
+      "This workshop feels big, and your energy is low. " +
+      "I can open your workshop workspace and walk you through one small field at a time. " +
       "Would you like to build it together?"
     );
   }
@@ -380,7 +380,7 @@ function buildOfferLine(target: WorkspaceTarget, mixed: boolean): string {
 
   return (
     `It sounds like ${feelsBig} and your energy is low. Let's make it smaller. ` +
-    `Would it help if I opened this beside our chat so we can work on it together, one piece at a time?`
+    `Would it help if we stepped into the workspace together, one piece at a time?`
   );
 }
 
@@ -423,8 +423,8 @@ export function buildWorkspaceOfferChatReply(
   const mixed = hasEmotionalBarrier(userText);
   if (mixed && offer.section === "projects" && /\bworkshop\b/i.test(userText)) {
     return (
-      "This workshop feels big, and your energy is low. We don't need to figure it all out in chat. " +
-      "I can open a Workshop Builder and walk you through one small field at a time.\n\n" +
+      "This workshop feels big, and your energy is low. " +
+      "I can open your workshop workspace and walk you through one small field at a time.\n\n" +
       "Would you like to build it together?"
     );
   }
@@ -434,7 +434,7 @@ export function buildWorkspaceOfferChatReply(
   if (offer.section === "projects" && /\bworkshop\b/i.test(userText)) {
     return (
       "This sounds like something we can build together. " +
-      "Would you like me to open Workshop Builder and walk through it one step at a time?"
+      "Would you like me to open your workshop workspace and walk through it one step at a time?"
     );
   }
   return `${offer.line}`;
@@ -446,7 +446,8 @@ export function workspaceOfferHintForChat(offer: WorkspaceOffer): string {
     `WORKSPACE OFFER (handled in UI — do NOT name buttons): ` +
     `A "${offer.buttonLabel}" option will appear below your reply. ` +
     `Validate how they feel in 1–2 warm sentences ONLY. ` +
-    `Then offer working side-by-side in the workspace — do NOT suggest jotting down, brainstorming, writing one idea, or any generic small step in chat. ` +
+    `Then invite them into the living workspace together (066 — never promise dual split layout). ` +
+    `Do NOT suggest jotting down, brainstorming, writing one idea, or any generic small step in chat. ` +
     `Do NOT give competing instructions before the workspace offer. ` +
     `If CURRENT WORKSPACE is already provided above, do NOT offer to open it — guide what is on screen.`
   );

@@ -14,7 +14,7 @@ type Props = {
 } & Omit<StrategiesPanelProps, "presentation" | "registerBack">;
 
 /**
- * Get Advice → Strategy Library as a Spark Estate destination.
+ * Guidance → Strategy Chamber (destination id: strategy-library).
  * Owns room shell, dismiss contract, and estate presentation flag.
  * StrategiesPanel owns inward Back (detail → list → home → exit).
  */

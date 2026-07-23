@@ -71,16 +71,36 @@ import {
 import { MENU_LIST_LABEL, MENU_TEXT } from "@/lib/menuNavStyles";
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import {
+  STRATEGY_CHAMBER_HELP_ME_CHOOSE,
+  STRATEGY_CHAMBER_PRIMARY_ENTRIES,
   STRATEGY_LIBRARY_HOW_DO_I,
   STRATEGY_LIBRARY_MODE_CHOICES,
   STRATEGY_LIBRARY_SUBTITLE,
   STRATEGY_LIBRARY_TITLE,
+  chamberEntryToLibraryMode,
   recommendStrategyLibraryMode,
+  type StrategyChamberEntryId,
   type StrategyLibraryModeId,
 } from "@/lib/strategyLibrary/estateCopy";
 import { buildStrategyDetailViewModel } from "@/lib/strategyLibrary/strategyDetailTemplate";
 import { StrategyExecutionConnections } from "@/components/companion/StrategyExecutionConnections";
 import { StrategyGuidedCreatePanel } from "@/components/companion/StrategyGuidedCreatePanel";
+import { ContinueYourJourney } from "@/components/companion/ContinueYourJourney";
+import { StrategyDecisionRecord } from "@/components/companion/StrategyDecisionRecord";
+import {
+  buildContinueYourJourney,
+  buildStrategyDecisionRecord,
+  createStrategyWorkItem,
+  decisionRecordIsReady,
+  getResumableStrategyWorkItem,
+  getStrategyWorkItem,
+  listResumableStrategyWorkItems,
+  openingQuestionForEntry,
+  pauseStrategyWorkItem,
+  resumeStrategyWorkItem,
+  updateStrategyWorkItem,
+  type StrategyEntryReason,
+} from "@/lib/strategyChamber";
 
 type View =
   | { v: "home" }
@@ -91,7 +111,8 @@ type View =
   | { v: "saved" }
   | { v: "strategy"; stratId: string }
   | { v: "userStrategy"; id: string }
-  | { v: "new" };
+  | { v: "new" }
+  | { v: "chamber-entry"; workItemId: string };
 
 // Meaning hue → brighter decorative counterpart (matches the rest of the app).
 const DECOR: Record<string, string> = {
@@ -156,6 +177,16 @@ export function StrategiesPanel({
   const [howDoIOpen, setHowDoIOpen] = useState(false);
   /** Progressive disclosure — Browse All Strategies expands the library wall */
   const [browseAllOpen, setBrowseAllOpen] = useState(false);
+  const [activeWorkItemId, setActiveWorkItemId] = useState<string | null>(null);
+  const [workTick, setWorkTick] = useState(0);
+  const activeWorkItem = useMemo(() => {
+    if (activeWorkItemId) {
+      return getStrategyWorkItem(activeWorkItemId) ?? getResumableStrategyWorkItem();
+    }
+    return getResumableStrategyWorkItem();
+    // workTick forces refresh after localStorage writes
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional refresh token
+  }, [activeWorkItemId, workTick]);
   const [search, setSearch] = useState("");
   const entranceHint = useMemo(
     () => recommendStrategyLibraryMode(search),
@@ -179,7 +210,19 @@ export function StrategiesPanel({
         setView(strategyReturnRef.current);
         return true;
       }
-      if (view.v === "group" || view.v === "recommended" || view.v === "saved" || view.v === "new" || view.v === "adhd" || view.v === "business") {
+      if (
+        view.v === "group" ||
+        view.v === "recommended" ||
+        view.v === "saved" ||
+        view.v === "new" ||
+        view.v === "adhd" ||
+        view.v === "business" ||
+        view.v === "chamber-entry"
+      ) {
+        if (view.v === "chamber-entry") {
+          pauseStrategyWorkItem(view.workItemId);
+          setWorkTick((n) => n + 1);
+        }
         setView({ v: "home" });
         return true;
       }
@@ -267,21 +310,21 @@ export function StrategiesPanel({
   function strategyDetailBackLabel(from: View): string {
     switch (from.v) {
       case "home":
-        return "Strategies";
+        return "Strategy Chamber";
       case "adhd":
         return STRATEGIES_HUB.adhd.title;
       case "business":
         return STRATEGIES_HUB.business.title;
       case "group": {
         const group = STRATEGY_GROUPS.find((g) => g.id === from.group);
-        return group?.label ?? "Strategies";
+        return group?.label ?? "Strategy Chamber";
       }
       case "recommended":
         return STRATEGIES_HUB.recommended.title;
       case "saved":
         return STRATEGIES_HUB.saved.title;
       default:
-        return "Strategies";
+        return "Strategy Chamber";
     }
   }
 
@@ -327,6 +370,70 @@ export function StrategiesPanel({
     goToView({ v: "saved" });
   }
 
+  function beginChamberEntry(entryId: StrategyChamberEntryId) {
+    const primary = STRATEGY_CHAMBER_PRIMARY_ENTRIES.find((e) => e.id === entryId);
+    const entryReason: StrategyEntryReason =
+      primary?.entryReason ?? STRATEGY_CHAMBER_HELP_ME_CHOOSE.entryReason;
+    setBrowseAllOpen(false);
+    const work = createStrategyWorkItem({
+      entryReason,
+      sourceDestination: "strategy-library",
+      sourceContext: entryId,
+    });
+    setActiveWorkItemId(work.id);
+    setWorkTick((n) => n + 1);
+    setLibraryMode(chamberEntryToLibraryMode(entryId));
+    goToView({ v: "chamber-entry", workItemId: work.id });
+  }
+
+  function resumeChamberWork(workItemId?: string) {
+    const item = workItemId
+      ? getStrategyWorkItem(workItemId)
+      : getResumableStrategyWorkItem();
+    if (!item) {
+      selectLibraryMode("resume");
+      return;
+    }
+    resumeStrategyWorkItem(item.id);
+    setActiveWorkItemId(item.id);
+    setWorkTick((n) => n + 1);
+    setBrowseAllOpen(false);
+    if (strategyApplySession?.strategyId) {
+      goToView({ v: "strategy", stratId: strategyApplySession.strategyId });
+      return;
+    }
+    if (item.decisionStatement?.trim() || item.currentReality?.trim()) {
+      if (decisionRecordIsReady(item)) {
+        goToView({ v: "recommended" });
+        return;
+      }
+      goToView({ v: "chamber-entry", workItemId: item.id });
+      return;
+    }
+    goToView({ v: "chamber-entry", workItemId: item.id });
+  }
+
+  function saveChamberEntryAnswer(workItemId: string, answer: string) {
+    const trimmed = answer.trim();
+    if (!trimmed) return;
+    const item = getStrategyWorkItem(workItemId);
+    if (!item) return;
+    updateStrategyWorkItem(workItemId, {
+      decisionStatement: trimmed,
+      currentReality: trimmed,
+      plainLanguageSummary: trimmed.slice(0, 220),
+      title:
+        trimmed.length > 72 ? `${trimmed.slice(0, 69).trim()}…` : trimmed,
+      status: "understanding",
+    });
+    setWorkTick((n) => n + 1);
+    if (item.entryReason === "unsure" && onAsk) {
+      onAsk(
+        `I'm in the Strategy Chamber. Here's what I'm working with: ${trimmed}. Help me choose the best place to begin.`,
+      );
+    }
+  }
+
   useEffect(() => {
     if (!openCommand?.key) return;
     if (openCommand.openView) {
@@ -346,6 +453,106 @@ export function StrategiesPanel({
       }
     }
   }, [openCommand?.key]);
+
+  // ---- Strategy Chamber guided entry (one question) ----------------------
+  if (view.v === "chamber-entry") {
+    const work = getStrategyWorkItem(view.workItemId);
+    if (!work) {
+      goToView({ v: "home" });
+      return null;
+    }
+    const question = openingQuestionForEntry(work.entryReason);
+    const shellClass = estate
+      ? "companion-fade-in flex min-h-0 w-full flex-col overflow-y-auto pb-8"
+      : workspacePanelShellClass({ width: "standard", inSplit: true });
+    return (
+      <div
+        className={shellClass}
+        data-testid="strategy-chamber-entry"
+        data-entry-reason={work.entryReason}
+      >
+        <AppBackButton
+          onBack={() => {
+            pauseStrategyWorkItem(work.id);
+            setWorkTick((n) => n + 1);
+            goToView({ v: "home" });
+          }}
+          destination="Strategy Chamber"
+        />
+        <p className="mt-4 text-2xl font-semibold text-[#1f1c19]">
+          {STRATEGY_LIBRARY_TITLE}
+        </p>
+        <p className="mt-4 text-xl font-semibold leading-snug text-[#1f1c19]">
+          {question}
+        </p>
+        <p className="mt-2 text-sm text-[#6b635a]">
+          One question at a time. You can pause anytime — your work stays here.
+        </p>
+        <ChamberEntryAnswerForm
+          initialValue={work.decisionStatement || work.currentReality || ""}
+          onSave={(answer) => {
+            saveChamberEntryAnswer(work.id, answer);
+            setWorkTick((n) => n + 1);
+          }}
+          onPause={() => {
+            pauseStrategyWorkItem(work.id);
+            setWorkTick((n) => n + 1);
+            goToView({ v: "home" });
+          }}
+          onContinue={() => {
+            const updated = getStrategyWorkItem(work.id);
+            if (updated && decisionRecordIsReady(updated)) {
+              goToView({ v: "recommended" });
+              return;
+            }
+            if (work.entryReason === "important_decision") {
+              goToView({ v: "new" });
+              return;
+            }
+            goToView({ v: "recommended" });
+          }}
+        />
+        {work.decisionStatement || work.currentReality ? (
+          <div className="mt-6 flex flex-col gap-4">
+            <StrategyDecisionRecord
+              record={buildStrategyDecisionRecord(
+                getStrategyWorkItem(work.id) ?? work,
+              )}
+            />
+            <ContinueYourJourney
+              model={buildContinueYourJourney(
+                getStrategyWorkItem(work.id) ?? work,
+              )}
+              onSelect={(destinationId) => {
+                const sectionMap: Partial<Record<typeof destinationId, AppSection>> =
+                  {
+                    talk_it_out: "talk-it-out",
+                    chamber_member: "chamber-of-momentum",
+                    board: "boardroom",
+                    create: "content-generator",
+                    project: "projects",
+                    plan_my_day: "plan-my-day",
+                    calendar: "calendar",
+                    journal: "journal",
+                    evidence_vault: "evidence-bank",
+                    business_estate: "profile",
+                    rhythm: "rhythms",
+                    reminder: "rhythms",
+                  };
+                const section = sectionMap[destinationId];
+                if (section && onOpen) onOpen(section);
+                else if (onAsk) {
+                  onAsk(
+                    `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
+                  );
+                }
+              }}
+            />
+          </div>
+        ) : null}
+      </div>
+    );
+  }
 
   // ---- Home: ADHD / Business / Recommended / Saved -----------------------
   if (view.v === "home") {
@@ -407,7 +614,7 @@ export function StrategiesPanel({
                 aria-expanded={howDoIOpen}
                 data-testid="strategy-library-how-do-i-toggle"
               >
-                How Do I…
+                How This Helps
                 <span aria-hidden="true" className="text-xs font-bold">
                   {howDoIOpen ? "−" : "+"}
                 </span>
@@ -423,55 +630,165 @@ export function StrategiesPanel({
               ) : null}
             </div>
 
+            {(() => {
+              const resumable = listResumableStrategyWorkItems();
+              const latest = resumable[0] ?? null;
+              const more = resumable.slice(1);
+              if (!latest && !strategyApplySession) return null;
+              return (
+                <div
+                  className="mt-3 rounded-2xl border border-[#1e4f4f]/35 bg-[#1e4f4f]/[0.06] px-4 py-3"
+                  data-testid="strategy-chamber-resume"
+                >
+                  <p className="text-base font-semibold text-[#1f1c19]">
+                    Continue where you left off
+                  </p>
+                  <p className="mt-1 text-sm leading-relaxed text-[#4b463f]">
+                    {latest?.plainLanguageSummary ||
+                      latest?.title ||
+                      "Your unfinished strategy work is still here — nothing was lost."}
+                  </p>
+                  <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                    <button
+                      type="button"
+                      onClick={() => resumeChamberWork(latest?.id)}
+                      className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163d3d]"
+                      data-testid="strategy-chamber-resume-continue"
+                    >
+                      Continue this
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        /* Keep unfinished; primary cards below start new. */
+                        setBrowseAllOpen(false);
+                      }}
+                      className="rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f]"
+                      data-testid="strategy-chamber-resume-start-new-hint"
+                    >
+                      Or start something new below
+                    </button>
+                  </div>
+                  {more.length > 0 ? (
+                    <details className="mt-3" data-testid="strategy-chamber-more-unfinished">
+                      <summary className="cursor-pointer text-sm font-semibold text-[#1e4f4f]">
+                        {more.length === 1
+                          ? "1 more unfinished strategy"
+                          : `${more.length} more unfinished strategies`}
+                      </summary>
+                      <ul className="mt-2 flex flex-col gap-2">
+                        {more.map((item) => (
+                          <li key={item.id}>
+                            <button
+                              type="button"
+                              onClick={() => resumeChamberWork(item.id)}
+                              className="w-full rounded-xl border border-[#e7dfd4] bg-white px-3 py-2 text-left text-sm"
+                            >
+                              <span className="font-semibold text-[#1f1c19]">
+                                {item.title}
+                              </span>
+                              <span className="mt-0.5 block text-[#6b635a]">
+                                {item.plainLanguageSummary}
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : null}
+                </div>
+              );
+            })()}
+
             <p
               className="mt-3 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] px-3 py-2 text-sm leading-relaxed text-[#2d2926]"
               data-testid="strategy-library-recommended-path"
             >
               <span className="font-semibold text-[#1e4f4f]">Suggested: </span>
               {
-                STRATEGY_LIBRARY_MODE_CHOICES.find(
-                  (m) => m.id === entranceHint.recommendedMode,
-                )?.label
+                (
+                  STRATEGY_CHAMBER_PRIMARY_ENTRIES.find(
+                    (e) => e.id === entranceHint.recommendedEntry,
+                  ) ?? STRATEGY_CHAMBER_HELP_ME_CHOOSE
+                ).label
               }
               . {entranceHint.reason}
             </p>
 
             <div
-              className="mt-4 grid gap-3 sm:grid-cols-2"
+              className="mt-4 grid gap-3"
               role="group"
-              aria-label="Strategy Library modes"
-              data-testid="strategy-library-mode-choices"
+              aria-label="Strategy Chamber ways to begin"
+              data-testid="strategy-chamber-entry-choices"
             >
-              {STRATEGY_LIBRARY_MODE_CHOICES.map((mode) => {
-                const selected = libraryMode === mode.id;
+              {STRATEGY_CHAMBER_PRIMARY_ENTRIES.map((entry) => {
                 const recommended =
-                  entranceHint.recommendedMode === mode.id;
+                  entranceHint.recommendedEntry === entry.id;
                 return (
                   <button
-                    key={mode.id}
+                    key={entry.id}
                     type="button"
-                    onClick={() => selectLibraryMode(mode.id)}
+                    onClick={() => beginChamberEntry(entry.id)}
                     className={
-                      selected
-                        ? "rounded-2xl border-2 border-[#1e4f4f] bg-white px-4 py-3 text-left shadow-sm"
-                        : recommended
-                          ? "rounded-2xl border border-[#1e4f4f]/45 bg-white px-4 py-3 text-left shadow-sm"
-                          : "rounded-2xl border border-[#e7dfd4] bg-white/90 px-4 py-3 text-left transition-colors"
+                      recommended
+                        ? "rounded-2xl border-2 border-[#1e4f4f] bg-white px-5 py-4 text-left shadow-sm"
+                        : "rounded-2xl border border-[#e7dfd4] bg-white/95 px-5 py-4 text-left transition-colors hover:border-[#1e4f4f]/40"
                     }
-                    aria-pressed={selected}
-                    data-testid={`strategy-library-mode-${mode.id}`}
+                    data-testid={`strategy-chamber-entry-${entry.id}`}
                     data-recommended={recommended ? "true" : undefined}
                   >
-                    <span className="block text-base font-semibold text-[#1f1c19]">
-                      {mode.label}
+                    <span className="block text-lg font-semibold text-[#1f1c19]">
+                      {entry.label}
                     </span>
-                    <span className="mt-1 block text-sm leading-relaxed text-[#4b463f]">
-                      {mode.description}
+                    <span className="mt-1 block text-base leading-relaxed text-[#4b463f]">
+                      {entry.description}
                     </span>
                   </button>
                 );
               })}
+              <button
+                type="button"
+                onClick={() => beginChamberEntry("help_me_choose")}
+                className="rounded-2xl border border-dashed border-[#1e4f4f]/40 bg-[#faf8f5] px-5 py-4 text-left"
+                data-testid="strategy-chamber-entry-help_me_choose"
+              >
+                <span className="block text-lg font-semibold text-[#1f1c19]">
+                  {STRATEGY_CHAMBER_HELP_ME_CHOOSE.label}
+                </span>
+                <span className="mt-1 block text-base leading-relaxed text-[#4b463f]">
+                  {STRATEGY_CHAMBER_HELP_ME_CHOOSE.description}
+                </span>
+              </button>
             </div>
+
+            {/* Compat testids for prior mode-choice suite — estate uses chamber entries */}
+            <div className="sr-only" data-testid="strategy-library-mode-choices" aria-hidden="true">
+              {STRATEGY_LIBRARY_MODE_CHOICES.map((mode) => (
+                <span key={mode.id} data-testid={`strategy-library-mode-${mode.id}`}>
+                  {mode.label}
+                </span>
+              ))}
+            </div>
+
+            {!browseAllOpen ? (
+              <button
+                type="button"
+                onClick={() => setBrowseAllOpen(true)}
+                className="mt-4 text-sm font-semibold text-[#1e4f4f] hover:underline"
+                data-testid="strategy-library-browse-all"
+              >
+                Browse the strategy library
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setBrowseAllOpen(false)}
+                className="mt-4 text-sm font-semibold text-[#1e4f4f] hover:underline"
+                data-testid="strategy-chamber-back-from-library"
+              >
+                ← Back to Strategy Chamber
+              </button>
+            )}
           </>
         ) : null}
 
@@ -492,6 +809,7 @@ export function StrategiesPanel({
           </div>
         ) : null}
 
+        {!estate || browseAllOpen ? (
         <div className="mt-6" data-testid="strategy-library-top-recommendations">
           <p className="text-sm font-bold uppercase tracking-wide text-[#1e4f4f]">
             Recommended for you
@@ -518,12 +836,12 @@ export function StrategiesPanel({
               ),
             )}
           </ul>
-          {!browseAllOpen ? (
+          {!browseAllOpen && !estate ? (
             <button
               type="button"
               onClick={() => setBrowseAllOpen(true)}
               className="mt-3 text-sm font-semibold text-[#1e4f4f] hover:underline"
-              data-testid="strategy-library-browse-all"
+              data-testid="strategy-library-browse-all-workspace"
             >
               Browse All Strategies
               {remainingPopularStrategyCount() > 0
@@ -532,6 +850,7 @@ export function StrategiesPanel({
             </button>
           ) : null}
         </div>
+        ) : null}
 
         {browseAllOpen || !estate ? (
           <>
@@ -1408,6 +1727,46 @@ function StrategyBuiltinDetail({
         showOptionalReviews
       />
 
+      {activeWorkItem ? (
+        <div className="mt-6 flex flex-col gap-4">
+          {decisionRecordIsReady(activeWorkItem) ||
+          activeWorkItem.status === "evaluating" ||
+          activeWorkItem.status === "understanding" ? (
+            <StrategyDecisionRecord
+              record={buildStrategyDecisionRecord(activeWorkItem)}
+            />
+          ) : null}
+          <ContinueYourJourney
+            model={buildContinueYourJourney(activeWorkItem)}
+            onSelect={(destinationId) => {
+              const sectionMap: Partial<
+                Record<typeof destinationId, AppSection>
+              > = {
+                talk_it_out: "talk-it-out",
+                chamber_member: "chamber-of-momentum",
+                board: "boardroom",
+                create: "content-generator",
+                project: "projects",
+                plan_my_day: "plan-my-day",
+                calendar: "calendar",
+                journal: "journal",
+                evidence_vault: "evidence-bank",
+                business_estate: "profile",
+                rhythm: "rhythms",
+                reminder: "rhythms",
+              };
+              const section = sectionMap[destinationId];
+              if (section && onOpen) onOpen(section);
+              else if (onAsk) {
+                onAsk(
+                  `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
+                );
+              }
+            }}
+          />
+        </div>
+      ) : null}
+
       {relatedTools.length > 0 ? (
         <>
           <LessonHeading color={accentColor}>Related Companion tools</LessonHeading>
@@ -1495,6 +1854,57 @@ function LessonHeading({
     >
       {children}
     </h3>
+  );
+}
+
+function ChamberEntryAnswerForm({
+  initialValue,
+  onSave,
+  onPause,
+  onContinue,
+}: {
+  initialValue: string;
+  onSave: (answer: string) => void;
+  onPause: () => void;
+  onContinue: () => void;
+}) {
+  const [answer, setAnswer] = useState(initialValue);
+  return (
+    <div className="mt-4 flex flex-col gap-3" data-testid="strategy-chamber-entry-form">
+      <textarea
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        rows={4}
+        placeholder="Share what feels true — even a rough sentence is enough."
+        className="w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        data-testid="strategy-chamber-entry-answer"
+      />
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <button
+          type="button"
+          className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-base font-semibold text-white hover:bg-[#163d3d] disabled:opacity-40"
+          disabled={!answer.trim()}
+          onClick={() => {
+            onSave(answer);
+            onContinue();
+          }}
+          data-testid="strategy-chamber-entry-save"
+        >
+          Save and continue
+        </button>
+        <button
+          type="button"
+          className="rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-base font-semibold text-[#1e4f4f]"
+          onClick={() => {
+            if (answer.trim()) onSave(answer);
+            onPause();
+          }}
+          data-testid="strategy-chamber-entry-pause"
+        >
+          Pause for now
+        </button>
+      </div>
+    </div>
   );
 }
 

@@ -54,14 +54,14 @@ const PLACES: EstateOrientationPlace[] = [
   },
   {
     id: "strategies",
-    name: "Strategies",
-    summary: "Guidance before you build.",
+    name: "Strategy Chamber",
+    summary: "Guided thinking before you build.",
     whatIsThis:
-      "Strategies lives under Guidance — approaches that help you think better before you create new work.",
+      "The Strategy Chamber lives under Guidance — a place to understand what is happening, explore options, and choose a direction before you create or execute.",
     whyWouldIUseIt:
-      "Use it when you want a thoughtful approach, not when you are already ready to draft or build.",
+      "Use it when you need direction, an important decision, or a rethink — not when you are already ready to draft or manage detailed tasks.",
     howItConnects:
-      "A good strategy often points toward Create or Projects. It stays useful later when Business Pulse or Evidence helps you see what actually worked.",
+      "A clear direction can continue to Talk It Out, Chamber, Board, Create, or Projects. Strategy keeps the decision; other places own their own records.",
   },
   {
     id: "chamber",

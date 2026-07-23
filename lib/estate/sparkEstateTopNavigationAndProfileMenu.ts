@@ -54,7 +54,6 @@ export const SPARK_ESTATE_TOP_NAVIGATION_CONTROLS = [
 
 /** Experience Controls live under SH — documented here for the profile overlay. */
 export const SPARK_ESTATE_EXPERIENCE_CONTROL_ITEMS = [
-  { id: "conversation-visibility", label: "Show or Hide Conversation" },
   { id: "estate-sounds", label: "Estate Sounds" },
   { id: "shari-voice", label: "Shari Voice" },
   { id: "volume", label: "Volume" },
@@ -98,7 +97,7 @@ export const SPARK_ESTATE_ROOM_MENU_MY_STORY_ITEMS = REFLECT_FLAT.filter((d) =>
   (WELCOME_HOME_MY_STORY_DESTINATION_IDS as readonly string[]).includes(d.id),
 );
 
-/** Guidance = Chamber · Boardroom · Strategies. */
+/** Guidance = Chamber · Boardroom · Strategy Chamber. */
 export const SPARK_ESTATE_ROOM_MENU_KNOWLEDGE_ITEMS =
   WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "get-advice")!.destinations;
 

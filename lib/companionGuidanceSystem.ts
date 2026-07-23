@@ -44,7 +44,7 @@ Never ask "what's your audience?" if they already said who they help.`;
 
 export const CONTEXT_CONTINUITY_RULE = `CONTEXT CONTINUITY (mandatory):
 Remember the active workspace. Audience questions update Client Avatar; content discussion updates Create draft;
-strategy discussion updates the plan beside chat. Stay in context until the user switches.`;
+strategy discussion updates the plan here. Stay in context until the user switches.`;
 
 const RESEARCH_VERB_RE =
   /\b(?:help me understand|research|learn about|tell me about|who are|what do|understand my|figure out my|define my|map out my)\b/i;
@@ -86,9 +86,9 @@ const TEACHING_TO_WORKSPACE: {
   {
     re: /\b(?:marketing plan|go to market|content strategy)\b/i,
     section: "playbook",
-    workspaceLabel: "Strategies",
+    workspaceLabel: "Strategy Chamber",
     offer:
-      "Want to turn this into a **marketing plan** beside us in Strategies?",
+      "Want to turn this into a **marketing plan** in Strategies?",
   },
   {
     re: /\b(?:workshop|webinar|masterclass)\b/i,
@@ -102,7 +102,7 @@ const TEACHING_TO_WORKSPACE: {
     section: "content-generator",
     workspaceLabel: "Create",
     offer:
-      "Want to **draft this in Create** beside us as we go?",
+      "Want to **draft this in Create** as we go?",
   },
 ];
 
@@ -137,7 +137,7 @@ const COMPLETION_ACTIONS: Partial<
   ],
 };
 
-/** User is researching a topic that maps to a workspace — offer to open beside chat. */
+/** User is researching a topic that maps to a workspace — offer to open it. */
 export function detectResearchWorkspaceConnection(
   userText: string,
   activePanel: AppSection | null,
@@ -156,8 +156,8 @@ export function detectResearchWorkspaceConnection(
     return {
       section: "client-avatars",
       topic,
-      offerLine: `Much of this belongs in your **Client Avatar**. We have a builder beside chat — want me to open it and fill in what we discover as we go?`,
-      prefillOfferLine: `I've noted several pieces about ${topic} from our chat. Open **Client Avatar** beside us and I'll prefill what we know?`,
+      offerLine: `Much of this belongs in your **Client Avatar**. We have a builder — want me to open it and fill in what we discover as we go?`,
+      prefillOfferLine: `I've noted several pieces about ${topic} from our chat. Want me to open **Client Avatar** and prefill what we know?`,
     };
   }
 
@@ -166,9 +166,9 @@ export function detectResearchWorkspaceConnection(
       section: "projects",
       topic: "your workshop",
       offerLine:
-        "Workshop planning fits **Projects** beside us — want me to open it and capture what we figure out?",
+        "Workshop planning fits **Projects** — want me to open it and capture what we figure out?",
       prefillOfferLine:
-        "I can prefill your workshop plan from our conversation. Open **Projects** beside us?",
+        "I can prefill your workshop plan from our conversation. Want me to open **Projects**?",
     };
   }
 
@@ -177,9 +177,9 @@ export function detectResearchWorkspaceConnection(
       section: "playbook",
       topic: "your strategy",
       offerLine:
-        "Strategy work belongs in **Strategies** beside us — open it and build the plan as we talk?",
+        "Strategy work belongs in **Strategies** — want to open it and build the plan as we talk?",
       prefillOfferLine:
-        "I can prefill your strategy from our chat. Open **Strategies** beside us?",
+        "I can prefill your strategy from our chat. Want me to open **Strategies**?",
     };
   }
 
@@ -188,9 +188,9 @@ export function detectResearchWorkspaceConnection(
       section: "content-generator",
       topic: "your funnel",
       offerLine:
-        "Funnel work lives in **Create** beside us — want me to open a funnel draft and fill it as we go?",
+        "Funnel work lives in **Create** — want me to open a funnel draft and fill it as we go?",
       prefillOfferLine:
-        "I can start your funnel draft from what we've discussed. Open **Create** beside us?",
+        "I can start your funnel draft from what we've discussed. Want me to open **Create**?",
     };
   }
 
@@ -199,9 +199,9 @@ export function detectResearchWorkspaceConnection(
       section: "client-avatars",
       topic: catalog.type ?? "Client Avatar",
       offerLine:
-        "Let's open **Client Avatar** beside us and build this as we research.",
+        "Let's open **Client Avatar** and build this as we research.",
       prefillOfferLine:
-        "I'll prefill your avatar from our conversation. Open **Client Avatar** beside us?",
+        "I'll prefill your avatar from our conversation. Want me to open **Client Avatar**?",
     };
   }
 
@@ -214,8 +214,8 @@ export function detectResearchWorkspaceConnection(
     return {
       section: "content-generator",
       topic: catalog.type,
-      offerLine: `Let's open **Create** for your **${catalog.type}** beside us and build as we go.`,
-      prefillOfferLine: `I can prefill your **${catalog.type}** from our chat. Open **Create** beside us?`,
+      offerLine: `Let's open **Create** for your **${catalog.type}** and build as we go.`,
+      prefillOfferLine: `I can prefill your **${catalog.type}** from our chat. Want me to open **Create**?`,
     };
   }
 
@@ -313,13 +313,13 @@ export function learningToDoingHint(
       "LEARNING → DOING BRIDGE (mandatory after teaching this topic):",
       "Do not stop at education. After the teaching beat, offer ONE bridge:",
       entry.offer,
-      "If they agree, the app opens the workspace beside chat — keep coaching there.",
+      "If they agree, open the workspace and keep coaching there.",
     ].join("\n");
   }
   return null;
 }
 
-/** App feature how-to — explain briefly, offer to open beside chat, guide through use. */
+/** App feature how-to — explain briefly, offer to open it, guide through use. */
 export function toolTeachingHint(userText: string): string | null {
   const t = userText.trim();
   if (!/\b(?:how do i|how to|what is|what does|use the|spin the wheel)\b/i.test(t)) {
@@ -329,7 +329,7 @@ export function toolTeachingHint(userText: string): string | null {
     return [
       "TOOL TEACHING — SPIN THE WHEEL:",
       "Brief: helps when you're stuck or can't choose — chance picks one next step.",
-      'Offer: "Want me to open Spin The Wheel beside us?"',
+      'Offer: "Want me to open Spin The Wheel?"',
       "If yes: guide them to spin, then interpret the result and offer: do it now, break it smaller, save for later, or spin again.",
       "Keep chat visible — never make them hunt for the conversation.",
     ].join("\n");
@@ -337,7 +337,7 @@ export function toolTeachingHint(userText: string): string | null {
   return [
     "TOOL TEACHING (mandatory):",
     "1. Briefly explain what the tool does (1–2 sentences).",
-    "2. Offer to open it beside chat.",
+    "2. Offer to open it.",
     "3. If they agree: guide step by step, interpret results, suggest next step.",
     "Keep chat visible. Never leave them searching for the conversation.",
   ].join("\n");

@@ -50,7 +50,7 @@ const HELP_ARTICLE_ID: Partial<Record<WorkspaceHelpAreaId, string>> = {
 const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "brain-dump": "Clear My Mind",
   "content-generator": "Create",
-  playbook: "Strategies",
+  playbook: "Strategy Chamber",
   "templates-library": "Templates",
   settings: "Settings",
   "time-block": "Calendar",
@@ -79,7 +79,7 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "my-work":
     "Hub with Search Everything, Continue Working (favorites, recently active, resume items), and Browse My Work (Created Content, Projects, Snippets, Strategies, Templates, Archive).",
   "evidence-bank":
-    "Separate from Wins This Week — wins capture what happened; evidence captures why it mattered. Part of 🌱 Growth alongside My Highlights and My Journey.",
+    "Separate from Wins This Week — wins capture what happened; the Vault preserves discoveries about yourself, impact, and learning. Part of 🌱 Growth alongside My Highlights and My Journey.",
   "wins-this-week":
     "Companion to Evidence Vault and My Highlights — weekly encouragement without scorekeeping. Review via Growth Inbox on the Growth hub.",
   growth:
@@ -174,7 +174,7 @@ const LOCAL_GROWTH_HELP: Record<
     ],
     tips: [
       "Recognizing accomplishments is not ego — it is remembering reality when self-doubt appears.",
-      "Separate from Evidence Vault: highlights celebrate you; evidence captures impact.",
+      "Separate from Evidence Vault: highlights celebrate recognition; the Vault preserves private discoveries and learning.",
     ],
     relatedAreas:
       "Part of 🌱 Growth alongside Wins, Evidence Vault, and My Journey.",
@@ -196,7 +196,7 @@ const LOCAL_GROWTH_HELP: Record<
       "Preserve meaning — not a profile form.",
     ],
     relatedAreas:
-      "Distinct from Evidence Vault (impact) and My Highlights (accomplishments and recognition).",
+      "Distinct from Evidence Vault (private discoveries) and My Highlights (accomplishments and recognition).",
   },
 };
 
