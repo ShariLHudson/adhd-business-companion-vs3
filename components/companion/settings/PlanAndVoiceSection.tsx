@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { getPrefs, getVoiceStatus, type Plan } from "@/lib/companionStore";
+import { getCompanionSupabase } from "@/lib/supabase/companionClient";
 import {
   isCurrentVoicePlan,
   markVoicePlanPaymentPending,
@@ -12,12 +13,15 @@ import {
 } from "@/lib/voicePlans/voicePlanEntitlement";
 import {
   VOICE_PLAN_COPY,
-  paymentLinkForVoicePlan,
+  paymentLinkWithUserCorrelation,
 } from "@/lib/voicePlans/voicePlanOffers";
+import { refreshVoicePlanEntitlementFromServer } from "@/lib/voicePlans/voicePlanServerSync";
 
 type Props = {
   /** Optional override for tests. Defaults to prefs.plan. */
   plan?: Plan;
+  /** Test seam — skip network refresh. */
+  disableServerRefresh?: boolean;
 };
 
 function PlanCard(props: {
@@ -62,15 +66,20 @@ function PlanCard(props: {
   );
 }
 
-export function PlanAndVoiceSection({ plan: planProp }: Props) {
+export function PlanAndVoiceSection({
+  plan: planProp,
+  disableServerRefresh = false,
+}: Props) {
   const [entitlement, setEntitlement] = useState<VoicePlanEntitlementState>(
     () => resolveVoicePlanEntitlement(planProp ?? getPrefs().plan),
   );
   const [pendingPlan, setPendingPlan] = useState<
     "voice-lite" | "voice-pro" | null
   >(null);
+  const [confirmation, setConfirmation] = useState<string | null>(null);
+  const [softStatus, setSoftStatus] = useState<string | null>(null);
 
-  useEffect(() => {
+  const refreshLocal = useCallback(() => {
     const plan = planProp ?? getPrefs().plan;
     syncVoicePlanPendingWithEntitlement(plan);
     setEntitlement(resolveVoicePlanEntitlement(plan));
@@ -78,15 +87,67 @@ export function PlanAndVoiceSection({ plan: planProp }: Props) {
     setPendingPlan(pending?.plan ?? null);
   }, [planProp]);
 
+  const refreshFromServer = useCallback(async () => {
+    if (disableServerRefresh || planProp) {
+      refreshLocal();
+      return;
+    }
+    const result = await refreshVoicePlanEntitlementFromServer();
+    refreshLocal();
+    if (!result.ok) {
+      setSoftStatus(result.statusMessage);
+      return;
+    }
+    if (result.confirmationMessage) {
+      setConfirmation(result.confirmationMessage);
+      setSoftStatus(null);
+    }
+  }, [disableServerRefresh, planProp, refreshLocal]);
+
+  useEffect(() => {
+    void refreshFromServer();
+  }, [refreshFromServer]);
+
+  useEffect(() => {
+    if (disableServerRefresh || planProp) return;
+    const onFocus = () => {
+      void refreshFromServer();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        void refreshFromServer();
+      }
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [disableServerRefresh, planProp, refreshFromServer]);
+
   const vs = getVoiceStatus();
   const essentialCurrent = isCurrentVoicePlan(entitlement, "essential");
   const liteCurrent = isCurrentVoicePlan(entitlement, "voice-lite");
   const proCurrent = isCurrentVoicePlan(entitlement, "voice-pro");
 
-  function openPayment(plan: "voice-lite" | "voice-pro") {
-    const href = paymentLinkForVoicePlan(plan);
+  async function openPayment(plan: "voice-lite" | "voice-pro") {
+    let sparkUserId: string | null = null;
+    let email: string | null = null;
+    try {
+      const client = getCompanionSupabase();
+      const session = client ? (await client.auth.getSession()).data.session : null;
+      sparkUserId = session?.user?.id ?? null;
+      email = session?.user?.email ?? null;
+    } catch {
+      /* correlation optional */
+    }
+
+    const href = paymentLinkWithUserCorrelation(plan, { sparkUserId, email });
     markVoicePlanPaymentPending(plan);
     setPendingPlan(plan);
+    setConfirmation(null);
+    setSoftStatus(null);
     // Do not change prefs.plan — entitlement stays until verified payment.
     window.open(href, "_blank", "noopener,noreferrer");
   }
@@ -104,6 +165,26 @@ export function PlanAndVoiceSection({ plan: planProp }: Props) {
           data-testid="plan-and-voice-unknown"
         >
           {VOICE_PLAN_COPY.unableToDetermine}
+        </p>
+      ) : null}
+
+      {confirmation ? (
+        <p
+          className="mt-3 rounded-xl bg-[#e8f2f1] px-3 py-2 text-sm text-[#1e4f4f]"
+          role="status"
+          data-testid="plan-and-voice-confirmed"
+        >
+          {confirmation}
+        </p>
+      ) : null}
+
+      {softStatus ? (
+        <p
+          className="mt-3 rounded-xl bg-[#f3efe8] px-3 py-2 text-sm text-[#6b635a]"
+          role="status"
+          data-testid="plan-and-voice-verify-soft-fail"
+        >
+          {softStatus}
         </p>
       ) : null}
 
@@ -129,7 +210,7 @@ export function PlanAndVoiceSection({ plan: planProp }: Props) {
           {!liteCurrent && !proCurrent ? (
             <>
               <a
-                href={paymentLinkForVoicePlan("voice-lite")}
+                href={paymentLinkWithUserCorrelation("voice-lite", {})}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
@@ -137,7 +218,7 @@ export function PlanAndVoiceSection({ plan: planProp }: Props) {
                 aria-label={VOICE_PLAN_COPY.subscribeLiteAria}
                 onClick={(e) => {
                   e.preventDefault();
-                  openPayment("voice-lite");
+                  void openPayment("voice-lite");
                 }}
               >
                 {VOICE_PLAN_COPY.chooseLite}
@@ -164,7 +245,7 @@ export function PlanAndVoiceSection({ plan: planProp }: Props) {
           {!proCurrent ? (
             <>
               <a
-                href={paymentLinkForVoicePlan("voice-pro")}
+                href={paymentLinkWithUserCorrelation("voice-pro", {})}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-3 inline-flex min-h-12 items-center justify-center rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
@@ -172,7 +253,7 @@ export function PlanAndVoiceSection({ plan: planProp }: Props) {
                 aria-label={VOICE_PLAN_COPY.subscribeProAria}
                 onClick={(e) => {
                   e.preventDefault();
-                  openPayment("voice-pro");
+                  void openPayment("voice-pro");
                 }}
               >
                 {VOICE_PLAN_COPY.choosePro}

@@ -34,7 +34,9 @@ afterEach(() => {
 describe("PlanAndVoiceSection", () => {
   it("shows Essential Voice as included with no purchase link", () => {
     act(() => {
-      root.render(<PlanAndVoiceSection plan="essential" />);
+      root.render(
+        <PlanAndVoiceSection plan="essential" disableServerRefresh />,
+      );
     });
     expect(
       container.querySelector("[data-testid='voice-plan-essential-status']")
@@ -52,7 +54,9 @@ describe("PlanAndVoiceSection", () => {
 
   it("shows Voice Lite paid wording and exact payment link", () => {
     act(() => {
-      root.render(<PlanAndVoiceSection plan="essential" />);
+      root.render(
+        <PlanAndVoiceSection plan="essential" disableServerRefresh />,
+      );
     });
     expect(
       container.querySelector("[data-testid='voice-plan-lite-status']")
@@ -72,7 +76,9 @@ describe("PlanAndVoiceSection", () => {
 
   it("shows Voice Pro paid wording and exact payment link", () => {
     act(() => {
-      root.render(<PlanAndVoiceSection plan="essential" />);
+      root.render(
+        <PlanAndVoiceSection plan="essential" disableServerRefresh />,
+      );
     });
     expect(
       container.querySelector("[data-testid='voice-plan-pro-status']")
@@ -89,12 +95,14 @@ describe("PlanAndVoiceSection", () => {
     expect(pro.getAttribute("aria-label")).toBe("Subscribe to Voice Pro");
   });
 
-  it("does not change entitlement when payment link is clicked", () => {
-    act(() => {
-      root.render(<PlanAndVoiceSection plan="essential" />);
+  it("does not change entitlement when payment link is clicked", async () => {
+    await act(async () => {
+      root.render(
+        <PlanAndVoiceSection plan="essential" disableServerRefresh />,
+      );
     });
     const before = getPrefs().plan;
-    act(() => {
+    await act(async () => {
       (
         container.querySelector(
           "[data-testid='voice-plan-lite-choose']",
@@ -113,9 +121,30 @@ describe("PlanAndVoiceSection", () => {
     ).toBeNull();
   });
 
+  it("refreshes UI after verified activation", async () => {
+    savePrefs({ plan: "voice-lite" });
+    await act(async () => {
+      root.render(
+        <PlanAndVoiceSection plan="voice-lite" disableServerRefresh />,
+      );
+    });
+    expect(
+      container.querySelector("[data-testid='voice-plan-lite-current']")
+        ?.textContent,
+    ).toBe("Current Voice Plan");
+    expect(
+      container.querySelector("[data-testid='voice-plan-lite-choose']"),
+    ).toBeNull();
+    expect(
+      container.querySelector("[data-testid='voice-plan-lite-pending']"),
+    ).toBeNull();
+  });
+
   it("marks Voice Lite as current and hides its purchase CTA", () => {
     act(() => {
-      root.render(<PlanAndVoiceSection plan="voice-lite" />);
+      root.render(
+        <PlanAndVoiceSection plan="voice-lite" disableServerRefresh />,
+      );
     });
     expect(
       container.querySelector("[data-testid='voice-plan-lite-current']")
@@ -131,7 +160,9 @@ describe("PlanAndVoiceSection", () => {
 
   it("marks Voice Pro as current and hides Voice Pro purchase CTA", () => {
     act(() => {
-      root.render(<PlanAndVoiceSection plan="voice-pro" />);
+      root.render(
+        <PlanAndVoiceSection plan="voice-pro" disableServerRefresh />,
+      );
     });
     expect(
       container.querySelector("[data-testid='voice-plan-pro-current']")
@@ -147,7 +178,9 @@ describe("PlanAndVoiceSection", () => {
 
   it("exposes keyboard-focusable subscribe controls", () => {
     act(() => {
-      root.render(<PlanAndVoiceSection plan="essential" />);
+      root.render(
+        <PlanAndVoiceSection plan="essential" disableServerRefresh />,
+      );
     });
     const lite = container.querySelector(
       "[data-testid='voice-plan-lite-choose']",
