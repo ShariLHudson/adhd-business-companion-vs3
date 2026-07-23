@@ -109,6 +109,18 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         ],
       },
       {
+        label: "Facebook Community",
+        emoji: "👥",
+        // More specific than "Facebook Post" below — listed first so a tie
+        // on match position (e.g. "Facebook group") resolves here (066/136).
+        matchTerms: [
+          "facebook group",
+          "facebook groups",
+          "facebook community",
+          "fb group",
+        ],
+      },
+      {
         label: "Facebook Post",
         emoji: "📘",
         matchTerms: ["facebook", "facebook post", "fb post", "fb"],

@@ -1,5 +1,5 @@
 /**
- * Create + Chat integration — when split beside Create, chat becomes a typed
+ * Create + Chat integration — Current Focus owns Create; companion coaches from within
  * builder (SOP Builder, Workshop Builder, etc.). One question per turn; generate
  * only after explicit user approval.
  */
@@ -124,7 +124,7 @@ export function pendingApprovalForSession(
 export function emptyCreateBuilderSession(): CreateBuilderSession {
   return {
     typeLabel: null,
-    workflow: { ...EMPTY_CREATE_WORKFLOW, questionMode: "split_screen" },
+    workflow: { ...EMPTY_CREATE_WORKFLOW, questionMode: "current_focus" },
     phase: "pick-type",
   };
 }
@@ -132,6 +132,7 @@ export function emptyCreateBuilderSession(): CreateBuilderSession {
 const BUILDER_NAMES: Record<string, string> = {
   SOP: "SOP Builder",
   Workshop: "Workshop Builder",
+  "Event Plan": "Event Plan",
   Proposal: "Proposal Builder",
   Strategy: "Strategy Builder",
   "Business Strategy": "Strategy Builder",
@@ -173,7 +174,7 @@ export function resolvedCreateTopic(
   return "";
 }
 
-/** Split-screen Create builder owns chat — block parallel coach/cards. */
+/** Current Focus Create builder owns interaction — block parallel coach/cards. */
 export function shouldSuppressParallelCoaching(
   session: CreateBuilderSession | null,
   splitCreateChat: boolean,
@@ -193,6 +194,9 @@ export function resolveBuilderType(text: string): string | null {
   if (/\bstrateg(y|ies)\b/i.test(t)) return "Business Strategy";
   if (/\bsop\b|standard operating procedure/i.test(t)) return "SOP";
   if (/\bworkshop\b|webinar\b/i.test(t)) return "Workshop";
+  if (/\b(retreat|event|summit|conference|gathering)\b/i.test(t)) {
+    return "Event Plan";
+  }
   if (/\bproposal\b|\bsow\b/i.test(t)) return "Proposal";
   if (/\bemail\b/i.test(t)) return "Email";
   if (isThankYouEmailIntent(t)) return "Thank-You Email";
@@ -489,7 +493,10 @@ export const READINESS_ACTIONS: CreateBuilderAction[] = [
 ];
 
 function workspacePanelVisible(workflow: CreateWorkflowState): boolean {
-  return workflow.questionMode === "split_screen";
+  return (
+    workflow.questionMode === "current_focus" ||
+    workflow.questionMode === "create_only"
+  );
 }
 
 function incompleteSectionsReply(
@@ -541,7 +548,7 @@ function freshDiscoveryWorkflow(typeLabel: string): CreateWorkflowState {
       },
       { preserveAnswers: false },
     ),
-    questionMode: "split_screen",
+    questionMode: "current_focus",
   };
 }
 
@@ -550,7 +557,16 @@ export function panelWorkflowHasProgress(
 ): boolean {
   if (!panelWorkflow) return false;
   if (panelWorkflow.step === "readiness") return true;
-  return answeredDiscoveryCount(panelWorkflow) > 0;
+  if (answeredDiscoveryCount(panelWorkflow) > 0) return true;
+  // 072 — Estate Current Focus writes sectionContent (not discoveryAnswers)
+  const sections = panelWorkflow.sectionContent ?? {};
+  if (Object.values(sections).some((v) => Boolean(v?.trim()))) return true;
+  if (panelWorkflow.draftContent?.trim()) return true;
+  if (panelWorkflow.skippedSectionIds?.length) return true;
+  if (panelWorkflow.templateSections?.length && panelWorkflow.workspaceFirst) {
+    return Boolean(panelWorkflow.sessionId?.trim());
+  }
+  return false;
 }
 
 /** Resume chat builder from answers already collected in the Create panel. */
@@ -598,7 +614,7 @@ export function applyCreateBuilderChatOpener(
   return [...cleaned, { role: "assistant", content: opener }];
 }
 
-/** Panel workflow for split-screen sync — use advanceAfterItemPick when ref is stale. */
+/** Panel workflow for Current Focus sync — use advanceAfterItemPick when ref is stale. */
 export function panelWorkflowForBuilderSync(
   typeLabel: string,
   panelWorkflow: CreateWorkflowState,
@@ -609,12 +625,12 @@ export function panelWorkflowForBuilderSync(
     panelWorkflow.selectedTypeLabel === trimmed &&
     panelWorkflow.categoryId
   ) {
-    return { ...panelWorkflow, questionMode: "split_screen" };
+    return { ...panelWorkflow, questionMode: "current_focus" };
   }
   return {
     ...advanceAfterItemPick(trimmed),
     sessionId: sessionId ?? panelWorkflow.sessionId ?? undefined,
-    questionMode: "split_screen",
+    questionMode: "current_focus",
   };
 }
 
@@ -627,7 +643,7 @@ export function bootstrapCreateBuilderFromWorkflow(
     ...panelWorkflow,
     selectedTypeLabel: panelWorkflow.selectedTypeLabel ?? resolved,
     categoryId: panelWorkflow.categoryId ?? categoryIdForType(resolved),
-    questionMode: "split_screen",
+    questionMode: "current_focus",
   };
 
   if (discoveryComplete(resolved, merged)) {
@@ -899,7 +915,7 @@ export function processCreateBuilderTurn(
       return {
         session,
         reply:
-          "Your living template is in the panel beside chat — expand any section there, or tell me what you'd like to adjust.",
+          "Your living template is ready — expand any section, or tell me what you'd like to adjust.",
         actions: READINESS_ACTIONS,
       };
     }
@@ -1177,7 +1193,7 @@ function enterReadiness(
     workflow: {
       ...session.workflow,
       step: "readiness",
-      questionMode: "split_screen",
+      questionMode: "current_focus",
       readinessConfirmed: true,
     },
   };
@@ -1202,7 +1218,7 @@ export function markCreateBuilderGenerated(
 export function createBuilderExportMessage(typeLabel: string): string {
   return (
     `Your **${typeLabel}** draft is in the workspace.\n\n` +
-    "Use **Edit**, **Save**, **Export**, or **Social** in the panel — and keep chatting here to review, improve, or rethink any section together."
+    "Use **Edit**, **Save**, **Export**, or **Social** when you're ready — we can review, improve, or rethink any section together."
   );
 }
 
@@ -1232,7 +1248,7 @@ export function formatCreateBuilderChatHint(
     : [];
 
   const lines = [
-    `ACTIVE MODE: ${name} (Create workspace beside chat).`,
+    `ACTIVE MODE: ${name} (Create living workspace — 066 single experience; Shari inside the work).`,
     CREATE_THINKING_PARTNER_PRINCIPLES,
     createDepthHintForChat(type),
     "- Ask ONE question per reply when moving the conversation forward.",

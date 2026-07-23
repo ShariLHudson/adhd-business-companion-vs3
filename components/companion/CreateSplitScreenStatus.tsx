@@ -3,15 +3,16 @@
 import type { CreateWorkspacePhase } from "@/lib/createBuild";
 import { userFacingCreateTypeLabel } from "@/lib/createTypePickers";
 import { AudienceSelector } from "@/components/companion/AudienceSelector";
+import { SparkThinkingFlame } from "@/components/companion/SparkThinkingFlame";
 import { selectedAudienceLabel } from "@/lib/contentAudience";
 import { WorkspaceStepCard } from "@/components/companion/WorkspaceStepCard";
 
 const PHASE_DETAIL: Record<CreateWorkspacePhase, string> = {
-  gathering: "Chat with Shari — your living plan fills in beside you.",
-  ready: "Approve in chat when you're ready for a first draft.",
+  gathering: "Talk with Shari — your living plan fills in as you go.",
+  ready: "Say when you're ready for a first draft.",
   generating: "This usually takes a few seconds.",
-  "draft-ready": "Ask Shari in chat if you'd like changes.",
-  error: "Try again or keep talking in chat.",
+  "draft-ready": "Ask Shari if you'd like changes.",
+  error: "Try again or keep talking with Shari.",
 };
 
 export function CreateSplitScreenStatus({
@@ -57,6 +58,11 @@ export function CreateSplitScreenStatus({
   return (
     <div className="flex flex-1 flex-col justify-center px-4 py-6">
       <WorkspaceStepCard sectionLabel="Create" title={title} footer={detail}>
+        {workspacePhase === "generating" ? (
+          <div className="mb-3 flex justify-center">
+            <SparkThinkingFlame size="md" label={title} />
+          </div>
+        ) : null}
         {audienceStepActive && onAudienceChange ? (
           <>
             <AudienceSelector

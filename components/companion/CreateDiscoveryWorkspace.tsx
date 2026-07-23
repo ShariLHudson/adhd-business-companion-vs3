@@ -10,6 +10,7 @@ import {
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { userFacingCreateTypeLabel } from "@/lib/createTypePickers";
 import { AudienceSelector } from "@/components/companion/AudienceSelector";
+import { SparkLoadingState } from "@/components/companion/SparkThinkingFlame";
 import { selectedAudienceLabel } from "@/lib/contentAudience";
 import { CreateTemplateProgress } from "@/components/companion/CreateTemplateProgress";
 import { hasGuidedTemplateFields } from "@/lib/createTemplateFields";
@@ -102,13 +103,11 @@ export function CreateDiscoveryWorkspace({
     return (
       <div className="flex flex-1 flex-col justify-center px-4 py-6">
         <div className="companion-fade-in mx-auto w-full max-w-lg rounded-2xl border border-[#d4cdc3] bg-white/85 p-5 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-            Create
-          </p>
-          <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
-            Creating your {displayType}…
-          </p>
-          <p className="mt-2 text-sm text-[#6b635a]">{loadingMessage}</p>
+          <SparkLoadingState
+            message={`Creating your ${displayType}…`}
+            size="lg"
+          />
+          <p className="mt-2 text-center text-sm text-[#6b635a]">{loadingMessage}</p>
         </div>
       </div>
     );
@@ -165,10 +164,10 @@ export function CreateDiscoveryWorkspace({
     workspacePhase === "ready"
       ? "Your plan looks ready — approve in chat when you want the first draft."
       : guidedProgress
-        ? `${view.progress.current} of ${view.progress.total} required sections complete — keep chatting with Shari.`
+        ? `${view.progress.current} of ${view.progress.total} required sections complete — keep shaping with Shari.`
         : totalSections > 0
-          ? `${filledSections} of ${totalSections} sections taking shape — keep chatting with Shari.`
-          : "Talk with Shari in chat — your plan builds here as you go.";
+          ? `${filledSections} of ${totalSections} sections taking shape — keep shaping with Shari.`
+          : "Shape this with Shari here — your plan builds as you go.";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4">

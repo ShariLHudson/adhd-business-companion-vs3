@@ -14,6 +14,14 @@ type CreateDraftResumeListProps = {
   onRename: (id: string, title: string) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
+  /**
+   * Create Simplification — narrow to a subset (e.g. Recent vs Older Work)
+   * without duplicating the open/rename/duplicate/delete list logic.
+   * Omit to show every saved draft (unchanged default behavior).
+   */
+  filter?: (entry: CreateDraftLibraryEntry) => boolean;
+  /** Override the "Resume a saved draft" label — used when grouped under Find Previous Work. */
+  listLabel?: string;
 };
 
 function formatRelativeDate(iso: string): string {
@@ -32,6 +40,8 @@ export function CreateDraftResumeList({
   onRename,
   onDuplicate,
   onDelete,
+  filter,
+  listLabel = "Resume a saved draft",
 }: CreateDraftResumeListProps) {
   const [drafts, setDrafts] = useState<CreateDraftLibraryEntry[]>([]);
   const [renameId, setRenameId] = useState<string | null>(null);
@@ -39,8 +49,10 @@ export function CreateDraftResumeList({
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
-    setDrafts(listCreateDraftEntries());
-  }, []);
+    const all = listCreateDraftEntries();
+    setDrafts(filter ? all.filter(filter) : all);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- filter is expected to be stable per call site
+  }, [filter]);
 
   useEffect(() => {
     refresh();
@@ -84,7 +96,7 @@ export function CreateDraftResumeList({
 
       <div className="mx-4 mb-4 rounded-2xl border border-[#d4cdc3] bg-white/90 p-4 shadow-sm">
         <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-          Resume a saved draft
+          {listLabel}
         </p>
         <ul className="mt-3 flex flex-col gap-2">
           {drafts.map((draft) => (

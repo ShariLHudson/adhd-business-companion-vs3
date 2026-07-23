@@ -23,6 +23,15 @@ import { evaluateFacilitatedCreateOpen } from "./facilitatedCreation/workspaceGa
 import type { AppSection } from "./companionUi";
 import type { CreationWorkspaceInput } from "./workspaceCreation";
 import type { ResolvedArtifact } from "./createInitialization";
+import {
+  buildActiveWorkspaceClarifyGuidance,
+  buildActiveWorkspaceResumeGuidance,
+  findActiveWorkspaceByHumanTitle,
+  getMostRecentActiveWorkspace,
+  isActiveWorkspaceResumeRequest,
+  matchActiveWorkspaceResume,
+  matchActiveWorkspaceResumeDetailed,
+} from "./activeWorkspaceRegistry";
 
 export type CreateOpenSource =
   | "chat"
@@ -161,6 +170,23 @@ export function buildCreateConsentOffer(
   itemType?: string | null,
 ): string {
   const t = userText.trim();
+  // 071/073 — never offer new Create when an Active Workspace already matches
+  if (isActiveWorkspaceResumeRequest(t)) {
+    const match = matchActiveWorkspaceResumeDetailed(t);
+    if (match.kind === "clarify") {
+      return buildActiveWorkspaceClarifyGuidance(match.candidates);
+    }
+    const entry =
+      match.kind === "single"
+        ? match.entry
+        : matchActiveWorkspaceResume(t) ?? getMostRecentActiveWorkspace();
+    if (entry) return buildActiveWorkspaceResumeGuidance(entry);
+  }
+  // Titled resume: "my productivity workshop" even when regex is soft
+  const byTitle = findActiveWorkspaceByHumanTitle(t);
+  if (byTitle && /\b(?:back|continue|resume|reopen|workshop|draft|document)\b/i.test(t)) {
+    return buildActiveWorkspaceResumeGuidance(byTitle);
+  }
   const catalog = itemType ?? matchCatalogFromText(t)?.type ?? null;
   if (
     isContentBrainstorming(t) ||
@@ -276,6 +302,18 @@ export function evaluateCreateOpen(
 
   const facilitated = evaluateFacilitatedCreateOpen(req, ctx);
   if (facilitated) return facilitated;
+
+  // 071 — resume requests never become new Create consent / open
+  if (isActiveWorkspaceResumeRequest(userText)) {
+    const entry =
+      matchActiveWorkspaceResume(userText) ?? getMostRecentActiveWorkspace();
+    if (entry) {
+      return {
+        action: "blocked",
+        message: buildActiveWorkspaceResumeGuidance(entry),
+      };
+    }
+  }
 
   if (
     ctx.lockedType &&

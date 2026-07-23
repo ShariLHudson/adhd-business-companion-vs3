@@ -1,4 +1,4 @@
-// Create catalog — categorized business assets users can build beside chat.
+// Create catalog — categorized business assets for living Create workspaces (066).
 
 import { sortByDropdownLabel, sortDropdownLabels } from "./dropdownSort";
 import {

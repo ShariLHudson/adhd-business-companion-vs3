@@ -624,14 +624,14 @@ export function buildCreateOpenAck(artifact: ResolvedArtifact): string {
   switch (artifact.source) {
     case "chat":
     case "context":
-      return `Opening **Create** with your **${artifact.itemType}** — “${artifact.title}” is beside you. Use the buttons above the draft to save, create a Google Doc, or print.`;
+      return `Let's shape your **${artifact.itemType}** — “${artifact.title}” — in Create. Use the buttons above the draft to save, create a Google Doc, or print.`;
     case "blank":
-      return `Opening a blank **${artifact.itemType}** in **Create** — start filling it in beside us, or tell me what to add.`;
+      return `Here's a blank **${artifact.itemType}** in Create — start filling it in, or tell me what to add.`;
     case "stored":
     case "last-activity":
-      return `Here's your **${artifact.itemType}** in **Create** beside you.`;
+      return `Here's your **${artifact.itemType}** in Create.`;
     default:
-      return "Opening **Create** beside you.";
+      return "Let's work on this in Create.";
   }
 }
 

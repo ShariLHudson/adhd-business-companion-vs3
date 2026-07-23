@@ -2,6 +2,10 @@
  * Persist the shared Create workflow record — survives close, switch, refresh.
  */
 
+import {
+  CREATE_WORKFLOW_RECORD_KEY,
+  safeLocalStorageSet,
+} from "./companionStorageRecovery";
 import { isCreatePersistencePaused } from "./createPersistencePause";
 import {
   shouldPersistWorkflowRecord,
@@ -9,7 +13,7 @@ import {
 import type { CreateWorkflowRecord } from "./createWorkflowRecord";
 import { emptyWorkflowRecord } from "./createWorkflowRecord";
 
-const RECORD_KEY = "companion-create-workflow-record-v1";
+const RECORD_KEY = CREATE_WORKFLOW_RECORD_KEY;
 const SAVED_FOR_LATER_KEY = "companion-create-workflow-saved-v1";
 
 export function saveWorkflowRecord(record: CreateWorkflowRecord): void {
@@ -19,11 +23,7 @@ export function saveWorkflowRecord(record: CreateWorkflowRecord): void {
     clearWorkflowRecord();
     return;
   }
-  try {
-    localStorage.setItem(RECORD_KEY, JSON.stringify(record));
-  } catch {
-    /* noop */
-  }
+  safeLocalStorageSet(RECORD_KEY, JSON.stringify(record));
 }
 
 export function loadWorkflowRecord(): CreateWorkflowRecord | null {
@@ -56,11 +56,7 @@ export function hasWorkflowRecord(): boolean {
 export function saveWorkflowRecordForLater(record: CreateWorkflowRecord): void {
   if (typeof window === "undefined") return;
   if (!shouldPersistWorkflowRecord(record)) return;
-  try {
-    localStorage.setItem(SAVED_FOR_LATER_KEY, JSON.stringify(record));
-  } catch {
-    /* noop */
-  }
+  safeLocalStorageSet(SAVED_FOR_LATER_KEY, JSON.stringify(record));
 }
 
 export function loadSavedWorkflowRecord(): CreateWorkflowRecord | null {

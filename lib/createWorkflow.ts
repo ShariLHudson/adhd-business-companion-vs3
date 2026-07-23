@@ -368,6 +368,24 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       why: "So messaging meets them where they are.",
     },
   ],
+  "Facebook Community": [
+    {
+      id: "purpose",
+      prompt: "What is this Facebook community for, and who is it for?",
+      why: "So naming, setup, and content all serve one clear purpose.",
+      placeholder: "Past clients wanting ongoing support, local business owners…",
+    },
+    {
+      id: "promise",
+      prompt: "What should members be able to count on this group for?",
+      why: "So the group has a credible, member-centered promise.",
+    },
+    {
+      id: "privacy",
+      prompt: "Public, private and visible, or private and hidden?",
+      why: "So setup matches the community before we go further — this can be hard to change later.",
+    },
+  ],
   "Landing Page": [
     {
       id: "offer",
