@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SHARI_ERROR_RECOVERY_LINE } from "@/lib/conversation/shariCompanionEngine";
+import { SHARI_ERROR_RECOVERY_LINE } from "@/lib/conversation/shariCompanionEnginePrompt";
 import {
   containsEstateSystemLanguage,
   ESTATE_RECOVERY_OPENING,

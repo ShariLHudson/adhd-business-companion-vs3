@@ -1,8 +1,10 @@
 /**
  * P0.16.1 — single source of truth for Create panel open + visibility checks.
+ * 066 — Create opens as single-experience workspace (never permanent Chat|Create split).
  */
 
 import type { AppSection } from "./companionUi";
+import { resolveCreationWorkspaceLayoutMode } from "./singleExperienceWorkspace";
 import type { ChatLayoutMode } from "./workspaceNav";
 import { shouldBlockWorkspaceOpenForPhase1 } from "./phase1Onboarding";
 
@@ -79,6 +81,6 @@ export function applyOpenCreateWorkspaceState(
   return {
     workspacePanel: CREATE_PANEL_SECTION,
     activeSection: "home",
-    chatLayoutMode: "split",
+    chatLayoutMode: resolveCreationWorkspaceLayoutMode(),
   };
 }

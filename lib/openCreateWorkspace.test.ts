@@ -15,20 +15,20 @@ describe("openCreateWorkspace integration", () => {
     chatLayoutMode: "workspace-focus" as const,
   };
 
-  it("resolveHardNavigationCommand(open create) targets content-generator", () => {
+  it("resolveHardNavigationCommand(open create) targets estate Create (066)", () => {
     const cmd = resolveHardNavigationCommand("open create");
     expect(cmd?.target).toEqual({
       kind: "workspace",
-      section: CREATE_PANEL_SECTION,
-      nav: "other",
+      section: "create",
+      nav: "create",
     });
   });
 
-  it("user-initiated open create sets workspacePanel and split layout", () => {
+  it("user-initiated open create sets workspacePanel and workspace-focus (066)", () => {
     const next = applyOpenCreateWorkspaceState(chatOnly, { userInitiated: true });
     expect(next.workspacePanel).toBe("content-generator");
     expect(next.activeSection).toBe("home");
-    expect(next.chatLayoutMode).toBe("split");
+    expect(next.chatLayoutMode).toBe("workspace-focus");
     expect(isCreatePanelOpen(next)).toBe(true);
     expect(isRightPanelVisible(next)).toBe(true);
     expect(isChatOnlyLayout(next)).toBe(false);
@@ -41,11 +41,10 @@ describe("openCreateWorkspace integration", () => {
     expect(isRightPanelVisible(next)).toBe(false);
   });
 
-  it("hard nav open create expects visible create panel state", () => {
-    const cmd = resolveHardNavigationCommand("open create");
-    expect(cmd).not.toBeNull();
+  it("legacy Create panel state model still opens content-generator workspace-focus", () => {
     const after = applyOpenCreateWorkspaceState(chatOnly, { userInitiated: true });
     expect(after.workspacePanel).toBe(CREATE_PANEL_SECTION);
+    expect(after.chatLayoutMode).toBe("workspace-focus");
     expect(isChatOnlyLayout(after)).toBe(false);
     expect(isRightPanelVisible(after)).toBe(true);
   });
