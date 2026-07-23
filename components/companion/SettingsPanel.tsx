@@ -5,9 +5,7 @@ import { compareDropdownLabels, sortByDropdownLabel } from "@/lib/dropdownSort";
 import {
   getPrefs,
   savePrefs,
-  getVoiceStatus,
   PLAN_LABEL,
-  PLAN_VOICE_MINUTES,
   SORTED_DATE_FORMAT_OPTIONS,
   SORTED_LANGUAGE_OPTIONS,
   SORTED_REGION_OPTIONS,
@@ -93,6 +91,8 @@ import {
   type PlanningViewMode,
 } from "@/lib/planMyDay";
 import { SETTINGS_SAVED_MESSAGE } from "@/lib/navigationOrigin";
+import { PlanAndVoiceSection } from "@/components/companion/settings/PlanAndVoiceSection";
+import { VOICE_PLAN_COPY } from "@/lib/voicePlans/voicePlanOffers";
 
 type Section =
   | "tone"
@@ -149,24 +149,6 @@ const MONTHS = [
   "October",
   "November",
   "December",
-];
-
-const PLANS: { id: Plan; label: string; desc: string }[] = [
-  {
-    id: "essential",
-    label: "Essential",
-    desc: "Everything except voice. Type or talk by text.",
-  },
-  {
-    id: "voice-lite",
-    label: "Voice Lite",
-    desc: `Talk back & forth with Shari — ${PLAN_VOICE_MINUTES["voice-lite"]} min/month.`,
-  },
-  {
-    id: "voice-pro",
-    label: "Voice Pro",
-    desc: `More voice conversation — ${PLAN_VOICE_MINUTES["voice-pro"]} min/month.`,
-  },
 ];
 
 type NotifPerm = "granted" | "denied" | "default" | "unsupported";
@@ -408,7 +390,14 @@ export function SettingsPanel({
         CELEBRATION_MODES.find((c) => c.id === celebrationMode)?.label ?? "",
     },
     { id: "pattern", label: "Pattern Awareness", value: patternSummary },
-    { id: "plan", label: "Plan & voice", value: PLAN_LABEL[plan] },
+    {
+      id: "plan",
+      label: VOICE_PLAN_COPY.sectionTitle,
+      value:
+        plan === "essential"
+          ? VOICE_PLAN_COPY.essentialLabel
+          : PLAN_LABEL[plan],
+    },
     { id: "advanced", label: "Advanced AI tools", value: advanced ? "On" : "Off" },
     {
       id: "connections",
@@ -1045,35 +1034,10 @@ export function SettingsPanel({
     );
   }
   if (open === "plan") {
-    const vs = getVoiceStatus();
     return (
       <div className={wrap}>
-        {header("Plan & voice")}
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Voice lets you talk back and forth with Shari out loud. It&apos;s part
-          of the paid tiers — upgrading from Essential is an add-on.
-        </p>
-        <Options
-          items={PLANS}
-          current={plan}
-          onPick={(v) => {
-            setPlan(v);
-            savePrefs({ plan: v });
-          }}
-        />
-        {vs.hasVoice && (
-          <p className="mt-3 text-sm text-[#6b635a]">
-            Voice this month:{" "}
-            <span className="font-semibold text-[#1f1c19]">
-              {Math.round(vs.usedMin)} / {vs.capMin} min used
-            </span>{" "}
-            · {Math.ceil(vs.leftMin)} min left
-          </p>
-        )}
-        <p className="mt-3 rounded-lg bg-[#f3efe8] px-3 py-2 text-xs text-[#9a8f82]">
-          Billing &amp; real upgrades are handled separately — this switch is for
-          setting up and trying each tier.
-        </p>
+        {header(VOICE_PLAN_COPY.sectionTitle)}
+        <PlanAndVoiceSection plan={plan} />
       </div>
     );
   }
