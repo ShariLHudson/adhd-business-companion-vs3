@@ -1,0 +1,50 @@
+# Global Library & Collection Standard™ (133)
+
+**Full document:** `docs/constitution/133_GLOBAL_LIBRARY_AND_COLLECTION_STANDARD.md`
+
+**Binding product law** for every Spark Estate experience that displays multiple user-owned records (Create, Projects, Journal, Evidence Vault, Spark Cards, Business Estate, Marketing, Founder Workspace, Learning, Documents, Conversations, future Chamber libraries, and any browse/shelf/vault/inbox).
+
+## Constitutional principle
+
+**If a member can reasonably perform an action without opening an item, they must be able to do so from the item’s card or list row.**
+
+Opening is for interior work (full content, deep edit, guided flow) — not for unlocking common lifecycle actions.
+
+## Twelve rules (summary)
+
+1. Card/row action parity — rename, archive, favorite, export, delete(+confirm), status, continue  
+2. Opening is for interior work only  
+3. One primary action per card (usually Continue / Open / Resume)  
+4. Honest identity on the card — title, preview, status; no architecture IDs  
+5. Counts and labels tell the truth (132)  
+6. Loading / empty / error all resolve calmly  
+7. Search, filter, sort protect momentum  
+8. Destructive actions confirmed with hospitality language  
+9. Connection-gated actions honest; incompatible destinations never shown just because connected  
+10. Same mental model across rooms — local flavor OK, new grammar not  
+11. ADHD / EF first — Continue obvious; don’t bury common actions  
+12. Estate language — not file-manager / dataset jargon  
+
+## Before shipping any multi-record library (all must pass)
+
+- [ ] Common actions available from card/row without opening?  
+- [ ] One primary action obvious in ten seconds (132)?  
+- [ ] Secondary actions in progressive disclosure (≤3 visible choices)?  
+- [ ] Title + preview + status answer “what is this?” without opening?  
+- [ ] Counts / filters truthful?  
+- [ ] Loading / empty / error resolve?  
+- [ ] Destructive confirm with Shari voice?  
+- [ ] No silent no-op on gated actions?  
+- [ ] Pattern matches other Estate libraries?  
+- [ ] Passes 128 ADHD / simplicity audit?  
+
+## Conflict rules
+
+- **128** wins on complexity / architecture exposure / ADHD certification  
+- **130** One Creation Rule — never silently create Work  
+- **132** wins on momentum, intentional navigation, truthfulness, Ten-Second Rule  
+- **133** governs library/collection card-row interaction  
+
+**Types:** `lib/sparkLibraryCollection/types.ts`  
+
+Also: [295 Shared Object Library](../docs/create-experience/standards/295_MASTER_SHARED_OBJECT_LIBRARY_STANDARD.md) (data) · [Estate Collections Playbook](../docs/estate/ESTATE_COLLECTIONS_PLAYBOOK.md) (emotional placement)
