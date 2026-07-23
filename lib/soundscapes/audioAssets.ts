@@ -3,9 +3,9 @@
 /** Canonical Soundscapes folder for master inventory plates (#181). */
 export const SOUNDSCAPES_AUDIO_DIR = "/audio/Soundscapes" as const;
 
-/** Coffee House — room-named loop (preferred). */
+/** Coffee House — room-named loop (preferred). Lives in peaceful-places, not Soundscapes. */
 export const COFFEE_HOUSE_AMBIENCE_MP3 =
-  `${SOUNDSCAPES_AUDIO_DIR}/java-seranade-coffee-house.mp3` as const;
+  "/audio/peaceful-places/java-seranade-coffee-house.mp3" as const;
 
 export const COFFEE_SHOP_AMBIENCE_MP3 =
   `${SOUNDSCAPES_AUDIO_DIR}/coffee-shop-chatter-audio.mp3` as const;
@@ -37,9 +37,9 @@ export const EVENING_HEARTH_AMBIENCE_MP3 =
 export const WELCOME_ROOM_AMBIENCE_MP3 =
   "/audio/welcome-room/welcome-room-ambience.mp3" as const;
 
-/** Gallery — Hall of Reflections (still water, nature hush). */
+/** Gallery — Hall of Reflections (still water, nature hush). File lives in peaceful-places, not gallery/. */
 export const HALL_OF_REFLECTIONS_AMBIENCE_MP3 =
-  "/audio/gallery/hall-of-reflections.mp3" as const;
+  "/audio/peaceful-places/hall-of-reflections.mp3" as const;
 
 /** Gazebo / Journal — water fountain hush. */
 export const GAZEBO_JOURNAL_AMBIENCE_MP3 =
@@ -60,13 +60,22 @@ export const GREENHOUSE_BIRDS_AMBIENCE_MP3 =
 export const OCEAN_CONSERVATORY_AMBIENCE_MP3 =
   `${SOUNDSCAPES_AUDIO_DIR}/aquarium bubbles.mp3` as const;
 
-/** Celebration Room / garden — reflections of triumph. */
+/**
+ * Celebration Room / garden — reflections of triumph.
+ * On-disk plate is named `reflections-of-triumph.mp3` (not the
+ * `-celebration-garden` suffix originally referenced here).
+ */
 export const CELEBRATION_ROOM_AMBIENCE_MP3 =
-  "/audio/peaceful-places/reflections-of-triumph-celebration-garden.mp3" as const;
+  "/audio/peaceful-places/reflections-of-triumph.mp3" as const;
 
-/** Library / institute / gallery study hush. */
+/**
+ * Library / institute / gallery study hush.
+ * On-disk plate is named `reflections-of-victory.mp3` (not the
+ * `-gallery` suffix originally referenced here) — the second Songer
+ * "Reflections" instrumental, distinct from the Celebration Garden loop.
+ */
 export const GALLERY_REFLECTIONS_AMBIENCE_MP3 =
-  "/audio/peaceful-places/reflections-of-triumph-gallery.mp3" as const;
+  "/audio/peaceful-places/reflections-of-victory.mp3" as const;
 
 /** Exercise Room / Game Room — Pulse of Momentum energy loop. */
 export const EXERCISE_ROOM_AMBIENCE_MP3 =

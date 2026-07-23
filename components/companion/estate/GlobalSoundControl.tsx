@@ -7,6 +7,12 @@ import {
   setEstateSilenced,
   subscribeEstateAudioSettings,
 } from "@/lib/estate/estateAudioSettings";
+import {
+  activeSoundscapeLabel,
+  isSoundscapePlaying,
+  stopSoundscapeOverlay,
+  subscribeSoundscapePlayback,
+} from "@/lib/estate/estateAudioService";
 import { stopAllAudio } from "@/lib/estate/stopAllAudio";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
@@ -25,15 +31,26 @@ type Props = {
   /** Optional: true when a registered/visible player is known to be active. */
   soundPlayingHint?: boolean;
   onOpenAudioSettings?: () => void;
+  /**
+   * Open Peaceful Moments (the Music Room) from anywhere in the companion —
+   * this is the one entry point that works regardless of the current
+   * section or room, satisfying "open from any window".
+   */
+  onOpenPeacefulMoments?: () => void;
 };
 
 /**
  * Persistent global Sound Off control — Estate top-right chrome.
  * One click stops all audio and persists silence. Does not create a second engine.
+ *
+ * Also self-subscribes to the shared Layer 2 soundscape overlay so it can
+ * show "Now Playing" + Stop for Peaceful Moments from any screen without any
+ * parent wiring — one truly global Now Playing surface.
  */
 export function GlobalSoundControl({
   soundPlayingHint = false,
   onOpenAudioSettings,
+  onOpenPeacefulMoments,
 }: Props) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -44,6 +61,9 @@ export function GlobalSoundControl({
     () => getEstateAudioSettings().masterVolume,
   );
   const [open, setOpen] = useState(false);
+  const [nowPlayingLabel, setNowPlayingLabel] = useState<string | null>(
+    () => (isSoundscapePlaying() ? activeSoundscapeLabel() : null),
+  );
 
   useEffect(() => {
     return subscribeEstateAudioSettings(() => {
@@ -51,6 +71,13 @@ export function GlobalSoundControl({
       setSilenced(s.silenced);
       setVolume(s.masterVolume);
     });
+  }, []);
+
+  useEffect(() => {
+    const sync = () =>
+      setNowPlayingLabel(isSoundscapePlaying() ? activeSoundscapeLabel() : null);
+    sync();
+    return subscribeSoundscapePlayback(sync);
   }, []);
 
   useDismissibleWindow({
@@ -71,7 +98,10 @@ export function GlobalSoundControl({
     return () => document.removeEventListener("mousedown", onPointer);
   }, [open]);
 
-  const uiState = resolveSoundUiState(silenced, soundPlayingHint && !silenced);
+  const uiState = resolveSoundUiState(
+    silenced,
+    (soundPlayingHint || nowPlayingLabel !== null) && !silenced,
+  );
   const label =
     uiState === "off"
       ? "Sound Off"
@@ -158,6 +188,51 @@ export function GlobalSoundControl({
           >
             {label}
           </p>
+          {nowPlayingLabel ? (
+            <div
+              className="global-sound-control__now-playing"
+              data-testid="global-sound-now-playing"
+            >
+              <p className="global-sound-control__now-playing-label">
+                Now playing: {nowPlayingLabel}
+              </p>
+              <div className="global-sound-control__now-playing-actions">
+                {onOpenPeacefulMoments ? (
+                  <button
+                    type="button"
+                    className="global-sound-control__action"
+                    data-testid="global-sound-now-playing-open"
+                    onClick={() => {
+                      setOpen(false);
+                      onOpenPeacefulMoments();
+                    }}
+                  >
+                    Open Peaceful Moments
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="global-sound-control__action"
+                  data-testid="global-sound-now-playing-stop"
+                  onClick={() => void stopSoundscapeOverlay()}
+                >
+                  Stop
+                </button>
+              </div>
+            </div>
+          ) : onOpenPeacefulMoments ? (
+            <button
+              type="button"
+              className="global-sound-control__action"
+              data-testid="global-sound-open-peaceful-moments"
+              onClick={() => {
+                setOpen(false);
+                onOpenPeacefulMoments();
+              }}
+            >
+              Peaceful Moments
+            </button>
+          ) : null}
           <div className="global-sound-control__actions">
             <button
               type="button"

@@ -1,7 +1,7 @@
 {
   "registry": "audio-mappings",
   "version": "1.0.0",
-  "description": "Audio Experience Foundation™ — cross-links rooms, features, needs, and discoveries to audio experiences.",
+  "description": "Audio Experience Foundation — cross-links rooms, features, needs, and discoveries to audio experiences.",
   "itemSchema": {
     "id": "string",
     "sourceType": "room | feature | tool | discovery | need-signal | experience-group",

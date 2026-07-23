@@ -52,8 +52,11 @@ describe("Peaceful Moments audio dropdown (137–139)", () => {
     expect(room).toContain("peaceful-moments-stop");
     expect(room).toContain("peaceful-moments-mute");
     expect(room).toContain("peaceful-moments-volume");
-    expect(room).toContain("registerEstateMediaStopper");
-    expect(room).toContain("stopAllAudio");
+    // Playback routes through the shared global Layer 2 engine — no local
+    // <audio> tied to component lifecycle — so it survives navigation.
+    expect(room).toContain("playSoundscapeTrack");
+    expect(room).toContain("stopSoundscapeOverlay");
+    expect(room).toContain("subscribeSoundscapePlayback");
     expect(room).not.toContain("autoPlay");
     expect(room).toMatch(
       /Selecting a track must not start playback|does not start playback/i,
@@ -64,6 +67,18 @@ describe("Peaceful Moments audio dropdown (137–139)", () => {
     )?.[0];
     expect(selectBlock).toBeTruthy();
     expect(selectBlock).not.toMatch(/\.play\(/);
+  });
+
+  it("keeps playing after Previous Screen — only Stop/Sound Off end it (persistence)", () => {
+    const room = read(
+      "components/companion/peacefulPlaces/PeacefulMomentsRoom.tsx",
+    );
+    const leaveBlock = room.match(
+      /const handleLeave = useCallback\([\s\S]*?\}, \[[\s\S]*?\]\);/,
+    )?.[0];
+    expect(leaveBlock).toBeTruthy();
+    expect(leaveBlock).not.toMatch(/stopSoundscapeOverlay|stopAllAudio/);
+    expect(leaveBlock).toContain("onDone?.()");
   });
 
   it("FocusAudioPanel mounts PeacefulMomentsRoom without garden extras", () => {

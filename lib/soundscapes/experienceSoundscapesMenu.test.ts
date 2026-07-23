@@ -13,8 +13,8 @@ describe("experienceSoundscapesMenu", () => {
     expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS.every((track) =>
       track.src.startsWith("/audio/Soundscapes/"),
     )).toBe(true);
-    expect(PEACEFUL_PLACES_MUSIC_TRACKS).toHaveLength(11);
-    expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS).toHaveLength(13);
+    expect(PEACEFUL_PLACES_MUSIC_TRACKS).toHaveLength(12);
+    expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS).toHaveLength(12);
   });
 
   it("resolves tracks by id", () => {

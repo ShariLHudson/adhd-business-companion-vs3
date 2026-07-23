@@ -1,16 +1,15 @@
-import { patchEstateAudioSettings } from "@/lib/estate/estateAudioSettings";
-import { patchEstateRuntimeState } from "@/lib/estate/estateRuntimeState";
-import { startEstateSoundscapeOverlayFromUrl } from "@/lib/estate/estateSoundscapeOverlay";
+import {
+  playSoundscapeTrack,
+  type EstateAudioPlayResult,
+} from "@/lib/estate/estateAudioService";
 import type { ExperienceSoundscapeTrack } from "./experienceSoundscapesMenu";
 
-/** Play a room-menu soundscape track without leaving the current room. */
+/**
+ * Play a room-menu soundscape track without leaving the current room.
+ * Routes through the shared Estate Audio Service (one master + one play path).
+ */
 export async function playExperienceSoundscapeTrack(
   track: ExperienceSoundscapeTrack,
-): Promise<void> {
-  patchEstateAudioSettings({
-    silenced: false,
-    soundscapeOverlayEnabled: true,
-  });
-  patchEstateRuntimeState({ activeSoundscape: track.id });
-  await startEstateSoundscapeOverlayFromUrl(track.id, track.src);
+): Promise<EstateAudioPlayResult> {
+  return playSoundscapeTrack(track);
 }

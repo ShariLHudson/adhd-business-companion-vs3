@@ -4,7 +4,7 @@
  */
 
 export const GALLERY_AMBIENCE_SRC =
-  "/audio/gallery/hall-of-reflections.mp3" as const;
+  "/audio/peaceful-places/hall-of-reflections.mp3" as const;
 
 /** Soft room music when The Gallery opens — not background entertainment. */
 export const GALLERY_AMBIENCE_VOLUME = 0.16 as const;

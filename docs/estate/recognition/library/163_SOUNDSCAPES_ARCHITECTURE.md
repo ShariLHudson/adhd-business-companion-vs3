@@ -1,25 +1,25 @@
 # 163_SOUNDSCAPES_ARCHITECTURE
 
-# Spark Estate™
-## Soundscapes™ Architecture Standard
+# Spark Estate
+## Soundscapes Architecture Standard
 
 **Version:** 1  
 **Status:** Architecture  
 **Date:** 2026-07-09  
-**Concept:** Soundscapes™ are independent audio layers — never permanently attached to a Scene
+**Concept:** Soundscapes are independent audio layers — never permanently attached to a Scene
 
 **Related:**
-- [162 Scenes™ Architecture](./162_SCENES_ARCHITECTURE.md)
+- [162 Scenes Architecture](./162_SCENES_ARCHITECTURE.md)
 - [100 Spark Estate Master Manifest](./100_SPARK_ESTATE_MASTER_MANIFEST.md)
 - Soundscapes runtime — `lib/soundscapes/`
-- Peaceful Places™ — `lib/peacefulPlaces/`
+- Peaceful Places — `lib/peacefulPlaces/`
 - Runtime mirror — `lib/soundscapes/soundscapesArchitecture.ts`
 
 ---
 
 ## Purpose
 
-Soundscapes™ are independent audio layers that accompany a Scene.
+Soundscapes are independent audio layers that accompany a Scene.
 
 A Soundscape is **never** permanently attached to a Scene.
 
@@ -56,7 +56,7 @@ A Scene may be enjoyed with no audio at all.
 - White Noise  
 - Soft Café  
 
-### Spark Companion™
+### Spark Companion
 
 Optional guided audio.
 
@@ -108,7 +108,7 @@ None are required. Any may accompany a Scene + Soundscape session:
 | Journal Afterwards | Capture after the session |
 | Voice Notes | Speak thoughts while present |
 | Focus Session | Timed work without labeling the Scene |
-| Calendar Scheduling | Schedule a return (Spark Hands™) |
+| Calendar Scheduling | Schedule a return (Spark Hands) |
 
 ---
 
@@ -134,7 +134,7 @@ Members may save combinations.
 
 | Layer | Choice |
 |-------|--------|
-| Scene | Bright Studio™ |
+| Scene | Bright Studio |
 | Soundscape | Coffee House |
 | Timer | 45 minutes |
 | Companion Audio | Off |
@@ -143,7 +143,7 @@ Members may save combinations.
 
 | Layer | Choice |
 |-------|--------|
-| Scene | Journal Gazebo™ |
+| Scene | Journal Gazebo |
 | Soundscape | Water Fountain |
 | Companion Reflection | On |
 
@@ -199,9 +199,9 @@ The architecture should support growth **without** changing the member experienc
 
 ---
 
-## Relationship to Scenes™
+## Relationship to Scenes
 
-| Scenes™ (#162) | Soundscapes™ (#163) |
+| Scenes (#162) | Soundscapes (#163) |
 |----------------|---------------------|
 | Visual environment | Independent audio layer |
 | “Where would you like to spend some time?” | “What would you like to hear?” |
@@ -235,7 +235,7 @@ Together they form a mixable presence experience — not a fixed “focus room�
 | Runtime catalog | `lib/soundscapes/` |
 | Inventory constants | `lib/soundscapes/masterSoundscapeInventory.ts` |
 | Architecture constants | `lib/soundscapes/soundscapesArchitecture.ts` |
-| Scenes™ | [162 Scenes Architecture](./162_SCENES_ARCHITECTURE.md) |
+| Scenes | [162 Scenes Architecture](./162_SCENES_ARCHITECTURE.md) |
 | Peaceful Places | `lib/peacefulPlaces/` |
 
 **Status:** Architecture ingested. Master asset list is #181. Existing `lib/soundscapes/` catalog continues as the playback registry; favorite-experience recipes and full behavior learning loops are future work aligned to this standard.

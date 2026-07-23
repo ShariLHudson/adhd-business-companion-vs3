@@ -1,7 +1,7 @@
 {
   "registry": "audio-experiences",
   "version": "1.0.0",
-  "description": "Audio Experience Foundation™ — what audio exists on the Estate, where it lives, and when it may help. Not the full music library.",
+  "description": "Audio Experience Foundation — what audio exists on the Estate, where it lives, and when it may help. Not the full music library.",
   "rules": {
     "kbSourceOfTruth": true,
     "neverInventAudio": true,
@@ -28,7 +28,7 @@
   "experiences": [
     {
       "audioExperienceId": "peaceful-places-focus",
-      "name": "Peaceful Places™",
+      "name": "Peaceful Places",
       "description": "Estate focus audio and calm soundscapes — gentle company while you think.",
       "status": "Live",
       "categoryId": "focus-ambience",

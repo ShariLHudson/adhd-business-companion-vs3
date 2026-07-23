@@ -1,7 +1,7 @@
 {
   "registry": "audio-categories",
   "version": "1.0.0",
-  "description": "Audio Experience Foundation™ — taxonomy for Estate sound. Categories describe purpose, not playlists.",
+  "description": "Audio Experience Foundation — taxonomy for Estate sound. Categories describe purpose, not playlists.",
   "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
   "itemSchema": {
     "categoryId": "string — stable slug",

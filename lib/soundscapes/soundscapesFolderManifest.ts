@@ -12,7 +12,6 @@ export const SOUNDSCAPES_FOLDER_FILENAMES = [
   "frogs-croaking-at-night.mp3",
   "gentle_rain_on_a_tin.mp3",
   "greenhouse-birds-ambience.mp3",
-  "java-seranade-coffee-house.mp3",
   "morning-birdsong.mp3",
   "water-fountain.mp3",
 ] as const;
@@ -28,7 +27,6 @@ const SOUNDSCAPE_TITLE_OVERRIDES: Readonly<Record<string, string>> = {
   "frogs-croaking-at-night.mp3": "Frogs Croaking at Night",
   "gentle_rain_on_a_tin.mp3": "Gentle Rain on a Tin Roof",
   "greenhouse-birds-ambience.mp3": "Greenhouse Birds",
-  "java-seranade-coffee-house.mp3": "Java Serenade",
   "morning-birdsong.mp3": "Morning Birdsong",
   "water-fountain.mp3": "Water Fountain",
 };
