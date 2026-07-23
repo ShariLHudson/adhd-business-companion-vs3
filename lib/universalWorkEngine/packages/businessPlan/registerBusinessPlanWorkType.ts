@@ -1,6 +1,7 @@
 /**
  * Business Plan — Work Type package for Crafter / maker Business Blueprints (201–202).
- * Owns Business domain configuration only. Does not mint IDs, save, or own resume.
+ * Owns Business domain configuration + section-ideas catalog only.
+ * Does not mint IDs or save. Exact-section resume and ideas runtime are shared UWE capabilities.
  */
 
 import {
@@ -12,8 +13,11 @@ import { registerWorkTypePackage } from "../../registry/universalWorkTypeRegistr
 import { registerSchemaAsWorkTypePackage } from "../../registry/bridgeWorkTypeSchema";
 import { registerWorkTypeSchema } from "@/lib/workTypeSchema/registry";
 import type { WorkTypeSchema } from "@/lib/workTypeSchema/types";
+import { GUIDED_WORK_TYPE_CAPABILITIES } from "../../types";
+import { registerSectionIdeasCatalog } from "../../sectionRuntime/sectionIdeas";
 import { BUSINESS_PLAN_BLUEPRINT_IDS } from "./businessBlueprintDefinitions";
 import { BUSINESS_PLAN_MAP_GROUPS } from "./businessPlanMapGroups";
+import { BUSINESS_PLAN_SECTION_IDEAS } from "./sectionIdeasCatalog";
 import { ensureBusinessPlanBlueprintsRegistered } from "./registerBusinessPlanBlueprints";
 
 export const BUSINESS_PLAN_PACKAGE_VERSION = "1.0.0";
@@ -52,17 +56,7 @@ export function ensureBusinessPlanWorkTypeRegistered(): void {
     defaultFocusSectionIds: BUSINESS_PLAN_DEFAULT_FOCUS,
     questionDefinitionIds: ["business-plan-foundation"],
     deliverableIds: ["business-plan-crafter"],
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
     certificationRequirementIds: [
       "business_plan.foundation",
       "business_plan.map",
@@ -70,20 +64,14 @@ export function ensureBusinessPlanWorkTypeRegistered(): void {
       "business_plan.anywhere_origin",
     ],
   });
+  registerSectionIdeasCatalog(
+    BUSINESS_PLAN_WORK_TYPE_ID,
+    BUSINESS_PLAN_SECTION_IDEAS,
+  );
   registerWorkTypeSchema(BUSINESS_PLAN_SCHEMA);
   registerSchemaAsWorkTypePackage(BUSINESS_PLAN_SCHEMA, {
     version: BUSINESS_PLAN_PACKAGE_VERSION,
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
   });
 }
 

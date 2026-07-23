@@ -1,6 +1,7 @@
 /**
  * Event Plan — first certified Work Type package for the Universal Work Engine.
- * Owns Event domain configuration only. Does not mint IDs, save, or own resume.
+ * Owns Event domain configuration + section-ideas catalog only.
+ * Does not mint IDs or save. Exact-section resume is a shared UWE capability.
  */
 
 import {
@@ -12,8 +13,11 @@ import { registerWorkTypePackage } from "../../registry/universalWorkTypeRegistr
 import { registerSchemaAsWorkTypePackage } from "../../registry/bridgeWorkTypeSchema";
 import { registerWorkTypeSchema } from "@/lib/workTypeSchema/registry";
 import type { WorkTypeSchema } from "@/lib/workTypeSchema/types";
+import { GUIDED_WORK_TYPE_CAPABILITIES } from "../../types";
+import { registerSectionIdeasCatalog } from "../../sectionRuntime/sectionIdeas";
 import { EVENT_PLAN_BLUEPRINT_IDS } from "./eventBlueprintDefinitions";
 import { EVENT_PLAN_MAP_GROUPS } from "./eventPlanMapGroups";
+import { EVENT_PLAN_SECTION_IDEAS } from "./sectionIdeasCatalog";
 import { ensureEventBlueprintsRegistered } from "./registerEventBlueprints";
 
 export const EVENT_PLAN_PACKAGE_VERSION = "1.0.0";
@@ -54,17 +58,7 @@ export function ensureEventPlanWorkTypeRegistered(): void {
     defaultFocusSectionIds: EVENT_PLAN_DEFAULT_FOCUS,
     questionDefinitionIds: ["event-foundation"],
     deliverableIds: ["event-plan-brief"],
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
     certificationRequirementIds: [
       "event.foundation",
       "event.map",
@@ -72,21 +66,12 @@ export function ensureEventPlanWorkTypeRegistered(): void {
       "event.continue",
     ],
   });
+  registerSectionIdeasCatalog(EVENT_PLAN_WORK_TYPE_ID, EVENT_PLAN_SECTION_IDEAS);
   // Keep legacy WorkTypeSchema registry in sync for existing map openers.
   registerWorkTypeSchema(EVENT_PLAN_SCHEMA);
   registerSchemaAsWorkTypePackage(EVENT_PLAN_SCHEMA, {
     version: EVENT_PLAN_PACKAGE_VERSION,
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
   });
 }
 

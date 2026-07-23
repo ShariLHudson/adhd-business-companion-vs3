@@ -1,7 +1,8 @@
 /**
  * Facebook Community — Work Type package for the Universal Work Engine (587–598).
- * Owns Facebook Community domain configuration only. Does not mint IDs, save,
- * or own resume. Reuses canonical Marketing / Client Relationships / Content /
+ * Owns Facebook Community domain configuration + section-ideas catalog only.
+ * Does not mint IDs or save. Exact-section resume and ideas runtime are shared
+ * UWE capabilities. Reuses canonical Marketing / Client Relationships / Content /
  * Creative Studio / Events / Create / Projects ownership — does not fork a
  * parallel Create runtime, router, image engine, or content-calendar engine.
  */
@@ -15,8 +16,11 @@ import { registerWorkTypePackage } from "../../registry/universalWorkTypeRegistr
 import { registerSchemaAsWorkTypePackage } from "../../registry/bridgeWorkTypeSchema";
 import { registerWorkTypeSchema } from "@/lib/workTypeSchema/registry";
 import type { WorkTypeSchema } from "@/lib/workTypeSchema/types";
+import { GUIDED_WORK_TYPE_CAPABILITIES } from "../../types";
+import { registerSectionIdeasCatalog } from "../../sectionRuntime/sectionIdeas";
 import { FACEBOOK_COMMUNITY_BLUEPRINT_IDS } from "./facebookCommunityBlueprint";
 import { FACEBOOK_COMMUNITY_MAP_GROUPS } from "./facebookCommunityMapGroups";
+import { FACEBOOK_COMMUNITY_SECTION_IDEAS } from "./sectionIdeasCatalog";
 import { ensureFacebookCommunityBlueprintsRegistered } from "./registerFacebookCommunityBlueprints";
 
 export const FACEBOOK_COMMUNITY_PACKAGE_VERSION = "1.0.0";
@@ -62,17 +66,7 @@ export function ensureFacebookCommunityWorkTypeRegistered(): void {
     defaultFocusSectionIds: FACEBOOK_COMMUNITY_DEFAULT_FOCUS,
     questionDefinitionIds: ["facebook-community-foundation"],
     deliverableIds: ["facebook-community-simple"],
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
     certificationRequirementIds: [
       "facebook_community.foundation",
       "facebook_community.map",
@@ -80,20 +74,14 @@ export function ensureFacebookCommunityWorkTypeRegistered(): void {
       "facebook_community.anywhere_origin",
     ],
   });
+  registerSectionIdeasCatalog(
+    FACEBOOK_COMMUNITY_WORK_TYPE_ID,
+    FACEBOOK_COMMUNITY_SECTION_IDEAS,
+  );
   registerWorkTypeSchema(FACEBOOK_COMMUNITY_SCHEMA);
   registerSchemaAsWorkTypePackage(FACEBOOK_COMMUNITY_SCHEMA, {
     version: FACEBOOK_COMMUNITY_PACKAGE_VERSION,
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
   });
 }
 

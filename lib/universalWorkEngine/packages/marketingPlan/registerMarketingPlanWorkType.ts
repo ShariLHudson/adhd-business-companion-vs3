@@ -1,6 +1,7 @@
 /**
  * Marketing Plan — first non-Event Work Type package for the Universal Work Engine (105).
- * Owns Marketing domain configuration only. Does not mint IDs, save, or own resume.
+ * Owns Marketing domain configuration + section-ideas catalog only.
+ * Does not mint IDs or save. Exact-section resume and ideas runtime are shared UWE capabilities.
  */
 
 import {
@@ -12,8 +13,11 @@ import { registerWorkTypePackage } from "../../registry/universalWorkTypeRegistr
 import { registerSchemaAsWorkTypePackage } from "../../registry/bridgeWorkTypeSchema";
 import { registerWorkTypeSchema } from "@/lib/workTypeSchema/registry";
 import type { WorkTypeSchema } from "@/lib/workTypeSchema/types";
+import { GUIDED_WORK_TYPE_CAPABILITIES } from "../../types";
+import { registerSectionIdeasCatalog } from "../../sectionRuntime/sectionIdeas";
 import { MARKETING_PLAN_BLUEPRINT_IDS } from "./marketingPlanBlueprint";
 import { MARKETING_PLAN_MAP_GROUPS } from "./marketingPlanMapGroups";
+import { MARKETING_PLAN_SECTION_IDEAS } from "./sectionIdeasCatalog";
 import { ensureMarketingPlanBlueprintsRegistered } from "./registerMarketingPlanBlueprints";
 
 export const MARKETING_PLAN_PACKAGE_VERSION = "1.0.0";
@@ -53,17 +57,7 @@ export function ensureMarketingPlanWorkTypeRegistered(): void {
     defaultFocusSectionIds: MARKETING_PLAN_DEFAULT_FOCUS,
     questionDefinitionIds: ["marketing-plan-foundation"],
     deliverableIds: ["marketing-plan-simple"],
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
     certificationRequirementIds: [
       "marketing_plan.foundation",
       "marketing_plan.map",
@@ -71,20 +65,14 @@ export function ensureMarketingPlanWorkTypeRegistered(): void {
       "marketing_plan.anywhere_origin",
     ],
   });
+  registerSectionIdeasCatalog(
+    MARKETING_PLAN_WORK_TYPE_ID,
+    MARKETING_PLAN_SECTION_IDEAS,
+  );
   registerWorkTypeSchema(MARKETING_PLAN_SCHEMA);
   registerSchemaAsWorkTypePackage(MARKETING_PLAN_SCHEMA, {
     version: MARKETING_PLAN_PACKAGE_VERSION,
-    capabilities: {
-      tasks: true,
-      milestones: true,
-      research: true,
-      chamberRouting: true,
-      boardReview: true,
-      cartography: true,
-      projectBridge: true,
-      print: true,
-      export: true,
-    },
+    capabilities: { ...GUIDED_WORK_TYPE_CAPABILITIES },
   });
 }
 
