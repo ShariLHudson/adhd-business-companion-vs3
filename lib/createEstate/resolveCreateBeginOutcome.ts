@@ -111,6 +111,19 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
     };
   }
 
+  // 587–598 — Facebook Community is a distinct guided experience. Resolve it
+  // before the generic catalog match so "Facebook community/group" wording is
+  // never mislabeled as a "Facebook Post" (or captured by a later word like
+  // "clients"). Narrow detector — plain "Facebook post" still falls through.
+  if (isFacebookCommunityCreationRequest(text)) {
+    return {
+      artifactType: "Facebook Community",
+      fromCatalog: false,
+      fromPromptDetect: false,
+      fromPromotionalIntent: false,
+    };
+  }
+
   const catalogMatch = matchCatalogFromText(text)?.type?.trim() || null;
   if (catalogMatch) {
     return {
@@ -126,14 +139,6 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
       artifactType: fromPrompt,
       fromCatalog: false,
       fromPromptDetect: true,
-      fromPromotionalIntent: false,
-    };
-  }
-  if (isFacebookCommunityCreationRequest(text)) {
-    return {
-      artifactType: "Facebook Community",
-      fromCatalog: false,
-      fromPromptDetect: false,
       fromPromotionalIntent: false,
     };
   }

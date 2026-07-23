@@ -11,7 +11,10 @@ import {
 import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
 import { BUSINESS_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/businessPlanMap";
 import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
+import { FACEBOOK_COMMUNITY_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/facebookCommunityMap";
 import { MARKETING_PLAN_SIMPLE_BLUEPRINT_ID } from "../packages/marketingPlan/marketingPlanBlueprint";
+import { FACEBOOK_COMMUNITY_SIMPLE_BLUEPRINT_ID } from "../packages/facebookCommunity/facebookCommunityBlueprint";
+import { isFacebookCommunityCreationRequest } from "../packages/facebookCommunity/isFacebookCommunityCreationRequest";
 import {
   AUTHOR_BUSINESS_BLUEPRINT_ID,
   COACHING_BUSINESS_BLUEPRINT_ID,
@@ -783,6 +786,13 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
     .filter(Boolean)
     .join(" ");
 
+  // 587–598 — Facebook Community must resolve before the Event patterns, because
+  // "launch"/"community"/"group" wording would otherwise fall through to Event.
+  if (!blueprintId && message && isFacebookCommunityCreationRequest(message)) {
+    blueprintId = FACEBOOK_COMMUNITY_SIMPLE_BLUEPRINT_ID;
+    workTypeId = workTypeId ?? FACEBOOK_COMMUNITY_WORK_TYPE_ID;
+  }
+
   if (!blueprintId && message) {
     for (const pattern of MESSAGE_BLUEPRINT_PATTERNS) {
       if (pattern.re.test(message)) {
@@ -835,6 +845,14 @@ export function inferWorkTypeAndBlueprint(contract: UniversalLaunchContract): {
     )
   ) {
     workTypeId = EVENT_PLAN_WORK_TYPE_ID;
+  }
+
+  // 587–598 — Facebook Community has a single guided Blueprint. When the FB Work
+  // Type is chosen (e.g. from Create Begin, which passes candidateWorkTypeId only)
+  // but no Blueprint was inferred, attach it so the guided experience opens
+  // instead of an empty scratch workspace.
+  if (workTypeId === FACEBOOK_COMMUNITY_WORK_TYPE_ID && !blueprintId) {
+    blueprintId = FACEBOOK_COMMUNITY_SIMPLE_BLUEPRINT_ID;
   }
 
   return { workTypeId, blueprintId, fromLegacyAlias };

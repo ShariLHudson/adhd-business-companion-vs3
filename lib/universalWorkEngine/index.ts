@@ -13,6 +13,11 @@ import "./packages/marketingPlan/registerMarketingPlanWorkType";
 import "./packages/marketingPlan/registerMarketingPlanBlueprints";
 import "./packages/businessPlan/registerBusinessPlanWorkType";
 import "./packages/businessPlan/registerBusinessPlanBlueprints";
+// 587–598 — Facebook Community must register on the live Create-open path.
+// Bare side-effect imports (not just re-exports) so bundlers cannot tree-shake
+// the self-registration away, matching the Event / Marketing / Business pattern.
+import "./packages/facebookCommunity/registerFacebookCommunityWorkType";
+import "./packages/facebookCommunity/registerFacebookCommunityBlueprints";
 
 export type {
   CanonicalWorkId,

@@ -82,6 +82,42 @@ describe("Create Begin — always one of two outcomes", () => {
     }
   });
 
+  it("Facebook community Begin → confirm with Facebook Community domain (587–598)", () => {
+    const outcome = resolveCreateBeginOutcome(
+      "Help me create a Facebook community for my clients",
+    );
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind === "confirm") {
+      expect(outcome.artifactType).toMatch(/facebook community/i);
+      expect(outcome.isFacebookCommunityDomain).toBe(true);
+      // Domain is exclusive — never double-counted as Marketing or Event.
+      expect(outcome.isMarketingPlanDomain).toBe(false);
+      expect(outcome.isEventDomain).toBe(false);
+      expect(outcome.confidence).toBe("high");
+    }
+  });
+
+  it("Facebook Community domain carries through confirm → open", () => {
+    const outcome = resolveCreateBeginOutcome(
+      "I want to start a Facebook group for my members",
+    );
+    expect(outcome.kind).toBe("confirm");
+    if (outcome.kind !== "confirm") return;
+    expect(outcome.isFacebookCommunityDomain).toBe(true);
+    const open = confirmCreateBeginToOpen(outcome);
+    expect(open.kind).toBe("open");
+    expect(open.isFacebookCommunityDomain).toBe(true);
+  });
+
+  it("plain Facebook post request is NOT a Facebook Community domain (honest routing)", () => {
+    const outcome = resolveCreateBeginOutcome(
+      "Write me a Facebook post about our weekend sale",
+    );
+    if (outcome.kind === "confirm") {
+      expect(outcome.isFacebookCommunityDomain).toBe(false);
+    }
+  });
+
   it("confirm → open only after explicit conversion (no silent create)", () => {
     const outcome = resolveCreateBeginOutcome(
       "Help me create a simple marketing plan",

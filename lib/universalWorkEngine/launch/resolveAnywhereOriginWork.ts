@@ -7,6 +7,8 @@ import { ensureEventBlueprintsRegistered } from "../packages/eventPlan/registerE
 import { ensureEventPlanWorkTypeRegistered } from "../packages/eventPlan/registerEventPlanWorkType";
 import { ensureMarketingPlanBlueprintsRegistered } from "../packages/marketingPlan/registerMarketingPlanBlueprints";
 import { ensureMarketingPlanWorkTypeRegistered } from "../packages/marketingPlan/registerMarketingPlanWorkType";
+import { ensureFacebookCommunityBlueprintsRegistered } from "../packages/facebookCommunity/registerFacebookCommunityBlueprints";
+import { ensureFacebookCommunityWorkTypeRegistered } from "../packages/facebookCommunity/registerFacebookCommunityWorkType";
 import { initializeWorkFromBlueprint } from "../blueprints/initializeFromBlueprint";
 import { getWorkBlueprintState, putWorkBlueprintState } from "../blueprints/workBlueprintStateStore";
 import { getBlueprint } from "../blueprints/registry";
@@ -196,6 +198,9 @@ export function resolveAnywhereOriginWork(
   ensureEventBlueprintsRegistered();
   ensureMarketingPlanWorkTypeRegistered();
   ensureMarketingPlanBlueprintsRegistered();
+  // 587–598 — Facebook Community resolves through the same Anywhere-Origin path.
+  ensureFacebookCommunityWorkTypeRegistered();
+  ensureFacebookCommunityBlueprintsRegistered();
 
   const mode = classifyIntentMode(contract);
   const talkOnly =
