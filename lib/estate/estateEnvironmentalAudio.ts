@@ -1,11 +1,13 @@
 import { stopEstateRoomAmbience } from "@/lib/estate/estateRoomAmbience";
 import { stopEstateSoundscapeOverlay } from "@/lib/estate/estateSoundscapeOverlay";
+import { stopLayeredAudioAll } from "@/lib/layeredAudio/session";
 import { stopGardenCardAmbience } from "@/lib/peacefulPlaces/gardenCardAmbience";
 import { stopGardenFlagAmbience } from "@/lib/peacefulPlaces/gardenFlagAmbience";
 
 /** Stop Layer 1 place ambience and Layer 2 soundscape overlay immediately. */
 export async function stopAllEstateEnvironmentalAudio(): Promise<void> {
   if (typeof window === "undefined") return;
+  stopLayeredAudioAll();
   await Promise.all([
     stopEstateRoomAmbience(),
     stopEstateSoundscapeOverlay(),

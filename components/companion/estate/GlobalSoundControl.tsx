@@ -37,6 +37,8 @@ type Props = {
    * section or room, satisfying "open from any window".
    */
   onOpenPeacefulMoments?: () => void;
+  /** Open the layered Voice + Environment + Music mixer. */
+  onOpenLayeredAudioMixer?: () => void;
 };
 
 /**
@@ -51,6 +53,7 @@ export function GlobalSoundControl({
   soundPlayingHint = false,
   onOpenAudioSettings,
   onOpenPeacefulMoments,
+  onOpenLayeredAudioMixer,
 }: Props) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -231,6 +234,19 @@ export function GlobalSoundControl({
               }}
             >
               Peaceful Moments
+            </button>
+          ) : null}
+          {onOpenLayeredAudioMixer ? (
+            <button
+              type="button"
+              className="global-sound-control__action"
+              data-testid="global-sound-open-layered-mixer"
+              onClick={() => {
+                setOpen(false);
+                onOpenLayeredAudioMixer();
+              }}
+            >
+              Environment Sounds
             </button>
           ) : null}
           <div className="global-sound-control__actions">

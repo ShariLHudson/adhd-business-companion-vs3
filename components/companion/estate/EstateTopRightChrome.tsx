@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
 import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
 import { GlobalSoundControl } from "@/components/companion/estate/GlobalSoundControl";
+import { LayeredAudioMixerPanel } from "@/components/companion/layeredAudio/LayeredAudioMixerPanel";
 import type { EstateMenuActionId } from "@/lib/estateMenu";
 import type { WelcomeHomeNavDestinationId } from "@/lib/estate/welcomeHomeNavigationStructure";
 
@@ -113,6 +114,7 @@ export function EstateTopRightChrome({
   backdropSurface,
 }: EstateTopRightChromeProps) {
   const [mounted, setMounted] = useState(false);
+  const [layeredMixerOpen, setLayeredMixerOpen] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -127,6 +129,12 @@ export function EstateTopRightChrome({
           onOpenAudioSettings ??
           (() => onEstateMenuAction("experience-controls"))
         }
+        onOpenPeacefulMoments={onOpenFocusAudio}
+        onOpenLayeredAudioMixer={() => setLayeredMixerOpen(true)}
+      />
+      <LayeredAudioMixerPanel
+        open={layeredMixerOpen}
+        onClose={() => setLayeredMixerOpen(false)}
       />
       {showRoom && roomId ? (
         <EstateRoomExperienceMenu

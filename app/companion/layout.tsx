@@ -4,6 +4,7 @@ import { CompanionPhotoProvider } from "@/lib/companionPhotoProvider";
 import { LiveEcosystemInit } from "@/components/companion/LiveEcosystemInit";
 import { RoomBackgroundWarmup } from "@/components/companion/RoomBackgroundWarmup";
 import { EstateSceneTransitionHost } from "@/components/companion/estate/EstateSceneTransitionHost";
+import { LayeredAudioHost } from "@/components/companion/layeredAudio/LayeredAudioHost";
 import { HomesteadSceneProvider } from "@/lib/homesteadScene";
 import { resolveCompanionSupabaseEnv } from "@/lib/supabase/resolveCompanionSupabaseEnv";
 import { isBrowserSafeSupabaseKey } from "@/lib/supabase/supabaseKeyRoles";
@@ -46,6 +47,7 @@ import "./estate-arrival.css";
 import "./ocean-conservatory-aquarium.css";
 import "./estate-room-frosted-chat.css";
 import "./estate-audio-settings.css";
+import "./layered-audio-mixer.css";
 import "./estate-room-invitation.css";
 import "./estate-room-template.css";
 import "./estate-room-experience-menu.css";
@@ -98,6 +100,7 @@ export default function CompanionLayout({
             <LiveEcosystemInit />
             <RoomBackgroundWarmup />
             <EstateSceneTransitionHost />
+            <LayeredAudioHost />
             {children}
           </CompanionPhotoProvider>
         </CompanionLanguageProvider>
