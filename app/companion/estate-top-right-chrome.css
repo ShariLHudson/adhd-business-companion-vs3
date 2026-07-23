@@ -95,6 +95,30 @@
   outline-offset: 2px;
 }
 
+.global-sound-control__heading {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1f1c19;
+}
+
+.global-sound-control__mix-title {
+  margin: 0 0 0.2rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e4f4f;
+}
+
+.global-sound-control__empty-mix {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  color: #6b635a;
+}
+
+.global-sound-control__trigger--paused {
+  color: #7a5c00;
+}
+
 .global-sound-control__trigger--playing {
   border-color: #1e4f4f;
   background: rgba(30, 79, 79, 0.12);
@@ -129,6 +153,37 @@
   font-size: 0.9rem;
   font-weight: 700;
   color: #1f1c19;
+}
+
+.global-sound-control__now-playing {
+  margin: 0 0 0.65rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(30, 79, 79, 0.25);
+  background: rgba(30, 79, 79, 0.08);
+}
+
+.global-sound-control__now-playing-label {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: #163d3d;
+}
+
+.global-sound-control__now-playing-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.global-sound-control__now-playing-actions .global-sound-control__action {
+  flex: 1;
+  min-height: 2.15rem;
+  font-size: 0.82rem;
+}
+
+button.global-sound-control__action[data-testid="global-sound-open-peaceful-moments"] {
+  margin: 0 0 0.65rem;
+  width: 100%;
 }
 
 .global-sound-control__actions {

@@ -2,85 +2,50 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import {
-  getEstateAudioSettings,
-  patchEstateAudioSettings,
-  setEstateSilenced,
-  subscribeEstateAudioSettings,
-} from "@/lib/estate/estateAudioSettings";
-import {
-  activeSoundscapeLabel,
-  isSoundscapePlaying,
-  stopSoundscapeOverlay,
-  subscribeSoundscapePlayback,
-} from "@/lib/estate/estateAudioService";
-import { stopAllAudio } from "@/lib/estate/stopAllAudio";
+  getEstateSoundsTransportSnapshot,
+  pauseEstateSounds,
+  resumeEstateSounds,
+  subscribeEstateSoundsTransport,
+  turnOffEstateSounds,
+  turnOnEstateSounds,
+  type EstateSoundsPlaybackState,
+  type EstateSoundsTransportSnapshot,
+} from "@/lib/estate/estateSoundsTransport";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
-export type GlobalSoundUiState = "off" | "on" | "playing";
-
-function resolveSoundUiState(
-  silenced: boolean,
-  playingHint: boolean,
-): GlobalSoundUiState {
-  if (silenced) return "off";
-  if (playingHint) return "playing";
-  return "on";
-}
-
 type Props = {
-  /** Optional: true when a registered/visible player is known to be active. */
+  /** @deprecated Hint unused — transport is the source of truth. */
   soundPlayingHint?: boolean;
-  onOpenAudioSettings?: () => void;
+  /** Opens Change Sounds (layered mixer + catalog). */
+  onOpenLayeredAudioMixer?: () => void;
   /**
-   * Open Peaceful Moments (the Music Room) from anywhere in the companion —
-   * this is the one entry point that works regardless of the current
-   * section or room, satisfying "open from any window".
+   * Optional — Peaceful Moments catalog. Prefer routing through Change Sounds.
+   * Kept for callers that still wire Focus Audio entry.
    */
   onOpenPeacefulMoments?: () => void;
-  /** Open the layered Voice + Environment + Music mixer. */
-  onOpenLayeredAudioMixer?: () => void;
+  /** @deprecated Prefer Change Sounds; ignored on the main surface. */
+  onOpenAudioSettings?: () => void;
 };
 
 /**
- * Persistent global Sound Off control — Estate top-right chrome.
- * One click stops all audio and persists silence. Does not create a second engine.
- *
- * Also self-subscribes to the shared Layer 2 soundscape overlay so it can
- * show "Now Playing" + Stop for Peaceful Moments from any screen without any
- * parent wiring — one truly global Now Playing surface.
+ * Canonical Estate Sounds control — one On / Paused / Off home.
+ * Does not create a second audio engine.
  */
 export function GlobalSoundControl({
-  soundPlayingHint = false,
-  onOpenAudioSettings,
-  onOpenPeacefulMoments,
   onOpenLayeredAudioMixer,
+  onOpenPeacefulMoments,
 }: Props) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
-  const [silenced, setSilenced] = useState(
-    () => getEstateAudioSettings().silenced,
-  );
-  const [volume, setVolume] = useState(
-    () => getEstateAudioSettings().masterVolume,
-  );
   const [open, setOpen] = useState(false);
-  const [nowPlayingLabel, setNowPlayingLabel] = useState<string | null>(
-    () => (isSoundscapePlaying() ? activeSoundscapeLabel() : null),
+  const [snap, setSnap] = useState<EstateSoundsTransportSnapshot>(() =>
+    getEstateSoundsTransportSnapshot(),
   );
 
   useEffect(() => {
-    return subscribeEstateAudioSettings(() => {
-      const s = getEstateAudioSettings();
-      setSilenced(s.silenced);
-      setVolume(s.masterVolume);
-    });
-  }, []);
-
-  useEffect(() => {
-    const sync = () =>
-      setNowPlayingLabel(isSoundscapePlaying() ? activeSoundscapeLabel() : null);
+    const sync = () => setSnap(getEstateSoundsTransportSnapshot());
     sync();
-    return subscribeSoundscapePlayback(sync);
+    return subscribeEstateSoundsTransport(sync);
   }, []);
 
   useDismissibleWindow({
@@ -101,30 +66,21 @@ export function GlobalSoundControl({
     return () => document.removeEventListener("mousedown", onPointer);
   }, [open]);
 
-  const uiState = resolveSoundUiState(
-    silenced,
-    (soundPlayingHint || nowPlayingLabel !== null) && !silenced,
-  );
-  const label =
-    uiState === "off"
-      ? "Sound Off"
-      : uiState === "playing"
-        ? "Sound Playing"
-        : "Sound On";
+  const state = snap.playbackState;
+  const statusAnnouncement =
+    state === "on"
+      ? "Sounds are on"
+      : state === "paused"
+        ? "Sounds are paused"
+        : "Sounds are off";
 
-  async function soundOff() {
-    await stopAllAudio({ silenceEstate: true });
-    setSilenced(true);
-  }
-
-  async function soundOn() {
-    setEstateSilenced(false);
-    setSilenced(false);
-  }
-
-  async function stopAll() {
-    await stopAllAudio({ silenceEstate: true });
-    setSilenced(true);
+  function openChangeSounds() {
+    setOpen(false);
+    if (onOpenLayeredAudioMixer) {
+      onOpenLayeredAudioMixer();
+      return;
+    }
+    onOpenPeacefulMoments?.();
   }
 
   return (
@@ -132,48 +88,28 @@ export function GlobalSoundControl({
       ref={rootRef}
       className="global-sound-control"
       data-testid="global-sound-control"
-      data-sound-state={uiState}
+      data-sound-state={state}
+      data-canonical-audio-controller="true"
     >
       <div className="global-sound-control__cluster">
         <button
           type="button"
           className={[
             "global-sound-control__trigger",
-            uiState === "playing" ? "global-sound-control__trigger--playing" : "",
-            uiState === "off" ? "global-sound-control__trigger--off" : "",
+            state === "on" ? "global-sound-control__trigger--playing" : "",
+            state === "off" ? "global-sound-control__trigger--off" : "",
+            state === "paused" ? "global-sound-control__trigger--paused" : "",
           ]
             .filter(Boolean)
             .join(" ")}
-          aria-label={
-            silenced
-              ? `${label}. Open sound controls`
-              : `${label}. Click to turn Sound Off`
-          }
-          title={silenced ? label : `${label} — click for Sound Off`}
-          data-testid="global-sound-control-trigger"
-          onClick={() => {
-            if (!silenced) {
-              void soundOff();
-              return;
-            }
-            setOpen((v) => !v);
-          }}
-        >
-          <span aria-hidden="true" className="global-sound-control__icon">
-            <SpeakerGlyph state={uiState} />
-          </span>
-          <span className="global-sound-control__label">{label}</span>
-        </button>
-        <button
-          type="button"
-          className="global-sound-control__menu"
-          aria-label="Open sound menu"
+          aria-label={`${snap.closedLabel}. Open Estate Sounds`}
           aria-expanded={open}
           aria-controls={panelId}
-          data-testid="global-sound-control-menu"
+          title={snap.closedLabel}
+          data-testid="global-sound-control-trigger"
           onClick={() => setOpen((v) => !v)}
         >
-          ▾
+          <span className="global-sound-control__label">{snap.closedLabel}</span>
         </button>
       </div>
 
@@ -182,178 +118,100 @@ export function GlobalSoundControl({
           id={panelId}
           className="global-sound-control__panel"
           role="dialog"
-          aria-label="Sound controls"
+          aria-label="Estate Sounds"
           data-testid="global-sound-control-panel"
         >
+          <p className="global-sound-control__heading">Estate Sounds</p>
           <p
             className="global-sound-control__status"
             data-testid="global-sound-control-status"
+            aria-live="polite"
           >
-            {label}
+            {statusAnnouncement}
           </p>
-          {nowPlayingLabel ? (
+
+          {snap.mixTitle || snap.mixSummary ? (
             <div
               className="global-sound-control__now-playing"
               data-testid="global-sound-now-playing"
             >
-              <p className="global-sound-control__now-playing-label">
-                Now playing: {nowPlayingLabel}
-              </p>
-              <div className="global-sound-control__now-playing-actions">
-                {onOpenPeacefulMoments ? (
-                  <button
-                    type="button"
-                    className="global-sound-control__action"
-                    data-testid="global-sound-now-playing-open"
-                    onClick={() => {
-                      setOpen(false);
-                      onOpenPeacefulMoments();
-                    }}
-                  >
-                    Open Peaceful Moments
-                  </button>
-                ) : null}
-                <button
-                  type="button"
-                  className="global-sound-control__action"
-                  data-testid="global-sound-now-playing-stop"
-                  onClick={() => void stopSoundscapeOverlay()}
+              {snap.mixTitle ? (
+                <p
+                  className="global-sound-control__mix-title"
+                  data-testid="global-sound-mix-title"
                 >
-                  Stop
-                </button>
-              </div>
+                  {snap.mixTitle}
+                </p>
+              ) : null}
+              {snap.mixSummary ? (
+                <p
+                  className="global-sound-control__now-playing-label"
+                  data-testid="global-sound-mix-summary"
+                >
+                  {snap.mixSummary}
+                </p>
+              ) : null}
             </div>
-          ) : onOpenPeacefulMoments ? (
-            <button
-              type="button"
-              className="global-sound-control__action"
-              data-testid="global-sound-open-peaceful-moments"
-              onClick={() => {
-                setOpen(false);
-                onOpenPeacefulMoments();
-              }}
-            >
-              Peaceful Moments
-            </button>
-          ) : null}
-          {onOpenLayeredAudioMixer ? (
-            <button
-              type="button"
-              className="global-sound-control__action"
-              data-testid="global-sound-open-layered-mixer"
-              onClick={() => {
-                setOpen(false);
-                onOpenLayeredAudioMixer();
-              }}
-            >
-              Environment Sounds
-            </button>
-          ) : null}
+          ) : (
+            <p className="global-sound-control__empty-mix">
+              No sounds selected yet.
+            </p>
+          )}
+
           <div className="global-sound-control__actions">
-            <button
-              type="button"
-              className="global-sound-control__action global-sound-control__action--primary"
-              data-testid="global-sound-off"
-              onClick={() => void soundOff()}
-            >
-              Sound Off
-            </button>
+            {state === "on" ? (
+              <button
+                type="button"
+                className="global-sound-control__action global-sound-control__action--primary"
+                data-testid="global-sound-pause"
+                onClick={() => void pauseEstateSounds()}
+              >
+                Pause
+              </button>
+            ) : null}
+            {state === "paused" ? (
+              <button
+                type="button"
+                className="global-sound-control__action global-sound-control__action--primary"
+                data-testid="global-sound-resume"
+                onClick={() => void resumeEstateSounds()}
+              >
+                Resume
+              </button>
+            ) : null}
+            {state === "off" ? (
+              <button
+                type="button"
+                className="global-sound-control__action global-sound-control__action--primary"
+                data-testid="global-sound-on"
+                onClick={() => void turnOnEstateSounds()}
+              >
+                Turn On
+              </button>
+            ) : null}
+            {state !== "off" ? (
+              <button
+                type="button"
+                className="global-sound-control__action"
+                data-testid="global-sound-off"
+                onClick={() => void turnOffEstateSounds()}
+              >
+                Turn Off
+              </button>
+            ) : null}
             <button
               type="button"
               className="global-sound-control__action"
-              data-testid="global-sound-on"
-              onClick={() => void soundOn()}
-              disabled={!silenced}
+              data-testid="global-sound-change-sounds"
+              onClick={openChangeSounds}
             >
-              Sound On
-            </button>
-            <button
-              type="button"
-              className="global-sound-control__action"
-              data-testid="global-stop-all-sound"
-              onClick={() => void stopAll()}
-            >
-              Stop All Sound
+              Change Sounds
             </button>
           </div>
-          <label className="global-sound-control__volume">
-            <span>Volume</span>
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={silenced ? 0 : volume}
-              data-testid="global-sound-volume"
-              onChange={(e) => {
-                const next = Number(e.target.value);
-                setVolume(next);
-                patchEstateAudioSettings({
-                  masterVolume: next,
-                  silenced: next <= 0,
-                });
-                setSilenced(next <= 0);
-              }}
-            />
-          </label>
-          {onOpenAudioSettings ? (
-            <button
-              type="button"
-              className="global-sound-control__settings"
-              data-testid="global-sound-open-settings"
-              onClick={() => {
-                setOpen(false);
-                onOpenAudioSettings();
-              }}
-            >
-              Audio Settings
-            </button>
-          ) : null}
         </div>
       ) : null}
     </div>
   );
 }
 
-function SpeakerGlyph({ state }: { state: GlobalSoundUiState }) {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M4 9.5v5h3.5L12 18.5V5.5L7.5 9.5H4z"
-        fill="currentColor"
-      />
-      {state === "off" ? (
-        <path
-          d="M15 9l5 5m0-5l-5 5"
-          stroke="currentColor"
-          strokeWidth="1.8"
-          strokeLinecap="round"
-        />
-      ) : (
-        <>
-          <path
-            d="M15.5 9.5a3.5 3.5 0 010 5"
-            stroke="currentColor"
-            strokeWidth="1.6"
-            strokeLinecap="round"
-          />
-          {state === "playing" ? (
-            <path
-              d="M18 7.5a6 6 0 010 9"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            />
-          ) : null}
-        </>
-      )}
-    </svg>
-  );
-}
+export type { EstateSoundsPlaybackState };

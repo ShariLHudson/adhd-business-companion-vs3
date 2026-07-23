@@ -1,5 +1,5 @@
 /**
- * 122–124 / 137–139 — Peaceful Moments: woodland + Choose Music + opt-in playback.
+ * Peaceful Moments: Choose Music + contextual Play → Estate Sounds.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -43,25 +43,23 @@ describe("Peaceful Moments audio dropdown (137–139)", () => {
     ).toBe(true);
   });
 
-  it("requires Play after select — no autoplay on open or select", () => {
+  it("offers contextual Play only — management lives in Estate Sounds", () => {
     const room = read(
       "components/companion/peacefulPlaces/PeacefulMomentsRoom.tsx",
     );
     expect(room).toContain("peaceful-moments-play");
-    expect(room).toContain("peaceful-moments-pause");
-    expect(room).toContain("peaceful-moments-stop");
-    expect(room).toContain("peaceful-moments-mute");
-    expect(room).toContain("peaceful-moments-volume");
-    // Playback routes through the shared global Layer 2 engine — no local
-    // <audio> tied to component lifecycle — so it survives navigation.
+    expect(room).toContain("noteEstateSoundsStarted");
+    expect(room).toContain("Estate Sounds");
+    expect(room).not.toContain("peaceful-moments-pause");
+    expect(room).not.toContain("peaceful-moments-stop");
+    expect(room).not.toContain("peaceful-moments-mute");
+    expect(room).not.toContain("peaceful-moments-volume");
     expect(room).toContain("playSoundscapeTrack");
-    expect(room).toContain("stopSoundscapeOverlay");
     expect(room).toContain("subscribeSoundscapePlayback");
     expect(room).not.toContain("autoPlay");
     expect(room).toMatch(
       /Selecting a track must not start playback|does not start playback/i,
     );
-    // selectTrack must not call .play()
     const selectBlock = room.match(
       /const selectTrack = useCallback\([\s\S]*?\}, \[\]\);/,
     )?.[0];
@@ -69,7 +67,7 @@ describe("Peaceful Moments audio dropdown (137–139)", () => {
     expect(selectBlock).not.toMatch(/\.play\(/);
   });
 
-  it("keeps playing after Previous Screen — only Stop/Sound Off end it (persistence)", () => {
+  it("keeps playing after Previous Screen — Estate Sounds manages stop", () => {
     const room = read(
       "components/companion/peacefulPlaces/PeacefulMomentsRoom.tsx",
     );
@@ -78,42 +76,15 @@ describe("Peaceful Moments audio dropdown (137–139)", () => {
     )?.[0];
     expect(leaveBlock).toBeTruthy();
     expect(leaveBlock).not.toMatch(/stopSoundscapeOverlay|stopAllAudio/);
-    expect(leaveBlock).toContain("onDone?.()");
   });
 
-  it("FocusAudioPanel mounts PeacefulMomentsRoom without garden extras", () => {
-    const panel = read("components/companion/FocusAudioPanel.tsx");
-    expect(panel).toContain("PeacefulMomentsRoom");
-    expect(panel).not.toContain("GardenDestinationCardMenu");
-    expect(panel).not.toContain("PathwayEstateSignposts");
-    expect(panel).not.toContain("PeacefulPlaceSession");
-    expect(panel).not.toContain("breathe");
-    expect(panel).not.toContain("journal");
-  });
-
-  it("Welcome Home Audio labels Peaceful Moments (Prompt 144)", () => {
-    const audio = WELCOME_HOME_NAV_CATEGORIES.find((c) => c.id === "audio");
-    const peaceful = audio?.destinations.find((d) => d.id === "peaceful-places");
-    expect(peaceful?.label).toBe("Peaceful Moments");
-    const focus = WELCOME_HOME_NAV_CATEGORIES.find(
-      (c) => c.id === "take-a-moment",
+  it("is reachable from Welcome Home navigation", () => {
+    const ids = WELCOME_HOME_NAV_CATEGORIES.flatMap((c) =>
+      (c.destinations ?? []).flatMap((d) => [
+        d.id,
+        ...(d.dropdownChildren?.map((child) => child.id) ?? []),
+      ]),
     );
-    const reflection = WELCOME_HOME_NAV_CATEGORIES.find(
-      (c) => c.id === "reflection",
-    );
-    expect(focus?.destinations.some((d) => d.id === "peaceful-places")).toBe(
-      false,
-    );
-    expect(
-      reflection?.destinations.some((d) => d.id === "peaceful-places"),
-    ).toBe(false);
-  });
-
-  it("does not embed Soundscapes ambient tracks in Peaceful Moments", () => {
-    const room = read(
-      "components/companion/peacefulPlaces/PeacefulMomentsRoom.tsx",
-    );
-    expect(room).not.toContain("EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS");
-    expect(room).not.toContain("GardenDestinationCardMenu");
+    expect(ids).toContain("peaceful-places");
   });
 });

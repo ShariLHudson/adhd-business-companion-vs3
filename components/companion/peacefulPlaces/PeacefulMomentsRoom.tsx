@@ -13,15 +13,12 @@ import { stopGardenCardAmbience } from "@/lib/peacefulPlaces/gardenCardAmbience"
 import { stopGardenFlagAmbience } from "@/lib/peacefulPlaces/gardenFlagAmbience";
 import {
   activeSoundscapeTrackId,
-  getMasterAudioSettings,
   isSoundscapePlaying,
-  pauseSoundscapeOverlay,
   playSoundscapeTrack,
   resumeSoundscapeOverlay,
-  setMasterVolume,
-  stopSoundscapeOverlay,
   subscribeSoundscapePlayback,
 } from "@/lib/estate/estateAudioService";
+import { noteEstateSoundsStarted } from "@/lib/estate/estateSoundsTransport";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
@@ -37,22 +34,15 @@ type Props = {
   backLabel?: string;
 };
 
-const CTRL =
-  "rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-sm font-semibold text-[#1f1c19] shadow-sm transition-colors hover:border-[#1e4f4f] hover:bg-[#f3f7f7] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f] disabled:cursor-not-allowed disabled:opacity-50";
 const CTRL_PRIMARY =
   "rounded-xl bg-[#1e4f4f] px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#163d3d] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f] disabled:cursor-not-allowed disabled:opacity-50";
 
 /**
- * Peaceful Moments (a.k.a. the Music Room) — woodland pathway + one music
- * dropdown + playback controls.
+ * Peaceful Moments (a.k.a. the Music Room) — woodland pathway + Choose Music.
  *
- * Sound is opt-in: select a track, then press Play. No autoplay.
- *
- * Playback routes through the shared Estate Audio Service / Layer 2
- * soundscape overlay — the same module-scoped engine used by the header
- * Soundscapes menu — so a track keeps playing across navigation until the
- * member explicitly presses Stop or Sound Off. Leaving this room (Previous
- * Screen) never stops playback on its own.
+ * Contextual action: Play. After Play, manage Pause / Off from Estate Sounds
+ * in the header (canonical audio controller). No autoplay. Leaving this room
+ * never stops playback on its own.
  */
 export function PeacefulMomentsRoom({
   onDone,
@@ -71,11 +61,6 @@ export function PeacefulMomentsRoom({
   const [isPlaying, setIsPlaying] = useState<boolean>(() =>
     isSoundscapePlaying(),
   );
-  const [muted, setMuted] = useState(false);
-  const [volume, setVolume] = useState(
-    () => getMasterAudioSettings().masterVolume,
-  );
-  const volumeBeforeMuteRef = useRef(0.85);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -86,8 +71,7 @@ export function PeacefulMomentsRoom({
 
   /**
    * Reflect the shared engine's Now Playing state — including when a track
-   * was started elsewhere (chat, header Soundscapes) or stopped elsewhere
-   * (header Sound Off / Stop All Sound) while this room is mounted.
+   * was started elsewhere or paused/turned off from Estate Sounds.
    */
   useEffect(() => {
     const sync = () => {
@@ -145,37 +129,13 @@ export function PeacefulMomentsRoom({
       setPlaybackError(result.message);
       return;
     }
+    noteEstateSoundsStarted();
     setIsPlaying(true);
   }, [selected]);
 
-  const pause = useCallback(async () => {
-    await pauseSoundscapeOverlay();
-    setIsPlaying(false);
-  }, []);
-
-  const stop = useCallback(async () => {
-    await stopSoundscapeOverlay();
-    setIsPlaying(false);
-  }, []);
-
-  const toggleMute = useCallback(() => {
-    setMuted((wasMuted) => {
-      if (wasMuted) {
-        const restore = volumeBeforeMuteRef.current || 0.85;
-        setVolume(restore);
-        setMasterVolume(restore);
-        return false;
-      }
-      volumeBeforeMuteRef.current = volume || 0.85;
-      setVolume(0);
-      setMasterVolume(0);
-      return true;
-    });
-  }, [volume]);
-
   /**
-   * Previous Screen leaves the room view only — the persistent soundscape
-   * keeps playing until the member presses Stop or Sound Off elsewhere.
+   * Previous Screen leaves the room view only — playback continues until
+   * the member uses Estate Sounds (Pause / Turn Off) in the header.
    */
   const handleLeave = useCallback(() => {
     onDone?.();
@@ -220,11 +180,11 @@ export function PeacefulMomentsRoom({
             Peaceful Moments
           </h1>
           <p className="mt-2 text-center text-base leading-relaxed text-[#4b463f]">
-            Choose a piece of music, then press Play when you are ready.
+            Choose a piece of music, then press Play. Pause or turn sounds off
+            anytime from Estate Sounds in the header.
           </p>
           <p className="mt-1 text-center text-xs text-[#8a8377]">
-            It keeps playing while you explore the estate — Stop whenever you
-            are ready.
+            It keeps playing while you explore the estate.
           </p>
 
           <div className="relative mt-5">
@@ -319,54 +279,16 @@ export function PeacefulMomentsRoom({
               >
                 Play
               </button>
-              <button
-                type="button"
-                className={CTRL}
-                data-testid="peaceful-moments-pause"
-                disabled={!selected || !isPlaying}
-                onClick={() => void pause()}
-              >
-                Pause
-              </button>
-              <button
-                type="button"
-                className={CTRL}
-                data-testid="peaceful-moments-stop"
-                disabled={!selected}
-                onClick={() => void stop()}
-              >
-                Stop
-              </button>
-              <button
-                type="button"
-                className={CTRL}
-                data-testid="peaceful-moments-mute"
-                aria-pressed={muted}
-                onClick={toggleMute}
-              >
-                {muted ? "Sound On" : "Sound Off"}
-              </button>
             </div>
-
-            <label className="mt-4 flex items-center gap-3 text-sm text-[#4b463f]">
-              <span className="shrink-0 font-semibold">Volume</span>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.05}
-                value={muted ? 0 : volume}
-                disabled={!selected}
-                data-testid="peaceful-moments-volume"
-                className="w-full accent-[#1e4f4f]"
-                onChange={(e) => {
-                  const next = Number(e.target.value);
-                  setVolume(next);
-                  setMasterVolume(next);
-                  if (next > 0 && muted) setMuted(false);
-                }}
-              />
-            </label>
+            {isPlaying ? (
+              <p
+                className="mt-2 text-center text-sm text-[#6b635a]"
+                data-testid="peaceful-moments-manage-in-header"
+                role="status"
+              >
+                Playing — use Estate Sounds in the header to pause or turn off.
+              </p>
+            ) : null}
 
             {playbackError ? (
               <p

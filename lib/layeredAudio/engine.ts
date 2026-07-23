@@ -376,6 +376,32 @@ export class LayeredAudioEngine {
     this.notify();
   }
 
+  /** Pause every layer without clearing the selected mix. */
+  async pauseAllLayers(): Promise<void> {
+    await this.pauseAllEnvironment();
+    await this.pauseMusic();
+    await this.pauseVoice();
+  }
+
+  /** Resume every selected layer (no duplicate handles). */
+  async resumeAllLayers(): Promise<void> {
+    await this.resumeAllEnvironment();
+    await this.resumeMusic();
+    await this.resumeVoice();
+  }
+
+  /** True when any layered track is actively playing. */
+  hasPlayingLayers(): boolean {
+    if (this.music?.playing) return true;
+    if (this.voice?.playing) return true;
+    return this.environment.some((track) => track.playing);
+  }
+
+  /** True when a mix is selected (playing or paused). */
+  hasSelectedMix(): boolean {
+    return Boolean(this.music || this.voice || this.environment.length > 0);
+  }
+
   async setVoice(trackId: string): Promise<LayerPlayResult> {
     const catalog = layeredCatalogTrackById(trackId);
     if (!catalog || catalog.layer !== "voice") {

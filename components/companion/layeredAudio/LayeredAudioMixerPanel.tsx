@@ -10,6 +10,7 @@ import {
   useLayeredAudio,
   voiceCatalogTracks,
 } from "@/lib/layeredAudio";
+import { noteEstateSoundsStarted } from "@/lib/estate/estateSoundsTransport";
 import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
 
 type Props = {
@@ -48,7 +49,7 @@ export function LayeredAudioMixerPanel({ open, onClose }: Props) {
       <div className="layered-audio-mixer__sheet">
         <header className="layered-audio-mixer__header">
           <div>
-            <h2 id={titleId}>Plan your sound</h2>
+            <h2 id={titleId}>Change Sounds</h2>
             <p className="layered-audio-mixer__sub">
               One voice, up to three environment sounds, and one music track.
             </p>
@@ -409,15 +410,17 @@ export function LayeredAudioMixerPanel({ open, onClose }: Props) {
                   type="button"
                   className="layered-audio-mixer__catalog-item"
                   data-testid={`layered-preset-${preset.id}`}
-                  aria-label={`Apply preset ${preset.title}`}
+                  aria-label={`Start This Mix: ${preset.title}`}
                   onClick={() => {
                     unlockBrowserAudioFromClick();
-                    void engine.applyPreset(preset.id);
+                    void engine.applyPreset(preset.id).then((result) => {
+                      if (result.ok) noteEstateSoundsStarted();
+                    });
                   }}
                 >
                   <span>{preset.title}</span>
                   <span className="layered-audio-mixer__muted">
-                    {preset.description}
+                    Start This Mix · {preset.description}
                   </span>
                 </button>
               </li>
@@ -432,7 +435,7 @@ export function LayeredAudioMixerPanel({ open, onClose }: Props) {
             data-testid="layered-stop-all"
             onClick={() => engine.stopAll()}
           >
-            Stop All
+            Clear Mix
           </button>
         </footer>
       </div>

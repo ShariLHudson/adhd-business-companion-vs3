@@ -18,7 +18,7 @@ export type SoundscapeSelectionOverlayProps = {
 
 /**
  * Dedicated Soundscapes selection — not a third-level Welcome Home flyout.
- * Playback only; master Sound On/Off stays in the header.
+ * Contextual selection only — Pause / Off live in Estate Sounds (header).
  */
 export function SoundscapeSelectionOverlay({
   open,
@@ -73,8 +73,8 @@ export function SoundscapeSelectionOverlay({
           </button>
         </header>
         <p className="soundscape-selection-overlay__hint">
-          Choose a track to play. Use Sound On/Off in the header for all Estate
-          sound.
+          Choose a sound to play. Pause or turn sounds off anytime from Estate
+          Sounds in the header.
         </p>
         <ul className="soundscape-selection-overlay__list">
           {EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS.map((track) => (
@@ -83,6 +83,7 @@ export function SoundscapeSelectionOverlay({
                 type="button"
                 className="soundscape-selection-overlay__item"
                 data-testid={`soundscape-play-${track.id}`}
+                aria-label={`Use This Sound: ${track.title}`}
                 disabled={playingId === track.id}
                 onClick={() => {
                   setPlayError(null);
@@ -102,7 +103,12 @@ export function SoundscapeSelectionOverlay({
                   });
                 }}
               >
-                {track.title}
+                <span className="soundscape-selection-overlay__item-title">
+                  {track.title}
+                </span>
+                <span className="soundscape-selection-overlay__item-action">
+                  Use This Sound
+                </span>
               </button>
             </li>
           ))}

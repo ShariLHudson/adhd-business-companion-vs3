@@ -30,7 +30,7 @@ import {
   isEstateAmbienceEnabled,
   setEstateAmbienceEnabled,
 } from "@/lib/estate/estateAmbiencePreference";
-import { stopAllAudio } from "@/lib/estate/stopAllAudio";
+import { turnOffEstateSounds } from "@/lib/estate/estateSoundsTransport";
 import {
   activeEstateAmbienceRoomId,
   kickstartEstateRoomAmbience,
@@ -137,7 +137,7 @@ export function ExperienceControlsOverlay({
       return;
     }
     if (getEstateAudioSettings().silenced) {
-      // Master Sound Off wins — do not start ambience until header Sound On.
+      // Estate Sounds Off wins — do not start ambience until Turn On.
       setEstateSoundsOn(false);
       return;
     }
@@ -151,7 +151,7 @@ export function ExperienceControlsOverlay({
   };
 
   const stopEverything = () => {
-    void stopAllAudio();
+    void turnOffEstateSounds();
     setEstateAmbienceEnabled(false);
     setEstateSoundsOn(false);
     patchExperienceControlPrefs({
@@ -162,6 +162,7 @@ export function ExperienceControlsOverlay({
       ambienceEnabled: false,
       soundscapeOverlayEnabled: false,
       autoplayAllowed: false,
+      silenced: true,
     });
   };
 
@@ -237,8 +238,8 @@ export function ExperienceControlsOverlay({
             <h3 className="experience-controls-overlay__section-title">Sound</h3>
             <p className="experience-controls-overlay__status">
               {masterSilenced
-                ? "Sound Off is on in the header. Turn Sound On there before playing anything."
-                : "Master Sound On/Off lives in the header. Choose a soundscape or use Play where you are."}
+                ? "Sounds are off. Use Estate Sounds in the header to turn them back on."
+                : "Day-to-day Pause and Off live in Estate Sounds in the header. This section is for preferences."}
             </p>
             <label className="experience-controls-overlay__toggle">
               <span>Place ambience</span>
@@ -277,10 +278,10 @@ export function ExperienceControlsOverlay({
             <button
               type="button"
               className="experience-controls-overlay__choice"
-              data-testid="experience-controls-stop-all-sound"
+              data-testid="experience-controls-turn-off-sounds"
               onClick={stopEverything}
             >
-              Stop All Sound
+              Turn Off Estate Sounds
             </button>
           </section>
 

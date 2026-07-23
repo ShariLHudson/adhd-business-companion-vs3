@@ -37,8 +37,10 @@ export function ensureLayeredAudioStopperRegistered(
     return () => {};
   }
   stopperRegistered = true;
+  // Pause (do not clear) so Estate Sounds Off / Stop All can Turn On again
+  // with the same selected mix. Explicit Remove/Change Sounds still clears tracks.
   const unregister = register(() => {
-    stopLayeredAudioAll();
+    void getLayeredAudioEngine().pauseAllLayers();
   });
   return () => {
     unregister();

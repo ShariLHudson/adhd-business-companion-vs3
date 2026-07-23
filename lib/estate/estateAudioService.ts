@@ -1,7 +1,7 @@
 /**
  * Estate Audio Service — one facade for master audio + intentional playback.
  *
- * Master control lives only in the header GlobalSoundControl (Sound On/Off).
+ * Master transport lives only in the header GlobalSoundControl (Estate Sounds).
  * Experiences call playback helpers (play / pause / stop / volume) — never a
  * second global mute.
  */
@@ -139,9 +139,15 @@ export async function playSoundscapeTrack(
       trackId: track.id,
       reason: "not_started",
       message:
-        "That soundscape did not start. Turn Sound On in the header, then try Play again.",
+        "That soundscape did not start. Turn sounds on from Estate Sounds in the header, then try again.",
     };
   }
+
+  // Contextual Play routes into the shared Estate Sounds transport.
+  const { noteEstateSoundsStarted } = await import(
+    "@/lib/estate/estateSoundsTransport"
+  );
+  noteEstateSoundsStarted();
 
   return { ok: true, trackId: track.id };
 }

@@ -198,6 +198,10 @@
 
 .soundscape-selection-overlay__item {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   text-align: left;
   min-height: 2.75rem;
   padding: 0.55rem 0.75rem;
@@ -207,6 +211,17 @@
   color: inherit;
   font-size: 1rem;
   cursor: pointer;
+}
+
+.soundscape-selection-overlay__item-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.soundscape-selection-overlay__item-action {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
 }
 
 /* Presentation modes — do not change route or unload destination */

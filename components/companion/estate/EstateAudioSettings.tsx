@@ -17,7 +17,7 @@ import {
   stopEstateRoomAmbience,
   transitionEstatePlaceAmbient,
 } from "@/lib/estate/estateRoomAmbience";
-import { stopAllAudio } from "@/lib/estate/stopAllAudio";
+import { turnOffEstateSounds } from "@/lib/estate/estateSoundsTransport";
 
 type Props = {
   placeId?: string | null;
@@ -45,7 +45,7 @@ export function EstateAudioSettings({ placeId, className }: Props) {
       setSettings(next);
 
       if (next.silenced) {
-        void stopAllAudio();
+        void turnOffEstateSounds();
         patchEstateRuntimeState({ activeSoundscape: null });
         return;
       }
@@ -80,8 +80,9 @@ export function EstateAudioSettings({ placeId, className }: Props) {
       aria-label="Estate audio"
     >
       <p className="estate-audio-settings__intro">
-        Master Sound On/Off lives in the header. Here you choose which layers
-        may play after you press Play — nothing starts on its own.
+        Day-to-day Pause and Off live in Estate Sounds in the header. Here you
+        choose which layers may play after you press Play — nothing starts on
+        its own.
       </p>
 
       <label className="estate-audio-settings__row">
@@ -154,9 +155,9 @@ export function EstateAudioSettings({ placeId, className }: Props) {
       <button
         type="button"
         className="estate-audio-settings__silence"
-        data-testid="estate-audio-stop-all-sound"
+        data-testid="estate-audio-turn-off-sounds"
         onClick={() => {
-          void stopAllAudio({ silenceEstate: true });
+          void turnOffEstateSounds();
           apply({
             silenced: true,
             ambienceEnabled: false,
@@ -165,7 +166,7 @@ export function EstateAudioSettings({ placeId, className }: Props) {
           });
         }}
       >
-        Stop All Sound
+        Turn Off Estate Sounds
       </button>
 
       {settings.silenced ? (
@@ -173,9 +174,14 @@ export function EstateAudioSettings({ placeId, className }: Props) {
           className="estate-audio-settings__hint"
           data-testid="estate-audio-master-hint"
         >
-          Sound Off is on. Use Sound On in the header to allow playback again.
+          Sounds are off. Use Estate Sounds in the header to turn them back on.
         </p>
-      ) : null}
+      ) : (
+        <p className="estate-audio-settings__hint">
+          Pause, resume, and day-to-day sound control live in Estate Sounds in
+          the header.
+        </p>
+      )}
     </div>
   );
 }
