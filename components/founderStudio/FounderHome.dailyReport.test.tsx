@@ -77,10 +77,11 @@ describe("FounderHome — daily FIRE report slice", () => {
     const todayDisplay = formatFounderLocalDateDisplay(new Date());
 
     expect(html).toContain("Executive Office");
-    expect(html).toContain("Today’s Executive Intelligence Brief");
+    expect(html).toContain("Good morning, Shari.");
     expect(html).toContain("Spark Estate Executive Intelligence Brief");
     expect(html).toContain(todayDisplay);
     expect(html).toContain('data-testid="fire-executive-brief"');
+    expect(html).toContain('data-testid="fire-dashboard-cards"');
     expect(html).toContain('data-testid="founder-home-secondary"');
     expect(html).toContain('data-testid="mission-shell"');
     expect(html).toContain('data-testid="workspace-cards"');

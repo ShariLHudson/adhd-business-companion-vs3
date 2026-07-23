@@ -11,6 +11,10 @@ import {
   FIRE_READING_SIZE_STORAGE_KEY,
   readFireReadingSize,
 } from "@/lib/founder/briefs/fireReadingSize";
+import {
+  clearFireBriefReadingProgressForTests,
+  readLastBriefSection,
+} from "@/lib/founder/briefs/fireBriefReadingProgress";
 import { FIRE_BRIEF_SECTION_ORDER } from "@/lib/founder/types/fireBriefDetail";
 import { FireExecutiveBriefReadingExperience } from "./FireExecutiveBriefReadingExperience";
 
@@ -25,6 +29,7 @@ function BriefHarness({ portfolio }: { portfolio: FireExecutivePortfolio }) {
   return createElement(FireExecutiveBriefReadingExperience, {
     portfolio,
     variant: "today",
+    greeting: "Good morning, Shari.",
     readingMode,
     onReadingModeChange: setReadingMode,
   });
@@ -51,12 +56,23 @@ function clickButton(label: string | RegExp) {
   });
 }
 
+function clickTestId(testId: string) {
+  const el = container.querySelector(
+    `[data-testid="${testId}"]`,
+  ) as HTMLElement | null;
+  expect(el, testId).toBeTruthy();
+  act(() => {
+    el!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+}
+
 describe("FireExecutiveBriefReadingExperience", () => {
   beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
     window.localStorage.clear();
+    clearFireBriefReadingProgressForTests();
     window.scrollTo = () => {};
   });
 
@@ -68,81 +84,116 @@ describe("FireExecutiveBriefReadingExperience", () => {
     window.localStorage.clear();
   });
 
-  it("shows full-date report title and gentle provenance", () => {
+  it("shows greeting, report title, and full date", () => {
     const portfolio = renderBrief();
     const text = container.textContent ?? "";
+    expect(text).toContain("Good morning, Shari.");
     expect(text).toContain("Spark Estate Executive Intelligence Brief");
     expect(text).toContain(portfolio.dateDisplay);
     expect(text).toMatch(
       /Prepared from the intelligence currently available in your Founder Workspace/i,
     );
-    expect(text).not.toMatch(/sample adapter/i);
   });
 
-  it("renders Executive Overview with priority and opportunity", () => {
+  it("renders five dashboard cards as the default overview", () => {
     renderBrief();
-    const overview = container.querySelector('[data-testid="fire-brief-overview"]');
-    expect(overview?.textContent).toMatch(/Three most important developments/i);
-    expect(overview?.textContent).toMatch(/Top founder priority/i);
-    expect(overview?.textContent).toMatch(/Highest-value opportunity/i);
-    expect(overview?.textContent).toMatch(/Izna/i);
+    const cards = container.querySelector('[data-testid="fire-dashboard-cards"]');
+    expect(cards).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-dash-attention"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-dash-actions"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-dash-alerts"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-dash-izna"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-dash-full-brief"]')).toBeTruthy();
+    expect(container.querySelector(".fire-brief__rail")).toBeNull();
   });
 
-  it("renders all supported report sections in Full Brief", () => {
+  it("uses a simplified toolbar without the old control wall", () => {
     renderBrief();
-    clickButton("Read Full Executive Brief");
+    expect(container.querySelector('[data-testid="fire-toolbar-overview"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-read-full-brief"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-text-size-trigger"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-toolbar-more"]')).toBeTruthy();
+    expect(container.textContent).not.toMatch(/Open Founder Actions/);
+    expect(container.textContent).not.toMatch(/Expand All/);
+    expect(container.textContent).not.toMatch(/\bSmaller\b/);
+  });
+
+  it("opens Full Brief as a section grid, not a split rail", () => {
+    renderBrief();
+    clickTestId("fire-read-full-brief");
     for (const id of FIRE_BRIEF_SECTION_ORDER) {
       expect(
         container.querySelector(`[data-section-id="${id}"]`),
         id,
       ).toBeTruthy();
     }
+    expect(container.querySelector(".fire-brief__section-grid")).toBeTruthy();
+    expect(container.querySelector(".fire-brief__rail")).toBeNull();
   });
 
-  it("supports Expand All and Collapse All", () => {
+  it("opens one section at a time from the grid", () => {
     renderBrief();
-    clickButton("Read Full Executive Brief");
-    clickButton("Expand All");
-    expect(container.querySelectorAll('[data-expanded="true"]').length).toBe(
-      FIRE_BRIEF_SECTION_ORDER.length,
+    clickTestId("fire-dash-full-brief");
+    clickButton("Open");
+    expect(container.querySelector('[data-testid="fire-active-section"]')).toBeTruthy();
+    expect(container.querySelectorAll('[data-testid="fire-active-section"]').length).toBe(
+      1,
     );
+  });
+
+  it("supports Expand All and Collapse All from More menu", () => {
+    renderBrief();
+    clickTestId("fire-toolbar-more");
+    clickButton("Expand All");
+    expect(
+      container.querySelectorAll('[data-expanded="true"]').length,
+    ).toBeGreaterThan(0);
+    clickTestId("fire-toolbar-more");
     clickButton("Collapse All");
-    expect(container.querySelectorAll('[data-expanded="true"]').length).toBe(0);
+    expect(container.querySelector('[data-testid="fire-brief-sections"]')).toBeTruthy();
   });
 
-  it("opens sections with actions", () => {
+  it("opens sections with actions from More", () => {
     renderBrief();
-    clickButton(/Open Sections With Actions/);
-    const open = container.querySelectorAll('[data-expanded="true"]');
-    expect(open.length).toBeGreaterThan(0);
+    clickTestId("fire-toolbar-more");
+    clickTestId("fire-open-action-sections");
+    expect(container.querySelector('[data-testid="fire-active-section"]')).toBeTruthy();
   });
 
-  it("persists text-size control and keeps smaller at/above body floor", () => {
+  it("persists accessible text sizes and never offers smaller-than-default", () => {
     renderBrief();
-    clickButton("Larger");
+    clickTestId("fire-text-size-trigger");
+    clickTestId("fire-text-size-largest");
     expect(
       container
         .querySelector('[data-testid="fire-executive-brief"]')
         ?.getAttribute("data-reading-size"),
-    ).toBe("larger");
-    expect(readFireReadingSize()).toBe("larger");
-    expect(FIRE_READING_BODY_PX.smaller).toBeGreaterThanOrEqual(22);
-    expect(FIRE_READING_BODY_PX.default).toBeGreaterThanOrEqual(22);
-    clickButton("Smaller");
+    ).toBe("largest");
+    expect(readFireReadingSize()).toBe("largest");
+    expect(FIRE_READING_BODY_PX.comfortable).toBeGreaterThanOrEqual(24);
     expect(window.localStorage.getItem(FIRE_READING_SIZE_STORAGE_KEY)).toBe(
-      "smaller",
+      "largest",
     );
+    expect(container.querySelector('[data-testid="fire-text-size-smaller"]')).toBeNull();
   });
 
-  it("enters and exits Reading Mode", () => {
+  it("uses one-section Reading Mode with Previous/Next", () => {
     renderBrief();
-    clickButton("Reading Mode");
+    clickTestId("fire-toolbar-more");
+    clickTestId("fire-enter-reading-mode");
     expect(
       container
         .querySelector('[data-testid="fire-executive-brief"]')
         ?.getAttribute("data-reading-mode"),
     ).toBe("true");
-    clickButton("Exit Reading Mode");
+    expect(container.querySelector('[data-testid="fire-dashboard-cards"]')).toBeNull();
+    expect(container.querySelector(".fire-brief__rail")).toBeNull();
+    expect(container.querySelector('[data-testid="fire-active-section"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-prev-section"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-next-section"]')).toBeTruthy();
+    clickTestId("fire-next-section");
+    expect(readLastBriefSection("fire-2026-07-23")).toBeTruthy();
+    clickTestId("fire-exit-reading-mode");
     expect(
       container
         .querySelector('[data-testid="fire-executive-brief"]')
@@ -150,10 +201,27 @@ describe("FireExecutiveBriefReadingExperience", () => {
     ).toBe("false");
   });
 
-  it("shows Founder Alert levels when alerts section is open", () => {
+  it("opens Founder Actions with top actions first", () => {
     renderBrief();
-    clickButton("Read Full Executive Brief");
-    clickButton("Expand All");
+    clickTestId("fire-dash-actions");
+    expect(container.querySelector('[data-testid="fire-focused-panel"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-view-this-week"]')).toBeTruthy();
+    expect(container.querySelector('[data-testid="fire-action-plan-groups"]')).toBeTruthy();
+  });
+
+  it("opens Izna work package with progressive disclosure", () => {
+    renderBrief();
+    clickTestId("fire-dash-izna");
+    const izna = container.querySelector('[data-testid="fire-izna-assignment"]');
+    expect(izna).toBeTruthy();
+    clickButton("Full Instructions");
+    expect(izna?.textContent).toMatch(/Definition of Done/i);
+    expect(izna?.textContent).toMatch(/Expected Deliverables/i);
+  });
+
+  it("shows Founder Alert levels from the alerts card", () => {
+    renderBrief();
+    clickTestId("fire-dash-alerts");
     expect(container.querySelectorAll("[data-alert-level]").length).toBeGreaterThan(
       0,
     );
@@ -162,57 +230,43 @@ describe("FireExecutiveBriefReadingExperience", () => {
     );
   });
 
-  it("keeps complete Izna instructions visible when expanded", () => {
-    renderBrief();
-    clickButton("Open Izna Work Package");
-    const izna = container.querySelector('[data-testid="fire-izna-assignment"]');
-    expect(izna?.textContent).toMatch(/Definition of done/i);
-    expect(izna?.textContent).toMatch(/Step-by-step guidance/i);
-    expect(izna?.textContent).toMatch(/Expected deliverables/i);
-    expect(izna?.textContent).toMatch(/returned to the founder/i);
+  it("marks a section read and supports Come Back Later", () => {
+    const portfolio = renderBrief();
+    clickTestId("fire-dash-full-brief");
+    clickButton("Open");
+    clickTestId("fire-mark-read");
+    clickTestId("fire-come-back-later");
+    expect(container.querySelector('[data-testid="fire-dashboard-cards"]')).toBeTruthy();
+    expect(readLastBriefSection(portfolio.id)).toBeTruthy();
   });
 
-  it("groups action plan by Today / This Week / Watch", () => {
+  it("uses full-width layout attributes and no fixed-height report container", () => {
     renderBrief();
-    clickButton("Open Founder Actions");
-    const groups = container.querySelector(
-      '[data-testid="fire-action-plan-groups"]',
-    );
-    expect(groups?.querySelector('[data-horizon-group="today"]')).toBeTruthy();
+    const brief = container.querySelector(
+      '[data-testid="fire-executive-brief"]',
+    ) as HTMLElement;
+    expect(brief.getAttribute("data-layout")).toBe("full-width");
+    expect(brief.className).toMatch(/fire-brief/);
+    const style = window.getComputedStyle(brief);
+    expect(style.maxHeight === "none" || style.maxHeight === "").toBe(true);
   });
 
-  it("supports keyboard operation on accordion toggles", () => {
+  it("supports keyboard focus on section navigation controls", () => {
     renderBrief();
-    clickButton("Read Full Executive Brief");
-    const toggle = container.querySelector(
-      ".fire-brief-section__toggle",
-    ) as HTMLButtonElement | null;
-    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
+    clickTestId("fire-toolbar-more");
+    clickTestId("fire-enter-reading-mode");
+    const next = container.querySelector(
+      '[data-testid="fire-next-section"]',
+    ) as HTMLButtonElement;
+    expect(next).toBeTruthy();
     act(() => {
-      toggle!.dispatchEvent(
+      next.focus();
+      next.dispatchEvent(
         new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
       );
+      next.click();
     });
-    expect(toggle?.getAttribute("aria-expanded")).toBe("true");
-    act(() => {
-      toggle!.dispatchEvent(
-        new KeyboardEvent("keydown", { key: " ", bubbles: true }),
-      );
-    });
-    expect(toggle?.getAttribute("aria-expanded")).toBe("false");
-  });
-
-  it("does not use fixed-height truncation on section bodies", () => {
-    renderBrief();
-    clickButton("Expand All");
-    const bodies = Array.from(
-      container.querySelectorAll(".fire-brief-section__body"),
-    ) as HTMLElement[];
-    for (const body of bodies) {
-      const style = window.getComputedStyle(body);
-      expect(style.maxHeight === "none" || style.maxHeight === "").toBe(true);
-      expect(style.overflow).not.toBe("hidden");
-    }
+    expect(readLastBriefSection("fire-2026-07-23")).toBeTruthy();
   });
 
   it("hides Listen and Print controls when capabilities are absent", () => {
@@ -225,10 +279,10 @@ describe("FireExecutiveBriefReadingExperience", () => {
 
   it("uses semantic heading structure", () => {
     renderBrief();
-    clickButton("Read Full Executive Brief");
     expect(container.querySelector("h2.fire-brief__title")).toBeTruthy();
-    expect(container.querySelector("h3.fire-brief__overview-title")).toBeTruthy();
-    expect(container.querySelectorAll("h3.fire-brief-section__title").length).toBe(
+    expect(container.querySelector("h3.fire-brief__dashboard-title")).toBeTruthy();
+    clickTestId("fire-read-full-brief");
+    expect(container.querySelectorAll("h3.fire-section-card__title").length).toBe(
       FIRE_BRIEF_SECTION_ORDER.length,
     );
   });

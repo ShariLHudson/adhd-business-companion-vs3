@@ -64,6 +64,46 @@
   padding-bottom: 3rem;
 }
 
+/* Executive Brief uses nearly full browser width */
+.founder-shell:has(.founder-home--brief-wide) .founder-shell__content,
+.founder-shell:has(.fire-brief) .founder-shell__content {
+  max-width: min(1680px, 100%);
+  padding-inline: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+/* Reading Mode: calm full-screen reading surface, no estate imagery */
+.founder-shell:has(.founder-home--reading-mode),
+.founder-shell:has(.fire-brief--reading-mode) {
+  --founder-office-bg: none;
+  background: #f3f1ea;
+}
+
+.founder-shell:has(.founder-home--reading-mode) .founder-shell__scrim,
+.founder-shell:has(.fire-brief--reading-mode) .founder-shell__scrim {
+  display: none;
+}
+
+.founder-shell:has(.founder-home--reading-mode) .founder-side-nav,
+.founder-shell:has(.fire-brief--reading-mode) .founder-side-nav,
+.founder-shell:has(.founder-home--reading-mode) .founder-concierge-drawer,
+.founder-shell:has(.fire-brief--reading-mode) .founder-concierge-drawer {
+  display: none;
+}
+
+.founder-shell:has(.founder-home--reading-mode) .founder-shell__content,
+.founder-shell:has(.fire-brief--reading-mode) .founder-shell__content {
+  max-width: min(1600px, 100%);
+  padding-inline: clamp(1.25rem, 4vw, 3rem);
+}
+
+.founder-home--reading-mode .founder-home__eyebrow {
+  display: none;
+}
+
+.founder-home--reading-mode .founder-home__secondary[hidden] {
+  display: none !important;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

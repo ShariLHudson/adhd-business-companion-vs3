@@ -34,21 +34,18 @@ export function FounderExecutiveOffice({ greeting, portfolio, office }: Props) {
 
   return (
     <div
-      className={`founder-home${readingMode ? " founder-home--reading-mode" : ""}`}
+      className={`founder-home founder-home--brief-wide${
+        readingMode ? " founder-home--reading-mode" : ""
+      }`}
       data-testid="founder-executive-office"
       data-reading-mode={readingMode ? "true" : "false"}
     >
-      <header className="founder-home__hero founder-home__hero--brief-first">
-        <p className="founder-home__eyebrow">Executive Office</p>
-        <h1 className="founder-home__greeting">{greeting}</h1>
-        <p className="founder-home__brief-kicker">
-          Today’s Executive Intelligence Brief
-        </p>
-      </header>
+      <p className="founder-home__eyebrow">Executive Office</p>
 
       <FireExecutiveBriefReadingExperience
         portfolio={portfolio}
         variant="today"
+        greeting={greeting}
         readingMode={readingMode}
         onReadingModeChange={onReadingModeChange}
       />
