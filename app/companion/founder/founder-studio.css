@@ -136,23 +136,57 @@
 
 /* Home hero */
 .founder-home__hero {
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.founder-home__hero--brief-first {
+  margin-bottom: 1rem;
 }
 
 .founder-home__eyebrow,
 .founder-room-page__eyebrow {
-  font-size: 0.875rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 1.125rem;
+  letter-spacing: 0.04em;
   color: var(--founder-gold);
   margin: 0 0 0.5rem;
+  font-weight: 650;
 }
 
 .founder-home__greeting {
-  font-size: clamp(2rem, 5vw, 3rem);
+  font-size: clamp(1.9rem, 4vw, 2.125rem);
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.2;
   margin: 0 0 0.35rem;
+}
+
+.founder-home__brief-kicker {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.5rem, 3vw, 1.85rem);
+  line-height: 1.3;
+  font-weight: 600;
+  color: rgba(245, 236, 220, 0.92);
+}
+
+.founder-home__secondary {
+  margin-top: 2.5rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid rgba(245, 193, 108, 0.18);
+}
+
+.founder-home__secondary-label {
+  margin: 0 0 1.25rem;
+  font-size: 1.25rem;
+  line-height: 1.4;
+  font-weight: 650;
+  color: var(--founder-gold);
+}
+
+.founder-home--reading-mode .founder-home__secondary {
+  display: none;
+}
+
+.founder-home--reading-mode .founder-home__hero {
+  margin-bottom: 0.75rem;
 }
 
 .founder-home__prompt {

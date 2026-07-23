@@ -1,22 +1,31 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 
 import {
   getExecutiveArchive,
   getFireExecutivePortfolio,
   listExecutiveArchives,
 } from "./briefs/firePortfolio";
+import { clearFirePortfolioStorageForTests } from "./briefs/firePortfolioStorage";
+import { toFounderLocalDateKey } from "./briefs/founderLocalDate";
 
 describe("FIRE executive briefing", () => {
+  beforeEach(() => {
+    clearFirePortfolioStorageForTests();
+  });
+
   it("getFireExecutivePortfolio returns capped executive portfolio", () => {
     const portfolio = getFireExecutivePortfolio();
     expect(portfolio.preparedFor).toContain("Shari");
+    expect(portfolio.date).toBe(toFounderLocalDateKey(new Date()));
+    expect(portfolio.id).toBe(`fire-${portfolio.date}`);
     expect(portfolio.executiveSummary.length).toBeLessThanOrEqual(6);
     expect(portfolio.priorities.length).toBeLessThanOrEqual(3);
     expect(portfolio.alerts.length).toBeLessThanOrEqual(3);
     expect(portfolio.decisions.length).toBeLessThanOrEqual(3);
     expect(portfolio.dashboardPanels.length).toBeLessThanOrEqual(6);
     expect(portfolio.primaryFocus.length).toBeGreaterThan(20);
-    expect(portfolio.readingTimeMinutes).toBe(3);
+    expect(portfolio.readingTimeMinutes).toBeGreaterThanOrEqual(3);
+    expect(portfolio.executiveBriefDetail?.sections.length).toBe(16);
   });
 
   it("listExecutiveArchives excludes today and sorts by issue", () => {

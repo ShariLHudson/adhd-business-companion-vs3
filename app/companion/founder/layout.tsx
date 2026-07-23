@@ -3,6 +3,7 @@ import { FounderAccessGate } from "@/components/founderStudio/FounderAccessGate"
 import { FounderShell } from "@/components/founderStudio/FounderShell";
 
 import "./founder-studio.css";
+import "./fire-executive-brief-reading.css";
 
 export const metadata = {
   title: "Founder Studio",
