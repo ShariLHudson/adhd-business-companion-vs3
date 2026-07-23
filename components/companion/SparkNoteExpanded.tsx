@@ -18,6 +18,11 @@ import {
   type SparkCardGalleryItem,
 } from "@/lib/sparkNote/sparkCardCollectibleDisplay";
 import {
+  logSparkCardImageLoadError,
+  resolveSparkCardImage,
+} from "@/lib/sparkNote/resolveSparkCardImage";
+import { normalizeSparkCardImageSrc } from "@/lib/sparkNote/wikimediaCommonsUrl";
+import {
   getFavoriteSparkIds,
   recordSparkNoteReaction,
   toggleSparkNoteFavorite,
@@ -127,26 +132,37 @@ function SparkCardArt({
   overrideSrc?: string;
   overrideAlt?: string;
 }) {
+  // Live + print share resolveSparkCardImage (via hero visual).
+  const resolved = useMemo(() => resolveSparkCardImage(card), [card]);
   const hero = useMemo(() => resolveSparkCardHeroVisual(card), [card]);
   const fallbackScene = useMemo(() => resolveSparkCardThemedScene(card), [card]);
   const [photoFailed, setPhotoFailed] = useState(false);
-  const photoSrc = overrideSrc || (hero.kind === "photo" ? hero.src : "");
-  const showPhoto = Boolean(photoSrc) && !photoFailed;
+  const [photoLoaded, setPhotoLoaded] = useState(false);
+  const photoSrc = useMemo(() => {
+    if (overrideSrc?.trim()) {
+      return normalizeSparkCardImageSrc(overrideSrc.trim());
+    }
+    return resolved.src || "";
+  }, [overrideSrc, resolved.src]);
+  const hasPhotoCandidate = Boolean(photoSrc) && !photoFailed;
+  const showPhoto = hasPhotoCandidate && photoLoaded;
   const aspectRatio =
-    hero.kind === "photo" || hero.kind === "themed"
+    resolved.aspectRatio ||
+    (hero.kind === "photo" || hero.kind === "themed"
       ? hero.aspectRatio
-      : "landscape";
+      : "landscape");
   const focalPoint =
-    hero.kind === "photo" || hero.kind === "themed"
+    resolved.focalPoint ||
+    (hero.kind === "photo" || hero.kind === "themed"
       ? hero.focalPoint
-      : "center";
-  const alt =
-    overrideAlt ||
-    (hero.kind === "photo" ? hero.alt : fallbackScene.alt);
-  const caption = hero.kind === "photo" ? hero.caption : undefined;
+      : "center");
+  const alt = overrideAlt || resolved.alt || fallbackScene.alt;
+  const caption =
+    !photoFailed && resolved.caption ? resolved.caption : undefined;
 
   useEffect(() => {
     setPhotoFailed(false);
+    setPhotoLoaded(false);
   }, [photoSrc]);
 
   return (
@@ -159,22 +175,44 @@ function SparkCardArt({
       ]
         .filter(Boolean)
         .join(" ")}
+      data-spark-image-source={resolved.sourceType}
+      data-spark-image-field={resolved.sourceField || undefined}
     >
-      {showPhoto ? (
+      {hasPhotoCandidate ? (
         <img
           src={photoSrc}
           alt={alt}
           className="spark-note-expanded__art-image"
-          onError={() => setPhotoFailed(true)}
+          // Wikimedia / storage often block hotlinking with a Referer.
+          referrerPolicy="no-referrer"
+          decoding="async"
+          onLoad={() => setPhotoLoaded(true)}
+          onError={() => {
+            setPhotoFailed(true);
+            setPhotoLoaded(false);
+            logSparkCardImageLoadError({
+              cardId: card.id,
+              src: photoSrc,
+              sourceField: resolved.sourceField,
+              error: "img_onerror",
+            });
+          }}
+          // Full-size under themed placeholder until paint — print + live share src.
+          style={
+            showPhoto
+              ? undefined
+              : { position: "absolute", inset: 0, opacity: 0, pointerEvents: "none" }
+          }
         />
-      ) : (
+      ) : null}
+      {!showPhoto ? (
         <SparkCardIllustratedScene
           card={card}
           scene={hero.kind === "themed" ? hero : fallbackScene}
         />
-      )}
+      ) : null}
       <span className="spark-note-expanded__art-frame" aria-hidden />
-      {caption ? (
+      {showPhoto && caption ? (
         <figcaption className="spark-note-expanded__art-photo-caption">
           {caption}
         </figcaption>

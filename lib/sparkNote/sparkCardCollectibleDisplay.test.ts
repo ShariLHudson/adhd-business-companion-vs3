@@ -159,8 +159,11 @@ describe("sparkCardCollectibleDisplay", () => {
     });
     expect(visual.kind).toBe("photo");
     if (visual.kind === "photo") {
-      expect(visual.src).toContain("wikimedia");
+      expect(visual.src).toContain("upload.wikimedia.org");
+      expect(visual.src).not.toContain("Special:FilePath");
+      expect(visual.src).toContain("Goodnestone_Park");
       expect(visual.alt.toLowerCase()).toMatch(/garden|door|adventure/);
+      expect(visual.caption).toBe("Adventure can be close to home.");
       expect(visual.aspectRatio).toBe("editorial");
     }
   });

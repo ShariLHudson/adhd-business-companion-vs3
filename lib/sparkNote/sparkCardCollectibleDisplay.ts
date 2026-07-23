@@ -4,11 +4,9 @@ import type {
   SparkNoteExpandedGalleryItem,
   SparkNoteGalleryIconKey,
 } from "./types";
-import {
-  resolveSparkCardDiversityArtAsset,
-  resolveSparkCardSpecificArtAsset,
-  type SparkCardImageAspectRatio,
-  type SparkCardImageFocalPoint,
+import type {
+  SparkCardImageAspectRatio,
+  SparkCardImageFocalPoint,
 } from "./sparkCardArtRegistry";
 import {
   diversityCategoryLabel,
@@ -18,6 +16,7 @@ import {
   type SparkCardDiversityCategoryId,
 } from "./sparkCardDiversity";
 import { generateSparkCardExpandedContent } from "./sparkCardTellMeMoreGenerator";
+import { resolveSparkCardImage } from "./resolveSparkCardImage";
 
 const GALLERY_ICON_KEYS: readonly SparkNoteGalleryIconKey[] = [
   "spark",
@@ -531,35 +530,17 @@ export type SparkCardHeroVisual =
 export function resolveSparkCardHeroVisual(
   card: SparkNoteDailyCard,
 ): SparkCardHeroVisual {
-  const specific = resolveSparkCardSpecificArtAsset(card);
-  if (specific) {
+  // Live expanded card and print share resolveSparkCardImage — one field lookup.
+  const image = resolveSparkCardImage(card);
+  if (image.src) {
     return {
       kind: "photo",
-      src: specific.src,
-      alt: specific.alt,
-      aspectRatio: specific.aspectRatio ?? "landscape",
-      focalPoint: specific.focalPoint ?? "center",
-      caption: specific.caption,
-      credit: specific.credit,
-    };
-  }
-
-  const diversityCategory = resolveSparkCardDiversityCategory({
-    category: card.category,
-    categoryLabel: card.categoryLabel,
-    tags: card.tags,
-    title: card.title,
-  });
-  const diversityPhoto = resolveSparkCardDiversityArtAsset(diversityCategory);
-  if (diversityPhoto) {
-    return {
-      kind: "photo",
-      src: diversityPhoto.src,
-      alt: diversityPhoto.alt,
-      aspectRatio: diversityPhoto.aspectRatio ?? "landscape",
-      focalPoint: diversityPhoto.focalPoint ?? "center",
-      caption: diversityPhoto.caption,
-      credit: diversityPhoto.credit,
+      src: image.src,
+      alt: image.alt,
+      aspectRatio: image.aspectRatio,
+      focalPoint: image.focalPoint,
+      caption: image.caption || undefined,
+      credit: image.credit || undefined,
     };
   }
 

@@ -1,5 +1,9 @@
 import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
 import type { SparkCardDiversityCategoryId } from "./sparkCardDiversity";
+import {
+  normalizeSparkCardImageSrc,
+  wikimediaCommonsDirectThumbUrl,
+} from "./wikimediaCommonsUrl";
 
 export type SparkCardImageAspectRatio =
   | "landscape"
@@ -25,18 +29,12 @@ export type SparkCardArtAsset = {
 };
 
 /**
- * Build a stable Wikimedia Commons image URL from a file *title* instead of
- * a hand-copied `/wikipedia/commons/<hash>/<hash2>/File.jpg` path.
+ * Build a stable Wikimedia Commons thumb URL from a file *title*.
  *
- * The hash-prefixed upload path previously hard-coded in this file is easy
- * to get wrong (a renamed/re-hashed file silently 404s forever) and several
- * entries were doing exactly that — see
- * docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
- * `Special:FilePath` resolves by title and 302s to the current file, so it
- * keeps working even if the underlying hash changes. `width` requests a
- * reasonably sized rendition instead of hot-linking a multi-MB original.
- * Titles use Wikimedia's canonical underscore form (spaces are equivalent,
- * but underscores keep the URL free of `%20`).
+ * Uses a direct `upload.wikimedia.org` thumb path (MD5-sharded). Prefer this
+ * over `Special:FilePath` redirects — those often leave a blank framed `<img>`
+ * in live view while print preview still paints the redirected bitmap.
+ * See docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
  */
 export function wikimediaCommonsImage(
   title: string,
@@ -47,11 +45,10 @@ export function wikimediaCommonsImage(
     "aspectRatio" | "focalPoint" | "caption" | "credit"
   >,
 ): SparkCardArtAsset {
-  const canonicalTitle = title.replace(/ /g, "_");
   return {
-    src: `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(
-      canonicalTitle,
-    )}?width=${widthPx}`,
+    // Direct upload.wikimedia.org thumb — avoids Special:FilePath redirect
+    // blank-frames in live view (print often still paints the redirect).
+    src: wikimediaCommonsDirectThumbUrl(title, widthPx),
     alt,
     aspectRatio: options?.aspectRatio ?? "landscape",
     focalPoint: options?.focalPoint ?? "center",
@@ -274,7 +271,7 @@ export function resolveSparkCardSpecificArtAsset(
   const explicit = card.imageSrc?.trim() || card.thumbnailSrc?.trim();
   if (explicit) {
     return {
-      src: explicit,
+      src: normalizeSparkCardImageSrc(explicit),
       alt: card.thumbnailAlt?.trim() || `Artwork for ${card.title}`,
     };
   }
