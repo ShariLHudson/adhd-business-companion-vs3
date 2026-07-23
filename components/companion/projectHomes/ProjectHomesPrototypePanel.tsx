@@ -18,6 +18,7 @@ import {
   type ProjectHomeCardAction,
 } from "@/components/companion/projectHomes/ProjectHomeCard";
 import { ProjectHomeDetail } from "@/components/companion/projectHomes/ProjectHomeDetail";
+import { ProjectLibraryPanel } from "@/components/companion/library/ProjectLibraryPanel";
 import {
   archiveProjectHome,
   createPersistedProjectHomeWithResult,
@@ -597,6 +598,33 @@ export function ProjectHomesPrototypePanel({
                 </div>
               )}
             </section>
+
+            {memberHomes.some((h) => !h.isSample) ? (
+              <section
+                className="project-homes-gallery-section"
+                data-testid="project-homes-library"
+                aria-labelledby="project-homes-library-heading"
+              >
+                <h2
+                  id="project-homes-library-heading"
+                  className="project-homes-gallery-section__title"
+                >
+                  Your Project Homes
+                </h2>
+                <ProjectLibraryPanel
+                  homes={memberHomes}
+                  onHomesChange={(next) => {
+                    setMemberHomes(next);
+                    setActiveWorkRevision((n) => n + 1);
+                  }}
+                  onOpen={openDetail}
+                  onOpenSourceCreation={(creationId) => {
+                    const match = activeWork.find((w) => w.id === creationId);
+                    if (match) continueActiveWork(match);
+                  }}
+                />
+              </section>
+            ) : null}
 
             {recoverableWork.length > 0 ? (
               <section

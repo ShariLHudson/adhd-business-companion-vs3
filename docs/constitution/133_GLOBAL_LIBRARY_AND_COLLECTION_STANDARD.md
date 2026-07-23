@@ -252,4 +252,19 @@ When this Standard conflicts with feature convenience:
 
 ---
 
-**Status:** Permanent v1.0 — binding
+---
+
+## Implementation status
+
+| Phase | Scope | Status |
+|-------|--------|--------|
+| **Phase 1** | Shared runtime + Create Continue Working + Projects library management | **Shipped** — see [shared-library-management.md](../create-projects/shared-library-management.md) |
+| Phase 2 | Project Trash/soft-delete, folders/tags, bulk library select, additional Estate libraries | Deferred |
+
+**Runtime:** `lib/sparkLibraryCollection/` · **UI:** `components/companion/library/`
+
+Phase 1 establishes reusable architecture (shell, toolbar, search/filter/sort/view, capability-driven action menu, adapters, persisted UI state, Load More). It does **not** yet retrofit every Estate library.
+
+---
+
+**Status:** Permanent v1.0 — binding · Phase 1 implemented 2026-07-23
