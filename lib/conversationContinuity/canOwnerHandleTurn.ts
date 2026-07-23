@@ -2,12 +2,15 @@
  * Whether the active owner should handle this turn before broad routing.
  */
 
+import { isDirectNavigationPriorityTurn } from "@/lib/chatScope";
+import { isCreateIrrelevantUserTurn } from "./createOwnershipGuard";
+import {
+  classifyDocumentContinuity,
+  shouldContinueStickyDocument,
+} from "./documentContinuityClassifier";
 import { isExplicitOwnerExit, isExplicitTaskChange } from "./exitRules";
 import { isStickyContinuityOwner } from "./routingPriority";
 import type { ConversationOwner } from "./types";
-
-const REFERENTIAL_CONTINUATION_RE =
-  /\b(?:the above|that section|number (?:one|two|three|\d)|what you just wrote|expand that|make it shorter|use that|no changes|i like it|write (?:it|that|the email)|continue|yes|good so far|draft it|build it out|add more detail|show me the finished)\b/i;
 
 export function canOwnerHandleTurn(
   owner: ConversationOwner,
@@ -16,15 +19,25 @@ export function canOwnerHandleTurn(
   const t = userMessage.trim();
   if (!t) return false;
   if (isExplicitOwnerExit(t) || isExplicitTaskChange(t)) return false;
+  // Direct navigation always outranks sticky Board / Create / Chamber locks.
+  if (isDirectNavigationPriorityTurn(t)) return false;
 
   if (!isStickyContinuityOwner(owner.kind)) {
     return false;
   }
 
   if (owner.kind === "guided_workflow" || owner.kind === "artifact") {
-    if (owner.awaitingAnswer) return true;
-    if (REFERENTIAL_CONTINUATION_RE.test(t)) return true;
-    return true;
+    // Reflective life decisions / Create-room pushback never belong to Create.
+    if (isCreateIrrelevantUserTurn(t)) return false;
+    // P0 — only continue when the classifier says this turn still belongs
+    // to the current document. New topics must not inherit automatically.
+    const continuity = classifyDocumentContinuity({
+      userText: t,
+      activeOwner: owner,
+      hasStickyDocument: true,
+      awaitingAnswer: owner.awaitingAnswer,
+    });
+    return shouldContinueStickyDocument(continuity);
   }
 
   if (

@@ -10,7 +10,9 @@ export type HardNavigationTarget =
   | { kind: "decision-compass" }
   | { kind: "focus-audio" }
   | { kind: "adapt-my-day" }
-  | { kind: "clear-my-mind" };
+  | { kind: "clear-my-mind" }
+  | { kind: "talk-it-out" }
+  | { kind: "spark-estate-guide" };
 
 export type HardNavigationCommand = {
   target: HardNavigationTarget;
@@ -26,47 +28,72 @@ type RouteDef = {
   reply: string;
 };
 
+/** Explicit destination verbs — keep aligned with explicitNavigationVerb.ts */
+const NAV_VERB = "(?:open|go to|take me to|bring me to|show me|enter)";
+
 /** Exact navigation phrases — anchored to full message (optional trailing punctuation). */
 const HARD_NAV_ROUTES: RouteDef[] = [
   {
-    test:
-      /^(?:(?:open|go to|take me to)\s+create(?:\s+mode)?|create\s+mode|open\s+create\s+mode)$/i,
-    target: { kind: "workspace", section: "content-generator", nav: "other" },
+    test: new RegExp(
+      `^(?:(?:${NAV_VERB})\\s+create(?:\\s+mode)?|create\\s+mode|open\\s+create\\s+mode)$`,
+      "i",
+    ),
+    target: { kind: "workspace", section: "create", nav: "create" },
     reply: "Opening Create.",
   },
   {
-    test:
-      /^(?:open|go to|take me to)\s+(?:the\s+)?(?:adhd\s+)?decision\s+compass$/i,
+    test: new RegExp(
+      `^${NAV_VERB}\\s+(?:the\\s+)?(?:adhd\\s+)?decision\\s+compass$`,
+      "i",
+    ),
     target: { kind: "decision-compass" },
     reply: "Opening Decision Compass.",
   },
   {
-    test: /^(?:open|go to|take me to)\s+plan\s+my\s+day$/i,
+    test: new RegExp(`^${NAV_VERB}\\s+plan\\s+my\\s+day$`, "i"),
     target: { kind: "workspace", section: "plan-my-day" },
     reply: "Opening Plan My Day.",
   },
   {
-    test: /^(?:open|go to|take me to)\s+adapt\s+my\s+day$/i,
+    test: new RegExp(`^${NAV_VERB}\\s+adapt\\s+my\\s+day$`, "i"),
     target: { kind: "adapt-my-day" },
     reply: "Opening Today's Reality.",
   },
   {
-    test: /^(?:open|go to|take me to)\s+clear\s+my\s+mind$/i,
+    test: new RegExp(`^${NAV_VERB}\\s+clear\\s+my\\s+mind$`, "i"),
     target: { kind: "clear-my-mind" },
     reply: "Opening Clear My Mind.",
   },
   {
-    test: /^(?:open|go to|take me to)\s+focus\s+audio$/i,
+    test: new RegExp(
+      `^${NAV_VERB}\\s+(?:the\\s+)?(?:focus\\s+audio|peaceful\\s+(?:moments|places)|soundscapes?|calm(?:ing)?\\s+audio|music\\s+for\\s+focus)$`,
+      "i",
+    ),
     target: { kind: "focus-audio" },
-    reply: "Opening Focus Audio.",
+    reply: "Opening Peaceful Moments.",
+  },
+  // Music Room is a canonical Estate place — do not alias to Peaceful Moments.
+  // Continuity falls through so the Estate kernel / place router navigates.
+  {
+    test: new RegExp(`^${NAV_VERB}\\s+(?:the\\s+)?talk\\s+it\\s+out$`, "i"),
+    target: { kind: "talk-it-out" },
+    reply: "Opening Talk It Out.",
   },
   {
-    test: /^(?:open|go to|take me to)\s+strateg(?:y|ies)$/i,
+    test: new RegExp(
+      `^${NAV_VERB}\\s+(?:the\\s+)?(?:spark\\s+)?estate\\s+guide$`,
+      "i",
+    ),
+    target: { kind: "spark-estate-guide" },
+    reply: "Opening the Spark Estate Guide.",
+  },
+  {
+    test: new RegExp(`^${NAV_VERB}\\s+strateg(?:y|ies)$`, "i"),
     target: { kind: "workspace", section: "playbook", nav: "playbook" },
     reply: "Opening Strategies.",
   },
   {
-    test: /^(?:open|go to|take me to)\s+saved(?:\s+work)?$/i,
+    test: new RegExp(`^${NAV_VERB}\\s+saved(?:\\s+work)?$`, "i"),
     target: { kind: "workspace", section: "saved-work", nav: "saved-work" },
     reply: "Opening Saved.",
   },
@@ -114,5 +141,9 @@ export function hardNavigationActiveWorkspace(text: string): AppSection | null {
       return "energy";
     case "clear-my-mind":
       return "brain-dump";
+    case "talk-it-out":
+      return "talk-it-out";
+    case "spark-estate-guide":
+      return null;
   }
 }
