@@ -37,15 +37,15 @@ describe("Strategy Library guided entrance (128)", () => {
       "create",
       "resume",
     ]);
-    expect(STRATEGY_LIBRARY_MODE_CHOICES[0]!.label).toMatch(/Problem/i);
+    expect(STRATEGY_LIBRARY_MODE_CHOICES[0]!.label).toMatch(/Direction/i);
     expect(STRATEGY_LIBRARY_MODE_CHOICES[1]!.label).toMatch(/Explore/i);
-    expect(STRATEGY_LIBRARY_MODE_CHOICES[2]!.label).toMatch(/Build/i);
+    expect(STRATEGY_LIBRARY_MODE_CHOICES[2]!.label).toMatch(/Decision/i);
     expect(STRATEGY_LIBRARY_MODE_CHOICES[3]!.label).toMatch(/Continue/i);
     for (const mode of STRATEGY_LIBRARY_MODE_CHOICES) {
       expect(mode.description.length).toBeGreaterThan(40);
     }
-    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/Problem and Need Help/i);
-    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/Explore Ideas/i);
+    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/Strategy Chamber/i);
+    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/important decision/i);
   });
 
   it("recommends a path from wording", () => {

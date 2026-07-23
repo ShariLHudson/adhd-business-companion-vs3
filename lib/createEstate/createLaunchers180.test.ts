@@ -114,7 +114,7 @@ describe("180 — Strategy Library removed from Create", () => {
     ]);
     expect(
       advice?.destinations.find((d) => d.id === "strategy-library")?.label,
-    ).toBe("Strategies");
+    ).toBe("Strategy Chamber");
   });
 });
 

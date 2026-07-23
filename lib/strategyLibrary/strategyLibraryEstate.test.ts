@@ -18,15 +18,15 @@ function read(pathFromRoot: string): string {
 
 describe("Strategy Library estate destination (110)", () => {
   it("keeps approved title and mode choices", () => {
-    expect(STRATEGY_LIBRARY_TITLE).toBe("ADHD Entrepreneur Strategy Library");
+    expect(STRATEGY_LIBRARY_TITLE).toBe("Strategy Chamber");
     expect(STRATEGY_LIBRARY_MODE_CHOICES.map((m) => m.id)).toEqual([
       "apply",
       "browse",
       "create",
       "resume",
     ]);
-    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/Explore Ideas/i);
-    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/Problem and Need Help/i);
+    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/Strategy Chamber/i);
+    expect(STRATEGY_LIBRARY_HOW_DO_I).toMatch(/important decision/i);
   });
 
   it("registers playbook as a full-bleed estate panel", () => {

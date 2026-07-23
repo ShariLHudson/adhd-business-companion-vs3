@@ -20,7 +20,7 @@ describe("sidebar navigation", () => {
       "Your Story",
       "Welcome Room",
       "How Do I?",
-      "Strategies",
+      "Strategy Chamber",
       "Visual Thinking",
     ]);
     const allItems = COMPANION_PROPERTY_NAV.flatMap((group) => group.items);

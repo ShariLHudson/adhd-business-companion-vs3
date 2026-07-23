@@ -24,7 +24,7 @@ describe("homesteadSignpostNav", () => {
       "Your Story",
       "Welcome Room",
       "How Do I?",
-      "Strategies",
+      "Strategy Chamber",
       "Visual Thinking",
     ]);
   });
