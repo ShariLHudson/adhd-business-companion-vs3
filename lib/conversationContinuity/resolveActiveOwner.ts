@@ -121,6 +121,8 @@ function ownerFromBoardDirector(
 function ownerFromBoardIntake(): ConversationOwner | null {
   const draft = loadBoardIntakeDraft();
   if (!draft) return null;
+  // Suspended after New Day / direct navigation — draft may remain for resume.
+  if (draft.conversationSuspended) return null;
   if (
     draft.currentStep === "discussion" ||
     draft.currentStep === "ready_to_begin"

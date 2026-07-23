@@ -36,6 +36,13 @@ import { clearOutcomeThread } from "@/lib/companionOutcomeThread";
 import { clearActiveTaskLockState } from "@/lib/estate/activeTaskLock";
 import { clearCollectionPendingOffer } from "@/lib/estate/collectionFramework/collectionPendingOffer";
 import { endTurnDecision } from "@/lib/conversationStabilization/turnDecisionStore";
+import { clearBoardIntakeDraft } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
+import { consumeCallTheBoard } from "@/lib/board/callTheBoard";
+import {
+  activateNewDayChatScope,
+  bindDaySessionConversation,
+  startNewDaySession,
+} from "@/lib/chatScope";
 
 /** Keep in sync with CONTEXTUAL_HELP_SESSION_STORAGE_KEY (avoid importing that module). */
 const CONTEXTUAL_HELP_SESSION_STORAGE_KEY =
@@ -121,7 +128,17 @@ export function resetActiveConversation(
   // CB-007 — remaining temporary conversation state (pending menus, sticky nouns, etc.)
   clearTemporaryConversationIsolationState();
 
+  // Board intake + Call-the-Board seed must not reattach after New Day / New Chat.
+  // Saved Board discussion history (director-discussions) is preserved.
+  clearBoardIntakeDraft();
+  consumeCallTheBoard();
+
   const next = getOrCreateConversationSession();
+  startNewDaySession(next.conversationId);
+  bindDaySessionConversation(next.conversationId);
+  if (input.mode === "new-day") {
+    activateNewDayChatScope();
+  }
 
   return {
     mode: input.mode,

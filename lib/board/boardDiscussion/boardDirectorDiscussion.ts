@@ -95,6 +95,11 @@ export type BoardDiscussionIntakeDraft = {
   currentStep: BoardIntakeStep;
   chairConfirmed: boolean;
   updatedAt: string;
+  /**
+   * When true, intake is retained for resume in the Boardroom but must not
+   * own Global Companion chat (navigation / New Day isolation).
+   */
+  conversationSuspended?: boolean;
 };
 
 /** @deprecated Prefer BoardDiscussionIntakeDraft — kept for call sites mid-migration. */
@@ -465,6 +470,29 @@ export function clearBoardIntakeDraft(): void {
   localStorage.removeItem(BOARD_DIRECTOR_INTAKE_DRAFT_STORAGE_KEY);
 }
 
+/** Suspend chat ownership without deleting the draft (nav / leave Boardroom). */
+export function suspendBoardIntakeConversation(): boolean {
+  const draft = loadBoardIntakeDraft();
+  if (!draft) return false;
+  if (draft.conversationSuspended) return true;
+  saveBoardIntakeDraft({ ...draft, conversationSuspended: true });
+  return true;
+}
+
+/** Resume chat ownership when the member deliberately reopens Board intake. */
+export function resumeBoardIntakeConversation(): BoardDiscussionIntakeDraft | null {
+  const draft = loadBoardIntakeDraft();
+  if (!draft) return null;
+  if (!draft.conversationSuspended) return draft;
+  const next = { ...draft, conversationSuspended: false };
+  saveBoardIntakeDraft(next);
+  return next;
+}
+
+export function isBoardIntakeConversationSuspended(): boolean {
+  return Boolean(loadBoardIntakeDraft()?.conversationSuspended);
+}
+
 /**
  * Restore an in-progress draft, or create empty.
  * Never overwrites an existing in-progress draft with empty defaults.
@@ -475,6 +503,11 @@ export function resolveInitialBoardIntakeDraft(
   const existing = loadBoardIntakeDraft();
   if (existing && existing.currentStep !== "discussion") {
     let draft = existing;
+    // Explicit Boardroom reopen — restore chat ownership for this draft.
+    if (draft.conversationSuspended) {
+      draft = { ...draft, conversationSuspended: false };
+      saveBoardIntakeDraft(draft);
+    }
     if (
       directorIds.length > 0 &&
       draft.selectedDirectorIds.length === 0
