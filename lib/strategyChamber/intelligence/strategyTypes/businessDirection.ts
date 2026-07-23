@@ -1,0 +1,50 @@
+import type { StrategyTypeContract } from "../types";
+
+export const businessDirectionStrategyType: StrategyTypeContract = {
+  id: "business_direction",
+  name: "Business Direction Strategy",
+  family: "business_direction",
+  plainLanguageDescription:
+    "Clarify where the business is headed and what it will and will not pursue.",
+  useWhen: [
+    "The overall direction feels unclear",
+    "Too many paths compete for attention",
+    "A major commitment needs a north star",
+  ],
+  doNotUseWhen: [
+    "The need is only a single task or calendar item",
+    "Emotional processing is the primary need",
+  ],
+  entrySignals: [
+    /\b(direction|where (am i|we)|what (should|do) i (focus|pursue)|scattered|north star)\b/i,
+    /\b(don'?t know what to do|too many ideas)\b/i,
+  ],
+  clarifyingQuestions: [
+    "What feels most important to decide about the direction of the business?",
+    "Which part of this feels like the real decision?",
+  ],
+  currentStateQuestions: [
+    "What is working in the current direction?",
+    "What has changed that makes direction feel unclear now?",
+  ],
+  directionQuestions: [
+    "What would a good direction make possible in the next season?",
+    "What do you most want to protect while you choose?",
+  ],
+  optionPatterns: ["continue", "narrow", "simplify", "staged_transition", "test"],
+  decisionCriteria: ["fit", "capacity", "values", "sustainability"],
+  commonTradeoffs: ["focus vs opportunity", "speed vs depth"],
+  commonRisks: ["spreading too thin", "locking into the wrong season"],
+  commonAssumptions: ["growth must be the answer", "every idea needs equal time"],
+  evidencePrompts: ["What do you know for certain about what is working?"],
+  capacityChecks: ["How much focus can this direction realistically receive?"],
+  experimentPatterns: ["Try one focus area for 30–90 days and review"],
+  successSignals: ["Clearer weekly choices", "Less competing priority noise"],
+  reviewTriggers: ["A major new opportunity appears", "Capacity drops sharply"],
+  recommendedChamberMembers: ["strategy"],
+  recommendedBoardRoles: ["strategy-director"],
+  handoffDestinations: ["project", "board", "create", "plan_my_day"],
+  adaptivePresentationNotes: "Keep one question; offer a brief journey map only if asked.",
+  qualityChecks: ["Direction named", "What not pursing named"],
+  version: 1,
+};

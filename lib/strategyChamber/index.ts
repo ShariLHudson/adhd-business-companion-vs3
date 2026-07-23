@@ -11,3 +11,4 @@ export * from "./contributionReturn";
 export * from "./answerIntake";
 export * from "./conversationGuidance";
 export * from "./thinkingSummary";
+/** Judgment intelligence: import from `@/lib/strategyChamber/intelligence` */

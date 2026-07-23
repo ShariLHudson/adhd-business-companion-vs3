@@ -13,11 +13,11 @@ import {
 } from "@/lib/strategyChamber/conversationGuidance";
 import {
   buildContinueYourJourney,
-  buildStrategyDecisionRecord,
   STRATEGY_HANDOFF_LIVE_DESTINATIONS,
   type ContinueJourneyDestinationId,
   type StrategyWorkItem,
 } from "@/lib/strategyChamber";
+import { buildIntelligentDecisionRecord } from "@/lib/strategyChamber/intelligence";
 
 type Props = {
   work: StrategyWorkItem;
@@ -421,7 +421,7 @@ export function StrategyChamberConversation({
             change anything before we use it?
           </p>
           <StrategyDecisionRecord
-            record={buildStrategyDecisionRecord(work)}
+            record={buildIntelligentDecisionRecord(work)}
             summaryFirst={presentation.summaryFirst}
           />
           <button

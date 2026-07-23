@@ -13,6 +13,7 @@ import {
   buildResumeRecap,
   buildShariReflection,
 } from "./conversationGuidance";
+import { analyzeStrategyWorkItem } from "./intelligence";
 import type {
   StrategyThinkingStage,
   StrategyWorkItem,
@@ -75,7 +76,8 @@ export function guidedPromptForWorkItem(
   presentation?: AdaptivePresentationResolved,
 ): GuidedJourneyPrompt {
   const question =
-    item.activeQuestion?.trim() || buildNextGuidedQuestion(item);
+    item.activeQuestion?.trim() ||
+    buildNextGuidedQuestion(item, presentation);
   const reflection =
     item.shariReflection?.trim() || buildShariReflection(item);
   return {
@@ -123,12 +125,19 @@ export function applyGuidedJourneyAnswer(
     decisionStatement: patch.decisionStatement ?? item.decisionStatement,
     desiredDirection: patch.desiredDirection ?? item.desiredDirection,
     chosenDirection: patch.chosenDirection ?? item.chosenDirection,
+    strategyType: patch.strategyType ?? item.strategyType,
+    strategyFamily: patch.strategyFamily ?? item.strategyFamily,
   };
+
+  const judgment = analyzeStrategyWorkItem(merged, undefined, {
+    lastAnswer: trimmed,
+  });
 
   return {
     ...patch,
-    shariReflection: buildShariReflection(merged),
-    activeQuestion: buildNextGuidedQuestion(merged),
+    ...judgment.workItemPatch,
+    shariReflection: buildShariReflection({ ...merged, ...judgment.workItemPatch }),
+    activeQuestion: judgment.nextQuestion.question,
     draftResponse: "",
   };
 }

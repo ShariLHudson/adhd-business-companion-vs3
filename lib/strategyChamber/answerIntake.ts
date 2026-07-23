@@ -4,6 +4,11 @@
  */
 
 import type { StrategyOption, StrategyWorkItem } from "./types";
+import {
+  classifyStrategicInput,
+  identifyStrategicQuestion,
+  suggestStrategyTypeId,
+} from "./intelligence";
 
 export type AnswerSignalKind =
   | "fact"
@@ -41,12 +46,6 @@ function looksLikeConstraint(text: string): boolean {
   );
 }
 
-function looksLikeAssumption(text: string): boolean {
-  return /\b(i think|maybe|might|probably|assume|seems like|feels like)\b/i.test(
-    text,
-  );
-}
-
 function looksLikeDesire(text: string): boolean {
   return /\b(want|hope|wish|goal|would like|trying to|need more|looking for)\b/i.test(
     text,
@@ -59,21 +58,21 @@ function looksLikeOption(text: string): boolean {
   );
 }
 
-function looksLikeFeeling(text: string): boolean {
-  return /\b(feel|feeling|overwhelmed|stuck|anxious|excited|scared|relieved)\b/i.test(
-    text,
-  );
-}
-
 /** Best-effort signal tags — preserved alongside original wording. */
 export function classifyAnswerSignals(answer: string): AnswerSignalKind[] {
   const t = answer.trim();
   if (!t) return ["unclear"];
+  const classified = classifyStrategicInput(t);
   const kinds: AnswerSignalKind[] = [];
-  if (looksLikeFeeling(t)) kinds.push("feeling");
+  for (const k of classified.kinds) {
+    if (k === "fact") kinds.push("fact");
+    else if (k === "observation") kinds.push("observation");
+    else if (k === "interpretation") kinds.push("interpretation");
+    else if (k === "assumption") kinds.push("assumption");
+    else if (k === "feeling") kinds.push("feeling");
+  }
   if (looksLikeRiskOrConcern(t)) kinds.push("concern", "risk");
   if (looksLikeConstraint(t)) kinds.push("constraint");
-  if (looksLikeAssumption(t)) kinds.push("assumption");
   if (looksLikeDesire(t)) kinds.push("desired_outcome");
   if (looksLikeOption(t)) kinds.push("option");
   if (kinds.length === 0) kinds.push("observation");
@@ -92,6 +91,11 @@ export function applyOpeningStrategicQuestion(
   if (!trimmed) return {};
   const title =
     trimmed.length > 72 ? `${trimmed.slice(0, 69).trim()}…` : trimmed;
+  const strategyType = suggestStrategyTypeId(trimmed);
+  const analysis = identifyStrategicQuestion(
+    { ...item, decisionStatement: trimmed },
+    trimmed,
+  );
   return {
     decisionStatement: trimmed,
     title,
@@ -102,6 +106,21 @@ export function applyOpeningStrategicQuestion(
     currentStage: "understand_current_state",
     activeQuestion: undefined,
     shariReflection: undefined,
+    strategyType: strategyType ?? item.strategyType,
+    strategyFamily:
+      analysis.strategyTypeId === "pricing"
+        ? "money_and_resources"
+        : analysis.strategyTypeId === "growth" ||
+            analysis.strategyTypeId === "market_customer"
+          ? "customer_and_market"
+          : analysis.strategyTypeId === "offer"
+            ? "offers_and_innovation"
+            : analysis.strategyTypeId === "hiring_delegation"
+              ? "people_and_leadership"
+              : analysis.strategyTypeId === "capacity_focus" ||
+                  analysis.strategyTypeId === "personal_direction"
+                ? "personal_direction"
+                : item.strategyFamily ?? "business_direction",
   };
 }
 
@@ -139,8 +158,15 @@ export function applyConversationalAnswer(
     patch.observations = pushUnique(item.observations, trimmed);
   }
 
-  if (signals.includes("assumption")) {
+  const classified = classifyStrategicInput(trimmed);
+  if (signals.includes("assumption") || classified.kinds.includes("assumption")) {
     patch.assumptions = pushUnique(item.assumptions, trimmed);
+  }
+  if (
+    classified.safeToTreatAsFact ||
+    classified.kinds.includes("fact")
+  ) {
+    patch.knownFacts = pushUnique(item.knownFacts, trimmed);
   }
   if (signals.includes("concern") || signals.includes("risk")) {
     patch.risks = pushUnique(item.risks, trimmed);

@@ -3,6 +3,7 @@ import type {
   ContinueYourJourneyModel,
   StrategyWorkItem,
 } from "./types";
+import { recommendStrategicHandoff } from "./intelligence";
 
 const MAX_SECONDARY = 2;
 
@@ -28,8 +29,18 @@ export function buildContinueYourJourney(
 
   let recommended: ContinueJourneyOption | null = null;
   const pool: ContinueJourneyOption[] = [];
+  const intel = recommendStrategicHandoff(item);
 
-  if (!hasDirection && emotional) {
+  if (intel) {
+    recommended = {
+      destinationId: intel.destinationId,
+      title: intel.title,
+      benefit: intel.benefit,
+      actionLabel: intel.actionLabel,
+    };
+  }
+
+  if (!recommended && !hasDirection && emotional) {
     recommended = {
       destinationId: "talk_it_out",
       title: "Talk it through first",
@@ -42,11 +53,11 @@ export function buildContinueYourJourney(
       chamberOption(),
       projectOption(),
     );
-  } else if (!hasDirection && evaluating) {
+  } else if (!recommended && !hasDirection && evaluating) {
     recommended = boardOption();
     pool.push(chamberOption(), talkOption(), createOption());
   } else if (hasDirection) {
-    recommended = projectOption();
+    if (!recommended) recommended = projectOption();
     pool.push(
       boardOption(),
       {
@@ -65,10 +76,13 @@ export function buildContinueYourJourney(
       },
       createOption(),
       chamberOption(),
+      projectOption(),
     );
-  } else {
+  } else if (!recommended) {
     recommended = chamberOption();
     pool.push(talkOption(), boardOption(), createOption());
+  } else {
+    pool.push(boardOption(), chamberOption(), projectOption(), talkOption());
   }
 
   const secondary = pool
