@@ -1259,6 +1259,14 @@ import {
   isChatRequestSuperseded,
   supersedeInFlightChatRequest,
 } from "@/lib/chatFastPath/chatRequestInterrupt";
+import { CompanionVisibilityProvider } from "@/components/companion/CompanionVisibilityContext";
+import {
+  isCompanionVisible,
+  normalizeConversationDestinationId,
+  setCompanionVisibility,
+  supportsCompanionVisibilityControl,
+  type CompanionVisibility,
+} from "@/lib/conversationVisibility";
 import { resolveChatFailureReply } from "@/lib/chatFastPath/resolveChatFailureReply";
 import { logConversationPipelineDiagnostic } from "@/lib/conversation/conversationPipelineDiagnostics";
 import {
@@ -2919,10 +2927,11 @@ export default function CompanionPageClient() {
   const instituteLearningHintRef = useRef<string | null>(null);
   const stablesLearningHintRef = useRef<string | null>(null);
   const previousMomentumPathIdRef = useRef<string | null>(null);
-  // Conversation is always shown by default — the manual Show/Hide Conversation
-  // control has been removed, so no stale "hidden" preference can strand a
-  // returning member without a way back to their conversation.
+  // Companion On/Off — canonical conversationVisibility prefs.
+  // Control stays visible when Off so members are never stranded without a way back.
   const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(true);
+  const [newChatCompanionConfirmOpen, setNewChatCompanionConfirmOpen] =
+    useState(false);
   const [experienceControlsOpen, setExperienceControlsOpen] = useState(false);
   const [soundscapeSelectionOpen, setSoundscapeSelectionOpen] = useState(false);
   useEffect(() => {
@@ -7486,6 +7495,15 @@ export default function CompanionPageClient() {
   }
 
   function requestClearTodayContext() {
+    // New Chat while Companion Off — never silently turn Companion on.
+    if (!justBeHereSession && !estateRoomChatVisible) {
+      setNewChatCompanionConfirmOpen(true);
+      return;
+    }
+    runClearTodayContext();
+  }
+
+  function runClearTodayContext() {
     // Conversations → New Chat: fresh thread + approved welcome only.
     try {
       const preserveRoom = shouldPreserveRoomForFreshConversation();
@@ -10907,6 +10925,37 @@ export default function CompanionPageClient() {
     setJustBeHereChatVisible((visible) => !visible);
   }
 
+  function resolveConversationDestinationKey(): string | null {
+    if (justBeHereSession) return "just-be-here";
+    const visitRoom = directEstateVisitRef.current?.roomId;
+    if (visitRoom) return normalizeConversationDestinationId(visitRoom);
+    const section = activeSectionRef.current;
+    if (section === "home") return "welcome-home";
+    return normalizeConversationDestinationId(section);
+  }
+
+  function applyCompanionVisibility(
+    visibility: CompanionVisibility,
+    source: "conversation_header" | "settings" | "empty_state" | "new_chat_confirm",
+  ) {
+    if (justBeHereSession) {
+      setJustBeHereChatVisible(visibility === "on");
+      return;
+    }
+    const destinationId = resolveConversationDestinationKey();
+    const result = setCompanionVisibility({
+      visibility,
+      destinationId,
+      source,
+    });
+    setEstateRoomChatVisible(visibility === "on");
+    if (result.abortInFlightResponse) {
+      chatRequestGenerationRef.current += 1;
+      supersedeInFlightChatRequest(chatRequestAbortRef.current);
+      chatRequestAbortRef.current = null;
+    }
+  }
+
   function toggleEstateRoomChat() {
     if (justBeHereSession) {
       toggleJustBeHereChat();
@@ -10916,15 +10965,10 @@ export default function CompanionPageClient() {
       activeSectionRef.current === "create" ||
       forbidCompanionSidePanelDuringCreation()
     ) {
-      return;
+      // Create still allows Companion On/Off in the frosted panel; do not block.
     }
-    setEstateRoomChatVisible((visible) => {
-      const next = !visible;
-      patchExperienceControlPrefs({
-        conversationVisibility: next ? "showing" : "hidden",
-      });
-      return next;
-    });
+    const next: CompanionVisibility = estateRoomChatVisible ? "off" : "on";
+    applyCompanionVisibility(next, "conversation_header");
   }
 
   /**
@@ -23209,6 +23253,48 @@ export default function CompanionPageClient() {
   const showEstateExperienceMenu =
     overlay !== "signin" && Boolean(roomMenuRoomId);
 
+  const conversationDestinationId = useMemo(() => {
+    if (justBeHereSession) return "just-be-here";
+    if (directEstateVisit?.roomId) {
+      return normalizeConversationDestinationId(directEstateVisit.roomId);
+    }
+    if (sparkEstateShellPlaceId) {
+      return normalizeConversationDestinationId(sparkEstateShellPlaceId);
+    }
+    if (activeSection === "home") return "welcome-home";
+    return normalizeConversationDestinationId(activeSection);
+  }, [
+    justBeHereSession,
+    directEstateVisit?.roomId,
+    sparkEstateShellPlaceId,
+    activeSection,
+  ]);
+
+  // Keep panel state aligned with canonical prefs when destination changes.
+  useEffect(() => {
+    if (justBeHereSession) return;
+    const visible = isCompanionVisible(conversationDestinationId);
+    setEstateRoomChatVisible(visible);
+  }, [conversationDestinationId, justBeHereSession]);
+
+  const companionVisibilityValue = useMemo(
+    () => ({
+      visibility: (roomMenuChatVisible ? "on" : "off") as CompanionVisibility,
+      destinationId: conversationDestinationId,
+      showControls: supportsCompanionVisibilityControl(conversationDestinationId),
+      onToggle: () => toggleEstateRoomChat(),
+      onTurnOn: () => applyCompanionVisibility("on", "empty_state"),
+      onNewChat: () => requestClearTodayContext(),
+      onNewDay: () => requestBeginNewDay("explicit-new-day"),
+    }),
+    [
+      roomMenuChatVisible,
+      conversationDestinationId,
+      estateRoomChatVisible,
+      justBeHereSession,
+    ],
+  );
+
   const handleCompanionBack = () => {
     // Back To Estate / Return to Estate — always Welcome Home lobby, never everyday chat.
     navigateBackToEstateHome();
@@ -23289,6 +23375,7 @@ export default function CompanionPageClient() {
         companionDeskVisible ? <CompanionDeskChrome /> : null
       }
     >
+    <CompanionVisibilityProvider value={companionVisibilityValue}>
     <div
       className={`companion-root relative flex h-dvh max-h-dvh overflow-hidden text-lg ${
         companionDeskVisible ? "companion-has-companion-desk" : ""
@@ -23331,8 +23418,15 @@ export default function CompanionPageClient() {
         activeSection === "project-homes" ? "" : undefined
       }
       data-estate-room-chat-visible={
-        roomMenuChatVisible ? "true" : "false"
+        // Just Be Here still uses CSS hide. Controllable destinations keep the
+        // layer visible so Companion: Off / Turn Companion On remain reachable.
+        justBeHereSession
+          ? roomMenuChatVisible
+            ? "true"
+            : "false"
+          : "true"
       }
+      data-companion-participation={roomMenuChatVisible ? "on" : "off"}
       {...constitutionalRenderContext.environment.dataAttributes}
       {...constitutionalRenderContext.presence.dataAttributes}
       suppressHydrationWarning
@@ -26156,7 +26250,53 @@ export default function CompanionPageClient() {
         )}
         onSelectLocation={handleExploreSparkMapSelect}
       />
+
+      {newChatCompanionConfirmOpen ? (
+        <div
+          className="fixed inset-0 z-[80] flex items-center justify-center bg-black/35 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="new-chat-companion-confirm-title"
+          data-testid="new-chat-companion-confirm"
+        >
+          <div className="max-w-md rounded-2xl border border-[#d4cdc3] bg-white p-5 shadow-xl">
+            <p
+              id="new-chat-companion-confirm-title"
+              className="text-lg font-semibold text-[#1f1c19]"
+            >
+              Starting a new chat will turn Companion on.
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-[#4b463f]">
+              Your previous conversation stays in history. Companion will become
+              visible again so you can begin the new chat.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white"
+                data-testid="new-chat-companion-confirm-start"
+                onClick={() => {
+                  setNewChatCompanionConfirmOpen(false);
+                  applyCompanionVisibility("on", "new_chat_confirm");
+                  runClearTodayContext();
+                }}
+              >
+                Start New Chat
+              </button>
+              <button
+                type="button"
+                className="rounded-xl border border-[#d4cdc3] px-4 py-2.5 text-sm font-semibold text-[#1f1c19]"
+                data-testid="new-chat-companion-confirm-cancel"
+                onClick={() => setNewChatCompanionConfirmOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
+    </CompanionVisibilityProvider>
     </CompanionDeskProvider>
   );
 }

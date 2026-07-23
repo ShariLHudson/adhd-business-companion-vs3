@@ -27,6 +27,13 @@ import {
   type ExperienceControlPrefs,
 } from "@/lib/estate/experienceControlPrefs";
 import {
+  getConversationDisplayPreference,
+  resetDestinationCompanionPreferences,
+  setCompanionVisibility,
+  subscribeConversationDisplayPreference,
+  type CompanionVisibility,
+} from "@/lib/conversationVisibility";
+import {
   isEstateAmbienceEnabled,
   setEstateAmbienceEnabled,
 } from "@/lib/estate/estateAmbiencePreference";
@@ -60,6 +67,9 @@ export function ExperienceControlsOverlay({
   const [prefs, setPrefs] = useState<ExperienceControlPrefs>(() =>
     getExperienceControlPrefs(),
   );
+  const [companionDefault, setCompanionDefault] = useState<CompanionVisibility>(
+    () => getConversationDisplayPreference().globalDefault,
+  );
   const [fullscreen, setFullscreen] = useState(false);
   const [estateSoundsOn, setEstateSoundsOn] = useState(true);
   const [volume, setVolume] = useState(0.85);
@@ -70,6 +80,7 @@ export function ExperienceControlsOverlay({
     const next = getExperienceControlPrefs();
     setPrefs(next);
     applyExperienceControlPresentation(next);
+    setCompanionDefault(getConversationDisplayPreference().globalDefault);
   }, []);
 
   const syncAudio = useCallback(() => {
@@ -98,11 +109,13 @@ export function ExperienceControlsOverlay({
     setFullscreen(isEstateBrowserFullscreen());
     const unsubPrefs = subscribeExperienceControlPrefs(syncPrefs);
     const unsubAudio = subscribeEstateAudioSettings(syncAudio);
+    const unsubCompanion = subscribeConversationDisplayPreference(syncPrefs);
     const onFs = () => setFullscreen(isEstateBrowserFullscreen());
     document.addEventListener("fullscreenchange", onFs);
     return () => {
       unsubPrefs();
       unsubAudio();
+      unsubCompanion();
       document.removeEventListener("fullscreenchange", onFs);
     };
   }, [open, syncPrefs, syncAudio]);
@@ -314,6 +327,58 @@ export function ExperienceControlsOverlay({
                 {label}
               </button>
             ))}
+          </section>
+
+          <section
+            className="experience-controls-overlay__section"
+            aria-label="Companion Conversation"
+          >
+            <h3 className="experience-controls-overlay__section-title">
+              Companion Conversation
+            </h3>
+            <p className="experience-controls-overlay__subsection">
+              Default Companion state
+            </p>
+            {(
+              [
+                ["on", "Companion: On"],
+                ["off", "Companion: Off"],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                className={
+                  companionDefault === value
+                    ? "experience-controls-overlay__choice experience-controls-overlay__choice--active"
+                    : "experience-controls-overlay__choice"
+                }
+                data-testid={`experience-controls-companion-default-${value}`}
+                aria-pressed={companionDefault === value}
+                onClick={() => {
+                  setCompanionVisibility({
+                    visibility: value,
+                    destinationId: null,
+                    source: "settings",
+                    updateGlobalDefault: true,
+                  });
+                  setCompanionDefault(value);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+            <button
+              type="button"
+              className="experience-controls-overlay__choice"
+              data-testid="experience-controls-companion-reset-destinations"
+              onClick={() => {
+                resetDestinationCompanionPreferences();
+                syncPrefs();
+              }}
+            >
+              Reset destination conversation preferences
+            </button>
           </section>
 
           <section className="experience-controls-overlay__section" aria-label="Display">
