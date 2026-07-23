@@ -83,6 +83,12 @@ export const CREATE_ESTATE_CONTINUE_HEADING = "Continue Working";
 export const CREATE_ESTATE_CONFIRM_YES = "Yes, let's begin";
 export const CREATE_ESTATE_CONFIRM_OTHER = "Choose something else";
 export const CREATE_ESTATE_CONFIRM_CANCEL = "Cancel";
+/** Anywhere-Origin clarify — actionable continue vs new (never text-only). */
+export const CREATE_ESTATE_AMBIGUITY_CANCEL = "Cancel";
+export const CREATE_ESTATE_START_NEW_READY_MESSAGE =
+  "Ready when you are — describe what you'd like to create, or pick a type below, then Start Creating. We'll begin something new.";
+export const CREATE_ESTATE_OPEN_FAILED_MESSAGE =
+  "I couldn't open that creation yet. Your words are still here — Retry, or tell me a little more above.";
 
 /** Spec 130 — Manage My Work (Continue Working cleanup). */
 export const CREATE_ESTATE_MANAGE_WORK_LABEL = "Manage My Work";
