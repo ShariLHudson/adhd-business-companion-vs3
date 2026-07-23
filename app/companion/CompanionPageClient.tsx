@@ -584,7 +584,6 @@ import {
   endCreationDestinationSession,
   forbidCompanionSidePanelDuringCreation,
   hydrateExactBuilderSession,
-  ideasGuidanceForFocus,
   resolveCanonicalCurrentFocus,
   submitCurrentFocusResponse,
 } from "@/lib/currentFocus";
@@ -596,6 +595,7 @@ import {
   enterCreationFromCreate,
   forceNewCreationAcknowledgment,
 } from "@/lib/universalCreationEntrypoint";
+import { armForceNewCreateSession } from "@/lib/createEstate/forceNewCreateSession";
 import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
 import { getEventRecord } from "@/lib/eventsIntelligence/eventRecordStore";
 import { mayApplyEventWorkspace } from "@/lib/creationIdentity/deriveCreationIdentity";
@@ -1292,9 +1292,14 @@ import {
   clearConversationOwner,
   continuityOwnerHintForChat,
   getActiveConversationOwner,
-  resolveContinuityTurnGate,
   setActiveConversationOwner,
 } from "@/lib/conversationContinuity";
+import {
+  beginRoutedChatRequest,
+  routeConversationTurn,
+  validateResponseEnvelope,
+  type ChatRequestIdentity,
+} from "@/lib/conversationRouter";
 import {
   logPrimaryTurnClassification,
   recordPrimaryTurnFinalResponse,
@@ -2498,6 +2503,10 @@ export default function CompanionPageClient() {
     const workspaceActive = Boolean(
       panel || companionStandaloneSectionRef.current || guideBesideSession,
     );
+    const estateWorking =
+      activeSectionRef.current === "create" &&
+      createBuilderSessionRef.current?.phase === "workspace" &&
+      Boolean(createBuilderSessionRef.current?.typeLabel);
     publishCreateOpenLiveTrace(
       buildCreateOpenLiveSnapshot({
         traceId,
@@ -2507,7 +2516,7 @@ export default function CompanionPageClient() {
         hardNavTarget: extra?.hardNavTarget,
         workspacePanel: panel,
         chatLayoutMode: chatLayoutModeRef.current,
-        workspaceActive,
+        workspaceActive: workspaceActive || estateWorking,
         activeSection: activeSectionRef.current,
         activeNav: activeNavRef.current,
         createOpenRequest: extra?.createOpenRequest,
@@ -2517,6 +2526,7 @@ export default function CompanionPageClient() {
         patchBlocked: extra?.patchBlocked,
         patchFrom: extra?.patchFrom,
         patchTo: extra?.patchTo,
+        createEstateWorkingMounted: estateWorking,
         extra: extra?.note,
       }),
     );
@@ -2528,16 +2538,23 @@ export default function CompanionPageClient() {
         const traceId =
           createOpenTraceRef.current ?? nextCreateOpenTraceId(command);
         const panel = workspacePanelRef.current;
+        const estateWorking =
+          activeSectionRef.current === "create" &&
+          createBuilderSessionRef.current?.phase === "workspace" &&
+          Boolean(createBuilderSessionRef.current?.typeLabel);
         return buildCreateOpenLiveSnapshot({
           traceId,
           stage,
           command,
           workspacePanel: panel,
           chatLayoutMode: chatLayoutModeRef.current,
-          workspaceActive: Boolean(panel || companionStandaloneSectionRef.current),
+          workspaceActive: Boolean(
+            panel || companionStandaloneSectionRef.current || estateWorking,
+          ),
           activeSection: activeSectionRef.current,
           activeNav: activeNavRef.current,
           builderBootstrap: createBuilderBootstrappedRef.current,
+          createEstateWorkingMounted: estateWorking,
         });
       };
     scheduleCreateOpenLiveTrace(100, build("after_react_settle_100ms"));
@@ -12003,6 +12020,7 @@ export default function CompanionPageClient() {
   }
 
   function beginForceNewCreationFromUi(_source: "create" | string): void {
+    armForceNewCreateSession();
     createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
     createBuilderBootstrappedRef.current = false;
     setCreateBuilderSession(null);
@@ -14048,11 +14066,17 @@ export default function CompanionPageClient() {
       clearUniversalCreationSession();
     }
 
-    const continuityGate = resolveContinuityTurnGate({
+    /** Authoritative arbiter — Continuity + intent family + navigation priority. */
+    const routedTurn = routeConversationTurn({
       userText: trimmed,
       lastAssistantText: lastAssistantForPrimary,
       activeSection: activeSectionRef.current,
+      conversationId: activeConversationIdRef.current,
+      destinationId: directEstateVisitRef.current?.roomId ?? null,
     });
+    const continuityGate = routedTurn.continuityGate;
+    const routedRequestIdentity: ChatRequestIdentity | null =
+      routedTurn.requestIdentity;
 
     if (continuityGate.action === "clear_owner_continue") {
       if (continuityGate.clearUniversalCreation) {
@@ -16345,9 +16369,31 @@ export default function CompanionPageClient() {
     setIsLoading(true);
     const requestAbort = new AbortController();
     chatRequestAbortRef.current = requestAbort;
-    const isStaleSend = () =>
-      isChatRequestSuperseded(sendGeneration, chatRequestGenerationRef.current) ||
-      requestAbort.signal.aborted;
+    const apiRequestIdentity: ChatRequestIdentity =
+      routedRequestIdentity ??
+      beginRoutedChatRequest({
+        conversationId:
+          activeConversationIdRef.current ?? `conv-${sendGeneration}`,
+        destinationId: directEstateVisitRef.current?.roomId ?? null,
+      });
+    const isStaleSend = () => {
+      if (
+        isChatRequestSuperseded(
+          sendGeneration,
+          chatRequestGenerationRef.current,
+        ) ||
+        requestAbort.signal.aborted
+      ) {
+        return true;
+      }
+      const envelope = validateResponseEnvelope({
+        identity: apiRequestIdentity,
+        activeConversationId: activeConversationIdRef.current,
+        activeDestinationId: directEstateVisitRef.current?.roomId ?? null,
+        responseDestinationId: apiRequestIdentity.destinationId,
+      });
+      return !envelope.ok;
+    };
     const finishLocalChatTurn = (assistantContent?: string) => {
       if (assistantContent) {
         const voiced = finalizeMemberFacingAssistantText(
@@ -25376,22 +25422,9 @@ export default function CompanionPageClient() {
                   });
                 }}
                 onNeedIdeasInFocus={() => {
-                  const focus = resolveCanonicalCurrentFocus({
-                    creationId:
-                      createBuilderSession.workflow.sessionId ||
-                      createBuilderSession.workflow.eventRecordId ||
-                      "",
-                    workflow: createBuilderSession.workflow,
-                  });
-                  if (!focus) return;
-                  const assist = runCreateAssistance({
-                    workflow: createBuilderSession.workflow,
-                    sectionId: focus.sectionId || focus.focusId,
-                    actionId: "give_me_ideas",
-                  });
-                  setCreateFocusGuidance(
-                    assist.guidance || ideasGuidanceForFocus(focus),
-                  );
+                  // Ideas panel is owned by CurrentFocusInteraction.
+                  // Keep parent guidance clear so the panel is the visible result.
+                  setCreateFocusGuidance(null);
                   setCreateFocusFailure(null);
                 }}
                 onBuildDraftInFocus={() => {
@@ -25496,11 +25529,34 @@ export default function CompanionPageClient() {
               registerBack={registerBack}
               onBeginCreate={(outcome) => {
                 // Never call Estate open without artifactType
-                void startFreshCreateFromEstate({
+                createOpenTraceRef.current = nextCreateOpenTraceId(
+                  outcome.text || outcome.artifactType,
+                );
+                publishLiveWorkspaceTrace("before_handler", {
+                  command: outcome.text,
+                  matchedHardNav: false,
+                  hardNavTarget: "create",
+                  note: `begin:${outcome.artifactType}`,
+                });
+                const ok = startFreshCreateFromEstate({
                   artifactType: outcome.artifactType,
                   initialPrompt: outcome.text,
                   isEventDomain: outcome.isEventDomain,
                 });
+                publishLiveWorkspaceTrace("after_open_create_workspace", {
+                  command: outcome.text,
+                  matchedHardNav: false,
+                  hardNavTarget: "create",
+                  note: ok
+                    ? `estateWorking:true;type:${outcome.artifactType}`
+                    : `estateWorking:false;type:${outcome.artifactType}`,
+                });
+                if (ok) {
+                  scheduleLiveWorkspaceTraceDelays(
+                    outcome.text || outcome.artifactType,
+                  );
+                }
+                return ok;
               }}
               onSelectCreationType={(item) => {
                 const resolved = resolveCreateLauncherType(item.label);
