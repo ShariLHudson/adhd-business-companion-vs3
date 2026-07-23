@@ -25,6 +25,8 @@
   border: none;
   background: transparent;
   box-shadow: none;
+  /* Parent .garden-banner-dropdown__scroll owns overflow scrolling */
+  overflow: visible;
 }
 
 .garden-banner-dropdown .garden-destination-cards__item {

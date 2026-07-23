@@ -27,7 +27,7 @@ describe("peaceful place destinations", () => {
       placeId: "summer-storm-covered-deck",
       soundscapeId: "summer-storm",
     });
-    expect(destination?.audioSrc).toContain("RAINMetl-Gentle_rain_on_a_tin-Elevenlabs.mp3");
+    expect(destination?.audioSrc).toContain("gentle_rain_on_a_tin.mp3");
   });
 
   it("resolves the destination by id and soundscape id", () => {
@@ -54,7 +54,7 @@ describe("peaceful place destinations", () => {
     const playback = resolvePeacefulPlacePlayback(destination!);
     expect(playback.kind).toBe("direct");
     if (playback.kind === "direct") {
-      expect(playback.src).toContain("RAINMetl-Gentle_rain_on_a_tin-Elevenlabs.mp3");
+      expect(playback.src).toContain("gentle_rain_on_a_tin.mp3");
     }
   });
 
@@ -83,7 +83,7 @@ describe("peaceful place destinations", () => {
       placeId: "cozy-cafe",
       soundscapeId: "coffee-shop",
     });
-    expect(destination?.audioSrc).toContain("AMBRest-Quiet_coffee_shop_am-Elevenlabs.mp3");
+    expect(destination?.audioSrc).toContain("coffee-shop-chatter-audio.mp3");
   });
 
   it("resolves cozy café destination by id and soundscape id", () => {
@@ -101,7 +101,7 @@ describe("peaceful place destinations", () => {
     const playback = resolvePeacefulPlacePlayback(destination!);
     expect(playback.kind).toBe("direct");
     if (playback.kind === "direct") {
-      expect(playback.src).toContain("AMBRest-Quiet_coffee_shop_am-Elevenlabs.mp3");
+      expect(playback.src).toContain("coffee-shop-chatter-audio.mp3");
     }
   });
 });

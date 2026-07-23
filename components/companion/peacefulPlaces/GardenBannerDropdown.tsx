@@ -93,7 +93,7 @@ export function GardenBannerDropdown({
       onPointerEnter={onMenuPointerEnter}
       onPointerLeave={onMenuPointerLeave}
     >
-      {children}
+      <div className="garden-banner-dropdown__scroll">{children}</div>
     </div>,
     document.body,
   );

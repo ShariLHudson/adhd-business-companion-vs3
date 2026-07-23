@@ -1,4 +1,4 @@
-# Peaceful Places™ — Estate Knowledge Base
+# Peaceful Places — Estate Knowledge Base
 
 **Audience:** Spark internal only.
 
@@ -66,7 +66,7 @@ Usually nothing — **restoration**. Optional return to conversation calmer.
 
 **Invitation:** "I know a peaceful place that might help. Would you like to go there with me?"
 
-**Audio-specific:** "Peaceful Places™ has soundscapes made for exactly this…"
+**Audio-specific:** "Peaceful Places has soundscapes made for exactly this…"
 
 ---
 
@@ -82,9 +82,9 @@ Usually nothing — **restoration**. Optional return to conversation calmer.
 
 | Room | When |
 |------|------|
-| Coffee House™ | Reflective talk more than sound |
-| Clear My Mind™ | Mental clutter after regulated |
-| Momentum Builder™ | Ready for one step after calm |
+| Coffee House | Reflective talk more than sound |
+| Clear My Mind | Mental clutter after regulated |
+| Momentum Builder | Ready for one step after calm |
 
 ---
 

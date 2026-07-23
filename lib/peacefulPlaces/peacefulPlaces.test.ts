@@ -75,7 +75,7 @@ describe("peaceful places", () => {
   it("links evening hearth soundscape to the owned fireplace ambience", () => {
     const soundscape = SOUNDSCAPES.find((s) => s.id === "fireplace-night");
     expect(soundscape?.peacefulPlaceId).toBe("evening-hearth");
-    expect(soundscape?.playbackUrl).toContain("evening-hearth-ambience.mp3");
+    expect(soundscape?.playbackUrl).toContain("evening-hearth.mp3");
 
     const place = peacefulPlaceForSoundscape("fireplace-night");
     expect(place?.id).toBe("evening-hearth");

@@ -3,8 +3,26 @@
 ═══════════════════════════════════════════════════════════ */
 
 .garden-banner-dropdown {
+  --garden-banner-dropdown-offset: calc(
+    max(0.75rem, env(safe-area-inset-top, 0px)) +
+      max(1rem, env(safe-area-inset-bottom, 0px))
+  );
   pointer-events: auto;
-  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  max-height: min(72dvh, calc(100dvh - var(--garden-banner-dropdown-offset)));
+  overflow: hidden;
+}
+
+/* Shared scroll region for Peaceful Places destination cards / cloth menus */
+.garden-banner-dropdown__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
 }
 
 .garden-banner-dropdown .pathway-garden-stake__menu {

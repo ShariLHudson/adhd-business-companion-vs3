@@ -10,7 +10,7 @@ describe("gardenCardAmbience", () => {
       "evening-hearth",
     );
     expect(GARDEN_DESTINATION_CARDS["bedroom-window"]?.hoverAmbienceUrl).toContain(
-      "bedroom-window",
+      "nightime-melody",
     );
   });
 });

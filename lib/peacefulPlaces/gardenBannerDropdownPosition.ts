@@ -17,7 +17,12 @@ export function computeGardenBannerDropdownPosition(
   viewportHeight = typeof window !== "undefined" ? window.innerHeight : 800,
 ): { top: number; left: number } {
   const menuWidth = menu.width > 0 ? menu.width : 280;
-  const menuHeight = menu.height > 0 ? menu.height : 420;
+  const rawMenuHeight = menu.height > 0 ? menu.height : 420;
+  /** Cap to viewport so scrollable menus are positioned correctly. */
+  const menuHeight = Math.min(
+    rawMenuHeight,
+    Math.max(120, viewportHeight - EDGE_PADDING * 2),
+  );
 
   let left =
     side === "left"

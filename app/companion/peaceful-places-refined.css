@@ -353,10 +353,12 @@
 .my-peaceful-places-workspace__panel {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
   width: min(100%, 34rem);
-  max-height: min(92vh, 44rem);
-  overflow: auto;
-  padding: clamp(1.35rem, 3.5vw, 1.85rem);
+  max-height: min(92dvh, calc(100dvh - 2rem));
+  overflow: hidden;
+  padding: 0;
   border-radius: 1.25rem;
   border: 1px solid rgba(255, 248, 232, 0.42);
   background:
@@ -374,8 +376,21 @@
 }
 
 .my-peaceful-places-workspace__header {
+  flex-shrink: 0;
   text-align: center;
-  margin-bottom: 1.25rem;
+  margin: 0;
+  padding: clamp(1.35rem, 3.5vw, 1.85rem) clamp(1.35rem, 3.5vw, 1.85rem) 0.85rem;
+}
+
+.my-peaceful-places-workspace__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 clamp(1.35rem, 3.5vw, 1.85rem)
+    max(1.5rem, calc(clamp(1.35rem, 3.5vw, 1.85rem) + env(safe-area-inset-bottom, 0px)));
 }
 
 .my-peaceful-places-workspace__title {
@@ -628,7 +643,7 @@
   display: flex;
   flex-direction: column;
   width: min(100%, 72rem);
-  height: min(100%, calc(100vh - 2rem));
+  height: min(100%, calc(100dvh - 2rem));
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid rgba(255, 248, 232, 0.35);
@@ -689,8 +704,12 @@
 .peaceful-places-signpost-portal .pathway-photo-sign__dropdown {
   z-index: 55;
   width: min(11.5rem, 46vw);
-  max-height: min(72vh, 26rem);
-  overflow: visible;
+  max-height: min(72dvh, calc(100dvh - 2rem));
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 0px));
 }
 
 .peaceful-places-signpost-portal .pathway-photo-sign--align-left .pathway-photo-sign__dropdown {

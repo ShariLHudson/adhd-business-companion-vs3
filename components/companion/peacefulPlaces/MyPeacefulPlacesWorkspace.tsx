@@ -79,6 +79,7 @@ export function MyPeacefulPlacesWorkspace({
           </p>
         </header>
 
+        <div className="my-peaceful-places-workspace__body">
         {savedPlaces.length > 0 ? (
           <div className="my-peaceful-places-workspace__collection">
             {savedPlaces.map((place) => (
@@ -159,6 +160,7 @@ export function MyPeacefulPlacesWorkspace({
             </button>
           </div>
         </form>
+        </div>
       </div>
     </div>,
     document.body,

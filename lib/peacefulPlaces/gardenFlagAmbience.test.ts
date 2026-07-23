@@ -12,10 +12,13 @@ describe("GARDEN_FLAG_HOVER_AMBIENCE", () => {
   });
 
   it("uses distinct emotional previews per destination", () => {
-    expect(GARDEN_FLAG_HOVER_AMBIENCE.focus).toContain("east-terrace");
-    expect(GARDEN_FLAG_HOVER_AMBIENCE.calming).toContain("RAINMetl");
+    expect(GARDEN_FLAG_HOVER_AMBIENCE.focus).toContain("morning-whisper");
+    expect(GARDEN_FLAG_HOVER_AMBIENCE.calming).toContain("gentle_rain_on_a_tin");
     expect(GARDEN_FLAG_HOVER_AMBIENCE.unwind).toContain("evening-hearth");
-    expect(GARDEN_FLAG_HOVER_AMBIENCE.energize).toContain("bedroom-window");
+    expect(GARDEN_FLAG_HOVER_AMBIENCE.energize).toContain("nightime-melody");
     expect(GARDEN_FLAG_HOVER_AMBIENCE["my-places"]).toContain("hall-of-reflections");
+    // Distinct destinations must never share a preview loop.
+    const values = Object.values(GARDEN_FLAG_HOVER_AMBIENCE);
+    expect(new Set(values).size).toBe(values.length);
   });
 });

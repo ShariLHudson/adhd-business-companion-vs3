@@ -21,4 +21,11 @@ describe("computeGardenBannerDropdownPosition", () => {
     const pos = computeGardenBannerDropdownPosition(rightEdge, menu, "left", 1200, 900);
     expect(pos.left).toBeLessThan(rightEdge.left);
   });
+
+  it("caps vertical placement when menu height exceeds the viewport", () => {
+    const tall = { width: 280, height: 2000 };
+    const pos = computeGardenBannerDropdownPosition(anchor, tall, "left", 1200, 800);
+    expect(pos.top).toBeGreaterThanOrEqual(10);
+    expect(pos.top + (800 - 20)).toBeLessThanOrEqual(800);
+  });
 });
