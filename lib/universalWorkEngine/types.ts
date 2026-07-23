@@ -73,6 +73,31 @@ export type WorkTypeCapabilityFlags = {
   projectBridge: boolean;
   print: boolean;
   export: boolean;
+  /**
+   * Exact-section resume on leave/return/refresh (UWE `resolveExactResumeSectionId`).
+   * Guided Create packages should keep this true.
+   */
+  exactResume: boolean;
+  /**
+   * Section “Give me ideas” via UWE catalogs (`registerSectionIdeasCatalog`).
+   * Guided Create packages should keep this true.
+   */
+  sectionIdeas: boolean;
+};
+
+/** Default flags for guided Universal Work packages. */
+export const GUIDED_WORK_TYPE_CAPABILITIES: WorkTypeCapabilityFlags = {
+  tasks: true,
+  milestones: true,
+  research: true,
+  chamberRouting: true,
+  boardReview: true,
+  cartography: true,
+  projectBridge: true,
+  print: true,
+  export: true,
+  exactResume: true,
+  sectionIdeas: true,
 };
 
 export type WorkTypeLifecycleConfig = {
