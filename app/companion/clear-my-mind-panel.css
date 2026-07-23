@@ -1,4 +1,4 @@
-/* Clear My Mind panel — one scrollable content region */
+/* Clear My Mind panel — one scrollable content region; background stays fixed */
 
 .clear-my-mind-panel {
   display: flex;
@@ -6,15 +6,58 @@
   overflow: hidden;
   min-height: 0;
   height: 100%;
+  max-height: min(92dvh, 100%);
 }
 
 .clear-my-mind-panel__content {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable;
+  padding-bottom: 2rem;
+}
+
+/* Inner choice/capture views must not create a second scrollport */
+.clear-my-mind-panel__content .clear-my-mind-capture-choice,
+.clear-my-mind-panel__content .clear-my-mind-session {
+  overflow: visible;
+  min-height: auto;
+  height: auto;
+}
+
+.clear-my-mind-persist-error {
+  margin: 0 0 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 248, 240, 0.92);
+  border: 1px solid rgba(196, 168, 130, 0.45);
+}
+
+.clear-my-mind-persist-error__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #3f342c;
+}
+
+.clear-my-mind-persist-error__body {
+  margin: 0.45rem 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #5c5046;
+}
+
+@media (max-width: 640px) {
+  .clear-my-mind-panel {
+    max-height: min(100dvh, 100%);
+  }
+
+  .clear-my-mind-panel__content {
+    padding-bottom: 2.5rem;
+  }
 }
 
 .clear-my-mind-draft-status {

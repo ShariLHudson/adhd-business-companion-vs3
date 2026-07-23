@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  addBrainDumps,
-  getBrainDumps,
-  type BrainDumpEntry,
-} from "@/lib/companionStore";
+import { getBrainDumps, type BrainDumpEntry } from "@/lib/companionStore";
 import {
   newCaptureSessionId,
   splitCaptureInput,
@@ -14,9 +10,13 @@ import {
   CLEAR_MY_MIND_CAPTURE_BUTTON,
   CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM,
   CLEAR_MY_MIND_REVIEW_THOUGHTS_LABEL,
+  CLEAR_MY_MIND_SAVE_FAILED_BODY,
+  CLEAR_MY_MIND_SAVE_FAILED_TITLE,
+  CLEAR_MY_MIND_SAVE_RETRY_LABEL,
   CLEAR_MY_MIND_SHARE_ACK_DELAY_MS,
   CLEAR_MY_MIND_SPLIT_KEEP,
 } from "@/lib/clearMyMindCopy";
+import { persistCapturedThoughts } from "@/lib/clearMyMind/persistCapturedThoughts";
 import {
   noteClearMyMindCapture,
   setClearMyMindModePhase,
@@ -106,6 +106,11 @@ export function ClearMyMindSession({
   const [shareConfirming, setShareConfirming] = useState(false);
   const [rawThoughts, setRawThoughts] = useState<string[]>([]);
   const [saveAck, setSaveAck] = useState<string | null>(null);
+  const [persistError, setPersistError] = useState(false);
+  const [pendingRetry, setPendingRetry] = useState<{
+    parts: string[];
+    raw: string;
+  } | null>(null);
   const [draftStatus, setDraftStatus] = useState<DraftSaveStatus>("idle");
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const draftVersionRef = useRef(loadClearMyMindDraft()?.version ?? 0);
@@ -219,16 +224,27 @@ export function ClearMyMindSession({
   function saveThoughtParts(parts: string[], rawDump: string) {
     if (!parts.length) return;
 
-    setShareConfirming(true);
     setHoldAck(null);
     setSaveAck(null);
-    setLastShareItemCount(parts.length);
+    setPersistError(false);
 
-    const all = addBrainDumps(parts, { captureSessionId: sessionId });
-    const createdItems = all.slice(0, parts.length);
-    const sessionSaved = all.filter(
-      (e) => e.captureSessionId === sessionId && isVisibleInMentalLandscape(e),
-    );
+    const persisted = persistCapturedThoughts({ parts, sessionId });
+
+    // Never show “Everything Is Safely Captured” until storage confirms success.
+    if (!persisted.ok) {
+      setShareConfirming(false);
+      setPersistError(true);
+      setPendingRetry({ parts, raw: rawDump });
+      setDraftStatus("error");
+      return;
+    }
+
+    const sessionSaved = persisted.sessionEntries;
+    const createdItems = persisted.created;
+
+    // Confirm only after storage succeeds — never flash “I’ve got it.” on failure.
+    setShareConfirming(true);
+    setLastShareItemCount(parts.length);
 
     setEntries(sessionSaved);
     setRawThoughts(sessionSaved.map((e) => e.originalText ?? e.text));
@@ -237,6 +253,8 @@ export function ClearMyMindSession({
     draftVersionRef.current += 1;
     setDraftStatus("idle");
     setPendingSplit(null);
+    setPendingRetry(null);
+    setPersistError(false);
     setStage(stageOnReleaseComplete(stageOnCaptureBegin(stage)));
 
     const nextSubmission = submissionCount + 1;
@@ -278,8 +296,6 @@ export function ClearMyMindSession({
       rawCaptureTexts: sessionSaved.map((e) => e.originalText ?? e.text),
     });
 
-    // Capture first — no automatic categorization until the member asks.
-
     void import("@/lib/ecosystem/eventTrackingEngine").then(
       ({ trackEcosystemEvent }) => {
         trackEcosystemEvent({
@@ -293,6 +309,20 @@ export function ClearMyMindSession({
         });
       },
     );
+  }
+
+  function retryFailedSave() {
+    if (!pendingRetry) return;
+    // Prefer the live box if the member edited after the failed attempt.
+    const live = input.trim();
+    if (live && live !== pendingRetry.raw.trim()) {
+      const parts = splitCaptureInput(live);
+      if (parts.length) {
+        saveThoughtParts(parts, live);
+        return;
+      }
+    }
+    saveThoughtParts(pendingRetry.parts, pendingRetry.raw);
   }
 
   function handleContinue() {
@@ -330,16 +360,14 @@ export function ClearMyMindSession({
         return;
       }
     }
-    if (sessionItems.length === 0 && rawThoughts.length === 0) return;
+    // Only open completion when persisted thoughts exist for this session.
+    if (sessionItems.length === 0) return;
     setSurface("choice");
     setClearMyMindModePhase("capture");
     pauseClearMyMindSession({
       sessionId,
       phase: "choice",
-      rawCaptureTexts:
-        rawThoughts.length > 0
-          ? rawThoughts
-          : sessionItems.map((e) => e.text),
+      rawCaptureTexts: sessionItems.map((e) => e.originalText ?? e.text),
     });
   }
 
@@ -360,13 +388,19 @@ export function ClearMyMindSession({
   function handleChoice(action: ClearMyMindChoiceAction) {
     if (action === "add-more") {
       setSurface("writing");
-      setSaveAck(null);
+      setSaveAck("Ready when you are — keep adding.");
       setClearMyMindModePhase("capture");
       focusCaptureInput();
       return;
     }
     if (action === "save") {
+      setSaveAck("Opening save choices…");
       onAction?.("save");
+      return;
+    }
+    if (action === "continue-later") {
+      setSaveAck("They’re saved for later.");
+      onAction?.("continue-later");
       return;
     }
 
@@ -405,14 +439,11 @@ export function ClearMyMindSession({
     (!input.trim() && !hasReviewableThoughts);
 
   if (surface === "choice") {
+    const capturedCount = sessionItems.length;
     return (
       <ClearMyMindCaptureChoice
-        thoughtCount={sessionItems.length || rawThoughts.length}
-        rawThoughts={
-          rawThoughts.length > 0
-            ? rawThoughts
-            : sessionItems.map((e) => e.originalText ?? e.text)
-        }
+        thoughtCount={capturedCount}
+        rawThoughts={sessionItems.map((e) => e.originalText ?? e.text)}
         entries={sessionItems}
         saveAck={saveAck}
         onAction={handleChoice}
@@ -428,6 +459,29 @@ export function ClearMyMindSession({
       className="clear-my-mind-session clear-my-mind-session--capture-workspace flex flex-col gap-4"
       data-cmind-mode="capture"
     >
+      {persistError ? (
+        <div
+          className="clear-my-mind-persist-error"
+          role="alert"
+          data-testid="cmm-persist-error"
+        >
+          <p className="clear-my-mind-persist-error__title">
+            {CLEAR_MY_MIND_SAVE_FAILED_TITLE}
+          </p>
+          <p className="clear-my-mind-persist-error__body">
+            {CLEAR_MY_MIND_SAVE_FAILED_BODY}
+          </p>
+          <button
+            type="button"
+            className="clear-my-mind-release-btn"
+            data-testid="cmm-persist-retry"
+            onClick={retryFailedSave}
+          >
+            {CLEAR_MY_MIND_SAVE_RETRY_LABEL}
+          </button>
+        </div>
+      ) : null}
+
       <ClearMyMindCaptureCard
         value={input}
         onChange={(value) => {

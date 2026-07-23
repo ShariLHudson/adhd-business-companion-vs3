@@ -33,7 +33,7 @@ describe("adaptive Clear My Mind next steps", () => {
     expect(model.primary.map((p) => p.id)).toContain("help-me-choose");
   });
 
-  it("offers three primary choices for mixed lists", () => {
+  it("offers Review 5 / Organize / Park Everything for mixed lists of five+", () => {
     const model = buildAdaptiveNextSteps([
       entry("pay rent"),
       entry("call dentist"),
@@ -42,10 +42,9 @@ describe("adaptive Clear My Mind next steps", () => {
       entry("buy groceries"),
       entry("plan mom's birthday"),
     ]);
-    expect(model.kind).toBe("several-mixed");
-    expect(model.primary).toHaveLength(3);
-    expect(model.primary.map((p) => p.id)).toContain("help-decide-attention");
-    expect(model.primary.map((p) => p.id)).toContain("save-for-later");
+    expect(model.kind).toBe("large-list");
+    expect(model.primary.map((p) => p.id)).toContain("review-batch");
+    expect(model.primary.map((p) => p.id)).toContain("park-everything");
   });
 
   it("recommends a time-sensitive item with a reason", () => {

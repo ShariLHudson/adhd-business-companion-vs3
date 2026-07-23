@@ -19,13 +19,18 @@ import {
 import { displayClearMyMindText } from "@/lib/clearMyMind/originalText";
 import {
   buildAdaptiveNextSteps,
+  nextReviewBatch,
+  unroutedClearMyMindEntries,
   type AdaptiveNextStepId,
 } from "@/lib/clearMyMind/adaptiveNextSteps";
+import { clearMyMindCapturedCountLabel } from "@/lib/clearMyMind/persistCapturedThoughts";
 import {
   recommendAttentionItem,
   type AttentionRecommendation,
 } from "@/lib/clearMyMind/attentionRecommend";
 import type { ClearMyMindWorkflowId } from "@/lib/clearMyMindWorkspaceIntelligence";
+import { routeBrainDumpEntry } from "@/lib/brainDumpRouting";
+import { CLEAR_MY_MIND_PARK_EVERYTHING_LABEL } from "@/lib/clearMyMindCopy";
 
 export type ClearMyMindChoiceAction =
   | ClearMyMindWorkflowId
@@ -59,20 +64,23 @@ type PanelMode =
   | "list"
   | "attention"
   | "make-sense"
-  | "saved";
+  | "saved"
+  | "review-batch"
+  | "parked-all";
 
 /**
  * Post-capture: flat list first, exact words, adaptive next steps.
  * No automatic theme, category, or project.
  */
 export function ClearMyMindCaptureChoice({
-  thoughtCount,
+  thoughtCount: _thoughtCountProp,
   rawThoughts,
   entries = [],
   saveAck,
   onAction,
   onEntriesChanged,
 }: Props) {
+  void _thoughtCountProp;
   const [mode, setMode] = useState<PanelMode>("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
@@ -84,6 +92,8 @@ export function ClearMyMindCaptureChoice({
   const [attentionExcluded, setAttentionExcluded] = useState<Set<string>>(
     () => new Set(),
   );
+  const [reviewOffset, setReviewOffset] = useState(0);
+  const [parkedAllCount, setParkedAllCount] = useState(0);
 
   const ordered = useMemo(
     () =>
@@ -93,6 +103,9 @@ export function ClearMyMindCaptureChoice({
       ),
     [entries],
   );
+
+  // Canonical count = persisted entries only (same source as adaptive steps).
+  const capturedCount = ordered.length;
 
   const adaptive = useMemo(
     () => buildAdaptiveNextSteps(ordered),
@@ -213,9 +226,25 @@ export function ClearMyMindCaptureChoice({
         onAction("add-more");
         return;
       case "save-for-later":
+      case "continue-tomorrow":
         setMode("saved");
         onAction("continue-later");
         return;
+      case "review-batch": {
+        setReviewOffset(0);
+        setMode("review-batch");
+        return;
+      }
+      case "park-everything": {
+        const open = unroutedClearMyMindEntries(ordered);
+        for (const entry of open) {
+          routeBrainDumpEntry(entry, "parking-lot");
+        }
+        setParkedAllCount(open.length);
+        setMode("parked-all");
+        refresh();
+        return;
+      }
       case "make-next-step":
       case "help-me-choose":
       case "help-decide-attention":
@@ -258,10 +287,149 @@ export function ClearMyMindCaptureChoice({
     }
   }
 
+  const reviewBatch = useMemo(
+    () => nextReviewBatch(ordered, reviewOffset, 5),
+    [ordered, reviewOffset],
+  );
+
+  if (mode === "parked-all") {
+    return (
+      <section
+        className="clear-my-mind-capture-choice"
+        data-testid="clear-my-mind-parked-all"
+        data-cmind-mode="parked-all"
+      >
+        <h2 className="clear-my-mind-capture-choice__next-title">
+          {CLEAR_MY_MIND_PARK_EVERYTHING_LABEL}
+        </h2>
+        <p className="clear-my-mind-capture-choice__body">
+          {parkedAllCount === 0
+            ? "Everything was already parked or finished."
+            : `${parkedAllCount} thought${parkedAllCount === 1 ? "" : "s"} parked. They will wait in your Parking Lot until you are ready.`}
+        </p>
+        <ul className="clear-my-mind-capture-choice__suggestions">
+          <li>
+            <button
+              type="button"
+              className="clear-my-mind-capture-choice__suggestion clear-my-mind-capture-choice__suggestion--lead"
+              data-testid="cmm-return-welcome"
+              onClick={() => onAction("return-welcome")}
+            >
+              Return to Welcome Home
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="clear-my-mind-capture-choice__suggestion"
+              data-testid="cmm-stay-here"
+              onClick={() => setMode("list")}
+            >
+              Stay Here
+            </button>
+          </li>
+        </ul>
+      </section>
+    );
+  }
+
+  if (mode === "review-batch") {
+    return (
+      <section
+        className="clear-my-mind-capture-choice"
+        data-testid="clear-my-mind-review-batch"
+        data-cmind-mode="review-batch"
+      >
+        <h2 className="clear-my-mind-capture-choice__next-title">
+          Review a few now
+        </h2>
+        <p className="clear-my-mind-capture-choice__body">
+          Looking at {reviewBatch.batch.length} thought
+          {reviewBatch.batch.length === 1 ? "" : "s"}. You can stop anytime —
+          {reviewBatch.remaining > 0
+            ? ` ${reviewBatch.remaining} still waiting.`
+            : " that was the last batch."}
+        </p>
+        <ul className="clear-my-mind-capture-choice__thought-list">
+          {reviewBatch.batch.map((entry) => (
+            <li key={entry.id} data-testid={`cmm-review-item-${entry.id}`}>
+              <p>{displayClearMyMindText(entry)}</p>
+              <div className="clear-my-mind-capture-choice__row-actions">
+                <button
+                  type="button"
+                  data-testid={`cmm-review-park-${entry.id}`}
+                  onClick={() => {
+                    routeBrainDumpEntry(entry, "parking-lot");
+                    refresh();
+                  }}
+                >
+                  Park
+                </button>
+                <button
+                  type="button"
+                  data-testid={`cmm-review-today-${entry.id}`}
+                  onClick={() => {
+                    routeBrainDumpEntry(entry, "plan-my-day");
+                    refresh();
+                  }}
+                >
+                  Today
+                </button>
+                <button
+                  type="button"
+                  data-testid={`cmm-review-skip-${entry.id}`}
+                  onClick={() => {
+                    /* leave in list for later */
+                  }}
+                >
+                  Leave for later
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <ul className="clear-my-mind-capture-choice__suggestions">
+          {reviewBatch.remaining > 0 ? (
+            <li>
+              <button
+                type="button"
+                className="clear-my-mind-capture-choice__suggestion clear-my-mind-capture-choice__suggestion--lead"
+                data-testid="cmm-review-next-5"
+                onClick={() => setReviewOffset(reviewBatch.nextOffset)}
+              >
+                Next 5
+              </button>
+            </li>
+          ) : null}
+          <li>
+            <button
+              type="button"
+              className="clear-my-mind-capture-choice__suggestion"
+              data-testid="cmm-review-stop"
+              onClick={() => setMode("list")}
+            >
+              Stop for now
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="clear-my-mind-capture-choice__suggestion"
+              data-testid="cmm-park-rest"
+              onClick={() => handleStep("park-everything")}
+            >
+              {CLEAR_MY_MIND_PARK_EVERYTHING_LABEL}
+            </button>
+          </li>
+        </ul>
+      </section>
+    );
+  }
+
   if (mode === "saved") {
     return (
       <section
-        className="clear-my-mind-capture-choice clear-my-mind-panel__content"
+        className="clear-my-mind-capture-choice"
         data-testid="clear-my-mind-capture-choice"
         data-cmind-mode="saved"
       >
@@ -297,7 +465,7 @@ export function ClearMyMindCaptureChoice({
   if (mode === "attention" && attention) {
     return (
       <section
-        className="clear-my-mind-capture-choice clear-my-mind-panel__content"
+        className="clear-my-mind-capture-choice"
         data-testid="clear-my-mind-attention"
       >
         <h2 className="clear-my-mind-capture-choice__next-title">
@@ -356,7 +524,7 @@ export function ClearMyMindCaptureChoice({
   if (mode === "make-sense") {
     return (
       <section
-        className="clear-my-mind-capture-choice clear-my-mind-panel__content"
+        className="clear-my-mind-capture-choice"
         data-testid="clear-my-mind-make-sense"
       >
         <h2 className="clear-my-mind-capture-choice__next-title">
@@ -403,29 +571,33 @@ export function ClearMyMindCaptureChoice({
 
   return (
     <section
-      className="clear-my-mind-capture-choice clear-my-mind-capture-choice--conversation clear-my-mind-panel__content"
+      className="clear-my-mind-capture-choice clear-my-mind-capture-choice--conversation"
       data-testid="clear-my-mind-capture-choice"
       data-cmind-mode="capture-choice"
       data-adaptive-kind={adaptive.kind}
     >
-      <header className="clear-my-mind-capture-choice__safe">
-        <h2
-          className="clear-my-mind-capture-choice__next-title"
-          data-testid="cmm-safe-title"
-        >
-          {CLEAR_MY_MIND_CAPTURED_SAFE_TITLE}
-        </h2>
-        <p className="clear-my-mind-capture-choice__insight">
-          {CLEAR_MY_MIND_CAPTURED_SAFE_BODY}
-        </p>
-        <p className="clear-my-mind-capture-choice__thinking">
-          {CLEAR_MY_MIND_CAPTURED_SAFE_LOOK}
-        </p>
-        <p className="clear-my-mind-capture-choice__count">
-          {thoughtCount} thought{thoughtCount === 1 ? "" : "s"} captured —
-          still yours, exactly as you wrote them.
-        </p>
-      </header>
+      {capturedCount > 0 ? (
+        <header className="clear-my-mind-capture-choice__safe">
+          <h2
+            className="clear-my-mind-capture-choice__next-title"
+            data-testid="cmm-safe-title"
+          >
+            {CLEAR_MY_MIND_CAPTURED_SAFE_TITLE}
+          </h2>
+          <p className="clear-my-mind-capture-choice__insight">
+            {CLEAR_MY_MIND_CAPTURED_SAFE_BODY}
+          </p>
+          <p className="clear-my-mind-capture-choice__thinking">
+            {CLEAR_MY_MIND_CAPTURED_SAFE_LOOK}
+          </p>
+          <p
+            className="clear-my-mind-capture-choice__count"
+            data-testid="cmm-captured-count"
+          >
+            {clearMyMindCapturedCountLabel(capturedCount)}
+          </p>
+        </header>
+      ) : null}
 
       {saveAck ? (
         <p className="clear-my-mind-capture-choice__ack" role="status">

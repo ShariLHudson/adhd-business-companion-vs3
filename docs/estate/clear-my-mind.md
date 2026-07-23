@@ -1,4 +1,4 @@
-# Clear My Mind™ — Estate Knowledge Base
+# Clear My Mind — Estate Knowledge Base
 
 **Audience:** Spark internal only.
 
@@ -6,7 +6,7 @@
 |-------|-------|
 | **Registry ID** | `clear-my-mind` |
 | **Estate section** | `brain-dump` |
-| **Primary location** | Treehouse Reflection Desk™ |
+| **Primary location** | Treehouse Reflection Desk |
 | **Background** | `treehouse-possibility-reflection-desk-background.png` |
 | **Status** | Live |
 | **Architecture** | [154 Clear My Mind Experience Architecture v2](./recognition/library/154_CLEAR_MY_MIND_EXPERIENCE_ARCHITECTURE.md) |
@@ -66,9 +66,9 @@ Never: "you should organize now" · shame for messy thoughts
 
 - Clear my mind / brain dump / jumbled head language
 - Scattered thoughts before clarity work
-- Pair with overwhelm carefully — may need Momentum Builder™ for forward motion after capture
+- Pair with overwhelm carefully — may need Momentum Builder for forward motion after capture
 
-**Invitation:** "Would you like to step into Clear My Mind™ together?"
+**Invitation:** "Would you like to step into Clear My Mind together?"
 
 ---
 
@@ -84,17 +84,24 @@ Never: "you should organize now" · shame for messy thoughts
 
 | Room | When |
 |------|------|
-| Momentum Builder™ | After capture — one next step |
-| Peaceful Places™ | Too activated to capture yet |
-| Creative Studio™ | Clarity then build |
-| Growth Journal™ | Reflective capture, not dump |
+| Momentum Builder | After capture — one next step |
+| Peaceful Places | Too activated to capture yet |
+| Creative Studio | Clarity then build |
+| Growth Journal | Reflective capture, not dump |
 
 ---
+
+## Save integrity
+
+- Persist must succeed before “Everything Is Safely Captured”
+- Failed save keeps the draft and offers retry (`CLEAR_MY_MIND_SAVE_FAILED_*`)
+- Protocol: `docs/protocols/CLEAR_MY_MIND_FLOW_PROTOCOL.md`
 
 ## Things this room should never do
 
 - Force organization during capture
 - Completion pressure
+- Claim thoughts are saved when storage failed
 - Invent context member didn't share
 
 ---

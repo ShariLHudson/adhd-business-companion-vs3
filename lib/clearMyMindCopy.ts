@@ -8,18 +8,21 @@ import {
 export const CLEAR_MY_MIND_HEADER = "Clear My Mind";
 
 export const CLEAR_MY_MIND_WORKSPACE_SUBTITLE =
-  "Empty everything competing for attention.";
+  "Best when there is more than one thing on your mind.";
 
 /** Primary entry CTA — multi-thought unload, not Park It. */
-export const CLEAR_MY_MIND_START_CTA = "Start Emptying My Mind";
+export const CLEAR_MY_MIND_START_CTA = "Empty My Mind";
 
 /**
  * Entry greeting — Capture Mode only.
  * Capture first. Protect the user’s words. Organize only with permission.
  */
 export const CLEAR_MY_MIND_WELCOME_LINES = [
-  "Feeling overwhelmed? Put everything on your mind here. I'll help sort it into manageable next steps. Nothing has to be organized yet — I'll safely capture your words first.",
+  "Have a lot swirling around in your head? Put everything here—tasks, ideas, worries, reminders, and unfinished thoughts. Shari will help separate them and decide what belongs today, later, in a project, as a reminder, or nowhere at all.",
 ] as const;
+
+export const CLEAR_MY_MIND_SUPPORT_LINE =
+  "Best when there is more than one thing on your mind." as const;
 
 /** Post-capture reassurance — flat list first, no automatic analysis. */
 export const CLEAR_MY_MIND_CAPTURED_SAFE_TITLE =
@@ -27,6 +30,15 @@ export const CLEAR_MY_MIND_CAPTURED_SAFE_TITLE =
 
 export const CLEAR_MY_MIND_CAPTURED_SAFE_BODY =
   "I placed your thoughts into a clear list while preserving your words. Nothing has been categorized, prioritized, or turned into a project." as const;
+
+/** Shown only when persist failed — never paired with the safe-captured title. */
+export const CLEAR_MY_MIND_SAVE_FAILED_TITLE =
+  "Those thoughts weren’t saved yet" as const;
+
+export const CLEAR_MY_MIND_SAVE_FAILED_BODY =
+  "Something got in the way before your thoughts were stored. They’re still in the box below — tap Try Saving Again and I’ll hold onto them." as const;
+
+export const CLEAR_MY_MIND_SAVE_RETRY_LABEL = "Try Saving Again" as const;
 
 export const CLEAR_MY_MIND_CAPTURED_SAFE_LOOK =
   "Take a quick look. You can adjust anything I separated incorrectly." as const;
@@ -71,7 +83,21 @@ export const CLEAR_MY_MIND_NEXT_PROMPT =
 
 /** Soft reflection lead after Continue — personal, not a report header. */
 export const CLEAR_MY_MIND_REFLECTION_LEAD =
-  "Everything is safely out of your head now." as const;
+  "They’re out of your head now." as const;
+
+/** Large-list reassurance — never force sorting everything. */
+export function clearMyMindLargeListMessage(count: number): string {
+  const n = Math.max(0, Math.floor(count));
+  return `You captured ${n} thought${n === 1 ? "" : "s"}. You do not need to sort all of them now. We can look at five, organize them automatically, or leave everything safely parked.`;
+}
+
+export const CLEAR_MY_MIND_REVIEW_5_LABEL = "Review 5 Now" as const;
+export const CLEAR_MY_MIND_LET_SHARI_ORGANIZE_LABEL =
+  "Let Shari Organize Them" as const;
+export const CLEAR_MY_MIND_PARK_EVERYTHING_LABEL =
+  "Park Everything for Now" as const;
+export const CLEAR_MY_MIND_CONTINUE_TOMORROW_LABEL =
+  "Continue Tomorrow" as const;
 
 export const CLEAR_MY_MIND_NEXT_SECTION =
   "What Would Help Most Right Now?" as const;

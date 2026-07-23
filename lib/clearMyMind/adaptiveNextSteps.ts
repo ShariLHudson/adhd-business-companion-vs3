@@ -1,8 +1,16 @@
 /**
  * Adaptive Clear My Mind next steps — by count and relatedness, not a fixed menu.
+ * Package 168: large lists offer Review 5 / Organize / Park Everything / Continue Tomorrow.
  */
 
 import type { BrainDumpEntry } from "@/lib/companionStore";
+import {
+  CLEAR_MY_MIND_CONTINUE_TOMORROW_LABEL,
+  CLEAR_MY_MIND_LET_SHARI_ORGANIZE_LABEL,
+  CLEAR_MY_MIND_PARK_EVERYTHING_LABEL,
+  CLEAR_MY_MIND_REVIEW_5_LABEL,
+  clearMyMindLargeListMessage,
+} from "@/lib/clearMyMindCopy";
 
 export type AdaptiveNextStepId =
   | "make-next-step"
@@ -20,7 +28,10 @@ export type AdaptiveNextStepId =
   | "start-with-this"
   | "show-another"
   | "return-welcome"
-  | "stay-here";
+  | "stay-here"
+  | "review-batch"
+  | "park-everything"
+  | "continue-tomorrow";
 
 export type AdaptiveNextStep = {
   id: AdaptiveNextStepId;
@@ -31,10 +42,12 @@ export type AdaptiveNextStep = {
 
 export type AdaptiveNextStepModel = {
   kind:
+    | "empty"
     | "one"
     | "two-unrelated"
     | "several-related"
-    | "several-mixed";
+    | "several-mixed"
+    | "large-list";
   headline: string;
   body: string;
   primary: AdaptiveNextStep[];
@@ -48,7 +61,6 @@ function textsLookRelated(texts: string[]): boolean {
   if (texts.length < 3) return false;
   const hits = texts.filter((t) => RELATED_HINTS.test(t)).length;
   if (hits >= Math.ceil(texts.length * 0.5)) return true;
-  // Shared leading verb / noun stem across majority
   const stems = texts
     .map((t) => t.trim().toLowerCase().split(/\s+/)[0] ?? "")
     .filter((s) => s.length >= 4);
@@ -57,6 +69,32 @@ function textsLookRelated(texts: string[]): boolean {
   for (const s of stems) counts.set(s, (counts.get(s) ?? 0) + 1);
   const top = Math.max(...counts.values());
   return top >= Math.ceil(texts.length * 0.5);
+}
+
+function largeListSteps(): AdaptiveNextStep[] {
+  return [
+    {
+      id: "review-batch",
+      label: CLEAR_MY_MIND_REVIEW_5_LABEL,
+      explanation: "Look at five thoughts now. You can continue later.",
+      primary: true,
+    },
+    {
+      id: "help-make-sense",
+      label: CLEAR_MY_MIND_LET_SHARI_ORGANIZE_LABEL,
+      explanation: "Group or explore without deciding everything yourself.",
+    },
+    {
+      id: "park-everything",
+      label: CLEAR_MY_MIND_PARK_EVERYTHING_LABEL,
+      explanation: "Move everything to the Parking Lot for later.",
+    },
+    {
+      id: "continue-tomorrow",
+      label: CLEAR_MY_MIND_CONTINUE_TOMORROW_LABEL,
+      explanation: "Keep everything captured and return when ready.",
+    },
+  ];
 }
 
 export function buildAdaptiveNextSteps(
@@ -73,7 +111,23 @@ export function buildAdaptiveNextSteps(
     { id: "turn-into-project", label: "Turn Selected Thoughts Into Projects" },
   ];
 
-  if (count <= 1) {
+  if (count === 0) {
+    return {
+      kind: "empty",
+      headline: "Nothing was captured yet",
+      body: "Go back and add a thought, or try saving again.",
+      primary: [
+        {
+          id: "keep-adding",
+          label: "Keep Adding Thoughts",
+          primary: true,
+        },
+      ],
+      moreWays: [],
+    };
+  }
+
+  if (count === 1) {
     return {
       kind: "one",
       headline: "What would help most right now?",
@@ -109,6 +163,16 @@ export function buildAdaptiveNextSteps(
     };
   }
 
+  if (count >= 5) {
+    return {
+      kind: "large-list",
+      headline: "They’re out of your head now.",
+      body: clearMyMindLargeListMessage(count),
+      primary: largeListSteps(),
+      moreWays,
+    };
+  }
+
   if (count >= 3 && textsLookRelated(texts)) {
     return {
       kind: "several-related",
@@ -121,7 +185,7 @@ export function buildAdaptiveNextSteps(
           primary: true,
         },
         { id: "keep-loose-list", label: "Keep as a Loose List" },
-        { id: "save-for-later", label: "Save for Later" },
+        { id: "park-everything", label: CLEAR_MY_MIND_PARK_EVERYTHING_LABEL },
       ],
       moreWays,
     };
@@ -129,28 +193,62 @@ export function buildAdaptiveNextSteps(
 
   return {
     kind: "several-mixed",
-    headline: "What Would Help Most Right Now?",
-    body: "Everything is safely out of your head. Choose one helpful next step — or save everything without deciding more.",
+    headline: "They’re out of your head now.",
+    body: "Choose one helpful next step — or park everything without deciding more.",
     primary: [
       {
-        id: "help-decide-attention",
-        label: "Help Me Decide What Deserves Attention First",
-        explanation:
-          "Help me find one useful place to begin without organizing everything.",
+        id: "review-batch",
+        label: CLEAR_MY_MIND_REVIEW_5_LABEL,
+        explanation: "Look at a few thoughts now without sorting everything.",
         primary: true,
       },
       {
         id: "help-make-sense",
-        label: "Help Me Make Sense of These",
+        label: CLEAR_MY_MIND_LET_SHARI_ORGANIZE_LABEL,
         explanation: "Organize or explore the thoughts in a useful way.",
       },
       {
-        id: "save-for-later",
-        label: "Save These for Later",
+        id: "park-everything",
+        label: CLEAR_MY_MIND_PARK_EVERYTHING_LABEL,
         explanation:
-          "Keep everything safely captured without making another decision right now.",
+          "Keep everything safely in the Parking Lot without making another decision right now.",
       },
     ],
-    moreWays,
+    moreWays: [
+      ...moreWays,
+      {
+        id: "continue-tomorrow",
+        label: CLEAR_MY_MIND_CONTINUE_TOMORROW_LABEL,
+      },
+    ],
+  };
+}
+
+/** Entries not yet routed — for Review 5 / Park Everything. */
+export function unroutedClearMyMindEntries(
+  entries: BrainDumpEntry[],
+): BrainDumpEntry[] {
+  return entries.filter((e) => {
+    const text = (e.originalText ?? e.text).trim();
+    if (!text) return false;
+    if (e.routedAction === "parking-lot" || e.routedAction === "done") {
+      return false;
+    }
+    return true;
+  });
+}
+
+export function nextReviewBatch(
+  entries: BrainDumpEntry[],
+  offset: number,
+  batchSize = 5,
+): { batch: BrainDumpEntry[]; nextOffset: number; remaining: number } {
+  const open = unroutedClearMyMindEntries(entries);
+  const batch = open.slice(offset, offset + batchSize);
+  const nextOffset = offset + batch.length;
+  return {
+    batch,
+    nextOffset,
+    remaining: Math.max(0, open.length - nextOffset),
   };
 }
