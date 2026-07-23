@@ -1,0 +1,49 @@
+---
+description: Platform rule — primary action buttons must never silently no-op
+alwaysApply: true
+---
+
+# Primary Action Feedback™ (Platform Rule)
+
+**Runtime:** `lib/primaryActionFeedback/` · **Create Begin:** `lib/createEstate/resolveCreateBeginOutcome.ts`
+
+## Rule
+
+No primary action button may ever appear to work while doing nothing.
+
+Buttons such as **Begin · Continue · Create · Save · Resume · Open** must always produce **immediate visible feedback**.
+
+## Required outcomes
+
+Every click must end in one of:
+
+1. **Success** — the intended surface opens / state changes (member can see it)
+2. **Clarify** — honest question when the request is ambiguous
+3. **Progress** — brief “working…” if processing takes more than a moment, then success or error
+4. **Honest error** — recoverable message; never a frozen button with no explanation
+
+## Forbidden
+
+- Silent no-op (click registers in code, UI unchanged)
+- Remaining on the same screen with no status, clarify, or error
+- Disabled-looking success without transition
+- Requiring the member to guess whether the click worked
+
+## Workspace identity (073)
+
+Member-facing titles are human-readable work names — never “Workshop Creation Workspace” or technical IDs. See `lib/activeWorkspaceRegistry/humanReadableIdentity.ts`.
+
+## Create Begin (P0)
+
+Exactly one of:
+
+1. Create accepted → type identified → workspace opens → Current Focus appears  
+2. Clarify: *"I'm not quite sure what you'd like to create yet. Are you thinking of a workshop, event, document, project, or something else?"*
+
+Never stay on Create Entrance with no feedback.
+
+## Before shipping any primary button
+
+- [ ] Click always changes something the member can see within one moment?
+- [ ] Slow path shows progress then success/error?
+- [ ] Ambiguous input clarifies instead of failing silently?

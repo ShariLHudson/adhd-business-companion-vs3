@@ -46,6 +46,7 @@ Do not start later phases while Phase 1 bugs remain.
 | Loading never permanent | Always resolve: loading → ready/empty/error + retry. |
 | Chamber / Board isolation | Leaving a member clears stream, persona, and temp state before next destination. |
 | Click = go | No second confirmation; close conflicting experiences; don’t restore unrelated chat. |
+| Primary action feedback | Begin / Continue / Create / Save / Resume / Open never silently no-op — progress, success, clarify, or honest error (`.cursor/rules/primary-action-feedback.mdc`). |
 
 ## Shari voice (member-facing)
 
