@@ -11,3 +11,4 @@ export * from "./destinationRegistry";
 export * from "./resolveCrystalLaunch";
 export * from "./artifactDestinationCrystals";
 export * from "./executeCrystalDestination";
+export * from "./resolveDestinationGalleryArtifactContext";

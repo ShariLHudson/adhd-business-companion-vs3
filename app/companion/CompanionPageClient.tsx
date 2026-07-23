@@ -1745,6 +1745,7 @@ import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio";
 import {
   getDestinationCrystal,
   resolveCrystalActivation,
+  resolveDestinationGalleryArtifactContext,
   type CrystalActivation,
   type DestinationCrystal,
   type DestinationCrystalId,
@@ -23079,6 +23080,16 @@ export default function CompanionPageClient() {
     presenceRoomId: estatePresenceRoomId,
     fallbackRoomId: welcomeHomePrimary ? "welcome-home" : null,
   });
+  /** Live Create draft → Destination Gallery crystal filtering (artifact-aware). */
+  const destinationGalleryArtifact =
+    resolveDestinationGalleryArtifactContext({
+      draftContent: creationContext?.draftContent,
+      itemType: creationContext?.itemType,
+      title: creationContext?.title,
+      fallbackAssistantText: [...messages]
+        .reverse()
+        .find((m) => m.role === "assistant")?.content,
+    });
   const roomMenuRoomId = justBeHereSession?.roomId
     ? justBeHereSession.roomId
     : clearMyMindWorkspaceActive
@@ -24566,13 +24577,12 @@ export default function CompanionPageClient() {
                 onSelectCrystal={handleSelectDestinationCrystal}
                 prepared={destinationCrystalPrepared}
                 onClearPrepared={() => setDestinationCrystalPrepared(null)}
-                exportText={
-                  [...messages]
-                    .reverse()
-                    .find((m) => m.role === "assistant")?.content ?? ""
-                }
-                exportTitle="Spark work"
+                exportText={destinationGalleryArtifact.exportText}
+                exportTitle={destinationGalleryArtifact.exportTitle}
+                artifactType={destinationGalleryArtifact.artifactType}
                 onOpenConnections={() => openHowDoISettings("connections")}
+                canvaConnected={isCanvaConnected()}
+                canvaDestinationUrl={readCanvaConnection().destinationUrl}
               />
             </EstateRoomErrorBoundary>
           )}
