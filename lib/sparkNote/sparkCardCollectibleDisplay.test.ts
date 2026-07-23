@@ -140,11 +140,29 @@ describe("sparkCardCollectibleDisplay", () => {
         ...sampleCard,
         imageSrc: "/images/sparks/post-it.png",
       }),
-    ).toEqual({
+    ).toMatchObject({
       kind: "photo",
       src: "/images/sparks/post-it.png",
       alt: "Artwork for The Post-it Note",
     });
+  });
+
+  it("resolves Summer's Open Door to a real garden doorway photo", () => {
+    const visual = resolveSparkCardHeroVisual({
+      ...sampleCard,
+      id: "SPARK-SEA-SUMMER",
+      category: "personal_growth",
+      categoryLabel: "Seasonal Spark",
+      title: "Summer's Open Door",
+      shortTitle: "Summer's Open Door",
+      tags: ["seasonal", "summer", "adventure"],
+    });
+    expect(visual.kind).toBe("photo");
+    if (visual.kind === "photo") {
+      expect(visual.src).toContain("wikimedia");
+      expect(visual.alt.toLowerCase()).toMatch(/garden|door|adventure/);
+      expect(visual.aspectRatio).toBe("editorial");
+    }
   });
 
   it("resolves topic art for Oscar Wilde quote cards", () => {
@@ -297,13 +315,24 @@ describe("sparkCardCollectibleDisplay", () => {
   // ——— Imagery: illustrated themed scene (fun, topic-specific, never a
   // single lonely icon) — used whenever no genuinely specific photo exists.
 
-  it("themed scene returns a medallion emblem plus multiple supporting motifs", () => {
+  it("themed scene returns estate icon keys — never emoji — plus supporting motifs", () => {
     const scene = resolveSparkCardThemedScene(sampleCard);
     expect(scene.kind).toBe("themed");
-    expect(scene.emblem.length).toBeGreaterThan(0);
+    expect(scene.emblem).toBe("flame");
     expect(scene.motifs.length).toBeGreaterThanOrEqual(3);
+    expect(scene.motifs.every((motif) => /^[a-z]+$/.test(motif))).toBe(true);
     expect(scene.caption.length).toBeGreaterThan(0);
     expect(scene.diversityCategory).toBe("innovation");
+  });
+
+  it("Tell Me More gallery chips include selectable detail and estate icons", () => {
+    const tellMeMore = resolveSparkCardTellMeMore(sampleCard);
+    expect(tellMeMore.gallery.length).toBeGreaterThan(0);
+    for (const item of tellMeMore.gallery) {
+      expect(item.icon).toMatch(/^[a-z]+$/);
+      expect(item.detail.length).toBeGreaterThan(10);
+      expect(item.caption.length).toBeGreaterThan(0);
+    }
   });
 
   it("themed scene motifs are deterministic per card id", () => {

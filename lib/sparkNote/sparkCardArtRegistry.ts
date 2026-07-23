@@ -1,9 +1,27 @@
 import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
 import type { SparkCardDiversityCategoryId } from "./sparkCardDiversity";
 
+export type SparkCardImageAspectRatio =
+  | "landscape"
+  | "portrait"
+  | "square"
+  | "editorial";
+
+export type SparkCardImageFocalPoint =
+  | "center"
+  | "top"
+  | "bottom"
+  | "left"
+  | "right";
+
+/** Hero / Tell Me More image payload for Spark Cards. */
 export type SparkCardArtAsset = {
   src: string;
   alt: string;
+  aspectRatio?: SparkCardImageAspectRatio;
+  focalPoint?: SparkCardImageFocalPoint;
+  caption?: string;
+  credit?: string;
 };
 
 /**
@@ -24,6 +42,10 @@ export function wikimediaCommonsImage(
   title: string,
   alt: string,
   widthPx = 900,
+  options?: Pick<
+    SparkCardArtAsset,
+    "aspectRatio" | "focalPoint" | "caption" | "credit"
+  >,
 ): SparkCardArtAsset {
   const canonicalTitle = title.replace(/ /g, "_");
   return {
@@ -31,6 +53,10 @@ export function wikimediaCommonsImage(
       canonicalTitle,
     )}?width=${widthPx}`,
     alt,
+    aspectRatio: options?.aspectRatio ?? "landscape",
+    focalPoint: options?.focalPoint ?? "center",
+    caption: options?.caption,
+    credit: options?.credit ?? "Wikimedia Commons",
   };
 }
 
@@ -107,6 +133,19 @@ const SPARK_CARD_TOPIC_ART: readonly {
     pattern: /super soaker|SPARK-INNOV-003/i,
     asset: wikimediaCommonsImage("Super Soaker CPS 2000.jpg", "Super Soaker water toy"),
   },
+  {
+    pattern: /summer'?s open door|SPARK-SEA-SUMMER/i,
+    asset: wikimediaCommonsImage(
+      "Arch door and portal in Walled Garden at Goodnestone Park Kent England.jpg",
+      "An open garden doorway in warm light — adventure close to home",
+      900,
+      {
+        aspectRatio: "editorial",
+        focalPoint: "center",
+        caption: "Adventure can be close to home.",
+      },
+    ),
+  },
 ];
 
 const SPARK_CARD_CATEGORY_ART: Record<SparkNoteCategory, SparkCardArtAsset> = {
@@ -163,7 +202,9 @@ export const SPARK_CARD_DIVERSITY_CATEGORY_ART: Record<
 > = {
   fun_celebrations: wikimediaCommonsImage(
     "Happy birthday balloons Mexico.jpg",
-    "Warm toy balloons — a small, low-stakes celebration",
+    "Warm celebration atmosphere — a small, low-stakes reason to smile",
+    900,
+    { aspectRatio: "landscape", focalPoint: "center" },
   ),
   innovation: wikimediaCommonsImage(
     "Edison bulb.jpg",

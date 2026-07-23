@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import type {
+  SparkNoteDailyCard,
+  SparkNoteGalleryIconKey,
+} from "@/lib/sparkNote/types";
 import {
   buildSparkCardShareText,
   resolveSparkCardFooterLine,
@@ -12,6 +15,7 @@ import {
   SPARK_CARD_SECTION_STORY,
   SPARK_CARD_SECTION_TELL_ME_MORE,
   SPARK_CARD_SECTION_TODAYS_SPARK,
+  type SparkCardGalleryItem,
 } from "@/lib/sparkNote/sparkCardCollectibleDisplay";
 import {
   getFavoriteSparkIds,
@@ -22,10 +26,39 @@ import { copySparkNoteText } from "@/lib/sparkNote/sparkNoteDestinations";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
 import {
+  SparkCompassIcon,
+  SparkLeafIcon,
   SparkMagnifyingGlassIcon,
   SparkOpenBookIcon,
+  SparkSealIcon,
   SparkSparkleIcon,
 } from "@/components/companion/SparkNoteSectionIcons";
+
+function SparkCardEstateIcon({
+  icon,
+  className,
+}: {
+  icon: SparkNoteGalleryIconKey;
+  className?: string;
+}): ReactNode {
+  switch (icon) {
+    case "flame":
+      return <SparkFlameIcon className={className} />;
+    case "book":
+      return <SparkOpenBookIcon className={className} />;
+    case "compass":
+      return <SparkCompassIcon className={className} />;
+    case "seal":
+      return <SparkSealIcon className={className} />;
+    case "lens":
+      return <SparkMagnifyingGlassIcon className={className} />;
+    case "leaf":
+      return <SparkLeafIcon className={className} />;
+    case "spark":
+    default:
+      return <SparkSparkleIcon className={className} />;
+  }
+}
 
 type Props = {
   card: SparkNoteDailyCard;
@@ -36,12 +69,8 @@ type Props = {
 type ViewPhase = "keepsake" | "saved";
 
 /**
- * Illustrated hero scene — medallion emblem, scattered motifs, and a small
- * "washi tape" + "stamp" ephemera treatment. Every diversity category now
- * resolves to a real photo (see `SPARK_CARD_DIVERSITY_CATEGORY_ART`), so
- * this only renders as the `onError` fallback if a photo genuinely fails to
- * load at runtime — never as the primary hero. See
- * docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
+ * Illustrated hero scene — estate medallion + line-art motifs only.
+ * Used solely as the `onError` fallback when a real photo fails to load.
  */
 function SparkCardIllustratedScene({
   card,
@@ -60,7 +89,10 @@ function SparkCardIllustratedScene({
       <span className="spark-note-expanded__art-tape" aria-hidden />
       <span className="spark-note-expanded__art-medallion" aria-hidden>
         <span className="spark-note-expanded__art-medallion-emblem">
-          {scene.emblem}
+          <SparkCardEstateIcon
+            icon={scene.emblem}
+            className="spark-note-expanded__art-medallion-svg"
+          />
         </span>
       </span>
       <div className="spark-note-expanded__art-motifs" aria-hidden>
@@ -69,12 +101,15 @@ function SparkCardIllustratedScene({
             key={`${card.id}-motif-${index}`}
             className={`spark-note-expanded__art-motif spark-note-expanded__art-motif--${index + 1}`}
           >
-            {motif}
+            <SparkCardEstateIcon
+              icon={motif}
+              className="spark-note-expanded__art-motif-svg"
+            />
           </span>
         ))}
       </div>
       <span className="spark-note-expanded__art-stamp" aria-hidden>
-        ✦
+        <SparkSealIcon className="spark-note-expanded__art-stamp-svg" />
       </span>
       <span className="spark-note-expanded__art-caption" aria-hidden>
         {scene.caption}
@@ -83,25 +118,52 @@ function SparkCardIllustratedScene({
   );
 }
 
-function SparkCardArt({ card }: { card: SparkNoteDailyCard }) {
+function SparkCardArt({
+  card,
+  overrideSrc,
+  overrideAlt,
+}: {
+  card: SparkNoteDailyCard;
+  overrideSrc?: string;
+  overrideAlt?: string;
+}) {
   const hero = useMemo(() => resolveSparkCardHeroVisual(card), [card]);
   const fallbackScene = useMemo(() => resolveSparkCardThemedScene(card), [card]);
   const [photoFailed, setPhotoFailed] = useState(false);
-  const showPhoto = hero.kind === "photo" && !photoFailed;
+  const photoSrc = overrideSrc || (hero.kind === "photo" ? hero.src : "");
+  const showPhoto = Boolean(photoSrc) && !photoFailed;
+  const aspectRatio =
+    hero.kind === "photo" || hero.kind === "themed"
+      ? hero.aspectRatio
+      : "landscape";
+  const focalPoint =
+    hero.kind === "photo" || hero.kind === "themed"
+      ? hero.focalPoint
+      : "center";
+  const alt =
+    overrideAlt ||
+    (hero.kind === "photo" ? hero.alt : fallbackScene.alt);
+  const caption = hero.kind === "photo" ? hero.caption : undefined;
+
+  useEffect(() => {
+    setPhotoFailed(false);
+  }, [photoSrc]);
 
   return (
-    <div
+    <figure
       className={[
         "spark-note-expanded__art",
         showPhoto ? "" : "spark-note-expanded__art--themed",
+        `spark-note-expanded__art--${aspectRatio}`,
+        `spark-note-expanded__art--focus-${focalPoint}`,
       ]
         .filter(Boolean)
         .join(" ")}
     >
-      {showPhoto && hero.kind === "photo" ? (
+      {showPhoto ? (
         <img
-          src={hero.src}
-          alt={hero.alt}
+          src={photoSrc}
+          alt={alt}
           className="spark-note-expanded__art-image"
           onError={() => setPhotoFailed(true)}
         />
@@ -112,6 +174,88 @@ function SparkCardArt({ card }: { card: SparkNoteDailyCard }) {
         />
       )}
       <span className="spark-note-expanded__art-frame" aria-hidden />
+      {caption ? (
+        <figcaption className="spark-note-expanded__art-photo-caption">
+          {caption}
+        </figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
+function SeeItDifferentlyGallery({
+  items,
+  onSelect,
+  selectedIndex,
+}: {
+  items: SparkCardGalleryItem[];
+  selectedIndex: number | null;
+  onSelect: (index: number) => void;
+}) {
+  return (
+    <div className="spark-note-expanded__more-gallery">
+      <p className="spark-note-expanded__more-section-label">
+        See It Differently
+      </p>
+      <div
+        className="spark-note-expanded__more-gallery-row"
+        role="list"
+        aria-label="Different ways to see this Spark"
+      >
+        {items.map((item, index) => {
+          const selected = selectedIndex === index;
+          return (
+            <button
+              key={`gallery-${index}`}
+              type="button"
+              role="listitem"
+              className={[
+                "spark-note-expanded__more-gallery-chip",
+                "spark-note-expanded__more-gallery-chip--interactive",
+                selected
+                  ? "spark-note-expanded__more-gallery-chip--selected"
+                  : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-pressed={selected}
+              onClick={() => onSelect(index)}
+            >
+              <SparkCardEstateIcon
+                icon={item.icon}
+                className="spark-note-expanded__more-gallery-chip-icon"
+              />
+              <span className="spark-note-expanded__more-gallery-caption">
+                {item.caption}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      {selectedIndex != null && items[selectedIndex] ? (
+        <div
+          className="spark-note-expanded__more-gallery-reveal"
+          data-testid="spark-note-see-it-differently-reveal"
+        >
+          {items[selectedIndex].imageSrc ? (
+            <img
+              src={items[selectedIndex].imageSrc}
+              alt={
+                items[selectedIndex].imageAlt ||
+                items[selectedIndex].caption
+              }
+              className="spark-note-expanded__more-gallery-reveal-image"
+            />
+          ) : null}
+          <p className="spark-note-expanded__more-gallery-reveal-copy">
+            {items[selectedIndex].detail}
+          </p>
+        </div>
+      ) : (
+        <p className="spark-note-expanded__more-gallery-hint">
+          Choose one to see a short example.
+        </p>
+      )}
     </div>
   );
 }
@@ -137,6 +281,9 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const footerLine = useMemo(() => resolveSparkCardFooterLine(card), [card]);
   const [phase, setPhase] = useState<ViewPhase>("keepsake");
   const [tellMeMoreOpen, setTellMeMoreOpen] = useState(false);
+  const [selectedSeeItIndex, setSelectedSeeItIndex] = useState<number | null>(
+    null,
+  );
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
   const [kept, setKept] = useState(() =>
@@ -260,6 +407,10 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   }
 
   const tellMeMore = presentation.tellMeMore;
+  const selectedSeeIt =
+    selectedSeeItIndex != null
+      ? tellMeMore.gallery[selectedSeeItIndex]
+      : null;
   const hasTellMeMore =
     tellMeMore.facts.length > 0 ||
     Boolean(tellMeMore.lookCloser) ||
@@ -377,35 +528,16 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                 className="spark-note-expanded__more-panel"
                 data-testid="spark-note-tell-me-more"
               >
-                {/* 1 — visual reveal comes first, never a paragraph.
-                    Non-interactive labels by design (no button semantics,
-                    no hover/focus affordance) — a set of small captioned
-                    notes to read, not pills that pretend to be tappable. */}
-                {tellMeMore.gallery.length > 0 ? (
-                  <div className="spark-note-expanded__more-gallery">
-                    <p className="spark-note-expanded__more-section-label">
-                      See It Differently
-                    </p>
-                    <ul
-                      className="spark-note-expanded__more-gallery-row"
-                      aria-label="A few different ways to see this"
-                    >
-                      {tellMeMore.gallery.map((item, index) => (
-                        <li
-                          key={`gallery-${index}`}
-                          className="spark-note-expanded__more-gallery-chip"
-                        >
-                          <SparkSparkleIcon className="spark-note-expanded__more-gallery-chip-icon" />
-                          <span className="spark-note-expanded__more-gallery-caption">
-                            {item.caption}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                {selectedSeeIt?.imageSrc ? (
+                  <SparkCardArt
+                    card={card}
+                    overrideSrc={selectedSeeIt.imageSrc}
+                    overrideAlt={
+                      selectedSeeIt.imageAlt || selectedSeeIt.caption
+                    }
+                  />
                 ) : null}
 
-                {/* 2 — surprising fact / look closer detail */}
                 {tellMeMore.lookCloser ? (
                   <div className="spark-note-expanded__more-block">
                     <p className="spark-note-expanded__more-section-label">
@@ -419,15 +551,18 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
 
                 {tellMeMore.facts.length > 0 ? (
                   <div className="spark-note-expanded__more-facts">
-                    {tellMeMore.facts.map((fact, index) => (
-                      <p key={`fact-${index}`} className="spark-note-expanded__more-fact">
-                        <span aria-hidden>✦</span> {fact}
+                    {tellMeMore.facts.slice(0, 3).map((fact, index) => (
+                      <p
+                        key={`fact-${index}`}
+                        className="spark-note-expanded__more-fact"
+                      >
+                        <SparkSparkleIcon className="spark-note-expanded__more-fact-icon" />{" "}
+                        {fact}
                       </p>
                     ))}
                   </div>
                 ) : null}
 
-                {/* 3 — deeper story, a genuinely separate story beat */}
                 {tellMeMore.deeperStory ? (
                   <div className="spark-note-expanded__more-block">
                     <p className="spark-note-expanded__more-section-label">
@@ -436,6 +571,40 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                     <p className="spark-note-expanded__section-copy">
                       {tellMeMore.deeperStory}
                     </p>
+                  </div>
+                ) : null}
+
+                {tellMeMore.gallery.length > 0 ? (
+                  <SeeItDifferentlyGallery
+                    items={tellMeMore.gallery}
+                    selectedIndex={selectedSeeItIndex}
+                    onSelect={(index) =>
+                      setSelectedSeeItIndex((current) =>
+                        current === index ? null : index,
+                      )
+                    }
+                  />
+                ) : null}
+
+                {tellMeMore.timeline.length > 0 ? (
+                  <div className="spark-note-expanded__more-timeline">
+                    <p className="spark-note-expanded__more-section-label">
+                      A Small Timeline
+                    </p>
+                    <ol>
+                      {tellMeMore.timeline.map((step, index) => (
+                        <li key={`timeline-${index}`}>
+                          <span className="spark-note-expanded__more-timeline-label">
+                            {step.label}
+                          </span>
+                          {step.detail ? (
+                            <span className="spark-note-expanded__more-timeline-detail">
+                              {step.detail}
+                            </span>
+                          ) : null}
+                        </li>
+                      ))}
+                    </ol>
                   </div>
                 ) : null}
 
@@ -461,30 +630,6 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                   </div>
                 ) : null}
 
-                {/* 4 — image / timeline visual module */}
-                {tellMeMore.timeline.length > 0 ? (
-                  <div className="spark-note-expanded__more-timeline">
-                    <p className="spark-note-expanded__more-section-label">
-                      A Small Timeline
-                    </p>
-                    <ol>
-                      {tellMeMore.timeline.map((step, index) => (
-                        <li key={`timeline-${index}`}>
-                          <span className="spark-note-expanded__more-timeline-label">
-                            {step.label}
-                          </span>
-                          {step.detail ? (
-                            <span className="spark-note-expanded__more-timeline-detail">
-                              {step.detail}
-                            </span>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                ) : null}
-
-                {/* 5 — optional reflection / try this */}
                 {tellMeMore.tryThis ? (
                   <div className="spark-note-expanded__more-try">
                     <SparkSparkleIcon className="spark-note-expanded__more-try-icon" />
@@ -498,7 +643,6 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                   </p>
                 ) : null}
 
-                {/* 6 — sources */}
                 {tellMeMore.sources.length > 0 ? (
                   <p className="spark-note-expanded__more-sources">
                     {tellMeMore.sources.join(" ")}
@@ -534,7 +678,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
             onClick={handleFavorite}
             aria-pressed={kept}
           >
-            {kept ? "★ Favorited" : "☆ Favorite"}
+            {kept ? "Favorited" : "Favorite"}
           </button>
           <div
             className="spark-note-expanded__more-menu-wrap"

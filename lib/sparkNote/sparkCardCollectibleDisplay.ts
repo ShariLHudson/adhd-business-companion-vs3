@@ -1,18 +1,84 @@
-import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
+import type {
+  SparkNoteCategory,
+  SparkNoteDailyCard,
+  SparkNoteExpandedGalleryItem,
+  SparkNoteGalleryIconKey,
+} from "./types";
 import {
   resolveSparkCardDiversityArtAsset,
   resolveSparkCardSpecificArtAsset,
+  type SparkCardImageAspectRatio,
+  type SparkCardImageFocalPoint,
 } from "./sparkCardArtRegistry";
 import {
-  diversityCategoryIcon,
   diversityCategoryLabel,
-  pickDiversityHeroMotifs,
   resolveSparkCardCategoryRibbon,
   resolveSparkCardDiversityCategory,
   SPARK_CARD_OUTCOME_FEELINGS,
   type SparkCardDiversityCategoryId,
 } from "./sparkCardDiversity";
 import { generateSparkCardExpandedContent } from "./sparkCardTellMeMoreGenerator";
+
+const GALLERY_ICON_KEYS: readonly SparkNoteGalleryIconKey[] = [
+  "spark",
+  "flame",
+  "book",
+  "compass",
+  "seal",
+  "lens",
+  "leaf",
+] as const;
+
+const DIVERSITY_ESTATE_ICON: Record<
+  SparkCardDiversityCategoryId,
+  SparkNoteGalleryIconKey
+> = {
+  fun_celebrations: "spark",
+  innovation: "flame",
+  remarkable_people: "seal",
+  amazing_places: "compass",
+  nature: "leaf",
+  history: "book",
+  fun_facts: "lens",
+  kindness: "spark",
+  curiosity: "compass",
+  inspiration: "flame",
+  books_ideas: "book",
+  creativity: "seal",
+  science_technology: "lens",
+};
+
+/** Map legacy emoji / free-text emblems to estate icon keys. */
+export function resolveSparkCardGalleryIcon(
+  emblemOrIcon?: string | SparkNoteGalleryIconKey | null,
+): SparkNoteGalleryIconKey {
+  const raw = (emblemOrIcon ?? "").trim().toLowerCase();
+  if ((GALLERY_ICON_KEYS as readonly string[]).includes(raw)) {
+    return raw as SparkNoteGalleryIconKey;
+  }
+  if (/book|📖|📚|quill|🖋️/.test(raw)) return "book";
+  if (/flame|🔥|bulb|💡|⚙️|🔧/.test(raw)) return "flame";
+  if (/compass|🧭|map|🗺️|place/.test(raw)) return "compass";
+  if (/lens|magnif|🔍|🔎|🔬|atom|⚛️/.test(raw)) return "lens";
+  if (/leaf|🌿|🍃|nature|🌼|🐝/.test(raw)) return "leaf";
+  if (/seal|🕰️|🗝️|🎓|📜/.test(raw)) return "seal";
+  return "spark";
+}
+
+export function normalizeSparkCardGalleryItem(
+  item: SparkNoteExpandedGalleryItem,
+): SparkCardGalleryItem {
+  const caption = item.caption.trim();
+  return {
+    icon: resolveSparkCardGalleryIcon(item.icon ?? item.emblem),
+    caption,
+    detail:
+      item.detail?.trim() ||
+      `${caption} — a small angle worth noticing without changing the whole story.`,
+    imageSrc: item.imageSrc?.trim() || undefined,
+    imageAlt: item.imageAlt?.trim() || undefined,
+  };
+}
 
 /** Simplified default-view section labels — treasure card, not article. */
 export const SPARK_CARD_SECTION_STORY = "The Story" as const;
@@ -166,7 +232,13 @@ export function resolveSparkInAction(card: SparkNoteDailyCard): string {
   return DIVERSITY_TINY_ACTIONS[diversity];
 }
 
-export type SparkCardGalleryItem = { emblem: string; caption: string };
+export type SparkCardGalleryItem = {
+  icon: SparkNoteGalleryIconKey;
+  caption: string;
+  detail: string;
+  imageSrc?: string;
+  imageAlt?: string;
+};
 export type SparkCardTimelineItem = { label: string; detail?: string };
 
 /**
@@ -323,8 +395,9 @@ export function resolveSparkCardTellMeMore(
     if (facts.length >= 4) break; // keepsake card, not an essay
   }
 
-  const gallery =
+  const rawGallery =
     authored?.gallery?.length ? authored.gallery : generated.gallery ?? [];
+  const gallery = rawGallery.map(normalizeSparkCardGalleryItem);
   const timeline =
     authored?.timeline?.length ? authored.timeline : generated.timeline ?? [];
   const sources =
@@ -389,7 +462,8 @@ export function resolveSparkCardSimplifiedPresentation(
     diversityCategory,
     title: card.title,
     subtitle: card.teaser?.trim() || "A small idea waiting to brighten your day.",
-    storyParagraphs: splitSparkCardStoryParagraphs(card.whatHappened),
+    // Face of the card stays light — deeper reading lives in Tell Me More.
+    storyParagraphs: splitSparkCardStoryParagraphs(card.whatHappened).slice(0, 2),
     todaysSpark: resolveTodaysSpark(card),
     sparkInAction: resolveSparkInAction(card),
     tellMeMore: resolveSparkCardTellMeMore(card),
@@ -418,16 +492,27 @@ export function resolveSparkCardFooterLine(card: SparkNoteDailyCard): string {
 }
 
 export type SparkCardHeroVisual =
-  | { kind: "photo"; src: string; alt: string }
+  | {
+      kind: "photo";
+      src: string;
+      alt: string;
+      aspectRatio: SparkCardImageAspectRatio;
+      focalPoint: SparkCardImageFocalPoint;
+      caption?: string;
+      credit?: string;
+    }
   | {
       kind: "themed";
       category: SparkNoteCategory;
       diversityCategory: SparkCardDiversityCategoryId;
-      emblem: string;
-      /** Small supporting motifs — an illustrated scene, not a single icon. */
-      motifs: string[];
+      /** Estate icon key for the medallion — never emoji. */
+      emblem: SparkNoteGalleryIconKey;
+      /** Supporting estate icon keys — never emoji. */
+      motifs: SparkNoteGalleryIconKey[];
       caption: string;
       alt: string;
+      aspectRatio: SparkCardImageAspectRatio;
+      focalPoint: SparkCardImageFocalPoint;
     };
 
 /**
@@ -448,7 +533,15 @@ export function resolveSparkCardHeroVisual(
 ): SparkCardHeroVisual {
   const specific = resolveSparkCardSpecificArtAsset(card);
   if (specific) {
-    return { kind: "photo", src: specific.src, alt: specific.alt };
+    return {
+      kind: "photo",
+      src: specific.src,
+      alt: specific.alt,
+      aspectRatio: specific.aspectRatio ?? "landscape",
+      focalPoint: specific.focalPoint ?? "center",
+      caption: specific.caption,
+      credit: specific.credit,
+    };
   }
 
   const diversityCategory = resolveSparkCardDiversityCategory({
@@ -459,7 +552,15 @@ export function resolveSparkCardHeroVisual(
   });
   const diversityPhoto = resolveSparkCardDiversityArtAsset(diversityCategory);
   if (diversityPhoto) {
-    return { kind: "photo", src: diversityPhoto.src, alt: diversityPhoto.alt };
+    return {
+      kind: "photo",
+      src: diversityPhoto.src,
+      alt: diversityPhoto.alt,
+      aspectRatio: diversityPhoto.aspectRatio ?? "landscape",
+      focalPoint: diversityPhoto.focalPoint ?? "center",
+      caption: diversityPhoto.caption,
+      credit: diversityPhoto.credit,
+    };
   }
 
   return resolveSparkCardThemedScene(card);
@@ -480,14 +581,26 @@ export function resolveSparkCardThemedScene(
     title: card.title,
   });
 
+  const emblem = DIVERSITY_ESTATE_ICON[diversityCategory] ?? "spark";
+  const motifCycle: SparkNoteGalleryIconKey[] = [
+    emblem,
+    "seal",
+    "compass",
+    "leaf",
+    "book",
+    "lens",
+    "flame",
+  ];
   return {
     kind: "themed",
     category: card.category,
     diversityCategory,
-    emblem: diversityCategoryIcon(diversityCategory),
-    motifs: pickDiversityHeroMotifs(diversityCategory, card.id, 3),
+    emblem,
+    motifs: motifCycle.slice(0, 3),
     caption: diversityCategoryLabel(diversityCategory),
     alt: `Illustrated ${diversityCategoryLabel(diversityCategory)} discovery — ${card.title}`,
+    aspectRatio: "landscape",
+    focalPoint: "center",
   };
 }
 

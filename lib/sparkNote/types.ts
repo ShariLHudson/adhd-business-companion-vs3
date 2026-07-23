@@ -19,10 +19,28 @@ export type SparkNoteCategory =
 
 export type SparkNoteType = "quick" | "story" | "deep";
 
+/** Estate icon keys for gallery chips — never emoji in the visible card. */
+export type SparkNoteGalleryIconKey =
+  | "spark"
+  | "flame"
+  | "book"
+  | "compass"
+  | "seal"
+  | "lens"
+  | "leaf";
+
 /** One illustrated chip in a Tell Me More gallery — a visual module, not decoration only. */
 export type SparkNoteExpandedGalleryItem = {
-  emblem: string;
+  /** @deprecated Prefer `icon` — kept for authored library JSON that still stores a motif key/emoji. */
+  emblem?: string;
+  /** Estate-style icon key rendered as line art (never emoji). */
+  icon?: SparkNoteGalleryIconKey;
   caption: string;
+  /** Short explanation revealed when the chip is selected. */
+  detail?: string;
+  /** Optional secondary image for this angle. */
+  imageSrc?: string;
+  imageAlt?: string;
 };
 
 /** One step in a Tell Me More mini timeline — a visual module, not a paragraph. */

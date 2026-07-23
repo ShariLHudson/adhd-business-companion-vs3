@@ -30,7 +30,7 @@ type DiscoveryVariant = {
   unexpectedConnection: string;
   newFacts: [string, string, string];
   tryThis: string;
-  gallery: { emblem: string; caption: string }[];
+  gallery: { emblem: string; caption: string; detail?: string }[];
   timeline?: { label: string; detail?: string }[];
   sources: string[];
 };
@@ -94,9 +94,24 @@ const BANK: Record<SparkCardDiversityCategoryId, DiscoveryVariant[]> = {
       ],
       tryThis: "Pick one tiny, private way to mark today — no announcement needed.",
       gallery: [
-        { emblem: "🪅", caption: "Low stakes, on purpose" },
-        { emblem: "✨", caption: "Easy to enjoy, easy to skip" },
-        { emblem: "🎁", caption: "A reason, not a requirement" },
+        {
+          emblem: "spark",
+          caption: "Low stakes, on purpose",
+          detail:
+            "These days ask almost nothing of you — a smile is enough, and skipping them is still allowed.",
+        },
+        {
+          emblem: "leaf",
+          caption: "Easy to enjoy, easy to skip",
+          detail:
+            "The design is forgiving on purpose: remember it and enjoy it, or miss it and nothing breaks.",
+        },
+        {
+          emblem: "seal",
+          caption: "A reason, not a requirement",
+          detail:
+            "The celebration is an invitation, not a homework assignment — keep the reason, drop the pressure.",
+        },
       ],
       sources: ["General pattern of novelty-calendar origins."],
     },

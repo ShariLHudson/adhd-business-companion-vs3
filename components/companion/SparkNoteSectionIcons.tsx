@@ -73,3 +73,73 @@ export function SparkMagnifyingGlassIcon({ className }: { className?: string }) 
     </svg>
   );
 }
+
+/** Small compass — wayfinding / place motifs. */
+export function SparkCompassIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <circle cx="12" cy="12" r="8.2" stroke="currentColor" strokeWidth="1.7" />
+      <path
+        d="M12 5.2V7.1M12 16.9V18.8M5.2 12H7.1M16.9 12H18.8"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <path d="M10.2 13.8 13.4 8.6 13.8 13.8 8.6 10.6Z" fill="currentColor" />
+    </svg>
+  );
+}
+
+/** Decorative wax-seal mark. */
+export function SparkSealIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <circle cx="12" cy="11" r="6.4" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="12" cy="11" r="3.2" stroke="currentColor" strokeWidth="1.3" />
+      <path
+        d="M9.2 16.6 8.4 20.2 12 18.6 15.6 20.2 14.8 16.6"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Botanical leaf — nature / quiet growth. */
+export function SparkLeafIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        d="M5.5 14.5C5.5 9.2 10.4 4.8 18.2 4.8c0 7.8-4.4 12.7-9.7 12.7-1.4 0-2.6-.4-3-.7Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.2 15.8C10.6 13.2 13.8 9.4 17.4 6.6"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
