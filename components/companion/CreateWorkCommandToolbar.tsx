@@ -167,7 +167,8 @@ export function CreateWorkCommandToolbar({
         <div className="w-full pt-1">
           <ExportActions
             title={workflow.selectedTemplateName || "Creation"}
-            content={draftText}
+            artifactType={workflow.selectedTemplateName || "Document"}
+            text={draftText}
           />
         </div>
       ) : null}

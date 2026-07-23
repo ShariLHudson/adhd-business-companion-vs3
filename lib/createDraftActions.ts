@@ -2,6 +2,11 @@
  * Draft screen action model — Edit / Save / Export / Social menus.
  */
 
+import {
+  artifactSupportsDestination,
+  classifyArtifactFamily,
+} from "@/lib/artifactDestinations";
+
 export type DraftEditAction =
   | "shorten"
   | "lengthen"
@@ -62,6 +67,32 @@ export const DRAFT_EXPORT_MENU: DraftMenuGroup[] = [
     ],
   },
 ];
+
+/** Context-aware export menu — omit incompatible destinations. */
+export function draftExportMenuForArtifact(
+  artifactType: string,
+  content = "",
+): DraftMenuGroup[] {
+  const family = classifyArtifactFamily(artifactType, content);
+  const items = DRAFT_EXPORT_MENU[0]!.items.filter((item) => {
+    if (item.id === "copy-text") return true;
+    if (item.id === "print") {
+      return artifactSupportsDestination(artifactType, "print", content);
+    }
+    if (item.id === "export-pdf") {
+      return artifactSupportsDestination(artifactType, "pdf", content);
+    }
+    if (item.id === "export-docx") {
+      return (
+        family === "document" ||
+        family === "other" ||
+        artifactSupportsDestination(artifactType, "microsoft-word", content)
+      );
+    }
+    return true;
+  });
+  return [{ items }];
+}
 
 export const DRAFT_SOCIAL_MENU: DraftMenuGroup[] = [
   {

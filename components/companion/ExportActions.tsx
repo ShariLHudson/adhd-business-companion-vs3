@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useEffect, useMemo, useState, type RefObject } from "react";
 import { getPrefs } from "@/lib/companionStore";
 import { isProposalArtifact } from "@/lib/artifactType";
+import {
+  buildDownloadArtifact,
+  detectPrintSupport,
+  destinationCapabilitiesForArtifact,
+  triggerBrowserDownload,
+  type ArtifactDestinationFormat,
+  type ArtifactDestinationId,
+} from "@/lib/artifactDestinations";
+import { readDigitalWorkspacePreferences } from "@/lib/connections/digitalWorkspacePreferences";
 import {
   formConversionOffer,
   googleFailureReceipt,
@@ -27,12 +36,16 @@ const SOCIAL_META = [
   { name: "Pinterest", fallback: "https://www.pinterest.com/", color: "#e60023" },
 ];
 
-function esc(s: string) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+function esc(s: string | null | undefined) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 export function ExportActions({
   text,
+  content,
   title,
   social,
   artifactType,
@@ -45,7 +58,9 @@ export function ExportActions({
   embedInPanel = false,
   compact = false,
 }: {
-  text: string;
+  text?: string;
+  /** Alias for `text` — some callers historically passed `content`. */
+  content?: string;
   title?: string;
   social?: boolean;
   artifactType?: string;
@@ -63,12 +78,30 @@ export function ExportActions({
   embedInPanel?: boolean;
   compact?: boolean;
 }) {
+  const bodyText = String(text ?? content ?? "");
   const [flash, setFlash] = useState<string | null>(null);
   const [googleConnected, setGoogleConnected] = useState<boolean | null>(null);
   const [googleConfigured, setGoogleConfigured] = useState<boolean | null>(null);
   const workspaceMode = variant === "workspace" || variant === "proposal";
   const proposalMode =
     workspaceMode || isProposalArtifact(artifactType ?? title);
+  const printSupport = useMemo(() => detectPrintSupport(), []);
+  const workspacePrefs = useMemo(() => readDigitalWorkspacePreferences(), []);
+  const caps = useMemo(
+    () =>
+      destinationCapabilitiesForArtifact(
+        artifactType ?? title ?? "Document",
+        bodyText,
+      ),
+    [artifactType, title, bodyText],
+  );
+  const allowed = useMemo(() => {
+    const set = new Set<ArtifactDestinationId>(
+      caps.destinations.map((d) => d.id),
+    );
+    return set;
+  }, [caps]);
+  const showDest = (id: ArtifactDestinationId) => allowed.has(id);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,7 +146,7 @@ export function ExportActions({
 
   async function clip(): Promise<boolean> {
     try {
-      await navigator.clipboard?.writeText(text);
+      await navigator.clipboard?.writeText(bodyText);
       return true;
     } catch {
       return false;
@@ -140,6 +173,17 @@ export function ExportActions({
       note(block);
       return;
     }
+    if (!printSupport.supported) {
+      note(
+        printSupport.reasonUnavailable ??
+          "Printing isn’t available here. Download a PDF instead.",
+      );
+      return;
+    }
+    if (!bodyText.trim()) {
+      note("Add some content before printing.");
+      return;
+    }
     const w = window.open("", "_blank", "width=720,height=900");
     if (!w) {
       note("Allow pop-ups to print.");
@@ -147,7 +191,7 @@ export function ExportActions({
     }
     w.document.write(
       `<html><head><title>${esc(title || "Content")}</title></head>` +
-        `<body><pre style="white-space:pre-wrap;font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.65;padding:28px;color:#1f1c19;">${esc(text)}</pre></body></html>`,
+        `<body><pre style="white-space:pre-wrap;font-family:system-ui,-apple-system,sans-serif;font-size:14px;line-height:1.65;padding:28px;color:#1f1c19;">${esc(bodyText)}</pre></body></html>`,
     );
     w.document.close();
     w.focus();
@@ -156,13 +200,42 @@ export function ExportActions({
     if (workspaceMode) note("Opening print…");
   }
 
+  async function downloadAs(format: ArtifactDestinationFormat) {
+    const block = onBeforeAction?.();
+    if (block) {
+      note(block);
+      return;
+    }
+    if (!bodyText.trim()) {
+      note("Add some content before downloading.");
+      return;
+    }
+    try {
+      const artifact = await buildDownloadArtifact({
+        title: title || "Content",
+        body: bodyText,
+        format,
+      });
+      triggerBrowserDownload(artifact);
+      note(
+        format === "pdf"
+          ? "Downloaded PDF — open it in a PDF reader."
+          : format === "docx"
+            ? "Downloaded Word document."
+            : `Downloaded ${artifact.filename}`,
+      );
+    } catch {
+      note("Couldn't download.");
+    }
+  }
+
   async function googleFile(kind: "doc" | "sheet" | "form", forceExport = false) {
     const block = onBeforeAction?.();
     if (block) {
       note(block);
       return;
     }
-    if (!text.trim()) {
+    if (!bodyText.trim()) {
       note("Add some content before exporting.");
       return;
     }
@@ -178,7 +251,7 @@ export function ExportActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: title || "Content",
-          content: text,
+          content: bodyText,
           kind,
           forceExport,
         }),
@@ -233,30 +306,12 @@ export function ExportActions({
   }
 
   function calendar() {
-    // Pre-fill a Google Calendar event — you pick the time and save. No extra
-    // permission needed.
     const url =
       "https://calendar.google.com/calendar/render?action=TEMPLATE" +
       `&text=${encodeURIComponent(title || "Post / content")}` +
-      `&details=${encodeURIComponent(text.slice(0, 1500))}`;
+      `&details=${encodeURIComponent(bodyText.slice(0, 1500))}`;
     window.open(url, "_blank");
     note("Opened Google Calendar — pick a time and save.");
-  }
-
-  function download() {
-    try {
-      const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${(title || "content").replace(/[^\w.-]+/g, "-").slice(0, 40)}.txt`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      note("Couldn't download.");
-    }
   }
 
   async function toSocial(name: string, url: string) {
@@ -267,77 +322,154 @@ export function ExportActions({
 
   const btn =
     "rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]";
+  const btnDisabled = `${btn} opacity-55 cursor-not-allowed`;
 
   const showGoogle = shouldShowGoogleExportButtons(googleConfigured, googleConnected);
+  const showWord =
+    showDest("microsoft-word") &&
+    workspacePrefs.documents === "microsoft-word";
   const googleModeLabel =
     googleConfigured === false
-      ? "Connect Google in Settings to save directly to Docs, Sheets, or Forms."
+      ? "Connect Google in Settings to save directly when a Google destination applies."
       : googleConnected
         ? null
-        : "Google not connected — connect in Settings to save directly, or use Copy.";
+        : "Google not connected — connect in Settings to save directly, or use Download / Print.";
 
   return (
-    <div className={compact ? "mt-2" : "mt-2"}>
+    <div
+      className={compact ? "mt-2" : "mt-2"}
+      data-testid="export-actions"
+      data-artifact-family={caps.family}
+    >
       {flash && !compact && (
-        <p className="mb-2 text-sm font-semibold text-[#1e4f4f]">{flash}</p>
+        <p className="mb-2 text-sm font-semibold text-[#1e4f4f]" role="status">
+          {flash}
+        </p>
       )}
       {googleModeLabel && !compact ? (
         <p className="mb-2 text-xs font-medium text-[#9a8f82]">{googleModeLabel}</p>
       ) : null}
       <div className="flex flex-wrap gap-2">
-        {!compact && (
+        {!compact && showDest("copy") ? (
           <button type="button" onClick={copy} className={btn}>
             📋 Copy
           </button>
-        )}
-        <button
-          ref={printButtonRef}
-          type="button"
-          onClick={print}
-          className={btn}
-        >
-          🖨 Print
-        </button>
-        {showGoogle ? (
-          <>
-            <button
-              ref={docButtonRef}
-              type="button"
-              onClick={() => void googleFile("doc")}
-              className={btn}
-            >
-              {workspaceMode ? "📝 Google Docs" : "📝 Google Docs"}
-            </button>
-            {!compact ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => void googleFile("sheet")}
-                  className={btn}
-                >
-                  📊 Google Sheets
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void googleFile("form")}
-                  className={btn}
-                >
-                  📋 Google Forms
-                </button>
-              </>
-            ) : null}
-          </>
         ) : null}
-        {!compact && (
-          <>
-            <button type="button" onClick={calendar} className={btn}>
-              📅 Calendar
-            </button>
-            <button type="button" onClick={download} className={btn}>
-              ⬇ Download
-            </button>
-          </>
-        )}
+
+        {showDest("print") ? (
+          <button
+            ref={printButtonRef}
+            type="button"
+            onClick={print}
+            className={printSupport.supported ? btn : btnDisabled}
+            aria-disabled={!printSupport.supported}
+            title={
+              printSupport.supported
+                ? "Print"
+                : (printSupport.reasonUnavailable ?? "Print unavailable")
+            }
+            data-testid="export-print"
+          >
+            {printSupport.supported ? "🖨 Print" : "🖨 Print (unavailable)"}
+          </button>
+        ) : null}
+
+        {showDest("google-docs") && showGoogle ? (
+          <button
+            ref={docButtonRef}
+            type="button"
+            onClick={() => void googleFile("doc")}
+            className={btn}
+            data-testid="export-google-docs"
+          >
+            📝 Google Docs
+          </button>
+        ) : null}
+
+        {showDest("google-sheets") && showGoogle && !compact ? (
+          <button
+            type="button"
+            onClick={() => void googleFile("sheet")}
+            className={btn}
+            data-testid="export-google-sheets"
+          >
+            📊 Google Sheets
+          </button>
+        ) : null}
+
+        {showDest("google-forms") && showGoogle && !compact ? (
+          <button
+            type="button"
+            onClick={() => void googleFile("form")}
+            className={btn}
+            data-testid="export-google-forms"
+          >
+            📋 Google Forms
+          </button>
+        ) : null}
+
+        {showWord ? (
+          <button
+            type="button"
+            onClick={() => void downloadAs("docx")}
+            className={btn}
+            data-testid="export-microsoft-word"
+          >
+            📄 Microsoft Word
+          </button>
+        ) : null}
+
+        {showDest("google-calendar") && !compact ? (
+          <button
+            type="button"
+            onClick={calendar}
+            className={btn}
+            data-testid="export-google-calendar"
+          >
+            📅 Google Calendar
+          </button>
+        ) : null}
+
+        {showDest("pdf") ? (
+          <button
+            type="button"
+            onClick={() => void downloadAs("pdf")}
+            className={btn}
+            data-testid="export-pdf"
+          >
+            ⬇ PDF
+          </button>
+        ) : null}
+
+        {showDest("download") || showDest("csv") || showDest("markdown") ? (
+          <button
+            type="button"
+            onClick={() =>
+              void downloadAs(
+                caps.defaultDownloadFormat === "pdf"
+                  ? "txt"
+                  : caps.defaultDownloadFormat,
+              )
+            }
+            className={btn}
+            data-testid="export-download"
+          >
+            ⬇ Download
+          </button>
+        ) : null}
+
+        {showDest("download") &&
+        caps.downloadFormats.includes("docx") &&
+        !showWord ? (
+          <button
+            type="button"
+            onClick={() => void downloadAs("docx")}
+            className={btn}
+            data-testid="export-docx"
+          >
+            📄 Word (.docx)
+          </button>
+        ) : null}
       </div>
       {social && (
         <div className="mt-2">

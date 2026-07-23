@@ -2,6 +2,7 @@
  * Create → Project → Google execution bridge.
  */
 
+import { classifyArtifactFamily } from "./artifactDestinations";
 import { saveProject } from "./companionStore";
 import { createSavedWork, linkSavedWorkToProject } from "./savedWorkStore";
 import { contentToSheetCsv } from "./googleSheetContent";
@@ -204,6 +205,26 @@ export function executionActionsForCapability(
     actions.push("task-list");
   }
   actions.push("google-doc");
-  if (cap.canExportSheet) actions.push("google-sheet");
+  // Sheets only when the artifact family is actually a spreadsheet
+  // (not merely "plan/calendar" wording that used to over-trigger).
+  if (cap.canExportSheet) {
+    /* retained on capability for task extraction callers */
+  }
+  return actions;
+}
+
+export function executionActionsForArtifact(
+  artifactType: string,
+  body: string,
+): ExecutionActionId[] {
+  const cap = detectExecutionCapability(artifactType, body);
+  const actions = executionActionsForCapability(cap);
+  const family = classifyArtifactFamily(artifactType, body);
+  if (family === "spreadsheet") {
+    actions.push("google-sheet");
+  }
+  if (family === "document" || family === "other" || family === "presentation") {
+    actions.push("download-pdf");
+  }
   return actions;
 }

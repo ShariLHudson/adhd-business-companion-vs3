@@ -42,12 +42,16 @@ export function googleWorkspaceTitle(kind: GoogleFileKind): string {
   }
 }
 
-/** Best Google surface for this artifact type. */
+/** Best Google file surface for this artifact type (Docs / Sheets / Forms only). */
 export function recommendGoogleExport(
   artifactType: string,
   content: string,
 ): GoogleFileKind {
   const t = artifactType.toLowerCase();
+  // Content calendars are documents — never route them to Sheets via "calendar".
+  if (/\b(content calendar|editorial calendar|posting calendar)\b/.test(t)) {
+    return "doc";
+  }
   if (
     /\b(form|questionnaire|intake|survey|quiz)\b/.test(t) ||
     /\b(form|questionnaire|intake|survey)\b/.test(content.slice(0, 400))
@@ -55,8 +59,10 @@ export function recommendGoogleExport(
     return "form";
   }
   if (
-    /\b(calendar|spreadsheet|sheet|table)\b/.test(t) ||
-    (content.includes("|") && content.split("\n").filter((l) => l.includes("|")).length >= 3)
+    /\b(spreadsheet|sheet|excel|csv|budget table|data table)\b/.test(t) ||
+    (content.includes("|") &&
+      content.split("\n").filter((l) => l.includes("|")).length >= 3 &&
+      /\b(sheet|table|spreadsheet|budget)\b/.test(t))
   ) {
     return "sheet";
   }
@@ -96,7 +102,7 @@ export function formatGoogleWorkspaceEditHint(
   session: GoogleWorkspaceSession,
 ): string {
   return (
-    `GOOGLE WORKSPACE MODE (ACTIVE — ${googleWorkspaceTitle(session.kind)} is visible beside chat):\n` +
+    `GOOGLE WORKSPACE MODE (ACTIVE — ${googleWorkspaceTitle(session.kind)} is open):\n` +
     `- The user is continuing work in Google — NOT in Create.\n` +
     `- Document: **${session.title}** (${session.artifactType})\n` +
     `- Chat edits update the Google file automatically.\n` +

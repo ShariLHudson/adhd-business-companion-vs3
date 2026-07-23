@@ -1,37 +1,57 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
+import { detectPrintSupport } from "@/lib/artifactDestinations";
 import {
   DESTINATION_GALLERY_BG,
-  DESTINATION_GALLERY_CRYSTALS,
   DESTINATION_CRYSTAL_HIT_AREAS,
-  crystalAriaLabel,
-  crystalHitAreaFor,
+  crystalOfferAriaLabel,
+  executeCrystalDestination,
+  getDestinationCrystal,
+  resolveArtifactDestinationCrystalOffers,
+  type ArtifactCrystalVisualState,
+  type ArtifactDestinationCrystalOffer,
   type CrystalActivation,
   type DestinationCrystal,
-  type DestinationCrystalId,
 } from "@/lib/destinationGallery";
-import { ExportActions } from "@/components/companion/ExportActions";
 
 type Props = {
   onBack?: () => void;
   onReturnToEstate?: () => void;
+  /**
+   * Legacy pillar activation (Schedule / Design / Share).
+   * Artifact-local destinations (PDF, Print, Docs…) execute in-panel.
+   */
   onSelectCrystal?: (crystal: DestinationCrystal) => void;
-  /** Prepared destination (Document / Store / Share / Print / Design). */
+  /** Prepared destination whisper (needs connection / hospitality). */
   prepared?: CrystalActivation | null;
   onClearPrepared?: () => void;
   exportText?: string;
   exportTitle?: string;
+  /** Drives which crystals appear (document vs sheet vs calendar…). */
+  artifactType?: string;
   onOpenConnections?: () => void;
+  canvaDestinationUrl?: string | null;
+  outlookConnected?: boolean;
+  canvaConnected?: boolean;
 };
 
 const ACTIVATE_MS = 380;
 
+type RuntimeStateMap = Partial<
+  Record<string, ArtifactCrystalVisualState>
+>;
+
 /**
- * Destination Gallery — painted crystal pillars are the navigation objects.
- * Transparent hit areas only; no cards, orbs, tooltips, or duplicate labels.
- * Artwork labels (Schedule, Write, Save, …) remain the only visible names.
+ * Destination Gallery — painted crystal pillars remain the visual destinations.
+ * Artifact capabilities filter which crystals light up; never a plain export menu.
  */
 export function DestinationGalleryPanel({
   onBack,
@@ -41,33 +61,174 @@ export function DestinationGalleryPanel({
   onClearPrepared,
   exportText = "",
   exportTitle = "Spark work",
+  artifactType = "Document",
   onOpenConnections,
+  canvaDestinationUrl = null,
+  outlookConnected = false,
+  canvaConnected = false,
 }: Props) {
-  const showPrepared =
-    prepared != null &&
-    prepared.kind !== "open_calendar" &&
-    prepared.kind !== "open_external_url";
-  const [activatingId, setActivatingId] =
-    useState<DestinationCrystalId | null>(null);
+  const printSupport = useMemo(() => detectPrintSupport(), []);
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleConfigured, setGoogleConfigured] = useState(true);
+  const [runtimeStates, setRuntimeStates] = useState<RuntimeStateMap>({});
+  const [statusWhisper, setStatusWhisper] = useState<string | null>(null);
+  const [activatingOfferId, setActivatingOfferId] = useState<string | null>(
+    null,
+  );
   const [flash, setFlash] = useState<{ x: string; y: string } | null>(null);
   const activateTimerRef = useRef<number | null>(null);
 
-  function activateCrystal(crystal: DestinationCrystal) {
-    if (activatingId) return;
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/google/status")
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return;
+        setGoogleConnected(Boolean(j.connected));
+        setGoogleConfigured(j.configured !== false);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setGoogleConnected(false);
+        setGoogleConfigured(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const baseOffers = useMemo(
+    () =>
+      resolveArtifactDestinationCrystalOffers(artifactType, exportText, {
+        googleConfigured,
+        googleConnected,
+        outlookConnected,
+        canvaConnected,
+        printSupported: printSupport.supported,
+      }),
+    [
+      artifactType,
+      exportText,
+      googleConfigured,
+      googleConnected,
+      outlookConnected,
+      canvaConnected,
+      printSupport.supported,
+    ],
+  );
+
+  const offers = useMemo(
+    () =>
+      baseOffers.map((offer) => {
+        const runtime = runtimeStates[offer.offerId];
+        if (!runtime) return offer;
+        return { ...offer, state: runtime };
+      }),
+    [baseOffers, runtimeStates],
+  );
+
+  const showPreparedWhisper =
+    prepared != null &&
+    prepared.kind !== "open_calendar" &&
+    prepared.kind !== "open_external_url";
+
+  function setOfferState(
+    offerId: string,
+    state: ArtifactCrystalVisualState,
+  ) {
+    setRuntimeStates((prev) => ({ ...prev, [offerId]: state }));
+  }
+
+  function whisper(message: string) {
+    setStatusWhisper(message);
+    window.setTimeout(() => setStatusWhisper(null), 3200);
+  }
+
+  async function runOffer(offer: ArtifactDestinationCrystalOffer) {
+    if (
+      offer.state === "temporarily_unavailable" &&
+      runtimeStates[offer.offerId] !== "failed"
+    ) {
+      whisper(offer.statusHint);
+      return;
+    }
+
+    if (offer.state === "needs_connection") {
+      whisper(offer.statusHint);
+      onOpenConnections?.();
+      return;
+    }
+
+    setOfferState(offer.offerId, "processing");
+    const result = await executeCrystalDestination({
+      destinationId: offer.destinationId,
+      title: exportTitle,
+      body: exportText,
+      artifactType,
+      googleConnected,
+      googleConfigured,
+      outlookConnected,
+      canvaConnected,
+      printSupported: printSupport.supported,
+      canvaDestinationUrl,
+    });
+
+    if (result.openConnections) {
+      setOfferState(offer.offerId, "needs_connection");
+      whisper(result.message);
+      onOpenConnections?.();
+      return;
+    }
+
+    if (result.openEstateCalendar) {
+      const schedule = getDestinationCrystal("schedule");
+      if (schedule) onSelectCrystal?.(schedule);
+    }
+
+    if (result.openUrl) {
+      try {
+        window.open(result.openUrl, "_blank", "noopener,noreferrer");
+      } catch {
+        setOfferState(offer.offerId, "failed");
+        whisper(
+          "Something got tangled opening that destination. You can try again.",
+        );
+        return;
+      }
+    }
+
+    if (result.ok) {
+      setOfferState(offer.offerId, "completed");
+      whisper(result.message);
+      window.setTimeout(() => {
+        setRuntimeStates((prev) => {
+          const next = { ...prev };
+          if (next[offer.offerId] === "completed") {
+            delete next[offer.offerId];
+          }
+          return next;
+        });
+      }, 2400);
+      return;
+    }
+
+    setOfferState(offer.offerId, "failed");
+    whisper(result.message);
+  }
+
+  function activateOffer(offer: ArtifactDestinationCrystalOffer) {
+    if (activatingOfferId) return;
     if (activateTimerRef.current != null) {
       window.clearTimeout(activateTimerRef.current);
     }
-    const area = crystalHitAreaFor(crystal.id);
-    setActivatingId(crystal.id);
-    if (area) {
-      setFlash({
-        x: `calc(${area.left} + ${area.width} / 2)`,
-        y: `calc(${area.top} + ${area.height} / 2)`,
-      });
-    }
+    setActivatingOfferId(offer.offerId);
+    setFlash({
+      x: `calc(${offer.hitArea.left} + ${offer.hitArea.width} / 2)`,
+      y: `calc(${offer.hitArea.top} + ${offer.hitArea.height} / 2)`,
+    });
     activateTimerRef.current = window.setTimeout(() => {
-      onSelectCrystal?.(crystal);
-      setActivatingId(null);
+      void runOffer(offer);
+      setActivatingOfferId(null);
       setFlash(null);
       activateTimerRef.current = null;
     }, ACTIVATE_MS);
@@ -78,7 +239,9 @@ export function DestinationGalleryPanel({
       className="destination-gallery-panel absolute inset-0 z-10"
       data-testid="destination-gallery-panel"
       data-crystal-navigation="true"
+      data-crystal-mode="artifact"
       data-scene="destination-gallery-background"
+      data-artifact-family={offers[0] ? artifactType : "Document"}
       role="region"
       aria-label="Destination Gallery"
     >
@@ -111,70 +274,84 @@ export function DestinationGalleryPanel({
           aria-hidden
         />
 
-        {showPrepared ? (
-          <PreparedDestinationView
-            prepared={prepared}
-            exportText={exportText}
-            exportTitle={exportTitle}
-            onOpenConnections={onOpenConnections}
-          />
-        ) : (
-          <ul
-            className="destination-gallery-crystal-field"
-            data-testid="destination-gallery-crystal-list"
-          >
-            {DESTINATION_GALLERY_CRYSTALS.map((crystal) => {
-              const area = crystalHitAreaFor(crystal.id);
-              if (!area) return null;
-              const activating = activatingId === crystal.id;
-              return (
-                <li
-                  key={crystal.id}
-                  className="destination-gallery-crystal-slot"
-                  style={{
-                    left: area.left,
-                    top: area.top,
-                    width: area.width,
-                    height: area.height,
+        <ul
+          className="destination-gallery-crystal-field"
+          data-testid="destination-gallery-crystal-list"
+        >
+          {offers.map((offer) => {
+            const activating = activatingOfferId === offer.offerId;
+            return (
+              <li
+                key={offer.offerId}
+                className="destination-gallery-crystal-slot"
+                style={{
+                  left: offer.hitArea.left,
+                  top: offer.hitArea.top,
+                  width: offer.hitArea.width,
+                  height: offer.hitArea.height,
+                }}
+              >
+                <button
+                  type="button"
+                  className="destination-gallery-crystal"
+                  data-testid={`destination-crystal-${offer.destinationId}`}
+                  data-crystal-id={offer.slotId}
+                  data-destination-id={offer.destinationId}
+                  data-crystal-state={offer.state}
+                  data-activating={activating ? "true" : "false"}
+                  aria-label={crystalOfferAriaLabel(offer)}
+                  onClick={() => activateOffer(offer)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      activateOffer(offer);
+                    }
                   }}
                 >
-                  <button
-                    type="button"
-                    className="destination-gallery-crystal"
-                    data-testid={`destination-crystal-${crystal.id}`}
-                    data-crystal-id={crystal.id}
-                    data-activating={activating ? "true" : "false"}
-                    aria-label={crystalAriaLabel(area)}
-                    onClick={() => activateCrystal(crystal)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        activateCrystal(crystal);
-                      }
-                    }}
+                  <span
+                    className="destination-gallery-crystal__glow"
+                    aria-hidden
+                  />
+                  <span
+                    className="destination-gallery-crystal__shimmer"
+                    aria-hidden
+                  />
+                  <span
+                    className="destination-gallery-crystal__spark"
+                    aria-hidden
+                  />
+                  <span
+                    className="destination-gallery-crystal__whisper"
+                    data-testid={`destination-crystal-whisper-${offer.destinationId}`}
                   >
-                    <span
-                      className="destination-gallery-crystal__glow"
-                      aria-hidden
-                    />
-                    <span
-                      className="destination-gallery-crystal__shimmer"
-                      aria-hidden
-                    />
-                    <span
-                      className="destination-gallery-crystal__spark"
-                      aria-hidden
-                    />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+                    {offer.label}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+
+        {showPreparedWhisper && prepared ? (
+          <PreparedDestinationWhisper
+            prepared={prepared}
+            onOpenConnections={onOpenConnections}
+          />
+        ) : null}
+
+        {statusWhisper ? (
+          <p
+            className="destination-gallery-status-whisper"
+            data-testid="destination-gallery-status-whisper"
+            aria-live="polite"
+          >
+            {statusWhisper}
+          </p>
+        ) : null}
       </div>
 
       <div className="destination-gallery-panel__chrome">
-        {showPrepared && onClearPrepared ? (
+        {showPreparedWhisper && onClearPrepared ? (
           <button
             type="button"
             className="destination-gallery-panel__chrome-btn"
@@ -204,26 +381,23 @@ export function DestinationGalleryPanel({
         ) : null}
       </div>
 
-      {/* Dev-facing count for tests — hit areas match painted pillars */}
       <span className="sr-only" data-testid="destination-crystal-hit-count">
+        {offers.length}
+      </span>
+      <span className="sr-only" data-testid="destination-crystal-pillar-count">
         {DESTINATION_CRYSTAL_HIT_AREAS.length}
       </span>
     </div>
   );
 }
 
-function PreparedDestinationView({
+function PreparedDestinationWhisper({
   prepared,
-  exportText,
-  exportTitle,
   onOpenConnections,
 }: {
   prepared: CrystalActivation;
-  exportText: string;
-  exportTitle: string;
   onOpenConnections?: () => void;
 }) {
-  const hasExportable = exportText.trim().length > 0;
   const showConnectionsCta =
     prepared.shouldOpenConnections === true ||
     prepared.kind === "needs_connection" ||
@@ -231,7 +405,7 @@ function PreparedDestinationView({
 
   return (
     <div
-      className="destination-gallery-prepared"
+      className="destination-gallery-prepared destination-gallery-prepared--over-crystals"
       data-testid={`destination-prepared-${prepared.crystalId}`}
       data-activation-kind={prepared.kind}
     >
@@ -286,39 +460,6 @@ function PreparedDestinationView({
               Open Connections
             </button>
           </div>
-        ) : null}
-
-        {(prepared.kind === "prepared_document" ||
-          prepared.kind === "prepared_print") &&
-        hasExportable ? (
-          <div
-            className="mt-4 rounded-xl bg-[#f7f0e4]/95 p-4 text-[#1f1c19]"
-            data-testid={
-              prepared.kind === "prepared_document"
-                ? "destination-document-export"
-                : "destination-print-export"
-            }
-          >
-            <ExportActions
-              text={exportText}
-              title={exportTitle}
-              social={false}
-              compact
-              embedInPanel
-            />
-          </div>
-        ) : null}
-
-        {(prepared.kind === "prepared_document" ||
-          prepared.kind === "prepared_print") &&
-        !hasExportable ? (
-          <p
-            className="mt-4 text-sm text-[#d4c4a8]"
-            data-testid="destination-export-empty"
-          >
-            Bring something we&apos;ve written together, and I can send it from
-            here.
-          </p>
         ) : null}
       </div>
     </div>

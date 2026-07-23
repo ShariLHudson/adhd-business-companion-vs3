@@ -3,6 +3,7 @@ import {
   buildTaskSheetCsv,
   createProjectFromDocument,
   detectExecutionCapability,
+  executionActionsForArtifact,
   executionActionsForCapability,
   extractTasksFromDocument,
 } from "./createExecution";
@@ -157,9 +158,15 @@ Action Plan:
     expect(saved?.projectName).toBe(result.projectName);
   });
 
-  it("12. task-oriented content enables sheet export action", () => {
+  it("12. task-oriented content may detect sheet capability, but only spreadsheets offer Sheets", () => {
     const cap = detectExecutionCapability("Content Calendar", LAUNCH_PLAN);
     expect(cap.canExportSheet).toBe(true);
-    expect(executionActionsForCapability(cap)).toContain("google-sheet");
+    expect(executionActionsForCapability(cap)).not.toContain("google-sheet");
+    expect(
+      executionActionsForArtifact("Content Calendar", LAUNCH_PLAN),
+    ).not.toContain("google-sheet");
+    expect(
+      executionActionsForArtifact("Spreadsheet", "col1,col2\n1,2"),
+    ).toContain("google-sheet");
   });
 });

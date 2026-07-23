@@ -4,6 +4,7 @@ import {
   DRAFT_EXPORT_MENU,
   DRAFT_SAVE_MENU,
   DRAFT_SOCIAL_MENU,
+  draftExportMenuForArtifact,
   refineInstructionForEditAction,
 } from "./createDraftActions";
 import { buildSectionEditOpener } from "./createTemplateEditOptions";
@@ -38,6 +39,15 @@ describe("createDraftActions", () => {
   it("maps edit actions to refine instructions", () => {
     expect(refineInstructionForEditAction("shorten")).toMatch(/Shorten/i);
     expect(refineInstructionForEditAction("custom-change")).toBeNull();
+  });
+
+  it("keeps print/pdf/docx for documents and filters by artifact family", () => {
+    const docIds = draftExportMenuForArtifact("Proposal").flatMap((g) =>
+      g.items.map((i) => i.id),
+    );
+    expect(docIds).toEqual(
+      expect.arrayContaining(["copy-text", "print", "export-pdf", "export-docx"]),
+    );
   });
 
   it("delegates section openers to template edit options", () => {

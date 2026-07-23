@@ -210,6 +210,94 @@
   animation: destination-crystal-spark 380ms ease-out;
 }
 
+/* Soft destination name on the crystal — estate whisper, not a file menu */
+.destination-gallery-crystal__whisper {
+  position: absolute;
+  left: 50%;
+  bottom: 4%;
+  transform: translateX(-50%);
+  z-index: 2;
+  max-width: 96%;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.4rem;
+  background: rgba(18, 14, 10, 0.42);
+  color: #f7f0e4;
+  font-family: "Cormorant Garamond", "Palatino Linotype", Palatino, serif;
+  font-size: clamp(0.7rem, 1.15vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.destination-gallery-crystal[data-crystal-state="needs_connection"] .destination-gallery-crystal__glow {
+  opacity: 0.55;
+  background: radial-gradient(
+    ellipse at 50% 35%,
+    rgba(255, 214, 140, 0.35) 0%,
+    rgba(230, 170, 80, 0.12) 42%,
+    transparent 70%
+  );
+}
+
+.destination-gallery-crystal[data-crystal-state="temporarily_unavailable"] {
+  opacity: 0.55;
+  filter: grayscale(0.25);
+}
+
+.destination-gallery-crystal[data-crystal-state="processing"] .destination-gallery-crystal__glow {
+  opacity: 1;
+  animation: destination-crystal-activate 900ms ease-in-out infinite;
+}
+
+.destination-gallery-crystal[data-crystal-state="completed"] .destination-gallery-crystal__glow {
+  opacity: 1;
+  background: radial-gradient(
+    ellipse at 50% 35%,
+    rgba(190, 255, 210, 0.35) 0%,
+    rgba(120, 200, 150, 0.12) 42%,
+    transparent 70%
+  );
+  box-shadow:
+    0 0 18px rgba(170, 230, 190, 0.35),
+    0 0 36px rgba(120, 200, 150, 0.2);
+}
+
+.destination-gallery-crystal[data-crystal-state="failed"] .destination-gallery-crystal__glow {
+  opacity: 1;
+  background: radial-gradient(
+    ellipse at 50% 35%,
+    rgba(255, 190, 180, 0.32) 0%,
+    rgba(210, 110, 100, 0.12) 42%,
+    transparent 70%
+  );
+}
+
+.destination-gallery-status-whisper {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  z-index: 30;
+  transform: translateX(-50%);
+  max-width: min(28rem, 88%);
+  margin: 0;
+  padding: 0.65rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(232, 220, 200, 0.28);
+  background: rgba(28, 22, 16, 0.78);
+  color: #f7f0e4;
+  font-family: "Cormorant Garamond", "Palatino Linotype", Palatino, serif;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  text-align: center;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
 @keyframes destination-crystal-shimmer {
   0% {
     transform: translateX(-35%);
@@ -289,6 +377,25 @@
   padding: 1.5rem;
   background: rgba(16, 12, 10, 0.35);
   backdrop-filter: blur(6px);
+}
+
+/* Keep crystals visible — whisper docks over the gallery, not a full takeover */
+.destination-gallery-prepared--over-crystals {
+  inset: auto 0 0 0;
+  align-items: flex-end;
+  padding: 0 1.25rem 4.5rem;
+  background: linear-gradient(
+    to top,
+    rgba(12, 9, 7, 0.72) 0%,
+    rgba(12, 9, 7, 0.28) 55%,
+    transparent 100%
+  );
+  backdrop-filter: none;
+  pointer-events: none;
+}
+
+.destination-gallery-prepared--over-crystals .destination-gallery-prepared__whisper {
+  pointer-events: auto;
 }
 
 .destination-gallery-prepared__whisper {

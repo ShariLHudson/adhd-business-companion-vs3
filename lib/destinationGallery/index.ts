@@ -9,3 +9,5 @@ export * from "./crystalConnectionMapping";
 export * from "./crystalLayout";
 export * from "./destinationRegistry";
 export * from "./resolveCrystalLaunch";
+export * from "./artifactDestinationCrystals";
+export * from "./executeCrystalDestination";

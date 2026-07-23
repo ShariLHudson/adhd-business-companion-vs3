@@ -6,14 +6,15 @@ import {
 } from "./googleWorkspace";
 
 describe("googleWorkspace", () => {
-  it("recommends sheets for calendars and forms for questionnaires", () => {
+  it("recommends docs for content calendars, forms for questionnaires, sheets only for true spreadsheets", () => {
     expect(recommendGoogleExport("Content Calendar", "Week 1 | Post")).toBe(
-      "sheet",
+      "doc",
     );
     expect(recommendGoogleExport("Client Intake Form", "Question 1")).toBe(
       "form",
     );
     expect(recommendGoogleExport("SOP", "Step 1")).toBe("doc");
+    expect(recommendGoogleExport("Spreadsheet", "a,b,c")).toBe("sheet");
   });
 
   it("builds embed session from create-doc url", () => {
