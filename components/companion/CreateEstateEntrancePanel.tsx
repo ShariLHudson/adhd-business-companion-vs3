@@ -7,6 +7,7 @@ import { CreateFindPreviousWorkPanel } from "@/components/companion/CreateFindPr
 import { CreateWorkspaceResumeList } from "@/components/companion/CreateWorkspaceResumeList";
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import {
+  CREATE_ESTATE_AMBIGUITY_CANCEL,
   CREATE_ESTATE_BROWSE_MORE_HEADING,
   CREATE_ESTATE_BROWSE_MORE_HINT,
   CREATE_ESTATE_BROWSE_MORE_LABEL,
@@ -20,8 +21,10 @@ import {
   CREATE_ESTATE_FIND_PREVIOUS_WORK_HINT,
   CREATE_ESTATE_HELP_ME_CHOOSE_LABEL,
   CREATE_ESTATE_NO_SEARCH_RESULTS_MESSAGE,
+  CREATE_ESTATE_OPEN_FAILED_MESSAGE,
   CREATE_ESTATE_START_CREATING_LABEL,
   CREATE_ESTATE_START_NEW_LABEL,
+  CREATE_ESTATE_START_NEW_READY_MESSAGE,
   CREATE_ESTATE_WHAT_WOULD_YOU_LIKE_HEADING,
   CREATE_ESTATE_WINDOW_TITLE,
 } from "@/lib/createEstate/copy";
@@ -43,6 +46,14 @@ import {
   switchCreateBeginConfirmType,
   type CreateBeginOutcome,
 } from "@/lib/createEstate/resolveCreateBeginOutcome";
+import {
+  resolveGuidedBeginOpen,
+  type GuidedBeginOpenOutcome,
+} from "@/lib/createEstate/createBeginOpenArbitration";
+import {
+  armForceNewCreateSession,
+  clearForceNewCreateSession,
+} from "@/lib/createEstate/forceNewCreateSession";
 import { SPARK_CREATE_MORE_WAYS_MAX_DECISION_LAYERS } from "@/lib/sparkCreateIntentConstitution/types";
 import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
 import { findCatalogItem } from "@/lib/createCatalog";
@@ -54,23 +65,19 @@ import {
   resolveCreateExitDestination,
 } from "@/lib/createGuidedConversation189";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
-import { EVENT_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema";
-import { BUSINESS_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/businessPlanMap";
-import { MARKETING_PLAN_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/marketingPlanMap";
-import { FACEBOOK_COMMUNITY_WORK_TYPE_ID } from "@/lib/workTypeSchema/schemas/facebookCommunityMap";
-import { launchFromCreate } from "@/lib/universalWorkEngine";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
+import { tryDirectNavigationInterrupt } from "@/lib/conversationRouter/tryDirectNavigationInterrupt";
 
 type Props = {
   onBack: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
   /**
    * P0 — Begin must open workspace or show clarify.
-   * Parent executes the open path; panel always shows feedback.
+   * Parent executes the open path; return false when mount fails.
    */
   onBeginCreate: (
     outcome: Extract<CreateBeginOutcome, { kind: "open" }>,
-  ) => void | Promise<void>;
+  ) => boolean | void | Promise<boolean | void>;
   /** Optional browse — catalog type opens workflow. */
   onSelectCreationType: (item: CreateCatalogItem) => void;
   /** Resume an active Creation Workspace — may return verified ok flag (074). */
@@ -81,6 +88,15 @@ type Props = {
    * Explicit force-new — new Workspace ID; does not resume or duplicate current work.
    */
   onStartSomethingNew: () => void | Promise<void>;
+  /**
+   * Direct Estate navigation interrupt — runs before Create intent classification.
+   * Return true when navigation was handled (composer must not append the phrase).
+   */
+  onDirectNavigationInterrupt?: (input: {
+    userText: string;
+    destinationId: string;
+    label: string;
+  }) => boolean | void | Promise<boolean | void>;
   onOpenSavedDraft: (id: string) => void;
   onRenameDraft: (id: string, title: string) => void;
   /** Spec 129 — rename active Work; syncs registry + durable store. */
@@ -110,6 +126,7 @@ export function CreateEstateEntrancePanel({
   onSelectCreationType: _onSelectCreationType,
   onResumeCreationWorkspace,
   onStartSomethingNew,
+  onDirectNavigationInterrupt,
   onOpenSavedDraft,
   onRenameDraft,
   onRenameWorkspace,
@@ -131,6 +148,10 @@ export function CreateEstateEntrancePanel({
   const [pendingConfirm, setPendingConfirm] = useState<Extract<
     CreateBeginOutcome,
     { kind: "confirm" }
+  > | null>(null);
+  const [pendingAnywhereClarify, setPendingAnywhereClarify] = useState<Extract<
+    GuidedBeginOpenOutcome,
+    { kind: "clarify" }
   > | null>(null);
   const [helpMeChooseOpen, setHelpMeChooseOpen] = useState(false);
   const [findPreviousWorkOpen, setFindPreviousWorkOpen] = useState(false);
@@ -250,33 +271,67 @@ export function CreateEstateEntrancePanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional mount-only
   }, []);
 
-  function openConfirmed(outcome: Extract<CreateBeginOutcome, { kind: "open" }>) {
-    // Guided UWE types — Event, Marketing Plan, Business Plan, Facebook Community
-    // resolve through Anywhere-Origin before Estate open (clarify when needed).
-    if (
-      outcome.isEventDomain ||
-      outcome.isMarketingPlanDomain ||
-      outcome.isBusinessPlanDomain ||
-      outcome.isFacebookCommunityDomain
-    ) {
-      const candidateWorkTypeId = outcome.isFacebookCommunityDomain
-        ? FACEBOOK_COMMUNITY_WORK_TYPE_ID
-        : outcome.isMarketingPlanDomain
-          ? MARKETING_PLAN_WORK_TYPE_ID
-          : outcome.isBusinessPlanDomain
-            ? BUSINESS_PLAN_WORK_TYPE_ID
-            : EVENT_PLAN_WORK_TYPE_ID;
-      const anywhere = launchFromCreate({
-        originalUserMessage: outcome.text,
-        candidateWorkTypeId,
-      });
-      if (anywhere.decision === "clarify") {
-        setBeginFeedback(anywhere.reply);
-        setBeginFeedbackKind("clarify");
-        setPendingConfirm(null);
-        setBeginBusy(false);
-        return;
-      }
+  function resumeWorkId(workId: string, artifactType: string): boolean {
+    const result = onResumeCreationWorkspace({
+      id: workId,
+      title: artifactType,
+      kindLabel: artifactType,
+      phaseLabel: "In progress",
+      updatedAt: new Date().toISOString(),
+      eventRecordId: workId,
+      creationRecordId: workId,
+      projectHomeId: null,
+      nextAction: "Continue",
+    });
+    if (result && typeof result === "object" && "ok" in result) {
+      return Boolean(result.ok);
+    }
+    return true;
+  }
+
+  function openConfirmed(
+    outcome: Extract<CreateBeginOutcome, { kind: "open" }>,
+    opts?: { forceNewArmed?: boolean },
+  ) {
+    setPendingAnywhereClarify(null);
+
+    const guided = resolveGuidedBeginOpen({
+      outcome,
+      forceNewArmed: opts?.forceNewArmed,
+    });
+
+    if (guided.kind === "clarify") {
+      setPendingAnywhereClarify(guided);
+      setBeginFeedback(guided.reply);
+      setBeginFeedbackKind("clarify");
+      setPendingConfirm(null);
+      setBeginBusy(false);
+      return;
+    }
+
+    if (guided.kind === "continue_existing") {
+      void (async () => {
+        try {
+          setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
+          setBeginFeedbackKind("progress");
+          const ok = resumeWorkId(guided.workId, outcome.artifactType);
+          if (!ok) {
+            setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
+            setBeginFeedbackKind("error");
+            return;
+          }
+          clearForceNewCreateSession();
+          setBeginFeedback(null);
+          setBeginFeedbackKind(null);
+          setPendingConfirm(null);
+        } catch {
+          setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
+          setBeginFeedbackKind("error");
+        } finally {
+          setBeginBusy(false);
+        }
+      })();
+      return;
     }
 
     void (async () => {
@@ -284,14 +339,19 @@ export function CreateEstateEntrancePanel({
         // Progress only — do not claim durable "saved" before persist ack.
         setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
         setBeginFeedbackKind("progress");
-        await Promise.resolve(onBeginCreate(outcome));
+        const opened = await Promise.resolve(onBeginCreate(outcome));
+        if (opened === false) {
+          setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
+          setBeginFeedbackKind("error");
+          return;
+        }
+        clearForceNewCreateSession();
         setBeginFeedback(null);
         setBeginFeedbackKind(null);
         setPendingConfirm(null);
+        setPendingAnywhereClarify(null);
       } catch {
-        setBeginFeedback(
-          "I couldn't open that creation yet. Your words are still here — Retry, or tell me a little more above.",
-        );
+        setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
         setBeginFeedbackKind("error");
       } finally {
         setBeginBusy(false);
@@ -299,7 +359,83 @@ export function CreateEstateEntrancePanel({
     })();
   }
 
+  function acceptAnywhereContinue() {
+    if (!pendingAnywhereClarify?.resolution.workId) return;
+    setBeginBusy(true);
+    const workId = pendingAnywhereClarify.resolution.workId;
+    const artifactType = pendingAnywhereClarify.outcome.artifactType;
+    setPendingAnywhereClarify(null);
+    void (async () => {
+      try {
+        setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
+        setBeginFeedbackKind("progress");
+        const ok = resumeWorkId(workId, artifactType);
+        if (!ok) {
+          setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
+          setBeginFeedbackKind("error");
+          return;
+        }
+        clearForceNewCreateSession();
+        setBeginFeedback(null);
+        setBeginFeedbackKind(null);
+      } catch {
+        setBeginFeedback(CREATE_ESTATE_OPEN_FAILED_MESSAGE);
+        setBeginFeedbackKind("error");
+      } finally {
+        setBeginBusy(false);
+      }
+    })();
+  }
+
+  function acceptAnywhereStartNew() {
+    if (!pendingAnywhereClarify) return;
+    const outcome = pendingAnywhereClarify.outcome;
+    armForceNewCreateSession();
+    setPendingAnywhereClarify(null);
+    setBeginBusy(true);
+    openConfirmed(outcome, { forceNewArmed: true });
+  }
+
+  function cancelAnywhereClarify() {
+    setPendingAnywhereClarify(null);
+    setBeginFeedback(null);
+    setBeginFeedbackKind(null);
+  }
+
   function submitPrompt() {
+    // Direct Estate navigation outranks Create intent — never append as content.
+    const navInterrupt = tryDirectNavigationInterrupt(prompt);
+    if (navInterrupt.interrupted && onDirectNavigationInterrupt) {
+      const navText = navInterrupt.userText;
+      setPrompt("");
+      setPendingConfirm(null);
+      setPendingAnywhereClarify(null);
+      setBeginFeedback(null);
+      setBeginFeedbackKind(null);
+      setBeginBusy(true);
+      setBeginFeedback("Taking you there…");
+      setBeginFeedbackKind("progress");
+      void Promise.resolve(
+        onDirectNavigationInterrupt({
+          userText: navText,
+          destinationId: navInterrupt.destinationId,
+          label: navInterrupt.label,
+        }),
+      ).then((handled) => {
+        if (handled === false) {
+          setBeginBusy(false);
+          setBeginFeedback(null);
+          setBeginFeedbackKind(null);
+          setPrompt(navText);
+          return;
+        }
+        setBeginBusy(false);
+        setBeginFeedback(null);
+        setBeginFeedbackKind(null);
+      });
+      return;
+    }
+
     // P0 — every Start Creating click produces visible feedback (never silent)
     setBeginBusy(true);
     setBeginFeedback(CREATE_BEGIN_PROGRESS_MESSAGE);
@@ -361,6 +497,7 @@ export function CreateEstateEntrancePanel({
       setBeginFeedback(null);
       setBeginFeedbackKind(null);
       setPendingConfirm(null);
+      setPendingAnywhereClarify(null);
     }
   }
 
@@ -563,7 +700,14 @@ export function CreateEstateEntrancePanel({
                     setStartNewBusy(true);
                     void (async () => {
                       try {
+                        armForceNewCreateSession();
+                        setPrompt("");
+                        setPendingConfirm(null);
+                        setPendingAnywhereClarify(null);
                         await Promise.resolve(onStartSomethingNew());
+                        // Establish usable new-create state — not input-clear only.
+                        setBeginFeedback(CREATE_ESTATE_START_NEW_READY_MESSAGE);
+                        setBeginFeedbackKind("clarify");
                       } finally {
                         setStartNewBusy(false);
                       }
@@ -606,6 +750,66 @@ export function CreateEstateEntrancePanel({
                 data-begin-feedback={beginFeedbackKind ?? "none"}
               >
                 <p>{beginFeedback}</p>
+                {beginFeedbackKind === "clarify" && pendingAnywhereClarify ? (
+                  <div
+                    className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap"
+                    data-testid="create-estate-anywhere-clarify"
+                    role="group"
+                    aria-label="Continue existing or start new"
+                  >
+                    {pendingAnywhereClarify.resolution.workId ? (
+                      <button
+                        type="button"
+                        disabled={beginBusy}
+                        className="rounded-xl bg-[#3d3429] px-5 py-2.5 text-sm font-semibold text-[#f7f2ea] transition hover:bg-[#2c241c] disabled:opacity-70"
+                        data-testid="create-estate-ambiguity-continue"
+                        data-primary-action="continue"
+                        onClick={acceptAnywhereContinue}
+                      >
+                        {pendingAnywhereClarify.continueLabel}
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="rounded-xl border border-[#cfc6b8] bg-white px-5 py-2.5 text-sm font-semibold text-[#3d3429] transition hover:bg-[#f3ebe0] disabled:opacity-70"
+                      data-testid="create-estate-ambiguity-start-new"
+                      data-primary-action="begin"
+                      onClick={acceptAnywhereStartNew}
+                    >
+                      {pendingAnywhereClarify.startNewLabel}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="rounded-xl px-5 py-2.5 text-sm font-semibold text-[#6b635a] transition hover:underline disabled:opacity-70"
+                      data-testid="create-estate-ambiguity-cancel"
+                      onClick={cancelAnywhereClarify}
+                    >
+                      {CREATE_ESTATE_AMBIGUITY_CANCEL}
+                    </button>
+                  </div>
+                ) : null}
+                {beginFeedbackKind === "error" ? (
+                  <div className="mt-3">
+                    <button
+                      type="button"
+                      disabled={beginBusy}
+                      className="rounded-xl bg-[#3d3429] px-5 py-2.5 text-sm font-semibold text-[#f7f2ea] transition hover:bg-[#2c241c] disabled:opacity-70"
+                      data-testid="create-estate-begin-retry"
+                      data-primary-action="begin"
+                      onClick={() => {
+                        if (pendingConfirm) {
+                          acceptConfirm();
+                          return;
+                        }
+                        if (!beginBusy) submitPrompt();
+                      }}
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : null}
                 {beginFeedbackKind === "confirm" && pendingConfirm ? (
                   <div
                     className="mt-3 flex flex-col gap-2"

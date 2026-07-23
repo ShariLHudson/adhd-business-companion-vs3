@@ -29,6 +29,10 @@ export {
 } from "./routingTypes";
 
 export { routeConversationTurn } from "./routeConversationTurn";
+export {
+  tryDirectNavigationInterrupt,
+  type DirectNavigationInterrupt,
+} from "./tryDirectNavigationInterrupt";
 export { classifyTurnIntent } from "./classifyTurnIntent";
 export {
   isWelcomeHomeNavigation,

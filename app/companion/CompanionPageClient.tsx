@@ -1300,6 +1300,11 @@ import {
   validateResponseEnvelope,
   type ChatRequestIdentity,
 } from "@/lib/conversationRouter";
+import { maybeDelayChatResponseForDev } from "@/lib/chatScope/devChatResponseDelay";
+import {
+  directNavigationTransitionLine,
+  isDirectNavigationPriorityTurn,
+} from "@/lib/chatScope/directNavigationPriority";
 import {
   logPrimaryTurnClassification,
   recordPrimaryTurnFinalResponse,
@@ -1668,7 +1673,10 @@ import {
   workspaceOfferReplyLine,
   type EstateCommandDecision,
 } from "@/lib/estateIntelligence";
-import { estateNavigateCommandForPlace } from "@/lib/estateIntelligence/estateCommandRouter";
+import {
+  detectDirectCommand,
+  estateNavigateCommandForPlace,
+} from "@/lib/estateIntelligence/estateCommandRouter";
 import {
   pickWanderDestination,
   recordWanderTransition,
@@ -13701,7 +13709,11 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (!chamberMemberConversationLocked && frictionlessAction.immediateEstatePlaceNavigate) {
+    if (
+      (!chamberMemberConversationLocked ||
+        isDirectNavigationPriorityTurn(trimmed)) &&
+      frictionlessAction.immediateEstatePlaceNavigate
+    ) {
       const payload = frictionlessAction.immediateEstatePlaceNavigate;
       const command = estateNavigateCommandForPlace(
         payload.placeId,
@@ -14077,6 +14089,38 @@ export default function CompanionPageClient() {
     const continuityGate = routedTurn.continuityGate;
     const routedRequestIdentity: ChatRequestIdentity | null =
       routedTurn.requestIdentity;
+
+    /** Authoritative navigate effects — execute before frictionless / Chamber locks. */
+    const navigateEffect = routedTurn.effects.find(
+      (effect) => effect.type === "navigate",
+    );
+    if (navigateEffect && navigateEffect.type === "navigate") {
+      const command =
+        detectDirectCommand(trimmed) ??
+        estateNavigateCommandForPlace(navigateEffect.destinationId, trimmed);
+      if (command) {
+        chatRequestGenerationRef.current += 1;
+        supersedeInFlightChatRequest(chatRequestAbortRef.current);
+        chatRequestAbortRef.current = null;
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (!getPrefs().hasChatted) {
+          savePrefs({ hasChatted: true });
+          setHasChatted(true);
+        }
+        const navLine = directNavigationTransitionLine(
+          navigateEffect.label ?? command.entry?.name ?? null,
+        );
+        runDirectEstateRoomNavigation(command, trimmed, navLine);
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
 
     if (continuityGate.action === "clear_owner_continue") {
       if (continuityGate.clearUniversalCreation) {
@@ -19704,6 +19748,9 @@ export default function CompanionPageClient() {
         { signal: requestAbort.signal },
       );
 
+      /** Founder-cert delay seam — discard if superseded while waiting. */
+      await maybeDelayChatResponseForDev();
+
       if (isStaleSend()) {
         return;
       }
@@ -20698,6 +20745,10 @@ export default function CompanionPageClient() {
     navigationLine?: string,
     opts?: { skipAssistantMessage?: boolean },
   ) {
+    /**
+     * Direct navigation outranks Chamber continuity. Suspend the member scope
+     * (preserve history) instead of silently ignoring the navigate command.
+     */
     if (
       isChamberMemberConversationActive({
         activeSection: activeSectionRef.current,
@@ -20705,7 +20756,12 @@ export default function CompanionPageClient() {
       }) &&
       command.section !== "chamber-of-momentum"
     ) {
-      return;
+      dismissActiveChamberConversationCore({
+        force: true,
+        destinationId: command.roomId ?? command.entryId ?? command.section,
+        previousSection: activeSectionRef.current,
+        nextSection: command.section,
+      });
     }
     setStressReliefOffer(null);
     clearOfferStateOnly();
@@ -22872,7 +22928,7 @@ export default function CompanionPageClient() {
       items.push({
         id: "playbook",
         objectId: "strategies",
-        label: "Strategies",
+        label: "Strategy Chamber",
         detail: "Browse open",
         onOpen: () => {
           setActiveSection("home");
@@ -25527,6 +25583,28 @@ export default function CompanionPageClient() {
             <CreateEstateEntrancePanel
               onBack={goBack}
               registerBack={registerBack}
+              onDirectNavigationInterrupt={({
+                userText,
+                destinationId,
+                label,
+              }) => {
+                chatRequestGenerationRef.current += 1;
+                supersedeInFlightChatRequest(chatRequestAbortRef.current);
+                chatRequestAbortRef.current = null;
+                endVisibleThinking();
+                setIsLoading(false);
+                const command =
+                  detectDirectCommand(userText) ??
+                  estateNavigateCommandForPlace(destinationId, userText);
+                if (!command) return false;
+                // Leave Create entrance without deleting library drafts.
+                runDirectEstateRoomNavigation(
+                  command,
+                  userText,
+                  directNavigationTransitionLine(label),
+                );
+                return true;
+              }}
               onBeginCreate={(outcome) => {
                 // Never call Estate open without artifactType
                 createOpenTraceRef.current = nextCreateOpenTraceId(

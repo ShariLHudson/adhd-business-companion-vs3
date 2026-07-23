@@ -22,7 +22,7 @@
 | Source | Handler | Uses arbiter | Status |
 |--------|---------|--------------|--------|
 | Talk It Out panel | TIO → `/api/companion-chat` | **No** | Approved exception — isolated CIE; hard-nav *into* TIO still via `handleSend` |
-| Create Estate Begin / Start Creating | `resolveCreateBeginOutcome` | **No** | Approved exception — Create begin contract (130/131); chat nav still via companion when chat is used |
+| Create Estate Begin / Start Creating | `tryDirectNavigationInterrupt` → else `resolveCreateBeginOutcome` | **Nav yes / Begin no** | Direct Estate navigation interrupts before Create intent; Begin/confirm path remains Create contract (130/131) |
 | Create draft review | `/api/create-draft-review` | **No** | Approved exception — review surface |
 | Boardroom UI forms | Boardroom panel | **No** | Approved exception — destination UI; Past Discussions resume is deliberate |
 | Project-brain next-action | `/api/project-brain` | **No** | Not conversational chat |

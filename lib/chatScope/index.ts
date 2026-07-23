@@ -30,6 +30,11 @@ export {
 } from "./staleResponseGuard";
 
 export {
+  maybeDelayChatResponseForDev,
+  readDevChatResponseDelayMs,
+} from "./devChatResponseDelay";
+
+export {
   directNavigationTransitionLine,
   isDirectNavigationPriorityTurn,
 } from "./directNavigationPriority";
