@@ -96,7 +96,9 @@ export type StrategyWorkItem = {
   strategyFamily?: StrategyFamilyId | null;
   strategyType?: string | null;
   currentStage: StrategyThinkingStage;
+  /** Central strategic question — not the same as current situation. */
   decisionStatement?: string;
+  /** Present-tense situation context — never auto-copied from the question. */
   currentReality?: string;
   knownFacts?: string[];
   observations?: string[];
@@ -123,6 +125,18 @@ export type StrategyWorkItem = {
   sourceContext?: string;
   sourceDestination?: string;
   createdBy?: "member" | "companion" | "migration";
+  /** Active guided question shown to the member */
+  activeQuestion?: string;
+  /** Latest Shari reflection shown above the question */
+  shariReflection?: string;
+  /** Conversational answers after the opening question (member language) */
+  memberStatements?: string[];
+  /** Draft text in the response field — preserved across remounts */
+  draftResponse?: string;
+  /** Member confirmed the generated Decision Record */
+  decisionRecordConfirmed?: boolean;
+  /** Options were offered in conversation (not typed into a blank field) */
+  optionsOffered?: boolean;
   version: number;
   /** Link to legacy catalog / user strategy when applicable */
   linkedCatalogStrategyId?: string | null;

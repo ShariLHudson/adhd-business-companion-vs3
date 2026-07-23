@@ -16,9 +16,9 @@ import {
   buildProjectHandoff,
   buildStrategyDecisionRecord,
   createStrategyWorkItem,
-  DECISION_RECORD_OPTIONAL_LIST_KEYS,
   decisionRecordSectionHasContent,
   getResumableStrategyWorkItem,
+  getStrategyWorkItem,
   listResumableStrategyWorkItems,
   listStrategyConnections,
   listStrategyWorkItems,
@@ -135,6 +135,8 @@ describe("Strategy Chamber foundation", () => {
   it("builds decision record and hides empty optional lists", () => {
     const item = createStrategyWorkItem({ entryReason: "important_decision" });
     const updated = updateStrategyWorkItem(item.id, {
+      decisionStatement: "Which offer deserves focus?",
+      currentReality: "Capacity is stretched across three offers",
       chosenDirection: "Focus on one offer this quarter",
       decisionRationale: "Capacity is limited",
       notChosen: ["Launch three offers at once"],
@@ -146,9 +148,12 @@ describe("Strategy Chamber foundation", () => {
     const record = buildStrategyDecisionRecord(updated);
     expect(record.directionYouChose).toMatch(/one offer/i);
     expect(record.whatYouAreNotChoosing).toMatch(/three offers/i);
-    for (const key of DECISION_RECORD_OPTIONAL_LIST_KEYS) {
-      expect(decisionRecordSectionHasContent(key, record)).toBe(true);
-    }
+    expect(record.whatIsHappeningNow).toMatch(/Capacity/i);
+    expect(record.whatIsHappeningNow).not.toBe(record.whatYouWereDeciding);
+    expect(decisionRecordSectionHasContent("assumptionsToTest", record)).toBe(
+      true,
+    );
+    expect(decisionRecordSectionHasContent("risksToWatch", record)).toBe(true);
 
     const empty = buildStrategyDecisionRecord(
       createStrategyWorkItem({ entryReason: "need_direction" }),
@@ -156,10 +161,26 @@ describe("Strategy Chamber foundation", () => {
     expect(decisionRecordSectionHasContent("assumptionsToTest", empty)).toBe(
       false,
     );
+    expect(decisionRecordSectionHasContent("whatIsHappeningNow", empty)).toBe(
+      false,
+    );
 
     const journey = buildContinueYourJourney(updated);
     expect(journey.recommended).toBeTruthy();
     expect(journey.secondary.length).toBeLessThanOrEqual(2);
+  });
+
+  it("does not copy the strategic question into what is happening now", () => {
+    const item = createStrategyWorkItem({ entryReason: "important_decision" });
+    updateStrategyWorkItem(item.id, {
+      decisionStatement: "Should I raise the price of my membership?",
+    });
+    const record = buildStrategyDecisionRecord(getStrategyWorkItem(item.id)!);
+    expect(record.whatYouWereDeciding).toMatch(/raise the price/i);
+    expect(record.whatIsHappeningNow).toBe("");
+    expect(
+      decisionRecordSectionHasContent("whatIsHappeningNow", record),
+    ).toBe(false);
   });
 
   it("requires approval before destination mutation helpers", () => {

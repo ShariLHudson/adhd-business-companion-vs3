@@ -87,27 +87,28 @@ import { StrategyExecutionConnections } from "@/components/companion/StrategyExe
 import { StrategyGuidedCreatePanel } from "@/components/companion/StrategyGuidedCreatePanel";
 import { ContinueYourJourney } from "@/components/companion/ContinueYourJourney";
 import { StrategyDecisionRecord } from "@/components/companion/StrategyDecisionRecord";
+import { StrategyChamberConversation } from "@/components/companion/StrategyChamberConversation";
 import { resolveAdaptivePresentation } from "@/lib/adaptiveCompanionIntelligence";
 import {
   applyGuidedJourneyAnswer,
   buildContinueYourJourney,
+  buildShariReflection,
   buildStrategyDecisionRecord,
   buildStrategyResumeSummary,
+  buildNextGuidedQuestion,
   createStrategyWorkItem,
   decisionRecordIsReady,
   executeApprovedStrategyHandoff,
   getResumableStrategyWorkItem,
   getStrategyWorkItem,
-  guidedJourneyIsComplete,
-  guidedPromptForWorkItem,
   listResumableStrategyWorkItems,
   pauseStrategyWorkItem,
   resumeStrategyWorkItem,
-  skipGuidedJourneyStage,
   STRATEGY_HANDOFF_LIVE_DESTINATIONS,
   updateStrategyWorkItem,
   type ContinueJourneyDestinationId,
   type StrategyEntryReason,
+  type StrategyWorkItem,
 } from "@/lib/strategyChamber";
 
 type View =
@@ -410,14 +411,7 @@ export function StrategiesPanel({
       goToView({ v: "strategy", stratId: strategyApplySession.strategyId });
       return;
     }
-    if (item.decisionStatement?.trim() || item.currentReality?.trim()) {
-      if (decisionRecordIsReady(item)) {
-        goToView({ v: "recommended" });
-        return;
-      }
-      goToView({ v: "chamber-entry", workItemId: item.id });
-      return;
-    }
+    // Conversation-first: always return to guided dialogue, not a form/record wall
     goToView({ v: "chamber-entry", workItemId: item.id });
   }
 
@@ -426,17 +420,30 @@ export function StrategiesPanel({
     if (!trimmed) return;
     const item = getStrategyWorkItem(workItemId);
     if (!item) return;
-    const wasBlank = !(
-      item.currentReality?.trim() || item.decisionStatement?.trim()
-    );
+    const wasOpening = !item.decisionStatement?.trim();
     const patch = applyGuidedJourneyAnswer(item, trimmed);
     updateStrategyWorkItem(workItemId, patch);
     setWorkTick((n) => n + 1);
-    if (wasBlank && item.entryReason === "unsure" && onAsk) {
+    if (wasOpening && item.entryReason === "unsure" && onAsk) {
       onAsk(
         `I'm in the Strategy Chamber. Here's what I'm working with: ${trimmed}. Help me choose the best place to begin.`,
       );
     }
+  }
+
+  function patchChamberWork(
+    workItemId: string,
+    patch: Partial<StrategyWorkItem>,
+  ) {
+    const item = getStrategyWorkItem(workItemId);
+    if (!item) return;
+    const merged = { ...item, ...patch };
+    updateStrategyWorkItem(workItemId, {
+      ...patch,
+      shariReflection: patch.shariReflection ?? buildShariReflection(merged),
+      activeQuestion: patch.activeQuestion ?? buildNextGuidedQuestion(merged),
+    });
+    setWorkTick((n) => n + 1);
   }
 
   function handleStrategyJourneySelect(
@@ -485,7 +492,7 @@ export function StrategiesPanel({
     }
   }, [openCommand?.key]);
 
-  // ---- Strategy Chamber guided journey (one question at a time) ----------
+  // ---- Strategy Chamber conversation-first guidance --------------------
   if (view.v === "chamber-entry") {
     const work = getStrategyWorkItem(view.workItemId);
     if (!work) {
@@ -495,9 +502,6 @@ export function StrategiesPanel({
     const presentation = resolveAdaptivePresentation({
       destinationHint: "strategy_chamber",
     });
-    const prompt = guidedPromptForWorkItem(work, presentation);
-    const complete = guidedJourneyIsComplete(work) || decisionRecordIsReady(work);
-    const resumeSummary = buildStrategyResumeSummary(work, presentation);
     const shellClass = estate
       ? "companion-fade-in flex min-h-0 w-full flex-col overflow-y-auto pb-8"
       : workspacePanelShellClass({ width: "standard", inSplit: true });
@@ -519,103 +523,44 @@ export function StrategiesPanel({
         <p className="mt-4 text-2xl font-semibold text-[#1f1c19]">
           {STRATEGY_LIBRARY_TITLE}
         </p>
-        {(work.decisionStatement || work.currentReality) &&
-        presentation.resumeDepth !== "brief" ? (
-          <p
-            className="mt-3 whitespace-pre-line rounded-xl border border-[#e7dfd4] bg-[#faf8f5] px-3 py-2 text-sm leading-relaxed text-[#4b463f]"
-            data-testid="strategy-chamber-resume-summary"
-          >
-            {resumeSummary}
-          </p>
-        ) : null}
-        {!complete ? (
-          <>
-            <p className="mt-4 text-xl font-semibold leading-snug text-[#1f1c19]">
-              {prompt.question}
-            </p>
-            {prompt.whyItMatters ? (
-              <p className="mt-2 text-sm text-[#6b635a]">{prompt.whyItMatters}</p>
-            ) : (
-              <p className="mt-2 text-sm text-[#6b635a]">
-                {presentation.oneQuestionAtATime
-                  ? "One question at a time. You can pause anytime — your work stays here."
-                  : "Answer what feels useful. You can pause anytime — your work stays here."}
-              </p>
-            )}
-            {prompt.exampleHint ? (
-              <p className="mt-1 text-sm italic text-[#6b635a]">{prompt.exampleHint}</p>
-            ) : null}
-            {presentation.showProgress ? (
-              <p
-                className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#1e4f4f]"
-                data-testid="strategy-chamber-stage-progress"
-              >
-                {prompt.stage.replace(/_/g, " ")}
-              </p>
-            ) : null}
-            <ChamberEntryAnswerForm
-              key={`${work.id}-${work.currentStage}-${work.version}-${workTick}`}
-              initialValue=""
-              onSave={(answer) => {
-                saveChamberEntryAnswer(work.id, answer);
-              }}
-              onPause={() => {
-                pauseStrategyWorkItem(work.id);
-                setWorkTick((n) => n + 1);
-                goToView({ v: "home" });
-              }}
-              onSkip={() => {
-                const patch = skipGuidedJourneyStage(work);
-                if (Object.keys(patch).length > 0) {
-                  updateStrategyWorkItem(work.id, patch);
-                  setWorkTick((n) => n + 1);
-                }
-              }}
-              onContinue={() => {
-                // Stay in chamber-entry — next question remounts via workTick
-                setWorkTick((n) => n + 1);
-              }}
-            />
-          </>
-        ) : (
-          <p className="mt-4 text-base leading-relaxed text-[#4b463f]">
-            You have enough clarity to record the decision and choose one next step.
-            Nothing else changes until you approve it.
-          </p>
-        )}
-        {work.decisionStatement || work.currentReality ? (
-          <div className="mt-6 flex flex-col gap-4">
-            <StrategyDecisionRecord
-              record={buildStrategyDecisionRecord(
+        <p className="mt-1 text-base text-[#4b463f]">
+          Talk it through with Shari — one question at a time.
+        </p>
+        <StrategyChamberConversation
+          key={`${work.id}-${work.version}-${workTick}`}
+          work={getStrategyWorkItem(work.id) ?? work}
+          presentation={presentation}
+          onAnswer={(answer) => saveChamberEntryAnswer(work.id, answer)}
+          onPause={() => {
+            const current = getStrategyWorkItem(work.id) ?? work;
+            updateStrategyWorkItem(work.id, {
+              draftResponse: current.draftResponse,
+              status: "paused",
+            });
+            pauseStrategyWorkItem(work.id);
+            setWorkTick((n) => n + 1);
+            goToView({ v: "home" });
+          }}
+          onDraftChange={(draft) => {
+            updateStrategyWorkItem(work.id, {
+              draftResponse: draft,
+              bumpVersion: false,
+            });
+          }}
+          onPatchWork={(patch) => patchChamberWork(work.id, patch)}
+          onJourneySelect={(destinationId) =>
+            handleStrategyJourneySelect(work.id, destinationId)
+          }
+          onBrowseLibrary={() => goToView({ v: "recommended" })}
+          onAskDifferentQuestion={(question) => {
+            patchChamberWork(work.id, {
+              activeQuestion: question,
+              shariReflection: buildShariReflection(
                 getStrategyWorkItem(work.id) ?? work,
-              )}
-              summaryFirst={presentation.summaryFirst}
-            />
-            <ContinueYourJourney
-              model={buildContinueYourJourney(
-                getStrategyWorkItem(work.id) ?? work,
-                {
-                  maxSecondary: Math.min(
-                    2,
-                    Math.max(0, presentation.maxVisibleChoices - 1),
-                  ),
-                },
-              )}
-              liveDestinations={STRATEGY_HANDOFF_LIVE_DESTINATIONS}
-              onSelect={(destinationId) =>
-                handleStrategyJourneySelect(work.id, destinationId)
-              }
-            />
-            <button
-              type="button"
-              className="text-left text-sm font-semibold text-[#1e4f4f] underline"
-              data-testid="strategy-chamber-browse-library-from-journey"
-              onClick={() => goToView({ v: "recommended" })}
-            >
-              Browse the strategy library
-            </button>
-          </div>
-        ) : null}
+              ),
+            });
+          }}
+        />
       </div>
     );
   }
@@ -729,7 +674,24 @@ export function StrategiesPanel({
                       className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163d3d]"
                       data-testid="strategy-chamber-resume-continue"
                     >
-                      Continue this
+                      Continue This
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!latest) return;
+                        resumeStrategyWorkItem(latest.id);
+                        updateStrategyWorkItem(latest.id, {
+                          sourceContext: "review_thinking",
+                        });
+                        setActiveWorkItemId(latest.id);
+                        setWorkTick((n) => n + 1);
+                        goToView({ v: "chamber-entry", workItemId: latest.id });
+                      }}
+                      className="rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f]"
+                      data-testid="strategy-chamber-resume-review"
+                    >
+                      Review My Thinking
                     </button>
                     <button
                       type="button"
@@ -737,10 +699,10 @@ export function StrategiesPanel({
                         /* Keep unfinished; primary cards below start new. */
                         setBrowseAllOpen(false);
                       }}
-                      className="rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f]"
+                      className="rounded-xl border border-transparent px-4 py-2.5 text-sm font-semibold text-[#6b635a] underline"
                       data-testid="strategy-chamber-resume-start-new-hint"
                     >
-                      Or start something new below
+                      Start Something New
                     </button>
                   </div>
                   {more.length > 0 ? (
@@ -1926,69 +1888,6 @@ function LessonHeading({
     >
       {children}
     </h3>
-  );
-}
-
-function ChamberEntryAnswerForm({
-  initialValue,
-  onSave,
-  onPause,
-  onContinue,
-  onSkip,
-}: {
-  initialValue: string;
-  onSave: (answer: string) => void;
-  onPause: () => void;
-  onContinue: () => void;
-  onSkip?: () => void;
-}) {
-  const [answer, setAnswer] = useState(initialValue);
-  return (
-    <div className="mt-4 flex flex-col gap-3" data-testid="strategy-chamber-entry-form">
-      <textarea
-        value={answer}
-        onChange={(e) => setAnswer(e.target.value)}
-        rows={4}
-        placeholder="Share what feels true — even a rough sentence is enough."
-        className="w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        data-testid="strategy-chamber-entry-answer"
-      />
-      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-        <button
-          type="button"
-          className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-base font-semibold text-white hover:bg-[#163d3d] disabled:opacity-40"
-          disabled={!answer.trim()}
-          onClick={() => {
-            onSave(answer);
-            onContinue();
-          }}
-          data-testid="strategy-chamber-entry-save"
-        >
-          Save and continue
-        </button>
-        <button
-          type="button"
-          className="rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-base font-semibold text-[#1e4f4f]"
-          onClick={() => {
-            if (answer.trim()) onSave(answer);
-            onPause();
-          }}
-          data-testid="strategy-chamber-entry-pause"
-        >
-          Pause for now
-        </button>
-        {onSkip ? (
-          <button
-            type="button"
-            className="rounded-xl border border-transparent px-4 py-2.5 text-base font-semibold text-[#6b635a] underline"
-            onClick={onSkip}
-            data-testid="strategy-chamber-entry-skip"
-          >
-            Skip this for now
-          </button>
-        ) : null}
-      </div>
-    </div>
   );
 }
 

@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  DECISION_RECORD_OPTIONAL_LIST_KEYS,
-  decisionRecordSectionHasContent,
-} from "@/lib/strategyChamber/decisionRecord";
+import { decisionRecordSectionHasContent } from "@/lib/strategyChamber/decisionRecord";
 import type { StrategyDecisionRecordView } from "@/lib/strategyChamber/types";
 
 type Props = {
@@ -18,20 +15,18 @@ const SECTIONS: {
   key: keyof StrategyDecisionRecordView;
   label: string;
   list?: boolean;
-  optional?: boolean;
 }[] = [
   { key: "whatYouWereDeciding", label: "What You Were Deciding" },
   { key: "whatIsHappeningNow", label: "What Is Happening Now" },
   { key: "directionYouChose", label: "The Direction You Chose" },
   { key: "whyThisDirectionFits", label: "Why This Direction Fits" },
   { key: "whatYouAreNotChoosing", label: "What You Are Not Choosing Right Now" },
-  { key: "assumptionsToTest", label: "Assumptions to Test", list: true, optional: true },
-  { key: "risksToWatch", label: "Risks to Watch", list: true, optional: true },
+  { key: "assumptionsToTest", label: "Assumptions to Test", list: true },
+  { key: "risksToWatch", label: "Risks to Watch", list: true },
   {
     key: "howYouWillKnowItIsWorking",
     label: "How You Will Know It Is Working",
     list: true,
-    optional: true,
   },
   { key: "whenToReview", label: "When to Review It" },
   { key: "nextHelpfulStep", label: "Your Next Helpful Step" },
@@ -67,15 +62,9 @@ export function StrategyDecisionRecord({
         },
   );
 
-  const visibleSections = SECTIONS.filter((section) => {
-    if (
-      section.optional &&
-      DECISION_RECORD_OPTIONAL_LIST_KEYS.includes(section.key)
-    ) {
-      return decisionRecordSectionHasContent(section.key, record);
-    }
-    return true;
-  });
+  const visibleSections = SECTIONS.filter((section) =>
+    decisionRecordSectionHasContent(section.key, record),
+  );
 
   return (
     <article

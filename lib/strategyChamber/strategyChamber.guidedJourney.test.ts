@@ -10,6 +10,7 @@ import {
   applyGuidedJourneyAnswer,
   applyStrategyContributionReturn,
   buildStrategyResumeSummary,
+  chooseEmergingOption,
   consumePendingStrategyHandoff,
   createStrategyWorkItem,
   executeApprovedStrategyHandoff,
@@ -29,36 +30,54 @@ describe("Strategy Chamber guided journey + handoffs", () => {
     __resetAdaptiveCompanionExplicitPrefsForTests();
   });
 
-  it("advances stages through guided answers without creating duplicates", () => {
+  it("treats the first answer as the strategic question only", () => {
     const item = createStrategyWorkItem({ entryReason: "need_direction" });
-    const first = applyGuidedJourneyAnswer(item, "Too many offers, no focus");
-    updateStrategyWorkItem(item.id, first);
+    updateStrategyWorkItem(
+      item.id,
+      applyGuidedJourneyAnswer(item, "Too many offers, unclear focus"),
+    );
+    const current = getStrategyWorkItem(item.id)!;
+    expect(current.decisionStatement).toMatch(/offers/i);
+    expect(current.currentReality).toBeFalsy();
+  });
+
+  it("builds situational context from later answers and can complete a choice", () => {
+    const item = createStrategyWorkItem({ entryReason: "need_direction" });
+    updateStrategyWorkItem(
+      item.id,
+      applyGuidedJourneyAnswer(item, "Where should marketing focus?"),
+    );
     let current = getStrategyWorkItem(item.id)!;
-    expect(current.currentReality).toMatch(/offers/i);
-
-    const second = applyGuidedJourneyAnswer(
-      current,
-      "Know which offer to grow",
+    updateStrategyWorkItem(
+      item.id,
+      applyGuidedJourneyAnswer(
+        current,
+        "I am stretched across three offers and none feel finished.",
+      ),
     );
-    updateStrategyWorkItem(item.id, second);
     current = getStrategyWorkItem(item.id)!;
-    expect(current.desiredDirection).toMatch(/offer/i);
+    expect(current.currentReality).toMatch(/stretched/i);
 
-    const third = applyGuidedJourneyAnswer(
-      current,
-      "Focus on one · Keep both lightly · Pause and test",
+    updateStrategyWorkItem(
+      item.id,
+      applyGuidedJourneyAnswer(current, "I want to know which offer to grow"),
     );
-    updateStrategyWorkItem(item.id, third);
     current = getStrategyWorkItem(item.id)!;
-    expect(current.optionsConsidered?.length).toBeGreaterThanOrEqual(2);
+    expect(current.desiredDirection).toBeTruthy();
 
-    const fourth = applyGuidedJourneyAnswer(
-      current,
-      "Focus on one offer for 90 days",
-    );
-    updateStrategyWorkItem(item.id, fourth);
+    updateStrategyWorkItem(item.id, {
+      optionsConsidered: [
+        { id: "opt_1", title: "Focus on one offer" },
+        { id: "opt_2", title: "Keep both lightly" },
+      ],
+    });
     current = getStrategyWorkItem(item.id)!;
-    expect(current.chosenDirection).toMatch(/Focus/i);
+    updateStrategyWorkItem(
+      item.id,
+      chooseEmergingOption(current, "opt_1"),
+    );
+    current = getStrategyWorkItem(item.id)!;
+    expect(current.chosenDirection).toMatch(/Focus on one/i);
     expect(guidedJourneyIsComplete(current)).toBe(true);
   });
 
@@ -80,17 +99,18 @@ describe("Strategy Chamber guided journey + handoffs", () => {
     expect(brief.split("\n").length).toBe(1);
   });
 
-  it("skips a stage without wiping prior answers", () => {
+  it("skips a question without wiping the strategic question", () => {
     const item = createStrategyWorkItem({ entryReason: "need_direction" });
     updateStrategyWorkItem(
       item.id,
-      applyGuidedJourneyAnswer(item, "Capacity is low"),
+      applyGuidedJourneyAnswer(item, "Capacity is the real issue"),
     );
     const afterOpen = getStrategyWorkItem(item.id)!;
+    expect(afterOpen.decisionStatement).toMatch(/Capacity/i);
     const skipped = skipGuidedJourneyStage(afterOpen);
     updateStrategyWorkItem(item.id, skipped);
     const next = getStrategyWorkItem(item.id)!;
-    expect(next.currentReality).toMatch(/Capacity/);
+    expect(next.decisionStatement).toMatch(/Capacity/i);
     expect(next.currentStage).not.toBe(afterOpen.currentStage);
   });
 
@@ -98,7 +118,7 @@ describe("Strategy Chamber guided journey + handoffs", () => {
     const item = createStrategyWorkItem({ entryReason: "unsure" });
     updateStrategyWorkItem(item.id, {
       decisionStatement: "Feeling stuck on direction",
-      currentReality: "Feeling stuck on direction",
+      currentReality: "Too many competing priorities",
       status: "understanding",
     });
     const result = executeApprovedStrategyHandoff({
@@ -110,7 +130,7 @@ describe("Strategy Chamber guided journey + handoffs", () => {
     expect(listStrategyConnections(item.id).length).toBe(1);
     expect(listStrategyConnections(item.id)[0]!.memberApproved).toBe(true);
     const consumed = consumePendingStrategyHandoff();
-    expect(consumed?.softContext).toMatch(/stuck/i);
+    expect(consumed?.softContext).toMatch(/priorities|stuck/i);
     expect(peekPendingStrategyHandoff()).toBeNull();
   });
 
@@ -125,7 +145,9 @@ describe("Strategy Chamber guided journey + handoffs", () => {
     const updated = getStrategyWorkItem(item.id)!;
     expect(updated.observations?.[0]).toMatch(/Clarity came/);
     expect(
-      listStrategyConnections(item.id).some((c) => c.syncDirection === "from_destination"),
+      listStrategyConnections(item.id).some(
+        (c) => c.syncDirection === "from_destination",
+      ),
     ).toBe(true);
   });
 
@@ -136,14 +158,14 @@ describe("Strategy Chamber guided journey + handoffs", () => {
     });
     const item = createStrategyWorkItem({ entryReason: "need_direction" });
     updateStrategyWorkItem(item.id, {
-      currentReality: "Already answered opening",
-      decisionStatement: "Already answered opening",
+      decisionStatement: "Where should we focus?",
+      currentReality: "Three offers competing",
     });
     const prompt = guidedPromptForWorkItem(
       getStrategyWorkItem(item.id)!,
       resolveAdaptivePresentation(),
     );
     expect(prompt.exampleHint).toBeTruthy();
-    expect(prompt.whyItMatters).toBeTruthy();
+    expect(prompt.question.length).toBeGreaterThan(10);
   });
 });
