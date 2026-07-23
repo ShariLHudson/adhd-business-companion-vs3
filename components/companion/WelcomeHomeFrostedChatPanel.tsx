@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from "react";
-import { CompanionConversationControls } from "@/components/companion/CompanionConversationControls";
 import { CompanionConversationQuietState } from "@/components/companion/CompanionConversationQuietState";
 import { useCompanionVisibility } from "@/components/companion/CompanionVisibilityContext";
 import { scrollConversationToLatestExchange } from "@/lib/conversation/scrollToLatestExchange";
@@ -24,13 +23,13 @@ type Props = {
   alwaysShowInput?: boolean;
   /** Bottom-anchored frosted panel for full-bleed estate rooms */
   estateRoom?: boolean;
-  /** Override context — when false, never show Companion On/Off controls */
-  companionControlsEnabled?: boolean;
 };
 
 /**
  * One frosted conversation card — messages above, input below, single surface.
- * Companion On/Off lives in the conversation area (not buried in Settings).
+ *
+ * Companion On/Off and New Chat / New Day live in the SH Conversations menu —
+ * never as a button row inside the Welcome Home daily opening card.
  */
 export function WelcomeHomeFrostedChatPanel({
   welcomeMessage,
@@ -43,23 +42,34 @@ export function WelcomeHomeFrostedChatPanel({
   conversationScrollKey,
   alwaysShowInput = false,
   estateRoom = false,
-  companionControlsEnabled = true,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const companion = useCompanionVisibility();
-  const showCompanionControls =
-    companionControlsEnabled && Boolean(companion?.showControls);
-  const companionOn =
-    !showCompanionControls || companion?.visibility !== "off";
+  const companionOn = companion == null || companion.visibility !== "off";
 
+  /** Daily opening / arrival greeting — never suppressed by Companion Off. */
   const showGreeting =
-    companionOn && showWelcomeLine && Boolean(welcomeSlot ?? welcomeMessage);
-  const showMessages =
+    showWelcomeLine && Boolean(welcomeSlot ?? welcomeMessage);
+
+  /** Chat thread messages — quiet when Companion is Off. */
+  const showThread = companionOn && showConversation;
+
+  /**
+   * Quiet state only when Companion is Off and there is no daily/arrival card
+   * occupying the panel (never replace Welcome Home daily opening).
+   */
+  const showQuietState =
+    !companionOn && !showGreeting && Boolean(companion);
+
+  const showMessageScroll = showGreeting || showThread;
+  const showFooter =
     companionOn && (showConversation || showGreeting || alwaysShowInput);
+  const showDivider =
+    companionOn && showMessageScroll && (showConversation || showGreeting);
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (!el || !showMessages) return;
+    if (!el || !showMessageScroll) return;
     if (welcomeSlot && showGreeting) {
       const toTop = () => {
         el.scrollTop = 0;
@@ -68,12 +78,20 @@ export function WelcomeHomeFrostedChatPanel({
       requestAnimationFrame(() => requestAnimationFrame(toTop));
       return;
     }
+    if (!showThread) return;
     const revealLatestFromTop = () => {
       scrollConversationToLatestExchange(el, { behavior: "auto" });
     };
     revealLatestFromTop();
     requestAnimationFrame(() => requestAnimationFrame(revealLatestFromTop));
-  }, [conversationScrollKey, showMessages, thread, showGreeting, welcomeSlot]);
+  }, [
+    conversationScrollKey,
+    showMessageScroll,
+    showThread,
+    thread,
+    showGreeting,
+    welcomeSlot,
+  ]);
 
   const panelClasses = estateRoom
     ? [
@@ -101,7 +119,9 @@ export function WelcomeHomeFrostedChatPanel({
     ? "estate-room-frosted-chat__input-wrap companion-home-input-footer input-footer shrink-0"
     : [
         "welcome-home-page__input-wrap companion-home-input-footer input-footer shrink-0",
-        alwaysShowInput && !showMessages ? "welcome-home-page__input-wrap--solo" : "",
+        alwaysShowInput && !showMessageScroll
+          ? "welcome-home-page__input-wrap--solo"
+          : "",
       ]
         .filter(Boolean)
         .join(" ");
@@ -114,44 +134,31 @@ export function WelcomeHomeFrostedChatPanel({
       data-everyday-chat=""
       data-testid={estateRoom ? "estate-room-frosted-chat" : "welcome-home-chat"}
     >
-      {showCompanionControls && companion ? (
-        <div className="shrink-0 px-3 pt-3 pb-1">
-          <CompanionConversationControls
-            visibility={companion.visibility}
-            onToggle={companion.onToggle}
-            onNewChat={companion.onNewChat}
-            onNewDay={companion.onNewDay}
-            onOpenHistory={companion.onOpenHistory}
-          />
-        </div>
-      ) : null}
-
-      {!companionOn && showCompanionControls && companion ? (
-        <div className="px-4 py-3" data-companion-chat-body="quiet">
-          <CompanionConversationQuietState onTurnOn={companion.onTurnOn} />
-        </div>
-      ) : null}
-
-      {companionOn && showMessages ? (
+      {showMessageScroll ? (
         <div
           ref={scrollRef}
           className={scrollClasses}
           data-companion-chat-body="true"
+          data-testid="welcome-home-chat-body"
         >
           {showGreeting ? (
             welcomeSlot ?? (
               <p className="welcome-home-page__welcome-line">{welcomeMessage}</p>
             )
           ) : null}
-          {showConversation ? thread : null}
+          {showThread ? thread : null}
         </div>
       ) : null}
 
-      {companionOn && showMessages && (showConversation || showGreeting) ? (
-        <div className={dividerClass} aria-hidden />
+      {showQuietState && companion ? (
+        <div className="px-4 py-3" data-companion-chat-body="quiet">
+          <CompanionConversationQuietState onTurnOn={companion.onTurnOn} />
+        </div>
       ) : null}
 
-      {companionOn ? (
+      {showDivider ? <div className={dividerClass} aria-hidden /> : null}
+
+      {showFooter ? (
         <footer className={footerClass} data-companion-chat-body="true">
           {footer}
         </footer>

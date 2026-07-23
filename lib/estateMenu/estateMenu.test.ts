@@ -13,6 +13,7 @@ describe("Global Estate Menu", () => {
     expect(ESTATE_MENU_ACTION_IDS).toContain("my-profile");
     expect(ESTATE_MENU_ACTION_IDS).toContain("start-new-conversation");
     expect(ESTATE_MENU_ACTION_IDS).toContain("start-new-day-conversation");
+    expect(ESTATE_MENU_ACTION_IDS).toContain("toggle-companion-visibility");
     expect(ESTATE_MENU_ACTION_IDS).toContain("log-out");
   });
 
@@ -26,7 +27,7 @@ describe("Global Estate Menu", () => {
     ]);
   });
 
-  it("nests New Chat and New Day Chat under Conversations", () => {
+  it("nests New Chat, New Day, and Companion On/Off under Conversations", () => {
     const conversations = ESTATE_MENU_DROPDOWN_ENTRIES.find(
       (entry) => entry.kind === "group" && entry.id === "conversations",
     );
@@ -34,11 +35,13 @@ describe("Global Estate Menu", () => {
     if (conversations?.kind !== "group") return;
     expect(conversations.children.map((child) => child.label)).toEqual([
       "New Chat",
-      "New Day Chat",
+      "New Day",
+      "Companion: On",
     ]);
     expect(conversations.children.map((child) => child.id)).toEqual([
       "start-new-conversation",
       "start-new-day-conversation",
+      "toggle-companion-visibility",
     ]);
   });
 

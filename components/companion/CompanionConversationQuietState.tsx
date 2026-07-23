@@ -6,7 +6,8 @@ type Props = {
 };
 
 /**
- * Calm empty state when Companion is Off — destination remains usable.
+ * Calm empty state when Companion is Off — only inside the chat surface,
+ * never as a replacement for the Welcome Home daily opening card.
  */
 export function CompanionConversationQuietState({
   onTurnOn,
@@ -18,7 +19,7 @@ export function CompanionConversationQuietState({
       data-testid="companion-conversation-quiet-state"
     >
       <p className="text-base leading-relaxed text-[#4b463f]">
-        Companion conversation is off in this place.
+        Companion conversation is off.
       </p>
       <button
         type="button"

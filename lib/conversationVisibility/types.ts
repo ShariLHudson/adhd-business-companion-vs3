@@ -7,6 +7,7 @@ export type CompanionVisibility = "on" | "off";
 
 export type CompanionVisibilitySource =
   | "conversation_header"
+  | "conversations_menu"
   | "settings"
   | "empty_state"
   | "migration"

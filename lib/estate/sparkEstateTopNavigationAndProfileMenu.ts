@@ -137,7 +137,8 @@ export const SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS: readonly {
   label: string;
 }[] = [
   { id: "start-new-conversation", label: "New Chat" },
-  { id: "start-new-day-conversation", label: "New Day Chat" },
+  { id: "start-new-day-conversation", label: "New Day" },
+  { id: "toggle-companion-visibility", label: "Companion: On" },
 ];
 
 export const SPARK_ESTATE_ROOM_MENU_PEACEFUL_PLACE_MUSIC_ITEMS: readonly {

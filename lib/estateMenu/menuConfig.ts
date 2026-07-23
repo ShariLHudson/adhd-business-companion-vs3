@@ -22,6 +22,7 @@ export const ESTATE_MENU_ACTION_IDS = [
   "progress-timeline",
   "start-new-conversation",
   "start-new-day-conversation",
+  "toggle-companion-visibility",
   "experience-controls",
   "settings",
   "replay-welcome",
@@ -70,7 +71,12 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
       {
         id: "start-new-day-conversation",
         emoji: "🌅",
-        label: "New Day Chat",
+        label: "New Day",
+      },
+      {
+        id: "toggle-companion-visibility",
+        emoji: "💬",
+        label: "Companion: On",
       },
     ],
   },

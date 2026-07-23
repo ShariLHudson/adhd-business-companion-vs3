@@ -10936,7 +10936,12 @@ export default function CompanionPageClient() {
 
   function applyCompanionVisibility(
     visibility: CompanionVisibility,
-    source: "conversation_header" | "settings" | "empty_state" | "new_chat_confirm",
+    source:
+      | "conversation_header"
+      | "conversations_menu"
+      | "settings"
+      | "empty_state"
+      | "new_chat_confirm",
   ) {
     if (justBeHereSession) {
       setJustBeHereChatVisible(visibility === "on");
@@ -10968,7 +10973,7 @@ export default function CompanionPageClient() {
       // Create still allows Companion On/Off in the frosted panel; do not block.
     }
     const next: CompanionVisibility = estateRoomChatVisible ? "off" : "on";
-    applyCompanionVisibility(next, "conversation_header");
+    applyCompanionVisibility(next, "conversations_menu");
   }
 
   /**
@@ -11312,6 +11317,9 @@ export default function CompanionPageClient() {
         return;
       case "start-new-day-conversation":
         requestBeginNewDay();
+        return;
+      case "toggle-companion-visibility":
+        toggleEstateRoomChat();
         return;
       case "settings":
         dismissTransientEstateExperiencesForDestinationSwitch({

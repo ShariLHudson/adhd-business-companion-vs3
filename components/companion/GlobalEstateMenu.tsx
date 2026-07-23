@@ -8,10 +8,15 @@ import {
   EstateDropdownMenuSection,
   EstateDropdownMenuSectionItems,
 } from "@/components/companion/estate/EstateDropdownMenuPrimitives";
+import { useCompanionVisibility } from "@/components/companion/CompanionVisibilityContext";
 import {
   ESTATE_MENU_DROPDOWN_ENTRIES,
   type EstateMenuActionId,
 } from "@/lib/estateMenu";
+import {
+  companionVisibilityAriaLabel,
+  companionVisibilityLabel,
+} from "@/lib/conversationVisibility";
 import {
   userProfileDisplayName,
   userProfileImageUrl,
@@ -118,11 +123,30 @@ export function GlobalEstateMenu({
   className = "",
 }: GlobalEstateMenuProps) {
   const { imageUrl, initials, displayName, greeting } = useUserProfileDisplay();
+  const companionVisibility = useCompanionVisibility();
   const [open, setOpen] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<ExpandedGroupId | null>(null);
   const [mounted, setMounted] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const onActionRef = useRef(onAction);
+
+  function labelForMenuAction(
+    actionId: EstateMenuActionId,
+    fallback: string,
+  ): string {
+    if (actionId === "toggle-companion-visibility") {
+      if (!companionVisibility?.showControls) return fallback;
+      return companionVisibilityLabel(companionVisibility.visibility);
+    }
+    return fallback;
+  }
+
+  function shouldShowMenuChild(actionId: EstateMenuActionId): boolean {
+    if (actionId === "toggle-companion-visibility") {
+      return Boolean(companionVisibility?.showControls);
+    }
+    return true;
+  }
 
   useEffect(() => {
     onActionRef.current = onAction;
@@ -278,17 +302,32 @@ export function GlobalEstateMenu({
                     />
                     {isExpanded ? (
                       <EstateDropdownMenuSectionItems label={entry.label}>
-                        {entry.children.map((child) => (
-                          <EstateDropdownMenuActionRow
-                            key={child.id}
-                            label={child.label}
-                            icon={child.emoji}
-                            showChevron
-                            testId={`global-estate-menu-item-${child.id}`}
-                            menuItemId={child.id}
-                            onClick={() => closeAndRun(child.id)}
-                          />
-                        ))}
+                        {entry.children
+                          .filter((child) => shouldShowMenuChild(child.id))
+                          .map((child) => (
+                            <EstateDropdownMenuActionRow
+                              key={child.id}
+                              label={labelForMenuAction(child.id, child.label)}
+                              icon={child.emoji}
+                              showChevron
+                              testId={`global-estate-menu-item-${child.id}`}
+                              menuItemId={child.id}
+                              ariaPressed={
+                                child.id === "toggle-companion-visibility"
+                                  ? companionVisibility?.visibility === "on"
+                                  : undefined
+                              }
+                              ariaLabel={
+                                child.id === "toggle-companion-visibility" &&
+                                companionVisibility
+                                  ? companionVisibilityAriaLabel(
+                                      companionVisibility.visibility,
+                                    )
+                                  : undefined
+                              }
+                              onClick={() => closeAndRun(child.id)}
+                            />
+                          ))}
                       </EstateDropdownMenuSectionItems>
                     ) : null}
                   </EstateDropdownMenuSection>

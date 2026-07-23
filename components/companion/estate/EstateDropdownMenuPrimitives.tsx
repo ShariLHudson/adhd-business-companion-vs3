@@ -69,6 +69,9 @@ export type EstateDropdownMenuActionRowProps = {
   menuItemId?: string;
   showChevron?: boolean;
   variant?: "default" | "logout";
+  /** For Companion On/Off — exposes pressed state to assistive tech */
+  ariaPressed?: boolean;
+  ariaLabel?: string;
 };
 
 /** Pill-shaped action row — nested submenu items and flat actions. */
@@ -80,6 +83,8 @@ export function EstateDropdownMenuActionRow({
   menuItemId,
   showChevron = false,
   variant = "default",
+  ariaPressed,
+  ariaLabel,
 }: EstateDropdownMenuActionRowProps) {
   return (
     <button
@@ -94,6 +99,8 @@ export function EstateDropdownMenuActionRow({
         .join(" ")}
       data-testid={testId}
       data-estate-menu-item={menuItemId}
+      aria-pressed={ariaPressed}
+      aria-label={ariaLabel}
       onClick={onClick}
       onPointerDown={(event) => event.stopPropagation()}
       onMouseDown={(event) => event.stopPropagation()}

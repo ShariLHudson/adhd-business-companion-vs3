@@ -1,7 +1,8 @@
 # Companion Visibility and Quiet Mode
 
 **Runtime:** `lib/conversationVisibility/`  
-**UI:** Conversation-area controls in `WelcomeHomeFrostedChatPanel` · secondary Settings → Experience Controls → Companion Conversation
+**Primary UI:** SH profile menu → Conversations  
+**Secondary:** Settings → Experience Controls → Companion Conversation
 
 ## User-facing behavior
 
@@ -10,35 +11,47 @@
 | On | Companion: On |
 | Off | Companion: Off |
 
-Primary location: Conversation header row beside **New Chat** and **New Day**.  
-Not icon-only. Not buried as the only control in Settings.
+Primary location: **SH → Conversations** alongside New Chat and New Day.  
+Not in the Welcome Home daily opening card. Not icon-only.
+
+## Welcome Home daily opening
+
+Companion Off must **not** suppress:
+
+- Shari’s daily opening message
+- Review Where You Left Off / Plan or Adapt My Day / Help Me Choose
+- navigation cards or destination content
+
+New Chat, New Day, and Companion On/Off never appear as a button row on the daily opening card.
 
 ## On semantics
 
-- Show messages and input
+- Show conversation messages and input
 - Allow voice where entitled
 - Allow Shari responses via the authoritative conversation router
 - Preserve the current conversation
+- Do not replace the daily opening experience
 
 ## Off semantics
 
-- Hide messages and input (quiet state)
-- Destination remains fully usable
+- Hide conversation messages and input (quiet chat surface only)
+- Destination and daily opening remain fully usable
 - Do not auto-prompt, autoplay restored chat, delete conversation, cancel saved work, erase awaiting records, or alter long-term memory
-- Calm copy: “Companion conversation is off in this place.” + **Turn Companion On**
+- Quiet copy (chat surface only): “Companion conversation is off.” + **Turn Companion On**
+- Never use “off in this place” inside the Welcome Home daily card
 
 ## New Chat
 
-Distinct from Companion On/Off.  
+Distinct from Companion On/Off. Lives in SH → Conversations.  
 If Companion is Off and the member chooses New Chat: confirm  
 “Starting a new chat will turn Companion on.” → Start New Chat / Cancel.
 
 ## New Day
 
-Distinct from Companion On/Off.  
+Distinct from Companion On/Off. Lives in SH → Conversations.  
 Respects current Off preference — New Day does not reopen chat.
 
-## Persistence model (this phase)
+## Persistence model
 
 ```ts
 ConversationDisplayPreference {
@@ -50,50 +63,14 @@ ConversationDisplayPreference {
 ```
 
 Storage: `spark:conversation-display-prefs:v1`  
-Migrates legacy `experienceControlPrefs.conversationVisibility` into `globalDefault`.  
-Per-destination overrides are implemented.
-
-## Destination classes
-
-| Class | Examples | Companion On/Off control |
-|-------|----------|---------------------------|
-| user_controllable | Welcome Home, Strategy Chamber, Create, Clear My Mind | Yes |
-| initially_hidden | Evidence Vault, Estate Library | Yes (defaults Off) |
-| no_chat_by_design | Journal Gazebo, Projects | No (no general companion panel) |
-| specialized_conversation | Talk It Out, Boardroom, Chamber members | No competing control — specialized session owns chat |
-
-Companion Off quiets the **general** companion surface. It does not silently discard a deliberately opened specialized session.
+Action source includes `conversations_menu`.
 
 ## Routing / state ownership
 
-Action: `SET_COMPANION_VISIBILITY` via `setCompanionVisibility()`.
-
-Effects:
-
-- Update canonical preference
-- Hide/show conversation body
-- Abort in-flight response when turning Off (`supersedeInFlightChatRequest` + generation bump)
-- Preserve conversation and scope
-- Bridge legacy Experience Controls `conversationVisibility` field
-
-Not: destination navigation, New Day, conversation deletion, logout, workflow cancellation.
-
-## Stale-response handling
-
-Turning Off bumps chat request generation and aborts the active AbortController so late responses cannot render.
+`SET_COMPANION_VISIBILITY` via `setCompanionVisibility()` — shared by SH menu and Settings.
 
 ## Accessibility
 
-- Visible text labels
-- `aria-pressed` on the Companion toggle
-- `aria-label`: “Companion conversation on/off”
-- Min 44px targets
-- Keyboard operable
-
-## Adaptive Companion Intelligence
-
-Explicit user control only. No silent Off from overwhelm inference. Future suggestions must ask permission.
-
-## Certification
-
-See `lib/conversationVisibility/companionVisibility.test.ts`.
+- Visible text labels in Conversations menu
+- `aria-pressed` / `aria-label` on Companion toggle
+- Keyboard operable menu rows

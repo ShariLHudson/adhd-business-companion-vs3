@@ -31,6 +31,7 @@ const VISIBLE_TOP_LABELS = [
 const VISIBLE_ACTION_IDS: EstateMenuActionId[] = [
   "start-new-conversation",
   "start-new-day-conversation",
+  "toggle-companion-visibility",
   "my-business-estate",
   "my-profile",
   "experience-controls",
@@ -83,7 +84,7 @@ describe("Welcome Home menu — visibility", () => {
     ]);
   });
 
-  it("nests New Chat and New Day Chat under Conversations", () => {
+  it("nests New Chat, New Day, and Companion On/Off under Conversations", () => {
     const group = ESTATE_MENU_DROPDOWN_ENTRIES.find(
       (e) => e.kind === "group" && e.id === "conversations",
     );
@@ -91,10 +92,11 @@ describe("Welcome Home menu — visibility", () => {
     if (group?.kind !== "group") return;
     expect(group.children.map((c) => c.label)).toEqual([
       "New Chat",
-      "New Day Chat",
+      "New Day",
+      "Companion: On",
     ]);
     expect(SPARK_ESTATE_PROFILE_MENU_CONVERSATION_ITEMS.map((i) => i.label)).toEqual(
-      ["New Chat", "New Day Chat"],
+      ["New Chat", "New Day", "Companion: On"],
     );
   });
 
@@ -141,7 +143,16 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
-  it("New Day Chat routes to requestBeginNewDay", () => {
+  it("Companion On/Off routes to toggleEstateRoomChat from Conversations menu", () => {
+    expect(source).toMatch(
+      /case\s+"toggle-companion-visibility"\s*:\s*[\s\S]*?toggleEstateRoomChat\(\)/,
+    );
+    expect(source).toMatch(
+      /applyCompanionVisibility\(next,\s*"conversations_menu"\)/,
+    );
+  });
+
+  it("New Day routes to requestBeginNewDay", () => {
     expect(source).toMatch(
       /case\s+"start-new-day-conversation"\s*:\s*[\s\S]*?requestBeginNewDay\(\)/,
     );
