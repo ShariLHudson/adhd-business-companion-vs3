@@ -1,10 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { dirname, resolve, sep } from "node:path";
+import { dirname, join } from "node:path";
 import { NextResponse } from "next/server";
-import {
-  FOUNDER_VALIDATION_EVIDENCE_ROOT,
-  evidenceRelativePathForRun,
-} from "@/lib/founderValidationMode";
+import { evidenceRelativePathForRun } from "@/lib/founderValidationMode";
 import type { CertificationJourneyId } from "@/lib/createCertification";
 
 /** Filesystem writes require Node — never Edge. */
@@ -13,14 +10,31 @@ export const dynamic = "force-dynamic";
 
 const SAFE_ID = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,127}$/;
 
-function resolveUnderCwd(relativePosix: string): string | null {
-  const cwd = process.cwd();
-  const abs = resolve(cwd, ...relativePosix.split("/"));
-  const root = resolve(cwd) + sep;
-  if (abs !== resolve(cwd) && !abs.startsWith(root)) {
-    return null;
-  }
-  return abs;
+/**
+ * Build absolute paths with *static* path segments only.
+ * Avoid `resolve(process.cwd(), ...dynamicParts)` — webpack treats that as a
+ * project-root context (`/ROOT/` matching thousands of files).
+ */
+function evidenceRunAbsPath(journeyId: string, runId: string): string {
+  return join(
+    process.cwd(),
+    "docs",
+    "create-experience",
+    "evidence",
+    "runs",
+    journeyId,
+    `${runId}.json`,
+  );
+}
+
+function evidenceDashboardAbsPath(): string {
+  return join(
+    process.cwd(),
+    "docs",
+    "create-experience",
+    "evidence",
+    "CERTIFICATION_DASHBOARD_FOUNDER_LIVE.md",
+  );
 }
 
 /**
@@ -52,42 +66,26 @@ export async function POST(request: Request) {
     }
 
     const relative = evidenceRelativePathForRun(journeyId, runId);
-    if (
-      !relative.startsWith(`${FOUNDER_VALIDATION_EVIDENCE_ROOT}/`) ||
-      relative.includes("..")
-    ) {
-      return NextResponse.json({ ok: false, error: "Invalid path." }, { status: 400 });
-    }
-
-    const abs = resolveUnderCwd(relative);
-    if (!abs) {
-      return NextResponse.json({ ok: false, error: "Invalid path." }, { status: 400 });
-    }
+    const abs = evidenceRunAbsPath(journeyId, runId);
 
     await mkdir(dirname(abs), { recursive: true });
     await writeFile(abs, json, "utf8");
 
-    // Refresh living dashboard snapshot for founders
-    const dashPath = resolveUnderCwd(
-      `${FOUNDER_VALIDATION_EVIDENCE_ROOT}/CERTIFICATION_DASHBOARD_FOUNDER_LIVE.md`,
+    await writeFile(
+      evidenceDashboardAbsPath(),
+      [
+        "# Founder Validation — evidence index",
+        "",
+        `Last written: ${new Date().toISOString()}`,
+        "",
+        `Latest run file: \`${relative}\``,
+        "",
+        "Open Founder Validation Mode to regenerate the full living dashboard.",
+        "CERTIFIED is never automatic — requires explicit founder approval.",
+        "",
+      ].join("\n"),
+      "utf8",
     );
-    if (dashPath) {
-      await writeFile(
-        dashPath,
-        [
-          "# Founder Validation — evidence index",
-          "",
-          `Last written: ${new Date().toISOString()}`,
-          "",
-          `Latest run file: \`${relative}\``,
-          "",
-          "Open Founder Validation Mode to regenerate the full living dashboard.",
-          "CERTIFIED is never automatic — requires explicit founder approval.",
-          "",
-        ].join("\n"),
-        "utf8",
-      );
-    }
 
     return NextResponse.json({ ok: true, path: relative });
   } catch (err) {
