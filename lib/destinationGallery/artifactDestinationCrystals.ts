@@ -8,7 +8,7 @@
 
 import {
   classifyArtifactFamily,
-  destinationCapabilitiesForFamily,
+  destinationCapabilitiesForArtifact,
   type ArtifactDestinationDef,
   type ArtifactDestinationId,
   type ArtifactFamily,
@@ -245,7 +245,7 @@ export function resolveArtifactDestinationCrystalOffers(
   ctx: ArtifactCrystalConnectionContext = {},
 ): ArtifactDestinationCrystalOffer[] {
   const family = classifyArtifactFamily(artifactType, content);
-  const caps = destinationCapabilitiesForFamily(family);
+  const caps = destinationCapabilitiesForArtifact(artifactType, content);
   return assignSlots(caps.destinations, family).map(({ def, slotId }) => {
     const { state, statusHint } = resolveInitialState(def, ctx);
     return {

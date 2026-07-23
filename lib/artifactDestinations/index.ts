@@ -7,7 +7,11 @@ export type {
   BuiltDownloadArtifact,
 } from "./types";
 
-export { classifyArtifactFamily } from "./classifyArtifactFamily";
+export {
+  classifyArtifactFamily,
+  isGuidedDocumentPackageType,
+  isGuidedEventPlanDocumentType,
+} from "./classifyArtifactFamily";
 export {
   artifactSupportsDestination,
   destinationCapabilitiesForArtifact,

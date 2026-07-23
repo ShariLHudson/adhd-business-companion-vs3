@@ -16,15 +16,28 @@ describe("artifactDestinations", () => {
   it("classifies document vs spreadsheet vs calendar vs presentation", () => {
     expect(classifyArtifactFamily("Proposal")).toBe("document");
     expect(classifyArtifactFamily("Workshop Outline")).toBe("document");
+    expect(classifyArtifactFamily("Event Plan")).toBe("document");
+    expect(classifyArtifactFamily("Marketing Plan")).toBe("document");
+    expect(classifyArtifactFamily("Business Plan")).toBe("document");
+    expect(classifyArtifactFamily("Facebook Community")).toBe("document");
     expect(classifyArtifactFamily("Content Calendar")).toBe("document");
     expect(classifyArtifactFamily("Spreadsheet")).toBe("spreadsheet");
     expect(classifyArtifactFamily("Budget Table")).toBe("spreadsheet");
     expect(classifyArtifactFamily("Calendar Event")).toBe("calendar");
-    expect(classifyArtifactFamily("Workshop Agenda", "Event date: July 1")).toBe(
-      "calendar",
-    );
     expect(classifyArtifactFamily("Pitch Deck")).toBe("presentation");
     expect(classifyArtifactFamily("Intake Form")).toBe("form");
+  });
+
+  it("adds calendar destinations to Event Plan / Workshop without Sheets", () => {
+    const ids = destinationCapabilitiesForArtifact(
+      "Event Plan",
+      "Agenda and logistics",
+    ).destinations.map((d) => d.id);
+    expect(ids).toContain("google-docs");
+    expect(ids).toContain("print");
+    expect(ids).toContain("download");
+    expect(ids).toContain("google-calendar");
+    expect(ids).not.toContain("google-sheets");
   });
 
   it("lists document destinations without Sheets or Calendar", () => {

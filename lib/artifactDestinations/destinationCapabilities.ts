@@ -1,10 +1,28 @@
-import { classifyArtifactFamily } from "./classifyArtifactFamily";
+import {
+  classifyArtifactFamily,
+  isGuidedEventPlanDocumentType,
+} from "./classifyArtifactFamily";
 import type {
   ArtifactDestinationCapabilities,
   ArtifactDestinationDef,
   ArtifactDestinationId,
   ArtifactFamily,
 } from "./types";
+
+const EVENT_PLAN_CALENDAR_DESTINATIONS: readonly ArtifactDestinationDef[] = [
+  {
+    id: "google-calendar",
+    label: "Google Calendar",
+    requires: "google",
+    alwaysOffer: true,
+  },
+  {
+    id: "outlook-calendar",
+    label: "Outlook Calendar",
+    requires: "outlook",
+    alwaysOffer: true,
+  },
+];
 
 const DOC: readonly ArtifactDestinationDef[] = [
   { id: "google-docs", label: "Google Docs", requires: "google", alwaysOffer: true },
@@ -139,9 +157,20 @@ export function destinationCapabilitiesForArtifact(
   artifactType: string | null | undefined,
   content = "",
 ): ArtifactDestinationCapabilities {
-  return destinationCapabilitiesForFamily(
-    classifyArtifactFamily(artifactType, content),
-  );
+  const family = classifyArtifactFamily(artifactType, content);
+  const base = destinationCapabilitiesForFamily(family);
+
+  // Event Plan / Workshop = document destinations + intentional calendar crystals.
+  if (family === "document" && isGuidedEventPlanDocumentType(artifactType)) {
+    const seen = new Set(base.destinations.map((d) => d.id));
+    const merged = [...base.destinations];
+    for (const dest of EVENT_PLAN_CALENDAR_DESTINATIONS) {
+      if (!seen.has(dest.id)) merged.push(dest);
+    }
+    return { ...base, destinations: merged };
+  }
+
+  return base;
 }
 
 export function artifactSupportsDestination(

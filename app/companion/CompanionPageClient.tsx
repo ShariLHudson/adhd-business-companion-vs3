@@ -23084,6 +23084,12 @@ export default function CompanionPageClient() {
   const destinationGalleryArtifact =
     resolveDestinationGalleryArtifactContext({
       draftContent: creationContext?.draftContent,
+      artifactContent: creationContext?.createWorkflow
+        ? Object.values(creationContext.createWorkflow.sectionContent ?? {})
+            .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+            .join("\n\n")
+        : null,
+      creationRecordContent: creationContext?.brief,
       itemType: creationContext?.itemType,
       title: creationContext?.title,
       fallbackAssistantText: [...messages]
