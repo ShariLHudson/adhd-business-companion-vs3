@@ -6,6 +6,7 @@
  */
 
 import { detectDirectCommand } from "@/lib/estateIntelligence/estateCommandRouter";
+import { resolveEstatePlaceIdFromUserText } from "@/lib/estate/estateRoomAliasRegistry";
 import { isHardNavigationCommand } from "@/lib/hardNavigationCommands";
 
 const WELCOME_HOME_RE =
@@ -13,7 +14,7 @@ const WELCOME_HOME_RE =
 
 /** Explicit navigation verbs — required before Estate place resolution. */
 const EXPLICIT_NAV_VERB_RE =
-  /\b(?:go to|take me to|bring me to|head to|take me|bring me|open|show me|visit|return to|(?:want|need|wanna)\s+to\s+go\s+to|i want to go to|let(?:'s| us) (?:go to|visit))\b/i;
+  /\b(?:go to|take me to|bring me to|head to|head over to|take me over to|take me|bring me|open|show me|visit|return to|(?:want|need|wanna)\s+to\s+go\s+to|i want to go to|let(?:'s| us) (?:go to|visit|head to)|(?:can|could|shall) we (?:go|head|visit|take)\b)/i;
 
 /**
  * True when this utterance is an explicit place / workspace navigation command
@@ -32,7 +33,10 @@ export function isDirectNavigationPriorityTurn(userText: string): boolean {
   if (!EXPLICIT_NAV_VERB_RE.test(t)) return false;
 
   const direct = detectDirectCommand(t);
-  return Boolean(direct?.executeImmediately);
+  if (direct?.executeImmediately) return true;
+
+  // Canonical alias registry — covers polite / indirect phrasing with a nav verb.
+  return Boolean(resolveEstatePlaceIdFromUserText(t));
 }
 
 /** Soft transition line — navigation should still execute immediately. */
