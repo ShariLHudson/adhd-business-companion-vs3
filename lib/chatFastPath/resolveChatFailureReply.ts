@@ -1,6 +1,11 @@
 import { routeCompanionFailure } from "@/lib/companionContextRouting";
 import type { CompanionFailureSurface } from "@/lib/companionContextRouting/types";
 import {
+  buildCreateChatFailureReply,
+  isCompanionChatHttpFailure,
+} from "@/lib/createExperience/createSendStability";
+import { SafeJsonResponseError } from "@/lib/safeJsonResponse";
+import {
   buildContextualChatFallback,
   buildRuntimeRecoveryResponse,
 } from "@/lib/sparkConversation/coachingFallback";
@@ -18,6 +23,8 @@ export type ResolveChatFailureReplyInput = {
   userText: string;
   messages: ReadonlyArray<ChatMessageLike>;
   surface?: CompanionFailureSurface;
+  /** When true, keep Create-specific retry copy (never navigate). */
+  createSessionActive?: boolean;
 };
 
 function memoryFromMessages(messages: ReadonlyArray<ChatMessageLike>): {
@@ -34,9 +41,16 @@ function memoryFromMessages(messages: ReadonlyArray<ChatMessageLike>): {
 }
 
 function isSoftRecoverableError(err: unknown): boolean {
+  if (isCompanionChatHttpFailure(err)) return true;
+  if (err instanceof SafeJsonResponseError) {
+    if (err.status === 503 || err.status === 502 || err.status === 500) {
+      return true;
+    }
+  }
   if (err instanceof Error) {
     if (err.name === "AbortError") return true;
     if (err.message === "companion-chat-timeout") return true;
+    if (err.message === "companion-chat-unavailable") return true;
     if (err.message === "turn-watchdog-timeout") return true;
     if (err.message.startsWith("companion-chat-stream-timeout:")) return true;
     if (err.message.includes("-timeout:")) return true;
@@ -64,6 +78,9 @@ export function resolveChatFailureReply(
   }
 
   if (isSoftRecoverableError(input.err)) {
+    if (input.createSessionActive) {
+      return buildCreateChatFailureReply(trimmed);
+    }
     const reply = buildContextualChatFallback({
       userText: trimmed,
       ...memory,
@@ -71,11 +88,18 @@ export function resolveChatFailureReply(
     return sanitizeBridgeFromReply(reply, trimmed);
   }
 
+  if (input.createSessionActive && isCompanionChatHttpFailure(input.err)) {
+    return buildCreateChatFailureReply(trimmed);
+  }
+
   const routed = routeCompanionFailure(input.err, {
     surface: input.surface ?? "chat",
     userText: trimmed,
   });
   if (routed.channel === "estate") {
+    if (input.createSessionActive) {
+      return buildCreateChatFailureReply(trimmed);
+    }
     return routed.message;
   }
 
