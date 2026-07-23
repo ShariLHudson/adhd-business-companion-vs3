@@ -4,6 +4,8 @@
 
 Spark Estate chat is one companion surface with **scoped ownership** behind the scenes. Members never see scope IDs. Behavior must feel continuous and calm while preventing stale Board / Create / destination workflows from capturing unrelated turns (especially after New Day or direct navigation).
 
+**Authoritative turn arbiter:** [`AUTHORITATIVE_CONVERSATION_ROUTING_STANDARD.md`](./AUTHORITATIVE_CONVERSATION_ROUTING_STANDARD.md) · runtime `lib/conversationRouter/routeConversationTurn.ts`. This document remains the New Day / scope behavior contract; the arbiter consolidates Continuity + chatScope rather than replacing them.
+
 ## Active-scope model
 
 Suggested scopes (`lib/chatScope/types.ts`):

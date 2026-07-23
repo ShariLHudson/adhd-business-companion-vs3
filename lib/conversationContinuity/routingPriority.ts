@@ -1,6 +1,12 @@
 /**
- * Every user message resolves in this order.
- * Broad intent / primary classifiers must not run before active ownership checks.
+ * Continuity owner-kind priority (sticky workflows).
+ *
+ * Intent-family priority is authoritative in
+ * `lib/conversationRouter` → `AUTHORITATIVE_ROUTING_PRIORITY`
+ * (direct navigation / cancel outrank awaiting-answer owners).
+ *
+ * Broad intent / primary classifiers must not run before active ownership checks
+ * unless a higher-priority intent family already resolved.
  */
 
 import type { ConversationOwnerKind } from "./types";
