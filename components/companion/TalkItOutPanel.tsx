@@ -30,6 +30,7 @@ import {
   saveTalkItOutDiscovery,
   type TalkItOutSession,
 } from "@/lib/talkItOut";
+import { consumePendingStrategyHandoff } from "@/lib/strategyChamber/pendingHandoffStore";
 
 type Props = {
   onBack?: () => void;
@@ -122,33 +123,54 @@ export function TalkItOutPanel({ onBack, registerBack }: Props) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    let s = resumeOrCreateTalkItOutSession();
-    // Package 200/205 — grounded re-entry after pause (never "welcome back")
-    if (s.needsReentry && s.messages.some((m) => m.role === "user")) {
-      const reentry = buildTalkItOutReentry({
-        topicAnchor:
-          s.topic ??
-          s.thinkingMap?.topicAnchor?.primaryTopic ??
-          s.cieState?.topicAnchor?.primaryTopic,
-        currentFocus:
-          s.thinkingMap?.topicAnchor?.currentFocus ??
-          s.cieState?.currentFocus?.label,
-        usefulSummary: s.usefulSummary,
-      });
-      s = appendTalkItOutMessages(
-        s,
-        [
-          {
-            id: `tio-reentry-${Date.now()}`,
-            role: "assistant",
-            content: reentry,
-            createdAt: new Date().toISOString(),
-          },
-        ],
-        { needsReentry: false },
-      );
+    try {
+      const pending = consumePendingStrategyHandoff();
+      let s: TalkItOutSession;
+      if (pending?.destinationId === "talk_it_out") {
+        const soft =
+          pending.softContext?.trim() ||
+          pending.centralQuestion ||
+          pending.plainLanguageSummary;
+        s = createTalkItOutSession({
+          linkedStrategyWorkItemId: pending.strategyWorkItemId,
+          strategyArrivalContext: soft,
+          openingExtra: soft
+            ? `You mentioned something that felt tangled: ${soft}\n\nWe can stay with that as long as you need — no need to turn it into a formal plan unless you want to.`
+            : undefined,
+        });
+      } else {
+        s = resumeOrCreateTalkItOutSession();
+      }
+      // Package 200/205 — grounded re-entry after pause (never "welcome back")
+      if (s.needsReentry && s.messages.some((m) => m.role === "user")) {
+        const reentry = buildTalkItOutReentry({
+          topicAnchor:
+            s.topic ??
+            s.thinkingMap?.topicAnchor?.primaryTopic ??
+            s.cieState?.topicAnchor?.primaryTopic,
+          currentFocus:
+            s.thinkingMap?.topicAnchor?.currentFocus ??
+            s.cieState?.currentFocus?.label,
+          usefulSummary: s.usefulSummary,
+        });
+        s = appendTalkItOutMessages(
+          s,
+          [
+            {
+              id: `tio-reentry-${Date.now()}`,
+              role: "assistant",
+              content: reentry,
+              createdAt: new Date().toISOString(),
+            },
+          ],
+          { needsReentry: false },
+        );
+      }
+      setSession(s);
+    } catch {
+      // Corrupt session storage must never blank the estate — start fresh.
+      setSession(createTalkItOutSession());
     }
-    setSession(s);
   }, []);
 
   useEffect(() => {

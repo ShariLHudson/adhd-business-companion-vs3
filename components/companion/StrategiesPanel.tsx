@@ -87,18 +87,26 @@ import { StrategyExecutionConnections } from "@/components/companion/StrategyExe
 import { StrategyGuidedCreatePanel } from "@/components/companion/StrategyGuidedCreatePanel";
 import { ContinueYourJourney } from "@/components/companion/ContinueYourJourney";
 import { StrategyDecisionRecord } from "@/components/companion/StrategyDecisionRecord";
+import { resolveAdaptivePresentation } from "@/lib/adaptiveCompanionIntelligence";
 import {
+  applyGuidedJourneyAnswer,
   buildContinueYourJourney,
   buildStrategyDecisionRecord,
+  buildStrategyResumeSummary,
   createStrategyWorkItem,
   decisionRecordIsReady,
+  executeApprovedStrategyHandoff,
   getResumableStrategyWorkItem,
   getStrategyWorkItem,
+  guidedJourneyIsComplete,
+  guidedPromptForWorkItem,
   listResumableStrategyWorkItems,
-  openingQuestionForEntry,
   pauseStrategyWorkItem,
   resumeStrategyWorkItem,
+  skipGuidedJourneyStage,
+  STRATEGY_HANDOFF_LIVE_DESTINATIONS,
   updateStrategyWorkItem,
+  type ContinueJourneyDestinationId,
   type StrategyEntryReason,
 } from "@/lib/strategyChamber";
 
@@ -418,19 +426,42 @@ export function StrategiesPanel({
     if (!trimmed) return;
     const item = getStrategyWorkItem(workItemId);
     if (!item) return;
-    updateStrategyWorkItem(workItemId, {
-      decisionStatement: trimmed,
-      currentReality: trimmed,
-      plainLanguageSummary: trimmed.slice(0, 220),
-      title:
-        trimmed.length > 72 ? `${trimmed.slice(0, 69).trim()}…` : trimmed,
-      status: "understanding",
-    });
+    const wasBlank = !(
+      item.currentReality?.trim() || item.decisionStatement?.trim()
+    );
+    const patch = applyGuidedJourneyAnswer(item, trimmed);
+    updateStrategyWorkItem(workItemId, patch);
     setWorkTick((n) => n + 1);
-    if (item.entryReason === "unsure" && onAsk) {
+    if (wasBlank && item.entryReason === "unsure" && onAsk) {
       onAsk(
         `I'm in the Strategy Chamber. Here's what I'm working with: ${trimmed}. Help me choose the best place to begin.`,
       );
+    }
+  }
+
+  function handleStrategyJourneySelect(
+    workItemId: string,
+    destinationId: ContinueJourneyDestinationId,
+  ) {
+    try {
+      const result = executeApprovedStrategyHandoff({
+        strategyWorkItemId: workItemId,
+        destinationId,
+      });
+      setWorkTick((n) => n + 1);
+      if (result.section && onOpen) onOpen(result.section);
+      else if (result.seedAsk && onAsk) onAsk(result.seedAsk);
+      else if (onAsk) {
+        onAsk(
+          `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
+        );
+      }
+    } catch {
+      if (onAsk) {
+        onAsk(
+          `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
+        );
+      }
     }
   }
 
@@ -454,14 +485,19 @@ export function StrategiesPanel({
     }
   }, [openCommand?.key]);
 
-  // ---- Strategy Chamber guided entry (one question) ----------------------
+  // ---- Strategy Chamber guided journey (one question at a time) ----------
   if (view.v === "chamber-entry") {
     const work = getStrategyWorkItem(view.workItemId);
     if (!work) {
       goToView({ v: "home" });
       return null;
     }
-    const question = openingQuestionForEntry(work.entryReason);
+    const presentation = resolveAdaptivePresentation({
+      destinationHint: "strategy_chamber",
+    });
+    const prompt = guidedPromptForWorkItem(work, presentation);
+    const complete = guidedJourneyIsComplete(work) || decisionRecordIsReady(work);
+    const resumeSummary = buildStrategyResumeSummary(work, presentation);
     const shellClass = estate
       ? "companion-fade-in flex min-h-0 w-full flex-col overflow-y-auto pb-8"
       : workspacePanelShellClass({ width: "standard", inSplit: true });
@@ -470,6 +506,7 @@ export function StrategiesPanel({
         className={shellClass}
         data-testid="strategy-chamber-entry"
         data-entry-reason={work.entryReason}
+        data-stage={work.currentStage}
       >
         <AppBackButton
           onBack={() => {
@@ -482,72 +519,101 @@ export function StrategiesPanel({
         <p className="mt-4 text-2xl font-semibold text-[#1f1c19]">
           {STRATEGY_LIBRARY_TITLE}
         </p>
-        <p className="mt-4 text-xl font-semibold leading-snug text-[#1f1c19]">
-          {question}
-        </p>
-        <p className="mt-2 text-sm text-[#6b635a]">
-          One question at a time. You can pause anytime — your work stays here.
-        </p>
-        <ChamberEntryAnswerForm
-          initialValue={work.decisionStatement || work.currentReality || ""}
-          onSave={(answer) => {
-            saveChamberEntryAnswer(work.id, answer);
-            setWorkTick((n) => n + 1);
-          }}
-          onPause={() => {
-            pauseStrategyWorkItem(work.id);
-            setWorkTick((n) => n + 1);
-            goToView({ v: "home" });
-          }}
-          onContinue={() => {
-            const updated = getStrategyWorkItem(work.id);
-            if (updated && decisionRecordIsReady(updated)) {
-              goToView({ v: "recommended" });
-              return;
-            }
-            if (work.entryReason === "important_decision") {
-              goToView({ v: "new" });
-              return;
-            }
-            goToView({ v: "recommended" });
-          }}
-        />
+        {(work.decisionStatement || work.currentReality) &&
+        presentation.resumeDepth !== "brief" ? (
+          <p
+            className="mt-3 whitespace-pre-line rounded-xl border border-[#e7dfd4] bg-[#faf8f5] px-3 py-2 text-sm leading-relaxed text-[#4b463f]"
+            data-testid="strategy-chamber-resume-summary"
+          >
+            {resumeSummary}
+          </p>
+        ) : null}
+        {!complete ? (
+          <>
+            <p className="mt-4 text-xl font-semibold leading-snug text-[#1f1c19]">
+              {prompt.question}
+            </p>
+            {prompt.whyItMatters ? (
+              <p className="mt-2 text-sm text-[#6b635a]">{prompt.whyItMatters}</p>
+            ) : (
+              <p className="mt-2 text-sm text-[#6b635a]">
+                {presentation.oneQuestionAtATime
+                  ? "One question at a time. You can pause anytime — your work stays here."
+                  : "Answer what feels useful. You can pause anytime — your work stays here."}
+              </p>
+            )}
+            {prompt.exampleHint ? (
+              <p className="mt-1 text-sm italic text-[#6b635a]">{prompt.exampleHint}</p>
+            ) : null}
+            {presentation.showProgress ? (
+              <p
+                className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#1e4f4f]"
+                data-testid="strategy-chamber-stage-progress"
+              >
+                {prompt.stage.replace(/_/g, " ")}
+              </p>
+            ) : null}
+            <ChamberEntryAnswerForm
+              key={`${work.id}-${work.currentStage}-${work.version}-${workTick}`}
+              initialValue=""
+              onSave={(answer) => {
+                saveChamberEntryAnswer(work.id, answer);
+              }}
+              onPause={() => {
+                pauseStrategyWorkItem(work.id);
+                setWorkTick((n) => n + 1);
+                goToView({ v: "home" });
+              }}
+              onSkip={() => {
+                const patch = skipGuidedJourneyStage(work);
+                if (Object.keys(patch).length > 0) {
+                  updateStrategyWorkItem(work.id, patch);
+                  setWorkTick((n) => n + 1);
+                }
+              }}
+              onContinue={() => {
+                // Stay in chamber-entry — next question remounts via workTick
+                setWorkTick((n) => n + 1);
+              }}
+            />
+          </>
+        ) : (
+          <p className="mt-4 text-base leading-relaxed text-[#4b463f]">
+            You have enough clarity to record the decision and choose one next step.
+            Nothing else changes until you approve it.
+          </p>
+        )}
         {work.decisionStatement || work.currentReality ? (
           <div className="mt-6 flex flex-col gap-4">
             <StrategyDecisionRecord
               record={buildStrategyDecisionRecord(
                 getStrategyWorkItem(work.id) ?? work,
               )}
+              summaryFirst={presentation.summaryFirst}
             />
             <ContinueYourJourney
               model={buildContinueYourJourney(
                 getStrategyWorkItem(work.id) ?? work,
+                {
+                  maxSecondary: Math.min(
+                    2,
+                    Math.max(0, presentation.maxVisibleChoices - 1),
+                  ),
+                },
               )}
-              onSelect={(destinationId) => {
-                const sectionMap: Partial<Record<typeof destinationId, AppSection>> =
-                  {
-                    talk_it_out: "talk-it-out",
-                    chamber_member: "chamber-of-momentum",
-                    board: "boardroom",
-                    create: "content-generator",
-                    project: "projects",
-                    plan_my_day: "plan-my-day",
-                    calendar: "calendar",
-                    journal: "journal",
-                    evidence_vault: "evidence-bank",
-                    business_estate: "profile",
-                    rhythm: "rhythms",
-                    reminder: "rhythms",
-                  };
-                const section = sectionMap[destinationId];
-                if (section && onOpen) onOpen(section);
-                else if (onAsk) {
-                  onAsk(
-                    `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
-                  );
-                }
-              }}
+              liveDestinations={STRATEGY_HANDOFF_LIVE_DESTINATIONS}
+              onSelect={(destinationId) =>
+                handleStrategyJourneySelect(work.id, destinationId)
+              }
             />
+            <button
+              type="button"
+              className="text-left text-sm font-semibold text-[#1e4f4f] underline"
+              data-testid="strategy-chamber-browse-library-from-journey"
+              onClick={() => goToView({ v: "recommended" })}
+            >
+              Browse the strategy library
+            </button>
           </div>
         ) : null}
       </div>
@@ -643,10 +709,18 @@ export function StrategiesPanel({
                   <p className="text-base font-semibold text-[#1f1c19]">
                     Continue where you left off
                   </p>
-                  <p className="mt-1 text-sm leading-relaxed text-[#4b463f]">
-                    {latest?.plainLanguageSummary ||
-                      latest?.title ||
-                      "Your unfinished strategy work is still here — nothing was lost."}
+                  <p
+                    className="mt-1 whitespace-pre-line text-sm leading-relaxed text-[#4b463f]"
+                    data-testid="strategy-chamber-home-resume-summary"
+                  >
+                    {latest
+                      ? buildStrategyResumeSummary(
+                          latest,
+                          resolveAdaptivePresentation({
+                            destinationHint: "strategy_chamber",
+                          }),
+                        )
+                      : "Your unfinished strategy work is still here — nothing was lost."}
                   </p>
                   <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                     <button
@@ -1582,6 +1656,7 @@ function StrategyBuiltinDetail({
     () => relatedCompanionTools(s, subcat),
     [s, subcat],
   );
+  const linkedWorkItem = getResumableStrategyWorkItem();
 
   function saveAsMine() {
     saveUserStrategy({
@@ -1727,40 +1802,37 @@ function StrategyBuiltinDetail({
         showOptionalReviews
       />
 
-      {activeWorkItem ? (
+      {linkedWorkItem ? (
         <div className="mt-6 flex flex-col gap-4">
-          {decisionRecordIsReady(activeWorkItem) ||
-          activeWorkItem.status === "evaluating" ||
-          activeWorkItem.status === "understanding" ? (
+          {decisionRecordIsReady(linkedWorkItem) ||
+          linkedWorkItem.status === "evaluating" ||
+          linkedWorkItem.status === "understanding" ? (
             <StrategyDecisionRecord
-              record={buildStrategyDecisionRecord(activeWorkItem)}
+              record={buildStrategyDecisionRecord(linkedWorkItem)}
             />
           ) : null}
           <ContinueYourJourney
-            model={buildContinueYourJourney(activeWorkItem)}
+            model={buildContinueYourJourney(linkedWorkItem)}
+            liveDestinations={STRATEGY_HANDOFF_LIVE_DESTINATIONS}
             onSelect={(destinationId) => {
-              const sectionMap: Partial<
-                Record<typeof destinationId, AppSection>
-              > = {
-                talk_it_out: "talk-it-out",
-                chamber_member: "chamber-of-momentum",
-                board: "boardroom",
-                create: "content-generator",
-                project: "projects",
-                plan_my_day: "plan-my-day",
-                calendar: "calendar",
-                journal: "journal",
-                evidence_vault: "evidence-bank",
-                business_estate: "profile",
-                rhythm: "rhythms",
-                reminder: "rhythms",
-              };
-              const section = sectionMap[destinationId];
-              if (section && onOpen) onOpen(section);
-              else if (onAsk) {
-                onAsk(
-                  `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
-                );
+              try {
+                const result = executeApprovedStrategyHandoff({
+                  strategyWorkItemId: linkedWorkItem.id,
+                  destinationId,
+                });
+                if (result.section && onOpen) onOpen(result.section);
+                else if (result.seedAsk && onAsk) onAsk(result.seedAsk);
+                else if (onAsk) {
+                  onAsk(
+                    `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
+                  );
+                }
+              } catch {
+                if (onAsk) {
+                  onAsk(
+                    `I'd like to continue from the Strategy Chamber toward ${destinationId.replace(/_/g, " ")}.`,
+                  );
+                }
               }
             }}
           />
@@ -1862,11 +1934,13 @@ function ChamberEntryAnswerForm({
   onSave,
   onPause,
   onContinue,
+  onSkip,
 }: {
   initialValue: string;
   onSave: (answer: string) => void;
   onPause: () => void;
   onContinue: () => void;
+  onSkip?: () => void;
 }) {
   const [answer, setAnswer] = useState(initialValue);
   return (
@@ -1903,6 +1977,16 @@ function ChamberEntryAnswerForm({
         >
           Pause for now
         </button>
+        {onSkip ? (
+          <button
+            type="button"
+            className="rounded-xl border border-transparent px-4 py-2.5 text-base font-semibold text-[#6b635a] underline"
+            onClick={onSkip}
+            data-testid="strategy-chamber-entry-skip"
+          >
+            Skip this for now
+          </button>
+        ) : null}
       </div>
     </div>
   );

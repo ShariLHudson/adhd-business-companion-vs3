@@ -12,7 +12,12 @@ const MAX_SECONDARY = 2;
  */
 export function buildContinueYourJourney(
   item: StrategyWorkItem,
+  options?: { maxSecondary?: number },
 ): ContinueYourJourneyModel {
+  const maxSecondary = Math.max(
+    0,
+    Math.min(2, options?.maxSecondary ?? MAX_SECONDARY),
+  );
   const hasDirection = Boolean(item.chosenDirection?.trim());
   const emotional =
     item.entryReason === "rethink_current_direction" ||
@@ -68,12 +73,12 @@ export function buildContinueYourJourney(
 
   const secondary = pool
     .filter((o) => o.destinationId !== recommended?.destinationId)
-    .slice(0, MAX_SECONDARY);
+    .slice(0, maxSecondary);
 
   return {
     recommended,
     secondary,
-    showSeeMore: pool.length > MAX_SECONDARY + (recommended ? 1 : 0),
+    showSeeMore: pool.length > maxSecondary + (recommended ? 1 : 0),
   };
 }
 

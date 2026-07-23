@@ -29,6 +29,10 @@ export type TalkItOutSession = {
   usedQuestionIds: string[];
   /** Strategy moves already used this conversation (package 201). */
   usedStrategyMoves?: string[];
+  /** Linked Strategy Chamber work item — contribution can return later. */
+  linkedStrategyWorkItemId?: string;
+  /** Soft context from Strategy — no formal strategy jargon forced. */
+  strategyArrivalContext?: string;
   userDiscoveries: string[];
   userNamedNextSteps: string[];
   savedDiscoveries: TalkItOutSavedDiscovery[];

@@ -102,9 +102,16 @@ export function upsertTalkItOutSession(session: TalkItOutSession): void {
   persistSessions(all.slice(0, 40));
 }
 
-export function createTalkItOutSession(): TalkItOutSession {
+export function createTalkItOutSession(options?: {
+  linkedStrategyWorkItemId?: string;
+  strategyArrivalContext?: string;
+  openingExtra?: string;
+}): TalkItOutSession {
   const now = new Date().toISOString();
   const opening = createOpeningMessage();
+  const openingContent = options?.openingExtra?.trim()
+    ? `${opening.content}\n\n${options.openingExtra.trim()}`
+    : opening.content;
   const session: TalkItOutSession = {
     id: uid("tio-session"),
     status: "active",
@@ -112,7 +119,7 @@ export function createTalkItOutSession(): TalkItOutSession {
       {
         id: opening.id,
         role: "assistant",
-        content: opening.content,
+        content: openingContent,
         createdAt: opening.createdAt,
       },
     ],
@@ -122,6 +129,8 @@ export function createTalkItOutSession(): TalkItOutSession {
     savedDiscoveries: [],
     explicitHelpRequested: false,
     futureFeelingAsked: false,
+    linkedStrategyWorkItemId: options?.linkedStrategyWorkItemId,
+    strategyArrivalContext: options?.strategyArrivalContext,
     createdAt: now,
     updatedAt: now,
   };

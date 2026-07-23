@@ -10,6 +10,8 @@ import type { StrategyDecisionRecordView } from "@/lib/strategyChamber/types";
 type Props = {
   record: StrategyDecisionRecordView;
   className?: string;
+  /** When true, only core sections start expanded; full detail remains available. */
+  summaryFirst?: boolean;
 };
 
 const SECTIONS: {
@@ -39,12 +41,31 @@ const SECTIONS: {
  * Concise, expandable Strategy Decision Record — not a long strategy document.
  * Empty optional list sections stay hidden.
  */
-export function StrategyDecisionRecord({ record, className = "" }: Props) {
-  const [open, setOpen] = useState<Record<string, boolean>>({
-    whatYouWereDeciding: true,
-    directionYouChose: true,
-    nextHelpfulStep: true,
-  });
+export function StrategyDecisionRecord({
+  record,
+  className = "",
+  summaryFirst = true,
+}: Props) {
+  const [open, setOpen] = useState<Record<string, boolean>>(() =>
+    summaryFirst
+      ? {
+          whatYouWereDeciding: true,
+          directionYouChose: true,
+          nextHelpfulStep: true,
+        }
+      : {
+          whatYouWereDeciding: true,
+          whatIsHappeningNow: true,
+          directionYouChose: true,
+          whyThisDirectionFits: true,
+          whatYouAreNotChoosing: true,
+          assumptionsToTest: true,
+          risksToWatch: true,
+          howYouWillKnowItIsWorking: true,
+          whenToReview: true,
+          nextHelpfulStep: true,
+        },
+  );
 
   const visibleSections = SECTIONS.filter((section) => {
     if (
