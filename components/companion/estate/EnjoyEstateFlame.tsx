@@ -1,7 +1,7 @@
 "use client";
 
-const SPARK_FLAME_SRC = "/images/spark-estate-flame-only.jpg";
-const SPARK_FLAME_FALLBACK = "/images/spark-estate-flame.svg";
+const SPARK_FLAME_SRC = "/images/ssc-presence-flame.png";
+const SPARK_FLAME_FALLBACK = "/images/spark-estate-flame-only.jpg";
 
 export type EnjoyEstateFlameProps = {
   onClick: () => void;
