@@ -1,6 +1,8 @@
 import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
-import { SPARK_NOTE_CATALOG } from "./catalog";
-import { resolveSparkCardSpecificArtAsset } from "./sparkCardArtRegistry";
+import {
+  resolveSparkCardDiversityArtAsset,
+  resolveSparkCardSpecificArtAsset,
+} from "./sparkCardArtRegistry";
 import {
   diversityCategoryIcon,
   diversityCategoryLabel,
@@ -164,12 +166,6 @@ export function resolveSparkInAction(card: SparkNoteDailyCard): string {
   return DIVERSITY_TINY_ACTIONS[diversity];
 }
 
-export type SparkCardRelatedSpark = {
-  id: string;
-  title: string;
-  categoryRibbon: string;
-};
-
 export type SparkCardGalleryItem = { emblem: string; caption: string };
 export type SparkCardTimelineItem = { label: string; detail?: string };
 
@@ -193,7 +189,6 @@ export type SparkCardTellMeMore = {
   /** Genuinely new facts only — never a repeat of front copy. */
   facts: string[];
   reflectionPrompt: string | null;
-  related: SparkCardRelatedSpark[];
   /** "Zoom in" detail not present anywhere on the front. */
   lookCloser: string | null;
   /** A second story beat — behind-the-scenes context, not a rephrase. */
@@ -262,8 +257,6 @@ function resolveFrontContentFingerprints(card: SparkNoteDailyCard): string[] {
 
 export type SparkCardSimplifiedPresentation = {
   categoryRibbon: string;
-  /** Small emblem for the category badge — visual redesign, additive. */
-  categoryIcon: string;
   diversityCategory: SparkCardDiversityCategoryId;
   title: string;
   subtitle: string;
@@ -272,47 +265,6 @@ export type SparkCardSimplifiedPresentation = {
   sparkInAction: string;
   tellMeMore: SparkCardTellMeMore;
 };
-
-function resolveRelatedSparks(card: SparkNoteDailyCard): SparkCardRelatedSpark[] {
-  const diversity = resolveSparkCardDiversityCategory({
-    category: card.category,
-    categoryLabel: card.categoryLabel,
-    tags: card.tags,
-    title: card.title,
-  });
-  const tagSet = new Set((card.tags ?? []).map((t) => t.toLowerCase()));
-
-  return SPARK_NOTE_CATALOG.filter((entry) => entry.id !== card.id)
-    .map((entry) => {
-      const entryDiversity = resolveSparkCardDiversityCategory({
-        category: entry.category,
-        categoryLabel: entry.categoryLabel,
-        tags: entry.tags,
-        title: entry.title,
-      });
-      const sharedTags = (entry.tags ?? []).filter((t) =>
-        tagSet.has(t.toLowerCase()),
-      ).length;
-      const score =
-        (entryDiversity === diversity ? 3 : 0) +
-        sharedTags +
-        (entry.category === card.category ? 1 : 0);
-      return { entry, score };
-    })
-    .filter((row) => row.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
-    .map(({ entry }) => ({
-      id: entry.id,
-      title: entry.shortTitle ?? entry.title,
-      categoryRibbon: resolveSparkCardCategoryRibbon({
-        category: entry.category,
-        categoryLabel: entry.categoryLabel,
-        tags: entry.tags,
-        title: entry.title,
-      }),
-    }));
-}
 
 /**
  * Tell Me More — the genuinely-new second layer.
@@ -402,7 +354,6 @@ export function resolveSparkCardTellMeMore(
   return {
     facts,
     reflectionPrompt: reflection,
-    related: resolveRelatedSparks(card),
     lookCloser,
     deeperStory,
     whatHappenedNext,
@@ -435,7 +386,6 @@ export function resolveSparkCardSimplifiedPresentation(
       tags: card.tags,
       title: card.title,
     }),
-    categoryIcon: diversityCategoryIcon(diversityCategory),
     diversityCategory,
     title: card.title,
     subtitle: card.teaser?.trim() || "A small idea waiting to brighten your day.",
@@ -480,32 +430,18 @@ export type SparkCardHeroVisual =
       alt: string;
     };
 
-/** Category emblem for collectible themed art when no photo ships. */
-export const SPARK_CARD_CATEGORY_EMBLEM: Record<SparkNoteCategory, string> = {
-  invention: "💡",
-  inventor: "🧭",
-  entrepreneur: "🚀",
-  business: "📈",
-  history: "📜",
-  holiday: "✨",
-  fun_fact: "🎲",
-  quote: "💬",
-  creativity: "🎨",
-  personal_growth: "🌱",
-  gratitude: "🙏",
-  adhd_friendly: "⚡",
-  personal: "🔥",
-};
-
 /**
  * Hero visual for expanded Spark Cards — always returns something displayable.
  *
- * Only uses a real photo when it is genuinely topic-specific (an explicit
- * catalog image, or a matched person/object/topic). Everything else renders
- * the illustrated themed scene (medallion emblem + supporting motifs) so the
- * ~90% of the library without a specific photo never recycles the same
- * handful of generic per-category stock photos — see
- * docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md.
+ * Real photography is now the default: a genuinely topic-specific photo
+ * (explicit catalog image, or a matched person/object/topic) wins first;
+ * otherwise every card falls through to a real, warm editorial/botanical/
+ * archival photo for its diversity category (see
+ * `SPARK_CARD_DIVERSITY_CATEGORY_ART`). The illustrated themed scene
+ * (medallion emblem + supporting motifs) is kept only as the runtime
+ * fallback the component shows if a photo genuinely fails to load — it is
+ * never the primary hero anymore. See
+ * docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
  */
 export function resolveSparkCardHeroVisual(
   card: SparkNoteDailyCard,
@@ -513,6 +449,17 @@ export function resolveSparkCardHeroVisual(
   const specific = resolveSparkCardSpecificArtAsset(card);
   if (specific) {
     return { kind: "photo", src: specific.src, alt: specific.alt };
+  }
+
+  const diversityCategory = resolveSparkCardDiversityCategory({
+    category: card.category,
+    categoryLabel: card.categoryLabel,
+    tags: card.tags,
+    title: card.title,
+  });
+  const diversityPhoto = resolveSparkCardDiversityArtAsset(diversityCategory);
+  if (diversityPhoto) {
+    return { kind: "photo", src: diversityPhoto.src, alt: diversityPhoto.alt };
   }
 
   return resolveSparkCardThemedScene(card);

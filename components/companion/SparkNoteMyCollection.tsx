@@ -20,9 +20,9 @@ import {
 
 } from "@/lib/sparkNote/mySparksCollection";
 
-import { SPARK_CARD_CATEGORY_EMBLEM } from "@/lib/sparkNote/sparkCardCollectibleDisplay";
-
 import { useDismissibleWindow } from "@/lib/windowDismiss";
+
+import { SparkSparkleIcon } from "@/components/companion/SparkNoteSectionIcons";
 
 type Props = {
 
@@ -295,9 +295,7 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
 
                   <span className="spark-note-collection__item-category">
 
-                    <span aria-hidden>
-                      {SPARK_CARD_CATEGORY_EMBLEM[item.category] ?? "✨"}{" "}
-                    </span>
+                    <SparkSparkleIcon className="spark-note-collection__item-category-icon" />
 
                     {item.categoryLabel}
 

@@ -20,6 +20,12 @@ import {
 } from "@/lib/sparkNote/persistence";
 import { copySparkNoteText } from "@/lib/sparkNote/sparkNoteDestinations";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
+import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
+import {
+  SparkMagnifyingGlassIcon,
+  SparkOpenBookIcon,
+  SparkSparkleIcon,
+} from "@/components/companion/SparkNoteSectionIcons";
 
 type Props = {
   card: SparkNoteDailyCard;
@@ -31,9 +37,11 @@ type ViewPhase = "keepsake" | "saved";
 
 /**
  * Illustrated hero scene — medallion emblem, scattered motifs, and a small
- * "washi tape" + "stamp" ephemera treatment. Renders whenever no genuinely
- * topic-specific photo exists, so cards never fall back to a single lonely
- * icon in a blank box (see Spark Card Imagery fix report).
+ * "washi tape" + "stamp" ephemera treatment. Every diversity category now
+ * resolves to a real photo (see `SPARK_CARD_DIVERSITY_CATEGORY_ART`), so
+ * this only renders as the `onError` fallback if a photo genuinely fails to
+ * load at runtime — never as the primary hero. See
+ * docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
  */
 function SparkCardIllustratedScene({
   card,
@@ -230,9 +238,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
         />
         <div className="spark-note-expanded__card spark-note-expanded__card--saved">
           <SparkCardOrnaments />
-          <span className="spark-note-expanded__saved-flame" aria-hidden>
-            🔥
-          </span>
+          <SparkFlameIcon className="spark-note-expanded__saved-flame" />
           <p className="spark-note-expanded__saved-title" role="status">
             Saved to your collection
           </p>
@@ -263,8 +269,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     Boolean(tellMeMore.tryThis) ||
     tellMeMore.gallery.length > 0 ||
     tellMeMore.timeline.length > 0 ||
-    Boolean(tellMeMore.reflectionPrompt) ||
-    tellMeMore.related.length > 0;
+    Boolean(tellMeMore.reflectionPrompt);
 
   return (
     <div
@@ -290,9 +295,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
             className="spark-note-expanded__badge"
             aria-label={`Category: ${presentation.categoryRibbon}`}
           >
-            <span className="spark-note-expanded__badge-icon" aria-hidden>
-              {presentation.categoryIcon}
-            </span>
+            <SparkFlameIcon className="spark-note-expanded__badge-icon" />
             <span className="spark-note-expanded__badge-text">
               {presentation.categoryRibbon}
             </span>
@@ -320,9 +323,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
         <div className="spark-note-expanded__sections">
           <section className="spark-note-expanded__section spark-note-expanded__section--story">
             <h3 className="spark-note-expanded__section-title">
-              <span className="spark-note-expanded__section-icon" aria-hidden>
-                📖
-              </span>
+              <SparkOpenBookIcon className="spark-note-expanded__section-icon" />
               {SPARK_CARD_SECTION_STORY}
             </h3>
             {presentation.storyParagraphs.map((paragraph, index) => (
@@ -338,9 +339,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           <div className="spark-note-expanded__panels">
             <section className="spark-note-expanded__panel spark-note-expanded__panel--takeaway">
               <h3 className="spark-note-expanded__panel-title">
-                <span className="spark-note-expanded__panel-icon" aria-hidden>
-                  ✨
-                </span>
+                <SparkSparkleIcon className="spark-note-expanded__panel-icon" />
                 {SPARK_CARD_SECTION_TODAYS_SPARK}
               </h3>
               <p className="spark-note-expanded__panel-copy">
@@ -350,9 +349,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           </div>
 
           <section className="spark-note-expanded__action">
-            <span className="spark-note-expanded__action-icon" aria-hidden>
-              🔥
-            </span>
+            <SparkFlameIcon className="spark-note-expanded__action-icon" />
             <div className="spark-note-expanded__action-copy">
               <h3 className="spark-note-expanded__action-title">
                 {SPARK_CARD_SECTION_SPARK_IN_ACTION}
@@ -372,7 +369,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
               aria-expanded={tellMeMoreOpen}
               onClick={() => setTellMeMoreOpen((open) => !open)}
             >
-              <span aria-hidden>🔎 </span>
+              <SparkMagnifyingGlassIcon className="spark-note-expanded__more-toggle-icon" />
               {SPARK_CARD_SECTION_TELL_ME_MORE}
             </button>
             {tellMeMoreOpen ? (
@@ -380,25 +377,31 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                 className="spark-note-expanded__more-panel"
                 data-testid="spark-note-tell-me-more"
               >
-                {/* 1 — visual reveal comes first, never a paragraph */}
+                {/* 1 — visual reveal comes first, never a paragraph.
+                    Non-interactive labels by design (no button semantics,
+                    no hover/focus affordance) — a set of small captioned
+                    notes to read, not pills that pretend to be tappable. */}
                 {tellMeMore.gallery.length > 0 ? (
                   <div className="spark-note-expanded__more-gallery">
                     <p className="spark-note-expanded__more-section-label">
                       See It Differently
                     </p>
-                    <div className="spark-note-expanded__more-gallery-row">
+                    <ul
+                      className="spark-note-expanded__more-gallery-row"
+                      aria-label="A few different ways to see this"
+                    >
                       {tellMeMore.gallery.map((item, index) => (
-                        <div
+                        <li
                           key={`gallery-${index}`}
                           className="spark-note-expanded__more-gallery-chip"
                         >
-                          <span aria-hidden>{item.emblem}</span>
+                          <SparkSparkleIcon className="spark-note-expanded__more-gallery-chip-icon" />
                           <span className="spark-note-expanded__more-gallery-caption">
                             {item.caption}
                           </span>
-                        </div>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 ) : null}
 
@@ -484,7 +487,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                 {/* 5 — optional reflection / try this */}
                 {tellMeMore.tryThis ? (
                   <div className="spark-note-expanded__more-try">
-                    <span aria-hidden>🌟</span>
+                    <SparkSparkleIcon className="spark-note-expanded__more-try-icon" />
                     <p>{tellMeMore.tryThis}</p>
                   </div>
                 ) : null}
@@ -493,24 +496,6 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                   <p className="spark-note-expanded__section-copy spark-note-expanded__section-copy--quiet">
                     A question to sit with: {tellMeMore.reflectionPrompt}
                   </p>
-                ) : null}
-
-                {tellMeMore.related.length > 0 ? (
-                  <div className="spark-note-expanded__related">
-                    <p className="spark-note-expanded__related-label">
-                      Related sparks
-                    </p>
-                    <ul>
-                      {tellMeMore.related.map((related) => (
-                        <li key={related.id}>
-                          <span className="spark-note-expanded__related-ribbon">
-                            {related.categoryRibbon}
-                          </span>
-                          {related.title}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
                 ) : null}
 
                 {/* 6 — sources */}

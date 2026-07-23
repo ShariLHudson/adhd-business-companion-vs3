@@ -12,7 +12,11 @@ import {
   resolveTodaysSpark,
   splitSparkCardStoryParagraphs,
 } from "./sparkCardCollectibleDisplay";
-import { resolveSparkCardArtAsset } from "./sparkCardArtRegistry";
+import {
+  resolveSparkCardArtAsset,
+  resolveSparkCardDiversityArtAsset,
+} from "./sparkCardArtRegistry";
+import { SPARK_CARD_DIVERSITY_CATEGORY_IDS } from "./sparkCardDiversity";
 import { SPARK_NOTE_CATALOG } from "./catalog";
 import type { SparkNoteDailyCard } from "./types";
 
@@ -322,7 +326,14 @@ describe("sparkCardCollectibleDisplay", () => {
     expect(nature.motifs).not.toEqual(invention.motifs);
   });
 
-  it("falls back to the illustrated themed scene when no specific photo exists for a card", () => {
+  // ——— Real imagery is now the default hero (Readability/Real Imagery
+  // fix). The illustrated themed scene only ever renders as the runtime
+  // `onError` fallback inside SparkNoteExpanded — resolveSparkCardHeroVisual
+  // itself should never hand back "themed" for a normal card, because every
+  // diversity category now maps to a real, warm editorial/archival photo.
+  // See docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
+
+  it("uses a real diversity-category photo — never the illustrated scene — even with no bespoke photo", () => {
     const visual = resolveSparkCardHeroVisual({
       ...sampleCard,
       id: "SPARK-NO-PHOTO-TEST-001",
@@ -332,6 +343,33 @@ describe("sparkCardCollectibleDisplay", () => {
       shortTitle: "No photo card",
       tags: [],
     });
-    expect(visual.kind).toBe("themed");
+    expect(visual.kind).toBe("photo");
+    if (visual.kind === "photo") {
+      expect(visual.src).toContain("wikimedia");
+      expect(visual.alt.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("every diversity category resolves to a real, non-empty photo asset", () => {
+    for (const id of SPARK_CARD_DIVERSITY_CATEGORY_IDS) {
+      const asset = resolveSparkCardDiversityArtAsset(id);
+      expect(asset.src.length, `diversity category ${id} has no photo src`).toBeGreaterThan(0);
+      expect(asset.src).toContain("wikimedia");
+      expect(asset.alt.length, `diversity category ${id} has no photo alt`).toBeGreaterThan(0);
+    }
+  });
+
+  it("every card in the full library resolves a real photo as its hero visual", () => {
+    for (const entry of SPARK_NOTE_CATALOG) {
+      const card = catalogEntryToDailyCard(entry);
+      const visual = resolveSparkCardHeroVisual(card);
+      expect(visual.kind, `card ${card.id} did not resolve a photo hero`).toBe("photo");
+    }
+  });
+
+  it("the illustrated themed scene remains available as the onError runtime fallback", () => {
+    const scene = resolveSparkCardThemedScene(sampleCard);
+    expect(scene.kind).toBe("themed");
+    expect(scene.emblem.length).toBeGreaterThan(0);
   });
 });

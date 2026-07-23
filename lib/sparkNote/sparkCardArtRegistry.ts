@@ -1,9 +1,38 @@
 import type { SparkNoteCategory, SparkNoteDailyCard } from "./types";
+import type { SparkCardDiversityCategoryId } from "./sparkCardDiversity";
 
 export type SparkCardArtAsset = {
   src: string;
   alt: string;
 };
+
+/**
+ * Build a stable Wikimedia Commons image URL from a file *title* instead of
+ * a hand-copied `/wikipedia/commons/<hash>/<hash2>/File.jpg` path.
+ *
+ * The hash-prefixed upload path previously hard-coded in this file is easy
+ * to get wrong (a renamed/re-hashed file silently 404s forever) and several
+ * entries were doing exactly that — see
+ * docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
+ * `Special:FilePath` resolves by title and 302s to the current file, so it
+ * keeps working even if the underlying hash changes. `width` requests a
+ * reasonably sized rendition instead of hot-linking a multi-MB original.
+ * Titles use Wikimedia's canonical underscore form (spaces are equivalent,
+ * but underscores keep the URL free of `%20`).
+ */
+export function wikimediaCommonsImage(
+  title: string,
+  alt: string,
+  widthPx = 900,
+): SparkCardArtAsset {
+  const canonicalTitle = title.replace(/ /g, "_");
+  return {
+    src: `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(
+      canonicalTitle,
+    )}?width=${widthPx}`,
+    alt,
+  };
+}
 
 /** Topic / person / title patterns — checked before category defaults. */
 const SPARK_CARD_TOPIC_ART: readonly {
@@ -12,166 +41,191 @@ const SPARK_CARD_TOPIC_ART: readonly {
 }[] = [
   {
     pattern: /oscar wilde|SPARK-QUOTE-008/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/a/a7/Oscar_Wilde_Sarony.jpg",
-      alt: "Oscar Wilde portrait",
-    },
+    asset: wikimediaCommonsImage("Oscar Wilde Sarony.jpg", "Oscar Wilde portrait"),
   },
   {
     pattern: /einstein|SPARK-QUOTE-004|SPARK-QUOTE-006/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Albert_Einstein_Head.jpg",
-      alt: "Albert Einstein portrait",
-    },
+    asset: wikimediaCommonsImage("Albert Einstein Head.jpg", "Albert Einstein portrait"),
   },
   {
     pattern: /steve jobs|SPARK-QUOTE-001|SPARK-QUOTE-002/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/d/dc/Steve_Jobs_Headshot_2010-CROP_%28cropped_2%29.jpg",
-      alt: "Steve Jobs portrait",
-    },
+    asset: wikimediaCommonsImage(
+      "Steve Jobs Headshot 2010-CROP (cropped 2).jpg",
+      "Steve Jobs portrait",
+    ),
   },
   {
     pattern: /churchill|SPARK-QUOTE-003/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/b/bc/Sir_Winston_Churchill_-_19086236948.jpg",
-      alt: "Winston Churchill portrait",
-    },
+    asset: wikimediaCommonsImage(
+      "Sir Winston Churchill - 19086236948.jpg",
+      "Winston Churchill portrait",
+    ),
   },
   {
     pattern: /walt disney|SPARK-QUOTE-005/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/d/df/Walt_Disney_1946.JPG",
-      alt: "Walt Disney portrait",
-    },
+    asset: wikimediaCommonsImage("Walt Disney 1946.JPG", "Walt Disney portrait"),
   },
   {
     pattern: /henry ford|SPARK-QUOTE-007/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/6/67/Henry_Ford_1919.jpg",
-      alt: "Henry Ford portrait",
-    },
+    asset: wikimediaCommonsImage("Henry Ford 1919.jpg", "Henry Ford portrait"),
   },
   {
     pattern: /arthur ashe|SPARK-QTE-003/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/4/4e/Arthur_Ashe_%281975%29.jpg",
-      alt: "Arthur Ashe portrait",
-    },
+    asset: wikimediaCommonsImage("Arthur Ashe (1975).jpg", "Arthur Ashe portrait"),
   },
   {
     pattern: /matisse|SPARK-QTE-004/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/0/0a/Henri_Matisse%2C_1913%2C_portrait_by_Alvin_Langdon_Coburn.jpg",
-      alt: "Henri Matisse portrait",
-    },
+    asset: wikimediaCommonsImage(
+      "Henri Matisse, 1913, portrait by Alvin Langdon Coburn.jpg",
+      "Henri Matisse portrait",
+    ),
   },
   {
     pattern: /post-it|SPARK-INV-001/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/0/04/Post-it_notes.jpg",
-      alt: "Colorful sticky notes",
-    },
+    asset: wikimediaCommonsImage("Post-it notes.jpg", "Colorful sticky notes"),
   },
   {
     pattern: /microwave|SPARK-INV-002/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Microwave_oven.jpg",
-      alt: "Microwave oven",
-    },
+    asset: wikimediaCommonsImage("Microwave oven.jpg", "Microwave oven"),
   },
   {
     pattern: /mouse|SPARK-INV-010/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/9/97/Computer_mouse_logitech.jpg",
-      alt: "Computer mouse",
-    },
+    asset: wikimediaCommonsImage("Computer mouse logitech.jpg", "Computer mouse"),
   },
   {
     pattern: /velcro|SPARK-INV-003/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Close_up_of_Velcro.jpg",
-      alt: "Velcro fastener close-up",
-    },
+    asset: wikimediaCommonsImage("Close up of Velcro.jpg", "Velcro fastener close-up"),
   },
   {
+    // Fixed: previous "Penicillin_production.jpg" hash path could not be
+    // verified against Wikimedia — the Spencer microscope photo below is a
+    // confirmed, currently-existing file with the same warm lab-discovery feel.
     pattern: /penicillin|SPARK-INNOV-001/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/b/bf/Penicillin_production.jpg",
-      alt: "Penicillin laboratory culture",
-    },
+    asset: wikimediaCommonsImage("Spencer Microscope.jpg", "Antique brass laboratory microscope"),
   },
   {
     pattern: /super soaker|SPARK-INNOV-003/i,
-    asset: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/8/8d/Super_Soaker_CPS_2000.jpg",
-      alt: "Super Soaker water toy",
-    },
+    asset: wikimediaCommonsImage("Super Soaker CPS 2000.jpg", "Super Soaker water toy"),
   },
 ];
 
 const SPARK_CARD_CATEGORY_ART: Record<SparkNoteCategory, SparkCardArtAsset> = {
-  invention: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Edison_and_light_bulb.jpg",
-    alt: "Inventor with early light bulb",
-  },
-  inventor: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Edison_and_light_bulb.jpg",
-    alt: "Inventor portrait with invention",
-  },
-  entrepreneur: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/8/8d/New_York_Stock_Exchange_Facade_2015.jpg",
-    alt: "Historic business district architecture",
-  },
-  business: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/4/4c/Office_desk_with_typewriter_and_telephone%2C_ca._1910.jpg",
-    alt: "Vintage office desk and telephone",
-  },
-  history: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/5/5f/Declaration_of_Independence_1819_by_John_Trumbull.jpg",
-    alt: "Historic painting of a pivotal moment",
-  },
-  holiday: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/1/14/Christmas_tree_with_presents.jpg",
-    alt: "Holiday tree with warm light",
-  },
-  fun_fact: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/4/4d/Magnifying_glass2.jpg",
-    alt: "Magnifying glass — curiosity and discovery",
-  },
-  quote: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Quill_and_ink.jpg",
-    alt: "Quill and ink — literary writing atmosphere",
-  },
-  creativity: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Monet_-_Impression%2C_Sunrise.jpg",
-    alt: "Impressionist painting — creative atmosphere",
-  },
-  personal_growth: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Fjord_in_Norway.jpg",
-    alt: "Path toward open horizon",
-  },
-  gratitude: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/5/57/Sunrise_over_the_sea.jpg",
-    alt: "Sunrise over calm water",
-  },
-  adhd_friendly: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Colorful_sticky_notes_on_wall.jpg",
-    alt: "Colorful notes and visual organization",
-  },
-  personal: {
-    src: "https://upload.wikimedia.org/wikipedia/commons/1/1e/Journal_and_pen.jpg",
-    alt: "Open journal with pen",
-  },
+  // Fixed: "Edison_and_light_bulb.jpg" does not exist on Commons under that
+  // title (confirmed 404). "Edison bulb.jpg" is the real file — Edison's
+  // first demonstration bulb at Menlo Park.
+  invention: wikimediaCommonsImage("Edison bulb.jpg", "Thomas Edison's first demonstration light bulb"),
+  inventor: wikimediaCommonsImage("Edison bulb.jpg", "Thomas Edison's first demonstration light bulb"),
+  entrepreneur: wikimediaCommonsImage(
+    "New York Stock Exchange Facade 2015.jpg",
+    "Historic business district architecture",
+  ),
+  business: wikimediaCommonsImage(
+    "Office desk with typewriter and telephone, ca. 1910.jpg",
+    "Vintage office desk and telephone",
+  ),
+  // Fixed: the previous title was missing the parentheses/comma that are
+  // part of the real file name, which made the hard-coded hash path 404.
+  history: wikimediaCommonsImage(
+    "Declaration of Independence (1819), by John Trumbull.jpg",
+    "Historic painting of a pivotal moment",
+  ),
+  holiday: wikimediaCommonsImage("Christmas tree with presents.jpg", "Holiday tree with warm light"),
+  fun_fact: wikimediaCommonsImage(
+    "Magnifying glass on the page of a book.jpg",
+    "Magnifying glass — curiosity and discovery",
+  ),
+  quote: wikimediaCommonsImage("Quill and ink.jpg", "Quill and ink — literary writing atmosphere"),
+  creativity: wikimediaCommonsImage(
+    "Monet - Impression, Sunrise.jpg",
+    "Impressionist painting — creative atmosphere",
+  ),
+  personal_growth: wikimediaCommonsImage("Fjord in Norway.jpg", "Path toward open horizon"),
+  gratitude: wikimediaCommonsImage("Sunrise over the sea.jpg", "Sunrise over calm water"),
+  adhd_friendly: wikimediaCommonsImage(
+    "Colorful sticky notes on wall.jpg",
+    "Colorful notes and visual organization",
+  ),
+  personal: wikimediaCommonsImage("Journal and pen.jpg", "Open journal with pen"),
 };
+
+/**
+ * Real, warm editorial/botanical/archival photography for every approved
+ * diversity category (see sparkCardDiversity.ts) — used as the hero image
+ * whenever a card has no bespoke topic-specific photo. This is what stops
+ * the illustrated emblem+motifs scene from being the *default* hero: every
+ * card now shows an actual photograph instead of a themed panel. Every
+ * title below was checked against Wikimedia Commons during this pass — see
+ * docs/spark-card/ for verification notes and known gaps.
+ */
+export const SPARK_CARD_DIVERSITY_CATEGORY_ART: Record<
+  SparkCardDiversityCategoryId,
+  SparkCardArtAsset
+> = {
+  fun_celebrations: wikimediaCommonsImage(
+    "Happy birthday balloons Mexico.jpg",
+    "Warm toy balloons — a small, low-stakes celebration",
+  ),
+  innovation: wikimediaCommonsImage(
+    "Edison bulb.jpg",
+    "An early lightbulb prototype — invention before polish",
+  ),
+  remarkable_people: wikimediaCommonsImage(
+    "Mentor Graham Photograph Date Unknown From Abraham Lincoln Museum of Lincoln Memorial University, Harrogate, TN.jpg",
+    "An archival portrait — a quiet figure behind a well-known story",
+  ),
+  amazing_places: wikimediaCommonsImage(
+    "Fjord in Norway.jpg",
+    "A fjord in Norway — a place worth a second look",
+  ),
+  nature: wikimediaCommonsImage(
+    "The road in the autumn birch forest.jpg",
+    "A quiet autumn forest path",
+  ),
+  history: wikimediaCommonsImage(
+    "Declaration of Independence (1819), by John Trumbull.jpg",
+    "A historic painting of a pivotal moment",
+  ),
+  fun_facts: wikimediaCommonsImage(
+    "Magnifying glass on the page of a book.jpg",
+    "A magnifying glass over an open page — curiosity in close-up",
+  ),
+  kindness: wikimediaCommonsImage(
+    "A Helping Hand.jpg",
+    "A small helping hand — kindness offered quietly",
+  ),
+  curiosity: wikimediaCommonsImage(
+    "BLW Brass compass.jpg",
+    "An antique brass compass — a tool for wondering and wayfinding",
+  ),
+  inspiration: wikimediaCommonsImage("Sunrise over the sea.jpg", "Sunrise over calm water"),
+  books_ideas: wikimediaCommonsImage(
+    "Book-rose-and-candle-on-teak.jpg",
+    "An old book beside a candle — a quiet idea waiting to be read",
+  ),
+  creativity: wikimediaCommonsImage(
+    "Monet - Impression, Sunrise.jpg",
+    "Impression, Sunrise by Claude Monet — the painting that named a movement",
+  ),
+  science_technology: wikimediaCommonsImage(
+    "Spencer Microscope.jpg",
+    "An antique brass laboratory microscope",
+  ),
+};
+
+/** Real photo for a diversity category — always returns a usable asset. */
+export function resolveSparkCardDiversityArtAsset(
+  id: SparkCardDiversityCategoryId,
+): SparkCardArtAsset {
+  return SPARK_CARD_DIVERSITY_CATEGORY_ART[id];
+}
 
 /**
  * Resolve an explicit or topic-specific photo match only — never the
  * generic per-category stock photo. Returns `null` when nothing genuinely
- * topic-specific exists, so the caller can render the illustrated themed
- * scene instead of recycling the same handful of category photos across
- * every card that shares a legacy category (the "sparse / generic imagery"
- * problem — see docs/spark-card/SPARK_CARD_IMAGERY_AND_TELL_ME_MORE_FIX_REPORT.md).
+ * topic-specific exists, so the caller can fall through to the diversity
+ * category's real photo (and, only if that photo fails at runtime, the
+ * illustrated themed scene) — see
+ * docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
  */
 export function resolveSparkCardSpecificArtAsset(
   card: SparkNoteDailyCard,
@@ -203,10 +257,10 @@ export function resolveSparkCardSpecificArtAsset(
 
 /**
  * Resolve a meaningful hero image for collectible Spark Cards.
- * Prefers catalog imageSrc, then topic match, then category artwork.
- * @deprecated Prefer `resolveSparkCardSpecificArtAsset` + the illustrated
- * themed scene for the hero visual — kept for any legacy callers that need
- * a guaranteed real-photo fallback (e.g. supplementary Tell Me More art).
+ * Prefers catalog imageSrc, then topic match, then legacy category artwork.
+ * @deprecated Prefer `resolveSparkCardSpecificArtAsset` +
+ * `resolveSparkCardDiversityArtAsset` — kept for any legacy callers that
+ * need a guaranteed real-photo fallback keyed by the old 13-category enum.
  */
 export function resolveSparkCardArtAsset(
   card: SparkNoteDailyCard,
