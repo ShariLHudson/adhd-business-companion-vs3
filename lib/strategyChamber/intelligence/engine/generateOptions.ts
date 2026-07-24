@@ -18,6 +18,7 @@ import {
 } from "../domainIntelligence";
 import { pricingOptionPatterns } from "../domains/pricing";
 import { growthOptionPatterns } from "../domains/growth";
+import { synthesizeStrategyDomains } from "../synthesis";
 import { getStrategyType } from "../registry";
 import type { EnrichedStrategyOption, OptionPatternId } from "../types";
 import { assessOptionReadiness } from "./assessOptionReadiness";
@@ -189,6 +190,18 @@ export function generateFullStrategicOptions(
   if (distinction?.preferredPatterns?.length) {
     candidates = [
       ...distinction.preferredPatterns,
+      ...candidates,
+    ];
+  }
+
+  // Phase 5 — when a secondary domain is material, prefer synthesized candidates
+  const synthesis = synthesizeStrategyDomains(item);
+  if (
+    synthesis.selection.secondaryDomainId &&
+    synthesis.optionPatternCandidates?.length
+  ) {
+    candidates = [
+      ...synthesis.optionPatternCandidates,
       ...candidates,
     ];
   }

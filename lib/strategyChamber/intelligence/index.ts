@@ -14,6 +14,7 @@ export * from "./registry";
 export * from "./domainIntelligence";
 export * from "./domains/pricing";
 export * from "./domains/growth";
+export * from "./synthesis";
 
 export * from "./frameworks/optionCatalog";
 export * from "./frameworks/opportunityCost";

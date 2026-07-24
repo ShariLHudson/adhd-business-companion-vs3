@@ -7,6 +7,7 @@ import {
 } from "../domainIntelligence";
 import { suggestSecondOrderEffects } from "../frameworks/secondOrderThinking";
 import { assessReversibility } from "../frameworks/reversibility";
+import { synthesizeStrategyDomains } from "../synthesis";
 import type {
   HandoffContext,
   StrategicDecision,
@@ -110,9 +111,16 @@ export function analyzeStrategyWorkItem(
     );
   }
 
+  // Phase 5 — quiet cross-domain synthesis (primary + at most one secondary)
+  const domainSynthesis = synthesizeStrategyDomains(item, opts);
   const activeDomain = getDomainIntelligence(
-    strategicQuestion.strategyTypeId ?? item.strategyType,
+    domainSynthesis.selection.primaryDomainId ||
+      strategicQuestion.strategyTypeId ||
+      item.strategyType,
   );
+  const secondaryDomain = domainSynthesis.selection.secondaryDomainId
+    ? getDomainIntelligence(domainSynthesis.selection.secondaryDomainId)
+    : null;
   const matchedProblemDistinction = matchProblemDistinction(
     activeDomain,
     [
@@ -179,5 +187,7 @@ export function analyzeStrategyWorkItem(
     reversibilityDepth: depth,
     activeDomain,
     matchedProblemDistinction,
+    secondaryDomain,
+    domainSynthesis,
   };
 }

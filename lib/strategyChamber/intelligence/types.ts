@@ -354,4 +354,8 @@ export type StrategyJudgmentTurn = {
   activeDomain?: StrategyTypeContract | null;
   /** Phase 4 — matched problem distinction within the domain, when suspected. */
   matchedProblemDistinction?: DomainProblemDistinction | null;
+  /** Phase 5 — optional supporting domain (at most one). Never a second conversation. */
+  secondaryDomain?: StrategyTypeContract | null;
+  /** Phase 5 — cross-domain synthesis package (internal; not a member report). */
+  domainSynthesis?: import("./synthesis/types").StrategySynthesisResult | null;
 };
