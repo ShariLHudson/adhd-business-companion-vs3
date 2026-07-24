@@ -132,12 +132,13 @@ function SparkCardArt({
   overrideSrc?: string;
   overrideAlt?: string;
 }) {
-  // Live + print share resolveSparkCardImage (via hero visual).
+  // Live + print share one resolver — never gate visibility on a load flag.
+  // Cached images often skip onLoad; opacity:0 until load hid the hero live
+  // while print still painted the same <img>.
   const resolved = useMemo(() => resolveSparkCardImage(card), [card]);
   const hero = useMemo(() => resolveSparkCardHeroVisual(card), [card]);
   const fallbackScene = useMemo(() => resolveSparkCardThemedScene(card), [card]);
   const [photoFailed, setPhotoFailed] = useState(false);
-  const [photoLoaded, setPhotoLoaded] = useState(false);
   const photoSrc = useMemo(() => {
     if (overrideSrc?.trim()) {
       return normalizeSparkCardImageSrc(overrideSrc.trim());
@@ -145,7 +146,6 @@ function SparkCardArt({
     return resolved.src || "";
   }, [overrideSrc, resolved.src]);
   const hasPhotoCandidate = Boolean(photoSrc) && !photoFailed;
-  const showPhoto = hasPhotoCandidate && photoLoaded;
   const aspectRatio =
     resolved.aspectRatio ||
     (hero.kind === "photo" || hero.kind === "themed"
@@ -157,19 +157,26 @@ function SparkCardArt({
       ? hero.focalPoint
       : "center");
   const alt = overrideAlt || resolved.alt || fallbackScene.alt;
-  const caption =
-    !photoFailed && resolved.caption ? resolved.caption : undefined;
+  const caption = hasPhotoCandidate
+    ? resolved.caption ||
+      (hero.kind === "photo" ? hero.caption : undefined) ||
+      undefined
+    : undefined;
 
   useEffect(() => {
     setPhotoFailed(false);
-    setPhotoLoaded(false);
   }, [photoSrc]);
+
+  // No resolved photo and no override — omit the image region cleanly.
+  if (!photoSrc && !overrideSrc?.trim() && !resolved.hasImage) {
+    return null;
+  }
 
   return (
     <figure
       className={[
         "spark-note-expanded__art",
-        showPhoto ? "" : "spark-note-expanded__art--themed",
+        hasPhotoCandidate ? "" : "spark-note-expanded__art--themed",
         `spark-note-expanded__art--${aspectRatio}`,
         `spark-note-expanded__art--focus-${focalPoint}`,
       ]
@@ -177,6 +184,8 @@ function SparkCardArt({
         .join(" ")}
       data-spark-image-source={resolved.sourceType}
       data-spark-image-field={resolved.sourceField || undefined}
+      data-spark-has-image={hasPhotoCandidate ? "true" : "false"}
+      data-testid="spark-card-hero"
     >
       {hasPhotoCandidate ? (
         <img
@@ -186,10 +195,8 @@ function SparkCardArt({
           // Wikimedia / storage often block hotlinking with a Referer.
           referrerPolicy="no-referrer"
           decoding="async"
-          onLoad={() => setPhotoLoaded(true)}
           onError={() => {
             setPhotoFailed(true);
-            setPhotoLoaded(false);
             logSparkCardImageLoadError({
               cardId: card.id,
               src: photoSrc,
@@ -197,22 +204,15 @@ function SparkCardArt({
               error: "img_onerror",
             });
           }}
-          // Full-size under themed placeholder until paint — print + live share src.
-          style={
-            showPhoto
-              ? undefined
-              : { position: "absolute", inset: 0, opacity: 0, pointerEvents: "none" }
-          }
         />
-      ) : null}
-      {!showPhoto ? (
+      ) : (
         <SparkCardIllustratedScene
           card={card}
           scene={hero.kind === "themed" ? hero : fallbackScene}
         />
-      ) : null}
+      )}
       <span className="spark-note-expanded__art-frame" aria-hidden />
-      {showPhoto && caption ? (
+      {hasPhotoCandidate && caption ? (
         <figcaption className="spark-note-expanded__art-photo-caption">
           {caption}
         </figcaption>

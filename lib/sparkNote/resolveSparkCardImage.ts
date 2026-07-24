@@ -21,17 +21,23 @@ export type SparkCardImageSourceType =
   | "legacy_field"
   | "none";
 
+export type SparkCardImageFallbackState = "none" | "themed" | "omitted";
+
 export type ResolvedSparkCardImage = {
   src: string | null;
   alt: string;
   caption: string | null;
+  /** True when a displayable photo URL was resolved. */
+  hasImage: boolean;
   aspectRatio: SparkCardImageAspectRatio;
   focalPoint: SparkCardImageFocalPoint;
   credit: string | null;
   sourceType: SparkCardImageSourceType;
   /** Field name that supplied the URL (for dev diagnostics). */
   sourceField: string | null;
+  /** @deprecated Prefer hasImage / fallbackState */
   fallback: boolean;
+  fallbackState: SparkCardImageFallbackState;
 };
 
 /** Loose card-like input — supports catalog + library JSON + daily cards. */
@@ -172,12 +178,14 @@ export function resolveSparkCardImage(
         explicit?.alt ||
         `Artwork for ${withExplicit.title}`,
       caption: specific.caption?.trim() || null,
+      hasImage: true,
       aspectRatio: specific.aspectRatio ?? "landscape",
       focalPoint: specific.focalPoint ?? "center",
       credit: specific.credit?.trim() || null,
       sourceType: explicit ? "explicit" : "topic",
       sourceField: explicit?.field || "topic_registry",
       fallback: false,
+      fallbackState: "none",
     };
     logDevImageResolution(withExplicit.id, resolved);
     return resolved;
@@ -196,12 +204,14 @@ export function resolveSparkCardImage(
       src: normalizeSparkCardImageSrc(diversity.src),
       alt: diversity.alt || `Artwork for ${withExplicit.title}`,
       caption: diversity.caption?.trim() || null,
+      hasImage: true,
       aspectRatio: diversity.aspectRatio ?? "landscape",
       focalPoint: diversity.focalPoint ?? "center",
       credit: diversity.credit?.trim() || null,
       sourceType: "diversity",
       sourceField: "diversity_registry",
       fallback: false,
+      fallbackState: "none",
     };
     logDevImageResolution(withExplicit.id, resolved);
     return resolved;
@@ -211,12 +221,14 @@ export function resolveSparkCardImage(
     src: null,
     alt: `Themed artwork for ${withExplicit.title}`,
     caption: null,
+    hasImage: false,
     aspectRatio: "landscape",
     focalPoint: "center",
     credit: null,
     sourceType: "none",
     sourceField: null,
     fallback: true,
+    fallbackState: "themed",
   };
   logDevImageResolution(withExplicit.id, empty);
   return empty;

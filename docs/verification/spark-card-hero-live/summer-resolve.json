@@ -1,0 +1,13 @@
+{
+  "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Arch_door_and_portal_in_Walled_Garden_at_Goodnestone_Park_Kent_England.jpg/960px-Arch_door_and_portal_in_Walled_Garden_at_Goodnestone_Park_Kent_England.jpg",
+  "alt": "An open garden doorway in warm light — adventure close to home",
+  "caption": "Adventure can be close to home.",
+  "hasImage": true,
+  "aspectRatio": "editorial",
+  "focalPoint": "center",
+  "credit": "Wikimedia Commons",
+  "sourceType": "topic",
+  "sourceField": "topic_registry",
+  "fallback": false,
+  "fallbackState": "none"
+}

@@ -28,7 +28,9 @@ describe("resolveSparkCardImage", () => {
     expect(image.src).not.toContain("Special:FilePath");
     expect(image.caption).toBe("Adventure can be close to home.");
     expect(image.alt.toLowerCase()).toMatch(/door|garden|adventure/);
+    expect(image.hasImage).toBe(true);
     expect(image.fallback).toBe(false);
+    expect(image.fallbackState).toBe("none");
     expect(image.sourceType).toBe("topic");
   });
 
