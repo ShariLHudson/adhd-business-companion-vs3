@@ -10,6 +10,7 @@ import { __resetAdaptiveCompanionExplicitPrefsForTests } from "@/lib/adaptiveCom
 import { clearVisualThinkingRequestDraft } from "@/lib/cartographersStudio/visualThinkingRequest";
 import { clearGenerationBundle } from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
 import { clearKnowledgeBundle } from "@/lib/cartographersStudio/visualThinkingKnowledgeIntelligence";
+import { clearPresentationPlan } from "@/lib/cartographersStudio/visualThinkingPresentationIntelligence";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 function setTextarea(container: HTMLElement, testId: string, value: string) {
@@ -39,6 +40,7 @@ describe("VisualThinkingRequestPanel", () => {
     clearVisualThinkingRequestDraft();
     clearKnowledgeBundle();
     clearGenerationBundle();
+    clearPresentationPlan();
     __resetAdaptiveCompanionExplicitPrefsForTests();
     container = document.createElement("div");
     document.body.appendChild(container);
@@ -53,6 +55,7 @@ describe("VisualThinkingRequestPanel", () => {
     clearVisualThinkingRequestDraft();
     clearKnowledgeBundle();
     clearGenerationBundle();
+    clearPresentationPlan();
     __resetAdaptiveCompanionExplicitPrefsForTests();
   });
 
@@ -247,6 +250,30 @@ describe("VisualThinkingRequestPanel", () => {
     expect(
       container.querySelector(
         "[data-testid='visual-thinking-review-deliverable']",
+      ),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(
+        "[data-testid='visual-thinking-presentation-title']",
+      ),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(
+        "[data-testid='visual-thinking-show-differently']",
+      ),
+    ).toBeTruthy();
+    expect(
+      container.querySelector("[data-testid='visual-thinking-density']"),
+    ).toBeTruthy();
+    expect(container.innerHTML).not.toMatch(
+      /VisualThinkingPresentationPlan|recommendedPresentation/,
+    );
+    act(() => {
+      click(container, "visual-thinking-show-differently");
+    });
+    expect(
+      container.querySelector(
+        "[data-testid='visual-thinking-presentation-alternates']",
       ),
     ).toBeTruthy();
   });

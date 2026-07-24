@@ -158,5 +158,6 @@ Not in this build: live research, source collection, full generation of reports/
 - Build 3 — [Experience Orchestrator](./VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md)  
 - Build 5 — [Knowledge Intelligence](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md)  
 - Build 4 — [Generation Engine](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md)  
+- Build 6 — [Presentation Intelligence](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md)  
 
-Knowledge and Generation must not re-run Understanding logic.
+Knowledge, Generation, and Presentation must not re-run Understanding logic.

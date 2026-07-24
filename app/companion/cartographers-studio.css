@@ -1351,6 +1351,98 @@
   gap: 0.55rem;
 }
 
+/* ——— Presentation review workspace (Build 6) ——— */
+.vts-presentation__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.vts-presentation__bar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vts-presentation__density {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 7rem;
+}
+
+.vts-presentation__density-select {
+  border-radius: 0.55rem;
+  border: 1px solid rgba(30, 79, 79, 0.28);
+  background: rgba(255, 253, 248, 0.95);
+  color: #1a2e2e;
+  font-size: 0.95rem;
+  padding: 0.45rem 0.55rem;
+  min-height: 2.5rem;
+}
+
+.vts-presentation__density-select:focus-visible,
+.vts-presentation__bar-actions .vts-request__secondary-btn:focus-visible,
+.vts-presentation__alternates .vts-request__choice:focus-visible {
+  outline: 2px solid #1e4f4f;
+  outline-offset: 2px;
+}
+
+.vts-presentation__alternates {
+  margin: 0.5rem 0 0.85rem;
+  padding: 0.75rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 253, 248, 0.92);
+  border: 1px solid rgba(184, 149, 106, 0.28);
+}
+
+.vts-presentation__primary {
+  position: relative;
+}
+
+.vts-presentation__supporting {
+  margin-top: 0.85rem;
+}
+
+.vts-presentation__canvas-shell {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.85rem;
+  background: rgba(255, 253, 248, 0.9);
+  border: 1px dashed rgba(30, 79, 79, 0.25);
+}
+
+.vts-presentation__shell-actions {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.vts-request__block--collapsed {
+  list-style: none;
+}
+
+@media (min-width: 768px) {
+  .vts-presentation__primary--split {
+    display: grid;
+    gap: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vts-presentation * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
 /* ——— Editable Mind Map canvas ——— */
 .mind-map-canvas {
   display: flex;

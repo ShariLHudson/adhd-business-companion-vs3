@@ -25,6 +25,8 @@ VisualThinkingRequest
 → VisualThinkingKnowledgePackage
 → VisualThinkingGenerationRun
 → Generated Deliverables
+→ VisualThinkingPresentationPlan
+→ Presentation Workspace
 ```
 
 The Knowledge Intelligence Engine must **not** re-interpret goals, choose new deliverables, change the experience plan, or regenerate content.
@@ -141,6 +143,10 @@ Live web research · crawling · citation fetching · broad connectors · canvas
 
 ---
 
-## Build 6 recommendation
+## Presentation handoff
+
+Generated deliverables pass through [Presentation Intelligence](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md) (Build 6) before the review workspace. Presentation must not recreate or mutate the Knowledge Package.
+
+## Build 7 recommendation
 
 **Research Acquisition Engine** — resolve `external_research` gaps by gathering approved sources into the same Knowledge Package contract, then re-assess readiness without changing the experience plan.

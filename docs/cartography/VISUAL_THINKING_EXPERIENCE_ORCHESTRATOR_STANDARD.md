@@ -155,10 +155,11 @@ Plans may list suggested targets; nothing is handed off in this build.
 | **Experience Orchestrator** | Experience plan, stages, interaction, switching contract |
 | Knowledge Intelligence | Knowledge Plan + Package — see [VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md) |
 | Generation Engine | Creating artifacts from a confirmed plan + Knowledge Package — see [VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md) |
+| Presentation Intelligence | How approved deliverables are initially experienced — see [VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md) |
 | Research Engine (later) | Live research acquisition into the Knowledge Package |
 | Canvas Engine (later) | Map / visual editing |
 
-Keep orchestration independent from generation, research, and canvas.
+Keep orchestration independent from generation, presentation, research, and canvas.
 
 ---
 
@@ -179,5 +180,5 @@ Must not reduce requested depth, change the goal, or force a format.
 
 ## Downstream
 
-Build 5 — Knowledge Intelligence · Build 4 — Generation Engine  
-The Orchestrator does not assemble knowledge; it only decides experience and deliverables.
+Build 5 — Knowledge Intelligence · Build 4 — Generation Engine · Build 6 — Presentation Intelligence  
+The Orchestrator does not assemble knowledge or choose presentation; it only decides experience and deliverables.

@@ -59,6 +59,16 @@ import {
   saveKnowledgeBundle,
   type VisualThinkingKnowledgeBundle,
 } from "@/lib/cartographersStudio/visualThinkingKnowledgeIntelligence";
+import {
+  applyPresentationOverride,
+  clearPresentationPlan,
+  collectPresentationStructureSignals,
+  loadPresentationPlan,
+  planVisualThinkingPresentation,
+  projectPresentationWorkspace,
+  savePresentationPlan,
+  type VisualThinkingPresentationPlan,
+} from "@/lib/cartographersStudio/visualThinkingPresentationIntelligence";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 type Props = {
@@ -92,7 +102,7 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 
 /**
  * Request-first opening experience for Visual Thinking Studio.
- * Builds 2–4: Understanding → Orchestrator plan → Generation.
+ * Builds 2–6: Understanding → Orchestrator → Knowledge → Generation → Presentation.
  */
 export function VisualThinkingRequestPanel({
   onOpenPreviousWork,
@@ -110,6 +120,10 @@ export function VisualThinkingRequestPanel({
   const [gapAnswer, setGapAnswer] = useState("");
   const [generationBundle, setGenerationBundle] =
     useState<VisualThinkingGenerationBundle | null>(null);
+  const [presentationPlan, setPresentationPlan] =
+    useState<VisualThinkingPresentationPlan | null>(null);
+  const [showThisDifferently, setShowThisDifferently] = useState(false);
+  const [showAllAlternates, setShowAllAlternates] = useState(false);
   const [activeDeliverableId, setActiveDeliverableId] = useState<string | null>(
     null,
   );
@@ -139,6 +153,8 @@ export function VisualThinkingRequestPanel({
       setGenerationBundle(existingGen);
       setActiveDeliverableId(existingGen.run.primaryDeliverableId);
     }
+    const existingPresentation = loadPresentationPlan();
+    if (existingPresentation) setPresentationPlan(existingPresentation);
   }, []);
 
   useEffect(() => {
@@ -152,6 +168,10 @@ export function VisualThinkingRequestPanel({
   useEffect(() => {
     if (generationBundle) saveGenerationBundle(generationBundle);
   }, [generationBundle]);
+
+  useEffect(() => {
+    if (presentationPlan) savePresentationPlan(presentationPlan);
+  }, [presentationPlan]);
 
   useEffect(() => {
     return () => {
@@ -186,6 +206,15 @@ export function VisualThinkingRequestPanel({
   const activeDeliverable =
     generationBundle?.deliverables.find((d) => d.id === activeDeliverableId) ??
     primaryDeliverable;
+  const presentationWorkspace =
+    presentationPlan && generationBundle
+      ? projectPresentationWorkspace(presentationPlan, generationBundle, {
+          showThisDifferentlyOpen: showThisDifferently,
+          showAllAlternates,
+          viewportWidth:
+            typeof window !== "undefined" ? window.innerWidth : 1024,
+        })
+      : null;
 
   function commitRequest(next: VisualThinkingRequest, reinterpret = true) {
     if (
@@ -259,8 +288,10 @@ export function VisualThinkingRequestPanel({
     });
     setKnowledgeBundle(knowledge);
     setGenerationBundle(null);
+    setPresentationPlan(null);
     setActiveDeliverableId(null);
     setGapAnswer("");
+    setShowThisDifferently(false);
     onConfirmed?.(confirmed);
   }
 
@@ -286,6 +317,15 @@ export function VisualThinkingRequestPanel({
     });
     setGenerationBundle(bundle);
     setActiveDeliverableId(bundle.run.primaryDeliverableId);
+    const nextPresentation = planVisualThinkingPresentation({
+      understanding,
+      experiencePlan,
+      knowledgePackage: knowledgeBundle.package,
+      generationBundle: bundle,
+    });
+    setPresentationPlan(nextPresentation);
+    setShowThisDifferently(false);
+    setShowAllAlternates(false);
   }
 
   function submitGapAnswer() {
@@ -847,11 +887,13 @@ export function VisualThinkingRequestPanel({
                 clearVisualThinkingRequestDraft();
                 clearKnowledgeBundle();
                 clearGenerationBundle();
+                clearPresentationPlan();
                 setDraftText("");
                 setUnderstanding(null);
                 setExperiencePlan(null);
                 setKnowledgeBundle(null);
                 setGenerationBundle(null);
+                setPresentationPlan(null);
                 setActiveDeliverableId(null);
                 setRequest(createVisualThinkingRequest({}));
               }}
@@ -863,16 +905,84 @@ export function VisualThinkingRequestPanel({
 
         {phase === "confirmed" && generationBundle && generationStatus ? (
           <section
-            className="vts-request__confirmed"
+            className="vts-request__confirmed vts-presentation"
             data-testid="visual-thinking-confirmed"
             data-generation-status={generationBundle.run.status}
+            data-presentation={
+              presentationWorkspace?.activePresentation ?? "none"
+            }
+            data-split-mode={presentationWorkspace?.splitViewMode ?? "unavailable"}
           >
-            <p
-              className="vts-request__section-title"
-              data-testid="visual-thinking-generation-status"
-            >
-              {generationStatus.headline}
-            </p>
+            <header className="vts-presentation__bar">
+              <div className="vts-presentation__bar-main">
+                <h2
+                  className="vts-request__section-title"
+                  data-testid="visual-thinking-presentation-title"
+                >
+                  {presentationWorkspace?.title ??
+                    activeDeliverable?.title ??
+                    "Your result"}
+                </h2>
+                <p
+                  className="vts-request__label"
+                  data-testid="visual-thinking-active-presentation"
+                >
+                  {presentationWorkspace?.activePresentationLabel ??
+                    generationStatus.headline}
+                </p>
+              </div>
+              <div className="vts-presentation__bar-actions">
+                <button
+                  type="button"
+                  className="vts-request__secondary-btn"
+                  data-testid="visual-thinking-show-differently"
+                  aria-expanded={showThisDifferently}
+                  onClick={() => setShowThisDifferently((v) => !v)}
+                >
+                  Show this differently
+                </button>
+                <label className="vts-presentation__density">
+                  <span className="vts-request__label">View</span>
+                  <select
+                    className="vts-presentation__density-select"
+                    data-testid="visual-thinking-density"
+                    aria-label="Information density"
+                    value={
+                      presentationPlan?.userOverrides.informationDensity ??
+                      presentationPlan?.informationDensity ??
+                      "balanced"
+                    }
+                    onChange={(e) => {
+                      if (!presentationPlan) return;
+                      setPresentationPlan(
+                        applyPresentationOverride(presentationPlan, {
+                          kind: "set_density",
+                          density: e.target.value as
+                            | "low"
+                            | "balanced"
+                            | "high",
+                        }),
+                      );
+                    }}
+                  >
+                    <option value="low">Focus</option>
+                    <option value="balanced">Balanced</option>
+                    <option value="high">Show more</option>
+                  </select>
+                </label>
+              </div>
+            </header>
+
+            {presentationWorkspace?.incompletenessVisible ? (
+              <p
+                className="vts-request__note"
+                data-testid="visual-thinking-incomplete-notice"
+                role="status"
+              >
+                {presentationWorkspace.incompletenessMessage}
+              </p>
+            ) : null}
+
             {generationStatus.researchBlocked ? (
               <p
                 className="vts-request__note"
@@ -883,68 +993,189 @@ export function VisualThinkingRequestPanel({
               </p>
             ) : null}
 
+            {showThisDifferently && presentationWorkspace ? (
+              <div
+                className="vts-presentation__alternates"
+                data-testid="visual-thinking-presentation-alternates"
+              >
+                <p className="vts-request__label">Eligible views</p>
+                <ul className="vts-request__choices">
+                  {presentationWorkspace.alternatePresentations.map((alt) => (
+                    <li key={alt.type}>
+                      <button
+                        type="button"
+                        className="vts-request__choice"
+                        data-testid={`visual-thinking-alt-${alt.type}`}
+                        onClick={() => {
+                          if (!presentationPlan || !understanding || !experiencePlan)
+                            return;
+                          const signals = collectPresentationStructureSignals({
+                            understanding,
+                            experiencePlan,
+                            knowledgePackage: knowledgeBundle?.package ?? null,
+                            generationBundle,
+                          });
+                          setPresentationPlan(
+                            applyPresentationOverride(
+                              presentationPlan,
+                              {
+                                kind: "set_presentation",
+                                presentation: alt.type,
+                              },
+                              signals,
+                            ),
+                          );
+                          setShowThisDifferently(false);
+                        }}
+                      >
+                        {alt.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {!showAllAlternates &&
+                (presentationPlan?.availablePresentations.length ?? 0) >
+                  presentationWorkspace.alternatePresentations.length + 1 ? (
+                  <button
+                    type="button"
+                    className="vts-request__more"
+                    data-testid="visual-thinking-more-alternates"
+                    onClick={() => setShowAllAlternates(true)}
+                  >
+                    Show more ways
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+
             {generationStatus.showReview && activeDeliverable ? (
               <div
-                className="vts-request__deliverable"
+                className={`vts-request__deliverable vts-presentation__primary${
+                  presentationWorkspace?.splitViewMode === "side_by_side"
+                    ? " vts-presentation__primary--split"
+                    : ""
+                }`}
                 data-testid="visual-thinking-review-deliverable"
-                data-deliverable-role={activeDeliverable.role}
+                data-deliverable-role={
+                  activeDeliverable.role === "primary" ||
+                  activeDeliverable.id === primaryDeliverable?.id
+                    ? "primary"
+                    : "supporting"
+                }
               >
                 <p className="vts-request__label">
-                  {activeDeliverable.role === "primary"
+                  {activeDeliverable.role === "primary" ||
+                  activeDeliverable.id === primaryDeliverable?.id
                     ? "Primary result"
                     : "Supporting result"}
                 </p>
-                <h2 className="vts-request__section-title">
+                <h3 className="vts-request__section-title">
                   {activeDeliverable.title}
-                </h2>
+                </h3>
                 <ul
                   className="vts-request__blocks"
                   data-testid="visual-thinking-deliverable-blocks"
                 >
-                  {activeDeliverable.blocks.map((b) => (
-                    <li
-                      key={b.id}
-                      className="vts-request__block"
-                      data-block-type={b.type}
-                      data-user-edited={b.userEdited ? "true" : "false"}
-                    >
-                      {b.title ? (
-                        <strong className="vts-request__block-title">
-                          {b.title}
-                        </strong>
-                      ) : null}
-                      {b.editable ? (
-                        <textarea
-                          className="vts-request__block-input"
-                          data-testid={`visual-thinking-block-${b.id}`}
-                          rows={b.type === "paragraph" ? 3 : 2}
-                          value={b.content}
-                          onChange={(e) => {
-                            updateActiveDeliverable(
-                              applyBlockEdit(activeDeliverable, {
-                                kind: "edit",
-                                blockId: b.id,
-                                content: e.target.value,
-                              }),
-                            );
-                          }}
-                        />
-                      ) : (
-                        <p>{b.content}</p>
-                      )}
-                    </li>
-                  ))}
+                  {activeDeliverable.blocks.map((b) => {
+                    const hidden =
+                      presentationWorkspace &&
+                      activeDeliverable.role === "primary" &&
+                      presentationWorkspace.collapsedBlockIds.includes(b.id) &&
+                      !presentationWorkspace.visibleBlockIds.includes(b.id);
+                    if (hidden) {
+                      return (
+                        <li key={b.id} className="vts-request__block vts-request__block--collapsed">
+                          <button
+                            type="button"
+                            className="vts-request__more"
+                            data-testid={`visual-thinking-expand-block-${b.id}`}
+                            onClick={() => {
+                              if (!presentationPlan) return;
+                              setPresentationPlan(
+                                applyPresentationOverride(presentationPlan, {
+                                  kind: "toggle_section",
+                                  sectionId: b.id,
+                                  expanded: true,
+                                }),
+                              );
+                            }}
+                          >
+                            Show more
+                          </button>
+                        </li>
+                      );
+                    }
+                    return (
+                      <li
+                        key={b.id}
+                        className="vts-request__block"
+                        data-block-type={b.type}
+                        data-user-edited={b.userEdited ? "true" : "false"}
+                      >
+                        {b.title ? (
+                          <strong className="vts-request__block-title">
+                            {b.title}
+                          </strong>
+                        ) : null}
+                        {b.editable ? (
+                          <textarea
+                            className="vts-request__block-input"
+                            data-testid={`visual-thinking-block-${b.id}`}
+                            rows={b.type === "paragraph" ? 3 : 2}
+                            value={b.content}
+                            onChange={(e) => {
+                              updateActiveDeliverable(
+                                applyBlockEdit(activeDeliverable, {
+                                  kind: "edit",
+                                  blockId: b.id,
+                                  content: e.target.value,
+                                }),
+                              );
+                            }}
+                          />
+                        ) : (
+                          <p>{b.content}</p>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
 
-                {activeDeliverable.visualShell ? (
-                  <p
-                    className="vts-request__note"
+                {presentationWorkspace?.userLedShell ||
+                activeDeliverable.visualShell ? (
+                  <div
+                    className="vts-presentation__canvas-shell"
                     data-testid="visual-thinking-visual-shell-note"
                   >
-                    {activeDeliverable.sourceMode === "user_led_shell"
-                      ? "An editable visual shell is ready — not a completed map."
-                      : "A visual structure is ready. The interactive canvas comes later."}
-                  </p>
+                    <p className="vts-request__note">
+                      {activeDeliverable.sourceMode === "user_led_shell" ||
+                      presentationWorkspace?.userLedShell
+                        ? "Your visual workspace is ready — not a completed map."
+                        : "A visual structure is ready. The interactive canvas comes later."}
+                    </p>
+                    {presentationWorkspace?.userLedShell ? (
+                      <ul className="vts-presentation__shell-actions">
+                        {presentationWorkspace.userLedActions.map((action) => (
+                          <li key={action}>
+                            <button
+                              type="button"
+                              className="vts-request__secondary-btn"
+                              data-testid={`visual-thinking-shell-${action
+                                .toLowerCase()
+                                .replace(/\s+/g, "-")}`}
+                              onClick={() => {
+                                if (action === "Open Previous Work") {
+                                  onOpenPreviousWork();
+                                }
+                              }}
+                            >
+                              {action}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
                 ) : null}
 
                 <div className="vts-request__preview-actions">
@@ -976,12 +1207,15 @@ export function VisualThinkingRequestPanel({
               </div>
             ) : null}
 
-            {supportingDeliverables.length > 0 ? (
-              <div
-                className="vts-request__supporting-block"
+            {supportingDeliverables.length > 0 &&
+            presentationWorkspace?.showSupporting !== false ? (
+              <aside
+                className="vts-request__supporting-block vts-presentation__supporting"
                 data-testid="visual-thinking-generated-supporting"
               >
-                <p className="vts-request__label">Also included</p>
+                <p className="vts-request__label">
+                  {presentationWorkspace?.supportingLabel ?? "Also available"}
+                </p>
                 <ul className="vts-request__supporting-list">
                   {supportingDeliverables.map((d) => (
                     <li key={d.id}>
@@ -989,7 +1223,17 @@ export function VisualThinkingRequestPanel({
                         type="button"
                         className="vts-request__remove"
                         data-testid={`visual-thinking-open-supporting-${d.type}`}
-                        onClick={() => setActiveDeliverableId(d.id)}
+                        onClick={() => {
+                          setActiveDeliverableId(d.id);
+                          if (presentationPlan) {
+                            setPresentationPlan(
+                              applyPresentationOverride(presentationPlan, {
+                                kind: "select_supporting",
+                                deliverableId: d.id,
+                              }),
+                            );
+                          }
+                        }}
                       >
                         {d.title}
                       </button>
@@ -1009,7 +1253,7 @@ export function VisualThinkingRequestPanel({
                     Back to primary result
                   </button>
                 ) : null}
-              </div>
+              </aside>
             ) : null}
 
             <button
@@ -1020,12 +1264,15 @@ export function VisualThinkingRequestPanel({
                 clearVisualThinkingRequestDraft();
                 clearKnowledgeBundle();
                 clearGenerationBundle();
+                clearPresentationPlan();
                 setDraftText("");
                 setUnderstanding(null);
                 setExperiencePlan(null);
                 setKnowledgeBundle(null);
                 setGenerationBundle(null);
+                setPresentationPlan(null);
                 setActiveDeliverableId(null);
+                setShowThisDifferently(false);
                 setRequest(createVisualThinkingRequest({}));
               }}
             >
