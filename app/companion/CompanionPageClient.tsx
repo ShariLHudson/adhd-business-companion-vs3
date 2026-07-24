@@ -354,6 +354,7 @@ import {
   recoverContextualHelpSessionAfterRefresh,
   resetActiveConversation,
 } from "@/lib/conversationReset";
+import { getOrCreateConversationSession } from "@/lib/conversationSession";
 import { resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
   dismissPlanMyDayForSession,
@@ -1918,7 +1919,7 @@ import {
   extractThreadCorrection,
   isShariConversationFollowUp,
   looksLikeConversationRestart,
-  peekShariConversationThread,
+  resolveShariConversationThread,
   runShariCognitivePipeline,
   SHARI_MAX_MODEL_REPAIR_ATTEMPTS,
   shouldBlockImmediateExperienceOpen,
@@ -14198,16 +14199,36 @@ export default function CompanionPageClient() {
     if (!trimmed) return;
 
     // Cognitive pipeline / answer-first: help in chat before destination routers.
-    const shariConversationThread = peekShariConversationThread();
+    // Bind a durable conversationId so help-thread isolation can scope correctly.
+    if (!activeConversationIdRef.current) {
+      activeConversationIdRef.current =
+        getOrCreateConversationSession().conversationId;
+    }
+    // Isolation: help-thread must match activeConversationId or is rejected.
+    const activeConversationIdForThread =
+      activeConversationIdRef.current ?? null;
+    const shariThreadResolve = resolveShariConversationThread(
+      activeConversationIdForThread,
+    );
+    const shariConversationThread = shariThreadResolve.thread;
     const shariCognitiveTurn = runShariCognitivePipeline(trimmed, {
+      conversationId: activeConversationIdForThread,
       thread: shariConversationThread,
     });
     const shariAnswerFirstDecision: ShariResponseDecision =
       shariCognitiveTurn.decision;
     const shariFollowUp = shariCognitiveTurn.isFollowUp;
+    if (shariThreadResolve.staleRejected) {
+      trackShariAnswerFirstEvent("stale_thread_rejected", {
+        currentConversationId: shariThreadResolve.currentConversationId,
+        hydratedConversationId: shariThreadResolve.hydratedConversationId,
+        hydrationSource: shariThreadResolve.hydrationSource,
+      });
+    }
     if (shariFollowUp) {
       trackShariAnswerFirstEvent("thread_binder_used", {
         mode: shariAnswerFirstDecision.primaryHelpMode,
+        conversationId: activeConversationIdForThread,
       });
     }
     trackShariAnswerFirstEvent("decision", {
@@ -19749,6 +19770,10 @@ export default function CompanionPageClient() {
             buildShariConversationThread({
               decision: shariAnswerFirstDecision,
               answer: adapted,
+              conversationId:
+                activeConversationIdForThread ||
+                activeConversationIdRef.current ||
+                "unknown",
               prior: shariConversationThread,
               memberNote: trimmed,
             }),
@@ -19789,6 +19814,10 @@ export default function CompanionPageClient() {
             buildShariConversationThread({
               decision: shariAnswerFirstDecision,
               answer: localAnswer,
+              conversationId:
+                activeConversationIdForThread ||
+                activeConversationIdRef.current ||
+                "unknown",
               prior: shariConversationThread,
             }),
           );
@@ -20668,6 +20697,10 @@ export default function CompanionPageClient() {
           buildShariConversationThread({
             decision: shariAnswerFirstDecision,
             answer: assistantMsg,
+            conversationId:
+              activeConversationIdForThread ||
+              activeConversationIdRef.current ||
+              "unknown",
             prior: shariConversationThread,
             memberNote: shariFollowUp ? trimmed : null,
             primaryProfessionalRole:

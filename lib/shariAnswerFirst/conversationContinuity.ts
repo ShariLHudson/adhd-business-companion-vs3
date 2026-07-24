@@ -1,5 +1,9 @@
 /**
  * Follow-up continuity — adapt the thread; never restart unnecessarily.
+ *
+ * Isolation rule (binding):
+ * Thread state is scoped to conversationId. If stored conversationId !==
+ * current conversationId, reject and start clean — never reuse stale topics.
  */
 
 import type { ShariConversationMode } from "./conversationModes";
@@ -7,6 +11,7 @@ import { conversationModeFromHelpMode } from "./conversationModes";
 import { decideShariResponse } from "./decideShariResponse";
 import type { ShariPrimaryHelpMode, ShariResponseDecision } from "./types";
 import type { ShariProfessionalRole } from "./professionalRoles";
+import { trackShariAnswerFirstEvent } from "./observability";
 
 export const SHARI_CONVERSATION_THREAD_KEY =
   "companion-shari-conversation-thread-v1";
@@ -17,6 +22,8 @@ export const SHARI_CONVERSATION_THREAD_KEY =
  */
 export type ShariConversationThread = {
   id: string;
+  /** Product conversation id — required for isolation across New Chat / New Day */
+  conversationId: string;
   originalRequest: string;
   currentGoal: string;
   conversationMode: ShariConversationMode | null;
@@ -32,7 +39,33 @@ export type ShariConversationThread = {
   corrections: string[];
   relevantContextKeys: string[];
   updatedAt: string;
+  /** Dev observability */
+  initializedAt?: string;
+  lastHydrationSource?: ShariThreadHydrationSource;
 };
+
+export type ShariThreadHydrationSource =
+  | "none"
+  | "session_storage"
+  | "rejected_stale"
+  | "reset_cleared"
+  | "new_chat_init"
+  | "new_day_init"
+  | "isolation_guard";
+
+export type ShariThreadResolveResult = {
+  thread: ShariConversationThread | null;
+  currentConversationId: string | null;
+  hydratedConversationId: string | null;
+  hydrationSource: ShariThreadHydrationSource;
+  staleRejected: boolean;
+  resetTimestamp: string | null;
+  newChatInitializedAt: string | null;
+};
+
+let lastResetTimestamp: string | null = null;
+let lastNewChatInitializedAt: string | null = null;
+let lastHydrationSource: ShariThreadHydrationSource = "none";
 
 const FOLLOW_UP_RE =
   /^(?:also|and|but|ok|okay|thanks|yes|no|mine (?:is|are)|it(?:'s| is)|for (?:my|our|the)|i (?:sell|make|offer|run|teach|coach)|what about|how about|what should|where should|can you|could you)/i;
@@ -76,8 +109,11 @@ function normalizeThread(
   raw: Partial<ShariConversationThread> | null,
 ): ShariConversationThread | null {
   if (!raw?.originalRequest || !raw.id) return null;
+  // Legacy threads without conversationId are treated as stale (must not hydrate).
+  if (!raw.conversationId?.trim()) return null;
   return {
     id: raw.id,
+    conversationId: raw.conversationId.trim(),
     originalRequest: raw.originalRequest,
     currentGoal: raw.currentGoal ?? raw.originalRequest,
     conversationMode: raw.conversationMode ?? null,
@@ -91,9 +127,15 @@ function normalizeThread(
     corrections: raw.corrections ?? [],
     relevantContextKeys: raw.relevantContextKeys ?? [],
     updatedAt: raw.updatedAt ?? new Date().toISOString(),
+    initializedAt: raw.initializedAt,
+    lastHydrationSource: raw.lastHydrationSource,
   };
 }
 
+/**
+ * Raw peek — does not apply conversationId isolation.
+ * Prefer `resolveShariConversationThread` in production paths.
+ */
 export function peekShariConversationThread(): ShariConversationThread | null {
   if (typeof window === "undefined") return null;
   try {
@@ -105,10 +147,91 @@ export function peekShariConversationThread(): ShariConversationThread | null {
   }
 }
 
+/**
+ * Isolation guard: only return thread when it matches current conversationId.
+ */
+export function resolveShariConversationThread(
+  currentConversationId: string | null | undefined,
+): ShariThreadResolveResult {
+  const stored = peekShariConversationThread();
+  const current = currentConversationId?.trim() || null;
+  const hydratedId = stored?.conversationId ?? null;
+
+  if (!stored) {
+    lastHydrationSource = "none";
+    return {
+      thread: null,
+      currentConversationId: current,
+      hydratedConversationId: null,
+      hydrationSource: "none",
+      staleRejected: false,
+      resetTimestamp: lastResetTimestamp,
+      newChatInitializedAt: lastNewChatInitializedAt,
+    };
+  }
+
+  // No active conversation id bound yet — never hydrate help-thread (do not clear).
+  if (!current) {
+    lastHydrationSource = "isolation_guard";
+    return {
+      thread: null,
+      currentConversationId: null,
+      hydratedConversationId: hydratedId,
+      hydrationSource: "isolation_guard",
+      staleRejected: true,
+      resetTimestamp: lastResetTimestamp,
+      newChatInitializedAt: lastNewChatInitializedAt,
+    };
+  }
+
+  if (stored.conversationId !== current) {
+    lastHydrationSource = "rejected_stale";
+    trackShariAnswerFirstEvent("stale_thread_rejected", {
+      currentConversationId: current,
+      hydratedConversationId: hydratedId,
+      hydrationSource: "rejected_stale",
+      originalRequest: stored.originalRequest.slice(0, 80),
+    });
+    // Mismatch: clear so the stale topic cannot bind the next turn.
+    clearShariConversationThread({ reason: "stale_mismatch" });
+    return {
+      thread: null,
+      currentConversationId: current,
+      hydratedConversationId: hydratedId,
+      hydrationSource: "rejected_stale",
+      staleRejected: true,
+      resetTimestamp: lastResetTimestamp,
+      newChatInitializedAt: lastNewChatInitializedAt,
+    };
+  }
+
+  lastHydrationSource = "session_storage";
+  trackShariAnswerFirstEvent("thread_hydrated", {
+    currentConversationId: current,
+    hydratedConversationId: hydratedId,
+    hydrationSource: "session_storage",
+  });
+  return {
+    thread: { ...stored, lastHydrationSource: "session_storage" },
+    currentConversationId: current,
+    hydratedConversationId: hydratedId,
+    hydrationSource: "session_storage",
+    staleRejected: false,
+    resetTimestamp: lastResetTimestamp,
+    newChatInitializedAt: lastNewChatInitializedAt,
+  };
+}
+
 export function storeShariConversationThread(
   thread: ShariConversationThread,
 ): void {
   if (typeof window === "undefined") return;
+  if (!thread.conversationId?.trim()) {
+    trackShariAnswerFirstEvent("thread_store_rejected", {
+      reason: "missing_conversation_id",
+    });
+    return;
+  }
   try {
     window.sessionStorage.setItem(
       SHARI_CONVERSATION_THREAD_KEY,
@@ -119,18 +242,79 @@ export function storeShariConversationThread(
   }
 }
 
-export function clearShariConversationThread(): void {
-  if (typeof window === "undefined") return;
+export function clearShariConversationThread(options?: {
+  reason?: string;
+}): void {
+  if (typeof window === "undefined") {
+    lastHydrationSource = "reset_cleared";
+    return;
+  }
   try {
     window.sessionStorage.removeItem(SHARI_CONVERSATION_THREAD_KEY);
   } catch {
     /* ignore */
   }
+  lastHydrationSource = "reset_cleared";
+  trackShariAnswerFirstEvent("thread_cleared", {
+    reason: options?.reason ?? "explicit_clear",
+    resetTimestamp: lastResetTimestamp,
+  });
+}
+
+/**
+ * Called by New Chat / New Day / hard conversation reset.
+ * Clears help-thread state and records reset time so rehydration cannot silently reuse it.
+ */
+export function resetShariConversationThreadForNewConversation(input: {
+  mode: "new-chat" | "new-day" | "hard-reset";
+  conversationId: string;
+}): void {
+  const ts = new Date().toISOString();
+  lastResetTimestamp = ts;
+  if (input.mode === "new-chat" || input.mode === "hard-reset") {
+    lastNewChatInitializedAt = ts;
+  }
+  clearShariConversationThread({ reason: input.mode });
+  lastHydrationSource =
+    input.mode === "new-day" ? "new_day_init" : "new_chat_init";
+  trackShariAnswerFirstEvent("thread_reset_for_new_conversation", {
+    mode: input.mode,
+    conversationId: input.conversationId,
+    resetTimestamp: ts,
+    newChatInitializedAt: lastNewChatInitializedAt,
+  });
+}
+
+/** Dev inspection — never expose to members. */
+export function inspectShariThreadIsolation(
+  currentConversationId: string | null | undefined,
+): ShariThreadResolveResult {
+  const stored = peekShariConversationThread();
+  return {
+    thread: stored,
+    currentConversationId: currentConversationId?.trim() || null,
+    hydratedConversationId: stored?.conversationId ?? null,
+    hydrationSource: lastHydrationSource,
+    staleRejected:
+      Boolean(stored?.conversationId) &&
+      Boolean(currentConversationId) &&
+      stored!.conversationId !== currentConversationId,
+    resetTimestamp: lastResetTimestamp,
+    newChatInitializedAt: lastNewChatInitializedAt,
+  };
+}
+
+/** Test helper */
+export function __resetShariThreadIsolationTimestampsForTests(): void {
+  lastResetTimestamp = null;
+  lastNewChatInitializedAt = null;
+  lastHydrationSource = "none";
 }
 
 export function buildShariConversationThread(input: {
   decision: ShariResponseDecision;
   answer: string;
+  conversationId: string;
   prior?: ShariConversationThread | null;
   memberNote?: string | null;
   primaryProfessionalRole?: ShariProfessionalRole;
@@ -139,32 +323,39 @@ export function buildShariConversationThread(input: {
   relevantContextKeys?: string[];
   correction?: string | null;
 }): ShariConversationThread {
-  const notes = [...(input.prior?.memberContextNotes ?? [])];
+  const conversationId = input.conversationId.trim();
+  // Never continue a prior thread from a different conversation.
+  const prior =
+    input.prior && input.prior.conversationId === conversationId
+      ? input.prior
+      : null;
+
+  const notes = [...(prior?.memberContextNotes ?? [])];
   if (input.memberNote?.trim()) notes.push(input.memberNote.trim());
-  const corrections = [...(input.prior?.corrections ?? [])];
+  const corrections = [...(prior?.corrections ?? [])];
   if (input.correction?.trim()) corrections.push(input.correction.trim());
   const assumptions = [
-    ...(input.prior?.assumptions ?? []),
+    ...(prior?.assumptions ?? []),
     ...(input.assumptions ?? []),
   ].filter((a, i, arr) => arr.indexOf(a) === i);
 
   return {
-    id: input.prior?.id ?? input.decision.id,
-    originalRequest: input.prior?.originalRequest ?? input.decision.rawRequest,
+    id: prior?.id ?? input.decision.id,
+    conversationId,
+    originalRequest: prior?.originalRequest ?? input.decision.rawRequest,
     currentGoal: input.decision.normalizedRequest,
     conversationMode: conversationModeFromHelpMode(
       input.decision.primaryHelpMode,
     ),
     primaryHelpMode: input.decision.primaryHelpMode,
     primaryProfessionalRole:
-      input.primaryProfessionalRole ?? input.prior?.primaryProfessionalRole,
+      input.primaryProfessionalRole ?? prior?.primaryProfessionalRole,
     supportingProfessionalRoles:
-      input.supportingProfessionalRoles ??
-      input.prior?.supportingProfessionalRoles,
+      input.supportingProfessionalRoles ?? prior?.supportingProfessionalRoles,
     lastAnswer: input.answer.slice(0, 8000),
     topicKeywords: extractKeywords(
       [
-        input.prior?.originalRequest ?? "",
+        prior?.originalRequest ?? "",
         input.decision.rawRequest,
         ...notes,
         ...corrections,
@@ -175,25 +366,13 @@ export function buildShariConversationThread(input: {
     corrections: corrections.slice(-8),
     relevantContextKeys: (
       input.relevantContextKeys ??
-      input.prior?.relevantContextKeys ??
+      prior?.relevantContextKeys ??
       []
     ).slice(0, 16),
     updatedAt: new Date().toISOString(),
+    initializedAt: prior?.initializedAt ?? new Date().toISOString(),
+    lastHydrationSource: "session_storage",
   };
-}
-
-/** Detect short corrective turns that override prior thread facts. */
-export function extractThreadCorrection(userText: string): string | null {
-  const t = userText.trim();
-  if (
-    /\b(?:actually|correction|i (?:don't|do not) sell|i sell|not journals?|instead)\b/i.test(
-      t,
-    ) &&
-    t.split(/\s+/).length <= 40
-  ) {
-    return t;
-  }
-  return null;
 }
 
 /**
@@ -204,11 +383,11 @@ export function isShariConversationFollowUp(
   thread: ShariConversationThread | null = peekShariConversationThread(),
 ): boolean {
   if (!thread?.originalRequest?.trim()) return false;
+  if (!thread.conversationId?.trim()) return false;
   const t = userText.trim();
   if (!t) return false;
 
   const decision = decideShariResponse(t);
-  // Explicit commands start a new action thread.
   if (
     decision.explicitCreationRequested ||
     decision.explicitProjectRequested ||
@@ -218,8 +397,6 @@ export function isShariConversationFollowUp(
     return false;
   }
 
-  // Fresh how-to / new topic with enough substance usually starts new — unless
-  // it clearly references the prior topic.
   const priorWords = new Set(thread.topicKeywords);
   const overlap = extractKeywords(t).filter((w) => priorWords.has(w)).length;
   const mentionsPriorTopic =
@@ -244,7 +421,7 @@ export function isShariConversationFollowUp(
       t,
     ) &&
     thread.topicKeywords.some((k) =>
-      /booth|vendor|facebook|strateg|form|loom|webinar|podcast|journal/.test(k),
+      /booth|vendor|facebook|strateg|form|loom|webinar|journal/.test(k),
     )
   ) {
     return true;
@@ -283,7 +460,6 @@ export function buildFollowUpAdaptedReply(
   const prior = `${thread.originalRequest} ${thread.memberContextNotes.join(" ")}`.toLowerCase();
   const combinedNotes = [...thread.memberContextNotes, t];
 
-  // Vendor booth thread
   if (/\b(?:vendor|booth|table)\b/.test(prior)) {
     if (/\b(?:table|put on|display|what should)\b/i.test(t)) {
       const product =
@@ -317,7 +493,6 @@ export function buildFollowUpAdaptedReply(
     }
   }
 
-  // Loom / video thread
   if (/\b(?:loom|video|screen record)\b/.test(prior)) {
     if (/\b(?:spark estate|spark|companion|estate)\b/i.test(t)) {
       return [
@@ -332,7 +507,6 @@ export function buildFollowUpAdaptedReply(
     }
   }
 
-  // Facebook groups thread
   if (/\bfacebook groups?\b/.test(prior) && /\b(?:audience|adhd|coach|sell)\b/i.test(t)) {
     return [
       "We’ll aim the search language at the people you just named.",
@@ -343,7 +517,6 @@ export function buildFollowUpAdaptedReply(
     ].join("\n");
   }
 
-  // Generic continuity — never restart
   if (t.split(/\s+/).length <= 16 || FOLLOW_UP_RE.test(t)) {
     return [
       `Staying with ${thread.originalRequest.replace(/\?+$/, "")}.`,

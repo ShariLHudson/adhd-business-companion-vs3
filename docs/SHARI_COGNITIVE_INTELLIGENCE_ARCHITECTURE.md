@@ -96,6 +96,20 @@ Phase 2 docs: [SHARI_RESPONSE_COMPOSER.md](./SHARI_RESPONSE_COMPOSER.md) · [SHA
 
 ---
 
+## Conversation isolation (binding)
+
+Help-thread state (`companion-shari-conversation-thread-v1`) is **scoped by `conversationId`**.
+
+| Reset path | Clears Shari help-thread | Clears ActiveTopic | Rotates conversationId |
+|---|---|---|---|
+| New Chat (`resetActiveConversation` mode `new-chat`) | Yes | Yes | Yes |
+| New Day (`resetActiveConversation` mode `new-day`) | Yes | Yes | Yes |
+| Hard conversation reset (same core) | Yes | Yes | Yes |
+
+If `resolveShariConversationThread(currentId)` sees a stored thread with a different `conversationId`, it **rejects**, clears the stale key, and logs `stale_thread_rejected`.
+
+Approved Business Estate / profile facts are **not** cleared — only active conversational continuity.
+
 ## Deprecation / consolidation notes
 
 | Item | Status |
@@ -104,6 +118,7 @@ Phase 2 docs: [SHARI_RESPONSE_COMPOSER.md](./SHARI_RESPONSE_COMPOSER.md) · [SHA
 | Parallel “answer-first v2” packages | Forbidden — extend `lib/shariAnswerFirst/` |
 | Full Business Estate dump in chat | Forbidden — ranked relevant context only |
 | `lib/conversationContinuity/*` renamed | No — keep; document naming distinction |
+| Global unscoped Shari thread (pre-isolation) | **Retired** — must include `conversationId` |
 
 ---
 

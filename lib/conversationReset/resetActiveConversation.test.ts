@@ -185,6 +185,43 @@ describe("resetActiveConversation — New Chat / New Day", () => {
     expect(loadConversationOwnerPointer()).toBeNull();
   });
 
+  it("New Chat / New Day clear Shari help-thread and ActiveTopic", async () => {
+    const {
+      storeShariConversationThread,
+      buildShariConversationThread,
+      peekShariConversationThread,
+      decideShariResponse,
+    } = await import("@/lib/shariAnswerFirst");
+    const { saveActiveTopic, loadActiveTopic } = await import(
+      "@/lib/conversationStabilization/activeTopicStore"
+    );
+    const oldId = seedPriorConversation();
+    storeShariConversationThread(
+      buildShariConversationThread({
+        decision: decideShariResponse("How do I create a Loom video?"),
+        answer: "Loom steps",
+        conversationId: oldId,
+      }),
+    );
+    saveActiveTopic({
+      topicId: "t1",
+      userGoal: "Loom video",
+      selectedKnowledgeSources: [],
+      status: "identified",
+      confidence: "high",
+      responseOwner: "shari",
+      startedAtTurn: 1,
+      updatedAtTurn: 1,
+    });
+    expect(peekShariConversationThread()?.originalRequest).toMatch(/Loom/i);
+    expect(loadActiveTopic()?.userGoal).toMatch(/Loom/i);
+
+    const result = resetActiveConversation({ mode: "new-chat" });
+    expect(peekShariConversationThread()).toBeNull();
+    expect(loadActiveTopic()).toBeNull();
+    expect(result.conversationId).not.toBe(oldId);
+  });
+
   it("clears hidden estate digest so the next AI hint cannot continue the prior thread", () => {
     seedPriorConversation();
     const beforeHint = estateMemoryHintForChat();

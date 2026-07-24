@@ -41,6 +41,7 @@ describe("Shari conversation continuity", () => {
     const thread = buildShariConversationThread({
       decision: d,
       answer: "Booth setup guidance with display and follow-up.",
+      conversationId: "test-conv-booth",
     });
     storeShariConversationThread(thread);
 
@@ -62,6 +63,7 @@ describe("Shari conversation continuity", () => {
       buildShariConversationThread({
         decision: d,
         answer: "Loom outline with open, show, close.",
+        conversationId: "test-conv-loom",
       }),
     );
     const adapted = buildFollowUpAdaptedReply("Mine is for Spark Estate.");
@@ -75,6 +77,7 @@ describe("Shari conversation continuity", () => {
       buildShariConversationThread({
         decision: d,
         answer: "Strategic plan education.",
+        conversationId: "test-conv-strategy",
       }),
     );
     expect(

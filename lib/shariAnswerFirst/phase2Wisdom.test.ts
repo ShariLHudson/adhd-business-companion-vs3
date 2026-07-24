@@ -190,11 +190,14 @@ describe("Phase 2 response composer + wisdom", () => {
       buildShariConversationThread({
         decision: first.decision,
         answer: "Booth guidance with zones and packing.",
+        conversationId: "test-conv-phase2",
         primaryProfessionalRole: first.primaryProfessionalRole,
         supportingProfessionalRoles: first.supportingProfessionalRoles,
       }),
     );
-    const follow = runShariCognitivePipeline("What should go on the table?");
+    const follow = runShariCognitivePipeline("What should go on the table?", {
+      conversationId: "test-conv-phase2",
+    });
     expect(follow.isFollowUp).toBe(true);
     expect(follow.primaryProfessionalRole).toBe("consultant");
     expect(follow.composition.openingApproach).toBe(

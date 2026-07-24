@@ -31,7 +31,7 @@ import {
   type ShariResponseComposition,
 } from "./responseComposer";
 import {
-  peekShariConversationThread,
+  resolveShariConversationThread,
   isShariConversationFollowUp,
   shariContinuityHintForChat,
   type ShariConversationThread,
@@ -102,10 +102,15 @@ export function runShariCognitivePipeline(
   },
 ): ShariCognitiveTurn {
   const decision = decideShariResponse(rawRequest);
-  const thread =
+  // Isolation: never reuse a help-thread from a different conversationId.
+  const resolved =
     options?.thread !== undefined
-      ? options.thread
-      : peekShariConversationThread();
+      ? {
+          thread: options.thread,
+          staleRejected: false,
+        }
+      : resolveShariConversationThread(options?.conversationId ?? null);
+  const thread = resolved.thread;
   const isFollowUp = isShariConversationFollowUp(rawRequest, thread);
 
   const roles = selectProfessionalRoles(

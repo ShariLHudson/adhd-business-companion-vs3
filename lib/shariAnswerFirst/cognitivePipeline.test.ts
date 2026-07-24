@@ -64,11 +64,14 @@ describe("Shari cognitive pipeline", () => {
       buildShariConversationThread({
         decision: first.decision,
         answer: "Booth setup with layout and packing list.",
+        conversationId: "test-conv-pipeline",
         primaryProfessionalRole: first.primaryProfessionalRole,
         supportingProfessionalRoles: first.supportingProfessionalRoles,
       }),
     );
-    const follow = runShariCognitivePipeline("What should go on the table?");
+    const follow = runShariCognitivePipeline("What should go on the table?", {
+      conversationId: "test-conv-pipeline",
+    });
     expect(follow.isFollowUp).toBe(true);
     expect(follow.promptHints).toMatch(/CONTINUITY/i);
   });

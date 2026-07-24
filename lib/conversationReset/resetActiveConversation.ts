@@ -43,6 +43,9 @@ import {
   bindDaySessionConversation,
   startNewDaySession,
 } from "@/lib/chatScope";
+import { resetShariConversationThreadForNewConversation } from "@/lib/shariAnswerFirst/conversationContinuity";
+import { clearShariConversationHandoff } from "@/lib/shariAnswerFirst/conversationHandoff";
+import { clearActiveTopic } from "@/lib/conversationStabilization/activeTopicStore";
 
 /** Keep in sync with CONTEXTUAL_HELP_SESSION_STORAGE_KEY (avoid importing that module). */
 const CONTEXTUAL_HELP_SESSION_STORAGE_KEY =
@@ -133,7 +136,16 @@ export function resetActiveConversation(
   clearBoardIntakeDraft();
   consumeCallTheBoard();
 
+  // ActiveTopic + Shari help-thread / handoff must not survive New Chat / New Day.
+  // Long-term Business Estate / profile remain untouched.
+  clearActiveTopic();
+  clearShariConversationHandoff();
+
   const next = getOrCreateConversationSession();
+  resetShariConversationThreadForNewConversation({
+    mode: input.mode,
+    conversationId: next.conversationId,
+  });
   startNewDaySession(next.conversationId);
   bindDaySessionConversation(next.conversationId);
   if (input.mode === "new-day") {

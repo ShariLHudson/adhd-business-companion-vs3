@@ -30,6 +30,11 @@ export type ShariAnswerFirstEvent =
   | "context_retained"
   | "follow_up_answered"
   | "thread_binder_used"
+  | "thread_hydrated"
+  | "thread_cleared"
+  | "thread_store_rejected"
+  | "thread_reset_for_new_conversation"
+  | "stale_thread_rejected"
   | "user_correction_applied"
   | "handoff_created";
 
