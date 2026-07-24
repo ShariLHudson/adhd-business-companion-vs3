@@ -1,0 +1,37 @@
+export type {
+  GrowthConstraintId,
+  GrowthDiagnosisArea,
+  GrowthDomainContract,
+  GrowthExperimentBlueprint,
+  GrowthReadinessConclusion,
+  GrowthRoutingBoundary,
+  GrowthTypeId,
+} from "./growthDomainContract";
+export { growthDomainIntelligence } from "./growthDomain";
+export { growthDomainAsStrategyType } from "./toStrategyType";
+export {
+  GROWTH_HANDOFF_BOUNDARIES,
+  GROWTH_SHARI_VOICE_NOTES,
+  assessGrowthReadinessHint,
+  detectGrowthConstraints,
+  detectGrowthTypes,
+  getGrowthExperimentBlueprints,
+  getGrowthHeuristics,
+  getGrowthRoutingBoundaries,
+  getGrowthStrategicOptionPatterns,
+  getGrowthUnderlyingQuestions,
+  growthEvidenceDisciplineRejects,
+  growthLooksLikeAssumptionNotEvidence,
+  growthOptionPatterns,
+  growthOptionsLookCosmetic,
+  growthQualityRejectReasons,
+  growthReversibilityForPattern,
+  growthShouldNotAssumeAcquisition,
+  growthTreatsSocialAsNonProof,
+  growthUnderlyingQuestionsForSurface,
+  isGrowthStrategyLanguage,
+  selectGrowthExperimentBlueprints,
+  suggestGrowthSecondaryDomain,
+  type GrowthEvidenceKind,
+  type GrowthHandoffBoundary,
+} from "./growthIntelligence";

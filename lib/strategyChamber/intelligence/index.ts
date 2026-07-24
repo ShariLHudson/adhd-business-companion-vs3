@@ -13,6 +13,8 @@ export * from "./statementAnalysis";
 export * from "./registry";
 export * from "./domainIntelligence";
 export * from "./domains/pricing";
+export * from "./domains/growth";
+
 export * from "./frameworks/optionCatalog";
 export * from "./frameworks/opportunityCost";
 export * from "./frameworks/experiments";
