@@ -1,11 +1,17 @@
 /**
- * Select primary Strategy domain + at most one secondary.
+ * Primary + optional secondary domain selection from full Strategy context.
+ * Not keyword-only. At most one secondary. Pair registry validated.
  */
 
 import type { StrategyWorkItem } from "../../types";
 import { matchDomainsForDecision } from "../domainIntelligence";
 import { resolvePrimaryStrategyType } from "../registry";
 import type { StrategyTypeId } from "../types";
+import { getPairRule, isPairAllowed } from "./pairRegistry";
+import {
+  evaluateSecondaryThreshold,
+  secondaryClearsThreshold,
+} from "./secondaryThreshold";
 import { suggestSecondaryDomainForPrimary } from "./suggestSecondaryDomain";
 import type {
   StrategyDomainCandidate,
@@ -18,6 +24,11 @@ function blobFromItem(item: StrategyWorkItem, lastAnswer?: string): string {
     item.decisionStatement,
     item.currentReality,
     item.desiredDirection,
+    item.chosenDirection,
+    ...(item.constraints ?? []),
+    ...(item.assumptions ?? []),
+    ...(item.knownFacts ?? []),
+    ...(item.optionsConsidered?.map((o) => o.title) ?? []),
     ...(item.memberStatements ?? []),
     lastAnswer,
   ]
@@ -29,6 +40,13 @@ function relevanceFromScore(score: number): "low" | "moderate" | "high" {
   if (score >= 3) return "high";
   if (score >= 2) return "moderate";
   return "low";
+}
+
+/** Too diffuse to load several domains — clarify first. */
+export function isLowConfidenceDiffuseAsk(text: string): boolean {
+  return /\b(everything is wrong|nothing works|my whole business|all of it|everything sucks|fix everything)\b/i.test(
+    text,
+  );
 }
 
 export function listDomainCandidates(text: string): StrategyDomainCandidate[] {
@@ -54,7 +72,7 @@ export function listDomainCandidates(text: string): StrategyDomainCandidate[] {
 
 /**
  * Phrase-level primary overrides for classic cross-domain asks.
- * Used only when registry scoring is weak or ambiguous — not a second registry.
+ * Used when registry scoring is weak — not a second registry.
  */
 function phrasePrimaryOverride(text: string): StrategyTypeId | null {
   const t = text.toLowerCase();
@@ -64,7 +82,11 @@ function phrasePrimaryOverride(text: string): StrategyTypeId | null {
   ) {
     return "growth";
   }
-  if (/too much for what i charge|doing too much for what/.test(t)) {
+  if (
+    /too much for what i charge|doing too much for what|far too much work for what/.test(
+      t,
+    )
+  ) {
     return "pricing";
   }
   if (
@@ -76,17 +98,38 @@ function phrasePrimaryOverride(text: string): StrategyTypeId | null {
     return "growth";
   }
   if (
-    /launch .{0,20}(program|offer)|new program|new offer/.test(t) &&
+    /launch .{0,20}(program|offer)|new program|new offer|idea for a program/.test(
+      t,
+    ) &&
     /who .{0,24}for|audience|don't know who|do not know who/.test(t)
   ) {
     return "offer";
   }
   if (
-    /(virtual assistant|hire|va).{0,40}(grow|growth)|(grow|growth).{0,40}(hire|va|assistant)/.test(
+    /(virtual assistant|hire|va|hire someone).{0,40}(grow|growth|cannot keep|can't keep)|(grow|growth|cannot keep|can't keep).{0,40}(hire|va|assistant)/.test(
       t,
-    )
+    ) ||
+    /need to hire someone because i cannot keep up/.test(t)
   ) {
     return "hiring_delegation";
+  }
+  if (/posting regularly|not attracting the right customers/.test(t)) {
+    return "growth";
+  }
+  if (/too many things to work on|too many priorities|scattered/.test(t)) {
+    return "capacity_focus";
+  }
+  if (/change who my program is for|who (my|the) program is for/.test(t)) {
+    return "market_customer";
+  }
+  if (/should i hire a va|hire a (va|virtual assistant)\b/.test(t)) {
+    return "hiring_delegation";
+  }
+  if (/raise my membership price|raise (the )?price/.test(t) && !/too much/.test(t)) {
+    return "pricing";
+  }
+  if (/need more customers|more customers/.test(t) && !/plenty|lots of customers/.test(t)) {
+    return "growth";
   }
   return null;
 }
@@ -96,12 +139,25 @@ export function selectStrategyDomains(
   opts?: { lastAnswer?: string; forcedPrimaryId?: StrategyTypeId },
 ): StrategyDomainSelection {
   const text = blobFromItem(item, opts?.lastAnswer);
+
+  if (isLowConfidenceDiffuseAsk(text)) {
+    return {
+      primaryDomainId: "business_direction",
+      primaryReason: "Ask is too broad — clarify the central decision first.",
+      confidence: "low",
+      needsClarification: true,
+      alternativesConsidered: [],
+    };
+  }
+
   const candidates = listDomainCandidates(text);
   const primaryFromRegistry = resolvePrimaryStrategyType(text);
   const phrasePrimary = phrasePrimaryOverride(text);
+  const persisted = item.strategyType as StrategyTypeId | undefined;
+
   const primaryId =
     opts?.forcedPrimaryId ||
-    (item.strategyType as StrategyTypeId | undefined) ||
+    persisted ||
     phrasePrimary ||
     primaryFromRegistry?.id ||
     candidates[0]?.domainId ||
@@ -113,33 +169,55 @@ export function selectStrategyDomains(
     .map((c) => c.domainId)
     .slice(0, 4);
 
-  const secondaryHint = suggestSecondaryDomainForPrimary(primaryId, text);
+  // Pure pricing with strong framing and no capacity/growth tension → no secondary
+  const purePricingNewMembers =
+    primaryId === "pricing" &&
+    /new members? only|for new (members|customers)/i.test(text) &&
+    !/overwhelm|too much|cannot keep|can't keep|not buying|weak demand|revenue is still low/i.test(
+      text,
+    );
 
-  // Only load secondary when relevance is material (hint present + not noise)
   let secondaryDomainId: StrategyTypeId | undefined;
   let secondaryReason: string | undefined;
-  if (secondaryHint) {
-    const secondaryInCandidates = candidates.find(
-      (c) => c.domainId === secondaryHint.secondaryId,
-    );
-    const material =
-      Boolean(secondaryInCandidates) ||
-      // Allow capacity/pricing cross even if signals are weak — language-gated in suggester
-      secondaryHint.secondaryId === "capacity_focus" ||
-      secondaryHint.secondaryId === "pricing" ||
-      secondaryHint.secondaryId === "growth";
-    if (material) {
-      secondaryDomainId = secondaryHint.secondaryId;
-      secondaryReason = secondaryHint.reason;
+  let secondaryThresholdReasons: StrategyDomainSelection["secondaryThresholdReasons"];
+  let secondaryStatus: StrategyDomainSelection["secondaryStatus"];
+
+  if (!purePricingNewMembers) {
+    const secondaryHint = suggestSecondaryDomainForPrimary(primaryId, text);
+    if (secondaryHint) {
+      const pair = getPairRule(primaryId, secondaryHint.secondaryId);
+      if (!pair || !isPairAllowed(primaryId, secondaryHint.secondaryId)) {
+        // Invalid / unavailable pair — continue primary-only
+        secondaryStatus = pair?.status ?? "unavailable";
+      } else {
+        secondaryStatus = pair.status;
+        if (pair.status === "unavailable") {
+          // skip
+        } else {
+          const reasons = evaluateSecondaryThreshold({
+            primaryId,
+            secondaryId: secondaryHint.secondaryId,
+            text,
+          });
+          if (secondaryClearsThreshold(reasons)) {
+            secondaryDomainId = secondaryHint.secondaryId;
+            secondaryReason = secondaryHint.reason;
+            secondaryThresholdReasons = reasons;
+          }
+        }
+      }
     }
   }
 
   let confidence: SynthesisConfidence = "moderate";
   if (primaryCandidate?.relevance === "high" && !secondaryDomainId) {
     confidence = "high";
-  } else if (primaryCandidate?.relevance === "low" || candidates.length === 0) {
+  } else if (
+    (!primaryCandidate && !phrasePrimary) ||
+    primaryCandidate?.relevance === "low"
+  ) {
     confidence = "low";
-  } else if (secondaryDomainId && primaryCandidate?.relevance === "high") {
+  } else if (secondaryDomainId && (primaryCandidate?.relevance === "high" || phrasePrimary)) {
     confidence = "high";
   }
 
@@ -148,8 +226,12 @@ export function selectStrategyDomains(
     secondaryDomainId,
     primaryReason:
       primaryCandidate?.reason ||
-      `Primary domain from decision language: ${primaryId}`,
+      (phrasePrimary
+        ? `Primary domain from strategic framing: ${primaryId}`
+        : `Primary domain from decision language: ${primaryId}`),
     secondaryReason,
+    secondaryThresholdReasons,
+    secondaryStatus: secondaryDomainId ? secondaryStatus : undefined,
     confidence,
     alternativesConsidered: alternatives,
   };

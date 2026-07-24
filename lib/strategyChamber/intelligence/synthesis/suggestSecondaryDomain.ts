@@ -14,15 +14,17 @@ export function suggestPricingSecondaryDomain(
 ): StrategyTypeId | null {
   const t = text.toLowerCase();
   if (
-    /too much for what|doing too much|cannot keep up|can't keep up|burned out|overwhelmed|delivery/.test(
+    /too much.{0,24}for what|doing too much|far too much|cannot keep up|can't keep up|burned out|overwhelmed|delivery (load|burden)|unsustainable delivery/.test(
       t,
     )
   ) {
     return "capacity_focus";
   }
   if (
-    /more customers|grow|growth|not buying|not converting|awareness|leads/.test(t) &&
-    !/only (about )?price|just (the )?price/.test(t)
+    /more customers|grow|growth|not buying|not converting|weak demand|awareness|leads|nobody is buying|no one is buying/.test(
+      t,
+    ) &&
+    !/only (about )?price|just (the )?price|new members? only/.test(t)
   ) {
     // Growth is secondary when price language is primary but demand/volume appears
     if (/price|pricing|charge|fee|underpriced|raise|lower/.test(t)) {
@@ -58,10 +60,15 @@ export function suggestHiringSecondaryDomain(
   text: string,
 ): StrategyTypeId | null {
   const t = text.toLowerCase();
-  if (/grow|growth|scale|more customers/.test(t)) return "growth";
-  if (/overwhelmed|burned out|too much|capacity/.test(t)) {
+  // Overload → capacity first (hiring is not assumed)
+  if (
+    /overwhelmed|burned out|too much|capacity|cannot keep|can't keep|keep up/.test(
+      t,
+    )
+  ) {
     return "capacity_focus";
   }
+  if (/grow|growth|scale|more customers/.test(t)) return "growth";
   return null;
 }
 
@@ -95,6 +102,14 @@ export function suggestSecondaryDomainForPrimary(
   switch (primaryId) {
     case "growth": {
       secondary = suggestGrowthSecondaryDomain(text);
+      if (
+        !secondary &&
+        /posting regularly|right customers|wrong customers|not attracting/.test(
+          text.toLowerCase(),
+        )
+      ) {
+        secondary = "market_customer";
+      }
       if (secondary === "capacity_focus") {
         reason = "Delivery or founder capacity may be the binding constraint.";
       } else if (secondary === "pricing") {

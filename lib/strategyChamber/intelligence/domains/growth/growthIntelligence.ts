@@ -401,7 +401,14 @@ export function suggestGrowthSecondaryDomain(
   text: string,
 ): StrategyTypeId | null {
   const t = text.toLowerCase();
-  if (/cannot keep up|can't keep up|burned out|overwhelmed|capacity/.test(t)) {
+  // Volume + weak revenue → Pricing before a generic capacity mention
+  if (
+    /plenty of customers|lots of customers/.test(t) &&
+    /revenue|profit|money|income|underpriced/.test(t)
+  ) {
+    return "pricing";
+  }
+  if (/cannot keep up|can't keep up|burned out|overwhelmed|at capacity|no capacity/.test(t)) {
     return "capacity_focus";
   }
   if (

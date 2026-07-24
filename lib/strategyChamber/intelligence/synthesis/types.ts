@@ -1,16 +1,13 @@
 /**
  * Phase 5 — Cross-Domain Strategy Synthesis contracts.
- * Multiple domains may contribute; Shari still delivers one coherent experience.
- * Not a second judgment engine.
+ * Advises the shared Strategy engine — does not duplicate live option/risk/experiment/recommendation types.
  */
 
 import type { StrategyTypeId } from "../types";
-import type { RiskAssessment, StrategicExperiment } from "../types";
-import type { StrategicOption } from "../optionContract";
-import type { StrategicRecommendation } from "../engine/recommendOption";
-import type { NextThinkingMovePlan } from "../engine/selectNextThinkingMove";
 import type { OptionPatternId } from "../types";
+import type { ContinueJourneyDestinationId } from "../../types";
 
+/** Reuse shared move confidence bands. */
 export type SynthesisConfidence = "low" | "moderate" | "high";
 
 export type StrategyDomainContributionType =
@@ -34,13 +31,28 @@ export type StrategyDomainCandidate = {
   contributionTypes: StrategyDomainContributionType[];
 };
 
+export type SecondaryThresholdReason =
+  | "could_reverse_recommendation"
+  | "could_eliminate_options"
+  | "reveals_major_constraint"
+  | "changes_reversibility_or_risk"
+  | "missing_essential_evidence"
+  | "better_experiment"
+  | "changes_destination";
+
 export type StrategyDomainSelection = {
   primaryDomainId: StrategyTypeId;
   secondaryDomainId?: StrategyTypeId;
   primaryReason: string;
   secondaryReason?: string;
+  /** Why secondary cleared the materiality threshold. */
+  secondaryThresholdReasons?: SecondaryThresholdReason[];
   confidence: SynthesisConfidence;
   alternativesConsidered?: StrategyTypeId[];
+  /** True when the ask is too broad to load domains aggressively. */
+  needsClarification?: boolean;
+  /** Pair status when secondary requested but pack incomplete. */
+  secondaryStatus?: "active" | "partial" | "unavailable";
 };
 
 export type StrategyDomainContribution = {
@@ -56,35 +68,75 @@ export type StrategyDomainContribution = {
   userFacing?: boolean;
 };
 
+export type StrategySynthesisConflictResolutionMethod =
+  | "shared_constraint"
+  | "evidence_priority"
+  | "capacity_priority"
+  | "reversibility_priority"
+  | "user_value_priority"
+  | "staged_option"
+  | "experiment"
+  | "ask_user";
+
+/**
+ * Internal conflict record — never expose mechanics or domain jargon to members.
+ */
 export type StrategySynthesisConflict = {
   id: string;
-  topic: string;
-  primaryStance: string;
-  secondaryStance: string;
-  resolution: string;
-  /** Prefer clarify before recommending when conflict is material. */
+  primaryDomainId: StrategyTypeId;
+  secondaryDomainId: StrategyTypeId;
+  issue: string;
+  primaryPosition: string;
+  secondaryPosition: string;
+  materiality: "low" | "moderate" | "high";
+  resolutionMethod: StrategySynthesisConflictResolutionMethod;
+  resolution?: string;
+  /** Derived: ask before forceful recommendation. */
   preferClarify: boolean;
 };
 
+export type StrategyDomainPairRule = {
+  primaryDomainId: StrategyTypeId;
+  secondaryDomainId: StrategyTypeId;
+  status: "active" | "partial" | "unavailable";
+  useWhen: string[];
+  avoidWhen: string[];
+  contributionPriorities: StrategyDomainContributionType[];
+  commonConflicts?: string[];
+  mergeGuidance?: string[];
+  version: string;
+};
+
+/**
+ * Synthesis advises the shared engine.
+ * Live StrategicOption / RiskAssessment / StrategicExperiment / StrategicRecommendation
+ * / NextThinkingMovePlan remain owned by the Phase 1–3 engine — not duplicated here.
+ */
 export type StrategySynthesisResult = {
   selection: StrategyDomainSelection;
   /** Integrated strategic question — not “Pricing asks…” / “Growth asks…”. */
   strategicQuestion?: string;
-  nextThinkingMove?: NextThinkingMovePlan;
+  /** Contribution to the next-thinking-move selector (one gap). */
+  suggestedNextQuestion?: string;
   relevantEvidencePrompts: string[];
   assumptionsToSurface: string[];
   constraintsToRespect: string[];
-  /** Pattern candidates for the shared option generator (≤ pool; engine still caps at 3). */
+  /** Pattern candidates only — generator remains authoritative (≤3). */
   optionPatternCandidates?: OptionPatternId[];
-  options?: StrategicOption[];
   tradeoffs?: string[];
-  risks?: RiskAssessment[];
-  experiment?: StrategicExperiment;
-  recommendation?: StrategicRecommendation;
-  recommendedDestination?: string;
+  /** Calm integrated risk lines (not full RiskAssessment duplicates). */
+  integratedRiskSummaries?: string[];
+  /** Hint for designStrategicExperiment — engine still builds StrategicExperiment. */
+  experimentHint?: string;
+  /** Warm member-facing recommendation copy — not a confirmed decision. */
+  memberFacingRecommendation?: string;
+  recommendedDestination?: ContinueJourneyDestinationId;
   conflictNotes?: StrategySynthesisConflict[];
   contributions: StrategyDomainContribution[];
   confidence: SynthesisConfidence;
-  /** Quiet note for Decision Record / internal — not a member report. */
+  /** Quiet internal note for Decision Record enrichment. */
   synthesisSummary?: string;
 };
+
+export const PRIMARY_CONTRIBUTION_BUDGET = 5;
+export const SECONDARY_CONTRIBUTION_BUDGET = 3;
