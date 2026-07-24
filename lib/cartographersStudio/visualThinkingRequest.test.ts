@@ -99,15 +99,25 @@ describe("Visual Thinking Studio request-first foundation", () => {
   });
 
   it("asks one simple depth question when detail level is unclear", () => {
+    // Ambiguous ask without authorizing create/teach/research language.
     const req = applyRequestText(
       createVisualThinkingRequest({}),
-      "Research artificial intelligence for small businesses.",
+      "Something about small businesses and options.",
     );
     expect(req.requestedDepth).toBe("unspecified");
     expect(req.status).toBe("awaiting_depth");
     const withDepth = applyHelpDepth(req, "guided");
     expect(withDepth.status).toBe("preview");
     expect(withDepth.recommendationSummary.length).toBeGreaterThan(10);
+  });
+
+  it("generate-first: clear research request infers depth and skips depth screen", () => {
+    const req = applyRequestText(
+      createVisualThinkingRequest({}),
+      "Research artificial intelligence for small businesses.",
+    );
+    expect(req.status).toBe("preview");
+    expect(req.requestedDepth).not.toBe("unspecified");
   });
 
   it("honors explicit output requests", () => {
@@ -284,15 +294,14 @@ describe("Browser validation scenarios A–E (logic)", () => {
     );
   });
 
-  it("B — Research AI: depth question when unspecified; research result", () => {
+  it("B — Research AI: generate-first skips depth; research result recommended", () => {
     const req = applyRequestText(
       createVisualThinkingRequest({}),
       "Research artificial intelligence for small businesses.",
     );
-    expect(req.status).toBe("awaiting_depth");
+    expect(req.status).toBe("preview");
     expect(req.provisionalIntent).toBe("research_topic");
-    const preview = applyHelpDepth(req, "detailed");
-    expect(preview.recommendedPrimaryOutput).toBe("report");
+    expect(req.recommendedPrimaryOutput).toBe("report");
   });
 
   it("C — Own map: user-led path; no research; no map-type choice required", () => {

@@ -188,8 +188,19 @@ describe("Visual Thinking Generation Engine", () => {
     expect(bundle.run.status).toBe("awaiting_research");
     expect(bundle.run.researchBlocked).toBe(true);
     const primary = getPrimaryDeliverable(bundle)!;
-    expect(primary.blocks.some((b) => b.type === "placeholder")).toBe(true);
-    expect(primary.blocks.some((b) => b.metadata.researchDependent)).toBe(true);
+    // Generate-first: stable instructional steps + localized verification — not invented UI labels.
+    expect(
+      primary.blocks.some(
+        (b) =>
+          b.type === "placeholder" ||
+          b.metadata.researchDependent === true ||
+          b.metadata.freshnessNotice === true ||
+          b.metadata.freshnessSensitive === true,
+      ),
+    ).toBe(true);
+    expect(primary.blocks.filter((b) => b.type === "numbered_step").length).toBeGreaterThanOrEqual(
+      3,
+    );
     const text = primary.blocks.map((b) => b.content).join(" ");
     expect(text).not.toMatch(/click the record button|chrome extension/i);
   });
@@ -225,9 +236,11 @@ describe("Visual Thinking Generation Engine", () => {
       ...ctx,
       suppliedContent: "1. Open app\n2. Start\n3. Share",
     });
-    const steps = getPrimaryDeliverable(bundle)!.blocks.filter(
-      (b) => b.type === "numbered_step",
-    );
+    expect(bundle.run.errors).toEqual([]);
+    expect(bundle.deliverables.length).toBeGreaterThan(0);
+    const primary = getPrimaryDeliverable(bundle);
+    expect(primary).toBeTruthy();
+    const steps = primary!.blocks.filter((b) => b.type === "numbered_step");
     expect(steps.length).toBeGreaterThanOrEqual(3);
     expect(steps[0]!.order).toBeLessThan(steps[1]!.order);
   });
@@ -480,7 +493,7 @@ describe("Visual Thinking Generation Engine", () => {
       expect(bundle.run.status).toBe("review_ready");
     });
 
-    it("B — Loom current instructions → awaiting_research placeholders", () => {
+    it("B — Loom current instructions → awaiting_research with usable steps", () => {
       const { plan, ctx } = confirmedPlan(
         "Show me how to create a Loom video. I need every step.",
         (p) => ({
@@ -493,9 +506,18 @@ describe("Visual Thinking Generation Engine", () => {
       );
       const bundle = startGenerationFromConfirmedPlan(plan, ctx);
       expect(bundle.run.status).toBe("awaiting_research");
+      const primary = getPrimaryDeliverable(bundle)!;
       expect(
-        getPrimaryDeliverable(bundle)!.blocks.some((b) => b.type === "placeholder"),
+        primary.blocks.some(
+          (b) =>
+            b.type === "placeholder" ||
+            b.metadata.researchDependent === true ||
+            b.metadata.freshnessSensitive === true,
+        ),
       ).toBe(true);
+      expect(
+        primary.blocks.filter((b) => b.type === "numbered_step").length,
+      ).toBeGreaterThanOrEqual(3);
     });
 
     it("C — own business map → user-led shell", () => {

@@ -96,6 +96,8 @@ Uncertainty records track unknown freshness and inferred items.
 
 `readyForGeneration` is true for structure/partial/full when a safe generation scope is clear.
 
+Generate-first (6.6): only `not_ready` may block all generation. `structure_ready` and `partial_ready` must proceed to useful output. External-research gaps auto-route; they do not become “Continue with a safe outline” gates.
+
 ---
 
 ## Generation Engine handoff
@@ -103,6 +105,8 @@ Uncertainty records track unknown freshness and inferred items.
 `VisualThinkingGenerationHandoff` supplies package id, readiness, approved items, unresolved gaps, sources, conflicts, uncertainties, assumptions, safe generation scope, blocked areas, and user-provided steps.
 
 Generation must fill only safe sections and keep placeholders for blocked areas.
+
+Handoff enrichment (6.6) may add stable instructional substance for clear how-to requests so Generation never receives only the raw request. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
 
 ---
 

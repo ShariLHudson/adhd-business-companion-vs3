@@ -158,6 +158,10 @@ Existing maps and research records are not modified by this build.
 
 ---
 
+## Generate-first (Corrective Build 6.6)
+
+A clear outcome request authorizes creation. Infer detail when unspecified; do not require “Yes, create this” for clear teach/show/create/research language. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
+
 ## Next build
 
 Build 2 (Understanding Engine) is documented separately.  

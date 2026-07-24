@@ -11,6 +11,11 @@ import type {
   VisualThinkingInteractionStyle,
 } from "@/lib/cartographersStudio/visualThinkingExperienceOrchestrator";
 import { deliverableLabel } from "@/lib/cartographersStudio/visualThinkingExperienceOrchestrator";
+import {
+  assessGeneratedResultSubstance,
+  applyInstructionalMaterialToBlocks,
+  buildInstructionalGenerationMaterial,
+} from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 
 // ─── Content blocks ─────────────────────────────────────────────────────────
 
@@ -156,6 +161,8 @@ export type VisualThinkingGenerationContext = {
   /** Explicit user-supplied body (steps, ideas) — never inferred from goal logic. */
   suppliedContent?: string | null;
   topicHint?: string | null;
+  /** Localized freshness notice for product-sensitive sections (generate-first). */
+  freshnessNotice?: string | null;
   /**
    * When Research Acquisition Intelligence has satisfied required knowledge gaps.
    * Does not change the Experience Plan — only lifts the generation research gate.
@@ -298,115 +305,185 @@ function generateStepByStep(
   role: VisualThinkingGeneratedDeliverableRole,
   researchBlocked: boolean,
 ): VisualThinkingGeneratedDeliverable {
-  const topic = topicFromContext(ctx);
+  const instructional = buildInstructionalGenerationMaterial(ctx.rawRequest);
+  const topic =
+    ctx.topicHint?.trim() ||
+    instructional.title ||
+    topicFromContext(ctx);
   const fromContext = parseSuppliedLines(ctx.suppliedContent);
   const supplied =
     fromContext.length > 0
       ? fromContext
       : extractSuppliedFromRequest(ctx.rawRequest);
+  const useInstructionalBlocks =
+    instructional.domain !== "none" &&
+    (supplied.length === 0 ||
+      supplied.every((s) => /^complete step \d+/i.test(s)));
+
   const d = makeDeliverableBase({
     runId,
     plan,
     type: "step_by_step_guide",
     role,
-    title: `Guide: ${topic}`,
+    title: topic.startsWith("How to") || topic.startsWith("Guide:")
+      ? topic
+      : `Guide: ${topic}`,
     purpose: ctx.successDefinition || ctx.userFacingGoal || "Follow these steps with confidence.",
     sourceMode: researchBlocked
       ? "research_placeholder"
-      : supplied.length
-        ? "user_supplied"
+      : useInstructionalBlocks || supplied.length
+        ? useInstructionalBlocks
+          ? "deterministic_v1"
+          : "user_supplied"
         : "deterministic_v1",
   });
 
-  const blocks: VisualThinkingContentBlock[] = [
-    block("heading", topic, 0, { title: "Overview" }),
-    block(
-      "paragraph",
-      plan.detailLevel === "essentials"
-        ? "A concise sequence to complete this task."
-        : "Follow these steps in order. You can edit any step.",
-      1,
-    ),
-  ];
+  let blocks: VisualThinkingContentBlock[] = [];
 
-  if (researchBlocked && supplied.length === 0) {
-    blocks.push(
-      block(
-        "placeholder",
-        "Current product-specific steps will be filled after research is gathered. No interface sequence has been invented.",
-        2,
-        { title: "Awaiting verified steps", metadata: { researchDependent: true } },
-      ),
-      block("numbered_step", "Prepare your workspace and open the product.", 3, {
-        title: "Step 1",
-        metadata: { safeGeneric: true },
-      }),
-      block(
-        "placeholder",
-        "Record / capture — exact controls verified after research.",
-        4,
-        { title: "Step 2", metadata: { researchDependent: true } },
-      ),
-      block(
-        "placeholder",
-        "Review and share — exact options verified after research.",
-        5,
-        { title: "Step 3", metadata: { researchDependent: true } },
-      ),
-    );
-  } else if (supplied.length > 0) {
-    supplied.forEach((step, i) => {
-      blocks.push(
-        block("numbered_step", step, blocks.length, {
-          title: `Step ${i + 1}`,
-        }),
-      );
-    });
-  } else if (plan.interactionStyle === "guide_me") {
-    blocks.push(
-      block("numbered_step", "Start with the first action you already know.", blocks.length, {
-        title: "Step 1",
-      }),
-      block(
-        "question",
-        "What is the next concrete action after that?",
-        blocks.length,
-        { title: "Your turn" },
-      ),
-      block(
-        "user_note",
-        "Add the remaining steps in your own words.",
-        blocks.length,
-        { title: "Continue here" },
-      ),
-    );
-  } else {
-    const count = plan.detailLevel === "essentials" ? 3 : plan.detailLevel === "detailed" ? 6 : 4;
-    for (let i = 0; i < count; i++) {
+  if (useInstructionalBlocks) {
+    blocks = applyInstructionalMaterialToBlocks(instructional);
+    if (researchBlocked) {
       blocks.push(
         block(
-          "numbered_step",
-          `Complete step ${i + 1} for ${topic}.`,
+          "warning",
+          "A few product-specific labels are still being verified. The sequence above remains usable.",
           blocks.length,
-          { title: `Step ${i + 1}` },
+          { title: "Verification in progress", metadata: { researchDependent: true } },
         ),
       );
     }
-    if (plan.detailLevel === "detailed") {
+  } else {
+    blocks = [
+      block("heading", topic, 0, { title: "Overview" }),
+      block(
+        "paragraph",
+        plan.detailLevel === "essentials"
+          ? "A concise sequence to complete this task."
+          : "Follow these steps in order. You can edit any step.",
+        1,
+      ),
+    ];
+    if (ctx.freshnessNotice || instructional.freshnessNotice) {
       blocks.push(
-        block("tip", "Pause to review before the final step.", blocks.length, {
-          title: "Check",
+        block(
+          "warning",
+          ctx.freshnessNotice || instructional.freshnessNotice || "",
+          blocks.length,
+          { title: "About current product details", metadata: { freshnessNotice: true } },
+        ),
+      );
+    }
+
+    if (researchBlocked && supplied.length === 0) {
+      // Prefer stable instructional material even when research is pending.
+      if (instructional.domain !== "none") {
+        blocks = applyInstructionalMaterialToBlocks(instructional);
+        blocks.push(
+          block(
+            "warning",
+            "Exact control labels may still be verified. No invented button names were used.",
+            blocks.length,
+            { title: "Verification note", metadata: { researchDependent: true } },
+          ),
+        );
+      } else {
+        blocks.push(
+          block(
+            "placeholder",
+            "Current product-specific steps will be filled after research is gathered. No interface sequence has been invented.",
+            2,
+            { title: "Awaiting verified steps", metadata: { researchDependent: true } },
+          ),
+          block("numbered_step", "Prepare your workspace and open the product.", 3, {
+            title: "Step 1",
+            metadata: { safeGeneric: true },
+          }),
+          block(
+            "placeholder",
+            "Record / capture — exact controls verified after research.",
+            4,
+            { title: "Step 2", metadata: { researchDependent: true } },
+          ),
+          block(
+            "placeholder",
+            "Review and share — exact options verified after research.",
+            5,
+            { title: "Step 3", metadata: { researchDependent: true } },
+          ),
+        );
+      }
+    } else if (supplied.length > 0) {
+      supplied.forEach((step, i) => {
+        const titled = step.match(/^([^:]{2,80}):\s+(.+)$/);
+        blocks.push(
+          block("numbered_step", titled?.[2] ?? step, blocks.length, {
+            title: titled?.[1] ?? `Step ${i + 1}`,
+          }),
+        );
+      });
+    } else if (plan.interactionStyle === "guide_me") {
+      blocks.push(
+        block("numbered_step", "Start with the first action you already know.", blocks.length, {
+          title: "Step 1",
+        }),
+        block(
+          "question",
+          "What is the next concrete action after that?",
+          blocks.length,
+          { title: "Your turn" },
+        ),
+        block(
+          "user_note",
+          "Add the remaining steps in your own words.",
+          blocks.length,
+          { title: "Continue here" },
+        ),
+      );
+    } else if (instructional.domain !== "none") {
+      blocks = applyInstructionalMaterialToBlocks(instructional);
+    } else {
+      // Last resort — still avoid echoing the raw request as step text.
+      blocks.push(
+        block(
+          "numbered_step",
+          "Name the finished result in one sentence.",
+          blocks.length,
+          { title: "Clarify the outcome" },
+        ),
+        block(
+          "numbered_step",
+          "Gather the tools and information you need before the first action.",
+          blocks.length,
+          { title: "Prepare" },
+        ),
+        block(
+          "numbered_step",
+          "Complete the first concrete action that moves the work forward.",
+          blocks.length,
+          { title: "First action" },
+        ),
+        block(
+          "numbered_step",
+          "Continue in order until the outcome matches your sentence.",
+          blocks.length,
+          { title: "Continue" },
+        ),
+        block(
+          "numbered_step",
+          "Review, save, or share the result.",
+          blocks.length,
+          { title: "Finish" },
+        ),
+      );
+    }
+
+    if (plan.detailLevel === "detailed" && !researchBlocked) {
+      blocks.push(
+        block("summary", "You should be able to repeat this sequence confidently.", blocks.length, {
+          title: "Done when",
         }),
       );
     }
-  }
-
-  if (plan.detailLevel === "detailed" && !researchBlocked) {
-    blocks.push(
-      block("summary", "You should be able to repeat this sequence confidently.", blocks.length, {
-        title: "Done when",
-      }),
-    );
   }
 
   d.blocks = blocks;
@@ -1500,6 +1577,44 @@ export function executeGenerationRun(
         );
       }
     }
+    // Generate-first substance gate — reject request-echo / empty guides once, then retry with instructional material.
+    if (
+      primary.type === "step_by_step_guide" ||
+      primary.type === "training_guide" ||
+      primary.type === "checklist" ||
+      primary.type === "comparison_table"
+    ) {
+      let substance = assessGeneratedResultSubstance({
+        deliverable: primary,
+        rawRequest: ctx.rawRequest,
+      });
+      if (!substance.substantive) {
+        const material = buildInstructionalGenerationMaterial(ctx.rawRequest);
+        if (material.domain !== "none" && primary.type === "step_by_step_guide") {
+          primary.blocks = applyInstructionalMaterialToBlocks(material);
+          primary.title = material.title || primary.title;
+          primary.userEdited = false;
+          primary.sourceMode = "deterministic_v1";
+          substance = assessGeneratedResultSubstance({
+            deliverable: primary,
+            rawRequest: ctx.rawRequest,
+          });
+        }
+        if (!substance.substantive) {
+          primary.status = "draft";
+          next.warnings.push(
+            ...substance.failureReasons.map(
+              (r) => `Substance check: ${r}`,
+            ),
+          );
+          next.userFacingStatus =
+            "I'm still shaping a useful first version — this isn't ready to treat as complete.";
+        } else {
+          primary.status = next.researchBlocked ? "draft" : "review_ready";
+        }
+      }
+    }
+
     deliverables.push(primary);
     next.primaryDeliverableId = primary.id;
     next.deliverableIds.push(primary.id);
@@ -1591,7 +1706,15 @@ export function executeGenerationRun(
     next.status = "partial";
     next.userFacingStatus =
       "Your main result is ready. One of the extras could not be created.";
-    if (primary) primary.status = "review_ready";
+    if (primary && primary.status !== "draft") primary.status = "review_ready";
+  } else if (primaryOk && primary?.status === "draft") {
+    next.status = "partial";
+    if (!next.userFacingStatus || next.userFacingStatus.includes("Creating")) {
+      next.userFacingStatus =
+        "Here is a usable start — a few areas still need verification or your input.";
+    }
+    completedStages.push("return_to_user");
+    next.completedStages = [...new Set(completedStages)];
   } else if (primaryOk) {
     next.status = "review_ready";
     next.completedAt = nowIso();

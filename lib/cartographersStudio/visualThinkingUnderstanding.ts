@@ -204,17 +204,25 @@ function topicHint(raw: string): string {
 export function detectCreationMode(raw: string): VisualThinkingCreationMode {
   const t = normalize(raw);
   if (
-    /\b(my own (map|visual|ideas)|build (it )?myself|make my own|i want to (map|make|build) my own|create my own visual|let me (build|map)|map my own)\b/.test(
+    /\b(my own (map|visual|ideas)|build (it )?myself|make my own|i want to (map|make|build) my own|create my own visual|let me (build|map|organize)|map my own|blank visual)\b/.test(
       t,
     )
   ) {
     return "build_myself";
   }
-  if (/\b(walk me through|guide me|help me create|with me)\b/.test(t)) {
+  // Collaborative pacing — only when the member asks to work together, not for clear build requests.
+  if (
+    /\b(ask me questions( as we go)?|help me work (it|this) out|walk through it with me|guide me through)\b/.test(
+      t,
+    ) &&
+    !/\b(teach me|show me how|learn how|create (a |an |the )?(guide|sop|report)|research|compare|build (this |it )?for me|how (do i|to))\b/.test(
+      t,
+    )
+  ) {
     return "guide_me";
   }
   if (
-    /\b(create (it |this |every |everything )?for me|build (it |this )?for me|do it for me|research and build)\b/.test(
+    /\b(teach me|show me how|help me (learn|understand)|i need to learn|learn how|walk me through|explain|create a guide|create an? |give me (a |an )?|research|compare|how do i|how to|make (this|me|a|an)|build (this|me|a|an)|create (it |this |every |everything )?for me|build (it |this )?for me|do it for me|research and build)\b/.test(
       t,
     )
   ) {

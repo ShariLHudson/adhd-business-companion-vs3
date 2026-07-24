@@ -151,6 +151,10 @@ Live research · citations · final canvas renderer · format conversion executi
 
 Prefer consuming a Knowledge Package handoff (Build 5) rather than disconnected raw inputs. See [VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md).
 
+## Substance validation (Corrective Build 6.6)
+
+Before treating a result as complete, Generation runs substance validation. Request-echo, empty guides, and generic “Complete step N for {request}” steps fail. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
+
 ## Presentation handoff
 
 Generated deliverables are passed to [Presentation Intelligence](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md) before the final review workspace. Presentation chooses how content is shown — not what content is generated.

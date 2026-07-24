@@ -103,6 +103,8 @@ If an assumption materially changes the result, mention it briefly or ask one cl
 Ask only when needed to avoid the wrong result.  
 At most one question. Never ask what is already answered.
 
+Generate-first (6.6): teach / show me how / learn how / create / research / compare authorize `build_for_me`. Researchable gaps must not become user questions. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
+
 ---
 
 ## Confidence

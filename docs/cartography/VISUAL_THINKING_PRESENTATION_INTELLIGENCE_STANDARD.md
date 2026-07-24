@@ -165,11 +165,13 @@ Optional. Wide screens may use side-by-side; under 768px switch between views. R
 
 | Run state | Presentation |
 |-----------|--------------|
-| Awaiting research | Safe outline + verified-info notice |
+| Awaiting research | Usable guide + localized verification notices (not a blank blocking screen) |
 | Awaiting user input | Structure + one focused question path |
 | Partial | Complete vs incomplete labeled honestly |
 | Failed supporting | Preserve successful primary |
 | Failed primary | Clear recovery — do not imply full success |
+
+Generate-first (6.6): never present an empty or request-echo deliverable as complete. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
 
 ---
 

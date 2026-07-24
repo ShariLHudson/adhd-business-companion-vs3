@@ -162,6 +162,8 @@ Plans may list suggested targets; nothing is handed off in this build.
 
 Keep orchestration independent from generation, presentation, research, and canvas.
 
+Generate-first (6.6): clear `build_for_me` plans continue automatically into knowledge and generation — orchestration is not a confirmation gate. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
+
 ---
 
 ## Adaptive Companion

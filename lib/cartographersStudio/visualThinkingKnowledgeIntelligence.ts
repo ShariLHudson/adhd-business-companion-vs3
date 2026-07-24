@@ -17,6 +17,7 @@ import { deliverableLabel } from "@/lib/cartographersStudio/visualThinkingExperi
 import type { VisualThinkingUnderstanding } from "@/lib/cartographersStudio/visualThinkingUnderstanding";
 import type { VisualThinkingRequest } from "@/lib/cartographersStudio/visualThinkingRequest";
 import type { VisualThinkingGenerationRun } from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
+import { enrichHandoffWithInstructionalMaterial } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 
 // ─── Source references ──────────────────────────────────────────────────────
 
@@ -1459,14 +1460,15 @@ export function buildGenerationHandoff(
 
   let userFacingStatus = "Gathering what we already know.";
   if (pkg.readiness === "full_ready") {
-    userFacingStatus = "Ready to create.";
+    userFacingStatus = "I'm building that for you.";
   } else if (unresolvedGaps.some((g) => g.researchNeeded && g.status === "open")) {
     userFacingStatus =
-      "I can build the structure now, but I need current information before I fill in the product-specific details.";
+      "I'm checking current product details so the guide stays accurate — practical steps are ready now.";
   } else if (unresolvedGaps.some((g) => g.userInputNeeded && g.status === "open")) {
-    userFacingStatus = "A few details are missing.";
+    userFacingStatus =
+      "I can get started with what you've given me — one detail still needs your words.";
   } else if (pkg.readiness === "structure_ready" || pkg.readiness === "partial_ready") {
-    userFacingStatus = "Ready to create a safe outline.";
+    userFacingStatus = "I'm building that for you.";
   }
 
   void knowledgePlan;
@@ -1560,6 +1562,8 @@ export function projectKnowledgePreparationStatus(
   showMissingQuestion: boolean;
   canContinueSafeOutline: boolean;
   canCreateFully: boolean;
+  /** Generate-first: structure/partial/full may proceed without a confirm gate. */
+  canProceedGenerateFirst: boolean;
   focusedQuestion: string | null;
   focusedGapId: string | null;
 } {
@@ -1567,18 +1571,30 @@ export function projectKnowledgePreparationStatus(
   const researchOpen = bundle.package.knowledgeGaps.some(
     (g) => g.researchNeeded && g.status === "open",
   );
+  const userQuestionRequired =
+    Boolean(question) &&
+    Boolean(
+      question &&
+        (question.userInputNeeded ||
+          question.resolutionType === "clarification" ||
+          question.resolutionType === "user_input") &&
+        !question.researchNeeded,
+    );
+  const mayProceed =
+    bundle.handoff.safeGenerationScope === "structure_only" ||
+    bundle.handoff.safeGenerationScope === "partial" ||
+    bundle.handoff.safeGenerationScope === "full";
   return {
     headline: bundle.handoff.userFacingStatus,
     detail: bundle.package.blockedReasons[0] ?? null,
     showResearchNeeded: researchOpen,
-    showMissingQuestion: Boolean(question),
-    canContinueSafeOutline:
-      bundle.handoff.safeGenerationScope === "structure_only" ||
-      bundle.handoff.safeGenerationScope === "partial" ||
-      bundle.handoff.safeGenerationScope === "full",
-    canCreateFully: bundle.handoff.safeGenerationScope === "full",
-    focusedQuestion: question?.focusedQuestion ?? null,
-    focusedGapId: question?.id ?? null,
+    showMissingQuestion: userQuestionRequired,
+    canContinueSafeOutline: mayProceed,
+    // Generate-first: do not reserve "Create this" for full_ready only.
+    canCreateFully: mayProceed && !userQuestionRequired,
+    canProceedGenerateFirst: mayProceed && !userQuestionRequired,
+    focusedQuestion: userQuestionRequired ? question?.focusedQuestion ?? null : null,
+    focusedGapId: userQuestionRequired ? question?.id ?? null : null,
   };
 }
 
@@ -1592,6 +1608,7 @@ export function knowledgeHandoffToGenerationContext(
     userFacingGoal?: string | null;
     successDefinition?: string | null;
   },
+  pkg?: VisualThinkingKnowledgePackage | null,
 ): {
   requestId: string;
   understandingId: string;
@@ -1602,16 +1619,30 @@ export function knowledgeHandoffToGenerationContext(
   knowledgePackageId: string;
   safeGenerationScope: VisualThinkingGenerationHandoff["safeGenerationScope"];
   blockedContentAreas: string[];
+  topicHint?: string | null;
+  freshnessNotice?: string | null;
 } {
+  const enriched = enrichHandoffWithInstructionalMaterial(
+    handoff,
+    base.rawRequest,
+    pkg ?? null,
+  );
+  const lines =
+    enriched.instructionalLines.length > 0
+      ? enriched.instructionalLines
+      : enriched.suppliedSteps;
   return {
     ...base,
     suppliedContent:
-      handoff.suppliedSteps.length > 0
-        ? handoff.suppliedSteps.map((s, i) => `${i + 1}. ${s}`).join("\n")
+      lines.length > 0
+        ? lines.map((s, i) => `${i + 1}. ${s}`).join("\n")
         : null,
     knowledgePackageId: handoff.knowledgePackageId,
-    safeGenerationScope: handoff.safeGenerationScope,
+    safeGenerationScope:
+      handoff.safeGenerationScope === "none" ? "structure_only" : handoff.safeGenerationScope,
     blockedContentAreas: handoff.blockedContentAreas,
+    topicHint: enriched.instructionalTitle,
+    freshnessNotice: enriched.freshnessNotice,
   };
 }
 

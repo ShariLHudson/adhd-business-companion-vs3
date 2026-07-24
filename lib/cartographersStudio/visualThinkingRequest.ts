@@ -8,6 +8,7 @@ import {
   limitVisibleChoices,
   resolveAdaptivePresentation,
 } from "@/lib/adaptiveCompanionIntelligence";
+import { assessRequestAuthorization } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 
 export type VisualThinkingProvisionalIntent =
   | "create_process"
@@ -613,8 +614,14 @@ export function applyRequestText(
     provisionalIntent = "research_topic";
   }
 
-  const needsDepth = depth === "unspecified";
-  const depthForRec = needsDepth ? "guided" : depth;
+  // Generate-first (6.6): clear outcome requests authorize creation — infer depth, skip the depth screen.
+  const auth = assessRequestAuthorization(raw);
+  const needsDepth = depth === "unspecified" && !auth.skipDetailScreen;
+  const depthForRec = needsDepth
+    ? "guided"
+    : depth === "unspecified"
+      ? auth.inferredDetail
+      : depth;
   const effectiveOutput =
     requestedOutput ??
     (request.entryPath === "research_assisted" ? "report" : null);
@@ -631,7 +638,9 @@ export function applyRequestText(
     ...request,
     rawRequest: raw,
     provisionalIntent,
-    requestedDepth: depth,
+    requestedDepth: depth === "unspecified" && auth.skipDetailScreen
+      ? auth.inferredDetail
+      : depth,
     requestedOutput: effectiveOutput,
     recommendedPrimaryOutput: rec.primary,
     recommendedSupportingOutputs: rec.supporting,

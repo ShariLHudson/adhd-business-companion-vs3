@@ -435,7 +435,10 @@ describe("Visual Thinking Knowledge Intelligence Engine", () => {
       rawRequest: input.request.rawRequest,
     });
     expect(ctx.safeGenerationScope).toBe("structure_only");
-    expect(ctx.suppliedContent).toBeNull();
+    // Generate-first: stable instructional material reaches Generation; not unsupported UI claims.
+    expect(ctx.suppliedContent).toBeTruthy();
+    expect(ctx.suppliedContent).not.toMatch(/click the record button/i);
+    expect(handoff.unresolvedGaps.some((g) => g.researchNeeded)).toBe(true);
   });
 
   describe("Scenario tests A–F", () => {

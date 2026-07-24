@@ -209,6 +209,25 @@ export {
 } from "./visualThinkingGenerationEngine";
 
 export {
+  assessRequestAuthorization,
+  inferCreationModeFromRequest,
+  inferDetailLevelFromRequest,
+  assessClarificationNecessity,
+  resolveKnowledgeGap,
+  assessScopedReadiness,
+  buildAutomaticContinuationPlan,
+  assessGeneratedResultSubstance,
+  buildInstructionalGenerationMaterial,
+  enrichHandoffWithInstructionalMaterial,
+  type VisualThinkingRequestAuthorization,
+  type VisualThinkingClarificationAssessment,
+  type VisualThinkingGapResolutionDecision,
+  type VisualThinkingScopedReadiness,
+  type VisualThinkingAutomaticContinuationPlan,
+  type VisualThinkingResultSubstanceAssessment,
+} from "./visualThinkingGenerateFirst";
+
+export {
   planVisualThinkingKnowledge,
   assembleVisualThinkingKnowledgePackage,
   prepareVisualThinkingKnowledge,

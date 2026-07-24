@@ -419,6 +419,10 @@ If any answer is **no**, the feature should not be added.
 
 ---
 
+## Generate-first continuity (Corrective Build 6.6)
+
+The Thinking Workspace must open on substantive generated content for clear instructional requests. Research updates merge into affected regions without restarting the experience or overwriting user edits. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
+
 ## Next build
 
 **`VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md`** — implementation standard for:

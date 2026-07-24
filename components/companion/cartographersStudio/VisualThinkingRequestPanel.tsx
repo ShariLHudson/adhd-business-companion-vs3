@@ -89,6 +89,12 @@ import {
   type VisualThinkingResearchBundle,
   type VisualThinkingResearchFindingInput,
 } from "@/lib/cartographersStudio/visualThinkingResearchAcquisition";
+import {
+  assessClarificationNecessity,
+  assessRequestAuthorization,
+  buildAutomaticContinuationPlan,
+  resolveKnowledgeGap,
+} from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
@@ -159,6 +165,11 @@ export function VisualThinkingRequestPanel({
   const [showCorrection, setShowCorrection] = useState(false);
   const [showAllDepth, setShowAllDepth] = useState(false);
   const [listening, setListening] = useState(false);
+  const [generateFirstAck, setGenerateFirstAck] = useState<string | null>(null);
+  const [generateFirstProgress, setGenerateFirstProgress] = useState<string[]>(
+    [],
+  );
+  const autoContinueLockRef = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
@@ -322,6 +333,136 @@ export function VisualThinkingRequestPanel({
     setExperiencePlan(nextPlan);
   }
 
+  function runGenerateFirstPipeline(rawText: string) {
+    const auth = assessRequestAuthorization(rawText);
+    const continuation = buildAutomaticContinuationPlan(auth);
+    setGenerateFirstAck(auth.acknowledgement);
+    setGenerateFirstProgress(continuation.progressLabels);
+
+    let next = applyRequestText(request, rawText);
+    if (next.status === "awaiting_depth" || next.requestedDepth === "unspecified") {
+      next = applyHelpDepth(next, auth.inferredDetail);
+    }
+
+    let understood = interpretVisualThinkingUnderstanding(next);
+    if (
+      auth.creationMode !== "unspecified" &&
+      understood.creationMode === "unspecified"
+    ) {
+      understood = { ...understood, creationMode: auth.creationMode };
+    }
+    const plan = orchestrateVisualThinkingExperience(understood);
+    const synced = syncRequestFromUnderstanding(next, understood);
+    const confirmed = confirmRecommendation(synced);
+    const confirmedPlan = applyExperiencePlanOverride(plan, { kind: "confirm" });
+    const knowledge = prepareVisualThinkingKnowledge({
+      request: confirmed,
+      understanding: understood,
+      experiencePlan: confirmedPlan,
+      attachedStructuredContent: confirmed.rawRequest,
+    });
+
+    const clarification = assessClarificationNecessity({
+      rawRequest: confirmed.rawRequest,
+      gaps: knowledge.package.knowledgeGaps,
+      creationMode: understood.creationMode,
+    });
+    const gapDecisions = knowledge.package.knowledgeGaps.map((gap) =>
+      resolveKnowledgeGap(gap, { rawRequest: confirmed.rawRequest }),
+    );
+    const researchGaps = gapDecisions.filter(
+      (d) => d.resolutionType === "external_research" && d.automatic,
+    );
+
+    let nextResearch: VisualThinkingResearchBundle | null = null;
+    if (researchGaps.length > 0) {
+      const planned = planVisualThinkingResearch({
+        knowledgeBundle: knowledge,
+        workspaceActive: false,
+      });
+      nextResearch = {
+        plan: planned.plan,
+        items: planned.items,
+        citations: [],
+        conflicts: [],
+        updatedKnowledgePackage: knowledge.package,
+        updatedHandoff: knowledge.handoff,
+        workspaceNotification: null,
+        acquiredAt: null,
+      };
+    }
+
+    const handoffCtx = knowledgeHandoffToGenerationContext(
+      knowledge.handoff,
+      {
+        requestId: confirmed.id,
+        understandingId: understood.id,
+        rawRequest: confirmed.rawRequest,
+        userFacingGoal: understood.userFacingGoal,
+        successDefinition: understood.successDefinition,
+      },
+      knowledge.package,
+    );
+    const researchFacts =
+      nextResearch?.updatedKnowledgePackage.items
+        .filter((i) => i.category === "research_acquired")
+        .map((i) => i.content)
+        .join("\n") ?? "";
+    const supplied = [handoffCtx.suppliedContent, researchFacts]
+      .filter(Boolean)
+      .join("\n");
+
+    const shouldGenerate =
+      auth.creationMode === "build_for_me" &&
+      (!clarification.required || !clarification.blocksAllGeneration);
+
+    setRequest(confirmed);
+    setUnderstanding(understood);
+    setExperiencePlan(confirmedPlan);
+    setKnowledgeBundle(knowledge);
+    setResearchBundle(nextResearch);
+    setGapAnswer("");
+    setShowThisDifferently(false);
+    setShowWrittenReview(false);
+    onConfirmed?.(confirmed);
+
+    if (!shouldGenerate) {
+      return;
+    }
+
+    const bundle = startGenerationFromConfirmedPlan(confirmedPlan, {
+      requestId: handoffCtx.requestId,
+      understandingId: handoffCtx.understandingId,
+      rawRequest: handoffCtx.rawRequest,
+      userFacingGoal: handoffCtx.userFacingGoal,
+      successDefinition: handoffCtx.successDefinition,
+      suppliedContent: supplied || handoffCtx.suppliedContent,
+      topicHint: handoffCtx.topicHint,
+      freshnessNotice: handoffCtx.freshnessNotice,
+      knowledgeResearchSatisfied:
+        knowledgeResearchSatisfiesGenerationGate(nextResearch) ||
+        researchGaps.length > 0,
+    });
+    setGenerationBundle(bundle);
+    setActiveDeliverableId(bundle.run.primaryDeliverableId);
+    const nextPresentation = planVisualThinkingPresentation({
+      understanding: understood,
+      experiencePlan: confirmedPlan,
+      knowledgePackage: knowledge.package,
+      generationBundle: bundle,
+    });
+    setPresentationPlan(nextPresentation);
+    setThinkingWorkspace(
+      createThinkingWorkspace({
+        understanding: understood,
+        experiencePlan: confirmedPlan,
+        knowledgePackage: knowledge.package,
+        generationBundle: bundle,
+        presentationPlan: nextPresentation,
+      }),
+    );
+  }
+
   function handleContinue() {
     const text = (textareaRef.current?.value ?? draftText).trim();
     if (!text) {
@@ -329,6 +470,16 @@ export function VisualThinkingRequestPanel({
       return;
     }
     setDraftText(text);
+    const auth = assessRequestAuthorization(text);
+    if (
+      auth.authorized &&
+      (auth.creationMode === "build_for_me" ||
+        auth.creationMode === "build_myself")
+    ) {
+      autoContinueLockRef.current = true;
+      runGenerateFirstPipeline(text);
+      return;
+    }
     const next = applyRequestText(request, text);
     commitRequest(next, true);
   }
@@ -341,6 +492,11 @@ export function VisualThinkingRequestPanel({
   }
 
   function handleConfirm() {
+    const auth = assessRequestAuthorization(request.rawRequest);
+    if (auth.skipRecommendationConfirm) {
+      runGenerateFirstPipeline(request.rawRequest);
+      return;
+    }
     const confirmed = confirmRecommendation(request);
     setRequest(confirmed);
     if (!experiencePlan || !understanding) {
@@ -453,6 +609,7 @@ export function VisualThinkingRequestPanel({
         userFacingGoal: understanding.userFacingGoal,
         successDefinition: understanding.successDefinition,
       },
+      knowledgeBundle.package,
     );
     const researchFacts =
       researchBundle?.updatedKnowledgePackage.items
@@ -462,6 +619,29 @@ export function VisualThinkingRequestPanel({
     const supplied = [handoffCtx.suppliedContent, researchFacts]
       .filter(Boolean)
       .join("\n");
+    const researchOpen = knowledgeBundle.package.knowledgeGaps.some(
+      (g) =>
+        g.status === "open" &&
+        (g.researchNeeded || g.resolutionType === "external_research"),
+    );
+    let nextResearch = researchBundle;
+    if (researchOpen && !researchBundle) {
+      const planned = planVisualThinkingResearch({
+        knowledgeBundle,
+        workspaceActive: Boolean(thinkingWorkspace),
+      });
+      nextResearch = {
+        plan: planned.plan,
+        items: planned.items,
+        citations: [],
+        conflicts: [],
+        updatedKnowledgePackage: knowledgeBundle.package,
+        updatedHandoff: knowledgeBundle.handoff,
+        workspaceNotification: null,
+        acquiredAt: null,
+      };
+      setResearchBundle(nextResearch);
+    }
     const bundle = startGenerationFromConfirmedPlan(experiencePlan, {
       requestId: handoffCtx.requestId,
       understandingId: handoffCtx.understandingId,
@@ -469,8 +649,10 @@ export function VisualThinkingRequestPanel({
       userFacingGoal: handoffCtx.userFacingGoal,
       successDefinition: handoffCtx.successDefinition,
       suppliedContent: supplied || handoffCtx.suppliedContent,
+      topicHint: handoffCtx.topicHint,
+      freshnessNotice: handoffCtx.freshnessNotice,
       knowledgeResearchSatisfied:
-        knowledgeResearchSatisfiesGenerationGate(researchBundle),
+        knowledgeResearchSatisfiesGenerationGate(nextResearch) || researchOpen,
     });
     setGenerationBundle(bundle);
     setActiveDeliverableId(bundle.run.primaryDeliverableId);
@@ -597,6 +779,24 @@ export function VisualThinkingRequestPanel({
   const depthChoices = visibleDepthChoices({ showAll: showAllDepth });
   const speechSupported = Boolean(getSpeechRecognitionCtor());
   const phase = request.status;
+  const requestAuth = useMemo(
+    () =>
+      request.rawRequest.trim()
+        ? assessRequestAuthorization(request.rawRequest)
+        : null,
+    [request.rawRequest],
+  );
+
+  // Safety net: if a clear build_for_me request lands in preview, continue automatically.
+  useEffect(() => {
+    if (autoContinueLockRef.current) return;
+    if (phase !== "preview" || generationBundle || knowledgeBundle) return;
+    if (!requestAuth?.skipRecommendationConfirm) return;
+    if (!request.rawRequest.trim()) return;
+    autoContinueLockRef.current = true;
+    runGenerateFirstPipeline(request.rawRequest);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional one-shot when preview appears
+  }, [phase, request.rawRequest, requestAuth?.skipRecommendationConfirm]);
 
   return (
     <div
@@ -604,6 +804,9 @@ export function VisualThinkingRequestPanel({
       data-testid="visual-thinking-request-panel"
       data-vts-phase={phase}
       data-vts-background={CARTOGRAPHERS_STUDIO_BACKGROUND}
+      data-vts-generate-first={
+        requestAuth?.skipRecommendationConfirm ? "true" : "false"
+      }
     >
       <div className="vts-request__glass">
         <header className="vts-request__header">
@@ -619,6 +822,24 @@ export function VisualThinkingRequestPanel({
                 : phase === "research_intake"
                   ? VISUAL_THINKING_RESEARCH_PROMPT
                   : VISUAL_THINKING_STUDIO_SUPPORTING}
+            </p>
+          ) : null}
+          {generateFirstAck ? (
+            <p
+              className="vts-request__supporting"
+              data-testid="visual-thinking-generate-first-ack"
+            >
+              {generateFirstAck}
+            </p>
+          ) : null}
+          {generateFirstProgress.length > 0 &&
+          phase === "confirmed" &&
+          !generationBundle ? (
+            <p
+              className="vts-request__note"
+              data-testid="visual-thinking-generate-first-progress"
+            >
+              {generateFirstProgress[0]}
             </p>
           ) : null}
         </header>
@@ -859,6 +1080,14 @@ export function VisualThinkingRequestPanel({
             </span>
 
             <div className="vts-request__preview-actions">
+              {requestAuth?.skipRecommendationConfirm ? (
+                <p
+                  className="vts-request__note"
+                  data-testid="visual-thinking-auto-creating"
+                >
+                  Creating your guide…
+                </p>
+              ) : (
               <button
                 type="button"
                 className="vts-request__primary"
@@ -867,6 +1096,7 @@ export function VisualThinkingRequestPanel({
               >
                 Yes, create this
               </button>
+              )}
               <button
                 type="button"
                 className="vts-request__secondary-btn"
@@ -1105,7 +1335,17 @@ export function VisualThinkingRequestPanel({
               </p>
             ) : null}
             <div className="vts-request__preview-actions">
-              {knowledgeStatus.canCreateFully ? (
+              {requestAuth?.skipSafeOutlineGate &&
+              knowledgeStatus.canProceedGenerateFirst ? (
+                <p
+                  className="vts-request__note"
+                  data-testid="visual-thinking-auto-generating"
+                >
+                  Creating your guide…
+                </p>
+              ) : null}
+              {!requestAuth?.skipSafeOutlineGate &&
+              knowledgeStatus.canCreateFully ? (
                 <button
                   type="button"
                   className="vts-request__primary"
@@ -1115,7 +1355,8 @@ export function VisualThinkingRequestPanel({
                   Create this
                 </button>
               ) : null}
-              {knowledgeStatus.canContinueSafeOutline &&
+              {!requestAuth?.skipSafeOutlineGate &&
+              knowledgeStatus.canContinueSafeOutline &&
               !knowledgeStatus.canCreateFully ? (
                 <button
                   type="button"
