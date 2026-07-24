@@ -1654,7 +1654,8 @@
   background: rgba(255, 250, 240, 0.95);
 }
 
-.vts-workspace__proposal {
+.vts-workspace__proposal,
+.vts-workspace__research-note {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -1663,6 +1664,17 @@
   padding: 0.65rem 1rem;
   border-bottom: 1px solid rgba(184, 149, 106, 0.22);
   background: rgba(255, 250, 240, 0.95);
+}
+
+.vts-request__research {
+  display: grid;
+  gap: 0.55rem;
+  margin-bottom: 0.5rem;
+}
+
+.vts-request__research-status {
+  display: grid;
+  gap: 0.4rem;
 }
 
 .vts-workspace__proposal-text {

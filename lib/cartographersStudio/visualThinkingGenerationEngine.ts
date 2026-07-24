@@ -156,6 +156,11 @@ export type VisualThinkingGenerationContext = {
   /** Explicit user-supplied body (steps, ideas) — never inferred from goal logic. */
   suppliedContent?: string | null;
   topicHint?: string | null;
+  /**
+   * When Research Acquisition Intelligence has satisfied required knowledge gaps.
+   * Does not change the Experience Plan — only lifts the generation research gate.
+   */
+  knowledgeResearchSatisfied?: boolean;
 };
 
 export type VisualThinkingGenerationBundle = {
@@ -225,8 +230,13 @@ function extractSuppliedFromRequest(raw: string): string[] {
   return parseSuppliedLines(marker[1]);
 }
 
-function researchBlocksNeeded(plan: VisualThinkingExperiencePlan): boolean {
-  return plan.researchStage === "before_generation";
+function researchBlocksNeeded(
+  plan: VisualThinkingExperiencePlan,
+  ctx?: VisualThinkingGenerationContext,
+): boolean {
+  if (plan.researchStage !== "before_generation") return false;
+  if (ctx?.knowledgeResearchSatisfied) return false;
+  return true;
 }
 
 /** Guard used in tests — Generation must not import Understanding inference. */
@@ -1373,7 +1383,7 @@ export function createGenerationRun(
   plan: VisualThinkingExperiencePlan,
   ctx: VisualThinkingGenerationContext,
 ): VisualThinkingGenerationRun {
-  const blocked = researchBlocksNeeded(plan);
+  const blocked = researchBlocksNeeded(plan, ctx);
   const timestamp = nowIso();
   return {
     id: newId("vtgr"),

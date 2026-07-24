@@ -204,9 +204,10 @@ Never rely on position alone to communicate meaning.
 
 Do **not** begin here:
 
-- Research Acquisition Intelligence  
 - Dynamic Representation Switching  
 - Estate-wide Integration  
+
+**Build 9 (done):** [Research Acquisition](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — fills knowledge gaps; does not rearrange the workspace.
 
 Those builds must still honor pinning, proposals, and content immutability.
 

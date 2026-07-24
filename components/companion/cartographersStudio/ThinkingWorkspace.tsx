@@ -10,6 +10,7 @@ import {
   type ThinkingWorkspaceState,
   type WorkspaceAction,
 } from "@/lib/cartographersStudio/visualThinkingWorkspaceFoundation";
+import type { VisualThinkingWorkspaceResearchNotification } from "@/lib/cartographersStudio/visualThinkingResearchAcquisition";
 
 type Props = {
   workspace: ThinkingWorkspaceState;
@@ -17,6 +18,9 @@ type Props = {
   onWorkspaceChange: (next: ThinkingWorkspaceState) => void;
   onAskShari?: (prompt: string, context: ReturnType<typeof buildAskShariContext>) => void;
   onClose?: () => void;
+  researchNotification?: VisualThinkingWorkspaceResearchNotification | null;
+  onDismissResearchNotification?: () => void;
+  onReviewResearch?: () => void;
 };
 
 /**
@@ -29,6 +33,9 @@ export function ThinkingWorkspace({
   onWorkspaceChange,
   onAskShari,
   onClose,
+  researchNotification,
+  onDismissResearchNotification,
+  onReviewResearch,
 }: Props) {
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const [ideaDraft, setIdeaDraft] = useState("");
@@ -296,6 +303,41 @@ export function ThinkingWorkspace({
           ) : null}
         </div>
       </header>
+
+      {researchNotification && !researchNotification.dismissed ? (
+        <div
+          className="vts-workspace__research-note"
+          data-testid="thinking-workspace-research-notification"
+          role="status"
+        >
+          <p className="vts-workspace__proposal-text">
+            {researchNotification.message}
+            {researchNotification.conflictCount > 0
+              ? " Some sources disagree — nothing was overwritten."
+              : ""}
+          </p>
+          <div className="vts-workspace__proposal-actions">
+            {onReviewResearch ? (
+              <button
+                type="button"
+                className="vts-request__secondary-btn"
+                data-testid="thinking-workspace-review-research"
+                onClick={onReviewResearch}
+              >
+                Review new information
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-dismiss-research"
+              onClick={() => onDismissResearchNotification?.()}
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       {workspace.pendingLayoutProposal ? (
         <div

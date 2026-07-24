@@ -149,4 +149,4 @@ Generated deliverables pass through [Presentation Intelligence](./VISUAL_THINKIN
 
 ## Build 7 recommendation
 
-**Research Acquisition Engine** — resolve `external_research` gaps by gathering approved sources into the same Knowledge Package contract, then re-assess readiness without changing the experience plan.
+**Research Acquisition Engine (Build 9 — done):** [VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — resolve `external_research` gaps into the same Knowledge Package contract, then re-assess readiness without changing the experience plan.

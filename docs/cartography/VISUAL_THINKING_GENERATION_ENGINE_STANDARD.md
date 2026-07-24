@@ -157,4 +157,4 @@ Generated deliverables are passed to [Presentation Intelligence](./VISUAL_THINKI
 
 ## Build 7 recommendation
 
-Research Acquisition Engine: resolve Knowledge Package `external_research` gaps, then re-handoff to Generation — without choosing new deliverables.
+Research Acquisition Engine (Build 9): [VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — resolve Knowledge Package `external_research` gaps, then re-handoff to Generation via `knowledgeResearchSatisfied` — without choosing new deliverables or rewriting the Experience Plan.

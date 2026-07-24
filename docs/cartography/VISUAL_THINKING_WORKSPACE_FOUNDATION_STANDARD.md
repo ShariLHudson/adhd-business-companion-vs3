@@ -258,11 +258,11 @@ Never moves user content without permission.
 
 ## Future compatibility
 
-**Build 8 (done):** [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md)
+**Build 8 (done):** [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md)  
+**Build 9 (done):** [Research Acquisition](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — may notify the workspace; never auto-replaces organization.
 
 Still later:
 
-- Research Acquisition  
 - Dynamic Representation Switching  
 - Cross-Estate Integration  
 

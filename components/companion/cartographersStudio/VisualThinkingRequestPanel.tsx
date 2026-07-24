@@ -76,6 +76,19 @@ import {
   saveThinkingWorkspace,
   type ThinkingWorkspaceState,
 } from "@/lib/cartographersStudio/visualThinkingWorkspaceFoundation";
+import {
+  acquireVisualThinkingResearch,
+  applyResearchToKnowledgeBundle,
+  clearResearchBundle,
+  dismissWorkspaceResearchNotification,
+  knowledgeResearchSatisfiesGenerationGate,
+  loadResearchBundle,
+  planVisualThinkingResearch,
+  projectResearchStatus,
+  saveResearchBundle,
+  type VisualThinkingResearchBundle,
+  type VisualThinkingResearchFindingInput,
+} from "@/lib/cartographersStudio/visualThinkingResearchAcquisition";
 import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
@@ -132,6 +145,9 @@ export function VisualThinkingRequestPanel({
     useState<VisualThinkingPresentationPlan | null>(null);
   const [thinkingWorkspace, setThinkingWorkspace] =
     useState<ThinkingWorkspaceState | null>(null);
+  const [researchBundle, setResearchBundle] =
+    useState<VisualThinkingResearchBundle | null>(null);
+  const [researchDraft, setResearchDraft] = useState("");
   const [showWrittenReview, setShowWrittenReview] = useState(false);
   const [showThisDifferently, setShowThisDifferently] = useState(false);
   const [showAllAlternates, setShowAllAlternates] = useState(false);
@@ -168,6 +184,8 @@ export function VisualThinkingRequestPanel({
     if (existingPresentation) setPresentationPlan(existingPresentation);
     const existingWorkspace = loadThinkingWorkspace();
     if (existingWorkspace) setThinkingWorkspace(existingWorkspace);
+    const existingResearch = loadResearchBundle();
+    if (existingResearch) setResearchBundle(existingResearch);
   }, []);
 
   useEffect(() => {
@@ -189,6 +207,10 @@ export function VisualThinkingRequestPanel({
   useEffect(() => {
     if (thinkingWorkspace) saveThinkingWorkspace(thinkingWorkspace);
   }, [thinkingWorkspace]);
+
+  useEffect(() => {
+    if (researchBundle) saveResearchBundle(researchBundle);
+  }, [researchBundle]);
 
   // Restore interactive workspace when session has gen+presentation but no workspace yet.
   useEffect(() => {
@@ -239,6 +261,9 @@ export function VisualThinkingRequestPanel({
   const preview = understandingPreview;
   const knowledgeStatus = knowledgeBundle
     ? projectKnowledgePreparationStatus(knowledgeBundle)
+    : null;
+  const researchStatus = researchBundle
+    ? projectResearchStatus(researchBundle)
     : null;
   const generationStatus = generationBundle
     ? projectGenerationStatus(generationBundle.run)
@@ -336,11 +361,85 @@ export function VisualThinkingRequestPanel({
     setGenerationBundle(null);
     setPresentationPlan(null);
     setThinkingWorkspace(null);
+    setResearchBundle(null);
+    clearResearchBundle();
+    setResearchDraft("");
     setActiveDeliverableId(null);
     setGapAnswer("");
     setShowThisDifferently(false);
     setShowWrittenReview(false);
     onConfirmed?.(confirmed);
+  }
+
+  function beginResearchPlan() {
+    if (!knowledgeBundle) return;
+    const { plan, items } = planVisualThinkingResearch({
+      knowledgeBundle,
+      workspaceActive: Boolean(thinkingWorkspace),
+    });
+    setResearchBundle({
+      plan,
+      items,
+      citations: [],
+      conflicts: [],
+      updatedKnowledgePackage: knowledgeBundle.package,
+      updatedHandoff: knowledgeBundle.handoff,
+      workspaceNotification: null,
+      acquiredAt: null,
+    });
+  }
+
+  function submitResearchFinding() {
+    if (!knowledgeBundle || !researchDraft.trim()) return;
+    const openGap =
+      knowledgeBundle.package.knowledgeGaps.find(
+        (g) =>
+          g.status === "open" &&
+          (g.researchNeeded || g.resolutionType === "external_research") &&
+          g.priority === "required",
+      ) ??
+      knowledgeBundle.package.knowledgeGaps.find(
+        (g) =>
+          g.status === "open" &&
+          (g.researchNeeded || g.resolutionType === "external_research"),
+      );
+    const userAuthorityGap = Boolean(
+      openGap &&
+        (openGap.userInputNeeded || openGap.resolutionType === "user_input"),
+    );
+    const finding: VisualThinkingResearchFindingInput = {
+      knowledgeGapId: openGap?.id ?? null,
+      question: openGap?.focusedQuestion || openGap?.description,
+      content: researchDraft.trim(),
+      title:
+        openGap?.focusedQuestion?.slice(0, 80) ||
+        openGap?.area ||
+        "Verified detail",
+      source: "Member-provided verified information",
+      sourceCategory: userAuthorityGap
+        ? "previously_verified_user_information"
+        : "trusted_reference",
+      confidence: "high",
+      freshness: "current",
+      verification: "verified",
+      userAuthority: userAuthorityGap,
+    };
+
+    const acquired = acquireVisualThinkingResearch(
+      {
+        knowledgeBundle,
+        workspaceActive: Boolean(thinkingWorkspace || generationBundle),
+        strategyOverride: researchBundle?.plan.strategy,
+      },
+      [finding],
+    );
+    const nextKnowledge = applyResearchToKnowledgeBundle(
+      knowledgeBundle,
+      acquired,
+    );
+    setKnowledgeBundle(nextKnowledge);
+    setResearchBundle(acquired);
+    setResearchDraft("");
   }
 
   function beginGenerationFromKnowledge() {
@@ -355,13 +454,23 @@ export function VisualThinkingRequestPanel({
         successDefinition: understanding.successDefinition,
       },
     );
+    const researchFacts =
+      researchBundle?.updatedKnowledgePackage.items
+        .filter((i) => i.category === "research_acquired")
+        .map((i) => i.content)
+        .join("\n") ?? "";
+    const supplied = [handoffCtx.suppliedContent, researchFacts]
+      .filter(Boolean)
+      .join("\n");
     const bundle = startGenerationFromConfirmedPlan(experiencePlan, {
       requestId: handoffCtx.requestId,
       understandingId: handoffCtx.understandingId,
       rawRequest: handoffCtx.rawRequest,
       userFacingGoal: handoffCtx.userFacingGoal,
       successDefinition: handoffCtx.successDefinition,
-      suppliedContent: handoffCtx.suppliedContent,
+      suppliedContent: supplied || handoffCtx.suppliedContent,
+      knowledgeResearchSatisfied:
+        knowledgeResearchSatisfiesGenerationGate(researchBundle),
     });
     setGenerationBundle(bundle);
     setActiveDeliverableId(bundle.run.primaryDeliverableId);
@@ -869,13 +978,95 @@ export function VisualThinkingRequestPanel({
               {knowledgeStatus.headline}
             </p>
             {knowledgeStatus.showResearchNeeded ? (
-              <p
-                className="vts-request__note"
+              <div
+                className="vts-request__research"
                 data-testid="visual-thinking-knowledge-research-needed"
               >
-                I can build the structure now, but I need current information
-                before I fill in the product-specific details.
-              </p>
+                <p className="vts-request__note">
+                  I can build the structure now, but I need current information
+                  before I fill in the product-specific details.
+                </p>
+                {!researchBundle ? (
+                  <button
+                    type="button"
+                    className="vts-request__secondary-btn"
+                    data-testid="visual-thinking-begin-research"
+                    onClick={beginResearchPlan}
+                  >
+                    Gather verified information
+                  </button>
+                ) : null}
+                {researchStatus ? (
+                  <div
+                    className="vts-request__research-status"
+                    data-testid="visual-thinking-research-status"
+                    data-research-status={researchBundle?.plan.status}
+                  >
+                    <p className="vts-request__summary">
+                      {researchStatus.headline}
+                    </p>
+                    <p className="vts-request__label">
+                      Status: {researchStatus.statusLabel}
+                      {researchStatus.conflictCount > 0
+                        ? ` · ${researchStatus.conflictCount} conflict${researchStatus.conflictCount === 1 ? "" : "s"} noted`
+                        : ""}
+                      {researchStatus.citationCount > 0
+                        ? ` · ${researchStatus.citationCount} source${researchStatus.citationCount === 1 ? "" : "s"}`
+                        : ""}
+                    </p>
+                    {researchStatus.showFreshnessWarning ? (
+                      <p
+                        className="vts-request__note"
+                        data-testid="visual-thinking-research-freshness-warning"
+                      >
+                        Some details may need a current source — I will not
+                        pretend outdated information is fresh.
+                      </p>
+                    ) : null}
+                    {researchBundle &&
+                    researchBundle.conflicts.length > 0 ? (
+                      <p
+                        className="vts-request__note"
+                        data-testid="visual-thinking-research-conflict"
+                      >
+                        Sources disagree on at least one point. I will keep both
+                        visible and treat the answer as uncertain.
+                      </p>
+                    ) : null}
+                    {researchStatus.requiredRemaining > 0 ||
+                    researchBundle?.plan.status === "ready" ||
+                    researchBundle?.plan.status === "partial" ? (
+                      <div className="vts-request__correction">
+                        <p className="vts-request__summary">
+                          {researchBundle?.items.find(
+                            (i) =>
+                              i.priority === "required" &&
+                              (i.status === "planned" ||
+                                i.status === "still_unresolved"),
+                          )?.question ??
+                            "What verified detail should we add?"}
+                        </p>
+                        <textarea
+                          className="vts-request__textarea"
+                          data-testid="visual-thinking-research-finding"
+                          rows={2}
+                          value={researchDraft}
+                          onChange={(e) => setResearchDraft(e.target.value)}
+                          placeholder="Add a verified detail you trust…"
+                        />
+                        <button
+                          type="button"
+                          className="vts-request__primary"
+                          data-testid="visual-thinking-research-finding-submit"
+                          onClick={submitResearchFinding}
+                        >
+                          Add verified information
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
             ) : null}
             {knowledgeStatus.showMissingQuestion &&
             knowledgeStatus.focusedQuestion ? (
@@ -946,6 +1137,7 @@ export function VisualThinkingRequestPanel({
                 clearGenerationBundle();
                 clearPresentationPlan();
                 clearThinkingWorkspace();
+                clearResearchBundle();
                 setDraftText("");
                 setUnderstanding(null);
                 setExperiencePlan(null);
@@ -953,6 +1145,8 @@ export function VisualThinkingRequestPanel({
                 setGenerationBundle(null);
                 setPresentationPlan(null);
                 setThinkingWorkspace(null);
+                setResearchBundle(null);
+                setResearchDraft("");
                 setActiveDeliverableId(null);
                 setShowWrittenReview(false);
                 setRequest(createVisualThinkingRequest({}));
@@ -1132,6 +1326,16 @@ export function VisualThinkingRequestPanel({
                 workspace={thinkingWorkspace}
                 deliverables={generationBundle.deliverables}
                 onWorkspaceChange={setThinkingWorkspace}
+                researchNotification={researchBundle?.workspaceNotification}
+                onDismissResearchNotification={() => {
+                  if (!researchBundle) return;
+                  setResearchBundle(
+                    dismissWorkspaceResearchNotification(researchBundle),
+                  );
+                }}
+                onReviewResearch={() => {
+                  setShowWrittenReview(true);
+                }}
                 onAskShari={(prompt, context) => {
                   if (typeof window !== "undefined") {
                     window.dispatchEvent(
@@ -1366,6 +1570,7 @@ export function VisualThinkingRequestPanel({
                 clearGenerationBundle();
                 clearPresentationPlan();
                 clearThinkingWorkspace();
+                clearResearchBundle();
                 setDraftText("");
                 setUnderstanding(null);
                 setExperiencePlan(null);
@@ -1373,6 +1578,8 @@ export function VisualThinkingRequestPanel({
                 setGenerationBundle(null);
                 setPresentationPlan(null);
                 setThinkingWorkspace(null);
+                setResearchBundle(null);
+                setResearchDraft("");
                 setActiveDeliverableId(null);
                 setShowThisDifferently(false);
                 setShowWrittenReview(false);

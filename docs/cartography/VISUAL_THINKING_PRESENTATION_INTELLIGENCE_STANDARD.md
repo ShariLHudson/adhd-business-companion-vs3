@@ -232,4 +232,4 @@ All interactive workspace work must conform to the [Thinking Workspace Experienc
 **Thinking Workspace Foundation** — [VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md)  
 **Intelligent Layout Engine** — [VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md)
 
-Presentation remains the input; the workspace is the primary interactive surface; layout arranges without rewriting knowledge. Research Acquisition and Dynamic Representation Switching remain subsequent builds.
+Presentation remains the input; the workspace is the primary interactive surface; layout arranges without rewriting knowledge. Research Acquisition is implemented ([standard](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md)). Dynamic Representation Switching remains a subsequent build.
