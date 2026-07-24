@@ -431,16 +431,16 @@ It is **entrepreneurial growth** — better thinking, better decisions, stronger
 
 ---
 
-## Visual Thinking pilot (Build 9)
+## Visual Thinking pilot (Build 10)
 
 Learning is the first Chamber consumer of shared Visual Thinking.
 
 | Document | Path |
 |----------|------|
-| Pilot standard | [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](../cartography/VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md) |
-| Runtime | `lib/learningIntelligence/` |
+| Pilot standard (complete) | [VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md](../cartography/VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md) |
+| Prior integration notes | [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](../cartography/VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md) |
+| Runtime | `lib/learningIntelligence/` (`learningVisualThinkingPilot.ts`, `visualThinkingIntegration.ts`) |
+| Shared recommendation | `lib/cartographersStudio/visualThinkingRecommendationIntelligence.ts` |
 | Shared service | `lib/cartographersStudio/visualThinkingService.ts` |
 
-**Separation:** Learning owns pedagogy (goal, level, progression, teaching). Visual Thinking owns representation and the Thinking Workspace. Learning must not invent local maps; Visual Thinking must not replace teaching.
-
-Optional “Show Me Visually” invitations appear only when a visual would materially help. Explicit visual requests skip the invitation. Declines stay in-session (topic / lesson) and are not permanent anti-visual preferences. Return-to-Learning preserves session and lesson position; insight writebacks require approval.
+**Separation:** Learning owns pedagogy. Recommendation Intelligence owns usefulness invitations. Visual Thinking owns representation and the Thinking Workspace. Learning must not invent local maps or a parallel recommender; Visual Thinking must not replace teaching. Visual activity alone is never mastery. Note writebacks and Ask in Learning require approval / preserve context.

@@ -388,6 +388,10 @@ Optional Visual Thinking invitations are assessed by [Recommendation Intelligenc
 
 After a substantive result opens, the workspace is collaborative — not a static viewer. See [WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md). Edits are selection-scoped; user edits are protected; representation updates require preview consent.
 
+### Learning pilot source experience
+
+When opened from Learning, preserve `WorkspaceLearningContext`, supporting written explanation, Return to Learning, and Ask in Learning. See [VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md).
+
 ### Learning pilot (first Estate consumer)
 
 See [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md).

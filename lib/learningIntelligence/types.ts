@@ -36,9 +36,16 @@ export type LearningVisualPurpose =
   | "see_the_whole"
   | "learn_a_process"
   | "reinforce_memory"
-  | "review_key_ideas"
+  | "organize_key_ideas"
+  | "understand_cause_and_effect"
+  | "identify_knowledge_gaps"
   | "identify_gaps"
-  | "follow_learning_progression";
+  | "review_what_was_learned"
+  | "review_key_ideas"
+  | "prepare_to_explain"
+  | "follow_a_learning_progression"
+  | "follow_learning_progression"
+  | "distinguish_similar_concepts";
 
 export type LearningApprovedKnowledgeItem = {
   id: string;

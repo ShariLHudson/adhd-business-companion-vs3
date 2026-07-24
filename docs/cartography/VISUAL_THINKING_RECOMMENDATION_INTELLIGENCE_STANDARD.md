@@ -3,7 +3,9 @@
 **Status:** Binding shared recommendation standard  
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/visualThinkingRecommendationIntelligence.ts`  
-**Related:** [Integration](./VISUAL_THINKING_INTEGRATION_STANDARD.md) · [Generate-First](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md) · [Rename & Research-to-Result](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md) · [Workspace Editing & Co-Creation](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md) · Learning pilot
+**Related:** [Integration](./VISUAL_THINKING_INTEGRATION_STANDARD.md) · [Generate-First](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md) · [Rename & Research-to-Result](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md) · [Workspace Editing & Co-Creation](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md) · [Learning Pilot](./VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md)
+
+**Learning consumer:** Learning builds `VisualThinkingRecommendationContext` via `buildLearningRecommendationContext` and must not invent a parallel recommender.
 
 ---
 

@@ -4,7 +4,9 @@
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/visualThinkingWorkspaceEditing.ts`  
 **UI:** `components/companion/cartographersStudio/ThinkingWorkspace.tsx`  
-**Related:** [Workspace Experience](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md) · [Workspace Foundation](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md) · [Presentation](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md) · [Generate-First](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md) · [Integration](./VISUAL_THINKING_INTEGRATION_STANDARD.md) · [Recommendation](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md)
+**Related:** [Workspace Experience](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md) · [Workspace Foundation](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md) · [Presentation](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md) · [Generate-First](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md) · [Integration](./VISUAL_THINKING_INTEGRATION_STANDARD.md) · [Recommendation](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) · [Learning Pilot](./VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md)
+
+**Learning pilot:** Selected-object learning actions map into co-creation; Ask in Learning and note writebacks require approval; opening the workspace never marks a lesson complete.
 
 ---
 

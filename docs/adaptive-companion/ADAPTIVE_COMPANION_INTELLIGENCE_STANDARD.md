@@ -51,3 +51,5 @@ Documented in [ADOPTION_AND_CERTIFICATION_PLAN.md](./ADOPTION_AND_CERTIFICATION_
 [Recommendation Intelligence](../cartography/VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) may use Adaptive Companion observations to adjust confidence, timing, density, and invitation strength.
 
 It must **not**: force a visual, suppress an explicit visual request, permanently label someone a “visual learner,” or replace written help. Explicit no-visual preferences suppress optional invitations only.
+
+**Learning pilot:** May influence invitation timing/density for Learning → Visual Thinking. Must not assume ADHD means every lesson should be visual. See [Learning Pilot Integration](../cartography/VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md).

@@ -11,6 +11,8 @@
 
 **Workspace Editing:** After handoff, the destination is an editable collaborative workspace ([Editing & Co-Creation](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md)). Integration must preserve return context; workspace edits never silently write back to source systems.
 
+**Learning pilot (first source experience):** [Learning Pilot Integration](./VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md) — Learning owns pedagogy; Recommendation Intelligence owns invitations; Visual Thinking owns representation. Progress and writebacks require Learning rules / approval.
+
 ---
 
 ## Mission

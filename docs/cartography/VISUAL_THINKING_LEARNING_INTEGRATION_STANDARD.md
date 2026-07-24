@@ -3,6 +3,7 @@
 **Status:** Binding pilot standard — Learning Chamber Member only  
 **Date:** 2026-07-24  
 **Runtime:** `lib/learningIntelligence/` · shared pipeline via `lib/cartographersStudio/visualThinkingService.ts`  
+**Superseding completion:** [VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md) (Build 10 — shared Recommendation Intelligence, Ask in Learning, V2 return)  
 **Related:** [VISUAL_THINKING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_INTEGRATION_STANDARD.md) · [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md) · [VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md) · [VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md) · [LEARNING_INTELLIGENCE.md](../momentum-institute/LEARNING_INTELLIGENCE.md)
 
 ---

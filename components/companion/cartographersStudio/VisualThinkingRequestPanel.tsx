@@ -108,6 +108,13 @@ import {
   type CoCreationActionId,
   type WorkspaceEditingSession,
 } from "@/lib/cartographersStudio/visualThinkingWorkspaceEditing";
+import {
+  buildLearningReturnV2,
+  createAskInLearningHandoff,
+  getSupportingWrittenLearningView,
+  loadLearningIntegrationRequest,
+  loadWorkspaceLearningContext,
+} from "@/lib/learningIntelligence";
 import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
@@ -167,6 +174,10 @@ export function VisualThinkingRequestPanel({
   const [editingSession, setEditingSession] =
     useState<WorkspaceEditingSession | null>(null);
   const [coCreationNotice, setCoCreationNotice] = useState<string | null>(null);
+  const [showLearningWritten, setShowLearningWritten] = useState(false);
+  const [learningReturnNotice, setLearningReturnNotice] = useState<string | null>(
+    null,
+  );
   const [researchBundle, setResearchBundle] =
     useState<VisualThinkingResearchBundle | null>(null);
   const [researchDraft, setResearchDraft] = useState("");
@@ -1614,7 +1625,115 @@ export function VisualThinkingRequestPanel({
                     );
                   }
                 }}
+                learningPilot={(() => {
+                  const learningCtx = loadWorkspaceLearningContext();
+                  const learningReq = loadLearningIntegrationRequest();
+                  if (!learningCtx || !learningReq) return null;
+                  const written = getSupportingWrittenLearningView(learningReq);
+                  return {
+                    topic: learningCtx.learningTopic,
+                    writtenExplanationAvailable: written.available,
+                    onOpenWrittenExplanation: () => setShowLearningWritten(true),
+                    onAskInLearning: () => {
+                      const selectedId =
+                        thinkingWorkspace.selection.primaryObjectId;
+                      const selected = selectedId
+                        ? thinkingWorkspace.objects.find((o) => o.id === selectedId)
+                        : null;
+                      const question =
+                        window.prompt(
+                          "What would you like to ask in Learning?",
+                          learningReq.learnerQuestion ??
+                            "I have a question about this part.",
+                        ) ?? "";
+                      if (!question.trim()) return;
+                      createAskInLearningHandoff({
+                        sourceLearningSessionId:
+                          learningCtx.sourceLearningSessionId,
+                        visualThinkingWorkspaceId: thinkingWorkspace.id,
+                        question: question.trim(),
+                        selectedObjectIds: selectedId ? [selectedId] : [],
+                        selectedObjectSummaries: selected
+                          ? [`${selected.title} — ${selected.summary}`]
+                          : [],
+                        relevantKnowledgeItemIds:
+                          learningCtx.approvedKnowledgeItemIds.slice(0, 8),
+                        currentPresentation:
+                          learningCtx.currentPresentation,
+                      });
+                      const ret = buildLearningReturnV2({
+                        request: learningReq,
+                        visualThinkingWorkspaceId: thinkingWorkspace.id,
+                        pendingQuestion: question.trim(),
+                        requestedResumeAction: "ask_my_visual_question",
+                      });
+                      setLearningReturnNotice(ret.resumeMessage);
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(
+                          new CustomEvent("visual-thinking-return-to-learning", {
+                            detail: { returnPayload: ret, askInLearning: true },
+                          }),
+                        );
+                      }
+                    },
+                    onReturnToLearning: () => {
+                      const ret = buildLearningReturnV2({
+                        request: learningReq,
+                        visualThinkingWorkspaceId: thinkingWorkspace.id,
+                        activePresentation: learningCtx.currentPresentation,
+                      });
+                      setLearningReturnNotice(ret.resumeMessage);
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(
+                          new CustomEvent("visual-thinking-return-to-learning", {
+                            detail: { returnPayload: ret },
+                          }),
+                        );
+                      }
+                    },
+                  };
+                })()}
               />
+            ) : null}
+
+            {showLearningWritten && loadLearningIntegrationRequest() ? (
+              <section
+                className="vts-request__section"
+                data-testid="learning-written-explanation"
+                aria-label="Written learning explanation"
+              >
+                <h3 className="vts-request__section-title">
+                  {
+                    getSupportingWrittenLearningView(
+                      loadLearningIntegrationRequest()!,
+                    ).title
+                  }
+                </h3>
+                <p className="vts-request__note">
+                  {
+                    getSupportingWrittenLearningView(
+                      loadLearningIntegrationRequest()!,
+                    ).body
+                  }
+                </p>
+                <button
+                  type="button"
+                  className="vts-request__secondary-btn"
+                  onClick={() => setShowLearningWritten(false)}
+                >
+                  Close written explanation
+                </button>
+              </section>
+            ) : null}
+
+            {learningReturnNotice ? (
+              <p
+                className="vts-request__note"
+                data-testid="learning-return-notice"
+                role="status"
+              >
+                {learningReturnNotice}
+              </p>
             ) : null}
 
             {generationStatus.showReview &&

@@ -13,6 +13,13 @@ import {
   type VisualThinkingServiceHandoff,
 } from "@/lib/cartographersStudio/visualThinkingService";
 import type { VisualThinkingPresentationType } from "@/lib/cartographersStudio/visualThinkingPresentationIntelligence";
+import {
+  assessLearningPilotRecommendation,
+  buildLearningIntegrationRequestV2,
+  buildWorkspaceLearningContext,
+  getSupportingWrittenLearningView,
+  type LearningVisualThinkingIntegrationRequestV2,
+} from "@/lib/learningIntelligence/learningVisualThinkingPilot";
 import type {
   LearningApprovedKnowledgeItem,
   LearningReturnContext,
@@ -138,7 +145,7 @@ const OBS_KEY = "companion-learning-vt-observability-v1";
 // ─── Explicit visual request detection ──────────────────────────────────────
 
 const EXPLICIT_VISUAL =
-  /\b(show\s+me\s+visually|create\s+a\s+visual|make\s+a\s+visual|map\s+this|diagram\s+this|show\s+how\s+these\s+connect|turn\s+this\s+into\s+a\s+timeline|show\s+me\s+the\s+process|help\s+me\s+see\s+the\s+big\s+picture|visualize\s+this|open\s+a\s+visual)\b/i;
+  /\b(show\s+me\s+visually|create\s+a\s+visual|make\s+a\s+visual|map\s+this|diagram\s+this|show\s+how\s+these\s+connect|turn\s+this\s+into\s+a\s+timeline|show\s+me\s+the\s+process|help\s+me\s+see\s+the\s+big\s+picture|visualize\s+this|open\s+a\s+visual|take\s+this\s+to\s+visual\s+thinking|open\s+visual\s+thinking\s+studio|lay\s+this\s+out\s+side\s+by\s+side|show\s+me\s+the\s+big\s+picture)\b/i;
 
 /** "Show me the steps" alone is NOT an explicit visual request (Scenario C). */
 export function detectsExplicitLearningVisualRequest(text: string): boolean {
@@ -148,6 +155,7 @@ export function detectsExplicitLearningVisualRequest(text: string): boolean {
   // "Make a visual showing…" / "map how … connect"
   if (/\b(make|create|open)\b.+\bvisual\b/i.test(t)) return true;
   if (/\bmap\b.+\b(connect|relationship|funnel|stages)\b/i.test(t)) return true;
+  if (/\bshow\s+this\s+visually\b/i.test(t)) return true;
   return false;
 }
 
@@ -341,12 +349,21 @@ export function assessLearningVisualThinkingRecommendation(input: {
   learnerConfused?: boolean;
 }): LearningVisualThinkingRecommendation {
   const { session, userRequest } = input;
-  const factors: string[] = [];
   const suppression = getLearningVisualSuppression(session.learningSessionId);
   const topicKey = session.topic.trim().toLowerCase();
 
-  if (detectsExplicitLearningVisualRequest(userRequest)) {
-    const purpose = inferPurpose(session, userRequest);
+  // Shared Recommendation Intelligence owns usefulness; Learning owns pedagogy + lesson suppression.
+  const pilot = assessLearningPilotRecommendation({
+    session,
+    userRequest,
+    hasProvidedInitialValue: input.hasProvidedInitialValue,
+    learnerConfused: input.learnerConfused,
+    lessonSuppressed: suppression.suppressLesson,
+    topicDeclined: Boolean(topicKey && suppression.topicDeclines.includes(topicKey)),
+  });
+
+  if (detectsExplicitLearningVisualRequest(userRequest) || pilot.shared.explicitlyRequested) {
+    const purpose = pilot.learningPurpose;
     return {
       recommended: true,
       confidence: "high",
@@ -360,11 +377,11 @@ export function assessLearningVisualThinkingRecommendation(input: {
       keepActionLabel: "Keep Learning Here",
       suppressActionLabel: "Not During This Lesson",
       suppressForSession: false,
-      factors: ["explicit_visual_request"],
+      factors: ["explicit_visual_request", ...pilot.shared.factors],
     };
   }
 
-  if (suppression.suppressLesson) {
+  if (pilot.shared.factors.includes("lesson_suppress")) {
     recordLearningVtEvent({
       type: "repeated_recommendation_suppressed",
       learningSessionId: session.learningSessionId,
@@ -374,7 +391,7 @@ export function assessLearningVisualThinkingRecommendation(input: {
     return noRecommend("Suppressed for this lesson.", ["lesson_suppress"]);
   }
 
-  if (topicKey && suppression.topicDeclines.includes(topicKey)) {
+  if (pilot.shared.factors.includes("topic_declined")) {
     recordLearningVtEvent({
       type: "repeated_recommendation_suppressed",
       learningSessionId: session.learningSessionId,
@@ -391,7 +408,6 @@ export function assessLearningVisualThinkingRecommendation(input: {
     );
   }
 
-  // Do not recommend before Learning has offered value (unless explicit — handled above).
   if (!input.hasProvidedInitialValue && !input.learnerConfused) {
     return noRecommend(
       "Wait until a short explanation is available.",
@@ -399,55 +415,20 @@ export function assessLearningVisualThinkingRecommendation(input: {
     );
   }
 
-  let score = 0;
-  const purpose = inferPurpose(session, userRequest);
-
-  if (session.keyConcepts.length >= 4) {
-    score += 3;
-    factors.push("many_concepts");
-  }
-  if (session.relationshipHints.length >= 2) {
-    score += 3;
-    factors.push("relationships");
-  }
-  if (session.sequenceHints.length >= 4) {
-    score += 3;
-    factors.push("long_sequence");
-  }
-  if (session.comparisonHints.length >= 2) {
-    score += 3;
-    factors.push("comparison");
-  }
-  if (session.approvedKnowledgeItems.length >= 4) {
-    score += 1;
-    factors.push("scoped_knowledge");
-  }
-  if (input.learnerConfused) {
-    score += 2;
-    factors.push("confusion");
-  }
-  if (
-    /\b(relate|together|connect|parts|stages|compare|system)\b/i.test(
-      userRequest + " " + session.learningGoal,
-    )
-  ) {
-    score += 2;
-    factors.push("usefulness_language");
-  }
-
-  // Keyword alone is not enough — require structural signal.
+  // Keyword alone is not enough — require structural signal (Learning + shared readiness).
   const structural =
     session.keyConcepts.length >= 3 ||
     session.relationshipHints.length >= 2 ||
     session.sequenceHints.length >= 3 ||
     session.comparisonHints.length >= 2;
-  if (!structural) {
+  if (!structural || !pilot.shared.readiness.structureSufficient) {
     return noRecommend(
       "Not enough structure to make a visual helpful yet.",
-      ["insufficient_structure", ...factors],
+      ["insufficient_structure", ...pilot.shared.factors],
     );
   }
 
+  // Keep a light platform service signal for compatibility with existing callers.
   const platform = shouldRecommendVisualThinking({
     sourceExperience: "learning",
     primaryGoal: session.learningGoal,
@@ -457,54 +438,74 @@ export function assessLearningVisualThinkingRecommendation(input: {
     relationshipCount: session.relationshipHints.length,
     processStepCount: session.sequenceHints.length,
     optionCount: session.comparisonHints.length,
-    reasonForRecommendation: userFacingRecommendation(purpose, session.topic),
+    reasonForRecommendation: userFacingRecommendation(
+      pilot.learningPurpose,
+      session.topic,
+    ),
   });
 
-  if (!platform.shouldRecommend && score < 5) {
-    return noRecommend(platform.reason, [...factors, ...platform.factors]);
-  }
+  const recommended =
+    pilot.shared.recommended &&
+    (pilot.shared.confidence === "high" ||
+      pilot.shared.confidence === "very_high" ||
+      platform.shouldRecommend);
 
-  const recommended = score >= 5 || platform.shouldRecommend;
   const timing: LearningVisualThinkingRecommendation["recommendationTiming"] =
-    input.learnerConfused
-      ? "on_confusion"
-      : session.comparisonHints.length >= 2
-        ? "on_complex_comparison"
-        : session.sequenceHints.length >= 4
-          ? "before_long_sequence"
-          : session.learningStage === "reviewing"
-            ? "on_review"
-            : "after_initial_explanation";
+    !recommended
+      ? "none"
+      : input.learnerConfused
+        ? "on_confusion"
+        : session.comparisonHints.length >= 2
+          ? "on_complex_comparison"
+          : session.sequenceHints.length >= 4
+            ? "before_long_sequence"
+            : session.learningStage === "reviewing"
+              ? "on_review"
+              : "after_initial_explanation";
 
+  const purpose = pilot.learningPurpose;
   const result: LearningVisualThinkingRecommendation = {
     recommended,
-    confidence: score >= 8 ? "high" : score >= 5 ? "medium" : "low",
+    confidence:
+      pilot.shared.confidence === "very_high" || pilot.shared.confidence === "high"
+        ? "high"
+        : pilot.shared.confidence === "medium"
+          ? "medium"
+          : "low",
     reason: recommended
-      ? "A visual is likely to improve understanding of connected learning content."
-      : "A visual is unlikely to improve learning right now.",
+      ? pilot.shared.reasons[0] ??
+        "A visual is likely to improve understanding of connected learning content."
+      : pilot.shared.cautions[0] ??
+        "A visual is unlikely to improve learning right now.",
     suggestedPurpose: recommended ? purpose : null,
     preferredPresentation: recommended
-      ? purposeToPresentation(purpose)
+      ? pilot.shared.preferredPresentation ?? purposeToPresentation(purpose)
       : null,
     alternativePresentations: recommended
-      ? ["training_guide", "step_by_step", "checklist"]
+      ? pilot.shared.eligibleAlternatePresentations.length
+        ? pilot.shared.eligibleAlternatePresentations
+        : ["training_guide", "step_by_step", "checklist"]
       : [],
-    recommendationTiming: recommended ? timing : "none",
+    recommendationTiming: timing,
     userFacingMessage: recommended
-      ? userFacingRecommendation(purpose, session.topic)
+      ? pilot.shared.userFacingMessage ||
+        userFacingRecommendation(purpose, session.topic)
       : "",
     primaryActionLabel: "Show Me Visually",
     keepActionLabel: "Keep Learning Here",
     suppressActionLabel: "Not During This Lesson",
     suppressForSession: false,
-    factors,
+    factors: [...pilot.shared.factors, ...platform.factors],
   };
 
   recordLearningVtEvent({
     type: "recommendation_assessed",
     learningSessionId: session.learningSessionId,
     topic: session.topic,
-    meta: { recommended, score },
+    meta: {
+      recommended,
+      sharedConfidence: pilot.shared.confidence,
+    },
   });
 
   return result;
@@ -535,9 +536,13 @@ function noRecommend(
 
 export type LearningToVisualThinkingAdapterResult = {
   integrationRequest: LearningVisualThinkingIntegrationRequest;
+  /** Build 10 expanded contract — same handoff, richer Learning provenance. */
+  integrationRequestV2: LearningVisualThinkingIntegrationRequestV2;
   visualThinkingContext: VisualThinkingRequestContext;
   handoff: VisualThinkingServiceHandoff;
   seedRequestText: string;
+  supportingWrittenExplanation: string | null;
+  workspaceLearningContext: ReturnType<typeof buildWorkspaceLearningContext>;
   /** Progress must not flip to complete solely because VT opened. */
   preservesLearningProgress: true;
   doesNotMarkLessonComplete: true;
@@ -651,6 +656,23 @@ export function createVisualThinkingContextFromLearning(input: {
     seedRequestText,
   };
 
+  const integrationRequestV2 = buildLearningIntegrationRequestV2({
+    session,
+    userRequest: input.userRequest,
+    purpose,
+    preferredPresentation: integrationRequest.suggestedPresentation,
+    eligibleAlternates: recommendation.alternativePresentations,
+    explicitlyRequested: input.explicitlyRequested,
+    userAcceptedRecommendation: input.userAcceptedRecommendation,
+    recommendationId: null,
+  });
+
+  const workspaceLearningContext = buildWorkspaceLearningContext(
+    integrationRequestV2,
+    session.keyConcepts.slice(0, 8),
+    integrationRequest.suggestedPresentation,
+  );
+
   saveReturnContext(returnContext, integrationRequest.id);
 
   recordLearningVtEvent({
@@ -676,12 +698,22 @@ export function createVisualThinkingContextFromLearning(input: {
 
   return {
     integrationRequest,
+    integrationRequestV2,
     visualThinkingContext,
     handoff: enrichedHandoff,
     seedRequestText,
+    supportingWrittenExplanation: session.currentExplanation,
+    workspaceLearningContext,
     preservesLearningProgress: true,
     doesNotMarkLessonComplete: true,
   };
+}
+
+/** Supporting written Learning explanation available inside Visual Thinking. */
+export function projectSupportingWrittenLearningView(
+  adapted: LearningToVisualThinkingAdapterResult,
+) {
+  return getSupportingWrittenLearningView(adapted.integrationRequestV2);
 }
 
 function scopeLearningKnowledge(

@@ -34,6 +34,15 @@ type Props = {
     choice: "update_all" | "choose_representationsations" | "keep_current",
   ) => void;
   coCreationNotice?: string | null;
+  /** Learning pilot — source-aware return + supporting written explanation. */
+  learningPilot?: {
+    topic: string;
+    resumeMessage?: string | null;
+    writtenExplanationAvailable: boolean;
+    onReturnToLearning?: () => void;
+    onOpenWrittenExplanation?: () => void;
+    onAskInLearning?: () => void;
+  } | null;
 };
 
 /**
@@ -54,6 +63,7 @@ export function ThinkingWorkspace({
   onCoCreateAction,
   onSyncChoice,
   coCreationNotice,
+  learningPilot,
 }: Props) {
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const [ideaDraft, setIdeaDraft] = useState("");
@@ -313,6 +323,36 @@ export function ThinkingWorkspace({
           >
             Ask Shari
           </button>
+          {learningPilot?.writtenExplanationAvailable ? (
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-written-explanation"
+              onClick={() => learningPilot.onOpenWrittenExplanation?.()}
+            >
+              Open Written Explanation
+            </button>
+          ) : null}
+          {learningPilot?.onAskInLearning ? (
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-ask-in-learning"
+              onClick={() => learningPilot.onAskInLearning?.()}
+            >
+              Ask in Learning
+            </button>
+          ) : null}
+          {learningPilot?.onReturnToLearning ? (
+            <button
+              type="button"
+              className="vts-request__primary-btn"
+              data-testid="thinking-workspace-return-learning"
+              onClick={() => learningPilot.onReturnToLearning?.()}
+            >
+              Return to Learning
+            </button>
+          ) : null}
           <button
             type="button"
             className="vts-request__secondary-btn"
