@@ -4,6 +4,13 @@ import type {
   StrategicInputClassification,
 } from "../types";
 
+/** Normalize curly quotes so member wording still matches analysis patterns. */
+export function normalizeStrategicText(text: string): string {
+  return text
+    .replace(/[\u2018\u2019\u201A\u201B]/g, "'")
+    .replace(/[\u201C\u201D\u201E]/g, '"');
+}
+
 function unique(
   classifications: StrategicInputClassification[],
 ): StrategicInputClassification[] {
@@ -25,7 +32,7 @@ export function classifyStrategicInput(text: string): ClassifiedStrategicInput {
   }
 
   const classifications: StrategicInputClassification[] = [];
-  const lower = originalText.toLowerCase();
+  const lower = normalizeStrategicText(originalText).toLowerCase();
 
   if (/\?|\b(should i|what if|how do i|which|do i)\b/.test(lower)) {
     classifications.push("question");
@@ -93,8 +100,9 @@ export function classifyStrategicInput(text: string): ClassifiedStrategicInput {
   ) {
     classifications.push("decision");
   }
+  // Measurable / confirmed → fact + evidence. Mere noticing → evidence only.
   if (
-    /\b(noticed|seeing|hearing|customers? (are|say)|data|numbers?|revenue|churn|cost[s]? (are|have|went))\b/.test(
+    /\b(data|numbers?|revenue|churn|cost[s]? (are|have|went)|confirmed|measured)\b/.test(
       lower,
     ) ||
     /\b\d+%|\b\d+\s*(members?|clients?|dollars?|weeks?)\b/.test(lower)
@@ -102,7 +110,9 @@ export function classifyStrategicInput(text: string): ClassifiedStrategicInput {
     classifications.push("fact");
     classifications.push("evidence");
   } else if (
-    /\b(noticed|seeing|happening|evidence|signal)\b/.test(lower)
+    /\b(noticed|seeing|hearing|happening|customers? (are|say)|evidence|signal)\b/.test(
+      lower,
+    )
   ) {
     classifications.push("evidence");
   }
@@ -142,6 +152,6 @@ export function classifyStrategicInput(text: string): ClassifiedStrategicInput {
 
 export function isIDontKnowResponse(text: string): boolean {
   return /\b(i don'?t know|im not sure|i'?m not sure|cannot tell|can'?t tell|too much|don'?t know how to answer|no idea)\b/i.test(
-    text.trim(),
+    normalizeStrategicText(text.trim()),
   );
 }

@@ -7,12 +7,16 @@
 
 export * from "../domainModel";
 export * from "./types";
+export * from "./statementAnalysis";
 export * from "./registry";
 export * from "./engine/classifyStrategicInput";
+export * from "./engine/analyzeStrategicStatement";
 export * from "./engine/identifyStrategicQuestion";
 export * from "./engine/selectNextQuestion";
+export * from "./engine/selectNextThinkingMove";
 export * from "./engine/assessJudgmentStage";
 export * from "./engine/assessDecisionReadiness";
+export * from "./engine/assessOptionReadiness";
 export * from "./engine/generateOptions";
 export * from "./engine/compareOptions";
 export * from "./engine/identifyRisks";

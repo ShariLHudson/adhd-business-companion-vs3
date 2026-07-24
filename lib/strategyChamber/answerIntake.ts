@@ -6,6 +6,7 @@
 import type { StrategyOption, StrategyWorkItem } from "./types";
 import type { StrategicInputClassification } from "./domainModel";
 import {
+  analyzeStrategicStatement,
   assessJudgmentStage,
   classifyStrategicInput,
   identifyStrategicQuestion,
@@ -112,18 +113,25 @@ export function applyConversationalAnswer(
   }
 
   const classified = classifyStrategicInput(trimmed);
+  const statement = analyzeStrategicStatement(trimmed);
+  // Epistemic discipline: feelings ≠ evidence; assumptions ≠ facts;
+  // observations ≠ proven causes; interpretations stay tentative.
   if (
+    statement.nature === "assumption" ||
     signals.includes("assumption") ||
     classified.classifications.includes("assumption")
   ) {
     patch.assumptions = pushUnique(item.assumptions, trimmed);
   }
-  if (
-    classified.safeToTreatAsFact ||
-    classified.classifications.includes("fact")
-  ) {
+  if (statement.safeToTreatAsFact && statement.nature === "fact") {
     patch.knownFacts = pushUnique(item.knownFacts, trimmed);
+  } else if (
+    statement.nature === "observation" &&
+    statement.safeToPresentAsEvidence
+  ) {
+    patch.observations = pushUnique(item.observations, trimmed);
   }
+  // Feelings / interpretations never populate knownFacts
   if (signals.includes("concern") || signals.includes("risk")) {
     patch.risks = pushUnique(item.risks, trimmed);
   }
