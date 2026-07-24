@@ -101,6 +101,18 @@ export const MY_DAY_AND_WORK_DESTINATIONS = [
       "research this",
     ],
   },
+  {
+    id: "creation-workspace",
+    label: "Creation Workspace",
+    opener: "creation-workspace",
+    aliases: [
+      "creation workspace",
+      "open my creation workspace",
+      "continue this creation",
+      "keep working on this",
+      "open creation workspace",
+    ],
+  },
 ] as const;
 
 export type MyDayAndWorkDestinationId =
@@ -186,6 +198,14 @@ export function resolveMyDayAndWorkOpenerFromText(
     /\bresearch this\b/i.test(normalized)
   ) {
     return "research-library";
+  }
+  if (
+    /\b(?:open|continue|keep working on)\s+(?:my\s+)?(?:creation\s+workspace|this\s+creation)\b/i.test(
+      normalized,
+    ) ||
+    /\bkeep working on this\b/i.test(normalized)
+  ) {
+    return "creation-workspace";
   }
   if (
     /\b(?:open|show|take me to|go to|bring me to|head to)\s+(?:my\s+|the\s+)?(?:goals\s*(?:&|and)\s*)?projects?\b/i.test(

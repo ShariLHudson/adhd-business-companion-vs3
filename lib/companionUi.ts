@@ -53,6 +53,8 @@ export type AppSection =
   | "talk-it-out"
   /** Conversational Research Library destination. */
   | "research-library"
+  /** Shared Creation Workspace — develop packages before destination handoff. */
+  | "creation-workspace"
   | "today"
   | "plan-my-day"
   /** Shared My Day window — Plan My Day / Adapt My Day. */
@@ -252,6 +254,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "welcome-room":
     case "talk-it-out":
     case "research-library":
+    case "creation-workspace":
       return "other";
     case "brain-dump":
       return "clear-my-mind";

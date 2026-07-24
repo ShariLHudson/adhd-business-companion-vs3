@@ -231,6 +231,20 @@ const ResearchLibraryPanel = dynamic(
     ),
   },
 );
+const CreationWorkspacePanel = dynamic(
+  () =>
+    import(
+      "@/components/companion/creationWorkspace/CreationWorkspacePanel"
+    ).then((mod) => ({
+      default: mod.CreationWorkspacePanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Creation Workspace…" size="md" />
+    ),
+  },
+);
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -612,6 +626,7 @@ import {
   forceNewCreationAcknowledgment,
 } from "@/lib/universalCreationEntrypoint";
 import { armForceNewCreateSession } from "@/lib/createEstate/forceNewCreateSession";
+import { runRequestIntoCreationWorkspace } from "@/lib/creationWorkspace";
 import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
 import { getEventRecord } from "@/lib/eventsIntelligence/eventRecordStore";
 import { mayApplyEventWorkspace } from "@/lib/creationIdentity/deriveCreationIdentity";
@@ -2479,6 +2494,10 @@ export default function CompanionPageClient() {
     null,
   );
   const [spinWheelAutoSpin, setSpinWheelAutoSpin] = useState(false);
+  const [creationWorkspaceInitialRequest, setCreationWorkspaceInitialRequest] =
+    useState<string | null>(null);
+  const [creationWorkspaceBootstrap, setCreationWorkspaceBootstrap] =
+    useState<import("@/lib/creationWorkspace").CreationWorkspace | null>(null);
   const directEstateVisitRef = useRef<DirectEstateVisit | null>(null);
   const syncDirectEstateVisit = useCallback((visit: DirectEstateVisit | null) => {
     directEstateVisitRef.current = visit;
@@ -9575,6 +9594,30 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("research-library");
   }
 
+  /**
+   * Creation Workspace — develop Creation Packages before destination handoff.
+   * Contextual access (not a permanent Welcome Home Build item yet).
+   */
+  function openCreationWorkspaceCore(options?: {
+    skipCapture?: boolean;
+    initialRequest?: string | null;
+    workspace?: import("@/lib/creationWorkspace").CreationWorkspace | null;
+  }) {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    setEstateRoomChatVisible(false);
+    setCreationWorkspaceBootstrap(options?.workspace ?? null);
+    setCreationWorkspaceInitialRequest(
+      options?.workspace ? null : (options?.initialRequest ?? null),
+    );
+    trackWorkspaceEcosystemEvent("creation-workspace");
+    noteWorkspaceOpened("creation-workspace", "standalone_room");
+    openStandaloneFocusSectionCore("creation-workspace");
+  }
+
   function openParkingLotCore() {
     leaveClearMyMindIfNavigatingAway();
     if (!confirmLeaveUnsavedWork()) return;
@@ -14152,6 +14195,9 @@ export default function CompanionPageClient() {
           break;
         case "research-library":
           openResearchLibraryCore();
+          break;
+        case "creation-workspace":
+          openCreationWorkspaceCore();
           break;
         default: {
           const _exhaustive: never = opener;
@@ -25562,9 +25608,8 @@ export default function CompanionPageClient() {
               onBack={goBack}
               registerBack={registerBack}
               onOpenCreate={(seedText) => {
-                openCreateEstateCore();
-                // Seed is preserved in Research Collection; Create opens for editing.
-                void seedText;
+                // Develop substantive research outcomes in Creation Workspace first.
+                openCreationWorkspaceCore({ initialRequest: seedText });
               }}
               onOpenProjects={() => openProjectHomesPrototypeCore()}
               onOpenVisualThinking={(payload) => {
@@ -25584,6 +25629,35 @@ export default function CompanionPageClient() {
               onOpenBusinessEstate={() =>
                 openProfileDestinationCore("my-business-estate")
               }
+            />
+          )}
+
+          {activeSection === "creation-workspace" && (
+            <CreationWorkspacePanel
+              onBack={goBack}
+              registerBack={registerBack}
+              initialWorkspace={creationWorkspaceBootstrap}
+              initialRequest={creationWorkspaceInitialRequest}
+              onOpenCreate={(content) => {
+                try {
+                  sessionStorage.setItem(
+                    "companion-creation-workspace-create-handoff-v1",
+                    content,
+                  );
+                } catch {
+                  /* ignore */
+                }
+                openCreateEstateCore();
+              }}
+              onOpenProjects={() => openProjectHomesPrototypeCore()}
+              onOpenVisualThinking={() => openCartographersStudioCore()}
+              onOpenStrategicPlanning={() =>
+                openStandaloneFocusSectionCore("playbook")
+              }
+              onOpenBusinessEstate={() =>
+                openProfileDestinationCore("my-business-estate")
+              }
+              onOpenResearchLibrary={() => openResearchLibraryCore()}
             />
           )}
 
@@ -25877,6 +25951,23 @@ export default function CompanionPageClient() {
                   hardNavTarget: "create",
                   note: `begin:${outcome.artifactType}`,
                 });
+                // Coordinated creations open Creation Workspace before Create polish.
+                const pipeline = runRequestIntoCreationWorkspace(outcome.text, {
+                  sourceExperience: "create",
+                  persist: true,
+                });
+                if (pipeline.openDecision.open && pipeline.workspace) {
+                  openCreationWorkspaceCore({
+                    workspace: pipeline.workspace,
+                  });
+                  publishLiveWorkspaceTrace("after_open_create_workspace", {
+                    command: outcome.text,
+                    matchedHardNav: false,
+                    hardNavTarget: "creation-workspace",
+                    note: `creationWorkspace:true;type:${outcome.artifactType}`,
+                  });
+                  return true;
+                }
                 const ok = startFreshCreateFromEstate({
                   artifactType: outcome.artifactType,
                   initialPrompt: outcome.text,

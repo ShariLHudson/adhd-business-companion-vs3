@@ -4,6 +4,7 @@
 **Date:** 2026-07-21  
 **Authority class:** Product constitution (extends series **113–117** · Create-facing companion to **128**)  
 **Research Library handoff:** [`docs/research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md`](../research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md) — conversational research may hand a Creation Package into Create; Create remains the writing destination; Research Library does not duplicate the creation engine.  
+**Creation Workspace:** [`docs/creation-workspace/CREATION_WORKSPACE_STANDARD.md`](../creation-workspace/CREATION_WORKSPACE_STANDARD.md) — coordinated Create Begin results may open the Creation Workspace before Create polish; simple single-item creations still enter Create directly.  
 **Cursor rule:** `.cursor/rules/create-intelligence-intent-constitution.mdc`  
 **Runtime types:** `lib/sparkCreateIntentConstitution/types.ts`  
 **Runtime hooks:** `lib/createEstate/createIntentConfirmation.ts` · `lib/createEstate/resolveCreateBeginOutcome.ts`

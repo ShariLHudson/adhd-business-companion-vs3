@@ -1,7 +1,9 @@
 # Research Library and Use This Research Standard™
 
 **Runtime:** `lib/researchLibrary/` · **UI:** `components/companion/researchLibrary/ResearchLibraryPanel.tsx`  
-**Related:** [Universal Request-to-Outcome Intelligence](../constitution/UNIVERSAL_REQUEST_TO_OUTCOME_INTELLIGENCE_STANDARD.md) · Create · Projects · Visual Thinking Studio · Strategic Planning · My Business Estate writeback
+**Related:** [Universal Request-to-Outcome Intelligence](../constitution/UNIVERSAL_REQUEST_TO_OUTCOME_INTELLIGENCE_STANDARD.md) · [Creation Workspace](../creation-workspace/CREATION_WORKSPACE_STANDARD.md) · Create · Projects · Visual Thinking Studio · Strategic Planning · My Business Estate writeback
+
+**Use This Research → Create:** substantive outcomes open the **Creation Workspace** for development before Create polish, unless the result is a simple single-item creation.
 
 ## Mission
 

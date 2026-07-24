@@ -66,6 +66,8 @@ Do not label stable model knowledge as current research.
 
 **Member destination:** [Research Library and Use This Research Standard](../research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md) — conversational Research Library (`lib/researchLibrary/`), Research Session + Research Collection persistence, Research This, Use This Research format inference, and Create / Projects / Visual Thinking / Strategic Planning handoffs. Universal Request-to-Outcome remains the shared creation engine; Research Library does not invent a second one.
 
+**Creation Workspace:** [Creation Workspace Standard](../creation-workspace/CREATION_WORKSPACE_STANDARD.md) — after a substantive `CreationPackage` is generated, coordinated work may open the Creation Workspace (`lib/creationWorkspace/`) for refine → Use This Work → destination handoff. Simple single-item creations still bypass directly to Create.
+
 ## Destination boundaries
 
 | Destination | Owns |

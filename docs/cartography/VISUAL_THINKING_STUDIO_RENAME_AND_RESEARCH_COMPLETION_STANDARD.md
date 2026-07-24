@@ -8,6 +8,8 @@
 
 **Research Library handoff:** [Research Library and Use This Research Standard](../research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md) — when a member chooses a visual outcome from Use This Research, Visual Thinking Studio receives the substantive Research Collection (findings, relationships, summary), not a title alone. Session key: `companion-research-library-visual-handoff-v1`.
 
+**Creation Workspace handoff:** [Creation Workspace Standard](../creation-workspace/CREATION_WORKSPACE_STANDARD.md) — Use This Work → Show Visually passes the substantive Creation Package sections via `companion-creation-workspace-visual-handoff-v1`.
+
 ---
 
 ## Official user-facing name

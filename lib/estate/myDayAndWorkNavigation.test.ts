@@ -8,7 +8,7 @@ import {
 
 describe("My Day & Work navigation contract", () => {
   it("lists distinct destinations with unique openers where required", () => {
-    expect(MY_DAY_AND_WORK_DESTINATIONS).toHaveLength(10);
+    expect(MY_DAY_AND_WORK_DESTINATIONS).toHaveLength(11);
     const openers = MY_DAY_AND_WORK_DESTINATIONS.map((d) => d.opener);
     expect(openers).toContain("reminders");
     expect(openers).toContain("rhythms");
@@ -16,6 +16,7 @@ describe("My Day & Work navigation contract", () => {
     expect(openers).toContain("destination-gallery");
     expect(openers).toContain("cartographers-studio");
     expect(openers).toContain("research-library");
+    expect(openers).toContain("creation-workspace");
     expect(openers).toContain("project-homes");
     expect(openers).not.toContain("projects");
   });

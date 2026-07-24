@@ -24,6 +24,7 @@ export const ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS = [
   "parking-lot",
   "talk-it-out",
   "research-library",
+  "creation-workspace",
   "spin-wheel",
   "focus-audio",
   "games",
