@@ -9,6 +9,7 @@ import type {
   StrategicQuestionType,
   StrategyTypeId,
 } from "../types";
+import { normalizeStrategicText } from "./classifyStrategicInput";
 
 function mapTypeToQuestionType(
   strategyTypeId: StrategyTypeId | null,
@@ -56,13 +57,13 @@ export function identifyStrategicQuestion(
   const questionType = mapTypeToQuestionType(strategyTypeId, stated);
 
   const alternateQuestions: string[] = [];
-  const lower = stated.toLowerCase();
+  const lower = normalizeStrategicText(stated).toLowerCase();
 
   if (/\bmore customers?\b/.test(lower) || /\bneed more customers?\b/.test(lower)) {
     alternateQuestions.push(
+      "Is awareness the real issue — or positioning, conversion, retention, offer fit, price, or capacity?",
       "Are we serving the right market?",
-      "Is the offer strong enough?",
-      "Is awareness the real problem — or retention, sales, or capacity?",
+      "Is the offer strong enough for the people already finding you?",
     );
   }
   if (/\bnot growing\b/.test(lower)) {
@@ -71,9 +72,42 @@ export function identifyStrategicQuestion(
       "Which part of the business is actually stuck?",
     );
   }
-  if (/\btoo many ideas\b/.test(lower) || /\bscattered\b/.test(lower)) {
+  if (
+    /\btoo many ideas\b/.test(lower) ||
+    /\bscattered\b/.test(lower) ||
+    /\bdon'?t know what to work on\b/.test(lower)
+  ) {
     alternateQuestions.push(
-      "What deserves focus this season, and what will wait?",
+      "What is the main goal for this season?",
+      "How much capacity do you really have right now?",
+      "What deserves focus now, and what can wait without being lost?",
+    );
+  }
+  if (/\bhire|virtual assistant|va\b/.test(lower)) {
+    alternateQuestions.push(
+      "What work needs relief before hiring is the right answer?",
+      "Is the bottleneck admin, delivery, sales, or something else?",
+      "What would free you up most in the next thirty days?",
+    );
+  }
+  if (
+    /\bisn'?t working|not working\b/.test(lower) ||
+    /\bpivot|rethink\b/.test(lower)
+  ) {
+    alternateQuestions.push(
+      "What does “not working” mean in concrete terms?",
+      "What evidence tells you that?",
+      "What were you hoping would be true that is not?",
+    );
+  }
+  if (
+    /\bclos(e|ing) (my |the )?business\b/.test(lower) ||
+    /\bshut (down|it)\b/.test(lower)
+  ) {
+    alternateQuestions.push(
+      "What feels most unfinished or unprotected if you stop?",
+      "Is there a smaller step than closing that would teach you something?",
+      "What must stay true for the people who depend on this?",
     );
   }
   if (/\brebrand\b/.test(lower)) {
@@ -81,6 +115,8 @@ export function identifyStrategicQuestion(
       "Is the brand the problem, or is the offer, market, or message unclear?",
     );
   }
+  // Clear pricing / hiring / experiment questions use next-move selection
+  // (e.g. "what changed") rather than alternate-question clarification.
 
   const needsClarification =
     alternateQuestions.length > 0 &&

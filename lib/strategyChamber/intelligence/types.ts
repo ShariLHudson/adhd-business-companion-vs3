@@ -57,7 +57,12 @@ export type QuestionPriority =
   | 6
   | 7
   | 8
-  | 9;
+  | 9
+  | 10
+  | 11
+  | 12
+  | 13
+  | 14;
 
 export type StrategyTypeId =
   | "business_direction"
@@ -117,7 +122,7 @@ export type StrategyTypeContract = {
   version: 1;
 };
 
-/** Classified member input — original wording preserved. */
+/** Classified member input — strategic role only. Epistemic nature is separate. */
 export type ClassifiedStrategicInput = {
   originalText: string;
   classifications: StrategicInputClassification[];
@@ -228,4 +233,10 @@ export type StrategyJudgmentTurn = {
   handoff: HandoffContext;
   decision: StrategicDecision | null;
   workItemPatch: Partial<StrategyWorkItem>;
+  /** Phase 2 — internal next thinking move (not member-facing). */
+  nextMove?: import("./engine/selectNextThinkingMove").NextThinkingMovePlan;
+  /** Phase 2 — internal option readiness (not member-facing). */
+  optionReadiness?: import("./engine/assessOptionReadiness").OptionReadinessAssessment;
+  /** Phase 2 — last answer epistemic analysis when provided. */
+  lastStatementAnalysis?: import("./statementAnalysis").StrategicStatementAnalysis | null;
 };

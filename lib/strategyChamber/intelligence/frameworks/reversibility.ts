@@ -12,13 +12,17 @@ export function assessReversibility(text: string): Reversibility {
     return "moderately_reversible";
   }
   if (
-    /\b(everyone|permanent|rebrand|fire|shut down|public announce|contract|lease)\b/.test(
+    /\b(everyone|permanent|rebrand|fire|shut down|public announce|contract|lease|clos(e|ing) (my |the )?business)\b/.test(
       t,
     )
   ) {
     return "difficult_to_reverse";
   }
-  if (/\b(irreversible|cannot undo|no going back|sold|closed permanently)\b/.test(t)) {
+  if (
+    /\b(irreversible|cannot undo|no going back|sold|closed permanently)\b/.test(
+      t,
+    )
+  ) {
     return "effectively_irreversible";
   }
   return "unknown";

@@ -7,8 +7,10 @@ import type {
   StrategicDecision,
   StrategyJudgmentTurn,
 } from "../types";
+import { analyzeStrategicStatement } from "./analyzeStrategicStatement";
 import { assessDecisionReadiness } from "./assessDecisionReadiness";
 import { assessJudgmentStage } from "./assessJudgmentStage";
+import { assessOptionReadiness } from "./assessOptionReadiness";
 import { designStrategicExperiment } from "./designExperiment";
 import {
   generateStrategicOptions,
@@ -18,6 +20,7 @@ import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 import { identifyStrategicRisks } from "./identifyRisks";
 import { recommendStrategicHandoff } from "./recommendHandoff";
 import { selectNextQuestion } from "./selectNextQuestion";
+import { selectNextThinkingMove } from "./selectNextThinkingMove";
 
 /**
  * Pure judgment turn over a Strategy Work Item.
@@ -30,10 +33,15 @@ export function analyzeStrategyWorkItem(
 ): StrategyJudgmentTurn {
   const strategicQuestion = identifyStrategicQuestion(item, opts?.lastAnswer);
   const judgmentStage = assessJudgmentStage(item);
+  const nextMove = selectNextThinkingMove(item, presentation, opts);
   const nextQuestion = selectNextQuestion(item, presentation, opts);
   const readiness = assessDecisionReadiness(item);
+  const optionReadiness = assessOptionReadiness(item);
   const options = generateStrategicOptions(item, presentation);
   const showOptions = shouldOfferStrategicOptions(item);
+  const lastStatementAnalysis = opts?.lastAnswer?.trim()
+    ? analyzeStrategicStatement(opts.lastAnswer)
+    : null;
   const { risks } = identifyStrategicRisks(item);
   const experiment = designStrategicExperiment(item);
   const recommendation = recommendStrategicHandoff(item);
@@ -116,5 +124,8 @@ export function analyzeStrategyWorkItem(
     handoff,
     decision,
     workItemPatch,
+    nextMove,
+    optionReadiness,
+    lastStatementAnalysis,
   };
 }
