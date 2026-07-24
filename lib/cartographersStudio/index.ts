@@ -279,6 +279,7 @@ export {
   fitViewportToContent,
   layoutIntentFromPresentation,
   workspacePreservesKnowledgeImmutability,
+  workspaceLayoutProfileForWidth,
   saveThinkingWorkspace,
   loadThinkingWorkspace,
   clearThinkingWorkspace,
@@ -293,3 +294,25 @@ export {
   type WorkspaceViewport,
   type AskShariWorkspaceContext,
 } from "./visualThinkingWorkspaceFoundation";
+
+export {
+  computeLayout,
+  createLayoutProposal,
+  applyLayoutPositions,
+  applyVisualRoles,
+  buildLayoutSuggestions,
+  classifyConnectorKind,
+  computeFocusViewport,
+  layoutEnginePreservesContent,
+  layoutSpacingForProfile,
+  resolveLayoutProfile,
+  supportedLayoutIntents,
+  isWorkspaceLayoutIntent,
+  type LayoutResult,
+  type LayoutProposal,
+  type LayoutSuggestion,
+  type LayoutVisualRole,
+  type LayoutViewportProfile,
+  type LayoutConnectorKind,
+  type LayoutEngineInput,
+} from "./visualThinkingLayoutEngine";

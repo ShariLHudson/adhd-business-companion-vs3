@@ -55,6 +55,40 @@ export function ThinkingWorkspace({
   }
 
   useEffect(() => {
+    const width = typeof window !== "undefined" ? window.innerWidth : 1200;
+    const profile =
+      width < 640 ? "mobile" : width < 960 ? "tablet" : "desktop";
+    if (workspace.layoutProfile !== profile) {
+      onWorkspaceChange(
+        applyWorkspaceAction(workspace, {
+          kind: "set_layout_profile",
+          profile,
+        }),
+      );
+    }
+    // Intentionally only on mount / resize via listener below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- profile sync
+  }, []);
+
+  useEffect(() => {
+    function onResize() {
+      const width = window.innerWidth;
+      const profile =
+        width < 640 ? "mobile" : width < 960 ? "tablet" : "desktop";
+      if (workspace.layoutProfile !== profile) {
+        onWorkspaceChange(
+          applyWorkspaceAction(workspace, {
+            kind: "set_layout_profile",
+            profile,
+          }),
+        );
+      }
+    }
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [workspace, onWorkspaceChange]);
+
+  useEffect(() => {
     function onKey(e: KeyboardEvent) {
       const meta = e.metaKey || e.ctrlKey;
       if (meta && e.key === "f") {
@@ -217,7 +251,7 @@ export function ThinkingWorkspace({
             data-testid="thinking-workspace-reorganize"
             onClick={() => dispatch({ kind: "auto_organize" })}
           >
-            Reorganize
+            Auto Organize
           </button>
           <button
             type="button"
@@ -262,6 +296,66 @@ export function ThinkingWorkspace({
           ) : null}
         </div>
       </header>
+
+      {workspace.pendingLayoutProposal ? (
+        <div
+          className="vts-workspace__proposal"
+          data-testid="thinking-workspace-layout-proposal"
+          role="status"
+        >
+          <p className="vts-workspace__proposal-text">
+            A calmer arrangement is ready. Your pinned ideas and notes stay put.
+          </p>
+          <div className="vts-workspace__proposal-actions">
+            <button
+              type="button"
+              className="vts-request__primary"
+              data-testid="thinking-workspace-accept-layout"
+              onClick={() => dispatch({ kind: "accept_layout_proposal" })}
+            >
+              Accept arrangement
+            </button>
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-reject-layout"
+              onClick={() => dispatch({ kind: "reject_layout_proposal" })}
+            >
+              Keep mine
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {workspace.layoutSuggestions.length > 0 ? (
+        <div
+          className="vts-workspace__suggestions"
+          data-testid="thinking-workspace-layout-suggestions"
+        >
+          <p className="vts-request__label">Layout ideas</p>
+          <ul className="vts-request__choices">
+            {workspace.layoutSuggestions.map((suggestion) => (
+              <li key={suggestion.id}>
+                <button
+                  type="button"
+                  className="vts-request__choice"
+                  data-testid={`thinking-layout-suggestion-${suggestion.kind}`}
+                  onClick={() => {
+                    if (suggestion.suggestedIntent) {
+                      dispatch({
+                        kind: "set_layout_intent",
+                        intent: suggestion.suggestedIntent,
+                      });
+                    }
+                  }}
+                >
+                  {suggestion.message}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <div className="vts-workspace__body">
         <div
@@ -353,6 +447,8 @@ export function ThinkingWorkspace({
                     match ? "vts-workspace__object--match" : "",
                     obj.userCreated ? "vts-workspace__object--user" : "",
                     obj.immutable ? "vts-workspace__object--generated" : "",
+                    obj.pinned ? "vts-workspace__object--pinned" : "",
+                    `vts-workspace__object--${obj.visualRole}`,
                   ]
                     .filter(Boolean)
                     .join(" ")}
@@ -365,6 +461,8 @@ export function ThinkingWorkspace({
                   data-testid={`thinking-object-${obj.id}`}
                   data-object-type={obj.type}
                   data-immutable={obj.immutable ? "true" : "false"}
+                  data-pinned={obj.pinned ? "true" : "false"}
+                  data-visual-role={obj.visualRole}
                   aria-pressed={selected}
                   onPointerDown={(e) =>
                     onPointerDownObject(e, obj.id, obj.x, obj.y)
@@ -414,6 +512,27 @@ export function ThinkingWorkspace({
                     ))}
                   </ul>
                 </div>
+              ) : null}
+              {workspace.selection.primaryObjectId ? (
+                <button
+                  type="button"
+                  className="vts-request__secondary-btn"
+                  data-testid="thinking-workspace-toggle-pin"
+                  onClick={() => {
+                    const id = workspace.selection.primaryObjectId!;
+                    const obj = workspace.objects.find((o) => o.id === id);
+                    dispatch({
+                      kind: obj?.pinned ? "unpin" : "pin",
+                      objectId: id,
+                    });
+                  }}
+                >
+                  {workspace.objects.find(
+                    (o) => o.id === workspace.selection.primaryObjectId,
+                  )?.pinned
+                    ? "Unpin"
+                    : "Pin in place"}
+                </button>
               ) : null}
             </>
           ) : (

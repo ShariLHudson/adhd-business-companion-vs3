@@ -102,14 +102,12 @@ Each object is one meaningful unit:
 
 ## Layout
 
-Initial placement comes from Presentation Intelligence layout intent:
+Initial placement and Auto Organize are owned by the [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md) (Build 8).
 
-`process` · `hierarchy` · `relationship` · `grouped_ideas` · `comparison` · `timeline` · `free_workspace`
+Intents include: `process` · `hierarchy` · `relationship` · `grouped_ideas` · `comparison` · `timeline` · `decision` · `learning_progression` · `journey` · `free_workspace`
 
-**Auto Organize** re-applies that intent to current object positions only.  
-It does **not** regenerate, rewrite, or change knowledge.
-
-No automatic layout engine beyond initial placement + reorganize (reserved for later builds).
+**Auto Organize** proposes an arrangement (accept/reject). Pins and user notes are preserved.  
+Layout never regenerates or rewrites knowledge.
 
 ---
 
@@ -258,11 +256,12 @@ Never moves user content without permission.
 
 ---
 
-## Future compatibility (out of scope for Build 7)
+## Future compatibility
 
-Do **not** begin in this foundation:
+**Build 8 (done):** [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md)
 
-- Intelligent Layout Engine  
+Still later:
+
 - Research Acquisition  
 - Dynamic Representation Switching  
 - Cross-Estate Integration  

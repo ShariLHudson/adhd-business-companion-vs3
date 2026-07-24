@@ -24,6 +24,18 @@ import {
   limitVisibleChoices,
   resolveAdaptivePresentation,
 } from "@/lib/adaptiveCompanionIntelligence";
+import {
+  applyLayoutPositions,
+  applyVisualRoles,
+  computeFocusViewport,
+  computeLayout,
+  createLayoutProposal,
+  type LayoutProposal,
+  type LayoutSuggestion,
+  type LayoutVisualRole,
+  type LayoutViewportProfile,
+  resolveLayoutProfile,
+} from "@/lib/cartographersStudio/visualThinkingLayoutEngine";
 
 // ─── Thinking Object model ──────────────────────────────────────────────────
 
@@ -72,6 +84,11 @@ export type ThinkingObject = {
   userCreated: boolean;
   /** Generated knowledge objects cannot be content-edited via workspace move/group. */
   immutable: boolean;
+  /** Pinned objects never move under Auto Organize / layout engine. */
+  pinned: boolean;
+  /** Member moved this object; layout engine respects until unpin/reorganize accept. */
+  manuallyMoved: boolean;
+  visualRole: LayoutVisualRole;
   metadata: Record<string, unknown>;
 };
 
@@ -102,6 +119,9 @@ export type WorkspaceLayoutIntent =
   | "grouped_ideas"
   | "comparison"
   | "timeline"
+  | "decision"
+  | "learning_progression"
+  | "journey"
   | "free_workspace";
 
 export type WorkspaceViewport = {
@@ -144,6 +164,11 @@ export type ThinkingWorkspaceState = {
   focusedObjectId: string | null;
   searchQuery: string;
   searchMatchIds: string[];
+  /** Suggested layout improvements — never auto-applied. */
+  layoutSuggestions: LayoutSuggestion[];
+  /** Pending Auto Organize arrangement awaiting accept/reject. */
+  pendingLayoutProposal: LayoutProposal | null;
+  layoutProfile: LayoutViewportProfile;
   undoStack: ThinkingWorkspaceSnapshot[];
   redoStack: ThinkingWorkspaceSnapshot[];
   createdAt: string;
@@ -158,6 +183,8 @@ export type ThinkingWorkspaceSnapshot = {
   selection: WorkspaceSelection;
   focusMode: boolean;
   focusedObjectId: string | null;
+  layoutIntent: WorkspaceLayoutIntent;
+  pendingLayoutProposal: LayoutProposal | null;
 };
 
 export type ThinkingWorkspaceInput = {
@@ -184,7 +211,14 @@ export type WorkspaceAction =
   | { kind: "search"; query: string }
   | { kind: "add_idea"; title: string; ideaType?: "note" | "question" | "placeholder" | "action" }
   | { kind: "delete_user_object"; objectId: string }
+  | { kind: "pin"; objectId: string }
+  | { kind: "unpin"; objectId: string }
+  | { kind: "set_layout_intent"; intent: WorkspaceLayoutIntent }
+  | { kind: "set_layout_profile"; profile: LayoutViewportProfile }
   | { kind: "auto_organize" }
+  | { kind: "accept_layout_proposal" }
+  | { kind: "reject_layout_proposal" }
+  | { kind: "refresh_layout_suggestions" }
   | { kind: "undo" }
   | { kind: "redo" };
 
@@ -192,9 +226,6 @@ const WORKSPACE_SESSION_KEY = "companion-visual-thinking-workspace-v1";
 
 const OBJECT_W = 200;
 const OBJECT_H = 72;
-const GAP_X = 40;
-const GAP_Y = 28;
-const COLS = 3;
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -229,6 +260,10 @@ export function layoutIntentFromPresentation(
       return "comparison";
     case "chronology":
       return "timeline";
+    case "branching":
+      return "decision";
+    case "journey":
+      return "journey";
     case "user_led":
       return "free_workspace";
     default:
@@ -248,6 +283,12 @@ export function layoutIntentFromPresentation(
       return "comparison";
     case "timeline":
       return "timeline";
+    case "decision_tree":
+      return "decision";
+    case "training_guide":
+    case "glossary":
+    case "faq":
+      return "learning_progression";
     case "user_led_canvas":
       return "free_workspace";
     default:
@@ -291,46 +332,6 @@ function blockToObjectType(block: VisualThinkingContentBlock): ThinkingObjectTyp
   }
 }
 
-function placeObjects(
-  count: number,
-  intent: WorkspaceLayoutIntent,
-): Array<{ x: number; y: number }> {
-  const positions: Array<{ x: number; y: number }> = [];
-  if (intent === "process" || intent === "timeline") {
-    for (let i = 0; i < count; i++) {
-      positions.push({ x: 48 + i * (OBJECT_W + GAP_X), y: 120 });
-    }
-    return positions;
-  }
-  if (intent === "comparison") {
-    for (let i = 0; i < count; i++) {
-      positions.push({
-        x: 48 + (i % 2) * (OBJECT_W + GAP_X * 2),
-        y: 100 + Math.floor(i / 2) * (OBJECT_H + GAP_Y),
-      });
-    }
-    return positions;
-  }
-  if (intent === "hierarchy") {
-    for (let i = 0; i < count; i++) {
-      const depth = Math.min(3, Math.floor(Math.log2(i + 1)));
-      positions.push({
-        x: 48 + (i % COLS) * (OBJECT_W + GAP_X) + depth * 24,
-        y: 80 + depth * (OBJECT_H + GAP_Y),
-      });
-    }
-    return positions;
-  }
-  // relationship / grouped / free — soft grid
-  for (let i = 0; i < count; i++) {
-    positions.push({
-      x: 48 + (i % COLS) * (OBJECT_W + GAP_X),
-      y: 80 + Math.floor(i / COLS) * (OBJECT_H + GAP_Y),
-    });
-  }
-  return positions;
-}
-
 function snapshotOf(state: ThinkingWorkspaceState): ThinkingWorkspaceSnapshot {
   return {
     objects: state.objects.map((o) => ({ ...o })),
@@ -339,6 +340,10 @@ function snapshotOf(state: ThinkingWorkspaceState): ThinkingWorkspaceSnapshot {
     selection: { ...state.selection },
     focusMode: state.focusMode,
     focusedObjectId: state.focusedObjectId,
+    layoutIntent: state.layoutIntent,
+    pendingLayoutProposal: state.pendingLayoutProposal
+      ? { ...state.pendingLayoutProposal, positionsById: { ...state.pendingLayoutProposal.positionsById } }
+      : null,
   };
 }
 
@@ -520,8 +525,7 @@ export function createThinkingWorkspace(
   const collapseThreshold =
     density === "low" || adaptive.summaryFirst ? 6 : density === "high" ? 24 : 12;
 
-  const positions = placeObjects(sourceUnits.length, layoutIntent);
-  const objects: ThinkingObject[] = sourceUnits.map((u, i) => ({
+  const draftObjects: ThinkingObject[] = sourceUnits.map((u) => ({
     id: newId("wto"),
     type: u.type,
     title: u.title,
@@ -531,19 +535,22 @@ export function createThinkingWorkspace(
     sourceKnowledgeItemId: u.sourceKnowledgeItemId,
     deliverableId: u.deliverableId,
     groupId: null,
-    x: positions[i]?.x ?? 48,
-    y: positions[i]?.y ?? 80,
+    x: 0,
+    y: 0,
     width: OBJECT_W,
     height: OBJECT_H,
     collapsed: false,
     userCreated: false,
     immutable: u.immutable,
+    pinned: false,
+    manuallyMoved: false,
+    visualRole: "supporting",
     metadata: {},
   }));
 
   const groups: ThinkingGroup[] = [];
-  if (objects.length > collapseThreshold) {
-    const overflow = objects.slice(collapseThreshold);
+  if (draftObjects.length > collapseThreshold) {
+    const overflow = draftObjects.slice(collapseThreshold);
     const groupId = newId("wtg");
     for (const o of overflow) {
       o.groupId = groupId;
@@ -555,27 +562,54 @@ export function createThinkingWorkspace(
       objectIds: overflow.map((o) => o.id),
       collapsed: true,
       x: 48,
-      y: 80 + Math.ceil(collapseThreshold / COLS) * (OBJECT_H + GAP_Y),
+      y: 320,
     });
-    // Represent group as a shell object for surface display
+  }
+
+  const initialLayout = computeLayout({
+    intent: layoutIntent,
+    objects: draftObjects,
+    groups,
+    connectors: [],
+    profile: "desktop",
+    respectAdaptiveCompanion: true,
+  });
+  let objects: ThinkingObject[] = applyVisualRoles(
+    applyLayoutPositions(draftObjects, initialLayout.positionsById, {
+      respectPins: true,
+      respectUserNotes: true,
+    }),
+    initialLayout.placements,
+  );
+
+  if (groups[0]) {
+    const anchor = initialLayout.groupAnchors[groups[0].id] ?? {
+      x: 48,
+      y: 320,
+    };
+    groups[0].x = anchor.x;
+    groups[0].y = anchor.y;
     objects.push({
       id: newId("wto"),
       type: "group",
       title: "More ideas",
-      summary: `${overflow.length} items`,
+      summary: `${groups[0].objectIds.length} items`,
       sourceKind: "group_shell",
       sourceBlockId: null,
       sourceKnowledgeItemId: null,
       deliverableId: primary?.id ?? null,
       groupId: null,
-      x: groups[0]!.x,
-      y: groups[0]!.y,
+      x: groups[0].x,
+      y: groups[0].y,
       width: OBJECT_W,
       height: OBJECT_H,
       collapsed: true,
       userCreated: false,
       immutable: true,
-      metadata: { groupId },
+      pinned: false,
+      manuallyMoved: false,
+      visualRole: "optional",
+      metadata: { groupId: groups[0].id },
     });
   }
 
@@ -665,10 +699,29 @@ export function createThinkingWorkspace(
   void blockIdToObject;
   void understanding;
 
+  // Refine placement once semantic connectors are known (centrality / sequence).
+  const refined = computeLayout({
+    intent: layoutIntent,
+    objects,
+    groups,
+    connectors,
+    profile: "desktop",
+    respectAdaptiveCompanion: true,
+  });
+  objects = applyVisualRoles(
+    applyLayoutPositions(objects, refined.positionsById, {
+      respectPins: true,
+      respectUserNotes: true,
+    }),
+    refined.placements,
+  );
+
   const initialZoom =
     density === "low" || adaptive.summaryFirst ? 0.9 : density === "high" ? 1 : 1;
   const viewport = fitViewportToContent(objects.filter((o) => !o.groupId));
   viewport.zoom = clampZoom(viewport.zoom * initialZoom);
+
+  const suggestions = refined.suggestions;
 
   return {
     id: newId("wts"),
@@ -689,6 +742,9 @@ export function createThinkingWorkspace(
     focusedObjectId: null,
     searchQuery: "",
     searchMatchIds: [],
+    layoutSuggestions: suggestions,
+    pendingLayoutProposal: null,
+    layoutProfile: "desktop",
     undoStack: [],
     redoStack: [],
     createdAt: nowIso(),
@@ -706,22 +762,32 @@ export function applyWorkspaceAction(
     if (!prev) return state;
     return {
       ...state,
-      ...prev,
       objects: prev.objects.map((o) => ({ ...o })),
       groups: prev.groups.map((g) => ({ ...g, objectIds: [...g.objectIds] })),
+      viewport: { ...prev.viewport },
+      selection: { ...prev.selection },
+      focusMode: prev.focusMode,
+      focusedObjectId: prev.focusedObjectId,
+      layoutIntent: prev.layoutIntent,
+      pendingLayoutProposal: prev.pendingLayoutProposal,
       undoStack: state.undoStack.slice(0, -1),
       redoStack: [...state.redoStack, snapshotOf(state)],
       updatedAt: nowIso(),
     };
   }
   if (action.kind === "redo") {
-    const next = state.redoStack[state.redoStack.length - 1];
-    if (!next) return state;
+    const nxt = state.redoStack[state.redoStack.length - 1];
+    if (!nxt) return state;
     return {
       ...state,
-      ...next,
-      objects: next.objects.map((o) => ({ ...o })),
-      groups: next.groups.map((g) => ({ ...g, objectIds: [...g.objectIds] })),
+      objects: nxt.objects.map((o) => ({ ...o })),
+      groups: nxt.groups.map((g) => ({ ...g, objectIds: [...g.objectIds] })),
+      viewport: { ...nxt.viewport },
+      selection: { ...nxt.selection },
+      focusMode: nxt.focusMode,
+      focusedObjectId: nxt.focusedObjectId,
+      layoutIntent: nxt.layoutIntent,
+      pendingLayoutProposal: nxt.pendingLayoutProposal,
       redoStack: state.redoStack.slice(0, -1),
       undoStack: [...state.undoStack, snapshotOf(state)],
       updatedAt: nowIso(),
@@ -736,9 +802,12 @@ export function applyWorkspaceAction(
     action.kind === "ungroup" ||
     action.kind === "collapse_group" ||
     action.kind === "expand_group" ||
-    action.kind === "auto_organize" ||
+    action.kind === "accept_layout_proposal" ||
+    action.kind === "set_layout_intent" ||
     action.kind === "add_idea" ||
-    action.kind === "delete_user_object"
+    action.kind === "delete_user_object" ||
+    action.kind === "pin" ||
+    action.kind === "unpin"
   ) {
     next = pushUndo(state);
   }
@@ -755,12 +824,74 @@ export function applyWorkspaceAction(
         ...next,
         objects: next.objects.map((o) =>
           o.id === action.objectId
-            ? { ...o, x: action.x, y: action.y }
+            ? { ...o, x: action.x, y: action.y, manuallyMoved: true }
             : o,
         ),
+        // Manual organization clears pending proposal so we don't fight the member.
+        pendingLayoutProposal: null,
         updatedAt: nowIso(),
       };
     }
+    case "pin":
+      return {
+        ...next,
+        objects: next.objects.map((o) =>
+          o.id === action.objectId ? { ...o, pinned: true } : o,
+        ),
+        updatedAt: nowIso(),
+      };
+    case "unpin":
+      return {
+        ...next,
+        objects: next.objects.map((o) =>
+          o.id === action.objectId ? { ...o, pinned: false } : o,
+        ),
+        updatedAt: nowIso(),
+      };
+    case "set_layout_profile":
+      return {
+        ...next,
+        layoutProfile: action.profile,
+        updatedAt: nowIso(),
+      };
+    case "set_layout_intent": {
+      const proposal = createLayoutProposal({
+        intent: action.intent,
+        objects: next.objects,
+        groups: next.groups,
+        connectors: next.connectors,
+        profile: next.layoutProfile,
+        respectAdaptiveCompanion: true,
+        focusObjectId: next.focusMode ? next.focusedObjectId : null,
+      });
+      return {
+        ...next,
+        layoutIntent: action.intent,
+        pendingLayoutProposal: proposal,
+        layoutSuggestions: computeLayout({
+          intent: action.intent,
+          objects: next.objects,
+          groups: next.groups,
+          connectors: next.connectors,
+          profile: next.layoutProfile,
+          respectAdaptiveCompanion: true,
+        }).suggestions,
+        updatedAt: nowIso(),
+      };
+    }
+    case "refresh_layout_suggestions":
+      return {
+        ...next,
+        layoutSuggestions: computeLayout({
+          intent: next.layoutIntent,
+          objects: next.objects,
+          groups: next.groups,
+          connectors: next.connectors,
+          profile: next.layoutProfile,
+          respectAdaptiveCompanion: true,
+        }).suggestions,
+        updatedAt: nowIso(),
+      };
     case "pan":
       return {
         ...next,
@@ -809,15 +940,21 @@ export function applyWorkspaceAction(
         updatedAt: nowIso(),
       };
     }
-    case "focus_mode":
+    case "focus_mode": {
+      const focusedId = action.enabled
+        ? next.selection.primaryObjectId
+        : null;
+      const focusViewport = action.enabled
+        ? computeFocusViewport(next.objects, focusedId, next.viewport.zoom)
+        : null;
       return {
         ...next,
         focusMode: action.enabled,
-        focusedObjectId: action.enabled
-          ? next.selection.primaryObjectId
-          : null,
+        focusedObjectId: focusedId,
+        viewport: focusViewport ?? next.viewport,
         updatedAt: nowIso(),
       };
+    }
     case "search": {
       const q = action.query.trim().toLowerCase();
       const matches = !q
@@ -939,12 +1076,15 @@ export function applyWorkspaceAction(
         deliverableId: null,
         groupId: null,
         x: bounds.minX,
-        y: bounds.maxY + GAP_Y,
+        y: bounds.maxY + 28,
         width: OBJECT_W,
         height: OBJECT_H,
         collapsed: false,
         userCreated: true,
         immutable: false,
+        pinned: false,
+        manuallyMoved: true,
+        visualRole: "supporting",
         metadata: { userNote: true },
       };
       return {
@@ -968,27 +1108,84 @@ export function applyWorkspaceAction(
       };
     }
     case "auto_organize": {
-      const movable = next.objects.filter((o) => o.type !== "group");
-      const positions = placeObjects(movable.length, next.layoutIntent);
-      const idOrder = movable.map((o) => o.id);
+      const proposal = createLayoutProposal({
+        intent: next.layoutIntent,
+        objects: next.objects,
+        groups: next.groups,
+        connectors: next.connectors,
+        profile: next.layoutProfile,
+        respectAdaptiveCompanion: true,
+        focusObjectId: next.focusMode ? next.focusedObjectId : null,
+      });
       return {
         ...next,
-        objects: next.objects.map((o) => {
-          const idx = idOrder.indexOf(o.id);
-          if (idx < 0) return o;
-          return {
-            ...o,
-            x: positions[idx]?.x ?? o.x,
-            y: positions[idx]?.y ?? o.y,
-          };
-        }),
-        viewport: fitViewportToContent(movable),
+        pendingLayoutProposal: proposal,
+        layoutSuggestions: computeLayout({
+          intent: next.layoutIntent,
+          objects: next.objects,
+          groups: next.groups,
+          connectors: next.connectors,
+          profile: next.layoutProfile,
+          respectAdaptiveCompanion: true,
+        }).suggestions,
         updatedAt: nowIso(),
       };
     }
+    case "accept_layout_proposal": {
+      const proposal = next.pendingLayoutProposal;
+      if (!proposal) return state;
+      const layoutPreview = computeLayout({
+        intent: proposal.intent,
+        objects: next.objects,
+        groups: next.groups,
+        connectors: next.connectors,
+        profile: next.layoutProfile,
+      });
+      const laidOut = applyVisualRoles(
+        applyLayoutPositions(next.objects, proposal.positionsById, {
+          respectPins: true,
+          respectUserNotes: true,
+        }),
+        layoutPreview.placements,
+      );
+      const groups = next.groups.map((g) => {
+        const anchor = laidOut.find((o) => o.metadata.groupId === g.id);
+        return anchor ? { ...g, x: anchor.x, y: anchor.y } : g;
+      });
+      const collapsedProbe: ThinkingWorkspaceState = {
+        ...next,
+        objects: laidOut,
+        groups,
+      };
+      return {
+        ...next,
+        layoutIntent: proposal.intent,
+        objects: laidOut,
+        groups,
+        pendingLayoutProposal: null,
+        viewport: fitViewportToContent(
+          laidOut.filter(
+            (o) => !o.groupId || !isInCollapsedGroup(collapsedProbe, o),
+          ),
+        ),
+        updatedAt: nowIso(),
+      };
+    }
+    case "reject_layout_proposal":
+      return {
+        ...next,
+        pendingLayoutProposal: null,
+        updatedAt: nowIso(),
+      };
     default:
       return next;
   }
+}
+
+export function workspaceLayoutProfileForWidth(
+  width: number | null | undefined,
+): LayoutViewportProfile {
+  return resolveLayoutProfile(width);
 }
 
 function isInCollapsedGroup(
@@ -1042,9 +1239,11 @@ export function projectInspector(
     title: obj.title,
     details,
     related: connected,
-    actions: obj.userCreated
-      ? ["Edit note", "Remove note", "Ask Shari"]
-      : ["Ask Shari", "Focus here", "Find related"],
+    actions: [
+      obj.pinned ? "Unpin" : "Pin in place",
+      "Ask Shari",
+      ...(obj.userCreated ? ["Remove note"] : ["Focus here"]),
+    ],
     sourceNote: obj.immutable
       ? "From your approved result — moving this only rearranges the workspace."
       : "Your note — separate from generated knowledge.",
@@ -1077,10 +1276,28 @@ export function loadThinkingWorkspace(): ThinkingWorkspaceState | null {
   try {
     const raw = window.sessionStorage.getItem(WORKSPACE_SESSION_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as ThinkingWorkspaceState;
+    const parsed = JSON.parse(raw) as ThinkingWorkspaceState;
+    return normalizeLoadedWorkspace(parsed);
   } catch {
     return null;
   }
+}
+
+function normalizeLoadedWorkspace(
+  state: ThinkingWorkspaceState,
+): ThinkingWorkspaceState {
+  return {
+    ...state,
+    layoutSuggestions: state.layoutSuggestions ?? [],
+    pendingLayoutProposal: state.pendingLayoutProposal ?? null,
+    layoutProfile: state.layoutProfile ?? "desktop",
+    objects: (state.objects ?? []).map((o) => ({
+      ...o,
+      pinned: Boolean(o.pinned),
+      manuallyMoved: Boolean(o.manuallyMoved),
+      visualRole: o.visualRole ?? "supporting",
+    })),
+  };
 }
 
 export function clearThinkingWorkspace(): void {

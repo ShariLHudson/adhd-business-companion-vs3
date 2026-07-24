@@ -308,6 +308,10 @@ describe("Visual Thinking Workspace Foundation", () => {
     expect(workspacePreservesKnowledgeImmutability(before, ws)).toBe(true);
     const mid = ws;
     ws = applyWorkspaceAction(ws, { kind: "auto_organize" });
+    expect(ws.pendingLayoutProposal).toBeTruthy();
+    expect(workspacePreservesKnowledgeImmutability(mid, ws)).toBe(true);
+    ws = applyWorkspaceAction(ws, { kind: "accept_layout_proposal" });
+    expect(ws.pendingLayoutProposal).toBeNull();
     expect(workspacePreservesKnowledgeImmutability(mid, ws)).toBe(true);
   });
 
