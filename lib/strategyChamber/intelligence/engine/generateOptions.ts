@@ -17,12 +17,14 @@ import {
   matchProblemDistinction,
 } from "../domainIntelligence";
 import { pricingOptionPatterns } from "../domains/pricing";
+import { growthOptionPatterns } from "../domains/growth";
 import { getStrategyType } from "../registry";
 import type { EnrichedStrategyOption, OptionPatternId } from "../types";
 import { assessOptionReadiness } from "./assessOptionReadiness";
 import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 import { selectDistinctOptionPatterns } from "./selectDistinctOptionPatterns";
 import { validateOptionDiversity } from "./validateOptionDiversity";
+
 
 function fromPersisted(item: StrategyWorkItem): EnrichedStrategyOption[] {
   return (item.optionsConsidered ?? []).slice(0, 3).map((o) => ({
@@ -49,11 +51,34 @@ function pricingPatterns(
   });
 }
 
-function growthPatterns(capacityTight: boolean): OptionPatternId[] {
-  if (capacityTight) {
-    return ["stabilize", "protect_current_base", "test", "simplify"];
-  }
-  return ["narrow", "test", "improve", "expand", "simplify"];
+function growthPatterns(
+  capacityTight: boolean,
+  statement: string,
+): OptionPatternId[] {
+  return growthOptionPatterns({
+    capacityTight,
+    retentionLeak: /\b(churn|retention|don't stay|do not stay|cancel)\b/i.test(
+      statement,
+    ),
+    focusScattered: /\b(three new offers|many offers|too many offers)\b/i.test(
+      statement,
+    ),
+    wantMaintainSize:
+      /\b(stay small|don't want (a )?bigger|do not want (a )?bigger|feel like i should)\b/i.test(
+        statement,
+      ),
+    revenueNotVolume:
+      /\b(plenty of customers|revenue is still low|more revenue)\b/i.test(
+        statement,
+      ) && !/\bmore customers\b/i.test(statement),
+    marketExpansion: /\b(another market|new market|expand into)\b/i.test(
+      statement,
+    ),
+    hireToGrow: /\b(hire|delegate).{0,40}(grow|growth)|(grow|growth).{0,40}(hire|delegate)\b/i.test(
+      statement,
+    ),
+    weakEvidence: /\b(not much evidence|unsure|don't know)\b/i.test(statement),
+  });
 }
 
 function ideasPatterns(): OptionPatternId[] {
@@ -123,7 +148,7 @@ export function generateFullStrategicOptions(
     analysis.questionType === "growth_decision" ||
     /\bmore customers?\b/i.test(statement)
   ) {
-    candidates = growthPatterns(capacityTight);
+    candidates = growthPatterns(capacityTight, statement);
   } else if (
     /\b(ten things|too many ideas|many ideas|ten ideas)\b/i.test(statement)
   ) {
