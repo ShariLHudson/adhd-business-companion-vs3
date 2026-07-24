@@ -78,7 +78,17 @@ export function userFacingCreateTypeLabel(
 export function catalogTypeFromUserPhrase(text: string): string | null {
   const t = text.trim().toLowerCase();
   if (!t) return null;
-  if (t === "social media content" || t === "social media") return "Social Post";
+  if (t === "social media content" || t === "social media") {
+    // Bare phrase only — multi-day / plan requests are handled upstream.
+    return "Social Post";
+  }
+  if (
+    /\b(five|5|seven|7|\d+)\s*[- ]?day\b/.test(t) &&
+    /\b(social|content)\b/.test(t) &&
+    /\b(plan|calendar)\b/.test(t)
+  ) {
+    return "Content Calendar";
+  }
   if (t === "email sequence") return "Email Sequence";
   if (t === "custom") return OTHER_OPTION;
   for (const [catalog, label] of Object.entries(USER_FACING_CREATE_LABELS)) {

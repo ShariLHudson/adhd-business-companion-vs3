@@ -326,12 +326,21 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
       {
         label: "Content Calendar",
         emoji: "🗓️",
-        matchTerms: ["content calendar", "editorial calendar"],
+        matchTerms: [
+          "content calendar",
+          "editorial calendar",
+          "social media content plan",
+          "social media plan",
+          "five-day social",
+          "5-day social",
+          "five day social",
+          "content plan",
+        ],
       },
       {
         label: "Marketing Plan",
         emoji: "📋",
-        matchTerms: ["marketing plan", "content plan"],
+        matchTerms: ["marketing plan", "go-to-market plan"],
       },
     ],
   },

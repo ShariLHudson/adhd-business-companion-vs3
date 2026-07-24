@@ -23,6 +23,11 @@ import { isBusinessPlanCreationRequest } from "@/lib/universalWorkEngine/package
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
 import { isFacebookCommunityCreationRequest } from "@/lib/universalWorkEngine/packages/facebookCommunity/isFacebookCommunityCreationRequest";
 import {
+  artifactTypePreservesUnderstanding,
+  understandUniversalRequest,
+  shouldPreferUniversalUnderstanding,
+} from "@/lib/universalRequestOutcome";
+import {
   createIntentAlternativesMessage,
   createIntentConfirmMessage,
   createIntentSoftConfirmMessage,
@@ -128,11 +133,42 @@ function resolveArtifactType(text: string): ResolvedArtifact | null {
     };
   }
 
+  // Universal Request Understanding — preserve duration / plan / series before
+  // keyword catalog last-match can collapse "five-day content plan" to a post.
+  const universal = understandUniversalRequest(text);
+  if (
+    shouldPreferUniversalUnderstanding(universal) &&
+    universal.createArtifactType &&
+    artifactTypePreservesUnderstanding(universal.createArtifactType, universal)
+  ) {
+    return {
+      artifactType: universal.createArtifactType,
+      fromCatalog: false,
+      fromPromptDetect: false,
+      fromPromotionalIntent: false,
+    };
+  }
+
   const catalogMatch = matchCatalogFromText(text)?.type?.trim() || null;
-  if (catalogMatch) {
+  if (
+    catalogMatch &&
+    artifactTypePreservesUnderstanding(catalogMatch, universal)
+  ) {
     return {
       artifactType: catalogMatch,
       fromCatalog: true,
+      fromPromptDetect: false,
+      fromPromotionalIntent: false,
+    };
+  }
+  if (
+    catalogMatch &&
+    !artifactTypePreservesUnderstanding(catalogMatch, universal) &&
+    universal.createArtifactType
+  ) {
+    return {
+      artifactType: universal.createArtifactType,
+      fromCatalog: false,
       fromPromptDetect: false,
       fromPromotionalIntent: false,
     };
@@ -194,7 +230,10 @@ export function resolveGuidedCreateDomainFlags(input: {
     !promo;
   const isMarketingPlanDomain =
     !isFacebookCommunityDomain &&
-    (isMarketingPlanCreationRequest(text) || /marketing\s+plan/i.test(label));
+    (isMarketingPlanCreationRequest(text) ||
+      /marketing\s+plan/i.test(label) ||
+      /content\s+calendar/i.test(label) ||
+      /content\s+plan/i.test(text));
   const isBusinessPlanDomain =
     !isFacebookCommunityDomain &&
     !isMarketingPlanDomain &&

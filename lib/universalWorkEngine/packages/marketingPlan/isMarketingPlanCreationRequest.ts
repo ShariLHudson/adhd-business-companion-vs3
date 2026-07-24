@@ -4,7 +4,7 @@
  */
 
 const MARKETING_PLAN_RE =
-  /\b(?:simple\s+)?marketing\s+plans?\b|\bmarket(?:ing)?\s+this\s+offer\b|\bturn\s+this\s+project\s+into\s+a\s+marketing\s+plan\b|\bmarketing\s+blueprint\b/i;
+  /\b(?:simple\s+)?marketing\s+plans?\b|\bmarket(?:ing)?\s+this\s+offer\b|\bturn\s+this\s+project\s+into\s+a\s+marketing\s+plan\b|\bmarketing\s+blueprint\b|\b(?:social\s+media\s+)?content\s+plans?\b|\bcontent\s+calendar\b|\b\d+\s*[- ]?day\s+(?:social|content)\b|\b(?:five|5)\s*[- ]?day\s+(?:social|content)\b/i;
 
 /**
  * True when the request should resolve through UWE Marketing Plan Work Type.

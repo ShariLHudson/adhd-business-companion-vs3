@@ -10,6 +10,11 @@ import {
   userFacingCreateTypeLabel,
 } from "./createTypePickers";
 import {
+  artifactTypePreservesUnderstanding,
+  shouldPreferUniversalUnderstanding,
+  understandUniversalRequest,
+} from "./universalRequestOutcome";
+import {
   CREATE_STEP1_CHAT,
   CREATE_KICKOFF_HEADER,
   CREATE_STEP1_QUESTION,
@@ -187,10 +192,29 @@ export function shouldSuppressParallelCoaching(
 export function resolveBuilderType(text: string): string | null {
   const t = text.trim();
   if (!t) return null;
+  const universal = understandUniversalRequest(t);
+  if (
+    shouldPreferUniversalUnderstanding(universal) &&
+    universal.createArtifactType &&
+    artifactTypePreservesUnderstanding(universal.createArtifactType, universal)
+  ) {
+    return universal.createArtifactType;
+  }
   const fromPhrase = catalogTypeFromUserPhrase(t);
-  if (fromPhrase) return fromPhrase;
+  if (
+    fromPhrase &&
+    artifactTypePreservesUnderstanding(fromPhrase, universal)
+  ) {
+    return fromPhrase;
+  }
   const match = matchCatalogFromText(t);
-  if (match?.type && !match.route) return match.type;
+  if (
+    match?.type &&
+    !match.route &&
+    artifactTypePreservesUnderstanding(match.type, universal)
+  ) {
+    return match.type;
+  }
   if (/\bstrateg(y|ies)\b/i.test(t)) return "Business Strategy";
   if (/\bsop\b|standard operating procedure/i.test(t)) return "SOP";
   if (/\bworkshop\b|webinar\b/i.test(t)) return "Workshop";
@@ -202,7 +226,9 @@ export function resolveBuilderType(text: string): string | null {
   if (isThankYouEmailIntent(t)) return "Thank-You Email";
   if (/\bnewsletter\b/i.test(t)) return "Newsletter";
   if (/\bpresentation\b|\bslides\b/i.test(t)) return "Presentation";
-  if (/\bsocial media post\b/i.test(t)) return "Social Post";
+  if (/\bsocial media post\b/i.test(t) && !/\b(plan|calendar|campaign)\b/i.test(t)) {
+    return "Social Post";
+  }
   if (/\blead magnet\b/i.test(t)) return "Lead Magnet";
   if (/\blanding page\b/i.test(t)) return "Landing Page";
   if (/\bfunnel\b/i.test(t)) return "Sales Funnel";
@@ -211,8 +237,11 @@ export function resolveBuilderType(text: string): string | null {
   if (/\bclient onboarding\b/i.test(t)) return "Client Onboarding";
   if (/\bmarketing plan\b/i.test(t)) return "Marketing Plan";
   if (/\btraining\b/i.test(t)) return "Training Guide";
-  if (/\bsocial media\b/i.test(t)) return "Social Post";
-  return null;
+  // Bare "social media" is not enough to force a single Social Post when a plan/series is present.
+  if (/\bsocial media\b/i.test(t) && !/\b(plan|calendar|campaign|series)\b/i.test(t)) {
+    return "Social Post";
+  }
+  return universal.createArtifactType;
 }
 
 export function isPendingApprovalAcceptance(text: string): boolean {

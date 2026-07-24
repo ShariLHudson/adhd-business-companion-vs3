@@ -62,6 +62,21 @@ export function findCatalogItem(label: string): CreateCatalogItem | undefined {
   return allCatalogItems().find((i) => i.label.toLowerCase() === t);
 }
 
+/** Longer / more specific terms outrank later short social-post keywords. */
+function catalogMatchScore(term: string, index: number): number {
+  const specificity = term.trim().length;
+  // Prefer plan/calendar/series families over bare social/post/facebook terms.
+  const familyBonus = /\b(plan|calendar|campaign|series|sequence|program|handbook|guide|project)\b/i.test(
+    term,
+  )
+    ? 40
+    : /\b(post|caption|facebook|instagram|social media)\b/i.test(term)
+      ? -25
+      : 0;
+  // Mild preference for earlier meaningful structure terms over trailing channel words.
+  return specificity * 2 + familyBonus - Math.floor(index / 8);
+}
+
 /** Match user text to a catalog create type or routed section. */
 export function matchCatalogFromText(text: string): {
   type?: string;
@@ -71,7 +86,7 @@ export function matchCatalogFromText(text: string): {
   if (!t) return null;
   if (isVisualStructureCatalogSkip(t)) return null;
 
-  let best: { index: number; item: CreateCatalogItem } | null = null;
+  let best: { score: number; item: CreateCatalogItem } | null = null;
 
   for (const item of allCatalogItems()) {
     const terms = [item.label.toLowerCase(), ...(item.matchTerms ?? [])];
@@ -79,8 +94,8 @@ export function matchCatalogFromText(text: string): {
       const re = new RegExp(`\\b${escapeRegex(term)}\\b`, "i");
       const match = re.exec(t);
       if (!match) continue;
-      const idx = match.index;
-      if (!best || idx > best.index) best = { index: idx, item };
+      const score = catalogMatchScore(term, match.index);
+      if (!best || score > best.score) best = { score, item };
     }
   }
 

@@ -24,6 +24,11 @@ import {
   shouldBlockDraftPanelFromChat,
 } from "./draftPermissionGate";
 import { matchCatalogFromText } from "./createCatalog";
+import {
+  artifactTypePreservesUnderstanding,
+  shouldPreferUniversalUnderstanding,
+  understandUniversalRequest,
+} from "./universalRequestOutcome";
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
 
@@ -321,10 +326,28 @@ export function inferArtifactTypeFromConversation(
   const t = userText.toLowerCase();
   const combined = `${userText}\n${content ?? ""}`.toLowerCase();
 
-  if (/\b(?:facebook|fb)\b/.test(t) || /\b(?:facebook|fb)\b/.test(combined)) {
+  // Universal understanding first — never let bare "facebook"/"social media"
+  // collapse a multi-day content plan into a single post.
+  const universal = understandUniversalRequest(userText);
+  if (
+    shouldPreferUniversalUnderstanding(universal) &&
+    universal.createArtifactType &&
+    artifactTypePreservesUnderstanding(universal.createArtifactType, universal)
+  ) {
+    return universal.createArtifactType;
+  }
+
+  // Facebook post only when the request is clearly a single post — not a plan.
+  if (
+    (/\b(?:facebook|fb)\b/.test(t) || /\b(?:facebook|fb)\b/.test(combined)) &&
+    !/\b(plan|calendar|campaign|series|community|group)\b/.test(combined)
+  ) {
     return "Facebook Post";
   }
-  if (/\blinkedin\b/.test(t) || /\blinkedin\b/.test(combined)) {
+  if (
+    (/\blinkedin\b/.test(t) || /\blinkedin\b/.test(combined)) &&
+    !/\b(plan|calendar|campaign|series)\b/.test(combined)
+  ) {
     return "LinkedIn Post";
   }
 
@@ -344,9 +367,15 @@ export function inferArtifactTypeFromConversation(
   }
   if (/\bproposal\b|scope of work|\bsow\b/.test(combined)) return "Proposal";
   if (/\bemail\b/.test(combined)) return "Email";
-  if (/\b(?:instagram|insta|ig)\b/.test(combined)) return "Social Post";
-  if (/\bsocial media\b/.test(combined)) return "Social Post";
-  if (/\bpost\b/.test(combined)) return "Social Post";
+  if (/\b(?:instagram|insta|ig)\b/.test(combined) && !/\b(plan|calendar)\b/.test(combined)) {
+    return "Social Post";
+  }
+  if (/\bsocial media\b/.test(combined) && !/\b(plan|calendar|campaign|series)\b/.test(combined)) {
+    return "Social Post";
+  }
+  if (/\bpost\b/.test(combined) && !/\b(plan|calendar|campaign)\b/.test(combined)) {
+    return "Social Post";
+  }
   return "Document";
 }
 
