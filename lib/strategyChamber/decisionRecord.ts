@@ -91,6 +91,14 @@ export const DECISION_RECORD_OPTIONAL_LIST_KEYS: Array<
   "whatYouAreNotChoosing",
   "whenToReview",
   "nextHelpfulStep",
+  "optionsConsideredSummary",
+  "whyOptionsDiffered",
+  "tradeoffsSummary",
+  "opportunityCostsSummary",
+  "reversibilityNote",
+  "experimentsConsidered",
+  "whatWouldChangeTheDecision",
+  "companionRecommendation",
 ];
 
 /** Core sections that may still show when present; all others are optional. */

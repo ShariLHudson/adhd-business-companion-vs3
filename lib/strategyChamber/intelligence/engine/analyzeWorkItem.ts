@@ -23,9 +23,11 @@ import {
 } from "./generateOptions";
 import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 import { identifyStrategicRisks } from "./identifyRisks";
+import { recommendStrategicOption } from "./recommendOption";
 import { recommendStrategicHandoff } from "./recommendHandoff";
 import { selectNextQuestion } from "./selectNextQuestion";
 import { selectNextThinkingMove } from "./selectNextThinkingMove";
+import { reversibilityDepth } from "../frameworks/reversibilityDepth";
 
 /**
  * Pure judgment turn over a Strategy Work Item.
@@ -42,15 +44,19 @@ export function analyzeStrategyWorkItem(
   const nextQuestion = selectNextQuestion(item, presentation, opts);
   const readiness = assessDecisionReadiness(item);
   const optionReadiness = assessOptionReadiness(item);
-  const fullOptions = generateFullStrategicOptions(item, presentation);
-  const options = generateStrategicOptions(item, presentation);
   const showOptions = shouldOfferStrategicOptions(item);
+  const fullOptions = showOptions
+    ? generateFullStrategicOptions(item, presentation)
+    : [];
+  const options = showOptions
+    ? generateStrategicOptions(item, presentation)
+    : [];
   const lastStatementAnalysis = opts?.lastAnswer?.trim()
     ? analyzeStrategicStatement(opts.lastAnswer)
     : null;
   const { risks } = identifyStrategicRisks(item);
   const experiment = designStrategicExperiment(item);
-  const recommendation = recommendStrategicHandoff(item);
+  const handoffRecommendation = recommendStrategicHandoff(item);
   const secondOrder = suggestSecondOrderEffects(item);
 
   const comparisonMoves = new Set([
@@ -67,7 +73,7 @@ export function analyzeStrategyWorkItem(
       : null;
 
   const handoff: HandoffContext = {
-    recommendation,
+    recommendation: handoffRecommendation,
     fromStage: judgmentStage,
     readiness: readiness.readiness,
   };
@@ -127,8 +133,8 @@ export function analyzeStrategyWorkItem(
   ) {
     workItemPatch.tradeoffs = optionComparison.lines.slice(0, 3);
   }
-  if (recommendation && item.chosenDirection?.trim()) {
-    workItemPatch.recommendedNextDestination = recommendation.destinationId;
+  if (handoffRecommendation && item.chosenDirection?.trim()) {
+    workItemPatch.recommendedNextDestination = handoffRecommendation.destinationId;
   }
   if (
     experiment &&
@@ -138,6 +144,14 @@ export function analyzeStrategyWorkItem(
   ) {
     workItemPatch.experiments = [experiment.smallAction];
   }
+
+  const optionRecommendation =
+    showOptions && !item.chosenDirection?.trim()
+      ? recommendStrategicOption(item, presentation)
+      : null;
+  const depth = reversibilityDepth(
+    assessReversibility(item.chosenDirection || item.decisionStatement || ""),
+  );
 
   return {
     strategicQuestion,
@@ -156,5 +170,7 @@ export function analyzeStrategyWorkItem(
     lastStatementAnalysis,
     fullOptions,
     optionComparison,
+    recommendation: optionRecommendation || undefined,
+    reversibilityDepth: depth,
   };
 }

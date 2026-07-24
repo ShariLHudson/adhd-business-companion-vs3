@@ -168,6 +168,16 @@ export type StrategyDecisionRecordView = {
   howYouWillKnowItIsWorking: string[];
   whenToReview: string;
   nextHelpfulStep: string;
+  /** Phase 3 — only when meaningful; never pads empty sections. */
+  optionsConsideredSummary?: string[];
+  whyOptionsDiffered?: string[];
+  tradeoffsSummary?: string[];
+  opportunityCostsSummary?: string[];
+  reversibilityNote?: string;
+  experimentsConsidered?: string[];
+  whatWouldChangeTheDecision?: string;
+  /** Companion recommendation copy — not a confirmed decision. */
+  companionRecommendation?: string;
 };
 
 export type ContinueJourneyDestinationId =
