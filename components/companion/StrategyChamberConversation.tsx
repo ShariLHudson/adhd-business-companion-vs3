@@ -13,6 +13,7 @@ import {
 } from "@/lib/strategyChamber/conversationGuidance";
 import {
   buildContinueYourJourney,
+  confirmStrategyDecisionRecord,
   STRATEGY_HANDOFF_LIVE_DESTINATIONS,
   type ContinueJourneyDestinationId,
   type StrategyWorkItem,
@@ -427,7 +428,17 @@ export function StrategyChamberConversation({
           <button
             type="button"
             className="w-fit rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
-            onClick={() => onPatchWork({ decisionRecordConfirmed: true })}
+            onClick={() => {
+              const confirmed = confirmStrategyDecisionRecord(work.id);
+              if (confirmed) {
+                onPatchWork({
+                  decisionRecordConfirmed: true,
+                  status: confirmed.workItem.status,
+                });
+              } else {
+                onPatchWork({ decisionRecordConfirmed: true });
+              }
+            }}
             data-testid="strategy-confirm-decision-record"
           >
             This looks right

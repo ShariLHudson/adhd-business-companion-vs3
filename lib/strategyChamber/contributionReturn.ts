@@ -9,6 +9,7 @@ import {
   getStrategyWorkItem,
   updateStrategyWorkItem,
 } from "./strategyWorkItemStore";
+import { recordOutcomeFromContribution } from "./memory/recordOutcome";
 import type { StrategyWorkItem } from "./types";
 
 export function applyStrategyContributionReturn(
@@ -44,6 +45,9 @@ export function applyStrategyContributionReturn(
     syncDirection: "from_destination",
     memberApproved: true,
   });
+
+  // Phase 6 — link aftermath without overwriting the decision
+  recordOutcomeFromContribution(contribution);
 
   return updated;
 }
