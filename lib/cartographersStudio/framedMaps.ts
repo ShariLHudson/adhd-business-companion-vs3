@@ -74,7 +74,8 @@ export function framedMapForVisualFocusMode(
 
 export const CARTOGRAPHERS_ROOM_INTRO = {
   plaque: "Cartographer's Studio",
-  tagline: "Every map tells a story. Every story reveals a path.",
+  /** Estate plain language — what this place is for, in one calm line. */
+  tagline: "Think through ideas visually.",
   welcome:
     "Choose a framed map on the wall, or open the Atlas when you want to learn first.",
   instruction: "Click any map to open it and start working.",
