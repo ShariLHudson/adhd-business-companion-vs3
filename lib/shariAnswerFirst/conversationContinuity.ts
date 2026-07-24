@@ -311,6 +311,24 @@ export function __resetShariThreadIsolationTimestampsForTests(): void {
   lastHydrationSource = "none";
 }
 
+const THREAD_CORRECTION_RE =
+  /\b(?:actually|i meant|i mean|that(?:'s| is) not (?:right|what i|correct)|you misunderstood|no[,.]?\s+i\b|correction:|i (?:sell|make|offer|don't|do not)|not (?:a |an |the )?(?:that|this))\b/i;
+
+/**
+ * Detect a member correction worth persisting on the help-thread.
+ * Returns null when the turn is ordinary follow-up, not a correction.
+ */
+export function extractThreadCorrection(userText: string): string | null {
+  const t = userText.trim();
+  if (!t || t.length > 280) return null;
+  if (!THREAD_CORRECTION_RE.test(t)) return null;
+  const meant = t.match(
+    /\b(?:actually[,:]?\s+|i meant[,:]?\s+|i mean[,:]?\s+|no[,.]?\s+|correction:\s*)(.+)/i,
+  );
+  if (meant?.[1]?.trim()) return meant[1].trim().slice(0, 240);
+  return t.slice(0, 240);
+}
+
 export function buildShariConversationThread(input: {
   decision: ShariResponseDecision;
   answer: string;

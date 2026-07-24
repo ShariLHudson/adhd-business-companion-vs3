@@ -20413,7 +20413,7 @@ export default function CompanionPageClient() {
         fill: assistantFill,
         content: assistantMsgRaw,
       } = extractWorkspaceDirectives(rawAssistantMsg);
-      const assistantMsg = toPlainLanguageDisplay(
+      let assistantMsg = toPlainLanguageDisplay(
         scrubFalseWorkspaceClaims(assistantMsgRaw, getWorkspaceSnapshot()),
       );
 

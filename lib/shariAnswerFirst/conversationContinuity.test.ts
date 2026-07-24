@@ -3,6 +3,7 @@ import {
   buildFollowUpAdaptedReply,
   buildShariConversationThread,
   clearShariConversationThread,
+  extractThreadCorrection,
   isShariConversationFollowUp,
   looksLikeConversationRestart,
   storeShariConversationThread,
@@ -83,5 +84,15 @@ describe("Shari conversation continuity", () => {
     expect(
       isShariConversationFollowUp("Create a strategic plan for my business."),
     ).toBe(false);
+  });
+
+  it("extracts thread corrections and ignores ordinary follow-ups", () => {
+    expect(extractThreadCorrection("Actually I sell journals")).toMatch(
+      /sell journals/i,
+    );
+    expect(extractThreadCorrection("I meant the craft fair booth")).toMatch(
+      /craft fair/i,
+    );
+    expect(extractThreadCorrection("make that shorter")).toBeNull();
   });
 });
