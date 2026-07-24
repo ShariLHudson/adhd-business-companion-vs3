@@ -100,7 +100,7 @@ describe("Shari answer-first general help", () => {
       "How do I set up a vendor table or booth at an event?",
     );
     const hint = shariAnswerFirstHintForChat(d);
-    expect(hint).toMatch(/ANSWER-FIRST/);
+    expect(hint).toMatch(/SHARI CORE CONVERSATION|ANSWER-FIRST/);
     expect(hint).toMatch(/Do NOT open Create/);
     const withOffer = appendRestrainedCapabilityOffer(
       "Here is a full booth setup guide with steps and follow-up.",

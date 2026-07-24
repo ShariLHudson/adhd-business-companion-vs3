@@ -3,6 +3,7 @@
  */
 
 import { newCreationWorkspaceId } from "@/lib/creationWorkspace/ids";
+import { conversationModeFromHelpMode } from "./conversationModes";
 import { classifyQuestionVersusAction } from "./questionVersusAction";
 import type {
   ShariAnswerDepth,
@@ -318,6 +319,7 @@ export function decideShariResponse(rawRequest: string): ShariResponseDecision {
     normalizedRequest,
     primaryHelpMode: primary,
     secondaryHelpModes: secondary,
+    conversationMode: conversationModeFromHelpMode(primary),
     directAnswerPossible,
     directAnswerRequired,
     currentResearchRequired: researchNeeded,

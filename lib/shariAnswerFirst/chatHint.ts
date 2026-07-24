@@ -4,6 +4,7 @@
 
 import type { ShariResponseDecision } from "./types";
 import { capabilityOfferLine } from "./capabilityOffers";
+import { conversationModeFromHelpMode } from "./conversationModes";
 
 export function shariAnswerFirstHintForChat(
   decision: ShariResponseDecision,
@@ -57,18 +58,24 @@ export function shariAnswerFirstHintForChat(
   }[decision.primaryHelpMode] ??
     "Answer helpfully in ordinary conversation before suggesting other experiences.";
 
+  const pyramidMode =
+    decision.conversationMode ??
+    conversationModeFromHelpMode(decision.primaryHelpMode);
+
   return [
-    "ANSWER-FIRST GENERAL HELP (mandatory for this turn):",
+    "SHARI CORE CONVERSATION (mandatory for this turn):",
+    "Prime directive: help inside this conversation first. Capabilities are invitations, never prerequisites.",
     "1. Answer in chat first with substantive, practical help.",
     "2. Do NOT open Create, Projects, Research Library, Visual Thinking, Strategic Planning, or Chamber before answering.",
     "3. Do NOT reply with only a destination menu, research warning, or thin summary.",
     "4. Do NOT ask the member to choose a workflow, template, or output format before helping.",
-    `5. Help mode (internal): ${decision.primaryHelpMode}.`,
-    `6. Depth: ${decision.answerDepth}. ${depthLine}`,
-    `7. ${modeLine}`,
+    "5. Do NOT ask unnecessary profiling questions before helping.",
+    `6. Conversation mode (internal): ${pyramidMode ?? decision.primaryHelpMode}.`,
+    `7. Depth: ${decision.answerDepth}. ${depthLine}`,
+    `8. ${modeLine}`,
     offer
-      ? `8. After the answer, you may include at most ONE soft next step: "${offer}"`
-      : "8. You may end without any platform offer.",
-    "9. Sound like a capable friend sitting beside them — warm, calm, practical, no platform jargon.",
+      ? `9. After the answer, you may include at most ONE soft next step: "${offer}"`
+      : "9. You may end without any platform offer.",
+    "10. Sound like a capable friend sitting beside them — warm, calm, practical, no platform jargon.",
   ].join("\n");
 }

@@ -42,7 +42,9 @@ describe("answer-first handler gates (CompanionPageClient path)", () => {
       expect(shouldBlockImmediateExperienceOpen(d), text).toBe(true);
       expect(isInformationalChatTurn(text), text).toBe(true);
       expect(isSimpleCreateRequest(text), text).toBe(false);
-      expect(shariAnswerFirstHintForChat(d)).toMatch(/ANSWER-FIRST/);
+      expect(shariAnswerFirstHintForChat(d)).toMatch(
+        /SHARI CORE CONVERSATION|ANSWER-FIRST/,
+      );
     }
   });
 

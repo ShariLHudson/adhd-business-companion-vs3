@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./conversationModes";
 export * from "./questionVersusAction";
 export * from "./decideShariResponse";
 export * from "./substanceValidation";
@@ -6,6 +7,7 @@ export * from "./answerRepair";
 export * from "./failSafeReply";
 export * from "./capabilityOffers";
 export * from "./conversationHandoff";
+export * from "./conversationContinuity";
 export * from "./chatHint";
 export * from "./observability";
 export * from "./evaluationSet";

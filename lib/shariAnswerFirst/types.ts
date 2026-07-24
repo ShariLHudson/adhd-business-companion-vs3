@@ -1,7 +1,13 @@
 /**
- * Shari Answer-First General Help — internal decision contracts.
+ * Shari Answer-First / Core Conversation Intelligence — internal contracts.
  * Never expose help modes or classification to members.
+ *
+ * Pyramid standard: docs/SHARI_CORE_CONVERSATION_INTELLIGENCE_STANDARD.md
  */
+
+import type { ShariConversationMode } from "./conversationModes";
+
+export type { ShariConversationMode };
 
 export type ShariPrimaryHelpMode =
   | "direct_answer"
@@ -49,6 +55,8 @@ export type ShariResponseDecision = {
   normalizedRequest: string;
   primaryHelpMode: ShariPrimaryHelpMode;
   secondaryHelpModes: ShariPrimaryHelpMode[];
+  /** Eight-mode pyramid classification (teach/explain/advise/…). */
+  conversationMode: ShariConversationMode | null;
   directAnswerPossible: boolean;
   directAnswerRequired: boolean;
   currentResearchRequired: boolean;

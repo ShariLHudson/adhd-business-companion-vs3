@@ -1909,13 +1909,20 @@ import {
 } from "@/lib/companionFirstWorkflow";
 import {
   buildAnswerFirstFailSafeReply,
+  buildFollowUpAdaptedReply,
   buildShariConversationHandoff,
+  buildShariConversationThread,
   decideShariResponse,
   evaluateAndRepairAnswerFirst,
+  isShariConversationFollowUp,
+  looksLikeConversationRestart,
+  peekShariConversationThread,
   shariAnswerFirstHintForChat,
+  shariContinuityHintForChat,
   shouldBlockImmediateExperienceOpen,
   shouldSuppressRouteBeforeAnswer,
   storeShariConversationHandoff,
+  storeShariConversationThread,
   trackShariAnswerFirstEvent,
   type ShariResponseDecision,
 } from "@/lib/shariAnswerFirst";
@@ -14188,20 +14195,28 @@ export default function CompanionPageClient() {
     // Never block send on isLoading — newer messages supersede in-flight AI.
     if (!trimmed) return;
 
-    // Answer-first: ordinary help stays in chat before destination routers.
+    // Answer-first / Core Conversation: help in chat before destination routers.
     const shariAnswerFirstDecision: ShariResponseDecision =
       decideShariResponse(trimmed);
+    const shariConversationThread = peekShariConversationThread();
+    const shariFollowUp = isShariConversationFollowUp(
+      trimmed,
+      shariConversationThread,
+    );
     trackShariAnswerFirstEvent("decision", {
       mode: shariAnswerFirstDecision.primaryHelpMode,
+      conversationMode: shariAnswerFirstDecision.conversationMode,
       directAnswerRequired: shariAnswerFirstDecision.directAnswerRequired,
       routingAllowed: shariAnswerFirstDecision.routingAllowed,
+      followUp: shariFollowUp,
     });
     const answerFirstPreferChat =
       preferChatAnswer ||
-      shouldSuppressRouteBeforeAnswer(shariAnswerFirstDecision);
-    const answerFirstBlockImmediateOpen = shouldBlockImmediateExperienceOpen(
-      shariAnswerFirstDecision,
-    );
+      shouldSuppressRouteBeforeAnswer(shariAnswerFirstDecision) ||
+      shariFollowUp;
+    const answerFirstBlockImmediateOpen =
+      shouldBlockImmediateExperienceOpen(shariAnswerFirstDecision) ||
+      shariFollowUp;
 
     // Freeform input dismisses the guided daily opening (choices stay optional).
     if (globalDailyOpening) {
@@ -19703,14 +19718,48 @@ export default function CompanionPageClient() {
         ? chamberMemberHintForChat(activeChamberMember)
         : null;
 
+      // Core Conversation: continue an open help thread without restarting.
+      if (answerFirstPreferChat && !chamberConversationActive && shariFollowUp) {
+        const adapted = buildFollowUpAdaptedReply(
+          trimmed,
+          shariConversationThread,
+        );
+        if (adapted) {
+          trackShariAnswerFirstEvent("follow_up_answered", {
+            mode: shariAnswerFirstDecision.primaryHelpMode,
+            source: "continuity",
+          });
+          if (activeChatTurnLifecycleRef.current) {
+            markAssistantReplied(activeChatTurnLifecycleRef.current);
+          }
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: adapted },
+          ]);
+          recordPrimaryTurnResponse(adapted);
+          storeShariConversationThread(
+            buildShariConversationThread({
+              decision: shariAnswerFirstDecision,
+              answer: adapted,
+              prior: shariConversationThread,
+              memberNote: trimmed,
+            }),
+          );
+          finishEarlyChatTurn();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
+      }
+
       // Answer-first: high-value how-to / troubleshooting gets a substantive
       // chat answer immediately — do not wait on model profiling questions.
       if (
         answerFirstPreferChat &&
         !chamberConversationActive &&
+        !shariFollowUp &&
         (shariAnswerFirstDecision.primaryHelpMode === "how_to_guidance" ||
           shariAnswerFirstDecision.primaryHelpMode === "troubleshooting") &&
-        /\b(?:vendor|booth|facebook groups?|strateg(?:y|ic plan)|qr code)\b/i.test(
+        /\b(?:vendor|booth|facebook groups?|strateg(?:y|ic plan)|qr code|loom)\b/i.test(
           trimmed,
         )
       ) {
@@ -19728,6 +19777,13 @@ export default function CompanionPageClient() {
             { role: "assistant", content: localAnswer },
           ]);
           recordPrimaryTurnResponse(localAnswer);
+          storeShariConversationThread(
+            buildShariConversationThread({
+              decision: shariAnswerFirstDecision,
+              answer: localAnswer,
+              prior: shariConversationThread,
+            }),
+          );
           finishEarlyChatTurn();
           finishLatencyTurn({ localReply: true });
           return;
@@ -20132,6 +20188,7 @@ export default function CompanionPageClient() {
             }),
             companionFirstWorkflowHintForChat(trimmed, workspacePanel),
             shariAnswerFirstHintForChat(shariAnswerFirstDecision),
+            shariContinuityHintForChat(trimmed, shariConversationThread),
             crossWorkspaceGuidanceHintForChat({
               sourceTitle: createBuilderSession?.typeLabel
                 ? createBuilderLabel(createBuilderSession.typeLabel)
@@ -20435,7 +20492,10 @@ export default function CompanionPageClient() {
           { role: "assistant", content: assistantMsg, relationshipTrace: uiTrace },
         ];
       });
-      if (shariAnswerFirstDecision.directAnswerRequired) {
+      if (
+        shariAnswerFirstDecision.directAnswerRequired ||
+        shariFollowUp
+      ) {
         const substance = evaluateAndRepairAnswerFirst({
           decision: shariAnswerFirstDecision,
           answer: assistantMsg,
@@ -20446,13 +20506,20 @@ export default function CompanionPageClient() {
           valid: substance.validation.valid,
           failureCount: substance.validation.failures.length,
         });
-        if (substance.needsRepair) {
-          const repaired = buildAnswerFirstFailSafeReply(trimmed);
+        const needsRestartRepair =
+          shariFollowUp && looksLikeConversationRestart(assistantMsg);
+        if (substance.needsRepair || needsRestartRepair) {
+          const repaired =
+            (shariFollowUp
+              ? buildFollowUpAdaptedReply(trimmed, shariConversationThread)
+              : null) ||
+            buildAnswerFirstFailSafeReply(trimmed);
           if (repaired) {
             assistantMsg = repaired;
             trackShariAnswerFirstEvent("automatic_repair", {
               mode: shariAnswerFirstDecision.primaryHelpMode,
               failureCount: substance.validation.failures.length,
+              restart: needsRestartRepair,
             });
             setMessages((prev) => {
               const copy = [...prev];
@@ -20470,6 +20537,18 @@ export default function CompanionPageClient() {
             });
           }
         }
+        storeShariConversationThread(
+          buildShariConversationThread({
+            decision: shariAnswerFirstDecision,
+            answer: assistantMsg,
+            prior: shariConversationThread,
+            memberNote: shariFollowUp ? trimmed : null,
+          }),
+        );
+        trackShariAnswerFirstEvent("context_retained", {
+          followUp: shariFollowUp,
+          mode: shariAnswerFirstDecision.conversationMode,
+        });
       }
       if (
         shouldUseCreateBuilderChatTurns() &&

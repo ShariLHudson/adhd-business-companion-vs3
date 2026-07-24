@@ -1,6 +1,6 @@
 # Universal Request-to-Outcome Intelligence Standard™
 
-**Answer-first companion chat:** Ordinary questions, how-to, advice, comparison, brainstorming, and troubleshooting are answered in Shari chat before Create / Research / Projects / Visual / Strategy routing. See [Shari Answer-First General Help Standard](../SHARI_ANSWER_FIRST_GENERAL_HELP_STANDARD.md).
+**Shari Core Conversation:** Ordinary questions, how-to, advice, comparison, brainstorming, and troubleshooting are answered in Shari chat before Create / Research / Projects / Visual / Strategy routing. See [Shari Core Conversation Intelligence](../SHARI_CORE_CONVERSATION_INTELLIGENCE_STANDARD.md) and [Answer-First General Help](../SHARI_ANSWER_FIRST_GENERAL_HELP_STANDARD.md).
 
 **Runtime:** `lib/universalRequestOutcome/`  
 **Create Begin wiring:** `lib/createEstate/resolveCreateBeginOutcome.ts`  

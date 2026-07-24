@@ -57,11 +57,26 @@ function strategicPlanHowTo(): string {
   ].join("\n");
 }
 
+function loomVideoHowTo(): string {
+  return [
+    "Here’s a simple way to make a clear Loom (or any screen-record) video.",
+    "",
+    "Decide the one thing the viewer should understand by the end. Outline three beats: open, show, close.",
+    "",
+    "Set up: quiet space, decent mic if you have one, browser zoom so text is readable, and close extra tabs. Start recording, greet briefly, then show the path while you narrate in plain language.",
+    "",
+    "Keep it short. Pause instead of filler words. End with one clear next step. Watch it once before you send — fix only what would confuse someone.",
+    "",
+    "If you tell me who it’s for and what you’re showing, I’ll tailor the outline.",
+  ].join("\n");
+}
+
 function howToFailSafe(text: string, decision: ShariResponseDecision): string {
   const t = text.toLowerCase();
   if (/\b(?:vendor|booth|table)\b/.test(t)) return vendorBoothHowTo();
   if (/\bfacebook groups?\b/.test(t)) return facebookGroupsHowTo();
   if (/\bstrateg(?:y|ic plan)\b/.test(t)) return strategicPlanHowTo();
+  if (/\b(?:loom|screen.?record)\b/.test(t)) return loomVideoHowTo();
 
   const topic = topicLabel(text);
   return [
