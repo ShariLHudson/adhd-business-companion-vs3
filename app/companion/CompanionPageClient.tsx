@@ -14975,14 +14975,15 @@ export default function CompanionPageClient() {
 
     // Create consent owns bare "ok/yes" before relationship/founder/other stealers.
     // Turn authority already suppressed relationship when pendingCreateConsent + bare ack.
+    // Use lastAssistantForPrimary (declared above) — lastAssistantText is assigned later in handleSend.
     if (
       (turnAuthority.owner === "create_consent_accept" || pendingCreateOpen) &&
       pendingCreateOpen &&
-      userAcceptedCreateConsent(trimmed, lastAssistantText)
+      userAcceptedCreateConsent(trimmed, lastAssistantForPrimary)
     ) {
       const acceptance = resolvePendingAcceptance({
         userText: trimmed,
-        lastAssistantText,
+        lastAssistantText: lastAssistantForPrimary,
         currentTurn: chatTurnRef.current,
         workspacePanel: workspacePanelRef.current,
         record: pendingAcceptanceRecord,
