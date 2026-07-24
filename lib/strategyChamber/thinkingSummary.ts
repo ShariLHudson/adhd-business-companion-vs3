@@ -1,8 +1,12 @@
 /**
  * Member-facing "My Thinking So Far" — only meaningful sections, plain language.
+ * Never present tentative content as confirmed. Preserve member wording.
  */
 
 import type { StrategyWorkItem } from "./types";
+import { assessDecisionReadiness } from "./intelligence/engine/assessDecisionReadiness";
+import { analyzeStrategicStatement } from "./intelligence/engine/analyzeStrategicStatement";
+import { DECISION_READINESS_LABEL } from "./domainModel";
 
 export type ThinkingSummarySection = {
   id: string;
@@ -14,20 +18,75 @@ function sameText(a?: string | null, b?: string | null): boolean {
   return Boolean(a?.trim() && b?.trim() && a.trim() === b.trim());
 }
 
+function normalizeKey(s: string): string {
+  return s.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function uniqueLines(lines: string[], ...exclude: Array<string | undefined>): string[] {
+  const blocked = new Set(
+    exclude.filter(Boolean).map((x) => normalizeKey(x!)),
+  );
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const line of lines) {
+    const t = line.trim();
+    if (!t) continue;
+    const key = normalizeKey(t);
+    if (blocked.has(key) || seen.has(key)) continue;
+    seen.add(key);
+    out.push(t);
+  }
+  return out;
+}
+
+function readinessMemberCopy(item: StrategyWorkItem): string | null {
+  const { readiness } = assessDecisionReadiness(item);
+  if (readiness === "problem_not_yet_clear") {
+    return "Still clarifying what you are really deciding";
+  }
+  if (readiness === "reality_not_yet_understood") {
+    return "Still understanding what is happening";
+  }
+  if (readiness === "more_options_needed") {
+    return "Ready to explore directions when you want";
+  }
+  if (readiness === "tradeoffs_not_evaluated") {
+    return "Comparing what each direction would ask of you";
+  }
+  if (readiness === "risks_not_reviewed") {
+    return "Looking carefully at what could go wrong";
+  }
+  if (readiness === "ready_for_decision") {
+    return "Close enough to choose — waiting for your confirmation";
+  }
+  if (readiness === "ready_for_handoff") {
+    return "Direction is clear enough to take a next step";
+  }
+  if (readiness === "decision_complete") {
+    return "You have confirmed a direction";
+  }
+  // Fallback — never expose raw enum as if it were copy
+  return DECISION_READINESS_LABEL[readiness] || null;
+}
+
+/**
+ * Build summary sections. Empty sections omitted. No duplicate wording.
+ */
 export function buildThinkingSummary(
   item: StrategyWorkItem,
 ): ThinkingSummarySection[] {
   const sections: ThinkingSummarySection[] = [];
   const question = item.decisionStatement?.trim();
+  const reality = item.currentReality?.trim();
+
   if (question) {
     sections.push({
-      id: "thinking_through",
-      label: "What we are thinking through",
+      id: "decide",
+      label: "What you’re trying to decide",
       body: question,
     });
   }
 
-  const reality = item.currentReality?.trim();
   if (reality && !sameText(reality, question)) {
     sections.push({
       id: "happening",
@@ -36,73 +95,188 @@ export function buildThinkingSummary(
     });
   }
 
-  const told = (item.memberStatements ?? []).filter(
-    (s) => s.trim() && !sameText(s, question) && !sameText(s, reality),
+  const protect = uniqueLines(
+    [
+      ...(item.constraints ?? []),
+      item.desiredDirection?.trim() &&
+      /\bprotect|keep|preserve\b/i.test(item.desiredDirection)
+        ? item.desiredDirection.trim()
+        : "",
+    ].filter(Boolean) as string[],
+    question,
+    reality,
   );
-  if (told.length) {
+  if (protect.length) {
     sections.push({
-      id: "told_me",
-      label: "What you have told me",
-      body: told,
+      id: "matters",
+      label: "What matters most",
+      body: protect,
+    });
+  } else if (item.desiredDirection?.trim() && !sameText(item.desiredDirection, question)) {
+    sections.push({
+      id: "matters",
+      label: "What matters most",
+      body: item.desiredDirection.trim(),
     });
   }
 
-  const known = [
-    ...(item.knownFacts ?? []),
-    ...(item.observations ?? []),
-  ].filter((s) => s.trim() && !sameText(s, question) && !sameText(s, reality));
+  const known = uniqueLines(
+    [...(item.knownFacts ?? [])],
+    question,
+    reality,
+  );
   if (known.length) {
     sections.push({
       id: "known",
-      label: "What is known",
+      label: "What we know",
       body: known,
     });
   }
 
-  if (item.assumptions?.length) {
+  const assumptions = uniqueLines(
+    [...(item.assumptions ?? [])],
+    question,
+    reality,
+    ...known,
+  );
+  if (assumptions.length) {
     sections.push({
       id: "assumptions",
-      label: "What may be an assumption",
-      body: item.assumptions,
+      label: "What may still be an assumption",
+      body: assumptions,
+    });
+  }
+
+  const concerns = uniqueLines(
+    [...(item.risks ?? [])],
+    question,
+    reality,
+    ...assumptions,
+  );
+  if (concerns.length) {
+    sections.push({
+      id: "concerns",
+      label: "What concerns you",
+      body: concerns,
+    });
+  }
+
+  const opportunities = uniqueLines(
+    [...(item.opportunities ?? [])],
+    question,
+    reality,
+  );
+  if (opportunities.length) {
+    sections.push({
+      id: "opportunity",
+      label: "What opportunity you see",
+      body: opportunities,
+    });
+  }
+
+  const limits = uniqueLines(
+    [...(item.constraints ?? [])],
+    question,
+    reality,
+    ...protect,
+  );
+  if (limits.length && !sections.some((s) => s.id === "matters" && Array.isArray(s.body) && s.body.join() === limits.join())) {
+    // Only add if distinct from "what matters most"
+    if (!sections.some((s) => s.id === "matters")) {
+      sections.push({
+        id: "limits",
+        label: "What limits we need to respect",
+        body: limits,
+      });
+    } else if (protect.join("|") !== limits.join("|")) {
+      sections.push({
+        id: "limits",
+        label: "What limits we need to respect",
+        body: limits,
+      });
+    }
+  }
+
+  const observations = uniqueLines(
+    [...(item.observations ?? [])],
+    question,
+    reality,
+    ...known,
+  );
+  // Observations stay tentative — not folded into "what we know"
+  const unknownBits: string[] = [];
+  if (!reality || sameText(reality, question)) {
+    unknownBits.push("What is happening in the current situation");
+  }
+  if (!item.desiredDirection?.trim() && !item.chosenDirection?.trim()) {
+    unknownBits.push("What a good outcome would look like");
+  }
+  for (const stmt of item.memberStatements ?? []) {
+    const analysis = analyzeStrategicStatement(stmt);
+    if (analysis.nature === "unknown" || analysis.needsClarification) {
+      const line = stmt.trim();
+      if (
+        line &&
+        !sameText(line, question) &&
+        !sameText(line, reality) &&
+        !unknownBits.some((u) => sameText(u, line))
+      ) {
+        // Keep unknowns visible without repeating the opening line everywhere
+        if (!known.includes(line) && !assumptions.includes(line)) {
+          unknownBits.push(`Still unclear: ${line}`);
+        }
+      }
+    }
+  }
+  if (observations.length) {
+    // Surface observations under happening-adjacent unknown if not already shown
+    for (const obs of observations) {
+      if (!unknownBits.some((u) => u.includes(obs))) {
+        unknownBits.push(`Noticing: ${obs}`);
+      }
+    }
+  }
+  if (unknownBits.length) {
+    sections.push({
+      id: "unknown",
+      label: "What is still unknown",
+      body: uniqueLines(unknownBits),
     });
   }
 
   if (item.optionsConsidered?.length) {
     sections.push({
       id: "options",
-      label: "Options beginning to emerge",
+      label: "Options being considered",
       body: item.optionsConsidered.map((o) => o.title),
     });
   }
 
-  const open: string[] = [];
-  if (!reality || sameText(reality, question)) {
-    open.push("What is happening in the current situation");
-  }
-  if (!item.optionsConsidered?.length && (item.memberStatements?.length ?? 0) >= 1) {
-    open.push("Which directions are worth exploring");
-  }
-  if (item.optionsConsidered?.length && !item.chosenDirection?.trim()) {
-    open.push("Whether one direction feels strong enough to choose");
-  }
-  if (open.length) {
+  const toTest = uniqueLines(
+    [
+      ...(item.assumptions ?? []).map((a) => `Assumption to test: ${a}`),
+      ...(item.experiments ?? []),
+    ],
+    question,
+  );
+  if (toTest.length && (item.assumptions?.length || item.experiments?.length)) {
     sections.push({
-      id: "open",
-      label: "Questions still open",
-      body: open,
+      id: "test",
+      label: "What may need to be tested",
+      body: item.experiments?.length
+        ? uniqueLines(item.experiments, question)
+        : toTest.slice(0, 3),
     });
   }
 
-  const next =
-    item.activeQuestion?.trim() ||
-    (item.chosenDirection?.trim()
-      ? "Confirm the summary, then choose one helpful next step"
-      : "Answer the next question when you are ready");
-  sections.push({
-    id: "next",
-    label: "What may help next",
-    body: next,
-  });
+  const readiness = readinessMemberCopy(item);
+  if (readiness) {
+    sections.push({
+      id: "readiness",
+      label: "Current readiness",
+      body: readiness,
+    });
+  }
 
   return sections;
 }

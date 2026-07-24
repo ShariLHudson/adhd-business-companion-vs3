@@ -102,7 +102,7 @@ describe("Strategy Chamber conversation-first guidance", () => {
     });
     const sections = buildThinkingSummary(getStrategyWorkItem(item.id)!);
     const labels = sections.map((s) => s.id);
-    expect(labels).toContain("thinking_through");
+    expect(labels).toContain("decide");
     expect(labels).toContain("happening");
     expect(labels).not.toContain("options");
   });
