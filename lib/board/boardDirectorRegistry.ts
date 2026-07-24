@@ -257,7 +257,9 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
       "conrad hayes",
       "money",
     ],
-    portraitPath: undefined,
+    portraitPath: boardPortrait(
+      "melissa-grant-financial-stewardship-director.png",
+    ),
     galleryCardPath: boardGalleryCard("financial-stewardship"),
     isCoreDirector: true,
     isOptionalDirector: false,
@@ -402,7 +404,9 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
       "theo",
       "theo brant",
     ],
-    portraitPath: undefined,
+    portraitPath: boardPortrait(
+      "james-holloway-growth-and-opportunity-director.png",
+    ),
     galleryCardPath: boardGalleryCard("growth-opportunity"),
     isCoreDirector: false,
     isOptionalDirector: true,
@@ -451,7 +455,9 @@ const BOARD_DIRECTOR_SEEDS: readonly BoardDirectorSeed[] = [
       "helen",
       "helen cross",
     ],
-    portraitPath: undefined,
+    portraitPath: boardPortrait(
+      "laura-bennett-risk-and-resilence-director.png",
+    ),
     galleryCardPath: boardGalleryCard("risk-resilience"),
     isCoreDirector: false,
     isOptionalDirector: true,
@@ -624,32 +630,6 @@ export const BOARD_DIRECTORS: readonly BoardDirectorDefinition[] =
 const BY_ID = new Map<BoardDirectorId, BoardDirectorDefinition>(
   BOARD_DIRECTORS.map((d) => [d.id, d]),
 );
-
-/**
- * Portrait path from registry only — never hardcode a Director by name.
- * Falls back to Chair’s portrait when a path is missing.
- */
-export function resolveBoardDirectorPortraitPath(
-  director: BoardDirectorDefinition,
-): string {
-  if (director.portraitPath) return director.portraitPath;
-  const chair = BY_ID.get("board-chair");
-  if (chair?.portraitPath) return chair.portraitPath;
-  return `${BOARD_DIRECTOR_ASSET_BASE}/director-portrait-placeholder.png`;
-}
-
-/**
- * Compact Gallery Card art from registry — full designed card (layout A).
- * Never a 3-layout design sheet. Falls back to Chair’s gallery card.
- */
-export function resolveBoardDirectorGalleryCardPath(
-  director: BoardDirectorDefinition,
-): string {
-  if (director.galleryCardPath) return director.galleryCardPath;
-  const chair = BY_ID.get("board-chair");
-  if (chair?.galleryCardPath) return chair.galleryCardPath;
-  return `${BOARD_DIRECTOR_ASSET_BASE}/board-chair-gallery-portrait.png`;
-}
 
 export function getBoardDirectorById(
   id: string,

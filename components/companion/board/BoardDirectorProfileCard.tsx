@@ -5,13 +5,14 @@ import type { BoardDirectorDefinition } from "@/lib/board/types";
 import type { BoardDirectorAccordionSectionId } from "@/lib/board/directorAccordion";
 import {
   meetDirectorCtaLabel,
-  resolveBoardDirectorPortraitPath,
+  resolveBoardDirectorPortrait,
 } from "@/lib/board";
 import { BoardReviewIncludeButton } from "@/components/companion/board/BoardReviewIncludeButton";
 import { BoardDirectorProfileAccordion } from "@/components/companion/board/BoardDirectorProfileAccordion";
 import "@/app/companion/board-director-meet.css";
 
 type Props = {
+  /** Canonical director record — name, role, and portrait must share this object. */
   director: BoardDirectorDefinition;
   /** When Meet conversation is open — fade profile underneath. */
   faded?: boolean;
@@ -46,15 +47,19 @@ export function BoardDirectorProfileCard({
   openAccordionId = null,
   onToggleAccordion,
 }: Props) {
-  const portraitSrc = resolveBoardDirectorPortraitPath(director);
+  const portrait = resolveBoardDirectorPortrait(director);
   const meetLabel = meetDirectorCtaLabel(director);
 
   return (
     <article
+      key={director.id}
       className={`board-director-profile${faded ? " board-director-profile--faded" : ""}${
         portraitEnlarged ? " board-director-profile--portrait-enlarged" : ""
       }`}
       data-testid={`board-director-profile-${director.id}`}
+      data-director-id={director.id}
+      data-portrait-src={portrait.src}
+      data-portrait-source={portrait.sourceField}
       data-faded={faded ? "true" : "false"}
       aria-hidden={faded ? true : undefined}
     >
@@ -155,11 +160,13 @@ export function BoardDirectorProfileCard({
         >
           <span className="board-director-profile__portrait-frame">
             <Image
-              src={portraitSrc}
-              alt={director.name}
+              key={`${portrait.directorId}:${portrait.src}`}
+              src={portrait.src}
+              alt={portrait.alt}
               width={360}
               height={480}
               className="board-director-profile__portrait"
+              data-testid={`board-director-portrait-img-${director.id}`}
               priority
             />
           </span>

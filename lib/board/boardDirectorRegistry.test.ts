@@ -152,6 +152,20 @@ describe("Board of Directors — Slice 1 registry", () => {
     );
   });
 
+  it("wires Melissa, James, and Laura to their own portraits — not Chairman", () => {
+    const chair = getBoardDirectorById("board-chair")!;
+    const melissa = getBoardDirectorById("financial-stewardship")!;
+    const james = getBoardDirectorById("growth-opportunity")!;
+    const laura = getBoardDirectorById("risk-resilience")!;
+    expect(melissa.portraitPath).toContain("melissa-grant");
+    expect(james.portraitPath).toContain("james-holloway");
+    expect(laura.portraitPath).toContain("laura-bennett");
+    for (const d of [melissa, james, laura]) {
+      expect(resolveBoardDirectorPortraitPath(d)).toBe(d.portraitPath);
+      expect(resolveBoardDirectorPortraitPath(d)).not.toBe(chair.portraitPath);
+    }
+  });
+
   it("resolves Compact Gallery Card art for every Director (not design sheets)", () => {
     for (const d of BOARD_DIRECTORS) {
       const path = resolveBoardDirectorGalleryCardPath(d);

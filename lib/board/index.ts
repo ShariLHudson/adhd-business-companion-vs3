@@ -15,9 +15,17 @@ export {
   listCoreBoardDirectors,
   listOptionalBoardDirectors,
   resolveBoardDirectorAlias,
-  resolveBoardDirectorGalleryCardPath,
-  resolveBoardDirectorPortraitPath,
 } from "@/lib/board/boardDirectorRegistry";
+export {
+  auditBoardDirectorPortraitIntegrity,
+  resolveBoardDirectorGalleryCardPath,
+  resolveBoardDirectorPortrait,
+  resolveBoardDirectorPortraitById,
+  resolveBoardDirectorPortraitPath,
+  type BoardDirectorPortraitIntegrityRow,
+  type BoardDirectorPortraitSourceField,
+  type ResolvedBoardDirectorPortrait,
+} from "@/lib/board/resolveBoardDirectorPortrait";
 export {
   BOARD_DIRECTOR_ACCORDION_SECTION_IDS,
   BOARD_DIRECTOR_PRIMARY_ACCORDION_SECTION_IDS,

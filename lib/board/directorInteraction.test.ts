@@ -60,7 +60,7 @@ describe("Director accordion (registry-driven)", () => {
 });
 
 describe("Portrait resolution", () => {
-  it("resolves every Director to a Board portrait path (Chair fallback when missing)", () => {
+  it("resolves every Director to their own Board portrait — never Chairman borrow", () => {
     const chair = getBoardDirectorById("board-chair")!;
     for (const d of BOARD_DIRECTORS) {
       const path = resolveBoardDirectorPortraitPath(d);
@@ -68,16 +68,19 @@ describe("Portrait resolution", () => {
       expect(path).not.toMatch(/chair-of-the-board/);
       if (d.portraitPath) {
         expect(path).toBe(d.portraitPath);
-      } else {
-        expect(path).toBe(chair.portraitPath);
+      }
+      if (d.id !== "board-chair") {
+        expect(path).not.toBe(chair.portraitPath);
       }
     }
   });
 
-  it("falls back to Chair portrait from registry when path missing", () => {
+  it("falls back to same-director gallery card when portraitPath missing — not Chairman", () => {
+    const vice = getBoardDirectorById("vice-chair")!;
     const chair = getBoardDirectorById("board-chair")!;
-    const orphan = { ...chair, id: "vice-chair" as const, portraitPath: undefined };
-    expect(resolveBoardDirectorPortraitPath(orphan)).toBe(chair.portraitPath);
+    const orphan = { ...vice, portraitPath: undefined };
+    expect(resolveBoardDirectorPortraitPath(orphan)).toBe(vice.galleryCardPath);
+    expect(resolveBoardDirectorPortraitPath(orphan)).not.toBe(chair.portraitPath);
   });
 });
 
