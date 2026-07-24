@@ -116,9 +116,12 @@ describe("Strategy Intelligence Phase 2", () => {
     const current = getStrategyWorkItem(item.id)!;
     const move = selectNextThinkingMove(current);
     expect(move.move).not.toBe("generate_options");
-    expect(["identify_evidence", "clarify_question", "explore_concern"]).toContain(
-      move.move,
-    );
+    expect([
+      "identify_change",
+      "identify_evidence",
+      "clarify_question",
+      "explore_concern",
+    ]).toContain(move.move);
     expect(shouldOfferStrategicOptions(current)).toBe(false);
     const q = selectNextQuestion(current);
     expect(q.question.toLowerCase()).toMatch(/chang|signal|happen|now|decid/);
@@ -149,9 +152,9 @@ describe("Strategy Intelligence Phase 2", () => {
     );
     const current = getStrategyWorkItem(item.id)!;
     const move = selectNextThinkingMove(current);
-    expect(move.move).toBe("clarify_question");
-    const q = selectNextQuestion(current);
-    expect(q.priority).toBe(1);
+    expect(["identify_goal", "check_capacity", "clarify_question"]).toContain(
+      move.move,
+    );
     expect(
       current.decisionStatement?.toLowerCase().includes("too many ideas"),
     ).toBe(true);

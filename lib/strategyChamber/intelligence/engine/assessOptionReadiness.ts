@@ -1,5 +1,7 @@
 import type { StrategyWorkItem } from "../../types";
+import { capacityAppearsTight } from "../frameworks/capacityFit";
 import { hasCurrentReality } from "../frameworks/currentReality";
+import { assessReversibility } from "../frameworks/reversibility";
 import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 
 /**
@@ -10,6 +12,7 @@ export type OptionReadiness =
   | "needs_question_clarity"
   | "needs_goal_clarity"
   | "needs_constraints"
+  | "needs_capacity"
   | "needs_evidence"
   | "ready_for_initial_options"
   | "ready_for_comparison";
@@ -19,17 +22,36 @@ export type OptionReadinessAssessment = {
   /** True when it is helpful to show or generate options. */
   optionsReady: boolean;
   missing: string[];
+  /** Easy reversible experiments may proceed with lighter readiness. */
+  lightPathAllowed: boolean;
 };
 
+function textBlob(item: StrategyWorkItem): string {
+  return [
+    item.decisionStatement,
+    item.currentReality,
+    item.desiredDirection,
+    ...(item.memberStatements ?? []),
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 /**
- * Options wait until the strategic question, goal, constraints/capacity,
- * and at least some evidence or concern/opportunity are known.
+ * Options wait until the strategic question and desired result are clear enough.
+ * A reversible, low-risk experiment may require less information than a
+ * difficult-to-reverse decision.
  */
 export function assessOptionReadiness(
   item: StrategyWorkItem,
 ): OptionReadinessAssessment {
   const analysis = identifyStrategicQuestion(item);
   const missing: string[] = [];
+  const blob = textBlob(item);
+  const reversibility = assessReversibility(blob);
+  const lightPathAllowed =
+    reversibility === "easily_reversible" ||
+    /\b(weekly email|pilot|small experiment|try a|test)\b/i.test(blob);
 
   if (!item.decisionStatement?.trim() || analysis.needsClarification) {
     missing.push("clear strategic question");
@@ -37,24 +59,32 @@ export function assessOptionReadiness(
       readiness: "needs_question_clarity",
       optionsReady: false,
       missing,
+      lightPathAllowed,
     };
   }
 
   if (!hasCurrentReality(item) && (item.memberStatements?.length ?? 0) < 1) {
     missing.push("current situation");
-    return { readiness: "too_early", optionsReady: false, missing };
+    return {
+      readiness: "too_early",
+      optionsReady: false,
+      missing,
+      lightPathAllowed,
+    };
   }
 
   if (
     !item.desiredDirection?.trim() &&
     !(item.opportunities?.length) &&
-    (item.memberStatements?.length ?? 0) < 2
+    (item.memberStatements?.length ?? 0) < 2 &&
+    !lightPathAllowed
   ) {
     missing.push("desired result");
     return {
       readiness: "needs_goal_clarity",
       optionsReady: false,
       missing,
+      lightPathAllowed,
     };
   }
 
@@ -62,40 +92,56 @@ export function assessOptionReadiness(
     Boolean(item.knownFacts?.length) ||
     Boolean(item.observations?.length) ||
     Boolean(item.currentReality?.trim());
-  const hasConcernOrOpportunity =
-    Boolean(item.risks?.length) ||
-    Boolean(item.opportunities?.length) ||
-    Boolean(item.assumptions?.length) ||
-    (item.memberStatements?.length ?? 0) >= 2;
 
-  if (!hasEvidence) {
+  if (!hasEvidence && !lightPathAllowed) {
     missing.push("evidence or present-tense context");
-    return { readiness: "needs_evidence", optionsReady: false, missing };
+    return {
+      readiness: "needs_evidence",
+      optionsReady: false,
+      missing,
+      lightPathAllowed,
+    };
+  }
+
+  if (capacityAppearsTight(item) && !(item.constraints?.length)) {
+    missing.push("capacity");
+    return {
+      readiness: "needs_capacity",
+      optionsReady: false,
+      missing,
+      lightPathAllowed,
+    };
   }
 
   if (
     !item.constraints?.length &&
-    /\b(overwhelm|capacity|time|energy|burned? out|can't keep up)\b/i.test(
-      [
-        item.currentReality,
-        item.decisionStatement,
-        ...(item.memberStatements ?? []),
-      ]
-        .filter(Boolean)
-        .join(" "),
-    )
+    /\b(budget|cash|must keep|cannot afford|deadline)\b/i.test(blob) &&
+    !lightPathAllowed
   ) {
-    missing.push("capacity constraints");
+    missing.push("important constraints");
     return {
       readiness: "needs_constraints",
       optionsReady: false,
       missing,
+      lightPathAllowed,
     };
   }
 
-  if (!hasConcernOrOpportunity && (item.memberStatements?.length ?? 0) < 2) {
+  const hasConcernOrOpportunity =
+    Boolean(item.risks?.length) ||
+    Boolean(item.opportunities?.length) ||
+    Boolean(item.assumptions?.length) ||
+    (item.memberStatements?.length ?? 0) >= 2 ||
+    lightPathAllowed;
+
+  if (!hasConcernOrOpportunity) {
     missing.push("main concern or opportunity");
-    return { readiness: "needs_evidence", optionsReady: false, missing };
+    return {
+      readiness: "needs_evidence",
+      optionsReady: false,
+      missing,
+      lightPathAllowed,
+    };
   }
 
   if (item.optionsConsidered && item.optionsConsidered.length >= 2) {
@@ -103,6 +149,7 @@ export function assessOptionReadiness(
       readiness: "ready_for_comparison",
       optionsReady: true,
       missing: [],
+      lightPathAllowed,
     };
   }
 
@@ -110,5 +157,6 @@ export function assessOptionReadiness(
     readiness: "ready_for_initial_options",
     optionsReady: true,
     missing: [],
+    lightPathAllowed,
   };
 }

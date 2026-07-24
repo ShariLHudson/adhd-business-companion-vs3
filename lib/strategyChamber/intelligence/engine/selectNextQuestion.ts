@@ -1,6 +1,5 @@
 import type { AdaptivePresentationResolved } from "@/lib/adaptiveCompanionIntelligence";
 import type { StrategyWorkItem } from "../../types";
-import { hasCurrentReality } from "../frameworks/currentReality";
 import { capacityCheckQuestion } from "../frameworks/capacityFit";
 import { getStrategyType } from "../registry";
 import type { NextQuestionPlan, QuestionPriority } from "../types";
@@ -9,7 +8,7 @@ import { isIDontKnowResponse } from "./classifyStrategicInput";
 import { assessOptionReadiness } from "./assessOptionReadiness";
 import {
   selectNextThinkingMove,
-  type NextThinkingMove,
+  type StrategicThinkingMove,
 } from "./selectNextThinkingMove";
 
 function choice(
@@ -78,47 +77,79 @@ export function selectNextQuestion(
   const optionReady = assessOptionReadiness(item);
   const move = movePlan.move;
 
-  if (opts?.lastAnswer && isIDontKnowResponse(opts.lastAnswer)) {
-    const softChoices =
-      maxChoices <= 1
-        ? [
-            choice(
-              "smaller",
-              "A smaller question",
-              "What feels like the smallest true piece of this?",
-            ),
-          ]
-        : withElseAndSkip(
-            [
-              choice(
-                "a",
-                "Something concrete changed recently",
-                "What changed recently that brought this up?",
-              ),
-              choice(
-                "b",
-                "I am worried about a risk",
-                "What are you most worried might go wrong?",
-              ),
-              choice(
-                "c",
-                "I want a better outcome",
-                "What would a good outcome look like, even roughly?",
-              ),
-            ],
-            maxChoices,
-          );
+  if (
+    (opts?.lastAnswer && isIDontKnowResponse(opts.lastAnswer)) ||
+    movePlan.idontKnowSupport
+  ) {
+    const support = movePlan.idontKnowSupport ?? "offer_choices";
+    if (support === "smaller_question" || maxChoices <= 1) {
+      return plan(
+        1,
+        "What feels like the smallest true piece of this?",
+        "I don’t know support — smaller question; do not repeat the prior question.",
+        [
+          choice(
+            "smaller",
+            "A smaller piece",
+            "What feels like the smallest true piece of this?",
+          ),
+        ],
+        1,
+        "It is fine not to have a clear answer yet. We can take a smaller step.",
+      );
+    }
     return plan(
       1,
       "That is okay. Which feels closest right now?",
-      "Member needs a softer on-ramp after uncertainty — do not repeat the same question.",
-      softChoices,
-      maxChoices <= 1 ? 1 : Math.max(3, maxChoices),
+      "I don’t know support — choices and skip; do not repeat the prior question.",
+      withElseAndSkip(
+        [
+          choice(
+            "a",
+            "Something concrete changed recently",
+            "What changed recently that brought this up?",
+          ),
+          choice(
+            "b",
+            "I am worried about a risk",
+            "What are you most worried might go wrong?",
+          ),
+          choice(
+            "c",
+            "I want a better outcome",
+            "What would a good outcome look like, even roughly?",
+          ),
+        ],
+        maxChoices,
+      ),
+      Math.max(3, maxChoices),
       "It is fine not to have a clear answer yet. We can take a smaller step.",
     );
   }
 
-  if (move === "clarify_question" || movePlan.preferReflection && move === "reflect_understanding" && analysis.needsClarification) {
+  if (move === "reflect_understanding") {
+    return plan(
+      3,
+      "What results or signals are shaping how this feels?",
+      movePlan.reason,
+      [
+        choice(
+          "results",
+          "What results I'm seeing",
+          "What results or signals are shaping how this feels?",
+        ),
+        choice(
+          "else",
+          "Something else",
+          "What else feels important for me to understand?",
+        ),
+      ].slice(0, maxChoices),
+      maxChoices,
+      "I'm with you in what you shared — we can separate the feeling from what the numbers show.",
+    );
+  }
+
+  if (move === "clarify_question") {
     const q =
       analysis.alternateQuestions[0] ||
       type?.clarifyingQuestions[0] ||
@@ -155,14 +186,20 @@ export function selectNextQuestion(
     );
   }
 
-  if (move === "identify_evidence" || (!hasCurrentReality(item) && move !== "explore_concern")) {
+  if (
+    move === "identify_change" ||
+    move === "identify_evidence" ||
+    move === "identify_unknown"
+  ) {
     const q =
-      type?.currentStateQuestions[0] ||
-      "What changed that made this question important now?";
+      move === "identify_unknown"
+        ? "What feels most important that we still do not know?"
+        : type?.currentStateQuestions[0] ||
+          "What changed that made this question important now?";
     return plan(
       2,
       q,
-      "Understand what changed before recommending.",
+      movePlan.reason || "Understand what changed before recommending.",
       [
         choice(
           "changed",
@@ -175,9 +212,9 @@ export function selectNextQuestion(
           "What signal are you noticing?",
         ),
         choice(
-          "not_working",
-          "What is not working?",
-          "What is not working about the current situation?",
+          "unknown",
+          "What is still unclear?",
+          "What feels most important that we still do not know?",
         ),
       ].slice(0, maxChoices),
       maxChoices,
@@ -361,15 +398,19 @@ export function selectNextQuestion(
     );
   }
 
-  if (move === "compare_options" || move === "assess_risk") {
+  if (
+    move === "compare_options" ||
+    move === "assess_risk" ||
+    move === "assess_tradeoffs"
+  ) {
     return plan(
       move === "assess_risk" ? 11 : 10,
       move === "assess_risk"
         ? "What could go wrong with the direction that feels strongest?"
-        : "Which direction feels strongest right now — or would you rather keep exploring?",
-      move === "assess_risk"
-        ? "Check risk before treating a preference as a decision."
-        : "Compare trade-offs among realistic alternatives.",
+        : move === "assess_tradeoffs"
+          ? "What would each direction ask you to give up?"
+          : "Which direction feels strongest right now — or would you rather keep exploring?",
+      movePlan.reason,
       [
         choice(
           "strongest",
@@ -377,9 +418,9 @@ export function selectNextQuestion(
           "Which direction feels strongest right now?",
         ),
         choice(
-          "combine",
-          "Combine parts?",
-          "Would combining parts of these options feel better?",
+          "tradeoff",
+          "What would I give up?",
+          "What would each direction ask you to give up?",
         ),
         choice(
           "not_ready",
@@ -388,6 +429,38 @@ export function selectNextQuestion(
         ),
       ].slice(0, maxChoices),
       maxChoices,
+    );
+  }
+
+  if (
+    move === "recommend_simplifying" ||
+    move === "recommend_waiting" ||
+    move === "recommend_current_direction"
+  ) {
+    return plan(
+      12,
+      move === "recommend_waiting"
+        ? "Would waiting a little serve you better than deciding today?"
+        : move === "recommend_current_direction"
+          ? "Does staying with what you are already doing feel like the wiser move for now?"
+          : "Would it help to simplify this to one smaller decision?",
+      movePlan.reason,
+      [
+        choice(
+          "yes",
+          "That feels right",
+          "Does that direction feel true for you?",
+        ),
+        choice(
+          "else",
+          "Something else",
+          "What else feels important before we decide?",
+        ),
+      ].slice(0, maxChoices),
+      maxChoices,
+      movePlan.shouldReflectFirst
+        ? "We can keep this smaller. You do not have to solve everything at once."
+        : undefined,
     );
   }
 
@@ -537,14 +610,12 @@ export function selectNextQuestion(
 
 /** Map move → whether a new question should be asked this turn. */
 export function shouldAskAnotherQuestion(
-  move: NextThinkingMove,
+  move: StrategicThinkingMove,
   item: StrategyWorkItem,
 ): boolean {
   if (move === "recommend_handoff" && item.decisionRecordConfirmed) {
     return true;
   }
-  if (move === "reflect_understanding") return false;
-  if (move === "soften_after_uncertainty") return true; // softer path, not same Q
   if (
     move === "generate_options" &&
     !assessOptionReadiness(item).optionsReady
