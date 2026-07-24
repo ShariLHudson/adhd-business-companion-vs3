@@ -11,6 +11,7 @@ import type {
   ConversationPermission,
   ConversationResponseMode,
 } from "./conversationDecision";
+import { markSpineTurnAuthorityConsumed } from "@/lib/conversationSession/spineInvariants";
 
 export type TurnDecisionAnnotation = {
   routeSelected?: string;
@@ -138,6 +139,9 @@ export function turnAllowsNavigation(): boolean {
 }
 
 export function endTurnDecision(): void {
+  markSpineTurnAuthorityConsumed(
+    active?.annotation?.finalResponseOwner ?? "turn_decision_ended",
+  );
   active = null;
 }
 

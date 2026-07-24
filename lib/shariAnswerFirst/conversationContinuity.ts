@@ -12,6 +12,7 @@ import { decideShariResponse } from "./decideShariResponse";
 import type { ShariPrimaryHelpMode, ShariResponseDecision } from "./types";
 import type { ShariProfessionalRole } from "./professionalRoles";
 import { trackShariAnswerFirstEvent } from "./observability";
+import { reportProjectionConversationIdMismatch } from "@/lib/conversationSession/spineInvariants";
 
 export const SHARI_CONVERSATION_THREAD_KEY =
   "companion-shari-conversation-thread-v1";
@@ -186,6 +187,11 @@ export function resolveShariConversationThread(
 
   if (stored.conversationId !== current) {
     lastHydrationSource = "rejected_stale";
+    reportProjectionConversationIdMismatch({
+      projection: "shariConversationThread",
+      projectionConversationId: hydratedId,
+      spineConversationId: current,
+    });
     trackShariAnswerFirstEvent("stale_thread_rejected", {
       currentConversationId: current,
       hydratedConversationId: hydratedId,

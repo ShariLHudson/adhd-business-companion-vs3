@@ -1,7 +1,12 @@
 /**
- * Pass 2 — Conversation Session Spine
- * Single source of truth for the active relationship turn.
- * Adapters (UC, workflow, pending choice, etc.) read/write through here — never own memory.
+ * Conversation Session Spine — sole durable conversational authority.
+ *
+ * See SPINE_CONTRACT.md. Adapters (UC, Continuity, help-thread, CIE runtime)
+ * project into or from this session; they must not outrank it.
+ *
+ * Phase 0/1: identity + reset alignment.
+ * Phase 2: conversationHistory is the authoritative transcript (dual-write).
+ * Later: ownership / cert persistence migrations.
  */
 
 import type { UniversalCreationPhase } from "@/lib/universalCreation/types";
@@ -59,6 +64,8 @@ export type ConversationHistoryEntry = {
   role: "user" | "assistant";
   content: string;
   at: string;
+  /** Optional dual-write / adapter metadata — never member-facing. */
+  metadata?: Record<string, string | number | boolean | null>;
 };
 
 export type ConversationSession = {

@@ -354,7 +354,16 @@ import {
   recoverContextualHelpSessionAfterRefresh,
   resetActiveConversation,
 } from "@/lib/conversationReset";
-import { getOrCreateConversationSession } from "@/lib/conversationSession";
+import {
+  getOrCreateConversationSpine,
+  getActiveSpineConversationId,
+  markSpineTurnStarted,
+  assertSpineAssistantEmissionAllowed,
+  appendConversationSpineTurn,
+  syncCompanionViewMessagesToSpine,
+  assertViewMatchesSpineTranscript,
+  getSpineTranscriptMessages,
+} from "@/lib/conversationSession";
 import { resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
   dismissPlanMyDayForSession,
@@ -2538,9 +2547,24 @@ export default function CompanionPageClient() {
   const [activeNav, setActiveNav] = useState<SidebarNavId>("chat");
   const activeNavRef = useRef<SidebarNavId>("chat");
   activeNavRef.current = activeNav;
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessagesState] = useState<Message[]>([]);
   const messagesRef = useRef<Message[]>([]);
   messagesRef.current = messages;
+  /**
+   * Phase 2 dual-write choke point: every React transcript commit syncs to
+   * ConversationSession.conversationHistory (authoritative) before/with UI.
+   */
+  const setMessages = useCallback(
+    (update: Message[] | ((prev: Message[]) => Message[])) => {
+      setMessagesState((prev) => {
+        const next = typeof update === "function" ? update(prev) : update;
+        syncCompanionViewMessagesToSpine(prev, next);
+        assertViewMatchesSpineTranscript(next);
+        return next;
+      });
+    },
+    [],
+  );
   const [directEstateVisit, setDirectEstateVisit] = useState<DirectEstateVisit | null>(
     null,
   );
@@ -13868,6 +13892,8 @@ export default function CompanionPageClient() {
     let finalOwner = owner;
     const advisory = [...(opts?.advisoryContributions ?? [])];
 
+    assertSpineAssistantEmissionAllowed(owner);
+
     if (
       shouldCertifyCompanionDelivery({
         owner,
@@ -13876,18 +13902,24 @@ export default function CompanionPageClient() {
       })
     ) {
       const conversationId =
-        activeConversationIdRef.current || "general-chat";
+        activeConversationIdRef.current ||
+        getActiveSpineConversationId() ||
+        "general-chat";
       const userText = lastUserTextRef.current ?? "";
+      // Phase 2 — prefer spine transcript; messagesRef is view fallback only.
+      const spineTranscript = getSpineTranscriptMessages(conversationId);
+      const viewTranscript = messagesRef.current
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .map((m) => ({
+          role: m.role as "user" | "assistant",
+          content: m.content,
+        }));
       const certified = certifyCompanionDelivery({
         conversationId,
         userText,
         draftText: draft,
-        messages: messagesRef.current
-          .filter((m) => m.role === "user" || m.role === "assistant")
-          .map((m) => ({
-            role: m.role as "user" | "assistant",
-            content: m.content,
-          })),
+        messages:
+          spineTranscript.length > 0 ? spineTranscript : viewTranscript,
         owner: finalOwner,
         advisoryContributions: advisory,
       });
@@ -14275,11 +14307,18 @@ export default function CompanionPageClient() {
     if (!trimmed) return;
 
     // Cognitive pipeline / answer-first: help in chat before destination routers.
-    // Bind a durable conversationId so help-thread isolation can scope correctly.
-    if (!activeConversationIdRef.current) {
-      activeConversationIdRef.current =
-        getOrCreateConversationSession().conversationId;
-    }
+    // Bind every Companion turn to the active ConversationSession spine id.
+    const spine = getOrCreateConversationSpine();
+    activeConversationIdRef.current = spine.conversationId;
+    markSpineTurnStarted(spine.conversationId);
+    // Phase 2 — commit user turn to authoritative transcript before projections/cert.
+    appendConversationSpineTurn({
+      conversationId: spine.conversationId,
+      role: "user",
+      text: trimmed,
+      metadata: { source: "companion_handle_send" },
+      source: "companion_handle_send",
+    });
     // Isolation: help-thread must match activeConversationId or is rejected.
     const activeConversationIdForThread =
       activeConversationIdRef.current ?? null;

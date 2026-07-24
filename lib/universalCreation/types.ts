@@ -13,6 +13,7 @@ export type UniversalCreationPhase =
   | "review"
   | "revision"
   | "approval"
+  | "awaiting_action"
   | "completion";
 
 export type UniversalDocumentType =
@@ -94,6 +95,10 @@ export type UniversalCreationSession = {
   pendingEnhancements: string[];
   /** Composed draft shown during review — persisted for revision turns. */
   draftContent?: string;
+  /** True once the member approved the draft wording (not send confirmation). */
+  approvedDraft?: boolean;
+  /** Spine ConversationSession id — reject on mismatch (Phase 1). */
+  boundConversationId?: string;
 };
 
 export const UNIVERSAL_DISCOVERY_THRESHOLD = 90;

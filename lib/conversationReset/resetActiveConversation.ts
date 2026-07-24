@@ -36,6 +36,7 @@ import { clearOutcomeThread } from "@/lib/companionOutcomeThread";
 import { clearActiveTaskLockState } from "@/lib/estate/activeTaskLock";
 import { clearCollectionPendingOffer } from "@/lib/estate/collectionFramework/collectionPendingOffer";
 import { endTurnDecision } from "@/lib/conversationStabilization/turnDecisionStore";
+import { clearIntentWorkflow } from "@/lib/conversationStabilization/intentWorkflowStore";
 import { clearBoardIntakeDraft } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
 import { consumeCallTheBoard } from "@/lib/board/callTheBoard";
 import {
@@ -46,6 +47,8 @@ import {
 import { resetShariConversationThreadForNewConversation } from "@/lib/shariAnswerFirst/conversationContinuity";
 import { clearShariConversationHandoff } from "@/lib/shariAnswerFirst/conversationHandoff";
 import { clearActiveTopic } from "@/lib/conversationStabilization/activeTopicStore";
+import { clearGeneralChatCertifiedRuntime } from "@/lib/certifiedConversation/generalChatCertifiedState";
+import { markSpineTurnAuthorityConsumed } from "@/lib/conversationSession/spineInvariants";
 
 /** Keep in sync with CONTEXTUAL_HELP_SESSION_STORAGE_KEY (avoid importing that module). */
 const CONTEXTUAL_HELP_SESSION_STORAGE_KEY =
@@ -99,7 +102,11 @@ export type ResetActiveConversationResult = {
 
 /**
  * Tear down the active conversation thread and start a clean one.
+ * Authoritative reset for New Chat and New Day (via runSharedNewDay).
  * Does not touch prefs, rhythms, reminders, calendar, or saved projects.
+ *
+ * Clears Continuity, UC, Shari help-thread, ActiveTopic, IntentWorkflow,
+ * turn decisions, generalChatCertifiedRuntime, and other conversation-scoped caches.
  */
 export function resetActiveConversation(
   input: ResetActiveConversationInput,
@@ -136,10 +143,13 @@ export function resetActiveConversation(
   clearBoardIntakeDraft();
   consumeCallTheBoard();
 
-  // ActiveTopic + Shari help-thread / handoff must not survive New Chat / New Day.
-  // Long-term Business Estate / profile remain untouched.
+  // ActiveTopic + Shari help-thread / handoff / IntentWorkflow / CIE cert runtime
+  // must not survive New Chat / New Day. Long-term profile remains untouched.
   clearActiveTopic();
+  clearIntentWorkflow();
   clearShariConversationHandoff();
+  clearGeneralChatCertifiedRuntime();
+  markSpineTurnAuthorityConsumed("reset");
 
   const next = getOrCreateConversationSession();
   resetShariConversationThreadForNewConversation({

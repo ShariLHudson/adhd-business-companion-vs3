@@ -1,6 +1,7 @@
 /**
  * Sticky ownership pointer — IDs and awaiting-answer only.
  * Does not duplicate Universal Creation drafts, Board history, or projects.
+ * Projection of ConversationSession spine — must match active conversationId.
  */
 
 import {
@@ -8,6 +9,8 @@ import {
   type ConversationOwner,
   type PersistedConversationOwnerPointer,
 } from "./types";
+import { getActiveSpineConversationId } from "@/lib/conversationSession/spine";
+import { reportProjectionConversationIdMismatch } from "@/lib/conversationSession/spineInvariants";
 
 function storage(): Storage | null {
   if (typeof window === "undefined") return null;
@@ -26,12 +29,14 @@ export function pointerFromOwner(
     return null;
   }
 
+  const spineId = getActiveSpineConversationId() ?? undefined;
   const base = {
     awaitingAnswer:
       "awaitingAnswer" in owner ? Boolean(owner.awaitingAnswer) : false,
     returnDestinationId: extras?.returnDestinationId,
     topic: extras?.topic ?? ("topic" in owner ? owner.topic : undefined),
     updatedAt: new Date().toISOString(),
+    conversationId: spineId,
   };
 
   switch (owner.kind) {
@@ -93,6 +98,19 @@ export function loadConversationOwnerPointer(): PersistedConversationOwnerPointe
     if (!raw) return null;
     const parsed = JSON.parse(raw) as PersistedConversationOwnerPointer;
     if (!parsed?.kind || !parsed?.id) return null;
+    const spineId = getActiveSpineConversationId();
+    const projId = parsed.conversationId?.trim() || "";
+    // Explicit foreign spine id → ignore. Legacy pointers without id still load
+    // until next persist stamps conversationId (reset already clears Continuity).
+    if (projId && spineId && projId !== spineId) {
+      reportProjectionConversationIdMismatch({
+        projection: "continuityOwner",
+        projectionConversationId: projId,
+        spineConversationId: spineId,
+      });
+      s.removeItem(CONVERSATION_OWNER_STORAGE_KEY);
+      return null;
+    }
     return parsed;
   } catch {
     return null;

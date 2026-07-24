@@ -65,6 +65,8 @@ import {
   isConversationSessionSpineEnabled,
   syncUniversalCreationToSession,
 } from "@/lib/conversationSession";
+import { getActiveSpineConversationId } from "@/lib/conversationSession/spine";
+import { reportProjectionConversationIdMismatch } from "@/lib/conversationSession/spineInvariants";
 import {
   isCreateFlowAssistantContext,
   isUniversalCreationMessage,
@@ -145,23 +147,58 @@ export function shouldEnterUniversalCreation(userText: string): boolean {
   return !isUniversalDiscoveryComplete(session.confidence);
 }
 
+function bindSessionToActiveSpine(
+  session: UniversalCreationSession,
+): UniversalCreationSession {
+  if (session.boundConversationId?.trim()) return session;
+  const spineId = getActiveSpineConversationId();
+  if (!spineId) return session;
+  return { ...session, boundConversationId: spineId };
+}
+
+function rejectForeignUniversalCreationSession(
+  session: UniversalCreationSession | null,
+): UniversalCreationSession | null {
+  if (!session) return null;
+  const spineId = getActiveSpineConversationId();
+  const bound = session.boundConversationId?.trim() || "";
+  // Explicit foreign spine id → ignore. Legacy sessions without bind still load
+  // until next save stamps boundConversationId (reset already clears UC).
+  if (bound && spineId && bound !== spineId) {
+    reportProjectionConversationIdMismatch({
+      projection: "universalCreationSession",
+      projectionConversationId: bound,
+      spineConversationId: spineId,
+    });
+    memoryUniversalCreationSession = null;
+    const storage =
+      typeof window !== "undefined" && window.localStorage
+        ? window.localStorage
+        : null;
+    storage?.removeItem(STORAGE_KEY);
+    return null;
+  }
+  return session;
+}
+
 export function saveUniversalCreationSession(
   session: UniversalCreationSession | null,
 ): void {
-  memoryUniversalCreationSession = session;
+  const bound = session ? bindSessionToActiveSpine(session) : null;
+  memoryUniversalCreationSession = bound;
   const storage =
     typeof window !== "undefined" && window.localStorage
       ? window.localStorage
       : null;
   if (!storage) return;
   try {
-    if (!session) {
+    if (!bound) {
       storage.removeItem(STORAGE_KEY);
       return;
     }
-    storage.setItem(STORAGE_KEY, JSON.stringify(session));
+    storage.setItem(STORAGE_KEY, JSON.stringify(bound));
     if (isConversationSessionSpineEnabled()) {
-      syncUniversalCreationToSession(session);
+      syncUniversalCreationToSession(bound);
     }
   } catch {
     // Memory session still holds — storage may be unavailable in tests/SSR.
@@ -169,7 +206,9 @@ export function saveUniversalCreationSession(
 }
 
 export function loadUniversalCreationSession(): UniversalCreationSession | null {
-  if (memoryUniversalCreationSession) return memoryUniversalCreationSession;
+  if (memoryUniversalCreationSession) {
+    return rejectForeignUniversalCreationSession(memoryUniversalCreationSession);
+  }
   const storage =
     typeof window !== "undefined" && window.localStorage
       ? window.localStorage
@@ -178,7 +217,9 @@ export function loadUniversalCreationSession(): UniversalCreationSession | null 
   try {
     const raw = storage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as UniversalCreationSession;
+    const parsed = JSON.parse(raw) as UniversalCreationSession;
+    memoryUniversalCreationSession = parsed;
+    return rejectForeignUniversalCreationSession(parsed);
   } catch {
     return null;
   }

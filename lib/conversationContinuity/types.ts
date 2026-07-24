@@ -76,6 +76,8 @@ export type PersistedConversationOwnerPointer = {
   returnDestinationId?: string;
   topic?: string;
   updatedAt: string;
+  /** Spine ConversationSession id — reject on mismatch (Phase 1). */
+  conversationId?: string;
 };
 
 export type ResolveActiveOwnerInput = {

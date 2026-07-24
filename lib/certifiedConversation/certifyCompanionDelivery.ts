@@ -9,6 +9,10 @@
  */
 
 import { classifyTurnRecovery, shouldRepairOrResumeTask } from "@/lib/shariAnswerFirst/turnRecovery";
+import {
+  assertCertReadsSpineTranscript,
+  getSpineTranscriptMessages,
+} from "@/lib/conversationSession/transcriptAuthority";
 import { certifyConversationDelivery } from "./certifyConversationDelivery";
 import {
   getGeneralChatCertifiedRuntime,
@@ -99,13 +103,25 @@ export function certifyCompanionDelivery(
     Boolean(input.repairActive) || shouldRepairOrResumeTask(recovery);
   const prior = getGeneralChatCertifiedRuntime(input.conversationId);
 
+  // Phase 2 — ConversationSession.conversationHistory is certification truth.
+  // Caller messages remain a fallback view when spine history is empty.
+  const spineMessages = getSpineTranscriptMessages(input.conversationId);
+  const messages: readonly CertifiedConversationMessage[] =
+    spineMessages.length > 0 ? spineMessages : input.messages;
+  if (spineMessages.length > 0) {
+    // Warn only when a non-empty view disagrees with the spine we are using.
+    if (input.messages.length > 0) {
+      assertCertReadsSpineTranscript(input.messages, input.conversationId);
+    }
+  }
+
   const certified = certifyConversationDelivery({
     experienceId: "general-chat",
     behaviorMode: "companion",
     conversationId: input.conversationId || "general-chat",
     userText: input.userText,
     draftText: input.draftText,
-    messages: input.messages,
+    messages,
     priorTopicAnchor: prior?.topicAnchor ?? null,
     priorCieState: prior?.cieState ?? null,
     repairActive,

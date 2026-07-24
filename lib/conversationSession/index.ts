@@ -1,5 +1,6 @@
 /**
- * Pass 2 — Conversation Session Spine (public API).
+ * Conversation Session Spine (public API).
+ * Contract: ./SPINE_CONTRACT.md
  */
 
 export type {
@@ -30,6 +31,39 @@ export {
   resetConversationSessionMemoryForTests,
   saveConversationSession,
 } from "./store";
+
+export {
+  CONVERSATION_STORE_CLASSIFICATION,
+  getOrCreateConversationSpine,
+  getConversationSpine,
+  getActiveSpineConversationId,
+  patchConversationSpine,
+  projectionMatchesActiveSpine,
+  type ConversationStoreClassification,
+} from "./spine";
+
+export {
+  appendConversationSpineTurn,
+  replaceLastSpineAssistantTurn,
+  getSpineTranscriptMessages,
+  syncCompanionViewMessagesToSpine,
+  assertViewMatchesSpineTranscript,
+  assertCertReadsSpineTranscript,
+  type SpineTurnAppendInput,
+  type SpineTranscriptMessage,
+} from "./transcriptAuthority";
+
+export {
+  logSpineInvariant,
+  markSpineTurnStarted,
+  markSpineTurnAuthorityConsumed,
+  markSpineTranscriptCommitted,
+  assertSpineAssistantEmissionAllowed,
+  reportProjectionConversationIdMismatch,
+  resetSpineTurnGateForTests,
+  getSpineTurnGateForTests,
+  type SpineInvariantKind,
+} from "./spineInvariants";
 
 export {
   findAnswerForSlot,
