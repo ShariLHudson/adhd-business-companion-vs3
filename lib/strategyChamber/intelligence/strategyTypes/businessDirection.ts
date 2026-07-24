@@ -75,6 +75,23 @@ export const businessDirectionStrategyType: StrategyTypeContract = {
       preferredPatterns: ["narrow", "simplify", "test"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "What is the real direction decision — focus, north star, or what to stop pursuing?",
+    "What is working in the current direction that should be protected?",
+    "What would a good season make possible without locking forever?",
+    "Which competing paths can wait without being lost?",
+  ],
+  recommendationRules: [
+    "Prefer naming what will not be pursued alongside the chosen direction.",
+    "Prefer a season-sized direction when uncertainty is high.",
+    "Do not recommend growth language when the need is focus.",
+    "Prefer narrow or test when too many paths compete.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until direction and not-pursuing are both named.",
+    "Board is for high-stakes direction challenges; Plan My Day is for living the choice.",
+    "Do not hand to Project until the primary direction is chosen.",
+  ],
   guidingPrinciples: [
     "Direction includes what you will not pursue.",
     "Growth is not the default conclusion.",

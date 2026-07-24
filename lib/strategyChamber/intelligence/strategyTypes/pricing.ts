@@ -170,6 +170,23 @@ export const pricingStrategyType: StrategyTypeContract = {
       preferredPatterns: ["restructure_price", "add_value", "protect_current_base"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "Is value clear enough that price is the real decision?",
+    "Are we deciding for new customers, existing customers, or both?",
+    "Would clarifying packaging or tiers change the number?",
+    "What must stay true for trust if the price moves?",
+  ],
+  recommendationRules: [
+    "Prefer value clarification before recommending a raise.",
+    "Prefer protect or grandfather when existing customers fund the business.",
+    "Prefer testing new price with new customers before changing everyone.",
+    "Do not recommend lowering price to fix an offer or positioning problem.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until value vs price is distinguished.",
+    "Do not hand to Create for sales pages before the pricing direction is clear.",
+    "Board is appropriate for high-stakes across-the-board raises; Project only after the decision.",
+  ],
   guidingPrinciples: [
     "Price is a strategy decision, not only a number change.",
     "Value before price when the promise is unclear.",

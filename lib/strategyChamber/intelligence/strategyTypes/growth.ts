@@ -189,6 +189,23 @@ export const growthStrategyType: StrategyTypeContract = {
       preferredPatterns: ["delay", "stabilize", "test"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "Which bottleneck is real — awareness, positioning, offer, sales, retention, or capacity?",
+    "If growth worked tomorrow, could delivery hold?",
+    "Is “more customers” the goal, or more revenue, retention, or relief?",
+    "Would not growing yet be the honest answer this season?",
+  ],
+  recommendationRules: [
+    "Diagnose the bottleneck before recommending acquisition tactics.",
+    "Prefer stabilize or delay when capacity is the constraint.",
+    "Prefer retention repair before pouring more acquisition into a leaky base.",
+    "“Do not grow yet” is a valid recommendation.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until the growth bottleneck is named.",
+    "Do not hand to Create/marketing execution while the diagnosis is still “more customers.”",
+    "Project handoff only after a bounded growth experiment or direction is chosen.",
+  ],
   guidingPrinciples: [
     "Do not default to “get more customers.”",
     "Sometimes the answer is: do not grow yet.",

@@ -159,8 +159,27 @@ export type StrategyTypeContract = {
   /**
    * Phase 4 Domain Intelligence — how this domain thinks.
    * Same judgment engine; different knowledge contribution.
+   *
+   * Contribution checklist (binding):
+   * - entrySignals
+   * - hiddenUnderlyingQuestions
+   * - evidencePrompts (evidence needed)
+   * - commonAssumptions (common false assumptions)
+   * - optionPatterns
+   * - commonTradeoffs (material trade-offs)
+   * - commonRisks (risk patterns)
+   * - capacityChecks
+   * - experimentPatterns
+   * - recommendationRules (+ decisionHeuristics)
+   * - handoffBoundaries (+ handoffDestinations)
    */
   decisionHeuristics: DomainDecisionHeuristic[];
+  /** Questions under the stated ask — what Spark listens for beneath the surface. */
+  hiddenUnderlyingQuestions: string[];
+  /** Domain rules that shape recommendations (never auto-decisions). */
+  recommendationRules: string[];
+  /** When not to leave Strategy / what must stay true before handoff. */
+  handoffBoundaries: string[];
   commonMistakes: string[];
   warningSigns: string[];
   problemDistinctions: DomainProblemDistinction[];

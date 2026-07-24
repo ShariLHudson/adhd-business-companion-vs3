@@ -10,6 +10,7 @@ import {
 } from "@/lib/strategyChamber";
 import {
   analyzeStrategyWorkItem,
+  DOMAIN_INTELLIGENCE_BUILD_ORDER,
   DOMAIN_INTELLIGENCE_IDS,
   familyForStrategyTypeId,
   generateFullStrategicOptions,
@@ -21,6 +22,7 @@ import {
   matchProblemDistinction,
   resolveDomainForDecision,
   shouldOfferStrategicOptions,
+  summarizeDomainContributions,
 } from "@/lib/strategyChamber/intelligence";
 
 function seedReadyForOptions(decisionStatement: string) {
@@ -47,30 +49,53 @@ describe("Strategy Intelligence Phase 4 — Domain Intelligence", () => {
     __resetAdaptiveCompanionExplicitPrefsForTests();
   });
 
-  it("registers eleven strategy types including partnership", () => {
+  it("registers eleven strategy types in Phase 4 build order", () => {
     expect(listStrategyTypes()).toHaveLength(11);
     expect(listStrategyTypes().some((t) => t.id === "partnership")).toBe(true);
+    expect(DOMAIN_INTELLIGENCE_BUILD_ORDER).toEqual([
+      "pricing",
+      "growth",
+      "offer",
+      "market_customer",
+      "capacity_focus",
+      "hiring_delegation",
+      "partnership",
+      "pivot_rethink",
+      "personal_direction",
+      "business_direction",
+      "ninety_day",
+    ]);
     expect(listDomainIntelligenceModules()).toHaveLength(
       DOMAIN_INTELLIGENCE_IDS.length,
     );
-    expect(DOMAIN_INTELLIGENCE_IDS).toHaveLength(9);
+    expect(DOMAIN_INTELLIGENCE_BUILD_ORDER).toHaveLength(11);
   });
 
-  it("every domain pack contributes Phase 4 knowledge fields", () => {
+  it("every domain pack contributes the full Phase 4 checklist", () => {
     for (const domain of listDomainIntelligenceModules()) {
       expect(domain.version).toBe(2);
+      expect(domain.entrySignals.length).toBeGreaterThan(0);
+      expect(domain.hiddenUnderlyingQuestions.length).toBeGreaterThan(0);
+      expect(domain.evidencePrompts.length).toBeGreaterThan(0);
+      expect(domain.commonAssumptions.length).toBeGreaterThan(0);
+      expect(domain.optionPatterns.length).toBeGreaterThan(0);
+      expect(domain.commonTradeoffs.length).toBeGreaterThan(0);
+      expect(domain.commonRisks.length).toBeGreaterThan(0);
+      expect(domain.capacityChecks.length).toBeGreaterThan(0);
+      expect(domain.experimentPatterns.length).toBeGreaterThan(0);
+      expect(domain.recommendationRules.length).toBeGreaterThan(0);
+      expect(domain.handoffBoundaries.length).toBeGreaterThan(0);
+      expect(domain.handoffDestinations.length).toBeGreaterThan(0);
       expect(domain.decisionHeuristics.length).toBeGreaterThan(0);
       expect(domain.commonMistakes.length).toBeGreaterThan(0);
       expect(domain.warningSigns.length).toBeGreaterThan(0);
       expect(domain.problemDistinctions.length).toBeGreaterThan(0);
       expect(domain.guidingPrinciples.length).toBeGreaterThan(0);
-      expect(domain.commonAssumptions.length).toBeGreaterThan(0);
-      expect(domain.commonRisks.length).toBeGreaterThan(0);
-      expect(domain.experimentPatterns.length).toBeGreaterThan(0);
-      expect(domain.commonTradeoffs.length).toBeGreaterThan(0);
-      expect(domain.capacityChecks.length).toBeGreaterThan(0);
-      expect(domain.handoffDestinations.length).toBeGreaterThan(0);
       expect(isDomainIntelligenceId(domain.id)).toBe(true);
+      const summary = summarizeDomainContributions(domain);
+      expect(summary.hiddenUnderlyingQuestions.length).toBeGreaterThan(0);
+      expect(summary.recommendationRules.length).toBeGreaterThan(0);
+      expect(summary.handoffBoundaries.length).toBeGreaterThan(0);
     }
   });
 

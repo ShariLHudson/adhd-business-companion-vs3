@@ -168,6 +168,23 @@ export const personalDirectionStrategyType: StrategyTypeContract = {
       preferredPatterns: ["simplify", "stabilize", "narrow"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "What personal decision sits under the business question?",
+    "What season are we actually in — building, sustaining, recovering, or transitioning?",
+    "Would an intentional pause protect what matters most?",
+    "Does the “winning” path still fit energy and life priorities?",
+  ],
+  recommendationRules: [
+    "Name the season before recommending pace or ambition.",
+    "Treat intentional pause as a valid strategic recommendation.",
+    "Prefer energy-fit paths over prestige paths that deplete.",
+    "Never shame a slower season in recommendation language.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy (or Talk It Out) until the personal decision under the business ask is clear.",
+    "Journal/Rhythm can hold the season — they do not replace the direction choice.",
+    "Do not hand to Project for more building while the honest need is pause or alignment.",
+  ],
   guidingPrinciples: [
     "Personal direction is a first-class strategy domain — not an afterthought.",
     "Intentional pauses can be wise strategy.",

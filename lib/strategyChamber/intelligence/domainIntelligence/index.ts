@@ -1,4 +1,5 @@
 export {
+  DOMAIN_INTELLIGENCE_BUILD_ORDER,
   DOMAIN_INTELLIGENCE_IDS,
   familyForStrategyTypeId,
   getDomainIntelligence,
@@ -10,3 +11,8 @@ export {
   domainPrefersRestraint,
   resolveDomainForDecision,
 } from "./registry";
+export {
+  nextHiddenUnderlyingQuestion,
+  summarizeDomainContributions,
+  type DomainContributionSummary,
+} from "./contributions";

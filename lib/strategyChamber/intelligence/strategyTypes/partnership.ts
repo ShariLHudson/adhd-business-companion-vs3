@@ -161,6 +161,23 @@ export const partnershipStrategyType: StrategyTypeContract = {
       preferredPatterns: ["test", "delay", "partner"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "What would this partnership make possible that we cannot do alone?",
+    "Are values and decision rights clear enough to proceed?",
+    "What does a clean exit look like if this does not work?",
+    "Would a small pilot answer the biggest unknown?",
+  ],
+  recommendationRules: [
+    "Prefer a pilot before deep commitment.",
+    "Prefer delay or decline when values or decision rights are vague.",
+    "Require a believable exit path before recommending commitment.",
+    "Declining is a valid partnership recommendation.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until fit, rights, and exit path are addressed.",
+    "Board challenge is appropriate for high-stakes partnerships; legal detail is not Strategy’s job.",
+    "Do not hand to Project for joint delivery before the partnership decision is clear.",
+  ],
   guidingPrinciples: [
     "Pilot before commitment.",
     "Strategic fit and values beat opportunity size.",

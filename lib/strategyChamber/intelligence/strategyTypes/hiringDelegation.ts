@@ -170,6 +170,23 @@ export const hiringDelegationStrategyType: StrategyTypeContract = {
       preferredPatterns: ["delay", "automate", "simplify"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "What work needs relief — and is it clear enough to hand off?",
+    "Can this be automated or simplified before adding a person?",
+    "Is a contractor pilot wiser than a hire right now?",
+    "Is there capacity and cash to train and manage help?",
+  ],
+  recommendationRules: [
+    "Name the work needing relief before recommending a role.",
+    "Prefer automate or simplify when the work is messy or repetitive.",
+    "Prefer contractor or pilot when the role is still forming.",
+    "Do not recommend hiring as the only relief path.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until relief work and readiness are clear.",
+    "Do not hand to Create for a job post before the hire/delegate decision is made.",
+    "Project can run onboarding after the decision — not instead of it.",
+  ],
   guidingPrinciples: [
     "Do not default to “hire someone.”",
     "Relief → clarify work → automate/simplify → pilot → hire.",

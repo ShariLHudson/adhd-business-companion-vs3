@@ -4,10 +4,12 @@
 
 import type { AdaptivePresentationResolved } from "@/lib/adaptiveCompanionIntelligence";
 import type { StrategyWorkItem } from "../../types";
+import { getDomainIntelligence } from "../domainIntelligence";
 import type { StrategicOption } from "../optionContract";
 import { memberFacingOptionName } from "../optionContract";
 import { generateFullStrategicOptions } from "./generateOptions";
 import { shouldOfferStrategicOptions } from "./generateOptions";
+import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 
 export type StrategicRecommendation = {
   /** Leading option — recommendation only. */
@@ -45,6 +47,35 @@ function scoreOption(option: StrategicOption, item: StrategyWorkItem): number {
   if (option.optionPattern === "test") score += 1;
   if (option.confidence === "high") score += 1;
   if (option.confidence === "low") score -= 1;
+
+  // Phase 4 — domain recommendation rules bias scoring (never auto-decide)
+  const analysis = identifyStrategicQuestion(item);
+  const domain = getDomainIntelligence(analysis.strategyTypeId);
+  const rules = (domain?.recommendationRules ?? []).join(" ").toLowerCase();
+  if (rules) {
+    if (/do not grow|stabilize|delay/.test(rules) && option.optionPattern === "expand") {
+      score -= 2;
+    }
+    if (/last resort|staged|diagnose/.test(rules) && option.optionPattern === "stop") {
+      score -= 1;
+    }
+    if (/pilot|test/.test(rules) && option.optionPattern === "test") score += 2;
+    if (/value|grandfather|protect/.test(rules) &&
+      ["add_value", "protect_current_base", "staged_transition"].includes(option.optionPattern)
+    ) {
+      score += 2;
+    }
+    if (/simplify|stop doing|pause/.test(rules) &&
+      ["simplify", "stop", "pause", "narrow"].includes(option.optionPattern)
+    ) {
+      score += 2;
+    }
+    if (/automate|contractor|pilot/.test(rules) &&
+      ["automate", "delegate", "test", "delay"].includes(option.optionPattern)
+    ) {
+      score += 1;
+    }
+  }
   return score;
 }
 

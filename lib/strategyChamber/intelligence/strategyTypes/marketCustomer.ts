@@ -169,6 +169,23 @@ export const marketCustomerStrategyType: StrategyTypeContract = {
       preferredPatterns: ["improve", "protect_current_base", "stabilize"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "Are we attracting the wrong people, speaking too broadly, or unclear with the right people?",
+    "Who already succeeds with us — and who will we not prioritize this season?",
+    "Is this a market choice or a journey/retention problem after the first yes?",
+    "What language do best-fit customers already use?",
+  ],
+  recommendationRules: [
+    "Start ICP from who already succeeds, not from a fantasy market.",
+    "Prefer narrowing before spending on reach when messaging is generic.",
+    "Distinguish wrong audience from broken journey before recommending repositioning.",
+    "Do not treat “more awareness” as the default market answer.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until who-we-serve / who-we-do-not is clear enough.",
+    "Create/marketing handoff only after the segment and message direction are chosen.",
+    "Business Estate for customer facts; Strategy keeps the market decision.",
+  ],
   guidingPrinciples: [
     "Who you do not serve is part of market strategy.",
     "Customer language is evidence, not decoration.",

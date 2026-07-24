@@ -1,5 +1,6 @@
 import type { AdaptivePresentationResolved } from "@/lib/adaptiveCompanionIntelligence";
 import type { StrategyWorkItem } from "../../types";
+import { nextHiddenUnderlyingQuestion } from "../domainIntelligence";
 import { capacityCheckQuestion } from "../frameworks/capacityFit";
 import { getStrategyType } from "../registry";
 import type { NextQuestionPlan, QuestionPriority } from "../types";
@@ -150,8 +151,20 @@ export function selectNextQuestion(
   }
 
   if (move === "clarify_question") {
+    const hidden = nextHiddenUnderlyingQuestion(
+      type,
+      [
+        item.decisionStatement,
+        item.currentReality,
+        item.desiredDirection,
+        ...(item.memberStatements ?? []),
+      ]
+        .filter(Boolean)
+        .join(" "),
+    );
     const q =
       analysis.alternateQuestions[0] ||
+      hidden ||
       type?.clarifyingQuestions[0] ||
       "What feels most important to decide here?";
     return plan(

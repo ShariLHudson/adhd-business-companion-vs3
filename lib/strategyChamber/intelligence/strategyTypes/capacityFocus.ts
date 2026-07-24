@@ -171,6 +171,23 @@ export const capacityFocusStrategyType: StrategyTypeContract = {
       preferredPatterns: ["narrow", "stabilize", "simplify"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "Is the load too many priorities, too many offers, or hidden maintenance?",
+    "What three things could stop to create real room?",
+    "Is energy the constraint even if the calendar looks free?",
+    "Are we adding systems when we need to remove work?",
+  ],
+  recommendationRules: [
+    "Prefer stop, pause, or simplify before adding new initiatives.",
+    "Count hidden maintenance as real capacity cost.",
+    "Treat energy constraints as strategic data, not personal failure.",
+    "Sometimes the best recommendation is: stop doing three things.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until what-to-stop is named alongside what-to-pursue.",
+    "Plan My Day / Rhythm can hold the chosen focus — they do not make the focus decision.",
+    "Do not hand to Project for more work while capacity strategy is still “do everything.”",
+  ],
   guidingPrinciples: [
     "Doing less can be the highest-leverage strategy.",
     "Especially for ADHD users: reduce decisions and open loops.",

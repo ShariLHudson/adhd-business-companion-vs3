@@ -181,6 +181,23 @@ export const pivotRethinkStrategyType: StrategyTypeContract = {
       preferredPatterns: ["delay", "pause", "test"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "What kind of “not working” is this — temporary, messaging, offer, market, execution, strategy, or timing?",
+    "What still works that we must not throw away?",
+    "What evidence would justify a full pivot versus a smaller correction?",
+    "Have we tried improve / narrow / reposition before starting over?",
+  ],
+  recommendationRules: [
+    "Treat a full pivot as a last resort, not the first recommendation.",
+    "Prefer diagnose-and-adjust before recommending start-over.",
+    "Prefer staged transition or limited test before full pivot.",
+    "Preserve what still works in every recommendation.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until the failure mode is named.",
+    "Board/Devil’s Advocate is appropriate before irreversible pivots.",
+    "Do not hand to Create/rebrand execution while diagnosis is still “everything is wrong.”",
+  ],
   guidingPrinciples: [
     "A pivot should be a last resort, not the first recommendation.",
     "Diagnose the failure mode before changing identity.",

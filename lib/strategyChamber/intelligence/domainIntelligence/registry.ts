@@ -2,6 +2,11 @@
  * Phase 4 — Domain Intelligence Registry.
  * Strategy Chamber loads the relevant domain from what the member is deciding.
  * Same judgment engine; different knowledge contribution per domain.
+ *
+ * Build order (canonical milestone sequence):
+ * Pricing → Growth → Offer → Customer/Market → Capacity/Focus →
+ * Hiring/Delegation → Partnership → Pivot/Rethink → Personal Direction →
+ * Business Direction / 90-Day Strategy
  */
 
 import type { StrategyFamilyId } from "../../types";
@@ -17,8 +22,8 @@ import type {
   StrategyTypeId,
 } from "../types";
 
-/** Signature Domain Intelligence modules (excludes general business / 90-day shells). */
-export const DOMAIN_INTELLIGENCE_IDS: readonly StrategyTypeId[] = [
+/** Full Phase 4 domain build order — all modules that plug into the engine. */
+export const DOMAIN_INTELLIGENCE_BUILD_ORDER: readonly StrategyTypeId[] = [
   "pricing",
   "growth",
   "offer",
@@ -28,16 +33,23 @@ export const DOMAIN_INTELLIGENCE_IDS: readonly StrategyTypeId[] = [
   "partnership",
   "pivot_rethink",
   "personal_direction",
+  "business_direction",
+  "ninety_day",
 ] as const;
+
+/** @deprecated Prefer DOMAIN_INTELLIGENCE_BUILD_ORDER — kept for callers expecting “signature nine”. */
+export const DOMAIN_INTELLIGENCE_IDS = DOMAIN_INTELLIGENCE_BUILD_ORDER;
 
 export function isDomainIntelligenceId(
   id: StrategyTypeId | string | null | undefined,
 ): boolean {
-  return Boolean(id && (DOMAIN_INTELLIGENCE_IDS as readonly string[]).includes(id));
+  return Boolean(
+    id && (DOMAIN_INTELLIGENCE_BUILD_ORDER as readonly string[]).includes(id),
+  );
 }
 
 export function listDomainIntelligenceModules(): StrategyTypeContract[] {
-  return DOMAIN_INTELLIGENCE_IDS.map((id) => getStrategyType(id)).filter(
+  return DOMAIN_INTELLIGENCE_BUILD_ORDER.map((id) => getStrategyType(id)).filter(
     (t): t is StrategyTypeContract => Boolean(t),
   );
 }

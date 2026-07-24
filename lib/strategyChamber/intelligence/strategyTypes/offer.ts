@@ -171,6 +171,23 @@ export const offerStrategyType: StrategyTypeContract = {
       preferredPatterns: ["simplify", "narrow", "stabilize"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "Is this an offer-market fit problem, a clarity problem, or a delivery burden problem?",
+    "What should we stop offering so the main offer can be clear?",
+    "Have we validated demand before building more?",
+    "What outcome does the right customer actually get?",
+  ],
+  recommendationRules: [
+    "Prefer simplification when prospects are confused.",
+    "Prefer demand validation before recommending a heavy new offer build.",
+    "Prefer retiring or pausing offers that drain capacity or confuse the market.",
+    "Do not recommend more features when fit is unclear.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until what-to-offer and what-not-to-offer are named.",
+    "Create is for shaping the chosen offer — not for deciding which offer exists.",
+    "Do not hand to Project for a full launch before a pilot or validation path exists.",
+  ],
   guidingPrinciples: [
     "Offer strategy includes what you will stop offering.",
     "Validate demand before heavy building.",

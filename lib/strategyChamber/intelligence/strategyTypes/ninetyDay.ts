@@ -61,6 +61,23 @@ export const ninetyDayStrategyType: StrategyTypeContract = {
       preferredPatterns: ["narrow", "delay", "stabilize"],
     },
   ],
+  hiddenUnderlyingQuestions: [
+    "What one outcome deserves priority this quarter?",
+    "What unfinished work already claims these 90 days?",
+    "What will we intentionally not pursue until review?",
+    "What mid-point signals will tell us to continue, adjust, or stop?",
+  ],
+  recommendationRules: [
+    "Prefer one primary 90-day outcome over a wishlist.",
+    "Prefer explicit not-pursuing lists in every recommendation.",
+    "Prefer review gates at day 30/60 before expanding scope.",
+    "Do not recommend compressing an annual plan into 90 days.",
+  ],
+  handoffBoundaries: [
+    "Stay in Strategy until the quarter focus and not-pursuing list exist.",
+    "Calendar/Plan My Day hold the season schedule after the focus decision.",
+    "Project handoff only for the chosen outcome — not for every idea on the wishlist.",
+  ],
   guidingPrinciples: [
     "90 days is a reviewable season, not forever.",
     "What you will not pursue this quarter is part of the strategy.",
