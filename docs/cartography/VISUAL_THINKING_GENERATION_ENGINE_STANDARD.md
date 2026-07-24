@@ -22,6 +22,7 @@ Create exactly what the plan requests — no more, no less.
 VisualThinkingRequest
 → VisualThinkingUnderstanding
 → VisualThinkingExperiencePlan
+→ VisualThinkingKnowledgePlan / KnowledgePackage
 → VisualThinkingGenerationRun
 → Generated Deliverables
 ```
@@ -29,9 +30,12 @@ VisualThinkingRequest
 | Layer | Owns |
 |-------|------|
 | Request | Capture |
-| Understanding | Goal, success, tasks, research need, knowledge |
+| Understanding | Goal, success, tasks, research need |
 | Orchestrator | Experience, deliverables, stages, interaction |
-| **Generation Engine** | Structured content for the confirmed plan |
+| Knowledge Intelligence | Structured, traceable Knowledge Package |
+| **Generation Engine** | Structured content from the confirmed plan + Knowledge Package handoff |
+
+Prefer generating from a **Knowledge Package** (via handoff) rather than disconnected raw inputs. See [VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md).
 
 The Generation Engine must **not** re-interpret goals, re-select experiences, invent deliverables, force visuals, perform live research, or fabricate current facts.
 
@@ -141,6 +145,10 @@ Live research · citations · final canvas renderer · format conversion executi
 
 ---
 
-## Build 5 recommendation
+## Knowledge handoff
 
-Research Engine (or research-assisted fill): resolve `awaiting_research` runs by gathering sources and replacing placeholders — still without the Generation Engine choosing new deliverables.
+Prefer consuming a Knowledge Package handoff (Build 5) rather than disconnected raw inputs. See [VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md).
+
+## Build 6 recommendation
+
+Research Acquisition Engine: resolve Knowledge Package `external_research` gaps, then re-handoff to Generation — without choosing new deliverables.

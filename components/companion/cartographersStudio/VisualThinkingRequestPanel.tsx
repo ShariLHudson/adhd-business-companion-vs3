@@ -49,6 +49,16 @@ import {
   startGenerationFromConfirmedPlan,
   type VisualThinkingGenerationBundle,
 } from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
+import {
+  applyKnowledgeGapAnswer,
+  clearKnowledgeBundle,
+  knowledgeHandoffToGenerationContext,
+  loadKnowledgeBundle,
+  prepareVisualThinkingKnowledge,
+  projectKnowledgePreparationStatus,
+  saveKnowledgeBundle,
+  type VisualThinkingKnowledgeBundle,
+} from "@/lib/cartographersStudio/visualThinkingKnowledgeIntelligence";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 type Props = {
@@ -95,6 +105,9 @@ export function VisualThinkingRequestPanel({
     useState<VisualThinkingUnderstanding | null>(null);
   const [experiencePlan, setExperiencePlan] =
     useState<VisualThinkingExperiencePlan | null>(null);
+  const [knowledgeBundle, setKnowledgeBundle] =
+    useState<VisualThinkingKnowledgeBundle | null>(null);
+  const [gapAnswer, setGapAnswer] = useState("");
   const [generationBundle, setGenerationBundle] =
     useState<VisualThinkingGenerationBundle | null>(null);
   const [activeDeliverableId, setActiveDeliverableId] = useState<string | null>(
@@ -119,6 +132,8 @@ export function VisualThinkingRequestPanel({
         setExperiencePlan(orchestrateVisualThinkingExperience(understood));
       }
     }
+    const existingKnowledge = loadKnowledgeBundle();
+    if (existingKnowledge) setKnowledgeBundle(existingKnowledge);
     const existingGen = loadGenerationBundle();
     if (existingGen) {
       setGenerationBundle(existingGen);
@@ -129,6 +144,10 @@ export function VisualThinkingRequestPanel({
   useEffect(() => {
     saveVisualThinkingRequestDraft(request);
   }, [request]);
+
+  useEffect(() => {
+    if (knowledgeBundle) saveKnowledgeBundle(knowledgeBundle);
+  }, [knowledgeBundle]);
 
   useEffect(() => {
     if (generationBundle) saveGenerationBundle(generationBundle);
@@ -152,6 +171,9 @@ export function VisualThinkingRequestPanel({
     [understanding, experiencePlan],
   );
   const preview = understandingPreview;
+  const knowledgeStatus = knowledgeBundle
+    ? projectKnowledgePreparationStatus(knowledgeBundle)
+    : null;
   const generationStatus = generationBundle
     ? projectGenerationStatus(generationBundle.run)
     : null;
@@ -229,17 +251,59 @@ export function VisualThinkingRequestPanel({
       kind: "confirm",
     });
     setExperiencePlan(confirmedPlan);
-    const bundle = startGenerationFromConfirmedPlan(confirmedPlan, {
-      requestId: confirmed.id,
-      understandingId: understanding.id,
-      rawRequest: confirmed.rawRequest,
-      userFacingGoal: understanding.userFacingGoal,
-      successDefinition: understanding.successDefinition,
-      suppliedContent: confirmed.rawRequest,
+    const knowledge = prepareVisualThinkingKnowledge({
+      request: confirmed,
+      understanding,
+      experiencePlan: confirmedPlan,
+      attachedStructuredContent: confirmed.rawRequest,
+    });
+    setKnowledgeBundle(knowledge);
+    setGenerationBundle(null);
+    setActiveDeliverableId(null);
+    setGapAnswer("");
+    onConfirmed?.(confirmed);
+  }
+
+  function beginGenerationFromKnowledge() {
+    if (!experiencePlan || !understanding || !knowledgeBundle) return;
+    const handoffCtx = knowledgeHandoffToGenerationContext(
+      knowledgeBundle.handoff,
+      {
+        requestId: request.id,
+        understandingId: understanding.id,
+        rawRequest: request.rawRequest,
+        userFacingGoal: understanding.userFacingGoal,
+        successDefinition: understanding.successDefinition,
+      },
+    );
+    const bundle = startGenerationFromConfirmedPlan(experiencePlan, {
+      requestId: handoffCtx.requestId,
+      understandingId: handoffCtx.understandingId,
+      rawRequest: handoffCtx.rawRequest,
+      userFacingGoal: handoffCtx.userFacingGoal,
+      successDefinition: handoffCtx.successDefinition,
+      suppliedContent: handoffCtx.suppliedContent,
     });
     setGenerationBundle(bundle);
     setActiveDeliverableId(bundle.run.primaryDeliverableId);
-    onConfirmed?.(confirmed);
+  }
+
+  function submitGapAnswer() {
+    if (!knowledgeBundle || !understanding || !experiencePlan) return;
+    if (!knowledgeStatus?.focusedGapId || !gapAnswer.trim()) return;
+    const next = applyKnowledgeGapAnswer(
+      knowledgeBundle,
+      {
+        request,
+        understanding,
+        experiencePlan,
+        attachedStructuredContent: request.rawRequest,
+      },
+      knowledgeStatus.focusedGapId,
+      gapAnswer.trim(),
+    );
+    setKnowledgeBundle(next);
+    setGapAnswer("");
   }
 
   function updateActiveDeliverable(
@@ -692,6 +756,111 @@ export function VisualThinkingRequestPanel({
           </section>
         ) : null}
 
+        {phase === "confirmed" &&
+        knowledgeBundle &&
+        knowledgeStatus &&
+        !generationBundle ? (
+          <section
+            className="vts-request__confirmed"
+            data-testid="visual-thinking-confirmed"
+            data-knowledge-status={knowledgeBundle.plan.status}
+          >
+            <p
+              className="vts-request__section-title"
+              data-testid="visual-thinking-knowledge-status"
+            >
+              {knowledgeStatus.headline}
+            </p>
+            {knowledgeStatus.showResearchNeeded ? (
+              <p
+                className="vts-request__note"
+                data-testid="visual-thinking-knowledge-research-needed"
+              >
+                I can build the structure now, but I need current information
+                before I fill in the product-specific details.
+              </p>
+            ) : null}
+            {knowledgeStatus.showMissingQuestion &&
+            knowledgeStatus.focusedQuestion ? (
+              <div
+                className="vts-request__correction"
+                data-testid="visual-thinking-knowledge-question"
+              >
+                <p className="vts-request__summary">
+                  {knowledgeStatus.focusedQuestion}
+                </p>
+                <textarea
+                  className="vts-request__textarea"
+                  data-testid="visual-thinking-knowledge-answer"
+                  rows={2}
+                  value={gapAnswer}
+                  onChange={(e) => setGapAnswer(e.target.value)}
+                  placeholder="Add what you know…"
+                />
+                <button
+                  type="button"
+                  className="vts-request__primary"
+                  data-testid="visual-thinking-knowledge-answer-submit"
+                  onClick={submitGapAnswer}
+                >
+                  Continue
+                </button>
+              </div>
+            ) : null}
+            {knowledgeBundle.package.conflicts.length > 0 ? (
+              <p
+                className="vts-request__note"
+                data-testid="visual-thinking-knowledge-conflict-note"
+              >
+                I noticed a few details that don&apos;t quite agree yet — I&apos;ll
+                keep both visible so nothing is quietly overwritten.
+              </p>
+            ) : null}
+            <div className="vts-request__preview-actions">
+              {knowledgeStatus.canCreateFully ? (
+                <button
+                  type="button"
+                  className="vts-request__primary"
+                  data-testid="visual-thinking-begin-generation"
+                  onClick={beginGenerationFromKnowledge}
+                >
+                  Create this
+                </button>
+              ) : null}
+              {knowledgeStatus.canContinueSafeOutline &&
+              !knowledgeStatus.canCreateFully ? (
+                <button
+                  type="button"
+                  className="vts-request__primary"
+                  data-testid="visual-thinking-begin-safe-outline"
+                  onClick={beginGenerationFromKnowledge}
+                >
+                  Continue with a safe outline
+                </button>
+              ) : null}
+            </div>
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="visual-thinking-start-over"
+              onClick={() => {
+                clearVisualThinkingRequestDraft();
+                clearKnowledgeBundle();
+                clearGenerationBundle();
+                setDraftText("");
+                setUnderstanding(null);
+                setExperiencePlan(null);
+                setKnowledgeBundle(null);
+                setGenerationBundle(null);
+                setActiveDeliverableId(null);
+                setRequest(createVisualThinkingRequest({}));
+              }}
+            >
+              Start a different request
+            </button>
+          </section>
+        ) : null}
+
         {phase === "confirmed" && generationBundle && generationStatus ? (
           <section
             className="vts-request__confirmed"
@@ -849,10 +1018,12 @@ export function VisualThinkingRequestPanel({
               data-testid="visual-thinking-start-over"
               onClick={() => {
                 clearVisualThinkingRequestDraft();
+                clearKnowledgeBundle();
                 clearGenerationBundle();
                 setDraftText("");
                 setUnderstanding(null);
                 setExperiencePlan(null);
+                setKnowledgeBundle(null);
                 setGenerationBundle(null);
                 setActiveDeliverableId(null);
                 setRequest(createVisualThinkingRequest({}));
@@ -863,7 +1034,7 @@ export function VisualThinkingRequestPanel({
           </section>
         ) : null}
 
-        {phase === "confirmed" && !generationBundle ? (
+        {phase === "confirmed" && !knowledgeBundle && !generationBundle ? (
           <section
             className="vts-request__confirmed"
             data-testid="visual-thinking-confirmed"
@@ -872,7 +1043,7 @@ export function VisualThinkingRequestPanel({
               We&apos;re ready when you are.
             </p>
             <p className="vts-request__note">
-              Confirm from the recommendation to create your first version.
+              Confirm from the recommendation to prepare what we already know.
             </p>
           </section>
         ) : null}

@@ -153,8 +153,9 @@ Plans may list suggested targets; nothing is handed off in this build.
 |-------|------|
 | Understanding Engine | Goal, success, tasks, research need, knowledge, output recommendations |
 | **Experience Orchestrator** | Experience plan, stages, interaction, switching contract |
-| Generation Engine | Creating artifacts from a confirmed plan — see [VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md) |
-| Research Engine (later) | Live research |
+| Knowledge Intelligence | Knowledge Plan + Package — see [VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md) |
+| Generation Engine | Creating artifacts from a confirmed plan + Knowledge Package — see [VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md) |
+| Research Engine (later) | Live research acquisition into the Knowledge Package |
 | Canvas Engine (later) | Map / visual editing |
 
 Keep orchestration independent from generation, research, and canvas.
@@ -176,7 +177,7 @@ Must not reduce requested depth, change the goal, or force a format.
 
 ---
 
-## Next build
+## Downstream
 
-Build 4 (Generation Engine) is documented separately.  
-Build 5 should resolve research-blocked runs and deepen generation quality without changing plan ownership.
+Build 5 — Knowledge Intelligence · Build 4 — Generation Engine  
+The Orchestrator does not assemble knowledge; it only decides experience and deliverables.

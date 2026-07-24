@@ -9,6 +9,7 @@ import { VisualThinkingRequestPanel } from "./VisualThinkingRequestPanel";
 import { __resetAdaptiveCompanionExplicitPrefsForTests } from "@/lib/adaptiveCompanionIntelligence";
 import { clearVisualThinkingRequestDraft } from "@/lib/cartographersStudio/visualThinkingRequest";
 import { clearGenerationBundle } from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
+import { clearKnowledgeBundle } from "@/lib/cartographersStudio/visualThinkingKnowledgeIntelligence";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 function setTextarea(container: HTMLElement, testId: string, value: string) {
@@ -36,6 +37,7 @@ describe("VisualThinkingRequestPanel", () => {
 
   beforeEach(() => {
     clearVisualThinkingRequestDraft();
+    clearKnowledgeBundle();
     clearGenerationBundle();
     __resetAdaptiveCompanionExplicitPrefsForTests();
     container = document.createElement("div");
@@ -49,6 +51,7 @@ describe("VisualThinkingRequestPanel", () => {
     });
     container.remove();
     clearVisualThinkingRequestDraft();
+    clearKnowledgeBundle();
     clearGenerationBundle();
     __resetAdaptiveCompanionExplicitPrefsForTests();
   });
@@ -187,7 +190,7 @@ describe("VisualThinkingRequestPanel", () => {
     ).toMatch(/staff|train|teach/i);
   });
 
-  it("generates a review-ready deliverable only after confirmation", () => {
+  it("knowledge prep begins after confirmation; generation after continue", () => {
     act(() => {
       root.render(
         <VisualThinkingRequestPanel onOpenPreviousWork={() => undefined} />,
@@ -216,7 +219,7 @@ describe("VisualThinkingRequestPanel", () => {
     ).toBeTruthy();
     expect(
       container.querySelector(
-        "[data-testid='visual-thinking-review-deliverable']",
+        "[data-testid='visual-thinking-knowledge-status']",
       ),
     ).toBeFalsy();
     act(() => {
@@ -224,21 +227,28 @@ describe("VisualThinkingRequestPanel", () => {
     });
     expect(
       container.querySelector(
-        "[data-testid='visual-thinking-generation-status']",
-      )?.textContent ?? "",
-    ).toMatch(/ready|guided structure|research/i);
+        "[data-testid='visual-thinking-knowledge-status']",
+      ),
+    ).toBeTruthy();
+    expect(container.innerHTML).not.toMatch(
+      /knowledgePlanId|VisualThinkingKnowledgePackage/,
+    );
+    const begin =
+      (container.querySelector(
+        "[data-testid='visual-thinking-begin-generation']",
+      ) as HTMLButtonElement | null) ||
+      (container.querySelector(
+        "[data-testid='visual-thinking-begin-safe-outline']",
+      ) as HTMLButtonElement | null);
+    expect(begin).toBeTruthy();
+    act(() => {
+      begin!.click();
+    });
     expect(
       container.querySelector(
         "[data-testid='visual-thinking-review-deliverable']",
       ),
     ).toBeTruthy();
-    expect(
-      container.querySelector(
-        "[data-testid='visual-thinking-deliverable-blocks']",
-      ),
-    ).toBeTruthy();
-    const html = container.innerHTML;
-    expect(html).not.toMatch(/VisualThinkingGenerationRun|researchBlocked/);
   });
 
   it("opens distinct Create My Own Visual and Research paths", () => {

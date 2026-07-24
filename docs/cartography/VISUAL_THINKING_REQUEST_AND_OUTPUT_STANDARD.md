@@ -21,9 +21,10 @@ This phase establishes intake only: capture the request, depth, and form prefere
 - **Build 1** captures the member’s request (`VisualThinkingRequest`).
 - **Build 2** interprets goal, success, cognitive task, research need, and recommendations (`VisualThinkingUnderstanding`).
 - **Build 3** turns understanding into an experience plan (`VisualThinkingExperiencePlan`).
-- **Build 4** generates structured deliverables from a **confirmed** plan (`VisualThinkingGenerationRun`).
+- **Build 5** assembles a Knowledge Package (`VisualThinkingKnowledgePackage`).
+- **Build 4** generates structured deliverables from the confirmed plan + Knowledge Package handoff.
 
-See: [Understanding](./VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md) · [Orchestrator](./VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md) · [Generation](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md)
+See: [Understanding](./VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md) · [Orchestrator](./VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md) · [Knowledge](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md) · [Generation](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md)
 
 ---
 
