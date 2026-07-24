@@ -47,7 +47,9 @@ Never mount both simultaneously.
 
 ## Back to Estate / Escape
 
-**Back to Estate** closes the viewer and returns to the Wander gallery (not Welcome Home).
+**Back to Estate** (visible control label) closes the viewer and returns to the Wander gallery (not Welcome Home).
+
+Keyboard hint under the controls: **Press Esc to return** (same action).
 
 **Return to Welcome Home** remains a separate gallery toolbar action.
 

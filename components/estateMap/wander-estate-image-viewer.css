@@ -164,6 +164,14 @@
   outline-offset: 2px;
 }
 
+.weiv-kbd-hint {
+  margin: 0.35rem 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: rgba(245, 240, 230, 0.72);
+}
+
 .weiv-btn--primary {
   border-color: rgba(201, 162, 39, 0.55);
   background: linear-gradient(135deg, #e8c36a 0%, #c9922e 100%);

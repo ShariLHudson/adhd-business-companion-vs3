@@ -208,6 +208,9 @@ export function WanderEstateImageViewer({
           Next →
         </button>
       </div>
+      <p className="weiv-kbd-hint" data-testid="wander-estate-viewer-esc-hint">
+        Press Esc to return
+      </p>
     </div>
   );
 }
