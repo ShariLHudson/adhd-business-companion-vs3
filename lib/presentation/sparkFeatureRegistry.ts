@@ -69,7 +69,7 @@ export const SPARK_FEATURES: readonly SparkFeatureDefinition[] = [
   },
   {
     id: "cartographer",
-    displayName: "Cartographer's Studio",
+    displayName: "Visual Thinking Studio",
     route: { placeId: "cartographers-studio", section: "visual-focus" },
     surfaces: surfaces(
       estate("visual-focus", "cartographers-studio"),

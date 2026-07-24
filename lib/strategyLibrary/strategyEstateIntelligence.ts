@@ -34,7 +34,7 @@ export const STRATEGY_ESTATE_SURFACES: readonly StrategyEstateSurface[] = [
   },
   {
     id: "cartography",
-    label: "Cartography",
+    label: "Visual Thinking Studio",
     relation: "Larger patterns and relationships may clarify why this fits.",
   },
   {

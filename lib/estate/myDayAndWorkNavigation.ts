@@ -67,15 +67,23 @@ export const MY_DAY_AND_WORK_DESTINATIONS = [
   },
   {
     id: "cartographers-studio",
-    label: "Cartographer's Studio",
+    label: "Visual Thinking Studio",
     opener: "cartographers-studio",
     aliases: [
+      "visual thinking studio",
+      "visual thinking",
+      "visual-thinking studio",
       "cartography",
       "cartography room",
       "cartographer's studio",
       "cartographers studio",
       "take me to cartography",
       "open cartography",
+      "open visual thinking studio",
+      "take me to visual thinking studio",
+      "show me visual thinking",
+      "help me create a visual",
+      "help me understand this visually",
     ],
   },
 ] as const;
@@ -148,9 +156,10 @@ export function resolveMyDayAndWorkOpenerFromText(
     return "destination-gallery";
   }
   if (
-    /\b(?:open|show|take me to)\s+(?:the\s+)?cartograph(?:y|er's?\s+studio|ers?\s+studio)\b/i.test(
+    /\b(?:open|show|take me to|show me)\s+(?:the\s+)?(?:visual\s+thinking(?:\s+studio)?|cartograph(?:y|er's?\s+studio|ers?\s+studio))\b/i.test(
       normalized,
-    )
+    ) ||
+    /\bhelp me (?:create a visual|understand this visually)\b/i.test(normalized)
   ) {
     return "cartographers-studio";
   }

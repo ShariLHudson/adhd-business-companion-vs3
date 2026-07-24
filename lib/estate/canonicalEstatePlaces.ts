@@ -876,12 +876,15 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
   },
   {
     id: "focus-studio",
-    officialName: "Cartographer's Studio",
+    officialName: "Visual Thinking Studio",
     category: "destination",
     primaryFeeling:
-      "Direction, clarity, mapping thoughts into a visible course",
+      "Direction, clarity, and clear ways of understanding information",
     backgroundImage: "/backgrounds/cartoghraphers-studio-background.png",
     aliases: [
+      "visual thinking studio",
+      "visual thinking",
+      "cartography",
       "cartographer's studio",
       "cartographers studio",
       "the cartographer's studio",

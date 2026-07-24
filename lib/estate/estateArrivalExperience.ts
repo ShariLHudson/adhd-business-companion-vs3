@@ -63,10 +63,10 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "focus-studio": {
-    title: "Cartographer's Studio",
-    motto: "Every map tells a story. Every story reveals a path.",
+    title: "Visual Thinking Studio",
+    motto: "See information in the clearest way for you.",
     shariGreeting:
-      "Welcome to the Cartographer's Studio — tell me what you'd like to map, or click a framed map to begin.",
+      "Welcome to Visual Thinking Studio — tell me what you'd like to understand, research, or create, and we can begin.",
     invitationAfterArrival: false,
     ambience: {
       src: BRIGHT_STUDIO_AMBIENCE_MP3,
@@ -75,10 +75,10 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "cartographers-studio": {
-    title: "Cartographer's Studio",
-    motto: "Every map tells a story. Every story reveals a path.",
+    title: "Visual Thinking Studio",
+    motto: "See information in the clearest way for you.",
     shariGreeting:
-      "Welcome to the Cartographer's Studio — tell me what you'd like to map, or click a framed map to begin.",
+      "Welcome to Visual Thinking Studio — tell me what you'd like to understand, research, or create, and we can begin.",
     invitationAfterArrival: false,
     ambience: {
       src: BRIGHT_STUDIO_AMBIENCE_MP3,
@@ -341,9 +341,9 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
   "evidence-vault": {
     title: "Evidence Vault",
     motto:
-      "This is where you collect proof of progress, strengths, results, and accomplishments.",
+      "A private place to keep meaningful discoveries about yourself, your work, and the difference you make.",
     shariGreeting:
-      "Your key unlocks after a short discovery that helps me notice evidence you may overlook. When you are ready, we can begin.",
+      "Your key opens a quiet place for discoveries you do not want to forget. When you are ready, we can begin.",
     invitationAfterArrival: false,
     ambience: {
       src: HALL_OF_REFLECTIONS_AMBIENCE_MP3,

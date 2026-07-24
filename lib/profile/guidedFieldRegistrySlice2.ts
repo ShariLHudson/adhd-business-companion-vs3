@@ -310,9 +310,9 @@ export const SLICE2_GUIDED_FIELDS: GuidedFieldDefinition[] = [
     whyItMatters:
       "Matching support to how you decide reduces friction and second-guessing.",
     howThisHelpsShari:
-      "I'll know when Cartography, the Chamber, or the Boardroom may be helpful — as guidance only, never automatic routing.",
+      "I'll know when Visual Thinking Studio, the Chamber, or the Boardroom may be helpful — as guidance only, never automatic routing.",
     distinctionNote:
-      "Visual map may later suggest Cartography · Multiple perspectives may suggest Chamber · Pros and cons may suggest Boardroom · Break into steps may simplify planning. You always choose.",
+      "Visual map may later suggest Visual Thinking Studio · Multiple perspectives may suggest Chamber · Pros and cons may suggest Boardroom · Break into steps may simplify planning. You always choose.",
     inputType: "multi_select",
     choices: [...DECISION_STYLE_CHOICES],
     examples: [

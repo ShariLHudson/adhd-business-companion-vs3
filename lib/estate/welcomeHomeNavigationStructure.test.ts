@@ -92,7 +92,7 @@ describe("welcomeHomeNavigationStructure (Welcome Home IA)", () => {
     expect(byId.build).toEqual([
       "Create",
       "Projects",
-      "Cartography",
+      "Visual Thinking Studio",
     ]);
     expect(byId["get-advice"]).toEqual([
       "Chamber of Momentum",

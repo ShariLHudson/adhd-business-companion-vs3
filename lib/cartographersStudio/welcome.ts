@@ -8,11 +8,11 @@ import { CARTOGRAPHERS_FRAMED_MAPS } from "./framedMaps";
 export const CARTOGRAPHERS_WELCOME_TITLE = "Visual Thinking Studio" as const;
 
 export const CARTOGRAPHERS_WELCOME_SUBTITLE =
-  "Every map tells a story. Every story reveals a path." as const;
+  "Turn information, ideas, research, and plans into clear visual and written ways of understanding them." as const;
 
 export const CARTOGRAPHERS_WELCOME_BODY = [
-  "The Cartographer's Studio helps you think visually.",
-  "Whether you're brainstorming, planning, solving problems, organizing information, or making decisions, Spark can help you build the right visual.",
+  "Visual Thinking Studio helps you explore, organize, and understand information through guides, reports, comparisons, processes, timelines, and visual thinking.",
+  "Whether you're researching, planning, solving problems, or making decisions, Spark can help you build the clearest result for the work in front of you.",
 ] as const;
 
 export const CARTOGRAPHERS_WELCOME_BEGIN_HEADING =

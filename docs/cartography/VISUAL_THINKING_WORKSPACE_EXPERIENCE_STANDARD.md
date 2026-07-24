@@ -373,6 +373,13 @@ Business Estate · Projects · Create · Board of Directors · Marketing · Lear
 
 …without changing the core interaction philosophy.
 
+### Naming (Corrective Build 7.1)
+
+User-facing destination name: **Visual Thinking Studio**.  
+Legacy technical identifiers (`cartographersStudio`, `cartographers-studio`) may remain for compatibility and must not appear in member-facing labels.
+
+See [VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md).
+
 ### Learning pilot (first Estate consumer)
 
 See [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md).

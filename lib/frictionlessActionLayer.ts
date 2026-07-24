@@ -3147,7 +3147,7 @@ function tryVisualBeginnerChoiceFlow(
         responseHint:
           "CARTOGRAPHER BEGINNER: Open Studio so member can explore frames / Atlas.",
         localReply:
-          "I'll open Cartographer's Studio — explore the framed maps or the Atlas, and choose when you're ready.",
+          "I'm opening Visual Thinking Studio — explore the framed maps or the Atlas, and choose when you're ready.",
         pendingAction: null,
         toolSuggestion: null,
         workspaceOffer: null,

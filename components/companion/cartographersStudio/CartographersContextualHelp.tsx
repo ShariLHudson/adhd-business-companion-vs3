@@ -25,7 +25,7 @@ export function CartographersContextualHelp({
 }: Props) {
   const mapName = map
     ? map.title?.trim() || studioCardTitleForMode(map.mode)
-    : "Cartographer's Studio";
+    : "Visual Thinking Studio";
 
   return (
     <div

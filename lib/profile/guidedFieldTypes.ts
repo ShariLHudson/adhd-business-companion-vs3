@@ -278,7 +278,7 @@ export const RETURN_OFFER_CHOICES: readonly GuidedFieldChoice[] = [
 
 export const DECISION_STYLE_CHOICES: readonly GuidedFieldChoice[] = [
   { id: "talk_it_through", label: "Talk it through", description: "Think out loud with a calm companion." },
-  { id: "visual_map", label: "Visual map", description: "See how pieces connect — Cartography may help later." },
+  { id: "visual_map", label: "Visual map", description: "See how pieces connect — Visual Thinking Studio may help later." },
   { id: "pros_and_cons", label: "Pros and cons", description: "Lay options side by side — Boardroom may help later." },
   { id: "research_first", label: "Research first", description: "Gather information before choosing." },
   { id: "multiple_perspectives", label: "Hear multiple perspectives", description: "Several viewpoints — Chamber may help later." },

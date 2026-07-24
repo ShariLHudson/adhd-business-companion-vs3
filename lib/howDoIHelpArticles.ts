@@ -124,7 +124,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whatItIs:
       "One mental model for Spark Estate — one business, many helpful perspectives, quietly connected behind the scenes. You only need the rooms that help today.",
     whenToUse:
-      "When you want to understand how Create, Projects, Cartography, Strategies, Chamber, Board, Pulse, Evidence, Wins, and the Hall fit together — without feature training.",
+      "When you want to understand how Create, Projects, Visual Thinking Studio, Strategies, Chamber, Board, Pulse, Evidence, Wins, and the Hall fit together — without feature training.",
     workflow: [
       "Read the short overview — you do not need every room.",
       "Open any place that interests you to see what it is, why you would use it, and how it connects.",

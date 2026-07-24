@@ -20963,7 +20963,7 @@ export default function CompanionPageClient() {
       openStandaloneFocusSectionCore("visual-focus");
       const arrivalAck =
         navigationLine ??
-        "Welcome to the Cartographer's Studio — every map tells a story.";
+        "Welcome to Visual Thinking Studio — every clear picture starts with what you want to understand.";
       if (!opts?.skipAssistantMessage) {
         if (activeChatTurnLifecycleRef.current) {
           markAssistantReplied(activeChatTurnLifecycleRef.current);
@@ -24781,7 +24781,7 @@ export default function CompanionPageClient() {
 
           {activeSection === "visual-focus" && !showDirectEstateOverlay && (
             <EstateRoomErrorBoundary
-              roomLabel="Cartographer's Studio"
+              roomLabel="Visual Thinking Studio"
               onReturnToEstate={navigateBackToEstateHome}
             >
               <VisualFocusWorkspacePanel

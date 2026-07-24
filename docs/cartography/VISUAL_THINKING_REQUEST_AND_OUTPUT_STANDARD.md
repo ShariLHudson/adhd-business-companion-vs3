@@ -4,7 +4,9 @@
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/visualThinkingRequest.ts`  
 **UI:** `components/companion/cartographersStudio/VisualThinkingRequestPanel.tsx`  
-**Background:** Existing Cartography room image (`CARTOGRAPHERS_STUDIO_BACKGROUND`) — retained
+**Background:** Existing room image (`CARTOGRAPHERS_STUDIO_BACKGROUND`) — retained as compatibility asset path  
+**User-facing name:** Visual Thinking Studio  
+**Corrective:** [Rename & Research-to-Result (7.1)](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md) — research-and-build requests must continue to a substantive result
 
 ---
 

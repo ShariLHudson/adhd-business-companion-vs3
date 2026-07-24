@@ -3,7 +3,9 @@
 **Status:** Binding platform integration standard  
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/visualThinkingService.ts`  
-**Related:** Generate-First · Presentation · Workspace Foundation · Experience Standard
+**Related:** Generate-First · Presentation · Workspace Foundation · Experience Standard · [Rename & Research-to-Result (7.1)](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md)
+
+**User-facing destination name:** Visual Thinking Studio (legacy technical ids such as `cartographers-studio` may remain for compatibility).
 
 ---
 

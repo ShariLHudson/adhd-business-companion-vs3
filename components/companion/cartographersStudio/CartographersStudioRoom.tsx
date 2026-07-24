@@ -113,7 +113,7 @@ export function CartographersStudioRoom({
         className="cartographers-immersive__plate"
         style={{ backgroundImage: `url(${CARTOGRAPHERS_STUDIO_BACKGROUND})` }}
         role="img"
-        aria-label="Cartographer's Studio"
+        aria-label="Visual Thinking Studio"
       />
       <div className="cartographers-immersive__veil" aria-hidden />
 
@@ -190,7 +190,7 @@ export function CartographersStudioRoom({
             className="cartographers-chrome-link"
             data-testid="cartographers-help"
             onClick={() => setContextualHelpOpen(true)}
-            aria-label="Help — how to use Cartographer's Studio"
+            aria-label="Help — how to use Visual Thinking Studio"
           >
             {CARTOGRAPHERS_HELP}
           </button>
@@ -200,7 +200,7 @@ export function CartographersStudioRoom({
               className="cartographers-chrome-link"
               data-testid="cartographers-exit"
               onClick={exit}
-              aria-label="Exit Cartographer's Studio"
+              aria-label="Exit Visual Thinking Studio"
             >
               {CARTOGRAPHERS_EXIT}
             </button>
@@ -317,7 +317,7 @@ export function CartographersStudioRoom({
           data-testid="cartographers-atlas"
           style={{ left: "72%", top: "58%", width: "16%", height: "18%" }}
           onClick={() => beginWorking(() => setAtlasOpen(true))}
-          aria-label="Open Cartographer's Atlas"
+          aria-label="Open Visual Thinking Atlas"
         >
           <span className="sr-only">Atlas</span>
         </button>

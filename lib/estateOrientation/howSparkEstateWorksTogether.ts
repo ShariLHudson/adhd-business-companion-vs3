@@ -43,14 +43,14 @@ const PLACES: EstateOrientationPlace[] = [
   },
   {
     id: "cartography",
-    name: "Cartography",
+    name: "Visual Thinking Studio",
     summary: "Relationships, patterns, and the bigger picture.",
     whatIsThis:
-      "Cartography lives under Work to Create — a place to see relationships, patterns, and the bigger picture when your thinking needs space to spread out.",
+      "Visual Thinking Studio lives under Work to Create — a place to see relationships, patterns, and the bigger picture when your thinking needs space to spread out.",
     whyWouldIUseIt:
       "Use it when ideas feel tangled, or when you want to understand how pieces of your business relate before you decide what to do next.",
     howItConnects:
-      "Maps can clarify what belongs in a Project. They do not invent connections — they help you notice the ones already forming in your work.",
+      "Guides, comparisons, timelines, and visuals can clarify what belongs in a Project. They do not invent connections — they help you notice the ones already forming in your work.",
   },
   {
     id: "strategies",
@@ -162,7 +162,7 @@ export const HOW_SPARK_ESTATE_WORKS_TOGETHER: HowSparkEstateWorksTogetherContent
         },
         {
           id: "cartographers-studio",
-          placeName: "Cartographer's Studio",
+          placeName: "Visual Thinking Studio",
           shariLine:
             "When you need the bigger picture, this is where relationships and patterns can breathe — so the next step feels clearer.",
           estatePlaceHint: "cartographers-studio",

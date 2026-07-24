@@ -174,8 +174,9 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
       },
       {
         id: "cartographers-studio",
-        label: "Cartography",
-        supportLine: "Map ideas so the path forward is easier to see.",
+        label: "Visual Thinking Studio",
+        supportLine:
+          "See ideas, research, plans, and information in the clearest way for you.",
       },
     ],
   },

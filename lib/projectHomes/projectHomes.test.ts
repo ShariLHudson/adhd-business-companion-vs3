@@ -80,7 +80,7 @@ describe("projectHomes refinement", () => {
   it("shortens purpose for cards and lists Connected Places", () => {
     expect(shortPurpose("A".repeat(120)).endsWith("…")).toBe(true);
     const places = connectedPlacesForProjectHome("writing-room");
-    expect(places.map((p) => p.label)).toContain("Cartography");
+    expect(places.map((p) => p.label)).toContain("Visual Thinking Studio");
     expect(places.map((p) => p.label)).toContain("Hall of Accomplishment");
   });
 });

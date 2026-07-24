@@ -95,6 +95,7 @@ import {
   buildAutomaticContinuationPlan,
   resolveKnowledgeGap,
 } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
+import { runVisualThinkingResearchToResult } from "@/lib/cartographersStudio/visualThinkingResearchToResult";
 import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
@@ -333,132 +334,29 @@ export function VisualThinkingRequestPanel({
   }
 
   function runGenerateFirstPipeline(rawText: string) {
-    const auth = assessRequestAuthorization(rawText);
-    const continuation = buildAutomaticContinuationPlan(auth);
-    setGenerateFirstAck(auth.acknowledgement);
-    setGenerateFirstProgress(continuation.progressLabels);
-
-    let next = applyRequestText(request, rawText);
-    if (next.status === "awaiting_depth" || next.requestedDepth === "unspecified") {
-      next = applyHelpDepth(next, auth.inferredDetail);
-    }
-
-    let understood = interpretVisualThinkingUnderstanding(next);
-    if (
-      auth.creationMode !== "unspecified" &&
-      understood.creationMode === "unspecified"
-    ) {
-      understood = { ...understood, creationMode: auth.creationMode };
-    }
-    const plan = orchestrateVisualThinkingExperience(understood);
-    const synced = syncRequestFromUnderstanding(next, understood);
-    const confirmed = confirmRecommendation(synced);
-    const confirmedPlan = applyExperiencePlanOverride(plan, { kind: "confirm" });
-    const knowledge = prepareVisualThinkingKnowledge({
-      request: confirmed,
-      understanding: understood,
-      experiencePlan: confirmedPlan,
-      attachedStructuredContent: confirmed.rawRequest,
+    const run = runVisualThinkingResearchToResult(rawText, {
+      entryPath:
+        request.entryPath === "research_assisted"
+          ? "research_assisted"
+          : "describe_request",
     });
-
-    const clarification = assessClarificationNecessity({
-      rawRequest: confirmed.rawRequest,
-      gaps: knowledge.package.knowledgeGaps,
-      creationMode: understood.creationMode,
-    });
-    const gapDecisions = knowledge.package.knowledgeGaps.map((gap) =>
-      resolveKnowledgeGap(gap, { rawRequest: confirmed.rawRequest }),
+    setGenerateFirstAck(run.acknowledgement);
+    setGenerateFirstProgress(run.progressLabels);
+    setRequest(run.request);
+    setUnderstanding(run.understanding);
+    setExperiencePlan(run.experiencePlan);
+    setKnowledgeBundle(run.knowledgeBundle);
+    setResearchBundle(run.researchBundle);
+    setGenerationBundle(run.generationBundle);
+    setPresentationPlan(run.presentationPlan);
+    setThinkingWorkspace(run.workspace);
+    setActiveDeliverableId(
+      run.generationBundle?.run.primaryDeliverableId ?? null,
     );
-    const researchGaps = gapDecisions.filter(
-      (d) => d.resolutionType === "external_research" && d.automatic,
-    );
-
-    let nextResearch: VisualThinkingResearchBundle | null = null;
-    if (researchGaps.length > 0) {
-      const planned = planVisualThinkingResearch({
-        knowledgeBundle: knowledge,
-        workspaceActive: false,
-      });
-      nextResearch = {
-        plan: planned.plan,
-        items: planned.items,
-        citations: [],
-        conflicts: [],
-        updatedKnowledgePackage: knowledge.package,
-        updatedHandoff: knowledge.handoff,
-        workspaceNotification: null,
-        acquiredAt: null,
-      };
-    }
-
-    const handoffCtx = knowledgeHandoffToGenerationContext(
-      knowledge.handoff,
-      {
-        requestId: confirmed.id,
-        understandingId: understood.id,
-        rawRequest: confirmed.rawRequest,
-        userFacingGoal: understood.userFacingGoal,
-        successDefinition: understood.successDefinition,
-      },
-      knowledge.package,
-    );
-    const researchFacts =
-      nextResearch?.updatedKnowledgePackage.items
-        .filter((i) => i.category === "research_acquired")
-        .map((i) => i.content)
-        .join("\n") ?? "";
-    const supplied = [handoffCtx.suppliedContent, researchFacts]
-      .filter(Boolean)
-      .join("\n");
-
-    const shouldGenerate =
-      auth.creationMode === "build_for_me" &&
-      (!clarification.required || !clarification.blocksAllGeneration);
-
-    setRequest(confirmed);
-    setUnderstanding(understood);
-    setExperiencePlan(confirmedPlan);
-    setKnowledgeBundle(knowledge);
-    setResearchBundle(nextResearch);
     setGapAnswer("");
     setShowThisDifferently(false);
     setShowWrittenReview(false);
-    onConfirmed?.(confirmed);
-
-    if (!shouldGenerate) {
-      return;
-    }
-
-    const bundle = startGenerationFromConfirmedPlan(confirmedPlan, {
-      requestId: handoffCtx.requestId,
-      understandingId: handoffCtx.understandingId,
-      rawRequest: handoffCtx.rawRequest,
-      userFacingGoal: handoffCtx.userFacingGoal,
-      successDefinition: handoffCtx.successDefinition,
-      suppliedContent: supplied || handoffCtx.suppliedContent,
-      topicHint: handoffCtx.topicHint,
-      freshnessNotice: handoffCtx.freshnessNotice,
-      knowledgeResearchSatisfied:
-        knowledgeResearchSatisfiesGenerationGate(nextResearch) ||
-        researchGaps.length > 0,
-    });
-    setGenerationBundle(bundle);
-    setActiveDeliverableId(bundle.run.primaryDeliverableId);
-    const nextPresentation = planVisualThinkingPresentation({
-      understanding: understood,
-      experiencePlan: confirmedPlan,
-      knowledgePackage: knowledge.package,
-      generationBundle: bundle,
-    });
-    setPresentationPlan(nextPresentation);
-    const autoWorkspace = createThinkingWorkspace({
-      understanding: understood,
-      experiencePlan: confirmedPlan,
-      knowledgePackage: knowledge.package,
-      generationBundle: bundle,
-      presentationPlan: nextPresentation,
-    });
-    if (autoWorkspace) setThinkingWorkspace(autoWorkspace);
+    onConfirmed?.(run.request);
   }
 
   function handleContinue() {
@@ -649,8 +547,9 @@ export function VisualThinkingRequestPanel({
       suppliedContent: supplied || handoffCtx.suppliedContent,
       topicHint: handoffCtx.topicHint,
       freshnessNotice: handoffCtx.freshnessNotice,
+      // Never treat "research still open / only planned" as generation-complete.
       knowledgeResearchSatisfied:
-        knowledgeResearchSatisfiesGenerationGate(nextResearch) || researchOpen,
+        knowledgeResearchSatisfiesGenerationGate(nextResearch),
     });
     setGenerationBundle(bundle);
     setActiveDeliverableId(bundle.run.primaryDeliverableId);
@@ -709,12 +608,20 @@ export function VisualThinkingRequestPanel({
   }
 
   function startResearch() {
-    const next = createVisualThinkingRequest({
-      rawRequest: draftText.trim(),
+    const text = (textareaRef.current?.value ?? draftText).trim();
+    if (!text) {
+      textareaRef.current?.focus();
+      return;
+    }
+    setDraftText(text);
+    autoContinueLockRef.current = true;
+    // Research and Build It for Me must continue through the full result pipeline.
+    const seeded = createVisualThinkingRequest({
+      rawRequest: text,
       entryPath: "research_assisted",
     });
-    setDraftText(next.rawRequest);
-    commitRequest(next, Boolean(next.rawRequest.trim()));
+    setRequest(seeded);
+    runGenerateFirstPipeline(text);
   }
 
   function continueUserLedOrResearch() {

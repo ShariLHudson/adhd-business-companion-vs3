@@ -35,7 +35,7 @@ export type VisualFocusStudioCard = {
 };
 
 export const VISUAL_FOCUS_STUDIO_HERO = {
-  title: "Cartographer's Studio",
+  title: "Visual Thinking Studio",
   tagline: "Every map tells a story. Every story reveals a path.",
   microCopy:
     "Choose a framed map. Spark asks the right questions, builds a first draft, and you reshape it.",

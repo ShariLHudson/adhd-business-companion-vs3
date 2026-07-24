@@ -6,6 +6,9 @@ export {
   CARTOGRAPHERS_STUDIO_BACKGROUND,
   CARTOGRAPHERS_STUDIO_PLACE_ID,
   CARTOGRAPHERS_STUDIO_OFFICIAL_NAME,
+  VISUAL_THINKING_STUDIO_OFFICIAL_NAME,
+  VISUAL_THINKING_RETURN_TO_STUDIO,
+  VISUAL_THINKING_PREVIOUS_WORK_LABEL,
   CARTOGRAPHERS_ATLAS_SAVE_LINE,
   CARTOGRAPHERS_RETURN_TO_ESTATE,
   CARTOGRAPHERS_RESUME_PREVIOUS,
@@ -389,3 +392,19 @@ export {
   type VisualThinkingResearchFreshness,
   type VisualThinkingResearchVerification,
 } from "./visualThinkingResearchAcquisition";
+
+export {
+  inferVisualThinkingRequestedOutcome,
+  assessVisualThinkingOutcomeCompletion,
+  researchPlanAloneSatisfiesOutcome,
+  knowledgePackageAloneSatisfiesOutcome,
+  type VisualThinkingRequestedOutcome,
+  type VisualThinkingOutcomeCompletionAssessment,
+  type VisualThinkingRequestedDeliverableType,
+} from "./visualThinkingRequestedOutcome";
+
+export {
+  runVisualThinkingResearchToResult,
+  buildStableResearchFindingsForRequest,
+  type VisualThinkingResearchToResultRun,
+} from "./visualThinkingResearchToResult";

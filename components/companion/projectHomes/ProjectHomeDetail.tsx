@@ -67,7 +67,7 @@ const PROJECT_TOOLS = [
   },
   {
     id: "cartographer",
-    label: "Cartographer",
+    label: "Visual Thinking Studio",
     blurb: "Map ideas, decisions, steps, or relationships visually.",
     status: "comingLater",
   },

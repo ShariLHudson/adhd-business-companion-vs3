@@ -43,13 +43,16 @@ describe("My Day & Work navigation contract", () => {
     expect(getMyDayAndWorkDestination("projects").opener).toBe("project-homes");
   });
 
-  it("routes Parking Lot, Destination Gallery, and Cartography distinctly", () => {
+  it("routes Parking Lot, Destination Gallery, and Visual Thinking Studio distinctly", () => {
     expect(resolveMyDayAndWorkOpenerFromText("Open my Parking Lot")).toBe(
       "parking-lot",
     );
     expect(resolveMyDayAndWorkOpenerFromText("Show Destination Gallery")).toBe(
       "destination-gallery",
     );
+    expect(
+      resolveMyDayAndWorkOpenerFromText("Take me to Visual Thinking Studio"),
+    ).toBe("cartographers-studio");
     expect(resolveMyDayAndWorkOpenerFromText("Take me to Cartography")).toBe(
       "cartographers-studio",
     );

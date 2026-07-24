@@ -73,9 +73,10 @@ export function framedMapForVisualFocusMode(
 }
 
 export const CARTOGRAPHERS_ROOM_INTRO = {
-  plaque: "Cartographer's Studio",
+  plaque: "Visual Thinking Studio",
   /** Estate plain language — what this place is for, in one calm line. */
-  tagline: "Think through ideas visually.",
+  tagline:
+    "Explore, organize, and understand information through guides, reports, and visual thinking.",
   welcome:
     "Choose a framed map on the wall, or open the Atlas when you want to learn first.",
   instruction: "Click any map to open it and start working.",
@@ -84,8 +85,8 @@ export const CARTOGRAPHERS_ROOM_INTRO = {
 
 /** @deprecated Prefer CartographersAtlas overlay — kept for import compatibility. */
 export const CARTOGRAPHERS_ATLAS_TEASER = {
-  title: "Cartographer's Atlas",
-  body: "Learn what each map is for, then create one when you're ready.",
+  title: "Visual Thinking Atlas",
+  body: "Learn what each approach is for, then create one when you're ready.",
   mindMapAction: "Create This Map",
   comingSoon: getCartographyMapDefinition("mind-map").name + " and every wall map are ready to create.",
 } as const;

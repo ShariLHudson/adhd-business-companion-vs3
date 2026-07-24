@@ -115,7 +115,7 @@ export function UniversalBlueprintPreview({
           preview.boardSupport.length > 0 ||
           preview.researchSupport.length > 0) && (
           <p className="ubi-muted">
-            Support available from Chamber, Board, research, and Cartography as
+            Support available from Chamber, Board, research, and Visual Thinking Studio as
             you go.
           </p>
         )}

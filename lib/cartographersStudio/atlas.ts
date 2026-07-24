@@ -197,7 +197,7 @@ export function getAtlasEntry(
 }
 
 export const CARTOGRAPHERS_ATLAS_INTRO = {
-  title: "Cartographer's Atlas",
+  title: "Visual Thinking Atlas",
   subtitle: "Learn visual thinking — then create when you're ready.",
   body: "Each method teaches a different way of seeing. Explore freely. When a map is ready, Create This Map opens the same Discovery Interview as the framed map on the wall.",
 } as const;

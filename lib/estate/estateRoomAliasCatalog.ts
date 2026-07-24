@@ -764,8 +764,11 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   },
   {
     roomId: "cartographers-studio",
-    officialName: "Cartographer's Studio",
+    officialName: "Visual Thinking Studio",
     aliases: [
+      "visual thinking studio",
+      "visual thinking",
+      "cartography",
       "cartographers studio",
       "cartographer's studio",
       "cartographer studio",

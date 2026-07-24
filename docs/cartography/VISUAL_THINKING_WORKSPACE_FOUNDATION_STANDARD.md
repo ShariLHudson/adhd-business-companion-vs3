@@ -3,7 +3,9 @@
 **Status:** Binding implementation standard (Build 7)  
 **Date:** 2026-07-24  
 **Scope:** First interactive Thinking Workspace over approved presentation, knowledge, and deliverables  
-**Experience authority:** [VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md)
+**Experience authority:** [VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md)  
+**User-facing name:** Visual Thinking Studio  
+**Corrective 7.1:** [Rename & Research-to-Result](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md)
 
 **Runtime:** `lib/cartographersStudio/visualThinkingWorkspaceFoundation.ts`  
 **UI:** `components/companion/cartographersStudio/ThinkingWorkspace.tsx`  

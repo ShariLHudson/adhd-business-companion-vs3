@@ -117,7 +117,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "focus-studio",
-    name: "Cartographer's Studio",
+    name: "Visual Thinking Studio",
     purpose: "Visual Thinking home — mapping, planning, and charting a path forward",
     emotionalPromise: "I'll help you see this clearly.",
     hospitalityStyle: "thoughtful-companion",

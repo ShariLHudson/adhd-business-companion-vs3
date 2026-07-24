@@ -18,7 +18,7 @@ export const CONNECTED_PLACES: readonly ConnectedPlaceShortcut[] = [
   },
   {
     id: "cartography",
-    label: "Cartography",
+    label: "Visual Thinking Studio",
     blurb: "Map ideas, decisions, steps, or relationships visually.",
     destinationHint: "visual-focus",
     status: "comingLater",

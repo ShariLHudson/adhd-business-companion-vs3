@@ -59,8 +59,8 @@ describe("visualFocus studioCards", () => {
     expect(joined).toContain("ready to act");
   });
 
-  it("hero shows Cartographer's Studio room identity", () => {
-    expect(VISUAL_FOCUS_STUDIO_HERO.title).toMatch(/Cartographer/i);
+  it("hero shows Visual Thinking Studio room identity", () => {
+    expect(VISUAL_FOCUS_STUDIO_HERO.title).toMatch(/Visual Thinking Studio/i);
     expect(VISUAL_FOCUS_STUDIO_HERO.tagline).toMatch(/Every map tells a story/i);
     expect(VISUAL_FOCUS_STUDIO_HERO.microCopy).toMatch(/first draft/i);
   });
