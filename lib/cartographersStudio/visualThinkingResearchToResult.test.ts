@@ -279,6 +279,33 @@ describe("Research-to-result pipeline (7.1)", () => {
     expect(thin.substanceValidationPassed).toBe(false);
   });
 
+  it("auto-safe-generation: Loom does not stop at research_unavailable awaiting choice", () => {
+    const run = runVisualThinkingResearchToResult(
+      "Research how Loom works now and create a step-by-step guide for recording a Loom video and uploading it to YouTube.",
+      { entryPath: "research_assisted" },
+    );
+    expect(run.liveResearchAvailable).toBe(false);
+    expect(run.generationBundle).toBeTruthy();
+    const primary =
+      run.generationBundle?.deliverables.find(
+        (d) => d.id === run.generationBundle!.run.primaryDeliverableId,
+      ) ?? null;
+    expect(primary).toBeTruthy();
+    expect(primary!.type).toBe("step_by_step_guide");
+    const steps = primary!.blocks.filter((b) => b.type === "numbered_step");
+    expect(steps.length).toBeGreaterThanOrEqual(20);
+    const process = run.generationBundle?.deliverables.find(
+      (d) => d.type === "process_flow",
+    );
+    expect(process).toBeTruthy();
+    expect(run.workspace).toBeTruthy();
+    expect(run.workspace!.objects.length).toBeGreaterThanOrEqual(12);
+    expect(run.completion.substanceValidationPassed).toBe(true);
+    const guideText = primary!.blocks.map((b) => b.content).join(" ");
+    expect(guideText).not.toMatch(/Build the Useful Guide|Still building your result|No primary result is available/i);
+    expect(run.progressLabels.length).toBeGreaterThan(0);
+  });
+
   it("F. Research unavailable keeps incomplete when no findings", () => {
     const outcome = inferVisualThinkingRequestedOutcome(
       "Research the latest obscure regulation XYZ-999 pricing now and create a report.",

@@ -90,7 +90,10 @@ import {
   assessClarificationNecessity,
   assessRequestAuthorization,
   buildAutomaticContinuationPlan,
+  buildInstructionalGenerationMaterial,
   resolveKnowledgeGap,
+  shouldAutomaticallyContinueWithSafeGeneration,
+  userRequiresCurrentVerifiedOnly,
 } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 import { runVisualThinkingResearchToResult } from "@/lib/cartographersStudio/visualThinkingResearchToResult";
 import {
@@ -401,6 +404,41 @@ export function VisualThinkingRequestPanel({
   const pipelineRecovery =
     Boolean(generationBundle || researchBundle || knowledgeBundle) &&
     !hasSubstantiveResult;
+  const safeAutoContinueAvailable = useMemo(() => {
+    const text = (request.rawRequest || draftText).trim();
+    if (!text) return false;
+    const auth = assessRequestAuthorization(text);
+    const material = buildInstructionalGenerationMaterial(text);
+    const clarification = assessClarificationNecessity({
+      rawRequest: text,
+      gaps: knowledgeBundle?.package.knowledgeGaps ?? [],
+      creationMode: auth.creationMode,
+    });
+    return shouldAutomaticallyContinueWithSafeGeneration({
+      originalRequestAuthorizedCreation:
+        auth.authorized &&
+        (auth.creationMode === "build_for_me" ||
+          auth.creationMode === "guide_me" ||
+          request.entryPath === "research_assisted"),
+      liveResearchAvailable: false,
+      liveResearchSucceeded: false,
+      stableKnowledgeAvailable:
+        material.domain !== "none" && material.steps.length >= 4,
+      substantivePartialPossible:
+        material.domain !== "none" && material.steps.length >= 4,
+      essentialUserInputMissing:
+        clarification.required && clarification.blocksAllGeneration,
+      consequentialAssumptionRequired:
+        clarification.required &&
+        clarification.reason === "consequential_jurisdiction",
+      userRequiresCurrentVerifiedOnly: userRequiresCurrentVerifiedOnly(text),
+    });
+  }, [
+    request.rawRequest,
+    request.entryPath,
+    draftText,
+    knowledgeBundle?.package.knowledgeGaps,
+  ]);
 
   const executionTraceSummary = useMemo(
     () => summarizeVisualThinkingTrace(executionTraceId),
@@ -766,6 +804,25 @@ export function VisualThinkingRequestPanel({
     runGenerateFirstPipeline(request.rawRequest);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional one-shot when preview appears
   }, [phase, request.rawRequest, requestAuth?.skipRecommendationConfirm]);
+
+  // Research unavailable / stale recovery: continue safe generation automatically
+  // when the original request already authorized creation. Do not require
+  // "Build the Useful Guide".
+  useEffect(() => {
+    if (autoContinueLockRef.current) return;
+    if (!pipelineRecovery) return;
+    if (!safeAutoContinueAvailable) return;
+    const text = (request.rawRequest || draftText).trim();
+    if (!text) return;
+    autoContinueLockRef.current = true;
+    runGenerateFirstPipeline(text);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot recovery continuation
+  }, [
+    pipelineRecovery,
+    safeAutoContinueAvailable,
+    request.rawRequest,
+    draftText,
+  ]);
 
   return (
     <div
@@ -1294,7 +1351,7 @@ export function VisualThinkingRequestPanel({
                 </button>
               </div>
             ) : null}
-            {knowledgeBundle.package.conflicts.length > 0 ? (
+            {(knowledgeBundle.package.conflicts?.length ?? 0) > 0 ? (
               <p
                 className="vts-request__note"
                 data-testid="visual-thinking-knowledge-conflict-note"
@@ -1370,7 +1427,35 @@ export function VisualThinkingRequestPanel({
           </section>
         ) : null}
 
-        {pipelineRecovery ? (
+        {pipelineRecovery && safeAutoContinueAvailable ? (
+          <section
+            className="vts-request__confirmed"
+            data-testid="visual-thinking-safe-generation-progress"
+            aria-label="Building your guide"
+          >
+            <h2 className="vts-request__section-title">Building your guide</h2>
+            <p className="vts-request__note">
+              Current research is unavailable. Building the useful guide from
+              stable information…
+            </p>
+            <ul className="vts-request__progress-list" aria-live="polite">
+              {(generateFirstProgress.length > 0
+                ? generateFirstProgress
+                : [
+                    "Current research is unavailable.",
+                    "Building the guide from stable information…",
+                    "Creating the visual process…",
+                    "Checking the result…",
+                    "Opening your guide…",
+                  ]
+              ).map((label) => (
+                <li key={label}>{label}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {pipelineRecovery && !safeAutoContinueAvailable ? (
           <section
             className="vts-request__confirmed"
             data-testid="visual-thinking-pipeline-recovery"
@@ -1379,18 +1464,10 @@ export function VisualThinkingRequestPanel({
             <h2 className="vts-request__section-title">Still building your result</h2>
             <p className="vts-request__note">
               I could not open a finished workspace yet. Your request and any
-              research so far are saved — I can build the useful guide from
-              stable steps, or retry current research.
+              research so far are saved. Tell me what is still missing, or retry
+              current research when you are ready.
             </p>
             <div className="vts-request__actions">
-              <button
-                type="button"
-                className="vts-request__primary"
-                data-testid="visual-thinking-recovery-build-guide"
-                onClick={() => runGenerateFirstPipeline(request.rawRequest)}
-              >
-                Build the Useful Guide
-              </button>
               <button
                 type="button"
                 className="vts-request__secondary-btn"
@@ -1460,6 +1537,19 @@ export function VisualThinkingRequestPanel({
                       : "Written review"}
                   </button>
                 ) : null}
+                {hasSubstantiveResult ? (
+                  <button
+                    type="button"
+                    className="vts-request__secondary-btn"
+                    data-testid="visual-thinking-retry-current-research"
+                    onClick={() => {
+                      autoContinueLockRef.current = false;
+                      runGenerateFirstPipeline(request.rawRequest);
+                    }}
+                  >
+                    Retry Current Research
+                  </button>
+                ) : null}
                 <label className="vts-presentation__density">
                   <span className="vts-request__label">View</span>
                   <select
@@ -1492,7 +1582,11 @@ export function VisualThinkingRequestPanel({
               </div>
             </header>
 
-            {presentationWorkspace?.incompletenessVisible ? (
+            {presentationWorkspace?.incompletenessVisible &&
+            hasSubstantiveResult &&
+            !/No primary result is available to present/i.test(
+              presentationWorkspace.incompletenessMessage ?? "",
+            ) ? (
               <p
                 className="vts-request__note"
                 data-testid="visual-thinking-incomplete-notice"
@@ -1501,14 +1595,16 @@ export function VisualThinkingRequestPanel({
                 {presentationWorkspace.incompletenessMessage}
               </p>
             ) : null}
-
-            {generationStatus.researchBlocked ? (
+            {hasSubstantiveResult &&
+            activeDeliverable?.blocks.some((b) => b.metadata?.freshnessNotice) ? (
               <p
                 className="vts-request__note"
-                data-testid="visual-thinking-research-blocked"
+                data-testid="visual-thinking-freshness-notice"
+                role="status"
               >
-                {generationStatus.detail ??
-                  "I'm ready to build this once the research is gathered."}
+                {activeDeliverable.blocks.find((b) => b.metadata?.freshnessNotice)
+                  ?.content ??
+                  "I built this using stable instructional knowledge. A few interface labels may look slightly different."}
               </p>
             ) : null}
 

@@ -11,11 +11,14 @@ import {
   type VisualThinkingExperiencePlan,
 } from "@/lib/cartographersStudio/visualThinkingExperienceOrchestrator";
 import {
+  assessClarificationNecessity,
   assessRequestAuthorization,
   buildAutomaticContinuationPlan,
   buildInstructionalGenerationMaterial,
   enrichHandoffWithInstructionalMaterial,
   instructionalMaterialToSuppliedLines,
+  shouldAutomaticallyContinueWithSafeGeneration,
+  userRequiresCurrentVerifiedOnly,
 } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 import {
   knowledgeHandoffToGenerationContext,
@@ -399,6 +402,31 @@ export function runVisualThinkingResearchToResult(
       deliverable: preferredDeliverable,
     });
   }
+  // Authorized guide requests should include a visual process + checklist when
+  // safe generation continues — do not stop at a written outline alone.
+  if (
+    confirmedPlan.primaryDeliverable === "step_by_step_guide" ||
+    confirmedPlan.primaryDeliverable === "training_guide"
+  ) {
+    const support = new Set(confirmedPlan.supportingDeliverables);
+    if (
+      requestedOutcome.requiresVisualProjection ||
+      /\b(process|visual|step-by-step|guide|how to)\b/i.test(rawRequest)
+    ) {
+      support.add("process_flow");
+    }
+    support.add("checklist");
+    confirmedPlan = applyExperiencePlanOverride(confirmedPlan, {
+      kind: "set_supporting",
+      deliverables: [...support],
+    });
+  }
+  // Plan overrides mark status user_adjusted — re-confirm before generation.
+  if (confirmedPlan.status !== "ready_to_generate") {
+    confirmedPlan = applyExperiencePlanOverride(confirmedPlan, {
+      kind: "confirm",
+    });
+  }
 
   let knowledge = prepareVisualThinkingKnowledge({
     request: confirmed,
@@ -515,10 +543,50 @@ export function runVisualThinkingResearchToResult(
     count: remainingGaps,
   });
 
-  const researchSatisfied =
+  const researchGateSatisfied =
     !requestedOutcome.requiresResearch ||
     knowledgeResearchSatisfiesGenerationGate(researchBundle) ||
     (findings.length > 0 && Boolean(researchBundle?.acquiredAt));
+
+  const stableKnowledgeAvailable =
+    material.domain !== "none" && material.steps.length >= 4;
+  const liveResearchSucceeded = Boolean(
+    liveResearchAvailable && researchBundle?.acquiredAt && researchGateSatisfied,
+  );
+  const clarification = assessClarificationNecessity({
+    rawRequest,
+    gaps: knowledge.package.knowledgeGaps,
+    creationMode: auth.creationMode,
+  });
+  const autoSafeContinue = shouldAutomaticallyContinueWithSafeGeneration({
+    originalRequestAuthorizedCreation:
+      auth.authorized &&
+      (auth.creationMode === "build_for_me" ||
+        auth.creationMode === "guide_me" ||
+        options?.entryPath === "research_assisted"),
+    liveResearchAvailable,
+    liveResearchSucceeded,
+    stableKnowledgeAvailable,
+    substantivePartialPossible: stableKnowledgeAvailable,
+    essentialUserInputMissing:
+      clarification.required && clarification.blocksAllGeneration,
+    consequentialAssumptionRequired:
+      clarification.required &&
+      clarification.reason === "consequential_jurisdiction",
+    userRequiresCurrentVerifiedOnly: userRequiresCurrentVerifiedOnly(rawRequest),
+  });
+  // Stable instructional knowledge satisfies the generation research gate for
+  // authorized creation when live research is unavailable — never stop for a
+  // second "Build the Useful Guide" click.
+  const researchSatisfied =
+    researchGateSatisfied || (autoSafeContinue && stableKnowledgeAvailable);
+  recordVisualThinkingTrace(traceId, "safe_generation_auto_continue", {
+    autoSafeContinue,
+    researchGateSatisfied,
+    researchSatisfied,
+    stableKnowledgeAvailable,
+    liveResearchAvailable,
+  });
 
   const handoffCtx = knowledgeHandoffToGenerationContext(
     knowledge.handoff,
@@ -556,11 +624,19 @@ export function runVisualThinkingResearchToResult(
     requestedOutcome.requiresGeneration ||
     options?.entryPath === "research_assisted";
 
-  // Do not treat "research planned" as satisfied — only acquired findings.
+  // Do not treat bare "research planned" as done — but do auto-continue when
+  // stable substantive knowledge makes safe generation available.
   if (
     shouldGenerate &&
-    (researchSatisfied || !requestedOutcome.requiresResearch)
+    (researchSatisfied || !requestedOutcome.requiresResearch || autoSafeContinue)
   ) {
+    if (autoSafeContinue && !liveResearchSucceeded) {
+      recordVisualThinkingTrace(traceId, "safe_generation_in_progress", {
+        reason: liveResearchAvailable
+          ? "live_research_incomplete"
+          : "live_research_unavailable",
+      });
+    }
     const generationInputItems =
       knowledge.package.items.length +
       (researchFacts ? 1 : 0) +
@@ -568,6 +644,7 @@ export function runVisualThinkingResearchToResult(
     recordVisualThinkingTrace(traceId, "generation_invoked", {
       invoked: true,
       researchSatisfied,
+      autoSafeContinue,
     });
     recordVisualThinkingTrace(traceId, "generation_input_item_count", {
       count: generationInputItems,
@@ -580,9 +657,11 @@ export function runVisualThinkingResearchToResult(
       userFacingGoal: handoffCtx.userFacingGoal,
       successDefinition: handoffCtx.successDefinition,
       suppliedContent: supplied || handoffCtx.suppliedContent,
-      topicHint: handoffCtx.topicHint,
+      topicHint: material.title || handoffCtx.topicHint,
       freshnessNotice: material.freshnessNotice || handoffCtx.freshnessNotice,
-      knowledgeResearchSatisfied: researchSatisfied,
+      // Safe generation from stable knowledge must not leave the run stuck in
+      // awaiting_research / empty primary presentation.
+      knowledgeResearchSatisfied: researchSatisfied || autoSafeContinue,
     });
 
     let nextPresentation = planVisualThinkingPresentation({
@@ -595,6 +674,19 @@ export function runVisualThinkingResearchToResult(
       nextPresentation,
       requestedOutcome.requestedPresentation,
     );
+    // Never surface recovery copy as the presentation completeness notice when
+    // a primary deliverable exists.
+    if (
+      generationBundle.run.primaryDeliverableId &&
+      nextPresentation.completenessNotice ===
+        "No primary result is available to present."
+    ) {
+      nextPresentation = {
+        ...nextPresentation,
+        status: "ready",
+        completenessNotice: material.freshnessNotice,
+      };
+    }
     presentationPlan = nextPresentation;
 
     workspace = createThinkingWorkspace({
@@ -609,6 +701,7 @@ export function runVisualThinkingResearchToResult(
       invoked: false,
       shouldGenerate,
       researchSatisfied,
+      autoSafeContinue,
     });
   }
 
@@ -670,15 +763,25 @@ export function runVisualThinkingResearchToResult(
         /have not been verified/i.test(workspace.completenessNotice),
     ),
   });
+  const hasPrimary =
+    Boolean(primary) &&
+    processSteps >= 4 &&
+    Boolean(generationBundle?.run.primaryDeliverableId);
   const finalState = workspace
     ? completion.complete
       ? "ready"
-      : "partial_ready"
-    : researchSatisfied
+      : hasPrimary
+        ? "partial_ready_with_substantive_result"
+        : "partial_ready"
+    : hasPrimary
       ? "generation_or_projection_failed"
-      : liveResearchAvailable
-        ? "research_in_progress"
-        : "research_unavailable";
+      : autoSafeContinue && !generationBundle
+        ? "safe_generation_in_progress"
+        : researchSatisfied
+          ? "generation_or_projection_failed"
+          : liveResearchAvailable
+            ? "research_in_progress"
+            : "research_unavailable";
   recordVisualThinkingTrace(traceId, "final_execution_state", {
     state: finalState,
   });
@@ -686,12 +789,24 @@ export function runVisualThinkingResearchToResult(
     hasWorkspace: Boolean(workspace),
     hasGeneration: Boolean(generationBundle),
     hasWrittenGuide: processSteps >= 4,
+    primaryResultPresent: hasPrimary,
     warningOnly: Boolean(
       workspace?.completenessNotice &&
         /have not been verified/i.test(workspace.completenessNotice) &&
         (workspace?.objects.length ?? 0) < 3,
     ),
   });
+
+  const safeProgressLabels =
+    autoSafeContinue && !liveResearchSucceeded
+      ? [
+          "Current research is unavailable.",
+          "Building the guide from stable information…",
+          "Creating the visual process…",
+          "Checking the result…",
+          "Opening your guide…",
+        ]
+      : continuation.progressLabels;
 
   return {
     request: confirmed,
@@ -707,7 +822,7 @@ export function runVisualThinkingResearchToResult(
     progressLabels:
       completion.progressLabels.length > 0
         ? completion.progressLabels
-        : continuation.progressLabels,
+        : safeProgressLabels,
     acknowledgement:
       auth.acknowledgement ||
       "I'll research what we need and build the result you asked for.",

@@ -765,7 +765,10 @@ export function canOpenThinkingWorkspace(input: {
   if (input.usefulPartialAllowed && hasContent) return true;
   if (
     input.generationRunStatus === "review_ready" ||
-    input.generationRunStatus === "partial"
+    input.generationRunStatus === "partial" ||
+    // Safe generation may still mark research as pending while substantive
+    // instructional content is already present — allow workspace entry.
+    (input.generationRunStatus === "awaiting_research" && hasContent)
   ) {
     return hasContent;
   }

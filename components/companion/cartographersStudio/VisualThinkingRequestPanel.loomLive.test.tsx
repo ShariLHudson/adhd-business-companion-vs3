@@ -132,6 +132,82 @@ describe("VisualThinkingRequestPanel Loom live path", () => {
     expect(container.textContent ?? "").not.toMatch(/have not been verified/i);
   });
 
+  it("research-unavailable recovery auto-continues without Build the Useful Guide", () => {
+    // Simulate the screenshot recovery session: knowledge + research, no result.
+    window.sessionStorage.setItem(
+      "companion-visual-thinking-request-draft-v1",
+      JSON.stringify({
+        id: "req-recovery",
+        rawRequest:
+          "Research how Loom works now and create a step-by-step guide for recording a Loom video and uploading it to YouTube.",
+        status: "confirmed",
+        entryPath: "research_assisted",
+        requestedDepth: "guided",
+        recommendationConfirmed: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }),
+    );
+    window.sessionStorage.setItem(
+      "companion-visual-thinking-knowledge-package-v1",
+      JSON.stringify({
+        plan: {
+          id: "kp-plan",
+          status: "awaiting_research",
+          missingKnowledgeGaps: [],
+          availableSourceRefs: [],
+          updatedAt: new Date().toISOString(),
+        },
+        package: {
+          id: "kp",
+          items: [],
+          knowledgeGaps: [],
+          sourceReferences: [],
+          readiness: "partial_ready",
+          blockedReasons: [],
+          conflicts: [],
+        },
+        handoff: {
+          safeGenerationScope: "partial",
+          suppliedSteps: [],
+          blockedContentAreas: [],
+          knowledgePackageId: "kp",
+        },
+      }),
+    );
+
+    act(() => {
+      root.render(
+        <VisualThinkingRequestPanel onOpenPreviousWork={() => undefined} />,
+      );
+    });
+
+    // Auto-continue must run — never require the recovery button.
+    expect(
+      container.querySelector(
+        "[data-testid='visual-thinking-recovery-build-guide']",
+      ),
+    ).toBeFalsy();
+    expect(container.textContent ?? "").not.toMatch(
+      /No primary result is available to present/i,
+    );
+
+    const ws = container.querySelector("[data-testid='thinking-workspace']");
+    const objs = container.querySelectorAll("[data-testid^='thinking-object-']");
+    expect(ws).toBeTruthy();
+    expect(objs.length).toBeGreaterThanOrEqual(12);
+    expect(
+      container.querySelector(
+        "[data-testid='visual-thinking-retry-current-research']",
+      ),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(
+        "[data-testid='visual-thinking-pipeline-recovery']",
+      ),
+    ).toBeFalsy();
+  });
+
   it("stale warning-only session workspace is not restored as ready", () => {
     const stale = {
       id: "ws-stale",

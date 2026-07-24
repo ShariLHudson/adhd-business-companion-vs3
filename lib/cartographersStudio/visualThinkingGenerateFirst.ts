@@ -107,7 +107,44 @@ export type InstructionalGenerationMaterial = {
   checklist: string[];
   freshnessNotice: string | null;
   domain: "screen_recording_publish" | "generic_how_to" | "comparison_seed" | "none";
+  /** Optional visual-process stage groups for supporting process maps. */
+  processGroups?: string[];
 };
+
+/**
+ * When live research is unavailable, decide whether authorized creation may
+ * continue automatically with stable substantive knowledge (no second click).
+ */
+export type SafeGenerationAutoContinueInput = {
+  originalRequestAuthorizedCreation: boolean;
+  liveResearchAvailable: boolean;
+  liveResearchSucceeded: boolean;
+  stableKnowledgeAvailable: boolean;
+  substantivePartialPossible: boolean;
+  essentialUserInputMissing: boolean;
+  consequentialAssumptionRequired: boolean;
+  userRequiresCurrentVerifiedOnly: boolean;
+};
+
+export function shouldAutomaticallyContinueWithSafeGeneration(
+  input: SafeGenerationAutoContinueInput,
+): boolean {
+  if (!input.originalRequestAuthorizedCreation) return false;
+  if (input.essentialUserInputMissing) return false;
+  if (input.consequentialAssumptionRequired) return false;
+  if (input.userRequiresCurrentVerifiedOnly) return false;
+  if (input.liveResearchAvailable && input.liveResearchSucceeded) return false;
+  if (!input.stableKnowledgeAvailable) return false;
+  if (!input.substantivePartialPossible) return false;
+  return true;
+}
+
+/** Detect explicit “verified current only” requests that decline stable fallback. */
+export function userRequiresCurrentVerifiedOnly(rawRequest: string): boolean {
+  return /\b(only\s+(use\s+)?(current|live|verified)\b|do not use (stable|generic|fallback)|fully verified current|current information only)\b/i.test(
+    rawRequest,
+  );
+}
 
 // ─── Request authorization ──────────────────────────────────────────────────
 
@@ -490,112 +527,195 @@ export function buildInstructionalGenerationMaterial(
 
   if (loom || (youtube && video) || (/\bupload\b/.test(t) && video)) {
     const freshnessNotice =
-      "Loom and YouTube occasionally change the location or wording of controls. The overall process below is reliable; exact button names may vary by your current account version.";
+      "I built this using the stable Loom and YouTube workflow. I could not verify the latest interface labels, so a few button names may look slightly different.";
     return {
-      title: loom && youtube
-        ? "How to Create a Loom Video and Share It on YouTube"
-        : loom
-          ? "How to Create a Loom Video"
-          : "How to Upload a Video to YouTube",
+      title:
+        loom && youtube
+          ? "How to Record a Loom Video and Upload It to YouTube"
+          : loom
+            ? "How to Record a Loom Video"
+            : "How to Upload a Video to YouTube",
       overview:
-        "A practical sequence for preparing, recording, reviewing, and publishing a screen video — with room to verify current product labels.",
+        "A practical sequence for preparing, recording, reviewing, sharing or downloading, and publishing a screen video on YouTube — with localized notes where product labels may change.",
       domain: "screen_recording_publish",
       freshnessNotice,
+      processGroups: [
+        "Prepare",
+        "Set Up",
+        "Record",
+        "Review",
+        "Share or Download",
+        "Upload to YouTube",
+        "Final Check",
+      ],
       steps: [
         {
-          title: "What you will create",
+          title: "Decide the Purpose of the Video",
           content:
-            "A short screen recording you can review, then publish to YouTube so others can watch a clear link.",
+            "Name the one outcome viewers should get — a demo, a walkthrough, or a short explanation — so every later step serves that purpose.",
         },
         {
-          title: "Before you begin",
+          title: "Prepare What You Will Show",
           content:
-            "Decide the one outcome of the video, close unrelated tabs, and ensure your microphone works in a quiet space.",
+            "Open the screens, tabs, and files you will demonstrate. Close unrelated windows and write a short talking outline if it helps you stay clear.",
         },
         {
-          title: "Set up your recording tool",
+          title: "Open Loom",
           content: loom
-            ? "Open Loom in the browser or desktop app and sign in. Start a new recording from the main recording entry point (label may vary by version)."
-            : "Open your screen recorder and start a new recording session.",
+            ? "Open Loom in the browser or desktop app and sign in so you can start a new recording."
+            : "Open your screen recorder and sign in if required.",
           freshnessSensitive: true,
         },
         {
-          title: "Choose what to record",
+          title: "Choose a Recording Method",
           content:
-            "Select screen only, camera only, or screen and camera. Pick the window or display that shows the steps you want to teach.",
+            "Pick screen only, camera only, or screen and camera based on whether viewers need to see your face along with the screen.",
           freshnessSensitive: true,
         },
         {
-          title: "Check microphone and camera",
+          title: "Select the Screen or Window",
           content:
-            "Confirm the correct microphone is selected and, if using camera, that framing and lighting look clear in the preview.",
+            "Choose the display or application window that shows the steps you want to teach, and confirm the preview matches what you intend to record.",
           freshnessSensitive: true,
         },
         {
-          title: "Record your video",
+          title: "Check the Camera",
           content:
-            "Start recording, speak slowly through one clear sequence, and avoid jumping between unrelated topics. Pause if your tool supports it when you need a moment.",
-        },
-        {
-          title: "Finish and review",
-          content:
-            "Stop the recording, watch the playback, and trim dead air or mistakes before you export or download.",
+            "If you are including camera, confirm framing, lighting, and that the correct camera is selected before you begin.",
           freshnessSensitive: true,
         },
         {
-          title: "Export or save the file",
+          title: "Select and Test the Microphone",
           content:
-            "Download or export a standard video file when YouTube needs a local upload. If your recorder offers a share link first, still keep a local copy when publishing elsewhere.",
+            "Choose the microphone you will use, then speak a short test phrase and confirm the level looks healthy and clear.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Begin Recording",
+          content:
+            "Start the recording from Loom’s main record control (exact label may vary by version), then pause for a breath before you speak.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Present the Content",
+          content:
+            "Walk through one clear sequence at a calm pace. Stay on the outcome you named earlier and avoid jumping between unrelated topics.",
+        },
+        {
+          title: "Finish the Recording",
+          content:
+            "Stop the recording when the demonstration is complete. Prefer one clean take over many unfinished starts.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Review the Video",
+          content:
+            "Watch the playback for clarity, pacing, and audio. Note any dead air, mistakes, or missing steps before you share or upload.",
+        },
+        {
+          title: "Trim or Edit",
+          content:
+            "Trim silence or mistakes using Loom’s editor when available. Keep edits light so the finished video stays easy to follow.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Name the Recording",
+          content:
+            "Give the recording a clear title that matches what viewers will learn so it is easy to find later in Loom and on YouTube.",
+        },
+        {
+          title: "Choose Sharing Permissions",
+          content:
+            "Set who can view the Loom link if you will share it directly. For a YouTube upload you will still need a downloadable file next.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Copy the Loom Link",
+          content:
+            "Copy the Loom share link if you want a quick preview for yourself or a collaborator before the YouTube publish.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Download the Video When Needed",
+          content:
+            "Download a standard video file from Loom when YouTube needs a local upload. Keep that file until the YouTube publish succeeds.",
           freshnessSensitive: true,
         },
         {
           title: "Open YouTube Studio",
           content:
-            "Go to YouTube Studio and begin a new upload. Use the create/upload entry that matches your channel (wording may vary).",
+            "Go to YouTube Studio and begin a new upload using the create or upload entry for your channel (wording may vary).",
           freshnessSensitive: true,
         },
         {
-          title: "Upload the video",
+          title: "Upload the Video File",
           content:
-            "Select the exported file and wait for processing to begin. Keep the tab open until the upload finishes.",
+            "Select the downloaded file and wait for the upload to finish. Keep the tab open until processing has clearly begun.",
           freshnessSensitive: true,
         },
         {
-          title: "Add title, description, and thumbnail",
+          title: "Add a Title and Description",
           content:
-            "Write a clear title, a short description of what viewers will learn, and choose or upload a thumbnail that matches the lesson.",
+            "Write a clear title and a short description of what viewers will learn so the video is easy to find and understand.",
         },
         {
-          title: "Choose visibility and audience",
+          title: "Add or Choose a Thumbnail",
           content:
-            "Set public, unlisted, or private, and answer the audience (made for kids) question honestly before publishing.",
+            "Choose or upload a thumbnail that matches the lesson so viewers recognize the topic at a glance.",
           freshnessSensitive: true,
         },
         {
-          title: "Publish or schedule",
+          title: "Select the Audience Setting",
           content:
-            "Publish now or schedule a time. Copy the final watch link and open it in a private window to confirm it works.",
+            "Answer YouTube’s audience question honestly (including whether the video is made for kids) before you publish.",
           freshnessSensitive: true,
         },
         {
-          title: "Common problems and fixes",
+          title: "Choose Visibility",
           content:
-            "No audio: re-check microphone permissions. Blurry screen: record a single window at full size. Upload stuck: confirm file finished exporting and retry once.",
+            "Set public, unlisted, or private based on how widely you want the video available right now.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Publish or Schedule",
+          content:
+            "Publish now or schedule a time. Confirm the final watch link appears after YouTube finishes processing.",
+          freshnessSensitive: true,
+        },
+        {
+          title: "Watch and Test the Final Upload",
+          content:
+            "Open the YouTube link in a private or signed-out window, play a few seconds, and confirm audio and video both work.",
+        },
+        {
+          title: "Troubleshooting",
+          content:
+            "No audio: re-check microphone permissions in the browser or Loom. Blurry screen: record one full-size window. Upload stuck: confirm the download finished, then retry once without creating duplicates.",
+        },
+        {
+          title: "Completion Checklist",
+          content:
+            "Purpose decided, mic tested, recording reviewed, file downloaded when needed, YouTube title and visibility set, and final watch link tested.",
         },
       ],
       troubleshooting: [
-        "If Loom will not start, refresh permissions for mic/camera and try again.",
-        "If YouTube processing stalls, wait, then refresh Studio — avoid re-uploading duplicates unless the first upload failed.",
+        "If Loom will not start, refresh mic and camera permissions, then try again.",
+        "If YouTube processing stalls, wait and refresh Studio once — avoid re-uploading duplicates unless the first upload failed.",
+        "If button names look different, follow the same sequence using the closest control in your current Loom or YouTube version.",
       ],
       checklist: [
-        "Decide the one teaching outcome",
-        "Test microphone",
-        "Record a clean take",
-        "Trim and export",
+        "Decide the purpose of the video",
+        "Prepare screens and talking outline",
+        "Open Loom and choose recording method",
+        "Test microphone (and camera if used)",
+        "Record, stop, and review",
+        "Trim and name the recording",
+        "Download when YouTube needs a file",
         "Upload in YouTube Studio",
         "Title, description, thumbnail",
-        "Visibility set",
-        "Final link tested",
+        "Audience and visibility set",
+        "Publish or schedule",
+        "Final watch link tested",
       ],
     };
   }

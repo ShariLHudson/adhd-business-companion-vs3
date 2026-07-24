@@ -1117,30 +1117,41 @@ function generateProcessFlowShell(
   runId: string,
   role: VisualThinkingGeneratedDeliverableRole,
 ): VisualThinkingGeneratedDeliverable {
-  const topic = topicFromContext(ctx);
+  const instructional = buildInstructionalGenerationMaterial(ctx.rawRequest);
+  const topic =
+    instructional.title || ctx.topicHint?.trim() || topicFromContext(ctx);
   const supplied =
     parseSuppliedLines(ctx.suppliedContent).length > 0
       ? parseSuppliedLines(ctx.suppliedContent)
       : extractSuppliedFromRequest(ctx.rawRequest);
+  const groupLabels =
+    instructional.processGroups && instructional.processGroups.length >= 3
+      ? instructional.processGroups
+      : null;
+  const stepLabels = groupLabels
+    ? groupLabels
+    : supplied.length > 0
+      ? supplied
+      : instructional.steps.length > 0
+        ? instructional.steps.map((s) => s.title)
+        : ["First action", "Core action", "Finish"];
   const d = makeDeliverableBase({
     runId,
     plan,
     type: "process_flow",
     role,
     title: `Process flow: ${topic}`,
-    purpose: "Structured process nodes — canvas rendering comes later.",
+    purpose: "Structured process nodes for the visual thinking workspace.",
     sourceMode: "deterministic_v1",
   });
   const startId = newId("node");
   const endId = newId("node");
-  const stepNodes = (supplied.length > 0 ? supplied : ["First action", "Core action", "Finish"]).map(
-    (label, i) => ({
-      id: newId("node"),
-      kind: "step",
-      label,
-      order: i,
-    }),
-  );
+  const stepNodes = stepLabels.map((label, i) => ({
+    id: newId("node"),
+    kind: "step",
+    label,
+    order: i,
+  }));
   const nodes = [
     { id: startId, kind: "start", label: "Start" },
     ...stepNodes.map(({ id, kind, label }) => ({ id, kind, label })),
@@ -1689,10 +1700,25 @@ export function executeGenerationRun(
   );
 
   if (next.researchBlocked) {
-    next.status = "awaiting_research";
-    next.userFacingStatus =
-      "I’m ready to build this once the research is gathered. A safe outline is available with placeholders for current facts.";
-    if (primary) primary.status = "draft";
+    const usableSteps = (primary?.blocks ?? []).filter(
+      (b) =>
+        (b.type === "numbered_step" || b.type === "checklist_item") &&
+        b.content.trim().split(/\s+/).length >= 5 &&
+        b.type !== "placeholder",
+    ).length;
+    // Stable instructional content is a usable partial result — do not leave
+    // the run blocked on awaiting_research when the guide is already useful.
+    if (usableSteps >= 4) {
+      next.status = "partial";
+      next.userFacingStatus =
+        "Your guide is ready from stable instructional knowledge. Current product labels may still be verified later.";
+      if (primary) primary.status = "review_ready";
+    } else {
+      next.status = "awaiting_research";
+      next.userFacingStatus =
+        "I’m ready to build this once the research is gathered. A safe outline is available with placeholders for current facts.";
+      if (primary) primary.status = "draft";
+    }
   } else if (
     plan.interactionStyle === "guide_me" &&
     primary &&

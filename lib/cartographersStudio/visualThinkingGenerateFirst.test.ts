@@ -30,6 +30,8 @@ import {
   inferCreationModeFromRequest,
   inferDetailLevelFromRequest,
   resolveKnowledgeGap,
+  shouldAutomaticallyContinueWithSafeGeneration,
+  userRequiresCurrentVerifiedOnly,
 } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 
 const LOOM =
@@ -369,7 +371,46 @@ describe("Visual Thinking Generate-First (6.6)", () => {
     expect(auth.skipDetailScreen).toBe(true);
     const material = buildInstructionalGenerationMaterial(LOOM);
     expect(material.domain).toBe("screen_recording_publish");
-    expect(material.steps.length).toBeGreaterThanOrEqual(10);
+    expect(material.steps.length).toBeGreaterThanOrEqual(26);
+    expect(material.processGroups?.length).toBeGreaterThanOrEqual(7);
     expect(material.freshnessNotice).toBeTruthy();
+    expect(material.title).toMatch(/Loom|YouTube/i);
+  });
+
+  it("safe-generation auto-continue is true for Loom when live research unavailable", () => {
+    const material = buildInstructionalGenerationMaterial(
+      "Research how Loom works now and create a step-by-step guide for recording a Loom video and uploading it to YouTube.",
+    );
+    expect(
+      shouldAutomaticallyContinueWithSafeGeneration({
+        originalRequestAuthorizedCreation: true,
+        liveResearchAvailable: false,
+        liveResearchSucceeded: false,
+        stableKnowledgeAvailable:
+          material.domain !== "none" && material.steps.length >= 4,
+        substantivePartialPossible: material.steps.length >= 4,
+        essentialUserInputMissing: false,
+        consequentialAssumptionRequired: false,
+        userRequiresCurrentVerifiedOnly: false,
+      }),
+    ).toBe(true);
+  });
+
+  it("safe-generation auto-continue is false when user requires verified-current only", () => {
+    const raw =
+      "Research Loom with fully verified current information only and create a guide.";
+    expect(userRequiresCurrentVerifiedOnly(raw)).toBe(true);
+    expect(
+      shouldAutomaticallyContinueWithSafeGeneration({
+        originalRequestAuthorizedCreation: true,
+        liveResearchAvailable: false,
+        liveResearchSucceeded: false,
+        stableKnowledgeAvailable: true,
+        substantivePartialPossible: true,
+        essentialUserInputMissing: false,
+        consequentialAssumptionRequired: false,
+        userRequiresCurrentVerifiedOnly: true,
+      }),
+    ).toBe(false);
   });
 });

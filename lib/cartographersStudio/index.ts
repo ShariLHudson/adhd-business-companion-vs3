@@ -219,6 +219,8 @@ export {
   resolveKnowledgeGap,
   assessScopedReadiness,
   buildAutomaticContinuationPlan,
+  shouldAutomaticallyContinueWithSafeGeneration,
+  userRequiresCurrentVerifiedOnly,
   assessGeneratedResultSubstance,
   buildInstructionalGenerationMaterial,
   enrichHandoffWithInstructionalMaterial,
@@ -228,6 +230,7 @@ export {
   type VisualThinkingScopedReadiness,
   type VisualThinkingAutomaticContinuationPlan,
   type VisualThinkingResultSubstanceAssessment,
+  type SafeGenerationAutoContinueInput,
 } from "./visualThinkingGenerateFirst";
 
 export {
