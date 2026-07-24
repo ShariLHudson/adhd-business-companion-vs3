@@ -3,6 +3,7 @@ import type { StrategyWorkItem } from "../../types";
 import { shouldPreferStabilizeOrTest } from "../frameworks/capacityFit";
 import { getStrategyType } from "../registry";
 import type { EnrichedStrategyOption, OptionPatternId } from "../types";
+import { assessOptionReadiness } from "./assessOptionReadiness";
 import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 
 function opt(
@@ -219,11 +220,5 @@ export function shouldOfferStrategicOptions(item: StrategyWorkItem): boolean {
   if (item.chosenDirection?.trim()) return false;
   if (item.optionsOffered === false) return false;
   if (item.optionsConsidered?.length) return true;
-  const answers =
-    (item.decisionStatement ? 1 : 0) + (item.memberStatements?.length ?? 0);
-  return (
-    answers >= 3 &&
-    Boolean(item.decisionStatement?.trim()) &&
-    Boolean(item.currentReality?.trim())
-  );
+  return assessOptionReadiness(item).optionsReady;
 }
