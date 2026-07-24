@@ -2,6 +2,7 @@ import type { AdaptivePresentationResolved } from "@/lib/adaptiveCompanionIntell
 import type { StrategyWorkItem } from "../../types";
 import { shouldPreferStabilizeOrTest } from "../frameworks/capacityFit";
 import { materializeStrategicOption } from "../frameworks/optionCatalog";
+import { normalizeOptionPattern } from "../patternLabels";
 import {
   strategicOptionsAreDistinct,
   toEnrichedStrategyOption,
@@ -16,6 +17,7 @@ import type { EnrichedStrategyOption, OptionPatternId } from "../types";
 import { assessOptionReadiness } from "./assessOptionReadiness";
 import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 import { selectDistinctOptionPatterns } from "./selectDistinctOptionPatterns";
+import { validateOptionDiversity } from "./validateOptionDiversity";
 
 function fromPersisted(item: StrategyWorkItem): EnrichedStrategyOption[] {
   return (item.optionsConsidered ?? []).slice(0, 3).map((o) => ({
@@ -28,20 +30,45 @@ function fromPersisted(item: StrategyWorkItem): EnrichedStrategyOption[] {
 
 function pricingPatterns(capacityTight: boolean): OptionPatternId[] {
   if (capacityTight) {
-    return ["stabilize", "protect_base", "raise_value"];
+    return ["stabilize", "protect_current_base", "add_value"];
   }
-  return ["raise_price", "protect_base", "raise_value", "test", "delay"];
+  // Meaningfully different pricing paths — not percentage variants
+  return [
+    "protect_current_base",
+    "restructure_price",
+    "test",
+    "add_value",
+    "increase_price",
+    "delay",
+  ];
 }
 
 function growthPatterns(capacityTight: boolean): OptionPatternId[] {
   if (capacityTight) {
-    return ["stabilize", "protect_base", "test", "simplify"];
+    return ["stabilize", "protect_current_base", "test", "simplify"];
   }
-  return ["narrow", "test", "expand", "raise_value", "simplify"];
+  return ["narrow", "test", "improve", "expand", "simplify"];
+}
+
+function ideasPatterns(): OptionPatternId[] {
+  return ["narrow", "test", "stabilize", "maintain_current_direction", "simplify"];
+}
+
+function hiringPatterns(): OptionPatternId[] {
+  return ["delegate", "automate", "simplify", "test", "delay", "partner"];
+}
+
+function partnershipPatterns(): OptionPatternId[] {
+  return ["test", "delay", "partner", "pause"];
+}
+
+function pivotPatterns(): OptionPatternId[] {
+  return ["improve", "narrow", "reposition", "pause", "stop", "test"];
 }
 
 /**
  * Full Phase 3 options — typed contract with trade-offs, risk, reversibility, experiments.
+ * Respects OptionReadiness — callers should use shouldOfferStrategicOptions before showing.
  */
 export function generateFullStrategicOptions(
   item: StrategyWorkItem,
@@ -80,6 +107,7 @@ export function generateFullStrategicOptions(
   const capacityTight = shouldPreferStabilizeOrTest(item);
   const max = Math.min(3, presentation?.maxVisibleChoices ?? 3);
   const type = getStrategyType(analysis.strategyTypeId);
+  const statement = (item.decisionStatement || "").toLowerCase();
 
   let candidates: OptionPatternId[];
   if (analysis.strategyTypeId === "pricing" || analysis.questionType === "pricing_decision") {
@@ -87,46 +115,69 @@ export function generateFullStrategicOptions(
   } else if (
     analysis.strategyTypeId === "growth" ||
     analysis.questionType === "growth_decision" ||
-    /\bmore customers?\b/i.test(item.decisionStatement || "")
+    /\bmore customers?\b/i.test(statement)
   ) {
     candidates = growthPatterns(capacityTight);
+  } else if (
+    /\b(ten things|too many ideas|many ideas|ten ideas)\b/i.test(statement)
+  ) {
+    candidates = ideasPatterns();
+  } else if (
+    analysis.strategyTypeId === "hiring_delegation" ||
+    /\bhire|va|assistant|delegate\b/i.test(statement)
+  ) {
+    candidates = hiringPatterns();
+  } else if (/\b(collaborat|partner with|partnership)\b/i.test(statement)) {
+    candidates = partnershipPatterns();
+  } else if (
+    analysis.strategyTypeId === "pivot_rethink" ||
+    /\b(isn'?t working|not working|pivot)\b/i.test(statement)
+  ) {
+    candidates = pivotPatterns();
   } else if (type) {
-    candidates = [...type.optionPatterns];
+    candidates = type.optionPatterns.map(normalizeOptionPattern);
     if (capacityTight || type.id === "capacity_focus") {
       candidates = ["stabilize", "simplify", "test", ...candidates];
     }
   } else {
     candidates = capacityTight
       ? ["stabilize", "test", "simplify", "delay"]
-      : ["continue", "test", "simplify", "delay"];
+      : ["continue", "test", "simplify", "improve", "delay"];
   }
 
-  // Deduplicate while preserving order
-  const uniqueCandidates = [...new Set(candidates)];
+  const uniqueCandidates = [...new Set(candidates.map(normalizeOptionPattern))];
   const selected = selectDistinctOptionPatterns(uniqueCandidates, item, {
     strategyTypeId: analysis.strategyTypeId,
-    max,
+    max: Math.max(max, 3),
   });
 
-  const options = selected.map((pattern) =>
-    materializeStrategicOption(pattern, {
-      typeId: analysis.strategyTypeId,
-      commonTradeoffs: type?.commonTradeoffs,
-      commonRisks: type?.commonRisks,
-      experimentHint: type?.experimentPatterns?.[0],
-    }),
+  const rejected = new Set(
+    (item.notChosen ?? []).map((s) => s.trim().toLowerCase()).filter(Boolean),
   );
 
-  // Quality gate — if somehow too similar, force a test + simplify pair
+  let options = selected
+    .map((pattern) =>
+      materializeStrategicOption(pattern, {
+        typeId: analysis.strategyTypeId,
+        commonTradeoffs: type?.commonTradeoffs,
+        commonRisks: type?.commonRisks,
+        experimentHint: type?.experimentPatterns?.[0],
+        possibleNextDestination: type?.handoffDestinations?.[0],
+      }),
+    )
+    .filter((o) => !rejected.has(o.title.toLowerCase()));
+
+  const diversity = validateOptionDiversity(options);
+  options = diversity.kept;
+
   if (!strategicOptionsAreDistinct(options) && options.length >= 2) {
-    return [
+    options = [
       materializeStrategicOption("test", { typeId: analysis.strategyTypeId }),
       materializeStrategicOption("simplify", { typeId: analysis.strategyTypeId }),
-      materializeStrategicOption(
-        capacityTight ? "stabilize" : "continue",
-        { typeId: analysis.strategyTypeId },
-      ),
-    ].slice(0, max);
+      materializeStrategicOption(capacityTight ? "stabilize" : "maintain_current_direction", {
+        typeId: analysis.strategyTypeId,
+      }),
+    ];
   }
 
   return options.slice(0, max);
@@ -134,7 +185,6 @@ export function generateFullStrategicOptions(
 
 /**
  * At most three meaningfully different options. Growth is never the default.
- * Returns EnrichedStrategyOption for Phase 1/2 / conversation compatibility.
  */
 export function generateStrategicOptions(
   item: StrategyWorkItem,
@@ -143,16 +193,23 @@ export function generateStrategicOptions(
   if (item.optionsConsidered?.length) {
     return fromPersisted(item);
   }
+  // Hard gate — do not invent options before readiness (unless already persisted)
+  if (!shouldOfferStrategicOptions(item) && !item.optionsConsidered?.length) {
+    return [];
+  }
   const full = generateFullStrategicOptions(item, presentation);
   const enriched = full.map(toEnrichedStrategyOption);
   const similarityOnly = strategyQualityIssues(enriched).filter(
-    (issue) => issue === "options_too_similar" || issue === "more_than_three_options",
+    (issue) =>
+      issue === "options_too_similar" || issue === "more_than_three_options",
   );
   if (similarityOnly.length > 0 || !optionsAreMeaningfullyDifferent(enriched)) {
     return [
       toEnrichedStrategyOption(full[0] ?? materializeStrategicOption("test")),
       toEnrichedStrategyOption(materializeStrategicOption("simplify")),
-      toEnrichedStrategyOption(materializeStrategicOption("continue")),
+      toEnrichedStrategyOption(
+        materializeStrategicOption("maintain_current_direction"),
+      ),
     ].slice(0, Math.min(3, presentation?.maxVisibleChoices ?? 3));
   }
   return enriched;

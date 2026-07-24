@@ -15,9 +15,12 @@ export const CONSERVATIVE_PATTERNS: readonly OptionPatternId[] = [
   "stabilize",
   "simplify",
   "delay",
+  "pause",
   "test",
   "stop",
   "continue",
+  "maintain_current_direction",
+  "protect_current_base",
   "protect_base",
 ];
 
@@ -100,7 +103,12 @@ export function selectDistinctOptionPatterns(
     const score = (p: OptionPatternId) => {
       let s = 0;
       if (capacityTight && CONSERVATIVE_PATTERNS.includes(p)) s += 3;
-      if (!capacityTight && (p === "expand" || p === "raise_price")) s += 1;
+      if (
+        !capacityTight &&
+        (p === "expand" || p === "increase_price" || p === "raise_price")
+      ) {
+        s += 1;
+      }
       if (opts?.strategyTypeId === "growth" && p === "expand") s -= 1; // still not default-only
       return s;
     };

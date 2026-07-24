@@ -76,22 +76,42 @@ export type StrategyTypeId =
   | "pivot_rethink"
   | "ninety_day";
 
+/**
+ * Internal option patterns — never expose these ids in member copy.
+ * Legacy aliases (raise_price, raise_value, protect_base, different_market)
+ * remain for existing StrategyTypeContract data; normalize before materializing.
+ */
 export type OptionPatternId =
   | "continue"
-  | "expand"
+  | "maintain_current_direction"
+  | "improve"
   | "narrow"
   | "simplify"
-  | "delay"
-  | "test"
+  | "reduce_scope"
+  | "expand"
+  | "reposition"
+  | "increase_price"
+  | "restructure_price"
+  | "add_value"
   | "partner"
+  | "delegate"
+  | "automate"
+  | "delay"
+  | "pause"
   | "stop"
   | "stabilize"
-  | "reposition"
-  | "raise_value"
+  | "test"
+  | "staged_transition"
+  | "protect_current_base"
+  | "serve_different_audience"
+  /** @deprecated Prefer increase_price */
   | "raise_price"
-  | "different_market"
+  /** @deprecated Prefer add_value */
+  | "raise_value"
+  /** @deprecated Prefer protect_current_base */
   | "protect_base"
-  | "staged_transition";
+  /** @deprecated Prefer serve_different_audience */
+  | "different_market";
 
 export type StrategyTypeContract = {
   id: StrategyTypeId;
@@ -201,6 +221,10 @@ export type EnrichedStrategyOption = StrategyOption & {
   smallestUsefulTest?: string;
 };
 
+/**
+ * Conversation-facing risk summary (Phase 1/2).
+ * Fuller Phase 3 contract: `StrategicRisk` in optionContract.ts.
+ */
 export type RiskAssessment = {
   whatCouldHappen: string;
   whyItMatters: string;
@@ -210,14 +234,34 @@ export type RiskAssessment = {
   reversibility: Reversibility;
 };
 
+/**
+ * Bounded strategic experiment — never silently creates a Project.
+ * `smallAction` remains the primary action field for existing callers.
+ */
 export type StrategicExperiment = {
+  id?: string;
+  name?: string;
   assumptionBeingTested: string;
+  questionToAnswer?: string;
+  /** Primary action (canonical for existing callers). */
   smallAction: string;
+  /** Spec alias for smallAction when present. */
+  action?: string;
+  scope?: string;
   duration: string;
-  successSignal: string;
-  stopSignal: string;
+  audience?: string;
+  capacityLimit?: string;
+  /** Plain-language summary for older callers. */
   evidenceToCollect: string;
+  /** Structured evidence list when available. */
+  evidenceItems?: string[];
+  successSignal: string;
+  successSignals?: string[];
+  stopSignal: string;
+  stopSignals?: string[];
+  reviewPoint?: string;
   decisionThatFollows: string;
+  recommendedDestination?: string;
 };
 
 export type HandoffRecommendation = {
@@ -257,4 +301,8 @@ export type StrategyJudgmentTurn = {
   fullOptions?: import("./optionContract").StrategicOption[];
   /** Phase 3 — comparison lines when options are offered or trade-offs are due. */
   optionComparison?: import("./engine/compareOptions").OptionComparisonResult | null;
+  /** Phase 3 — recommendation only; never a confirmed decision. */
+  recommendation?: import("./engine/recommendOption").StrategicRecommendation | null;
+  /** Phase 3 — how deep analysis should go given reversibility. */
+  reversibilityDepth?: import("./frameworks/reversibilityDepth").ReversibilityDepth;
 };
