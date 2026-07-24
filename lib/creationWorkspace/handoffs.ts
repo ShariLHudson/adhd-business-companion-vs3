@@ -1,8 +1,4 @@
-import {
-  buildProjectProposalFromPackage,
-  understandUniversalRequest,
-  type CreationPackage,
-} from "@/lib/universalRequestOutcome";
+import type { CreationPackage } from "@/lib/universalRequestOutcome";
 import { newCreationWorkspaceId, nowIso } from "./ids";
 import type {
   CreationWorkspace,
@@ -10,17 +6,23 @@ import type {
   CreationWorkspaceHandoffDestination,
   CreationWorkspaceUseOption,
 } from "./types";
+import {
+  buildCreateHandoff,
+  buildEstateHandoff,
+  buildProjectHandoff,
+  buildStrategyHandoff,
+  buildVisualHandoff,
+  storeCreateHandoff,
+  storeEstateHandoff,
+  storeProjectHandoff,
+  storeStrategyHandoff,
+  storeVisualHandoff,
+} from "./destination";
 
 function draftItems(workspace: CreationWorkspace) {
   return workspace.items
     .filter((i) => i.groupId !== "research" && i.status !== "removed")
     .sort((a, b) => a.order - b.order);
-}
-
-function serializeWorkspaceContent(workspace: CreationWorkspace): string {
-  return draftItems(workspace)
-    .map((i) => `## ${i.title}\n${i.body}`)
-    .join("\n\n");
 }
 
 export function prepareCreationWorkspaceHandoff(input: {
@@ -34,123 +36,48 @@ export function prepareCreationWorkspaceHandoff(input: {
     .filter((i) => i.protected || i.userEdited)
     .map((i) => i.title);
 
-  let payload = serializeWorkspaceContent(input.workspace);
+  let payload = "";
   let requiresReview = false;
   let unresolvedAreas = input.workspace.missingPieces.slice(0, 8);
+  let handoffId = newCreationWorkspaceId("cwh");
 
-  if (input.option.destination === "projects") {
+  if (input.option.destination === "create") {
+    const createHandoff = buildCreateHandoff(input.workspace);
+    handoffId = createHandoff.id;
+    payload = JSON.stringify(createHandoff);
+    storeCreateHandoff(createHandoff);
+  } else if (input.option.destination === "projects") {
     requiresReview = true;
-    const u = understandUniversalRequest(
-      `Turn into a project: ${input.workspace.title}`,
+    const projectHandoff = buildProjectHandoff(
+      input.workspace,
+      input.creationPackage,
     );
-    const pkg =
-      input.creationPackage ??
-      ({
-        id: input.workspace.creationPackageId || "pkg_temp",
-        title: input.workspace.title,
-        purpose: input.workspace.purpose,
-        audience: input.workspace.intendedAudience,
-        desiredOutcome: input.workspace.primaryOutcome,
-        requestUnderstandingId: input.workspace.requestUnderstandingId || "",
-        blueprintId: input.workspace.blueprintId || "",
-        researchCollectionIds: input.workspace.researchCollectionIds,
-        primaryDeliverableId: "primary",
-        supportingDeliverableIds: [],
-        sections: items.map((i, order) => ({
-          id: i.id,
-          title: i.title,
-          content: i.body,
-          order,
-          kind: i.type === "timeline_item" ? ("day" as const) : ("section" as const),
-        })),
-        knowledgeItemIds: [],
-        sourceReferences: [],
-        status: "substantive" as const,
-        completionAssessment: "",
-        validationResults: [],
-        researchStatus: "stable_knowledge_used" as const,
-        sourceExperience: "creation_workspace",
-        currentDestination: null,
-        availableHandoffs: [],
-        linkedProjectId: null,
-        linkedVisualWorkspaceId: null,
-        linkedStrategyId: null,
-        linkedEstateRecords: [],
-        createdAt: now,
-        updatedAt: now,
-      } satisfies CreationPackage);
-    const proposal = buildProjectProposalFromPackage(u, pkg);
-    payload = [
-      "Project Proposal Review — nothing is created until you approve.",
-      "",
-      proposal.title,
-      "",
-      ...proposal.phases.map(
-        (p, i) =>
-          `Phase ${i + 1}: ${p.name}\nMilestones: ${p.milestones.join("; ")}\nTasks: ${p.tasks.join("; ")}`,
-      ),
-      "",
-      proposal.dependencies.length
-        ? `Dependencies: ${proposal.dependencies.join("; ")}`
-        : null,
-      proposal.risks.length ? `Risks: ${proposal.risks.join("; ")}` : null,
-      "Approve All · Approve Selected · Edit Before Adding · Keep as Proposal · Cancel",
-    ]
-      .filter(Boolean)
-      .join("\n");
-  }
-
-  if (input.option.destination === "visual_thinking") {
-    payload = JSON.stringify({
-      workspaceId: input.workspace.id,
-      creationPackageId: input.workspace.creationPackageId,
-      title: input.workspace.title,
-      purpose: input.workspace.purpose,
-      summary: input.workspace.purpose,
-      sections: items.map((i) => ({
-        id: i.id,
-        title: i.title,
-        content: i.body,
-        type: i.type,
-      })),
-      relationships: items.map((i) => i.title),
-      researchCollectionIds: input.workspace.researchCollectionIds,
-    });
-  }
-
-  if (input.option.destination === "strategic_planning") {
+    handoffId = projectHandoff.id;
+    payload = JSON.stringify(projectHandoff);
+    storeProjectHandoff(projectHandoff);
+  } else if (input.option.destination === "visual_thinking") {
+    const visualHandoff = buildVisualHandoff(input.workspace);
+    handoffId = visualHandoff.id;
+    payload = JSON.stringify(visualHandoff);
+    storeVisualHandoff(visualHandoff);
+  } else if (input.option.destination === "strategic_planning") {
     requiresReview = true;
-    payload = [
-      "Strategic proposal — not approved strategy.",
-      "",
-      `Objective: ${input.workspace.primaryOutcome}`,
-      "",
-      "Evidence / draft content:",
-      serializeWorkspaceContent(input.workspace).slice(0, 4000),
-      "",
-      "Options, tradeoffs, risks, and initiatives remain candidates until confirmed.",
-    ].join("\n");
-  }
-
-  if (input.option.destination === "business_estate") {
+    const strategyHandoff = buildStrategyHandoff(input.workspace);
+    handoffId = strategyHandoff.id;
+    payload = JSON.stringify(strategyHandoff);
+    storeStrategyHandoff(strategyHandoff);
+  } else if (input.option.destination === "business_estate") {
     requiresReview = true;
-    payload = [
-      "Business Estate proposal — field-level review required.",
-      "",
-      "Possible proposals:",
-      "- Audience update",
-      "- Offer update",
-      "- Framework or process draft",
-      "- Business research finding",
-      "",
-      serializeWorkspaceContent(input.workspace).slice(0, 2500),
-      "",
-      "Nothing authoritative changes without approval.",
-    ].join("\n");
+    const estateHandoff = buildEstateHandoff(input.workspace);
+    handoffId = estateHandoff.id;
+    payload = JSON.stringify(estateHandoff);
+    storeEstateHandoff(estateHandoff);
+  } else {
+    payload = items.map((i) => `## ${i.title}\n${i.body}`).join("\n\n");
   }
 
   const handoff: CreationWorkspaceHandoff = {
-    id: newCreationWorkspaceId("cwh"),
+    id: handoffId,
     workspaceId: input.workspace.id,
     creationPackageId: input.workspace.creationPackageId || "",
     destination: input.option.destination,

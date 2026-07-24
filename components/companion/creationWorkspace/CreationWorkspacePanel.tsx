@@ -6,7 +6,6 @@ import { popNavigationFrame } from "@/lib/navigationContext";
 import {
   CREATION_WORKSPACE_SUPPORTING,
   CREATION_WORKSPACE_TITLE,
-  CREATION_WORKSPACE_VISUAL_HANDOFF_KEY,
   applySelectedAreaAction,
   askShariAboutSelection,
   completeHandoff,
@@ -38,9 +37,10 @@ type Props = {
   registerBack?: (fn: (() => void) | null) => void;
   initialWorkspace?: CreationWorkspace | null;
   initialRequest?: string | null;
-  onOpenCreate?: (content: string, title: string) => void;
+  /** Return false to keep handoff retryable (consumption failed). */
+  onOpenCreate?: (content: string, title: string) => boolean | void;
   onOpenProjects?: (proposal: string) => void;
-  onOpenVisualThinking?: (payload: string) => void;
+  onOpenVisualThinking?: (payload: string) => boolean | void;
   onOpenStrategicPlanning?: (content: string) => void;
   onOpenBusinessEstate?: (content: string) => void;
   onOpenResearchLibrary?: () => void;
@@ -165,22 +165,19 @@ export function CreationWorkspacePanel({
     setShowUse(false);
 
     if (option.destination === "create") {
-      onOpenCreate?.(handoff.payload, workspace.title);
-      persist(completeHandoff(next, handoff.id, "completed"));
-      trackCreationWorkspaceEvent("handoff_completed");
+      const opened = onOpenCreate?.(handoff.payload, workspace.title);
+      if (opened !== false) {
+        persist(completeHandoff(next, handoff.id, "completed"));
+        trackCreationWorkspaceEvent("handoff_completed");
+      }
     } else if (option.destination === "projects") {
       onOpenProjects?.(handoff.payload);
     } else if (option.destination === "visual_thinking") {
-      try {
-        sessionStorage.setItem(
-          CREATION_WORKSPACE_VISUAL_HANDOFF_KEY,
-          handoff.payload,
-        );
-      } catch {
-        /* ignore */
+      const opened = onOpenVisualThinking?.(handoff.payload);
+      if (opened !== false) {
+        persist(completeHandoff(next, handoff.id, "completed"));
+        trackCreationWorkspaceEvent("handoff_completed");
       }
-      onOpenVisualThinking?.(handoff.payload);
-      persist(completeHandoff(next, handoff.id, "completed"));
     } else if (option.destination === "strategic_planning") {
       onOpenStrategicPlanning?.(handoff.payload);
     } else if (option.destination === "business_estate") {

@@ -147,7 +147,12 @@ describe("Creation Workspace", () => {
       creationPackage: result.creationPackage,
     });
     expect(createHandoff.handoff.payload.length).toBeGreaterThan(100);
-    expect(createHandoff.handoff.payload).toMatch(/## /);
+    const createPayload = JSON.parse(createHandoff.handoff.payload) as {
+      version: string;
+      sections: Array<{ title: string; body: string }>;
+    };
+    expect(createPayload.version).toBe("creation-workspace-create-handoff-v1");
+    expect(createPayload.sections.length).toBeGreaterThanOrEqual(5);
 
     const projectOpt = options.find((o) => o.destination === "projects");
     if (projectOpt) {
@@ -157,7 +162,16 @@ describe("Creation Workspace", () => {
         creationPackage: result.creationPackage,
       });
       expect(projectHandoff.handoff.requiresReview).toBe(true);
-      expect(projectHandoff.handoff.payload).toMatch(/Proposal Review|approve/i);
+      const projectPayload = JSON.parse(projectHandoff.handoff.payload) as {
+        version: string;
+        requiresReview: boolean;
+        phases: unknown[];
+      };
+      expect(projectPayload.version).toBe(
+        "creation-workspace-project-handoff-v1",
+      );
+      expect(projectPayload.requiresReview).toBe(true);
+      expect(projectPayload.phases.length).toBeGreaterThan(0);
     }
 
     const visualOpt =
@@ -196,7 +210,16 @@ describe("Creation Workspace", () => {
       },
     });
     expect(strategy.handoff.requiresReview).toBe(true);
-    expect(strategy.handoff.payload).toMatch(/not approved|proposal/i);
+    const strategyPayload = JSON.parse(strategy.handoff.payload) as {
+      version: string;
+      autoApproved: boolean;
+      requiresReview: boolean;
+    };
+    expect(strategyPayload.version).toBe(
+      "creation-workspace-strategy-handoff-v1",
+    );
+    expect(strategyPayload.autoApproved).toBe(false);
+    expect(strategyPayload.requiresReview).toBe(true);
 
     const estate = prepareCreationWorkspaceHandoff({
       workspace: result.workspace!,
@@ -212,7 +235,14 @@ describe("Creation Workspace", () => {
       },
     });
     expect(estate.handoff.requiresReview).toBe(true);
-    expect(estate.handoff.payload).toMatch(/approval|review/i);
+    const estatePayload = JSON.parse(estate.handoff.payload) as {
+      version: string;
+      requiresFieldApproval: boolean;
+      silentWritebackAllowed: boolean;
+    };
+    expect(estatePayload.version).toBe("creation-workspace-estate-handoff-v1");
+    expect(estatePayload.requiresFieldApproval).toBe(true);
+    expect(estatePayload.silentWritebackAllowed).toBe(false);
   });
 
   it("20: direct simple thank-you email bypasses workspace", () => {

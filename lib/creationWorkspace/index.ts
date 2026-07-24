@@ -43,3 +43,4 @@ export {
   trackCreationWorkspaceEvent,
   type CreationWorkspaceEvent,
 } from "./observability";
+export * from "./destination";

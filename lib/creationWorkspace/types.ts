@@ -214,5 +214,3 @@ export const CREATION_WORKSPACE_STORAGE_KEY =
   "companion-creation-workspace-store-v1";
 export const CREATION_WORKSPACE_ACTIVE_KEY =
   "companion-creation-workspace-active-v1";
-export const CREATION_WORKSPACE_VISUAL_HANDOFF_KEY =
-  "companion-creation-workspace-visual-handoff-v1";
