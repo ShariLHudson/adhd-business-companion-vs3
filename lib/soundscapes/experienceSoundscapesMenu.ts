@@ -28,3 +28,25 @@ export function experienceSoundscapeTrackById(
     (track) => track.id === trackId,
   );
 }
+
+export function peacefulPlacesMusicTrackById(
+  trackId: string,
+): ExperienceSoundscapeTrack | undefined {
+  return PEACEFUL_PLACES_MUSIC_TRACKS.find((track) => track.id === trackId);
+}
+
+export function ambientSoundscapeTrackById(
+  trackId: string,
+): ExperienceSoundscapeTrack | undefined {
+  return EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS.find(
+    (track) => track.id === trackId,
+  );
+}
+
+export function isPeacefulPlacesMusicTrackId(trackId: string): boolean {
+  return Boolean(peacefulPlacesMusicTrackById(trackId));
+}
+
+export function isAmbientSoundscapeTrackId(trackId: string): boolean {
+  return Boolean(ambientSoundscapeTrackById(trackId));
+}

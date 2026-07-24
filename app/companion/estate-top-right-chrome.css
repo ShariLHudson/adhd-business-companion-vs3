@@ -186,6 +186,26 @@ button.global-sound-control__action[data-testid="global-sound-open-peaceful-mome
   width: 100%;
 }
 
+.global-sound-control__catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin: 0 0 0.75rem;
+}
+
+.global-sound-control__catalog-label {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6b635a;
+}
+
+.global-sound-control__catalog .global-sound-control__action {
+  width: 100%;
+}
+
 .global-sound-control__actions {
   display: flex;
   flex-direction: column;

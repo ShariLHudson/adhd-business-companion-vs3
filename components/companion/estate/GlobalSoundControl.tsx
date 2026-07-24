@@ -18,11 +18,10 @@ type Props = {
   soundPlayingHint?: boolean;
   /** Opens Change Sounds (layered mixer + catalog). */
   onOpenLayeredAudioMixer?: () => void;
-  /**
-   * Optional — Peaceful Moments catalog. Prefer routing through Change Sounds.
-   * Kept for callers that still wire Focus Audio entry.
-   */
+  /** Opens Peaceful Moments (songs / guided listening). */
   onOpenPeacefulMoments?: () => void;
+  /** Opens Soundscapes (ambient environment sounds). */
+  onOpenSoundscapes?: () => void;
   /** @deprecated Prefer Change Sounds; ignored on the main surface. */
   onOpenAudioSettings?: () => void;
 };
@@ -34,6 +33,7 @@ type Props = {
 export function GlobalSoundControl({
   onOpenLayeredAudioMixer,
   onOpenPeacefulMoments,
+  onOpenSoundscapes,
 }: Props) {
   const panelId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -74,13 +74,9 @@ export function GlobalSoundControl({
         ? "Sounds are paused"
         : "Sounds are off";
 
-  function openChangeSounds() {
+  function openSection(openFn?: () => void) {
     setOpen(false);
-    if (onOpenLayeredAudioMixer) {
-      onOpenLayeredAudioMixer();
-      return;
-    }
-    onOpenPeacefulMoments?.();
+    openFn?.();
   }
 
   return (
@@ -158,6 +154,43 @@ export function GlobalSoundControl({
             </p>
           )}
 
+          <div
+            className="global-sound-control__catalog"
+            data-testid="global-sound-catalog"
+          >
+            <p className="global-sound-control__catalog-label">Browse</p>
+            {onOpenPeacefulMoments ? (
+              <button
+                type="button"
+                className="global-sound-control__action"
+                data-testid="global-sound-peaceful-moments"
+                onClick={() => openSection(onOpenPeacefulMoments)}
+              >
+                Peaceful Moments
+              </button>
+            ) : null}
+            {onOpenSoundscapes ? (
+              <button
+                type="button"
+                className="global-sound-control__action"
+                data-testid="global-sound-soundscapes"
+                onClick={() => openSection(onOpenSoundscapes)}
+              >
+                Soundscapes
+              </button>
+            ) : null}
+            {onOpenLayeredAudioMixer ? (
+              <button
+                type="button"
+                className="global-sound-control__action"
+                data-testid="global-sound-change-sounds"
+                onClick={() => openSection(onOpenLayeredAudioMixer)}
+              >
+                Current Mix
+              </button>
+            ) : null}
+          </div>
+
           <div className="global-sound-control__actions">
             {state === "on" ? (
               <button
@@ -199,14 +232,6 @@ export function GlobalSoundControl({
                 Turn Off
               </button>
             ) : null}
-            <button
-              type="button"
-              className="global-sound-control__action"
-              data-testid="global-sound-change-sounds"
-              onClick={openChangeSounds}
-            >
-              Change Sounds
-            </button>
           </div>
         </div>
       ) : null}

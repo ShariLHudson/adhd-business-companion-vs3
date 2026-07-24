@@ -129,7 +129,8 @@ export function EstateTopRightChrome({
           onOpenAudioSettings ??
           (() => onEstateMenuAction("experience-controls"))
         }
-        onOpenPeacefulMoments={onOpenFocusAudio}
+        onOpenPeacefulMoments={onOpenPeacefulPlaces ?? onOpenFocusAudio}
+        onOpenSoundscapes={onOpenSoundscapes}
         onOpenLayeredAudioMixer={() => setLayeredMixerOpen(true)}
       />
       <LayeredAudioMixerPanel

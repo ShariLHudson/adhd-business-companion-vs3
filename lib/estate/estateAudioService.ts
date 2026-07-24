@@ -193,6 +193,15 @@ export function isSoundscapePlaying(): boolean {
   return isEstateSoundscapeOverlayPlaying();
 }
 
+/**
+ * True when a Layer 2 track is loaded and paused (not stopped).
+ * Stop clears the active id — paused keeps it.
+ */
+export function isSoundscapePaused(): boolean {
+  const id = activeEstateSoundscapeOverlayId();
+  return Boolean(id && !isEstateSoundscapeOverlayPlaying());
+}
+
 /** Friendly label for whatever is currently playing, when known. */
 export function activeSoundscapeLabel(): string | null {
   const id = activeEstateSoundscapeOverlayId();

@@ -193,29 +193,65 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  gap: 0.55rem;
+}
+
+.soundscape-selection-overlay__row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 236, 200, 0.22);
+  background: rgba(255, 248, 235, 0.06);
+}
+
+.soundscape-selection-overlay__item-main {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.soundscape-selection-overlay__item-actions {
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.4rem;
 }
 
 .soundscape-selection-overlay__item {
-  width: 100%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  text-align: left;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
   min-height: 2.75rem;
-  padding: 0.55rem 0.75rem;
+  min-width: 6.5rem;
+  padding: 0.55rem 0.85rem;
   border-radius: 0.65rem;
-  border: 1px solid rgba(255, 236, 200, 0.22);
-  background: rgba(255, 248, 235, 0.06);
+  border: 1px solid rgba(255, 236, 200, 0.28);
+  background: rgba(255, 248, 235, 0.1);
   color: inherit;
   font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.soundscape-selection-overlay__item--secondary {
+  background: transparent;
+  font-weight: 500;
 }
 
 .soundscape-selection-overlay__item-title {
   flex: 1;
   min-width: 0;
+  font-weight: 600;
+}
+
+.soundscape-selection-overlay__item-state {
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
 }
 
 .soundscape-selection-overlay__item-action {

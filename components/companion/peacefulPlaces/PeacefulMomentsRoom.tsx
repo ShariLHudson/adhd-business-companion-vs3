@@ -13,18 +13,23 @@ import { stopGardenCardAmbience } from "@/lib/peacefulPlaces/gardenCardAmbience"
 import { stopGardenFlagAmbience } from "@/lib/peacefulPlaces/gardenFlagAmbience";
 import {
   activeSoundscapeTrackId,
+  isSoundscapePaused,
   isSoundscapePlaying,
   playSoundscapeTrack,
   resumeSoundscapeOverlay,
   subscribeSoundscapePlayback,
 } from "@/lib/estate/estateAudioService";
-import { noteEstateSoundsStarted } from "@/lib/estate/estateSoundsTransport";
+import {
+  noteEstateSoundsStarted,
+  pauseEstateSounds,
+  stopActiveEstateSoundscapeItem,
+} from "@/lib/estate/estateSoundsTransport";
 import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import {
   PEACEFUL_PLACES_MUSIC_TRACKS,
-  experienceSoundscapeTrackById,
+  peacefulPlacesMusicTrackById,
   type ExperienceSoundscapeTrack,
 } from "@/lib/soundscapes/experienceSoundscapesMenu";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
@@ -34,15 +39,19 @@ type Props = {
   backLabel?: string;
 };
 
+type ItemPlaybackState = "stopped" | "playing" | "paused";
+
 const CTRL_PRIMARY =
   "rounded-xl bg-[#1e4f4f] px-3 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#163d3d] active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f] disabled:cursor-not-allowed disabled:opacity-50";
 
+const CTRL_SECONDARY =
+  "rounded-xl border border-[#1e4f4f]/35 bg-white px-3 py-2.5 text-sm font-semibold text-[#1e4f4f] shadow-sm transition-colors hover:bg-[#1e4f4f]/08 active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]";
+
 /**
- * Peaceful Moments (a.k.a. the Music Room) — woodland pathway + Choose Music.
+ * Peaceful Moments — songs and guided listening only (not ambient soundscapes).
  *
- * Contextual action: Play. After Play, manage Pause / Off from Estate Sounds
- * in the header (canonical audio controller). No autoplay. Leaving this room
- * never stops playback on its own.
+ * Uses the canonical Estate Sounds transport. Item Stop ends this track;
+ * Estate Sounds → Turn Off silences the whole session.
  */
 export function PeacefulMomentsRoom({
   onDone,
@@ -55,12 +64,16 @@ export function PeacefulMomentsRoom({
   const [selected, setSelected] = useState<ExperienceSoundscapeTrack | null>(
     () => {
       const activeId = activeSoundscapeTrackId();
-      return activeId ? experienceSoundscapeTrackById(activeId) ?? null : null;
+      return activeId ? peacefulPlacesMusicTrackById(activeId) ?? null : null;
     },
   );
-  const [isPlaying, setIsPlaying] = useState<boolean>(() =>
-    isSoundscapePlaying(),
-  );
+  const [itemState, setItemState] = useState<ItemPlaybackState>(() => {
+    const activeId = activeSoundscapeTrackId();
+    if (!activeId || !peacefulPlacesMusicTrackById(activeId)) return "stopped";
+    if (isSoundscapePlaying()) return "playing";
+    if (isSoundscapePaused()) return "paused";
+    return "stopped";
+  });
   const [playbackError, setPlaybackError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -70,19 +83,22 @@ export function PeacefulMomentsRoom({
   }, []);
 
   /**
-   * Reflect the shared engine's Now Playing state — including when a track
-   * was started elsewhere or paused/turned off from Estate Sounds.
+   * Reflect the shared engine — music tracks only.
+   * Ambient soundscapes never appear as the selected Peaceful Moments song.
    */
   useEffect(() => {
     const sync = () => {
       const activeId = activeSoundscapeTrackId();
-      setIsPlaying(isSoundscapePlaying());
-      if (!activeId) return;
-      setSelected((current) =>
-        current?.id === activeId
-          ? current
-          : experienceSoundscapeTrackById(activeId) ?? current,
-      );
+      const music = activeId ? peacefulPlacesMusicTrackById(activeId) : null;
+      if (music) {
+        setSelected(music);
+        if (isSoundscapePlaying()) setItemState("playing");
+        else if (isSoundscapePaused()) setItemState("paused");
+        else setItemState("stopped");
+        return;
+      }
+      // Active ambient soundscape (or nothing) — do not show it as a song.
+      setItemState("stopped");
     };
     sync();
     return subscribeSoundscapePlayback(sync);
@@ -114,7 +130,14 @@ export function PeacefulMomentsRoom({
     setSelected(track);
     setDropdownOpen(false);
     // Selecting a track must not start playback — Play is deliberate.
-    // (Switching tracks while one is already playing still requires Play.)
+    const activeId = activeSoundscapeTrackId();
+    if (activeId === track.id) {
+      if (isSoundscapePlaying()) setItemState("playing");
+      else if (isSoundscapePaused()) setItemState("paused");
+      else setItemState("stopped");
+    } else {
+      setItemState("stopped");
+    }
   }, []);
 
   const play = useCallback(async () => {
@@ -125,21 +148,40 @@ export function PeacefulMomentsRoom({
       ? await resumeSoundscapeOverlay()
       : await playSoundscapeTrack(selected);
     if (!result.ok) {
-      setIsPlaying(false);
+      setItemState("stopped");
       setPlaybackError(result.message);
       return;
     }
     noteEstateSoundsStarted();
-    setIsPlaying(true);
+    setItemState("playing");
   }, [selected]);
+
+  const pause = useCallback(async () => {
+    setPlaybackError(null);
+    await pauseEstateSounds();
+    setItemState("paused");
+  }, []);
+
+  const stop = useCallback(async () => {
+    setPlaybackError(null);
+    await stopActiveEstateSoundscapeItem();
+    setItemState("stopped");
+  }, []);
 
   /**
    * Previous Screen leaves the room view only — playback continues until
-   * the member uses Estate Sounds (Pause / Turn Off) in the header.
+   * the member uses Stop on the track or Estate Sounds → Turn Off.
    */
   const handleLeave = useCallback(() => {
     onDone?.();
   }, [onDone]);
+
+  const statusLabel =
+    itemState === "playing"
+      ? "Playing"
+      : itemState === "paused"
+        ? "Paused"
+        : "Stopped";
 
   return (
     <div
@@ -180,11 +222,12 @@ export function PeacefulMomentsRoom({
             Peaceful Moments
           </h1>
           <p className="mt-2 text-center text-base leading-relaxed text-[#4b463f]">
-            Choose a piece of music, then press Play. Pause or turn sounds off
-            anytime from Estate Sounds in the header.
+            Choose a song or guided listening track, then press Play. Ambient
+            environment sounds live in Soundscapes.
           </p>
           <p className="mt-1 text-center text-xs text-[#8a8377]">
-            It keeps playing while you explore the estate.
+            It keeps playing while you explore the estate. Use Stop on this
+            track, or Turn Off all sounds from Estate Sounds in the header.
           </p>
 
           <div className="relative mt-5">
@@ -192,7 +235,7 @@ export function PeacefulMomentsRoom({
               className="mb-2 block text-sm font-semibold uppercase tracking-wide text-[#6b635a]"
               htmlFor="peaceful-moments-music-trigger"
             >
-              Choose Music
+              Peaceful Moments
             </label>
             <button
               ref={triggerRef}
@@ -206,7 +249,7 @@ export function PeacefulMomentsRoom({
               onClick={() => setDropdownOpen((open) => !open)}
             >
               <span className="min-w-0 truncate">
-                {selected?.title ?? "Choose music…"}
+                {selected?.title ?? "Choose a song…"}
               </span>
               <span aria-hidden="true" className="shrink-0 text-base text-[#6b635a]">
                 {dropdownOpen ? "▴" : "▾"}
@@ -218,7 +261,7 @@ export function PeacefulMomentsRoom({
                 ref={listRef}
                 id={listboxId}
                 role="listbox"
-                aria-label="Choose Music"
+                aria-label="Peaceful Moments songs"
                 className="absolute left-0 right-0 z-20 mt-2 max-h-64 overflow-y-auto overscroll-contain rounded-xl border border-[#c9bfb0] bg-white py-1 shadow-lg"
                 data-testid="peaceful-moments-music-list"
               >
@@ -252,43 +295,102 @@ export function PeacefulMomentsRoom({
               <p
                 className="text-center text-sm font-semibold text-[#1f1c19]"
                 data-testid="peaceful-moments-current-track"
+                aria-live="polite"
               >
                 {selected.title}
-                {isPlaying ? (
-                  <span className="ml-2 font-normal text-[#1e4f4f]">
-                    · Playing
-                  </span>
-                ) : null}
+                <span
+                  className="ml-2 font-normal text-[#1e4f4f]"
+                  data-testid="peaceful-moments-playback-state"
+                  data-playback-state={itemState}
+                >
+                  · {statusLabel}
+                </span>
               </p>
             ) : (
               <p className="text-center text-sm text-[#6b635a]">
-                Select a track above, then press Play when you are ready.
+                Select a song above, then press Play when you are ready.
               </p>
             )}
 
             <div
               className="mt-3 flex flex-wrap justify-center gap-2"
               data-testid="peaceful-moments-playback-controls"
+              role="group"
+              aria-label="Peaceful Moments playback"
             >
-              <button
-                type="button"
-                className={CTRL_PRIMARY}
-                data-testid="peaceful-moments-play"
-                disabled={!selected || isPlaying}
-                onClick={() => void play()}
-              >
-                Play
-              </button>
+              {itemState === "stopped" ? (
+                <button
+                  type="button"
+                  className={CTRL_PRIMARY}
+                  data-testid="peaceful-moments-play"
+                  aria-label={
+                    selected
+                      ? `Play ${selected.title}`
+                      : "Play selected song"
+                  }
+                  disabled={!selected}
+                  onClick={() => void play()}
+                >
+                  Play
+                </button>
+              ) : null}
+              {itemState === "playing" ? (
+                <>
+                  <button
+                    type="button"
+                    className={CTRL_PRIMARY}
+                    data-testid="peaceful-moments-pause"
+                    aria-label={
+                      selected ? `Pause ${selected.title}` : "Pause"
+                    }
+                    onClick={() => void pause()}
+                  >
+                    Pause
+                  </button>
+                  <button
+                    type="button"
+                    className={CTRL_SECONDARY}
+                    data-testid="peaceful-moments-stop"
+                    aria-label={
+                      selected
+                        ? `Stop ${selected.title}`
+                        : "Stop this track"
+                    }
+                    onClick={() => void stop()}
+                  >
+                    Stop
+                  </button>
+                </>
+              ) : null}
+              {itemState === "paused" ? (
+                <>
+                  <button
+                    type="button"
+                    className={CTRL_PRIMARY}
+                    data-testid="peaceful-moments-resume"
+                    aria-label={
+                      selected ? `Resume ${selected.title}` : "Resume"
+                    }
+                    onClick={() => void play()}
+                  >
+                    Resume
+                  </button>
+                  <button
+                    type="button"
+                    className={CTRL_SECONDARY}
+                    data-testid="peaceful-moments-stop"
+                    aria-label={
+                      selected
+                        ? `Stop ${selected.title}`
+                        : "Stop this track"
+                    }
+                    onClick={() => void stop()}
+                  >
+                    Stop
+                  </button>
+                </>
+              ) : null}
             </div>
-            {isPlaying ? (
-              <p
-                className="mt-2 text-center text-sm text-[#6b635a]"
-                data-testid="peaceful-moments-manage-in-header"
-                role="status"
-              >
-                Playing — use Estate Sounds in the header to pause or turn off.
-              </p>
-            ) : null}
 
             {playbackError ? (
               <p

@@ -14,9 +14,13 @@ describe("Global Sound Control — one shared Estate Sounds home", () => {
     expect(chrome).toContain(
       'from "@/components/companion/estate/GlobalSoundControl"',
     );
+    expect(chrome).toContain("onOpenSoundscapes={onOpenSoundscapes}");
+    expect(chrome).toContain(
+      "onOpenPeacefulMoments={onOpenPeacefulPlaces ?? onOpenFocusAudio}",
+    );
   });
 
-  it("exposes On / Pause / Resume / Off / Change Sounds on the main surface", () => {
+  it("exposes On / Pause / Resume / Off plus separate Peaceful Moments and Soundscapes", () => {
     const control = read(
       "components/companion/estate/GlobalSoundControl.tsx",
     );
@@ -31,8 +35,12 @@ describe("Global Sound Control — one shared Estate Sounds home", () => {
     expect(control).toContain("global-sound-resume");
     expect(control).toContain("global-sound-off");
     expect(control).toContain("global-sound-on");
+    expect(control).toContain("global-sound-peaceful-moments");
+    expect(control).toContain("global-sound-soundscapes");
     expect(control).toContain("global-sound-change-sounds");
-    expect(control).toContain("Change Sounds");
+    expect(control).toContain("Peaceful Moments");
+    expect(control).toContain("Soundscapes");
+    expect(control).toContain("Current Mix");
     expect(control).toContain("pauseEstateSounds");
     expect(control).toContain("resumeEstateSounds");
     expect(control).toContain("turnOffEstateSounds");
@@ -47,7 +55,6 @@ describe("Global Sound Control — one shared Estate Sounds home", () => {
     expect(control).not.toContain("Audio Settings");
     expect(control).not.toContain("global-sound-volume");
     expect(control).not.toContain("Environment Sounds");
-    expect(control).not.toContain("Open Peaceful Moments");
     expect(control).not.toMatch(/new AudioEngine|createAudioManager/);
   });
 
@@ -67,6 +74,7 @@ describe("Global Sound Control — one shared Estate Sounds home", () => {
     const css = read("app/companion/estate-top-right-chrome.css");
     expect(css).toContain(".global-sound-control");
     expect(css).toContain(".global-sound-control__trigger--playing");
+    expect(css).toContain(".global-sound-control__catalog");
   });
 
   it("routes Peaceful Moments Play into the shared transport", () => {
@@ -93,7 +101,7 @@ describe("Global Sound Control — one shared Estate Sounds home", () => {
     expect(experience).not.toContain("pauseEstateSounds");
   });
 
-  it("Soundscape selection is contextual Use This Sound — not a second player", () => {
+  it("Soundscape selection is contextual — not a second global controller", () => {
     const overlay = read(
       "components/companion/estate/SoundscapeSelectionOverlay.tsx",
     );
@@ -102,6 +110,5 @@ describe("Global Sound Control — one shared Estate Sounds home", () => {
     expect(overlay).not.toContain("data-canonical-audio-controller");
     expect(overlay).not.toContain("global-sound-pause");
     expect(overlay).not.toContain("global-sound-off");
-    expect(overlay).not.toContain("data-testid=\"soundscape-pause\"");
   });
 });

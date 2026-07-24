@@ -39,6 +39,8 @@ export type EstateSoundsTransportSnapshot = {
 type Listener = () => void;
 
 let memberPaused = false;
+/** In-memory Off latch — survives environments without localStorage (tests/SSR). */
+let sessionOff = false;
 const listeners = new Set<Listener>();
 
 function notify(): void {
@@ -93,14 +95,13 @@ function buildMixSummary(): {
 }
 
 export function getEstateSoundsPlaybackState(): EstateSoundsPlaybackState {
-  const silenced = getEstateAudioSettings().silenced;
+  const silenced = sessionOff || getEstateAudioSettings().silenced;
   if (silenced) return "off";
   if (memberPaused) return "paused";
   if (isSoundscapePlaying() || layeredPlaying()) return "on";
-  if (layeredSelected() || activeSoundscapeLabel()) {
-    // Selected but not currently audible — treat as paused if member paused,
-    // otherwise Off/ready. Prefer "off" when nothing is playing and not paused.
-    return "off";
+  // Loaded overlay or layered selection that is not audible = paused, not Off.
+  if (activeSoundscapeLabel() || layeredSelected()) {
+    return "paused";
   }
   return "off";
 }
@@ -138,6 +139,7 @@ export function subscribeEstateSoundsTransport(listener: Listener): () => void {
 /** Pause every active intentional sound; preserve selection + positions. */
 export async function pauseEstateSounds(): Promise<void> {
   memberPaused = true;
+  sessionOff = false;
   setEstateSilenced(false);
   await pauseSoundscapeOverlay();
   try {
@@ -151,6 +153,7 @@ export async function pauseEstateSounds(): Promise<void> {
 /** Resume the same selected mix without duplicating instances. */
 export async function resumeEstateSounds(): Promise<void> {
   memberPaused = false;
+  sessionOff = false;
   setEstateSilenced(false);
   await resumeSoundscapeOverlay();
   try {
@@ -176,6 +179,7 @@ export async function resumeEstateSounds(): Promise<void> {
  */
 export async function turnOffEstateSounds(): Promise<void> {
   memberPaused = false;
+  sessionOff = true;
   try {
     await getLayeredAudioEngine().pauseAllLayers();
   } catch {
@@ -199,6 +203,7 @@ export async function turnOffEstateSounds(): Promise<void> {
 
 /** Clear silence so Estate can play again; resume paused mix when present. */
 export async function turnOnEstateSounds(): Promise<void> {
+  sessionOff = false;
   setEstateSilenced(false);
   if (memberPaused || layeredSelected() || activeSoundscapeLabel()) {
     await resumeEstateSounds();
@@ -211,8 +216,22 @@ export async function turnOnEstateSounds(): Promise<void> {
 /** Called when a contextual Play starts audio — clears paused/off silence. */
 export function noteEstateSoundsStarted(): void {
   memberPaused = false;
+  sessionOff = false;
   if (getEstateAudioSettings().silenced) {
     setEstateSilenced(false);
+  }
+  notify();
+}
+
+/**
+ * Item-level Stop — ends the active Layer 2 soundscape/song only.
+ * Resets to the beginning. Does not silence the Estate or clear a layered mix.
+ * Distinct from Turn Off (whole Estate Sounds session).
+ */
+export async function stopActiveEstateSoundscapeItem(): Promise<void> {
+  await stopSoundscapeOverlay();
+  if (!layeredPlaying()) {
+    memberPaused = false;
   }
   notify();
 }
@@ -220,5 +239,6 @@ export function noteEstateSoundsStarted(): void {
 /** Test helper. */
 export function __resetEstateSoundsTransportForTests(): void {
   memberPaused = false;
+  sessionOff = false;
   notify();
 }

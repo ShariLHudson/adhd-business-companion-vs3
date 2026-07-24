@@ -6,6 +6,7 @@ import {
   noteEstateSoundsStarted,
   pauseEstateSounds,
   resumeEstateSounds,
+  stopActiveEstateSoundscapeItem,
   turnOffEstateSounds,
   turnOnEstateSounds,
 } from "@/lib/estate/estateSoundsTransport";
@@ -165,5 +166,25 @@ describe("estateSoundsTransport", () => {
     expect(getEstateSoundsPlaybackState()).toBe("off");
     expect(resumeAllLayers).not.toHaveBeenCalled();
     expect(resumeSoundscape).not.toHaveBeenCalled();
+  });
+
+  it("item-level Stop stops the soundscape without silencing Estate", async () => {
+    soundscapePlaying = true;
+    layeredSelected = true;
+    layeredPlaying = true;
+    await stopActiveEstateSoundscapeItem();
+    expect(stopSoundscape).toHaveBeenCalled();
+    expect(stopAll).not.toHaveBeenCalled();
+    soundscapePlaying = false;
+    expect(getEstateSoundsPlaybackState()).toBe("on");
+  });
+
+  it("reports Paused when a mix is selected but not audible", () => {
+    layeredSelected = true;
+    layeredPlaying = false;
+    expect(getEstateSoundsPlaybackState()).toBe("paused");
+    expect(getEstateSoundsTransportSnapshot().closedLabel).toBe(
+      "Sounds Paused",
+    );
   });
 });
