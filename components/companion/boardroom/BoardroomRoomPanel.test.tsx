@@ -1,70 +1,113 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { BoardroomRoomPanel } from "@/components/companion/boardroom/BoardroomRoomPanel";
 import {
-  BOARDROOM_HOME_PRIMARY_CHOICES,
-  BOARDROOM_WELCOME_MESSAGE,
-} from "@/lib/boardroom";
+  answerBoardIntakeStep,
+  clearBoardIntakeDraft,
+  createEmptyBoardIntakeDraft,
+  saveBoardIntakeDraft,
+  suspendBoardIntakeConversation,
+} from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
+import { prepareCallTheBoard } from "@/lib/board/callTheBoard";
 
-describe("BoardroomRoomPanel home restoration", () => {
-  it("normal entry renders Boardroom Home with welcome and three choices", () => {
-    const html = renderToStaticMarkup(
-      <BoardroomRoomPanel onBack={() => {}} entryIntent="home" />,
-    );
-    expect(html).toContain('data-testid="boardroom-home"');
-    expect(html).toContain('data-testid="boardroom-welcome-message"');
-    expect(html).toContain(BOARDROOM_WELCOME_MESSAGE);
-    expect(html).toContain('data-testid="boardroom-primary-choices"');
-    for (const choice of BOARDROOM_HOME_PRIMARY_CHOICES) {
-      expect(html).toContain(`data-testid="${choice.testId}"`);
-      expect(html).toContain(choice.title);
-      expect(html).toContain(choice.description);
+describe("BoardroomRoomPanel destination entry", () => {
+  beforeEach(() => {
+    clearBoardIntakeDraft();
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.clear();
     }
-    expect(html).toContain('data-testid="boardroom-how-to-use"');
-    expect(html).toContain("How the Boardroom Works");
-    expect(html).toContain("boardroom-chamber-contrast");
-    expect(html).toContain("boardroom-home__action-card--primary");
-    expect(html).not.toContain("Start a Board Discussion");
-    expect(html).not.toContain('data-testid="boardroom-my-place-at-the-table"');
-    expect(html).not.toContain('data-testid="board-director-profile-board-chair"');
-    expect(html).toContain('data-testid="round-table-boardroom"');
   });
 
-  it("does not auto-open Thomas on home entry", () => {
+  it("direct navigation to Round Table opens boardroom_home seating overview", () => {
     const html = renderToStaticMarkup(
       <BoardroomRoomPanel onBack={() => {}} entryIntent="home" />,
     );
-    expect(html).toContain('data-testid="boardroom-home"');
-    expect(html).not.toContain('data-testid="board-directors-meet-gallery"');
-    expect(html).not.toContain('data-testid="board-director-profile-board-chair"');
-  });
-
-  it("direct Thomas entry opens Meet Directors on Thomas profile path", () => {
-    const html = renderToStaticMarkup(
-      <BoardroomRoomPanel onBack={() => {}} entryIntent="meet-thomas" />,
-    );
+    expect(html).toContain('data-boardroom-view-mode="boardroom_home"');
+    expect(html).toContain('data-testid="board-directors-meet-gallery"');
+    expect(html).toContain('data-testid="round-table-overlay"');
+    expect(html).toContain('data-testid="board-view-round-table"');
     expect(html).not.toContain('data-testid="boardroom-home"');
-    expect(html).toContain('data-testid="board-director-profile-board-chair"');
-    expect(html).toContain("Thomas Ellison");
-    expect(html).toMatch(/Boardroom Home/);
+    expect(html).not.toMatch(/Start a Board Discussion|Board Discussion Intake/i);
   });
 
-  it("direct intake entry opens Board discussion intake", () => {
+  it("first entry shows Round Table seating map", () => {
+    const html = renderToStaticMarkup(
+      <BoardroomRoomPanel onBack={() => {}} entryIntent="home" />,
+    );
+    expect(html).toContain('data-testid="round-table-overlay"');
+    expect(html).toContain('data-testid="round-table-seat-');
+    expect(html).toContain('aria-label="Chairs at the Round Table"');
+  });
+
+  it("re-entry after unfinished discussion still opens boardroom_home", () => {
+    let d = createEmptyBoardIntakeDraft(["board-chair"]);
+    d = answerBoardIntakeStep(d, "Should we expand?");
+    saveBoardIntakeDraft(d);
+    suspendBoardIntakeConversation();
+
+    const html = renderToStaticMarkup(
+      <BoardroomRoomPanel onBack={() => {}} entryIntent="home" />,
+    );
+    expect(html).toContain('data-boardroom-view-mode="boardroom_home"');
+    expect(html).toContain('data-testid="boardroom-resume-discussion-card"');
+    expect(html).toContain("You have an unfinished Board discussion.");
+    expect(html).toContain('data-testid="boardroom-resume-discussion"');
+    expect(html).not.toContain("Should we expand?");
+    expect(html).not.toMatch(/board-director-discussion-intake|Current question/i);
+  });
+
+  it("does not auto-open intake from sticky Call the Board on ordinary home", () => {
+    prepareCallTheBoard({
+      source: "project-home",
+      projectName: "Newsletter",
+      decisionSeed: "What next for Newsletter?",
+    });
+    const html = renderToStaticMarkup(
+      <BoardroomRoomPanel onBack={() => {}} entryIntent="home" />,
+    );
+    expect(html).toContain('data-boardroom-view-mode="boardroom_home"');
+    expect(html).not.toContain("What next for Newsletter?");
+  });
+
+  it("explicit intake intent still opens board discussion", () => {
     const html = renderToStaticMarkup(
       <BoardroomRoomPanel onBack={() => {}} entryIntent="intake" />,
     );
-    expect(html).not.toContain('data-testid="boardroom-home"');
+    expect(html).not.toContain('data-boardroom-view-mode="boardroom_home"');
     expect(html).toMatch(/board-director|Start a Board Discussion|Board Discussion/i);
   });
 
-  it("direct past entry opens history", () => {
+  it("direct Thomas entry opens director profile path", () => {
+    const html = renderToStaticMarkup(
+      <BoardroomRoomPanel onBack={() => {}} entryIntent="meet-thomas" />,
+    );
+    expect(html).toContain('data-testid="board-director-profile-board-chair"');
+    expect(html).toContain("Thomas Ellison");
+    expect(html).toMatch(/Back to Boardroom/);
+  });
+
+  it("direct past entry opens saved discussions", () => {
     const html = renderToStaticMarkup(
       <BoardroomRoomPanel onBack={() => {}} entryIntent="past" />,
     );
     expect(html).toContain('data-testid="boardroom-past-discussions"');
-    expect(html).toContain("Back to Boardroom Home");
+    expect(html).toContain("Back to Boardroom");
+  });
+
+  it("Board chat chrome is not mounted on boardroom_home", () => {
+    const html = renderToStaticMarkup(
+      <BoardroomRoomPanel
+        onBack={() => {}}
+        entryIntent="home"
+        shariChatOpen={false}
+        thread={<div data-testid="boardroom-shari-thread">chat</div>}
+        footer={<div data-testid="boardroom-shari-footer">footer</div>}
+      />,
+    );
+    expect(html).not.toContain('data-testid="boardroom-shari-thread"');
+    expect(html).not.toContain("boardroom-room__chat-panel");
   });
 });

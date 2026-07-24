@@ -243,8 +243,10 @@ import {
 } from "@/lib/boardroom";
 import {
   buildCallTheBoardContext,
+  consumeCallTheBoard,
   prepareCallTheBoard,
 } from "@/lib/board/callTheBoard";
+import { suspendBoardIntakeConversation } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
 import { PROJECT_HOMES_ROOM_BACKGROUND } from "@/lib/projectHomes/roomCatalog";
 
 /** Lazy — keeps Project Homes off Create registry / creationRecord init graph. */
@@ -9208,6 +9210,19 @@ export default function CompanionPageClient() {
       return;
     }
     const resolvedSection = section === "games" ? "quick-recharge" : section;
+    // Leaving Boardroom for another destination — suspend discussion, do not resume later.
+    if (
+      activeSectionRef.current === "boardroom" &&
+      resolvedSection !== "boardroom"
+    ) {
+      suspendBoardIntakeConversation();
+      const boardOwner = getActiveConversationOwner();
+      if (boardOwner?.kind === "board_intake") {
+        clearConversationOwner();
+      }
+      setBoardroomShariChatOpen(false);
+      setBoardroomSourceContext(null);
+    }
     dismissTransientEstateExperiencesForDestinationSwitch({
       destinationId: resolvedSection,
       kind: "section",
@@ -9617,12 +9632,18 @@ export default function CompanionPageClient() {
     if (options?.sourceContext !== undefined) {
       setBoardroomSourceContext(options.sourceContext);
     } else if (intent === "home") {
+      // Ordinary destination entry — seating home, not prior discussion.
       setBoardroomSourceContext(null);
+      consumeCallTheBoard();
+      suspendBoardIntakeConversation();
+      const owner = getActiveConversationOwner();
+      if (owner?.kind === "board_intake") {
+        clearConversationOwner();
+      }
     }
     /**
-     * Remount when entering Boardroom, forcing Home, or Call the Board intake
-     * with fresh source context. Do NOT remount while already inside on a
-     * non-home re-entry — that wiped in-progress Board intake.
+     * Remount on every ordinary home entry so Boardroom always opens seating
+     * overview. Remount intake when Call the Board provides fresh context.
      */
     if (
       !alreadyInBoardroom ||
@@ -11179,6 +11200,15 @@ export default function CompanionPageClient() {
       previousSection: fromSection,
       nextSection: "home",
     });
+    if (fromSection === "boardroom") {
+      suspendBoardIntakeConversation();
+      const boardOwner = getActiveConversationOwner();
+      if (boardOwner?.kind === "board_intake") {
+        clearConversationOwner();
+      }
+      setBoardroomSourceContext(null);
+      setBoardroomEntryIntent("home");
+    }
     setBoardroomShariChatOpen(false);
     setPreferEverydayConversation(false);
     preferEverydayConversationRef.current = false;

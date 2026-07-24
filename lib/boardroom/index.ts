@@ -53,6 +53,15 @@ export {
   type BoardroomHomePrimaryChoiceId,
 } from "./boardroomEntry";
 
+export {
+  boardroomViewModeFromView,
+  hasResumableBoardDiscussion,
+  isBoardroomDestinationHomeView,
+  isResumableBoardIntakeDraft,
+  ordinaryDestinationBoardroomView,
+  type BoardroomViewMode,
+} from "./boardroomViewState";
+
 export const DISCUSSION_STYLE_META = {
   "quick-review": {
     label: "Quick Review",

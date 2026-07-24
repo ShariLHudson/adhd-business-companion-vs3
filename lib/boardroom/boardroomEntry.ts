@@ -195,7 +195,8 @@ export function boardroomViewFromEntryIntent(
       return "past";
     case "home":
     default:
-      return "home";
+      // Ordinary Estate navigation → seating / Board member overview (not chat).
+      return "meet-directors";
   }
 }
 

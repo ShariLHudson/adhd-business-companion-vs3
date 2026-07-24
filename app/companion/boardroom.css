@@ -439,6 +439,28 @@
   max-width: 38rem;
 }
 
+.boardroom-home__resume-card {
+  margin-top: 1.1rem;
+  padding: 0.95rem 1.05rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(180, 132, 58, 0.45);
+  background: rgba(255, 252, 245, 0.92);
+}
+
+.boardroom-home__resume-title {
+  margin: 0;
+  font-size: clamp(0.98rem, 1.8vw, 1.1rem);
+  font-weight: 600;
+  color: #2a241c;
+}
+
+.boardroom-home__resume-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
 .boardroom-home__actions {
   display: flex;
   flex-direction: column;

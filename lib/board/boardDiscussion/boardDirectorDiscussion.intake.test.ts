@@ -150,6 +150,14 @@ describe("Board intake state machine", () => {
     expect(restored.concerns).toBe("Hurting the relationship vs staying stuck");
   });
 
+  it("resolveInitial keeps conversationSuspended until explicit resume", () => {
+    const filled = answerAllQuestions(createEmptyBoardIntakeDraft(["board-chair"]));
+    saveBoardIntakeDraft({ ...filled, conversationSuspended: true });
+    const restored = resolveInitialBoardIntakeDraft([]);
+    expect(restored.conversationSuspended).toBe(true);
+    expect(restored.decision).toBe("Whether to keep this client");
+  });
+
   it("resolveInitial does not overwrite an in-progress draft with empty defaults", () => {
     const filled = answerBoardIntakeStep(
       createEmptyBoardIntakeDraft(["board-chair"]),

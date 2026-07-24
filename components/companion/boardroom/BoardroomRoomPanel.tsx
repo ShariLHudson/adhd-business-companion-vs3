@@ -24,10 +24,11 @@ import {
 import {
   clearBoardIntakeDraft,
   listBoardDirectorDiscussions,
+  resumeBoardIntakeConversation,
   type BoardDiscussionContext,
   type BoardDirectorDiscussionRecord,
 } from "@/lib/board/boardDiscussion/boardDirectorDiscussion";
-import { peekCallTheBoard } from "@/lib/board/callTheBoard";
+import { consumeCallTheBoard } from "@/lib/board/callTheBoard";
 import {
   BOARDROOM_WELCOME_MESSAGE,
   BOARDROOM_HOME_PRIMARY_CHOICES,
@@ -35,6 +36,9 @@ import {
   BOARDROOM_HOW_TO_SUMMARY_LABEL,
   BOARDROOM_CHAMBER_CONTRAST_BLURB,
   boardroomViewFromEntryIntent,
+  hasResumableBoardDiscussion,
+  isBoardroomDestinationHomeView,
+  ordinaryDestinationBoardroomView,
   shouldOpenCarlosFromEntry,
   shouldOpenDavidFromEntry,
   shouldOpenMarcusFromEntry,
@@ -70,12 +74,12 @@ type Props = {
   onBack: () => void;
   /**
    * How this Boardroom visit should open.
-   * Fresh menu / Explore / “Open the Boardroom” → home.
-   * Direct phrases (Meet Thomas, intake, past) may skip home.
+   * Ordinary Estate navigation (`home`) → seating overview (boardroom_home).
+   * Direct phrases (Meet Thomas, intake, past) may deep-link deliberately.
    * Remount via parent `key` so stale subviews cannot hijack a new entry.
    */
   entryIntent?: BoardroomEntryIntent;
-  /** Current Focus / Call the Board context (Prompt 145). */
+  /** Current Focus / Call the Board context (Prompt 145) — intake only. */
   sourceContext?: BoardDiscussionContext | null;
   onReturnToSource?: () => void;
   /** Supporting Shari chat — not the primary Boardroom interface. */
@@ -114,20 +118,33 @@ export function BoardroomRoomPanel({
   conversationScrollKey,
 }: Props) {
   const [view, setView] = useState<BoardroomView>(() => {
-    const pendingCall = peekCallTheBoard();
-    if (pendingCall || sourceContext) return "board-director-intake";
+    // Ordinary destination entry never auto-opens discussion from sticky
+    // Call-the-Board or leftover drafts — only explicit intake / sourceContext.
+    if (entryIntent === "intake" || sourceContext) {
+      return "board-director-intake";
+    }
     return boardroomViewFromEntryIntent(entryIntent);
   });
   const [callContext, setCallContext] = useState<BoardDiscussionContext | null>(
-    () => sourceContext ?? peekCallTheBoard(),
+    () => {
+      if (entryIntent === "intake" || sourceContext) {
+        return sourceContext ?? consumeCallTheBoard();
+      }
+      return null;
+    },
   );
   const [directorPastDetail, setDirectorPastDetail] =
     useState<BoardDirectorDiscussionRecord | null>(null);
+  const [resumeAvailable, setResumeAvailable] = useState(() =>
+    hasResumableBoardDiscussion(),
+  );
 
   useEffect(() => {
     if (sourceContext) setCallContext(sourceContext);
   }, [sourceContext]);
-  const [meetRoundTableOpen, setMeetRoundTableOpen] = useState(false);
+  const [meetRoundTableOpen, setMeetRoundTableOpen] = useState(
+    () => entryIntent === "home" || entryIntent === "meet-directors",
+  );
   const [meetInitialDirectorId] = useState<BoardDirectorId | null>(() => {
     if (shouldOpenThomasFromEntry(entryIntent)) return THOMAS_ELLISON_DIRECTOR_ID;
     if (shouldOpenShariFromEntry(entryIntent)) return SHARI_MENON_DIRECTOR_ID;
@@ -193,20 +210,34 @@ export function BoardroomRoomPanel({
   }
 
   function startHome() {
-    setView("home");
-    setMeetRoundTableOpen(false);
+    // Destination home = Round Table seating / director overview.
+    setView(ordinaryDestinationBoardroomView());
+    setMeetRoundTableOpen(true);
     setActive(null);
     setDetailId(null);
     setActionPanel(null);
+    setDirectorPastDetail(null);
     onToggleShariChat?.(false);
+    setResumeAvailable(hasResumableBoardDiscussion());
   }
 
   function beginNewDiscussion() {
     clearBoardIntakeDraft();
     setBoardReviewDirectorIds([]);
     setForceFreshBoardIntake(true);
+    setCallContext(null);
     setView("board-director-intake");
     setActionPanel(null);
+    setResumeAvailable(false);
+  }
+
+  function resumeBoardDiscussion() {
+    resumeBoardIntakeConversation();
+    setForceFreshBoardIntake(false);
+    setMeetRoundTableOpen(false);
+    setView("board-director-intake");
+    setActionPanel(null);
+    setResumeAvailable(false);
   }
 
   function beginDiscussionWithDirectors(ids: readonly BoardDirectorId[]) {
@@ -489,7 +520,7 @@ export function BoardroomRoomPanel({
         <EstateWorkspace className="boardroom-workspace grow-room-panel">
           <GrowPanelBackButton
             onBack={
-              view === "home"
+              isBoardroomDestinationHomeView(view)
                 ? onBack
                 : view === "discussion" || view === "brief"
                   ? () => {
@@ -498,17 +529,27 @@ export function BoardroomRoomPanel({
                     }
                   : startHome
             }
-            label={view === "home" ? "Estate" : "Boardroom Home"}
+            label={
+              isBoardroomDestinationHomeView(view)
+                ? "Estate"
+                : "Back to Boardroom"
+            }
           />
 
           {view === "home" ? (
             <HomeView
               onStart={beginNewDiscussion}
               onMeetDirectors={() => {
-                setMeetRoundTableOpen(false);
+                setMeetRoundTableOpen(true);
                 setView("meet-directors");
               }}
               onReviewPast={() => setView("past")}
+              resumeAvailable={resumeAvailable}
+              onResumeDiscussion={resumeBoardDiscussion}
+              onViewBoardMembers={() => {
+                setMeetRoundTableOpen(true);
+                setView("meet-directors");
+              }}
             />
           ) : null}
 
@@ -529,7 +570,7 @@ export function BoardroomRoomPanel({
                   className="boardroom-btn boardroom-btn--secondary"
                   onClick={startHome}
                 >
-                  Return to Boardroom Home
+                  Back to Boardroom
                 </button>
               </div>
             </div>
@@ -564,10 +605,8 @@ export function BoardroomRoomPanel({
 
           {view === "meet-directors" ? (
             <BoardDirectorsMeetExperience
-              onBackToBoardroom={() => {
-                setMeetRoundTableOpen(false);
-                startHome();
-              }}
+              isDestinationHome
+              onBackToBoardroom={onBack}
               initialDirectorId={meetInitialDirectorId}
               initialRoundTableOpen={meetRoundTableOpen}
               initialBoardReviewIds={boardReviewDirectorIds}
@@ -575,6 +614,10 @@ export function BoardroomRoomPanel({
                 beginDiscussionWithDirectors(ids);
               }}
               onBoardReviewIdsChange={setBoardReviewDirectorIds}
+              resumeAvailable={resumeAvailable}
+              onResumeDiscussion={resumeBoardDiscussion}
+              onStartNewDiscussion={beginNewDiscussion}
+              onReviewPastDiscussions={() => setView("past")}
             />
           ) : null}
           {view === "past" ? (
@@ -900,10 +943,16 @@ function HomeView({
   onStart,
   onMeetDirectors,
   onReviewPast,
+  resumeAvailable = false,
+  onResumeDiscussion,
+  onViewBoardMembers,
 }: {
   onStart: () => void;
   onMeetDirectors: () => void;
   onReviewPast: () => void;
+  resumeAvailable?: boolean;
+  onResumeDiscussion?: () => void;
+  onViewBoardMembers?: () => void;
 }) {
   const choiceHandlers: Record<
     (typeof BOARDROOM_HOME_PRIMARY_CHOICES)[number]["id"],
@@ -938,6 +987,45 @@ function HomeView({
       >
         {BOARDROOM_CHAMBER_CONTRAST_BLURB}
       </p>
+
+      {resumeAvailable ? (
+        <div
+          className="boardroom-home__resume-card"
+          data-testid="boardroom-resume-discussion-card"
+          role="region"
+          aria-label="Unfinished Board discussion"
+        >
+          <p className="boardroom-home__resume-title">
+            You have an unfinished Board discussion.
+          </p>
+          <div className="boardroom-home__resume-actions">
+            <button
+              type="button"
+              className="boardroom-btn boardroom-btn--secondary"
+              data-testid="boardroom-resume-discussion"
+              onClick={onResumeDiscussion}
+            >
+              Resume Discussion
+            </button>
+            <button
+              type="button"
+              className="boardroom-btn boardroom-btn--ghost"
+              data-testid="boardroom-resume-start-new"
+              onClick={onStart}
+            >
+              Start New
+            </button>
+            <button
+              type="button"
+              className="boardroom-btn boardroom-btn--ghost"
+              data-testid="boardroom-resume-view-members"
+              onClick={onViewBoardMembers ?? onMeetDirectors}
+            >
+              View Board Members
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <div
         className="boardroom-home__actions"
@@ -1196,7 +1284,7 @@ function PastListView({
           className="boardroom-btn boardroom-btn--ghost"
           onClick={onBack}
         >
-          Back to Boardroom Home
+          Back to Boardroom
         </button>
       </div>
     </div>

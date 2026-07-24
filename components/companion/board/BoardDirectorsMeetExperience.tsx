@@ -52,6 +52,8 @@ import "@/app/companion/board-director-meet.css";
 
 type Props = {
   onBackToBoardroom: () => void;
+  /** When true, gallery is Boardroom destination home (Estate leave). */
+  isDestinationHome?: boolean;
   /** Optional: open directly on a Director profile (e.g. deep link). */
   initialDirectorId?: BoardDirectorId | null;
   /** Open Round Table immediately (official Board navigation entry). */
@@ -62,6 +64,11 @@ type Props = {
   onStartBoardDiscussion?: (directorIds: readonly BoardDirectorId[]) => void;
   /** Sync Board Review selection to Boardroom host. */
   onBoardReviewIdsChange?: (directorIds: BoardDirectorId[]) => void;
+  /** Secondary resume affordance — never auto-opens discussion. */
+  resumeAvailable?: boolean;
+  onResumeDiscussion?: () => void;
+  onStartNewDiscussion?: () => void;
+  onReviewPastDiscussions?: () => void;
 };
 
 /**
@@ -70,11 +77,16 @@ type Props = {
  */
 export function BoardDirectorsMeetExperience({
   onBackToBoardroom,
+  isDestinationHome = false,
   initialDirectorId = null,
   initialRoundTableOpen = false,
   initialBoardReviewIds = [],
   onStartBoardDiscussion,
   onBoardReviewIdsChange,
+  resumeAvailable = false,
+  onResumeDiscussion,
+  onStartNewDiscussion,
+  onReviewPastDiscussions,
 }: Props) {
   const [state, setState] = useState<MeetDirectorExperienceState>(() =>
     initialDirectorId
@@ -261,23 +273,79 @@ export function BoardDirectorsMeetExperience({
       <div
         className="board-directors-meet"
         data-testid="board-directors-meet-gallery"
+        data-boardroom-view-mode="boardroom_home"
       >
-        <button
-          type="button"
-          className="board-director-profile__back"
-          onClick={onBackToBoardroom}
-          data-testid="board-directors-meet-back-boardroom"
-        >
-          ← Return to Boardroom Home
-        </button>
-        <p className="boardroom-kicker">Board of Directors</p>
-        <h1 className="boardroom-title">Meet the Directors</h1>
+        {!isDestinationHome ? (
+          <button
+            type="button"
+            className="board-director-profile__back"
+            onClick={onBackToBoardroom}
+            data-testid="board-directors-meet-back-boardroom"
+          >
+            ← Back to Boardroom
+          </button>
+        ) : null}
+        <p className="boardroom-kicker">Round Table Boardroom</p>
+        <h1 className="boardroom-title">
+          {isDestinationHome ? "Board Members" : "Meet the Directors"}
+        </h1>
         <div className="boardroom-gold-rule" aria-hidden />
         <p className="boardroom-purpose">
-          Each card shows a Director&rsquo;s portrait, role, and decision
-          lens. Meet anyone, or add them to your Board Review.
+          {isDestinationHome
+            ? "Choose who should join the discussion. Each seat at the Round Table shows a Director's place and role."
+            : "Each card shows a Director's portrait, role, and decision lens. Meet anyone, or add them to your Board Review."}
         </p>
-        <div className="board-directors-meet__nav-actions">{placeAtTableBtn}</div>
+        {resumeAvailable ? (
+          <div
+            className="boardroom-home__resume-card"
+            data-testid="boardroom-resume-discussion-card"
+            role="region"
+            aria-label="Unfinished Board discussion"
+          >
+            <p className="boardroom-home__resume-title">
+              You have an unfinished Board discussion.
+            </p>
+            <div className="boardroom-home__resume-actions">
+              <button
+                type="button"
+                className="boardroom-btn boardroom-btn--secondary"
+                data-testid="boardroom-resume-discussion"
+                onClick={onResumeDiscussion}
+              >
+                Resume Discussion
+              </button>
+              <button
+                type="button"
+                className="boardroom-btn boardroom-btn--ghost"
+                data-testid="boardroom-resume-start-new"
+                onClick={onStartNewDiscussion}
+              >
+                Start New
+              </button>
+              <button
+                type="button"
+                className="boardroom-btn boardroom-btn--ghost"
+                data-testid="boardroom-resume-view-past"
+                onClick={onReviewPastDiscussions}
+              >
+                Previous Discussions
+              </button>
+            </div>
+          </div>
+        ) : null}
+        <div className="board-directors-meet__nav-actions">
+          {placeAtTableBtn}
+          {onStartNewDiscussion ? (
+            <button
+              type="button"
+              className="boardroom-btn boardroom-btn--primary"
+              data-testid="boardroom-ask-full-board"
+              onClick={onStartNewDiscussion}
+            >
+              Ask the Full Board
+            </button>
+          ) : null}
+        </div>
         {reviewTray}
         <div
           className="compact-board-director-selector__bulk"

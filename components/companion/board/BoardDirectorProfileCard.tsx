@@ -64,7 +64,7 @@ export function BoardDirectorProfileCard({
         onClick={onBackToGallery}
         data-testid="board-director-profile-back"
       >
-        ← Directors
+        ← Back to Boardroom
       </button>
 
       <header

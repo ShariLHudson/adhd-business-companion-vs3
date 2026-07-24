@@ -503,11 +503,8 @@ export function resolveInitialBoardIntakeDraft(
   const existing = loadBoardIntakeDraft();
   if (existing && existing.currentStep !== "discussion") {
     let draft = existing;
-    // Explicit Boardroom reopen — restore chat ownership for this draft.
-    if (draft.conversationSuspended) {
-      draft = { ...draft, conversationSuspended: false };
-      saveBoardIntakeDraft(draft);
-    }
+    // Keep suspended on restore — only resumeBoardIntakeConversation()
+    // (explicit Resume) clears conversationSuspended.
     if (
       directorIds.length > 0 &&
       draft.selectedDirectorIds.length === 0

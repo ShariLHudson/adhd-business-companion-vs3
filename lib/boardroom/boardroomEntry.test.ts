@@ -31,7 +31,7 @@ describe("Boardroom home entry", () => {
       "Show me the Boardroom",
     ]) {
       expect(resolveBoardroomEntryIntent(phrase)).toBe("home");
-      expect(boardroomViewFromEntryIntent("home")).toBe("home");
+      expect(boardroomViewFromEntryIntent("home")).toBe("meet-directors");
       expect(shouldOpenThomasFromEntry("home")).toBe(false);
       expect(shouldOpenShariFromEntry("home")).toBe(false);
     }
@@ -183,7 +183,7 @@ describe("Boardroom home entry", () => {
   it("stale-state safety: fresh home entry never implies Thomas or intake", () => {
     const intent = resolveBoardroomEntryIntent("Open the Boardroom");
     expect(intent).toBe("home");
-    expect(boardroomViewFromEntryIntent(intent)).toBe("home");
+    expect(boardroomViewFromEntryIntent(intent)).toBe("meet-directors");
     expect(shouldOpenThomasFromEntry(intent)).toBe(false);
   });
 });
