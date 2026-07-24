@@ -328,6 +328,7 @@ export function VisualFocusWorkspacePanel({
   onClose,
   registerBack,
   onReturnToEstate,
+  onReturnToCreationWorkspace,
 }: {
   onBack?: () => void;
   onClose?: () => void;
@@ -335,6 +336,7 @@ export function VisualFocusWorkspacePanel({
   /** @deprecated Removed from production chrome. */
   onWorkWithShari?: () => void;
   onReturnToEstate?: () => void;
+  onReturnToCreationWorkspace?: (workspaceId: string) => void;
 }) {
   const [view, setView] = useState<StudioView>("hub");
   const [workspaceMode, setWorkspaceMode] = useState<WorkspaceMode>("build");
@@ -916,6 +918,7 @@ export function VisualFocusWorkspacePanel({
           }) ? (
             <VisualThinkingRequestPanel
               onOpenPreviousWork={() => setMyMapsOpen(true)}
+              onReturnToCreationWorkspace={onReturnToCreationWorkspace}
             />
           ) : null}
           {entryMapId ? (

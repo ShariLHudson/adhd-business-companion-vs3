@@ -2,6 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
+  consumeCreationWorkspaceVisualHandoff,
+  peekReturnContext,
+  peekVisualHandoff,
+} from "@/lib/creationWorkspace";
+import {
   VISUAL_THINKING_DEPTH_QUESTION,
   VISUAL_THINKING_REQUEST_PLACEHOLDER,
   VISUAL_THINKING_RESEARCH_PROMPT,
@@ -136,6 +141,7 @@ const IS_VTS_DEV_DIAGNOSTICS =
 type Props = {
   onOpenPreviousWork: () => void;
   onConfirmed?: (request: VisualThinkingRequest) => void;
+  onReturnToCreationWorkspace?: (workspaceId: string) => void;
 };
 
 type SpeechRecognitionLike = {
@@ -169,6 +175,7 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 export function VisualThinkingRequestPanel({
   onOpenPreviousWork,
   onConfirmed,
+  onReturnToCreationWorkspace,
 }: Props) {
   const [request, setRequest] = useState<VisualThinkingRequest>(() =>
     createVisualThinkingRequest({}),
@@ -217,10 +224,56 @@ export function VisualThinkingRequestPanel({
   );
   const autoContinueLockRef = useRef(false);
   const [executionTraceId, setExecutionTraceId] = useState<string | null>(null);
+  const [creationHandoffRecovery, setCreationHandoffRecovery] = useState<
+    string | null
+  >(null);
+  const [creationReturnWorkspaceId, setCreationReturnWorkspaceId] = useState<
+    string | null
+  >(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
+    const pendingVisual = peekVisualHandoff();
+    if (pendingVisual) {
+      const consumed = consumeCreationWorkspaceVisualHandoff({
+        handoff: pendingVisual,
+      });
+      if (consumed.ok) {
+        setCreationHandoffRecovery(null);
+        setCreationReturnWorkspaceId(consumed.handoff.returnContext.workspaceId);
+        setThinkingWorkspace(consumed.thinkingWorkspace);
+        setGenerationBundle(consumed.generationBundle);
+        setPresentationPlan(consumed.presentationPlan);
+        setActiveDeliverableId(
+          consumed.generationBundle.run.primaryDeliverableId,
+        );
+        const req = loadVisualThinkingRequestDraft();
+        if (req) {
+          setRequest(req);
+          setDraftText(req.rawRequest);
+          if (req.rawRequest.trim()) {
+            const understood = interpretVisualThinkingUnderstanding(req);
+            setUnderstanding(understood);
+            setExperiencePlan(orchestrateVisualThinkingExperience(understood));
+          }
+        }
+        const existingKnowledge = loadKnowledgeBundle();
+        if (existingKnowledge) setKnowledgeBundle(existingKnowledge);
+        const existingEditing = loadEditingSession();
+        if (existingEditing) setEditingSession(existingEditing);
+        return;
+      }
+      setCreationHandoffRecovery(consumed.reason);
+      setCreationReturnWorkspaceId(
+        pendingVisual.returnContext?.workspaceId ??
+          peekReturnContext()?.workspaceId ??
+          null,
+      );
+      // Preserve handoff; do not open empty workspace from stale restore.
+      return;
+    }
+
     const existing = loadVisualThinkingRequestDraft();
     const projectsReq = loadProjectsIntegrationRequest();
     const projectsSeed = projectsReq?.projectSummaryForSeed?.trim() ?? "";
@@ -835,6 +888,72 @@ export function VisualThinkingRequestPanel({
       }
     >
       <div className="vts-request__glass">
+        {creationHandoffRecovery ? (
+          <div
+            className="mb-4 rounded-xl border border-[#d4cdc3] bg-[#fbf8f3] p-4 text-[#2f2a24]"
+            data-testid="visual-thinking-creation-handoff-recovery"
+          >
+            <p className="font-semibold">
+              I still have your written Creation Workspace package.
+            </p>
+            <p className="mt-1 text-sm text-[#4b463f]">{creationHandoffRecovery}</p>
+            <p className="mt-2 text-sm text-[#6b6358]">
+              The visual projection can be tried again without regenerating from
+              the original request alone.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="rounded-xl bg-[#1e4f4f] px-3 py-2 text-sm font-semibold text-white"
+                onClick={() => {
+                  const pending = peekVisualHandoff();
+                  if (!pending) return;
+                  const retry = consumeCreationWorkspaceVisualHandoff({
+                    handoff: pending,
+                  });
+                  if (!retry.ok) {
+                    setCreationHandoffRecovery(retry.reason);
+                    return;
+                  }
+                  setCreationHandoffRecovery(null);
+                  setThinkingWorkspace(retry.thinkingWorkspace);
+                  setGenerationBundle(retry.generationBundle);
+                  setPresentationPlan(retry.presentationPlan);
+                  setActiveDeliverableId(
+                    retry.generationBundle.run.primaryDeliverableId,
+                  );
+                }}
+              >
+                Retry visual projection
+              </button>
+              {creationReturnWorkspaceId ? (
+                <button
+                  type="button"
+                  className="rounded-xl border border-[#d4cdc3] px-3 py-2 text-sm font-semibold"
+                  onClick={() =>
+                    onReturnToCreationWorkspace?.(creationReturnWorkspaceId)
+                  }
+                >
+                  Return to Creation Workspace
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+        {creationReturnWorkspaceId && !creationHandoffRecovery ? (
+          <div className="mb-3">
+            <button
+              type="button"
+              className="rounded-xl border border-[#d4cdc3] px-3 py-2 text-sm font-semibold text-[#4b463f]"
+              data-testid="visual-thinking-return-creation-workspace"
+              onClick={() =>
+                onReturnToCreationWorkspace?.(creationReturnWorkspaceId)
+              }
+            >
+              Return to Creation Workspace
+            </button>
+          </div>
+        ) : null}
         <header className="vts-request__header">
           <h1 className="vts-request__title" id="vts-request-title">
             {VISUAL_THINKING_STUDIO_TITLE}
