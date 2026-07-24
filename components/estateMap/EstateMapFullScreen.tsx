@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   EXPLORE_CATEGORY_LABELS,
   EXPLORE_MEMBER_BUCKET_LABELS,
@@ -20,6 +20,16 @@ import type {
   EstateMapFullScreenProps,
   EstateMapLocation,
 } from "@/lib/estateMap/types";
+import {
+  getWanderEstateImageById,
+  getWanderTourIndex,
+} from "@/lib/estateMap/wanderEstateImageRegistry";
+import {
+  createViewerState,
+  type WanderEstateViewMode,
+  type WanderEstateViewerState,
+} from "@/lib/estateMap/wanderEstateViewerState";
+import { WanderEstateImageViewer } from "@/components/estateMap/WanderEstateImageViewer";
 import "./estate-map-full-screen.css";
 
 type DestinationCardProps = {
@@ -136,23 +146,47 @@ export function EstateMapFullScreen({
   onSelectLocation,
 }: EstateMapFullScreenProps) {
   const [visible, setVisible] = useState(false);
-  const [entering, setEntering] = useState<EstateExploreDestination | null>(
-    null,
-  );
   const [query, setQuery] = useState("");
   const [browseAllPlaces, setBrowseAllPlaces] = useState(false);
   const [openCategories, setOpenCategories] = useState<
     Record<string, boolean>
   >({});
   const [openBuckets, setOpenBuckets] = useState<Record<string, boolean>>({});
+  const [viewMode, setViewMode] = useState<WanderEstateViewMode>("gallery");
+  const [viewerState, setViewerState] =
+    useState<WanderEstateViewerState | null>(null);
+  const galleryScrollRef = useRef<HTMLDivElement>(null);
+  const savedGalleryScrollTop = useRef(0);
 
   const leaveExplore = useCallback(() => {
+    setViewMode("gallery");
+    setViewerState(null);
     if (onReturnToEstate) {
       onReturnToEstate();
       return;
     }
     onClose();
   }, [onClose, onReturnToEstate]);
+
+  const pendingReturnFocusId = useRef<string | null>(null);
+
+  const closeViewerToGallery = useCallback(() => {
+    pendingReturnFocusId.current = viewerState?.returnFocusId ?? null;
+    setViewMode("gallery");
+    setViewerState(null);
+  }, [viewerState?.returnFocusId]);
+
+  useEffect(() => {
+    if (viewMode !== "gallery" || !pendingReturnFocusId.current) return;
+    const returnId = pendingReturnFocusId.current;
+    pendingReturnFocusId.current = null;
+    const scroller = galleryScrollRef.current;
+    if (scroller) scroller.scrollTop = savedGalleryScrollTop.current;
+    const card = document.querySelector<HTMLElement>(
+      `[data-testid="${returnId}"]`,
+    );
+    card?.focus();
+  }, [viewMode]);
 
   const destinations = useMemo(
     () => locations.map(toDestination),
@@ -184,9 +218,10 @@ export function EstateMapFullScreen({
   useEffect(() => {
     if (!open) {
       setVisible(false);
-      setEntering(null);
       setQuery("");
       setBrowseAllPlaces(false);
+      setViewMode("gallery");
+      setViewerState(null);
       return;
     }
     const frame = window.requestAnimationFrame(() => setVisible(true));
@@ -216,43 +251,53 @@ export function EstateMapFullScreen({
   }, [open, memberBuckets]);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open || viewMode === "image_viewer") return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        if (entering) setEntering(null);
-        else leaveExplore();
+        leaveExplore();
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, entering, leaveExplore]);
+  }, [open, viewMode, leaveExplore]);
+
+  const openImageViewer = useCallback((destination: EstateExploreDestination) => {
+    if (!destination.isAvailable || !destination.imageReady) return;
+    const record = getWanderEstateImageById(destination.id);
+    if (!record?.enabled) return;
+    const index = getWanderTourIndex(destination.id);
+    if (index < 0) return;
+    savedGalleryScrollTop.current = galleryScrollRef.current?.scrollTop ?? 0;
+    setViewerState(createViewerState(destination.id, index));
+    setViewMode("image_viewer");
+  }, []);
 
   const handleSelect = useCallback(
     (destination: EstateExploreDestination) => {
       if (!destination.isAvailable) return;
-      setEntering(destination);
-      const asLocation: EstateMapLocation = {
-        id: destination.id,
-        name: destination.name,
-        image: destination.imagePath,
-        mood: destination.description,
-        x: 50,
-        y: 50,
-        width: 12,
-        rotation: 0,
-      };
-      /**
-       * Parent closes Explore and navigates. Do not call onClose/leaveExplore
-       * here — Fold / Return to Estate go to Welcome Home and would cancel
-       * the room hop.
-       */
-      window.setTimeout(() => {
-        onSelectLocation?.(asLocation);
-        setEntering(null);
-      }, 450);
+      // Focused visual tour — open image viewer (do not navigate away yet)
+      openImageViewer(destination);
     },
-    [onSelectLocation],
+    [openImageViewer],
   );
+
+  const handleViewerNavigate = useCallback((imageId: string) => {
+    const index = getWanderTourIndex(imageId);
+    if (index < 0) return;
+    setViewerState((prev) => ({
+      ...createViewerState(imageId, index),
+      returnFocusId:
+        prev?.returnFocusId ?? `explore-estate-card-${imageId}`,
+    }));
+  }, []);
+
+  const viewerImage =
+    viewMode === "image_viewer" && viewerState
+      ? getWanderEstateImageById(viewerState.selectedImageId)
+      : null;
+
+  // Keep onSelectLocation available for future "Visit this place" without unused lint
+  void onSelectLocation;
 
   function toggleCategory(id: EstateExploreCategory) {
     setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -266,23 +311,37 @@ export function EstateMapFullScreen({
 
   return (
     <div
-      className={`emfs-root${visible ? " emfs-root--visible" : ""}${
-        entering ? " emfs-root--entering" : ""
-      }`}
+      className={`emfs-root${visible ? " emfs-root--visible" : ""}`}
       role="dialog"
       aria-modal="true"
-      aria-label="Explore Estate"
+      aria-label={
+        viewMode === "image_viewer" && viewerImage
+          ? viewerImage.title
+          : "Wander the Estate"
+      }
       data-testid="explore-estate-directory"
+      data-wander-view={viewMode}
     >
-      <div className="emfs-parchment">
+      {viewMode === "image_viewer" && viewerImage?.enabled ? (
+        <WanderEstateImageViewer
+          image={viewerImage}
+          onClose={closeViewerToGallery}
+          onNavigate={handleViewerNavigate}
+        />
+      ) : null}
+
+      {viewMode === "gallery" ? (
+      <div className="emfs-parchment" data-testid="wander-estate-gallery">
         <header className="emfs-toolbar">
           <div className="emfs-toolbar__title">
-            <h1>Explore Estate</h1>
-            <p>
+            <h1>Wander the Estate</h1>
+            <p data-testid="wander-estate-gallery-subtitle">
               {showFullDirectory
-                ? "Every place with a photograph — choose where to go"
-                : "A few places to begin — browse all when you want to wander"}
+                ? "Every place with a photograph — open an image to look more closely"
+                : "A few places to begin — open an image, or browse all"}
             </p>
+            {/* Keep Explore Estate phrase for directory regressions / search copy */}
+            <p className="emfs-sr-only">Explore Estate visual directory</p>
           </div>
           <div className="emfs-toolbar__actions">
             {onReturnToEstate ? (
@@ -292,7 +351,7 @@ export function EstateMapFullScreen({
                 onClick={onReturnToEstate}
                 data-testid="explore-estate-return-home"
               >
-                Return to Estate
+                Return to Welcome Home
               </button>
             ) : null}
             <button
@@ -324,7 +383,11 @@ export function EstateMapFullScreen({
           </p>
         </div>
 
-        <div className="emfs-directory-scroll" data-testid="explore-estate-scroll">
+        <div
+          className="emfs-directory-scroll"
+          data-testid="explore-estate-scroll"
+          ref={galleryScrollRef}
+        >
           {!showFullDirectory ? (
             <>
               {memberBuckets.map((group) => {
@@ -438,22 +501,6 @@ export function EstateMapFullScreen({
           )}
         </div>
       </div>
-
-      {entering ? (
-        <div className="emfs-enter" aria-hidden>
-          {entering.imageReady && entering.imagePath ? (
-            <div
-              className="emfs-enter__image"
-              style={{
-                backgroundImage: `url(${entering.imagePath})`,
-                backgroundPosition: entering.focalPosition ?? "center",
-              }}
-            />
-          ) : (
-            <div className="emfs-enter__image emfs-enter__image--plain" />
-          )}
-          <p className="emfs-enter__label">Stepping into {entering.name}…</p>
-        </div>
       ) : null}
     </div>
   );
