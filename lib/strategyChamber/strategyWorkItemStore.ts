@@ -4,6 +4,7 @@
 
 import type { StrategicJudgmentStage } from "./domainModel";
 import { __resetStrategicMemoryStoreForTests } from "./memory/strategicMemoryStore";
+import { __resetStrategicPatternStoreForTests } from "./patterns/patternStore";
 import type {
   StrategyEntryReason,
   StrategyWorkItem,
@@ -274,6 +275,7 @@ export function __resetStrategyChamberStoresForTests(): void {
   memory.connections = [];
   memory.activeId = null;
   __resetStrategicMemoryStoreForTests();
+  __resetStrategicPatternStoreForTests();
   if (typeof window === "undefined") return;
   window.localStorage.removeItem(WORK_KEY);
   window.localStorage.removeItem(CONN_KEY);
