@@ -6,6 +6,7 @@ import { offerStrategyType } from "./strategyTypes/offer";
 import { marketCustomerStrategyType } from "./strategyTypes/marketCustomer";
 import { capacityFocusStrategyType } from "./strategyTypes/capacityFocus";
 import { hiringDelegationStrategyType } from "./strategyTypes/hiringDelegation";
+import { partnershipStrategyType } from "./strategyTypes/partnership";
 import { personalDirectionStrategyType } from "./strategyTypes/personalDirection";
 import { pivotRethinkStrategyType } from "./strategyTypes/pivotRethink";
 import { ninetyDayStrategyType } from "./strategyTypes/ninetyDay";
@@ -18,6 +19,7 @@ const STRATEGY_TYPES: StrategyTypeContract[] = [
   marketCustomerStrategyType,
   capacityFocusStrategyType,
   hiringDelegationStrategyType,
+  partnershipStrategyType,
   personalDirectionStrategyType,
   pivotRethinkStrategyType,
   ninetyDayStrategyType,
@@ -52,6 +54,11 @@ export function matchStrategyTypesFromText(
     for (const signal of type.entrySignals) {
       if (signal.test(t)) score += 1;
     }
+    // Prefer more specific domains when language is shared (e.g. partnership vs offer)
+    if (score > 0 && type.id === "partnership") score += 2;
+    if (score > 0 && type.id === "hiring_delegation") score += 1;
+    if (score > 0 && type.id === "pricing") score += 1;
+    if (score > 0 && type.id === "pivot_rethink") score += 1;
     return { type, score };
   }).filter((x) => x.score > 0);
   scored.sort((a, b) => b.score - a.score);

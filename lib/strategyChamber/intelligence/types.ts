@@ -72,9 +72,26 @@ export type StrategyTypeId =
   | "market_customer"
   | "capacity_focus"
   | "hiring_delegation"
+  | "partnership"
   | "personal_direction"
   | "pivot_rethink"
   | "ninety_day";
+
+/** Phase 4 — problem distinctions within a domain (e.g. growth: awareness vs retention). */
+export type DomainProblemDistinction = {
+  id: string;
+  label: string;
+  description: string;
+  whenToSuspect: string[];
+  preferredPatterns?: OptionPatternId[];
+};
+
+/** Phase 4 — domain decision heuristics (advisor judgment, not member copy templates). */
+export type DomainDecisionHeuristic = {
+  id: string;
+  rule: string;
+  when: string;
+};
 
 /**
  * Internal option patterns — never expose these ids in member copy.
@@ -139,7 +156,16 @@ export type StrategyTypeContract = {
   handoffDestinations: ContinueJourneyDestinationId[];
   adaptivePresentationNotes: string;
   qualityChecks: string[];
-  version: 1;
+  /**
+   * Phase 4 Domain Intelligence — how this domain thinks.
+   * Same judgment engine; different knowledge contribution.
+   */
+  decisionHeuristics: DomainDecisionHeuristic[];
+  commonMistakes: string[];
+  warningSigns: string[];
+  problemDistinctions: DomainProblemDistinction[];
+  guidingPrinciples: string[];
+  version: 2;
 };
 
 /**
@@ -305,4 +331,8 @@ export type StrategyJudgmentTurn = {
   recommendation?: import("./engine/recommendOption").StrategicRecommendation | null;
   /** Phase 3 — how deep analysis should go given reversibility. */
   reversibilityDepth?: import("./frameworks/reversibilityDepth").ReversibilityDepth;
+  /** Phase 4 — active domain intelligence pack loaded for this turn. */
+  activeDomain?: StrategyTypeContract | null;
+  /** Phase 4 — matched problem distinction within the domain, when suspected. */
+  matchedProblemDistinction?: DomainProblemDistinction | null;
 };

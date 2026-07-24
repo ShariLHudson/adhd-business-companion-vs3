@@ -12,6 +12,10 @@ import {
   optionsAreMeaningfullyDifferent,
   strategyQualityIssues,
 } from "../quality/strategyQuality";
+import {
+  getDomainIntelligence,
+  matchProblemDistinction,
+} from "../domainIntelligence";
 import { getStrategyType } from "../registry";
 import type { EnrichedStrategyOption, OptionPatternId } from "../types";
 import { assessOptionReadiness } from "./assessOptionReadiness";
@@ -127,7 +131,11 @@ export function generateFullStrategicOptions(
     /\bhire|va|assistant|delegate\b/i.test(statement)
   ) {
     candidates = hiringPatterns();
-  } else if (/\b(collaborat|partner with|partnership)\b/i.test(statement)) {
+  } else if (
+    analysis.strategyTypeId === "partnership" ||
+    analysis.questionType === "partnership_decision" ||
+    /\b(collaborat|partner with|partnership)\b/i.test(statement)
+  ) {
     candidates = partnershipPatterns();
   } else if (
     analysis.strategyTypeId === "pivot_rethink" ||
@@ -145,6 +153,19 @@ export function generateFullStrategicOptions(
       : ["continue", "test", "simplify", "improve", "delay"];
   }
 
+  // Phase 4 — bias candidate pool with matched problem distinction patterns
+  const domain = getDomainIntelligence(analysis.strategyTypeId) ?? type;
+  const distinction = matchProblemDistinction(
+    domain,
+    `${item.decisionStatement ?? ""} ${item.currentReality ?? ""} ${item.desiredDirection ?? ""}`,
+  );
+  if (distinction?.preferredPatterns?.length) {
+    candidates = [
+      ...distinction.preferredPatterns,
+      ...candidates,
+    ];
+  }
+
   const uniqueCandidates = [...new Set(candidates.map(normalizeOptionPattern))];
   const selected = selectDistinctOptionPatterns(uniqueCandidates, item, {
     strategyTypeId: analysis.strategyTypeId,
@@ -155,14 +176,15 @@ export function generateFullStrategicOptions(
     (item.notChosen ?? []).map((s) => s.trim().toLowerCase()).filter(Boolean),
   );
 
+  const knowledge = domain ?? type;
   let options = selected
     .map((pattern) =>
       materializeStrategicOption(pattern, {
         typeId: analysis.strategyTypeId,
-        commonTradeoffs: type?.commonTradeoffs,
-        commonRisks: type?.commonRisks,
-        experimentHint: type?.experimentPatterns?.[0],
-        possibleNextDestination: type?.handoffDestinations?.[0],
+        commonTradeoffs: knowledge?.commonTradeoffs,
+        commonRisks: knowledge?.commonRisks,
+        experimentHint: knowledge?.experimentPatterns?.[0],
+        possibleNextDestination: knowledge?.handoffDestinations?.[0],
       }),
     )
     .filter((o) => !rejected.has(o.title.toLowerCase()));

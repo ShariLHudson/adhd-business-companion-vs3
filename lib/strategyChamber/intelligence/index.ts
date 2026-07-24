@@ -11,6 +11,7 @@ export * from "./optionContract";
 export * from "./patternLabels";
 export * from "./statementAnalysis";
 export * from "./registry";
+export * from "./domainIntelligence";
 export * from "./frameworks/optionCatalog";
 export * from "./frameworks/opportunityCost";
 export * from "./frameworks/experiments";

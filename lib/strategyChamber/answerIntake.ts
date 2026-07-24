@@ -8,6 +8,7 @@ import type { StrategicInputClassification } from "./domainModel";
 import {
   assessJudgmentStage,
   classifyStrategicInput,
+  familyForStrategyTypeId,
   identifyStrategicQuestion,
   suggestStrategyTypeId,
 } from "./intelligence";
@@ -63,20 +64,9 @@ export function applyOpeningStrategicQuestion(
     activeQuestion: undefined,
     shariReflection: undefined,
     strategyType: strategyType ?? item.strategyType,
-    strategyFamily:
-      analysis.strategyTypeId === "pricing"
-        ? "money_and_resources"
-        : analysis.strategyTypeId === "growth" ||
-            analysis.strategyTypeId === "market_customer"
-          ? "customer_and_market"
-          : analysis.strategyTypeId === "offer"
-            ? "offers_and_innovation"
-            : analysis.strategyTypeId === "hiring_delegation"
-              ? "people_and_leadership"
-              : analysis.strategyTypeId === "capacity_focus" ||
-                  analysis.strategyTypeId === "personal_direction"
-                ? "personal_direction"
-                : item.strategyFamily ?? "business_direction",
+    strategyFamily: analysis.strategyTypeId
+      ? familyForStrategyTypeId(analysis.strategyTypeId)
+      : item.strategyFamily ?? "business_direction",
   };
 }
 

@@ -45,6 +45,39 @@ export const businessDirectionStrategyType: StrategyTypeContract = {
   recommendedBoardRoles: ["strategy-director"],
   handoffDestinations: ["project", "board", "create", "plan_my_day"],
   adaptivePresentationNotes: "Keep one question; offer a brief journey map only if asked.",
-  qualityChecks: ["Direction named", "What not pursing named"],
-  version: 1,
+  qualityChecks: ["Direction named", "What not pursuing named"],
+  decisionHeuristics: [
+    {
+      id: "name_not_pursuing",
+      rule: "A direction is clearer when what you will not pursue is named.",
+      when: "Too many ideas compete",
+    },
+    {
+      id: "season_sized",
+      rule: "Prefer a season-sized direction over a forever identity lock.",
+      when: "Uncertainty is high",
+    },
+  ],
+  commonMistakes: [
+    "Treating every idea as equal priority",
+    "Choosing growth language when focus is the need",
+  ],
+  warningSigns: [
+    "No clear “not now” list",
+    "Direction changes weekly without evidence",
+  ],
+  problemDistinctions: [
+    {
+      id: "too_many_paths",
+      label: "Too many paths",
+      description: "The issue may be selection, not inspiration.",
+      whenToSuspect: ["too many ideas", "scattered", "don’t know what to focus"],
+      preferredPatterns: ["narrow", "simplify", "test"],
+    },
+  ],
+  guidingPrinciples: [
+    "Direction includes what you will not pursue.",
+    "Growth is not the default conclusion.",
+  ],
+  version: 2,
 };

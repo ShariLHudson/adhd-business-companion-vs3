@@ -1,5 +1,10 @@
 import type { AdaptivePresentationResolved } from "@/lib/adaptiveCompanionIntelligence";
 import type { StrategyWorkItem } from "../../types";
+import {
+  familyForStrategyTypeId,
+  getDomainIntelligence,
+  matchProblemDistinction,
+} from "../domainIntelligence";
 import { suggestSecondOrderEffects } from "../frameworks/secondOrderThinking";
 import { assessReversibility } from "../frameworks/reversibility";
 import type {
@@ -99,26 +104,26 @@ export function analyzeStrategyWorkItem(
   if (strategicQuestion.strategyTypeId && !item.strategyType) {
     workItemPatch.strategyType = strategicQuestion.strategyTypeId;
   }
-  if (strategicQuestion.strategyTypeId) {
-    const family = strategicQuestion.strategyTypeId;
-    if (!item.strategyFamily) {
-      if (family === "pricing" || family === "hiring_delegation") {
-        workItemPatch.strategyFamily =
-          family === "pricing" ? "money_and_resources" : "people_and_leadership";
-      } else if (family === "growth" || family === "market_customer") {
-        workItemPatch.strategyFamily = "customer_and_market";
-      } else if (family === "offer") {
-        workItemPatch.strategyFamily = "offers_and_innovation";
-      } else if (
-        family === "capacity_focus" ||
-        family === "personal_direction"
-      ) {
-        workItemPatch.strategyFamily = "personal_direction";
-      } else {
-        workItemPatch.strategyFamily = "business_direction";
-      }
-    }
+  if (strategicQuestion.strategyTypeId && !item.strategyFamily) {
+    workItemPatch.strategyFamily = familyForStrategyTypeId(
+      strategicQuestion.strategyTypeId,
+    );
   }
+
+  const activeDomain = getDomainIntelligence(
+    strategicQuestion.strategyTypeId ?? item.strategyType,
+  );
+  const matchedProblemDistinction = matchProblemDistinction(
+    activeDomain,
+    [
+      item.decisionStatement,
+      item.currentReality,
+      item.desiredDirection,
+      opts?.lastAnswer,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
   if (secondOrder.length && !(item.secondOrderEffects?.length)) {
     workItemPatch.secondOrderEffects = secondOrder;
   }
@@ -172,5 +177,7 @@ export function analyzeStrategyWorkItem(
     optionComparison,
     recommendation: optionRecommendation || undefined,
     reversibilityDepth: depth,
+    activeDomain,
+    matchedProblemDistinction,
   };
 }

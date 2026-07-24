@@ -34,8 +34,8 @@ describe("Strategy Intelligence Phase 1", () => {
     __resetAdaptiveCompanionExplicitPrefsForTests();
   });
 
-  it("registers ten strategy types", () => {
-    expect(listStrategyTypes()).toHaveLength(10);
+  it("registers eleven strategy types", () => {
+    expect(listStrategyTypes()).toHaveLength(11);
   });
 
   it("identifies pricing from a membership price statement", () => {

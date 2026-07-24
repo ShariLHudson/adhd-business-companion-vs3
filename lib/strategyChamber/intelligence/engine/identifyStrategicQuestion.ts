@@ -1,5 +1,9 @@
 import type { StrategyWorkItem } from "../../types";
 import {
+  getDomainIntelligence,
+  matchProblemDistinction,
+} from "../domainIntelligence";
+import {
   matchStrategyTypesFromText,
   resolvePrimaryStrategyType,
 } from "../registry";
@@ -21,6 +25,7 @@ function mapTypeToQuestionType(
   if (strategyTypeId === "market_customer") return "market_decision";
   if (strategyTypeId === "capacity_focus") return "capacity_decision";
   if (strategyTypeId === "hiring_delegation") return "hiring_decision";
+  if (strategyTypeId === "partnership") return "partnership_decision";
   if (strategyTypeId === "personal_direction") {
     return "personal_direction_decision";
   }
@@ -32,6 +37,7 @@ function mapTypeToQuestionType(
   if (/\bmore customers?\b/.test(t)) return "growth_decision";
   if (/\bhire\b/.test(t)) return "hiring_decision";
   if (/\bprice\b/.test(t)) return "pricing_decision";
+  if (/\bpartner(ship)?|collaborat\b/.test(t)) return "partnership_decision";
   if (/\bpivot|rethink\b/.test(t)) return "pivot_decision";
   if (/\bkeep doing|should i continue\b/.test(t)) {
     return "continue_or_stop_decision";
@@ -114,6 +120,21 @@ export function identifyStrategicQuestion(
     alternateQuestions.push(
       "Is the brand the problem, or is the offer, market, or message unclear?",
     );
+  }
+
+  // Phase 4 — only inject a matched distinction (never speculative lists that
+  // force clarification on already-clear pricing / hiring questions).
+  if (alternateQuestions.length < 2 && strategyTypeId) {
+    const domain = getDomainIntelligence(strategyTypeId);
+    const matched = matchProblemDistinction(
+      domain,
+      `${stated} ${item.currentReality ?? ""}`,
+    );
+    if (matched) {
+      alternateQuestions.push(
+        `Could this be a ${matched.label.toLowerCase()} — ${matched.description}`,
+      );
+    }
   }
   // Clear pricing / hiring / experiment questions use next-move selection
   // (e.g. "what changed") rather than alternate-question clarification.

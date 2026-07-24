@@ -74,7 +74,9 @@ Easily Reversible · Moderately Reversible · Difficult to Reverse · Effectivel
 
 ## Phase 1 strategy types
 
-Business Direction · Growth · Pricing · Offer · Market/Customer · Capacity/Focus · Hiring/Delegation · Personal Direction · Pivot/Rethink · 90-Day
+Business Direction · Growth · Pricing · Offer · Market/Customer · Capacity/Focus · Hiring/Delegation · **Partnership** · Personal Direction · Pivot/Rethink · 90-Day
+
+Phase 4 deepens these into Domain Intelligence packs — see `docs/strategy-intelligence/19_DOMAIN_INTELLIGENCE.md`.
 
 ## Certification checklist
 
