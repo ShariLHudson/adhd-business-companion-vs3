@@ -166,29 +166,19 @@ export function BoardDirectorProfileCard({
         </button>
       </div>
 
-      <div className="board-director-profile__detail-grid">
-        <div className="board-director-profile__detail-main">
-          {onToggleAccordion ? (
-            <BoardDirectorProfileAccordion
-              director={director}
-              openSectionId={openAccordionId}
-              onToggleSection={onToggleAccordion}
-              disabled={faded}
-            />
-          ) : null}
-        </div>
-        <aside
-          className="board-director-profile__enjoy"
-          data-noninteractive
-          data-testid="board-director-enjoy-panel"
-        >
-          <h3 className="board-director-profile__enjoy-title">
-            You&apos;ll enjoy working with me if…
-          </h3>
-          <p className="board-director-profile__enjoy-body">
-            {director.youllEnjoyWorkingWithMeIf}
-          </p>
-        </aside>
+      {/*
+        Fit copy lives only in the accordion (youll-enjoy-working-with-me).
+        Do not also render a side panel — that duplicated the same field.
+      */}
+      <div className="board-director-profile__detail">
+        {onToggleAccordion ? (
+          <BoardDirectorProfileAccordion
+            director={director}
+            openSectionId={openAccordionId}
+            onToggleSection={onToggleAccordion}
+            disabled={faded}
+          />
+        ) : null}
       </div>
 
       <div className="board-director-profile__actions">

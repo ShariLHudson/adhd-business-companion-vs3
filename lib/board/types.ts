@@ -94,6 +94,11 @@ export type BoardDirectorDefinition = {
   whatIProtect: string[];
   whenYoullWantMe: string;
   howIWorkWithFounders: string;
+  /**
+   * Canonical fit copy for “You'll enjoy working with me if…”
+   * Rendered once via accordion section `youll-enjoy-working-with-me`.
+   * Do not duplicate as a side panel or a second registry field.
+   */
   youllEnjoyWorkingWithMeIf: string;
 };
 

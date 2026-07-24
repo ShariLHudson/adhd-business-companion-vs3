@@ -1066,41 +1066,11 @@
   box-shadow: 0 0 0 2px rgba(196, 164, 106, 0.4);
 }
 
-.board-director-profile__detail-grid {
+/* Single column — fit copy is an accordion section, not a side panel. */
+.board-director-profile__detail {
   margin-top: 1.25rem;
-  display: grid;
-  gap: 1rem;
-}
-
-@media (min-width: 48rem) {
-  .board-director-profile__detail-grid {
-    grid-template-columns: minmax(0, 1.4fr) minmax(12rem, 0.85fr);
-    align-items: start;
-  }
-}
-
-.board-director-profile__enjoy {
-  padding: 0.95rem 1rem;
-  border-radius: 0.85rem;
-  border: 1px solid rgba(196, 164, 106, 0.38);
-  background: rgba(255, 250, 242, 0.92);
-  cursor: default;
-}
-
-.board-director-profile__enjoy-title {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #1a2744;
-}
-
-.board-director-profile__enjoy-body {
-  margin: 0.55rem 0 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: #3d3630;
+  display: block;
+  min-width: 0;
 }
 
 /* Accordion — gold icon rail, cream rows */

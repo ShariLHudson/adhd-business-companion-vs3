@@ -5,14 +5,18 @@
 
 import type { BoardDirectorDefinition } from "@/lib/board/types";
 
+/**
+ * Full profile accordion order (canonical).
+ * Fit section appears once — never also as a side panel.
+ */
 export const BOARD_DIRECTOR_ACCORDION_SECTION_IDS = [
   "how-i-think",
   "what-i-protect",
   "questions-ill-ask",
   "when-youll-want-me",
+  "youll-enjoy-working-with-me",
   "decision-i-helped-guide",
   "how-i-work-with-founders",
-  "youll-enjoy-working-with-me",
 ] as const;
 
 /** Shown first on profile overview — reduce default cognitive load. */
@@ -25,9 +29,22 @@ export const BOARD_DIRECTOR_PRIMARY_ACCORDION_SECTION_IDS = [
 /** Deeper material behind “More About This Director”. */
 export const BOARD_DIRECTOR_MORE_ACCORDION_SECTION_IDS = [
   "questions-ill-ask",
+  "youll-enjoy-working-with-me",
   "decision-i-helped-guide",
   "how-i-work-with-founders",
-  "youll-enjoy-working-with-me",
+] as const;
+
+/** Canonical member-facing fit heading — single render path only. */
+export const BOARD_DIRECTOR_ENJOY_WORKING_TITLE =
+  "You'll enjoy working with me if…" as const;
+
+/** Legacy labels that must not also appear as separate sections. */
+export const BOARD_DIRECTOR_ENJOY_WORKING_LEGACY_TITLES = [
+  "You'll Enjoy Working With Me If",
+  "You'll enjoy working with me if",
+  "Good fit if",
+  "Working style fit",
+  "When you will enjoy working with me",
 ] as const;
 
 export type BoardDirectorAccordionSectionId =
@@ -49,7 +66,7 @@ const TITLES: Record<BoardDirectorAccordionSectionId, string> = {
   "when-youll-want-me": "When You'll Want Me",
   "decision-i-helped-guide": "A Decision I Helped Guide",
   "how-i-work-with-founders": "How I Work With Founders",
-  "youll-enjoy-working-with-me": "You'll Enjoy Working With Me If",
+  "youll-enjoy-working-with-me": BOARD_DIRECTOR_ENJOY_WORKING_TITLE,
 };
 
 function sectionFromId(

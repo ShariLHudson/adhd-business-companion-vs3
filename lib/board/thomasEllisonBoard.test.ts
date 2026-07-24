@@ -114,9 +114,9 @@ describe("Thomas Ellison — visible Board Director", () => {
       "What I Protect",
       "Questions I'll Ask",
       "When You'll Want Me",
+      "You'll enjoy working with me if…",
       "A Decision I Helped Guide",
       "How I Work With Founders",
-      "You'll Enjoy Working With Me If",
     ]);
     expect(sections.every((s) => s.preview.length > 0)).toBe(true);
     expect(toggleDirectorAccordion(null, "how-i-think")).toBe("how-i-think");
