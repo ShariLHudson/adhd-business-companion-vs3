@@ -35,6 +35,8 @@ export type ShariAnswerFirstEvent =
   | "thread_store_rejected"
   | "thread_reset_for_new_conversation"
   | "stale_thread_rejected"
+  | "turn_authority"
+  | "competing_owner_suppressed"
   | "user_correction_applied"
   | "handoff_created";
 

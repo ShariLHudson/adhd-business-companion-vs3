@@ -10,10 +10,12 @@
 - Professional roles are internal posture, never member-facing mode pickers.
 - `conversationContinuity.ts` in this module = help-thread binder. Distinct from `lib/conversationContinuity/*` (workflow ownership).
 - Topic fail-safes are last resort; excellence + baseline repair is preferred.
+- One turn owner: `decideConversationTurnAuthority()` gates relationship local, founder recovery/accept, continuity adapt, and local how-to primary. Do not add new CPC early returns that write assistant messages without consulting it.
 
 ## Before shipping ordinary chat changes
 
 - [ ] Production path still calls `runShariCognitivePipeline`?
+- [ ] Turn authority computed and competing owners suppressed?
 - [ ] Known context used before re-asking?
 - [ ] General-AI baseline cannot silently pass a weaker reply?
 - [ ] Docs SoT links still accurate?

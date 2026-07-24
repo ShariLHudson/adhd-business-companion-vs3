@@ -22,3 +22,4 @@ export * from "./wisdomPlan";
 export * from "./responseComposer";
 export * from "./cognitivePipeline";
 export * from "./goldenResponseSuite";
+export * from "./turnAuthority";

@@ -1919,6 +1919,7 @@ import {
   extractThreadCorrection,
   isShariConversationFollowUp,
   looksLikeConversationRestart,
+  decideConversationTurnAuthority,
   resolveShariConversationThread,
   runShariCognitivePipeline,
   SHARI_MAX_MODEL_REPAIR_ATTEMPTS,
@@ -1927,6 +1928,7 @@ import {
   storeShariConversationHandoff,
   storeShariConversationThread,
   trackShariAnswerFirstEvent,
+  type ConversationTurnAuthority,
   type ShariResponseDecision,
 } from "@/lib/shariAnswerFirst";
 import {
@@ -14217,7 +14219,25 @@ export default function CompanionPageClient() {
     });
     const shariAnswerFirstDecision: ShariResponseDecision =
       shariCognitiveTurn.decision;
-    const shariFollowUp = shariCognitiveTurn.isFollowUp;
+    const turnAuthority: ConversationTurnAuthority =
+      decideConversationTurnAuthority({
+        userText: trimmed,
+        decision: shariAnswerFirstDecision,
+        isFollowUp: shariCognitiveTurn.isFollowUp,
+        thread: shariConversationThread,
+        primaryRole: shariCognitiveTurn.primaryProfessionalRole,
+        pendingCreateConsent: Boolean(pendingCreateOpen),
+        hasCurrentFounderAction: Boolean(founderActionBoard.currentAction),
+      });
+    // Authoritative owner may break help-thread so continuity cannot steal the turn.
+    const shariFollowUp = turnAuthority.breakHelpThread
+      ? false
+      : shariCognitiveTurn.isFollowUp;
+    const allowContinuityLocalReply =
+      turnAuthority.allowContinuityAdapt && shariFollowUp;
+    const effectiveShariThread = turnAuthority.breakHelpThread
+      ? null
+      : shariConversationThread;
     if (shariThreadResolve.staleRejected) {
       trackShariAnswerFirstEvent("stale_thread_rejected", {
         currentConversationId: shariThreadResolve.currentConversationId,
@@ -14238,13 +14258,16 @@ export default function CompanionPageClient() {
       routingAllowed: shariAnswerFirstDecision.routingAllowed,
       followUp: shariFollowUp,
       role: shariCognitiveTurn.primaryProfessionalRole,
+      turnOwner: turnAuthority.owner,
     });
     const answerFirstPreferChat =
       preferChatAnswer ||
       shouldSuppressRouteBeforeAnswer(shariAnswerFirstDecision) ||
+      turnAuthority.preferCompanionChat ||
       shariFollowUp;
     const answerFirstBlockImmediateOpen =
       shouldBlockImmediateExperienceOpen(shariAnswerFirstDecision) ||
+      turnAuthority.preferCompanionChat ||
       shariFollowUp;
 
     // Freeform input dismisses the guided daily opening (choices stay optional).
@@ -14908,7 +14931,10 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (shouldCompleteRelationshipChatLocally(primaryTurnDecision, trimmed)) {
+    if (
+      turnAuthority.allowRelationshipLocal &&
+      shouldCompleteRelationshipChatLocally(primaryTurnDecision, trimmed)
+    ) {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
       if (fresh) clearConversation();
@@ -14945,6 +14971,28 @@ export default function CompanionPageClient() {
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
+    }
+
+    // Create consent owns bare "ok/yes" before relationship/founder/other stealers.
+    // Turn authority already suppressed relationship when pendingCreateConsent + bare ack.
+    if (
+      (turnAuthority.owner === "create_consent_accept" || pendingCreateOpen) &&
+      pendingCreateOpen &&
+      userAcceptedCreateConsent(trimmed, lastAssistantText)
+    ) {
+      const acceptance = resolvePendingAcceptance({
+        userText: trimmed,
+        lastAssistantText,
+        currentTurn: chatTurnRef.current,
+        workspacePanel: workspacePanelRef.current,
+        record: pendingAcceptanceRecord,
+        pendingAction: null,
+        createConsent: pendingCreateOpen,
+      });
+      if (dispatchResolvedAcceptance(acceptance, null)) {
+        finishEarlyChatTurn();
+        return;
+      }
     }
 
     if (isVagueHelpRequest(trimmed) && !continuityLocksBroadRouting) {
@@ -17397,7 +17445,10 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (isActionRecoveryCommand(trimmed)) {
+    if (
+      turnAuthority.allowFounderActionRecovery &&
+      isActionRecoveryCommand(trimmed)
+    ) {
       commitUserLine();
       const events = eventStore.query({ founderId: FOUNDER_ID });
       const board = buildActionDashboard(events, FOUNDER_ID);
@@ -17430,12 +17481,35 @@ export default function CompanionPageClient() {
       finishEarlyChatTurn();
       return;
     }
+    if (
+      !turnAuthority.allowFounderActionRecovery &&
+      isActionRecoveryCommand(trimmed)
+    ) {
+      trackShariAnswerFirstEvent("competing_owner_suppressed", {
+        owner: "founder_action_recovery",
+        turnOwner: turnAuthority.owner,
+      });
+    }
 
-    if (isFounderActionAcceptance(trimmed) && founderActionBoard.currentAction) {
+    if (
+      turnAuthority.allowFounderActionAccept &&
+      isFounderActionAcceptance(trimmed) &&
+      founderActionBoard.currentAction
+    ) {
       commitUserLine();
       respondToFounderAction(founderActionBoard.currentAction, "open");
       finishEarlyChatTurn();
       return;
+    }
+    if (
+      !turnAuthority.allowFounderActionAccept &&
+      isFounderActionAcceptance(trimmed) &&
+      founderActionBoard.currentAction
+    ) {
+      trackShariAnswerFirstEvent("competing_owner_suppressed", {
+        owner: "founder_action_accept",
+        turnOwner: turnAuthority.owner,
+      });
     }
 
     // Scheduling / planning context: do NOT auto-open Create just because the
@@ -19747,11 +19821,15 @@ export default function CompanionPageClient() {
         ? chamberMemberHintForChat(activeChamberMember)
         : null;
 
-      // Core Conversation: continue an open help thread without restarting.
-      if (answerFirstPreferChat && !chamberConversationActive && shariFollowUp) {
+      // Continuity local adapt — only when turn authority allows (never Create/emotion/daily-focus steals).
+      if (
+        allowContinuityLocalReply &&
+        answerFirstPreferChat &&
+        !chamberConversationActive
+      ) {
         const adapted = buildFollowUpAdaptedReply(
           trimmed,
-          shariConversationThread,
+          effectiveShariThread,
         );
         if (adapted) {
           trackShariAnswerFirstEvent("follow_up_answered", {
@@ -19774,7 +19852,7 @@ export default function CompanionPageClient() {
                 activeConversationIdForThread ||
                 activeConversationIdRef.current ||
                 "unknown",
-              prior: shariConversationThread,
+              prior: effectiveShariThread,
               memberNote: trimmed,
             }),
           );
@@ -19782,49 +19860,25 @@ export default function CompanionPageClient() {
           finishLatencyTurn({ localReply: true });
           return;
         }
+      } else if (shariCognitiveTurn.isFollowUp && !allowContinuityLocalReply) {
+        trackShariAnswerFirstEvent("competing_owner_suppressed", {
+          owner: "continuity_adapt",
+          turnOwner: turnAuthority.owner,
+        });
       }
 
-      // Answer-first: high-value how-to / troubleshooting gets a substantive
-      // chat answer immediately — do not wait on model profiling questions.
+      // Local how-to failsafe is NOT a primary owner — companion-chat owns teaching.
+      // Failsafe remains available only via post-API repair paths.
       if (
+        !turnAuthority.allowLocalHowToFailsafeAsPrimary &&
         answerFirstPreferChat &&
-        !chamberConversationActive &&
-        !shariFollowUp &&
         (shariAnswerFirstDecision.primaryHelpMode === "how_to_guidance" ||
-          shariAnswerFirstDecision.primaryHelpMode === "troubleshooting") &&
-        /\b(?:vendor|booth|facebook groups?|strateg(?:y|ic plan)|qr code|loom)\b/i.test(
-          trimmed,
-        )
+          shariAnswerFirstDecision.primaryHelpMode === "troubleshooting")
       ) {
-        const localAnswer = buildAnswerFirstFailSafeReply(trimmed);
-        if (localAnswer) {
-          trackShariAnswerFirstEvent("answer_generated", {
-            mode: shariAnswerFirstDecision.primaryHelpMode,
-            source: "local_failsafe",
-          });
-          if (activeChatTurnLifecycleRef.current) {
-            markAssistantReplied(activeChatTurnLifecycleRef.current);
-          }
-          setMessages((prev) => [
-            ...prev,
-            { role: "assistant", content: localAnswer },
-          ]);
-          recordPrimaryTurnResponse(localAnswer);
-          storeShariConversationThread(
-            buildShariConversationThread({
-              decision: shariAnswerFirstDecision,
-              answer: localAnswer,
-              conversationId:
-                activeConversationIdForThread ||
-                activeConversationIdRef.current ||
-                "unknown",
-              prior: shariConversationThread,
-            }),
-          );
-          finishEarlyChatTurn();
-          finishLatencyTurn({ localReply: true });
-          return;
-        }
+        trackShariAnswerFirstEvent("competing_owner_suppressed", {
+          owner: "local_howto_failsafe",
+          turnOwner: turnAuthority.owner,
+        });
       }
 
       const useChatStream = speedProfile.routeClass !== "instant";
@@ -20568,6 +20622,7 @@ export default function CompanionPageClient() {
         ) {
           let repaired: string | null = null;
           // Prefer one bounded model repair using composition + wisdom instructions.
+          // Local failsafe/continuity are last resort only — never primary owners.
           if (
             excellence.preferModelRepair &&
             excellence.repairInstructions &&

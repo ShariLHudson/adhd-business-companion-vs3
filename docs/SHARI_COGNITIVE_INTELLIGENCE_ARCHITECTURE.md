@@ -30,6 +30,8 @@ Conversation Thread Binding   (conversationContinuity.ts)
         ↓
 Request Understanding           (decideShariResponse.ts)
         ↓
+Turn Authority (one owner)      (turnAuthority.ts)  ← gates all early returns
+        ↓
 Professional Role Selection     (professionalRoles.ts)
         ↓
 Relevant Context Retrieval      (contextResolver.ts)
@@ -44,18 +46,33 @@ Response Composition            (responseComposer.ts)
         ↓
 Response Strategy + Hints       (chatHint + composition + wisdom → promptHints)
         ↓
-Draft Response                  (/api/companion-chat)
+Draft Response                  (/api/companion-chat)  — primary for teaching
         ↓
 General-AI Baseline Review      (generalAiBaseline.ts)
         ↓
 Substance + Excellence + Delight (conversationExcellence.ts · conversationDelight.ts)
         ↓
-Model Repair (bounded) → local fail-safe last
+Model Repair (bounded) → local fail-safe last (never primary owner)
         ↓
 Final Response + Thread Store
         ↓
 Optional One Capability Offer / Handoff
 ```
+
+### Turn authority (binding)
+
+`decideConversationTurnAuthority()` assigns **one** owner per turn. Competing CPC early returns must consult its suppress flags before writing an assistant message or navigating.
+
+| Failure pattern (production) | Stolen by | Owner after authority |
+|---|---|---|
+| Loom how-to short duplicate | local how-to failsafe as primary | `companion_chat` (API); failsafe demoted |
+| Depth ask / never-used-app | continuity “Staying with…” filler | `companion_chat`; continuity off |
+| “print / process” → “ok” | relationship local on bare `ok` | `create_consent_accept` |
+| “what should I work on today” | founder action recovery playbook | `companion_chat`; recovery off |
+| “yes… checklist” | founder action accept on leading `yes` | `companion_chat`; accept off |
+| Overwhelm mid how-to thread | continuity adapt on help-thread | `overwhelm_frictionless`; break thread |
+
+Events: `turn_authority`, `competing_owner_suppressed`.
 
 Phase 2 docs: [SHARI_RESPONSE_COMPOSER.md](./SHARI_RESPONSE_COMPOSER.md) · [SHARI_WISDOM_LAYER.md](./SHARI_WISDOM_LAYER.md) · [SHARI_CONVERSATION_DELIGHT_STANDARD.md](./SHARI_CONVERSATION_DELIGHT_STANDARD.md)
 
@@ -77,6 +94,7 @@ Phase 2 docs: [SHARI_RESPONSE_COMPOSER.md](./SHARI_RESPONSE_COMPOSER.md) · [SHA
 | Substance validation | `validateShariAnswerSubstance` | Per-destination validators for ordinary help |
 | Excellence + baseline | `validateConversationExcellence` · `reviewAgainstGeneralAiBaseline` | Second scoring system |
 | Capability offers / handoffs | `capabilityOffers.ts` · `conversationHandoff.ts` | Second handoff registry |
+| Turn ownership / early-return gates | `decideConversationTurnAuthority` | Ad-hoc “who answers first” races in CPC |
 | Observability | `trackShariAnswerFirstEvent` | Member-visible classifications |
 
 ---
