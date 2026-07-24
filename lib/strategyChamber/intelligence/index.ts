@@ -7,8 +7,12 @@
 
 export * from "../domainModel";
 export * from "./types";
+export * from "./optionContract";
 export * from "./statementAnalysis";
 export * from "./registry";
+export * from "./frameworks/optionCatalog";
+export * from "./frameworks/opportunityCost";
+export * from "./frameworks/experiments";
 export * from "./engine/classifyStrategicInput";
 export * from "./engine/analyzeStrategicStatement";
 export * from "./engine/identifyStrategicQuestion";
@@ -17,6 +21,7 @@ export * from "./engine/selectNextThinkingMove";
 export * from "./engine/assessJudgmentStage";
 export * from "./engine/assessDecisionReadiness";
 export * from "./engine/assessOptionReadiness";
+export * from "./engine/selectDistinctOptionPatterns";
 export * from "./engine/generateOptions";
 export * from "./engine/compareOptions";
 export * from "./engine/identifyRisks";

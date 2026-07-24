@@ -1,11 +1,39 @@
 import type { StrategyWorkItem } from "../../types";
-import type { StrategicExperiment } from "../types";
+import { getStrategyType, resolvePrimaryStrategyType } from "../registry";
+import type { OptionPatternId, StrategicExperiment } from "../types";
+import { materializeStrategicOption } from "./optionCatalog";
 
 export function designDefaultExperiment(
   item: StrategyWorkItem,
 ): StrategicExperiment | null {
   const q = (item.decisionStatement || item.title || "").trim();
   if (!q) return null;
+
+  const type =
+    getStrategyType(item.strategyType) ||
+    resolvePrimaryStrategyType(q);
+  if (type?.experimentPatterns?.[0]) {
+    const pattern: OptionPatternId =
+      type.id === "pricing"
+        ? "protect_base"
+        : type.id === "hiring_delegation"
+          ? "partner"
+          : "test";
+    const seeded = materializeStrategicOption(pattern, {
+      typeId: type.id,
+      experimentHint: type.experimentPatterns[0],
+    }).experiment;
+    if (seeded) {
+      return {
+        ...seeded,
+        assumptionBeingTested:
+          item.assumptions?.[0]?.trim() || seeded.assumptionBeingTested,
+        successSignal:
+          item.successSignals?.[0]?.trim() || seeded.successSignal,
+      };
+    }
+  }
+
   const lower = q.toLowerCase();
 
   if (/\bprice|pricing|fee\b/.test(lower)) {
@@ -48,4 +76,20 @@ export function designDefaultExperiment(
     evidenceToCollect: "A few concrete signals you can notice without a dashboard.",
     decisionThatFollows: "Whether to commit, adjust, or choose another path.",
   };
+}
+
+/** Prefer a small experiment when the leading option is hard to reverse or low-confidence. */
+export function shouldPreferExperiment(
+  item: StrategyWorkItem,
+  leadingOptionTitle?: string,
+): boolean {
+  const text = `${item.chosenDirection || ""} ${leadingOptionTitle || ""}`.toLowerCase();
+  if (/\b(test|pilot|experiment|30 days|trial)\b/.test(text)) return true;
+  if (
+    /\b(everyone|permanent|rebrand|shut down|fire|contract)\b/.test(text)
+  ) {
+    return true;
+  }
+  if ((item.confidenceLevel || "medium") === "low") return true;
+  return false;
 }

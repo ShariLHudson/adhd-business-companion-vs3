@@ -11,8 +11,13 @@ import { analyzeStrategicStatement } from "./analyzeStrategicStatement";
 import { assessDecisionReadiness } from "./assessDecisionReadiness";
 import { assessJudgmentStage } from "./assessJudgmentStage";
 import { assessOptionReadiness } from "./assessOptionReadiness";
+import {
+  compareStrategicOptions,
+  type OptionComparisonResult,
+} from "./compareOptions";
 import { designStrategicExperiment } from "./designExperiment";
 import {
+  generateFullStrategicOptions,
   generateStrategicOptions,
   shouldOfferStrategicOptions,
 } from "./generateOptions";
@@ -37,6 +42,7 @@ export function analyzeStrategyWorkItem(
   const nextQuestion = selectNextQuestion(item, presentation, opts);
   const readiness = assessDecisionReadiness(item);
   const optionReadiness = assessOptionReadiness(item);
+  const fullOptions = generateFullStrategicOptions(item, presentation);
   const options = generateStrategicOptions(item, presentation);
   const showOptions = shouldOfferStrategicOptions(item);
   const lastStatementAnalysis = opts?.lastAnswer?.trim()
@@ -46,6 +52,19 @@ export function analyzeStrategyWorkItem(
   const experiment = designStrategicExperiment(item);
   const recommendation = recommendStrategicHandoff(item);
   const secondOrder = suggestSecondOrderEffects(item);
+
+  const comparisonMoves = new Set([
+    "generate_options",
+    "compare_options",
+    "assess_tradeoffs",
+    "assess_risk",
+    "assess_reversibility",
+    "design_experiment",
+  ]);
+  const optionComparison: OptionComparisonResult | null =
+    showOptions || comparisonMoves.has(nextMove.move)
+      ? compareStrategicOptions(options, presentation)
+      : null;
 
   const handoff: HandoffContext = {
     recommendation,
@@ -100,6 +119,14 @@ export function analyzeStrategyWorkItem(
   if (risks.length && !(item.risks?.length)) {
     workItemPatch.risks = risks.map((r) => r.whatCouldHappen);
   }
+  // Phase 3 — surface salient trade-offs when comparison is active
+  if (
+    optionComparison?.lines.length &&
+    !(item.tradeoffs?.length) &&
+    (showOptions || nextMove.move === "compare_options" || nextMove.move === "assess_tradeoffs")
+  ) {
+    workItemPatch.tradeoffs = optionComparison.lines.slice(0, 3);
+  }
   if (recommendation && item.chosenDirection?.trim()) {
     workItemPatch.recommendedNextDestination = recommendation.destinationId;
   }
@@ -127,5 +154,7 @@ export function analyzeStrategyWorkItem(
     nextMove,
     optionReadiness,
     lastStatementAnalysis,
+    fullOptions,
+    optionComparison,
   };
 }

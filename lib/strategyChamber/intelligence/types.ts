@@ -253,4 +253,8 @@ export type StrategyJudgmentTurn = {
   optionReadiness?: import("./engine/assessOptionReadiness").OptionReadinessAssessment;
   /** Phase 2 — last answer epistemic analysis when provided. */
   lastStatementAnalysis?: import("./statementAnalysis").StrategicStatementAnalysis | null;
+  /** Phase 3 — full option contract (trade-offs, risk, reversibility, experiments). */
+  fullOptions?: import("./optionContract").StrategicOption[];
+  /** Phase 3 — comparison lines when options are offered or trade-offs are due. */
+  optionComparison?: import("./engine/compareOptions").OptionComparisonResult | null;
 };
