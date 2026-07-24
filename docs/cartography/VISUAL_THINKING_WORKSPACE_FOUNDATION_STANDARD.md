@@ -5,7 +5,8 @@
 **Scope:** First interactive Thinking Workspace over approved presentation, knowledge, and deliverables  
 **Experience authority:** [VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md)  
 **User-facing name:** Visual Thinking Studio  
-**Corrective 7.1:** [Rename & Research-to-Result](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md)
+**Corrective 7.1:** [Rename & Research-to-Result](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md)  
+**Build 8:** [Recommendation Intelligence](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) — optional invitations require substantive-result readiness before opening the workspace.
 
 **Runtime:** `lib/cartographersStudio/visualThinkingWorkspaceFoundation.ts`  
 **UI:** `components/companion/cartographersStudio/ThinkingWorkspace.tsx`  

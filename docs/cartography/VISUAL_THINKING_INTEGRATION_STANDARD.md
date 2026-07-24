@@ -3,9 +3,11 @@
 **Status:** Binding platform integration standard  
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/visualThinkingService.ts`  
-**Related:** Generate-First · Presentation · Workspace Foundation · Experience Standard · [Rename & Research-to-Result (7.1)](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md)
+**Related:** Generate-First · Presentation · Workspace Foundation · Experience Standard · [Rename & Research-to-Result (7.1)](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md) · [Recommendation Intelligence (Build 8)](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md)
 
 **User-facing destination name:** Visual Thinking Studio (legacy technical ids such as `cartographers-studio` may remain for compatibility).
+
+**Recommendation Intelligence:** Optional invitations require real usefulness, substantive-result readiness, and (normally) initial value first. Explicit visual requests route directly. Declines are respected. Source return context must be preserved. Callers use `assessVisualThinkingRecommendation` — they do not invent parallel recommenders.
 
 ---
 

@@ -1,6 +1,7 @@
 # Visual Thinking Studio — Generate-First Knowledge Completion Standard™ (Corrective Build 6.6)
 
-**Also see:** [VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md) (Corrective Build 7.1 — research must produce the requested result; destination name is Visual Thinking Studio).
+**Also see:** [VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md) (Corrective Build 7.1 — research must produce the requested result; destination name is Visual Thinking Studio).  
+**Recommendation:** [VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) — accepted/explicit recommendations continue through generate-first without a second confirmation.
 
 ## Mission
 

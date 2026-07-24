@@ -158,6 +158,10 @@ Cover Welcome Home rename, legacy aliases, Loom guide, CRM comparison, timeline,
 
 ---
 
+## Recommendation Intelligence dependency
+
+[Recommendation Intelligence](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) must only recommend destinations that can produce substantive results under this standard. Optional recommendations require usefulness + readiness; explicit visual requests route directly.
+
 ## Core rules
 
 1. The destination is called **Visual Thinking Studio**.  

@@ -380,6 +380,10 @@ Legacy technical identifiers (`cartographersStudio`, `cartographers-studio`) may
 
 See [VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md).
 
+### Recommendation Intelligence (Build 8)
+
+Optional Visual Thinking invitations are assessed by [Recommendation Intelligence](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md). Explicit requests skip the invitation. Declines suppress topic repeats. Entry still requires substantive workspace eligibility.
+
 ### Learning pilot (first Estate consumer)
 
 See [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md).

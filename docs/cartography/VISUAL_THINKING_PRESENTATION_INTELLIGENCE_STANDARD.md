@@ -3,7 +3,8 @@
 **Status:** Binding for Visual Thinking Studio Build 6  
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/visualThinkingPresentationIntelligence.ts`  
-**Session key:** `companion-visual-thinking-presentation-plan-v1` (session-only)
+**Session key:** `companion-visual-thinking-presentation-plan-v1` (session-only)  
+**Related:** [Recommendation Intelligence](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) — optional invitations suggest a cognitive purpose, not a technical map-type menu; Presentation Intelligence may offer eligible alternate views after entry.
 
 ---
 

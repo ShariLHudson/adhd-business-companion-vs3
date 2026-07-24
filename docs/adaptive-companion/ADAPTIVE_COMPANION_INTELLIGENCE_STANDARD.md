@@ -45,3 +45,9 @@ Spark Estate changes doorway, pacing, density, and support according to how the 
 ## Destinations still on fixed presentation
 
 Documented in [ADOPTION_AND_CERTIFICATION_PLAN.md](./ADOPTION_AND_CERTIFICATION_PLAN.md). Do not claim platform-wide retrofit until certified per destination.
+
+## Visual Thinking Recommendation Intelligence (boundary)
+
+[Recommendation Intelligence](../cartography/VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) may use Adaptive Companion observations to adjust confidence, timing, density, and invitation strength.
+
+It must **not**: force a visual, suppress an explicit visual request, permanently label someone a “visual learner,” or replace written help. Explicit no-visual preferences suppress optional invitations only.
