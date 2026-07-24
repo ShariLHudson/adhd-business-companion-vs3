@@ -15,6 +15,8 @@ import type {
 export type TurnDecisionAnnotation = {
   routeSelected?: string;
   finalResponseOwner?: string;
+  /** Advisory systems that contributed — never the final speaker. */
+  advisoryContributions?: string[];
   actionExecuted?: string;
   bypassDetected?: string | null;
   pendingState?: string;
@@ -80,6 +82,12 @@ export function annotateTurnDecision(patch: TurnDecisionAnnotation): void {
     active.decision = {
       ...active.decision,
       finalResponseOwner: patch.finalResponseOwner,
+    };
+  }
+  if (patch.advisoryContributions != null) {
+    active.decision = {
+      ...active.decision,
+      advisoryContributions: [...patch.advisoryContributions],
     };
   }
 }

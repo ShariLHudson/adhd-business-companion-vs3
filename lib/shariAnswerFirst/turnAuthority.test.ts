@@ -146,6 +146,26 @@ describe("decideConversationTurnAuthority — production failure modes", () => {
     expect(auth.allowContinuityAdapt).toBe(false);
     expect(auth.allowFounderActionRecovery).toBe(false);
     expect(auth.allowRelationshipLocal).toBe(false);
+    expect(auth.allowOverwhelmFrictionless).toBe(true);
+  });
+
+  it("C1: overwhelm + write the email → create_execution, not overwhelm", () => {
+    const text =
+      "I'm so overwhelmed, I don't even know what to tell my team — can you just write the email for me.";
+    const decision = decideShariResponse(text);
+    const auth = decideConversationTurnAuthority({
+      userText: text,
+      decision,
+      isFollowUp: false,
+      thread: null,
+      primaryRole: "teacher",
+      pendingCreateConsent: false,
+      hasCurrentFounderAction: false,
+    });
+    expect(decision.explicitCreationRequested).toBe(true);
+    expect(auth.owner).toBe("create_execution");
+    expect(auth.allowEmotionalDestinationOffer).toBe(false);
+    expect(auth.allowOverwhelmFrictionless).toBe(false);
   });
 
   it("short same-topic refinement may allow continuity adapt", () => {

@@ -23,3 +23,5 @@ export * from "./responseComposer";
 export * from "./cognitivePipeline";
 export * from "./goldenResponseSuite";
 export * from "./turnAuthority";
+export * from "./turnRecovery";
+export * from "./creationCriticalGap";

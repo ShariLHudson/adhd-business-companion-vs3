@@ -53,6 +53,8 @@ export function selectPrimaryMode(input: {
   if (input.experienceId === "create") return "creation_workflow";
   if (input.experienceId === "chamber") return "expert_member_response";
   if (input.experienceId === "board") return "board_deliberation";
+  // Companion / global Shari — assist first; emotion may soften tone later.
+  if (input.experienceId === "general-chat") return "direct_answer";
 
   const t = input.userText.toLowerCase();
   if (/\b(?:hire|decid|whether|should i|or not|price|launch)\b/.test(t)) {

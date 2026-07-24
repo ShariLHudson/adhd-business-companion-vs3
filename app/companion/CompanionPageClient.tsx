@@ -1317,6 +1317,7 @@ import {
   isCompanionVisible,
   normalizeConversationDestinationId,
   setCompanionVisibility,
+  setDestinationCompanionVisibility,
   supportsCompanionVisibilityControl,
   type CompanionVisibility,
 } from "@/lib/conversationVisibility";
@@ -1325,10 +1326,13 @@ import { logConversationPipelineDiagnostic } from "@/lib/conversation/conversati
 import {
   isSimpleCreateRequest,
   isUniversalCreationMessage,
+  isCreateFlowAssistantContext,
   isGuidedCreationAssistantContext,
   loadUniversalCreationSession,
   clearUniversalCreationSession,
   detectUniversalDocumentType,
+  formatUniversalCreationTurnReply,
+  resolveUniversalCreationTurn,
 } from "@/lib/universalCreation";
 import {
   formatEstateGuideReply,
@@ -1919,11 +1923,13 @@ import {
   extractThreadCorrection,
   isShariConversationFollowUp,
   looksLikeConversationRestart,
+  classifyTurnRecovery,
   decideConversationTurnAuthority,
   resolveShariConversationThread,
   runShariCognitivePipeline,
   SHARI_MAX_MODEL_REPAIR_ATTEMPTS,
   shouldBlockImmediateExperienceOpen,
+  shouldResumeAfterDetourDecline,
   shouldSuppressRouteBeforeAnswer,
   storeShariConversationHandoff,
   storeShariConversationThread,
@@ -2431,6 +2437,13 @@ import {
   type ProcessActiveTopicTurnResult,
   type ProcessIntentWorkflowTurnResult,
 } from "@/lib/conversationStabilization";
+import {
+  certifyCompanionDelivery,
+  clearGeneralChatCertifiedRuntime,
+  inferCompanionDeliveryKind,
+  shouldCertifyCompanionDelivery,
+  type CompanionDeliveryKind,
+} from "@/lib/certifiedConversation";
 import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
   continuous: boolean;
@@ -7594,17 +7607,16 @@ export default function CompanionPageClient() {
     try {
       const preserveRoom = shouldPreserveRoomForFreshConversation();
       clearTodayContext({ preserveRoom, mode: "new-chat" });
+      clearGeneralChatCertifiedRuntime();
       setGlobalDailyOpening(null);
       setDailyOpeningHelpSuggestions(null);
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
-      const routed = routeCompanionFailure(err, {
-        surface: "fresh-start",
-      });
-      if (routed.channel === "estate") {
-        setMessages([{ role: "assistant", content: routed.message }]);
-      }
+      // Log recovery — never open a new chat on the tangled apology.
+      routeCompanionFailure(err, { surface: "fresh-start" });
+      clearGeneralChatCertifiedRuntime();
+      setMessages([{ role: "assistant", content: NEW_CONVERSATION_GREETING }]);
     }
   }
 
@@ -7621,12 +7633,8 @@ export default function CompanionPageClient() {
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
-      const routed = routeCompanionFailure(err, {
-        surface: "fresh-start",
-      });
-      if (routed.channel === "estate") {
-        setMessages([{ role: "assistant", content: routed.message }]);
-      }
+      routeCompanionFailure(err, { surface: "fresh-start" });
+      setMessages([{ role: "assistant", content: NEW_CONVERSATION_GREETING }]);
     }
   }
 
@@ -7665,12 +7673,8 @@ export default function CompanionPageClient() {
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
-      const routed = routeCompanionFailure(err, {
-        surface: "fresh-start",
-      });
-      if (routed.channel === "estate") {
-        setMessages([{ role: "assistant", content: routed.message }]);
-      }
+      routeCompanionFailure(err, { surface: "fresh-start" });
+      setMessages([{ role: "assistant", content: NEW_CONVERSATION_GREETING }]);
     } finally {
       setFreshStartDialog(null);
     }
@@ -13843,21 +13847,71 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Shari Voice Layer — every normal member-facing assistant string passes here
-   * before it is shown. Legal/safety/system copy may set bypassVoiceLayer.
+   * Companion delivery choke — chat-owned drafts certify through the shared
+   * CIE/HCV spine, then Shari Voice Layer. Navigation / Create / system copy
+   * may skip certification via deliveryKind or bypassVoiceLayer.
    */
   function finalizeMemberFacingAssistantText(
     content: string,
     owner: string,
-    opts?: { bypassVoiceLayer?: boolean; bypassReason?: "legal" | "safety" | "system_required" },
+    opts?: {
+      bypassVoiceLayer?: boolean;
+      bypassReason?: "legal" | "safety" | "system_required";
+      deliveryKind?: CompanionDeliveryKind;
+      advisoryContributions?: string[];
+    },
   ): string {
+    const deliveryKind =
+      opts?.deliveryKind ??
+      inferCompanionDeliveryKind({ owner });
+    let draft = content;
+    let finalOwner = owner;
+    const advisory = [...(opts?.advisoryContributions ?? [])];
+
+    if (
+      shouldCertifyCompanionDelivery({
+        owner,
+        deliveryKind,
+        bypassVoiceLayer: opts?.bypassVoiceLayer,
+      })
+    ) {
+      const conversationId =
+        activeConversationIdRef.current || "general-chat";
+      const userText = lastUserTextRef.current ?? "";
+      const certified = certifyCompanionDelivery({
+        conversationId,
+        userText,
+        draftText: draft,
+        messages: messagesRef.current
+          .filter((m) => m.role === "user" || m.role === "assistant")
+          .map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content,
+          })),
+        owner: finalOwner,
+        advisoryContributions: advisory,
+      });
+      draft = certified.text;
+      finalOwner = certified.finalResponseOwner;
+      annotateTurnDecision({
+        finalResponseOwner: finalOwner,
+        advisoryContributions: certified.advisoryContributions,
+      });
+      trackShariAnswerFirstEvent("companion_certified_delivery", {
+        finalResponseOwner: finalOwner,
+        advisoryContributions: certified.advisoryContributions.join(",") || null,
+        regenerated: certified.regenerated,
+        usedFallback: certified.usedFallback,
+      });
+    }
+
     const decision = getActiveTurnDecision();
     const voiced = applyShariVoiceLayer({
-      text: content,
+      text: draft,
       userText: lastUserTextRef.current ?? undefined,
       emotionalCondition: decision?.emotionalCondition,
-      contentPlanOwner: owner,
-      finalResponseOwner: owner,
+      contentPlanOwner: finalOwner,
+      finalResponseOwner: finalOwner,
       bypassVoiceLayer: opts?.bypassVoiceLayer,
       bypassReason: opts?.bypassReason,
     }).text;
@@ -13944,8 +13998,27 @@ export default function CompanionPageClient() {
       return false;
     }
 
+    const frictionlessOwner = `frictionless:${frictionlessAction.category}`;
+    const frictionlessCreateOwned =
+      frictionlessAction.category === "universal_creation" ||
+      Boolean(frictionlessAction.immediateCreateOpen) ||
+      Boolean(frictionlessAction.immediateCreateProjectOpen);
+    const frictionlessNavOnly = Boolean(
+      frictionlessAction.immediateEstatePlaceNavigate ||
+        frictionlessAction.immediateVisualOpen ||
+        frictionlessAction.immediateCartographersStudioOpen ||
+        frictionlessAction.immediateResearchOpen ||
+        frictionlessAction.immediateEstateHowToGuideOpen ||
+        frictionlessAction.immediateEstateCoachingOpen,
+    );
+    const frictionlessDeliveryKind = inferCompanionDeliveryKind({
+      owner: frictionlessOwner,
+      hasImmediateNavigation: frictionlessNavOnly,
+      createOwned: frictionlessCreateOwned,
+    });
+
     annotateTurnDecision({
-      finalResponseOwner: `frictionless:${frictionlessAction.category}`,
+      finalResponseOwner: frictionlessOwner,
       routeSelected: frictionlessAction.category,
       actionExecuted: frictionlessAction.immediateEstatePlaceNavigate
         ? "navigate_place"
@@ -13956,7 +14029,8 @@ export default function CompanionPageClient() {
 
     const voicedLocalReply = finalizeMemberFacingAssistantText(
       frictionlessAction.localReply!,
-      `frictionless:${frictionlessAction.category}`,
+      frictionlessOwner,
+      { deliveryKind: frictionlessDeliveryKind },
     );
 
     if (activeChatTurnLifecycleRef.current) {
@@ -14228,6 +14302,7 @@ export default function CompanionPageClient() {
         primaryRole: shariCognitiveTurn.primaryProfessionalRole,
         pendingCreateConsent: Boolean(pendingCreateOpen),
         hasCurrentFounderAction: Boolean(founderActionBoard.currentAction),
+        activeCreateSession: Boolean(loadUniversalCreationSession()),
       });
     // Authoritative owner may break help-thread so continuity cannot steal the turn.
     const shariFollowUp = turnAuthority.breakHelpThread
@@ -14577,14 +14652,22 @@ export default function CompanionPageClient() {
           /\b(?:online event|virtual event|webinar|create(?: an?)? event)\b/i.test(
             trimmed,
           );
-        const followUp = wantsEvent
+        const followUpDraft = wantsEvent
           ? `${continuityGate.correctionAck}\n\nWhat kind of online event are you creating?`
           : continuityGate.correctionAck;
+        const followUp = finalizeMemberFacingAssistantText(
+          followUpDraft,
+          "workflow_correction",
+        );
         setMessages((prev) => [
           ...(fresh ? [] : prev),
           userMessage,
           { role: "assistant", content: followUp },
         ]);
+        annotateTurnDecision({
+          finalResponseOwner: "workflow_correction",
+          actionExecuted: "repair_ack",
+        });
         setInput("");
         voiceUsedRef.current = false;
         if (!getPrefs().hasChatted) {
@@ -14914,12 +14997,20 @@ export default function CompanionPageClient() {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
       if (fresh) clearConversation();
+      const socialReply = finalizeMemberFacingAssistantText(
+        simpleSocialGreetingReply(trimmed),
+        "social_greeting",
+      );
       setMessages((prev) => [
         ...(fresh ? [] : prev),
         userMessage,
-        { role: "assistant", content: simpleSocialGreetingReply(trimmed) },
+        { role: "assistant", content: socialReply },
       ]);
-      recordPrimaryTurnResponse(simpleSocialGreetingReply(trimmed));
+      recordPrimaryTurnResponse(socialReply);
+      annotateTurnDecision({
+        finalResponseOwner: "social_greeting",
+        actionExecuted: "social_greeting",
+      });
       setInput("");
       voiceUsedRef.current = false;
       if (!getPrefs().hasChatted) {
@@ -14938,7 +15029,10 @@ export default function CompanionPageClient() {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
       if (fresh) clearConversation();
-      const reply = relationshipConversationLocalReply(trimmed);
+      const reply = finalizeMemberFacingAssistantText(
+        relationshipConversationLocalReply(trimmed),
+        "relationship_local",
+      );
       setMessages((prev) => [
         ...(fresh ? [] : prev),
         userMessage,
@@ -14946,6 +15040,10 @@ export default function CompanionPageClient() {
       ]);
       recordPrimaryTurnResponse(reply);
       markAssistantReplied(chatTurnState);
+      annotateTurnDecision({
+        finalResponseOwner: "relationship_local",
+        actionExecuted: "relationship_chat_local",
+      });
       logConversationPipelineDiagnostic({
         turn: chatTurnRef.current,
         userText: trimmed,
@@ -15001,7 +15099,10 @@ export default function CompanionPageClient() {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
       if (fresh) clearConversation();
-      const reply = vagueHelpLocalReply();
+      const reply = finalizeMemberFacingAssistantText(
+        vagueHelpLocalReply(),
+        "companion_chat",
+      );
       setMessages((prev) => [
         ...(fresh ? [] : prev),
         userMessage,
@@ -15009,6 +15110,10 @@ export default function CompanionPageClient() {
       ]);
       recordPrimaryTurnResponse(reply);
       markAssistantReplied(chatTurnState);
+      annotateTurnDecision({
+        finalResponseOwner: "companion_chat",
+        actionExecuted: "vague_help_local",
+      });
       logConversationPipelineDiagnostic({
         turn: chatTurnRef.current,
         userText: trimmed,
@@ -15252,11 +15357,13 @@ export default function CompanionPageClient() {
       isCreateWorkflowContinuation(trimmed);
     const universalCreationContinuation =
       Boolean(universalSessionActive) &&
-      (isUniversalCreationMessage(lastAssistantForCreateFastPath) ||
+      (isCreateFlowAssistantContext(lastAssistantForCreateFastPath) ||
+        isUniversalCreationMessage(lastAssistantForCreateFastPath) ||
         isGuidedCreationAssistantContext(lastAssistantForCreateFastPath) ||
         createWorkflowContinuation ||
         conversationPriority?.winner === "continue_creation" ||
         Boolean(universalSessionActive?.approvedDraft) ||
+        universalSessionActive?.phase === "discovery" ||
         universalSessionActive?.phase === "awaiting_action" ||
         universalSessionActive?.phase === "review" ||
         universalSessionActive?.phase === "revision" ||
@@ -15761,6 +15868,60 @@ export default function CompanionPageClient() {
       awaitingUserConfirmationRef.current?.active
     ) {
       const userMessage: Message = { role: "user", content: trimmed };
+      const declinedPrompt =
+        awaitingUserConfirmationRef.current?.assistantPrompt ?? "";
+      clearFrictionlessPending();
+      clearVisualThinkingMenuPending();
+      clearPendingAcceptanceAuthority();
+      clearCollectionPendingOffer();
+      setToolSuggestion(null);
+      setWorkspaceOffer(null);
+      setAwaitingUserConfirmation(null);
+      setInput("");
+      voiceUsedRef.current = false;
+
+      // Declined optional destination — resume active create instead of orphaning the task.
+      const createSessionAfterDecline = loadUniversalCreationSession();
+      const recoveryAfterDecline = classifyTurnRecovery(trimmed);
+      if (
+        shouldResumeAfterDetourDecline({
+          recoveryType: recoveryAfterDecline,
+          activeCreateSession: Boolean(createSessionAfterDecline),
+          createOwnsTurn:
+            turnAuthority.owner === "create_execution" ||
+            turnAuthority.allowCreatePresentation,
+        })
+      ) {
+        const resumeSource =
+          createSessionAfterDecline?.originalUserText?.trim() || "continue";
+        const resumeTurn = resolveUniversalCreationTurn(
+          resumeSource,
+          chatTurnRef.current,
+          declinedPrompt,
+        );
+        if (resumeTurn) {
+          const resumeReply = formatUniversalCreationTurnReply(resumeTurn);
+          setMessages((prev) => [
+            ...prev,
+            userMessage,
+            { role: "assistant", content: resumeReply },
+          ]);
+          recordPrimaryTurnResponse(resumeReply);
+          annotateTurnDecision({
+            finalResponseOwner: "create_execution",
+            actionExecuted: "resume_after_detour_decline",
+          });
+          trackShariAnswerFirstEvent("turn_authority", {
+            owner: "create_execution",
+            responseMode: "repair",
+            reasons: "resume_after_confirmation_decline",
+          });
+          finishEarlyChatTurn();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
+      }
+
       setMessages((prev) => [
         ...prev,
         userMessage,
@@ -15769,14 +15930,6 @@ export default function CompanionPageClient() {
           content: "No problem — we can stay right here. What would help most?",
         },
       ]);
-      setInput("");
-      voiceUsedRef.current = false;
-      clearFrictionlessPending();
-      clearVisualThinkingMenuPending();
-      clearPendingAcceptanceAuthority();
-      setToolSuggestion(null);
-      setWorkspaceOffer(null);
-      setAwaitingUserConfirmation(null);
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
@@ -16324,9 +16477,17 @@ export default function CompanionPageClient() {
       return;
     }
 
-    const confidenceRecovery = runConfidenceRecovery(trimmed);
+    // Emotional destinations are advisory-only — never replace create execution.
+    const confidenceRecovery = turnAuthority.allowEmotionalDestinationOffer
+      ? runConfidenceRecovery(trimmed)
+      : null;
     if (confidenceRecovery) {
-      const recoveryMessage = confidenceRecovery.message;
+      // Advisory may offer — Companion turn owner remains authoritative speaker.
+      const recoveryMessage = finalizeMemberFacingAssistantText(
+        confidenceRecovery.message,
+        turnAuthority.owner,
+        { advisoryContributions: ["confidence_recovery"] },
+      );
       const openTarget =
         confidenceRecovery.openPlaceId === "portfolio"
           ? "growth-portfolio"
@@ -16335,6 +16496,10 @@ export default function CompanionPageClient() {
             : confidenceRecovery.openPlaceId === "my-journey"
               ? "my-journey"
               : "evidence-bank";
+      trackShariAnswerFirstEvent("capability_offered", {
+        owner: turnAuthority.owner,
+        advisory: "confidence_recovery",
+      });
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: recoveryMessage },
@@ -16361,17 +16526,27 @@ export default function CompanionPageClient() {
           },
         }),
       );
+      annotateTurnDecision({
+        finalResponseOwner: turnAuthority.owner,
+        advisoryContributions: ["confidence_recovery"],
+        actionExecuted: "emotional_destination_offer",
+      });
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
     }
 
     if (
-      detectsSoftDiscouragement(trimmed) ||
-      detectsEncouragementNeed(trimmed)
+      turnAuthority.allowEmotionalDestinationOffer &&
+      (detectsSoftDiscouragement(trimmed) ||
+        detectsEncouragementNeed(trimmed))
     ) {
       /** Permission first — never auto-open Evidence Vault for encouragement/doubt. */
-      const encouragementLine = EVIDENCE_VAULT_ENCOURAGEMENT_LINE;
+      const encouragementLine = finalizeMemberFacingAssistantText(
+        EVIDENCE_VAULT_ENCOURAGEMENT_LINE,
+        turnAuthority.owner,
+        { advisoryContributions: ["encouragement_vault"] },
+      );
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: encouragementLine },
@@ -16391,6 +16566,11 @@ export default function CompanionPageClient() {
           },
         }),
       );
+      annotateTurnDecision({
+        finalResponseOwner: turnAuthority.owner,
+        advisoryContributions: ["encouragement_vault"],
+        actionExecuted: "emotional_destination_offer",
+      });
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
@@ -16458,6 +16638,52 @@ export default function CompanionPageClient() {
         } else if (collectionReply.kind !== "menu") {
           clearCollectionPendingOffer();
         }
+
+        // Declined optional destination → resume active create task (never orphan).
+        const recoveryType = classifyTurnRecovery(trimmed);
+        const createSessionForResume = loadUniversalCreationSession();
+        if (
+          collectionReply.kind === "decline" &&
+          shouldResumeAfterDetourDecline({
+            recoveryType,
+            activeCreateSession: Boolean(createSessionForResume),
+            createOwnsTurn:
+              turnAuthority.owner === "create_execution" ||
+              turnAuthority.allowCreatePresentation,
+          })
+        ) {
+          const resumeSource =
+            createSessionForResume?.originalUserText?.trim() ||
+            collectionPendingNow.sourceUserText?.trim() ||
+            "continue";
+          const resumeTurn = resolveUniversalCreationTurn(
+            resumeSource,
+            chatTurnRef.current,
+            collectionPendingNow.offerLine,
+          );
+          if (resumeTurn) {
+            const resumeReply = formatUniversalCreationTurnReply(resumeTurn);
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: resumeReply },
+            ]);
+            recordPrimaryTurnResponse(resumeReply);
+            annotateTurnDecision({
+              finalResponseOwner: "create_execution",
+              actionExecuted: "resume_after_detour_decline",
+            });
+            trackShariAnswerFirstEvent("turn_authority", {
+              owner: "create_execution",
+              responseMode: "repair",
+              reasons: "resume_after_detour_decline",
+            });
+            setAwaitingUserConfirmation(null);
+            finishEarlyChatTurn();
+            finishLatencyTurn({ localReply: true });
+            return;
+          }
+        }
+
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: collectionReply.ack },
@@ -17687,10 +17913,17 @@ export default function CompanionPageClient() {
 
     latencyProfiler.mark("frictionlessAction");
 
+    // Active Create / explicit write owns the turn — never steal for Evidence Vault.
+    const createSessionBlocksCollection =
+      Boolean(loadUniversalCreationSession()) ||
+      turnAuthority.owner === "create_execution" ||
+      !turnAuthority.allowEmotionalDestinationOffer;
+
     if (
       !distressed &&
       !estateRoutingActive &&
       !workspacePanel &&
+      !createSessionBlocksCollection &&
       !isCollectionOfferCooldownActive(chatTurnRef.current) &&
       !primaryTurnDecision.blockCollectionOffer
     ) {
@@ -17823,12 +18056,35 @@ export default function CompanionPageClient() {
     const frictionlessBlockedByTaskLock =
       taskLockBlocksEstateRouting &&
       frictionlessOffersEstateRoom(frictionlessAction.localReply);
+    // Create ownership must present Create — never blanket-suppress frictionless UC.
+    const frictionlessIsCreatePresentation =
+      frictionlessAction.category === "universal_creation" &&
+      turnAuthority.allowCreatePresentation;
+    const frictionlessBlockedByTurnAuthority =
+      !frictionlessIsCreatePresentation &&
+      !turnAuthority.allowOverwhelmFrictionless &&
+      (turnAuthority.owner === "create_execution" ||
+        Boolean(loadUniversalCreationSession()));
 
     if (
       !frictionlessBlockedByTaskLock &&
+      !frictionlessBlockedByTurnAuthority &&
       presentFrictionlessLocalReply(frictionlessAction, finishLatencyTurn)
     ) {
+      if (frictionlessIsCreatePresentation) {
+        annotateTurnDecision({
+          finalResponseOwner: "create_execution",
+          actionExecuted: "universal_creation_present",
+        });
+      }
       return;
+    }
+    if (frictionlessBlockedByTurnAuthority && frictionlessAction.localReply) {
+      trackShariAnswerFirstEvent("competing_owner_suppressed", {
+        owner: frictionlessAction.category ?? "frictionless",
+        turnOwner: turnAuthority.owner,
+        responseMode: turnAuthority.responseMode,
+      });
     }
 
     if (
@@ -19840,15 +20096,19 @@ export default function CompanionPageClient() {
           if (activeChatTurnLifecycleRef.current) {
             markAssistantReplied(activeChatTurnLifecycleRef.current);
           }
+          const certifiedAdapted = finalizeMemberFacingAssistantText(
+            adapted,
+            "continuity_adapt",
+          );
           setMessages((prev) => [
             ...prev,
-            { role: "assistant", content: adapted },
+            { role: "assistant", content: certifiedAdapted },
           ]);
-          recordPrimaryTurnResponse(adapted);
+          recordPrimaryTurnResponse(certifiedAdapted);
           storeShariConversationThread(
             buildShariConversationThread({
               decision: shariAnswerFirstDecision,
-              answer: adapted,
+              answer: certifiedAdapted,
               conversationId:
                 activeConversationIdForThread ||
                 activeConversationIdRef.current ||
@@ -19857,6 +20117,10 @@ export default function CompanionPageClient() {
               memberNote: trimmed,
             }),
           );
+          annotateTurnDecision({
+            finalResponseOwner: "continuity_adapt",
+            actionExecuted: "continuity_adapt",
+          });
           finishEarlyChatTurn();
           finishLatencyTurn({ localReply: true });
           return;
@@ -21256,11 +21520,19 @@ export default function CompanionPageClient() {
               prev,
             );
             if (!failSafeReply) return prev;
+            const certifiedFailSafe = finalizeMemberFacingAssistantText(
+              failSafeReply,
+              "local_howto_failsafe",
+            );
+            annotateTurnDecision({
+              finalResponseOwner: "local_howto_failsafe",
+              actionExecuted: "fail_safe_reply",
+            });
             return [
               ...prev,
               {
                 role: "assistant" as const,
-                content: failSafeReply,
+                content: certifiedFailSafe,
               },
             ];
           });
@@ -24033,9 +24305,19 @@ export default function CompanionPageClient() {
   // Keep panel state aligned with canonical prefs when destination changes.
   useEffect(() => {
     if (justBeHereSession) return;
+    // Welcome Home is conversation-first — arrive ready to talk (no Companion: On click).
+    if (
+      welcomeHomePrimary &&
+      conversationDestinationId === "welcome-home" &&
+      !isCompanionVisible("welcome-home")
+    ) {
+      setDestinationCompanionVisibility("welcome-home", "on");
+      setEstateRoomChatVisible(true);
+      return;
+    }
     const visible = isCompanionVisible(conversationDestinationId);
     setEstateRoomChatVisible(visible);
-  }, [conversationDestinationId, justBeHereSession]);
+  }, [conversationDestinationId, justBeHereSession, welcomeHomePrimary]);
 
   const companionVisibilityValue = useMemo(
     () => ({

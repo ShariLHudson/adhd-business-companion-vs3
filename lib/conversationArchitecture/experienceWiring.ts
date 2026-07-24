@@ -34,16 +34,18 @@ export const EXPERIENCE_WIRING: readonly ExperienceWiringRecord[] = [
   {
     experienceId: "general-chat",
     label: "Shari global",
-    status: "bypass",
-    entryModule: "app/api/companion-chat",
-    notes: "LLM companion-chat path — not CIE",
+    status: "wired_cie_hcv",
+    entryModule: "lib/certifiedConversation/certifyCompanionDelivery.ts",
+    notes:
+      "Companion-owned drafts → certifyCompanionDelivery (TCAI+CQRI+CIE+HCV); Create/nav owners unchanged",
   },
   {
     experienceId: "chamber",
     label: "Chamber of Momentum",
-    status: "bypass",
-    entryModule: "lib/chamber",
-    notes: "Persona prompts — not CIE",
+    status: "wired_cie_hcv",
+    entryModule: "lib/certifiedConversation/certifyConversationDelivery.ts",
+    notes:
+      "Advisory Certified Conversation Pipeline after specialist draft; preserves chamberConversationLock + member prompts",
   },
   {
     experienceId: "board",

@@ -13,7 +13,9 @@ export type ConversationBehaviorMode =
   /** Chamber / expert members — answer first, optional one useful follow-up. */
   | "advisory"
   /** Create — blueprint / document facilitation. */
-  | "facilitative";
+  | "facilitative"
+  /** Companion / global Shari — assist first; preserve owner substance. */
+  | "companion";
 
 export type CertifiedConversationMessage = {
   role: "user" | "assistant";

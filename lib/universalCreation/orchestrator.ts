@@ -1,5 +1,10 @@
 /**
  * Universal Creation orchestrator — Discover → Prepare → Create → …
+ *
+ * @deprecated As Create open API — P0-03 ownership: use
+ * `lib/universalCreationEntrypoint` (`resolveUniversalCreationEntrypoint`).
+ * This module remains a **legacy chat-document adapter** only.
+ * @see lib/createEstate/createOwnershipContract.ts
  */
 
 import { isRegistryArtifactExecution } from "@/lib/artifactRegistry";
@@ -60,6 +65,21 @@ import {
   isConversationSessionSpineEnabled,
   syncUniversalCreationToSession,
 } from "@/lib/conversationSession";
+import {
+  isCreateFlowAssistantContext,
+  isUniversalCreationMessage,
+} from "./createFlowContext";
+import {
+  applyEmailDiscoveryDefaults,
+  harvestDiscoveryFromConversation,
+} from "./discoveryContextHarvest";
+import { composeDocumentDraft } from "./draftComposer";
+import { evaluateCreationCriticalGap } from "@/lib/shariAnswerFirst/creationCriticalGap";
+import {
+  classifyTurnRecovery,
+  shouldRepairOrResumeTask,
+} from "@/lib/shariAnswerFirst/turnRecovery";
+import { isExplicitCreationCommand } from "@/lib/shariAnswerFirst/questionVersusAction";
 
 const STORAGE_KEY = "universal-creation-session-v1";
 
@@ -71,8 +91,7 @@ const EXPLICIT_ROOM_NAV_RE =
 const UNCERTAINTY_RE =
   /\b(?:i don'?t know|not sure|no idea|you decide|whatever works|haven'?t figured|unsure)\b/i;
 
-const CREATION_MARKER_RE =
-  /let me understand what you'?re trying|what would success look like|who is this for|main reason you'?re creating|who is the workshop for|transformation do you want|how long will the workshop|a couple of quick questions first|one question at a time|(?:map|bottom of) (?:a |this )?funnel|offer sits at the bottom/i;
+export { isUniversalCreationMessage, isCreateFlowAssistantContext };
 
 export function detectUniversalDocumentType(
   userText: string,
@@ -126,30 +145,38 @@ export function shouldEnterUniversalCreation(userText: string): boolean {
   return !isUniversalDiscoveryComplete(session.confidence);
 }
 
-export function isUniversalCreationMessage(text: string): boolean {
-  return CREATION_MARKER_RE.test(text);
-}
-
 export function saveUniversalCreationSession(
   session: UniversalCreationSession | null,
 ): void {
   memoryUniversalCreationSession = session;
-  if (typeof window === "undefined") return;
-  if (!session) {
-    localStorage.removeItem(STORAGE_KEY);
-    return;
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
-  if (isConversationSessionSpineEnabled()) {
-    syncUniversalCreationToSession(session);
+  const storage =
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage
+      : null;
+  if (!storage) return;
+  try {
+    if (!session) {
+      storage.removeItem(STORAGE_KEY);
+      return;
+    }
+    storage.setItem(STORAGE_KEY, JSON.stringify(session));
+    if (isConversationSessionSpineEnabled()) {
+      syncUniversalCreationToSession(session);
+    }
+  } catch {
+    // Memory session still holds — storage may be unavailable in tests/SSR.
   }
 }
 
 export function loadUniversalCreationSession(): UniversalCreationSession | null {
   if (memoryUniversalCreationSession) return memoryUniversalCreationSession;
-  if (typeof window === "undefined") return null;
+  const storage =
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage
+      : null;
+  if (!storage) return null;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = storage.getItem(STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as UniversalCreationSession;
   } catch {
@@ -188,18 +215,82 @@ function extractPrefilledAnswers(
   return answers;
 }
 
-function buildInitialSession(
-  userText: string,
+/**
+ * Enough critical facts (who + why/purpose) to write a useful first draft
+ * without more interviewing — emails, SOPs, posts, proposals, plans, etc.
+ */
+export function hasExecutableDraftContext(
+  session: UniversalCreationSession,
+): boolean {
+  return evaluateCreationCriticalGap(session).canDraft;
+}
+
+function mergeHarvestedAnswers(
   documentType: UniversalDocumentType,
-  turn: number,
+  userText: string,
+  priorAnswers: Record<string, string>,
+  contextTexts: readonly string[] = [],
+): Record<string, string> {
+  const harvested = harvestDiscoveryFromConversation(documentType, [
+    ...contextTexts,
+    userText,
+  ]);
+  let answers = { ...priorAnswers, ...harvested };
+  if (documentType === "email") {
+    answers = applyEmailDiscoveryDefaults(answers, userText, contextTexts);
+  }
+  return answers;
+}
+
+function recomputeSessionFromAnswers(
+  session: UniversalCreationSession,
+  answers: Record<string, string>,
 ): UniversalCreationSession {
-  const plugin = pluginById(documentType)!;
-  const memoryPrefill = prefillDiscoveryFromAdaptiveMemory("create_sop");
-  const extracted = extractPrefilledAnswers(userText, plugin);
-  const answers = { ...memoryPrefill, ...extracted };
-  const flags = initialFlags(userText, plugin);
+  const plugin = pluginById(session.documentType)!;
+  const flags = {
+    what: false,
+    why: false,
+    who: false,
+    success: false,
+  };
   for (const q of plugin.discoveryQuestions) {
     if (answers[q.id]) flags[q.slot] = true;
+  }
+  // Executable who+why: treat optional success as satisfied so we can draft.
+  if (
+    flags.who &&
+    flags.why &&
+    (flags.what ||
+      answers["email-ask"] ||
+      answers["email-purpose"] ||
+      session.documentType !== "email")
+  ) {
+    flags.what = true;
+    flags.why = true;
+    flags.who = true;
+    flags.success = true;
+    if (session.documentType === "email") {
+      if (!answers["email-ask"] && answers["email-purpose"]) {
+        answers = { ...answers, "email-ask": answers["email-purpose"] };
+      }
+      if (!answers["email-purpose"] && answers["email-ask"]) {
+        answers = { ...answers, "email-purpose": answers["email-ask"] };
+      }
+      if (!answers["email-context"]) {
+        answers = {
+          ...answers,
+          "email-context":
+            "They know I've been handling questions as they come.",
+        };
+      }
+      if (!answers["email-success"]) {
+        answers = {
+          ...answers,
+          "email-success":
+            "They give me until tomorrow and wait for my reply.",
+        };
+      }
+    }
   }
   let questionIndex = 0;
   while (
@@ -209,16 +300,81 @@ function buildInitialSession(
     questionIndex += 1;
   }
   return {
-    documentType,
-    phase: "discovery",
-    confidence: computeUniversalDiscoveryConfidence(flags),
+    ...session,
     answers,
     questionIndex,
+    confidence: computeUniversalDiscoveryConfidence(flags),
+  };
+}
+
+function draftArtifactTurn(
+  session: UniversalCreationSession,
+): UniversalCreationTurnResult {
+  const filled = recomputeSessionFromAnswers(
+    session,
+    mergeHarvestedAnswers(
+      session.documentType,
+      session.originalUserText,
+      session.answers,
+    ),
+  );
+  const draftBody = composeDocumentDraft(filled);
+  const plugin = pluginById(filled.documentType);
+  const label = plugin?.label?.toLowerCase() ?? "draft";
+  const readySession: UniversalCreationSession = {
+    ...filled,
+    phase: "awaiting_action",
+    preparationReady: true,
+    approvedDraft: true,
+    draftContent: draftBody,
+    confidence: computeUniversalDiscoveryConfidence({
+      what: true,
+      why: true,
+      who: true,
+      success: true,
+    }),
+  };
+  const opener =
+    filled.documentType === "email"
+      ? "Absolutely. Here's a simple email you can send — edit anything that doesn't sound like you."
+      : `Here's a solid first ${label} from what you've shared — edit anything that doesn't sound like you.`;
+  return {
+    kind: "draft",
+    message: opener,
+    draftBody,
+    session: readySession,
+  };
+}
+
+function buildInitialSession(
+  userText: string,
+  documentType: UniversalDocumentType,
+  turn: number,
+): UniversalCreationSession {
+  const plugin = pluginById(documentType)!;
+  const memoryPrefill = prefillDiscoveryFromAdaptiveMemory("create_sop");
+  const extracted = extractPrefilledAnswers(userText, plugin);
+  const harvested = mergeHarvestedAnswers(documentType, userText, {
+    ...memoryPrefill,
+    ...extracted,
+  });
+  const base: UniversalCreationSession = {
+    documentType,
+    phase: "discovery",
+    confidence: computeUniversalDiscoveryConfidence({
+      what: true,
+      why: false,
+      who: false,
+      success: false,
+    }),
+    answers: harvested,
+    questionIndex: 0,
     originalUserText: userText,
     startedAtTurn: turn,
     preparationReady: false,
     pendingEnhancements: [],
   };
+  return recomputeSessionFromAnswers(base, harvested);
 }
 
 function nextQuestion(session: UniversalCreationSession) {
@@ -318,8 +474,29 @@ export function startUniversalCreationTurn(
   if (!docType) return null;
 
   const session = buildInitialSession(userText, docType, turn);
+  if (hasExecutableDraftContext(session)) {
+    return draftArtifactTurn(session);
+  }
   if (isUniversalDiscoveryComplete(session.confidence)) {
     return finalizeDiscovery(session);
+  }
+
+  // One blocking question only — skip non-critical slots when a draft is possible after one answer.
+  const gap = evaluateCreationCriticalGap(session);
+  if (gap.blockingQuestion) {
+    const plugin = pluginById(docType)!;
+    const idx = plugin.discoveryQuestions.findIndex(
+      (q) => q.id === gap.blockingQuestionId,
+    );
+    return {
+      kind: "question",
+      intro: plugin.intro,
+      question: gap.blockingQuestion,
+      session: {
+        ...session,
+        questionIndex: idx >= 0 ? idx : session.questionIndex,
+      },
+    };
   }
 
   const next = nextQuestion(session);
@@ -374,34 +551,112 @@ export function advanceUniversalCreation(
     };
   }
 
-  const next = nextQuestion(session);
+  // Merge reply into harvest before asking the next slot — retain recipient/purpose.
+  const harvested = recomputeSessionFromAnswers(
+    session,
+    mergeHarvestedAnswers(
+      session.documentType,
+      userReply,
+      session.answers,
+      [session.originalUserText, ...Object.values(session.answers)],
+    ),
+  );
+  if (hasExecutableDraftContext(harvested)) {
+    return draftArtifactTurn(harvested);
+  }
+
+  const gap = evaluateCreationCriticalGap(harvested);
+  if (gap.blockingQuestion && gap.blockingQuestionId) {
+    // Apply reply to the blocking slot when it matches; else store on current gap.
+    const updated = applyAnswer(
+      harvested,
+      gap.blockingQuestionId,
+      userReply,
+    );
+    const afterHarvest = recomputeSessionFromAnswers(
+      updated,
+      mergeHarvestedAnswers(
+        updated.documentType,
+        userReply,
+        updated.answers,
+        [updated.originalUserText],
+      ),
+    );
+    if (hasExecutableDraftContext(afterHarvest)) {
+      return draftArtifactTurn(afterHarvest);
+    }
+    const nextGap = evaluateCreationCriticalGap(afterHarvest);
+    if (nextGap.canDraft) return draftArtifactTurn(afterHarvest);
+    if (nextGap.blockingQuestion) {
+      const idx = pluginById(afterHarvest.documentType)!.discoveryQuestions.findIndex(
+        (q) => q.id === nextGap.blockingQuestionId,
+      );
+      return {
+        kind: "question",
+        question: nextGap.blockingQuestion,
+        session: {
+          ...afterHarvest,
+          questionIndex: idx >= 0 ? idx : afterHarvest.questionIndex,
+        },
+      };
+    }
+  }
+
+  const next = nextQuestion(harvested);
   if (!next) {
-    if (!isUniversalDiscoveryComplete(session.confidence)) {
-      session = {
-        ...session,
+    if (!isUniversalDiscoveryComplete(harvested.confidence)) {
+      return finalizeDiscovery({
+        ...harvested,
         confidence: computeUniversalDiscoveryConfidence({
           what: true,
           why: true,
           who: true,
           success: true,
         }),
-      };
+      });
     }
-    return finalizeDiscovery(session);
+    return finalizeDiscovery(harvested);
   }
 
-  const updated = applyAnswer(session, next.question.id, userReply);
-  if (isUniversalDiscoveryComplete(updated.confidence)) {
-    return finalizeDiscovery(updated);
+  const updated = applyAnswer(harvested, next.question.id, userReply);
+  const afterHarvest = recomputeSessionFromAnswers(
+    updated,
+    mergeHarvestedAnswers(
+      updated.documentType,
+      userReply,
+      updated.answers,
+      [updated.originalUserText],
+    ),
+  );
+  if (hasExecutableDraftContext(afterHarvest)) {
+    return draftArtifactTurn(afterHarvest);
+  }
+  if (isUniversalDiscoveryComplete(afterHarvest.confidence)) {
+    return finalizeDiscovery(afterHarvest);
   }
 
-  const following = nextQuestion(updated);
-  if (!following) return finalizeDiscovery(updated);
+  const followingGap = evaluateCreationCriticalGap(afterHarvest);
+  if (followingGap.blockingQuestion) {
+    const idx = pluginById(afterHarvest.documentType)!.discoveryQuestions.findIndex(
+      (q) => q.id === followingGap.blockingQuestionId,
+    );
+    return {
+      kind: "question",
+      question: followingGap.blockingQuestion,
+      session: {
+        ...afterHarvest,
+        questionIndex: idx >= 0 ? idx : afterHarvest.questionIndex,
+      },
+    };
+  }
+
+  const following = nextQuestion(afterHarvest);
+  if (!following) return finalizeDiscovery(afterHarvest);
 
   return {
     kind: "question",
     question: following.question.prompt,
-    session: { ...updated, questionIndex: following.index },
+    session: { ...afterHarvest, questionIndex: following.index },
   };
 }
 
@@ -461,6 +716,20 @@ export function resolveUniversalCreationTurn(
   if (!t) return null;
 
   const storedSession = loadUniversalCreationSession();
+  const requestedType = detectUniversalDocumentType(t);
+  const recoveryType = classifyTurnRecovery(t);
+
+  // Artifact-type correction: switch the create session without discovery restart loops.
+  if (
+    storedSession &&
+    requestedType &&
+    requestedType !== storedSession.documentType &&
+    (isExplicitCreationCommand(t) || isSimpleCreateRequest(t)) &&
+    shouldRepairOrResumeTask(recoveryType)
+  ) {
+    clearUniversalCreationSession();
+    return startUniversalCreationTurn(t, currentTurn);
+  }
 
   // Active post-discovery / approved artifact — never restart intake on "write".
   if (
@@ -508,9 +777,28 @@ export function resolveUniversalCreationTurn(
     }
   }
 
+  // Active discovery — always continue the same session (never restart on re-assert).
+  if (
+    storedSession &&
+    storedSession.phase === "discovery" &&
+    !EXPLICIT_EMAIL_START_OVER_RE.test(t)
+  ) {
+    const createContext =
+      !lastAssistantText?.trim() ||
+      isCreateFlowAssistantContext(lastAssistantText) ||
+      isUniversalCreationMessage(lastAssistantText) ||
+      isGuidedCreationAssistantContext(lastAssistantText) ||
+      isSimpleCreateRequest(t) ||
+      detectUniversalDocumentType(t) === storedSession.documentType;
+    if (createContext) {
+      return advanceUniversalCreation(storedSession, t);
+    }
+  }
+
   if (storedSession && isBareGenericAcceptance(t) && lastAssistantText?.trim()) {
     const recentTopic = inferMeaningTopicFromAssistant(lastAssistantText);
     if (
+      isCreateFlowAssistantContext(lastAssistantText) ||
       isUniversalCreationMessage(lastAssistantText) ||
       isGuidedCreationAssistantContext(lastAssistantText) ||
       assistantOfferedConsent(lastAssistantText) ||
@@ -530,7 +818,8 @@ export function resolveUniversalCreationTurn(
 
   if (
     lastAssistantText &&
-    (isUniversalCreationMessage(lastAssistantText) ||
+    (isCreateFlowAssistantContext(lastAssistantText) ||
+      isUniversalCreationMessage(lastAssistantText) ||
       isGuidedCreationAssistantContext(lastAssistantText))
   ) {
     if (storedSession) {
@@ -563,6 +852,17 @@ export function resolveUniversalCreationTurn(
       lastAssistantText,
     );
     if (guided) return guided;
+  }
+
+  // Live discovery session + create re-assert → continue, never restart intake.
+  if (
+    storedSession &&
+    storedSession.phase === "discovery" &&
+    !EXPLICIT_EMAIL_START_OVER_RE.test(t) &&
+    (isSimpleCreateRequest(t) ||
+      detectUniversalDocumentType(t) === storedSession.documentType)
+  ) {
+    return advanceUniversalCreation(storedSession, t);
   }
 
   if (isSimpleCreateRequest(t)) {

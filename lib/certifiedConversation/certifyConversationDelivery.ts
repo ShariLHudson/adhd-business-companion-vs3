@@ -132,7 +132,9 @@ export function certifyConversationDelivery(
       input.repairActive || input.wasClarification ? "clarification" : "other",
     aiTone: prefsTone,
     recentAssistantTexts,
-    preferBrevity: input.behaviorMode !== "advisory",
+    // Companion + advisory keep substance; reflective prefers shorter shells.
+    preferBrevity:
+      input.behaviorMode !== "advisory" && input.behaviorMode !== "companion",
   });
 
   const grounded = applyGroundedAcknowledgement({
@@ -228,6 +230,27 @@ export function certifyConversationDelivery(
     } else {
       text = advisoryQuestionSanitize(text);
     }
+  } else if (input.behaviorMode === "companion") {
+    // Preserve Companion / answer-first substance when CIE/HCV over-rewrite.
+    const draftOk =
+      workingDraft.trim().length > 0 && !containsPermanentBanPhrase(workingDraft);
+    if (
+      isReflectiveConversationShell(text) ||
+      containsPermanentBanPhrase(text) ||
+      (usedFallback && draftOk)
+    ) {
+      if (draftOk) {
+        text = limitToOneQuestion(
+          scrubCertifiedAiLanguage(workingDraft, { stripAdviceMarkers: false }),
+        );
+        regenerated = true;
+        usedFallback = false;
+      } else {
+        text = limitToOneQuestion(cqri.approvedText || input.draftText);
+      }
+    } else {
+      text = limitToOneQuestion(text);
+    }
   } else {
     const qCheck = validateTalkItOutQuestion({
       responseText: text,
@@ -246,20 +269,27 @@ export function certifyConversationDelivery(
   });
 
   if (containsPermanentBanPhrase(text) || !text.trim()) {
-    text =
-      input.behaviorMode === "advisory"
-        ? originalAdvisory
-          ? preserveAdvisoryDraft(input.draftText)
-          : buildAdvisorySafeFallback({
-              userText: input.userText,
-              topicAnchor: primaryTopic,
-              specialistLabel: input.specialistLabel,
-            })
-        : limitToOneQuestion(cqri.approvedText || input.draftText);
-    usedFallback = !originalAdvisory;
+    if (input.behaviorMode === "advisory") {
+      text = originalAdvisory
+        ? preserveAdvisoryDraft(input.draftText)
+        : buildAdvisorySafeFallback({
+            userText: input.userText,
+            topicAnchor: primaryTopic,
+            specialistLabel: input.specialistLabel,
+          });
+      usedFallback = !originalAdvisory;
+    } else if (input.behaviorMode === "companion") {
+      text = limitToOneQuestion(
+        workingDraft.trim() || cqri.approvedText || input.draftText,
+      );
+      usedFallback = !workingDraft.trim();
+    } else {
+      text = limitToOneQuestion(cqri.approvedText || input.draftText);
+      usedFallback = !originalAdvisory;
+    }
   }
 
-  if (input.behaviorMode === "advisory") {
+  if (input.behaviorMode === "advisory" || input.behaviorMode === "companion") {
     text = limitToOneQuestion(text);
   }
 

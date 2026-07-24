@@ -44,13 +44,19 @@ describe("210 — Conversation Architecture Manifest", () => {
     }
   });
 
-  it("Talk It Out is fully wired; bypass list is explicit", () => {
+  it("Talk It Out, Chamber, and Companion are CIE/HCV wired; remaining bypasses are explicit", () => {
     const tio = EXPERIENCE_WIRING.find((e) => e.experienceId === "talk-it-out");
+    const chamber = EXPERIENCE_WIRING.find((e) => e.experienceId === "chamber");
+    const shari = EXPERIENCE_WIRING.find((e) => e.experienceId === "general-chat");
     expect(tio?.status).toBe("wired_cie_hcv");
+    expect(chamber?.status).toBe("wired_cie_hcv");
+    expect(shari?.status).toBe("wired_cie_hcv");
     const bypasses = EXPERIENCE_WIRING.filter((e) => e.status === "bypass");
     expect(bypasses.map((b) => b.experienceId)).toEqual(
-      expect.arrayContaining(["general-chat", "chamber", "board"]),
+      expect.arrayContaining(["board", "projects"]),
     );
+    expect(bypasses.map((b) => b.experienceId)).not.toContain("chamber");
+    expect(bypasses.map((b) => b.experienceId)).not.toContain("general-chat");
   });
 });
 

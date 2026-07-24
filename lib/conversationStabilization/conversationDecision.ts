@@ -66,6 +66,8 @@ export type ConversationDecision = {
   arbitration: ArbitrationResult;
   primaryTurnType?: string | null;
   finalResponseOwner?: string | null;
+  /** Advisory contributors for this turn — never the final speaker. */
+  advisoryContributions?: string[] | null;
   confidence: number;
   reason: string;
 };

@@ -27,16 +27,28 @@ function harvestEmailDiscovery(
 ): Record<string, string> {
   const answers: Record<string, string> = {};
 
-  if (/\b(?:to (?:a |my )?(?:difficult )?client|client email|email to (?:a )?client)\b/i.test(combined)) {
+  if (
+    /\b(?:to (?:a |my )?(?:difficult )?client|client email|email to (?:a )?client)\b/i.test(
+      combined,
+    )
+  ) {
     answers["email-recipient"] = "A client";
+  } else if (/\b(?:my |the )?team\b/i.test(combined)) {
+    answers["email-recipient"] = "the team";
+  } else if (/\b(?:my |the )?(?:staff|group|crew)\b/i.test(combined)) {
+    answers["email-recipient"] = "the group";
   }
 
   if (/\b(?:rough|strained|tense|difficult relationship|bad place|rocky)\b/i.test(combined)) {
     answers["email-relationship"] = "Rough at the moment";
+  } else if (/\b(?:my |the )?team\b/i.test(combined)) {
+    answers["email-relationship"] = "Working together as a team";
   }
 
   const purposeLine = texts.find((t) =>
-    /\b(?:follow through|agreed|no longer|keep (?:her|him|them) as|can no longer)\b/i.test(t),
+    /\b(?:follow through|agreed|no longer|keep (?:her|him|them) as|can no longer|overwhelmed|until tomorrow|give me until|need (?:them|you) to|answer (?:their|your) questions)\b/i.test(
+      t,
+    ),
   );
   if (purposeLine) {
     answers["email-purpose"] = purposeLine.trim();
@@ -46,6 +58,17 @@ function harvestEmailDiscovery(
   ) {
     const synthesized =
       "She needs to follow through on agreed items, or you can no longer keep her as a client.";
+    answers["email-purpose"] = synthesized;
+    answers["email-ask"] = synthesized;
+  } else if (
+    /\boverwhelm(?:ed)?\b/i.test(combined) &&
+    /\b(?:email|tell (?:my |the )?team|write)\b/i.test(combined)
+  ) {
+    const synthesized = /\b(?:until tomorrow|give (?:me|us) until|answer (?:their|your|the) questions)\b/i.test(
+      combined,
+    )
+      ? "I'm overwhelmed right now and need until tomorrow to answer questions thoughtfully."
+      : "I'm overwhelmed and need a little time before I can respond thoughtfully.";
     answers["email-purpose"] = synthesized;
     answers["email-ask"] = synthesized;
   }
@@ -71,18 +94,21 @@ export function applyEmailDiscoveryDefaults(
   const next = { ...answers };
 
   if (!next["email-recipient"]) {
-    if (/\bclient\b/i.test(combined)) next["email-recipient"] = "Client";
+    if (/\b(?:my |the )?team\b/i.test(combined)) next["email-recipient"] = "the team";
+    else if (/\bclient\b/i.test(combined)) next["email-recipient"] = "Client";
     else if (/\bcustomer\b/i.test(combined)) next["email-recipient"] = "Customer";
   }
 
   if (!next["email-purpose"]) {
     const substantive = [...(contextTexts ?? []), userText].find(
       (t) =>
-        t.trim().length >= 20 &&
-        /\b(?:follow|agreed|need|must|tell|ask|remind|boundary|no longer|keep (?:her|him|them))\b/i.test(
+        t.trim().length >= 12 &&
+        /\b(?:follow|agreed|need|must|tell|ask|remind|boundary|no longer|keep (?:her|him|them)|overwhelm|until tomorrow|give me until|answer .+ questions)\b/i.test(
           t,
         ) &&
-        !/^(?:yes|no|ok(?:ay)?|sure|direct|formal|friendly)\b/i.test(t.trim()),
+        !/^(?:yes|no|ok(?:ay)?|sure|direct|formal|friendly|the team|my team)\b/i.test(
+          t.trim(),
+        ),
     );
     if (substantive) next["email-purpose"] = substantive.trim();
   }

@@ -85,16 +85,18 @@ export const CONVERSATION_IMPLEMENTATION_CHECKLIST: readonly ChecklistItem[] = [
     id: "exp-shari",
     section: "experiences",
     label: "Shari",
-    status: "fail",
-    evidence: "companion-chat LLM bypasses CIE/HCV",
+    status: "pass",
+    evidence:
+      "certifyCompanionDelivery → processConversationTurn (CIE+HCV) for Companion-owned chat",
     releaseBlocking: true,
   },
   {
     id: "exp-chamber",
     section: "experiences",
     label: "Chamber",
-    status: "fail",
-    evidence: "persona path bypasses CIE/HCV",
+    status: "partial",
+    evidence:
+      "CIE+HCV+TCAI via certifyConversationDelivery (advisory); live authenticated Marketing regression still required",
     releaseBlocking: true,
   },
   {

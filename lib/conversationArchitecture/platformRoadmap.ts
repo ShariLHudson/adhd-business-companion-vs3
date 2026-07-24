@@ -97,8 +97,9 @@ export const PLATFORM_PRIORITIES: readonly PlatformPriority[] = [
     order: 5,
     id: "shari-global",
     label: "Complete Shari Global",
-    status: "not_started",
-    evidence: "companion-chat LLM bypasses CIE",
+    status: "in_progress",
+    evidence:
+      "certifyCompanionDelivery wired for Companion-owned chat; Create/Projects/Board still separate",
   },
   {
     order: 6,
@@ -207,15 +208,16 @@ export const EXPERIENCE_IMPLEMENTATION_TRACKS: readonly ExperienceImplementation
         architectureComplete: "partial",
         uiComplete: "complete",
         runtimeComplete: "partial",
-        cieIntegrated: "not_started",
-        validationActive: "not_started",
-        hcvActive: "not_started",
+        cieIntegrated: "partial",
+        validationActive: "partial",
+        hcvActive: "partial",
         goldStandardIntegration: "not_started",
         regressionTested: "partial",
         authenticatedTested: "not_started",
         productionReady: "not_started",
       }),
-      notes: "LLM companion-chat bypass",
+      notes:
+        "Companion-owned chat certifies via certifyCompanionDelivery; Create/nav unchanged",
     },
     {
       experienceId: "chamber",

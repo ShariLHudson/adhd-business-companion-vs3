@@ -529,6 +529,9 @@ export function evaluateCompanionBehaviorCase(
         continuationTarget = pending.target;
       }
     }
+    // Setup may start Universal Creation; clear so the bare "yes" probe
+    // does not inherit draft/review menus as the turn's user-facing text.
+    clearUniversalCreationSession();
   }
 
   if (testCase.category === "yes_continuation" && testCase.setupGoogleSheetPending) {

@@ -79,6 +79,31 @@ export function validateConversationExcellence(input: {
     excellenceFailures.push("ignored_known_context");
   }
 
+  // Explicit create/write must not be replaced by destination offers or empty interviews.
+  if (input.decision.explicitCreationRequested) {
+    const a = input.answer;
+    const looksLikeDraft =
+      /\b(?:subject|hi team|hello|dear |here'?s (?:a |an )?(?:simple |draft )?email|absolutely\.?\s*here'?s)\b/i.test(
+        a,
+      ) ||
+      (a.includes("---") && /\b(?:subject|hi |hello)\b/i.test(a));
+    const asksDiscoveryAgain =
+      /\b(?:who is receiving|one person, a role|what is this email trying|main reason you'?re creating)\b/i.test(
+        a,
+      );
+    const emotionalDestinationSteal =
+      /\b(?:evidence vault|would it help to open|celebration garden)\b/i.test(a);
+    if (emotionalDestinationSteal && !looksLikeDraft) {
+      excellenceFailures.push("explicit_create_stolen_by_emotional_destination");
+    }
+    if (asksDiscoveryAgain && !looksLikeDraft) {
+      excellenceFailures.push("explicit_create_unanswered_discovery_loop");
+    }
+    if (!looksLikeDraft && !asksDiscoveryAgain && a.trim().length < 80) {
+      excellenceFailures.push("explicit_create_request_unanswered");
+    }
+  }
+
   const roleAppropriate = roleFitsAnswer(
     input.primaryRole,
     input.answer,
@@ -172,6 +197,13 @@ export function validateConversationExcellence(input: {
           ]
         : []),
       ...(delight?.repairInstructions ?? []),
+      ...(excellenceFailures.includes("explicit_create_stolen_by_emotional_destination") ||
+      excellenceFailures.includes("explicit_create_unanswered_discovery_loop") ||
+      excellenceFailures.includes("explicit_create_request_unanswered")
+        ? [
+            "Honor the explicit create/write request: draft with what you know now. Soften tone for overwhelm, but do not open optional destinations or restart discovery.",
+          ]
+        : []),
     ],
   };
 }

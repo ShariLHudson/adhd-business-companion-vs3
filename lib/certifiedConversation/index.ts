@@ -8,6 +8,19 @@ export type {
 
 export { certifyConversationDelivery } from "./certifyConversationDelivery";
 export {
+  certifyCompanionDelivery,
+  shouldCertifyCompanionDelivery,
+  inferCompanionDeliveryKind,
+  type CertifyCompanionDeliveryInput,
+  type CertifyCompanionDeliveryResult,
+  type CompanionDeliveryKind,
+} from "./certifyCompanionDelivery";
+export {
+  getGeneralChatCertifiedRuntime,
+  saveGeneralChatCertifiedRuntime,
+  clearGeneralChatCertifiedRuntime,
+} from "./generalChatCertifiedState";
+export {
   evaluateChamberSharedResponsePolicy,
   buildAdvisorySafeFallback,
 } from "./responsePolicy";
