@@ -11,6 +11,6 @@ Foundation for Spark Estate’s guided strategic thinking destination.
 | [05_PHASE_AUDIT_ADAPTIVE_AND_JOURNEY.md](./05_PHASE_AUDIT_ADAPTIVE_AND_JOURNEY.md) | Adaptive + live journey re-audit |
 | [06_STRATEGY_INTELLIGENCE_PHASE1.md](./06_STRATEGY_INTELLIGENCE_PHASE1.md) | Judgment intelligence foundation (Phase 1) |
 
-**Runtime:** `lib/strategyChamber/` · **Judgment:** `lib/strategyChamber/intelligence/` · **Adaptive presentation:** `lib/adaptiveCompanionIntelligence/` · **UI:** `StrategiesPanel` (estate opening) · **Destination id:** `strategy-library` · **Section id:** `playbook`
+**Runtime:** `lib/strategyChamber/` · **Domain model:** `lib/strategyChamber/domainModel.ts` · **Judgment:** `lib/strategyChamber/intelligence/` · **Adaptive presentation:** `lib/adaptiveCompanionIntelligence/` · **UI:** `StrategiesPanel` (estate opening) · **Destination id:** `strategy-library` · **Section id:** `playbook`
 
 **Adaptive docs:** `docs/adaptive-companion/` · **Platform rules:** `docs/platform-intelligence/PLATFORM_INTELLIGENCE_RULES.md`

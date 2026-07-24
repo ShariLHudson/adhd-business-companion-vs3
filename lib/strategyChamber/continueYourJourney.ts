@@ -24,7 +24,7 @@ export function buildContinueYourJourney(
     item.entryReason === "rethink_current_direction" ||
     item.entryReason === "unsure";
   const evaluating =
-    item.currentStage === "evaluate_decision" ||
+    item.currentStage === "evaluate_tradeoffs" ||
     item.status === "evaluating";
 
   let recommended: ContinueJourneyOption | null = null;

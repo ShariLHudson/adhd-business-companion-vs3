@@ -1,8 +1,14 @@
 import type { AdaptivePresentationResolved } from "@/lib/adaptiveCompanionIntelligence";
 import type { StrategyWorkItem } from "../../types";
 import { suggestSecondOrderEffects } from "../frameworks/secondOrderThinking";
-import type { StrategyJudgmentTurn } from "../types";
+import { assessReversibility } from "../frameworks/reversibility";
+import type {
+  HandoffContext,
+  StrategicDecision,
+  StrategyJudgmentTurn,
+} from "../types";
 import { assessDecisionReadiness } from "./assessDecisionReadiness";
+import { assessJudgmentStage } from "./assessJudgmentStage";
 import { designStrategicExperiment } from "./designExperiment";
 import {
   generateStrategicOptions,
@@ -22,23 +28,46 @@ export function analyzeStrategyWorkItem(
   presentation?: AdaptivePresentationResolved,
   opts?: { lastAnswer?: string },
 ): StrategyJudgmentTurn {
-  const questionAnalysis = identifyStrategicQuestion(item, opts?.lastAnswer);
+  const strategicQuestion = identifyStrategicQuestion(item, opts?.lastAnswer);
+  const judgmentStage = assessJudgmentStage(item);
   const nextQuestion = selectNextQuestion(item, presentation, opts);
   const readiness = assessDecisionReadiness(item);
   const options = generateStrategicOptions(item, presentation);
   const showOptions = shouldOfferStrategicOptions(item);
   const { risks } = identifyStrategicRisks(item);
   const experiment = designStrategicExperiment(item);
-  const handoff = recommendStrategicHandoff(item);
+  const recommendation = recommendStrategicHandoff(item);
   const secondOrder = suggestSecondOrderEffects(item);
 
-  const workItemPatch: Partial<StrategyWorkItem> = {};
-  if (questionAnalysis.strategyTypeId && !item.strategyType) {
-    workItemPatch.strategyType = questionAnalysis.strategyTypeId;
+  const handoff: HandoffContext = {
+    recommendation,
+    fromStage: judgmentStage,
+    readiness: readiness.readiness,
+  };
+
+  const decision: StrategicDecision | null = item.chosenDirection?.trim()
+    ? {
+        direction: item.chosenDirection.trim(),
+        rationale:
+          item.decisionRationale?.trim() ||
+          "Chosen after exploring options in the Strategy Chamber.",
+        notChosen: item.notChosen ?? [],
+        assumptionsToTest: item.assumptions ?? [],
+        risksToWatch: item.risks ?? [],
+        confidence: readiness.confidence,
+        readiness: readiness.readiness,
+        reversibility: assessReversibility(item.chosenDirection),
+      }
+    : null;
+
+  const workItemPatch: Partial<StrategyWorkItem> = {
+    currentStage: judgmentStage,
+  };
+  if (strategicQuestion.strategyTypeId && !item.strategyType) {
+    workItemPatch.strategyType = strategicQuestion.strategyTypeId;
   }
-  if (questionAnalysis.strategyTypeId) {
-    const family = questionAnalysis.strategyTypeId;
-    // family mapped loosely for store; registry owns precise family
+  if (strategicQuestion.strategyTypeId) {
+    const family = strategicQuestion.strategyTypeId;
     if (!item.strategyFamily) {
       if (family === "pricing" || family === "hiring_delegation") {
         workItemPatch.strategyFamily =
@@ -63,19 +92,21 @@ export function analyzeStrategyWorkItem(
   if (risks.length && !(item.risks?.length)) {
     workItemPatch.risks = risks.map((r) => r.whatCouldHappen);
   }
-  if (handoff && item.chosenDirection?.trim()) {
-    workItemPatch.recommendedNextDestination = handoff.destinationId;
+  if (recommendation && item.chosenDirection?.trim()) {
+    workItemPatch.recommendedNextDestination = recommendation.destinationId;
   }
   if (
     experiment &&
-    readiness.readiness === "ready_to_test" &&
+    (readiness.readiness === "ready_for_decision" ||
+      judgmentStage === "test_confidence") &&
     !(item.experiments?.length)
   ) {
     workItemPatch.experiments = [experiment.smallAction];
   }
 
   return {
-    questionAnalysis,
+    strategicQuestion,
+    judgmentStage,
     nextQuestion,
     readiness,
     options,
@@ -83,6 +114,7 @@ export function analyzeStrategyWorkItem(
     risks,
     experiment,
     handoff,
+    decision,
     workItemPatch,
   };
 }

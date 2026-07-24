@@ -5,7 +5,7 @@ import {
 } from "../registry";
 import type {
   DecisionConfidence,
-  StrategicQuestionAnalysis,
+  StrategicQuestion,
   StrategicQuestionType,
   StrategyTypeId,
 } from "../types";
@@ -45,7 +45,7 @@ function mapTypeToQuestionType(
 export function identifyStrategicQuestion(
   item: StrategyWorkItem,
   latestAnswer?: string,
-): StrategicQuestionAnalysis {
+): StrategicQuestion {
   const stated =
     item.decisionStatement?.trim() ||
     latestAnswer?.trim() ||
@@ -87,13 +87,13 @@ export function identifyStrategicQuestion(
     (item.memberStatements?.length ?? 0) < 2 &&
     !item.desiredDirection?.trim();
 
-  let refinedQuestion = stated;
+  let refined = stated;
   if (
     /\bmore customers?\b/.test(lower) &&
     item.currentReality?.trim() &&
     /retention|capacity|offer|position/i.test(item.currentReality)
   ) {
-    refinedQuestion = `Given that ${item.currentReality.trim()}, what is the real growth decision?`;
+    refined = `Given that ${item.currentReality.trim()}, what is the real growth decision?`;
   }
 
   let confidence: DecisionConfidence = "emerging";
@@ -103,8 +103,8 @@ export function identifyStrategicQuestion(
   else if (item.optionsConsidered?.length) confidence = "moderate";
 
   return {
-    statedQuestion: stated,
-    refinedQuestion: refinedQuestion || stated,
+    stated,
+    refined: refined || stated,
     questionType,
     strategyTypeId,
     confidence,

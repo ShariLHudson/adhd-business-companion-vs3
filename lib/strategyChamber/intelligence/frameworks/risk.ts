@@ -25,7 +25,7 @@ export function buildRiskAssessments(item: StrategyWorkItem): RiskAssessment[] {
       likelihood: "medium",
       mitigation: "Consider protecting current members or explaining value clearly.",
       earlyWarning: "Questions, cancellations, or quieter engagement after the change.",
-      reversibility: "reversible_with_effort",
+      reversibility: "moderately_reversible",
     });
   }
   if (/\bgrow|more customers\b/.test(q)) {
@@ -35,7 +35,7 @@ export function buildRiskAssessments(item: StrategyWorkItem): RiskAssessment[] {
       likelihood: "medium",
       mitigation: "Check capacity before expanding acquisition.",
       earlyWarning: "Longer wait times or rising complaints.",
-      reversibility: "reversible_with_effort",
+      reversibility: "moderately_reversible",
     });
   }
   return seeded.slice(0, 2);

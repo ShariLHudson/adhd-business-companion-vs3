@@ -80,7 +80,7 @@ describe("Strategy Chamber foundation", () => {
       title: "Where should marketing go?",
     });
     expect(listStrategyWorkItems()).toHaveLength(1);
-    expect(created.currentStage).toBe("understand_current_state");
+    expect(created.currentStage).toBe("clarify_question");
 
     pauseStrategyWorkItem(created.id);
     const resumable = getResumableStrategyWorkItem();

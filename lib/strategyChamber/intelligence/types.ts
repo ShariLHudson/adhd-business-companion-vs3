@@ -1,6 +1,8 @@
 /**
  * Strategy Chamber judgment intelligence — analysis shapes only.
  * Does not own storage. Distinct from catalog `lib/strategyIntelligence.ts`.
+ *
+ * Domain vocabulary lives in `../domainModel` — shared by every strategy type.
  */
 
 import type {
@@ -9,6 +11,13 @@ import type {
   StrategyOption,
   StrategyWorkItem,
 } from "../types";
+import type {
+  DecisionReadiness,
+  EvidenceStrength,
+  Reversibility,
+  StrategicInputClassification,
+  StrategicJudgmentStage,
+} from "../domainModel";
 
 export type StrategicQuestionType =
   | "direction_decision"
@@ -32,39 +41,12 @@ export type StrategicQuestionType =
   | "personal_direction_decision"
   | "unknown";
 
-export type EvidenceQuality =
-  | "confirmed"
-  | "strong_signal"
-  | "limited_signal"
-  | "anecdotal"
-  | "assumed"
-  | "unknown"
-  | "conflicting";
-
-export type StrategicInputKind =
-  | "fact"
-  | "observation"
-  | "interpretation"
-  | "assumption"
-  | "feeling"
-  | "unknown";
-
 export type DecisionConfidence =
   | "low"
   | "emerging"
   | "moderate"
   | "strong"
   | "confirmed";
-
-export type DecisionReadiness =
-  | "ready_to_choose"
-  | "ready_to_test"
-  | "needs_more_evidence"
-  | "needs_another_perspective"
-  | "needs_reflection"
-  | "needs_capacity_review"
-  | "not_ready"
-  | "current_direction_appropriate";
 
 export type QuestionPriority =
   | 1
@@ -135,17 +117,19 @@ export type StrategyTypeContract = {
   version: 1;
 };
 
+/** Classified member input — original wording preserved. */
 export type ClassifiedStrategicInput = {
   originalText: string;
-  kinds: StrategicInputKind[];
-  evidenceQuality: EvidenceQuality;
+  classifications: StrategicInputClassification[];
+  evidenceStrength: EvidenceStrength;
   /** Never treat assumption as fact in user-facing copy. */
   safeToTreatAsFact: boolean;
 };
 
-export type StrategicQuestionAnalysis = {
-  statedQuestion: string;
-  refinedQuestion: string;
+/** Domain: StrategicQuestion — the decision being judged. */
+export type StrategicQuestion = {
+  stated: string;
+  refined: string;
   questionType: StrategicQuestionType;
   strategyTypeId: StrategyTypeId | null;
   confidence: DecisionConfidence;
@@ -165,6 +149,7 @@ export type NextQuestionPlan = {
 export type DecisionReadinessAssessment = {
   readiness: DecisionReadiness;
   confidence: DecisionConfidence;
+  judgmentStage: StrategicJudgmentStage;
   missing: string[];
   strategicQuestionClear: boolean;
   outcomeClearEnough: boolean;
@@ -172,7 +157,20 @@ export type DecisionReadinessAssessment = {
   hasRealisticOption: boolean;
   tradeoffsVisible: boolean;
   assumptionsVisible: boolean;
+  risksReviewed: boolean;
   userReadyHint: boolean;
+};
+
+/** Domain: StrategicDecision — direction chosen with judgment context. */
+export type StrategicDecision = {
+  direction: string;
+  rationale: string;
+  notChosen: string[];
+  assumptionsToTest: string[];
+  risksToWatch: string[];
+  confidence: DecisionConfidence;
+  readiness: DecisionReadiness;
+  reversibility: Reversibility;
 };
 
 export type EnrichedStrategyOption = StrategyOption & {
@@ -190,7 +188,7 @@ export type RiskAssessment = {
   likelihood: "low" | "medium" | "high" | "unknown";
   mitigation?: string;
   earlyWarning?: string;
-  reversibility: "easily_reversible" | "reversible_with_effort" | "difficult" | "effectively_irreversible" | "unknown";
+  reversibility: Reversibility;
 };
 
 export type StrategicExperiment = {
@@ -211,14 +209,23 @@ export type HandoffRecommendation = {
   actionLabel: string;
 };
 
+/** Domain: HandoffContext — next place after a strategic decision. */
+export type HandoffContext = {
+  recommendation: HandoffRecommendation | null;
+  fromStage: StrategicJudgmentStage;
+  readiness: DecisionReadiness;
+};
+
 export type StrategyJudgmentTurn = {
-  questionAnalysis: StrategicQuestionAnalysis;
+  strategicQuestion: StrategicQuestion;
+  judgmentStage: StrategicJudgmentStage;
   nextQuestion: NextQuestionPlan;
   readiness: DecisionReadinessAssessment;
   options: EnrichedStrategyOption[];
   showOptions: boolean;
   risks: RiskAssessment[];
   experiment: StrategicExperiment | null;
-  handoff: HandoffRecommendation | null;
+  handoff: HandoffContext;
+  decision: StrategicDecision | null;
   workItemPatch: Partial<StrategyWorkItem>;
 };

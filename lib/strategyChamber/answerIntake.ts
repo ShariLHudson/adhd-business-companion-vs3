@@ -4,26 +4,13 @@
  */
 
 import type { StrategyOption, StrategyWorkItem } from "./types";
+import type { StrategicInputClassification } from "./domainModel";
 import {
+  assessJudgmentStage,
   classifyStrategicInput,
   identifyStrategicQuestion,
   suggestStrategyTypeId,
 } from "./intelligence";
-
-export type AnswerSignalKind =
-  | "fact"
-  | "observation"
-  | "interpretation"
-  | "feeling"
-  | "assumption"
-  | "concern"
-  | "constraint"
-  | "desired_outcome"
-  | "option"
-  | "risk"
-  | "success_signal"
-  | "next_step"
-  | "unclear";
 
 function pushUnique(list: string[] | undefined, value: string): string[] {
   const next = [...(list ?? [])];
@@ -34,49 +21,13 @@ function pushUnique(list: string[] | undefined, value: string): string[] {
   return next;
 }
 
-function looksLikeRiskOrConcern(text: string): boolean {
-  return /\b(worried|worry|afraid|fear|risk|leave|churn|lose|fail|wrong|concern)\b/i.test(
-    text,
-  );
-}
-
-function looksLikeConstraint(text: string): boolean {
-  return /\b(can'?t|cannot|have to|must|budget|cash|time|capacity|energy|only)\b/i.test(
-    text,
-  );
-}
-
-function looksLikeDesire(text: string): boolean {
-  return /\b(want|hope|wish|goal|would like|trying to|need more|looking for)\b/i.test(
-    text,
-  );
-}
-
-function looksLikeOption(text: string): boolean {
-  return /\b(option|path|could|either|or we|instead|raise|keep|increase|pause)\b/i.test(
-    text,
-  );
-}
-
-/** Best-effort signal tags — preserved alongside original wording. */
-export function classifyAnswerSignals(answer: string): AnswerSignalKind[] {
+/** Best-effort classifications — preserved alongside original wording. */
+export function classifyAnswerSignals(
+  answer: string,
+): StrategicInputClassification[] {
   const t = answer.trim();
-  if (!t) return ["unclear"];
-  const classified = classifyStrategicInput(t);
-  const kinds: AnswerSignalKind[] = [];
-  for (const k of classified.kinds) {
-    if (k === "fact") kinds.push("fact");
-    else if (k === "observation") kinds.push("observation");
-    else if (k === "interpretation") kinds.push("interpretation");
-    else if (k === "assumption") kinds.push("assumption");
-    else if (k === "feeling") kinds.push("feeling");
-  }
-  if (looksLikeRiskOrConcern(t)) kinds.push("concern", "risk");
-  if (looksLikeConstraint(t)) kinds.push("constraint");
-  if (looksLikeDesire(t)) kinds.push("desired_outcome");
-  if (looksLikeOption(t)) kinds.push("option");
-  if (kinds.length === 0) kinds.push("observation");
-  return Array.from(new Set(kinds));
+  if (!t) return ["unknown"];
+  return classifyStrategicInput(t).classifications;
 }
 
 /**
@@ -96,6 +47,11 @@ export function applyOpeningStrategicQuestion(
     { ...item, decisionStatement: trimmed },
     trimmed,
   );
+  const draft: StrategyWorkItem = {
+    ...item,
+    decisionStatement: trimmed,
+    strategyType: strategyType ?? item.strategyType,
+  };
   return {
     decisionStatement: trimmed,
     title,
@@ -103,7 +59,7 @@ export function applyOpeningStrategicQuestion(
     // Intentionally leave currentReality empty until real context arrives
     currentReality: item.currentReality?.trim() || undefined,
     status: "understanding",
-    currentStage: "understand_current_state",
+    currentStage: assessJudgmentStage(draft),
     activeQuestion: undefined,
     shariReflection: undefined,
     strategyType: strategyType ?? item.strategyType,
@@ -143,28 +99,28 @@ export function applyConversationalAnswer(
   // First contextual answer after the strategic question → current situation
   if (!item.currentReality?.trim()) {
     if (
-      signals.includes("observation") ||
+      signals.includes("evidence") ||
       signals.includes("fact") ||
       signals.includes("concern") ||
       signals.includes("constraint") ||
-      signals.includes("feeling")
+      signals.includes("risk")
     ) {
       patch.currentReality = trimmed;
     }
-  } else if (
-    signals.includes("observation") ||
-    signals.includes("fact")
-  ) {
+  } else if (signals.includes("evidence") || signals.includes("fact")) {
     patch.observations = pushUnique(item.observations, trimmed);
   }
 
   const classified = classifyStrategicInput(trimmed);
-  if (signals.includes("assumption") || classified.kinds.includes("assumption")) {
+  if (
+    signals.includes("assumption") ||
+    classified.classifications.includes("assumption")
+  ) {
     patch.assumptions = pushUnique(item.assumptions, trimmed);
   }
   if (
     classified.safeToTreatAsFact ||
-    classified.kinds.includes("fact")
+    classified.classifications.includes("fact")
   ) {
     patch.knownFacts = pushUnique(item.knownFacts, trimmed);
   }
@@ -174,15 +130,14 @@ export function applyConversationalAnswer(
   if (signals.includes("constraint")) {
     patch.constraints = pushUnique(item.constraints, trimmed);
   }
-  if (signals.includes("desired_outcome")) {
+  if (signals.includes("goal")) {
     patch.desiredDirection = item.desiredDirection?.trim() || trimmed;
   }
-  if (signals.includes("success_signal")) {
-    patch.successSignals = pushUnique(item.successSignals, trimmed);
+  if (signals.includes("opportunity")) {
+    patch.opportunities = pushUnique(item.opportunities, trimmed);
   }
-  if (signals.includes("next_step")) {
-    patch.recommendedNextDestination =
-      item.recommendedNextDestination?.trim() || trimmed.slice(0, 120);
+  if (signals.includes("decision")) {
+    patch.chosenDirection = item.chosenDirection?.trim() || trimmed;
   }
 
   if (signals.includes("option") && !item.optionsConsidered?.length) {
@@ -197,29 +152,32 @@ export function applyConversationalAnswer(
         title,
       }));
       patch.optionsConsidered = options;
-      patch.currentStage = "explore_options";
       patch.status = "exploring";
     }
   }
 
-  // Advance stage gently based on what we know — never rigid five-step force
-  if (!patch.currentStage) {
-    if (
-      item.currentReality?.trim() ||
-      patch.currentReality ||
-      (item.memberStatements?.length ?? 0) >= 1
-    ) {
-      if (!item.desiredDirection?.trim() && !patch.desiredDirection) {
-        patch.currentStage = "choose_direction";
-        patch.status = "understanding";
-      } else if (!item.optionsConsidered?.length) {
-        patch.currentStage = "explore_options";
-        patch.status = "exploring";
-      } else if (!item.chosenDirection?.trim()) {
-        patch.currentStage = "evaluate_decision";
-        patch.status = "evaluating";
-      }
-    }
+  const merged: StrategyWorkItem = {
+    ...item,
+    ...patch,
+    memberStatements: patch.memberStatements ?? item.memberStatements,
+    optionsConsidered: patch.optionsConsidered ?? item.optionsConsidered,
+    assumptions: patch.assumptions ?? item.assumptions,
+    risks: patch.risks ?? item.risks,
+    constraints: patch.constraints ?? item.constraints,
+    currentReality: patch.currentReality ?? item.currentReality,
+    desiredDirection: patch.desiredDirection ?? item.desiredDirection,
+    chosenDirection: patch.chosenDirection ?? item.chosenDirection,
+    knownFacts: patch.knownFacts ?? item.knownFacts,
+    observations: patch.observations ?? item.observations,
+    opportunities: patch.opportunities ?? item.opportunities,
+  };
+  patch.currentStage = assessJudgmentStage(merged);
+  if (merged.optionsConsidered?.length && !merged.chosenDirection?.trim()) {
+    patch.status = "exploring";
+  } else if (merged.chosenDirection?.trim()) {
+    patch.status = "direction_chosen";
+  } else if (merged.currentReality?.trim()) {
+    patch.status = "understanding";
   }
 
   return patch;
@@ -235,7 +193,7 @@ export function chooseEmergingOption(
     item.optionsConsidered
       ?.filter((o) => o.id !== optionId)
       .map((o) => o.title) ?? [];
-  return {
+  const patch: Partial<StrategyWorkItem> = {
     chosenDirection: option.title,
     notChosen,
     decisionRationale:
@@ -243,6 +201,8 @@ export function chooseEmergingOption(
       item.decisionRationale ||
       "Chosen after exploring options in the Strategy Chamber.",
     status: "direction_chosen",
-    currentStage: "handoff_direction",
   };
+  const merged = { ...item, ...patch };
+  patch.currentStage = assessJudgmentStage(merged);
+  return patch;
 }

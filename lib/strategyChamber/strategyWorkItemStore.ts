@@ -2,9 +2,9 @@
  * Strategy Chamber shared work items — local V1; intelligence-ready shape.
  */
 
+import type { StrategicJudgmentStage } from "./domainModel";
 import type {
   StrategyEntryReason,
-  StrategyThinkingStage,
   StrategyWorkItem,
   StrategyWorkStatus,
   StrategyConnection,
@@ -59,16 +59,16 @@ function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-const ENTRY_STAGE: Record<StrategyEntryReason, StrategyThinkingStage> = {
-  need_direction: "understand_current_state",
-  important_decision: "evaluate_decision",
-  rethink_current_direction: "understand_current_state",
+const ENTRY_STAGE: Record<StrategyEntryReason, StrategicJudgmentStage> = {
+  need_direction: "clarify_question",
+  important_decision: "evaluate_tradeoffs",
+  rethink_current_direction: "understand_reality",
   new_opportunity: "explore_options",
-  problem_not_improving: "understand_current_state",
-  major_commitment: "evaluate_decision",
+  problem_not_improving: "understand_reality",
+  major_commitment: "evaluate_tradeoffs",
   review_existing_strategy: "choose_direction",
-  referred_from_other_destination: "understand_current_state",
-  unsure: "understand_current_state",
+  referred_from_other_destination: "clarify_question",
+  unsure: "clarify_question",
 };
 
 const ENTRY_TITLE: Record<StrategyEntryReason, string> = {

@@ -1,14 +1,11 @@
 /**
  * Strategy Chamber — shared strategic work record and stage model.
  * Source of truth for strategic reasoning; execution lives elsewhere.
+ *
+ * Judgment vocabulary: `domainModel.ts` (StrategicJudgmentStage, etc.).
  */
 
-export type StrategyThinkingStage =
-  | "understand_current_state"
-  | "choose_direction"
-  | "explore_options"
-  | "evaluate_decision"
-  | "handoff_direction";
+import type { StrategicJudgmentStage } from "./domainModel";
 
 export type StrategyWorkStatus =
   | "not_started"
@@ -95,7 +92,7 @@ export type StrategyWorkItem = {
   entryReason: StrategyEntryReason;
   strategyFamily?: StrategyFamilyId | null;
   strategyType?: string | null;
-  currentStage: StrategyThinkingStage;
+  currentStage: StrategicJudgmentStage;
   /** Central strategic question — not the same as current situation. */
   decisionStatement?: string;
   /** Present-tense situation context — never auto-copied from the question. */

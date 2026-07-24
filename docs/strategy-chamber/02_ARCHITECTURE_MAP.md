@@ -55,14 +55,19 @@ Strategy Chamber decision clear
   → strategy_work_item updated (never duplicated)
 ```
 
-## Five thinking areas (internal stages)
+## Judgment stages (Strategy Domain Model)
 
 | Stage id | User language |
 |----------|----------------|
-| `understand_current_state` | See what is really happening |
-| `choose_direction` | Choose your direction |
-| `explore_options` | Explore your options |
-| `evaluate_decision` | Think through the decision |
-| `handoff_direction` | Put your direction into motion |
+| `clarify_question` | Clarify Question |
+| `understand_reality` | Understand Reality |
+| `gather_evidence` | Gather Evidence |
+| `surface_assumptions` | Surface Assumptions |
+| `explore_options` | Explore Options |
+| `evaluate_tradeoffs` | Evaluate Tradeoffs |
+| `choose_direction` | Choose Direction |
+| `test_confidence` | Test Confidence |
+| `prepare_handoff` | Prepare Handoff |
+| `review_results` | Review Results |
 
-Not forced as a five-step wizard. Progress when useful.
+Not forced as a wizard. Progress when useful. Canonical types: `lib/strategyChamber/domainModel.ts`.

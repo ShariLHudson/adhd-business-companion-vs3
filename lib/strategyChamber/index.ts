@@ -1,3 +1,4 @@
+export * from "./domainModel";
 export * from "./types";
 export * from "./strategyWorkItemStore";
 export * from "./decisionRecord";

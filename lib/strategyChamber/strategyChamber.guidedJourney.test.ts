@@ -88,7 +88,7 @@ describe("Strategy Chamber guided journey + handoffs", () => {
       currentReality: "Clients hesitate at checkout",
       chosenDirection: "Test a simpler offer first",
       status: "direction_chosen",
-      currentStage: "handoff_direction",
+      currentStage: "prepare_handoff",
     });
     patchAdaptiveCompanionExplicitPrefs({ resumeSummaryPreference: "brief" });
     const brief = buildStrategyResumeSummary(

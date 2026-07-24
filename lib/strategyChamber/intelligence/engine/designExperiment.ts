@@ -8,7 +8,8 @@ export function designStrategicExperiment(
 ): StrategicExperiment | null {
   const readiness = assessDecisionReadiness(item);
   if (
-    readiness.readiness === "ready_to_test" ||
+    readiness.readiness === "ready_for_decision" ||
+    readiness.judgmentStage === "test_confidence" ||
     readiness.confidence === "low" ||
     readiness.confidence === "emerging" ||
     /\b(test|pilot|experiment)\b/i.test(item.chosenDirection || "")

@@ -1,11 +1,13 @@
 import type {
   ClassifiedStrategicInput,
-  EvidenceQuality,
-  StrategicInputKind,
+  EvidenceStrength,
+  StrategicInputClassification,
 } from "../types";
 
-function uniqueKinds(kinds: StrategicInputKind[]): StrategicInputKind[] {
-  return Array.from(new Set(kinds));
+function unique(
+  classifications: StrategicInputClassification[],
+): StrategicInputClassification[] {
+  return Array.from(new Set(classifications));
 }
 
 /**
@@ -16,33 +18,80 @@ export function classifyStrategicInput(text: string): ClassifiedStrategicInput {
   if (!originalText) {
     return {
       originalText: "",
-      kinds: ["unknown"],
-      evidenceQuality: "unknown",
+      classifications: ["unknown"],
+      evidenceStrength: "unknown",
       safeToTreatAsFact: false,
     };
   }
 
-  const kinds: StrategicInputKind[] = [];
+  const classifications: StrategicInputClassification[] = [];
   const lower = originalText.toLowerCase();
 
+  if (/\?|\b(should i|what if|how do i|which|do i)\b/.test(lower)) {
+    classifications.push("question");
+  }
   if (
-    /\b(feel|feeling|overwhelmed|anxious|scared|excited|stuck|relieved)\b/.test(
+    /\b(want|hope|wish|goal|would like|trying to|looking for|need more)\b/.test(
       lower,
     )
   ) {
-    kinds.push("feeling");
+    classifications.push("goal");
+  }
+  if (
+    /\b(can'?t|cannot|have to|must|budget|cash|time|capacity|energy|only|limit)\b/.test(
+      lower,
+    )
+  ) {
+    classifications.push("constraint");
   }
   if (
     /\b(i think|maybe|might|probably|assume|seems like|i guess|everyone will)\b/.test(
       lower,
     )
   ) {
-    kinds.push("assumption");
+    classifications.push("assumption");
   }
   if (
-    /\b(means|so that means|which means|therefore)\b/.test(lower)
+    /\b(prefer|rather|important to me|care about|value|matters to me)\b/.test(
+      lower,
+    )
   ) {
-    kinds.push("interpretation");
+    classifications.push("preference");
+  }
+  if (
+    /\b(value|integrity|trust|fairness|quality over|won'?t compromise)\b/.test(
+      lower,
+    )
+  ) {
+    classifications.push("value");
+  }
+  if (
+    /\b(worried|worry|afraid|fear|risk|leave|churn|lose|fail|concern)\b/.test(
+      lower,
+    )
+  ) {
+    classifications.push("risk");
+    classifications.push("concern");
+  }
+  if (
+    /\b(opportunity|opening|chance|could grow|new market|window)\b/.test(lower)
+  ) {
+    classifications.push("opportunity");
+  }
+  if (/\b(idea|what if we|brainstorm|concept)\b/.test(lower)) {
+    classifications.push("idea");
+  }
+  if (
+    /\b(option|path|either|instead|raise|keep|increase|pause|could)\b/.test(
+      lower,
+    )
+  ) {
+    classifications.push("option");
+  }
+  if (
+    /\b(decided|i'?m choosing|going with|direction is|we will)\b/.test(lower)
+  ) {
+    classifications.push("decision");
   }
   if (
     /\b(noticed|seeing|hearing|customers? (are|say)|data|numbers?|revenue|churn|cost[s]? (are|have|went))\b/.test(
@@ -50,37 +99,43 @@ export function classifyStrategicInput(text: string): ClassifiedStrategicInput {
     ) ||
     /\b\d+%|\b\d+\s*(members?|clients?|dollars?|weeks?)\b/.test(lower)
   ) {
-    kinds.push("fact");
+    classifications.push("fact");
+    classifications.push("evidence");
+  } else if (
+    /\b(noticed|seeing|happening|evidence|signal)\b/.test(lower)
+  ) {
+    classifications.push("evidence");
   }
-  if (kinds.length === 0 || /\b(noticed|seeing|happening)\b/.test(lower)) {
-    if (!kinds.includes("fact") && !kinds.includes("assumption")) {
-      kinds.push("observation");
-    }
-  }
-  if (kinds.length === 0) kinds.push("observation");
 
-  let evidenceQuality: EvidenceQuality = "limited_signal";
-  if (kinds.includes("assumption") && !kinds.includes("fact")) {
-    evidenceQuality = "assumed";
-  } else if (kinds.includes("fact")) {
-    evidenceQuality = /\b(data|numbers?|%|confirmed)\b/.test(lower)
+  if (classifications.length === 0) {
+    classifications.push("evidence");
+  }
+
+  let evidenceStrength: EvidenceStrength = "limited_signal";
+  if (
+    classifications.includes("assumption") &&
+    !classifications.includes("fact")
+  ) {
+    evidenceStrength = "assumed";
+  } else if (classifications.includes("fact")) {
+    evidenceStrength = /\b(data|numbers?|%|confirmed)\b/.test(lower)
       ? "strong_signal"
       : "limited_signal";
-  } else if (kinds.includes("feeling")) {
-    evidenceQuality = "anecdotal";
-  } else if (kinds.includes("observation")) {
-    evidenceQuality = "limited_signal";
+  } else if (classifications.includes("concern")) {
+    evidenceStrength = "anecdotal";
+  } else if (classifications.includes("evidence")) {
+    evidenceStrength = "limited_signal";
   }
 
   const safeToTreatAsFact =
-    kinds.includes("fact") &&
-    !kinds.includes("assumption") &&
-    evidenceQuality !== "assumed";
+    classifications.includes("fact") &&
+    !classifications.includes("assumption") &&
+    evidenceStrength !== "assumed";
 
   return {
     originalText,
-    kinds: uniqueKinds(kinds),
-    evidenceQuality,
+    classifications: unique(classifications),
+    evidenceStrength,
     safeToTreatAsFact,
   };
 }

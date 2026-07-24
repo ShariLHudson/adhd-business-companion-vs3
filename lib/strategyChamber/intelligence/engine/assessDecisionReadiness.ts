@@ -1,17 +1,19 @@
 import type { StrategyWorkItem } from "../../types";
+import type { DecisionReadiness } from "../../domainModel";
 import { hasCurrentReality } from "../frameworks/currentReality";
 import { capacityAppearsTight } from "../frameworks/capacityFit";
-import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 import type {
   DecisionConfidence,
-  DecisionReadiness,
   DecisionReadinessAssessment,
 } from "../types";
+import { assessJudgmentStage } from "./assessJudgmentStage";
+import { identifyStrategicQuestion } from "./identifyStrategicQuestion";
 
 export function assessDecisionReadiness(
   item: StrategyWorkItem,
 ): DecisionReadinessAssessment {
   const analysis = identifyStrategicQuestion(item);
+  const judgmentStage = assessJudgmentStage(item);
   const strategicQuestionClear =
     Boolean(item.decisionStatement?.trim()) && !analysis.needsClarification;
   const outcomeClearEnough = Boolean(
@@ -27,6 +29,7 @@ export function assessDecisionReadiness(
       item.optionsConsidered?.some((o) => o.tradeoffs?.length),
   );
   const assumptionsVisible = Boolean(item.assumptions?.length);
+  const risksReviewed = Boolean(item.risks?.length);
   const userReadyHint = Boolean(
     item.chosenDirection?.trim() || item.decisionRecordConfirmed,
   );
@@ -39,6 +42,12 @@ export function assessDecisionReadiness(
     missing.push("capacity constraints");
   }
   if (!hasRealisticOption) missing.push("at least one realistic option");
+  if (hasRealisticOption && !tradeoffsVisible) {
+    missing.push("tradeoffs");
+  }
+  if (hasRealisticOption && !risksReviewed) {
+    missing.push("risks");
+  }
 
   let confidence: DecisionConfidence = "low";
   if (item.decisionRecordConfirmed) confidence = "confirmed";
@@ -48,52 +57,61 @@ export function assessDecisionReadiness(
     confidence = "emerging";
   }
 
-  let readiness: DecisionReadiness = "not_ready";
-  if (item.chosenDirection?.trim() && item.decisionRecordConfirmed) {
-    readiness = "ready_to_choose";
+  let readiness: DecisionReadiness = "problem_not_yet_clear";
+
+  if (item.decisionRecordConfirmed && item.chosenDirection?.trim()) {
+    readiness = "decision_complete";
+  } else if (
+    item.chosenDirection?.trim() &&
+    tradeoffsVisible &&
+    risksReviewed
+  ) {
+    readiness = "ready_for_handoff";
   } else if (
     strategicQuestionClear &&
     hasCurrentReality(item) &&
     hasRealisticOption &&
-    confidence !== "low" &&
-    /\b(test|pilot|experiment|new members)\b/i.test(
-      item.optionsConsidered?.map((o) => o.title).join(" ") || "",
-    )
+    tradeoffsVisible &&
+    risksReviewed &&
+    confidence !== "low"
   ) {
-    readiness = "ready_to_test";
-  } else if (
-    analysis.needsClarification ||
-    missing.includes("clear strategic question")
-  ) {
-    readiness = "needs_more_evidence";
-  } else if (capacityAppearsTight(item) && !constraintsKnown) {
-    readiness = "needs_capacity_review";
-  } else if (
-    item.entryReason === "rethink_current_direction" &&
-    !item.optionsConsidered?.length
-  ) {
-    readiness = "needs_another_perspective";
+    readiness = "ready_for_decision";
   } else if (
     strategicQuestionClear &&
     hasCurrentReality(item) &&
-    outcomeClearEnough &&
     hasRealisticOption &&
-    tradeoffsVisible
+    tradeoffsVisible &&
+    !risksReviewed
   ) {
-    readiness = "ready_to_choose";
+    readiness = "risks_not_reviewed";
+  } else if (
+    strategicQuestionClear &&
+    hasCurrentReality(item) &&
+    hasRealisticOption &&
+    !tradeoffsVisible
+  ) {
+    readiness = "tradeoffs_not_evaluated";
   } else if (
     strategicQuestionClear &&
     hasCurrentReality(item) &&
     !hasRealisticOption
   ) {
-    readiness = "needs_more_evidence";
-  } else if (!userReadyHint && missing.length <= 1) {
-    readiness = "needs_reflection";
+    readiness = "more_options_needed";
+  } else if (
+    analysis.needsClarification ||
+    !strategicQuestionClear
+  ) {
+    readiness = "problem_not_yet_clear";
+  } else if (!hasCurrentReality(item)) {
+    readiness = "reality_not_yet_understood";
+  } else {
+    readiness = "reality_not_yet_understood";
   }
 
   return {
     readiness,
     confidence,
+    judgmentStage,
     missing,
     strategicQuestionClear,
     outcomeClearEnough,
@@ -101,6 +119,7 @@ export function assessDecisionReadiness(
     hasRealisticOption,
     tradeoffsVisible,
     assumptionsVisible,
+    risksReviewed,
     userReadyHint,
   };
 }

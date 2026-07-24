@@ -36,7 +36,8 @@ export function buildIntelligentDecisionRecord(
   }
   if (
     !why.trim() &&
-    readiness.readiness === "ready_to_test" &&
+    (readiness.readiness === "ready_for_decision" ||
+      readiness.judgmentStage === "test_confidence") &&
     experiment
   ) {
     why = `A small test can reduce uncertainty: ${experiment.smallAction}`;

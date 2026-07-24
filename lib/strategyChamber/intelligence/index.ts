@@ -5,11 +5,13 @@
  * Pure analysis over StrategyWorkItem — Chamber store remains source of truth.
  */
 
+export * from "../domainModel";
 export * from "./types";
 export * from "./registry";
 export * from "./engine/classifyStrategicInput";
 export * from "./engine/identifyStrategicQuestion";
 export * from "./engine/selectNextQuestion";
+export * from "./engine/assessJudgmentStage";
 export * from "./engine/assessDecisionReadiness";
 export * from "./engine/generateOptions";
 export * from "./engine/compareOptions";

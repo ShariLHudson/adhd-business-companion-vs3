@@ -35,9 +35,8 @@ export function recommendHandoffDestination(
   if (
     !item.chosenDirection?.trim() &&
     emotional &&
-    (readiness.readiness === "needs_reflection" ||
-      readiness.readiness === "needs_another_perspective" ||
-      readiness.readiness === "not_ready")
+    (readiness.readiness === "problem_not_yet_clear" ||
+      readiness.readiness === "reality_not_yet_understood")
   ) {
     return rec(
       "talk_it_out",
@@ -50,8 +49,9 @@ export function recommendHandoffDestination(
 
   if (
     !item.chosenDirection?.trim() &&
-    (readiness.readiness === "needs_another_perspective" ||
-      item.currentStage === "evaluate_decision")
+    (readiness.readiness === "tradeoffs_not_evaluated" ||
+      readiness.readiness === "risks_not_reviewed" ||
+      item.currentStage === "evaluate_tradeoffs")
   ) {
     return rec(
       "board",

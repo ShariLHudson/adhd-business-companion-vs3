@@ -15,6 +15,8 @@ import {
 } from "@/lib/strategyChamber";
 import {
   analyzeStrategyWorkItem,
+  assessDecisionReadiness,
+  assessJudgmentStage,
   classifyStrategicInput,
   conversationQualityIssues,
   generateStrategicOptions,
@@ -22,6 +24,7 @@ import {
   listStrategyTypes,
   optionsAreMeaningfullyDifferent,
   selectNextQuestion,
+  STRATEGIC_JUDGMENT_STAGE_ORDER,
   strategyQualityIssues,
 } from "@/lib/strategyChamber/intelligence";
 
@@ -72,7 +75,7 @@ describe("Strategy Intelligence Phase 1", () => {
     const classified = classifyStrategicInput(
       "I think everyone will leave if I raise the price.",
     );
-    expect(classified.kinds).toContain("assumption");
+    expect(classified.classifications).toContain("assumption");
     expect(classified.safeToTreatAsFact).toBe(false);
   });
 
@@ -119,8 +122,20 @@ describe("Strategy Intelligence Phase 1", () => {
     });
     const turn = analyzeStrategyWorkItem(getStrategyWorkItem(item.id)!);
     expect(turn.nextQuestion.question.length).toBeGreaterThan(0);
-    expect(turn.questionAnalysis.strategyTypeId).toBe("hiring_delegation");
+    expect(turn.strategicQuestion.strategyTypeId).toBe("hiring_delegation");
+    expect(turn.judgmentStage).toBeTruthy();
     expect(turn.readiness).toBeTruthy();
+  });
+
+  it("uses the Strategy Domain Model judgment backbone", () => {
+    expect(STRATEGIC_JUDGMENT_STAGE_ORDER[0]).toBe("clarify_question");
+    expect(STRATEGIC_JUDGMENT_STAGE_ORDER.at(-1)).toBe("review_results");
+    const item = createStrategyWorkItem({ entryReason: "need_direction" });
+    expect(item.currentStage).toBe("clarify_question");
+    expect(assessJudgmentStage(item)).toBe("clarify_question");
+    expect(assessDecisionReadiness(item).readiness).toBe(
+      "problem_not_yet_clear",
+    );
   });
 
   it("softens after I do not know", () => {

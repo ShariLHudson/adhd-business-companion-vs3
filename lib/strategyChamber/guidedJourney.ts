@@ -13,15 +13,13 @@ import {
   buildResumeRecap,
   buildShariReflection,
 } from "./conversationGuidance";
+import type { StrategicJudgmentStage } from "./domainModel";
+import { STRATEGIC_JUDGMENT_STAGE_ORDER } from "./domainModel";
 import { analyzeStrategyWorkItem } from "./intelligence";
-import type {
-  StrategyThinkingStage,
-  StrategyWorkItem,
-  StrategyWorkStatus,
-} from "./types";
+import type { StrategyWorkItem, StrategyWorkStatus } from "./types";
 
 export type GuidedJourneyPrompt = {
-  stage: StrategyThinkingStage;
+  stage: StrategicJudgmentStage;
   question: string;
   reflection?: string;
   whyItMatters?: string;
@@ -35,37 +33,37 @@ export type GuidedJourneyPrompt = {
     | "strategic_question";
 };
 
-const STAGE_ORDER: StrategyThinkingStage[] = [
-  "understand_current_state",
-  "choose_direction",
-  "explore_options",
-  "evaluate_decision",
-  "handoff_direction",
-];
-
-export function stageOrderIndex(stage: StrategyThinkingStage): number {
-  return STAGE_ORDER.indexOf(stage);
+export function stageOrderIndex(stage: StrategicJudgmentStage): number {
+  return STRATEGIC_JUDGMENT_STAGE_ORDER.indexOf(stage);
 }
 
 export function nextThinkingStage(
-  stage: StrategyThinkingStage,
-): StrategyThinkingStage | null {
+  stage: StrategicJudgmentStage,
+): StrategicJudgmentStage | null {
   const idx = stageOrderIndex(stage);
-  if (idx < 0 || idx >= STAGE_ORDER.length - 1) return null;
-  return STAGE_ORDER[idx + 1]!;
+  if (idx < 0 || idx >= STRATEGIC_JUDGMENT_STAGE_ORDER.length - 1) return null;
+  return STRATEGIC_JUDGMENT_STAGE_ORDER[idx + 1]!;
 }
 
-export function statusForStage(stage: StrategyThinkingStage): StrategyWorkStatus {
+export function statusForStage(stage: StrategicJudgmentStage): StrategyWorkStatus {
   switch (stage) {
-    case "understand_current_state":
-    case "choose_direction":
+    case "clarify_question":
+    case "understand_reality":
+    case "gather_evidence":
+    case "surface_assumptions":
       return "understanding";
     case "explore_options":
       return "exploring";
-    case "evaluate_decision":
+    case "evaluate_tradeoffs":
       return "evaluating";
-    case "handoff_direction":
+    case "choose_direction":
       return "direction_chosen";
+    case "test_confidence":
+      return "testing";
+    case "prepare_handoff":
+      return "handed_off";
+    case "review_results":
+      return "under_review";
     default:
       return "understanding";
   }
@@ -164,7 +162,8 @@ export function buildStrategyResumeSummary(
 export function guidedJourneyIsComplete(item: StrategyWorkItem): boolean {
   return Boolean(
     item.chosenDirection?.trim() &&
-      (item.currentStage === "handoff_direction" ||
+      (item.currentStage === "prepare_handoff" ||
+        item.currentStage === "review_results" ||
         item.status === "direction_chosen" ||
         item.status === "handed_off" ||
         item.status === "completed" ||

@@ -1,5 +1,6 @@
 import type { StrategyWorkItem } from "../../types";
-import type { EvidenceQuality } from "../types";
+import type { EvidenceStrength } from "../../domainModel";
+import { EVIDENCE_STRENGTH_LABEL } from "../../domainModel";
 
 export function listAssumptions(item: StrategyWorkItem): string[] {
   return (item.assumptions ?? []).map((a) => a.trim()).filter(Boolean);
@@ -9,23 +10,8 @@ export function listFacts(item: StrategyWorkItem): string[] {
   return (item.knownFacts ?? []).map((a) => a.trim()).filter(Boolean);
 }
 
-export function evidenceLabel(quality: EvidenceQuality): string {
-  switch (quality) {
-    case "confirmed":
-      return "We know this";
-    case "strong_signal":
-      return "This appears likely";
-    case "limited_signal":
-      return "We have some indication";
-    case "anecdotal":
-      return "This is based on a limited signal";
-    case "assumed":
-      return "This is still an assumption";
-    case "conflicting":
-      return "The evidence is mixed";
-    default:
-      return "We do not know this yet";
-  }
+export function evidenceLabel(strength: EvidenceStrength): string {
+  return EVIDENCE_STRENGTH_LABEL[strength];
 }
 
 export function needsFactAssumptionSplit(item: StrategyWorkItem): boolean {
