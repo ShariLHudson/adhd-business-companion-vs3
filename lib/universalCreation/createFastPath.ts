@@ -7,6 +7,10 @@ import { isProjectCreationIntent } from "@/lib/createExperience/createExperience
 import { isEmailAutomationOrInboxHelpRequest } from "@/lib/estate/emailAutomationHelp";
 import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
+import {
+  decideShariResponse,
+  isQuestionAboutCreation,
+} from "@/lib/shariAnswerFirst";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform";
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
 import { isBusinessPlanCreationRequest } from "@/lib/universalWorkEngine/packages/businessPlan/isBusinessPlanCreationRequest";
@@ -92,6 +96,15 @@ export function isSimpleCreateRequest(userText: string): boolean {
   if (!t || EXPLICIT_ROOM_NAV_RE.test(t)) return false;
   if (isEmailAutomationOrInboxHelpRequest(t)) return false;
   if (isKnowledgeQuestion(t)) return false;
+  // Answer-first: questions about creating are not Create commands.
+  if (isQuestionAboutCreation(t)) return false;
+  const answerFirst = decideShariResponse(t);
+  if (
+    answerFirst.directAnswerRequired &&
+    !answerFirst.explicitCreationRequested
+  ) {
+    return false;
+  }
   if (isProjectCreationIntent(t)) return false;
   if (isDevelopmentWorkFrustration(t)) return false;
   if (isVisualStructureExecution(t)) return false;

@@ -7,6 +7,10 @@
 import { resolveChamberMemberFromText } from "@/lib/chamber/chamberMemberAliases";
 import type { ChamberMemberId } from "@/lib/chamber/chamberMemberRegistry";
 import {
+  buildAnswerFirstFailSafeReply,
+  decideShariResponse,
+} from "@/lib/shariAnswerFirst";
+import {
   clearActiveTopic,
   getActiveTopic,
   isActiveTopicUnresolved,
@@ -45,6 +49,51 @@ const GENERIC_FALLBACK_SNIPPETS = [
   "I'm here. Tell me what would help most.",
 ] as const;
 
+/**
+ * Permanently disabled canned substitutes — never emit from fallback paths,
+ * and always treat as blocked if they appear as recovery text.
+ */
+export const DISABLED_CANNED_FALLBACKS = [
+  "Which platform matters most for the people you want to reach right now?",
+] as const;
+
+const CLIENT_NEED_RE =
+  /\b(client|clients|relationships?|trust|deadline|scope|follow[- ]?up|guilt)\b/i;
+const CONTENT_NEED_RE =
+  /\b(content|instagram|facebook|linkedin|post|platform|audience|caption|newsletter)\b/i;
+const FINANCE_NEED_RE =
+  /\b(price|pricing|money|invoice|cash|budget|profit|revenue)\b/i;
+
+/** Specialty-voice clarifying questions — used only for the active companion. */
+const SPECIALTY_CLARIFY: Record<string, string> = {
+  content: "What are you trying to say or create — and who is it for?",
+  finance:
+    "What part of the money decision feels murkiest — the number, the timing, or saying it out loud?",
+  "client-relationships":
+    "What's the relationship pressure you feel most right now — repairing trust, setting a boundary, or following up?",
+  "ai-technology":
+    "What are you trying to accomplish — and where is the tech part feeling murky?",
+  "creative-studio":
+    "What are you making or imagining — and what's getting in the way of the next step?",
+  "data-analytics":
+    "What decision are you hoping clearer numbers would help you make?",
+  events: "What gathering are you shaping — and what's the first decision you need?",
+  horizons: "What future are you curious about — and what feels hard to see clearly?",
+  innovations: "What new idea is pulling at you — and what's the smallest test that would tell you something?",
+  marketing:
+    "Who are you trying to reach — and what do you want them to understand first?",
+  operations:
+    "Which part of the system feels heaviest right now — the process, the people, or the follow-through?",
+  partnerships:
+    "Are you exploring a collaboration or already in one — and what's unclear?",
+  sales:
+    "Where are you in the conversation — finding the right people, or knowing what to say next?",
+  strategy:
+    "What decision are you trying to get clearer on before you move?",
+  "time-energy":
+    "What part of your time or energy feels hardest to protect right now?",
+};
+
 export type ProcessActiveTopicTurnInput = {
   userText: string;
   turn: number;
@@ -69,8 +118,32 @@ export type ProcessActiveTopicTurnResult = {
   skipRepeatChamberActivation: boolean;
 };
 
+export type TopicPreservingFallbackOptions = {
+  /** Live Chamber UI member — wins over a stale stored topic domain. */
+  activeChamberMemberId?: string | null;
+};
+
 function newTopicId(): string {
   return `topic-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function needMatchesDomain(need: string, domain: string): boolean {
+  if (!need) return false;
+  switch (domain) {
+    case "client-relationships":
+      return CLIENT_NEED_RE.test(need);
+    case "content":
+      return CONTENT_NEED_RE.test(need);
+    case "finance":
+      return FINANCE_NEED_RE.test(need);
+    default:
+      // Unknown specialty — only treat as match when the domain token itself appears.
+      return need.includes(domain.replace(/-/g, " ")) || need.includes(domain);
+  }
+}
+
+function specialtyClarifyQuestion(domain: string): string | null {
+  return SPECIALTY_CLARIFY[domain] ?? null;
 }
 
 export function isExplicitTopicChangeRequest(userText: string): boolean {
@@ -83,13 +156,21 @@ export function shouldBlockGenericFallback(
   return isActiveTopicUnresolved(topic);
 }
 
+export function isDisabledCannedFallback(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  return DISABLED_CANNED_FALLBACKS.some((s) => t === s || t.startsWith(s));
+}
+
 export function isBlockedGenericFallbackText(
   text: string,
   topic: ActiveTopicState | null = getActiveTopic(),
 ): boolean {
-  if (!shouldBlockGenericFallback(topic)) return false;
   const t = text.trim();
   if (!t) return false;
+  // Permanently disabled — never allow these as recovery / substitute replies.
+  if (isDisabledCannedFallback(t)) return true;
+  if (!shouldBlockGenericFallback(topic)) return false;
   if (GENERIC_FALLBACK_SNIPPETS.some((s) => t === s || t.startsWith(s))) {
     return true;
   }
@@ -105,16 +186,144 @@ export function isBlockedGenericFallbackText(
   return false;
 }
 
-/** Topic-preserving substitute when a generic fallback would have fired. */
+/**
+ * Topic-preserving substitute when a generic fallback would have fired.
+ * Talk It Out posture: one clarifying question tied to the latest situation
+ * and the active companion's specialty. Never emits DISABLED_CANNED_FALLBACKS.
+ */
 export function topicPreservingFallbackLine(
   topic: ActiveTopicState | null = getActiveTopic(),
+  userText?: string,
+  opts?: TopicPreservingFallbackOptions,
 ): string {
-  const goal = topic?.userGoal?.trim();
-  if (goal) {
-    const short = goal.length > 120 ? `${goal.slice(0, 117)}…` : goal;
-    return `Still with you on this — ${short}. What part should we tackle first?`;
+  const activeMember =
+    opts?.activeChamberMemberId?.trim()?.toLowerCase() || null;
+  const topicMember = (
+    topic?.chamberMemberId ??
+    topic?.domain ??
+    ""
+  )
+    .toString()
+    .trim()
+    .toLowerCase();
+
+  // Live companion wins — stale prior-member topics must not own the reply.
+  const domain =
+    activeMember ||
+    (topicMember && topicMember !== "chamber" ? topicMember : "") ||
+    "";
+
+  const latestRaw =
+    userText?.trim() ||
+    // Only reuse stored need when it still belongs to the active companion
+    (domain && topicMember && domain !== topicMember
+      ? ""
+      : topic?.unresolvedNeed?.trim() || topic?.userGoal?.trim() || "");
+  const need = latestRaw.toLowerCase();
+
+  const safe = (line: string): string => {
+    if (!isDisabledCannedFallback(line)) return line;
+    return (
+      specialtyClarifyQuestion(domain) ??
+      "What feels like the hardest part of that for you right now?"
+    );
+  };
+
+  // Answer-first: general how-to beats clarify-only topic fallbacks.
+  // Stale Chamber domain on a prior topic must not swallow unrelated how-tos
+  // (e.g. vendor booth after a client-relationships topic).
+  if (userText?.trim()) {
+    const answerFirst = decideShariResponse(userText);
+    const latestMatchesDomain = Boolean(domain) && needMatchesDomain(need, domain);
+    const domainFlavored =
+      latestMatchesDomain ||
+      CLIENT_NEED_RE.test(userText) ||
+      CONTENT_NEED_RE.test(userText) ||
+      FINANCE_NEED_RE.test(userText);
+    if (
+      !domainFlavored &&
+      answerFirst.directAnswerRequired &&
+      answerFirst.primaryHelpMode !== "reflective_thinking"
+    ) {
+      const substantive = buildAnswerFirstFailSafeReply(userText);
+      if (substantive) return substantive;
+    }
   }
-  return "Still with you on what you just shared. What part should we tackle first?";
+
+  // Situational matches from the latest message — specialty-agnostic signals.
+  // Never return DISABLED_CANNED_FALLBACKS (platform line is permanently off).
+  if (CLIENT_NEED_RE.test(need)) {
+    if (/\b(trust|missed|dropped|late|repair|guilt)\b/i.test(need)) {
+      return safe(
+        "What would rebuilding trust look like for you in the next conversation with them?",
+      );
+    }
+    if (/\b(boundar|scope|creep|extra|said yes)\b/i.test(need)) {
+      return safe(
+        "What boundary feels hardest to name out loud with this client?",
+      );
+    }
+    if (
+      /\b(follow|reply|email|avoid|putting off|call|conversation)\b/i.test(need)
+    ) {
+      return safe(
+        "What's making the follow-up feel heavy — the words, the timing, or what they might say back?",
+      );
+    }
+    return safe(
+      "What's the relationship pressure you feel most right now — repairing trust, setting a boundary, or following up?",
+    );
+  }
+
+  if (CONTENT_NEED_RE.test(need)) {
+    // Situation-tied Content clarify — never the disabled platform canned line.
+    if (/\b(instagram|facebook|linkedin)\b/i.test(need)) {
+      return safe(
+        "What are you trying to get those posts to do for you right now?",
+      );
+    }
+    return safe("What are you trying to say or create — and who is it for?");
+  }
+
+  if (FINANCE_NEED_RE.test(need)) {
+    return safe(
+      "What part of the money decision feels murkiest — the number, the timing, or saying it out loud?",
+    );
+  }
+
+  // Specialty clarify in the active companion's voice — never a mismatched domain default.
+  if (domain && (!need || needMatchesDomain(need, domain))) {
+    const specialty = specialtyClarifyQuestion(domain);
+    if (specialty) return safe(specialty);
+  }
+
+  if (need) {
+    // Latest message exists but doesn't map cleanly — ask in-voice, not canned domain.
+    const specialty = specialtyClarifyQuestion(domain);
+    if (specialty) {
+      return safe(specialty);
+    }
+    return safe("What feels like the hardest part of that for you right now?");
+  }
+
+  return safe(
+    specialtyClarifyQuestion(domain) ??
+      "What part of this should we look at first?",
+  );
+}
+
+/** True when user text alone is enough to refuse the generic recovery bridge. */
+export function userTextBlocksGenericFallback(userText: string): boolean {
+  const t = userText.trim();
+  if (t.split(/\s+/).length < 6) return false;
+  return (
+    /\b(client|deadline|trust|guilt|avoid(?:ing)?|follow[- ]?up|invoice|boundary|scope)\b/i.test(
+      t,
+    ) ||
+    /\b(worried|scared|afraid|anxious|overwhelm|stuck|shame|embarrassed)\b/i.test(
+      t,
+    )
+  );
 }
 
 export function markActiveTopicAnswered(turn: number): ActiveTopicState | null {
@@ -176,6 +385,43 @@ export function processActiveTopicOnUserTurn(
   }
 
   let topic = getActiveTopic();
+  const activeMember = input.activeChamberMemberId?.trim() || null;
+
+  // Companion switch — prior member's topic must not drive this companion's turn.
+  if (
+    activeMember &&
+    topic?.chamberMemberId &&
+    topic.chamberMemberId !== activeMember
+  ) {
+    clearActiveTopic();
+    topic = null;
+  }
+
+  // Already inside a Chamber member chat — keep a durable topic so fail-safes
+  // cannot collapse to the generic recovery bridge.
+  if (
+    activeMember &&
+    !explicitTopicChange &&
+    userText.split(/\s+/).length >= 4 &&
+    (!topic || !isActiveTopicUnresolved(topic) || !topic.chamberMemberId)
+  ) {
+    topic = {
+      topicId: topic?.topicId ?? newTopicId(),
+      domain: activeMember,
+      userGoal: topic?.userGoal || userText,
+      unresolvedNeed: userText,
+      selectedKnowledgeSources: Array.from(
+        new Set([...(topic?.selectedKnowledgeSources ?? []), activeMember]),
+      ),
+      responseOwner: "shari",
+      status: "ready_to_answer",
+      confidence: "high",
+      startedAtTurn: topic?.startedAtTurn ?? turn,
+      updatedAtTurn: turn,
+      chamberMemberId: activeMember,
+    };
+    saveActiveTopic(topic);
+  }
 
   // Ambiguous short reply while awaiting clarification ("yes", "1", "sales")
   if (
@@ -192,12 +438,53 @@ export function processActiveTopicOnUserTurn(
     }
   }
 
+  // Answer-first general help (no Chamber alias / domain flavor) should not
+  // create an unresolved topic that forces clarify-only fail-safes.
+  const skipTopicForAnswerFirstGeneral = (() => {
+    if (navigateGate.memberId) return false;
+    if (navigateGate.reason === "domain_question_alias") return false;
+    if (userText.split(/\s+/).length < 6) return false;
+    if (
+      CLIENT_NEED_RE.test(userText) ||
+      CONTENT_NEED_RE.test(userText) ||
+      FINANCE_NEED_RE.test(userText)
+    ) {
+      return false;
+    }
+    const d = decideShariResponse(userText);
+    if (
+      !d.directAnswerRequired ||
+      d.primaryHelpMode === "reflective_thinking" ||
+      d.explicitDestinationRequested
+    ) {
+      return false;
+    }
+    // Only skip topic creation for clear general-help modes — not short acks.
+    return (
+      d.primaryHelpMode === "how_to_guidance" ||
+      d.primaryHelpMode === "explanation" ||
+      d.primaryHelpMode === "troubleshooting" ||
+      d.primaryHelpMode === "brainstorming" ||
+      d.primaryHelpMode === "comparison" ||
+      d.primaryHelpMode === "simple_planning" ||
+      d.primaryHelpMode === "advice"
+    );
+  })();
+
+  // Clear a stale unresolved topic when this turn is ordinary answer-first help
+  // so fail-safes cannot keep asking clarify questions from an old domain.
+  if (skipTopicForAnswerFirstGeneral && topic && isActiveTopicUnresolved(topic)) {
+    clearActiveTopic();
+    topic = null;
+  }
+
   // Domain question (alias hit or clear goal language) — identify topic, keep chat
   const preserveChatForDomainQuestion =
-    (!navigateGate.allow && navigateGate.reason === "domain_question_alias") ||
-    (!navigateGate.allow &&
-      navigateGate.reason !== "ambiguous_needs_clarify" &&
-      looksLikeDomainGoalQuestion(userText));
+    !skipTopicForAnswerFirstGeneral &&
+    ((!navigateGate.allow && navigateGate.reason === "domain_question_alias") ||
+      (!navigateGate.allow &&
+        navigateGate.reason !== "ambiguous_needs_clarify" &&
+        looksLikeDomainGoalQuestion(userText)));
 
   if (preserveChatForDomainQuestion) {
     const memberId = navigateGate.memberId;
@@ -298,7 +585,6 @@ export function processActiveTopicOnUserTurn(
       }) ?? topic;
   }
 
-  const activeMember = input.activeChamberMemberId ?? null;
   const skipRepeatChamberActivation = Boolean(
     activeMember &&
       navigateGate.allow &&

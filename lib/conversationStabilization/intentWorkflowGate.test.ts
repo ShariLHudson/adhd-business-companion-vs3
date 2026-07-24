@@ -175,6 +175,35 @@ describe("intent workflow — browse / apply / resume", () => {
   });
 });
 
+describe("intent workflow — answer-first strategy education", () => {
+  it("does not open Strategy Library for how-to strategic plan questions", () => {
+    const text = "How do I set up a strategic plan?";
+    expect(classifyRequestedArtifactType(text)).toBe("unknown");
+    expect(detectStrategyEntryMode(text)).toBeNull();
+
+    const result = processIntentWorkflowOnUserTurn({
+      userText: text,
+      turn: 1,
+      activeOwner: { kind: "general_chat" },
+    });
+    expect(result.strategyAction).toBeNull();
+    expect(result.blockCreateFastPath).toBe(false);
+  });
+
+  it("still opens strategy create for explicit build commands", () => {
+    const text = "Create a strategic plan for my business.";
+    expect(classifyRequestedArtifactType(text)).toBe("strategy");
+    expect(detectStrategyEntryMode(text)).toBe("create");
+    const result = processIntentWorkflowOnUserTurn({
+      userText: text,
+      turn: 1,
+      activeOwner: { kind: "general_chat" },
+    });
+    expect(result.strategyAction?.mode).toBe("create");
+    expect(result.strategyAction?.startBusinessBuilder).toBe(true);
+  });
+});
+
 describe("intent workflow — explicit document and topic change", () => {
   it("allows explicit letter/document creation", () => {
     const text = "create a letter to my client";
@@ -243,8 +272,9 @@ describe("Get Advice → Strategy Library navigation", () => {
       "boardroom",
       "strategy-library",
     ]);
-    expect(getAdvice?.destinations.map((d) => d.label)).toContain(
-      "Strategy Library",
+    // Label may be humanized; identity is the destination id.
+    expect(getAdvice?.destinations.some((d) => d.id === "strategy-library")).toBe(
+      true,
     );
   });
 });

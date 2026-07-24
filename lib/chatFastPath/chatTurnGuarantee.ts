@@ -17,6 +17,11 @@ import {
 import { resolveInformationalKnowledgeLocalReply } from "@/lib/sparkKnowledge/informationalKnowledge";
 import { conversationRecentlyShowedRecovery, messagesAlreadyHasRecoveryReply } from "./recoveryDedup";
 import { sanitizeBridgeFromReply } from "@/lib/sparkConversation/bridgeResponderGuard";
+import {
+  buildAnswerFirstFailSafeReply,
+  decideShariResponse,
+  isExplicitNavigationCommand,
+} from "@/lib/shariAnswerFirst";
 
 /** Hard ceiling — fallback if API/stream does not finish in time. */
 export const CHAT_COMPLETION_TIMEOUT_MS = 28_000;
@@ -29,11 +34,17 @@ const PLAN_DAY_INFORMATIONAL_RE =
 
 /**
  * Coaching / SOP / how-to questions — chat only; skip estate kernel and heavy routing.
+ * Answer-first decisions widen this beyond the legacy regex set.
  */
 export function isInformationalChatTurn(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
-  if (shouldRouteThroughEstateKernel(t)) return false;
+  if (isExplicitNavigationCommand(t)) return false;
+  if (shouldRouteThroughEstateKernel(t) && !decideShariResponse(t).directAnswerRequired) {
+    return false;
+  }
+  const answerFirst = decideShariResponse(t);
+  if (answerFirst.directAnswerRequired) return true;
   if (isEstateGuideQuestion(t)) return true;
   if (PLAN_DAY_INFORMATIONAL_RE.test(t)) return true;
   if (INFORMATIONAL_CHAT_RE.test(t)) return true;
@@ -59,6 +70,9 @@ export function buildFailSafeChatReply(
   }
   const knowledgeReply = resolveInformationalKnowledgeLocalReply(trimmed);
   if (knowledgeReply) return knowledgeReply;
+  // Answer-first: ordinary how-to / advice must not collapse to a clarify question.
+  const answerFirstFailSafe = buildAnswerFirstFailSafeReply(trimmed);
+  if (answerFirstFailSafe) return answerFirstFailSafe;
   const input: RuntimeRecoveryInput = {
     userText: trimmed,
     lastAssistantText: memory?.lastAssistantText,

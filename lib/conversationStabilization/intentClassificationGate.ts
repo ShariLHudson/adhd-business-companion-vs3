@@ -8,6 +8,10 @@ import {
   strategyDisambiguationMessage,
 } from "@/lib/strategyRouting";
 import {
+  isExplicitCreationCommand,
+  isQuestionAboutCreation,
+} from "@/lib/shariAnswerFirst";
+import {
   getIntentWorkflow,
   saveIntentWorkflow,
 } from "./intentWorkflowStore";
@@ -31,7 +35,7 @@ import type { UniversalCreationSession } from "@/lib/universalCreation/types";
 
 const STRATEGY_WORD_RE = /\bstrateg(?:y|ies|ic)\b/i;
 const CREATE_STRATEGY_RE =
-  /\b(?:create|build|write|develop|draft|make|need)\b[\s\S]{0,48}\bstrateg(?:y|ies)\b|\b(?:a|an|my|our|the|new)\s+(?:\w+\s+){0,4}strateg(?:y|ies)\b[\s\S]{0,48}\b(?:for|to|about|around|that)\b|\bi need (?:to )?(?:create|build|make)\b[\s\S]{0,40}\bstrateg/i;
+  /\b(?:create|build|write|develop|draft|make|need)\b[\s\S]{0,48}\bstrateg(?:y|ies|ic(?:\s+plan)?)\b|\b(?:a|an|my|our|the|new)\s+(?:\w+\s+){0,4}strateg(?:y|ies)\b[\s\S]{0,48}\b(?:for|to|about|around|that)\b|\bi need (?:to )?(?:create|build|make)\b[\s\S]{0,40}\bstrateg/i;
 const BROWSE_STRATEGY_RE =
   /\b(?:show me|browse|look at|see|open|list)\b[\s\S]{0,48}\bstrateg(?:y|ies)\b/i;
 const APPLY_STRATEGY_RE =
@@ -47,6 +51,28 @@ const REMINDER_RE =
 const PEOPLE_RE =
   /\b(?:my|our)\s+(va|virtual assistant|assistant|team|clients?|employees?)\b/i;
 
+/**
+ * How-to / education about strategy — answer in chat; do not open Strategy Library.
+ * Must NOT swallow create / browse / apply / resume strategy commands.
+ */
+function isStrategyEducationQuestion(userText: string): boolean {
+  const t = userText.trim();
+  if (!t || !STRATEGY_WORD_RE.test(t)) return false;
+  if (isExplicitCreationCommand(t)) return false;
+  if (isExplicitStrategyContinue(t)) return false;
+  if (CREATE_STRATEGY_RE.test(t) || /\bnew strategy\b/i.test(t)) return false;
+  if (BROWSE_STRATEGY_RE.test(t) || APPLY_STRATEGY_RE.test(t)) return false;
+  if (/\bi need (?:to )?(?:create|build|make)\b[\s\S]{0,40}\bstrateg/i.test(t)) {
+    return false;
+  }
+  if (isQuestionAboutCreation(t)) return true;
+  return (
+    /\b(?:how (?:do|can|would|should) i|how to|what (?:is|are|should|does|belongs|goes)|explain|teach me|walk me through)\b/i.test(
+      t,
+    ) && !/\b(?:create|build|draft|start|open|browse|apply|use)\s+(?:a |my |the )?(?:new )?strateg/i.test(t)
+  );
+}
+
 function newGoalIdSeed(turn: number): string {
   return `iw-${turn}-${Date.now().toString(36)}`;
 }
@@ -57,6 +83,8 @@ export function classifyRequestedArtifactType(
   const t = userText.trim();
   if (!t) return "unknown";
   if (REMINDER_RE.test(t)) return "reminder";
+  // Answer-first: "How do I set up a strategic plan?" is education, not Strategy Library.
+  if (isStrategyEducationQuestion(t)) return "unknown";
   if (STRATEGY_WORD_RE.test(t) && !EXPLICIT_LETTER_DOC_RE.test(t)) {
     return "strategy";
   }
@@ -77,6 +105,8 @@ export function detectStrategyEntryMode(
 ): StrategyEntryMode | null {
   const t = userText.trim();
   if (!STRATEGY_WORD_RE.test(t) && !isExplicitStrategyContinue(t)) return null;
+  // Answer-first: educational how-to about strategy stays in chat.
+  if (isStrategyEducationQuestion(t)) return null;
   if (isExplicitStrategyContinue(t)) return "resume";
   // Apply / browse win over create (e.g. "use a strategy for getting started").
   if (
@@ -487,7 +517,9 @@ export function processIntentWorkflowOnUserTurn(
 
   let strategyAction: StrategyTurnAction | null = null;
 
-  if (isStrategyTurn && state) {
+  // Answer-first: never claim the turn with a Strategy Library local reply for
+  // ordinary how-to / education questions about strategic plans.
+  if (isStrategyTurn && state && !isStrategyEducationQuestion(userText)) {
     if (classification.askUser || classification.status === "awaiting_user") {
       strategyAction = {
         mode: "create",

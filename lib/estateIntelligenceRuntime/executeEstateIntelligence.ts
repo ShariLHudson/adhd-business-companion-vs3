@@ -48,6 +48,7 @@ import {
   shouldBlockGenericFallback,
   topicPreservingFallbackLine,
 } from "@/lib/conversationStabilization/activeTopicGate";
+import { buildAnswerFirstFailSafeReply } from "@/lib/shariAnswerFirst";
 import {
   isConversationStabilizationEnabled,
   shouldBlockEstateSubsystem,
@@ -306,11 +307,27 @@ function executeFeature(
   }
 
   const match = matchFeatureHowToGuide(userText);
-  const localReply = match
-    ? formatFeatureHowToResponse(match.guide)
-    : shouldBlockGenericFallback()
-      ? topicPreservingFallbackLine()
+  if (!match) {
+    // Answer-first: general business/how-to questions are not Estate feature guides.
+    // Do not claim the turn with a settings/reminders clarification menu.
+    const answerFirst = buildAnswerFirstFailSafeReply(userText);
+    if (answerFirst) return null;
+    const localReply = shouldBlockGenericFallback()
+      ? topicPreservingFallbackLine(undefined, userText)
       : "Tell me what you're trying to do — settings, reminders, Clear My Mind, or something else — and I'll walk you through it.";
+    return {
+      capability: "feature",
+      knowledgeSource: "feature-how-to-guides",
+      category: "estate_concierge",
+      localReply,
+      responseHint: baseHint("feature", "feature-how-to-guides"),
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+    };
+  }
+
+  const localReply = formatFeatureHowToResponse(match.guide);
 
   const result: EstateIntelligenceRuntimeResult = {
     capability: "feature",

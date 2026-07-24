@@ -1,7 +1,9 @@
 # Creation Workspace Standard™
 
 **Runtime:** `lib/creationWorkspace/` · **UI:** `components/companion/creationWorkspace/CreationWorkspacePanel.tsx`  
-**Related:** [Universal Request-to-Outcome](../constitution/UNIVERSAL_REQUEST_TO_OUTCOME_INTELLIGENCE_STANDARD.md) · [Research Library](../research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md) · Create · Projects · Visual Thinking Studio · Strategic Planning · My Business Estate
+**Related:** [Universal Request-to-Outcome](../constitution/UNIVERSAL_REQUEST_TO_OUTCOME_INTELLIGENCE_STANDARD.md) · [Shari Answer-First General Help](../SHARI_ANSWER_FIRST_GENERAL_HELP_STANDARD.md) · [Research Library](../research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md) · Create · Projects · Visual Thinking Studio · Strategic Planning · My Business Estate
+
+**Answer-first:** Questions about creating (“How do I create…”, “What should a form include?”) receive a chat answer before Create opens. Explicit create commands still enter creation flows.
 
 ## Mission
 

@@ -108,14 +108,9 @@ export function resolveHelpDiscoveryQuery(
   if (route === "feature_how_to") {
     const match = matchFeatureHowToGuide(trimmed);
     if (!match) {
-      return {
-        kind: "resolved",
-        query: trimmed,
-        route,
-        memberFacingResponse:
-          "Tell me what you're trying to do — settings, reminders, Clear My Mind, or something else — and I'll walk you through it.",
-        reason: "how_to_clarification",
-      };
+      // Unresolved general how-to — leave to Shari answer-first chat, not a
+      // settings/reminders clarification that steals ordinary business questions.
+      return { ...unresolved, route, reason: "how_to_unresolved_general" };
     }
     return {
       kind: "resolved",

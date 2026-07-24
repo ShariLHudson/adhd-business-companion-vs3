@@ -1908,6 +1908,18 @@ import {
   type CompanionFirstTarget,
 } from "@/lib/companionFirstWorkflow";
 import {
+  buildAnswerFirstFailSafeReply,
+  buildShariConversationHandoff,
+  decideShariResponse,
+  evaluateAndRepairAnswerFirst,
+  shariAnswerFirstHintForChat,
+  shouldBlockImmediateExperienceOpen,
+  shouldSuppressRouteBeforeAnswer,
+  storeShariConversationHandoff,
+  trackShariAnswerFirstEvent,
+  type ShariResponseDecision,
+} from "@/lib/shariAnswerFirst";
+import {
   buildWorkspaceCoachAutoStart,
   isWorkspaceCoachSilent,
   workspaceCoachSeedKey,
@@ -13879,6 +13891,47 @@ export default function CompanionPageClient() {
   ): boolean {
     if (!frictionlessAction.localReply) return false;
 
+    const lastUserForAnswerFirst =
+      [...messagesRef.current].reverse().find((m) => m.role === "user")
+        ?.content ??
+      frictionlessAction.immediateEstatePlaceNavigate?.userText ??
+      inputRef.current?.value ??
+      "";
+    const answerFirstDecisionForFrictionless = lastUserForAnswerFirst.trim()
+      ? decideShariResponse(lastUserForAnswerFirst)
+      : null;
+    const blockImmediateForAnswerFirst = answerFirstDecisionForFrictionless
+      ? shouldBlockImmediateExperienceOpen(answerFirstDecisionForFrictionless)
+      : false;
+
+    // Answer-first: do not post a thin destination/offer reply when ordinary
+    // help should go to companion-chat for a substantive answer.
+    const estateFeatureClarifyOnly =
+      /\bsettings, reminders, Clear My Mind\b/i.test(
+        frictionlessAction.localReply ?? "",
+      ) ||
+      /\bhardest part of that for you right now\b/i.test(
+        frictionlessAction.localReply ?? "",
+      );
+    if (
+      blockImmediateForAnswerFirst &&
+      (frictionlessAction.immediateCreateOpen ||
+        frictionlessAction.immediateCreateProjectOpen ||
+        frictionlessAction.immediateResearchOpen ||
+        frictionlessAction.immediateEstateHowToGuideOpen ||
+        frictionlessAction.immediateVisualOpen ||
+        frictionlessAction.immediateCartographersStudioOpen ||
+        frictionlessAction.workspaceOffer ||
+        estateFeatureClarifyOnly ||
+        frictionlessAction.category === "estate_concierge")
+    ) {
+      trackShariAnswerFirstEvent("route_suppressed", {
+        category: frictionlessAction.category,
+        mode: answerFirstDecisionForFrictionless?.primaryHelpMode,
+      });
+      return false;
+    }
+
     annotateTurnDecision({
       finalResponseOwner: `frictionless:${frictionlessAction.category}`,
       routeSelected: frictionlessAction.category,
@@ -13927,7 +13980,11 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (!chamberMemberConversationLocked && frictionlessAction.immediateCreateOpen) {
+    if (
+      !chamberMemberConversationLocked &&
+      frictionlessAction.immediateCreateOpen &&
+      !blockImmediateForAnswerFirst
+    ) {
       completeImmediateCreateOpen(frictionlessAction.immediateCreateOpen);
       setInput("");
       finishEarlyChatTurn();
@@ -13935,7 +13992,11 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (!chamberMemberConversationLocked && frictionlessAction.immediateCreateProjectOpen) {
+    if (
+      !chamberMemberConversationLocked &&
+      frictionlessAction.immediateCreateProjectOpen &&
+      !blockImmediateForAnswerFirst
+    ) {
       completeImmediateCreateProjectOpen(
         frictionlessAction.immediateCreateProjectOpen,
       );
@@ -13953,7 +14014,11 @@ export default function CompanionPageClient() {
       return true;
     }
 
-    if (!chamberMemberConversationLocked && frictionlessAction.immediateResearchOpen) {
+    if (
+      !chamberMemberConversationLocked &&
+      frictionlessAction.immediateResearchOpen &&
+      !blockImmediateForAnswerFirst
+    ) {
       completeImmediateResearchOpen(frictionlessAction.immediateResearchOpen);
       setInput("");
       finishEarlyChatTurn();
@@ -13995,7 +14060,7 @@ export default function CompanionPageClient() {
 
     if (
       (!chamberMemberConversationLocked ||
-        isDirectNavigationPriorityTurn(trimmed)) &&
+        isDirectNavigationPriorityTurn(lastUserForAnswerFirst)) &&
       frictionlessAction.immediateEstatePlaceNavigate
     ) {
       const payload = frictionlessAction.immediateEstatePlaceNavigate;
@@ -14122,6 +14187,21 @@ export default function CompanionPageClient() {
     ).trim();
     // Never block send on isLoading — newer messages supersede in-flight AI.
     if (!trimmed) return;
+
+    // Answer-first: ordinary help stays in chat before destination routers.
+    const shariAnswerFirstDecision: ShariResponseDecision =
+      decideShariResponse(trimmed);
+    trackShariAnswerFirstEvent("decision", {
+      mode: shariAnswerFirstDecision.primaryHelpMode,
+      directAnswerRequired: shariAnswerFirstDecision.directAnswerRequired,
+      routingAllowed: shariAnswerFirstDecision.routingAllowed,
+    });
+    const answerFirstPreferChat =
+      preferChatAnswer ||
+      shouldSuppressRouteBeforeAnswer(shariAnswerFirstDecision);
+    const answerFirstBlockImmediateOpen = shouldBlockImmediateExperienceOpen(
+      shariAnswerFirstDecision,
+    );
 
     // Freeform input dismisses the guided daily opening (choices stay optional).
     if (globalDailyOpening) {
@@ -14280,7 +14360,9 @@ export default function CompanionPageClient() {
      * Continuity sticky UC and CREATE fast path. One Shari response owner.
      */
     const intentWf = intentWorkflowTurnRef.current;
-    if (intentWf?.strategyAction) {
+    // Answer-first: strategy education stays in chat (gate should already null
+    // strategyAction; this is a safety demotion for residual local replies).
+    if (intentWf?.strategyAction && !answerFirstPreferChat) {
       const action = intentWf.strategyAction;
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
@@ -16415,7 +16497,7 @@ export default function CompanionPageClient() {
     }
 
     const estateKernelForced =
-      !preferChatAnswer &&
+      !answerFirstPreferChat &&
       primaryTurnAllowsKernel(primaryTurnDecision) &&
       shouldRouteThroughEstateKernel(trimmed, {
         primaryTurn: primaryTurnDecision,
@@ -16430,7 +16512,7 @@ export default function CompanionPageClient() {
           currentPlaceId: currentEstateRoomId,
           activeSection: activeSectionRef.current,
           forceChat:
-            preferChatAnswer ||
+            answerFirstPreferChat ||
             ((informationalChatTurn ||
               taskLockBlocksEstateRouting ||
               isDirectHelpOverrideRequest(trimmed)) &&
@@ -16472,7 +16554,7 @@ export default function CompanionPageClient() {
         openUserMemoryCore(tab);
       },
       onNavigatePlace: ({ command, navigationLine }) => {
-        if (preferChatAnswer) {
+        if (answerFirstPreferChat) {
           return;
         }
         if (
@@ -19285,7 +19367,11 @@ export default function CompanionPageClient() {
       !turnArbitration?.blockAutoRouteAsset
     ) {
       const companionFirst = detectCompanionFirstTarget(trimmed);
-      if (companionFirst && workspacePanel !== companionFirst.section) {
+      if (
+        companionFirst &&
+        !answerFirstPreferChat &&
+        workspacePanel !== companionFirst.section
+      ) {
         companionFirstTargetRef.current = companionFirst;
         const offerLine = buildCompanionFirstOfferReply(companionFirst);
         setMessages((prev) => [
@@ -19301,12 +19387,19 @@ export default function CompanionPageClient() {
         finishEarlyChatTurn();
         return;
       }
+      if (companionFirst && answerFirstPreferChat) {
+        trackShariAnswerFirstEvent("route_suppressed", {
+          route: "companion_first",
+          section: companionFirst.section,
+          mode: shariAnswerFirstDecision.primaryHelpMode,
+        });
+      }
 
       const researchMatch = detectResearchWorkspaceConnection(
         trimmed,
         workspacePanel,
       );
-      if (researchMatch) {
+      if (researchMatch && !answerFirstPreferChat) {
         const offerLine = shouldOfferConversationPrefill(trimmed)
           ? researchMatch.prefillOfferLine
           : researchMatch.offerLine;
@@ -19327,9 +19420,17 @@ export default function CompanionPageClient() {
         finishEarlyChatTurn();
         return;
       }
+      if (researchMatch && answerFirstPreferChat) {
+        trackShariAnswerFirstEvent("route_suppressed", {
+          route: "research_workspace",
+          mode: shariAnswerFirstDecision.primaryHelpMode,
+        });
+      }
     }
 
+    // Answer-first: do not block how-to / ordinary help behind a business-profile gate.
     if (
+      !answerFirstPreferChat &&
       isBusinessAdviceRequest(trimmed) &&
       !businessConfidenceBypassRef.current &&
       !businessConfidenceOffer
@@ -19601,6 +19702,38 @@ export default function CompanionPageClient() {
       const chamberMemberChatHint = activeChamberMember
         ? chamberMemberHintForChat(activeChamberMember)
         : null;
+
+      // Answer-first: high-value how-to / troubleshooting gets a substantive
+      // chat answer immediately — do not wait on model profiling questions.
+      if (
+        answerFirstPreferChat &&
+        !chamberConversationActive &&
+        (shariAnswerFirstDecision.primaryHelpMode === "how_to_guidance" ||
+          shariAnswerFirstDecision.primaryHelpMode === "troubleshooting") &&
+        /\b(?:vendor|booth|facebook groups?|strateg(?:y|ic plan)|qr code)\b/i.test(
+          trimmed,
+        )
+      ) {
+        const localAnswer = buildAnswerFirstFailSafeReply(trimmed);
+        if (localAnswer) {
+          trackShariAnswerFirstEvent("answer_generated", {
+            mode: shariAnswerFirstDecision.primaryHelpMode,
+            source: "local_failsafe",
+          });
+          if (activeChatTurnLifecycleRef.current) {
+            markAssistantReplied(activeChatTurnLifecycleRef.current);
+          }
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: localAnswer },
+          ]);
+          recordPrimaryTurnResponse(localAnswer);
+          finishEarlyChatTurn();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
+      }
+
       const useChatStream = speedProfile.routeClass !== "instant";
       const res = await fetchCompanionChatWithTimeout(
         {
@@ -19998,6 +20131,7 @@ export default function CompanionPageClient() {
               createWorkspaceV2: createWorkspaceV2Active,
             }),
             companionFirstWorkflowHintForChat(trimmed, workspacePanel),
+            shariAnswerFirstHintForChat(shariAnswerFirstDecision),
             crossWorkspaceGuidanceHintForChat({
               sourceTitle: createBuilderSession?.typeLabel
                 ? createBuilderLabel(createBuilderSession.typeLabel)
@@ -20301,6 +20435,42 @@ export default function CompanionPageClient() {
           { role: "assistant", content: assistantMsg, relationshipTrace: uiTrace },
         ];
       });
+      if (shariAnswerFirstDecision.directAnswerRequired) {
+        const substance = evaluateAndRepairAnswerFirst({
+          decision: shariAnswerFirstDecision,
+          answer: assistantMsg,
+          priorContext: lastAssistantText,
+        });
+        trackShariAnswerFirstEvent("substance_validation", {
+          mode: shariAnswerFirstDecision.primaryHelpMode,
+          valid: substance.validation.valid,
+          failureCount: substance.validation.failures.length,
+        });
+        if (substance.needsRepair) {
+          const repaired = buildAnswerFirstFailSafeReply(trimmed);
+          if (repaired) {
+            assistantMsg = repaired;
+            trackShariAnswerFirstEvent("automatic_repair", {
+              mode: shariAnswerFirstDecision.primaryHelpMode,
+              failureCount: substance.validation.failures.length,
+            });
+            setMessages((prev) => {
+              const copy = [...prev];
+              for (let i = copy.length - 1; i >= 0; i--) {
+                if (copy[i]?.role === "assistant") {
+                  copy[i] = {
+                    ...copy[i],
+                    role: "assistant",
+                    content: repaired,
+                  };
+                  break;
+                }
+              }
+              return copy;
+            });
+          }
+        }
+      }
       if (
         shouldUseCreateBuilderChatTurns() &&
         workspacePanelRef.current === "content-generator" &&
@@ -21322,6 +21492,44 @@ export default function CompanionPageClient() {
     const pendingTransition = loadEstatePendingTransition();
     const pendingIntent = pendingTransition?.originalUserIntent;
     const estateAck = estateTransitionAckForSection(offer.section, pendingIntent);
+    // Answer-first handoff: pass the last substantive answer, not only the ask.
+    try {
+      const lastAssistant = [...messagesRef.current]
+        .reverse()
+        .find((m) => m.role === "assistant")?.content;
+      const seedAsk =
+        pendingIntent || lastUserTextRef.current || offer.line || "";
+      if (lastAssistant && seedAsk.trim().length > 8) {
+        const dest =
+          offer.section === "content-generator" || offer.section === "create"
+            ? ("create" as const)
+            : offer.section === "projects" ||
+                offer.section === "project-homes"
+              ? ("projects" as const)
+              : offer.section === "research" ||
+                  offer.section === "research-library"
+                ? ("research_library" as const)
+                : offer.section === "visual-thinking"
+                  ? ("visual_thinking" as const)
+                  : offer.section === "strategy" ||
+                      offer.section === "strategy-library"
+                    ? ("strategic_planning" as const)
+                    : ("create" as const);
+        storeShariConversationHandoff(
+          buildShariConversationHandoff({
+            decision: decideShariResponse(seedAsk),
+            answerContent: lastAssistant,
+            destination: dest,
+          }),
+        );
+        trackShariAnswerFirstEvent("handoff_created", {
+          destination: dest,
+          section: offer.section,
+        });
+      }
+    } catch {
+      /* ignore handoff failures */
+    }
     captureOfferAccepted(offer, closedLoopCtx());
     clearOfferStateOnly();
     const directVisitAtOffer = directEstateVisitRef.current;
