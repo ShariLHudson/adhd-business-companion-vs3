@@ -8,6 +8,7 @@ import { MapGuidedBuilder } from "@/components/companion/cartographersStudio/Map
 import { MapResearchEntry } from "@/components/companion/cartographersStudio/MapResearchEntry";
 import { MyMapsPanel } from "@/components/companion/cartographersStudio/MyMapsPanel";
 import { MindMapDiscoveryInterview } from "@/components/companion/cartographersStudio/MindMapDiscoveryInterview";
+import { VisualThinkingRequestPanel } from "@/components/companion/cartographersStudio/VisualThinkingRequestPanel";
 import { MindMapEditableCanvas } from "@/components/companion/cartographersStudio/MindMapEditableCanvas";
 import { VisualFocusVisualCanvas } from "@/components/companion/visualFocus/VisualFocusVisualCanvas";
 import {
@@ -38,6 +39,7 @@ import {
   getCartographyMapDefinition,
   type CartographersFramedMapId,
 } from "@/lib/cartographersStudio";
+import { shouldShowRequestFirstExperience } from "@/lib/cartographersStudio/visualThinkingRequest";
 import { CartographersContextualHelp } from "@/components/companion/cartographersStudio/CartographersContextualHelp";
 import { buildDraftFromGuidedAnswers } from "@/lib/visualFocus/guidedBuilder";
 import {
@@ -902,6 +904,20 @@ export function VisualFocusWorkspacePanel({
             onBack={onBack}
             onClose={onClose}
           />
+          {shouldShowRequestFirstExperience({
+            hasActiveMap: Boolean(active),
+            hasPendingMapOverlay: Boolean(
+              entryMapId ||
+                guidedMapId ||
+                researchMapId ||
+                myMapsOpen ||
+                mindMapDiscoveryOpen,
+            ),
+          }) ? (
+            <VisualThinkingRequestPanel
+              onOpenPreviousWork={() => setMyMapsOpen(true)}
+            />
+          ) : null}
           {entryMapId ? (
             <MapEntryPanel
               definition={getCartographyMapDefinition(entryMapId)}

@@ -5,7 +5,7 @@
 
 import { CARTOGRAPHERS_FRAMED_MAPS } from "./framedMaps";
 
-export const CARTOGRAPHERS_WELCOME_TITLE = "Cartographer's Studio" as const;
+export const CARTOGRAPHERS_WELCOME_TITLE = "Visual Thinking Studio" as const;
 
 export const CARTOGRAPHERS_WELCOME_SUBTITLE =
   "Every map tells a story. Every story reveals a path." as const;
