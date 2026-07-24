@@ -35,16 +35,21 @@ Request
 → Understanding
 → Experience
 → Knowledge
-→ Generation
+→ Automatic Gap Resolution
+→ Generation + Result Substance Validation
 → Presentation
+→ VisualThinkingWorkspacePlan
 → Thinking Workspace   ← primary presentation surface (Build 7)
 ```
+
+Depends on: [Experience Standard](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md) · [Generate-First](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md) · [Presentation Intelligence](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md)
 
 The workspace **consumes**:
 
 - `VisualThinkingPresentationPlan`  
 - `VisualThinkingKnowledgePackage`  
-- `VisualThinkingGeneratedDeliverables` (via generation bundle)
+- `VisualThinkingGeneratedDeliverables` (via generation bundle)  
+- `VisualThinkingWorkspacePlan` (entry contract)
 
 The workspace **does not**:
 
@@ -56,6 +61,22 @@ The workspace **does not**:
 - modify Experience Plans  
 
 It presents existing information interactively and allows **organization-only** changes.
+
+---
+
+## Substantive-result guard (non-negotiable)
+
+Before opening a `build_for_me` workspace, `assessWorkspaceEntryEligibility` requires:
+
+- substance validation passed  
+- meaningful instructional content (not request-echo)  
+- an approved Presentation Plan  
+- honest incomplete-area notices when partial  
+
+`createThinkingWorkspace` returns `null` when the guard rejects.  
+User-led (`let_me_build` / `build_myself`) is exempt and opens a calm starter surface.
+
+Partial useful results may open with `status: "partial"` and localized `completenessNotice` — never a blank impressive canvas.
 
 ---
 
@@ -256,10 +277,21 @@ Never moves user content without permission.
 
 ---
 
+## Workspace Plan model
+
+`VisualThinkingWorkspacePlan` records mode, presentations, incomplete state, density, and organization editability before the interactive state is created.
+
+Modes: `reading` · `visual` · `split` · `user_led` · `comparison` · `process` · `training` · `execution`
+
+## Ask Shari context
+
+`AskShariWorkspaceContext` scopes to selected objects/groups, visible ids, incomplete areas, and a user question. Shari proposes — she does not auto-modify the workspace.
+
 ## Future compatibility
 
-**Build 8 (done):** [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md)  
-**Build 9 (done):** [Research Acquisition](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — may notify the workspace; never auto-replaces organization.
+**Build 8 recommendation:** Validate this foundation in authenticated Studio (Loom guide + partial SOP + user-led), then deepen only the [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md) behaviors that remain thin — never before substantive entry is proven.
+
+**Build 9 (exists):** [Research Acquisition](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — may notify the workspace; never auto-replaces organization.
 
 Still later:
 

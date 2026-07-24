@@ -107,6 +107,10 @@ F. Legal termination policy — safe framework + clarification; never fabricate 
 
 Full visual canvas · intelligent layout redesign · unsupported crawling · fake citations · fabricated current product details · new approval screens · Build 7+ redesigns
 
+## Workspace handoff
+
+Only substantive generated results enter a `build_for_me` Thinking Workspace. Partial useful results may enter with honest localized notices. See [Workspace Foundation](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md).
+
 ## Runtime
 
 `lib/cartographersStudio/visualThinkingGenerateFirst.ts`  

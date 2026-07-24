@@ -108,6 +108,8 @@ Generation must fill only safe sections and keep placeholders for blocked areas.
 
 Handoff enrichment (6.6) may add stable instructional substance for clear how-to requests so Generation never receives only the raw request. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
 
+Thinking Workspace organization never mutates the Knowledge Package — only references items and relationships.
+
 ---
 
 ## Creation modes

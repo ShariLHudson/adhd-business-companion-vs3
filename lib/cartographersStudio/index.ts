@@ -291,6 +291,8 @@ export {
 
 export {
   createThinkingWorkspace,
+  planVisualThinkingWorkspace,
+  assessWorkspaceEntryEligibility,
   applyWorkspaceAction,
   buildAskShariContext,
   projectVisibleWorkspaceObjects,
@@ -308,6 +310,9 @@ export {
   type ThinkingGroup,
   type ThinkingConnector,
   type ThinkingWorkspaceState,
+  type VisualThinkingWorkspacePlan,
+  type VisualThinkingWorkspaceEntryAssessment,
+  type VisualThinkingWorkspaceMode,
   type WorkspaceAction,
   type WorkspaceLayoutIntent,
   type WorkspaceViewport,

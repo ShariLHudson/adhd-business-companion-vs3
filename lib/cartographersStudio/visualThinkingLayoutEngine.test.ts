@@ -113,13 +113,17 @@ function workspaceFromSteps(raw: string): ThinkingWorkspaceState {
     knowledgePackage: knowledge.package,
     generationBundle,
   });
-  return createThinkingWorkspace({
+  const ws = createThinkingWorkspace({
     understanding,
     experiencePlan: plan,
     knowledgePackage: knowledge.package,
     generationBundle,
     presentationPlan,
   });
+  if (!ws) {
+    throw new Error("Expected substantive workspace for layout tests");
+  }
+  return ws;
 }
 
 describe("Visual Thinking Layout Engine", () => {

@@ -173,6 +173,8 @@ Optional. Wide screens may use side-by-side; under 768px switch between views. R
 
 Generate-first (6.6): never present an empty or request-echo deliverable as complete. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
 
+Workspace Foundation (Build 7): only approved presentations with substantive primary content may open a `build_for_me` Thinking Workspace.
+
 ---
 
 ## Editing separation

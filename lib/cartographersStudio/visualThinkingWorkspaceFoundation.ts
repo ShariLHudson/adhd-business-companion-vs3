@@ -3,6 +3,7 @@
  * Interactive thinking surface over approved presentation, knowledge, and deliverables.
  * Does not reinterpret goals, regenerate knowledge, research, or change deliverables.
  * Conforms to VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md
+ * and VISUAL_THINKING_GENERATE_FIRST_STANDARD.md (substantive entry only).
  */
 
 import type { VisualThinkingExperiencePlan } from "@/lib/cartographersStudio/visualThinkingExperienceOrchestrator";
@@ -24,6 +25,9 @@ import {
   limitVisibleChoices,
   resolveAdaptivePresentation,
 } from "@/lib/adaptiveCompanionIntelligence";
+import {
+  assessGeneratedResultSubstance,
+} from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 import {
   applyLayoutPositions,
   applyVisualRoles,
@@ -134,8 +138,85 @@ export type WorkspaceSelection = {
   primaryObjectId: string | null;
 };
 
+// ─── Workspace Plan (canonical entry contract) ──────────────────────────────
+
+export type VisualThinkingWorkspaceMode =
+  | "reading"
+  | "visual"
+  | "split"
+  | "user_led"
+  | "comparison"
+  | "process"
+  | "training"
+  | "execution";
+
+export type VisualThinkingWorkspacePlanStatus =
+  | "draft"
+  | "ready"
+  | "active"
+  | "user_adjusted"
+  | "partial"
+  | "failed"
+  | "archived";
+
+export type VisualThinkingWorkspacePlan = {
+  id: string;
+  requestId: string;
+  understandingId: string;
+  experiencePlanId: string;
+  knowledgePackageId: string | null;
+  generationRunId: string;
+  presentationPlanId: string;
+  primaryDeliverableId: string;
+  supportingDeliverableIds: string[];
+  workspaceMode: VisualThinkingWorkspaceMode;
+  initialPresentation: string;
+  activePresentation: string;
+  objectIds: string[];
+  groupIds: string[];
+  relationshipIds: string[];
+  initialViewport: WorkspaceViewport;
+  initialSelectionId: string | null;
+  informationDensity: string;
+  progressiveDisclosure: string;
+  incompleteState: boolean;
+  completenessNotice: string | null;
+  incompleteAreas: string[];
+  userLed: boolean;
+  editable: boolean;
+  organizationEditable: boolean;
+  status: VisualThinkingWorkspacePlanStatus;
+  createdAt: string;
+  updatedAt: string;
+  plannedBy: "deterministic_v1";
+  planningVersion: "vts-workspace-plan-1";
+};
+
+export type VisualThinkingWorkspaceEntryAssessment = {
+  allowed: boolean;
+  reason: string;
+  userLedExempt: boolean;
+  substantive: boolean;
+  substanceFailureReasons: string[];
+  incompleteAreas: string[];
+  completenessNotice: string | null;
+  status: VisualThinkingWorkspacePlanStatus;
+};
+
 export type AskShariWorkspaceContext = {
+  workspacePlanId: string;
   workspaceId: string;
+  requestSummary: string;
+  primaryGoal: string;
+  activePresentation: string;
+  selectedObjectIds: string[];
+  selectedGroupIds: string[];
+  visibleObjectIds: string[];
+  focusedObjectId: string | null;
+  relevantKnowledgeItemIds: string[];
+  relevantContentBlockIds: string[];
+  incompleteAreas: string[];
+  userQuestion: string | null;
   selectedObjectId: string | null;
   selectedTitle: string | null;
   selectedSummary: string | null;
@@ -154,6 +235,8 @@ export type ThinkingWorkspaceState = {
   generationRunId: string;
   presentationPlanId: string;
   primaryDeliverableId: string;
+  workspacePlanId: string;
+  workspaceMode: VisualThinkingWorkspaceMode;
   layoutIntent: WorkspaceLayoutIntent;
   objects: ThinkingObject[];
   groups: ThinkingGroup[];
@@ -164,6 +247,10 @@ export type ThinkingWorkspaceState = {
   focusedObjectId: string | null;
   searchQuery: string;
   searchMatchIds: string[];
+  incompleteState: boolean;
+  completenessNotice: string | null;
+  incompleteAreas: string[];
+  status: VisualThinkingWorkspacePlanStatus;
   /** Suggested layout improvements — never auto-applied. */
   layoutSuggestions: LayoutSuggestion[];
   /** Pending Auto Organize arrangement awaiting accept/reject. */
@@ -406,23 +493,266 @@ export function workspacePreservesKnowledgeImmutability(
   return JSON.stringify(beforeGen) === JSON.stringify(afterGen);
 }
 
+function resolvePrimaryDeliverable(
+  input: ThinkingWorkspaceInput,
+): VisualThinkingGeneratedDeliverable | null {
+  const { presentationPlan, generationBundle } = input;
+  return (
+    generationBundle.deliverables.find(
+      (d) => d.id === presentationPlan.primaryDeliverableId,
+    ) ??
+    generationBundle.deliverables.find((d) => d.role === "primary") ??
+    generationBundle.deliverables[0] ??
+    null
+  );
+}
+
+function collectIncompleteAreas(
+  input: ThinkingWorkspaceInput,
+  primary: VisualThinkingGeneratedDeliverable | null,
+): { areas: string[]; notice: string | null } {
+  const areas: string[] = [];
+  const pkg = input.knowledgePackage;
+  if (pkg) {
+    for (const gap of pkg.knowledgeGaps.filter((g) => g.status === "open")) {
+      areas.push(gap.focusedQuestion || gap.description || gap.area);
+    }
+  }
+  if (primary) {
+    for (const b of primary.blocks) {
+      if (
+        b.type === "placeholder" ||
+        b.metadata?.researchDependent === true ||
+        b.metadata?.freshnessSensitive === true
+      ) {
+        const label = b.title || b.content.slice(0, 80);
+        if (label && !areas.includes(label)) areas.push(label);
+      }
+    }
+  }
+  if (input.generationBundle.run.status === "awaiting_research") {
+    areas.push("Current product details awaiting verification");
+  }
+  if (input.generationBundle.run.status === "partial") {
+    areas.push("Some supporting pieces are still incomplete");
+  }
+  const notice =
+    areas.length === 0
+      ? null
+      : areas.length === 1
+        ? areas[0]!
+        : `A few areas still need attention — including ${areas[0]}.`;
+  return { areas, notice };
+}
+
+function resolveWorkspaceMode(
+  input: ThinkingWorkspaceInput,
+  userLed: boolean,
+): VisualThinkingWorkspaceMode {
+  if (userLed) return "user_led";
+  const active = input.presentationPlan.activePresentation;
+  if (active === "comparison_view") return "comparison";
+  if (
+    active === "process_flow" ||
+    active === "step_by_step" ||
+    active === "sop" ||
+    active === "checklist"
+  ) {
+    return "process";
+  }
+  if (active === "training_guide") return "training";
+  if (
+    active === "relationship_view" ||
+    active === "mind_map" ||
+    active === "grouped_ideas"
+  ) {
+    return "visual";
+  }
+  if (input.presentationPlan.splitViewEligible) return "split";
+  return "reading";
+}
+
+/**
+ * Substantive-result guard — build_for_me must not open on echo/empty results.
+ * User-led workspaces are exempt.
+ */
+export function assessWorkspaceEntryEligibility(
+  input: ThinkingWorkspaceInput,
+): VisualThinkingWorkspaceEntryAssessment {
+  const userLed =
+    input.experiencePlan.interactionStyle === "let_me_build" ||
+    input.understanding.creationMode === "build_myself" ||
+    input.presentationPlan.activePresentation === "user_led_canvas";
+
+  const primary = resolvePrimaryDeliverable(input);
+  const { areas, notice } = collectIncompleteAreas(input, primary);
+
+  if (userLed) {
+    return {
+      allowed: true,
+      reason: "User-led workspace does not require completed generation.",
+      userLedExempt: true,
+      substantive: true,
+      substanceFailureReasons: [],
+      incompleteAreas: areas,
+      completenessNotice: notice,
+      status: "ready",
+    };
+  }
+
+  if (!primary) {
+    return {
+      allowed: false,
+      reason: "No primary deliverable is available for the workspace.",
+      userLedExempt: false,
+      substantive: false,
+      substanceFailureReasons: ["missing_primary_deliverable"],
+      incompleteAreas: areas,
+      completenessNotice: notice,
+      status: "failed",
+    };
+  }
+
+  if (!input.presentationPlan?.id) {
+    return {
+      allowed: false,
+      reason: "Presentation Plan is required before opening the workspace.",
+      userLedExempt: false,
+      substantive: false,
+      substanceFailureReasons: ["missing_presentation_plan"],
+      incompleteAreas: areas,
+      completenessNotice: notice,
+      status: "failed",
+    };
+  }
+
+  const substance = assessGeneratedResultSubstance({
+    deliverable: primary,
+    rawRequest: input.understanding.rawRequest || input.understanding.userFacingGoal,
+  });
+
+  const instructionalSteps = primary.blocks.filter(
+    (b) =>
+      (b.type === "numbered_step" || b.type === "checklist_item") &&
+      b.content.trim().length >= 1 &&
+      !/^complete step \d+ for /i.test(b.content),
+  );
+  const meaningfulBlocks = primary.blocks.filter((b) => {
+    const c = b.content.trim();
+    if (!c) return false;
+    if (b.type === "placeholder" && !b.metadata?.safeGeneric) return false;
+    if (b.type === "numbered_step" || b.type === "checklist_item") return true;
+    return c.split(/\s+/).length >= 4;
+  });
+
+  if (
+    !substance.substantive ||
+    (meaningfulBlocks.length < 3 && instructionalSteps.length < 3)
+  ) {
+    return {
+      allowed: false,
+      reason:
+        substance.failureReasons[0] ||
+        "Result is not substantive enough to open a Thinking Workspace.",
+      userLedExempt: false,
+      substantive: false,
+      substanceFailureReasons:
+        substance.failureReasons.length > 0
+          ? substance.failureReasons
+          : ["insufficient_meaningful_blocks"],
+      incompleteAreas: areas,
+      completenessNotice: notice,
+      status: "failed",
+    };
+  }
+
+  const incomplete = areas.length > 0 || input.generationBundle.run.status === "partial" ||
+    input.generationBundle.run.status === "awaiting_research";
+
+  return {
+    allowed: true,
+    reason: incomplete
+      ? "Useful content is ready; incomplete areas remain localized."
+      : "Substantive result approved for workspace entry.",
+    userLedExempt: false,
+    substantive: true,
+    substanceFailureReasons: [],
+    incompleteAreas: areas,
+    completenessNotice: notice,
+    status: incomplete ? "partial" : "ready",
+  };
+}
+
+export function planVisualThinkingWorkspace(
+  input: ThinkingWorkspaceInput,
+): VisualThinkingWorkspacePlan | null {
+  const assessment = assessWorkspaceEntryEligibility(input);
+  if (!assessment.allowed) return null;
+
+  const primary = resolvePrimaryDeliverable(input);
+  const userLed = assessment.userLedExempt;
+  const supporting = input.generationBundle.deliverables
+    .filter((d) => d.role === "supporting")
+    .map((d) => d.id);
+  const mode = resolveWorkspaceMode(input, userLed);
+  const timestamp = nowIso();
+
+  return {
+    id: newId("wtp"),
+    requestId: input.understanding.requestId,
+    understandingId: input.understanding.id,
+    experiencePlanId: input.experiencePlan.id,
+    knowledgePackageId: input.knowledgePackage?.id ?? null,
+    generationRunId: input.generationBundle.run.id,
+    presentationPlanId: input.presentationPlan.id,
+    primaryDeliverableId: primary?.id ?? "",
+    supportingDeliverableIds: supporting,
+    workspaceMode: mode,
+    initialPresentation: input.presentationPlan.activePresentation,
+    activePresentation: input.presentationPlan.activePresentation,
+    objectIds: [],
+    groupIds: [],
+    relationshipIds: [],
+    initialViewport: { panX: 0, panY: 0, zoom: 1 },
+    initialSelectionId: null,
+    informationDensity: String(input.presentationPlan.informationDensity),
+    progressiveDisclosure: String(input.presentationPlan.progressiveDisclosure),
+    incompleteState: assessment.status === "partial",
+    completenessNotice: assessment.completenessNotice,
+    incompleteAreas: assessment.incompleteAreas,
+    userLed,
+    editable: true,
+    organizationEditable: true,
+    status: assessment.status,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+    plannedBy: "deterministic_v1",
+    planningVersion: "vts-workspace-plan-1",
+  };
+}
+
 export function buildAskShariContext(
   state: ThinkingWorkspaceState,
+  userQuestion: string | null = null,
 ): AskShariWorkspaceContext {
   const selected = state.objects.find(
     (o) => o.id === state.selection.primaryObjectId,
   );
   const prompts = [
     "Explain this.",
-    "Simplify this.",
+    "Make this easier to understand.",
+    "Give me an example.",
     "What am I missing?",
-    "Find missing steps.",
+    "Find a possible gap.",
+    "Help me organize this.",
+    "What should I look at next?",
   ];
   if (selected?.type === "step" || selected?.type === "process") {
-    prompts.unshift("Expand this step.");
+    prompts.unshift("Explain this step.");
   }
   if (state.selection.primaryObjectId) {
-    prompts.push("Compare related ideas.");
+    prompts.push("Compare these.");
+    prompts.push("Turn this into an action.");
   }
   const adaptive = resolveAdaptivePresentation({
     destinationHint: "visual_thinking_studio",
@@ -432,8 +762,34 @@ export function buildAskShariContext(
     adaptive,
   ).visible.map((p) => p.label);
 
+  const visibleObjectIds = state.objects
+    .filter((o) => {
+      if (o.type === "group") return true;
+      if (!o.groupId) return true;
+      const g = state.groups.find((x) => x.id === o.groupId);
+      return !g?.collapsed;
+    })
+    .map((o) => o.id);
+  const selectedGroupIds = selected?.groupId ? [selected.groupId] : [];
+
   return {
+    workspacePlanId: state.workspacePlanId,
     workspaceId: state.id,
+    requestSummary: selected?.summary?.slice(0, 120) ?? "",
+    primaryGoal: selected?.title ?? "",
+    activePresentation: state.workspaceMode,
+    selectedObjectIds: selected ? [selected.id] : [],
+    selectedGroupIds,
+    visibleObjectIds,
+    focusedObjectId: state.focusedObjectId,
+    relevantKnowledgeItemIds: selected?.sourceKnowledgeItemId
+      ? [selected.sourceKnowledgeItemId]
+      : [],
+    relevantContentBlockIds: selected?.sourceBlockId
+      ? [selected.sourceBlockId]
+      : [],
+    incompleteAreas: state.incompleteAreas,
+    userQuestion,
     selectedObjectId: selected?.id ?? null,
     selectedTitle: selected?.title ?? null,
     selectedSummary: selected?.summary ?? null,
@@ -444,17 +800,22 @@ export function buildAskShariContext(
   };
 }
 
+/**
+ * Create the interactive workspace from approved upstream results.
+ * Returns null when the substantive-result guard rejects build_for_me entry.
+ */
 export function createThinkingWorkspace(
   input: ThinkingWorkspaceInput,
-): ThinkingWorkspaceState {
+): ThinkingWorkspaceState | null {
+  const assessment = assessWorkspaceEntryEligibility(input);
+  if (!assessment.allowed) return null;
+
+  const workspacePlan = planVisualThinkingWorkspace(input);
+  if (!workspacePlan) return null;
+
   const { presentationPlan, generationBundle, knowledgePackage, understanding } =
     input;
-  const primary =
-    generationBundle.deliverables.find(
-      (d) => d.id === presentationPlan.primaryDeliverableId,
-    ) ??
-    generationBundle.deliverables.find((d) => d.role === "primary") ??
-    generationBundle.deliverables[0];
+  const primary = resolvePrimaryDeliverable(input);
 
   const layoutIntent = layoutIntentFromPresentation(presentationPlan);
   const adaptive = resolveAdaptivePresentation({
@@ -697,7 +1058,32 @@ export function createThinkingWorkspace(
   }
 
   void blockIdToObject;
-  void understanding;
+
+  // User-led starter: ensure Add Idea surface has orientation objects even when empty.
+  if (assessment.userLedExempt && objects.length === 0) {
+    objects.push({
+      id: newId("wto"),
+      type: "title",
+      title: understanding.userFacingGoal || "Your visual space",
+      summary: "Add ideas in your own words. Ask Shari whenever you want a thought partner.",
+      sourceKind: "user_note",
+      sourceBlockId: null,
+      sourceKnowledgeItemId: null,
+      deliverableId: primary?.id ?? null,
+      groupId: null,
+      x: 120,
+      y: 80,
+      width: OBJECT_W + 40,
+      height: OBJECT_H,
+      collapsed: false,
+      userCreated: true,
+      immutable: false,
+      pinned: true,
+      manuallyMoved: false,
+      visualRole: "central",
+      metadata: { starter: true },
+    });
+  }
 
   // Refine placement once semantic connectors are known (centrality / sequence).
   const refined = computeLayout({
@@ -722,6 +1108,13 @@ export function createThinkingWorkspace(
   viewport.zoom = clampZoom(viewport.zoom * initialZoom);
 
   const suggestions = refined.suggestions;
+  const timestamp = nowIso();
+
+  workspacePlan.objectIds = objects.map((o) => o.id);
+  workspacePlan.groupIds = groups.map((g) => g.id);
+  workspacePlan.relationshipIds = connectors.map((c) => c.id);
+  workspacePlan.initialViewport = { ...viewport };
+  workspacePlan.updatedAt = timestamp;
 
   return {
     id: newId("wts"),
@@ -732,6 +1125,8 @@ export function createThinkingWorkspace(
     generationRunId: generationBundle.run.id,
     presentationPlanId: presentationPlan.id,
     primaryDeliverableId: primary?.id ?? "",
+    workspacePlanId: workspacePlan.id,
+    workspaceMode: workspacePlan.workspaceMode,
     layoutIntent,
     objects,
     groups,
@@ -742,13 +1137,17 @@ export function createThinkingWorkspace(
     focusedObjectId: null,
     searchQuery: "",
     searchMatchIds: [],
+    incompleteState: workspacePlan.incompleteState,
+    completenessNotice: workspacePlan.completenessNotice,
+    incompleteAreas: workspacePlan.incompleteAreas,
+    status: workspacePlan.status,
     layoutSuggestions: suggestions,
     pendingLayoutProposal: null,
     layoutProfile: "desktop",
     undoStack: [],
     redoStack: [],
-    createdAt: nowIso(),
-    updatedAt: nowIso(),
+    createdAt: timestamp,
+    updatedAt: timestamp,
     version: "vts-thinking-workspace-1",
   };
 }
@@ -1288,6 +1687,12 @@ function normalizeLoadedWorkspace(
 ): ThinkingWorkspaceState {
   return {
     ...state,
+    workspacePlanId: state.workspacePlanId ?? state.id,
+    workspaceMode: state.workspaceMode ?? "reading",
+    incompleteState: Boolean(state.incompleteState),
+    completenessNotice: state.completenessNotice ?? null,
+    incompleteAreas: state.incompleteAreas ?? [],
+    status: state.status ?? "ready",
     layoutSuggestions: state.layoutSuggestions ?? [],
     pendingLayoutProposal: state.pendingLayoutProposal ?? null,
     layoutProfile: state.layoutProfile ?? "desktop",

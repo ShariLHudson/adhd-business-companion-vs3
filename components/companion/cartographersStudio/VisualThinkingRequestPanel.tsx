@@ -234,15 +234,14 @@ export function VisualThinkingRequestPanel({
     ) {
       return;
     }
-    setThinkingWorkspace(
-      createThinkingWorkspace({
-        understanding,
-        experiencePlan,
-        knowledgePackage: knowledgeBundle?.package ?? null,
-        generationBundle,
-        presentationPlan,
-      }),
-    );
+    const restored = createThinkingWorkspace({
+      understanding,
+      experiencePlan,
+      knowledgePackage: knowledgeBundle?.package ?? null,
+      generationBundle,
+      presentationPlan,
+    });
+    if (restored) setThinkingWorkspace(restored);
   }, [
     thinkingWorkspace,
     generationBundle,
@@ -452,15 +451,14 @@ export function VisualThinkingRequestPanel({
       generationBundle: bundle,
     });
     setPresentationPlan(nextPresentation);
-    setThinkingWorkspace(
-      createThinkingWorkspace({
-        understanding: understood,
-        experiencePlan: confirmedPlan,
-        knowledgePackage: knowledge.package,
-        generationBundle: bundle,
-        presentationPlan: nextPresentation,
-      }),
-    );
+    const autoWorkspace = createThinkingWorkspace({
+      understanding: understood,
+      experiencePlan: confirmedPlan,
+      knowledgePackage: knowledge.package,
+      generationBundle: bundle,
+      presentationPlan: nextPresentation,
+    });
+    if (autoWorkspace) setThinkingWorkspace(autoWorkspace);
   }
 
   function handleContinue() {
@@ -670,7 +668,7 @@ export function VisualThinkingRequestPanel({
       generationBundle: bundle,
       presentationPlan: nextPresentation,
     });
-    setThinkingWorkspace(workspace);
+    if (workspace) setThinkingWorkspace(workspace);
     setShowThisDifferently(false);
     setShowAllAlternates(false);
     setShowWrittenReview(false);
@@ -1529,15 +1527,14 @@ export function VisualThinkingRequestPanel({
                             signals,
                           );
                           setPresentationPlan(nextPlan);
-                          setThinkingWorkspace(
-                            createThinkingWorkspace({
-                              understanding,
-                              experiencePlan,
-                              knowledgePackage: knowledgeBundle?.package ?? null,
-                              generationBundle,
-                              presentationPlan: nextPlan,
-                            }),
-                          );
+                          const switched = createThinkingWorkspace({
+                            understanding,
+                            experiencePlan,
+                            knowledgePackage: knowledgeBundle?.package ?? null,
+                            generationBundle,
+                            presentationPlan: nextPlan,
+                          });
+                          if (switched) setThinkingWorkspace(switched);
                           setShowThisDifferently(false);
                           setShowWrittenReview(false);
                         }}

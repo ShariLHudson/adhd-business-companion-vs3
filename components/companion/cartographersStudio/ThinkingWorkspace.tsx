@@ -233,7 +233,10 @@ export function ThinkingWorkspace({
       className="vts-workspace"
       data-testid="thinking-workspace"
       data-layout={workspace.layoutIntent}
+      data-workspace-mode={workspace.workspaceMode}
+      data-workspace-status={workspace.status}
       data-focus={workspace.focusMode ? "true" : "false"}
+      data-incomplete={workspace.incompleteState ? "true" : "false"}
       aria-label="Thinking workspace"
     >
       <header className="vts-workspace__toolbar">
@@ -242,6 +245,14 @@ export function ThinkingWorkspace({
           <p className="vts-workspace__subtitle">
             Arrange to understand — your content stays intact.
           </p>
+          {workspace.completenessNotice ? (
+            <p
+              className="vts-workspace__incomplete-notice"
+              data-testid="thinking-workspace-incomplete-notice"
+            >
+              {workspace.completenessNotice}
+            </p>
+          ) : null}
         </div>
         <div className="vts-workspace__toolbar-actions" role="toolbar">
           <button

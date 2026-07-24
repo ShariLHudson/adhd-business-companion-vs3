@@ -423,6 +423,8 @@ If any answer is **no**, the feature should not be added.
 
 The Thinking Workspace must open on substantive generated content for clear instructional requests. Research updates merge into affected regions without restarting the experience or overwriting user edits. See [VISUAL_THINKING_GENERATE_FIRST_STANDARD.md](./VISUAL_THINKING_GENERATE_FIRST_STANDARD.md).
 
+Implementation: [Workspace Foundation](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md) — `assessWorkspaceEntryEligibility` rejects request-echo / empty guides before `createThinkingWorkspace`. Workspace organization never alters knowledge; content edits and presentation changes remain separate.
+
 ## Next build
 
 **`VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md`** — implementation standard for:

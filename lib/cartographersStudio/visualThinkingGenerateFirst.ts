@@ -743,6 +743,10 @@ export function assessGeneratedResultSubstance(input: {
     if (c === req) return false;
     if (/^complete step \d+ for /.test(c)) return false;
     if (b.type === "placeholder" && b.metadata?.researchDependent) return false;
+    // Instructional steps may be short phrases ("Open app", even "A") and still count.
+    if (b.type === "numbered_step" || b.type === "checklist_item") {
+      return c.length >= 1;
+    }
     return c.split(" ").length >= 5;
   });
   const placeholders = blocks.filter((b) => b.type === "placeholder").length;

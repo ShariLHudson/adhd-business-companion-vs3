@@ -29,11 +29,13 @@ import {
 } from "@/lib/cartographersStudio/visualThinkingPresentationIntelligence";
 import {
   applyWorkspaceAction,
+  assessWorkspaceEntryEligibility,
   buildAskShariContext,
   clearThinkingWorkspace,
   createThinkingWorkspace,
   layoutIntentFromPresentation,
   loadThinkingWorkspace,
+  planVisualThinkingWorkspace,
   projectInspector,
   projectVisibleWorkspaceObjects,
   saveThinkingWorkspace,
@@ -41,6 +43,13 @@ import {
   type ThinkingWorkspaceInput,
   type ThinkingWorkspaceState,
 } from "@/lib/cartographersStudio/visualThinkingWorkspaceFoundation";
+import type { VisualThinkingGeneratedDeliverable } from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
+
+function requireWorkspace(input: ThinkingWorkspaceInput): ThinkingWorkspaceState {
+  const ws = createThinkingWorkspace(input);
+  if (!ws) throw new Error("Expected workspace creation to succeed");
+  return ws;
+}
 import {
   __resetAdaptiveCompanionExplicitPrefsForTests,
   __resetAdaptiveSessionOverrideForTests,
@@ -114,14 +123,17 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       "1. Greet\n2. Collect\n3. Confirm",
     );
-    const ws = createThinkingWorkspace(input);
+    const ws = requireWorkspace(input);
     expect(ws.version).toBe("vts-thinking-workspace-1");
     expect(ws.presentationPlanId).toBe(input.presentationPlan.id);
     expect(ws.generationRunId).toBe(input.generationBundle.run.id);
     expect(ws.objects.length).toBeGreaterThan(0);
+    expect(ws.workspacePlanId).toBeTruthy();
     expect(ws.layoutIntent).toBe(
       layoutIntentFromPresentation(input.presentationPlan),
     );
+    const plan = planVisualThinkingWorkspace(input);
+    expect(plan?.status).toMatch(/ready|partial/);
   });
 
   it("selection updates and inspector reflects selection", () => {
@@ -134,7 +146,7 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       "1. Open\n2. Review\n3. Close",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const first = ws.objects.find((o) => o.type !== "group");
     expect(first).toBeTruthy();
     ws = applyWorkspaceAction(ws, { kind: "select", objectId: first!.id });
@@ -157,7 +169,7 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       manySteps,
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     expect(ws.groups.length).toBeGreaterThan(0);
     const groupId = ws.groups[0]!.id;
     const beforeSummaries = ws.objects
@@ -191,7 +203,7 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       "- pack\n- ship\n- confirm",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const z0 = ws.viewport.zoom;
     ws = applyWorkspaceAction(ws, { kind: "pan", panX: 40, panY: -20 });
     expect(ws.viewport.panX).toBe(40);
@@ -206,15 +218,15 @@ describe("Visual Thinking Workspace Foundation", () => {
 
   it("focus mode dims context around selection", () => {
     const input = pipeline(
-      "Steps: 1. A 2. B 3. C",
+      "Steps: 1. Prepare 2. Record 3. Review",
       (p) => ({
         ...p,
         researchStage: "not_at_all",
         primaryDeliverable: "step_by_step_guide",
       }),
-      "1. A\n2. B\n3. C",
+      "1. Prepare\n2. Record\n3. Review",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const id = ws.objects.find((o) => o.type !== "group")!.id;
     ws = applyWorkspaceAction(ws, { kind: "select", objectId: id });
     ws = applyWorkspaceAction(ws, { kind: "focus_mode", enabled: true });
@@ -234,7 +246,7 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       "1. Greeting\n2. Collect details\n3. Confirm",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     ws = applyWorkspaceAction(ws, { kind: "search", query: "Collect" });
     expect(ws.searchMatchIds.length).toBeGreaterThan(0);
     expect(ws.selection.primaryObjectId).toBe(ws.searchMatchIds[0]);
@@ -250,7 +262,7 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       "1. Start\n2. Finish",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const id = ws.objects.find((o) => o.type !== "group")!.id;
     ws = applyWorkspaceAction(ws, { kind: "select", objectId: id });
     const ctx = buildAskShariContext(ws);
@@ -270,7 +282,7 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       "1. One\n2. Two",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const before = ws;
     ws = applyWorkspaceAction(ws, {
       kind: "add_idea",
@@ -296,7 +308,7 @@ describe("Visual Thinking Workspace Foundation", () => {
       }),
       "1. Alpha\n2. Beta\n3. Gamma",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const target = ws.objects.find((o) => o.immutable && o.type !== "group")!;
     const before: ThinkingWorkspaceState = ws;
     ws = applyWorkspaceAction(ws, {
@@ -317,15 +329,15 @@ describe("Visual Thinking Workspace Foundation", () => {
 
   it("delete removes user notes only", () => {
     const input = pipeline(
-      "Steps: 1. Keep me",
+      "Steps: 1. Keep me 2. Next action 3. Finish up",
       (p) => ({
         ...p,
         researchStage: "not_at_all",
         primaryDeliverable: "step_by_step_guide",
       }),
-      "1. Keep me",
+      "1. Keep me\n2. Next action\n3. Finish up",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const generated = ws.objects.find((o) => o.immutable)!;
     ws = applyWorkspaceAction(ws, {
       kind: "add_idea",
@@ -346,15 +358,15 @@ describe("Visual Thinking Workspace Foundation", () => {
 
   it("group / ungroup and undo support organization only", () => {
     const input = pipeline(
-      "Steps: 1. A 2. B 3. C",
+      "Steps: 1. Prepare 2. Record 3. Review",
       (p) => ({
         ...p,
         researchStage: "not_at_all",
         primaryDeliverable: "step_by_step_guide",
       }),
-      "1. A\n2. B\n3. C",
+      "1. Prepare\n2. Record\n3. Review",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const ids = ws.objects
       .filter((o) => o.immutable && o.type !== "group")
       .slice(0, 2)
@@ -394,7 +406,7 @@ describe("Visual Thinking Workspace Foundation", () => {
         }),
         "1. Save\n2. Restore",
       );
-      let ws = createThinkingWorkspace(input);
+      let ws = requireWorkspace(input);
       const id = ws.objects.find((o) => o.type !== "group")!.id;
       ws = applyWorkspaceAction(ws, { kind: "select", objectId: id });
       ws = applyWorkspaceAction(ws, { kind: "pan", panX: 12, panY: 8 });
@@ -416,15 +428,15 @@ describe("Visual Thinking Workspace Foundation", () => {
 
   it("large workspace projection stays responsive for 200+ objects", () => {
     const input = pipeline(
-      "Steps: 1. Base",
+      "Show me how. Steps: 1. Prepare 2. Record 3. Review 4. Publish 5. Share",
       (p) => ({
         ...p,
         researchStage: "not_at_all",
         primaryDeliverable: "step_by_step_guide",
       }),
-      "1. Base",
+      "1. Prepare\n2. Record\n3. Review\n4. Publish\n5. Share",
     );
-    let ws = createThinkingWorkspace(input);
+    let ws = requireWorkspace(input);
     const extras = Array.from({ length: 220 }, (_, i) => ({
       ...ws.objects[0]!,
       id: `bulk_${i}`,
@@ -442,5 +454,127 @@ describe("Visual Thinking Workspace Foundation", () => {
     const elapsed = Date.now() - t0;
     expect(visible.length).toBeGreaterThan(200);
     expect(elapsed).toBeLessThan(50);
+  });
+
+  it("substantive build_for_me result creates a Workspace Plan", () => {
+    const input = pipeline(
+      "I need to learn how to make a Loom video and upload it to YouTube.",
+      (p) => ({
+        ...p,
+        researchStage: "during_generation",
+        primaryDeliverable: "step_by_step_guide",
+        supportingDeliverables: ["checklist"],
+        interactionStyle: "build_for_me",
+      }),
+    );
+    const assessment = assessWorkspaceEntryEligibility(input);
+    expect(assessment.allowed).toBe(true);
+    expect(assessment.substantive).toBe(true);
+    const plan = planVisualThinkingWorkspace(input);
+    expect(plan).toBeTruthy();
+    expect(plan!.primaryDeliverableId).toBeTruthy();
+    const ws = requireWorkspace(input);
+    expect(ws.objects.some((o) => /loom|youtube|record|upload/i.test(o.title + o.summary))).toBe(
+      true,
+    );
+  });
+
+  it("request-echo result is rejected before workspace creation", () => {
+    const input = pipeline(
+      "Turn these into a step-by-step guide: 1. Greet 2. Collect 3. Confirm",
+      (p) => ({
+        ...p,
+        researchStage: "not_at_all",
+        primaryDeliverable: "step_by_step_guide",
+        interactionStyle: "build_for_me",
+      }),
+      "1. Greet\n2. Collect\n3. Confirm",
+    );
+    const echo: VisualThinkingGeneratedDeliverable = {
+      ...input.generationBundle.deliverables[0]!,
+      title: `Guide: ${input.understanding.rawRequest}`,
+      purpose: input.understanding.rawRequest,
+      blocks: [
+        {
+          id: "e1",
+          type: "heading",
+          title: "Overview",
+          content: input.understanding.rawRequest,
+          order: 0,
+          parentId: null,
+          metadata: {},
+          editable: true,
+          userEdited: false,
+        },
+        {
+          id: "e2",
+          type: "paragraph",
+          title: null,
+          content: input.understanding.rawRequest,
+          order: 1,
+          parentId: null,
+          metadata: {},
+          editable: true,
+          userEdited: false,
+        },
+        {
+          id: "e3",
+          type: "numbered_step",
+          title: "Step 1",
+          content: `Complete step 1 for ${input.understanding.rawRequest.slice(0, 40)}`,
+          order: 2,
+          parentId: null,
+          metadata: {},
+          editable: true,
+          userEdited: false,
+        },
+      ],
+    };
+    const rejected = {
+      ...input,
+      generationBundle: {
+        ...input.generationBundle,
+        deliverables: [echo],
+      },
+      presentationPlan: {
+        ...input.presentationPlan,
+        primaryDeliverableId: echo.id,
+      },
+    };
+    const assessment = assessWorkspaceEntryEligibility(rejected);
+    expect(assessment.allowed).toBe(false);
+    expect(createThinkingWorkspace(rejected)).toBeNull();
+    expect(planVisualThinkingWorkspace(rejected)).toBeNull();
+  });
+
+  it("user-led request creates a calm starter workspace", () => {
+    const input = pipeline("I want to make my own map of my business.");
+    const assessment = assessWorkspaceEntryEligibility(input);
+    expect(assessment.userLedExempt || assessment.allowed).toBe(true);
+    const ws = requireWorkspace(input);
+    expect(ws.workspaceMode === "user_led" || ws.layoutIntent === "free_workspace").toBe(
+      true,
+    );
+    expect(ws.objects.length).toBeGreaterThan(0);
+  });
+
+  it("Ask Shari context includes selected object scope without auto-modifying", () => {
+    const input = pipeline(
+      "Steps: 1. Open 2. Review 3. Close",
+      (p) => ({
+        ...p,
+        researchStage: "not_at_all",
+        primaryDeliverable: "step_by_step_guide",
+      }),
+      "1. Open\n2. Review\n3. Close",
+    );
+    let ws = requireWorkspace(input);
+    const step = ws.objects.find((o) => o.type === "step") ?? ws.objects[0]!;
+    ws = applyWorkspaceAction(ws, { kind: "select", objectId: step.id });
+    const ctx = buildAskShariContext(ws, "Explain this step.");
+    expect(ctx.selectedObjectIds).toEqual([step.id]);
+    expect(ctx.userQuestion).toBe("Explain this step.");
+    expect(ctx.suggestedPrompts.length).toBeGreaterThan(0);
+    expect(ws.objects.find((o) => o.id === step.id)?.summary).toBe(step.summary);
   });
 });
