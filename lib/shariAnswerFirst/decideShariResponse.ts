@@ -81,7 +81,7 @@ function inferHelpMode(
   }
 
   if (
-    /\b(?:i keep putting off|i'?m stuck|talk (?:this|it) through|why can'?t i|afraid to|feeling overwhelmed about)\b/.test(
+    /\b(?:i keep putting off|i'?m stuck|talk (?:this|it) through|why can'?t i|afraid to|feeling overwhelmed(?:\s+about)?|i feel overwhelmed|do not know where to start|don'?t know where to start)\b/.test(
       t,
     )
   ) {

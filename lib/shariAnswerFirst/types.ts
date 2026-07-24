@@ -6,8 +6,10 @@
  */
 
 import type { ShariConversationMode } from "./conversationModes";
+import type { ShariProfessionalRole } from "./professionalRoles";
 
 export type { ShariConversationMode };
+export type { ShariProfessionalRole };
 
 export type ShariPrimaryHelpMode =
   | "direct_answer"
@@ -76,6 +78,28 @@ export type ShariResponseDecision = {
   routingAllowed: boolean;
   confidence: number;
   reasons: string[];
+};
+
+/**
+ * Cognitive extension of ShariResponseDecision — same engine, richer contract.
+ * Built by `buildShariCognitiveDecision` / `runShariCognitivePipeline`.
+ */
+export type ShariCognitiveDecision = ShariResponseDecision & {
+  conversationId: string | null;
+  userGoal: string;
+  immediateNeed: string;
+  primaryProfessionalRole: ShariProfessionalRole;
+  supportingProfessionalRoles: ShariProfessionalRole[];
+  essentialClarificationRequired: boolean;
+  knownContextAvailable: boolean;
+  relevantContextKeys: string[];
+  contextConfidence: number;
+  staleContextKeys: string[];
+  assumptionsAllowed: boolean;
+  assumptions: string[];
+  answerBeforeQuestionRequired: boolean;
+  bestFollowUpQuestion: string | null;
+  reasoningPlanSummary: string;
 };
 
 export type ShariAnswerSubstanceValidation = {

@@ -6,19 +6,31 @@ import type { ShariConversationMode } from "./conversationModes";
 import { conversationModeFromHelpMode } from "./conversationModes";
 import { decideShariResponse } from "./decideShariResponse";
 import type { ShariPrimaryHelpMode, ShariResponseDecision } from "./types";
+import type { ShariProfessionalRole } from "./professionalRoles";
 
 export const SHARI_CONVERSATION_THREAD_KEY =
   "companion-shari-conversation-thread-v1";
 
+/**
+ * Canonical conversation-thread binder (help-thread state).
+ * Distinct from `lib/conversationContinuity/*` (workflow ownership).
+ */
 export type ShariConversationThread = {
   id: string;
   originalRequest: string;
   currentGoal: string;
   conversationMode: ShariConversationMode | null;
   primaryHelpMode: ShariPrimaryHelpMode;
+  primaryProfessionalRole?: ShariProfessionalRole;
+  supportingProfessionalRoles?: ShariProfessionalRole[];
   lastAnswer: string;
   topicKeywords: string[];
   memberContextNotes: string[];
+  /** Stated assumptions used in prior answers */
+  assumptions: string[];
+  /** Member corrections that override prior memory for this thread */
+  corrections: string[];
+  relevantContextKeys: string[];
   updatedAt: string;
 };
 
@@ -60,12 +72,34 @@ function extractKeywords(text: string): string[] {
     .slice(0, 16);
 }
 
+function normalizeThread(
+  raw: Partial<ShariConversationThread> | null,
+): ShariConversationThread | null {
+  if (!raw?.originalRequest || !raw.id) return null;
+  return {
+    id: raw.id,
+    originalRequest: raw.originalRequest,
+    currentGoal: raw.currentGoal ?? raw.originalRequest,
+    conversationMode: raw.conversationMode ?? null,
+    primaryHelpMode: raw.primaryHelpMode ?? "direct_answer",
+    primaryProfessionalRole: raw.primaryProfessionalRole,
+    supportingProfessionalRoles: raw.supportingProfessionalRoles,
+    lastAnswer: raw.lastAnswer ?? "",
+    topicKeywords: raw.topicKeywords ?? [],
+    memberContextNotes: raw.memberContextNotes ?? [],
+    assumptions: raw.assumptions ?? [],
+    corrections: raw.corrections ?? [],
+    relevantContextKeys: raw.relevantContextKeys ?? [],
+    updatedAt: raw.updatedAt ?? new Date().toISOString(),
+  };
+}
+
 export function peekShariConversationThread(): ShariConversationThread | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.sessionStorage.getItem(SHARI_CONVERSATION_THREAD_KEY);
     if (!raw) return null;
-    return JSON.parse(raw) as ShariConversationThread;
+    return normalizeThread(JSON.parse(raw) as Partial<ShariConversationThread>);
   } catch {
     return null;
   }
@@ -99,9 +133,21 @@ export function buildShariConversationThread(input: {
   answer: string;
   prior?: ShariConversationThread | null;
   memberNote?: string | null;
+  primaryProfessionalRole?: ShariProfessionalRole;
+  supportingProfessionalRoles?: ShariProfessionalRole[];
+  assumptions?: string[];
+  relevantContextKeys?: string[];
+  correction?: string | null;
 }): ShariConversationThread {
   const notes = [...(input.prior?.memberContextNotes ?? [])];
   if (input.memberNote?.trim()) notes.push(input.memberNote.trim());
+  const corrections = [...(input.prior?.corrections ?? [])];
+  if (input.correction?.trim()) corrections.push(input.correction.trim());
+  const assumptions = [
+    ...(input.prior?.assumptions ?? []),
+    ...(input.assumptions ?? []),
+  ].filter((a, i, arr) => arr.indexOf(a) === i);
+
   return {
     id: input.prior?.id ?? input.decision.id,
     originalRequest: input.prior?.originalRequest ?? input.decision.rawRequest,
@@ -110,17 +156,44 @@ export function buildShariConversationThread(input: {
       input.decision.primaryHelpMode,
     ),
     primaryHelpMode: input.decision.primaryHelpMode,
+    primaryProfessionalRole:
+      input.primaryProfessionalRole ?? input.prior?.primaryProfessionalRole,
+    supportingProfessionalRoles:
+      input.supportingProfessionalRoles ??
+      input.prior?.supportingProfessionalRoles,
     lastAnswer: input.answer.slice(0, 8000),
     topicKeywords: extractKeywords(
       [
         input.prior?.originalRequest ?? "",
         input.decision.rawRequest,
         ...notes,
+        ...corrections,
       ].join(" "),
     ),
     memberContextNotes: notes.slice(-8),
+    assumptions: assumptions.slice(-8),
+    corrections: corrections.slice(-8),
+    relevantContextKeys: (
+      input.relevantContextKeys ??
+      input.prior?.relevantContextKeys ??
+      []
+    ).slice(0, 16),
     updatedAt: new Date().toISOString(),
   };
+}
+
+/** Detect short corrective turns that override prior thread facts. */
+export function extractThreadCorrection(userText: string): string | null {
+  const t = userText.trim();
+  if (
+    /\b(?:actually|correction|i (?:don't|do not) sell|i sell|not journals?|instead)\b/i.test(
+      t,
+    ) &&
+    t.split(/\s+/).length <= 40
+  ) {
+    return t;
+  }
+  return null;
 }
 
 /**

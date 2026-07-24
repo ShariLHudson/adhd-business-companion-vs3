@@ -2,8 +2,9 @@
 
 **Status:** Binding foundational platform standard  
 **Runtime:** `lib/shariAnswerFirst/`  
+**Cognitive orchestration:** [SHARI_COGNITIVE_INTELLIGENCE_ARCHITECTURE.md](./SHARI_COGNITIVE_INTELLIGENCE_ARCHITECTURE.md)  
 **Sibling:** [Answer-First General Help](./SHARI_ANSWER_FIRST_GENERAL_HELP_STANDARD.md)  
-**Cursor rule:** `.cursor/rules/shari-core-conversation-intelligence.mdc`
+**Cursor rule:** `.cursor/rules/shari-core-conversation-intelligence.mdc` · `.cursor/rules/shari-cognitive-intelligence.mdc`
 
 ## Mission
 

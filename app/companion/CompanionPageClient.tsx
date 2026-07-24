@@ -1914,11 +1914,13 @@ import {
   buildShariConversationThread,
   decideShariResponse,
   evaluateAndRepairAnswerFirst,
+  evaluateConversationExcellenceRepair,
+  extractThreadCorrection,
   isShariConversationFollowUp,
   looksLikeConversationRestart,
   peekShariConversationThread,
-  shariAnswerFirstHintForChat,
-  shariContinuityHintForChat,
+  runShariCognitivePipeline,
+  SHARI_MAX_MODEL_REPAIR_ATTEMPTS,
   shouldBlockImmediateExperienceOpen,
   shouldSuppressRouteBeforeAnswer,
   storeShariConversationHandoff,
@@ -14195,20 +14197,26 @@ export default function CompanionPageClient() {
     // Never block send on isLoading — newer messages supersede in-flight AI.
     if (!trimmed) return;
 
-    // Answer-first / Core Conversation: help in chat before destination routers.
-    const shariAnswerFirstDecision: ShariResponseDecision =
-      decideShariResponse(trimmed);
+    // Cognitive pipeline / answer-first: help in chat before destination routers.
     const shariConversationThread = peekShariConversationThread();
-    const shariFollowUp = isShariConversationFollowUp(
-      trimmed,
-      shariConversationThread,
-    );
+    const shariCognitiveTurn = runShariCognitivePipeline(trimmed, {
+      thread: shariConversationThread,
+    });
+    const shariAnswerFirstDecision: ShariResponseDecision =
+      shariCognitiveTurn.decision;
+    const shariFollowUp = shariCognitiveTurn.isFollowUp;
+    if (shariFollowUp) {
+      trackShariAnswerFirstEvent("thread_binder_used", {
+        mode: shariAnswerFirstDecision.primaryHelpMode,
+      });
+    }
     trackShariAnswerFirstEvent("decision", {
       mode: shariAnswerFirstDecision.primaryHelpMode,
       conversationMode: shariAnswerFirstDecision.conversationMode,
       directAnswerRequired: shariAnswerFirstDecision.directAnswerRequired,
       routingAllowed: shariAnswerFirstDecision.routingAllowed,
       followUp: shariFollowUp,
+      role: shariCognitiveTurn.primaryProfessionalRole,
     });
     const answerFirstPreferChat =
       preferChatAnswer ||
@@ -20187,8 +20195,7 @@ export default function CompanionPageClient() {
               createWorkspaceV2: createWorkspaceV2Active,
             }),
             companionFirstWorkflowHintForChat(trimmed, workspacePanel),
-            shariAnswerFirstHintForChat(shariAnswerFirstDecision),
-            shariContinuityHintForChat(trimmed, shariConversationThread),
+            shariCognitiveTurn.promptHints,
             crossWorkspaceGuidanceHintForChat({
               sourceTitle: createBuilderSession?.typeLabel
                 ? createBuilderLabel(createBuilderSession.typeLabel)
@@ -20501,25 +20508,139 @@ export default function CompanionPageClient() {
           answer: assistantMsg,
           priorContext: lastAssistantText,
         });
+        const excellence = evaluateConversationExcellenceRepair({
+          decision: shariAnswerFirstDecision,
+          answer: assistantMsg,
+          context: shariCognitiveTurn.context,
+          questionPolicy: shariCognitiveTurn.questionPolicy,
+          primaryRole: shariCognitiveTurn.primaryProfessionalRole,
+          composition: shariCognitiveTurn.composition,
+          wisdom: shariCognitiveTurn.wisdom,
+        });
         trackShariAnswerFirstEvent("substance_validation", {
           mode: shariAnswerFirstDecision.primaryHelpMode,
           valid: substance.validation.valid,
           failureCount: substance.validation.failures.length,
         });
+        trackShariAnswerFirstEvent("conversation_excellence", {
+          mode: shariAnswerFirstDecision.primaryHelpMode,
+          score: excellence.validation.score,
+          excellent: excellence.validation.excellent,
+          baselineWeaker: excellence.validation.baseline.shariIsWeaker,
+          delightScore: excellence.validation.delight?.delightScore ?? null,
+          comparativeScore: excellence.validation.baseline.comparativeScore,
+        });
         const needsRestartRepair =
           shariFollowUp && looksLikeConversationRestart(assistantMsg);
-        if (substance.needsRepair || needsRestartRepair) {
-          const repaired =
-            (shariFollowUp
-              ? buildFollowUpAdaptedReply(trimmed, shariConversationThread)
-              : null) ||
-            buildAnswerFirstFailSafeReply(trimmed);
+        if (
+          substance.needsRepair ||
+          excellence.needsRepair ||
+          needsRestartRepair
+        ) {
+          let repaired: string | null = null;
+          // Prefer one bounded model repair using composition + wisdom instructions.
+          if (
+            excellence.preferModelRepair &&
+            excellence.repairInstructions &&
+            SHARI_MAX_MODEL_REPAIR_ATTEMPTS >= 1 &&
+            !isStaleSend()
+          ) {
+            try {
+              const repairRes = await fetchCompanionChatWithTimeout(
+                {
+                  stream: false,
+                  messages: [
+                    ...messagesForApi(
+                      nextMessages,
+                      workspaceChatScopeRef.current,
+                    ),
+                    { role: "assistant", content: assistantMsg },
+                    {
+                      role: "user",
+                      content:
+                        "Please rewrite your previous reply so it fully helps me. Return only the improved answer — no preamble about rewriting.",
+                    },
+                  ],
+                  inputType,
+                  coachingMode,
+                  aiTone: prefs.aiTone,
+                  helpMode: prefs.helpMode,
+                  supportStyle: getActiveSupportStyleId(),
+                  userName: prefs.name || undefined,
+                  businessContext: businessContextForApi,
+                  companionGuidanceHint: [
+                    shariCognitiveTurn.promptHints,
+                    excellence.repairInstructions,
+                    substance.repairInstructions,
+                  ]
+                    .filter(Boolean)
+                    .join("\n\n"),
+                },
+                { signal: requestAbort.signal },
+              );
+              if (repairRes.ok && !isStaleSend()) {
+                const repairData = await readJsonResponse<
+                  Record<string, unknown>
+                >(repairRes, { url: "/api/companion-chat" });
+                const candidate =
+                  typeof repairData.message === "string"
+                    ? finalizeMemberFacingAssistantText(
+                        repairData.message,
+                        "chat_api",
+                      )
+                    : "";
+                if (candidate.trim().length >= 80) {
+                  const recheck = evaluateConversationExcellenceRepair({
+                    decision: shariAnswerFirstDecision,
+                    answer: candidate,
+                    context: shariCognitiveTurn.context,
+                    questionPolicy: shariCognitiveTurn.questionPolicy,
+                    primaryRole: shariCognitiveTurn.primaryProfessionalRole,
+                    composition: shariCognitiveTurn.composition,
+                    wisdom: shariCognitiveTurn.wisdom,
+                  });
+                  if (
+                    recheck.validation.score >= excellence.validation.score ||
+                    recheck.validation.valid ||
+                    candidate.length > assistantMsg.length
+                  ) {
+                    repaired = candidate;
+                    trackShariAnswerFirstEvent("repair_succeeded", {
+                      mode: shariAnswerFirstDecision.primaryHelpMode,
+                      score: recheck.validation.score,
+                      priorScore: excellence.validation.score,
+                    });
+                  }
+                }
+              }
+            } catch {
+              trackShariAnswerFirstEvent("repair_exhausted", {
+                mode: shariAnswerFirstDecision.primaryHelpMode,
+                reason: "model_repair_error",
+              });
+            }
+          }
+          if (!repaired) {
+            repaired =
+              (shariFollowUp
+                ? buildFollowUpAdaptedReply(trimmed, shariConversationThread)
+                : null) ||
+              buildAnswerFirstFailSafeReply(trimmed);
+            if (repaired) {
+              trackShariAnswerFirstEvent("repair_exhausted", {
+                mode: shariAnswerFirstDecision.primaryHelpMode,
+                reason: "local_failsafe",
+              });
+            }
+          }
           if (repaired) {
             assistantMsg = repaired;
             trackShariAnswerFirstEvent("automatic_repair", {
               mode: shariAnswerFirstDecision.primaryHelpMode,
               failureCount: substance.validation.failures.length,
+              excellenceScore: excellence.validation.score,
               restart: needsRestartRepair,
+              modelRepair: excellence.preferModelRepair,
             });
             setMessages((prev) => {
               const copy = [...prev];
@@ -20537,12 +20658,26 @@ export default function CompanionPageClient() {
             });
           }
         }
+        const correction = extractThreadCorrection(trimmed);
+        if (correction) {
+          trackShariAnswerFirstEvent("user_correction_applied", {
+            mode: shariAnswerFirstDecision.primaryHelpMode,
+          });
+        }
         storeShariConversationThread(
           buildShariConversationThread({
             decision: shariAnswerFirstDecision,
             answer: assistantMsg,
             prior: shariConversationThread,
             memberNote: shariFollowUp ? trimmed : null,
+            primaryProfessionalRole:
+              shariCognitiveTurn.primaryProfessionalRole,
+            supportingProfessionalRoles:
+              shariCognitiveTurn.supportingProfessionalRoles,
+            assumptions: shariCognitiveTurn.cognitive.assumptions,
+            relevantContextKeys:
+              shariCognitiveTurn.context.relevantContextKeys,
+            correction,
           }),
         );
         trackShariAnswerFirstEvent("context_retained", {

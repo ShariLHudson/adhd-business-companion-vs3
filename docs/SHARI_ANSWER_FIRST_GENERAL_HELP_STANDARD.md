@@ -1,6 +1,7 @@
 # Shari Answer-First General Help Standard™
 
 **Parent:** [Shari Core Conversation Intelligence](./SHARI_CORE_CONVERSATION_INTELLIGENCE_STANDARD.md)  
+**Cognitive orchestration:** [SHARI_COGNITIVE_INTELLIGENCE_ARCHITECTURE.md](./SHARI_COGNITIVE_INTELLIGENCE_ARCHITECTURE.md) (`runShariCognitivePipeline`)  
 **Runtime:** `lib/shariAnswerFirst/`  
 **Primary wiring:** `app/companion/CompanionPageClient.tsx` (`handleSend`)  
 **Allies:** `lib/chatFastPath/chatTurnGuarantee.ts` · `lib/universalCreation/createFastPath.ts` · `lib/conversationStabilization/intentClassificationGate.ts`

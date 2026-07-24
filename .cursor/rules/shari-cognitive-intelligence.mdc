@@ -1,0 +1,19 @@
+# Shari Cognitive Intelligence
+
+**Architecture:** `docs/SHARI_COGNITIVE_INTELLIGENCE_ARCHITECTURE.md`  
+**Runtime:** `lib/shariAnswerFirst/` · entry `runShariCognitivePipeline()`
+
+## Rules
+
+- Extend `lib/shariAnswerFirst/` — never create a parallel answer-first / context / validator / handoff engine.
+- Help before routing. Remember before asking. Earn the right to ask.
+- Professional roles are internal posture, never member-facing mode pickers.
+- `conversationContinuity.ts` in this module = help-thread binder. Distinct from `lib/conversationContinuity/*` (workflow ownership).
+- Topic fail-safes are last resort; excellence + baseline repair is preferred.
+
+## Before shipping ordinary chat changes
+
+- [ ] Production path still calls `runShariCognitivePipeline`?
+- [ ] Known context used before re-asking?
+- [ ] General-AI baseline cannot silently pass a weaker reply?
+- [ ] Docs SoT links still accurate?
