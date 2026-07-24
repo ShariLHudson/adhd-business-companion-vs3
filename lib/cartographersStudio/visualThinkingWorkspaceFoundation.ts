@@ -477,18 +477,22 @@ export function fitViewportToContent(
   };
 }
 
-/** Guard — workspace must not mutate upstream knowledge/deliverable content. */
+/**
+ * Guard — organization actions must not rebind generated objects to different sources.
+ * Projected titles/summaries may sync from deliverables via co-creation edits;
+ * source identity (id, sourceBlockId, sourceKnowledgeItemId) must stay stable.
+ */
 export function workspacePreservesKnowledgeImmutability(
   before: ThinkingWorkspaceState,
   after: ThinkingWorkspaceState,
 ): boolean {
   const beforeGen = before.objects
     .filter((o) => o.immutable)
-    .map((o) => `${o.id}:${o.sourceBlockId}:${o.sourceKnowledgeItemId}:${o.summary}`)
+    .map((o) => `${o.id}:${o.sourceBlockId}:${o.sourceKnowledgeItemId}`)
     .sort();
   const afterGen = after.objects
     .filter((o) => o.immutable)
-    .map((o) => `${o.id}:${o.sourceBlockId}:${o.sourceKnowledgeItemId}:${o.summary}`)
+    .map((o) => `${o.id}:${o.sourceBlockId}:${o.sourceKnowledgeItemId}`)
     .sort();
   return JSON.stringify(beforeGen) === JSON.stringify(afterGen);
 }

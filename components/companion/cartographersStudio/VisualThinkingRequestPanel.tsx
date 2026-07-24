@@ -96,6 +96,18 @@ import {
   resolveKnowledgeGap,
 } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 import { runVisualThinkingResearchToResult } from "@/lib/cartographersStudio/visualThinkingResearchToResult";
+import {
+  applyCoCreationAction,
+  applyRepresentationSyncChoice,
+  autosaveEditingSession,
+  clearEditingSession,
+  createWorkspaceEditingSession,
+  loadEditingSession,
+  projectCoCreationInspector,
+  updateSelection,
+  type CoCreationActionId,
+  type WorkspaceEditingSession,
+} from "@/lib/cartographersStudio/visualThinkingWorkspaceEditing";
 import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
@@ -152,6 +164,9 @@ export function VisualThinkingRequestPanel({
     useState<VisualThinkingPresentationPlan | null>(null);
   const [thinkingWorkspace, setThinkingWorkspace] =
     useState<ThinkingWorkspaceState | null>(null);
+  const [editingSession, setEditingSession] =
+    useState<WorkspaceEditingSession | null>(null);
+  const [coCreationNotice, setCoCreationNotice] = useState<string | null>(null);
   const [researchBundle, setResearchBundle] =
     useState<VisualThinkingResearchBundle | null>(null);
   const [researchDraft, setResearchDraft] = useState("");
@@ -196,6 +211,8 @@ export function VisualThinkingRequestPanel({
     if (existingPresentation) setPresentationPlan(existingPresentation);
     const existingWorkspace = loadThinkingWorkspace();
     if (existingWorkspace) setThinkingWorkspace(existingWorkspace);
+    const existingEditing = loadEditingSession();
+    if (existingEditing) setEditingSession(existingEditing);
     const existingResearch = loadResearchBundle();
     if (existingResearch) setResearchBundle(existingResearch);
   }, []);
@@ -221,6 +238,12 @@ export function VisualThinkingRequestPanel({
   }, [thinkingWorkspace]);
 
   useEffect(() => {
+    if (editingSession && thinkingWorkspace) {
+      autosaveEditingSession(editingSession, thinkingWorkspace);
+    }
+  }, [editingSession, thinkingWorkspace]);
+
+  useEffect(() => {
     if (researchBundle) saveResearchBundle(researchBundle);
   }, [researchBundle]);
 
@@ -242,7 +265,15 @@ export function VisualThinkingRequestPanel({
       generationBundle,
       presentationPlan,
     });
-    if (restored) setThinkingWorkspace(restored);
+    if (restored) {
+      setThinkingWorkspace(restored);
+      setEditingSession(
+        createWorkspaceEditingSession({
+          workspace: restored,
+          generationBundle,
+        }),
+      );
+    }
   }, [
     thinkingWorkspace,
     generationBundle,
@@ -251,6 +282,18 @@ export function VisualThinkingRequestPanel({
     experiencePlan,
     knowledgeBundle,
   ]);
+
+  // Keep editing session aligned when a workspace opens with a generation bundle.
+  useEffect(() => {
+    if (!thinkingWorkspace || !generationBundle) return;
+    if (editingSession?.workspaceId === thinkingWorkspace.id) return;
+    setEditingSession(
+      createWorkspaceEditingSession({
+        workspace: thinkingWorkspace,
+        generationBundle,
+      }),
+    );
+  }, [thinkingWorkspace, generationBundle, editingSession?.workspaceId]);
 
   useEffect(() => {
     return () => {
@@ -350,6 +393,17 @@ export function VisualThinkingRequestPanel({
     setGenerationBundle(run.generationBundle);
     setPresentationPlan(run.presentationPlan);
     setThinkingWorkspace(run.workspace);
+    if (run.workspace && run.generationBundle) {
+      setEditingSession(
+        createWorkspaceEditingSession({
+          workspace: run.workspace,
+          generationBundle: run.generationBundle,
+        }),
+      );
+    } else {
+      setEditingSession(null);
+    }
+    setCoCreationNotice(null);
     setActiveDeliverableId(
       run.generationBundle?.run.primaryDeliverableId ?? null,
     );
@@ -1283,6 +1337,7 @@ export function VisualThinkingRequestPanel({
                 clearGenerationBundle();
                 clearPresentationPlan();
                 clearThinkingWorkspace();
+                clearEditingSession();
                 clearResearchBundle();
                 setDraftText("");
                 setUnderstanding(null);
@@ -1291,6 +1346,8 @@ export function VisualThinkingRequestPanel({
                 setGenerationBundle(null);
                 setPresentationPlan(null);
                 setThinkingWorkspace(null);
+                setEditingSession(null);
+                setCoCreationNotice(null);
                 setResearchBundle(null);
                 setResearchDraft("");
                 setActiveDeliverableId(null);
@@ -1470,7 +1527,23 @@ export function VisualThinkingRequestPanel({
               <ThinkingWorkspace
                 workspace={thinkingWorkspace}
                 deliverables={generationBundle.deliverables}
-                onWorkspaceChange={setThinkingWorkspace}
+                onWorkspaceChange={(next) => {
+                  setThinkingWorkspace(next);
+                  if (editingSession) {
+                    const synced = updateSelection(
+                      editingSession,
+                      next,
+                      next.selection.primaryObjectId
+                        ? [next.selection.primaryObjectId]
+                        : [],
+                    );
+                    setEditingSession({
+                      ...synced.session,
+                      generationBundle:
+                        synced.session.generationBundle ?? generationBundle,
+                    });
+                  }
+                }}
                 researchNotification={researchBundle?.workspaceNotification}
                 onDismissResearchNotification={() => {
                   if (!researchBundle) return;
@@ -1480,6 +1553,57 @@ export function VisualThinkingRequestPanel({
                 }}
                 onReviewResearch={() => {
                   setShowWrittenReview(true);
+                }}
+                coCreationInspector={
+                  editingSession
+                    ? projectCoCreationInspector(editingSession, thinkingWorkspace)
+                    : null
+                }
+                syncPreview={editingSession?.pendingSyncPreview ?? null}
+                coCreationNotice={coCreationNotice}
+                onSyncChoice={(choice) => {
+                  if (!editingSession) return;
+                  setEditingSession(
+                    applyRepresentationSyncChoice(editingSession, choice),
+                  );
+                  setCoCreationNotice(
+                    choice === "keep_current"
+                      ? "Kept your current views."
+                      : "Related views will stay in sync with this change.",
+                  );
+                }}
+                onCoCreateAction={(action: CoCreationActionId) => {
+                  if (!editingSession || !thinkingWorkspace) return;
+                  const payload =
+                    action === "annotate"
+                      ? {
+                          annotationText:
+                            window.prompt(
+                              "Add a private note for this piece",
+                              "",
+                            ) ?? undefined,
+                          annotationType: "personal_note" as const,
+                        }
+                      : action === "ask_board"
+                        ? {
+                            question:
+                              window.prompt(
+                                "What should the Board focus on?",
+                                "What would you improve here?",
+                              ) ?? "What would you improve here?",
+                          }
+                        : undefined;
+                  if (action === "annotate" && !payload?.annotationText) return;
+                  const result = applyCoCreationAction(
+                    editingSession,
+                    thinkingWorkspace,
+                    action,
+                    payload,
+                  );
+                  setEditingSession(result.session);
+                  setThinkingWorkspace(result.workspace);
+                  setGenerationBundle(result.generationBundle);
+                  setCoCreationNotice(result.userFacingNotice);
                 }}
                 onAskShari={(prompt, context) => {
                   if (typeof window !== "undefined") {
@@ -1715,6 +1839,7 @@ export function VisualThinkingRequestPanel({
                 clearGenerationBundle();
                 clearPresentationPlan();
                 clearThinkingWorkspace();
+                clearEditingSession();
                 clearResearchBundle();
                 setDraftText("");
                 setUnderstanding(null);
@@ -1723,6 +1848,8 @@ export function VisualThinkingRequestPanel({
                 setGenerationBundle(null);
                 setPresentationPlan(null);
                 setThinkingWorkspace(null);
+                setEditingSession(null);
+                setCoCreationNotice(null);
                 setResearchBundle(null);
                 setResearchDraft("");
                 setActiveDeliverableId(null);

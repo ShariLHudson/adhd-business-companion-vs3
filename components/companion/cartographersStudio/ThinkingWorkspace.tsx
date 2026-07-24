@@ -11,6 +11,11 @@ import {
   type WorkspaceAction,
 } from "@/lib/cartographersStudio/visualThinkingWorkspaceFoundation";
 import type { VisualThinkingWorkspaceResearchNotification } from "@/lib/cartographersStudio/visualThinkingResearchAcquisition";
+import type {
+  CoCreationActionId,
+  CoCreationInspectorProjection,
+  RepresentationSyncPreview,
+} from "@/lib/cartographersStudio/visualThinkingWorkspaceEditing";
 
 type Props = {
   workspace: ThinkingWorkspaceState;
@@ -21,6 +26,14 @@ type Props = {
   researchNotification?: VisualThinkingWorkspaceResearchNotification | null;
   onDismissResearchNotification?: () => void;
   onReviewResearch?: () => void;
+  /** Co-creation inspector (progressive). When present, content actions are available. */
+  coCreationInspector?: CoCreationInspectorProjection | null;
+  syncPreview?: RepresentationSyncPreview | null;
+  onCoCreateAction?: (action: CoCreationActionId) => void;
+  onSyncChoice?: (
+    choice: "update_all" | "choose_representationsations" | "keep_current",
+  ) => void;
+  coCreationNotice?: string | null;
 };
 
 /**
@@ -36,6 +49,11 @@ export function ThinkingWorkspace({
   researchNotification,
   onDismissResearchNotification,
   onReviewResearch,
+  coCreationInspector,
+  syncPreview,
+  onCoCreateAction,
+  onSyncChoice,
+  coCreationNotice,
 }: Props) {
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const [ideaDraft, setIdeaDraft] = useState("");
@@ -243,7 +261,8 @@ export function ThinkingWorkspace({
         <div className="vts-workspace__toolbar-main">
           <h2 className="vts-workspace__title">Thinking Workspace</h2>
           <p className="vts-workspace__subtitle">
-            Arrange to understand — your content stays intact.
+            Think together here — arrange, refine, and evolve ideas without
+            starting over.
           </p>
           {workspace.completenessNotice ? (
             <p
@@ -587,11 +606,95 @@ export function ThinkingWorkspace({
                     : "Pin in place"}
                 </button>
               ) : null}
+              {coCreationInspector && onCoCreateAction ? (
+                <div
+                  className="vts-workspace__cocreate"
+                  data-testid="thinking-workspace-cocreate"
+                >
+                  <p className="vts-request__label">Work with this piece</p>
+                  <div
+                    className="vts-workspace__cocreate-actions"
+                    role="group"
+                    aria-label="Co-creation actions for selected idea"
+                  >
+                    {coCreationInspector.suggestedActions
+                      .filter((a) =>
+                        ["expand", "simplify", "research", "find_missing_pieces", "generate_alternatives", "ask_board", "lock", "unlock", "annotate"].includes(
+                          a.id,
+                        ),
+                      )
+                      .slice(0, 6)
+                      .map((action) => (
+                        <button
+                          key={action.id}
+                          type="button"
+                          className="vts-request__secondary-btn"
+                          data-testid={`thinking-cocreate-${action.id}`}
+                          onClick={() => onCoCreateAction(action.id)}
+                        >
+                          {action.label}
+                        </button>
+                      ))}
+                  </div>
+                  {coCreationInspector.locked ? (
+                    <p className="vts-request__note">Locked — won’t regenerate.</p>
+                  ) : null}
+                  {coCreationInspector.notes.length > 0 ? (
+                    <ul className="vts-workspace__related">
+                      {coCreationInspector.notes.map((n) => (
+                        <li key={n}>{n}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
+              {coCreationNotice ? (
+                <p
+                  className="vts-request__note"
+                  data-testid="thinking-cocreate-notice"
+                  role="status"
+                >
+                  {coCreationNotice}
+                </p>
+              ) : null}
+              {syncPreview && onSyncChoice ? (
+                <div
+                  className="vts-workspace__sync-preview"
+                  data-testid="thinking-sync-preview"
+                  role="region"
+                  aria-label="Representation update preview"
+                >
+                  <p className="vts-request__label">This change also affects</p>
+                  <ul className="vts-workspace__related">
+                    {syncPreview.affectedPresentations.slice(0, 4).map((p) => (
+                      <li key={p}>{p.replace(/_/g, " ")}</li>
+                    ))}
+                  </ul>
+                  <div className="vts-workspace__cocreate-actions">
+                    <button
+                      type="button"
+                      className="vts-request__primary-btn"
+                      data-testid="thinking-sync-update-all"
+                      onClick={() => onSyncChoice("update_all")}
+                    >
+                      Update all
+                    </button>
+                    <button
+                      type="button"
+                      className="vts-request__secondary-btn"
+                      data-testid="thinking-sync-keep"
+                      onClick={() => onSyncChoice("keep_current")}
+                    >
+                      Keep current versions
+                    </button>
+                  </div>
+                </div>
+              ) : null}
             </>
           ) : (
             <p className="vts-request__note">
-              Select an idea to see details. Moving ideas only rearranges this
-              table — it does not change your knowledge.
+              Select an idea to refine it with Shari — or rearrange freely. Edits
+              stay scoped to what you choose.
             </p>
           )}
 

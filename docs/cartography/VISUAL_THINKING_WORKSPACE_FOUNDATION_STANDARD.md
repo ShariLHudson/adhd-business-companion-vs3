@@ -6,7 +6,8 @@
 **Experience authority:** [VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md)  
 **User-facing name:** Visual Thinking Studio  
 **Corrective 7.1:** [Rename & Research-to-Result](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md)  
-**Build 8:** [Recommendation Intelligence](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) — optional invitations require substantive-result readiness before opening the workspace.
+**Build 8:** [Recommendation Intelligence](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) — optional invitations require substantive-result readiness before opening the workspace.  
+**Editing & Co-Creation:** [WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md) — selection-scoped content edits via the editing session; Foundation remains the organization surface.
 
 **Runtime:** `lib/cartographersStudio/visualThinkingWorkspaceFoundation.ts`  
 **UI:** `components/companion/cartographersStudio/ThinkingWorkspace.tsx`  

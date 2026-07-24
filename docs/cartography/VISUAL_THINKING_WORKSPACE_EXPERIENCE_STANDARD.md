@@ -384,6 +384,10 @@ See [VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md](./VISUAL
 
 Optional Visual Thinking invitations are assessed by [Recommendation Intelligence](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md). Explicit requests skip the invitation. Declines suppress topic repeats. Entry still requires substantive workspace eligibility.
 
+### Workspace Editing & Co-Creation
+
+After a substantive result opens, the workspace is collaborative — not a static viewer. See [WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md). Edits are selection-scoped; user edits are protected; representation updates require preview consent.
+
 ### Learning pilot (first Estate consumer)
 
 See [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md).

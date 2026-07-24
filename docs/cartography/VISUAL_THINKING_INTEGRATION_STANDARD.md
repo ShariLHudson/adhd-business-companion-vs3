@@ -9,6 +9,8 @@
 
 **Recommendation Intelligence:** Optional invitations require real usefulness, substantive-result readiness, and (normally) initial value first. Explicit visual requests route directly. Declines are respected. Source return context must be preserved. Callers use `assessVisualThinkingRecommendation` — they do not invent parallel recommenders.
 
+**Workspace Editing:** After handoff, the destination is an editable collaborative workspace ([Editing & Co-Creation](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md)). Integration must preserve return context; workspace edits never silently write back to source systems.
+
 ---
 
 ## Mission
