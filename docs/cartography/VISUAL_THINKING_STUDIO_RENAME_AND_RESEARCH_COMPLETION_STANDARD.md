@@ -3,7 +3,8 @@
 **Status:** Binding corrective standard  
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/` · Welcome Home / Estate navigation labels  
-**Related:** Generate-First · Research Acquisition · Generation · Presentation · Workspace Foundation · Integration
+**Related:** Generate-First · Research Acquisition · Generation · Presentation · Workspace Foundation · Integration  
+**Corrective follow-up:** [Research-to-Populated Workspace Fix](./VISUAL_THINKING_RESEARCH_TO_POPULATED_WORKSPACE_FIX.md) — empty/warning-only workspace must never pass as a completed Loom (or similar) result.
 
 ---
 

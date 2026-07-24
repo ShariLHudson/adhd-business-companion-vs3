@@ -1,6 +1,7 @@
 # Visual Thinking — Thinking Workspace Foundation Standard
 
 **Status:** Binding implementation standard (Build 7)  
+**Corrective:** [Research-to-Populated Workspace Fix](./VISUAL_THINKING_RESEARCH_TO_POPULATED_WORKSPACE_FIX.md) — `canOpenThinkingWorkspace` / substance guards; never open warning-only shells.  
 **Date:** 2026-07-24  
 **Scope:** First interactive Thinking Workspace over approved presentation, knowledge, and deliverables  
 **Experience authority:** [VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md)  

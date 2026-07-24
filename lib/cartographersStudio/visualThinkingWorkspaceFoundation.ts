@@ -517,9 +517,29 @@ function collectIncompleteAreas(
 ): { areas: string[]; notice: string | null } {
   const areas: string[] = [];
   const pkg = input.knowledgePackage;
+  const instructionalSteps = (primary?.blocks ?? []).filter(
+    (b) =>
+      (b.type === "numbered_step" || b.type === "checklist_item") &&
+      b.content.trim().length >= 12,
+  ).length;
+  const hasSubstantiveGuide = instructionalSteps >= 4;
+
   if (pkg) {
     for (const gap of pkg.knowledgeGaps.filter((g) => g.status === "open")) {
-      areas.push(gap.focusedQuestion || gap.description || gap.area);
+      const raw = gap.focusedQuestion || gap.description || gap.area;
+      // Never surface the all-or-nothing verification sentence as the main
+      // workspace content when a substantive guide already exists.
+      if (
+        hasSubstantiveGuide &&
+        /have not been verified/i.test(raw) &&
+        gap.area === "current_external_facts"
+      ) {
+        areas.push(
+          "Exact product control labels may vary — verify them in your current version.",
+        );
+        continue;
+      }
+      areas.push(raw);
     }
   }
   if (primary) {
@@ -545,7 +565,9 @@ function collectIncompleteAreas(
       ? null
       : areas.length === 1
         ? areas[0]!
-        : `A few areas still need attention — including ${areas[0]}.`;
+        : hasSubstantiveGuide
+          ? "Exact current control labels may vary by product version — the process below is ready to use."
+          : `A few areas still need attention — including ${areas[0]}.`;
   return { areas, notice };
 }
 
@@ -670,6 +692,26 @@ export function assessWorkspaceEntryEligibility(
     };
   }
 
+  // Warning / request-echo / title-only results must never open as complete.
+  const warningOnlyNotice =
+    Boolean(notice) &&
+    /have not been verified|awaiting verification/i.test(notice ?? "") &&
+    instructionalSteps < 3 &&
+    meaningfulBlocks.length < 4;
+  if (warningOnlyNotice) {
+    return {
+      allowed: false,
+      reason:
+        "Only a verification warning is available — research or generation must continue first.",
+      userLedExempt: false,
+      substantive: false,
+      substanceFailureReasons: ["warning_only_result"],
+      incompleteAreas: areas,
+      completenessNotice: notice,
+      status: "failed",
+    };
+  }
+
   const incomplete = areas.length > 0 || input.generationBundle.run.status === "partial" ||
     input.generationBundle.run.status === "awaiting_research";
 
@@ -682,9 +724,48 @@ export function assessWorkspaceEntryEligibility(
     substantive: true,
     substanceFailureReasons: [],
     incompleteAreas: areas,
-    completenessNotice: notice,
+    completenessNotice: incomplete
+      ? notice && /have not been verified/i.test(notice)
+        ? "Exact product control labels may vary — verify them in your current version."
+        : notice
+      : null,
     status: incomplete ? "partial" : "ready",
   };
+}
+
+/**
+ * Explicit guard before rendering the Thinking Workspace shell.
+ */
+export function canOpenThinkingWorkspace(input: {
+  generationRunStatus?: string | null;
+  outcomeValidationPassed?: boolean;
+  usefulPartialAllowed?: boolean;
+  workspaceObjectCount: number;
+  substantiveWrittenBlocks: number;
+  substanceFailureReasons?: string[];
+  warningOnly?: boolean;
+  requestEchoOnly?: boolean;
+}): boolean {
+  if (input.warningOnly || input.requestEchoOnly) return false;
+  if (
+    input.substanceFailureReasons?.some((r) =>
+      /warning_only|request_echo|insufficient|empty/i.test(r),
+    )
+  ) {
+    return false;
+  }
+  const hasContent =
+    input.workspaceObjectCount >= 2 || input.substantiveWrittenBlocks >= 3;
+  if (!hasContent) return false;
+  if (input.outcomeValidationPassed) return true;
+  if (input.usefulPartialAllowed && hasContent) return true;
+  if (
+    input.generationRunStatus === "review_ready" ||
+    input.generationRunStatus === "partial"
+  ) {
+    return hasContent;
+  }
+  return false;
 }
 
 export function planVisualThinkingWorkspace(
@@ -816,6 +897,37 @@ export function createThinkingWorkspace(
 
   const workspacePlan = planVisualThinkingWorkspace(input);
   if (!workspacePlan) return null;
+
+  const primaryForGuard = resolvePrimaryDeliverable(input);
+  const instructionalForGuard = (primaryForGuard?.blocks ?? []).filter(
+    (b) =>
+      (b.type === "numbered_step" ||
+        b.type === "checklist_item" ||
+        b.type === "paragraph" ||
+        b.type === "summary") &&
+      b.content.trim().split(/\s+/).length >= 4,
+  ).length;
+  if (
+    !assessment.userLedExempt &&
+    !canOpenThinkingWorkspace({
+      generationRunStatus: input.generationBundle.run.status,
+      outcomeValidationPassed: assessment.status === "ready",
+      usefulPartialAllowed: assessment.status === "partial",
+      workspaceObjectCount: Math.max(
+        instructionalForGuard,
+        primaryForGuard?.blocks.length ?? 0,
+      ),
+      substantiveWrittenBlocks: instructionalForGuard,
+      substanceFailureReasons: assessment.substanceFailureReasons,
+      warningOnly: Boolean(
+        assessment.completenessNotice &&
+          /have not been verified/i.test(assessment.completenessNotice) &&
+          instructionalForGuard < 3,
+      ),
+    })
+  ) {
+    return null;
+  }
 
   const { presentationPlan, generationBundle, knowledgePackage, understanding } =
     input;

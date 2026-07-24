@@ -296,6 +296,7 @@ export {
   createThinkingWorkspace,
   planVisualThinkingWorkspace,
   assessWorkspaceEntryEligibility,
+  canOpenThinkingWorkspace,
   applyWorkspaceAction,
   buildAskShariContext,
   projectVisibleWorkspaceObjects,

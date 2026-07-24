@@ -595,9 +595,13 @@ export function planVisualThinkingKnowledge(
     areasForDeliverable(t, plan.detailLevel).required,
   );
 
+  const needsCurrentProductResearch =
+    looksLikeCurrentProductRequest(raw) ||
+    looksLikeExternalComparison(raw, plan.primaryDeliverable);
   const researchRequired =
     plan.researchStage === "before_generation" ||
-    understanding.researchNeed === "required";
+    understanding.researchNeed === "required" ||
+    needsCurrentProductResearch;
   const researchPriority: VisualThinkingKnowledgePlan["researchPriority"] =
     researchRequired
       ? "required"
@@ -637,7 +641,12 @@ export function planVisualThinkingKnowledge(
       "generation_placeholder",
       "prior_visual_thinking_work",
     ],
-    excludedSourceKinds: researchRequired ? [] : ["external_research"],
+    // Never exclude external research when current product/market facts are needed —
+    // that previously blocked Loom findings as "internal_only".
+    excludedSourceKinds:
+      researchRequired || needsCurrentProductResearch
+        ? []
+        : ["external_research"],
     availableSourceRefs: [],
     missingKnowledgeGaps: [],
     researchRequired,

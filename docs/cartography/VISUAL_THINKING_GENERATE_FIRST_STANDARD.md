@@ -1,6 +1,7 @@
 # Visual Thinking Studio — Generate-First Knowledge Completion Standard™ (Corrective Build 6.6)
 
 **Also see:** [VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md](./VISUAL_THINKING_STUDIO_RENAME_AND_RESEARCH_COMPLETION_STANDARD.md) (Corrective Build 7.1 — research must produce the requested result; destination name is Visual Thinking Studio).  
+**Empty-workspace corrective:** [VISUAL_THINKING_RESEARCH_TO_POPULATED_WORKSPACE_FIX.md](./VISUAL_THINKING_RESEARCH_TO_POPULATED_WORKSPACE_FIX.md).  
 **Recommendation:** [VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_RECOMMENDATION_INTELLIGENCE_STANDARD.md) — accepted/explicit recommendations continue through generate-first without a second confirmation.  
 **After generation:** [Workspace Editing & Co-Creation](./WORKSPACE_EDITING_AND_CO_CREATION_STANDARD.md) — the result opens into an iterative thinking workspace; section edits must not force full regeneration.  
 **Learning pilot:** [Learning Pilot Integration](./VISUAL_THINKING_LEARNING_PILOT_INTEGRATION_STANDARD.md) — Learning handoffs reuse established teaching context through the same generate-first pipeline.

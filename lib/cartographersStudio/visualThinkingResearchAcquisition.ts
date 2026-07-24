@@ -698,7 +698,31 @@ export function acquireVisualThinkingResearch(
     }
 
     if (item.status === "blocked") {
-      continue;
+      // Stable / trusted findings may still fill an externally-blocked gap when
+      // the plan incorrectly chose internal_only. Unblock and continue.
+      const canUnblock =
+        finding.sourceCategory === "trusted_reference" ||
+        finding.sourceCategory === "official_documentation" ||
+        finding.sourceCategory === "industry_publication" ||
+        finding.verification === "partially_verified" ||
+        finding.verification === "verified";
+      if (!canUnblock) continue;
+      item = {
+        ...item,
+        status: "planned",
+        priority: item.priority === "blocked" ? "required" : item.priority,
+        notes: "Unblocked by acquired research findings.",
+        updatedAt: timestamp,
+      };
+      items = items.map((i) => (i.id === item!.id ? item! : i));
+      plan = {
+        ...plan,
+        blockedResearch: plan.blockedResearch.filter((id) => id !== item!.id),
+        requiredResearch: plan.requiredResearch.includes(item.id)
+          ? plan.requiredResearch
+          : [...plan.requiredResearch, item.id],
+        status: plan.status === "blocked" ? "partial" : plan.status,
+      };
     }
 
     if (!sourceCategoryAllowed(finding.sourceCategory, plan, item)) {
@@ -991,7 +1015,8 @@ export function acquireVisualThinkingResearch(
   pkg.sourceReferences = [...pkg.sourceReferences, ...newSources];
   pkg.conflicts = [...pkg.conflicts, ...newKnowledgeConflicts];
 
-  // Resolve gaps that research covered
+  // Resolve gaps that research covered — partially_verified stable research
+  // closes process/product gaps with localized freshness, not a permanent open block.
   pkg.knowledgeGaps = pkg.knowledgeGaps.map((gap) => {
     const covering = items.filter(
       (i) =>
@@ -1000,15 +1025,27 @@ export function acquireVisualThinkingResearch(
     );
     if (!covering.length) return gap;
     const fully = covering.some((i) => i.status === "resolved");
+    const partialOk =
+      !fully &&
+      covering.some((i) => i.status === "partially_resolved") &&
+      (gap.area === "current_external_facts" ||
+        gap.resolutionType === "external_research");
     return {
       ...gap,
-      status: fully ? ("resolved" as const) : gap.status,
+      status: fully
+        ? ("resolved" as const)
+        : partialOk
+          ? ("resolved" as const)
+          : gap.status,
       resolvedByItemIds: [
         ...new Set([
           ...gap.resolvedByItemIds,
           ...covering.flatMap((c) => c.knowledgeItemIds),
         ]),
       ],
+      focusedQuestion: partialOk
+        ? "Exact current control labels may vary — verify in your product version."
+        : gap.focusedQuestion,
     };
   });
 

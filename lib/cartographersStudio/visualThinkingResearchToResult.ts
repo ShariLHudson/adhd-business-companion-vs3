@@ -364,12 +364,13 @@ export function runVisualThinkingResearchToResult(
   const confirmed = confirmRecommendation(synced);
   let confirmedPlan = applyExperiencePlanOverride(plan, { kind: "confirm" });
   const preferredDeliverable = deliverableForRequestedOutcome(requestedOutcome);
+  // Requested outcome is authoritative — including guides/training/process.
+  // Previously step_by_step_guide was skipped, leaving a research_assisted
+  // default of "report" and an empty/warning workspace for Loom how-tos.
   if (
     preferredDeliverable &&
     confirmedPlan.primaryDeliverable !== preferredDeliverable &&
-    preferredDeliverable !== "relationship_visualization" &&
-    preferredDeliverable !== "step_by_step_guide" &&
-    preferredDeliverable !== "training_guide"
+    preferredDeliverable !== "relationship_visualization"
   ) {
     confirmedPlan = applyExperiencePlanOverride(confirmedPlan, {
       kind: "set_primary_deliverable",

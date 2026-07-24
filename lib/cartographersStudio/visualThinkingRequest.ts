@@ -168,6 +168,36 @@ export function detectHelpDepth(raw: string): VisualThinkingHelpDepth {
   return "unspecified";
 }
 
+/**
+ * When Research & Build is chosen without an explicit format, infer a useful
+ * default from the request — never force "report" for how-to / process asks.
+ */
+export function inferResearchAssistedDefaultOutput(
+  raw: string,
+  entryPath: VisualThinkingRequest["entryPath"],
+  provisionalIntent: VisualThinkingProvisionalIntent,
+): VisualThinkingOutputForm | null {
+  if (entryPath !== "research_assisted") return null;
+  const detected = detectRequestedOutput(raw);
+  if (detected) return detected;
+  const t = normalize(raw);
+  if (/\b(how to|teach|learn|guide|walk me|steps?)\b/.test(t)) {
+    return "step_by_step_guide";
+  }
+  if (/\b(compar(e|ison)|versus|vs\.?)\b/.test(t)) return "comparison";
+  if (/\b(timeline|chronolog|history)\b/.test(t)) return "timeline";
+  if (/\b(process|workflow)\b/.test(t)) return "process_flow";
+  if (/\b(checklist)\b/.test(t)) return "checklist";
+  if (
+    provisionalIntent === "research_topic" ||
+    /\b(research|report|analysis)\b/.test(t)
+  ) {
+    return "report";
+  }
+  // Prefer a practical guide over an empty report shell.
+  return "step_by_step_guide";
+}
+
 /** Detect an explicitly requested output form. */
 export function detectRequestedOutput(
   raw: string,
@@ -189,7 +219,7 @@ export function detectRequestedOutput(
     return "process_flow";
   }
   if (
-    /\b(step[- ]by[- ]step|every step|all the steps|how (do|to) i|show me how)\b/.test(
+    /\b(step[- ]by[- ]step|every step|all the steps|how (do|to) i|how to|show me how|create a guide|make a guide|walk me through)\b/.test(
       t,
     )
   ) {
@@ -622,9 +652,11 @@ export function applyRequestText(
     : depth === "unspecified"
       ? auth.inferredDetail
       : depth;
+  // Research-assisted must NOT default to "report" — that forced empty report
+  // shells for how-to requests (e.g. "How to Create a Loom Video").
   const effectiveOutput =
     requestedOutput ??
-    (request.entryPath === "research_assisted" ? "report" : null);
+    inferResearchAssistedDefaultOutput(raw, request.entryPath, provisionalIntent);
   const rec = recommendOutputs({
     rawRequest: raw,
     provisionalIntent,

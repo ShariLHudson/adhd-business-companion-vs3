@@ -91,6 +91,30 @@ export function ThinkingWorkspace({
     () => buildAskShariContext(workspace),
     [workspace],
   );
+  const substantiveObjectCount = useMemo(
+    () =>
+      visible.filter(
+        (o) =>
+          (o.summary?.trim().split(/\s+/).length ?? 0) >= 4 &&
+          !/have not been verified/i.test(o.summary ?? ""),
+      ).length,
+    [visible],
+  );
+  const hasSubstantiveWorkspace = substantiveObjectCount >= 2;
+  const canAutoOrganize = substantiveObjectCount >= 2;
+  const canFitView = substantiveObjectCount >= 1;
+  const canFocus = substantiveObjectCount >= 1;
+  const canUndo = (workspace.undoStack?.length ?? 0) > 0;
+  const warningOnlyShell =
+    !hasSubstantiveWorkspace &&
+    Boolean(
+      workspace.completenessNotice &&
+        /have not been verified|awaiting verification/i.test(
+          workspace.completenessNotice,
+        ),
+    );
+  const showAddIdea =
+    hasSubstantiveWorkspace || workspace.workspaceMode === "user_led";
 
   function dispatch(action: WorkspaceAction) {
     onWorkspaceChange(applyWorkspaceAction(workspace, action));
@@ -291,36 +315,42 @@ export function ThinkingWorkspace({
           ) : null}
         </div>
         <div className="vts-workspace__toolbar-actions" role="toolbar">
-          <button
-            type="button"
-            className="vts-request__secondary-btn"
-            data-testid="thinking-workspace-fit"
-            onClick={() => dispatch({ kind: "fit_content" })}
-          >
-            Fit view
-          </button>
-          <button
-            type="button"
-            className="vts-request__secondary-btn"
-            data-testid="thinking-workspace-reorganize"
-            onClick={() => dispatch({ kind: "auto_organize" })}
-          >
-            Auto Organize
-          </button>
-          <button
-            type="button"
-            className="vts-request__secondary-btn"
-            data-testid="thinking-workspace-focus"
-            aria-pressed={workspace.focusMode}
-            onClick={() =>
-              dispatch({
-                kind: "focus_mode",
-                enabled: !workspace.focusMode,
-              })
-            }
-          >
-            {workspace.focusMode ? "Exit focus" : "Focus"}
-          </button>
+          {canFitView ? (
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-fit"
+              onClick={() => dispatch({ kind: "fit_content" })}
+            >
+              Fit view
+            </button>
+          ) : null}
+          {canAutoOrganize ? (
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-reorganize"
+              onClick={() => dispatch({ kind: "auto_organize" })}
+            >
+              Auto Organize
+            </button>
+          ) : null}
+          {canFocus ? (
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-focus"
+              aria-pressed={workspace.focusMode}
+              onClick={() =>
+                dispatch({
+                  kind: "focus_mode",
+                  enabled: !workspace.focusMode,
+                })
+              }
+            >
+              {workspace.focusMode ? "Exit focus" : "Focus"}
+            </button>
+          ) : null}
           <button
             type="button"
             className="vts-request__secondary-btn"
@@ -381,14 +411,16 @@ export function ThinkingWorkspace({
               Return to Projects
             </button>
           ) : null}
-          <button
-            type="button"
-            className="vts-request__secondary-btn"
-            data-testid="thinking-workspace-undo"
-            onClick={() => dispatch({ kind: "undo" })}
-          >
-            Undo
-          </button>
+          {canUndo ? (
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-undo"
+              onClick={() => dispatch({ kind: "undo" })}
+            >
+              Undo
+            </button>
+          ) : null}
           {onClose ? (
             <button
               type="button"
@@ -766,34 +798,46 @@ export function ThinkingWorkspace({
             </p>
           )}
 
-          <div className="vts-workspace__add-idea">
-            <p className="vts-request__label">Add idea</p>
-            <input
-              className="vts-workspace__idea-input"
-              data-testid="thinking-workspace-idea-input"
-              value={ideaDraft}
-              placeholder="A note, question, or placeholder…"
-              onChange={(e) => setIdeaDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && ideaDraft.trim()) {
+          {showAddIdea ? (
+            <div className="vts-workspace__add-idea">
+              <p className="vts-request__label">Add idea</p>
+              <input
+                className="vts-workspace__idea-input"
+                data-testid="thinking-workspace-idea-input"
+                value={ideaDraft}
+                placeholder="A note, question, or placeholder…"
+                onChange={(e) => setIdeaDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && ideaDraft.trim()) {
+                    dispatch({ kind: "add_idea", title: ideaDraft.trim() });
+                    setIdeaDraft("");
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="vts-request__secondary-btn"
+                data-testid="thinking-workspace-add-idea"
+                onClick={() => {
+                  if (!ideaDraft.trim()) return;
                   dispatch({ kind: "add_idea", title: ideaDraft.trim() });
                   setIdeaDraft("");
-                }
-              }}
-            />
-            <button
-              type="button"
-              className="vts-request__secondary-btn"
-              data-testid="thinking-workspace-add-idea"
-              onClick={() => {
-                if (!ideaDraft.trim()) return;
-                dispatch({ kind: "add_idea", title: ideaDraft.trim() });
-                setIdeaDraft("");
-              }}
+                }}
+              >
+                Add Idea
+              </button>
+            </div>
+          ) : null}
+          {warningOnlyShell ? (
+            <p
+              className="vts-request__note"
+              data-testid="thinking-workspace-recovery-note"
+              role="status"
             >
-              Add Idea
-            </button>
-          </div>
+              I’m still gathering what you need for a usable result. Ask Shari
+              to retry research or build the useful guide from stable steps.
+            </p>
+          ) : null}
         </aside>
       </div>
 

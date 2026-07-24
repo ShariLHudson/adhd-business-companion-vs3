@@ -372,6 +372,30 @@ export function VisualThinkingRequestPanel({
         })
       : null;
 
+  const substantiveWrittenBlocks = useMemo(() => {
+    if (!activeDeliverable) return 0;
+    return activeDeliverable.blocks.filter((b) => {
+      const words = b.content.trim().split(/\s+/).length;
+      return (
+        words >= 4 &&
+        b.type !== "placeholder" &&
+        !/have not been verified/i.test(b.content)
+      );
+    }).length;
+  }, [activeDeliverable]);
+  const hasSubstantiveResult =
+    substantiveWrittenBlocks >= 3 ||
+    (thinkingWorkspace?.objects.length ?? 0) >= 2;
+  const hasEligibleAlternate =
+    (presentationPlan?.availablePresentations.length ?? 0) >= 2 &&
+    hasSubstantiveResult;
+  const showWrittenReviewControl =
+    hasSubstantiveResult && substantiveWrittenBlocks >= 3;
+  const pipelineRecovery =
+    Boolean(generationBundle || researchBundle || knowledgeBundle) &&
+    !thinkingWorkspace &&
+    !hasSubstantiveResult;
+
   function commitRequest(next: VisualThinkingRequest, reinterpret = true) {
     if (
       reinterpret &&
@@ -1391,6 +1415,42 @@ export function VisualThinkingRequestPanel({
           </section>
         ) : null}
 
+        {pipelineRecovery ? (
+          <section
+            className="vts-request__confirmed"
+            data-testid="visual-thinking-pipeline-recovery"
+            aria-label="Result still building"
+          >
+            <h2 className="vts-request__section-title">Still building your result</h2>
+            <p className="vts-request__note">
+              I could not open a finished workspace yet. Your request and any
+              research so far are saved — I can build the useful guide from
+              stable steps, or retry current research.
+            </p>
+            <div className="vts-request__actions">
+              <button
+                type="button"
+                className="vts-request__primary"
+                data-testid="visual-thinking-recovery-build-guide"
+                onClick={() => runGenerateFirstPipeline(request.rawRequest)}
+              >
+                Build the Useful Guide
+              </button>
+              <button
+                type="button"
+                className="vts-request__secondary-btn"
+                data-testid="visual-thinking-recovery-retry-research"
+                onClick={() => {
+                  autoContinueLockRef.current = false;
+                  runGenerateFirstPipeline(request.rawRequest);
+                }}
+              >
+                Retry Current Research
+              </button>
+            </div>
+          </section>
+        ) : null}
+
         {phase === "confirmed" && generationBundle && generationStatus ? (
           <section
             className="vts-request__confirmed vts-presentation"
@@ -1421,24 +1481,30 @@ export function VisualThinkingRequestPanel({
                 </p>
               </div>
               <div className="vts-presentation__bar-actions">
-                <button
-                  type="button"
-                  className="vts-request__secondary-btn"
-                  data-testid="visual-thinking-show-differently"
-                  aria-expanded={showThisDifferently}
-                  onClick={() => setShowThisDifferently((v) => !v)}
-                >
-                  Show this differently
-                </button>
-                <button
-                  type="button"
-                  className="vts-request__secondary-btn"
-                  data-testid="visual-thinking-toggle-written-review"
-                  aria-pressed={showWrittenReview}
-                  onClick={() => setShowWrittenReview((v) => !v)}
-                >
-                  {showWrittenReview ? "Hide written review" : "Written review"}
-                </button>
+                {hasEligibleAlternate ? (
+                  <button
+                    type="button"
+                    className="vts-request__secondary-btn"
+                    data-testid="visual-thinking-show-differently"
+                    aria-expanded={showThisDifferently}
+                    onClick={() => setShowThisDifferently((v) => !v)}
+                  >
+                    Show this differently
+                  </button>
+                ) : null}
+                {showWrittenReviewControl ? (
+                  <button
+                    type="button"
+                    className="vts-request__secondary-btn"
+                    data-testid="visual-thinking-toggle-written-review"
+                    aria-pressed={showWrittenReview}
+                    onClick={() => setShowWrittenReview((v) => !v)}
+                  >
+                    {showWrittenReview
+                      ? "Hide written review"
+                      : "Written review"}
+                  </button>
+                ) : null}
                 <label className="vts-presentation__density">
                   <span className="vts-request__label">View</span>
                   <select

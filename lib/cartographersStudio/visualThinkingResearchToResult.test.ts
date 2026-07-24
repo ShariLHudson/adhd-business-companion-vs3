@@ -75,6 +75,40 @@ describe("Research-to-result pipeline (7.1)", () => {
     expect(knowledgePackageAloneSatisfiesOutcome()).toBe(false);
   });
 
+  it("A0. Short Loom how-to must not open warning-only empty workspace", () => {
+    const run = runVisualThinkingResearchToResult(
+      "How to Create a Loom Video",
+      { entryPath: "research_assisted" },
+    );
+    expect(run.experiencePlan.primaryDeliverable).toBe("step_by_step_guide");
+    expect(run.researchBundle?.acquiredAt).toBeTruthy();
+    expect(
+      run.knowledgeBundle.package.knowledgeGaps.filter(
+        (g) =>
+          g.status === "open" &&
+          /have not been verified/i.test(g.description),
+      ),
+    ).toHaveLength(0);
+    const primary =
+      run.generationBundle?.deliverables.find(
+        (d) => d.id === run.generationBundle!.run.primaryDeliverableId,
+      ) ?? run.generationBundle?.deliverables[0];
+    expect(primary?.type).toBe("step_by_step_guide");
+    const steps = (primary?.blocks ?? []).filter(
+      (b) => b.type === "numbered_step" && b.content.trim().length >= 12,
+    );
+    expect(steps.length).toBeGreaterThanOrEqual(8);
+    const text = (primary?.blocks ?? []).map((b) => b.content).join(" ");
+    expect(text).toMatch(/record|microphone|review|share|upload/i);
+    expect(run.workspace).toBeTruthy();
+    expect(run.workspace!.objects.length).toBeGreaterThanOrEqual(8);
+    expect(run.workspace!.completenessNotice ?? "").not.toMatch(
+      /have not been verified/i,
+    );
+    expect(run.completion.requestedOutcomeSatisfied).toBe(true);
+    expect(run.completion.substanceValidationPassed).toBe(true);
+  });
+
   it("A. Loom guide — research findings enter package and guide generates", () => {
     const run = runVisualThinkingResearchToResult(
       "Research how Loom works now and create a detailed guide for recording a video and uploading it to YouTube.",
