@@ -46,8 +46,23 @@ export function analyzeStrategyWorkItem(
 ): StrategyJudgmentTurn {
   const strategicQuestion = identifyStrategicQuestion(item, opts?.lastAnswer);
   const judgmentStage = assessJudgmentStage(item);
+  // Phase 5 — synthesis advises; next-thinking-move and readiness remain authoritative
+  const domainSynthesis = synthesizeStrategyDomains(item, opts);
   const nextMove = selectNextThinkingMove(item, presentation, opts);
-  const nextQuestion = selectNextQuestion(item, presentation, opts);
+  let nextQuestion = selectNextQuestion(item, presentation, opts);
+  if (
+    domainSynthesis.suggestedNextQuestion &&
+    nextMove.shouldAskQuestion &&
+    (domainSynthesis.selection.needsClarification ||
+      domainSynthesis.confidence === "low" ||
+      domainSynthesis.conflictNotes?.some((c) => c.preferClarify))
+  ) {
+    nextQuestion = {
+      ...nextQuestion,
+      question: domainSynthesis.suggestedNextQuestion,
+      reason: "Clarify the cross-domain distinction before options",
+    };
+  }
   const readiness = assessDecisionReadiness(item);
   const optionReadiness = assessOptionReadiness(item);
   const showOptions = shouldOfferStrategicOptions(item);
@@ -111,16 +126,16 @@ export function analyzeStrategyWorkItem(
     );
   }
 
-  // Phase 5 — quiet cross-domain synthesis (primary + at most one secondary)
-  const domainSynthesis = synthesizeStrategyDomains(item, opts);
   const activeDomain = getDomainIntelligence(
     domainSynthesis.selection.primaryDomainId ||
       strategicQuestion.strategyTypeId ||
       item.strategyType,
   );
-  const secondaryDomain = domainSynthesis.selection.secondaryDomainId
-    ? getDomainIntelligence(domainSynthesis.selection.secondaryDomainId)
-    : null;
+  const secondaryDomain =
+    domainSynthesis.selection.secondaryDomainId &&
+    domainSynthesis.selection.secondaryStatus !== "unavailable"
+      ? getDomainIntelligence(domainSynthesis.selection.secondaryDomainId)
+      : null;
   const matchedProblemDistinction = matchProblemDistinction(
     activeDomain,
     [
@@ -158,10 +173,22 @@ export function analyzeStrategyWorkItem(
     workItemPatch.experiments = [experiment.smallAction];
   }
 
-  const optionRecommendation =
+  let optionRecommendation =
     showOptions && !item.chosenDirection?.trim()
       ? recommendStrategicOption(item, presentation)
       : null;
+  // Synthesis may supply warmer integrated copy — still not a decision
+  if (
+    optionRecommendation &&
+    domainSynthesis.memberFacingRecommendation &&
+    domainSynthesis.selection.secondaryDomainId
+  ) {
+    optionRecommendation = {
+      ...optionRecommendation,
+      memberCopy: domainSynthesis.memberFacingRecommendation,
+      isDecision: false,
+    };
+  }
   const depth = reversibilityDepth(
     assessReversibility(item.chosenDirection || item.decisionStatement || ""),
   );

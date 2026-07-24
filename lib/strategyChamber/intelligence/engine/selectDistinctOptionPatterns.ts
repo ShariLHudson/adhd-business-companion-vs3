@@ -58,12 +58,23 @@ export function selectDistinctOptionPatterns(
   };
 
   if (capacityTight) {
-    pushUnique(
-      candidatePatterns.find((p) => p === "stabilize") ||
-        candidatePatterns.find((p) => p === "simplify") ||
-        "stabilize",
-    );
-    pushUnique(candidatePatterns.find((p) => p === "test") || "test");
+    // Pricing: protect/maintain current members is the capacity-aware anchor — not generic stabilize
+    if (opts?.strategyTypeId === "pricing") {
+      pushUnique(
+        candidatePatterns.find((p) => p === "protect_current_base") ||
+          candidatePatterns.find((p) => p === "maintain_current_direction") ||
+          candidatePatterns.find((p) => p === "simplify") ||
+          "protect_current_base",
+      );
+      pushUnique(candidatePatterns.find((p) => p === "test") || "test");
+    } else {
+      pushUnique(
+        candidatePatterns.find((p) => p === "stabilize") ||
+          candidatePatterns.find((p) => p === "simplify") ||
+          "stabilize",
+      );
+      pushUnique(candidatePatterns.find((p) => p === "test") || "test");
+    }
   }
 
   if (/\b(wait|not sure|unclear|don'?t know yet)\b/.test(text)) {

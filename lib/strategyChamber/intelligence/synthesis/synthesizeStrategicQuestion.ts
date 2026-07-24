@@ -17,25 +17,27 @@ export function synthesizeStrategicQuestion(input: {
   const surface = surfaceStatement.trim();
   const lower = surface.toLowerCase();
 
-  if (conflicts[0]?.preferClarify) {
-    if (conflicts[0].id === "pricing_capacity_burden") {
-      return "Is the strongest move to raise the price, reduce the scope, or change both?";
-    }
-    if (conflicts[0].id === "growth_capacity_overwhelm") {
-      return "Should you stabilize capacity first, or is a limited growth test still safe?";
-    }
-    if (conflicts[0].id === "growth_pricing_revenue") {
-      return "Is the stronger path more customers, more value per customer, or better pricing?";
-    }
-    if (conflicts[0].id === "pricing_growth_demand") {
-      return "Is price the real issue — or demand quality, conversion, or retention?";
-    }
-    if (conflicts[0].id === "hiring_growth") {
-      return "Is hiring required for growth, or would simplification or a smaller test come first?";
-    }
-    if (conflicts[0].id === "offer_market") {
-      return "Is the primary issue the offer itself, or who it is really for?";
-    }
+  const conflictId = conflicts[0]?.id;
+  if (conflictId === "pricing_capacity_burden") {
+    return "Should you raise the price, reduce the scope, or test a different structure so the offer becomes sustainable without unnecessarily disrupting current members?";
+  }
+  if (conflictId === "growth_capacity_overwhelm") {
+    return "Should you stabilize capacity first, or is a limited growth test still safe?";
+  }
+  if (conflictId === "growth_pricing_revenue") {
+    return "Is the strongest growth path more customers, better retention, or greater value from the customers you already serve?";
+  }
+  if (conflictId === "pricing_growth_demand") {
+    return "Is price the real issue — or demand quality, conversion, or retention?";
+  }
+  if (conflictId === "hiring_growth" || conflictId === "hiring_capacity") {
+    return "Is hiring the best way to relieve the work limiting you, or would simplifying, automating, or testing a contractor first fit better?";
+  }
+  if (conflictId === "offer_market") {
+    return "Is the primary issue the offer itself, or who it is really for?";
+  }
+  if (conflictId === "growth_market_activity") {
+    return "Are you having trouble reaching enough people, or are the people you reach not seeing the offer as a strong fit?";
   }
 
   if (

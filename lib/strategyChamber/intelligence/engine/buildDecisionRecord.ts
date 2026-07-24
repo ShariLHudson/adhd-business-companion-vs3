@@ -3,6 +3,7 @@ import {
   buildStrategyDecisionRecord,
   decisionRecordSectionHasContent,
 } from "../../decisionRecord";
+import { synthesizeStrategyDomains } from "../synthesis";
 import { identifyStrategicRisks } from "./identifyRisks";
 import { designStrategicExperiment } from "./designExperiment";
 import { assessDecisionReadiness } from "./assessDecisionReadiness";
@@ -22,6 +23,7 @@ export function buildIntelligentDecisionRecord(
   item: StrategyWorkItem,
 ): StrategyDecisionRecordView {
   const base = buildStrategyDecisionRecord(item);
+  const synthesis = synthesizeStrategyDomains(item);
   const { risks, secondOrderEffects } = identifyStrategicRisks(item);
   const experiment = designStrategicExperiment(item);
   const readiness = assessDecisionReadiness(item);
@@ -58,10 +60,31 @@ export function buildIntelligentDecisionRecord(
 
   const record: StrategyDecisionRecordView = {
     ...base,
+    // Prefer synthesized framing without domain IDs or multi-section reports
+    whatYouWereDeciding:
+      synthesis.strategicQuestion?.trim() || base.whatYouWereDeciding,
     whyThisDirectionFits: why,
-    assumptionsToTest: uniqueAssumptions,
-    risksToWatch: uniqueRisks,
+    assumptionsToTest: Array.from(
+      new Set([
+        ...uniqueAssumptions,
+        ...synthesis.assumptionsToSurface.slice(0, 2),
+      ]),
+    ).slice(0, 4),
+    risksToWatch: Array.from(
+      new Set([
+        ...(synthesis.integratedRiskSummaries ?? []),
+        ...uniqueRisks,
+      ]),
+    ).slice(0, 4),
   };
+  if (synthesis.tradeoffs?.length) {
+    record.tradeoffsSummary = synthesis.tradeoffs.slice(0, 3);
+  }
+  if (synthesis.constraintsToRespect[0]) {
+    record.whatWouldChangeTheDecision =
+      record.whatWouldChangeTheDecision ||
+      `If this constraint shifts: ${synthesis.constraintsToRespect[0]}`;
+  }
 
   // Phase 3 enrichment — only when options are ready or already considered
   if (shouldOfferStrategicOptions(item) || item.optionsConsidered?.length) {
@@ -103,11 +126,16 @@ export function buildIntelligentDecisionRecord(
 
   if (!confirmed) {
     const rec = recommendStrategicOption(item);
-    if (rec) {
+    if (synthesis.memberFacingRecommendation) {
+      record.companionRecommendation = synthesis.memberFacingRecommendation;
+    } else if (rec) {
       record.companionRecommendation = rec.memberCopy;
-      // Never copy recommendation into directionYouChose
-      record.directionYouChose = base.directionYouChose;
     }
+    // Never copy recommendation into directionYouChose
+    record.directionYouChose = base.directionYouChose;
+  }
+  if (synthesis.experimentHint && !record.experimentsConsidered?.length) {
+    record.experimentsConsidered = [synthesis.experimentHint];
   }
 
   if (item.unknowns?.[0] || experiment?.assumptionBeingTested) {
