@@ -153,7 +153,7 @@ Plans may list suggested targets; nothing is handed off in this build.
 |-------|------|
 | Understanding Engine | Goal, success, tasks, research need, knowledge, output recommendations |
 | **Experience Orchestrator** | Experience plan, stages, interaction, switching contract |
-| Generation Engine (later) | Creating artifacts from a confirmed plan |
+| Generation Engine | Creating artifacts from a confirmed plan — see [VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md) |
 | Research Engine (later) | Live research |
 | Canvas Engine (later) | Map / visual editing |
 
@@ -176,6 +176,7 @@ Must not reduce requested depth, change the goal, or force a format.
 
 ---
 
-## Next build (Build 4)
+## Next build
 
-Generation Engine: execute a **confirmed** `VisualThinkingExperiencePlan` to produce the primary deliverable shell (and optional supporting shells), still with confirmation, overrides, and no-forced-map guarantees.
+Build 4 (Generation Engine) is documented separately.  
+Build 5 should resolve research-blocked runs and deepen generation quality without changing plan ownership.

@@ -35,6 +35,20 @@ import {
   type VisualThinkingDeliverable,
   type VisualThinkingExperiencePlan,
 } from "@/lib/cartographersStudio/visualThinkingExperienceOrchestrator";
+import {
+  applyBlockEdit,
+  clearGenerationBundle,
+  deepenDeliverable,
+  getPrimaryDeliverable,
+  getSupportingDeliverables,
+  loadGenerationBundle,
+  projectGenerationStatus,
+  replaceDeliverableInBundle,
+  saveGenerationBundle,
+  simplifyDeliverable,
+  startGenerationFromConfirmedPlan,
+  type VisualThinkingGenerationBundle,
+} from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 type Props = {
@@ -68,7 +82,7 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 
 /**
  * Request-first opening experience for Visual Thinking Studio.
- * Build 2: Understanding Engine. Build 3: Experience Orchestrator plan.
+ * Builds 2–4: Understanding → Orchestrator plan → Generation.
  */
 export function VisualThinkingRequestPanel({
   onOpenPreviousWork,
@@ -81,6 +95,11 @@ export function VisualThinkingRequestPanel({
     useState<VisualThinkingUnderstanding | null>(null);
   const [experiencePlan, setExperiencePlan] =
     useState<VisualThinkingExperiencePlan | null>(null);
+  const [generationBundle, setGenerationBundle] =
+    useState<VisualThinkingGenerationBundle | null>(null);
+  const [activeDeliverableId, setActiveDeliverableId] = useState<string | null>(
+    null,
+  );
   const [draftText, setDraftText] = useState("");
   const [correctionText, setCorrectionText] = useState("");
   const [showCorrection, setShowCorrection] = useState(false);
@@ -100,11 +119,20 @@ export function VisualThinkingRequestPanel({
         setExperiencePlan(orchestrateVisualThinkingExperience(understood));
       }
     }
+    const existingGen = loadGenerationBundle();
+    if (existingGen) {
+      setGenerationBundle(existingGen);
+      setActiveDeliverableId(existingGen.run.primaryDeliverableId);
+    }
   }, []);
 
   useEffect(() => {
     saveVisualThinkingRequestDraft(request);
   }, [request]);
+
+  useEffect(() => {
+    if (generationBundle) saveGenerationBundle(generationBundle);
+  }, [generationBundle]);
 
   useEffect(() => {
     return () => {
@@ -124,6 +152,18 @@ export function VisualThinkingRequestPanel({
     [understanding, experiencePlan],
   );
   const preview = understandingPreview;
+  const generationStatus = generationBundle
+    ? projectGenerationStatus(generationBundle.run)
+    : null;
+  const primaryDeliverable = generationBundle
+    ? getPrimaryDeliverable(generationBundle)
+    : null;
+  const supportingDeliverables = generationBundle
+    ? getSupportingDeliverables(generationBundle)
+    : [];
+  const activeDeliverable =
+    generationBundle?.deliverables.find((d) => d.id === activeDeliverableId) ??
+    primaryDeliverable;
 
   function commitRequest(next: VisualThinkingRequest, reinterpret = true) {
     if (
@@ -181,12 +221,32 @@ export function VisualThinkingRequestPanel({
   function handleConfirm() {
     const confirmed = confirmRecommendation(request);
     setRequest(confirmed);
-    if (experiencePlan) {
-      setExperiencePlan(
-        applyExperiencePlanOverride(experiencePlan, { kind: "confirm" }),
-      );
+    if (!experiencePlan || !understanding) {
+      onConfirmed?.(confirmed);
+      return;
     }
+    const confirmedPlan = applyExperiencePlanOverride(experiencePlan, {
+      kind: "confirm",
+    });
+    setExperiencePlan(confirmedPlan);
+    const bundle = startGenerationFromConfirmedPlan(confirmedPlan, {
+      requestId: confirmed.id,
+      understandingId: understanding.id,
+      rawRequest: confirmed.rawRequest,
+      userFacingGoal: understanding.userFacingGoal,
+      successDefinition: understanding.successDefinition,
+      suppliedContent: confirmed.rawRequest,
+    });
+    setGenerationBundle(bundle);
+    setActiveDeliverableId(bundle.run.primaryDeliverableId);
     onConfirmed?.(confirmed);
+  }
+
+  function updateActiveDeliverable(
+    next: NonNullable<typeof activeDeliverable>,
+  ) {
+    if (!generationBundle) return;
+    setGenerationBundle(replaceDeliverableInBundle(generationBundle, next));
   }
 
   function startUserLed() {
@@ -632,7 +692,178 @@ export function VisualThinkingRequestPanel({
           </section>
         ) : null}
 
-        {phase === "confirmed" ? (
+        {phase === "confirmed" && generationBundle && generationStatus ? (
+          <section
+            className="vts-request__confirmed"
+            data-testid="visual-thinking-confirmed"
+            data-generation-status={generationBundle.run.status}
+          >
+            <p
+              className="vts-request__section-title"
+              data-testid="visual-thinking-generation-status"
+            >
+              {generationStatus.headline}
+            </p>
+            {generationStatus.researchBlocked ? (
+              <p
+                className="vts-request__note"
+                data-testid="visual-thinking-research-blocked"
+              >
+                {generationStatus.detail ??
+                  "I'm ready to build this once the research is gathered."}
+              </p>
+            ) : null}
+
+            {generationStatus.showReview && activeDeliverable ? (
+              <div
+                className="vts-request__deliverable"
+                data-testid="visual-thinking-review-deliverable"
+                data-deliverable-role={activeDeliverable.role}
+              >
+                <p className="vts-request__label">
+                  {activeDeliverable.role === "primary"
+                    ? "Primary result"
+                    : "Supporting result"}
+                </p>
+                <h2 className="vts-request__section-title">
+                  {activeDeliverable.title}
+                </h2>
+                <ul
+                  className="vts-request__blocks"
+                  data-testid="visual-thinking-deliverable-blocks"
+                >
+                  {activeDeliverable.blocks.map((b) => (
+                    <li
+                      key={b.id}
+                      className="vts-request__block"
+                      data-block-type={b.type}
+                      data-user-edited={b.userEdited ? "true" : "false"}
+                    >
+                      {b.title ? (
+                        <strong className="vts-request__block-title">
+                          {b.title}
+                        </strong>
+                      ) : null}
+                      {b.editable ? (
+                        <textarea
+                          className="vts-request__block-input"
+                          data-testid={`visual-thinking-block-${b.id}`}
+                          rows={b.type === "paragraph" ? 3 : 2}
+                          value={b.content}
+                          onChange={(e) => {
+                            updateActiveDeliverable(
+                              applyBlockEdit(activeDeliverable, {
+                                kind: "edit",
+                                blockId: b.id,
+                                content: e.target.value,
+                              }),
+                            );
+                          }}
+                        />
+                      ) : (
+                        <p>{b.content}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+
+                {activeDeliverable.visualShell ? (
+                  <p
+                    className="vts-request__note"
+                    data-testid="visual-thinking-visual-shell-note"
+                  >
+                    {activeDeliverable.sourceMode === "user_led_shell"
+                      ? "An editable visual shell is ready — not a completed map."
+                      : "A visual structure is ready. The interactive canvas comes later."}
+                  </p>
+                ) : null}
+
+                <div className="vts-request__preview-actions">
+                  <button
+                    type="button"
+                    className="vts-request__secondary-btn"
+                    data-testid="visual-thinking-simplify-deliverable"
+                    onClick={() =>
+                      updateActiveDeliverable(
+                        simplifyDeliverable(activeDeliverable),
+                      )
+                    }
+                  >
+                    Make it simpler
+                  </button>
+                  <button
+                    type="button"
+                    className="vts-request__secondary-btn"
+                    data-testid="visual-thinking-deepen-deliverable"
+                    onClick={() =>
+                      updateActiveDeliverable(
+                        deepenDeliverable(activeDeliverable),
+                      )
+                    }
+                  >
+                    Add more detail
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {supportingDeliverables.length > 0 ? (
+              <div
+                className="vts-request__supporting-block"
+                data-testid="visual-thinking-generated-supporting"
+              >
+                <p className="vts-request__label">Also included</p>
+                <ul className="vts-request__supporting-list">
+                  {supportingDeliverables.map((d) => (
+                    <li key={d.id}>
+                      <button
+                        type="button"
+                        className="vts-request__remove"
+                        data-testid={`visual-thinking-open-supporting-${d.type}`}
+                        onClick={() => setActiveDeliverableId(d.id)}
+                      >
+                        {d.title}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                {primaryDeliverable &&
+                activeDeliverableId !== primaryDeliverable.id ? (
+                  <button
+                    type="button"
+                    className="vts-request__secondary-btn"
+                    data-testid="visual-thinking-back-to-primary"
+                    onClick={() =>
+                      setActiveDeliverableId(primaryDeliverable.id)
+                    }
+                  >
+                    Back to primary result
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="visual-thinking-start-over"
+              onClick={() => {
+                clearVisualThinkingRequestDraft();
+                clearGenerationBundle();
+                setDraftText("");
+                setUnderstanding(null);
+                setExperiencePlan(null);
+                setGenerationBundle(null);
+                setActiveDeliverableId(null);
+                setRequest(createVisualThinkingRequest({}));
+              }}
+            >
+              Start a different request
+            </button>
+          </section>
+        ) : null}
+
+        {phase === "confirmed" && !generationBundle ? (
           <section
             className="vts-request__confirmed"
             data-testid="visual-thinking-confirmed"
@@ -640,27 +871,9 @@ export function VisualThinkingRequestPanel({
             <p className="vts-request__section-title">
               We&apos;re ready when you are.
             </p>
-            <p className="vts-request__summary">
-              {understanding?.userFacingRecommendation ??
-                request.recommendationSummary}
-            </p>
             <p className="vts-request__note">
-              Full generation comes next — nothing has been built yet. You can
-              still change direction anytime.
+              Confirm from the recommendation to create your first version.
             </p>
-            <button
-              type="button"
-              className="vts-request__secondary-btn"
-              data-testid="visual-thinking-start-over"
-              onClick={() => {
-                clearVisualThinkingRequestDraft();
-                setDraftText("");
-                setUnderstanding(null);
-                setRequest(createVisualThinkingRequest({}));
-              }}
-            >
-              Start a different request
-            </button>
           </section>
         ) : null}
 

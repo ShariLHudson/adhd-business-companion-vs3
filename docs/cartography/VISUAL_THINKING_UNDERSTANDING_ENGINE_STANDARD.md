@@ -153,8 +153,9 @@ Not in this build: live research, source collection, full generation of reports/
 
 ---
 
-## Next build
+## Downstream
 
-Build 3 (Experience Orchestrator) consumes this contract and produces an execution plan — see [VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md](./VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md).
+- Build 3 — [Experience Orchestrator](./VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md)  
+- Build 4 — [Generation Engine](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md)  
 
-Build 4 should generate results from a confirmed experience plan.
+Generation must not re-run Understanding logic.
