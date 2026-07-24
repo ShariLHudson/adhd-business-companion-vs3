@@ -56,17 +56,19 @@ Blueprint-driven `reviewMissingPieces()` (suggestions only). Alternatives store 
 
 ## Use This Work
 
-`inferUseThisWorkOptions()` returns ~3–5 context-aware destinations. Handoffs:
+`inferUseThisWorkOptions()` returns ~3–5 context-aware destinations. Handoffs are versioned JSON contracts consumed by destination-native code (not markdown shells):
 
-- **Create** — full substantive content (no regenerate-from-title)  
-- **Projects** — Project Proposal Review (`requiresReview`)  
-- **Visual Thinking** — JSON package with sections/objects  
-- **Strategic Planning** — candidates, not approved strategy  
-- **Business Estate** — field-level approval required  
+- **Create** — `consumeCreationWorkspaceCreateHandoff()` hydrates native editor sections (no regenerate-from-prompt); conflict dialog if Create already has work  
+- **Projects** — `consumeCreationWorkspaceProjectHandoff()` → Project Proposal Review; records only after approval  
+- **Visual Thinking** — `consumeCreationWorkspaceVisualHandoff()` projects substantive Thinking Objects  
+- **Strategic Planning** — candidates only (`autoApproved: false`)  
+- **Business Estate** — field-level approval required (`silentWritebackAllowed: false`)  
+
+**Full destination integration:** [CREATION_WORKSPACE_DESTINATION_INTEGRATION_STANDARD.md](./CREATION_WORKSPACE_DESTINATION_INTEGRATION_STANDARD.md) · runtime `lib/creationWorkspace/destination/`.
 
 ## Source of truth / sync
 
-Workspace owns the developing package until intentional handoff. After handoff, destinations own their approved records. Later workspace edits offer update previews — never silent replace.
+Workspace owns the developing package until intentional handoff. After handoff, destinations own their approved records. Later workspace edits offer update previews via `buildDestinationSyncPreview()` — never silent replace. Registry statuses prevent duplicate destination creation and stale reuse.
 
 ## Navigation
 

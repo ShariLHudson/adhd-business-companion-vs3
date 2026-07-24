@@ -77,6 +77,13 @@ import {
   shouldDivertEventCreateToWorkspace,
   updateProjectPiece,
 } from "@/lib/projects/projectPieces190";
+import {
+  consumeCreationWorkspaceProjectHandoff,
+  loadCreationWorkspace,
+  peekProjectHandoff,
+  type CreationWorkspaceProjectHandoff,
+} from "@/lib/creationWorkspace";
+import { ProjectProposalReviewPanel } from "@/components/companion/creationWorkspace/ProjectProposalReviewPanel";
 import "@/app/companion/project-homes.css";
 
 type Props = {
@@ -85,6 +92,8 @@ type Props = {
   onCallTheBoard?: (project: ProjectHomeRecord) => void;
   /** Open Visual Thinking Studio with project execution context (Build 11). */
   onOpenVisualThinking?: (project: ProjectHomeRecord) => void;
+  /** Return to Creation Workspace after proposal review. */
+  onReturnToCreationWorkspace?: (workspaceId: string) => void;
   /** When opening from "create a project", land on create-purpose. */
   initialView?: ProjectHomeView;
   /**
@@ -123,6 +132,7 @@ export function ProjectHomesPrototypePanel({
   onBack,
   onCallTheBoard,
   onOpenVisualThinking,
+  onReturnToCreationWorkspace,
   initialView = "gallery",
   onLaunchEventWorkspace,
   onStartSomethingNew,
@@ -135,6 +145,9 @@ export function ProjectHomesPrototypePanel({
   const [view, setView] = useState<ProjectHomeView>(initialView);
   /** Member projects only — hydrated from companion-projects-v1 */
   const [memberHomes, setMemberHomes] = useState<ProjectHomeRecord[]>([]);
+  const [projectProposal, setProjectProposal] =
+    useState<CreationWorkspaceProjectHandoff | null>(null);
+  const [proposalError, setProposalError] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   /** Bump when Continue list changes outside memberHomes (rename / delete). */
   const [activeWorkRevision, setActiveWorkRevision] = useState(0);
@@ -152,6 +165,18 @@ export function ProjectHomesPrototypePanel({
   const [renameValue, setRenameValue] = useState("");
   /** Samples stay hidden until the member asks to see them. */
   const [showExamples, setShowExamples] = useState(false);
+
+  useEffect(() => {
+    const pending = peekProjectHandoff();
+    if (!pending) return;
+    const result = consumeCreationWorkspaceProjectHandoff({ handoff: pending });
+    if (result.ok) {
+      setProjectProposal(result.handoff);
+      setProposalError(null);
+    } else {
+      setProposalError(result.reason);
+    }
+  }, []);
 
   const exampleHomes = useMemo(() => exploreExampleHomes(), []);
   const rooms = useMemo(() => listProjectHomeRooms(), []);
@@ -445,6 +470,57 @@ export function ProjectHomesPrototypePanel({
       default:
         break;
     }
+  }
+
+  if (projectProposal) {
+    return (
+      <ProjectHomesRoomShell backgroundUrl={PROJECT_HOMES_ROOM_BACKGROUND}>
+        <ProjectProposalReviewPanel
+          handoff={projectProposal}
+          onApproved={(projectId) => {
+            setProjectProposal(null);
+            const refreshed = loadMemberProjectHomesFromStore();
+            setMemberHomes(refreshed);
+            setActiveId(projectId);
+            setView("detail");
+          }}
+          onCancel={() => {
+            setProjectProposal(null);
+            setView("gallery");
+          }}
+          onKeepProposal={() => {
+            setProjectProposal(null);
+            setView("gallery");
+          }}
+          onReturnToCreationWorkspace={(workspaceId) => {
+            const ws = loadCreationWorkspace(workspaceId);
+            if (ws) onReturnToCreationWorkspace?.(workspaceId);
+            else onBack();
+          }}
+        />
+      </ProjectHomesRoomShell>
+    );
+  }
+
+  if (proposalError) {
+    return (
+      <ProjectHomesRoomShell backgroundUrl={PROJECT_HOMES_ROOM_BACKGROUND}>
+        <div className="mx-auto max-w-xl px-4 py-8 text-[#2f2a24]">
+          <h1 className="text-xl font-semibold">Project proposal needs a moment</h1>
+          <p className="mt-2 text-sm text-[#4b463f]">{proposalError}</p>
+          <button
+            type="button"
+            className="mt-4 rounded-xl border border-[#d4cdc3] px-3 py-2 text-sm font-semibold"
+            onClick={() => {
+              setProposalError(null);
+              onBack();
+            }}
+          >
+            Return
+          </button>
+        </div>
+      </ProjectHomesRoomShell>
+    );
   }
 
   const recommendation = recommendProjectHome(purpose);

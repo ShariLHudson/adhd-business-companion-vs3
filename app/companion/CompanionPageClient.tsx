@@ -626,7 +626,21 @@ import {
   forceNewCreationAcknowledgment,
 } from "@/lib/universalCreationEntrypoint";
 import { armForceNewCreateSession } from "@/lib/createEstate/forceNewCreateSession";
-import { runRequestIntoCreationWorkspace } from "@/lib/creationWorkspace";
+import {
+  consumeCreationWorkspaceCreateHandoff,
+  consumeCreationWorkspaceEstateHandoff,
+  consumeCreationWorkspaceStrategyHandoff,
+  loadCreationWorkspace,
+  peekEstateHandoff,
+  peekStrategyHandoff,
+  runRequestIntoCreationWorkspace,
+  type CreationWorkspaceCreateHandoff,
+  type CreationWorkspaceEstateHandoff,
+  type CreationWorkspaceStrategyHandoff,
+  type ConsumeCreateHandoffResult,
+} from "@/lib/creationWorkspace";
+import { StrategyCandidateReviewPanel } from "@/components/companion/creationWorkspace/StrategyCandidateReviewPanel";
+import { EstateProposalReviewPanel } from "@/components/companion/creationWorkspace/EstateProposalReviewPanel";
 import { applyEventWorkspaceToCreateWorkflow } from "@/lib/eventCreationWorkspace";
 import { getEventRecord } from "@/lib/eventsIntelligence/eventRecordStore";
 import { mayApplyEventWorkspace } from "@/lib/creationIdentity/deriveCreationIdentity";
@@ -4034,6 +4048,12 @@ export default function CompanionPageClient() {
   const [createFocusSubmitting, setCreateFocusSubmitting] = useState(false);
   const [createPreservedResponse, setCreatePreservedResponse] = useState<string | null>(null);
   const [createLinkedProjectHomeId, setCreateLinkedProjectHomeId] = useState<string | null>(null);
+  const [createHandoffConflict, setCreateHandoffConflict] =
+    useState<ConsumeCreateHandoffResult | null>(null);
+  const [strategyCandidateHandoff, setStrategyCandidateHandoff] =
+    useState<CreationWorkspaceStrategyHandoff | null>(null);
+  const [estateProposalHandoff, setEstateProposalHandoff] =
+    useState<CreationWorkspaceEstateHandoff | null>(null);
   const createEstateWorkingActive =
     activeSection === "create" &&
     createBuilderSession?.phase === "workspace" &&
@@ -12152,12 +12172,16 @@ export default function CompanionPageClient() {
     initialPrompt?: string;
     resumeWorkspaceId?: string;
     isEventDomain?: boolean;
+    /** Pre-hydrated session from Creation Workspace handoff (never regenerate). */
+    seededSession?: CreateBuilderSession | null;
   }): boolean {
     // Never call openCreateWorkspace
     const resumeWorkspaceId = opts?.resumeWorkspaceId?.trim();
     let session: CreateBuilderSession | null;
 
-    if (resumeWorkspaceId) {
+    if (opts?.seededSession) {
+      session = opts.seededSession;
+    } else if (resumeWorkspaceId) {
       session = hydrateExactBuilderSession(resumeWorkspaceId);
       if (!session) return false;
     } else {
@@ -12224,6 +12248,46 @@ export default function CompanionPageClient() {
     setActiveNav("create");
     setEstateRoomChatVisible(false);
     return true;
+  }
+
+  function openCreateFromCreationWorkspaceHandoff(
+    rawPayload: string,
+    conflictOverride?: "open_as_new" | "save_current_and_open" | "cancel",
+  ): boolean {
+    let handoff: CreationWorkspaceCreateHandoff | null = null;
+    try {
+      handoff = JSON.parse(rawPayload) as CreationWorkspaceCreateHandoff;
+    } catch {
+      return false;
+    }
+    const filled = Object.values(
+      createBuilderSessionRef.current?.workflow.sectionContent ?? {},
+    ).some((v) => Boolean(v?.trim()));
+    const result = consumeCreationWorkspaceCreateHandoff({
+      handoff,
+      conflictOverride,
+      hasActiveWorkspaceSession:
+        createBuilderSessionRef.current?.phase === "workspace",
+      hasFilledSections: filled,
+    });
+    if (!result.ok) {
+      if (result.stage === "conflict") {
+        setCreateHandoffConflict(result);
+      }
+      return false;
+    }
+    setCreateHandoffConflict(null);
+    return startFreshCreateFromEstate({
+      artifactType: result.session.typeLabel ?? "Social Post",
+      seededSession: result.session,
+    });
+  }
+
+  function returnToCreationWorkspaceFromDestination(workspaceId: string) {
+    const ws = loadCreationWorkspace(workspaceId);
+    openCreationWorkspaceCore({
+      workspace: ws,
+    });
   }
 
   function resumeActiveWorkspaceEntry(workspaceId: string): {
@@ -22160,6 +22224,9 @@ export default function CompanionPageClient() {
             onClose={closeWorkspacePanel}
             registerBack={registerBack}
             onReturnToEstate={navigateBackToEstateHome}
+            onReturnToCreationWorkspace={
+              returnToCreationWorkspaceFromDestination
+            }
           />
         );
       case "wins-this-week":
@@ -24933,6 +25000,9 @@ export default function CompanionPageClient() {
                 onClose={navigateToChatCore}
                 registerBack={registerBack}
                 onReturnToEstate={navigateBackToEstateHome}
+                onReturnToCreationWorkspace={
+                  returnToCreationWorkspaceFromDestination
+                }
               />
             </EstateRoomErrorBoundary>
           )}
@@ -25207,6 +25277,9 @@ export default function CompanionPageClient() {
               <ProjectHomesPrototypePanel
                 onBack={navigateBackToEstateHome}
                 initialView={projectHomesInitialView}
+                onReturnToCreationWorkspace={
+                  returnToCreationWorkspaceFromDestination
+                }
                 onCallTheBoard={(project) => {
                   const payload = buildCallTheBoardContext({
                     source: "project-home",
@@ -25638,27 +25711,153 @@ export default function CompanionPageClient() {
               registerBack={registerBack}
               initialWorkspace={creationWorkspaceBootstrap}
               initialRequest={creationWorkspaceInitialRequest}
-              onOpenCreate={(content) => {
-                try {
-                  sessionStorage.setItem(
-                    "companion-creation-workspace-create-handoff-v1",
-                    content,
-                  );
-                } catch {
-                  /* ignore */
-                }
-                openCreateEstateCore();
-              }}
+              onOpenCreate={(content) =>
+                openCreateFromCreationWorkspaceHandoff(content)
+              }
               onOpenProjects={() => openProjectHomesPrototypeCore()}
-              onOpenVisualThinking={() => openCartographersStudioCore()}
-              onOpenStrategicPlanning={() =>
-                openStandaloneFocusSectionCore("playbook")
-              }
-              onOpenBusinessEstate={() =>
-                openProfileDestinationCore("my-business-estate")
-              }
+              onOpenVisualThinking={() => {
+                openCartographersStudioCore();
+                return true;
+              }}
+              onOpenStrategicPlanning={(content) => {
+                try {
+                  const parsed = JSON.parse(
+                    content,
+                  ) as CreationWorkspaceStrategyHandoff;
+                  const result = consumeCreationWorkspaceStrategyHandoff({
+                    handoff: parsed,
+                  });
+                  if (result.ok) {
+                    setStrategyCandidateHandoff(result.handoff);
+                  }
+                } catch {
+                  const pending = peekStrategyHandoff();
+                  if (pending) {
+                    const result = consumeCreationWorkspaceStrategyHandoff({
+                      handoff: pending,
+                    });
+                    if (result.ok) setStrategyCandidateHandoff(result.handoff);
+                  }
+                }
+                openStandaloneFocusSectionCore("playbook");
+              }}
+              onOpenBusinessEstate={(content) => {
+                try {
+                  const parsed = JSON.parse(
+                    content,
+                  ) as CreationWorkspaceEstateHandoff;
+                  const result = consumeCreationWorkspaceEstateHandoff({
+                    handoff: parsed,
+                  });
+                  if (result.ok) setEstateProposalHandoff(result.handoff);
+                } catch {
+                  const pending = peekEstateHandoff();
+                  if (pending) {
+                    const result = consumeCreationWorkspaceEstateHandoff({
+                      handoff: pending,
+                    });
+                    if (result.ok) setEstateProposalHandoff(result.handoff);
+                  }
+                }
+                openProfileDestinationCore("my-business-estate");
+              }}
               onOpenResearchLibrary={() => openResearchLibraryCore()}
             />
+          )}
+
+          {createHandoffConflict &&
+            !createHandoffConflict.ok &&
+            createHandoffConflict.conflict?.kind === "active_unsaved" && (
+              <div
+                className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 p-4"
+                data-testid="create-handoff-conflict-dialog"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Create already has work in progress"
+              >
+                <div className="max-w-md rounded-2xl bg-[#fbf8f3] p-5 text-[#2f2a24] shadow-xl">
+                  <h2 className="text-xl font-semibold">
+                    You already have Create work open
+                  </h2>
+                  <p className="mt-2 text-sm text-[#4b463f]">
+                    Opening this Creation Workspace handoff would replace what is
+                    currently in Create. Your handoff is saved until you choose.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <button
+                      type="button"
+                      className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white"
+                      onClick={() => {
+                        const payload = JSON.stringify(
+                          createHandoffConflict.handoff,
+                        );
+                        openCreateFromCreationWorkspaceHandoff(
+                          payload,
+                          "open_as_new",
+                        );
+                      }}
+                    >
+                      Open as New Creation
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white"
+                      onClick={() => {
+                        const current = createBuilderSessionRef.current;
+                        if (current?.workflow) {
+                          syncCanonicalWorkFromCreateWorkflow({
+                            workflow: current.workflow,
+                            createWorkflowId: current.workflow.sessionId,
+                            projectHomeId: createLinkedProjectHomeId,
+                          });
+                        }
+                        const payload = JSON.stringify(
+                          createHandoffConflict.handoff,
+                        );
+                        openCreateFromCreationWorkspaceHandoff(
+                          payload,
+                          "save_current_and_open",
+                        );
+                      }}
+                    >
+                      Save Current and Open
+                    </button>
+                    <button
+                      type="button"
+                      className="rounded-xl border border-[#d4cdc3] px-4 py-2.5 text-sm font-semibold"
+                      onClick={() => setCreateHandoffConflict(null)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          {strategyCandidateHandoff && (
+            <div className="fixed inset-0 z-[70] overflow-auto bg-[#efe6d8]">
+              <StrategyCandidateReviewPanel
+                handoff={strategyCandidateHandoff}
+                onApproved={() => setStrategyCandidateHandoff(null)}
+                onCancel={() => setStrategyCandidateHandoff(null)}
+                onReturnToCreationWorkspace={
+                  returnToCreationWorkspaceFromDestination
+                }
+              />
+            </div>
+          )}
+
+          {estateProposalHandoff && (
+            <div className="fixed inset-0 z-[70] overflow-auto bg-[#efe6d8]">
+              <EstateProposalReviewPanel
+                handoff={estateProposalHandoff}
+                onApplied={() => setEstateProposalHandoff(null)}
+                onCancel={() => setEstateProposalHandoff(null)}
+                onReturnToCreationWorkspace={
+                  returnToCreationWorkspaceFromDestination
+                }
+              />
+            </div>
           )}
 
           {activeSection === "spin-wheel" && (
