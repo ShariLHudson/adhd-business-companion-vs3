@@ -14,7 +14,15 @@ Visual Thinking Studio helps members see, understand, create, and work through i
 
 Members must never be required to understand map types, research methods, frameworks, or output formats before beginning.
 
-This phase establishes intake only: understand the request, depth, and form — then confirm before any major generation.
+This phase establishes intake only: capture the request, depth, and form preference — then confirm before any major generation.
+
+### Relationship to the Understanding Engine (Build 2)
+
+- **Build 1** captures the member’s request (`VisualThinkingRequest`).
+- The **Understanding Engine** interprets goal, success, cognitive task, research need, and recommendations (`VisualThinkingUnderstanding`).
+- Downstream result planning and generation must use the **canonical understanding contract**, not raw keyword → artifact matching.
+
+See: [VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md](./VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md)
 
 ---
 
@@ -149,4 +157,5 @@ Existing maps and research records are not modified by this build.
 
 ## Next build
 
-Generate the confirmed primary result (starting with step-by-step / report / user-led canvas shells) while keeping confirmation, simplify/deepen, and no-forced-map guarantees.
+Build 2 (Understanding Engine) is documented separately.  
+Build 3 should generate the confirmed primary result from the understanding contract (starting with step-by-step / report / user-led canvas shells) while keeping confirmation, corrections, and no-forced-map guarantees.

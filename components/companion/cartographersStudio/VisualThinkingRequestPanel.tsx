@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   VISUAL_THINKING_DEPTH_QUESTION,
   VISUAL_THINKING_REQUEST_PLACEHOLDER,
@@ -10,7 +10,6 @@ import {
   VISUAL_THINKING_USER_LED_PROMPT,
   applyHelpDepth,
   applyRequestText,
-  applyUserControl,
   clearVisualThinkingRequestDraft,
   confirmRecommendation,
   createVisualThinkingRequest,
@@ -20,6 +19,15 @@ import {
   type VisualThinkingHelpDepth,
   type VisualThinkingRequest,
 } from "@/lib/cartographersStudio/visualThinkingRequest";
+import {
+  applyUnderstandingCorrection,
+  interpretVisualThinkingUnderstanding,
+  outputLabel,
+  projectUnderstandingPreview,
+  syncRequestFromUnderstanding,
+  type VisualThinkingUnderstanding,
+  type VisualThinkingUnderstandingOutput,
+} from "@/lib/cartographersStudio/visualThinkingUnderstanding";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 type Props = {
@@ -33,7 +41,11 @@ type SpeechRecognitionLike = {
   lang: string;
   start: () => void;
   stop: () => void;
-  onresult: ((event: { results: ArrayLike<{ 0: { transcript: string } }> }) => void) | null;
+  onresult:
+    | ((event: {
+        results: ArrayLike<{ 0: { transcript: string } }>;
+      }) => void)
+    | null;
   onerror: (() => void) | null;
   onend: (() => void) | null;
 };
@@ -49,7 +61,7 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 
 /**
  * Request-first opening experience for Visual Thinking Studio.
- * Sits above the Cartography room image — does not replace the background.
+ * Build 2: preview is projected from the Understanding Engine.
  */
 export function VisualThinkingRequestPanel({
   onOpenPreviousWork,
@@ -58,7 +70,11 @@ export function VisualThinkingRequestPanel({
   const [request, setRequest] = useState<VisualThinkingRequest>(() =>
     createVisualThinkingRequest({}),
   );
+  const [understanding, setUnderstanding] =
+    useState<VisualThinkingUnderstanding | null>(null);
   const [draftText, setDraftText] = useState("");
+  const [correctionText, setCorrectionText] = useState("");
+  const [showCorrection, setShowCorrection] = useState(false);
   const [showAllDepth, setShowAllDepth] = useState(false);
   const [listening, setListening] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -69,6 +85,9 @@ export function VisualThinkingRequestPanel({
     if (existing && existing.status !== "capturing") {
       setRequest(existing);
       setDraftText(existing.rawRequest);
+      if (existing.rawRequest.trim()) {
+        setUnderstanding(interpretVisualThinkingUnderstanding(existing));
+      }
     }
   }, []);
 
@@ -82,8 +101,35 @@ export function VisualThinkingRequestPanel({
     };
   }, []);
 
-  function updateRequest(next: VisualThinkingRequest) {
+  const preview = useMemo(
+    () => (understanding ? projectUnderstandingPreview(understanding) : null),
+    [understanding],
+  );
+
+  function commitRequest(next: VisualThinkingRequest, reinterpret = true) {
+    if (
+      reinterpret &&
+      next.rawRequest.trim() &&
+      (next.status === "preview" ||
+        next.status === "confirmed" ||
+        next.status === "user_led")
+    ) {
+      const understood = interpretVisualThinkingUnderstanding(next);
+      setUnderstanding(understood);
+      setRequest(syncRequestFromUnderstanding(next, understood));
+      return;
+    }
     setRequest(next);
+    if (!next.rawRequest.trim()) setUnderstanding(null);
+  }
+
+  function applyUnderstanding(
+    nextUnderstanding: VisualThinkingUnderstanding,
+  ) {
+    setUnderstanding(nextUnderstanding);
+    setRequest((prev) =>
+      syncRequestFromUnderstanding(prev, nextUnderstanding),
+    );
   }
 
   function handleContinue() {
@@ -93,18 +139,20 @@ export function VisualThinkingRequestPanel({
       return;
     }
     setDraftText(text);
-    updateRequest(applyRequestText(request, text));
+    const next = applyRequestText(request, text);
+    commitRequest(next, true);
   }
 
   function handleDepth(
     depth: Exclude<VisualThinkingHelpDepth, "unspecified">,
   ) {
-    updateRequest(applyHelpDepth(request, depth));
+    const next = applyHelpDepth(request, depth);
+    commitRequest(next, true);
   }
 
   function handleConfirm() {
     const confirmed = confirmRecommendation(request);
-    updateRequest(confirmed);
+    setRequest(confirmed);
     onConfirmed?.(confirmed);
   }
 
@@ -114,7 +162,7 @@ export function VisualThinkingRequestPanel({
       entryPath: "user_led_visual",
     });
     setDraftText(next.rawRequest);
-    updateRequest(next);
+    commitRequest(next, true);
   }
 
   function startResearch() {
@@ -123,7 +171,7 @@ export function VisualThinkingRequestPanel({
       entryPath: "research_assisted",
     });
     setDraftText(next.rawRequest);
-    updateRequest(next);
+    commitRequest(next, Boolean(next.rawRequest.trim()));
   }
 
   function continueUserLedOrResearch() {
@@ -133,7 +181,8 @@ export function VisualThinkingRequestPanel({
       return;
     }
     setDraftText(text);
-    updateRequest(applyRequestText({ ...request, rawRequest: text }, text));
+    const next = applyRequestText({ ...request, rawRequest: text }, text);
+    commitRequest(next, true);
   }
 
   function toggleVoice() {
@@ -158,6 +207,28 @@ export function VisualThinkingRequestPanel({
     recognitionRef.current = recognition;
     recognition.start();
     setListening(true);
+  }
+
+  function removeSupporting(output: VisualThinkingUnderstandingOutput) {
+    if (!understanding) return;
+    applyUnderstanding(
+      applyUnderstandingCorrection(understanding, {
+        kind: "remove_supporting",
+        output,
+      }),
+    );
+  }
+
+  function submitCorrection() {
+    if (!understanding || !correctionText.trim()) return;
+    applyUnderstanding(
+      applyUnderstandingCorrection(understanding, {
+        kind: "natural_language",
+        text: correctionText.trim(),
+      }),
+    );
+    setCorrectionText("");
+    setShowCorrection(false);
   }
 
   const depthChoices = visibleDepthChoices({ showAll: showAllDepth });
@@ -232,7 +303,9 @@ export function VisualThinkingRequestPanel({
                 className="vts-request__primary"
                 data-testid="visual-thinking-request-continue"
                 onClick={
-                  phase === "capturing" ? handleContinue : continueUserLedOrResearch
+                  phase === "capturing"
+                    ? handleContinue
+                    : continueUserLedOrResearch
                 }
               >
                 Continue
@@ -303,30 +376,85 @@ export function VisualThinkingRequestPanel({
                 More options
               </button>
             ) : null}
-            <p className="vts-request__note" data-testid="visual-thinking-depth-full-detail">
+            <p
+              className="vts-request__note"
+              data-testid="visual-thinking-depth-full-detail"
+            >
               You can always ask for more detail later — fewer choices here does
               not limit how thorough Spark can be.
             </p>
           </section>
         ) : null}
 
-        {phase === "preview" ? (
+        {phase === "preview" && preview && understanding ? (
           <section
             className="vts-request__preview"
             data-testid="visual-thinking-recommendation-preview"
             aria-labelledby="vts-preview-heading"
           >
             <p className="vts-request__echo">{request.rawRequest}</p>
+
+            <p className="vts-request__label">What I think you&apos;re trying to do</p>
+            <p
+              className="vts-request__goal"
+              data-testid="visual-thinking-interpreted-goal"
+            >
+              {preview.goalLine}
+            </p>
+
             <h2 id="vts-preview-heading" className="vts-request__section-title">
-              Here&apos;s what I think would help:
+              Here&apos;s what I recommend
             </h2>
             <p
               className="vts-request__summary"
               data-testid="visual-thinking-recommendation-summary"
             >
-              {request.recommendationSummary}
+              {preview.primaryLine}
             </p>
-            {request.declinesMap ? (
+
+            {preview.showSupporting && preview.supportingLines.length > 0 ? (
+              <div
+                className="vts-request__supporting-block"
+                data-testid="visual-thinking-supporting-outputs"
+              >
+                <p className="vts-request__label">I can also include</p>
+                <ul className="vts-request__supporting-list">
+                  {understanding.recommendedSupportingOutputs.map((output) => (
+                    <li key={output}>
+                      <span>{outputLabel(output)}</span>
+                      <button
+                        type="button"
+                        className="vts-request__remove"
+                        data-testid={`visual-thinking-remove-${output}`}
+                        onClick={() => removeSupporting(output)}
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {preview.researchLine ? (
+              <p
+                className="vts-request__note"
+                data-testid="visual-thinking-research-note"
+              >
+                {preview.researchLine}
+              </p>
+            ) : null}
+
+            {preview.creationModeLine ? (
+              <p
+                className="vts-request__note"
+                data-testid="visual-thinking-creation-mode-note"
+              >
+                {preview.creationModeLine}
+              </p>
+            ) : null}
+
+            {understanding.declinesMap ? (
               <p
                 className="vts-request__note"
                 data-testid="visual-thinking-no-map-honored"
@@ -334,6 +462,21 @@ export function VisualThinkingRequestPanel({
                 No map required — we&apos;ll stay with a written result.
               </p>
             ) : null}
+
+            {preview.clarificationQuestion ? (
+              <p
+                className="vts-request__note"
+                data-testid="visual-thinking-clarification"
+              >
+                {preview.clarificationQuestion}
+              </p>
+            ) : null}
+
+            {/* Guard: never expose technical labels */}
+            <span className="sr-only" data-testid="visual-thinking-no-tech-labels">
+              preview
+            </span>
+
             <div className="vts-request__preview-actions">
               <button
                 type="button"
@@ -347,9 +490,14 @@ export function VisualThinkingRequestPanel({
                 type="button"
                 className="vts-request__secondary-btn"
                 data-testid="visual-thinking-make-simpler"
-                onClick={() =>
-                  updateRequest(applyUserControl(request, "simplify"))
-                }
+                onClick={() => {
+                  if (!understanding) return;
+                  applyUnderstanding(
+                    applyUnderstandingCorrection(understanding, {
+                      kind: "simplify",
+                    }),
+                  );
+                }}
               >
                 Make it simpler
               </button>
@@ -357,23 +505,77 @@ export function VisualThinkingRequestPanel({
                 type="button"
                 className="vts-request__secondary-btn"
                 data-testid="visual-thinking-add-detail"
-                onClick={() =>
-                  updateRequest(applyUserControl(request, "add_detail"))
-                }
+                onClick={() => {
+                  if (!understanding) return;
+                  applyUnderstanding(
+                    applyUnderstandingCorrection(understanding, {
+                      kind: "add_detail",
+                    }),
+                  );
+                }}
               >
                 Add more detail
               </button>
               <button
                 type="button"
                 className="vts-request__secondary-btn"
-                data-testid="visual-thinking-different-format"
-                onClick={() =>
-                  updateRequest(applyUserControl(request, "different_format"))
-                }
+                data-testid="visual-thinking-change-included"
+                onClick={() => setShowCorrection(true)}
               >
-                Choose a different format
+                Change what&apos;s included
+              </button>
+              <button
+                type="button"
+                className="vts-request__secondary-btn"
+                data-testid="visual-thinking-build-myself"
+                onClick={() => {
+                  if (!understanding) return;
+                  applyUnderstanding(
+                    applyUnderstandingCorrection(understanding, {
+                      kind: "build_myself",
+                    }),
+                  );
+                }}
+              >
+                I want to build it myself
+              </button>
+              <button
+                type="button"
+                className="vts-request__secondary-btn"
+                data-testid="visual-thinking-correct-goal"
+                onClick={() => setShowCorrection(true)}
+              >
+                That&apos;s not what I mean
               </button>
             </div>
+
+            {showCorrection ? (
+              <div
+                className="vts-request__correction"
+                data-testid="visual-thinking-correction-box"
+              >
+                <label className="sr-only" htmlFor="vts-correction-input">
+                  Correction
+                </label>
+                <textarea
+                  id="vts-correction-input"
+                  className="vts-request__textarea"
+                  data-testid="visual-thinking-correction-input"
+                  rows={2}
+                  value={correctionText}
+                  onChange={(e) => setCorrectionText(e.target.value)}
+                  placeholder="Tell me what you meant — for example, this is for training my team."
+                />
+                <button
+                  type="button"
+                  className="vts-request__primary"
+                  data-testid="visual-thinking-correction-submit"
+                  onClick={submitCorrection}
+                >
+                  Update the plan
+                </button>
+              </div>
+            ) : null}
           </section>
         ) : null}
 
@@ -382,9 +584,12 @@ export function VisualThinkingRequestPanel({
             className="vts-request__confirmed"
             data-testid="visual-thinking-confirmed"
           >
-            <p className="vts-request__section-title">We&apos;re ready when you are.</p>
+            <p className="vts-request__section-title">
+              We&apos;re ready when you are.
+            </p>
             <p className="vts-request__summary">
-              {request.recommendationSummary}
+              {understanding?.userFacingRecommendation ??
+                request.recommendationSummary}
             </p>
             <p className="vts-request__note">
               Full generation comes next — nothing has been built yet. You can
@@ -397,7 +602,8 @@ export function VisualThinkingRequestPanel({
               onClick={() => {
                 clearVisualThinkingRequestDraft();
                 setDraftText("");
-                updateRequest(createVisualThinkingRequest({}));
+                setUnderstanding(null);
+                setRequest(createVisualThinkingRequest({}));
               }}
             >
               Start a different request
@@ -405,21 +611,22 @@ export function VisualThinkingRequestPanel({
           </section>
         ) : null}
 
-        {(phase === "user_led" || phase === "research_intake") &&
-        request.rawRequest &&
-        request.status !== "preview" &&
-        request.status !== "awaiting_depth" ? (
+        {phase === "user_led" && understanding ? (
           <p
             className="vts-request__path-note"
-            data-testid={
-              phase === "user_led"
-                ? "visual-thinking-user-led-path"
-                : "visual-thinking-research-path"
-            }
+            data-testid="visual-thinking-user-led-path"
           >
-            {phase === "user_led"
-              ? "User-led visual path — no map type choice and no research required."
-              : "Research-assisted path — Spark will learn with you before building."}
+            {preview?.creationModeLine ??
+              "User-led visual path — no map type choice and no research required."}
+          </p>
+        ) : null}
+
+        {phase === "research_intake" ? (
+          <p
+            className="vts-request__path-note"
+            data-testid="visual-thinking-research-path"
+          >
+            Research-assisted path — Spark will learn with you before building.
           </p>
         ) : null}
       </div>
