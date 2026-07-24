@@ -6,7 +6,9 @@
 
 ## Verdict
 
-Phase 4 Pricing and Growth domain packs and the Phase 1–3 shared judgment engine are in place. Cross-domain **synthesis was not implemented**. Secondary-domain helpers existed only for Growth and were **not wired** into the judgment turn. Phase 5 adds a thin synthesis layer — not a second engine, not a parallel registry.
+Phase 4 Pricing and Growth domain packs and the Phase 1–3 shared judgment engine are in place. Phase 5 adds a thin **Strategy Synthesis Engine** — primary + at most one secondary, budgeted contributions, dedupe, conflict resolution, and integrated member-facing copy — **not** a second judgment engine and **not** a parallel option/risk/recommendation contract set.
+
+See also: `01`–`07` in this folder.
 
 ## What already supports synthesis
 
