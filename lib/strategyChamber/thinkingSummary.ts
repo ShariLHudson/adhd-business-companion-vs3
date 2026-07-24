@@ -5,7 +5,10 @@
 
 import type { StrategyWorkItem } from "./types";
 import { assessDecisionReadiness } from "./intelligence/engine/assessDecisionReadiness";
-import { analyzeStrategicStatement } from "./intelligence/engine/analyzeStrategicStatement";
+import {
+  classifyStrategicInput,
+  formatStanceAwareCopy,
+} from "./intelligence/engine/classifyStrategicInput";
 import { DECISION_READINESS_LABEL } from "./domainModel";
 
 export type ThinkingSummarySection = {
@@ -88,10 +91,15 @@ export function buildThinkingSummary(
   }
 
   if (reality && !sameText(reality, question)) {
+    const realityClassified = classifyStrategicInput(reality);
     sections.push({
       id: "happening",
       label: "What seems to be happening",
-      body: reality,
+      // Stance-aware framing — never elevate observation/feeling to fact
+      body:
+        realityClassified.stance === "fact" && realityClassified.safeToTreatAsFact
+          ? reality
+          : formatStanceAwareCopy(realityClassified),
     });
   }
 
@@ -121,7 +129,10 @@ export function buildThinkingSummary(
   }
 
   const known = uniqueLines(
-    [...(item.knownFacts ?? [])],
+    [...(item.knownFacts ?? [])].filter((f) => {
+      const c = classifyStrategicInput(f);
+      return c.stance === "fact" && c.safeToTreatAsFact;
+    }),
     question,
     reality,
   );
@@ -134,7 +145,19 @@ export function buildThinkingSummary(
   }
 
   const assumptions = uniqueLines(
-    [...(item.assumptions ?? [])],
+    [
+      ...(item.assumptions ?? []),
+      ...(item.knownFacts ?? []).filter((f) => {
+        const c = classifyStrategicInput(f);
+        return c.stance === "assumption" || c.stance === "interpretation";
+      }),
+    ].map((line) => {
+      const c = classifyStrategicInput(line);
+      if (c.stance === "assumption" || c.stance === "interpretation") {
+        return formatStanceAwareCopy(c);
+      }
+      return line;
+    }),
     question,
     reality,
     ...known,
@@ -198,7 +221,9 @@ export function buildThinkingSummary(
   }
 
   const observations = uniqueLines(
-    [...(item.observations ?? [])],
+    [...(item.observations ?? [])].map((obs) =>
+      formatStanceAwareCopy(classifyStrategicInput(obs)),
+    ),
     question,
     reality,
     ...known,
@@ -212,8 +237,8 @@ export function buildThinkingSummary(
     unknownBits.push("What a good outcome would look like");
   }
   for (const stmt of item.memberStatements ?? []) {
-    const analysis = analyzeStrategicStatement(stmt);
-    if (analysis.nature === "unknown" || analysis.needsClarification) {
+    const classified = classifyStrategicInput(stmt);
+    if (classified.stance === "unknown" || classified.stance === "feeling") {
       const line = stmt.trim();
       if (
         line &&
@@ -221,18 +246,16 @@ export function buildThinkingSummary(
         !sameText(line, reality) &&
         !unknownBits.some((u) => sameText(u, line))
       ) {
-        // Keep unknowns visible without repeating the opening line everywhere
-        if (!known.includes(line) && !assumptions.includes(line)) {
-          unknownBits.push(`Still unclear: ${line}`);
+        if (!known.includes(line)) {
+          unknownBits.push(formatStanceAwareCopy(classified));
         }
       }
     }
   }
   if (observations.length) {
-    // Surface observations under happening-adjacent unknown if not already shown
     for (const obs of observations) {
-      if (!unknownBits.some((u) => u.includes(obs))) {
-        unknownBits.push(`Noticing: ${obs}`);
+      if (!unknownBits.some((u) => u.includes(obs) || obs.includes(u))) {
+        unknownBits.push(obs);
       }
     }
   }

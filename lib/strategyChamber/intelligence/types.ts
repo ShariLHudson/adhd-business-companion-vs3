@@ -122,12 +122,26 @@ export type StrategyTypeContract = {
   version: 1;
 };
 
-/** Classified member input — strategic role only. Epistemic nature is separate. */
+/**
+ * Epistemic stance of a statement — separate from StrategicInputClassification
+ * (strategic role). Does not expand or rename the primary role union.
+ */
+export type StrategicStatementStance =
+  | "fact"
+  | "observation"
+  | "interpretation"
+  | "assumption"
+  | "feeling"
+  | "unknown";
+
+/** Classified member input — strategic role + epistemic stance. */
 export type ClassifiedStrategicInput = {
   originalText: string;
   classifications: StrategicInputClassification[];
   evidenceStrength: EvidenceStrength;
-  /** Never treat assumption as fact in user-facing copy. */
+  /** Epistemic standing — never conflated with strategic role. */
+  stance: StrategicStatementStance;
+  /** Never treat assumption/feeling/interpretation/observation as fact. */
   safeToTreatAsFact: boolean;
 };
 

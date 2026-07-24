@@ -1,19 +1,18 @@
 /**
- * Secondary epistemic layer — statement nature.
+ * Secondary epistemic layer — statement nature / stance.
  * Distinct from StrategicInputClassification (strategic role).
  * Does not rename or replace domainModel.ts contracts.
+ *
+ * Canonical stance lives on ClassifiedStrategicInput.stance
+ * (`StrategicStatementStance` in types.ts). Nature is the same union
+ * for richer StrategicStatementAnalysis metadata.
  */
 
 import type { EvidenceStrength, StrategicInputClassification } from "../domainModel";
+import type { StrategicStatementStance } from "./types";
 
-/** Epistemic nature of a member statement — not its strategic role. */
-export type StrategicStatementNature =
-  | "fact"
-  | "observation"
-  | "interpretation"
-  | "assumption"
-  | "feeling"
-  | "unknown";
+/** @deprecated Prefer StrategicStatementStance — same epistemic union. */
+export type StrategicStatementNature = StrategicStatementStance;
 
 export type StatementAnalysisConfidence = "low" | "moderate" | "high";
 
@@ -25,7 +24,7 @@ export type StrategicStatementAnalysis = {
   confidence: StatementAnalysisConfidence;
   /** Strategic role tags from the primary classification union. */
   classifications: StrategicInputClassification[];
-  /** Only true for confirmed/strong facts without assumption markers. */
+  /** Only true for facts with supporting evidence strength. */
   safeToTreatAsFact: boolean;
   /** False for feelings, pure assumptions, and unsupported interpretations. */
   safeToPresentAsEvidence: boolean;

@@ -7,6 +7,8 @@ import type { AdaptivePresentationResolved } from "@/lib/adaptiveCompanionIntell
 import type { StrategyOption, StrategyWorkItem } from "./types";
 import {
   analyzeStrategyWorkItem,
+  classifyStrategicInput,
+  formatStanceAwareCopy,
   generateStrategicOptions,
   selectNextQuestion,
   shouldOfferStrategicOptions,
@@ -63,7 +65,9 @@ export function buildShariReflection(item: StrategyWorkItem): string {
     return `We've named a few directions for: ${question}`;
   }
   if (item.currentReality?.trim()) {
-    return `You're deciding about “${question}” while noticing that ${item.currentReality.trim()}`;
+    const classified = classifyStrategicInput(item.currentReality);
+    const realityCopy = formatStanceAwareCopy(classified);
+    return `You're deciding about “${question}”. ${realityCopy}`;
   }
   return `We're still unpacking: ${question}`;
 }

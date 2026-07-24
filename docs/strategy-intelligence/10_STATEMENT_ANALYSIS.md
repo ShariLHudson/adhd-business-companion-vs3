@@ -9,13 +9,17 @@
 | Layer | Type | Answers |
 |-------|------|---------|
 | Strategic role | `StrategicInputClassification` | What *kind of strategic material* is this? (goal, risk, option…) |
-| Statement nature | `StrategicStatementNature` | What *epistemic standing* does this claim have? |
+| Epistemic stance | `StrategicStatementStance` on `ClassifiedStrategicInput.stance` | What *epistemic standing* does this claim have? |
 
 They must stay separate. A risk can be a feeling. An observation can play the role of evidence without being a proven fact. Collapsing them into one union forces false certainty.
 
-## Natures
+`StrategicStatementNature` (on richer analysis objects) is the same epistemic union as `StrategicStatementStance`.
+
+## Stances / natures
 
 `fact` · `observation` · `interpretation` · `assumption` · `feeling` · `unknown`
+
+Assigned by `classifyStrategicInput`. Copy uses `formatStanceAwareCopy` so observations, interpretations, assumptions, and feelings are never silently presented as facts.
 
 ## Behavioral rules
 
