@@ -335,6 +335,27 @@ function placeProcess(
   profile: LayoutViewportProfile,
 ): LayoutObjectPlacement[] {
   const vertical = profile === "mobile" || ordered.length > 8;
+  // Long guides: wrap into a few columns that still fit a frosted panel.
+  // Too many columns push objects outside overflow:hidden and look "empty".
+  if (vertical && ordered.length > 12) {
+    const targetCols = Math.min(3, Math.max(2, Math.ceil(ordered.length / 12)));
+    const rowsPerCol = Math.ceil(ordered.length / targetCols);
+    return ordered.map((o, i) => {
+      const col = Math.floor(i / rowsPerCol);
+      const row = i % rowsPerCol;
+      const role = inferVisualRole(o, i, ordered.length);
+      return {
+        objectId: o.id,
+        x:
+          spacing.originX +
+          col * (spacing.objectW + spacing.gapX + 28) +
+          (role === "optional" ? 12 : 0),
+        y: spacing.originY + row * (spacing.objectH + spacing.gapY),
+        visualRole: role,
+        readingOrder: i,
+      };
+    });
+  }
   return ordered.map((o, i) => {
     const role = inferVisualRole(o, i, ordered.length);
     if (vertical) {

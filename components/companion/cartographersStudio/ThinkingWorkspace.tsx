@@ -287,6 +287,33 @@ export function ThinkingWorkspace({
   }
   const { panX, panY, zoom } = workspace.viewport;
 
+  // Never render the editing shell for a warning-only / empty generated result.
+  // User-led canvases may start sparse on purpose.
+  if (
+    warningOnlyShell ||
+    (!hasSubstantiveWorkspace && workspace.workspaceMode !== "user_led")
+  ) {
+    return (
+      <section
+        className="vts-workspace vts-workspace--recovery"
+        data-testid="thinking-workspace-recovery"
+        data-workspace-status="failed"
+        aria-label="Result still building"
+      >
+        <h2 className="vts-workspace__title">Still building your result</h2>
+        <p
+          className="vts-request__note"
+          data-testid="thinking-workspace-recovery-note"
+          role="status"
+        >
+          I could not open a finished workspace yet. Ask Shari to retry research
+          or build the useful guide from stable steps — the editing tools stay
+          closed until something real is ready.
+        </p>
+      </section>
+    );
+  }
+
   return (
     <section
       className="vts-workspace"

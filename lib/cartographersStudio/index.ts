@@ -307,6 +307,7 @@ export {
   workspaceLayoutProfileForWidth,
   saveThinkingWorkspace,
   loadThinkingWorkspace,
+  isSubstantiveLoadedWorkspace,
   clearThinkingWorkspace,
   WORKSPACE_SESSION_KEY,
   type ThinkingObject,
@@ -450,6 +451,15 @@ export {
   buildStableResearchFindingsForRequest,
   type VisualThinkingResearchToResultRun,
 } from "./visualThinkingResearchToResult";
+
+export {
+  beginVisualThinkingExecutionTrace,
+  recordVisualThinkingTrace,
+  getVisualThinkingExecutionTrace,
+  getLastVisualThinkingTraceId,
+  summarizeVisualThinkingTrace,
+  type VisualThinkingExecutionTrace,
+} from "./visualThinkingExecutionTrace";
 
 export {
   assessVisualThinkingRecommendation,

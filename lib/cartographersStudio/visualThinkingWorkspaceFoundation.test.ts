@@ -170,6 +170,20 @@ describe("Visual Thinking Workspace Foundation", () => {
       manySteps,
     );
     let ws = requireWorkspace(input);
+    // Process guides no longer auto-collapse early (empty-workspace repair).
+    // Create a group explicitly so collapse/expand immutability is still covered.
+    if (ws.groups.length === 0) {
+      const ids = ws.objects
+        .filter((o) => o.type !== "group")
+        .slice(4)
+        .map((o) => o.id);
+      expect(ids.length).toBeGreaterThan(1);
+      ws = applyWorkspaceAction(ws, {
+        kind: "group",
+        objectIds: ids,
+        title: "More ideas",
+      });
+    }
     expect(ws.groups.length).toBeGreaterThan(0);
     const groupId = ws.groups[0]!.id;
     const beforeSummaries = ws.objects

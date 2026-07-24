@@ -323,7 +323,9 @@ function newId(prefix: string): string {
 }
 
 function clampZoom(z: number): number {
-  return Math.max(0.4, Math.min(2.2, z));
+  // Tall process guides need deeper zoom-out than the old 0.4 floor —
+  // otherwise Fit View leaves objects thousands of pixels off-canvas.
+  return Math.max(0.12, Math.min(2.2, z));
 }
 
 export function layoutIntentFromPresentation(
@@ -463,9 +465,11 @@ function contentBounds(objects: ThinkingObject[]): {
 
 export function fitViewportToContent(
   objects: ThinkingObject[],
-  viewW = 960,
-  viewH = 560,
+  viewW = 520,
+  viewH = 420,
 ): WorkspaceViewport {
+  // Defaults match the frosted Visual Thinking panel, not a full desktop
+  // canvas — otherwise Fit View centers content outside the visible glass.
   const b = contentBounds(objects);
   const contentW = Math.max(200, b.maxX - b.minX + 80);
   const contentH = Math.max(160, b.maxY - b.minY + 80);
@@ -948,6 +952,9 @@ export function createThinkingWorkspace(
     (knowledgePackage?.items.length ?? 0) > 0 &&
     blocks.filter((b) => b.type !== "heading" && b.type !== "paragraph").length < 2;
 
+  const isVerificationWarningText = (text: string) =>
+    /have not been verified|awaiting verification/i.test(text);
+
   const sourceUnits: Array<{
     type: ThinkingObjectType;
     title: string;
@@ -961,7 +968,11 @@ export function createThinkingWorkspace(
 
   if (useKnowledgeItems && knowledgePackage) {
     for (const item of knowledgePackage.items.filter(
-      (i) => i.type !== "assumption" && i.verificationStatus !== "assumption",
+      (i) =>
+        i.type !== "assumption" &&
+        i.verificationStatus !== "assumption" &&
+        !isVerificationWarningText(i.content) &&
+        !isVerificationWarningText(i.title ?? ""),
     )) {
       sourceUnits.push({
         type:
@@ -984,6 +995,9 @@ export function createThinkingWorkspace(
   } else {
     for (const block of blocks) {
       if (block.type === "paragraph" && blocks.length > 8) continue;
+      // Never project the readiness warning as a Thinking Object body.
+      if (isVerificationWarningText(block.content)) continue;
+      if (block.title && isVerificationWarningText(block.title)) continue;
       sourceUnits.push({
         type: blockToObjectType(block),
         title: block.title || block.content.slice(0, 48) || "Idea",
@@ -997,10 +1011,19 @@ export function createThinkingWorkspace(
     }
   }
 
-  // Adaptive: collapse density for high choice-load by grouping late items
+  // Adaptive: collapse density for high choice-load by grouping late items.
+  // Process guides keep a readable first board (~14 steps). Overflow goes to
+  // "More ideas" so Fit View stays legible inside the frosted panel.
   const density = presentationPlan.informationDensity;
-  const collapseThreshold =
-    density === "low" || adaptive.summaryFirst ? 6 : density === "high" ? 24 : 12;
+  const processLayout =
+    layoutIntent === "process" || layoutIntent === "timeline";
+  const collapseThreshold = processLayout
+    ? 14
+    : density === "low" || adaptive.summaryFirst
+      ? 6
+      : density === "high"
+        ? 24
+        : 12;
 
   const draftObjects: ThinkingObject[] = sourceUnits.map((u) => ({
     id: newId("wto"),
@@ -1218,10 +1241,14 @@ export function createThinkingWorkspace(
     refined.placements,
   );
 
-  const initialZoom =
-    density === "low" || adaptive.summaryFirst ? 0.9 : density === "high" ? 1 : 1;
-  const viewport = fitViewportToContent(objects.filter((o) => !o.groupId));
-  viewport.zoom = clampZoom(viewport.zoom * initialZoom);
+  const visibleForFit = objects.filter((o) => !o.groupId);
+  const viewport = fitViewportToContent(visibleForFit);
+  // Only nudge zoom for compact boards — never undo Fit for long process guides.
+  if (visibleForFit.length <= 12) {
+    const initialZoom =
+      density === "low" || adaptive.summaryFirst ? 0.9 : 1;
+    viewport.zoom = clampZoom(viewport.zoom * initialZoom);
+  }
 
   const suggestions = refined.suggestions;
   const timestamp = nowIso();
@@ -1786,13 +1813,50 @@ export function saveThinkingWorkspace(state: ThinkingWorkspaceState): void {
   }
 }
 
+/**
+ * Reject stale warning-only / empty shells restored from session storage.
+ * A previous failed run must never reopen as a "ready" Thinking Workspace.
+ */
+export function isSubstantiveLoadedWorkspace(
+  state: ThinkingWorkspaceState,
+): boolean {
+  if (state.workspaceMode === "user_led") return true;
+  const objects = state.objects ?? [];
+  const meaningful = objects.filter((o) => {
+    if (o.type === "group") return false;
+    const summary = (o.summary ?? "").trim();
+    if (summary.split(/\s+/).length < 4) return false;
+    if (/have not been verified|awaiting verification/i.test(summary)) {
+      return false;
+    }
+    if (/have not been verified|awaiting verification/i.test(o.title ?? "")) {
+      return false;
+    }
+    return true;
+  });
+  const warningNotice = Boolean(
+    state.completenessNotice &&
+      /have not been verified|awaiting verification/i.test(
+        state.completenessNotice,
+      ),
+  );
+  if (warningNotice && meaningful.length < 2) return false;
+  if (meaningful.length < 2) return false;
+  return true;
+}
+
 export function loadThinkingWorkspace(): ThinkingWorkspaceState | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.sessionStorage.getItem(WORKSPACE_SESSION_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as ThinkingWorkspaceState;
-    return normalizeLoadedWorkspace(parsed);
+    const normalized = normalizeLoadedWorkspace(parsed);
+    if (!isSubstantiveLoadedWorkspace(normalized)) {
+      window.sessionStorage.removeItem(WORKSPACE_SESSION_KEY);
+      return null;
+    }
+    return normalized;
   } catch {
     return null;
   }

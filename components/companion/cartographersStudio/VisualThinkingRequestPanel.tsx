@@ -46,13 +46,11 @@ import {
   replaceDeliverableInBundle,
   saveGenerationBundle,
   simplifyDeliverable,
-  startGenerationFromConfirmedPlan,
   type VisualThinkingGenerationBundle,
 } from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
 import {
   applyKnowledgeGapAnswer,
   clearKnowledgeBundle,
-  knowledgeHandoffToGenerationContext,
   loadKnowledgeBundle,
   prepareVisualThinkingKnowledge,
   projectKnowledgePreparationStatus,
@@ -81,7 +79,6 @@ import {
   applyResearchToKnowledgeBundle,
   clearResearchBundle,
   dismissWorkspaceResearchNotification,
-  knowledgeResearchSatisfiesGenerationGate,
   loadResearchBundle,
   planVisualThinkingResearch,
   projectResearchStatus,
@@ -96,6 +93,10 @@ import {
   resolveKnowledgeGap,
 } from "@/lib/cartographersStudio/visualThinkingGenerateFirst";
 import { runVisualThinkingResearchToResult } from "@/lib/cartographersStudio/visualThinkingResearchToResult";
+import {
+  getLastVisualThinkingTraceId,
+  summarizeVisualThinkingTrace,
+} from "@/lib/cartographersStudio/visualThinkingExecutionTrace";
 import {
   applyCoCreationAction,
   applyRepresentationSyncChoice,
@@ -123,6 +124,11 @@ import {
 } from "@/lib/projectsIntelligence";
 import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
+
+const IS_VTS_DEV_DIAGNOSTICS =
+  typeof process !== "undefined" &&
+  (process.env.NODE_ENV === "development" ||
+    process.env.NODE_ENV === "test");
 
 type Props = {
   onOpenPreviousWork: () => void;
@@ -207,6 +213,7 @@ export function VisualThinkingRequestPanel({
     [],
   );
   const autoContinueLockRef = useRef(false);
+  const [executionTraceId, setExecutionTraceId] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
@@ -393,8 +400,12 @@ export function VisualThinkingRequestPanel({
     hasSubstantiveResult && substantiveWrittenBlocks >= 3;
   const pipelineRecovery =
     Boolean(generationBundle || researchBundle || knowledgeBundle) &&
-    !thinkingWorkspace &&
     !hasSubstantiveResult;
+
+  const executionTraceSummary = useMemo(
+    () => summarizeVisualThinkingTrace(executionTraceId),
+    [executionTraceId, generationBundle?.run.id, thinkingWorkspace?.id],
+  );
 
   function commitRequest(next: VisualThinkingRequest, reinterpret = true) {
     if (
@@ -432,12 +443,16 @@ export function VisualThinkingRequestPanel({
   }
 
   function runGenerateFirstPipeline(rawText: string) {
+    // Clear any stale warning-only shell before executing the live path.
+    clearThinkingWorkspace();
+    clearEditingSession();
     const run = runVisualThinkingResearchToResult(rawText, {
       entryPath:
         request.entryPath === "research_assisted"
           ? "research_assisted"
           : "describe_request",
     });
+    setExecutionTraceId(run.traceId || getLastVisualThinkingTraceId());
     setGenerateFirstAck(run.acknowledgement);
     setGenerateFirstProgress(run.progressLabels);
     setRequest(run.request);
@@ -464,7 +479,17 @@ export function VisualThinkingRequestPanel({
     );
     setGapAnswer("");
     setShowThisDifferently(false);
-    setShowWrittenReview(false);
+    // Auto-open Written Review when a substantive guide exists.
+    const primary =
+      run.generationBundle?.deliverables.find(
+        (d) => d.id === run.generationBundle!.run.primaryDeliverableId,
+      ) ?? run.generationBundle?.deliverables[0];
+    const guideSteps = (primary?.blocks ?? []).filter(
+      (b) =>
+        (b.type === "numbered_step" || b.type === "checklist_item") &&
+        b.content.trim().length >= 8,
+    ).length;
+    setShowWrittenReview(guideSteps >= 4);
     onConfirmed?.(run.request);
   }
 
@@ -604,82 +629,12 @@ export function VisualThinkingRequestPanel({
   }
 
   function beginGenerationFromKnowledge() {
-    if (!experiencePlan || !understanding || !knowledgeBundle) return;
-    const handoffCtx = knowledgeHandoffToGenerationContext(
-      knowledgeBundle.handoff,
-      {
-        requestId: request.id,
-        understandingId: understanding.id,
-        rawRequest: request.rawRequest,
-        userFacingGoal: understanding.userFacingGoal,
-        successDefinition: understanding.successDefinition,
-      },
-      knowledgeBundle.package,
-    );
-    const researchFacts =
-      researchBundle?.updatedKnowledgePackage.items
-        .filter((i) => i.category === "research_acquired")
-        .map((i) => i.content)
-        .join("\n") ?? "";
-    const supplied = [handoffCtx.suppliedContent, researchFacts]
-      .filter(Boolean)
-      .join("\n");
-    const researchOpen = knowledgeBundle.package.knowledgeGaps.some(
-      (g) =>
-        g.status === "open" &&
-        (g.researchNeeded || g.resolutionType === "external_research"),
-    );
-    let nextResearch = researchBundle;
-    if (researchOpen && !researchBundle) {
-      const planned = planVisualThinkingResearch({
-        knowledgeBundle,
-        workspaceActive: Boolean(thinkingWorkspace),
-      });
-      nextResearch = {
-        plan: planned.plan,
-        items: planned.items,
-        citations: [],
-        conflicts: [],
-        updatedKnowledgePackage: knowledgeBundle.package,
-        updatedHandoff: knowledgeBundle.handoff,
-        workspaceNotification: null,
-        acquiredAt: null,
-      };
-      setResearchBundle(nextResearch);
-    }
-    const bundle = startGenerationFromConfirmedPlan(experiencePlan, {
-      requestId: handoffCtx.requestId,
-      understandingId: handoffCtx.understandingId,
-      rawRequest: handoffCtx.rawRequest,
-      userFacingGoal: handoffCtx.userFacingGoal,
-      successDefinition: handoffCtx.successDefinition,
-      suppliedContent: supplied || handoffCtx.suppliedContent,
-      topicHint: handoffCtx.topicHint,
-      freshnessNotice: handoffCtx.freshnessNotice,
-      // Never treat "research still open / only planned" as generation-complete.
-      knowledgeResearchSatisfied:
-        knowledgeResearchSatisfiesGenerationGate(nextResearch),
-    });
-    setGenerationBundle(bundle);
-    setActiveDeliverableId(bundle.run.primaryDeliverableId);
-    const nextPresentation = planVisualThinkingPresentation({
-      understanding,
-      experiencePlan,
-      knowledgePackage: knowledgeBundle.package,
-      generationBundle: bundle,
-    });
-    setPresentationPlan(nextPresentation);
-    const workspace = createThinkingWorkspace({
-      understanding,
-      experiencePlan,
-      knowledgePackage: knowledgeBundle.package,
-      generationBundle: bundle,
-      presentationPlan: nextPresentation,
-    });
-    if (workspace) setThinkingWorkspace(workspace);
-    setShowThisDifferently(false);
-    setShowAllAlternates(false);
-    setShowWrittenReview(false);
+    // Live path: never generate from a knowledge plan alone. Always continue
+    // through research → merge → instructional enrichment → generation → workspace.
+    const text = (request.rawRequest || draftText).trim();
+    if (!text) return;
+    autoContinueLockRef.current = true;
+    runGenerateFirstPipeline(text);
   }
 
   function submitGapAnswer() {
@@ -1620,7 +1575,7 @@ export function VisualThinkingRequestPanel({
               </div>
             ) : null}
 
-            {thinkingWorkspace && generationBundle ? (
+            {thinkingWorkspace && generationBundle && hasSubstantiveResult ? (
               <ThinkingWorkspace
                 workspace={thinkingWorkspace}
                 deliverables={generationBundle.deliverables}
@@ -2175,6 +2130,65 @@ export function VisualThinkingRequestPanel({
           >
             Research-assisted path — Spark will learn with you before building.
           </p>
+        ) : null}
+
+        {IS_VTS_DEV_DIAGNOSTICS && executionTraceSummary.traceId ? (
+          <aside
+            className="vts-request__note"
+            data-testid="visual-thinking-execution-diagnostics"
+            aria-label="Development execution diagnostics"
+          >
+            <p className="vts-request__label">VTS execution diagnostics</p>
+            <ul>
+              <li>trace: {executionTraceSummary.traceId}</li>
+              <li>
+                state: {String(executionTraceSummary.counts.finalState ?? "—")}
+              </li>
+              <li>
+                deliverable:{" "}
+                {experiencePlan?.primaryDeliverable ??
+                  request.requestedOutput ??
+                  "—"}
+              </li>
+              <li>
+                research provider:{" "}
+                {executionTraceSummary.stages.includes("provider_invocation")
+                  ? "invoked"
+                  : "not invoked"}
+              </li>
+              <li>
+                findings:{" "}
+                {String(executionTraceSummary.counts.researchFindings ?? 0)}
+              </li>
+              <li>
+                knowledge items:{" "}
+                {String(executionTraceSummary.counts.knowledgeAfter ?? 0)}
+              </li>
+              <li>
+                sections: {String(executionTraceSummary.counts.sections ?? 0)}
+              </li>
+              <li>
+                process steps:{" "}
+                {String(executionTraceSummary.counts.processSteps ?? 0)}
+              </li>
+              <li>
+                thinking objects:{" "}
+                {String(executionTraceSummary.counts.thinkingObjects ?? 0)}
+              </li>
+              <li>
+                validation:{" "}
+                {executionTraceSummary.counts.validationPassed
+                  ? "passed"
+                  : "failed"}
+              </li>
+              <li>
+                next:{" "}
+                {hasSubstantiveResult
+                  ? "workspace ready"
+                  : "continue research or safe generation"}
+              </li>
+            </ul>
+          </aside>
         ) : null}
       </div>
     </div>

@@ -62,6 +62,10 @@ import {
   type VisualThinkingOutcomeCompletionAssessment,
   type VisualThinkingRequestedOutcome,
 } from "@/lib/cartographersStudio/visualThinkingRequestedOutcome";
+import {
+  beginVisualThinkingExecutionTrace,
+  recordVisualThinkingTrace,
+} from "@/lib/cartographersStudio/visualThinkingExecutionTrace";
 
 export type VisualThinkingResearchToResultRun = {
   request: VisualThinkingRequest;
@@ -77,6 +81,8 @@ export type VisualThinkingResearchToResultRun = {
   progressLabels: string[];
   acknowledgement: string;
   liveResearchAvailable: boolean;
+  /** Development/diagnostic trace id for this execution. */
+  traceId: string;
 };
 
 /**
@@ -326,6 +332,10 @@ export function runVisualThinkingResearchToResult(
   rawRequest: string,
   options?: { entryPath?: VisualThinkingRequest["entryPath"] },
 ): VisualThinkingResearchToResultRun {
+  const traceId = beginVisualThinkingExecutionTrace({
+    entryPath: options?.entryPath ?? "research_assisted",
+    requestChars: rawRequest.trim().length,
+  });
   const auth = assessRequestAuthorization(rawRequest);
   const continuation = buildAutomaticContinuationPlan(auth);
   const requestedOutcome = inferVisualThinkingRequestedOutcome(rawRequest, {
@@ -338,6 +348,18 @@ export function runVisualThinkingResearchToResult(
           : auth.inferredDetail === "detailed"
             ? "detailed"
             : "guided",
+  });
+  recordVisualThinkingTrace(traceId, "resolved_user_request", {
+    authorized: auth.authorized,
+    creationMode: auth.creationMode,
+  });
+  recordVisualThinkingTrace(traceId, "requested_deliverable", {
+    deliverable: requestedOutcome.requestedDeliverable,
+    requiresResearch: requestedOutcome.requiresResearch,
+    requiresGeneration: requestedOutcome.requiresGeneration,
+  });
+  recordVisualThinkingTrace(traceId, "requested_presentation", {
+    presentation: requestedOutcome.requestedPresentation,
   });
 
   let request = createVisualThinkingRequest({
@@ -384,6 +406,18 @@ export function runVisualThinkingResearchToResult(
     experiencePlan: confirmedPlan,
     attachedStructuredContent: confirmed.rawRequest,
   });
+  const knowledgeBeforeMerge = knowledge.package.items.length;
+  recordVisualThinkingTrace(traceId, "knowledge_item_count_before_merge", {
+    count: knowledgeBeforeMerge,
+  });
+  recordVisualThinkingTrace(traceId, "current_information_requirement", {
+    required: knowledge.package.knowledgeGaps.some(
+      (g) =>
+        g.status === "open" &&
+        g.area === "current_external_facts" &&
+        g.priority === "required",
+    ),
+  });
 
   const material = buildInstructionalGenerationMaterial(rawRequest);
   knowledge = {
@@ -409,15 +443,48 @@ export function runVisualThinkingResearchToResult(
         g.status === "open" &&
         (g.researchNeeded || g.resolutionType === "external_research"),
     );
+  recordVisualThinkingTrace(traceId, "research_decision", {
+    needsResearch,
+    findingSeedCount: findings.length,
+    liveResearchAvailable,
+  });
+  recordVisualThinkingTrace(traceId, "selected_research_provider", {
+    provider: liveResearchAvailable
+      ? "live_configured"
+      : findings.length > 0
+        ? "stable_instructional_knowledge"
+        : "none",
+  });
 
   if (needsResearch || findings.length > 0) {
     if (findings.length > 0) {
+      recordVisualThinkingTrace(traceId, "provider_invocation", {
+        provider: "stable_instructional_knowledge",
+        invoked: true,
+      });
+      recordVisualThinkingTrace(traceId, "provider_response_count", {
+        count: findings.length,
+      });
       researchBundle = acquireVisualThinkingResearch(
         { knowledgeBundle: knowledge, workspaceActive: false },
         findings,
       );
       knowledge = applyResearchToKnowledgeBundle(knowledge, researchBundle);
+      recordVisualThinkingTrace(traceId, "normalized_finding_count", {
+        count: researchBundle.items.filter(
+          (i) =>
+            i.status === "resolved" || i.status === "partially_resolved",
+        ).length,
+      });
     } else {
+      recordVisualThinkingTrace(traceId, "provider_invocation", {
+        provider: "none",
+        invoked: false,
+        reason: "research_unavailable_no_stable_seeds",
+      });
+      recordVisualThinkingTrace(traceId, "provider_response_count", {
+        count: 0,
+      });
       const planned = planVisualThinkingResearch({
         knowledgeBundle: knowledge,
         workspaceActive: false,
@@ -437,6 +504,16 @@ export function runVisualThinkingResearchToResult(
       };
     }
   }
+
+  recordVisualThinkingTrace(traceId, "knowledge_item_count_after_merge", {
+    count: knowledge.package.items.length,
+  });
+  const remainingGaps = knowledge.package.knowledgeGaps.filter(
+    (g) => g.status === "open" && g.priority === "required",
+  ).length;
+  recordVisualThinkingTrace(traceId, "remaining_required_gap_count", {
+    count: remainingGaps,
+  });
 
   const researchSatisfied =
     !requestedOutcome.requiresResearch ||
@@ -484,6 +561,18 @@ export function runVisualThinkingResearchToResult(
     shouldGenerate &&
     (researchSatisfied || !requestedOutcome.requiresResearch)
   ) {
+    const generationInputItems =
+      knowledge.package.items.length +
+      (researchFacts ? 1 : 0) +
+      (instructionalLines ? material.steps.length : 0);
+    recordVisualThinkingTrace(traceId, "generation_invoked", {
+      invoked: true,
+      researchSatisfied,
+    });
+    recordVisualThinkingTrace(traceId, "generation_input_item_count", {
+      count: generationInputItems,
+      suppliedChars: supplied.length,
+    });
     generationBundle = startGenerationFromConfirmedPlan(confirmedPlan, {
       requestId: handoffCtx.requestId,
       understandingId: handoffCtx.understandingId,
@@ -515,6 +604,12 @@ export function runVisualThinkingResearchToResult(
       generationBundle,
       presentationPlan,
     });
+  } else {
+    recordVisualThinkingTrace(traceId, "generation_invoked", {
+      invoked: false,
+      shouldGenerate,
+      researchSatisfied,
+    });
   }
 
   const primary =
@@ -533,6 +628,27 @@ export function runVisualThinkingResearchToResult(
     generationBundle?.deliverables[0] ??
     null;
 
+  const processSteps = (primary?.blocks ?? []).filter(
+    (b) =>
+      (b.type === "numbered_step" || b.type === "checklist_item") &&
+      b.content.trim().length >= 8,
+  ).length;
+  const sections = (primary?.blocks ?? []).filter(
+    (b) => b.type === "heading" || b.type === "section",
+  ).length;
+  recordVisualThinkingTrace(traceId, "generated_deliverable_count", {
+    count: generationBundle?.deliverables.length ?? 0,
+  });
+  recordVisualThinkingTrace(traceId, "generated_section_count", {
+    count: sections,
+  });
+  recordVisualThinkingTrace(traceId, "generated_process_step_count", {
+    count: processSteps,
+  });
+  recordVisualThinkingTrace(traceId, "generated_thinking_object_count", {
+    count: workspace?.objects.length ?? 0,
+  });
+
   const completion = assessVisualThinkingOutcomeCompletion({
     outcome: requestedOutcome,
     researchBundle,
@@ -540,6 +656,41 @@ export function runVisualThinkingResearchToResult(
     primaryDeliverable: primary,
     presentationPlan,
     workspace,
+  });
+  recordVisualThinkingTrace(traceId, "validation_result", {
+    passed: completion.substanceValidationPassed,
+    outcomeSatisfied: completion.requestedOutcomeSatisfied,
+    complete: completion.complete,
+  });
+  recordVisualThinkingTrace(traceId, "workspace_projection_result", {
+    opened: Boolean(workspace),
+    objectCount: workspace?.objects.length ?? 0,
+    noticeIsVerificationWarning: Boolean(
+      workspace?.completenessNotice &&
+        /have not been verified/i.test(workspace.completenessNotice),
+    ),
+  });
+  const finalState = workspace
+    ? completion.complete
+      ? "ready"
+      : "partial_ready"
+    : researchSatisfied
+      ? "generation_or_projection_failed"
+      : liveResearchAvailable
+        ? "research_in_progress"
+        : "research_unavailable";
+  recordVisualThinkingTrace(traceId, "final_execution_state", {
+    state: finalState,
+  });
+  recordVisualThinkingTrace(traceId, "final_ui_payload", {
+    hasWorkspace: Boolean(workspace),
+    hasGeneration: Boolean(generationBundle),
+    hasWrittenGuide: processSteps >= 4,
+    warningOnly: Boolean(
+      workspace?.completenessNotice &&
+        /have not been verified/i.test(workspace.completenessNotice) &&
+        (workspace?.objects.length ?? 0) < 3,
+    ),
   });
 
   return {
@@ -561,5 +712,6 @@ export function runVisualThinkingResearchToResult(
       auth.acknowledgement ||
       "I'll research what we need and build the result you asked for.",
     liveResearchAvailable,
+    traceId,
   };
 }
