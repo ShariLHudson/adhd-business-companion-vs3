@@ -43,6 +43,12 @@ type Props = {
     onOpenWrittenExplanation?: () => void;
     onAskInLearning?: () => void;
   } | null;
+  projectsPilot?: {
+    projectName: string;
+    pendingChangeCount: number;
+    onReturnToProjects?: () => void;
+    onReviewPendingChanges?: () => void;
+  } | null;
 };
 
 /**
@@ -64,6 +70,7 @@ export function ThinkingWorkspace({
   onSyncChoice,
   coCreationNotice,
   learningPilot,
+  projectsPilot,
 }: Props) {
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const [ideaDraft, setIdeaDraft] = useState("");
@@ -351,6 +358,27 @@ export function ThinkingWorkspace({
               onClick={() => learningPilot.onReturnToLearning?.()}
             >
               Return to Learning
+            </button>
+          ) : null}
+          {projectsPilot?.onReviewPendingChanges &&
+          projectsPilot.pendingChangeCount > 0 ? (
+            <button
+              type="button"
+              className="vts-request__secondary-btn"
+              data-testid="thinking-workspace-pending-changes"
+              onClick={() => projectsPilot.onReviewPendingChanges?.()}
+            >
+              Pending Changes ({projectsPilot.pendingChangeCount})
+            </button>
+          ) : null}
+          {projectsPilot?.onReturnToProjects ? (
+            <button
+              type="button"
+              className="vts-request__primary-btn"
+              data-testid="thinking-workspace-return-projects"
+              onClick={() => projectsPilot.onReturnToProjects?.()}
+            >
+              Return to Projects
             </button>
           ) : null}
           <button

@@ -19,9 +19,9 @@ export const CONNECTED_PLACES: readonly ConnectedPlaceShortcut[] = [
   {
     id: "cartography",
     label: "Visual Thinking Studio",
-    blurb: "Map ideas, decisions, steps, or relationships visually.",
+    blurb: "See project structure, blockers, and dependencies visually.",
     destinationHint: "visual-focus",
-    status: "comingLater",
+    status: "active",
   },
   {
     id: "chamber-of-momentum",

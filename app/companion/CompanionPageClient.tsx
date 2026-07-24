@@ -1190,6 +1190,13 @@ import {
   type VisualThinkingViewId,
 } from "@/lib/visualThinkingStudio";
 import {
+  assessProjectsVisualThinkingRecommendation,
+  buildProjectsSessionSnapshot,
+  createVisualThinkingContextFromProjects,
+} from "@/lib/projectsIntelligence";
+import { getProjectItems } from "@/lib/companionProjectsStore";
+import type { ProjectHomeRecord } from "@/lib/projectHomes";
+import {
   resolveStudioViewForEngineOpen,
   type SparkVisualEngineOpenRequest,
 } from "@/lib/sparkVisualEngine";
@@ -9849,6 +9856,51 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("visual-focus");
   }
 
+  /**
+   * Projects Intelligence pilot (Build 11) — hand project execution context
+   * into Visual Thinking Studio without duplicating Projects state.
+   */
+  function openVisualThinkingFromProjectHome(project: ProjectHomeRecord) {
+    const companionId = project.companionProjectId ?? project.id;
+    const storeProject = getProjects().find((p) => p.id === companionId);
+    if (!storeProject) {
+      openCartographersStudioCore();
+      return;
+    }
+    const items = getProjectItems(storeProject.id);
+    const session = buildProjectsSessionSnapshot({
+      project: storeProject,
+      items,
+      conversationId: null,
+      currentView: "detail",
+      selectedTaskId: null,
+    });
+    const userRequest =
+      storeProject.nextAction ||
+      storeProject.nextStepSuggestion ||
+      `Help me understand ${storeProject.name}`;
+    const recommendation = assessProjectsVisualThinkingRecommendation({
+      session,
+      userRequest,
+      hasProvidedInitialValue: true,
+    });
+    createVisualThinkingContextFromProjects({
+      session,
+      userRequest,
+      recommendation: {
+        ...recommendation,
+        recommended: true,
+        suggestedPurpose:
+          recommendation.suggestedPurpose ?? "understand_execution",
+        preferredPresentation:
+          recommendation.preferredPresentation ?? "process_flow",
+      },
+      explicitlyRequested: true,
+      userAcceptedRecommendation: true,
+    });
+    openCartographersStudioCore();
+  }
+
   function inviteChamberMemberCore(
     memberId: ChamberMemberId,
     opts?: { skipOpener?: boolean },
@@ -9907,6 +9959,22 @@ export default function CompanionPageClient() {
     window.addEventListener(ADVISORY_INVITE_CHAMBER_EVENT, onAdvisoryInvite);
     return () =>
       window.removeEventListener(ADVISORY_INVITE_CHAMBER_EVENT, onAdvisoryInvite);
+  }, []);
+
+  // Projects Intelligence pilot — return from Visual Thinking restores Project Homes
+  useEffect(() => {
+    function onReturnToProjects() {
+      openProjectHomesPrototypeCore("gallery");
+    }
+    window.addEventListener(
+      "visual-thinking-return-to-projects",
+      onReturnToProjects,
+    );
+    return () =>
+      window.removeEventListener(
+        "visual-thinking-return-to-projects",
+        onReturnToProjects,
+      );
   }, []);
 
   /**
@@ -25077,6 +25145,7 @@ export default function CompanionPageClient() {
                     sourceContext: payload,
                   });
                 }}
+                onOpenVisualThinking={openVisualThinkingFromProjectHome}
                 onResumeActiveWork={(work: ActiveWorkCardModel) => {
                   const id =
                     work.eventRecordId ||

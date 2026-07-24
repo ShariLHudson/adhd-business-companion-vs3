@@ -98,7 +98,7 @@ Useful teaching before optional invite · shared pipeline used · substantive op
 
 ## Next pilot recommendation (Build 11)
 
-**Projects dependency / blockage view** — after this Learning pilot is validated end to end in authenticated browser.
+**Projects dependency / blockage view** — implemented as [VISUAL_THINKING_PROJECTS_PILOT_STANDARD.md](./VISUAL_THINKING_PROJECTS_PILOT_STANDARD.md) (`lib/projectsIntelligence/`).
 
 ## Core belief
 

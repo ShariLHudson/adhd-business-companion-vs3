@@ -12,6 +12,8 @@ type Props = {
   /** Present when a real "Boardroom" hand-off is wired for this project. */
   project?: ProjectHomeRecord;
   onCallTheBoard?: (project: ProjectHomeRecord) => void;
+  /** Projects → Visual Thinking Studio pilot hand-off. */
+  onOpenVisualThinking?: (project: ProjectHomeRecord) => void;
 };
 
 /**
@@ -24,6 +26,7 @@ export function ConnectedPlacesSection({
   projectHomeId,
   project,
   onCallTheBoard,
+  onOpenVisualThinking,
 }: Props) {
   const active = activeConnectedPlaces(projectHomeId);
   const comingLater = comingLaterConnectedPlaces(projectHomeId);
@@ -41,7 +44,15 @@ export function ConnectedPlacesSection({
       {active.length > 0 ? (
         <ul className="project-homes-connected__list">
           {active.map((place) => {
-            const canOpen = place.id === "boardroom" && Boolean(onCallTheBoard) && Boolean(project);
+            const canOpenBoard =
+              place.id === "boardroom" &&
+              Boolean(onCallTheBoard) &&
+              Boolean(project);
+            const canOpenVisual =
+              place.id === "cartography" &&
+              Boolean(onOpenVisualThinking) &&
+              Boolean(project);
+            const canOpen = canOpenBoard || canOpenVisual;
             return (
               <li key={place.id}>
                 {canOpen ? (
@@ -49,7 +60,11 @@ export function ConnectedPlacesSection({
                     type="button"
                     className="project-homes-connected__item project-homes-connected__item--active"
                     data-testid={`project-homes-connected-${place.id}`}
-                    onClick={() => project && onCallTheBoard?.(project)}
+                    onClick={() => {
+                      if (!project) return;
+                      if (canOpenBoard) onCallTheBoard?.(project);
+                      else if (canOpenVisual) onOpenVisualThinking?.(project);
+                    }}
                   >
                     <span className="project-homes-connected__label">
                       {place.label}

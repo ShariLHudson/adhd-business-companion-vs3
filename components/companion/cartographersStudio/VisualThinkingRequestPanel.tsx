@@ -115,6 +115,12 @@ import {
   loadLearningIntegrationRequest,
   loadWorkspaceLearningContext,
 } from "@/lib/learningIntelligence";
+import {
+  buildProjectsReturnFromVisual,
+  loadPendingChanges,
+  loadProjectsIntegrationRequest,
+  loadWorkspaceProjectsContext,
+} from "@/lib/projectsIntelligence";
 import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
@@ -175,6 +181,10 @@ export function VisualThinkingRequestPanel({
     useState<WorkspaceEditingSession | null>(null);
   const [coCreationNotice, setCoCreationNotice] = useState<string | null>(null);
   const [showLearningWritten, setShowLearningWritten] = useState(false);
+  const [projectsReturnNotice, setProjectsReturnNotice] = useState<string | null>(
+    null,
+  );
+  const [showProjectsPending, setShowProjectsPending] = useState(false);
   const [learningReturnNotice, setLearningReturnNotice] = useState<string | null>(
     null,
   );
@@ -202,6 +212,8 @@ export function VisualThinkingRequestPanel({
 
   useEffect(() => {
     const existing = loadVisualThinkingRequestDraft();
+    const projectsReq = loadProjectsIntegrationRequest();
+    const projectsSeed = projectsReq?.projectSummaryForSeed?.trim() ?? "";
     if (existing && existing.status !== "capturing") {
       setRequest(existing);
       setDraftText(existing.rawRequest);
@@ -210,6 +222,14 @@ export function VisualThinkingRequestPanel({
         setUnderstanding(understood);
         setExperiencePlan(orchestrateVisualThinkingExperience(understood));
       }
+    } else if (projectsSeed && (!existing || !existing.rawRequest.trim())) {
+      // Projects pilot: seed with execution context — never re-ask "What project?"
+      setDraftText(projectsSeed);
+      setRequest((prev) => ({
+        ...prev,
+        rawRequest: projectsSeed,
+        status: "capturing",
+      }));
     }
     const existingKnowledge = loadKnowledgeBundle();
     if (existingKnowledge) setKnowledgeBundle(existingKnowledge);
@@ -1693,6 +1713,41 @@ export function VisualThinkingRequestPanel({
                     },
                   };
                 })()}
+                projectsPilot={(() => {
+                  const projectsCtx = loadWorkspaceProjectsContext();
+                  const projectsReq = loadProjectsIntegrationRequest();
+                  if (!projectsCtx || !projectsReq) return null;
+                  const pending = loadPendingChanges(
+                    projectsReq.sourceProjectId,
+                  ).filter((c) => c.status === "pending");
+                  return {
+                    projectName: projectsCtx.projectName,
+                    pendingChangeCount: pending.length,
+                    onReviewPendingChanges: () => setShowProjectsPending(true),
+                    onReturnToProjects: () => {
+                      const ret = buildProjectsReturnFromVisual({
+                        request: projectsReq,
+                        sourceProjectId: projectsReq.sourceProjectId,
+                        visualThinkingWorkspaceId: thinkingWorkspace.id,
+                        activePresentation: projectsCtx.currentPresentation,
+                        pendingChangeIds: pending.map((c) => c.id),
+                        approvedChangeIds: loadPendingChanges(
+                          projectsReq.sourceProjectId,
+                        )
+                          .filter((c) => c.status === "approved")
+                          .map((c) => c.id),
+                      });
+                      setProjectsReturnNotice(ret.resumeMessage);
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(
+                          new CustomEvent("visual-thinking-return-to-projects", {
+                            detail: { returnPayload: ret },
+                          }),
+                        );
+                      }
+                    },
+                  };
+                })()}
               />
             ) : null}
 
@@ -1733,6 +1788,47 @@ export function VisualThinkingRequestPanel({
                 role="status"
               >
                 {learningReturnNotice}
+              </p>
+            ) : null}
+
+            {showProjectsPending && loadProjectsIntegrationRequest() ? (
+              <section
+                className="vts-request__section"
+                data-testid="projects-pending-changes"
+                aria-label="Pending project changes"
+              >
+                <h3 className="vts-request__section-title">Pending Changes</h3>
+                <p className="vts-request__note">
+                  Suggestions from Visual Thinking never change project
+                  dates, owners, dependencies, or status until you approve
+                  each one in Projects.
+                </p>
+                <ul className="vts-request__note">
+                  {loadPendingChanges(
+                    loadProjectsIntegrationRequest()!.sourceProjectId,
+                  )
+                    .filter((c) => c.status === "pending")
+                    .map((c) => (
+                      <li key={c.id}>{c.summary}</li>
+                    ))}
+                </ul>
+                <button
+                  type="button"
+                  className="vts-request__secondary-btn"
+                  onClick={() => setShowProjectsPending(false)}
+                >
+                  Close
+                </button>
+              </section>
+            ) : null}
+
+            {projectsReturnNotice ? (
+              <p
+                className="vts-request__note"
+                data-testid="projects-return-notice"
+                role="status"
+              >
+                {projectsReturnNotice}
               </p>
             ) : null}
 

@@ -36,6 +36,8 @@ type Props = {
   onProjectChange: (next: ProjectHomeRecord) => void;
   /** Call the Board with this project’s Current Focus (Prompt 145). */
   onCallTheBoard?: (project: ProjectHomeRecord) => void;
+  /** Open Visual Thinking Studio with this project’s execution context. */
+  onOpenVisualThinking?: (project: ProjectHomeRecord) => void;
 };
 
 type DrawerId = "plan" | "tools" | "progress" | "connections";
@@ -129,6 +131,7 @@ export function ProjectHomeDetail({
   project,
   onProjectChange,
   onCallTheBoard,
+  onOpenVisualThinking,
 }: Props) {
   const room = getProjectHomeRoom(project.projectHomeId);
   const artwork = resolveProjectHomeArtwork(project);
@@ -1016,12 +1019,14 @@ export function ProjectHomeDetail({
           projectHomeId={project.projectHomeId}
           project={!sample ? project : undefined}
           onCallTheBoard={!sample ? onCallTheBoard : undefined}
+          onOpenVisualThinking={!sample ? onOpenVisualThinking : undefined}
         />
       </ProjectHomeDrawer>
 
       <p className="project-homes-prototype-note">
         Project Homes uses your existing projects storage for sections, tasks,
-        and notes. Connected Places and Project Tools are not wired yet.
+        and notes. Boardroom and Visual Thinking Studio are available from
+        Connected Places when a hand-off is ready.
       </p>
     </div>
   );

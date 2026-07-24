@@ -83,6 +83,8 @@ type Props = {
   onBack: () => void;
   /** Call the Board with Current Focus from a Project Home (Prompt 145). */
   onCallTheBoard?: (project: ProjectHomeRecord) => void;
+  /** Open Visual Thinking Studio with project execution context (Build 11). */
+  onOpenVisualThinking?: (project: ProjectHomeRecord) => void;
   /** When opening from "create a project", land on create-purpose. */
   initialView?: ProjectHomeView;
   /**
@@ -120,6 +122,7 @@ type Props = {
 export function ProjectHomesPrototypePanel({
   onBack,
   onCallTheBoard,
+  onOpenVisualThinking,
   initialView = "gallery",
   onLaunchEventWorkspace,
   onStartSomethingNew,
@@ -1088,6 +1091,7 @@ export function ProjectHomesPrototypePanel({
             project={active}
             onProjectChange={updateActiveProject}
             onCallTheBoard={onCallTheBoard}
+            onOpenVisualThinking={onOpenVisualThinking}
           />
         ) : null}
 
