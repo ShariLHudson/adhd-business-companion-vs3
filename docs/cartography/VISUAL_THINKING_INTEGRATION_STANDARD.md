@@ -153,11 +153,35 @@ Adaptive Companion may influence whether/how strongly a visual is suggested. It 
 
 ---
 
+## Learning Intelligence pilot (first consumer)
+
+**Standard:** [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md)  
+**Runtime:** `lib/learningIntelligence/`
+
+Learning is the first Estate pilot consumer of this service.
+
+| Layer | Owns |
+|-------|------|
+| **Learning** | Pedagogy — request understanding, goal, learner level, progression, teaching |
+| **Visual Thinking** | Representation — eligibility, presentation, Thinking Workspace |
+
+Clarifications for all callers (proven in the Learning pilot):
+
+- Explicit visual requests bypass optional recommendation cards and authorize handoff  
+- Optional recommendations must be useful, dismissible, and non-repeating for the same topic/session  
+- Source experience state must always be preserved; return is source-aware  
+- Callers adapt context into `VisualThinkingRequestContext` — they do not fork engines  
+
+Do not begin a second Chamber Member integration until the Learning pilot is validated.
+
+---
+
 ## Future integrations
 
-- Conversational invitation surfaces in each caller UI  
+- Conversational invitation surfaces in each caller UI (Learning invitation projection first)  
 - Durable preference store (beyond session) when Spec 112 paths allow  
 - Estate Brain capability registration pointing at this service  
+- Next candidates after Learning validation: Projects · Business Estate  
 
 Those builds consume this service — they do not fork new visual engines.
 

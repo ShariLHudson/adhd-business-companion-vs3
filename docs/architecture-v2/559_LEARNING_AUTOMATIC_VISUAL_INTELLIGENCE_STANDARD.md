@@ -27,3 +27,11 @@ Do not create a visual merely because one is possible. Prefer one useful visual 
 Visuals must use readable labels, avoid crowded layouts, include text alternatives, preserve logical sequence, avoid color-only meaning, and support enlargement.
 
 Learning owns instructional meaning, sequence, emphasis, labels, and mastery state. The shared visual engine owns rendering, interaction, and export.
+
+## Build 9 pilot wiring
+
+Implementation: `lib/learningIntelligence/` via `VisualThinkingService` — not a Learning-local visual engine.
+
+Authoritative pilot standard: `docs/cartography/VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md`.
+
+Explicit visual requests authorize handoff. Optional recommendations must be useful and dismissible. Source Learning state is always preserved on open and on return.

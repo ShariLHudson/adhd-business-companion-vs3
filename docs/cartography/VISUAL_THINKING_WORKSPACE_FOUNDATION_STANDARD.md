@@ -287,6 +287,22 @@ Modes: `reading` · `visual` · `split` · `user_led` · `comparison` · `proces
 
 `AskShariWorkspaceContext` scopes to selected objects/groups, visible ids, incomplete areas, and a user question. Shari proposes — she does not auto-modify the workspace.
 
+## Source-aware Learning pilot handoff
+
+**Pilot consumer:** Learning Intelligence — [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md)
+
+When Learning opens the Thinking Workspace:
+
+- Learning owns pedagogy; Visual Thinking owns representation and workspace interaction  
+- Explicit visual requests skip optional recommendation cards  
+- Optional recommendations must be useful and dismissible; declines must not reset Learning  
+- Source Learning session, lesson position, and written explanation must remain preserved  
+- Return uses source-aware context (`VisualThinkingLearningReturn`) — not a generic Estate back  
+- User-created questions/notes require approval before Learning writeback  
+- Opening or manipulating workspace objects does not mark Learning progress complete  
+
+---
+
 ## Future compatibility
 
 **Platform integration:** [Visual Thinking Integration Standard](./VISUAL_THINKING_INTEGRATION_STANDARD.md) — Estate experiences request Visual Thinking via `VisualThinkingService`; they do not implement local map engines.
@@ -298,7 +314,7 @@ Modes: `reading` · `visual` · `split` · `user_led` · `comparison` · `proces
 Still later:
 
 - Dynamic Representation Switching  
-- Cross-Estate Integration  
+- Additional Chamber consumers after Learning pilot validation  
 
 Those builds must still conform to the Experience Standard and this foundation’s immutability rules.
 

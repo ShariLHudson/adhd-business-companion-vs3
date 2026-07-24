@@ -373,6 +373,16 @@ Business Estate · Projects · Create · Board of Directors · Marketing · Lear
 
 …without changing the core interaction philosophy.
 
+### Learning pilot (first Estate consumer)
+
+See [VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md](./VISUAL_THINKING_LEARNING_INTEGRATION_STANDARD.md).
+
+- Learning remains responsible for teaching; this workspace remains responsible for seeing and organizing  
+- When Learning is the source, written explanation stays available as a supporting view  
+- Return-to-Learning restores the exact learning position via source-aware return context  
+- Explicit visual requests authorize entry without a second recommendation card  
+- Optional invitations stay calm, dismissible, and non-repeating for the same lesson topic  
+
 ---
 
 ## Relationship to engine builds
