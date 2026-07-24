@@ -289,9 +289,11 @@ Modes: `reading` · `visual` · `split` · `user_led` · `comparison` · `proces
 
 ## Future compatibility
 
-**Build 8 recommendation:** Validate this foundation in authenticated Studio (Loom guide + partial SOP + user-led), then deepen only the [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md) behaviors that remain thin — never before substantive entry is proven.
+**Platform integration:** [Visual Thinking Integration Standard](./VISUAL_THINKING_INTEGRATION_STANDARD.md) — Estate experiences request Visual Thinking via `VisualThinkingService`; they do not implement local map engines.
 
-**Build 9 (exists):** [Research Acquisition](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — may notify the workspace; never auto-replaces organization.
+**Layout engine:** [Intelligent Layout Engine](./VISUAL_THINKING_LAYOUT_ENGINE_STANDARD.md) organizes workspace objects after a substantive handoff.
+
+**Research:** [Research Acquisition](./VISUAL_THINKING_RESEARCH_ACQUISITION_STANDARD.md) — may notify the workspace; never auto-replaces organization.
 
 Still later:
 

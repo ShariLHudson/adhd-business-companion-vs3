@@ -342,6 +342,26 @@ export {
 } from "./visualThinkingLayoutEngine";
 
 export {
+  VisualThinkingService,
+  VISUAL_THINKING_SUPPORTED_CALLERS,
+  shouldRecommendVisualThinking,
+  requestVisualThinkingHandoff,
+  buildVisualThinkingInvitation,
+  isSupportedVisualThinkingCaller,
+  assertNoDuplicateVisualThinkingEngines,
+  getVisualThinkingPreference,
+  recordVisualThinkingPreferenceEvent,
+  VISUAL_THINKING_PREFERENCE_KEY,
+  type VisualThinkingCallerId,
+  type VisualThinkingCapability,
+  type VisualThinkingRequestContext,
+  type VisualThinkingRecommendation,
+  type VisualThinkingServiceHandoff,
+  type VisualThinkingPreferenceProfile,
+  type VisualThinkingPreferenceRecord,
+} from "./visualThinkingService";
+
+export {
   planVisualThinkingResearch,
   acquireVisualThinkingResearch,
   applyResearchToKnowledgeBundle,
