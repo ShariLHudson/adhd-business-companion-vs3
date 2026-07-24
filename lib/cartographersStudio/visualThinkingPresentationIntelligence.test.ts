@@ -28,6 +28,7 @@ import {
 } from "@/lib/cartographersStudio/visualThinkingGenerationEngine";
 import {
   applyPresentationOverride,
+  classifyPresentationRequest,
   clearPresentationPlan,
   collectPresentationStructureSignals,
   densityPreservesContentDepth,
@@ -237,7 +238,39 @@ describe("Visual Thinking Presentation Intelligence", () => {
     ).toBe(false);
   });
 
-  it("10 — no-map preference excludes visual-map presentations", () => {
+  it("10 — checklist requires actionable or checklist-compatible blocks", () => {
+    const withSteps = collectPresentationStructureSignals(
+      pipeline(
+        "Checklist: 1. One 2. Two",
+        (p) => ({
+          ...p,
+          researchStage: "not_at_all",
+          primaryDeliverable: "checklist",
+          supportingDeliverables: [],
+        }),
+        "1. One\n2. Two",
+      ),
+    );
+    expect(withSteps.hasChecklistCompatible).toBe(true);
+    expect(
+      evaluatePresentationEligibility("checklist", withSteps).eligible,
+    ).toBe(true);
+    const bare = collectPresentationStructureSignals(
+      pipeline("A short note about trust.", (p) => ({
+        ...p,
+        researchStage: "not_at_all",
+        primaryDeliverable: "summary",
+        supportingDeliverables: [],
+      })),
+    );
+    bare.hasChecklistCompatible = false;
+    bare.hasOrderedSteps = false;
+    expect(evaluatePresentationEligibility("checklist", bare).eligible).toBe(
+      false,
+    );
+  });
+
+  it("10b — no-map preference excludes visual-map presentations", () => {
     const plan = planVisualThinkingPresentation(
       pipeline(
         "Give me a detailed report. I do not want a map.",
@@ -284,7 +317,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
     expect(proj.supportingLabel).toBe("Also available");
   });
 
-  it("13 — information density does not change underlying content depth", () => {
+  it("13–15 — density does not change depth or remove approved content", () => {
     const input = pipeline(
       "Detailed SOP: 1. One 2. Two 3. Three",
       (p) => ({
@@ -303,6 +336,13 @@ describe("Visual Thinking Presentation Intelligence", () => {
     });
     expect(densityPreservesContentDepth(plan, after)).toBe(true);
     expect(after.contentDetailLevel).toBe("detailed");
+    const primary = input.generationBundle.deliverables.find(
+      (d) => d.id === plan.primaryDeliverableId,
+    )!;
+    const beforeIds = primary.blocks.map((b) => b.id).sort();
+    const proj = projectPresentationWorkspace(after, input.generationBundle);
+    expect(proj.preservedBlockIds.sort()).toEqual(beforeIds);
+    expect(primary.blocks.length).toBe(beforeIds.length);
   });
 
   it("14 — Adaptive Companion limits visible choices without removing eligible", () => {
@@ -483,7 +523,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
     expect(proj.incompletenessVisible).toBe(true);
   });
 
-  it("25 — block edits remain when switching presentations", () => {
+  it("22 / 25 / 28 — switching does not regenerate facts; edits remain", () => {
     const input = pipeline(
       "Guide: 1. Alpha 2. Beta",
       (p) => ({
@@ -497,6 +537,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
     const primary = input.generationBundle.deliverables.find(
       (d) => d.role === "primary",
     )!;
+    const snapshot = JSON.stringify(primary.blocks);
     const editable = primary.blocks.find((b) => b.editable)!;
     const edited = applyBlockEdit(primary, {
       kind: "edit",
@@ -510,16 +551,67 @@ describe("Visual Thinking Presentation Intelligence", () => {
       ),
     };
     let plan = planVisualThinkingPresentation({ ...input, generationBundle: bundle });
+    const beforeSwitch = JSON.stringify(
+      bundle.deliverables.find((d) => d.id === edited.id)!.blocks,
+    );
     plan = applyPresentationOverride(
       plan,
       { kind: "set_presentation", presentation: "checklist" },
       collectPresentationStructureSignals({ ...input, generationBundle: bundle }),
     );
     const still = bundle.deliverables.find((d) => d.id === edited.id)!;
+    expect(JSON.stringify(still.blocks)).toBe(beforeSwitch);
     expect(
       still.blocks.some((b) => b.content === "Edited step content" && b.userEdited),
     ).toBe(true);
-    expect(plan.initialView).toBe("checklist");
+    expect(plan.activePresentation).toBe("checklist");
+    expect(snapshot).not.toContain("Edited step content");
+  });
+
+  it("29 — primary remains available after opening a supporting view", () => {
+    const input = pipeline(
+      "Guide: 1. A 2. B 3. C",
+      (p) => ({
+        ...p,
+        researchStage: "not_at_all",
+        primaryDeliverable: "step_by_step_guide",
+        supportingDeliverables: ["checklist"],
+      }),
+      "1. A\n2. B\n3. C",
+    );
+    let plan = planVisualThinkingPresentation(input);
+    const primaryId = plan.primaryDeliverableId;
+    const supportingId = plan.supportingDeliverableIds[0];
+    expect(supportingId).toBeTruthy();
+    plan = applyPresentationOverride(plan, {
+      kind: "select_supporting",
+      deliverableId: supportingId!,
+    });
+    expect(plan.selectedSupportingDeliverableId).toBe(supportingId);
+    expect(plan.primaryDeliverableId).toBe(primaryId);
+    expect(
+      input.generationBundle.deliverables.some((d) => d.id === primaryId),
+    ).toBe(true);
+  });
+
+  it("switching versus conversion messaging", () => {
+    const plan = planVisualThinkingPresentation(
+      pipeline(
+        "Write a report about trust.",
+        (p) => ({
+          ...p,
+          declinesMap: true,
+          researchStage: "not_at_all",
+          primaryDeliverable: "report",
+          supportingDeliverables: [],
+        }),
+      ),
+    );
+    const switchOk = classifyPresentationRequest(plan, plan.recommendedPresentation);
+    expect(switchOk.kind).toBe("presentation_switch");
+    const conversion = classifyPresentationRequest(plan, "training_guide");
+    expect(conversion.kind).toBe("deliverable_conversion");
+    expect(conversion.userFacingMessage).toMatch(/new version/i);
   });
 
   describe("Scenario tests A–G", () => {
@@ -542,7 +634,36 @@ describe("Visual Thinking Presentation Intelligence", () => {
       expect(plan.contentDetailLevel).toBe(input.experiencePlan.detailLevel);
     });
 
-    it("B — Medicare explanation", () => {
+    it("B — Loom guide still awaiting research", () => {
+      const input = pipeline(
+        "Show me every step for making a Loom video.",
+        (p) => ({
+          ...p,
+          researchStage: "before_generation",
+          primaryDeliverable: "step_by_step_guide",
+          supportingDeliverables: ["checklist"],
+        }),
+      );
+      const incomplete: VisualThinkingGenerationBundle = {
+        ...input.generationBundle,
+        run: {
+          ...input.generationBundle.run,
+          status: "awaiting_research",
+          researchBlocked: true,
+          researchBlockReason: "Current Loom steps need verification.",
+        },
+      };
+      const plan = planVisualThinkingPresentation({
+        ...input,
+        generationBundle: incomplete,
+      });
+      expect(plan.completenessNotice).toMatch(/verified information/i);
+      const proj = projectPresentationWorkspace(plan, incomplete);
+      expect(proj.incompletenessVisible).toBe(true);
+      expect(proj.incompletenessMessage).not.toMatch(/complete|finished/i);
+    });
+
+    it("C — Medicare explanation", () => {
       const input = pipeline(
         "Explain Medicare basics as a report.",
         (p) => ({
@@ -567,7 +688,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
       );
     });
 
-    it("C — Business map", () => {
+    it("D — Business map", () => {
       const input = pipeline(
         "Help me map how my business works.",
         (p) => ({
@@ -587,7 +708,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
       expect(denser.informationDensity).toBe("high");
     });
 
-    it("D — CRM comparison", () => {
+    it("E — CRM comparison", () => {
       const input = pipeline(
         "Compare current CRM platforms.",
         (p) => ({
@@ -609,7 +730,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
       );
     });
 
-    it("E — Staff training", () => {
+    it("F — Staff training", () => {
       const input = pipeline(
         "Create a training guide for onboarding.",
         (p) => ({
@@ -625,7 +746,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
       expect(plan.supportingDeliverableIds.length).toBeGreaterThan(0);
     });
 
-    it("F — Report only, no map", () => {
+    it("G — Report only, no map", () => {
       const plan = planVisualThinkingPresentation(
         pipeline(
           "Write a report only. No map please.",
@@ -643,7 +764,7 @@ describe("Visual Thinking Presentation Intelligence", () => {
       expect(plan.visualRecommendation).toBeNull();
     });
 
-    it("G — User-led visual", () => {
+    it("H — User-led visual", () => {
       const plan = planVisualThinkingPresentation(
         pipeline("Let me build my own visual about my offers.", (p) => ({
           ...p,

@@ -3,15 +3,23 @@
 **Status:** Binding for Visual Thinking Studio Build 6  
 **Date:** 2026-07-24  
 **Runtime:** `lib/cartographersStudio/visualThinkingPresentationIntelligence.ts`  
-**Session key:** `companion-visual-thinking-presentation-plan-v1`
+**Session key:** `companion-visual-thinking-presentation-plan-v1` (session-only)
 
 ---
 
 ## Mission
 
-Determine how an approved result should be presented so the member can understand, edit, and use it easily.
+Determine how an approved result should initially be shown so the member can understand, edit, and use it easily.
 
-This layer does **not** re-interpret goals, choose deliverables, perform research, recreate the Knowledge Package, or generate factual content.
+Presentation Intelligence does **not**:
+
+- reinterpret the request or change the goal  
+- choose new deliverables  
+- perform research or change the Knowledge Package  
+- generate new factual content  
+- force a visual or written presentation  
+
+It chooses the clearest **eligible** presentation of content that already exists.
 
 ---
 
@@ -21,6 +29,7 @@ This layer does **not** re-interpret goals, choose deliverables, perform researc
 VisualThinkingRequest
 → VisualThinkingUnderstanding
 → VisualThinkingExperiencePlan
+→ VisualThinkingKnowledgePlan
 → VisualThinkingKnowledgePackage
 → VisualThinkingGenerationRun
 → VisualThinkingGeneratedDeliverables
@@ -34,7 +43,18 @@ Generated deliverables pass through Presentation Intelligence before the final r
 
 ## Presentation Plan model
 
-`VisualThinkingPresentationPlan` — recommended and available presentations, exclusions with user-facing reasons, initial view, information density, progressive disclosure, navigation mode, visual/written recommendations, supporting order, overrides, content detail snapshot, completeness notice.
+`VisualThinkingPresentationPlan` includes:
+
+- identity links (`requestId`, `understandingId`, `experiencePlanId`, `knowledgePackageId`, `generationRunId`)  
+- `primaryDeliverableId` / `supportingDeliverableIds`  
+- `recommendedPresentation` · `availablePresentations` · `excludedPresentations`  
+- `activePresentation` · `initialView`  
+- `informationDensity` · `progressiveDisclosure` · `navigationMode`  
+- `visualRecommendation` (`VisualThinkingVisualRecommendation`) · `writtenRecommendation`  
+- `supportingPresentationOrder` · `selectedSupportingDeliverableId`  
+- `expandedSectionIds` · `collapsedSectionIds`  
+- `splitView` · `splitViewEligible`  
+- `userOverrides` · `userAdjusted` · `contentDetailLevel` · `completenessNotice`  
 
 Statuses: `draft` · `ready` · `active` · `user_adjusted` · `archived` · `failed`
 
@@ -42,131 +62,167 @@ Statuses: `draft` · `ready` · `active` · `user_adjusted` · `archived` · `fa
 
 ## Presentation types
 
-`concise_reading` · `guided_reading` · `detailed_reading` · `step_by_step` · `checklist` · `process_flow` · `relationship_view` · `mind_map` · `timeline` · `decision_tree` · `comparison_view` · `report` · `sop` · `training_guide` · `action_plan` · `quick_reference` · `glossary` · `faq` · `user_led_canvas` · `split_view`
+Internal IDs (never shown raw to members):
 
-Technical IDs are never shown to members — use `presentationLabel()`.
+`concise_reading` · `guided_reading` · `detailed_reading` · `step_by_step` · `checklist` · `process_flow` · `relationship_view` · `grouped_ideas` · `mind_map` · `timeline` · `decision_tree` · `comparison_view` · `report` · `sop` · `training_guide` · `action_plan` · `quick_reference` · `glossary` · `faq` · `user_led_canvas` · `split_view`
 
----
-
-## Eligibility
-
-Pure `evaluatePresentationEligibility` / `listPresentationEligibilities` from structure signals (ordered steps, relationships, chronology, options/criteria, decision structure, glossary/FAQ, declinesMap).
-
-Do not offer a presentation merely because its name exists in a menu. Do not invent missing structure.
+Use `presentationLabel()` for member-facing names.
 
 ---
 
-## Initial selection
+## Eligibility rules
 
-Normally aligns with the approved primary deliverable (e.g. step-by-step guide → step-by-step reading). Optional visual alternate stays secondary unless the plan or preference supports it.
+Pure `evaluatePresentationEligibility` / `listPresentationEligibilities` from structure that **actually exists**:
+
+| View | Requires |
+|------|----------|
+| Process / step / SOP | Ordered steps or process nodes |
+| Checklist | Checklist-compatible / actionable blocks |
+| Relationship / mind map / grouped ideas | Entities + semantic relationships |
+| Timeline | Chronology evidence (not ordinary numbered steps alone) |
+| Decision tree | Decision question / branches |
+| Comparison | ≥2 options + criterion |
+| Report | Explanatory sections or summary |
+| User-led canvas | `let_me_build` / user-led shell |
+| Split view | Written + visual-ready structure; not when `declinesMap` |
+
+Do not invent missing structure.
 
 ---
 
-## Visual recommendation
+## Initial-presentation selection
 
-Metadata for future canvas: process · relationship · hierarchy · sequence · chronology · branching · comparison · cause_and_effect · journey · grouped_ideas · user_led.
-
-No draggable canvas in this build. No map-type chooser.
+Normally reflects the approved primary deliverable. Supporting visuals stay secondary — never silently replace a written primary with a map because a shell exists.
 
 ---
 
-## Written recommendation
+## Written recommendations
 
-concise · guided · detailed · reference · procedural · explanatory · instructional · comparative · executive · training — preserves approved depth.
+`concise` · `guided` · `detailed` · `instructional` · `procedural` · `explanatory` · `comparative` · `executive` · `reference` · `training`
+
+Changes how content is revealed — not the underlying approved content.
+
+---
+
+## Visual recommendations
+
+`VisualThinkingVisualRecommendation` carries structure metadata for a future canvas:
+
+`structure` · `sourceDeliverableId` · `sourceBlockIds` · `sourceKnowledgeItemIds` · grouping / relationship / hierarchy / sequence intent · density · progressive disclosure · `eligible` · `exclusionReason`
+
+No layout coordinates in this build. Suppressed when no-map.
 
 ---
 
 ## Information density
 
-`low` · `balanced` · `high` — controls visibility only. Must not change underlying content depth (`contentDetailLevel`).
+`low` · `balanced` · `high` — visibility only. Must not change requested detail, Knowledge Package, generated blocks, warnings, or gaps. Collapsed blocks remain preserved (`preservedBlockIds`).
 
 ---
 
 ## Progressive disclosure
 
-`start_with_summary` · `start_with_first_step` · `start_with_overview` · `start_with_primary_visual` · `reveal_by_section` · `reveal_by_phase` · `show_all`
+`start_with_summary` · `start_with_overview` · `start_with_first_step` · `start_with_primary_visual` · `reveal_by_section` · `reveal_by_phase` · `reveal_by_group` · `show_all`
 
-Never hide warnings, placeholders, research gaps, or incompleteness notices.
+Never hide warnings, research requirements, incompleteness, required questions, conflicts, or important uncertainties.
 
 ---
 
-## Primary and supporting
+## Primary and supporting behavior
 
-Primary remains dominant. Supporting appear as “Also available” / companion views — not equal competing cards. Do not auto-open every supporting deliverable.
+Primary remains dominant. Supporting appear as “Also available” / companion views — not equal cards; not all auto-opened.
 
 ---
 
 ## Show This Differently
 
-Reveals only eligible alternate presentations, capped by Adaptive Companion (`limitVisibleChoices`). Progressive “Show more ways” when needed.
-
----
-
-## Overrides
-
-May change active presentation, density, disclosure, visual-first preference, supporting visibility, split view, expanded sections, selected supporting.
-
-Must **not** modify Understanding, Experience Plan, Knowledge Package, or regenerate facts. Unsupported requests explain what is missing.
-
----
-
-## Split view
-
-Contract: side-by-side when wide; stacked switch under 768px; unavailable when structure cannot support it.
-
----
-
-## Incomplete content
-
-`awaiting_research` / `awaiting_user_input` / `partial` / `failed` → completeness notice; never styled as complete.
-
----
-
-## User-led visual
-
-Opens calm workspace shell (Add Idea · Ask Shari · Reorganize · Fit View · Open Previous Work) — not a completed map.
-
----
-
-## Adaptive Companion
-
-Influences density, disclosure, and how many alternates show. Must not remove approved content, reduce requested detail, hide gaps/warnings, or force visual/written presentation.
-
----
-
-## Accessibility
-
-Keyboard-accessible controls, focus-visible styles, semantic headings, readable contrast, large targets, screen-reader labels, reduced-motion support, no hover-only essentials.
-
----
-
-## Persistence
-
-Session-only: `companion-visual-thinking-presentation-plan-v1` — presentation state only.
-
----
-
-## Future canvas compatibility
-
-Plan carries visual structure, eligible modes, density, disclosure, grouping/sequence intent, and overrides for later layout — without node positioning in this build.
+Eligible alternates only, Adaptive-capped. Progressive “Show more ways” when needed.
 
 ---
 
 ## Switching versus conversion
 
-1. **Presentation switching** — same approved content already structured for another view.  
-2. **Deliverable conversion** — new deliverable required (later).
+- **Presentation switching** — same approved content already supports another view (`classifyPresentationRequest` → `presentation_switch`).  
+- **Deliverable conversion** — would create a new artifact. Not performed; member may see: *“This would create a new version rather than simply changing the view.”*
 
-This build supports switching only where eligible.
+---
+
+## Presentation overrides
+
+May change active presentation, density, disclosure, visual-first preference, supporting selection, expanded/collapsed sections, split view.
+
+Must **not** modify Understanding, Experience Plan, Knowledge Package, generated facts, or the approved deliverable set.
+
+---
+
+## Split view
+
+Optional. Wide screens may use side-by-side; under 768px switch between views. Requires `splitViewEligible`.
+
+---
+
+## Incomplete-result behavior
+
+| Run state | Presentation |
+|-----------|--------------|
+| Awaiting research | Safe outline + verified-info notice |
+| Awaiting user input | Structure + one focused question path |
+| Partial | Complete vs incomplete labeled honestly |
+| Failed supporting | Preserve successful primary |
+| Failed primary | Clear recovery — do not imply full success |
+
+---
+
+## Editing separation
+
+Presentation actions update the Presentation Plan. Content actions (`applyBlockEdit`, simplify/deepen) update generated deliverables. Switching views must not regenerate facts.
+
+---
+
+## User-led visual shell
+
+Calm shell: Add Idea · Ask Shari · Reorganize · Fit View · Open Previous Work — not a completed map; no technical map-type menu.
+
+---
+
+## Adaptive Companion
+
+Influences density, disclosure, and visible alternate count. Must not remove approved content, reduce depth, hide gaps/warnings/conflicts, force visual/written, or mark partial work complete.
+
+---
+
+## Accessibility
+
+Semantic headings · keyboard controls · focus-visible · logical tab order · large targets · readable contrast · screen-reader labels · reduced motion · no hover-only essentials · no color-only meaning · responsive narrow screens.
+
+---
+
+## Persistence
+
+Session-only key `companion-visual-thinking-presentation-plan-v1` — presentation state only. Not a competing persistence system.
+
+---
+
+## Architecture boundaries
+
+Pure functions outside React: plan creation · eligibility · recommendations · density · disclosure · overrides · persistence · UI projection.
+
+Same Presentation Plan supports content from deterministic, AI, research-assisted, user-led, imported, or Estate sources.
+
+---
+
+## Future canvas compatibility
+
+Plan visual metadata feeds later Interactive Visual Canvas without changing goals, deliverables, or knowledge assembly.
 
 ---
 
 ## Exclusions
 
-Full draggable canvas · auto node positioning · live research · new factual content · full deliverable conversion · exports · print · cross-Estate handoffs · broad visual redesign outside the result workspace
+Full draggable canvas · auto graph layout · live research · citations · new factual generation · complete deliverable conversion · exports · print · cross-Estate writebacks · broad route renaming
 
 ---
 
 ## Build 7 recommendation
 
-**Visual Canvas Foundation** — render an interactive (but calm) canvas from Presentation Plan visual metadata and Knowledge Package relationships, without changing goals, deliverables, or knowledge assembly.
+**Interactive Visual Canvas Foundation** — render a calm interactive canvas from `VisualThinkingVisualRecommendation` + Knowledge Package relationships / generated visual shells, without changing goals, deliverables, or knowledge assembly. Research Acquisition remains a parallel knowledge-side build.

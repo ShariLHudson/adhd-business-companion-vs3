@@ -29,6 +29,7 @@ export type VisualThinkingPresentationType =
   | "checklist"
   | "process_flow"
   | "relationship_view"
+  | "grouped_ideas"
   | "mind_map"
   | "timeline"
   | "decision_tree"
@@ -77,7 +78,26 @@ export type VisualThinkingProgressiveDisclosure =
   | "start_with_primary_visual"
   | "reveal_by_section"
   | "reveal_by_phase"
+  | "reveal_by_group"
   | "show_all";
+
+export type VisualThinkingVisualRecommendation = {
+  structure: VisualThinkingVisualStructure;
+  sourceDeliverableId: string | null;
+  sourceBlockIds: string[];
+  sourceKnowledgeItemIds: string[];
+  groupingStrategy: string | null;
+  relationshipTypes: string[];
+  hierarchyIntent: string | null;
+  sequenceIntent: string | null;
+  startingFocus: string | null;
+  density: VisualThinkingInformationDensity;
+  progressiveDisclosure: VisualThinkingProgressiveDisclosure;
+  eligible: boolean;
+  exclusionReason: string | null;
+};
+
+export type PresentationSwitchKind = "presentation_switch" | "deliverable_conversion";
 
 export type VisualThinkingNavigationMode =
   | "linear"
@@ -128,13 +148,19 @@ export type VisualThinkingPresentationPlan = {
     reason: string;
     userFacingReason: string;
   }>;
+  activePresentation: VisualThinkingPresentationType;
   initialView: VisualThinkingPresentationType;
   informationDensity: VisualThinkingInformationDensity;
   progressiveDisclosure: VisualThinkingProgressiveDisclosure;
   navigationMode: VisualThinkingNavigationMode;
-  visualRecommendation: VisualThinkingVisualStructure | null;
+  visualRecommendation: VisualThinkingVisualRecommendation | null;
   writtenRecommendation: VisualThinkingWrittenTreatment;
   supportingPresentationOrder: string[];
+  selectedSupportingDeliverableId: string | null;
+  expandedSectionIds: string[];
+  collapsedSectionIds: string[];
+  splitView: boolean;
+  splitViewEligible: boolean;
   userOverrides: VisualThinkingPresentationOverrides;
   userAdjusted: boolean;
   status: VisualThinkingPresentationPlanStatus;
@@ -167,11 +193,13 @@ export type VisualThinkingPresentationWorkspaceProjection = {
     type: VisualThinkingPresentationType;
     label: string;
   }>;
-  densitiyLabel: string;
+  densityLabel: string;
   informationDensity: VisualThinkingInformationDensity;
   progressiveDisclosure: VisualThinkingProgressiveDisclosure;
   visibleBlockIds: string[];
   collapsedBlockIds: string[];
+  /** All approved block ids remain present even when collapsed (density never deletes). */
+  preservedBlockIds: string[];
   splitViewActive: boolean;
   splitViewMode: "side_by_side" | "stacked_switch" | "unavailable";
   incompletenessVisible: boolean;
@@ -180,9 +208,10 @@ export type VisualThinkingPresentationWorkspaceProjection = {
   gapMessages: string[];
   userLedShell: boolean;
   userLedActions: string[];
-  visualRecommendation: VisualThinkingVisualStructure | null;
+  visualRecommendation: VisualThinkingVisualRecommendation | null;
   writtenRecommendation: VisualThinkingWrittenTreatment;
   showThisDifferentlyOpen: boolean;
+  conversionNotice: string | null;
 };
 
 const PRESENTATION_DRAFT_KEY = "companion-visual-thinking-presentation-plan-v1";
@@ -195,6 +224,7 @@ const ALL_PRESENTATIONS: VisualThinkingPresentationType[] = [
   "checklist",
   "process_flow",
   "relationship_view",
+  "grouped_ideas",
   "mind_map",
   "timeline",
   "decision_tree",
@@ -217,6 +247,15 @@ const VISUAL_MAP_PRESENTATIONS: VisualThinkingPresentationType[] = [
   "timeline",
   "decision_tree",
   "user_led_canvas",
+];
+
+/** Presentations that typically require a new deliverable, not a view switch. */
+const CONVERSION_HEAVY_TARGETS: VisualThinkingPresentationType[] = [
+  "training_guide",
+  "sop",
+  "faq",
+  "glossary",
+  "action_plan",
 ];
 
 function nowIso(): string {
@@ -245,6 +284,8 @@ export function presentationLabel(
       return "Visual process";
     case "relationship_view":
       return "Relationship view";
+    case "grouped_ideas":
+      return "Grouped ideas";
     case "mind_map":
       return "Mind map";
     case "timeline":
@@ -281,6 +322,7 @@ export function presentationLabel(
 export type PresentationStructureSignals = {
   hasOrderedSteps: boolean;
   hasProcessNodes: boolean;
+  hasChecklistCompatible: boolean;
   hasSemanticRelationships: boolean;
   hasEntitiesOrConcepts: boolean;
   hasChronology: boolean;
@@ -290,6 +332,7 @@ export type PresentationStructureSignals = {
   hasGlossaryItems: boolean;
   hasFaqItems: boolean;
   hasSummary: boolean;
+  hasExplanatoryContent: boolean;
   hasWarningsOrGaps: boolean;
   isUserLedShell: boolean;
   declinesMap: boolean;
@@ -299,6 +342,10 @@ export type PresentationStructureSignals = {
   runIncomplete: boolean;
   runStatus: VisualThinkingGenerationRun["status"];
   researchBlocked: boolean;
+  primaryDeliverableId: string | null;
+  knowledgeItemIds: string[];
+  processBlockIds: string[];
+  relationshipKinds: string[];
 };
 
 function blocksOf(
@@ -320,14 +367,24 @@ export function collectPresentationStructureSignals(
     (d) => d.role === "supporting",
   );
   const blocks = blocksOf(generationBundle.deliverables);
+  const stepBlocks = blocks.filter(
+    (b) =>
+      b.type === "numbered_step" ||
+      b.type === "checklist_item" ||
+      b.type === "process_node",
+  );
   const orderedSteps =
-    blocks.filter((b) => b.type === "numbered_step" || b.type === "checklist_item")
-      .length >= 2 ||
+    stepBlocks.length >= 2 ||
     (pkg?.items.filter((i) => i.type === "step" && i.sequence != null).length ??
       0) >= 2;
   const processNodes =
     blocks.some((b) => b.type === "process_node") ||
     Boolean(primary?.visualShell?.kind === "process_flow");
+  const checklistCompatible =
+    blocks.some((b) => b.type === "checklist_item") ||
+    orderedSteps ||
+    plan.primaryDeliverable === "checklist" ||
+    supporting.some((d) => d.type === "checklist");
   const relationships =
     (pkg?.relationships.length ?? 0) >= 1 ||
     blocks.some((b) => b.type === "relationship_node") ||
@@ -340,10 +397,16 @@ export function collectPresentationStructureSignals(
     (pkg?.items.filter((i) => i.type === "relationship" || i.type === "step")
       .length ?? 0) >= 2 ||
     (primary?.visualShell?.nodes.length ?? 0) >= 2;
+  // Chronology requires time evidence — ordinary numbered steps alone are not enough.
   const chronology =
     blocks.some((b) => b.type === "timeline_event") ||
     (pkg?.items.some((i) => i.type === "timeline_event") ?? false) ||
-    pkg?.organizationStrategy === "chronology";
+    pkg?.organizationStrategy === "chronology" ||
+    blocks.some((b) =>
+      /\b(19|20)\d{2}\b|\b(january|february|march|april|may|june|july|august|september|october|november|december)\b|\bq[1-4]\b|\bfy\d{2,4}\b/i.test(
+        b.content,
+      ),
+    );
   const decision =
     blocks.some((b) => b.type === "decision_branch") ||
     (pkg?.items.some((i) => i.type === "decision_point") ?? false) ||
@@ -368,6 +431,13 @@ export function collectPresentationStructureSignals(
     supporting.some((d) => d.type === "faq") ||
     plan.primaryDeliverable === "faq";
   const summary = blocks.some((b) => b.type === "summary" || b.type === "key_point");
+  const explanatory = blocks.some(
+    (b) =>
+      b.type === "paragraph" ||
+      b.type === "summary" ||
+      b.type === "heading" ||
+      b.type === "key_point",
+  );
   const gaps =
     pkg?.knowledgeGaps
       .filter((g) => g.status === "open" && g.priority !== "optional")
@@ -384,6 +454,7 @@ export function collectPresentationStructureSignals(
   return {
     hasOrderedSteps: orderedSteps,
     hasProcessNodes: processNodes,
+    hasChecklistCompatible: checklistCompatible,
     hasSemanticRelationships: relationships,
     hasEntitiesOrConcepts: entities,
     hasChronology: chronology,
@@ -393,6 +464,7 @@ export function collectPresentationStructureSignals(
     hasGlossaryItems: glossary,
     hasFaqItems: faq,
     hasSummary: summary,
+    hasExplanatoryContent: explanatory,
     hasWarningsOrGaps: warnings || gaps.length > 0,
     isUserLedShell:
       plan.interactionStyle === "let_me_build" ||
@@ -405,6 +477,10 @@ export function collectPresentationStructureSignals(
     runIncomplete: incomplete,
     runStatus: run.status,
     researchBlocked: run.researchBlocked,
+    primaryDeliverableId: primary?.id ?? null,
+    knowledgeItemIds: (pkg?.items ?? []).map((i) => i.id),
+    processBlockIds: stepBlocks.map((b) => b.id),
+    relationshipKinds: (pkg?.relationships ?? []).map((r) => r.kind),
   };
 }
 
@@ -439,8 +515,6 @@ export function evaluatePresentationEligibility(
 
   switch (type) {
     case "step_by_step":
-    case "checklist":
-    case "sop":
     case "process_flow":
       if (!signals.hasOrderedSteps && !signals.hasProcessNodes) {
         return deny(
@@ -452,8 +526,17 @@ export function evaluatePresentationEligibility(
         return deny("declines_map", "A visual map isn't part of this result.");
       }
       return allow();
+    case "checklist":
+      if (!signals.hasChecklistCompatible) {
+        return deny(
+          "missing_checklist_structure",
+          "A checklist needs actions that can be marked complete.",
+        );
+      }
+      return allow();
     case "relationship_view":
     case "mind_map":
+    case "grouped_ideas":
       if (!signals.hasSemanticRelationships || !signals.hasEntitiesOrConcepts) {
         return deny(
           "missing_relationships",
@@ -527,12 +610,57 @@ export function evaluatePresentationEligibility(
         );
       }
       return allow();
+    case "report":
+      if (!signals.hasExplanatoryContent && !signals.hasSummary) {
+        return deny(
+          "missing_report_structure",
+          "A report needs explanatory sections or a summary.",
+        );
+      }
+      return allow();
+    case "training_guide":
+      if (
+        signals.primaryType !== "training_guide" &&
+        signals.primaryType !== "learning_guide" &&
+        !signals.supportingTypes.includes("training_guide")
+      ) {
+        return deny(
+          "requires_conversion",
+          "This would create a new version rather than simply changing the view.",
+        );
+      }
+      return allow();
+    case "action_plan":
+      if (
+        signals.primaryType !== "action_plan" &&
+        !signals.supportingTypes.includes("action_plan")
+      ) {
+        return deny(
+          "requires_conversion",
+          "This would create a new version rather than simply changing the view.",
+        );
+      }
+      return allow();
+    case "sop":
+      if (
+        signals.primaryType !== "sop" &&
+        !signals.supportingTypes.includes("sop")
+      ) {
+        return deny(
+          "requires_conversion",
+          "This would create a new version rather than simply changing the view.",
+        );
+      }
+      if (!signals.hasOrderedSteps && !signals.hasProcessNodes) {
+        return deny(
+          "missing_ordered_steps",
+          "There aren't enough ordered steps for this view yet.",
+        );
+      }
+      return allow();
     case "concise_reading":
     case "guided_reading":
     case "detailed_reading":
-    case "report":
-    case "training_guide":
-    case "action_plan":
     case "quick_reference":
       return allow();
     default:
@@ -601,7 +729,7 @@ function primaryPresentationForDeliverable(
   }
 }
 
-export function recommendVisualStructure(
+function structureForPresentation(
   signals: PresentationStructureSignals,
   recommended: VisualThinkingPresentationType,
 ): VisualThinkingVisualStructure | null {
@@ -618,6 +746,8 @@ export function recommendVisualStructure(
     case "relationship_view":
     case "mind_map":
       return "relationship";
+    case "grouped_ideas":
+      return "grouped_ideas";
     case "timeline":
       return "chronology";
     case "decision_tree":
@@ -631,6 +761,108 @@ export function recommendVisualStructure(
       if (signals.hasOrderedSteps) return "sequence";
       return null;
   }
+}
+
+/** @deprecated Prefer buildVisualRecommendation — kept for structure-only callers. */
+export function recommendVisualStructure(
+  signals: PresentationStructureSignals,
+  recommended: VisualThinkingPresentationType,
+): VisualThinkingVisualStructure | null {
+  return structureForPresentation(signals, recommended);
+}
+
+export function buildVisualRecommendation(
+  signals: PresentationStructureSignals,
+  recommended: VisualThinkingPresentationType,
+  density: VisualThinkingInformationDensity,
+  disclosure: VisualThinkingProgressiveDisclosure,
+): VisualThinkingVisualRecommendation | null {
+  if (signals.declinesMap) {
+    return {
+      structure: "user_led",
+      sourceDeliverableId: signals.primaryDeliverableId,
+      sourceBlockIds: [],
+      sourceKnowledgeItemIds: [],
+      groupingStrategy: null,
+      relationshipTypes: [],
+      hierarchyIntent: null,
+      sequenceIntent: null,
+      startingFocus: null,
+      density,
+      progressiveDisclosure: disclosure,
+      eligible: false,
+      exclusionReason: "A visual map isn't part of this result.",
+    };
+  }
+  const structure = structureForPresentation(signals, recommended);
+  if (!structure) return null;
+  return {
+    structure,
+    sourceDeliverableId: signals.primaryDeliverableId,
+    sourceBlockIds: signals.processBlockIds.slice(),
+    sourceKnowledgeItemIds: signals.knowledgeItemIds.slice(0, 24),
+    groupingStrategy:
+      structure === "grouped_ideas" || structure === "relationship"
+        ? "topic_groups"
+        : structure === "process" || structure === "sequence"
+          ? "phase"
+          : null,
+    relationshipTypes: signals.relationshipKinds.slice(),
+    hierarchyIntent:
+      structure === "hierarchy" ? "parent_child" : null,
+    sequenceIntent:
+      structure === "process" || structure === "sequence" || structure === "chronology"
+        ? "ordered"
+        : null,
+    startingFocus:
+      structure === "user_led"
+        ? "central_topic"
+        : structure === "relationship"
+          ? "central_idea"
+          : "primary_section",
+    density,
+    progressiveDisclosure: disclosure,
+    eligible: true,
+    exclusionReason: null,
+  };
+}
+
+/**
+ * Presentation switching reuses eligible structure.
+ * Deliverable conversion would create a genuinely new artifact (not performed here).
+ */
+export function classifyPresentationRequest(
+  plan: VisualThinkingPresentationPlan,
+  target: VisualThinkingPresentationType,
+): {
+  kind: PresentationSwitchKind;
+  allowedNow: boolean;
+  userFacingMessage: string | null;
+} {
+  if (
+    plan.availablePresentations.includes(target) ||
+    target === plan.recommendedPresentation ||
+    target === plan.activePresentation
+  ) {
+    return { kind: "presentation_switch", allowedNow: true, userFacingMessage: null };
+  }
+  const excluded = plan.excludedPresentations.find((e) => e.type === target);
+  if (excluded?.reason === "requires_conversion" || CONVERSION_HEAVY_TARGETS.includes(target)) {
+    return {
+      kind: "deliverable_conversion",
+      allowedNow: false,
+      userFacingMessage:
+        excluded?.userFacingReason ??
+        "This would create a new version rather than simply changing the view.",
+    };
+  }
+  return {
+    kind: "deliverable_conversion",
+    allowedNow: false,
+    userFacingMessage:
+      excluded?.userFacingReason ??
+      "This would create a new version rather than simply changing the view.",
+  };
 }
 
 export function recommendWrittenTreatment(
@@ -712,6 +944,9 @@ export function selectProgressiveDisclosure(
     return "start_with_overview";
   }
   if (recommended === "comparison_view") return "start_with_overview";
+  if (recommended === "grouped_ideas") {
+    return density === "low" ? "reveal_by_group" : "start_with_overview";
+  }
   return adaptiveSummaryFirst ? "start_with_summary" : "reveal_by_section";
 }
 
@@ -741,7 +976,7 @@ function navigationFor(
 
 function completenessNotice(signals: PresentationStructureSignals): string | null {
   if (signals.researchBlocked || signals.runStatus === "awaiting_research") {
-    return "Some sections are waiting for verified information before they can be filled in.";
+    return "I have the structure ready. The current product-specific steps still need verified information.";
   }
   if (signals.runStatus === "awaiting_user_input") {
     return "The structure is ready. A few details still need your input.";
@@ -791,6 +1026,7 @@ export function planVisualThinkingPresentation(
       recommendedPresentation: "guided_reading",
       availablePresentations: ["guided_reading"],
       excludedPresentations: [],
+      activePresentation: "guided_reading",
       initialView: "guided_reading",
       informationDensity: "balanced",
       progressiveDisclosure: "start_with_summary",
@@ -798,6 +1034,11 @@ export function planVisualThinkingPresentation(
       visualRecommendation: null,
       writtenRecommendation: "guided",
       supportingPresentationOrder: [],
+      selectedSupportingDeliverableId: null,
+      expandedSectionIds: [],
+      collapsedSectionIds: [],
+      splitView: false,
+      splitViewEligible: false,
       userOverrides: {},
       userAdjusted: false,
       status: "failed",
@@ -874,8 +1115,14 @@ export function planVisualThinkingPresentation(
     signals,
     adaptive.summaryFirst,
   );
-  const visual = recommendVisualStructure(signals, recommended);
+  const visual = buildVisualRecommendation(
+    signals,
+    recommended,
+    density,
+    disclosure,
+  );
   const written = recommendWrittenTreatment(plan, recommended);
+  const splitEligible = evaluatePresentationEligibility("split_view", signals).eligible;
 
   return {
     id: newId("vtpp"),
@@ -889,13 +1136,20 @@ export function planVisualThinkingPresentation(
     recommendedPresentation: recommended,
     availablePresentations: available,
     excludedPresentations: excluded,
+    activePresentation: recommended,
     initialView: recommended,
     informationDensity: density,
     progressiveDisclosure: disclosure,
     navigationMode: navigationFor(recommended, false),
-    visualRecommendation: visual,
+    visualRecommendation:
+      visual && visual.eligible ? visual : signals.declinesMap ? null : visual,
     writtenRecommendation: written,
     supportingPresentationOrder: run.supportingDeliverableIds.slice(),
+    selectedSupportingDeliverableId: null,
+    expandedSectionIds: [],
+    collapsedSectionIds: [],
+    splitView: false,
+    splitViewEligible: splitEligible,
     userOverrides: {},
     userAdjusted: false,
     status: "ready",
@@ -932,18 +1186,28 @@ export function applyPresentationOverride(
   const nextOverrides = { ...plan.userOverrides };
   let available = plan.availablePresentations;
   let excluded = plan.excludedPresentations;
+  let activePresentation = plan.activePresentation;
   let initialView = plan.initialView;
   let density = plan.informationDensity;
   let disclosure = plan.progressiveDisclosure;
   let navigation = plan.navigationMode;
   let visual = plan.visualRecommendation;
+  let selectedSupporting = plan.selectedSupportingDeliverableId;
+  let expanded = [...plan.expandedSectionIds];
+  let collapsed = [...plan.collapsedSectionIds];
+  let splitView = plan.splitView;
 
   if (override.kind === "set_presentation") {
     const eligibility = signals
       ? evaluatePresentationEligibility(override.presentation, signals)
-      : { eligible: available.includes(override.presentation), reason: null, userFacingReason: null, type: override.presentation };
+      : {
+          eligible: available.includes(override.presentation),
+          reason: null,
+          userFacingReason: null,
+          type: override.presentation,
+        };
     if (!eligibility.eligible) {
-      // Do not invent structure — keep plan, record exclusion note
+      const conversion = classifyPresentationRequest(plan, override.presentation);
       return {
         ...plan,
         updatedAt: nowIso(),
@@ -953,18 +1217,19 @@ export function applyPresentationOverride(
           ...excluded.filter((e) => e.type !== override.presentation),
           {
             type: override.presentation,
-            reason: eligibility.reason ?? "ineligible",
+            reason: eligibility.reason ?? conversion.kind,
             userFacingReason:
               eligibility.userFacingReason ??
+              conversion.userFacingMessage ??
               "That view needs more structure before it can open.",
           },
         ],
       };
     }
     nextOverrides.activePresentation = override.presentation;
+    activePresentation = override.presentation;
     initialView = override.presentation;
     if (signals) {
-      visual = recommendVisualStructure(signals, override.presentation);
       disclosure = selectProgressiveDisclosure(
         override.presentation,
         density,
@@ -972,15 +1237,21 @@ export function applyPresentationOverride(
         false,
         nextOverrides.progressiveDisclosure,
       );
+      const built = buildVisualRecommendation(
+        signals,
+        override.presentation,
+        density,
+        disclosure,
+      );
+      visual = built && built.eligible ? built : null;
     }
     navigation = navigationFor(
       override.presentation,
-      Boolean(nextOverrides.splitView),
+      Boolean(nextOverrides.splitView ?? splitView),
     );
   } else if (override.kind === "set_density") {
     nextOverrides.informationDensity = override.density;
     density = override.density;
-    // Content depth unchanged — contentDetailLevel stays
   } else if (override.kind === "set_disclosure") {
     nextOverrides.progressiveDisclosure = override.disclosure;
     disclosure = override.disclosure;
@@ -989,15 +1260,31 @@ export function applyPresentationOverride(
   } else if (override.kind === "set_show_supporting") {
     nextOverrides.showSupporting = override.value;
   } else if (override.kind === "set_split_view") {
+    if (!plan.splitViewEligible && override.value) {
+      return {
+        ...plan,
+        updatedAt: nowIso(),
+        userAdjusted: true,
+        status: "user_adjusted",
+      };
+    }
     nextOverrides.splitView = override.value;
-    navigation = navigationFor(initialView, override.value);
+    splitView = override.value;
+    navigation = navigationFor(activePresentation, override.value);
   } else if (override.kind === "toggle_section") {
-    const set = new Set(nextOverrides.expandedSectionIds ?? []);
-    if (override.expanded) set.add(override.sectionId);
-    else set.delete(override.sectionId);
-    nextOverrides.expandedSectionIds = [...set];
+    const set = new Set(nextOverrides.expandedSectionIds ?? expanded);
+    if (override.expanded) {
+      set.add(override.sectionId);
+      collapsed = collapsed.filter((id) => id !== override.sectionId);
+    } else {
+      set.delete(override.sectionId);
+      if (!collapsed.includes(override.sectionId)) collapsed.push(override.sectionId);
+    }
+    expanded = [...set];
+    nextOverrides.expandedSectionIds = expanded;
   } else if (override.kind === "select_supporting") {
     nextOverrides.selectedSupportingDeliverableId = override.deliverableId;
+    selectedSupporting = override.deliverableId;
   }
 
   void available;
@@ -1006,11 +1293,16 @@ export function applyPresentationOverride(
     userOverrides: nextOverrides,
     userAdjusted: true,
     status: "user_adjusted",
+    activePresentation,
     initialView,
     informationDensity: density,
     progressiveDisclosure: disclosure,
     navigationMode: navigation,
     visualRecommendation: visual,
+    selectedSupportingDeliverableId: selectedSupporting,
+    expandedSectionIds: expanded,
+    collapsedSectionIds: collapsed,
+    splitView,
     updatedAt: nowIso(),
   };
 }
@@ -1020,7 +1312,9 @@ export function visibleAlternatePresentations(
   options?: { showAll?: boolean },
 ): Array<{ type: VisualThinkingPresentationType; label: string }> {
   const active =
-    plan.userOverrides.activePresentation ?? plan.recommendedPresentation;
+    plan.userOverrides.activePresentation ??
+    plan.activePresentation ??
+    plan.recommendedPresentation;
   const alts = plan.availablePresentations
     .filter((t) => t !== active && t !== "split_view")
     .map((t) => ({ type: t, label: presentationLabel(t) }));
@@ -1035,14 +1329,9 @@ export function resolveSplitViewMode(
   plan: VisualThinkingPresentationPlan,
   viewportWidth = 1024,
 ): "side_by_side" | "stacked_switch" | "unavailable" {
-  const wantsSplit = Boolean(plan.userOverrides.splitView);
+  const wantsSplit = Boolean(plan.userOverrides.splitView ?? plan.splitView);
   if (!wantsSplit) return "unavailable";
-  if (
-    !plan.availablePresentations.includes("split_view") &&
-    !plan.availablePresentations.some((t) => VISUAL_MAP_PRESENTATIONS.includes(t))
-  ) {
-    return "unavailable";
-  }
+  if (!plan.splitViewEligible) return "unavailable";
   if (viewportWidth < 768) return "stacked_switch";
   return "side_by_side";
 }
@@ -1128,7 +1417,9 @@ export function projectPresentationWorkspace(
       (d) => d.id === plan.primaryDeliverableId,
     ) ?? generationBundle.deliverables.find((d) => d.role === "primary");
   const active =
-    plan.userOverrides.activePresentation ?? plan.recommendedPresentation;
+    plan.userOverrides.activePresentation ??
+    plan.activePresentation ??
+    plan.recommendedPresentation;
   const showSupporting = plan.userOverrides.showSupporting !== false;
   const supportingIds = showSupporting
     ? plan.supportingPresentationOrder
@@ -1139,11 +1430,15 @@ export function projectPresentationWorkspace(
   const blockProj = primary
     ? projectVisibleBlocks(primary, plan)
     : { visible: [] as string[], collapsed: [] as string[] };
+  const preserved = primary?.blocks.map((b) => b.id) ?? [];
   const splitMode = resolveSplitViewMode(plan, options?.viewportWidth ?? 1024);
   const incomplete = Boolean(plan.completenessNotice);
-  const gaps = plan.completenessNotice
-    ? [plan.completenessNotice]
-    : [];
+  const gaps = [
+    ...(plan.completenessNotice ? [plan.completenessNotice] : []),
+    ...((primary?.blocks
+      .filter((b) => b.type === "placeholder" || b.type === "warning")
+      .map((b) => b.content) ?? []) as string[]),
+  ];
 
   return {
     title: primary?.title ?? "Your result",
@@ -1154,7 +1449,7 @@ export function projectPresentationWorkspace(
     showSupporting,
     visibleSupportingDeliverableIds: supportingIds,
     alternatePresentations: alts,
-    densitiyLabel:
+    densityLabel:
       (plan.userOverrides.informationDensity ?? plan.informationDensity) ===
       "low"
         ? "Focus"
@@ -1168,11 +1463,12 @@ export function projectPresentationWorkspace(
       plan.userOverrides.progressiveDisclosure ?? plan.progressiveDisclosure,
     visibleBlockIds: blockProj.visible,
     collapsedBlockIds: blockProj.collapsed,
+    preservedBlockIds: preserved,
     splitViewActive: splitMode !== "unavailable",
     splitViewMode: splitMode,
     incompletenessVisible: incomplete,
     incompletenessMessage: plan.completenessNotice,
-    gapWarningsVisible: incomplete || (primary?.blocks.some((b) => b.type === "placeholder" || b.type === "warning") ?? false),
+    gapWarningsVisible: incomplete || gaps.length > 0,
     gapMessages: gaps,
     userLedShell:
       active === "user_led_canvas" || primary?.sourceMode === "user_led_shell",
@@ -1186,6 +1482,7 @@ export function projectPresentationWorkspace(
     visualRecommendation: plan.visualRecommendation,
     writtenRecommendation: plan.writtenRecommendation,
     showThisDifferentlyOpen: Boolean(options?.showThisDifferentlyOpen),
+    conversionNotice: null,
   };
 }
 

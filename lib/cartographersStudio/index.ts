@@ -247,6 +247,8 @@ export {
   resolveSplitViewMode,
   presentationLabel,
   recommendVisualStructure,
+  buildVisualRecommendation,
+  classifyPresentationRequest,
   recommendWrittenTreatment,
   selectInformationDensity,
   selectProgressiveDisclosure,
@@ -262,6 +264,8 @@ export {
   type VisualThinkingInformationDensity,
   type VisualThinkingProgressiveDisclosure,
   type VisualThinkingVisualStructure,
+  type VisualThinkingVisualRecommendation,
   type VisualThinkingWrittenTreatment,
   type PresentationOverride,
+  type PresentationSwitchKind,
 } from "./visualThinkingPresentationIntelligence";
