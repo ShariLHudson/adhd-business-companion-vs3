@@ -1,117 +1,96 @@
 /**
- * Extract typed contributions from a Strategy domain pack.
- * Content is for synthesis merge — not “Domain says…” member reports.
+ * Extract only high-value contributions — not full domain dumps.
+ * Budgets: primary ≤5, secondary ≤3 (after relevance ranking).
  */
 
 import { getDomainIntelligence } from "../domainIntelligence";
 import { summarizeDomainContributions } from "../domainIntelligence/contributions";
 import type { StrategyTypeId } from "../types";
-import type { StrategyDomainContribution } from "./types";
+import type { StrategyDomainContribution, StrategyDomainContributionType } from "./types";
+import {
+  PRIMARY_CONTRIBUTION_BUDGET,
+  SECONDARY_CONTRIBUTION_BUDGET,
+} from "./types";
 
+function relevanceBoost(content: string, text: string): number {
+  const c = content.toLowerCase();
+  const t = text.toLowerCase();
+  let score = 0;
+  const tokens = c.split(/\s+/).filter((w) => w.length > 4).slice(0, 8);
+  for (const tok of tokens) {
+    if (t.includes(tok)) score += 2;
+  }
+  if (/capacity|delivery/.test(c) && /capacity|delivery|overwhelm|too much/.test(t)) score += 8;
+  if (/price|pricing|value/.test(c) && /price|charge|revenue|fee/.test(t)) score += 8;
+  if (/retention|churn/.test(c) && /retention|churn|stay|leave/.test(t)) score += 8;
+  if (/audience|fit|position/.test(c) && /audience|customers|fit|who/.test(t)) score += 6;
+  if (/hire|delegat/.test(c) && /hire|va|assistant|delegat/.test(t)) score += 6;
+  if (/grow|acquisition|customer/.test(c) && /grow|customer|revenue/.test(t)) score += 4;
+  return score;
+}
+
+function pushTyped(
+  out: StrategyDomainContribution[],
+  domainId: StrategyTypeId,
+  type: StrategyDomainContributionType,
+  contents: string[],
+  basePriority: number,
+  text: string,
+  limit: number,
+) {
+  let i = 0;
+  for (const content of contents.slice(0, limit)) {
+    out.push({
+      domainId,
+      contributionType: type,
+      id: `${domainId}-${type}-${i}`,
+      content,
+      priority: basePriority - i + relevanceBoost(content, text),
+      userFacing: false,
+    });
+    i += 1;
+  }
+}
+
+/**
+ * Pull candidate contributions then keep only the budgeted high-value set.
+ */
 export function extractDomainContributions(
   domainId: StrategyTypeId,
   role: "primary" | "secondary",
+  text = "",
 ): StrategyDomainContribution[] {
   const domain = getDomainIntelligence(domainId);
   if (!domain) return [];
+
   const summary = summarizeDomainContributions(domain);
   const basePriority = role === "primary" ? 100 : 60;
-  const out: StrategyDomainContribution[] = [];
-  let i = 0;
+  const candidates: StrategyDomainContribution[] = [];
 
-  for (const q of summary.hiddenUnderlyingQuestions.slice(0, 4)) {
-    out.push({
-      domainId,
-      contributionType: "question",
-      id: `${domainId}-q-${i++}`,
-      content: q,
-      priority: basePriority - i,
-      userFacing: false,
-    });
-  }
-  for (const e of summary.evidenceNeeded.slice(0, 3)) {
-    out.push({
-      domainId,
-      contributionType: "evidence",
-      id: `${domainId}-e-${i++}`,
-      content: e,
-      priority: basePriority - 10 - i,
-    });
-  }
-  for (const a of summary.commonFalseAssumptions.slice(0, 3)) {
-    out.push({
-      domainId,
-      contributionType: "assumption",
-      id: `${domainId}-a-${i++}`,
-      content: a,
-      priority: basePriority - 20 - i,
-    });
-  }
-  for (const c of summary.capacityChecks.slice(0, 3)) {
-    out.push({
-      domainId,
-      contributionType: "capacity",
-      id: `${domainId}-c-${i++}`,
-      content: c,
-      priority: basePriority - 15 - i,
-    });
-  }
-  for (const t of summary.materialTradeoffs.slice(0, 4)) {
-    out.push({
-      domainId,
-      contributionType: "tradeoff",
-      id: `${domainId}-t-${i++}`,
-      content: t,
-      priority: basePriority - 25 - i,
-    });
-  }
-  for (const r of summary.riskPatterns.slice(0, 4)) {
-    out.push({
-      domainId,
-      contributionType: "risk",
-      id: `${domainId}-r-${i++}`,
-      content: r,
-      priority: basePriority - 30 - i,
-    });
-  }
-  for (const x of summary.experiments.slice(0, 3)) {
-    out.push({
-      domainId,
-      contributionType: "experiment",
-      id: `${domainId}-x-${i++}`,
-      content: x,
-      priority: basePriority - 35 - i,
-    });
-  }
-  for (const p of summary.optionPatterns.slice(0, 8)) {
-    out.push({
-      domainId,
-      contributionType: "option",
-      id: `${domainId}-o-${p}`,
-      content: p,
-      priority: basePriority - 5,
-    });
-  }
-  for (const h of summary.handoffBoundaries.slice(0, 2)) {
-    out.push({
-      domainId,
-      contributionType: "handoff",
-      id: `${domainId}-h-${i++}`,
-      content: h,
-      priority: basePriority - 40 - i,
-    });
-  }
+  // Prefer one of each high-value type rather than flooding one type
+  pushTyped(candidates, domainId, "question", summary.hiddenUnderlyingQuestions, basePriority, text, 2);
+  pushTyped(candidates, domainId, "evidence", summary.evidenceNeeded, basePriority - 5, text, 1);
+  pushTyped(candidates, domainId, "assumption", summary.commonFalseAssumptions, basePriority - 8, text, 1);
+  pushTyped(candidates, domainId, "capacity", summary.capacityChecks, basePriority - 4, text, 1);
+  pushTyped(candidates, domainId, "constraint", domain.guidingPrinciples ?? [], basePriority - 6, text, 1);
+  pushTyped(candidates, domainId, "tradeoff", summary.materialTradeoffs, basePriority - 10, text, 1);
+  pushTyped(candidates, domainId, "risk", summary.riskPatterns, basePriority - 12, text, 1);
+  pushTyped(candidates, domainId, "experiment", summary.experiments, basePriority - 14, text, 1);
+  pushTyped(
+    candidates,
+    domainId,
+    "option",
+    summary.optionPatterns.map(String),
+    basePriority - 2,
+    text,
+    2,
+  );
+  pushTyped(candidates, domainId, "handoff", summary.handoffBoundaries, basePriority - 20, text, 1);
 
-  // Constraint-flavored guiding principles
-  for (const g of (domain.guidingPrinciples ?? []).slice(0, 3)) {
-    out.push({
-      domainId,
-      contributionType: "constraint",
-      id: `${domainId}-g-${i++}`,
-      content: g,
-      priority: basePriority - 8 - i,
-    });
-  }
+  const budget =
+    role === "primary" ? PRIMARY_CONTRIBUTION_BUDGET : SECONDARY_CONTRIBUTION_BUDGET;
 
-  return out;
+  return [...candidates]
+    .sort((a, b) => b.priority - a.priority)
+    .slice(0, budget);
 }
