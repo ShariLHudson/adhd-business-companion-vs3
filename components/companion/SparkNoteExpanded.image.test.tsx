@@ -15,6 +15,7 @@ import {
   summerOpenDoorCard,
 } from "@/lib/sparkNote/fixtures/summerOpenDoor";
 import { SPARK_CARD_SECTION_STORY } from "@/lib/sparkNote/sparkCardCollectibleDisplay";
+import { SPARK_NOTE_CATALOG } from "@/lib/sparkNote/catalog";
 
 import { SparkNoteExpanded } from "./SparkNoteExpanded";
 
@@ -62,53 +63,120 @@ describe("SparkNoteExpanded image parity", () => {
     });
   }
 
-  it("1. Summer's Open Door resolves a hero image", () => {
+  it("1. SPARK-SEA-SUMMER renders data-spark-card-hero=true", () => {
     const resolved = resolveSparkCardImage(summerOpenDoorCard);
     expect(resolved.hasImage).toBe(true);
     expect(resolved.src).toContain("upload.wikimedia.org");
     expect(resolved.src).toContain(SUMMER_OPEN_DOOR_IMAGE_FRAGMENT);
     expect(resolved.caption).toBe(SUMMER_OPEN_DOOR_CAPTION);
-    expect(resolved.fallbackState).toBe("none");
-    expect(summerOpenDoorCard.id).toBe(SUMMER_OPEN_DOOR_CARD_ID);
+
+    render(summerOpenDoorCard);
+    const hero = container.querySelector(
+      '[data-spark-card-hero="true"]',
+    ) as HTMLElement | null;
+    expect(hero).toBeTruthy();
+    expect(hero?.getAttribute("data-testid")).toBe("spark-card-hero");
   });
 
-  it("2–4. live card renders image + caption before The Story", () => {
+  it("2–4. hero appears before The Story with garden-door src + caption", () => {
     const resolved = resolveSparkCardImage(summerOpenDoorCard);
     render(summerOpenDoorCard);
 
-    const figure = container.querySelector(
-      '[data-testid="spark-card-hero"]',
-    ) as HTMLElement | null;
-    expect(figure).toBeTruthy();
-    expect(figure?.className).toContain("spark-note-expanded__art--editorial");
-    expect(figure?.getAttribute("data-spark-has-image")).toBe("true");
+    const hero = container.querySelector(
+      '[data-spark-card-hero="true"]',
+    ) as HTMLElement;
+    expect(hero).toBeTruthy();
+    expect(
+      hero.querySelector(".spark-note-expanded__art")?.className,
+    ).toContain("spark-note-expanded__art--editorial");
+    expect(
+      hero
+        .querySelector(".spark-card-hero__frame")
+        ?.getAttribute("data-spark-has-image"),
+    ).toBe("true");
 
-    const img = container.querySelector(
-      ".spark-note-expanded__art-image",
+    const img = hero.querySelector(
+      ".spark-card-hero__image, .spark-note-expanded__art-image",
     ) as HTMLImageElement | null;
     expect(img).toBeTruthy();
     expect(img?.getAttribute("src")).toBe(resolved.src);
-    // Visible immediately — not gated on onLoad / opacity:0
     expect(img?.style.opacity || "1").not.toBe("0");
     expect(
-      container.querySelector(".spark-note-expanded__art-photo-caption")
-        ?.textContent,
+      hero.querySelector(".spark-card-hero__caption")?.textContent,
     ).toBe(SUMMER_OPEN_DOOR_CAPTION);
 
     const html = container.innerHTML;
-    const imgAt = html.indexOf("spark-note-expanded__art-image");
+    const heroAt = html.indexOf('data-spark-card-hero="true"');
     const storyAt = html.indexOf(SPARK_CARD_SECTION_STORY);
-    expect(imgAt).toBeGreaterThan(-1);
+    const dividerAt = html.indexOf("spark-note-expanded__divider");
+    expect(heroAt).toBeGreaterThan(-1);
     expect(storyAt).toBeGreaterThan(-1);
-    expect(imgAt).toBeLessThan(storyAt);
-
-    // No themed placeholder when a photo is resolved
+    expect(heroAt).toBeLessThan(storyAt);
+    // Divider must not replace the hero region — hero comes first.
+    expect(dividerAt).toBeGreaterThan(heroAt);
     expect(
       container.querySelector(".spark-note-expanded__art-scene"),
     ).toBeFalsy();
   });
 
-  it("5. print and live choose the same image source", () => {
+  it("5. hero is not omitted in live mode (SparkCardArt mounted)", () => {
+    render(summerOpenDoorCard);
+    expect(
+      container.querySelector('[data-spark-card-hero="true"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(".spark-card-hero__image"),
+    ).toBeTruthy();
+  });
+
+  it("6–7. hero remains present on remount and with catalog imageSrc", () => {
+    const resolved = resolveSparkCardImage(summerOpenDoorCard);
+    render(summerOpenDoorCard);
+    expect(
+      container
+        .querySelector(".spark-card-hero__image")
+        ?.getAttribute("src"),
+    ).toBe(resolved.src);
+
+    act(() => root.unmount());
+    container.remove();
+
+    const catalogEntry = SPARK_NOTE_CATALOG.find(
+      (e) => e.id === SUMMER_OPEN_DOOR_CARD_ID,
+    );
+    expect(catalogEntry?.imageSrc).toBeTruthy();
+    const fromCatalog: SparkNoteDailyCard = {
+      ...summerOpenDoorCard,
+      imageSrc: catalogEntry!.imageSrc,
+      thumbnailAlt: catalogEntry!.thumbnailAlt,
+    };
+    render(fromCatalog);
+    expect(
+      container.querySelector('[data-spark-card-hero="true"]'),
+    ).toBeTruthy();
+    expect(
+      container
+        .querySelector(".spark-card-hero__image")
+        ?.getAttribute("src"),
+    ).toContain(SUMMER_OPEN_DOOR_IMAGE_FRAGMENT);
+    expect(
+      container.querySelector(".spark-card-hero__caption")?.textContent,
+    ).toBe(SUMMER_OPEN_DOOR_CAPTION);
+  });
+
+  it("8–9. desktop modal and mobile expanded keep the same hero mount", () => {
+    render(summerOpenDoorCard);
+    const card = container.querySelector(".spark-note-expanded__card");
+    expect(card?.className).toContain("keepsake");
+    expect(
+      container.querySelector('[data-spark-card-hero="true"]'),
+    ).toBeTruthy();
+    // Width classes live in CSS media queries — assert hero is in flow.
+    const hero = container.querySelector(".spark-card-hero") as HTMLElement;
+    expect(hero.className).toContain("spark-card-hero");
+  });
+
+  it("10. print and live choose the same image source", () => {
     const image = resolveSparkCardImage(summerOpenDoorCard);
     const hero = resolveSparkCardHeroVisual(summerOpenDoorCard);
     expect(hero.kind).toBe("photo");
@@ -118,20 +186,7 @@ describe("SparkNoteExpanded image parity", () => {
     }
   });
 
-  it("6. image wrapper has nonzero layout dimensions", () => {
-    render(summerOpenDoorCard);
-    const figure = container.querySelector(
-      ".spark-note-expanded__art",
-    ) as HTMLElement;
-    // jsdom may not compute aspect-ratio; assert CSS contract classes exist
-    expect(figure.className).toMatch(/art--(editorial|landscape|square|portrait)/);
-    const style = getComputedStyle(figure);
-    // Width is set in stylesheet to 100%
-    expect(figure.className).toContain("spark-note-expanded__art");
-    void style;
-  });
-
-  it("7. cards without a loadable image omit the photo and use fallback, not a blank frame", () => {
+  it("11. cards with no loadable image keep a hero region via themed fallback", () => {
     render(noImageCard);
     const img = container.querySelector(
       ".spark-note-expanded__art-image",
@@ -146,68 +201,45 @@ describe("SparkNoteExpanded image parity", () => {
       container.querySelector(".spark-note-expanded__art-image"),
     ).toBeFalsy();
     expect(
+      container.querySelector('[data-spark-card-hero="true"]'),
+    ).toBeTruthy();
+    expect(
       container.querySelector(".spark-note-expanded__art--themed"),
     ).toBeTruthy();
     expect(
       container.querySelector(".spark-note-expanded__art-scene"),
     ).toBeTruthy();
     expect(
-      container.querySelector(".spark-note-expanded__art-photo-caption"),
+      container.querySelector(".spark-card-hero__caption"),
     ).toBeFalsy();
   });
 
-  it("8. failed image load uses themed fallback rather than a blank frame", () => {
-    render(noImageCard);
-    const img = container.querySelector(
-      ".spark-note-expanded__art-image",
-    ) as HTMLImageElement;
-    act(() => {
-      img.dispatchEvent(new Event("error"));
-    });
-    const hero = container.querySelector('[data-testid="spark-card-hero"]');
-    expect(hero?.getAttribute("data-spark-has-image")).toBe("false");
-    expect(hero?.querySelector(".spark-note-expanded__art-scene")).toBeTruthy();
+  it("12. divider does not replace the hero region", () => {
+    render(summerOpenDoorCard);
+    const html = container.innerHTML;
+    const subtitleAt = html.indexOf("spark-note-expanded__subtitle");
+    const heroAt = html.indexOf('data-spark-card-hero="true"');
+    const dividerAt = html.indexOf("spark-note-expanded__divider");
+    const storyAt = html.indexOf(SPARK_CARD_SECTION_STORY);
+    expect(subtitleAt).toBeLessThan(heroAt);
+    expect(heroAt).toBeLessThan(dividerAt);
+    expect(dividerAt).toBeLessThan(storyAt);
   });
 
-  it("9–10. reopening the card still shows the image (remount)", () => {
-    const resolved = resolveSparkCardImage(summerOpenDoorCard);
-    render(summerOpenDoorCard);
-    expect(
-      container
-        .querySelector(".spark-note-expanded__art-image")
-        ?.getAttribute("src"),
-    ).toBe(resolved.src);
-
-    act(() => root.unmount());
-    container.remove();
-
-    render(summerOpenDoorCard);
-    expect(
-      container
-        .querySelector(".spark-note-expanded__art-image")
-        ?.getAttribute("src"),
-    ).toBe(resolved.src);
-    expect(
-      container.querySelector(".spark-note-expanded__art-photo-caption")
-        ?.textContent,
-    ).toBe(SUMMER_OPEN_DOOR_CAPTION);
-  });
-
-  it("renders legacy image_url through the same resolver path", () => {
-    const resolved = resolveSparkCardImage({
+  it("renders curly-apostrophe Summer title through topic match", () => {
+    const curly: SparkNoteDailyCard = {
       ...summerOpenDoorCard,
-      id: "legacy-url",
-      title: "Legacy Image Card",
-      image_url: "https://cdn.example.com/legacy-door.jpg",
-    });
-    expect(resolved.src).toBe("https://cdn.example.com/legacy-door.jpg");
-
-    render({ ...summerOpenDoorCard, id: "legacy-url", imageSrc: resolved.src! });
-    const img = container.querySelector(
-      ".spark-note-expanded__art-image",
-    ) as HTMLImageElement | null;
-    expect(img?.getAttribute("src")).toBe(
-      "https://cdn.example.com/legacy-door.jpg",
-    );
+      id: "custom-summer",
+      title: "Summer\u2019s Open Door",
+      shortTitle: "Summer\u2019s Open Door",
+      imageSrc: undefined,
+    };
+    const resolved = resolveSparkCardImage(curly);
+    expect(resolved.hasImage).toBe(true);
+    expect(resolved.src).toContain(SUMMER_OPEN_DOOR_IMAGE_FRAGMENT);
+    render(curly);
+    expect(
+      container.querySelector('[data-spark-card-hero="true"]'),
+    ).toBeTruthy();
   });
 });

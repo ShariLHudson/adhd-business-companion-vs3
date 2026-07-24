@@ -1500,6 +1500,11 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
       "A change of pace can reset creativity. Adventure sometimes means curiosity in a familiar place seen with fresh eyes.",
     sparkApplication:
       "Where could you explore for twenty minutes today — a new path, a new recipe, a conversation you have been putting off?",
+    // Explicit hero so live expanded card never depends only on topic regex match.
+    imageSrc:
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Arch_door_and_portal_in_Walled_Garden_at_Goodnestone_Park_Kent_England.jpg/960px-Arch_door_and_portal_in_Walled_Garden_at_Goodnestone_Park_Kent_England.jpg",
+    thumbnailAlt:
+      "An open garden doorway in warm light — adventure close to home",
     seasons: ["summer"],
     priority: 55,
     tags: ["seasonal", "summer", "adventure"],

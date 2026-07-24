@@ -407,13 +407,46 @@
   color: var(--spark-note-teal-deep);
 }
 
+/* ——— Live hero (document flow — never absolute / never opacity-gated) ——— */
+.spark-card-hero {
+  display: block;
+  width: 100%;
+  margin: 0.65rem 0 0.85rem;
+  flex-shrink: 0;
+}
+
+.spark-card-hero__frame {
+  /* Prevent flex + aspect-ratio collapse inside the scrollable card */
+  flex-shrink: 0;
+  min-height: 12rem;
+}
+
+.spark-card-hero__caption {
+  position: static;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--spark-note-ink-soft);
+  font-family: var(--spark-note-script-font);
+  font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+  line-height: 1.35;
+  text-align: center;
+  z-index: auto;
+}
+
 /* ——— Main illustration — layout adapts to image shape ——— */
 .spark-note-expanded__art {
   position: relative;
+  display: block;
   width: 100%;
   aspect-ratio: 16 / 10;
+  min-height: 12rem;
   max-height: 18rem;
-  margin: 0.4rem 0 1rem;
+  margin: 0;
   overflow: hidden;
   border-radius: 0.85rem;
   border: 2px solid var(--spark-note-gold);
@@ -421,6 +454,9 @@
     0 0 0 4px rgba(255, 252, 245, 0.7),
     0 0 0 5px var(--spark-note-gold-soft),
     0 10px 24px rgba(42, 58, 38, 0.16);
+  flex-shrink: 0;
+  visibility: visible;
+  opacity: 1;
 }
 
 .spark-note-expanded__art--landscape {
@@ -454,13 +490,15 @@
   }
 }
 
-.spark-note-expanded__art-image {
+.spark-note-expanded__art-image,
+.spark-card-hero__image {
   width: 100%;
   height: 100%;
   min-height: 12rem;
   object-fit: cover;
   display: block;
-  opacity: 1;
+  opacity: 1 !important;
+  visibility: visible !important;
   position: relative;
   filter: saturate(0.92) sepia(0.06) contrast(1.02);
 }
@@ -811,9 +849,10 @@
   display: block;
   width: 3.5rem;
   height: 3px;
-  margin: 0.7rem 0 0;
+  margin: 0.35rem 0 0.55rem;
   background: linear-gradient(90deg, var(--spark-note-gold) 0%, var(--spark-note-gold-bright) 60%, transparent 100%);
   border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .spark-note-expanded__sections {

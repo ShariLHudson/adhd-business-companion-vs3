@@ -139,6 +139,7 @@ function SparkCardArt({
   const hero = useMemo(() => resolveSparkCardHeroVisual(card), [card]);
   const fallbackScene = useMemo(() => resolveSparkCardThemedScene(card), [card]);
   const [photoFailed, setPhotoFailed] = useState(false);
+  const heroFrameRef = useRef<HTMLDivElement | null>(null);
   const photoSrc = useMemo(() => {
     if (overrideSrc?.trim()) {
       return normalizeSparkCardImageSrc(overrideSrc.trim());
@@ -146,6 +147,8 @@ function SparkCardArt({
     return resolved.src || "";
   }, [overrideSrc, resolved.src]);
   const hasPhotoCandidate = Boolean(photoSrc) && !photoFailed;
+  const shouldMountHero =
+    Boolean(overrideSrc?.trim()) || resolved.hasImage || Boolean(photoSrc);
   const aspectRatio =
     resolved.aspectRatio ||
     (hero.kind === "photo" || hero.kind === "themed"
@@ -167,57 +170,93 @@ function SparkCardArt({
     setPhotoFailed(false);
   }, [photoSrc]);
 
-  // No resolved photo and no override — omit the image region cleanly.
-  if (!photoSrc && !overrideSrc?.trim() && !resolved.hasImage) {
+  useEffect(() => {
+    if (typeof process !== "undefined" && process.env.NODE_ENV === "production") {
+      return;
+    }
+    if (typeof console === "undefined" || !console.debug) return;
+    const frame = heroFrameRef.current;
+    const rect = frame?.getBoundingClientRect();
+    console.debug("[spark-card-hero-trace]", {
+      cardId: card.id,
+      hasImage: resolved.hasImage,
+      resolvedSrc: resolved.src,
+      liveVariant: "keepsake",
+      sparkCardArtMounted: shouldMountHero,
+      photoFailed,
+      wrapperWidth: rect?.width ?? null,
+      wrapperHeight: rect?.height ?? null,
+      display: frame ? getComputedStyle(frame).display : null,
+      visibility: frame ? getComputedStyle(frame).visibility : null,
+      opacity: frame ? getComputedStyle(frame).opacity : null,
+    });
+  }, [
+    card.id,
+    photoFailed,
+    resolved.hasImage,
+    resolved.src,
+    shouldMountHero,
+  ]);
+
+  // Omit only when the resolver truly has no approved hero.
+  if (!shouldMountHero) {
     return null;
   }
 
   return (
-    <figure
-      className={[
-        "spark-note-expanded__art",
-        hasPhotoCandidate ? "" : "spark-note-expanded__art--themed",
-        `spark-note-expanded__art--${aspectRatio}`,
-        `spark-note-expanded__art--focus-${focalPoint}`,
-      ]
-        .filter(Boolean)
-        .join(" ")}
-      data-spark-image-source={resolved.sourceType}
-      data-spark-image-field={resolved.sourceField || undefined}
-      data-spark-has-image={hasPhotoCandidate ? "true" : "false"}
+    <section
+      className="spark-card-hero"
+      data-spark-card-hero="true"
       data-testid="spark-card-hero"
+      aria-label={caption ? `Spark Card image: ${caption}` : "Spark Card image"}
     >
-      {hasPhotoCandidate ? (
-        <img
-          src={photoSrc}
-          alt={alt}
-          className="spark-note-expanded__art-image"
-          // Wikimedia / storage often block hotlinking with a Referer.
-          referrerPolicy="no-referrer"
-          decoding="async"
-          onError={() => {
-            setPhotoFailed(true);
-            logSparkCardImageLoadError({
-              cardId: card.id,
-              src: photoSrc,
-              sourceField: resolved.sourceField,
-              error: "img_onerror",
-            });
-          }}
-        />
-      ) : (
-        <SparkCardIllustratedScene
-          card={card}
-          scene={hero.kind === "themed" ? hero : fallbackScene}
-        />
-      )}
-      <span className="spark-note-expanded__art-frame" aria-hidden />
+      <div
+        ref={heroFrameRef}
+        className={[
+          "spark-card-hero__frame",
+          "spark-note-expanded__art",
+          hasPhotoCandidate ? "" : "spark-note-expanded__art--themed",
+          `spark-note-expanded__art--${aspectRatio}`,
+          `spark-note-expanded__art--focus-${focalPoint}`,
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        data-spark-image-source={resolved.sourceType}
+        data-spark-image-field={resolved.sourceField || undefined}
+        data-spark-has-image={hasPhotoCandidate ? "true" : "false"}
+      >
+        {hasPhotoCandidate ? (
+          <img
+            src={photoSrc}
+            alt={alt}
+            className="spark-card-hero__image spark-note-expanded__art-image"
+            // Wikimedia / storage often block hotlinking with a Referer.
+            referrerPolicy="no-referrer"
+            decoding="async"
+            onError={() => {
+              setPhotoFailed(true);
+              logSparkCardImageLoadError({
+                cardId: card.id,
+                src: photoSrc,
+                sourceField: resolved.sourceField,
+                error: "img_onerror",
+              });
+            }}
+          />
+        ) : (
+          <SparkCardIllustratedScene
+            card={card}
+            scene={hero.kind === "themed" ? hero : fallbackScene}
+          />
+        )}
+        <span className="spark-note-expanded__art-frame" aria-hidden />
+      </div>
       {hasPhotoCandidate && caption ? (
-        <figcaption className="spark-note-expanded__art-photo-caption">
+        <p className="spark-card-hero__caption spark-note-expanded__art-photo-caption">
           {caption}
-        </figcaption>
+        </p>
       ) : null}
-    </figure>
+    </section>
   );
 }
 
@@ -505,9 +544,11 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
 
         <h2 className="spark-note-expanded__title">{presentation.title}</h2>
         <p className="spark-note-expanded__subtitle">{presentation.subtitle}</p>
-        <span className="spark-note-expanded__divider" aria-hidden />
 
+        {/* Explicit live hero — not an optional slot. Between subtitle and story. */}
         <SparkCardArt card={card} />
+
+        <span className="spark-note-expanded__divider" aria-hidden />
 
         <div className="spark-note-expanded__sections">
           <section className="spark-note-expanded__section spark-note-expanded__section--story">

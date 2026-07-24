@@ -131,7 +131,7 @@ const SPARK_CARD_TOPIC_ART: readonly {
     asset: wikimediaCommonsImage("Super Soaker CPS 2000.jpg", "Super Soaker water toy"),
   },
   {
-    pattern: /summer'?s open door|SPARK-SEA-SUMMER/i,
+    pattern: /summer[\u2019']?s open door|SPARK-SEA-SUMMER/i,
     asset: wikimediaCommonsImage(
       "Arch door and portal in Walled Garden at Goodnestone Park Kent England.jpg",
       "An open garden doorway in warm light — adventure close to home",
@@ -265,17 +265,9 @@ export function resolveSparkCardDiversityArtAsset(
  * illustrated themed scene) — see
  * docs/spark-card/SPARK_CARD_READABILITY_REAL_IMAGERY_INTERACTION_REPORT.md.
  */
-export function resolveSparkCardSpecificArtAsset(
+function resolveSparkCardTopicArtMatch(
   card: SparkNoteDailyCard,
 ): SparkCardArtAsset | null {
-  const explicit = card.imageSrc?.trim() || card.thumbnailSrc?.trim();
-  if (explicit) {
-    return {
-      src: normalizeSparkCardImageSrc(explicit),
-      alt: card.thumbnailAlt?.trim() || `Artwork for ${card.title}`,
-    };
-  }
-
   const haystack = [
     card.id,
     card.title,
@@ -289,8 +281,30 @@ export function resolveSparkCardSpecificArtAsset(
       return entry.asset;
     }
   }
-
   return null;
+}
+
+export function resolveSparkCardSpecificArtAsset(
+  card: SparkNoteDailyCard,
+): SparkCardArtAsset | null {
+  const topic = resolveSparkCardTopicArtMatch(card);
+  const explicit = card.imageSrc?.trim() || card.thumbnailSrc?.trim();
+  if (explicit) {
+    // Explicit catalog URL wins for src; keep topic caption / framing metadata.
+    return {
+      src: normalizeSparkCardImageSrc(explicit),
+      alt:
+        card.thumbnailAlt?.trim() ||
+        topic?.alt ||
+        `Artwork for ${card.title}`,
+      aspectRatio: topic?.aspectRatio ?? "editorial",
+      focalPoint: topic?.focalPoint ?? "center",
+      caption: topic?.caption,
+      credit: topic?.credit,
+    };
+  }
+
+  return topic;
 }
 
 /**
