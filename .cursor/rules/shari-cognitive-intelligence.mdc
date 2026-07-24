@@ -3,6 +3,10 @@
 **Architecture:** `docs/SHARI_COGNITIVE_INTELLIGENCE_ARCHITECTURE.md`  
 **Runtime:** `lib/shariAnswerFirst/` · entry `runShariCognitivePipeline()`
 
+## Binding order
+
+cognitive pipeline → turn authority → one permitted owner → response generation → excellence / baseline / repair → thread update
+
 ## Rules
 
 - Extend `lib/shariAnswerFirst/` — never create a parallel answer-first / context / validator / handoff engine.

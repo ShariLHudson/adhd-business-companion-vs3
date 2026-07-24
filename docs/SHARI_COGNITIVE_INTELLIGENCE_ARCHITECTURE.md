@@ -21,16 +21,37 @@ She must never be weaker because she is inside Spark Estate.
 
 ---
 
-## Canonical pipeline
+## Canonical pipeline (binding order)
 
 ```text
-Incoming User Message
+cognitive pipeline
         ↓
+turn authority
+        ↓
+one permitted owner
+        ↓
+response generation
+        ↓
+excellence / baseline / repair
+        ↓
+thread update
+```
+
+| Stage | Runtime | Rule |
+|---|---|---|
+| **Cognitive pipeline** | `runShariCognitivePipeline()` | Thread bind → understand → role → context → question policy → reasoning → wisdom → composition → `promptHints` |
+| **Turn authority** | `decideConversationTurnAuthority()` | Assigns one owner; sets suppress flags for competing early returns |
+| **One permitted owner** | CPC `handleSend` gates | Only the permitted owner may write/navigate (Create consent, overwhelm, companion-chat, etc.) |
+| **Response generation** | `/api/companion-chat` (primary for teaching) | Local how-to failsafe is **not** a primary owner |
+| **Excellence / baseline / repair** | `conversationExcellence` · `generalAiBaseline` · model repair → failsafe last | Never invent a second scoring engine |
+| **Thread update** | `storeShariConversationThread()` | Scoped by `conversationId`; isolation on New Chat / New Day |
+
+### Cognitive pipeline internals (inside stage 1)
+
+```text
 Conversation Thread Binding   (conversationContinuity.ts)
         ↓
 Request Understanding           (decideShariResponse.ts)
-        ↓
-Turn Authority (one owner)      (turnAuthority.ts)  ← gates all early returns
         ↓
 Professional Role Selection     (professionalRoles.ts)
         ↓
@@ -45,18 +66,6 @@ Wisdom Plan                     (wisdomPlan.ts)
 Response Composition            (responseComposer.ts)
         ↓
 Response Strategy + Hints       (chatHint + composition + wisdom → promptHints)
-        ↓
-Draft Response                  (/api/companion-chat)  — primary for teaching
-        ↓
-General-AI Baseline Review      (generalAiBaseline.ts)
-        ↓
-Substance + Excellence + Delight (conversationExcellence.ts · conversationDelight.ts)
-        ↓
-Model Repair (bounded) → local fail-safe last (never primary owner)
-        ↓
-Final Response + Thread Store
-        ↓
-Optional One Capability Offer / Handoff
 ```
 
 ### Turn authority (binding)
