@@ -14,6 +14,7 @@ import "@/app/companion/chamber-member-gallery.css";
 type Props = {
   onTalkWithMember: (memberId: ChamberMemberId) => void;
   onBrowseAll: () => void;
+  onAboutMember?: (memberId: ChamberMemberId) => void;
 };
 
 /**
@@ -22,6 +23,7 @@ type Props = {
 export function ChamberPerspectiveGuide({
   onTalkWithMember,
   onBrowseAll,
+  onAboutMember,
 }: Props) {
   const [choiceId, setChoiceId] =
     useState<ChamberPerspectiveChoiceId | null>(null);
@@ -115,14 +117,26 @@ export function ChamberPerspectiveGuide({
                   </p>
                   <p className="chamber-member-card__purpose">{whyFits}</p>
                   <p className="mt-2 text-sm text-white/80">{canHelpWith}</p>
-                  <button
-                    type="button"
-                    className="chamber-member-card__talk"
-                    data-testid={`chamber-rec-talk-${member.id}`}
-                    onClick={() => onTalkWithMember(member.id)}
-                  >
-                    {chamberMemberTalkLabel(member)}
-                  </button>
+                  <div className="chamber-member-card__actions">
+                    {onAboutMember ? (
+                      <button
+                        type="button"
+                        className="chamber-member-card__about"
+                        data-testid={`chamber-rec-about-${member.id}`}
+                        onClick={() => onAboutMember(member.id)}
+                      >
+                        About This Member
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="chamber-member-card__talk"
+                      data-testid={`chamber-rec-talk-${member.id}`}
+                      onClick={() => onTalkWithMember(member.id)}
+                    >
+                      {chamberMemberTalkLabel(member)}
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

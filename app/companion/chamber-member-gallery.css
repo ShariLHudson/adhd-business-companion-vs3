@@ -207,14 +207,18 @@
   display: none;
 }
 
-.chamber-member-card__talk {
-  margin-top: 0.2rem;
+.chamber-member-card__actions {
+  margin-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.chamber-member-card__talk,
+.chamber-member-card__about {
   width: 100%;
   padding: 0.5rem 0.7rem;
-  border: none;
   border-radius: 0.45rem;
-  background: #1a3d5c;
-  color: #fff;
   font-size: 0.8rem;
   font-weight: 650;
   line-height: 1.25;
@@ -222,11 +226,28 @@
   text-align: center;
 }
 
+.chamber-member-card__talk {
+  border: none;
+  background: #1a3d5c;
+  color: #fff;
+}
+
 .chamber-member-card__talk:hover {
   background: #234d72;
 }
 
-.chamber-member-card__talk:focus-visible {
+.chamber-member-card__about {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(26, 61, 92, 0.92);
+  color: #fff;
+}
+
+.chamber-member-card__about:hover {
+  background: #234d72;
+}
+
+.chamber-member-card__talk:focus-visible,
+.chamber-member-card__about:focus-visible {
   outline: 2px solid rgba(201, 162, 39, 0.95);
   outline-offset: 2px;
 }
@@ -293,23 +314,44 @@
   justify-content: flex-end;
 }
 
+.chamber-active-member__about,
 .chamber-active-member__invite,
 .chamber-active-member__end {
   align-self: center;
-  padding: 0.45rem 0.7rem;
-  border: 1px dashed rgba(201, 162, 39, 0.55);
+  padding: 0.5rem 0.8rem;
   border-radius: 0.45rem;
-  background: transparent;
-  color: #1a3d5c;
-  font-size: 0.74rem;
-  font-weight: 650;
+  font-size: 0.78rem;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
+  min-height: 2.5rem;
+}
+
+.chamber-active-member__about {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: #1a3d5c;
+  color: #ffffff;
+}
+
+.chamber-active-member__about:hover {
+  background: #234d72;
+}
+
+.chamber-active-member__about:focus-visible {
+  outline: 2px solid rgba(201, 162, 39, 0.95);
+  outline-offset: 2px;
+}
+
+.chamber-active-member__invite,
+.chamber-active-member__end {
+  border: 1px solid rgba(201, 162, 39, 0.65);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
 }
 
 .chamber-active-member__invite[aria-pressed="true"] {
   border-style: solid;
-  background: rgba(30, 79, 79, 0.08);
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .chamber-entry__add-member {
@@ -544,9 +586,166 @@
   overflow: hidden;
 }
 
+.chamber-entry--conversation .chamber-active-member__about {
+  color: #ffffff;
+  background: #1a3d5c;
+  border-color: rgba(255, 255, 255, 0.65);
+}
+
+.chamber-entry--conversation .chamber-active-member__invite,
 .chamber-entry--conversation .chamber-active-member__end {
-  color: rgba(255, 249, 239, 0.92);
-  border-color: rgba(201, 162, 39, 0.55);
+  color: #ffffff;
+  border-color: rgba(201, 162, 39, 0.7);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Focused member profile — replaces gallery; not a floating overlay */
+.chamber-member-profile-view {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: min(44rem, 100%);
+  margin: 0 auto;
+  max-height: min(88vh, 52rem);
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 245, 0.97);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.chamber-member-profile-view__header {
+  padding: 0.85rem 1rem 0.65rem;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.22);
+}
+
+.chamber-member-profile-view__kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(30, 92, 92, 0.9);
+}
+
+.chamber-member-profile-view__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  line-height: 1.25;
+  color: #1a3d5c;
+}
+
+.chamber-member-profile-view__title:focus {
+  outline: none;
+}
+
+.chamber-member-profile-view__title:focus-visible {
+  outline: 2px solid rgba(201, 162, 39, 0.95);
+  outline-offset: 2px;
+}
+
+.chamber-member-profile-view__specialty {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: rgba(26, 61, 92, 0.88);
+}
+
+.chamber-member-profile-view__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.chamber-member-profile-view__body {
+  display: grid;
+  gap: 1rem;
+  padding: 0.85rem 1rem 1rem;
+}
+
+@media (min-width: 40rem) {
+  .chamber-member-profile-view__body {
+    grid-template-columns: minmax(9rem, 11rem) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.chamber-member-profile-view__portrait {
+  border-radius: 0.55rem;
+  overflow: hidden;
+  border: 1px solid rgba(201, 162, 39, 0.28);
+}
+
+.chamber-member-profile-view__image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.chamber-member-profile-view__lead,
+.chamber-member-profile-view__text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: rgba(26, 61, 92, 0.94);
+}
+
+.chamber-member-profile-view__lead + .chamber-member-profile-view__lead {
+  margin-top: 0.45rem;
+}
+
+.chamber-member-profile-view__section-title {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #1a3d5c;
+}
+
+.chamber-member-profile-view__specialties,
+.chamber-member-profile-view__examples {
+  margin: 0.45rem 0 0;
+  padding-left: 1.1rem;
+  color: #1a3d5c;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.chamber-member-profile-view__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid rgba(201, 162, 39, 0.22);
+  background: rgba(255, 252, 245, 0.98);
+}
+
+.chamber-member-profile-view__talk,
+.chamber-member-profile-view__return {
+  min-height: 2.6rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 0.45rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chamber-member-profile-view__talk {
+  border: none;
+  background: #1a3d5c;
+  color: #ffffff;
+}
+
+.chamber-member-profile-view__return {
+  border: 1px solid rgba(26, 61, 92, 0.35);
+  background: #ffffff;
+  color: #1a3d5c;
+}
+
+.chamber-entry--member-profile.grow-room-panel {
+  max-width: min(48rem, 96vw);
+  width: 100%;
 }
 
 .chamber-active-member__specialty {

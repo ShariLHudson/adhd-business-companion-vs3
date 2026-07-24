@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ChamberMemberGallery } from "@/components/companion/chamber/ChamberMemberGallery";
 import { ChamberActiveMemberCard } from "@/components/companion/chamber/ChamberActiveMemberCard";
+import { ChamberMemberProfileView } from "@/components/companion/chamber/ChamberMemberProfileView";
 import { ChamberMemberProfileModal } from "@/components/companion/chamber/ChamberMemberProfileModal";
 import {
   CHAMBER_MEMBER_ASSET_BASE,
@@ -218,6 +219,13 @@ describe("Chamber gallery roster", () => {
       />,
     );
     const profile = renderToStaticMarkup(
+      <ChamberMemberProfileView
+        member={member}
+        onReturnToGallery={() => {}}
+        onTalkWithMember={() => {}}
+      />,
+    );
+    const legacyModal = renderToStaticMarkup(
       <ChamberMemberProfileModal
         member={member}
         open
@@ -229,6 +237,7 @@ describe("Chamber gallery roster", () => {
     expect(gallery).toContain(file);
     expect(active).toContain(file);
     expect(profile).toContain(file);
+    expect(legacyModal).toContain(file);
     expect(member.cardImagePath).toBe(
       "/momentum-chamber-members/leadership-chamber-member.png",
     );

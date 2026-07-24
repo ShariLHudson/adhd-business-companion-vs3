@@ -18,7 +18,9 @@ import "@/app/companion/estate-how-to-guide.css";
 
 type Props = {
   activeMemberId?: ChamberMemberId | null;
+  selectedMemberId?: ChamberMemberId | null;
   onTalkWithMember: (memberId: ChamberMemberId) => void;
+  onAboutMember?: (memberId: ChamberMemberId) => void;
   howToOpen?: boolean;
   onOpenHowTo?: () => void;
   onCloseHowTo?: () => void;
@@ -27,25 +29,30 @@ type Props = {
 function ChamberMemberCard({
   member,
   isActive,
+  isSelected,
   onTalk,
+  onAbout,
 }: {
   member: ChamberMember;
   isActive: boolean;
+  isSelected: boolean;
   onTalk: (id: ChamberMemberId) => void;
+  onAbout?: (id: ChamberMemberId) => void;
 }) {
   const display = getChamberMemberCardDisplay(member);
 
   return (
     <article
-      className={`chamber-member-card${isActive ? " chamber-member-card--active" : ""}`}
+      className={`chamber-member-card${isActive ? " chamber-member-card--active" : ""}${isSelected ? " chamber-member-card--selected" : ""}`}
       data-testid={`chamber-member-card-${member.id}`}
       data-active={isActive ? "true" : "false"}
+      data-selected={isSelected ? "true" : "false"}
     >
       <button
         type="button"
         className="chamber-member-card__portrait-btn"
-        aria-label={chamberMemberTalkLabel(member)}
-        onClick={() => onTalk(member.id)}
+        aria-label={`About ${member.displayName}`}
+        onClick={() => (onAbout ? onAbout(member.id) : onTalk(member.id))}
       >
         <span className="chamber-member-card__frame">
           <Image
@@ -70,14 +77,26 @@ function ChamberMemberCard({
             ))}
           </ul>
         ) : null}
-        <button
-          type="button"
-          className="chamber-member-card__talk"
-          data-testid={`chamber-member-talk-${member.id}`}
-          onClick={() => onTalk(member.id)}
-        >
-          {chamberMemberTalkLabel(member)}
-        </button>
+        <div className="chamber-member-card__actions">
+          {onAbout ? (
+            <button
+              type="button"
+              className="chamber-member-card__about"
+              data-testid={`chamber-member-about-${member.id}`}
+              onClick={() => onAbout(member.id)}
+            >
+              About This Member
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="chamber-member-card__talk"
+            data-testid={`chamber-member-talk-${member.id}`}
+            onClick={() => onTalk(member.id)}
+          >
+            {chamberMemberTalkLabel(member)}
+          </button>
+        </div>
       </div>
     </article>
   );
@@ -86,7 +105,9 @@ function ChamberMemberCard({
 /** Desktop: 3 cards across; full roster scrolls vertically. */
 export function ChamberMemberGallery({
   activeMemberId = null,
+  selectedMemberId = null,
   onTalkWithMember,
+  onAboutMember,
   howToOpen = false,
   onOpenHowTo,
 }: Props) {
@@ -97,6 +118,7 @@ export function ChamberMemberGallery({
       className="chamber-member-gallery"
       aria-label="Chamber Members"
       data-testid="chamber-member-gallery"
+      data-chamber-view="gallery"
       data-member-total={members.length}
     >
       <header className="chamber-member-gallery__header">
@@ -125,6 +147,7 @@ export function ChamberMemberGallery({
       </header>
       <div
         className="chamber-member-gallery__scroll"
+        data-testid="chamber-member-gallery-scroll"
         hidden={howToOpen ? true : undefined}
         aria-hidden={howToOpen || undefined}
       >
@@ -140,7 +163,9 @@ export function ChamberMemberGallery({
               <ChamberMemberCard
                 member={member}
                 isActive={activeMemberId === member.id}
+                isSelected={selectedMemberId === member.id}
                 onTalk={onTalkWithMember}
+                onAbout={onAboutMember}
               />
             </div>
           ))}

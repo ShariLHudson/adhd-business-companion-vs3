@@ -8,6 +8,8 @@ import "@/app/companion/chamber-member-gallery.css";
 type Props = {
   member: ChamberMember;
   onEndConversation: () => void;
+  /** Open focused About This Member profile (hides chat + gallery). */
+  onAboutMember?: () => void;
   /** Keep the current thread and choose another member to join it. */
   onInviteAnother?: () => void;
   invitingAnother?: boolean;
@@ -17,6 +19,7 @@ type Props = {
 export function ChamberActiveMemberCard({
   member,
   onEndConversation,
+  onAboutMember,
   onInviteAnother,
   invitingAnother = false,
 }: Props) {
@@ -43,6 +46,16 @@ export function ChamberActiveMemberCard({
         <p className="chamber-active-member__purpose">{display.purposeStatement}</p>
       </div>
       <div className="chamber-active-member__actions">
+        {onAboutMember ? (
+          <button
+            type="button"
+            className="chamber-active-member__about"
+            data-testid="chamber-active-member-about"
+            onClick={onAboutMember}
+          >
+            About This Member
+          </button>
+        ) : null}
         {onInviteAnother ? (
           <button
             type="button"
