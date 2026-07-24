@@ -16,6 +16,8 @@ const SECTION_TO_DESTINATION: Record<string, WelcomeHomeNavDestinationId> = {
   templates: "templates",
   "destination-gallery": "destination-gallery",
   "cartographers-studio": "cartographers-studio",
+  "visual-focus": "cartographers-studio",
+  "research-library": "research-library",
   "continue-working": "continue-working",
   "plan-my-day": "adapt-plan-my-day",
   "adapt-plan-my-day": "adapt-plan-my-day",

@@ -7,14 +7,15 @@ import {
 } from "./myDayAndWorkNavigation";
 
 describe("My Day & Work navigation contract", () => {
-  it("lists nine distinct destinations with unique openers where required", () => {
-    expect(MY_DAY_AND_WORK_DESTINATIONS).toHaveLength(9);
+  it("lists distinct destinations with unique openers where required", () => {
+    expect(MY_DAY_AND_WORK_DESTINATIONS).toHaveLength(10);
     const openers = MY_DAY_AND_WORK_DESTINATIONS.map((d) => d.opener);
     expect(openers).toContain("reminders");
     expect(openers).toContain("rhythms");
     expect(openers).toContain("parking-lot");
     expect(openers).toContain("destination-gallery");
     expect(openers).toContain("cartographers-studio");
+    expect(openers).toContain("research-library");
     expect(openers).toContain("project-homes");
     expect(openers).not.toContain("projects");
   });
@@ -43,7 +44,7 @@ describe("My Day & Work navigation contract", () => {
     expect(getMyDayAndWorkDestination("projects").opener).toBe("project-homes");
   });
 
-  it("routes Parking Lot, Destination Gallery, and Visual Thinking Studio distinctly", () => {
+  it("routes Parking Lot, Destination Gallery, Visual Thinking, and Research Library distinctly", () => {
     expect(resolveMyDayAndWorkOpenerFromText("Open my Parking Lot")).toBe(
       "parking-lot",
     );
@@ -55,6 +56,12 @@ describe("My Day & Work navigation contract", () => {
     ).toBe("cartographers-studio");
     expect(resolveMyDayAndWorkOpenerFromText("Take me to Cartography")).toBe(
       "cartographers-studio",
+    );
+    expect(resolveMyDayAndWorkOpenerFromText("Open Research Library")).toBe(
+      "research-library",
+    );
+    expect(resolveMyDayAndWorkOpenerFromText("help me research")).toBe(
+      "research-library",
     );
     expect(resolveMyDayAndWorkOpenerFromText("Open my Parking Lot")).not.toBe(
       "clear-my-mind",

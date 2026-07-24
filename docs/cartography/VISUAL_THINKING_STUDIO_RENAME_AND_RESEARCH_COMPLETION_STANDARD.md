@@ -6,6 +6,8 @@
 **Related:** Generate-First · Research Acquisition · Generation · Presentation · Workspace Foundation · Integration  
 **Corrective follow-up:** [Research-to-Populated Workspace Fix](./VISUAL_THINKING_RESEARCH_TO_POPULATED_WORKSPACE_FIX.md) — empty/warning-only workspace must never pass as a completed Loom (or similar) result.
 
+**Research Library handoff:** [Research Library and Use This Research Standard](../research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md) — when a member chooses a visual outcome from Use This Research, Visual Thinking Studio receives the substantive Research Collection (findings, relationships, summary), not a title alone. Session key: `companion-research-library-visual-handoff-v1`.
+
 ---
 
 ## Official user-facing name

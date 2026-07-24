@@ -64,6 +64,8 @@ Do not label stable model knowledge as current research.
 - `createResearchCollection` — durable collection  
 - `resolveUseThisResearchOptions` — relevant choices only; empty when outcome already specified  
 
+**Member destination:** [Research Library and Use This Research Standard](../research/RESEARCH_LIBRARY_AND_USE_THIS_RESEARCH_STANDARD.md) — conversational Research Library (`lib/researchLibrary/`), Research Session + Research Collection persistence, Research This, Use This Research format inference, and Create / Projects / Visual Thinking / Strategic Planning handoffs. Universal Request-to-Outcome remains the shared creation engine; Research Library does not invent a second one.
+
 ## Destination boundaries
 
 | Destination | Owns |

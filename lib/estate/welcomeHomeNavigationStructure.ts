@@ -45,6 +45,7 @@ export type WelcomeHomeNavDestinationId =
   | "strategy-library"
   | "spin-the-wheel"
   | "cartographers-studio"
+  | "research-library"
   | "clear-my-mind"
   | "parking-lot"
   | "talk-it-out"
@@ -177,6 +178,12 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
         label: "Visual Thinking Studio",
         supportLine:
           "See ideas, research, plans, and information in the clearest way for you.",
+      },
+      {
+        id: "research-library",
+        label: "Research Library",
+        supportLine:
+          "Explore a question, gather useful information, and decide what you want to do with what you discover.",
       },
     ],
   },

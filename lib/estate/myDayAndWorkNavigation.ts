@@ -86,6 +86,21 @@ export const MY_DAY_AND_WORK_DESTINATIONS = [
       "help me understand this visually",
     ],
   },
+  {
+    id: "research-library",
+    label: "Research Library",
+    opener: "research-library",
+    aliases: [
+      "research library",
+      "open research library",
+      "take me to research library",
+      "show research library",
+      "show my saved research",
+      "continue my research",
+      "help me research",
+      "research this",
+    ],
+  },
 ] as const;
 
 export type MyDayAndWorkDestinationId =
@@ -162,6 +177,15 @@ export function resolveMyDayAndWorkOpenerFromText(
     /\bhelp me (?:create a visual|understand this visually)\b/i.test(normalized)
   ) {
     return "cartographers-studio";
+  }
+  if (
+    /\b(?:open|show|take me to|continue)\s+(?:my\s+)?(?:research(?:\s+library)?|saved\s+research)\b/i.test(
+      normalized,
+    ) ||
+    /\bhelp me research\b/i.test(normalized) ||
+    /\bresearch this\b/i.test(normalized)
+  ) {
+    return "research-library";
   }
   if (
     /\b(?:open|show|take me to|go to|bring me to|head to)\s+(?:my\s+|the\s+)?(?:goals\s*(?:&|and)\s*)?projects?\b/i.test(

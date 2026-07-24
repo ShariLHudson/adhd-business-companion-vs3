@@ -51,6 +51,8 @@ export type AppSection =
   | "decision-compass"
   /** Reflective thinking — one situation, one question at a time. */
   | "talk-it-out"
+  /** Conversational Research Library destination. */
+  | "research-library"
   | "today"
   | "plan-my-day"
   /** Shared My Day window — Plan My Day / Adapt My Day. */
@@ -178,7 +180,7 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   focus: "focus",
   "todays-reality": "energy",
   "visual-thinking": "visual-focus",
-  create: "content-generator",
+  create: "create",
   grow: "grow",
   "how-do-i": "how-do-i",
   playbook: "playbook",
@@ -249,6 +251,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "destination-gallery":
     case "welcome-room":
     case "talk-it-out":
+    case "research-library":
       return "other";
     case "brain-dump":
       return "clear-my-mind";

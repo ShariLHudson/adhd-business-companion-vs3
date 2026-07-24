@@ -217,6 +217,20 @@ const TalkItOutPanel = dynamic(
     ),
   },
 );
+const ResearchLibraryPanel = dynamic(
+  () =>
+    import("@/components/companion/researchLibrary/ResearchLibraryPanel").then(
+      (mod) => ({
+        default: mod.ResearchLibraryPanel,
+      }),
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <SparkLoadingState message="Loading Research Library…" size="md" />
+    ),
+  },
+);
 const VisualFocusWorkspacePanel = dynamic(
   () =>
     import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
@@ -9548,6 +9562,19 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("talk-it-out");
   }
 
+  /** Research Library — conversational research destination (Build). */
+  function openResearchLibraryCore(_options?: { skipCapture?: boolean }) {
+    leaveClearMyMindIfNavigatingAway();
+    if (!confirmLeaveUnsavedWork()) return;
+    setOverlay(null);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    setEstateRoomChatVisible(false);
+    trackWorkspaceEcosystemEvent("research-library");
+    noteWorkspaceOpened("research-library", "standalone_room");
+    openStandaloneFocusSectionCore("research-library");
+  }
+
   function openParkingLotCore() {
     leaveClearMyMindIfNavigatingAway();
     if (!confirmLeaveUnsavedWork()) return;
@@ -14122,6 +14149,9 @@ export default function CompanionPageClient() {
           break;
         case "cartographers-studio":
           openCartographersStudioCore();
+          break;
+        case "research-library":
+          openResearchLibraryCore();
           break;
         default: {
           const _exhaustive: never = opener;
@@ -25527,6 +25557,36 @@ export default function CompanionPageClient() {
             <TalkItOutPanel onBack={goBack} registerBack={registerBack} />
           )}
 
+          {activeSection === "research-library" && (
+            <ResearchLibraryPanel
+              onBack={goBack}
+              registerBack={registerBack}
+              onOpenCreate={(seedText) => {
+                openCreateEstateCore();
+                // Seed is preserved in Research Collection; Create opens for editing.
+                void seedText;
+              }}
+              onOpenProjects={() => openProjectHomesPrototypeCore()}
+              onOpenVisualThinking={(payload) => {
+                try {
+                  sessionStorage.setItem(
+                    "companion-research-library-visual-handoff-v1",
+                    JSON.stringify(payload),
+                  );
+                } catch {
+                  /* ignore */
+                }
+                openCartographersStudioCore();
+              }}
+              onOpenStrategicPlanning={() =>
+                openStandaloneFocusSectionCore("playbook")
+              }
+              onOpenBusinessEstate={() =>
+                openProfileDestinationCore("my-business-estate")
+              }
+            />
+          )}
+
           {activeSection === "spin-wheel" && (
             <SpinWheelPanel
               autoSpinWhenReady={spinWheelAutoSpin}
@@ -26174,6 +26234,7 @@ export default function CompanionPageClient() {
         onOpenSpinTheWheel={() => openStandaloneFocusSectionCore("spin-wheel")}
         onOpenDestinationGallery={() => openDestinationGalleryCore()}
         onOpenCartographersStudio={() => openCartographersStudioCore()}
+        onOpenResearchLibrary={() => openResearchLibraryCore()}
         onOpenTemplates={() =>
           openStandaloneFocusSectionCore("templates-library")
         }

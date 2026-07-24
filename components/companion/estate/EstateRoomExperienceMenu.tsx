@@ -61,6 +61,8 @@ export type EstateRoomExperienceMenuProps = {
   onOpenCreateStudio?: () => void;
   onOpenDestinationGallery?: () => void;
   onOpenCartographersStudio?: () => void;
+  /** Build → Research Library (conversational research). */
+  onOpenResearchLibrary?: () => void;
   /** Legacy Build → Templates library (not in primary IA). */
   onOpenTemplates?: () => void;
   /** Legacy Build → Continue Working (not in primary IA). */
@@ -127,6 +129,7 @@ export function EstateRoomExperienceMenu({
   onOpenSpinTheWheel,
   onOpenDestinationGallery,
   onOpenCartographersStudio,
+  onOpenResearchLibrary,
   onOpenTemplates,
   onOpenContinueWorking,
   onOpenJournal,
@@ -236,6 +239,7 @@ export function EstateRoomExperienceMenu({
           templates: onOpenTemplates,
           "destination-gallery": onOpenDestinationGallery,
           "cartographers-studio": onOpenCartographersStudio,
+          "research-library": onOpenResearchLibrary,
           "continue-working": onOpenContinueWorking ?? onOpenProjects,
           "clear-my-mind": onOpenClearMyMind,
           "parking-lot": onOpenParkingLot,
@@ -275,6 +279,7 @@ export function EstateRoomExperienceMenu({
       onOpenProjects,
       onOpenDestinationGallery,
       onOpenCartographersStudio,
+      onOpenResearchLibrary,
       onOpenTemplates,
       onOpenContinueWorking,
       onOpenClearMyMind,

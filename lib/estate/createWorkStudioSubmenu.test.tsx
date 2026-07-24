@@ -1,5 +1,5 @@
 /**
- * Build — focused submenu (Create · Projects · Visual Thinking Studio).
+ * Build — focused submenu (Create · Projects · Visual Thinking · Research Library).
  * Destination Gallery retired from menus — Crystal Actions is contextual.
  * @vitest-environment jsdom
  */
@@ -23,11 +23,13 @@ describe("Build — menu canon", () => {
       "create",
       "projects",
       "cartographers-studio",
+      "research-library",
     ]);
     expect(SPARK_ESTATE_ROOM_MENU_MY_WORK_STUDIO_ITEMS.map((i) => i.label)).toEqual([
       "Create",
       "Projects",
       "Visual Thinking Studio",
+      "Research Library",
     ]);
   });
 });
@@ -39,6 +41,7 @@ describe("Build — EstateRoomExperienceMenu focused submenu", () => {
   const onOpenProjects = vi.fn();
   const onOpenDestinationGallery = vi.fn();
   const onOpenCartographersStudio = vi.fn();
+  const onOpenResearchLibrary = vi.fn();
 
   beforeEach(() => {
     container = document.createElement("div");
@@ -48,6 +51,7 @@ describe("Build — EstateRoomExperienceMenu focused submenu", () => {
     onOpenProjects.mockReset();
     onOpenDestinationGallery.mockReset();
     onOpenCartographersStudio.mockReset();
+    onOpenResearchLibrary.mockReset();
   });
 
   afterEach(() => {
@@ -71,6 +75,7 @@ describe("Build — EstateRoomExperienceMenu focused submenu", () => {
           onOpenProjects={onOpenProjects}
           onOpenDestinationGallery={onOpenDestinationGallery}
           onOpenCartographersStudio={onOpenCartographersStudio}
+          onOpenResearchLibrary={onOpenResearchLibrary}
         />,
       );
     });
@@ -93,7 +98,7 @@ describe("Build — EstateRoomExperienceMenu focused submenu", () => {
     });
   }
 
-  it("replaces top-level with Create, Projects, Visual Thinking Studio", () => {
+  it("replaces top-level with Create, Projects, Visual Thinking, Research Library", () => {
     renderMenu();
     openBuild();
     expect(
@@ -110,6 +115,7 @@ describe("Build — EstateRoomExperienceMenu focused submenu", () => {
       "Create",
       "Projects",
       "Visual Thinking Studio",
+      "Research Library",
     ]);
     expect(
       container.querySelector('[data-testid="estate-open-destination-gallery"]'),
@@ -146,6 +152,19 @@ describe("Build — EstateRoomExperienceMenu focused submenu", () => {
       ).click();
     });
     expect(onOpenCartographersStudio).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens Research Library as a working sibling", () => {
+    renderMenu();
+    openBuild();
+    act(() => {
+      (
+        container.querySelector(
+          '[data-testid="estate-open-research-library"]',
+        ) as HTMLButtonElement
+      ).click();
+    });
+    expect(onOpenResearchLibrary).toHaveBeenCalledTimes(1);
   });
 });
 
