@@ -223,6 +223,10 @@ Full draggable canvas · auto graph layout · live research · citations · new 
 
 ---
 
+## Experience governance
+
+All interactive workspace work must conform to the [Thinking Workspace Experience Standard](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md).
+
 ## Build 7 recommendation
 
-**Interactive Visual Canvas Foundation** — render a calm interactive canvas from `VisualThinkingVisualRecommendation` + Knowledge Package relationships / generated visual shells, without changing goals, deliverables, or knowledge assembly. Research Acquisition remains a parallel knowledge-side build.
+**Thinking Workspace Foundation** — implement the interactive thinking surface per `VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md`, fully compliant with the Experience Standard: node interaction, grouping, navigation, zoom/pan/focus, contextual inspector, Ask Shari, visual editing foundation — without changing goals, deliverables, or knowledge assembly. Research Acquisition remains a parallel knowledge-side build.

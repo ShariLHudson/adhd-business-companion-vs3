@@ -156,8 +156,9 @@ Plans may list suggested targets; nothing is handed off in this build.
 | Knowledge Intelligence | Knowledge Plan + Package — see [VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_KNOWLEDGE_INTELLIGENCE_STANDARD.md) |
 | Generation Engine | Creating artifacts from a confirmed plan + Knowledge Package — see [VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md](./VISUAL_THINKING_GENERATION_ENGINE_STANDARD.md) |
 | Presentation Intelligence | How approved deliverables are initially experienced — see [VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md](./VISUAL_THINKING_PRESENTATION_INTELLIGENCE_STANDARD.md) |
+| Thinking Workspace Experience | How interactive thinking must feel — see [VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md) |
 | Research Engine (later) | Live research acquisition into the Knowledge Package |
-| Canvas Engine (later) | Map / visual editing |
+| Workspace Foundation / Canvas (later) | Interactive thinking surface — must obey the Experience Standard |
 
 Keep orchestration independent from generation, presentation, research, and canvas.
 
