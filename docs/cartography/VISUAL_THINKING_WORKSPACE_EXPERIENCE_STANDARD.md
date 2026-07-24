@@ -10,7 +10,7 @@ It defines how the experience should feel, behave, evolve, and support human thi
 
 All future builds — including Visual Canvas, Layout Engine, Representation Switching, Research Integration, AI Collaboration, and Cross-Estate Thinking Experiences — must conform to this standard.
 
-**Next implementation standard:** [VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md) *(to be authored)*
+**Implementation standard (Build 7):** [VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md)
 
 ---
 

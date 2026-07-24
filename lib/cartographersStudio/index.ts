@@ -269,3 +269,27 @@ export {
   type PresentationOverride,
   type PresentationSwitchKind,
 } from "./visualThinkingPresentationIntelligence";
+
+export {
+  createThinkingWorkspace,
+  applyWorkspaceAction,
+  buildAskShariContext,
+  projectVisibleWorkspaceObjects,
+  projectInspector,
+  fitViewportToContent,
+  layoutIntentFromPresentation,
+  workspacePreservesKnowledgeImmutability,
+  saveThinkingWorkspace,
+  loadThinkingWorkspace,
+  clearThinkingWorkspace,
+  WORKSPACE_SESSION_KEY,
+  type ThinkingObject,
+  type ThinkingObjectType,
+  type ThinkingGroup,
+  type ThinkingConnector,
+  type ThinkingWorkspaceState,
+  type WorkspaceAction,
+  type WorkspaceLayoutIntent,
+  type WorkspaceViewport,
+  type AskShariWorkspaceContext,
+} from "./visualThinkingWorkspaceFoundation";

@@ -227,6 +227,6 @@ Full draggable canvas · auto graph layout · live research · citations · new 
 
 All interactive workspace work must conform to the [Thinking Workspace Experience Standard](./VISUAL_THINKING_WORKSPACE_EXPERIENCE_STANDARD.md).
 
-## Build 7 recommendation
+## Build 7 status
 
-**Thinking Workspace Foundation** — implement the interactive thinking surface per `VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md`, fully compliant with the Experience Standard: node interaction, grouping, navigation, zoom/pan/focus, contextual inspector, Ask Shari, visual editing foundation — without changing goals, deliverables, or knowledge assembly. Research Acquisition remains a parallel knowledge-side build.
+**Thinking Workspace Foundation** is implemented — see [VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md](./VISUAL_THINKING_WORKSPACE_FOUNDATION_STANDARD.md). Presentation remains the input; the workspace is the primary interactive surface. Research Acquisition and Intelligent Layout Engine remain subsequent builds.

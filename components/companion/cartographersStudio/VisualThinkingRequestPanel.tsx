@@ -69,6 +69,14 @@ import {
   savePresentationPlan,
   type VisualThinkingPresentationPlan,
 } from "@/lib/cartographersStudio/visualThinkingPresentationIntelligence";
+import {
+  clearThinkingWorkspace,
+  createThinkingWorkspace,
+  loadThinkingWorkspace,
+  saveThinkingWorkspace,
+  type ThinkingWorkspaceState,
+} from "@/lib/cartographersStudio/visualThinkingWorkspaceFoundation";
+import { ThinkingWorkspace } from "@/components/companion/cartographersStudio/ThinkingWorkspace";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 type Props = {
@@ -102,7 +110,7 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 
 /**
  * Request-first opening experience for Visual Thinking Studio.
- * Builds 2–6: Understanding → Orchestrator → Knowledge → Generation → Presentation.
+ * Builds 2–7: Understanding → Orchestrator → Knowledge → Generation → Presentation → Workspace.
  */
 export function VisualThinkingRequestPanel({
   onOpenPreviousWork,
@@ -122,6 +130,9 @@ export function VisualThinkingRequestPanel({
     useState<VisualThinkingGenerationBundle | null>(null);
   const [presentationPlan, setPresentationPlan] =
     useState<VisualThinkingPresentationPlan | null>(null);
+  const [thinkingWorkspace, setThinkingWorkspace] =
+    useState<ThinkingWorkspaceState | null>(null);
+  const [showWrittenReview, setShowWrittenReview] = useState(false);
   const [showThisDifferently, setShowThisDifferently] = useState(false);
   const [showAllAlternates, setShowAllAlternates] = useState(false);
   const [activeDeliverableId, setActiveDeliverableId] = useState<string | null>(
@@ -155,6 +166,8 @@ export function VisualThinkingRequestPanel({
     }
     const existingPresentation = loadPresentationPlan();
     if (existingPresentation) setPresentationPlan(existingPresentation);
+    const existingWorkspace = loadThinkingWorkspace();
+    if (existingWorkspace) setThinkingWorkspace(existingWorkspace);
   }, []);
 
   useEffect(() => {
@@ -172,6 +185,39 @@ export function VisualThinkingRequestPanel({
   useEffect(() => {
     if (presentationPlan) savePresentationPlan(presentationPlan);
   }, [presentationPlan]);
+
+  useEffect(() => {
+    if (thinkingWorkspace) saveThinkingWorkspace(thinkingWorkspace);
+  }, [thinkingWorkspace]);
+
+  // Restore interactive workspace when session has gen+presentation but no workspace yet.
+  useEffect(() => {
+    if (thinkingWorkspace) return;
+    if (
+      !generationBundle ||
+      !presentationPlan ||
+      !understanding ||
+      !experiencePlan
+    ) {
+      return;
+    }
+    setThinkingWorkspace(
+      createThinkingWorkspace({
+        understanding,
+        experiencePlan,
+        knowledgePackage: knowledgeBundle?.package ?? null,
+        generationBundle,
+        presentationPlan,
+      }),
+    );
+  }, [
+    thinkingWorkspace,
+    generationBundle,
+    presentationPlan,
+    understanding,
+    experiencePlan,
+    knowledgeBundle,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -289,9 +335,11 @@ export function VisualThinkingRequestPanel({
     setKnowledgeBundle(knowledge);
     setGenerationBundle(null);
     setPresentationPlan(null);
+    setThinkingWorkspace(null);
     setActiveDeliverableId(null);
     setGapAnswer("");
     setShowThisDifferently(false);
+    setShowWrittenReview(false);
     onConfirmed?.(confirmed);
   }
 
@@ -324,8 +372,17 @@ export function VisualThinkingRequestPanel({
       generationBundle: bundle,
     });
     setPresentationPlan(nextPresentation);
+    const workspace = createThinkingWorkspace({
+      understanding,
+      experiencePlan,
+      knowledgePackage: knowledgeBundle.package,
+      generationBundle: bundle,
+      presentationPlan: nextPresentation,
+    });
+    setThinkingWorkspace(workspace);
     setShowThisDifferently(false);
     setShowAllAlternates(false);
+    setShowWrittenReview(false);
   }
 
   function submitGapAnswer() {
@@ -888,13 +945,16 @@ export function VisualThinkingRequestPanel({
                 clearKnowledgeBundle();
                 clearGenerationBundle();
                 clearPresentationPlan();
+                clearThinkingWorkspace();
                 setDraftText("");
                 setUnderstanding(null);
                 setExperiencePlan(null);
                 setKnowledgeBundle(null);
                 setGenerationBundle(null);
                 setPresentationPlan(null);
+                setThinkingWorkspace(null);
                 setActiveDeliverableId(null);
+                setShowWrittenReview(false);
                 setRequest(createVisualThinkingRequest({}));
               }}
             >
@@ -912,6 +972,7 @@ export function VisualThinkingRequestPanel({
               presentationWorkspace?.activePresentation ?? "none"
             }
             data-split-mode={presentationWorkspace?.splitViewMode ?? "unavailable"}
+            data-workspace={thinkingWorkspace ? "open" : "none"}
           >
             <header className="vts-presentation__bar">
               <div className="vts-presentation__bar-main">
@@ -940,6 +1001,15 @@ export function VisualThinkingRequestPanel({
                   onClick={() => setShowThisDifferently((v) => !v)}
                 >
                   Show this differently
+                </button>
+                <button
+                  type="button"
+                  className="vts-request__secondary-btn"
+                  data-testid="visual-thinking-toggle-written-review"
+                  aria-pressed={showWrittenReview}
+                  onClick={() => setShowWrittenReview((v) => !v)}
+                >
+                  {showWrittenReview ? "Hide written review" : "Written review"}
                 </button>
                 <label className="vts-presentation__density">
                   <span className="vts-request__label">View</span>
@@ -1015,17 +1085,26 @@ export function VisualThinkingRequestPanel({
                             knowledgePackage: knowledgeBundle?.package ?? null,
                             generationBundle,
                           });
-                          setPresentationPlan(
-                            applyPresentationOverride(
-                              presentationPlan,
-                              {
-                                kind: "set_presentation",
-                                presentation: alt.type,
-                              },
-                              signals,
-                            ),
+                          const nextPlan = applyPresentationOverride(
+                            presentationPlan,
+                            {
+                              kind: "set_presentation",
+                              presentation: alt.type,
+                            },
+                            signals,
+                          );
+                          setPresentationPlan(nextPlan);
+                          setThinkingWorkspace(
+                            createThinkingWorkspace({
+                              understanding,
+                              experiencePlan,
+                              knowledgePackage: knowledgeBundle?.package ?? null,
+                              generationBundle,
+                              presentationPlan: nextPlan,
+                            }),
                           );
                           setShowThisDifferently(false);
+                          setShowWrittenReview(false);
                         }}
                       >
                         {alt.label}
@@ -1048,7 +1127,26 @@ export function VisualThinkingRequestPanel({
               </div>
             ) : null}
 
-            {generationStatus.showReview && activeDeliverable ? (
+            {thinkingWorkspace && generationBundle ? (
+              <ThinkingWorkspace
+                workspace={thinkingWorkspace}
+                deliverables={generationBundle.deliverables}
+                onWorkspaceChange={setThinkingWorkspace}
+                onAskShari={(prompt, context) => {
+                  if (typeof window !== "undefined") {
+                    window.dispatchEvent(
+                      new CustomEvent("visual-thinking-ask-shari", {
+                        detail: { prompt, context },
+                      }),
+                    );
+                  }
+                }}
+              />
+            ) : null}
+
+            {generationStatus.showReview &&
+            activeDeliverable &&
+            (showWrittenReview || !thinkingWorkspace) ? (
               <div
                 className={`vts-request__deliverable vts-presentation__primary${
                   presentationWorkspace?.splitViewMode === "side_by_side"
@@ -1151,7 +1249,9 @@ export function VisualThinkingRequestPanel({
                       {activeDeliverable.sourceMode === "user_led_shell" ||
                       presentationWorkspace?.userLedShell
                         ? "Your visual workspace is ready — not a completed map."
-                        : "A visual structure is ready. The interactive canvas comes later."}
+                        : thinkingWorkspace
+                          ? "Use the Thinking Workspace above to arrange and explore."
+                          : "A visual structure is ready for the Thinking Workspace."}
                     </p>
                     {presentationWorkspace?.userLedShell ? (
                       <ul className="vts-presentation__shell-actions">
@@ -1265,14 +1365,17 @@ export function VisualThinkingRequestPanel({
                 clearKnowledgeBundle();
                 clearGenerationBundle();
                 clearPresentationPlan();
+                clearThinkingWorkspace();
                 setDraftText("");
                 setUnderstanding(null);
                 setExperiencePlan(null);
                 setKnowledgeBundle(null);
                 setGenerationBundle(null);
                 setPresentationPlan(null);
+                setThinkingWorkspace(null);
                 setActiveDeliverableId(null);
                 setShowThisDifferently(false);
+                setShowWrittenReview(false);
                 setRequest(createVisualThinkingRequest({}));
               }}
             >
