@@ -11,9 +11,11 @@ export {
   certifyCompanionDelivery,
   shouldCertifyCompanionDelivery,
   inferCompanionDeliveryKind,
-  type CertifyCompanionDeliveryInput,
-  type CertifyCompanionDeliveryResult,
-  type CompanionDeliveryKind,
+} from "./certifyCompanionDelivery";
+export type {
+  CertifyCompanionDeliveryInput,
+  CertifyCompanionDeliveryResult,
+  CompanionDeliveryKind,
 } from "./certifyCompanionDelivery";
 export {
   getGeneralChatCertifiedRuntime,

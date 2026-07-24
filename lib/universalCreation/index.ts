@@ -46,6 +46,14 @@ export {
   formatPostDraftReviewPrompt,
 } from "./guidedCreationFlow";
 
+/** Direct export — avoid Turbopack missing-export via orchestrator re-export chain. */
+export {
+  isUniversalCreationMessage,
+  isCreateFlowAssistantContext,
+  inferDocumentTypeFromAssistantContext,
+  CREATION_MARKER_RE,
+} from "./createFlowContext";
+
 export {
   emailWorkflowStateFromSession,
   hasUsableApprovedEmailDraft,
@@ -62,7 +70,7 @@ export {
 export {
   detectUniversalDocumentType,
   shouldEnterUniversalCreation,
-  isUniversalCreationMessage,
+  hasExecutableDraftContext,
   saveUniversalCreationSession,
   loadUniversalCreationSession,
   clearUniversalCreationSession,
