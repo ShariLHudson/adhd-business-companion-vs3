@@ -1,19 +1,35 @@
 export type {
   PricingDomainContract,
+  PricingExperimentBlueprint,
+  PricingOfferShape,
   PricingProblemDistinctionId,
+  PricingRoutingBoundary,
 } from "./pricingDomainContract";
 export { pricingDomainIntelligence } from "./pricingDomain";
 export { pricingDomainAsStrategyType } from "./toStrategyType";
 export {
   PRICING_HANDOFF_BOUNDARIES,
+  PRICING_SHARI_VOICE_NOTES,
+  classifyPricingEvidenceHints,
+  detectPricingOfferShape,
   detectPricingProblemDistinctions,
+  getPricingExperimentBlueprints,
+  getPricingHeuristics,
+  getPricingRoutingBoundaries,
+  getPricingStrategicOptionPatterns,
   getPricingUnderlyingQuestions,
   isPricingStrategyLanguage,
+  pricingEvidenceDisciplineRejects,
   pricingLooksLikeAssumptionNotEvidence,
   pricingMentionsFounderEffortAsValue,
   pricingOptionPatterns,
+  pricingOptionsLookCosmetic,
   pricingQualityRejectReasons,
+  pricingReversibilityForPattern,
   pricingShouldNotAssumePriceIsCause,
+  pricingTreatsCompetitorAsObservation,
   pricingUnderlyingQuestionsForSurface,
+  selectPricingExperimentBlueprints,
+  type PricingEvidenceKind,
   type PricingHandoffBoundary,
 } from "./pricingIntelligence";
