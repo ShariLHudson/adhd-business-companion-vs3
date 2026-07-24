@@ -153,6 +153,8 @@ Not in this build: live research, source collection, full generation of reports/
 
 ---
 
-## Next build (Build 3)
+## Next build
 
-Generate the confirmed primary result using the understanding contract (starting with step-by-step / report / user-led canvas shells), while preserving confirmation, corrections, and no-forced-map guarantees.
+Build 3 (Experience Orchestrator) consumes this contract and produces an execution plan — see [VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md](./VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md).
+
+Build 4 should generate results from a confirmed experience plan.

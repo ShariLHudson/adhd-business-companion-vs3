@@ -16,13 +16,14 @@ Members must never be required to understand map types, research methods, framew
 
 This phase establishes intake only: capture the request, depth, and form preference — then confirm before any major generation.
 
-### Relationship to the Understanding Engine (Build 2)
+### Relationship to Understanding + Orchestration
 
 - **Build 1** captures the member’s request (`VisualThinkingRequest`).
-- The **Understanding Engine** interprets goal, success, cognitive task, research need, and recommendations (`VisualThinkingUnderstanding`).
-- Downstream result planning and generation must use the **canonical understanding contract**, not raw keyword → artifact matching.
+- **Build 2** interprets goal, success, cognitive task, research need, and recommendations (`VisualThinkingUnderstanding`).
+- **Build 3** turns understanding into an experience plan (`VisualThinkingExperiencePlan`).
+- Downstream generation must use the **confirmed experience plan**, which depends on the understanding contract — not raw keyword → artifact matching.
 
-See: [VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md](./VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md)
+See: [VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md](./VISUAL_THINKING_UNDERSTANDING_ENGINE_STANDARD.md) · [VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md](./VISUAL_THINKING_EXPERIENCE_ORCHESTRATOR_STANDARD.md)
 
 ---
 

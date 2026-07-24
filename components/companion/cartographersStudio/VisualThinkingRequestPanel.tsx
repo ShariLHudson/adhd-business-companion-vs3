@@ -22,12 +22,19 @@ import {
 import {
   applyUnderstandingCorrection,
   interpretVisualThinkingUnderstanding,
-  outputLabel,
   projectUnderstandingPreview,
   syncRequestFromUnderstanding,
   type VisualThinkingUnderstanding,
-  type VisualThinkingUnderstandingOutput,
 } from "@/lib/cartographersStudio/visualThinkingUnderstanding";
+import {
+  applyExperiencePlanOverride,
+  deliverableLabel,
+  orchestrateVisualThinkingExperience,
+  projectExperiencePlanPreview,
+  visibleSupportingDeliverables,
+  type VisualThinkingDeliverable,
+  type VisualThinkingExperiencePlan,
+} from "@/lib/cartographersStudio/visualThinkingExperienceOrchestrator";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
 type Props = {
@@ -61,7 +68,7 @@ function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
 
 /**
  * Request-first opening experience for Visual Thinking Studio.
- * Build 2: preview is projected from the Understanding Engine.
+ * Build 2: Understanding Engine. Build 3: Experience Orchestrator plan.
  */
 export function VisualThinkingRequestPanel({
   onOpenPreviousWork,
@@ -72,6 +79,8 @@ export function VisualThinkingRequestPanel({
   );
   const [understanding, setUnderstanding] =
     useState<VisualThinkingUnderstanding | null>(null);
+  const [experiencePlan, setExperiencePlan] =
+    useState<VisualThinkingExperiencePlan | null>(null);
   const [draftText, setDraftText] = useState("");
   const [correctionText, setCorrectionText] = useState("");
   const [showCorrection, setShowCorrection] = useState(false);
@@ -86,7 +95,9 @@ export function VisualThinkingRequestPanel({
       setRequest(existing);
       setDraftText(existing.rawRequest);
       if (existing.rawRequest.trim()) {
-        setUnderstanding(interpretVisualThinkingUnderstanding(existing));
+        const understood = interpretVisualThinkingUnderstanding(existing);
+        setUnderstanding(understood);
+        setExperiencePlan(orchestrateVisualThinkingExperience(understood));
       }
     }
   }, []);
@@ -101,10 +112,18 @@ export function VisualThinkingRequestPanel({
     };
   }, []);
 
-  const preview = useMemo(
+  const understandingPreview = useMemo(
     () => (understanding ? projectUnderstandingPreview(understanding) : null),
     [understanding],
   );
+  const planPreview = useMemo(
+    () =>
+      understanding && experiencePlan
+        ? projectExperiencePlanPreview(experiencePlan, understanding)
+        : null,
+    [understanding, experiencePlan],
+  );
+  const preview = understandingPreview;
 
   function commitRequest(next: VisualThinkingRequest, reinterpret = true) {
     if (
@@ -116,20 +135,29 @@ export function VisualThinkingRequestPanel({
     ) {
       const understood = interpretVisualThinkingUnderstanding(next);
       setUnderstanding(understood);
+      setExperiencePlan(orchestrateVisualThinkingExperience(understood));
       setRequest(syncRequestFromUnderstanding(next, understood));
       return;
     }
     setRequest(next);
-    if (!next.rawRequest.trim()) setUnderstanding(null);
+    if (!next.rawRequest.trim()) {
+      setUnderstanding(null);
+      setExperiencePlan(null);
+    }
   }
 
   function applyUnderstanding(
     nextUnderstanding: VisualThinkingUnderstanding,
   ) {
     setUnderstanding(nextUnderstanding);
+    setExperiencePlan(orchestrateVisualThinkingExperience(nextUnderstanding));
     setRequest((prev) =>
       syncRequestFromUnderstanding(prev, nextUnderstanding),
     );
+  }
+
+  function applyPlan(nextPlan: VisualThinkingExperiencePlan) {
+    setExperiencePlan(nextPlan);
   }
 
   function handleContinue() {
@@ -153,6 +181,11 @@ export function VisualThinkingRequestPanel({
   function handleConfirm() {
     const confirmed = confirmRecommendation(request);
     setRequest(confirmed);
+    if (experiencePlan) {
+      setExperiencePlan(
+        applyExperiencePlanOverride(experiencePlan, { kind: "confirm" }),
+      );
+    }
     onConfirmed?.(confirmed);
   }
 
@@ -209,12 +242,12 @@ export function VisualThinkingRequestPanel({
     setListening(true);
   }
 
-  function removeSupporting(output: VisualThinkingUnderstandingOutput) {
-    if (!understanding) return;
-    applyUnderstanding(
-      applyUnderstandingCorrection(understanding, {
+  function removeSupporting(deliverable: VisualThinkingDeliverable) {
+    if (!experiencePlan) return;
+    applyPlan(
+      applyExperiencePlanOverride(experiencePlan, {
         kind: "remove_supporting",
-        output,
+        deliverable,
       }),
     );
   }
@@ -386,7 +419,7 @@ export function VisualThinkingRequestPanel({
           </section>
         ) : null}
 
-        {phase === "preview" && preview && understanding ? (
+        {phase === "preview" && preview && understanding && experiencePlan && planPreview ? (
           <section
             className="vts-request__preview"
             data-testid="visual-thinking-recommendation-preview"
@@ -402,6 +435,14 @@ export function VisualThinkingRequestPanel({
               {preview.goalLine}
             </p>
 
+            <p className="vts-request__label">Primary experience</p>
+            <p
+              className="vts-request__experience"
+              data-testid="visual-thinking-primary-experience"
+            >
+              {planPreview.experienceLine}
+            </p>
+
             <h2 id="vts-preview-heading" className="vts-request__section-title">
               Here&apos;s what I recommend
             </h2>
@@ -409,50 +450,60 @@ export function VisualThinkingRequestPanel({
               className="vts-request__summary"
               data-testid="visual-thinking-recommendation-summary"
             >
-              {preview.primaryLine}
+              {planPreview.primaryDeliverableLine}
             </p>
 
-            {preview.showSupporting && preview.supportingLines.length > 0 ? (
+            {planPreview.showSupporting && planPreview.supportingLines.length > 0 ? (
               <div
                 className="vts-request__supporting-block"
                 data-testid="visual-thinking-supporting-outputs"
               >
                 <p className="vts-request__label">I can also include</p>
                 <ul className="vts-request__supporting-list">
-                  {understanding.recommendedSupportingOutputs.map((output) => (
-                    <li key={output}>
-                      <span>{outputLabel(output)}</span>
-                      <button
-                        type="button"
-                        className="vts-request__remove"
-                        data-testid={`visual-thinking-remove-${output}`}
-                        onClick={() => removeSupporting(output)}
-                      >
-                        Remove
-                      </button>
-                    </li>
-                  ))}
+                  {visibleSupportingDeliverables(experiencePlan).map(
+                    (deliverable) => (
+                      <li key={deliverable}>
+                        <span>{deliverableLabel(deliverable)}</span>
+                        <button
+                          type="button"
+                          className="vts-request__remove"
+                          data-testid={`visual-thinking-remove-${deliverable}`}
+                          onClick={() => removeSupporting(deliverable)}
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ),
+                  )}
                 </ul>
               </div>
             ) : null}
 
-            {preview.researchLine ? (
+            {planPreview.researchLine ? (
               <p
                 className="vts-request__note"
                 data-testid="visual-thinking-research-note"
               >
-                {preview.researchLine}
+                {planPreview.researchLine}
               </p>
             ) : null}
 
-            {preview.creationModeLine ? (
+            {planPreview.interactionLine || preview.creationModeLine ? (
               <p
                 className="vts-request__note"
                 data-testid="visual-thinking-creation-mode-note"
               >
-                {preview.creationModeLine}
+                {planPreview.interactionLine ?? preview.creationModeLine}
               </p>
             ) : null}
+
+            <p
+              className="vts-request__note vts-request__stages"
+              data-testid="visual-thinking-generation-stages"
+              hidden
+            >
+              {planPreview.stagesSummary}
+            </p>
 
             {understanding.declinesMap ? (
               <p
@@ -491,10 +542,11 @@ export function VisualThinkingRequestPanel({
                 className="vts-request__secondary-btn"
                 data-testid="visual-thinking-make-simpler"
                 onClick={() => {
-                  if (!understanding) return;
-                  applyUnderstanding(
-                    applyUnderstandingCorrection(understanding, {
-                      kind: "simplify",
+                  if (!experiencePlan) return;
+                  applyPlan(
+                    applyExperiencePlanOverride(experiencePlan, {
+                      kind: "set_detail",
+                      detail: "essentials",
                     }),
                   );
                 }}
@@ -506,10 +558,11 @@ export function VisualThinkingRequestPanel({
                 className="vts-request__secondary-btn"
                 data-testid="visual-thinking-add-detail"
                 onClick={() => {
-                  if (!understanding) return;
-                  applyUnderstanding(
-                    applyUnderstandingCorrection(understanding, {
-                      kind: "add_detail",
+                  if (!experiencePlan) return;
+                  applyPlan(
+                    applyExperiencePlanOverride(experiencePlan, {
+                      kind: "set_detail",
+                      detail: "detailed",
                     }),
                   );
                 }}

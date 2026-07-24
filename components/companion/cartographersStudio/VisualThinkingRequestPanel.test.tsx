@@ -6,6 +6,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { VisualThinkingRequestPanel } from "./VisualThinkingRequestPanel";
+import { __resetAdaptiveCompanionExplicitPrefsForTests } from "@/lib/adaptiveCompanionIntelligence";
 import { clearVisualThinkingRequestDraft } from "@/lib/cartographersStudio/visualThinkingRequest";
 import { CARTOGRAPHERS_STUDIO_BACKGROUND } from "@/lib/cartographersStudio/media";
 
@@ -34,6 +35,7 @@ describe("VisualThinkingRequestPanel", () => {
 
   beforeEach(() => {
     clearVisualThinkingRequestDraft();
+    __resetAdaptiveCompanionExplicitPrefsForTests();
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
@@ -45,6 +47,7 @@ describe("VisualThinkingRequestPanel", () => {
     });
     container.remove();
     clearVisualThinkingRequestDraft();
+    __resetAdaptiveCompanionExplicitPrefsForTests();
   });
 
   it("opens with request-first copy and Cartography background marker", () => {
@@ -86,6 +89,11 @@ describe("VisualThinkingRequestPanel", () => {
       "[data-testid='visual-thinking-interpreted-goal']",
     );
     expect(goal?.textContent ?? "").toMatch(/Loom/i);
+    expect(
+      container.querySelector(
+        "[data-testid='visual-thinking-primary-experience']",
+      )?.textContent ?? "",
+    ).toMatch(/Guided Learning/i);
     const summary = container.querySelector(
       "[data-testid='visual-thinking-recommendation-summary']",
     );
