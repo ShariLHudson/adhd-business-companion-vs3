@@ -21,6 +21,7 @@ import {
   subscribeEstateHowToGuideOpen,
 } from "@/lib/estateRoomGuides";
 import "@/app/companion/chamber-of-momentum.css";
+import "@/app/companion/chamber-entry.css";
 import "@/app/companion/chamber-member-gallery.css";
 import "@/app/companion/estate-how-to-guide.css";
 
@@ -40,7 +41,7 @@ type Props = {
   onEndMemberConversation: () => void;
 };
 
-/** Chamber of Momentum — gallery / focused profile / chat identity (one layer). */
+/** Chamber of Momentum — exclusive gallery / profile / chat layers. */
 export function ChamberOfMomentumEntryPanel({
   onBack,
   activeMemberId,
@@ -121,6 +122,17 @@ export function ChamberOfMomentumEntryPanel({
     restoreGalleryScroll();
   }
 
+  function backToChamberStart() {
+    setBrowseAllMembers(false);
+    setProfileMemberId(null);
+    setAddingMember(false);
+    setHowToOpen(false);
+    onViewModeChange("gallery");
+    if (activeMemberId) {
+      onEndMemberConversation();
+    }
+  }
+
   function handleTalkWithMember(memberId: ChamberMemberId) {
     const addToConversation = addingMember && Boolean(activeMemberId);
     setAddingMember(false);
@@ -138,109 +150,145 @@ export function ChamberOfMomentumEntryPanel({
   const showChatIdentity =
     viewMode === "member_chat" && Boolean(activeMember);
   const showAddMemberGallery = showChatIdentity && addingMember;
-  const showMainGallery = viewMode === "gallery" && !showProfile;
+  const showEntryGuide =
+    viewMode === "gallery" && !browseAllMembers && !showProfile;
+  const showBrowseGallery =
+    viewMode === "gallery" && browseAllMembers && !showProfile;
+
+  const stageClassName = showEntryGuide
+    ? "chamber-entry--perspective"
+    : "chamber-entry--members";
+
+  const workspaceClassName = [
+    "chamber-entry",
+    "grow-room-panel",
+    showEntryGuide ? "chamber-entry--perspective" : "chamber-entry--members",
+    showEntryGuide ? "" : "chamber-entry--how-to-host",
+    showChatIdentity ? "chamber-entry--conversation" : "",
+    showProfile ? "chamber-entry--member-profile" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <ChamberOfMomentumRoomShell>
       <EstateWorkspace
-        stageClassName="chamber-entry--members"
-        className={[
-          "chamber-entry chamber-entry--members grow-room-panel chamber-entry--how-to-host",
-          showChatIdentity ? "chamber-entry--conversation" : "",
-          showProfile ? "chamber-entry--member-profile" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        stageClassName={stageClassName}
+        className={workspaceClassName}
       >
         <div
           data-testid="chamber-entry-view-root"
           data-chamber-view={viewMode}
+          data-chamber-surface={
+            showEntryGuide
+              ? "entry"
+              : showBrowseGallery
+                ? "gallery"
+                : showProfile
+                  ? "profile"
+                  : showChatIdentity
+                    ? "chat"
+                    : "other"
+          }
           data-last-selected-member={lastSelectedMemberId ?? undefined}
         >
-        {showMainGallery ? (
-          <GrowPanelBackButton onBack={onBack} label="Estate" />
-        ) : null}
+          {showEntryGuide ? (
+            <>
+              <GrowPanelBackButton onBack={onBack} label="Estate" />
+              <ChamberPerspectiveGuide
+                onTalkWithMember={handleTalkWithMember}
+                onBrowseAll={() => setBrowseAllMembers(true)}
+                onAboutMember={openMemberProfile}
+              />
+            </>
+          ) : null}
 
-        {showProfile && profileMember ? (
-          <ChamberMemberProfileView
-            member={profileMember}
-            onReturnToGallery={returnToGallery}
-            onTalkWithMember={(member) => handleTalkWithMember(member.id)}
-          />
-        ) : null}
+          {showBrowseGallery ? (
+            <>
+              <GrowPanelBackButton onBack={onBack} label="Estate" />
+              <button
+                type="button"
+                className="chamber-entry__back-to-start"
+                data-testid="chamber-back-to-start"
+                onClick={backToChamberStart}
+              >
+                ← Back to Chamber Start
+              </button>
+              <ChamberMemberGallery
+                activeMemberId={activeMemberId}
+                selectedMemberId={lastSelectedMemberId}
+                onTalkWithMember={handleTalkWithMember}
+                onAboutMember={openMemberProfile}
+                howToOpen={howToOpen}
+                onOpenHowTo={openHowTo}
+              />
+            </>
+          ) : null}
 
-        {showChatIdentity && activeMember ? (
-          <ChamberActiveMemberCard
-            member={activeMember}
-            onAboutMember={() => openMemberProfile(activeMember.id)}
-            onEndConversation={returnToGallery}
-            onInviteAnother={() => setAddingMember((prev) => !prev)}
-            invitingAnother={addingMember}
-          />
-        ) : null}
-
-        {showAddMemberGallery ? (
-          <div
-            className="chamber-entry__add-member"
-            data-testid="chamber-add-member-gallery"
-          >
-            <p className="chamber-entry__add-member-note">
-              Choose who to bring into this conversation. Your current thread
-              stays.
-            </p>
-            <ChamberMemberGallery
-              activeMemberId={activeMemberId}
-              selectedMemberId={lastSelectedMemberId}
-              onTalkWithMember={handleTalkWithMember}
-              onAboutMember={openMemberProfile}
-              howToOpen={howToOpen}
-              onOpenHowTo={openHowTo}
+          {showProfile && profileMember ? (
+            <ChamberMemberProfileView
+              member={profileMember}
+              onReturnToGallery={returnToGallery}
+              onTalkWithMember={(member) => handleTalkWithMember(member.id)}
             />
-          </div>
-        ) : null}
+          ) : null}
 
-        {showMainGallery ? (
-          browseAllMembers ? (
-            <ChamberMemberGallery
-              activeMemberId={activeMemberId}
-              selectedMemberId={lastSelectedMemberId}
-              onTalkWithMember={handleTalkWithMember}
-              onAboutMember={openMemberProfile}
-              howToOpen={howToOpen}
-              onOpenHowTo={openHowTo}
+          {showChatIdentity && activeMember ? (
+            <ChamberActiveMemberCard
+              member={activeMember}
+              onAboutMember={() => openMemberProfile(activeMember.id)}
+              onEndConversation={returnToGallery}
+              onInviteAnother={() => setAddingMember((prev) => !prev)}
+              invitingAnother={addingMember}
             />
-          ) : (
-            <ChamberPerspectiveGuide
-              onTalkWithMember={handleTalkWithMember}
-              onBrowseAll={() => setBrowseAllMembers(true)}
-              onAboutMember={openMemberProfile}
-            />
-          )
-        ) : null}
+          ) : null}
 
-        <EstateHowToGuide
-          content={CHAMBER_HOW_TO_GUIDE}
-          open={howToOpen}
-          onClose={closeHowTo}
-          onPrimaryAction={() => {
-            closeHowTo();
-            if (activeMember) {
-              setAddingMember(false);
-              returnToGallery();
-              return;
-            }
-            setBrowseAllMembers(true);
-            window.setTimeout(() => {
-              const grid = document.querySelector(
-                '[data-testid="chamber-member-gallery-grid"]',
-              );
-              if (grid instanceof HTMLElement) {
-                grid.scrollIntoView({ behavior: "smooth", block: "start" });
-                grid.focus();
-              }
-            }, 0);
-          }}
-        />
+          {showAddMemberGallery ? (
+            <div
+              className="chamber-entry__add-member"
+              data-testid="chamber-add-member-gallery"
+            >
+              <p className="chamber-entry__add-member-note">
+                Choose who to bring into this conversation. Your current thread
+                stays.
+              </p>
+              <ChamberMemberGallery
+                activeMemberId={activeMemberId}
+                selectedMemberId={lastSelectedMemberId}
+                onTalkWithMember={handleTalkWithMember}
+                onAboutMember={openMemberProfile}
+                howToOpen={howToOpen}
+                onOpenHowTo={openHowTo}
+              />
+            </div>
+          ) : null}
+
+          {/* How-to overlay only when browsing / in destination layers — never an empty shell on entry */}
+          {!showEntryGuide ? (
+            <EstateHowToGuide
+              content={CHAMBER_HOW_TO_GUIDE}
+              open={howToOpen}
+              onClose={closeHowTo}
+              onPrimaryAction={() => {
+                closeHowTo();
+                if (activeMember) {
+                  setAddingMember(false);
+                  returnToGallery();
+                  return;
+                }
+                setBrowseAllMembers(true);
+                window.setTimeout(() => {
+                  const grid = document.querySelector(
+                    '[data-testid="chamber-member-gallery-grid"]',
+                  );
+                  if (grid instanceof HTMLElement) {
+                    grid.scrollIntoView({ behavior: "smooth", block: "start" });
+                    grid.focus();
+                  }
+                }, 0);
+              }}
+            />
+          ) : null}
         </div>
       </EstateWorkspace>
     </ChamberOfMomentumRoomShell>

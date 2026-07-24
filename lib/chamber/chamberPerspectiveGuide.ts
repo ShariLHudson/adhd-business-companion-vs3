@@ -21,15 +21,44 @@ export type ChamberPerspectiveChoiceId =
 export type ChamberPerspectiveChoice = {
   id: ChamberPerspectiveChoiceId;
   label: string;
+  /** Optional one-line explanation under the label. */
+  hint: string;
+  /** Softer secondary treatment in the entry grid. */
+  secondary?: boolean;
 };
 
 export const CHAMBER_PERSPECTIVE_CHOICES: readonly ChamberPerspectiveChoice[] = [
-  { id: "decide", label: "Help me decide" },
-  { id: "plan", label: "Help me plan" },
-  { id: "market-sell", label: "Help me market or sell" },
-  { id: "organize-process", label: "Help me organize or improve a process" },
-  { id: "confidence-momentum", label: "Help me regain confidence or momentum" },
-  { id: "not-sure", label: "I’m not sure" },
+  {
+    id: "decide",
+    label: "Help Me Decide",
+    hint: "Clarity when options compete",
+  },
+  {
+    id: "plan",
+    label: "Help Me Plan",
+    hint: "Turn intention into a workable sequence",
+  },
+  {
+    id: "market-sell",
+    label: "Help Me Market or Sell",
+    hint: "Message, offer, and reach",
+  },
+  {
+    id: "organize-process",
+    label: "Help Me Improve a Process",
+    hint: "Simplify systems and workflows",
+  },
+  {
+    id: "confidence-momentum",
+    label: "Help Me Regain Momentum",
+    hint: "Steadiness and forward motion",
+  },
+  {
+    id: "not-sure",
+    label: "Help Me Choose",
+    hint: "A gentle start when the need is still forming",
+    secondary: true,
+  },
 ] as const;
 
 const RECOMMENDATIONS: Record<

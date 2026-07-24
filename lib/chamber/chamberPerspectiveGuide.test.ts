@@ -9,8 +9,25 @@ describe("chamberPerspectiveGuide", () => {
     expect(CHAMBER_PERSPECTIVE_CHOICES).toHaveLength(6);
     expect(CHAMBER_PERSPECTIVE_CHOICES.map((c) => c.id)).toContain("decide");
     expect(CHAMBER_PERSPECTIVE_CHOICES.map((c) => c.label)).toContain(
-      "I’m not sure",
+      "Help Me Choose",
     );
+  });
+
+  it("uses title-case warmer labels", () => {
+    const labels = CHAMBER_PERSPECTIVE_CHOICES.map((c) => c.label);
+    expect(labels).toEqual([
+      "Help Me Decide",
+      "Help Me Plan",
+      "Help Me Market or Sell",
+      "Help Me Improve a Process",
+      "Help Me Regain Momentum",
+      "Help Me Choose",
+    ]);
+  });
+
+  it("marks Help Me Choose as a gentler secondary option", () => {
+    const unsure = CHAMBER_PERSPECTIVE_CHOICES.find((c) => c.id === "not-sure");
+    expect(unsure?.secondary).toBe(true);
   });
 
   it("recommends at most three members with fit explanations", () => {
