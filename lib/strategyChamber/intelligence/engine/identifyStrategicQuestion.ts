@@ -4,6 +4,10 @@ import {
   matchProblemDistinction,
 } from "../domainIntelligence";
 import {
+  isPricingStrategyLanguage,
+  pricingUnderlyingQuestionsForSurface,
+} from "../domains/pricing";
+import {
   matchStrategyTypesFromText,
   resolvePrimaryStrategyType,
 } from "../registry";
@@ -143,6 +147,18 @@ export function identifyStrategicQuestion(
     alternateQuestions.length > 0 &&
     (item.memberStatements?.length ?? 0) < 2 &&
     !item.desiredDirection?.trim();
+
+  // Phase 4A — Pricing underlying questions enrich alternates AFTER readiness
+  // for clarification is decided (so “raise membership price” still moves to
+  // “what changed” rather than forcing a meta clarify turn).
+  if (
+    (strategyTypeId === "pricing" || isPricingStrategyLanguage(stated)) &&
+    alternateQuestions.length < 3
+  ) {
+    for (const q of pricingUnderlyingQuestionsForSurface(stated)) {
+      if (!alternateQuestions.includes(q)) alternateQuestions.push(q);
+    }
+  }
 
   let refined = stated;
   if (

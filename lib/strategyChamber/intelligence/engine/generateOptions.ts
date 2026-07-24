@@ -16,6 +16,7 @@ import {
   getDomainIntelligence,
   matchProblemDistinction,
 } from "../domainIntelligence";
+import { pricingOptionPatterns } from "../domains/pricing";
 import { getStrategyType } from "../registry";
 import type { EnrichedStrategyOption, OptionPatternId } from "../types";
 import { assessOptionReadiness } from "./assessOptionReadiness";
@@ -32,19 +33,20 @@ function fromPersisted(item: StrategyWorkItem): EnrichedStrategyOption[] {
   }));
 }
 
-function pricingPatterns(capacityTight: boolean): OptionPatternId[] {
-  if (capacityTight) {
-    return ["stabilize", "protect_current_base", "add_value"];
-  }
-  // Meaningfully different pricing paths — not percentage variants
-  return [
-    "protect_current_base",
-    "restructure_price",
-    "test",
-    "add_value",
-    "increase_price",
-    "delay",
-  ];
+function pricingPatterns(
+  capacityTight: boolean,
+  statement: string,
+): OptionPatternId[] {
+  return pricingOptionPatterns({
+    capacityTight,
+    fearChurn: /\b(leave|churn|upset|resent)\b/i.test(statement),
+    weakConversion: /\b(not buying|not converting|lower (the )?price)\b/i.test(
+      statement,
+    ),
+    deliveryBurden: /\b(too much for what|doing too much|delivery)\b/i.test(
+      statement,
+    ),
+  });
 }
 
 function growthPatterns(capacityTight: boolean): OptionPatternId[] {
@@ -115,7 +117,7 @@ export function generateFullStrategicOptions(
 
   let candidates: OptionPatternId[];
   if (analysis.strategyTypeId === "pricing" || analysis.questionType === "pricing_decision") {
-    candidates = pricingPatterns(capacityTight);
+    candidates = pricingPatterns(capacityTight, statement);
   } else if (
     analysis.strategyTypeId === "growth" ||
     analysis.questionType === "growth_decision" ||
