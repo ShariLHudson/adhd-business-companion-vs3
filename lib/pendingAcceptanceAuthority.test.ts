@@ -184,6 +184,32 @@ describe("pendingAcceptanceAuthority", () => {
     ).toBe(true);
   });
 
+  it("clarification does not invalidate the active offer (F11)", () => {
+    const record = createPendingAcceptanceRecord(
+      "workspace",
+      "hiring a marketing assistant",
+      1,
+      null,
+    );
+    // A clarification about the offer must keep it live for a later "yes".
+    expect(topicChangeInvalidatesOffer("What does that mean?", record)).toBe(
+      false,
+    );
+    expect(topicChangeInvalidatesOffer("what do you mean?", record)).toBe(
+      false,
+    );
+    expect(topicChangeInvalidatesOffer("I don't understand", record)).toBe(
+      false,
+    );
+    // A genuine new subject still clears the offer.
+    expect(
+      topicChangeInvalidatesOffer(
+        "Actually let's talk about my pricing strategy instead",
+        record,
+      ),
+    ).toBe(true);
+  });
+
   it("workspace change invalidates offer", () => {
     const record = createPendingAcceptanceRecord(
       "workspace",

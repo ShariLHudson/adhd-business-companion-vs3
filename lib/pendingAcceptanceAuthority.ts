@@ -20,6 +20,7 @@ import {
   matchesExperienceFollowUp,
   shouldAutoLaunchPendingAction,
 } from "./companionAutoLaunch";
+import { isClarificationRequest } from "./topicContinuityAnchorIntelligence/clarificationDetection";
 
 /** Generic affirmations that must not act without pending context. */
 export const GENERIC_ACCEPTANCE_RE =
@@ -378,6 +379,9 @@ export function topicChangeInvalidatesOffer(
 ): boolean {
   const t = userText.trim();
   if (!t || isBareGenericAcceptance(t)) return false;
+  // A clarification ("what does that mean?") is not a topic change — it must
+  // keep the active offer alive so a later "yes" can still accept it (F11).
+  if (isClarificationRequest(t)) return false;
   if (t.length < 12) return false;
   const summary = record.offerSummary.toLowerCase();
   if (!summary) return false;
