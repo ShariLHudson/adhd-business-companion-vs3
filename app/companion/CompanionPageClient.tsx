@@ -1186,6 +1186,7 @@ import {
   isConfirmationAcceptance,
   isConfirmationDecline,
   isPureConfirmationDecline,
+  shouldArmPendingQuestion,
   shouldStopAfterAssistantOffer,
   type AwaitingUserConfirmationState,
 } from "@/lib/conversationConfirmationGate";
@@ -21134,6 +21135,26 @@ export default function CompanionPageClient() {
                   },
                 }),
               );
+            } else if (shouldArmPendingQuestion(assistantMsg)) {
+              // F1/B1: a free-form assistant offer ("Want to build one?")
+              // armed none of the structured handlers above, so register a
+              // first-class pending question — the existing awaiting-
+              // confirmation state plus a `confirmation` spine claim — so the
+              // confirming reply next turn lands owned instead of being
+              // captured by an unrelated system.
+              setAwaitingUserConfirmation(
+                createAwaitingConfirmationState({
+                  assistantPrompt: assistantMsg,
+                  offeredAtTurn: chatTurnRef.current,
+                  kind: "general",
+                }),
+              );
+              beginSpineOwnership({
+                owner: "confirmation",
+                reason: "free_form_assistant_offer",
+                status: "awaiting_user",
+                expectedReply: { kind: "confirmation" },
+              });
             }
           }
         }

@@ -26,6 +26,14 @@ const CONFIRMATION_QUESTION_PATTERNS: readonly RegExp[] = [
   /\bwould that help\b/i,
   /\bwant me to take you\b/i,
   /\bopen it\?\s*$/i,
+  // Free-form build/create/draft/make invitations (F1/B1) — the assistant
+  // offers to make something ("Want to build one?", "Should we create it
+  // together?"). These previously armed nothing, so the confirming "yes"
+  // arrived unowned.
+  /\bwant (?:me )?to (?:build|create|draft|make|write|put together|set up)\b/i,
+  /\bwould you like (?:me )?to (?:build|create|draft|make|write|put together)\b/i,
+  /\bshould (?:i|we) (?:build|create|draft|make|write|put together|set up)\b/i,
+  /\bshall (?:i|we)\b/i,
 ];
 
 export type AwaitingConfirmationKind =
@@ -62,6 +70,22 @@ export function messageAsksUserConfirmation(text: string): boolean {
 
 export function shouldStopAfterAssistantOffer(assistantContent: string): boolean {
   return messageAsksUserConfirmation(assistantContent);
+}
+
+/**
+ * Decide whether a free-form assistant reply should arm a first-class pending
+ * question on the ownership spine (F1/B1). True only for a genuine
+ * confirmation/build/create/offer invitation, and never when a structured
+ * offer (menu, strategy, visual, estate) already armed a pending this turn.
+ * This is a pure decision — it stores no state and adds no parallel tracker;
+ * the caller seeds the existing awaiting-confirmation + spine ownership.
+ */
+export function shouldArmPendingQuestion(
+  assistantReply: string,
+  opts?: { alreadyArmed?: boolean },
+): boolean {
+  if (opts?.alreadyArmed) return false;
+  return messageAsksUserConfirmation(assistantReply);
 }
 
 export function createAwaitingConfirmationState(input: {
