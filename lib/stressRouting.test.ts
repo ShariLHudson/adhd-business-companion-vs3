@@ -57,6 +57,29 @@ describe("stressRouting", () => {
     expect(shouldOfferStressRelief("open clear my mind")).toBe(false);
   });
 
+  it("keeps a practical task ask out of stress-relief routing (F9)", () => {
+    // Distress word + explicit practical ask → help, not the relief menu.
+    expect(
+      shouldOfferStressRelief(
+        "I'm overwhelmed by all these tasks, help me prioritize",
+      ),
+    ).toBe(false);
+    // Pure distress with no practical ask → relief still offered.
+    expect(shouldOfferStressRelief("I'm overwhelmed")).toBe(true);
+    // "frustrated … prioritize" and "overwhelmed … prioritize" reach parity:
+    // both stay in practical help rather than the relief menu.
+    expect(
+      shouldOfferStressRelief(
+        "I'm frustrated by all these tasks, help me prioritize",
+      ),
+    ).toBe(false);
+    expect(
+      shouldOfferStressRelief(
+        "I'm overwhelmed by all these tasks, help me prioritize",
+      ),
+    ).toBe(false);
+  });
+
   it("maps stress causes to recommended tools", () => {
     expect(recommendForStressCause("too-many-thoughts").primary.id).toBe(
       "clear-mind",

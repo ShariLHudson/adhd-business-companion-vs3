@@ -5,6 +5,7 @@ import {
   isCognitiveOverloadNeed,
   isTaskBreakdownNeed,
   isEmotionalCalmingNeed,
+  hasPracticalTaskAsk,
 } from "./overwhelmNeedClassifier";
 import { detectCanonicalSuggestionProfile } from "@/lib/estate/canonicalPlaceSuggestions";
 import { detectOverwhelmTodayRoute } from "@/lib/overwhelmTodayRouting";
@@ -43,6 +44,24 @@ describe("overwhelmNeedClassifier", () => {
 
   it("brain-dump route prefers Clear My Mind for cognitive overload phrasing", () => {
     expect(detectOverwhelmTodayRoute(COGNITIVE)).toBe("brain_dump_primary");
+  });
+
+  it("detects an explicit practical task ask (F9)", () => {
+    expect(hasPracticalTaskAsk("help me prioritize")).toBe(true);
+    expect(hasPracticalTaskAsk("help me plan my day")).toBe(true);
+    expect(hasPracticalTaskAsk("can you help me organize this")).toBe(true);
+    expect(hasPracticalTaskAsk("where do I start")).toBe(true);
+    expect(hasPracticalTaskAsk("what should I do first")).toBe(true);
+    expect(
+      hasPracticalTaskAsk(
+        "I'm overwhelmed by all these tasks, help me prioritize",
+      ),
+    ).toBe(true);
+    // Pure distress carries no practical ask.
+    expect(hasPracticalTaskAsk("I'm overwhelmed")).toBe(false);
+    expect(hasPracticalTaskAsk("I feel panicky and need to calm down")).toBe(
+      false,
+    );
   });
 
   it("blocks scenic menus for laundry / start paralysis phrasing", () => {

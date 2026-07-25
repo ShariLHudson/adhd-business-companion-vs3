@@ -61,6 +61,19 @@ export function classifyOverwhelmNeed(text: string): OverwhelmNeedKind {
   return null;
 }
 
+/**
+ * Explicit request for practical task help — prioritize / plan / organize the
+ * work, where to start, what to do first. A distress word alongside one of
+ * these ("I'm overwhelmed by all these tasks, help me prioritize") is a request
+ * for help, not a request for stress-relief routing (F9).
+ */
+const PRACTICAL_ASK_RE =
+  /\b(?:help me (?:to )?(?:prioriti[sz]e|plan|organi[sz]e|figure out what|work out what|sort out what|decide what)|(?:where|how) (?:do|should|can) i (?:start|begin)|what (?:should|do|can) i (?:do|tackle|start with|focus on) first|what'?s the (?:first|next) step)\b/i;
+
+export function hasPracticalTaskAsk(text: string): boolean {
+  return PRACTICAL_ASK_RE.test(text.trim());
+}
+
 /** Everyday chores / start friction — help with the task, not scenic menus. */
 const PRACTICAL_TASK_RE =
   /\b(?:laundry|dryer|chores?|dishes|fold(?:ing)? (?:laundry|clothes|rags)|put away|cleaning rags|i need to fold|have to fold)\b/i;

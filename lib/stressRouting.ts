@@ -9,6 +9,7 @@ import {
   isGenuineEmotionalDistress,
   shouldSuppressEmotionalTools,
 } from "./messageClassification";
+import { hasPracticalTaskAsk } from "./conversation/overwhelmNeedClassifier";
 import type { SidebarToolId } from "./companionUi";
 
 export type StressReliefOptionId =
@@ -194,6 +195,11 @@ export function shouldOfferStressRelief(
   _messages?: { role: string; content: string }[],
 ): boolean {
   if (!isStressRoutingSignal(text)) return false;
+  // A practical task-help ask that merely contains a distress word is a request
+  // for help, not for stress-relief routing — keep prioritization/planning here
+  // rather than replacing it with the relief menu (F9). Pure distress with no
+  // practical ask ("I'm overwhelmed") still gets relief.
+  if (hasPracticalTaskAsk(text)) return false;
   if (isExplicitStressToolRequest(text)) return false;
   return true;
 }
