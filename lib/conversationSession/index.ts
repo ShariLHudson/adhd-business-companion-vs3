@@ -85,3 +85,6 @@ export {
   resolvedArtifactFromSessionContext,
   sessionAwareFollowUpLine,
 } from "./adapters/createExperienceAdapter";
+
+// Phase 3 — conversation ownership public API
+export * from "./ownership";
