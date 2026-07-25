@@ -365,6 +365,7 @@ import {
   getSpineTranscriptMessages,
   resolveConversationOwnership,
   applyOwnershipResolution,
+  isBoundConfirmationAcceptance,
   beginSpineOwnership,
   claimTurnOwnership,
   mayRecoverCollectionPendingFromAssistant,
@@ -18329,6 +18330,14 @@ export default function CompanionPageClient() {
       }
     }
 
+    // B3 — on a bound confirmation-acceptance turn the active owner continues.
+    // Competing frictionless navigation and the phase 2–11 proactive observers
+    // must not also act this turn. Reuse the resolver result directly — never
+    // re-detect acceptance from raw text, so an unowned "yes"/"go"/"next" (no
+    // active awaiting-reply owner) is NOT gated.
+    const isConfirmationAcceptanceTurn =
+      isBoundConfirmationAcceptance(ownershipResolution);
+
     const frictionlessAction = runReliableSyncLayer(
       "frictionless",
       () =>
@@ -18378,6 +18387,7 @@ export default function CompanionPageClient() {
         Boolean(loadUniversalCreationSession()));
 
     if (
+      !isConfirmationAcceptanceTurn &&
       !frictionlessBlockedByTaskLock &&
       !frictionlessBlockedByTurnAuthority &&
       presentFrictionlessLocalReply(frictionlessAction, finishLatencyTurn)
@@ -18454,7 +18464,7 @@ export default function CompanionPageClient() {
     let phase9WisdomReflection: string | null = null;
     let phase10TransformationReflection: string | null = null;
     let phase11EcosystemInsight: string | null = null;
-    if (isPhase1OnboardingComplete() && !speedProfile.skipLayers.phaseObservers && !menuContinuation.active) {
+    if (isPhase1OnboardingComplete() && !speedProfile.skipLayers.phaseObservers && !menuContinuation.active && !isConfirmationAcceptanceTurn) {
       latencyProfiler.mark("observationEngine");
       observeFromConversationTurn({
         userText: trimmed,

@@ -44,6 +44,7 @@ export {
 } from "./claimTurnOwnership";
 
 export {
+  isBoundConfirmationAcceptance,
   resolveConversationOwnership,
   type ResolveOwnershipInput,
 } from "./resolveOwnership";

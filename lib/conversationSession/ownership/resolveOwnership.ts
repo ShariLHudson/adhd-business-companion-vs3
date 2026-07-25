@@ -46,6 +46,26 @@ const AWAITING_REPLY_OWNERS: ConversationExperienceOwner[] = [
   "confirmation",
 ];
 
+/**
+ * B3 — a bound confirmation acceptance: ownership resolution kept the turn with
+ * the active awaiting-reply owner because the user accepted (the
+ * `confirmation_acceptance` branch fired). On such a turn the owner continues,
+ * so competing proactive observers, recommendation injection, and frictionless
+ * navigation must NOT also act.
+ *
+ * This reads the resolver RESULT directly — it never re-parses the user text.
+ * An unowned "yes" / "go" / "next" (no active awaiting-reply owner) never
+ * produces `confirmation_acceptance`, so it is never gated.
+ */
+export function isBoundConfirmationAcceptance(
+  resolution: Pick<OwnershipResolution, "action" | "reason">,
+): boolean {
+  return (
+    resolution.action === "continue_owner" &&
+    resolution.reason === "confirmation_acceptance"
+  );
+}
+
 function uniqueCleanup(
   items: OwnershipCleanupTarget[],
 ): OwnershipCleanupTarget[] {
