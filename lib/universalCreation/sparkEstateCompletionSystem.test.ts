@@ -88,7 +88,7 @@ describe("sparkEstateCompletionSystem", () => {
 
     const plugin = pluginById("email")!;
     const pluginMenu = formatCompletionMenu(plugin);
-    expect(pluginMenu).toContain("Copy text");
+    expect(pluginMenu).toContain("Copy Email");
     expect(pluginMenu).toContain("Export");
     expect(connectionTargetsForArchetype("funnel")).toContain("strategy");
   });

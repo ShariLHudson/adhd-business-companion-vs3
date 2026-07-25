@@ -541,17 +541,7 @@ export function buildFollowUpAdaptedReply(
     ].join("\n");
   }
 
-  if (t.split(/\s+/).length <= 16 || FOLLOW_UP_RE.test(t)) {
-    return [
-      `Staying with ${thread.originalRequest.replace(/\?+$/, "")}.`,
-      "",
-      `I’ll use what you just said (“${t}”) to tailor the next piece.`,
-      "Here’s the most useful adjustment from here: keep the same goal, apply your detail, and take the next concrete step without starting over.",
-      "",
-      "What part should we tighten next?",
-    ].join("\n");
-  }
-
+  // No generic "Staying with…" filler — unknown follow-ups go to Companion chat/API.
   return null;
 }
 

@@ -143,11 +143,53 @@ function troubleshootFailSafe(text: string): string {
 /**
  * Returns a substantive chat reply for answer-first turns, or null to use other fallbacks.
  */
-export function buildAnswerFirstFailSafeReply(userText: string): string | null {
+const RETURN_TO_CREATE_ARTIFACT_RE =
+  /\b(?:go back to|return to|let'?s go back to|back to)\b.{0,40}\b(?:the |my )?(?:email|draft|document|newsletter)\b/i;
+
+export type AnswerFirstFailSafeOptions = {
+  /**
+   * Parked-Create side questions must go through companion-chat.
+   * Never invent a generic how-to lesson for those turns.
+   */
+  suppressHowToLesson?: boolean;
+};
+
+function returnToCreateArtifactFailSafe(): string {
+  return [
+    "Of course — let's pick the email back up.",
+    "",
+    "Tell me what you'd like different, or say Make Changes, Copy Email, or Save for Later.",
+  ].join("\n");
+}
+
+export function buildAnswerFirstFailSafeReply(
+  userText: string,
+  options?: AnswerFirstFailSafeOptions,
+): string | null {
   const decision = decideShariResponse(userText);
   if (!decision.directAnswerRequired) return null;
   if (decision.primaryHelpMode === "reflective_thinking") return null;
   if (decision.explicitNavigationRequested) return null;
+
+  // Never treat topic-return as a generic how-to lesson.
+  if (RETURN_TO_CREATE_ARTIFACT_RE.test(userText.trim())) {
+    return returnToCreateArtifactFailSafe();
+  }
+
+  // Parked-Create detours: companion-chat owns the answer. Do not substitute
+  // the generic "practical way to approach…" howto lesson.
+  if (options?.suppressHowToLesson) {
+    switch (decision.primaryHelpMode) {
+      case "how_to_guidance":
+      case "explanation":
+      case "simple_planning":
+      case "direct_answer":
+      case "research":
+        return null;
+      default:
+        break;
+    }
+  }
 
   let body: string;
   switch (decision.primaryHelpMode) {

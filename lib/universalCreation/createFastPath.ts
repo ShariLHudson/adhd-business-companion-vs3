@@ -103,7 +103,11 @@ export function isSimpleCreateRequest(userText: string): boolean {
     answerFirst.directAnswerRequired &&
     !answerFirst.explicitCreationRequested
   ) {
-    return false;
+    // "Help me draft a customer email…" is still Create — answer-first must not
+    // divert document creation into howto / legacy Create-room recovery.
+    if (!(SIMPLE_CREATE_VERB_RE.test(t) && inferDocumentTypeFromCreateText(t))) {
+      return false;
+    }
   }
   if (isProjectCreationIntent(t)) return false;
   if (isDevelopmentWorkFrustration(t)) return false;
@@ -119,7 +123,23 @@ export function isSimpleCreateRequest(userText: string): boolean {
   if (isBusinessPlanCreationRequest(t)) return false;
   // CB-022 addendum — strategy ≠ document create.
   if (isStrategyCreateOrLibraryRequest(t)) return false;
-  if (SIMPLE_CREATE_VERB_RE.test(t)) return true;
+  if (SIMPLE_CREATE_VERB_RE.test(t)) {
+    // Bare "make the tone warmer…" is a revision, not a new document create.
+    const inferredFromVerb = inferDocumentTypeFromCreateText(t);
+    if (
+      inferredFromVerb ||
+      /\b(?:help me (?:write|create|build|draft|compose|design|outline|plan|develop|make|generate))\b/i.test(
+        t,
+      ) ||
+      /\b(?:write|create|build|draft|compose|design|outline|plan|develop|generate)\s+(?:a|an|my|the|new|our)\b/i.test(
+        t,
+      )
+    ) {
+      return true;
+    }
+    // "make a/an/my/the …" only counts when an artifact type is present.
+    return false;
+  }
   const inferred = inferDocumentTypeFromCreateText(t);
   if (
     inferred &&

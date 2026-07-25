@@ -57,6 +57,13 @@ describe("Shari answer-first general help", () => {
     expect(create.directAnswerRequired).toBe(false);
     expect(create.routingAllowed).toBe(true);
 
+    const helpMeDraftEmail =
+      "Please help me draft a customer email announcing a price change for my coaching packages.";
+    expect(isExplicitCreationCommand(helpMeDraftEmail)).toBe(true);
+    expect(isSimpleCreateRequest(helpMeDraftEmail)).toBe(true);
+    const emailCreate = decideShariResponse(helpMeDraftEmail);
+    expect(emailCreate.explicitCreationRequested).toBe(true);
+
     const formQ = decideShariResponse(
       "What should a client intake form include?",
     );
@@ -215,6 +222,20 @@ describe("Shari answer-first general help", () => {
     expect(topicPreservingFallbackLine(undefined, booth)).toMatch(
       /booth|display|signage/i,
     );
+  });
+
+  it("parked-Create side questions suppress howto failsafe lesson", () => {
+    const side =
+      "Quick side question — do I need a business license to sell digital products in Texas?";
+    const suppressed = buildAnswerFirstFailSafeReply(side, {
+      suppressHowToLesson: true,
+    });
+    expect(suppressed).toBeNull();
+    expect(
+      buildFailSafeChatReply(side, undefined, undefined, {
+        suppressHowToLesson: true,
+      }),
+    ).not.toMatch(/practical way to approach/i);
   });
 
   it("substance validation rejects profiling-before-answer replies", () => {

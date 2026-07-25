@@ -211,7 +211,9 @@ export function decideConversationTurnAuthority(input: {
   ) {
     reasons.push("substantive_help_requires_companion_chat");
     const auth = baseAuth("companion_chat", reasons, {
-      allowFounderActionAccept: !input.hasCurrentFounderAction || !bareAck,
+      // Only a bare ack may accept a queued Founder action during help turns.
+      // Inverted logic previously allowed "Let's go back to the email" steals.
+      allowFounderActionAccept: input.hasCurrentFounderAction && bareAck,
       allowContinuityAdapt:
         input.isFollowUp &&
         !wantsCreateOrPrint &&

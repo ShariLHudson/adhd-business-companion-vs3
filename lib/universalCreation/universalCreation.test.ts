@@ -172,14 +172,16 @@ describe("Universal Creation Framework", () => {
       "looks good",
       reviseTurn!.message,
     );
-    expect(approveTurn?.message).toMatch(/feel ready/i);
+    expect(approveTurn?.session.phase).toBe("awaiting_action");
+    expect(approveTurn?.session.approvedDraft).toBe(true);
+    expect(approveTurn?.message).toMatch(/ready/i);
 
     const completeTurn = advanceGuidedCreationFlow(
-      { ...reviseTurn!.session, phase: "approval" },
-      "1",
+      approveTurn!.session,
+      "save for later",
       approveTurn!.message,
     );
-    expect(completeTurn?.message).toMatch(/Google Docs/i);
+    expect(completeTurn?.message).toMatch(/saved|keep this approved/i);
   });
 
   it("provides review phase menu", () => {

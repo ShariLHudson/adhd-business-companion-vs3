@@ -83,6 +83,28 @@ export {
 } from "./orchestrator";
 
 export {
+  getCreateLifecycle,
+  isCreateParked,
+  isCreateWorkflowPresent,
+  parkCreateWorkflow,
+  resumeCreateWorkflow,
+  exitCreateWorkflow,
+  shouldSuppressSoftConfirmationForCreate,
+  type CreateLifecycleState,
+  type CreateLifecycleSnapshot,
+} from "./createLifecycle";
+
+export {
+  classifyCreateTurnRelationship,
+  createHandlerEligible,
+  isParkedCreateCompanionDetour,
+  isExplicitReturnToCreate,
+  isCreateRevisionInstruction,
+  type CreateTurnRelationship,
+  type CreateTurnRelationshipDecision,
+} from "./createTurnRelationship";
+
+export {
   isSimpleCreateRequest,
   inferDocumentTypeFromCreateText,
   logCreateFastPath,

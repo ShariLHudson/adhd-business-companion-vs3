@@ -151,13 +151,14 @@ describe("frictionlessActionLayer", () => {
     expect(decision.localReply).toMatch(/email|reason/i);
   });
 
-  it("routes help me create an SOP through universal creation before Create", () => {
+  it("routes help me create an SOP to Create Foundation — never UC discovery", () => {
     const decision = resolveFrictionlessAction({
       userText: "help me create an SOP",
       currentTurn: 3,
     });
-    expect(decision.category).toBe("universal_creation");
-    expect(decision.localReply).toMatch(/understand what you're trying to build/i);
+    // CompanionPageClient owns Foundation handoff; frictionless must not open UC.
+    expect(decision.category).not.toBe("universal_creation");
+    expect(decision.localReply).toBeNull();
     expect(decision.immediateCreateOpen).toBeUndefined();
   });
 
@@ -312,19 +313,16 @@ describe("frictionlessActionLayer", () => {
     );
   });
 
-  it("yes-sales-funnel continues universal creation from stored pending", () => {
+  it("yes-sales-funnel starts UC discovery without frictionless pending", () => {
     const setup = resolveFrictionlessAction({
       userText: "I need to create a sales funnel",
       currentTurn: 1,
     });
-    saveFrictionlessPending(setup.pendingAction);
-    const yes = resolveFrictionlessAction({
-      userText: "yes",
-      currentTurn: 2,
-      lastAssistantText: setup.localReply ?? "",
-    });
-    expect(yes.category).toBe("universal_creation");
-    expect(yes.localReply).not.toMatch(/what would you like to create/i);
+    // Phase 3 — Create continuation lives on UC session, not soft pending.
+    expect(setup.category).toBe("universal_creation");
+    expect(setup.pendingAction).toBeNull();
+    expect(setup.localReply).toMatch(/funnel/i);
+    expect(setup.localReply).not.toMatch(/what would you like to create/i);
   });
 
   it("yes-decide resolves decision-compass pending", () => {
@@ -350,36 +348,26 @@ describe("frictionlessActionLayer", () => {
     );
   });
 
-  it("yes-write-email continues Create pending without re-asking", () => {
+  it("yes-write-email starts UC discovery without frictionless pending", () => {
     const setup = resolveFrictionlessAction({
       userText: "I need to write an email",
       currentTurn: 1,
     });
-    expect(setup.pendingAction?.target).toBe("content-generator");
-    saveFrictionlessPending(setup.pendingAction);
-    const yes = resolveFrictionlessAction({
-      userText: "let's do it",
-      currentTurn: 2,
-      lastAssistantText: setup.localReply ?? "",
-    });
-    expect(yes.localReply).not.toMatch(/what would you like to create/i);
-    expect(yes.category).toMatch(/universal_creation|direct_action/);
+    // Phase 3 — Create continuation lives on UC session, not soft pending.
+    expect(setup.category).toBe("universal_creation");
+    expect(setup.pendingAction).toBeNull();
+    expect(setup.localReply).toMatch(/email/i);
+    expect(setup.localReply).not.toMatch(/what would you like to create/i);
   });
 
-  it("yes-newsletter stores and continues Create pending", () => {
+  it("newsletter Create Foundation — frictionless does not open UC pending", () => {
     const setup = resolveFrictionlessAction({
       userText: "I need to create a newsletter",
       currentTurn: 1,
     });
-    expect(setup.pendingAction?.target).toBe("content-generator");
-    expect(setup.pendingAction?.initialPrompt).toMatch(/newsletter/i);
-    saveFrictionlessPending(setup.pendingAction);
-    const cont = resolveFrictionlessContinuation(
-      "go ahead",
-      loadFrictionlessPending()!,
-      2,
-    );
-    expect(cont?.execute).toBe(true);
+    expect(setup.category).not.toBe("universal_creation");
+    expect(setup.pendingAction).toBeNull();
+    expect(setup.localReply).toBeNull();
   });
 
   it("yes-clear-my-mind resolves brain-dump pending", () => {

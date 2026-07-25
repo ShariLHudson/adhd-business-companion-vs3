@@ -153,6 +153,16 @@ import {
 } from "./universalCreation/createFastPath";
 import { isCreateFlowAssistantContext } from "./universalCreation/createFlowContext";
 import {
+  exitCreateWorkflow,
+  parkCreateWorkflow,
+  resumeCreateWorkflow,
+} from "./universalCreation/createLifecycle";
+import {
+  classifyCreateTurnRelationship,
+  createHandlerEligible,
+} from "./universalCreation/createTurnRelationship";
+import { resolveCreateFoundationClassification } from "@/lib/creationIdentity/createFoundationRouting";
+import {
   estateGuideHint,
   formatEstateGuideReply,
   isEstateGuideQuestion,
@@ -1482,6 +1492,12 @@ function resolveFrictionlessForPrimaryTurn(
         });
         const universal = tryUniversalCreationFlow(input, routing);
         if (universal?.localReply) return universal;
+        if (
+          resolveCreateFoundationClassification(input.userText.trim())
+            .routeDirectlyToCreateFoundation
+        ) {
+          return null;
+        }
         if (isSimpleCreateRequest(input.userText.trim())) {
           return buildCreateFastPathRecoveryDecision(input, routing);
         }
@@ -1916,6 +1932,32 @@ function tryUniversalCreationFlow(
   ) {
     return null;
   }
+  // Create Foundation types (SOP, newsletter, …) — not UC discovery in frictionless.
+  if (
+    !loadUniversalCreationSession() &&
+    resolveCreateFoundationClassification(userText).routeDirectlyToCreateFoundation
+  ) {
+    return null;
+  }
+
+  // Authoritative Create lifecycle gate — parked / detour must not steal turns.
+  const createRel = classifyCreateTurnRelationship({
+    userText,
+    session: loadUniversalCreationSession(),
+    lastAssistantText: input.lastAssistantText,
+  });
+  if (createRel.shouldExit) {
+    exitCreateWorkflow("exited");
+  } else if (createRel.shouldPark) {
+    parkCreateWorkflow(createRel.reason, input.currentTurn);
+  } else if (createRel.shouldResume) {
+    resumeCreateWorkflow(createRel.reason);
+  }
+  if (!createHandlerEligible(createRel)) {
+    return null;
+  }
+  // Create owns the workflow — do not arm independent soft confirmation.
+  clearFrictionlessPending();
 
   let turn;
   try {
@@ -1941,11 +1983,8 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: formatUniversalCreationQuestion(turn),
-      pendingAction: universalCreationPendingAction(
-        turn.session,
-        input.currentTurn ?? 0,
-        routing.artifactKind,
-      ),
+      // Create continuation lives on UC session — not frictionless_pending owner.
+      pendingAction: null,
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -1962,11 +2001,7 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: turn.message,
-      pendingAction: universalCreationPendingAction(
-        turn.session,
-        input.currentTurn ?? 0,
-        routing.artifactKind,
-      ),
+      pendingAction: null,
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -1983,11 +2018,7 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: formatUniversalCreationTurnReply(turn),
-      pendingAction: universalCreationPendingAction(
-        turn.session,
-        input.currentTurn ?? 0,
-        routing.artifactKind,
-      ),
+      pendingAction: null,
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -2004,11 +2035,7 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: turn.message,
-      pendingAction: universalCreationPendingAction(
-        turn.session,
-        input.currentTurn ?? 0,
-        routing.artifactKind,
-      ),
+      pendingAction: null,
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -2016,30 +2043,8 @@ function tryUniversalCreationFlow(
     };
   }
 
-  syncUniversalCreationHandoffToSession(turn.session);
-  saveUniversalCreationSession(turn.session);
-  const combined = `${turn.session.originalUserText} ${Object.values(turn.session.answers).join(" ")}`;
-  const createOpen = resolveImmediateCreateAction(
-    combined,
-    routing.artifactKind,
-    { universalCreationSession: turn.session },
-  );
-  if (!createOpen) return null;
-
-  return {
-    category: "universal_creation",
-    suppressRelationship: true,
-    suppressRecap: true,
-    suppressReflectionFirst: true,
-    responseHint: universalCreationHint(turn.session, turn),
-    localReply: turn.message,
-    pendingAction: null,
-    toolSuggestion: null,
-    workspaceOffer: null,
-    intentRouting: routing,
-    immediateCreateOpen: createOpen,
-    universalCreationSession: turn.session,
-  };
+  // Exhaustiveness: all UC kinds are handled above. Never open Create workspace.
+  return null;
 }
 
 function tryDiscoveryFlow(
@@ -3433,11 +3438,9 @@ function tryConversationStabilizationFlow(
   if (fast.category === "universal_creation") {
     const session = loadUniversalCreationSession();
     if (session) {
-      base.pendingAction = universalCreationPendingAction(
-        session,
-        input.currentTurn ?? 0,
-        routing.artifactKind,
-      );
+      // Create owns continuation on the UC session — not soft confirmation.
+      clearFrictionlessPending();
+      base.pendingAction = null;
       base.universalCreationSession = session;
     }
   }
@@ -3477,11 +3480,8 @@ function mapEstateIntelligenceRuntimeToFrictionless(
   if (runtime.universalCreationCategory || runtime.category === "universal_creation") {
     const session = loadUniversalCreationSession();
     if (session) {
-      base.pendingAction = universalCreationPendingAction(
-        session,
-        input.currentTurn ?? 0,
-        routing.artifactKind,
-      );
+      clearFrictionlessPending();
+      base.pendingAction = null;
       base.universalCreationSession = session;
     }
   }
@@ -4165,6 +4165,12 @@ function resolveFrictionlessActionImpl(
     });
     const createFastPath = tryUniversalCreationFlow(input, routing);
     if (createFastPath) return createFastPath;
+    // Foundation / non-UC document creates must not get UC recovery as a rival owner.
+    if (
+      resolveCreateFoundationClassification(userText).routeDirectlyToCreateFoundation
+    ) {
+      return finish({ ...none, intentRouting: routing });
+    }
     return buildCreateFastPathRecoveryDecision(input, routing);
   }
 
@@ -4376,6 +4382,12 @@ export function resolveCreateFastPathAction(
   if (!isSimpleCreateRequest(userText) && !loadUniversalCreationSession()) {
     return null;
   }
+  if (
+    !loadUniversalCreationSession() &&
+    resolveCreateFoundationClassification(userText).routeDirectlyToCreateFoundation
+  ) {
+    return null;
+  }
   logCreateFastPath({
     turn: input.currentTurn,
     userText,
@@ -4385,6 +4397,11 @@ export function resolveCreateFastPathAction(
   if (universal?.localReply) return universal;
   if (!isSimpleCreateRequest(userText)) {
     clearUniversalCreationSession();
+    return null;
+  }
+  if (
+    resolveCreateFoundationClassification(userText).routeDirectlyToCreateFoundation
+  ) {
     return null;
   }
   return buildCreateFastPathRecoveryDecision(input, routing);

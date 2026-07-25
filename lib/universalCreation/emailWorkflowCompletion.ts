@@ -105,7 +105,14 @@ export function parseEmailAwaitingAction(
   if (/^1\b|\bcopy\b/.test(t)) return "copy";
   if (/^2\b|gmail|google draft|create (?:a )?draft/.test(t)) return "gmail_draft";
   if (/^3\b|\bsend\b/.test(t) && !/don'?t send|not send/.test(t)) return "send";
-  if (/^4\b|make changes|edit|revise|change/.test(t)) return "make_changes";
+  if (
+    /^4\b/.test(t) ||
+    /\bmake changes\b/.test(t) ||
+    /^(?:edit|revise)\b/.test(t) ||
+    /\b(?:edit|revise) (?:the |my )?(?:email|draft|it)\b/.test(t)
+  ) {
+    return "make_changes";
+  }
   if (/^5\b|save for later|save it|save for/.test(t)) return "save";
   return null;
 }

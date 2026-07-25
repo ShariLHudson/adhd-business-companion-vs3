@@ -19,6 +19,7 @@ import {
   type CollectionPendingOffer,
   saveCollectionPendingOffer,
 } from "./collectionPendingOffer";
+import { clearAllCollectionPrefills } from "./collectionPrefillStore";
 import { getEstateCollectionRoom } from "./registry";
 import type { EstateCollectionRoomId } from "./types";
 import { ESTATE_COLLECTION_ROOM_IDS } from "./types";
@@ -117,6 +118,7 @@ export function resolveCollectionOfferReply(
 
   if (isPureConfirmationDecline(userText)) {
     clearCollectionPendingOffer();
+    clearAllCollectionPrefills();
     return {
       handled: true,
       kind: "decline",

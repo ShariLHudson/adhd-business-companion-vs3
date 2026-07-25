@@ -26,7 +26,11 @@ import {
   type FrictionlessActionCategory,
 } from "./frictionlessActionLayer";
 import { clearDiscoverySession } from "./estateBrain/discoveryMode";
-import { clearUniversalCreationSession } from "./universalCreation";
+import { resolveCreateFoundationClassification } from "@/lib/creationIdentity/createFoundationRouting";
+import {
+  clearUniversalCreationSession,
+  loadUniversalCreationSession,
+} from "./universalCreation";
 import { clearVisualRecommendationPending } from "./visualThinkingContinuation";
 import {
   auditRelationshipIntelligenceScope,
@@ -519,7 +523,21 @@ export function evaluateCompanionBehaviorCase(
         ? frictionlessPendingFromWorkspaceOffer(setup.workspaceOffer, 1)
         : null);
     if (!pending) {
-      reasons.push("continuation setup did not produce a pending action");
+      // Phase 3 — Create owns continuation on the UC session (or Create
+      // Foundation). Soft frictionless_pending is intentionally not armed.
+      const uc = loadUniversalCreationSession();
+      const createFoundation =
+        resolveCreateFoundationClassification(testCase.setupUserInput)
+          .routeDirectlyToCreateFoundation;
+      if (uc && setup.category === "universal_creation") {
+        isContinuation = true;
+        continuationTarget = "content-generator";
+      } else if (createFoundation) {
+        isContinuation = true;
+        continuationTarget = "content-generator";
+      } else {
+        reasons.push("continuation setup did not produce a pending action");
+      }
     } else {
       const cont = resolveFrictionlessContinuation(userText, pending, 2);
       if (!cont?.execute) {

@@ -44,6 +44,17 @@ import {
   hasUsableApprovedEmailDraft,
 } from "./emailWorkflowCompletion";
 import {
+  exitCreateWorkflow,
+  parkCreateWorkflow,
+  resumeCreateWorkflow,
+} from "./createLifecycle";
+import {
+  classifyCreateTurnRelationship,
+  createHandlerEligible,
+} from "./createTurnRelationship";
+import { isCreateRevisionInstruction } from "./createRevisionDetect";
+import { resolveCreateFoundationClassification } from "@/lib/creationIdentity/createFoundationRouting";
+import {
   formatShariCreationIntro,
   formatShariCreationQuestion,
 } from "./shariCreationExperience";
@@ -124,6 +135,8 @@ export function detectUniversalDocumentType(
     if (plugin.detectPatterns.some((re) => re.test(t))) return plugin.id;
   }
   if (isRegistryArtifactExecution(t)) return "document";
+  // Revision phrasing often matches "make the …" — never invent a document type.
+  if (isCreateRevisionInstruction(t)) return null;
   if (SIMPLE_CREATE_VERB_RE.test(t)) {
     return inferDocumentTypeFromCreateText(t) ?? "document";
   }
@@ -756,15 +769,44 @@ export function resolveUniversalCreationTurn(
   const t = userText.trim();
   if (!t) return null;
 
-  const storedSession = loadUniversalCreationSession();
+  let storedSession = loadUniversalCreationSession();
+  // Create Foundation (SOP/newsletter/…) — not UC discovery when no live session.
+  if (
+    !storedSession &&
+    resolveCreateFoundationClassification(t).routeDirectlyToCreateFoundation
+  ) {
+    return null;
+  }
+  const createRel = classifyCreateTurnRelationship({
+    userText: t,
+    session: storedSession,
+    lastAssistantText,
+  });
+  if (createRel.shouldExit) {
+    exitCreateWorkflow("exited");
+    storedSession = null;
+  } else if (createRel.shouldPark) {
+    parkCreateWorkflow(createRel.reason, currentTurn);
+    return null;
+  } else if (createRel.shouldResume) {
+    resumeCreateWorkflow(createRel.reason);
+    storedSession = loadUniversalCreationSession();
+  }
+  if (!createHandlerEligible(createRel)) {
+    return null;
+  }
+
   const requestedType = detectUniversalDocumentType(t);
   const recoveryType = classifyTurnRecovery(t);
 
   // Artifact-type correction: switch the create session without discovery restart loops.
+  // Never treat revision language ("make the tone warmer") as a new document type.
   if (
     storedSession &&
     requestedType &&
     requestedType !== storedSession.documentType &&
+    requestedType !== "document" &&
+    !isCreateRevisionInstruction(t) &&
     (isExplicitCreationCommand(t) || isSimpleCreateRequest(t)) &&
     shouldRepairOrResumeTask(recoveryType)
   ) {

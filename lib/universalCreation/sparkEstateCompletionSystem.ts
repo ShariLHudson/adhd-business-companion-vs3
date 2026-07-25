@@ -214,6 +214,7 @@ const UNIVERSAL_PHASE_TO_COMPLETION_STEP: Record<
   enhancement: "improve",
   revision: "improve",
   approval: "finalize",
+  awaiting_action: "output",
   completion: "output",
 };
 
@@ -276,7 +277,7 @@ export function formatSparkEstateOutputMenu(input?: {
     ) ?? [];
 
   const parts = [
-    "What would you like to do with it?",
+    "What would you like to do next?",
     "",
     ...lines,
     ...pluginLines,

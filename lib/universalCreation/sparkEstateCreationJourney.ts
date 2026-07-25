@@ -129,6 +129,7 @@ const UNIVERSAL_PHASE_TO_STEP: Record<
   review: "review",
   revision: "improve",
   approval: "complete",
+  awaiting_action: "complete",
   completion: "complete",
 };
 

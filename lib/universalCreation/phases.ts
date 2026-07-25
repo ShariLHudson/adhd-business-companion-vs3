@@ -50,8 +50,16 @@ export function parseApprovalChoice(
   reply: string,
 ): UniversalApprovalChoice | null {
   const t = reply.trim().toLowerCase();
-  if (/^1$|yes|ready|looks good|good to go/i.test(t)) return "yes_ready";
-  if (/^2$|one more|another change|tweak/i.test(t)) return "one_more_change";
+  if (
+    /^1$|yes|ready|looks good|good to go|i like it|no changes|use this|that works|keep it/i.test(
+      t,
+    )
+  ) {
+    return "yes_ready";
+  }
+  if (/^2$|one more|another change|tweak|make changes/i.test(t)) {
+    return "one_more_change";
+  }
   if (/^3$|later|save for|come back/i.test(t)) return "continue_later";
   return null;
 }

@@ -107,15 +107,15 @@ export function composeEmailDraft(session: UniversalCreationSession): string {
     lines.push(`${emailGreeting(tone)}`, "");
   }
 
-  if (relationship) {
+  if (relationship && !isCreateCommandNoise(relationship)) {
     lines.push(sentence(`Hope you're doing well — ${relationship.toLowerCase()}`), "");
   }
 
-  if (context) {
+  if (context && !isCreateCommandNoise(context)) {
     lines.push(sentence(context), "");
   }
 
-  if (purpose) {
+  if (purpose && !isCreateCommandNoise(purpose)) {
     lines.push(sentence(purpose), "");
   }
 
@@ -307,7 +307,16 @@ export function composeDocumentDraft(session: UniversalCreationSession): string 
   }
 }
 
-/** Apply a natural-language revision note to an existing draft. */
+function isCreateCommandNoise(text: string): boolean {
+  return /\b(?:please\s+)?(?:draft|write|create)\s+(?:a\s+|an\s+|the\s+)?(?:customer\s+)?email\b/i.test(
+    text,
+  );
+}
+
+/**
+ * Apply a natural-language revision to an existing draft.
+ * Revision instructions modify the draft — they must not become the body.
+ */
 export function applyDraftRevision(draft: string, revisionNote: string): string {
   const note = revisionNote.trim();
   if (!note) return draft;
@@ -315,13 +324,49 @@ export function applyDraftRevision(draft: string, revisionNote: string): string 
     return draft;
   }
 
-  return [
-    draft,
+  // "Add a free-delivery line" / "Add free delivery to the email"
+  const addMatch = note.match(
+    /^(?:please\s+)?(?:add|include|insert)\s+(?:a\s+|an\s+|the\s+)?(.+?)(?:\s+(?:line|sentence|paragraph))?(?:\s+to\s+(?:the\s+)?(?:email|draft|message))?[.!]?\s*$/i,
+  );
+  if (addMatch) {
+    let addition = addMatch[1].trim().replace(/[- ]line$/i, "").trim();
+    if (/^free[- ]?delivery$/i.test(addition)) {
+      addition =
+        "We're also offering free delivery with this update — no extra cost for you.";
+    } else if (!/^[A-Z]/.test(addition) && addition.length < 80) {
+      addition = sentence(
+        addition.charAt(0).toUpperCase() + addition.slice(1),
+      );
+    } else {
+      addition = sentence(addition);
+    }
+    // Prefer inserting before a signature / closing line.
+    const closing = draft.search(
+      /\n(?:—|–|-)\s*\[?Your name\]?|\n(?:Best|Thanks|Warmly|Sincerely|Looking forward)\b/i,
+    );
+    if (closing > 0) {
+      return `${draft.slice(0, closing)}\n${addition}\n${draft.slice(closing)}`;
+    }
+    // Strip prior revision banners so we don't stack raw notes.
+    const base = draft.replace(
+      /\n---\n\n\*\*(?:Revised with your notes|Updated):\*\*[\s\S]*$/i,
+      "",
+    );
+    return `${base.trimEnd()}\n\n${addition}\n`;
+  }
+
+  // Tone / shorten / change — apply as editorial update, strip meta "to the email".
+  const cleaned = note
+    .replace(/^(?:please\s+)?/i, "")
+    .replace(/\s+to\s+(?:the\s+)?(?:email|draft|message)\.?$/i, "")
+    .trim();
+  if (!cleaned || isCreateCommandNoise(cleaned)) return draft;
+
+  const base = draft.replace(
+    /\n---\n\n\*\*(?:Revised with your notes|Updated):\*\*[\s\S]*$/i,
     "",
-    "---",
-    "",
-    "**Revised with your notes:**",
-    "",
-    sentence(note),
-  ].join("\n");
+  );
+  return [base.trimEnd(), "", "---", "", "**Updated:**", "", sentence(cleaned)].join(
+    "\n",
+  );
 }

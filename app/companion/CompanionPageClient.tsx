@@ -363,6 +363,12 @@ import {
   syncCompanionViewMessagesToSpine,
   assertViewMatchesSpineTranscript,
   getSpineTranscriptMessages,
+  resolveConversationOwnership,
+  applyOwnershipResolution,
+  beginSpineOwnership,
+  claimTurnOwnership,
+  mayRecoverCollectionPendingFromAssistant,
+  collectOwnershipClaims,
 } from "@/lib/conversationSession";
 import { resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
@@ -1344,6 +1350,16 @@ import {
   resolveUniversalCreationTurn,
 } from "@/lib/universalCreation";
 import {
+  classifyCreateTurnRelationship,
+  createHandlerEligible,
+  isParkedCreateCompanionDetour,
+} from "@/lib/universalCreation/createTurnRelationship";
+import {
+  exitCreateWorkflow,
+  parkCreateWorkflow,
+  resumeCreateWorkflow,
+} from "@/lib/universalCreation/createLifecycle";
+import {
   formatEstateGuideReply,
   isEstateGuideQuestion,
   resolveEstateGuideTurn,
@@ -1778,6 +1794,7 @@ import type {
 import type { ProjectHomeView } from "@/lib/projectHomes/types";
 import {
   CREATE_ROOM_PREPARED_STATE_MESSAGE,
+  isUnreadyCreateRoomRoutingIntent,
   resolveLegacyCreateWorkspaceGuard,
 } from "@/lib/createExperience/blockLegacyCreateWorkspaceRouting";
 import {
@@ -2016,7 +2033,9 @@ import { tryResolveSuggestionSelection } from "@/lib/workspaceSuggestion";
 import {
   classifyWorkspaceIntent,
   extractProjectQuery,
+  isCreateResumeRequest,
 } from "@/lib/workspaceIntent";
+import { looksLikeKnowledgeQuestion } from "@/lib/platformIntent";
 import {
   buildDuplicateProjectMessage,
   buildProjectChooserMessage,
@@ -2089,6 +2108,8 @@ import {
   loadCollectionPendingOffer,
   saveCollectionPendingOffer,
   clearCollectionPendingOffer,
+  clearCollectionOfferOwnership,
+  shouldReArmCollectionConfirmation,
   markCollectionOfferCooldown,
   isCollectionOfferCooldownActive,
   isCollectionOfferMessage,
@@ -7633,7 +7654,11 @@ export default function CompanionPageClient() {
       clearTodayContext({ preserveRoom, mode: "new-chat" });
       clearGeneralChatCertifiedRuntime();
       setGlobalDailyOpening(null);
-      setDailyOpeningHelpSuggestions(null);
+      setDailyOpeningHelpMeChoose(null);
+      setDailyOpeningHelpfulLesson(null);
+      // New Chat must keep Companion conversation available — never land on Off.
+      setDestinationCompanionVisibility("welcome-home", "on");
+      setEstateRoomChatVisible(true);
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
@@ -7641,6 +7666,7 @@ export default function CompanionPageClient() {
       routeCompanionFailure(err, { surface: "fresh-start" });
       clearGeneralChatCertifiedRuntime();
       setMessages([{ role: "assistant", content: NEW_CONVERSATION_GREETING }]);
+      setEstateRoomChatVisible(true);
     }
   }
 
@@ -7669,7 +7695,8 @@ export default function CompanionPageClient() {
   function handleStartCleanConversation() {
     clearTodayContext();
     setGlobalDailyOpening(null);
-    setDailyOpeningHelpSuggestions(null);
+    setDailyOpeningHelpMeChoose(null);
+    setDailyOpeningHelpfulLesson(null);
   }
 
   function handleStartNewDayConversation() {
@@ -7692,7 +7719,8 @@ export default function CompanionPageClient() {
       } else if (freshStartDialog === "clear-context") {
         clearTodayContext({ preserveRoom, mode: "new-chat" });
         setGlobalDailyOpening(null);
-        setDailyOpeningHelpSuggestions(null);
+        setDailyOpeningHelpMeChoose(null);
+        setDailyOpeningHelpfulLesson(null);
       }
       setFreshStartRevision((revision) => revision + 1);
       window.requestAnimationFrame(() => requestChatInputFocus());
@@ -9667,10 +9695,11 @@ export default function CompanionPageClient() {
   }
 
   /**
-   * Creation Workspace — develop Creation Packages before destination handoff.
-   * Contextual access (not a permanent Welcome Home Build item yet).
+   * Creation Workspace room — develop Creation Packages before destination handoff.
+   * Must not share a name with openCreationWorkspaceCore (Create panel / content-generator).
+   * The room opener turns chat off; Create panel opens must keep Companion on.
    */
-  function openCreationWorkspaceCore(options?: {
+  function openCreationWorkspaceRoomCore(options?: {
     skipCapture?: boolean;
     initialRequest?: string | null;
     workspace?: import("@/lib/creationWorkspace").CreationWorkspace | null;
@@ -12337,7 +12366,7 @@ export default function CompanionPageClient() {
 
   function returnToCreationWorkspaceFromDestination(workspaceId: string) {
     const ws = loadCreationWorkspace(workspaceId);
-    openCreationWorkspaceCore({
+    openCreationWorkspaceRoomCore({
       workspace: ws,
     });
   }
@@ -13676,6 +13705,16 @@ export default function CompanionPageClient() {
 
   function completeImmediateCreateOpen(payload: ImmediateCreateOpenPayload) {
     clearFrictionlessOfferState();
+    // Document creates (email, SOP, …) stay in Companion chat via Universal Creation.
+    // Do not post the "Create room is still being prepared" dead-end.
+    if (
+      isUnreadyCreateRoomRoutingIntent(
+        payload.userText,
+        payload.artifact.itemType,
+      )
+    ) {
+      return;
+    }
     // Never open legacy Create / content-generator from chat create intents.
     redirectLegacyCreateWorkspaceIfNeeded("content-generator", {
       userText: payload.userText,
@@ -14332,6 +14371,17 @@ export default function CompanionPageClient() {
     });
     const shariAnswerFirstDecision: ShariResponseDecision =
       shariCognitiveTurn.decision;
+    // Create eligibility for this turn — parked / detour must not look "active"
+    // to turnAuthority or frictionless Create presentation will steal.
+    const lastAssistantForCreateAuthority =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const createRelForAuthority = classifyCreateTurnRelationship({
+      userText: trimmed,
+      session: loadUniversalCreationSession(),
+      lastAssistantText: lastAssistantForCreateAuthority,
+    });
+    const parkedCreateCompanionDetourEarly =
+      isParkedCreateCompanionDetour(createRelForAuthority);
     const turnAuthority: ConversationTurnAuthority =
       decideConversationTurnAuthority({
         userText: trimmed,
@@ -14341,17 +14391,22 @@ export default function CompanionPageClient() {
         primaryRole: shariCognitiveTurn.primaryProfessionalRole,
         pendingCreateConsent: Boolean(pendingCreateOpen),
         hasCurrentFounderAction: Boolean(founderActionBoard.currentAction),
-        activeCreateSession: Boolean(loadUniversalCreationSession()),
+        activeCreateSession: createRelForAuthority.createEligible,
       });
     // Authoritative owner may break help-thread so continuity cannot steal the turn.
-    const shariFollowUp = turnAuthority.breakHelpThread
-      ? false
-      : shariCognitiveTurn.isFollowUp;
+    // Parked-Create side questions always break binders so Companion chat owns the answer.
+    const shariFollowUp =
+      turnAuthority.breakHelpThread || parkedCreateCompanionDetourEarly
+        ? false
+        : shariCognitiveTurn.isFollowUp;
     const allowContinuityLocalReply =
-      turnAuthority.allowContinuityAdapt && shariFollowUp;
-    const effectiveShariThread = turnAuthority.breakHelpThread
-      ? null
-      : shariConversationThread;
+      turnAuthority.allowContinuityAdapt &&
+      shariFollowUp &&
+      !parkedCreateCompanionDetourEarly;
+    const effectiveShariThread =
+      turnAuthority.breakHelpThread || parkedCreateCompanionDetourEarly
+        ? null
+        : shariConversationThread;
     if (shariThreadResolve.staleRejected) {
       trackShariAnswerFirstEvent("stale_thread_rejected", {
         currentConversationId: shariThreadResolve.currentConversationId,
@@ -14378,7 +14433,8 @@ export default function CompanionPageClient() {
       preferChatAnswer ||
       shouldSuppressRouteBeforeAnswer(shariAnswerFirstDecision) ||
       turnAuthority.preferCompanionChat ||
-      shariFollowUp;
+      shariFollowUp ||
+      parkedCreateCompanionDetourEarly;
     const answerFirstBlockImmediateOpen =
       shouldBlockImmediateExperienceOpen(shariAnswerFirstDecision) ||
       turnAuthority.preferCompanionChat ||
@@ -14487,6 +14543,43 @@ export default function CompanionPageClient() {
     markChatTurnStarted(chatTurnState);
     activeChatTurnLifecycleRef.current = chatTurnState;
 
+    /**
+     * Hard Create exit — must run before Continuity / intent-workflow clear UC.
+     * Uses createRelForAuthority (classified before those clears). Local ack only;
+     * never companion-chat certification (regenerates into another email draft).
+     */
+    if (createRelForAuthority.relationship === "exit-create") {
+      exitCreateWorkflow("exited");
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      const exitReply = finalizeMemberFacingAssistantText(
+        "Okay — we can leave the email here. Whenever you want to pick it back up, just say so.",
+        "create_exit_ack",
+        { bypassVoiceLayer: true, deliveryKind: "system" },
+      );
+      markAssistantReplied(chatTurnState);
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: exitReply },
+      ]);
+      recordPrimaryTurnResponse(exitReply);
+      annotateTurnDecision({
+        finalResponseOwner: "create_exit_ack",
+        actionExecuted: "create_exit_ack",
+      });
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      finishEarlyChatTurn("create_exit_ack");
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     const applyMyDayAndWorkOpener = (
       opener: import("@/lib/estate/myDayAndWorkNavigation").MyDayAndWorkOpener,
     ) => {
@@ -14522,7 +14615,7 @@ export default function CompanionPageClient() {
           openResearchLibraryCore();
           break;
         case "creation-workspace":
-          openCreationWorkspaceCore();
+          openCreationWorkspaceRoomCore();
           break;
         default: {
           const _exhaustive: never = opener;
@@ -15391,29 +15484,59 @@ export default function CompanionPageClient() {
 
     const lastAssistantForCreateFastPath = lastAssistantForPriority;
     const universalSessionActive = loadUniversalCreationSession();
-    const createWorkflowContinuation =
-      Boolean(universalSessionActive) &&
-      isCreateWorkflowContinuation(trimmed);
-    const universalCreationContinuation =
-      Boolean(universalSessionActive) &&
-      (isCreateFlowAssistantContext(lastAssistantForCreateFastPath) ||
-        isUniversalCreationMessage(lastAssistantForCreateFastPath) ||
-        isGuidedCreationAssistantContext(lastAssistantForCreateFastPath) ||
-        createWorkflowContinuation ||
-        conversationPriority?.winner === "continue_creation" ||
-        Boolean(universalSessionActive?.approvedDraft) ||
-        universalSessionActive?.phase === "discovery" ||
-        universalSessionActive?.phase === "awaiting_action" ||
-        universalSessionActive?.phase === "review" ||
-        universalSessionActive?.phase === "revision" ||
-        universalSessionActive?.phase === "approval" ||
-        universalSessionActive?.phase === "guided_creation") &&
-      !isVagueHelpRequest(trimmed);
+    // Authoritative Create turn relationship — before Create handler / failsafe.
+    const createTurnRel = classifyCreateTurnRelationship({
+      userText: trimmed,
+      session: universalSessionActive,
+      lastAssistantText: lastAssistantForCreateFastPath,
+      continueCreationPriority:
+        conversationPriority?.winner === "continue_creation",
+    });
+    if (createTurnRel.shouldExit) {
+      exitCreateWorkflow("exited");
+    } else if (createTurnRel.shouldPark) {
+      parkCreateWorkflow(createTurnRel.reason, chatTurnRef.current);
+    } else if (createTurnRel.shouldResume) {
+      resumeCreateWorkflow(createTurnRel.reason);
+    }
+    const universalCreationContinuation = createHandlerEligible(createTurnRel);
+    /** Side questions while Create is active/parked → Companion API owns the turn. */
+    const parkedCreateCompanionDetour =
+      isParkedCreateCompanionDetour(createTurnRel);
+
+    // Hard Create exit — acknowledge locally. Do not let companion-chat re-draft.
+    // Owner + bypass must skip certifyCompanionDelivery: companion_chat certification
+    // regenerates this ack into another email draft from transcript context.
+    if (createTurnRel.relationship === "exit-create") {
+      const exitReply = finalizeMemberFacingAssistantText(
+        "Okay — we can leave the email here. Whenever you want to pick it back up, just say so.",
+        "create_exit_ack",
+        { bypassVoiceLayer: true, deliveryKind: "system" },
+      );
+      if (activeChatTurnLifecycleRef.current) {
+        markAssistantReplied(activeChatTurnLifecycleRef.current);
+      }
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: exitReply },
+      ]);
+      recordPrimaryTurnResponse(exitReply);
+      annotateTurnDecision({
+        finalResponseOwner: "create_exit_ack",
+        actionExecuted: "create_exit_ack",
+      });
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
 
     if (
       !continuityLocksBroadRouting &&
       !intentWorkflowTurnRef.current?.blockCreateFastPath &&
-      (isSimpleCreateRequest(trimmed) || universalCreationContinuation)
+      (isSimpleCreateRequest(trimmed) || universalCreationContinuation) &&
+      createTurnRel.relationship !== "temporary-detour" &&
+      createTurnRel.relationship !== "unrelated-turn" &&
+      createTurnRel.relationship !== "exit-create"
     ) {
       const createRouting = resolveIntentRouting({
         userText: trimmed,
@@ -15538,8 +15661,23 @@ export default function CompanionPageClient() {
       confirmationReply && isEstateTransitionOfferMessage(lastAssistantForYesEarly);
     const collectionOfferOnLastTurn =
       confirmationReply && isCollectionOfferMessage(lastAssistantForYesEarly);
+    // Phase 3E — transcript recovery is guarded compatibility only.
+    const collectionRecoveryGate = mayRecoverCollectionPendingFromAssistant({
+      userText: trimmed,
+      lastAssistantLooksLikeOffer: Boolean(collectionOfferOnLastTurn),
+      isConfirmationReply: Boolean(confirmationReply),
+      turnsSinceOffer: awaitingUserConfirmationRef.current?.offeredAtTurn
+        ? Math.max(
+            0,
+            chatTurnRef.current -
+              awaitingUserConfirmationRef.current.offeredAtTurn,
+          )
+        : undefined,
+    });
     const recoveredCollectionPending =
-      !loadCollectionPendingOffer() && collectionOfferOnLastTurn
+      collectionRecoveryGate.allow &&
+      !loadCollectionPendingOffer() &&
+      collectionOfferOnLastTurn
         ? recoverCollectionPendingFromAssistant({
             assistantText: lastAssistantForYesEarly,
             sourceUserText: priorUserForYesEarly ?? trimmed,
@@ -15548,6 +15686,18 @@ export default function CompanionPageClient() {
         : null;
     if (recoveredCollectionPending) {
       saveCollectionPendingOffer(recoveredCollectionPending);
+      beginSpineOwnership({
+        owner: "collection_offer",
+        reason: "recovered_collection_pending_guarded",
+        status: "awaiting_user",
+        destinationId: recoveredCollectionPending.suggestedRoomId,
+        expectedReply: { kind: "confirmation" },
+        continuation: {
+          kind: "collection_offer",
+          roomId: recoveredCollectionPending.suggestedRoomId,
+          sourceTurn: recoveredCollectionPending.offeredAtTurn,
+        },
+      });
     }
     const recoveredEstatePending =
       !frictionlessPending &&
@@ -15912,7 +16062,13 @@ export default function CompanionPageClient() {
       clearFrictionlessPending();
       clearVisualThinkingMenuPending();
       clearPendingAcceptanceAuthority();
-      clearCollectionPendingOffer();
+      // Decline must fully release Collection / win-save ownership — never re-arm.
+      clearCollectionOfferOwnership({ currentTurn: chatTurnRef.current });
+      beginSpineOwnership({
+        owner: "companion",
+        reason: "confirmation_decline",
+        status: "active",
+      });
       setToolSuggestion(null);
       setWorkspaceOffer(null);
       setAwaitingUserConfirmation(null);
@@ -16454,6 +16610,42 @@ export default function CompanionPageClient() {
     const lastAssistantBeforeSend =
       [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
 
+    // Phase 3C — central ownership resolution before feature handlers.
+    const ownershipClaims = collectOwnershipClaims({
+      awaitingConfirmation: awaitingUserConfirmationRef.current,
+    });
+    const ownershipResolution = resolveConversationOwnership({
+      userText: trimmed,
+      legacy: {
+        awaitingConfirmation: awaitingUserConfirmationRef.current,
+      },
+      createSessionActive: Boolean(loadUniversalCreationSession()),
+    });
+    applyOwnershipResolution(
+      ownershipResolution,
+      {
+        clearAwaitingConfirmation: () => setAwaitingUserConfirmation(null),
+        currentTurn: chatTurnRef.current,
+        conversationId: getActiveSpineConversationId(),
+      },
+      {
+        ownerBefore: ownershipResolution.currentOwner,
+        claims: ownershipClaims.map((c) => ({
+          owner: c.owner,
+          source: c.source,
+          priority: c.priority,
+        })),
+      },
+    );
+    if (
+      ownershipResolution.action === "release_owner" ||
+      ownershipResolution.action === "transfer_owner" ||
+      ownershipResolution.action === "repair_owner" ||
+      ownershipResolution.action === "reject_stale_owner"
+    ) {
+      clearPendingAcceptanceAuthority();
+    }
+
     const winSavePendingNow = loadWinSavePending();
     if (winSavePendingNow) {
       const winSaveReply = resolveWinSaveReply(trimmed, winSavePendingNow);
@@ -16467,7 +16659,11 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: winSaveReply.ack },
         ]);
+        // Not-now / save — never leave confirmation ownership armed.
         setAwaitingUserConfirmation(null);
+        if (winSaveReply.destination === "not-now") {
+          clearCollectionOfferOwnership({ currentTurn: chatTurnRef.current });
+        }
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
@@ -16498,6 +16694,19 @@ export default function CompanionPageClient() {
             kind: "general",
           }),
         );
+        beginSpineOwnership({
+          owner: "collection_offer",
+          reason: "win_save_offer",
+          status: "awaiting_user",
+          expectedReply: {
+            kind: "choice",
+            allowedValues: ["1", "2", "3", "4"],
+          },
+          continuation: {
+            kind: "win_save",
+            offeredAtTurn: chatTurnRef.current,
+          },
+        });
       } else {
         clearWinSavePending();
         if (winSaveRequest.openPlaceId === "evidence-vault") {
@@ -16666,6 +16875,7 @@ export default function CompanionPageClient() {
       );
       if (collectionReply.handled) {
         if (collectionReply.kind === "open" && collectionReply.openRoomId) {
+          // Prefill only on explicit accept + open — never from a declined seed.
           openCollectionRoomWithPrefillCore(
             collectionReply.openRoomId,
             collectionReply.prefill ?? collectionPendingNow.prefill,
@@ -16678,60 +16888,72 @@ export default function CompanionPageClient() {
           clearCollectionPendingOffer();
         }
 
-        // Declined optional destination → resume active create task (never orphan).
-        const recoveryType = classifyTurnRecovery(trimmed);
-        const createSessionForResume = loadUniversalCreationSession();
-        if (
-          collectionReply.kind === "decline" &&
-          shouldResumeAfterDetourDecline({
-            recoveryType,
-            activeCreateSession: Boolean(createSessionForResume),
-            createOwnsTurn:
-              turnAuthority.owner === "create_execution" ||
-              turnAuthority.allowCreatePresentation,
-          })
-        ) {
-          const resumeSource =
-            createSessionForResume?.originalUserText?.trim() ||
-            collectionPendingNow.sourceUserText?.trim() ||
-            "continue";
-          const resumeTurn = resolveUniversalCreationTurn(
-            resumeSource,
-            chatTurnRef.current,
-            collectionPendingNow.offerLine,
-          );
-          if (resumeTurn) {
-            const resumeReply = formatUniversalCreationTurnReply(resumeTurn);
-            setMessages((prev) => [
-              ...prev,
-              { role: "assistant", content: resumeReply },
-            ]);
-            recordPrimaryTurnResponse(resumeReply);
-            annotateTurnDecision({
-              finalResponseOwner: "create_execution",
-              actionExecuted: "resume_after_detour_decline",
-            });
-            trackShariAnswerFirstEvent("turn_authority", {
-              owner: "create_execution",
-              responseMode: "repair",
-              reasons: "resume_after_detour_decline",
-            });
-            setAwaitingUserConfirmation(null);
-            finishEarlyChatTurn();
-            finishLatencyTurn({ localReply: true });
-            return;
+        // Decline: release ownership completely — do not re-arm confirmation.
+        if (collectionReply.kind === "decline") {
+          clearCollectionOfferOwnership({ currentTurn: chatTurnRef.current });
+          setAwaitingUserConfirmation(null);
+          beginSpineOwnership({
+            owner: "companion",
+            reason: "collection_decline",
+            status: "active",
+          });
+
+          const recoveryType = classifyTurnRecovery(trimmed);
+          const createSessionForResume = loadUniversalCreationSession();
+          if (
+            shouldResumeAfterDetourDecline({
+              recoveryType,
+              activeCreateSession: Boolean(createSessionForResume),
+              createOwnsTurn:
+                turnAuthority.owner === "create_execution" ||
+                turnAuthority.allowCreatePresentation,
+            })
+          ) {
+            // Never stitch frozen Collection sourceUserText into create resume.
+            const resumeSource =
+              createSessionForResume?.originalUserText?.trim() || "continue";
+            const resumeTurn = resolveUniversalCreationTurn(
+              resumeSource,
+              chatTurnRef.current,
+              collectionPendingNow.offerLine,
+            );
+            if (resumeTurn) {
+              const resumeReply = formatUniversalCreationTurnReply(resumeTurn);
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: resumeReply },
+              ]);
+              recordPrimaryTurnResponse(resumeReply);
+              annotateTurnDecision({
+                finalResponseOwner: "create_execution",
+                actionExecuted: "resume_after_detour_decline",
+              });
+              trackShariAnswerFirstEvent("turn_authority", {
+                owner: "create_execution",
+                responseMode: "repair",
+                reasons: "resume_after_detour_decline",
+              });
+              finishEarlyChatTurn();
+              finishLatencyTurn({ localReply: true });
+              return;
+            }
           }
+
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: collectionReply.ack },
+          ]);
+          finishEarlyChatTurn();
+          finishLatencyTurn({ localReply: true });
+          return;
         }
 
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: collectionReply.ack },
         ]);
-        if (
-          collectionReply.kind === "menu" ||
-          collectionReply.kind === "decline" ||
-          isCollectionOfferMessage(collectionReply.ack)
-        ) {
+        // Menu / still-active offer may keep confirmation; decline never reaches here.
+        if (shouldReArmCollectionConfirmation(collectionReply)) {
           setAwaitingUserConfirmation(
             createAwaitingConfirmationState({
               assistantPrompt: collectionReply.ack,
@@ -17642,6 +17864,18 @@ export default function CompanionPageClient() {
           kind: "general",
         }),
       );
+      beginSpineOwnership({
+        owner: "collection_offer",
+        reason: "celebration_garden_win_offer",
+        status: "awaiting_user",
+        destinationId: collectionOffer.roomId,
+        expectedReply: { kind: "confirmation" },
+        continuation: {
+          kind: "collection_offer",
+          roomId: collectionOffer.roomId,
+          sourceTurn: chatTurnRef.current,
+        },
+      });
       logMomentum("complete", `Win: ${trimmed.slice(0, 60)}`);
       clearLastActivity();
       setLastAct(null);
@@ -18001,6 +18235,18 @@ export default function CompanionPageClient() {
               kind: "general",
             }),
           );
+          beginSpineOwnership({
+            owner: "collection_offer",
+            reason: "evidence_vault_offer",
+            status: "awaiting_user",
+            destinationId: "evidence-vault",
+            expectedReply: { kind: "confirmation" },
+            continuation: {
+              kind: "collection_offer",
+              roomId: "evidence-vault",
+              sourceTurn: chatTurnRef.current,
+            },
+          });
           finishEarlyChatTurn();
           finishLatencyTurn({ localReply: true });
           return;
@@ -18025,6 +18271,19 @@ export default function CompanionPageClient() {
               kind: "general",
             }),
           );
+          beginSpineOwnership({
+            owner: "collection_offer",
+            reason: "hall_win_save_offer",
+            status: "awaiting_user",
+            expectedReply: {
+              kind: "choice",
+              allowedValues: ["1", "2", "3", "4"],
+            },
+            continuation: {
+              kind: "win_save",
+              offeredAtTurn: chatTurnRef.current,
+            },
+          });
           finishEarlyChatTurn();
           finishLatencyTurn({ localReply: true });
           return;
@@ -18051,6 +18310,18 @@ export default function CompanionPageClient() {
             kind: "general",
           }),
         );
+        beginSpineOwnership({
+          owner: "collection_offer",
+          reason: "collection_save_offer",
+          status: "awaiting_user",
+          destinationId: collectionOffer.roomId,
+          expectedReply: { kind: "confirmation" },
+          continuation: {
+            kind: "collection_offer",
+            roomId: collectionOffer.roomId,
+            sourceTurn: chatTurnRef.current,
+          },
+        });
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
@@ -20118,10 +20389,12 @@ export default function CompanionPageClient() {
         : null;
 
       // Continuity local adapt — only when turn authority allows (never Create/emotion/daily-focus steals).
+      // Parked-Create side questions must reach companion-chat, not continuity filler.
       if (
         allowContinuityLocalReply &&
         answerFirstPreferChat &&
-        !chamberConversationActive
+        !chamberConversationActive &&
+        !parkedCreateCompanionDetour
       ) {
         const adapted = buildFollowUpAdaptedReply(
           trimmed,
@@ -20919,7 +21192,20 @@ export default function CompanionPageClient() {
         });
         const needsRestartRepair =
           shariFollowUp && looksLikeConversationRestart(assistantMsg);
+        // Parked-Create side questions: keep the companion-chat answer.
+        // Never replace it with the local howto failsafe lesson.
         if (
+          parkedCreateCompanionDetour &&
+          (substance.needsRepair ||
+            excellence.needsRepair ||
+            needsRestartRepair)
+        ) {
+          trackShariAnswerFirstEvent("parked_create_detour_api_answer_kept", {
+            mode: shariAnswerFirstDecision.primaryHelpMode,
+            score: excellence.validation.score,
+            substanceValid: substance.validation.valid,
+          });
+        } else if (
           substance.needsRepair ||
           excellence.needsRepair ||
           needsRestartRepair
@@ -21557,14 +21843,20 @@ export default function CompanionPageClient() {
                 priorUserText: priorUser,
               },
               prev,
+              {
+                suppressHowToLesson: parkedCreateCompanionDetour,
+              },
             );
             if (!failSafeReply) return prev;
+            const failSafeOwner = parkedCreateCompanionDetour
+              ? "companion_chat"
+              : "local_howto_failsafe";
             const certifiedFailSafe = finalizeMemberFacingAssistantText(
               failSafeReply,
-              "local_howto_failsafe",
+              failSafeOwner,
             );
             annotateTurnDecision({
-              finalResponseOwner: "local_howto_failsafe",
+              finalResponseOwner: failSafeOwner,
               actionExecuted: "fail_safe_reply",
             });
             return [
@@ -26514,7 +26806,7 @@ export default function CompanionPageClient() {
               registerBack={registerBack}
               onOpenCreate={(seedText) => {
                 // Develop substantive research outcomes in Creation Workspace first.
-                openCreationWorkspaceCore({ initialRequest: seedText });
+                openCreationWorkspaceRoomCore({ initialRequest: seedText });
               }}
               onOpenProjects={() => openProjectHomesPrototypeCore()}
               onOpenVisualThinking={(payload) => {
@@ -26988,7 +27280,7 @@ export default function CompanionPageClient() {
                   persist: true,
                 });
                 if (pipeline.openDecision.open && pipeline.workspace) {
-                  openCreationWorkspaceCore({
+                  openCreationWorkspaceRoomCore({
                     workspace: pipeline.workspace,
                   });
                   publishLiveWorkspaceTrace("after_open_create_workspace", {

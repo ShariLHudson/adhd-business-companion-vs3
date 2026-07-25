@@ -86,6 +86,23 @@ describe("Shari conversation continuity", () => {
     ).toBe(false);
   });
 
+  it("does not invent a generic Staying-with filler for short follow-ups", () => {
+    const d = decideShariResponse(
+      "Quick side question — do I need a business license to sell online coaching in Texas?",
+    );
+    storeShariConversationThread(
+      buildShariConversationThread({
+        decision: d,
+        answer: "In Texas, you generally do not need a specific coaching license.",
+        conversationId: "test-conv-license",
+      }),
+    );
+    const adapted = buildFollowUpAdaptedReply(
+      "I'm done with the email for now — thanks.",
+    );
+    expect(adapted).toBeNull();
+  });
+
   it("extracts thread corrections and ignores ordinary follow-ups", () => {
     expect(extractThreadCorrection("Actually I sell journals")).toMatch(
       /sell journals/i,

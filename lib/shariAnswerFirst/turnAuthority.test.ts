@@ -129,6 +129,22 @@ describe("decideConversationTurnAuthority — production failure modes", () => {
     expect(auth.allowContinuityAdapt).toBe(false);
   });
 
+  it("return-to-email does not accept stale founder idea-validation action", () => {
+    const text = "Let's go back to the email.";
+    const decision = decideShariResponse(text);
+    const auth = decideConversationTurnAuthority({
+      userText: text,
+      decision,
+      isFollowUp: true,
+      thread: thread("customer price change email"),
+      primaryRole: "advisor",
+      pendingCreateConsent: false,
+      hasCurrentFounderAction: true,
+    });
+    expect(auth.allowFounderActionAccept).toBe(false);
+    expect(auth.allowFounderActionRecovery).toBe(false);
+  });
+
   it("emotional overload breaks help-thread and blocks continuity/founder steals", () => {
     const text = "i feel very frustrated and have a ton on my mind";
     const decision = decideShariResponse(text);

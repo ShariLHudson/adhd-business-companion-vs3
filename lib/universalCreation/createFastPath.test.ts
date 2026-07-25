@@ -13,6 +13,7 @@ import { SHARI_ERROR_RECOVERY_LINE } from "@/lib/conversation/shariCompanionEngi
 import { resolveCreateFoundationClassification } from "@/lib/creationIdentity/createFoundationRouting";
 import { isEventDomainCreationRequest } from "@/lib/universalCreationPlatform";
 import { isMarketingPlanCreationRequest } from "@/lib/universalWorkEngine/packages/marketingPlan/isMarketingPlanCreationRequest";
+import { isBusinessPlanCreationRequest } from "@/lib/universalWorkEngine/packages/businessPlan/isBusinessPlanCreationRequest";
 import {
   detectUniversalDocumentType,
   shouldEnterUniversalCreation,
@@ -28,7 +29,7 @@ import { resolveCreateFastPathAction } from "@/lib/frictionlessActionLayer";
 /** Still use UC pre-workspace discovery interviews. */
 const UC_DISCOVERY_PHRASES = [
   "Write an email",
-  "Create a social media campaign",
+  "Please help me draft a customer email announcing a price change for my coaching packages.",
 ] as const;
 
 /** 105 — Marketing Plan Work Type resolves through UWE, not document UC. */
@@ -36,6 +37,11 @@ const MARKETING_PLAN_UWE_PHRASES = [
   "Create a marketing plan",
   "Help me build a marketing plan",
   "Help me create a simple marketing plan",
+] as const;
+
+/** 201–202 — Business Plan / campaign Work Types resolve through UWE, not document UC. */
+const BUSINESS_PLAN_UWE_PHRASES = [
+  "Create a social media campaign",
 ] as const;
 
 /** Create Foundation — frictionless must not open UC discovery. */
@@ -91,6 +97,19 @@ describe("CREATE fast path — documents only (Sprint 2)", () => {
       expect(isSimpleCreateRequest(text)).toBe(false);
       expect(detectUniversalDocumentType(text)).toBeNull();
       expect(shouldEnterUniversalCreation(text)).toBe(false);
+    },
+  );
+
+  it.each(BUSINESS_PLAN_UWE_PHRASES)(
+    "%s — Business Plan UWE path (not document UC)",
+    (text) => {
+      expect(isBusinessPlanCreationRequest(text)).toBe(true);
+      expect(isSimpleCreateRequest(text)).toBe(false);
+      const frictionless = resolveFrictionlessAction({
+        userText: text,
+        currentTurn: 1,
+      });
+      expect(frictionless.category).not.toBe("universal_creation");
     },
   );
 

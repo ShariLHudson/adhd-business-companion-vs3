@@ -6,10 +6,11 @@ const EXPLICIT_NAV_RE =
   /\b(?:take me to|go to|open|show me|bring me to|navigate to|enter|visit)\b/i;
 
 const EXPLICIT_CREATE_COMMAND_RE =
-  /^(?:please\s+)?(?:create|write|draft|build|make|compose)\b(?!.*\b(?:how|what|why|when|should)\b)/i;
+  /^(?:please\s+)?(?:(?:help me|can you|could you|would you)\s+)?(?:create|write|draft|build|make|compose)\b(?!.*\b(?:how|what|why|when|should)\b)/i;
 
+/** Allow light modifiers between article and artifact ("draft a customer email"). */
 const CREATE_COMMAND_BODY_RE =
-  /\b(?:create|write|draft|build|make)\s+(?:me\s+)?(?:a |an |my |the )?(?:strategic plan|client intake form|intake form|marketing plan|sop|email|checklist|proposal|handbook|program|campaign)\b/i;
+  /\b(?:create|write|draft|build|make|compose)\s+(?:me\s+)?(?:a |an |my |the )?(?:(?:short|quick|simple|brief|customer|client|welcome|follow[- ]?up|sales|marketing)\s+){0,4}?(?:strategic plan|client intake form|intake form|marketing plan|sop|e-?mails?|checklist|proposal|handbook|program|campaign|summary|agenda|script|post|outline)\b/i;
 
 const QUESTION_ABOUT_CREATE_RE =
   /\b(?:how (?:do|can|would|should) i|how to|what (?:should|does|is)|explain how|teach me how|walk me through)\b.*\b(?:create|write|draft|build|make)\b/i;

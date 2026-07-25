@@ -53,10 +53,16 @@ export function isInformationalChatTurn(text: string): boolean {
   return false;
 }
 
+export type FailSafeChatReplyOptions = {
+  /** Parked-Create side questions must not get a local howto lesson. */
+  suppressHowToLesson?: boolean;
+};
+
 export function buildFailSafeChatReply(
   userText: string,
   memory?: Pick<RuntimeRecoveryInput, "lastAssistantText" | "priorUserText">,
   messages?: ReadonlyArray<{ role: string; content: string }>,
+  options?: FailSafeChatReplyOptions,
 ): string | null {
   const trimmed = userText.trim();
   if (messages && messagesAlreadyHasRecoveryReply(messages)) {
@@ -71,7 +77,10 @@ export function buildFailSafeChatReply(
   const knowledgeReply = resolveInformationalKnowledgeLocalReply(trimmed);
   if (knowledgeReply) return knowledgeReply;
   // Answer-first: ordinary how-to / advice must not collapse to a clarify question.
-  const answerFirstFailSafe = buildAnswerFirstFailSafeReply(trimmed);
+  // Parked-Create detours suppress the generic howto lesson entirely.
+  const answerFirstFailSafe = buildAnswerFirstFailSafeReply(trimmed, {
+    suppressHowToLesson: options?.suppressHowToLesson,
+  });
   if (answerFirstFailSafe) return answerFirstFailSafe;
   const input: RuntimeRecoveryInput = {
     userText: trimmed,

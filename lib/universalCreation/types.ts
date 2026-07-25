@@ -83,6 +83,15 @@ export type UniversalDiscoveryConfidence = {
   score: number;
 };
 
+export type UniversalCreationLifecycle =
+  | "active"
+  | "awaiting_input"
+  | "parked"
+  | "resumed"
+  | "completed"
+  | "exited"
+  | "abandoned";
+
 export type UniversalCreationSession = {
   documentType: UniversalDocumentType;
   phase: UniversalCreationPhase;
@@ -99,6 +108,15 @@ export type UniversalCreationSession = {
   approvedDraft?: boolean;
   /** Spine ConversationSession id — reject on mismatch (Phase 1). */
   boundConversationId?: string;
+  /**
+   * Create lifecycle — parked preserves draft/facts but must not steal turns.
+   * Absent/legacy sessions are treated as active until parked or exited.
+   */
+  lifecycle?: UniversalCreationLifecycle;
+  parkedAt?: string;
+  parkedReason?: string;
+  parkedAtTurn?: number;
+  resumeReason?: string;
 };
 
 export const UNIVERSAL_DISCOVERY_THRESHOLD = 90;

@@ -84,6 +84,15 @@ export {
 } from "./collectionPendingOffer";
 
 export {
+  clearCollectionOfferOwnership,
+  hasPendingCollectionOwnership,
+  isExplicitCreateOrRevisionRequest,
+  shouldReArmCollectionConfirmation,
+  shouldReleasePendingCollectionOwnership,
+  type CollectionOwnershipReleaseReason,
+} from "./collectionOfferRelease";
+
+export {
   consumeCollectionPrefill,
   clearAllCollectionPrefills,
   peekCollectionPrefill,
