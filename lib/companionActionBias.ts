@@ -222,7 +222,7 @@ export function actionBiasHintForChat(analysis: ActionBiasAnalysis): string {
     "Investigate → Decide → Move. NEVER Investigate → Investigate → Investigate.",
     "Maximum clarification: 0–3 questions typical; rarely 4–5; almost never more than 5.",
     "OUTCOME OVER INSIGHT: prefer a meaningful next step over a brilliant insight.",
-    "Every meaningful turn should end with: a decision, next step, completed action, feature transition, or plan to continue — NOT more confusion.",
+    "When a turn has a genuine next step, end with it — a decision, next step, completed action, feature transition, or plan to continue. A complete answer may also simply end; never manufacture a step just to close — and never end in confusion.",
     "ANTI-THERAPY: understand enough, help effectively, move forward — do not endlessly analyze emotions.",
     "After responding, evaluate: Did this help the user move forward? (Not: was the analysis impressive?)",
   ];
