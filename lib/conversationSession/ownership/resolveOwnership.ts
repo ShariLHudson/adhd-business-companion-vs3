@@ -10,7 +10,7 @@ import {
 import { detectWorkflowCorrection } from "@/lib/conversationContinuity/workflowCorrection";
 import { classifyTurnRecovery } from "@/lib/shariAnswerFirst/turnRecovery";
 import {
-  isConfirmationAcceptance,
+  isActiveQuestionAcceptance,
   isPureConfirmationDecline,
 } from "@/lib/conversationConfirmationGate";
 import { parseWinSaveChoice } from "@/lib/estate/winSaveOffer";
@@ -240,9 +240,12 @@ export function resolveConversationOwnership(
     };
   }
 
-  // Acceptance of confirmation stays with confirmation/collection until open completes
+  // Acceptance of confirmation stays with confirmation/collection until open
+  // completes. The wider continuation/selection vocabulary (B2 — "go", "next",
+  // "continue", "that one", "the first one") binds ONLY here, gated by an
+  // active awaiting-reply owner, so it never becomes a global acceptance rule.
   if (
-    isConfirmationAcceptance(text) &&
+    isActiveQuestionAcceptance(text) &&
     AWAITING_REPLY_OWNERS.includes(currentOwner)
   ) {
     const next = selected

@@ -119,6 +119,35 @@ export function isConfirmationAcceptance(text: string): boolean {
   return ACCEPT_RE.test(t);
 }
 
+/**
+ * Bounded continuation / selection short answers that bind to an ACTIVE
+ * awaiting-reply owner (B2): "go", "continue", "next", "that one", "the first
+ * one", "option two", etc. These are `$`-anchored short answers, so a longer
+ * navigation sentence ("go to the boardroom", "continue working on the deck")
+ * does NOT match.
+ */
+const ACTIVE_QUESTION_BINDING_RE =
+  /^(?:go|go for it|continue|keep going|next|that one|this one|(?:the )?(?:first|second) one|option (?:one|two|1|2)|number (?:one|two|1|2))[.!]?$/i;
+
+/**
+ * Acceptance vocabulary for an ACTIVE awaiting-reply owner only (B2). Extends
+ * base confirmation acceptance (yes / sure / okay / go ahead …) with the
+ * bounded continuation / selection tokens above.
+ *
+ * MUST be consulted only where an awaiting-reply owner is already confirmed —
+ * i.e. inside the ownership-guarded `confirmation_acceptance` resolver branch.
+ * It is deliberately NOT wired into the shared `isConfirmationAcceptance`,
+ * because that predicate is also read by unguarded navigation / task-lock /
+ * frictionless consumers, where widening would become a global "short reply
+ * means yes" rule and let unrelated systems capture these tokens.
+ */
+export function isActiveQuestionAcceptance(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (isConfirmationAcceptance(t)) return true;
+  return ACTIVE_QUESTION_BINDING_RE.test(t);
+}
+
 export function isConfirmationDecline(text: string): boolean {
   const t = text.trim();
   if (!t) return false;

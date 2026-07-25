@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isActiveQuestionAcceptance,
   isConfirmationAcceptance,
   isConfirmationDecline,
   messageAsksUserConfirmation,
@@ -84,6 +85,56 @@ describe("conversationConfirmationGate", () => {
       expect(
         shouldArmPendingQuestion("Want to build one?", { alreadyArmed: true }),
       ).toBe(false);
+    });
+  });
+
+  describe("isActiveQuestionAcceptance (B2)", () => {
+    it("preserves the base acceptance vocabulary", () => {
+      for (const t of ["yes", "sure", "okay", "ok", "go ahead", "do it"]) {
+        expect(isActiveQuestionAcceptance(t)).toBe(true);
+      }
+    });
+
+    it("adds bounded continuation and selection short answers", () => {
+      for (const t of [
+        "go",
+        "go for it",
+        "continue",
+        "keep going",
+        "next",
+        "that one",
+        "this one",
+        "the first one",
+        "first one",
+        "the second one",
+        "option two",
+        "option 1",
+        "number two",
+      ]) {
+        expect(isActiveQuestionAcceptance(t)).toBe(true);
+      }
+    });
+
+    it("does not match longer navigation / action sentences", () => {
+      // These start with a binding word but are not short answers — they must
+      // not bind as acceptance even inside an active question.
+      for (const t of [
+        "go to the boardroom",
+        "continue working on the deck",
+        "next room please",
+        "take me to momentum",
+      ]) {
+        expect(isActiveQuestionAcceptance(t)).toBe(false);
+      }
+    });
+
+    it("does NOT widen the shared global acceptance predicate", () => {
+      // The context-free predicate (read by unguarded frictionless / task-lock
+      // consumers) must stay narrow, so these tokens can never be captured
+      // globally.
+      for (const t of ["go", "continue", "next", "that one", "the first one"]) {
+        expect(isConfirmationAcceptance(t)).toBe(false);
+      }
     });
   });
 });
