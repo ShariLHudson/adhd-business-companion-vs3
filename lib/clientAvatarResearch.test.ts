@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
   appendResearchToAnswer,
+  appendToResearchArea,
   buildAvatarResearchAutoPrompt,
   buildAvatarResearchSystemPrompt,
+  describeResearchArea,
 } from "./clientAvatarResearch";
+
+const MODULE_LABELS = {
+  behavioral: "Behavioral patterns — how they react",
+  motivation: "Motivation drivers — what moves them",
+};
 
 describe("buildAvatarResearchSystemPrompt", () => {
   it("includes the question, current answer, prior context and avatar name", () => {
@@ -66,5 +73,68 @@ describe("appendResearchToAnswer", () => {
 
   it("leaves the answer unchanged for an empty addition", () => {
     expect(appendResearchToAnswer("Existing", "   ")).toBe("Existing");
+  });
+});
+
+describe("describeResearchArea (Step 10 per-area scoping)", () => {
+  it("resolves a module key to its label + current text", () => {
+    const area = describeResearchArea(
+      { behavioral: "They procrastinate under stress" },
+      "behavioral",
+      MODULE_LABELS,
+    );
+    expect(area).toEqual({
+      label: "Behavioral patterns — how they react",
+      currentAnswer: "They procrastinate under stress",
+    });
+  });
+
+  it("resolves a custom field by index, falling back to a friendly label", () => {
+    const research = { custom: [{ label: "", value: "test idea" }] };
+    expect(describeResearchArea(research, "custom:0", MODULE_LABELS)).toEqual({
+      label: "Custom research field",
+      currentAnswer: "test idea",
+    });
+    // A custom index that no longer exists resolves to null (caller skips).
+    expect(describeResearchArea(research, "custom:5", MODULE_LABELS)).toBeNull();
+  });
+});
+
+describe("appendToResearchArea (Add to This Area)", () => {
+  it("appends to one module without touching any other area", () => {
+    const before = {
+      behavioral: "Existing note",
+      motivation: "Keep me",
+      custom: [{ label: "Idea", value: "orig" }],
+    };
+    const after = appendToResearchArea(before, "behavioral", "New angle");
+    expect(after.behavioral).toBe("Existing note\n\nNew angle");
+    // Every other area is untouched.
+    expect(after.motivation).toBe("Keep me");
+    expect(after.custom).toEqual([{ label: "Idea", value: "orig" }]);
+    // Pure: the input object is not mutated.
+    expect(before.behavioral).toBe("Existing note");
+  });
+
+  it("creates an empty module rather than overwriting, and scopes custom by index", () => {
+    expect(appendToResearchArea({}, "motivation", "First").motivation).toBe(
+      "First",
+    );
+    const research = {
+      custom: [
+        { label: "A", value: "a1" },
+        { label: "B", value: "" },
+      ],
+    };
+    const after = appendToResearchArea(research, "custom:1", "b-add");
+    expect(after.custom).toEqual([
+      { label: "A", value: "a1" },
+      { label: "B", value: "b-add" },
+    ]);
+  });
+
+  it("returns the research unchanged for a deleted custom index", () => {
+    const research = { custom: [{ label: "A", value: "a1" }] };
+    expect(appendToResearchArea(research, "custom:9", "nope")).toBe(research);
   });
 });

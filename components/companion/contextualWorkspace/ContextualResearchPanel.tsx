@@ -55,6 +55,10 @@ export type ContextualResearchPanelProps = {
   onAddToAnswer?: (text: string) => void;
   toggleLabel?: string;
   helperText?: string;
+  /** Label for the append action (e.g. "Add to This Area"). */
+  addLabel?: string;
+  /** Confirmation shown after appending (e.g. "Added to this area ✓"). */
+  addedLabel?: string;
 };
 
 export function ContextualResearchPanel({
@@ -67,6 +71,8 @@ export function ContextualResearchPanel({
   onAddToAnswer,
   toggleLabel = "Research This Question",
   helperText = "Shari researches this question for you. Read along, keep asking, and add anything useful to your answer.",
+  addLabel = "Add to Answer",
+  addedLabel = "Added to your answer ✓",
 }: ContextualResearchPanelProps) {
   // Per-question threads so navigating between questions keeps each thread.
   const [threads, setThreads] = useState<Record<string, ResearchMessage[]>>({});
@@ -231,7 +237,7 @@ export function ContextualResearchPanel({
                   {m.role === "assistant" && !m.error ? (
                     state === "added" ? (
                       <p className="mt-1.5 text-xs font-semibold text-[#1e4f4f]">
-                        Added to your answer ✓
+                        {addedLabel}
                       </p>
                     ) : state === "dismissed" ? null : (
                       <div className="mt-2 flex flex-wrap gap-2">
@@ -241,7 +247,7 @@ export function ContextualResearchPanel({
                           className="rounded-md bg-[#1e4f4f] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#163a3a]"
                           data-testid="research-add-to-answer"
                         >
-                          Add to Answer
+                          {addLabel}
                         </button>
                         <button
                           type="button"

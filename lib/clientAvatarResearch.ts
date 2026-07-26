@@ -63,3 +63,76 @@ export function appendResearchToAnswer(existing: string, addition: string): stri
   if (!base.trim()) return add;
   return `${base.replace(/\s+$/, "")}\n\n${add}`;
 }
+
+/**
+ * Client Avatar Step 10 research is scoped per area. An area key is either a
+ * research-module key (e.g. "behavioral") or a custom field addressed by index
+ * ("custom:2"). These helpers keep that routing pure so the builder stays thin
+ * and "Add to This Area" is guaranteed append-only, per area, everywhere.
+ */
+export type ResearchAreaValue = { label: string; value: string };
+export type ResearchAreaData = Record<string, unknown> & {
+  custom?: ResearchAreaValue[];
+};
+
+const CUSTOM_PREFIX = "custom:";
+
+/** Parse a `custom:<i>` key into its index, or null for module keys. */
+function customIndex(areaKey: string): number | null {
+  if (!areaKey.startsWith(CUSTOM_PREFIX)) return null;
+  const i = Number(areaKey.slice(CUSTOM_PREFIX.length));
+  return Number.isInteger(i) && i >= 0 ? i : null;
+}
+
+/**
+ * Resolve an area key to its display label and current text. `moduleLabels`
+ * maps module keys to labels. Returns null for keys that don't resolve (e.g. a
+ * custom index that no longer exists), so callers can skip cleanly.
+ */
+export function describeResearchArea(
+  research: ResearchAreaData,
+  areaKey: string,
+  moduleLabels: Record<string, string>,
+): { label: string; currentAnswer: string } | null {
+  const idx = customIndex(areaKey);
+  if (idx !== null) {
+    const field = research.custom?.[idx];
+    if (!field) return null;
+    return {
+      label: field.label.trim() || "Custom research field",
+      currentAnswer: field.value ?? "",
+    };
+  }
+  const label = moduleLabels[areaKey];
+  if (!label) return null;
+  return { label, currentAnswer: String(research[areaKey] ?? "") };
+}
+
+/**
+ * Append a chosen research reply into a single area, never overwriting and
+ * never touching any other area. A `custom:<i>` key with no matching field
+ * (e.g. deleted) returns the research unchanged; a module key that is empty is
+ * created, since an empty module is valid, not unknown.
+ */
+export function appendToResearchArea(
+  research: ResearchAreaData,
+  areaKey: string,
+  text: string,
+): ResearchAreaData {
+  if (!areaKey) return research;
+  const idx = customIndex(areaKey);
+  if (idx !== null) {
+    const custom = [...(research.custom ?? [])];
+    const existing = custom[idx];
+    if (!existing) return research;
+    custom[idx] = {
+      ...existing,
+      value: appendResearchToAnswer(existing.value ?? "", text),
+    };
+    return { ...research, custom };
+  }
+  return {
+    ...research,
+    [areaKey]: appendResearchToAnswer(String(research[areaKey] ?? ""), text),
+  };
+}

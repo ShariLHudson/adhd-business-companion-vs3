@@ -153,4 +153,21 @@ describe("ContextualResearchPanel (refined flow)", () => {
     ).toBeNull();
     expect(onAddToAnswer).not.toHaveBeenCalled();
   });
+
+  it("uses a custom add label and confirmation (Step 10 'Add to This Area')", async () => {
+    mockReplies();
+    await render({
+      onAddToAnswer: vi.fn(),
+      addLabel: "Add to This Area",
+      addedLabel: "Added to this area ✓",
+    });
+    const add = container.querySelector(
+      '[data-testid="research-add-to-answer"]',
+    ) as HTMLButtonElement;
+    // The action carries the caller's label, not the default "Add to Answer".
+    expect(add.textContent).toBe("Add to This Area");
+    await act(async () => add.click());
+    expect(container.textContent).toContain("Added to this area ✓");
+    expect(container.textContent).not.toContain("Added to your answer");
+  });
 });

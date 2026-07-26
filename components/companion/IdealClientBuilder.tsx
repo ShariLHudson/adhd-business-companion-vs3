@@ -20,8 +20,10 @@ import { WorkspaceStepControls } from "@/components/companion/contextualWorkspac
 import { ContextualResearchPanel } from "@/components/companion/contextualWorkspace/ContextualResearchPanel";
 import {
   appendResearchToAnswer,
+  appendToResearchArea,
   buildAvatarResearchAutoPrompt,
   buildAvatarResearchSystemPrompt,
+  describeResearchArea,
 } from "@/lib/clientAvatarResearch";
 import {
   avatarPrintSections,
@@ -109,6 +111,12 @@ const RESEARCH_MODULES: {
   },
 ];
 
+// Per-area research scoping: module key → "label — hint" so Step 10 research is
+// automatically anchored to the exact area the member is refining.
+const RESEARCH_MODULE_LABELS: Record<string, string> = Object.fromEntries(
+  RESEARCH_MODULES.map((m) => [m.key, `${m.label} — ${m.hint}`]),
+);
+
 // Research-first flow: quick identity → lightweight discovery → AI expand →
 // review → optional deep refine. Early understanding = sharper AI sooner.
 const STEPS: { key: StepKey; q: string; hint?: string }[] = [
@@ -151,21 +159,6 @@ const STEPS: { key: StepKey; q: string; hint?: string }[] = [
     q: "Want to track revenue from this client type? (optional)",
   },
 ];
-
-// Short labels for the section-jump nav (edit mode is a hub, not a wizard).
-const STEP_NAV: Record<StepKey, string> = {
-  who: "Identity",
-  identity: "Photo",
-  painPoints: "Struggles",
-  goals: "Goals",
-  currentBehavior: "Obstacles",
-  expand: "AI expand",
-  behavior: "Behavior",
-  insights: "Motivation",
-  solution: "Your edge",
-  research: "Research",
-  revenue: "Revenue",
-};
 
 type TextFieldKey = "painPoints" | "goals" | "currentBehavior" | "solution";
 
@@ -326,6 +319,12 @@ export function IdealClientBuilder({
   const [aiBusy, setAiBusy] = useState(false);
   const [savedHint, setSavedHint] = useState(false);
   const [researchOpen, setResearchOpen] = useState(false);
+  // Step 10: which research area (module key or `custom:<i>`) has its scoped
+  // research conversation open. null = none. Answers live in `form.research`,
+  // so they survive area switches, open/close, and Back regardless of this.
+  const [activeResearchArea, setActiveResearchArea] = useState<string | null>(
+    null,
+  );
   const [printMenuOpen, setPrintMenuOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const appliedChatFillKey = useRef<number | null>(null);
@@ -354,6 +353,7 @@ export function IdealClientBuilder({
     savedSigRef.current = formSignature(EMPTY);
     setSavedHint(false);
     setResearchOpen(false);
+    setActiveResearchArea(null);
     setBuilding(true);
   }, [coachKickoff]);
 
@@ -460,6 +460,7 @@ export function IdealClientBuilder({
     savedSigRef.current = formSignature(EMPTY);
     setSavedHint(false);
     setResearchOpen(false);
+    setActiveResearchArea(null);
     setBuilding(true);
     onStartNew?.();
   }
@@ -509,6 +510,7 @@ export function IdealClientBuilder({
     });
     setSavedHint(false);
     setResearchOpen(false);
+    setActiveResearchArea(null);
     setBuilding(true);
   }
 
@@ -597,6 +599,7 @@ export function IdealClientBuilder({
     setStep(0);
     setSavedHint(false);
     setResearchOpen(false);
+    setActiveResearchArea(null);
     savedSigRef.current = formSignature(EMPTY);
     if (persisted) onAvatarSaved?.(persisted);
     onBuildComplete?.();
@@ -636,6 +639,7 @@ export function IdealClientBuilder({
     if (dirty || formRef.current.id) persist();
     setBuilding(false);
     setResearchOpen(false);
+    setActiveResearchArea(null);
   }
 
   function handleBack() {
@@ -645,12 +649,14 @@ export function IdealClientBuilder({
     }
     if (dirty) persist();
     setResearchOpen(false);
+    setActiveResearchArea(null);
     setStep(step - 1);
   }
 
   function handleSkip() {
     if (dirty) persist();
     setResearchOpen(false);
+    setActiveResearchArea(null);
     if (step >= STEPS.length - 1) {
       setBuilding(false);
       return;
@@ -669,6 +675,7 @@ export function IdealClientBuilder({
     }
     persist();
     setResearchOpen(false);
+    setActiveResearchArea(null);
     const next = step + 1;
     setStep(next);
     const nextKey = STEPS[next]?.key;
@@ -803,6 +810,37 @@ export function IdealClientBuilder({
     };
     const researchSystemPrompt = buildAvatarResearchSystemPrompt(researchContext);
     const researchAutoPrompt = buildAvatarResearchAutoPrompt(researchContext);
+    // Step 10 per-area research: resolve the active area (a module key or a
+    // `custom:<i>` field) into its label, current text, and an append-only
+    // writer via the pure helpers. Answers always live in `form.research`, so
+    // nothing is lost when the member switches areas, closes research, or steps
+    // Back. The AI context uses the label + hint so research is auto-scoped.
+    const activeAreaDesc = activeResearchArea
+      ? describeResearchArea(form.research, activeResearchArea, RESEARCH_MODULE_LABELS)
+      : null;
+    const activeArea =
+      activeResearchArea && activeAreaDesc
+        ? {
+            ...activeAreaDesc,
+            append: (text: string) =>
+              setForm((f) => ({
+                ...f,
+                research: appendToResearchArea(
+                  f.research,
+                  activeResearchArea,
+                  text,
+                ) as AvatarResearch,
+              })),
+          }
+        : null;
+    const areaResearchContext = activeArea
+      ? {
+          questionLabel: activeArea.label,
+          currentAnswer: activeArea.currentAnswer,
+          priorAnswers: researchPriors,
+          avatarName: form.name,
+        }
+      : null;
     const avatarComplete = isAvatarComplete({
       name: form.name,
       who: form.who,
@@ -831,14 +869,12 @@ export function IdealClientBuilder({
             ) : null}
           </div>
         ) : null}
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-medium text-[#9a8f82]">
-            Step {step + 1} of {STEPS.length}
-          </p>
-          <div className="flex items-center gap-2">
-            <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[#1e4f4f]">
-              {STEP_NAV[current.key]}
-            </span>
+        <div className="rounded-2xl border border-[#d9d2c6] bg-[#fbf8f3]/95 px-4 py-3 shadow-sm backdrop-blur-md">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-[#1e4f4f]">
+              Step {step + 1} of {STEPS.length}
+            </p>
+            <div className="flex items-center gap-2">
             <div className="relative">
               <button
                 type="button"
@@ -892,14 +928,15 @@ export function IdealClientBuilder({
                 </div>
               ) : null}
             </div>
+            </div>
           </div>
+          <p className="mt-2 text-2xl font-semibold leading-snug text-[#1f1c19]">
+            {current.q}
+          </p>
+          {current.hint && (
+            <p className="mt-1 text-base text-[#4b463f]">{current.hint}</p>
+          )}
         </div>
-        <p className="mt-2 text-2xl font-semibold leading-snug text-[#1f1c19]">
-          {current.q}
-        </p>
-        {current.hint && (
-          <p className="mt-1 text-base text-[#6b635a]">{current.hint}</p>
-        )}
 
         <div className="mt-6 flex-1">
           {current.key === "who" && (
@@ -1042,36 +1079,54 @@ export function IdealClientBuilder({
           {current.key === "research" && (
             <div className="flex flex-col gap-3">
               {RESEARCH_MODULES.map((m) => (
-                <details
-                  key={m.key}
-                  className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3"
-                >
-                  <summary className="flex cursor-pointer items-center justify-between text-base font-semibold text-[#1f1c19]">
-                    <span>
-                      {m.emoji} {m.label}
-                    </span>
-                    {m.key === "market" && (
-                      <span
-                        role="button"
-                        tabIndex={0}
+                <div key={m.key} className="flex flex-col gap-2">
+                  <details className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3">
+                    <summary className="flex cursor-pointer items-center justify-between gap-2 text-base font-semibold text-[#1f1c19]">
+                      <span>
+                        {m.emoji} {m.label}
+                      </span>
+                      <button
+                        type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          if (!aiBusy) void aiMarketInsights();
+                          setActiveResearchArea(m.key);
                         }}
-                        className="rounded-md bg-[#1e4f4f]/10 px-2 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
+                        className="shrink-0 rounded-md bg-[#1e4f4f]/10 px-2 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
+                        data-testid={`research-area-${m.key}`}
                       >
-                        {aiBusy ? "Researching…" : "🔍 AI research"}
-                      </span>
-                    )}
-                  </summary>
-                  <p className="mt-1 text-sm text-[#9a8f82]">{m.hint}</p>
-                  <textarea
-                    value={(form.research[m.key] as string) ?? ""}
-                    onChange={(e) => setResearch(m.key, e.target.value)}
-                    placeholder="Optional…"
-                    className="mt-2 min-h-[64px] w-full resize-none rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                  />
-                </details>
+                        🔍 Research this area
+                      </button>
+                    </summary>
+                    <p className="mt-1 text-sm text-[#6b635a]">{m.hint}</p>
+                    <textarea
+                      value={(form.research[m.key] as string) ?? ""}
+                      onChange={(e) => setResearch(m.key, e.target.value)}
+                      placeholder="Optional…"
+                      className="mt-2 min-h-[64px] w-full resize-none rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                    />
+                  </details>
+                  {activeResearchArea === m.key &&
+                  activeArea &&
+                  areaResearchContext ? (
+                    <ContextualResearchPanel
+                      open
+                      onToggle={() => setActiveResearchArea(null)}
+                      questionKey={`research:${m.key}`}
+                      questionLabel={m.label}
+                      systemPrompt={buildAvatarResearchSystemPrompt(
+                        areaResearchContext,
+                      )}
+                      autoPrompt={buildAvatarResearchAutoPrompt(
+                        areaResearchContext,
+                      )}
+                      onAddToAnswer={activeArea.append}
+                      addLabel="Add to This Area"
+                      addedLabel="Added to this area ✓"
+                      toggleLabel="Research this area"
+                      helperText="Shari researches this area for you. Read along, keep asking, and add anything useful to this area."
+                    />
+                  ) : null}
+                </div>
               ))}
 
               {/* Custom research fields — experiments, content ideas, tests */}
@@ -1085,48 +1140,86 @@ export function IdealClientBuilder({
                 </p>
                 <div className="mt-2 flex flex-col gap-2">
                   {(form.research.custom ?? []).map((c, i) => (
-                    <div key={i} className="flex gap-2">
-                      <input
-                        value={c.label}
-                        onChange={(e) => {
-                          const custom = [...(form.research.custom ?? [])];
-                          custom[i] = { ...custom[i]!, label: e.target.value };
-                          setForm({
-                            ...form,
-                            research: { ...form.research, custom },
-                          });
-                        }}
-                        placeholder="Label"
-                        className="w-1/3 rounded-lg border border-[#c9bfb0] bg-white px-2.5 py-2 text-sm outline-none focus:border-[#1e4f4f]"
-                      />
-                      <input
-                        value={c.value}
-                        onChange={(e) => {
-                          const custom = [...(form.research.custom ?? [])];
-                          custom[i] = { ...custom[i]!, value: e.target.value };
-                          setForm({
-                            ...form,
-                            research: { ...form.research, custom },
-                          });
-                        }}
-                        placeholder="Notes…"
-                        className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-2.5 py-2 text-sm outline-none focus:border-[#1e4f4f]"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const custom = (form.research.custom ?? []).filter(
-                            (_, j) => j !== i,
-                          );
-                          setForm({
-                            ...form,
-                            research: { ...form.research, custom },
-                          });
-                        }}
-                        className="shrink-0 px-2 text-[#a85c4a]"
-                      >
-                        ✕
-                      </button>
+                    <div key={i} className="flex flex-col gap-2">
+                      <div className="flex gap-2">
+                        <input
+                          value={c.label}
+                          onChange={(e) => {
+                            const custom = [...(form.research.custom ?? [])];
+                            custom[i] = { ...custom[i]!, label: e.target.value };
+                            setForm({
+                              ...form,
+                              research: { ...form.research, custom },
+                            });
+                          }}
+                          placeholder="Label"
+                          className="w-1/3 rounded-lg border border-[#c9bfb0] bg-white px-2.5 py-2 text-sm outline-none focus:border-[#1e4f4f]"
+                        />
+                        <input
+                          value={c.value}
+                          onChange={(e) => {
+                            const custom = [...(form.research.custom ?? [])];
+                            custom[i] = { ...custom[i]!, value: e.target.value };
+                            setForm({
+                              ...form,
+                              research: { ...form.research, custom },
+                            });
+                          }}
+                          placeholder="Notes…"
+                          className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-2.5 py-2 text-sm outline-none focus:border-[#1e4f4f]"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setActiveResearchArea(`custom:${i}`)}
+                          title="Research this area"
+                          aria-label="Research this area"
+                          className="shrink-0 rounded-md bg-[#1e4f4f]/10 px-2 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
+                          data-testid={`research-area-custom-${i}`}
+                        >
+                          🔍
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const custom = (form.research.custom ?? []).filter(
+                              (_, j) => j !== i,
+                            );
+                            setForm({
+                              ...form,
+                              research: { ...form.research, custom },
+                            });
+                            // Indexes shift on delete — close research so it can
+                            // never point at the wrong field.
+                            setActiveResearchArea(null);
+                          }}
+                          className="shrink-0 px-2 text-[#a85c4a]"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      {activeResearchArea === `custom:${i}` &&
+                      activeArea &&
+                      areaResearchContext ? (
+                        <ContextualResearchPanel
+                          open
+                          onToggle={() => setActiveResearchArea(null)}
+                          questionKey={`research:custom:${i}`}
+                          questionLabel={
+                            c.label.trim() || "Custom research field"
+                          }
+                          systemPrompt={buildAvatarResearchSystemPrompt(
+                            areaResearchContext,
+                          )}
+                          autoPrompt={buildAvatarResearchAutoPrompt(
+                            areaResearchContext,
+                          )}
+                          onAddToAnswer={activeArea.append}
+                          addLabel="Add to This Area"
+                          addedLabel="Added to this area ✓"
+                          toggleLabel="Research this area"
+                          helperText="Shari researches this area for you. Read along, keep asking, and add anything useful to this area."
+                        />
+                      ) : null}
                     </div>
                   ))}
                   <button
