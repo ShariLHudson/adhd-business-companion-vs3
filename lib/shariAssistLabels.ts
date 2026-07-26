@@ -22,7 +22,7 @@ const SECTION_LABELS: Partial<Record<AppSection, string>> = {
   "focus-timer": "Focus With Shari",
   "focus-audio": "Focus With Shari",
   playbook: "Apply With Shari",
-  "client-avatars": "Define With Shari",
+  "client-avatars": "Research My Ideal Client",
   "brain-dump": "Sort It Out With Shari",
   "templates-library": "Build With Shari",
   snippets: "Use With Shari",

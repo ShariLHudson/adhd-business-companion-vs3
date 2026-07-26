@@ -21,14 +21,28 @@ export function WorkspaceShell({
 }) {
   return (
     <div
-      className="relative min-h-full bg-cover bg-center bg-no-repeat"
+      className="relative flex min-h-full flex-col bg-cover bg-center bg-no-repeat"
       style={
         backgroundImage
           ? { backgroundImage: `url("${backgroundImage}")` }
           : undefined
       }
     >
-      {children}
+      {/*
+        Content fills the room and scrolls when needed — never a blank block
+        beneath the image. A soft warm veil lifts text contrast over the plate
+        while keeping the room clearly visible (the builder uses dark text, so
+        the scrim is light rather than a heavy dark overlay).
+      */}
+      <div
+        className={`relative z-10 flex-1 overflow-y-auto${
+          backgroundImage
+            ? " bg-gradient-to-b from-[#fbf7f1]/72 via-[#fbf7f1]/42 to-[#fbf7f1]/64"
+            : ""
+        }`}
+      >
+        {children}
+      </div>
       {showAssist && onAskShari ? (
         <CompanionAssistButton onOpen={onAskShari} label={assistLabel} />
       ) : null}

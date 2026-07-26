@@ -22288,6 +22288,44 @@ export default function CompanionPageClient() {
       return;
     }
 
+    /**
+     * Guided workspace experiences (e.g. Client Avatar) are first-class focused
+     * workspaces, not physical Estate rooms — enter them focused, never with the
+     * beside-chat direct-visit overlay ("While you're here… Just Chat / Visit
+     * Another Room"). This is the reusable focused-workspace entry contract that
+     * other guided workspaces (My Business Estate, etc.) can adopt next.
+     */
+    if (
+      command.section === "client-avatars" ||
+      roomId === "client-avatar" ||
+      command.entryId === "client-avatar"
+    ) {
+      executeEstateCommandMemoryHandoff(command, {
+        userText,
+        fromSection: activeSectionRef.current,
+        playArrival: true,
+        playAmbience: true,
+      });
+      captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
+      clearSplitBesideWorkspace();
+      openStandaloneFocusSectionCore("client-avatars");
+      const arrivalAck = navigationLine ?? estateCommandAckLine(command);
+      if (!opts?.skipAssistantMessage && arrivalAck) {
+        if (activeChatTurnLifecycleRef.current) {
+          markAssistantReplied(activeChatTurnLifecycleRef.current);
+        }
+        setMessages((prev) =>
+          prev.some(
+            (m) => m.role === "assistant" && m.content === arrivalAck,
+          )
+            ? prev
+            : [...prev, { role: "assistant", content: arrivalAck }],
+        );
+      }
+      finishEarlyChatTurn();
+      return;
+    }
+
     const openingClearMyMind =
       command.section === "brain-dump" ||
       roomId === "clear-my-mind" ||

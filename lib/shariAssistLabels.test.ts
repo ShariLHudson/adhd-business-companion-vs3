@@ -9,7 +9,7 @@ describe("getShariAssistLabel", () => {
     expect(getShariAssistLabel("brain-dump")).toBe("Sort It Out With Shari");
     expect(getShariAssistLabel("templates-library")).toBe("Build With Shari");
     expect(getShariAssistLabel("how-do-i")).toBe("Learn With Shari");
-    expect(getShariAssistLabel("client-avatars")).toBe("Define With Shari");
+    expect(getShariAssistLabel("client-avatars")).toBe("Research My Ideal Client");
     expect(getShariAssistLabel("focus-timer")).toBe("Focus With Shari");
   });
 

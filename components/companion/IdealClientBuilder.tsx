@@ -599,6 +599,7 @@ export function IdealClientBuilder({
           {current.key === "who" && (
             <div className="flex flex-col gap-3" ref={focusTargetRef}>
               <VoiceAnswerField
+                hideMic
                 value={form.name}
                 onChange={(name) => setForm({ ...form, name })}
                 multiline={false}
@@ -607,6 +608,7 @@ export function IdealClientBuilder({
                 inputClassName="rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               />
               <VoiceAnswerField
+                hideMic
                 value={form.who}
                 onChange={(who) => setForm({ ...form, who })}
                 id="avatar-who"
@@ -620,6 +622,7 @@ export function IdealClientBuilder({
             current.key === "currentBehavior" ||
             current.key === "solution") && (
             <VoiceAnswerField
+              hideMic
               value={form[current.key as TextFieldKey]}
               onChange={(v) =>
                 setForm({

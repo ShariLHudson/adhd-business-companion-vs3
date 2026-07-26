@@ -29,6 +29,11 @@ type VoiceAnswerFieldProps = {
   onVoiceUsed?: () => void;
   voiceProminent?: boolean;
   inputRef?: RefObject<HTMLTextAreaElement | HTMLInputElement | null>;
+  /**
+   * Hide the per-field mic. Use when the workspace provides one shared voice
+   * entry point instead of a microphone beside every field (reduces clutter).
+   */
+  hideMic?: boolean;
   /** @deprecated Layout is always compact (icon beside field). */
   compact?: boolean;
 };
@@ -50,6 +55,7 @@ export function VoiceAnswerField({
   onVoiceUsed,
   voiceProminent = false,
   inputRef,
+  hideMic = false,
 }: VoiceAnswerFieldProps) {
   const fieldCls =
     inputClassName ??
@@ -62,14 +68,16 @@ export function VoiceAnswerField({
       <div
         className={`flex items-start gap-3 ${voiceProminent ? "clear-my-mind-voice-row" : "gap-2"}`}
       >
-        <MicButton
-          prominent={voiceProminent}
-          onText={(t) => {
-            onVoiceUsed?.();
-            onChange(appendVoiceText(value, t));
-          }}
-          title={micTitle}
-        />
+        {hideMic ? null : (
+          <MicButton
+            prominent={voiceProminent}
+            onText={(t) => {
+              onVoiceUsed?.();
+              onChange(appendVoiceText(value, t));
+            }}
+            title={micTitle}
+          />
+        )}
         {multiline ? (
           <textarea
             ref={inputRef as RefObject<HTMLTextAreaElement>}
