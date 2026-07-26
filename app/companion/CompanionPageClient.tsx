@@ -377,7 +377,11 @@ import {
   detectClientAvatarExploration,
   isClientAvatarOfferAcceptance,
 } from "@/lib/clientAvatarOffer";
-import { detectBusinessEstateNavIntent } from "@/lib/businessEstateNavIntent";
+import {
+  detectBusinessEstateNavIntent,
+  detectBusinessProfileNavIntent,
+} from "@/lib/businessEstateNavIntent";
+import { hasStartedBusinessProfile } from "@/lib/profile/businessEstateProfile";
 import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
@@ -14805,8 +14809,13 @@ export default function CompanionPageClient() {
       const userMessage: Message = { role: "user", content: trimmed };
       if (fresh) clearConversation();
       openProfileDestinationCore("my-business-estate");
+      const businessProfileAck = detectBusinessProfileNavIntent(trimmed)
+        ? hasStartedBusinessProfile()
+          ? "Let's continue your Business Profile. I'll take you to the next section that still needs your attention."
+          : "Let's begin your Business Profile. We'll build it one clear section at a time, and you can stop and return whenever you need to."
+        : "Opening your Business Estate.";
       const voicedAck = finalizeMemberFacingAssistantText(
-        "Opening your Business Estate.",
+        businessProfileAck,
         "business-estate-nav",
       );
       setMessages((prev) => [

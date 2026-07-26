@@ -357,6 +357,22 @@ export function getBusinessEstateSections(): BusinessEstateSections {
   return getBusinessEstateEnvelope().sections;
 }
 
+/**
+ * True when the member has begun their Business Profile — any estate section has
+ * content, or a legacy profile exists. Drives begin-vs-continue messaging and
+ * resume behavior. The estate envelope is the source of truth; the legacy shape
+ * is only a fallback for pre-existing data.
+ */
+export function hasStartedBusinessProfile(): boolean {
+  const sections = getBusinessEstateSections();
+  const started = Object.values(sections).some((section) =>
+    sectionHasContent(section as Record<string, string>),
+  );
+  if (started) return true;
+  const legacy = getBusinessProfile();
+  return Boolean(legacy && (legacy.role || legacy.sells || legacy.idealClient));
+}
+
 function sectionRecordKey(
   sectionId: BusinessEstateSectionId,
 ): keyof BusinessEstateSections {
