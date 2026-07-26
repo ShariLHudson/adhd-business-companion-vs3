@@ -1,13 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { IdealClientBuilder } from "@/components/companion/IdealClientBuilder";
-import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEstateRoomShell";
 import { CLIENT_AVATAR_BACKGROUND_SRC } from "@/lib/estateExperienceBackgrounds";
-import { GetExpertHelpAction } from "@/components/companion/advisory/GetExpertHelpAction";
-import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHelpPanel";
-import { getActiveAvatar } from "@/lib/companionStore";
 import { businessEstateAreaBreadcrumb } from "@/lib/profile/profileDestination";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "@/app/companion/my-business-estate.css";
@@ -17,64 +12,47 @@ type Props = {
 };
 
 /**
- * People I Help — area inside My Business Estate over existing client avatars.
- * Quick Understanding is enough; Client Avatar depth stays optional.
- * Shared Need Another Perspective? (not per-field).
+ * People I Help — the Client Avatar room.
+ *
+ * One room, no frosted panel: the builder renders directly over the room
+ * background (Contextual Workspace pattern), so the room fills the workspace and
+ * content scrolls over it. There is no Chamber / Board escalation in the avatar
+ * flow — per-question help lives inline via ContextualResearchPanel inside the
+ * builder, keeping every action inside Client Avatar.
  */
 export function PeopleIHelpPanel({ onClose }: Props) {
-  const [expertHelpOpen, setExpertHelpOpen] = useState(false);
-  const [avatarIdForHelp, setAvatarIdForHelp] = useState<string | undefined>();
-  const { requestClose } = useDismissibleWindow({
-    open: true,
-    onClose,
-  });
-
-  function dismissOutside() {
-    if (expertHelpOpen) {
-      setExpertHelpOpen(false);
-      return;
-    }
-    requestClose();
-  }
+  const { requestClose } = useDismissibleWindow({ open: true, onClose });
 
   return (
     <MyBusinessEstateRoomShell backgroundUrl={CLIENT_AVATAR_BACKGROUND_SRC}>
-      <EstateWorkspace
-        className="my-business-estate-panel people-i-help-panel"
-        onDismissOutside={dismissOutside}
-      >
-        {expertHelpOpen ? (
-          <GetExpertHelpPanel
-            sourceType="people_i_help"
-            areaId="people-i-help"
-            avatarId={avatarIdForHelp ?? getActiveAvatar()?.id}
-            onClose={() => setExpertHelpOpen(false)}
-            onReturn={() => setExpertHelpOpen(false)}
-          />
-        ) : null}
-
-        <div hidden={expertHelpOpen ? true : undefined} aria-hidden={expertHelpOpen || undefined}>
-          <button
-            type="button"
-            className="people-i-help-panel__back"
-            onClick={requestClose}
+      <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col px-6 py-8">
+        <button
+          type="button"
+          className="people-i-help-panel__back self-start"
+          onClick={requestClose}
+        >
+          Close
+        </button>
+        <header className="mt-2">
+          <p
+            className="text-xs font-semibold uppercase tracking-wide text-[#9a8f82]"
+            data-testid="people-i-help-breadcrumb"
           >
-            Close
-          </button>
-          <header className="people-i-help-panel__header">
-            <p className="estate-workspace__kicker" data-testid="people-i-help-breadcrumb">
-              {businessEstateAreaBreadcrumb("People I Help")}
-            </p>
-            <h1 className="estate-workspace__title">People I Help</h1>
-            <p className="my-business-estate-panel__lead">
-              A calm place for who you serve — start with a Quick Understanding.
-              A fuller Client Avatar is optional when you want more depth.
-            </p>
-            <p className="people-i-help-panel__meta">
-              About 5 minutes · Primary, Secondary, and Future audiences welcome
-            </p>
-          </header>
+            {businessEstateAreaBreadcrumb("People I Help")}
+          </p>
+          <h1 className="mt-1 text-3xl font-semibold text-[#1f1c19]">
+            People I Help
+          </h1>
+          <p className="mt-1 max-w-xl text-base text-[#4b463f]">
+            A calm place for who you serve — start with a Quick Understanding. A
+            fuller Client Avatar is optional when you want more depth.
+          </p>
+          <p className="mt-1 text-sm text-[#9a8f82]">
+            About 5 minutes · Primary, Secondary, and Future audiences welcome
+          </p>
+        </header>
 
+        <div className="mt-4 flex-1">
           <IdealClientBuilder
             presentation={{
               destinationKicker: "People I Help",
@@ -84,15 +62,8 @@ export function PeopleIHelpPanel({ onClose }: Props) {
               newAvatarTitle: "New Client Avatar",
             }}
           />
-
-          <GetExpertHelpAction
-            onOpen={() => {
-              setAvatarIdForHelp(getActiveAvatar()?.id);
-              setExpertHelpOpen(true);
-            }}
-          />
         </div>
-      </EstateWorkspace>
+      </div>
     </MyBusinessEstateRoomShell>
   );
 }

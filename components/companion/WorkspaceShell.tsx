@@ -37,7 +37,9 @@ export function WorkspaceShell({
       <div
         className={`relative z-10 flex-1 overflow-y-auto${
           backgroundImage
-            ? " bg-gradient-to-b from-[#fbf7f1]/72 via-[#fbf7f1]/42 to-[#fbf7f1]/64"
+            ? // Light scrim only — the room fills the workspace and content
+              // scrolls over it; readability comes from the content cards.
+              " bg-gradient-to-b from-[#fbf7f1]/40 via-[#fbf7f1]/16 to-[#fbf7f1]/34"
             : ""
         }`}
       >

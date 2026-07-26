@@ -1394,6 +1394,8 @@ export type IdealClientAvatar = {
   contentPrefs?: string; // how they like to consume content
   // Level 3 — optional structured research.
   research?: AvatarResearch;
+  /** Contextual Workspace resume pointer — the step the member last worked on. */
+  draftStepKey?: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -1490,6 +1492,7 @@ export function saveAvatar(
     triggers: input.triggers,
     contentPrefs: input.contentPrefs,
     research: input.research,
+    draftStepKey: input.draftStepKey,
     createdAt: now,
     updatedAt: now,
   };

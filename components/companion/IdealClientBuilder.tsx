@@ -15,6 +15,9 @@ import {
   type AvatarResearch,
 } from "@/lib/companionStore";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import { ContextualWorkspaceShell } from "@/components/companion/contextualWorkspace/ContextualWorkspaceShell";
+import { WorkspaceStepControls } from "@/components/companion/contextualWorkspace/WorkspaceStepControls";
+import { ContextualResearchPanel } from "@/components/companion/contextualWorkspace/ContextualResearchPanel";
 import type { WorkspaceFieldId } from "@/lib/workspaceAwareness";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import type { ClientAvatarStepKey } from "@/lib/clientAvatarCoach";
@@ -215,6 +218,22 @@ const EMPTY: Form = {
   research: {},
 };
 
+// Free-text questions where an inline research conversation adds the most value.
+const TEXT_RESEARCH_STEPS: readonly StepKey[] = [
+  "who",
+  "painPoints",
+  "goals",
+  "currentBehavior",
+  "solution",
+];
+
+/** Content signature (ignores id) — drives the "unsaved changes" state. */
+function formSignature(f: Form): string {
+  const { id: _id, ...rest } = f;
+  void _id;
+  return JSON.stringify(rest);
+}
+
 function AvatarMark({
   avatar,
   size,
@@ -294,9 +313,19 @@ export function IdealClientBuilder({
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<Form>(EMPTY);
   const [aiBusy, setAiBusy] = useState(false);
+  const [savedHint, setSavedHint] = useState(false);
+  const [researchOpen, setResearchOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const appliedChatFillKey = useRef<number | null>(null);
   const focusTargetRef = useRef<HTMLDivElement | null>(null);
+  // Contextual Workspace save/draft: signature-based dirty tracking so
+  // "Save Progress" is only active when there is genuinely something new.
+  const formRef = useRef(form);
+  formRef.current = form;
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const savedSigRef = useRef(formSignature(EMPTY));
+  const dirty = formSignature(form) !== savedSigRef.current;
 
   function refresh() {
     setAvatars(getAvatars());
@@ -310,6 +339,9 @@ export function IdealClientBuilder({
     if (!coachKickoff) return;
     setForm({ ...EMPTY });
     setStep(0);
+    savedSigRef.current = formSignature(EMPTY);
+    setSavedHint(false);
+    setResearchOpen(false);
     setBuilding(true);
   }, [coachKickoff]);
 
@@ -413,6 +445,9 @@ export function IdealClientBuilder({
   function startNew() {
     setForm({ ...EMPTY });
     setStep(0);
+    savedSigRef.current = formSignature(EMPTY);
+    setSavedHint(false);
+    setResearchOpen(false);
     setBuilding(true);
     onStartNew?.();
   }
@@ -437,7 +472,31 @@ export function IdealClientBuilder({
       contentPrefs: a.contentPrefs,
       research: a.research ?? {},
     });
-    setStep(0);
+    const resumeIdx = a.draftStepKey
+      ? STEPS.findIndex((s) => s.key === a.draftStepKey)
+      : -1;
+    setStep(resumeIdx >= 0 ? resumeIdx : 0);
+    savedSigRef.current = formSignature({
+      id: a.id,
+      name: a.name,
+      who: a.who,
+      painPoints: a.painPoints,
+      goals: a.goals,
+      currentBehavior: a.currentBehavior,
+      solution: a.solution,
+      tagline: a.tagline,
+      emoji: a.emoji ?? "👤",
+      image: a.image,
+      revenue: a.revenue,
+      behaviorTraits: a.behaviorTraits ?? [],
+      motivations: a.motivations,
+      objections: a.objections,
+      triggers: a.triggers,
+      contentPrefs: a.contentPrefs,
+      research: a.research ?? {},
+    });
+    setSavedHint(false);
+    setResearchOpen(false);
     setBuilding(true);
   }
 
@@ -511,7 +570,10 @@ export function IdealClientBuilder({
   }
 
   function finish() {
-    const saved = { ...form };
+    const saved: Form = {
+      ...form,
+      draftStepKey: STEPS[STEPS.length - 1]?.key,
+    } as Form & { draftStepKey?: string };
     const list = saveAvatar(saved);
     const persisted =
       list.find((a) => a.id === saved.id) ?? list[0] ?? null;
@@ -519,8 +581,84 @@ export function IdealClientBuilder({
     setBuilding(false);
     setForm({ ...EMPTY });
     setStep(0);
+    setSavedHint(false);
+    setResearchOpen(false);
+    savedSigRef.current = formSignature(EMPTY);
     if (persisted) onAvatarSaved?.(persisted);
     onBuildComplete?.();
+  }
+
+  /**
+   * Persist the in-progress avatar without leaving the builder. Mints the id on
+   * first save so partial drafts survive, and records the active step so
+   * re-entry resumes exactly where the member left off. Deliberately does NOT
+   * fire onAvatarSaved — that belongs to finish(), so a mid-build save never
+   * navigates away.
+   */
+  function persist() {
+    const cur = {
+      ...formRef.current,
+      draftStepKey: STEPS[stepRef.current]?.key,
+    };
+    const list = saveAvatar(cur);
+    if (!formRef.current.id) {
+      const mintedId = list[0]?.id;
+      if (mintedId) {
+        formRef.current = { ...formRef.current, id: mintedId };
+        setForm((f) => ({ ...f, id: mintedId }));
+      }
+    }
+    savedSigRef.current = formSignature(formRef.current);
+    setSavedHint(true);
+    setAvatars(getAvatars());
+    setActiveId(getActiveAvatar()?.id);
+  }
+
+  // ---- Contextual Workspace controls (never leave the room) ---------------
+  function exitToList() {
+    // Save on the way out so nothing is lost and the resume pointer reflects
+    // the step they actually left from — but never mint an empty draft from a
+    // builder that was opened and closed without any input.
+    if (dirty || formRef.current.id) persist();
+    setBuilding(false);
+    setResearchOpen(false);
+  }
+
+  function handleBack() {
+    if (step === 0) {
+      exitToList();
+      return;
+    }
+    if (dirty) persist();
+    setResearchOpen(false);
+    setStep(step - 1);
+  }
+
+  function handleSkip() {
+    if (dirty) persist();
+    setResearchOpen(false);
+    if (step >= STEPS.length - 1) {
+      setBuilding(false);
+      return;
+    }
+    setStep(step + 1);
+  }
+
+  function handleSaveProgress() {
+    persist();
+  }
+
+  function handleSaveAndContinue() {
+    if (step >= STEPS.length - 1) {
+      finish();
+      return;
+    }
+    persist();
+    setResearchOpen(false);
+    const next = step + 1;
+    setStep(next);
+    const nextKey = STEPS[next]?.key;
+    if (nextKey) onStepAdvance?.(nextKey as ClientAvatarStepKey, next);
   }
 
   function onUpload(file: File) {
@@ -535,17 +673,44 @@ export function IdealClientBuilder({
     const current = STEPS[step]!;
     const isLast = step === STEPS.length - 1;
     const editing = Boolean(form.id);
+    const showResearch = TEXT_RESEARCH_STEPS.includes(current.key);
+    const researchAnswer =
+      current.key === "who"
+        ? [form.name, form.who].filter(Boolean).join(" — ")
+        : current.key === "painPoints"
+          ? form.painPoints
+          : current.key === "goals"
+            ? form.goals
+            : current.key === "currentBehavior"
+              ? form.currentBehavior
+              : current.key === "solution"
+                ? form.solution
+                : "";
+    const researchSystemPrompt = [
+      "You are Shari, helping an ADHD founder think through ONE question about",
+      "their ideal client so they can write their own answer, in their own words.",
+      "",
+      `The question: "${current.q}"`,
+      form.name ? `Client name/label: ${form.name}` : "",
+      form.who ? `Who they help: ${form.who}` : "",
+      researchAnswer
+        ? `Their current draft answer: "${researchAnswer}"`
+        : "Their current draft answer: (empty so far)",
+      "",
+      "Help them explore and think it through: ask one gentle clarifying question,",
+      "offer a few concrete angles or examples, and suggest possible wording they",
+      "could adapt. Keep replies short, warm, and concrete. Do NOT write the whole",
+      "answer for them or call it final — they copy anything useful into their own",
+      "answer field. Never mention menus, tools, the Chamber, or the Board. Stay",
+      "entirely on this one question.",
+    ].join("\n");
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+      <ContextualWorkspaceShell>
         {destinationKicker ? (
           <div className="mb-3">
             <button
               type="button"
-              onClick={() => {
-                setBuilding(false);
-                setForm({ ...EMPTY });
-                setStep(0);
-              }}
+              onClick={exitToList}
               className="people-i-help-panel__back"
             >
               ← {backToDestinationLabel}
@@ -560,34 +725,14 @@ export function IdealClientBuilder({
             ) : null}
           </div>
         ) : null}
-        {editing ? (
-          // Edit mode = section hub: jump straight to any block, no flow lock.
-          <div className="mb-2">
-            <p className="text-2xl font-semibold text-[#1f1c19]">
-              {form.emoji ?? "👤"} {form.name || "Editing avatar"}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {STEPS.map((s, i) => (
-                <button
-                  key={s.key}
-                  type="button"
-                  onClick={() => setStep(i)}
-                  className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                    i === step
-                      ? "bg-[#1e4f4f] text-white"
-                      : "bg-white/80 text-[#4b463f] hover:bg-white"
-                  }`}
-                >
-                  {STEP_NAV[s.key]}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : (
+        <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-medium text-[#9a8f82]">
             Step {step + 1} of {STEPS.length}
           </p>
-        )}
+          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[#1e4f4f]">
+            {STEP_NAV[current.key]}
+          </span>
+        </div>
         <p className="mt-2 text-2xl font-semibold leading-snug text-[#1f1c19]">
           {current.q}
         </p>
@@ -924,58 +1069,33 @@ export function IdealClientBuilder({
           )}
         </div>
 
-        <div className="mt-6 flex justify-between gap-2">
-          {editing ? (
-            // Hub: save from any section, no "next step" requirement.
-            <>
-              <button
-                type="button"
-                onClick={() => setBuilding(false)}
-                className="rounded-xl border-2 border-[#1e4f4f] bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                onClick={() => finish()}
-                className="rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-              >
-                Save changes
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                onClick={() =>
-                  step === 0 ? setBuilding(false) : setStep(step - 1)
-                }
-                className="rounded-xl border-2 border-[#1e4f4f] bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
-              >
-                {step === 0 ? (destinationKicker ? backToDestinationLabel : "Cancel") : "Back"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (isLast) {
-                    finish();
-                    return;
-                  }
-                  const next = step + 1;
-                  setStep(next);
-                  const nextKey = STEPS[next]?.key;
-                  if (nextKey) {
-                    onStepAdvance?.(nextKey as ClientAvatarStepKey, next);
-                  }
-                }}
-                className="rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-              >
-                {isLast ? "Save client" : "Next"}
-              </button>
-            </>
-          )}
-        </div>
-      </div>
+        {showResearch ? (
+          <ContextualResearchPanel
+            open={researchOpen}
+            onToggle={() => setResearchOpen((v) => !v)}
+            questionKey={`${form.id ?? "new"}:${current.key}`}
+            questionLabel={current.q}
+            systemPrompt={researchSystemPrompt}
+          />
+        ) : null}
+
+        <WorkspaceStepControls
+          onBack={handleBack}
+          backLabel={
+            step === 0
+              ? destinationKicker
+                ? backToDestinationLabel
+                : "Back to list"
+              : "Back"
+          }
+          onSkip={handleSkip}
+          onSaveProgress={handleSaveProgress}
+          canSaveProgress={dirty}
+          onSaveAndContinue={handleSaveAndContinue}
+          continueLabel={isLast ? "Save and Finish" : "Save and Continue"}
+          savedHint={savedHint}
+        />
+      </ContextualWorkspaceShell>
     );
   }
 
