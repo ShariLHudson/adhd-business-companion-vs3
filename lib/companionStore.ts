@@ -1426,8 +1426,10 @@ export type IdealClientAvatar = {
   id: string;
   name: string;
   tagline: string;
-  emoji?: string;
-  image?: string; // data URL when uploaded
+  emoji?: string; // legacy — no longer rendered as identity; kept for back-compat
+  image?: string; // uploaded reference image (data URL); the avatar's own, never the user's
+  /** Chosen estate-style archetype emblem (a client-type cue, used when no image). */
+  visualReferenceId?: import("./clientAvatarVisualReferences").ClientAvatarVisualReferenceId;
   who: string;
   painPoints: string;
   goals: string;
@@ -1533,6 +1535,7 @@ export function saveAvatar(
     tagline: input.tagline ?? "",
     emoji: input.emoji,
     image: input.image,
+    visualReferenceId: input.visualReferenceId,
     who: input.who ?? "",
     painPoints: input.painPoints ?? "",
     goals: input.goals ?? "",

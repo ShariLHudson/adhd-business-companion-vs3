@@ -6,11 +6,14 @@ type Props = {
   offer: WorkspaceOffer;
   onAccept: () => void;
   onStayHere: () => void;
-  onShowMap: () => void;
+  /** Optional — when omitted, the "Show map" choice is hidden (e.g. the Client
+   * Avatar invitation, where routing to the Estate map adds nothing). */
+  onShowMap?: () => void;
 };
 
 /**
  * Spec 108 — Yes · Stay here · Show Estate map (Welcome Home front door).
+ * "Show map" is offered only when the host provides `onShowMap`.
  */
 export function EstateWorkspaceOfferCard({
   offer,
@@ -45,13 +48,15 @@ export function EstateWorkspaceOfferCard({
         >
           Stay here
         </button>
-        <button
-          type="button"
-          onClick={onShowMap}
-          className="rounded-full border border-[#1e4f4f]/25 bg-[#1e4f4f]/[0.06] px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
-        >
-          Show map
-        </button>
+        {onShowMap ? (
+          <button
+            type="button"
+            onClick={onShowMap}
+            className="rounded-full border border-[#1e4f4f]/25 bg-[#1e4f4f]/[0.06] px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+          >
+            Show map
+          </button>
+        ) : null}
       </div>
     </div>
   );

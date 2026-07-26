@@ -104,10 +104,17 @@ export function HomeChatInputFooter({
             onClearPendingOffers();
             onDismissOfferKeepTalking();
           }}
-          onShowMap={() => {
-            onClearPendingOffers();
-            onShowEstateMap?.();
-          }}
+          // The Client Avatar invitation offers only Open / Stay here — routing
+          // to the Estate map from here adds nothing. Other estate offers keep
+          // the Spec 108 "Show map" choice.
+          onShowMap={
+            pendingAction.offer.section === "client-avatars"
+              ? undefined
+              : () => {
+                  onClearPendingOffers();
+                  onShowEstateMap?.();
+                }
+          }
         />
       ) : pendingAction && !suppressInterventionCards && !isLoading && !homeCalm ? (
         pendingAction.kind === "artifact-export" ? (

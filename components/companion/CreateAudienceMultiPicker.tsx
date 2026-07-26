@@ -49,7 +49,12 @@ export function CreateAudienceMultiPicker({
                   : "border-[#c9bfb0] bg-white text-[#4b463f] hover:border-[#1e4f4f]"
               }`}
             >
-              <ClientAvatarMark name={a.name} image={a.image} size={20} />
+              <ClientAvatarMark
+                name={a.name}
+                image={a.image}
+                visualReferenceId={a.visualReferenceId}
+                size={20}
+              />
               {a.name}
             </button>
           );

@@ -18,6 +18,12 @@ import {
   type ResearchThreadMessage,
 } from "@/lib/companionStore";
 import { ClientAvatarMark } from "@/components/companion/ClientAvatarMark";
+import { ClientAvatarVisualGlyph } from "@/components/companion/clientAvatarVisualReferences";
+import {
+  CLIENT_AVATAR_VISUAL_REFERENCE_IDS,
+  CLIENT_AVATAR_VISUAL_REFERENCE_LABELS,
+  type ClientAvatarVisualReferenceId,
+} from "@/lib/clientAvatarVisualReferences";
 import { processAvatarImage } from "@/lib/clientAvatarImage";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { ContextualWorkspaceShell } from "@/components/companion/contextualWorkspace/ContextualWorkspaceShell";
@@ -156,7 +162,7 @@ const STEPS: { key: StepKey; q: string; hint?: string }[] = [
   {
     key: "identity",
     q: "Add a visual reference.",
-    hint: "Add an optional image to help you recognize this Client Avatar. Without one, Spark Estate will use their initials or an estate-style profile mark.",
+    hint: "Choose an optional image or symbol that helps you recognize this type of client.",
   },
   { key: "painPoints", q: "What are they struggling with most?" },
   { key: "goals", q: "What are they trying to achieve?" },
@@ -202,6 +208,7 @@ export type Form = {
   tagline: string;
   emoji?: string;
   image?: string;
+  visualReferenceId?: ClientAvatarVisualReferenceId;
   revenue?: string;
   behaviorTraits: string[];
   motivations?: string;
@@ -429,6 +436,7 @@ export function IdealClientBuilder({
             tagline: active.tagline,
             emoji: active.emoji,
             image: active.image,
+            visualReferenceId: active.visualReferenceId,
             revenue: active.revenue,
             behaviorTraits: active.behaviorTraits ?? [],
             motivations: active.motivations,
@@ -496,6 +504,7 @@ export function IdealClientBuilder({
       tagline: a.tagline,
       emoji: a.emoji,
       image: a.image,
+      visualReferenceId: a.visualReferenceId,
       revenue: a.revenue,
       behaviorTraits: a.behaviorTraits ?? [],
       motivations: a.motivations,
@@ -859,8 +868,22 @@ export function IdealClientBuilder({
   }
 
   function removeImage() {
+    // Removing the uploaded image restores the chosen archetype emblem (if any),
+    // else the neutral default dossier emblem — visualReferenceId is retained.
     setImageError(null);
     setForm((f) => ({ ...f, image: undefined }));
+  }
+
+  function pickVisualReference(referenceId: ClientAvatarVisualReferenceId) {
+    // Choosing an archetype makes it the active visual — clear any uploaded
+    // image so the emblem shows immediately.
+    setImageError(null);
+    setForm((f) => ({ ...f, visualReferenceId: referenceId, image: undefined }));
+  }
+
+  function useDefaultMark() {
+    // Return to the neutral estate default emblem (no chosen archetype).
+    setForm((f) => ({ ...f, visualReferenceId: undefined }));
   }
 
   // ---- Interview ----------------------------------------------------------
@@ -1319,67 +1342,141 @@ export function IdealClientBuilder({
 
           {current.key === "identity" && (
             <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-4">
-                <ClientAvatarMark
-                  name={form.name}
-                  image={form.image}
-                  size={72}
-                />
-                <div className="flex flex-col gap-2">
-                  <button
-                    type="button"
-                    onClick={() => fileRef.current?.click()}
-                    disabled={imageBusy}
-                    className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
-                    data-testid="avatar-image-upload"
-                  >
-                    {imageBusy
-                      ? "Processing…"
-                      : form.image
-                        ? "Change Image"
-                        : "Add Image"}
-                  </button>
-                  {form.image && (
+              {/* One readable frosted card so preview, controls, marks, and
+                  helper text stay legible over the room background. */}
+              <div
+                className="rounded-2xl border border-[#d9d2c6] bg-[#faf7f2]/95 p-4 shadow-sm backdrop-blur-md"
+                data-testid="avatar-identity-card"
+              >
+                <p className="text-sm font-medium text-[#3a3630]">
+                  This Client Avatar represents a client type, not one specific
+                  person.
+                </p>
+                <p className="mt-1 text-sm text-[#6b635a]">
+                  Choose a representative image, archetype, or estate-style
+                  mark—or leave the default.
+                </p>
+
+                <div className="mt-3 flex items-center gap-4">
+                  <ClientAvatarMark
+                    name={form.name}
+                    image={form.image}
+                    visualReferenceId={form.visualReferenceId}
+                    size={72}
+                  />
+                  <div className="flex flex-col items-start gap-2">
                     <button
                       type="button"
-                      onClick={removeImage}
-                      className="text-xs font-medium text-[#a85c4a]"
-                      data-testid="avatar-image-remove"
+                      onClick={() => fileRef.current?.click()}
+                      disabled={imageBusy}
+                      className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+                      data-testid="avatar-image-upload"
                     >
-                      Remove Image
+                      {imageBusy
+                        ? "Processing…"
+                        : form.image
+                          ? "Change Image"
+                          : "Add Image"}
                     </button>
-                  )}
+                    {form.image ? (
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="text-xs font-semibold text-[#a85c4a]"
+                        data-testid="avatar-image-remove"
+                      >
+                        Remove Image
+                      </button>
+                    ) : null}
+                    {!form.image && form.visualReferenceId ? (
+                      <button
+                        type="button"
+                        onClick={useDefaultMark}
+                        className="text-xs font-semibold text-[#6b635a] hover:text-[#1e4f4f]"
+                        data-testid="avatar-use-default"
+                      >
+                        Use default mark
+                      </button>
+                    ) : null}
+                  </div>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) void onUpload(file);
+                      // Allow re-picking the same file after a remove.
+                      e.target.value = "";
+                    }}
+                  />
                 </div>
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) void onUpload(file);
-                    // Allow re-picking the same file after a remove.
-                    e.target.value = "";
-                  }}
-                />
-              </div>
 
-              {imageError ? (
-                <p
-                  className="text-sm font-medium text-[#a85c4a]"
-                  role="alert"
-                  data-testid="avatar-image-error"
-                >
-                  {imageError}
+                <p className="mt-2 text-xs text-[#6b635a]">
+                  You may upload your own licensed image, illustration, logo,
+                  mood-board image, or other visual reference.
                 </p>
-              ) : null}
 
-              <p className="text-sm text-[#6b635a]">
-                It can be a representative image or another visual reference.
-              </p>
-              <p className="text-xs text-[#9a8f82]">
-                Use an image you own or have permission to use.
-              </p>
+                {imageError ? (
+                  <p
+                    className="mt-2 text-sm font-medium text-[#a85c4a]"
+                    role="alert"
+                    data-testid="avatar-image-error"
+                  >
+                    {imageError}
+                  </p>
+                ) : null}
+
+                <div className="mt-4">
+                  <p className="text-sm font-semibold text-[#3a3630]">
+                    Or choose a client-archetype mark
+                  </p>
+                  <div
+                    className="mt-2 flex flex-wrap gap-2"
+                    role="group"
+                    aria-label="Client-archetype marks"
+                    data-testid="avatar-visual-ref-picker"
+                  >
+                    {CLIENT_AVATAR_VISUAL_REFERENCE_IDS.map((refId) => {
+                      const selected =
+                        !form.image && form.visualReferenceId === refId;
+                      const label = CLIENT_AVATAR_VISUAL_REFERENCE_LABELS[refId];
+                      return (
+                        <button
+                          key={refId}
+                          type="button"
+                          onClick={() => pickVisualReference(refId)}
+                          aria-pressed={selected}
+                          aria-label={label}
+                          title={label}
+                          data-testid={`avatar-visual-ref-${refId}`}
+                          className={`flex w-[84px] flex-col items-center gap-1 rounded-lg border bg-white px-1 py-2 text-[#1e4f4f] transition-colors ${
+                            selected
+                              ? "border-[#1e4f4f] ring-2 ring-[#1e4f4f]/25"
+                              : "border-[#d4cdc3] hover:border-[#1e4f4f]"
+                          }`}
+                        >
+                          <span className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d4cdc3] bg-[#faf7f2]">
+                            <ClientAvatarVisualGlyph referenceId={refId} px={24} />
+                          </span>
+                          <span className="text-center text-[11px] leading-tight text-[#3a3630]">
+                            {label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="mt-2 text-xs text-[#6b635a]">
+                    These are optional visual cues. They do not need to match
+                    your client exactly.
+                  </p>
+                </div>
+
+                <p className="mt-3 text-xs text-[#6b635a]">
+                  Use only images you own or have permission to use.
+                </p>
+              </div>
 
               <input
                 id="avatar-tagline"
@@ -1533,6 +1630,7 @@ export function IdealClientBuilder({
             <ClientAvatarMark
               name={active.name}
               image={active.image}
+              visualReferenceId={active.visualReferenceId}
               size={22}
             />
             Using: {active.name}
@@ -1553,7 +1651,12 @@ export function IdealClientBuilder({
               className="rounded-2xl border border-[#d4cdc3] bg-white/85 p-4"
             >
               <div className="flex items-center gap-3">
-                <ClientAvatarMark name={a.name} image={a.image} size={48} />
+                <ClientAvatarMark
+                  name={a.name}
+                  image={a.image}
+                  visualReferenceId={a.visualReferenceId}
+                  size={48}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-1.5 truncate text-base font-semibold text-[#1f1c19]">
                     {a.name}

@@ -6,7 +6,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { ClientAvatarMark } from "./ClientAvatarMark";
 
-describe("ClientAvatarMark (fallback order + accessibility)", () => {
+describe("ClientAvatarMark (archetype priority + accessibility)", () => {
   let container: HTMLDivElement;
   let root: Root;
 
@@ -25,45 +25,58 @@ describe("ClientAvatarMark (fallback order + accessibility)", () => {
     act(() => root.render(<ClientAvatarMark {...props} />));
   }
 
-  it("shows the uploaded image first, with meaningful name-based alt text", () => {
-    render({ name: "Burned Out Coach", image: "data:image/webp;base64,AAAA", size: 48 });
+  it("shows an uploaded reference image first, with meaningful name-based alt", () => {
+    render({ name: "Coach clients", image: "data:image/webp;base64,AAAA", size: 48 });
     const img = container.querySelector(
       '[data-testid="client-avatar-mark-image"]',
     ) as HTMLImageElement;
     expect(img).toBeTruthy();
-    expect(img.getAttribute("alt")).toBe("Burned Out Coach avatar image");
-    // No fallback shown when an image exists.
-    expect(
-      container.querySelector('[data-testid="client-avatar-mark-initials"]'),
-    ).toBeNull();
+    expect(img.getAttribute("alt")).toBe("Coach clients visual reference");
   });
 
-  it("shows monogram initials when a named avatar has no image (fallback aria-hidden)", () => {
-    render({ name: "Burned Out Coach", size: 48 });
-    const initials = container.querySelector(
-      '[data-testid="client-avatar-mark-initials"]',
+  it("shows the chosen archetype emblem when there is no image (decorative)", () => {
+    render({ name: "Coach clients", visualReferenceId: "coach", size: 48 });
+    const emblem = container.querySelector(
+      '[data-testid="client-avatar-mark-emblem"]',
     );
-    expect(initials).toBeTruthy();
-    expect(initials!.textContent).toBe("BC");
-    expect(initials!.getAttribute("aria-hidden")).toBe("true");
+    expect(emblem).toBeTruthy();
+    expect(emblem!.getAttribute("aria-hidden")).toBe("true");
+    expect(emblem!.querySelector("svg")).toBeTruthy();
     expect(container.querySelector("img")).toBeNull();
   });
 
-  it("shows the estate silhouette for an unnamed avatar (no initials, no emoji)", () => {
+  it("shows the neutral default dossier emblem when there is no image or archetype — even unnamed", () => {
     render({ name: "", size: 48 });
-    const sil = container.querySelector(
-      '[data-testid="client-avatar-mark-silhouette"]',
+    const def = container.querySelector(
+      '[data-testid="client-avatar-mark-default"]',
     );
-    expect(sil).toBeTruthy();
-    expect(sil!.querySelector("svg")).toBeTruthy();
-    expect(sil!.getAttribute("aria-hidden")).toBe("true");
+    expect(def).toBeTruthy();
+    expect(def!.querySelector("svg")).toBeTruthy();
+    // Initials are NOT the default for a named-but-image-less avatar either.
+    render({ name: "Some Named Type", size: 48 });
+    expect(
+      container.querySelector('[data-testid="client-avatar-mark-default"]'),
+    ).toBeTruthy();
+    expect(container.textContent).toBe("");
   });
 
-  it("never renders an emoji as the identity (the component has no emoji input)", () => {
-    // Even a legacy avatar that only had an emoji resolves by name → initials
-    // (or silhouette). The emoji glyph can never appear.
-    render({ name: "Anxious Founder", size: 48 });
+  it("an uploaded image beats a chosen archetype emblem", () => {
+    render({
+      name: "Coach clients",
+      visualReferenceId: "coach",
+      image: "data:image/webp;base64,AAAA",
+      size: 48,
+    });
+    expect(
+      container.querySelector('[data-testid="client-avatar-mark-image"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('[data-testid="client-avatar-mark-emblem"]'),
+    ).toBeNull();
+  });
+
+  it("never renders an emoji as the identity", () => {
+    render({ name: "Anxious Founder", visualReferenceId: "entrepreneur", size: 48 });
     expect(container.textContent).not.toContain("👤");
-    expect(container.textContent).toBe("AF");
   });
 });
