@@ -190,8 +190,8 @@ const STEPS: { key: StepKey; q: string; hint?: string }[] = [
   },
   {
     key: "revenue",
-    q: "Note the revenue from this client type? (optional)",
-    hint: "This just saves a note for yourself — it doesn't track anything yet. It prepares this avatar for revenue features later. When you finish, you'll return to your Client Avatars, where you can review, print, or keep refining anytime.",
+    q: "Revenue Connection for this Client Type",
+    hint: "Use this optional note to record how this type of client connects to your revenue—for example, typical offer, price range, buying frequency, or long-term value. This does not track revenue automatically. It is saved with this Client Avatar for your reference. You can finish without adding this now and return to Step 11 later.",
   },
 ];
 
@@ -1492,7 +1492,7 @@ export function IdealClientBuilder({
             <input
               value={form.revenue ?? ""}
               onChange={(e) => setForm({ ...form, revenue: e.target.value })}
-              placeholder="e.g. ~$2k/mo — or leave blank to skip"
+              placeholder="e.g. typical offer, price range, buying frequency, or long-term value — optional"
               className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             />
           )}

@@ -118,13 +118,13 @@ describe("avatarReportGroups (professional report structure)", () => {
     expect(labels).not.toContain("addedResponses");
   });
 
-  it("includes revenue only when populated", () => {
+  it("includes the Revenue Connection section only when populated", () => {
     expect(
-      avatarReportGroups(full).some((g) => g.heading === "Revenue"),
+      avatarReportGroups(full).some((g) => g.heading === "Revenue Connection"),
     ).toBe(true);
     expect(
       avatarReportGroups({ ...full, revenue: "" }).some(
-        (g) => g.heading === "Revenue",
+        (g) => g.heading === "Revenue Connection",
       ),
     ).toBe(false);
   });

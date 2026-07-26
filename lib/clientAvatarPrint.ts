@@ -209,10 +209,12 @@ export function avatarReportGroups(a: AvatarPrintInput): PrintGroup[] {
     ]),
     group("Step 10 research insights", [...moduleSections, ...customSections]),
   ];
-  // Revenue only when the member noted one.
+  // Revenue Connection only when the member noted one.
   if ((a.revenue ?? "").trim()) {
     groups.push(
-      group("Revenue", [{ label: "Revenue note", value: (a.revenue ?? "").trim() }]),
+      group("Revenue Connection", [
+        { label: "Note", value: (a.revenue ?? "").trim() },
+      ]),
     );
   }
   return groups.filter((g) => g.sections.length);
