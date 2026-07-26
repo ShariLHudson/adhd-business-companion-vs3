@@ -71,7 +71,11 @@ export function WorkspaceStepControls({
           {continueLabel}
         </button>
       </div>
-      <div className="mt-2 h-4 text-right">
+      <div
+        className="mt-2 h-4 text-right"
+        role="status"
+        aria-live="polite"
+      >
         {savedHint && !canSaveProgress ? (
           <span className="text-sm font-medium text-[#1e4f4f]">
             Progress saved.

@@ -570,9 +570,11 @@ export function IdealClientBuilder({
   }
 
   function finish() {
+    // Completed avatars reopen at the top for review — not on the last
+    // (optional) step where "Save and Finish" was clicked.
     const saved: Form = {
       ...form,
-      draftStepKey: STEPS[STEPS.length - 1]?.key,
+      draftStepKey: STEPS[0]?.key,
     } as Form & { draftStepKey?: string };
     const list = saveAvatar(saved);
     const persisted =
@@ -1073,7 +1075,10 @@ export function IdealClientBuilder({
           <ContextualResearchPanel
             open={researchOpen}
             onToggle={() => setResearchOpen((v) => !v)}
-            questionKey={`${form.id ?? "new"}:${current.key}`}
+            // Key on the question only — stable across the id mint on first save
+            // (so saving never wipes an open thread). The panel remounts between
+            // avatars, so this never leaks context across avatars.
+            questionKey={current.key}
             questionLabel={current.q}
             systemPrompt={researchSystemPrompt}
           />

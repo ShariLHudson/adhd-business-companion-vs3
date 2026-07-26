@@ -139,6 +139,9 @@ export function ContextualResearchPanel({
           <div
             ref={scrollRef}
             className="mt-3 flex max-h-72 flex-col gap-3 overflow-y-auto"
+            role="log"
+            aria-live="polite"
+            aria-atomic="false"
           >
             {messages.length === 0 ? (
               <p className="text-sm italic text-[#9a8f82]">
@@ -185,6 +188,7 @@ export function ContextualResearchPanel({
               }}
               rows={2}
               placeholder="Ask about this question…"
+              aria-label={`Ask a research question about: ${questionLabel}`}
               className="min-h-[44px] flex-1 resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               data-testid="research-input"
             />
