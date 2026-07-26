@@ -15,3 +15,11 @@ export const PROJECTS_BACKGROUND_SRC =
 /** My Profile — sunlit writing room; calm, personal, reflective. */
 export const PROFILE_BACKGROUND_SRC =
   "/backgrounds/writing-room-background.png" as const;
+
+/**
+ * Client Avatar / People I Help builder — the ideal-client room. One canonical
+ * source so every entry path (direct `client-avatars` section and the
+ * People I Help panel) paints the same room instead of the estate exterior.
+ */
+export const CLIENT_AVATAR_BACKGROUND_SRC =
+  "/backgrounds/client-avatar-building-background.png" as const;

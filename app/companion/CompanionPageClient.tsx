@@ -377,6 +377,7 @@ import {
   detectClientAvatarExploration,
   isClientAvatarOfferAcceptance,
 } from "@/lib/clientAvatarOffer";
+import { detectBusinessEstateNavIntent } from "@/lib/businessEstateNavIntent";
 import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
@@ -1713,7 +1714,10 @@ import {
   type EstateMenuShellActionId,
   type ProfileEstateRoomId,
 } from "@/lib/growth/profileEstateRooms";
-import { CREATE_BACKGROUND_SRC as CREATIVE_STUDIO_ROOM_BG } from "@/lib/estateExperienceBackgrounds";
+import {
+  CREATE_BACKGROUND_SRC as CREATIVE_STUDIO_ROOM_BG,
+  CLIENT_AVATAR_BACKGROUND_SRC,
+} from "@/lib/estateExperienceBackgrounds";
 import { CELEBRATION_GARDEN_ROOM_BG } from "@/lib/celebrationGarden/celebrationGardenRoom";
 import { STORY_LIBRARY_ROOM_BG } from "@/lib/storyLibrary/storyLibraryRoom";
 import { CAPTURE_MOMENT_ROOM_BG } from "@/lib/captureMoment/captureMomentRoom";
@@ -14781,6 +14785,46 @@ export default function CompanionPageClient() {
       clearUniversalCreationSession();
     }
 
+    // Deterministic Business Estate navigation — "open business builder",
+    // "go to my business estate", "help me work on my business", etc. These
+    // match no capability/direct-command detector and otherwise fall through to
+    // a section-less direct-estate visit that never mounts MyBusinessEstatePanel
+    // (a blank / black screen). Open the focused overlay directly and terminate
+    // before the routing arbiter can pick the broken path. Client Avatar /
+    // People I Help language is handled by the capability recognizer below.
+    if (
+      detectBusinessEstateNavIntent(trimmed) &&
+      !awaitingUserConfirmationRef.current?.active
+    ) {
+      annotateTurnDecision({
+        finalResponseOwner: "business-estate-nav",
+        routeSelected: "my-business-estate",
+        actionExecuted: "open_capability",
+      });
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      openProfileDestinationCore("my-business-estate");
+      const voicedAck = finalizeMemberFacingAssistantText(
+        "Opening your Business Estate.",
+        "business-estate-nav",
+      );
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: voicedAck },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      finishEarlyChatTurn("business-estate-nav");
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     /** Authoritative arbiter — Continuity + intent family + navigation priority. */
     const routedTurn = routeConversationTurn({
       userText: trimmed,
@@ -21978,11 +22022,15 @@ export default function CompanionPageClient() {
               },
               prev,
               {
-                suppressHowToLesson: parkedCreateCompanionDetour,
+                // Outer-scope flag — the block-scoped `parkedCreateCompanionDetour`
+                // is not visible inside this setMessages updater. Referencing it
+                // here threw a ReferenceError that crashed the reducer and blanked
+                // the screen (Defect 1). The Early flag is the in-scope equivalent.
+                suppressHowToLesson: parkedCreateCompanionDetourEarly,
               },
             );
             if (!failSafeReply) return prev;
-            const failSafeOwner = parkedCreateCompanionDetour
+            const failSafeOwner = parkedCreateCompanionDetourEarly
               ? "companion_chat"
               : "local_howto_failsafe";
             const certifiedFailSafe = finalizeMemberFacingAssistantText(
@@ -27200,7 +27248,7 @@ export default function CompanionPageClient() {
             <WorkspaceShell
               assistLabel={getShariAssistLabel("client-avatars")}
               onAskShari={() => openCompanionAssist("client-avatars")}
-              backgroundImage="/backgrounds/client-avatar-building-background.png"
+              backgroundImage={CLIENT_AVATAR_BACKGROUND_SRC}
             >
               <IdealClientBuilder
                 coachKickoff={avatarCoachKickoff}

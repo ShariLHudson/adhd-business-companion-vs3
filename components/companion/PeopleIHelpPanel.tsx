@@ -4,6 +4,7 @@ import { useState } from "react";
 import { IdealClientBuilder } from "@/components/companion/IdealClientBuilder";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { MyBusinessEstateRoomShell } from "@/components/companion/MyBusinessEstateRoomShell";
+import { CLIENT_AVATAR_BACKGROUND_SRC } from "@/lib/estateExperienceBackgrounds";
 import { GetExpertHelpAction } from "@/components/companion/advisory/GetExpertHelpAction";
 import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHelpPanel";
 import { getActiveAvatar } from "@/lib/companionStore";
@@ -37,7 +38,7 @@ export function PeopleIHelpPanel({ onClose }: Props) {
   }
 
   return (
-    <MyBusinessEstateRoomShell>
+    <MyBusinessEstateRoomShell backgroundUrl={CLIENT_AVATAR_BACKGROUND_SRC}>
       <EstateWorkspace
         className="my-business-estate-panel people-i-help-panel"
         onDismissOutside={dismissOutside}
