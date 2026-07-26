@@ -18,6 +18,17 @@ import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { ContextualWorkspaceShell } from "@/components/companion/contextualWorkspace/ContextualWorkspaceShell";
 import { WorkspaceStepControls } from "@/components/companion/contextualWorkspace/WorkspaceStepControls";
 import { ContextualResearchPanel } from "@/components/companion/contextualWorkspace/ContextualResearchPanel";
+import {
+  appendResearchToAnswer,
+  buildAvatarResearchAutoPrompt,
+  buildAvatarResearchSystemPrompt,
+} from "@/lib/clientAvatarResearch";
+import {
+  avatarPrintSections,
+  buildAvatarPrintHtml,
+  isAvatarComplete,
+  type AvatarPrintMode,
+} from "@/lib/clientAvatarPrint";
 import type { WorkspaceFieldId } from "@/lib/workspaceAwareness";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import type { ClientAvatarStepKey } from "@/lib/clientAvatarCoach";
@@ -315,6 +326,7 @@ export function IdealClientBuilder({
   const [aiBusy, setAiBusy] = useState(false);
   const [savedHint, setSavedHint] = useState(false);
   const [researchOpen, setResearchOpen] = useState(false);
+  const [printMenuOpen, setPrintMenuOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const appliedChatFillKey = useRef<number | null>(null);
   const focusTargetRef = useRef<HTMLDivElement | null>(null);
@@ -663,6 +675,90 @@ export function IdealClientBuilder({
     if (nextKey) onStepAdvance?.(nextKey as ClientAvatarStepKey, next);
   }
 
+  /**
+   * Append a chosen research reply into the current question's answer — never
+   * overwriting, marking the draft dirty, staying on the same question, and NOT
+   * auto-saving (the member edits and saves when ready).
+   */
+  function appendToCurrentAnswer(stepKey: StepKey, text: string) {
+    const field: TextFieldKey | "who" | null =
+      stepKey === "who"
+        ? "who"
+        : stepKey === "painPoints" ||
+            stepKey === "goals" ||
+            stepKey === "currentBehavior" ||
+            stepKey === "solution"
+          ? stepKey
+          : null;
+    if (!field) return;
+    setForm((f) => ({
+      ...f,
+      [field]: appendResearchToAnswer(String(f[field] ?? ""), text),
+    }));
+  }
+
+  function printAvatar(mode: AvatarPrintMode) {
+    setPrintMenuOpen(false);
+    if (typeof window === "undefined") return;
+    const cur = STEPS[stepRef.current];
+    const title = form.name?.trim() || "Client Avatar";
+    const printInput = {
+      name: form.name,
+      tagline: form.tagline,
+      emoji: form.emoji,
+      who: form.who,
+      painPoints: form.painPoints,
+      goals: form.goals,
+      currentBehavior: form.currentBehavior,
+      solution: form.solution,
+      behaviorTraits: form.behaviorTraits,
+      motivations: form.motivations,
+      objections: form.objections,
+      triggers: form.triggers,
+      contentPrefs: form.contentPrefs,
+      revenue: form.revenue,
+      research: form.research as Record<string, unknown>,
+    };
+    const stepAnswer = (key: StepKey): string => {
+      switch (key) {
+        case "who":
+          return [form.name, form.who].filter(Boolean).join("\n");
+        case "painPoints":
+          return form.painPoints;
+        case "goals":
+          return form.goals;
+        case "currentBehavior":
+          return form.currentBehavior;
+        case "solution":
+          return form.solution;
+        case "revenue":
+          return form.revenue ?? "";
+        case "behavior":
+          return (form.behaviorTraits ?? []).join(", ");
+        default:
+          return "";
+      }
+    };
+    const { subtitle, sections } =
+      mode === "current" && cur
+        ? {
+            subtitle: "Current Question",
+            sections: [{ label: cur.q, value: stepAnswer(cur.key) }],
+          }
+        : {
+            subtitle:
+              mode === "complete" ? "Complete Client Avatar" : "Progress So Far",
+            sections: avatarPrintSections(printInput),
+          };
+    const html = buildAvatarPrintHtml({ title, subtitle, sections });
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html);
+    w.document.close();
+    w.focus();
+    w.print();
+  }
+
   function onUpload(file: File) {
     const reader = new FileReader();
     reader.onload = () =>
@@ -688,24 +784,32 @@ export function IdealClientBuilder({
               : current.key === "solution"
                 ? form.solution
                 : "";
-    const researchSystemPrompt = [
-      "You are Shari, helping an ADHD founder think through ONE question about",
-      "their ideal client so they can write their own answer, in their own words.",
-      "",
-      `The question: "${current.q}"`,
-      form.name ? `Client name/label: ${form.name}` : "",
-      form.who ? `Who they help: ${form.who}` : "",
-      researchAnswer
-        ? `Their current draft answer: "${researchAnswer}"`
-        : "Their current draft answer: (empty so far)",
-      "",
-      "Help them explore and think it through: ask one gentle clarifying question,",
-      "offer a few concrete angles or examples, and suggest possible wording they",
-      "could adapt. Keep replies short, warm, and concrete. Do NOT write the whole",
-      "answer for them or call it final — they copy anything useful into their own",
-      "answer field. Never mention menus, tools, the Chamber, or the Board. Stay",
-      "entirely on this one question.",
-    ].join("\n");
+    // Relevant prior answers to ground the research (exclude the active one).
+    const researchPriors = (
+      [
+        ["Who they help", form.who],
+        ["What they're struggling with", form.painPoints],
+        ["What they're trying to achieve", form.goals],
+        ["What holds them back", form.currentBehavior],
+      ] as Array<[string, string]>
+    )
+      .filter(([, v]) => v.trim())
+      .map(([label, value]) => ({ label, value }));
+    const researchContext = {
+      questionLabel: current.q,
+      currentAnswer: researchAnswer,
+      priorAnswers: researchPriors,
+      avatarName: form.name,
+    };
+    const researchSystemPrompt = buildAvatarResearchSystemPrompt(researchContext);
+    const researchAutoPrompt = buildAvatarResearchAutoPrompt(researchContext);
+    const avatarComplete = isAvatarComplete({
+      name: form.name,
+      who: form.who,
+      painPoints: form.painPoints,
+      goals: form.goals,
+      solution: form.solution,
+    });
     return (
       <ContextualWorkspaceShell>
         {destinationKicker ? (
@@ -731,9 +835,64 @@ export function IdealClientBuilder({
           <p className="text-sm font-medium text-[#9a8f82]">
             Step {step + 1} of {STEPS.length}
           </p>
-          <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[#1e4f4f]">
-            {STEP_NAV[current.key]}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[#1e4f4f]">
+              {STEP_NAV[current.key]}
+            </span>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setPrintMenuOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={printMenuOpen}
+                className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-white"
+                data-testid="avatar-print-toggle"
+              >
+                🖨 Print ▾
+              </button>
+              {printMenuOpen ? (
+                <div
+                  role="menu"
+                  className="absolute right-0 z-20 mt-1 w-64 rounded-xl border border-[#d4cdc3] bg-white p-1 shadow-lg"
+                >
+                  <button
+                    role="menuitem"
+                    type="button"
+                    onClick={() => printAvatar("current")}
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[#2d2926] hover:bg-[#1e4f4f]/8"
+                    data-testid="print-current-question"
+                  >
+                    Print Current Question
+                  </button>
+                  <button
+                    role="menuitem"
+                    type="button"
+                    onClick={() => printAvatar("progress")}
+                    className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[#2d2926] hover:bg-[#1e4f4f]/8"
+                    data-testid="print-progress"
+                  >
+                    Print Progress So Far
+                  </button>
+                  {avatarComplete ? (
+                    <button
+                      role="menuitem"
+                      type="button"
+                      onClick={() => printAvatar("complete")}
+                      className="block w-full rounded-lg px-3 py-2 text-left text-sm text-[#2d2926] hover:bg-[#1e4f4f]/8"
+                      data-testid="print-complete"
+                    >
+                      Print Complete Client Avatar
+                    </button>
+                  ) : (
+                    <span className="block px-3 py-2 text-left text-xs italic text-[#9a8f82]">
+                      Print Complete Client Avatar — finish the key questions
+                      first
+                    </span>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          </div>
         </div>
         <p className="mt-2 text-2xl font-semibold leading-snug text-[#1f1c19]">
           {current.q}
@@ -1081,6 +1240,8 @@ export function IdealClientBuilder({
             questionKey={current.key}
             questionLabel={current.q}
             systemPrompt={researchSystemPrompt}
+            autoPrompt={researchAutoPrompt}
+            onAddToAnswer={(text) => appendToCurrentAnswer(current.key, text)}
           />
         ) : null}
 

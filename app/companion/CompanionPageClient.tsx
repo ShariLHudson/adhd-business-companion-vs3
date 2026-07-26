@@ -25536,11 +25536,6 @@ export default function CompanionPageClient() {
                   <HomeChatInputFooter
                     welcomeHome
                     homeCalm={false}
-                    className={
-                      todaysWelcomeOpening
-                        ? "todays-welcome-card__input-secondary"
-                        : undefined
-                    }
                     homeChatPlaceholder={
                       todaysWelcomeOpening
                         ? GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER
@@ -27246,8 +27241,7 @@ export default function CompanionPageClient() {
 
           {activeSection === "client-avatars" && (
             <WorkspaceShell
-              assistLabel={getShariAssistLabel("client-avatars")}
-              onAskShari={() => openCompanionAssist("client-avatars")}
+              showAssist={false}
               backgroundImage={CLIENT_AVATAR_BACKGROUND_SRC}
             >
               <IdealClientBuilder

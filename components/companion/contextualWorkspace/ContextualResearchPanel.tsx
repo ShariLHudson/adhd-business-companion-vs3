@@ -8,30 +8,52 @@ import { useEffect, useRef, useState } from "react";
  *
  * Part of the Contextual Workspace pattern (see ./README.md). It never
  * navigates, never opens split chat, and never routes to Chamber / Board — it
- * is simply a scoped conversation tied to one question. The member reads the
- * assistant's help and copies whatever wording they like into their own answer
- * field. There is no automatic insertion in this phase, by design.
+ * is a scoped conversation tied to one question.
  *
- * Reuse: any builder (Client Avatar today; Business Estate, Projects,
- * Marketing, Decision Compass later) passes a `questionKey` (resets the thread
- * when the active question changes), a human `questionLabel`, and a scoped
- * `systemPrompt`.
+ * Behavior:
+ * - When opened for a question, it automatically researches that question once
+ *   per workspace session (built from context via `autoPrompt`), so the member
+ *   never has to retype the question. The initial request is sent but not shown
+ *   as a member-authored message; a calm "Researching this question…" state
+ *   shows instead.
+ * - After each useful reply, it offers Add to Answer / Keep Researching / Not
+ *   Now. Add to Answer appends only that reply to the member's answer (via
+ *   `onAddToAnswer`) — never the whole conversation, never overwriting.
+ * - Threads are per-question: reopening the same question preserves the
+ *   conversation; a new question gets a fresh thread and its own auto-research.
+ * - On failure it stays open with a calm error + Try Again, and never offers
+ *   Add to Answer for an error.
+ *
+ * Reuse: any builder passes `questionKey` (identity of the active question),
+ * `questionLabel`, a scoped `systemPrompt`, an `autoPrompt`, and `onAddToAnswer`.
  */
 
-type ResearchMessage = { role: "user" | "assistant"; content: string };
+type ResearchMessage = {
+  role: "user" | "assistant";
+  content: string;
+  /** Auto-research request — sent to the model but not rendered. */
+  hidden?: boolean;
+  /** A failure notice — offers Try Again, never Add to Answer. */
+  error?: boolean;
+};
+
+const CALM_ERROR =
+  "I couldn't reach research just now. Your answer is safe — you can try again.";
 
 export type ContextualResearchPanelProps = {
   open: boolean;
   onToggle: () => void;
-  /** Changing this resets the conversation — research is per-question. */
+  /** Identity of the active question — threads are scoped to this. */
   questionKey: string;
   /** The active question, shown as the conversation's anchor. */
   questionLabel: string;
-  /** Scoped system prompt (avatar + question context) for the assistant. */
+  /** Scoped system prompt (question + answer + prior context). */
   systemPrompt: string;
-  /** Optional label for the expander. */
+  /** Auto first request, sent (hidden) the first time this question opens. */
+  autoPrompt?: string;
+  /** Append the given reply into the member's answer for this question. */
+  onAddToAnswer?: (text: string) => void;
   toggleLabel?: string;
-  /** Optional helper text under the toggle. */
   helperText?: string;
 };
 
@@ -41,75 +63,111 @@ export function ContextualResearchPanel({
   questionKey,
   questionLabel,
   systemPrompt,
+  autoPrompt,
+  onAddToAnswer,
   toggleLabel = "Research This Question",
-  helperText = "Explore this question, think it through with Shari, and copy anything useful into your answer.",
+  helperText = "Shari researches this question for you. Read along, keep asking, and add anything useful to your answer.",
 }: ContextualResearchPanelProps) {
-  const [messages, setMessages] = useState<ResearchMessage[]>([]);
+  // Per-question threads so navigating between questions keeps each thread.
+  const [threads, setThreads] = useState<Record<string, ResearchMessage[]>>({});
   const [input, setInput] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [acted, setActed] = useState<Record<string, "added" | "dismissed">>({});
+  const threadsRef = useRef(threads);
+  threadsRef.current = threads;
+  const autoRanRef = useRef<Set<string>>(new Set());
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Research is scoped to the active question — start fresh when it changes.
+  const messages = threads[questionKey] ?? [];
+  const busy = busyKey === questionKey;
+  const visible = messages.filter((m) => !(m.role === "user" && m.hidden));
+
+  // Fresh input line per question.
   useEffect(() => {
-    setMessages([]);
     setInput("");
-    setCopiedIdx(null);
   }, [questionKey]);
 
   useEffect(() => {
     if (open && scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, open]);
+  }, [threads, open, busyKey]);
 
-  async function send() {
-    const text = input.trim();
-    if (!text || busy) return;
-    const nextMessages: ResearchMessage[] = [
-      ...messages,
-      { role: "user", content: text },
-    ];
-    setMessages(nextMessages);
-    setInput("");
-    setBusy(true);
+  // Auto-research once per question, the first time its panel is open.
+  useEffect(() => {
+    if (!open || !autoPrompt) return;
+    if (autoRanRef.current.has(questionKey)) return;
+    autoRanRef.current.add(questionKey);
+    void runRequest(questionKey, autoPrompt, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, autoPrompt, questionKey]);
+
+  async function complete(qk: string, thread: ResearchMessage[]) {
+    setBusyKey(qk);
     try {
       const res = await fetch("/api/companion-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: nextMessages,
+          messages: thread.map((m) => ({ role: m.role, content: m.content })),
           talkItOutShariEngine: true,
           systemPromptOverride: systemPrompt,
         }),
       });
       const data = await res.json();
       const reply =
-        typeof data.message === "string" && data.message.trim()
-          ? data.message.trim()
-          : "I'm having trouble reaching that right now — try again in a moment.";
-      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+        typeof data.message === "string" ? data.message.trim() : "";
+      if (!reply) throw new Error("empty");
+      setThreads((t) => ({
+        ...t,
+        [qk]: [...(t[qk] ?? thread), { role: "assistant", content: reply }],
+      }));
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "I couldn't reach that just now. Your answer above is safe — try again in a moment.",
-        },
-      ]);
+      setThreads((t) => ({
+        ...t,
+        [qk]: [
+          ...(t[qk] ?? thread),
+          { role: "assistant", content: CALM_ERROR, error: true },
+        ],
+      }));
     }
-    setBusy(false);
+    setBusyKey((k) => (k === qk ? null : k));
   }
 
-  async function copy(text: string, idx: number) {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedIdx(idx);
-      window.setTimeout(() => setCopiedIdx((v) => (v === idx ? null : v)), 1600);
-    } catch {
-      /* clipboard blocked — the text is selectable, so the member can copy it manually */
-    }
+  function runRequest(qk: string, text: string, hidden: boolean) {
+    const userMsg: ResearchMessage = { role: "user", content: text, hidden };
+    const projected = [...(threadsRef.current[qk] ?? []), userMsg];
+    setThreads((t) => ({ ...t, [qk]: [...(t[qk] ?? []), userMsg] }));
+    return complete(qk, projected);
+  }
+
+  function submitFollowUp() {
+    const text = input.trim();
+    if (!text || busy) return;
+    setInput("");
+    void runRequest(questionKey, text, false);
+  }
+
+  function retry() {
+    const cur = threadsRef.current[questionKey] ?? [];
+    const trimmed = cur[cur.length - 1]?.error ? cur.slice(0, -1) : cur;
+    setThreads((t) => ({ ...t, [questionKey]: trimmed }));
+    void complete(questionKey, trimmed);
+  }
+
+  function actKey(idx: number) {
+    return `${questionKey}#${idx}`;
+  }
+
+  function addToAnswer(idx: number, text: string) {
+    onAddToAnswer?.(text);
+    setActed((a) => ({ ...a, [actKey(idx)]: "added" }));
+  }
+
+  function dismiss(idx: number, focus: boolean) {
+    setActed((a) => ({ ...a, [actKey(idx)]: "dismissed" }));
+    if (focus) inputRef.current?.focus();
   }
 
   return (
@@ -138,63 +196,103 @@ export function ContextualResearchPanel({
 
           <div
             ref={scrollRef}
-            className="mt-3 flex max-h-72 flex-col gap-3 overflow-y-auto"
+            className="mt-3 flex max-h-80 flex-col gap-3 overflow-y-auto"
             role="log"
             aria-live="polite"
             aria-atomic="false"
           >
-            {messages.length === 0 ? (
-              <p className="text-sm italic text-[#9a8f82]">
-                Ask anything about this — for examples, angles, or how to word it.
-                I&apos;ll help you think; you keep the pen.
-              </p>
-            ) : null}
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={
-                  m.role === "user"
-                    ? "self-end rounded-2xl bg-[#1e4f4f] px-3 py-2 text-sm text-white"
-                    : "self-start rounded-2xl bg-white px-3 py-2 text-sm leading-relaxed text-[#2d2926] shadow-sm"
-                }
-                style={{ maxWidth: "90%" }}
-              >
-                <p className="whitespace-pre-wrap">{m.content}</p>
-                {m.role === "assistant" ? (
-                  <button
-                    type="button"
-                    onClick={() => copy(m.content, i)}
-                    className="mt-1.5 rounded-md px-2 py-0.5 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
-                  >
-                    {copiedIdx === i ? "Copied ✓" : "Copy"}
-                  </button>
-                ) : null}
-              </div>
-            ))}
+            {visible.map((m, i) => {
+              // Map back to the real index for per-message action state.
+              const realIdx = messages.indexOf(m);
+              const state = acted[actKey(realIdx)];
+              return (
+                <div
+                  key={realIdx}
+                  className={
+                    m.role === "user"
+                      ? "self-end rounded-2xl bg-[#1e4f4f] px-3 py-2 text-sm text-white"
+                      : m.error
+                        ? "self-start rounded-2xl border border-[#a85c4a]/30 bg-[#fdf3f0] px-3 py-2 text-sm text-[#7a3b2c]"
+                        : "self-start rounded-2xl bg-white px-3 py-2 text-sm leading-relaxed text-[#2d2926] shadow-sm"
+                  }
+                  style={{ maxWidth: "92%" }}
+                >
+                  <p className="whitespace-pre-wrap">{m.content}</p>
+                  {m.role === "assistant" && m.error ? (
+                    <button
+                      type="button"
+                      onClick={retry}
+                      className="mt-2 rounded-md bg-[#1e4f4f] px-3 py-1 text-xs font-semibold text-white hover:bg-[#163a3a]"
+                      data-testid="research-try-again"
+                    >
+                      Try Again
+                    </button>
+                  ) : null}
+                  {m.role === "assistant" && !m.error ? (
+                    state === "added" ? (
+                      <p className="mt-1.5 text-xs font-semibold text-[#1e4f4f]">
+                        Added to your answer ✓
+                      </p>
+                    ) : state === "dismissed" ? null : (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => addToAnswer(realIdx, m.content)}
+                          className="rounded-md bg-[#1e4f4f] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#163a3a]"
+                          data-testid="research-add-to-answer"
+                        >
+                          Add to Answer
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => dismiss(realIdx, true)}
+                          className="rounded-md px-2.5 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+                          data-testid="research-keep-researching"
+                        >
+                          Keep Researching
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => dismiss(realIdx, false)}
+                          className="rounded-md px-2.5 py-1 text-xs font-semibold text-[#6b635a] hover:bg-[#1e4f4f]/10"
+                        >
+                          Not Now
+                        </button>
+                      </div>
+                    )
+                  ) : null}
+                </div>
+              );
+            })}
             {busy ? (
-              <p className="self-start text-sm italic text-[#9a8f82]">Thinking…</p>
+              <p className="self-start text-sm italic text-[#9a8f82]">
+                {visible.some((m) => m.role === "assistant")
+                  ? "Thinking…"
+                  : "Researching this question…"}
+              </p>
             ) : null}
           </div>
 
           <div className="mt-3 flex items-end gap-2">
             <textarea
+              ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
-                  void send();
+                  submitFollowUp();
                 }
               }}
               rows={2}
-              placeholder="Ask about this question…"
-              aria-label={`Ask a research question about: ${questionLabel}`}
+              placeholder="Ask a follow-up…"
+              aria-label={`Ask a follow-up research question about: ${questionLabel}`}
               className="min-h-[44px] flex-1 resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               data-testid="research-input"
             />
             <button
               type="button"
-              onClick={() => void send()}
+              onClick={submitFollowUp}
               disabled={busy || !input.trim()}
               className="shrink-0 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
             >

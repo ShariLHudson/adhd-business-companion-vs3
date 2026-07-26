@@ -300,6 +300,10 @@ export function WelcomeHomePage({
             thread={thread}
             footer={footer}
             conversationScrollKey={conversationScrollKey}
+            // Welcome Home stays conversational-first: the chat composer is
+            // always available beside the welcome card + suggestion cards, so a
+            // member can type a request without first choosing a card.
+            alwaysShowInput
           />
         ) : null}
       </div>
