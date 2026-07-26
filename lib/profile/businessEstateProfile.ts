@@ -1,6 +1,18 @@
 /**
  * My Business Estate — structured profile sections in companion-business-profile-v1.
  * Extends the existing key; does not create a duplicate store.
+ *
+ * COMPATIBILITY BOUNDARY (canonical vs. legacy) — BINDING:
+ * - The estate envelope (the `estate` field written by this module) is the
+ *   single canonical source of truth for the Business Profile.
+ * - All new Business Profile work reads from and writes to the estate envelope.
+ * - The legacy flat BusinessProfile shape (role/sells/goals/tone in
+ *   companionStore) is a DERIVED MIRROR only — kept in sync downstream from the
+ *   envelope for backward compatibility with older consumers. It is temporary.
+ * - No new feature may treat the legacy shape as canonical.
+ * - Do not perform a destructive migration or remove the legacy mirror until
+ *   every downstream consumer of the legacy shape has been migrated to the
+ *   envelope and verified.
  */
 import {
   getBusinessProfile,
@@ -34,6 +46,9 @@ export type BusinessEstateIdentity = {
   mission: string;
   vision: string;
   coreValues: string;
+  /** Optional business image / logo (data URL). NOT the user's personal profile
+   * image (prefs.profileImage) and NOT a Client Avatar image. */
+  businessImage: string;
 };
 
 export type BusinessEstateOffers = {
@@ -47,6 +62,11 @@ export type BusinessEstateOffers = {
   offersInDevelopment: string;
   problemsSolved: string;
   outcomesCreated: string;
+  /** Business-level pricing / price ranges (distinct from a Client Avatar's
+   * optional Revenue Connection note). */
+  pricing: string;
+  /** Primary revenue sources (recurring vs one-time, main earners). */
+  revenueSources: string;
 };
 
 export type BusinessEstateBrand = {
@@ -127,6 +147,7 @@ const EMPTY_IDENTITY: BusinessEstateIdentity = {
   mission: "",
   vision: "",
   coreValues: "",
+  businessImage: "",
 };
 
 const EMPTY_OFFERS: BusinessEstateOffers = {
@@ -140,6 +161,8 @@ const EMPTY_OFFERS: BusinessEstateOffers = {
   offersInDevelopment: "",
   problemsSolved: "",
   outcomesCreated: "",
+  pricing: "",
+  revenueSources: "",
 };
 
 const EMPTY_BRAND: BusinessEstateBrand = {
@@ -493,6 +516,15 @@ export function summarizeBusinessEstateSection(
   }
 }
 
+/**
+ * Backward-compatibility mirror: derive the legacy flat BusinessProfile shape
+ * FROM the canonical estate envelope. This is a one-way, envelope → legacy
+ * projection so older code paths that still read getBusinessProfile() keep
+ * working. It is NOT a second source of truth — never edit the legacy shape
+ * directly for new work, and never treat it as canonical (see the compatibility
+ * boundary at the top of this file). Remove only after downstream consumers are
+ * migrated to the envelope and verified.
+ */
 function syncLegacyBusinessProfile(
   sections: BusinessEstateSections,
   approval: BusinessEstateFieldApproval,
