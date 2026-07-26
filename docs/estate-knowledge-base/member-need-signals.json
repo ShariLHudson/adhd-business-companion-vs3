@@ -11,6 +11,34 @@
   "toneValues": ["recovery", "clarity", "creation", "celebration", "connection", "rest", "focus", "exploration"],
   "signals": [
     {
+      "signalId": "define-ideal-customer",
+      "label": "Figuring out their ideal customer",
+      "memberMaySay": [
+        "I need help figuring out who my ideal customer is",
+        "who do I help?",
+        "who should I serve?",
+        "help me define my target audience",
+        "I need to create a customer persona",
+        "can you help me build my client avatar?"
+      ],
+      "keywords": [
+        "ideal customer",
+        "ideal client",
+        "client avatar",
+        "customer avatar",
+        "customer persona",
+        "buyer persona",
+        "target audience",
+        "target customer",
+        "who do i help",
+        "who do i serve",
+        "people i help",
+        "people i serve"
+      ],
+      "emotionalTone": "clarity",
+      "status": "Live"
+    },
+    {
       "signalId": "mental-overload",
       "label": "Mental overload",
       "memberMaySay": [

@@ -28,6 +28,9 @@ function inferSectionFromAssistantOffer(assistantText: string): AppSection | nul
   if (/\bclear my mind\b/.test(t)) return "brain-dump";
   if (/\bmomentum builder\b/.test(t)) return "momentum-builder";
   if (/\bjournal\b/.test(t)) return "growth-journal";
+  if (/\b(?:client avatar(?:s| builder)?|people i help)\b/.test(t)) {
+    return "client-avatars";
+  }
   return null;
 }
 

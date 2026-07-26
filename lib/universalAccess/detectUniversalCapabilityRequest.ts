@@ -185,8 +185,13 @@ const RULES: readonly Rule[] = [
     id: "client-avatars",
     section: "client-avatars",
     nav: "create",
+    // Explicit NAVIGATION commands only ("open the Client Avatar Builder",
+    // "take me to People I Help", "go to my client avatars", "start the Client
+    // Avatar Builder"). The navigation verb is embedded so soft/build phrasing
+    // ("build my client avatar", "ideal customer", "who do I help") does NOT
+    // immediate-open — that is handled by the deterministic Client Avatar offer.
     pattern:
-      /\b(?:client avatars?|ideal client|open (?:my )?(?:icp|client avatar))\b/i,
+      /\b(?:open|start|launch|show me|take me to|go to|bring me to)\s+(?:the\s+|my\s+)?(?:client avatars?|client avatar builder|people i (?:help|serve)|icp)\b/i,
     ackSeed: 0,
   },
   {

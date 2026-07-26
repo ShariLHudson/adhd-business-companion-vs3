@@ -24,6 +24,7 @@ export const SECTION_TO_ESTATE_ENTRY: Partial<Record<AppSection, string>> = {
   "content-generator": "creative-studio",
   "decision-compass": "decision-compass",
   "growth-journal": "journal",
+  "client-avatars": "client-avatar",
   "stables": "stables",
 };
 

@@ -101,9 +101,17 @@ export function ProfileDestinationHost({
 
   return createPortal(
     <div
-      className="profile-destination-host"
+      className="profile-destination-host bg-cover bg-center bg-no-repeat"
       data-testid="profile-destination-host"
       data-profile-destination={canonical}
+      style={
+        canonical === "my-business-estate"
+          ? {
+              backgroundImage:
+                'url("/backgrounds/business-builder-background.png")',
+            }
+          : undefined
+      }
       role="dialog"
       aria-modal="true"
       aria-label={profileDestinationTitle(canonical)}

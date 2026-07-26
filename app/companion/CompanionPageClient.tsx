@@ -373,6 +373,11 @@ import {
 } from "@/lib/conversationSession";
 import { resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
+  buildClientAvatarWorkspaceOffer,
+  detectClientAvatarExploration,
+  isClientAvatarOfferAcceptance,
+} from "@/lib/clientAvatarOffer";
+import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
   TODAY_PLAN_LATER_MESSAGE,
@@ -8696,30 +8701,48 @@ export default function CompanionPageClient() {
     applyWorkspaceFocus(field ?? opener.focusField);
   }
 
-  function startClientAvatarBuilderKickoff() {
-    companionReturnSectionRef.current = "client-avatars";
-    setWorkspaceFirstSplit(false);
-    applyChatLayoutMode("split");
-    setCompanionStandaloneSection(null);
-    if (workspacePanel !== "client-avatars") {
-      patchWorkspacePanel("client-avatars");
-    }
-    setActiveNav(navForWorkspaceSection("client-avatars") ?? activeNav);
-    setActiveSection("home");
-    revealWorkspace();
-
+  /**
+   * Builder initialization ONLY — kickoff / coach / draft / progress state.
+   * No workspace layout, ownership, or global chat navigation.
+   *
+   * Canonical rule for guided workspaces: workspace initialization ≠ global
+   * companion navigation. "+ New Avatar" from inside the focused Client Avatar
+   * workspace uses this directly, so Question 1 renders in Audience Profile and
+   * the member never perceives leaving Client Avatars.
+   */
+  function initClientAvatarBuilderKickoff() {
     setAvatarCoachActive(true);
     setBuilderKickoffActive(true);
     setAvatarCoachKickoff(Date.now());
     avatarTaglineOptionsRef.current = [];
     workspaceCoachSeededRef.current = `client-avatars:kickoff:${Date.now()}`;
-
-    beginWorkspaceChat(
-      { section: "client-avatars" },
-      resolveWorkspaceOpener("client-avatars"),
-    );
     applyWorkspaceFocus("avatar-name");
-    requestChatInputFocus();
+  }
+
+  /**
+   * Enter the Client Avatar workspace from ELSEWHERE, then initialize the
+   * builder. Layout / navigation is touched only on a genuine cross-workspace
+   * entry — never when already inside the focused Client Avatar experience.
+   */
+  function startClientAvatarBuilderKickoff() {
+    companionReturnSectionRef.current = "client-avatars";
+    if (activeSectionRef.current !== "client-avatars") {
+      setWorkspaceFirstSplit(false);
+      applyChatLayoutMode("split");
+      setCompanionStandaloneSection(null);
+      if (workspacePanel !== "client-avatars") {
+        patchWorkspacePanel("client-avatars");
+      }
+      setActiveNav(navForWorkspaceSection("client-avatars") ?? activeNav);
+      setActiveSection("home");
+      revealWorkspace();
+      beginWorkspaceChat(
+        { section: "client-avatars" },
+        resolveWorkspaceOpener("client-avatars"),
+      );
+      requestChatInputFocus();
+    }
+    initClientAvatarBuilderKickoff();
   }
 
   function openCompanionAssist(
@@ -11714,7 +11737,7 @@ export default function CompanionPageClient() {
         openBeside("templates-library");
         break;
       case "client-avatars":
-        openBeside("client-avatars");
+        openStandaloneFocusSectionCore("client-avatars");
         break;
       case "momentum-games":
         openStandaloneFocusSectionCore("quick-recharge");
@@ -14523,8 +14546,19 @@ export default function CompanionPageClient() {
         true,
     );
 
+    // Capture an active Client Avatar offer before the confirmation gate can
+    // clear it, so natural acceptance ("go" / "that sounds good") still opens
+    // the builder on the acceptance turn.
+    const pendingClientAvatarOffer =
+      awaitingUserConfirmationRef.current?.active &&
+      awaitingUserConfirmationRef.current.workspaceOffer?.section ===
+        "client-avatars"
+        ? awaitingUserConfirmationRef.current.workspaceOffer
+        : null;
     const confirmationReply =
-      isConfirmationAcceptance(trimmed) || isConfirmationDecline(trimmed);
+      isConfirmationAcceptance(trimmed) ||
+      isConfirmationDecline(trimmed) ||
+      Boolean(pendingClientAvatarOffer && isClientAvatarOfferAcceptance(trimmed));
     if (!confirmationReply) {
       setAwaitingUserConfirmation(null);
     }
@@ -14544,6 +14578,27 @@ export default function CompanionPageClient() {
     const chatTurnState = createChatTurnState();
     markChatTurnStarted(chatTurnState);
     activeChatTurnLifecycleRef.current = chatTurnState;
+
+    // Accept an active Client Avatar offer with natural language → open the
+    // builder via the existing workspace-offer acceptance seam.
+    if (
+      pendingClientAvatarOffer &&
+      isClientAvatarOfferAcceptance(trimmed) &&
+      !isConfirmationDecline(trimmed)
+    ) {
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      setAwaitingUserConfirmation(null);
+      setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
+      setInput("");
+      voiceUsedRef.current = false;
+      markAssistantReplied(chatTurnState);
+      acceptWorkspaceOffer(pendingClientAvatarOffer);
+      finishEarlyChatTurn("client_avatar_offer_accept");
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
 
     /**
      * Hard Create exit — must run before Continuity / intent-workflow clear UC.
@@ -15027,6 +15082,54 @@ export default function CompanionPageClient() {
         finishLatencyTurn({ localReply: true });
         return;
       }
+    }
+
+    // Deterministic Client Avatar offer — MUST run regardless of continuity
+    // locks so exploratory ideal-customer / audience language always wins the
+    // turn. This is terminal: it renders the offer, marks the turn replied, and
+    // returns before the LLM / answer-first failsafe can run or overwrite it.
+    // (Explicit nav commands already immediate-opened above via the capability
+    // recognizer, so they never reach here.)
+    if (
+      detectClientAvatarExploration(trimmed) &&
+      !awaitingUserConfirmationRef.current?.active &&
+      !pendingCreateOpen &&
+      !loadUniversalCreationSession() &&
+      workspacePanel !== "client-avatars"
+    ) {
+      const offer = buildClientAvatarWorkspaceOffer();
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      setWorkspaceOffer(offer);
+      registerPendingAcceptance("workspace", offer.buttonLabel);
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: offer.line,
+          offeredAtTurn: chatTurnRef.current,
+          kind: "workspace",
+          workspaceOffer: offer,
+        }),
+      );
+      const voicedOffer = finalizeMemberFacingAssistantText(
+        offer.line,
+        "client_avatar_offer",
+      );
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: voicedOffer },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      markAssistantReplied(chatTurnState);
+      finishEarlyChatTurn("client_avatar_offer");
+      finishLatencyTurn({ localReply: true });
+      return;
     }
 
     /**
@@ -22683,6 +22786,11 @@ export default function CompanionPageClient() {
       openDecisionCompass();
       return;
     }
+    if (offer.section === "client-avatars") {
+      noteWorkspaceOpened("client-avatars", "estate_offer");
+      openStandaloneFocusSectionCore("client-avatars");
+      return;
+    }
     if (offer.section === "focus-audio") {
       const directVisit = directEstateVisitRef.current;
       if (directVisit?.roomId === "peaceful-places") {
@@ -23566,7 +23674,7 @@ export default function CompanionPageClient() {
             focusStamp={workspaceFocusStamp}
             chatFieldFill={workspaceChatFill}
             coachKickoff={avatarCoachKickoff}
-            onStartNew={startClientAvatarBuilderKickoff}
+            onStartNew={initClientAvatarBuilderKickoff}
             onContextChange={handleWorkspaceDetailChange}
             onCoachSnapshot={(snapshot) => {
               avatarBuilderSnapshotRef.current = snapshot;
@@ -27054,10 +27162,11 @@ export default function CompanionPageClient() {
             <WorkspaceShell
               assistLabel={getShariAssistLabel("client-avatars")}
               onAskShari={() => openCompanionAssist("client-avatars")}
+              backgroundImage="/backgrounds/client-avatar-building-background.png"
             >
               <IdealClientBuilder
                 coachKickoff={avatarCoachKickoff}
-                onStartNew={startClientAvatarBuilderKickoff}
+                onStartNew={initClientAvatarBuilderKickoff}
                 chatFieldFill={workspaceChatFill}
                 focusField={workspaceFocusField}
                 focusStamp={workspaceFocusStamp}

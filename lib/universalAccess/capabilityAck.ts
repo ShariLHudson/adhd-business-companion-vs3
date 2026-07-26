@@ -22,7 +22,7 @@ const CAPABILITY_ACK: Record<UniversalCapabilityId, string> = {
   strategies: "Opening Strategies.",
   "saved-work": "Opening your saved work.",
   templates: "Opening templates.",
-  "client-avatars": "Opening Client Avatars.",
+  "client-avatars": "Opening the Client Avatar Builder — I'll guide you one question at a time and save your answers in People I Help.",
   "momentum-games": "Opening Momentum Games.",
   "spin-wheel": "Let's give it a spin.",
 };
