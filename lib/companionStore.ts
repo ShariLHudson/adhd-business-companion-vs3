@@ -1362,6 +1362,31 @@ export function businessContextSummary(avatarId?: string): string | undefined {
 
 // Level 3 — optional "Research Mode" depth. Every field is optional; beginners
 // stay simple, advanced users go deep. Folded into AI context when present.
+/** One message in a persistent research thread. `id` is the canonical, stable
+ * reference used for accumulation and duplicate-prevention (never text compare). */
+export type ResearchThreadMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  hidden?: boolean; // auto-research request — sent to the model, not rendered
+  error?: boolean; // a failure notice — offers Try Again, never Add
+};
+
+/** A persistent, per-question / per-area research conversation. */
+export type ResearchThread = {
+  messages: ResearchThreadMessage[];
+  updatedAt: string;
+};
+
+/**
+ * A custom research field. `id` is permanent (minted on create) so research
+ * threads survive reorder / insert / delete / rename — never keyed by index.
+ */
+export type CustomResearchField = { id: string; label: string; value: string };
+
+/** Current research schema version (for forward-compatible normalization). */
+export const AVATAR_RESEARCH_VERSION = 1;
+
 export type AvatarResearch = {
   behavioral?: string; // stress reaction, procrastination, decision habits
   motivation?: string; // urgency vs calm, reward sensitivity, fear vs growth
@@ -1369,8 +1394,33 @@ export type AvatarResearch = {
   communication?: string; // short vs detailed, emotional vs logical
   market?: string; // AI-generated industry/objection/content patterns
   notes?: string; // user's own observations about this client type
-  custom?: { label: string; value: string }[]; // experiments, content ideas…
+  custom?: CustomResearchField[]; // experiments, content ideas…
+  // ---- Phase 2 research notebook — persistent, and deliberately NOT part of
+  // the printable answers (only research the member intentionally adds to an
+  // answer/area is printed). Threads travel with the avatar object. ----
+  /** Per-key conversation threads (key = question key or `research:custom:<id>`). */
+  threads?: Record<string, ResearchThread>;
+  /** Optional per-thread summaries (reserved; not populated yet). */
+  summaries?: Record<string, string>;
+  /** Canonical IDs of assistant responses already appended to an answer. */
+  addedResponses?: string[];
+  /** Per-thread last-researched ISO timestamp (drives "Continue Research"). */
+  lastResearched?: Record<string, string>;
+  /** Schema version for normalization. */
+  version?: number;
 };
+
+/** The research keys that hold printable answer content (everything else in
+ * AvatarResearch — threads/summaries/addedResponses/lastResearched/version — is
+ * notebook metadata and must never appear in the printed report). */
+export const PRINTABLE_RESEARCH_MODULE_KEYS = [
+  "behavioral",
+  "motivation",
+  "buying",
+  "communication",
+  "market",
+  "notes",
+] as const;
 
 export type IdealClientAvatar = {
   id: string;

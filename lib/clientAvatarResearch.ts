@@ -66,37 +66,44 @@ export function appendResearchToAnswer(existing: string, addition: string): stri
 
 /**
  * Client Avatar Step 10 research is scoped per area. An area key is either a
- * research-module key (e.g. "behavioral") or a custom field addressed by index
- * ("custom:2"). These helpers keep that routing pure so the builder stays thin
- * and "Add to This Area" is guaranteed append-only, per area, everywhere.
+ * research-module key (e.g. "behavioral") or a custom field addressed by its
+ * PERMANENT id ("custom:<id>") — never by array index, so threads survive
+ * reorder / insert / delete / rename. These helpers keep routing pure so the
+ * builder stays thin and "Add to This Area" is append-only, per area, always.
  */
-export type ResearchAreaValue = { label: string; value: string };
+export type ResearchAreaField = { id?: string; label: string; value: string };
 export type ResearchAreaData = Record<string, unknown> & {
-  custom?: ResearchAreaValue[];
+  custom?: ResearchAreaField[];
 };
 
 const CUSTOM_PREFIX = "custom:";
 
-/** Parse a `custom:<i>` key into its index, or null for module keys. */
-function customIndex(areaKey: string): number | null {
+/** Parse a `custom:<id>` key into its field id, or null for module keys. */
+export function customFieldId(areaKey: string): string | null {
   if (!areaKey.startsWith(CUSTOM_PREFIX)) return null;
-  const i = Number(areaKey.slice(CUSTOM_PREFIX.length));
-  return Number.isInteger(i) && i >= 0 ? i : null;
+  const id = areaKey.slice(CUSTOM_PREFIX.length);
+  return id ? id : null;
+}
+
+/** The thread key for an area, given the area key. Step 10 areas are prefixed
+ * with `research:` so they never collide with normal question keys. */
+export function researchThreadKey(areaKey: string): string {
+  return `research:${areaKey}`;
 }
 
 /**
  * Resolve an area key to its display label and current text. `moduleLabels`
  * maps module keys to labels. Returns null for keys that don't resolve (e.g. a
- * custom index that no longer exists), so callers can skip cleanly.
+ * custom field that was deleted), so callers can skip cleanly.
  */
 export function describeResearchArea(
   research: ResearchAreaData,
   areaKey: string,
   moduleLabels: Record<string, string>,
 ): { label: string; currentAnswer: string } | null {
-  const idx = customIndex(areaKey);
-  if (idx !== null) {
-    const field = research.custom?.[idx];
+  const id = customFieldId(areaKey);
+  if (id !== null) {
+    const field = research.custom?.find((c) => c.id === id);
     if (!field) return null;
     return {
       label: field.label.trim() || "Custom research field",
@@ -110,7 +117,7 @@ export function describeResearchArea(
 
 /**
  * Append a chosen research reply into a single area, never overwriting and
- * never touching any other area. A `custom:<i>` key with no matching field
+ * never touching any other area. A `custom:<id>` key with no matching field
  * (e.g. deleted) returns the research unchanged; a module key that is empty is
  * created, since an empty module is valid, not unknown.
  */
@@ -120,14 +127,14 @@ export function appendToResearchArea(
   text: string,
 ): ResearchAreaData {
   if (!areaKey) return research;
-  const idx = customIndex(areaKey);
-  if (idx !== null) {
+  const id = customFieldId(areaKey);
+  if (id !== null) {
     const custom = [...(research.custom ?? [])];
-    const existing = custom[idx];
-    if (!existing) return research;
-    custom[idx] = {
-      ...existing,
-      value: appendResearchToAnswer(existing.value ?? "", text),
+    const at = custom.findIndex((c) => c.id === id);
+    if (at < 0) return research;
+    custom[at] = {
+      ...custom[at]!,
+      value: appendResearchToAnswer(custom[at]!.value ?? "", text),
     };
     return { ...research, custom };
   }
@@ -135,4 +142,86 @@ export function appendToResearchArea(
     ...research,
     [areaKey]: appendResearchToAnswer(String(research[areaKey] ?? ""), text),
   };
+}
+
+/**
+ * Set (replace) a single area's value — used by accumulation, which computes the
+ * full append-only answer and writes it back. A `custom:<id>` with no matching
+ * field returns the research unchanged.
+ */
+export function setResearchAreaValue(
+  research: ResearchAreaData,
+  areaKey: string,
+  value: string,
+): ResearchAreaData {
+  if (!areaKey) return research;
+  const id = customFieldId(areaKey);
+  if (id !== null) {
+    const custom = [...(research.custom ?? [])];
+    const at = custom.findIndex((c) => c.id === id);
+    if (at < 0) return research;
+    custom[at] = { ...custom[at]!, value };
+    return { ...research, custom };
+  }
+  return { ...research, [areaKey]: value };
+}
+
+/**
+ * Research accumulation (Phase 2). Dedup is by stable message id ONLY — never by
+ * comparing text — so legitimately repeated ideas are preserved and the same
+ * response is never appended twice.
+ */
+export type ResearchMessageLike = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  hidden?: boolean;
+  error?: boolean;
+};
+
+/** Result of an accumulation action: the new (append-only) answer plus the ids
+ * that were newly added (to record in `research.addedResponses`). */
+export type ResearchAdditionResult = { answer: string; addedIds: string[] };
+
+/** Useful assistant responses (non-error, non-hidden) not yet added, in order. */
+export function collectAddableResponses(
+  messages: readonly ResearchMessageLike[],
+  addedResponseIds: readonly string[],
+): ResearchMessageLike[] {
+  const added = new Set(addedResponseIds);
+  return messages.filter(
+    (m) => m.role === "assistant" && !m.error && !m.hidden && !added.has(m.id),
+  );
+}
+
+/** Append one response, unless it was already added or isn't a useful reply. */
+export function addResponseToAnswer(
+  answer: string,
+  message: ResearchMessageLike,
+  addedResponseIds: readonly string[],
+): ResearchAdditionResult {
+  if (message.role !== "assistant" || message.error || message.hidden) {
+    return { answer, addedIds: [] };
+  }
+  if (addedResponseIds.includes(message.id)) return { answer, addedIds: [] };
+  return {
+    answer: appendResearchToAnswer(answer, message.content),
+    addedIds: [message.id],
+  };
+}
+
+/** Append the whole session's useful, not-yet-added responses in order. */
+export function addSessionToAnswer(
+  answer: string,
+  messages: readonly ResearchMessageLike[],
+  addedResponseIds: readonly string[],
+): ResearchAdditionResult {
+  const addable = collectAddableResponses(messages, addedResponseIds);
+  let next = answer;
+  const addedIds: string[] = [];
+  for (const m of addable) {
+    next = appendResearchToAnswer(next, m.content);
+    addedIds.push(m.id);
+  }
+  return { answer: next, addedIds };
 }

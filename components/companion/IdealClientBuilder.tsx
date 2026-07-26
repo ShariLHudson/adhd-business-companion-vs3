@@ -11,23 +11,29 @@ import {
   duplicateAvatar,
   CLIENT_BEHAVIOR_TRAITS,
   TRAIT_EMOJI,
+  AVATAR_RESEARCH_VERSION,
   type IdealClientAvatar,
   type AvatarResearch,
+  type ResearchThreadMessage,
 } from "@/lib/companionStore";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { ContextualWorkspaceShell } from "@/components/companion/contextualWorkspace/ContextualWorkspaceShell";
 import { WorkspaceStepControls } from "@/components/companion/contextualWorkspace/WorkspaceStepControls";
 import { ContextualResearchPanel } from "@/components/companion/contextualWorkspace/ContextualResearchPanel";
 import {
-  appendResearchToAnswer,
-  appendToResearchArea,
+  addResponseToAnswer,
+  addSessionToAnswer,
   buildAvatarResearchAutoPrompt,
   buildAvatarResearchSystemPrompt,
   describeResearchArea,
+  researchThreadKey,
+  setResearchAreaValue,
 } from "@/lib/clientAvatarResearch";
 import {
-  avatarPrintSections,
+  avatarReportGroups,
+  avatarStatus,
   buildAvatarPrintHtml,
+  buildAvatarReportHtml,
   isAvatarComplete,
   type AvatarPrintMode,
 } from "@/lib/clientAvatarPrint";
@@ -66,9 +72,19 @@ type StepKey =
   | "identity"
   | "revenue";
 
+// The Step 10 research modules that hold printable answer content (distinct from
+// the research-notebook metadata keys threads/summaries/addedResponses/…).
+type ResearchModuleKey =
+  | "behavioral"
+  | "motivation"
+  | "buying"
+  | "communication"
+  | "market"
+  | "notes";
+
 // Level 3 research modules — optional depth.
 const RESEARCH_MODULES: {
-  key: keyof Omit<AvatarResearch, "custom">;
+  key: ResearchModuleKey;
   emoji: string;
   label: string;
   hint: string;
@@ -117,6 +133,31 @@ const RESEARCH_MODULE_LABELS: Record<string, string> = Object.fromEntries(
   RESEARCH_MODULES.map((m) => [m.key, `${m.label} — ${m.hint}`]),
 );
 
+// Permanent id for a custom research field — minted on create so research
+// threads survive reorder / insert / delete / rename (never keyed by index).
+let customFieldSeq = 0;
+function newCustomFieldId(): string {
+  customFieldSeq += 1;
+  return `cf_${customFieldSeq}_${Math.random().toString(36).slice(2, 8)}`;
+}
+
+/**
+ * Load-time normalization for backward compatibility: legacy avatars whose
+ * custom research fields predate stable ids get one minted here so their
+ * research threads can key by id. Everything else is left untouched.
+ */
+function normalizeResearch(research: AvatarResearch | undefined): AvatarResearch {
+  const r = research ?? {};
+  if (!r.custom || r.custom.length === 0) return r;
+  let changed = false;
+  const custom = r.custom.map((c) => {
+    if (c.id) return c;
+    changed = true;
+    return { ...c, id: newCustomFieldId() };
+  });
+  return changed ? { ...r, custom } : r;
+}
+
 // Research-first flow: quick identity → lightweight discovery → AI expand →
 // review → optional deep refine. Early understanding = sharper AI sooner.
 const STEPS: { key: StepKey; q: string; hint?: string }[] = [
@@ -146,7 +187,7 @@ const STEPS: { key: StepKey; q: string; hint?: string }[] = [
   {
     key: "insights",
     q: "A little more on what moves them (optional).",
-    hint: "Edit anything AIRA suggested, or add your own.",
+    hint: "These insights help Spark shape future messaging, offers, content, and sales conversations for this client. Edit anything suggested, or add your own.",
   },
   { key: "solution", q: "How do you help them in a way others don't?" },
   {
@@ -156,7 +197,8 @@ const STEPS: { key: StepKey; q: string; hint?: string }[] = [
   },
   {
     key: "revenue",
-    q: "Want to track revenue from this client type? (optional)",
+    q: "Note the revenue from this client type? (optional)",
+    hint: "This just saves a note for yourself — it doesn't track anything yet. It prepares this avatar for revenue features later. When you finish, you'll return to your Client Avatars, where you can review, print, or keep refining anytime.",
   },
 ];
 
@@ -331,11 +373,11 @@ export function IdealClientBuilder({
   const [form, setForm] = useState<Form>(EMPTY);
   const [aiBusy, setAiBusy] = useState(false);
   const [savedHint, setSavedHint] = useState(false);
-  const [researchOpen, setResearchOpen] = useState(false);
-  // Step 10: which research area (module key or `custom:<i>`) has its scoped
-  // research conversation open. null = none. Answers live in `form.research`,
-  // so they survive area switches, open/close, and Back regardless of this.
-  const [activeResearchArea, setActiveResearchArea] = useState<string | null>(
+  // Phase 2: one shared research panel for the whole workspace, keyed by the
+  // active THREAD key — a question key (text steps) or `research:<area>` (Step
+  // 10 module / `research:custom:<id>`). null = closed. Threads themselves live
+  // in form.research.threads, so they persist and survive open/close/switch.
+  const [activeResearchKey, setActiveResearchKey] = useState<string | null>(
     null,
   );
   const [printMenuOpen, setPrintMenuOpen] = useState(false);
@@ -365,8 +407,7 @@ export function IdealClientBuilder({
     setStep(0);
     savedSigRef.current = formSignature(EMPTY);
     setSavedHint(false);
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     setBuilding(true);
   }, [coachKickoff]);
 
@@ -430,7 +471,7 @@ export function IdealClientBuilder({
             objections: active.objections,
             triggers: active.triggers,
             contentPrefs: active.contentPrefs,
-            research: active.research ?? {},
+            research: normalizeResearch(active.research),
           }
         : { ...EMPTY };
       const current = String(base[formKey] ?? "").trim();
@@ -472,14 +513,15 @@ export function IdealClientBuilder({
     setStep(0);
     savedSigRef.current = formSignature(EMPTY);
     setSavedHint(false);
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     setBuilding(true);
     onStartNew?.();
   }
 
   function startEdit(a: IdealClientAvatar) {
-    setForm({
+    // Build once so the form and the saved-signature match exactly (legacy
+    // custom fields get permanent ids here, but that must not read as "dirty").
+    const loaded: Form = {
       id: a.id,
       name: a.name,
       who: a.who,
@@ -496,41 +538,20 @@ export function IdealClientBuilder({
       objections: a.objections,
       triggers: a.triggers,
       contentPrefs: a.contentPrefs,
-      research: a.research ?? {},
-    });
+      research: normalizeResearch(a.research),
+    };
+    setForm(loaded);
     const resumeIdx = a.draftStepKey
       ? STEPS.findIndex((s) => s.key === a.draftStepKey)
       : -1;
     setStep(resumeIdx >= 0 ? resumeIdx : 0);
-    savedSigRef.current = formSignature({
-      id: a.id,
-      name: a.name,
-      who: a.who,
-      painPoints: a.painPoints,
-      goals: a.goals,
-      currentBehavior: a.currentBehavior,
-      solution: a.solution,
-      tagline: a.tagline,
-      emoji: a.emoji ?? "👤",
-      image: a.image,
-      revenue: a.revenue,
-      behaviorTraits: a.behaviorTraits ?? [],
-      motivations: a.motivations,
-      objections: a.objections,
-      triggers: a.triggers,
-      contentPrefs: a.contentPrefs,
-      research: a.research ?? {},
-    });
+    savedSigRef.current = formSignature(loaded);
     setSavedHint(false);
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     setBuilding(true);
   }
 
-  function setResearch(
-    key: keyof Omit<AvatarResearch, "custom">,
-    value: string,
-  ) {
+  function setResearch(key: ResearchModuleKey, value: string) {
     setForm((f) => ({ ...f, research: { ...f.research, [key]: value } }));
   }
 
@@ -611,8 +632,7 @@ export function IdealClientBuilder({
     setForm({ ...EMPTY });
     setStep(0);
     setSavedHint(false);
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     savedSigRef.current = formSignature(EMPTY);
     if (persisted) onAvatarSaved?.(persisted);
     onBuildComplete?.();
@@ -651,8 +671,7 @@ export function IdealClientBuilder({
     // builder that was opened and closed without any input.
     if (dirty || formRef.current.id) persist();
     setBuilding(false);
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
   }
 
   /**
@@ -664,8 +683,7 @@ export function IdealClientBuilder({
    */
   function handleReturnHome() {
     if (dirty || formRef.current.id) persist();
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     onReturnHome?.();
   }
 
@@ -675,15 +693,13 @@ export function IdealClientBuilder({
       return;
     }
     if (dirty) persist();
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     setStep(step - 1);
   }
 
   function handleSkip() {
     if (dirty) persist();
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     if (step >= STEPS.length - 1) {
       setBuilding(false);
       return;
@@ -701,8 +717,7 @@ export function IdealClientBuilder({
       return;
     }
     persist();
-    setResearchOpen(false);
-    setActiveResearchArea(null);
+    setActiveResearchKey(null);
     const next = step + 1;
     setStep(next);
     const nextKey = STEPS[next]?.key;
@@ -710,36 +725,84 @@ export function IdealClientBuilder({
   }
 
   /**
-   * Append a chosen research reply into the current question's answer — never
-   * overwriting, marking the draft dirty, staying on the same question, and NOT
-   * auto-saving (the member edits and saves when ready).
+   * Persist a research thread's messages onto the avatar draft (marks it dirty,
+   * so Save Progress lights up and the thread travels with the avatar). Threads
+   * are keyed by question key or `research:<area>` — never mounted-component
+   * state — so they survive close/reopen, switching, saving, and reopening.
    */
-  function appendToCurrentAnswer(stepKey: StepKey, text: string) {
-    const field: TextFieldKey | "who" | null =
-      stepKey === "who"
-        ? "who"
-        : stepKey === "painPoints" ||
-            stepKey === "goals" ||
-            stepKey === "currentBehavior" ||
-            stepKey === "solution"
-          ? stepKey
-          : null;
-    if (!field) return;
+  function setThreadMessages(key: string, next: ResearchThreadMessage[]) {
+    const now = new Date().toISOString();
     setForm((f) => ({
       ...f,
-      [field]: appendResearchToAnswer(String(f[field] ?? ""), text),
+      research: {
+        ...f.research,
+        version: AVATAR_RESEARCH_VERSION,
+        threads: {
+          ...(f.research.threads ?? {}),
+          [key]: { messages: next, updatedAt: now },
+        },
+        lastResearched: {
+          ...(f.research.lastResearched ?? {}),
+          [key]: now,
+        },
+      },
     }));
+  }
+
+  /**
+   * Apply a research addition to exactly one answer/area, append-only, marking
+   * the draft dirty and recording added message ids for dedup. `compute` returns
+   * the new (append-only) answer plus the ids newly added. Never overwrites and
+   * never touches any other field.
+   */
+  function applyResearchAdd(
+    target: { key: string; isArea: boolean; areaKey: string },
+    compute: (
+      currentAnswer: string,
+      addedIds: string[],
+    ) => { answer: string; addedIds: string[] },
+  ) {
+    setForm((f) => {
+      const addedIds0 = f.research.addedResponses ?? [];
+      const current = target.isArea
+        ? describeResearchArea(f.research, target.areaKey, RESEARCH_MODULE_LABELS)
+            ?.currentAnswer ?? ""
+        : String((f as unknown as Record<string, unknown>)[target.key] ?? "");
+      const { answer, addedIds } = compute(current, addedIds0);
+      if (!addedIds.length) return f;
+      const addedResponses = [...addedIds0, ...addedIds];
+      if (target.isArea) {
+        const research2 = setResearchAreaValue(
+          f.research,
+          target.areaKey,
+          answer,
+        ) as AvatarResearch;
+        return { ...f, research: { ...research2, addedResponses } };
+      }
+      return {
+        ...f,
+        [target.key]: answer,
+        research: { ...f.research, addedResponses },
+      };
+    });
   }
 
   function printAvatar(mode: AvatarPrintMode) {
     setPrintMenuOpen(false);
     if (typeof window === "undefined") return;
+    // Persist first so the report reflects saved data (and has created/updated
+    // dates), without advancing or losing the current step.
+    if (dirty || formRef.current.id) persist();
     const cur = STEPS[stepRef.current];
     const title = form.name?.trim() || "Client Avatar";
+    const saved = formRef.current.id
+      ? getAvatars().find((a) => a.id === formRef.current.id)
+      : undefined;
     const printInput = {
       name: form.name,
       tagline: form.tagline,
       emoji: form.emoji,
+      image: form.image,
       who: form.who,
       painPoints: form.painPoints,
       goals: form.goals,
@@ -752,6 +815,8 @@ export function IdealClientBuilder({
       contentPrefs: form.contentPrefs,
       revenue: form.revenue,
       research: form.research as Record<string, unknown>,
+      createdAt: saved?.createdAt,
+      updatedAt: saved?.updatedAt,
     };
     const stepAnswer = (key: StepKey): string => {
       switch (key) {
@@ -773,18 +838,24 @@ export function IdealClientBuilder({
           return "";
       }
     };
-    const { subtitle, sections } =
+    // "current" prints just the active question; "progress"/"complete" produce
+    // the full professional grouped report.
+    const html =
       mode === "current" && cur
-        ? {
+        ? buildAvatarPrintHtml({
+            title,
             subtitle: "Current Question",
             sections: [{ label: cur.q, value: stepAnswer(cur.key) }],
-          }
-        : {
-            subtitle:
-              mode === "complete" ? "Complete Client Avatar" : "Progress So Far",
-            sections: avatarPrintSections(printInput),
-          };
-    const html = buildAvatarPrintHtml({ title, subtitle, sections });
+          })
+        : buildAvatarReportHtml({
+            name: title,
+            status: avatarStatus(printInput),
+            tagline: form.tagline,
+            image: form.image,
+            createdAt: printInput.createdAt,
+            updatedAt: printInput.updatedAt,
+            groups: avatarReportGroups(printInput),
+          });
     const w = window.open("", "_blank");
     if (!w) return;
     w.document.write(html);
@@ -806,18 +877,6 @@ export function IdealClientBuilder({
     const isLast = step === STEPS.length - 1;
     const editing = Boolean(form.id);
     const showResearch = TEXT_RESEARCH_STEPS.includes(current.key);
-    const researchAnswer =
-      current.key === "who"
-        ? [form.name, form.who].filter(Boolean).join(" — ")
-        : current.key === "painPoints"
-          ? form.painPoints
-          : current.key === "goals"
-            ? form.goals
-            : current.key === "currentBehavior"
-              ? form.currentBehavior
-              : current.key === "solution"
-                ? form.solution
-                : "";
     // Relevant prior answers to ground the research (exclude the active one).
     const researchPriors = (
       [
@@ -829,41 +888,45 @@ export function IdealClientBuilder({
     )
       .filter(([, v]) => v.trim())
       .map(([label, value]) => ({ label, value }));
-    const researchContext = {
-      questionLabel: current.q,
-      currentAnswer: researchAnswer,
-      priorAnswers: researchPriors,
-      avatarName: form.name,
-    };
-    const researchSystemPrompt = buildAvatarResearchSystemPrompt(researchContext);
-    const researchAutoPrompt = buildAvatarResearchAutoPrompt(researchContext);
-    // Step 10 per-area research: resolve the active area (a module key or a
-    // `custom:<i>` field) into its label, current text, and an append-only
-    // writer via the pure helpers. Answers always live in `form.research`, so
-    // nothing is lost when the member switches areas, closes research, or steps
-    // Back. The AI context uses the label + hint so research is auto-scoped.
-    const activeAreaDesc = activeResearchArea
-      ? describeResearchArea(form.research, activeResearchArea, RESEARCH_MODULE_LABELS)
-      : null;
-    const activeArea =
-      activeResearchArea && activeAreaDesc
-        ? {
-            ...activeAreaDesc,
-            append: (text: string) =>
-              setForm((f) => ({
-                ...f,
-                research: appendToResearchArea(
-                  f.research,
-                  activeResearchArea,
-                  text,
-                ) as AvatarResearch,
-              })),
-          }
-        : null;
-    const areaResearchContext = activeArea
+
+    // Phase 2: one shared, controlled research panel. `activeResearchKey` is a
+    // THREAD key — a question key (text steps) or `research:<area>` (Step 10
+    // module / `research:custom:<id>`). Threads live in form.research.threads
+    // and persist with the avatar, so they survive open/close, switching, save,
+    // and reopening. `addedResponses` (message ids) drives dedup.
+    const threadMessagesFor = (key: string): ResearchThreadMessage[] =>
+      form.research.threads?.[key]?.messages ?? [];
+    const addedResponseIds = form.research.addedResponses ?? [];
+
+    const activeResearch = (() => {
+      const key = activeResearchKey;
+      if (!key) return null;
+      if (key.startsWith("research:")) {
+        const areaKey = key.slice("research:".length);
+        const desc = describeResearchArea(
+          form.research,
+          areaKey,
+          RESEARCH_MODULE_LABELS,
+        );
+        if (!desc) return null;
+        return {
+          key,
+          label: desc.label,
+          currentAnswer: desc.currentAnswer,
+          isArea: true as const,
+          areaKey,
+        };
+      }
+      const label = STEPS.find((s) => s.key === key)?.q ?? key;
+      const currentAnswer = String(
+        (form as unknown as Record<string, unknown>)[key] ?? "",
+      );
+      return { key, label, currentAnswer, isArea: false as const, areaKey: "" };
+    })();
+    const activeResearchContext = activeResearch
       ? {
-          questionLabel: activeArea.label,
-          currentAnswer: activeArea.currentAnswer,
+          questionLabel: activeResearch.label,
+          currentAnswer: activeResearch.currentAnswer,
           priorAnswers: researchPriors,
           avatarName: form.name,
         }
@@ -1128,9 +1191,14 @@ export function IdealClientBuilder({
 
           {current.key === "research" && (
             <div className="flex flex-col gap-3">
-              {RESEARCH_MODULES.map((m) => (
-                <div key={m.key} className="flex flex-col gap-2">
-                  <details className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3">
+              {RESEARCH_MODULES.map((m) => {
+                const tKey = researchThreadKey(m.key);
+                const hasThread = threadMessagesFor(tKey).length > 0;
+                return (
+                  <details
+                    key={m.key}
+                    className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3"
+                  >
                     <summary className="flex cursor-pointer items-center justify-between gap-2 text-base font-semibold text-[#1f1c19]">
                       <span>
                         {m.emoji} {m.label}
@@ -1139,12 +1207,12 @@ export function IdealClientBuilder({
                         type="button"
                         onClick={(e) => {
                           e.preventDefault();
-                          setActiveResearchArea(m.key);
+                          setActiveResearchKey(tKey);
                         }}
                         className="shrink-0 rounded-md bg-[#1e4f4f]/10 px-2 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
                         data-testid={`research-area-${m.key}`}
                       >
-                        🔍 Research this area
+                        {hasThread ? "🔬 Continue Research" : "🔍 Research this area"}
                       </button>
                     </summary>
                     <p className="mt-1 text-sm text-[#6b635a]">{m.hint}</p>
@@ -1155,29 +1223,8 @@ export function IdealClientBuilder({
                       className="mt-2 min-h-[64px] w-full resize-none rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
                     />
                   </details>
-                  {activeResearchArea === m.key &&
-                  activeArea &&
-                  areaResearchContext ? (
-                    <ContextualResearchPanel
-                      open
-                      onToggle={() => setActiveResearchArea(null)}
-                      questionKey={`research:${m.key}`}
-                      questionLabel={m.label}
-                      systemPrompt={buildAvatarResearchSystemPrompt(
-                        areaResearchContext,
-                      )}
-                      autoPrompt={buildAvatarResearchAutoPrompt(
-                        areaResearchContext,
-                      )}
-                      onAddToAnswer={activeArea.append}
-                      addLabel="Add to This Area"
-                      addedLabel="Added to this area ✓"
-                      toggleLabel="Research this area"
-                      helperText="Shari researches this area for you. Read along, keep asking, and add anything useful to this area."
-                    />
-                  ) : null}
-                </div>
-              ))}
+                );
+              })}
 
               {/* Custom research fields — experiments, content ideas, tests */}
               <div className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3">
@@ -1189,9 +1236,11 @@ export function IdealClientBuilder({
                   ideas”.
                 </p>
                 <div className="mt-2 flex flex-col gap-2">
-                  {(form.research.custom ?? []).map((c, i) => (
-                    <div key={i} className="flex flex-col gap-2">
-                      <div className="flex gap-2">
+                  {(form.research.custom ?? []).map((c, i) => {
+                    const tKey = researchThreadKey(`custom:${c.id}`);
+                    const hasThread = threadMessagesFor(tKey).length > 0;
+                    return (
+                      <div key={c.id ?? i} className="flex gap-2">
                         <input
                           value={c.label}
                           onChange={(e) => {
@@ -1220,13 +1269,15 @@ export function IdealClientBuilder({
                         />
                         <button
                           type="button"
-                          onClick={() => setActiveResearchArea(`custom:${i}`)}
-                          title="Research this area"
-                          aria-label="Research this area"
+                          onClick={() => setActiveResearchKey(tKey)}
+                          title={hasThread ? "Continue research" : "Research this area"}
+                          aria-label={
+                            hasThread ? "Continue research" : "Research this area"
+                          }
                           className="shrink-0 rounded-md bg-[#1e4f4f]/10 px-2 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
-                          data-testid={`research-area-custom-${i}`}
+                          data-testid={`research-area-custom-${c.id}`}
                         >
-                          🔍
+                          {hasThread ? "🔬" : "🔍"}
                         </button>
                         <button
                           type="button"
@@ -1238,40 +1289,19 @@ export function IdealClientBuilder({
                               ...form,
                               research: { ...form.research, custom },
                             });
-                            // Indexes shift on delete — close research so it can
-                            // never point at the wrong field.
-                            setActiveResearchArea(null);
+                            // Threads key by permanent id, so other fields are
+                            // safe; just close research if this field was active.
+                            if (activeResearchKey === tKey) {
+                              setActiveResearchKey(null);
+                            }
                           }}
                           className="shrink-0 px-2 text-[#a85c4a]"
                         >
                           ✕
                         </button>
                       </div>
-                      {activeResearchArea === `custom:${i}` &&
-                      activeArea &&
-                      areaResearchContext ? (
-                        <ContextualResearchPanel
-                          open
-                          onToggle={() => setActiveResearchArea(null)}
-                          questionKey={`research:custom:${i}`}
-                          questionLabel={
-                            c.label.trim() || "Custom research field"
-                          }
-                          systemPrompt={buildAvatarResearchSystemPrompt(
-                            areaResearchContext,
-                          )}
-                          autoPrompt={buildAvatarResearchAutoPrompt(
-                            areaResearchContext,
-                          )}
-                          onAddToAnswer={activeArea.append}
-                          addLabel="Add to This Area"
-                          addedLabel="Added to this area ✓"
-                          toggleLabel="Research this area"
-                          helperText="Shari researches this area for you. Read along, keep asking, and add anything useful to this area."
-                        />
-                      ) : null}
-                    </div>
-                  ))}
+                    );
+                  })}
                   <button
                     type="button"
                     onClick={() =>
@@ -1281,7 +1311,7 @@ export function IdealClientBuilder({
                           ...form.research,
                           custom: [
                             ...(form.research.custom ?? []),
-                            { label: "", value: "" },
+                            { id: newCustomFieldId(), label: "", value: "" },
                           ],
                         },
                       })
@@ -1373,18 +1403,79 @@ export function IdealClientBuilder({
           )}
         </div>
 
-        {showResearch ? (
+        {/* Compact research entry for normal questions (near the answer). */}
+        {showResearch && activeResearchKey !== current.key ? (
+          <button
+            type="button"
+            onClick={() => setActiveResearchKey(current.key)}
+            className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full border border-[#1e4f4f]/30 bg-white/80 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white"
+            data-testid="research-question-entry"
+          >
+            {threadMessagesFor(current.key).length > 0
+              ? "🔬 Continue Research"
+              : "🔍 Need ideas? Research this question"}
+          </button>
+        ) : null}
+
+        {/* One shared, controlled research panel for the whole workspace —
+            mounted once, keyed by the active thread. Threads persist on the
+            avatar, so switching / closing / reopening never loses them. */}
+        {activeResearch && activeResearchContext ? (
           <ContextualResearchPanel
-            open={researchOpen}
-            onToggle={() => setResearchOpen((v) => !v)}
-            // Key on the question only — stable across the id mint on first save
-            // (so saving never wipes an open thread). The panel remounts between
-            // avatars, so this never leaks context across avatars.
-            questionKey={current.key}
-            questionLabel={current.q}
-            systemPrompt={researchSystemPrompt}
-            autoPrompt={researchAutoPrompt}
-            onAddToAnswer={(text) => appendToCurrentAnswer(current.key, text)}
+            open
+            onToggle={() => setActiveResearchKey(null)}
+            questionKey={activeResearch.key}
+            questionLabel={activeResearch.label}
+            systemPrompt={buildAvatarResearchSystemPrompt(activeResearchContext)}
+            autoPrompt={buildAvatarResearchAutoPrompt(activeResearchContext)}
+            messages={threadMessagesFor(activeResearch.key)}
+            onMessagesChange={(next) =>
+              setThreadMessages(activeResearch.key, next)
+            }
+            addedResponseIds={addedResponseIds}
+            onAddResponse={(msg) =>
+              applyResearchAdd(
+                {
+                  key: activeResearch.key,
+                  isArea: activeResearch.isArea,
+                  areaKey: activeResearch.areaKey,
+                },
+                (cur, added) => addResponseToAnswer(cur, msg, added),
+              )
+            }
+            onAddSession={() =>
+              applyResearchAdd(
+                {
+                  key: activeResearch.key,
+                  isArea: activeResearch.isArea,
+                  areaKey: activeResearch.areaKey,
+                },
+                (cur, added) =>
+                  addSessionToAnswer(
+                    cur,
+                    threadMessagesFor(activeResearch.key),
+                    added,
+                  ),
+              )
+            }
+            addLabel={
+              activeResearch.isArea
+                ? "Add This Response to This Area"
+                : "Add This Response"
+            }
+            addAllLabel={
+              activeResearch.isArea
+                ? "Add Entire Research Session to This Area"
+                : "Add Entire Research Session"
+            }
+            addedLabel={
+              activeResearch.isArea
+                ? "Added to this area ✓"
+                : "Added to your answer ✓"
+            }
+            toggleLabel={
+              activeResearch.isArea ? "Research this area" : "Research this question"
+            }
           />
         ) : null}
 
