@@ -162,7 +162,7 @@ const STEPS: { key: StepKey; q: string; hint?: string }[] = [
 
 type TextFieldKey = "painPoints" | "goals" | "currentBehavior" | "solution";
 
-type Form = {
+export type Form = {
   id?: string;
   name: string;
   who: string;
@@ -209,7 +209,7 @@ const AVATAR_FIELD_TO_STEP: Partial<Record<WorkspaceFieldId, StepKey>> = {
 
 const AVATAR_REPLACE_FIELDS = new Set(["name", "who", "tagline"]);
 
-const EMPTY: Form = {
+export const EMPTY: Form = {
   name: "",
   who: "",
   painPoints: "",
@@ -231,8 +231,14 @@ const TEXT_RESEARCH_STEPS: readonly StepKey[] = [
   "solution",
 ];
 
-/** Content signature (ignores id) — drives the "unsaved changes" state. */
-function formSignature(f: Form): string {
+/**
+ * Content signature (ignores id) — drives the "unsaved changes" (dirty) state
+ * that enables Save Progress. Exported for focused tests: any change to a
+ * standard answer, a Step 10 research area, or a custom field changes the
+ * signature, so Save Progress enables regardless of which field the member
+ * edited (and without requiring the question to be "complete").
+ */
+export function formSignature(f: Form): string {
   const { id: _id, ...rest } = f;
   void _id;
   return JSON.stringify(rest);
@@ -285,6 +291,7 @@ export function IdealClientBuilder({
   onStepAdvance,
   onBuildComplete,
   onCoachSnapshot,
+  onReturnHome,
   presentation,
 }: {
   focusField?: WorkspaceFieldId | null;
@@ -303,6 +310,12 @@ export function IdealClientBuilder({
   onStepAdvance?: (step: ClientAvatarStepKey, stepIndex: number) => void;
   onBuildComplete?: () => void;
   onCoachSnapshot?: (snapshot: ReturnType<typeof snapshotFromBuilderInput>) => void;
+  /**
+   * Leave the whole workspace for Welcome Home. When provided, the builder
+   * shows an always-visible workspace-level exit (in addition to the
+   * question-level Back). The host wires this to its canonical home nav.
+   */
+  onReturnHome?: () => void;
   presentation?: IdealClientBuilderPresentation;
 } = {}) {
   const listHeading = presentation?.listHeading ?? "Client Avatars";
@@ -642,6 +655,20 @@ export function IdealClientBuilder({
     setActiveResearchArea(null);
   }
 
+  /**
+   * Leave the whole Client Avatar workspace for Welcome Home. Never discards
+   * work: it persists any in-progress draft (so name, all answers, the current
+   * step, Step 10 areas, and custom fields survive), closes any open research,
+   * then hands off to the host's canonical home nav (which does not show the
+   * Estate map).
+   */
+  function handleReturnHome() {
+    if (dirty || formRef.current.id) persist();
+    setResearchOpen(false);
+    setActiveResearchArea(null);
+    onReturnHome?.();
+  }
+
   function handleBack() {
     if (step === 0) {
       exitToList();
@@ -850,6 +877,29 @@ export function IdealClientBuilder({
     });
     return (
       <ContextualWorkspaceShell>
+        {onReturnHome ? (
+          <div
+            className="mb-3 flex flex-wrap items-center gap-2"
+            data-testid="avatar-workspace-exit"
+          >
+            <button
+              type="button"
+              onClick={exitToList}
+              className="people-i-help-panel__back"
+              data-testid="avatar-exit-to-list"
+            >
+              ← Back to Client Avatars
+            </button>
+            <button
+              type="button"
+              onClick={handleReturnHome}
+              className="people-i-help-panel__back"
+              data-testid="avatar-exit-home"
+            >
+              Return to Welcome Home
+            </button>
+          </div>
+        ) : null}
         {destinationKicker ? (
           <div className="mb-3">
             <button
@@ -1361,6 +1411,16 @@ export function IdealClientBuilder({
   // ---- List of avatars ----------------------------------------------------
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      {onReturnHome ? (
+        <button
+          type="button"
+          onClick={onReturnHome}
+          className="people-i-help-panel__back mb-3 self-start"
+          data-testid="avatar-list-exit-home"
+        >
+          ← Return to Welcome Home
+        </button>
+      ) : null}
       <div className="flex items-center justify-between gap-3">
         <p className="text-2xl font-semibold text-[#1f1c19]">{listHeading}</p>
         <button

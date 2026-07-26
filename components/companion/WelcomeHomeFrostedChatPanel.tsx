@@ -62,8 +62,11 @@ export function WelcomeHomeFrostedChatPanel({
     !companionOn && !showGreeting && Boolean(companion);
 
   const showMessageScroll = showGreeting || showThread;
+  // `alwaysShowInput` is a true override: Welcome Home / estate rooms keep the
+  // composer visible even when Companion is Off, and a welcome card or greeting
+  // never suppresses it. Companion Off only quiets the *thread*, not the input.
   const showFooter =
-    companionOn && (showConversation || showGreeting || alwaysShowInput);
+    alwaysShowInput || (companionOn && (showConversation || showGreeting));
   const showDivider =
     companionOn && showMessageScroll && (showConversation || showGreeting);
 

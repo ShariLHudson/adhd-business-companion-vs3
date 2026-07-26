@@ -23795,6 +23795,7 @@ export default function CompanionPageClient() {
               ]);
             }}
             onAvatarSaved={completeClientAvatarHandoffReturn}
+            onReturnHome={() => returnToWelcomeHome("client avatar exit")}
           />
         );
       case "projects":
@@ -27286,6 +27287,7 @@ export default function CompanionPageClient() {
                     },
                   ]);
                 }}
+                onReturnHome={() => returnToWelcomeHome("client avatar exit")}
               />
             </WorkspaceShell>
           )}
