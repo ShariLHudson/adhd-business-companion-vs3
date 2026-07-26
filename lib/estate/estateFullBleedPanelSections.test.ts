@@ -33,6 +33,13 @@ describe("estateFullBleedPanelSections", () => {
     expect(isEstateFullBleedPanelSection("create")).toBe(true);
   });
 
+  it("includes Client Avatar room as full-bleed so it owns the viewport", () => {
+    // Contextual Workspace pattern: the room fills the full height instead of
+    // sitting inside the max-w-3xl white/80 companion-panel-surface (gray block).
+    expect(ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS).toContain("client-avatars");
+    expect(isEstateFullBleedPanelSection("client-avatars")).toBe(true);
+  });
+
   it("does not treat generic home as full-bleed", () => {
     expect(isEstateFullBleedPanelSection("home")).toBe(false);
   });

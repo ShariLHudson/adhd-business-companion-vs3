@@ -21,6 +21,14 @@ can adopt it later without rebuilding the workflow.
 
 1. Render inside a room shell that paints the background (e.g. `WorkspaceShell`
    or `MyBusinessEstateRoomShell`) — **not** inside an opaque frosted panel.
+   Crucially, the section must **own the full workspace height**: register it in
+   `ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS` (or open it as an overlay room shell)
+   so it is *not* wrapped in `WORKSPACE_FULL_PAGE_SURFACE_CLASS`
+   (`companion-panel-surface … max-w-3xl bg-white/80`). That wrapper is
+   viewport-agnostic and its `bg-white/80` reads as a gray block below the
+   content wherever the room image does not reach. Full-bleed sections get a
+   `h-full min-h-[100dvh]` frame instead, so the room background fills 100% of
+   the height and the content scrolls over it.
 2. Wrap the active step in `ContextualWorkspaceShell`.
 3. Show the current question, its answer field, then `WorkspaceStepControls`,
    then (optionally) `ContextualResearchPanel` for free-text questions.

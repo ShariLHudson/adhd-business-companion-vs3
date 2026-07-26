@@ -31,6 +31,11 @@ export const ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS = [
   "quick-recharge",
   "playbook",
   "create",
+  // Client Avatar is a room (Contextual Workspace pattern): it owns the viewport
+  // so WorkspaceShell's room background fills the full height instead of sitting
+  // inside the max-w-3xl white/80 companion-panel-surface (which reads as a gray
+  // block below the content).
+  "client-avatars",
 ] as const satisfies readonly AppSection[];
 
 export function isEstateCoreFullBleedPanelSection(
