@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getAvatars, type IdealClientAvatar } from "@/lib/companionStore";
+import { ClientAvatarMark } from "@/components/companion/ClientAvatarMark";
 
 /** Multi-select client avatars for Create audience step. */
 export function CreateAudienceMultiPicker({
@@ -42,13 +43,13 @@ export function CreateAudienceMultiPicker({
               key={a.id}
               type="button"
               onClick={() => toggle(a)}
-              className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`inline-flex items-center gap-1.5 rounded-full border py-1 pl-1 pr-3 text-sm font-medium transition-colors ${
                 active
                   ? "border-[#1e4f4f] bg-[#1e4f4f] text-white"
                   : "border-[#c9bfb0] bg-white text-[#4b463f] hover:border-[#1e4f4f]"
               }`}
             >
-              {a.emoji ? `${a.emoji} ` : ""}
+              <ClientAvatarMark name={a.name} image={a.image} size={20} />
               {a.name}
             </button>
           );

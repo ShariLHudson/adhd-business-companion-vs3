@@ -1497,12 +1497,17 @@ function readAvatars(): IdealClientAvatar[] {
   }
 }
 
-function writeAvatars(list: IdealClientAvatar[]) {
-  if (typeof window === "undefined") return;
+/** Returns true when the write succeeded, false on quota/serialization failure
+ * (e.g. a large uploaded image). Callers that ignore the result keep the prior
+ * fire-and-forget behavior; callers that need to surface a failure use it. */
+function writeAvatars(list: IdealClientAvatar[]): boolean {
+  if (typeof window === "undefined") return false;
   try {
     localStorage.setItem(AVATARS_KEY, JSON.stringify(list));
+    return true;
   } catch {
-    /* noop (storage full — e.g. a large uploaded image) */
+    /* storage full — e.g. a large uploaded image */
+    return false;
   }
 }
 
@@ -1551,6 +1556,22 @@ export function saveAvatar(
   const next = [avatar, ...list];
   writeAvatars(next);
   return next;
+}
+
+/**
+ * Like saveAvatar, but reports whether the write actually persisted. Used by the
+ * Client Avatar image flow so the user is told clearly when a processed image
+ * still can't be saved, instead of a false "saved" confirmation. `ok: false`
+ * means localStorage rejected the write (quota) — the prior state is unchanged.
+ */
+export function saveAvatarChecked(
+  input: Partial<IdealClientAvatar> & { id?: string },
+): { avatars: IdealClientAvatar[]; ok: boolean } {
+  const avatars = saveAvatar(input); // intended state; writes internally
+  // If the write landed, re-reading storage matches the intended state; if the
+  // quota rejected it, storage still holds the prior state → ok = false.
+  const ok = JSON.stringify(readAvatars()) === JSON.stringify(avatars);
+  return { avatars, ok };
 }
 
 export function deleteAvatar(id: string): IdealClientAvatar[] {

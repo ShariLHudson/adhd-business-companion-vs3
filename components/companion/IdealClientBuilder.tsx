@@ -5,6 +5,7 @@ import {
   deleteAvatar,
   getAvatars,
   saveAvatar,
+  saveAvatarChecked,
   setPrimaryAvatar,
   setActiveAvatar,
   getActiveAvatar,
@@ -16,6 +17,8 @@ import {
   type AvatarResearch,
   type ResearchThreadMessage,
 } from "@/lib/companionStore";
+import { ClientAvatarMark } from "@/components/companion/ClientAvatarMark";
+import { processAvatarImage } from "@/lib/clientAvatarImage";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { ContextualWorkspaceShell } from "@/components/companion/contextualWorkspace/ContextualWorkspaceShell";
 import { WorkspaceStepControls } from "@/components/companion/contextualWorkspace/WorkspaceStepControls";
@@ -42,22 +45,6 @@ import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import type { ClientAvatarStepKey } from "@/lib/clientAvatarCoach";
 import { snapshotFromBuilderInput } from "@/lib/clientAvatarCoach";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
-
-// Curated identity marks — double as quick "icons" and emoji avatars.
-const EMOJI_CHOICES = [
-  "🧑‍💻",
-  "🧠",
-  "🌿",
-  "🚀",
-  "💼",
-  "✨",
-  "🌱",
-  "⛰️",
-  "🧭",
-  "🎯",
-  "❤️",
-  "👤",
-];
 
 type StepKey =
   | "who"
@@ -168,8 +155,8 @@ const STEPS: { key: StepKey; q: string; hint?: string }[] = [
   },
   {
     key: "identity",
-    q: "Give them a face.",
-    hint: "An emoji or photo makes them feel real — pick fast.",
+    q: "Add a visual reference.",
+    hint: "Add an optional image to help you recognize this Client Avatar. Without one, Spark Estate will use their initials or an estate-style profile mark.",
   },
   { key: "painPoints", q: "What are they struggling with most?" },
   { key: "goals", q: "What are they trying to achieve?" },
@@ -259,7 +246,6 @@ export const EMPTY: Form = {
   currentBehavior: "",
   solution: "",
   tagline: "",
-  emoji: "👤",
   behaviorTraits: [],
   research: {},
 };
@@ -284,34 +270,6 @@ export function formSignature(f: Form): string {
   const { id: _id, ...rest } = f;
   void _id;
   return JSON.stringify(rest);
-}
-
-function AvatarMark({
-  avatar,
-  size,
-}: {
-  avatar: { emoji?: string; image?: string };
-  size: number;
-}) {
-  if (avatar.image) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return (
-      <img
-        src={avatar.image}
-        alt=""
-        className="rounded-full object-cover"
-        style={{ width: size, height: size }}
-      />
-    );
-  }
-  return (
-    <div
-      className="flex items-center justify-center rounded-full bg-[#1e4f4f]/10"
-      style={{ width: size, height: size, fontSize: size * 0.5 }}
-    >
-      {avatar.emoji ?? "👤"}
-    </div>
-  );
 }
 
 export type IdealClientBuilderPresentation = {
@@ -381,6 +339,12 @@ export function IdealClientBuilder({
     null,
   );
   const [printMenuOpen, setPrintMenuOpen] = useState(false);
+  // Client Avatar image workflow (Phase 2A): processing state, a user-facing
+  // error for unsupported/oversized/undecodable files, and a save error when a
+  // processed image still can't be persisted (localStorage quota).
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const appliedChatFillKey = useRef<number | null>(null);
   const focusTargetRef = useRef<HTMLDivElement | null>(null);
@@ -463,7 +427,7 @@ export function IdealClientBuilder({
             currentBehavior: active.currentBehavior,
             solution: active.solution,
             tagline: active.tagline,
-            emoji: active.emoji ?? "👤",
+            emoji: active.emoji,
             image: active.image,
             revenue: active.revenue,
             behaviorTraits: active.behaviorTraits ?? [],
@@ -530,7 +494,7 @@ export function IdealClientBuilder({
       currentBehavior: a.currentBehavior,
       solution: a.solution,
       tagline: a.tagline,
-      emoji: a.emoji ?? "👤",
+      emoji: a.emoji,
       image: a.image,
       revenue: a.revenue,
       behaviorTraits: a.behaviorTraits ?? [],
@@ -650,7 +614,10 @@ export function IdealClientBuilder({
       ...formRef.current,
       draftStepKey: STEPS[stepRef.current]?.key,
     };
-    const list = saveAvatar(cur);
+    // saveAvatarChecked reports whether the write actually landed — so a
+    // processed image that still can't fit is surfaced instead of a false
+    // "saved" confirmation.
+    const { avatars: list, ok } = saveAvatarChecked(cur);
     if (!formRef.current.id) {
       const mintedId = list[0]?.id;
       if (mintedId) {
@@ -658,8 +625,16 @@ export function IdealClientBuilder({
         setForm((f) => ({ ...f, id: mintedId }));
       }
     }
-    savedSigRef.current = formSignature(formRef.current);
-    setSavedHint(true);
+    if (ok) {
+      savedSigRef.current = formSignature(formRef.current);
+      setSavedHint(true);
+      setSaveError(null);
+    } else {
+      setSavedHint(false);
+      setSaveError(
+        "Your progress couldn't be saved — the image may be too large for this device. Try removing it or using a smaller image.",
+      );
+    }
     setAvatars(getAvatars());
     setActiveId(getActiveAvatar()?.id);
   }
@@ -864,11 +839,28 @@ export function IdealClientBuilder({
     w.print();
   }
 
-  function onUpload(file: File) {
-    const reader = new FileReader();
-    reader.onload = () =>
-      setForm((f) => ({ ...f, image: String(reader.result), emoji: undefined }));
-    reader.readAsDataURL(file);
+  async function onUpload(file: File) {
+    setImageError(null);
+    setImageBusy(true);
+    try {
+      // Validate + downscale + center-crop to a small square WebP so a large
+      // phone photo never lands in the avatar JSON.
+      const processed = await processAvatarImage(file);
+      setForm((f) => ({ ...f, image: processed }));
+    } catch (err) {
+      setImageError(
+        err instanceof Error
+          ? err.message
+          : "We couldn't process that image. Please try another one.",
+      );
+    } finally {
+      setImageBusy(false);
+    }
+  }
+
+  function removeImage() {
+    setImageError(null);
+    setForm((f) => ({ ...f, image: undefined }));
   }
 
   // ---- Interview ----------------------------------------------------------
@@ -1328,60 +1320,66 @@ export function IdealClientBuilder({
           {current.key === "identity" && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
-                <AvatarMark avatar={form} size={72} />
+                <ClientAvatarMark
+                  name={form.name}
+                  image={form.image}
+                  size={72}
+                />
                 <div className="flex flex-col gap-2">
                   <button
                     type="button"
                     onClick={() => fileRef.current?.click()}
-                    className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+                    disabled={imageBusy}
+                    className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+                    data-testid="avatar-image-upload"
                   >
-                    Upload image
+                    {imageBusy
+                      ? "Processing…"
+                      : form.image
+                        ? "Change Image"
+                        : "Add Image"}
                   </button>
                   {form.image && (
                     <button
                       type="button"
-                      onClick={() => setForm({ ...form, image: undefined })}
+                      onClick={removeImage}
                       className="text-xs font-medium text-[#a85c4a]"
+                      data-testid="avatar-image-remove"
                     >
-                      Remove image
+                      Remove Image
                     </button>
                   )}
                 </div>
                 <input
                   ref={fileRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0];
-                    if (file) onUpload(file);
+                    if (file) void onUpload(file);
+                    // Allow re-picking the same file after a remove.
+                    e.target.value = "";
                   }}
                 />
               </div>
 
-              <div>
-                <p className="text-sm font-semibold text-[#6b635a]">
-                  Or pick an emoji
+              {imageError ? (
+                <p
+                  className="text-sm font-medium text-[#a85c4a]"
+                  role="alert"
+                  data-testid="avatar-image-error"
+                >
+                  {imageError}
                 </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {EMOJI_CHOICES.map((e) => (
-                    <button
-                      key={e}
-                      type="button"
-                      onClick={() =>
-                        setForm({ ...form, emoji: e, image: undefined })
-                      }
-                      className={`flex h-11 w-11 items-center justify-center rounded-full text-2xl transition-colors ${
-                        form.emoji === e && !form.image
-                          ? "bg-[#1e4f4f]/15 ring-2 ring-[#1e4f4f]"
-                          : "bg-white hover:bg-[#f0f5f5]"
-                      }`}
-                    >
-                      {e}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              ) : null}
+
+              <p className="text-sm text-[#6b635a]">
+                It can be a representative image or another visual reference.
+              </p>
+              <p className="text-xs text-[#9a8f82]">
+                Use an image you own or have permission to use.
+              </p>
 
               <input
                 id="avatar-tagline"
@@ -1531,8 +1529,13 @@ export function IdealClientBuilder({
       {(() => {
         const active = avatars.find((a) => a.id === activeId);
         return active ? (
-          <p className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-sm font-semibold text-[#1e4f4f]">
-            👤 Using: {active.name}
+          <p className="mt-2 inline-flex w-fit items-center gap-2 rounded-full bg-[#1e4f4f]/10 py-1 pl-1 pr-3 text-sm font-semibold text-[#1e4f4f]">
+            <ClientAvatarMark
+              name={active.name}
+              image={active.image}
+              size={22}
+            />
+            Using: {active.name}
           </p>
         ) : null;
       })()}
@@ -1550,7 +1553,7 @@ export function IdealClientBuilder({
               className="rounded-2xl border border-[#d4cdc3] bg-white/85 p-4"
             >
               <div className="flex items-center gap-3">
-                <AvatarMark avatar={a} size={48} />
+                <ClientAvatarMark name={a.name} image={a.image} size={48} />
                 <div className="min-w-0 flex-1">
                   <p className="flex items-center gap-1.5 truncate text-base font-semibold text-[#1f1c19]">
                     {a.name}
