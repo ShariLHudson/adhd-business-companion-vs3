@@ -90,16 +90,18 @@ function AvatarFace({
   initials,
   imageClassName,
   fallbackClassName,
+  alt = "",
 }: {
   imageUrl: string | null;
   initials: string;
   imageClassName: string;
   fallbackClassName: string;
+  alt?: string;
 }): ReactNode {
   if (imageUrl) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
-      <img src={imageUrl} alt="" className={imageClassName} />
+      <img src={imageUrl} alt={alt} className={imageClassName} />
     );
   }
   if (initials) {
@@ -245,6 +247,11 @@ export function GlobalEstateMenu({
         <AvatarFace
           imageUrl={imageUrl}
           initials={initials}
+          alt={
+            displayName && displayName !== "Member"
+              ? `${displayName} profile image`
+              : "Your profile image"
+          }
           imageClassName="global-estate-menu__avatar-image global-estate-menu__avatar-image--trigger"
           fallbackClassName="global-estate-menu__trigger-initials"
         />

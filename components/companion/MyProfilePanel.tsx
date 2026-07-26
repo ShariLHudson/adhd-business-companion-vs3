@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
+import { processAvatarImage } from "@/lib/clientAvatarImage";
 import { MyProfileRoomShell } from "@/components/companion/MyProfileRoomShell";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import {
@@ -47,6 +48,11 @@ export function MyProfilePanel({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [savedHint, setSavedHint] = useState<string | null>(null);
   const [draftReady, setDraftReady] = useState(false);
+  // Profile image upload — preview before saving; persisted via prefs.profileImage.
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [imageBusy, setImageBusy] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const imageFileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const sync = () => {
@@ -111,6 +117,46 @@ export function MyProfilePanel({
     window.setTimeout(() => setSavedHint(null), 2200);
   }
 
+  // Validate + downscale the chosen photo (reusing the shared image ingest),
+  // then hold it as a preview until the member saves it.
+  async function onChooseProfileImage(file: File) {
+    setImageError(null);
+    setImageBusy(true);
+    try {
+      const processed = await processAvatarImage(file);
+      setPendingImage(processed);
+    } catch (err) {
+      setImageError(
+        err instanceof Error
+          ? err.message
+          : "We couldn't process that image. Please try another one.",
+      );
+    } finally {
+      setImageBusy(false);
+    }
+  }
+
+  function saveProfileImage() {
+    if (!pendingImage) return;
+    savePrefs({ profileImage: pendingImage });
+    setPendingImage(null);
+    setSavedHint("Profile photo saved.");
+    window.setTimeout(() => setSavedHint(null), 2200);
+  }
+
+  function cancelProfileImage() {
+    setPendingImage(null);
+    setImageError(null);
+  }
+
+  function removeProfileImage() {
+    savePrefs({ profileImage: "" });
+    setPendingImage(null);
+    setImageError(null);
+    setSavedHint("Profile photo removed.");
+    window.setTimeout(() => setSavedHint(null), 2200);
+  }
+
   return (
     <MyProfileRoomShell>
       <div
@@ -153,19 +199,99 @@ export function MyProfilePanel({
             data-testid="my-profile-panel"
             aria-label="Personal identity"
           >
-            <div className="my-profile-panel__avatar" aria-hidden>
-              {imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={imageUrl}
-                  alt=""
-                  className="my-profile-panel__avatar-image"
+            <div
+              className="my-profile-panel__image-field"
+              data-testid="profile-image-field"
+            >
+              <div className="my-profile-panel__avatar" aria-hidden>
+                {pendingImage ?? imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={(pendingImage ?? imageUrl) as string}
+                    alt=""
+                    className="my-profile-panel__avatar-image"
+                    data-testid="profile-image-preview"
+                  />
+                ) : (
+                  <span className="my-profile-panel__avatar-initials">
+                    {initials}
+                  </span>
+                )}
+              </div>
+              <div className="my-profile-panel__image-controls">
+                <p className="my-profile-panel__image-title">Your Profile Image</p>
+                <p className="my-profile-panel__image-help">
+                  Add a photo that represents you throughout Spark Estate.
+                </p>
+                <input
+                  ref={imageFileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="my-profile-panel__image-input-hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void onChooseProfileImage(file);
+                    e.target.value = "";
+                  }}
                 />
-              ) : (
-                <span className="my-profile-panel__avatar-initials">
-                  {initials}
-                </span>
-              )}
+                <div className="my-profile-panel__image-actions">
+                  {pendingImage ? (
+                    <>
+                      <button
+                        type="button"
+                        className="my-profile-panel__image-btn my-profile-panel__image-btn--primary"
+                        onClick={saveProfileImage}
+                        data-testid="profile-image-save"
+                      >
+                        Save photo
+                      </button>
+                      <button
+                        type="button"
+                        className="my-profile-panel__image-btn"
+                        onClick={cancelProfileImage}
+                        data-testid="profile-image-cancel"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        className="my-profile-panel__image-btn"
+                        onClick={() => imageFileRef.current?.click()}
+                        disabled={imageBusy}
+                        data-testid="profile-image-choose"
+                      >
+                        {imageBusy
+                          ? "Processing…"
+                          : imageUrl
+                            ? "Change Image"
+                            : "Add Image"}
+                      </button>
+                      {imageUrl ? (
+                        <button
+                          type="button"
+                          className="my-profile-panel__image-btn my-profile-panel__image-btn--danger"
+                          onClick={removeProfileImage}
+                          data-testid="profile-image-remove"
+                        >
+                          Remove Image
+                        </button>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+                {imageError ? (
+                  <p
+                    className="my-profile-panel__image-error"
+                    role="alert"
+                    data-testid="profile-image-error"
+                  >
+                    {imageError}
+                  </p>
+                ) : null}
+              </div>
             </div>
 
             <label className="my-profile-panel__field">

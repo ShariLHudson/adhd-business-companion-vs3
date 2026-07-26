@@ -138,6 +138,88 @@
   color: var(--profile-text-heading);
 }
 
+/* Profile image upload — readable controls beside the avatar preview. */
+.my-profile-panel__image-field {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.my-profile-panel__image-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 12rem;
+  flex: 1;
+}
+
+.my-profile-panel__image-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--profile-text-secondary);
+}
+
+.my-profile-panel__image-help {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--profile-text-muted);
+}
+
+.my-profile-panel__image-input-hidden {
+  display: none;
+}
+
+.my-profile-panel__image-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.my-profile-panel__image-btn {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--profile-border);
+  background: var(--profile-input-bg);
+  color: var(--profile-text-primary);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.my-profile-panel__image-btn:hover {
+  border-color: var(--profile-text-heading);
+}
+
+.my-profile-panel__image-btn:focus-visible {
+  outline: 2px solid var(--profile-text-heading);
+  outline-offset: 2px;
+}
+
+.my-profile-panel__image-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.my-profile-panel__image-btn--primary {
+  border-color: var(--profile-button-fill);
+  background: var(--profile-button-fill);
+  color: var(--profile-button-fill-text);
+}
+
+.my-profile-panel__image-btn--danger {
+  color: #a3402f;
+}
+
+.my-profile-panel__image-error {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #a3402f;
+}
+
 .my-profile-panel__field {
   display: flex;
   flex-direction: column;
