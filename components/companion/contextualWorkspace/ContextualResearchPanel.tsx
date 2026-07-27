@@ -68,6 +68,17 @@ export type ContextualResearchPanelProps = {
   systemPrompt: string;
   /** Auto first request, sent (hidden) the first time an empty thread opens. */
   autoPrompt?: string;
+  /**
+   * Optional generic turn handler. When provided, the panel routes each turn
+   * through this instead of its built-in companion-chat call — e.g. the shared
+   * research engine (runResearch). Returns the assistant reply plus optional
+   * findings. The panel stays destination-neutral; it knows nothing about the
+   * caller, the engine, or any experience.
+   */
+  onResearchTurn?: (input: {
+    systemPrompt: string;
+    messages: { role: "user" | "assistant"; content: string }[];
+  }) => Promise<{ reply: string; findings?: SharedResearchFinding[]; error?: boolean }>;
   /** The active thread's messages (host-owned, persisted with the avatar). */
   messages: ContextualResearchMessage[];
   /** Emitted on every thread change so the host can persist it. */
@@ -95,6 +106,7 @@ export function ContextualResearchPanel({
   questionLabel,
   systemPrompt,
   autoPrompt,
+  onResearchTurn,
   messages,
   onMessagesChange,
   addedResponseIds = [],
@@ -146,21 +158,40 @@ export function ContextualResearchPanel({
   async function complete(projected: ContextualResearchMessage[]) {
     setBusy(true);
     try {
-      const res = await fetch("/api/companion-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      let reply = "";
+      let findings: SharedResearchFinding[] | undefined;
+      if (onResearchTurn) {
+        // Injected engine (e.g. the shared runResearch). The panel does not know
+        // which engine or experience this is.
+        const out = await onResearchTurn({
+          systemPrompt,
           messages: projected.map((m) => ({ role: m.role, content: m.content })),
-          talkItOutShariEngine: true,
-          systemPromptOverride: systemPrompt,
-        }),
-      });
-      const data = await res.json();
-      const reply = typeof data.message === "string" ? data.message.trim() : "";
-      if (!reply) throw new Error("empty");
+        });
+        reply = (out.reply ?? "").trim();
+        findings = out.findings;
+        if (out.error || !reply) throw new Error("empty");
+      } else {
+        const res = await fetch("/api/companion-chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: projected.map((m) => ({ role: m.role, content: m.content })),
+            talkItOutShariEngine: true,
+            systemPromptOverride: systemPrompt,
+          }),
+        });
+        const data = await res.json();
+        reply = typeof data.message === "string" ? data.message.trim() : "";
+        if (!reply) throw new Error("empty");
+      }
       onMessagesChange([
         ...projected,
-        { id: newMessageId(), role: "assistant", content: reply },
+        {
+          id: newMessageId(),
+          role: "assistant",
+          content: reply,
+          ...(findings && findings.length ? { findings } : {}),
+        },
       ]);
     } catch {
       onMessagesChange([

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildResearchLibraryAutoPrompt,
   buildResearchLibrarySystemPrompt,
   pickResearchLibraryGuidance,
 } from "./researchLibraryConfig";
@@ -53,5 +54,12 @@ describe("researchLibraryConfig — honest Explore prompt", () => {
       priorContext: "Sells coaching packages.",
     });
     expect(prompt).toContain("Sells coaching packages.");
+  });
+
+  it("builds an honest auto-prompt seed from a topic", () => {
+    const p = buildResearchLibraryAutoPrompt("advisory board");
+    expect(p).toContain("advisory board");
+    expect(p).toMatch(/frameworks|proven models/i);
+    expect(p).toMatch(/Do not invent sources/i);
   });
 });

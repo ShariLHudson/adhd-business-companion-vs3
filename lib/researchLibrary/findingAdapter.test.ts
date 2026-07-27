@@ -1,11 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
+  collectResearchRecordsFromSharedMessages,
   mapResearchFindingKind,
   researchRecordToSharedFinding,
   researchTurnToSharedMessage,
   researchTurnsToSharedMessages,
+  sharedFindingToResearchRecord,
+  sharedMessagesToConversationTurns,
 } from "./findingAdapter";
-import { findingMayShowCitation } from "@/lib/research/types";
+import { findingMayShowCitation, makeFinding } from "@/lib/research/types";
+import { addFindingsToCollection, createResearchCollection } from "./collection";
+import { createResearchSession } from "./session";
 import type {
   ResearchConversationTurn,
   ResearchFindingRecord,
@@ -113,5 +118,54 @@ describe("findingAdapter — conversation turns → shared messages", () => {
     );
     expect(msgs.map((m) => m.role)).toEqual(["user", "assistant"]);
     expect(msgs[1]!.findings).toHaveLength(1);
+  });
+});
+
+describe("findingAdapter — write shared results back into existing records", () => {
+  const guidance = makeFinding({
+    id: "g1",
+    title: "Typical structure",
+    content: "Start with 3–5 advisors.",
+    kind: "example",
+    evidenceBasis: "built_in_guidance",
+  });
+
+  it("drops the hidden seed and records findingIdsAdded", () => {
+    const turns = sharedMessagesToConversationTurns(
+      [
+        { id: "u0", role: "user", content: "seed", hidden: true },
+        { id: "a1", role: "assistant", content: "Here's a start.", findings: [guidance] },
+        { id: "u1", role: "user", content: "follow-up" },
+      ],
+      "2026-07-27T00:00:00Z",
+    );
+    expect(turns.map((t) => t.id)).toEqual(["a1", "u1"]); // hidden seed dropped
+    expect(turns[0]!.findingIdsAdded).toEqual(["g1"]);
+    expect(turns[1]!.findingIdsAdded).toBeUndefined();
+  });
+
+  it("stores findings with NO source metadata, so the collection has no synthetic sources", () => {
+    const records = collectResearchRecordsFromSharedMessages([
+      { id: "a1", role: "assistant", content: "…", findings: [guidance] },
+    ]);
+    expect(records).toHaveLength(1);
+    expect(records[0]!.sourceTitle).toBe("");
+    expect(records[0]!.sourceType).toBe("stable_knowledge");
+
+    const session = createResearchSession({ text: "advisory board" });
+    const collection = addFindingsToCollection(
+      createResearchCollection(session),
+      records,
+    );
+    // The aggregate "Sources" the collection view reads is empty — nothing synthetic.
+    expect(collection.sourceReferences).toEqual([]);
+    expect(collection.findings).toHaveLength(1);
+  });
+
+  it("a stored shared finding round-trips back to built_in_guidance (no citation)", () => {
+    const record = sharedFindingToResearchRecord(guidance);
+    const backToShared = researchRecordToSharedFinding(record);
+    expect(backToShared.evidenceBasis).toBe("built_in_guidance");
+    expect(findingMayShowCitation(backToShared)).toBe(false);
   });
 });

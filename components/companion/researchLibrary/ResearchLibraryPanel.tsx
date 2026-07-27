@@ -10,7 +10,6 @@ import {
   RESEARCH_LIBRARY_TITLE,
   buildResearchOutcome,
   consumePendingContextualResearch,
-  continueResearchConversation,
   contextualRequestOpeningText,
   getResearchCollectionById,
   groupSavedResearch,
@@ -22,13 +21,36 @@ import {
   persistResearchPair,
   refreshCurrentResearch,
   saveResearchCollectionRecord,
-  startResearchConversation,
   trackResearchLibraryEvent,
   type ResearchCollectionRecord,
   type ResearchOutcomeArtifact,
   type ResearchSession,
   type ResearchUseOption,
 } from "@/lib/researchLibrary";
+import {
+  ContextualResearchPanel,
+  type ContextualResearchMessage,
+} from "@/components/companion/contextualWorkspace/ContextualResearchPanel";
+import {
+  createDefaultChatProvider,
+  runResearch,
+} from "@/lib/research/researchEngine";
+import { createResearchSession } from "@/lib/researchLibrary/session";
+import {
+  addFindingsToCollection,
+  createResearchCollection,
+} from "@/lib/researchLibrary/collection";
+import {
+  RESEARCH_LIBRARY_RESEARCH_LABELS,
+  buildResearchLibraryAutoPrompt,
+  buildResearchLibrarySystemPrompt,
+  pickResearchLibraryGuidance,
+} from "@/lib/researchLibrary/researchLibraryConfig";
+import {
+  collectResearchRecordsFromSharedMessages,
+  researchTurnsToSharedMessages,
+  sharedMessagesToConversationTurns,
+} from "@/lib/researchLibrary/findingAdapter";
 
 type Props = {
   onBack?: () => void;
@@ -45,7 +67,9 @@ type Props = {
   onOpenBusinessEstate?: (seedText: string) => void;
 };
 
-type ViewMode = "home" | "conversation" | "collection" | "saved" | "use";
+type ViewMode = "home" | "conversation" | "collection" | "saved" | "use" | "sources";
+
+const RESEARCH_PROVIDERS = { chat: createDefaultChatProvider(), liveRetrieval: null };
 
 const BTN_PRIMARY =
   "rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-base font-semibold text-white shadow-md transition-colors hover:bg-[#163a3a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]";
@@ -68,7 +92,6 @@ export function ResearchLibraryPanel({
   const [session, setSession] = useState<ResearchSession | null>(null);
   const [collection, setCollection] =
     useState<ResearchCollectionRecord | null>(null);
-  const [offerUse, setOfferUse] = useState(false);
   const [useOptions, setUseOptions] = useState<ResearchUseOption[]>([]);
   const [outcome, setOutcome] = useState<ResearchOutcomeArtifact | null>(null);
   const [statusNotice, setStatusNotice] = useState<string | null>(null);
@@ -76,6 +99,10 @@ export function ResearchLibraryPanel({
   const [activeSessions, setActiveSessions] = useState(() =>
     listActiveResearchSessions(),
   );
+  // Shared-panel conversation state (RL-2).
+  const [messages, setMessages] = useState<ContextualResearchMessage[]>([]);
+  const [addedIds, setAddedIds] = useState<string[]>([]);
+  const [sourcesNotice, setSourcesNotice] = useState<string | null>(null);
 
   useEffect(() => {
     trackResearchLibraryEvent("research_library_opened");
@@ -86,12 +113,7 @@ export function ResearchLibraryPanel({
   useEffect(() => {
     const pending = consumePendingContextualResearch();
     if (!pending) return;
-    const text = contextualRequestOpeningText(pending);
-    void handleSubmitText(text, {
-      sourceExperience: pending.sourceExperience,
-      sourceEntityId: pending.sourceEntityId,
-      sourceSelectionIds: pending.sourceSelectionIds,
-    });
+    startExplore(contextualRequestOpeningText(pending));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount for Research This
   }, []);
 
@@ -100,69 +122,120 @@ export function ResearchLibraryPanel({
     setActiveSessions(listActiveResearchSessions());
   }
 
-  function handleSubmitText(
-    text: string,
-    meta?: {
-      sourceExperience?: string | null;
-      sourceEntityId?: string | null;
-      sourceSelectionIds?: string[];
-    },
-  ) {
-    const trimmed = text.trim();
+  /** Begin an Explore-with-Shari thread on a topic (shared engine + panel). */
+  function startExplore(topic: string) {
+    const trimmed = topic.trim();
     if (!trimmed) return;
-
     trackResearchLibraryEvent("research_request_submitted", {
       length: trimmed.length,
     });
-
-    if (!session || !collection) {
-      const result = startResearchConversation({
-        text: trimmed,
-        sourceExperience: meta?.sourceExperience ?? "research_library",
-        sourceEntityId: meta?.sourceEntityId,
-        sourceSelectionIds: meta?.sourceSelectionIds,
-      });
-      trackResearchLibraryEvent("research_mode_inferred", {
-        mode: result.session.researchMode,
-      });
-      trackResearchLibraryEvent("research_collection_created");
-      trackResearchLibraryEvent("source_type_used", {
-        type: result.session.liveResearchAvailable
-          ? "current"
-          : "stable_knowledge",
-      });
-      setSession(result.session);
-      setCollection(result.collection);
-      setStatusNotice(result.currentResearchNotice);
-      setOutcome(result.autoOutcome);
-      setOfferUse(result.offerUseThisResearch);
-      persistResearchPair(result.session, result.collection);
-      setView("conversation");
-      setDraft("");
-      syncLists();
-      return;
-    }
-
-    const result = continueResearchConversation({
-      session,
-      collection,
-      text: trimmed,
-    });
-    trackResearchLibraryEvent("research_continued");
-    if (result.autoOutcome) {
-      trackResearchLibraryEvent("creation_generated", {
-        kind: result.autoOutcome.kind,
-      });
-    }
-    setSession(result.session);
-    setCollection(result.collection);
-    setStatusNotice(result.currentResearchNotice);
-    setOutcome(result.autoOutcome);
-    setOfferUse(result.offerUseThisResearch);
-    persistResearchPair(result.session, result.collection);
-    setView("conversation");
+    const nextSession: ResearchSession = { ...createResearchSession({ text: trimmed, sourceExperience: "research_library" }), currentStatus: "conversing" };
+    const nextCollection = createResearchCollection(nextSession);
+    const linkedSession = { ...nextSession, currentResearchCollectionId: nextCollection.id };
+    setSession(linkedSession);
+    setCollection(nextCollection);
+    setMessages([]);
+    setAddedIds([]);
+    setOutcome(null);
+    setStatusNotice(null);
+    setSourcesNotice(null);
     setDraft("");
+    persistResearchPair(linkedSession, nextCollection);
+    setView("conversation");
     syncLists();
+    trackResearchLibraryEvent("research_collection_created");
+  }
+
+  /** Research with Sources — honestly unavailable until a real provider exists. */
+  async function startSources(topic: string) {
+    const trimmed = topic.trim();
+    if (!trimmed) return;
+    const result = await runResearch(
+      {
+        mode: "sources",
+        systemPrompt: buildResearchLibrarySystemPrompt({ topic: trimmed }),
+        messages: [{ role: "user", content: trimmed }],
+      },
+      RESEARCH_PROVIDERS,
+    );
+    trackResearchLibraryEvent("source_type_used", { type: "stable_knowledge" });
+    // No provider → providerUnavailable, zero findings, honest notice, no fallback.
+    setSourcesNotice(
+      result.notice ??
+        "Live web research isn't connected yet, so I can't pull real sources right now.",
+    );
+    setView("sources");
+  }
+
+  /** The Explore turn handler injected into the shared panel — routes through
+   * the shared research engine. Topic-pack guidance enters only on the first
+   * turn as built_in_guidance. */
+  async function handleResearchTurn(input: {
+    systemPrompt: string;
+    messages: { role: "user" | "assistant"; content: string }[];
+  }): Promise<{ reply: string; findings?: unknown[] }> {
+    const isFirstTurn = !input.messages.some((m) => m.role === "assistant");
+    const guidance =
+      isFirstTurn && session ? pickResearchLibraryGuidance(session.primaryTopic) : undefined;
+    const result = await runResearch(
+      {
+        mode: "explore",
+        systemPrompt: input.systemPrompt,
+        messages: input.messages,
+        builtInGuidance: guidance,
+      },
+      RESEARCH_PROVIDERS,
+    );
+    return { reply: result.reply, findings: result.findings };
+  }
+
+  /** Persist the live thread back into the EXISTING session + collection
+   * records (no new store; findings stored in the existing record shape). */
+  function handleMessagesChange(next: ContextualResearchMessage[]) {
+    setMessages(next);
+    if (!session || !collection) return;
+    const now = new Date().toISOString();
+    const nextSession: ResearchSession = {
+      ...session,
+      conversationTurns: sharedMessagesToConversationTurns(next, now),
+      currentStatus: "conversing",
+      updatedAt: now,
+      lastOpenedAt: now,
+    };
+    const nextCollection = addFindingsToCollection(
+      collection,
+      collectResearchRecordsFromSharedMessages(next),
+    );
+    setSession(nextSession);
+    setCollection(nextCollection);
+    persistResearchPair(nextSession, nextCollection);
+    syncLists();
+  }
+
+  function saveResponseToResearch(message: ContextualResearchMessage) {
+    if (!collection) return;
+    setAddedIds((prev) => (prev.includes(message.id) ? prev : [...prev, message.id]));
+    const nextCollection = {
+      ...collection,
+      userHighlights: [...collection.userHighlights, message.content],
+      updatedAt: new Date().toISOString(),
+    };
+    setCollection(nextCollection);
+    if (session) persistResearchPair(session, nextCollection);
+    syncLists();
+  }
+
+  function handleAddResponse(message: ContextualResearchMessage) {
+    saveResponseToResearch(message);
+  }
+
+  function handleAddSession() {
+    const added = new Set(addedIds);
+    for (const m of messages) {
+      if (m.role === "assistant" && !m.error && !m.hidden && !added.has(m.id)) {
+        saveResponseToResearch(m);
+      }
+    }
   }
 
   function openUseThisResearch() {
@@ -278,6 +351,15 @@ export function ResearchLibraryPanel({
       : null;
     setSession(s);
     if (found) setCollection(found);
+    // Rehydrate the existing transcript into the shared panel (resume).
+    setMessages(
+      researchTurnsToSharedMessages(
+        s.conversationTurns,
+        found?.findings ?? [],
+      ) as ContextualResearchMessage[],
+    );
+    setAddedIds([]);
+    setSourcesNotice(null);
     setView("conversation");
     setOutcome(null);
   }
@@ -389,38 +471,63 @@ export function ResearchLibraryPanel({
           </div>
         ) : null}
 
-        {(view === "conversation" || (view === "home" && session)) &&
-        session ? (
+        {view === "conversation" && session ? (
           <div
-            className="mx-auto flex max-w-3xl flex-col gap-4"
+            className="mx-auto max-w-3xl"
             data-testid="research-library-conversation"
           >
-            {statusNotice ? (
-              <p
-                className="rounded-xl border border-[#d9cfc0] bg-[#fff9f0] px-4 py-3 text-sm text-[#5a5349]"
-                role="status"
+            <ContextualResearchPanel
+              open
+              onToggle={() => setView("home")}
+              questionKey={session.id}
+              questionLabel={session.primaryTopic}
+              systemPrompt={buildResearchLibrarySystemPrompt({
+                topic: session.primaryTopic,
+              })}
+              autoPrompt={buildResearchLibraryAutoPrompt(session.primaryTopic)}
+              onResearchTurn={handleResearchTurn}
+              messages={messages}
+              onMessagesChange={handleMessagesChange}
+              addedResponseIds={addedIds}
+              onAddResponse={handleAddResponse}
+              onAddSession={handleAddSession}
+              toggleLabel={RESEARCH_LIBRARY_RESEARCH_LABELS.toggleLabel}
+              helperText={RESEARCH_LIBRARY_RESEARCH_LABELS.helperText}
+              addLabel={RESEARCH_LIBRARY_RESEARCH_LABELS.addLabel}
+              addAllLabel={RESEARCH_LIBRARY_RESEARCH_LABELS.addAllLabel}
+              addedLabel={RESEARCH_LIBRARY_RESEARCH_LABELS.addedLabel}
+            />
+            {/* Progress bridge — existing handoff points, connected in RL-3. */}
+            <div
+              className="mt-4 flex flex-wrap gap-2"
+              data-testid="research-library-progress-bridge"
+            >
+              <button
+                type="button"
+                className={BTN_SECONDARY}
+                onClick={() => setView("collection")}
               >
-                {statusNotice}
-              </p>
-            ) : null}
-            {session.conversationTurns.map((turn) => (
-              <article
-                key={turn.id}
-                className={
-                  turn.role === "user"
-                    ? "ml-8 rounded-2xl bg-[#1e4f4f] px-4 py-3 text-lg text-white"
-                    : "mr-4 rounded-2xl border border-[#ddd2c3] bg-white/70 px-4 py-3 text-lg leading-relaxed text-[#2f2a24] whitespace-pre-wrap"
-                }
+                Review the findings
+              </button>
+              <button
+                type="button"
+                className={BTN_SECONDARY}
+                onClick={handleSaveCollection}
               >
-                <h2 className="sr-only">
-                  {turn.role === "user" ? "You" : "Shari"}
-                </h2>
-                {turn.content.replace(/\*\*/g, "")}
-              </article>
-            ))}
+                Save the research
+              </button>
+              <button
+                type="button"
+                className={BTN_PRIMARY}
+                onClick={openUseThisResearch}
+                data-testid="research-library-use-this-from-conversation"
+              >
+                Use this research
+              </button>
+            </div>
             {outcome ? (
               <aside
-                className="rounded-2xl border border-[#1e4f4f]/30 bg-white/80 p-4"
+                className="mt-4 rounded-2xl border border-[#1e4f4f]/30 bg-white/80 p-4"
                 data-testid="research-library-outcome"
               >
                 <h2 className="text-xl font-semibold">{outcome.title}</h2>
@@ -436,15 +543,36 @@ export function ResearchLibraryPanel({
                 </div>
               </aside>
             ) : null}
-            {offerUse ? (
+          </div>
+        ) : null}
+
+        {view === "sources" ? (
+          <div
+            className="mx-auto max-w-2xl space-y-3 rounded-2xl border border-[#ddd2c3] bg-white/75 p-5"
+            data-testid="research-library-sources-unavailable"
+          >
+            <h2 className="text-2xl font-semibold">Research with Sources</h2>
+            <p className="text-base text-[#5a5349]" role="status">
+              {sourcesNotice}
+            </p>
+            <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 className={BTN_PRIMARY}
-                onClick={openUseThisResearch}
+                onClick={() =>
+                  draft.trim() ? startExplore(draft) : setView("home")
+                }
               >
-                Use This Research
+                Explore with Shari instead
               </button>
-            ) : null}
+              <button
+                type="button"
+                className={BTN_SECONDARY}
+                onClick={() => setView("home")}
+              >
+                Back
+              </button>
+            </div>
           </div>
         ) : null}
 
@@ -647,38 +775,54 @@ export function ResearchLibraryPanel({
         ) : null}
       </div>
 
-      <div className="relative z-[1] border-t border-[#ddd2c3]/80 bg-white/50 px-4 py-3 backdrop-blur-md sm:px-6">
-        <form
-          className="mx-auto flex max-w-3xl flex-col gap-2 sm:flex-row sm:items-end"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmitText(draft);
-          }}
-        >
-          <label className="sr-only" htmlFor="research-library-input">
-            Research question
-          </label>
-          <textarea
-            id="research-library-input"
-            ref={inputRef}
-            data-testid="research-library-input"
-            className="min-h-[56px] flex-1 rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-lg text-[#2f2a24] outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]"
-            placeholder={RESEARCH_LIBRARY_INPUT_PLACEHOLDER}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmitText(draft);
-              }
+      {view !== "conversation" && view !== "sources" ? (
+        <div className="relative z-[1] border-t border-[#ddd2c3]/80 bg-white/50 px-4 py-3 backdrop-blur-md sm:px-6">
+          <form
+            className="mx-auto flex max-w-3xl flex-col gap-2 sm:flex-row sm:items-end"
+            onSubmit={(e) => {
+              e.preventDefault();
+              startExplore(draft);
             }}
-            rows={2}
-          />
-          <button type="submit" className={BTN_PRIMARY}>
-            Send
-          </button>
-        </form>
-      </div>
+          >
+            <label className="sr-only" htmlFor="research-library-input">
+              Research question
+            </label>
+            <textarea
+              id="research-library-input"
+              ref={inputRef}
+              data-testid="research-library-input"
+              className="min-h-[56px] flex-1 rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-lg text-[#2f2a24] outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]"
+              placeholder={RESEARCH_LIBRARY_INPUT_PLACEHOLDER}
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  startExplore(draft);
+                }
+              }}
+              rows={2}
+            />
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className={BTN_PRIMARY}
+                data-testid="research-library-explore"
+              >
+                Explore with Shari
+              </button>
+              <button
+                type="button"
+                className={BTN_SECONDARY}
+                data-testid="research-library-sources"
+                onClick={() => startSources(draft)}
+              >
+                Research with Sources
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : null}
     </section>
   );
 }

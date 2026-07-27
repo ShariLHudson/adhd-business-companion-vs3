@@ -66,6 +66,14 @@ export function buildResearchLibrarySystemPrompt(
     .join("\n");
 }
 
+/** The hidden first request that seeds an Explore thread from a topic. */
+export function buildResearchLibraryAutoPrompt(topic: string): string {
+  return (
+    `Help me explore this: "${topic.trim()}". Share the most useful frameworks, ` +
+    `proven models, angles, and open questions to think it through. Do not invent sources.`
+  );
+}
+
 function slug(text: string): string {
   return text
     .toLowerCase()
