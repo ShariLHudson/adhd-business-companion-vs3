@@ -1403,6 +1403,7 @@ import {
   getActiveConversationOwner,
   setActiveConversationOwner,
 } from "@/lib/conversationContinuity";
+import { resolveTurnBoundaryDecision } from "@/lib/conversationBoundaryInputs";
 import {
   beginRoutedChatRequest,
   routeConversationTurn,
@@ -14856,6 +14857,18 @@ export default function CompanionPageClient() {
       return;
     }
 
+    /**
+     * S3 — shared Conversation Boundary Decision, computed ONCE here and threaded
+     * to the continuity gate so an ambiguous turn during active Create parks
+     * (recoverable) instead of destroying. Behavior-neutral unless a Create
+     * session is active and the gate reaches a Create-exit seam.
+     */
+    const turnBoundaryDecision = resolveTurnBoundaryDecision({
+      userText: trimmed,
+      turn: chatTurnRef.current,
+      lastAssistantText: lastAssistantForPrimary,
+    });
+
     /** Authoritative arbiter — Continuity + intent family + navigation priority. */
     const routedTurn = routeConversationTurn({
       userText: trimmed,
@@ -14863,6 +14876,8 @@ export default function CompanionPageClient() {
       activeSection: activeSectionRef.current,
       conversationId: activeConversationIdRef.current,
       destinationId: directEstateVisitRef.current?.roomId ?? null,
+      boundaryDecision: turnBoundaryDecision,
+      turn: chatTurnRef.current,
     });
     const continuityGate = routedTurn.continuityGate;
     const routedRequestIdentity: ChatRequestIdentity | null =

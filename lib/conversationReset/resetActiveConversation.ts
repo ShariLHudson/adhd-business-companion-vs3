@@ -47,6 +47,7 @@ import {
 import { resetShariConversationThreadForNewConversation } from "@/lib/shariAnswerFirst/conversationContinuity";
 import { clearShariConversationHandoff } from "@/lib/shariAnswerFirst/conversationHandoff";
 import { clearActiveTopic } from "@/lib/conversationStabilization/activeTopicStore";
+import { clearSuspensionStore } from "@/lib/conversationStabilization/suspensionStore";
 import { clearGeneralChatCertifiedRuntime } from "@/lib/certifiedConversation/generalChatCertifiedState";
 import { markSpineTurnAuthorityConsumed } from "@/lib/conversationSession/spineInvariants";
 
@@ -147,6 +148,7 @@ export function resetActiveConversation(
   // must not survive New Chat / New Day. Long-term profile remains untouched.
   clearActiveTopic();
   clearIntentWorkflow();
+  clearSuspensionStore();
   clearShariConversationHandoff();
   clearGeneralChatCertifiedRuntime();
   markSpineTurnAuthorityConsumed("reset");

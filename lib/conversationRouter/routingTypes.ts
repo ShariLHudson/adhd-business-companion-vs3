@@ -167,6 +167,14 @@ export type RouteConversationTurnInput = {
   suppressDestination?: boolean;
   /** When true, skip creating a request identity (local-only probes). */
   skipIdentity?: boolean;
+  /**
+   * Shared Conversation Boundary Decision (S3), computed once early in the turn.
+   * Threaded to the continuity gate so an ambiguous turn during active Create
+   * parks (recoverable) instead of destroying. Absent → legacy destroy behavior.
+   */
+  boundaryDecision?: import("@/lib/conversationBoundary").ConversationBoundaryDecision;
+  /** Current turn number — for the parked SuspendedContext. */
+  turn?: number;
 };
 
 export function chatScopeKindToRoutingScope(

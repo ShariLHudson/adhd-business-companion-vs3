@@ -16,6 +16,10 @@ import {
   clearUniversalCreationSession,
   loadUniversalCreationSession,
 } from "@/lib/universalCreation";
+import { parkCreateWorkflow } from "@/lib/universalCreation/createLifecycle";
+import { suspendedContextFromParkedCreate } from "@/lib/conversationSuspension";
+import { pushSuspendedContext } from "@/lib/conversationStabilization/suspensionStore";
+import type { ConversationBoundaryDecision } from "@/lib/conversationBoundary";
 import { classifyRequestedArtifactType } from "@/lib/conversationStabilization/intentClassificationGate";
 import { getIntentWorkflow } from "@/lib/conversationStabilization/intentWorkflowStore";
 import { resolveWorkflowResumeDecision } from "@/lib/conversationStabilization/workflowResumeDecision";
@@ -108,6 +112,16 @@ export type ResolveContinuityGateInput = ResolveActiveOwnerInput & {
   userText: string;
   lastAssistantText?: string | null;
   suppressDestination?: boolean;
+  /**
+   * Shared Conversation Boundary Decision, computed ONCE early in the turn and
+   * threaded in (S3). When present, an ambiguous turn during an active Create
+   * PARKS (recoverable) instead of destroying. When ABSENT, the gate keeps its
+   * legacy destroy behavior — so every caller that does not thread it is
+   * behavior-neutral.
+   */
+  boundaryDecision?: ConversationBoundaryDecision;
+  /** Current turn number — for the parked SuspendedContext. */
+  turn?: number;
 };
 
 function exitDocumentMode(
@@ -120,18 +134,75 @@ function exitDocumentMode(
   return { action: "exit_document_mode", owner, intentBucket };
 }
 
+/**
+ * Soft leave — PARK the Create session (recoverable) instead of destroying it,
+ * and record a SuspendedContext for a later return (S5). Reuses the
+ * exit_document_mode action so downstream routing continues as conversation
+ * exactly as before; the only difference is the session survives, parked.
+ */
+function parkDocumentMode(
+  owner: ConversationOwner,
+  intentBucket: MemberIntentBucket,
+  turn?: number,
+): ContinuityGateDecision {
+  const parked = parkCreateWorkflow(`boundary_${intentBucket}`, turn);
+  const ctx = parked ? suspendedContextFromParkedCreate(parked) : null;
+  if (ctx) pushSuspendedContext(ctx);
+  clearConversationOwner();
+  clearRejectedRecoveryReply();
+  return { action: "exit_document_mode", owner, intentBucket };
+}
+
+/**
+ * Replaces the destructive default at Create-exit seams. Precedence #1 (the
+ * high-confidence continue-in-owner path) runs BEFORE this is reached. Here the
+ * shared Boundary Decision maps: cancel → destroy; interrupt/switch → park;
+ * unclear/continue/expand/answer/return → keep Create intact; and — absent a
+ * decision — legacy destroy (behavior-neutral).
+ */
+function resolveDocumentDisposition(
+  owner: ConversationOwner,
+  intentBucket: MemberIntentBucket,
+  decision: ConversationBoundaryDecision | undefined,
+  turn: number | undefined,
+): ContinuityGateDecision {
+  if (!decision) return exitDocumentMode(owner, intentBucket);
+  switch (decision.decision) {
+    case "cancel_current_workflow":
+      return exitDocumentMode(owner, intentBucket);
+    case "interrupt_and_suspend":
+    case "switch_topic":
+      return parkDocumentMode(owner, intentBucket, turn);
+    case "unclear":
+    case "continue_current_topic":
+    case "expand_current_topic":
+    case "answer_pending_question":
+    case "return_to_suspended_topic":
+      // Neither destroy nor park — keep the Create session; continue as chat.
+      return { action: "fall_through", owner, intentBucket };
+    default: {
+      const _exhaustive: never = decision.decision;
+      void _exhaustive;
+      return exitDocumentMode(owner, intentBucket);
+    }
+  }
+}
+
 function tryRouteActiveDocument(
   owner: ConversationOwner,
   userText: string,
-  lastAssistantText?: string | null,
+  lastAssistantText: string | null | undefined,
+  decision: ConversationBoundaryDecision | undefined,
+  turn: number | undefined,
 ): ContinuityGateDecision {
   const artifactType = classifyRequestedArtifactType(userText);
   if (
     !isStickyContinuityOwner(owner.kind) ||
     !canOwnerHandleTurn(owner, userText)
   ) {
-    return exitDocumentMode(owner, "conversation");
+    return resolveDocumentDisposition(owner, "conversation", decision, turn);
   }
+  // Precedence #1 — the existing high-confidence continue-in-owner path wins.
   const resume = resolveWorkflowResumeDecision({
     userText,
     activeOwner: owner,
@@ -140,7 +211,7 @@ function tryRouteActiveDocument(
     currentArtifactType: artifactType,
   });
   if (!resume.shouldResume || resume.confidence !== "high") {
-    return exitDocumentMode(owner, "conversation");
+    return resolveDocumentDisposition(owner, "conversation", decision, turn);
   }
   const routed = routeTurnToOwner({
     owner,
@@ -155,7 +226,7 @@ function tryRouteActiveDocument(
       intentBucket: "active_document",
     };
   }
-  return exitDocumentMode(owner, "conversation");
+  return resolveDocumentDisposition(owner, "conversation", decision, turn);
 }
 
 /**
@@ -343,6 +414,8 @@ export function resolveContinuityTurnGate(
         owner,
         userText,
         input.lastAssistantText,
+        input.boundaryDecision,
+        input.turn,
       );
     }
 
@@ -385,7 +458,12 @@ export function resolveContinuityTurnGate(
     case "research": {
       // Research never stays in document mode.
       if (hasStickyDocument) {
-        return exitDocumentMode(owner, "research");
+        return resolveDocumentDisposition(
+          owner,
+          "research",
+          input.boundaryDecision,
+          input.turn,
+        );
       }
       return {
         action: "fall_through",
@@ -410,7 +488,12 @@ export function resolveContinuityTurnGate(
     case "conversation":
     default: {
       if (hasStickyDocument) {
-        return exitDocumentMode(owner, "conversation");
+        return resolveDocumentDisposition(
+          owner,
+          "conversation",
+          input.boundaryDecision,
+          input.turn,
+        );
       }
       // Non-Create sticky owners (e.g. none) — allow Board/Chamber already handled.
       if (

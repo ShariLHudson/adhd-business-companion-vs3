@@ -108,6 +108,8 @@ export function routeConversationTurn(
     lastAssistantText: input.lastAssistantText,
     activeSection: input.activeSection,
     suppressDestination: input.suppressDestination,
+    boundaryDecision: input.boundaryDecision,
+    turn: input.turn,
   });
 
   const clarification = resolveClarification({
