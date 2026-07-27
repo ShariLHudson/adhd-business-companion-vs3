@@ -6,6 +6,7 @@ import {
   isDecisionCompassOfferDismissedForSession,
   shouldOfferDecisionCompass,
 } from "../decisionCompassRouting";
+import { isOrdinaryDailyTasks } from "../ordinaryTaskList";
 import type { CompanionDecisionIntelligence } from "./types";
 
 export function shouldOfferDecisionCompassForTurn(input: {
@@ -13,6 +14,10 @@ export function shouldOfferDecisionCompassForTurn(input: {
   decisionIntelligence: CompanionDecisionIntelligence;
 }): boolean {
   if (isDecisionCompassOfferDismissedForSession()) return false;
+  // Ordinary daily task lists / day-planning must not escalate to Decision
+  // Compass. isOrdinaryDailyTasks already rejects explicit decision intent
+  // ("decide between…", "should I launch…"), so genuine decisions still offer it.
+  if (isOrdinaryDailyTasks(input.text)) return false;
 
   const intel = input.decisionIntelligence;
 

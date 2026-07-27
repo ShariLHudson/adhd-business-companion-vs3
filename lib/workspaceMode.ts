@@ -9,6 +9,7 @@
 // first, then offer workspace — never let emotional tools erase concrete work.
 
 import { audioSuggestionLine, detectAudioRequest } from "./audioSuggestions";
+import { isOrdinaryDailyTasks } from "./ordinaryTaskList";
 import { shouldBlockStressAutoToolRouting } from "./stressRouting";
 import { matchCatalogFromText } from "./createCatalog";
 import {
@@ -398,6 +399,14 @@ export function detectAudioIntent(text: string): WorkspaceOffer | null {
 export function detectDoingIntent(text: string): WorkspaceOffer | null {
   const t = text.trim().toLowerCase();
   if (!t) return null;
+
+  // Stage 2C — ordinary daily task lists / day-planning are not build/create
+  // work. This single guard covers every detectDoingIntent caller (category
+  // classifier, feature-offer builder, and the companion doing-intent offer)
+  // without touching the DOING_VERB/CONCRETE_OBJECT matchers themselves.
+  // isOrdinaryDailyTasks rejects explicit maker/decision intent, so explicit
+  // "create/build/launch" requests still produce a doing offer.
+  if (isOrdinaryDailyTasks(text)) return null;
 
   // Audio requests route straight to Focus Audio (no conversational substitute).
   const audio = detectAudioIntent(t);

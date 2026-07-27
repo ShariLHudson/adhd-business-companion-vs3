@@ -9,6 +9,7 @@
  */
 
 import { isAdaptMyDayIntent, adaptMyDayOfferLine } from "./adaptMyDayChatRouting";
+import { isOrdinaryDailyTasks } from "./ordinaryTaskList";
 import { messageNamesExactEstateRoom } from "./estate/estateRoomAliasRegistry";
 import { shouldDeferKeywordWorkspaceOffer } from "./companionEntry/entryLayerGate";
 import type { AppSection } from "./companionUi";
@@ -282,6 +283,13 @@ function detectIntentCategory(text: string): IntentCategory {
   }
   if (isCompanionFirstQuestion(t)) return "conversation";
   if (STRENGTH_UNDERSTAND_RE.test(t) || UNDERSTAND_RE.test(t)) return "understand";
+
+  // Ordinary daily task list / day-planning — treat as day planning (Plan My Day
+  // eligible), never Create/Projects/Decision Compass. Evaluated BEFORE artifact
+  // execution, decide, and build/doing-intent — an errand like "email the
+  // accountant" must not be claimed as an "email artifact" to create.
+  // isOrdinaryDailyTasks already rejects explicit maker/decision/launch intent.
+  if (isOrdinaryDailyTasks(t)) return "plan";
 
   if (isRegistryArtifactExecution(t)) {
     return /\bhelp me\b/i.test(t) ? "build" : "execute";
@@ -737,9 +745,14 @@ export function shouldSuppressRelationshipLeadForRouting(
 
 export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDecision {
   const text = input.userText.trim();
-  const artifactKind = detectArtifactRequest(text);
+  // Ordinary daily task lists must not be re-claimed by the artifact pathway
+  // (e.g. "email the accountant" detected as an "email artifact" to create).
+  // isOrdinaryDailyTasks already rejects explicit maker/decision intent, so
+  // genuine "create an email…" requests are unaffected.
+  const ordinaryTasks = isOrdinaryDailyTasks(text);
+  const artifactKind = ordinaryTasks ? null : detectArtifactRequest(text);
   const artifactDetected = artifactKind !== null;
-  const artifactExecution = isRegistryArtifactExecution(text);
+  const artifactExecution = !ordinaryTasks && isRegistryArtifactExecution(text);
   const overwhelmTodayRoute = detectOverwhelmTodayRoute(text);
   let category = detectIntentCategory(text);
   if (artifactExecution) {
