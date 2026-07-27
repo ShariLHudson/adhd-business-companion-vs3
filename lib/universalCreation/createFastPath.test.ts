@@ -50,9 +50,16 @@ const CREATE_FOUNDATION_PHRASES = [
   "Write an SOP",
   "Create a newsletter",
   "Create a proposal",
-  "Client Onboarding Checklist",
   "create a client onboarding checklist",
 ] as const;
+
+/**
+ * Artifact-intent model: a bare deliverable TITLE (no creation verb, no natural
+ * creation shorthand) no longer signals document/artifact creation at the
+ * artifact-detection layer. Creation requires an explicit verb or preserved
+ * shorthand — the verb form ("create a client onboarding checklist") still routes.
+ */
+const BARE_TITLE_NOT_DOCUMENT_CREATION = ["Client Onboarding Checklist"] as const;
 
 const EVENT_PHRASES = [
   "Help me write a workshop",
@@ -145,6 +152,16 @@ describe("CREATE fast path — documents only (Sprint 2)", () => {
       expect(frictionless.category).not.toBe("universal_creation");
       expect(frictionless.localReply).toBeNull();
       expect(loadUniversalCreationSession()).toBeNull();
+    },
+  );
+
+  it.each(BARE_TITLE_NOT_DOCUMENT_CREATION)(
+    "%s — bare title is not document creation (artifact-intent model)",
+    (text) => {
+      // The artifact-detection layer (this change's scope) no longer treats a
+      // bare deliverable title as a document creation request.
+      expect(detectUniversalDocumentType(text)).toBeNull();
+      expect(isSimpleCreateRequest(text)).toBe(false);
     },
   );
 

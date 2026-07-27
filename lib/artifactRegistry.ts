@@ -5,6 +5,16 @@
 
 import { isCompanionFirstQuestion } from "./companionFirstWorkflow";
 import { containsVisualStructurePhrase } from "./visualStructureRouting";
+import {
+  ARTIFACT_EXECUTE_VERB_RE,
+  ARTIFACT_NEED_VERB_RE,
+  artifactTermExpressesCreation,
+  type ArtifactCollisionClass,
+} from "./artifactIntent";
+
+// Re-exported for compatibility — the canonical definitions now live in
+// artifactIntent (the centralized artifact-intent policy).
+export { ARTIFACT_EXECUTE_VERB_RE, ARTIFACT_NEED_VERB_RE };
 
 export type RegistryArtifactKind =
   | "email"
@@ -25,40 +35,41 @@ export type RegistryArtifactKind =
   | "client_avatar"
   | "content_plan";
 
-/** Verbs that signal the user wants to produce something now. */
-export const ARTIFACT_EXECUTE_VERB_RE =
-  /\b(?:create|build|develop|design|draft|write|generate|make|produce|put together|map out)\b/i;
-
-export const ARTIFACT_NEED_VERB_RE =
-  /\b(?:i need(?: a| to)?|want to|have to|need to|help me)\b/i;
-
 const FUNNEL_PHRASE_RE =
   /\b(?:sales funnel|marketing funnel|lead generation funnel|lead funnel|email funnel|webinar funnel|workshop funnel|launch funnel|course funnel|membership funnel|automation funnel|customer journey|(?:lead magnet|product sale|membership|webinar|workshop)\s+funnel|funnel)\b/i;
 
 const SEQUENCE_PHRASE_RE =
   /\b(?:follow-?up sequence|nurture sequence|sales sequence|email sequence|drip sequence)\b/i;
 
-const REGISTRY_PATTERNS: { kind: RegistryArtifactKind; re: RegExp }[] = [
-  { kind: "email_sequence", re: SEQUENCE_PHRASE_RE },
-  { kind: "funnel", re: FUNNEL_PHRASE_RE },
-  { kind: "client_avatar", re: /\b(?:client avatar|ideal client|buyer persona|icp)\b/i },
-  { kind: "landing_page", re: /\b(?:landing page|lead capture page)\b/i },
-  { kind: "lead_magnet", re: /\b(?:lead magnet|freebie|opt-?in)\b/i },
-  { kind: "sales_page", re: /\b(?:sales page|sales letter)\b/i },
-  { kind: "sales_script", re: /\b(?:sales script|call script|pitch script)\b/i },
-  { kind: "social_post", re: /\b(?:social post|social media post|(?:facebook|linkedin|instagram) post|caption)\b/i },
-  { kind: "content_plan", re: /\bcontent plan\b/i },
-  { kind: "marketing_plan", re: /\bmarketing plan\b/i },
-  { kind: "email", re: /\b(?:an? )?email\b/i },
-  { kind: "sop", re: /\b(?:an? )?sop\b|standard operating procedure\b/i },
-  { kind: "proposal", re: /\b(?:an? )?proposal\b/i },
-  { kind: "checklist", re: /\b(?:an? )?checklist\b/i },
-  { kind: "workflow", re: /\b(?:an? )?workflow\b/i },
-  { kind: "offer", re: /\b(?:an? )?offer(?:\s+stack)?\b/i },
-  {
-    kind: "content",
-    re: /\b(?:an? )?(?:content|blog post|newsletter|copy|article|video script)\b/i,
-  },
+type RegistryPattern = {
+  kind: RegistryArtifactKind;
+  re: RegExp;
+  collisionClass: ArtifactCollisionClass;
+};
+
+// Mixed kinds (content, social_post) are split so each grammatical sense carries
+// its own collision class. First-match order (and thus the returned kind) is
+// unchanged from the pre-split registry.
+const REGISTRY_PATTERNS: RegistryPattern[] = [
+  { kind: "email_sequence", re: SEQUENCE_PHRASE_RE, collisionClass: "unambiguous_deliverable" },
+  { kind: "funnel", re: FUNNEL_PHRASE_RE, collisionClass: "unambiguous_deliverable" },
+  { kind: "client_avatar", re: /\b(?:client avatar|ideal client|buyer persona|icp)\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "landing_page", re: /\b(?:landing page|lead capture page)\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "lead_magnet", re: /\b(?:lead magnet|freebie|opt-?in)\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "sales_page", re: /\b(?:sales page|sales letter)\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "sales_script", re: /\b(?:sales script|call script|pitch script)\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "social_post", re: /\b(?:social post|social media post|(?:facebook|linkedin|instagram) post)\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "social_post", re: /\bcaption\b/i, collisionClass: "receive_noun" },
+  { kind: "content_plan", re: /\bcontent plan\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "marketing_plan", re: /\bmarketing plan\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "email", re: /\b(?:an? )?email\b/i, collisionClass: "verb_collision" },
+  { kind: "sop", re: /\b(?:an? )?sop\b|standard operating procedure\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "proposal", re: /\b(?:an? )?proposal\b/i, collisionClass: "receive_noun" },
+  { kind: "checklist", re: /\b(?:an? )?checklist\b/i, collisionClass: "receive_noun" },
+  { kind: "workflow", re: /\b(?:an? )?workflow\b/i, collisionClass: "mention_requires_creation_signal" },
+  { kind: "offer", re: /\b(?:an? )?offer(?:\s+stack)?\b/i, collisionClass: "verb_collision" },
+  { kind: "content", re: /\b(?:blog post|newsletter|video script)\b/i, collisionClass: "unambiguous_deliverable" },
+  { kind: "content", re: /\b(?:an? )?(?:content|copy|article)\b/i, collisionClass: "verb_collision" },
 ];
 
 /** All registered business deliverable phrases (for combined matching). */
@@ -67,13 +78,18 @@ export const BUSINESS_DELIVERABLE_RE = new RegExp(
   "i",
 );
 
-export function detectRegistryArtifact(text: string): RegistryArtifactKind | null {
+/** The first matching registry entry (kind + collision class). */
+function detectRegistryArtifactEntry(text: string): RegistryPattern | null {
   const t = text.trim();
   if (!t) return null;
-  for (const { kind, re } of REGISTRY_PATTERNS) {
-    if (re.test(t)) return kind;
+  for (const entry of REGISTRY_PATTERNS) {
+    if (entry.re.test(t)) return entry;
   }
   return null;
+}
+
+export function detectRegistryArtifact(text: string): RegistryArtifactKind | null {
+  return detectRegistryArtifactEntry(text)?.kind ?? null;
 }
 
 export function hasArtifactExecuteVerb(text: string): boolean {
@@ -96,10 +112,15 @@ export function isRegistryArtifactExecution(text: string): boolean {
     return false;
   }
   if (FEATURE_DISCOVERY_RE.test(t)) return false;
-  if (!detectRegistryArtifact(t)) return false;
-  if (hasArtifactExecuteVerb(t)) return true;
-  if (ARTIFACT_NEED_VERB_RE.test(t)) return true;
-  return false;
+  const entry = detectRegistryArtifactEntry(t);
+  if (!entry) return false;
+  // Centralized artifact-intent policy: verb-collision / mention terms require an
+  // explicit creation verb; receive-nouns exclude "from someone" language; only
+  // unambiguous deliverables keep the bare need-verb shorthand.
+  return artifactTermExpressesCreation({
+    text: t,
+    collisionClass: entry.collisionClass,
+  });
 }
 
 export function registryArtifactLabel(kind: RegistryArtifactKind): string {

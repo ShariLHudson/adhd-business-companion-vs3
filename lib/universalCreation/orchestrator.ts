@@ -8,6 +8,10 @@
  */
 
 import { isRegistryArtifactExecution } from "@/lib/artifactRegistry";
+import {
+  artifactTermExpressesCreation,
+  type ArtifactCollisionClass,
+} from "@/lib/artifactIntent";
 import { resolveImmediateCreateAction } from "@/lib/createExperience/createExperienceRouting";
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
 import { isEmailAutomationOrInboxHelpRequest } from "@/lib/estate/emailAutomationHelp";
@@ -106,6 +110,20 @@ const UNCERTAINTY_RE =
 
 export { isUniversalCreationMessage, isCreateFlowAssistantContext };
 
+// Collision-prone plugins whose bare pattern match must be confirmed by the
+// centralized artifact-intent policy. Plugins NOT listed here keep their exact
+// existing match-on-pattern behavior (selection semantics unchanged). Email is
+// intentionally absent: its plugin patterns already require a creation verb, and
+// the "email"-verb collision is handled upstream via isRegistryArtifactExecution.
+const PLUGIN_COLLISION_CLASS: Record<string, ArtifactCollisionClass | undefined> = {
+  proposal: "receive_noun",
+  checklist: "receive_noun",
+  social_post: "receive_noun",
+  workflow: "mention_requires_creation_signal",
+  presentation: "mention_requires_creation_signal",
+  blog: "mention_requires_creation_signal",
+};
+
 export function detectUniversalDocumentType(
   userText: string,
 ): UniversalDocumentType | null {
@@ -132,7 +150,20 @@ export function detectUniversalDocumentType(
   for (const plugin of UNIVERSAL_DOCUMENT_PLUGINS) {
     if (plugin.id === "document") continue;
     if (plugin.id === "workshop" || plugin.id === "webinar") continue;
-    if (plugin.detectPatterns.some((re) => re.test(t))) return plugin.id;
+    if (plugin.detectPatterns.some((re) => re.test(t))) {
+      // Centralized artifact-intent policy: collision-prone plugins only count
+      // when the phrasing actually signals creation (not ordinary mention /
+      // receive). Unambiguous plugins keep their existing match-on-pattern
+      // behavior, so plugin selection among genuine creates is unchanged.
+      const collisionClass = PLUGIN_COLLISION_CLASS[plugin.id];
+      if (
+        collisionClass &&
+        !artifactTermExpressesCreation({ text: t, collisionClass })
+      ) {
+        continue;
+      }
+      return plugin.id;
+    }
   }
   if (isRegistryArtifactExecution(t)) return "document";
   // Revision phrasing often matches "make the …" — never invent a document type.
@@ -141,7 +172,15 @@ export function detectUniversalDocumentType(
     return inferDocumentTypeFromCreateText(t) ?? "document";
   }
   const inferred = inferDocumentTypeFromCreateText(t);
-  if (inferred) return inferred;
+  if (inferred) {
+    // Same policy gate as the plugin loop: a keyword-inferred collision-prone
+    // type (presentation/article/workflow/…) only counts when the phrasing
+    // signals creation — never on bare mention ("I have a presentation").
+    const collisionClass = PLUGIN_COLLISION_CLASS[inferred];
+    if (!collisionClass || artifactTermExpressesCreation({ text: t, collisionClass })) {
+      return inferred;
+    }
+  }
   return null;
 }
 
