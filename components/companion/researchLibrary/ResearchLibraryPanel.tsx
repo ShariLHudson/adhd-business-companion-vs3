@@ -48,9 +48,12 @@ import {
 } from "@/lib/researchLibrary/researchLibraryConfig";
 import {
   collectResearchRecordsFromSharedMessages,
+  researchRecordToSharedFinding,
   researchTurnsToSharedMessages,
   sharedMessagesToConversationTurns,
 } from "@/lib/researchLibrary/findingAdapter";
+import { ResearchFindingCard } from "@/components/companion/research/ResearchFindingCard";
+import { CollectionEvidenceSection } from "@/components/companion/researchLibrary/CollectionEvidenceSection";
 
 type Props = {
   onBack?: () => void;
@@ -615,13 +618,18 @@ export function ResearchLibraryPanel({
             </section>
             <section>
               <h3 className="text-lg font-semibold">Important Findings</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5">
-                {organized.importantFindings.map((f) => (
-                  <li key={f.id}>
-                    <strong>{f.title}</strong> — {f.content}
-                  </li>
-                ))}
-              </ul>
+              {organized.importantFindings.length ? (
+                <div className="mt-2 space-y-2">
+                  {organized.importantFindings.map((f) => (
+                    <ResearchFindingCard
+                      key={f.id}
+                      finding={researchRecordToSharedFinding(f)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-1 text-sm text-[#6b6358]">None marked yet.</p>
+              )}
             </section>
             {organized.keyFacts.length ? (
               <section>
@@ -675,14 +683,9 @@ export function ResearchLibraryPanel({
                 )}
               </ul>
             </section>
-            <section>
-              <h3 className="text-lg font-semibold">Sources</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5">
-                {organized.sources.map((s) => (
-                  <li key={s}>{s}</li>
-                ))}
-              </ul>
-            </section>
+            <CollectionEvidenceSection
+              findings={collection.findings.map(researchRecordToSharedFinding)}
+            />
             <section>
               <h3 className="text-lg font-semibold">My Notes</h3>
               <p className="mt-1">
