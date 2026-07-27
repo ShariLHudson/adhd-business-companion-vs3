@@ -46,6 +46,15 @@ export type BusinessEstateIdentity = {
   mission: string;
   vision: string;
   coreValues: string;
+  /** Optional note behind the core values (surfaced in the guided editor). */
+  coreValueNotes: string;
+  /** Purpose / "Your Story" fields — declared by the identity field registry
+   * and edited via the guided stages + the Your Story flow. They live in this
+   * one identity section (no separate Story store). */
+  whyBusinessMatters: string;
+  whatInspiredYou: string;
+  hopedImpact: string;
+  whatHelpsYouContinue: string;
   /** Optional business image / logo (data URL). NOT the user's personal profile
    * image (prefs.profileImage) and NOT a Client Avatar image. */
   businessImage: string;
@@ -104,6 +113,19 @@ export type BusinessEstateWorkStyle = {
   restartHelpers: string;
   overwhelmTriggers: string;
   shariSupportStyle: string;
+  /** Guided work-style fields declared by the identity/work-style field
+   * registry. Kept here so the Working Style Study room persists and resumes
+   * its answers (one section, no separate store). */
+  preferredTimeOfDay: string;
+  preferredSessionLength: string;
+  soundPreference: string;
+  structurePreference: string;
+  thinkingOrderPreference: string;
+  collaborationPreference: string;
+  decisionStyle: string;
+  returnSupportTone: string;
+  shariShouldAvoid: string;
+  returnOfferPreferences: string;
 };
 
 export type BusinessEstateTools = {
@@ -147,6 +169,11 @@ const EMPTY_IDENTITY: BusinessEstateIdentity = {
   mission: "",
   vision: "",
   coreValues: "",
+  coreValueNotes: "",
+  whyBusinessMatters: "",
+  whatInspiredYou: "",
+  hopedImpact: "",
+  whatHelpsYouContinue: "",
   businessImage: "",
 };
 
@@ -200,6 +227,16 @@ const EMPTY_WORK_STYLE: BusinessEstateWorkStyle = {
   restartHelpers: "",
   overwhelmTriggers: "",
   shariSupportStyle: "",
+  preferredTimeOfDay: "",
+  preferredSessionLength: "",
+  soundPreference: "",
+  structurePreference: "",
+  thinkingOrderPreference: "",
+  collaborationPreference: "",
+  decisionStyle: "",
+  returnSupportTone: "",
+  shariShouldAvoid: "",
+  returnOfferPreferences: "",
 };
 
 const EMPTY_TOOLS: BusinessEstateTools = {
