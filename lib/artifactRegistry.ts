@@ -9,6 +9,7 @@ import {
   ARTIFACT_EXECUTE_VERB_RE,
   ARTIFACT_NEED_VERB_RE,
   artifactTermExpressesCreation,
+  hasArtifactReceiveLanguage,
   type ArtifactCollisionClass,
 } from "./artifactIntent";
 
@@ -121,6 +122,37 @@ export function isRegistryArtifactExecution(text: string): boolean {
     text: t,
     collisionClass: entry.collisionClass,
   });
+}
+
+/**
+ * True when the text NAMES a deliverable in the artifact-NOUN sense — distinct
+ * from `isRegistryArtifactExecution` ("requests creation"). Verb-collision terms
+ * used as errands ("email the client", "offer a refund", "copy the files") do NOT
+ * count; receive constructions ("a proposal from the vendor") do NOT count;
+ * genuine deliverable nouns (packing checklist, client proposal, caption,
+ * marketing plan) DO. Reuses the centralized collision classification — no new
+ * vocabulary. Consumed by the (currently unwired) conversation-boundary
+ * expansion signal.
+ */
+export function namesDeliverableTerm(text: string): boolean {
+  const entry = detectRegistryArtifactEntry(text);
+  if (!entry) return false;
+  switch (entry.collisionClass) {
+    case "unambiguous_deliverable":
+      return true;
+    case "receive_noun":
+      // A named deliverable noun, unless it is expected FROM someone else.
+      return !hasArtifactReceiveLanguage(text);
+    case "verb_collision":
+    case "mention_requires_creation_signal":
+      // email/offer/copy (verb errands) and bare workflow mentions are not
+      // deliverable additions on their own.
+      return false;
+    default: {
+      const _exhaustive: never = entry.collisionClass;
+      return _exhaustive;
+    }
+  }
 }
 
 export function registryArtifactLabel(kind: RegistryArtifactKind): string {

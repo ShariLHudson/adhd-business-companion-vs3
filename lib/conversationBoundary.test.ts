@@ -21,6 +21,7 @@ import {
   resolveConversationBoundary,
   type BoundaryTurnInput,
 } from "./conversationBoundary";
+import { namesDeliverableTerm } from "./artifactRegistry";
 
 const topic = (
   goal: string,
@@ -187,5 +188,74 @@ describe("resolveConversationBoundary — precedence + safety", () => {
 
   it("empty message is unclear", () => {
     expect(decide({ userText: "   ", turn: 1 }).decision).toBe("unclear");
+  });
+});
+
+describe("S2.5 — deliverable-vs-errand evidence", () => {
+  it("verb-collision errands and receive constructions do NOT name a deliverable", () => {
+    for (const t of [
+      "I also need to email the client.",
+      "I need to offer a refund.",
+      "I have to copy the files.",
+      "I need a proposal from the vendor.",
+      "I need a checklist from my assistant.",
+    ]) {
+      expect(namesDeliverableTerm(t)).toBe(false);
+    }
+  });
+
+  it("genuine deliverable nouns DO name a deliverable", () => {
+    for (const t of [
+      "I also need a packing checklist.",
+      "We should add a client proposal.",
+      "I also need a caption for the post.",
+    ]) {
+      expect(namesDeliverableTerm(t)).toBe(true);
+    }
+  });
+
+  it("KNOWN GAP: 'workshop handout' is outside the artifact-registry vocabulary", () => {
+    // "handout" is not a registry term (workshop is an excluded event domain), so
+    // the centralized policy does not classify it as a deliverable. Extending the
+    // vocabulary is a separate, behavior-changing stage — flagged, not silently
+    // added here.
+    expect(namesDeliverableTerm("We need a workshop handout.")).toBe(false);
+  });
+
+  it("deliverable expansion expands; errand 'expansion' switches", () => {
+    const booth = topic("help me plan my booth");
+    expect(
+      decide({ userText: "I also need a packing checklist.", turn: 2, activeTopic: booth }).decision,
+    ).toBe("expand_current_topic");
+    expect(
+      decide({ userText: "I also need to email the client.", turn: 2, activeTopic: booth }).decision,
+    ).toBe("switch_topic");
+  });
+});
+
+describe("S2.5 — short prioritization continuations", () => {
+  const priTopic = () => topic("what should I do first");
+
+  it("short answers to a prioritization topic continue it", () => {
+    for (const t of [
+      "The accountant.",
+      "I think the invoices.",
+      "Probably the venue.",
+      "The accountant is the most urgent.",
+    ]) {
+      expect(decide({ userText: t, turn: 2, activeTopic: priTopic() }).decision).toBe(
+        "continue_current_topic",
+      );
+    }
+  });
+
+  it("a short noun phrase WITHOUT a prioritization context is not consumed as continuation", () => {
+    const d = decide({
+      userText: "The dentist.",
+      turn: 2,
+      activeTopic: topic("prepare for the craft show"),
+    });
+    expect(d.decision).not.toBe("continue_current_topic");
+    expect(d.decision).toBe("unclear");
   });
 });

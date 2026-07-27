@@ -27,7 +27,7 @@
  * reused directly, to demonstrate the client model rather than duplicate logic.
  */
 
-import { detectRegistryArtifact } from "./artifactRegistry";
+import { namesDeliverableTerm } from "./artifactRegistry";
 
 export type ConversationBoundaryDecisionKind =
   | "continue_current_topic"
@@ -171,13 +171,6 @@ export function hasTemporaryDetourMarker(t: string): boolean {
 export function hasExpansionMarker(t: string): boolean {
   return EXPANSION_MARKER_RE.test(t);
 }
-/** Reuses the artifact registry — the added item NAMES a real deliverable
- * (checklist/email/proposal/…), distinguishing "also need a packing checklist"
- * (expand) from "also need to call the dentist" (switch). */
-export function mentionsDeliverable(t: string): boolean {
-  return detectRegistryArtifact(t) !== null;
-}
-
 /** A substantive new statement (subject+predicate), not a short ack/answer. */
 export function isSubstantiveNewSubject(t: string): boolean {
   const words = t.trim().split(/\s+/).filter(Boolean);
@@ -215,10 +208,23 @@ function matchesPendingExpectedShape(
   }
 }
 
-function isDirectAnswerToOpenTopic(t: string, topic: BoundaryActiveTopic): boolean {
+// A short answer-shaped reply (article/hedge lead-in or a bare selection).
+const SHORT_ANSWER_SHAPE_RE =
+  /^\s*(?:the|a|an|my|our|probably|maybe|i think|i'?d say|it'?s|it is|that'?d be|let'?s do|do the|start with)\b/i;
+
+/**
+ * NARROW continuation evidence — deliberately named for what it covers. It only
+ * recognizes a short answer to an unresolved PRIORITIZATION / open-choice topic
+ * ("what should I do first?"); it does NOT handle all open questions. Requires
+ * the prioritization context, so a short noun phrase without such a context is
+ * NOT treated as continuation, and long statements are excluded.
+ */
+function answersPrioritizationTopic(t: string, topic: BoundaryActiveTopic): boolean {
   if (topic.resolved) return false;
   if (!PRIORITIZATION_GOAL_RE.test(topic.goal)) return false;
-  return PRIORITY_ANSWER_RE.test(t);
+  if (NEW_SUBJECT_MARKER_RE.test(t)) return false;
+  if (t.trim().split(/\s+/).filter(Boolean).length > 8) return false;
+  return PRIORITY_ANSWER_RE.test(t) || SHORT_ANSWER_SHAPE_RE.test(t);
 }
 
 function continuesActiveWork(t: string, work: BoundaryActiveWork): boolean {
@@ -320,7 +326,7 @@ export function resolveConversationBoundary(
   // 7 — related expansion
   if (topic && hasExpansionMarker(t)) {
     const overlap = sharesContentWord(t, `${topic.goal} ${topic.unresolvedNeed ?? ""}`);
-    if (overlap || mentionsDeliverable(t)) {
+    if (overlap || namesDeliverableTerm(t)) {
       return decide("expand_current_topic", "medium", [
         "expansion_marker",
         overlap ? "topic_overlap" : "deliverable_addition",
@@ -332,9 +338,9 @@ export function resolveConversationBoundary(
     if (sharesContentWord(t, `${topic.goal} ${topic.unresolvedNeed ?? ""}`)) {
       return decide("continue_current_topic", "medium", ["topic_overlap"]);
     }
-    if (isDirectAnswerToOpenTopic(t, topic)) {
+    if (answersPrioritizationTopic(t, topic)) {
       return decide("continue_current_topic", "medium", [
-        "answers_open_topic_question",
+        "answers_prioritization_topic",
       ]);
     }
   }
