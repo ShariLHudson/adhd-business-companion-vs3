@@ -24,7 +24,7 @@ export type ResearchTurnResult = {
   currentResearchNotice: string | null;
 };
 
-type TopicPack = {
+export type TopicPack = {
   match: RegExp;
   intro: string;
   findings: Array<{
@@ -35,7 +35,10 @@ type TopicPack = {
   followUp: string;
 };
 
-const TOPIC_PACKS: TopicPack[] = [
+// Exported (additive, no behavior change) so researchLibraryConfig can surface
+// these as built_in_guidance without duplicating the content. The packs move
+// fully into the config when this engine path is retired (RL-4).
+export const TOPIC_PACKS: TopicPack[] = [
   {
     match: /advisory\s*board/i,
     intro:
@@ -185,7 +188,7 @@ const TOPIC_PACKS: TopicPack[] = [
   },
 ];
 
-function pickTopicPack(text: string): TopicPack | null {
+export function pickTopicPack(text: string): TopicPack | null {
   for (const pack of TOPIC_PACKS) {
     if (pack.match.test(text)) return pack;
   }
