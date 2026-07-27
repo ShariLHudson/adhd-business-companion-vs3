@@ -381,7 +381,11 @@ import {
   detectBusinessEstateNavIntent,
   detectBusinessProfileNavIntent,
 } from "@/lib/businessEstateNavIntent";
-import { hasStartedBusinessProfile } from "@/lib/profile/businessEstateProfile";
+import {
+  hasStartedBusinessProfile,
+  getBusinessEstateResumeSectionId,
+} from "@/lib/profile/businessEstateProfile";
+import { requestOpenBusinessEstateSection } from "@/lib/businessEstateSectionIntent";
 import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
@@ -461,7 +465,7 @@ import { CompanionSignInFromQuery } from "@/components/companion/CompanionSignIn
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { EmailGeneratorPanel } from "@/components/companion/EmailGeneratorPanel";
 import { SnippetsLibrary } from "@/components/companion/SnippetsLibrary";
-import { BusinessProfilePanel } from "@/components/companion/BusinessProfilePanel";
+import { BusinessProfileLegacyRedirect } from "@/components/companion/business-estate/BusinessProfileLegacyRedirect";
 import { IdealClientBuilder } from "@/components/companion/IdealClientBuilder";
 import { ContentTypesPanel } from "@/components/companion/ContentTypesPanel";
 import {
@@ -13110,8 +13114,9 @@ export default function CompanionPageClient() {
   function openBusinessIntelligenceProfile(section: AppSection) {
     setBusinessConfidenceOffer(null);
     if (section === "business-profile") {
-      setActiveSection("business-profile");
-      activeSectionRef.current = "business-profile";
+      // Business Profile is the Business Estate — one experience. The legacy
+      // BusinessProfilePanel is retired; the token stays and routes here.
+      openProfileDestinationCore("my-business-estate");
       return;
     }
     if (section === "client-avatars") {
@@ -14808,10 +14813,19 @@ export default function CompanionPageClient() {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
       if (fresh) clearConversation();
+      const isBusinessProfileIntent = detectBusinessProfileNavIntent(trimmed);
+      const resumeSection =
+        isBusinessProfileIntent && hasStartedBusinessProfile()
+          ? getBusinessEstateResumeSectionId()
+          : null;
       openProfileDestinationCore("my-business-estate");
-      const businessProfileAck = detectBusinessProfileNavIntent(trimmed)
-        ? hasStartedBusinessProfile()
-          ? "Let's continue your Business Profile. I'll take you to the next section that still needs your attention."
+      // Resume where meaningful progress was last saved (derived from the
+      // estate envelope's sectionUpdatedAt). No resume request → the estate
+      // opens at its overview (the front door) to begin.
+      if (resumeSection) requestOpenBusinessEstateSection(resumeSection);
+      const businessProfileAck = isBusinessProfileIntent
+        ? resumeSection
+          ? "Let's continue your Business Profile. I'll take you back to where you last saved progress."
           : "Let's begin your Business Profile. We'll build it one clear section at a time, and you can stop and return whenever you need to."
         : "Opening your Business Estate.";
       const voicedAck = finalizeMemberFacingAssistantText(
@@ -23883,12 +23897,12 @@ export default function CompanionPageClient() {
         );
       case "business-profile":
         return (
-          <BusinessProfilePanel
-            onDone={() => {
+          <BusinessProfileLegacyRedirect
+            onRedirect={() => {
+              openProfileDestinationCore("my-business-estate");
               setActiveNav("chat");
               setActiveSection("home");
             }}
-            onOpenAvatars={() => openProfileDestinationCore("people-i-help")}
           />
         );
       case "brain-dump":
@@ -27240,12 +27254,12 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "business-profile" && (
-            <BusinessProfilePanel
-              onDone={() => {
+            <BusinessProfileLegacyRedirect
+              onRedirect={() => {
+                openProfileDestinationCore("my-business-estate");
                 setActiveNav("chat");
                 setActiveSection("home");
               }}
-              onOpenAvatars={() => openProfileDestinationCore("people-i-help")}
             />
           )}
 

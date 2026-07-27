@@ -11,6 +11,10 @@ import { IdentitySectionBrowser } from "@/components/companion/business-estate/r
 import { BusinessBasicsFlow } from "@/components/companion/business-estate/redesign/BusinessBasicsFlow";
 import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHelpPanel";
 import type { BusinessEstateSectionId } from "@/lib/profile/businessEstateProfile";
+import {
+  consumePendingBusinessEstateSection,
+  subscribeBusinessEstateSectionOpen,
+} from "@/lib/businessEstateSectionIntent";
 import { getBusinessAreaPresentation } from "@/lib/profile/executiveOfficePresentation";
 import type { IdentitySectionId } from "@/lib/profile/businessEstateRedesign";
 import {
@@ -61,6 +65,17 @@ export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
     setRevision((value) => value + 1);
   }, []);
 
+  /** Deep-link / resume: open the panel directly into a specific room. */
+  const navigateToSection = useCallback((sectionId: BusinessEstateSectionId) => {
+    if (sectionId === "identity") {
+      setShowHowHelps(false);
+      setView({ kind: "identity-entrance" });
+      return;
+    }
+    setLegacyEdit(false);
+    setView({ kind: "legacy-room", sectionId });
+  }, []);
+
   useEffect(() => {
     refresh();
     const onUpdate = () => refresh();
@@ -78,6 +93,15 @@ export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
     }
     return subscribeEstateHowToGuideOpen("my-business-estate", openHowTo);
   }, [openHowTo]);
+
+  // Deep-link / resume: land directly in a requested room (e.g. "continue my
+  // business profile" from chat), and re-navigate if a request arrives while
+  // the panel is already open.
+  useEffect(() => {
+    const pending = consumePendingBusinessEstateSection();
+    if (pending) navigateToSection(pending);
+    return subscribeBusinessEstateSectionOpen(navigateToSection);
+  }, [navigateToSection]);
 
   useEffect(() => {
     if (!sectionDirty) {

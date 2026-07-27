@@ -396,6 +396,42 @@ export function hasStartedBusinessProfile(): boolean {
   return Boolean(legacy && (legacy.role || legacy.sells || legacy.idealClient));
 }
 
+/**
+ * The section whose progress was most recently saved (by `sectionUpdatedAt`),
+ * or null when nothing has been saved yet. Drives "continue where you left
+ * off": resume lands the member back where meaningful progress was last
+ * recorded. Derived entirely from the existing envelope — no `lastVisited`
+ * field, no separate resume store.
+ */
+export function getBusinessEstateResumeSectionId(): BusinessEstateSectionId | null {
+  const { sectionUpdatedAt } = getBusinessEstateEnvelope();
+  let latestId: BusinessEstateSectionId | null = null;
+  let latestTs = "";
+  for (const { id } of BUSINESS_ESTATE_SECTIONS) {
+    const ts = sectionUpdatedAt[id];
+    // ISO-8601 timestamps sort lexicographically, so string comparison is safe.
+    if (ts && ts > latestTs) {
+      latestTs = ts;
+      latestId = id;
+    }
+  }
+  return latestId;
+}
+
+/**
+ * First room (in canonical order) that still needs attention — `not-started`
+ * or `ready-to-review` — or null when every room is complete. Skipped rooms
+ * stay `not-started`, so they remain visibly incomplete here. Derived from
+ * existing envelope status; no duplicate progress store.
+ */
+export function nextIncompleteBusinessEstateSection(): BusinessEstateSectionId | null {
+  for (const { id } of BUSINESS_ESTATE_SECTIONS) {
+    const status = getBusinessEstateSectionStatus(id);
+    if (status === "not-started" || status === "ready-to-review") return id;
+  }
+  return null;
+}
+
 function sectionRecordKey(
   sectionId: BusinessEstateSectionId,
 ): keyof BusinessEstateSections {
