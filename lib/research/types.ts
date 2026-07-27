@@ -134,19 +134,22 @@ export function makeFinding(input: MakeFindingInput): SharedResearchFinding {
   return base;
 }
 
-/** Human label for a finding's evidence basis (used by the shared card). */
+/**
+ * Friendly, member-facing label for a finding's evidence basis (used by the
+ * shared card). The internal enum stays stable; only this display copy is warm.
+ */
 export function evidenceBasisLabel(basis: ResearchEvidenceBasis): string {
   switch (basis) {
     case "live_source":
-      return "Live source";
+      return "Live Sources";
     case "connected_source":
-      return "Connected source";
+      return "Connected Sources";
     case "built_in_guidance":
-      return "Built-in guidance";
+      return "Built-in Guidance";
     case "user_provided":
-      return "Your own words";
+      return "Your Thoughts";
     case "interpretation":
-      return "Interpretation";
+      return "Shari's Insights";
     default: {
       const _exhaustive: never = basis;
       return _exhaustive;

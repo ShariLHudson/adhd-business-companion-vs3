@@ -1,10 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type { SharedResearchFinding } from "@/lib/research/types";
+import { ResearchFindingCard } from "@/components/companion/research/ResearchFindingCard";
 
 /**
- * ContextualResearchPanel — a reusable, controlled research conversation that
- * expands inside a builder, beneath the active question or Step 10 area.
+ * ContextualResearchPanel — the shared research conversation (a reusable,
+ * controlled panel) that expands inside a builder, beneath the active question
+ * or area. Used identically by Client Avatar, Business Estate, and the Research
+ * Library — only the persona/labels, prior context, and save destination differ.
  *
  * Part of the Contextual Workspace pattern (see ./README.md). It never
  * navigates, never opens split chat, never routes to Chamber / Board.
@@ -33,6 +37,13 @@ export type ContextualResearchMessage = {
   hidden?: boolean;
   /** A failure notice — offers Try Again, never an add action. */
   error?: boolean;
+  /**
+   * Structured findings attached to an assistant reply (Research-with-Sources
+   * and honestly-labeled Explore findings). Empty/absent for a plain
+   * conversational reply — the current Client Avatar behavior. Citation cards
+   * render only via findingMayShowCitation(); see ResearchFindingCard.
+   */
+  findings?: SharedResearchFinding[];
 };
 
 const CALM_ERROR =
@@ -245,6 +256,16 @@ export function ContextualResearchPanel({
                   style={{ maxWidth: "92%" }}
                 >
                   <p className="whitespace-pre-wrap">{m.content}</p>
+                  {m.role === "assistant" && !m.error && m.findings?.length ? (
+                    <div
+                      className="mt-2 flex flex-col gap-2"
+                      data-testid="research-findings"
+                    >
+                      {m.findings.map((f) => (
+                        <ResearchFindingCard key={f.id} finding={f} />
+                      ))}
+                    </div>
+                  ) : null}
                   {m.role === "assistant" && m.error ? (
                     <button
                       type="button"
