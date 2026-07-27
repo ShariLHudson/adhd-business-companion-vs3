@@ -107,6 +107,7 @@ export {
   chamberNavigateGateForText,
   isBlockedGenericFallbackText,
   isExplicitTopicChangeRequest,
+  isNewConversationalSubject,
   markActiveTopicAnswered,
   markActiveTopicCompleted,
   processActiveTopicOnUserTurn,

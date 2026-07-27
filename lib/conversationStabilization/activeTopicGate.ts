@@ -150,6 +150,85 @@ export function isExplicitTopicChangeRequest(userText: string): boolean {
   return EXPLICIT_TOPIC_CHANGE_RE.test(userText.trim());
 }
 
+// Stage 1B — conservative subject-pivot detection.
+// The user linguistically ANNOUNCES a new subject ("thinking about…",
+// "what about…", "by the way…"). Required, not sufficient — see
+// isNewConversationalSubject for the full gate.
+const SUBJECT_PIVOT_MARKER_RE =
+  /\b(?:thinking about|think(?:ing)? i (?:might|should|could|want)|considering|i (?:might|may) (?:enter|start|try|do|join|sign up|go)|what about|how about|switch(?:ing)? gears|chang(?:e|ing) the subject|different (?:question|topic|subject|thing)|another (?:question|topic|thing)|new (?:question|topic|subject)|unrelated|by the way|on a (?:different|another|separate) note)\b/i;
+
+// Function/modal words ignored when checking topical overlap. Kept intentionally
+// SMALL so the overlap check stays sensitive — a shared content word blocks the
+// pivot, which biases toward preserving a genuine follow-up.
+const SUBJECT_PIVOT_STOPWORDS = new Set([
+  "about", "actually", "again", "already", "always", "because", "been",
+  "before", "being", "could", "does", "doing", "done", "from", "have",
+  "having", "into", "just", "like", "more", "most", "much", "only", "over",
+  "really", "should", "some", "still", "such", "than", "that", "their",
+  "them", "then", "there", "these", "they", "thing", "things", "think",
+  "thinking", "this", "those", "though", "through", "very", "want", "were",
+  "what", "when", "where", "which", "while", "will", "with", "would", "your",
+  "going", "maybe", "might",
+]);
+
+function subjectContentWords(text: string): Set<string> {
+  return new Set(
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 4 && !SUBJECT_PIVOT_STOPWORDS.has(w)),
+  );
+}
+
+function sharesSubjectContentWord(a: string, b: string): boolean {
+  const wb = subjectContentWords(b);
+  if (!wb.size) return false;
+  for (const w of subjectContentWords(a)) {
+    if (wb.has(w)) return true;
+  }
+  return false;
+}
+
+/**
+ * Conservative subject-pivot detector (Stage 1B). True ONLY when the current
+ * message obviously introduces a new conversational subject that must not be
+ * rebound onto a stale unresolved topic:
+ *  - there is an unresolved stored topic,
+ *  - the message is substantive (>= 5 words — never a short ack/answer),
+ *  - it linguistically announces a new subject (pivot marker),
+ *  - it is an answer-first declarative, not a reflective continuation,
+ *  - it does not belong to the stored topic's domain, and
+ *  - it shares no meaningful content word with the stored topic.
+ * Deliberately narrow: it prefers to MISS a pivot rather than clear a genuine
+ * follow-up. Broader semantic divergence is left to the later soft-boundary
+ * stage.
+ */
+export function isNewConversationalSubject(
+  userText: string,
+  topic: ActiveTopicState | null = getActiveTopic(),
+): boolean {
+  if (!topic || !isActiveTopicUnresolved(topic)) return false;
+  const t = userText.trim();
+  if (t.split(/\s+/).length < 5) return false;
+  if (!SUBJECT_PIVOT_MARKER_RE.test(t)) return false;
+  // Still clearly within the stored topic's domain — treat as a follow-up.
+  if (topic.domain && needMatchesDomain(t.toLowerCase(), topic.domain)) {
+    return false;
+  }
+  const stored = `${topic.userGoal ?? ""} ${topic.unresolvedNeed ?? ""}`.trim();
+  if (sharesSubjectContentWord(t, stored)) return false;
+  const decision = decideShariResponse(t);
+  if (
+    !decision.directAnswerRequired ||
+    decision.primaryHelpMode === "reflective_thinking" ||
+    decision.explicitDestinationRequested
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export function shouldBlockGenericFallback(
   topic: ActiveTopicState | null = getActiveTopic(),
 ): boolean {
@@ -473,7 +552,18 @@ export function processActiveTopicOnUserTurn(
 
   // Clear a stale unresolved topic when this turn is ordinary answer-first help
   // so fail-safes cannot keep asking clarify questions from an old domain.
-  if (skipTopicForAnswerFirstGeneral && topic && isActiveTopicUnresolved(topic)) {
+  // Stage 1B: also clear when the message obviously pivots to a NEW subject, so
+  // it is not rebound onto (and later replayed from) the stale topic. Excluded
+  // inside a Chamber member chat, which intentionally keeps a durable topic.
+  const pivotToNewSubject =
+    !skipTopicForAnswerFirstGeneral &&
+    !activeMember &&
+    isNewConversationalSubject(userText, topic);
+  if (
+    (skipTopicForAnswerFirstGeneral || pivotToNewSubject) &&
+    topic &&
+    isActiveTopicUnresolved(topic)
+  ) {
     clearActiveTopic();
     topic = null;
   }

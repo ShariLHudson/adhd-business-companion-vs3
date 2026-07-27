@@ -325,7 +325,11 @@ export function resolveRecoveryContinuation(input: RuntimeRecoveryInput): string
         topicPreservingFallbackLine,
       } = require("@/lib/conversationStabilization/activeTopicGate") as typeof import("@/lib/conversationStabilization/activeTopicGate");
       if (shouldBlockGenericFallback()) {
-        return topicPreservingFallbackLine();
+        // Stage 1A — answer the CURRENT message. Passing userText activates the
+        // answer-first branch inside topicPreservingFallbackLine, so a new
+        // subject is addressed instead of the reply being regenerated purely
+        // from the stored (possibly stale) topic.
+        return topicPreservingFallbackLine(undefined, userText);
       }
     } catch {
       /* keep generic bridge if gate unavailable */
