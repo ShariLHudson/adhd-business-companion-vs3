@@ -4,22 +4,14 @@ export {
   inferResearchMode,
   extractIntendedOutcome,
   extractPrimaryTopic,
-  appendSessionTurn,
-  touchSession,
 } from "./session";
 export {
   createResearchCollection,
   addFindingsToCollection,
   makeStableFinding,
   organizedCollectionView,
-  mergeResearchCollections,
 } from "./collection";
-export {
-  startResearchConversation,
-  continueResearchConversation,
-  refreshCurrentResearch,
-  type ResearchTurnResult,
-} from "./conversation";
+export { refreshCurrentResearch } from "./conversation";
 export {
   inferResearchUseOptions,
   shouldAskAboutFormat,
@@ -29,14 +21,12 @@ export {
   validateResearchOutcome,
 } from "./formatOutcomes";
 export {
-  loadResearchLibraryStore,
   persistResearchPair,
   saveResearchSession,
   saveResearchCollectionRecord,
   listSavedResearch,
   listActiveResearchSessions,
   getResearchCollectionById,
-  getResearchSessionById,
   markCollectionSaved,
   setPendingContextualResearch,
   consumePendingContextualResearch,
@@ -44,7 +34,6 @@ export {
 } from "./persistence";
 export {
   buildContextualResearchRequest,
-  queueResearchThis,
   contextualRequestOpeningText,
 } from "./contextualResearch";
 export {

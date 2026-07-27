@@ -1,5 +1,4 @@
 import { captureResearchThisContext } from "@/lib/universalRequestOutcome";
-import { setPendingContextualResearch } from "./persistence";
 import type { ContextualResearchRequest } from "./types";
 
 function newId(prefix: string): string {
@@ -55,15 +54,6 @@ export function buildContextualResearchRequest(input: {
     returnContext: input.returnContext ?? null,
     createdAt: new Date().toISOString(),
   };
-}
-
-/** Queue Research This for the Research Library opening experience. */
-export function queueResearchThis(
-  input: Parameters<typeof buildContextualResearchRequest>[0],
-): ContextualResearchRequest {
-  const request = buildContextualResearchRequest(input);
-  setPendingContextualResearch(request);
-  return request;
 }
 
 export function contextualRequestOpeningText(

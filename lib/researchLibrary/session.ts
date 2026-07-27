@@ -1,9 +1,5 @@
 import { getLiveResearchProviderStatus } from "@/lib/universalRequestOutcome";
-import type {
-  ResearchConversationTurn,
-  ResearchMode,
-  ResearchSession,
-} from "./types";
+import type { ResearchMode, ResearchSession } from "./types";
 
 function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
@@ -124,32 +120,3 @@ export function createResearchSession(input: {
   };
 }
 
-export function appendSessionTurn(
-  session: ResearchSession,
-  turn: Omit<ResearchConversationTurn, "id" | "createdAt"> & {
-    id?: string;
-    createdAt?: string;
-  },
-): ResearchSession {
-  const now = new Date().toISOString();
-  const full: ResearchConversationTurn = {
-    id: turn.id ?? newId("rt"),
-    role: turn.role,
-    content: turn.content,
-    createdAt: turn.createdAt ?? now,
-    findingIdsAdded: turn.findingIdsAdded,
-  };
-  return {
-    ...session,
-    conversationTurns: [...session.conversationTurns, full],
-    currentQuestion:
-      turn.role === "user" ? turn.content : session.currentQuestion,
-    updatedAt: now,
-    lastOpenedAt: now,
-  };
-}
-
-export function touchSession(session: ResearchSession): ResearchSession {
-  const now = new Date().toISOString();
-  return { ...session, lastOpenedAt: now, updatedAt: now };
-}

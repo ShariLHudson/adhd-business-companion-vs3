@@ -9,13 +9,6 @@ const COLLECTION_KEY = "companion-research-library-collections-v1";
 const ACTIVE_KEY = "companion-research-library-active-v1";
 const CONTEXTUAL_KEY = "companion-research-library-contextual-pending-v1";
 
-type StoreShape = {
-  sessions: ResearchSession[];
-  collections: ResearchCollectionRecord[];
-  activeSessionId: string | null;
-  activeCollectionId: string | null;
-};
-
 function canUseStorage(): boolean {
   return typeof window !== "undefined" && typeof localStorage !== "undefined";
 }
@@ -38,21 +31,6 @@ function writeJson(key: string, value: unknown): void {
   } catch {
     // Fail silent — conversation continues in memory
   }
-}
-
-export function loadResearchLibraryStore(): StoreShape {
-  const sessions = readJson<ResearchSession[]>(SESSION_KEY, []);
-  const collections = readJson<ResearchCollectionRecord[]>(COLLECTION_KEY, []);
-  const active = readJson<{
-    activeSessionId: string | null;
-    activeCollectionId: string | null;
-  }>(ACTIVE_KEY, { activeSessionId: null, activeCollectionId: null });
-  return {
-    sessions,
-    collections,
-    activeSessionId: active.activeSessionId,
-    activeCollectionId: active.activeCollectionId,
-  };
 }
 
 export function saveResearchSession(session: ResearchSession): void {
@@ -118,13 +96,6 @@ export function getResearchCollectionById(
     readJson<ResearchCollectionRecord[]>(COLLECTION_KEY, []).find(
       (c) => c.id === id,
     ) ?? null
-  );
-}
-
-export function getResearchSessionById(id: string): ResearchSession | null {
-  return (
-    readJson<ResearchSession[]>(SESSION_KEY, []).find((s) => s.id === id) ??
-    null
   );
 }
 

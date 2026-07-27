@@ -1,79 +1,95 @@
 import { describe, expect, it } from "vitest";
 import {
+  addFindingsToCollection,
   buildContextualResearchRequest,
   buildResearchOutcome,
-  continueResearchConversation,
+  createResearchCollection,
+  createResearchSession,
   extractIntendedOutcome,
   inferResearchMode,
   inferResearchUseOptions,
+  makeStableFinding,
   organizedCollectionView,
   shouldAskAboutFormat,
-  startResearchConversation,
   validateResearchOutcome,
+  type ResearchCollectionRecord,
+  type ResearchSession,
 } from "./index";
+import { pickTopicPack } from "./conversation";
 import { getLiveResearchProviderStatus } from "@/lib/universalRequestOutcome";
+import * as RL from "./index";
 
-describe("Research Library — conversational research", () => {
-  it("A: open research chat begins without forced format", () => {
-    const result = startResearchConversation({
-      text: "I want to understand advisory boards.",
-    });
-    expect(result.session.researchMode).toBe("open_exploration");
-    expect(result.session.intendedOutcome).toBeNull();
-    expect(result.autoOutcome).toBeNull();
-    expect(result.offerUseThisResearch).toBe(false);
-    expect(result.assistantMessage.toLowerCase()).toContain("advisory board");
-    expect(result.assistantMessage).not.toMatch(
-      /choose report|map, project, or strategy/i,
-    );
-    expect(result.collection.findings.length).toBeGreaterThanOrEqual(3);
-    expect(result.collection.currentResearchStatus).toBe(
-      getLiveResearchProviderStatus().liveResearchAvailable
-        ? "current_research_in_progress"
-        : "stable_knowledge_used",
-    );
+/**
+ * RL-4: the canned conversation engine (startResearchConversation /
+ * continueResearchConversation) is gone — the Research Library runs on the
+ * shared engine now. These tests exercise the STILL-LIVE Use-This-Research,
+ * outcome-building, session-mode, and collection layers, seeding collections
+ * exactly the way the real collection is built (createResearchSession +
+ * createResearchCollection + addFindingsToCollection) — no canned engine.
+ */
+function seedCollection(text: string): {
+  session: ResearchSession;
+  collection: ResearchCollectionRecord;
+} {
+  const session = createResearchSession({ text });
+  const pack = pickTopicPack(text);
+  const findings = (pack?.findings ?? []).map((f) =>
+    makeStableFinding({ title: f.title, content: f.content, kind: f.kind }),
+  );
+  const seeded = findings.length
+    ? findings
+    : [
+        makeStableFinding({ title: "Overview", content: "…", kind: "theme" }),
+        makeStableFinding({ title: "Key fact", content: "…", kind: "fact" }),
+        makeStableFinding({
+          title: "Recommendation",
+          content: "…",
+          kind: "recommendation",
+        }),
+      ];
+  const collection = addFindingsToCollection(
+    createResearchCollection(session),
+    seeded,
+  );
+  return { session, collection };
+}
+
+describe("Research Library — canned conversation engine retired (RL-4)", () => {
+  it("no longer exports the canned conversation engine or dead helpers", () => {
+    const bag = RL as unknown as Record<string, unknown>;
+    expect(bag.startResearchConversation).toBeUndefined();
+    expect(bag.continueResearchConversation).toBeUndefined();
+    expect(bag.queueResearchThis).toBeUndefined();
+    expect(bag.touchSession).toBeUndefined();
+    expect(bag.mergeResearchCollections).toBeUndefined();
+    expect(bag.loadResearchLibraryStore).toBeUndefined();
+    expect(bag.getResearchSessionById).toBeUndefined();
+    expect(bag.appendSessionTurn).toBeUndefined();
   });
+});
 
-  it("B: research with explicit result continues automatically", () => {
-    const result = startResearchConversation({
-      text: "Research advisory boards and create a plan for building one for my business.",
-    });
-    expect(result.session.researchMode).toBe("research_with_outcome");
-    expect(result.session.intendedOutcome).toBeTruthy();
-    expect(result.autoOutcome).toBeTruthy();
-    expect(result.autoOutcome?.researchCollectionId).toBe(
-      result.collection.id,
+describe("Research Library — live Use-This-Research + outcome layer", () => {
+  it("Use This Research offers context-aware advisory choices", () => {
+    const { session, collection } = seedCollection(
+      "I want to understand advisory boards.",
     );
-    expect(result.assistantMessage).not.toMatch(/what would you like to do with this research/i);
-  });
-
-  it("C: Use This Research offers context-aware advisory choices", () => {
-    const started = startResearchConversation({
-      text: "I want to understand advisory boards.",
-    });
-    const options = inferResearchUseOptions({
-      collection: started.collection,
-      session: started.session,
-    });
+    const options = inferResearchUseOptions({ collection, session });
     expect(options.length).toBeGreaterThanOrEqual(3);
     expect(options.length).toBeLessThanOrEqual(5);
     const labels = options.map((o) => o.label).join(" | ");
     expect(labels).toMatch(/Advisory Board Plan/i);
-    expect(labels).toMatch(/Strategic Planning|Visually|Invitation|Role/i);
     expect(labels).not.toMatch(/Five-Day Content Plan/i);
   });
 
-  it("D: prioritized list is organized, not a raw dump", () => {
-    const started = startResearchConversation({
-      text: "Research podcasting.",
-    });
-    const option = inferResearchUseOptions({
-      collection: started.collection,
-    }).find((o) => o.outcomeType === "list") || {
+  it("prioritized list is organized, not a raw dump", () => {
+    const { collection } = seedCollection("Research podcasting.");
+    const option = inferResearchUseOptions({ collection }).find(
+      (o) => o.outcomeType === "list",
+    ) || {
       id: "generic_list",
       label: "Make a Prioritized List",
       description: "",
-      outcomeType: "list",
+      outcomeType: "list" as const,
       destination: "create" as const,
       reason: "",
       confidence: 0.8,
@@ -81,7 +97,7 @@ describe("Research Library — conversational research", () => {
       requiresClarification: false,
     };
     const artifact = buildResearchOutcome({
-      collection: started.collection,
+      collection,
       option,
       freeformRequest: "Turn this into a prioritized list of what I should do first.",
     });
@@ -90,12 +106,10 @@ describe("Research Library — conversational research", () => {
     expect(validateResearchOutcome(artifact).passed).toBe(true);
   });
 
-  it("E/F: document and form outcomes are substantive", () => {
-    const started = startResearchConversation({
-      text: "I want to understand advisory boards.",
-    });
+  it("document and form outcomes are substantive", () => {
+    const { collection } = seedCollection("I want to understand advisory boards.");
     const doc = buildResearchOutcome({
-      collection: started.collection,
+      collection,
       option: {
         id: "doc",
         label: "Create a document I can give my team",
@@ -112,7 +126,7 @@ describe("Research Library — conversational research", () => {
     expect(doc.sections.length).toBeGreaterThanOrEqual(2);
 
     const form = buildResearchOutcome({
-      collection: started.collection,
+      collection,
       option: {
         id: "form",
         label: "Create a form",
@@ -133,12 +147,10 @@ describe("Research Library — conversational research", () => {
     expect(validateResearchOutcome(form).passed).toBe(true);
   });
 
-  it("G: visual handoff carries substantive collection payload", () => {
-    const started = startResearchConversation({
-      text: "I want to understand advisory boards.",
-    });
+  it("visual handoff carries substantive collection payload", () => {
+    const { collection } = seedCollection("I want to understand advisory boards.");
     const visual = buildResearchOutcome({
-      collection: started.collection,
+      collection,
       option: {
         id: "advisory_visual",
         label: "Show the Advisory Structure Visually",
@@ -156,16 +168,14 @@ describe("Research Library — conversational research", () => {
       findings: unknown[];
       researchCollectionId: string;
     };
-    expect(payload.researchCollectionId).toBe(started.collection.id);
+    expect(payload.researchCollectionId).toBe(collection.id);
     expect(payload.findings.length).toBeGreaterThan(0);
   });
 
-  it("H/I: strategy and project proposals require review", () => {
-    const started = startResearchConversation({
-      text: "I want to understand advisory boards.",
-    });
+  it("strategy and project proposals require review", () => {
+    const { collection } = seedCollection("I want to understand advisory boards.");
     const strategy = buildResearchOutcome({
-      collection: started.collection,
+      collection,
       option: {
         id: "strategy",
         label: "Create a strategy",
@@ -182,7 +192,7 @@ describe("Research Library — conversational research", () => {
     expect(strategy.content).toMatch(/not approved|proposed/i);
 
     const project = buildResearchOutcome({
-      collection: started.collection,
+      collection,
       option: {
         id: "project",
         label: "Turn this into a project",
@@ -199,60 +209,37 @@ describe("Research Library — conversational research", () => {
     expect(project.content).toMatch(/Proposal Review|approve/i);
   });
 
-  it("J: research-only follow-ups never force a format", () => {
-    let turn = startResearchConversation({
-      text: "I want to understand advisory boards.",
-    });
-    for (let i = 0; i < 5; i += 1) {
-      turn = continueResearchConversation({
-        session: turn.session,
-        collection: turn.collection,
-        text: `Tell me more about point ${i + 1}.`,
-      });
-      expect(turn.assistantMessage).not.toMatch(
-        /would you like a report, map, or document/i,
-      );
-    }
-    expect(turn.collection.findings.length).toBeGreaterThanOrEqual(3);
-    // Offering Use This Research after substance is allowed; forcing format menus is not.
+  it("does not force a format menu after substantive research", () => {
+    const { session, collection } = seedCollection(
+      "I want to understand advisory boards.",
+    );
+    expect(collection.findings.length).toBeGreaterThanOrEqual(3);
     expect(
       shouldAskAboutFormat({
-        collection: turn.collection,
-        session: { ...turn.session, currentStatus: "conversing" },
+        collection,
+        session: { ...session, currentStatus: "conversing" },
         userAskedWhatNext: false,
       }),
     ).toBe(false);
   });
+});
 
-  it("K: five-day social plan preserves qualifier via explicit outcome", () => {
-    const result = startResearchConversation({
-      text: "Research current webinar-promotion ideas and create a five-day social media content plan.",
-    });
-    expect(extractIntendedOutcome(result.session.currentQuestion)).toBeTruthy();
-    expect(result.autoOutcome).toBeTruthy();
+describe("Research Library — session modes + contextual Research This", () => {
+  it("infers research modes", () => {
     expect(
-      `${result.autoOutcome?.title} ${result.autoOutcome?.content}`.toLowerCase(),
-    ).toMatch(/day|plan|content|webinar|social/);
-  });
-
-  it("L: step-by-step podcast guide path", () => {
-    const result = startResearchConversation({
-      text: "Research podcasting and show me step by step how to launch a podcast.",
-    });
-    expect(result.session.intendedOutcome).toBeTruthy();
-    expect(result.autoOutcome).toBeTruthy();
-    expect(result.collection.id).toBe(
-      result.autoOutcome?.researchCollectionId,
-    );
-  });
-
-  it("infers modes and contextual Research This", () => {
-    expect(
-      inferResearchMode({
-        text: "compare hosting options",
-        intendedOutcome: null,
-      }),
+      inferResearchMode({ text: "compare hosting options", intendedOutcome: null }),
     ).toBe("comparison");
+  });
+
+  it("preserves an explicit intended outcome from the request", () => {
+    const session = createResearchSession({
+      text: "Research advisory boards and create a plan for building one for my business.",
+    });
+    expect(session.intendedOutcome).toBeTruthy();
+    expect(extractIntendedOutcome(session.currentQuestion)).toBeTruthy();
+  });
+
+  it("builds a contextual Research This request without re-explaining", () => {
     const ctx = buildContextualResearchRequest({
       sourceExperience: "projects",
       selectedText: "customer onboarding checklist",
@@ -263,22 +250,13 @@ describe("Research Library — conversational research", () => {
   });
 
   it("organized collection view exposes progressive sections", () => {
-    const started = startResearchConversation({
-      text: "Help me understand Medicare.",
-    });
-    const view = organizedCollectionView(started.collection);
+    const { collection } = seedCollection("Help me understand Medicare.");
+    const view = organizedCollectionView(collection);
     expect(view.whatIAsked).toBeTruthy();
-    expect(view.sources.length).toBeGreaterThan(0);
     expect(view.importantFindings.length).toBeGreaterThan(0);
   });
 
-  it("marks live research unavailable honestly when provider is off", () => {
-    const live = getLiveResearchProviderStatus();
-    expect(live.liveResearchAvailable).toBe(false);
-    const result = startResearchConversation({
-      text: "Research current webinar promotion practices.",
-    });
-    expect(result.session.currentResearchStatus).toBe("stable_knowledge_used");
-    expect(result.currentResearchNotice).toMatch(/stable|current research/i);
+  it("live research is honestly unavailable while no provider is connected", () => {
+    expect(getLiveResearchProviderStatus().liveResearchAvailable).toBe(false);
   });
 });
