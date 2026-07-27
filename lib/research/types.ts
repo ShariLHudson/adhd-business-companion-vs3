@@ -24,6 +24,13 @@ export const CITATION_EVIDENCE_BASES: readonly ResearchEvidenceBasis[] = [
   "connected_source",
 ];
 
+/**
+ * The two honest research modes. `explore` is conversation/guidance/
+ * interpretation (never citations). `sources` requires a real retrieval
+ * provider and never fabricates citations from model memory.
+ */
+export type SharedResearchMode = "explore" | "sources";
+
 export type ResearchFindingKind =
   | "fact"
   | "inference"
