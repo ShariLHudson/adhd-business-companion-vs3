@@ -28,6 +28,23 @@ import {
 import { estateRoomTimeEstimate } from "@/lib/profile/businessEstateRedesign";
 import type { GuidedStageAreaId } from "@/lib/profile/guidedStageTypes";
 import { getGuidedAreaStages } from "@/lib/profile/guidedStageRegistry";
+import {
+  ContextualResearchPanel,
+  type ContextualResearchMessage,
+} from "@/components/companion/contextualWorkspace/ContextualResearchPanel";
+import {
+  addBusinessEstateResearchResponseToField,
+  addBusinessEstateResearchSessionToField,
+  getBusinessEstateResearchAddedResponses,
+  getBusinessEstateResearchThreadMessages,
+  saveBusinessEstateResearchThread,
+} from "@/lib/profile/businessEstateProfile";
+import {
+  BUSINESS_ESTATE_RESEARCH_LABELS,
+  buildBusinessEstateResearchAutoPrompt,
+  buildBusinessEstateResearchSystemPrompt,
+  businessEstateResearchThreadKey,
+} from "@/lib/profile/businessProfileResearchConfig";
 
 type Props = {
   sectionId: BusinessEstateSectionId;
@@ -105,6 +122,14 @@ export function BusinessEstateSectionEditor({
   const [focusStageId, setFocusStageId] = useState<string | null>(() =>
     initialMode === "edit" ? firstStageId : null,
   );
+  // Contextual research — one active field, one shared panel (mirrors Client Avatar).
+  const [researchFieldKey, setResearchFieldKey] = useState<string | null>(null);
+  const [researchMessages, setResearchMessages] = useState<
+    ContextualResearchMessage[]
+  >([]);
+  const activeResearchKey = researchFieldKey
+    ? businessEstateResearchThreadKey(sectionId, researchFieldKey)
+    : null;
 
   const sectionStatus = getBusinessEstateSectionStatus(sectionId);
   const dirty = mode === "edit" && valuesAreDirty(sectionId, values);
@@ -119,10 +144,57 @@ export function BusinessEstateSectionEditor({
     reload();
     setMode(initialMode);
     setActiveFieldKey(null);
+    setResearchFieldKey(null);
     const startId =
       getGuidedAreaStages(sectionId as GuidedStageAreaId).stages[0]?.id ?? null;
     setFocusStageId(initialMode === "edit" ? startId : null);
   }, [reload, sectionId, initialMode]);
+
+  // Load the persisted thread when research opens for a field (resume).
+  useEffect(() => {
+    if (activeResearchKey) {
+      setResearchMessages(
+        getBusinessEstateResearchThreadMessages(activeResearchKey),
+      );
+    } else {
+      setResearchMessages([]);
+    }
+  }, [activeResearchKey]);
+
+  function openResearch(fieldKey: string) {
+    // Load the persisted thread synchronously so the panel mounts non-empty and
+    // resumes instead of auto-researching afresh (the empty-mount race).
+    const key = businessEstateResearchThreadKey(sectionId, fieldKey);
+    setResearchMessages(getBusinessEstateResearchThreadMessages(key));
+    setResearchFieldKey(fieldKey);
+  }
+
+  function handleResearchMessages(next: ContextualResearchMessage[]) {
+    setResearchMessages(next);
+    if (activeResearchKey) saveBusinessEstateResearchThread(activeResearchKey, next);
+  }
+
+  function handleResearchAddResponse(message: ContextualResearchMessage) {
+    if (!researchFieldKey) return;
+    const result = addBusinessEstateResearchResponseToField(
+      sectionId,
+      researchFieldKey,
+      values[researchFieldKey] ?? "",
+      message,
+    );
+    if (result.added) updateField(researchFieldKey, result.value);
+  }
+
+  function handleResearchAddSession() {
+    if (!researchFieldKey) return;
+    const result = addBusinessEstateResearchSessionToField(
+      sectionId,
+      researchFieldKey,
+      values[researchFieldKey] ?? "",
+      researchMessages,
+    );
+    if (result.added) updateField(researchFieldKey, result.value);
+  }
 
   useEffect(() => {
     onDirtyChange?.(dirty);
@@ -140,6 +212,7 @@ export function BusinessEstateSectionEditor({
     setFocusStageId(null);
     setSavedMessage("Saved");
     setActiveFieldKey(null);
+    setResearchFieldKey(null);
     reload();
   }
 
@@ -148,6 +221,7 @@ export function BusinessEstateSectionEditor({
     setMode("view");
     setFocusStageId(null);
     setActiveFieldKey(null);
+    setResearchFieldKey(null);
   }
 
   function handleBack() {
@@ -239,7 +313,40 @@ export function BusinessEstateSectionEditor({
         roomChrome
         focusStageId={focusStageId}
         onFocusStageIdChange={setFocusStageId}
+        onResearchField={openResearch}
       />
+
+      {researchFieldKey ? (
+        <ContextualResearchPanel
+          open
+          onToggle={() => setResearchFieldKey(null)}
+          questionKey={activeResearchKey ?? ""}
+          questionLabel={
+            visibleFields.find((f) => f.key === researchFieldKey)?.label ??
+            researchFieldKey
+          }
+          systemPrompt={buildBusinessEstateResearchSystemPrompt(
+            sectionId,
+            researchFieldKey,
+            values[researchFieldKey] ?? "",
+          )}
+          autoPrompt={buildBusinessEstateResearchAutoPrompt(
+            sectionId,
+            researchFieldKey,
+            values[researchFieldKey] ?? "",
+          )}
+          messages={researchMessages}
+          onMessagesChange={handleResearchMessages}
+          addedResponseIds={getBusinessEstateResearchAddedResponses()}
+          onAddResponse={handleResearchAddResponse}
+          onAddSession={handleResearchAddSession}
+          toggleLabel={BUSINESS_ESTATE_RESEARCH_LABELS.toggleLabel}
+          helperText={BUSINESS_ESTATE_RESEARCH_LABELS.helperText}
+          addLabel={BUSINESS_ESTATE_RESEARCH_LABELS.addLabel}
+          addAllLabel={BUSINESS_ESTATE_RESEARCH_LABELS.addAllLabel}
+          addedLabel={BUSINESS_ESTATE_RESEARCH_LABELS.addedLabel}
+        />
+      ) : null}
     </div>
   ) : null;
 

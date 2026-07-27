@@ -18,8 +18,15 @@ import {
   getBusinessProfile,
   saveBusinessProfile,
   type BusinessProfile,
+  type ResearchThread,
+  type ResearchThreadMessage,
 } from "@/lib/companionStore";
 import { getPrefs } from "@/lib/companionStore";
+import {
+  addResponseToAnswer,
+  addSessionToAnswer,
+  type ResearchMessageLike,
+} from "@/lib/research/contextualResearchCore";
 
 export type BusinessEstateSectionId =
   | "identity"
@@ -149,12 +156,48 @@ export type BusinessEstateSections = {
 
 export type BusinessEstateFieldApproval = Record<string, boolean>;
 
+/**
+ * Contextual research kept with the profile (Stage 4). Threads are keyed by
+ * `research:<sectionId>.<fieldKey>`. This is research working data, not approved
+ * facts — approved findings are written to the section fields through the
+ * canonical writer (saveBusinessEstateSection). Lives on the canonical envelope;
+ * no new storage key.
+ */
+export type BusinessEstateResearchStore = {
+  threads: Record<string, ResearchThread>;
+  /** Canonical ids of responses already added to a field (dedup by id). */
+  addedResponses: string[];
+  /** Per-thread ISO timestamp of the last research activity. */
+  lastResearched: Record<string, string>;
+};
+
 type EstateEnvelope = {
   version: 1;
   sections: BusinessEstateSections;
   approval: BusinessEstateFieldApproval;
   sectionUpdatedAt: Partial<Record<BusinessEstateSectionId, string>>;
+  research: BusinessEstateResearchStore;
 };
+
+function emptyBusinessEstateResearch(): BusinessEstateResearchStore {
+  return { threads: {}, addedResponses: [], lastResearched: {} };
+}
+
+function parseBusinessEstateResearch(raw: unknown): BusinessEstateResearchStore {
+  if (!raw || typeof raw !== "object") return emptyBusinessEstateResearch();
+  const r = raw as Partial<BusinessEstateResearchStore>;
+  return {
+    threads:
+      r.threads && typeof r.threads === "object" ? { ...r.threads } : {},
+    addedResponses: Array.isArray(r.addedResponses)
+      ? r.addedResponses.filter((id): id is string => typeof id === "string")
+      : [],
+    lastResearched:
+      r.lastResearched && typeof r.lastResearched === "object"
+        ? { ...r.lastResearched }
+        : {},
+  };
+}
 
 const BIZ_PROFILE_KEY = "companion-business-profile-v1";
 
@@ -398,6 +441,7 @@ function parseEnvelope(raw: Record<string, unknown> | null): EstateEnvelope {
           ? { ...parsed.approval }
           : {},
       sectionUpdatedAt: parsed.sectionUpdatedAt ?? {},
+      research: parseBusinessEstateResearch(parsed.research),
     };
   }
 
@@ -406,6 +450,7 @@ function parseEnvelope(raw: Record<string, unknown> | null): EstateEnvelope {
     sections: emptyBusinessEstateSections(),
     approval: {},
     sectionUpdatedAt: {},
+    research: emptyBusinessEstateResearch(),
   });
 }
 
@@ -677,6 +722,98 @@ export function saveBusinessEstateSection(
 
   syncLegacyBusinessProfile(nextEnvelope.sections, nextApproval);
   return nextEnvelope.sections;
+}
+
+// ---------------------------------------------------------------------------
+// Contextual research (Stage 4) — threads + dedup live on the canonical
+// envelope; approved findings are written to fields via saveBusinessEstateSection.
+// ---------------------------------------------------------------------------
+
+export function getBusinessEstateResearch(): BusinessEstateResearchStore {
+  return getBusinessEstateEnvelope().research;
+}
+
+export function getBusinessEstateResearchThreadMessages(
+  key: string,
+): ResearchThreadMessage[] {
+  return getBusinessEstateResearch().threads[key]?.messages ?? [];
+}
+
+export function getBusinessEstateResearchAddedResponses(): string[] {
+  return getBusinessEstateResearch().addedResponses;
+}
+
+/** Persist a research mutation, preserving sections/approval/legacy fields. */
+function writeBusinessEstateResearch(
+  mutate: (research: BusinessEstateResearchStore) => BusinessEstateResearchStore,
+): void {
+  const raw = readRawDocument() ?? {};
+  const envelope = parseEnvelope(raw);
+  const nextResearch = mutate(envelope.research);
+  writeRawDocument({
+    ...raw,
+    updatedAt: new Date().toISOString(),
+    estate: { ...envelope, research: nextResearch },
+  });
+}
+
+/** Save/replace a research thread's messages (working data, not approved facts). */
+export function saveBusinessEstateResearchThread(
+  key: string,
+  messages: ResearchThreadMessage[],
+): void {
+  const now = new Date().toISOString();
+  writeBusinessEstateResearch((research) => ({
+    ...research,
+    threads: { ...research.threads, [key]: { messages, updatedAt: now } },
+    lastResearched: { ...research.lastResearched, [key]: now },
+  }));
+}
+
+export function recordBusinessEstateResearchAdded(ids: string[]): void {
+  if (!ids.length) return;
+  writeBusinessEstateResearch((research) => {
+    const set = new Set(research.addedResponses);
+    for (const id of ids) set.add(id);
+    return { ...research, addedResponses: [...set] };
+  });
+}
+
+export type BusinessEstateResearchAddResult = { added: boolean; value: string };
+
+/**
+ * Append one chosen research response into a section field. Append-only, dedup
+ * by stable id, and written ONLY through the canonical writer
+ * (saveBusinessEstateSection), which sets the field's approval — the member's
+ * explicit "Add" is the approval. No automatic writes.
+ */
+export function addBusinessEstateResearchResponseToField(
+  sectionId: BusinessEstateSectionId,
+  fieldKey: string,
+  currentValue: string,
+  message: ResearchMessageLike,
+): BusinessEstateResearchAddResult {
+  const added = getBusinessEstateResearchAddedResponses();
+  const { answer, addedIds } = addResponseToAnswer(currentValue, message, added);
+  if (!addedIds.length) return { added: false, value: currentValue };
+  saveBusinessEstateSection(sectionId, { [fieldKey]: answer });
+  recordBusinessEstateResearchAdded(addedIds);
+  return { added: true, value: answer };
+}
+
+/** Append every not-yet-added response from a session into a section field. */
+export function addBusinessEstateResearchSessionToField(
+  sectionId: BusinessEstateSectionId,
+  fieldKey: string,
+  currentValue: string,
+  messages: readonly ResearchMessageLike[],
+): BusinessEstateResearchAddResult {
+  const added = getBusinessEstateResearchAddedResponses();
+  const { answer, addedIds } = addSessionToAnswer(currentValue, messages, added);
+  if (!addedIds.length) return { added: false, value: currentValue };
+  saveBusinessEstateSection(sectionId, { [fieldKey]: answer });
+  recordBusinessEstateResearchAdded(addedIds);
+  return { added: true, value: answer };
 }
 
 export const BUSINESS_ESTATE_SECTIONS: readonly {

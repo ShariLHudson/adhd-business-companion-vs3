@@ -27,7 +27,10 @@ describe("Business Estate section help placement", () => {
     container.remove();
   });
 
-  function renderOffers(stageId = "offers-problems-outcomes") {
+  function renderOffers(
+    stageId = "offers-problems-outcomes",
+    onResearchField?: (fieldKey: string) => void,
+  ) {
     act(() => {
       root.render(
         <GuidedStageWorkspace
@@ -43,6 +46,7 @@ describe("Business Estate section help placement", () => {
           roomChrome
           focusStageId={stageId}
           onFocusStageIdChange={() => {}}
+          onResearchField={onResearchField}
         />,
       );
     });
@@ -81,30 +85,34 @@ describe("Business Estate section help placement", () => {
     ).toBe(1);
   });
 
-  it("preserves draft text when help actions are used", () => {
+  it("preserves draft text when help actions are used (research opens the panel)", () => {
     const helpSpy = vi.spyOn(guidedFieldHelp, "requestGuidedFieldHelp");
-    renderOffers("offers-problems-outcomes");
+    const onResearchField = vi.fn();
+    renderOffers("offers-problems-outcomes", onResearchField);
     const before = "Scattered follow-up";
     expect(
       (container.querySelector("textarea") as HTMLTextAreaElement)?.value,
     ).toBe(before);
 
+    // Help Me Answer still opens the guided help chat…
     act(() => {
       container
         .querySelector('[data-testid="section-help-me-answer"]')
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
+    // …Research This opens the shared inline panel instead.
     act(() => {
       container
         .querySelector('[data-testid="section-research-this"]')
         ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
     });
 
+    expect(onResearchField).toHaveBeenCalledWith("problemsSolved");
     expect(values.problemsSolved).toBe(before);
     expect(
       (container.querySelector("textarea") as HTMLTextAreaElement).value,
     ).toBe(before);
-    expect(helpSpy).toHaveBeenCalled();
+    expect(helpSpy).toHaveBeenCalled(); // Help Me Answer (help_me_develop)
     helpSpy.mockRestore();
   });
 

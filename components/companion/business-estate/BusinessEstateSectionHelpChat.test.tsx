@@ -37,7 +37,10 @@ describe("Business Estate section help opens chat", () => {
     container.remove();
   });
 
-  function renderOffers(stageId = "offers-problems-outcomes") {
+  function renderOffers(
+    stageId = "offers-problems-outcomes",
+    onResearchField?: (fieldKey: string) => void,
+  ) {
     act(() => {
       root.render(
         <GuidedStageWorkspace
@@ -52,6 +55,7 @@ describe("Business Estate section help opens chat", () => {
           onCancel={() => {}}
           roomChrome
           focusStageId={stageId}
+          onResearchField={onResearchField}
         />,
       );
     });
@@ -92,9 +96,30 @@ describe("Business Estate section help opens chat", () => {
     helpSpy.mockRestore();
   });
 
-  it("Research This dispatches research mode with the same draft context", () => {
+  it("Research This opens the shared research panel instead of the help chat", () => {
     const helpSpy = vi.spyOn(guidedFieldHelp, "requestGuidedFieldHelp");
-    renderOffers();
+    const onResearchField = vi.fn();
+    renderOffers("offers-problems-outcomes", onResearchField);
+    act(() => {
+      container
+        .querySelector('[data-testid="section-research-this"]')
+        ?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    // Redirected to the shared panel for this field…
+    expect(onResearchField).toHaveBeenCalledWith("problemsSolved");
+    // …and NOT into the research_with_shari help chat.
+    const researchDispatch = helpSpy.mock.calls.find(
+      (c) => (c[0] as GuidedFieldHelpRequest).helpMode === "research_with_shari",
+    );
+    expect(researchDispatch).toBeUndefined();
+    // Draft is never mutated by opening research.
+    expect(values.problemsSolved).toBe("Scattered follow-up");
+    helpSpy.mockRestore();
+  });
+
+  it("falls back to the research help chat when no panel host is provided", () => {
+    const helpSpy = vi.spyOn(guidedFieldHelp, "requestGuidedFieldHelp");
+    renderOffers(); // no onResearchField
     act(() => {
       container
         .querySelector('[data-testid="section-research-this"]')
@@ -102,7 +127,6 @@ describe("Business Estate section help opens chat", () => {
     });
     const req = helpSpy.mock.calls[0]![0] as GuidedFieldHelpRequest;
     expect(req.helpMode).toBe("research_with_shari");
-    expect(req.currentValue).toBe("Scattered follow-up");
     expect(req.fieldPath).toBe("offers.problemsSolved");
     helpSpy.mockRestore();
   });

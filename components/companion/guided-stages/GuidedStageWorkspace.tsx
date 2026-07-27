@@ -73,6 +73,12 @@ type Props = {
   focusStageId?: string | null;
   /** Keep Progress Overview in sync when this workspace advances stages. */
   onFocusStageIdChange?: (stageId: string) => void;
+  /**
+   * Open the shared research panel for a field. When provided, the "Research
+   * This" action opens the host's inline ContextualResearchPanel instead of the
+   * research_with_shari help chat. Other help modes are unaffected.
+   */
+  onResearchField?: (fieldKey: string) => void;
 };
 
 function pathToFieldKey(path: string): string | null {
@@ -119,6 +125,7 @@ export function GuidedStageWorkspace({
   roomChrome = false,
   focusStageId = null,
   onFocusStageIdChange,
+  onResearchField,
 }: Props) {
   const area = getGuidedAreaStages(areaId);
   const stages = area.stages;
@@ -791,6 +798,13 @@ export function GuidedStageWorkspace({
                                 className="guided-estate-field__help-btn"
                                 data-testid="section-research-this"
                                 onClick={() => {
+                                  // Redirect the research branch to the shared
+                                  // inline panel when the host provides it.
+                                  // Other help modes are untouched.
+                                  if (onResearchField) {
+                                    onResearchField(fieldKey);
+                                    return;
+                                  }
                                   const sectionId = path.includes(".")
                                     ? path.slice(0, path.indexOf("."))
                                     : activeStage.areaId;
