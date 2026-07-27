@@ -385,7 +385,10 @@ import {
   hasStartedBusinessProfile,
   getBusinessEstateResumeSectionId,
 } from "@/lib/profile/businessEstateProfile";
-import { requestOpenBusinessEstateSection } from "@/lib/businessEstateSectionIntent";
+import {
+  requestBusinessEstateReset,
+  requestOpenBusinessEstateSection,
+} from "@/lib/businessEstateSectionIntent";
 import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
@@ -11036,6 +11039,11 @@ export default function CompanionPageClient() {
         setOverlay("profile-personal");
         return;
       case "my-business-estate-overlay":
+        // Entering Business Builder from outside always starts at the overview.
+        // Clears any transient room intent + returns an already-open panel to
+        // the beginning. An explicit resume (chat "continue …") re-requests a
+        // room immediately after this call. Saved data is never touched.
+        requestBusinessEstateReset();
         setOverlay("my-business-estate");
         return;
       default: {

@@ -14,6 +14,7 @@ import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHel
 import type { BusinessEstateSectionId } from "@/lib/profile/businessEstateProfile";
 import {
   consumePendingBusinessEstateSection,
+  subscribeBusinessEstateReset,
   subscribeBusinessEstateSectionOpen,
 } from "@/lib/businessEstateSectionIntent";
 import { getBusinessAreaPresentation } from "@/lib/profile/executiveOfficePresentation";
@@ -104,6 +105,20 @@ export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
     if (pending) navigateToSection(pending);
     return subscribeBusinessEstateSectionOpen(navigateToSection);
   }, [navigateToSection]);
+
+  // Navigation reset: re-entering Business Builder from outside always returns
+  // to the overview (never a resumed room/field/editor/research). Saved data is
+  // untouched — this only resets transient view state.
+  useEffect(() => {
+    return subscribeBusinessEstateReset(() => {
+      setSectionDirty(false);
+      setLegacyEdit(false);
+      setSectionBrowserOpen(false);
+      setShowHowHelps(false);
+      setExpandedSectionId(null);
+      setView({ kind: "overview" });
+    });
+  }, []);
 
   useEffect(() => {
     if (!sectionDirty) {
