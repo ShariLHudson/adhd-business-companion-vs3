@@ -8,7 +8,6 @@ import { isCreateResumeRequest } from "@/lib/workspaceIntent";
 import { looksLikeKnowledgeQuestion } from "@/lib/platformIntent";
 import { isCreateIrrelevantUserTurn } from "@/lib/conversationContinuity/createOwnershipGuard";
 import { isExplicitOwnerExit, isExplicitTaskChange } from "@/lib/conversationContinuity/exitRules";
-import { isCreateFlowAssistantContext } from "./createFlowContext";
 import { isCreateWorkflowContinuation } from "@/lib/pendingChoice/listContinuation";
 import { isSimpleCreateRequest } from "./createFastPath";
 import type { UniversalCreationSession } from "./types";
@@ -16,6 +15,7 @@ import { getCreateLifecycle, isCreateParked } from "./createLifecycle";
 import { isBareGenericAcceptance } from "@/lib/pendingAcceptanceAuthority";
 import { EXPLICIT_EMAIL_START_OVER_RE } from "./emailWorkflowCompletion";
 import { isCreateRevisionInstruction } from "./createRevisionDetect";
+import type { ConversationBoundaryDecision } from "@/lib/conversationBoundary";
 
 export { isCreateRevisionInstruction } from "./createRevisionDetect";
 
@@ -68,13 +68,6 @@ export function isExplicitReturnToCreate(userText: string): boolean {
   );
 }
 
-function lastIsCreateContext(lastAssistantText: string | null | undefined): boolean {
-  const last = lastAssistantText?.trim() || "";
-  if (!last) return false;
-  // Covers UC + guided create assistant context.
-  return isCreateFlowAssistantContext(last);
-}
-
 /**
  * Single choke-point decision for Create vs Companion for this user turn.
  */
@@ -83,6 +76,12 @@ export function classifyCreateTurnRelationship(input: {
   session: UniversalCreationSession | null;
   lastAssistantText?: string | null;
   continueCreationPriority?: boolean;
+  /**
+   * Shared Conversation Boundary Decision — the single authority for whether this
+   * turn belongs to the active Create. When present, it replaces the legacy
+   * lastAssistantText / message-position heuristic for claiming a discovery answer.
+   */
+  boundaryDecision?: ConversationBoundaryDecision;
 }): CreateTurnRelationshipDecision {
   const t = input.userText.trim();
   const session = input.session;
@@ -148,12 +147,14 @@ export function classifyCreateTurnRelationship(input: {
   }
 
   // Revision before replace/detour — "make warmer" must not restart Create.
+  // Requires an actual draft to revise (has-draft or parked-with-draft); the
+  // lastAssistantText position heuristic is intentionally NOT a trigger here, so a
+  // discovery answer that happens to contain a revision-like verb ("update the
+  // client on the timeline") is not misread as revising a non-existent draft.
   if (
     hasWorkflow &&
     isCreateRevisionInstruction(t) &&
-    (life.hasDraft ||
-      lastIsCreateContext(input.lastAssistantText) ||
-      parked)
+    (life.hasDraft || parked)
   ) {
     return {
       relationship: "revise-create",
@@ -247,34 +248,45 @@ export function classifyCreateTurnRelationship(input: {
     };
   }
 
-  // Menu / short continue / bare ack while Create is awaiting action or draft
+  // Explicit Create-domain continuation signals (menu selection, bare acceptance,
+  // list continuation) — unambiguous actions on the Create itself, not
+  // message-position guesses, so they remain Create-owned regardless of Boundary.
   const bareContinue =
     isBareGenericAcceptance(t) ||
     isCreateWorkflowContinuation(t) ||
     CREATE_MENU_RE.test(t);
-  if (
-    bareContinue ||
-    input.continueCreationPriority ||
-    lastIsCreateContext(input.lastAssistantText)
-  ) {
-    const discoveryAnswer =
-      life.state === "awaiting_input" &&
-      !DETOUR_QUESTION_RE.test(t) &&
-      !bareContinue &&
-      t.split(/\s+/).length <= 40;
+  if (bareContinue) {
     return {
-      relationship: discoveryAnswer
-        ? "answer-create-question"
-        : "continue-create",
+      relationship: "continue-create",
       createEligible: true,
       shouldPark: false,
       shouldResume: false,
       shouldExit: false,
-      reason: discoveryAnswer
-        ? "create_discovery_answer"
-        : bareContinue
-          ? "create_bare_continue"
-          : "continue_create",
+      reason: "create_bare_continue",
+    };
+  }
+
+  // Discovery answer — the shared Boundary Decision is the SOLE authority for
+  // whether this turn belongs to the active Create. The legacy lastAssistantText /
+  // message-length position heuristic is removed: a reply is consumed as a
+  // discovery answer ONLY when the Boundary classified it as answering the pending
+  // question (or continuing the current topic). Absent a granting Boundary
+  // decision, an unrelated statement is never captured as an answer.
+  const boundaryGrantsCreateAnswer =
+    input.boundaryDecision?.decision === "answer_pending_question" ||
+    input.boundaryDecision?.decision === "continue_current_topic";
+  if (
+    life.state === "awaiting_input" &&
+    boundaryGrantsCreateAnswer &&
+    !DETOUR_QUESTION_RE.test(t)
+  ) {
+    return {
+      relationship: "answer-create-question",
+      createEligible: true,
+      shouldPark: false,
+      shouldResume: false,
+      shouldExit: false,
+      reason: "create_discovery_answer",
     };
   }
 

@@ -72,11 +72,43 @@ export type BoundaryActiveWork = {
   suspendable: boolean;
 };
 
+/**
+ * General semantic role of a pending answer — workflow-agnostic. A Create
+ * workflow's discovery slot (what/why/who/success) is mapped to one of these by
+ * the wiring adapter; the Boundary evaluates role conformance structurally and
+ * never contains domain vocabulary.
+ */
+export type PendingAnswerRole =
+  | "recipient"
+  | "goal"
+  | "subject"
+  | "outcome"
+  | "tone"
+  | "date"
+  | "decision"
+  | "quantity"
+  | "freeform";
+
 export type BoundaryPendingQuestion = {
   kind: "menu" | "confirmation" | "strategy_disambiguation" | "scheduling" | "open";
   /** The SHAPE of answer this question expects. */
   expects: "selection" | "yes_no" | "date_or_day" | "free";
   choices?: string[];
+  /** S4.1 — semantic role of the pending slot (Create discovery). */
+  role?: PendingAnswerRole;
+  /**
+   * Roles of slots still outstanding in this Create discovery. A member may
+   * answer a slot that was not the one just asked ("the purpose" while "who" is
+   * pending); the reply fills the pending Create if it plausibly satisfies ANY
+   * outstanding role.
+   */
+  outstandingRoles?: readonly PendingAnswerRole[];
+  /**
+   * Authored answer affordances from the outstanding discovery questions
+   * (each workflow's own signalPatterns). Passed as data; the Boundary matches
+   * them but never defines domain words itself.
+   */
+  affordances?: readonly RegExp[];
 };
 
 export type BoundarySuspendedItem = {
@@ -127,6 +159,13 @@ const PRIORITIZATION_GOAL_RE =
 
 const PRIORITY_ANSWER_RE =
   /\b(?:most urgent|urgent(?:est)?|first|priority|start with|begin with|do .* first|is the (?:most|one))\b/i;
+
+// A bare hesitation / incomplete pivot ("Actually…", "Um…", "Wait") — the member
+// is reconsidering, not answering. Matches the marker ALONE (optionally with
+// trailing punctuation/ellipsis); "Actually, make it warmer" carries content and
+// does NOT match, so genuine corrections still flow through normally.
+const BARE_HESITATION_RE =
+  /^\s*(?:actually|hmm+|umm*|uh+|er+|well|wait|hold on|let me think|one sec|hang on)[\s.,!?…]*$/i;
 
 const CONTENT_STOPWORDS = new Set([
   "about", "actually", "again", "already", "always", "because", "been",
@@ -206,6 +245,93 @@ function matchesPendingExpectedShape(
     default:
       return false;
   }
+}
+
+// ── General role-shape evidence (S4.1) — structural only, no domain words ─────
+
+/** Purpose / accomplishment: "to <verb>…", "so that…", "because…", "for…". */
+const GOAL_SHAPE_RE =
+  /^\s*(?:to|so(?:\s+that)?|because|in order to|for)\b|\bi (?:want|need|hope|plan|would like|am trying) to\b/i;
+/** A finite verb — marks a full clause, so the reply is NOT a bare entity/topic. */
+const CLAUSE_VERB_RE =
+  /\b(?:is|are|was|were|be|been|being|am|has|have|had|do|does|did|will|would|can|could|should|must|need|needs|want|wants|threw|broke|ruined|got|get|goes|went|feel|feels|feeling|happened|left|said)\b/i;
+/** Temporal expression — a day, relative day, month, or a bare date number. */
+const DATE_SHAPE_RE =
+  /\b(?:mon|tues|wednes|thurs|fri|satur|sun)day\b|\b(?:tomorrow|tonight|today|this (?:morning|afternoon|evening|week|month)|next (?:week|month)|morning|afternoon|evening|noon)\b|\b\d{1,2}(?::\d{2})?\s*(?:am|pm)?\b|\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i;
+const QUANTITY_SHAPE_RE =
+  /\b\d+\b|\b(?:one|two|three|four|five|six|seven|eight|nine|ten|several|a few|a couple|dozen|hundred|thousand)\b/i;
+
+function isBriefReply(t: string): boolean {
+  return t.trim().split(/\s+/).filter(Boolean).length <= 5;
+}
+
+/**
+ * Does the reply STRUCTURALLY fit a general answer role? No domain vocabulary —
+ * shape only. Weak/open roles (subject, outcome, freeform) return false here and
+ * rely on the workflow's authored affordances instead of broad guessing.
+ */
+function fitsRole(t: string, role: PendingAnswerRole): boolean {
+  const text = t.trim();
+  switch (role) {
+    case "goal":
+      return GOAL_SHAPE_RE.test(text);
+    case "date":
+      return DATE_SHAPE_RE.test(text);
+    case "quantity":
+      return QUANTITY_SHAPE_RE.test(text);
+    case "decision":
+      return /^\s*(?:yes|yeah|yep|sure|ok(?:ay)?|no|nope|not now|please do|go ahead|let'?s|do it|neither|both)\b/i.test(
+        text,
+      );
+    case "recipient":
+    case "tone":
+      // A brief entity/descriptor — not a full clause (which signals a narrative
+      // interruption like "the carpet is ruined").
+      return isBriefReply(text) && !CLAUSE_VERB_RE.test(text);
+    case "subject":
+    case "outcome":
+    case "freeform":
+    default:
+      return false;
+  }
+}
+
+/**
+ * Whether the message FILLS the pending slot (S4.1 — slot-aware ownership).
+ *
+ * Explicit shapes (selection / yes-no / date) remain a shape match. For a Create
+ * discovery question, the reply fills the slot when it (1) matches an authored
+ * affordance (the workflow's own signalPatterns), or (2) structurally fits the
+ * pending or any outstanding role, or — only when no role metadata is present
+ * (legacy non-Create free questions) — is a short non-new-subject reply. A bare
+ * hesitation ("Actually…") never fills a slot; goal/content overlap is not used.
+ */
+function answerFillsPendingSlot(
+  t: string,
+  q: BoundaryPendingQuestion,
+): boolean {
+  const text = t.trim();
+  if (!text) return false;
+  if (BARE_HESITATION_RE.test(text)) return false;
+
+  if (q.expects !== "free") {
+    return matchesPendingExpectedShape(t, q) && !isSubstantiveNewSubject(t);
+  }
+
+  // 1 — authored affordance (each workflow's own signalPatterns, passed as data).
+  if (q.affordances?.some((re) => re.test(text))) return true;
+
+  // 2 — general role shape: the pending slot OR any still-outstanding slot
+  // (members often answer a slot other than the one just asked).
+  const roles = [q.role, ...(q.outstandingRoles ?? [])].filter(
+    (r): r is PendingAnswerRole => Boolean(r),
+  );
+  if (roles.some((role) => fitsRole(text, role))) return true;
+
+  // 3 — legacy non-Create free question (no role metadata): conservative short answer.
+  if (roles.length === 0) return !isSubstantiveNewSubject(text);
+
+  return false;
 }
 
 // A short answer-shaped reply (article/hedge lead-in or a bare selection).
@@ -309,15 +435,12 @@ export function resolveConversationBoundary(
       suspend: true,
     });
   }
-  // 5 — direct pending answer (shape must match; not a new subject)
-  if (
-    input.pendingQuestion &&
-    matchesPendingExpectedShape(t, input.pendingQuestion) &&
-    !isSubstantiveNewSubject(t)
-  ) {
-    return decide("answer_pending_question", "high", [
-      "pending_answer_shape_match",
-    ]);
+  // 5 — direct pending answer (slot-aware, S4.1). The Boundary is the single
+  // authority on whether a turn fills the pending discovery slot: an authored
+  // affordance, or a structural fit for the pending/outstanding role. An
+  // unrelated substantive statement falls through to interrupt/switch below.
+  if (input.pendingQuestion && answerFillsPendingSlot(t, input.pendingQuestion)) {
+    return decide("answer_pending_question", "high", ["pending_slot_fill"]);
   }
   // 6 — active work continuation
   if (work && continuesActiveWork(t, work)) {
@@ -344,8 +467,16 @@ export function resolveConversationBoundary(
       ]);
     }
   }
-  // 9 — substantive new subject
-  if (isSubstantiveNewSubject(t) || NEW_SUBJECT_MARKER_RE.test(t)) {
+  // 9 — substantive new subject. A CLEAR switch needs real substance: an explicit
+  // new-subject marker, or a substantive statement carrying ≥2 content words ("my
+  // dog threw up on the carpet"). A short substantive fragment with <2 content
+  // words ("they need to know") is genuinely ambiguous — it neither fills the slot
+  // nor clearly switches — so it falls through to unclear (clarify), never a
+  // silent switch/park.
+  if (
+    NEW_SUBJECT_MARKER_RE.test(t) ||
+    (isSubstantiveNewSubject(t) && contentWords(t).size >= 2)
+  ) {
     return decide("switch_topic", "medium", ["substantive_new_subject", "no_overlap"], {
       suspend: suspendable,
     });

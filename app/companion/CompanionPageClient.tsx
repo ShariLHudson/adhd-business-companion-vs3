@@ -1403,7 +1403,10 @@ import {
   getActiveConversationOwner,
   setActiveConversationOwner,
 } from "@/lib/conversationContinuity";
-import { resolveTurnBoundaryDecision } from "@/lib/conversationBoundaryInputs";
+import {
+  captureBoundaryPreTurnSnapshot,
+  resolveTurnBoundaryDecision,
+} from "@/lib/conversationBoundaryInputs";
 import {
   beginRoutedChatRequest,
   routeConversationTurn,
@@ -14392,6 +14395,22 @@ export default function CompanionPageClient() {
     // Never block send on isLoading — newer messages supersede in-flight AI.
     if (!trimmed) return;
 
+    // S4 Phase 0 — capture prior-turn conversation state and compute the shared
+    // Conversation Boundary Decision ONCE, BEFORE any state machine ingests this
+    // message. processActiveTopicOnUserTurn (below) writes the current text into
+    // ActiveTopic.unresolvedNeed; the Boundary must never see that mutation, so it
+    // reads only this captured snapshot. This exact decision is threaded forward to
+    // every ownership consumer (Create relationship + continuity gate).
+    const preTurnBoundarySnapshot = captureBoundaryPreTurnSnapshot();
+    const lastAssistantForBoundary =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const turnBoundaryDecision = resolveTurnBoundaryDecision({
+      userText: trimmed,
+      turn: chatTurnRef.current,
+      lastAssistantText: lastAssistantForBoundary,
+      snapshot: preTurnBoundarySnapshot,
+    });
+
     // Cognitive pipeline / answer-first: help in chat before destination routers.
     // Bind every Companion turn to the active ConversationSession spine id.
     const spine = getOrCreateConversationSpine();
@@ -14426,6 +14445,7 @@ export default function CompanionPageClient() {
       userText: trimmed,
       session: loadUniversalCreationSession(),
       lastAssistantText: lastAssistantForCreateAuthority,
+      boundaryDecision: turnBoundaryDecision,
     });
     const parkedCreateCompanionDetourEarly =
       isParkedCreateCompanionDetour(createRelForAuthority);
@@ -14857,18 +14877,8 @@ export default function CompanionPageClient() {
       return;
     }
 
-    /**
-     * S3 — shared Conversation Boundary Decision, computed ONCE here and threaded
-     * to the continuity gate so an ambiguous turn during active Create parks
-     * (recoverable) instead of destroying. Behavior-neutral unless a Create
-     * session is active and the gate reaches a Create-exit seam.
-     */
-    const turnBoundaryDecision = resolveTurnBoundaryDecision({
-      userText: trimmed,
-      turn: chatTurnRef.current,
-      lastAssistantText: lastAssistantForPrimary,
-    });
-
+    // Boundary Decision (turnBoundaryDecision) was computed once at the top of the
+    // turn from the pre-turn snapshot (S4 Phase 0) and is threaded in below.
     /** Authoritative arbiter — Continuity + intent family + navigation priority. */
     const routedTurn = routeConversationTurn({
       userText: trimmed,
@@ -15686,6 +15696,7 @@ export default function CompanionPageClient() {
       lastAssistantText: lastAssistantForCreateFastPath,
       continueCreationPriority:
         conversationPriority?.winner === "continue_creation",
+      boundaryDecision: turnBoundaryDecision,
     });
     if (createTurnRel.shouldExit) {
       exitCreateWorkflow("exited");
