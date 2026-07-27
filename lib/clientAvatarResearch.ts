@@ -1,11 +1,38 @@
 /**
- * Client Avatar research context — builds the scoped system prompt and the
- * automatic first research request from what the workspace already knows
- * (active question, current answer, relevant prior answers, avatar identity),
- * and appends a chosen research response into an answer without losing text.
+ * Client Avatar research context — the avatar-specific *configuration* of the
+ * shared contextual-research core. Prompt copy ("Shari", "their ideal client",
+ * the Chamber/Board guardrail) lives here as config; the assembly, per-area
+ * accumulation, and append-only mechanics live in
+ * `lib/research/contextualResearchCore`.
  *
- * Pure + testable; the panel and builder stay thin.
+ * This module keeps its original public API so the builder and existing tests
+ * are unaffected — it now delegates to the shared core.
  */
+
+import {
+  buildResearchAutoPrompt,
+  buildResearchSystemPrompt,
+  type ResearchContext,
+  type ResearchPersonaConfig,
+} from "@/lib/research/contextualResearchCore";
+
+// Re-export the shared mechanics under their established names so existing
+// importers (IdealClientBuilder, tests) keep working unchanged.
+export {
+  appendResearchToAnswer,
+  customFieldId,
+  researchThreadKey,
+  describeResearchArea,
+  appendToResearchArea,
+  setResearchAreaValue,
+  collectAddableResponses,
+  addResponseToAnswer,
+  addSessionToAnswer,
+  type ResearchAreaField,
+  type ResearchAreaData,
+  type ResearchMessageLike,
+  type ResearchAdditionResult,
+} from "@/lib/research/contextualResearchCore";
 
 export type AvatarResearchContext = {
   questionLabel: string;
@@ -17,211 +44,44 @@ export type AvatarResearchContext = {
   avatarName?: string;
 };
 
-/** Scoped system prompt — the assistant helps think through ONE question. */
-export function buildAvatarResearchSystemPrompt(ctx: AvatarResearchContext): string {
-  const priors = (ctx.priorAnswers ?? [])
-    .filter((p) => p.value.trim())
-    .map((p) => `- ${p.label}: ${p.value.trim()}`);
-  return [
+/** The avatar voice/guardrails — the config passed to the shared prompt builder. */
+const AVATAR_RESEARCH_CONFIG: ResearchPersonaConfig = {
+  intro: [
     "You are Shari, helping an ADHD founder think through ONE question about",
     "their ideal client so they can write their own answer, in their own words.",
-    "",
-    `The question: "${ctx.questionLabel}"`,
-    ctx.avatarName?.trim() ? `Client name/label: ${ctx.avatarName.trim()}` : "",
-    priors.length ? "What they've already said about this client:" : "",
-    ...priors,
-    ctx.currentAnswer?.trim()
-      ? `Their current draft answer: "${ctx.currentAnswer.trim()}"`
-      : "Their current draft answer: (empty so far)",
-    "",
+  ],
+  nameLinePrefix: "Client name/label: ",
+  priorsHeader: "What they've already said about this client:",
+  draftLabel: "Their current draft answer:",
+  emptyDraftText: "(empty so far)",
+  guidance: [
     "Help them explore and think it through: offer a few concrete angles,",
     "examples, and possible wording they could adapt. Keep replies short, warm,",
     "and concrete. Do NOT write the whole answer for them or call it final — they",
     "decide what to keep. Never mention menus, tools, the Chamber, or the Board.",
     "Stay entirely on this one question.",
-  ]
-    .filter((line) => line !== "")
-    .join("\n");
+  ],
+};
+
+function toSharedContext(ctx: AvatarResearchContext): ResearchContext {
+  return {
+    questionLabel: ctx.questionLabel,
+    currentAnswer: ctx.currentAnswer,
+    priorAnswers: ctx.priorAnswers,
+    entityName: ctx.avatarName,
+  };
+}
+
+/** Scoped system prompt — the assistant helps think through ONE question. */
+export function buildAvatarResearchSystemPrompt(
+  ctx: AvatarResearchContext,
+): string {
+  return buildResearchSystemPrompt(AVATAR_RESEARCH_CONFIG, toSharedContext(ctx));
 }
 
 /** The automatic first request, sent for the member so they need not type it. */
-export function buildAvatarResearchAutoPrompt(ctx: AvatarResearchContext): string {
-  const answer = ctx.currentAnswer?.trim();
-  return answer
-    ? `Help me think through this question. Here's my draft so far: "${answer}". Give me a few angles, examples, and possible wording I could adapt.`
-    : `Help me think through this question. Give me a few concrete angles, examples, and possible wording I could adapt to write my own answer.`;
-}
-
-/**
- * Append a research response to an existing answer without ever overwriting.
- * Preserves prior text and separates additions with a clean blank line.
- */
-export function appendResearchToAnswer(existing: string, addition: string): string {
-  const add = addition.trim();
-  if (!add) return existing;
-  const base = existing ?? "";
-  if (!base.trim()) return add;
-  return `${base.replace(/\s+$/, "")}\n\n${add}`;
-}
-
-/**
- * Client Avatar Step 10 research is scoped per area. An area key is either a
- * research-module key (e.g. "behavioral") or a custom field addressed by its
- * PERMANENT id ("custom:<id>") — never by array index, so threads survive
- * reorder / insert / delete / rename. These helpers keep routing pure so the
- * builder stays thin and "Add to This Area" is append-only, per area, always.
- */
-export type ResearchAreaField = { id?: string; label: string; value: string };
-export type ResearchAreaData = Record<string, unknown> & {
-  custom?: ResearchAreaField[];
-};
-
-const CUSTOM_PREFIX = "custom:";
-
-/** Parse a `custom:<id>` key into its field id, or null for module keys. */
-export function customFieldId(areaKey: string): string | null {
-  if (!areaKey.startsWith(CUSTOM_PREFIX)) return null;
-  const id = areaKey.slice(CUSTOM_PREFIX.length);
-  return id ? id : null;
-}
-
-/** The thread key for an area, given the area key. Step 10 areas are prefixed
- * with `research:` so they never collide with normal question keys. */
-export function researchThreadKey(areaKey: string): string {
-  return `research:${areaKey}`;
-}
-
-/**
- * Resolve an area key to its display label and current text. `moduleLabels`
- * maps module keys to labels. Returns null for keys that don't resolve (e.g. a
- * custom field that was deleted), so callers can skip cleanly.
- */
-export function describeResearchArea(
-  research: ResearchAreaData,
-  areaKey: string,
-  moduleLabels: Record<string, string>,
-): { label: string; currentAnswer: string } | null {
-  const id = customFieldId(areaKey);
-  if (id !== null) {
-    const field = research.custom?.find((c) => c.id === id);
-    if (!field) return null;
-    return {
-      label: field.label.trim() || "Custom research field",
-      currentAnswer: field.value ?? "",
-    };
-  }
-  const label = moduleLabels[areaKey];
-  if (!label) return null;
-  return { label, currentAnswer: String(research[areaKey] ?? "") };
-}
-
-/**
- * Append a chosen research reply into a single area, never overwriting and
- * never touching any other area. A `custom:<id>` key with no matching field
- * (e.g. deleted) returns the research unchanged; a module key that is empty is
- * created, since an empty module is valid, not unknown.
- */
-export function appendToResearchArea(
-  research: ResearchAreaData,
-  areaKey: string,
-  text: string,
-): ResearchAreaData {
-  if (!areaKey) return research;
-  const id = customFieldId(areaKey);
-  if (id !== null) {
-    const custom = [...(research.custom ?? [])];
-    const at = custom.findIndex((c) => c.id === id);
-    if (at < 0) return research;
-    custom[at] = {
-      ...custom[at]!,
-      value: appendResearchToAnswer(custom[at]!.value ?? "", text),
-    };
-    return { ...research, custom };
-  }
-  return {
-    ...research,
-    [areaKey]: appendResearchToAnswer(String(research[areaKey] ?? ""), text),
-  };
-}
-
-/**
- * Set (replace) a single area's value — used by accumulation, which computes the
- * full append-only answer and writes it back. A `custom:<id>` with no matching
- * field returns the research unchanged.
- */
-export function setResearchAreaValue(
-  research: ResearchAreaData,
-  areaKey: string,
-  value: string,
-): ResearchAreaData {
-  if (!areaKey) return research;
-  const id = customFieldId(areaKey);
-  if (id !== null) {
-    const custom = [...(research.custom ?? [])];
-    const at = custom.findIndex((c) => c.id === id);
-    if (at < 0) return research;
-    custom[at] = { ...custom[at]!, value };
-    return { ...research, custom };
-  }
-  return { ...research, [areaKey]: value };
-}
-
-/**
- * Research accumulation (Phase 2). Dedup is by stable message id ONLY — never by
- * comparing text — so legitimately repeated ideas are preserved and the same
- * response is never appended twice.
- */
-export type ResearchMessageLike = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  hidden?: boolean;
-  error?: boolean;
-};
-
-/** Result of an accumulation action: the new (append-only) answer plus the ids
- * that were newly added (to record in `research.addedResponses`). */
-export type ResearchAdditionResult = { answer: string; addedIds: string[] };
-
-/** Useful assistant responses (non-error, non-hidden) not yet added, in order. */
-export function collectAddableResponses(
-  messages: readonly ResearchMessageLike[],
-  addedResponseIds: readonly string[],
-): ResearchMessageLike[] {
-  const added = new Set(addedResponseIds);
-  return messages.filter(
-    (m) => m.role === "assistant" && !m.error && !m.hidden && !added.has(m.id),
-  );
-}
-
-/** Append one response, unless it was already added or isn't a useful reply. */
-export function addResponseToAnswer(
-  answer: string,
-  message: ResearchMessageLike,
-  addedResponseIds: readonly string[],
-): ResearchAdditionResult {
-  if (message.role !== "assistant" || message.error || message.hidden) {
-    return { answer, addedIds: [] };
-  }
-  if (addedResponseIds.includes(message.id)) return { answer, addedIds: [] };
-  return {
-    answer: appendResearchToAnswer(answer, message.content),
-    addedIds: [message.id],
-  };
-}
-
-/** Append the whole session's useful, not-yet-added responses in order. */
-export function addSessionToAnswer(
-  answer: string,
-  messages: readonly ResearchMessageLike[],
-  addedResponseIds: readonly string[],
-): ResearchAdditionResult {
-  const addable = collectAddableResponses(messages, addedResponseIds);
-  let next = answer;
-  const addedIds: string[] = [];
-  for (const m of addable) {
-    next = appendResearchToAnswer(next, m.content);
-    addedIds.push(m.id);
-  }
-  return { answer: next, addedIds };
+export function buildAvatarResearchAutoPrompt(
+  ctx: AvatarResearchContext,
+): string {
+  return buildResearchAutoPrompt(toSharedContext(ctx));
 }
