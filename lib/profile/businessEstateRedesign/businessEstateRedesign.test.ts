@@ -89,14 +89,19 @@ describe("Business Estate redesign first slice", () => {
     expect(rec.primaryLabel).toMatch(/Continue Business Basics/i);
   });
 
-  it("defines Identity sections with only Business Basics implemented", () => {
+  it("defines Identity sections with Business Basics and Your Story implemented", () => {
     const basics = IDENTITY_SECTION_DEFINITIONS.find(
       (s) => s.id === "business-basics",
     );
     expect(basics?.implemented).toBe(true);
+    const story = IDENTITY_SECTION_DEFINITIONS.find(
+      (s) => s.id === "business-story",
+    );
+    expect(story?.implemented).toBe(true);
+    expect(story?.title).toBe("Your Story");
     expect(
       IDENTITY_SECTION_DEFINITIONS.filter((s) => s.implemented),
-    ).toHaveLength(1);
+    ).toHaveLength(2);
   });
 
   it("preserves existing Business Basics answers through save helpers", () => {

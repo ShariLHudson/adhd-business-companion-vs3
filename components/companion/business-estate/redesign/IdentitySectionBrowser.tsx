@@ -4,13 +4,15 @@ import {
   IDENTITY_SECTION_DEFINITIONS,
   businessBasicsProgress,
   isBusinessBasicsComplete,
+  isYourStoryComplete,
+  yourStoryProgress,
   type IdentitySectionId,
 } from "@/lib/profile/businessEstateRedesign";
 
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSelectImplemented: (id: "business-basics") => void;
+  onSelectImplemented: (id: IdentitySectionId) => void;
   expandedId: IdentitySectionId | null;
   onExpand: (id: IdentitySectionId | null) => void;
 };
@@ -20,6 +22,11 @@ function sectionStatusLabel(id: IdentitySectionId): string {
     if (isBusinessBasicsComplete()) return "Complete";
     if (businessBasicsProgress().answered > 0) return "In Progress";
     return "Recommended";
+  }
+  if (id === "business-story") {
+    if (isYourStoryComplete()) return "Complete";
+    if (yourStoryProgress().answered > 0) return "In Progress";
+    return "Optional";
   }
   return "Later";
 }
@@ -90,10 +97,10 @@ export function IdentitySectionBrowser({
                       <button
                         type="button"
                         className="be-btn be-btn--primary be-btn--compact"
-                        onClick={() => onSelectImplemented("business-basics")}
-                        data-testid="be-section-open-basics"
+                        onClick={() => onSelectImplemented(section.id)}
+                        data-testid={`be-section-open-${section.id}`}
                       >
-                        Open Business Basics
+                        Open {section.title}
                       </button>
                     ) : (
                       <p className="be-section-browser__later">

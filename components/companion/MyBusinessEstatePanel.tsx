@@ -9,6 +9,7 @@ import { BusinessEstateOverview } from "@/components/companion/business-estate/r
 import { IdentityOfficeEntrance } from "@/components/companion/business-estate/redesign/IdentityOfficeEntrance";
 import { IdentitySectionBrowser } from "@/components/companion/business-estate/redesign/IdentitySectionBrowser";
 import { BusinessBasicsFlow } from "@/components/companion/business-estate/redesign/BusinessBasicsFlow";
+import { YourStoryFlow } from "@/components/companion/business-estate/redesign/YourStoryFlow";
 import { GetExpertHelpPanel } from "@/components/companion/advisory/GetExpertHelpPanel";
 import type { BusinessEstateSectionId } from "@/lib/profile/businessEstateProfile";
 import {
@@ -37,6 +38,7 @@ type View =
   | { kind: "overview" }
   | { kind: "identity-entrance" }
   | { kind: "business-basics" }
+  | { kind: "your-story" }
   | { kind: "legacy-room"; sectionId: Exclude<BusinessEstateSectionId, "identity"> };
 
 /**
@@ -178,7 +180,9 @@ export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
   );
 
   const backgroundUrl =
-    view.kind === "identity-entrance" || view.kind === "business-basics"
+    view.kind === "identity-entrance" ||
+    view.kind === "business-basics" ||
+    view.kind === "your-story"
       ? getBusinessAreaPresentation("identity").coverImageUrl
       : view.kind === "legacy-room"
         ? getBusinessAreaPresentation(view.sectionId).coverImageUrl
@@ -255,9 +259,13 @@ export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
                 onClose={() => setSectionBrowserOpen(false)}
                 expandedId={expandedSectionId}
                 onExpand={setExpandedSectionId}
-                onSelectImplemented={() => {
+                onSelectImplemented={(id) => {
                   setSectionBrowserOpen(false);
-                  setView({ kind: "business-basics" });
+                  setView(
+                    id === "business-story"
+                      ? { kind: "your-story" }
+                      : { kind: "business-basics" },
+                  );
                 }}
               />
             </>
@@ -265,6 +273,16 @@ export function MyBusinessEstatePanel({ onClose, onOpenPeopleIHelp }: Props) {
 
           {view.kind === "business-basics" ? (
             <BusinessBasicsFlow
+              onExitToEntrance={() => setView({ kind: "identity-entrance" })}
+              onFinished={() => {
+                refresh();
+                setView({ kind: "identity-entrance" });
+              }}
+            />
+          ) : null}
+
+          {view.kind === "your-story" ? (
+            <YourStoryFlow
               onExitToEntrance={() => setView({ kind: "identity-entrance" })}
               onFinished={() => {
                 refresh();

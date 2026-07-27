@@ -3,6 +3,7 @@ export * from "./status";
 export * from "./groups";
 export * from "./identitySections";
 export * from "./businessBasics";
+export * from "./yourStory";
 export * from "./recommendations";
 export * from "./futureStructure";
 export * from "./roomProgress";

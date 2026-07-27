@@ -40,7 +40,7 @@ export const BUSINESS_ESTATE_SECTION_FIELDS: Record<
     },
     {
       key: "businessStory",
-      label: "Business story",
+      label: "Your Story",
       type: "textarea",
     },
     { key: "mission", label: "Mission", type: "textarea", guided: true },

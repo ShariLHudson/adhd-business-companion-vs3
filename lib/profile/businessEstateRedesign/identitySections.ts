@@ -15,9 +15,9 @@ export const IDENTITY_SECTION_DEFINITIONS: readonly IdentitySectionDefinition[] 
     },
     {
       id: "business-story",
-      title: "Business Story",
+      title: "Your Story",
       benefit: "Helps Shari understand how your business came to be.",
-      implemented: false,
+      implemented: true,
     },
     {
       id: "purpose",
