@@ -5,6 +5,7 @@
 
 import { decideShariResponse } from "./decideShariResponse";
 import { capabilityOfferLine } from "./capabilityOffers";
+import { isBareGenericAcceptance } from "@/lib/pendingAcceptanceAuthority";
 import type { ShariResponseDecision } from "./types";
 
 function topicLabel(text: string): string {
@@ -166,6 +167,12 @@ export function buildAnswerFirstFailSafeReply(
   userText: string,
   options?: AnswerFirstFailSafeOptions,
 ): string | null {
+  // A bare affirmation / continuation ("yes", "okay", "go ahead", "that one",
+  // "try it", "let's try it") is never a how-to request. Let the normal
+  // conversation-state path (pending acceptance / choice) own the turn — never
+  // emit the generic "practical way to approach…" scaffold for these.
+  if (isBareGenericAcceptance(userText)) return null;
+
   const decision = decideShariResponse(userText);
   if (!decision.directAnswerRequired) return null;
   if (decision.primaryHelpMode === "reflective_thinking") return null;
@@ -193,10 +200,14 @@ export function buildAnswerFirstFailSafeReply(
 
   let body: string;
   switch (decision.primaryHelpMode) {
+    // Only genuine procedural intent gets the how-to scaffold. `direct_answer`
+    // is the classifier's catch-all (bare replies, unresolved contextual /
+    // navigation questions like "where did the strategies go"): it must NOT
+    // become a generic how-to lesson — fall through to `default` → null so the
+    // normal conversation path handles it.
     case "how_to_guidance":
     case "explanation":
     case "simple_planning":
-    case "direct_answer":
       body = howToFailSafe(userText, decision);
       break;
     case "advice":
