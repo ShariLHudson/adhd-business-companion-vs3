@@ -331,6 +331,7 @@ import {
   homeStateDataAttr,
   recordArrivalFirstAction,
   recordFirstRelationshipSignals,
+  resolveArrivalReturnState,
   type ArrivalIntelligence,
 } from "@/lib/arrivalIntelligence";
 import { recordLivingRoomDeparture } from "@/lib/livingLifeEngine";
@@ -3856,6 +3857,8 @@ export default function CompanionPageClient() {
     dailyOpeningStartedRef.current = true;
     const opening = resolveGlobalDailyOpening({
       entryPoint: "explicit-new-day",
+      // MA-05 Phase 4b — precise canonical return state from the live arrival.
+      returnState: resolveArrivalReturnState(arrival),
     });
     setGlobalDailyOpening(opening);
     setDailyOpeningHelpMeChoose(null);
@@ -3883,8 +3886,12 @@ export default function CompanionPageClient() {
   const todaysWelcomeOpening = useMemo(() => {
     if (globalDailyOpening) return globalDailyOpening;
     if (!welcomeHomeQuietForDailyOpening) return null;
-    return resolveGlobalDailyOpening({ entryPoint: "explicit-new-day" });
-  }, [globalDailyOpening, welcomeHomeQuietForDailyOpening]);
+    return resolveGlobalDailyOpening({
+      entryPoint: "explicit-new-day",
+      // MA-05 Phase 4b — precise canonical return state from the live arrival.
+      returnState: resolveArrivalReturnState(homeArrival),
+    });
+  }, [globalDailyOpening, welcomeHomeQuietForDailyOpening, homeArrival]);
 
   const welcomeHomeVisibleMessages = useMemo(
     () => filterLegacyDailyOpeningMessages(messages),

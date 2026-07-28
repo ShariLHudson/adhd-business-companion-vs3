@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { evaluateArrivalIntelligence } from "./arrivalIntelligence";
+import {
+  evaluateArrivalIntelligence,
+  resolveArrivalReturnState,
+} from "./arrivalIntelligence";
 import { getLivingIntelligenceGraph } from "./livingIntelligenceGraph";
 import {
   homeChromeForState,
@@ -161,5 +164,73 @@ describe("homeState", () => {
         },
       }),
     ).toBe("RETURNING_ACTIVE");
+  });
+});
+
+describe("resolveArrivalReturnState (MA-05 Phase 4b)", () => {
+  const arrival = (o: {
+    homeState?: string;
+    isFirstMeeting?: boolean;
+    returnIntervalDays?: number | null;
+  }) =>
+    ({
+      homeState: "QUIET_PRESENCE",
+      isFirstMeeting: false,
+      returnIntervalDays: null,
+      ...o,
+    }) as Parameters<typeof resolveArrivalReturnState>[0];
+
+  it("first-ever arrival (FIRST_VISIT)", () => {
+    expect(
+      resolveArrivalReturnState(arrival({ homeState: "FIRST_VISIT" }), {
+        sameLocalDay: false,
+      }),
+    ).toBe("first_ever_arrival");
+  });
+  it("same-day return", () => {
+    expect(
+      resolveArrivalReturnState(arrival({ returnIntervalDays: 0 }), {
+        sameLocalDay: true,
+      }),
+    ).toBe("same_day_return");
+  });
+  it("ordinary return below the absence threshold (1 and 2 days)", () => {
+    expect(
+      resolveArrivalReturnState(arrival({ returnIntervalDays: 1 }), {
+        sameLocalDay: false,
+      }),
+    ).toBe("ordinary_return");
+    expect(
+      resolveArrivalReturnState(arrival({ returnIntervalDays: 2 }), {
+        sameLocalDay: false,
+      }),
+    ).toBe("ordinary_return");
+  });
+  it("3 and 13 days → return_after_absence", () => {
+    expect(
+      resolveArrivalReturnState(arrival({ returnIntervalDays: 3 }), {
+        sameLocalDay: false,
+      }),
+    ).toBe("return_after_absence");
+    expect(
+      resolveArrivalReturnState(arrival({ returnIntervalDays: 13 }), {
+        sameLocalDay: false,
+      }),
+    ).toBe("return_after_absence");
+  });
+  it("14 days → long_absence_return", () => {
+    expect(
+      resolveArrivalReturnState(arrival({ returnIntervalDays: 14 }), {
+        sameLocalDay: false,
+      }),
+    ).toBe("long_absence_return");
+  });
+  it("same-day wins over a large gap; null arrival → ordinary", () => {
+    expect(
+      resolveArrivalReturnState(arrival({ returnIntervalDays: 30 }), {
+        sameLocalDay: true,
+      }),
+    ).toBe("same_day_return");
+    expect(resolveArrivalReturnState(null)).toBe("ordinary_return");
   });
 });

@@ -37,6 +37,7 @@ export {
   evaluateArrivalIntelligence,
   homeChromeForState,
   homeStateDataAttr,
+  resolveArrivalReturnState,
   resolveCompanionHomeState,
   type ArrivalIntelligence,
   type ArrivalConversationalTone,

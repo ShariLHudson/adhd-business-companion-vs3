@@ -4,7 +4,10 @@
  * and any explicit Start New Day control.
  */
 
-import type { CanonicalReturnState } from "@/lib/arrivalIntelligence/returnState";
+import {
+  RETURN_AFTER_ABSENCE_DAYS,
+  type CanonicalReturnState,
+} from "@/lib/arrivalIntelligence/returnState";
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
 import type { AppSection } from "@/lib/companionUi";
 import type { WelcomeActiveWorkCard } from "@/lib/welcomeHome/resolveWelcomeActiveWork";
@@ -202,8 +205,11 @@ export const GLOBAL_DAILY_OPENING_GREETING =
 export const GLOBAL_DAILY_OPENING_INPUT_PLACEHOLDER =
   "You can also tell me what you need today." as const;
 
-/** Absence threshold aligned with Welcome Home / Phase 24 (3 days). */
-export const DAILY_OPENING_ABSENCE_THRESHOLD_DAYS = 3;
+/**
+ * @deprecated MA-05 Phase 4b — redirected to the single canonical policy
+ * (`RETURN_AFTER_ABSENCE_DAYS`). No independent numeric threshold remains here.
+ */
+export const DAILY_OPENING_ABSENCE_THRESHOLD_DAYS = RETURN_AFTER_ABSENCE_DAYS;
 
 export const DAILY_OPENING_DAY_KEY_STORAGE =
   "spark-global-daily-opening-day-v1";

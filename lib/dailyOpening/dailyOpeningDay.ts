@@ -2,11 +2,9 @@
  * Calendar-day gate for the Global Daily Companion Experience.
  */
 
+import { RETURN_AFTER_ABSENCE_DAYS } from "@/lib/arrivalIntelligence/returnState";
 import { todayStr } from "@/lib/companionStore";
-import {
-  DAILY_OPENING_DAY_KEY_STORAGE,
-  DAILY_OPENING_ABSENCE_THRESHOLD_DAYS,
-} from "./types";
+import { DAILY_OPENING_DAY_KEY_STORAGE } from "./types";
 
 export function readDailyOpeningPresentedDay(): string | null {
   if (typeof window === "undefined") return null;
@@ -45,8 +43,7 @@ export function shouldOfferFirstPlatformOpeningOfDay(
 export function isAbsenceReturn(
   returnIntervalDays: number | null | undefined,
 ): boolean {
-  return (
-    returnIntervalDays != null &&
-    returnIntervalDays >= DAILY_OPENING_ABSENCE_THRESHOLD_DAYS
-  );
+  // MA-05 Phase 4b — canonical shared return-after-absence policy (was the
+  // duplicate DAILY_OPENING_ABSENCE_THRESHOLD_DAYS literal).
+  return returnIntervalDays != null && returnIntervalDays >= RETURN_AFTER_ABSENCE_DAYS;
 }

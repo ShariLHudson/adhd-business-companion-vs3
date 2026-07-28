@@ -27,6 +27,10 @@ import {
   markDailyOpeningPresented,
   resolveGlobalDailyOpening,
 } from "@/lib/dailyOpening";
+import { isAbsenceReturn } from "@/lib/dailyOpening/dailyOpeningDay";
+import { DAILY_OPENING_ABSENCE_THRESHOLD_DAYS } from "@/lib/dailyOpening/types";
+import { RETURN_AFTER_ABSENCE_DAYS } from "@/lib/arrivalIntelligence/returnState";
+import { resolveArrivalReturnState } from "@/lib/arrivalIntelligence";
 
 beforeEach(() => {
   localStorage.clear();
@@ -92,5 +96,31 @@ describe("MA-05 P4a — MA-05 P1 daily stability preserved through the context",
     expect(a.welcomeContext.opening.greetingTitle).toBe(
       b.welcomeContext.opening.greetingTitle,
     );
+  });
+});
+
+describe("MA-05 P4b — daily-opening absence detection uses the shared policy", () => {
+  it("DAILY_OPENING_ABSENCE_THRESHOLD_DAYS redirects to the canonical constant", () => {
+    expect(DAILY_OPENING_ABSENCE_THRESHOLD_DAYS).toBe(RETURN_AFTER_ABSENCE_DAYS);
+  });
+  it("isAbsenceReturn uses the shared 3-day boundary (2 → false, 3 → true)", () => {
+    expect(isAbsenceReturn(2)).toBe(false);
+    expect(isAbsenceReturn(3)).toBe(true);
+    expect(isAbsenceReturn(null)).toBe(false);
+  });
+});
+
+describe("MA-05 P4b — live arrival return state flows into the context", () => {
+  it("a precise arrival-derived returnState is carried into welcomeContext", () => {
+    const returnState = resolveArrivalReturnState(
+      { homeState: "QUIET_PRESENCE", isFirstMeeting: false, returnIntervalDays: 14 },
+      { sameLocalDay: false },
+    );
+    expect(returnState).toBe("long_absence_return");
+    const r = resolveGlobalDailyOpening({
+      entryPoint: "first-platform-opening",
+      returnState,
+    });
+    expect(r.welcomeContext.resident.returnState).toBe("long_absence_return");
   });
 });

@@ -10,7 +10,11 @@
 
 import { getCompanionAuthIntelligence } from "@/lib/companionAuthIntelligence";
 import { getPrefs } from "@/lib/companionStore";
-import { isLongAbsence } from "./returnState";
+import {
+  classifyReturnState,
+  isLongAbsence,
+  type CanonicalReturnState,
+} from "./returnState";
 import {
   resolveCompanionContinue,
   type CompanionContinueOption,
@@ -147,6 +151,38 @@ function resolveVisitorKind(
   // MA-05 Phase 2 — shared canonical long-absence policy (was inline `>= 14`).
   if (isLongAbsence(returnDays)) return "long_absence";
   return "returning";
+}
+
+/**
+ * MA-05 Phase 4b — derive the precise canonical return state (MA-05 P2) from a
+ * live arrival object, so callers never re-implement return classification. Pure
+ * signal extraction + the shared `classifyReturnState` policy:
+ *   - isFirstEver: FIRST_VISIT / first-meeting (device-local; server-backed
+ *     refinement is a documented later concern).
+ *   - sameLocalDay: not the first arrival of the local calendar day.
+ *   - daysSinceLastArrival: arrival.returnIntervalDays.
+ * `sameLocalDay` can be supplied explicitly (tests); otherwise it is computed
+ * from `isFirstVisitOfDay`.
+ */
+export function resolveArrivalReturnState(
+  arrival:
+    | Pick<
+        ArrivalIntelligence,
+        "homeState" | "isFirstMeeting" | "returnIntervalDays"
+      >
+    | null
+    | undefined,
+  opts: { now?: Date; sameLocalDay?: boolean } = {},
+): CanonicalReturnState {
+  if (!arrival) return "ordinary_return";
+  const sameLocalDay =
+    opts.sameLocalDay ?? !isFirstVisitOfDay(opts.now ?? new Date());
+  return classifyReturnState({
+    isFirstEver:
+      arrival.homeState === "FIRST_VISIT" || arrival.isFirstMeeting === true,
+    sameLocalDay,
+    daysSinceLastArrival: arrival.returnIntervalDays ?? null,
+  });
 }
 
 function resolveGreetingStrategy(
