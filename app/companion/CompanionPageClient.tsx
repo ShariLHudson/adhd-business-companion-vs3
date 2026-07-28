@@ -14412,6 +14412,18 @@ export default function CompanionPageClient() {
       snapshot: preTurnBoundarySnapshot,
     });
 
+    // MA-04 Phase 2b/2c — Boundary (S4) is the sole ownership authority. Any
+    // short-acceptance fast path may consume the turn ONLY when Boundary has not
+    // already claimed it for another owner (emotional interrupt, topic switch,
+    // cancel, a pending question, or a return to a suspended topic). Computed
+    // once here and READ by each acceptance site; no new ownership state.
+    const boundaryClaimedTurn =
+      turnBoundaryDecision.decision === "interrupt_and_suspend" ||
+      turnBoundaryDecision.decision === "switch_topic" ||
+      turnBoundaryDecision.decision === "cancel_current_workflow" ||
+      turnBoundaryDecision.decision === "answer_pending_question" ||
+      turnBoundaryDecision.decision === "return_to_suspended_topic";
+
     // Cognitive pipeline / answer-first: help in chat before destination routers.
     // Bind every Companion turn to the active ConversationSession spine id.
     const spine = getOrCreateConversationSpine();
@@ -14624,9 +14636,14 @@ export default function CompanionPageClient() {
 
     // Accept an active Client Avatar offer with natural language → open the
     // builder via the existing workspace-offer acceptance seam.
+    // MA-04 Phase 2c: this runs BEFORE the Boundary arbiter, so it must consult
+    // `boundaryClaimedTurn` itself; and it uses the whole-message canonical
+    // predicate (not the start-anchored `isClientAvatarOfferAcceptance`) so
+    // "yes, but first I need help" / "okay, I'm overwhelmed" are not stolen.
     if (
       pendingClientAvatarOffer &&
-      isClientAvatarOfferAcceptance(trimmed) &&
+      !boundaryClaimedTurn &&
+      isShortAcceptanceOfArmedOwner(trimmed, Boolean(pendingClientAvatarOffer)) &&
       !isConfirmationDecline(trimmed)
     ) {
       lastUserTextRef.current = trimmed;
@@ -15415,6 +15432,7 @@ export default function CompanionPageClient() {
     if (
       (turnAuthority.owner === "create_consent_accept" || pendingCreateOpen) &&
       pendingCreateOpen &&
+      !boundaryClaimedTurn && // MA-04 Phase 2c — Boundary owns interrupts/answers first
       userAcceptedCreateConsent(trimmed, lastAssistantForPrimary)
     ) {
       const acceptance = resolvePendingAcceptance({
@@ -15568,8 +15586,12 @@ export default function CompanionPageClient() {
       clearPendingChoice();
     }
 
+    // MA-04 Phase 2c: let Boundary win first — an emotional interrupt ("I'm
+    // overwhelmed"), topic switch, cancel, pending-question answer, or return
+    // must reach its owner rather than being re-prompted as a menu selection.
     const shouldRunPendingChoice =
       hasActivePendingChoice() &&
+      !boundaryClaimedTurn &&
       !(conversationPriority?.deferPendingChoice ?? false);
 
     if (shouldRunPendingChoice) {
@@ -16010,18 +16032,6 @@ export default function CompanionPageClient() {
     }
 
     const isDirectEstateNavPhrase = isDirectEstateRoomRequest(trimmed);
-
-    // MA-04 Phase 2b — Boundary (S4) remains the sole ownership authority. This
-    // one frictionless-offer path may consume a short acceptance only when
-    // Boundary has NOT already claimed the turn for another owner. We only READ
-    // `turnBoundaryDecision` (computed once at the top of handleSend); no new
-    // ownership logic or state is introduced here.
-    const boundaryClaimedTurn =
-      turnBoundaryDecision.decision === "interrupt_and_suspend" ||
-      turnBoundaryDecision.decision === "switch_topic" ||
-      turnBoundaryDecision.decision === "cancel_current_workflow" ||
-      turnBoundaryDecision.decision === "answer_pending_question" ||
-      turnBoundaryDecision.decision === "return_to_suspended_topic";
 
     if (
       !taskLockBlocksEstateRouting &&
@@ -18855,7 +18865,11 @@ export default function CompanionPageClient() {
       }
     }
 
-    if (pendingCreateOpen && userAcceptedCreateConsent(trimmed, lastAssistantText)) {
+    if (
+      pendingCreateOpen &&
+      !boundaryClaimedTurn && // MA-04 Phase 2c — Boundary owns interrupts/answers first
+      userAcceptedCreateConsent(trimmed, lastAssistantText)
+    ) {
       const acceptance = resolvePendingAcceptance({
         userText: trimmed,
         lastAssistantText,
@@ -19018,12 +19032,16 @@ export default function CompanionPageClient() {
       }
     }
 
-    if (dispatchResolvedAcceptance(acceptanceResolution, pendingNow)) {
+    // MA-04 Phase 2c — do not launch an accepted/auto-launch pending action when
+    // Boundary has claimed the turn for another owner. resolvePendingAcceptance
+    // still runs (pure); only the launch is gated.
+    if (!boundaryClaimedTurn && dispatchResolvedAcceptance(acceptanceResolution, pendingNow)) {
       finishEarlyChatTurn();
       return;
     }
 
     if (
+      !boundaryClaimedTurn &&
       pendingNow &&
       pendingAcceptanceRecord &&
       !isPendingAcceptanceExpired(pendingAcceptanceRecord, {
