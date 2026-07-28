@@ -4,6 +4,7 @@
  * and any explicit Start New Day control.
  */
 
+import type { CanonicalReturnState } from "@/lib/arrivalIntelligence/returnState";
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
 import type { AppSection } from "@/lib/companionUi";
 import type { WelcomeActiveWorkCard } from "@/lib/welcomeHome/resolveWelcomeActiveWork";
@@ -97,6 +98,35 @@ export type DailyOpeningDiscoveryInvite = {
   featureTitle?: string;
 };
 
+/**
+ * MA-05 Phase 4a — the minimal canonical context the redesigned Welcome Home
+ * page renders. Built by `resolveGlobalDailyOpening` from ALREADY-resolved
+ * signals (MA-05 P1 stable daily selection, P2 return-state policy, and the
+ * existing choices / continuation / discovery), so the page can become
+ * render-only and decide nothing itself. Presence/energy, recognition callbacks,
+ * environment, and "Just Be Here" are intentionally OUT of this foundation slice.
+ */
+export type CanonicalWelcomeContext = {
+  resident: {
+    /** MA-05 Phase 2 canonical return classification. */
+    returnState: CanonicalReturnState;
+    /** guided = days 1–60; adaptive = day 61+ (= welcomePhase). */
+    journeyPhase: "guided" | "adaptive";
+  };
+  opening: {
+    greetingTitle: string;
+    welcomeLine: string;
+    /** MA-05 Phase 1 stable daily encouragement (= encouragementLine). */
+    encouragement: string | null;
+  };
+  /** Existing three choice cards, unchanged (= choiceCards). */
+  choices: DailyOpeningChoiceCard[];
+  continuation: {
+    candidate: CompanionContinueOption | null;
+  };
+  discovery: DailyOpeningDiscoveryInvite;
+};
+
 export type GlobalDailyOpeningResult = {
   entryPoint: DailyOpeningEntryPoint;
   momentKind: DailyOpeningMomentKind;
@@ -132,6 +162,11 @@ export type GlobalDailyOpeningResult = {
   /** @deprecated Empty — Help Me Choose uses need-based flow. */
   helpMeChooseSuggestions: HelpMeChooseSuggestion[];
   discovery: DailyOpeningDiscoveryInvite;
+  /**
+   * MA-05 Phase 4a — additive canonical context mirroring the fields above.
+   * Purely additive: existing fields are unchanged and still drive the UI.
+   */
+  welcomeContext: CanonicalWelcomeContext;
 };
 
 export const DAILY_OPENING_CHOICE_LABELS_CONTINUE_FALLBACK =

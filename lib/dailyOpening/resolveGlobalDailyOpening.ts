@@ -21,13 +21,16 @@ import { resolveMeaningfulContinueForWelcome } from "./resolveMeaningfulContinue
 import { readDailyOpeningPresentedDay } from "./dailyOpeningDay";
 import { todayStr } from "@/lib/companionStore";
 import { resolveWelcomeActiveWork } from "@/lib/welcomeHome/resolveWelcomeActiveWork";
+import type { CanonicalReturnState } from "@/lib/arrivalIntelligence/returnState";
 import {
   DAILY_OPENING_CHOICE_LABELS,
+  type CanonicalWelcomeContext,
   type DailyOpeningChoice,
   type DailyOpeningChoiceAction,
   type DailyOpeningChoiceId,
   type DailyOpeningDestination,
   type DailyOpeningEntryPoint,
+  type DailyOpeningMomentKind,
   type GlobalDailyOpeningResult,
   type HelpMeChooseSuggestion,
 } from "./types";
@@ -40,7 +43,27 @@ export type ResolveGlobalDailyOpeningInput = {
   memberFirstName?: string | null;
   suppressDiscoveryForRecovery?: boolean;
   now?: Date;
+  /**
+   * MA-05 Phase 4a — optional canonical return-state (MA-05 P2) for the additive
+   * welcomeContext. When omitted (all current callers), it is derived from
+   * momentKind so behavior is unchanged; a later slice threads the precise
+   * classifyReturnState value in.
+   */
+  returnState?: CanonicalReturnState;
 };
+
+/**
+ * MA-05 Phase 4a fallback: derive a coarse canonical return-state from momentKind
+ * when the caller has not supplied the precise P2 classification. Deterministic;
+ * never affects visible output (welcomeContext is additive, not rendered here).
+ */
+function returnStateFromMomentKind(
+  momentKind: DailyOpeningMomentKind,
+): CanonicalReturnState {
+  if (momentKind === "same-day-return") return "same_day_return";
+  if (momentKind === "absence-return") return "return_after_absence";
+  return "ordinary_return"; // first-of-day / explicit new day
+}
 
 /**
  * @deprecated Destination-card Help Me Choose removed.
@@ -109,6 +132,23 @@ export function resolveGlobalDailyOpening(
 
   const encouragementLine = resolveFirst60TeachingSentence(now);
 
+  // MA-05 Phase 4a — additive canonical context. A pure MIRROR of the values
+  // already resolved above (no recomputation, no new resident-facing decision).
+  const welcomeContext: CanonicalWelcomeContext = {
+    resident: {
+      returnState: input.returnState ?? returnStateFromMomentKind(momentKind),
+      journeyPhase: welcomePhase,
+    },
+    opening: {
+      greetingTitle,
+      welcomeLine,
+      encouragement: encouragementLine,
+    },
+    choices: choiceCards,
+    continuation: { candidate: continueOption },
+    discovery,
+  };
+
   return {
     entryPoint: input.entryPoint,
     momentKind,
@@ -128,6 +168,7 @@ export function resolveGlobalDailyOpening(
     activeWork,
     helpMeChooseSuggestions: [],
     discovery,
+    welcomeContext,
   };
 }
 
