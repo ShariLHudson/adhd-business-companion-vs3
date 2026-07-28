@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { matchAmbiguousLocationTerm } from "./ambiguousLocations";
 import { validateEstateNavigationTarget } from "./routeValidation";
@@ -6,6 +8,12 @@ import {
   shouldNavigateFromDecision,
 } from "./resolveEstateNavigationIntent";
 import { tryKnowledgeBasePlaceResolution } from "./bridge";
+import {
+  RoutingOwnershipViolation,
+  assertRoutingOwnership,
+  isPrimaryRoutingIntelligence,
+  routingOwnerRoleForPath,
+} from "@/lib/estateBrain/routingOwnershipContract";
 
 describe("Estate Navigation Intelligence", () => {
   it("navigates directly for alias match — treehouse → Possibility House", () => {
@@ -99,5 +107,65 @@ describe("Estate Navigation Intelligence", () => {
       "Find me a snippet about my ADHD Business Ecosystem",
     );
     expect(decision.kind).toBe("unresolved");
+  });
+});
+
+describe("Estate Navigation Intelligence — EC-002.3 helper-only guardrails", () => {
+  const PKG = "lib/estateNavigationIntelligence";
+
+  it("is registered as a helper, never the primary routing owner", () => {
+    for (const file of [
+      `${PKG}/resolveEstateNavigationIntent.ts`,
+      `${PKG}/bridge.ts`,
+      `${PKG}/routeValidation.ts`,
+    ]) {
+      expect(routingOwnerRoleForPath(file)).toBe("helper");
+      expect(isPrimaryRoutingIntelligence(file)).toBe(false);
+    }
+  });
+
+  it("cannot be affirmed as the routing owner", () => {
+    expect(() =>
+      assertRoutingOwnership({
+        ownerPath: `${PKG}/resolveEstateNavigationIntent.ts`,
+        liveSymbols: {
+          resolveEstateIntelligenceImmediateAction: () => {},
+          resolveEstateIntelligenceRoute: () => {},
+        },
+      }),
+    ).toThrow(RoutingOwnershipViolation);
+  });
+
+  it("resolveEstateNavigationIntent returns a decision object — it never navigates", () => {
+    // Structural (data-state independent): the module returns a decision object,
+    // never an executed navigation — regardless of which places are currently Live.
+    const nav = resolveEstateNavigationIntent("Take me to the garden");
+    expect(typeof nav.kind).toBe("string");
+    expect(nav).toHaveProperty("query");
+    expect(typeof shouldNavigateFromDecision(nav)).toBe("boolean");
+    expect(nav).not.toHaveProperty("section"); // no shell navigation was performed
+
+    const unresolved = resolveEstateNavigationIntent("How do I write email?");
+    expect(unresolved.kind).toBe("unresolved");
+
+    // The bridge produces resolution DATA (a suggestion/place resolution), not a nav.
+    const resolution = tryKnowledgeBasePlaceResolution("Take me to the garden");
+    expect(resolution).not.toHaveProperty("section");
+  });
+
+  it("the decision/bridge path contains no navigation executor — only routeValidation touches goToPlace (read-only)", () => {
+    const read = (rel: string) =>
+      readFileSync(join(process.cwd(), rel), "utf8");
+    // The resolver and bridge must never call the executor.
+    for (const rel of [
+      `${PKG}/resolveEstateNavigationIntent.ts`,
+      `${PKG}/bridge.ts`,
+    ]) {
+      expect(read(rel)).not.toMatch(/goToPlace\s*\(/);
+      expect(read(rel)).not.toMatch(/openSection\w*\s*\(/);
+      expect(read(rel)).not.toMatch(/window\.location/);
+    }
+    // routeValidation may reference goToPlace, but only as a resolvability check.
+    expect(read(`${PKG}/routeValidation.ts`)).toMatch(/goToPlace/);
   });
 });
