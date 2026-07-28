@@ -6,6 +6,7 @@ import {
   resolveChamberMemberFromText,
   isChamberMemberRequest,
 } from "./chamberMemberAliases";
+import { mayNavigateToChamberMember } from "@/lib/conversationStabilization/chamberNavigateGate";
 import { detectChamberMemberCommand } from "@/lib/estateIntelligence/estateCommandRouter";
 import { resolveEstateAction } from "@/lib/estate/decisionKernel/resolveEstateAction";
 import { resetEstateRoomAwarenessForTests } from "@/lib/estate/roomAwareness";
@@ -88,6 +89,90 @@ describe("chamberMemberAliases", () => {
     expect(isChamberMemberRequest("Let's ask Finance")).toBe(true);
     expect(isChamberMemberRequest("Take me to the Conservatory")).toBe(false);
   });
+});
+
+describe("chamberMemberAliases — HR / hiring routes to People & Culture", () => {
+  // People & Culture is the authoritative HR / hiring / recruiting / candidate /
+  // onboarding / team-fit member. These requests must resolve there instead of
+  // falling through to generic Estate navigation.
+  const directMatchToPeopleCulture = [
+    // Required test phrases (alias-shaped)
+    "HR Chamber member",
+    "human resources",
+    "candidate selection",
+    "applicant hiring decision",
+    "interviewing help",
+    "onboarding",
+    // Required natural-language requests
+    "I need to speak to the HR Chamber member",
+    "Take me to the human resources member",
+    "Help me choose between two candidates",
+    "Which applicant should I hire?",
+    "I need help interviewing a candidate",
+    "I need advice about onboarding someone",
+  ];
+
+  for (const text of directMatchToPeopleCulture) {
+    it(`resolves "${text}" → people-culture`, () => {
+      const r = resolveChamberMemberFromText(text);
+      expect(r.kind).toBe("match");
+      if (r.kind === "match") expect(r.match.memberId).toBe("people-culture");
+    });
+  }
+
+  it("keeps the existing team-culture alias on People & Culture", () => {
+    const r = resolveChamberMemberFromText("team culture");
+    expect(r.kind).toBe("match");
+    if (r.kind === "match") expect(r.match.memberId).toBe("people-culture");
+  });
+
+  it("resolves an explicit HR request as a navigable member request", () => {
+    expect(isChamberMemberRequest("Take me to the human resources member")).toBe(
+      true,
+    );
+    const gate = mayNavigateToChamberMember({
+      userText: "Take me to the human resources member",
+    });
+    expect(gate.allow).toBe(true);
+    if (gate.allow) expect(gate.memberId).toBe("people-culture");
+  });
+
+  it("keeps hiring-for-marketing ambiguous between People & Culture and Marketing", () => {
+    const r = resolveChamberMemberFromText("I'm hiring someone for marketing");
+    expect(r.kind).toBe("ambiguous");
+    if (r.kind === "ambiguous") {
+      const ids = r.options.map((o) => o.memberId);
+      expect(ids).toContain("people-culture");
+      expect(ids).toContain("marketing");
+    }
+    // Ambiguous never silently auto-navigates — it clarifies in chat.
+    const gate = mayNavigateToChamberMember({
+      userText: "I'm hiring someone for marketing",
+    });
+    expect(gate.allow).toBe(false);
+  });
+
+  // Negative guards: ordinary statements that merely contain an HR domain word
+  // must NOT be over-claimed as explicit Chamber-navigation requests. Safety is
+  // provided by the CB-022 gate (explicit member request or bare member name),
+  // not by suppressing the alias.
+  const ordinaryStatementsMustNotNavigate = [
+    "I hired a great VA last year",
+    "One candidate emailed me yesterday",
+    "My employee is on vacation",
+    "I have an interview tomorrow",
+    "Talent matters in this business",
+  ];
+
+  for (const text of ordinaryStatementsMustNotNavigate) {
+    it(`does not treat "${text}" as a Chamber-navigation request`, () => {
+      expect(isChamberMemberRequest(text)).toBe(false);
+      expect(
+        mayNavigateToChamberMember({ userText: text }).allow,
+      ).toBe(false);
+      expect(detectChamberMemberCommand(text)).toBeNull();
+    });
+  }
 });
 
 describe("resolveEstateAction chamber members", () => {
