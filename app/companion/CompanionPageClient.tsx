@@ -1204,6 +1204,7 @@ import {
   isConfirmationAcceptance,
   isConfirmationDecline,
   isPureConfirmationDecline,
+  isShortAcceptanceOfArmedOwner,
   shouldArmPendingQuestion,
   shouldStopAfterAssistantOffer,
   type AwaitingUserConfirmationState,
@@ -16010,11 +16011,31 @@ export default function CompanionPageClient() {
 
     const isDirectEstateNavPhrase = isDirectEstateRoomRequest(trimmed);
 
+    // MA-04 Phase 2b — Boundary (S4) remains the sole ownership authority. This
+    // one frictionless-offer path may consume a short acceptance only when
+    // Boundary has NOT already claimed the turn for another owner. We only READ
+    // `turnBoundaryDecision` (computed once at the top of handleSend); no new
+    // ownership logic or state is introduced here.
+    const boundaryClaimedTurn =
+      turnBoundaryDecision.decision === "interrupt_and_suspend" ||
+      turnBoundaryDecision.decision === "switch_topic" ||
+      turnBoundaryDecision.decision === "cancel_current_workflow" ||
+      turnBoundaryDecision.decision === "answer_pending_question" ||
+      turnBoundaryDecision.decision === "return_to_suspended_topic";
+
     if (
       !taskLockBlocksEstateRouting &&
       !isDirectEstateNavPhrase &&
       frictionlessPendingForYes &&
-      (isFrictionlessAffirmation(trimmed) || isConfirmationAcceptance(trimmed)) &&
+      !boundaryClaimedTurn &&
+      // Whole-message acceptance only. `isShortAcceptanceOfArmedOwner` (Phase 2a)
+      // replaces the previous start-anchored `isConfirmationAcceptance`, which
+      // consumed "okay, I'm overwhelmed" by locking onto the first word. NOTE:
+      // "okay, please" is intentionally NOT accepted in this slice — a canonical
+      // Phase 2a normalizer change (separate, bounded) is the only sanctioned way
+      // to add it; no local comma/punctuation workaround here.
+      (isFrictionlessAffirmation(trimmed) ||
+        isShortAcceptanceOfArmedOwner(trimmed, Boolean(frictionlessPendingForYes))) &&
       !strategyOfferOnLastTurn
     ) {
       const lastAssistantForYes = lastAssistantForYesEarly;
