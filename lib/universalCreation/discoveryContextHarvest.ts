@@ -93,11 +93,10 @@ export function applyEmailDiscoveryDefaults(
   const combined = [userText, ...(contextTexts ?? [])].join("\n").trim();
   const next = { ...answers };
 
-  if (!next["email-recipient"]) {
-    if (/\b(?:my |the )?team\b/i.test(combined)) next["email-recipient"] = "the team";
-    else if (/\bclient\b/i.test(combined)) next["email-recipient"] = "Client";
-    else if (/\bcustomer\b/i.test(combined)) next["email-recipient"] = "Customer";
-  }
+  // D3 Commit 2: recipient is never fabricated from broad keyword presence
+  // ("client"/"customer"/"team"). A recipient is only ever set from what the
+  // member actually stated (harvestEmailDiscovery) or an authoritative
+  // pending-slot answer — never invented here.
 
   if (!next["email-purpose"]) {
     const substantive = [...(contextTexts ?? []), userText].find(
