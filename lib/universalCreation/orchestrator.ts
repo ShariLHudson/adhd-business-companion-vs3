@@ -671,7 +671,129 @@ function finalizeDiscovery(
   };
 }
 
+/**
+ * Resolve the pending discovery question — the one the member is currently
+ * answering — from the session's questionIndex (D3 Phase 1). The stable question
+ * id is the contract; questionIndex is only the lookup key. Returns null when no
+ * valid pending question exists (out-of-range or misaligned index, or the indexed
+ * question is already answered), routing the caller to the compatibility path.
+ */
+function resolvePendingQuestion(
+  session: UniversalCreationSession,
+): UniversalDiscoveryQuestion | null {
+  const plugin = pluginById(session.documentType);
+  if (!plugin) return null;
+  const idx = session.questionIndex;
+  if (
+    !Number.isInteger(idx) ||
+    idx < 0 ||
+    idx >= plugin.discoveryQuestions.length
+  ) {
+    return null;
+  }
+  const question = plugin.discoveryQuestions[idx];
+  if (!question) return null;
+  // Pending only if still unanswered — an already-answered slot means the index
+  // is stale and we must not treat it as the question being answered now.
+  if (session.answers[question.id]?.trim()) return null;
+  return question;
+}
+
+/** Align questionIndex to a stable question id (never a blind +1 on array position). */
+function withQuestionIndexForId(
+  session: UniversalCreationSession,
+  questionId: string | null,
+  fallbackIndex?: number,
+): UniversalCreationSession {
+  const plugin = pluginById(session.documentType)!;
+  const idx = questionId
+    ? plugin.discoveryQuestions.findIndex((q) => q.id === questionId)
+    : -1;
+  return {
+    ...session,
+    questionIndex: idx >= 0 ? idx : fallbackIndex ?? session.questionIndex,
+  };
+}
+
+/**
+ * Advance a live discovery session by one member reply.
+ *
+ * D3 pending-slot binding contract: the pending question owns the reply. The
+ * reply is written authoritatively to the pending slot FIRST; harvest then runs
+ * supplement-only (filling other empty slots, never the pending slot); the
+ * critical-gap engine is consulted only to decide what happens next (draft /
+ * finalize / which question to ask) — never to decide where the reply belongs.
+ */
 export function advanceUniversalCreation(
+  session: UniversalCreationSession,
+  userReply: string,
+): UniversalCreationTurnResult | null {
+  if (UNCERTAINTY_RE.test(userReply)) {
+    const plugin = pluginById(session.documentType)!;
+    return {
+      kind: "uncertainty",
+      message: formatUncertaintyMenu(plugin.uncertaintyPaths),
+      session,
+    };
+  }
+
+  const pending = resolvePendingQuestion(session);
+  if (!pending) {
+    // Compatibility fallback — reached ONLY when questionIndex cannot name a
+    // valid unanswered pending question (legacy/malformed persisted sessions, an
+    // out-of-range index, or an already-satisfied indexed slot). Normal discovery
+    // turns always resolve a pending question and never reach this path.
+    return advanceUniversalCreationCompat(session, userReply);
+  }
+
+  // 1. Authoritative pending-slot write — the reply owns the asked slot, first.
+  const bound = applyAnswer(session, pending.id, userReply);
+  // 2. Supplement-only harvest — fill OTHER empty slots from the same reply;
+  //    never overwrite or fabricate the pending slot (protectSlotId).
+  const enriched = recomputeSessionFromAnswers(
+    bound,
+    mergeHarvestedAnswers(
+      bound.documentType,
+      userReply,
+      bound.answers,
+      [bound.originalUserText, ...Object.values(session.answers)],
+      { supplementOnly: true, protectSlotId: pending.id },
+    ),
+  );
+
+  // 3. Critical-gap decides only what happens NEXT — never where the reply went.
+  if (hasExecutableDraftContext(enriched)) {
+    return draftArtifactTurn(enriched);
+  }
+  if (isUniversalDiscoveryComplete(enriched.confidence)) {
+    return finalizeDiscovery(enriched);
+  }
+
+  const gap = evaluateCreationCriticalGap(enriched);
+  if (gap.blockingQuestion) {
+    return {
+      kind: "question",
+      question: gap.blockingQuestion,
+      session: withQuestionIndexForId(enriched, gap.blockingQuestionId),
+    };
+  }
+
+  const next = nextQuestion(enriched);
+  if (!next) return finalizeDiscovery(enriched);
+  return {
+    kind: "question",
+    question: next.question.prompt,
+    session: withQuestionIndexForId(enriched, next.question.id, next.index),
+  };
+}
+
+/**
+ * Legacy answer-routing, retained verbatim ONLY as the compatibility fallback for
+ * sessions with no resolvable pending question (see resolvePendingQuestion). This
+ * is the pre-D3 flow: harvest first, then route the reply to the critical-gap
+ * blocker. It is unreachable for normal discovery turns.
+ */
+function advanceUniversalCreationCompat(
   session: UniversalCreationSession,
   userReply: string,
 ): UniversalCreationTurnResult | null {
