@@ -15761,6 +15761,9 @@ export default function CompanionPageClient() {
               lastAssistantText: lastAssistantForCreateFastPath,
               workspace: workspacePanel,
               primaryTurn: primaryTurnDecision,
+              // S4 — honor the single Boundary authority inside the Create
+              // fast-path's internal relationship check (frictionlessActionLayer).
+              boundaryDecision: turnBoundaryDecision,
             },
             createRouting,
           ),

@@ -8,6 +8,7 @@
  */
 
 import { isRegistryArtifactExecution } from "@/lib/artifactRegistry";
+import type { ConversationBoundaryDecision } from "@/lib/conversationBoundary";
 import {
   artifactTermExpressesCreation,
   type ArtifactCollisionClass,
@@ -804,6 +805,7 @@ export function resolveUniversalCreationTurn(
   userText: string,
   currentTurn: number,
   lastAssistantText?: string,
+  boundaryDecision?: ConversationBoundaryDecision,
 ): UniversalCreationTurnResult | null {
   const t = userText.trim();
   if (!t) return null;
@@ -816,10 +818,15 @@ export function resolveUniversalCreationTurn(
   ) {
     return null;
   }
+  // Honor the single Boundary authority (S4): when the page threaded a pre-turn
+  // decision, this internal relationship check must not independently re-label a
+  // slot-valid discovery answer "unrelated" and park it. Absent a decision (other
+  // callers), behavior is unchanged.
   const createRel = classifyCreateTurnRelationship({
     userText: t,
     session: storedSession,
     lastAssistantText,
+    boundaryDecision,
   });
   if (createRel.shouldExit) {
     exitCreateWorkflow("exited");

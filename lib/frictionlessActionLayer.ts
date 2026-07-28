@@ -474,6 +474,13 @@ export type FrictionlessActionInput = {
   timeBlocks?: TimeBlock[];
   reminderDraft?: ReminderDraft | null;
   primaryTurn?: import("@/lib/conversation/primaryTurnClassifier").PrimaryTurnDecision | null;
+  /**
+   * Shared pre-turn Conversation Boundary Decision (S4). Threaded from the page so
+   * the Create fast-path's internal relationship check honors the SAME single
+   * authority as the page-level ownership check. Optional: legacy / non-page
+   * callers omit it and keep their prior behavior (no re-computation here).
+   */
+  boundaryDecision?: import("@/lib/conversationBoundary").ConversationBoundaryDecision;
   isReturning?: boolean;
   trustEstablished?: boolean;
   currentRoom?: string | null;
@@ -1941,10 +1948,15 @@ function tryUniversalCreationFlow(
   }
 
   // Authoritative Create lifecycle gate — parked / detour must not steal turns.
+  // Honor the single Boundary authority: the same pre-turn decision the page used
+  // for ownership is threaded in so a slot-valid discovery answer is not re-labeled
+  // unrelated here (which would park-then-clear the session). Absent a decision
+  // (non-page callers), this behaves exactly as before.
   const createRel = classifyCreateTurnRelationship({
     userText,
     session: loadUniversalCreationSession(),
     lastAssistantText: input.lastAssistantText,
+    boundaryDecision: input.boundaryDecision,
   });
   if (createRel.shouldExit) {
     exitCreateWorkflow("exited");
@@ -1965,6 +1977,7 @@ function tryUniversalCreationFlow(
       userText,
       input.currentTurn ?? 0,
       input.lastAssistantText,
+      input.boundaryDecision,
     );
   } catch {
     if (isSimpleCreateRequest(userText)) {
