@@ -125,6 +125,36 @@ export function recordFirst60DiscoveryOffer(
   });
 }
 
+/**
+ * MA-05 Phase 1 — atomically pin BOTH daily selections for one local calendar
+ * day. Re-reads the latest stored progress immediately before writing, so two
+ * interleaved daily resolutions can never clobber each other's fields, and every
+ * unrelated field (explored / skipped / discovery-offer / recent) is preserved.
+ * Reuses the existing storage key; backward-compatible with older blobs.
+ */
+export function pinDailySelections(input: {
+  dayKey: string;
+  welcomeId: string;
+  encouragementId: string;
+}): First60ProgressState {
+  const latest = loadFirst60Progress();
+  const next: First60ProgressState = {
+    ...latest,
+    recentWelcomeIds: uniquePush(latest.recentWelcomeIds, input.welcomeId, 12),
+    recentEncouragementIds: uniquePush(
+      latest.recentEncouragementIds,
+      input.encouragementId,
+      12,
+    ),
+    lastWelcomeDay: input.dayKey,
+    lastWelcomeId: input.welcomeId,
+    lastEncouragementDay: input.dayKey,
+    lastEncouragementId: input.encouragementId,
+  };
+  write(next);
+  return next;
+}
+
 export function clearFirst60ProgressForTests(): void {
   if (typeof window === "undefined") return;
   try {
