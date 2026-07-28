@@ -3,6 +3,14 @@
  *
  * High-confidence immediate opens are handled in createExperienceRouting +
  * frictionlessActionLayer. This module covers medium disambiguation and low discovery.
+ *
+ * ROUTING ROLE (EC-002.1/EC-002.2): `helper`. It produces disambiguation menus
+ * and discovery questions only — the options are sourced from Estate Brain
+ * (`searchEstateBrain` / `estateEnvironmentById`). It must never open a place or
+ * finalize a route: the primary path
+ * (`resolveFrictionlessAction` → Estate Brain → shared shell execution) owns the
+ * final navigation downstream when the member picks a choice.
+ * @see lib/estateBrain/routingOwnershipContract.ts
  */
 
 import type {
