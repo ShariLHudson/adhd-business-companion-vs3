@@ -319,19 +319,58 @@ export function hasExecutableDraftContext(
   return evaluateCreationCriticalGap(session).canDraft;
 }
 
-function mergeHarvestedAnswers(
+/**
+ * Options for {@link mergeHarvestedAnswers} (D3 pending-slot binding contract).
+ *
+ * Both fields are opt-in — the default (empty options) preserves the exact prior
+ * behavior for every existing caller.
+ */
+export type MergeHarvestedAnswersOptions = {
+  /**
+   * Supplement-only mode: harvested/default values may only fill slots that are
+   * ABSENT in `priorAnswers`. Prior (authoritative) answers always win. Default
+   * mode keeps the legacy behavior where harvested values overwrite prior ones.
+   */
+  supplementOnly?: boolean;
+  /**
+   * A slot id the merge must never write. The merged result's value for this id
+   * always equals `priorAnswers`' value for it (present or absent) — harvest and
+   * defaults can neither introduce nor overwrite it. Used to protect the pending
+   * slot after its authoritative write.
+   */
+  protectSlotId?: string;
+};
+
+export function mergeHarvestedAnswers(
   documentType: UniversalDocumentType,
   userText: string,
   priorAnswers: Record<string, string>,
   contextTexts: readonly string[] = [],
+  options: MergeHarvestedAnswersOptions = {},
 ): Record<string, string> {
+  const { supplementOnly = false, protectSlotId } = options;
   const harvested = harvestDiscoveryFromConversation(documentType, [
     ...contextTexts,
     userText,
   ]);
-  let answers = { ...priorAnswers, ...harvested };
+  // Supplement-only: prior answers are authoritative and win; harvest fills only
+  // absent keys. Default: legacy behavior — harvest overwrites prior.
+  let answers = supplementOnly
+    ? { ...harvested, ...priorAnswers }
+    : { ...priorAnswers, ...harvested };
   if (documentType === "email") {
     answers = applyEmailDiscoveryDefaults(answers, userText, contextTexts);
+  }
+  if (protectSlotId) {
+    // Hard guarantee: the protected slot equals its prior value (or stays absent)
+    // regardless of anything harvest or defaults produced.
+    if (Object.prototype.hasOwnProperty.call(priorAnswers, protectSlotId)) {
+      answers = { ...answers, [protectSlotId]: priorAnswers[protectSlotId]! };
+    } else if (protectSlotId in answers) {
+      const rest = { ...answers };
+      delete rest[protectSlotId];
+      answers = rest;
+    }
   }
   return answers;
 }
