@@ -12877,9 +12877,12 @@ export default function CompanionPageClient() {
     lastAssistantText: string,
     _fresh: boolean,
   ): boolean {
+    // MA-04 Phase 2d — whole-message acceptance only. `isShortAcceptanceOfArmedOwner`
+    // replaces the start-anchored `isConfirmationAcceptance` so "yes, but first I
+    // need help" is not consumed. Boundary is honored by the caller gate (:18801).
     if (
       isFrictionlessAffirmation(trimmed) ||
-      isConfirmationAcceptance(trimmed)
+      isShortAcceptanceOfArmedOwner(trimmed, true)
     ) {
       const frictionlessPending = loadFrictionlessPendingForConfirmation({
         confirmationReply: true,
@@ -16005,7 +16008,8 @@ export default function CompanionPageClient() {
         ? frictionlessPending
         : null);
 
-    if (strategyPendingForYes && strategyOfferOnLastTurn) {
+    // MA-04 Phase 2d — Boundary owns interrupts/switches/answers first.
+    if (!boundaryClaimedTurn && strategyPendingForYes && strategyOfferOnLastTurn) {
       const continuation = resolveFrictionlessContinuation(
         trimmed,
         strategyPendingForYes,
@@ -18768,7 +18772,8 @@ export default function CompanionPageClient() {
       }
     }
 
-    if (decisionCompassOffer && isAcceptanceAttempt(trimmed)) {
+    // MA-04 Phase 2d — Boundary owns interrupts/switches/answers first.
+    if (decisionCompassOffer && !boundaryClaimedTurn && isAcceptanceAttempt(trimmed)) {
       const snap = decisionCompassOffer;
       setDecisionCompassOffer(null);
       clearAllPendingOffers();
@@ -18798,7 +18803,12 @@ export default function CompanionPageClient() {
       }
     }
 
-    if (tryContinueConversationWorkflow(trimmed, lastAssistantText, fresh)) {
+    // MA-04 Phase 2d — Boundary owns interrupts/switches/answers first; this
+    // workflow-continuation acceptance path may run only when Boundary is unclaimed.
+    if (
+      !boundaryClaimedTurn &&
+      tryContinueConversationWorkflow(trimmed, lastAssistantText, fresh)
+    ) {
       return;
     }
 
