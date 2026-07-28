@@ -445,10 +445,15 @@ function draftArtifactTurn(
 ): UniversalCreationTurnResult {
   const filled = recomputeSessionFromAnswers(
     session,
+    // D3 Commit 4: obey the same supplement-only invariant as the main Create
+    // path — a re-harvest of originalUserText may only fill still-empty slots,
+    // never overwrite an answer the member already gave.
     mergeHarvestedAnswers(
       session.documentType,
       session.originalUserText,
       session.answers,
+      [],
+      { supplementOnly: true },
     ),
   );
   const draftBody = composeDocumentDraft(filled);
