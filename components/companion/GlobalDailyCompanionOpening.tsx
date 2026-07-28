@@ -325,6 +325,8 @@ export function TodaysWelcomeCard(props: Props) {
 
   const greetingTitle = props.greetingTitle?.trim() || null;
   const welcomeLine = props.welcomeLine?.trim() || null;
+  const choicesIntro = props.choicesIntro?.trim() || null;
+  const discoveryInviteLine = props.discoveryInviteLine?.trim() || null;
   const useStructuredHeader = Boolean(greetingTitle || welcomeLine);
 
   return (
@@ -357,6 +359,14 @@ export function TodaysWelcomeCard(props: Props) {
                 data-testid="global-daily-welcome-line"
               >
                 {welcomeLine}
+              </p>
+            ) : null}
+            {choicesIntro ? (
+              <p
+                className="global-daily-opening__choices-intro"
+                data-testid="global-daily-choices-intro"
+              >
+                {choicesIntro}
               </p>
             ) : null}
           </>
@@ -407,14 +417,24 @@ export function TodaysWelcomeCard(props: Props) {
           </div>
         </aside>
       ) : props.onShowSomethingHelpful ? (
-        <button
-          type="button"
-          className="global-daily-opening__secondary-action"
-          onClick={props.onShowSomethingHelpful}
-          data-testid="show-me-something-helpful"
-        >
-          {SHOW_ME_SOMETHING_HELPFUL_LABEL}
-        </button>
+        <div className="global-daily-opening__discovery-fallback">
+          {useStructuredHeader && discoveryInviteLine ? (
+            <p
+              className="global-daily-opening__discovery-invite"
+              data-testid="global-daily-discovery-invite"
+            >
+              {discoveryInviteLine}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            className="global-daily-opening__secondary-action"
+            onClick={props.onShowSomethingHelpful}
+            data-testid="show-me-something-helpful"
+          >
+            {SHOW_ME_SOMETHING_HELPFUL_LABEL}
+          </button>
+        </div>
       ) : null}
 
       {/* 3. Three familiar action cards */}

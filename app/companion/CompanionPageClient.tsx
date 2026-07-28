@@ -25615,6 +25615,10 @@ export default function CompanionPageClient() {
                         mode="main"
                         greetingTitle={todaysWelcomeOpening.greetingTitle}
                         welcomeLine={todaysWelcomeOpening.welcomeLine}
+                        choicesIntro={todaysWelcomeOpening.choicesIntro}
+                        discoveryInviteLine={
+                          todaysWelcomeOpening.discoveryInviteLine
+                        }
                         welcomeMessage={todaysWelcomeOpening.welcomeMessage}
                         encouragementLine={
                           todaysWelcomeOpening.encouragementLine
