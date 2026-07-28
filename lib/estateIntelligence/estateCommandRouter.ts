@@ -350,11 +350,18 @@ function buildCommandDecision(
 
 /** Build an immediate direct navigation command for a canonical place id. */
 /**
- * Adapter / command-builder (EC-002.4a). Builds an `EstateCommandDecision` for a
- * SUPPLIED `placeId` (or exact room alias) so the shell can execute it. It only
+ * Adapter / command-builder (EC-002.4a / EC-002.4b-1). Builds an
+ * `EstateCommandDecision` for a SUPPLIED `placeId` (or exact room alias). It only
  * resolves the given place — it does NOT select a destination from natural-language
  * intent, and it does not own or authorize routing on its own. Returns `null` when
  * `placeId` is not a known place/alias.
+ *
+ * EC-002.4b-1: the builder is recommendation-only — it returns
+ * `executeImmediately: false` and never self-grants immediate execution.
+ * Execution authority is granted by the approved hub / Estate Brain path.
+ * (This flag is currently unconsumed for this builder's outputs, so the change
+ * is behavior-neutral; the shell executor `runDirectEstateRoomNavigation` and
+ * every current call site ignore it.)
  * @see lib/estateBrain/routingOwnershipContract.ts
  */
 export function estateNavigateCommandForPlace(
@@ -377,7 +384,8 @@ export function estateNavigateCommandForPlace(
         menuActionId: fromAlias.menuActionId,
         displayName: fromAlias.displayName,
       },
-      true,
+      // EC-002.4b-1: recommendation-only — authority granted downstream, not here.
+      false,
     );
   }
   return buildCommandDecision(
@@ -389,7 +397,8 @@ export function estateNavigateCommandForPlace(
       menuActionId: resolved.menuActionId,
       displayName: resolved.displayName,
     },
-    true,
+    // EC-002.4b-1: recommendation-only — authority granted downstream, not here.
+    false,
   );
 }
 

@@ -93,6 +93,16 @@ describe("EC-002.4a — estateNavigateCommandForPlace is a command-builder (adap
     expect(cmd?.roomId ?? cmd?.entryId).toBe("apple-orchard");
   });
 
+  it("does not self-grant executeImmediately (EC-002.4b-1 — recommendation only)", () => {
+    // The builder recommends a destination; it must not authorize immediate
+    // execution itself — that authority belongs to the hub / Estate Brain path.
+    const cmd = estateNavigateCommandForPlace("apple-orchard", "visit");
+    expect(cmd).not.toBeNull();
+    expect(cmd?.executeImmediately).toBe(false);
+    const viaAlias = estateNavigateCommandForPlace("clear-my-mind");
+    expect(viaAlias?.executeImmediately).toBe(false);
+  });
+
   it("does not select a destination from natural-language intent", () => {
     // A feeling/task sentence is not a supplied place → no command produced.
     expect(
