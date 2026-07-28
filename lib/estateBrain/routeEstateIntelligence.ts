@@ -18,6 +18,7 @@ import {
   researchCapabilityIdForLevel,
 } from "./researchRouting";
 import { resolveIntentFirstRoute } from "./routeIntentFirstNavigation";
+import { assertRoutingOwnership } from "./routingOwnershipContract";
 import { shouldEnterDiscoveryMode } from "./discoveryMode";
 import { shouldEnterUniversalCreation } from "@/lib/universalCreation";
 import { shouldCoachBeforeNavigate } from "./estateCoaching";
@@ -327,4 +328,18 @@ export function formatEstateIntelligenceHint(
     `Tool=${route.toolId ?? "conversation"}. ` +
     `No permission ask on high confidence.`
   );
+}
+
+// EC-001 / P0-05 — affirm the Routing Ownership Contract at module load so any
+// drift (a renamed/removed primary symbol, or a non-primary owner) fails loudly
+// instead of the contract silently lying. Dev/test only: skipped in production,
+// so there is no runtime or behavior cost on the live path.
+if (process.env.NODE_ENV !== "production") {
+  assertRoutingOwnership({
+    ownerPath: "lib/estateBrain/routeEstateIntelligence.ts",
+    liveSymbols: {
+      resolveEstateIntelligenceImmediateAction,
+      resolveEstateIntelligenceRoute,
+    },
+  });
 }
