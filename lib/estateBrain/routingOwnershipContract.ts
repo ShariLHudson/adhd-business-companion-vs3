@@ -30,42 +30,119 @@ export const ROUTING_OWNERSHIP_CONTRACT = {
   rule: "One production path: Frictionless → Estate Brain. Adapters may feed Brain or normalize actions; they must not independently own final place choice.",
 } as const;
 
-export const ROUTING_ADAPTER_OR_LEGACY_STACKS = [
-  {
-    path: "lib/estateIntelligence/",
-    role: "phase-c-adapter",
-    status: "adapter" as const,
-    note: "Matcher/router adapter — invitations must not override goToPlace / Brain route.",
-  },
-  {
-    path: "lib/estateCapabilityRegistry/",
-    role: "catalog-adapter",
-    status: "adapter" as const,
-    note: "Secondary capability catalog consulted by Estate Brain; not a second router owner.",
-  },
-  {
-    path: "lib/estateNavigationIntelligence/",
-    role: "navigation-helper",
-    status: "helper" as const,
-    note: "Scenic / navigation helpers — gate behind Brain / frictionless policy.",
-  },
-] as const;
-
 export type RoutingOwnerRole =
   | "orchestration-hub"
   | "primary-intelligence"
   | "adapter"
   | "helper"
+  | "execution-primitive"
   | null;
 
-export function routingOwnerRoleForPath(path: string): RoutingOwnerRole {
+export type RoutingSurfaceRole = Exclude<RoutingOwnerRole, null>;
+
+export type RoutingSurface = {
+  /** Path fragment identifying the module (or file) that owns this surface. */
+  path: string;
+  /** Optional live symbol name for the surface's entry point. */
+  symbol?: string;
+  role: RoutingSurfaceRole;
+  note: string;
+};
+
+/**
+ * EC-002.1 — the single source of truth for routing-surface roles. Every
+ * routing-related module named in the Estate Convergence backlog (EC-002) gets
+ * one explicit, machine-checkable role:
+ *   - `orchestration-hub`   calls the primary owner; not a decider itself.
+ *   - `primary-intelligence` the ONLY surface that may own final place choice.
+ *   - `adapter`             feeds / normalizes for the Brain; never owns.
+ *   - `helper`              scenic / navigation refinement; never owns.
+ *   - `execution-primitive` performs an already-decided navigation; never decides.
+ * This is the contract's own enumeration — not a second router or a parallel
+ * authority. Extend it by adding a row here; the derived views below read from it.
+ */
+export const ROUTING_SURFACES: readonly RoutingSurface[] = [
+  {
+    path: "lib/frictionlessActionLayer.ts",
+    symbol: "resolveFrictionlessAction",
+    role: "orchestration-hub",
+    note: "Live companion hub called from CompanionPageClient; delegates place/capability choice to Estate Brain.",
+  },
+  {
+    path: "lib/estateBrain/",
+    symbol: "resolveEstateIntelligenceImmediateAction",
+    role: "primary-intelligence",
+    note: "Primary Estate place/capability intelligence owner — the only surface that may own final place choice.",
+  },
+  {
+    path: "lib/estateIntelligence/",
+    role: "adapter",
+    note: "Matcher / command router adapter — must not override goToPlace / Brain route.",
+  },
+  {
+    path: "lib/estateCapabilityRegistry/",
+    role: "adapter",
+    note: "Capability catalog consulted by Estate Brain (consultBestCapability); not a second router owner.",
+  },
+  {
+    path: "lib/intentRoutingIntelligence.ts",
+    role: "adapter",
+    note: "Phase-C intent routing decision layer — must not override exact canonical place navigation.",
+  },
+  {
+    path: "lib/estateNavigationIntelligence/",
+    role: "helper",
+    note: "Scenic / navigation disambiguation helper — gate behind Brain / frictionless policy.",
+  },
+  {
+    path: "lib/estateExperiences/resolveEstateNavigation.ts",
+    role: "helper",
+    note: "Navigation disambiguation / discovery helper feeding the hub; not an independent owner.",
+  },
+  {
+    path: "lib/estate/goToPlace.ts",
+    symbol: "goToPlace",
+    role: "execution-primitive",
+    note: "Approved shell navigation primitive — executes a decided place, does not decide intent.",
+  },
+  {
+    path: "app/companion/CompanionPageClient.tsx",
+    symbol: "runDirectEstateRoomNavigation",
+    role: "execution-primitive",
+    note: "Shell execution of an already-decided EstateCommandDecision; not a decider.",
+  },
+];
+
+/**
+ * Backward-compatible view: adapters and helpers only, derived from
+ * ROUTING_SURFACES so there is a single source of truth (no duplicate registry).
+ */
+export const ROUTING_ADAPTER_OR_LEGACY_STACKS = ROUTING_SURFACES.filter(
+  (surface) => surface.role === "adapter" || surface.role === "helper",
+).map((surface) => ({
+  path: surface.path,
+  role: surface.role,
+  status: surface.role,
+  note: surface.note,
+}));
+
+/** Most-specific registered surface for a module path (longest match wins). */
+export function routingSurfaceForPath(path: string): RoutingSurface | null {
   const p = path.replace(/\\/g, "/");
-  if (p.includes("lib/frictionlessActionLayer")) return "orchestration-hub";
-  if (p.includes("lib/estateBrain")) return "primary-intelligence";
-  if (p.includes("lib/estateIntelligence")) return "adapter";
-  if (p.includes("lib/estateCapabilityRegistry")) return "adapter";
-  if (p.includes("lib/estateNavigationIntelligence")) return "helper";
-  return null;
+  let best: RoutingSurface | null = null;
+  for (const surface of ROUTING_SURFACES) {
+    if (
+      p.includes(surface.path) &&
+      (best === null || surface.path.length > best.path.length)
+    ) {
+      best = surface;
+    }
+  }
+  return best;
+}
+
+export function routingOwnerRoleForPath(path: string): RoutingOwnerRole {
+  return routingSurfaceForPath(path)?.role ?? null;
 }
 
 export function isPrimaryRoutingIntelligence(path: string): boolean {
