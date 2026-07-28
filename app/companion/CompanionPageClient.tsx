@@ -22403,6 +22403,10 @@ export default function CompanionPageClient() {
     });
   }
 
+  // EC-002.4a — execution-primitive (see lib/estateBrain/routingOwnershipContract.ts).
+  // Executes an ALREADY-DECIDED command: it must not interpret intent, match
+  // capabilities, evaluate estate commands, or call goToPlace to (re)select a
+  // destination. The destination is fixed by the incoming `command`.
   function runDirectEstateRoomNavigation(
     command: EstateCommandDecision,
     userText: string,

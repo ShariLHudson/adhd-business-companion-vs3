@@ -349,6 +349,14 @@ function buildCommandDecision(
 }
 
 /** Build an immediate direct navigation command for a canonical place id. */
+/**
+ * Adapter / command-builder (EC-002.4a). Builds an `EstateCommandDecision` for a
+ * SUPPLIED `placeId` (or exact room alias) so the shell can execute it. It only
+ * resolves the given place — it does NOT select a destination from natural-language
+ * intent, and it does not own or authorize routing on its own. Returns `null` when
+ * `placeId` is not a known place/alias.
+ * @see lib/estateBrain/routingOwnershipContract.ts
+ */
 export function estateNavigateCommandForPlace(
   placeId: string,
   userText?: string,
