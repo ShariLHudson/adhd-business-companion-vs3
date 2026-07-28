@@ -6,6 +6,7 @@
  */
 
 import type { ArrivalIntelligence } from "@/lib/arrivalIntelligence";
+import { isReturnAfterAbsence } from "@/lib/arrivalIntelligence/returnState";
 import {
   resolveCompanionContinue,
   type CompanionContinueResolution,
@@ -95,9 +96,10 @@ function resolveVisitorKind(
     return "new";
   }
 
+  // MA-05 Phase 2 — shared canonical return-after-absence policy (was inline `>= 3`).
   if (
     arrival?.visitorKind === "long_absence" ||
-    (arrival?.returnIntervalDays != null && arrival.returnIntervalDays >= 3)
+    isReturnAfterAbsence(arrival?.returnIntervalDays)
   ) {
     return "absence";
   }

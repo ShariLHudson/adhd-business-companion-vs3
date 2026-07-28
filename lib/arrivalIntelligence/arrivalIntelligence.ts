@@ -10,6 +10,7 @@
 
 import { getCompanionAuthIntelligence } from "@/lib/companionAuthIntelligence";
 import { getPrefs } from "@/lib/companionStore";
+import { isLongAbsence } from "./returnState";
 import {
   resolveCompanionContinue,
   type CompanionContinueOption,
@@ -143,7 +144,8 @@ function resolveVisitorKind(
   if (onboardingActive) {
     return visitIndex <= 1 && !hasChatted ? "first_onboarding" : "onboarding_return";
   }
-  if (returnDays != null && returnDays >= 14) return "long_absence";
+  // MA-05 Phase 2 — shared canonical long-absence policy (was inline `>= 14`).
+  if (isLongAbsence(returnDays)) return "long_absence";
   return "returning";
 }
 

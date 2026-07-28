@@ -6,6 +6,7 @@ import {
   composeBibleSoftPresence,
   composeLivingRoomOpening,
 } from "@/lib/shariVoiceBible";
+import { isLongAbsence } from "@/lib/arrivalIntelligence/returnState";
 import type { GreetingIntelligence, GreetingIntelligenceInput } from "./types";
 
 function resolveMood(input: GreetingIntelligenceInput): WelcomeMood {
@@ -30,7 +31,8 @@ function resolveCategory(input: GreetingIntelligenceInput): string {
   if (input.celebrationActive || input.projectRecentlyCompleted) return "celebration";
   if (input.recoveryGentle) return "recovery";
   if (input.lowEnergy) return "low_energy";
-  if (input.returnIntervalDays != null && input.returnIntervalDays >= 42) {
+  // MA-05 Phase 2 — shared canonical long-absence policy (was inline `>= 42`).
+  if (isLongAbsence(input.returnIntervalDays)) {
     return "long_absence";
   }
   return input.timeOfDay;

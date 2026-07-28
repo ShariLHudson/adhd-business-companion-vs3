@@ -78,6 +78,16 @@ describe("resolveWelcomeHomeDailyChoices (retired choice list)", () => {
     );
   });
 
+  it("MA-05 P2: 'absence' visitor triggers at the shared 3-day threshold, not below", () => {
+    const visitorKindAt = (returnIntervalDays: number) =>
+      resolveWelcomeHomeDailyChoices({
+        experienceVisitorKind: "returning",
+        arrival: { returnIntervalDays } as never,
+      }).visitorKind;
+    expect(visitorKindAt(2)).toBe("returning");
+    expect(visitorKindAt(3)).toBe("absence");
+  });
+
   it("returning soft greeting never uses the retired prompt", () => {
     const result = resolveWelcomeHomeDailyChoices({
       experienceVisitorKind: "returning",

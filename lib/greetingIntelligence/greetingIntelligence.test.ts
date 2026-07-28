@@ -50,6 +50,21 @@ describe("GreetingIntelligence", () => {
     expect(violatesShariVoice(intel.greeting)).toBe(false);
   });
 
+  it("MA-05 P2: long-absence category now triggers at the shared 14-day threshold", () => {
+    clearVoiceUsageForTests();
+    const categoryAt = (returnIntervalDays: number) =>
+      evaluateGreetingIntelligence({
+        homeState: "QUIET_PRESENCE",
+        timeOfDay: "morning",
+        sessionVisitIndex: 30,
+        returnIntervalHours: returnIntervalDays * 24,
+        returnIntervalDays,
+        isFirstMeeting: false,
+      }).greetingCategory;
+    expect(categoryAt(13)).not.toBe("long_absence");
+    expect(categoryAt(14)).toBe("long_absence");
+  });
+
   it("is stable within the same day", () => {
     clearVoiceUsageForTests();
     const base = {
