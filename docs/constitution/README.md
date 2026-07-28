@@ -4,6 +4,31 @@
 
 This series is the master constitutional layer for Spark Estate product behavior. It is distinct from the Estate place canon (`docs/estate/`) and from the ADHD ecosystem Product Constitution (`docs/PRODUCT_CONSTITUTION.md`, P0.58).
 
+## Product Authority Hierarchy (MA-05 Phase 5a — locked)
+
+The **Companion Constitution v1 (master)** is the **highest product-principle authority** for Spark Estate — it governs identity, emotional experience, companion behavior, member relationship, and experience philosophy. More specific repository authorities remain **operative beneath it** for their own subjects. The hierarchy is:
+
+1. **Companion Constitution v1** — product-principle apex (identity · emotional experience · companion behavior · member relationship · experience philosophy).
+2. **Subject-specific product authorities** — this constitution series (**113–117** · **128** · **131** · **132** · **133**), the Estate place canon ([`ESTATE_ARCHITECTURAL_AUTHORITY.md`](../estate/ESTATE_ARCHITECTURAL_AUTHORITY.md)), Companion DNA ([`THE_FRIEND_WE_ALL_DESERVE.md`](../THE_FRIEND_WE_ALL_DESERVE.md)), First-Time Welcome ([`126`](../product-specifications/126_FIRST_TIME_WELCOME_EXPERIENCE_STANDARD.md)), First-60-Days ([`FIRST_60_DAYS_WELCOME_EXPERIENCE.md`](../estate/FIRST_60_DAYS_WELCOME_EXPERIENCE.md)), Spark Cards ([`SPARK_CARD_FRAMEWORK.md`](../SPARK_CARD_FRAMEWORK.md)), Discovery ([`ESTATE_DISCOVERY_MODE.md`](../estate/ESTATE_DISCOVERY_MODE.md) · [`DiscoveryKey-Constitution.md`](../estate-intelligence/discovery-key/DiscoveryKey-Constitution.md)), Presence ([`PRESENCE_INTELLIGENCE.md`](../companion-homestead/PRESENCE_INTELLIGENCE.md)), Relationship Phases ([`RELATIONSHIP-PHASE-CONSTITUTION.md`](../relationship-phases/RELATIONSHIP-PHASE-CONSTITUTION.md)).
+3. **Engineering architecture.**
+4. **Code.**
+
+The repository constitution documents (113–117 and the binding extensions) are **not deleted or archived** in this phase. Under this lock they are **supporting / implementation-facing authorities beneath the Companion Constitution v1, pending a later consolidation phase** (which will also establish the Constitution's canonical in-repo home). The 12-rank "Order of authority (from 113)" below continues to govern conflicts **among the repository product authorities** (tier 2 above); it does not sit above the Companion Constitution v1.
+
+### Document authority status (locked this phase)
+
+- **`docs/estate/ESTATE_PLACE_MASTER_MANIFEST.json` — authoritative.** Remains the authoritative inventory of physical Estate places, stable place IDs, routing identities, assets, aliases, and route protections.
+- **External *Spark Estate Master Place Registry* (28-place spreadsheet) — supporting authority.** It does **not** replace the manifest. It is the supporting authority for the richer place-experience model: ambience, music and quiet options, seasonal behavior, first-visit prompts, return-visit prompts, invitation eligibility, signature memories, surprise moments, and Kinsey appearance planning. Its fields are **not** merged into the manifest in this phase.
+- **Onboarding & First 7 Days Experience Specification — supporting resident-journey material.** Its emotional outcomes and useful first-week intentions inform the canonical First-60-Days experience ([`FIRST_60_DAYS_WELCOME_EXPERIENCE.md`](../estate/FIRST_60_DAYS_WELCOME_EXPERIENCE.md)). Its rigid Day 1–7 schedule is **not** an approved required-implementation calendar. It is **not** retired or rewritten in this phase.
+- **First 90-Card Expansion Plan — editorial reference, not the Spark Card inventory authority.** Its 30→90 premise and proposed category quotas are historical planning assumptions (the live library is already larger and uses another taxonomy). Its editorial principles, emotional pacing, action-load rules, scheduling simulations, and quality gates remain inputs for future reconciliation into [`SPARK_CARD_FRAMEWORK.md`](../SPARK_CARD_FRAMEWORK.md). Spark Card taxonomy and records are **unchanged** this phase.
+
+### Deferred to later phases (identified here, not resolved)
+
+- **Days 61–90 resident-journey gap** — no distinct 61–90 journey exists (post-day-60 is a single "adaptive" bucket; day 90 appears only as an invisible relationship-phase checkpoint).
+- **Spark Card taxonomy reconciliation** — Card Plan categories vs the live `lib/sparkNote` taxonomy vs `SPARK_CARD_FRAMEWORK.md`.
+- **Place-experience schema integration** — folding the external registry's ambience / invitation / seasonal / prompt / Kinsey model into the manifest schema.
+- **Deprecated place-registry convergence** — `lib/estate/canonicalEstatePlaces.ts` and `lib/estate/estateRoomAliasCatalog.ts` (both `@deprecated`) converging onto the manifest.
+
 ## Documents
 
 | # | Document | Status | Role |
@@ -27,6 +52,8 @@ This series is the master constitutional layer for Spark Estate product behavior
 **Unified Business Intelligence & Relationship Engine (141) Phase 1:** [Prompt](../platform/141_CURSOR_UNIFIED_BUSINESS_INTELLIGENCE_AND_RELATIONSHIP_ENGINE_PROMPT.md) · [Report](../platform/141_UNIFIED_BUSINESS_INTELLIGENCE_AND_RELATIONSHIP_ENGINE_REPORT.md) — Relationship Integrity Rule™, Projects hub related surfaces, create lineage, gap register.
 
 ## Order of authority (from 113)
+
+> This 12-rank order governs conflicts **among the repository product authorities** (tier 2 of the Product Authority Hierarchy above). The **Companion Constitution v1** sits above this order as the product-principle apex; rank 1 (user trust and safety) remains inviolable.
 
 When documents conflict:
 
