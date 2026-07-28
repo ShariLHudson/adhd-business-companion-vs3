@@ -306,10 +306,11 @@ the Phase-0 build re-verification (MA-35/37) is green.
   existing Boundary (S4) + spine ownership + claim ladder and forbids a new gate. Building a separate
   ownership authority would itself be the meta-defect; this note is structured to prevent that.
 
-### Unresolved decisions requiring Shari's approval
+### Decisions (resolved 2026-07-28)
 
-1. **Risk appetite:** land MA-04's hot-path edit **now**, or defer 2b until the Phase-4 monolith split
-   makes `handleSend` safe (ship 2a — the predicate — now regardless)?
+1. **Hot-path risk: RESOLVED — do not implement the early `handleSend` compliance change yet.**
+   Phase 2b remains **deferred** until the predicate work (Phase 2a) is complete and reviewed. Ship 2a
+   (the pure predicate + tests) now; 2b waits for explicit approval.
 2. **Canonical authority: RESOLVED — Boundary (S4) is canonical.** See
    [CANONICAL_OWNERSHIP_AUTHORITY.md](CANONICAL_OWNERSHIP_AUTHORITY.md). Consequence for this slice:
    MA-04 is a **narrow compliance fix** — the fast-path handlers must obey the Boundary decision
@@ -317,8 +318,13 @@ the Phase-0 build re-verification (MA-35/37) is green.
    second gate. This supersedes any wording above that framed MA-04 as "consult the spine armed-owner
    early." Unifying the two authorities (demoting `resolveOwnership` to execution/persistence) is a
    separate Phase-4 item, not part of this slice.
-3. **Test F semantics:** when an owner is armed and the user says "I'm overwhelmed," is the owner
-   **parked** (recommended, resumable), **retained**, or **cleared**? This defines correct behavior and
-   must be decided before coding.
-4. **Predicate unification scope:** re-point only the two "authority" regexes now, or collapse all 8 in
-   this slice (larger, overlaps MA-11)?
+3. **Emotional-interruption semantics: RESOLVED — "park, don't lose."** When Boundary identifies an
+   emotional interruption (e.g. "I'm overwhelmed"): the current owner is **parked/suspended**; the
+   emotional need owns the immediate turn; the prior owner is **not silently cleared**; it may be
+   resumed later **only when contextually appropriate**; there is **no automatic forced return**. This
+   is Boundary behavior (rule #1 `interrupt_and_suspend`) — the Phase-2a predicate merely returns
+   `false` for "okay, I'm overwhelmed" so acceptance never consumes an emotional interruption.
+4. **Predicate scope: RESOLVED — keep this slice narrow.** Unify only the authority-related
+   short-acceptance predicate needed by MA-04 (`isShortAcceptanceOfArmedOwner`, sourced from the
+   canonical `isBareGenericAcceptance` vocabulary). **Do not** collapse all eight regex/predicate
+   systems — broader consolidation is a separate MA-11 concern.

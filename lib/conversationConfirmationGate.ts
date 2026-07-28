@@ -9,6 +9,7 @@ import {
 } from "@/lib/estate/estateRoomAliasRegistry";
 import type { FrictionlessPendingAction } from "./frictionlessActionLayer";
 import type { WorkspaceOffer } from "./workspaceMode";
+import { isBareGenericAcceptance } from "./pendingAcceptanceAuthority";
 
 /** Assistant lines that require waiting for member answer — no thinking, no follow-up LLM. */
 const CONFIRMATION_QUESTION_PATTERNS: readonly RegExp[] = [
@@ -160,4 +161,83 @@ export function isPureConfirmationDecline(text: string): boolean {
   if (messageNamesExactEstateRoom(text)) return false;
   if (extractRoomPhraseFromNavigation(text)) return false;
   return true;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Armed-owner acceptance predicate (MA-04, Phase 2a)
+ *
+ * The single authority-related check for one narrow question: "does this reply
+ * look like a short acceptance of the already-armed owner?" It is a pure
+ * boolean — it cannot arm, resume, route, or decide ownership. See
+ * docs/architecture/CANONICAL_OWNERSHIP_AUTHORITY.md and
+ * docs/architecture/MA01_MA04_OWNERSHIP_GATE_DESIGN.md.
+ *
+ * Vocabulary is REUSED, not duplicated: the base is the canonical whole-message
+ * `isBareGenericAcceptance` (pendingAcceptanceAuthority) plus a small supplement
+ * for matrix tokens that base misses ("do it", "absolutely", the "yes please"
+ * politeness combo). Both sources are whole-message anchored, so any reply that
+ * carries a cancellation / topic-switch / clarification / emotional clause
+ * ("sure, cancel that", "yes, but pricing", "okay, I'm overwhelmed", "sounds
+ * good to me generally") fails by construction. This predicate does NOT change
+ * the behavior of `isBareGenericAcceptance`, `isConfirmationAcceptance`, or
+ * `isActiveQuestionAcceptance`; broader consolidation is MA-11.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Minimal descriptor of an armed owner. Accepts the spine ownership status
+ * (`"awaiting_user"`), the legacy awaiting-confirmation `active` flag, or a bare
+ * boolean. Anything falsy / non-awaiting = no owner armed.
+ */
+export type ArmedOwnerSignal =
+  | boolean
+  | { active?: boolean | null; status?: string | null }
+  | null
+  | undefined;
+
+function isArmedOwnerActive(armed: ArmedOwnerSignal): boolean {
+  if (armed === true) return true;
+  if (!armed || typeof armed !== "object") return false;
+  if (typeof armed.status === "string") return armed.status === "awaiting_user";
+  return armed.active === true;
+}
+
+/** Normalize for acceptance matching — case, curly apostrophes, whitespace, trailing punctuation. */
+function normalizeAcceptanceText(text: string): string {
+  return text
+    .normalize("NFKC")
+    .replace(/[‘’ʼ`]/g, "'")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/[.!?…]+$/g, "")
+    .trim()
+    .toLowerCase();
+}
+
+/** Matrix tokens the canonical base regex does not cover; whole-message anchored. */
+const SHORT_ACCEPTANCE_SUPPLEMENT_RE =
+  /^(?:do it|absolutely|(?:yes|okay|ok|sure)\s+please)$/i;
+
+/**
+ * PURE text check: is the whole reply a bare short acceptance? Reuses the
+ * canonical `isBareGenericAcceptance` vocabulary + the supplement above. No
+ * owner context; cannot arm/resume/decide anything.
+ */
+export function isBareShortAcceptanceText(text: string): boolean {
+  const t = normalizeAcceptanceText(text);
+  if (!t) return false;
+  return isBareGenericAcceptance(t) || SHORT_ACCEPTANCE_SUPPLEMENT_RE.test(t);
+}
+
+/**
+ * Owner-aware wrapper — the single authority-related predicate for the ARMED
+ * OWNER acceptance question (MA-04). True only when (a) an owner is armed
+ * (`awaiting_user` / `active`) AND (b) the reply is a bare short acceptance.
+ * Generic agreement with NO armed owner is never an acceptance here.
+ */
+export function isShortAcceptanceOfArmedOwner(
+  text: string,
+  armed: ArmedOwnerSignal,
+): boolean {
+  if (!isArmedOwnerActive(armed)) return false;
+  return isBareShortAcceptanceText(text);
 }

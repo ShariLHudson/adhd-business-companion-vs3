@@ -78,6 +78,13 @@ export type ResolvePendingAcceptanceResult =
       via: "generic" | "specific";
     };
 
+/**
+ * Canonical whole-message acceptance vocabulary. This is the shared base reused
+ * by `isShortAcceptanceOfArmedOwner` (conversationConfirmationGate) for the
+ * armed-owner acceptance question (MA-04) — that predicate composes this plus a
+ * small supplement rather than defining a second vocabulary. Behavior here is
+ * unchanged; do not widen without checking that predicate's callers.
+ */
 export function isBareGenericAcceptance(text: string): boolean {
   return GENERIC_ACCEPTANCE_RE.test(text.trim());
 }
