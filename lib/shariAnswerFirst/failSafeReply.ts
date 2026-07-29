@@ -100,7 +100,7 @@ function isHighStakesFactualQuestion(t: string): boolean {
     /\b(?:medical|medicine|medication|symptom|symptoms|diagnos(?:e|is|ed)|disease|illness|dosage|dose|prescription|treat(?:ment)?|therapy|fever|infection|mental health)\b/.test(
       t,
     ) ||
-    /\b(?:invest(?:ing|ment)?\s+in\s+(?:stocks?|shares?|crypto|the market|securities)|buy(?:ing)?\s+stocks?|which\s+stock|retirement account|401\(?k\)?|\bira\b|securities|portfolio allocation|cryptocurrenc)\b/.test(
+    /\b(?:invest(?:ing|ment)?\s+in\s+(?:stocks?|shares?|crypto|the market|securities)|buy(?:ing)?\s+stocks?|which\s+stock|stock market|index funds?|mutual funds?|\betf\b|securities|retirement account|401\(?k\)?|\bira\b|roth|pension|annuity|portfolio allocation|cryptocurrenc|bitcoin|insurance)\b/.test(
       t,
     )
   );
@@ -290,7 +290,12 @@ export function buildAnswerFirstFailSafeReply(
       break;
     case "advice":
     case "comparison":
-      body = adviceFailSafe(userText);
+      // Same high-stakes honesty rule as the how-to path: a legal / tax /
+      // medical / regulated-finance / insurance decision must not get an
+      // invented or authoritative-sounding recommendation from the fallback.
+      body = isHighStakesFactualQuestion(userText.toLowerCase())
+        ? highStakesSafeFailSafe(userText)
+        : adviceFailSafe(userText);
       break;
     case "brainstorming":
       body = brainstormFailSafe(userText);
