@@ -11,6 +11,7 @@ import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { shouldEnterUniversalCreation } from "@/lib/universalCreation";
 import { isRegistryArtifactExecution } from "@/lib/artifactRegistry";
 import { isSimpleCreateRequest } from "@/lib/universalCreation/createFastPath";
+import { isExploratoryCreation } from "@/lib/createIntent/creationExecutionEligibility";
 import type { CompanionActiveSession } from "@/lib/companionIntelligence/activeSession";
 
 export type ConversationGoal =
@@ -176,16 +177,22 @@ export function classifyConversationGoal(
 
   if (isCaptureIntent(t, context)) return "capture";
 
+  // Shared authority: an exploratory / descriptive / evaluative use of "create"
+  // may not open Create even if a create sub-predicate fires. Trusted UI /
+  // research handoffs do not reach this natural-language path.
+  const createEligible = !isExploratoryCreation(t);
+
   if (
-    isProjectCreationIntent(t) ||
-    isRegistryArtifactExecution(t) ||
-    shouldEnterUniversalCreation(t) ||
-    isSimpleCreateRequest(t)
+    createEligible &&
+    (isProjectCreationIntent(t) ||
+      isRegistryArtifactExecution(t) ||
+      shouldEnterUniversalCreation(t) ||
+      isSimpleCreateRequest(t))
   ) {
     return "create";
   }
 
-  if (isTemplateIntent(t)) return "create";
+  if (createEligible && isTemplateIntent(t)) return "create";
 
   if (isResearchIntent(t)) return "research";
 

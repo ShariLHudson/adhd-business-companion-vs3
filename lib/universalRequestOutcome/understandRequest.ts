@@ -10,6 +10,7 @@ import {
   isCreateRejection,
   mentionsCreateDeliverable,
 } from "@/lib/createIntentVocabulary";
+import { isExploratoryCreation } from "@/lib/createIntent/creationExecutionEligibility";
 
 function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random()
@@ -129,24 +130,6 @@ function detectFamily(t: string): UniversalCreationFamily {
   return "unknown";
 }
 
-/**
- * The request is *talking about* creating, not commanding it now: first-person
- * aspiration ("I want to", "my goal is to"), consideration ("thinking about",
- * "considering"), evaluation ("whether to", "should I", "help me decide"),
- * ideation / capability questions ("what could I", "ideas for", "how can I",
- * "what does it take to"), and attribution / incidental use ("who created",
- * "this could create"). A detected creation family in such a sentence names a
- * KIND of thing but is not execution intent — it must not open Create. The
- * boundary here is exploration-vs-execution, not an arbitrary phrase list, and
- * an explicit research→creation handoff still overrides it.
- */
-const EXPLORATORY_CREATION_FRAMING_RE =
-  /\b(?:i\s+(?:want|'?d\s+like|would\s+like|hope|'?d\s+love|would\s+love|plan|intend|aim|wish)\s+to|my\s+goal\s+is\s+to|i'?m\s+(?:hoping|planning|thinking|wanting)\s+(?:to|about)|i'?ve\s+(?:been\s+(?:thinking|wanting)|always\s+wanted)|thinking\s+about|think\s+i\s+(?:might|could|should|want)|considering|toying\s+with|maybe\s+i|whether\s+(?:to|i\s+should)|should\s+i|help\s+me\s+decide|deciding\s+whether|trying\s+to\s+decide|is\s+it\s+worth|do\s+you\s+think\s+i\s+should|what\s+(?:could|should|can|do|would|kind\s+of|type\s+of)\s+i|ideas?\s+(?:for|to)\b|brainstorm|how\s+(?:can|do|would|should)\s+i|what\s+does\s+it\s+take\s+to|what\s+goes\s+into|what'?s\s+involved\s+in|(?:could|can|should|would|do|might)\s+i\s+(?:create|make|build|write|draft|design|produce|generate|come\s+up\s+with)|who\s+(?:created|made|makes|built|designed)|(?:this|that|it)\s+(?:could|would|might|can)\s+(?:create|cause))\b/i;
-
-function isExploratoryCreationFraming(t: string): boolean {
-  return EXPLORATORY_CREATION_FRAMING_RE.test(t);
-}
-
 function isSeriesOrMulti(t: string, duration: ReturnType<typeof parseDuration>, qty: number | null): boolean {
   if (duration && duration.value >= 2) return true;
   if (qty && qty >= 2) return true;
@@ -237,15 +220,14 @@ export function understandUniversalRequest(
   const duration = parseDuration(t);
   const quantity = parseQuantity(t);
   const detectedFamily = detectFamily(t);
-  // An exploratory / aspirational framing must not let a family keyword promote
-  // to create intent ("I'm thinking about creating a course" names a curriculum
-  // but is not a request to build one). An explicit handoff overrides this.
+  // Shared Create authority: an exploratory / descriptive / evaluative framing
+  // ("I'm thinking about creating a course", "what kind of report could I create
+  // from this?") is not execution intent — even a concrete deliverable noun or a
+  // creation family must not promote it to create. An explicit handoff overrides.
+  const exploratoryVeto =
+    isExploratoryCreation(t) && options?.explicitCreateHandoff !== true;
   const family: UniversalCreationFamily =
-    detectedFamily !== "unknown" &&
-    isExploratoryCreationFraming(t) &&
-    options?.explicitCreateHandoff !== true
-      ? "unknown"
-      : detectedFamily;
+    detectedFamily !== "unknown" && exploratoryVeto ? "unknown" : detectedFamily;
   const multi = isSeriesOrMulti(t, duration, quantity);
 
   const wantsResearch = /\b(research|current|latest|now|best practices)\b/.test(
@@ -259,6 +241,7 @@ export function understandUniversalRequest(
     /\b(?:create|build|make|write|draft|design|produce|generate)\b/.test(t);
   const wantsCreate =
     !isCreateRejection(t) &&
+    !exploratoryVeto &&
     (family !== "unknown" ||
       (hasCreateVerb &&
         (mentionsCreateDeliverable(t) ||

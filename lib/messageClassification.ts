@@ -14,6 +14,7 @@ import {
   isCreateRejection,
   mentionsCreateDeliverable,
 } from "./createIntentVocabulary";
+import { isExploratoryCreation } from "./createIntent/creationExecutionEligibility";
 
 export type MessageCategory =
   | "emotional_distress"
@@ -443,6 +444,9 @@ export function shouldAutoOpenWorkspaceBeforeChat(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
   if (isInformationIntent(t)) return false;
+  // Shared Create authority: exploratory / descriptive natural-language creation
+  // never auto-opens a workspace (trusted UI / research handoffs use other paths).
+  if (isExploratoryCreation(t)) return false;
   if (isExplicitCreationRequest(t)) return true;
   if (isExplicitProjectRequest(t)) return true;
   if (isExplicitWorkspaceOpenRequest(t)) return true;

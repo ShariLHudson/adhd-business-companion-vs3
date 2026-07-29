@@ -15,6 +15,7 @@ import {
 } from "@/lib/artifactIntent";
 import { resolveImmediateCreateAction } from "@/lib/createExperience/createExperienceRouting";
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
+import { isExploratoryCreation } from "@/lib/createIntent/creationExecutionEligibility";
 import { isEmailAutomationOrInboxHelpRequest } from "@/lib/estate/emailAutomationHelp";
 import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
 import { shouldOfferVisualThinkingRecommendation } from "@/lib/visualThinkingOverreach";
@@ -188,6 +189,9 @@ export function detectUniversalDocumentType(
 export function shouldEnterUniversalCreation(userText: string): boolean {
   const t = userText.trim();
   if (!t || EXPLICIT_ROOM_NAV_RE.test(t)) return false;
+  // Shared Create authority: an exploratory / descriptive / evaluative use of
+  // "create" never enters universal creation on its own (no provenance here).
+  if (isExploratoryCreation(t)) return false;
   if (isEmailAutomationOrInboxHelpRequest(t)) return false;
   if (isProjectCreationIntent(t)) return false;
   if (isGoogleSheetWorthyRequest(t)) return false;
