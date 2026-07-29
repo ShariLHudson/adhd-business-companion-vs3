@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type {
   DailyOpeningChoiceCard,
   DailyOpeningChoiceId,
@@ -80,6 +81,152 @@ type Props =
   | HelpSupportProps
   | HelpfulLessonProps
   | MeaningfulStartProps;
+
+/**
+ * Show Me Something Helpful — one calm guided-discovery suggestion at a time.
+ * Renders title, a multi-sentence explanation, an optional why-now line, a
+ * primary action, an in-place "Tell me more" expansion, and "Something else".
+ * "Tell me more" only reveals detail — it never saves, navigates, or creates.
+ */
+function HelpfulLessonCard({
+  lesson,
+  onShowMe,
+  onSomethingElse,
+  onMaybeLater,
+}: {
+  lesson: HelpfulLesson;
+  onShowMe: () => void;
+  onSomethingElse: () => void;
+  onMaybeLater: () => void;
+}) {
+  const [tellMeMoreOpen, setTellMeMoreOpen] = useState(false);
+  // Collapse the expansion whenever the suggestion changes (e.g. "Something else").
+  useEffect(() => {
+    setTellMeMoreOpen(false);
+  }, [lesson.id]);
+
+  const explanation = lesson.explanation?.trim() || lesson.shortExplanation;
+  const whyNow = lesson.whyNow?.trim() || null;
+  const primaryLabel =
+    lesson.primaryActionLabel?.trim() || lesson.actionLabel || "Show Me";
+  const more = lesson.tellMeMore;
+  const hasTellMeMore = Boolean(
+    more &&
+      (more.whatItDoes ||
+        more.howItHelps ||
+        more.whatToExpect ||
+        more.timeEstimate ||
+        typeof more.optional === "boolean"),
+  );
+
+  return (
+    <section
+      className="global-daily-opening todays-welcome-card"
+      data-testid="todays-welcome-card"
+      data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
+      data-mode="show-something-helpful"
+      aria-label="Show me something helpful"
+    >
+      <header className="global-daily-opening__header">
+        <p className="global-daily-opening__eyebrow">Something helpful</p>
+        <h2
+          className="global-daily-opening__title"
+          data-testid="helpful-lesson-title"
+        >
+          {lesson.title}
+        </h2>
+      </header>
+
+      <div
+        className="global-daily-opening__lesson"
+        data-testid="helpful-lesson-offer"
+      >
+        <p
+          className="global-daily-opening__lesson-body"
+          data-testid="helpful-lesson-explanation"
+        >
+          {explanation}
+        </p>
+        {whyNow ? (
+          <p
+            className="global-daily-opening__lesson-why-now"
+            data-testid="helpful-lesson-why-now"
+          >
+            {whyNow}
+          </p>
+        ) : null}
+
+        {tellMeMoreOpen && hasTellMeMore ? (
+          <div
+            className="global-daily-opening__lesson-more"
+            data-testid="helpful-lesson-tell-me-more"
+          >
+            {more?.whatItDoes ? (
+              <p className="global-daily-opening__lesson-more-line">
+                {more.whatItDoes}
+              </p>
+            ) : null}
+            {more?.howItHelps ? (
+              <p className="global-daily-opening__lesson-more-line">
+                {more.howItHelps}
+              </p>
+            ) : null}
+            {more?.whatToExpect ? (
+              <p className="global-daily-opening__lesson-more-line">
+                {more.whatToExpect}
+              </p>
+            ) : null}
+            {typeof more?.optional === "boolean" || more?.timeEstimate ? (
+              <p className="global-daily-opening__lesson-more-meta">
+                {more?.optional ? "This step is optional." : null}
+                {more?.optional && more?.timeEstimate ? " " : null}
+                {more?.timeEstimate ? `About ${more.timeEstimate}.` : null}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="global-daily-opening__discovery-actions">
+        <button
+          type="button"
+          className="global-daily-opening__discovery-primary"
+          onClick={onShowMe}
+          data-testid="helpful-lesson-show-me"
+        >
+          {primaryLabel}
+        </button>
+        {hasTellMeMore ? (
+          <button
+            type="button"
+            className="global-daily-opening__discovery-secondary"
+            onClick={() => setTellMeMoreOpen((open) => !open)}
+            data-testid="helpful-lesson-tell-me-more-toggle"
+            aria-expanded={tellMeMoreOpen}
+          >
+            {tellMeMoreOpen ? "Show less" : "Tell me more"}
+          </button>
+        ) : null}
+        <button
+          type="button"
+          className="global-daily-opening__discovery-secondary"
+          onClick={onSomethingElse}
+          data-testid="helpful-lesson-something-else"
+        >
+          Something else
+        </button>
+        <button
+          type="button"
+          className="global-daily-opening__back"
+          onClick={onMaybeLater}
+          data-testid="helpful-lesson-maybe-later"
+        >
+          Maybe later
+        </button>
+      </div>
+    </section>
+  );
+}
 
 /**
  * Today's Welcome Card — shared Global Daily Companion Opening.
@@ -257,59 +404,13 @@ export function TodaysWelcomeCard(props: Props) {
   }
 
   if (props.mode === "show-something-helpful") {
-    const { lesson } = props;
     return (
-      <section
-        className="global-daily-opening todays-welcome-card"
-        data-testid="todays-welcome-card"
-        data-daily-opening-version={TODAYS_WELCOME_CARD_VERSION}
-        data-mode="show-something-helpful"
-        aria-label="Show me something helpful"
-      >
-        <header className="global-daily-opening__header">
-          <p className="global-daily-opening__eyebrow">Shari</p>
-          <h2 className="global-daily-opening__title">
-            Here&apos;s something that may be useful
-          </h2>
-        </header>
-
-        <div
-          className="global-daily-opening__lesson"
-          data-testid="helpful-lesson-offer"
-        >
-          <p className="global-daily-opening__lesson-title">{lesson.title}</p>
-          <p className="global-daily-opening__lesson-body">
-            {lesson.shortExplanation}
-          </p>
-        </div>
-
-        <div className="global-daily-opening__discovery-actions">
-          <button
-            type="button"
-            className="global-daily-opening__discovery-primary"
-            onClick={props.onShowMe}
-            data-testid="helpful-lesson-show-me"
-          >
-            {lesson.actionLabel || "Show Me"}
-          </button>
-          <button
-            type="button"
-            className="global-daily-opening__discovery-secondary"
-            onClick={props.onSomethingElse}
-            data-testid="helpful-lesson-something-else"
-          >
-            Something Else
-          </button>
-          <button
-            type="button"
-            className="global-daily-opening__back"
-            onClick={props.onMaybeLater}
-            data-testid="helpful-lesson-maybe-later"
-          >
-            Maybe Later
-          </button>
-        </div>
-      </section>
+      <HelpfulLessonCard
+        lesson={props.lesson}
+        onShowMe={props.onShowMe}
+        onSomethingElse={props.onSomethingElse}
+        onMaybeLater={props.onMaybeLater}
+      />
     );
   }
 

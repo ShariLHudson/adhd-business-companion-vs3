@@ -146,6 +146,24 @@ export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
       "Clarify who you serve so suggestions for offers, content, and messaging stay grounded.",
     destinationId: "people-i-help",
     actionLabel: "Show Me",
+    category: "client-profile",
+    completionArea: "people-i-help",
+    explanation:
+      "This is where you describe who your business serves — the people you help, what they're working through, and what they're hoping for. When Spark understands your audience, ideas, writing, offers, and strategy can fit the right people instead of staying generic.",
+    whyNow:
+      "Even a rough first pass gives every later conversation something real to build on.",
+    primaryActionLabel: "Open People I Help",
+    tellMeMore: {
+      whatItDoes:
+        "People I Help holds a simple picture of your ideal clients — who they are, what they need, and what matters to them.",
+      howItHelps:
+        "Spark uses it quietly in the background, so suggestions and drafts speak to your actual audience instead of a generic one.",
+      whatToExpect:
+        "You can add as little or as much as you like, and come back to refine it any time.",
+      optional: true,
+      timeEstimate: "5 minutes",
+    },
+    lifecycleWindows: ["days-1-14", "days-15-30"],
     eligibility: { tags: ["business"] },
   },
   {
