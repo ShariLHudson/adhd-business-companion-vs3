@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   CREATE_CANONICAL_DESTINATION_NAME,
   createNavigationArrivalMessage,
+  immediateCreateOpenRendersPlaceholder,
   isCreateDestinationSection,
 } from "./createNavigationAcknowledgement";
 import { CREATE_ROOM_PREPARED_STATE_MESSAGE } from "./blockLegacyCreateWorkspaceRouting";
@@ -101,5 +102,133 @@ describe("direct-navigation assembly — Create renders only the placeholder", (
     expect(renderDirectNavTurn({ section: "boardroom", label: "Round Table" })).toEqual([
       "Let's go to the Round Table.",
     ]);
+  });
+});
+
+// ── Path A: frictionless immediateCreateOpen ────────────────────────────────
+
+describe("immediateCreateOpen placeholder ownership", () => {
+  it("a blocked create (marketing plan) renders the placeholder", () => {
+    expect(
+      immediateCreateOpenRendersPlaceholder({
+        userText: "create a marketing plan for my adhd business",
+      }),
+    ).toBe(true);
+  });
+  it("a document-guided create (SOP) does NOT render the placeholder", () => {
+    expect(
+      immediateCreateOpenRendersPlaceholder({
+        userText: "create an SOP for onboarding",
+        itemType: "SOP",
+      }),
+    ).toBe(false);
+  });
+});
+
+/**
+ * Simulate the CompanionPageClient immediateCreateOpen assembly: the general
+ * voiced reply ("I can help you build that in Create.") is suppressed when the
+ * placeholder will render; completeImmediateCreateOpen posts the placeholder.
+ */
+function renderImmediateCreateOpenTurn(input: {
+  userText: string;
+  itemType?: string | null;
+  voicedReply: string;
+}): string[] {
+  const messages: string[] = [];
+  const pushDedup = (line: string) => {
+    if (!messages.includes(line)) messages.push(line);
+  };
+  const rendersPlaceholder = immediateCreateOpenRendersPlaceholder(input);
+  // Post A — general voiced reply (suppressed when the placeholder will render).
+  if (!rendersPlaceholder) messages.push(input.voicedReply);
+  // completeImmediateCreateOpen posts the placeholder for the dead-end.
+  if (rendersPlaceholder) pushDedup(createNavigationArrivalMessage());
+  return messages;
+}
+
+describe("immediate creation execution — one arrival response", () => {
+  const VOICED = "I can help you build that in Create.";
+
+  it("1-4. 'create a marketing plan' produces only the placeholder (no voiced reply)", () => {
+    const rendered = renderImmediateCreateOpenTurn({
+      userText: "create a marketing plan for my adhd business",
+      voicedReply: VOICED,
+    });
+    expect(rendered).toEqual([createNavigationArrivalMessage()]);
+    expect(rendered).not.toContain(VOICED);
+  });
+
+  it("5. a document-guided create keeps its voiced reply (functioning destination)", () => {
+    const rendered = renderImmediateCreateOpenTurn({
+      userText: "create an SOP for onboarding",
+      itemType: "SOP",
+      voicedReply: VOICED,
+    });
+    expect(rendered).toEqual([VOICED]);
+  });
+});
+
+// ── Path B: pending immediateEstatePlaceNavigate ────────────────────────────
+
+/**
+ * Simulate the CompanionPageClient immediateEstatePlaceNavigate assembly: a
+ * Create destination suppresses the transition line + duplicate reply and posts
+ * only the placeholder; any other room keeps its acknowledgement unchanged.
+ */
+function renderPendingNavTurn(command: {
+  section: string;
+  navigationLine: string;
+  localReply: string;
+}): string[] {
+  const messages: string[] = [];
+  const pushDedup = (line: string) => {
+    if (!messages.includes(line)) messages.push(line);
+  };
+  const createArrival = isCreateDestinationSection(command.section);
+  // runDirectEstateRoomNavigation posts navigationLine unless skipAssistantMessage.
+  if (!createArrival) messages.push(command.navigationLine);
+  if (createArrival) pushDedup(createNavigationArrivalMessage());
+  else messages.push(command.localReply);
+  return messages;
+}
+
+describe("pending navigation confirmation — one Create arrival response", () => {
+  it("6-10. pending Create nav ('go') shows only the placeholder, no 'Creative Studio'", () => {
+    const rendered = renderPendingNavTurn({
+      section: "create",
+      navigationLine: "Taking you to Creative Studio.",
+      localReply: "Taking you to Creative Studio.",
+    });
+    expect(rendered).toEqual([createNavigationArrivalMessage()]);
+    expect(rendered.join(" ")).not.toMatch(/Creative Studio/i);
+    expect(rendered.join(" ")).not.toMatch(/Taking you to/i);
+  });
+
+  it("15. unrelated pending Estate navigation is unchanged", () => {
+    const rendered = renderPendingNavTurn({
+      section: "boardroom",
+      navigationLine: "Taking you to the Round Table.",
+      localReply: "Taking you to the Round Table.",
+    });
+    expect(rendered).toContain("Taking you to the Round Table.");
+    expect(rendered).not.toContain(createNavigationArrivalMessage());
+  });
+
+  it("13. placeholder is not duplicated across optimistic/reconciled posts", () => {
+    // Both immediateCreateOpen and immediateEstatePlaceNavigate render one only.
+    expect(
+      renderImmediateCreateOpenTurn({
+        userText: "create a marketing plan for my adhd business",
+        voicedReply: "x",
+      }),
+    ).toHaveLength(1);
+    expect(
+      renderPendingNavTurn({
+        section: "content-generator",
+        navigationLine: "Taking you to Creative Studio.",
+        localReply: "Taking you to Creative Studio.",
+      }),
+    ).toHaveLength(1);
   });
 });

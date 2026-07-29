@@ -15,7 +15,11 @@
  * user-visible strings.
  */
 
-import { CREATE_ROOM_PREPARED_STATE_MESSAGE } from "./blockLegacyCreateWorkspaceRouting";
+import {
+  CREATE_ROOM_PREPARED_STATE_MESSAGE,
+  isUnreadyCreateRoomRoutingIntent,
+  resolveLegacyCreateWorkspaceGuard,
+} from "./blockLegacyCreateWorkspaceRouting";
 
 /** Approved user-visible name for the Create destination. */
 export const CREATE_CANONICAL_DESTINATION_NAME = "Create";
@@ -39,4 +43,29 @@ export function isCreateDestinationSection(
  */
 export function createNavigationArrivalMessage(): string {
   return CREATE_ROOM_PREPARED_STATE_MESSAGE;
+}
+
+/**
+ * True when a frictionless `immediateCreateOpen` will land on the unfinished
+ * Create dead-end and render the prepared-state placeholder — mirrors
+ * `completeImmediateCreateOpen`. When true the placeholder OWNS the arrival, so
+ * the general voiced reply ("I can help you build that in Create.") must not be
+ * appended for the same event. Document-guided creates (which open the guided
+ * flow, not the placeholder) return false so their voiced reply is preserved.
+ */
+export function immediateCreateOpenRendersPlaceholder(input: {
+  userText: string;
+  itemType?: string | null;
+  alreadyOpen?: boolean;
+}): boolean {
+  if (isUnreadyCreateRoomRoutingIntent(input.userText, input.itemType ?? null)) {
+    return false;
+  }
+  const guard = resolveLegacyCreateWorkspaceGuard({
+    section: "content-generator",
+    userText: input.userText,
+    itemType: input.itemType ?? null,
+    alreadyOpen: input.alreadyOpen,
+  });
+  return guard.kind === "prepared_state";
 }

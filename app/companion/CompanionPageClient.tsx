@@ -1797,6 +1797,7 @@ import {
 } from "@/lib/estateIntelligence/estateCommandRouter";
 import {
   createNavigationArrivalMessage,
+  immediateCreateOpenRendersPlaceholder,
   isCreateDestinationSection,
 } from "@/lib/createExperience/createNavigationAcknowledgement";
 import {
@@ -14187,11 +14188,27 @@ export default function CompanionPageClient() {
     if (activeChatTurnLifecycleRef.current) {
       markAssistantReplied(activeChatTurnLifecycleRef.current);
     }
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: voicedLocalReply },
-    ]);
-    recordPrimaryTurnResponse(voicedLocalReply);
+    // Create arrival ownership: when this frictionless immediateCreateOpen will
+    // render the prepared-state placeholder (an unfinished Create dead-end), the
+    // placeholder is the single user-visible arrival — do not also append the
+    // general voiced reply ("I can help you build that in Create."). Voiced
+    // replies for functioning destinations / non-Create actions are untouched.
+    const suppressCreateVoicedReply =
+      Boolean(frictionlessAction.immediateCreateOpen) &&
+      immediateCreateOpenRendersPlaceholder({
+        userText: frictionlessAction.immediateCreateOpen!.userText,
+        itemType: frictionlessAction.immediateCreateOpen!.artifact.itemType,
+        alreadyOpen: workspacePanelRef.current === "content-generator",
+      });
+    if (suppressCreateVoicedReply) {
+      recordPrimaryTurnResponse(createNavigationArrivalMessage());
+    } else {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: voicedLocalReply },
+      ]);
+      recordPrimaryTurnResponse(voicedLocalReply);
+    }
 
     const chamberMemberConversationLocked = isChamberMemberConversationActive({
       activeSection: activeSectionRef.current,
@@ -14305,17 +14322,29 @@ export default function CompanionPageClient() {
         payload.placeId,
         payload.userText,
       );
+      // Same Create arrival ownership as the direct-navigation path: a pending
+      // confirmation that lands on Create shows only the placeholder — no
+      // "Taking you to Creative Studio" transition line and no duplicate reply.
+      // Non-Create Estate navigation keeps its existing acknowledgement.
+      const createArrival = command
+        ? isCreateDestinationSection(command.section)
+        : false;
       if (command) {
         runDirectEstateRoomNavigation(
           command,
           payload.userText,
           payload.navigationLine,
+          createArrival ? { skipAssistantMessage: true } : undefined,
         );
       }
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: frictionlessAction.localReply! },
-      ]);
+      if (createArrival) {
+        postCreateTransparencyMessage(createNavigationArrivalMessage());
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: frictionlessAction.localReply! },
+        ]);
+      }
       setInput("");
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
