@@ -10,6 +10,10 @@ import { isChatConversationOnlyMode } from "./chatConversationOnly";
 import { isHelpSeekingAnswer } from "./builderContentSync";
 import { isInformationIntent } from "./companionIntentRouting";
 import { isExplicitWorkspaceOpenRequest } from "./conversationGating";
+import {
+  isCreateRejection,
+  mentionsCreateDeliverable,
+} from "./createIntentVocabulary";
 
 export type MessageCategory =
   | "emotional_distress"
@@ -84,11 +88,18 @@ const CONTENT_BRAINSTORM_RE =
 const CONTENT_TYPE_MENTION_RE =
   /\b(?:facebook|fb|instagram|ig|linkedin|social media|twitter|tiktok|youtube|post|email|newsletter|blog|caption|script|sales page|landing page|proposal|content|message)\b/i;
 
+// Self-contained create phrases: pronoun forms ("write it") and deliverable-named
+// forms. The broad "make/generate/help-me-write + article" alternatives were
+// removed — they matched ordinary talk like "make the pasta" / "make a decision".
 const EXPLICIT_CREATE_RE =
-  /\b(?:write it|draft it|draft one|create it|generate it|build (?:the |a )?(?:post|draft|email|script|content)|open create|start (?:the )?draft|start drafting|create draft|build draft|help me write (?:the|my|a )|make (?:the|my|a )|generate (?:the|my|a )|create the post|generate the post|draft the post|write the post)\b/i;
+  /\b(?:write it|draft it|draft one|create it|generate it|build (?:the |a )?(?:post|draft|email|script|content)|open create|start (?:the )?draft|start drafting|create draft|build draft|create the post|generate the post|draft the post|write the post)\b/i;
 
+// Imperative create opener. A match here is only treated as a create request when
+// a concrete deliverable is also present (see isExplicitCreationRequest), so
+// "make the pasta" / "create the momentum" no longer qualify while "make me an
+// SOP" / "create a proposal" still do.
 const EXPLICIT_CREATE_IMPERATIVE_RE =
-  /^(?:please\s+)?(?:write|draft|create|generate|build)\s+(?:the|my|a|this|that)\b/i;
+  /^(?:please\s+)?(?:write|draft|create|generate|build|make|design|put together)\s+(?:me\s+)?(?:the|my|a|an|this|that|some)?\s*/i;
 
 const EXPLICIT_CREATE_THE_RE =
   /\b(?:write|draft|create|generate)\s+(?:the|my|a|this)\s+(?:\w+\s+){0,2}(?:post|email|draft|script|content|proposal|newsletter|linkedin|message|copy|page)\b/i;
@@ -443,6 +454,10 @@ export function shouldAutoOpenWorkspaceBeforeChat(text: string): boolean {
 export function isExplicitCreationRequest(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  // A sentence that rejects Create (or asks to stay in conversation) is never a
+  // create request — even when it literally contains the word "create".
+  if (isCreateRejection(t)) return false;
+
   const weakCreatePhrase =
     /\b(?:need to|want to|have to|should|i need to|i want to)\s+(?:write|draft|create|build|generate)\b/i.test(
       t,
@@ -450,9 +465,31 @@ export function isExplicitCreationRequest(text: string): boolean {
   if (weakCreatePhrase && !EXPLICIT_CREATE_IMPERATIVE_RE.test(t)) {
     return false;
   }
+  // Self-contained pronoun / deliverable-named phrases.
   if (EXPLICIT_CREATE_RE.test(t)) return true;
-  if (EXPLICIT_CREATE_IMPERATIVE_RE.test(t)) return true;
   if (EXPLICIT_CREATE_THE_RE.test(t)) return true;
+  // Unmistakable artifact requests.
+  if (/\bwrite this (?:up |out )?for me\b/i.test(t)) return true;
+  if (
+    /\b(?:turn|make|put|format)\s+(?:this|it)\s+(?:in)?to\s+(?:a |an |the )?/i.test(
+      t,
+    ) &&
+    mentionsCreateDeliverable(t)
+  ) {
+    return true;
+  }
+  if (
+    /\bsave\s+(?:this|it)\s+as\s+(?:a |an |the )?/i.test(t) &&
+    mentionsCreateDeliverable(t)
+  ) {
+    return true;
+  }
+  // An imperative create verb ("make/create/build/write/draft …") only counts as
+  // a Create request when a concrete deliverable object is present, so cooking or
+  // ordinary "make the …" language does not route to Create.
+  if (EXPLICIT_CREATE_IMPERATIVE_RE.test(t) && mentionsCreateDeliverable(t)) {
+    return true;
+  }
   if (/\bopen (?:the )?create\b/i.test(t)) return true;
   if (isExplicitWorkspaceOpenRequest(t) && /\bcreate\b/i.test(t)) return true;
   return false;

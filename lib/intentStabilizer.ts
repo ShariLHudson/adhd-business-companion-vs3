@@ -7,6 +7,10 @@ import {
   isContentBrainstorming,
   shouldSuppressCreatePending,
 } from "./messageClassification";
+import {
+  isCreateRejection,
+  mentionsCreateDeliverable,
+} from "./createIntentVocabulary";
 
 export type IntentAction = "chat" | "make" | "stabilize" | "edit-draft";
 
@@ -206,11 +210,22 @@ export function effectiveIntentText(text: string): {
 }
 
 export function hasCreateIntent(text: string): boolean {
+  // A Create rejection ("I don't need the create room") must never retrigger
+  // Create, even though it contains the word "create".
+  if (isCreateRejection(text)) return false;
   if (isInformationIntent(text)) return false;
   if (isContentBrainstorming(text)) return false;
   if (isExplicitCreationRequest(text)) return true;
   if (shouldSuppressCreatePending(text)) return false;
-  if (CREATE_VERB_RE.test(text)) return true;
+  // A bare create verb ("create"/"write"/"build"/"start") only counts with a
+  // concrete deliverable or a known Create catalog type — so the word "create"
+  // alone (or "start …") no longer forces a create turn.
+  if (
+    CREATE_VERB_RE.test(text) &&
+    (findLastMakeType(text) !== null || mentionsCreateDeliverable(text))
+  ) {
+    return true;
+  }
   if (NEED_WANT_DELIVERABLE_RE.test(text) && findLastMakeType(text)) return true;
   if (MAKE_DELIVERABLE_RE.test(text) && findLastMakeType(text)) return true;
   if (/\bhelp me\b/i.test(text) && findLastMakeType(text)) return true;
@@ -315,13 +330,18 @@ export function resolveIntent(
 
   const type = findLastMakeType(scope);
   const hasCreate = hasCreateIntent(rawText);
+  // A bare create verb ("write"/"draft"/"build"/…) is enough to STABILIZE (ask
+  // which deliverable) even though it is no longer enough to OPEN Create.
+  // Stabilize is a chat outcome, so this never routes to Create on its own.
+  // CREATE_VERB_RE excludes "make", so "make the pasta" stays plain chat.
+  const hasCreateVerb = CREATE_VERB_RE.test(rawText);
   const vague =
     VAGUE_CREATE.test(rawText) ||
-    (hasCreate &&
+    ((hasCreate || hasCreateVerb) &&
       !type &&
       /\b(something|anything|stuff|content|message)\b/i.test(rawText));
 
-  if (vague && hasCreate) {
+  if (vague && (hasCreate || hasCreateVerb)) {
     return buildIntent("stabilize", rawText, {
       confidence: 0.55,
       reason: "vague create intent — pick type",

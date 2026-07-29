@@ -6,6 +6,10 @@ import type {
   UniversalCreationFamily,
   UniversalRequestUnderstanding,
 } from "./types";
+import {
+  isCreateRejection,
+  mentionsCreateDeliverable,
+} from "@/lib/createIntentVocabulary";
 
 function newId(prefix: string): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random()
@@ -211,10 +215,15 @@ export function understandUniversalRequest(
   const wantsResearch = /\b(research|current|latest|now|best practices)\b/.test(
     t,
   );
+  // A create verb only signals create intent when paired with a concrete
+  // deliverable (or a known creation family). Bare "make"/"help me" no longer
+  // qualifies, and a Create rejection never does — so "make the pasta", "help me
+  // make a decision", and "I don't need the create room" are not create turns.
+  const hasCreateVerb =
+    /\b(?:create|build|make|write|draft|design|produce|generate)\b/.test(t);
   const wantsCreate =
-    /\b(create|build|make|write|draft|design|produce|generate|help me)\b/.test(
-      t,
-    ) || family !== "unknown";
+    !isCreateRejection(t) &&
+    (family !== "unknown" || (hasCreateVerb && mentionsCreateDeliverable(t)));
   const wantsInstruct =
     /\b(how (do|to)|step[- ]by[- ]step|teach me|walk me through|show me how)\b/.test(
       t,
