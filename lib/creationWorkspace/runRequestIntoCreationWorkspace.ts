@@ -49,6 +49,10 @@ export function runRequestIntoCreationWorkspace(
 ): CreationWorkspacePipelineResult {
   const universal = runUniversalRequestToOutcome(rawRequest, {
     sourceExperience: options?.sourceExperience ?? "creation_workspace",
+    // An explicit "Use This Research → build …" handoff is explicit creation
+    // intent even without a deliverable noun; the strict classifier still owns
+    // every ordinary turn (fromResearchUse is only set by that explicit action).
+    explicitCreateHandoff: options?.fromResearchUse === true,
   });
 
   const openDecision = decideCreationWorkspaceOpen({

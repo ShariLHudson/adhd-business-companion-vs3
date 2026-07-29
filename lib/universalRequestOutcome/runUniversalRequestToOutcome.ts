@@ -52,9 +52,13 @@ export function runUniversalRequestToOutcome(
     sourceExperience?: string | null;
     /** When false, research-only — skip automatic package generation. */
     generatePackage?: boolean;
+    /** Explicit research→creation handoff — see understandUniversalRequest. */
+    explicitCreateHandoff?: boolean;
   },
 ): UniversalRequestToOutcomeResult {
-  const understanding = understandUniversalRequest(rawRequest);
+  const understanding = understandUniversalRequest(rawRequest, {
+    explicitCreateHandoff: options?.explicitCreateHandoff === true,
+  });
   const interpretationValidation =
     validateRequestInterpretation(understanding);
   const blueprint = buildDynamicCreationBlueprint(understanding);

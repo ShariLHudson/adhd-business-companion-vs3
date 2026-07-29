@@ -204,6 +204,15 @@ function mapCreateArtifactType(
  */
 export function understandUniversalRequest(
   rawRequest: string,
+  options?: {
+    /**
+     * Explicit research→creation handoff (e.g. the user pressed "Use This
+     * Research"). Treats a create-verb request as create intent even without a
+     * concrete deliverable noun. Opt-in only — default behavior keeps the strict
+     * deliverable requirement from 2a34c232.
+     */
+    explicitCreateHandoff?: boolean;
+  },
 ): UniversalRequestUnderstanding {
   const normalizedRequest = normalizeRequest(rawRequest);
   const t = normalizedRequest.toLowerCase();
@@ -223,7 +232,10 @@ export function understandUniversalRequest(
     /\b(?:create|build|make|write|draft|design|produce|generate)\b/.test(t);
   const wantsCreate =
     !isCreateRejection(t) &&
-    (family !== "unknown" || (hasCreateVerb && mentionsCreateDeliverable(t)));
+    (family !== "unknown" ||
+      (hasCreateVerb &&
+        (mentionsCreateDeliverable(t) ||
+          options?.explicitCreateHandoff === true)));
   const wantsInstruct =
     /\b(how (do|to)|step[- ]by[- ]step|teach me|walk me through|show me how)\b/.test(
       t,
