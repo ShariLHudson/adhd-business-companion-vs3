@@ -69,6 +69,12 @@ type Props = {
   card: SparkNoteDailyCard;
   onClose: () => void;
   onOpenCollection: () => void;
+  /**
+   * Optional — when provided, shows a "Show me another" control that requests a
+   * different eligible Spark. Used by the Welcome "Show Me Something Helpful"
+   * launcher; the always-on corner Daily Spark omits it (one card per day).
+   */
+  onSomethingElse?: () => void;
 };
 
 type ViewPhase = "keepsake" | "saved";
@@ -350,7 +356,12 @@ function SparkCardOrnaments() {
 }
 
 /** Daily Spark — illustrated collectible treasure card, not an article panel. */
-export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
+export function SparkNoteExpanded({
+  card,
+  onClose,
+  onOpenCollection,
+  onSomethingElse,
+}: Props) {
   const presentation = useMemo(
     () => resolveSparkCardSimplifiedPresentation(card),
     [card],
@@ -738,6 +749,16 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           className="spark-note-expanded__actions spark-note-expanded__actions--collection"
           aria-label="Spark Card actions"
         >
+          {onSomethingElse ? (
+            <button
+              type="button"
+              className="spark-note-expanded__btn spark-note-expanded__btn--ghost spark-note-expanded__btn--save"
+              onClick={onSomethingElse}
+              data-testid="spark-note-something-else"
+            >
+              Show me another
+            </button>
+          ) : null}
           <button
             type="button"
             className="spark-note-expanded__btn spark-note-expanded__btn--primary spark-note-expanded__btn--save"
