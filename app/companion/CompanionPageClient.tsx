@@ -4888,6 +4888,12 @@ export default function CompanionPageClient() {
    * certification/delivery gate) so no later layer contradicts it.
    */
   const createTurnEnvelopeRef = useRef<CreationTurnEnvelope | null>(null);
+  /**
+   * Intended artifact for an eligible Create request that resolved to
+   * blocked_unavailable (the Create room isn't ready yet) — preserved so the
+   * workspace can be completed later without re-asking the member.
+   */
+  const pendingBlockedCreateArtifactRef = useRef<string | null>(null);
   const [workspaceRevealSeq, setWorkspaceRevealSeq] = useState(0);
   const [brainDumpInitialView, setBrainDumpInitialView] =
     useState<ClearMyMindPanelView>("capture");
@@ -15039,6 +15045,50 @@ export default function CompanionPageClient() {
           );
           runDirectEstateRoomNavigation(command, trimmed, navLine);
         }
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    // Blocked eligible-Create normalization. When the turn is an eligible /
+    // explicit Create request whose artifact cannot open yet (the execution
+    // guard returns prepared_state — the Create room is unfinished), the
+    // prepared-state placeholder is the SINGLE outcome. Preserve the creation
+    // intent: never fall through to the model, a generic "I can help you build
+    // that in Create" ack, a Business Profile gate, or a silent turn. Exploratory
+    // creation is excluded (createEligible === false) and stays conversational.
+    {
+      const createEnv = createTurnEnvelopeRef.current;
+      const blockedCreateGuard =
+        createEnv && createEnv.createEligible && !createEnv.exploratoryCreation
+          ? resolveLegacyCreateWorkspaceGuard({
+              section: "content-generator",
+              userText: trimmed,
+              itemType: createEnv.intendedArtifact,
+              alreadyOpen: workspacePanelRef.current === "content-generator",
+            })
+          : null;
+      if (
+        createEnv &&
+        blockedCreateGuard?.kind === "prepared_state" &&
+        // Never interrupt an in-progress guided creation session.
+        !loadUniversalCreationSession()
+      ) {
+        chatRequestGenerationRef.current += 1;
+        supersedeInFlightChatRequest(chatRequestAbortRef.current);
+        chatRequestAbortRef.current = null;
+        lastUserTextRef.current = trimmed;
+        // Preserve the intended artifact for future workspace completion.
+        pendingBlockedCreateArtifactRef.current = createEnv.intendedArtifact;
+        if (fresh) clearConversation();
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          { role: "user", content: trimmed },
+        ]);
+        setInput("");
+        // Single truthful outcome — the prepared-state placeholder, once.
+        postCreateTransparencyMessage(createNavigationArrivalMessage());
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
