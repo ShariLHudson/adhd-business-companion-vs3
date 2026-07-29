@@ -8381,7 +8381,15 @@ export default function CompanionPageClient() {
     };
 
     let opened = false;
-    if (isHardNav) {
+    // Room navigation opens the Create room directly — the same path hard
+    // navigation uses. It must NOT route through requestCreateOpen, which
+    // re-applies the legacy artifact-panel block (redirectLegacyCreateWorkspace-
+    // IfNeeded → prepared_state) and would return opened=false, skipping
+    // startCreateBuilderChat and leaving the room unmounted. Artifact
+    // unavailability is surfaced inside Create (createRoomEntryRef /
+    // pendingBlockedCreateArtifactRef), never as the global room placeholder.
+    const directOpen = isHardNav || Boolean(opts?.roomNavigation);
+    if (directOpen) {
       executeCreateOpenInternal(CREATE_PANEL_SECTION, createInput, {
         silent: true,
         userInitiated: true,
@@ -8394,7 +8402,9 @@ export default function CompanionPageClient() {
       publishLiveWorkspaceTrace("after_request_create_open", {
         command: opts?.hardNavCommand ?? prompt,
         createOpenRequest: false,
-        note: "hard_nav direct executeCreateOpenInternal",
+        note: isHardNav
+          ? "hard_nav direct executeCreateOpenInternal"
+          : "room_navigation direct executeCreateOpenInternal",
       });
     } else {
       opened = requestCreateOpen(
