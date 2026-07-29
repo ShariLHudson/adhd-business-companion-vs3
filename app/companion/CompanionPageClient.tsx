@@ -21902,13 +21902,32 @@ export default function CompanionPageClient() {
             fromChat.itemType,
             fromChat.title,
           );
-          setMessages((prev) => {
-            const next = [...prev];
-            if (next.length > 0 && next[next.length - 1]?.role === "assistant") {
-              next[next.length - 1] = { role: "assistant", content: handoff };
-            }
-            return next;
-          });
+          // One truthful Create execution outcome. Only claim the workspace
+          // ("that's your workspace") when the artifact open will actually
+          // succeed. When the Create room is blocked/unfinished the open is
+          // redirected to the prepared-state placeholder — so we must NOT
+          // pre-post the success handoff (that produced the contradictory
+          // "…is in Create here now" + "still being prepared" pair).
+          const createWillOpen =
+            resolveLegacyCreateWorkspaceGuard({
+              section: "content-generator",
+              userText: trimmed,
+              itemType: fromChat.itemType,
+              alreadyOpen:
+                workspacePanelRef.current === "content-generator",
+            }).kind !== "prepared_state";
+          if (createWillOpen) {
+            setMessages((prev) => {
+              const next = [...prev];
+              if (
+                next.length > 0 &&
+                next[next.length - 1]?.role === "assistant"
+              ) {
+                next[next.length - 1] = { role: "assistant", content: handoff };
+              }
+              return next;
+            });
+          }
           openCreateWithResolvedArtifact(
             {
               itemType: fromChat.itemType,
