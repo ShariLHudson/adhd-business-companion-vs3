@@ -1991,6 +1991,7 @@ import {
   type ConversationTurnAuthority,
   type ShariResponseDecision,
 } from "@/lib/shariAnswerFirst";
+import { localFallbackMayReplace } from "@/lib/shariAnswerFirst/answerPreservation";
 import {
   buildWorkspaceCoachAutoStart,
   isWorkspaceCoachSilent,
@@ -21591,7 +21592,15 @@ export default function CompanionPageClient() {
               });
             }
           }
-          if (!repaired) {
+          if (
+            localFallbackMayReplace({
+              finalizedAnswer: assistantMsg,
+              hasModelRepair: Boolean(repaired),
+            })
+          ) {
+            // Fallbacks fill absence, not substance: a local generic fail-safe
+            // may only replace an empty / failed / unusable finalized answer —
+            // never a substantive streamed answer that a soft gate merely flagged.
             repaired =
               (shariFollowUp
                 ? buildFollowUpAdaptedReply(trimmed, shariConversationThread)
@@ -21603,6 +21612,15 @@ export default function CompanionPageClient() {
                 reason: "local_failsafe",
               });
             }
+          } else if (!repaired) {
+            // Substantive answer flagged by a soft excellence/style gate but still
+            // usable — preserve it instead of overwriting with a generic template.
+            trackShariAnswerFirstEvent("competing_owner_suppressed", {
+              mode: shariAnswerFirstDecision.primaryHelpMode,
+              reason: "substantive_answer_preserved",
+              excellenceScore: excellence.validation.score,
+              substanceValid: substance.validation.valid,
+            });
           }
           if (repaired) {
             assistantMsg = repaired;
