@@ -138,7 +138,13 @@ function subjectPhrase(text: string): string {
   return capped.charAt(0).toUpperCase() + capped.slice(1);
 }
 
-function howToFailSafe(text: string, decision: ShariResponseDecision): string {
+/**
+ * Definitively low-risk, topic-specific how-to answers. Returns null when none
+ * apply. These stay ahead of the shared high-stakes guard so a networking /
+ * vendor question that merely mentions a lawyer or tax still gets its real
+ * answer (they are inherently low-risk topics).
+ */
+function lowRiskSpecificHowTo(text: string): string | null {
   const t = text.toLowerCase();
   if (/\b(?:vendor|booth|table)\b/.test(t)) return vendorBoothHowTo();
   if (/\bfacebook groups?\b/.test(t)) return facebookGroupsHowTo();
@@ -152,13 +158,20 @@ function howToFailSafe(text: string, decision: ShariResponseDecision): string {
   ) {
     return networkingHowTo();
   }
+  return null;
+}
 
-  // High-stakes factual questions get an honest, non-fabricated safe answer.
-  if (isHighStakesFactualQuestion(t)) return highStakesSafeFailSafe(text);
-
-  // Ordinary low-risk how-to: a concise, subject-named starter — no generic
-  // "clarify success / prepare / decisions / completion check" template, no
-  // awkward echo of the whole question, no compulsory coaching question.
+/**
+ * Ordinary low-risk how-to: a concise, subject-named starter — no generic
+ * "clarify success / prepare / decisions / completion check" template, no
+ * awkward echo of the whole question, no compulsory coaching question. The
+ * specific-topic and high-stakes cases are handled by the shared boundary in
+ * buildAnswerFirstFailSafeReply before this runs.
+ */
+function howToGenericStarter(
+  text: string,
+  decision: ShariResponseDecision,
+): string {
   const subject = subjectPhrase(text);
   const opener =
     decision.answerDepth === "brief"
@@ -276,42 +289,74 @@ export function buildAnswerFirstFailSafeReply(
     }
   }
 
-  let body: string;
-  switch (decision.primaryHelpMode) {
-    // Only genuine procedural intent gets the how-to scaffold. `direct_answer`
-    // is the classifier's catch-all (bare replies, unresolved contextual /
-    // navigation questions like "where did the strategies go"): it must NOT
-    // become a generic how-to lesson — fall through to `default` → null so the
-    // normal conversation path handles it.
-    case "how_to_guidance":
-    case "explanation":
-    case "simple_planning":
-      body = howToFailSafe(userText, decision);
-      break;
-    case "advice":
-    case "comparison":
-      // Same high-stakes honesty rule as the how-to path: a legal / tax /
-      // medical / regulated-finance / insurance decision must not get an
-      // invented or authoritative-sounding recommendation from the fallback.
-      body = isHighStakesFactualQuestion(userText.toLowerCase())
-        ? highStakesSafeFailSafe(userText)
-        : adviceFailSafe(userText);
-      break;
-    case "brainstorming":
-      body = brainstormFailSafe(userText);
-      break;
-    case "troubleshooting":
-      body = troubleshootFailSafe(userText);
-      break;
-    case "research":
-      body = [
-        howToFailSafe(userText, decision),
-        "",
-        "For anything that depends on live availability, prices, or current lists, I’ll be honest when I can’t verify it yet — and still give you the stable method.",
-      ].join("\n");
-      break;
-    default:
-      return null;
+  const mode = decision.primaryHelpMode;
+  const isHowToFamily =
+    mode === "how_to_guidance" ||
+    mode === "explanation" ||
+    mode === "simple_planning" ||
+    mode === "research";
+  // Every substantive-guidance intent that could sound authoritative on a
+  // high-stakes topic. Non-substantive intents (direct_answer catch-all,
+  // reflective, navigation, bare acceptance) are not here — they already
+  // returned null above and must never get the safety disclaimer.
+  const isSubstantiveGuidance =
+    isHowToFamily ||
+    mode === "advice" ||
+    mode === "comparison" ||
+    mode === "brainstorming" ||
+    mode === "troubleshooting";
+
+  let body: string | undefined;
+
+  // Step 1 — definitively low-risk, topic-specific how-to answers keep top
+  // precedence (see lowRiskSpecificHowTo).
+  if (isHowToFamily) {
+    body = lowRiskSpecificHowTo(userText) ?? undefined;
+  }
+
+  // Step 2 — SHARED high-stakes guard. One boundary before any ordinary
+  // substantive branch, so classification (troubleshooting / brainstorming /
+  // planning / explanation / …) can never route a legal / tax / medical /
+  // regulated-finance / insurance question to an authoritative-sounding answer.
+  if (
+    body === undefined &&
+    isSubstantiveGuidance &&
+    isHighStakesFactualQuestion(userText.toLowerCase())
+  ) {
+    body = highStakesSafeFailSafe(userText);
+  }
+
+  // Step 3 — ordinary substantive fallback selection (low-risk only; specific
+  // and high-stakes cases were resolved above). `direct_answer` is the
+  // classifier's catch-all (bare replies, unresolved contextual / navigation
+  // questions): it has no case and falls through to `default` → null.
+  if (body === undefined) {
+    switch (mode) {
+      case "how_to_guidance":
+      case "explanation":
+      case "simple_planning":
+        body = howToGenericStarter(userText, decision);
+        break;
+      case "advice":
+      case "comparison":
+        body = adviceFailSafe(userText);
+        break;
+      case "brainstorming":
+        body = brainstormFailSafe(userText);
+        break;
+      case "troubleshooting":
+        body = troubleshootFailSafe(userText);
+        break;
+      case "research":
+        body = [
+          howToGenericStarter(userText, decision),
+          "",
+          "For anything that depends on live availability, prices, or current lists, I’ll be honest when I can’t verify it yet — and still give you the stable method.",
+        ].join("\n");
+        break;
+      default:
+        return null;
+    }
   }
 
   const offer = capabilityOfferLine(decision);
