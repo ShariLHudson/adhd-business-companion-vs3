@@ -1927,6 +1927,7 @@ import {
 } from "@/lib/chamber/dismissActiveChamberConversation";
 import { chamberMemberHintForChat } from "@/lib/chamber/chamberMemberPrompt";
 import { selectGeneralChatExpertiseMember } from "@/lib/chamber/expertiseCategory";
+import { resolveSpecialistTurnMember } from "@/lib/chamber/expertiseContinuity";
 import { isChamberMemberConversationActive } from "@/lib/chamber/chamberConversationLock";
 import {
   chamberConversationTitle,
@@ -3109,6 +3110,9 @@ export default function CompanionPageClient() {
   const [activeChamberMemberId, setActiveChamberMemberId] =
     useState<ChamberMemberId | null>(null);
   const activeChamberMemberIdRef = useRef<ChamberMemberId | null>(null);
+  // Silent expertise ownership for general chat (in-memory only; NOT the Chamber
+  // room lock). Retains the resolver-selected member across related follow-ups.
+  const silentExpertiseMemberIdRef = useRef<ChamberMemberId | null>(null);
   activeChamberMemberIdRef.current = activeChamberMemberId;
   /** CB-022 — result of processActiveTopicOnUserTurn for the in-flight send. */
   const activeTopicTurnRef = useRef<ProcessActiveTopicTurnResult | null>(null);
@@ -20666,16 +20670,29 @@ export default function CompanionPageClient() {
       // member already owns the turn, a clearly specialist business question
       // resolves to ONE expertise category and its owning Chamber member, whose
       // EXISTING hint is injected into this same model call. Shari voice /
-      // composition is unchanged; no navigation, no second model call, and no
-      // ownership is persisted across turns (continuity is a later slice).
-      const generalExpertiseMemberId = selectGeneralChatExpertiseMember({
+      // composition is unchanged; no navigation and no second model call.
+      const resolvedExpertiseMemberId = activeChamberMember
+        ? null
+        : selectGeneralChatExpertiseMember({
+            userText: trimmed,
+            hasActiveOrNamedMember: false,
+          });
+      // Specialist follow-up continuity: keep the silently-selected member across
+      // clearly related follow-ups, and release on a topic change, a different /
+      // explicitly named member, a Create request, or another owned workflow.
+      // In-memory only (no navigation, no Chamber-room lock, no persistence).
+      const specialistTurn = resolveSpecialistTurnMember({
         userText: trimmed,
+        resolvedMemberId: resolvedExpertiseMemberId,
+        retainedMemberId: silentExpertiseMemberIdRef.current,
         hasActiveOrNamedMember: Boolean(activeChamberMember),
+        enteredOtherWorkflow: parkedCreateCompanionDetour,
       });
+      silentExpertiseMemberIdRef.current = specialistTurn.retain;
       const expertMemberForChat =
         activeChamberMember ??
-        (generalExpertiseMemberId
-          ? getChamberMemberById(generalExpertiseMemberId)
+        (specialistTurn.memberId
+          ? getChamberMemberById(specialistTurn.memberId)
           : undefined);
       const chamberMemberChatHint = expertMemberForChat
         ? chamberMemberHintForChat(expertMemberForChat)
