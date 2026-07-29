@@ -197,6 +197,16 @@ export function isIllegalTopicLabel(label: string): boolean {
     return true;
   }
   if (/\bsomething around (?:does|what|that|it)\b/.test(t)) return true;
+  // "Best way …" question residue is a compressed keyword dump, never a
+  // member-facing topic. Rejecting it here stops the token-dump from being
+  // stored as a Topic Anchor (updateTopicAnchor) and from being read as an
+  // active anchor (hasActiveTopicAnchor) — so a direct informational question
+  // cannot be intercepted by, nor surfaced as, a stale topic return
+  // ("You're still sitting with best way determine network meeting before").
+  // Scoped to query-scaffold salad only: clean noun phrases produced by the
+  // explicit branches above ("how to explain your program") are preserved.
+  if (/\bbest way\b/.test(t) || /\bway to\b/.test(t)) return true;
+  if (/^(?:best|way|determine|figure(?: out)?)\b/.test(t)) return true;
   // Package 209 — malformed extraction dumps
   if (/\bplatform need\b/.test(t)) return true;
   if (
