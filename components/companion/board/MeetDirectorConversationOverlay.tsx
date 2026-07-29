@@ -15,6 +15,7 @@ import {
   type MeetDirectorConversation,
   type MeetDirectorMessage,
 } from "@/lib/board/meetDirector";
+import { finalizeBoardFacingText } from "@/lib/board/finalizeBoardFacingText";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import "@/app/companion/board-director-meet.css";
 
@@ -69,7 +70,10 @@ export function MeetDirectorConversationOverlay({
     const trimmed = text.trim();
     if (!trimmed) return;
     const memberMsg = createMeetDirectorMessage("member", trimmed);
-    const reply = craftMeetDirectorReply(director, trimmed);
+    // Route the Director's substance through the existing Shari-facing
+    // finalization (voice + plain-language) so it sounds like the same Estate
+    // conversation and never leaks markdown. Substance is preserved.
+    const reply = finalizeBoardFacingText(craftMeetDirectorReply(director, trimmed));
     const directorMsg = createMeetDirectorMessage("director", reply);
     onConversationChange({
       ...conversation,

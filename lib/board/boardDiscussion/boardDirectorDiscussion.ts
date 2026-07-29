@@ -10,6 +10,7 @@ import type { BoardDirectorId } from "@/lib/board/types";
 import { THOMAS_ELLISON_DIRECTOR_ID } from "@/lib/board/visibleDirectors";
 import { getBoardDirectorById } from "@/lib/board/boardDirectorRegistry";
 import { buildDirectorPerspectiveText } from "@/lib/board/buildDirectorPerspectiveText";
+import { finalizeBoardFacingText } from "@/lib/board/finalizeBoardFacingText";
 import {
   relatedWorkFromBoardDecision,
   type RelatedMatterReference,
@@ -927,9 +928,18 @@ export function createBoardDirectorDiscussionFromDraft(
     status: "in-progress",
     sourceContext: normalized.sourceContext,
   };
+  // Synthesize the decision record from the RAW turns (it parses their wording),
+  // then route each Director/Chair turn's substance through the existing
+  // Shari-facing finalization (voice + plain-language). Per-turn keeps each
+  // perspective distinguishable; substance is preserved.
+  const decisionRecord = buildDecisionRecordFromDiscussion(base);
   return {
     ...base,
-    decisionRecord: buildDecisionRecordFromDiscussion(base),
+    turns: base.turns.map((turn) => ({
+      ...turn,
+      text: finalizeBoardFacingText(turn.text),
+    })),
+    decisionRecord,
   };
 }
 
