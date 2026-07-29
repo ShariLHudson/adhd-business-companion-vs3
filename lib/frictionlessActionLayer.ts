@@ -153,6 +153,10 @@ import {
 } from "./universalCreation/createFastPath";
 import { isCreateFlowAssistantContext } from "./universalCreation/createFlowContext";
 import {
+  governFrictionlessDecisionByEnvelope,
+  type CreationTurnEnvelope,
+} from "./createIntent/creationTurnEnvelope";
+import {
   exitCreateWorkflow,
   parkCreateWorkflow,
   resumeCreateWorkflow,
@@ -490,6 +494,12 @@ export type FrictionlessActionInput = {
   pendingConciergeChoices?: boolean;
   /** Pre-computed Decision Engine runtime — skips re-evaluation when set */
   sparkRuntime?: SparkRuntimeAction | null;
+  /**
+   * Immutable per-turn Create decision. When present, this layer CONSUMES it
+   * instead of independently deciding Create intent — an exploratory-creation
+   * turn may not open Create here.
+   */
+  createEnvelope?: CreationTurnEnvelope | null;
 };
 
 export type FrictionlessActionDecision = {
@@ -4424,11 +4434,15 @@ export function resolveFrictionlessAction(
   input: FrictionlessActionInput,
 ): FrictionlessActionDecision {
   const userText = input.userText.trim();
-  if (!userText) return resolveFrictionlessActionImpl(input);
-  return resolveFrictionlessActionImpl({
-    ...input,
-    sparkRuntime: input.sparkRuntime ?? resolveSparkRuntime(input),
-  });
+  const decision = !userText
+    ? resolveFrictionlessActionImpl(input)
+    : resolveFrictionlessActionImpl({
+        ...input,
+        sparkRuntime: input.sparkRuntime ?? resolveSparkRuntime(input),
+      });
+  // Consume the immutable turn envelope: this layer may not open Create when the
+  // shared authority classified the turn as exploratory creation.
+  return governFrictionlessDecisionByEnvelope(decision, input.createEnvelope);
 }
 
 export function shouldSuppressRelationshipForFrictionless(

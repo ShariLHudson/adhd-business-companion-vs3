@@ -1800,6 +1800,7 @@ import {
   immediateCreateOpenRendersPlaceholder,
   isCreateDestinationSection,
 } from "@/lib/createExperience/createNavigationAcknowledgement";
+import { resolveCreationTurnEnvelope } from "@/lib/createIntent/creationTurnEnvelope";
 import {
   pickWanderDestination,
   recordWanderTransition,
@@ -14118,9 +14119,17 @@ export default function CompanionPageClient() {
     const answerFirstDecisionForFrictionless = lastUserForAnswerFirst.trim()
       ? decideShariResponse(lastUserForAnswerFirst)
       : null;
-    const blockImmediateForAnswerFirst = answerFirstDecisionForFrictionless
-      ? shouldBlockImmediateExperienceOpen(answerFirstDecisionForFrictionless)
-      : false;
+    // Envelope contract: answer-first may DELAY rendering but may not rewrite an
+    // eligible / explicit-navigation Create routing decision into reflection.
+    const createEnvelopeForFrictionless = resolveCreationTurnEnvelope(
+      lastUserForAnswerFirst,
+      String(chatTurnRef.current),
+    );
+    const blockImmediateForAnswerFirst =
+      answerFirstDecisionForFrictionless &&
+      !createEnvelopeForFrictionless.createEligible
+        ? shouldBlockImmediateExperienceOpen(answerFirstDecisionForFrictionless)
+        : false;
 
     // Answer-first: do not post a thin destination/offer reply when ordinary
     // help should go to companion-chat for a substantive answer.
@@ -18658,6 +18667,12 @@ export default function CompanionPageClient() {
           overwhelmed: detected === "overwhelmed",
           primaryTurn: primaryTurnDecision,
           pendingConciergeChoices: hasActivePendingChoice(),
+          // Immutable turn contract: the frictionless layer consumes this and
+          // may not open Create when the shared authority says exploratory.
+          createEnvelope: resolveCreationTurnEnvelope(
+            trimmed,
+            String(chatTurnRef.current),
+          ),
         }),
       {
         category: "none",
@@ -20446,12 +20461,20 @@ export default function CompanionPageClient() {
       }
     }
 
-    // Answer-first: do not block how-to / ordinary help behind a business-profile gate.
+    // Envelope contract: Business Profile gating may recommend profile info AFTER
+    // Create is acknowledged, but may not replace an eligible / explicit-navigation
+    // Create decision. Answer-first help stays ungated as before.
+    const businessGateCreateEnvelope = resolveCreationTurnEnvelope(
+      trimmed,
+      String(chatTurnRef.current),
+    );
     if (
       !answerFirstPreferChat &&
       isBusinessAdviceRequest(trimmed) &&
       !businessConfidenceBypassRef.current &&
-      !businessConfidenceOffer
+      !businessConfidenceOffer &&
+      !businessGateCreateEnvelope.createEligible &&
+      !businessGateCreateEnvelope.explicitCreateNavigation
     ) {
       const confidence = loadBusinessIntelligenceConfidence();
       if (confidence.level === "low") {

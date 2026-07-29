@@ -83,6 +83,16 @@ const TRANSFORM_PRODUCTION_RE =
   /\b(?:turn|make|put|format|convert)\s+(?:this|that|these|those|it|them|the|my)\b[\s\S]*\binto\s+(?:a|an|the)?\s*\w/i;
 
 /**
+ * First-person intent to produce something now ("I want to create …",
+ * "I need to build …"). On its own this is aspirational, but PAIRED WITH A
+ * CONCRETE DELIVERABLE NOUN it is an execution request ("I want to create a
+ * marketing plan"). Kept separate from the exploratory veto: aspiration without
+ * a deliverable ("I want to create AI innovations") stays exploratory.
+ */
+const ASPIRATION_TO_PRODUCE_RE =
+  /\b(?:i\s+)?(?:want|'?d\s+like|would\s+like|need|going|planning|gonna|wanna)\s+to\s+(?:create|make|build|draft|write|design|produce|put\s+together)\b/i;
+
+/**
  * The canonical exploratory veto every natural-language caller consults. When
  * true (and no trusted provenance), no deterministic path may open Create.
  */
@@ -146,8 +156,15 @@ export function isCreationExecutionRequest(
   // 3. A sentence that rejects Create is never eligible.
   if (isCreateRejection(raw)) return make(false, "none", "create_rejection");
 
-  // 4. Exploratory / descriptive framing vetoes natural-language create — even
-  //    when a concrete deliverable noun is present.
+  // 4. First-person intent to produce a CONCRETE deliverable is an execution
+  //    request even under otherwise-exploratory framing ("I want to create a
+  //    marketing plan"). Aspiration without a deliverable stays exploratory (5).
+  if (ASPIRATION_TO_PRODUCE_RE.test(raw) && concreteDeliverable) {
+    return make(true, "none", "aspiration_to_produce_deliverable");
+  }
+
+  // 5. Exploratory / descriptive framing vetoes natural-language create — even
+  //    when a concrete deliverable noun is present in a question/evaluation form.
   if (exploratory) return make(false, "none", "exploratory_framing");
 
   // 5. An immediate production instruction directed at the system is eligible.
