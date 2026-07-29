@@ -30,14 +30,6 @@ import {
 } from "@/lib/estate/experienceControlPrefs";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
 import { SparkNoteChrome } from "@/components/companion/SparkNoteChrome";
-import { SparkNoteExpanded } from "@/components/companion/SparkNoteExpanded";
-import { SparkNoteMyCollection } from "@/components/companion/SparkNoteMyCollection";
-import { requestNewDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
-import {
-  recordSparkNoteCompleted,
-  recordSparkNoteViewed,
-} from "@/lib/sparkNote/persistence";
-import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
 import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
@@ -3811,15 +3803,6 @@ export default function CompanionPageClient() {
   >(null);
   const [dailyOpeningHelpfulLesson, setDailyOpeningHelpfulLesson] =
     useState<HelpfulLessonOffer | null>(null);
-  // Welcome "Show Me Something Helpful" now opens the rich Spark Card system
-  // (lib/sparkNote) instead of the Estate feature-tour lesson registry.
-  const [welcomeSparkCard, setWelcomeSparkCard] =
-    useState<SparkNoteDailyCard | null>(null);
-  const [welcomeSparkView, setWelcomeSparkView] = useState<
-    "expanded" | "collection"
-  >("expanded");
-  // In-memory session history so "Something Else" varies even if storage fails.
-  const welcomeSparkRecentIdsRef = useRef<string[]>([]);
   const [dailyOpeningAdaptCheckIn, setDailyOpeningAdaptCheckIn] =
     useState(false);
   const [dailyOpeningMeaningfulStart, setDailyOpeningMeaningfulStart] =
@@ -7964,47 +7947,12 @@ export default function CompanionPageClient() {
     focusChatInput();
   }
 
-  /**
-   * Pick a rich Spark Card, avoiding ids shown earlier this session so
-   * consecutive "Something Else" taps vary even when storage is unavailable.
-   */
-  function pickWelcomeSparkCard(): SparkNoteDailyCard {
-    const input = {
-      firstName: getPrefs().name || null,
-      birthday: getRecognitionStore().birthday,
-      personalDates: getRecognitionStore().personalDates,
-      memberSinceIso: getMemberSinceIso(),
-    };
-    const recent = welcomeSparkRecentIdsRef.current;
-    let chosen = requestNewDailySparkCard(input).card;
-    for (let i = 0; i < 8 && recent.includes(chosen.id); i++) {
-      chosen = requestNewDailySparkCard(input).card;
-    }
-    welcomeSparkRecentIdsRef.current = [...recent, chosen.id].slice(-12);
-    return chosen;
-  }
-
-  function openWelcomeSparkCard(card: SparkNoteDailyCard) {
-    recordSparkNoteViewed(card.id);
-    recordSparkNoteCompleted(card.id);
-    setWelcomeSparkView("expanded");
-    setWelcomeSparkCard(card);
-  }
-
   function handleShowSomethingHelpful() {
+    const offer = offerNextHelpfulLesson();
+    if (!offer) return;
     setDailyOpeningHelpMeChoose(null);
     setDailyOpeningAdaptCheckIn(false);
-    setDailyOpeningHelpfulLesson(null);
-    openWelcomeSparkCard(pickWelcomeSparkCard());
-  }
-
-  function handleWelcomeSparkSomethingElse() {
-    openWelcomeSparkCard(pickWelcomeSparkCard());
-  }
-
-  function handleWelcomeSparkClose() {
-    setWelcomeSparkCard(null);
-    setWelcomeSparkView("expanded");
+    setDailyOpeningHelpfulLesson(offer);
   }
 
   function handleHelpfulLessonShowMe() {
@@ -27995,24 +27943,6 @@ export default function CompanionPageClient() {
         personalDates={getRecognitionStore().personalDates}
         memberSinceIso={getMemberSinceIso()}
       />
-      {welcomeSparkCard
-        ? createPortal(
-            welcomeSparkView === "collection" ? (
-              <SparkNoteMyCollection
-                onBack={() => setWelcomeSparkView("expanded")}
-                onClose={handleWelcomeSparkClose}
-              />
-            ) : (
-              <SparkNoteExpanded
-                card={welcomeSparkCard}
-                onClose={handleWelcomeSparkClose}
-                onOpenCollection={() => setWelcomeSparkView("collection")}
-                onSomethingElse={handleWelcomeSparkSomethingElse}
-              />
-            ),
-            document.body,
-          )
-        : null}
       <EstateTopRightChrome
         showProfile={showGlobalEstateMenu}
         showRoom={showEstateExperienceMenu}
