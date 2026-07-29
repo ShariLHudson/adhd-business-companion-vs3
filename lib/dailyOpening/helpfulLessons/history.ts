@@ -4,6 +4,8 @@ const STORAGE_KEY = "spark-helpful-lesson-history-v1";
 const MAX_ENTRIES = 40;
 /** Do not re-show a lesson within this window unless nothing else is available. */
 export const HELPFUL_LESSON_COOLDOWN_MS = 5 * 24 * 60 * 60 * 1000;
+/** Intentionally-dismissed lessons cool down longer than merely-shown ones. */
+export const HELPFUL_LESSON_DISMISS_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
 
 function readAll(): HelpfulLessonHistory[] {
   if (typeof window === "undefined") return [];
@@ -77,6 +79,21 @@ export function recentlyShownLessonIds(
 ): Set<string> {
   const recent = new Set<string>();
   for (const entry of readAll()) {
+    const at = Date.parse(entry.shownAt);
+    if (!Number.isFinite(at)) continue;
+    if (now - at < cooldownMs) recent.add(entry.lessonId);
+  }
+  return recent;
+}
+
+/** Lessons the member intentionally dismissed within the dismiss-cooldown window. */
+export function recentlyDismissedLessonIds(
+  now = Date.now(),
+  cooldownMs = HELPFUL_LESSON_DISMISS_COOLDOWN_MS,
+): Set<string> {
+  const recent = new Set<string>();
+  for (const entry of readAll()) {
+    if (!entry.dismissed) continue;
     const at = Date.parse(entry.shownAt);
     if (!Number.isFinite(at)) continue;
     if (now - at < cooldownMs) recent.add(entry.lessonId);

@@ -7948,7 +7948,9 @@ export default function CompanionPageClient() {
   }
 
   function handleShowSomethingHelpful() {
-    const offer = offerNextHelpfulLesson();
+    const offer = offerNextHelpfulLesson({
+      currentActivityDestinationId: activeSection ?? null,
+    });
     if (!offer) return;
     setDailyOpeningHelpMeChoose(null);
     setDailyOpeningAdaptCheckIn(false);
@@ -8022,9 +8024,10 @@ export default function CompanionPageClient() {
 
   function handleHelpfulLessonSomethingElse() {
     const currentId = dailyOpeningHelpfulLesson?.lesson.id;
+    const activity = { currentActivityDestinationId: activeSection ?? null };
     const next = currentId
-      ? offerNextHelpfulLessonExcluding(currentId)
-      : offerNextHelpfulLesson();
+      ? offerNextHelpfulLessonExcluding(currentId, activity)
+      : offerNextHelpfulLesson(activity);
     if (!next) {
       setDailyOpeningHelpfulLesson(null);
       return;
