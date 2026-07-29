@@ -45,7 +45,12 @@ export function resolveCreationTurnEnvelope(
   const explicitCreateNavigation =
     elig.explicitNavigation || isHardNavToCreate(userText);
   const createEligible = elig.eligible || explicitCreateNavigation;
-  const exploratoryCreation = elig.exploratory && !createEligible;
+  // Exploratory-CREATION only when the turn is actually about creating — the
+  // shared veto's framing (e.g. "how do I …") also matches ordinary how-to
+  // questions, which must keep full certification.
+  const mentionsCreate = /\bcreat(?:e|es|ing|ed)\b/i.test(userText);
+  const exploratoryCreation =
+    elig.exploratory && !createEligible && mentionsCreate;
 
   let intendedArtifact: string | null = null;
   try {
@@ -65,6 +70,24 @@ export function resolveCreationTurnEnvelope(
       : elig.provenance,
     decisionOwner: "creationTurnEnvelope",
   };
+}
+
+/**
+ * True when the turn's Create decision is "locked" — any Create-related turn
+ * (eligible, explicit navigation, or exploratory). Such a turn must NOT pass
+ * through the reflective certification spine (topic-continuity /
+ * buildNaturalTopicReturn), which would overwrite the answer with
+ * "you're still deciding whether … makes sense" or reuse a stale topic anchor.
+ */
+export function isCreateLockedTurn(
+  envelope: CreationTurnEnvelope | null | undefined,
+): boolean {
+  return Boolean(
+    envelope &&
+      (envelope.createEligible ||
+        envelope.explicitCreateNavigation ||
+        envelope.exploratoryCreation),
+  );
 }
 
 /** Minimal shape of a frictionless decision the envelope governs. */

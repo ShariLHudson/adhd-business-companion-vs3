@@ -1800,7 +1800,11 @@ import {
   immediateCreateOpenRendersPlaceholder,
   isCreateDestinationSection,
 } from "@/lib/createExperience/createNavigationAcknowledgement";
-import { resolveCreationTurnEnvelope } from "@/lib/createIntent/creationTurnEnvelope";
+import {
+  resolveCreationTurnEnvelope,
+  isCreateLockedTurn,
+  type CreationTurnEnvelope,
+} from "@/lib/createIntent/creationTurnEnvelope";
 import {
   pickWanderDestination,
   recordWanderTransition,
@@ -4877,6 +4881,13 @@ export default function CompanionPageClient() {
   const savedArtifactRef = useRef<SavedArtifactRecord | null>(null);
   savedArtifactRef.current = savedArtifact;
   const lastUserTextRef = useRef("");
+  /**
+   * The immutable Create routing decision for the current turn — created ONCE at
+   * the top of handleSend and read (never recomputed) by every downstream
+   * consumer (frictionless, answer-first block, Business Profile gate, and the
+   * certification/delivery gate) so no later layer contradicts it.
+   */
+  const createTurnEnvelopeRef = useRef<CreationTurnEnvelope | null>(null);
   const [workspaceRevealSeq, setWorkspaceRevealSeq] = useState(0);
   const [brainDumpInitialView, setBrainDumpInitialView] =
     useState<ClearMyMindPanelView>("capture");
@@ -14015,7 +14026,17 @@ export default function CompanionPageClient() {
 
     assertSpineAssistantEmissionAllowed(owner);
 
+    // Envelope contract: a Create-related turn (eligible, explicit-navigation, OR
+    // exploratory) must not pass through the reflective certification spine
+    // (topic-continuity / buildNaturalTopicReturn). That layer overwrites the
+    // answer with "you're still deciding whether … makes sense" and reuses a
+    // stale prior topic anchor on a new exploratory question. The turn's Create
+    // decision was locked at the top of handleSend; later layers may not
+    // contradict it. Non-Create turns keep full certification.
+    const createLockedTurn = isCreateLockedTurn(createTurnEnvelopeRef.current);
+
     if (
+      !createLockedTurn &&
       shouldCertifyCompanionDelivery({
         owner,
         deliveryKind,
@@ -14121,13 +14142,9 @@ export default function CompanionPageClient() {
       : null;
     // Envelope contract: answer-first may DELAY rendering but may not rewrite an
     // eligible / explicit-navigation Create routing decision into reflection.
-    const createEnvelopeForFrictionless = resolveCreationTurnEnvelope(
-      lastUserForAnswerFirst,
-      String(chatTurnRef.current),
-    );
     const blockImmediateForAnswerFirst =
       answerFirstDecisionForFrictionless &&
-      !createEnvelopeForFrictionless.createEligible
+      !createTurnEnvelopeRef.current?.createEligible
         ? shouldBlockImmediateExperienceOpen(answerFirstDecisionForFrictionless)
         : false;
 
@@ -14462,6 +14479,13 @@ export default function CompanionPageClient() {
     ).trim();
     // Never block send on isLoading — newer messages supersede in-flight AI.
     if (!trimmed) return;
+
+    // Create routing contract for THIS turn — computed once, read everywhere.
+    const createTurnEnvelope = resolveCreationTurnEnvelope(
+      trimmed,
+      String(chatTurnRef.current),
+    );
+    createTurnEnvelopeRef.current = createTurnEnvelope;
 
     // S4 Phase 0 — capture prior-turn conversation state and compute the shared
     // Conversation Boundary Decision ONCE, BEFORE any state machine ingests this
@@ -18667,12 +18691,10 @@ export default function CompanionPageClient() {
           overwhelmed: detected === "overwhelmed",
           primaryTurn: primaryTurnDecision,
           pendingConciergeChoices: hasActivePendingChoice(),
-          // Immutable turn contract: the frictionless layer consumes this and
-          // may not open Create when the shared authority says exploratory.
-          createEnvelope: resolveCreationTurnEnvelope(
-            trimmed,
-            String(chatTurnRef.current),
-          ),
+          // Immutable turn contract (created once at handleSend top): the
+          // frictionless layer consumes it and may not open Create when the
+          // shared authority says exploratory.
+          createEnvelope: createTurnEnvelopeRef.current,
         }),
       {
         category: "none",
@@ -20464,17 +20486,13 @@ export default function CompanionPageClient() {
     // Envelope contract: Business Profile gating may recommend profile info AFTER
     // Create is acknowledged, but may not replace an eligible / explicit-navigation
     // Create decision. Answer-first help stays ungated as before.
-    const businessGateCreateEnvelope = resolveCreationTurnEnvelope(
-      trimmed,
-      String(chatTurnRef.current),
-    );
     if (
       !answerFirstPreferChat &&
       isBusinessAdviceRequest(trimmed) &&
       !businessConfidenceBypassRef.current &&
       !businessConfidenceOffer &&
-      !businessGateCreateEnvelope.createEligible &&
-      !businessGateCreateEnvelope.explicitCreateNavigation
+      !createTurnEnvelopeRef.current?.createEligible &&
+      !createTurnEnvelopeRef.current?.explicitCreateNavigation
     ) {
       const confidence = loadBusinessIntelligenceConfidence();
       if (confidence.level === "low") {

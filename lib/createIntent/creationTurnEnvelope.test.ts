@@ -9,6 +9,7 @@ import {
   resolveCreationTurnEnvelope,
   governFrictionlessDecisionByEnvelope,
   frictionlessDecisionOpensCreate,
+  isCreateLockedTurn,
 } from "./creationTurnEnvelope";
 import { isCreationExecutionRequest } from "./creationExecutionEligibility";
 import { createNavigationArrivalMessage } from "@/lib/createExperience/createNavigationAcknowledgement";
@@ -147,5 +148,48 @@ describe("14 + 18. final rendered message list for each live prompt", () => {
     expect(finalRender("i want to create a social media post")).toEqual([
       createNavigationArrivalMessage(),
     ]);
+  });
+});
+
+describe("delivery gate — Create-related turns bypass reflective certification", () => {
+  const LIVE = [
+    "create a marketing plan",
+    "i want to create a marketing plan",
+    "what kind of things can i create",
+    "go to create i want to create a marketing plan",
+    "i want to create a social media post",
+  ];
+
+  it("every live Create prompt is a locked turn (skips the reflective spine)", () => {
+    for (const p of LIVE) expect(isCreateLockedTurn(env(p))).toBe(true);
+  });
+
+  it("ordinary non-Create turns are NOT locked (full certification runs)", () => {
+    for (const p of ["what is a sales funnel?", "help me price my service", "how do i network at an event"]) {
+      expect(isCreateLockedTurn(env(p))).toBe(false);
+    }
+  });
+
+  /**
+   * Model of the finalizeMemberFacingAssistantText gate: when the turn is locked
+   * the substantive answer is delivered as-is; otherwise it would pass through
+   * the reflective certification spine (stand-in below) that rewrites Create
+   * answers into "you're still deciding whether … makes sense".
+   */
+  function finalizeGate(userText: string, modelAnswer: string): string {
+    const locked = isCreateLockedTurn(env(userText));
+    if (locked) return modelAnswer;
+    // Reflective-certification stand-in (the proven live divergence).
+    return "You're still deciding whether create marketing plan makes sense.";
+  }
+
+  it("a Create turn's model answer survives — no 'deciding whether' rewrite", () => {
+    const answer =
+      "You can create various types of materials for your marketing plan, including a target audience profile and a unique selling proposition.";
+    for (const p of LIVE) {
+      const out = finalizeGate(p, answer);
+      expect(out).toBe(answer);
+      expect(out).not.toMatch(/deciding whether/i);
+    }
   });
 });
