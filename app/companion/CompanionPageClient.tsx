@@ -1926,6 +1926,7 @@ import {
   planDismissActiveChamberConversation,
 } from "@/lib/chamber/dismissActiveChamberConversation";
 import { chamberMemberHintForChat } from "@/lib/chamber/chamberMemberPrompt";
+import { selectGeneralChatExpertiseMember } from "@/lib/chamber/expertiseCategory";
 import { isChamberMemberConversationActive } from "@/lib/chamber/chamberConversationLock";
 import {
   chamberConversationTitle,
@@ -20661,9 +20662,23 @@ export default function CompanionPageClient() {
         chamberConversationActive && activeChamberMemberIdRef.current
           ? getChamberMemberById(activeChamberMemberIdRef.current)
           : undefined;
-      // Never inject Chamber persona outside an active Chamber member session.
-      const chamberMemberChatHint = activeChamberMember
-        ? chamberMemberHintForChat(activeChamberMember)
+      // Expertise-category routing (general chat only): when no Chamber/Board
+      // member already owns the turn, a clearly specialist business question
+      // resolves to ONE expertise category and its owning Chamber member, whose
+      // EXISTING hint is injected into this same model call. Shari voice /
+      // composition is unchanged; no navigation, no second model call, and no
+      // ownership is persisted across turns (continuity is a later slice).
+      const generalExpertiseMemberId = selectGeneralChatExpertiseMember({
+        userText: trimmed,
+        hasActiveOrNamedMember: Boolean(activeChamberMember),
+      });
+      const expertMemberForChat =
+        activeChamberMember ??
+        (generalExpertiseMemberId
+          ? getChamberMemberById(generalExpertiseMemberId)
+          : undefined);
+      const chamberMemberChatHint = expertMemberForChat
+        ? chamberMemberHintForChat(expertMemberForChat)
         : null;
 
       // Continuity local adapt — only when turn authority allows (never Create/emotion/daily-focus steals).

@@ -186,7 +186,11 @@ describe("chamber knowledge chat path", () => {
       "utf8",
     );
     expect(client).toContain('from "@/lib/chamber/chamberMemberPrompt"');
-    expect(client).toContain("chamberMemberHintForChat(activeChamberMember)");
+    // Chamber hints still route through chamberMemberHintForChat, and an active
+    // Chamber member is still honored (now via the shared active-or-resolved
+    // member so general-chat expertise can reuse the same hint path).
+    expect(client).toContain("chamberMemberHintForChat(");
+    expect(client).toContain("activeChamberMember");
     expect(client).toContain("chamberMemberChatHint");
   });
 });
