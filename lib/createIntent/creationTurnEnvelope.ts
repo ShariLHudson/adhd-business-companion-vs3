@@ -52,9 +52,15 @@ export function resolveCreationTurnEnvelope(
   const exploratoryCreation =
     elig.exploratory && !createEligible && mentionsCreate;
 
+  // Detect the named artifact independently of eligibility framing: pass the
+  // handoff flag so an aspirational phrasing ("i want to create a marketing
+  // plan") still yields "Marketing Plan" instead of null. This only NAMES the
+  // artifact — it does not change createEligible/exploratory above.
   let intendedArtifact: string | null = null;
   try {
-    intendedArtifact = understandUniversalRequest(userText).createArtifactType ?? null;
+    intendedArtifact =
+      understandUniversalRequest(userText, { explicitCreateHandoff: true })
+        .createArtifactType ?? null;
   } catch {
     intendedArtifact = null;
   }

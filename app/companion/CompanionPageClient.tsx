@@ -1806,6 +1806,10 @@ import {
   type CreationTurnEnvelope,
 } from "@/lib/createIntent/creationTurnEnvelope";
 import {
+  buildCreateRoomEntry,
+  type CreateRoomEntry,
+} from "@/lib/createExperience/createDestination";
+import {
   pickWanderDestination,
   recordWanderTransition,
   validateWanderPick,
@@ -4894,6 +4898,12 @@ export default function CompanionPageClient() {
    * workspace can be completed later without re-asking the member.
    */
   const pendingBlockedCreateArtifactRef = useRef<string | null>(null);
+  /**
+   * Context handed into the Create room on navigation (intended artifact,
+   * original text, turn id, provenance) so the creation request is never lost
+   * when the room opens.
+   */
+  const createRoomEntryRef = useRef<CreateRoomEntry | null>(null);
   const [workspaceRevealSeq, setWorkspaceRevealSeq] = useState(0);
   const [brainDumpInitialView, setBrainDumpInitialView] =
     useState<ClearMyMindPanelView>("capture");
@@ -8264,6 +8274,13 @@ export default function CompanionPageClient() {
     initialPrompt?: string;
     artifactType?: string;
     hardNavCommand?: string;
+    /**
+     * Room-level navigation: open the Create room regardless of whether the
+     * requested artifact workspace is available. The artifact-workspace block
+     * (prepared_state) applies only to the legacy artifact panel, never to
+     * navigating to the room itself.
+     */
+    roomNavigation?: boolean;
   }): boolean {
     const source = opts?.source ?? "ui_nav";
     const prompt = opts?.initialPrompt?.trim() ?? lastUserTextRef.current;
@@ -8271,7 +8288,10 @@ export default function CompanionPageClient() {
     const beforePanel = workspacePanelRef.current;
     const beforeSection = activeSectionRef.current;
 
+    // Split availability: room navigation is always allowed. Only non-room
+    // (legacy artifact-panel) opens are gated by the artifact-workspace block.
     if (
+      !opts?.roomNavigation &&
       redirectLegacyCreateWorkspaceIfNeeded("content-generator", {
         userText: prompt || opts?.hardNavCommand,
         itemType: opts?.artifactType,
@@ -15033,12 +15053,19 @@ export default function CompanionPageClient() {
         if (isCreateDestinationSection(command.section)) {
           // Create navigation: the prepared-state placeholder is the single
           // user-visible arrival response. Suppress the transition line ("Let's
-          // go to the Creative Studio") — the internal route stays creative-studio
-          // but the user-facing name is Create — and let the placeholder own it.
-          runDirectEstateRoomNavigation(command, trimmed, undefined, {
-            skipAssistantMessage: true,
+          // go to the Creative Studio"). Room navigation ALWAYS opens the Create
+          // room — the artifact workspace may still be unavailable, but that is
+          // evaluated inside Create, never as the global room placeholder here.
+          const roomEnv = createTurnEnvelopeRef.current;
+          if (roomEnv) {
+            createRoomEntryRef.current = buildCreateRoomEntry(roomEnv, trimmed);
+          }
+          openCreateWorkspace({
+            roomNavigation: true,
+            source: "chat",
+            initialPrompt: trimmed,
+            artifactType: roomEnv?.intendedArtifact ?? undefined,
           });
-          postCreateTransparencyMessage(createNavigationArrivalMessage());
         } else {
           const navLine = directNavigationTransitionLine(
             navigateEffect.label ?? command.entry?.name ?? null,
@@ -15079,16 +15106,24 @@ export default function CompanionPageClient() {
         supersedeInFlightChatRequest(chatRequestAbortRef.current);
         chatRequestAbortRef.current = null;
         lastUserTextRef.current = trimmed;
-        // Preserve the intended artifact for future workspace completion.
-        pendingBlockedCreateArtifactRef.current = createEnv.intendedArtifact;
         if (fresh) clearConversation();
         setMessages((prev) => [
           ...(fresh ? [] : prev),
           { role: "user", content: trimmed },
         ]);
         setInput("");
-        // Single truthful outcome — the prepared-state placeholder, once.
-        postCreateTransparencyMessage(createNavigationArrivalMessage());
+        // Room navigation always opens the Create room and carries the intended
+        // artifact. The requested artifact workspace may be unavailable, but that
+        // is surfaced inside Create — NOT as the global room placeholder, and the
+        // room open guarantees a visible outcome (never a silent turn).
+        createRoomEntryRef.current = buildCreateRoomEntry(createEnv, trimmed);
+        pendingBlockedCreateArtifactRef.current = createEnv.intendedArtifact;
+        openCreateWorkspace({
+          roomNavigation: true,
+          source: "chat",
+          initialPrompt: trimmed,
+          artifactType: createEnv.intendedArtifact ?? undefined,
+        });
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
