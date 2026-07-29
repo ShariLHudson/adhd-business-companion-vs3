@@ -31,11 +31,18 @@ type RouteDef = {
 /** Explicit destination verbs — keep aligned with explicitNavigationVerb.ts */
 const NAV_VERB = "(?:open|go to|take me to|bring me to|show me|enter)";
 
+/**
+ * "create" plus a bounded set of unmistakable typos (extra/missing/transposed
+ * letters). Kept to an explicit list — NOT fuzzy matching — so it can only route
+ * a whole-message create command, never a partial word inside other text.
+ */
+const CREATE_WORD = "(?:create|creaste|craete|creatte|createe|creaet)";
+
 /** Exact navigation phrases — anchored to full message (optional trailing punctuation). */
 const HARD_NAV_ROUTES: RouteDef[] = [
   {
     test: new RegExp(
-      `^(?:(?:${NAV_VERB})\\s+create(?:\\s+mode)?|create\\s+mode|open\\s+create\\s+mode)$`,
+      `^(?:(?:${NAV_VERB})\\s+${CREATE_WORD}(?:\\s+mode)?|${CREATE_WORD}\\s+mode|open\\s+${CREATE_WORD}\\s+mode)$`,
       "i",
     ),
     target: { kind: "workspace", section: "create", nav: "create" },

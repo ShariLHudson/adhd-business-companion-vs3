@@ -1796,6 +1796,10 @@ import {
   estateNavigateCommandForPlace,
 } from "@/lib/estateIntelligence/estateCommandRouter";
 import {
+  createNavigationArrivalMessage,
+  isCreateDestinationSection,
+} from "@/lib/createExperience/createNavigationAcknowledgement";
+import {
   pickWanderDestination,
   recordWanderTransition,
   validateWanderPick,
@@ -5799,7 +5803,13 @@ export default function CompanionPageClient() {
   function postCreateTransparencyMessage(content: string) {
     const line = content.trim();
     if (!line) return;
-    setMessages((prev) => [...prev, { role: "assistant", content: line }]);
+    // Idempotent: the prepared-state placeholder is the single Create arrival
+    // response, so the same line must never be appended twice for one event.
+    setMessages((prev) =>
+      prev.some((m) => m.role === "assistant" && m.content === line)
+        ? prev
+        : [...prev, { role: "assistant", content: line }],
+    );
   }
 
   /**
@@ -14952,10 +14962,21 @@ export default function CompanionPageClient() {
           savePrefs({ hasChatted: true });
           setHasChatted(true);
         }
-        const navLine = directNavigationTransitionLine(
-          navigateEffect.label ?? command.entry?.name ?? null,
-        );
-        runDirectEstateRoomNavigation(command, trimmed, navLine);
+        if (isCreateDestinationSection(command.section)) {
+          // Create navigation: the prepared-state placeholder is the single
+          // user-visible arrival response. Suppress the transition line ("Let's
+          // go to the Creative Studio") — the internal route stays creative-studio
+          // but the user-facing name is Create — and let the placeholder own it.
+          runDirectEstateRoomNavigation(command, trimmed, undefined, {
+            skipAssistantMessage: true,
+          });
+          postCreateTransparencyMessage(createNavigationArrivalMessage());
+        } else {
+          const navLine = directNavigationTransitionLine(
+            navigateEffect.label ?? command.entry?.name ?? null,
+          );
+          runDirectEstateRoomNavigation(command, trimmed, navLine);
+        }
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
