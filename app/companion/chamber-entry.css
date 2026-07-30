@@ -66,6 +66,168 @@
   color: rgba(255, 252, 245, 0.94);
 }
 
+/* --- Natural-language intake (Phase 1A) --- */
+.chamber-entry-card__intake {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.chamber-entry-card__intake-label {
+  font-size: 0.82rem;
+  font-weight: 650;
+  color: rgba(255, 236, 196, 0.9);
+}
+
+.chamber-entry-card__intake-input {
+  width: 100%;
+  min-height: 4.5rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(201, 162, 39, 0.45);
+  background: rgba(255, 252, 245, 0.95);
+  color: #241d10;
+  font-size: 1rem;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.chamber-entry-card__intake-input::placeholder {
+  color: rgba(60, 52, 34, 0.6);
+}
+
+.chamber-entry-card__intake-input:focus-visible {
+  outline: 2px solid #f0d48a;
+  outline-offset: 2px;
+}
+
+.chamber-entry-card__follow-up {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(201, 162, 39, 0.4);
+  background: rgba(255, 252, 245, 0.12);
+  color: #fff9ef;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.chamber-entry-card__intake-submit {
+  align-self: flex-start;
+  padding: 0.6rem 1rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(201, 162, 39, 0.6);
+  background: linear-gradient(135deg, #e8c36a 0%, #c9922e 100%);
+  color: #2c2410;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.chamber-entry-card__intake-submit:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.chamber-entry-card__intake-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.chamber-entry-card__intake-submit:focus-visible {
+  outline: 2px solid #f0d48a;
+  outline-offset: 2px;
+}
+
+.chamber-entry-card__examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.chamber-entry-card__examples-label,
+.chamber-entry-card__quick-start-label {
+  margin: 0;
+  font-size: 0.78rem;
+  color: rgba(255, 252, 245, 0.78);
+}
+
+.chamber-entry-card__examples-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chamber-entry-card__example {
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 252, 245, 0.3);
+  background: rgba(255, 252, 245, 0.08);
+  color: rgba(255, 252, 245, 0.92);
+  font-size: 0.8rem;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chamber-entry-card__example:hover {
+  background: rgba(255, 252, 245, 0.16);
+}
+
+.chamber-entry-card__example:focus-visible {
+  outline: 2px solid #f0d48a;
+  outline-offset: 2px;
+}
+
+.chamber-entry-card__quick-start {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.chamber-entry-card__recs-heading {
+  margin: 0 0 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 236, 196, 0.9);
+}
+
+.chamber-entry-card__recs-group + .chamber-entry-card__recs-group {
+  margin-top: 0.85rem;
+}
+
+.chamber-entry-card__recs-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 0.85rem;
+}
+
+/* Comfortable clearance so the final recommendation + actions never sit flush
+   against the bottom of the scroll viewport. */
+.chamber-entry-card__recs {
+  padding-bottom: clamp(2.5rem, 10vh, 6rem);
+}
+
+/* Subtle, secondary cue that more recommendations exist below the first.
+   Text-only (no cartoon icon); the ↓ is a plain glyph. */
+.chamber-entry-card__more-cue {
+  margin: 0.15rem 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 236, 196, 0.82);
+  letter-spacing: 0.01em;
+}
+
+.chamber-entry-card__more-cue::after {
+  content: " ↓";
+  opacity: 0.75;
+}
+
 .chamber-entry-card__choices {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

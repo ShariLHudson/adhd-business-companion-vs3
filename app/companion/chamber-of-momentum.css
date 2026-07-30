@@ -19,6 +19,13 @@
   z-index: 1;
   min-height: 100dvh;
   min-height: 100svh;
+  /* Bound the height to the viewport so overflow-y:auto actually scrolls when
+     content (e.g. multiple recommendation cards) exceeds the screen. Without a
+     cap the element grows past the viewport and the overflow:hidden parent
+     clips it, trapping the extra recommendations off-screen. This container is
+     the single scroll owner — recommendation cards never scroll individually. */
+  max-height: 100dvh;
+  max-height: 100svh;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

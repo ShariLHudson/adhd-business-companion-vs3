@@ -83,19 +83,22 @@ function whyForChoice(
   choiceId: ChamberPerspectiveChoiceId,
   member: ChamberMember,
 ): string {
+  // Fold in each member's own specialty so 2–3 recommendations never share an
+  // identical sentence — each reason names what THIS member brings.
+  const focus = member.specialty.toLowerCase().replace(/\.$/, "");
   switch (choiceId) {
     case "decide":
-      return `${member.displayName} is a strong fit when you need a clear choice and the reasoning behind it.`;
+      return `${member.displayName} brings ${focus} to help you reach a clear, well-reasoned choice.`;
     case "plan":
-      return `${member.displayName} helps turn a big intention into a workable sequence.`;
+      return `${member.displayName} uses ${focus} to turn the intention into a workable sequence.`;
     case "market-sell":
-      return `${member.displayName} is oriented toward message, offer, and reaching the right people.`;
+      return `${member.displayName} works on ${focus} to sharpen your message and reach.`;
     case "organize-process":
-      return `${member.displayName} is good at simplifying systems so less has to live in your head.`;
+      return `${member.displayName} applies ${focus} to simplify the work so less lives in your head.`;
     case "confidence-momentum":
-      return `${member.displayName} helps restore steadiness and forward motion without pressure.`;
+      return `${member.displayName} draws on ${focus} to restore steadiness and forward motion.`;
     case "not-sure":
-      return `${member.displayName} is a gentle starting place when you are still naming the need.`;
+      return `${member.displayName} is a gentle starting place, grounded in ${focus}.`;
   }
 }
 
