@@ -13,7 +13,9 @@ describe("experienceSoundscapesMenu", () => {
     expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS.every((track) =>
       track.src.startsWith("/audio/Soundscapes/"),
     )).toBe(true);
-    expect(PEACEFUL_PLACES_MUSIC_TRACKS).toHaveLength(12);
+    // 12 original + 5 new Peaceful Moments tracks = 17 music titles.
+    expect(PEACEFUL_PLACES_MUSIC_TRACKS).toHaveLength(17);
+    // Ambient soundscapes are unchanged — the five music tracks were NOT added here.
     expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS).toHaveLength(12);
   });
 
