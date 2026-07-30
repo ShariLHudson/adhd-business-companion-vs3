@@ -114,7 +114,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Coffee House",
     category: "living-place",
     primaryFeeling: "Warmth, ease, gentle company",
-    backgroundImage: "/backgrounds/room-coffee-house-background.png",
+    backgroundImage: "/backgrounds/coffee-house-background.png",
     aliases: [
       "coffee house",
       "coffee shop",

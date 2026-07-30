@@ -52,7 +52,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "destination-gallery": estateBackgroundPath(
     "destination-gallery-background.png",
   ),
-  "coffee-house": estateBackgroundPath("tea-room-background.webp"),
+  "coffee-house": estateBackgroundPath("coffee-house-background.png"),
   "tea-room": estateBackgroundPath("tea-room-background.webp"),
   "dining-room": estateBackgroundPath("room-dining-room-background.png"),
   "estate-kitchen": estateBackgroundPath("kitchen-background.png"),
