@@ -49,8 +49,8 @@ export function ChamberOfMomentumRoomPanel({
 
   return (
     <div
-      className="chamber-room"
-      data-testid="chamber-of-momentum-room"
+      className="chamber-room-host"
+      data-testid="chamber-of-momentum-room-host"
       data-chamber-view={viewMode}
     >
       <ChamberOfMomentumEntryPanel

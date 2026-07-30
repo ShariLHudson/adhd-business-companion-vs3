@@ -1,13 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useState, type FormEvent } from "react";
-import {
-  CHAMBER_PERSPECTIVE_CHOICES,
-  recommendChamberMembersForPerspective,
-  type ChamberMemberRecommendation,
-  type ChamberPerspectiveChoiceId,
-} from "@/lib/chamber/chamberPerspectiveGuide";
+import { useId, useRef, useState, type FormEvent } from "react";
+import type { ChamberMemberRecommendation } from "@/lib/chamber/chamberPerspectiveGuide";
 import {
   matchChamberIntake,
   type ChamberIntakeMatch,
@@ -23,12 +18,30 @@ type Props = {
   onAboutMember?: (memberId: ChamberMemberId) => void;
 };
 
-/** Example descriptions shown beneath the intake field (optional prompts). */
-const INTAKE_EXAMPLES: readonly string[] = [
-  "I cannot decide whether to launch now.",
-  "My marketing is not working.",
-  "I have too many ideas and do not know where to start.",
+/**
+ * Sentence starters revealed by the quiet "Not sure how to describe it?"
+ * disclosure. They only POPULATE and FOCUS the same intake field — they are
+ * not routes or categories.
+ */
+const SENTENCE_STARTERS: readonly string[] = [
+  "I need help deciding…",
+  "I am trying to plan…",
+  "Something in my business is not working…",
+  "I feel stuck because…",
+  "I need another perspective on…",
 ];
+
+/** Labels for the three distinct recommendation slots. */
+const REC_LABELS = [
+  "Best fit",
+  "Supporting perspective",
+  "Different perspective",
+] as const;
+const REC_TESTIDS = [
+  "chamber-recs-best",
+  "chamber-recs-another",
+  "chamber-recs-different",
+] as const;
 
 type EntryStage =
   | { view: "intake"; followUp: string | null }
@@ -39,9 +52,8 @@ type EntryStage =
     };
 
 /**
- * Focused Chamber entry card — natural-language intake first, with the guided
- * quick-start choices kept as optional shortcuts and a secondary browse.
- * Does not mount gallery, profile, or chat.
+ * Focused Chamber entry — a single natural-language intake. Does not mount
+ * gallery, profile, or chat.
  */
 export function ChamberPerspectiveGuide({
   onTalkWithMember,
@@ -54,7 +66,8 @@ export function ChamberPerspectiveGuide({
     followUp: null,
   });
   const [howWorksOpen, setHowWorksOpen] = useState(false);
-  const howWorksId = useId();
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
+  const baseId = useId();
 
   function applyMatch(match: ChamberIntakeMatch) {
     if (match.kind === "follow_up") {
@@ -74,16 +87,20 @@ export function ChamberPerspectiveGuide({
     applyMatch(matchChamberIntake(query));
   }
 
-  function handleQuickStart(choiceId: ChamberPerspectiveChoiceId) {
-    const recs = recommendChamberMembersForPerspective(choiceId);
-    const [primary, ...rest] = recs;
-    if (!primary) return;
-    setStage({ view: "recs", primary, additional: rest.slice(0, 2) });
+  /** A starter only seeds + focuses the intake — it does not route. */
+  function useStarter(starter: string) {
+    setQuery((prev) => (prev.trim() ? prev : starter));
+    inputRef.current?.focus();
   }
 
   function resetToIntake() {
     setStage({ view: "intake", followUp: null });
   }
+
+  const recSlots =
+    stage.view === "recs"
+      ? [stage.primary, ...stage.additional].slice(0, 3)
+      : [];
 
   return (
     <section
@@ -98,8 +115,7 @@ export function ChamberPerspectiveGuide({
           What would you like help with today?
         </h1>
         <p className="chamber-entry-card__question">
-          Tell us what you are working through, and we will help you find the
-          right person around the table.
+          Describe what you are trying to decide, plan, improve, or move forward.
         </p>
       </header>
 
@@ -110,29 +126,25 @@ export function ChamberPerspectiveGuide({
             data-testid="chamber-intake"
             onSubmit={handleSubmit}
           >
-            <label
-              className="chamber-entry-card__intake-label"
-              htmlFor={`${howWorksId}-intake`}
-            >
-              Describe your situation in your own words
-            </label>
             <textarea
-              id={`${howWorksId}-intake`}
+              ref={inputRef}
+              id={`${baseId}-intake`}
               className="chamber-entry-card__intake-input"
               data-testid="chamber-intake-input"
+              aria-label="Describe what you would like help with"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              rows={3}
+              rows={4}
               placeholder="For example: I need another perspective on an important business decision."
               aria-describedby={
-                stage.followUp ? `${howWorksId}-follow-up` : undefined
+                stage.followUp ? `${baseId}-follow-up` : undefined
               }
             />
 
             {stage.followUp ? (
               <p
                 className="chamber-entry-card__follow-up"
-                id={`${howWorksId}-follow-up`}
+                id={`${baseId}-follow-up`}
                 data-testid="chamber-intake-follow-up"
                 role="status"
               >
@@ -146,70 +158,31 @@ export function ChamberPerspectiveGuide({
               data-testid="chamber-intake-submit"
               disabled={!query.trim()}
             >
-              Find the right Chamber member
+              Find the right Chamber members
             </button>
           </form>
 
-          <div
-            className="chamber-entry-card__examples"
-            data-testid="chamber-intake-examples"
+          <details
+            className="chamber-entry-card__starters"
+            data-testid="chamber-intake-starters"
           >
-            <p className="chamber-entry-card__examples-label">
-              Not sure how to start? Try one of these:
-            </p>
-            <div className="chamber-entry-card__examples-list">
-              {INTAKE_EXAMPLES.map((example, index) => (
+            <summary className="chamber-entry-card__starters-summary">
+              Not sure how to describe it?
+            </summary>
+            <div className="chamber-entry-card__starters-list">
+              {SENTENCE_STARTERS.map((starter, index) => (
                 <button
-                  key={example}
+                  key={starter}
                   type="button"
-                  className="chamber-entry-card__example"
-                  data-testid={`chamber-intake-example-${index}`}
-                  onClick={() => {
-                    setQuery(example);
-                    applyMatch(matchChamberIntake(example));
-                  }}
+                  className="chamber-entry-card__starter"
+                  data-testid={`chamber-intake-starter-${index}`}
+                  onClick={() => useStarter(starter)}
                 >
-                  {example}
+                  {starter}
                 </button>
               ))}
             </div>
-          </div>
-
-          <div className="chamber-entry-card__quick-start">
-            <p className="chamber-entry-card__quick-start-label">
-              Or pick a starting point:
-            </p>
-            <div
-              className="chamber-entry-card__choices"
-              data-testid="chamber-perspective-choices"
-              role="group"
-              aria-label="Optional quick-start choices"
-            >
-              {CHAMBER_PERSPECTIVE_CHOICES.map((choice) => (
-                <button
-                  key={choice.id}
-                  type="button"
-                  className={[
-                    "chamber-entry-card__choice",
-                    choice.secondary
-                      ? "chamber-entry-card__choice--secondary"
-                      : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ")}
-                  data-testid={`chamber-perspective-${choice.id}`}
-                  onClick={() => handleQuickStart(choice.id)}
-                >
-                  <span className="chamber-entry-card__choice-label">
-                    {choice.label}
-                  </span>
-                  <span className="chamber-entry-card__choice-hint">
-                    {choice.hint}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+          </details>
 
           <div className="chamber-entry-card__secondary">
             <button
@@ -218,7 +191,7 @@ export function ChamberPerspectiveGuide({
               data-testid="chamber-perspective-browse-all"
               onClick={onBrowseAll}
             >
-              Browse All Members
+              Browse all Chamber members
             </button>
           </div>
 
@@ -232,21 +205,21 @@ export function ChamberPerspectiveGuide({
           >
             <summary
               className="chamber-entry-card__how-summary"
-              id={`${howWorksId}-summary`}
+              id={`${baseId}-how`}
             >
-              How the Chamber Works
+              How the Chamber works
             </summary>
             <div
               className="chamber-entry-card__how-body"
               role="region"
-              aria-labelledby={`${howWorksId}-summary`}
+              aria-labelledby={`${baseId}-how`}
             >
-              <p>Tell us what you are working through.</p>
+              <p>Describe what you are working through.</p>
               <p>
-                We suggest the Chamber member or members best suited to help —
-                never more than a few at a time.
+                We suggest the Chamber members best suited to help — a few, never
+                all twenty-four.
               </p>
-              <p>You can accept a suggestion or choose anyone yourself.</p>
+              <p>You can talk with a suggestion or choose anyone yourself.</p>
               <p>Your current work and context stay connected.</p>
             </div>
           </details>
@@ -269,37 +242,26 @@ export function ChamberPerspectiveGuide({
             className="chamber-entry-card__recs-list"
             data-testid="chamber-perspective-recs-list"
           >
-            <RecommendationGroup
-              heading="Recommended starting point"
-              testId="chamber-recs-primary"
-              recommendations={[stage.primary]}
-              onTalkWithMember={onTalkWithMember}
-              onAboutMember={onAboutMember}
-            />
-
-            {stage.additional.length > 0 ? (
-              <p
-                className="chamber-entry-card__more-cue"
-                data-testid="chamber-recs-more-cue"
-                role="note"
-              >
-                More perspectives below
-              </p>
-            ) : null}
-
-            {stage.additional.length > 0 ? (
-              <RecommendationGroup
-                heading={
-                  stage.additional.length > 1
-                    ? "Additional perspectives"
-                    : "Additional perspective"
-                }
-                testId="chamber-recs-additional"
-                recommendations={stage.additional}
-                onTalkWithMember={onTalkWithMember}
-                onAboutMember={onAboutMember}
-              />
-            ) : null}
+            {recSlots.map((rec, index) => (
+              <div key={rec.member.id}>
+                {index === 1 && recSlots.length > 1 ? (
+                  <p
+                    className="chamber-entry-card__more-cue"
+                    data-testid="chamber-recs-more-cue"
+                    role="note"
+                  >
+                    More perspectives below
+                  </p>
+                ) : null}
+                <RecommendationSlot
+                  heading={REC_LABELS[index] ?? "Another perspective"}
+                  testId={REC_TESTIDS[index] ?? `chamber-recs-${index}`}
+                  recommendation={rec}
+                  onTalkWithMember={onTalkWithMember}
+                  onAboutMember={onAboutMember}
+                />
+              </div>
+            ))}
           </div>
 
           <div className="chamber-entry-card__recs-footer">
@@ -326,76 +288,71 @@ export function ChamberPerspectiveGuide({
   );
 }
 
-function RecommendationGroup({
+function RecommendationSlot({
   heading,
   testId,
-  recommendations,
+  recommendation,
   onTalkWithMember,
   onAboutMember,
 }: {
   heading: string;
   testId: string;
-  recommendations: ChamberMemberRecommendation[];
+  recommendation: ChamberMemberRecommendation;
   onTalkWithMember: (memberId: ChamberMemberId) => void;
   onAboutMember?: (memberId: ChamberMemberId) => void;
 }) {
+  const { member, whyFits } = recommendation;
   return (
-    <div className="chamber-entry-card__recs-group" data-testid={testId}>
+    <div
+      className="chamber-entry-card__recs-group"
+      data-testid={testId}
+      role="listitem"
+    >
       <h2 className="chamber-entry-card__recs-heading">{heading}</h2>
-      <div className="chamber-entry-card__recs-grid" role="list">
-        {recommendations.map(({ member, whyFits }) => (
-          <article
-            key={member.id}
-            className="chamber-entry-card__rec"
-            data-testid={`chamber-rec-card-${member.id}`}
-            role="listitem"
-          >
+      <article
+        className="chamber-entry-card__rec"
+        data-testid={`chamber-rec-card-${member.id}`}
+      >
+        <button
+          type="button"
+          className="chamber-entry-card__rec-portrait"
+          aria-label={chamberMemberTalkLabel(member)}
+          onClick={() => onTalkWithMember(member.id)}
+        >
+          <Image
+            src={member.cardImagePath}
+            alt=""
+            width={96}
+            height={144}
+            className="chamber-entry-card__rec-image"
+          />
+        </button>
+        <div className="chamber-entry-card__rec-body">
+          <h3 className="chamber-entry-card__rec-name">{member.displayName}</h3>
+          <p className="chamber-entry-card__rec-specialty">{member.specialty}</p>
+          <p className="chamber-entry-card__rec-why">{whyFits}</p>
+          <div className="chamber-entry-card__rec-actions">
             <button
               type="button"
-              className="chamber-entry-card__rec-portrait"
-              aria-label={chamberMemberTalkLabel(member)}
+              className="chamber-entry-card__rec-talk"
+              data-testid={`chamber-rec-talk-${member.id}`}
               onClick={() => onTalkWithMember(member.id)}
             >
-              <Image
-                src={member.cardImagePath}
-                alt=""
-                width={96}
-                height={144}
-                className="chamber-entry-card__rec-image"
-              />
+              {chamberMemberTalkLabel(member)}
             </button>
-            <div className="chamber-entry-card__rec-body">
-              <h3 className="chamber-entry-card__rec-name">
-                {member.displayName}
-              </h3>
-              <p className="chamber-entry-card__rec-specialty">
-                {member.specialty}
-              </p>
-              <p className="chamber-entry-card__rec-why">{whyFits}</p>
-              <div className="chamber-entry-card__rec-actions">
-                <button
-                  type="button"
-                  className="chamber-entry-card__rec-talk"
-                  data-testid={`chamber-rec-talk-${member.id}`}
-                  onClick={() => onTalkWithMember(member.id)}
-                >
-                  {chamberMemberTalkLabel(member)}
-                </button>
-                {onAboutMember ? (
-                  <button
-                    type="button"
-                    className="chamber-entry-card__rec-about"
-                    data-testid={`chamber-rec-about-${member.id}`}
-                    onClick={() => onAboutMember(member.id)}
-                  >
-                    Learn about this member
-                  </button>
-                ) : null}
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
+            {onAboutMember ? (
+              <button
+                type="button"
+                className="chamber-entry-card__rec-about"
+                data-testid={`chamber-rec-about-${member.id}`}
+                onClick={() => onAboutMember(member.id)}
+              >
+                Learn about this member
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </article>
     </div>
   );
 }

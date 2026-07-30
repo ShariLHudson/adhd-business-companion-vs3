@@ -517,3 +517,57 @@
     display: none;
   }
 }
+
+/* --- Quiet "Not sure how to describe it?" disclosure (sentence starters) --- */
+.chamber-entry-card__starters {
+  margin-top: 0.1rem;
+}
+
+.chamber-entry-card__starters-summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 236, 196, 0.9);
+  list-style: none;
+  padding: 0.2rem 0;
+}
+
+.chamber-entry-card__starters-summary::-webkit-details-marker {
+  display: none;
+}
+
+.chamber-entry-card__starters-summary::before {
+  content: "+ ";
+  opacity: 0.7;
+}
+
+.chamber-entry-card__starters[open] .chamber-entry-card__starters-summary::before {
+  content: "\2013 ";
+}
+
+.chamber-entry-card__starters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+
+.chamber-entry-card__starter {
+  text-align: left;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 252, 245, 0.28);
+  background: rgba(255, 252, 245, 0.06);
+  color: rgba(255, 252, 245, 0.92);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chamber-entry-card__starter:hover {
+  background: rgba(255, 252, 245, 0.14);
+}
+
+.chamber-entry-card__starter:focus-visible {
+  outline: 2px solid #f0d48a;
+  outline-offset: 2px;
+}

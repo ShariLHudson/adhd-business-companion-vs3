@@ -1,10 +1,33 @@
-.chamber-room {
+/*
+ * ONE room shell, ONE fixed background owner, ONE bounded scroll owner.
+ * The Chamber mounts inside a bounded flex column in CompanionPageClient
+ * (flex h-full min-h-0 flex-1 flex-col overflow-hidden), so every layer is
+ * parent-bounded via flex — the embedded content is never sized to 100dvh.
+ */
+
+/* Panel wrapper (ChamberOfMomentumRoomPanel) — was a duplicate .chamber-room. */
+.chamber-room-host {
   position: relative;
-  min-height: 100dvh;
-  min-height: 100svh;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
+/* The single room shell (ChamberOfMomentumRoomShell). */
+.chamber-room {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* The single fixed background owner (full viewport, behind content). */
 .chamber-room__cinematic {
   position: fixed;
   inset: 0;
@@ -14,18 +37,14 @@
   height: 100svh;
 }
 
+/* The single bounded content scroll owner — fills the shell, scrolls inside it.
+   min-height:0 lets it shrink within the flex column so overflow-y engages.
+   No 100dvh sizing; no nested per-card scrollers. */
 .chamber-room__scroll {
   position: relative;
   z-index: 1;
-  min-height: 100dvh;
-  min-height: 100svh;
-  /* Bound the height to the viewport so overflow-y:auto actually scrolls when
-     content (e.g. multiple recommendation cards) exceeds the screen. Without a
-     cap the element grows past the viewport and the overflow:hidden parent
-     clips it, trapping the extra recommendations off-screen. This container is
-     the single scroll owner — recommendation cards never scroll individually. */
-  max-height: 100dvh;
-  max-height: 100svh;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

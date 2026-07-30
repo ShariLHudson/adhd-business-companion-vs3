@@ -1,29 +1,24 @@
 /**
- * Chamber of Momentum — conversational intake matching (Phase 1A).
+ * Chamber of Momentum — conversational intake matching.
  *
- * A THIN, DETERMINISTIC layer that composes the existing canonical systems.
- * It performs topic + need matching only — there is no AI evaluation here.
- * It introduces no new member registry and no second recommendation engine:
- *   - specific topic / need language  → resolveChamberMemberFromText()  (aliases)
- *   - broad need language             → an existing perspective choice
- *                                       → recommendChamberMembersForPerspective()
+ * A THIN, DETERMINISTIC layer over the canonical systems (no AI, no new
+ * registry): the 24-member registry + aliases (resolveChamberMemberFromText)
+ * plus a need→member COVERAGE MAP built entirely from canonical member ids.
  *
- * Returns at most three members (one primary + up to two additional
- * perspectives), or a single gentle follow-up question when confidence is too
- * low. It never falls back to displaying all 24 members.
+ * Contract: return exactly THREE credible members (a best starting point plus
+ * two genuinely different perspectives from the same need area) when a need is
+ * recognized, or ONE gentle follow-up question when it is not. It never pads
+ * with weak matches and never lists all 24.
  */
 
 import {
   resolveChamberMemberFromText,
 } from "./chamberMemberAliases";
-import {
-  recommendChamberMembersForPerspective,
-  type ChamberMemberRecommendation,
-  type ChamberPerspectiveChoiceId,
-} from "./chamberPerspectiveGuide";
+import type { ChamberMemberRecommendation } from "./chamberPerspectiveGuide";
 import {
   getChamberMemberById,
   type ChamberMember,
+  type ChamberMemberId,
 } from "./chamberMemberRegistry";
 
 /** The single gentle follow-up shown when a request is too broad to match. */
@@ -33,10 +28,9 @@ export const CHAMBER_INTAKE_FOLLOW_UP =
 export type ChamberIntakeMatch =
   | {
       kind: "recommendations";
-      /** How the match was derived — for honest, non-AI wording. */
-      basis: "topic" | "perspective" | "cross-specialty";
+      basis: "topic" | "coverage" | "cross-specialty";
       primary: ChamberMemberRecommendation;
-      /** Up to two additional perspectives (may be empty for a single clear match). */
+      /** Up to two additional perspectives (materially different from primary). */
       additional: ChamberMemberRecommendation[];
     }
   | {
@@ -45,54 +39,94 @@ export type ChamberIntakeMatch =
     };
 
 /**
- * Broad need-language → an existing perspective choice. Evaluated in order;
- * first match wins. These map the member's OWN words onto the perspective
- * buckets that already exist in chamberPerspectiveGuide.ts — we do not invent
- * new categories. The follow-up answers ("choosing between options", "making a
- * plan", "getting started") are covered here so a follow-up reply resolves.
+ * Need coverage areas → an ordered list of credible canonical members
+ * (best first, then two genuinely different perspectives). Every one of the 24
+ * members appears in at least one area, so need-based language can surface all
+ * of them — not just the eleven the old perspective buckets reached.
  */
-const PERSPECTIVE_PATTERNS: {
-  choiceId: ChamberPerspectiveChoiceId;
-  pattern: RegExp;
-}[] = [
-  {
-    choiceId: "market-sell",
-    pattern:
-      /\b(?:marketing|market|advertis\w*|ads?|campaign\w*|promot\w*|audience|brand\w*|sell|selling|sales|lead\w*|customer\w*|messaging|copy|content)\b/i,
-  },
-  {
-    choiceId: "organize-process",
-    pattern:
-      /\b(?:process\w*|workflow\w*|system\w*|operation\w*|sops?|automat\w*|bottleneck\w*|streamline\w*|repeatable)\b/i,
-  },
-  {
-    choiceId: "decide",
-    pattern:
-      /\b(?:decid\w*|decision\w*|choose|choosing|choice\w*|torn|weigh\w*|whether to|should i|can'?t decide|between options|two options|which option)\b/i,
-  },
-  {
-    choiceId: "plan",
-    pattern:
-      /\b(?:plan\w*|roadmap|strateg\w*|sequenc\w*|timeline|prioriti\w*|next steps?)\b/i,
-  },
-  {
-    choiceId: "confidence-momentum",
-    pattern:
-      /\b(?:stuck|overwhelm\w*|momentum|motivat\w*|procrastinat\w*|paralysis|burn(?:ed|t)?\s?out|energy|confidence|too many ideas|where (?:to|do i) start|getting started|get started|can'?t start|keep going|falling behind)\b/i,
-  },
+type NeedCategory =
+  | "decisions"
+  | "planning"
+  | "marketing-selling"
+  | "process-systems"
+  | "finance-pricing"
+  | "customers-market"
+  | "people-hiring"
+  | "technology-ai"
+  | "risk-resilience"
+  | "values-trust"
+  | "founder-wellbeing"
+  | "momentum"
+  | "strategy-growth"
+  | "assumptions-blindspots"
+  | "events"
+  | "ideas-innovation"
+  | "creative"
+  | "presentations"
+  | "learning"
+  | "networking"
+  | "partnerships"
+  | "knowledge"
+  | "data"
+  | "horizons";
+
+const CATEGORY_MEMBERS: Record<NeedCategory, ChamberMemberId[]> = {
+  decisions: ["strategy", "leadership", "research"],
+  planning: ["project-management", "strategy", "systems"],
+  "marketing-selling": ["marketing", "sales", "content"],
+  "process-systems": ["systems", "project-management", "knowledge-management"],
+  "finance-pricing": ["finance", "strategy", "data-analytics"],
+  "customers-market": ["client-relationships", "sales", "research"],
+  "people-hiring": ["people-culture", "leadership", "learning"],
+  "technology-ai": ["ai-technology", "systems", "data-analytics"],
+  "risk-resilience": ["strategy", "wellness", "leadership"],
+  "values-trust": ["client-relationships", "leadership", "partnerships"],
+  "founder-wellbeing": ["wellness", "momentum", "leadership"],
+  momentum: ["momentum", "wellness", "strategy"],
+  "strategy-growth": ["strategy", "horizons", "marketing"],
+  "assumptions-blindspots": ["research", "strategy", "data-analytics"],
+  events: ["events", "project-management", "marketing"],
+  "ideas-innovation": ["innovations", "creative-studio", "horizons"],
+  creative: ["creative-studio", "content", "innovations"],
+  presentations: ["presentations", "content", "marketing"],
+  learning: ["learning", "knowledge-management", "people-culture"],
+  networking: ["networking", "partnerships", "client-relationships"],
+  partnerships: ["partnerships", "networking", "strategy"],
+  knowledge: ["knowledge-management", "systems", "learning"],
+  data: ["data-analytics", "research", "strategy"],
+  horizons: ["horizons", "innovations", "strategy"],
+};
+
+/** Ordered detection — first match wins; specific areas precede broad ones. */
+const CATEGORY_PATTERNS: { category: NeedCategory; pattern: RegExp }[] = [
+  { category: "events", pattern: /\b(events?|retreat\w*|workshop\w*|seminar\w*|conference\w*|summit\w*|gathering\w*|webinar\w*|gala|convention|meetup|venue|agenda|attendees?|registration)\b/i },
+  { category: "finance-pricing", pattern: /\b(financ\w*|money|budget\w*|cash\s*flow|pricing|price|profit\w*|revenue|cost\w*|invoic\w*|expenses?|bookkeep\w*|accounting)\b/i },
+  { category: "people-hiring", pattern: /\b(hir\w*|recruit\w*|staff\w*|employee\w*|onboard\w*|candidate\w*|interview\w*|human resources|\bhr\b|talent|team\s*(?:culture|fit)|people\s*(?:and\s*culture|management))\b/i },
+  { category: "technology-ai", pattern: /\b(\bai\b|a\.i\.|artificial intelligence|automat\w*|software|no[\s-]?code|integration\w*|\bapi\b|chatgpt|claude|tech(?:nology)?\s*(?:stack|tool|choice))\b/i },
+  { category: "data", pattern: /\b(data|analytic\w*|metric\w*|\bkpis?\b|measure\w*|dashboard\w*|the numbers|reporting)\b/i },
+  { category: "presentations", pattern: /\b(present\w*|slide\w*|\bdeck\b|pitch\w*|keynote|speaking|a\s+talk)\b/i },
+  { category: "creative", pattern: /\b(creative\s*(?:direction|studio)?|design\w*|visual\w*|aesthetic\w*|look and feel|brand\s*visuals)\b/i },
+  { category: "ideas-innovation", pattern: /\b(innovat\w*|invent\w*|new\s+(?:idea|product|service|concept)s?|experiment\w*|brainstorm\w*|too many ideas)\b/i },
+  { category: "learning", pattern: /\b(learn\w*|skill\w*|study\w*|\bcourse\b|master\w*|training|upskill\w*|get better at)\b/i },
+  { category: "networking", pattern: /\b(network\w*|connection\w*|meet people|introduction\w*|referral\w*)\b/i },
+  { category: "partnerships", pattern: /\b(partner\w*|collaborat\w*|joint venture|alliance\w*|co[\s-]?found\w*|affiliate\w*)\b/i },
+  { category: "knowledge", pattern: /\b(knowledge|documentation|second brain|organize (?:what i know|my (?:notes|information))|\bwiki\b|reference library)\b/i },
+  { category: "marketing-selling", pattern: /\b(marketing|advertis\w*|ads?|campaign\w*|promot\w*|audience|brand\w*|selling|sales|lead\w*|messaging|\bcopy\b|social media|funnel|content)\b/i },
+  { category: "customers-market", pattern: /\b(customer\w*|client\w*|competitor\w*|market research|buyer\w*|churn|retention)\b/i },
+  { category: "process-systems", pattern: /\b(process\w*|workflow\w*|system\w*|operation\w*|sops?|bottleneck\w*|streamline\w*|repeatable|standard operating)\b/i },
+  { category: "risk-resilience", pattern: /\b(risk\w*|resilien\w*|contingen\w*|worst[\s-]?case|downside|mitigat\w*|safeguard\w*|backup plan|what could go wrong)\b/i },
+  { category: "values-trust", pattern: /\b(values?|trust|integrity|ethic\w*|authentic\w*|reputation|do the right thing|true to)\b/i },
+  { category: "assumptions-blindspots", pattern: /\b(assumption\w*|blind\s?spot\w*|(?:what|am i) missing|overlook\w*|challenge my thinking|pressure[\s-]?test|poke holes|second opinion|another perspective)\b/i },
+  { category: "founder-wellbeing", pattern: /\b(burn(?:ed|t)?\s?out|burnout|exhaust\w*|wellbeing|well-being|work[\s-]?life|boundaries|rest|self[\s-]?care|running on empty)\b/i },
+  { category: "momentum", pattern: /\b(stuck|momentum|motivat\w*|procrastinat\w*|paralysis|where (?:to|do i) start|getting started|get started|can'?t start|keep going|falling behind|restart|lost steam)\b/i },
+  { category: "planning", pattern: /\b(plan\w*|roadmap|sequenc\w*|timeline|prioriti\w*|next steps?|schedul\w*|deadline\w*|\bproject\b)\b/i },
+  { category: "decisions", pattern: /\b(decid\w*|decision\w*|choose|choosing|choice\w*|torn|weigh\w*|whether to|should i|can'?t decide|between options|which option)\b/i },
+  { category: "horizons", pattern: /\b(future|long[\s-]?term|trends?|what'?s next|five years|vision for|where (?:this|we) (?:is|are) (?:going|headed))\b/i },
+  { category: "strategy-growth", pattern: /\b(strateg\w*|grow\w*|scal\w*|expand\w*|direction|\bvision\b|big picture)\b/i },
 ];
 
-/** Normalize for length / emptiness checks (matching itself uses raw text). */
 function normalize(text: string): string {
   return text.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-function reasonForTopic(member: ChamberMember): string {
-  return `${member.displayName} focuses on ${member.specialty.toLowerCase()} — a direct fit for what you described.`;
-}
-
-function reasonForCrossSpecialty(member: ChamberMember): string {
-  return `${member.displayName} could help here — ${member.specialty.toLowerCase()}.`;
 }
 
 function toRecommendation(
@@ -102,25 +136,61 @@ function toRecommendation(
   return { member, whyFits, canHelpWith: member.howTheyHelp };
 }
 
-/** Cap to primary + up to two additional (never more than three total). */
-function shape(
-  basis: "topic" | "perspective" | "cross-specialty",
-  recommendations: ChamberMemberRecommendation[],
+/** Position-anchored, member-specific, materially-different reasons. */
+function reasonForPosition(member: ChamberMember, index: number): string {
+  const focus = member.specialty.toLowerCase().replace(/\.$/, "");
+  if (index === 0) {
+    return `${member.displayName} is the best starting point — ${focus} is exactly what this calls for.`;
+  }
+  if (index === 1) {
+    return `${member.displayName} adds a useful second angle: ${focus}.`;
+  }
+  return `${member.displayName} brings a different lens worth considering — ${focus}.`;
+}
+
+function dedupeIds(ids: readonly ChamberMemberId[]): ChamberMemberId[] {
+  return [...new Set(ids)];
+}
+
+/** First coverage area whose credible list contains this member. */
+function categoryContaining(id: ChamberMemberId): NeedCategory | null {
+  for (const category of Object.keys(CATEGORY_MEMBERS) as NeedCategory[]) {
+    if (CATEGORY_MEMBERS[category].includes(id)) return category;
+  }
+  return null;
+}
+
+/** Build a three-member recommendation (or follow-up if <3 credible exist). */
+function build(
+  basis: "topic" | "coverage" | "cross-specialty",
+  seedIds: readonly ChamberMemberId[],
+  fillCategory: NeedCategory | null,
 ): ChamberIntakeMatch {
-  const [primary, ...rest] = recommendations;
-  if (!primary) {
+  const ids = dedupeIds([
+    ...seedIds,
+    ...(fillCategory ? CATEGORY_MEMBERS[fillCategory] : []),
+  ]).slice(0, 3);
+
+  const members = ids
+    .map((id) => getChamberMemberById(id))
+    .filter((m): m is ChamberMember => Boolean(m));
+
+  // Credibility over slot-filling: fewer than three credible → follow-up.
+  if (members.length < 3) {
     return { kind: "follow_up", question: CHAMBER_INTAKE_FOLLOW_UP };
   }
+
+  const recs = members.map((m, i) => toRecommendation(m, reasonForPosition(m, i)));
   return {
     kind: "recommendations",
     basis,
-    primary,
-    additional: rest.slice(0, 2),
+    primary: recs[0]!,
+    additional: recs.slice(1, 3),
   };
 }
 
 /**
- * Match a natural-language request to Chamber members.
+ * Match a natural-language request to three Chamber members, or one follow-up.
  * Topic/need matching only — never an AI evaluation.
  */
 export function matchChamberIntake(userText: string): ChamberIntakeMatch {
@@ -129,42 +199,25 @@ export function matchChamberIntake(userText: string): ChamberIntakeMatch {
     return { kind: "follow_up", question: CHAMBER_INTAKE_FOLLOW_UP };
   }
 
-  // 1 + 2. Direct specialty / need language → a specific member (aliases).
+  // 1. Direct member (alias) match → that member leads, filled by its area.
   const resolved = resolveChamberMemberFromText(userText);
-
   if (resolved.kind === "match") {
-    const member = getChamberMemberById(resolved.match.memberId);
-    if (member) {
-      // One clear match → a single primary recommendation.
-      return shape("topic", [toRecommendation(member, reasonForTopic(member))]);
-    }
+    const id = resolved.match.memberId;
+    return build("topic", [id], categoryContaining(id));
   }
-
   if (resolved.kind === "ambiguous") {
-    // The situation crosses specialties → primary + additional (2–3).
-    const recs = resolved.options
-      .map((opt) => getChamberMemberById(opt.memberId))
-      .filter((m): m is ChamberMember => Boolean(m))
-      .map((m) => toRecommendation(m, reasonForCrossSpecialty(m)));
-    if (recs.length >= 2) {
-      return shape("cross-specialty", recs);
-    }
-    if (recs.length === 1) {
-      return shape("topic", recs);
-    }
+    // Genuinely crosses specialties → seed with the options, fill to three.
+    const optionIds = resolved.options.map((o) => o.memberId);
+    return build("cross-specialty", optionIds, categoryContaining(optionIds[0]!));
   }
 
-  // 3 + 4. Broad need language → an existing perspective bucket.
-  for (const { choiceId, pattern } of PERSPECTIVE_PATTERNS) {
+  // 2. Need-language → a coverage area (surfaces all 24 members).
+  for (const { category, pattern } of CATEGORY_PATTERNS) {
     if (pattern.test(userText)) {
-      return shape(
-        "perspective",
-        recommendChamberMembersForPerspective(choiceId),
-      );
+      return build("coverage", CATEGORY_MEMBERS[category], category);
     }
   }
 
-  // 7 + 8. Too broad to match confidently → one gentle follow-up question.
-  // Never fall back to showing all 24 members.
+  // 3. Too broad to place → one gentle follow-up. Never lists all 24.
   return { kind: "follow_up", question: CHAMBER_INTAKE_FOLLOW_UP };
 }
