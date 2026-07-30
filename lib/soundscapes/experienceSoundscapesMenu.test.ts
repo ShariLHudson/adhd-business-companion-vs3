@@ -13,8 +13,10 @@ describe("experienceSoundscapesMenu", () => {
     expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS.every((track) =>
       track.src.startsWith("/audio/Soundscapes/"),
     )).toBe(true);
+    // Music catalog is unchanged by the storm-soundscapes work.
     expect(PEACEFUL_PLACES_MUSIC_TRACKS).toHaveLength(12);
-    expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS).toHaveLength(12);
+    // 12 original + 2 new storm soundscapes (distant-thunder, rain-and-thunder) = 14.
+    expect(EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS).toHaveLength(14);
   });
 
   it("resolves tracks by id", () => {
