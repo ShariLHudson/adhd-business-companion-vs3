@@ -128,9 +128,10 @@ import {
 import {
   buildDraftSavedAnnouncement,
   persistGeneratedDraft,
+  persistGeneratedDraftDurable,
 } from "@/lib/createDraftPersistence";
-import { persistSavedWorkDurable } from "@/lib/savedWorkStore";
 import { isSavedWorkDurableEnabled } from "@/lib/durableRecords/flags";
+import { resolveSavedWorkClaim } from "@/lib/durableRecords/savedWorkClaims";
 import {
   deleteCreateDraftEntry,
   duplicateCreateDraftEntry,
@@ -338,6 +339,12 @@ export function ContentGeneratorPanel({
   const workflowRef = useRef(workflow);
   workflowRef.current = workflow;
   const [confirmDeleteDraft, setConfirmDeleteDraft] = useState(false);
+  // Durable-save status for truthful, receipt-gated feedback (Blocker 2).
+  const [durableSaveStatus, setDurableSaveStatus] = useState<
+    | null
+    | { kind: "saving" }
+    | { kind: "retained" | "failed"; message: string; retryable: boolean }
+  >(null);
   const started = useRef(false);
   const lastSeedSig = useRef("");
   // Zero-hop: opened from chat with a clear type → straight to writing, never
@@ -733,21 +740,43 @@ export function ContentGeneratorPanel({
           "Draft"
         ).slice(0, 80);
         if (onSavedArtifactChange) {
-          const { record, item } = persistGeneratedDraft({
-            draft: content,
-            artifactType: resolvedType,
-            title: artifactTitle,
-            existingSavedWorkId:
-              savedArtifact?.savedWorkId ?? savedArtifact?.templateId,
-            prevArtifact: savedArtifact ?? null,
-          });
-          onSavedArtifactChange(record);
-          setLocationPanelOpen(true);
-          onArtifactReady?.(buildDraftSavedAnnouncement(record));
-          // Durable persistence (rollout-flagged). Background; keeps local
-          // recovery + current announcement. Receipt is traced for Blocker 2.
           if (isSavedWorkDurableEnabled()) {
-            void persistSavedWorkDurable(item);
+            // Durable path: announce "saved" only after a verified receipt.
+            setDurableSaveStatus({ kind: "saving" });
+            const { record, receipt } = await persistGeneratedDraftDurable({
+              draft: content,
+              artifactType: resolvedType,
+              title: artifactTitle,
+              existingSavedWorkId:
+                savedArtifact?.savedWorkId ?? savedArtifact?.templateId,
+              prevArtifact: savedArtifact ?? null,
+            });
+            onSavedArtifactChange(record);
+            setLocationPanelOpen(true);
+            const claim = resolveSavedWorkClaim(receipt, "create");
+            if (claim.status === "durably_saved") {
+              setDurableSaveStatus(null);
+              onArtifactReady?.(buildDraftSavedAnnouncement(record));
+            } else {
+              setDurableSaveStatus({
+                kind: claim.retryable ? "retained" : "failed",
+                message: claim.message,
+                retryable: claim.retryable,
+              });
+              onArtifactReady?.(claim.message);
+            }
+          } else {
+            const { record } = persistGeneratedDraft({
+              draft: content,
+              artifactType: resolvedType,
+              title: artifactTitle,
+              existingSavedWorkId:
+                savedArtifact?.savedWorkId ?? savedArtifact?.templateId,
+              prevArtifact: savedArtifact ?? null,
+            });
+            onSavedArtifactChange(record);
+            setLocationPanelOpen(true);
+            onArtifactReady?.(buildDraftSavedAnnouncement(record));
           }
         }
         return true;
@@ -1004,28 +1033,44 @@ export function ContentGeneratorPanel({
     return validateArtifactForExport(savedArtifact, draft, artifactTitleValue());
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!draft.trim()) return;
     const artifactTitle = artifactTitleValue();
     const artifactType = type || "content";
-    const { record, item } = persistGeneratedDraft({
+    const persistArgs = {
       draft,
       artifactType,
       title: artifactTitle,
       existingSavedWorkId:
         savedArtifact?.savedWorkId ?? savedArtifact?.templateId,
       prevArtifact: savedArtifact ?? null,
-    });
-
+    };
+    if (isSavedWorkDurableEnabled()) {
+      // Announce success only after a verified durable receipt.
+      setDurableSaveStatus({ kind: "saving" });
+      const { record, receipt } = await persistGeneratedDraftDurable(persistArgs);
+      onSavedArtifactChange?.(record);
+      setLocationPanelOpen(true);
+      const claim = resolveSavedWorkClaim(receipt, "save");
+      if (claim.status === "durably_saved") {
+        setDurableSaveStatus(null);
+        note(saveReceipt("saved-work"));
+        onWin?.(artifactTitle);
+      } else {
+        setDurableSaveStatus({
+          kind: claim.retryable ? "retained" : "failed",
+          message: claim.message,
+          retryable: claim.retryable,
+        });
+        note(claim.message);
+      }
+      return;
+    }
+    const { record } = persistGeneratedDraft(persistArgs);
     onSavedArtifactChange?.(record);
     setLocationPanelOpen(true);
     note(saveReceipt("saved-work"));
     onWin?.(artifactTitle);
-    // Durable persistence (rollout-flagged). Background; keeps local recovery +
-    // current receipt copy. Durable receipt is traced for Blocker 2.
-    if (isSavedWorkDurableEnabled()) {
-      void persistSavedWorkDurable(item);
-    }
   }
 
   function handleProjectPicked(project: Project) {
@@ -2046,6 +2091,26 @@ export function ContentGeneratorPanel({
               </details>
               {flash && (
                 <p className="mt-2 text-sm font-semibold text-[#1e4f4f]">{flash}</p>
+              )}
+              {durableSaveStatus?.kind === "saving" && (
+                <p className="mt-2 text-sm text-[#5a6b6b]">Saving your work safely…</p>
+              )}
+              {(durableSaveStatus?.kind === "retained" ||
+                durableSaveStatus?.kind === "failed") && (
+                <div className="mt-2 flex items-center gap-3">
+                  <p className="text-sm font-medium text-[#8a5a2b]">
+                    {durableSaveStatus.message}
+                  </p>
+                  {durableSaveStatus.retryable && (
+                    <button
+                      type="button"
+                      onClick={() => void handleSave()}
+                      className="text-sm font-semibold text-[#1e4f4f] underline"
+                    >
+                      Try again
+                    </button>
+                  )}
+                </div>
               )}
             </>
           )}
