@@ -202,3 +202,26 @@ Everything here preserves the validated durable Saved Work work and changes noth
 - **Deployed to Preview only** (no `--prod`, no promote, no alias/settings/git-integration change).
 - **Deployment id:** `dpl_BFgDKbecbBtWVbRbLuvcsZmEXFrJ` · **URL:** https://adhd-business-companion-vs3-8mcjimq1j-shari-hudsons-projects.vercel.app · **target: preview** · **READY** · build succeeded (`npm run build`, Next.js 16.2.7, photo manifest generated; no build errors).
 - **Production alias unchanged** — still → `6ogtcyibg` (Jul 26).
+
+---
+
+## 11. Manual Preview acceptance (`42e87822`) + Soundscapes / Peaceful Moments diagnostic
+
+**Manual acceptance (Shari, clean Preview `dpl_BFgDKbecbBtWVbRbLuvcsZmEXFrJ` @ `42e87822`):**
+- ✅ Coffee House reachable through Wander the Estate.
+- ✅ A Wander Estate background can be opened and **kept open** (persistent + immersive Wander viewer works). → The committed Wander immersive work is now live in Preview.
+- ❌ **Soundscapes — not available.** ❌ **Peaceful Moments — not available.**
+
+**Diagnostic (Soundscapes + Peaceful Moments only; committed-code analysis — see runtime limitation):**
+
+- **Committed vs uncommitted:** Both features are **fully committed in `42e87822`** — components, menu entries, chrome host, chat intents, and 24 audio assets (`public/audio/Soundscapes/*` ×12, `public/audio/peaceful-places/*` ×12). They are **not** dependent on the 54 uncommitted files. The uncommitted items are additive soundscape tracks/manifest/tests (+2 tracks) and a *separate* "hide/show conversation" estate-visibility feature — neither gates these two.
+- **Expected member path:**
+  - Soundscapes → estate chrome `EstateTopRightChrome` → room "Audio" menu → Soundscapes, or the GlobalSoundControl "Soundscapes" button → `SoundscapeSelectionOverlay` (`CompanionPageClient.tsx:28291,28308`); also chat intent → `executeSoundscapeIntent` (`CompanionPageClient.tsx:17623`).
+  - Peaceful Moments → estate chrome → Audio menu → Peaceful Moments, or GlobalSoundControl → `openPeacefulPlacesCore` → section `focus-audio` (`FocusAudioPanel`→`PeacefulMomentsRoom`); also chat intent → `openFocusAudioCore` (~15 call sites via `detectAudioRequest`).
+- **Verified root cause (shared):** the **visible** entry points for BOTH features (the room "Audio" menu and the GlobalSoundControl) live inside `EstateTopRightChrome`, gated by `const visible = showProfile || (showRoom && Boolean(roomId))` (`EstateTopRightChrome.tsx:121-122`). Fed by `showProfile={showGlobalEstateMenu}` / `showRoom={showEstateExperienceMenu}` (`CompanionPageClient.tsx:28204-28207`), where `showEstateExperienceMenu = overlay!=="signin" && Boolean(roomMenuRoomId)` (`:25220`) and `showGlobalEstateMenu = estateChromePolicy.showSubtleEstateMenu && overlay!=="signin"` (`:25109`). On the home/arrival surface (no room context, subtle estate menu not shown), the chrome — and thus both audio entries — does not render, so both appear unavailable. Both retain chat-intent fallbacks that require typing an audio request. This is one shared visibility/reachability condition — **not** missing code, assets, a feature flag, or autoplay.
+- **Deployed asset status:** assets committed and in the build; HTTP verification blocked — every Preview request returns **302 → Vercel Login** (Vercel Deployment Protection). Not an app-level asset failure.
+- **Feature-flag / environment:** no feature flag gates these; sound is **opt-in** (`estateAudioSettings.ts:33-40`) which affects *playback after selection*, not entry *visibility*; Supabase auth gates the whole app and Vercel SSO gates the whole Preview — neither selectively hides these two; autoplay restrictions apply only on play, not to whether the entry appears.
+- **Runtime limitation:** authenticated in-browser inspection (console, network, rendered UI) was not possible — the Preview is behind Vercel SSO and I do not enter credentials. Recommend Shari, while authenticated, confirm whether `EstateTopRightChrome` renders on her surface and whether `/audio/*` requests return 200.
+- **Confidence:** committed-not-uncommitted — **High**; shared chrome-visibility gate as the mechanism — **Medium-High** (code-verified; exact runtime surface for Shari unconfirmed).
+- **Smallest contained correction (not implemented):** surface a persistent audio entry reachable on the home/arrival surface — e.g., allow the GlobalSoundControl to render outside the room/profile-menu condition (relax the `EstateTopRightChrome` visibility gate for the sound control), or add one always-present home-level "Sound" affordance. Contained to the chrome visibility condition / one control; do not modify the features, assets, Wander, Saved Work, or Coffee House.
+- **Tests to prevent recurrence:** (a) reachability test — the sound control / Audio entry renders from the home/arrival state; (b) menu-resolution test — every "Audio" nav destination resolves a forwarded handler and renders (as with the Research Library gap); (c) chat-intent parity test — an audio request opens Peaceful and a soundscape request opens the overlay; (d) manifest↔disk asset integrity for soundscape/peaceful filenames.
