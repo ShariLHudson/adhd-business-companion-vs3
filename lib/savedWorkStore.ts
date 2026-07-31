@@ -1,5 +1,13 @@
 // Saved Work — user-created documents (separate from reusable Templates).
 
+import { durableRecordFail } from "./durableRecords";
+import type { DurableRecordResult } from "./durableRecords";
+import {
+  noteSavedWorkReceipt,
+  softDeleteSavedWorkDurable,
+  upsertSavedWorkDurable,
+} from "./durableRecords/domains/savedWork";
+
 export type SavedWorkStatus = "draft" | "saved" | "exported" | "archived";
 
 export type SavedWorkItem = {
@@ -248,4 +256,89 @@ export function unarchiveSavedWork(id: string): SavedWorkItem | undefined {
   const restored: SavedWorkStatus =
     item.status === "archived" ? "saved" : item.status;
   return updateSavedWork(id, { status: restored });
+}
+
+// ---------------------------------------------------------------------------
+// Durable write integration (Beta Blocker 1, slice 1).
+//
+// Each durable write also keeps the local copy (via the sync functions above)
+// as a recovery cache. Durable success comes ONLY from the verified repository
+// receipt — never from the local write. Member-facing "saved" copy is NOT
+// changed here; the receipt is returned/traced so Blocker 2 can consume it.
+// ---------------------------------------------------------------------------
+
+const NOT_FOUND_RECEIPT = (): DurableRecordResult<SavedWorkItem> =>
+  durableRecordFail(
+    "NOT_FOUND",
+    "I couldn't find that to save — it may already be gone. Your work is still here.",
+    false,
+  );
+
+function announceSavedWorkUpdated(): void {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(SAVED_WORK_UPDATED_EVENT));
+  }
+}
+
+/** Attempt a verified durable save of an already-built item; returns the receipt. */
+export async function persistSavedWorkDurable(
+  item: SavedWorkItem,
+): Promise<DurableRecordResult<SavedWorkItem>> {
+  const receipt = await upsertSavedWorkDurable(item);
+  noteSavedWorkReceipt(item.id, receipt);
+  if (receipt.ok) announceSavedWorkUpdated();
+  return receipt;
+}
+
+export async function createSavedWorkDurable(input: {
+  title: string;
+  artifactType: string;
+  body: string;
+  status?: SavedWorkStatus;
+  sourceWorkspace?: string;
+  tags?: string[];
+}): Promise<{ item: SavedWorkItem; receipt: DurableRecordResult<SavedWorkItem> }> {
+  const item = createSavedWork(input); // local recovery write
+  const receipt = await persistSavedWorkDurable(item);
+  return { item, receipt };
+}
+
+export async function updateSavedWorkDurable(
+  id: string,
+  changes: Parameters<typeof updateSavedWork>[1],
+): Promise<{
+  item?: SavedWorkItem;
+  receipt: DurableRecordResult<SavedWorkItem>;
+}> {
+  const item = updateSavedWork(id, changes); // local recovery write
+  if (!item) return { receipt: NOT_FOUND_RECEIPT() };
+  const receipt = await persistSavedWorkDurable(item);
+  return { item, receipt };
+}
+
+export async function archiveSavedWorkDurable(id: string): Promise<{
+  item?: SavedWorkItem;
+  receipt: DurableRecordResult<SavedWorkItem>;
+}> {
+  const item = archiveSavedWork(id); // local: status -> archived
+  if (!item) return { receipt: NOT_FOUND_RECEIPT() };
+  const receipt = await persistSavedWorkDurable(item);
+  return { item, receipt };
+}
+
+/**
+ * Soft-delete durably (server retains status "deleted" for recovery). The local
+ * copy is removed only after the durable tombstone is verified, so a failed
+ * delete never loses the local recovery copy.
+ */
+export async function deleteSavedWorkDurable(
+  id: string,
+): Promise<DurableRecordResult<SavedWorkItem>> {
+  const receipt = await softDeleteSavedWorkDurable(id);
+  noteSavedWorkReceipt(id, receipt);
+  if (receipt.ok) {
+    deleteSavedWork(id); // remove local; server keeps recoverable soft-delete
+    announceSavedWorkUpdated();
+  }
+  return receipt;
 }

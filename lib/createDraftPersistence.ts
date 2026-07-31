@@ -9,9 +9,11 @@ import {
 } from "./savedArtifact";
 import {
   createSavedWork,
+  persistSavedWorkDurable,
   updateSavedWork,
   type SavedWorkItem,
 } from "./savedWorkStore";
+import type { DurableRecordResult } from "./durableRecords";
 
 export function buildDraftSavedAnnouncement(record: SavedArtifactRecord): string {
   const loc = record.savedLocationDetail || record.savedLocation;
@@ -69,4 +71,26 @@ export function persistGeneratedDraft(opts: {
   );
 
   return { item, record };
+}
+
+/**
+ * Durable variant: performs the same local recovery write, then attempts a
+ * verified durable save and returns the receipt. Member-facing copy is
+ * unchanged (buildDraftSavedAnnouncement stays as-is); the truthful receipt is
+ * returned so Blocker 2 can gate the "saved" announcement on it later.
+ */
+export async function persistGeneratedDraftDurable(opts: {
+  draft: string;
+  artifactType: string;
+  title: string;
+  existingSavedWorkId?: string | null;
+  prevArtifact?: SavedArtifactRecord | null;
+}): Promise<{
+  item: SavedWorkItem;
+  record: SavedArtifactRecord;
+  receipt: DurableRecordResult<SavedWorkItem>;
+}> {
+  const { item, record } = persistGeneratedDraft(opts);
+  const receipt = await persistSavedWorkDurable(item);
+  return { item, record, receipt };
 }

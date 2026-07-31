@@ -129,6 +129,8 @@ import {
   buildDraftSavedAnnouncement,
   persistGeneratedDraft,
 } from "@/lib/createDraftPersistence";
+import { persistSavedWorkDurable } from "@/lib/savedWorkStore";
+import { isSavedWorkDurableEnabled } from "@/lib/durableRecords/flags";
 import {
   deleteCreateDraftEntry,
   duplicateCreateDraftEntry,
@@ -731,7 +733,7 @@ export function ContentGeneratorPanel({
           "Draft"
         ).slice(0, 80);
         if (onSavedArtifactChange) {
-          const { record } = persistGeneratedDraft({
+          const { record, item } = persistGeneratedDraft({
             draft: content,
             artifactType: resolvedType,
             title: artifactTitle,
@@ -742,6 +744,11 @@ export function ContentGeneratorPanel({
           onSavedArtifactChange(record);
           setLocationPanelOpen(true);
           onArtifactReady?.(buildDraftSavedAnnouncement(record));
+          // Durable persistence (rollout-flagged). Background; keeps local
+          // recovery + current announcement. Receipt is traced for Blocker 2.
+          if (isSavedWorkDurableEnabled()) {
+            void persistSavedWorkDurable(item);
+          }
         }
         return true;
       }
@@ -1001,7 +1008,7 @@ export function ContentGeneratorPanel({
     if (!draft.trim()) return;
     const artifactTitle = artifactTitleValue();
     const artifactType = type || "content";
-    const { record } = persistGeneratedDraft({
+    const { record, item } = persistGeneratedDraft({
       draft,
       artifactType,
       title: artifactTitle,
@@ -1014,6 +1021,11 @@ export function ContentGeneratorPanel({
     setLocationPanelOpen(true);
     note(saveReceipt("saved-work"));
     onWin?.(artifactTitle);
+    // Durable persistence (rollout-flagged). Background; keeps local recovery +
+    // current receipt copy. Durable receipt is traced for Blocker 2.
+    if (isSavedWorkDurableEnabled()) {
+      void persistSavedWorkDurable(item);
+    }
   }
 
   function handleProjectPicked(project: Project) {
