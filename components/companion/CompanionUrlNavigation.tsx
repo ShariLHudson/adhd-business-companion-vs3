@@ -42,6 +42,7 @@ const GROW_SECTION_IDS = new Set<AppSection>([
   "growth",
   "growth-capture",
   "growth-library",
+  "personal-library",
   "growth-reports",
   "user-memory",
   "growth-journal",

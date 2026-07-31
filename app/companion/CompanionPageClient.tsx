@@ -20,6 +20,7 @@ import {
   getDiscoveryMemberId,
 } from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
+import { PersonalLibraryRoom } from "@/components/companion/personalLibrary/PersonalLibraryRoom";
 import { ExperienceControlsOverlay } from "@/components/companion/estate/ExperienceControlsOverlay";
 import { GlobalOverlayHost } from "@/components/companion/estate/GlobalOverlayHost";
 import { SoundscapeSelectionOverlay } from "@/components/companion/estate/SoundscapeSelectionOverlay";
@@ -27162,6 +27163,13 @@ export default function CompanionPageClient() {
           {activeSection === "growth-library" && !showDirectEstateOverlay && (
             <EstateCollectionRoomPanel
               roomId="achievement-library"
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+            />
+          )}
+
+          {activeSection === "personal-library" && !showDirectEstateOverlay && (
+            <PersonalLibraryRoom
               onBack={goBack}
               backLabel={workspacePanelBackLabel}
             />

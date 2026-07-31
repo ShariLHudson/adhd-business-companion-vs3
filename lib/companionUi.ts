@@ -71,6 +71,7 @@ export type AppSection =
   | "growth"
   | "growth-capture"
   | "growth-library"
+  | "personal-library"
   | "growth-reports"
   | "confidence-vault"
   | "my-journey"

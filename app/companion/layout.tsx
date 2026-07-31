@@ -59,6 +59,7 @@ import "./estate-presence.css";
 import "./global-estate-menu.css";
 import "./spark-estate-guide.css";
 import "./spark-note.css";
+import "./personal-library.css";
 import "./companion-chat-surface.css";
 import "./companion-layout-layers.css";
 import "./universal-blueprint-interface.css";
