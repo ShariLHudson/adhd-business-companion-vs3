@@ -13,6 +13,7 @@ import type { PersonalDate } from "@/lib/recognition/types";
 import { SparkNoteAnchor } from "./SparkNoteAnchor";
 import { TodaysSparkGiftRoom } from "./TodaysSparkGiftRoom";
 import { TodaysSparkCardShell } from "./TodaysSparkCardShell";
+import { applySparkTestOverride } from "@/lib/sparkNote/devSparkOverride"; // TEMP Preview test — remove after acceptance
 
 type Props = {
   visible: boolean;
@@ -95,7 +96,7 @@ export function SparkNoteChrome({
       {cardOpen && card ? (
         // Full pinned daily Spark Card in the approved card-shell style: correct
         // image + complete content + durable Save. Close returns to the gift room.
-        <TodaysSparkCardShell card={card} onClose={() => setCardOpen(false)} />
+        <TodaysSparkCardShell card={applySparkTestOverride(card)} onClose={() => setCardOpen(false)} />
       ) : null}
     </>,
     document.body,
