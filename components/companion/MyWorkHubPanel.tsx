@@ -14,7 +14,12 @@ import {
   EcosystemCollapsibleSection,
 } from "@/components/companion/EcosystemCollapsibleSection";
 import { SavedBrowsePanel } from "@/components/companion/SavedBrowsePanel";
-import { SAVED_WORK_UPDATED_EVENT } from "@/lib/savedWorkStore";
+import {
+  SAVED_WORK_UPDATED_EVENT,
+  type SavedWorkItem,
+} from "@/lib/savedWorkStore";
+import { isSavedWorkDurableEnabled } from "@/lib/durableRecords/flags";
+import { loadActiveSavedWorkMerged } from "@/lib/durableRecords/domains/savedWorkRead";
 import { VISUAL_FOCUS_UPDATED } from "@/lib/visualFocus";
 import { getProjects, getSnippets, getTemplates } from "@/lib/companionStore";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -111,11 +116,29 @@ export function MyWorkHubPanel({
   const [savedWorkTick, setSavedWorkTick] = useState(0);
   const [openSections, setOpenSections] = useState<Set<HubSectionId>>(new Set());
   const [savedBrowseOpen, setSavedBrowseOpen] = useState(false);
+  // Durable-first active saved work (null until loaded / when flag off).
+  const [durableActive, setDurableActive] = useState<SavedWorkItem[] | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!isSavedWorkDurableEnabled()) return;
+    let cancelled = false;
+    void loadActiveSavedWorkMerged().then((items) => {
+      if (!cancelled) setDurableActive(items);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshKey, savedWorkTick]);
 
   const hub = useMemo(
-    () => buildMyWorkHub(),
+    () =>
+      buildMyWorkHub(
+        isSavedWorkDurableEnabled() && durableActive ? durableActive : undefined,
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [refreshKey, savedWorkTick],
+    [refreshKey, savedWorkTick, durableActive],
   );
 
   const searchGroups = useMemo(

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { AppSection } from "@/lib/companionUi";
 import { listPinnedVisualFocusMaps } from "@/lib/visualFocus/store";
 import { buildSavedBrowseIndex, searchSavedBrowse } from "@/lib/savedBrowseIndex";
@@ -8,9 +8,15 @@ import { buildVisualThinkingByCategory } from "@/lib/myWorkHub";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
 import { EcosystemCollapsibleSection } from "@/components/companion/EcosystemCollapsibleSection";
 import { getProjects, getSnippets, getTemplates } from "@/lib/companionStore";
-import { getSavedWork } from "@/lib/savedWorkStore";
+import {
+  getSavedWork,
+  SAVED_WORK_UPDATED_EVENT,
+  type SavedWorkItem,
+} from "@/lib/savedWorkStore";
 import { buildMyWorkHub } from "@/lib/myWorkHub";
 import { listSavedVisualFocusMaps } from "@/lib/visualFocus/store";
+import { isSavedWorkDurableEnabled } from "@/lib/durableRecords/flags";
+import { loadSavedWorkMerged } from "@/lib/durableRecords/domains/savedWorkRead";
 
 type SavedCategoryId =
   | "projects"
@@ -50,6 +56,23 @@ export function SavedBrowsePanel({
   const [openCategories, setOpenCategories] = useState<Set<SavedCategoryId>>(
     new Set(),
   );
+  // Durable-first saved work (null until loaded / when flag off).
+  const [durableSaved, setDurableSaved] = useState<SavedWorkItem[] | null>(null);
+
+  useEffect(() => {
+    if (!isSavedWorkDurableEnabled()) return;
+    let cancelled = false;
+    const load = () =>
+      void loadSavedWorkMerged().then((items) => {
+        if (!cancelled) setDurableSaved(items);
+      });
+    load();
+    window.addEventListener(SAVED_WORK_UPDATED_EVENT, load);
+    return () => {
+      cancelled = true;
+      window.removeEventListener(SAVED_WORK_UPDATED_EVENT, load);
+    };
+  }, []);
 
   const pinned = useMemo(() => listPinnedVisualFocusMaps(), []);
   const searchResults = useMemo(
@@ -58,7 +81,12 @@ export function SavedBrowsePanel({
   );
 
   const counts = useMemo(() => {
-    const hub = buildMyWorkHub();
+    const savedSource =
+      isSavedWorkDurableEnabled() && durableSaved ? durableSaved : getSavedWork();
+    const activeSaved = savedSource.filter((w) => w.status !== "archived");
+    const hub = buildMyWorkHub(
+      isSavedWorkDurableEnabled() && durableSaved ? activeSaved : undefined,
+    );
     const savedMaps = listSavedVisualFocusMaps();
     return {
       projects: getProjects().filter((p) => p.status !== "completed").length,
@@ -66,21 +94,17 @@ export function SavedBrowsePanel({
       strategies: hub.strategies.length,
       templates: getTemplates().filter((t) => t.status !== "archived").length,
       snippets: getSnippets().length,
-      documents: getSavedWork().filter(
-        (w) =>
-          w.status !== "archived" &&
-          !w.artifactType.toLowerCase().includes("sop"),
+      documents: activeSaved.filter(
+        (w) => !w.artifactType.toLowerCase().includes("sop"),
       ).length,
-      sops: getSavedWork().filter(
-        (w) =>
-          w.status !== "archived" &&
-          w.artifactType.toLowerCase().includes("sop"),
+      sops: activeSaved.filter((w) =>
+        w.artifactType.toLowerCase().includes("sop"),
       ).length,
       decisionCompass: 0,
       favorites: pinned.length,
       total: buildSavedBrowseIndex().length,
     };
-  }, [pinned.length]);
+  }, [pinned.length, durableSaved]);
 
   const visualCategories = useMemo(() => buildVisualThinkingByCategory(), []);
 

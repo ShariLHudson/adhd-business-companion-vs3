@@ -644,9 +644,13 @@ export function buildVisualThinkingByCategory(): {
   }));
 }
 
-export function buildMyWorkHub(): MyWorkHubSnapshot {
+export function buildMyWorkHub(
+  overrideActiveSavedWork?: SavedWorkItem[],
+): MyWorkHubSnapshot {
   const manifest = buildContinuityManifest();
-  const saved = getActiveSavedWork();
+  // Durable-first: callers may pass durable-merged active saved work; otherwise
+  // fall back to the synchronous local store (flag-off / not yet loaded).
+  const saved = overrideActiveSavedWork ?? getActiveSavedWork();
   const savedItems = saved.map(savedWorkToItem);
   const continueWorking = buildContinueWorking(manifest);
   const activeProjects = buildActiveProjects();
