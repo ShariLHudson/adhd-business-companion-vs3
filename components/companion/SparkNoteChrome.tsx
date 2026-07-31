@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import {
-  dismissHomeTeaserToday,
   isHomeTeaserDismissedToday,
   recordSparkNoteCompleted,
   recordSparkNoteViewed,
@@ -44,11 +43,9 @@ export function SparkNoteChrome({
   onOpenTodaysSpark,
 }: Props) {
   const [mounted, setMounted] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    setDismissed(isHomeTeaserDismissedToday());
   }, []);
 
   const { card } = useMemo(
@@ -68,12 +65,23 @@ export function SparkNoteChrome({
       recordSparkNoteViewed(card.id);
       recordSparkNoteCompleted(card.id);
     }
-    dismissHomeTeaserToday();
-    setDismissed(true);
+    // Navigate to Personal Library (daily-arrival). The teaser is marked opened
+    // for the day ONLY once the room actually opens (PersonalLibraryRoom arrival),
+    // not here — so a failed navigation never loses the day's teaser.
     onOpenTodaysSpark?.();
   }
 
-  if (!mounted || !visible || !isWelcomeHome || dismissed || !card) return null;
+  // Dismissal is read at render time (not cached) so returning to Welcome Home
+  // after the room dismissed it keeps the teaser hidden for the rest of the day.
+  if (
+    !mounted ||
+    !visible ||
+    !isWelcomeHome ||
+    !card ||
+    isHomeTeaserDismissedToday()
+  ) {
+    return null;
+  }
 
   return createPortal(
     <SparkNoteAnchor card={card} onExpand={handleOpen} />,

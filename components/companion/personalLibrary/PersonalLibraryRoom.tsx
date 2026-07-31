@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   formatMySparkSavedDate,
   type MySparkSavedItem,
 } from "@/lib/sparkNote/mySparksCollection";
 import { loadMySparksCollection } from "@/lib/sparkNote/savedSparksDurable";
+import { dismissHomeTeaserToday } from "@/lib/sparkNote/persistence";
 import { findCatalogCardById } from "@/lib/sparkNote/evaluateDailySparkNote";
 import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { resolveSparkCardImage } from "@/lib/sparkNote/resolveSparkCardImage";
@@ -78,9 +79,10 @@ export function PersonalLibraryRoom({
   const [openedCard, setOpenedCard] = useState<SparkNoteDailyCard | null>(null);
   const [showCollection, setShowCollection] = useState(false);
 
+  const todaysSparkButtonRef = useRef<HTMLButtonElement | null>(null);
+
   // Today's Spark — the current pinned daily card, resolved read-only (this
-  // never changes the pin). Always openable from the room; auto-opened on
-  // teaser arrival.
+  // never changes the pin or its id). Always available in the room.
   const dailyCard = useMemo(
     () =>
       resolveDailySparkCard({
@@ -93,12 +95,18 @@ export function PersonalLibraryRoom({
     [firstName, birthday, personalDates, memberSinceIso, region],
   );
 
+  // Daily-arrival mode (from the Welcome Home teaser): land IN the room with
+  // Today's Spark available and focused — do NOT auto-open the full-card overlay
+  // (that reads as the legacy Spark card). The member opens it deliberately.
   useEffect(() => {
-    if (arrivalMode && dailyCard) {
-      setOpenedCard(dailyCard);
+    if (arrivalMode) {
+      // The room opened successfully → now mark the Welcome Home teaser opened
+      // for the day (once), and focus Today's Spark for keyboard members.
+      dismissHomeTeaserToday();
+      todaysSparkButtonRef.current?.focus();
       onArrivalConsumed?.();
     }
-  }, [arrivalMode, dailyCard, onArrivalConsumed]);
+  }, [arrivalMode, onArrivalConsumed]);
 
   useEffect(() => {
     let active = true;
@@ -199,6 +207,7 @@ export function PersonalLibraryRoom({
             </div>
             {dailyCard ? (
               <button
+                ref={todaysSparkButtonRef}
                 type="button"
                 className="pl-today-open"
                 onClick={() => setOpenedCard(dailyCard)}

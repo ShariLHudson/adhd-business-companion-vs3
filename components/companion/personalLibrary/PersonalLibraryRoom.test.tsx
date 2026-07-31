@@ -16,7 +16,10 @@ import { clearMemberRecordDurableMarksForTests } from "@/lib/durableRecords/veri
 import { setSavedSparkDurableEnabledForTests } from "@/lib/durableRecords/flags";
 import { upsertSavedSparkDurable } from "@/lib/durableRecords/domains/savedSpark";
 import { SPARK_NOTE_CATALOG } from "@/lib/sparkNote/catalog";
-import { resetSparkNoteStoreForTests } from "@/lib/sparkNote/persistence";
+import {
+  isHomeTeaserDismissedToday,
+  resetSparkNoteStoreForTests,
+} from "@/lib/sparkNote/persistence";
 import { PersonalLibraryRoom } from "./PersonalLibraryRoom";
 
 // @ts-expect-error — React act environment flag
@@ -140,7 +143,7 @@ describe("PersonalLibraryRoom (Slice 3a)", () => {
     expect(q('[data-testid="spark-note-expanded"]')).not.toBeNull();
   });
 
-  it("auto-opens Today's Spark on teaser arrival", async () => {
+  it("on teaser arrival, lands in the room with Today's Spark available and does NOT auto-open the legacy card", async () => {
     const onArrivalConsumed = vi.fn();
     await act(async () => {
       root.render(
@@ -153,7 +156,13 @@ describe("PersonalLibraryRoom (Slice 3a)", () => {
       );
     });
     await flush();
-    expect(q('[data-testid="spark-note-expanded"]')).not.toBeNull();
+    // The room (My Personal Library) is what opens, with Today's Spark available…
+    expect(q('[data-testid="personal-library-room"]')).not.toBeNull();
+    expect(q('[data-testid="pl-todays-spark-open"]')).not.toBeNull();
+    // …and the legacy full-card overlay is NOT auto-opened.
+    expect(q('[data-testid="spark-note-expanded"]')).toBeNull();
     expect(onArrivalConsumed).toHaveBeenCalled();
+    // Teaser is marked opened for the day only now that the room has opened.
+    expect(isHomeTeaserDismissedToday()).toBe(true);
   });
 });
