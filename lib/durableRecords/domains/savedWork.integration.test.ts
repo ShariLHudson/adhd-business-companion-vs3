@@ -45,7 +45,12 @@ import {
   migrateSavedWorkForMember,
   resetSavedWorkMigrationSessionForTests,
 } from "./savedWorkMigration";
-import { loadSavedWorkMerged } from "./savedWorkRead";
+import {
+  loadActiveSavedWorkMerged,
+  loadSavedWorkMerged,
+} from "./savedWorkRead";
+import { resolveSavedWorkClaim } from "../savedWorkClaims";
+import { buildMyWorkHub } from "@/lib/myWorkHub";
 
 const RUN = process.env.RUN_SUPABASE_INTEGRATION === "1";
 const URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -230,5 +235,62 @@ suite("Saved Work durable slice — live Supabase certification", () => {
     setDurableRecordAuthForTests(userBId);
     const bList = await listSavedWorkDurable();
     expect(bList.some((i) => i.title.includes("A-secret"))).toBe(false);
+  });
+
+  // --- Blocker 2: truthfulness walkthrough (live) ---
+
+  it("B2: a real save yields a durably_saved claim and appears in My Work surfaces", async () => {
+    useMemberA();
+    const { item, receipt } = await createSavedWorkDurable({
+      title: `${tag} B2-save`,
+      artifactType: "SOP",
+      body: "body",
+    });
+    // Success claim is allowed only after a verified durable receipt.
+    const claim = resolveSavedWorkClaim(receipt, "create");
+    expect(claim.status).toBe("durably_saved");
+    expect(claim.durable).toBe(true);
+
+    // Appears via durable-first merged read and the My Work Hub snapshot.
+    const merged = await loadActiveSavedWorkMerged();
+    expect(merged.some((i) => i.id === item.id)).toBe(true);
+    const hub = buildMyWorkHub(merged);
+    expect(hub.savedWork.some((w) => w.savedWorkId === item.id)).toBe(true);
+  });
+
+  it("B2: the same item is retrievable from a fresh session (device context)", async () => {
+    useMemberA();
+    const { item } = await createSavedWorkDurable({
+      title: `${tag} B2-fresh`,
+      artifactType: "SOP",
+      body: "body",
+    });
+    // A brand-new signed-in client for the same member = a second session.
+    const fresh = createClient(URL!, ANON!, { auth: { persistSession: false } });
+    await fresh.auth.signInWithPassword({
+      email: `${tag}-a@foundation-verify.example.com`,
+      password: pass,
+    });
+    setDurableRecordBackendForTests(liveBackend(fresh));
+    setDurableRecordAuthForTests(userAId);
+    const list = await listSavedWorkDurable();
+    expect(list.some((i) => i.id === item.id)).toBe(true);
+  });
+
+  it("B2: a forced durable failure yields a truthful retained claim (no false save)", async () => {
+    // An anon (signed-out) client -> RLS denies the write -> real failure.
+    const anon = createClient(URL!, ANON!, { auth: { persistSession: false } });
+    setDurableRecordBackendForTests(liveBackend(anon));
+    setDurableRecordAuthForTests(userAId); // resolver says A, but client is anon
+    const { receipt } = await createSavedWorkDurable({
+      title: `${tag} B2-fail`,
+      artifactType: "SOP",
+      body: "body",
+    });
+    expect(receipt.ok).toBe(false);
+    const claim = resolveSavedWorkClaim(receipt, "create");
+    expect(claim.status).not.toBe("durably_saved");
+    expect(claim.durable).toBe(false);
+    expect(claim.message.length).toBeGreaterThan(0);
   });
 });
