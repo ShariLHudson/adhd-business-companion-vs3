@@ -60,6 +60,7 @@ import "./global-estate-menu.css";
 import "./spark-estate-guide.css";
 import "./spark-note.css";
 import "./personal-library.css";
+import "./todays-spark-gift.css";
 import "./companion-chat-surface.css";
 import "./companion-layout-layers.css";
 import "./universal-blueprint-interface.css";

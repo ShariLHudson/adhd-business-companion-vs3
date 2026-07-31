@@ -6,6 +6,7 @@ import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndD
 import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
 import { SparkNoteAnchor } from "./SparkNoteAnchor";
+import { TodaysSparkGiftRoom } from "./TodaysSparkGiftRoom";
 
 type Props = {
   visible: boolean;
@@ -37,6 +38,7 @@ export function SparkNoteChrome({
   region,
 }: Props) {
   const [mounted, setMounted] = useState(false);
+  const [giftRoomOpen, setGiftRoomOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -105,20 +107,22 @@ export function SparkNoteChrome({
     [firstName, birthday, personalDates, memberSinceIso, region],
   );
 
-  function handleOpen() {
-    // Teaser correction slice: verify size/placement only. Routing is
-    // intentionally disabled here — do NOT open the Spark Card, Personal
-    // Library, or gift room. (Wired in a later slice.)
-    if (typeof console !== "undefined") {
-      console.debug("[todays-spark-teaser] clicked — routing disabled this slice");
-    }
-  }
-
-  // Estate-wide; never dismissed this slice so the size/placement can be retested.
-  if (!mounted || !visible || !card) return null;
+  // Estate-wide; the teaser is NOT dismissed in this slice (still testing).
+  if (!mounted) return null;
+  const showTeaser = visible && Boolean(card);
 
   return createPortal(
-    <SparkNoteAnchor card={card} onExpand={handleOpen} />,
+    <>
+      {showTeaser ? (
+        <SparkNoteAnchor card={card} onExpand={() => setGiftRoomOpen(true)} />
+      ) : null}
+      {giftRoomOpen ? (
+        // Clicking the teaser opens the approved gift room (daily-arrival) —
+        // NOT the old Spark Card and NOT the dashboard Personal Library room.
+        // The gift click is a no-op test event this slice (full card deferred).
+        <TodaysSparkGiftRoom onClose={() => setGiftRoomOpen(false)} />
+      ) : null}
+    </>,
     document.body,
   );
 }

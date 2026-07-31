@@ -71,14 +71,41 @@ describe("SparkNoteChrome — small Estate-wide teaser", () => {
     expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
   });
 
-  it("click does not route (no legacy Spark Card, no onOpenTodaysSpark)", () => {
+  it("teaser click opens the gift room — not the old Spark Card, not the dashboard Personal Library", () => {
     const onOpenTodaysSpark = vi.fn();
     render({ visible: true, onOpenTodaysSpark });
+    expect(q('[data-testid="todays-spark-gift-room"]')).toBeNull();
     click(q(".spark-note-teaser__button"));
+    expect(q('[data-testid="todays-spark-gift-room"]')).not.toBeNull();
+    // Old Spark Card and dashboard Personal Library must NOT open.
     expect(q('[data-testid="spark-note-expanded"]')).toBeNull();
+    expect(q('[data-testid="personal-library-room"]')).toBeNull();
+    expect(q('[data-testid="spark-note-my-collection"]')).toBeNull();
+    // Legacy routing prop is not used.
     expect(onOpenTodaysSpark).not.toHaveBeenCalled();
-    // Teaser stays (not dismissed by the click).
+  });
+
+  it("gift room shows the wrapped gift and the click instruction", () => {
+    render({ visible: true });
+    click(q(".spark-note-teaser__button"));
+    expect(q('[data-testid="tsg-gift"]')).not.toBeNull();
+    expect(q('[data-testid="tsg-callout"]')?.textContent).toContain(
+      "Click the gift",
+    );
+  });
+
+  it("keeps the teaser present while the gift room is open (not dismissed)", () => {
+    render({ visible: true });
+    click(q(".spark-note-teaser__button"));
     expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
+  });
+
+  it("Welcome Home / back closes the gift room and returns to the previous screen", () => {
+    render({ visible: true });
+    click(q(".spark-note-teaser__button"));
+    expect(q('[data-testid="todays-spark-gift-room"]')).not.toBeNull();
+    click(q('[data-testid="tsg-welcome-home"]'));
+    expect(q('[data-testid="todays-spark-gift-room"]')).toBeNull();
   });
 
   it("anchors placement above the composer by publishing --spark-teaser-bottom", () => {
