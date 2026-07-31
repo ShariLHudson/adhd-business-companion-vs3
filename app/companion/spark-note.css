@@ -1836,24 +1836,17 @@
 /* Welcome Home Today's Spark teaser — approved image, whole-image clickable. */
 .spark-note-teaser {
   position: fixed;
-  right: 1.25rem; /* ~20px safe-area from the edge (16-24px) */
-  /* Anchored above the chat composer (not the raw viewport bottom) via a
-     variable published by SparkNoteChrome; falls back to a small gap. */
-  bottom: var(--spark-teaser-bottom, 1.5rem);
+  /* Pinned to the actual lower-right safe area: ~20px from the right edge and
+     ~20px above the bottom safe edge. Never centered/floating inward. The chat
+     composer is bottom-CENTER, so the lower-right corner stays clear. */
+  right: 20px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
+  left: auto;
   z-index: 60;
   /* Very small ~1in bottom-right teaser (~88px). Never the image's full
      1369x1149 intrinsic size. max-width is only a safety limit on tiny screens. */
   width: 88px;
   max-width: 15vw;
-}
-
-/* Temporary mobile safety (mobile placement designed in a later slice):
-   if the composer variable is unavailable, keep the teaser well clear of the
-   bottom composer area so it never covers the chat input. */
-@media (max-width: 640px) {
-  .spark-note-teaser {
-    bottom: var(--spark-teaser-bottom, 30vh);
-  }
 }
 .spark-note-teaser__button {
   display: block;

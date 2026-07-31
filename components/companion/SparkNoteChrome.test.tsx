@@ -8,10 +8,12 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  getStoredDailySparkId,
   isHomeTeaserDismissedToday,
   resetSparkNoteStoreForTests,
 } from "@/lib/sparkNote/persistence";
 import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
+import { resolvePinnedDailySparkCard } from "@/lib/sparkNote/evaluateDailySparkNote";
 import { SparkNoteChrome } from "./SparkNoteChrome";
 
 // @ts-expect-error — React act environment flag
@@ -84,12 +86,17 @@ describe("SparkNoteChrome — teaser → gift room → full Spark Card", () => {
     expect(isHomeTeaserDismissedToday()).toBe(false);
   });
 
-  it("gift click opens the exact pinned daily Spark (not a different one)", () => {
-    const expected = resolveDailySparkCard({}).card; // pins today's Spark
+  it("gift click opens the exact pinned daily Spark id (not a different/fallback one)", () => {
+    const expected = resolveDailySparkCard({}).card; // establishes today's pin
     render({ visible: true });
     openGift();
     const card = q('[data-testid="spark-note-expanded"]');
     expect(card).not.toBeNull();
+    // The opened card is the exact stored pin, resolved by id.
+    const pinnedId = getStoredDailySparkId();
+    expect(pinnedId).toBe(expected.id);
+    const pinned = resolvePinnedDailySparkCard({});
+    expect(pinned?.id).toBe(pinnedId);
     expect(card?.textContent).toContain(expected.title);
   });
 
@@ -124,15 +131,7 @@ describe("SparkNoteChrome — teaser → gift room → full Spark Card", () => {
     expect(q('[data-testid="todays-spark-gift-room"]')).not.toBeNull();
   });
 
-  it("anchors placement above the composer by publishing --spark-teaser-bottom", () => {
-    document.documentElement.style.removeProperty("--spark-teaser-bottom");
-    render({ visible: true });
-    expect(
-      document.documentElement.style.getPropertyValue("--spark-teaser-bottom"),
-    ).not.toBe("");
-  });
-
-  it("CSS constrains the teaser to the approved small-card size", () => {
+  it("CSS pins the teaser to the lower-right safe area at the approved size", () => {
     const css = readFileSync(
       resolve(process.cwd(), "app/companion/spark-note.css"),
       "utf8",
@@ -141,7 +140,13 @@ describe("SparkNoteChrome — teaser → gift room → full Spark Card", () => {
       css.indexOf(".spark-note-teaser {"),
       css.indexOf(".spark-note-teaser__button"),
     );
+    expect(block).toContain("position: fixed");
+    expect(block).toContain("right: 20px");
+    expect(block).toContain("bottom: calc(env(safe-area-inset-bottom, 0px) + 20px)");
     expect(block).toContain("width: 88px");
-    expect(block).toContain("var(--spark-teaser-bottom");
+    // Never centered/floating inward, and no composer-height variable.
+    expect(block).not.toContain("var(--spark-teaser-bottom");
+    expect(block).not.toContain("translateX");
+    expect(block).not.toContain("left: 50%");
   });
 });

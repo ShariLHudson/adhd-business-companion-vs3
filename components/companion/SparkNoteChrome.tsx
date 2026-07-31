@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
+import { resolvePinnedDailySparkCard } from "@/lib/sparkNote/evaluateDailySparkNote";
 import {
   dismissHomeTeaserToday,
   isHomeTeaserDismissedToday,
@@ -62,64 +63,19 @@ export function SparkNoteChrome({
     }
   }, [cardOpen]);
 
-  // Anchor the teaser above the chat composer (published as --spark-teaser-bottom).
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const GAP = 20;
-    const CHAT_SELECTOR = '[data-companion-chat-layer="true"]';
-    let raf = 0;
-    let tries = 0;
-    const ro =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(() => measure())
-        : null;
-
-    function measure() {
-      const chat = document.querySelector<HTMLElement>(CHAT_SELECTOR);
-      let bottomPx = 24;
-      if (chat) {
-        const rect = chat.getBoundingClientRect();
-        if (rect.height > 0) {
-          bottomPx = Math.max(24, window.innerHeight - rect.top + GAP);
-        }
-      }
-      document.documentElement.style.setProperty(
-        "--spark-teaser-bottom",
-        `${bottomPx}px`,
-      );
-    }
-
-    function attach() {
-      measure();
-      const chat = document.querySelector(CHAT_SELECTOR);
-      if (chat) {
-        ro?.observe(chat);
-      } else if (tries++ < 40) {
-        raf = requestAnimationFrame(attach);
-      }
-    }
-
-    attach();
-    window.addEventListener("resize", measure);
-    return () => {
-      cancelAnimationFrame(raf);
-      ro?.disconnect();
-      window.removeEventListener("resize", measure);
-      document.documentElement.style.removeProperty("--spark-teaser-bottom");
+  const card = useMemo(() => {
+    const inputs = {
+      firstName,
+      birthday,
+      personalDates,
+      memberSinceIso,
+      region,
     };
-  }, []);
-
-  const { card } = useMemo(
-    () =>
-      resolveDailySparkCard({
-        firstName,
-        birthday,
-        personalDates,
-        memberSinceIso,
-        region,
-      }),
-    [firstName, birthday, personalDates, memberSinceIso, region],
-  );
+    // Use the EXACT pinned daily Spark (canonical by-id resolver). Only
+    // establish today's pin on first load; never swap to a different/fallback
+    // Spark at gift-click time.
+    return resolvePinnedDailySparkCard(inputs) ?? resolveDailySparkCard(inputs).card;
+  }, [firstName, birthday, personalDates, memberSinceIso, region]);
 
   if (!mounted) return null;
   const showTeaser = visible && Boolean(card) && !teaserDismissed;

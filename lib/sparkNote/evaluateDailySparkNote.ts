@@ -186,6 +186,25 @@ export function findCatalogCardById(id: string): SparkNoteDailyCard | null {
   return entryToCard(entry, source);
 }
 
+/**
+ * Resolve the EXACT pinned daily Spark for `now` by its stored id, using the
+ * canonical by-id resolvers (findCatalogCardById / rebuildPersonalSparkFromId).
+ * Returns null when no pin exists yet or the pinned id can't be resolved — it
+ * NEVER generates a new Spark, re-pins, or falls back to a sample card. Callers
+ * that need to establish today's pin use resolveDailySparkCard instead.
+ */
+export function resolvePinnedDailySparkCard(
+  input: EvaluateDailySparkNoteInput = {},
+): SparkNoteDailyCard | null {
+  const now = input.now ?? new Date();
+  const storedId = getStoredDailySparkId(now);
+  if (!storedId) return null;
+  if (isPersonalSparkId(storedId)) {
+    return rebuildPersonalSparkFromId(storedId, personalInput(input, now));
+  }
+  return findCatalogCardById(storedId);
+}
+
 function personalInput(input: EvaluateDailySparkNoteInput, now: Date) {
   return {
     now,
