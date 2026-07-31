@@ -26,4 +26,60 @@ describe("peacefulPlacesFolderManifest", () => {
       expect(track.src.startsWith("/audio/peaceful-places/")).toBe(true);
     }
   });
+
+  // --- 12 original + 5 recovered (2026-07-31, from the v4 clone) ---
+
+  const ORIGINAL_TWELVE = [
+    "bright-studio.mp3",
+    "evening-hearth.mp3",
+    "evening-reflections.mp3",
+    "hall-of-reflections.mp3",
+    "java-seranade-coffee-house.mp3",
+    "lofty-studio.mp3",
+    "morning-whisper.mp3",
+    "nightime-melody.mp3",
+    "pulse-of-momentum-energy-exercise-room.mp3",
+    "pulse-of-momentum-energy.mp3",
+    "reflections-of-triumph.mp3",
+    "reflections-of-victory.mp3",
+  ];
+  const RECOVERED_FIVE: Record<string, string> = {
+    "Catalyst of Joy.mp3": "Catalyst of Joy",
+    "Dawn of New Horizons.mp3": "Dawn of New Horizons",
+    "Energize the Day.mp3": "Energize the Day",
+    "Momentum Unleashed.mp3": "Momentum Unleashed",
+    "Radiant Horizons.mp3": "Radiant Horizons",
+  };
+
+  it("lists seventeen peaceful moments", () => {
+    expect(PEACEFUL_PLACES_FOLDER_FILENAMES).toHaveLength(17);
+  });
+
+  it("keeps the original twelve and adds the five recovered", () => {
+    for (const f of ORIGINAL_TWELVE) {
+      expect(PEACEFUL_PLACES_FOLDER_FILENAMES).toContain(f);
+    }
+    for (const f of Object.keys(RECOVERED_FIVE)) {
+      expect(PEACEFUL_PLACES_FOLDER_FILENAMES).toContain(f);
+    }
+  });
+
+  it("renders the five recovered titles with exact asset URLs", () => {
+    const tracks = buildPeacefulPlacesFolderTracks();
+    for (const [filename, title] of Object.entries(RECOVERED_FIVE)) {
+      const track = tracks.find((t) => t.title === title);
+      expect(track, `missing recovered title: ${title}`).toBeDefined();
+      expect(track?.src).toBe(`/audio/peaceful-places/${filename}`);
+    }
+  });
+
+  it("has no duplicate ids, titles, or asset paths", () => {
+    const tracks = buildPeacefulPlacesFolderTracks();
+    const ids = tracks.map((t) => t.id);
+    const titles = tracks.map((t) => t.title);
+    const srcs = tracks.map((t) => t.src);
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(new Set(titles).size).toBe(titles.length);
+    expect(new Set(srcs).size).toBe(srcs.length);
+  });
 });

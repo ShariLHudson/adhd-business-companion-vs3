@@ -14,6 +14,13 @@ export const PEACEFUL_PLACES_FOLDER_FILENAMES = [
   "pulse-of-momentum-energy.mp3",
   "reflections-of-triumph.mp3",
   "reflections-of-victory.mp3",
+  // Recovered 2026-07-31 from the v4 clone (see ESTATE_REGRESSION_AUDIT).
+  // Filenames preserved exactly as accepted (Title Case with spaces).
+  "Catalyst of Joy.mp3",
+  "Dawn of New Horizons.mp3",
+  "Energize the Day.mp3",
+  "Momentum Unleashed.mp3",
+  "Radiant Horizons.mp3",
 ] as const;
 
 const PEACEFUL_PLACES_TITLE_OVERRIDES: Readonly<Record<string, string>> = {
@@ -29,6 +36,12 @@ const PEACEFUL_PLACES_TITLE_OVERRIDES: Readonly<Record<string, string>> = {
   "pulse-of-momentum-energy.mp3": "Pulse of Momentum Energy",
   "reflections-of-triumph.mp3": "Reflections of Triumph",
   "reflections-of-victory.mp3": "Reflections of Victory",
+  // Recovered 2026-07-31 (v4 clone). Titles preserved exactly.
+  "Catalyst of Joy.mp3": "Catalyst of Joy",
+  "Dawn of New Horizons.mp3": "Dawn of New Horizons",
+  "Energize the Day.mp3": "Energize the Day",
+  "Momentum Unleashed.mp3": "Momentum Unleashed",
+  "Radiant Horizons.mp3": "Radiant Horizons",
 };
 
 function slugFromFilename(filename: string): string {
