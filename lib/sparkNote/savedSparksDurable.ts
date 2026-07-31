@@ -13,6 +13,7 @@
 
 import { isSavedSparkDurableEnabled } from "@/lib/durableRecords/flags";
 import {
+  fetchSavedSparkDurable,
   listSavedSparkDurable,
   softDeleteSavedSparkDurable,
   upsertSavedSparkDurable,
@@ -53,22 +54,30 @@ type SparkSaveInput = Pick<
   "id" | "title" | "category" | "categoryLabel"
 >;
 
-function toPayload(card: SparkSaveInput, savedAtIso: string): SavedSparkPayload {
+function toPayload(
+  card: SparkSaveInput,
+  savedAtIso: string,
+  note?: string,
+): SavedSparkPayload {
+  const trimmed = note?.trim();
   return {
     sparkId: card.id,
     savedAtIso,
     title: card.title,
     category: card.category,
     categoryLabel: card.categoryLabel,
+    ...(trimmed ? { note: trimmed } : {}),
   };
 }
 
 /**
  * Save a Spark. Always updates the optimistic local cache; when durable is
- * enabled, only a verified durable write yields a "saved" claim.
+ * enabled, only a verified durable write yields a "saved" claim. An optional
+ * `note` (the member's "My notes and ideas") is persisted with the record.
  */
 export async function saveSparkDurable(
   card: SparkSaveInput,
+  note?: string,
 ): Promise<SavedSparkClaim> {
   const savedAtIso = new Date().toISOString();
   // Optimistic/offline cache — never the success signal.
@@ -83,7 +92,7 @@ export async function saveSparkDurable(
     };
   }
 
-  const receipt = await upsertSavedSparkDurable(toPayload(card, savedAtIso));
+  const receipt = await upsertSavedSparkDurable(toPayload(card, savedAtIso, note));
   if (receipt.ok && receipt.durable) {
     return {
       confirmed: true,
@@ -99,6 +108,24 @@ export async function saveSparkDurable(
     message: receipt.message,
     retryable: receipt.retryable,
   };
+}
+
+/**
+ * Read the member's saved note for a Spark, if any. Best-effort and durable-only
+ * (there is no local note cache): returns null when durable is disabled, the
+ * Spark isn't saved, has no note, or the lookup fails. Used to prefill the
+ * "My notes and ideas" field when reopening a saved Spark.
+ */
+export async function loadSavedSparkNote(
+  sparkId: string,
+): Promise<string | null> {
+  if (!isSavedSparkDurableEnabled()) return null;
+  try {
+    const payload = await fetchSavedSparkDurable(sparkId);
+    return payload?.note?.trim() || null;
+  } catch {
+    return null;
+  }
 }
 
 /** Remove a saved Spark. Clears the local cache only after a verified unsave. */

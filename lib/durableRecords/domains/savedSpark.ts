@@ -36,6 +36,11 @@ export type SavedSparkPayload = {
   title: string;
   category: string;
   categoryLabel: string;
+  /**
+   * The member's own note for this Spark ("My notes and ideas"). Optional and
+   * additive — older records simply have none. Preserved across devices.
+   */
+  note?: string;
 };
 
 export function upsertSavedSparkDurable(

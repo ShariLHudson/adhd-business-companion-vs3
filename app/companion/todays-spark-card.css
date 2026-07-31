@@ -189,6 +189,35 @@
   color: #2e241c;
 }
 
+.tsc-notes {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid rgba(15, 111, 124, 0.28);
+  border-radius: 18px;
+  background: #f5fbfc;
+}
+.tsc-notes-label {
+  display: block;
+  margin-bottom: 9px;
+  color: #0f6f7c;
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+}
+.tsc-notes-input {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 15px;
+  border: 1px solid rgba(46, 36, 28, 0.24);
+  border-radius: 12px;
+  background: white;
+  color: #2e241c;
+  font-family: Arial, sans-serif;
+  font-size: 19px;
+  line-height: 1.5;
+}
+
 .tsc-actions {
   display: flex;
   flex-wrap: wrap;
@@ -227,9 +256,12 @@
   gap: 12px;
   min-height: 26px;
   margin-top: 12px;
-  color: #8a3a2a;
+  color: #47645f;
   font-family: Arial, sans-serif;
   font-size: 17px;
+}
+.tsc-status--error {
+  color: #8a3a2a;
 }
 
 @media (max-width: 620px) {
