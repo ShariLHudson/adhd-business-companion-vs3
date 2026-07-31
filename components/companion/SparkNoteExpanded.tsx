@@ -25,8 +25,11 @@ import { normalizeSparkCardImageSrc } from "@/lib/sparkNote/wikimediaCommonsUrl"
 import {
   getFavoriteSparkIds,
   recordSparkNoteReaction,
-  toggleSparkNoteFavorite,
 } from "@/lib/sparkNote/persistence";
+import {
+  removeSparkDurable,
+  saveSparkDurable,
+} from "@/lib/sparkNote/savedSparksDurable";
 import { copySparkNoteText } from "@/lib/sparkNote/sparkNoteDestinations";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
@@ -366,6 +369,10 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const [kept, setKept] = useState(() =>
     getFavoriteSparkIds().includes(card.id),
   );
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "error">(
+    "idle",
+  );
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState<string | null>(null);
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open: true,
@@ -393,25 +400,49 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     };
   }, [moreMenuOpen]);
 
-  function ensureSaved() {
-    if (!getFavoriteSparkIds().includes(card.id)) {
-      toggleSparkNoteFavorite(card.id);
-      recordSparkNoteReaction(card.id, "save", card.category, card.tags);
+  async function handleSaveSpark() {
+    setSaveState("saving");
+    setSaveError(null);
+    // Affinity signal + optimistic local cache; NOT a "saved" claim.
+    recordSparkNoteReaction(card.id, "save", card.category, card.tags);
+    const claim = await saveSparkDurable(card);
+    if (claim.confirmed) {
+      setKept(true);
+      setSaveState("idle");
+      // Only now — after a verified durable save — show the confirmation.
+      setPhase("saved");
+      return;
     }
-    setKept(true);
+    // Durable save failed: keep the local cache, tell the truth, offer retry.
+    setKept(getFavoriteSparkIds().includes(card.id));
+    setSaveError(claim.message);
+    setSaveState("error");
   }
 
-  function handleSaveSpark() {
-    ensureSaved();
-    setPhase("saved");
-  }
-
-  function handleFavorite() {
-    const next = toggleSparkNoteFavorite(card.id);
-    setKept(next);
-    if (next) {
-      recordSparkNoteReaction(card.id, "save", card.category, card.tags);
+  async function handleFavorite() {
+    setSaveState("saving");
+    setSaveError(null);
+    if (kept) {
+      const claim = await removeSparkDurable(card.id);
+      if (claim.confirmed) {
+        setKept(false);
+        setSaveState("idle");
+        return;
+      }
+      setSaveError(claim.message);
+      setSaveState("error");
+      return;
     }
+    recordSparkNoteReaction(card.id, "save", card.category, card.tags);
+    const claim = await saveSparkDurable(card);
+    if (claim.confirmed) {
+      setKept(true);
+      setSaveState("idle");
+      return;
+    }
+    setKept(getFavoriteSparkIds().includes(card.id));
+    setSaveError(claim.message);
+    setSaveState("error");
   }
 
   async function handleShare() {
@@ -741,10 +772,11 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           <button
             type="button"
             className="spark-note-expanded__btn spark-note-expanded__btn--primary spark-note-expanded__btn--save"
-            onClick={handleSaveSpark}
+            onClick={() => void handleSaveSpark()}
             aria-pressed={kept}
+            disabled={saveState === "saving"}
           >
-            {kept ? "Saved" : "Save"}
+            {saveState === "saving" ? "Saving…" : kept ? "Saved" : "Save"}
           </button>
           <button
             type="button"
@@ -754,8 +786,9 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
             ]
               .filter(Boolean)
               .join(" ")}
-            onClick={handleFavorite}
+            onClick={() => void handleFavorite()}
             aria-pressed={kept}
+            disabled={saveState === "saving"}
           >
             {kept ? "Favorited" : "Favorite"}
           </button>
@@ -799,6 +832,23 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
             ) : null}
           </div>
         </div>
+        {saveState === "error" && saveError ? (
+          <div className="spark-note-expanded__save-error" role="alert">
+            <p className="spark-note-expanded__save-error-message">
+              {saveError}
+            </p>
+            {saveError ? (
+              <button
+                type="button"
+                className="spark-note-expanded__btn spark-note-expanded__btn--ghost spark-note-expanded__btn--save"
+                onClick={() => void handleSaveSpark()}
+                data-testid="spark-note-save-retry"
+              >
+                Try again
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         {shareStatus ? (
           <p className="spark-note-expanded__share-status" role="status">
             {shareStatus}

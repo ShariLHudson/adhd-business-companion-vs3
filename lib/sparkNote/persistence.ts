@@ -187,9 +187,11 @@ export function recordSparkNoteCompleted(sparkId: string): void {
 export function toggleSparkNoteFavorite(sparkId: string): boolean {
   const store = readSparkNoteStore();
   const isFavorite = store.favoriteIds.includes(sparkId);
+  // No cap: the saved collection is a durable, growing collection — never drop
+  // the member's saves silently. localStorage is only the optimistic cache.
   const favoriteIds = isFavorite
     ? store.favoriteIds.filter((id) => id !== sparkId)
-    : [sparkId, ...store.favoriteIds].slice(0, 20);
+    : [sparkId, ...store.favoriteIds];
   const favoriteSavedAt = { ...store.favoriteSavedAt };
   if (isFavorite) {
     delete favoriteSavedAt[sparkId];
@@ -198,6 +200,44 @@ export function toggleSparkNoteFavorite(sparkId: string): boolean {
   }
   writeSparkNoteStore({ ...store, favoriteIds, favoriteSavedAt });
   return !isFavorite;
+}
+
+/**
+ * Idempotent, unbounded optimistic-cache add for a saved Spark. Preserves an
+ * existing savedAt if present. The durable record (companion_member_records) is
+ * the source of truth; this cache exists for offline/immediate feedback only.
+ */
+export function ensureSparkFavoriteLocal(
+  sparkId: string,
+  savedAtIso: string = new Date().toISOString(),
+): void {
+  const store = readSparkNoteStore();
+  if (store.favoriteIds.includes(sparkId)) return;
+  writeSparkNoteStore({
+    ...store,
+    favoriteIds: [sparkId, ...store.favoriteIds],
+    favoriteSavedAt: {
+      ...store.favoriteSavedAt,
+      [sparkId]: store.favoriteSavedAt[sparkId] ?? savedAtIso,
+    },
+  });
+}
+
+/** Remove a Spark from the optimistic cache (used after a verified durable unsave). */
+export function removeSparkFavoriteLocal(sparkId: string): void {
+  const store = readSparkNoteStore();
+  if (!store.favoriteIds.includes(sparkId)) return;
+  const favoriteSavedAt = { ...store.favoriteSavedAt };
+  delete favoriteSavedAt[sparkId];
+  writeSparkNoteStore({
+    ...store,
+    favoriteIds: store.favoriteIds.filter((id) => id !== sparkId),
+    favoriteSavedAt,
+  });
+}
+
+export function getSparkFavoriteSavedAtMap(): Record<string, string> {
+  return { ...readSparkNoteStore().favoriteSavedAt };
 }
 
 const REACTION_AFFINITY_BOOST: Record<SparkNoteReaction, number> = {
@@ -234,7 +274,8 @@ export function recordSparkNoteReaction(
   let favoriteIds = store.favoriteIds;
   let favoriteSavedAt = { ...store.favoriteSavedAt };
   if (reaction === "save" && !favoriteIds.includes(sparkId)) {
-    favoriteIds = [sparkId, ...favoriteIds].slice(0, 20);
+    // No cap — never silently drop a member's saved Spark.
+    favoriteIds = [sparkId, ...favoriteIds];
     favoriteSavedAt[sparkId] = new Date().toISOString();
   }
 

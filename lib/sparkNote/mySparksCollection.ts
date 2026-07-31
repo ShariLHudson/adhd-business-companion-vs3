@@ -29,6 +29,20 @@ export type MySparkSavedItem = NonNullable<
 export type MySparkCollectionDateFilter = "all" | "this-month" | "this-year";
 export type MySparkCollectionSort = "newest" | "oldest";
 
+/**
+ * Hydrate a single saved item from the static catalog by id, stamping the
+ * save date. Shared by the local resolver and the durable resolver so both
+ * render identically. Returns null if the id is not in the catalog.
+ */
+export function buildMySparkSavedItem(
+  id: string,
+  savedAtIso: string | null,
+): MySparkSavedItem | null {
+  const item = catalogEntryToSavedCard(id);
+  if (!item) return null;
+  return { ...item, savedAtIso };
+}
+
 /** Saved Sparks for My Spark Collection — separate from the daily experience. */
 export function resolveMySparksCollection(): MySparkSavedItem[] {
   const store = readSparkNoteStore();

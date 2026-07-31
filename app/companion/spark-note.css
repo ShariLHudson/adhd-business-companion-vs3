@@ -1703,3 +1703,49 @@
     transform: none;
   }
 }
+
+/* Durable Save This Spark — truthful save error/retry + collection remove. */
+.spark-note-expanded__save-error {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.spark-note-expanded__save-error-message {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #8a4b3a;
+}
+
+.spark-note-collection__error {
+  margin: 0 0 0.5rem;
+  font-size: 0.85rem;
+  color: #8a4b3a;
+  text-align: center;
+}
+
+.spark-note-collection__item-remove {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(30, 79, 79, 0.35);
+  border-radius: 0.5rem;
+  background: transparent;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e4f4f;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.spark-note-collection__item-remove:hover {
+  background: rgba(30, 79, 79, 0.08);
+}
+
+.spark-note-collection__item-remove:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
