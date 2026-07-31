@@ -15,7 +15,7 @@ import { isSavedSparkDurableEnabled } from "@/lib/durableRecords/flags";
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
-import { SparkNoteExpanded } from "@/components/companion/SparkNoteExpanded";
+import { TodaysSparkCardShell } from "@/components/companion/TodaysSparkCardShell";
 import { SparkNoteMyCollection } from "@/components/companion/SparkNoteMyCollection";
 import { SparkSparkleIcon } from "@/components/companion/SparkNoteSectionIcons";
 
@@ -319,14 +319,7 @@ export function PersonalLibraryRoom({
       </div>
 
       {openedCard ? (
-        <SparkNoteExpanded
-          card={openedCard}
-          onClose={closeSpark}
-          onOpenCollection={() => {
-            setOpenedCard(null);
-            setShowCollection(true);
-          }}
-        />
+        <TodaysSparkCardShell card={openedCard} onClose={closeSpark} />
       ) : null}
 
       {showCollection ? (

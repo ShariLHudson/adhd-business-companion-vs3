@@ -104,7 +104,7 @@ describe("SparkNoteMyCollection — durable retrieval (Slice 2)", () => {
     await render();
     click(q(`[data-testid="spark-note-collection-open-${CARD.id}"]`));
     await flush();
-    const opened = q('[data-testid="spark-note-expanded"]');
+    const opened = q('[data-testid="todays-spark-card"]');
     expect(opened).not.toBeNull();
     expect(opened?.textContent).toContain(CARD.title);
   });

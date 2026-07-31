@@ -117,7 +117,7 @@ describe("PersonalLibraryRoom (Slice 3a)", () => {
     await render();
     click(q(`[data-testid="pl-spark-open-${CARD.id}"]`));
     await flush();
-    const opened = q('[data-testid="spark-note-expanded"]');
+    const opened = q('[data-testid="todays-spark-card"]');
     expect(opened).not.toBeNull();
     expect(opened?.textContent).toContain(CARD.title);
   });
@@ -140,7 +140,7 @@ describe("PersonalLibraryRoom (Slice 3a)", () => {
     expect(q('[data-testid="pl-todays-spark"]')).not.toBeNull();
     click(q('[data-testid="pl-todays-spark-open"]'));
     await flush();
-    expect(q('[data-testid="spark-note-expanded"]')).not.toBeNull();
+    expect(q('[data-testid="todays-spark-card"]')).not.toBeNull();
   });
 
   it("on teaser arrival, lands in the room with Today's Spark available and does NOT auto-open the legacy card", async () => {
@@ -160,7 +160,7 @@ describe("PersonalLibraryRoom (Slice 3a)", () => {
     expect(q('[data-testid="personal-library-room"]')).not.toBeNull();
     expect(q('[data-testid="pl-todays-spark-open"]')).not.toBeNull();
     // …and the legacy full-card overlay is NOT auto-opened.
-    expect(q('[data-testid="spark-note-expanded"]')).toBeNull();
+    expect(q('[data-testid="todays-spark-card"]')).toBeNull();
     expect(onArrivalConsumed).toHaveBeenCalled();
     // Teaser is marked opened for the day only now that the room has opened.
     expect(isHomeTeaserDismissedToday()).toBe(true);

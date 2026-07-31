@@ -20,7 +20,7 @@ import { isSavedSparkDurableEnabled } from "@/lib/durableRecords/flags";
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { SparkSparkleIcon } from "@/components/companion/SparkNoteSectionIcons";
-import { SparkNoteExpanded } from "./SparkNoteExpanded";
+import { TodaysSparkCardShell } from "./TodaysSparkCardShell";
 
 type Props = {
   onClose: () => void;
@@ -343,11 +343,7 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
       </div>
 
       {openedCard ? (
-        <SparkNoteExpanded
-          card={openedCard}
-          onClose={handleCloseCard}
-          onOpenCollection={() => setOpenedCard(null)}
-        />
+        <TodaysSparkCardShell card={openedCard} onClose={handleCloseCard} />
       ) : null}
     </div>
   );
