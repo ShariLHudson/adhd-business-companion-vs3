@@ -225,3 +225,15 @@ Everything here preserves the validated durable Saved Work work and changes noth
 - **Confidence:** committed-not-uncommitted — **High**; shared chrome-visibility gate as the mechanism — **Medium-High** (code-verified; exact runtime surface for Shari unconfirmed).
 - **Smallest contained correction (not implemented):** surface a persistent audio entry reachable on the home/arrival surface — e.g., allow the GlobalSoundControl to render outside the room/profile-menu condition (relax the `EstateTopRightChrome` visibility gate for the sound control), or add one always-present home-level "Sound" affordance. Contained to the chrome visibility condition / one control; do not modify the features, assets, Wander, Saved Work, or Coffee House.
 - **Tests to prevent recurrence:** (a) reachability test — the sound control / Audio entry renders from the home/arrival state; (b) menu-resolution test — every "Audio" nav destination resolves a forwarded handler and renders (as with the Research Library gap); (c) chat-intent parity test — an audio request opens Peaceful and a soundscape request opens the overlay; (d) manifest↔disk asset integrity for soundscape/peaceful filenames.
+
+---
+
+## 12. Canonical source policy (BINDING — 2026-07-31)
+
+Established after recovering audio that had been split across two working copies of the same project (both linked to Vercel project `adhd-business-companion-vs3`).
+
+- **Canonical repository:** the repo containing branch **`audit/beta-experience-readiness`** (`C:\Users\Shari\adhd-business-companion - vs3\companion-app`). All Spark Estate development happens here.
+- **`spark-ecosystem-v4\companion-app` is RECOVERY-ONLY.** Do not develop from it, deploy from it, or treat it as a second canonical copy. It is read-only salvage until Shari has accepted the recovered audio in Preview, after which it may be retired.
+- **Every Vercel deployment must originate from a clean worktree at an exact pushed commit of the canonical repository** (`git worktree add --detach <path> <sha>`, `git status --porcelain` empty, HEAD == the pushed SHA). This is how the recovery Previews were produced.
+- **No manual deployment may be made from another clone or from a dirty working tree.** Deploying a dirty tree (or a second clone) is what caused accepted audio to appear in Preview yet be absent from the canonical repo, and what left the deploy source non-reproducible.
+- **One deploy source of truth.** Until Git↔Vercel integration is configured (separate decision), all deploys go through the clean-worktree procedure above from the canonical repo only.
