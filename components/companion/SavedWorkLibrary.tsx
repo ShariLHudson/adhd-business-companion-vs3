@@ -21,6 +21,8 @@ import {
 } from "@/lib/savedWorkStore";
 import { isSavedWorkDurableEnabled } from "@/lib/durableRecords/flags";
 import { loadSavedWorkMerged } from "@/lib/durableRecords/domains/savedWorkRead";
+import { resolveSavedWorkClaim } from "@/lib/durableRecords/savedWorkClaims";
+import type { DurableRecordResult } from "@/lib/durableRecords";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { AppBackButton } from "@/components/companion/AppBackButton";
@@ -153,6 +155,24 @@ export function SavedWorkLibrary({
   const [renaming, setRenaming] = useState<SavedWorkItem | null>(null);
   const [renameValue, setRenameValue] = useState("");
   const [deleteTarget, setDeleteTarget] = useState<SavedWorkItem | null>(null);
+  // Truthful feedback for durable edits that didn't verify (Blocker 2).
+  const [opStatus, setOpStatus] = useState<
+    null | { message: string; retryable: boolean; retry?: () => void }
+  >(null);
+
+  function applyDurableOutcome(
+    receipt: DurableRecordResult<SavedWorkItem>,
+    action: "update" | "delete" | "archive" | "unarchive" | "create",
+    retry?: () => void,
+  ) {
+    const claim = resolveSavedWorkClaim(receipt, action);
+    setOpStatus(
+      claim.status === "durably_saved"
+        ? null
+        : { message: claim.message, retryable: claim.retryable, retry },
+    );
+    refresh();
+  }
 
   function refresh() {
     if (isSavedWorkDurableEnabled()) {
@@ -199,13 +219,26 @@ export function SavedWorkLibrary({
     }
     if (action === "duplicate") {
       const dup = duplicateSavedWork(item.id);
-      if (dup && isSavedWorkDurableEnabled()) void persistSavedWorkDurable(dup);
-      refresh();
+      if (dup && isSavedWorkDurableEnabled()) {
+        void persistSavedWorkDurable(dup).then((r) =>
+          applyDurableOutcome(r, "create", () =>
+            void persistSavedWorkDurable(dup).then((rr) =>
+              applyDurableOutcome(rr, "create"),
+            ),
+          ),
+        );
+      } else {
+        refresh();
+      }
       return;
     }
     if (action === "archive") {
       if (isSavedWorkDurableEnabled()) {
-        void archiveSavedWorkDurable(item.id).then(refresh);
+        void archiveSavedWorkDurable(item.id).then((res) =>
+          applyDurableOutcome(res.receipt, "archive", () =>
+            handleItemAction("archive", item),
+          ),
+        );
       } else {
         archiveSavedWork(item.id);
         refresh();
@@ -216,8 +249,13 @@ export function SavedWorkLibrary({
     if (action === "unarchive") {
       if (isSavedWorkDurableEnabled()) {
         const un = unarchiveSavedWork(item.id);
-        if (un) void persistSavedWorkDurable(un).then(refresh);
-        else refresh();
+        if (un) {
+          void persistSavedWorkDurable(un).then((r) =>
+            applyDurableOutcome(r, "unarchive", () =>
+              handleItemAction("unarchive", item),
+            ),
+          );
+        } else refresh();
       } else {
         unarchiveSavedWork(item.id);
         refresh();
@@ -236,7 +274,11 @@ export function SavedWorkLibrary({
     setRenaming(null);
     setRenameValue("");
     if (isSavedWorkDurableEnabled()) {
-      void updateSavedWorkDurable(id, { title }).then(refresh);
+      const applyRename = () =>
+        void updateSavedWorkDurable(id, { title }).then((res) =>
+          applyDurableOutcome(res.receipt, "update", applyRename),
+        );
+      applyRename();
     } else {
       updateSavedWork(id, { title });
       refresh();
@@ -249,7 +291,11 @@ export function SavedWorkLibrary({
     if (viewId === id) setViewId(null);
     setDeleteTarget(null);
     if (isSavedWorkDurableEnabled()) {
-      void deleteSavedWorkDurable(id).then(refresh);
+      const applyDelete = () =>
+        void deleteSavedWorkDurable(id).then((r) =>
+          applyDurableOutcome(r, "delete", applyDelete),
+        );
+      applyDelete();
     } else {
       deleteSavedWork(id);
       refresh();
@@ -266,14 +312,32 @@ export function SavedWorkLibrary({
     >
       <ConfirmDialog
         open={Boolean(deleteTarget)}
-        title="Delete this item permanently?"
-        message="This removes it from Saved Work. This cannot be undone."
-        confirmLabel="Delete"
+        title="Remove this from My Work?"
+        message="This removes it from your My Work list."
+        confirmLabel="Remove"
         cancelLabel="Cancel"
         destructive
         onCancel={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
       />
+      {opStatus && (
+        <div className="mb-3 flex items-center gap-3 rounded-lg border border-[#e2d3bf] bg-[#fbf5ea] px-3 py-2">
+          <p className="text-sm font-medium text-[#8a5a2b]">{opStatus.message}</p>
+          {opStatus.retryable && opStatus.retry && (
+            <button
+              type="button"
+              onClick={() => {
+                const retry = opStatus.retry;
+                setOpStatus(null);
+                retry?.();
+              }}
+              className="text-sm font-semibold text-[#1e4f4f] underline"
+            >
+              Try again
+            </button>
+          )}
+        </div>
+      )}
 
       {renaming ? (
         <div
