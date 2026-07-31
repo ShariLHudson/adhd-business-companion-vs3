@@ -85,13 +85,17 @@ describe("SparkNoteChrome — small Estate-wide teaser", () => {
     expect(onOpenTodaysSpark).not.toHaveBeenCalled();
   });
 
-  it("gift room shows the wrapped gift and the click instruction", () => {
+  it("gift room uses the exact extracted prototype room and shows the gift hotspot", () => {
     render({ visible: true });
     click(q(".spark-note-teaser__button"));
     expect(q('[data-testid="tsg-gift"]')).not.toBeNull();
-    expect(q('[data-testid="tsg-callout"]')?.textContent).toContain(
-      "Click the gift",
+    // The exact prototype background (gift + "Click the gift" callout baked in,
+    // bottom menu cropped off) — not a substitute Personal Library image.
+    const bg = q(".tsg-room__bg");
+    expect(bg?.style.backgroundImage).toContain(
+      "todays-spark-gift-room-background",
     );
+    expect(bg?.style.backgroundImage).not.toContain("personal-library-background");
   });
 
   it("keeps the teaser present while the gift room is open (not dismissed)", () => {

@@ -3,28 +3,30 @@
 import { createPortal } from "react-dom";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
-const GIFT_ROOM_BG = "/backgrounds/personal-library-background.png";
+// The exact room extracted from the approved prototype HTML (embedded
+// library-bg), with the baked-in bottom menu bar cropped off. The gift, the
+// "Click the gift to unwrap Today's Spark" callout, and the Welcome Home label
+// are part of this image — so the component only adds invisible clickable
+// hotspots over them (no duplicate UI).
+const GIFT_ROOM_BG = "/backgrounds/todays-spark-gift-room-background.png";
 
 type Props = {
   /** Back / close → returns to the previous Estate screen. */
   onClose: () => void;
-  /** This slice: gift click emits a test event only — the full Spark Card is
-   *  NOT opened yet (wired in a later slice). */
+  /** This slice: gift click is a no-op test event (full Spark Card deferred). */
   onGiftClick?: () => void;
 };
 
 /**
- * Today's Spark gift room (daily-arrival), reproduced from the approved
- * prototype. A full-screen overlay showing the wrapped gift on the table with
- * a clear instruction to click it. It is intentionally separate from the normal
- * dashboard Personal Library room. For this slice the gift click is a no-op
- * test event; the full Spark Card is not opened yet.
+ * Today's Spark gift room (daily-arrival) — the exact prototype room. A
+ * full-viewport overlay showing the wrapped gift on the table with the baked-in
+ * instruction to click it. Separate from the normal Personal Library room; the
+ * gift click is deferred to a later slice.
  */
 export function TodaysSparkGiftRoom({ onClose, onGiftClick }: Props) {
   const { requestClose } = useDismissibleWindow({ open: true, onClose });
 
   function handleGift() {
-    // Full Spark Card opening is deferred to a later slice.
     if (typeof console !== "undefined") {
       console.debug(
         "[todays-spark-gift] gift clicked — full Spark Card deferred this slice",
@@ -41,32 +43,30 @@ export function TodaysSparkGiftRoom({ onClose, onGiftClick }: Props) {
       aria-label="My Personal Library — Today's Spark"
       data-testid="todays-spark-gift-room"
     >
-      <div
-        className="tsg-room__bg"
-        aria-hidden="true"
-        style={{ backgroundImage: `url(${GIFT_ROOM_BG})` }}
-      />
+      <div className="tsg-room__stage">
+        <div
+          className="tsg-room__bg"
+          aria-hidden="true"
+          style={{ backgroundImage: `url(${GIFT_ROOM_BG})` }}
+        />
 
-      <button
-        type="button"
-        className="tsg-room__welcome-home"
-        onClick={() => requestClose()}
-        data-testid="tsg-welcome-home"
-      >
-        <span aria-hidden="true">⌂ </span>Welcome Home
-      </button>
+        {/* Invisible clickable region over the baked-in "Welcome Home" label. */}
+        <button
+          type="button"
+          className="tsg-room__welcome-home"
+          onClick={() => requestClose()}
+          aria-label="Back to Welcome Home"
+          data-testid="tsg-welcome-home"
+        />
 
-      <button
-        type="button"
-        className="tsg-room__gift"
-        onClick={handleGift}
-        aria-label="Open Today's Spark"
-        data-testid="tsg-gift"
-      />
-
-      <div className="tsg-room__callout" data-testid="tsg-callout">
-        <strong>Click the gift to unwrap Today’s Spark.</strong>
-        A new discovery is waiting just for you.
+        {/* Invisible clickable region over the wrapped gift (no-op this slice). */}
+        <button
+          type="button"
+          className="tsg-room__gift"
+          onClick={handleGift}
+          aria-label="Open Today's Spark"
+          data-testid="tsg-gift"
+        />
       </div>
     </section>,
     document.body,
