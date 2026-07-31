@@ -28,7 +28,7 @@ import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import {
-  PEACEFUL_PLACES_MUSIC_TRACKS,
+  PEACEFUL_PLACES_MUSIC_GROUPS,
   peacefulPlacesMusicTrackById,
   type ExperienceSoundscapeTrack,
 } from "@/lib/soundscapes/experienceSoundscapesMenu";
@@ -265,27 +265,45 @@ export function PeacefulMomentsRoom({
                 className="absolute left-0 right-0 z-20 mt-2 max-h-64 overflow-y-auto overscroll-contain rounded-xl border border-[#c9bfb0] bg-white py-1 shadow-lg"
                 data-testid="peaceful-moments-music-list"
               >
-                {PEACEFUL_PLACES_MUSIC_TRACKS.map((track) => {
-                  const isSelected = selected?.id === track.id;
-                  return (
-                    <li key={track.id} role="presentation">
-                      <button
-                        type="button"
-                        role="option"
-                        aria-selected={isSelected}
-                        className={`block w-full px-4 py-3 text-left text-base font-semibold outline-none focus-visible:bg-[#1e4f4f]/12 focus-visible:outline-none ${
-                          isSelected
-                            ? "bg-[#1e4f4f]/14 text-[#1e4f4f]"
-                            : "text-[#1f1c19] hover:bg-[#1e4f4f]/08"
-                        }`}
-                        data-testid={`peaceful-moments-track-${track.id}`}
-                        onClick={() => selectTrack(track)}
-                      >
-                        {track.title}
-                      </button>
-                    </li>
-                  );
-                })}
+                {PEACEFUL_PLACES_MUSIC_GROUPS.map((section) => (
+                  <li
+                    key={section.group}
+                    role="group"
+                    aria-label={section.group}
+                    className="border-t border-[#eadfce] first:border-t-0"
+                  >
+                    <p
+                      aria-hidden="true"
+                      className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-[#8a8377]"
+                      data-testid={`peaceful-moments-group-${section.group
+                        .toLowerCase()
+                        .replace(/[^a-z0-9]+/g, "-")
+                        .replace(/^-+|-+$/g, "")}`}
+                    >
+                      {section.group}
+                    </p>
+                    {section.tracks.map((track) => {
+                      const isSelected = selected?.id === track.id;
+                      return (
+                        <button
+                          key={track.id}
+                          type="button"
+                          role="option"
+                          aria-selected={isSelected}
+                          className={`block w-full px-4 py-3 text-left text-base font-semibold outline-none focus-visible:bg-[#1e4f4f]/12 focus-visible:outline-none ${
+                            isSelected
+                              ? "bg-[#1e4f4f]/14 text-[#1e4f4f]"
+                              : "text-[#1f1c19] hover:bg-[#1e4f4f]/08"
+                          }`}
+                          data-testid={`peaceful-moments-track-${track.id}`}
+                          onClick={() => selectTrack(track)}
+                        >
+                          {track.title}
+                        </button>
+                      );
+                    })}
+                  </li>
+                ))}
               </ul>
             ) : null}
           </div>

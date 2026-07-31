@@ -4,18 +4,33 @@
  * Soundscapes = ambient audio from public/audio/Soundscapes.
  */
 
-import { buildPeacefulPlacesFolderTracks } from "@/lib/peacefulPlaces/peacefulPlacesFolderManifest";
+import {
+  buildPeacefulPlacesFolderTracks,
+  buildPeacefulPlacesGroupedTracks,
+  type PeacefulPlaceGroup,
+} from "@/lib/peacefulPlaces/peacefulPlacesFolderManifest";
 import { buildSoundscapesFolderTracks } from "./soundscapesFolderManifest";
 
 export type ExperienceSoundscapeTrack = {
   id: string;
   title: string;
   src: string;
+  /** Peaceful Moments display group. Undefined for ambient soundscapes. */
+  group?: PeacefulPlaceGroup;
 };
 
 /** Music titles — Peaceful Places submenu. */
 export const PEACEFUL_PLACES_MUSIC_TRACKS: readonly ExperienceSoundscapeTrack[] =
   buildPeacefulPlacesFolderTracks();
+
+/**
+ * Peaceful Moments songs grouped for display (fixed group order,
+ * alphabetized within each group). Playback still resolves by id.
+ */
+export const PEACEFUL_PLACES_MUSIC_GROUPS: readonly {
+  group: PeacefulPlaceGroup;
+  tracks: readonly ExperienceSoundscapeTrack[];
+}[] = buildPeacefulPlacesGroupedTracks();
 
 /** Ambient loops — Soundscapes submenu. */
 export const EXPERIENCE_AMBIENT_SOUNDSCAPE_TRACKS: readonly ExperienceSoundscapeTrack[] =
