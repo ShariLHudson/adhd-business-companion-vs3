@@ -12,7 +12,7 @@ import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
 import { SparkNoteAnchor } from "./SparkNoteAnchor";
 import { TodaysSparkGiftRoom } from "./TodaysSparkGiftRoom";
-import { SparkNoteExpanded } from "./SparkNoteExpanded";
+import { TodaysSparkCardShell } from "./TodaysSparkCardShell";
 
 type Props = {
   visible: boolean;
@@ -31,11 +31,12 @@ type Props = {
  * Today's Spark flow:
  *   small Estate-wide teaser  →  gift room (daily-arrival)  →  full Spark Card.
  *
- * The full card is the exact pinned daily Spark (resolveDailySparkCard returns
- * the day's stored pick — no swap/regeneration) rendered by the existing
- * SparkNoteExpanded (correct image, complete content, durable Save This Spark).
- * Closing the card returns to the gift room. The small teaser stays visible
- * until the full card has opened successfully, then is dismissed for the day.
+ * The full card is the exact pinned daily Spark (resolvePinnedDailySparkCard
+ * returns the day's stored pick — no swap/regeneration) rendered by
+ * TodaysSparkCardShell in the approved card-shell style (correct image, complete
+ * content, durable Save This Spark). Closing the card returns to the gift room.
+ * The small teaser stays visible until the full card has opened successfully,
+ * then is dismissed for the day.
  */
 export function SparkNoteChrome({
   visible,
@@ -92,13 +93,9 @@ export function SparkNoteChrome({
         />
       ) : null}
       {cardOpen && card ? (
-        // Full pinned daily Spark Card (existing component): correct image +
-        // complete content + durable Save. Close returns to the gift room.
-        <SparkNoteExpanded
-          card={card}
-          onClose={() => setCardOpen(false)}
-          onOpenCollection={() => setCardOpen(false)}
-        />
+        // Full pinned daily Spark Card in the approved card-shell style: correct
+        // image + complete content + durable Save. Close returns to the gift room.
+        <TodaysSparkCardShell card={card} onClose={() => setCardOpen(false)} />
       ) : null}
     </>,
     document.body,

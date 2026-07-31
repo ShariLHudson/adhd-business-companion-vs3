@@ -1,0 +1,257 @@
+/* Today's Spark full card — the approved prototype "card-shell" style
+   (todays-spark-to-personal-library-prototype-v2). Clean paper card the gift
+   unwraps: eyebrow · title · subtitle · media · The Story · The Spark ·
+   Explore It. Closing returns to the gift room. All class names are tsc-*
+   prefixed so nothing collides with global element/utility selectors.
+
+   Palette (from the prototype :root):
+     paper #fffdf8 · gold #bb7d21 · teal #0f6f7c · ink #2e241c · muted #6b6158 */
+
+.tsc-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 100010; /* above the gift room (80) and teaser (60) */
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 26px 16px;
+  background: rgba(30, 31, 30, 0.66);
+  backdrop-filter: blur(10px);
+}
+.tsc-shell--open {
+  display: flex;
+}
+
+.tsc-card {
+  width: min(980px, 100%);
+  overflow: hidden;
+  border: 1px solid rgba(187, 125, 33, 0.55);
+  border-radius: 28px;
+  background: #fffdf8;
+  box-shadow: 0 28px 80px rgba(48, 36, 24, 0.28);
+  color: #2e241c;
+}
+
+.tsc-header {
+  position: relative;
+  padding: 26px 32px 22px;
+  border-bottom: 1px solid rgba(187, 125, 33, 0.22);
+  background: linear-gradient(135deg, #fffefb, #f4e8d2);
+}
+
+.tsc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  border: 0;
+  background: transparent;
+  color: #0f6f7c;
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tsc-close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(46, 36, 28, 0.2);
+  border-radius: 50%;
+  background: white;
+  color: #2e241c;
+  font-size: 27px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.tsc-eyebrow {
+  color: #bb7d21;
+  font-family: Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tsc-title {
+  margin: 7px 0 7px;
+  font-size: clamp(32px, 5vw, 64px);
+  line-height: 1.02;
+  font-weight: 500;
+  color: #2e241c;
+}
+
+.tsc-subtitle {
+  margin: 0;
+  color: #6b6158;
+  font-size: clamp(19px, 2.4vw, 28px);
+  line-height: 1.45;
+}
+
+.tsc-media-section {
+  padding: 28px 32px 0;
+  background: #f4ecdf;
+}
+.tsc-figure {
+  margin: 0;
+}
+.tsc-media-frame {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #2c2925;
+  min-height: 340px;
+}
+.tsc-media-frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 620px;
+  object-fit: contain;
+}
+.tsc-caption {
+  margin: 10px 2px 0;
+  color: #6a625a;
+  font-family: Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.tsc-body {
+  padding: 14px 32px 34px;
+}
+.tsc-section {
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(46, 36, 28, 0.13);
+}
+.tsc-section:last-of-type {
+  border-bottom: 0;
+}
+.tsc-section-title {
+  margin: 0 0 10px;
+  color: #0f6f7c;
+  font-size: 29px;
+  font-weight: 600;
+}
+.tsc-copy {
+  margin: 0 0 14px;
+  font-family: Arial, sans-serif;
+  font-size: 21px;
+  line-height: 1.65;
+  color: #2e241c;
+}
+
+.tsc-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 18px 0 2px;
+}
+.tsc-fact {
+  padding: 14px;
+  border: 1px solid rgba(187, 125, 33, 0.24);
+  border-radius: 14px;
+  background: #fbf6ec;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.4;
+  color: #2e241c;
+}
+
+.tsc-spark-box {
+  padding: 22px;
+  border-left: 5px solid #bb7d21;
+  border-radius: 0 16px 16px 0;
+  background: #f3e4c7;
+  color: #553b13;
+  font-size: 24px;
+  line-height: 1.45;
+}
+
+.tsc-explore-box {
+  padding: 20px;
+  border: 1px solid rgba(15, 111, 124, 0.28);
+  border-radius: 16px;
+  background: #f3fafb;
+}
+.tsc-explore-box p {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  font-size: 21px;
+  line-height: 1.65;
+  color: #2e241c;
+}
+
+.tsc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+.tsc-actions button {
+  min-height: 54px;
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-family: Arial, sans-serif;
+  font-size: 19px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tsc-actions button:disabled {
+  cursor: default;
+  opacity: 0.9;
+}
+.tsc-save {
+  flex: 1 1 250px;
+  border: 1px solid #bb7d21;
+  background: linear-gradient(135deg, #a86e18, #d1a146);
+  color: white;
+}
+.tsc-secondary {
+  border: 1px solid #0f6f7c;
+  background: white;
+  color: #0f6f7c;
+}
+
+.tsc-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-height: 26px;
+  margin-top: 12px;
+  color: #8a3a2a;
+  font-family: Arial, sans-serif;
+  font-size: 17px;
+}
+
+@media (max-width: 620px) {
+  .tsc-shell {
+    padding: 8px;
+  }
+  .tsc-card {
+    border-radius: 18px;
+  }
+  .tsc-header,
+  .tsc-media-section,
+  .tsc-body {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .tsc-media-frame {
+    min-height: 220px;
+  }
+  .tsc-facts {
+    grid-template-columns: 1fr;
+  }
+  .tsc-actions {
+    display: grid;
+  }
+}

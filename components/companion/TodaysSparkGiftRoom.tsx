@@ -27,11 +27,6 @@ export function TodaysSparkGiftRoom({ onClose, onGiftClick }: Props) {
   const { requestClose } = useDismissibleWindow({ open: true, onClose });
 
   function handleGift() {
-    if (typeof console !== "undefined") {
-      console.debug(
-        "[todays-spark-gift] gift clicked — full Spark Card deferred this slice",
-      );
-    }
     onGiftClick?.();
   }
 
