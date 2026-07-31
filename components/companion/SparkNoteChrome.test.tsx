@@ -81,6 +81,26 @@ describe("SparkNoteChrome — small Estate-wide teaser", () => {
     expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
   });
 
+  it("anchors placement above the composer by publishing --spark-teaser-bottom", () => {
+    document.documentElement.style.removeProperty("--spark-teaser-bottom");
+    render({ visible: true });
+    expect(
+      document.documentElement.style.getPropertyValue("--spark-teaser-bottom"),
+    ).not.toBe("");
+  });
+
+  it("CSS anchors the teaser bottom to the composer variable (not the viewport bottom)", () => {
+    const css = readFileSync(
+      resolve(process.cwd(), "app/companion/spark-note.css"),
+      "utf8",
+    );
+    const block = css.slice(
+      css.indexOf(".spark-note-teaser {"),
+      css.indexOf(".spark-note-teaser__button"),
+    );
+    expect(block).toContain("var(--spark-teaser-bottom");
+  });
+
   it("constrains the teaser to the approved small-card size in CSS", () => {
     const css = readFileSync(
       resolve(process.cwd(), "app/companion/spark-note.css"),
