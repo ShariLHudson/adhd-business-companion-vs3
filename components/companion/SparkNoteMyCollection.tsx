@@ -10,13 +10,27 @@ import {
   type MySparkCollectionSort,
   type MySparkSavedItem,
 } from "@/lib/sparkNote/mySparksCollection";
-import { loadMySparksCollection, removeSparkDurable } from "@/lib/sparkNote/savedSparksDurable";
+import {
+  loadMySparksCollection,
+  removeSparkDurable,
+} from "@/lib/sparkNote/savedSparksDurable";
+import { findCatalogCardById } from "@/lib/sparkNote/evaluateDailySparkNote";
+import { resolveSparkCardImage } from "@/lib/sparkNote/resolveSparkCardImage";
+import { isSavedSparkDurableEnabled } from "@/lib/durableRecords/flags";
+import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 import { SparkSparkleIcon } from "@/components/companion/SparkNoteSectionIcons";
+import { SparkNoteExpanded } from "./SparkNoteExpanded";
 
 type Props = {
   onClose: () => void;
   onBack: () => void;
+};
+
+type ResolvedSavedSpark = {
+  card: SparkNoteDailyCard | null;
+  imageSrc: string | null;
+  imageAlt: string;
 };
 
 /** Personal collection of saved Daily Sparks — durable-first, separate from today's discovery. */
@@ -28,6 +42,8 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
 
   // null = still loading; array = loaded (durable-first, local fallback).
   const [saved, setSaved] = useState<MySparkSavedItem[] | null>(null);
+  const [source, setSource] = useState<"durable" | "local">("durable");
+  const [openedCard, setOpenedCard] = useState<SparkNoteDailyCard | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [removeError, setRemoveError] = useState<string | null>(null);
 
@@ -40,15 +56,39 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
   useEffect(() => {
     let active = true;
     void loadMySparksCollection().then((result) => {
-      if (active) setSaved(result.items);
+      if (!active) return;
+      setSaved(result.items);
+      setSource(result.source);
     });
     return () => {
       active = false;
     };
   }, []);
 
+  function refresh() {
+    void loadMySparksCollection().then((result) => {
+      setSaved(result.items);
+      setSource(result.source);
+    });
+  }
+
   const items = saved ?? [];
   const categories = mySparkCollectionCategories(items);
+
+  // Resolve each saved Spark to its full card (to reopen) + a visual reference.
+  const resolvedById = useMemo(() => {
+    const map = new Map<string, ResolvedSavedSpark>();
+    for (const item of items) {
+      const card = findCatalogCardById(item.id);
+      const image = card ? resolveSparkCardImage(card) : null;
+      map.set(item.id, {
+        card,
+        imageSrc: image?.src ?? null,
+        imageAlt: image?.alt ?? item.title,
+      });
+    }
+    return map;
+  }, [items]);
 
   const filtered = useMemo(
     () =>
@@ -62,12 +102,27 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
     [items, query, category, dateFilter, sort],
   );
 
+  // Durable is enabled but we could only load the on-device copy → be honest.
+  const degraded = source === "local" && isSavedSparkDurableEnabled();
+
+  function handleOpen(id: string) {
+    const resolved = resolvedById.get(id);
+    if (resolved?.card) setOpenedCard(resolved.card);
+  }
+
+  function handleCloseCard() {
+    setOpenedCard(null);
+    // A save/remove may have happened inside the card — reflect it truthfully.
+    refresh();
+  }
+
   async function handleRemove(id: string) {
     setRemovingId(id);
     setRemoveError(null);
     const claim = await removeSparkDurable(id);
     if (claim.confirmed) {
-      setSaved((prev) => (prev ? prev.filter((item) => item.id !== id) : prev));
+      // Refresh from durable storage so the removed Spark cannot reappear.
+      refresh();
       setRemovingId(null);
       return;
     }
@@ -181,6 +236,17 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
           </div>
         </div>
 
+        {degraded ? (
+          <p
+            className="spark-note-collection__notice"
+            role="status"
+            data-testid="spark-note-collection-offline"
+          >
+            Showing the copy saved on this device — it will sync when you’re back
+            online.
+          </p>
+        ) : null}
+
         {removeError ? (
           <p className="spark-note-collection__error" role="alert">
             {removeError}
@@ -192,48 +258,97 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
             Gathering your saved Sparks…
           </p>
         ) : items.length === 0 ? (
-          <p className="spark-note-collection__empty">
-            Sparks you keep will appear here — tap Save Spark when something
-            resonates.
-          </p>
+          <div className="spark-note-collection__empty-state">
+            <p className="spark-note-collection__empty">
+              Sparks you keep will appear here. When something resonates, tap Save
+              on Today’s Spark and it will be waiting for you.
+            </p>
+            <button
+              type="button"
+              className="spark-note-collection__empty-action"
+              onClick={onBack}
+              data-testid="spark-note-collection-back-to-today"
+            >
+              Back to Today’s Spark
+            </button>
+          </div>
         ) : filtered.length === 0 ? (
           <p className="spark-note-collection__empty">
             No saved Sparks match your filters yet.
           </p>
         ) : (
           <ul className="spark-note-collection__list">
-            {filtered.map((item) => (
-              <li key={item.id} className="spark-note-collection__item">
-                <div className="spark-note-collection__item-meta">
-                  <span className="spark-note-collection__item-category">
-                    <SparkSparkleIcon className="spark-note-collection__item-category-icon" />
-                    {item.categoryLabel}
-                  </span>
-                  <span className="spark-note-collection__item-date">
-                    {formatMySparkSavedDate(item.savedAtIso)}
-                  </span>
-                </div>
-                <span className="spark-note-collection__item-title">
-                  {item.title}
-                </span>
-                <span className="spark-note-collection__item-teaser">
-                  {item.teaser}
-                </span>
-                <button
-                  type="button"
-                  className="spark-note-collection__item-remove"
-                  onClick={() => void handleRemove(item.id)}
-                  disabled={removingId === item.id}
-                  aria-label={`Remove ${item.title} from your collection`}
-                  data-testid={`spark-note-collection-remove-${item.id}`}
-                >
-                  {removingId === item.id ? "Removing…" : "Remove"}
-                </button>
-              </li>
-            ))}
+            {filtered.map((item) => {
+              const resolved = resolvedById.get(item.id);
+              const canOpen = Boolean(resolved?.card);
+              return (
+                <li key={item.id} className="spark-note-collection__item">
+                  <button
+                    type="button"
+                    className="spark-note-collection__item-open"
+                    onClick={() => handleOpen(item.id)}
+                    disabled={!canOpen}
+                    aria-label={`Open ${item.title}`}
+                    data-testid={`spark-note-collection-open-${item.id}`}
+                  >
+                    <span
+                      className="spark-note-collection__item-thumb"
+                      aria-hidden
+                    >
+                      {resolved?.imageSrc ? (
+                        <img
+                          className="spark-note-collection__item-thumb-img"
+                          src={resolved.imageSrc}
+                          alt=""
+                          referrerPolicy="no-referrer"
+                          decoding="async"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <SparkSparkleIcon className="spark-note-collection__item-thumb-icon" />
+                      )}
+                    </span>
+                    <span className="spark-note-collection__item-body">
+                      <span className="spark-note-collection__item-meta">
+                        <span className="spark-note-collection__item-category">
+                          {item.categoryLabel}
+                        </span>
+                        <span className="spark-note-collection__item-date">
+                          {formatMySparkSavedDate(item.savedAtIso)}
+                        </span>
+                      </span>
+                      <span className="spark-note-collection__item-title">
+                        {item.title}
+                      </span>
+                      <span className="spark-note-collection__item-teaser">
+                        {item.teaser}
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="spark-note-collection__item-remove"
+                    onClick={() => void handleRemove(item.id)}
+                    disabled={removingId === item.id}
+                    aria-label={`Remove ${item.title} from your collection`}
+                    data-testid={`spark-note-collection-remove-${item.id}`}
+                  >
+                    {removingId === item.id ? "Removing…" : "Remove"}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
+
+      {openedCard ? (
+        <SparkNoteExpanded
+          card={openedCard}
+          onClose={handleCloseCard}
+          onOpenCollection={() => setOpenedCard(null)}
+        />
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,9 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { SPARK_NOTE_CATALOG } from "./catalog";
-import { evaluateDailySparkNote } from "./evaluateDailySparkNote";
+import {
+  evaluateDailySparkNote,
+  findCatalogCardById,
+} from "./evaluateDailySparkNote";
 import { resolvePersonalSpark } from "./personalSparks";
 import {
   dayKey,
@@ -217,5 +220,21 @@ describe("evaluateDailySparkNote", () => {
     expect(card).not.toBeNull();
     expect(card?.title).toBeTruthy();
     expect(card?.teaser).toBeTruthy();
+  });
+
+  // Reopening a saved Spark by id (My Spark Collection → full card).
+  it("findCatalogCardById resolves the full card for a catalog id", () => {
+    const id = SPARK_NOTE_CATALOG[0]!.id;
+    const card = findCatalogCardById(id);
+    expect(card).not.toBeNull();
+    expect(card?.id).toBe(id);
+    expect(card?.title).toBeTruthy();
+    expect(card?.whatHappened).toBeTruthy();
+    expect(card?.whyItMatters).toBeTruthy();
+    expect(card?.sparkApplication).toBeTruthy();
+  });
+
+  it("findCatalogCardById returns null for an unknown id", () => {
+    expect(findCatalogCardById("SPARK-DOES-NOT-EXIST")).toBeNull();
   });
 });

@@ -173,7 +173,12 @@ function resolveFromCatalog(
   return entryToCard(chosen, "library");
 }
 
-function findCatalogCardById(id: string): SparkNoteDailyCard | null {
+/**
+ * Resolve the full daily card for a catalog Spark id. Exported so surfaces like
+ * My Spark Collection can reopen the exact full Spark Card from a saved id.
+ * Read-only lookup — does not affect selection, pinning, or the daily record.
+ */
+export function findCatalogCardById(id: string): SparkNoteDailyCard | null {
   const entry = SPARK_NOTE_CATALOG.find((e) => e.id === id);
   if (!entry) return null;
   const source: SparkNoteDailyCard["source"] =
