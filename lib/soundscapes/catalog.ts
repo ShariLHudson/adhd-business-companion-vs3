@@ -10,6 +10,8 @@ import {
   MUSIC_LOFT_AMBIENCE_MP3,
   OCEAN_CONSERVATORY_AMBIENCE_MP3,
   ORCHARD_BIRDS_AMBIENCE_MP3,
+  RAIN_AND_THUNDER_AMBIENCE_MP3,
+  DISTANT_THUNDER_AMBIENCE_MP3,
   TIN_ROOF_RAIN_AMBIENCE_MP3,
 } from "./audioAssets";
 
@@ -42,6 +44,32 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     playbackUrl: TIN_ROOF_RAIN_AMBIENCE_MP3,
     peacefulPlaceId: "summer-storm-covered-deck",
     signature: true,
+  },
+  {
+    id: "rain-and-thunder",
+    mood: "calming",
+    emoji: "⛈️",
+    title: "Rain & Thunder",
+    environment: "Sheltered Porch",
+    destinationName: "Sheltered Porch",
+    experience: "Rain & Thunder",
+    tagline: "Steady rain and rolling thunder — safe and dry beneath the eaves.",
+    description:
+      "Full rain sweeps across the yard while thunder rolls close overhead. You stay dry beneath the eaves — nothing to do but listen as the storm moves through.",
+    playbackUrl: RAIN_AND_THUNDER_AMBIENCE_MP3,
+  },
+  {
+    id: "distant-thunder",
+    mood: "calming",
+    emoji: "🌩️",
+    title: "Distant Thunder",
+    environment: "Evening Window",
+    destinationName: "Evening Window",
+    experience: "Distant Thunder",
+    tagline: "A far-off storm rumbles softly beyond the glass.",
+    description:
+      "A storm passes somewhere on the horizon — low thunder rolling in the distance, the air still and cool. Far enough away to feel calm, close enough to keep you company.",
+    playbackUrl: DISTANT_THUNDER_AMBIENCE_MP3,
   },
   {
     id: "morning-garden",

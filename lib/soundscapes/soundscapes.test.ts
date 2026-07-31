@@ -4,7 +4,7 @@ import { parseYoutubeVideoId } from "../focusAudio/youtubeEmbed";
 
 describe("soundscape catalog", () => {
   it("ships slow down, focus, unwind, and recharge destinations", () => {
-    expect(soundscapesForMood("calming")).toHaveLength(4);
+    expect(soundscapesForMood("calming")).toHaveLength(6);
     expect(soundscapesForMood("focus")).toHaveLength(5);
     expect(soundscapesForMood("unwind")).toHaveLength(4);
     expect(soundscapesForMood("energize")).toHaveLength(3);

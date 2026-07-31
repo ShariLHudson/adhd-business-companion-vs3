@@ -8,11 +8,13 @@ export const SOUNDSCAPES_FOLDER_FILENAMES = [
   "church-bells-clock chime.mp3",
   "coffee-shop-chatter-audio.mp3",
   "crickets-birds-and-bee-flight.mp3",
+  "distant-thunder.mp3",
   "fireplace-crackling-fire.mp3",
   "frogs-croaking-at-night.mp3",
   "gentle_rain_on_a_tin.mp3",
   "greenhouse-birds-ambience.mp3",
   "morning-birdsong.mp3",
+  "rain-and-thunder.mp3",
   "water-fountain.mp3",
 ] as const;
 
@@ -23,11 +25,13 @@ const SOUNDSCAPE_TITLE_OVERRIDES: Readonly<Record<string, string>> = {
   "church-bells-clock chime.mp3": "Church Bells Clock Chime",
   "coffee-shop-chatter-audio.mp3": "Coffee Shop Chatter",
   "crickets-birds-and-bee-flight.mp3": "Crickets, Birds, and Bee Flight",
+  "distant-thunder.mp3": "Distant Thunder",
   "fireplace-crackling-fire.mp3": "Fireplace Crackling Fire",
   "frogs-croaking-at-night.mp3": "Frogs Croaking at Night",
   "gentle_rain_on_a_tin.mp3": "Gentle Rain on a Tin Roof",
   "greenhouse-birds-ambience.mp3": "Greenhouse Birds",
   "morning-birdsong.mp3": "Morning Birdsong",
+  "rain-and-thunder.mp3": "Rain and Thunder",
   "water-fountain.mp3": "Water Fountain",
 };
 

@@ -13,6 +13,12 @@ export const COFFEE_SHOP_AMBIENCE_MP3 =
 export const TIN_ROOF_RAIN_AMBIENCE_MP3 =
   `${SOUNDSCAPES_AUDIO_DIR}/gentle_rain_on_a_tin.mp3` as const;
 
+export const RAIN_AND_THUNDER_AMBIENCE_MP3 =
+  `${SOUNDSCAPES_AUDIO_DIR}/rain-and-thunder.mp3` as const;
+
+export const DISTANT_THUNDER_AMBIENCE_MP3 =
+  `${SOUNDSCAPES_AUDIO_DIR}/distant-thunder.mp3` as const;
+
 /** Music Loft ambience — Morning Momentum (Songer). Also plays in Focus → Music Room. */
 export const MUSIC_LOFT_AMBIENCE_MP3 =
   "/audio/peaceful-places/lofty-studio.mp3" as const;
