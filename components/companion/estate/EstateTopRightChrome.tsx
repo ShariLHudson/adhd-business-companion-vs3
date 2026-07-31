@@ -51,6 +51,7 @@ export type EstateTopRightChromeProps = {
   onOpenJournal?: () => void;
   onOpenEvidenceVault?: () => void;
   onOpenHallOfAccomplishments?: () => void;
+  onOpenPersonalLibrary?: () => void;
   onOpenChamber?: () => void;
   onOpenBoardroom?: () => void;
   onOpenStrategyLibrary?: () => void;
@@ -106,6 +107,7 @@ export function EstateTopRightChrome({
   onOpenJournal,
   onOpenEvidenceVault,
   onOpenHallOfAccomplishments,
+  onOpenPersonalLibrary,
   onOpenChamber,
   onOpenBoardroom,
   onOpenStrategyLibrary,
@@ -185,6 +187,7 @@ export function EstateTopRightChrome({
           onOpenJournal={onOpenJournal}
           onOpenEvidenceVault={onOpenEvidenceVault}
           onOpenHallOfAccomplishments={onOpenHallOfAccomplishments}
+          onOpenPersonalLibrary={onOpenPersonalLibrary}
           onOpenChamber={onOpenChamber}
           onOpenBoardroom={onOpenBoardroom}
           onOpenStrategyLibrary={onOpenStrategyLibrary}

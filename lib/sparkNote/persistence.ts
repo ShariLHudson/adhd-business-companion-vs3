@@ -29,6 +29,8 @@ export type SparkNotePersistenceStore = {
   ignoredCategories: Record<string, number>;
   /** spark id → reactions given */
   reactionsBySparkId: Record<string, SparkNoteReaction[]>;
+  /** dayKey the Welcome Home Today's Spark teaser was dismissed (per device). */
+  homeTeaserDismissedDay: string | null;
 };
 
 function emptyStore(): SparkNotePersistenceStore {
@@ -44,6 +46,7 @@ function emptyStore(): SparkNotePersistenceStore {
     categoryAffinity: {},
     ignoredCategories: {},
     reactionsBySparkId: {},
+    homeTeaserDismissedDay: null,
   };
 }
 
@@ -68,6 +71,7 @@ export function readSparkNoteStore(): SparkNotePersistenceStore {
       categoryAffinity: parsed.categoryAffinity ?? {},
       ignoredCategories: parsed.ignoredCategories ?? {},
       reactionsBySparkId: parsed.reactionsBySparkId ?? {},
+      homeTeaserDismissedDay: parsed.homeTeaserDismissedDay ?? null,
     };
   } catch {
     return emptyStore();
@@ -314,4 +318,18 @@ export function getFavoriteSparkIds(): string[] {
 
 export function getSparkReactions(sparkId: string): SparkNoteReaction[] {
   return [...(readSparkNoteStore().reactionsBySparkId[sparkId] ?? [])];
+}
+
+/**
+ * Welcome Home Today's Spark teaser — shown once per local calendar day. The
+ * teaser is dismissed after the first successful open that day and returns the
+ * next day. Per-device UI state only; never affects the pinned daily Spark.
+ */
+export function isHomeTeaserDismissedToday(now = new Date()): boolean {
+  return readSparkNoteStore().homeTeaserDismissedDay === dayKey(now);
+}
+
+export function dismissHomeTeaserToday(now = new Date()): void {
+  const store = readSparkNoteStore();
+  writeSparkNoteStore({ ...store, homeTeaserDismissedDay: dayKey(now) });
 }

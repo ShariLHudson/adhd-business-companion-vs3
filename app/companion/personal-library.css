@@ -293,3 +293,37 @@
     transition: none;
   }
 }
+
+/* Today's Spark entry — always available inside the room. */
+.pl-card-panel--today {
+  border-color: rgba(30, 79, 79, 0.4);
+  background: rgba(255, 253, 249, 0.96);
+}
+.pl-today-open {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  width: 100%;
+  margin-top: 0.4rem;
+  border: 1px solid rgba(30, 79, 79, 0.35);
+  border-radius: 0.5rem;
+  background: #1e4f4f;
+  color: #fff;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.pl-today-open:hover {
+  background: #163d3d;
+}
+.pl-today-open:focus-visible {
+  outline: 3px solid #1e4f4f;
+  outline-offset: 2px;
+}
+.pl-today-open__hint {
+  font-size: 0.7rem;
+  font-weight: 500;
+  opacity: 0.9;
+}

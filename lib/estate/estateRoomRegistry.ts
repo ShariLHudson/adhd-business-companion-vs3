@@ -109,7 +109,7 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
     id: "personal-library",
     name: "Personal Library",
     trademark: "Personal Library",
-    route: "growth-library",
+    route: "personal-library",
     routes: ["how-do-i"],
     backgroundImage: null,
     intendedBackgroundImage: ESTATE_ROOM_BG.personalLibrary,

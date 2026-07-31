@@ -64,6 +64,7 @@ export type WelcomeHomeNavDestinationId =
   | "journal"
   | "evidence-vault"
   | "hall-of-accomplishments"
+  | "personal-library"
   | "reflect-more"
   | "chamber-of-momentum"
   | "boardroom"
@@ -267,6 +268,11 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
         id: "hall-of-accomplishments",
         label: "Hall of Accomplishments",
         supportLine: "Remember what you’ve already built.",
+      },
+      {
+        id: "personal-library",
+        label: "My Personal Library",
+        supportLine: "Your saved Sparks and discoveries, kept in one place.",
       },
     ],
   },

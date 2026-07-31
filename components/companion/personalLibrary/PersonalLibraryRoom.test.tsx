@@ -131,4 +131,29 @@ describe("PersonalLibraryRoom (Slice 3a)", () => {
     await render();
     expect(document.body.textContent).toContain("Sparks you save will appear here");
   });
+
+  it("offers Today's Spark in the room and opens it on click", async () => {
+    await render();
+    expect(q('[data-testid="pl-todays-spark"]')).not.toBeNull();
+    click(q('[data-testid="pl-todays-spark-open"]'));
+    await flush();
+    expect(q('[data-testid="spark-note-expanded"]')).not.toBeNull();
+  });
+
+  it("auto-opens Today's Spark on teaser arrival", async () => {
+    const onArrivalConsumed = vi.fn();
+    await act(async () => {
+      root.render(
+        <PersonalLibraryRoom
+          onBack={onBack}
+          backLabel="Welcome Home"
+          arrivalMode
+          onArrivalConsumed={onArrivalConsumed}
+        />,
+      );
+    });
+    await flush();
+    expect(q('[data-testid="spark-note-expanded"]')).not.toBeNull();
+    expect(onArrivalConsumed).toHaveBeenCalled();
+  });
 });

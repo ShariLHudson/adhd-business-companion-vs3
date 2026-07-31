@@ -3757,6 +3757,9 @@ export default function CompanionPageClient() {
     null,
   );
   const [estateGuideFlipbookOpen, setEstateGuideFlipbookOpen] = useState(false);
+  // One-shot: the Welcome Home teaser opens Personal Library in Today's Spark
+  // arrival mode (auto-opens the daily card); the room clears it after use.
+  const [personalLibraryArrival, setPersonalLibraryArrival] = useState(false);
   const [justBeHereSession, setJustBeHereSession] =
     useState<JustBeHereSession | null>(null);
   const [justBeHerePhase, setJustBeHerePhase] = useState<
@@ -27172,6 +27175,12 @@ export default function CompanionPageClient() {
             <PersonalLibraryRoom
               onBack={goBack}
               backLabel={workspacePanelBackLabel}
+              arrivalMode={personalLibraryArrival}
+              onArrivalConsumed={() => setPersonalLibraryArrival(false)}
+              firstName={getPrefs().name || null}
+              birthday={getRecognitionStore().birthday}
+              personalDates={getRecognitionStore().personalDates}
+              memberSinceIso={getMemberSinceIso()}
             />
           )}
 
@@ -28212,10 +28221,15 @@ export default function CompanionPageClient() {
       />
       <SparkNoteChrome
         visible={showSparkNoteChrome}
+        isWelcomeHome={activeSection === "home"}
         firstName={getPrefs().name || null}
         birthday={getRecognitionStore().birthday}
         personalDates={getRecognitionStore().personalDates}
         memberSinceIso={getMemberSinceIso()}
+        onOpenTodaysSpark={() => {
+          setPersonalLibraryArrival(true);
+          openGrowthDestinationCore("personal-library");
+        }}
       />
       <EstateTopRightChrome
         showProfile={showGlobalEstateMenu}
@@ -28291,6 +28305,7 @@ export default function CompanionPageClient() {
         onOpenHallOfAccomplishments={() =>
           openGrowthDestinationCore("growth-portfolio")
         }
+        onOpenPersonalLibrary={() => openGrowthDestinationCore("personal-library")}
         onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
         onOpenChamber={() => openChamberOfMomentumCore()}
         onOpenBoardroom={() => openBoardroomCore()}

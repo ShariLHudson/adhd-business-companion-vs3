@@ -1,10 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
-import { diversityCategoryForEntry } from "@/lib/sparkNote/sparkCardDiversity";
 
-import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
+const TEASER_SRC = "/images/todays-spark-card.png";
 
 type Props = {
   card: SparkNoteDailyCard;
@@ -12,32 +10,29 @@ type Props = {
 };
 
 /**
- * Collapsed Spark Card — compact companion object (bottom-right, opposite Guide Book).
- * Decorative keepsake styling only; no thumbnail image or teaser text on this
- * face (kept calm/small — full illustration and story live in the expanded card).
+ * Welcome Home Today's Spark teaser — the approved bottom-right image. The whole
+ * image is a single clickable control that opens My Personal Library in Today's
+ * Spark arrival mode. Shown once per local calendar day (gated by SparkNoteChrome).
  */
 export function SparkNoteAnchor({ card, onExpand }: Props) {
-  const diversityCategory = useMemo(() => diversityCategoryForEntry(card), [card]);
-
   return (
     <div
-      className="spark-note-anchor"
+      className="spark-note-teaser"
       data-estate-chrome-position="bottom-right"
-      data-diversity-category={diversityCategory}
       data-testid="spark-note-anchor"
     >
       <button
         type="button"
-        className="spark-note-anchor__card"
+        className="spark-note-teaser__button"
         onClick={onExpand}
-        aria-label={`Daily Spark. Today's discovery: ${card.shortTitle}. Open to read.`}
+        aria-label={`Today's Spark: ${card.shortTitle}. Open your Personal Library.`}
       >
-        <span className="spark-note-anchor__seal" aria-hidden />
-        <span className="spark-note-anchor__flame-wrap" aria-hidden>
-          <SparkFlameIcon className="spark-note-anchor__flame" />
-        </span>
-        <span className="spark-note-anchor__identity">Daily Spark</span>
-        <span className="spark-note-anchor__hint">{card.shortTitle}</span>
+        <img
+          className="spark-note-teaser__image"
+          src={TEASER_SRC}
+          alt="Today's Spark"
+          decoding="async"
+        />
       </button>
     </div>
   );

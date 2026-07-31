@@ -108,10 +108,10 @@ export const SPARK_FEATURES: readonly SparkFeatureDefinition[] = [
   {
     id: "personal-library",
     displayName: "Personal Library",
-    route: { placeId: "personal-library", section: "growth-library" },
+    route: { placeId: "personal-library", section: "personal-library" },
     surfaces: surfaces(
-      estate("growth-library", "personal-library"),
-      "growth-library",
+      estate("personal-library", "personal-library"),
+      "personal-library",
     ),
   },
   {

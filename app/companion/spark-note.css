@@ -1832,3 +1832,49 @@
 .spark-note-collection__empty-action:hover {
   background: #163d3d;
 }
+
+/* Welcome Home Today's Spark teaser — approved image, whole-image clickable. */
+.spark-note-teaser {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 40;
+  width: min(18rem, 42vw);
+}
+.spark-note-teaser__button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 1rem;
+}
+.spark-note-teaser__button:focus-visible {
+  outline: 3px solid #1e4f4f;
+  outline-offset: 3px;
+}
+.spark-note-teaser__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 1rem;
+  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+  transition: transform 0.15s ease;
+}
+.spark-note-teaser__button:hover .spark-note-teaser__image {
+  transform: translateY(-2px);
+}
+@media (max-width: 640px) {
+  .spark-note-teaser {
+    width: min(14rem, 55vw);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .spark-note-teaser__image {
+    transition: none;
+  }
+  .spark-note-teaser__button:hover .spark-note-teaser__image {
+    transform: none;
+  }
+}

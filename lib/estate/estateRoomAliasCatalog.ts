@@ -393,8 +393,15 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   {
     roomId: "personal-library",
     officialName: "Personal Library",
-    aliases: ["personal library", "the personal library", "my library"],
-    route: "growth-library",
+    aliases: [
+      "personal library",
+      "the personal library",
+      "my library",
+      "spark collection",
+      "my spark collection",
+      "saved sparks",
+    ],
+    route: "personal-library",
     roomType: "learning",
   },
   {

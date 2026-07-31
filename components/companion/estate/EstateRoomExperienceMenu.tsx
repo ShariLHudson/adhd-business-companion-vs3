@@ -85,6 +85,8 @@ export type EstateRoomExperienceMenuProps = {
   onOpenJournal?: () => void;
   onOpenEvidenceVault?: () => void;
   onOpenHallOfAccomplishments?: () => void;
+  /** Reflection → My Personal Library (saved Sparks room). */
+  onOpenPersonalLibrary?: () => void;
   onOpenChamber?: () => void;
   onOpenBoardroom?: () => void;
   /** Guidance → Strategies (playbook / StrategiesPanel). */
@@ -135,6 +137,7 @@ export function EstateRoomExperienceMenu({
   onOpenJournal,
   onOpenEvidenceVault,
   onOpenHallOfAccomplishments,
+  onOpenPersonalLibrary,
   onOpenChamber,
   onOpenBoardroom,
   onOpenStrategyLibrary,
@@ -260,6 +263,7 @@ export function EstateRoomExperienceMenu({
           journal: onOpenJournal,
           "evidence-vault": onOpenEvidenceVault,
           "hall-of-accomplishments": onOpenHallOfAccomplishments,
+          "personal-library": onOpenPersonalLibrary,
           // Browse more expands in-place — no parent navigation.
           "reflect-more": undefined,
           "chamber-of-momentum": onOpenChamber,
@@ -297,6 +301,7 @@ export function EstateRoomExperienceMenu({
       onOpenJournal,
       onOpenEvidenceVault,
       onOpenHallOfAccomplishments,
+      onOpenPersonalLibrary,
       onOpenChamber,
       onOpenBoardroom,
       onOpenStrategyLibrary,

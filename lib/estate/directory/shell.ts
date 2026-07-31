@@ -34,7 +34,7 @@ export const ESTATE_DIRECTORY_PLACE_SECTION: Partial<
   journal: "growth-journal",
   greenhouse: "growth-greenhouse",
   library: "growth-library",
-  "personal-library": "growth-library",
+  "personal-library": "personal-library",
   "creative-studio": "content-generator",
   "focus-studio": "visual-focus",
   "cartographers-studio": "visual-focus",

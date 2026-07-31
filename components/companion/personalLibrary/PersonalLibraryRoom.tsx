@@ -8,9 +8,12 @@ import {
 } from "@/lib/sparkNote/mySparksCollection";
 import { loadMySparksCollection } from "@/lib/sparkNote/savedSparksDurable";
 import { findCatalogCardById } from "@/lib/sparkNote/evaluateDailySparkNote";
+import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { resolveSparkCardImage } from "@/lib/sparkNote/resolveSparkCardImage";
 import { isSavedSparkDurableEnabled } from "@/lib/durableRecords/flags";
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
+import type { RegionCode } from "@/lib/companionLanguage";
+import type { PersonalDate } from "@/lib/recognition/types";
 import { SparkNoteExpanded } from "@/components/companion/SparkNoteExpanded";
 import { SparkNoteMyCollection } from "@/components/companion/SparkNoteMyCollection";
 import { SparkSparkleIcon } from "@/components/companion/SparkNoteSectionIcons";
@@ -18,6 +21,15 @@ import { SparkSparkleIcon } from "@/components/companion/SparkNoteSectionIcons";
 type Props = {
   onBack: () => void;
   backLabel?: string | null;
+  /** When true (teaser arrival), auto-open Today's Spark once on mount. */
+  arrivalMode?: boolean;
+  /** Called after arrival opens Today's Spark, so the one-shot flag can clear. */
+  onArrivalConsumed?: () => void;
+  firstName?: string | null;
+  birthday?: { month: number; day: number } | null;
+  personalDates?: PersonalDate[];
+  memberSinceIso?: string | null;
+  region?: RegionCode;
 };
 
 type ResolvedSpark = {
@@ -50,11 +62,43 @@ const JOURNEY_UPCOMING = [
  * World, Find/Search, and Recent arrive in later slices and are shown as calm
  * "coming soon" states rather than the artwork's placeholders.
  */
-export function PersonalLibraryRoom({ onBack, backLabel }: Props) {
+export function PersonalLibraryRoom({
+  onBack,
+  backLabel,
+  arrivalMode = false,
+  onArrivalConsumed,
+  firstName,
+  birthday,
+  personalDates,
+  memberSinceIso,
+  region,
+}: Props) {
   const [saved, setSaved] = useState<MySparkSavedItem[] | null>(null);
   const [source, setSource] = useState<"durable" | "local">("durable");
   const [openedCard, setOpenedCard] = useState<SparkNoteDailyCard | null>(null);
   const [showCollection, setShowCollection] = useState(false);
+
+  // Today's Spark — the current pinned daily card, resolved read-only (this
+  // never changes the pin). Always openable from the room; auto-opened on
+  // teaser arrival.
+  const dailyCard = useMemo(
+    () =>
+      resolveDailySparkCard({
+        firstName,
+        birthday,
+        personalDates,
+        memberSinceIso,
+        region,
+      }).card,
+    [firstName, birthday, personalDates, memberSinceIso, region],
+  );
+
+  useEffect(() => {
+    if (arrivalMode && dailyCard) {
+      setOpenedCard(dailyCard);
+      onArrivalConsumed?.();
+    }
+  }, [arrivalMode, dailyCard, onArrivalConsumed]);
 
   useEffect(() => {
     let active = true;
@@ -145,6 +189,31 @@ export function PersonalLibraryRoom({ onBack, backLabel }: Props) {
           <h2 id="pl-journey-heading" className="pl-region__title">
             My Journey
           </h2>
+
+          <div
+            className="pl-card-panel pl-card-panel--today"
+            data-testid="pl-todays-spark"
+          >
+            <div className="pl-card-panel__head">
+              <h3 className="pl-card-panel__title">Today’s Spark</h3>
+            </div>
+            {dailyCard ? (
+              <button
+                type="button"
+                className="pl-today-open"
+                onClick={() => setOpenedCard(dailyCard)}
+                data-testid="pl-todays-spark-open"
+                aria-label={`Open today’s Spark: ${dailyCard.shortTitle}`}
+              >
+                Open today’s Spark
+                <span className="pl-today-open__hint">
+                  {dailyCard.shortTitle}
+                </span>
+              </button>
+            ) : (
+              <p className="pl-state">Today’s Spark will appear here.</p>
+            )}
+          </div>
 
           <div className="pl-card-panel" data-testid="pl-spark-collection">
             <div className="pl-card-panel__head">
