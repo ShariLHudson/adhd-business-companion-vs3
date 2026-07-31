@@ -14,6 +14,13 @@ export type EstateTopRightChromeProps = {
   showRoom: boolean;
   roomId: string | null;
   chatVisible: boolean;
+  /**
+   * Home/arrival reachability: when true, the canonical GlobalSoundControl
+   * renders even if the full chrome (room / profile menu) is not shown, so sound
+   * is reachable from the authenticated home/arrival surface without first
+   * opening a menu. Never set on sign-in. The rest of the chrome stays gated.
+   */
+  showHomeSoundControl?: boolean;
   /** Spec 129 — current Welcome Home destination for orientation highlight. */
   activeDestinationId?: WelcomeHomeNavDestinationId | null;
   soundEnabled?: boolean;
@@ -69,6 +76,7 @@ export function EstateTopRightChrome({
   showRoom,
   roomId,
   chatVisible,
+  showHomeSoundControl = false,
   activeDestinationId = null,
   soundEnabled,
   soundPlayingHint,
@@ -118,11 +126,20 @@ export function EstateTopRightChrome({
 
   useEffect(() => setMounted(true), []);
 
-  const visible = showProfile || (showRoom && Boolean(roomId));
-  if (!mounted || !visible) return null;
+  // Full chrome (room / profile menus) keeps its original gate. The canonical
+  // GlobalSoundControl additionally renders standalone on the authenticated
+  // home/arrival surface so sound is reachable without opening a menu. It is a
+  // single instance either way — never duplicated when full chrome is visible.
+  const renderFullChrome = showProfile || (showRoom && Boolean(roomId));
+  const renderStandaloneSound = !renderFullChrome && showHomeSoundControl;
+  if (!mounted || (!renderFullChrome && !renderStandaloneSound)) return null;
 
   return createPortal(
-    <div className="estate-top-right-chrome" data-testid="estate-top-right-chrome">
+    <div
+      className="estate-top-right-chrome"
+      data-testid="estate-top-right-chrome"
+      data-standalone-sound={renderStandaloneSound ? "true" : "false"}
+    >
       <GlobalSoundControl
         soundPlayingHint={soundPlayingHint}
         onOpenAudioSettings={

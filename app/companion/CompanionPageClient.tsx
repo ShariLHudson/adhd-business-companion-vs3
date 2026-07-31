@@ -25219,6 +25219,14 @@ export default function CompanionPageClient() {
     : estateRoomChatVisible;
   const showEstateExperienceMenu =
     overlay !== "signin" && Boolean(roomMenuRoomId);
+  /**
+   * Sound reachability on the authenticated home/arrival surface (106–135):
+   * make the canonical GlobalSoundControl available without first opening the
+   * room or profile menu. Scoped to Welcome Home; never on sign-in or Just Be
+   * Here. Room-level audio behavior is unchanged.
+   */
+  const showHomeSoundControl =
+    welcomeHomePrimary && overlay !== "signin" && !justBeHereSession;
 
   const conversationDestinationId = useMemo(() => {
     if (justBeHereSession) return "just-be-here";
@@ -28205,6 +28213,7 @@ export default function CompanionPageClient() {
         showProfile={showGlobalEstateMenu}
         showRoom={showEstateExperienceMenu}
         roomId={roomMenuRoomId}
+        showHomeSoundControl={showHomeSoundControl}
         chatVisible={roomMenuChatVisible}
         backdropSurface={
           activeSection === "brain-dump" || isClearMyMindModeActive()
