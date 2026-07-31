@@ -75,6 +75,10 @@
   object-fit: contain;
 }
 
+.weiv-image {
+  cursor: zoom-in;
+}
+
 .weiv-image--cover {
   object-fit: cover;
   width: min(100%, 56rem);
@@ -176,6 +180,67 @@
   border-color: rgba(201, 162, 39, 0.55);
   background: linear-gradient(135deg, #e8c36a 0%, #c9922e 100%);
   color: #2c2410;
+}
+
+.weiv-secondary {
+  flex: 0 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0 0.5rem 0.35rem;
+}
+
+.weiv-btn--wide {
+  min-width: 12rem;
+}
+
+/* ── Immersive full-screen background ─────────────────────────────────────── */
+.weiv-root--immersive {
+  padding: 0;
+  background: #05060a;
+}
+
+.weiv-root--immersive .weiv-stage {
+  padding: 0;
+}
+
+.weiv-image--immersive {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
+  /* The full-screen background is not an exit control — leave via the bar/Esc. */
+  cursor: default;
+}
+
+.weiv-immersive-bar {
+  position: absolute;
+  left: 50%;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 999px;
+  background: rgba(12, 14, 18, 0.55);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.weiv-btn--ghost {
+  background: rgba(255, 252, 245, 0.12);
+  border-color: rgba(244, 239, 230, 0.28);
 }
 
 @media (max-width: 40rem) {

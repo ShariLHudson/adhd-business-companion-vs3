@@ -13,21 +13,32 @@ type Props = {
   image: WanderEstateImageRecord;
   onClose: () => void;
   onNavigate: (imageId: string) => void;
+  /**
+   * "Talk here" — stay in this place with Spark. Optional: when provided, the
+   * viewer offers to make this image the companion background and drop the
+   * member into the normal chat-over-background experience (reuses estate
+   * navigation; the viewer never mounts its own chat).
+   */
+  onEnterPlace?: () => void;
 };
 
 /**
  * Focused Wander the Estate image viewer — exclusive layer over the gallery.
- * Does not mount chat or the directory grid.
+ * Two presentations: a framed view (photo + title + Previous/Back/Next), and an
+ * immersive full-screen background the member can stay on (chrome hidden, photo
+ * full-bleed). Neither mounts chat; "Talk here" reuses estate navigation.
  */
 export function WanderEstateImageViewer({
   image,
   onClose,
   onNavigate,
+  onEnterPlace,
 }: Props) {
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [imageFailed, setImageFailed] = useState(false);
+  const [immersive, setImmersive] = useState(false);
   const adjacent = getAdjacentWanderImages(image.id);
   const canPrevious = Boolean(adjacent.previous);
   const canNext = Boolean(adjacent.next);
@@ -50,12 +61,19 @@ export function WanderEstateImageViewer({
     if (adjacent.next) onNavigate(adjacent.next.id);
   }, [adjacent.next, onNavigate]);
 
+  // Single `immersive` authority. Enter is explicit; there is no image-based
+  // exit toggle, so a full-screen background click never collapses the view.
+  const enterImmersive = useCallback(() => setImmersive(true), []);
+  const exitImmersive = useCallback(() => setImmersive(false), []);
+
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         event.preventDefault();
         event.stopPropagation();
-        onClose();
+        // Esc steps out of immersive first, then closes the viewer.
+        if (immersive) setImmersive(false);
+        else onClose();
         return;
       }
       if (event.key === "ArrowLeft") {
@@ -70,7 +88,7 @@ export function WanderEstateImageViewer({
     };
     window.addEventListener("keydown", onKey, true);
     return () => window.removeEventListener("keydown", onKey, true);
-  }, [goNext, goPrevious, onClose]);
+  }, [goNext, goPrevious, onClose, immersive]);
 
   // Focus trap within viewer controls
   useEffect(() => {
@@ -96,19 +114,20 @@ export function WanderEstateImageViewer({
     };
     root.addEventListener("keydown", onTab);
     return () => root.removeEventListener("keydown", onTab);
-  }, [image.id]);
+  }, [image.id, immersive]);
 
   const showImage = Boolean(image.imageSrc) && !imageFailed;
 
   return (
     <div
       ref={containerRef}
-      className="weiv-root"
+      className={`weiv-root${immersive ? " weiv-root--immersive" : ""}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
       data-testid="wander-estate-image-viewer"
-      data-wander-view="image_viewer"
+      data-wander-view={immersive ? "image_immersive" : "image_viewer"}
+      data-immersive={immersive ? "true" : "false"}
       data-image-id={image.id}
       data-image-index={adjacent.index}
     >
@@ -132,7 +151,9 @@ export function WanderEstateImageViewer({
             key={image.id}
             src={image.imageSrc}
             alt={image.alt}
-            className={`weiv-image weiv-image--${image.objectFit}`}
+            className={`weiv-image weiv-image--${
+              immersive ? "immersive" : image.objectFit
+            }`}
             style={{
               objectPosition: image.focalPosition ?? "center",
             }}
@@ -140,6 +161,10 @@ export function WanderEstateImageViewer({
             data-loaded="true"
             draggable={false}
             onError={() => setImageFailed(true)}
+            // Click-to-enter only while framed. In immersive mode the image has
+            // no handler, so tapping the full-screen background does nothing.
+            onClick={!immersive && showImage ? enterImmersive : undefined}
+            title={immersive ? undefined : "View full screen"}
           />
         ) : (
           <div
@@ -156,61 +181,142 @@ export function WanderEstateImageViewer({
         )}
       </div>
 
-      <div className="weiv-meta">
-        <h2 id={titleId} className="weiv-title">
-          {image.title}
-        </h2>
-        {image.description ? (
-          <p className="weiv-description">{image.description}</p>
-        ) : null}
-        <p className="weiv-position" aria-live="polite">
-          {adjacent.index >= 0
-            ? `${adjacent.index + 1} of ${tour.length}`
-            : null}
-        </p>
-      </div>
+      {immersive ? (
+        <div
+          className="weiv-immersive-bar"
+          role="group"
+          aria-label="Full-screen background controls"
+          data-testid="wander-estate-immersive-bar"
+        >
+          <button
+            type="button"
+            className="weiv-btn weiv-btn--ghost"
+            onClick={goPrevious}
+            disabled={!canPrevious}
+            aria-label="Previous image"
+            data-testid="wander-estate-immersive-previous"
+          >
+            ←
+          </button>
+          {onEnterPlace ? (
+            <button
+              type="button"
+              className="weiv-btn weiv-btn--primary"
+              onClick={onEnterPlace}
+              data-testid="wander-estate-immersive-talk"
+            >
+              Talk here with Spark
+            </button>
+          ) : null}
+          <button
+            type="button"
+            className="weiv-btn weiv-btn--ghost"
+            onClick={exitImmersive}
+            data-testid="wander-estate-immersive-exit"
+          >
+            Exit full screen
+          </button>
+          <button
+            type="button"
+            className="weiv-btn weiv-btn--ghost"
+            onClick={goNext}
+            disabled={!canNext}
+            aria-label="Next image"
+            data-testid="wander-estate-immersive-next"
+          >
+            →
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="weiv-meta">
+            <h2 id={titleId} className="weiv-title">
+              {image.title}
+            </h2>
+            {image.description ? (
+              <p className="weiv-description">{image.description}</p>
+            ) : null}
+            <p className="weiv-position" aria-live="polite">
+              {adjacent.index >= 0
+                ? `${adjacent.index + 1} of ${tour.length}`
+                : null}
+            </p>
+          </div>
 
-      <div className="weiv-controls" role="group" aria-label="Image navigation">
-        <button
-          type="button"
-          className="weiv-btn"
-          onClick={goPrevious}
-          disabled={!canPrevious}
-          aria-label={
-            adjacent.previous
-              ? `Previous image, ${adjacent.previous.title}`
-              : "Previous image, unavailable"
-          }
-          data-testid="wander-estate-viewer-previous"
-        >
-          ← Previous
-        </button>
-        <button
-          type="button"
-          className="weiv-btn weiv-btn--primary"
-          onClick={onClose}
-          data-testid="wander-estate-viewer-back"
-        >
-          Back to Estate
-        </button>
-        <button
-          type="button"
-          className="weiv-btn"
-          onClick={goNext}
-          disabled={!canNext}
-          aria-label={
-            adjacent.next
-              ? `Next image, ${adjacent.next.title}`
-              : "Next image, unavailable"
-          }
-          data-testid="wander-estate-viewer-next"
-        >
-          Next →
-        </button>
-      </div>
-      <p className="weiv-kbd-hint" data-testid="wander-estate-viewer-esc-hint">
-        Press Esc to return
-      </p>
+          <div
+            className="weiv-controls"
+            role="group"
+            aria-label="Image navigation"
+          >
+            <button
+              type="button"
+              className="weiv-btn"
+              onClick={goPrevious}
+              disabled={!canPrevious}
+              aria-label={
+                adjacent.previous
+                  ? `Previous image, ${adjacent.previous.title}`
+                  : "Previous image, unavailable"
+              }
+              data-testid="wander-estate-viewer-previous"
+            >
+              ← Previous
+            </button>
+            <button
+              type="button"
+              className="weiv-btn weiv-btn--primary"
+              onClick={onClose}
+              data-testid="wander-estate-viewer-back"
+            >
+              Back to Estate
+            </button>
+            <button
+              type="button"
+              className="weiv-btn"
+              onClick={goNext}
+              disabled={!canNext}
+              aria-label={
+                adjacent.next
+                  ? `Next image, ${adjacent.next.title}`
+                  : "Next image, unavailable"
+              }
+              data-testid="wander-estate-viewer-next"
+            >
+              Next →
+            </button>
+          </div>
+
+          <div className="weiv-secondary" role="group" aria-label="Viewing options">
+            {showImage ? (
+              <button
+                type="button"
+                className="weiv-btn weiv-btn--wide"
+                onClick={enterImmersive}
+                data-testid="wander-estate-viewer-fullscreen"
+              >
+                View full screen
+              </button>
+            ) : null}
+            {onEnterPlace ? (
+              <button
+                type="button"
+                className="weiv-btn weiv-btn--wide"
+                onClick={onEnterPlace}
+                data-testid="wander-estate-viewer-talk"
+              >
+                Talk here with Spark
+              </button>
+            ) : null}
+          </div>
+
+          <p
+            className="weiv-kbd-hint"
+            data-testid="wander-estate-viewer-esc-hint"
+          >
+            Tap the photo for full screen · Press Esc to return
+          </p>
+        </>
+      )}
     </div>
   );
 }

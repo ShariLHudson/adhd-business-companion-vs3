@@ -99,7 +99,6 @@ describe("Explore Estate visual destinations", () => {
       "personal-library",
       "main-staircase",
       "window-seat",
-      "coffee-house",
       "momentum-builder",
       "momentum-room",
       "peaceful-places",

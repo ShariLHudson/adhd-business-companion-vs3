@@ -53,8 +53,6 @@ const EXPLORE_CATALOG_EXCLUDED_IDS = new Set([
   "observatory-day-outside",
   "observatory-day-inside",
   "observatory-night-outside",
-  // Same plate as Tea Room
-  "coffee-house",
   // Same plate as Seat at Pond
   "peaceful-places",
   // Same plate as Greenhouse
@@ -122,6 +120,8 @@ const IMAGE_PATH_OVERRIDES: Readonly<Record<string, string>> = {
   // Distinct from Spark Estate Entry (manifest reused estate entry photo)
   "estate-gardens": "/backgrounds/estate-garden-background.png",
   gardens: "/backgrounds/celebrations-garden-background.png",
+  // Dedicated plate (manifest borrows Tea Room; now has its own asset)
+  "coffee-house": "/backgrounds/coffee-house-background.png",
   // Dedicated plate (manifest reused writing-room plate)
   "music-room": "/backgrounds/music-room-background.png",
 };
@@ -168,6 +168,7 @@ const ID_CATEGORY_OVERRIDES: Readonly<Record<string, EstateExploreCategory>> = {
   "personal-library": "rooms",
   "reading-nook": "rooms",
   "tea-room": "rooms",
+  "coffee-house": "rooms",
   "music-room": "rooms",
   "celebration-room": "rooms",
   "art-studio": "rooms",

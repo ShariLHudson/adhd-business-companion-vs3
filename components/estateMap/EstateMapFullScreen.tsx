@@ -296,8 +296,17 @@ export function EstateMapFullScreen({
       ? getWanderEstateImageById(viewerState.selectedImageId)
       : null;
 
-  // Keep onSelectLocation available for future "Visit this place" without unused lint
-  void onSelectLocation;
+  /**
+   * "Talk here" from the image viewer — reuse estate navigation so the selected
+   * image becomes the companion background and the member lands in the normal
+   * chat-over-background experience. The viewer never mounts its own chat.
+   */
+  const enterViewerPlace = useCallback(() => {
+    const imageId = viewerState?.selectedImageId;
+    if (!imageId || !onSelectLocation) return;
+    const location = locations.find((l) => l.id === imageId);
+    if (location) onSelectLocation(location);
+  }, [viewerState?.selectedImageId, onSelectLocation, locations]);
 
   function toggleCategory(id: EstateExploreCategory) {
     setOpenCategories((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -327,6 +336,7 @@ export function EstateMapFullScreen({
           image={viewerImage}
           onClose={closeViewerToGallery}
           onNavigate={handleViewerNavigate}
+          onEnterPlace={onSelectLocation ? enterViewerPlace : undefined}
         />
       ) : null}
 
