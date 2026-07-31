@@ -78,6 +78,15 @@ Columns: Expected · Current · In repo? · On current branch? · In preview? ·
 ### Estate map (Wander)
 - **Current [VERIFIED]:** Functional; graceful per-image placeholders; working-tree changes are additive. Not a regression.
 
+### Wander persistent image view (immersive room-image experience)
+- **Expected:** Open a room image from Wander; it stays open as an immersive background; opening it does not force navigation; controls don't obscure the scene; clear close/return.
+- **Current [VERIFIED]:** Split between committed and uncommitted:
+  - **Committed/deployed (`HEAD`):** a *framed* exclusive viewer — opens and **persists** (local `viewMode="image_viewer"` switch, `EstateMapFullScreen.tsx:264-282`; comment "do not navigate away yet" at :278), no forced navigation on open, controls sit **below** the stage (not obscuring), explicit exits only (× / "Back to Estate" / Esc → `closeViewerToGallery`, `EstateMapFullScreen.tsx:173-177`; parent Esc guard disabled while open, :254). Introduced by `8d075f8d` ("add focused wander image viewer"), label/Esc hint by `0b713a93`.
+  - **Immersive full-bleed background + "Talk here with Spark" + repositioned pill controls:** exists **only in the uncommitted working tree** — `WanderEstateImageViewer.tsx` (`immersive` state :41; full-bleed CSS `.weiv-image--immersive`; background is inert, not an exit; Esc steps out of immersive then closes), `EstateMapFullScreen.tsx` (`enterViewerPlace`→`onSelectLocation`, `onEnterPlace` wired :304-309,:339), `wander-estate-image-viewer.css` (+65), `lib/estateMap/exploreEstateDestinations.ts`, plus an **untracked** test `lib/estateMap/wanderEstateImmersive.test.tsx`.
+- **In repo/on branch:** framed viewer committed; **immersive layer uncommitted (on no branch — confirmed via `git log --all -S` for `weiv-root--immersive`, `Talk here with Spark`, `immersive` in `components/estateMap/`, all empty).** **In preview:** framed viewer present only if preview builds deploy (else deployment mismatch); **immersive layer can appear in NO preview** (never committed).
+- **Same issue elsewhere? [VERIFIED] No.** `WanderEstateImageViewer` is mounted only by `EstateMapFullScreen` (`CompanionPageClient.tsx:28425-28438`). Other estate image entrypoints (ambient Wander `handleEstateWander` :11384-11403; peacefulPlaces cards; map "Talk here" `handleExploreSparkMapSelect` :11421-11495) **navigate into a room background by design** — they don't hold an image open, so they neither share nor exhibit this regression.
+- **Cause:** **missed commit** — accepted immersive work never committed to any branch, so it is absent from every deploy and at silent-loss risk (compounded by deployment mismatch for the framed layer). **Confidence:** High.
+
 ---
 
 ## 2. Last-known-good commit map
@@ -89,6 +98,8 @@ Columns: Expected · Current · In repo? · On current branch? · In preview? ·
 | Coffee House **asset** | committed 2026-07-11 (`public/backgrounds/coffee-house-background.png`) | Present; only mis-referenced. |
 | Room dedicated media (`estate-room-*-main.png`) | **none** | Never created; forward-fix (commission/accept), not restore. |
 | Estate navigation menu | `517ed2e2` | Not regressed; gaps are pre-existing wiring. |
+| Wander **framed** image viewer | `8d075f8d` (+ `0b713a93`) | Committed & current on deploy; persists, no forced nav, controls not obscuring. |
+| Wander **immersive** persistent view + "Talk here" | **none (uncommitted)** | Never committed to any branch; lives only in the working tree here. Restore by committing it (below), not by reverting. |
 
 ---
 
@@ -100,6 +111,7 @@ Columns: Expected · Current · In repo? · On current branch? · In preview? ·
 - **Asset / manifest omission** — canonical `estate-room-*-main.png` (0 files); orphaned committed Coffee House asset; manifest under-reports working coffee audio. [VERIFIED/DOC]
 - **Route / navigation regression (pre-existing gap)** — Research Library not forwarded; Destination Gallery has no menu destination. [VERIFIED]
 - **Merge overwrite / missed commit** — the coffee "renamed backgrounds" (`fbecd015`) is a rename that was never accompanied by the renamed file: effectively a half-landed change. [VERIFIED]
+- **Missed commit (uncommitted accepted work)** — the Wander immersive persistent image view + "Talk here" is fully built and tested in the working tree but committed on no branch, so it cannot deploy and is one `git checkout`/`stash` from loss. [VERIFIED]
 - **Unknown / next step** — the exact live-preview branch (run the decisive diagnostic above).
 
 Not implicated: branch divergence *away from deploy* (deploy is the most complete branch); competing audio implementation (single canonical transport, `globalSoundControl.test.ts` enforces one mount); feature-flag/env mismatch for audio (none found).
@@ -116,6 +128,7 @@ Not implicated: branch divergence *away from deploy* (deploy is the most complet
 - **Step 3 — Room media, per room/batch**: for each `borrowed_pending_dedicated_asset` / `missing_dedicated_asset` room, either add the dedicated asset or formally accept the borrowed plate (update `media_ownership` + manifest). One contained change per room or small batch; prioritize the report's commission list (Library, Orchard, Stables, Music, Coffee).
 - **Step 4 — Navigation reachability**: forward `onOpenResearchLibrary` through `EstateTopRightChrome`; add a Destination Gallery menu destination (or remove its dangling handler). One contained commit.
 - **Step 5 — Asset hygiene**: commit the two untracked Soundscape mp3s (`distant-thunder.mp3`, `rain-and-thunder.mp3`) together with the manifest change that references them — or revert that manifest addition. Never ship a manifest referencing uncommitted assets.
+- **Step 6 — Wander persistent image view (commit the uncommitted immersive work)**: after review, commit **only** the Wander viewer files as one contained change so the accepted immersive experience is preserved and can deploy: `components/estateMap/WanderEstateImageViewer.tsx`, `components/estateMap/EstateMapFullScreen.tsx`, `components/estateMap/wander-estate-image-viewer.css`, `lib/estateMap/exploreEstateDestinations.ts` (+ its test), and the untracked `lib/estateMap/wanderEstateImmersive.test.tsx`. Do **not** sweep the other ~55 unrelated uncommitted files (soundscape tweaks, deleted `ExecutiveBusinessSnapshot.tsx`, docs) into this commit, and do not touch Saved Work. This is a "commit accepted work," not a code rewrite. (If the deployment mismatch in Step 1 is unresolved, this still won't show until the correct branch is deployed.)
 
 ---
 
@@ -129,7 +142,9 @@ Before accepting any preview as "good":
 5. **Estate map (Wander)** loads; spot-check 5 rooms render real art, not "Image being prepared."
 6. **Navigation:** every Welcome Home menu entry opens something (no dead rows); Research Library + Gallery reachable.
 7. **No console 404s** for `/audio/*` or `/backgrounds/*` on the previewed pages.
-8. Record the checklist result + SHA in the deploy log.
+8. **Wander image view:** open a room image from Wander — it **stays open** (doesn't close/replace or force navigation), can go **immersive full-bleed**, controls stay out of the scene's center, and ×/"Back to Estate"/Esc return cleanly. Confirm "Talk here with Spark" is the *only* control that navigates into the room.
+9. **No uncommitted accepted work:** `git status` on the deploy branch is clean for feature code — nothing accepted is sitting untracked/modified (guards against the Wander-immersive silent-loss pattern).
+10. Record the checklist result + SHA in the deploy log.
 
 ---
 
@@ -141,6 +156,8 @@ Before accepting any preview as "good":
 - **Navigation reachability test**: every `WELCOME_HOME_NAV_CATEGORIES` destination resolves to a forwarded handler (would have caught Research Library); every handler prop passed to `EstateTopRightChrome` is declared/forwarded.
 - **AppSection coverage test**: every menu/route target is a valid `AppSection`; flag orphans.
 - **Single-audio-controller test**: already exists (`globalSoundControl.test.ts`) — keep.
+- **Wander persistent image-view interaction test** (already authored, currently untracked `lib/estateMap/wanderEstateImmersive.test.tsx` — commit it with Step 6): asserts the viewer stays mounted on open, background click does not exit, repeated clicks/Prev-Next keep immersive, Esc steps out of immersive then closes, and opening does not force navigation. Add a companion assertion that only "Talk here" calls `onSelectLocation`.
+- **No-uncommitted-accepted-work guard** (CI): fail if `git status --porcelain` shows modified/untracked files under `components/` or `lib/` on the deploy branch build — turns the silent-loss pattern into a hard signal.
 
 ## 7. Recommended asset & manifest integrity checks
 
