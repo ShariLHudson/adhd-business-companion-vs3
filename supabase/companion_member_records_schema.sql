@@ -43,6 +43,16 @@ create trigger companion_member_records_set_updated_at
   before update on public.companion_member_records
   for each row execute function public.companion_member_records_touch_updated_at();
 
+-- Table privileges. RLS (below) constrains WHICH rows each role may touch; these
+-- GRANTs are the prerequisite table-level access. Members act as `authenticated`
+-- (via their JWT) and get select/insert/update only — never delete, since removal
+-- is soft (status = 'deleted'). `service_role` (server/admin, bypasses RLS) gets
+-- full access. `anon` is intentionally omitted: unauthenticated callers have no
+-- access at all. Explicit here so the table does not depend on project-level
+-- default privileges.
+grant select, insert, update on public.companion_member_records to authenticated;
+grant all on public.companion_member_records to service_role;
+
 -- Row Level Security: a member may only ever see or change their own rows.
 alter table public.companion_member_records enable row level security;
 
