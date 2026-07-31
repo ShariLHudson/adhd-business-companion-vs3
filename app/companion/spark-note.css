@@ -1836,13 +1836,13 @@
 /* Welcome Home Today's Spark teaser — approved image, whole-image clickable. */
 .spark-note-teaser {
   position: fixed;
-  right: 1rem;
-  bottom: 1rem;
+  right: 1.25rem; /* ~20px safe-area from the edge (16-24px) */
+  bottom: 1.25rem;
   z-index: 60;
-  /* Small bottom-right teaser (~240px) — comparable to the original anchor,
-     never the image's full 1369x1149 intrinsic size. */
-  width: 15rem;
-  max-width: 60vw;
+  /* Very small ~1in bottom-right teaser (~88px). Never the image's full
+     1369x1149 intrinsic size. max-width is only a safety limit on tiny screens. */
+  width: 88px;
+  max-width: 15vw;
 }
 .spark-note-teaser__button {
   display: block;
@@ -1851,32 +1851,22 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  border-radius: 0.9rem;
+  border-radius: 0.6rem;
 }
 .spark-note-teaser__button:focus-visible {
   outline: 3px solid #1e4f4f;
-  outline-offset: 3px;
+  outline-offset: 2px;
 }
 .spark-note-teaser__image {
   display: block;
   width: 100%;
-  height: auto;
-  max-width: 15rem; /* hard cap: never render at intrinsic size */
-  border-radius: 0.9rem;
-  filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+  height: auto; /* preserve the image aspect ratio */
+  border-radius: 0.6rem;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
   transition: transform 0.15s ease;
 }
 .spark-note-teaser__button:hover .spark-note-teaser__image {
-  transform: translateY(-2px);
-}
-@media (max-width: 640px) {
-  .spark-note-teaser {
-    width: 11rem;
-    max-width: 45vw;
-  }
-  .spark-note-teaser__image {
-    max-width: 11rem;
-  }
+  transform: translateY(-1px);
 }
 @media (prefers-reduced-motion: reduce) {
   .spark-note-teaser__image {

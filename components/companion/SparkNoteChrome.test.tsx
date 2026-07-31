@@ -1,13 +1,15 @@
 /**
  * @vitest-environment jsdom
- * Welcome Home Today's Spark teaser — home-only, once/day, click navigates to
- * Personal Library (does NOT expand the legacy card in place).
+ * Today's Spark teaser — size/placement slice: one small Estate-wide teaser,
+ * never dismissed this slice, click does not route to the old Spark Card.
  */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  isHomeTeaserDismissedToday,
+  dismissHomeTeaserToday,
   resetSparkNoteStoreForTests,
 } from "@/lib/sparkNote/persistence";
 import { SparkNoteChrome } from "./SparkNoteChrome";
@@ -43,31 +45,54 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("SparkNoteChrome — Welcome Home teaser", () => {
-  it("renders exactly one small image teaser on Welcome Home", () => {
-    render({ visible: true, isWelcomeHome: true, onOpenTodaysSpark: vi.fn() });
+describe("SparkNoteChrome — small Estate-wide teaser", () => {
+  it("renders exactly one teaser when visible", () => {
+    render({ visible: true });
     expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
     expect(q(".spark-note-teaser__image")).not.toBeNull();
   });
 
-  it("does not render outside Welcome Home", () => {
-    render({ visible: true, isWelcomeHome: false, onOpenTodaysSpark: vi.fn() });
+  it("renders across Estate screens, not only Welcome Home", () => {
+    render({ visible: true, isWelcomeHome: false });
+    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
+  });
+
+  it("does not render when the chrome is hidden", () => {
+    render({ visible: false });
     expect(q('[data-testid="spark-note-anchor"]')).toBeNull();
   });
 
-  it("does not render when chrome is hidden", () => {
-    render({ visible: false, isWelcomeHome: true, onOpenTodaysSpark: vi.fn() });
-    expect(q('[data-testid="spark-note-anchor"]')).toBeNull();
+  it("does not dismiss during navigation or after a dismiss call", () => {
+    render({ visible: true });
+    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
+    // Simulate navigation re-render + an unrelated dismiss write.
+    dismissHomeTeaserToday();
+    render({ visible: true, isWelcomeHome: false });
+    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
   });
 
-  it("click navigates via onOpenTodaysSpark, never expands the legacy card, and defers dismissal until the room opens", () => {
+  it("click does not route (no legacy Spark Card, no onOpenTodaysSpark)", () => {
     const onOpenTodaysSpark = vi.fn();
-    render({ visible: true, isWelcomeHome: true, onOpenTodaysSpark });
+    render({ visible: true, onOpenTodaysSpark });
     click(q(".spark-note-teaser__button"));
-    expect(onOpenTodaysSpark).toHaveBeenCalledTimes(1);
-    // No legacy expanded card is opened by the chrome itself.
     expect(q('[data-testid="spark-note-expanded"]')).toBeNull();
-    // NOT dismissed by the click alone — the room marks it opened on arrival.
-    expect(isHomeTeaserDismissedToday()).toBe(false);
+    expect(onOpenTodaysSpark).not.toHaveBeenCalled();
+    // Teaser stays (not dismissed by the click).
+    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
+  });
+
+  it("constrains the teaser to the approved small-card size in CSS", () => {
+    const css = readFileSync(
+      resolve(process.cwd(), "app/companion/spark-note.css"),
+      "utf8",
+    );
+    const block = css.slice(
+      css.indexOf(".spark-note-teaser {"),
+      css.indexOf(".spark-note-teaser__button"),
+    );
+    expect(block).toContain("width: 88px");
+    expect(block).toContain("max-width: 15vw");
+    expect(block).not.toContain("15rem");
+    expect(block).not.toContain("18rem");
   });
 });
