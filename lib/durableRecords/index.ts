@@ -55,3 +55,10 @@ export {
   readLocalRecoveryCache,
   clearLocalRecoveryCache,
 } from "./localRecoveryCache";
+
+export { resolveSavedWorkClaim, mayClaimSaved } from "./savedWorkClaims";
+export type {
+  SavedWorkAction,
+  SavedWorkClaim,
+  SavedWorkClaimStatus,
+} from "./savedWorkClaims";
