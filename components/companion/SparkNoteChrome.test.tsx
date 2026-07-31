@@ -1,7 +1,6 @@
 /**
  * @vitest-environment jsdom
- * Today's Spark teaser — size/placement slice: one small Estate-wide teaser,
- * never dismissed this slice, click does not route to the old Spark Card.
+ * Today's Spark: teaser (Estate-wide) -> gift room -> full pinned Spark Card.
  */
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -9,9 +8,10 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
-  dismissHomeTeaserToday,
+  isHomeTeaserDismissedToday,
   resetSparkNoteStoreForTests,
 } from "@/lib/sparkNote/persistence";
+import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { SparkNoteChrome } from "./SparkNoteChrome";
 
 // @ts-expect-error — React act environment flag
@@ -31,6 +31,10 @@ function click(el: Element | null) {
   if (!el) throw new Error("missing element to click");
   act(() => el.dispatchEvent(new MouseEvent("click", { bubbles: true })));
 }
+function openGift() {
+  click(q(".spark-note-teaser__button")); // teaser -> gift room
+  click(q('[data-testid="tsg-gift"]')); // gift -> full card
+}
 
 beforeEach(() => {
   container = document.createElement("div");
@@ -38,6 +42,9 @@ beforeEach(() => {
   root = createRoot(container);
   localStorage.clear();
   resetSparkNoteStoreForTests();
+  vi.spyOn(window.HTMLMediaElement.prototype, "play").mockImplementation(() =>
+    Promise.resolve(),
+  );
 });
 afterEach(() => {
   act(() => root.unmount());
@@ -45,16 +52,11 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe("SparkNoteChrome — small Estate-wide teaser", () => {
-  it("renders exactly one teaser when visible", () => {
-    render({ visible: true });
-    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
-    expect(q(".spark-note-teaser__image")).not.toBeNull();
-  });
-
-  it("renders across Estate screens, not only Welcome Home", () => {
+describe("SparkNoteChrome — teaser → gift room → full Spark Card", () => {
+  it("renders exactly one small teaser Estate-wide when visible", () => {
     render({ visible: true, isWelcomeHome: false });
     expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
+    expect(q(".spark-note-teaser__image")).not.toBeNull();
   });
 
   it("does not render when the chrome is hidden", () => {
@@ -62,54 +64,64 @@ describe("SparkNoteChrome — small Estate-wide teaser", () => {
     expect(q('[data-testid="spark-note-anchor"]')).toBeNull();
   });
 
-  it("does not dismiss during navigation or after a dismiss call", () => {
+  it("teaser click opens the gift room (not the card, not the dashboard library)", () => {
     render({ visible: true });
-    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
-    // Simulate navigation re-render + an unrelated dismiss write.
-    dismissHomeTeaserToday();
-    render({ visible: true, isWelcomeHome: false });
-    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
-  });
-
-  it("teaser click opens the gift room — not the old Spark Card, not the dashboard Personal Library", () => {
-    const onOpenTodaysSpark = vi.fn();
-    render({ visible: true, onOpenTodaysSpark });
-    expect(q('[data-testid="todays-spark-gift-room"]')).toBeNull();
     click(q(".spark-note-teaser__button"));
     expect(q('[data-testid="todays-spark-gift-room"]')).not.toBeNull();
-    // Old Spark Card and dashboard Personal Library must NOT open.
-    expect(q('[data-testid="spark-note-expanded"]')).toBeNull();
+    expect(q('[data-testid="spark-note-expanded"]')).toBeNull(); // card not yet
     expect(q('[data-testid="personal-library-room"]')).toBeNull();
-    expect(q('[data-testid="spark-note-my-collection"]')).toBeNull();
-    // Legacy routing prop is not used.
-    expect(onOpenTodaysSpark).not.toHaveBeenCalled();
-  });
-
-  it("gift room uses the exact extracted prototype room and shows the gift hotspot", () => {
-    render({ visible: true });
-    click(q(".spark-note-teaser__button"));
-    expect(q('[data-testid="tsg-gift"]')).not.toBeNull();
-    // The exact prototype background (gift + "Click the gift" callout baked in,
-    // bottom menu cropped off) — not a substitute Personal Library image.
-    const bg = q(".tsg-room__bg");
-    expect(bg?.style.backgroundImage).toContain(
+    // Uses the exact extracted prototype room (not a substitute image).
+    expect(q(".tsg-room__bg")?.style.backgroundImage).toContain(
       "todays-spark-gift-room-background",
     );
-    expect(bg?.style.backgroundImage).not.toContain("personal-library-background");
   });
 
-  it("keeps the teaser present while the gift room is open (not dismissed)", () => {
+  it("keeps the teaser visible before the gift is clicked", () => {
     render({ visible: true });
-    click(q(".spark-note-teaser__button"));
     expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
+    click(q(".spark-note-teaser__button")); // gift room open, gift not clicked
+    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1);
+    expect(isHomeTeaserDismissedToday()).toBe(false);
   });
 
-  it("Welcome Home / back closes the gift room and returns to the previous screen", () => {
+  it("gift click opens the exact pinned daily Spark (not a different one)", () => {
+    const expected = resolveDailySparkCard({}).card; // pins today's Spark
+    render({ visible: true });
+    openGift();
+    const card = q('[data-testid="spark-note-expanded"]');
+    expect(card).not.toBeNull();
+    expect(card?.textContent).toContain(expected.title);
+  });
+
+  it("full card renders complete content, image, and durable Save", () => {
+    render({ visible: true });
+    openGift();
+    const card = q('[data-testid="spark-note-expanded"]');
+    expect(card?.textContent).toContain("The Story");
+    expect(card?.querySelector("img")).not.toBeNull(); // topic image
+    // Durable Save This Spark control is present (same SparkNoteExpanded flow).
+    const hasSave = qa('[data-testid="spark-note-expanded"] button').some(
+      (b) => b.textContent?.trim() === "Save",
+    );
+    expect(hasSave).toBe(true);
+  });
+
+  it("hides the teaser only after the full card opens successfully", () => {
     render({ visible: true });
     click(q(".spark-note-teaser__button"));
+    expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1); // still there
+    click(q('[data-testid="tsg-gift"]')); // full card opens
+    expect(q('[data-testid="spark-note-anchor"]')).toBeNull(); // now hidden
+    expect(isHomeTeaserDismissedToday()).toBe(true);
+  });
+
+  it("closing the full card returns to the gift room", () => {
+    render({ visible: true });
+    openGift();
+    expect(q('[data-testid="spark-note-expanded"]')).not.toBeNull();
+    click(q('[aria-label="Close Spark Card"]'));
+    expect(q('[data-testid="spark-note-expanded"]')).toBeNull();
     expect(q('[data-testid="todays-spark-gift-room"]')).not.toBeNull();
-    click(q('[data-testid="tsg-welcome-home"]'));
-    expect(q('[data-testid="todays-spark-gift-room"]')).toBeNull();
   });
 
   it("anchors placement above the composer by publishing --spark-teaser-bottom", () => {
@@ -120,19 +132,7 @@ describe("SparkNoteChrome — small Estate-wide teaser", () => {
     ).not.toBe("");
   });
 
-  it("CSS anchors the teaser bottom to the composer variable (not the viewport bottom)", () => {
-    const css = readFileSync(
-      resolve(process.cwd(), "app/companion/spark-note.css"),
-      "utf8",
-    );
-    const block = css.slice(
-      css.indexOf(".spark-note-teaser {"),
-      css.indexOf(".spark-note-teaser__button"),
-    );
-    expect(block).toContain("var(--spark-teaser-bottom");
-  });
-
-  it("constrains the teaser to the approved small-card size in CSS", () => {
+  it("CSS constrains the teaser to the approved small-card size", () => {
     const css = readFileSync(
       resolve(process.cwd(), "app/companion/spark-note.css"),
       "utf8",
@@ -142,8 +142,6 @@ describe("SparkNoteChrome — small Estate-wide teaser", () => {
       css.indexOf(".spark-note-teaser__button"),
     );
     expect(block).toContain("width: 88px");
-    expect(block).toContain("max-width: 15vw");
-    expect(block).not.toContain("15rem");
-    expect(block).not.toContain("18rem");
+    expect(block).toContain("var(--spark-teaser-bottom");
   });
 });

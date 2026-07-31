@@ -3,31 +3,38 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
+import {
+  dismissHomeTeaserToday,
+  isHomeTeaserDismissedToday,
+} from "@/lib/sparkNote/persistence";
 import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
 import { SparkNoteAnchor } from "./SparkNoteAnchor";
 import { TodaysSparkGiftRoom } from "./TodaysSparkGiftRoom";
+import { SparkNoteExpanded } from "./SparkNoteExpanded";
 
 type Props = {
   visible: boolean;
-  /** Accepted for compatibility; not used this slice (teaser is Estate-wide). */
+  /** Accepted for compatibility; the teaser is Estate-wide. */
   isWelcomeHome?: boolean;
   firstName?: string | null;
   birthday?: { month: number; day: number } | null;
   personalDates?: PersonalDate[];
   memberSinceIso?: string | null;
   region?: RegionCode;
-  /** Accepted for compatibility; intentionally NOT invoked this slice. */
+  /** Accepted for compatibility; not used (teaser opens the gift room). */
   onOpenTodaysSpark?: () => void;
 };
 
 /**
- * Today's Spark teaser — size/placement correction slice.
+ * Today's Spark flow:
+ *   small Estate-wide teaser  →  gift room (daily-arrival)  →  full Spark Card.
  *
- * Renders ONE small (~88px) bottom-right teaser across Estate screens. For this
- * slice it is deliberately never dismissed (so size/placement can be retested)
- * and clicking is a no-op test log — it does NOT route to the old Spark Card,
- * Personal Library, or the gift room. Routing/dismissal return in a later slice.
+ * The full card is the exact pinned daily Spark (resolveDailySparkCard returns
+ * the day's stored pick — no swap/regeneration) rendered by the existing
+ * SparkNoteExpanded (correct image, complete content, durable Save This Spark).
+ * Closing the card returns to the gift room. The small teaser stays visible
+ * until the full card has opened successfully, then is dismissed for the day.
  */
 export function SparkNoteChrome({
   visible,
@@ -39,18 +46,26 @@ export function SparkNoteChrome({
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [giftRoomOpen, setGiftRoomOpen] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
+  const [teaserDismissed, setTeaserDismissed] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    setTeaserDismissed(isHomeTeaserDismissedToday());
   }, []);
 
-  // Anchor the teaser above the chat composer (bottom-center layer), not the
-  // raw viewport bottom, so it never overlaps the chat input / mic / Send.
-  // Publishes --spark-teaser-bottom = (distance from viewport bottom to the
-  // composer's top) + gap, and re-measures when the composer resizes.
+  // Dismiss the small teaser ONLY after the full Spark Card has opened.
+  useEffect(() => {
+    if (cardOpen) {
+      dismissHomeTeaserToday();
+      setTeaserDismissed(true);
+    }
+  }, [cardOpen]);
+
+  // Anchor the teaser above the chat composer (published as --spark-teaser-bottom).
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const GAP = 20; // ~16-24px clear gap above the composer
+    const GAP = 20;
     const CHAT_SELECTOR = '[data-companion-chat-layer="true"]';
     let raf = 0;
     let tries = 0;
@@ -61,7 +76,6 @@ export function SparkNoteChrome({
 
     function measure() {
       const chat = document.querySelector<HTMLElement>(CHAT_SELECTOR);
-      // Fallback: a small safe gap from the viewport bottom.
       let bottomPx = 24;
       if (chat) {
         const rect = chat.getBoundingClientRect();
@@ -76,12 +90,12 @@ export function SparkNoteChrome({
     }
 
     function attach() {
-      measure(); // always set the variable immediately (measured or fallback)
+      measure();
       const chat = document.querySelector(CHAT_SELECTOR);
       if (chat) {
         ro?.observe(chat);
       } else if (tries++ < 40) {
-        raf = requestAnimationFrame(attach); // wait for the composer to mount
+        raf = requestAnimationFrame(attach);
       }
     }
 
@@ -107,9 +121,8 @@ export function SparkNoteChrome({
     [firstName, birthday, personalDates, memberSinceIso, region],
   );
 
-  // Estate-wide; the teaser is NOT dismissed in this slice (still testing).
   if (!mounted) return null;
-  const showTeaser = visible && Boolean(card);
+  const showTeaser = visible && Boolean(card) && !teaserDismissed;
 
   return createPortal(
     <>
@@ -117,10 +130,19 @@ export function SparkNoteChrome({
         <SparkNoteAnchor card={card} onExpand={() => setGiftRoomOpen(true)} />
       ) : null}
       {giftRoomOpen ? (
-        // Clicking the teaser opens the approved gift room (daily-arrival) —
-        // NOT the old Spark Card and NOT the dashboard Personal Library room.
-        // The gift click is a no-op test event this slice (full card deferred).
-        <TodaysSparkGiftRoom onClose={() => setGiftRoomOpen(false)} />
+        <TodaysSparkGiftRoom
+          onClose={() => setGiftRoomOpen(false)}
+          onGiftClick={() => setCardOpen(true)}
+        />
+      ) : null}
+      {cardOpen && card ? (
+        // Full pinned daily Spark Card (existing component): correct image +
+        // complete content + durable Save. Close returns to the gift room.
+        <SparkNoteExpanded
+          card={card}
+          onClose={() => setCardOpen(false)}
+          onOpenCollection={() => setCardOpen(false)}
+        />
       ) : null}
     </>,
     document.body,
