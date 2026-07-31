@@ -11,7 +11,6 @@ import { evaluateDailySparkNote } from "./evaluateDailySparkNote";
 import { SPARK_DELIGHT_CORE_REACTION_IDS } from "./delightExperience";
 import {
   dayKey,
-  getStoredDailySparkId,
   readSparkNoteStore,
   resetSparkNoteStoreForTests,
 } from "./persistence";
@@ -161,80 +160,29 @@ export const SPARK_CARD_MEMORY_ITEMS = [
 export const SPARK_CARD_LANGUAGE_RULE =
   "Translation preserves meaning, warmth, and emotional tone via member region preferences.";
 
-const PERSONAL_SETTINGS_KEY = "spark-card-personal-settings-v1";
-
-let personalSettingsFallback: string | null = null;
-
-function readPersonalSettingsFingerprint(): string | null {
-  if (typeof window === "undefined") return personalSettingsFallback;
-  try {
-    return localStorage.getItem(PERSONAL_SETTINGS_KEY) ?? personalSettingsFallback;
-  } catch {
-    return personalSettingsFallback;
-  }
-}
-
-function writePersonalSettingsFingerprint(fingerprint: string): void {
-  personalSettingsFallback = fingerprint;
-  if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(PERSONAL_SETTINGS_KEY, fingerprint);
-  } catch {
-    /* quota */
-  }
-}
-
-export function buildSparkCardPersonalSettingsFingerprint(
-  input: EvaluateDailySparkNoteInput = {},
-): string {
-  return JSON.stringify({
-    firstName: input.firstName ?? null,
-    birthday: input.birthday ?? null,
-    personalDates: input.personalDates ?? [],
-    memberSinceIso: input.memberSinceIso ?? null,
-    region: input.region ?? "US",
-  });
-}
-
+/**
+ * Pin stability (Slice 0): once a Spark is pinned for the local calendar day,
+ * it is replaced ONLY by an explicit member request (`forceRefresh`). Ordinary
+ * loading and asynchronous personal-setting hydration (firstName / birthday /
+ * personalDates / memberSinceIso arriving after first render) must NEVER swap
+ * today's already-displayed card. Changed settings take effect on the next
+ * calendar day, when no pin exists yet — or immediately via the explicit
+ * "give me a new Spark" path (`requestNewDailySparkCard`). This deliberately
+ * retires the old personal-settings fingerprint mechanism, whose value-based
+ * diffing caused hydration to regenerate the pinned card mid-day.
+ */
 export function shouldRegenerateSparkCard(input: {
-  now?: Date;
   forceRefresh?: boolean;
-  personalSettingsFingerprint?: string;
 }): boolean {
-  if (input.forceRefresh) return true;
-
-  const now = input.now ?? new Date();
-  const storedId = getStoredDailySparkId(now);
-  if (!storedId) return false;
-
-  const previousFingerprint = readPersonalSettingsFingerprint();
-  const nextFingerprint = input.personalSettingsFingerprint;
-  if (
-    previousFingerprint &&
-    nextFingerprint &&
-    previousFingerprint !== nextFingerprint
-  ) {
-    return true;
-  }
-
-  return false;
+  return Boolean(input.forceRefresh);
 }
 
 export function resolveDailySparkCard(
   input: EvaluateDailySparkNoteInput = {},
 ): { card: SparkNoteDailyCard } {
-  const fingerprint = buildSparkCardPersonalSettingsFingerprint(input);
-  const regenerate = shouldRegenerateSparkCard({
-    now: input.now,
-    forceRefresh: input.forceRefresh,
-    personalSettingsFingerprint: fingerprint,
-  });
-
-  writePersonalSettingsFingerprint(fingerprint);
-
   return evaluateDailySparkNote({
     ...input,
-    forceRefresh: regenerate,
+    forceRefresh: shouldRegenerateSparkCard({ forceRefresh: input.forceRefresh }),
   });
 }
 
@@ -337,7 +285,6 @@ export function verifySparkCardVisualDesignAndDailyGeneration(): {
   qualityTestReady: boolean;
 } {
   resetSparkNoteStoreForTests();
-  personalSettingsFallback = null;
 
   try {
     const now = new Date("2026-04-10T10:00:00");
@@ -363,7 +310,6 @@ export function verifySparkCardVisualDesignAndDailyGeneration(): {
     };
   } finally {
     resetSparkNoteStoreForTests();
-    personalSettingsFallback = null;
   }
 }
 
@@ -428,15 +374,4 @@ export function formatSparkCardVisualDesignReport(
   ];
 
   return lines.join("\n");
-}
-
-export function resetSparkCardPersonalSettingsForTests(): void {
-  personalSettingsFallback = null;
-  if (typeof window !== "undefined") {
-    try {
-      localStorage.removeItem(PERSONAL_SETTINGS_KEY);
-    } catch {
-      /* ignore */
-    }
-  }
 }

@@ -3,10 +3,8 @@ import { describe, expect, it, beforeEach } from "vitest";
 import {
   assessSparkCardVisualDesignCompliance,
   buildSparkCardDailyLifecycleView,
-  buildSparkCardPersonalSettingsFingerprint,
   formatSparkCardVisualDesignReport,
   requestNewDailySparkCard,
-  resetSparkCardPersonalSettingsForTests,
   resolveDailySparkCard,
   resolveSparkCardPersonalReflectionTone,
   shouldRegenerateSparkCard,
@@ -23,7 +21,6 @@ import { resetSparkNoteStoreForTests } from "./persistence";
 describe("sparkCardVisualDesignAndDailyGeneration", () => {
   beforeEach(() => {
     resetSparkNoteStoreForTests();
-    resetSparkCardPersonalSettingsForTests();
   });
 
   it("defines companion design principle and daily generation rule", () => {
@@ -58,31 +55,31 @@ describe("sparkCardVisualDesignAndDailyGeneration", () => {
     );
   });
 
-  it("allows regeneration on member request and setting changes", () => {
+  it("regenerates only on an explicit member request", () => {
     const now = new Date("2026-04-10T10:00:00");
-    resolveDailySparkCard({
-      now,
-      firstName: "Alex",
-      forceRefresh: true,
-    });
+    const first = resolveDailySparkCard({ now });
+    // Ordinary re-resolve keeps the pinned card.
+    expect(resolveDailySparkCard({ now }).card.id).toBe(first.card.id);
+    // Only an explicit request regenerates.
     expect(shouldRegenerateSparkCard({ forceRefresh: true })).toBe(true);
-
+    expect(shouldRegenerateSparkCard({})).toBe(false);
     const refreshed = requestNewDailySparkCard({ now });
     expect(refreshed.card.title).toBeTruthy();
+  });
 
-    resolveDailySparkCard({
+  it("keeps today's pinned Spark stable when personal settings hydrate asynchronously", () => {
+    const now = new Date("2026-04-10T10:00:00");
+    // First render pins today's Spark before personal settings have loaded.
+    const first = resolveDailySparkCard({ now });
+    // Later the same day, personal settings hydrate in (a value change that
+    // previously forced regeneration). The pinned card must not change.
+    const afterHydration = resolveDailySparkCard({
       now,
-      firstName: "Jordan",
-      forceRefresh: true,
+      firstName: "Alex",
+      birthday: { month: 12, day: 25 },
+      memberSinceIso: "2020-01-01T00:00:00.000Z",
     });
-    expect(
-      shouldRegenerateSparkCard({
-        now,
-        personalSettingsFingerprint: buildSparkCardPersonalSettingsFingerprint({
-          firstName: "Sam",
-        }),
-      }),
-    ).toBe(true);
+    expect(afterHydration.card.id).toBe(first.card.id);
   });
 
   it("verifies visual design compliance across spark note bridges", () => {
