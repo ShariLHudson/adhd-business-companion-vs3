@@ -182,3 +182,23 @@ Before accepting any preview as "good":
 - **If the preview already builds `deploy`/`audit`: the first change is the Coffee House background re-point (Step 2)** — one contained commit, the asset is already committed, and it matches the approved Version A artwork decision (confirm Shari's go on the registry re-point).
 
 Everything here preserves the validated durable Saved Work work and changes nothing yet.
+
+---
+
+## 10. Verified deployment diagnostic (2026-07-31) — via authenticated Vercel CLI (read-only)
+
+**Vercel project:** `adhd-business-companion-vs3` (team `shari-hudsons-projects`), linked via `companion-app/.vercel`.
+
+**Deployment model — no Git→Vercel pipeline (verified):** `vercel project inspect` shows only General + Framework Settings — **no "Git Repository" / "Production Branch"** section. No deployment carries a git commit or branch: `vercel inspect --json` contains no `gitSource`/`githubCommit*`, and the only 40-hex present is a Vercel **blob digest** (`git cat-file` → *bad object*, not a commit). **Deployments are manual `vercel deploy` uploads of the local working directory.**
+
+**Production:** alias `adhd-business-companion-vs3.vercel.app` → deployment `6ogtcyibg`, `target: production`, created **2026-07-26 19:47 CDT (~4 days stale)** — predates the Estate/Create commits landed through 2026-07-29 on `deploy/companion-app-v3 @ 517ed2e2`.
+
+**Cause (confirmed):** *deployment alias pointing to an older deployment* + *no Git integration* → no reproducible branch→deploy mapping; production is frozen at a Jul 26 CLI upload. This is the structural reason many completed Estate experiences can "disappear at once."
+
+**Redeploy sufficiency:** a fresh deploy from the correct source restores the audio / soundscape / peaceful-moments / navigation / **framed** Wander set; it does **not** fix the Coffee House / room-media placeholders (on-branch), and the Wander **immersive** layer required committing first (now done — `42e87822`).
+
+### Clean Preview deployment (executed this task — Preview only)
+- **Source:** clean git worktree at `audit/beta-experience-readiness` @ **`42e878223c92d098d33b07c2166c0abf71c426f8`** — `git status` clean, no untracked files; includes deploy inheritance (`517ed2e2`), durable Saved Work through `a62ac279`, the Wander immersive commit `42e87822`, and the regression audit `61418ddc`.
+- **Deployed to Preview only** (no `--prod`, no promote, no alias/settings/git-integration change).
+- **Deployment id:** `dpl_BFgDKbecbBtWVbRbLuvcsZmEXFrJ` · **URL:** https://adhd-business-companion-vs3-8mcjimq1j-shari-hudsons-projects.vercel.app · **target: preview** · **READY** · build succeeded (`npm run build`, Next.js 16.2.7, photo manifest generated; no build errors).
+- **Production alias unchanged** — still → `6ogtcyibg` (Jul 26).
