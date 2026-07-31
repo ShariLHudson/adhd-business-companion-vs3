@@ -3,7 +3,7 @@
  */
 
 import { getProjects, getSnippets, getTemplates } from "./companionStore";
-import { getSavedWork } from "./savedWorkStore";
+import { getSavedWork, type SavedWorkItem } from "./savedWorkStore";
 import { listSavedVisualFocusMaps } from "./visualFocus/store";
 import { myWorkCategoryLabelForMode } from "./visualFocus/myWorkIntegration";
 import { buildMyWorkHub } from "./myWorkHub";
@@ -15,8 +15,17 @@ export type SavedBrowseHit = {
   subtitle?: string;
 };
 
-export function buildSavedBrowseIndex(): SavedBrowseHit[] {
+/**
+ * @param overrideSavedWork Durable-first Saved Work (durable-merged) supplied by
+ * the caller when the Saved Work flag is on; falls back to the local store when
+ * omitted (flag off / not yet loaded). Archive/deleted filtering is applied here.
+ */
+export function buildSavedBrowseIndex(
+  overrideSavedWork?: SavedWorkItem[],
+): SavedBrowseHit[] {
   const hits: SavedBrowseHit[] = [];
+  const savedWork = overrideSavedWork ?? getSavedWork();
+  const activeSavedWork = savedWork.filter((w) => w.status !== "archived");
 
   for (const map of listSavedVisualFocusMaps()) {
     hits.push({
@@ -54,7 +63,7 @@ export function buildSavedBrowseIndex(): SavedBrowseHit[] {
     });
   }
 
-  for (const doc of getSavedWork().filter((w) => w.status !== "archived")) {
+  for (const doc of activeSavedWork) {
     const category = doc.artifactType.toLowerCase().includes("sop")
       ? "SOPs"
       : "Documents";
@@ -66,7 +75,9 @@ export function buildSavedBrowseIndex(): SavedBrowseHit[] {
     });
   }
 
-  for (const strategy of buildMyWorkHub().strategies) {
+  for (const strategy of buildMyWorkHub(
+    overrideSavedWork ? activeSavedWork : undefined,
+  ).strategies) {
     hits.push({
       id: strategy.id,
       title: strategy.title,
@@ -77,10 +88,13 @@ export function buildSavedBrowseIndex(): SavedBrowseHit[] {
   return hits;
 }
 
-export function searchSavedBrowse(query: string): SavedBrowseHit[] {
+export function searchSavedBrowse(
+  query: string,
+  overrideSavedWork?: SavedWorkItem[],
+): SavedBrowseHit[] {
   const q = query.trim().toLowerCase();
   if (!q) return [];
-  return buildSavedBrowseIndex().filter((hit) => {
+  return buildSavedBrowseIndex(overrideSavedWork).filter((hit) => {
     const haystack = [hit.title, hit.category, hit.subtitle ?? ""]
       .join(" ")
       .toLowerCase();

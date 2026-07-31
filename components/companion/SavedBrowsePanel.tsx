@@ -75,9 +75,12 @@ export function SavedBrowsePanel({
   }, []);
 
   const pinned = useMemo(() => listPinnedVisualFocusMaps(), []);
+  // Durable-first Saved Work source for index/search/total when the flag is on.
+  const savedWorkSource =
+    isSavedWorkDurableEnabled() && durableSaved ? durableSaved : undefined;
   const searchResults = useMemo(
-    () => (query.trim() ? searchSavedBrowse(query) : []),
-    [query],
+    () => (query.trim() ? searchSavedBrowse(query, savedWorkSource) : []),
+    [query, savedWorkSource],
   );
 
   const counts = useMemo(() => {
@@ -102,9 +105,9 @@ export function SavedBrowsePanel({
       ).length,
       decisionCompass: 0,
       favorites: pinned.length,
-      total: buildSavedBrowseIndex().length,
+      total: buildSavedBrowseIndex(savedWorkSource).length,
     };
-  }, [pinned.length, durableSaved]);
+  }, [pinned.length, durableSaved, savedWorkSource]);
 
   const visualCategories = useMemo(() => buildVisualThinkingByCategory(), []);
 
