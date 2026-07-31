@@ -6,17 +6,21 @@ import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelec
 import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
 import {
   archiveSavedWork,
+  archiveSavedWorkDurable,
   deleteSavedWork,
+  deleteSavedWorkDurable,
   duplicateSavedWork,
-  getActiveSavedWork,
-  getArchivedSavedWork,
   getSavedWork,
+  persistSavedWorkDurable,
   SAVED_WORK_UPDATED_EVENT,
   unarchiveSavedWork,
   updateSavedWork,
+  updateSavedWorkDurable,
   type SavedWorkItem,
   type SavedWorkStatus,
 } from "@/lib/savedWorkStore";
+import { isSavedWorkDurableEnabled } from "@/lib/durableRecords/flags";
+import { loadSavedWorkMerged } from "@/lib/durableRecords/domains/savedWorkRead";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { AppBackButton } from "@/components/companion/AppBackButton";
@@ -151,7 +155,12 @@ export function SavedWorkLibrary({
   const [deleteTarget, setDeleteTarget] = useState<SavedWorkItem | null>(null);
 
   function refresh() {
-    setItems(getSavedWork());
+    if (isSavedWorkDurableEnabled()) {
+      // Durable-first: authoritative records + not-yet-durable local recovery.
+      void loadSavedWorkMerged().then(setItems);
+    } else {
+      setItems(getSavedWork());
+    }
   }
 
   useEffect(() => {
@@ -161,12 +170,14 @@ export function SavedWorkLibrary({
     return () => window.removeEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
   }, []);
 
+  // Derived from `items` (durable-merged when the flag is on; local otherwise)
+  // so durable + local recovery are shown consistently without double entries.
   const baseList =
     status === NO_CATEGORY
       ? []
       : status === "archived"
-        ? getArchivedSavedWork()
-        : getActiveSavedWork().filter((w) => w.status === status);
+        ? items.filter((w) => w.status === "archived")
+        : items.filter((w) => w.status === status);
 
   const visible = baseList.filter((w) => {
     if (!query.trim()) return true;
@@ -187,19 +198,30 @@ export function SavedWorkLibrary({
       return;
     }
     if (action === "duplicate") {
-      duplicateSavedWork(item.id);
+      const dup = duplicateSavedWork(item.id);
+      if (dup && isSavedWorkDurableEnabled()) void persistSavedWorkDurable(dup);
       refresh();
       return;
     }
     if (action === "archive") {
-      archiveSavedWork(item.id);
-      refresh();
+      if (isSavedWorkDurableEnabled()) {
+        void archiveSavedWorkDurable(item.id).then(refresh);
+      } else {
+        archiveSavedWork(item.id);
+        refresh();
+      }
       if (viewId === item.id) setViewId(null);
       return;
     }
     if (action === "unarchive") {
-      unarchiveSavedWork(item.id);
-      refresh();
+      if (isSavedWorkDurableEnabled()) {
+        const un = unarchiveSavedWork(item.id);
+        if (un) void persistSavedWorkDurable(un).then(refresh);
+        else refresh();
+      } else {
+        unarchiveSavedWork(item.id);
+        refresh();
+      }
       return;
     }
     if (action === "delete") {
@@ -210,18 +232,28 @@ export function SavedWorkLibrary({
   function confirmRename() {
     if (!renaming) return;
     const title = renameValue.trim() || "Untitled";
-    updateSavedWork(renaming.id, { title });
+    const id = renaming.id;
     setRenaming(null);
     setRenameValue("");
-    refresh();
+    if (isSavedWorkDurableEnabled()) {
+      void updateSavedWorkDurable(id, { title }).then(refresh);
+    } else {
+      updateSavedWork(id, { title });
+      refresh();
+    }
   }
 
   function confirmDelete() {
     if (!deleteTarget) return;
-    deleteSavedWork(deleteTarget.id);
-    if (viewId === deleteTarget.id) setViewId(null);
+    const id = deleteTarget.id;
+    if (viewId === id) setViewId(null);
     setDeleteTarget(null);
-    refresh();
+    if (isSavedWorkDurableEnabled()) {
+      void deleteSavedWorkDurable(id).then(refresh);
+    } else {
+      deleteSavedWork(id);
+      refresh();
+    }
   }
 
   return (
