@@ -15,9 +15,19 @@
   align-items: flex-start;
   justify-content: center;
   overflow-y: auto;
+  /* Full-card scrolling: the entire detail view scrolls from the top on every
+     open (mouse wheel, trackpad, touch, Page Up/Down, arrows). The card itself
+     is never height-trapped, so Story/Spark/Action/note/actions stay reachable. */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 26px 16px;
   background: rgba(30, 31, 30, 0.66);
   backdrop-filter: blur(10px);
+}
+/* Focus is moved here programmatically only to enable keyboard scrolling — no
+   focus ring around the whole overlay (real controls keep their own :focus). */
+.tsc-shell:focus {
+  outline: none;
 }
 .tsc-shell--open {
   display: flex;

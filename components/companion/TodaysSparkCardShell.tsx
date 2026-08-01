@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 import {
   resolveSparkCardSimplifiedPresentation,
@@ -9,10 +9,8 @@ import {
   SPARK_CARD_SECTION_STORY,
   SPARK_CARD_SECTION_TODAYS_SPARK,
 } from "@/lib/sparkNote/sparkCardCollectibleDisplay";
-import {
-  logSparkCardImageLoadError,
-  resolveSparkCardImage,
-} from "@/lib/sparkNote/resolveSparkCardImage";
+import { logSparkCardImageLoadError } from "@/lib/sparkNote/resolveSparkCardImage";
+import { sparkEditionForCategory } from "@/lib/sparkNote/sparkEditions";
 import {
   getFavoriteSparkIds,
   recordSparkNoteReaction,
@@ -50,7 +48,17 @@ export function TodaysSparkCardShell({ card, onClose }: Props) {
     () => resolveSparkCardSimplifiedPresentation(card),
     [card],
   );
-  const image = useMemo(() => resolveSparkCardImage(card), [card]);
+  // Hero image is the card's numbered Spark Edition cover (001 Discovery …
+  // 012 Wonder), resolved from the card's category via the edition registry.
+  // Only the hero changes by category; Story / Spark / Action / note stay put.
+  const hero = useMemo(() => {
+    const edition = sparkEditionForCategory(card.category);
+    if (!edition) return null;
+    return {
+      src: edition.imageSrc,
+      alt: `${card.categoryLabel} edition artwork for ${card.title}`,
+    };
+  }, [card.category, card.categoryLabel, card.title]);
 
   const storyParagraphs = useMemo(() => {
     const full = splitSparkCardStoryParagraphs(card.whatHappened);
@@ -71,7 +79,9 @@ export function TodaysSparkCardShell({ card, onClose }: Props) {
     return points.filter((p) => Boolean(p?.trim()));
   }, [presentation.sparkInAction, presentation.tellMeMore.reflectionPrompt]);
 
-  const [photoFailed, setPhotoFailed] = useState(false);
+  // Track the card whose hero image failed to load — comparing against the
+  // current card.id resets automatically when a different card opens (no effect).
+  const [failedCardId, setFailedCardId] = useState<string | null>(null);
   const [note, setNote] = useState("");
   const [kept, setKept] = useState(() =>
     getFavoriteSparkIds().includes(card.id),
@@ -85,7 +95,19 @@ export function TodaysSparkCardShell({ card, onClose }: Props) {
     onClose,
   });
 
-  const hasPhoto = Boolean(image.src) && !photoFailed;
+  // The scroll container for the whole card. Every time a different card opens,
+  // start reading from the very top (and clear any prior image-failure state).
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.scrollTop = 0;
+      // Focus the scroll region so Page Up/Down and arrow keys work immediately.
+      el.focus({ preventScroll: true });
+    }
+  }, [card.id]);
+
+  const hasPhoto = Boolean(hero?.src) && failedCardId !== card.id;
   const saving = saveState === "savingSpark" || saveState === "savingNote";
 
   // Prefill "My notes and ideas" if this Spark already has a saved note.
@@ -120,11 +142,13 @@ export function TodaysSparkCardShell({ card, onClose }: Props) {
 
   return (
     <div
+      ref={scrollRef}
       className="tsc-shell tsc-shell--open"
       role="dialog"
       aria-modal="true"
       aria-label={`Today's Spark: ${presentation.title}. Click outside the card to close.`}
       data-testid="todays-spark-card"
+      tabIndex={-1}
       onClick={() => onBackdropClick()}
     >
       <article
@@ -155,31 +179,29 @@ export function TodaysSparkCardShell({ card, onClose }: Props) {
           <p className="tsc-subtitle">{presentation.subtitle}</p>
         </header>
 
-        {image.src ? (
+        {hero?.src ? (
           <div className="tsc-media-section">
             <figure className="tsc-figure">
               <div className="tsc-media-frame">
                 {hasPhoto ? (
                   <img
-                    src={image.src}
-                    alt={image.alt}
-                    referrerPolicy="no-referrer"
+                    className="tsc-hero-img"
+                    src={hero.src}
+                    alt={hero.alt}
                     decoding="async"
+                    data-testid="todays-spark-hero"
                     onError={() => {
-                      setPhotoFailed(true);
+                      setFailedCardId(card.id);
                       logSparkCardImageLoadError({
                         cardId: card.id,
-                        src: image.src ?? "",
-                        sourceField: image.sourceField,
+                        src: hero.src,
+                        sourceField: "edition_cover",
                         error: "img_onerror",
                       });
                     }}
                   />
                 ) : null}
               </div>
-              {hasPhoto && image.caption ? (
-                <figcaption className="tsc-caption">{image.caption}</figcaption>
-              ) : null}
             </figure>
           </div>
         ) : null}

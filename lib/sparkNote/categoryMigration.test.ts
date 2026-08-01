@@ -105,20 +105,28 @@ describe("12-category Spark migration", () => {
     }
   });
 
-  it("never uses a branded edition cover as an individual card hero image", () => {
+  it("resolves every card's full-card hero to its category edition cover", () => {
+    // The full-card hero is driven by the card's numbered category (see
+    // TodaysSparkCardShell). Every card maps to a staged edition cover.
+    for (const card of SPARK_NOTE_CATALOG) {
+      const edition = sparkEditionForCategory(card.category);
+      expect(edition?.imageSrc).toMatch(/^\/spark-card-images\/[a-z]+\.png$/);
+    }
+  });
+
+  it("keeps the topic-photo system (thumbnails/print) separate from edition covers", () => {
+    // resolveSparkCardImage powers collection thumbnails + print — it resolves
+    // topic/diversity photos, never an edition cover. Only the full-card hero
+    // uses the edition cover.
     for (const card of SPARK_NOTE_CATALOG) {
       const image = resolveSparkCardImage(card);
       expect(image.src ?? "").not.toContain("/spark-card-images/");
     }
-  });
-
-  it("keeps individual card topic images unchanged (topic-specific photo wins)", () => {
-    // SPARK-INV-001 still resolves to its Post-it topic photo despite its new
-    // numbered category — the card-image system is untouched by the migration.
+    // SPARK-INV-001 still resolves to its Post-it topic photo for thumbnails.
     const postit = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-001")!;
-    const image = resolveSparkCardImage(postit);
-    expect(image.hasImage).toBe(true);
-    expect(image.src ?? "").toMatch(/Post-it/i);
+    const thumb = resolveSparkCardImage(postit);
+    expect(thumb.hasImage).toBe(true);
+    expect(thumb.src ?? "").toMatch(/Post-it/i);
   });
 
   it("date-based and seasonal cards still resolve with numbered categories", () => {

@@ -179,9 +179,10 @@ describe("PersonalLibraryRoom", () => {
     expect(isHomeTeaserDismissedToday()).toBe(true);
   });
 
-  it("does not wire the branded edition covers as individual card hero images", async () => {
-    // The card-image system is untouched: resolving a real card must never
-    // return one of the /spark-card-images edition covers.
+  it("keeps collection thumbnails on the topic-photo system (not edition covers)", async () => {
+    // The room's saved-Spark thumbnails use resolveSparkCardImage (topic
+    // photos); edition covers are the full-card hero, resolved separately in
+    // TodaysSparkCardShell.
     const image = resolveSparkCardImage(CARD);
     expect(image.src ?? "").not.toContain("/spark-card-images/");
   });
