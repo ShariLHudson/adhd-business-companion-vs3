@@ -101,8 +101,10 @@ describe("sparkCardDiversity", () => {
     expect(recent.length).toBeLessThanOrEqual(
       VARIETY_DIVERSITY_CATEGORY_LOOKBACK,
     );
-    expect(recent).toContain("innovation");
-    expect(recent).toContain("fun_facts");
+    const divOf = (id: string) =>
+      diversityCategoryForEntry(SPARK_NOTE_CATALOG.find((e) => e.id === id)!);
+    expect(recent).toContain(divOf("SPARK-INV-001"));
+    expect(recent).toContain(divOf("SPARK-FACT-001"));
   });
 
   it("avoids repeating yesterday's diversity ribbon when alternatives exist", () => {
@@ -122,7 +124,10 @@ describe("sparkCardDiversity", () => {
   });
 
   it("yields calendar celebrations when they would dominate", () => {
-    const holiday = SPARK_NOTE_CATALOG.find((e) => e.category === "holiday");
+    // Calendar celebrations are the fun_celebrations diversity, not one category.
+    const holiday = SPARK_NOTE_CATALOG.find(
+      (e) => diversityCategoryForEntry(e) === "fun_celebrations",
+    );
     expect(holiday).toBeTruthy();
     if (!holiday) return;
 
@@ -130,9 +135,11 @@ describe("sparkCardDiversity", () => {
       holiday.id,
       new Date("2026-04-09T10:00:00"),
     );
-    // Second celebration-ish recent entry via another holiday if available
+    // Second celebration-ish recent entry via another celebration card if available
     const otherHoliday = SPARK_NOTE_CATALOG.find(
-      (e) => e.category === "holiday" && e.id !== holiday.id,
+      (e) =>
+        diversityCategoryForEntry(e) === "fun_celebrations" &&
+        e.id !== holiday.id,
     );
     if (otherHoliday) {
       recordDailySparkSelection(

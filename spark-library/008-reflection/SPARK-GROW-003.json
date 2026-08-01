@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-003",
+  "title": "Your Past Can Become Wisdom",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Every chapter of life can teach something valuable.",
+  "story": "Experiences, challenges, successes, and mistakes all contribute to the person we become. The lessons we gain can become strengths we use later. Every chapter of life can teach something valuable. Reflection turns experience into wisdom. Without reflection, a moment passes; with reflection, it can reveal a pattern, clarify a value, or help us decide what to carry forward. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: your history is not only what happened to you. It is also what you learned from it.",
+  "impact": "Your history is not only what happened to you. It is also what you learned from it. Reflection is not dwelling on the past; it is using experience to make the next choice with greater awareness. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What lesson from your past helps you today? Write one sentence about what this brings up for you, one lesson you want to remember, and one thing you are ready to do differently. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "resilience",
+    "experience",
+    "learning"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "Past as Wisdom"
+}

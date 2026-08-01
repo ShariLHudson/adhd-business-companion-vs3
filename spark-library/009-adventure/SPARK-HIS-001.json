@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HIS-001",
+  "title": "The Moon Landing",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Moon landing",
+  "short_teaser": "One small step that inspired generations.",
+  "story": "On July 20, 1969, Neil Armstrong became the first human to walk on the Moon. The Apollo 11 mission fulfilled a promise made years earlier and proved that audacious goals, backed by persistence, can become reality. One small step that inspired generations. Adventure does not always begin with certainty. It often begins with movement: one step beyond routine, one question asked, or one willingness to enter unfamiliar territory and learn from what happens. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: the moon landing showed humanity what focused collaboration can achieve â and gave every child permission to dream bigger.",
+  "impact": "The moon landing showed humanity what focused collaboration can achieve â and gave every child permission to dream bigger. Adventure expands our sense of what is possible because action teaches what imagination alone cannot. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What 'impossible' goal deserves another look with fresh eyes? Take one safe step beyond routine today. Make it small enough to begin and meaningful enough to teach you something. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "07-20"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "priority": 85
+}

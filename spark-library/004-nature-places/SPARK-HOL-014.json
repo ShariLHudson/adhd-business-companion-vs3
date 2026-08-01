@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-014",
+  "title": "International Coffee Day",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Coffee cup",
+  "short_teaser": "A global toast to the bean that fuels mornings.",
+  "story": "International Coffee Day on September 29 celebrates one of the world's most traded commodities. From Ethiopian highlands to your favorite mug, coffee has shaped cultures, economies, and countless morning rituals. A global toast to the bean that fuels mornings. Nature and place can teach without speaking. When we slow down enough to observe patterns, seasons, structures, and relationships, the familiar world becomes a source of perspective. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: rituals around food and drink connect us across cultures and give structure to our days.",
+  "impact": "Rituals around food and drink connect us across cultures and give structure to our days. The natural world often models patience, interdependence, adaptation, and change more clearly than advice ever could. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What daily ritual helps you pause and reset â even for just a minute? Step outside or look closely at a natural object, place, or seasonal change. Note one pattern that offers a lesson for your own pace or direction. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "09-29"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "priority": 80
+}

@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-013",
+  "title": "National Chocolate Chip Cookie Day",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Chocolate chip cookies",
+  "short_teaser": "The accidental invention that became America's favorite cookie.",
+  "story": "Ruth Wakefield invented the chocolate chip cookie in 1938 at the Toll House Inn in Massachusetts. She broke a NestlÃ© chocolate bar into her butter cookie dough, expecting it to melt â but the chunks held their shape, creating something entirely new. The accidental invention that became America's favorite cookie. The deeper value of this story is not only the event itself, but the moment someone noticed that something unexpected deserved a second look. Discovery often begins before there is certainty; it begins with attention. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: another reminder that happy accidents often become beloved traditions.",
+  "impact": "Another reminder that happy accidents often become beloved traditions. The useful question is not only “What did they discover?” but “What allowed them to notice it?” This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What 'mistake' in your work might actually be your best idea? Pause long enough to notice one unexpected result, overlooked detail, or unanswered question. Write down what it might be inviting you to explore. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "08-04"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "priority": 80
+}

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-008",
+  "title": "The Ten-Minute Idea Challenge",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Small creative moments can create big possibilities.",
+  "story": "Setting aside a short amount of time to explore ideas removes pressure. The goal is not to create something perfect. The goal is to create movement. Small creative moments can create big possibilities. Creativity is often described as inspiration, but stories like this show that it is also attention, courage, play, and the willingness to keep shaping an idea before anyone else can fully see it. The lasting importance is simple: consistency builds creative confidence.",
+  "impact": "Consistency builds creative confidence. Inspiration becomes meaningful when it gives us permission to make, explore, or express something of our own. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What idea could you explore for just ten minutes? Make a small version, sketch, list, draft, or experiment before judging the idea. Let curiosity lead for ten minutes. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "action",
+    "ideas",
+    "momentum"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "quick",
+  "short_title": "Ten-Minute Ideas"
+}

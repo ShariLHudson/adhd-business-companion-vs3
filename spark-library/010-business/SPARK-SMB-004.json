@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-004",
+  "title": "A Better Way to Solve an Everyday Problem",
+  "category": "Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Businesses often begin by noticing frustrations.",
+  "story": "Entrepreneurs frequently discover opportunities by asking: \"Why is this harder than it needs to be?\" A better solution can become a valuable product or service. Businesses often begin by noticing frustrations. Business lessons become useful when they move beyond success stories and reveal the decisions underneath: what problem was noticed, what value was created, what relationship was strengthened, and what changed because someone listened. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: problems can become possibilities. The strongest businesses create value people can feel, understand, and trustânot just products people can buy. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "impact": "Problems can become possibilities. The strongest businesses create value people can feel, understand, and trust—not just products people can buy. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What problem do you notice that others accept? Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience more useful, clear, or trustworthy. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "problem-solving",
+    "innovation",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "010",
+  "category_label": "Business",
+  "spark_type": "story",
+  "short_title": "Everyday Problem"
+}

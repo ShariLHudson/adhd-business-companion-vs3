@@ -56,7 +56,7 @@ function main(): void {
 
   for (const record of all) {
     const folder = libraryFolderForCategory(
-      record.runtime_category ?? "invention",
+      record.runtime_category ?? "001",
     );
     writeRecord(folder, record);
   }

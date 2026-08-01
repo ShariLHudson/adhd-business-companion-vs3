@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-009",
+  "title": "The IKEA Effect",
+  "category": "Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Assembled furniture",
+  "short_teaser": "Why we value things more when we build them ourselves.",
+  "story": "Researchers found that people place higher value on furniture they assemble themselves â even when the result is imperfect. The effort of creation creates emotional ownership. Why we value things more when we build them ourselves. Business lessons become useful when they move beyond success stories and reveal the decisions underneath: what problem was noticed, what value was created, what relationship was strengthened, and what changed because someone listened. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: involving customers in the creation process builds loyalty and satisfaction. People support what they help build.",
+  "impact": "Involving customers in the creation process builds loyalty and satisfaction. People support what they help build. The strongest businesses create value people can feel, understand, and trust—not just products people can buy. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "Where could you invite your customers or team to co-create instead of just consume? Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience more useful, clear, or trustworthy. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "psychology",
+    "customer-experience",
+    "co-creation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "010",
+  "category_label": "Business",
+  "spark_type": "story"
+}

@@ -6,8 +6,8 @@ export const SPARK_NOTE_FALLBACK_ID = "SPARK-GROW-001";
 
 const FALLBACK_COPY: SparkNoteDailyCard = {
   id: "spark-note-fallback",
-  category: "personal_growth",
-  categoryLabel: "Personal Growth",
+  category: "008", // Reflection
+  categoryLabel: "Reflection",
   sparkType: "story",
   title: "A Little Spark for Today",
   shortTitle: "Today's Spark",

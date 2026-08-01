@@ -15,8 +15,8 @@ export const SUMMER_OPEN_DOOR_IMAGE_FRAGMENT =
 
 export const summerOpenDoorCard: SparkNoteDailyCard = {
   id: SUMMER_OPEN_DOOR_CARD_ID,
-  category: "personal_growth",
-  categoryLabel: "Seasonal Spark",
+  category: "009", // Adventure
+  categoryLabel: "Adventure",
   sparkType: "quick",
   title: "Summer's Open Door",
   shortTitle: "Summer's Open Door",

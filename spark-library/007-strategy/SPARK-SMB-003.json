@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-003",
+  "title": "The Power of Starting Small",
+  "category": "Strategy",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Big businesses often begin with one small step.",
+  "story": "Many entrepreneurs start with limited resources. They test ideas, learn from customers, improve their offer, and grow over time. Big businesses often begin with one small step. Strategy is not simply making a plan. It is noticing what matters most, choosing where to place effort, learning from evidence, and being willing to adjust before more time or energy is spent. The lasting importance is simple: small beginnings create opportunities for learning.",
+  "impact": "Small beginnings create opportunities for learning. A strong strategy reduces noise by helping us choose what deserves attention now and what can wait. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What small version of your idea could you test? Identify the decision underneath your current activity. Choose the one next move that would create the clearest useful information. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "entrepreneurship",
+    "momentum",
+    "action"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "007",
+  "category_label": "Strategy",
+  "spark_type": "quick",
+  "short_title": "Start Small"
+}

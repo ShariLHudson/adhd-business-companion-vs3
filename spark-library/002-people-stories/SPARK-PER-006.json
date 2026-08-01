@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-006",
+  "title": "Steve Jobs: Thinking Differently",
+  "category": "People & Stories",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Technology became more human through design and imagination.",
+  "story": "Steve Jobs focused on combining technology with simplicity and user experience. His work helped shape personal computing, music, and mobile technology. Technology became more human through design and imagination. The story of Steve Jobs: Thinking Differently matters because people are rarely remembered only for what they accomplished. They are remembered for the choices, persistence, perspective, and humanity that shaped what they did. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: innovation is not only about what something does. It is also about how people experience it.",
+  "impact": "Innovation is not only about what something does. It is also about how people experience it. A life story becomes most valuable when it helps us recognize courage, choices, and possibility in our own. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "How could you make something easier or more enjoyable? Choose one quality from this person’s story that you want to practice today. Name one small way it could show up in your own life or work. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "innovation",
+    "creativity",
+    "design"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "002",
+  "category_label": "People & Stories",
+  "spark_type": "story",
+  "short_title": "Steve Jobs"
+}

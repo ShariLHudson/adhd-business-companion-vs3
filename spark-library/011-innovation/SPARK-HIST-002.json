@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-HIST-002",
+  "title": "The Birth of the Internet",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A small message helped begin a connected world.",
+  "story": "On October 29, 1969, the first message was sent between two computers on ARPANET, an early foundation of today's internet. The system crashed after only two letters were transmitted, but the experiment represented a huge step forward. A small message helped begin a connected world. Innovation is rarely a single flash of brilliance. It is more often a chain of observations, experiments, revisions, and connections that gradually turn possibility into something useful. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: major changes often begin with small first attempts. The first version does not need to be perfect.",
+  "impact": "Major changes often begin with small first attempts. The first version does not need to be perfect. Innovation grows when people treat imperfect results as information rather than proof that an idea should be abandoned. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What first step could you take even if it is not the final version? Choose one idea and run a tiny experiment. Decide in advance what you want to learn, not only what you hope will succeed. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "technology",
+    "innovation",
+    "communication"
+  ],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "10-29"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "Birth of the Internet",
+  "priority": 85
+}

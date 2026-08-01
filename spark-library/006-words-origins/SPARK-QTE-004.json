@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-QTE-004",
+  "title": "Creativity Takes Courage",
+  "category": "Words & Origins",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Artist palette",
+  "short_teaser": "Henri Matisse on the bravery of making art.",
+  "story": "\"Creativity takes courage.\" — Henri Matisse, one of the most influential artists of the 20th century. Matisse spent decades pushing past comfort, reinventing his style even when the world resisted change. Henri Matisse on the bravery of making art. Words give shape to ideas that might otherwise remain difficult to hold. A phrase, name, or story can become a doorway into memory, meaning, identity, and a new way of seeing. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: sharing creative work means risking judgment. Matisse reminds us that the act of creating is itself an act of bravery. The words we choose can preserve meaning, change perspective, and help an idea travel from one person to another. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "impact": "Sharing creative work means risking judgment. Matisse reminds us that the act of creating is itself an act of bravery. The words we choose can preserve meaning, change perspective, and help an idea travel from one person to another. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What small experiment could you share before it feels 'ready'? Capture one phrase, word, or sentence that stays with you. Add a note about why it matters and how you might use it. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "creativity",
+    "courage",
+    "art"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "006",
+  "category_label": "Words & Origins",
+  "spark_type": "story",
+  "short_title": "Henri Matisse"
+}

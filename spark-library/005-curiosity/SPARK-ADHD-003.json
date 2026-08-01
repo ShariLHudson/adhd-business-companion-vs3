@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-003",
+  "title": "Curiosity Is a Superpower",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Questions can lead you toward your next breakthrough.",
+  "story": "Curious minds often explore topics deeply, make unexpected connections, and discover new possibilities. That curiosity can become a powerful creative advantage. Questions can lead you toward your next breakthrough. Curiosity changes an ordinary fact into an invitation. Instead of stopping at what happened, it asks what else might be true, what assumptions may be incomplete, and what becomes visible when we look again. The lasting importance is simple: many entrepreneurs succeed because they keep asking better questions.",
+  "impact": "Many entrepreneurs succeed because they keep asking better questions. Curiosity loosens the grip of assumptions and creates room for better questions. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What are you curious about right now? Write three questions about something you have been assuming is fixed. Choose the question that opens the most possibility. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "curiosity",
+    "learning",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "quick",
+  "short_title": "Curiosity Superpower"
+}

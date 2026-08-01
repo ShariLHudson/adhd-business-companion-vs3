@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-006",
+  "title": "The Power of the First Customer",
+  "category": "Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "One customer can change how you see your idea.",
+  "story": "The first person who pays for a product or service provides more than income. They provide evidence that the idea has value. One customer can change how you see your idea. Business lessons become useful when they move beyond success stories and reveal the decisions underneath: what problem was noticed, what value was created, what relationship was strengthened, and what changed because someone listened. The lasting importance is simple: small wins create confidence and momentum.",
+  "impact": "Small wins create confidence and momentum. The strongest businesses create value people can feel, understand, and trust—not just products people can buy. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What evidence of progress have you overlooked? Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience more useful, clear, or trustworthy. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "validation",
+    "confidence",
+    "entrepreneurship"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "010",
+  "category_label": "Business",
+  "spark_type": "quick",
+  "short_title": "First Customer"
+}

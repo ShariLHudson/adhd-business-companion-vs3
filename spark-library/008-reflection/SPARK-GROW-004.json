@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-004",
+  "title": "Progress Is Not Always Visible",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Some of the most important growth happens quietly.",
+  "story": "Seeds grow underground before anything appears above the surface. People often experience the same thing. Learning, healing, and building can happen before results become obvious. Some of the most important growth happens quietly. Reflection turns experience into wisdom. Without reflection, a moment passes; with reflection, it can reveal a pattern, clarify a value, or help us decide what to carry forward. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: invisible progress is still progress.",
+  "impact": "Invisible progress is still progress. Reflection is not dwelling on the past; it is using experience to make the next choice with greater awareness. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What might be growing in your life that you cannot see yet? Write one sentence about what this brings up for you, one lesson you want to remember, and one thing you are ready to do differently. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "patience",
+    "growth",
+    "encouragement"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "Invisible Progress"
+}

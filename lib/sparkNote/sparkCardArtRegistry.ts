@@ -145,43 +145,61 @@ const SPARK_CARD_TOPIC_ART: readonly {
   },
 ];
 
+/**
+ * Legacy per-category themed art, keyed by the 12 numbered Spark Editions.
+ * @deprecated Only a guaranteed non-empty fallback for `resolveSparkCardArtAsset`
+ * (test-only). Live/print image resolution uses `resolveSparkCardImage` →
+ * topic-specific photo → diversity photo → honest omission. Edition covers are
+ * never used here.
+ */
 const SPARK_CARD_CATEGORY_ART: Record<SparkNoteCategory, SparkCardArtAsset> = {
-  // Fixed: "Edison_and_light_bulb.jpg" does not exist on Commons under that
-  // title (confirmed 404). "Edison bulb.jpg" is the real file — Edison's
-  // first demonstration bulb at Menlo Park.
-  invention: wikimediaCommonsImage("Edison bulb.jpg", "Thomas Edison's first demonstration light bulb"),
-  inventor: wikimediaCommonsImage("Edison bulb.jpg", "Thomas Edison's first demonstration light bulb"),
-  entrepreneur: wikimediaCommonsImage(
-    "New York Stock Exchange Facade 2015.jpg",
-    "Historic business district architecture",
-  ),
-  business: wikimediaCommonsImage(
-    "Office desk with typewriter and telephone, ca. 1910.jpg",
-    "Vintage office desk and telephone",
-  ),
-  // Fixed: the previous title was missing the parentheses/comma that are
-  // part of the real file name, which made the hard-coded hash path 404.
-  history: wikimediaCommonsImage(
-    "Declaration of Independence (1819), by John Trumbull.jpg",
-    "Historic painting of a pivotal moment",
-  ),
-  holiday: wikimediaCommonsImage("Christmas tree with presents.jpg", "Holiday tree with warm light"),
-  fun_fact: wikimediaCommonsImage(
+  "001": wikimediaCommonsImage(
     "Magnifying glass on the page of a book.jpg",
     "Magnifying glass — curiosity and discovery",
   ),
-  quote: wikimediaCommonsImage("Quill and ink.jpg", "Quill and ink — literary writing atmosphere"),
-  creativity: wikimediaCommonsImage(
+  "002": wikimediaCommonsImage(
+    "Mentor Graham Photograph Date Unknown From Abraham Lincoln Museum of Lincoln Memorial University, Harrogate, TN.jpg",
+    "An archival portrait — a person behind a story",
+  ),
+  "003": wikimediaCommonsImage(
     "Monet - Impression, Sunrise.jpg",
     "Impressionist painting — creative atmosphere",
   ),
-  personal_growth: wikimediaCommonsImage("Fjord in Norway.jpg", "Path toward open horizon"),
-  gratitude: wikimediaCommonsImage("Sunrise over the sea.jpg", "Sunrise over calm water"),
-  adhd_friendly: wikimediaCommonsImage(
-    "Colorful sticky notes on wall.jpg",
-    "Colorful notes and visual organization",
+  "004": wikimediaCommonsImage(
+    "Fjord in Norway.jpg",
+    "A fjord in Norway — a place worth a second look",
   ),
-  personal: wikimediaCommonsImage("Journal and pen.jpg", "Open journal with pen"),
+  "005": wikimediaCommonsImage(
+    "BLW Brass compass.jpg",
+    "An antique brass compass — a tool for wondering",
+  ),
+  "006": wikimediaCommonsImage(
+    "Book-rose-and-candle-on-teak.jpg",
+    "An old book beside a candle — a quiet idea waiting",
+  ),
+  "007": wikimediaCommonsImage(
+    "Office desk with typewriter and telephone, ca. 1910.jpg",
+    "A working desk — decisions taking shape",
+  ),
+  "008": wikimediaCommonsImage("Sunrise over the sea.jpg", "Sunrise over calm water"),
+  "009": wikimediaCommonsImage(
+    "The road in the autumn birch forest.jpg",
+    "An open road through the trees — adventure ahead",
+  ),
+  "010": wikimediaCommonsImage(
+    "New York Stock Exchange Facade 2015.jpg",
+    "Historic business district architecture",
+  ),
+  // Fixed: "Edison_and_light_bulb.jpg" does not exist on Commons under that
+  // title (confirmed 404). "Edison bulb.jpg" is the real file.
+  "011": wikimediaCommonsImage(
+    "Edison bulb.jpg",
+    "Thomas Edison's first demonstration light bulb",
+  ),
+  "012": wikimediaCommonsImage(
+    "Happy birthday balloons Mexico.jpg",
+    "A warm, wondering sense of delight",
+  ),
 };
 
 /**
@@ -322,7 +340,7 @@ export function resolveSparkCardArtAsset(
 
   return (
     SPARK_CARD_CATEGORY_ART[card.category] ?? {
-      src: SPARK_CARD_CATEGORY_ART.quote.src,
+      src: SPARK_CARD_CATEGORY_ART["001"].src,
       alt: `Themed artwork for ${card.categoryLabel}`,
     }
   );

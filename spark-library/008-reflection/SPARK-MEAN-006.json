@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-006",
+  "title": "Celebrate How Far You Have Come",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Growth deserves recognition along the way.",
+  "story": "People often focus on what remains unfinished and forget to recognize what they have already accomplished. Looking back reveals progress. Growth deserves recognition along the way. Reflection turns experience into wisdom. Without reflection, a moment passes; with reflection, it can reveal a pattern, clarify a value, or help us decide what to carry forward. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: acknowledging growth builds confidence and appreciation.",
+  "impact": "Acknowledging growth builds confidence and appreciation. Reflection is not dwelling on the past; it is using experience to make the next choice with greater awareness. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What is something you can celebrate about your journey? Write one sentence about what this brings up for you, one lesson you want to remember, and one thing you are ready to do differently. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "progress",
+    "reflection",
+    "achievement"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "Celebrate Progress"
+}

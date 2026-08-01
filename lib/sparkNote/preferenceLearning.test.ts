@@ -21,7 +21,7 @@ describe("preferenceLearning", () => {
   it("boosts affinity score after loved reaction", () => {
     const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-001")!;
     const before = scoreEntryAffinity(entry);
-    recordSparkNoteReaction("SPARK-INV-001", "loved", "invention", ["invention"]);
+    recordSparkNoteReaction(entry.id, "loved", entry.category, entry.tags);
     const after = scoreEntryAffinity(entry);
     expect(after).toBeGreaterThan(before);
   });
@@ -41,16 +41,16 @@ describe("preferenceLearning", () => {
   });
 
   it("affinity score ranks loved category above others", () => {
-    recordSparkNoteReaction("SPARK-INV-001", "loved", "invention");
     const inv = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-001")!;
     const ent = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-ENT-001")!;
+    recordSparkNoteReaction(inv.id, "loved", inv.category, inv.tags);
     expect(scoreEntryAffinity(inv)).toBeGreaterThan(scoreEntryAffinity(ent));
   });
 
   it("pass reaction lowers affinity for that category", () => {
     const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-FACT-006")!;
     const before = scoreEntryAffinity(entry);
-    recordSparkNoteReaction("SPARK-FACT-006", "pass", "fun_fact");
+    recordSparkNoteReaction(entry.id, "pass", entry.category);
     const after = scoreEntryAffinity(entry);
     expect(after).toBeLessThan(before);
   });
@@ -63,9 +63,12 @@ describe("preferenceLearning", () => {
   });
 
   it("viewed sparks gently boost same-category affinity", () => {
-    const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-002")!;
+    // SPARK-INV-010 and SPARK-INV-001 share a category (011 Innovation).
+    const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-010")!;
+    const sameCategory = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-001")!;
+    expect(sameCategory.category).toBe(entry.category);
     const before = scoreEntryAffinity(entry);
-    recordSparkNoteViewed("SPARK-INV-001");
+    recordSparkNoteViewed(sameCategory.id);
     const after = scoreEntryAffinity(entry);
     expect(after).toBeGreaterThan(before);
     expect(after - before).toBeLessThanOrEqual(1);

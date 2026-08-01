@@ -73,3 +73,15 @@ export function sparkEditionByTopic(
   const key = topic.trim().toLowerCase();
   return SPARK_EDITION_COVERS.find((edition) => edition.topic === key);
 }
+
+/**
+ * Resolve the Spark Edition for a card's numbered category ("001"–"012").
+ * Collection-layer only (grouping, edition browsing, headers, cover lookup,
+ * Personal Library navigation) — never used as an individual card hero image.
+ */
+export function sparkEditionForCategory(
+  category: string,
+): SparkEditionCover | undefined {
+  const n = Number.parseInt(category, 10);
+  return Number.isFinite(n) ? sparkEditionByNumber(n) : undefined;
+}

@@ -45,19 +45,18 @@ export const SPARK_MASTER_RECOMMENDED_TAGS = [
 export const SPARK_ID_PREFIX_BY_CATEGORY: Partial<
   Record<SparkNoteCategory, string>
 > = {
-  invention: "INV",
-  inventor: "INV",
-  entrepreneur: "ENT",
-  business: "BIZ",
-  history: "HIS",
-  holiday: "HOL",
-  fun_fact: "FUN",
-  quote: "QTE",
-  creativity: "CRE",
-  personal_growth: "GRO",
-  gratitude: "MEAN",
-  adhd_friendly: "ADHD",
-  personal: "PER",
+  "001": "DISC", // Discovery
+  "002": "PEOP", // People & Stories
+  "003": "CREA", // Creativity & Inspiration
+  "004": "NATP", // Nature & Places
+  "005": "CURI", // Curiosity
+  "006": "WORD", // Words & Origins
+  "007": "STRA", // Strategy
+  "008": "REFL", // Reflection
+  "009": "ADVE", // Adventure
+  "010": "BUSI", // Business
+  "011": "INNO", // Innovation
+  "012": "WOND", // Wonder
 };
 
 export const SPARK_MASTER_SUBCATEGORY_HINTS: Record<string, string[]> = {

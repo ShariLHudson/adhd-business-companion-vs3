@@ -34,9 +34,9 @@ describe("selectionIntelligence", () => {
 
     const categories = getRecentSelectionCategories();
     expect(categories.length).toBe(VARIETY_RECENT_CATEGORY_LOOKBACK);
-    expect(categories).toContain("invention");
-    expect(categories).toContain("business");
-    expect(categories).toContain("fun_fact");
+    expect(categories).toContain("011"); // SPARK-INV-001 → Innovation
+    expect(categories).toContain("007"); // SPARK-BIZ-004 → Strategy
+    expect(categories).toContain("004"); // SPARK-FACT-001 → Nature & Places
   });
 
   it("filters out multiple recent categories when alternatives exist", () => {

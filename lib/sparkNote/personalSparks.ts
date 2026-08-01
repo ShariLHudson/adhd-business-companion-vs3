@@ -44,7 +44,7 @@ export function buildBirthdaySpark(
   const greeting = name ? `Happy Birthday, ${name}!` : "Happy Birthday!";
   return {
     id: `personal-birthday:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: greeting,
@@ -78,7 +78,7 @@ export function buildAnticipationSpark(
         : `${daysUntilEvent} days to go.`;
   return {
     id: `personal-anticipation:${personalDateId}:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: label,
@@ -105,7 +105,7 @@ export function buildBusinessAnniversarySpark(
   const name = firstName?.trim();
   return {
     id: `personal-business:${personalDateId}:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: "Look How Far You Have Come",
@@ -132,7 +132,7 @@ export function buildRemembranceSpark(
   const name = firstName?.trim();
   return {
     id: `personal-remembrance:${personalDateId}:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: "A Meaningful Day",
@@ -159,7 +159,7 @@ export function buildAnniversarySpark(
   const name = firstName?.trim();
   return {
     id: `personal-anniversary:${personalDateId}:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: label,
@@ -184,7 +184,7 @@ export function buildMembershipAnniversarySpark(
   const name = firstName?.trim();
   return {
     id: `personal-membership:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: name ? `Another Year Together, ${name}` : "Another Year Together",
@@ -210,7 +210,7 @@ export function buildMilestoneSpark(
   const name = firstName?.trim();
   return {
     id: `personal-milestone:${personalDateId}:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: label,
@@ -237,7 +237,7 @@ export function buildCelebrationSpark(
   const name = firstName?.trim();
   return {
     id: `personal-celebration:${personalDateId}:${dayKey(now)}`,
-    category: "personal",
+    category: "012", // Wonder edition (routing); label stays "Personal Moment"
     categoryLabel: "Personal Moment",
     sparkType: "story",
     title: label,

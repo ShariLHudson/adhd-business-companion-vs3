@@ -118,24 +118,30 @@ const SPARK_CARD_MORE_TO_DISCOVER_BY_ID: Record<string, string> = {
 const SPARK_CARD_MORE_TO_DISCOVER_BY_CATEGORY: Partial<
   Record<SparkNoteCategory, string>
 > = {
-  invention:
+  "001": // Discovery
     "Many everyday tools began as side discoveries — noticed by someone willing to ask what else they could become.",
-  inventor:
-    "Inventors often combine patience, observation, and the courage to keep exploring after the first attempt fails.",
-  entrepreneur:
-    "Behind many ventures is a person who saw a problem differently — and stayed with it long enough to build a path.",
-  business:
-    "Business stories are rarely straight lines; they are collections of decisions, risks, and lessons learned in public.",
-  history:
-    "Dates and names are anchors — the interesting part is how a single choice or discovery changed what came next.",
-  quote:
-    "Behind many famous lines is a life story, a moment of pressure, or a philosophy that took years to form.",
-  fun_fact:
-    "The memorable facts are the ones tied to a place, a person, or a chain of events you did not expect.",
-  creativity:
+  "002": // People & Stories
+    "Behind many stories is a person who saw a problem differently — and stayed with it long enough to build a path.",
+  "003": // Creativity & Inspiration
     "Creative breakthroughs often arrive after play, rest, or a change of scene — not only during forced effort.",
-  personal_growth:
-    "Growth sparks often connect a small daily choice to a larger identity you are still becoming.",
+  "004": // Nature & Places
+    "The natural world rewards a second look — a place or a pattern that quietly changes how you see the day.",
+  "005": // Curiosity
+    "The memorable facts are the ones tied to a place, a person, or a chain of events you did not expect.",
+  "006": // Words & Origins
+    "Behind many words and famous lines is a life story, a moment of pressure, or an idea that took years to form.",
+  "007": // Strategy
+    "Good strategy is rarely a straight line; it is a set of decisions, risks, and lessons learned in public.",
+  "008": // Reflection
+    "Reflection sparks often connect a small daily choice to a larger identity you are still becoming.",
+  "009": // Adventure
+    "Adventure can be close to home — a small step past the familiar that changes what you notice next.",
+  "010": // Business
+    "Business stories are rarely straight lines; they are collections of decisions, risks, and lessons learned in public.",
+  "011": // Innovation
+    "Inventors often combine patience, observation, and the courage to keep exploring after the first attempt fails.",
+  "012": // Wonder
+    "Wonder is a quiet skill — noticing the surprising thing hidden inside an ordinary moment.",
 };
 
 const DIVERSITY_TINY_ACTIONS: Record<SparkCardDiversityCategoryId, string> = {
@@ -452,12 +458,16 @@ export function resolveSparkCardSimplifiedPresentation(
   });
 
   return {
-    categoryRibbon: resolveSparkCardCategoryRibbon({
-      category: card.category,
-      categoryLabel: card.categoryLabel,
-      tags: card.tags,
-      title: card.title,
-    }),
+    // The ribbon shows the card's own numbered Spark Edition label (e.g.
+    // "Innovation"); the diversity category is internal image/topic plumbing.
+    categoryRibbon:
+      card.categoryLabel?.trim() ||
+      resolveSparkCardCategoryRibbon({
+        category: card.category,
+        categoryLabel: card.categoryLabel,
+        tags: card.tags,
+        title: card.title,
+      }),
     diversityCategory,
     title: card.title,
     subtitle: card.teaser?.trim() || "A small idea waiting to brighten your day.",

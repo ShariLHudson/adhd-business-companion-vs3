@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-010",
+  "title": "National Donut Day",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Donuts",
+  "short_teaser": "A sweet tradition with a surprising origin.",
+  "story": "National Donut Day began in 1938 to honor the Salvation Army 'Donut Lassies' who served donuts to soldiers during World War I. What started as comfort food in the trenches became an annual celebration of small joys. A sweet tradition with a surprising origin. The deeper value of this story is not only the event itself, but the moment someone noticed that something unexpected deserved a second look. Discovery often begins before there is certainty; it begins with attention. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: sometimes the sweetest traditions come from simple acts of care during hard times.",
+  "impact": "Sometimes the sweetest traditions come from simple acts of care during hard times. The useful question is not only “What did they discover?” but “What allowed them to notice it?” This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "Who could you surprise with a small treat or kind gesture today? Pause long enough to notice one unexpected result, overlooked detail, or unanswered question. Write down what it might be inviting you to explore. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "06-06"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "priority": 80
+}

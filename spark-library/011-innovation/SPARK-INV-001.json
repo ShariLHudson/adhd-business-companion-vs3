@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-INV-001",
+  "title": "The Post-it® Note",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Colorful sticky notes",
+  "short_teaser": "A failed experiment became one of the world's favorite tools for capturing ideas.",
+  "story": "A scientist was trying to create a very strong adhesive. Instead, he created something unusual â an adhesive that could stick but also be removed. For years, the discovery did not have an obvious purpose. Another employee saw the possibility and realized it could solve an everyday problem: marking pages without damaging them. The mistake became an invention. A failed experiment became one of the world's favorite tools for capturing ideas. Innovation is rarely a single flash of brilliance. It is more often a chain of observations, experiments, revisions, and connections that gradually turn possibility into something useful. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: some of the best ideas are not created by having the perfect plan. Sometimes innovation comes from noticing a possibility hidden inside an unexpected result.",
+  "impact": "Some of the best ideas are not created by having the perfect plan. Sometimes innovation comes from noticing a possibility hidden inside an unexpected result. Innovation grows when people treat imperfect results as information rather than proof that an idea should be abandoned. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What idea have you dismissed because it did not work the way you originally imagined? Choose one idea and run a tiny experiment. Decide in advance what you want to learn, not only what you hope will succeed. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "innovation",
+    "creativity",
+    "productivity",
+    "accidental-discovery"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "The Post-it® Note"
+}

@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-012",
+  "title": "National Book Lovers Day",
+  "category": "Words & Origins",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Open book",
+  "short_teaser": "A day to celebrate stories that change us.",
+  "story": "August 9 is National Book Lovers Day â a quiet celebration of reading, discovery, and the worlds we enter through pages. No one knows exactly who started it, which feels fitting for a holiday about getting lost in someone else's words. A day to celebrate stories that change us. Words give shape to ideas that might otherwise remain difficult to hold. A phrase, name, or story can become a doorway into memory, meaning, identity, and a new way of seeing. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: books let us live other lives, learn from distant minds, and return changed. A single sentence can shift a perspective.",
+  "impact": "Books let us live other lives, learn from distant minds, and return changed. A single sentence can shift a perspective. The words we choose can preserve meaning, change perspective, and help an idea travel from one person to another. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What book, article, or story has been waiting for your attention? Capture one phrase, word, or sentence that stays with you. Add a note about why it matters and how you might use it. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "08-09"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "006",
+  "category_label": "Words & Origins",
+  "priority": 80
+}

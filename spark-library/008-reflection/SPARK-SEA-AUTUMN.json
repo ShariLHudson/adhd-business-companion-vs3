@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEA-AUTUMN",
+  "title": "Autumn's Gentle Pause",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Learning season — harvest what you have grown.",
+  "story": "Autumn invites reflection. Trees release what they no longer need; harvest traditions remind communities to notice what the year produced before rushing into the next chapter. Learning season â harvest what you have grown. Reflection turns experience into wisdom. Without reflection, a moment passes; with reflection, it can reveal a pattern, clarify a value, or help us decide what to carry forward. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: reflection is not slowing down for its own sake â it helps us carry forward what worked and release what did not.",
+  "impact": "Reflection is not slowing down for its own sake â it helps us carry forward what worked and release what did not. Reflection is not dwelling on the past; it is using experience to make the next choice with greater awareness. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What is one thing from this year worth keeping â and one thing you are ready to let go? Write one sentence about what this brings up for you, one lesson you want to remember, and one thing you are ready to do differently. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "seasonal",
+    "autumn",
+    "reflection"
+  ],
+  "date_rules": {
+    "type": "season",
+    "value": "autumn"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "Autumn's Gentle Pause",
+  "priority": 55
+}

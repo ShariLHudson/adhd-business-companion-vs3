@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-INV-010",
+  "title": "The First Computer Mouse",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Vintage computer mouse",
+  "short_teaser": "A wooden block that changed how we interact with computers.",
+  "story": "In 1964, Douglas Engelbart built the first computer mouse from a wooden block, two metal wheels, and a single button. He called it a mouse because the cord looked like a tail. His goal was to make computers feel more intuitive â something you could point at, not just type at. A wooden block that changed how we interact with computers. Innovation is rarely a single flash of brilliance. It is more often a chain of observations, experiments, revisions, and connections that gradually turn possibility into something useful. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: the mouse made personal computing accessible to everyone. Point-and-click became the bridge between human intention and digital action.",
+  "impact": "The mouse made personal computing accessible to everyone. Point-and-click became the bridge between human intention and digital action. Innovation grows when people treat imperfect results as information rather than proof that an idea should be abandoned. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What tool could make something complicated feel simple for the people you serve? Choose one idea and run a tiny experiment. Decide in advance what you want to learn, not only what you hope will succeed. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "invention",
+    "technology",
+    "computing"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "First Computer Mouse"
+}

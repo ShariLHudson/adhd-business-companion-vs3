@@ -135,23 +135,28 @@ const TAG_TO_DIVERSITY: Array<{
   },
 ];
 
+/**
+ * Numbered Spark Edition → diversity category, used only as the *image/ribbon*
+ * fallback when tags/labels don't already resolve a diversity category. This
+ * keeps the honest topic-photo lookup working after the 12-category migration;
+ * it never introduces edition covers as card art.
+ */
 const LEGACY_CATEGORY_TO_DIVERSITY: Record<
   SparkNoteCategory,
   SparkCardDiversityCategoryId
 > = {
-  invention: "innovation",
-  inventor: "remarkable_people",
-  entrepreneur: "remarkable_people",
-  business: "inspiration",
-  history: "history",
-  holiday: "fun_celebrations",
-  fun_fact: "fun_facts",
-  quote: "inspiration",
-  creativity: "creativity",
-  personal_growth: "inspiration",
-  gratitude: "kindness",
-  adhd_friendly: "curiosity",
-  personal: "fun_celebrations",
+  "001": "curiosity", // Discovery
+  "002": "remarkable_people", // People & Stories
+  "003": "creativity", // Creativity & Inspiration
+  "004": "nature", // Nature & Places
+  "005": "curiosity", // Curiosity
+  "006": "books_ideas", // Words & Origins
+  "007": "science_technology", // Strategy
+  "008": "inspiration", // Reflection
+  "009": "amazing_places", // Adventure
+  "010": "inspiration", // Business
+  "011": "innovation", // Innovation
+  "012": "fun_facts", // Wonder
 };
 
 function haystack(source: DiversitySource): string {

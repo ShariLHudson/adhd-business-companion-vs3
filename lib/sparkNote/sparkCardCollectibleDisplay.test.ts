@@ -69,8 +69,8 @@ function catalogEntryToDailyCard(
 
 const sampleCard: SparkNoteDailyCard = {
   id: "SPARK-INV-001",
-  category: "invention",
-  categoryLabel: "Invention",
+  category: "011", // Innovation
+  categoryLabel: "Innovation",
   sparkType: "story",
   title: "The Post-it Note",
   shortTitle: "The Post-it Note",

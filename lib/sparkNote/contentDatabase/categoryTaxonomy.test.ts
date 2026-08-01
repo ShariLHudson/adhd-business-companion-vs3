@@ -7,9 +7,9 @@ import {
 
 describe("categoryTaxonomy", () => {
   it("suggests ID prefixes per master standard", () => {
-    expect(suggestIdPrefix("invention")).toBe("INV");
-    expect(suggestIdPrefix("business")).toBe("BIZ");
-    expect(suggestIdPrefix("adhd_friendly")).toBe("ADHD");
+    expect(suggestIdPrefix("001")).toBe("DISC");
+    expect(suggestIdPrefix("010")).toBe("BUSI");
+    expect(suggestIdPrefix("011")).toBe("INNO");
   });
 
   it("includes recommended personalization tags", () => {

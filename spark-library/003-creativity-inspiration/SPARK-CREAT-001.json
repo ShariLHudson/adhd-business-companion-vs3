@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-CREAT-001",
+  "title": "The Power of the Bad First Draft",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Great ideas rarely begin perfectly.",
+  "story": "Many creators, writers, and inventors begin with rough versions. The first version is not meant to be the final version. It is meant to create something that can be improved. Great ideas rarely begin perfectly. Creativity is often described as inspiration, but stories like this show that it is also attention, courage, play, and the willingness to keep shaping an idea before anyone else can fully see it. The lasting importance is simple: waiting for perfection prevents many ideas from ever becoming real.",
+  "impact": "Waiting for perfection prevents many ideas from ever becoming real. Inspiration becomes meaningful when it gives us permission to make, explore, or express something of our own. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What could you create if the first version was allowed to be imperfect? Make a small version, sketch, list, draft, or experiment before judging the idea. Let curiosity lead for ten minutes. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "creativity",
+    "perfectionism",
+    "action",
+    "ideas"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "quick",
+  "short_title": "Bad First Draft"
+}

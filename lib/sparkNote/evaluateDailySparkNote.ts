@@ -263,31 +263,30 @@ export function evaluateDailySparkNote(
 
 export function categoryEmoji(category: SparkNoteDailyCard["category"]): string {
   switch (category) {
-    case "invention":
-      return "💡";
-    case "inventor":
-    case "entrepreneur":
+    case "001": // Discovery
+      return "🔭";
+    case "002": // People & Stories
       return "⭐";
-    case "business":
-      return "📈";
-    case "history":
-      return "📜";
-    case "holiday":
-      return "🎉";
-    case "fun_fact":
-      return "✨";
-    case "quote":
-      return "💬";
-    case "creativity":
+    case "003": // Creativity & Inspiration
       return "🎨";
-    case "personal_growth":
-      return "🌱";
-    case "gratitude":
-      return "💛";
-    case "adhd_friendly":
-      return "✦";
-    case "personal":
-      return "🎂";
+    case "004": // Nature & Places
+      return "🌿";
+    case "005": // Curiosity
+      return "🔎";
+    case "006": // Words & Origins
+      return "📖";
+    case "007": // Strategy
+      return "🧭";
+    case "008": // Reflection
+      return "🌅";
+    case "009": // Adventure
+      return "🗺️";
+    case "010": // Business
+      return "📈";
+    case "011": // Innovation
+      return "💡";
+    case "012": // Wonder
+      return "✨";
     default:
       return "🔥";
   }

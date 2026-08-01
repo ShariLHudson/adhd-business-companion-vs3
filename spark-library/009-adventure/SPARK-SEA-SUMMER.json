@@ -1,0 +1,31 @@
+{
+  "spark_id": "SPARK-SEA-SUMMER",
+  "title": "Summer's Open Door",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Arch_door_and_portal_in_Walled_Garden_at_Goodnestone_Park_Kent_England.jpg/960px-Arch_door_and_portal_in_Walled_Garden_at_Goodnestone_Park_Kent_England.jpg",
+  "thumbnail": null,
+  "thumbnail_alt": "An open garden doorway in warm light — adventure close to home",
+  "short_teaser": "Adventure doesn't always require a plane ticket.",
+  "story": "Summer has long been the season of exploration â longer days, open schedules, and the feeling that something unexpected might be waiting just outside routine. Adventure doesn't always require a plane ticket. Adventure does not always begin with certainty. It often begins with movement: one step beyond routine, one question asked, or one willingness to enter unfamiliar territory and learn from what happens. The lasting importance is simple: a change of pace can reset creativity. Adventure sometimes means curiosity in a familiar place seen with fresh eyes.",
+  "impact": "A change of pace can reset creativity. Adventure sometimes means curiosity in a familiar place seen with fresh eyes. Adventure expands our sense of what is possible because action teaches what imagination alone cannot. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "Where could you explore for twenty minutes today â a new path, a new recipe, a conversation you have been putting off? Take one safe step beyond routine today. Make it small enough to begin and meaningful enough to teach you something. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "seasonal",
+    "summer",
+    "adventure"
+  ],
+  "date_rules": {
+    "type": "season",
+    "value": "summer"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "quick",
+  "short_title": "Summer's Open Door",
+  "priority": 55
+}

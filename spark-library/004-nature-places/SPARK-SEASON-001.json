@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEASON-001",
+  "title": "Spring: New Beginnings",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A new season reminds us that growth happens gradually.",
+  "story": "Nature does not rush. Seeds grow quietly before anything appears above the surface. Spring reminds us that progress is often happening before results are visible. A new season reminds us that growth happens gradually. Nature and place can teach without speaking. When we slow down enough to observe patterns, seasons, structures, and relationships, the familiar world becomes a source of perspective. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: personal and business growth also requires patience.",
+  "impact": "Personal and business growth also requires patience. The natural world often models patience, interdependence, adaptation, and change more clearly than advice ever could. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What are you growing that needs more time? Step outside or look closely at a natural object, place, or seasonal change. Note one pattern that offers a lesson for your own pace or direction. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "growth",
+    "renewal",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "03-20"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "Spring Beginnings",
+  "priority": 75
+}

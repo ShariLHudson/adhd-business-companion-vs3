@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-007",
+  "title": "The Accidental Success of Post-it Notes",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A product without a purpose found its purpose.",
+  "story": "The Post-it Note was not created from a perfect plan. It became successful because someone recognized a new use for an unexpected discovery. A product without a purpose found its purpose. Innovation is rarely a single flash of brilliance. It is more often a chain of observations, experiments, revisions, and connections that gradually turn possibility into something useful. The lasting importance is simple: entrepreneurs often need the ability to adapt when reality changes.",
+  "impact": "Entrepreneurs often need the ability to adapt when reality changes. Innovation grows when people treat imperfect results as information rather than proof that an idea should be abandoned. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What could you rethink instead of abandoning? Choose one idea and run a tiny experiment. Decide in advance what you want to learn, not only what you hope will succeed. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "innovation",
+    "flexibility",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "quick",
+  "short_title": "Post-it Business Lesson"
+}

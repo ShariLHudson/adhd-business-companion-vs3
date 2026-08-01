@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-004",
+  "title": "The Power of Asking \"What If?\"",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Many breakthroughs begin with one simple question.",
+  "story": "Inventors and creators often begin by challenging what already exists. \"What if this worked differently?\" \"What if there was another way?\" Questions create possibilities. Many breakthroughs begin with one simple question. Curiosity changes an ordinary fact into an invitation. Instead of stopping at what happened, it asks what else might be true, what assumptions may be incomplete, and what becomes visible when we look again. The lasting importance is simple: curiosity is the beginning of innovation. Curiosity loosens the grip of assumptions and creates room for better questions. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "impact": "Curiosity is the beginning of innovation. Curiosity loosens the grip of assumptions and creates room for better questions. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What assumption could you challenge today? Write three questions about something you have been assuming is fixed. Choose the question that opens the most possibility. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "innovation",
+    "imagination",
+    "problem-solving"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "quick",
+  "short_title": "What If?"
+}

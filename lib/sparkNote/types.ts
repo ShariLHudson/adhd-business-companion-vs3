@@ -2,20 +2,25 @@ import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
 import type { WelcomeSeason } from "@/lib/welcomeLivingRoom";
 
+/**
+ * Spark Card categories — the 12 approved numbered Spark Editions (001–012).
+ * Each value is an edition code; see `lib/sparkNote/sparkEditions.ts` for the
+ * number → label → edition-cover mapping (collection layer only — edition covers
+ * are never used as individual card hero images).
+ */
 export type SparkNoteCategory =
-  | "invention"
-  | "inventor"
-  | "entrepreneur"
-  | "business"
-  | "history"
-  | "holiday"
-  | "fun_fact"
-  | "quote"
-  | "creativity"
-  | "personal_growth"
-  | "gratitude"
-  | "adhd_friendly"
-  | "personal";
+  | "001" // Discovery
+  | "002" // People & Stories
+  | "003" // Creativity & Inspiration
+  | "004" // Nature & Places
+  | "005" // Curiosity
+  | "006" // Words & Origins
+  | "007" // Strategy
+  | "008" // Reflection
+  | "009" // Adventure
+  | "010" // Business
+  | "011" // Innovation
+  | "012"; // Wonder
 
 export type SparkNoteType = "quick" | "story" | "deep";
 

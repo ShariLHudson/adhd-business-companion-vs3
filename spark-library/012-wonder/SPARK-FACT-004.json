@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-FACT-004",
+  "title": "Octopuses Have Three Hearts",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Octopus",
+  "short_teaser": "One ocean creature has a surprisingly unusual design.",
+  "story": "Octopuses have three hearts. Two pump blood toward the gills, while one pumps blood through the rest of the body. Their unique biology helps them survive in the ocean. One ocean creature has a surprisingly unusual design. Wonder gives us permission to pause before explaining everything away. It restores scale, surprise, and imagination, reminding us that the world still contains more than we have noticed. The lasting importance is simple: nature solves problems in creative ways.",
+  "impact": "Nature solves problems in creative ways. Wonder can renew energy because it shifts us from rushing past life to actually noticing it. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "Where could a different approach create a better solution? Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what it changed in your perspective. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "animals",
+    "science",
+    "wonder"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "quick",
+  "short_title": "Three Hearts"
+}

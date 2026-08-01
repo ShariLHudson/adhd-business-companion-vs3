@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEA-WINTER",
+  "title": "Winter's Quiet Inspiration",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Traditions and warmth when the world slows down.",
+  "story": "Winter has always been a season for gathering â firelight, stories, handmade gifts, and rituals that turn cold months into something human and hopeful. Traditions and warmth when the world slows down. Wonder gives us permission to pause before explaining everything away. It restores scale, surprise, and imagination, reminding us that the world still contains more than we have noticed. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: quiet seasons create space for imagination. Not every productive season looks busy from the outside.",
+  "impact": "Quiet seasons create space for imagination. Not every productive season looks busy from the outside. Wonder can renew energy because it shifts us from rushing past life to actually noticing it. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What tradition â old or new â could make this week feel warmer for you or someone you care about? Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what it changed in your perspective. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "seasonal",
+    "winter",
+    "inspiration"
+  ],
+  "date_rules": {
+    "type": "season",
+    "value": "winter"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "Winter's Quiet Inspiration",
+  "priority": 55
+}

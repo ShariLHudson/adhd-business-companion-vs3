@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-007",
+  "title": "The Business That Listened",
+  "category": "Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Listening can become a business advantage.",
+  "story": "Many small businesses succeed because they build relationships with customers. They remember preferences, respond personally, and create trust. Listening can become a business advantage. Business lessons become useful when they move beyond success stories and reveal the decisions underneath: what problem was noticed, what value was created, what relationship was strengthened, and what changed because someone listened. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: relationships are often the foundation of loyalty.",
+  "impact": "Relationships are often the foundation of loyalty. The strongest businesses create value people can feel, understand, and trust—not just products people can buy. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "How can you make someone feel valued today? Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience more useful, clear, or trustworthy. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "customer-service",
+    "relationships",
+    "growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "010",
+  "category_label": "Business",
+  "spark_type": "story",
+  "short_title": "The Business That Listened"
+}

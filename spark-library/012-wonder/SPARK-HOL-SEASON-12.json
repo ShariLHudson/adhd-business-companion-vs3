@@ -1,0 +1,33 @@
+{
+  "spark_id": "SPARK-HOL-SEASON-12",
+  "title": "December's Quiet Glow",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Winter candles",
+  "short_teaser": "A season of light, reflection, and small rituals.",
+  "story": "December has carried meaning across cultures for centuries â from winter solstice gatherings to festivals of light. Long nights invite slower pacing, warmer rooms, and traditions that reconnect us to people we love. A season of light, reflection, and small rituals. Wonder gives us permission to pause before explaining everything away. It restores scale, surprise, and imagination, reminding us that the world still contains more than we have noticed. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: seasons shape how we work and rest. December reminds us that endings and celebrations can coexist â that closing a year is its own kind of beginning.",
+  "why_interesting": "Many December traditions began as practical responses to darkness — candles, feasts, and gatherings that made the coldest month feel survivable, even beautiful.",
+  "impact": "Seasons shape how we work and rest. December reminds us that endings and celebrations can coexist â that closing a year is its own kind of beginning. Wonder can renew energy because it shifts us from rushing past life to actually noticing it. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What small ritual could make this week feel warmer â for you or for someone else? Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what it changed in your perspective. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "seasonal",
+    "december",
+    "holiday"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      12
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "short_title": "December's Quiet Glow",
+  "priority": 60
+}

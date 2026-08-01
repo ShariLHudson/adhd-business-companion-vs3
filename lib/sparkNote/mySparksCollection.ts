@@ -156,23 +156,22 @@ export function mySparksShelfBucket(
   category: MySparkSavedItem["category"],
 ): MySparksShelfBucket {
   switch (category) {
-    case "business":
-    case "entrepreneur":
+    case "007": // Strategy
+    case "010": // Business
       return "business";
-    case "personal_growth":
-    case "gratitude":
-    case "adhd_friendly":
-    case "personal":
+    case "008": // Reflection
       return "growth";
-    case "fun_fact":
-    case "holiday":
+    case "004": // Nature & Places
+    case "009": // Adventure
+    case "012": // Wonder
       return "fun";
-    case "invention":
-    case "inventor":
-    case "history":
+    case "001": // Discovery
+    case "005": // Curiosity
+    case "006": // Words & Origins
+    case "011": // Innovation
       return "learning";
-    case "creativity":
-    case "quote":
+    case "002": // People & Stories
+    case "003": // Creativity & Inspiration
       return "reflections";
     default:
       return "favorites";

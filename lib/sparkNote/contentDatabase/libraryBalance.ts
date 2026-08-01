@@ -4,72 +4,25 @@ import type { SparkContentRecord } from "./types";
  * Recommended library mix per SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md
  * (and aligned with SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL).
  */
+/** One bucket per numbered Spark Edition (001–012). Target shares reflect the
+    approved library mix; delta reports over/under-representation per edition. */
 export const RECOMMENDED_SPARK_LIBRARY_BALANCE: {
   label: string;
   share: number;
   match: (record: SparkContentRecord) => boolean;
 }[] = [
-  {
-    label: "Inventions",
-    share: 0.25,
-    match: (r) =>
-      r.runtime_category === "invention" || r.runtime_category === "inventor",
-  },
-  {
-    label: "Inspiring People",
-    share: 0.2,
-    match: (r) => r.runtime_category === "entrepreneur",
-  },
-  {
-    label: "Entrepreneurs",
-    share: 0.15,
-    match: (r) =>
-      r.runtime_category === "business" &&
-      (r.subcategory?.toLowerCase().includes("founder") ||
-        r.tags.includes("entrepreneurship")),
-  },
-  {
-    label: "Business Lessons",
-    share: 0.15,
-    match: (r) =>
-      r.runtime_category === "business" &&
-      !(
-        r.subcategory?.toLowerCase().includes("founder") ||
-        r.tags.includes("entrepreneurship")
-      ),
-  },
-  {
-    label: "History",
-    share: 0.1,
-    match: (r) => r.runtime_category === "history",
-  },
-  {
-    label: "Holidays",
-    share: 0.05,
-    match: (r) => r.runtime_category === "holiday",
-  },
-  {
-    label: "Fun Facts",
-    share: 0.05,
-    match: (r) => r.runtime_category === "fun_fact",
-  },
-  {
-    label: "Personal Growth",
-    share: 0.05,
-    match: (r) =>
-      r.runtime_category === "personal_growth" ||
-      r.runtime_category === "gratitude" ||
-      r.runtime_category === "adhd_friendly" ||
-      r.runtime_category === "quote" ||
-      r.runtime_category === "creativity",
-  },
-  {
-    label: "Creativity & Seasonal",
-    share: 0,
-    match: (r) =>
-      r.runtime_category === "creativity" ||
-      Boolean(r.date_rules.type === "season"),
-  },
+  { label: "001 Discovery", share: 0.04, match: (r) => r.runtime_category === "001" },
+  { label: "002 People & Stories", share: 0.1, match: (r) => r.runtime_category === "002" },
+  { label: "003 Creativity & Inspiration", share: 0.08, match: (r) => r.runtime_category === "003" },
+  { label: "004 Nature & Places", share: 0.04, match: (r) => r.runtime_category === "004" },
+  { label: "005 Curiosity", share: 0.06, match: (r) => r.runtime_category === "005" },
+  { label: "006 Words & Origins", share: 0.12, match: (r) => r.runtime_category === "006" },
+  { label: "007 Strategy", share: 0.11, match: (r) => r.runtime_category === "007" },
+  { label: "008 Reflection", share: 0.14, match: (r) => r.runtime_category === "008" },
+  { label: "009 Adventure", share: 0.03, match: (r) => r.runtime_category === "009" },
+  { label: "010 Business", share: 0.11, match: (r) => r.runtime_category === "010" },
+  { label: "011 Innovation", share: 0.13, match: (r) => r.runtime_category === "011" },
+  { label: "012 Wonder", share: 0.04, match: (r) => r.runtime_category === "012" },
 ];
 
 export type SparkLibraryBalanceRow = {

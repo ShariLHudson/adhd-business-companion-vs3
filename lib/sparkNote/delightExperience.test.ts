@@ -16,10 +16,10 @@ describe("delightExperience", () => {
 
 describe("mySparksCollection shelves", () => {
   it("maps categories to delight shelf buckets", () => {
-    expect(mySparksShelfBucket("business")).toBe("business");
-    expect(mySparksShelfBucket("creativity")).toBe("reflections");
-    expect(mySparksShelfBucket("gratitude")).toBe("growth");
-    expect(mySparksShelfBucket("fun_fact")).toBe("fun");
+    expect(mySparksShelfBucket("010")).toBe("business"); // Business
+    expect(mySparksShelfBucket("003")).toBe("reflections"); // Creativity & Inspiration
+    expect(mySparksShelfBucket("008")).toBe("growth"); // Reflection
+    expect(mySparksShelfBucket("012")).toBe("fun"); // Wonder
     expect(MY_SPARKS_SHELF_BUCKETS.length).toBeGreaterThan(4);
   });
 });

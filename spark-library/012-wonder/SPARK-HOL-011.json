@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-011",
+  "title": "National Ice Cream Day",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Ice cream cone",
+  "short_teaser": "A presidential proclamation for something cold and sweet.",
+  "story": "President Ronald Reagan declared the third Sunday in July as National Ice Cream Day in 1984. Americans consume about 23 gallons of ice cream per person each year â making it one of the most beloved treats in the country. A presidential proclamation for something cold and sweet. Wonder gives us permission to pause before explaining everything away. It restores scale, surprise, and imagination, reminding us that the world still contains more than we have noticed. What makes the moment especially useful is the pattern beneath it: attention came before understanding, and understanding came before change. That pattern is available in everyday life too, whenever we resist the urge to dismiss something simply because it does not yet fit the plan. The lasting importance is simple: celebrating small pleasures reminds us that joy doesn't need a grand occasion.",
+  "impact": "Celebrating small pleasures reminds us that joy doesn't need a grand occasion. Wonder can renew energy because it shifts us from rushing past life to actually noticing it. This matters because the lesson is transferable. It can help someone recognize a pattern, make a more thoughtful choice, or see possibility where they previously saw only a problem.",
+  "spark_application": "What simple pleasure could you savor today without guilt or rush? Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what it changed in your perspective. Afterward, save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "07-21"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "priority": 80
+}
