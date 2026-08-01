@@ -1,7 +1,9 @@
-/* My Personal Library room (Slice 3a).
-   The approved artwork is a non-interactive, aspect-locked background. Live
-   HTML/React overlays sit over the two shelf panels as opaque parchment panels
-   so the artwork's illustrative (non-member) cards never show through. */
+/* My Personal Library room.
+   The approved artwork is the whole room — one complete image (1536×1024). We do
+   NOT redraw it with HTML panels. Interactivity is added as transparent,
+   keyboard-accessible hotspots positioned in % of the aspect-locked stage, so
+   they stay aligned with the artwork at any scale. The control is the artwork;
+   feedback is a gentle focus/hover glow only — never a button drawn on top. */
 
 .personal-library-room {
   position: relative;
@@ -9,10 +11,10 @@
   height: 100%;
   min-height: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   overflow: auto;
-  background: #efe7d8;
+  background: #ead9c5; /* matches the room image's warm border */
 }
 
 .personal-library-room__sr-title {
@@ -27,303 +29,103 @@
   border: 0;
 }
 
-.personal-library-room__back {
-  position: absolute;
-  top: 0.9rem;
-  left: 0.9rem;
-  z-index: 5;
-  border: 1px solid rgba(30, 79, 79, 0.35);
-  border-radius: 0.6rem;
-  background: rgba(250, 247, 242, 0.92);
-  color: #1e4f4f;
-  padding: 0.4rem 0.8rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-}
-.personal-library-room__back:hover {
-  background: #fff;
-}
-.personal-library-room__back:focus-visible {
-  outline: 3px solid #1e4f4f;
-  outline-offset: 2px;
-}
-
-/* Aspect-locked stage — overlays are positioned in % of this box, so they stay
-   aligned with the artwork at any scale. 1620x971 = the approved asset. */
+/* Width-driven stage — the image sets its own height from its intrinsic 1536×1024
+   ratio, so the stage box always equals the *visible* picture (no object-fit
+   letterboxing to offset the overlays). Every hotspot % therefore lines up with
+   the artwork at any width; a very short container just scrolls (overflow:auto).
+   Verified: stage box == image box, ratio 1.5, at 375–1200px widths. */
 .personal-library-room__stage {
   position: relative;
-  aspect-ratio: 1620 / 971;
   width: 100%;
-  max-height: 100%;
+  max-width: 100%;
   margin: auto;
 }
 
-.personal-library-room__bg {
-  position: absolute;
-  inset: 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover; /* stage matches asset ratio → no cropping */
-  pointer-events: none;
-}
-
-/* --- overlay regions (percentages measured from the approved composition) --- */
-.pl-region {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  border-radius: 0.7rem;
-  padding: 0.7rem 0.8rem;
-  background: rgba(250, 247, 242, 0.94);
-  border: 1px solid rgba(184, 145, 47, 0.55);
-  box-shadow: 0 2px 10px rgba(60, 45, 20, 0.18);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.pl-region--world {
-  left: 22.3%;
-  top: 12.7%;
-  width: 27.4%;
-  height: 53.5%;
-}
-.pl-region--journey {
-  left: 50.2%;
-  top: 12.7%;
-  width: 28.6%;
-  height: 68.5%;
-}
-.pl-region--bottom {
-  left: 27%;
-  top: 87%;
-  width: 46%;
-  height: 9.5%;
-  align-items: center;
-  justify-content: center;
-}
-
-.pl-region__title {
-  margin: 0;
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #8a6d1f;
-}
-.pl-region__note,
-.pl-bottom__note {
-  margin: 0;
-  text-align: center;
-  font-size: 0.8rem;
-  color: #6b635a;
-}
-
-.pl-card-panel {
-  border-radius: 0.55rem;
-  border: 1px solid rgba(184, 145, 47, 0.35);
-  background: rgba(255, 253, 249, 0.9);
-  padding: 0.5rem 0.6rem;
-}
-.pl-card-panel--soon {
-  opacity: 0.92;
-}
-.pl-card-panel__head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-.pl-card-panel__title {
-  margin: 0;
-  font-size: 0.82rem;
-  font-weight: 700;
-  color: #2f261f;
-}
-
-.pl-viewall {
-  border: none;
-  background: transparent;
-  color: #1e4f4f;
-  font-size: 0.72rem;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0.15rem 0.3rem;
-  border-radius: 0.35rem;
-}
-.pl-viewall:hover {
-  text-decoration: underline;
-}
-.pl-viewall:focus-visible {
-  outline: 3px solid #1e4f4f;
-  outline-offset: 2px;
-}
-
-.pl-state {
-  margin: 0.35rem 0 0;
-  font-size: 0.75rem;
-  color: #6b635a;
-}
-.pl-state--offline {
-  color: #8a6d1f;
-}
-
-.pl-cards {
-  display: flex;
-  gap: 0.4rem;
-  margin: 0.4rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-.pl-cards__item {
-  flex: 1 1 0;
-  min-width: 0;
-}
-.pl-cards__open {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  width: 100%;
-  border: 1px solid rgba(184, 145, 47, 0.3);
-  border-radius: 0.45rem;
-  background: #fff;
-  padding: 0.3rem;
-  text-align: left;
-  cursor: pointer;
-}
-.pl-cards__open:hover {
-  border-color: rgba(30, 79, 79, 0.5);
-}
-.pl-cards__open:focus-visible {
-  outline: 3px solid #1e4f4f;
-  outline-offset: 2px;
-}
-.pl-cards__open:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-.pl-cards__thumb {
+.personal-library-room__image {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  border-radius: 0.35rem;
-  overflow: hidden;
-  background: rgba(30, 79, 79, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.pl-cards__thumb-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.pl-cards__thumb-icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  color: #1e4f4f;
-}
-.pl-cards__title {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #1f1c19;
-  line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-.pl-cards__date {
-  font-size: 0.65rem;
-  color: #8a8377;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* --- Mobile: stop positioning over shelves; readable stacked layout with the
-   room as a decorative header. --- */
-@media (max-width: 768px) {
-  .personal-library-room {
-    align-items: stretch;
-    overflow-y: auto;
-  }
-  .personal-library-room__stage {
-    aspect-ratio: auto;
-    width: 100%;
-    max-height: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 0 0.75rem 1.25rem;
-  }
-  .personal-library-room__bg {
-    position: relative;
-    height: 30vh;
-    min-height: 150px;
-    border-radius: 0 0 0.9rem 0.9rem;
-  }
-  .pl-region {
-    position: static;
-    left: auto;
-    top: auto;
-    width: auto;
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-  .pl-region--journey {
-    order: 1;
-  }
-  .pl-region--world {
-    order: 2;
-  }
-  .pl-region--bottom {
-    order: 3;
-  }
-  .pl-cards__title {
-    font-size: 0.8rem;
-  }
+/* --- Transparent hotspots over the artwork --- */
+.pl-hotspot {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+.pl-hotspot:hover {
+  background-color: rgba(255, 244, 214, 0.16);
+  box-shadow:
+    0 0 0 2px rgba(197, 160, 74, 0.5),
+    0 0 18px 4px rgba(197, 160, 74, 0.32);
+}
+.pl-hotspot:focus-visible {
+  outline: none;
+  background-color: rgba(255, 244, 214, 0.2);
+  box-shadow:
+    0 0 0 3px rgba(30, 79, 79, 0.9),
+    0 0 20px 5px rgba(197, 160, 74, 0.45);
+}
+.pl-hotspot--unavailable {
+  cursor: default;
+}
+.pl-hotspot--unavailable:hover,
+.pl-hotspot--unavailable:focus-visible {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.pl-hotspot__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Today's Spark — the wrapped gift box on the table.
+   Approved image map: rect coords 660,765,865,980 of the 1536×1024 asset. */
+.pl-hotspot--gift {
+  left: 42.97%;
+  top: 74.71%;
+  width: 13.35%;
+  height: 21%;
+  border-radius: 0.9rem;
+}
+
+/* My Spark Collection — the "View all" panel at the top of My Journey. */
+.pl-hotspot--collection {
+  left: 68%;
+  top: 20.5%;
+  width: 30%;
+  height: 14%;
+}
+
+/* Back — the drawn "Welcome Home" pill, top-left. */
+.pl-hotspot--back {
+  left: 5.5%;
+  top: 2.5%;
+  width: 12%;
+  height: 5.5%;
+  border-radius: 999px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .personal-library-room__back,
-  .pl-cards__open,
-  .pl-viewall {
+  .pl-hotspot {
     transition: none;
   }
-}
-
-/* Today's Spark entry — always available inside the room. */
-.pl-card-panel--today {
-  border-color: rgba(30, 79, 79, 0.4);
-  background: rgba(255, 253, 249, 0.96);
-}
-.pl-today-open {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  width: 100%;
-  margin-top: 0.4rem;
-  border: 1px solid rgba(30, 79, 79, 0.35);
-  border-radius: 0.5rem;
-  background: #1e4f4f;
-  color: #fff;
-  padding: 0.5rem 0.7rem;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-align: left;
-  cursor: pointer;
-}
-.pl-today-open:hover {
-  background: #163d3d;
-}
-.pl-today-open:focus-visible {
-  outline: 3px solid #1e4f4f;
-  outline-offset: 2px;
-}
-.pl-today-open__hint {
-  font-size: 0.7rem;
-  font-weight: 500;
-  opacity: 0.9;
 }

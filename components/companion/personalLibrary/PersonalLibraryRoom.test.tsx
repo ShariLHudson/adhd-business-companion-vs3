@@ -1,7 +1,11 @@
 /**
  * @vitest-environment jsdom
- * My Personal Library room (Slice 3a) — durable My Spark Collection, click-to-open,
- * View all, honest empties. react-dom/client + act; memory backend for Supabase.
+ * My Personal Library room — the approved flat room image plus transparent,
+ * accessible hotspots: the gift opens the real Today's Spark, "My Spark
+ * Collection / View all" opens the real saved-card collection, and the drawn
+ * "Welcome Home" pill goes back. react-dom/client + act; memory backend for
+ * Supabase. `resolveDailySparkCard` is mocked so the gift opens a deterministic
+ * card (its own selection logic is covered in evaluateDailySparkNote.test.ts).
  */
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
@@ -14,13 +18,21 @@ import {
 } from "@/lib/durableRecords/repository";
 import { clearMemberRecordDurableMarksForTests } from "@/lib/durableRecords/verifiedRegistry";
 import { setSavedSparkDurableEnabledForTests } from "@/lib/durableRecords/flags";
-import { upsertSavedSparkDurable } from "@/lib/durableRecords/domains/savedSpark";
 import { SPARK_NOTE_CATALOG } from "@/lib/sparkNote/catalog";
+import { resolveSparkCardImage } from "@/lib/sparkNote/resolveSparkCardImage";
 import {
   isHomeTeaserDismissedToday,
   resetSparkNoteStoreForTests,
 } from "@/lib/sparkNote/persistence";
+import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { PersonalLibraryRoom } from "./PersonalLibraryRoom";
+
+// The gift must open exactly the resolved daily card. Mock the resolver so the
+// test is deterministic; its selection logic has dedicated coverage elsewhere.
+vi.mock("@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration", () => ({
+  resolveDailySparkCard: vi.fn(),
+}));
+const mockResolveDaily = vi.mocked(resolveDailySparkCard);
 
 // @ts-expect-error — React act environment flag
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
@@ -38,9 +50,11 @@ async function flush() {
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 }
-async function render() {
+async function render(props: Partial<Parameters<typeof PersonalLibraryRoom>[0]> = {}) {
   await act(async () => {
-    root.render(<PersonalLibraryRoom onBack={onBack} backLabel="Welcome Home" />);
+    root.render(
+      <PersonalLibraryRoom onBack={onBack} backLabel="Welcome Home" {...props} />,
+    );
   });
   await flush();
 }
@@ -54,6 +68,8 @@ beforeEach(() => {
   document.body.appendChild(container);
   root = createRoot(container);
   onBack.mockClear();
+  mockResolveDaily.mockReset();
+  mockResolveDaily.mockReturnValue({ card: CARD });
   localStorage.clear();
   resetSparkNoteStoreForTests();
   clearMemberRecordDurableMarksForTests();
@@ -74,95 +90,99 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-async function seed() {
-  await upsertSavedSparkDurable({
-    sparkId: CARD.id,
-    savedAtIso: "2026-07-31T12:00:00.000Z",
-    title: CARD.title,
-    category: CARD.category,
-    categoryLabel: CARD.categoryLabel,
-  });
-}
-
-describe("PersonalLibraryRoom (Slice 3a)", () => {
-  it("renders the room shell with background and a working back control", async () => {
+describe("PersonalLibraryRoom", () => {
+  it("renders the approved room image and a working back control", async () => {
     await render();
     expect(q('[data-testid="personal-library-room"]')).not.toBeNull();
-    expect(q(".personal-library-room__bg")).not.toBeNull();
-    click(q('[data-testid="personal-library-back"]'));
+    const img = q('[data-testid="personal-library-image"]') as HTMLImageElement | null;
+    expect(img).not.toBeNull();
+    expect(img?.getAttribute("src")).toBe(
+      "/backgrounds/personal-library-background.png",
+    );
+    expect((img?.getAttribute("alt") ?? "").length).toBeGreaterThan(0);
+
+    const back = q('[data-testid="personal-library-back"]');
+    expect(back?.tagName).toBe("BUTTON");
+    expect(back?.getAttribute("aria-label")).toBe("Welcome Home");
+    click(back);
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  it("shows honest empty states, never the artwork's illustrative content", async () => {
+  it("never renders the artwork's baked-in example content as member data", async () => {
     await render();
     const text = document.body.textContent ?? "";
-    expect(text).toContain("Available soon"); // My Journey upcoming sections
-    expect(text).toContain("Discovery collections are coming soon"); // The World
-    // None of the baked-in illustrative names are rendered as member data.
     expect(text).not.toContain("Atomic Habits");
     expect(text).not.toContain("View all (87)");
+    expect(text).not.toContain("Designing a Life");
   });
 
-  it("renders My Spark Collection from real durable data with a real count", async () => {
-    await seed();
+  it("gives the gift an accessible name and opens the real Today's Spark on it", async () => {
     await render();
-    expect(document.body.textContent).toContain(CARD.title);
-    expect(q('[data-testid="pl-spark-collection-viewall"]')?.textContent).toContain(
-      "View all (1)",
-    );
-  });
+    const gift = q('[data-testid="pl-todays-spark-open"]');
+    expect(gift?.tagName).toBe("BUTTON");
+    expect(gift?.getAttribute("aria-label")).toBe("Open Today's Spark");
+    expect(q('[data-testid="todays-spark-card"]')).toBeNull();
 
-  it("opens the correct full Spark Card when a saved card is clicked", async () => {
-    await seed();
-    await render();
-    click(q(`[data-testid="pl-spark-open-${CARD.id}"]`));
+    click(gift);
     await flush();
     const opened = q('[data-testid="todays-spark-card"]');
     expect(opened).not.toBeNull();
+    // Opens exactly the resolved daily card — with its Story / Spark / Action.
     expect(opened?.textContent).toContain(CARD.title);
+    expect(opened?.textContent).toContain("The Story");
   });
 
-  it("View all opens the full My Spark Collection", async () => {
-    await seed();
+  it("returns to the room when the opened Spark is closed", async () => {
     await render();
-    click(q('[data-testid="pl-spark-collection-viewall"]'));
+    click(q('[data-testid="pl-todays-spark-open"]'));
+    await flush();
+    expect(q('[data-testid="todays-spark-card"]')).not.toBeNull();
+
+    click(q(".tsc-back"));
+    await flush();
+    expect(q('[data-testid="todays-spark-card"]')).toBeNull();
+    expect(q('[data-testid="personal-library-room"]')).not.toBeNull();
+  });
+
+  it("opens the real saved-card collection from the collection hotspot", async () => {
+    await render();
+    const viewAll = q('[data-testid="pl-spark-collection-viewall"]');
+    expect(viewAll?.getAttribute("aria-label")).toBe("Open My Spark Collection");
+    click(viewAll);
     await flush();
     expect(q('[data-testid="spark-note-my-collection"]')).not.toBeNull();
   });
 
-  it("shows a truthful empty collection state when nothing is saved", async () => {
+  it("shows an honest state — never fake content — when no card is available", async () => {
+    mockResolveDaily.mockReturnValue({ card: null });
     await render();
-    expect(document.body.textContent).toContain("Sparks you save will appear here");
+    // No gift button to open a non-existent card…
+    expect(q('[data-testid="pl-todays-spark-open"]')).toBeNull();
+    // …and a truthful, quiet unavailable state instead.
+    const unavailable = q('[data-testid="pl-todays-spark-unavailable"]');
+    expect(unavailable).not.toBeNull();
+    expect(unavailable?.getAttribute("role")).toBe("status");
+    expect(q('[data-testid="todays-spark-card"]')).toBeNull();
   });
 
-  it("offers Today's Spark in the room and opens it on click", async () => {
-    await render();
-    expect(q('[data-testid="pl-todays-spark"]')).not.toBeNull();
-    click(q('[data-testid="pl-todays-spark-open"]'));
-    await flush();
-    expect(q('[data-testid="todays-spark-card"]')).not.toBeNull();
-  });
-
-  it("on teaser arrival, lands in the room with Today's Spark available and does NOT auto-open the legacy card", async () => {
+  it("on teaser arrival, lands in the room with the gift focused and does not auto-open the card", async () => {
     const onArrivalConsumed = vi.fn();
-    await act(async () => {
-      root.render(
-        <PersonalLibraryRoom
-          onBack={onBack}
-          backLabel="Welcome Home"
-          arrivalMode
-          onArrivalConsumed={onArrivalConsumed}
-        />,
-      );
-    });
-    await flush();
-    // The room (My Personal Library) is what opens, with Today's Spark available…
+    await render({ arrivalMode: true, onArrivalConsumed });
     expect(q('[data-testid="personal-library-room"]')).not.toBeNull();
     expect(q('[data-testid="pl-todays-spark-open"]')).not.toBeNull();
-    // …and the legacy full-card overlay is NOT auto-opened.
+    // The full-card overlay is NOT auto-opened…
     expect(q('[data-testid="todays-spark-card"]')).toBeNull();
+    // …the gift is focused for keyboard members…
+    expect(document.activeElement).toBe(q('[data-testid="pl-todays-spark-open"]'));
     expect(onArrivalConsumed).toHaveBeenCalled();
-    // Teaser is marked opened for the day only now that the room has opened.
+    // …and the Welcome Home teaser is marked opened for the day.
     expect(isHomeTeaserDismissedToday()).toBe(true);
+  });
+
+  it("does not wire the branded edition covers as individual card hero images", async () => {
+    // The card-image system is untouched: resolving a real card must never
+    // return one of the /spark-card-images edition covers.
+    const image = resolveSparkCardImage(CARD);
+    expect(image.src ?? "").not.toContain("/spark-card-images/");
   });
 });
