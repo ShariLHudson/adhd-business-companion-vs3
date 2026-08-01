@@ -1,0 +1,304 @@
+/* Private Spark Card Review Mode — internal tooling styles. */
+
+.scr-gate {
+  padding: 2rem;
+  font-family: system-ui, sans-serif;
+  color: #2e241c;
+}
+.scr-gate code {
+  background: #f0e7d6;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.scr-root {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+  font-family: system-ui, sans-serif;
+  color: #2e241c;
+}
+
+.scr-header {
+  margin-bottom: 16px;
+}
+.scr-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+.scr-subtitle {
+  margin: 6px 0 0;
+  color: #6b6158;
+  font-size: 14px;
+}
+
+/* Progress */
+.scr-progress {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(184, 145, 47, 0.4);
+  border-radius: 12px;
+  background: #fffdf8;
+}
+.scr-stat {
+  display: flex;
+  flex-direction: column;
+  min-width: 92px;
+}
+.scr-stat__n {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+  color: #0f6f7c;
+}
+.scr-stat__l {
+  font-size: 12px;
+  color: #6b6158;
+}
+.scr-cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+.scr-cat-pill {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f0e7d6;
+  color: #5a5248;
+}
+
+/* Recent */
+.scr-recent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.scr-recent__label {
+  font-size: 13px;
+  color: #6b6158;
+}
+.scr-recent__chip {
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+  padding: 3px 8px;
+  border: 1px solid rgba(15, 111, 124, 0.35);
+  border-radius: 999px;
+  background: #eef7f8;
+  color: #0f6f7c;
+  cursor: pointer;
+}
+
+/* Controls */
+.scr-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.scr-search {
+  flex: 1 1 240px;
+  min-width: 200px;
+  padding: 9px 12px;
+  border: 1px solid rgba(46, 36, 28, 0.25);
+  border-radius: 10px;
+  font-size: 14px;
+}
+.scr-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #6b6158;
+}
+.scr-select {
+  padding: 8px 10px;
+  border: 1px solid rgba(46, 36, 28, 0.25);
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fffdf8;
+}
+.scr-count {
+  font-size: 13px;
+  color: #6b6158;
+}
+
+/* Table */
+.scr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.scr-table th,
+.scr-table td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid rgba(46, 36, 28, 0.12);
+  vertical-align: middle;
+}
+.scr-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8a8074;
+}
+.scr-mono {
+  font-family: ui-monospace, monospace;
+  font-size: 13px;
+  white-space: nowrap;
+}
+.scr-type {
+  text-transform: capitalize;
+  color: #6b6158;
+}
+
+.scr-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #f0e7d6;
+  color: #6b6158;
+  white-space: nowrap;
+}
+.scr-badge[data-status="approved"] {
+  background: #d9f0dc;
+  color: #1f7a3a;
+}
+.scr-badge[data-status="needs_review"] {
+  background: #eee9df;
+  color: #6b6158;
+}
+.scr-badge[data-status="needs_changes"],
+.scr-badge[data-status="wrong_category"],
+.scr-badge[data-status="wrong_image"],
+.scr-badge[data-status="content_issue"],
+.scr-badge[data-status="technical_problem"] {
+  background: #fbe3d6;
+  color: #a3521f;
+}
+
+.scr-btn {
+  border: 1px solid rgba(46, 36, 28, 0.25);
+  border-radius: 9px;
+  background: #fffdf8;
+  color: #2e241c;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.scr-btn:hover {
+  background: #fff;
+}
+.scr-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.scr-btn--open {
+  border-color: rgba(15, 111, 124, 0.4);
+  color: #0f6f7c;
+}
+
+/* Detail review panel — sits above the real full card overlay. */
+.scr-review-panel {
+  position: fixed;
+  z-index: 100020; /* above .tsc-shell (100010) */
+  top: 0;
+  right: 0;
+  width: min(360px, 100%);
+  max-height: 100vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: #fffdf8;
+  border-left: 1px solid rgba(184, 145, 47, 0.5);
+  box-shadow: -12px 0 40px rgba(48, 36, 24, 0.28);
+}
+.scr-review-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.scr-review-nav__stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.scr-review-pos {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: #6b6158;
+}
+.scr-review-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(46, 36, 28, 0.12);
+}
+.scr-review-cat {
+  font-size: 12px;
+  color: #6b6158;
+}
+.scr-review-marks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.scr-mark {
+  border: 1px solid rgba(46, 36, 28, 0.25);
+  border-radius: 9px;
+  background: #fff;
+  color: #2e241c;
+  padding: 9px 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.scr-mark--active {
+  border-color: #0f6f7c;
+  background: #0f6f7c;
+  color: #fff;
+}
+.scr-review-note-label {
+  font-size: 12px;
+  color: #6b6158;
+}
+.scr-review-note {
+  min-height: 120px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid rgba(46, 36, 28, 0.25);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+}
+
+@media (max-width: 760px) {
+  .scr-review-panel {
+    top: auto;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    max-height: 52vh;
+    border-left: 0;
+    border-top: 1px solid rgba(184, 145, 47, 0.5);
+  }
+}
