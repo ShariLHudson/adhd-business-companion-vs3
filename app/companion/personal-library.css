@@ -29,6 +29,31 @@
   border: 0;
 }
 
+/* Real back control — the approved artwork has no drawn back affordance, so this
+   is a genuine corner button (over blank wall), not a hotspot on the artwork. */
+.personal-library-room__back {
+  position: absolute;
+  top: 0.9rem;
+  left: 0.9rem;
+  z-index: 5;
+  border: 1px solid rgba(30, 79, 79, 0.35);
+  border-radius: 999px;
+  background: rgba(250, 247, 242, 0.92);
+  color: #1e4f4f;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+}
+.personal-library-room__back:hover {
+  background: #fff;
+}
+.personal-library-room__back:focus-visible {
+  outline: 3px solid #1e4f4f;
+  outline-offset: 2px;
+}
+
 /* Width-driven stage — the image sets its own height from its intrinsic 1536×1024
    ratio, so the stage box always equals the *visible* picture (no object-fit
    letterboxing to offset the overlays). Every hotspot % therefore lines up with
@@ -98,30 +123,21 @@
 }
 
 /* Today's Spark — the wrapped gift box on the table.
-   Approved image map: rect coords 660,765,865,980 of the 1536×1024 asset. */
+   Coords from the approved updated artwork (personal-library-with-clickable-gift). */
 .pl-hotspot--gift {
-  left: 42.97%;
-  top: 74.71%;
-  width: 13.35%;
-  height: 21%;
-  border-radius: 0.9rem;
+  left: 44.9%;
+  top: 67.9%;
+  width: 9.5%;
+  height: 17.2%;
+  border-radius: 18%;
 }
 
 /* My Spark Collection — the "View all" panel at the top of My Journey. */
 .pl-hotspot--collection {
-  left: 68%;
+  left: 65.5%;
   top: 20.5%;
-  width: 30%;
+  width: 31.5%;
   height: 14%;
-}
-
-/* Back — the drawn "Welcome Home" pill, top-left. */
-.pl-hotspot--back {
-  left: 5.5%;
-  top: 2.5%;
-  width: 12%;
-  height: 5.5%;
-  border-radius: 999px;
 }
 
 @media (prefers-reduced-motion: reduce) {

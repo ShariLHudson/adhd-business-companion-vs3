@@ -99,6 +99,18 @@ export function PersonalLibraryRoom({
     >
       <h1 className="personal-library-room__sr-title">My Personal Library</h1>
 
+      {/* Back — a real control (the approved artwork has no drawn back affordance). */}
+      <button
+        type="button"
+        className="personal-library-room__back"
+        onClick={onBack}
+        data-testid="personal-library-back"
+        aria-label={backLabel ?? "Back to Welcome Home"}
+      >
+        <span aria-hidden="true">‹ </span>
+        {backLabel ?? "Back to Welcome Home"}
+      </button>
+
       <div className="personal-library-room__stage">
         <img
           className="personal-library-room__image"
@@ -108,16 +120,6 @@ export function PersonalLibraryRoom({
           height={1024}
           decoding="async"
           data-testid="personal-library-image"
-        />
-
-        {/* Back — transparent hotspot over the drawn "Welcome Home" pill. */}
-        <button
-          type="button"
-          className="pl-hotspot pl-hotspot--back"
-          onClick={onBack}
-          data-testid="personal-library-back"
-          aria-label={backLabel ?? "Back to Welcome Home"}
-          title={backLabel ?? "Back to Welcome Home"}
         />
 
         {/* Today's Spark — the wrapped gift on the table opens the real card. */}
