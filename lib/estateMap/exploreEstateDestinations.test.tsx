@@ -96,7 +96,7 @@ describe("Explore Estate visual destinations", () => {
   it("hides catalog-only duplicate plates from Explore Estate", () => {
     const destinations = getExploreEstateDestinations();
     const hidden = [
-      "personal-library",
+      // personal-library is now an included canonical Wander destination.
       "main-staircase",
       "window-seat",
       "momentum-builder",
@@ -165,15 +165,27 @@ describe("Explore Estate visual destinations", () => {
     ]);
   });
 
-  it("excludes Personal Library / Reading Nook Under Stairway from Explore Estate", () => {
+  it("includes My Personal Library but not the Reading Nook Under Stairway plate", () => {
     const destinations = getExploreEstateDestinations();
-    expect(destinations.some((d) => d.id === "personal-library")).toBe(false);
+    // My Personal Library is now a canonical Wander destination…
+    const personalLibrary = destinations.find((d) => d.id === "personal-library");
+    expect(personalLibrary?.name).toBe("My Personal Library");
+    // …opening the same real room (no duplicate destination id / route)…
+    expect(personalLibrary?.destinationId).toBe("personal-library");
+    expect(
+      destinations.filter((d) => d.destinationId === "personal-library").length,
+    ).toBe(1);
+    // …with the approved room art and approved description.
+    expect(personalLibrary?.imagePath).toBe(
+      "/backgrounds/personal-library-background.png",
+    );
+    expect(personalLibrary?.description).toBe(
+      "Your saved Sparks, ideas, notes, actions, lessons, and questions.",
+    );
+    // The borrowed Reading Nook Under Stairway plate stays out.
     expect(destinations.some((d) => d.id === "stairway-reading-nook")).toBe(
       false,
     );
-    expect(
-      destinations.some((d) => d.name === "Personal Library"),
-    ).toBe(false);
     expect(
       destinations.some((d) => d.name === "Reading Nook Under Stairway"),
     ).toBe(false);

@@ -7,6 +7,7 @@ import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndD
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
+import type { PersonalLibraryEntryView } from "@/lib/estate/personalLibraryEntry";
 import { TodaysSparkCardShell } from "@/components/companion/TodaysSparkCardShell";
 import { SparkNoteMyCollection } from "@/components/companion/SparkNoteMyCollection";
 
@@ -22,6 +23,12 @@ type Props = {
   personalDates?: PersonalDate[];
   memberSinceIso?: string | null;
   region?: RegionCode;
+  /**
+   * Which sub-view to land on (from intentional navigation). "collection" /
+   * "find" / "recent" open the real saved-Spark collection; "find" focuses
+   * Search, "recent" shows most-recent-first. Defaults to the plain room.
+   */
+  initialView?: PersonalLibraryEntryView;
 };
 
 /**
@@ -56,9 +63,16 @@ export function PersonalLibraryRoom({
   personalDates,
   memberSinceIso,
   region,
+  initialView = "room",
 }: Props) {
   const [openedCard, setOpenedCard] = useState<SparkNoteDailyCard | null>(null);
-  const [showCollection, setShowCollection] = useState(false);
+  // Intentional navigation can land directly in the saved-Spark collection
+  // (Spark Collection / Find / Recent requests) rather than the plain room.
+  const [showCollection, setShowCollection] = useState(
+    initialView === "collection" ||
+      initialView === "find" ||
+      initialView === "recent",
+  );
 
   const giftButtonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -163,6 +177,7 @@ export function PersonalLibraryRoom({
 
       {showCollection ? (
         <SparkNoteMyCollection
+          autoFocusSearch={initialView === "find"}
           onBack={() => setShowCollection(false)}
           onClose={() => setShowCollection(false)}
         />

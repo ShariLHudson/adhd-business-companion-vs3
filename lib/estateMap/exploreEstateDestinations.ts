@@ -37,7 +37,8 @@ export const EXPLORE_ESTATE_FORBIDDEN_IDS = [
  */
 const EXPLORE_CATALOG_EXCLUDED_IDS = new Set([
   // Removed from Explore Estate (member-facing list)
-  "personal-library",
+  // "personal-library" is intentionally NOT excluded — it is a canonical
+  // Wander destination (My Personal Library) that opens the real room.
   "stairway-reading-nook",
   "main-staircase",
   "window-seat",
@@ -75,7 +76,7 @@ const DISPLAY_NAME_OVERRIDES: Readonly<Record<string, string>> = {
   "spark-estate": "Spark Estate Entry",
   "house-possibility-outside": "Possibility House",
   "round-table": "Round Table Boardroom",
-  "personal-library": "Reading Nook Under Stairway",
+  "personal-library": "My Personal Library",
   portfolio: "Hall of Achievements",
   "estate-gardens": "Estate Garden",
   "the-swing-beneath-the-oak": "Tree Swing",
@@ -96,8 +97,16 @@ const DESTINATION_ID_OVERRIDES: Readonly<Record<string, string>> = {
   "project-room": "goals-projects",
 };
 
+/** Approved member-facing descriptions for specific Wander destinations. */
+const DESCRIPTION_OVERRIDES: Readonly<Record<string, string>> = {
+  "personal-library":
+    "Your saved Sparks, ideas, notes, actions, lessons, and questions.",
+};
+
 /** Prefer a dedicated plate when the manifest primary is a borrowed asset. */
 const IMAGE_PATH_OVERRIDES: Readonly<Record<string, string>> = {
+  // The Wander card must show the same approved art the real room renders.
+  "personal-library": "/backgrounds/personal-library-background.png",
   "round-table": "/backgrounds/round-table-boardroom-background.png",
   "destination-gallery": "/backgrounds/destination-gallery-background.png",
   "art-studio": "/backgrounds/art-studio-background.png",
@@ -359,7 +368,8 @@ function buildFromManifestPlace(
     imagePath,
     mediaType,
     videoPath,
-    description: descriptionFor(place),
+    description:
+      DESCRIPTION_OVERRIDES[place.legacy_place_id] ?? descriptionFor(place),
     destinationType: "room",
     destinationId,
     isAvailable: true,
@@ -691,6 +701,7 @@ export function resetExploreEstateDestinationsCache(): void {
 export const EXPLORE_ESTATE_REQUIRED_NAMES = [
   "Spark Estate Entry",
   "Welcome Home",
+  "My Personal Library",
   "Study Hall",
   "Reading Nook Window",
   "Tea Room",

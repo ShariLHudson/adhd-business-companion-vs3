@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   filterMySparksCollection,
@@ -25,6 +25,8 @@ import { TodaysSparkCardShell } from "./TodaysSparkCardShell";
 type Props = {
   onClose: () => void;
   onBack: () => void;
+  /** Focus the Search field on open (Find/Search navigation intent). */
+  autoFocusSearch?: boolean;
 };
 
 type ResolvedSavedSpark = {
@@ -34,11 +36,20 @@ type ResolvedSavedSpark = {
 };
 
 /** Personal collection of saved Daily Sparks — durable-first, separate from today's discovery. */
-export function SparkNoteMyCollection({ onClose, onBack }: Props) {
+export function SparkNoteMyCollection({
+  onClose,
+  onBack,
+  autoFocusSearch = false,
+}: Props) {
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open: true,
     onClose,
   });
+
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  useEffect(() => {
+    if (autoFocusSearch) searchRef.current?.focus();
+  }, [autoFocusSearch]);
 
   // null = still loading; array = loaded (durable-first, local fallback).
   const [saved, setSaved] = useState<MySparkSavedItem[] | null>(null);
@@ -178,8 +189,10 @@ export function SparkNoteMyCollection({ onClose, onBack }: Props) {
           <label className="spark-note-collection__field">
             <span className="spark-note-collection__field-label">Search</span>
             <input
+              ref={searchRef}
               type="search"
               className="spark-note-collection__input"
+              data-testid="spark-note-collection-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Search saved Sparks…"

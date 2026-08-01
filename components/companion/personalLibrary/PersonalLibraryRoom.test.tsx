@@ -179,6 +179,24 @@ describe("PersonalLibraryRoom", () => {
     expect(isHomeTeaserDismissedToday()).toBe(true);
   });
 
+  it("opens the real saved-Spark collection when initialView is collection/find/recent", async () => {
+    await render({ initialView: "collection" });
+    expect(q('[data-testid="spark-note-my-collection"]')).not.toBeNull();
+  });
+
+  it("focuses Find/Search when opened with initialView=find", async () => {
+    await render({ initialView: "find" });
+    const search = q('[data-testid="spark-note-collection-search"]');
+    expect(search).not.toBeNull();
+    expect(document.activeElement).toBe(search);
+  });
+
+  it("opens the plain room (no collection) by default", async () => {
+    await render();
+    expect(q('[data-testid="spark-note-my-collection"]')).toBeNull();
+    expect(q('[data-testid="pl-todays-spark-open"]')).not.toBeNull();
+  });
+
   it("keeps collection thumbnails on the topic-photo system (not edition covers)", async () => {
     // The room's saved-Spark thumbnails use resolveSparkCardImage (topic
     // photos); edition covers are the full-card hero, resolved separately in

@@ -21,6 +21,10 @@ import {
 } from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
 import { PersonalLibraryRoom } from "@/components/companion/personalLibrary/PersonalLibraryRoom";
+import {
+  resolvePersonalLibraryEntryView,
+  type PersonalLibraryEntryView,
+} from "@/lib/estate/personalLibraryEntry";
 import { ExperienceControlsOverlay } from "@/components/companion/estate/ExperienceControlsOverlay";
 import { GlobalOverlayHost } from "@/components/companion/estate/GlobalOverlayHost";
 import { SoundscapeSelectionOverlay } from "@/components/companion/estate/SoundscapeSelectionOverlay";
@@ -3760,6 +3764,11 @@ export default function CompanionPageClient() {
   // One-shot: the Welcome Home teaser opens Personal Library in Today's Spark
   // arrival mode (auto-opens the daily card); the room clears it after use.
   const [personalLibraryArrival, setPersonalLibraryArrival] = useState(false);
+  // Which Personal Library sub-view intentional navigation should land on
+  // (room / collection / find / recent). Set from the request text at the
+  // single estate-navigation execution point; reset to "room" on teaser arrival.
+  const [personalLibraryInitialView, setPersonalLibraryInitialView] =
+    useState<PersonalLibraryEntryView>("room");
   const [justBeHereSession, setJustBeHereSession] =
     useState<JustBeHereSession | null>(null);
   const [justBeHerePhase, setJustBeHerePhase] = useState<
@@ -22696,6 +22705,12 @@ export default function CompanionPageClient() {
     setStressReliefOffer(null);
     clearOfferStateOnly();
 
+    // Personal Library is one canonical room; the request text decides whether
+    // to land on the room, the Spark collection, Find/Search, or Recent.
+    if (command.section === "personal-library") {
+      setPersonalLibraryInitialView(resolvePersonalLibraryEntryView(userText));
+    }
+
     const roomId = command.roomId ?? command.entryId;
 
     /**
@@ -27177,6 +27192,7 @@ export default function CompanionPageClient() {
               backLabel={workspacePanelBackLabel}
               arrivalMode={personalLibraryArrival}
               onArrivalConsumed={() => setPersonalLibraryArrival(false)}
+              initialView={personalLibraryInitialView}
               firstName={getPrefs().name || null}
               birthday={getRecognitionStore().birthday}
               personalDates={getRecognitionStore().personalDates}
@@ -28228,6 +28244,7 @@ export default function CompanionPageClient() {
         memberSinceIso={getMemberSinceIso()}
         onOpenTodaysSpark={() => {
           setPersonalLibraryArrival(true);
+          setPersonalLibraryInitialView("room");
           openGrowthDestinationCore("personal-library");
         }}
       />
