@@ -114,7 +114,7 @@ const IMAGE_PATH_OVERRIDES: Readonly<Record<string, string>> = {
   portfolio: "/backgrounds/hall-of-achievements-room-background.png",
   "game-room": "/backgrounds/game-room-background.png",
   "gallery-of-firsts": "/backgrounds/gallery-background.png",
-  "creative-studio": "/backgrounds/art-studio-background.png",
+  "creative-studio": "/backgrounds/creative-studio-background.png",
   "cartographers-studio":
     "/backgrounds/cartoghraphers-studio-background.png",
   "woodland-path": "/backgrounds/woodland-pathway.png",
@@ -743,7 +743,7 @@ export const EXPLORE_ESTATE_REQUIRED_BACKGROUNDS: Readonly<
   portfolio: "/backgrounds/hall-of-achievements-room-background.png",
   "game-room": "/backgrounds/game-room-background.png",
   "gallery-of-firsts": "/backgrounds/gallery-background.png",
-  "creative-studio": "/backgrounds/art-studio-background.png",
+  "creative-studio": "/backgrounds/creative-studio-background.png",
   "cartographers-studio":
     "/backgrounds/cartoghraphers-studio-background.png",
   "estate-gardens": "/backgrounds/estate-garden-background.png",

@@ -464,7 +464,7 @@ describe("Explore Estate visual destinations", () => {
     expect(names).toContain("Discovery Room");
     expect(names).toContain("Woodland Path");
     expect(names).toContain("Hall of Achievements");
-    expect(names.some((n) => n.includes("Cartographer"))).toBe(true);
+    expect(names).toContain("Visual Thinking Studio");
     expect(names).not.toContain("Personal Library");
     expect(names).not.toContain("Reading Nook Under Stairway");
     expect(html).toContain("Wander the Estate");
