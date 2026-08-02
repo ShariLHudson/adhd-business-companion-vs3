@@ -22,7 +22,9 @@ import { SPARK_NOTE_CATALOG } from "@/lib/sparkNote/catalog";
 import { resolveSparkCardImage } from "@/lib/sparkNote/resolveSparkCardImage";
 import {
   isHomeTeaserDismissedToday,
+  isTodaysSparkViewed,
   resetSparkNoteStoreForTests,
+  toggleSparkNoteFavorite,
 } from "@/lib/sparkNote/persistence";
 import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { PersonalLibraryRoom } from "./PersonalLibraryRoom";
@@ -195,6 +197,51 @@ describe("PersonalLibraryRoom", () => {
     await render();
     expect(q('[data-testid="spark-note-my-collection"]')).toBeNull();
     expect(q('[data-testid="pl-todays-spark-open"]')).not.toBeNull();
+  });
+
+  it("keeps Today's Spark available after opening and marks it viewed (never dismissed)", async () => {
+    await render();
+    click(q('[data-testid="pl-todays-spark-open"]'));
+    await flush();
+    expect(q('[data-testid="todays-spark-card"]')).not.toBeNull();
+
+    click(q(".tsc-back"));
+    await flush();
+    // The gift entry is STILL present — opening is not completion/dismissal.
+    expect(q('[data-testid="pl-todays-spark-open"]')).not.toBeNull();
+    // …now in a calmer "viewed" state with a Revisit affordance…
+    const state = q('[data-testid="pl-todays-spark-state"]');
+    expect(state?.textContent).toContain("Revisit");
+    // …and viewed is recorded for today.
+    expect(isTodaysSparkViewed(CARD.id)).toBe(true);
+  });
+
+  it("reopening opens the same daily card", async () => {
+    await render();
+    click(q('[data-testid="pl-todays-spark-open"]'));
+    await flush();
+    expect(q('[data-testid="todays-spark-card"]')?.textContent).toContain(CARD.title);
+    click(q(".tsc-back"));
+    await flush();
+    // Reopen via the revisit chip → same daily card.
+    click(q('[data-testid="pl-todays-spark-state"]'));
+    await flush();
+    expect(q('[data-testid="todays-spark-card"]')?.textContent).toContain(CARD.title);
+  });
+
+  it("shows the saved state without removing the Today's Spark entry", async () => {
+    toggleSparkNoteFavorite(CARD.id); // saved to My Spark Collection
+    await render();
+    expect(q('[data-testid="pl-todays-spark-state"]')?.textContent).toContain(
+      "Saved to My Spark Collection",
+    );
+    // The gift entry remains and is still openable.
+    const gift = q('[data-testid="pl-todays-spark-open"]');
+    expect(gift).not.toBeNull();
+    expect(gift?.getAttribute("aria-label")).toContain("saved to My Spark Collection");
+    click(gift);
+    await flush();
+    expect(q('[data-testid="todays-spark-card"]')).not.toBeNull();
   });
 
   it("keeps collection thumbnails on the topic-photo system (not edition covers)", async () => {

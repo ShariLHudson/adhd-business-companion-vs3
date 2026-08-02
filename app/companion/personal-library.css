@@ -1,9 +1,9 @@
 /* My Personal Library room.
-   The approved artwork is the whole room — one complete image (1536×1024). We do
+   The approved artwork is the whole room - one complete image (1536x1024). We do
    NOT redraw it with HTML panels. Interactivity is added as transparent,
    keyboard-accessible hotspots positioned in % of the aspect-locked stage, so
    they stay aligned with the artwork at any scale. The control is the artwork;
-   feedback is a gentle focus/hover glow only — never a button drawn on top. */
+   feedback is a gentle focus/hover glow only - never a button drawn on top. */
 
 .personal-library-room {
   position: relative;
@@ -29,7 +29,7 @@
   border: 0;
 }
 
-/* Real back control — the approved artwork has no drawn back affordance, so this
+/* Real back control - the approved artwork has no drawn back affordance, so this
    is a genuine corner button (over blank wall), not a hotspot on the artwork. */
 .personal-library-room__back {
   position: absolute;
@@ -54,11 +54,11 @@
   outline-offset: 2px;
 }
 
-/* Width-driven stage — the image sets its own height from its intrinsic 1536×1024
+/* Width-driven stage - the image sets its own height from its intrinsic 1536x1024
    ratio, so the stage box always equals the *visible* picture (no object-fit
    letterboxing to offset the overlays). Every hotspot % therefore lines up with
    the artwork at any width; a very short container just scrolls (overflow:auto).
-   Verified: stage box == image box, ratio 1.5, at 375–1200px widths. */
+   Verified: stage box == image box, ratio 1.5, at 375-1200px widths. */
 .personal-library-room__stage {
   position: relative;
   width: 100%;
@@ -122,7 +122,7 @@
   border: 0;
 }
 
-/* Today's Spark — the wrapped gift box on the table.
+/* Today's Spark - the wrapped gift box on the table.
    Coords from the approved updated artwork (personal-library-with-clickable-gift). */
 .pl-hotspot--gift {
   left: 44.9%;
@@ -132,12 +132,52 @@
   border-radius: 18%;
 }
 
-/* My Spark Collection — the "View all" panel at the top of My Journey. */
+/* My Spark Collection - the "View all" panel at the top of My Journey. */
 .pl-hotspot--collection {
   left: 65.5%;
   top: 20.5%;
   width: 31.5%;
   height: 14%;
+}
+
+/* Viewed / saved: the gift stays, but its attention treatment calms down. */
+.pl-hotspot--gift-viewed:hover,
+.pl-hotspot--gift-viewed:focus-visible {
+  background-color: rgba(255, 244, 214, 0.1);
+  box-shadow: 0 0 0 2px rgba(197, 160, 74, 0.32);
+}
+
+/* Visible "revisit / saved" chip just below the gift - a calm, always-available
+   way back into today's card once it has been viewed or saved. */
+.pl-spark-state {
+  position: absolute;
+  left: 49.6%;
+  top: 86.5%;
+  transform: translateX(-50%);
+  max-width: 46%;
+  border: 1px solid rgba(30, 79, 79, 0.35);
+  border-radius: 999px;
+  background: rgba(250, 247, 242, 0.94);
+  color: #1e4f4f;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.16);
+}
+.pl-spark-state:hover {
+  background: #fff;
+}
+.pl-spark-state:focus-visible {
+  outline: 3px solid #1e4f4f;
+  outline-offset: 2px;
+}
+.pl-spark-state--saved {
+  border-color: rgba(184, 145, 47, 0.6);
+  color: #8a6d1f;
 }
 
 @media (prefers-reduced-motion: reduce) {

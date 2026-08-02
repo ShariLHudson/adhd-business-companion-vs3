@@ -1,11 +1,11 @@
-/* Today's Spark full card — the approved prototype "card-shell" style
+/* Today's Spark full card - the approved prototype "card-shell" style
    (todays-spark-to-personal-library-prototype-v2). Clean paper card the gift
-   unwraps: eyebrow · title · subtitle · media · The Story · The Spark ·
+   unwraps: eyebrow - title - subtitle - media - The Story - The Spark -
    Explore It. Closing returns to the gift room. All class names are tsc-*
    prefixed so nothing collides with global element/utility selectors.
 
    Palette (from the prototype :root):
-     paper #fffdf8 · gold #bb7d21 · teal #0f6f7c · ink #2e241c · muted #6b6158 */
+     paper #fffdf8 - gold #bb7d21 - teal #0f6f7c - ink #2e241c - muted #6b6158 */
 
 .tsc-shell {
   position: fixed;
@@ -24,7 +24,7 @@
   background: rgba(30, 31, 30, 0.66);
   backdrop-filter: blur(10px);
 }
-/* Focus is moved here programmatically only to enable keyboard scrolling — no
+/* Focus is moved here programmatically only to enable keyboard scrolling - no
    focus ring around the whole overlay (real controls keep their own :focus). */
 .tsc-shell:focus {
   outline: none;

@@ -129,7 +129,7 @@ export function SparkCardReviewMode() {
               data-testid="scr-back"
               onClick={() => setOpenCardId(null)}
             >
-              ‹ Back to Review List
+              Back to Review List
             </button>
             <div className="scr-review-nav__stepper">
               <button
@@ -139,7 +139,7 @@ export function SparkCardReviewMode() {
                 disabled={!adjacent.prevId}
                 onClick={() => adjacent.prevId && openCard(adjacent.prevId)}
               >
-                ◀ Previous
+                Previous
               </button>
               <span className="scr-review-pos" data-testid="scr-position">
                 {adjacent.index + 1} / {list.length}
@@ -151,7 +151,7 @@ export function SparkCardReviewMode() {
                 disabled={!adjacent.nextId}
                 onClick={() => adjacent.nextId && openCard(adjacent.nextId)}
               >
-                Next ▶
+                Next
               </button>
             </div>
           </div>
@@ -162,7 +162,7 @@ export function SparkCardReviewMode() {
               {SPARK_REVIEW_STATUS_LABEL[review.status]}
             </span>
             <span className="scr-review-cat">
-              {openCardEntry.category} · {openCardEntry.categoryLabel}
+              {openCardEntry.category} - {openCardEntry.categoryLabel}
             </span>
           </div>
 
@@ -185,14 +185,14 @@ export function SparkCardReviewMode() {
           </div>
 
           <label className="scr-review-note-label" htmlFor="scr-review-note">
-            Review note (internal only — never shown to members)
+            Review note (internal only - never shown to members)
           </label>
           <textarea
             id="scr-review-note"
             className="scr-review-note"
             data-testid="scr-review-note"
             value={review.note}
-            placeholder="What needs changing? Category, image, wording, bug…"
+            placeholder="What needs changing? Category, image, wording, bug..."
             onChange={(e) => noteChange(openCardEntry.id, e.target.value)}
           />
         </aside>
@@ -203,7 +203,7 @@ export function SparkCardReviewMode() {
   return (
     <div className="scr-root" data-testid="scr-root">
       <header className="scr-header">
-        <h1 className="scr-title">Spark Card Review — internal</h1>
+        <h1 className="scr-title">Spark Card Review - internal</h1>
         <p className="scr-subtitle">
           Inspect and approve all {cards.length} runtime Spark Cards. Review
           status and notes are private and never appear in the member experience.
@@ -265,7 +265,7 @@ export function SparkCardReviewMode() {
           className="scr-search"
           data-testid="scr-search"
           type="search"
-          placeholder="Search by title or ID…"
+          placeholder="Search by title or ID..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           aria-label="Search Spark Cards"

@@ -1,5 +1,5 @@
 /**
- * Private Spark Card Review store — internal review/QA only.
+ * Private Spark Card Review store - internal review/QA only.
  *
  * Review status + review notes are persisted in localStorage under a namespace
  * that is completely separate from the member's personal Spark Card note
@@ -11,7 +11,7 @@
 import type { SparkNoteCatalogEntry } from "@/lib/sparkNote/types";
 
 export type SparkReviewStatus =
-  | "needs_review" // default — never marked
+  | "needs_review" // default - never marked
   | "approved"
   | "needs_changes"
   | "wrong_category"
@@ -230,7 +230,7 @@ export function getReviewRecentlyOpened(): string[] {
   }
 }
 
-/** Test helper — clear all review state (memory + storage). */
+/** Test helper - clear all review state (memory + storage). */
 export function resetSparkReviewStoreForTests(): void {
   memoryReviews = {};
   memoryRecent = [];

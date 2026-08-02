@@ -31,6 +31,8 @@ export type SparkNotePersistenceStore = {
   reactionsBySparkId: Record<string, SparkNoteReaction[]>;
   /** dayKey the Welcome Home Today's Spark teaser was dismissed (per device). */
   homeTeaserDismissedDay: string | null;
+  /** dayKey -> the Today's Spark id opened that day (viewed-state, resets daily). */
+  todaysSparkViewed: Record<string, string>;
 };
 
 function emptyStore(): SparkNotePersistenceStore {
@@ -47,6 +49,7 @@ function emptyStore(): SparkNotePersistenceStore {
     ignoredCategories: {},
     reactionsBySparkId: {},
     homeTeaserDismissedDay: null,
+    todaysSparkViewed: {},
   };
 }
 
@@ -72,6 +75,7 @@ export function readSparkNoteStore(): SparkNotePersistenceStore {
       ignoredCategories: parsed.ignoredCategories ?? {},
       reactionsBySparkId: parsed.reactionsBySparkId ?? {},
       homeTeaserDismissedDay: parsed.homeTeaserDismissedDay ?? null,
+      todaysSparkViewed: parsed.todaysSparkViewed ?? {},
     };
   } catch {
     return emptyStore();
@@ -90,6 +94,29 @@ export function writeSparkNoteStore(store: SparkNotePersistenceStore): void {
 
 export function resetSparkNoteStoreForTests(): void {
   memoryStore = null;
+}
+
+/**
+ * Today's Spark viewed-state — opening the daily card records it as viewed for
+ * the local calendar day (never a completion/dismissal; the card stays
+ * available). Keyed by dayKey, so it resets automatically at local midnight.
+ */
+export function markTodaysSparkViewed(sparkId: string, now = new Date()): void {
+  const store = readSparkNoteStore();
+  writeSparkNoteStore({
+    ...store,
+    todaysSparkViewed: {
+      ...store.todaysSparkViewed,
+      [dayKey(now)]: sparkId,
+    },
+  });
+}
+
+export function isTodaysSparkViewed(
+  sparkId: string,
+  now = new Date(),
+): boolean {
+  return readSparkNoteStore().todaysSparkViewed[dayKey(now)] === sparkId;
 }
 
 export function dayKey(now = new Date()): string {
