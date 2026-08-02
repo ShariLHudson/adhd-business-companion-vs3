@@ -28243,9 +28243,25 @@ export default function CompanionPageClient() {
         personalDates={getRecognitionStore().personalDates}
         memberSinceIso={getMemberSinceIso()}
         onOpenTodaysSpark={() => {
+          // Open the Personal Library the SAME full-bleed way chat/Wander do
+          // (estate room), not the max-width growth panel - one consistent
+          // presentation regardless of entry path.
           setPersonalLibraryArrival(true);
-          setPersonalLibraryInitialView("room");
-          openGrowthDestinationCore("personal-library");
+          const command = estateNavigateCommandForPlace(
+            "personal-library",
+            "go to my personal library",
+          );
+          if (command) {
+            runDirectEstateRoomNavigation(
+              command,
+              "go to my personal library",
+              undefined,
+              { skipAssistantMessage: true },
+            );
+          } else {
+            setPersonalLibraryInitialView("room");
+            openGrowthDestinationCore("personal-library");
+          }
         }}
       />
       <EstateTopRightChrome
@@ -28322,7 +28338,23 @@ export default function CompanionPageClient() {
         onOpenHallOfAccomplishments={() =>
           openGrowthDestinationCore("growth-portfolio")
         }
-        onOpenPersonalLibrary={() => openGrowthDestinationCore("personal-library")}
+        onOpenPersonalLibrary={() => {
+          // Full-bleed estate-room presentation (same as chat/Wander).
+          const command = estateNavigateCommandForPlace(
+            "personal-library",
+            "go to my personal library",
+          );
+          if (command) {
+            runDirectEstateRoomNavigation(
+              command,
+              "go to my personal library",
+              undefined,
+              { skipAssistantMessage: true },
+            );
+          } else {
+            openGrowthDestinationCore("personal-library");
+          }
+        }}
         onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
         onOpenChamber={() => openChamberOfMomentumCore()}
         onOpenBoardroom={() => openBoardroomCore()}

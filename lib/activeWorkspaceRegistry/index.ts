@@ -17,14 +17,18 @@ export {
   peekRegistryWorkspaceEntry,
   readLastActiveWorkspaceId,
   removeActiveWorkspaceFromContinue,
-  removeActiveWorkspaceFromContinueDurable,
   restoreActiveWorkspace,
-  restoreActiveWorkspaceDurable,
   setLastActiveWorkspaceId,
   touchActiveWorkspace,
   upsertActiveWorkspace,
   wasLastRegistryPersistDurable,
 } from "./registryCore";
+
+/** Durable variants live in registryDurable (not registryCore). */
+export {
+  removeActiveWorkspaceFromContinueDurable,
+  restoreActiveWorkspaceDurable,
+} from "./registryDurable";
 
 /** Create-heavy APIs — pull creationRecord / Event hydrate. */
 export {
