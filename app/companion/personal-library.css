@@ -14,6 +14,14 @@
   overflow: hidden;
   background: #ead9c5; /* matches the room image's warm border */
   container-type: size;
+  /* Center the contained room, and reserve space at the bottom so the baked-in
+     Find/Search + Recent controls (~82% down the artwork) sit ABOVE the app's
+     bottom chrome (the chat panel / Wander "Talk here with Spark" bar) and stay
+     clickable. */
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding-bottom: clamp(104px, 17vh, 188px);
 }
 
 .personal-library-room__sr-title {
@@ -59,10 +67,7 @@
    the container width and height, centered; the image fills it exactly (same
    ratio -> no distortion), so every hotspot % lines up with the artwork. */
 .personal-library-room__stage {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: relative;
   aspect-ratio: 1536 / 1024;
   width: min(100cqw, calc(100cqh * (1536 / 1024)));
   max-width: 100%;
