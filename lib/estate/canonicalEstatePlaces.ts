@@ -750,7 +750,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Personal Library",
     category: "destination",
     primaryFeeling: "Quiet ownership, reading at your own pace",
-    backgroundImage: "/backgrounds/room-library-personal-background.png",
+    backgroundImage: "/backgrounds/personal-library-background.png",
     aliases: [
       "personal library",
       "the personal library",
