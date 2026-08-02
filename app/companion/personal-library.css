@@ -6,15 +6,14 @@
    feedback is a gentle focus/hover glow only - never a button drawn on top. */
 
 .personal-library-room {
-  position: relative;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   min-height: 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow: auto;
+  overflow: hidden;
   background: #ead9c5; /* matches the room image's warm border */
+  container-type: size;
 }
 
 .personal-library-room__sr-title {
@@ -54,22 +53,27 @@
   outline-offset: 2px;
 }
 
-/* Width-driven stage - the image sets its own height from its intrinsic 1536x1024
-   ratio, so the stage box always equals the *visible* picture (no object-fit
-   letterboxing to offset the overlays). Every hotspot % therefore lines up with
-   the artwork at any width; a very short container just scrolls (overflow:auto).
-   Verified: stage box == image box, ratio 1.5, at 375-1200px widths. */
+/* Contain the whole 1536x1024 room within the panel so the ENTIRE artwork -
+   including the Find/Search + Recent controls near the bottom - is always
+   visible (never cut off). The stage is the largest 1536:1024 box that fits both
+   the container width and height, centered; the image fills it exactly (same
+   ratio -> no distortion), so every hotspot % lines up with the artwork. */
 .personal-library-room__stage {
-  position: relative;
-  width: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  aspect-ratio: 1536 / 1024;
+  width: min(100cqw, calc(100cqh * (1536 / 1024)));
   max-width: 100%;
-  margin: auto;
+  max-height: 100%;
 }
 
 .personal-library-room__image {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: fill;
   user-select: none;
   -webkit-user-drag: none;
 }

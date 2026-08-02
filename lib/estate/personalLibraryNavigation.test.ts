@@ -49,6 +49,18 @@ describe("Personal Library chat navigation", () => {
     expect(resolvesToPersonalLibrary("show my recent saved items")).toBe(true);
   });
 
+  it("'spark cards' requests navigate to the Personal Library (not a content query)", () => {
+    for (const phrase of [
+      "go to spark cards",
+      "go to spark card",
+      "show me my spark cards",
+      "search my spark cards",
+      "my spark cards",
+    ]) {
+      expect(resolvesToPersonalLibrary(phrase), phrase).toBe(true);
+    }
+  });
+
   it("Wander 'My Personal Library' opens the same canonical room, no duplicate", () => {
     const dests = getExploreEstateDestinations();
     const pl = dests.find((d) => d.id === "personal-library");

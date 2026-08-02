@@ -117,13 +117,14 @@ describe("SparkNoteChrome — teaser → gift room → full Spark Card", () => {
     expect(hasSave).toBe(true);
   });
 
-  it("hides the teaser only after the full card opens successfully", () => {
+  it("keeps the teaser visible even after the full card opens (never dismissed)", () => {
     render({ visible: true });
     click(q(".spark-note-teaser__button"));
     expect(qa('[data-testid="spark-note-anchor"]')).toHaveLength(1); // still there
     click(q('[data-testid="tsg-gift"]')); // full card opens
-    expect(q('[data-testid="spark-note-anchor"]')).toBeNull(); // now hidden
-    expect(isHomeTeaserDismissedToday()).toBe(true);
+    // The bottom-right teaser stays available all day - opening is not dismissal.
+    expect(q('[data-testid="spark-note-anchor"]')).not.toBeNull();
+    expect(isHomeTeaserDismissedToday()).toBe(false);
   });
 
   it("closing the full card returns to the gift room", () => {

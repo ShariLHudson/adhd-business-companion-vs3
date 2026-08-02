@@ -4,10 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { resolvePinnedDailySparkCard } from "@/lib/sparkNote/evaluateDailySparkNote";
-import {
-  dismissHomeTeaserToday,
-  isHomeTeaserDismissedToday,
-} from "@/lib/sparkNote/persistence";
 import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
 import { SparkNoteAnchor } from "./SparkNoteAnchor";
@@ -51,20 +47,10 @@ export function SparkNoteChrome({
   const [mounted, setMounted] = useState(false);
   const [giftRoomOpen, setGiftRoomOpen] = useState(false);
   const [cardOpen, setCardOpen] = useState(false);
-  const [teaserDismissed, setTeaserDismissed] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    setTeaserDismissed(isHomeTeaserDismissedToday());
   }, []);
-
-  // Dismiss the small teaser ONLY after the full Spark Card has opened.
-  useEffect(() => {
-    if (cardOpen) {
-      dismissHomeTeaserToday();
-      setTeaserDismissed(true);
-    }
-  }, [cardOpen]);
 
   const card = useMemo(() => {
     const inputs = {
@@ -81,7 +67,9 @@ export function SparkNoteChrome({
   }, [firstName, birthday, personalDates, memberSinceIso, region]);
 
   if (!mounted) return null;
-  const showTeaser = visible && Boolean(card) && !teaserDismissed;
+  // The bottom-right Today's Spark teaser stays visible all day - opening it is
+  // not a dismissal, so members can always revisit today's Spark.
+  const showTeaser = visible && Boolean(card);
 
   return createPortal(
     <>
