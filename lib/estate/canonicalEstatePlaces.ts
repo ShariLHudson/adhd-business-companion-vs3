@@ -1372,7 +1372,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     category: "collection",
     primaryFeeling: "Hope, emergence, gentle growth",
     backgroundImage: null,
-    aliases: ["seeds planted", "my spark cards", "planted seeds"],
+    aliases: ["seeds planted", "planted seeds"],
     arrivalBehavior: "object-invitation",
     conversationStyle: "archive-browsing",
     permanentObjects: ["Seed packets", "Labeled stakes", "Starter pots"],

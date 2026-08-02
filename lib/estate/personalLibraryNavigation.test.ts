@@ -61,6 +61,24 @@ describe("Personal Library chat navigation", () => {
     }
   });
 
+  it("'spark cards' phrases resolve to Personal Library, NOT Seeds Planted", () => {
+    // Regression: Seeds Planted used to claim "spark cards" / "my spark cards".
+    for (const phrase of [
+      "show me my spark cards",
+      "my spark cards",
+      "go to spark cards",
+      "spark cards",
+    ]) {
+      const place = resolveEstatePlace(phrase);
+      expect("placeId" in place && place.placeId, phrase).toBe(
+        "personal-library",
+      );
+    }
+    // Seeds Planted still reachable by its own name.
+    const seeds = resolveEstatePlace("go to seeds planted");
+    expect("placeId" in seeds && seeds.placeId).toBe("seeds-planted");
+  });
+
   it("Wander 'My Personal Library' opens the same canonical room, no duplicate", () => {
     const dests = getExploreEstateDestinations();
     const pl = dests.find((d) => d.id === "personal-library");
