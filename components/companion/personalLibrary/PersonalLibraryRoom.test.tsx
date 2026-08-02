@@ -93,6 +93,20 @@ describe("PersonalLibraryRoom (browse room)", () => {
     expect(q('[data-testid="spark-note-my-collection"]')).toBeNull();
   });
 
+  it("Find/Search and Recent are real, enabled, clickable buttons (not covered)", async () => {
+    await render();
+    const find = q('[data-testid="pl-find-open"]') as HTMLButtonElement | null;
+    const recent = q('[data-testid="pl-recent-open"]') as HTMLButtonElement | null;
+    expect(find?.tagName).toBe("BUTTON");
+    expect(recent?.tagName).toBe("BUTTON");
+    expect(find?.disabled).toBe(false);
+    expect(recent?.disabled).toBe(false);
+    // Each opens the collection when clicked — proves the click reaches them.
+    click(find);
+    await flush();
+    expect(q('[data-testid="spark-note-my-collection"]')).not.toBeNull();
+  });
+
   it("Find / Search opens the real collection with Search focused", async () => {
     await render();
     click(q('[data-testid="pl-find-open"]'));

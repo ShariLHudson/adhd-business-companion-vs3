@@ -14,14 +14,15 @@
   overflow: hidden;
   background: #ead9c5; /* matches the room image's warm border */
   container-type: size;
-  /* Center the contained room, and reserve space at the bottom so the baked-in
-     Find/Search + Recent controls (~82% down the artwork) sit ABOVE the app's
-     bottom chrome (the chat panel / Wander "Talk here with Spark" bar) and stay
-     clickable. */
+  /* Personal Library owns the full viewport as a canonical full-screen
+     workspace: the frosted chat composer is hidden and the shared Wander /
+     full-screen bottom control strip is suppressed while it is active
+     (lib/estate/personalLibraryWorkspace.ts), so the artwork is NOT shrunk to
+     dodge bottom chrome. Center the aspect-locked room; the Find/Search + Recent
+     controls (~82% down the artwork) stay fully visible at their drawn spots. */
   display: grid;
   place-items: center;
   box-sizing: border-box;
-  padding-bottom: clamp(104px, 17vh, 188px);
 }
 
 .personal-library-room__sr-title {

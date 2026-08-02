@@ -1820,6 +1820,7 @@ import {
   validateWanderPick,
 } from "@/lib/estate/manifest/estateWanderMode";
 import { EstateMapFullScreen } from "@/components/estateMap";
+import { estateMapFullScreenVisible } from "@/lib/estate/personalLibraryWorkspace";
 import {
   exploreMapLocationIdForPlaceId,
   getExploreSparkMapLocations,
@@ -28554,7 +28555,7 @@ export default function CompanionPageClient() {
       />
 
       <EstateMapFullScreen
-        open={exploreSparkMapOpen}
+        open={estateMapFullScreenVisible(exploreSparkMapOpen, activeSection)}
         onClose={() => returnToWelcomeHomeLobby("explore estate fold")}
         onReturnToEstate={() =>
           returnToWelcomeHomeLobby("explore estate return")
