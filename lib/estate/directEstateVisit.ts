@@ -34,6 +34,14 @@ export const DEDICATED_ESTATE_ROOM_PANEL_SECTIONS: readonly AppSection[] = [
   "visual-focus",
   /** Chamber of Momentum — member gallery, never frosted invitation overlay */
   "chamber-of-momentum",
+  /**
+   * My Personal Library — one canonical browse room (PersonalLibraryRoom) with
+   * Find/Search + Recent controls. Every entry path (Spark Card, chat "go to my
+   * personal library", Wander) must land on this dedicated panel, never the
+   * frosted SparkEstateShell chat overlay (which would hide the room controls
+   * behind a conversation composer).
+   */
+  "personal-library",
 ] as const;
 
 export function isDedicatedEstateRoomPanelSection(

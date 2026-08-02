@@ -31,6 +31,12 @@ export const ESTATE_CORE_FULL_BLEED_PANEL_SECTIONS = [
   "quick-recharge",
   "playbook",
   "create",
+  // My Personal Library owns the viewport so the canonical browse room
+  // (PersonalLibraryRoom) — including the Find/Search + Recent controls near the
+  // bottom of the artwork — renders full-bleed instead of inside the max-width
+  // companion-panel-surface. Pairs with its dedicated-panel entry so every entry
+  // path (Spark Card, chat, Wander) produces the identical full room.
+  "personal-library",
   // Client Avatar is a room (Contextual Workspace pattern): it owns the viewport
   // so WorkspaceShell's room background fills the full height instead of sitting
   // inside the max-w-3xl white/80 companion-panel-surface (which reads as a gray

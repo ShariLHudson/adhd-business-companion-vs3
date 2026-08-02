@@ -22937,6 +22937,56 @@ export default function CompanionPageClient() {
     }
 
     /**
+     * My Personal Library — one canonical browse room (PersonalLibraryRoom) with
+     * its Find/Search + Recent controls. Like the other dedicated panels above,
+     * it must open as a full standalone room (openStandaloneFocusSectionCore),
+     * never the frosted SparkEstateShell chat overlay and never a beside-chat
+     * workspace. Every entry path (Spark Card, chat "go to my personal library",
+     * Wander, room menu) reaches here and lands on the identical room.
+     */
+    if (
+      command.section === "personal-library" ||
+      roomId === "personal-library" ||
+      command.entryId === "personal-library"
+    ) {
+      patchEstateRuntimeState({
+        currentPlaceId: "personal-library",
+        activeConversationMode: true,
+      });
+      registerEstatePendingTransition({
+        destinationSection: "personal-library",
+        destinationEntryId: "personal-library",
+        originalUserIntent: userText,
+        offeredAtTurn: chatTurnRef.current,
+        followUpQuestion: false,
+      });
+      executeEstateCommandMemoryHandoff(command, {
+        userText,
+        fromSection: activeSectionRef.current,
+        playArrival: true,
+        playAmbience: true,
+      });
+      captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
+      clearSplitBesideWorkspace();
+      openStandaloneFocusSectionCore("personal-library");
+      const arrivalAck = navigationLine ?? estateCommandAckLine(command);
+      if (!opts?.skipAssistantMessage && arrivalAck) {
+        if (activeChatTurnLifecycleRef.current) {
+          markAssistantReplied(activeChatTurnLifecycleRef.current);
+        }
+        setMessages((prev) =>
+          prev.some(
+            (m) => m.role === "assistant" && m.content === arrivalAck,
+          )
+            ? prev
+            : [...prev, { role: "assistant", content: arrivalAck }],
+        );
+      }
+      finishEarlyChatTurn();
+      return;
+    }
+
+    /**
      * While Clear My Mind Mode is active, refuse estate room hops that would
      * replace the workspace with frosted chat (Wander / go-to-room).
      * Reflection destinations (Journal, Evidence Vault, Hall of Accomplishments)
