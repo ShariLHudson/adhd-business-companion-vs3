@@ -32,6 +32,6 @@ describe("library vs personal-library navigation", () => {
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
     expect(outcome.placeId).toBe("personal-library");
-    expect(outcome.backgroundImage).toMatch(/personal-library-background/);
+    expect(outcome.backgroundImage).toMatch(/personal-library-search-recent-background/);
   });
 });

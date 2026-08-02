@@ -106,7 +106,7 @@ const DESCRIPTION_OVERRIDES: Readonly<Record<string, string>> = {
 /** Prefer a dedicated plate when the manifest primary is a borrowed asset. */
 const IMAGE_PATH_OVERRIDES: Readonly<Record<string, string>> = {
   // The Wander card must show the same approved art the real room renders.
-  "personal-library": "/backgrounds/personal-library-background.png",
+  "personal-library": "/backgrounds/personal-library-search-recent-background.png",
   "round-table": "/backgrounds/round-table-boardroom-background.png",
   "destination-gallery": "/backgrounds/destination-gallery-background.png",
   "art-studio": "/backgrounds/art-studio-background.png",

@@ -177,7 +177,7 @@ describe("Explore Estate visual destinations", () => {
     ).toBe(1);
     // …with the approved room art and approved description.
     expect(personalLibrary?.imagePath).toBe(
-      "/backgrounds/personal-library-background.png",
+      "/backgrounds/personal-library-search-recent-background.png",
     );
     expect(personalLibrary?.description).toBe(
       "Your saved Sparks, ideas, notes, actions, lessons, and questions.",

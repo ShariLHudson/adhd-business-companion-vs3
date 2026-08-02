@@ -122,14 +122,21 @@
   border: 0;
 }
 
-/* Today's Spark - the wrapped gift box on the table.
-   Coords from the approved updated artwork (personal-library-with-clickable-gift). */
-.pl-hotspot--gift {
-  left: 44.9%;
-  top: 67.9%;
-  width: 9.5%;
-  height: 17.2%;
-  border-radius: 18%;
+/* Find / Search and Recent - the two controls on the bar across the rug.
+   Coords from the approved artwork (personal-library-search-recent-clickable). */
+.pl-hotspot--find {
+  left: 27.4%;
+  top: 82.45%;
+  width: 22.35%;
+  height: 7.85%;
+  border-radius: 999px 0 0 999px;
+}
+.pl-hotspot--recent {
+  left: 49.75%;
+  top: 82.45%;
+  width: 20.05%;
+  height: 7.85%;
+  border-radius: 0 999px 999px 0;
 }
 
 /* My Spark Collection - the "View all" panel at the top of My Journey. */
@@ -138,46 +145,6 @@
   top: 20.5%;
   width: 31.5%;
   height: 14%;
-}
-
-/* Viewed / saved: the gift stays, but its attention treatment calms down. */
-.pl-hotspot--gift-viewed:hover,
-.pl-hotspot--gift-viewed:focus-visible {
-  background-color: rgba(255, 244, 214, 0.1);
-  box-shadow: 0 0 0 2px rgba(197, 160, 74, 0.32);
-}
-
-/* Visible "revisit / saved" chip just below the gift - a calm, always-available
-   way back into today's card once it has been viewed or saved. */
-.pl-spark-state {
-  position: absolute;
-  left: 49.6%;
-  top: 86.5%;
-  transform: translateX(-50%);
-  max-width: 46%;
-  border: 1px solid rgba(30, 79, 79, 0.35);
-  border-radius: 999px;
-  background: rgba(250, 247, 242, 0.94);
-  color: #1e4f4f;
-  padding: 0.3rem 0.85rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.16);
-}
-.pl-spark-state:hover {
-  background: #fff;
-}
-.pl-spark-state:focus-visible {
-  outline: 3px solid #1e4f4f;
-  outline-offset: 2px;
-}
-.pl-spark-state--saved {
-  border-color: rgba(184, 145, 47, 0.6);
-  color: #8a6d1f;
 }
 
 @media (prefers-reduced-motion: reduce) {
