@@ -46,6 +46,7 @@ export function SparkNoteChrome({
   personalDates,
   memberSinceIso,
   region,
+  onOpenTodaysSpark,
 }: Props) {
   const [mounted, setMounted] = useState(false);
   const [giftRoomOpen, setGiftRoomOpen] = useState(false);
@@ -96,7 +97,21 @@ export function SparkNoteChrome({
       {cardOpen && card ? (
         // Full pinned daily Spark Card in the approved card-shell style: correct
         // image + complete content + durable Save. Close returns to the gift room.
-        <TodaysSparkCardShell card={applySparkTestOverride(card)} onClose={() => setCardOpen(false)} />
+        <TodaysSparkCardShell
+          card={applySparkTestOverride(card)}
+          onClose={() => setCardOpen(false)}
+          onGoToPersonalLibrary={
+            onOpenTodaysSpark
+              ? () => {
+                  // Leave the teaser gift-room flow and open the real Personal
+                  // Library (Find/Search + Recent to browse past saved items).
+                  setCardOpen(false);
+                  setGiftRoomOpen(false);
+                  onOpenTodaysSpark();
+                }
+              : undefined
+          }
+        />
       ) : null}
     </>,
     document.body,

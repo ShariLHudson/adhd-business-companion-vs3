@@ -35,9 +35,11 @@ async function flush() {
     await new Promise((resolve) => setTimeout(resolve, 0));
   });
 }
-async function render(card = CARD) {
+async function render(card = CARD, extra: { onGoToPersonalLibrary?: () => void } = {}) {
   await act(async () => {
-    root.render(<TodaysSparkCardShell card={card} onClose={onClose} />);
+    root.render(
+      <TodaysSparkCardShell card={card} onClose={onClose} {...extra} />,
+    );
   });
   await flush();
 }
@@ -93,6 +95,18 @@ describe("TodaysSparkCardShell", () => {
     expect(text).toContain("Save This Spark");
     expect(text).toContain("Save My Note");
     expect(text).toContain("Back to My Personal Library");
+  });
+
+  it("shows a Go to Personal Library action only when wired, and invokes it", async () => {
+    await render();
+    expect(q('[data-testid="todays-spark-go-to-library"]')).toBeNull();
+
+    const onGo = vi.fn();
+    await render(CARD, { onGoToPersonalLibrary: onGo });
+    const btn = q('[data-testid="todays-spark-go-to-library"]');
+    expect(btn?.textContent).toContain("Go to Personal Library");
+    click(btn);
+    expect(onGo).toHaveBeenCalledTimes(1);
   });
 
   it("closes and returns when Back is pressed", async () => {

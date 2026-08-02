@@ -17,8 +17,8 @@
 
 .tsg-room__stage {
   position: relative;
-  aspect-ratio: 1536 / 900; /* matches the extracted room image */
-  width: min(100vw, calc(100dvh * (1536 / 900)));
+  aspect-ratio: 1536 / 1024; /* matches the approved Personal Library image */
+  width: min(100vw, calc(100dvh * (1536 / 1024)));
   max-height: 100dvh;
 }
 
@@ -31,13 +31,14 @@
   pointer-events: none;
 }
 
-/* Invisible clickable region over the baked-in "Welcome Home" label. */
+/* Invisible back region, top-left over the blank wall (this image has no drawn
+   "Welcome Home" pill). Escape / backdrop also closes the overlay. */
 .tsg-room__welcome-home {
   position: absolute;
-  left: 0.6%;
-  top: 1.6%;
-  width: 14%;
-  height: 7%;
+  left: 1%;
+  top: 2%;
+  width: 12%;
+  height: 6%;
   z-index: 4;
   border: 0;
   background: transparent;
@@ -49,13 +50,14 @@
   outline-offset: 2px;
 }
 
-/* Invisible clickable region over the wrapped gift on the table. */
+/* Invisible clickable region over the wrapped gift on the table
+   (approved personal-library-with-clickable-gift coords). */
 .tsg-room__gift {
   position: absolute;
-  left: 37.5%;
-  top: 79%;
-  width: 14%;
-  height: 20%;
+  left: 44.9%;
+  top: 67.9%;
+  width: 9.5%;
+  height: 17.2%;
   z-index: 4;
   border: 0;
   background: transparent;

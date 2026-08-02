@@ -3,12 +3,10 @@
 import { createPortal } from "react-dom";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
-// The exact room extracted from the approved prototype HTML (embedded
-// library-bg), with the baked-in bottom menu bar cropped off. The gift, the
-// "Click the gift to unwrap Today's Spark" callout, and the Welcome Home label
-// are part of this image — so the component only adds invisible clickable
-// hotspots over them (no duplicate UI).
-const GIFT_ROOM_BG = "/backgrounds/todays-spark-gift-room-background.png";
+// The one approved Personal Library room image (personal-library-with-clickable-gift).
+// The gift and the "Click the gift to unwrap Today's Spark" callout are part of
+// this image, so the component only adds invisible clickable hotspots over them.
+const GIFT_ROOM_BG = "/backgrounds/personal-library-background.png";
 
 type Props = {
   /** Back / close → returns to the previous Estate screen. */

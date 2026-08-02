@@ -25,6 +25,12 @@ type Props = {
   card: SparkNoteDailyCard;
   /** Dismiss the card. In the daily-arrival flow this returns to the gift room. */
   onClose: () => void;
+  /**
+   * Optional: go to the Personal Library to browse past saved Spark cards / notes
+   * (Find/Search + Recent). When provided, a "Go to Personal Library" action is
+   * shown alongside Save / Close.
+   */
+  onGoToPersonalLibrary?: () => void;
 };
 
 /** Template invitation shared by every Spark's "Explore It" (not per-card copy). */
@@ -43,7 +49,11 @@ type SaveState = "idle" | "savingSpark" | "savingNote" | "error";
  * Close for Now. Content and image come from the shared Spark resolvers; Save
  * This Spark / Save My Note write through the durable saved-Spark record.
  */
-export function TodaysSparkCardShell({ card, onClose }: Props) {
+export function TodaysSparkCardShell({
+  card,
+  onClose,
+  onGoToPersonalLibrary,
+}: Props) {
   const presentation = useMemo(
     () => resolveSparkCardSimplifiedPresentation(card),
     [card],
@@ -282,6 +292,16 @@ export function TodaysSparkCardShell({ card, onClose }: Props) {
             >
               {saveState === "savingNote" ? "Saving…" : "Save My Note"}
             </button>
+            {onGoToPersonalLibrary ? (
+              <button
+                type="button"
+                className="tsc-secondary"
+                data-testid="todays-spark-go-to-library"
+                onClick={() => onGoToPersonalLibrary()}
+              >
+                Go to Personal Library
+              </button>
+            ) : null}
             <button
               type="button"
               className="tsc-secondary"

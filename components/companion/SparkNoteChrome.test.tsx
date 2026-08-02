@@ -72,9 +72,9 @@ describe("SparkNoteChrome — teaser → gift room → full Spark Card", () => {
     expect(q('[data-testid="todays-spark-gift-room"]')).not.toBeNull();
     expect(q('[data-testid="todays-spark-card"]')).toBeNull(); // card not yet
     expect(q('[data-testid="personal-library-room"]')).toBeNull();
-    // Uses the exact extracted prototype room (not a substitute image).
+    // Uses the one approved Personal Library image (not a substitute image).
     expect(q(".tsg-room__bg")?.style.backgroundImage).toContain(
-      "todays-spark-gift-room-background",
+      "personal-library-background",
     );
   });
 

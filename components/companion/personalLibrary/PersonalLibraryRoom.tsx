@@ -228,7 +228,16 @@ export function PersonalLibraryRoom({
       </div>
 
       {openedCard ? (
-        <TodaysSparkCardShell card={openedCard} onClose={closeSpark} />
+        <TodaysSparkCardShell
+          card={openedCard}
+          onClose={closeSpark}
+          onGoToPersonalLibrary={() => {
+            // Close the card and open the saved-Spark collection, where Find/
+            // Search and Recent live (browse past saved cards + notes).
+            setOpenedCard(null);
+            setShowCollection(true);
+          }}
+        />
       ) : null}
 
       {showCollection ? (
