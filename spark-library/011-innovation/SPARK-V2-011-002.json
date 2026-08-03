@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-011-002",
+  "title": "The Shipping Container That Changed Trade",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Standardized shipping containers reduced the cost and complexity of moving goods between trucks, trains, and ships.",
+  "story": "Standardized shipping containers reduced the cost and complexity of moving goods between trucks, trains, and ships. The breakthrough was not only the box, but the shared system around it. Innovation can come from standardizing the connections between existing parts. Innovation is rarely one perfect idea. It is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Innovation can come from standardizing the connections between existing parts. Innovation is rarely one perfect idea. It is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+  "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Innovation",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "The Shipping Container That Changed Trade",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

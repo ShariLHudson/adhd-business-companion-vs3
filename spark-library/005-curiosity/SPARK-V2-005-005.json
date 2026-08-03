@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-005-005",
+  "title": "Why New Places Make a Day Feel Longer",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Novel experiences create more distinct memories than routine ones.",
+  "story": "Novel experiences create more distinct memories than routine ones. Looking back, a day filled with new details may seem longer because more moments were encoded. Adding small novelty can make life feel less compressed without requiring a dramatic change. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adding small novelty can make life feel less compressed without requiring a dramatic change. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+  "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why New Places Make a Day Feel Longer",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-003-002",
+  "title": "Beethoven After Silence Arrived",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "As Beethoven’s hearing deteriorated, he continued composing music he could no longer experience in the ordinary way.",
+  "story": "As Beethoven’s hearing deteriorated, he continued composing music he could no longer experience in the ordinary way. He relied on memory, structure, vibration, and an internal understanding of sound. A lost method does not always mean the work itself must end; sometimes the creative process must change. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A lost method does not always mean the work itself must end; sometimes the creative process must change. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "Beethoven After Silence Arrived",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

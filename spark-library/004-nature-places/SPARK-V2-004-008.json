@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-004-008",
+  "title": "The Edge Where Two Habitats Meet",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Ecologists often find rich activity where forests meet fields, rivers meet land, or saltwater meets freshwater.",
+  "story": "Ecologists often find rich activity where forests meet fields, rivers meet land, or saltwater meets freshwater. These edges contain tension, exchange, and unusual combinations of life. Transitions can be uncomfortable, but they can also be places of exceptional creativity and possibility. Nature and place can teach us about timing, interdependence, adaptation, patience, and the value of seeing a familiar landscape with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Transitions can be uncomfortable, but they can also be places of exceptional creativity and possibility. Nature and place can teach us about timing, interdependence, adaptation, patience, and the value of seeing a familiar landscape with fresh attention.",
+  "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Nature & Places",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "The Edge Where Two Habitats Meet",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-FALL-002",
+  "title": "What the Harvest Reveals",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Harvest makes results visible: what grew well, what struggled, what weather changed, and what decisions mattered.",
+  "story": "Harvest makes results visible: what grew well, what struggled, what weather changed, and what decisions mattered. The field becomes a record of the entire season rather than a single day. Reflection is a kind of harvest because it gathers meaning from what has already happened. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Reflection is a kind of harvest because it gathers meaning from what has already happened. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+  "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Reflection",
+    "iowa-seasons",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      9,
+      10,
+      11
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "What the Harvest Reveals",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "autumn",
+  "months": [
+    9,
+    10,
+    11
+  ],
+  "volume": 2,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

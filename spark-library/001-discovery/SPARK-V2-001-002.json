@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-001-002",
+  "title": "The Cave That Changed the Timeline",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "In 1940, teenagers near Lascaux in France followed a dog into a narrow opening and found walls covered with prehistoric paintings.",
+  "story": "In 1940, teenagers near Lascaux in France followed a dog into a narrow opening and found walls covered with prehistoric paintings. The images revealed extraordinary observation, movement, and imagination from people who lived thousands of years before written history. The discovery expanded what people believed early humans could notice, create, and communicate. Discovery grows when we notice what does not fit, stay with the question, and resist the urge to explain it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "The discovery expanded what people believed early humans could notice, create, and communicate. Discovery grows when we notice what does not fit, stay with the question, and resist the urge to explain it away too quickly.",
+  "spark_application": "Write down one unexpected result or unanswered question from your own work. List three explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Cave That Changed the Timeline",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

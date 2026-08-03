@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-003-001",
+  "title": "The Pixar Braintrust and Honest Help",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Pixar developed a feedback practice in which filmmakers show unfinished work to trusted peers.",
+  "story": "Pixar developed a feedback practice in which filmmakers show unfinished work to trusted peers. The group’s job is not to take control, but to identify problems candidly while leaving the creator responsible for the solution. Creative work improves when feedback is honest, specific, and separated from authority. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Creative work improves when feedback is honest, specific, and separated from authority. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The Pixar Braintrust and Honest Help",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

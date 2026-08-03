@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-FALL-005",
+  "title": "The Covered-Bridge Detour",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A fall drive through Iowa can become an adventure when the route includes a covered bridge, gravel road, small town, or unexpected overlook.",
+  "story": "A fall drive through Iowa can become an adventure when the route includes a covered bridge, gravel road, small town, or unexpected overlook. The value is not speed but the decision to notice the journey. Adventure can begin by choosing a route that allows discovery instead of only efficiency. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adventure can begin by choosing a route that allows discovery instead of only efficiency. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot.",
+  "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "iowa-seasons",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      9,
+      10,
+      11
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The Covered-Bridge Detour",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "autumn",
+  "months": [
+    9,
+    10,
+    11
+  ],
+  "volume": 2,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

@@ -100,7 +100,11 @@ export function futureSparkCardToCatalogEntry(
     whatHappened: card.story,
     whyItMatters: card.spark,
     sparkApplication: card.action,
-    imageSrc: card.categoryImage,
+    // No explicit imageSrc: the full-card hero already renders the matching
+    // category edition cover (by `category`), and the thumbnail/topic-photo
+    // system stays reserved for real topic/diversity photos. Setting the
+    // categoryImage here would duplicate the cover into the thumbnail slot and
+    // break that separation. `card.categoryImage` is authoring documentation.
     tags: [...card.tags],
     priority: card.priority,
     displayRule: card.displayRule,
@@ -125,9 +129,6 @@ export function futureSparkCardsToCatalog(
   return cards.map(futureSparkCardToCatalogEntry);
 }
 
-/**
- * Volume/seasonal entries integrated into the canonical catalog process.
- * EMPTY in Phase 4 (no card data added) — Volume 2 lands here in Phase 5 so the
- * manifest export remains a no-op diff until then.
- */
-export const INTEGRATED_VOLUME_ENTRIES: readonly SparkNoteCatalogEntry[] = [];
+// The aggregate of integrated volume/seasonal entries lives in
+// `lib/sparkNote/volumes/index.ts` (`INTEGRATED_VOLUME_ENTRIES`) — kept there so
+// this transform module never imports the volume data (avoids a cycle).

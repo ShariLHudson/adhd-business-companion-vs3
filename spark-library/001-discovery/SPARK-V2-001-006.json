@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-001-006",
+  "title": "The Accidental Archive in Tree Rings",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A tree adds growth rings year by year, and those rings can preserve clues about drought, fire, temperature, and injury.",
+  "story": "A tree adds growth rings year by year, and those rings can preserve clues about drought, fire, temperature, and injury. Researchers learned to read trees as records of conditions that no person had written down. Evidence can be stored in places we do not initially recognize as records. Discovery grows when we notice what does not fit, stay with the question, and resist the urge to explain it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Evidence can be stored in places we do not initially recognize as records. Discovery grows when we notice what does not fit, stay with the question, and resist the urge to explain it away too quickly.",
+  "spark_application": "Write down one unexpected result or unanswered question from your own work. List three explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Accidental Archive in Tree Rings",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

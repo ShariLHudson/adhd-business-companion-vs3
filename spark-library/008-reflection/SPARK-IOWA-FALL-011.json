@@ -1,0 +1,45 @@
+{
+  "spark_id": "SPARK-IOWA-FALL-011",
+  "title": "The Pause Before Thanksgiving",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Thanksgiving can carry gratitude, family history, complexity, grief, abundance, and expectation at the same time.",
+  "story": "Thanksgiving can carry gratitude, family history, complexity, grief, abundance, and expectation at the same time. A thoughtful pause allows the day to become more than preparation and performance. Gratitude becomes deeper when it can coexist with honesty. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Gratitude becomes deeper when it can coexist with honesty. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+  "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Reflection",
+    "iowa-seasons",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      9,
+      10,
+      11
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "The Pause Before Thanksgiving",
+  "priority": 300,
+  "display_rule": "calculated-date",
+  "date_rule": "thanksgiving-us",
+  "season": "autumn",
+  "months": [
+    9,
+    10,
+    11
+  ],
+  "volume": 2,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

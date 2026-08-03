@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-003-003",
+  "title": "The LEGO Turnaround",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "LEGO nearly collapsed after expanding into too many products and ventures.",
+  "story": "LEGO nearly collapsed after expanding into too many products and ventures. The company recovered by returning to the value of the brick, listening closely to devoted customers, and becoming more disciplined about what fit the brand. Creativity becomes stronger when it has a clear center rather than unlimited directions. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Creativity becomes stronger when it has a clear center rather than unlimited directions. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The LEGO Turnaround",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

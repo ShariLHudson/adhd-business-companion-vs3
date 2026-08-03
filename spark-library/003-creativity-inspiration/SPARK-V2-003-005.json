@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-003-005",
+  "title": "The Sketchbook Before the Masterpiece",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Great paintings, buildings, products, and stories are often preceded by rough sketches that were never meant to be admired.",
+  "story": "Great paintings, buildings, products, and stories are often preceded by rough sketches that were never meant to be admired. Those pages show thinking in motion: alternatives, mistakes, and discoveries. The rough version is not an embarrassing stage; it is where the idea becomes visible enough to improve. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "The rough version is not an embarrassing stage; it is where the idea becomes visible enough to improve. Creativity is not reserved for rare bursts of inspiration. It grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The Sketchbook Before the Masterpiece",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

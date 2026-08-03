@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-005-007",
+  "title": "Why We Finish a Story in Our Head",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "When information is incomplete, the brain often tries to create a coherent explanation.",
+  "story": "When information is incomplete, the brain often tries to create a coherent explanation. This helps us move quickly, but it can also make assumptions feel like facts. A confident story is not always a complete story. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A confident story is not always a complete story. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+  "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why We Finish a Story in Our Head",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

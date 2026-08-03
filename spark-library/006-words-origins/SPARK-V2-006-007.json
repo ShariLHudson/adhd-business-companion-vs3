@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-006-007",
+  "title": "The Meaning Hidden in Entrepreneur",
+  "category": "Words & Origins",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Entrepreneur comes from a French verb meaning to undertake.",
+  "story": "Entrepreneur comes from a French verb meaning to undertake. The word points less to glamour than to the act of taking responsibility for beginning and carrying something forward. The heart of entrepreneurship is not a title; it is the willingness to undertake uncertain work. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "The heart of entrepreneurship is not a title; it is the willingness to undertake uncertain work. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+  "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Words & Origins",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "006",
+  "category_label": "Words & Origins",
+  "spark_type": "story",
+  "short_title": "The Meaning Hidden in Entrepreneur",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-009-003",
+  "title": "The Cave Beyond the Daylight",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Cave explorers move through spaces where the route, weather, water, and visibility can change quickly.",
+  "story": "Cave explorers move through spaces where the route, weather, water, and visibility can change quickly. Progress depends on communication, redundant safety, and the willingness to turn back. Adventure becomes wiser when courage includes limits. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adventure becomes wiser when courage includes limits. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot.",
+  "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The Cave Beyond the Daylight",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

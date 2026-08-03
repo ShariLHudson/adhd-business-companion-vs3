@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-007-008",
+  "title": "The Option Value of Waiting",
+  "category": "Strategy",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Sometimes waiting preserves choices while new information arrives.",
+  "story": "Sometimes waiting preserves choices while new information arrives. Other times delay quietly removes options. The strategic question is whether waiting is buying information or merely avoiding discomfort. Timing is a decision, even when no visible action is taken. Strategy is the discipline of choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Timing is a decision, even when no visible action is taken. Strategy is the discipline of choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+  "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Strategy",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "007",
+  "category_label": "Strategy",
+  "spark_type": "story",
+  "short_title": "The Option Value of Waiting",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

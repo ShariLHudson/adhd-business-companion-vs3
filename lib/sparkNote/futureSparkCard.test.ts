@@ -41,7 +41,9 @@ describe("futureSparkCardToCatalogEntry — body + metadata mapping", () => {
     expect(e.id).toBe("SPARK-Y");
     expect(e.category).toBe("001");
     expect(e.categoryLabel).toBe("Discovery");
-    expect(e.imageSrc).toBe("/spark-card-images/discovery.png");
+    // No explicit imageSrc — the category edition cover renders the hero, and the
+    // thumbnail/topic-photo system stays reserved for real photos.
+    expect(e.imageSrc).toBeUndefined();
     expect(e.tags).toEqual(["Discovery", "volume-2"]);
     expect(e.priority).toBe(100);
     expect(e.shortTitle).toBe("SPARK-Y");

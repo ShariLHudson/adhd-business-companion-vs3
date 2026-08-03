@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-001-008",
+  "title": "The Missing Piece in the Photograph",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Early astronomers compared photographs of the same patch of sky and noticed tiny points that shifted position or changed brightness.",
+  "story": "Early astronomers compared photographs of the same patch of sky and noticed tiny points that shifted position or changed brightness. Those differences helped reveal asteroids, variable stars, and distant explosions. Comparison can expose change that a single snapshot hides. Discovery grows when we notice what does not fit, stay with the question, and resist the urge to explain it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Comparison can expose change that a single snapshot hides. Discovery grows when we notice what does not fit, stay with the question, and resist the urge to explain it away too quickly.",
+  "spark_application": "Write down one unexpected result or unanswered question from your own work. List three explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Missing Piece in the Photograph",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

@@ -7,7 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { SEED_SPARK_NOTE_CATALOG } from "../lib/sparkNote/catalogSeed";
-import { INTEGRATED_VOLUME_ENTRIES } from "../lib/sparkNote/futureSparkCard";
+import { INTEGRATED_VOLUME_ENTRIES } from "../lib/sparkNote/volumes";
 import { libraryFolderForCategory } from "../lib/sparkNote/contentDatabase/folders";
 import { catalogEntryToRecord } from "../lib/sparkNote/contentDatabase/mapRecord";
 import type { SparkContentRecord } from "../lib/sparkNote/contentDatabase/types";

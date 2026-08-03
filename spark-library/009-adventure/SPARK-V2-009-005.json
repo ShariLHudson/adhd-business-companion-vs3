@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-009-005",
+  "title": "The First Solo Flight",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Early solo pilots describe a moment when instruction becomes personal responsibility.",
+  "story": "Early solo pilots describe a moment when instruction becomes personal responsibility. The skills were practiced with support, but the flight requires the learner to trust preparation and respond alone. Independence is often built through supported practice before the visible leap. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Independence is often built through supported practice before the visible leap. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot.",
+  "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The First Solo Flight",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

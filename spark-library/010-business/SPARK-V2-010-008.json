@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-010-008",
+  "title": "The Founder Who Documented the Process",
+  "category": "Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A repeated task becomes easier to delegate, improve, and protect when the steps and reasoning are recorded.",
+  "story": "A repeated task becomes easier to delegate, improve, and protect when the steps and reasoning are recorded. Documentation turns private memory into a business asset. A system begins when knowledge no longer depends on one person remembering everything. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the success story. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A system begins when knowledge no longer depends on one person remembering everything. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the success story.",
+  "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Business",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "010",
+  "category_label": "Business",
+  "spark_type": "story",
+  "short_title": "The Founder Who Documented the Process",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

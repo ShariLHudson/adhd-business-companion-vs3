@@ -49,10 +49,12 @@ const EDITION_LABEL: Record<SparkNoteCategory, string> = {
   "012": "Wonder",
 };
 
+// Seed 112 + Volume 2 (96 core, 8 per category) + Iowa Fall (12) = 220.
 const EXPECTED_COUNTS: Record<string, number> = {
-  "001": 5, "002": 11, "003": 9, "004": 5, "005": 7, "006": 13,
-  "007": 12, "008": 16, "009": 3, "010": 12, "011": 14, "012": 5,
+  "001": 13, "002": 20, "003": 18, "004": 14, "005": 16, "006": 22,
+  "007": 21, "008": 26, "009": 12, "010": 21, "011": 22, "012": 15,
 };
+const EXPECTED_TOTAL = 220;
 
 const manifest = manifestJson as Array<{
   spark_id: string;
@@ -62,7 +64,7 @@ const manifest = manifestJson as Array<{
 
 describe("12-category Spark migration", () => {
   it("every runtime card uses only categories 001–012", () => {
-    expect(SPARK_NOTE_CATALOG.length).toBe(112);
+    expect(SPARK_NOTE_CATALOG.length).toBe(EXPECTED_TOTAL);
     for (const card of SPARK_NOTE_CATALOG) {
       expect(NUMBERED_SET.has(card.category)).toBe(true);
     }
@@ -95,14 +97,19 @@ describe("12-category Spark migration", () => {
     }
   });
 
-  it("the regenerated manifest contains the same 112 cards with numbered categories", () => {
-    expect(manifest.length).toBe(112);
+  it("the regenerated manifest holds all 220 cards (seed + Volume 2) with numbered categories", () => {
+    expect(manifest.length).toBe(EXPECTED_TOTAL);
+    // Every seed card is still present…
     const seedIds = new Set(SEED_SPARK_NOTE_CATALOG.map((e) => e.id));
     expect(seedIds.size).toBe(112);
+    const manifestIds = new Set(manifest.map((r) => r.spark_id));
+    for (const id of seedIds) expect(manifestIds.has(id)).toBe(true);
+    // …the rest are integrated Volume 2 records, and every record is numbered.
     for (const record of manifest) {
-      expect(seedIds.has(record.spark_id)).toBe(true);
       expect(NUMBERED_SET.has(record.runtime_category ?? "")).toBe(true);
     }
+    // No duplicate spark_ids across the whole manifest.
+    expect(manifestIds.size).toBe(manifest.length);
   });
 
   it("resolves every card's full-card hero to its category edition cover", () => {

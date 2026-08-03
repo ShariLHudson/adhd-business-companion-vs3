@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V2-009-001",
+  "title": "The First Step on the Appalachian Trail",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A long trail is completed through thousands of ordinary decisions: when to start, where to rest, what to carry, and how to respond when conditions change.",
+  "story": "A long trail is completed through thousands of ordinary decisions: when to start, where to rest, what to carry, and how to respond when conditions change. The dramatic idea of the journey is sustained by practical choices. Adventure depends on preparation and adaptation as much as courage. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adventure depends on preparation and adaptation as much as courage. Adventure begins with movement into the unfamiliar. The step does not need to be dramatic; it only needs to teach something that staying still cannot.",
+  "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "core",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The First Step on the Appalachian Trail",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 2,
+  "collection": "core"
+}

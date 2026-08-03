@@ -1,0 +1,46 @@
+{
+  "spark_id": "SPARK-IOWA-FALL-012",
+  "title": "The Night of Costumes and Porch Lights",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "On October 31, neighborhoods change for a few hours as costumes, stories, porch lights, and shared traditions turn familiar streets into playful spaces.",
+  "story": "On October 31, neighborhoods change for a few hours as costumes, stories, porch lights, and shared traditions turn familiar streets into playful spaces. Wonder can be created collectively when people agree to see the ordinary differently for a night. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Wonder can be created collectively when people agree to see the ordinary differently for a night. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+  "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Wonder",
+    "iowa-seasons",
+    "volume-2"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      9,
+      10,
+      11
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "The Night of Costumes and Porch Lights",
+  "priority": 300,
+  "display_rule": "exact-date",
+  "season": "autumn",
+  "month": 10,
+  "day": 31,
+  "months": [
+    9,
+    10,
+    11
+  ],
+  "volume": 2,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}
