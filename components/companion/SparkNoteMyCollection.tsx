@@ -3,13 +3,21 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  filterMySparksCollection,
   formatMySparkSavedDate,
-  mySparkCollectionCategories,
-  type MySparkCollectionDateFilter,
-  type MySparkCollectionSort,
   type MySparkSavedItem,
 } from "@/lib/sparkNote/mySparksCollection";
+import {
+  PERSONAL_LIBRARY_ALPHABET_RANGES,
+  PERSONAL_LIBRARY_DATE_OPTIONS,
+  PERSONAL_LIBRARY_ITEM_TYPES,
+  filterAndSortPersonalLibrary,
+  personalLibraryEmptyState,
+  shouldShowPersonalLibraryResults,
+  sparkRecordsForItemType,
+  type AlphabetRangeId,
+  type PersonalLibraryDateOption,
+  type PersonalLibraryItemType,
+} from "@/lib/sparkNote/personalLibraryFilters";
 import {
   loadMySparksCollection,
   removeSparkDurable,
@@ -25,7 +33,11 @@ import { TodaysSparkCardShell } from "./TodaysSparkCardShell";
 type Props = {
   onClose: () => void;
   onBack: () => void;
-  /** Focus the Search field on open (Find/Search navigation intent). */
+  /**
+   * Focus the first filter (Item Type) on open — the Find/Search navigation
+   * intent from the room. (The free-text search box was replaced by the
+   * Item Type / Alphabet Range / Date dropdowns.)
+   */
   autoFocusSearch?: boolean;
 };
 
@@ -46,10 +58,14 @@ export function SparkNoteMyCollection({
     onClose,
   });
 
-  const searchRef = useRef<HTMLInputElement | null>(null);
+  const itemTypeRef = useRef<HTMLSelectElement | null>(null);
   useEffect(() => {
-    if (autoFocusSearch) searchRef.current?.focus();
+    if (autoFocusSearch) itemTypeRef.current?.focus();
   }, [autoFocusSearch]);
+
+  // Preserve the results scroll position across opening/closing a record.
+  const listRef = useRef<HTMLUListElement | null>(null);
+  const savedScrollTop = useRef(0);
 
   // null = still loading; array = loaded (durable-first, local fallback).
   const [saved, setSaved] = useState<MySparkSavedItem[] | null>(null);
@@ -58,11 +74,11 @@ export function SparkNoteMyCollection({
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [removeError, setRemoveError] = useState<string | null>(null);
 
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<string>("");
-  const [dateFilter, setDateFilter] =
-    useState<MySparkCollectionDateFilter>("all");
-  const [sort, setSort] = useState<MySparkCollectionSort>("newest");
+  // Item Type + Alphabet Range gate the results; Date is optional.
+  const [itemType, setItemType] = useState<PersonalLibraryItemType | "">("");
+  const [alphabetRange, setAlphabetRange] = useState<AlphabetRangeId | "">("");
+  const [dateOption, setDateOption] =
+    useState<PersonalLibraryDateOption>("all");
 
   useEffect(() => {
     let active = true;
@@ -83,8 +99,7 @@ export function SparkNoteMyCollection({
     });
   }
 
-  const items = saved ?? [];
-  const categories = mySparkCollectionCategories(items);
+  const items = useMemo(() => saved ?? [], [saved]);
 
   // Resolve each saved Spark to its full card (to reopen) + a visual reference.
   const resolvedById = useMemo(() => {
@@ -101,31 +116,47 @@ export function SparkNoteMyCollection({
     return map;
   }, [items]);
 
-  const filtered = useMemo(
-    () =>
-      filterMySparksCollection({
-        items,
-        query,
-        category: category || null,
-        dateFilter,
-        sort,
-      }),
-    [items, query, category, dateFilter, sort],
-  );
+  const showResults = shouldShowPersonalLibraryResults(itemType, alphabetRange);
+
+  // Records backing the chosen Item Type, then narrowed by Alphabet Range + Date.
+  const filtered = useMemo(() => {
+    if (!itemType || !alphabetRange) return [] as MySparkSavedItem[];
+    const records = sparkRecordsForItemType(itemType, items).map((item) => ({
+      ...item,
+      dateIso: item.savedAtIso,
+    }));
+    return filterAndSortPersonalLibrary({
+      records,
+      alphabetRange,
+      dateOption,
+    });
+  }, [items, itemType, alphabetRange, dateOption]);
 
   // Durable is enabled but we could only load the on-device copy → be honest.
   const degraded = source === "local" && isSavedSparkDurableEnabled();
 
   function handleOpen(id: string) {
     const resolved = resolvedById.get(id);
-    if (resolved?.card) setOpenedCard(resolved.card);
+    if (!resolved?.card) return;
+    // Remember where the member was so closing the record restores their place.
+    savedScrollTop.current = listRef.current?.scrollTop ?? 0;
+    setOpenedCard(resolved.card);
   }
 
   function handleCloseCard() {
     setOpenedCard(null);
     // A save/remove may have happened inside the card — reflect it truthfully.
+    // Item Type / Alphabet Range / Date selections are preserved (component
+    // state is untouched); restore the scroll position too.
     refresh();
   }
+
+  // Restore scroll position after the record closes and the list re-renders.
+  useEffect(() => {
+    if (openedCard) return;
+    const list = listRef.current;
+    if (list) list.scrollTop = savedScrollTop.current;
+  }, [openedCard, filtered]);
 
   async function handleRemove(id: string) {
     setRemovingId(id);
@@ -186,33 +217,45 @@ export function SparkNoteMyCollection({
         </p>
 
         <div className="spark-note-collection__filters">
-          <label className="spark-note-collection__field">
-            <span className="spark-note-collection__field-label">Search</span>
-            <input
-              ref={searchRef}
-              type="search"
-              className="spark-note-collection__input"
-              data-testid="spark-note-collection-search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search saved Sparks…"
-            />
-          </label>
-
           <div className="spark-note-collection__filter-row">
             <label className="spark-note-collection__field spark-note-collection__field--compact">
               <span className="spark-note-collection__field-label">
-                Category
+                Item Type
+              </span>
+              <select
+                ref={itemTypeRef}
+                className="spark-note-collection__select"
+                data-testid="spark-note-collection-item-type"
+                value={itemType}
+                onChange={(event) =>
+                  setItemType(event.target.value as PersonalLibraryItemType | "")
+                }
+              >
+                <option value="">Choose a type…</option>
+                {PERSONAL_LIBRARY_ITEM_TYPES.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="spark-note-collection__field spark-note-collection__field--compact">
+              <span className="spark-note-collection__field-label">
+                Alphabet Range
               </span>
               <select
                 className="spark-note-collection__select"
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
+                data-testid="spark-note-collection-alphabet-range"
+                value={alphabetRange}
+                onChange={(event) =>
+                  setAlphabetRange(event.target.value as AlphabetRangeId | "")
+                }
               >
-                <option value="">All categories</option>
-                {categories.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
+                <option value="">Choose a range…</option>
+                {PERSONAL_LIBRARY_ALPHABET_RANGES.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
                   </option>
                 ))}
               </select>
@@ -222,28 +265,17 @@ export function SparkNoteMyCollection({
               <span className="spark-note-collection__field-label">Date</span>
               <select
                 className="spark-note-collection__select"
-                value={dateFilter}
+                data-testid="spark-note-collection-date"
+                value={dateOption}
                 onChange={(event) =>
-                  setDateFilter(event.target.value as MySparkCollectionDateFilter)
+                  setDateOption(event.target.value as PersonalLibraryDateOption)
                 }
               >
-                <option value="all">All dates</option>
-                <option value="this-month">This month</option>
-                <option value="this-year">This year</option>
-              </select>
-            </label>
-
-            <label className="spark-note-collection__field spark-note-collection__field--compact">
-              <span className="spark-note-collection__field-label">Sort</span>
-              <select
-                className="spark-note-collection__select"
-                value={sort}
-                onChange={(event) =>
-                  setSort(event.target.value as MySparkCollectionSort)
-                }
-              >
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
+                {PERSONAL_LIBRARY_DATE_OPTIONS.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </label>
           </div>
@@ -270,27 +302,42 @@ export function SparkNoteMyCollection({
           <p className="spark-note-collection__empty" role="status">
             Gathering your saved Sparks…
           </p>
-        ) : items.length === 0 ? (
-          <div className="spark-note-collection__empty-state">
-            <p className="spark-note-collection__empty">
-              Sparks you keep will appear here. When something resonates, tap Save
-              on Today’s Spark and it will be waiting for you.
-            </p>
-            <button
-              type="button"
-              className="spark-note-collection__empty-action"
-              onClick={onBack}
-              data-testid="spark-note-collection-back-to-today"
-            >
-              Back to Today’s Spark
-            </button>
-          </div>
-        ) : filtered.length === 0 ? (
-          <p className="spark-note-collection__empty">
-            No saved Sparks match your filters yet.
+        ) : !showResults ? (
+          <p
+            className="spark-note-collection__empty"
+            role="status"
+            data-testid="spark-note-collection-choose-filters"
+          >
+            Choose an item type and a letter range to see your saved items.
           </p>
+        ) : filtered.length === 0 ? (
+          <div
+            className="spark-note-collection__empty-state"
+            data-testid="spark-note-collection-empty-state"
+            data-item-type={itemType}
+          >
+            <p
+              className="spark-note-collection__empty"
+              data-testid="spark-note-collection-empty-heading"
+            >
+              {personalLibraryEmptyState(itemType as PersonalLibraryItemType).heading}
+            </p>
+            <p className="spark-note-collection__empty">
+              {personalLibraryEmptyState(itemType as PersonalLibraryItemType).body}
+            </p>
+            {itemType === "spark-cards" ? (
+              <button
+                type="button"
+                className="spark-note-collection__empty-action"
+                onClick={onBack}
+                data-testid="spark-note-collection-back-to-today"
+              >
+                Back to Today’s Spark
+              </button>
+            ) : null}
+          </div>
         ) : (
-          <ul className="spark-note-collection__list">
+          <ul ref={listRef} className="spark-note-collection__list">
             {filtered.map((item) => {
               const resolved = resolvedById.get(item.id);
               const canOpen = Boolean(resolved?.card);

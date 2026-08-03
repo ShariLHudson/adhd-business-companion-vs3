@@ -173,6 +173,7 @@ function snapshotToItem(payload: SavedSparkPayload): MySparkSavedItem | null {
     shortTitle: payload.title,
     teaser: "",
     savedAtIso: payload.savedAtIso,
+    ...(payload.note?.trim() ? { note: payload.note.trim() } : {}),
   };
 }
 
@@ -196,10 +197,14 @@ export async function loadMySparksCollection(): Promise<MySparksCollectionLoad> 
     const durable = await listSavedSparkDurable();
     const byId = new Map<string, MySparkSavedItem>();
     for (const payload of durable) {
-      const item =
+      const base =
         buildMySparkSavedItem(payload.sparkId, payload.savedAtIso) ??
         snapshotToItem(payload);
-      if (item) byId.set(payload.sparkId, item);
+      if (!base) continue;
+      // Carry the member's saved note through so "My Ideas & Notes" can surface
+      // saved Sparks that have a note (the only real data for that item type).
+      const note = payload.note?.trim();
+      byId.set(payload.sparkId, note ? { ...base, note } : base);
     }
 
     // Merge local-only ids not yet (or not) durable so nothing the member saved

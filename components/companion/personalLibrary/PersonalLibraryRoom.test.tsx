@@ -107,13 +107,13 @@ describe("PersonalLibraryRoom (browse room)", () => {
     expect(q('[data-testid="spark-note-my-collection"]')).not.toBeNull();
   });
 
-  it("Find / Search opens the real collection with Search focused", async () => {
+  it("Find / Search opens the real collection focused on the Item Type filter", async () => {
     await render();
     click(q('[data-testid="pl-find-open"]'));
     await flush();
     expect(q('[data-testid="spark-note-my-collection"]')).not.toBeNull();
     expect(document.activeElement).toBe(
-      q('[data-testid="spark-note-collection-search"]'),
+      q('[data-testid="spark-note-collection-item-type"]'),
     );
   });
 
@@ -135,7 +135,7 @@ describe("PersonalLibraryRoom (browse room)", () => {
     await render({ initialView: "find" });
     expect(q('[data-testid="spark-note-my-collection"]')).not.toBeNull();
     expect(document.activeElement).toBe(
-      q('[data-testid="spark-note-collection-search"]'),
+      q('[data-testid="spark-note-collection-item-type"]'),
     );
   });
 

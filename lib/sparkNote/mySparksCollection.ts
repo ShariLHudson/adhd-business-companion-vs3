@@ -24,6 +24,12 @@ export type MySparkSavedItem = NonNullable<
   ReturnType<typeof catalogEntryToSavedCard>
 > & {
   savedAtIso: string | null;
+  /**
+   * The member's saved note ("My notes and ideas") for this Spark, when present.
+   * Only the durable record carries it; local-only saves have none. Drives the
+   * Personal Library "My Ideas & Notes" item type (saved Sparks that have a note).
+   */
+  note?: string;
 };
 
 export type MySparkCollectionDateFilter = "all" | "this-month" | "this-year";
