@@ -1,4 +1,3 @@
-import type { RegionCode } from "@/lib/companionLanguage";
 import {
   DEFAULT_SPARK_NOTE_COOLDOWN_DAYS,
   SPARK_NOTE_CATALOG,
@@ -21,7 +20,13 @@ import {
 } from "./librarySelection";
 import { pickAffinityWeightedFromPool } from "./preferenceLearning";
 import { resolveFallbackSparkCard } from "./runtimeIntegration";
-import { currentSparkSeason, matchesSeasonEntry } from "./seasonalPersonality";
+import { currentSparkSeason } from "./seasonalPersonality";
+import {
+  isCoreEligible,
+  matchesCalculatedTier,
+  matchesDateTier,
+  matchesSeasonalTier,
+} from "./scheduling/selectSchedule";
 import type {
   EvaluateDailySparkNoteInput,
   EvaluateDailySparkNoteOutput,
@@ -62,31 +67,6 @@ function entryToCard(
   };
 }
 
-function matchesDateEntry(
-  entry: SparkNoteCatalogEntry,
-  now: Date,
-  region: RegionCode,
-): boolean {
-  if (entry.regions && !entry.regions.includes(region)) return false;
-  const month = now.getMonth() + 1;
-  const day = now.getDate();
-  if (entry.monthDay) {
-    return entry.monthDay.month === month && entry.monthDay.day === day;
-  }
-  if (entry.months) {
-    return entry.months.includes(month);
-  }
-  return false;
-}
-
-function matchesSeasonalEntry(
-  entry: SparkNoteCatalogEntry,
-  now: Date,
-): boolean {
-  if (entry.monthDay || entry.months) return false;
-  return matchesSeasonEntry(entry, currentSparkSeason(now));
-}
-
 function pickFromPool(
   pool: SparkNoteCatalogEntry[],
   seed: string,
@@ -95,23 +75,40 @@ function pickFromPool(
   return pickAffinityWeightedFromPool(pool, seed);
 }
 
+/**
+ * Resolve today's catalog Spark using the normalized selection tiers, in order:
+ *   1. exact-date (legacy monthDay/months compat + new exact-date)
+ *   2. calculated-date (new computed holidays)
+ *   3. eligible seasonal (legacy seasons + new seasonal)
+ *   4. eligible core (evergreen) with catalog-wide repeat protection + unseen
+ *      preference
+ *
+ * Legacy cards flow through the exact same branches the pre-Phase-3 selector
+ * used (see scheduling/selectSchedule.ts COMPATIBILITY CONTRACT), so their
+ * selection outcomes are unchanged. `catalog` is injectable for tests only;
+ * production always uses SPARK_NOTE_CATALOG.
+ */
 function resolveFromCatalog(
   now: Date,
-  region: RegionCode,
+  region: string,
+  catalog: readonly SparkNoteCatalogEntry[] = SPARK_NOTE_CATALOG,
 ): SparkNoteDailyCard | null {
   const seed = `${dayKey(now)}:spark-note`;
+  const memberRegion = region;
+  const notCooled = (entry: SparkNoteCatalogEntry) =>
+    !sparkNoteOnCooldown(
+      entry.id,
+      entry.cooldownDays ?? DEFAULT_SPARK_NOTE_COOLDOWN_DAYS,
+      now,
+    );
+  const byPriority = (a: SparkNoteCatalogEntry, b: SparkNoteCatalogEntry) =>
+    (b.priority ?? 0) - (a.priority ?? 0);
 
-  const dateCandidates = SPARK_NOTE_CATALOG.filter(
-    (entry) =>
-      matchesDateEntry(entry, now, region) &&
-      !sparkNoteOnCooldown(
-        entry.id,
-        entry.cooldownDays ?? DEFAULT_SPARK_NOTE_COOLDOWN_DAYS,
-        now,
-      ),
-  ).sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
-
-  // Calendar delights are welcome — but not when celebrations would dominate.
+  // 1. exact-date (+ legacy monthDay/months, unchanged). Calendar delights are
+  // welcome — but not when celebrations would dominate (legacy variety rule).
+  const dateCandidates = catalog
+    .filter((entry) => matchesDateTier(entry, now, memberRegion) && notCooled(entry))
+    .sort(byPriority);
   if (
     dateCandidates.length > 0 &&
     !shouldYieldCalendarSparkForVariety(dateCandidates[0]!)
@@ -119,51 +116,47 @@ function resolveFromCatalog(
     return entryToCard(dateCandidates[0]!, "date");
   }
 
-  const season = currentSparkSeason(now);
-  const seasonalCandidates = SPARK_NOTE_CATALOG.filter(
-    (entry) =>
-      matchesSeasonalEntry(entry, now) &&
-      !sparkNoteOnCooldown(
-        entry.id,
-        entry.cooldownDays ?? DEFAULT_SPARK_NOTE_COOLDOWN_DAYS,
-        now,
-      ) &&
-      !shouldYieldCalendarSparkForVariety(entry),
-  ).sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
+  // 2. calculated-date (new computed holidays).
+  const calculatedCandidates = catalog
+    .filter(
+      (entry) => matchesCalculatedTier(entry, now, memberRegion) && notCooled(entry),
+    )
+    .sort(byPriority);
+  if (
+    calculatedCandidates.length > 0 &&
+    !shouldYieldCalendarSparkForVariety(calculatedCandidates[0]!)
+  ) {
+    return entryToCard(calculatedCandidates[0]!, "date");
+  }
 
+  // 3. eligible seasonal.
+  const seasonalCandidates = catalog
+    .filter(
+      (entry) =>
+        matchesSeasonalTier(entry, now, memberRegion) &&
+        notCooled(entry) &&
+        !shouldYieldCalendarSparkForVariety(entry),
+    )
+    .sort(byPriority);
   if (seasonalCandidates.length > 0) {
     const chosen = pickAffinityWeightedFromPool(
       seasonalCandidates,
-      `${seed}:season:${season}`,
+      `${seed}:season:${currentSparkSeason(now)}`,
     );
     if (chosen) return entryToCard(chosen, "date");
   }
 
+  // 4. eligible core — catalog-wide repeat protection + unseen preference.
   const recent = getRecentSparkNoteIds();
-  let pool = SPARK_NOTE_CATALOG.filter(
+  let pool = catalog.filter(
     (entry) =>
-      !entry.monthDay &&
-      !entry.months &&
-      !entry.seasons?.length &&
+      isCoreEligible(entry, memberRegion) &&
       !recent.includes(entry.id) &&
-      !sparkNoteOnCooldown(
-        entry.id,
-        entry.cooldownDays ?? DEFAULT_SPARK_NOTE_COOLDOWN_DAYS,
-        now,
-      ),
+      notCooled(entry),
   );
-
   if (pool.length === 0) {
-    pool = SPARK_NOTE_CATALOG.filter(
-      (entry) =>
-        !entry.monthDay &&
-        !entry.months &&
-        !entry.seasons?.length &&
-        !sparkNoteOnCooldown(
-          entry.id,
-          entry.cooldownDays ?? DEFAULT_SPARK_NOTE_COOLDOWN_DAYS,
-          now,
-        ),
+    pool = catalog.filter(
+      (entry) => isCoreEligible(entry, memberRegion) && notCooled(entry),
     );
   }
 
@@ -171,6 +164,18 @@ function resolveFromCatalog(
   const chosen = pickFromPool(filtered.length > 0 ? filtered : pool, seed);
   if (!chosen) return null;
   return entryToCard(chosen, "library");
+}
+
+/**
+ * Test-only hook: run the tiered catalog resolution against an injected catalog
+ * (fixtures), bypassing the daily pin. Never used in production.
+ */
+export function resolveDailySparkFromCatalogForTests(input: {
+  now: Date;
+  region?: string;
+  catalog: readonly SparkNoteCatalogEntry[];
+}): SparkNoteDailyCard | null {
+  return resolveFromCatalog(input.now, input.region ?? "US", input.catalog);
 }
 
 /**

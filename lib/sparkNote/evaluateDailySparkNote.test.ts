@@ -3,6 +3,7 @@ import { SPARK_NOTE_CATALOG } from "./catalog";
 import {
   evaluateDailySparkNote,
   findCatalogCardById,
+  resolveDailySparkFromCatalogForTests,
 } from "./evaluateDailySparkNote";
 import { resolvePersonalSpark } from "./personalSparks";
 import {
@@ -13,6 +14,29 @@ import {
   recordSparkNoteViewed,
   resetSparkNoteStoreForTests,
 } from "./persistence";
+import type { SparkNoteCatalogEntry } from "./types";
+
+/** Fixture catalog entry for injected-catalog selector tests. */
+function fx(
+  overrides: Partial<SparkNoteCatalogEntry> & { id: string },
+): SparkNoteCatalogEntry {
+  return {
+    category: "001",
+    categoryLabel: "Discovery",
+    title: overrides.id,
+    teaser: `${overrides.id} teaser`,
+    whatHappened: "story",
+    whyItMatters: "matters",
+    sparkApplication: "action",
+    ...overrides,
+  };
+}
+
+const pick = (
+  catalog: SparkNoteCatalogEntry[],
+  now: Date,
+  region: string = "US",
+) => resolveDailySparkFromCatalogForTests({ now, region, catalog });
 
 describe("evaluateDailySparkNote", () => {
   beforeEach(() => {
@@ -236,5 +260,159 @@ describe("evaluateDailySparkNote", () => {
 
   it("findCatalogCardById returns null for an unknown id", () => {
     expect(findCatalogCardById("SPARK-DOES-NOT-EXIST")).toBeNull();
+  });
+});
+
+describe("Phase 3 — legacy month-based compatibility (regression)", () => {
+  beforeEach(() => resetSparkNoteStoreForTests());
+
+  it("legacy months card stays in the DATE tier, outranking seasonal + core", () => {
+    // Normalization maps legacy `months` to the seasonal tier conceptually; the
+    // selector must NOT demote it. In December the months card must win over a
+    // higher-priority seasonal card and the core card (pre-Phase-3 behavior).
+    const catalog = [
+      fx({ id: "L-MONTH", months: [12], priority: 50 }),
+      fx({ id: "L-SEASON", seasons: ["winter"], priority: 999 }),
+      fx({ id: "L-CORE" }),
+    ];
+    const card = pick(catalog, new Date(2024, 11, 10));
+    expect(card?.id).toBe("L-MONTH");
+    expect(card?.source).toBe("date");
+  });
+});
+
+describe("Phase 3 — new-model selection priority", () => {
+  beforeEach(() => resetSparkNoteStoreForTests());
+
+  it("exact-date beats seasonal and core", () => {
+    const catalog = [
+      fx({ id: "N-EXACT", displayRule: "exact-date", month: 10, day: 31 }),
+      fx({
+        id: "N-SEASON",
+        displayRule: "seasonal",
+        season: "autumn",
+        months: [9, 10, 11],
+        priority: 999,
+      }),
+      fx({ id: "N-CORE", displayRule: "core" }),
+    ];
+    expect(pick(catalog, new Date(2024, 9, 31))?.id).toBe("N-EXACT");
+  });
+
+  it("exact-date beats calculated-date on the same day", () => {
+    // Nov 28 2024 is Thanksgiving — an exact-date card that day must still win.
+    const catalog = [
+      fx({ id: "N-EXACT", displayRule: "exact-date", month: 11, day: 28 }),
+      fx({
+        id: "N-CALC",
+        displayRule: "calculated-date",
+        dateRule: "thanksgiving-us",
+        priority: 999,
+      }),
+    ];
+    expect(pick(catalog, new Date(2024, 10, 28))?.id).toBe("N-EXACT");
+  });
+
+  it("seasonal beats core when no dated card matches", () => {
+    const catalog = [
+      fx({ id: "N-SEASON", displayRule: "seasonal", months: [10] }),
+      fx({ id: "N-CORE", displayRule: "core" }),
+    ];
+    expect(pick(catalog, new Date(2024, 9, 15))?.id).toBe("N-SEASON");
+  });
+});
+
+describe("Phase 3 — calculated-date holiday selection", () => {
+  beforeEach(() => resetSparkNoteStoreForTests());
+
+  const cases = [
+    { rule: "thanksgiving-us", date: new Date(2024, 10, 28), label: "Thanksgiving" },
+    { rule: "memorial-day-us", date: new Date(2024, 4, 27), label: "Memorial Day" },
+    { rule: "mothers-day-us", date: new Date(2024, 4, 12), label: "Mother's Day" },
+    { rule: "mlk-day-us", date: new Date(2025, 0, 20), label: "MLK Day" },
+    { rule: "winter-solstice", date: new Date(2024, 11, 21), label: "Winter Solstice" },
+    { rule: "spring-equinox", date: new Date(2025, 2, 20), label: "Spring Equinox" },
+  ] as const;
+
+  for (const { rule, date, label } of cases) {
+    it(`selects the ${label} card on its day, not the day before`, () => {
+      const catalog = [
+        fx({ id: `H-${rule}`, displayRule: "calculated-date", dateRule: rule }),
+        fx({ id: "H-CORE", displayRule: "core" }),
+      ];
+      expect(pick(catalog, date)?.id).toBe(`H-${rule}`);
+      const dayBefore = new Date(date);
+      dayBefore.setDate(date.getDate() - 1);
+      expect(pick(catalog, dayBefore)?.id).toBe("H-CORE");
+    });
+  }
+});
+
+describe("Phase 3 — region gating (new structured region)", () => {
+  beforeEach(() => resetSparkNoteStoreForTests());
+
+  const catalog = [
+    fx({
+      id: "R-IOWA",
+      displayRule: "seasonal",
+      season: "autumn",
+      months: [9, 10, 11],
+      region: "US-IA",
+      priority: 999,
+    }),
+    fx({ id: "R-CORE", displayRule: "core" }),
+  ];
+
+  it("no matching saved region → regional card is not silently shown", () => {
+    expect(pick(catalog, new Date(2024, 9, 15), "US")?.id).toBe("R-CORE");
+  });
+
+  it("member region matches → regional card becomes eligible", () => {
+    expect(pick(catalog, new Date(2024, 9, 15), "US-IA")?.id).toBe("R-IOWA");
+  });
+});
+
+describe("Phase 3 — repeat protection, pinning, and history", () => {
+  beforeEach(() => resetSparkNoteStoreForTests());
+
+  it("no ordinary repeats until eligible unseen cards are exhausted", () => {
+    // Six evergreen cards; six consecutive days must never repeat before the
+    // unseen pool is exhausted.
+    const catalog = Array.from({ length: 6 }, (_, i) =>
+      fx({ id: `E-${i}`, displayRule: "core" }),
+    );
+    const seen: string[] = [];
+    for (let i = 0; i < 6; i += 1) {
+      const day = new Date(2024, 5, 1 + i);
+      const card = pick(catalog, day);
+      expect(card).not.toBeNull();
+      // Record the selection so repeat protection can see it next day.
+      recordDailySparkSelection(card!.id, day, "library");
+      seen.push(card!.id);
+    }
+    expect(new Set(seen).size).toBe(6);
+  });
+
+  it("same card stays pinned throughout one local day", () => {
+    const now = new Date("2026-04-10T09:00:00");
+    const first = evaluateDailySparkNote({ now, forceRefresh: true });
+    const laterSameDay = evaluateDailySparkNote({
+      now: new Date("2026-04-10T21:45:00"),
+    });
+    expect(laterSameDay.card?.id).toBe(first.card?.id);
+    expect(getStoredDailySparkId(now)).toBe(first.card?.id);
+  });
+
+  it("adding new volumes does not erase existing history", () => {
+    // Prior history (a viewed spark) recorded before any new volume exists.
+    recordSparkNoteViewed("SPARK-INV-001");
+    recordDailySparkSelection("SPARK-INV-001", new Date(2024, 4, 1), "library");
+    // Selecting against a larger (post-integration) catalog must not clear it.
+    const biggerCatalog = [
+      ...SPARK_NOTE_CATALOG,
+      fx({ id: "V2-NEW", displayRule: "core", volume: 2 }),
+    ];
+    pick(biggerCatalog, new Date(2024, 5, 2));
+    expect(readSparkNoteStore().viewedIds).toContain("SPARK-INV-001");
   });
 });
