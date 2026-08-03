@@ -24,6 +24,33 @@ export type SparkNoteCategory =
 
 export type SparkNoteType = "quick" | "story" | "deep";
 
+/**
+ * New scheduling model (Volumes 2–4 + seasonal collections). Additive and
+ * optional — legacy Volume 1 records keep using `monthDay` / `months` /
+ * `seasons`. One normalization layer (`scheduling/normalizedSchedule.ts`)
+ * converts BOTH shapes into a single internal model before selection.
+ */
+export type SparkDisplayRule =
+  | "core"
+  | "seasonal"
+  | "exact-date"
+  | "calculated-date";
+
+/** Holidays whose date is computed each year (see scheduling/calculatedDates). */
+export type SparkCalculatedDateRule =
+  | "thanksgiving-us"
+  | "memorial-day-us"
+  | "mothers-day-us"
+  | "mlk-day-us"
+  | "winter-solstice"
+  | "spring-equinox";
+
+/** Season keyword used by the new seasonal cards (Iowa collections). */
+export type SparkSeason = "spring" | "summer" | "autumn" | "winter";
+
+/** Which authored collection a card belongs to. */
+export type SparkCollection = "core" | "iowa-seasons";
+
 /** Estate icon keys for gallery chips — never emoji in the visible card. */
 export type SparkNoteGalleryIconKey =
   | "spark"
@@ -124,6 +151,25 @@ export type SparkNoteCatalogEntry = {
   cooldownDays?: number;
   /** Content tags for future interest matching and admin. */
   tags?: string[];
+
+  // --- New scheduling model (additive; legacy fields above still apply) -------
+  // Present on Volumes 2–4 + seasonal cards. The normalization layer reads these
+  // when `displayRule` is set, otherwise it falls back to the legacy fields.
+  /** How this card is scheduled. When set, takes precedence over legacy fields. */
+  displayRule?: SparkDisplayRule;
+  /** Computed-holiday rule (only with `displayRule: "calculated-date"`). */
+  dateRule?: SparkCalculatedDateRule;
+  /** Single season keyword (only with `displayRule: "seasonal"`). */
+  season?: SparkSeason;
+  /** Flat exact-date month (1–12) — new-model equivalent of `monthDay.month`. */
+  month?: number;
+  /** Flat exact-date day (1–31) — new-model equivalent of `monthDay.day`. */
+  day?: number;
+  /** Which content volume this card came from (1–4). Filtering/admin only. */
+  volume?: number;
+  /** Which authored collection (core / iowa-seasons). Filtering/admin only. */
+  collection?: SparkCollection;
+
   /** Authored second-layer "Tell Me More" content — optional; generator fills gaps. */
   expanded?: SparkNoteExpandedContent;
 };
