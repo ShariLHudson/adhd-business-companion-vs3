@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-002-002",
+  "title": "Nelson Mandela and the Discipline of Reconciliation",
+  "category": "People & Stories",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "After decades of imprisonment, Nelson Mandela helped lead South Africa through a fragile political transition.",
+  "story": "After decades of imprisonment, Nelson Mandela helped lead South Africa through a fragile political transition. He treated reconciliation not as forgetting injustice, but as a disciplined choice about the future. Restraint can be a form of leadership when anger would be understandable but destructive. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Restraint can be a form of leadership when anger would be understandable but destructive. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+  "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "People & Stories",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "002",
+  "category_label": "People & Stories",
+  "spark_type": "story",
+  "short_title": "Nelson Mandela and the Discipline of Reconciliation",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

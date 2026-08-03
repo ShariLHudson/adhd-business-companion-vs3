@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-001-004",
+  "title": "The Ice Core That Preserved Ancient Air",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Scientists drill deep into polar ice and examine bubbles trapped layer by layer.",
+  "story": "Scientists drill deep into polar ice and examine bubbles trapped layer by layer. Those bubbles preserve samples of past atmospheres and help reveal long-term climate patterns. The past can leave physical evidence in forms that were never intended as records. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "The past can leave physical evidence in forms that were never intended as records. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+  "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Ice Core That Preserved Ancient Air",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

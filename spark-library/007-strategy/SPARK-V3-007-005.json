@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-007-005",
+  "title": "The Customer You Choose Not to Serve",
+  "category": "Strategy",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A business gains clarity when it knows not only who it serves but who is a poor fit.",
+  "story": "A business gains clarity when it knows not only who it serves but who is a poor fit. Saying no can protect quality, trust, and capacity. Exclusion can be ethical when it prevents false promises and misaligned expectations. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Exclusion can be ethical when it prevents false promises and misaligned expectations. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+  "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Strategy",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "007",
+  "category_label": "Strategy",
+  "spark_type": "story",
+  "short_title": "The Customer You Choose Not to Serve",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

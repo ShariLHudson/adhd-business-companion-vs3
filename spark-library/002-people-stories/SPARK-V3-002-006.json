@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-002-006",
+  "title": "Malala Yousafzai and the Right to Learn",
+  "category": "People & Stories",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Malala Yousafzai continued advocating for girls’ education after surviving an attack intended to silence her.",
+  "story": "Malala Yousafzai continued advocating for girls’ education after surviving an attack intended to silence her. Her story became a global reminder that access to learning is both personal and political. A voice can grow stronger when others recognize the importance of what it protects. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A voice can grow stronger when others recognize the importance of what it protects. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+  "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "People & Stories",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "002",
+  "category_label": "People & Stories",
+  "spark_type": "story",
+  "short_title": "Malala Yousafzai and the Right to Learn",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

@@ -49,12 +49,14 @@ const EDITION_LABEL: Record<SparkNoteCategory, string> = {
   "012": "Wonder",
 };
 
-// Seed 112 + Volume 2 (96 core, 8 per category) + Iowa Fall (12) = 220.
+// Seed 112 + Volume 2 (96 core + 12 Iowa Fall) + Volume 3 (96 core + 12 Iowa
+// Winter) = 328. EXPECTED_TOTAL counts BOTH core and seasonal cards (unchanged
+// counting convention; seasonal is not split into a separate total).
 const EXPECTED_COUNTS: Record<string, number> = {
-  "001": 13, "002": 20, "003": 18, "004": 14, "005": 16, "006": 22,
-  "007": 21, "008": 26, "009": 12, "010": 21, "011": 22, "012": 15,
+  "001": 21, "002": 29, "003": 27, "004": 23, "005": 25, "006": 31,
+  "007": 30, "008": 36, "009": 21, "010": 30, "011": 30, "012": 25,
 };
-const EXPECTED_TOTAL = 220;
+const EXPECTED_TOTAL = 328;
 
 const manifest = manifestJson as Array<{
   spark_id: string;
@@ -97,14 +99,14 @@ describe("12-category Spark migration", () => {
     }
   });
 
-  it("the regenerated manifest holds all 220 cards (seed + Volume 2) with numbered categories", () => {
+  it("the regenerated manifest holds all cards (seed + integrated volumes) with numbered categories", () => {
     expect(manifest.length).toBe(EXPECTED_TOTAL);
     // Every seed card is still present…
     const seedIds = new Set(SEED_SPARK_NOTE_CATALOG.map((e) => e.id));
     expect(seedIds.size).toBe(112);
     const manifestIds = new Set(manifest.map((r) => r.spark_id));
     for (const id of seedIds) expect(manifestIds.has(id)).toBe(true);
-    // …the rest are integrated Volume 2 records, and every record is numbered.
+    // …the rest are integrated Volume 2/3 records, and every record is numbered.
     for (const record of manifest) {
       expect(NUMBERED_SET.has(record.runtime_category ?? "")).toBe(true);
     }

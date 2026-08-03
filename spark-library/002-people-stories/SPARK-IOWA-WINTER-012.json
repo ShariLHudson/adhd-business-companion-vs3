@@ -1,0 +1,45 @@
+{
+  "spark_id": "SPARK-IOWA-WINTER-012",
+  "title": "The Work of Dr. Martin Luther King Jr.",
+  "category": "People & Stories",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Martin Luther King Jr. Day honors a leader whose work joined moral vision, organized action, public courage, and collective participation.",
+  "story": "Martin Luther King Jr. Day honors a leader whose work joined moral vision, organized action, public courage, and collective participation. The day is observed on the third Monday in January. A legacy becomes active when remembrance influences present choices. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A legacy becomes active when remembrance influences present choices. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+  "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "People & Stories",
+    "iowa-seasons",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      12,
+      1,
+      2
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "002",
+  "category_label": "People & Stories",
+  "spark_type": "story",
+  "short_title": "The Work of Dr. Martin Luther King Jr.",
+  "priority": 320,
+  "display_rule": "calculated-date",
+  "date_rule": "mlk-day-us",
+  "season": "winter",
+  "months": [
+    12,
+    1,
+    2
+  ],
+  "volume": 3,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

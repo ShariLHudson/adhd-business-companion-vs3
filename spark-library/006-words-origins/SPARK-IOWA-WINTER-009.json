@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-WINTER-009",
+  "title": "Why We Call It a Cold Snap",
+  "category": "Words & Origins",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The phrase cold snap describes a sudden period of unusually cold weather.",
+  "story": "The phrase cold snap describes a sudden period of unusually cold weather. The word snap captures both speed and sharpness. Language often turns weather into a physical sensation we can imagine. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Language often turns weather into a physical sensation we can imagine. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+  "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Words & Origins",
+    "iowa-seasons",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      12,
+      1,
+      2
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "006",
+  "category_label": "Words & Origins",
+  "spark_type": "story",
+  "short_title": "Why We Call It a Cold Snap",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "winter",
+  "months": [
+    12,
+    1,
+    2
+  ],
+  "volume": 3,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

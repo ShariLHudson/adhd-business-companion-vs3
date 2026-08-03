@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-011-003",
+  "title": "The Modular Phone Concept",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Designers have explored phones made from replaceable modules so individual parts could be upgraded or repaired.",
+  "story": "Designers have explored phones made from replaceable modules so individual parts could be upgraded or repaired. The idea raises questions about durability, standards, cost, and user behavior. Innovation must work across the entire system, not only in the concept sketch. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Innovation must work across the entire system, not only in the concept sketch. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+  "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Innovation",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "The Modular Phone Concept",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

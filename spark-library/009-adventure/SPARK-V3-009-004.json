@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-009-004",
+  "title": "The Desert Road With No Signal",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Traveling beyond cell coverage changes how people prepare.",
+  "story": "Traveling beyond cell coverage changes how people prepare. Maps, fuel, water, timing, and communication plans become more important. Convenience can hide the systems that safety depends on. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Convenience can hide the systems that safety depends on. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+  "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The Desert Road With No Signal",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

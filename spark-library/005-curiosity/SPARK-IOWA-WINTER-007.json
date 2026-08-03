@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-WINTER-007",
+  "title": "Why Snow Makes the World Quieter",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Fresh snow can absorb and scatter sound because of the air spaces between flakes.",
+  "story": "Fresh snow can absorb and scatter sound because of the air spaces between flakes. The result is a noticeable softening of the environment. A change in texture can transform how a place feels even when nothing else moves. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A change in texture can transform how a place feels even when nothing else moves. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+  "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "iowa-seasons",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      12,
+      1,
+      2
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why Snow Makes the World Quieter",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "winter",
+  "months": [
+    12,
+    1,
+    2
+  ],
+  "volume": 3,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

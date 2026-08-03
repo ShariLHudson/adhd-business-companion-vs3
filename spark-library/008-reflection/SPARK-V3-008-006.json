@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-008-006",
+  "title": "The Conversation You Understand Differently Now",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Time and new experience can change the meaning of an old conversation.",
+  "story": "Time and new experience can change the meaning of an old conversation. A sentence that once felt confusing may become clear later. Understanding can continue after the moment has passed. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Understanding can continue after the moment has passed. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+  "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Reflection",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "The Conversation You Understand Differently Now",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

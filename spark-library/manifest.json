@@ -2514,6 +2514,538 @@
     "region": "US-IA"
   },
   {
+    "spark_id": "SPARK-IOWA-WINTER-001",
+    "title": "The First Snow Over an Iowa Field",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "The first lasting snow changes the familiar geometry of Iowa fields, fences, barns, and roads.",
+    "story": "The first lasting snow changes the familiar geometry of Iowa fields, fences, barns, and roads. Edges become softer, sound becomes quieter, and details that were easy to overlook become visible through contrast. A changed surface can help us notice the structure that was there all along. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A changed surface can help us notice the structure that was there all along. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The First Snow Over an Iowa Field",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-002",
+    "title": "What Winter Makes Us Notice",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Winter removes leaves, shortens daylight, and slows many outdoor routines.",
+    "story": "Winter removes leaves, shortens daylight, and slows many outdoor routines. The season can make absence, structure, limits, and essential supports easier to see. Reflection often becomes clearer when excess is stripped away. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Reflection often becomes clearer when excess is stripped away. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "What Winter Makes Us Notice",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-003",
+    "title": "Frost Feathers on the Window",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Frost can form intricate branching patterns when water vapor freezes on cold glass.",
+    "story": "Frost can form intricate branching patterns when water vapor freezes on cold glass. Temperature, moisture, and tiny surface differences shape each design. Wonder can emerge from ordinary conditions arranged with precision. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Wonder can emerge from ordinary conditions arranged with precision. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "Frost Feathers on the Window",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-004",
+    "title": "The Indoor Season of Making",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Cold Iowa days often move creativity indoors: quilting, woodworking, baking, journaling, painting, and repairing.",
+    "story": "Cold Iowa days often move creativity indoors: quilting, woodworking, baking, journaling, painting, and repairing. Winter can become a season for work that needs concentration more than motion. A smaller physical world can create deeper creative attention. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A smaller physical world can create deeper creative attention. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Indoor Season of Making",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-005",
+    "title": "The Quiet Adventure of a Snow Day",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A snow day changes routine and creates a temporary world of altered roads, canceled plans, and unexpected time.",
+    "story": "A snow day changes routine and creates a temporary world of altered roads, canceled plans, and unexpected time. Even familiar places can feel newly explored. Adventure sometimes begins when ordinary schedules are interrupted. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Adventure sometimes begins when ordinary schedules are interrupted. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Quiet Adventure of a Snow Day",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-006",
+    "title": "The Business of Preparing Before the Storm",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Iowa businesses and households often prepare for winter weather by checking supplies, communication plans, staffing, and safety procedures.",
+    "story": "Iowa businesses and households often prepare for winter weather by checking supplies, communication plans, staffing, and safety procedures. Reliability is created before pressure arrives, not during the crisis alone. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Reliability is created before pressure arrives, not during the crisis alone. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Business of Preparing Before the Storm",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-007",
+    "title": "Why Snow Makes the World Quieter",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Fresh snow can absorb and scatter sound because of the air spaces between flakes.",
+    "story": "Fresh snow can absorb and scatter sound because of the air spaces between flakes. The result is a noticeable softening of the environment. A change in texture can transform how a place feels even when nothing else moves. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A change in texture can transform how a place feels even when nothing else moves. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why Snow Makes the World Quieter",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-008",
+    "title": "The Value of a Winter Reserve",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Farmers, families, and businesses prepare for winter by creating reserves of fuel, food, cash, time, or capacity.",
+    "story": "Farmers, families, and businesses prepare for winter by creating reserves of fuel, food, cash, time, or capacity. The reserve is not wasted simply because it is not used immediately. Resilience often looks like unused capacity until the day it is needed. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Resilience often looks like unused capacity until the day it is needed. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Value of a Winter Reserve",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-009",
+    "title": "Why We Call It a Cold Snap",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "The phrase cold snap describes a sudden period of unusually cold weather.",
+    "story": "The phrase cold snap describes a sudden period of unusually cold weather. The word snap captures both speed and sharpness. Language often turns weather into a physical sensation we can imagine. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Language often turns weather into a physical sensation we can imagine. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "Why We Call It a Cold Snap",
+    "priority": 140,
+    "display_rule": "seasonal",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-010",
+    "title": "The Longest Night and the Return of Light",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "The winter solstice marks the shortest day and longest night of the year in the Northern Hemisphere.",
+    "story": "The winter solstice marks the shortest day and longest night of the year in the Northern Hemisphere. After it, daylight begins returning gradually. A turning point may occur before the improvement is easy to feel. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A turning point may occur before the improvement is easy to feel. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Longest Night and the Return of Light",
+    "priority": 320,
+    "display_rule": "calculated-date",
+    "date_rule": "winter-solstice",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-011",
+    "title": "A New Year Without the Pressure to Reinvent",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "January 1 often carries expectations of dramatic change.",
+    "story": "January 1 often carries expectations of dramatic change. A more sustainable beginning may come from one honest review, one meaningful priority, and one supportive condition. Renewal does not require rejecting the person you were yesterday. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Renewal does not require rejecting the person you were yesterday. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "A New Year Without the Pressure to Reinvent",
+    "priority": 320,
+    "display_rule": "exact-date",
+    "season": "winter",
+    "month": 1,
+    "day": 1,
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
+    "spark_id": "SPARK-IOWA-WINTER-012",
+    "title": "The Work of Dr. Martin Luther King Jr.",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Martin Luther King Jr. Day honors a leader whose work joined moral vision, organized action, public courage, and collective participation.",
+    "story": "Martin Luther King Jr. Day honors a leader whose work joined moral vision, organized action, public courage, and collective participation. The day is observed on the third Monday in January. A legacy becomes active when remembrance influences present choices. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A legacy becomes active when remembrance influences present choices. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "iowa-seasons",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12,
+        1,
+        2
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "The Work of Dr. Martin Luther King Jr.",
+    "priority": 320,
+    "display_rule": "calculated-date",
+    "date_rule": "mlk-day-us",
+    "season": "winter",
+    "months": [
+      12,
+      1,
+      2
+    ],
+    "volume": 3,
+    "collection": "iowa-seasons",
+    "region": "US-IA"
+  },
+  {
     "spark_id": "SPARK-MEAN-001",
     "title": "The Power of Saying Thank You",
     "category": "Reflection",
@@ -6750,6 +7282,3078 @@
     "priority": 100,
     "display_rule": "core",
     "volume": 2,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-001",
+    "title": "The Bacteria That Changed Medicine",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Alexander Fleming returned from time away and noticed that mold had contaminated one of his bacterial cultures.",
+    "story": "Alexander Fleming returned from time away and noticed that mold had contaminated one of his bacterial cultures. Around the mold, the bacteria had stopped growing. The observation eventually helped open the path to penicillin. The breakthrough began because an unwanted result was examined instead of immediately discarded. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "The breakthrough began because an unwanted result was examined instead of immediately discarded. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Bacteria That Changed Medicine",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-002",
+    "title": "The Planet Found Through Mathematics",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Before Neptune was seen through a telescope, astronomers noticed that Uranus did not move exactly as expected.",
+    "story": "Before Neptune was seen through a telescope, astronomers noticed that Uranus did not move exactly as expected. Calculations suggested that another unseen planet might be pulling on it. Sometimes the effects of something reveal its presence before the thing itself can be seen. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Sometimes the effects of something reveal its presence before the thing itself can be seen. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Planet Found Through Mathematics",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-003",
+    "title": "The Fossil in a Museum Drawer",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some major discoveries happen not in the field but when old collections are reexamined with new questions or better tools.",
+    "story": "Some major discoveries happen not in the field but when old collections are reexamined with new questions or better tools. A specimen gathered decades earlier can suddenly become important. A new perspective can change the value of information that has been sitting quietly for years. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A new perspective can change the value of information that has been sitting quietly for years. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Fossil in a Museum Drawer",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-004",
+    "title": "The Ice Core That Preserved Ancient Air",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Scientists drill deep into polar ice and examine bubbles trapped layer by layer.",
+    "story": "Scientists drill deep into polar ice and examine bubbles trapped layer by layer. Those bubbles preserve samples of past atmospheres and help reveal long-term climate patterns. The past can leave physical evidence in forms that were never intended as records. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "The past can leave physical evidence in forms that were never intended as records. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Ice Core That Preserved Ancient Air",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-005",
+    "title": "The Tiny Wobble That Revealed a World",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Many planets beyond our solar system were detected because their gravity caused a star to wobble slightly.",
+    "story": "Many planets beyond our solar system were detected because their gravity caused a star to wobble slightly. Astronomers learned to measure a subtle movement that could not be seen directly. Small repeated signals can point to something much larger. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Small repeated signals can point to something much larger. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Tiny Wobble That Revealed a World",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-006",
+    "title": "The Language Hidden in Whale Songs",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Researchers studying whale songs found patterns that change, spread, and sometimes repeat across groups and years.",
+    "story": "Researchers studying whale songs found patterns that change, spread, and sometimes repeat across groups and years. The sounds became evidence of learning and communication. Discovery often begins when we stop treating unfamiliar communication as meaningless noise. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Discovery often begins when we stop treating unfamiliar communication as meaningless noise. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Language Hidden in Whale Songs",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-007",
+    "title": "The Ancient City Beneath the Fields",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Aerial photographs, satellite images, and ground-penetrating tools have revealed buried roads, walls, and settlements beneath modern farmland.",
+    "story": "Aerial photographs, satellite images, and ground-penetrating tools have revealed buried roads, walls, and settlements beneath modern farmland. New ways of looking can make hidden structures visible without destroying what covers them. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "New ways of looking can make hidden structures visible without destroying what covers them. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Ancient City Beneath the Fields",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-001-008",
+    "title": "The Medical Clue in a Family Pattern",
+    "category": "Discovery",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Doctors and researchers sometimes recognize a rare condition because several relatives share a pattern of symptoms.",
+    "story": "Doctors and researchers sometimes recognize a rare condition because several relatives share a pattern of symptoms. What seems isolated becomes understandable when the family history is viewed as a whole. Connections across time can reveal what a single case cannot. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Connections across time can reveal what a single case cannot. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+    "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Discovery",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "001",
+    "category_label": "Discovery",
+    "spark_type": "story",
+    "short_title": "The Medical Clue in a Family Pattern",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-001",
+    "title": "Ada Lovelace and the Machine Beyond Arithmetic",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Ada Lovelace saw that Charles Babbage’s proposed analytical engine might manipulate symbols, not only numbers.",
+    "story": "Ada Lovelace saw that Charles Babbage’s proposed analytical engine might manipulate symbols, not only numbers. Her notes imagined possibilities that computers would not realize for generations. Vision often means seeing what a tool could become before the surrounding world is ready. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Vision often means seeing what a tool could become before the surrounding world is ready. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "Ada Lovelace and the Machine Beyond Arithmetic",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-002",
+    "title": "Nelson Mandela and the Discipline of Reconciliation",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "After decades of imprisonment, Nelson Mandela helped lead South Africa through a fragile political transition.",
+    "story": "After decades of imprisonment, Nelson Mandela helped lead South Africa through a fragile political transition. He treated reconciliation not as forgetting injustice, but as a disciplined choice about the future. Restraint can be a form of leadership when anger would be understandable but destructive. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Restraint can be a form of leadership when anger would be understandable but destructive. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "Nelson Mandela and the Discipline of Reconciliation",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-003",
+    "title": "Rachel Carson and the Courage to Warn",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Rachel Carson documented how pesticides could move through ecosystems and harm wildlife.",
+    "story": "Rachel Carson documented how pesticides could move through ecosystems and harm wildlife. Her work challenged powerful interests and helped change public understanding of environmental risk. Speaking clearly about a hidden consequence can alter an entire system. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Speaking clearly about a hidden consequence can alter an entire system. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "Rachel Carson and the Courage to Warn",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-004",
+    "title": "James Baldwin and the Work of Honest Language",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "James Baldwin wrote about race, identity, love, fear, and power with unusual clarity.",
+    "story": "James Baldwin wrote about race, identity, love, fear, and power with unusual clarity. He used personal experience not as the end of the story, but as a way into larger truths. Honest language can make difficult realities harder to ignore and easier to examine. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Honest language can make difficult realities harder to ignore and easier to examine. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "James Baldwin and the Work of Honest Language",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-005",
+    "title": "Helen Keller and the Door Opened by Language",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Helen Keller’s education changed when Anne Sullivan connected words with lived experience.",
+    "story": "Helen Keller’s education changed when Anne Sullivan connected words with lived experience. The famous moment at the water pump represented more than vocabulary; it opened a world of relationship and meaning. Learning becomes transformative when symbols connect to something real. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Learning becomes transformative when symbols connect to something real. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "Helen Keller and the Door Opened by Language",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-006",
+    "title": "Malala Yousafzai and the Right to Learn",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Malala Yousafzai continued advocating for girls’ education after surviving an attack intended to silence her.",
+    "story": "Malala Yousafzai continued advocating for girls’ education after surviving an attack intended to silence her. Her story became a global reminder that access to learning is both personal and political. A voice can grow stronger when others recognize the importance of what it protects. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A voice can grow stronger when others recognize the importance of what it protects. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "Malala Yousafzai and the Right to Learn",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-007",
+    "title": "Buckminster Fuller and the Long View",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "After a period of personal crisis, Buckminster Fuller committed himself to exploring how design might serve humanity.",
+    "story": "After a period of personal crisis, Buckminster Fuller committed himself to exploring how design might serve humanity. His work ranged across architecture, systems, and resource use. A life can change direction when a person chooses to make usefulness the organizing question. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A life can change direction when a person chooses to make usefulness the organizing question. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "Buckminster Fuller and the Long View",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-002-008",
+    "title": "Wilma Rudolph and the Race No One Expected",
+    "category": "People & Stories",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Wilma Rudolph survived serious childhood illness and wore a leg brace before becoming an Olympic champion.",
+    "story": "Wilma Rudolph survived serious childhood illness and wore a leg brace before becoming an Olympic champion. Her achievement grew from years of family support, therapy, practice, and persistence. Visible success often rests on a long history of help and repetition. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Visible success often rests on a long history of help and repetition. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+    "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "People & Stories",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "002",
+    "category_label": "People & Stories",
+    "spark_type": "story",
+    "short_title": "Wilma Rudolph and the Race No One Expected",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-001",
+    "title": "The Architect Who Began With Light",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some architects start not with walls but with the movement of light through a space.",
+    "story": "Some architects start not with walls but with the movement of light through a space. The building is shaped around how morning, afternoon, and season will change the experience. A creative project can become stronger when it begins with the feeling it should create. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A creative project can become stronger when it begins with the feeling it should create. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Architect Who Began With Light",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-002",
+    "title": "The Song Built From Silence",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Musicians use rests and pauses to create tension, emphasis, and shape.",
+    "story": "Musicians use rests and pauses to create tension, emphasis, and shape. Without silence, sound loses contrast and the listener has no space to anticipate. What is left out can be as important as what is added. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "What is left out can be as important as what is added. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Song Built From Silence",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-003",
+    "title": "The Photographer Who Waited",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A powerful photograph may require hours of preparation for a fraction of a second.",
+    "story": "A powerful photograph may require hours of preparation for a fraction of a second. The creative act includes patience, position, timing, and the willingness not to force the moment. Creative readiness is often quiet before it becomes visible. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Creative readiness is often quiet before it becomes visible. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Photographer Who Waited",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-004",
+    "title": "The Ceramic Bowl Repaired With Gold",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "The Japanese art of kintsugi repairs broken pottery with lacquer mixed with gold or other metals.",
+    "story": "The Japanese art of kintsugi repairs broken pottery with lacquer mixed with gold or other metals. The damage is not hidden; the repair becomes part of the object’s story. Restoration can honor what happened instead of pretending the break never existed. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Restoration can honor what happened instead of pretending the break never existed. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Ceramic Bowl Repaired With Gold",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-005",
+    "title": "The Play Rewritten in Rehearsal",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Plays often change when actors speak the words aloud and move through the scene.",
+    "story": "Plays often change when actors speak the words aloud and move through the scene. What looked complete on the page may reveal problems or possibilities in performance. A creation can only teach its maker certain things after it enters the real world. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A creation can only teach its maker certain things after it enters the real world. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Play Rewritten in Rehearsal",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-006",
+    "title": "The Garden Designed for Every Season",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A thoughtful garden is designed not only for peak bloom but for changing color, structure, seed heads, shadows, and winter form.",
+    "story": "A thoughtful garden is designed not only for peak bloom but for changing color, structure, seed heads, shadows, and winter form. Creative work can be planned as an evolving experience rather than one perfect moment. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Creative work can be planned as an evolving experience rather than one perfect moment. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Garden Designed for Every Season",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-007",
+    "title": "The Collage That Made Meaning From Scraps",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Collage artists combine printed fragments, photographs, handwriting, texture, and found material.",
+    "story": "Collage artists combine printed fragments, photographs, handwriting, texture, and found material. The work gains meaning through selection and relationship. Fragments do not need to match before they can belong together. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Fragments do not need to match before they can belong together. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Collage That Made Meaning From Scraps",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-003-008",
+    "title": "The Story Told From the Side Character",
+    "category": "Creativity & Inspiration",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Writers sometimes retell a familiar story from the perspective of someone who was barely noticed in the original.",
+    "story": "Writers sometimes retell a familiar story from the perspective of someone who was barely noticed in the original. The shift can reveal assumptions and new emotional truths. Changing the point of view can change the entire meaning of the story. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Changing the point of view can change the entire meaning of the story. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+    "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Creativity & Inspiration",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "003",
+    "category_label": "Creativity & Inspiration",
+    "spark_type": "story",
+    "short_title": "The Story Told From the Side Character",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-001",
+    "title": "The Wetland That Protected a City",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Wetlands absorb water, slow flooding, filter pollutants, and provide habitat.",
+    "story": "Wetlands absorb water, slow flooding, filter pollutants, and provide habitat. When they are removed, communities may lose a natural system that had been doing valuable work quietly. What looks unused may be performing essential functions. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "What looks unused may be performing essential functions. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Wetland That Protected a City",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-002",
+    "title": "The Lichen Growing on Bare Rock",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Lichens can live on exposed surfaces where few other organisms survive.",
+    "story": "Lichens can live on exposed surfaces where few other organisms survive. Over time, they help weather rock and contribute to the earliest stages of soil formation. Small beginnings can prepare conditions for life that comes much later. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Small beginnings can prepare conditions for life that comes much later. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Lichen Growing on Bare Rock",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-003",
+    "title": "The Tundra That Blooms Briefly",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Arctic and alpine plants complete much of their growth and reproduction during a short season.",
+    "story": "Arctic and alpine plants complete much of their growth and reproduction during a short season. They respond quickly because the window is limited. A short season can still hold meaningful growth when the timing is understood. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A short season can still hold meaningful growth when the timing is understood. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Tundra That Blooms Briefly",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-004",
+    "title": "The Mangrove Roots That Hold the Shore",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Mangrove forests reduce wave energy, trap sediment, shelter young marine life, and protect coastlines.",
+    "story": "Mangrove forests reduce wave energy, trap sediment, shelter young marine life, and protect coastlines. Their tangled roots create safety through complexity. A strong boundary can be both protective and life-giving. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A strong boundary can be both protective and life-giving. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Mangrove Roots That Hold the Shore",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-005",
+    "title": "The Canyon Carved Slowly",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Canyons form through persistent erosion, uplift, weather, and immense time.",
+    "story": "Canyons form through persistent erosion, uplift, weather, and immense time. The dramatic landscape is the result of processes too gradual to notice in a single day. Slow change can create outcomes that look impossible from the scale of one moment. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Slow change can create outcomes that look impossible from the scale of one moment. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Canyon Carved Slowly",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-006",
+    "title": "The Meadow After the Mower Stops",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "When some areas are mowed less often, native plants and insects may return.",
+    "story": "When some areas are mowed less often, native plants and insects may return. A change in maintenance can alter the entire community of life. Sometimes improvement begins by interrupting a routine rather than adding a new intervention. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Sometimes improvement begins by interrupting a routine rather than adding a new intervention. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Meadow After the Mower Stops",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-007",
+    "title": "The Island Built by Volcanoes",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Volcanic islands begin as raw rock and gradually become home to soil, plants, animals, and people.",
+    "story": "Volcanic islands begin as raw rock and gradually become home to soil, plants, animals, and people. Life arrives through wind, water, flight, and human movement. A place can develop identity through layers of arrival and adaptation. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A place can develop identity through layers of arrival and adaptation. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Island Built by Volcanoes",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-004-008",
+    "title": "The Winter River Still Moving",
+    "category": "Nature & Places",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A frozen surface can hide flowing water below.",
+    "story": "A frozen surface can hide flowing water below. Rivers continue carrying energy and shaping their channels even when the landscape appears still. Visible stillness does not always mean a system has stopped. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Visible stillness does not always mean a system has stopped. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+    "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Nature & Places",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "004",
+    "category_label": "Nature & Places",
+    "spark_type": "story",
+    "short_title": "The Winter River Still Moving",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-001",
+    "title": "Why We Remember Beginnings and Endings",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "People often remember the beginning and end of an experience more clearly than the middle.",
+    "story": "People often remember the beginning and end of an experience more clearly than the middle. This pattern helps explain why opening moments and final impressions carry unusual weight. Designing an experience well includes paying attention to how it starts and how it closes. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Designing an experience well includes paying attention to how it starts and how it closes. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why We Remember Beginnings and Endings",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-002",
+    "title": "Why a Familiar Smell Can Feel Like Home",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Smell connects closely with memory and emotion.",
+    "story": "Smell connects closely with memory and emotion. A scent can bring back a place or person before the conscious mind identifies why. Meaning can be stored in sensory pathways that are faster than explanation. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Meaning can be stored in sensory pathways that are faster than explanation. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why a Familiar Smell Can Feel Like Home",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-003",
+    "title": "Why We Underestimate Small Repeated Effort",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A small action may seem insignificant when viewed once.",
+    "story": "A small action may seem insignificant when viewed once. Repeated across weeks or months, it can create a result that intuition fails to predict. The mind notices dramatic events more easily than accumulation. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "The mind notices dramatic events more easily than accumulation. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why We Underestimate Small Repeated Effort",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-004",
+    "title": "Why We Copy the Mood of a Room",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "People unconsciously respond to tone, expression, pace, and tension in others.",
+    "story": "People unconsciously respond to tone, expression, pace, and tension in others. Emotional states can spread through a group without anyone naming what is happening. The atmosphere we create may influence people before our words do. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "The atmosphere we create may influence people before our words do. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why We Copy the Mood of a Room",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-005",
+    "title": "Why Open Loops Stay in the Mind",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Unfinished tasks can remain mentally active because the brain keeps returning to what has not been resolved.",
+    "story": "Unfinished tasks can remain mentally active because the brain keeps returning to what has not been resolved. Writing the next step can reduce the pressure even before the work is complete. Closure can begin with a trusted plan, not only with total completion. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Closure can begin with a trusted plan, not only with total completion. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why Open Loops Stay in the Mind",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-006",
+    "title": "Why We Value What We Help Create",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "People often feel more attached to something when they contributed effort or choice to making it.",
+    "story": "People often feel more attached to something when they contributed effort or choice to making it. Participation can increase meaning and ownership. Inviting contribution can create commitment that passive delivery cannot. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Inviting contribution can create commitment that passive delivery cannot. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why We Value What We Help Create",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-007",
+    "title": "Why a Name Makes Something Easier to Notice",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Once we learn a name for a plant, pattern, emotion, or behavior, we often begin seeing it more frequently.",
+    "story": "Once we learn a name for a plant, pattern, emotion, or behavior, we often begin seeing it more frequently. The word creates a mental category for recognition. Language can change perception by giving attention a place to land. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Language can change perception by giving attention a place to land. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why a Name Makes Something Easier to Notice",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-005-008",
+    "title": "Why Tiny Friction Changes Behavior",
+    "category": "Curiosity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A small extra step, confusing label, or delayed response can reduce completion more than expected.",
+    "story": "A small extra step, confusing label, or delayed response can reduce completion more than expected. Conversely, removing one obstacle can make action much easier. Behavior is shaped not only by motivation but by the design of the path. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Behavior is shaped not only by motivation but by the design of the path. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+    "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Curiosity",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "005",
+    "category_label": "Curiosity",
+    "spark_type": "story",
+    "short_title": "Why Tiny Friction Changes Behavior",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-001",
+    "title": "The Word Threshold",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Threshold originally referred to the piece of wood or stone at the bottom of a doorway.",
+    "story": "Threshold originally referred to the piece of wood or stone at the bottom of a doorway. It became a word for the point where one state, place, or stage begins. A physical boundary became language for transition. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A physical boundary became language for transition. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "The Word Threshold",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-002",
+    "title": "Why We Say Red Tape",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Red tape became associated with official documents tied or bound with red ribbon.",
+    "story": "Red tape became associated with official documents tied or bound with red ribbon. The phrase now describes procedures that feel unnecessarily difficult. A vivid object can become shorthand for an entire experience. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A vivid object can become shorthand for an entire experience. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "Why We Say Red Tape",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-003",
+    "title": "The Word Prototype",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Prototype comes from roots meaning first and model or form.",
+    "story": "Prototype comes from roots meaning first and model or form. It describes an early version built to test and learn. A prototype is not a failed final product; it is a tool for discovering what the final product needs. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A prototype is not a failed final product; it is a tool for discovering what the final product needs. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "The Word Prototype",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-004",
+    "title": "The Meaning of Curate",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Curate is related to care. Its modern use expanded from caring for collections to selecting and arranging information, objects, or experiences thoughtfully.",
+    "story": "Curate is related to care. Its modern use expanded from caring for collections to selecting and arranging information, objects, or experiences thoughtfully. Selection becomes more meaningful when it is treated as care rather than mere sorting. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Selection becomes more meaningful when it is treated as care rather than mere sorting. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "The Meaning of Curate",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-005",
+    "title": "Why We Call It a Breakthrough",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Breakthrough suggests passing through a barrier that had blocked progress.",
+    "story": "Breakthrough suggests passing through a barrier that had blocked progress. The word makes insight sound sudden, even when the real process was long. Language often highlights the visible moment and hides the years that prepared it. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Language often highlights the visible moment and hides the years that prepared it. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "Why We Call It a Breakthrough",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-006",
+    "title": "The Word Legacy",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Legacy once referred strongly to something handed down, especially through a will.",
+    "story": "Legacy once referred strongly to something handed down, especially through a will. Today it includes influence, stories, values, systems, and consequences passed forward. What we leave behind is often larger than what can be listed as property. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "What we leave behind is often larger than what can be listed as property. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "The Word Legacy",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-007",
+    "title": "The Difference Between Urgent and Important",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Urgent means demanding immediate attention.",
+    "story": "Urgent means demanding immediate attention. Important means carrying meaningful consequence or value. The two can overlap, but they are not the same. Clear words help protect important work from being crowded out by constant urgency. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Clear words help protect important work from being crowded out by constant urgency. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "The Difference Between Urgent and Important",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-006-008",
+    "title": "The Word Belonging",
+    "category": "Words & Origins",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Belonging is more than being present in a place.",
+    "story": "Belonging is more than being present in a place. It includes being recognized, accepted, and able to participate without hiding essential parts of oneself. A useful word can reveal why inclusion and attendance are not identical. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A useful word can reveal why inclusion and attendance are not identical. Words shape what we notice and remember. Naming an experience can make it easier to understand, share, and use.",
+    "spark_application": "Save one word or phrase that stayed with you. Add a note about why it matters and where you might use it. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Words & Origins",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "006",
+    "category_label": "Words & Origins",
+    "spark_type": "story",
+    "short_title": "The Word Belonging",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-001",
+    "title": "The Assumption Log",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Teams often record decisions but not the assumptions behind them.",
+    "story": "Teams often record decisions but not the assumptions behind them. An assumption log makes it possible to revisit what was believed when the choice was made. A strategy becomes easier to improve when its hidden beliefs are visible. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A strategy becomes easier to improve when its hidden beliefs are visible. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Assumption Log",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-002",
+    "title": "The Rule of One Clear Outcome",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Projects become difficult when they carry several competing definitions of success.",
+    "story": "Projects become difficult when they carry several competing definitions of success. Naming one primary outcome helps people make tradeoffs. Clarity about the main result reduces conflict among secondary goals. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Clarity about the main result reduces conflict among secondary goals. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Rule of One Clear Outcome",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-003",
+    "title": "The Reserve Before the Risk",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some strategies create a buffer of time, money, energy, or inventory before taking a larger risk.",
+    "story": "Some strategies create a buffer of time, money, energy, or inventory before taking a larger risk. The reserve does not eliminate uncertainty, but it changes the consequences. Resilience can be designed before pressure arrives. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Resilience can be designed before pressure arrives. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Reserve Before the Risk",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-004",
+    "title": "The Decision Review After Ninety Days",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A planned review date prevents a decision from becoming permanent by neglect.",
+    "story": "A planned review date prevents a decision from becoming permanent by neglect. The team can evaluate evidence without reopening the issue every day. A decision can be firm now and still include a responsible moment for reconsideration. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A decision can be firm now and still include a responsible moment for reconsideration. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Decision Review After Ninety Days",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-005",
+    "title": "The Customer You Choose Not to Serve",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A business gains clarity when it knows not only who it serves but who is a poor fit.",
+    "story": "A business gains clarity when it knows not only who it serves but who is a poor fit. Saying no can protect quality, trust, and capacity. Exclusion can be ethical when it prevents false promises and misaligned expectations. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Exclusion can be ethical when it prevents false promises and misaligned expectations. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Customer You Choose Not to Serve",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-006",
+    "title": "The Signal Metric and the Outcome Metric",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "An outcome may take months to appear, while earlier behaviors can signal whether progress is likely.",
+    "story": "An outcome may take months to appear, while earlier behaviors can signal whether progress is likely. Strong plans track both. A useful strategy watches what predicts the result, not only the final result. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A useful strategy watches what predicts the result, not only the final result. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Signal Metric and the Outcome Metric",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-007",
+    "title": "The Contingency Path",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A contingency plan identifies what will happen if a key assumption fails.",
+    "story": "A contingency plan identifies what will happen if a key assumption fails. It reduces panic because alternatives have already been considered. Prepared flexibility is different from indecision. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Prepared flexibility is different from indecision. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Contingency Path",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-007-008",
+    "title": "The Smallest Reversible Commitment",
+    "category": "Strategy",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "When uncertainty is high, the next move can be designed to preserve options.",
+    "story": "When uncertainty is high, the next move can be designed to preserve options. A limited pilot, short agreement, or test period may create learning without locking in the entire future. Commitment can be scaled to match the quality of the evidence. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Commitment can be scaled to match the quality of the evidence. Strategy is choosing what matters most, learning from evidence, and placing limited effort where it can create the greatest useful change.",
+    "spark_application": "Identify the decision underneath your current activity. Choose the smallest next move that would create useful information. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Strategy",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "007",
+    "category_label": "Strategy",
+    "spark_type": "story",
+    "short_title": "The Smallest Reversible Commitment",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-001",
+    "title": "The List of Things You No Longer Owe",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "People often carry old expectations long after the situation that created them has changed.",
+    "story": "People often carry old expectations long after the situation that created them has changed. Naming what is no longer owed can reveal hidden pressure. Release becomes easier when the obligation is made visible. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Release becomes easier when the obligation is made visible. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The List of Things You No Longer Owe",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-002",
+    "title": "The Difference Between Regret and Responsibility",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Regret focuses on wishing the past were different.",
+    "story": "Regret focuses on wishing the past were different. Responsibility asks what can be acknowledged, repaired, learned, or changed now. Reflection is most useful when it leads toward honest action rather than endless punishment. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Reflection is most useful when it leads toward honest action rather than endless punishment. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The Difference Between Regret and Responsibility",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-003",
+    "title": "The Year in Twelve Moments",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Looking back through one meaningful moment from each month can reveal a year more accurately than judging it by the loudest event.",
+    "story": "Looking back through one meaningful moment from each month can reveal a year more accurately than judging it by the loudest event. A broader timeline prevents one difficult period from defining everything. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A broader timeline prevents one difficult period from defining everything. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The Year in Twelve Moments",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-004",
+    "title": "The Support You Forgot to Count",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Achievements are often remembered as individual effort even when encouragement, access, advice, timing, or practical help made them possible.",
+    "story": "Achievements are often remembered as individual effort even when encouragement, access, advice, timing, or practical help made them possible. Gratitude becomes more specific when we name the structure of support. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Gratitude becomes more specific when we name the structure of support. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The Support You Forgot to Count",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-005",
+    "title": "The Cost of Carrying an Old Role",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A role that once protected a family, team, or identity can become exhausting when circumstances change.",
+    "story": "A role that once protected a family, team, or identity can become exhausting when circumstances change. Reflection helps determine whether the role is still needed. Growth may require releasing a useful identity that has completed its purpose. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Growth may require releasing a useful identity that has completed its purpose. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The Cost of Carrying an Old Role",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-006",
+    "title": "The Conversation You Understand Differently Now",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Time and new experience can change the meaning of an old conversation.",
+    "story": "Time and new experience can change the meaning of an old conversation. A sentence that once felt confusing may become clear later. Understanding can continue after the moment has passed. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Understanding can continue after the moment has passed. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The Conversation You Understand Differently Now",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-007",
+    "title": "The Difference Between Progress and Proof",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A person may be making progress before there is enough visible evidence to feel confident.",
+    "story": "A person may be making progress before there is enough visible evidence to feel confident. Small indicators can matter without pretending the outcome is guaranteed. Reflection can recognize movement without turning hope into certainty. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Reflection can recognize movement without turning hope into certainty. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The Difference Between Progress and Proof",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-008-008",
+    "title": "The Promise You Want to Keep to Yourself",
+    "category": "Reflection",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Personal promises often fail when they are vague, unrealistic, or disconnected from support.",
+    "story": "Personal promises often fail when they are vague, unrealistic, or disconnected from support. Rewriting the promise in practical terms can restore trust. Self-trust grows through promises designed to be kept. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Self-trust grows through promises designed to be kept. Reflection turns experience into guidance. The goal is not to stay in the past, but to carry forward what the past can teach.",
+    "spark_application": "Write one sentence about what this story brings up for you, one lesson worth keeping, and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Reflection",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "008",
+    "category_label": "Reflection",
+    "spark_type": "story",
+    "short_title": "The Promise You Want to Keep to Yourself",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-001",
+    "title": "The Night Train to an Unknown City",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Overnight travel compresses departure, uncertainty, and arrival into one experience.",
+    "story": "Overnight travel compresses departure, uncertainty, and arrival into one experience. The traveler wakes to a changed landscape and a new set of choices. Adventure can begin when we allow ourselves to cross a threshold before knowing every detail. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Adventure can begin when we allow ourselves to cross a threshold before knowing every detail. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Night Train to an Unknown City",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-002",
+    "title": "The Paddle Into Morning Fog",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Canoeing or kayaking in fog requires slower movement, attention to sound, and reliable navigation.",
+    "story": "Canoeing or kayaking in fog requires slower movement, attention to sound, and reliable navigation. The familiar shoreline may disappear even when it is close. Uncertainty changes the pace and the kind of information we need. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Uncertainty changes the pace and the kind of information we need. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Paddle Into Morning Fog",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-003",
+    "title": "The First Time on Snowshoes",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Snowshoes distribute weight so a person can travel across deep snow more easily.",
+    "story": "Snowshoes distribute weight so a person can travel across deep snow more easily. The movement feels awkward at first because the body must learn a wider, unfamiliar rhythm. A new tool may require a temporary loss of grace before it creates freedom. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A new tool may require a temporary loss of grace before it creates freedom. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The First Time on Snowshoes",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-004",
+    "title": "The Desert Road With No Signal",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Traveling beyond cell coverage changes how people prepare.",
+    "story": "Traveling beyond cell coverage changes how people prepare. Maps, fuel, water, timing, and communication plans become more important. Convenience can hide the systems that safety depends on. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Convenience can hide the systems that safety depends on. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Desert Road With No Signal",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-005",
+    "title": "The Trail Marked by Cairns",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "In rocky or treeless landscapes, stacked stones may help mark a route.",
+    "story": "In rocky or treeless landscapes, stacked stones may help mark a route. Each marker is useful only as part of a sequence and must be interpreted carefully. Progress often depends on seeing the next reliable signal rather than the entire path. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Progress often depends on seeing the next reliable signal rather than the entire path. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Trail Marked by Cairns",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-006",
+    "title": "The Day Trip Chosen by a Coin Toss",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A small random choice can interrupt overthinking when several options are equally safe and worthwhile.",
+    "story": "A small random choice can interrupt overthinking when several options are equally safe and worthwhile. The coin does not make the decision important; it simply helps movement begin. Not every choice requires perfect optimization. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Not every choice requires perfect optimization. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Day Trip Chosen by a Coin Toss",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-007",
+    "title": "The Winter Hike That Required Turning Back",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Cold, wind, daylight, and trail conditions can change faster than expected.",
+    "story": "Cold, wind, daylight, and trail conditions can change faster than expected. Turning back early can be the decision that preserves the experience and everyone’s safety. A responsible adventure includes the freedom to stop. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A responsible adventure includes the freedom to stop. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Winter Hike That Required Turning Back",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-009-008",
+    "title": "The Map Drawn After the Journey",
+    "category": "Adventure",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Explorers, hikers, and travelers often understand a route differently after completing it.",
+    "story": "Explorers, hikers, and travelers often understand a route differently after completing it. The return map includes landmarks, difficulties, and shortcuts that were invisible at the start. Experience can turn a confusing path into guidance for the future. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Experience can turn a confusing path into guidance for the future. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+    "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Adventure",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "009",
+    "category_label": "Adventure",
+    "spark_type": "story",
+    "short_title": "The Map Drawn After the Journey",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-001",
+    "title": "The Business That Charged for the Outcome",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some businesses move from charging by the hour to charging for a defined result.",
+    "story": "Some businesses move from charging by the hour to charging for a defined result. The change requires clarity about scope, value, risk, and trust. A pricing model shapes both the customer’s expectations and the business’s behavior. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A pricing model shapes both the customer’s expectations and the business’s behavior. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Business That Charged for the Outcome",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-002",
+    "title": "The Welcome Email That Reduced Support",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A clear welcome message can prevent confusion by explaining what happens next, where to find help, and what the customer should do first.",
+    "story": "A clear welcome message can prevent confusion by explaining what happens next, where to find help, and what the customer should do first. Good communication can remove work before problems appear. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Good communication can remove work before problems appear. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Welcome Email That Reduced Support",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-003",
+    "title": "The Subscription People Forgot They Had",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Recurring revenue can look attractive, but trust erodes when customers feel trapped or surprised.",
+    "story": "Recurring revenue can look attractive, but trust erodes when customers feel trapped or surprised. Transparent renewal and cancellation practices protect the relationship. A business model should not depend on customer inattention. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A business model should not depend on customer inattention. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Subscription People Forgot They Had",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-004",
+    "title": "The Workshop That Became an Offer",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A founder may discover that repeated questions in a workshop point to a deeper service or product opportunity.",
+    "story": "A founder may discover that repeated questions in a workshop point to a deeper service or product opportunity. The live experience becomes research. Teaching can reveal where people need more support than a single session can provide. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Teaching can reveal where people need more support than a single session can provide. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Workshop That Became an Offer",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-005",
+    "title": "The Follow-Up That Arrived at the Right Time",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A thoughtful follow-up can help a customer decide after they have had time to reflect.",
+    "story": "A thoughtful follow-up can help a customer decide after they have had time to reflect. The message is useful when it adds clarity rather than pressure. Timing and relevance make follow-up feel like service instead of pursuit. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Timing and relevance make follow-up feel like service instead of pursuit. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Follow-Up That Arrived at the Right Time",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-006",
+    "title": "The Process Customers Could See",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "When customers understand the steps, responsibilities, and timeline, they feel less uncertainty.",
+    "story": "When customers understand the steps, responsibilities, and timeline, they feel less uncertainty. Visibility becomes part of the experience. A clear process can increase trust before the final result exists. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A clear process can increase trust before the final result exists. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Process Customers Could See",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-007",
+    "title": "The Offer That Removed One Feature",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Adding features can make an offer harder to understand and deliver.",
+    "story": "Adding features can make an offer harder to understand and deliver. Removing one low-value element may strengthen the promise and improve consistency. More value does not always require more parts. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "More value does not always require more parts. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Offer That Removed One Feature",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-010-008",
+    "title": "The Business Built Around a Community Ritual",
+    "category": "Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some businesses grow by creating a repeated gathering, challenge, event, or shared practice.",
+    "story": "Some businesses grow by creating a repeated gathering, challenge, event, or shared practice. The ritual gives customers a reason to return and belong. A strong experience can create connection beyond the transaction. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A strong experience can create connection beyond the transaction. Strong businesses create value people can understand and trust. The lesson is usually found in the decisions beneath the visible success.",
+    "spark_application": "Apply the lesson to one customer, offer, process, or decision. Ask what would make the experience clearer, more useful, or more trustworthy. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Business",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "010",
+    "category_label": "Business",
+    "spark_type": "story",
+    "short_title": "The Business Built Around a Community Ritual",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-001",
+    "title": "The Velcro Idea Inspired by Burrs",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "George de Mestral examined burrs that clung to clothing and fur.",
+    "story": "George de Mestral examined burrs that clung to clothing and fur. Under magnification, he saw tiny hooks and used the structure as inspiration for a new fastening system. Innovation can begin by asking how nature already solves a similar problem. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Innovation can begin by asking how nature already solves a similar problem. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The Velcro Idea Inspired by Burrs",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-002",
+    "title": "The E-Ink Screen That Uses Power Differently",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Electronic ink displays use tiny particles that remain in position without constant power.",
+    "story": "Electronic ink displays use tiny particles that remain in position without constant power. The result is a screen suited to long reading and low energy use. A better solution may come from changing the underlying mechanism rather than improving the familiar one. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A better solution may come from changing the underlying mechanism rather than improving the familiar one. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The E-Ink Screen That Uses Power Differently",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-003",
+    "title": "The Modular Phone Concept",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Designers have explored phones made from replaceable modules so individual parts could be upgraded or repaired.",
+    "story": "Designers have explored phones made from replaceable modules so individual parts could be upgraded or repaired. The idea raises questions about durability, standards, cost, and user behavior. Innovation must work across the entire system, not only in the concept sketch. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Innovation must work across the entire system, not only in the concept sketch. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The Modular Phone Concept",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-004",
+    "title": "The 3D-Printed Home",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Large-scale printers can place building material layer by layer to create walls and structures.",
+    "story": "Large-scale printers can place building material layer by layer to create walls and structures. The promise includes speed, customization, and reduced waste, while challenges remain in codes, materials, and scale. A new method becomes real only when it fits the surrounding rules and needs. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A new method becomes real only when it fits the surrounding rules and needs. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The 3D-Printed Home",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-005",
+    "title": "The App That Began as an Internal Tool",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Many products begin as tools built to solve a company’s own recurring problem.",
+    "story": "Many products begin as tools built to solve a company’s own recurring problem. When others face the same problem, the private solution can become a market offering. Internal friction may reveal an opportunity if the pattern extends beyond one organization. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Internal friction may reveal an opportunity if the pattern extends beyond one organization. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The App That Began as an Internal Tool",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-006",
+    "title": "The Battery Designed for Second Life",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Electric-vehicle batteries may retain useful capacity after they are no longer ideal for driving.",
+    "story": "Electric-vehicle batteries may retain useful capacity after they are no longer ideal for driving. Repurposing them for stationary storage extends their value. Innovation can come from redesigning the end of a product’s life. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Innovation can come from redesigning the end of a product’s life. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The Battery Designed for Second Life",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-007",
+    "title": "The Sensor That Prevented a Failure",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Modern equipment can use vibration, temperature, pressure, or sound data to detect problems before breakdown.",
+    "story": "Modern equipment can use vibration, temperature, pressure, or sound data to detect problems before breakdown. Maintenance shifts from fixed schedules toward evidence. A weak signal becomes valuable when the system knows how to interpret it. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A weak signal becomes valuable when the system knows how to interpret it. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The Sensor That Prevented a Failure",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-011-008",
+    "title": "The Translation Tool That Learned From Context",
+    "category": "Innovation",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Language tools improved as systems began considering surrounding words and patterns rather than translating each word in isolation.",
+    "story": "Language tools improved as systems began considering surrounding words and patterns rather than translating each word in isolation. Meaning often lives in relationships, not individual parts. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Meaning often lives in relationships, not individual parts. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+    "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Innovation",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "011",
+    "category_label": "Innovation",
+    "spark_type": "story",
+    "short_title": "The Translation Tool That Learned From Context",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-001",
+    "title": "The Northern Lights Over a Quiet Road",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Auroras occur when charged particles from the Sun interact with Earth’s magnetic field and atmosphere.",
+    "story": "Auroras occur when charged particles from the Sun interact with Earth’s magnetic field and atmosphere. The result can turn a dark sky into moving curtains of color. Wonder can arrive when invisible forces become briefly visible. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Wonder can arrive when invisible forces become briefly visible. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Northern Lights Over a Quiet Road",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-002",
+    "title": "The Deep-Sea Creature With Its Own Light",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Many deep-sea animals create light through chemical reactions or partnerships with bacteria.",
+    "story": "Many deep-sea animals create light through chemical reactions or partnerships with bacteria. In darkness, light becomes camouflage, communication, attraction, or defense. A harsh environment can produce strategies unlike anything at the surface. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "A harsh environment can produce strategies unlike anything at the surface. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Deep-Sea Creature With Its Own Light",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-003",
+    "title": "The Spiral Shared by Storms and Shells",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Spiral forms appear in shells, plants, galaxies, and storms for different physical reasons.",
+    "story": "Spiral forms appear in shells, plants, galaxies, and storms for different physical reasons. The visual similarity invites connection while reminding us not to assume one explanation fits all. Wonder grows when resemblance leads to questions rather than premature conclusions. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Wonder grows when resemblance leads to questions rather than premature conclusions. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Spiral Shared by Storms and Shells",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-004",
+    "title": "The Meteorite Older Than Earth",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some meteorites contain material formed before Earth itself.",
+    "story": "Some meteorites contain material formed before Earth itself. Holding one means holding evidence from the early solar system. An ordinary-looking stone can carry a history far beyond human scale. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "An ordinary-looking stone can carry a history far beyond human scale. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Meteorite Older Than Earth",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-005",
+    "title": "The Desert That Sings",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Certain sand dunes can produce deep humming or booming sounds when dry grains slide together under the right conditions.",
+    "story": "Certain sand dunes can produce deep humming or booming sounds when dry grains slide together under the right conditions. The world can contain unexpected music in places that appear silent. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "The world can contain unexpected music in places that appear silent. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Desert That Sings",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-006",
+    "title": "The Animal That Sees Ultraviolet",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Many birds and insects can detect ultraviolet wavelengths invisible to humans.",
+    "story": "Many birds and insects can detect ultraviolet wavelengths invisible to humans. Flowers, feathers, and signals may look completely different to them. Reality is larger than the portion our senses can receive. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Reality is larger than the portion our senses can receive. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Animal That Sees Ultraviolet",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-007",
+    "title": "The Ice Flower on a Frozen Lake",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Under certain conditions, delicate crystals can grow across new ice in patterns that resemble petals or ferns.",
+    "story": "Under certain conditions, delicate crystals can grow across new ice in patterns that resemble petals or ferns. The forms are temporary and highly sensitive to weather. Beauty can be both precise and brief. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "Beauty can be both precise and brief. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Ice Flower on a Frozen Lake",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
+    "collection": "core"
+  },
+  {
+    "spark_id": "SPARK-V3-012-008",
+    "title": "The Galaxy Hidden Behind Dust",
+    "category": "Wonder",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Astronomers use infrared and other wavelengths to see through dust that blocks visible light.",
+    "story": "Astronomers use infrared and other wavelengths to see through dust that blocks visible light. A different kind of observation reveals structures that were present all along. What appears empty may simply require another way of seeing. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+    "impact": "What appears empty may simply require another way of seeing. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+    "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+    "tags": [
+      "Wonder",
+      "core",
+      "volume-3"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "012",
+    "category_label": "Wonder",
+    "spark_type": "story",
+    "short_title": "The Galaxy Hidden Behind Dust",
+    "priority": 100,
+    "display_rule": "core",
+    "volume": 3,
     "collection": "core"
   }
 ]

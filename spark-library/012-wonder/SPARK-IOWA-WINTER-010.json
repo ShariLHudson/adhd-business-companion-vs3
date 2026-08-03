@@ -1,0 +1,45 @@
+{
+  "spark_id": "SPARK-IOWA-WINTER-010",
+  "title": "The Longest Night and the Return of Light",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The winter solstice marks the shortest day and longest night of the year in the Northern Hemisphere.",
+  "story": "The winter solstice marks the shortest day and longest night of the year in the Northern Hemisphere. After it, daylight begins returning gradually. A turning point may occur before the improvement is easy to feel. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A turning point may occur before the improvement is easy to feel. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+  "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Wonder",
+    "iowa-seasons",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      12,
+      1,
+      2
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "The Longest Night and the Return of Light",
+  "priority": 320,
+  "display_rule": "calculated-date",
+  "date_rule": "winter-solstice",
+  "season": "winter",
+  "months": [
+    12,
+    1,
+    2
+  ],
+  "volume": 3,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

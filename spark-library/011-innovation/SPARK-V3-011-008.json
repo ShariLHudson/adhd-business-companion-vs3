@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-011-008",
+  "title": "The Translation Tool That Learned From Context",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Language tools improved as systems began considering surrounding words and patterns rather than translating each word in isolation.",
+  "story": "Language tools improved as systems began considering surrounding words and patterns rather than translating each word in isolation. Meaning often lives in relationships, not individual parts. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Meaning often lives in relationships, not individual parts. Innovation is usually a chain of observations, tests, failures, adjustments, and connections that gradually become useful.",
+  "spark_application": "Run one tiny experiment. Decide what you want to learn before deciding what success must look like. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Innovation",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "The Translation Tool That Learned From Context",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

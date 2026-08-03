@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-002-004",
+  "title": "James Baldwin and the Work of Honest Language",
+  "category": "People & Stories",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "James Baldwin wrote about race, identity, love, fear, and power with unusual clarity.",
+  "story": "James Baldwin wrote about race, identity, love, fear, and power with unusual clarity. He used personal experience not as the end of the story, but as a way into larger truths. Honest language can make difficult realities harder to ignore and easier to examine. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Honest language can make difficult realities harder to ignore and easier to examine. A person’s story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own life.",
+  "spark_application": "Choose one quality from this story that you want to practice today. Name one small way it could appear in your work or relationships. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "People & Stories",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "002",
+  "category_label": "People & Stories",
+  "spark_type": "story",
+  "short_title": "James Baldwin and the Work of Honest Language",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

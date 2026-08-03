@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-012-006",
+  "title": "The Animal That Sees Ultraviolet",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Many birds and insects can detect ultraviolet wavelengths invisible to humans.",
+  "story": "Many birds and insects can detect ultraviolet wavelengths invisible to humans. Flowers, feathers, and signals may look completely different to them. Reality is larger than the portion our senses can receive. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Reality is larger than the portion our senses can receive. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+  "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Wonder",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "The Animal That Sees Ultraviolet",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

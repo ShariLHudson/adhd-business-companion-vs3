@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-001-006",
+  "title": "The Language Hidden in Whale Songs",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Researchers studying whale songs found patterns that change, spread, and sometimes repeat across groups and years.",
+  "story": "Researchers studying whale songs found patterns that change, spread, and sometimes repeat across groups and years. The sounds became evidence of learning and communication. Discovery often begins when we stop treating unfamiliar communication as meaningless noise. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Discovery often begins when we stop treating unfamiliar communication as meaningless noise. Discovery grows when we notice what does not fit, stay with the question, and resist explaining it away too quickly.",
+  "spark_application": "Write down one unexpected result or unanswered question from your own work. List three possible explanations before choosing one. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Language Hidden in Whale Songs",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

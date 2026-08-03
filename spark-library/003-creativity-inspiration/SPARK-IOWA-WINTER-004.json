@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-WINTER-004",
+  "title": "The Indoor Season of Making",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Cold Iowa days often move creativity indoors: quilting, woodworking, baking, journaling, painting, and repairing.",
+  "story": "Cold Iowa days often move creativity indoors: quilting, woodworking, baking, journaling, painting, and repairing. Winter can become a season for work that needs concentration more than motion. A smaller physical world can create deeper creative attention. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A smaller physical world can create deeper creative attention. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Give yourself ten minutes to explore rather than perfect. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "iowa-seasons",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      12,
+      1,
+      2
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The Indoor Season of Making",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "winter",
+  "months": [
+    12,
+    1,
+    2
+  ],
+  "volume": 3,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

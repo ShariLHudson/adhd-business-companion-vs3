@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-005-004",
+  "title": "Why We Copy the Mood of a Room",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "People unconsciously respond to tone, expression, pace, and tension in others.",
+  "story": "People unconsciously respond to tone, expression, pace, and tension in others. Emotional states can spread through a group without anyone naming what is happening. The atmosphere we create may influence people before our words do. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "The atmosphere we create may influence people before our words do. Curiosity loosens assumptions. A better question can reveal options that certainty would have hidden.",
+  "spark_application": "Take one assumption you have been treating as fixed and turn it into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why We Copy the Mood of a Room",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

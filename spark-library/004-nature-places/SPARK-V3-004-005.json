@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-004-005",
+  "title": "The Canyon Carved Slowly",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Canyons form through persistent erosion, uplift, weather, and immense time.",
+  "story": "Canyons form through persistent erosion, uplift, weather, and immense time. The dramatic landscape is the result of processes too gradual to notice in a single day. Slow change can create outcomes that look impossible from the scale of one moment. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Slow change can create outcomes that look impossible from the scale of one moment. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+  "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Nature & Places",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "The Canyon Carved Slowly",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-009-003",
+  "title": "The First Time on Snowshoes",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Snowshoes distribute weight so a person can travel across deep snow more easily.",
+  "story": "Snowshoes distribute weight so a person can travel across deep snow more easily. The movement feels awkward at first because the body must learn a wider, unfamiliar rhythm. A new tool may require a temporary loss of grace before it creates freedom. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A new tool may require a temporary loss of grace before it creates freedom. Adventure begins with movement into the unfamiliar. The step only needs to teach something that staying still cannot.",
+  "spark_application": "Take one safe step beyond routine. Make it small enough to begin today and meaningful enough to teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The First Time on Snowshoes",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-004-003",
+  "title": "The Tundra That Blooms Briefly",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Arctic and alpine plants complete much of their growth and reproduction during a short season.",
+  "story": "Arctic and alpine plants complete much of their growth and reproduction during a short season. They respond quickly because the window is limited. A short season can still hold meaningful growth when the timing is understood. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A short season can still hold meaningful growth when the timing is understood. Nature and place can teach timing, interdependence, adaptation, patience, and the value of seeing familiar surroundings with fresh attention.",
+  "spark_application": "Notice one natural pattern, place, or seasonal change today. Write one sentence about what it suggests about your own pace or direction. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Nature & Places",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "The Tundra That Blooms Briefly",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}

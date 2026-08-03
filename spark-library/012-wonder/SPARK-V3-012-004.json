@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V3-012-004",
+  "title": "The Meteorite Older Than Earth",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Some meteorites contain material formed before Earth itself.",
+  "story": "Some meteorites contain material formed before Earth itself. Holding one means holding evidence from the early solar system. An ordinary-looking stone can carry a history far beyond human scale. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed. The lasting value is not merely knowing the fact. It is seeing the pattern beneath it and considering where that same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "An ordinary-looking stone can carry a history far beyond human scale. Wonder interrupts routine and restores perspective. It reminds us that the world still contains more than we have noticed.",
+  "spark_application": "Spend five quiet minutes noticing something that creates awe, surprise, or delight. Save one sentence about what shifted in your perspective. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Wonder",
+    "core",
+    "volume-3"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "The Meteorite Older Than Earth",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 3,
+  "collection": "core"
+}
