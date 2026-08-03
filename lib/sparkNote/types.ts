@@ -169,6 +169,12 @@ export type SparkNoteCatalogEntry = {
   volume?: number;
   /** Which authored collection (core / iowa-seasons). Filtering/admin only. */
   collection?: SparkCollection;
+  /**
+   * Structured region code for regional cards, e.g. "US-IA" (Iowa). Core cards
+   * leave this undefined. Region gates only automatic daily eligibility (Phase
+   * 3) — never manual search, saved-card reopening, review, or admin testing.
+   */
+  region?: string;
 
   /** Authored second-layer "Tell Me More" content — optional; generator fills gaps. */
   expanded?: SparkNoteExpandedContent;

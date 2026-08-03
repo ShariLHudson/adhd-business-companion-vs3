@@ -87,15 +87,14 @@ describe("normalizeSchedule — new shape (displayRule authoritative)", () => {
     });
   });
 
-  it("displayRule seasonal + season + months → seasonal", () => {
-    // `region` (e.g. "Iowa") is intentionally out of Phase 1 scope; it joins the
-    // schema when the seasonal collections are transformed in a later phase.
+  it("displayRule seasonal + season + months + region → seasonal", () => {
     const s = normalizeSchedule(
       entry({
         id: "i",
         displayRule: "seasonal",
         season: "autumn",
         months: [9, 10, 11],
+        region: "US-IA",
         priority: 140,
       }),
     );
@@ -103,6 +102,7 @@ describe("normalizeSchedule — new shape (displayRule authoritative)", () => {
       kind: "seasonal",
       season: "autumn",
       months: [9, 10, 11],
+      region: "US-IA",
       priority: 140,
     });
   });

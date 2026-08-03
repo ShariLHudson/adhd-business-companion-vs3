@@ -24,14 +24,7 @@ import type {
   SparkSeason,
 } from "../types";
 
-/**
- * Fields common to every normalized schedule kind.
- *
- * Note: the new single-`region` tag (e.g. "Iowa") on seasonal cards is NOT
- * carried yet — the `region` field is not part of the approved Phase 1 entry
- * schema. It is added when the seasonal collections are transformed (a later
- * phase), at which point `region` joins the entry type and this base.
- */
+/** Fields common to every normalized schedule kind. */
 type NormalizedScheduleBase = {
   /** Higher wins when multiple entries of the same kind match a day. */
   priority: number;
@@ -39,6 +32,12 @@ type NormalizedScheduleBase = {
   cooldownDays?: number;
   /** Legacy region gate (RegionCode[]). */
   regions?: RegionCode[];
+  /**
+   * Structured region code for regional cards, e.g. "US-IA". Undefined = no
+   * region restriction. The eligibility rule (match member's saved region;
+   * never block search/reopen/review/admin) is applied by the selector (Phase 3).
+   */
+  region?: string;
 };
 
 /**
@@ -68,6 +67,7 @@ function baseOf(entry: SparkNoteCatalogEntry): NormalizedScheduleBase {
       ? { cooldownDays: entry.cooldownDays }
       : {}),
     ...(entry.regions && entry.regions.length ? { regions: entry.regions } : {}),
+    ...(entry.region ? { region: entry.region } : {}),
   };
 }
 
