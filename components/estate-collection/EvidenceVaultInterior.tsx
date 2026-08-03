@@ -50,6 +50,7 @@ type Props = {
   onOpenEntry?: (id: string) => void;
   onCategorySelect?: (category: EvidenceVaultHomeCategory) => void;
   onSearchBrowse?: (query: string) => void;
+  onOpenSavedEvidence?: () => void;
   /** Discovery File is open above the vault interior plate. */
   behindDiscovery?: boolean;
 };
@@ -68,6 +69,7 @@ export function EvidenceVaultInterior({
   onOpenEntry,
   onCategorySelect,
   onSearchBrowse,
+  onOpenSavedEvidence,
   behindDiscovery = false,
 }: Props) {
   const [entries, setEntries] = useState<EvidenceEntry[]>([]);
@@ -309,6 +311,16 @@ export function EvidenceVaultInterior({
                 >
                   Journal
                 </button>
+                {onOpenSavedEvidence ? (
+                  <button
+                    type="button"
+                    className="evidence-vault-interior__text-btn"
+                    onClick={onOpenSavedEvidence}
+                    data-testid="evidence-vault-saved-evidence"
+                  >
+                    Saved Evidence
+                  </button>
+                ) : null}
               </div>
 
               <div

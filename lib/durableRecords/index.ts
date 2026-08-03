@@ -62,3 +62,13 @@ export type {
   SavedWorkClaim,
   SavedWorkClaimStatus,
 } from "./savedWorkClaims";
+
+export {
+  resolveEvidenceVaultClaim,
+  mayClaimEvidenceSaved,
+} from "./evidenceVaultClaims";
+export type {
+  EvidenceVaultAction,
+  EvidenceVaultClaim,
+  EvidenceVaultClaimStatus,
+} from "./evidenceVaultClaims";

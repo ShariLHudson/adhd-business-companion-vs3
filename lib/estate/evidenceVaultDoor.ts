@@ -187,7 +187,13 @@ export function isEvidenceVaultEntranceComplete(
 export function shouldMountEvidenceVaultHome(opts: {
   doorState: EvidenceVaultDoorState;
   vaultMode: "arrive" | "add" | "browse";
-  vaultPanel: null | "discovery" | "browse" | "insights" | "search";
+  vaultPanel:
+    | null
+    | "discovery"
+    | "browse"
+    | "insights"
+    | "search"
+    | "saved-evidence";
 }): boolean {
   return (
     isEvidenceVaultEntranceComplete(opts.doorState) &&

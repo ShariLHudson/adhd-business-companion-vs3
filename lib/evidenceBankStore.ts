@@ -7,6 +7,13 @@
 import type { EcosystemObjectKind } from "./intelligence/intelligenceReadyTypes";
 import type { GrowthAttachment } from "./growthAttachments";
 import { linkGrowthAttachmentsToRecord } from "@/lib/assetLibrary/references";
+import { DURABLE_ERROR, durableRecordFail } from "./durableRecords/types";
+import type { DurableRecordResult } from "./durableRecords/types";
+import {
+  softDeleteEvidenceVaultDurable,
+  upsertEvidenceVaultDurable,
+} from "./durableRecords/domains/evidenceVault";
+import { isEvidenceVaultDurableEnabled } from "./durableRecords/flags";
 
 /** Vault categories aligned to 246 capture moments + 248 example types. */
 export const EVIDENCE_CATEGORIES = [
@@ -128,6 +135,34 @@ function writeAll(list: EvidenceEntry[]): void {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Durable write integration.
+//
+// Every local write additionally kicks off a best-effort background durable
+// upsert/soft-delete (when the flag is enabled) so every existing call site —
+// the discovery form, quick-add, chamber/institute/plan-my-day capture, etc. —
+// gets durable backing for free, with no change to its own signature or
+// synchronous behavior. Durable success comes ONLY from the verified
+// repository receipt, never from this fire-and-forget call; localStorage
+// remains the local recovery cache / fallback, never the durable-success
+// signal. Callers that need a verified outcome should use the explicit
+// *Durable wrapper functions below instead.
+// ---------------------------------------------------------------------------
+
+function scheduleDurableEvidenceSync(entry: EvidenceEntry): void {
+  if (!isEvidenceVaultDurableEnabled()) return;
+  void upsertEvidenceVaultDurable(entry).catch(() => {
+    /* best-effort background sync; local copy remains the fallback */
+  });
+}
+
+function scheduleDurableEvidenceDelete(id: string): void {
+  if (!isEvidenceVaultDurableEnabled()) return;
+  void softDeleteEvidenceVaultDurable(id).catch(() => {
+    /* best-effort background sync; local copy remains the fallback */
+  });
+}
+
 export function getEvidenceEntries(): EvidenceEntry[] {
   return readAll().sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
@@ -172,6 +207,7 @@ export function createEvidenceEntry(
     "evidence-bank",
     entry.id,
   );
+  scheduleDurableEvidenceSync(entry);
   return entry;
 }
 
@@ -264,6 +300,7 @@ export function filterEvidenceEntries(
 
 export function deleteEvidenceEntry(id: string): void {
   writeAll(readAll().filter((e) => e.id !== id));
+  scheduleDurableEvidenceDelete(id);
 }
 
 export function updateEvidenceEntry(
@@ -280,6 +317,7 @@ export function updateEvidenceEntry(
   };
   list[idx] = updated;
   writeAll(list);
+  scheduleDurableEvidenceSync(updated);
   return updated;
 }
 
@@ -689,4 +727,63 @@ export const EMPTY_EVIDENCE_DRAFT: EvidenceEntryInput = {
 
 export function categoryLabel(category: EvidenceCategory): string {
   return category;
+}
+
+// ---------------------------------------------------------------------------
+// Durable write integration — explicit, receipted variants for callers that
+// need a verified outcome (the Saved Evidence view). Every durable write also
+// keeps the local copy as a recovery cache; durable success comes ONLY from
+// the verified repository receipt, never from the local write.
+// ---------------------------------------------------------------------------
+
+const EVIDENCE_NOT_FOUND_RECEIPT = (): DurableRecordResult<EvidenceEntry> =>
+  durableRecordFail(
+    DURABLE_ERROR.NOT_FOUND,
+    "I couldn't find that discovery to save — it may already be gone. Your evidence is still here.",
+    false,
+  );
+
+/** Attempt a verified durable save of an already-built entry; returns the receipt. */
+export async function persistEvidenceEntryDurable(
+  entry: EvidenceEntry,
+): Promise<DurableRecordResult<EvidenceEntry>> {
+  return upsertEvidenceVaultDurable(entry);
+}
+
+export async function createEvidenceEntryDurable(
+  input: EvidenceEntryInput,
+): Promise<{ entry: EvidenceEntry; receipt: DurableRecordResult<EvidenceEntry> }> {
+  const entry = createEvidenceEntry(input); // local recovery write
+  const receipt = await persistEvidenceEntryDurable(entry);
+  return { entry, receipt };
+}
+
+export async function updateEvidenceEntryDurable(
+  id: string,
+  patch: Partial<EvidenceEntryInput>,
+): Promise<{
+  entry?: EvidenceEntry;
+  receipt: DurableRecordResult<EvidenceEntry>;
+}> {
+  const entry = updateEvidenceEntry(id, patch); // local recovery write
+  if (!entry) return { receipt: EVIDENCE_NOT_FOUND_RECEIPT() };
+  const receipt = await persistEvidenceEntryDurable(entry);
+  return { entry, receipt };
+}
+
+/**
+ * Soft-delete durably (server retains status "deleted" for recovery). The
+ * local copy is removed only after the durable tombstone is verified, so a
+ * failed delete never loses the local recovery copy.
+ */
+export async function deleteEvidenceEntryDurable(
+  id: string,
+): Promise<DurableRecordResult<EvidenceEntry>> {
+  const receipt = await softDeleteEvidenceVaultDurable(id);
+  const alreadyGone =
+    !receipt.ok && receipt.errorCode === DURABLE_ERROR.NOT_FOUND;
+  if ((receipt.ok && receipt.durable) || alreadyGone) {
+    deleteEvidenceEntry(id); // remove local; server keeps recoverable soft-delete
+  }
+  return receipt;
 }

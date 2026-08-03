@@ -71,6 +71,7 @@ import {
 } from "./DiscoveryFileExperience";
 import { EvidenceVaultEntrance } from "./EvidenceVaultEntrance";
 import { EvidenceVaultInterior } from "./EvidenceVaultInterior";
+import { SavedEvidenceLibrary } from "@/components/companion/SavedEvidenceLibrary";
 import { EstateCollectionCaptureForm } from "./EstateCollectionCaptureForm";
 import { EstateCollectionItemCard } from "./EstateCollectionItemCard";
 import { EstateCollectionRoomScene } from "./EstateCollectionRoomScene";
@@ -90,7 +91,13 @@ import "./evidence-vault-entrance.css";
 import "./evidence-vault-interior.css";
 import "./evidence-vault-workspace.css";
 
-type VaultPanel = null | "discovery" | "browse" | "insights" | "search";
+type VaultPanel =
+  | null
+  | "discovery"
+  | "browse"
+  | "insights"
+  | "search"
+  | "saved-evidence";
 
 function vaultPanelForMode(mode: EvidenceVaultWorkspaceMode): VaultPanel {
   if (mode === "add") return "discovery";
@@ -233,6 +240,8 @@ export function EstateCollectionRoomEngine({
     isEvidenceVault && entranceComplete && vaultPanel === "insights";
   const showVaultSearch =
     isEvidenceVault && entranceComplete && vaultPanel === "search";
+  const showVaultSavedEvidence =
+    isEvidenceVault && entranceComplete && vaultPanel === "saved-evidence";
   const vaultPlateImage = useMemo(() => {
     if (!isEvidenceVault) return undefined;
     return evidenceVaultShellBackground(doorState);
@@ -353,6 +362,11 @@ export function EstateCollectionRoomEngine({
   function openBrowsePanel() {
     setVaultMode("browse");
     setVaultPanel("browse");
+  }
+
+  function openSavedEvidencePanel() {
+    setVaultMode("browse");
+    setVaultPanel("saved-evidence");
   }
 
   /**
@@ -635,6 +649,7 @@ export function EstateCollectionRoomEngine({
                 onOpenEntry={(id) => beginEdit(id)}
                 onCategorySelect={openHomeCategory}
                 onSearchBrowse={searchBrowseFromHome}
+                onOpenSavedEvidence={openSavedEvidencePanel}
               />
             </div>
           ) : null}
@@ -779,6 +794,14 @@ export function EstateCollectionRoomEngine({
             >
               Open Browse Archive
             </button>
+          </EvidenceVaultWorkspaceModal>
+          <EvidenceVaultWorkspaceModal
+            open={showVaultSavedEvidence}
+            onClose={closeVaultPanel}
+            title="Saved Evidence"
+            testId="evidence-vault-saved-evidence-modal"
+          >
+            <SavedEvidenceLibrary />
           </EvidenceVaultWorkspaceModal>
         </>
       ) : (

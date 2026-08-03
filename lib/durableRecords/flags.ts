@@ -63,3 +63,36 @@ export function isSavedSparkDurableEnabled(): boolean {
   }
   return true;
 }
+
+/**
+ * Evidence Vault durable persistence.
+ *
+ * OFF by default, same rollout posture as saved_work: Evidence Vault (Tier A7)
+ * is a full-object round-trip domain with many existing local-only call sites,
+ * so it ships behind a flag until cross-device behavior is certified. Enable
+ * via env (NEXT_PUBLIC_DURABLE_EVIDENCE_VAULT=1) or a per-browser override
+ * (localStorage "spark.flag.durableEvidenceVault" = "1").
+ */
+const EVIDENCE_VAULT_FLAG_KEY = "spark.flag.durableEvidenceVault";
+
+let evidenceVaultTestOverride: boolean | null = null;
+
+/** Test seam: force the flag on/off, or null to restore normal resolution. */
+export function setEvidenceVaultDurableEnabledForTests(
+  value: boolean | null,
+): void {
+  evidenceVaultTestOverride = value;
+}
+
+export function isEvidenceVaultDurableEnabled(): boolean {
+  if (evidenceVaultTestOverride !== null) return evidenceVaultTestOverride;
+  if (process.env.NEXT_PUBLIC_DURABLE_EVIDENCE_VAULT === "1") return true;
+  if (typeof window !== "undefined") {
+    try {
+      return window.localStorage.getItem(EVIDENCE_VAULT_FLAG_KEY) === "1";
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
