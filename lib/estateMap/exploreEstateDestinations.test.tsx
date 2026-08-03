@@ -96,7 +96,9 @@ describe("Explore Estate visual destinations", () => {
   it("hides catalog-only duplicate plates from Explore Estate", () => {
     const destinations = getExploreEstateDestinations();
     const hidden = [
-      // personal-library is now an included canonical Wander destination.
+      // Temporarily removed from Wander the Estate (canonical room still opens
+      // from chat / Spark Cards / normal navigation).
+      "personal-library",
       "main-staircase",
       "window-seat",
       "momentum-builder",
@@ -125,6 +127,7 @@ describe("Explore Estate visual destinations", () => {
     const destinations = getExploreEstateDestinations();
     const forbiddenNames = [
       "Personal Library",
+      "My Personal Library",
       "Momentum Builder",
       "Momentum Room",
       "Main Staircase",
@@ -165,24 +168,19 @@ describe("Explore Estate visual destinations", () => {
     ]);
   });
 
-  it("includes My Personal Library but not the Reading Nook Under Stairway plate", () => {
+  it("no longer offers Personal Library as a Wander destination (temporary)", () => {
     const destinations = getExploreEstateDestinations();
-    // My Personal Library is now a canonical Wander destination…
-    const personalLibrary = destinations.find((d) => d.id === "personal-library");
-    expect(personalLibrary?.name).toBe("My Personal Library");
-    // …opening the same real room (no duplicate destination id / route)…
-    expect(personalLibrary?.destinationId).toBe("personal-library");
+    // Temporary scope reduction: Personal Library is removed from Wander so the
+    // immersive shell cannot trap the room / block Find/Search + Recent. It must
+    // be gone from the card list, by id, by destination id, and by name.
+    expect(destinations.some((d) => d.id === "personal-library")).toBe(false);
     expect(
-      destinations.filter((d) => d.destinationId === "personal-library").length,
-    ).toBe(1);
-    // …with the approved room art and approved description.
-    expect(personalLibrary?.imagePath).toBe(
-      "/backgrounds/personal-library-search-recent-background.png",
+      destinations.some((d) => d.destinationId === "personal-library"),
+    ).toBe(false);
+    expect(destinations.some((d) => d.name === "My Personal Library")).toBe(
+      false,
     );
-    expect(personalLibrary?.description).toBe(
-      "Your saved Sparks, ideas, notes, actions, lessons, and questions.",
-    );
-    // The borrowed Reading Nook Under Stairway plate stays out.
+    // The borrowed Reading Nook Under Stairway plate stays out too.
     expect(destinations.some((d) => d.id === "stairway-reading-nook")).toBe(
       false,
     );

@@ -10,7 +10,6 @@ import { describe, expect, it } from "vitest";
 import { estateNavigateCommandForPlace } from "@/lib/estateIntelligence/estateCommandRouter";
 import { isDedicatedEstateRoomPanelSection } from "./directEstateVisit";
 import { isEstateFullBleedPanelSection } from "./estateFullBleedPanelSections";
-import { planWelcomeHomeDestinationSwitch } from "./welcomeHomeDestinationSwitch";
 import {
   PERSONAL_LIBRARY_SECTION,
   estateMapFullScreenVisible,
@@ -79,40 +78,27 @@ describe("Personal Library — canonical full-screen workspace", () => {
     });
   });
 
-  describe("Wander entry leaves the Wander shell for the canonical room", () => {
-    it("selecting Personal Library from Wander closes the Explore/Wander shell", () => {
-      // handleExploreSparkMapSelect navigates with kind "section"; the switch
-      // plan must tear down the full-screen Explore/Wander map + image viewer.
-      const plan = planWelcomeHomeDestinationSwitch({
-        destinationId: "personal-library",
-        kind: "section",
-      });
-      expect(plan.closeExploreEstate).toBe(true);
-    });
-
-    it("the Wander bottom controls are absent once Personal Library is active", () => {
-      // Even if the map state lagged open, the render guard hides the immersive
-      // bar ("Talk here with Spark", "Exit full screen", prev/next) over the room.
+  describe("Explore/Wander viewport guard (defense-in-depth)", () => {
+    // Personal Library is no longer offered as a Wander destination (see
+    // lib/estateMap/wanderPersonalLibraryRemoval.test.ts). This render guard is
+    // kept anyway: if the Explore/Wander map were ever open while Personal
+    // Library is active, its bottom controls ("Talk here with Spark", "Exit full
+    // screen", prev/next) must not cover the room.
+    it("hides the Explore/Wander controls while Personal Library is active", () => {
       expect(estateMapFullScreenVisible(true, PERSONAL_LIBRARY_SECTION)).toBe(false);
     });
 
-    it("Wander entry resolves to the SAME canonical workspace as chat", () => {
-      const wander = estateNavigateCommandForPlace(
-        "personal-library",
-        "Explore Estate: My Personal Library",
-      );
+    it("shows the Explore/Wander controls normally elsewhere", () => {
+      expect(estateMapFullScreenVisible(true, "home")).toBe(true);
+    });
+
+    it("still routes chat / Spark Card navigation to the canonical room", () => {
       const chat = estateNavigateCommandForPlace(
         "personal-library",
         "go to my personal library",
       );
-      expect(wander?.section).toBe(PERSONAL_LIBRARY_SECTION);
       expect(chat?.section).toBe(PERSONAL_LIBRARY_SECTION);
-      expect(wander?.section).toBe(chat?.section);
-      expect(isCanonicalFullScreenWorkspace(wander!.section!)).toBe(true);
-    });
-
-    it("Wander controls return after leaving Personal Library", () => {
-      expect(estateMapFullScreenVisible(true, "home")).toBe(true);
+      expect(isCanonicalFullScreenWorkspace(chat!.section!)).toBe(true);
     });
   });
 

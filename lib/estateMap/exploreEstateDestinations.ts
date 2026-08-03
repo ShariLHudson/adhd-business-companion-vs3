@@ -37,8 +37,16 @@ export const EXPLORE_ESTATE_FORBIDDEN_IDS = [
  */
 const EXPLORE_CATALOG_EXCLUDED_IDS = new Set([
   // Removed from Explore Estate (member-facing list)
-  // "personal-library" is intentionally NOT excluded — it is a canonical
-  // Wander destination (My Personal Library) that opens the real room.
+  // TEMPORARY scope reduction (not a deletion): Personal Library is removed from
+  // Wander the Estate because the Wander immersive shell traps the room and can
+  // block its approved Find/Search + Recent controls. The canonical room still
+  // opens from chat, Spark Cards, and normal navigation. Excluding it here
+  // removes the card, the Wander image-tour entry (prev/next), the by-id lookup,
+  // and the map location in one place — no dead hotspot is left behind. To
+  // restore the Wander destination later, delete just this id; the display name,
+  // description, image, and category overrides below are intentionally retained
+  // so it comes back intact.
+  "personal-library",
   "stairway-reading-nook",
   "main-staircase",
   "window-seat",
@@ -701,7 +709,9 @@ export function resetExploreEstateDestinationsCache(): void {
 export const EXPLORE_ESTATE_REQUIRED_NAMES = [
   "Spark Estate Entry",
   "Welcome Home",
-  "My Personal Library",
+  // "My Personal Library" is intentionally NOT required here — it is temporarily
+  // removed from Wander the Estate (see EXPLORE_CATALOG_EXCLUDED_IDS). Restore
+  // this entry alongside the excluded id to bring the Wander destination back.
   "Study Hall",
   "Reading Nook Window",
   "Tea Room",

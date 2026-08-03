@@ -79,18 +79,17 @@ describe("Personal Library chat navigation", () => {
     expect("placeId" in seeds && seeds.placeId).toBe("seeds-planted");
   });
 
-  it("Wander 'My Personal Library' opens the same canonical room, no duplicate", () => {
+  it("Personal Library is no longer a Wander destination, but chat still resolves the canonical room", () => {
+    // Temporary scope reduction: Personal Library is removed from Wander the
+    // Estate (the immersive shell trapped the room / blocked Find/Search +
+    // Recent). See lib/estateMap/wanderPersonalLibraryRemoval.test.ts.
     const dests = getExploreEstateDestinations();
-    const pl = dests.find((d) => d.id === "personal-library");
-    expect(pl?.name).toBe("My Personal Library");
-    // Same canonical destination id chat navigation uses…
-    expect(pl?.destinationId).toBe("personal-library");
-    // …exactly one destination/route targets it (no duplicate room)…
-    expect(
-      dests.filter((d) => d.destinationId === "personal-library").length,
-    ).toBe(1);
-    // …resolving to the same section that renders PersonalLibraryRoom.
-    expect(estateNavigateCommandForPlace(pl!.destinationId)?.section).toBe(
+    expect(dests.some((d) => d.id === "personal-library")).toBe(false);
+    expect(dests.some((d) => d.destinationId === "personal-library")).toBe(
+      false,
+    );
+    // Chat / Spark Card / normal navigation still resolve the real room.
+    expect(estateNavigateCommandForPlace("personal-library")?.section).toBe(
       "personal-library",
     );
   });
