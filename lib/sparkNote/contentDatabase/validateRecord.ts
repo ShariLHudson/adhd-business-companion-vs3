@@ -72,6 +72,70 @@ function runMasterQualityTests(
 }
 
 /**
+ * New scheduling model (Volumes 2–4 + seasonal) field consistency. Only runs
+ * when `display_rule` is set, so legacy records are unaffected.
+ */
+function runSchedulingValidation(
+  record: SparkContentRecord,
+): SparkRecordValidationIssue[] {
+  const issues: SparkRecordValidationIssue[] = [];
+  if (!record.display_rule) return issues;
+
+  if (record.display_rule === "exact-date") {
+    const monthOk = typeof record.month === "number" && record.month >= 1 && record.month <= 12;
+    const dayOk = typeof record.day === "number" && record.day >= 1 && record.day <= 31;
+    if (!monthOk || !dayOk) {
+      issues.push({
+        field: "display_rule",
+        message: "exact-date requires a valid month (1–12) and day (1–31).",
+        severity: "error",
+      });
+    }
+  }
+
+  if (record.display_rule === "calculated-date" && !record.date_rule) {
+    issues.push({
+      field: "date_rule",
+      message: "calculated-date requires a date_rule (e.g. thanksgiving-us).",
+      severity: "error",
+    });
+  }
+
+  if (
+    record.display_rule === "seasonal" &&
+    !record.months?.length &&
+    !record.season
+  ) {
+    issues.push({
+      field: "display_rule",
+      message: "seasonal requires months and/or a season.",
+      severity: "error",
+    });
+  }
+
+  if (
+    typeof record.volume === "number" &&
+    (!Number.isInteger(record.volume) || record.volume < 1)
+  ) {
+    issues.push({
+      field: "volume",
+      message: "volume must be a positive integer.",
+      severity: "error",
+    });
+  }
+
+  if (record.region && !/^[A-Za-z]{2}-[A-Za-z0-9]+$/.test(record.region)) {
+    issues.push({
+      field: "region",
+      message: "region should be a structured code, e.g. US-IA.",
+      severity: "warning",
+    });
+  }
+
+  return issues;
+}
+
+/**
  * Validate a Spark library record per
  * SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md and admin protocol.
  */
@@ -176,6 +240,7 @@ export function validateSparkRecord(
     });
   }
 
+  issues.push(...runSchedulingValidation(record));
   issues.push(...runMasterQualityTests(record));
 
   return issues;

@@ -1,7 +1,14 @@
 import type { RegionCode } from "@/lib/companionLanguage";
 import type { WelcomeSeason } from "@/lib/welcomeLivingRoom";
 
-import type { SparkNoteCategory, SparkNoteType } from "../types";
+import type {
+  SparkCalculatedDateRule,
+  SparkCollection,
+  SparkDisplayRule,
+  SparkNoteCategory,
+  SparkNoteType,
+  SparkSeason,
+} from "../types";
 
 /** JSON-authorable "Tell Me More" second layer — snake_case, additive/optional. */
 export type SparkExpandedContentFields = {
@@ -72,6 +79,20 @@ export type SparkContentRecord = {
   priority?: number;
   cooldown_days?: number;
   regions?: RegionCode[];
+
+  // New scheduling model (Volumes 2–4 + seasonal). Additive/optional; when
+  // `display_rule` is set the runtime reads these instead of `date_rules`.
+  // Legacy records omit them, so their serialization is unchanged.
+  display_rule?: SparkDisplayRule;
+  date_rule?: SparkCalculatedDateRule;
+  season?: SparkSeason;
+  month?: number;
+  day?: number;
+  months?: number[];
+  volume?: number;
+  collection?: SparkCollection;
+  /** Structured region code, e.g. "US-IA". */
+  region?: string;
 } & SparkExpandedContentFields;
 
 export type SparkDailySelectionReason = "personal" | "date" | "library";

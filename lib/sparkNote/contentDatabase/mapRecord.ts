@@ -72,7 +72,7 @@ export function catalogEntryToRecord(entry: SparkNoteCatalogEntry): SparkContent
     date_rules = { type: "months", months: [...entry.months] };
   }
 
-  return {
+  const record: SparkContentRecord = {
     spark_id: entry.id,
     title: entry.title,
     category: entry.categoryLabel,
@@ -98,6 +98,22 @@ export function catalogEntryToRecord(entry: SparkNoteCatalogEntry): SparkContent
     regions: entry.regions,
     ...expandedToRecordFields(entry.expanded),
   };
+
+  // New scheduling model — only added when present, so legacy records serialize
+  // exactly as before (keeps the committed manifest a no-op diff).
+  if (entry.displayRule) {
+    record.display_rule = entry.displayRule;
+    if (entry.dateRule) record.date_rule = entry.dateRule;
+    if (entry.season) record.season = entry.season;
+    if (typeof entry.month === "number") record.month = entry.month;
+    if (typeof entry.day === "number") record.day = entry.day;
+    if (entry.months?.length) record.months = [...entry.months];
+    if (typeof entry.volume === "number") record.volume = entry.volume;
+    if (entry.collection) record.collection = entry.collection;
+    if (entry.region) record.region = entry.region;
+  }
+
+  return record;
 }
 
 export function recordToCatalogEntry(record: SparkContentRecord): SparkNoteCatalogEntry | null {
@@ -138,6 +154,19 @@ export function recordToCatalogEntry(record: SparkContentRecord): SparkNoteCatal
     entry.seasons = [rules.value];
   } else if (rules.type === "months") {
     entry.months = [...rules.months];
+  }
+
+  // New scheduling model — authoritative when present (mirrors the entry shape).
+  if (record.display_rule) {
+    entry.displayRule = record.display_rule;
+    if (record.date_rule) entry.dateRule = record.date_rule;
+    if (record.season) entry.season = record.season;
+    if (typeof record.month === "number") entry.month = record.month;
+    if (typeof record.day === "number") entry.day = record.day;
+    if (record.months?.length) entry.months = [...record.months];
+    if (typeof record.volume === "number") entry.volume = record.volume;
+    if (record.collection) entry.collection = record.collection;
+    if (record.region) entry.region = record.region;
   }
 
   return entry;

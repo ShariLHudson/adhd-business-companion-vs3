@@ -7,6 +7,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { SEED_SPARK_NOTE_CATALOG } from "../lib/sparkNote/catalogSeed";
+import { INTEGRATED_VOLUME_ENTRIES } from "../lib/sparkNote/futureSparkCard";
 import { libraryFolderForCategory } from "../lib/sparkNote/contentDatabase/folders";
 import { catalogEntryToRecord } from "../lib/sparkNote/contentDatabase/mapRecord";
 import type { SparkContentRecord } from "../lib/sparkNote/contentDatabase/types";
@@ -43,12 +44,17 @@ function main(): void {
   mkdirSync(libraryRoot, { recursive: true });
 
   const fromSeed = SEED_SPARK_NOTE_CATALOG.map(catalogEntryToRecord);
+  // Integrated Volumes 2–4 + seasonal (empty until Phase 5 — keeps this a no-op).
+  const fromVolumes = INTEGRATED_VOLUME_ENTRIES.map(catalogEntryToRecord);
   const byId = new Map<string, SparkContentRecord>();
 
   for (const record of collectExistingRecords()) {
     byId.set(record.spark_id, record);
   }
   for (const record of fromSeed) {
+    byId.set(record.spark_id, record);
+  }
+  for (const record of fromVolumes) {
     byId.set(record.spark_id, record);
   }
 
