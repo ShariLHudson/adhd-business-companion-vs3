@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-001-008",
+  "title": "The Family Photograph With a Missing Name",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Genealogists often identify unknown people by comparing dates, clothing, locations, and family relationships.",
+  "story": "Genealogists often identify unknown people by comparing dates, clothing, locations, and family relationships. Identity can emerge from several modest clues rather than one decisive fact. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Identity can emerge from several modest clues rather than one decisive fact. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge.",
+  "spark_application": "Write one unexpected result or unanswered question from your work and list three possible explanations. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Family Photograph With a Missing Name",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

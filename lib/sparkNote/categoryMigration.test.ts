@@ -49,14 +49,14 @@ const EDITION_LABEL: Record<SparkNoteCategory, string> = {
   "012": "Wonder",
 };
 
-// Seed 112 + Volume 2 (96 core + 12 Iowa Fall) + Volume 3 (96 core + 12 Iowa
-// Winter) = 328. EXPECTED_TOTAL counts BOTH core and seasonal cards (unchanged
-// counting convention; seasonal is not split into a separate total).
+// Seed 112 + Vol 2 (96 core + 12 Iowa Fall) + Vol 3 (96 core + 12 Iowa Winter)
+// + Vol 4 (96 core + 12 Iowa Spring) = 436. EXPECTED_TOTAL counts BOTH core and
+// seasonal cards (unchanged counting convention; seasonal is not split out).
 const EXPECTED_COUNTS: Record<string, number> = {
-  "001": 21, "002": 29, "003": 27, "004": 23, "005": 25, "006": 31,
-  "007": 30, "008": 36, "009": 21, "010": 30, "011": 30, "012": 25,
+  "001": 29, "002": 38, "003": 36, "004": 32, "005": 34, "006": 40,
+  "007": 39, "008": 46, "009": 30, "010": 39, "011": 38, "012": 35,
 };
-const EXPECTED_TOTAL = 328;
+const EXPECTED_TOTAL = 436;
 
 const manifest = manifestJson as Array<{
   spark_id: string;

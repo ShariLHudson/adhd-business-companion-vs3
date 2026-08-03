@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-003-007",
+  "title": "The Melody Found in a Mistake",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Musicians sometimes keep an unexpected note, rhythm, or technical error because it creates a better direction.",
+  "story": "Musicians sometimes keep an unexpected note, rhythm, or technical error because it creates a better direction. A mistake becomes creative material when curiosity replaces embarrassment. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A mistake becomes creative material when curiosity replaces embarrassment. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Explore for ten minutes. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The Melody Found in a Mistake",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

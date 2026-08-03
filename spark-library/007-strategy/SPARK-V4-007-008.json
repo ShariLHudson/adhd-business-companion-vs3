@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-007-008",
+  "title": "The Review That Asked What Changed",
+  "category": "Strategy",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A useful strategy review begins with new conditions, evidence, and constraints rather than defending the old plan.",
+  "story": "A useful strategy review begins with new conditions, evidence, and constraints rather than defending the old plan. Adaptation starts by updating reality. Strategy means choosing what matters most and placing effort where it can create the greatest useful change. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adaptation starts by updating reality. Strategy means choosing what matters most and placing effort where it can create the greatest useful change.",
+  "spark_application": "Name the decision beneath your current activity and choose the smallest useful next move. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Strategy",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "007",
+  "category_label": "Strategy",
+  "spark_type": "story",
+  "short_title": "The Review That Asked What Changed",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

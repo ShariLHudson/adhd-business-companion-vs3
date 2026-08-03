@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-011-007",
+  "title": "The Farm Sensor That Saved Water",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Soil sensors can help irrigation respond to actual moisture instead of a fixed schedule.",
+  "story": "Soil sensors can help irrigation respond to actual moisture instead of a fixed schedule. Measurement can replace habit when conditions vary. Innovation is usually a chain of observations, tests, failures, adjustments, and connections. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Measurement can replace habit when conditions vary. Innovation is usually a chain of observations, tests, failures, adjustments, and connections.",
+  "spark_application": "Run one tiny experiment and decide what you want to learn. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Innovation",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "The Farm Sensor That Saved Water",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

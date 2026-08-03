@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-005-005",
+  "title": "Why a Small Reward Can Restart Momentum",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Immediate positive feedback can make the next step easier, especially when the final result is distant.",
+  "story": "Immediate positive feedback can make the next step easier, especially when the final result is distant. The timing of encouragement matters. Curiosity loosens assumptions and creates room for better questions. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "The timing of encouragement matters. Curiosity loosens assumptions and creates room for better questions.",
+  "spark_application": "Turn one assumption into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why a Small Reward Can Restart Momentum",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

@@ -1,0 +1,45 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-012",
+  "title": "Memorial Day and the Cost Remembered",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Memorial Day honors members of the U.S. military who died in service.",
+  "story": "Memorial Day honors members of the U.S. military who died in service. Remembrance asks us to pause before turning sacrifice into a general symbol. Reflection turns experience into guidance rather than leaving it as an unexamined memory. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Remembrance asks us to pause before turning sacrifice into a general symbol. Reflection turns experience into guidance rather than leaving it as an unexamined memory.",
+  "spark_application": "Write one lesson worth keeping and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Reflection",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "Memorial Day and the Cost Remembered",
+  "priority": 320,
+  "display_rule": "calculated-date",
+  "date_rule": "memorial-day-us",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

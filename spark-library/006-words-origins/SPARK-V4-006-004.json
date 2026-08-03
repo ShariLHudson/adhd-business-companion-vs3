@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-006-004",
+  "title": "The Word Iteration",
+  "category": "Words & Origins",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Iteration means repeating a process, often with change or improvement each time.",
+  "story": "Iteration means repeating a process, often with change or improvement each time. Repetition becomes progress when learning is carried forward. Words shape what we notice, remember, and make possible together. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Repetition becomes progress when learning is carried forward. Words shape what we notice, remember, and make possible together.",
+  "spark_application": "Save one word or phrase that stayed with you and note why it matters. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Words & Origins",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "006",
+  "category_label": "Words & Origins",
+  "spark_type": "story",
+  "short_title": "The Word Iteration",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

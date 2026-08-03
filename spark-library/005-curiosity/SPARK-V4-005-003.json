@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-005-003",
+  "title": "Why We Avoid Tasks With Unclear Endings",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A task without a visible finish can feel larger because the brain cannot estimate the effort.",
+  "story": "A task without a visible finish can feel larger because the brain cannot estimate the effort. Defining done can reduce resistance. Curiosity loosens assumptions and creates room for better questions. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Defining done can reduce resistance. Curiosity loosens assumptions and creates room for better questions.",
+  "spark_application": "Turn one assumption into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why We Avoid Tasks With Unclear Endings",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

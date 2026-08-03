@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-005-007",
+  "title": "Why Choice Is Easier With a Default",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A default reduces the number of decisions required while still allowing change.",
+  "story": "A default reduces the number of decisions required while still allowing change. Good design can preserve freedom while lowering effort. Curiosity loosens assumptions and creates room for better questions. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Good design can preserve freedom while lowering effort. Curiosity loosens assumptions and creates room for better questions.",
+  "spark_application": "Turn one assumption into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why Choice Is Easier With a Default",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

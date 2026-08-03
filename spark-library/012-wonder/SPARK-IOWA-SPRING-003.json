@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-003",
+  "title": "The Chorus of Spring Peepers",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Tiny frogs can fill wet Iowa evenings with sound soon after thaw.",
+  "story": "Tiny frogs can fill wet Iowa evenings with sound soon after thaw. Wonder often arrives through voices much smaller than the space they fill. Wonder interrupts routine and restores perspective by reminding us how much remains unseen. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Wonder often arrives through voices much smaller than the space they fill. Wonder interrupts routine and restores perspective by reminding us how much remains unseen.",
+  "spark_application": "Spend five quiet minutes noticing something that creates awe or surprise. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Wonder",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "The Chorus of Spring Peepers",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

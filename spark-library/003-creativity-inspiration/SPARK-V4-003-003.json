@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-003-003",
+  "title": "The Mural Built by a Neighborhood",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Community murals combine many voices, sketches, stories, and hands into one shared image.",
+  "story": "Community murals combine many voices, sketches, stories, and hands into one shared image. Co-creation can turn a surface into a record of belonging. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Co-creation can turn a surface into a record of belonging. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Explore for ten minutes. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The Mural Built by a Neighborhood",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

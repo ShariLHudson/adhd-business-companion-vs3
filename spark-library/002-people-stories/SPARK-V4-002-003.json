@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-002-003",
+  "title": "Eleanor Roosevelt and the Work After the Title",
+  "category": "People & Stories",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Eleanor Roosevelt reshaped the role of First Lady and later helped advance the Universal Declaration of Human Rights.",
+  "story": "Eleanor Roosevelt reshaped the role of First Lady and later helped advance the Universal Declaration of Human Rights. Influence can continue when a formal position ends. A life story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Influence can continue when a formal position ends. A life story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own.",
+  "spark_application": "Choose one quality from this story and name one small way to practice it today. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "People & Stories",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "002",
+  "category_label": "People & Stories",
+  "spark_type": "story",
+  "short_title": "Eleanor Roosevelt and the Work After the Title",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

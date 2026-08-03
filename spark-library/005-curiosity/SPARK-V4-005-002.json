@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-005-002",
+  "title": "Why Handwriting Can Aid Memory",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Writing by hand often requires slower selection and physical formation of words.",
+  "story": "Writing by hand often requires slower selection and physical formation of words. Memory may improve when the act of recording includes processing. Curiosity loosens assumptions and creates room for better questions. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Memory may improve when the act of recording includes processing. Curiosity loosens assumptions and creates room for better questions.",
+  "spark_application": "Turn one assumption into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why Handwriting Can Aid Memory",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

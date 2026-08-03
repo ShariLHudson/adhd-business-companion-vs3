@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-001-002",
+  "title": "The Disease Traced Through a Map",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "During a nineteenth-century cholera outbreak, John Snow mapped deaths and connected them to a public water pump.",
+  "story": "During a nineteenth-century cholera outbreak, John Snow mapped deaths and connected them to a public water pump. A pattern became visible when information was placed in relationship to location. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A pattern became visible when information was placed in relationship to location. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge.",
+  "spark_application": "Write one unexpected result or unanswered question from your work and list three possible explanations. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Disease Traced Through a Map",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

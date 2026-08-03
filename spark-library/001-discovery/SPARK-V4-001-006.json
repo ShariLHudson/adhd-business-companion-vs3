@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-001-006",
+  "title": "The Mineral That Glowed Under Ultraviolet Light",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Some minerals fluoresce because their atoms absorb invisible ultraviolet energy and release visible light.",
+  "story": "Some minerals fluoresce because their atoms absorb invisible ultraviolet energy and release visible light. A different light can reveal properties hidden in ordinary conditions. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A different light can reveal properties hidden in ordinary conditions. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge.",
+  "spark_application": "Write one unexpected result or unanswered question from your work and list three possible explanations. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Mineral That Glowed Under Ultraviolet Light",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-005",
+  "title": "The First Trail Without Snow",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A familiar Iowa trail feels new when mud, water, buds, and returning birds replace winter stillness.",
+  "story": "A familiar Iowa trail feels new when mud, water, buds, and returning birds replace winter stillness. Adventure can come from revisiting a place at a different moment. Adventure begins with movement into the unfamiliar and the willingness to learn from what happens. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adventure can come from revisiting a place at a different moment. Adventure begins with movement into the unfamiliar and the willingness to learn from what happens.",
+  "spark_application": "Take one safe step beyond routine that can teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The First Trail Without Snow",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

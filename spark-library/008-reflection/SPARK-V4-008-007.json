@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-008-007",
+  "title": "The Boundary That Created Relief",
+  "category": "Reflection",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A boundary can reveal how much strain had been treated as normal.",
+  "story": "A boundary can reveal how much strain had been treated as normal. Relief may be evidence that a limit was needed. Reflection turns experience into guidance rather than leaving it as an unexamined memory. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Relief may be evidence that a limit was needed. Reflection turns experience into guidance rather than leaving it as an unexamined memory.",
+  "spark_application": "Write one lesson worth keeping and one thing you may do differently. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Reflection",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "008",
+  "category_label": "Reflection",
+  "spark_type": "story",
+  "short_title": "The Boundary That Created Relief",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

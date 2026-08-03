@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-004-007",
+  "title": "The Salt Marsh That Moves Inland",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "As sea levels and shorelines change, salt marshes may need room to migrate inland.",
+  "story": "As sea levels and shorelines change, salt marshes may need room to migrate inland. Adaptation sometimes requires preserving a path, not only protecting the current location. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adaptation sometimes requires preserving a path, not only protecting the current location. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely.",
+  "spark_application": "Notice one natural pattern or place today and write what it suggests about your own pace. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Nature & Places",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "The Salt Marsh That Moves Inland",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

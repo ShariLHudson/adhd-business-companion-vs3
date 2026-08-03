@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-008",
+  "title": "The Decision to Plant Now or Wait",
+  "category": "Strategy",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Farmers weigh soil temperature, moisture, weather forecasts, and risk before planting.",
+  "story": "Farmers weigh soil temperature, moisture, weather forecasts, and risk before planting. Strategy often means acting with incomplete information at the best available moment. Strategy means choosing what matters most and placing effort where it can create the greatest useful change. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Strategy often means acting with incomplete information at the best available moment. Strategy means choosing what matters most and placing effort where it can create the greatest useful change.",
+  "spark_application": "Name the decision beneath your current activity and choose the smallest useful next move. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Strategy",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "007",
+  "category_label": "Strategy",
+  "spark_type": "story",
+  "short_title": "The Decision to Plant Now or Wait",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

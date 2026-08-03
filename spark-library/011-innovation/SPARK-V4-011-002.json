@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-011-002",
+  "title": "The Refillable Package",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Some brands redesign packaging so the durable container remains while only the contents are replaced.",
+  "story": "Some brands redesign packaging so the durable container remains while only the contents are replaced. Innovation can reduce waste by changing what is treated as disposable. Innovation is usually a chain of observations, tests, failures, adjustments, and connections. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Innovation can reduce waste by changing what is treated as disposable. Innovation is usually a chain of observations, tests, failures, adjustments, and connections.",
+  "spark_application": "Run one tiny experiment and decide what you want to learn. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Innovation",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "The Refillable Package",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

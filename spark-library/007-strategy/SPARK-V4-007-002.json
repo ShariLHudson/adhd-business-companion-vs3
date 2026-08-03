@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-007-002",
+  "title": "The Capacity Check Before Commitment",
+  "category": "Strategy",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A strong plan compares required effort with actual time, energy, money, and skill.",
+  "story": "A strong plan compares required effort with actual time, energy, money, and skill. A good idea can still be a poor commitment when capacity is ignored. Strategy means choosing what matters most and placing effort where it can create the greatest useful change. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A good idea can still be a poor commitment when capacity is ignored. Strategy means choosing what matters most and placing effort where it can create the greatest useful change.",
+  "spark_application": "Name the decision beneath your current activity and choose the smallest useful next move. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Strategy",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "007",
+  "category_label": "Strategy",
+  "spark_type": "story",
+  "short_title": "The Capacity Check Before Commitment",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

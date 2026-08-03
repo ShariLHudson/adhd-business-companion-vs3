@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-011-003",
+  "title": "The Heat Pump That Moves Rather Than Creates Heat",
+  "category": "Innovation",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Heat pumps transfer heat instead of generating it directly, allowing efficient heating and cooling.",
+  "story": "Heat pumps transfer heat instead of generating it directly, allowing efficient heating and cooling. A different mechanism can change the economics of a familiar need. Innovation is usually a chain of observations, tests, failures, adjustments, and connections. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A different mechanism can change the economics of a familiar need. Innovation is usually a chain of observations, tests, failures, adjustments, and connections.",
+  "spark_application": "Run one tiny experiment and decide what you want to learn. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Innovation",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "011",
+  "category_label": "Innovation",
+  "spark_type": "story",
+  "short_title": "The Heat Pump That Moves Rather Than Creates Heat",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

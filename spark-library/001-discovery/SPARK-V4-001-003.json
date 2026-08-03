@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-001-003",
+  "title": "The Hidden Chamber Found by Heat",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Thermal imaging can reveal voids, airflow, or different materials behind walls without opening them.",
+  "story": "Thermal imaging can reveal voids, airflow, or different materials behind walls without opening them. A new kind of measurement can make a hidden structure visible. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A new kind of measurement can make a hidden structure visible. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge.",
+  "spark_application": "Write one unexpected result or unanswered question from your work and list three possible explanations. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Hidden Chamber Found by Heat",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

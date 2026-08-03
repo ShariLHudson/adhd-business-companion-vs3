@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-004",
+  "title": "The Garden Plan Drawn Before Planting",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Spring gardens begin with sketches, seed choices, spacing, and imagination long before harvest.",
+  "story": "Spring gardens begin with sketches, seed choices, spacing, and imagination long before harvest. Creative work can begin as a plan for conditions, not only a finished object. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Creative work can begin as a plan for conditions, not only a finished object. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Explore for ten minutes. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The Garden Plan Drawn Before Planting",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

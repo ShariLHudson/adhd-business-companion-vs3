@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-003-006",
+  "title": "The Prototype Made From Cardboard",
+  "category": "Creativity & Inspiration",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Designers often use inexpensive materials to test size, movement, and interaction before building a polished version.",
+  "story": "Designers often use inexpensive materials to test size, movement, and interaction before building a polished version. A rough model can answer important questions cheaply. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A rough model can answer important questions cheaply. Creativity grows through attention, experimentation, revision, and the courage to make an imperfect beginning.",
+  "spark_application": "Make a rough version of one idea before judging it. Explore for ten minutes. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Creativity & Inspiration",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "003",
+  "category_label": "Creativity & Inspiration",
+  "spark_type": "story",
+  "short_title": "The Prototype Made From Cardboard",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

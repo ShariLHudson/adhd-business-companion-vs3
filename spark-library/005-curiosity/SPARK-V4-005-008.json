@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-005-008",
+  "title": "Why Shared Attention Feels Connecting",
+  "category": "Curiosity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Looking at the same object, event, or problem can create a sense of alignment.",
+  "story": "Looking at the same object, event, or problem can create a sense of alignment. Connection often grows around a shared focus. Curiosity loosens assumptions and creates room for better questions. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Connection often grows around a shared focus. Curiosity loosens assumptions and creates room for better questions.",
+  "spark_application": "Turn one assumption into three open questions. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Curiosity",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "005",
+  "category_label": "Curiosity",
+  "spark_type": "story",
+  "short_title": "Why Shared Attention Feels Connecting",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-004-004",
+  "title": "The Orchard That Needed Different Trees",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Many fruit trees produce better crops when compatible varieties grow nearby for cross-pollination.",
+  "story": "Many fruit trees produce better crops when compatible varieties grow nearby for cross-pollination. Productivity can depend on difference and proximity. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Productivity can depend on difference and proximity. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely.",
+  "spark_application": "Notice one natural pattern or place today and write what it suggests about your own pace. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Nature & Places",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "The Orchard That Needed Different Trees",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

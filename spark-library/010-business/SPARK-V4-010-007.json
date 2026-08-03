@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-010-007",
+  "title": "The Package Named for the Result",
+  "category": "Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Offer names become clearer when they describe the outcome or experience rather than internal terminology.",
+  "story": "Offer names become clearer when they describe the outcome or experience rather than internal terminology. Language can reduce the work of understanding. Strong businesses create value people can understand and trust through the decisions beneath the visible offer. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Language can reduce the work of understanding. Strong businesses create value people can understand and trust through the decisions beneath the visible offer.",
+  "spark_application": "Apply the lesson to one customer, offer, process, or decision. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Business",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "010",
+  "category_label": "Business",
+  "spark_type": "story",
+  "short_title": "The Package Named for the Result",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

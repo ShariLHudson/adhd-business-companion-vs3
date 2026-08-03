@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-009-005",
+  "title": "The Bicycle Ride Beyond the Usual Turn",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Going one road farther than normal can expand a familiar map.",
+  "story": "Going one road farther than normal can expand a familiar map. Exploration can grow from a small extension. Adventure begins with movement into the unfamiliar and the willingness to learn from what happens. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Exploration can grow from a small extension. Adventure begins with movement into the unfamiliar and the willingness to learn from what happens.",
+  "spark_application": "Take one safe step beyond routine that can teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The Bicycle Ride Beyond the Usual Turn",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

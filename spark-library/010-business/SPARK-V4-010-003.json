@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-010-003",
+  "title": "The Client Offboarding Experience",
+  "category": "Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The end of a service can include review, handoff, celebration, and next-step guidance.",
+  "story": "The end of a service can include review, handoff, celebration, and next-step guidance. A strong ending protects the value of the entire relationship. Strong businesses create value people can understand and trust through the decisions beneath the visible offer. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A strong ending protects the value of the entire relationship. Strong businesses create value people can understand and trust through the decisions beneath the visible offer.",
+  "spark_application": "Apply the lesson to one customer, offer, process, or decision. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Business",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "010",
+  "category_label": "Business",
+  "spark_type": "story",
+  "short_title": "The Client Offboarding Experience",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

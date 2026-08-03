@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-004-001",
+  "title": "The Beaver Dam That Rewrote the Stream",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Beaver dams slow water, create wetlands, and change habitat for many species.",
+  "story": "Beaver dams slow water, create wetlands, and change habitat for many species. One species can reshape conditions for an entire community. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "One species can reshape conditions for an entire community. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely.",
+  "spark_application": "Notice one natural pattern or place today and write what it suggests about your own pace. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Nature & Places",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "The Beaver Dam That Rewrote the Stream",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

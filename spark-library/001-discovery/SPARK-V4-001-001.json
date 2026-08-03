@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-001-001",
+  "title": "The Ink That Revealed a Forgery",
+  "category": "Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Researchers can examine ink chemistry, paper fibers, and aging patterns to test whether a document belongs to the period it claims.",
+  "story": "Researchers can examine ink chemistry, paper fibers, and aging patterns to test whether a document belongs to the period it claims. Evidence becomes powerful when several small clues point in the same direction. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Evidence becomes powerful when several small clues point in the same direction. Discovery begins when attention stays with what does not fit long enough for a better explanation to emerge.",
+  "spark_application": "Write one unexpected result or unanswered question from your work and list three possible explanations. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Discovery",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "001",
+  "category_label": "Discovery",
+  "spark_type": "story",
+  "short_title": "The Ink That Revealed a Forgery",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

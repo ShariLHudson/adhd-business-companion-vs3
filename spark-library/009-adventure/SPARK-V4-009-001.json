@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-009-001",
+  "title": "The Ferry to a Small Island",
+  "category": "Adventure",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A short crossing can create a strong sense of departure because the route has a clear threshold.",
+  "story": "A short crossing can create a strong sense of departure because the route has a clear threshold. Adventure often begins with a visible change of context. Adventure begins with movement into the unfamiliar and the willingness to learn from what happens. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Adventure often begins with a visible change of context. Adventure begins with movement into the unfamiliar and the willingness to learn from what happens.",
+  "spark_application": "Take one safe step beyond routine that can teach you something. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Adventure",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "009",
+  "category_label": "Adventure",
+  "spark_type": "story",
+  "short_title": "The Ferry to a Small Island",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

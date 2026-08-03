@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-001",
+  "title": "When Iowa Fields Turn Green Again",
+  "category": "Nature & Places",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Early spring growth changes Iowa fields gradually, often before the landscape looks fully awake.",
+  "story": "Early spring growth changes Iowa fields gradually, often before the landscape looks fully awake. Renewal becomes visible through many small changes rather than one dramatic moment. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Renewal becomes visible through many small changes rather than one dramatic moment. Nature and place reveal timing, interdependence, adaptation, patience, and the value of looking closely.",
+  "spark_application": "Notice one natural pattern or place today and write what it suggests about your own pace. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Nature & Places",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "004",
+  "category_label": "Nature & Places",
+  "spark_type": "story",
+  "short_title": "When Iowa Fields Turn Green Again",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

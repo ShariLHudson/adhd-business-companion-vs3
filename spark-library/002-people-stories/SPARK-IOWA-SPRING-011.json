@@ -1,0 +1,45 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-011",
+  "title": "The Work of Mothers and Caregivers",
+  "category": "People & Stories",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Mother’s Day can honor biological mothers, adoptive mothers, grandmothers, mentors, and others whose care shaped a life.",
+  "story": "Mother’s Day can honor biological mothers, adoptive mothers, grandmothers, mentors, and others whose care shaped a life. Care is often remembered most clearly through repeated ordinary acts. A life story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Care is often remembered most clearly through repeated ordinary acts. A life story becomes useful when it helps us recognize choices, courage, persistence, and possibility in our own.",
+  "spark_application": "Choose one quality from this story and name one small way to practice it today. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "People & Stories",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "002",
+  "category_label": "People & Stories",
+  "spark_type": "story",
+  "short_title": "The Work of Mothers and Caregivers",
+  "priority": 320,
+  "display_rule": "calculated-date",
+  "date_rule": "mothers-day-us",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

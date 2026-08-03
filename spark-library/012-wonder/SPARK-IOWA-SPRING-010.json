@@ -1,0 +1,45 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-010",
+  "title": "The Balance of the Spring Equinox",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Around the spring equinox, day and night are close to equal before daylight continues increasing.",
+  "story": "Around the spring equinox, day and night are close to equal before daylight continues increasing. A turning point can mark balance while also beginning a new direction. Wonder interrupts routine and restores perspective by reminding us how much remains unseen. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A turning point can mark balance while also beginning a new direction. Wonder interrupts routine and restores perspective by reminding us how much remains unseen.",
+  "spark_application": "Spend five quiet minutes noticing something that creates awe or surprise. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Wonder",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "The Balance of the Spring Equinox",
+  "priority": 320,
+  "display_rule": "calculated-date",
+  "date_rule": "spring-equinox",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

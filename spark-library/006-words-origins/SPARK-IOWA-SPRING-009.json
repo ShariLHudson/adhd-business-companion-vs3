@@ -1,0 +1,44 @@
+{
+  "spark_id": "SPARK-IOWA-SPRING-009",
+  "title": "Why We Call It Spring",
+  "category": "Words & Origins",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The season’s name is connected to plants springing or rising from the ground.",
+  "story": "The season’s name is connected to plants springing or rising from the ground. A word can preserve the visible movement that defined a season. Words shape what we notice, remember, and make possible together. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "A word can preserve the visible movement that defined a season. Words shape what we notice, remember, and make possible together.",
+  "spark_application": "Save one word or phrase that stayed with you and note why it matters. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Words & Origins",
+    "iowa-seasons",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      3,
+      4,
+      5
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "006",
+  "category_label": "Words & Origins",
+  "spark_type": "story",
+  "short_title": "Why We Call It Spring",
+  "priority": 140,
+  "display_rule": "seasonal",
+  "season": "spring",
+  "months": [
+    3,
+    4,
+    5
+  ],
+  "volume": 4,
+  "collection": "iowa-seasons",
+  "region": "US-IA"
+}

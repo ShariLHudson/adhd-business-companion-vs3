@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-012-002",
+  "title": "The River of Stars Across the Sky",
+  "category": "Wonder",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The Milky Way appears as a glowing band because we are looking through the dense disk of our own galaxy.",
+  "story": "The Milky Way appears as a glowing band because we are looking through the dense disk of our own galaxy. Perspective changes what structure becomes visible. Wonder interrupts routine and restores perspective by reminding us how much remains unseen. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Perspective changes what structure becomes visible. Wonder interrupts routine and restores perspective by reminding us how much remains unseen.",
+  "spark_application": "Spend five quiet minutes noticing something that creates awe or surprise. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Wonder",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "012",
+  "category_label": "Wonder",
+  "spark_type": "story",
+  "short_title": "The River of Stars Across the Sky",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}

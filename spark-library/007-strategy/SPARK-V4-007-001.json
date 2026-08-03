@@ -1,0 +1,32 @@
+{
+  "spark_id": "SPARK-V4-007-001",
+  "title": "The One-Page Strategy",
+  "category": "Strategy",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Condensing a strategy to one page forces clarity about priorities, choices, measures, and exclusions.",
+  "story": "Condensing a strategy to one page forces clarity about priorities, choices, measures, and exclusions. Compression can reveal whether the plan is truly understood. Strategy means choosing what matters most and placing effort where it can create the greatest useful change. The value is not only knowing the story, but recognizing where the same pattern may already be present in ordinary life, creative work, or business.",
+  "impact": "Compression can reveal whether the plan is truly understood. Strategy means choosing what matters most and placing effort where it can create the greatest useful change.",
+  "spark_application": "Name the decision beneath your current activity and choose the smallest useful next move. Save a short note about what you noticed, what surprised you, or what you may want to revisit.",
+  "tags": [
+    "Strategy",
+    "core",
+    "volume-4"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "007",
+  "category_label": "Strategy",
+  "spark_type": "story",
+  "short_title": "The One-Page Strategy",
+  "priority": 100,
+  "display_rule": "core",
+  "volume": 4,
+  "collection": "core"
+}
