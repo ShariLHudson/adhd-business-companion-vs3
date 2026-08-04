@@ -31,8 +31,15 @@
 
   --spark-surface-frosted-bg: rgba(255, 255, 255, 0.8);
   --spark-surface-frosted-blur: 8px;
-  --spark-surface-frosted-strong-bg: rgba(255, 255, 255, 0.94);
-  --spark-surface-frosted-strong-blur: 16px;
+  /*
+   * "Strong" is the Estate room shell's own warm, more-translucent,
+   * heavier-blur glass (see app/companion/estate-workspace.css) — strength
+   * here comes from blur depth, not opacity, so background photography
+   * still reads as present while never competing with foreground text.
+   */
+  --spark-surface-frosted-strong-bg: rgba(255, 252, 245, 0.56);
+  --spark-surface-frosted-strong-blur: 14px;
+  --spark-surface-frosted-strong-border: rgba(255, 255, 255, 0.5);
   --spark-surface-border: #d4cdc3;
 
   --spark-surface-selected-bg: #f0f5f5;
@@ -72,6 +79,7 @@
   background: var(--spark-surface-frosted-strong-bg);
   backdrop-filter: blur(var(--spark-surface-frosted-strong-blur));
   -webkit-backdrop-filter: blur(var(--spark-surface-frosted-strong-blur));
+  border: 1px solid var(--spark-surface-frosted-strong-border);
 }
 .spark-surface-border {
   border-color: var(--spark-surface-border);

@@ -25,10 +25,10 @@
 
 .estate-workspace.companion-workspace-frosted,
 .estate-workspace--ivory.companion-workspace-frosted {
-  background: rgba(255, 252, 245, 0.56);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: var(--spark-surface-frosted-strong-bg);
+  backdrop-filter: blur(var(--spark-surface-frosted-strong-blur));
+  -webkit-backdrop-filter: blur(var(--spark-surface-frosted-strong-blur));
+  border: 1px solid var(--spark-surface-frosted-strong-border);
   border-radius: clamp(1.5rem, 2.4vw, 1.75rem);
   box-shadow:
     0 24px 56px rgba(42, 58, 38, 0.1),
@@ -51,7 +51,7 @@
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #9a8f82;
+  color: var(--spark-text-supporting);
 }
 
 .estate-workspace--vault .estate-workspace__kicker {
@@ -64,7 +64,7 @@
   font-size: clamp(1.65rem, 3.2vw, 2rem);
   font-weight: 600;
   line-height: 1.12;
-  color: #2f261f;
+  color: var(--spark-text-primary);
 }
 
 .estate-workspace--vault .estate-workspace__title {
@@ -75,7 +75,7 @@
   margin: 0.55rem 0 0;
   font-size: clamp(0.92rem, 1.8vw, 1.02rem);
   line-height: 1.55;
-  color: #6f6259;
+  color: var(--spark-text-secondary);
   font-style: italic;
   max-width: 36rem;
 }
