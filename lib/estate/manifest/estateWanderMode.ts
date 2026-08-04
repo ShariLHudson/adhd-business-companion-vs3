@@ -12,6 +12,7 @@ import {
   resolveManifestLegacyPlaceId,
 } from "./estatePlaceMasterManifest";
 import { resolveChamberMemberFacingName } from "../chamberOfMomentumIdentity";
+import { labelForDestinationId } from "@/lib/navigationContext/destinationLabels";
 
 const WANDER_RECENT_KEY = "estate-wander-recent-v1";
 const MAX_RECENT = 8;
@@ -182,7 +183,9 @@ export function resolveWanderRoomDisplayName(
   const fromManifest = getPlaceById(legacyPlaceId);
   if (fromManifest?.display_name) return fromManifest.display_name;
   if (fromManifest?.official_name) return fromManifest.official_name;
-  return legacyPlaceId;
+  // Never the raw legacy place id — labelForDestinationId has its own
+  // humanized-and-warns-in-dev fallback for anything even it doesn't know.
+  return labelForDestinationId(legacyPlaceId);
 }
 
 /** Ensure wander pick uses one manifest record for name, image, and route. */

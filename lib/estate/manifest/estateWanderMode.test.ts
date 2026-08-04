@@ -50,6 +50,26 @@ describe("estateWanderMode", () => {
     );
   });
 
+  it("never returns the raw legacy place id for a room not in the manifest — found live leaking as the Estate menu trigger label", () => {
+    // Confirmed live: the "adapt-plan-my-day" room isn't in the manifest
+    // (getPlaceById returns nothing), so this previously fell through to
+    // `return legacyPlaceId` verbatim — EstateRoomExperienceMenu's header
+    // trigger literally showed the text "adapt-plan-my-day" to members.
+    expect(getPlaceById("adapt-plan-my-day")).toBeFalsy();
+    expect(resolveWanderRoomDisplayName("adapt-plan-my-day")).toBe(
+      "Plan My Day / Adapt My Day",
+    );
+    expect(resolveWanderRoomDisplayName("reminders-rhythms")).toBe(
+      "Reminders / Rhythms",
+    );
+  });
+
+  it("humanizes instead of leaking raw for a room in neither the manifest nor any label map", () => {
+    const label = resolveWanderRoomDisplayName("some-brand-new-unmapped-room");
+    expect(label).not.toBe("some-brand-new-unmapped-room");
+    expect(label).not.toContain("-");
+  });
+
   it("excludes current room and recent manifest ids from pool", () => {
     const wanderable = getWanderableManifestPlaces();
     const pool = filterWanderCandidatePool(wanderable, "butterfly-house", [

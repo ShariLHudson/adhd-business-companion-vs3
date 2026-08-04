@@ -118,6 +118,24 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   focus: "Focus",
   progress: "Progress",
   activities: "Activities",
+
+  // Navigation-labels audit batch — confirmed-live destinations that
+  // previously fell through to humanizeSectionId's mechanical title-casing
+  // (e.g. "adapt-plan-my-day" -> "Adapt Plan My Day"). Labels match each
+  // destination's own authored title/menu entry where one already exists.
+  "adapt-plan-my-day": "Plan My Day / Adapt My Day",
+  "reminders-rhythms": "Reminders / Rhythms",
+  "creation-workspace": "Creation Workspace",
+  "research-library": "Research Library",
+  "personal-library": "My Personal Library",
+  "destination-gallery": "Destination Gallery",
+  calendar: "Calendar",
+  create: "Create",
+  "talk-it-out": "Talk It Out",
+  boardroom: "Boardroom",
+  stables: "The Stables",
+  reminders: "Reminders",
+  rhythms: "Rhythms",
 };
 
 const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
@@ -154,11 +172,14 @@ function humanizeSectionId(section: AppSection): string {
 
 /** User-facing name for any ecosystem area — never returns the word "Workspace". */
 export function workspaceAreaTitle(section: AppSection): string {
-  return (
-    WORKSPACE_TITLES[section] ??
-    EXTRA_AREA_TITLES[section] ??
-    humanizeSectionId(section)
-  );
+  const known = WORKSPACE_TITLES[section] ?? EXTRA_AREA_TITLES[section];
+  if (known) return known;
+  if (process.env.NODE_ENV === "development") {
+    console.warn(
+      `[navigation-labels] Unmapped section "${section}" — add an entry to WORKSPACE_TITLES or EXTRA_AREA_TITLES in lib/workspaceMode.ts.`,
+    );
+  }
+  return humanizeSectionId(section);
 }
 
 export function workspaceTitle(section: AppSection): string {
