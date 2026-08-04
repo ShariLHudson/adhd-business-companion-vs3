@@ -51,6 +51,8 @@ export function MeetDirectorConversationOverlay({
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open: conversation.open,
     onClose: onReturnToProfile,
+    overlayId: `board-meet-director:${director.id}`,
+    overlayKind: "modal",
   });
 
   useEffect(() => {

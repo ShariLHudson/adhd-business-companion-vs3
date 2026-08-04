@@ -49,6 +49,8 @@ export function RoundTableOverlay({
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open,
     onClose,
+    overlayId: "board-round-table",
+    overlayKind: "modal",
   });
 
   useEffect(() => {

@@ -18,6 +18,8 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open,
     onClose,
+    overlayId: `focus-audio-player:${playback?.id ?? "none"}`,
+    overlayKind: "modal",
   });
 
   const inApp = useMemo(() => {

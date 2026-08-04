@@ -40,6 +40,10 @@ export function EvidenceVaultWorkspaceModal({
     onClose,
     isDirty: closeBlocked,
     confirmDiscard: () => !closeBlocked,
+    // Reuses the existing testId prop — already unique per mount site
+    // (browse / insights / search), so no new prop is needed.
+    overlayId: testId,
+    overlayKind: "modal",
   });
 
   useEffect(() => {

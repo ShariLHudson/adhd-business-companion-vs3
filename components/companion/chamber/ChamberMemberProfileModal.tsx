@@ -29,6 +29,8 @@ export function ChamberMemberProfileModal({
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open,
     onClose,
+    overlayId: `chamber-member-profile:${member?.id ?? "none"}`,
+    overlayKind: "modal",
   });
 
   useEffect(() => {

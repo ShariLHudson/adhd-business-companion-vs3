@@ -377,6 +377,8 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open: true,
     onClose,
+    overlayId: `spark-note-expanded:${card.id}`,
+    overlayKind: "modal",
   });
 
   useEffect(() => {

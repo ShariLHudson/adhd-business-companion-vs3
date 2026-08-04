@@ -31,6 +31,8 @@ export function DecisionCompassSaveModal({
   const { onBackdropClick } = useDismissibleWindow({
     open: open && !pickerOpen,
     onClose,
+    overlayId: "decision-compass-save",
+    overlayKind: "modal",
   });
 
   if (!open) return null;

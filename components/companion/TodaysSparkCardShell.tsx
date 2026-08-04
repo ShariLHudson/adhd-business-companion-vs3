@@ -103,6 +103,8 @@ export function TodaysSparkCardShell({
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open: true,
     onClose,
+    overlayId: `todays-spark-card:${card.id}`,
+    overlayKind: "modal",
   });
 
   // The scroll container for the whole card. Every time a different card opens,

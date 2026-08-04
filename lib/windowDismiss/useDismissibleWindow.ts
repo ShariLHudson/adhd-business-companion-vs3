@@ -19,6 +19,7 @@ import {
   registerOverlay,
   type OverlayKind,
 } from "@/lib/windowDismiss/overlayRegistry";
+import { isUnsavedWorkGuardDirty } from "@/lib/unsavedWorkGuard";
 
 export type UseDismissibleWindowOptions = {
   open: boolean;
@@ -125,10 +126,18 @@ export function useDismissibleWindow({
    */
   useEffect(() => {
     if (!open || !enabled || !overlayId || !overlayKind) return;
+    const id = overlayId;
     return registerOverlay({
-      id: overlayId,
+      id,
       kind: overlayKind,
       requestDismiss: () => requestCloseRef.current(),
+      /**
+       * Read live, not captured — reflects this window's own `isDirty` prop
+       * (e.g. an unsaved edit flag) OR a guard separately registered under
+       * the same id (Step 1.2). Either way, exclusivity can never force-close
+       * a window holding unsaved work; it stays open beneath the new one.
+       */
+      isDirty: () => optionsRef.current.isDirty || isUnsavedWorkGuardDirty(id),
     });
   }, [open, enabled, overlayId, overlayKind]);
 

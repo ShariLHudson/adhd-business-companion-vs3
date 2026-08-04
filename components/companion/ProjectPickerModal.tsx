@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { getProjects, saveProject, type Project } from "@/lib/companionStore";
 import { useDismissibleWindow } from "@/lib/windowDismiss";
 
@@ -23,10 +23,13 @@ export function ProjectPickerModal({
   const [projects, setProjects] = useState<Project[]>(() => getProjects());
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
+  const instanceId = useId();
   const { onBackdropClick } = useDismissibleWindow({
     open,
     onClose,
     isDirty: creating && newName.trim().length > 0,
+    overlayId: `project-picker:${instanceId}`,
+    overlayKind: "modal",
   });
 
   if (!open) return null;

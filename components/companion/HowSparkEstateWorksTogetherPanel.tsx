@@ -42,6 +42,8 @@ export function HowSparkEstateWorksTogetherPanel({
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open,
     onClose,
+    overlayId: "how-spark-estate-works-together",
+    overlayKind: "modal",
   });
 
   useEffect(() => {

@@ -56,6 +56,8 @@ export function SparkNoteMyCollection({
   const { requestClose, onBackdropClick } = useDismissibleWindow({
     open: true,
     onClose,
+    overlayId: "spark-note-my-collection",
+    overlayKind: "modal",
   });
 
   const itemTypeRef = useRef<HTMLSelectElement | null>(null);
