@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { useDismissibleWindow } from "@/lib/windowDismiss";
 
 export type ModalSheetTheme = "default" | "estate-dark";
 
@@ -28,6 +29,17 @@ export function ModalSheet({
 }) {
   const [entered, setEntered] = useState(open);
   const [portalReady, setPortalReady] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Escape, outside click, and Close all take the shared guarded path
+   * (dismiss stack + upload / active-operation / unsaved-work policy).
+   */
+  const { requestClose } = useDismissibleWindow({
+    open,
+    onClose,
+    outsideClickRef: panelRef,
+  });
 
   useLayoutEffect(() => {
     if (!portaled) return;
@@ -41,15 +53,6 @@ export function ModalSheet({
     }
     setEntered(true);
   }, [open]);
-
-  useEffect(() => {
-    if (!open) return;
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -67,16 +70,17 @@ export function ModalSheet({
       data-modal-theme={theme}
     >
       {entered ? (
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
+        // Scrim only — dismissal is owned by the shared outside-click policy.
+        // The header Close button remains the accessible close affordance.
+        <div
+          aria-hidden="true"
           className="pointer-events-auto absolute inset-0 bg-black/30 transition-opacity duration-300"
           data-testid="modal-sheet-backdrop"
         />
       ) : null}
 
       <div
+        ref={panelRef}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -105,7 +109,7 @@ export function ModalSheet({
           </span>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => requestClose()}
             aria-label="Close"
             className={
               dark
