@@ -44,8 +44,18 @@ export function WelcomeHomeFrostedChatPanel({
   estateRoom = false,
 }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const hideConversationRef = useRef<HTMLButtonElement>(null);
+  const showConversationRef = useRef<HTMLButtonElement>(null);
+  const prevCompanionOnRef = useRef<boolean | null>(null);
   const companion = useCompanionVisibility();
   const companionOn = companion == null || companion.visibility !== "off";
+  /**
+   * Estate full-screen backgrounds get an inline Hide/Show conversation control.
+   * It drives the SAME CompanionVisibility authority (no new state, no second
+   * chat surface); hiding only quiets the thread — messages/context are kept.
+   */
+  const estateVisibilityControls =
+    estateRoom && Boolean(companion) && companion?.showControls === true;
 
   /** Daily opening / arrival greeting — never suppressed by Companion Off. */
   const showGreeting =
@@ -96,6 +106,20 @@ export function WelcomeHomeFrostedChatPanel({
     welcomeSlot,
   ]);
 
+  // When the member hides/shows the conversation, move focus to the now-relevant
+  // control so keyboard users are not stranded. Skips initial mount and no-ops.
+  useEffect(() => {
+    if (!estateVisibilityControls) {
+      prevCompanionOnRef.current = companionOn;
+      return;
+    }
+    const prev = prevCompanionOnRef.current;
+    prevCompanionOnRef.current = companionOn;
+    if (prev === null || prev === companionOn) return;
+    if (companionOn) hideConversationRef.current?.focus();
+    else showConversationRef.current?.focus();
+  }, [companionOn, estateVisibilityControls]);
+
   const panelClasses = estateRoom
     ? [
         "companion-chat-layer",
@@ -137,6 +161,21 @@ export function WelcomeHomeFrostedChatPanel({
       data-everyday-chat=""
       data-testid={estateRoom ? "estate-room-frosted-chat" : "welcome-home-chat"}
     >
+      {estateVisibilityControls && companionOn ? (
+        <div className="flex justify-end px-1 pt-1">
+          <button
+            ref={hideConversationRef}
+            type="button"
+            className="min-h-[44px] rounded-full border border-white/30 bg-black/45 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-black/60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            onClick={() => companion?.onToggle()}
+            aria-label="Hide conversation"
+            data-testid="estate-hide-conversation"
+          >
+            Hide conversation
+          </button>
+        </div>
+      ) : null}
+
       {showMessageScroll ? (
         <div
           ref={scrollRef}
@@ -155,7 +194,11 @@ export function WelcomeHomeFrostedChatPanel({
 
       {showQuietState && companion ? (
         <div className="px-4 py-3" data-companion-chat-body="quiet">
-          <CompanionConversationQuietState onTurnOn={companion.onTurnOn} />
+          <CompanionConversationQuietState
+            onTurnOn={companion.onTurnOn}
+            turnOnLabel={estateRoom ? "Show conversation" : undefined}
+            buttonRef={estateRoom ? showConversationRef : undefined}
+          />
         </div>
       ) : null}
 

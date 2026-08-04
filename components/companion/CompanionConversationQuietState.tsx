@@ -1,8 +1,14 @@
 "use client";
 
+import type { Ref } from "react";
+
 type Props = {
   onTurnOn: () => void;
   className?: string;
+  /** Restore label — defaults to "Turn Companion On"; estate backgrounds pass "Show conversation". */
+  turnOnLabel?: string;
+  /** Focus target so the caller can move focus here when the conversation is hidden. */
+  buttonRef?: Ref<HTMLButtonElement>;
 };
 
 /**
@@ -12,6 +18,8 @@ type Props = {
 export function CompanionConversationQuietState({
   onTurnOn,
   className = "",
+  turnOnLabel = "Turn Companion On",
+  buttonRef,
 }: Props) {
   return (
     <div
@@ -22,12 +30,13 @@ export function CompanionConversationQuietState({
         Companion conversation is off.
       </p>
       <button
+        ref={buttonRef}
         type="button"
         className="min-h-[44px] rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-base font-semibold text-white hover:bg-[#163d3d] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
         onClick={onTurnOn}
         data-testid="companion-turn-on"
       >
-        Turn Companion On
+        {turnOnLabel}
       </button>
     </div>
   );
