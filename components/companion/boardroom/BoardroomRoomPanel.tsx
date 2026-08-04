@@ -973,7 +973,7 @@ function HomeView({
   return (
     <div className="boardroom-home" data-testid="boardroom-home">
       <p className="boardroom-kicker">Spark Estate</p>
-      <h1 className="boardroom-title">Round Table Boardroom</h1>
+      <h1 className="boardroom-title">Boardroom</h1>
       <div className="boardroom-gold-rule" aria-hidden />
       <p
         className="boardroom-welcome"

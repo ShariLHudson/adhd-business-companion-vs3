@@ -110,7 +110,7 @@ describe("welcomeHomeNavigationStructure (Welcome Home IA)", () => {
       "Journal",
       "Evidence Vault",
       "Hall of Accomplishments",
-      "My Personal Library",
+      "Personal Library",
     ]);
     expect(byId.audio).toEqual(["Peaceful Moments", "Soundscapes"]);
 

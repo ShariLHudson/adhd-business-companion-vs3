@@ -33,7 +33,7 @@ export function TodaysSparkGiftRoom({ onClose, onGiftClick }: Props) {
       className="tsg-room"
       role="dialog"
       aria-modal="true"
-      aria-label="My Personal Library — Today's Spark"
+      aria-label="Personal Library — Today's Spark"
       data-testid="todays-spark-gift-room"
     >
       <div className="tsg-room__stage">

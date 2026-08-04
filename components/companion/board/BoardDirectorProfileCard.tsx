@@ -79,7 +79,7 @@ export function BoardDirectorProfileCard({
       >
         <span>Board of Directors</span>
         <span aria-hidden>·</span>
-        <span>Round Table Boardroom</span>
+        <span>Boardroom</span>
         <span
           className="board-director-profile__role-badge"
           data-testid="board-director-role-badge"

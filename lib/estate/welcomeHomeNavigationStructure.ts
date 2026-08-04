@@ -271,7 +271,7 @@ export const WELCOME_HOME_NAV_CATEGORIES: readonly WelcomeHomeNavCategory[] = [
       },
       {
         id: "personal-library",
-        label: "My Personal Library",
+        label: "Personal Library",
         supportLine: "Your saved Sparks and discoveries, kept in one place.",
       },
     ],

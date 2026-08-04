@@ -5,7 +5,7 @@
  */
 
 /** Official destination / group naming (user-facing) */
-export const BOARDROOM_DESTINATION_NAME = "Round Table Boardroom" as const;
+export const BOARDROOM_DESTINATION_NAME = "Boardroom" as const;
 export const BOARD_GROUP_NAME = "Board of Directors" as const;
 export const BOARD_MEMBER_TITLE = "Director" as const;
 

@@ -127,7 +127,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "reminders-rhythms": "Reminders / Rhythms",
   "creation-workspace": "Creation Workspace",
   "research-library": "Research Library",
-  "personal-library": "My Personal Library",
+  "personal-library": "Personal Library",
   "destination-gallery": "Destination Gallery",
   calendar: "Calendar",
   create: "Create",

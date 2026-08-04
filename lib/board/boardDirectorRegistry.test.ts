@@ -36,7 +36,7 @@ import {
 
 describe("Board of Directors — Slice 1 registry", () => {
   it("uses official Board naming (not Chamber language)", () => {
-    expect(BOARDROOM_DESTINATION_NAME).toBe("Round Table Boardroom");
+    expect(BOARDROOM_DESTINATION_NAME).toBe("Boardroom");
     expect(BOARD_GROUP_NAME).toBe("Board of Directors");
     expect(BOARD_MEMBER_TITLE).toBe("Director");
   });

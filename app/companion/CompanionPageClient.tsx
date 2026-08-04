@@ -27043,7 +27043,7 @@ export default function CompanionPageClient() {
 
           {activeSection === "boardroom" && (
             <EstateRoomErrorBoundary
-              roomLabel="Round Table Boardroom"
+              roomLabel="Boardroom"
               onReturnToEstate={navigateBackToEstateHome}
             >
               <BoardroomRoomPanel

@@ -94,7 +94,7 @@ describe("TodaysSparkCardShell", () => {
     expect(q(".tsc-notes-input")).not.toBeNull(); // My Note field
     expect(text).toContain("Save This Spark");
     expect(text).toContain("Save My Note");
-    expect(text).toContain("Back to My Personal Library");
+    expect(text).toContain("Back to Personal Library");
   });
 
   it("shows a Go to Personal Library action only when wired, and invokes it", async () => {

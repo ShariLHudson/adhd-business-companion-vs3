@@ -249,7 +249,7 @@ export const ESTATE_ENVIRONMENTS: readonly EstateEnvironment[] = [
       "Exploring options without deciding for you",
     ],
     capabilities: ["Board discussion", "Decision brief", "Perspective gathering"],
-    tools: ["Round Table Boardroom"],
+    tools: ["Boardroom"],
     relatedSpaceIds: ["decision-compass", "goals-projects", "study-hall"],
     suggestedNextSpaceIds: ["decision-compass", "goals-projects"],
     conversationStyle: "decision-facilitation",

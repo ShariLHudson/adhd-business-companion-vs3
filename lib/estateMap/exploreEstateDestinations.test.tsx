@@ -128,7 +128,6 @@ describe("Explore Estate visual destinations", () => {
     const destinations = getExploreEstateDestinations();
     const forbiddenNames = [
       "Personal Library",
-      "My Personal Library",
       "Momentum Builder",
       "Momentum Room",
       "Main Staircase",
@@ -178,7 +177,7 @@ describe("Explore Estate visual destinations", () => {
     expect(
       destinations.some((d) => d.destinationId === "personal-library"),
     ).toBe(false);
-    expect(destinations.some((d) => d.name === "My Personal Library")).toBe(
+    expect(destinations.some((d) => d.name === "Personal Library")).toBe(
       false,
     );
   });
@@ -395,7 +394,7 @@ describe("Explore Estate visual destinations", () => {
     ).toBe(true);
 
     const board = destinations.find((d) => d.id === "round-table");
-    expect(board?.name).toBe("Round Table Boardroom");
+    expect(board?.name).toBe("Boardroom");
     expect(board?.destinationId).toBe("boardroom");
   });
 
@@ -486,7 +485,7 @@ describe("Explore Estate visual destinations", () => {
     expect(html).toContain("Possibility House");
     // Featured landing shows a curated subset — assert catalog for places not on the first screen
     const names = getExploreEstateDestinations().map((d) => d.name);
-    expect(names).toContain("Round Table Boardroom");
+    expect(names).toContain("Boardroom");
     expect(names).toContain("Chamber of Momentum");
     expect(html).toContain("data-image-ready=");
     expect(html).not.toContain('src=""');

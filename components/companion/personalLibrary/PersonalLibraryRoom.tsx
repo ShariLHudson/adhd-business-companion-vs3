@@ -82,10 +82,10 @@ export function PersonalLibraryRoom({
   return (
     <section
       className="personal-library-room"
-      aria-label="My Personal Library"
+      aria-label="Personal Library"
       data-testid="personal-library-room"
     >
-      <h1 className="personal-library-room__sr-title">My Personal Library</h1>
+      <h1 className="personal-library-room__sr-title">Personal Library</h1>
 
       {/* Back - a real control (the approved artwork has no drawn back affordance). */}
       <button

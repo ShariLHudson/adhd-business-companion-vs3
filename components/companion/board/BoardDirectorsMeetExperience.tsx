@@ -285,7 +285,7 @@ export function BoardDirectorsMeetExperience({
             ← Back to Boardroom
           </button>
         ) : null}
-        <p className="boardroom-kicker">Round Table Boardroom</p>
+        <p className="boardroom-kicker">Boardroom</p>
         <h1 className="boardroom-title">
           {isDestinationHome ? "Board Members" : "Meet the Directors"}
         </h1>

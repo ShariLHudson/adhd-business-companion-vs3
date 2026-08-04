@@ -181,7 +181,7 @@ export const HELPFUL_LESSON_REGISTRY: readonly HelpfulLesson[] = [
   },
   {
     id: "boardroom",
-    title: "Round Table Boardroom",
+    title: "Boardroom",
     shortExplanation:
       "Bring a Board of Directors lens to a business question when you want several angles at once.",
     destinationId: "boardroom",

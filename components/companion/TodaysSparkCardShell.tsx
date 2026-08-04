@@ -43,7 +43,7 @@ type SaveState = "idle" | "savingSpark" | "savingNote" | "error";
  * Today's Spark — the full card in the approved prototype card-shell design.
  * Every Spark uses this exact card; only the image and content differ per Spark.
  *
- * Pieces (matching the prototype): Back to My Personal Library · Close ·
+ * Pieces (matching the prototype): Back to Personal Library · Close ·
  * eyebrow · title · subtitle · image + caption · The Story (+ fact tiles) ·
  * The Spark · Explore It · My notes and ideas · Save This Spark · Save My Note ·
  * Close for Now. Content and image come from the shared Spark resolvers; Save
@@ -174,7 +174,7 @@ export function TodaysSparkCardShell({
             className="tsc-back"
             onClick={() => requestClose()}
           >
-            ← Back to My Personal Library
+            ← Back to Personal Library
           </button>
           <button
             type="button"

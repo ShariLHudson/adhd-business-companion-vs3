@@ -74,7 +74,7 @@ export const DESTINATION_LABELS: Record<string, string> = {
   "reminders-rhythms": "Reminders / Rhythms",
   "creation-workspace": "Creation Workspace",
   "research-library": "Research Library",
-  "personal-library": "My Personal Library",
+  "personal-library": "Personal Library",
   "destination-gallery": "Destination Gallery",
   create: "Create",
   stables: "The Stables",

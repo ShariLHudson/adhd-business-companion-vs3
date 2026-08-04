@@ -89,8 +89,8 @@ export const EXPLORE_ESTATE_VIDEO_PATHS: Readonly<Record<string, string>> = {
 const DISPLAY_NAME_OVERRIDES: Readonly<Record<string, string>> = {
   "spark-estate": "Spark Estate Entry",
   "house-possibility-outside": "Possibility House",
-  "round-table": "Round Table Boardroom",
-  "personal-library": "My Personal Library",
+  "round-table": "Boardroom",
+  "personal-library": "Personal Library",
   portfolio: "Hall of Achievements",
   "estate-gardens": "Estate Garden",
   "the-swing-beneath-the-oak": "Tree Swing",
