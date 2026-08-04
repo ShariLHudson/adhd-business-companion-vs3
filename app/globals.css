@@ -28,6 +28,13 @@
   --spark-text-secondary: #6b635a;
   --spark-text-supporting: #7a6f61;
   --spark-text-disabled: #9a8f82;
+  /*
+   * Accent/heading text — the app's one established teal, already used as
+   * text color (buttons, links, headings) across Settings and Create.
+   * Completes the pair with --spark-text-accent-on-dark below, which
+   * existed without a light-mode counterpart until now.
+   */
+  --spark-text-accent: #1e4f4f;
 
   --spark-surface-frosted-bg: rgba(255, 255, 255, 0.8);
   --spark-surface-frosted-blur: 8px;
@@ -92,6 +99,9 @@
 }
 .spark-text-disabled {
   color: var(--spark-text-disabled);
+}
+.spark-text-accent {
+  color: var(--spark-text-accent);
 }
 
 /* Frosted work surfaces. */

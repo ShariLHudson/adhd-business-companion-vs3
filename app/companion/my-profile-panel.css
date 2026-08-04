@@ -34,10 +34,6 @@
 }
 
 .my-profile-destination {
-  --profile-text-primary: #2e2e2e;
-  --profile-text-secondary: #454545;
-  --profile-text-heading: #0f6f7c;
-  --profile-text-muted: #5f5f5f;
   --profile-surface: rgba(255, 252, 247, 0.96);
   --profile-border: rgba(46, 46, 46, 0.18);
   --profile-input-bg: #fffdf9;
@@ -47,28 +43,28 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  color: var(--profile-text-primary);
+  color: var(--spark-text-primary);
 }
 
 .my-profile-destination .estate-workspace,
 .my-profile-destination .estate-workspace__title,
 .my-profile-destination .estate-workspace__kicker {
-  color: var(--profile-text-primary);
+  color: var(--spark-text-primary);
 }
 
 .my-profile-destination .estate-workspace__title {
-  color: var(--profile-text-heading);
+  color: var(--spark-text-accent);
 }
 
 .my-profile-destination .estate-workspace__kicker {
-  color: var(--profile-text-muted);
+  color: var(--spark-text-supporting);
 }
 
 .my-profile-panel {
   max-width: 36rem;
   margin: 0 auto;
   padding: 1.25rem 1.25rem 2.5rem;
-  color: var(--profile-text-primary);
+  color: var(--spark-text-primary);
 }
 
 .my-profile-panel__back {
@@ -78,7 +74,7 @@
   border-radius: 999px;
   border: 1px solid var(--profile-border);
   background: var(--profile-surface);
-  color: var(--profile-text-heading);
+  color: var(--spark-text-accent);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -86,11 +82,11 @@
 
 .my-profile-panel__back:hover {
   background: #fff;
-  border-color: rgba(15, 111, 124, 0.45);
+  border-color: rgba(30, 79, 79, 0.45);
 }
 
 .my-profile-panel__back:focus-visible {
-  outline: 2px solid var(--profile-text-heading);
+  outline: 2px solid var(--spark-text-accent);
   outline-offset: 2px;
 }
 
@@ -100,7 +96,7 @@
 
 .my-profile-panel__lead {
   margin: 0.35rem 0 0;
-  color: var(--profile-text-secondary);
+  color: var(--spark-text-secondary);
   font-size: 1rem;
   line-height: 1.45;
   opacity: 1;
@@ -123,7 +119,7 @@
   justify-content: center;
   background: #e7dfd4;
   border: 1px solid var(--profile-border);
-  color: var(--profile-text-heading);
+  color: var(--spark-text-accent);
   font-size: 1.35rem;
   font-weight: 600;
 }
@@ -135,7 +131,7 @@
 }
 
 .my-profile-panel__avatar-initials {
-  color: var(--profile-text-heading);
+  color: var(--spark-text-accent);
 }
 
 /* Profile image upload — readable controls beside the avatar preview. */
@@ -157,13 +153,13 @@
 .my-profile-panel__image-title {
   margin: 0;
   font-weight: 600;
-  color: var(--profile-text-secondary);
+  color: var(--spark-text-secondary);
 }
 
 .my-profile-panel__image-help {
   margin: 0;
   font-size: 0.85rem;
-  color: var(--profile-text-muted);
+  color: var(--spark-text-supporting);
 }
 
 .my-profile-panel__image-input-hidden {
@@ -183,18 +179,18 @@
   border-radius: 999px;
   border: 1px solid var(--profile-border);
   background: var(--profile-input-bg);
-  color: var(--profile-text-primary);
+  color: var(--spark-text-primary);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
 .my-profile-panel__image-btn:hover {
-  border-color: var(--profile-text-heading);
+  border-color: var(--spark-text-accent);
 }
 
 .my-profile-panel__image-btn:focus-visible {
-  outline: 2px solid var(--profile-text-heading);
+  outline: 2px solid var(--spark-text-accent);
   outline-offset: 2px;
 }
 
@@ -225,11 +221,11 @@
   flex-direction: column;
   gap: 0.35rem;
   font-size: 0.95rem;
-  color: var(--profile-text-primary);
+  color: var(--spark-text-primary);
 }
 
 .my-profile-panel__field span {
-  color: var(--profile-text-secondary);
+  color: var(--spark-text-secondary);
   font-weight: 600;
   opacity: 1;
 }
@@ -241,21 +237,21 @@
   border-radius: 0.65rem;
   border: 1px solid var(--profile-border);
   background: var(--profile-input-bg);
-  color: var(--profile-text-primary);
+  color: var(--spark-text-primary);
   font: inherit;
 }
 
 .my-profile-panel__field input::placeholder,
 .my-profile-panel__field textarea::placeholder {
-  color: var(--profile-text-muted);
+  color: var(--spark-text-supporting);
   opacity: 1;
 }
 
 .my-profile-panel__field input:focus-visible,
 .my-profile-panel__field textarea:focus-visible {
-  outline: 2px solid var(--profile-text-heading);
+  outline: 2px solid var(--spark-text-accent);
   outline-offset: 2px;
-  border-color: var(--profile-text-heading);
+  border-color: var(--spark-text-accent);
 }
 
 .my-profile-panel__field textarea {
@@ -287,7 +283,7 @@
 }
 
 .my-profile-panel__primary:focus-visible {
-  outline: 2px solid var(--profile-text-heading);
+  outline: 2px solid var(--spark-text-accent);
   outline-offset: 2px;
 }
 
@@ -299,7 +295,7 @@
 .my-profile-panel__saved {
   margin: 0;
   font-size: 0.95rem;
-  color: var(--profile-text-heading);
+  color: var(--spark-text-accent);
   opacity: 1;
 }
 
@@ -313,13 +309,13 @@
 .my-profile-panel__section-title {
   margin: 0;
   font-size: 1.05rem;
-  color: var(--profile-text-heading);
+  color: var(--spark-text-accent);
   font-weight: 700;
 }
 
 .my-profile-panel__section-lead {
   margin: 0 0 0.35rem;
-  color: var(--profile-text-secondary);
+  color: var(--spark-text-secondary);
   font-size: 0.95rem;
   opacity: 1;
 }
@@ -331,19 +327,19 @@
   border-radius: 0.65rem;
   border: 1px solid var(--profile-border);
   background: var(--profile-surface);
-  color: var(--profile-text-primary);
+  color: var(--spark-text-primary);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
 .my-profile-panel__link:hover {
-  border-color: rgba(15, 111, 124, 0.45);
-  color: var(--profile-text-heading);
+  border-color: rgba(30, 79, 79, 0.45);
+  color: var(--spark-text-accent);
   background: #fff;
 }
 
 .my-profile-panel__link:focus-visible {
-  outline: 2px solid var(--profile-text-heading);
+  outline: 2px solid var(--spark-text-accent);
   outline-offset: 2px;
 }

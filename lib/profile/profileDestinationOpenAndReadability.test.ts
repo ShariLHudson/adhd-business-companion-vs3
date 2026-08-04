@@ -77,11 +77,16 @@ describe("profile destination open path (113)", () => {
 describe("My Profile dark text readability (113)", () => {
   const css = read("app/companion/my-profile-panel.css");
 
-  it("owns dark profile text tokens", () => {
-    expect(css).toContain("--profile-text-primary: #2e2e2e");
-    expect(css).toContain("--profile-text-secondary: #454545");
-    expect(css).toContain("--profile-text-heading: #0f6f7c");
-    expect(css).toContain("--profile-text-muted: #5f5f5f");
+  it("resolves text color through the shared Spark tokens, not its own duplicate palette", () => {
+    // The --profile-text-* custom properties were removed and reconciled
+    // with the shared app-wide tokens (app/globals.css) — see
+    // lib/profile/profileTextReadabilityTokens.test.ts for the full
+    // reconciliation coverage.
+    expect(css).not.toContain("--profile-text-primary");
+    expect(css).not.toContain("--profile-text-secondary");
+    expect(css).not.toContain("--profile-text-heading");
+    expect(css).not.toContain("--profile-text-muted");
+    expect(css).toContain("color: var(--spark-text-primary)");
   });
 
   it("does not force near-white text on profile surfaces", () => {
@@ -99,10 +104,10 @@ describe("My Profile dark text readability (113)", () => {
     expect(css).toContain(".my-profile-panel__link");
     expect(css).toContain(".my-profile-panel__section-title");
     expect(css).toMatch(
-      /\.my-profile-panel__field span\s*\{[\s\S]*?color:\s*var\(--profile-text-secondary\)/,
+      /\.my-profile-panel__field span\s*\{[\s\S]*?color:\s*var\(--spark-text-secondary\)/,
     );
     expect(css).toMatch(
-      /\.my-profile-panel__field input[\s\S]*?color:\s*var\(--profile-text-primary\)/,
+      /\.my-profile-panel__field input[\s\S]*?color:\s*var\(--spark-text-primary\)/,
     );
   });
 });
